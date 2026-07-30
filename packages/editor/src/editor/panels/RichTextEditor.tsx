@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import { ColorField } from "../../shared/forms";
-import { Cluster, Popover } from "@/editor/ui";
+import { Popover } from "@/editor/ui";
 import { BK_SELECT_BASE_THEME } from "@/editor/ui/selectTheme";
 import { Button, Select, Tooltip, TextInput } from "flowbite-react";
 import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
@@ -116,8 +116,8 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
   ];
 
   return (
-    <Cluster
-      gap="xs"
+    <div
+      className="tw:flex tw:flex-wrap tw:items-center tw:gap-1"
       style={{
         padding: 8,
         background: "var(--bk-bg-panel)",
@@ -298,7 +298,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
           ✕
         </Button>
       </Tooltip>
-    </Cluster>
+    </div>
   );
 };
 

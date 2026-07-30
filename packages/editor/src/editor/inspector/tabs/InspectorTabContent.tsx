@@ -44,8 +44,9 @@ import {
   type TabId,
 } from "../sections/registry";
 import type { SectionTier } from "../shared/controls";
-import { HelperText, Stack } from "@/editor/ui";
-import { Button } from "flowbite-react";
+import { Stack } from "@/editor/ui";
+import { BK_HELPER_CLASS } from "@/editor/ui/labelTheme";
+import { Button, HelperText } from "flowbite-react";
 
 // ============================================================================
 // TYPES
@@ -235,7 +236,7 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
           a permission (so this is a "hidden", not a "locked", affordance). */}
       {density === "fewer" && visibleIds.length > renderIds.length && (
         <Stack gap="sm" separator>
-          <HelperText>
+          <HelperText className={BK_HELPER_CLASS}>
             Simplified view — {visibleIds.length - renderIds.length} more control
             {visibleIds.length - renderIds.length === 1 ? "" : "s"} hidden. It&apos;s a preference, not a limit.
           </HelperText>

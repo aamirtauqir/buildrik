@@ -5,8 +5,9 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import React from "react";
-import { FormField, Tag, Popover, Menu, MenuItem, MenuGroup, MenuLabel, Cluster, HelperText } from "../index";
-import { Button } from "flowbite-react";
+import { FormField, Popover, Menu, MenuItem, MenuGroup, MenuLabel } from "../index";
+import { Button, Label, HelperText } from "flowbite-react";
+import { BK_LABEL_CLASS, BK_HELPER_CLASS, BK_HELPER_ERROR_CLASS } from "../labelTheme";
 
 describe("FormField", () => {
   it("wires label, hint and control together", () => {
@@ -34,16 +35,7 @@ describe("FormField", () => {
 
   it("marks required fields", () => {
     const { container } = render(<FormField label="Name" required>{(p) => <input {...p} />}</FormField>);
-    expect(container.querySelector(".bk-label__required")).toBeTruthy();
-  });
-});
-
-describe("Tag", () => {
-  it("names what its remove button removes", () => {
-    const onRemove = vi.fn();
-    render(<Tag onRemove={onRemove}>Pricing</Tag>);
-    fireEvent.click(screen.getByRole("button", { name: "Remove Pricing" }));
-    expect(onRemove).toHaveBeenCalled();
+    expect(container.querySelector('label [aria-hidden="true"]')?.textContent).toBe("*");
   });
 });
 
@@ -147,14 +139,33 @@ describe("Menu", () => {
   });
 });
 
-describe("Cluster / HelperText", () => {
-  it("render their modifiers", () => {
-    const { container } = render(
-      <Cluster justify="between">
-        <HelperText error>bad</HelperText>
-      </Cluster>,
+describe("Label / HelperText overrides (labelTheme.ts)", () => {
+  // Positive assertions on the resolved className — flowbite's own Label/
+  // HelperText no longer need a contract test here (that's testing the
+  // library, not our code); this only verifies OUR override strings survive
+  // flowbite's twMerge and land on the real element.
+  it("BK_LABEL_CLASS lands on the real <label>", () => {
+    render(<Label htmlFor="x" className={BK_LABEL_CLASS}>Title</Label>);
+    const label = screen.getByText("Title");
+    expect(label.className).toMatch(/tw:text-gray-600/);
+    expect(label.className).not.toMatch(/\btext-gray-900\b/);
+  });
+
+  it("BK_HELPER_CLASS neutralizes flowbite's default top margin", () => {
+    render(<HelperText className={BK_HELPER_CLASS}>hint</HelperText>);
+    const helper = screen.getByText("hint");
+    expect(helper.className).toMatch(/tw:mt-0/);
+    expect(helper.className).not.toMatch(/\bmt-2\b/);
+  });
+
+  it("BK_HELPER_ERROR_CLASS evicts flowbite's default red for the exact --bk-error-text match", () => {
+    render(
+      <HelperText color="failure" className={BK_HELPER_ERROR_CLASS}>
+        bad
+      </HelperText>,
     );
-    expect(container.querySelector(".bk-cluster--between")).toBeTruthy();
-    expect(container.querySelector(".bk-helper--error")).toBeTruthy();
+    const helper = screen.getByText("bad");
+    expect(helper.className).toMatch(/tw:text-\[var\(--bk-error-text\)\]/);
+    expect(helper.className).not.toMatch(/\btext-red-600\b/);
   });
 });

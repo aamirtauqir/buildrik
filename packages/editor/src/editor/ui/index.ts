@@ -22,6 +22,7 @@ export { FormatRow, type FormatRowProps } from "./FormatRow";
 export { IntegrationRow, type IntegrationRowProps, type IntegrationStatus } from "./IntegrationRow";
 export { CommentRow, type CommentRowProps } from "./CommentRow";
 export { FieldRow, type FieldRowProps } from "./FieldRow";
+export { FormField, type FormFieldProps } from "./FormField";
 export { NavItem, type NavItemProps } from "./NavItem";
 export { SectionHeader, type SectionHeaderProps } from "./SectionHeader";
 export { PanelHeader, type PanelHeaderProps } from "./PanelHeader";
@@ -62,7 +63,6 @@ export {
   ModalRoot, ModalContent, ModalTitle, ModalDescription, ModalBody, ModalFooter, ModalClose,
   type ModalContentProps, type ModalSize,
 } from "./ModalParts";
-export { Cluster, Label, HelperText, FormField, Tag, type ClusterProps, type LabelProps, type HelperTextProps, type FormFieldProps, type TagProps } from "./Field";
 export { Popover, Menu, MenuItem, MenuGroup, MenuLabel, MenuSeparator } from "./Popover";
 export type { PopoverProps, PopoverPlacement, MenuProps, MenuItemProps } from "./Popover";
 export { SaveStatus, type SaveStatusProps, type SaveState } from "./SaveStatus";

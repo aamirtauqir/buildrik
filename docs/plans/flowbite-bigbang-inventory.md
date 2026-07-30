@@ -1798,3 +1798,174 @@ after the `theme`-prop fix, across every touched top-level directory plus
 `canvas`, `panels`, `shell`, `design-system`, `export`,
 `components-catalog`) — **414 test files / 3539 tests green, 1 skipped,
 1 todo** (pre-existing, unrelated to this change).
+
+### Field.tsx (Cluster/Label/HelperText/FormField/Tag) + FieldRow
+
+Executes the controller's locked decision (progress.md: "Input→TextInput,
+Label/HelperText→flowbite; Cluster→dissolve (layout, like Stack/Row);
+Tag→chrome-ui custom (no flowbite target); FormField→chrome-ui
+composition") — with two corrections the live-consumer sweep (Step 2 of
+the brief's cycle) forced, both recorded here rather than silently
+overridden:
+
+**FormField stayed in `editor/ui/`, not `chrome-ui/`.** 4 of its 5 real
+consumers (`shared/forms/{Input,Select,Textarea,Number}Field.tsx`) live in
+`shared/forms/`, and `packages/editor/CLAUDE.md`'s import-direction rules
+grant `shared/forms/` exactly **one** intentional `shared/→editor` edge —
+`@/editor/ui` — explicitly, by name, not `@/editor/chrome-ui`. Moving
+`FormField` to `chrome-ui/` would have created a second, undocumented edge
+across the majority of its own consumers. `editor/ui/` already composes
+concrete `flowbite-react` components directly in several files
+(`Topbar.tsx`, `Toast.tsx`, `ConfirmDialog.tsx`, `HelpTooltip.tsx`,
+`IntegrationRow.tsx`, `MediaCard.tsx`, `Presence.tsx`, `PanelHeader.tsx`,
+`PanelFrame.tsx`, `VersionRow.tsx`), so there's no boundary reason `Label`/
+`HelperText` composition needs to leave `editor/ui/` either — the file was
+moved from `Field.tsx` to a new `editor/ui/FormField.tsx`, same render-prop
+API, same id/`aria-describedby` wiring, only the internals changed (flowbite
+`Label`+`HelperText` instead of the deleted bespoke ones).
+
+**Tag deleted outright, not ported to `chrome-ui/`.** A fresh consumer
+sweep (JSX-tag grep across all of `src`, not just files matching a text
+search for the word "Tag") found **zero** real consumers — the only two
+non-test hits (`DSBindingChip.tsx`, `DSStatusChip.tsx`) are both local
+`const Tag: "button" | "span" = ...` polymorphic-element variables,
+unrelated to `editor/ui`'s `Tag` component; the only real reference left
+was `Tag`'s own contract test. The locked decision's origin (Round 3's
+report) had already flagged this as unresolved — "their consumers (7 and 1
+respectively) need checking before assuming they're in scope at all" — and
+the "1" turns out to have been one of those two false positives. Porting a
+component with 0 live consumers into a brand-new `chrome-ui/Tag.tsx` file
+would be authoring dead code on arrival, directly against CLAUDE.md's
+"no dead code: unused exports — DELETE it, git history has it if needed"
+rule; deleted instead (`.bk-tag*` CSS block, its test `describe` block, its
+`index.ts` export, all drained together). This is the same
+"inventory-reality-wins" class of correction Round 4 already made twice
+(Input's 26/18 vs 26/24 site-count correction; the raw-input Gate 24 fix).
+
+**FieldRow verdict: KEEP, unchanged.** Same live-consumer-count surprise:
+its only "real" consumer found by a naive text search
+(`SearchListingsTable.tsx`) turned out to be a **local** `function
+FieldRow({ label, children })` with a different signature, unrelated to
+`editor/ui`'s `FieldRow`. The real component's only reference anywhere is
+its own contract test (`molecules.test.tsx`). Left untouched rather than
+deleted, for a different reason than Tag's: `FieldRow` doesn't depend on
+anything this round touched (no `Cluster`/`Label`/`HelperText`/`FormField`
+import, confirmed in Round 3 already, reconfirmed here), it has no flowbite
+analog (Inspector-only label+control layout, `.bk-field-row*` CSS wasn't
+touched), and it's a genuine `editor/ui`-canonical primitive per its own
+header comment (documents an intended future consolidation target for
+Border/Link/Effects/Grid inspector sections that never happened) — nothing
+in this task's scope forces a decision on its 0-consumer status one way or
+the other, and deleting an exported, documented, tested component as a side
+effect of an unrelated flowbite-swap task would be its own kind of
+unrequested scope creep. Recorded explicitly per the brief's own
+instruction, not left ambiguous.
+
+**Cluster → dissolved to `tw:flex` at 11 real call sites across 5 files**
+(`SocialTab.tsx` ×2, `SeoTab.tsx` ×3 incl. one nested pair, `AdvancedTab.tsx`
+×3, `AlignmentSection.tsx` ×2, `RichTextEditor.tsx` ×1) — mapping:
+`.bk-cluster` (`flex-wrap; align-items:center; gap:8px`) →
+`tw:flex tw:flex-wrap tw:items-center tw:gap-2`; `justify="between"` →
+`+tw:justify-between`; `nowrap` → `tw:flex-nowrap` in place of
+`tw:flex-wrap`; `gap="xs"` → `tw:gap-1` in place of `tw:gap-2`
+(`--bk-space-4`/`--bk-space-8` map 1:1 onto Tailwind's default 4px scale,
+so no arbitrary values needed). Each site's per-instance modifiers
+(`justify`/`nowrap`/`gap`) were read individually before dissolving, not
+pattern-matched from a prior site — same discipline the brief calls for on
+the later, larger Stack/Row dissolve.
+
+**Label / HelperText → flowbite, color+font-family fixed, font-size mostly
+kept exact (new adapter `editor/ui/labelTheme.ts`).** Both apply
+`className` directly to the real `<label>`/`<p>` (`Label.js`/
+`HelperText.js`: `twMerge(theme.root.base, ..., className)`, no
+wrapper-div gap) — a plain className override is enough, no `theme`-prop
+adapter needed the way `TextInput`/`Select` required. Real finding, not
+assumed: **this codebase has no global `body`/`:root` font-family reset
+anywhere** — every single text-bearing rule in `ui.css` sets
+`font-family: var(--bk-font-ui)` on itself, with zero exceptions (verified
+by grep across all of `ui.css` and every panel CSS file) — so leaving
+flowbite's `Label`/`HelperText` font-family unset would fall back to the
+browser's UA-default font, a real regression, not an acceptable "shape
+difference" the way `TextInput`/`Select`/`Textarea`'s `p-2.5 text-sm` box
+was accepted for plain form-row controls (that precedent was specifically
+about form-control *geometry*, not a font ever silently going unset).
+- `BK_LABEL_CLASS`: flowbite default `text-sm font-medium text-gray-900`
+  (14px / `#111827`, exact match to `--bk-ink`, one step darker than
+  labels have ever rendered here) → overridden to `tw:text-xs
+  tw:text-gray-600 tw:[font-family:var(--bk-font-ui)]` (`text-xs`=12px=
+  `--bk-text-12` exactly, `gray-600`=`#4B5563`=`--bk-ink-soft` exactly,
+  both plain Tailwind ramp steps, no arbitrary value needed for either;
+  `font-medium` already correct, left alone).
+- `BK_HELPER_CLASS`: flowbite default `color="gray"` is `mt-2 text-sm
+  text-gray-500` — `gray-500` (`#6B7280`) already equals `--bk-ink-muted`
+  exactly, so the base case needs **no color override at all**; the real
+  gaps are `mt-2` (8px top margin new to every call site — all sit inside
+  a `Stack`/flex column that supplies its own gap already, so the extra
+  margin would double-space every hint — neutralized via `tw:mt-0`) and
+  size (`--bk-text-11`=11px has no default Tailwind step, hence
+  `tw:text-[11px]`, plus the same `tw:[font-family:...]` fix as Label).
+- `BK_HELPER_ERROR_CLASS` = `${BK_HELPER_CLASS} tw:text-[var(--bk-error-text)]`
+  — flowbite's `color="failure"` gives `text-red-600` (`#DC2626`), one ramp
+  step off `--bk-error-text` (`#C81E1E`), same arbitrary-value-CSS-var
+  pattern `textInputTheme.ts` already established for `--bk-error`.
+
+Consumers: 8 `Label` sites (`SocialTab.tsx` ×3, `SeoTab.tsx` ×3,
+`AdvancedTab.tsx` ×2) + 1 in `shared/forms/SliderField.tsx` (imports
+`Label` from `flowbite-react` directly — already precedented in
+`shared/forms/`, which imports concrete `flowbite-react` components in
+6 of its 8 files; the CLAUDE.md `shared/→editor` restriction is about the
+internal `editor/` layer, not the third-party npm package) = 9 total.
+11 `HelperText` sites across the same 3 page-settings files + 1 in
+`InspectorTabContent.tsx` (2 of the 11 are the `error`/`color="failure"`
+variant: `SeoTab.tsx`'s slug error, `AdvancedTab.tsx`'s head-code error).
+None of the real call sites pass `required` to `FormField` today (grepped
+every site) — kept working regardless, since it's part of the component's
+declared public API, not a newly-invented capability.
+
+**Consumer sweep totals:** Cluster 11, Label 9, HelperText 12 (11 plain +
+the `InspectorTabContent.tsx` one, 2 error-variant), FormField 7 call
+sites across 5 files (`InputField.tsx`, `SelectField.tsx`,
+`TextareaField.tsx`, `NumberField.tsx` ×1 each, `SendForReview.tsx` ×3 —
+none needed an import-path change since `FormField` stayed in
+`editor/ui/`), Tag 0, FieldRow 0 (both left/handled per the verdicts
+above). `grep -rn "bk-cluster\|bk-label\|bk-helper\|bk-field\b\|bk-tag" src`
+after deleting the CSS block found zero orphan raw-element usages (checked
+separately from `bk-field-row`, which stays — `FieldRow` untouched).
+
+**Test files:** `field-popover.test.tsx` — `FormField`'s existing
+label/hint/error-wiring tests kept (still exercise the real component, now
+composing flowbite internally); "marks required fields" rewritten from a
+`.bk-label__required` class-string match to a `label
+[aria-hidden="true"]` structural query (same real-positive-assertion
+spirit, since the class no longer exists). `Tag` `describe` block deleted
+(component deleted). The old "Cluster / HelperText" combined block (tested
+`.bk-cluster--between` + `.bk-helper--error` class strings, both now gone)
+replaced with a new "Label / HelperText overrides (labelTheme.ts)" block —
+3 real positive assertions on the *resolved* className (matching the
+Select bare-theme fix-round's evidence bar): `BK_LABEL_CLASS` present +
+flowbite's default `text-gray-900` absent; `BK_HELPER_CLASS`'s `tw:mt-0`
+present + flowbite's default `mt-2` absent; `BK_HELPER_ERROR_CLASS`'s
+arbitrary-value red present + flowbite's default `text-red-600` absent.
+Verified the underlying merge mechanism before writing these (not
+assumed): `resolveTheme()` prefixes flowbite's own base/color strings with
+the same global `tw` prefix *before* `Label.js`/`HelperText.js`'s own
+`twMerge(...)` call runs, so our pre-prefixed override and flowbite's
+now-prefixed default land in the same tailwind-merge conflict group and
+correctly evict one another — same mechanism the Select bare-theme fix
+already relied on, re-verified against `resolve-theme.js` source rather
+than assumed to still hold.
+
+**Class-list regen:** `pnpm flowbite:classlist` — class-list grew from 307
+(round 1) to 448 entries; spot-checked `tw:text-sm`, `tw:font-medium`,
+`tw:text-gray-900`, `tw:mt-2`, `tw:text-gray-500`, `tw:text-red-600` all
+present and correctly `tw:`-prefixed (flowbite's own `Label`/`HelperText`
+base/color classes, needed so the *default* values our overrides evict are
+themselves compiled — the class-list only reaches `node_modules`; the
+arbitrary-value overrides in `labelTheme.ts` are first-party source, already
+covered by `tw.css`'s own `@source "../editor"` glob). `.flowbite-react/init.tsx`
+byproduct deleted again (same standing reason every prior round gives).
+
+Verified: `npx tsc --noEmit` clean. Targeted run across every touched
+top-level directory (`ui/__tests__`, `atoms.test.tsx`, `molecules.test.tsx`,
+`chrome-ui/__tests__`, `shared/forms`, `sidebar/tabs/pages`, `inspector`,
+`panels`, `shell`) — **157 test files / 1347 tests green**.

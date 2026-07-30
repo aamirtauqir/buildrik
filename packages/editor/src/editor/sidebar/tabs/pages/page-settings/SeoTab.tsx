@@ -8,12 +8,13 @@
  */
 
 import * as React from "react";
-import { Cluster, HelperText, Label, Stack } from "@/editor/ui";
+import { Stack } from "@/editor/ui";
 import { generateContent } from "@/shared/utils/openai";
 import type { PageItem } from "../types";
 import type { UsePageSettingsReturn } from "./usePageSettings";
-import { Button, Textarea, TextInput, Tooltip } from "flowbite-react";
+import { Button, HelperText, Label, Textarea, TextInput, Tooltip } from "flowbite-react";
 import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
+import { BK_LABEL_CLASS, BK_HELPER_CLASS, BK_HELPER_ERROR_CLASS } from "@/editor/ui/labelTheme";
 
 interface Props {
   s: UsePageSettingsReturn;
@@ -136,12 +137,12 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
       )}
       {/* ── 3. TITLE ────────────────────────────────────────────────────── */}
       <Stack gap="xs" style={{ gap: 6 }}>
-        <Cluster justify="between">
-          <Label htmlFor="seo-title">Title</Label>
+        <div className="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
+          <Label htmlFor="seo-title" className={BK_LABEL_CLASS}>Title</Label>
           <span style={{ font: "500 10.5px var(--bk-font-mono)", color: range === "ok" || range === "ideal" ? "var(--bk-success)" : range === "short" ? "var(--bk-warning)" : "var(--bk-error)" }}>
             {s.seoTitle.length}/60{rangeLabel[range]}
           </span>
-        </Cluster>
+        </div>
         {s.seoTitle.length < 10 && (
           <Button
             color="light"
@@ -166,14 +167,14 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
           maxLength={60}
           aria-describedby="seo-title-hint"
         />
-        <HelperText>Aim for 50–60 characters for best Google ranking</HelperText>
+        <HelperText className={BK_HELPER_CLASS}>Aim for 50–60 characters for best Google ranking</HelperText>
       </Stack>
       {/* ── 4. META DESCRIPTION ─────────────────────────────────────────── */}
       <Stack gap="xs" style={{ gap: 6 }}>
-        <Cluster justify="between">
+        <div className="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
           {/* label + info icon in a flex row — button must NOT be inside <label> (HTML spec) */}
-          <Cluster>
-            <Label htmlFor="seo-desc">Meta Description</Label>
+          <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+            <Label htmlFor="seo-desc" className={BK_LABEL_CLASS}>Meta Description</Label>
             <Tooltip
               content="A short summary of your page shown in Google search results (keep under 160 characters)"
               placement="bottom"
@@ -194,11 +195,11 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
                 </svg>
               </Button>
             </Tooltip>
-          </Cluster>
+          </div>
           <span style={{ font: "500 10.5px var(--bk-font-mono)", color: s.seoDesc.length > 160 ? "var(--bk-error)" : s.seoDesc.length > 50 ? "var(--bk-success)" : "var(--bk-ink-muted)" }}>
             {s.seoDesc.length}/160
           </span>
-        </Cluster>
+        </div>
         <Textarea
           className="tw:bg-white tw:focus:border-primary-700 tw:focus:ring-primary-700"
           id="seo-desc"
@@ -208,11 +209,11 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
           placeholder='E.g. "We help small businesses build professional websites. Start free today."'
           aria-describedby="seo-desc-hint"
         />
-        <HelperText>Briefly describe this page (150–160 chars). Appears in Google results below your title.</HelperText>
+        <HelperText className={BK_HELPER_CLASS}>Briefly describe this page (150–160 chars). Appears in Google results below your title.</HelperText>
       </Stack>
       {/* ── 5. URL SLUG ─────────────────────────────────────────────────── */}
       <Stack gap="xs" style={{ gap: 6 }}>
-        <Label htmlFor="seo-slug">URL Slug</Label>
+        <Label htmlFor="seo-slug" className={BK_LABEL_CLASS}>URL Slug</Label>
         <div style={{ display: "flex", alignItems: "stretch" }}>
           <span style={{ display: "inline-flex", alignItems: "center", padding: "0 var(--bk-space-8)", border: "1px solid var(--bk-border)", borderRight: 0, borderRadius: "4px 0 0 4px", background: "var(--bk-bg-subtle)", color: "var(--bk-ink-soft)", font: "500 11px var(--bk-font-mono)" }}>
             {domain}/
@@ -242,9 +243,9 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
           </div>
         )}
         {s.slugError ? (
-          <HelperText error>{s.slugError}</HelperText>
+          <HelperText color="failure" className={BK_HELPER_ERROR_CLASS}>{s.slugError}</HelperText>
         ) : (
-          <HelperText>Lowercase letters, numbers, and hyphens only — auto-formatted as you type</HelperText>
+          <HelperText className={BK_HELPER_CLASS}>Lowercase letters, numbers, and hyphens only — auto-formatted as you type</HelperText>
         )}
       </Stack>
     </Stack>

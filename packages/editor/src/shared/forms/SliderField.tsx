@@ -8,7 +8,9 @@
  */
 
 import * as React from "react";
-import { Label, Slider } from "@/editor/ui";
+import { Slider } from "@/editor/ui";
+import { BK_LABEL_CLASS } from "@/editor/ui/labelTheme";
+import { Label } from "flowbite-react";
 
 export interface SliderFieldProps {
   label?: string;
@@ -54,7 +56,7 @@ export const SliderField: React.FC<SliderFieldProps> = ({
 
   return (
     <div>
-      <Label htmlFor={sliderId}>{label}</Label>
+      <Label htmlFor={sliderId} className={BK_LABEL_CLASS}>{label}</Label>
       {slider}
     </div>
   );

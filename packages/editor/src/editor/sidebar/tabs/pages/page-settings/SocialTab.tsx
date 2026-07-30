@@ -5,11 +5,12 @@
  */
 
 import * as React from "react";
-import { Cluster, HelperText, Label, Stack } from "@/editor/ui";
-import { Textarea, TextInput } from "flowbite-react";
+import { Stack } from "@/editor/ui";
+import { HelperText, Label, Textarea, TextInput } from "flowbite-react";
 import type { PageItem } from "../types";
 import type { UsePageSettingsReturn } from "./usePageSettings";
 import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
+import { BK_LABEL_CLASS, BK_HELPER_CLASS } from "@/editor/ui/labelTheme";
 
 interface Props {
   s: UsePageSettingsReturn;
@@ -40,24 +41,24 @@ export const SocialTab: React.FC<Props> = ({ s, page }) => {
       </div>
       {/* OG Title */}
       <Stack gap="xs" style={{ gap: 6 }}>
-        <Cluster justify="between">
-          <Label htmlFor="og-title">Open Graph Title</Label>
+        <div className="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
+          <Label htmlFor="og-title" className={BK_LABEL_CLASS}>Open Graph Title</Label>
           <span style={{ font: "500 10.5px var(--bk-font-mono)", color: "var(--bk-ink-muted)" }}>{s.ogTitle.length}/60</span>
-        </Cluster>
+        </div>
         <TextInput theme={BK_TEXT_INPUT_THEME}
           id="og-title"
           value={s.ogTitle}
           onChange={(e) => s.setOgTitle(e.target.value)}
           placeholder={s.seoTitle || page.name}
         />
-        <HelperText>Title shown when the page is shared on social networks. Defaults to SEO title.</HelperText>
+        <HelperText className={BK_HELPER_CLASS}>Title shown when the page is shared on social networks. Defaults to SEO title.</HelperText>
       </Stack>
       {/* OG Description */}
       <Stack gap="xs" style={{ gap: 6 }}>
-        <Cluster justify="between">
-          <Label htmlFor="og-desc">Open Graph Description</Label>
+        <div className="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
+          <Label htmlFor="og-desc" className={BK_LABEL_CLASS}>Open Graph Description</Label>
           <span style={{ font: "500 10.5px var(--bk-font-mono)", color: "var(--bk-ink-muted)" }}>{s.ogDesc.length}/160</span>
-        </Cluster>
+        </div>
         <Textarea
           className="tw:bg-white tw:focus:border-primary-700 tw:focus:ring-primary-700"
           id="og-desc"
@@ -68,7 +69,7 @@ export const SocialTab: React.FC<Props> = ({ s, page }) => {
       </Stack>
       {/* OG Image URL */}
       <Stack gap="xs" style={{ gap: 6 }}>
-        <Label htmlFor="og-image">Image URL</Label>
+        <Label htmlFor="og-image" className={BK_LABEL_CLASS}>Image URL</Label>
         <TextInput theme={BK_TEXT_INPUT_THEME}
           id="og-image"
           value={s.ogImageUrl ?? ""}
@@ -76,7 +77,7 @@ export const SocialTab: React.FC<Props> = ({ s, page }) => {
           placeholder="https://…"
           type="url"
         />
-        <HelperText>Recommended size: 1200×630. Appears in Facebook, Twitter/X, LinkedIn previews.</HelperText>
+        <HelperText className={BK_HELPER_CLASS}>Recommended size: 1200×630. Appears in Facebook, Twitter/X, LinkedIn previews.</HelperText>
       </Stack>
     </Stack>
   );

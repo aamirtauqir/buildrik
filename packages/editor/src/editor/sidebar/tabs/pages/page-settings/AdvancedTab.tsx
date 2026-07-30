@@ -5,10 +5,11 @@
  */
 
 import * as React from "react";
-import { Cluster, HelperText, Label, Stack } from "@/editor/ui";
+import { Stack } from "@/editor/ui";
 import type { UsePageSettingsReturn } from "./usePageSettings";
-import { Button, Textarea, ToggleSwitch, TextInput } from "flowbite-react";
+import { Button, HelperText, Label, Textarea, ToggleSwitch, TextInput } from "flowbite-react";
 import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
+import { BK_LABEL_CLASS, BK_HELPER_CLASS, BK_HELPER_ERROR_CLASS } from "@/editor/ui/labelTheme";
 
 interface Props {
   s: UsePageSettingsReturn;
@@ -48,7 +49,7 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
             </Button>
           ))}
         </div>
-        <HelperText>
+        <HelperText className={BK_HELPER_CLASS}>
           {s.visibility === "live" && "Page is publicly accessible."}
           {s.visibility === "hidden" && "Page is not linked in menus but reachable via direct URL."}
           {s.visibility === "password" && "Visitors must enter a password to view this page."}
@@ -57,7 +58,7 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
       {/* Password input — only when visibility=password */}
       {s.visibility === "password" && (
         <div style={{ padding: 10, background: "var(--bk-bg-subtle)", border: "1px solid var(--bk-border)", borderRadius: 4, display: "flex", flexDirection: "column", gap: "var(--bk-space-8)" }}>
-          <Cluster nowrap>
+          <div className="tw:flex tw:flex-nowrap tw:items-center tw:gap-2">
             <TextInput theme={BK_TEXT_INPUT_THEME}
               type={s.showPassword ? "text" : "password"}
               value={s.password}
@@ -72,8 +73,8 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
             <Button color="light" size="xs" onClick={() => s.copyPassword()} aria-label="Copy password" disabled={!s.password}>
               Copy
             </Button>
-          </Cluster>
-          <HelperText>Share this password with visitors who need access.</HelperText>
+          </div>
+          <HelperText className={BK_HELPER_CLASS}>Share this password with visitors who need access.</HelperText>
         </div>
       )}
       {/* Indexing */}
@@ -81,20 +82,20 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
         <div style={{ font: "600 11px var(--bk-font-ui)", color: "var(--bk-ink)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
           Search Engine Indexing
         </div>
-        <Cluster justify="between" nowrap>
+        <div className="tw:flex tw:flex-nowrap tw:items-center tw:justify-between tw:gap-2">
           <Stack gap="xs">
-            <Label>Allow indexing</Label>
-            <HelperText>Let search engines list this page in results.</HelperText>
+            <Label className={BK_LABEL_CLASS}>Allow indexing</Label>
+            <HelperText className={BK_HELPER_CLASS}>Let search engines list this page in results.</HelperText>
           </Stack>
           <ToggleSwitch checked={s.allowIndex} onChange={() => s.setAllowIndex(!s.allowIndex)} aria-label="Allow indexing" />
-        </Cluster>
-        <Cluster justify="between" nowrap>
+        </div>
+        <div className="tw:flex tw:flex-nowrap tw:items-center tw:justify-between tw:gap-2">
           <Stack gap="xs">
-            <Label>Follow links</Label>
-            <HelperText>Let search engines follow outbound links on this page.</HelperText>
+            <Label className={BK_LABEL_CLASS}>Follow links</Label>
+            <HelperText className={BK_HELPER_CLASS}>Let search engines follow outbound links on this page.</HelperText>
           </Stack>
           <ToggleSwitch checked={s.allowFollow} onChange={() => s.setAllowFollow(!s.allowFollow)} aria-label="Follow links" />
-        </Cluster>
+        </div>
       </Stack>
       {/* Head code */}
       <Stack gap="sm">
@@ -111,8 +112,8 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
           aria-label="Custom head code"
           style={{ minHeight: 100, fontFamily: "var(--bk-font-mono)", fontSize: "11.5px", lineHeight: 1.4 }}
         />
-        {s.headCodeError && <HelperText error>{s.headCodeError}</HelperText>}
-        <HelperText>Injected into the &lt;head&gt; of this page only. Sanitized before save.</HelperText>
+        {s.headCodeError && <HelperText color="failure" className={BK_HELPER_ERROR_CLASS}>{s.headCodeError}</HelperText>}
+        <HelperText className={BK_HELPER_CLASS}>Injected into the &lt;head&gt; of this page only. Sanitized before save.</HelperText>
       </Stack>
     </Stack>
   );
