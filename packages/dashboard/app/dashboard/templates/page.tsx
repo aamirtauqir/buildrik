@@ -10,7 +10,7 @@ import { LoadingSkeleton, ErrorState, StateEmpty } from "@/components/states";
 import { TemplateFilterRail } from "@/components/templates/template-filter-rail";
 import { paginationRange } from "@/components/templates/pagination-range";
 import { DIFFICULTY_PILL } from "@/components/templates/difficulty";
-import { Pill } from "@/components/dashboard/primitives";
+import { InputField, Pill } from "@/components/dashboard/primitives";
 import {
   type TemplateFilters,
   templateFiltersFromParams,
@@ -72,17 +72,14 @@ function TemplatesBrowserInner() {
         <h1 className="text-[19px] font-[680] tracking-tight" style={{ color: "var(--color-text-primary)" }}>
           Templates
         </h1>
-        <div className="ml-auto flex h-9 w-[280px] items-center gap-2 rounded-lg border px-3"
-          style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}>
-          <Search className="h-4 w-4" style={{ color: "var(--color-text-muted)" }} />
-          <input
-            value={filters.search}
-            onChange={(e) => applyFilters({ search: e.target.value, page: 1 })}
-            placeholder="Search templates…"
-            className="w-full bg-transparent text-[13px] outline-none"
-            style={{ color: "var(--color-text-primary)" }}
-          />
-        </div>
+        <InputField
+          wrapperClassName="ml-auto w-[280px]"
+          leading={<Search className="h-4 w-4" />}
+          value={filters.search}
+          onChange={(e) => applyFilters({ search: e.target.value, page: 1 })}
+          placeholder="Search templates…"
+          aria-label="Search templates"
+        />
       </div>
 
       <div className="flex gap-8">
