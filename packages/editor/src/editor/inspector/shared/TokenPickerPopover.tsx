@@ -20,7 +20,8 @@
  */
 
 import * as React from "react";
-import { Button, Input, Stack } from "@/editor/ui";
+import { Input, Stack } from "@/editor/ui";
+import { Button } from "flowbite-react";
 
 // ============================================================================
 // TYPES

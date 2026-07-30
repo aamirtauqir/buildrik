@@ -6,11 +6,11 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import { createBuildrikApiClient } from "@/services/api-client";
 import { Field, Input, Screen, Section, Select } from "../shared";
 import type { ScreenProps } from "../types";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
+import { Button } from "flowbite-react";
 
 interface Redirect {
   id: string;
@@ -212,7 +212,7 @@ export const RedirectsScreen: React.FC<ScreenProps> = ({
           {submitError && (
             <div role="alert" style={errorStyles}>{submitError}</div>
           )}
-          <Button type="submit" kind="primary" disabled={submitting} style={addButtonStyles}>
+          <Button type="submit" disabled={submitting} style={addButtonStyles}>
             {submitting ? "Adding…" : "Add redirect"}
           </Button>
         </form>
@@ -238,12 +238,12 @@ export const RedirectsScreen: React.FC<ScreenProps> = ({
                 <div style={metaColStyles}>
                   <span style={typeBadgeStyles}>{r.type}</span>
                   <Button
-                    kind="ghost"
-                    size="sm"
+                    color="light"
+                    size="xs"
                     type="button"
                     onClick={() => handleDelete(r.id)}
                     aria-label={`Delete redirect from ${r.fromPath}`}
-                    style={{ color: "var(--bk-error)" }}
+                    style={{ color: "var(--bk-error)" }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
                   >
                     Delete
                   </Button>

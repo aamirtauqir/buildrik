@@ -15,8 +15,9 @@
  */
 
 import * as React from "react";
-import { Button, Input, Stack } from "@/editor/ui";
+import { Input, Stack } from "@/editor/ui";
 import { CANVAS_COLORS, PANEL_STYLE, Z_INDEX } from "../shared";
+import { Button } from "flowbite-react";
 
 // =============================================================================
 // TYPES

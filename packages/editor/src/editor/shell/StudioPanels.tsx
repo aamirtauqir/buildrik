@@ -9,7 +9,6 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import type { Composer } from "../../engine";
 import type { UsePublishJobResult } from "./hooks/usePublishJob";
 import { EVENTS } from "../../shared/constants/events";
@@ -30,6 +29,7 @@ import { StarterGalleryMount } from "@/editor/design-system/ui/StarterGalleryMou
 import { useBlockInsertion } from "./hooks/useBlockInsertion";
 import { useAltTextAutoTrigger } from "./hooks/useAltTextAutoTrigger";
 import { PageTabBar } from "./PageTabBar";
+import { Button } from "flowbite-react";
 
 // ============================================================================
 // TYPES

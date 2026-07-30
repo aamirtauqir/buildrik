@@ -4,8 +4,9 @@
  */
 
 import * as React from "react";
-import { Button, Input, Tooltip } from "@/editor/ui";
+import { Input, Tooltip } from "@/editor/ui";
 import { ZOOM_PRESETS } from "./shared";
+import { Button } from "flowbite-react";
 
 export interface ZoomControlsProps {
   zoom: number;
@@ -47,11 +48,11 @@ export const ZoomControls: React.FC<ZoomControlsProps> = ({
     <div style={containerStyles}>
       <Tooltip label="Zoom Out">
         <Button
-          kind="ghost"
-          size="sm"
+          color="light"
+          size="xs"
           aria-label="Zoom Out"
           onClick={handleZoomOut}
-          disabled={zoom <= minZoom}
+          disabled={zoom <= minZoom} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
         ><ZoomOutIcon /></Button>
       </Tooltip>
       <div style={sliderContainerStyles}>
@@ -66,19 +67,19 @@ export const ZoomControls: React.FC<ZoomControlsProps> = ({
       </div>
       <Tooltip label="Zoom In">
         <Button
-          kind="ghost"
-          size="sm"
+          color="light"
+          size="xs"
           aria-label="Zoom In"
           onClick={handleZoomIn}
-          disabled={zoom >= maxZoom}
+          disabled={zoom >= maxZoom} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
         ><ZoomInIcon /></Button>
       </Tooltip>
       <div style={dividerStyles} />
       <Button
-        kind="ghost"
+        color="light"
         onClick={() => setShowPresets(!showPresets)}
         style={percentButtonStyles}
-        title="Zoom presets"
+        title="Zoom presets" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
       >
         {Math.round(zoom)}%
       </Button>
@@ -87,10 +88,10 @@ export const ZoomControls: React.FC<ZoomControlsProps> = ({
           <div style={dividerStyles} />
           <Tooltip label="Fit to Screen">
             <Button
-              kind="ghost"
-              size="sm"
+              color="light"
+              size="xs"
               aria-label="Fit to Screen"
-              onClick={onFitToScreen}
+              onClick={onFitToScreen} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
             ><FitIcon /></Button>
           </Tooltip>
         </>
@@ -100,12 +101,12 @@ export const ZoomControls: React.FC<ZoomControlsProps> = ({
           {ZOOM_PRESETS.map((preset) => (
             <Button
               key={preset}
-              kind="ghost"
+              color="light"
               onClick={() => handlePresetSelect(preset)}
               style={{
                 ...presetItemStyles,
                 background: zoom === preset ? "var(--bk-accent)" : "transparent",
-              }}
+              }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
             >
               {preset}%
             </Button>

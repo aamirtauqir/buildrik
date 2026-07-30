@@ -4,13 +4,14 @@
  */
 
 import * as React from "react";
-import { Button, Input } from "@/editor/ui";
+import { Input } from "@/editor/ui";
 import { HelpTooltip } from "@/editor/ui";
 import { InputRow } from "../../shared/controls";
 import { baseStyles } from "../../shared/controls/controlStyles";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
 import { PositionPreview } from "./previews";
 import { cardBtn, positionOffsetContainerStyle, positionOffsetBoxStyle } from "./styles";
+import { Button } from "flowbite-react";
 
 // ============================================================================
 // TYPES

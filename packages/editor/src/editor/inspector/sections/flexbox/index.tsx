@@ -4,7 +4,6 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import { Section, baseStyles, type SectionTier } from "../../shared/controls";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
 import { AlignmentSection } from "./AlignmentSection";
@@ -12,6 +11,7 @@ import { DirectionControls } from "./DirectionControls";
 import { EnableFlexPrompt } from "./EnableFlexPrompt";
 import { FlexItemControls } from "./FlexItemControls";
 import { GapControls } from "./GapControls";
+import { Button } from "flowbite-react";
 
 // ============================================================================
 // TYPES

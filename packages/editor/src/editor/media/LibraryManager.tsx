@@ -10,7 +10,7 @@
  */
 
 import * as React from "react";
-import { Button, Input } from "@/editor/ui";
+import { Input } from "@/editor/ui";
 import {
   Upload, Plus, X, Search, FolderOpen, Download, AlertCircle,
 } from "lucide-react";
@@ -32,6 +32,7 @@ import { formatBytes } from "@shared/utils/helpers/number";
 import { generateAltTextRemote } from "../../services/AltTextService";
 import { DEFAULT_MODEL } from "@buildrik/shared/schemas/ai";
 import "./LibraryManager.css";
+import { Button } from "flowbite-react";
 
 interface LibraryManagerProps {
   composer: Composer;

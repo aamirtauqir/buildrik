@@ -6,7 +6,7 @@
  */
 
 import * as React from "react";
-import { Button, Input, ModalContent, ModalRoot } from "@/editor/ui";
+import { Input, ModalContent, ModalRoot } from "@/editor/ui";
 import { getBlockById, insertBlock } from "../../../blocks/blockRegistry";
 import type { Composer } from "../../../engine";
 import type { BlockData } from "../../../shared/types";
@@ -15,6 +15,7 @@ import { devLogger } from "../../../shared/utils/devLogger";
 import { runTransaction } from "../../../shared/utils/helpers";
 import { canNestElement } from "../../../shared/utils/nesting";
 import { ElementsTab } from "../../sidebar/tabs/ElementsTab";
+import { Button } from "flowbite-react";
 
 export interface BlockPickerModalProps {
   composer: Composer;

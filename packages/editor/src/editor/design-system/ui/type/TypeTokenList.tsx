@@ -5,10 +5,11 @@
  */
 
 import * as React from "react";
-import { Button, Input, Select } from "@/editor/ui";
+import { Input, Select } from "@/editor/ui";
 import type { ResponsiveMode } from "../../state/useTypeTokens";
 import type { DesignToken } from "../../types";
 import { TokenUsageChip } from "../sections/TokenUsageChip";
+import { Button } from "flowbite-react";
 
 export interface TypeTokenListProps {
   tokens: DesignToken[];
@@ -65,8 +66,8 @@ const StyleToggle: React.FC<{
   fontStyle?: React.CSSProperties;
 }> = ({ label, active, onToggle, fontStyle }) => (
   <Button
-    kind="ghost"
-    size="sm"
+    color="light"
+    size="xs"
     onClick={onToggle}
     aria-pressed={active}
     style={{
@@ -85,7 +86,7 @@ const StyleToggle: React.FC<{
       cursor: "pointer",
       ...fontStyle,
     }}
-    title={`Toggle ${label}`}
+    title={`Toggle ${label}`} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
   >
     {label}
   </Button>
@@ -239,8 +240,8 @@ const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
       {/* Undo button */}
       {canUndo && (
         <Button
-          kind="ghost"
-          size="sm"
+          color="light"
+          size="xs"
           onClick={() => onUndo(token.id)}
           title="Undo"
           style={{
@@ -251,7 +252,7 @@ const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
             color: "var(--bk-warning)",
             fontSize: 13,
             flexShrink: 0,
-          }}
+          }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
         >
           ↩
         </Button>
@@ -260,8 +261,8 @@ const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
       {/* Redo button */}
       {canRedo && (
         <Button
-          kind="ghost"
-          size="sm"
+          color="light"
+          size="xs"
           onClick={() => onRedo(token.id)}
           title="Redo"
           style={{
@@ -272,7 +273,7 @@ const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
             color: "var(--bk-accent)",
             fontSize: 13,
             flexShrink: 0,
-          }}
+          }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
         >
           ↪
         </Button>
@@ -516,8 +517,8 @@ export const TypeTokenList: React.FC<TypeTokenListProps> = ({
         title="Preview only — font sizes scale automatically for mobile. You cannot set separate mobile values here."
       >
         <Button
-          kind="ghost"
-          size="sm"
+          color="light"
+          size="xs"
           onClick={() => onResponsiveModeChange("desktop")}
           title="Desktop preview"
           style={{
@@ -532,14 +533,14 @@ export const TypeTokenList: React.FC<TypeTokenListProps> = ({
             color: responsiveMode === "desktop" ? "var(--bk-accent)" : "var(--bk-ink-muted)",
             fontSize: 12,
             cursor: "pointer",
-          }}
+          }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
         >
           <DesktopIcon />
           Desktop preview
         </Button>
         <Button
-          kind="ghost"
-          size="sm"
+          color="light"
+          size="xs"
           onClick={() => onResponsiveModeChange("mobile")}
           title="Mobile preview"
           style={{
@@ -554,7 +555,7 @@ export const TypeTokenList: React.FC<TypeTokenListProps> = ({
             color: responsiveMode === "mobile" ? "var(--bk-accent)" : "var(--bk-ink-muted)",
             fontSize: 12,
             cursor: "pointer",
-          }}
+          }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
         >
           <MobileIcon />
           Mobile preview (85%)

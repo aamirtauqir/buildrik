@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { Button, Input, PanelFrame, useToast } from "@/editor/ui";
+import { Input, PanelFrame, useToast } from "@/editor/ui";
 import { Search, X } from "lucide-react";
 import type { Composer } from "../../../../engine";
 import { DrillInHeader } from "../../shared/DrillInHeader";
@@ -28,6 +28,7 @@ import { snapshotFromComputedStyle } from "./utils/tokenSnapshot";
 import { DEFAULT_TOKENS } from "../../../design-system/constants";
 import { ApplyProgressOverlay } from "./ApplyProgressOverlay";
 import "./TemplatesTab.css";
+import { Button } from "flowbite-react";
 
 // Re-export for external consumers
 export type { TemplateItem, RecentTemplate } from "./templatesData";

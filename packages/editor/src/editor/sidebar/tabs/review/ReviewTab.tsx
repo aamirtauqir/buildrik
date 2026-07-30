@@ -18,7 +18,7 @@
 
 import * as React from "react";
 import { AlertCircle, CheckCircle2, ChevronLeft, History } from "lucide-react";
-import { Badge, Button, ConfirmDialog, PanelHeader, Spinner, Textarea, Toggle } from "@/editor/ui";
+import { Badge, ConfirmDialog, PanelHeader, Spinner, Textarea, Toggle } from "@/editor/ui";
 import { ApprovedCompareView } from "@/editor/panels/version-history/ApprovedCompareView";
 import type { PublishPage } from "@/editor/shell/exportPublishPages";
 import {
@@ -32,6 +32,7 @@ import {
   type CurrentRound,
   type ReviewComment,
 } from "../../../../services/ReviewService";
+import { Button } from "flowbite-react";
 
 /** Review's own status words onto Badge kinds. Named, not inlined, so a new
  *  status shows up as a type error instead of silently rendering neutral. */
@@ -287,7 +288,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
           <AlertCircle size={24} aria-hidden="true" />
           <div style={S.centerTitle}>Couldn't load the review</div>
           <div style={S.centerHint}>The dashboard didn't answer. Your feedback is safe — this is just the panel.</div>
-          <Button kind="secondary" size="sm" onClick={() => void load()}>Retry</Button>
+          <Button color="light" size="xs" onClick={() => void load()}>Retry</Button>
         </div>
       </div>
     );
@@ -310,7 +311,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
     return (
       <div style={S.body}>
         <div style={S.compareBar}>
-          <Button kind="ghost" size="sm" onClick={() => setCompareOpen(false)}>
+          <Button color="light" size="xs" onClick={() => setCompareOpen(false)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
             <ChevronLeft size={14} aria-hidden="true" /> Back
           </Button>
           <span style={S.who}>Compare with approved</span>
@@ -322,7 +323,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
             <AlertCircle size={24} aria-hidden="true" />
             <div style={S.centerTitle}>Couldn't load the approved snapshot</div>
             <div style={S.centerHint}>The dashboard didn't answer. Try again.</div>
-            <Button kind="secondary" size="sm" onClick={() => void openCompare()}>Retry</Button>
+            <Button color="light" size="xs" onClick={() => void openCompare()}>Retry</Button>
           </div>
         ) : (
           <ApprovedCompareView
@@ -359,18 +360,18 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
           </div>
           <div style={S.actions}>
             {round.status === "APPROVED" && onExportCurrentPages && (
-              <Button kind="ghost" size="sm" onClick={() => void openCompare()}>
+              <Button color="light" size="xs" onClick={() => void openCompare()} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                 <History size={14} aria-hidden="true" /> Compare
               </Button>
             )}
-            <Button kind="primary" size="sm" loading={resending} onClick={() => void doResend()}>Re-send</Button>
+            <Button size="xs" disabled={resending} onClick={() => void doResend()} aria-busy={resending || undefined}>Re-send</Button>
             <div style={S.more}>
-              <Button kind="ghost" size="sm" aria-label="More options" onClick={() => setMoreOpen((v) => !v)}>⋯</Button>
+              <Button color="light" size="xs" aria-label="More options" onClick={() => setMoreOpen((v) => !v)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">⋯</Button>
               {moreOpen && (
                 <div style={S.menu} role="menu">
                   <Button
-                    kind="destructive"
-                    size="sm"
+                    color="red"
+                    size="xs"
                     onClick={() => { setConfirmRevoke(true); setMoreOpen(false); }}
                   >
                     Revoke link
@@ -424,13 +425,13 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
                   <div style={S.text}>{c.body}</div>
                   <div style={S.actions}>
                     <Button
-                      kind="ghost"
-                      size="sm"
-                      onClick={() => composer?.emit("comments:reattach-start", { id: c.id })}
+                      color="light"
+                      size="xs"
+                      onClick={() => composer?.emit("comments:reattach-start", { id: c.id })} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
                     >
                       Reattach
                     </Button>
-                    <Button kind="ghost" size="sm" onClick={() => void onResolve(c)}>
+                    <Button color="light" size="xs" onClick={() => void onResolve(c)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                       {c.status === "RESOLVED" ? "Reopen" : "Resolve"}
                     </Button>
                   </div>
@@ -457,7 +458,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
                     </div>
                     <div style={S.text}>{c.body}</div>
                     <div style={S.actions}>
-                      <Button kind="ghost" size="sm" onClick={() => void onResolve(c)}>
+                      <Button color="light" size="xs" onClick={() => void onResolve(c)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                         {c.status === "RESOLVED" ? "Reopen" : "Resolve"}
                       </Button>
                     </div>
@@ -481,7 +482,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
         {replyError && <span style={S.meta}>Couldn't send that reply. Try again.</span>}
         <div style={S.headRow}>
           <span style={S.meta}>Replies are internal notes on the thread.</span>
-          <Button kind="primary" size="sm" loading={sending} disabled={!draft.trim()} onClick={() => void send()}>Send</Button>
+          <Button size="xs" disabled={!draft.trim() || sending} onClick={() => void send()} aria-busy={sending || undefined}>Send</Button>
         </div>
       </div>
 

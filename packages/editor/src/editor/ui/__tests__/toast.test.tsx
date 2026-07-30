@@ -5,7 +5,8 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, act } from "@testing-library/react";
 import React from "react";
-import { ToastProvider, useToast, Button } from "../index";
+import { ToastProvider, useToast } from "../index";
+import { Button } from "flowbite-react";
 
 function Harness({ onReady }: { onReady?: (api: ReturnType<typeof useToast>) => void }) {
   const api = useToast();

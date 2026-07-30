@@ -4,8 +4,9 @@
  */
 
 import * as React from "react";
-import { Button, Input } from "@/editor/ui";
+import { Input } from "@/editor/ui";
 import { generateColorTokenId } from "../../utils/exportUtils";
+import { Button } from "flowbite-react";
 
 export interface AddTokenModalProps {
   existingIds: string[];
@@ -153,7 +154,7 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
 
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 16 }}>
           <Button
-            kind="secondary"
+            color="light"
             onClick={onClose}
             style={{
               padding: "7px 14px",
@@ -168,7 +169,6 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
             Cancel
           </Button>
           <Button
-            kind="primary"
             onClick={handleAdd}
             style={{
               padding: "7px 14px",

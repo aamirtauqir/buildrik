@@ -14,10 +14,11 @@
  */
 
 import * as React from "react";
-import { Button, Input } from "@/editor/ui";
+import { Input } from "@/editor/ui";
 import type { Composer } from "../../../../../engine";
 import type { PageItem } from "../types";
 import { getStatusLabel } from "../utils/statusLabel";
+import { Button } from "flowbite-react";
 
 interface Props {
   page: PageItem;

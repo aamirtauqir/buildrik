@@ -20,11 +20,12 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button, ModalContent, ModalDescription, ModalFooter, ModalRoot, ModalTitle, Textarea } from "@/editor/ui";
+import { ModalContent, ModalDescription, ModalFooter, ModalRoot, ModalTitle, Textarea } from "@/editor/ui";
 import type {
   AIAssistService,
   ComponentSchema,
 } from "../../../engine/designSystem/services/AIAssistService";
+import { Button } from "flowbite-react";
 
 type ModalState =
   | { kind: "idle" }
@@ -189,30 +190,30 @@ export const AIPromptModal: React.FC<AIPromptModalProps> = ({
         <ModalFooter style={{ padding: "16px 28px", borderTop: "1px solid var(--bk-border)" }}>
           {state.kind === "idle" && (
             <>
-              <Button kind="ghost" size="sm" type="button" onClick={() => onOpenChange(false)}>
+              <Button color="light" size="xs" type="button" onClick={() => onOpenChange(false)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                 Cancel
               </Button>
-              <Button kind="primary" size="sm" type="button" onClick={handleGenerate}>
+              <Button size="xs" type="button" onClick={handleGenerate}>
                 Generate
               </Button>
             </>
           )}
 
           {isGenerating && (
-            <Button kind="ghost" size="sm" type="button" onClick={handleCancelGeneration}>
+            <Button color="light" size="xs" type="button" onClick={handleCancelGeneration} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
               Cancel generation
             </Button>
           )}
 
           {showSuccess && (
             <>
-              <Button kind="ghost" size="sm" type="button" onClick={handleDiscard}>
+              <Button color="light" size="xs" type="button" onClick={handleDiscard} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                 Discard
               </Button>
-              <Button kind="ghost" size="sm" type="button" onClick={handleGenerate}>
+              <Button color="light" size="xs" type="button" onClick={handleGenerate} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                 Retry
               </Button>
-              <Button kind="primary" size="sm" type="button" onClick={handleAccept}>
+              <Button size="xs" type="button" onClick={handleAccept}>
                 Accept
               </Button>
             </>
@@ -220,10 +221,10 @@ export const AIPromptModal: React.FC<AIPromptModalProps> = ({
 
           {state.kind === "error" && (
             <>
-              <Button kind="ghost" size="sm" type="button" onClick={() => onOpenChange(false)}>
+              <Button color="light" size="xs" type="button" onClick={() => onOpenChange(false)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                 Cancel
               </Button>
-              <Button kind="primary" size="sm" type="button" onClick={handleGenerate}>
+              <Button size="xs" type="button" onClick={handleGenerate}>
                 Retry
               </Button>
             </>

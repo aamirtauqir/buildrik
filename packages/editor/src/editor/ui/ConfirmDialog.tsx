@@ -10,7 +10,7 @@
  */
 import React from "react";
 import { Modal } from "./Modal";
-import { Button } from "./Button";
+import { Button } from "flowbite-react";
 
 export interface ConfirmDialogProps {
   open: boolean;
@@ -37,10 +37,21 @@ export function ConfirmDialog({
       dismissOnScrimClick={!destructive}
       footer={
         <>
-          <Button kind="ghost" size="sm" onClick={onClose}>
+          <Button
+            color="light"
+            size="xs"
+            onClick={onClose}
+            className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+          >
             {cancelLabel}
           </Button>
-          <Button kind={destructive ? "destructive" : "primary"} size="sm" loading={busy} onClick={onConfirm}>
+          <Button
+            color={destructive ? "red" : undefined}
+            size="xs"
+            disabled={busy}
+            aria-busy={busy || undefined}
+            onClick={onConfirm}
+          >
             {confirmLabel}
           </Button>
         </>

@@ -9,7 +9,6 @@
 
 import * as React from "react";
 import {
-  Button,
   EmptyState,
   EmptyStateActions,
   EmptyStateDesc,
@@ -24,6 +23,7 @@ import { AddPageButton } from "./AddPageButton";
 import { BulkToolbar } from "./BulkToolbar";
 import { PageFolder } from "./PageFolder";
 import { PageRow } from "./PageRow";
+import { Button } from "flowbite-react";
 
 interface Props {
   pages: PageItem[];
@@ -124,11 +124,11 @@ export const PageList: React.FC<Props> = ({
             <EmptyStateTitle>No pages yet</EmptyStateTitle>
             <EmptyStateDesc>Add your first page to get started. Pages are the screens visitors see.</EmptyStateDesc>
             <EmptyStateActions>
-              <Button kind="primary" size="sm" onClick={onAddPage}>
+              <Button size="xs" onClick={onAddPage}>
                 Create blank page
               </Button>
               {onRequestTemplates && (
-                <Button kind="ghost" size="sm" onClick={onRequestTemplates}>
+                <Button color="light" size="xs" onClick={onRequestTemplates} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                   From template
                 </Button>
               )}
@@ -215,7 +215,7 @@ export const PageList: React.FC<Props> = ({
           <EmptyState size="compact">
             <EmptyStateTitle>No pages match &ldquo;{search}&rdquo;</EmptyStateTitle>
             <EmptyStateActions>
-              <Button kind="ghost" size="sm" onClick={() => setSearch("")}>
+              <Button color="light" size="xs" onClick={() => setSearch("")} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                 Clear search
               </Button>
             </EmptyStateActions>

@@ -9,9 +9,9 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import { createPortal } from "react-dom";
 import "./ApplyProgressOverlay.css";
+import { Button } from "flowbite-react";
 
 export interface ApplyProgressOverlayProps {
   templateName: string;

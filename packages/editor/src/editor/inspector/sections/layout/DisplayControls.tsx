@@ -1,4 +1,3 @@
-import { Button } from "@/editor/ui";
 /**
  * Display Controls - Display mode selection with visual previews
  * @license BSD-3-Clause
@@ -9,6 +8,7 @@ import { HelpTooltip } from "@/editor/ui";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
 import { DisplayPreview } from "./previews";
 import { cardBtn, tipBoxStyle } from "./styles";
+import { Button } from "flowbite-react";
 
 // ============================================================================
 // TYPES

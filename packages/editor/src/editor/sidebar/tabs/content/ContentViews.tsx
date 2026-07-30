@@ -8,11 +8,12 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button, Checkbox, ConfirmDialog, Input, Select, Textarea, Toggle } from "@/editor/ui";
+import { Checkbox, ConfirmDialog, Input, Select, Textarea, Toggle } from "@/editor/ui";
 import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
 import type { ConditionExpression, ConditionOperator, DataSource } from "@/shared/types/data";
 import { conditionSummary, fieldDefault, isValidVariableKey, type SiteVariable } from "./contentPanelUtils";
 import type { ConditionRow } from "./useContentPanel";
+import { Button } from "flowbite-react";
 
 export const S: Record<string, React.CSSProperties> = {
   body: { display: "flex", flexDirection: "column", height: "100%", minHeight: 0 },
@@ -171,7 +172,7 @@ export function RootView({
       <div style={S.center} data-testid="content-empty">
         <div>Collections turn a spreadsheet into pages — one page per row, updated when the data changes.</div>
         {onCreateCollection && (
-          <Button kind="primary" size="sm" onClick={onCreateCollection}>
+          <Button size="xs" onClick={onCreateCollection}>
             Create a collection
           </Button>
         )}
@@ -378,12 +379,11 @@ export function RecordView({
         <div style={S.savebar} role="region" aria-label="Unsaved changes">
           <span style={{ fontSize: 12, color: "var(--bk-warning-text)" }}>Unsaved changes</span>
           <span style={{ flex: 1 }} />
-          <Button kind="ghost" size="sm" onClick={() => { setData(initial); setPublished(record?.status === "published"); }}>
+          <Button color="light" size="xs" onClick={() => { setData(initial); setPublished(record?.status === "published"); }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
             Discard
           </Button>
           <Button
-            kind="primary"
-            size="sm"
+            size="xs"
             disabled={saving}
             onClick={() => {
               setSaving(true);
@@ -432,10 +432,10 @@ export function FieldsView({
             <span style={S.rowMeta}>
               {f.validation?.required && <span style={{ color: "var(--bk-ink-muted)" }}>required</span>}
               <Button
-                kind="ghost"
-                size="sm"
+                color="light"
+                size="xs"
                 aria-label={`Delete field ${f.name}`}
-                onClick={() => setConfirmDelete(f)}
+                onClick={() => setConfirmDelete(f)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
               >
                 ✕
               </Button>
@@ -466,10 +466,9 @@ export function FieldsView({
                 <span>required</span>
               </label>
               <span style={{ flex: 1 }} />
-              <Button kind="ghost" size="sm" onClick={() => setAdding(false)}>Cancel</Button>
+              <Button color="light" size="xs" onClick={() => setAdding(false)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">Cancel</Button>
               <Button
-                kind="primary"
-                size="sm"
+                size="xs"
                 disabled={!name.trim()}
                 onClick={() => {
                   void onAddField(name, type, required).then(() => {
@@ -547,10 +546,9 @@ export function SourcesView({
             {error && <div style={{ fontSize: 12, color: "var(--bk-error)" }} role="alert">{error}</div>}
             <div style={S.formRow}>
               <span style={{ flex: 1 }} />
-              <Button kind="ghost" size="sm" onClick={() => { setAdding(false); setError(null); }}>Cancel</Button>
+              <Button color="light" size="xs" onClick={() => { setAdding(false); setError(null); }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">Cancel</Button>
               <Button
-                kind="primary"
-                size="sm"
+                size="xs"
                 disabled={!json.trim()}
                 onClick={() => {
                   const err = onImportJson(json);
@@ -626,21 +624,21 @@ export function VariablesView({
             <span style={S.rowMeta}>
               {editKey === v.key ? (
                 <Button
-                  kind="ghost"
-                  size="sm"
+                  color="light"
+                  size="xs"
                   onClick={() => {
                     onChange(variables.map((x) => (x.key === v.key ? { ...x, value: editValue } : x)));
                     setEditKey(null);
-                  }}
+                  }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
                 >
                   Save
                 </Button>
               ) : (
                 <>
-                  <Button kind="ghost" size="sm" aria-label={`Edit ${v.key}`} onClick={() => { setEditKey(v.key); setEditValue(v.value); }}>
+                  <Button color="light" size="xs" aria-label={`Edit ${v.key}`} onClick={() => { setEditKey(v.key); setEditValue(v.value); }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                     Edit
                   </Button>
-                  <Button kind="ghost" size="sm" aria-label={`Delete ${v.key}`} onClick={() => onChange(variables.filter((x) => x.key !== v.key))}>
+                  <Button color="light" size="xs" aria-label={`Delete ${v.key}`} onClick={() => onChange(variables.filter((x) => x.key !== v.key))} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                     ✕
                   </Button>
                 </>
@@ -672,10 +670,9 @@ export function VariablesView({
             />
             <div style={S.formRow}>
               <span style={{ flex: 1 }} />
-              <Button kind="ghost" size="sm" onClick={() => setAdding(false)}>Cancel</Button>
+              <Button color="light" size="xs" onClick={() => setAdding(false)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">Cancel</Button>
               <Button
-                kind="primary"
-                size="sm"
+                size="xs"
                 disabled={!key.trim() || keyError || dupError}
                 onClick={() => {
                   onChange([...variables, { key: key.trim(), value }]);
@@ -737,10 +734,10 @@ export function ConditionsView({
               <span style={S.sub}>{conditionSummary(c.binding)}</span>
             </span>
             <span style={S.rowMeta}>
-              <Button kind="ghost" size="sm" onClick={() => onSelectElement(c.elementId)}>
+              <Button color="light" size="xs" onClick={() => onSelectElement(c.elementId)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                 Select
               </Button>
-              <Button kind="ghost" size="sm" aria-label="Remove condition" onClick={() => onRemove(c.elementId)}>
+              <Button color="light" size="xs" aria-label="Remove condition" onClick={() => onRemove(c.elementId)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                 ✕
               </Button>
             </span>
@@ -785,10 +782,9 @@ export function ConditionsView({
             </div>
             <div style={S.formRow}>
               <span style={{ flex: 1 }} />
-              <Button kind="ghost" size="sm" onClick={onCancelPick}>Cancel</Button>
+              <Button color="light" size="xs" onClick={onCancelPick} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">Cancel</Button>
               <Button
-                kind="primary"
-                size="sm"
+                size="xs"
                 disabled={!left.trim() || (needsRight && !right.trim())}
                 onClick={() =>
                   onCreate({

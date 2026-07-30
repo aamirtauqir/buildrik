@@ -5,7 +5,8 @@
  */
 
 import * as React from "react";
-import { Button, Input, ModalClose, ModalContent, ModalRoot, ModalTitle, Portal, Stack } from "@/editor/ui";
+import { Input, ModalClose, ModalContent, ModalRoot, ModalTitle, Portal, Stack } from "@/editor/ui";
+import { Button } from "flowbite-react";
 
 // ============================================================================
 // TYPES
@@ -404,7 +405,7 @@ export const VideoPreview: React.FC<VideoPreviewProps> = (props) => {
                   marginTop: 16,
                 }}
               >
-                <Button kind="ghost" onClick={props.onClose}>
+                <Button color="light" onClick={props.onClose} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                   Close
                 </Button>
               </div>

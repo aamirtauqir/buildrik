@@ -10,8 +10,8 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import { Z_LAYERS } from "@/shared/constants/canvas";
+import { Button } from "flowbite-react";
 
 interface PreviewOverlayProps {
   /** Sanitized page HTML. null → overlay hidden. */
@@ -58,8 +58,7 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({ html, onDone }) 
         style={{ flex: 1, width: "100%", border: "none", background: "#fff" }}
       />
       <Button
-        kind="primary"
-        size="sm"
+        size="xs"
         onClick={onDone}
         style={{
           position: "absolute",

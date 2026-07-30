@@ -20,13 +20,14 @@
  */
 
 import * as React from "react";
-import { Button, Input } from "@/editor/ui";
+import { Input } from "@/editor/ui";
 import type { DesignToken, TokenDiff } from "../../types";
 import { calcWcagLevel, calcContrastRatio } from "../../utils/colorUtils";
 import { suggestContrastFix } from "../../utils/contrastFix";
 import { TokenRow } from "../sections/TokenRow";
 import type { LintIssue } from "../../../../engine/designSystem/LintState";
 import type { Composer } from "../../../../engine/Composer";
+import { Button } from "flowbite-react";
 
 export interface ColorTokenListProps {
   tokens: DesignToken[];
@@ -325,8 +326,8 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
         </div>
         <Button
           type="button"
-          kind="secondary"
-          size="sm"
+          color="light"
+          size="xs"
           onClick={() => setFilterMode("all")}
           style={{
             padding: "4px 10px",
@@ -344,8 +345,8 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
         </Button>
         <Button
           type="button"
-          kind="secondary"
-          size="sm"
+          color="light"
+          size="xs"
           onClick={() => setFilterMode("issues")}
           style={{
             padding: "4px 10px",
@@ -368,8 +369,8 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
       {resolvedMode === "dark" && missingDarkCount > 0 && (
         <Button
           type="button"
-          kind="ghost"
-          size="sm"
+          color="light"
+          size="xs"
           onClick={handleDarkMissingClick}
           data-dark-missing-chip
           style={{
@@ -386,7 +387,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
             fontWeight: 500,
             cursor: "pointer",
             alignSelf: "flex-start",
-          }}
+          }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
         >
           <span aria-hidden="true">⚠</span>
           <span>
@@ -420,8 +421,8 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
             {Object.keys(contrastFixes).length > 0 && (
               <Button
                 type="button"
-                kind="secondary"
-                size="sm"
+                color="light"
+                size="xs"
                 onClick={applyAllFixes}
                 style={{
                   padding: "3px 10px",
@@ -535,8 +536,8 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
                       <code style={{ fontSize: 11 }}>{fix}</code>
                       <Button
                         type="button"
-                        kind="secondary"
-                        size="sm"
+                        color="light"
+                        size="xs"
                         onClick={() => onColorChange(t.id, fix)}
                         style={{
                           marginLeft: "auto",
@@ -563,7 +564,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
       {/* Add token */}
       <Button
         type="button"
-        kind="ghost"
+        color="light"
         onClick={onAddToken}
         style={{
           marginTop: 16,
@@ -575,7 +576,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
           color: "var(--bk-ink-muted)",
           fontSize: 12,
           cursor: "pointer",
-        }}
+        }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
       >
         + Add token
       </Button>

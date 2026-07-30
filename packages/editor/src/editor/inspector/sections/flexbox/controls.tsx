@@ -5,7 +5,8 @@
  */
 
 import * as React from "react";
-import { Button, Input } from "@/editor/ui";
+import { Input } from "@/editor/ui";
+import { Button } from "flowbite-react";
 
 // ============================================================================
 // ALIGNMENT GRID - 9-dot visual alignment picker

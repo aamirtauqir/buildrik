@@ -10,7 +10,6 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import type { PresetCategory, StylePreset } from "../../types";
 import {
   useButtonPresets,
@@ -28,6 +27,7 @@ import {
 } from "../../state/StylePresetRegistryContext";
 import { StyleCategoryRow } from "./StyleCategoryRow";
 import { PresetDetailPane } from "./PresetDetailPane";
+import { Button } from "flowbite-react";
 
 type View =
   | { kind: "list" }
@@ -105,8 +105,8 @@ export const StylesRouter: React.FC = () => {
       >
         <Button
           type="button"
-          kind="ghost"
-          size="sm"
+          color="light"
+          size="xs"
           onClick={() => setView({ kind: "list" })}
           style={{
             padding: "6px 12px",
@@ -119,7 +119,7 @@ export const StylesRouter: React.FC = () => {
             display: "flex",
             alignItems: "center",
             gap: 4,
-          }}
+          }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
         >
           ← Back to styles
         </Button>

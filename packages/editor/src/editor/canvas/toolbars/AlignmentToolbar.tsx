@@ -5,10 +5,10 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import type { Composer } from "../../../engine";
 import { AlignmentHandler } from "../../../engine/canvas/AlignmentHandler";
 import { canvasTokens } from "../../../styles/tokens";
+import { Button } from "flowbite-react";
 
 // ============================================================================
 // TYPES

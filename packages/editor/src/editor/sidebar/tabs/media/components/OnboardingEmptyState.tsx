@@ -5,12 +5,13 @@
  */
 
 import * as React from "react";
-import { Button, Input } from "@/editor/ui";
+import { Input } from "@/editor/ui";
 import { useRef } from "react";
 import { Upload } from "lucide-react";
 import { SUPPORTED_FORMATS_LABEL } from "../../../../../shared/constants/media";
 import { EMPTY_MSGS } from "../data/mediaData";
 import type { MediaTypeFilter } from "../data/mediaTypes";
+import { Button } from "flowbite-react";
 
 interface OnboardingEmptyStateProps {
   activeType: MediaTypeFilter;

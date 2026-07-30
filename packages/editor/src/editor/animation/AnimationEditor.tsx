@@ -8,7 +8,8 @@ import * as React from "react";
 import { SelectField, NumberField, SliderField } from "../../shared/forms";
 import type { AnimationConfig } from "../../shared/types/animations";
 import { DEFAULT_ANIMATION } from "../../shared/types/animations";
-import { Button, Tabs, Stack } from "@/editor/ui";
+import { Tabs, Stack } from "@/editor/ui";
+import { Button } from "flowbite-react";
 
 // Re-export for backwards compatibility
 export type { AnimationConfig } from "../../shared/types/animations";
@@ -191,7 +192,7 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
       <div style={{ marginTop: 24 }}>
         <Button onClick={onPreview} style={{
           width: "100%"
-        }} kind="secondary">
+        }} color="light">
           ▶️ Preview Animation
         </Button>
       </div>

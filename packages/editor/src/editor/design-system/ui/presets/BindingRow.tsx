@@ -14,9 +14,9 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import type { DesignToken } from "../../types";
 import { TokenPickerPopover, type TokenEntry } from "@/editor/inspector/shared/TokenPickerPopover";
+import { Button } from "flowbite-react";
 
 interface BindingRowProps {
   cssProperty: string;
@@ -102,19 +102,19 @@ export const BindingRow: React.FC<BindingRowProps> = ({
         <span style={labelStyle}>{cssProperty}</span>
         <Button
           type="button"
-          kind="ghost"
-          size="sm"
+          color="light"
+          size="xs"
           aria-label={`Edit binding for ${cssProperty}`}
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
-          style={valueButtonStyle}
+          style={valueButtonStyle} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
         >
           {displayName}
         </Button>
         <Button
           type="button"
-          kind="destructive"
-          size="sm"
+          color="red"
+          size="xs"
           aria-label={`Delete binding for ${cssProperty}`}
           onClick={onDelete}
           style={dangerBtnStyle}

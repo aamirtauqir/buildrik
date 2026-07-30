@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Button } from "@/editor/ui";
+import { Button } from "flowbite-react";
 
 interface SelectionContextBarProps {
   /** Display label for the canvas element requesting media (e.g., "Hero block"). */

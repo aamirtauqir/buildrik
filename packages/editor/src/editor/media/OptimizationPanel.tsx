@@ -8,10 +8,11 @@
  */
 
 import * as React from "react";
-import { Button, Input, Spinner } from "@/editor/ui";
+import { Input, Spinner } from "@/editor/ui";
 import { MediaOptimizer } from "../../engine/media";
 import { formatBytes } from "@shared/utils/helpers/number";
 import type { ImageExportFormat } from "../../shared/types/media";
+import { Button } from "flowbite-react";
 
 // ============================================================================
 // TYPES
@@ -338,7 +339,7 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
       {/* Actions */}
       <div style={styles.footer}>
         {onClose && (
-          <Button kind="ghost" onClick={onClose}>
+          <Button color="light" onClick={onClose} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
             Cancel
           </Button>
         )}

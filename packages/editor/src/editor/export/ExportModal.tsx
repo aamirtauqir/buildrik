@@ -11,7 +11,6 @@ import { ReactExporter } from "../../engine/export/ReactExporter";
 import type { ExportConfig, ExportResult, PreviewDevice } from "../../shared/types/export";
 import { DEFAULT_EXPORT_CONFIG, PREVIEW_DEVICES } from "../../shared/types/export";
 import {
-  Button,
   ModalClose,
   ModalContent,
   ModalRoot,
@@ -27,6 +26,7 @@ import { FormatGrid, OptionsPanel } from "./ExportOptions";
 import { downloadFile } from "./ExportUtils";
 import { formatBytes } from "@shared/utils/helpers/number";
 import { PreviewFrame } from "./PreviewFrame";
+import { Button } from "flowbite-react";
 
 // ============================================================================
 // TYPES
@@ -296,17 +296,17 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
               marginTop: 12,
             }}
           >
-            <Button kind="ghost" onClick={onClose}>
+            <Button color="light" onClick={onClose} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
               Cancel
             </Button>
             <div style={{ display: "flex", gap: 8 }}>
               {config.format !== "react" && config.cssStyle === "external" && (
-                <Button kind="secondary" onClick={handleDownloadCSS} disabled={!result?.css}>
+                <Button color="light" onClick={handleDownloadCSS} disabled={!result?.css}>
                   Download CSS
                 </Button>
               )}
               {config.format !== "react" && (
-                <Button kind="secondary" onClick={handleDownloadAll} disabled={!result?.html}>
+                <Button color="light" onClick={handleDownloadAll} disabled={!result?.html}>
                   Download All
                 </Button>
               )}

@@ -8,11 +8,12 @@
  */
 
 import * as React from "react";
-import { Button, Input, Stack } from "@/editor/ui";
+import { Input, Stack } from "@/editor/ui";
 import type { Composer } from "../../../engine";
 import { EVENTS } from "../../../shared/constants/events";
 import { GROUPED_TABS_CONFIG } from "../../rail/tabsConfig";
 import { getRecentCommandIds, recordCommandRun } from "./commandRecents";
+import { Button } from "flowbite-react";
 
 // =============================================================================
 // TYPES

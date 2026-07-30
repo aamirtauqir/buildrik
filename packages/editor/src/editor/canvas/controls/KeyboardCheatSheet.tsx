@@ -9,8 +9,9 @@
  */
 
 import * as React from "react";
-import { Button, Kbd, ModalContent, ModalRoot, Stack } from "@/editor/ui";
+import { Kbd, ModalContent, ModalRoot, Stack } from "@/editor/ui";
 import { tokens } from "../shared/tokens";
+import { Button } from "flowbite-react";
 
 export interface KeyboardCheatSheetProps {
   isOpen: boolean;

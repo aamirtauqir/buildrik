@@ -5,7 +5,8 @@
 
 import * as React from "react";
 import { InputField, TextareaField, SelectField } from "../shared/forms";
-import { Button, ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/ui";
+import { ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/ui";
+import { Button } from "flowbite-react";
 
 export interface SaveTemplateProps {
   isOpen: boolean;
@@ -89,10 +90,10 @@ export const SaveTemplate: React.FC<SaveTemplateProps> = ({
           justifyContent: "flex-end",
         }}
       >
-        <Button kind="ghost" onClick={onClose}>
+        <Button color="light" onClick={onClose} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
           Cancel
         </Button>
-        <Button onClick={handleSave} loading={saving} disabled={!name.trim()}>
+        <Button onClick={handleSave} disabled={!name.trim() || saving} aria-busy={saving || undefined}>
           Save Template
         </Button>
       </div>

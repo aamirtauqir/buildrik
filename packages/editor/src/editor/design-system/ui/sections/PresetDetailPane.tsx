@@ -11,9 +11,9 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import type { PresetCategory, StylePreset } from "../../types";
 import { PresetBindingRow } from "./PresetBindingRow";
+import { Button } from "flowbite-react";
 
 const CATEGORY_LABELS: Record<PresetCategory, string> = {
   button: "Button",
@@ -156,8 +156,8 @@ export const PresetDetailPane: React.FC<PresetDetailPaneProps> = ({
             <Button
               key={p.variant}
               type="button"
-              kind="ghost"
-              size="sm"
+              color="light"
+              size="xs"
               role="tab"
               aria-selected={isActive}
               data-variant-tab={p.variant}
@@ -175,7 +175,7 @@ export const PresetDetailPane: React.FC<PresetDetailPaneProps> = ({
                 cursor: "pointer",
                 marginBottom: -1,
                 whiteSpace: "nowrap",
-              }}
+              }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
             >
               {p.variant}
             </Button>

@@ -732,3 +732,122 @@ Modal, Dropdown/Menu, Popover, and Toast all move to `chrome-ui/` as kept
 primitives, restyled with Tailwind (`tw:*` utility classes, `ui.css` blocks
 retired) but keeping their current React implementation and behavior
 contracts intact — that move + restyle is Task 5/6 scope, not this task's.
+
+## Task 5 — component swap API mappings
+
+Color-fidelity method: every mapping below was checked against real hex
+values — `src/themes/tokens.generated.css` (our `--bk-*`) vs
+`node_modules/flowbite-react/dist/plugin/tailwindcss/index.css` (flowbite's
+`--primary-*`/`--blue-*`/`--gray-*`/`--red-*`/`--green-*` ramps), not
+eyeballed. Confirmed exact hex matches (post-07-28 Figma rebase to
+`#1A56DB`):
+
+| `--bk-*` token | hex | flowbite ramp step | hex |
+|---|---|---|---|
+| `--bk-accent` | `#1A56DB` | `blue-700` / `primary-700` (default color) | `#1A56DB` |
+| `--bk-accent-hover` | `#1E429F` | `blue-800` | `#1E429F` |
+| `--bk-accent-pressed` | `#233876` | `blue-900` | `#233876` |
+| `--bk-bg-card` | `#FFFFFF` | `light` color's `bg-white` | `#FFFFFF` |
+| `--bk-ink` | `#111827` | `gray-900` | `#111827` |
+| `--bk-ink-soft` | `#4B5563` | `gray-600` | `#4B5563` |
+| `--bk-bg-subtle` | `#F3F4F6` | `gray-100` | `#F3F4F6` |
+| `--bk-border-medium` | `#D1D5DB` | `gray-300` (`light` color's border) | `#D1D5DB` |
+| `--bk-error-text` | `#C81E1E` | `red-700` (`red` color's base bg) | `#C81E1E` |
+| `--bk-success-tint` | `#DEF7EC` | `green-100` | `#DEF7EC` |
+| `--bk-success-text` | `#057A55` | `green-600` | `#057A55` |
+
+### Button → `flowbite-react` `Button`
+
+`src/editor/ui/Button.tsx` (`kind`, `size`, `loading`) →
+`node_modules/flowbite-react/dist/components/Button/Button.d.ts` (`color`,
+`size`, `outline`, `pill`).
+
+| Our prop | Flowbite prop | Notes |
+|---|---|---|
+| `kind="primary"` (default) | *(omit `color`)* | flowbite's own default color (`bg-primary-700`) already **is** `--bk-accent` — exact hex match, zero override needed. |
+| `kind="secondary"` | `color="light"` | `bg-white`/`text-gray-900`/`hover:bg-gray-100` all exact `--bk-*` matches; border resolves to `gray-300` (`--bk-border-medium`, not `--bk-border`) — accepted, still an exact token, just the adjacent step. |
+| `kind="ghost"` | `color="light"` + `className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"` | flowbite has no borderless/transparent color preset; built one from exact-match utilities (`gray-600`=`--bk-ink-soft`, `gray-100` hover bg from the unmodified `light` theme, `gray-900`=`--bk-ink` hover text). `className` merges through flowbite's own `twMerge` call, so this reliably wins over the theme's `border-gray-300 bg-white` regardless of prop order. |
+| `kind="destructive"` | `color="red"` | flowbite's `red` base is `red-700` (`#C81E1E`, exact match to `--bk-error-text`) rather than our old `--bk-error`/`red-600` (`#E02424`) base — one ramp step off; accepted as the closest predefined color rather than a bespoke hex override, since `red-700` is itself one of our real token hex values (just the "text" variant, not "base"). |
+| `size="sm"` | `size="xs"` | brief's own worked example; `xs` (32px) is flowbite's closest compact step. |
+| `size="md"` / omitted | *(omit `size`)* | flowbite's default size is already `"md"`. |
+| `loading={x}` | `disabled={x}` (or `disabled={existingDisabled || x}` if both were present) + `aria-busy={x || undefined}` | flowbite `Button` has no `loading` prop; translated to the same disable-while-busy behavior our `loading` produced, `aria-busy` reproduced explicitly (`|| undefined` so React omits the attribute rather than rendering `aria-busy="false"`, matching the old component's own `loading || undefined`). |
+| `type`, `ref`, `disabled`, `onClick`, `aria-*`, `data-*`, `style`, `className` (non-ghost) | unchanged, pass through | `ButtonBase` (`ButtonBase.js`) spreads all rest props onto the underlying `<button>`/`<a>` and defaults `type="button"` itself — identical default to ours. |
+
+**Cascade-layer finding (load-bearing for every remaining swap, not just
+Button):** `src/themes/default.css` declares `@layer reset, components,
+overrides;` then imports `tw.css` (which declares `@layer tw-theme,
+tw-utilities;`) *before* importing `ui.css` `layer(components)`. Global layer
+order ends up `reset < components < overrides < tw-theme < tw-utilities`.
+Any `ui.css` rule (i.e. anything in the `components` layer, e.g.
+`.bk-topbar__published:disabled`, `.bk-toast__close`) is **weaker** than a
+flowbite component's own theme classes and can no longer be trusted to
+override them by specificity — it will silently lose. By contrast, CSS files
+imported directly by a `.tsx` file via a plain `import "./X.css"` (e.g.
+`MediaTab.css`, `AITab.css`, `LeftSidebar.css`, `CanvasFooterToolbar`'s inline
+`style`) are genuinely **unlayered** and still win over anything layered,
+regardless of layer order — verified case by case (below) before leaving
+those className-merge sites untouched.
+
+Found and fixed 2 real instances of the layer trap: `Topbar.tsx`'s
+`.bk-topbar__published:disabled` (green "✓ Published" success tint) and
+confirmed `.bk-toast__close` had no bg/color rule to lose (`flex: none` only,
+so no risk). `Topbar.tsx`'s published-state Button now bakes the look
+directly into `tw:` utilities on the element (`tw:bg-green-100
+tw:text-green-600` — exact hex matches to `--bk-success-tint`/`-text` — plus
+`tw:opacity-100` to beat flowbite's own `disabled` class's `opacity-50`)
+instead of relying on the now-too-weak `components`-layer selector.
+
+**Consumers swept:** 237 files via `@/editor/ui` import (per
+`import_map.json`, built by scanning every file in list (a) for its actual
+named imports — see Task 5 sweep methodology below) + 5 more found only by
+`tsc`/grep because they import `./Button` relatively from inside
+`src/editor/ui/` itself (`ConfirmDialog.tsx`, `HelpTooltip.tsx`, `Toast.tsx`,
+`Topbar.tsx`, `UpgradeModal.tsx` — none of these matched the `@/editor/ui`
+alias scan since they're siblings of `Button.tsx`) + `PanelHeader.tsx` /
+`PanelFrame.tsx`, which never imported the `Button` *component* at all but
+used raw `<button className="bk-btn bk-btn--ghost bk-btn--sm">` directly —
+caught only by grepping for `bk-btn` before deleting its `ui.css` block, and
+converted to flowbite `Button` too for consistency (Gate 24 exempts
+`editor/ui/` from the raw-native-element ban, but there is no other owner of
+that visual contract now that `.bk-btn` is gone) + 4 test files
+(`field-popover.test.tsx`, `molecules.test.tsx`, `organisms.test.tsx`,
+`toast.test.tsx`) that import `Button` from `../index` as a generic click
+target in test harnesses.
+
+**Sweep methodology note:** a naive `rg -l "Button" $(rg -l "@/editor/ui"
+src)` over-matches badly for a name this generic (`kind=`/`size=` collide
+with `Badge`, `ConfirmDialog`, `Row`, `TreeRow`, etc.). Built
+`scripts` (scratch, not committed) that (1) parsed every file's actual
+`import { ... } from "@/editor/ui"` statement(s) to get a precise
+component→consumer-file map, then (2) ran a `ts-morph` codemod that only
+touches JSX elements whose tag name is literally `Button` — immune to the
+`kind=`/`size=` false-positive problem entirely, since it operates on the
+AST, not text. One caveat found the hard way: a file with **two separate**
+`@/editor/ui` import statements (13 such files) can have `Button` in the
+*second* one; the first codemod pass used `.find()` and only checked the
+first import declaration, silently skipping `src/editor/sidebar/LeftSidebar.tsx`
+entirely (`ConfirmDialog` was in its first import, `Button`/`Tooltip` in its
+second) — caught by the post-delete `tsc` pass, fixed by hand. `tsc --noEmit`
+after deleting `Button.tsx` is the real safety net regardless of sweep
+method: 0 errors is the only trustworthy proof nothing was missed.
+
+**Dynamic `kind=` sites** (9, across 6 files — ternaries between two of our
+four kind values, e.g. `kind={mode === m ? "primary" : "ghost"}`): the
+codemod flagged these (can't statically resolve a ternary) rather than
+guess; fixed by hand as `color={cond ? undefined : "light"}` +
+`className={cond ? undefined : GHOST_CLASS}` (or just `color={cond ?
+undefined : "light"}` alone when neither branch was ghost).
+
+**Ghost-Button-with-non-literal-`className`** (9 sites, 6 files — template
+literals or props the codemod couldn't safely string-concat): each verified
+individually against its CSS source before deciding no `tw:` override was
+needed — every one resolved to either (a) a bespoke unlayered custom class
+(`.med-type-pill`, `.med-detail-tab`, `.bd-ai-mode-btn`, `.ls-btn`,
+`.med-asset-cell`, `.med-folder-breadcrumb__seg` — all imported via plain
+`import "./X.css"`, none routed through `default.css`'s `@layer`) that fully
+repaints background/border/color and therefore wins regardless of the
+`components`-vs-`tw-utilities` layer gap, or (b) a full inline `style` prop
+on the same element (higher specificity than any class, layered or not) that
+already sets `background`/`border`/`color` unconditionally
+(`CanvasFooterToolbar.tsx`'s `zoomBtnStyles`/`zoomPctStyles`, its
+`OverlayButton`'s own `style`).

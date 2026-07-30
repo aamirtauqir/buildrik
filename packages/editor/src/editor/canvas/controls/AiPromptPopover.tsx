@@ -5,7 +5,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button, Textarea } from "@/editor/ui";
+import { Textarea } from "@/editor/ui";
 import type { Composer } from "../../../engine";
 import { Z_LAYERS } from "../../../shared/constants/canvas";
 import { useStreamPrompt } from "../../sidebar/tabs/ai/hooks/useStreamPrompt";
@@ -14,6 +14,7 @@ import { DiffRows } from "../../sidebar/tabs/ai/DiffRows";
 import { DEFAULT_MODEL } from "../../sidebar/tabs/ai/types";
 import { trackAiEditApplied } from "@/services/ai/adoptionTracker";
 import "./AiPromptPopover.css";
+import { Button } from "flowbite-react";
 
 export interface AiPromptPopoverProps {
   composer: Composer;
@@ -88,7 +89,7 @@ export const AiPromptPopover: React.FC<AiPromptPopoverProps> = ({
         <>
           <DiffRows edit={stream.edit!} />
           <div className="bd-ai-popover-actions">
-            <Button type="button" kind="ghost" onClick={onClose} aria-label="Discard">
+            <Button type="button" color="light" onClick={onClose} aria-label="Discard" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
               Discard
             </Button>
             <Button type="button" onClick={accept} aria-label="Apply changes">

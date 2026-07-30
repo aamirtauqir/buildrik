@@ -19,11 +19,11 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import type { Composer } from "../../../../engine/Composer";
 import { CATALOG } from "../../../components-catalog/catalog";
 import type { ComponentType } from "../../../components-catalog/types";
 import type { ComponentDefinition } from "../../../../shared/types/components";
+import { Button } from "flowbite-react";
 
 const CATALOG_LAST_UPDATED = "2026-04-12";
 
@@ -301,8 +301,8 @@ export const ComponentsSection: React.FC<ComponentsSectionProps> = ({
         </div>
         <Button
           type="button"
-          kind="secondary"
-          size="sm"
+          color="light"
+          size="xs"
           onClick={() => dispatchOpenComponentsPanel(composer)}
           data-open-components-panel
           style={openPanelButtonStyle}
@@ -339,8 +339,8 @@ export const ComponentsSection: React.FC<ComponentsSectionProps> = ({
         </div>
         <Button
           type="button"
-          kind="secondary"
-          size="sm"
+          color="light"
+          size="xs"
           onClick={onOpenAIAssist}
           disabled={!onOpenAIAssist}
           data-open-ai-assist

@@ -7,9 +7,10 @@
  */
 
 import * as React from "react";
-import { Button, Input, ModalContent, ModalRoot } from "@/editor/ui";
+import { Input, ModalContent, ModalRoot } from "@/editor/ui";
 import { useState } from "react";
 import type { ConfirmDeletePayload } from "../data/mediaTypes";
+import { Button } from "flowbite-react";
 
 interface ConfirmDeleteModalProps {
   payload: ConfirmDeletePayload;

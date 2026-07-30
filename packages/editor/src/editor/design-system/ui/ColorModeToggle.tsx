@@ -17,9 +17,9 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import type { Composer } from "../../../engine";
 import { useColorMode } from "../state/useColorMode";
+import { Button } from "flowbite-react";
 
 export interface ColorModeToggleProps {
   composer: Composer;
@@ -66,8 +66,8 @@ interface PillProps {
 const Pill: React.FC<PillProps> = ({ value, label, active, composer }) => (
   <Button
     type="button"
-    kind="ghost"
-    size="sm"
+    color="light"
+    size="xs"
     role="tab"
     aria-selected={active}
     onClick={() => composer.colorMode.set(value)}
@@ -81,7 +81,7 @@ const Pill: React.FC<PillProps> = ({ value, label, active, composer }) => (
       background: active ? "var(--bk-accent)" : "transparent",
       color: active ? "var(--bk-accent-on)" : "var(--bk-ink-muted)",
       transition: "background 80ms",
-    }}
+    }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
   >
     {label}
   </Button>

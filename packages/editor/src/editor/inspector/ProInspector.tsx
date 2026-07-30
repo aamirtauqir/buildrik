@@ -8,7 +8,6 @@
 
 import { Crosshair, CornerLeftUp } from "lucide-react";
 import * as React from "react";
-import { Button, } from "@/editor/ui";
 import { getElementIcon } from "@/editor/shared/elementIcons";
 import { BindingPopover } from "./components/BindingPopover";
 import { BreakpointPill } from "./components/BreakpointPill";
@@ -39,6 +38,7 @@ import { detectMixedValues } from "./shared/detectMixedValues";
 import type { Element } from "../../engine";
 import { InspectorTabContent } from "./tabs/InspectorTabContent";
 import "./styles/inspector.css";
+import { Button } from "flowbite-react";
 
 // ============================================================================
 // TYPES
@@ -380,10 +380,10 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
             everywhere updates.
           </div>
           <div style={{ display: "flex", gap: 8 }}>
-            <Button kind="primary" size="sm" onClick={() => composer?.emit("ui:switch-tab", { tab: "design" })}>
+            <Button size="xs" onClick={() => composer?.emit("ui:switch-tab", { tab: "design" })}>
               Open Brand
             </Button>
-            <Button kind="ghost" size="sm" onClick={() => setWholeSite(false)}>
+            <Button color="light" size="xs" onClick={() => setWholeSite(false)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
               Back to this element
             </Button>
           </div>

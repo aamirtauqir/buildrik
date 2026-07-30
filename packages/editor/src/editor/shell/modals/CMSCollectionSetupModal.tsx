@@ -11,8 +11,9 @@
 
 import { X, Plus, Trash2, Check } from "lucide-react";
 import * as React from "react";
-import { Button, Input, ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal, Select, Stack, Textarea } from "@/editor/ui";
+import { Input, ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal, Select, Stack, Textarea } from "@/editor/ui";
 import type { Composer } from "../../../engine";
+import { Button } from "flowbite-react";
 
 // =============================================================================
 // TYPES
@@ -342,13 +343,12 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
 
   const footer = (
     <div style={s.footer}>
-      <Button kind="ghost" size="sm" onClick={onClose} disabled={creating}>
+      <Button color="light" size="xs" onClick={onClose} disabled={creating} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
         Cancel
       </Button>
       {step === 1 ? (
         <Button
-          kind="primary"
-          size="sm"
+          size="xs"
           disabled={!canProceed}
           onClick={() => setStep(2)}
         >
@@ -356,11 +356,10 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
         </Button>
       ) : (
         <Button
-          kind="primary"
-          size="sm"
-          loading={creating}
+          size="xs"
           disabled={!canProceed || creating}
           onClick={handleCreate}
+          aria-busy={creating || undefined}
         >
           Create Collection
         </Button>
@@ -479,7 +478,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
             <span style={{ fontSize: 12, color: "var(--bk-ink-soft)" }}>
               Fields for <strong style={{ color: "var(--bk-ink)" }}>{name}</strong>
             </span>
-            <Button kind="ghost" size="sm" onClick={addField}>
+            <Button color="light" size="xs" onClick={addField} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
               <Plus size={12} aria-hidden="true" />
               Add Field
             </Button>
@@ -551,7 +550,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
           <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid var(--bk-border)" }}>
             <Button
               type="button"
-              kind={genPages ? "primary" : "secondary"}
+              color={genPages ? undefined : "light"}
               onClick={() => setGenPages((v) => !v)}
               style={{ fontSize: 12 }}
             >

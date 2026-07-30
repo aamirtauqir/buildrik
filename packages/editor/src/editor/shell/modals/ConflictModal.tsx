@@ -20,7 +20,7 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
+import { Button } from "flowbite-react";
 
 export interface ConflictModalProps {
   open: boolean;
@@ -60,12 +60,12 @@ export function ConflictModal({ open, onReload, onSaveBackup, onOverwrite, onClo
           </p>
         )}
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 20, justifyContent: "flex-end" }}>
-          <Button kind="primary" onClick={onReload}>Reload latest</Button>
-          <Button kind="secondary" onClick={onSaveBackup}>Save a backup</Button>
+          <Button onClick={onReload}>Reload latest</Button>
+          <Button color="light" onClick={onSaveBackup}>Save a backup</Button>
           {confirmOverwrite ? (
-            <Button kind="destructive" onClick={onOverwrite}>Yes, overwrite</Button>
+            <Button color="red" onClick={onOverwrite}>Yes, overwrite</Button>
           ) : (
-            <Button kind="ghost" onClick={() => setConfirmOverwrite(true)}>Overwrite…</Button>
+            <Button color="light" onClick={() => setConfirmOverwrite(true)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">Overwrite…</Button>
           )}
         </div>
       </div>

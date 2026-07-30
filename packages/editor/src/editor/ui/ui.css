@@ -8,38 +8,6 @@
  * @license BSD-3-Clause
  */
 
-/* ── Button · Figma 9:102 · Kind × Size × State ─────────────────────────── */
-.bk-btn {
-  display: inline-flex; align-items: center; justify-content: center;
-  gap: var(--bk-space-8);
-  border-radius: var(--bk-radius-lg);
-  border: 1px solid transparent;
-  font-family: var(--bk-font-ui);
-  font-weight: var(--bk-weight-medium);
-  cursor: pointer;
-  transition: var(--bk-transition-fast);
-  white-space: nowrap;
-}
-.bk-btn--sm { height: var(--bk-space-28); padding: 0 var(--bk-space-12); font-size: var(--bk-text-12); }
-.bk-btn--md { height: var(--bk-space-32); padding: 0 var(--bk-space-16); font-size: var(--bk-text-13); }
-
-.bk-btn--primary { background: var(--bk-accent); color: var(--bk-accent-on); }
-.bk-btn--primary:hover:not(:disabled) { background: var(--bk-accent-hover); }
-.bk-btn--primary:active:not(:disabled) { background: var(--bk-accent-pressed); }
-
-.bk-btn--secondary { background: var(--bk-bg-card); color: var(--bk-ink); border-color: var(--bk-border); }
-.bk-btn--secondary:hover:not(:disabled) { background: var(--bk-bg-subtle); }
-
-.bk-btn--ghost { background: transparent; color: var(--bk-ink-soft); }
-.bk-btn--ghost:hover:not(:disabled) { background: var(--bk-bg-subtle); color: var(--bk-ink); }
-
-.bk-btn--destructive { background: var(--bk-error); color: var(--bk-accent-on); }
-.bk-btn--destructive:hover:not(:disabled) { background: var(--bk-error-text); }
-
-.bk-btn:focus-visible { outline: none; box-shadow: var(--bk-shadow-focus); }
-.bk-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.bk-btn[data-loading="true"] { pointer-events: none; }
-
 /* ── Input · Figma 10:16 · State ────────────────────────────────────────── */
 .bk-input {
   height: var(--bk-space-36);

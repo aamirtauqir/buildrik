@@ -4,6 +4,9 @@
  * @license BSD-3-Clause
  */
 import React from "react";
+import { Button } from "flowbite-react";
+
+const GHOST_BTN_CLASS = "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900";
 
 export interface PanelHeaderActionsProps {
   /** Aria-label context: "Pin {label}" / "Close {label}" (e.g. the panel title). */
@@ -30,30 +33,34 @@ export function PanelHeaderActions({
     <span className={["bk-panel-header__actions", className].filter(Boolean).join(" ")} style={style}>
       {children}
       {onPinToggle ? (
-        <button
+        <Button
           type="button"
-          className="bk-btn bk-btn--ghost bk-btn--sm"
+          color="light"
+          size="xs"
+          className={GHOST_BTN_CLASS}
           onClick={onPinToggle}
           aria-pressed={Boolean(isPinned)}
           aria-label={isPinned ? `Unpin ${label}` : `Pin ${label}`}
         >
           {isPinned ? "📌" : "📍"}
-        </button>
+        </Button>
       ) : null}
       {onHelpClick ? (
-        <button type="button" className="bk-btn bk-btn--ghost bk-btn--sm" onClick={onHelpClick} aria-label="Help">
+        <Button type="button" color="light" size="xs" className={GHOST_BTN_CLASS} onClick={onHelpClick} aria-label="Help">
           ?
-        </button>
+        </Button>
       ) : null}
       {onClose ? (
-        <button
+        <Button
           type="button"
-          className="bk-btn bk-btn--ghost bk-btn--sm"
+          color="light"
+          size="xs"
+          className={GHOST_BTN_CLASS}
           onClick={onClose}
           aria-label={`Close ${label}`}
         >
           ✕
-        </button>
+        </Button>
       ) : null}
     </span>
   );

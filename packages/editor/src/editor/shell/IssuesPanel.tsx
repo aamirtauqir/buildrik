@@ -16,8 +16,9 @@
 
 import * as React from "react";
 import { AlertCircle, CheckCircle2, Info } from "lucide-react";
-import { Button, PanelHeader } from "@/editor/ui";
+import { PanelHeader } from "@/editor/ui";
 import { issueAppliesToPage, type Issue } from "./hooks/useStudioState";
+import { Button } from "flowbite-react";
 
 export interface IssuesPanelProps {
   issues: Issue[];
@@ -140,10 +141,20 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
         <>
           {anyPageBound && (
             <div style={S.toolbar} role="group" aria-label="Issue scope">
-              <Button kind={scope === "page" ? "primary" : "ghost"} size="sm" onClick={() => setScope("page")}>
+              <Button
+                color={scope === "page" ? undefined : "light"}
+                size="xs"
+                onClick={() => setScope("page")}
+                className={scope === "page" ? undefined : "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"}
+              >
                 This page
               </Button>
-              <Button kind={scope === "site" ? "primary" : "ghost"} size="sm" onClick={() => setScope("site")}>
+              <Button
+                color={scope === "site" ? undefined : "light"}
+                size="xs"
+                onClick={() => setScope("site")}
+                className={scope === "site" ? undefined : "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"}
+              >
                 All pages
               </Button>
             </div>
@@ -152,9 +163,10 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
             {FILTERS.map((f) => (
               <Button
                 key={f.key}
-                kind={filter === f.key ? "primary" : "ghost"}
-                size="sm"
+                color={filter === f.key ? undefined : "light"}
+                size="xs"
                 onClick={() => setFilter(f.key)}
+                className={filter === f.key ? undefined : "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"}
               >
                 {f.label}
               </Button>
@@ -182,16 +194,16 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
                 would change every site using them.
               </div>
               <div style={S.failedActions}>
-                <Button kind="ghost" size="sm" onClick={() => { setFailed(null); onOpenBrand?.(); }}>
+                <Button color="light" size="xs" onClick={() => { setFailed(null); onOpenBrand?.(); }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                   Open Brand
                 </Button>
                 <Button
-                  kind="ghost"
-                  size="sm"
+                  color="light"
+                  size="xs"
                   onClick={() => {
                     if (failed.tokenId) onIgnore?.(failed.tokenId);
                     setFailed(null);
-                  }}
+                  }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
                 >
                   Ignore once
                 </Button>
@@ -227,10 +239,10 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
                   </div>
                   {isFixable(i) && onFix && (
                     <Button
-                      kind="ghost"
-                      size="sm"
+                      color="light"
+                      size="xs"
                       disabled={fixing !== null}
-                      onClick={() => void runFix(i)}
+                      onClick={() => void runFix(i)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
                     >
                       Fix ›
                     </Button>

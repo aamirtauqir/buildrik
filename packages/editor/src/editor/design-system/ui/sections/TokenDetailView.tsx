@@ -27,7 +27,7 @@
  */
 
 import * as React from "react";
-import { Button, Input } from "@/editor/ui";
+import { Input } from "@/editor/ui";
 import type { Composer } from "../../../../engine/Composer";
 import type { DesignToken } from "../../types";
 import type { LintIssue } from "../../../../engine/designSystem/LintState";
@@ -36,6 +36,7 @@ import { ELEMENT_TYPE_LABELS } from "../../../../shared/constants/elementTypeLab
 import { useDSModeOptional } from "../../state/DSModeContext";
 import { ColorPicker } from "../colors/ColorPicker";
 import { TokenReplaceModal } from "./TokenReplaceModal";
+import { Button } from "flowbite-react";
 
 export interface TokenDetailViewProps {
   token: DesignToken;
@@ -547,22 +548,22 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
           {issue.autoFixHint && (
             <Button
               type="button"
-              kind="ghost"
-              size="sm"
+              color="light"
+              size="xs"
               onClick={handleAutoFix}
               style={smallBtnStyle}
-              aria-label="Auto-fix lint issue"
+              aria-label="Auto-fix lint issue" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
             >
               Auto-fix
             </Button>
           )}
           <Button
             type="button"
-            kind="ghost"
-            size="sm"
+            color="light"
+            size="xs"
             onClick={handleIgnore}
             style={smallBtnStyle}
-            aria-label="Ignore lint issue"
+            aria-label="Ignore lint issue" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           >
             Ignore
           </Button>
@@ -576,10 +577,10 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
       {/* Back arrow */}
       <Button
         type="button"
-        kind="ghost"
+        color="light"
         onClick={onBack}
         style={backBtnStyle}
-        aria-label="Back to tokens"
+        aria-label="Back to tokens" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
       >
         <span aria-hidden="true">←</span>
         <span>Back to tokens</span>
@@ -668,7 +669,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
         <div style={fieldValueStyle}>
           <Button
             type="button"
-            kind="ghost"
+            color="light"
             onClick={() => {
               if (usageCount > 0) setUsageExpanded((v) => !v);
             }}
@@ -676,7 +677,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
             aria-expanded={usageExpanded}
             aria-disabled={usageCount === 0 || undefined}
             disabled={usageCount === 0}
-            data-used-by-toggle
+            data-used-by-toggle className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           >
             <span aria-hidden="true" style={usageCaretStyle}>
               {usageCount === 0 ? "" : usageExpanded ? "▾" : "▸"}
@@ -698,7 +699,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
                   <li key={`${ref.elementId}-${ref.styleProp}-${idx}`}>
                     <Button
                       type="button"
-                      kind="ghost"
+                      color="light"
                       onClick={() => {
                         const target = composer?.elements?.getElement?.(
                           ref.elementId,
@@ -707,7 +708,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
                       }}
                       style={usageEntryBtnStyle}
                       aria-label={`Select ${name} · ${ref.styleProp}`}
-                      data-used-by-entry={ref.elementId}
+                      data-used-by-entry={ref.elementId} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
                     >
                       <span>{name}</span>
                       <span style={usagePropStyle}>· {ref.styleProp}</span>
@@ -743,7 +744,6 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
       <div style={actionRowStyle}>
         <Button
           type="button"
-          kind="primary"
           onClick={handleReplaceValue}
           style={actionBtnStyle}
           aria-label="Replace value"
@@ -752,7 +752,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
         </Button>
         <Button
           type="button"
-          kind="secondary"
+          color="light"
           onClick={handleRenameId}
           style={{
             ...actionBtnStyle,
@@ -767,7 +767,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
         </Button>
         <Button
           type="button"
-          kind="destructive"
+          color="red"
           onClick={handleDelete}
           style={dangerBtnStyle}
           aria-label="Delete token"

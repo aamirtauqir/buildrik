@@ -6,7 +6,8 @@
 
 import * as React from "react";
 import { ColorField } from "../../shared/forms";
-import { Button, Tooltip, Select, Input, Cluster, Popover } from "@/editor/ui";
+import { Tooltip, Select, Input, Cluster, Popover } from "@/editor/ui";
+import { Button } from "flowbite-react";
 
 export interface RichTextEditorProps {
   onCommand: (command: string, value?: string) => void;
@@ -171,14 +172,14 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
             return (
               <Tooltip key={item.command} label={item.label}>
                 <Button
-                  kind="ghost"
+                  color="light"
                   onClick={() => onCommand(item.command)}
                   style={{
                     ...toolbarButtonStyle,
                     background: isActive ? "var(--bk-accent)" : "transparent",
                     color: isActive ? "var(--bk-bg-card)" : "var(--bk-ink-soft)",
                     ...itemStyle,
-                  }}
+                  }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
                 >
                   {item.icon}
                 </Button>
@@ -195,12 +196,12 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
         label="Text color"
         trigger={
           <Button
-            kind="ghost"
+            color="light"
             style={toolbarButtonStyle}
             title="Text Color"
             aria-label="Change text color"
             aria-expanded={textColorOpen}
-            onClick={() => setTextColorOpen((v) => !v)}
+            onClick={() => setTextColorOpen((v) => !v)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           >
             <span style={{ borderBottom: "2px solid var(--bk-accent)" }}>A</span>
           </Button>
@@ -214,12 +215,12 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
         label="Highlight color"
         trigger={
           <Button
-            kind="ghost"
+            color="light"
             style={toolbarButtonStyle}
             title="Background Color"
             aria-label="Change background highlight color"
             aria-expanded={bgColorOpen}
-            onClick={() => setBgColorOpen((v) => !v)}
+            onClick={() => setBgColorOpen((v) => !v)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           >
             <span style={{ background: "var(--bk-warning)", padding: "0 4px" }}>A</span>
           </Button>
@@ -238,7 +239,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
         label="Insert link"
         trigger={
           <Button
-            kind="ghost"
+            color="light"
             style={{
               ...toolbarButtonStyle,
               background: activeStyles.link ? "var(--bk-accent)" : "transparent",
@@ -246,7 +247,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
             }}
             title="Insert Link"
             aria-expanded={linkOpen}
-            onClick={() => setLinkOpen((v) => !v)}
+            onClick={() => setLinkOpen((v) => !v)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           >
             🔗
           </Button>
@@ -270,10 +271,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
             }}
           />
           <div style={{ display: "flex", gap: 8 }}>
-            <Button size="sm" kind="ghost" onClick={() => onCommand("unlink")}>
+            <Button size="xs" color="light" onClick={() => onCommand("unlink")} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
               Remove
             </Button>
-            <Button size="sm" kind="primary" onClick={handleLink}>
+            <Button size="xs" onClick={handleLink}>
               Apply
             </Button>
           </div>
@@ -281,7 +282,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
       </Popover>
       {/* Clear Formatting */}
       <Tooltip label="Clear Formatting">
-        <Button kind="ghost" onClick={() => onCommand("removeFormat")} style={toolbarButtonStyle}>
+        <Button color="light" onClick={() => onCommand("removeFormat")} style={toolbarButtonStyle} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
           ✕
         </Button>
       </Tooltip>

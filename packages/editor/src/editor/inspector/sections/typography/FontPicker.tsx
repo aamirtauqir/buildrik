@@ -7,7 +7,7 @@
  */
 
 import * as React from "react";
-import { Button, Stack } from "@/editor/ui";
+import { Stack } from "@/editor/ui";
 import {
   GoogleFontsService,
   loadGoogleFont,
@@ -16,6 +16,7 @@ import {
   type FontCategory,
 } from "../../../../services/GoogleFontsService";
 import { FontSearchInput, CategoryTabs, FontList } from "./FontPickerDropdown";
+import { Button } from "flowbite-react";
 
 // ============================================================================
 // TYPES

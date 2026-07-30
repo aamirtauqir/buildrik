@@ -6,8 +6,9 @@
 
 import * as React from "react";
 import { InputField } from "../shared/forms";
-import { Badge, Button } from "@/editor/ui";
+import { Badge } from "@/editor/ui";
 import type { Template } from "./types";
+import { Button } from "flowbite-react";
 
 // ============================================================================
 // TYPES
@@ -182,7 +183,7 @@ const TemplateItem: React.FC<TemplateItemProps> = ({
         >
           🗑️
         </button>
-        <Button size="sm" onClick={onSelect}>
+        <Button size="xs" onClick={onSelect}>
           Use
         </Button>
       </div>

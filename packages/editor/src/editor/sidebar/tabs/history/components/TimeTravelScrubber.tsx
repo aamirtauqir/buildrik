@@ -18,11 +18,12 @@
  */
 
 import * as React from "react";
-import { Button, Input } from "@/editor/ui";
+import { Input } from "@/editor/ui";
 import type { Composer } from "../../../../../engine";
 import type { HistoryDisplayEntry } from "../../../../../engine/HistoryManager";
 import type { NamedVersion } from "../../../../../shared/types/versions";
 import { useReducedMotion } from "../../../../../shared/hooks/useReducedMotion";
+import { Button } from "flowbite-react";
 
 interface TimeTravelScrubberProps {
   composer: Composer | null;

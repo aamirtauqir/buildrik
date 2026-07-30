@@ -5,8 +5,8 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import type { FormState } from "../../engine/forms/FormHandler";
+import { Button } from "flowbite-react";
 
 // ============================================================================
 // TYPES
@@ -86,7 +86,7 @@ export const FormStateOverlay: React.FC<FormStateOverlayProps> = ({
             ))}
           </ul>
         )}
-        <Button kind="primary" onClick={handleDismiss}>
+        <Button onClick={handleDismiss}>
           {isSuccess ? "Continue" : "Try Again"}
         </Button>
       </div>

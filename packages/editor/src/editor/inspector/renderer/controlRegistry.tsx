@@ -11,7 +11,7 @@
  */
 
 import * as React from "react";
-import { Button, Checkbox, Input, Select } from "@/editor/ui";
+import { Checkbox, Input, Select } from "@/editor/ui";
 import type {
   ColorField,
   ControlProps,
@@ -25,6 +25,7 @@ import type {
   TextField,
   ToggleField,
 } from "./schema";
+import { Button } from "flowbite-react";
 
 // ============================================================================
 // SHARED STYLE TOKENS — keep each control file-local so future sections can

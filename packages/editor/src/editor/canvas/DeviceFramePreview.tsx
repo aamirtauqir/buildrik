@@ -10,8 +10,8 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import type { DeviceType } from "../../shared/types";
+import { Button } from "flowbite-react";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 

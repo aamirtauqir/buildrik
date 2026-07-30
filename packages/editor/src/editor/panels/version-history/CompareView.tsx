@@ -19,9 +19,9 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import type { CompareResult, NamedVersion } from "../../../shared/types/versions";
 import { AIResultText, AIControls } from "./AIPanel";
+import { Button } from "flowbite-react";
 
 // ─── Style constants ──────────────────────────────────────────────────
 

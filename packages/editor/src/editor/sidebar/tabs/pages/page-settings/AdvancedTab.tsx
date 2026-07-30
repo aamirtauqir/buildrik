@@ -5,8 +5,9 @@
  */
 
 import * as React from "react";
-import { Button, Cluster, HelperText, Input, Label, Stack, Textarea, Toggle } from "@/editor/ui";
+import { Cluster, HelperText, Input, Label, Stack, Textarea, Toggle } from "@/editor/ui";
 import type { UsePageSettingsReturn } from "./usePageSettings";
+import { Button } from "flowbite-react";
 
 interface Props {
   s: UsePageSettingsReturn;
@@ -24,8 +25,8 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
           {(["live", "hidden", "password"] as const).map((v) => (
             <Button
               key={v}
-              kind="ghost"
-              size="sm"
+              color="light"
+              size="xs"
               role="radio"
               aria-checked={s.visibility === v}
               style={{
@@ -40,7 +41,7 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
                 transition: "background 100ms, color 100ms",
                 boxShadow: s.visibility === v ? "var(--bk-shadow-drag)" : "none",
               }}
-              onClick={() => s.setVisibility(v)}
+              onClick={() => s.setVisibility(v)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
             >
               {v.charAt(0).toUpperCase() + v.slice(1)}
             </Button>
@@ -64,10 +65,10 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
               aria-label="Page access password"
               style={{ flex: 1 }}
             />
-            <Button kind="secondary" size="sm" onClick={() => s.setShowPassword(!s.showPassword)} aria-label={s.showPassword ? "Hide password" : "Show password"}>
+            <Button color="light" size="xs" onClick={() => s.setShowPassword(!s.showPassword)} aria-label={s.showPassword ? "Hide password" : "Show password"}>
               {s.showPassword ? "Hide" : "Show"}
             </Button>
-            <Button kind="secondary" size="sm" onClick={() => s.copyPassword()} aria-label="Copy password" disabled={!s.password}>
+            <Button color="light" size="xs" onClick={() => s.copyPassword()} aria-label="Copy password" disabled={!s.password}>
               Copy
             </Button>
           </Cluster>

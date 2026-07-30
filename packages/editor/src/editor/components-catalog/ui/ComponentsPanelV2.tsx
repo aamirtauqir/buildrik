@@ -22,7 +22,7 @@
  */
 
 import * as React from "react";
-import { Button, Input, PanelHeader } from "@/editor/ui";
+import { Input, PanelHeader } from "@/editor/ui";
 import { useToast } from "@/editor/ui";
 import type { Composer } from "@/engine";
 import { CatalogSection } from "./CatalogSection";
@@ -30,6 +30,7 @@ import { UserSavedSection } from "./UserSavedSection";
 import { DSStatusChip } from "./DSStatusChip";
 import { AIPromptModal } from "@/editor/design-system/ui/AIPromptModal";
 import { EVENTS } from "@/shared/constants/events";
+import { Button } from "flowbite-react";
 
 type FilterMode = "all" | "ds" | "yours";
 
@@ -194,12 +195,12 @@ export const ComponentsPanelV2: React.FC<ComponentsPanelV2Props> = ({
         <div style={{ marginLeft: "auto" }}>
           <Button
             type="button"
-            kind="ghost"
-            size="sm"
+            color="light"
+            size="xs"
             onClick={handleOpenAI}
             data-components-ai-entry
             aria-label="Add component via AI"
-            style={headerAiButtonStyle}
+            style={headerAiButtonStyle} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           >
             + AI
           </Button>
@@ -211,12 +212,12 @@ export const ComponentsPanelV2: React.FC<ComponentsPanelV2Props> = ({
           <Button
             key={f.id}
             type="button"
-            kind="ghost"
-            size="sm"
+            color="light"
+            size="xs"
             role="radio"
             aria-checked={filter === f.id}
             onClick={() => setFilter(f.id)}
-            style={pillStyle(filter === f.id)}
+            style={pillStyle(filter === f.id)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           >
             {f.label}
           </Button>
@@ -250,10 +251,10 @@ export const ComponentsPanelV2: React.FC<ComponentsPanelV2Props> = ({
 
       <Button
         type="button"
-        kind="ghost"
+        color="light"
         onClick={handleSaveSelection}
         data-save-current-selection
-        style={footerSaveStyle}
+        style={footerSaveStyle} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
       >
         + Save current selection
       </Button>

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Button } from "@/editor/ui";
+import { Button } from "flowbite-react";
 
 interface TokenKindCardProps {
   kindId: string;
@@ -87,7 +87,7 @@ export const TokenKindCard: React.FC<TokenKindCardProps> = ({
 
   return (
     <div style={cardStyle} data-token-kind-card={kindId}>
-      <Button type="button" kind="ghost" size="sm" onClick={toggle} style={headerStyle} aria-expanded={open}>
+      <Button type="button" color="light" size="xs" onClick={toggle} style={headerStyle} aria-expanded={open} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
         <span>{title} · {count} TOKENS</span>
         {isDirty && <span aria-label="unsaved changes in this kind" style={dirtyDotStyle} />}
         <span style={spacerStyle} />

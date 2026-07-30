@@ -18,7 +18,6 @@
 
 import * as React from "react";
 import {
-  Button,
   Checkbox,
   Input,
   ModalClose,
@@ -34,6 +33,7 @@ import {
   dialogInputStyles,
   dialogPrimaryBtnStyles,
 } from "./styles";
+import { Button } from "flowbite-react";
 
 export interface SelectionContext {
   selectionIds: readonly string[];

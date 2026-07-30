@@ -50,7 +50,6 @@ import {
   Upload,
 } from "lucide-react";
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import type {
   LibraryItem,
   MediaSortBy,
@@ -59,6 +58,7 @@ import type {
 } from "../../sidebar/tabs/media/data/mediaTypes";
 import type { SmartFolder } from "./FolderTree";
 import { formatBytes } from "@shared/utils/helpers/number";
+import { Button } from "flowbite-react";
 
 // ─── Toast contract (matches @/editor/ui useToast) ───────────────────────
 

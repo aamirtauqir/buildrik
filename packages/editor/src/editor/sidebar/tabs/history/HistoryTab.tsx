@@ -9,7 +9,7 @@
  */
 
 import * as React from "react";
-import { Button, Input, PanelFrame } from "@/editor/ui";
+import { Input, PanelFrame } from "@/editor/ui";
 import { useHistoryState } from "../../../../shared/hooks/useHistoryState";
 import { useAutoMilestone } from "../../../../shared/hooks/useAutoMilestone";
 import { VersionHistoryPanel } from "../../../panels/VersionHistoryPanel";
@@ -17,6 +17,7 @@ import { ActivityView } from "./components/ActivityView";
 import { TimeTravelScrubber } from "./components/TimeTravelScrubber";
 import { MilestoneSuggestionBanner } from "./components/MilestoneSuggestionBanner";
 import type { HistoryView, HistoryTabProps } from "./types";
+import { Button } from "flowbite-react";
 
 const HELPER_TEXT: Record<HistoryView, string> = {
   changes: "Your recent edits",

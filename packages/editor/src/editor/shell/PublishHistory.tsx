@@ -14,7 +14,7 @@
 
 import * as React from "react";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
-import { Badge, Button, ConfirmDialog, Spinner } from "@/editor/ui";
+import { Badge, ConfirmDialog, Spinner } from "@/editor/ui";
 import { useEditorRole } from "./hooks/useEditorRole";
 import { roleAtLeast } from "@/services/RoleService";
 import {
@@ -22,6 +22,7 @@ import {
   rollbackToVersion,
   type PublishHistoryRow,
 } from "../../services/PublishService";
+import { Button } from "flowbite-react";
 
 export interface PublishHistoryProps {
   siteId: string;
@@ -103,7 +104,7 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
       <div style={S.center}>
         <AlertCircle size={24} aria-hidden="true" />
         <div style={S.centerTitle}>Couldn't load publish history</div>
-        <Button kind="secondary" size="sm" onClick={() => void load()}>Retry</Button>
+        <Button color="light" size="xs" onClick={() => void load()}>Retry</Button>
       </div>
     );
   }
@@ -139,8 +140,8 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
             </div>
             {!isLive && (
               <Button
-                kind="secondary"
-                size="sm"
+                color="light"
+                size="xs"
                 disabled={!r.rollbackable || !canRollback}
                 title={
                   !canRollback

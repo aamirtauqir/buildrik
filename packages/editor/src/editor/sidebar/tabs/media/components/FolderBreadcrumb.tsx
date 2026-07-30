@@ -13,9 +13,9 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import { ChevronRight } from "lucide-react";
 import type { MediaFolder } from "@shared/types/media";
+import { Button } from "flowbite-react";
 
 export interface FolderBreadcrumbProps {
   folders: MediaFolder[];
@@ -40,8 +40,8 @@ export function FolderBreadcrumb({
     >
       <Button
         type="button"
-        kind="ghost"
-        size="sm"
+        color="light"
+        size="xs"
         className={
           "med-folder-breadcrumb__seg" +
           (currentFolderId === null ? " med-folder-breadcrumb__seg--current" : "")
@@ -61,8 +61,8 @@ export function FolderBreadcrumb({
             />
             <Button
               type="button"
-              kind="ghost"
-              size="sm"
+              color="light"
+              size="xs"
               className={
                 "med-folder-breadcrumb__seg" +
                 (isCurrent ? " med-folder-breadcrumb__seg--current" : "")

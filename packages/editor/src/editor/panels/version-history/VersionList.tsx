@@ -21,7 +21,6 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import type { NamedVersion } from "../../../shared/types/versions";
 import { formatRelativeTime } from "../../../editor/sidebar/tabs/history/helpers";
 import { SnapshotPreview } from "../../../editor/sidebar/tabs/history/components/SnapshotPreview";
@@ -32,6 +31,7 @@ import { SnapshotPreview } from "../../../editor/sidebar/tabs/history/components
 // strict.
 // @ts-expect-error — no declaration file for react-window@1.8.x
 import { FixedSizeList as FixedSizeListUntyped } from "react-window";
+import { Button } from "flowbite-react";
 
 interface ListChildComponentProps {
   index: number;

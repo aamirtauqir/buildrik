@@ -4,9 +4,10 @@
  */
 
 import * as React from "react";
-import { Button, Select } from "@/editor/ui";
+import { Select } from "@/editor/ui";
 import { baseStyles } from "../../shared/controls/controlStyles";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
+import { Button } from "flowbite-react";
 
 // ============================================================================
 // TYPES

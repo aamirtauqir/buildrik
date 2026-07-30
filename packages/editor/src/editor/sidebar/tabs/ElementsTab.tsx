@@ -10,11 +10,12 @@
 
 import { History, Star, X, Lightbulb } from "lucide-react";
 import * as React from "react";
-import { Button, EmptyState, EmptyStateDesc } from "@/editor/ui";
+import { EmptyState, EmptyStateDesc } from "@/editor/ui";
 import { CATEGORY_ICONS } from "./elements/constants";
 import { ElementCard, AnimatedAccordionContent, ChevronIcon } from "./elements/ElementCard";
 import type { ElementsTabProps } from "./elements/types";
 import { useElementsState } from "./elements/useElementsState";
+import { Button } from "flowbite-react";
 
 export type { ElementsTabProps };
 

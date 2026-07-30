@@ -15,7 +15,7 @@
  */
 
 import * as React from "react";
-import { Button } from "./Button";
+import { Button } from "flowbite-react";
 
 export interface HelpTooltipProps {
   /** Help text explaining the property */
@@ -51,12 +51,13 @@ export const HelpTooltip: React.FC<HelpTooltipProps> = ({
   return (
     <span style={{ position: "relative", display: "inline-flex" }}>
       <Button
-        kind="ghost"
-        size="sm"
+        color="light"
+        size="xs"
         type="button"
         aria-label="What's this?"
         aria-describedby={open ? tipId : undefined}
         style={buttonStyles}
+        className="tw:border-transparent tw:bg-transparent"
         onMouseEnter={() => setOpen(true)}
         onMouseLeave={() => setOpen(false)}
         onFocus={() => setOpen(true)}

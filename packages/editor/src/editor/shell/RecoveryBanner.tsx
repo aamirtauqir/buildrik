@@ -13,8 +13,8 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import { RecoveryManager } from "@/engine/recovery/RecoveryManager";
+import { Button } from "flowbite-react";
 
 export interface RecoveryBannerProps {
   /** How many pages the recovered draft holds — the scope of what was kept. */
@@ -66,8 +66,8 @@ export const RecoveryBanner: React.FC<RecoveryBannerProps> = ({ pageCount, reloa
         <span style={S.strong}>Recovered your work</span> after an unexpected close · {relTime(record.at)}{scope}.
       </div>
       <div style={S.actions}>
-        <Button kind="ghost" size="sm" onClick={discard}>Discard &amp; reload</Button>
-        <Button kind="primary" size="sm" onClick={() => setDismissed(true)}>Keep changes</Button>
+        <Button color="light" size="xs" onClick={discard} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">Discard &amp; reload</Button>
+        <Button size="xs" onClick={() => setDismissed(true)}>Keep changes</Button>
       </div>
     </div>
   );

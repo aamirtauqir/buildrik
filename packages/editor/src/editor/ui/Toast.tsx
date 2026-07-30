@@ -16,7 +16,9 @@
  */
 import React from "react";
 import { createPortal } from "react-dom";
-import { Button } from "./Button";
+import { Button } from "flowbite-react";
+
+const GHOST_BTN_CLASS = "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900";
 
 export type ToastTone = "info" | "success" | "warning" | "error" | "neutral";
 
@@ -143,14 +145,14 @@ function ToastItem({ toast, onDismiss }: { toast: QueuedToast; onDismiss: (id: s
         <span className="bk-toast__desc">{description}</span>
       </div>
       {action ? (
-        <Button kind="ghost" size="sm" onClick={action.onClick}>
+        <Button color="light" size="xs" onClick={action.onClick} className={GHOST_BTN_CLASS}>
           {action.label}
         </Button>
       ) : null}
       <Button
-        kind="ghost"
-        size="sm"
-        className="bk-toast__close"
+        color="light"
+        size="xs"
+        className={`bk-toast__close ${GHOST_BTN_CLASS}`}
         aria-label="Dismiss notification"
         onClick={() => onDismiss(id)}
       >

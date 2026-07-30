@@ -5,10 +5,11 @@
  */
 
 import * as React from "react";
-import { Button, Checkbox, Input, ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal, Stack } from "@/editor/ui";
+import { Checkbox, Input, ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal, Stack } from "@/editor/ui";
 import type { Composer } from "../../../engine";
 import { useToast } from "@/editor/ui";
 import { devError } from "../../../shared/utils/devLogger";
+import { Button } from "flowbite-react";
 
 export interface ProjectSettingsModalProps {
   isOpen: boolean;
@@ -190,10 +191,10 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
       </div>
           </div>
           <ModalFooter>
-            <Button kind="ghost" onClick={onClose}>
+            <Button color="light" onClick={onClose} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
               Cancel
             </Button>
-            <Button kind="primary" onClick={handleSave}>
+            <Button onClick={handleSave}>
               Save changes
             </Button>
           </ModalFooter>

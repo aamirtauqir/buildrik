@@ -9,29 +9,7 @@
  */
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { Button, Input, Select, Checkbox, Radio, Toggle, Slider, Badge, StatusDot, Avatar } from "../index";
-
-describe("Button", () => {
-  it("defaults to a primary md button that does not submit forms", () => {
-    render(<Button>Publish</Button>);
-    const btn = screen.getByRole("button", { name: "Publish" });
-    expect(btn.className).toContain("bk-btn--primary");
-    expect(btn.className).toContain("bk-btn--md");
-    expect(btn.getAttribute("type")).toBe("button");
-  });
-
-  it("loading disables the button and announces busy", () => {
-    render(<Button loading>Saving</Button>);
-    const btn = screen.getByRole("button", { name: "Saving" });
-    expect(btn).toBeDisabled();
-    expect(btn.getAttribute("aria-busy")).toBe("true");
-  });
-
-  it.each(["primary", "secondary", "ghost", "destructive"] as const)("renders the %s kind", (kind) => {
-    render(<Button kind={kind}>x</Button>);
-    expect(screen.getByRole("button").className).toContain(`bk-btn--${kind}`);
-  });
-});
+import { Input, Select, Checkbox, Radio, Toggle, Slider, Badge, StatusDot, Avatar } from "../index";
 
 describe("Input", () => {
   it("marks the error state for assistive tech, not just visually", () => {

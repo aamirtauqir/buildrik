@@ -12,8 +12,8 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import { useDSMode, type DSMode } from "../state/DSModeContext";
+import { Button } from "flowbite-react";
 
 const SEGMENTS: ReadonlyArray<{ value: DSMode; label: string; hint: string }> = [
   { value: "beginner", label: "Beginner", hint: "Friendly · hides token IDs and empty foundations" },
@@ -48,8 +48,8 @@ export const DSModeToggle: React.FC<DSModeToggleProps> = ({ className }) => {
           <Button
             key={seg.value}
             type="button"
-            kind="ghost"
-            size="sm"
+            color="light"
+            size="xs"
             role="radio"
             aria-checked={active}
             title={seg.hint}
@@ -65,7 +65,7 @@ export const DSModeToggle: React.FC<DSModeToggleProps> = ({ className }) => {
               background: active ? "var(--bk-accent)" : "transparent",
               transition: "background-color 0.12s, color 0.12s",
               userSelect: "none",
-            }}
+            }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           >
             {seg.label}
           </Button>

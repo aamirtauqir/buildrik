@@ -1,4 +1,4 @@
-import { Button, Cluster } from "@/editor/ui";
+import { Cluster } from "@/editor/ui";
 /**
  * AlignmentSection - Alignment grid and justify/align controls
  * @license BSD-3-Clause
@@ -7,6 +7,7 @@ import { Button, Cluster } from "@/editor/ui";
 import * as React from "react";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
 import { FlexAlignmentGrid } from "./controls";
+import { Button } from "flowbite-react";
 
 // ============================================================================
 // TYPES

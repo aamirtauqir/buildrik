@@ -18,9 +18,10 @@
  */
 
 import * as React from "react";
-import { Button, Input as VibcoderInput, Select as VibcoderSelect, Textarea as VibcoderTextarea } from "@/editor/ui";
+import { Input as VibcoderInput, Select as VibcoderSelect, Textarea as VibcoderTextarea } from "@/editor/ui";
 import { SIDEBAR_WIDE } from "@/shared/constants/layout";
 import "./settings.css";
+import { Button } from "flowbite-react";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Section

@@ -11,10 +11,10 @@
 
 import { Link, Link2Off } from "lucide-react";
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import type { Composer } from "../../../engine";
 import { useClickOutside } from "../../../shared/hooks/useClickOutside";
 import type { CMSCollection, CMSContentItem } from "../../../shared/types/cms";
+import { Button } from "flowbite-react";
 
 // =============================================================================
 // TYPES

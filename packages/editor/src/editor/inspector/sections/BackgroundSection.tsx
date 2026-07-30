@@ -3,10 +3,11 @@
  */
 
 import * as React from "react";
-import { Button, Input } from "@/editor/ui";
+import { Input } from "@/editor/ui";
 import type { MediaAsset, MediaAssetType } from "../../../shared/types/media";
 import { extractGradientUI, composeGradient, deriveBgType } from "../../../shared/utils/parsers/gradientHelpers";
 import { Section, ColorInput, SelectRow, InputRow, MoreSettingsToggle, type SectionTier, MixedValueIndicator } from "../shared/controls";
+import { Button } from "flowbite-react";
 
 export interface BackgroundSectionProps {
   styles: Record<string, string>;

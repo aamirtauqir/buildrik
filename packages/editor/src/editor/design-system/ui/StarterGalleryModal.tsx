@@ -18,8 +18,9 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button, ModalContent, ModalDescription, ModalFooter, ModalRoot, ModalTitle } from "@/editor/ui";
+import { ModalContent, ModalDescription, ModalFooter, ModalRoot, ModalTitle } from "@/editor/ui";
 import { STARTER_DS_REGISTRY, type StarterDS } from "../starters";
+import { Button } from "flowbite-react";
 
 export interface StarterGalleryModalProps {
   open: boolean;
@@ -86,12 +87,11 @@ export const StarterGalleryModal: React.FC<StarterGalleryModalProps> = ({
           <div style={{ fontSize: 11, color: "var(--bk-ink-muted)", marginRight: "auto" }}>
             Tip: applying a starter restyles tokens but keeps your elements.
           </div>
-          <Button kind="ghost" size="sm" type="button" onClick={handleSkip}>
+          <Button color="light" size="xs" type="button" onClick={handleSkip} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
             Skip
           </Button>
           <Button
-            kind="primary"
-            size="sm"
+            size="xs"
             type="button"
             onClick={handleApply}
             disabled={!selected}
@@ -118,7 +118,7 @@ function StarterCard({ starter, selected, onSelect }: StarterCardProps) {
   return (
     <Button
       type="button"
-      kind="ghost"
+      color="light"
       role="radio"
       aria-checked={selected}
       onClick={onSelect}
@@ -134,7 +134,7 @@ function StarterCard({ starter, selected, onSelect }: StarterCardProps) {
         display: "flex",
         flexDirection: "column",
         background: "var(--bk-bg-panel)",
-      }}
+      }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
     >
       <div
         style={{

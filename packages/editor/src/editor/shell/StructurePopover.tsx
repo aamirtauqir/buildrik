@@ -11,11 +11,11 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import type { Composer } from "../../engine";
 import { X } from "lucide-react";
 import { LayersPanel } from "../panels/layers";
 import type { SelectedElementInfo } from "../panels/layers";
+import { Button } from "flowbite-react";
 
 interface StructurePopoverProps {
   open: boolean;
@@ -83,11 +83,11 @@ export const StructurePopover: React.FC<StructurePopoverProps> = ({
       >
         <span style={{ fontSize: 12, fontWeight: 600, color: "var(--bk-ink)" }}>Structure</span>
         <Button
-          kind="ghost"
-          size="sm"
+          color="light"
+          size="xs"
           onClick={onClose}
           aria-label="Close structure"
-          style={{ display: "inline-grid", placeItems: "center", width: 24, height: 24, padding: 0 }}
+          style={{ display: "inline-grid", placeItems: "center", width: 24, height: 24, padding: 0 }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
         >
           <X size={14} />
         </Button>

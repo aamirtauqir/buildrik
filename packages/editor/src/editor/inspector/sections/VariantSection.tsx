@@ -5,11 +5,11 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import { Package } from "lucide-react";
 import type { Composer } from "../../../engine";
 import type { ComponentDefinition } from "../../../shared/types/components";
 import { Section } from "../shared/controls";
+import { Button } from "flowbite-react";
 
 // ============================================================================
 // TYPES

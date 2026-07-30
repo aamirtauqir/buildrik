@@ -4,9 +4,9 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import { useClickOutside } from "../../../shared/hooks/useClickOutside";
 import type { ExportFormat } from "../utils/exportUtils";
+import { Button } from "flowbite-react";
 
 const EXPORT_OPTIONS = [
   { fmt: "css", label: "CSS Variables", desc: "for custom CSS / SCSS" },
@@ -27,12 +27,12 @@ export const ExportDropdown: React.FC<{
   return (
     <div ref={ref} style={{ position: "relative" }}>
       <Button
-        kind="ghost"
-        size="sm"
+        color="light"
+        size="xs"
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="true"
         aria-expanded={open}
-        style={{ display: "flex", alignItems: "center", gap: 4 }}
+        style={{ display: "flex", alignItems: "center", gap: 4 }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
       >
         Export
         <svg
@@ -74,8 +74,8 @@ export const ExportDropdown: React.FC<{
                 ⚠ Exporting unsaved changes — not yet live on your site.
               </div>
               <Button
-                kind="ghost"
-                size="sm"
+                color="light"
+                size="xs"
                 onClick={() => {
                   setOpen(false);
                   onSaveFirst();
@@ -85,7 +85,7 @@ export const ExportDropdown: React.FC<{
                   color: "var(--bk-accent)",
                   padding: 0,
                   textDecoration: "underline",
-                }}
+                }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
               >
                 Save first →
               </Button>
@@ -94,8 +94,8 @@ export const ExportDropdown: React.FC<{
           {EXPORT_OPTIONS.map(({ fmt, label, desc }) => (
             <Button
               key={fmt}
-              kind="ghost"
-              size="sm"
+              color="light"
+              size="xs"
               role="menuitem"
               onClick={() => {
                 onExport(fmt as ExportFormat);
@@ -109,7 +109,7 @@ export const ExportDropdown: React.FC<{
                 border: "none",
                 cursor: "pointer",
                 textAlign: "left",
-              }}
+              }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
             >
               <div style={{ fontSize: 12, color: "var(--bk-ink)" }}>{label}</div>
               <div style={{ fontSize: 12, color: "var(--bk-ink-muted)", marginTop: 1 }}>

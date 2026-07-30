@@ -7,7 +7,7 @@
  */
 
 import * as React from "react";
-import { Button, Input, ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/ui";
+import { Input, ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/ui";
 import {
   ICON_CATEGORIES,
   getAllIcons,
@@ -20,6 +20,7 @@ import {
 } from "../../shared/constants/icons";
 import { InputField } from "../../shared/forms";
 import type { IconConfig, IconLibrary } from "../../shared/types/media";
+import { Button } from "flowbite-react";
 
 // ============================================
 // Types
@@ -506,7 +507,7 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
             Powered by Lucide Icons
           </span>
           <div style={{ display: "flex", gap: 8 }}>
-            <Button kind="ghost" onClick={onClose}>
+            <Button color="light" onClick={onClose} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
               Cancel
             </Button>
             <Button onClick={handleSelect} disabled={!selectedIcon}>

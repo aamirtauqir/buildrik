@@ -44,7 +44,8 @@ import {
   type TabId,
 } from "../sections/registry";
 import type { SectionTier } from "../shared/controls";
-import { Button, HelperText, Stack } from "@/editor/ui";
+import { HelperText, Stack } from "@/editor/ui";
+import { Button } from "flowbite-react";
 
 // ============================================================================
 // TYPES
@@ -239,13 +240,13 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
             {visibleIds.length - renderIds.length === 1 ? "" : "s"} hidden. It&apos;s a preference, not a limit.
           </HelperText>
           <Button
-            kind="ghost"
-            size="sm"
+            color="light"
+            size="xs"
             onClick={() => {
               const url = new URL(window.location.href);
               url.searchParams.set("density", "full");
               window.location.assign(url.toString());
-            }}
+            }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           >
             Show all controls
           </Button>

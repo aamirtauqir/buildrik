@@ -1,7 +1,8 @@
 import * as React from "react";
-import { Button, Checkbox } from "@/editor/ui";
+import { Checkbox } from "@/editor/ui";
 import { DiffRows } from "./DiffRows";
 import type { RunStep, RunPhase } from "./hooks/useAgentRunner";
+import { Button } from "flowbite-react";
 
 /**
  * P4 agent run surface: the ordered plan with per-step status, and on the step
@@ -66,7 +67,7 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
           <span className="bd-ai-agent-progress">
             Step {Math.min(currentIndex + 1, steps.length)} of {steps.length}
           </span>
-          <Button type="button" kind="ghost" aria-label="Stop run" onClick={onStop}>
+          <Button type="button" color="light" aria-label="Stop run" onClick={onStop} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
             Stop
           </Button>
         </div>
@@ -85,7 +86,7 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
               <div className="bd-ai-agent-step-review">
                 <DiffRows edit={{ ...s.edit, state: "pending" }} />
                 <div className="bd-ai-agent-step-actions">
-                  <Button type="button" kind="ghost" aria-label="Skip step" onClick={onSkip}>
+                  <Button type="button" color="light" aria-label="Skip step" onClick={onSkip} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                     Skip
                   </Button>
                   <Button type="button" aria-label="Apply step" onClick={onApprove}>

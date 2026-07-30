@@ -6,8 +6,9 @@
  */
 
 import * as React from "react";
-import { Button, Input } from "@/editor/ui";
+import { Input } from "@/editor/ui";
 import type { MilestoneSuggestion } from "../../../../../shared/hooks/useAutoMilestone";
+import { Button } from "flowbite-react";
 
 interface MilestoneSuggestionBannerProps {
   suggestion: MilestoneSuggestion;

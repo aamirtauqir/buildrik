@@ -1,6 +1,7 @@
 
 import * as React from "react";
-import { Button, Textarea } from "@/editor/ui";
+import { Textarea } from "@/editor/ui";
+import { Button } from "flowbite-react";
 
 export interface ComposerProps {
   onSubmit: (text: string) => void;

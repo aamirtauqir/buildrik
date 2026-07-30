@@ -20,7 +20,6 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import { defaultControlRegistry } from "./controlRegistry";
 import type {
   AtomicField,
@@ -29,6 +28,7 @@ import type {
   Field,
   SectionSchema,
 } from "./schema";
+import { Button } from "flowbite-react";
 
 export interface InspectorRendererProps {
   schema: SectionSchema;

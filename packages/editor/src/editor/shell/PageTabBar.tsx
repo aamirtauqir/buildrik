@@ -4,7 +4,7 @@
  */
 
 import * as React from "react";
-import { Button, ConfirmDialog, Input } from "@/editor/ui";
+import { ConfirmDialog, Input } from "@/editor/ui";
 import { createPortal } from "react-dom";
 import type { Composer } from "../../engine";
 import { EVENTS } from "../../shared/constants";
@@ -13,6 +13,7 @@ import { useToast } from "@/editor/ui";
 import { useClickOutside } from "@/shared/hooks";
 import { getDefaultPageName } from "../../shared/utils/pageUtils";
 import { normalizeSlug } from "../sidebar/tabs/pages/utils/slug";
+import { Button } from "flowbite-react";
 
 // ============================================================================
 // TYPES

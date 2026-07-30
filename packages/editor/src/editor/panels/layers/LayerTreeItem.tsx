@@ -5,11 +5,12 @@
  */
 
 import * as React from "react";
-import { Button, Input, } from "@/editor/ui";
+import { Input, } from "@/editor/ui";
 import { getElementIcon } from "@/editor/shared/elementIcons";
 import type { Composer } from "../../../engine";
 import { ELEMENT_TYPE_LABELS } from "../../../shared/constants/elementTypeLabels";
 import type { LayerItem, DragState, LayerDisplayPrefs } from "./types";
+import { Button } from "flowbite-react";
 
 export interface LayerTreeItemProps {
   layer: LayerItem;

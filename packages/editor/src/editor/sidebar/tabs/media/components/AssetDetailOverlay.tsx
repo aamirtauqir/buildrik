@@ -14,7 +14,7 @@
  */
 
 import * as React from "react";
-import { Button, Input } from "@/editor/ui";
+import { Input } from "@/editor/ui";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { OptimizationPanel } from "@/editor/media/OptimizationPanel";
 import type { LibraryItem } from "../data/mediaTypes";
@@ -25,6 +25,7 @@ import {
   restoreAssetVersion,
   type AssetVersion,
 } from "../../../../../services/MediaVersionService";
+import { Button } from "flowbite-react";
 
 type Tab = "preview" | "used" | "versions" | "edit" | "optimize";
 
@@ -222,8 +223,8 @@ export function AssetDetailOverlay({
           <Button
             key={t.id}
             type="button"
-            kind="ghost"
-            size="sm"
+            color="light"
+            size="xs"
             role="tab"
             aria-selected={tab === t.id}
             className={`med-detail-tab${tab === t.id ? " is-active" : ""}`}
@@ -339,8 +340,8 @@ export function AssetDetailOverlay({
                   <li key={v.key}>
                     <Button
                       type="button"
-                      kind="ghost"
-                      size="sm"
+                      color="light"
+                      size="xs"
                       className={`med-detail-version-row${v.key === item.key ? " is-current" : ""}`}
                       onClick={() => v.key !== item.key && onOpenItem?.(v)}
                       disabled={v.key === item.key || !onOpenItem}
@@ -373,10 +374,10 @@ export function AssetDetailOverlay({
                         </span>
                         <Button
                           type="button"
-                          kind="ghost"
-                          size="sm"
+                          color="light"
+                          size="xs"
                           onClick={() => handleRestoreVersion(v.id)}
-                          disabled={restoringId !== null}
+                          disabled={restoringId !== null} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
                         >
                           {restoringId === v.id ? "Restoring…" : "Restore"}
                         </Button>

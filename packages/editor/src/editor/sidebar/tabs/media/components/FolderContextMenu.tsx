@@ -1,6 +1,6 @@
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import { createPortal } from "react-dom";
+import { Button } from "flowbite-react";
 
 interface Props {
   folderId: string;

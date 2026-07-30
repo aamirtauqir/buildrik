@@ -9,7 +9,7 @@
  */
 
 import * as React from "react";
-import { Button, Input, PanelFrame } from "@/editor/ui";
+import { Input, PanelFrame } from "@/editor/ui";
 import { Search } from "lucide-react";
 import type { Composer } from "@/engine/Composer";
 import type { LibraryItem, MediaTypeFilter, TypeCounts, UploadProgress } from "../data/mediaTypes";
@@ -18,6 +18,7 @@ import { SelectionContextBar } from "./SelectionContextBar";
 import { AssetCell } from "./AssetCell";
 import { UploadZone } from "./UploadZone";
 import "./SlimLauncher.css";
+import { Button } from "flowbite-react";
 
 interface SlimLauncherProps {
   composer: Composer;

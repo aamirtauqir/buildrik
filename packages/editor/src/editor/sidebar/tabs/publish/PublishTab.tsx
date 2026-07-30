@@ -9,12 +9,13 @@
  */
 
 import * as React from "react";
-import { Button, PanelFrame, Stack } from "@/editor/ui";
+import { PanelFrame, Stack } from "@/editor/ui";
 import type { Composer } from "../../../../engine";
 import type { UsePublishJobResult } from "../../../shell/hooks/usePublishJob";
 import { useToast } from "@/editor/ui";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { PublishHistory } from "../../../shell/PublishHistory";
+import { Button } from "flowbite-react";
 
 // ============================================
 // Types
@@ -359,7 +360,6 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           ) : (
             <>
               <Button
-                kind="primary"
                 onClick={handlePublish}
                 disabled={isPublishing}
                 style={{ width: "100%" }}

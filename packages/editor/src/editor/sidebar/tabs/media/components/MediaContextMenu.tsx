@@ -12,9 +12,9 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import { useClickOutside } from "../../../../../shared/hooks/useClickOutside";
 import type { LibraryItem, MediaFolder } from "../data/mediaTypes";
+import { Button } from "flowbite-react";
 
 interface MediaContextMenuProps {
   x: number;

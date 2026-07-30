@@ -14,7 +14,6 @@ import { Plus, Trash2, Pencil } from "lucide-react";
 import type { Composer } from "../../../engine";
 import type { CMSCollection, CMSContentItem, CMSField } from "../../../shared/types/cms";
 import {
-  Button,
   Checkbox,
   Input,
   ModalClose,
@@ -25,6 +24,7 @@ import {
   Select,
   Textarea,
 } from "@/editor/ui";
+import { Button } from "flowbite-react";
 
 export interface CMSRecordsModalProps {
   composer: Composer | null;
@@ -222,10 +222,10 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                   <div>
                     {collection.fields.map(renderField)}
                     <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-                      <Button kind="primary" size="sm" loading={busy} onClick={save}>
+                      <Button size="xs" disabled={busy} onClick={save} aria-busy={busy || undefined}>
                         {editingId === "" ? "Add record" : "Save"}
                       </Button>
-                      <Button kind="ghost" size="sm" onClick={() => setEditingId(null)}>
+                      <Button color="light" size="xs" onClick={() => setEditingId(null)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                         Cancel
                       </Button>
                     </div>
@@ -253,7 +253,7 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                       <span style={{ fontSize: 12, color: "var(--bk-ink-soft)" }}>
                         {items.length} record{items.length === 1 ? "" : "s"}
                       </span>
-                      <Button kind="secondary" size="sm" onClick={startAdd} disabled={!collection}>
+                      <Button color="light" size="xs" onClick={startAdd} disabled={!collection}>
                         <Plus size={13} /> Add record
                       </Button>
                     </div>
@@ -281,18 +281,18 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                             </span>
                             <span style={{ display: "flex", gap: 4 }}>
                               <Button
-                                kind="ghost"
-                                size="sm"
-                                loading={busy}
+                                color="light"
+                                size="xs"
+                                disabled={busy}
                                 onClick={() => setStatus(item.id, item.status === "published" ? "draft" : "published")}
-                                aria-label={item.status === "published" ? "Unpublish record" : "Publish record"}
+                                aria-label={item.status === "published" ? "Unpublish record" : "Publish record"} aria-busy={busy || undefined} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
                               >
                                 {item.status === "published" ? "Unpublish" : "Publish"}
                               </Button>
-                              <Button kind="ghost" size="sm" onClick={() => startEdit(item)} aria-label="Edit record">
+                              <Button color="light" size="xs" onClick={() => startEdit(item)} aria-label="Edit record" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                                 <Pencil size={13} />
                               </Button>
-                              <Button kind="ghost" size="sm" loading={busy} onClick={() => remove(item.id)} aria-label="Delete record">
+                              <Button color="light" size="xs" disabled={busy} onClick={() => remove(item.id)} aria-label="Delete record" aria-busy={busy || undefined} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                                 <Trash2 size={13} />
                               </Button>
                             </span>

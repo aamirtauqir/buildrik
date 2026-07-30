@@ -34,7 +34,8 @@ import {
   Rocket,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { Button, Tooltip } from "@/editor/ui";
+import { Tooltip } from "@/editor/ui";
+import { Button } from "flowbite-react";
 
 // ============================================
 // Icon map — lucide icon name → component
@@ -136,7 +137,7 @@ function RailZone({
         return (
           <Tooltip key={tab.id} label={tab.shortcut ? `${tab.label} · ${tab.shortcut}` : tab.label}>
             <Button
-              kind="ghost"
+              color="light"
               className={`ls-btn${showLabels ? " ls-btn--labeled" : ""}${isSelectedTab ? " ls-btn--active" : ""}${!drawerOpen && isSelectedTab ? " ls-btn--last" : ""}`}
               onClick={() => onBtnClick(tab.id)}
               role="tab"
@@ -233,7 +234,7 @@ function FourToolRail({
         return (
           <Tooltip key={tool} label={meta.label}>
             <Button
-              kind="ghost"
+              color="light"
               className={`ls-btn${isSelected ? " ls-btn--active" : ""}${!drawerOpen && isSelected ? " ls-btn--last" : ""}`}
               onClick={() => onBtnClick(TOOL_PRIMARY_TAB[tool])}
               role="tab"
@@ -281,8 +282,8 @@ function ToolSubNav({
         return (
           <Button
             key={t.id}
-            kind="ghost"
-            size="sm"
+            color="light"
+            size="xs"
             role="tab"
             aria-selected={active}
             onClick={() => onSubTabChange(t.id)}

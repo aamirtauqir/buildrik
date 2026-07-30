@@ -7,8 +7,9 @@
  */
 
 import * as React from "react";
-import { Button, Input } from "@/editor/ui";
+import { Input } from "@/editor/ui";
 import type { Composer } from "../../../../engine";
+import { Button } from "flowbite-react";
 
 // ============================================================================
 // TYPES

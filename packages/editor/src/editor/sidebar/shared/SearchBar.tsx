@@ -5,8 +5,9 @@
  */
 
 import * as React from "react";
-import { Button, Input } from "@/editor/ui";
+import { Input } from "@/editor/ui";
 import { trackSidebar } from "../../../shared/utils/sidebarAnalytics";
+import { Button } from "flowbite-react";
 
 export interface SearchBarProps {
   value: string;

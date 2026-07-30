@@ -23,7 +23,7 @@
  */
 
 import * as React from "react";
-import { Button, Input, Textarea } from "@/editor/ui";
+import { Input, Textarea } from "@/editor/ui";
 import { useToast } from "@/editor/ui";
 import { parseImportJSON, diffTokens, type DiffResult } from "../../utils/importUtils";
 import { useImportTokens } from "../../state/useImportTokens";
@@ -35,6 +35,7 @@ import {
   useIconRegistry, useImageryRegistry,
 } from "../../state/TokenRegistryContext";
 import type { DesignToken } from "../../types";
+import { Button } from "flowbite-react";
 
 type ConflictStrategy = "replace" | "keep-mine" | "keep-theirs";
 
@@ -397,8 +398,8 @@ export const ImportCard: React.FC = () => {
 
           <Button
             type="button"
-            kind="ghost"
-            size="sm"
+            color="light"
+            size="xs"
             onClick={() => setShowPaste((v) => !v)}
             style={{
               marginTop: 8,
@@ -410,7 +411,7 @@ export const ImportCard: React.FC = () => {
               cursor: "pointer",
               textDecoration: "underline",
             }}
-            aria-expanded={showPaste}
+            aria-expanded={showPaste} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           >
             or paste JSON
           </Button>
@@ -431,7 +432,6 @@ export const ImportCard: React.FC = () => {
               </label>
               <Button
                 type="button"
-                kind="primary"
                 onClick={() => ingestRaw(pasteBuffer, null)}
                 style={pasteSubmitStyle}
                 disabled={!pasteBuffer.trim()}
@@ -498,8 +498,8 @@ export const ImportCard: React.FC = () => {
               <div style={conflictBtnRowStyle}>
                 <Button
                   type="button"
-                  kind="secondary"
-                  size="sm"
+                  color="light"
+                  size="xs"
                   onClick={() => setStrategy("replace")}
                   style={strategyBtnStyle(strategy === "replace")}
                   aria-pressed={strategy === "replace"}
@@ -508,8 +508,8 @@ export const ImportCard: React.FC = () => {
                 </Button>
                 <Button
                   type="button"
-                  kind="secondary"
-                  size="sm"
+                  color="light"
+                  size="xs"
                   onClick={() => setStrategy("keep-mine")}
                   style={strategyBtnStyle(strategy === "keep-mine")}
                   aria-pressed={strategy === "keep-mine"}
@@ -518,8 +518,8 @@ export const ImportCard: React.FC = () => {
                 </Button>
                 <Button
                   type="button"
-                  kind="secondary"
-                  size="sm"
+                  color="light"
+                  size="xs"
                   onClick={() => setStrategy("keep-theirs")}
                   style={strategyBtnStyle(strategy === "keep-theirs")}
                   aria-pressed={strategy === "keep-theirs"}
@@ -533,7 +533,6 @@ export const ImportCard: React.FC = () => {
           <div style={actionRowStyle}>
             <Button
               type="button"
-              kind="primary"
               onClick={handleApply}
               style={applyBtnStyle}
               disabled={applyCount === 0}
@@ -542,7 +541,7 @@ export const ImportCard: React.FC = () => {
             </Button>
             <Button
               type="button"
-              kind="secondary"
+              color="light"
               onClick={handleCancel}
               style={cancelBtnStyle}
             >

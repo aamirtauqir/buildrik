@@ -22,7 +22,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button, ModalContent, ModalFooter, ModalRoot, ModalTitle, Textarea, isModalOpen } from "@/editor/ui";
+import { ModalContent, ModalFooter, ModalRoot, ModalTitle, Textarea, isModalOpen } from "@/editor/ui";
 import { useToast } from "@/editor/ui";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants";
@@ -40,6 +40,7 @@ import {
   pinPosition,
   pointToFractions,
 } from "./commentAnchors";
+import { Button } from "flowbite-react";
 
 interface CommentLayerProps {
   composer: Composer | null;
@@ -431,16 +432,16 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
             />
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 6, marginTop: 8 }}>
               <Button
-                kind="ghost"
-                size="sm"
+                color="light"
+                size="xs"
                 onClick={() => {
                   setDraft(null);
                   setDraftBody("");
-                }}
+                }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
               >
                 Cancel
               </Button>
-              <Button kind="primary" size="sm" disabled={!draftBody.trim() || posting} onClick={() => void handlePost()}>
+              <Button size="xs" disabled={!draftBody.trim() || posting} onClick={() => void handlePost()}>
                 {posting ? "Posting…" : "Post"}
               </Button>
             </div>
@@ -479,8 +480,7 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
           </div>
           <ModalFooter>
             <Button
-              kind="primary"
-              size="sm"
+              size="xs"
               onClick={() => {
                 setOrphanModal(null);
                 composer?.emit("ui:switch-tab", { tab: "review" });

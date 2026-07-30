@@ -8,7 +8,7 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
+import { Button } from "flowbite-react";
 
 export interface FeatureCardProps {
   /** Card title (e.g., "Elements", "Templates") */

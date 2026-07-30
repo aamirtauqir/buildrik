@@ -6,8 +6,9 @@
 
 import DOMPurify from "dompurify";
 import * as React from "react";
-import { Badge, Button, ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/ui";
+import { Badge, ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/ui";
 import type { Template } from "./types";
+import { Button } from "flowbite-react";
 
 // ============================================================================
 // TYPES

@@ -8,9 +8,9 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import { captureError } from "../../../shared/utils/errorTracking";
 import { trackSidebar } from "../../../shared/utils/sidebarAnalytics";
+import { Button } from "flowbite-react";
 
 interface InspectorErrorBoundaryProps {
   children: React.ReactNode;

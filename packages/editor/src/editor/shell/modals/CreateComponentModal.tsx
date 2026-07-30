@@ -5,9 +5,10 @@
  */
 
 import * as React from "react";
-import { Button, Checkbox, Input, ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal, Stack, Textarea } from "@/editor/ui";
+import { Checkbox, Input, ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal, Stack, Textarea } from "@/editor/ui";
 import type { Composer } from "../../../engine";
 import { useToast } from "@/editor/ui";
+import { Button } from "flowbite-react";
 
 export interface CreateComponentModalProps {
   isOpen: boolean;
@@ -240,10 +241,10 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
       </Stack>
           </div>
           <ModalFooter>
-            <Button kind="ghost" onClick={onClose} disabled={isCreating}>
+            <Button color="light" onClick={onClose} disabled={isCreating} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
               Cancel
             </Button>
-            <Button kind="primary" onClick={handleSubmit} disabled={!name.trim() || isCreating}>
+            <Button onClick={handleSubmit} disabled={!name.trim() || isCreating}>
               {isCreating ? "Creating..." : "Create Component"}
             </Button>
           </ModalFooter>

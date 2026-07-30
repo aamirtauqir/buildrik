@@ -1,4 +1,4 @@
-import { Button, Popover } from "@/editor/ui";
+import { Popover } from "@/editor/ui";
 /**
  * FontControls - Font weight, style, and decoration controls
  * Part of Typography section refactoring
@@ -18,6 +18,7 @@ import { useTypeRegistry } from "../../../design-system/state/TokenRegistryConte
 import { TokenPickerPopover } from "../../shared/TokenPickerPopover";
 import { SelectRow, ButtonGroup, InputWithUnit, MixedValueIndicator } from "../../shared/controls";
 import { getCssVariable } from "@/shared/utils/getCssVariable";
+import { Button } from "flowbite-react";
 
 // Font weight options
 export const FONT_WEIGHTS = [

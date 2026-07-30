@@ -11,7 +11,6 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import type { Composer } from "../../../../../engine";
 import type { PageItem, DrawerTab } from "../types";
 import { usePageSettings } from "./usePageSettings";
@@ -19,6 +18,7 @@ import { SeoTab } from "./SeoTab";
 import { SocialTab } from "./SocialTab";
 import { AdvancedTab } from "./AdvancedTab";
 import { UnsavedWarningModal } from "./UnsavedWarningModal";
+import { Button } from "flowbite-react";
 
 const TABS: { id: DrawerTab; label: string }[] = [
   { id: "seo", label: "SEO" },

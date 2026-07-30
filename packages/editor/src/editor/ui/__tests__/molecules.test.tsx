@@ -11,8 +11,9 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import {
   Row, ListRow, TreeRow, VersionRow, RecordRow, FormatRow, IntegrationRow, CommentRow,
   FieldRow, NavItem, SectionHeader, PanelHeader, EmptyState, ProgressRow, Tooltip,
-  MediaCard, SiteCard, Button,
+  MediaCard, SiteCard,
 } from "../index";
+import { Button } from "flowbite-react";
 
 describe("Row", () => {
   it("is inert by default — no tab stop, no role", () => {

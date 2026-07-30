@@ -10,7 +10,7 @@
  */
 import React from "react";
 import { Modal } from "./Modal";
-import { Button } from "./Button";
+import { Button } from "flowbite-react";
 import { Badge } from "./Badge";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 
@@ -70,10 +70,15 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
       title="Upgrade Your Plan"
       footer={
         <>
-          <Button kind="ghost" size="sm" onClick={handleClose}>
+          <Button
+            color="light"
+            size="xs"
+            onClick={handleClose}
+            className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+          >
             Maybe Later
           </Button>
-          <Button kind="primary" size="sm" onClick={handleUpgrade}>
+          <Button size="xs" onClick={handleUpgrade}>
             Upgrade to {requiredPlan}
           </Button>
         </>

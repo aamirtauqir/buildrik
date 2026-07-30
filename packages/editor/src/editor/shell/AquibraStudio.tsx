@@ -15,7 +15,7 @@ import type { Composer } from "../../engine";
 import { useElementFlash } from "../../shared/hooks";
 import { EVENTS } from "../../shared/constants";
 import type { ComposerConfig, ProjectData, BlockData } from "../../shared/types";
-import { Button, Stack, StudioSkeleton, ToastProvider, UpgradeModal, useToast } from "@/editor/ui";
+import { Stack, StudioSkeleton, ToastProvider, UpgradeModal, useToast } from "@/editor/ui";
 import { StaleApprovalModal } from "./modals/StaleApprovalModal";
 import { PreviewOverlay } from "./PreviewOverlay";
 import { migrateStorageKeys, migrateAqbKeys } from "../../shared/utils/storageMigration";
@@ -54,6 +54,7 @@ import "./chrome.css";
 // flowbite-bigbang Task 2: configure flowbite-react's tw: class prefix
 // (spec §4.1) before any flowbite-react component can mount in the real app.
 import "../chrome-ui/flowbiteStore";
+import { Button } from "flowbite-react";
 
 // Run localStorage migration on app startup (module load)
 migrateStorageKeys();

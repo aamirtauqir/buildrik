@@ -6,7 +6,8 @@
  */
 
 import * as React from "react";
-import { Button, SkeletonListItem, Stack } from "@/editor/ui";
+import { SkeletonListItem, Stack } from "@/editor/ui";
+import { Button } from "flowbite-react";
 
 /** Loading skeleton shown while lazy-loaded tab chunks download */
 export const PanelSkeleton: React.FC = () => (

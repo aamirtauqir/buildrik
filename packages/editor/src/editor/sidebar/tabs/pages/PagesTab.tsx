@@ -13,7 +13,7 @@
  */
 
 import * as React from "react";
-import { Button, ConfirmDialog, EmptyState, EmptyStateActions, EmptyStateDesc, EmptyStateTitle, PanelFrame } from "@/editor/ui";
+import { ConfirmDialog, EmptyState, EmptyStateActions, EmptyStateDesc, EmptyStateTitle, PanelFrame } from "@/editor/ui";
 import type { Composer } from "../../../../engine";
 import { PageCommandPalette } from "./components/PageCommandPalette";
 import { PageContextMenu } from "./components/PageContextMenu";
@@ -25,6 +25,7 @@ import { usePages } from "./usePages";
 import { useFolders } from "./useFolders";
 import { useBulkSelect } from "./useBulkSelect";
 import "./PagesTab.css";
+import { Button } from "flowbite-react";
 
 export interface PagesTabProps {
   composer: Composer | null;
@@ -196,11 +197,11 @@ export const PagesTab: React.FC<PagesTabProps> = ({
         onClose={onClose}
       >
         <Button
-          kind="ghost"
-          size="sm"
+          color="light"
+          size="xs"
           style={{ display: "inline-grid", placeItems: "center", width: 26, height: 22, padding: 0 }}
           onClick={() => setPaletteOpen(true)}
-          aria-label="Open command palette"
+          aria-label="Open command palette" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
         >
           <span style={{ font: "500 10px var(--bk-font-mono)", padding: "1px 5px", borderRadius: 3, border: "1px solid var(--bk-border)", background: "var(--bk-bg-subtle)", color: "var(--bk-ink-muted)" }}>
             ⌘K
@@ -214,7 +215,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             <EmptyStateTitle>{p.loadError}</EmptyStateTitle>
             <EmptyStateDesc>Your connection dropped. Work is safe — nothing was lost.</EmptyStateDesc>
             <EmptyStateActions>
-              <Button kind="secondary" size="sm" onClick={p.retrySync}>
+              <Button color="light" size="xs" onClick={p.retrySync}>
                 Try again
               </Button>
             </EmptyStateActions>
@@ -240,8 +241,8 @@ export const PagesTab: React.FC<PagesTabProps> = ({
               return (
                 <Button
                   key={v}
-                  kind="ghost"
-                  size="sm"
+                  color="light"
+                  size="xs"
                   role="tab"
                   aria-selected={on}
                   onClick={() => setView(v)}
@@ -253,7 +254,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
                     borderRight: i === 0 ? "1px solid var(--bk-border)" : undefined,
                     background: on ? "var(--bk-accent)" : "transparent",
                     color: on ? "var(--bk-accent-on)" : "var(--bk-ink-muted)",
-                  }}
+                  }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
                 >
                   {label}
                 </Button>

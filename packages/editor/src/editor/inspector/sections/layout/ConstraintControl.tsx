@@ -4,8 +4,9 @@
  */
 
 import * as React from "react";
-import { Button, Input } from "@/editor/ui";
+import { Input } from "@/editor/ui";
 import { constraintBtnStyle, fixedInputStyle } from "./styles";
+import { Button } from "flowbite-react";
 
 // ============================================================================
 // TYPES

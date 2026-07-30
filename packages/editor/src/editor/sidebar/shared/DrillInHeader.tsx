@@ -5,9 +5,10 @@
  */
 
 import * as React from "react";
-import { Button, PanelHeaderActions } from "@/editor/ui";
+import { PanelHeaderActions } from "@/editor/ui";
 import { BackArrowIcon } from "./headerIcons";
 import { drillInHeaderContainerStyles } from "./headerStyles";
+import { Button } from "flowbite-react";
 
 export interface DrillInHeaderProps {
   /** Current screen title (e.g., "Elements") */

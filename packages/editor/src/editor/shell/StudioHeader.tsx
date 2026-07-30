@@ -22,7 +22,6 @@
 import * as React from "react";
 import {
   Topbar,
-  Button,
   ModalRoot,
   ModalContent,
   ModalTitle,
@@ -59,6 +58,7 @@ import { NotificationPanel, useUnreadCount } from "./NotificationPanel";
 import { SendForReview } from "./SendForReview";
 import { SiteMenu } from "./SiteMenu";
 import "./header.css";
+import { Button } from "flowbite-react";
 
 /** Selected element minimal info */
 export interface SelectedElementInfo {
@@ -686,12 +686,12 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
               ))}
               {confirmMore > 0 ? (
                 <Button
-                  kind="ghost"
-                  size="sm"
+                  color="light"
+                  size="xs"
                   onClick={() => {
                     setPubConfirm(false);
                     onOpenIssues?.();
-                  }}
+                  }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
                 >
                   +{confirmMore} more
                 </Button>
@@ -705,19 +705,16 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
             </ModalDescription>
             <ModalFooter>
               <Button
-                kind="ghost"
-                size="md"
+                color="light"
                 autoFocus
                 onClick={() => {
                   setPubConfirm(false);
                   onOpenIssues?.();
-                }}
+                }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
               >
                 Review issues first
               </Button>
               <Button
-                kind="primary"
-                size="md"
                 onClick={() => {
                   setPubConfirm(false);
                   publishNow();
@@ -747,14 +744,14 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
               </p>
             ) : null}
             <ModalFooter>
-              <Button kind="ghost" size="md" onClick={() => setExitDialog(null)}>
+              <Button color="light" onClick={() => setExitDialog(null)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                 Stay
               </Button>
-              <Button kind="destructive" size="md" onClick={leaveAnyway}>
+              <Button color="red" onClick={leaveAnyway}>
                 Leave anyway
               </Button>
               {exitDialog.kind === "dirty" ? (
-                <Button kind="primary" size="md" loading={leaving} onClick={() => void saveAndLeave()}>
+                <Button disabled={leaving} onClick={() => void saveAndLeave()} aria-busy={leaving || undefined}>
                   Save &amp; leave
                 </Button>
               ) : null}

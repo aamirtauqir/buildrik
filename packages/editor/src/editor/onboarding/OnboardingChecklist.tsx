@@ -21,9 +21,10 @@
  */
 
 import * as React from "react";
-import { Button, Stack } from "@/editor/ui";
+import { Stack } from "@/editor/ui";
 import { Check, ChevronUp, ChevronDown, Minus, X, ArrowRight } from "lucide-react";
 import type { OnboardingStep } from "../../shared/constants/onboardingSteps";
+import { Button } from "flowbite-react";
 
 // ── Props ───────────────────────────────────────────────────────────────────
 

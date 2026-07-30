@@ -13,10 +13,11 @@
  */
 
 import * as React from "react";
-import { Button, FormField, Input, Popover, Textarea, Tooltip } from "@/editor/ui";
+import { FormField, Input, Popover, Textarea, Tooltip } from "@/editor/ui";
 import type { Composer } from "../../engine";
 import { submitForReview, type ReviewStatus } from "../../services/ReviewService";
 import { exportPublishPages } from "./exportPublishPages";
+import { Button } from "flowbite-react";
 
 export interface SendForReviewProps {
   composer: Composer | null;
@@ -108,14 +109,13 @@ export const SendForReview: React.FC<SendForReviewProps> = ({
            * those are busy states, and busy must stay un-clickable.
            */
           <Tooltip label={disabledReason} placement="bottom-end">
-            <Button kind="primary" size="sm" aria-disabled="true" onClick={() => {}}>
+            <Button size="xs" aria-disabled="true" onClick={() => {}}>
               {LABEL[state]}
             </Button>
           </Tooltip>
         ) : (
           <Button
-            kind="primary"
-            size="sm"
+            size="xs"
             onClick={() => state !== "sent" && setOpen((v) => !v)}
             disabled={state === "sending" || state === "sent"}
           >
@@ -158,10 +158,10 @@ export const SendForReview: React.FC<SendForReviewProps> = ({
           </p>
         ) : null}
         <div className="bk-send-review__actions">
-          <Button kind="ghost" size="sm" onClick={() => setOpen(false)}>
+          <Button color="light" size="xs" onClick={() => setOpen(false)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
             Cancel
           </Button>
-          <Button kind="primary" size="sm" loading={state === "sending"} onClick={() => void send()}>
+          <Button size="xs" disabled={state === "sending"} onClick={() => void send()} aria-busy={state === "sending" || undefined}>
             Send
           </Button>
         </div>

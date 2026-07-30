@@ -5,11 +5,11 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import { useClickOutside } from "../../../../shared/hooks/useClickOutside";
 import type { DesignToken, WcagLevel } from "../../types";
 import { calcWcagLevel, wcagTooltip, calcContrastRatio } from "../../utils/colorUtils";
 import { ColorPicker } from "./ColorPicker";
+import { Button } from "flowbite-react";
 
 // ─── WCAG Badge ───────────────────────────────────────────────────────────────
 
@@ -235,7 +235,7 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
             )}
           </div>
           <Button
-            kind="ghost"
+            color="light"
             onClick={handleCopyHex}
             style={{
               background: "none",
@@ -247,7 +247,7 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
               fontFamily: "monospace",
               letterSpacing: "0.3px",
             }}
-            title="Click to copy hex"
+            title="Click to copy hex" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           >
             {copied ? "Copied!" : token.value.toUpperCase()}
           </Button>
@@ -257,10 +257,10 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
         {showWcag && (
           <div ref={popoverRef} style={{ position: "relative" }}>
             <Button
-              kind="ghost"
+              color="light"
               onClick={() => setShowWcagPopover((v) => !v)}
               style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}
-              aria-label={wcagTooltip(wcagLevel)}
+              aria-label={wcagTooltip(wcagLevel)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
             >
               <WcagBadge level={wcagLevel} />
             </Button>
@@ -317,7 +317,7 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
         {/* Undo */}
         {canUndo && (
           <Button
-            kind="ghost"
+            color="light"
             onClick={() => onUndo(token.id)}
             style={{
               background: "none",
@@ -330,7 +330,7 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
               alignItems: "center",
             }}
             title="Undo color change"
-            aria-label="Undo"
+            aria-label="Undo" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           >
             <UndoIcon />
           </Button>
@@ -339,7 +339,7 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
         {/* Redo */}
         {canRedo && (
           <Button
-            kind="ghost"
+            color="light"
             onClick={() => onRedo(token.id)}
             style={{
               background: "none",
@@ -352,7 +352,7 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
               alignItems: "center",
             }}
             title="Redo color change"
-            aria-label="Redo"
+            aria-label="Redo" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           >
             <RedoIcon />
           </Button>

@@ -6,11 +6,12 @@
  */
 
 import * as React from "react";
-import { Button, Input } from "@/editor/ui";
+import { Input } from "@/editor/ui";
 import type { Composer } from "../../../engine";
 import { devWarn } from "../../../shared/utils/devLogger";
 import { runTransaction } from "../../../shared/utils/helpers";
 import { Section, type SectionTier } from "../shared/controls";
+import { Button } from "flowbite-react";
 
 export interface CSSClassesSectionProps {
   selectedElement: {

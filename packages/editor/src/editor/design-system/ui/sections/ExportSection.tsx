@@ -27,7 +27,8 @@ import { buildExport, downloadFile, type ExportFormat } from "../../utils/export
 import type { DesignToken } from "../../types";
 import type { BundleOptions } from "../../../../engine/designSystem/bundler/CSSBundler";
 import { ImportCard } from "./ImportCard";
-import { Button, Radio } from "@/editor/ui";
+import { Radio } from "@/editor/ui";
+import { Button } from "flowbite-react";
 
 // Local format type widens exportUtils ExportFormat with a stub "figma" entry
 // so the s05 prototype's 4-row selector renders without touching the shared
@@ -389,7 +390,7 @@ export const ExportSection: React.FC = () => {
         <pre data-testid="export-preview" style={previewStyle}>
           {preview}
         </pre>
-        <Button kind="primary" onClick={handleDownload} style={downloadButtonStyle}>
+        <Button onClick={handleDownload} style={downloadButtonStyle}>
           {downloadLabelFor(format)}
         </Button>
       </div>

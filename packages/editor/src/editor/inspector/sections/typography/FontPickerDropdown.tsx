@@ -7,9 +7,10 @@
  */
 
 import * as React from "react";
-import { Button, Input } from "@/editor/ui";
+import { Input } from "@/editor/ui";
 import type { GoogleFont, FontCategory } from "../../../../services/GoogleFontsService";
 import type { SystemFont } from "./FontPicker";
+import { Button } from "flowbite-react";
 
 // Category labels for display
 export const CATEGORY_LABELS: Record<FontCategory | "system", string> = {

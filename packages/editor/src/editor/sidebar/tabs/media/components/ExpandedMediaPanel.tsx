@@ -13,7 +13,7 @@
  */
 
 import * as React from "react";
-import { Button, ConfirmDialog, Input, useToast } from "@/editor/ui";
+import { ConfirmDialog, Input, useToast } from "@/editor/ui";
 import { Maximize2, Minimize2, Plus, Upload, X } from "lucide-react";
 import type { Composer } from "../../../../../engine/Composer";
 import type { LibraryItem, MediaStateResult } from "../data/mediaTypes";
@@ -30,6 +30,7 @@ import { StockSourceModal } from "./StockSourceModal";
 import { ReplaceAcrossDialog } from "./ReplaceAcrossDialog";
 import "../MediaTab.css";
 import "./ExpandedMediaPanel.css";
+import { Button } from "flowbite-react";
 
 export interface ExpandedMediaPanelProps {
   composer: Composer;

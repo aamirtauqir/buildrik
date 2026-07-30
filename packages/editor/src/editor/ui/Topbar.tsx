@@ -20,8 +20,10 @@
  * @license BSD-3-Clause
  */
 import React from "react";
-import { Button } from "./Button";
+import { Button } from "flowbite-react";
 import { IconButton } from "./Icon";
+
+const GHOST_BTN_CLASS = "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900";
 import { IssueChip } from "./IssueChip";
 import { SaveStatus, type SaveState } from "./SaveStatus";
 import { Presence, type PresenceProps } from "./Presence";
@@ -103,7 +105,7 @@ export function Topbar({
   const hasTools = Boolean(tools && (tools.onPreview || tools.onToggleComments || tools.issues));
   return (
     <header className="bk-topbar">
-      <Button kind="ghost" size="sm" onClick={onExit}>
+      <Button color="light" size="xs" onClick={onExit} className={GHOST_BTN_CLASS}>
         ‹ Exit
       </Button>
 
@@ -154,8 +156,17 @@ export function Topbar({
 
       {action ?? (
         publish === "published" ? (
-          /* Success transient — disabled for its 2s beat, restyled not re-built. */
-          <Button kind="ghost" size="md" disabled className="bk-topbar__published">
+          /* Success transient — disabled for its 2s beat, restyled not re-built.
+             bk-topbar__published's old :disabled bg/color rule lived in the
+             components layer, weaker than flowbite's tw-utilities — baked the
+             green look into tw: utilities directly (green-100/green-600 are
+             exact hex matches for --bk-success-tint/--bk-success-text). */
+          <Button
+            color="light"
+            size="xs"
+            disabled
+            className="bk-topbar__published tw:border-transparent tw:bg-green-100 tw:text-green-600 tw:opacity-100"
+          >
             {PUBLISH_LABEL[publish]}
           </Button>
         ) : publish === "disabled" ? (
@@ -170,17 +181,16 @@ export function Topbar({
            */
           <Tooltip label={publishBlockedReason ?? "Publishing is unavailable"} placement="bottom-end">
             <Button
-              kind="primary"
-              size="md"
               aria-disabled="true"
-              loading={publishBusy}
+              disabled={publishBusy}
+              aria-busy={publishBusy || undefined}
               onClick={() => {}}
             >
               {PUBLISH_LABEL[publish]}
             </Button>
           </Tooltip>
         ) : (
-          <Button kind="primary" size="md" loading={publishBusy} onClick={onPublish}>
+          <Button disabled={publishBusy} aria-busy={publishBusy || undefined} onClick={onPublish}>
             {PUBLISH_LABEL[publish]}
           </Button>
         )

@@ -8,10 +8,11 @@
  */
 
 import * as React from "react";
-import { Button, Cluster, HelperText, Input, Label, Stack, Textarea, Tooltip } from "@/editor/ui";
+import { Cluster, HelperText, Input, Label, Stack, Textarea, Tooltip } from "@/editor/ui";
 import { generateContent } from "@/shared/utils/openai";
 import type { PageItem } from "../types";
 import type { UsePageSettingsReturn } from "./usePageSettings";
+import { Button } from "flowbite-react";
 
 interface Props {
   s: UsePageSettingsReturn;
@@ -82,11 +83,11 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
             <strong style={{ color: "var(--bk-ink)" }}>noIndex is ON</strong> — search engines won&apos;t index this page regardless of your
             SEO settings.
             <Button
-              kind="ghost"
-              size="sm"
+              color="light"
+              size="xs"
               type="button"
               style={{ marginLeft: 6, padding: "2px 6px", color: "var(--bk-accent)", font: "500 11.5px var(--bk-font-ui)" }}
-              onClick={() => s.setAllowIndex(true)}
+              onClick={() => s.setAllowIndex(true)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
             >
               Turn indexing on →
             </Button>
@@ -142,13 +143,13 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
         </Cluster>
         {s.seoTitle.length < 10 && (
           <Button
-            kind="ghost"
-            size="sm"
+            color="light"
+            size="xs"
             type="button"
             style={{ alignSelf: "flex-start", display: "inline-flex", alignItems: "center", gap: "var(--bk-space-4)", padding: "3px var(--bk-space-8)", border: "1px solid var(--bk-accent)", borderRadius: "var(--bk-radius-full)", background: "var(--bk-accent-subtle)", color: "var(--bk-accent)", font: "500 10.5px var(--bk-font-ui)", transition: "background 100ms" }}
             aria-label="Suggest SEO title"
-            loading={aiBusy}
-            onClick={suggestTitle}
+            disabled={aiBusy}
+            onClick={suggestTitle} aria-busy={aiBusy || undefined} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           >
             <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
               <path d="M5 3l14 9-14 9V3z" />
@@ -173,11 +174,11 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
             <Label htmlFor="seo-desc">Meta Description</Label>
             <Tooltip label="A short summary of your page shown in Google search results (keep under 160 characters)">
               <Button
-                kind="ghost"
-                size="sm"
+                color="light"
+                size="xs"
                 type="button"
                 aria-label="About Meta Description"
-                style={{ padding: 2, color: "var(--bk-ink-muted)", display: "inline-flex", lineHeight: 0 }}
+                style={{ padding: 2, color: "var(--bk-ink-muted)", display: "inline-flex", lineHeight: 0 }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
               >
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                   <circle cx="12" cy="12" r="10" />

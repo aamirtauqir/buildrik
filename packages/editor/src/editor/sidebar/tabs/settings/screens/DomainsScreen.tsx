@@ -12,13 +12,13 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import { createBuildrikApiClient } from "@/services/api-client";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
 import { roleAtLeast } from "@/services/RoleService";
 import { Field, Input, Screen, Section } from "../shared";
 import type { ScreenProps } from "../types";
+import { Button } from "flowbite-react";
 
 interface DnsRecordRow {
   id: string;
@@ -50,13 +50,13 @@ function CopyValue({ value }: { value: string }) {
   const [copied, setCopied] = React.useState(false);
   return (
     <Button
-      kind="ghost"
-      size="sm"
+      color="light"
+      size="xs"
       onClick={() => {
         void navigator.clipboard?.writeText(value);
         setCopied(true);
         window.setTimeout(() => setCopied(false), 1500);
-      }}
+      }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
     >
       {copied ? "Copied" : "Copy"}
     </Button>
@@ -217,8 +217,8 @@ export const DomainsScreen: React.FC<ScreenProps> = ({ projectId, onDirtyChange 
               No custom domain. Using the free buildrick.app address until you connect one.
             </div>
             <Button
-              kind="secondary"
-              size="sm"
+              color="light"
+              size="xs"
               disabled={!canManage}
               title={canManage ? undefined : ADMIN_REASON}
               onClick={() => setAdding(true)}
@@ -241,10 +241,10 @@ export const DomainsScreen: React.FC<ScreenProps> = ({ projectId, onDirtyChange 
             </Field>
             {submitError && <div className="bd-set-section-d">{submitError}</div>}
             <div className="bd-set-domain-actions">
-              <Button kind="primary" size="sm" disabled={submitting || !domainInput.trim()} onClick={() => void handleConnect()}>
+              <Button size="xs" disabled={submitting || !domainInput.trim()} onClick={() => void handleConnect()}>
                 {submitting ? "Connecting…" : "Connect"}
               </Button>
-              <Button kind="ghost" size="sm" onClick={() => { setAdding(false); setSubmitError(null); }}>
+              <Button color="light" size="xs" onClick={() => { setAdding(false); setSubmitError(null); }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                 Cancel
               </Button>
             </div>
@@ -273,8 +273,8 @@ export const DomainsScreen: React.FC<ScreenProps> = ({ projectId, onDirtyChange 
             <div className="bd-set-domain-actions">
               {row.status !== "VERIFIED" && (
                 <Button
-                  kind="secondary"
-                  size="sm"
+                  color="light"
+                  size="xs"
                   disabled={checkingId === row.id}
                   onClick={() => void runCheck(row.id)}
                 >
@@ -282,11 +282,11 @@ export const DomainsScreen: React.FC<ScreenProps> = ({ projectId, onDirtyChange 
                 </Button>
               )}
               <Button
-                kind="ghost"
-                size="sm"
+                color="light"
+                size="xs"
                 disabled={!canManage}
                 title={canManage ? undefined : ADMIN_REASON}
-                onClick={() => void handleRemove(row)}
+                onClick={() => void handleRemove(row)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
               >
                 Remove
               </Button>

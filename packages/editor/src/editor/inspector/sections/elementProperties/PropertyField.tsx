@@ -5,10 +5,11 @@
  */
 
 import * as React from "react";
-import { Button, Checkbox } from "@/editor/ui";
+import { Checkbox } from "@/editor/ui";
 import type { MediaAsset, MediaAssetType } from "../../../../shared/types/media";
 import { InputRow, SelectRow } from "../../shared/controls";
 import type { PropertyConfig } from "./config";
+import { Button } from "flowbite-react";
 
 const styles = {
   checkboxRow: {

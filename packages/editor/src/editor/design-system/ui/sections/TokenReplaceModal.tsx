@@ -16,7 +16,6 @@
  */
 import * as React from "react";
 import {
-  Button,
   ModalRoot,
   ModalContent,
   ModalTitle,
@@ -24,6 +23,7 @@ import {
   ModalFooter,
 } from "@/editor/ui";
 import type { DesignToken } from "../../types";
+import { Button } from "flowbite-react";
 
 export interface TokenReplaceModalProps {
   open: boolean;
@@ -166,7 +166,7 @@ export const TokenReplaceModal: React.FC<TokenReplaceModalProps> = ({
           <div style={btnRowStyle}>
             <Button
               type="button"
-              kind="secondary"
+              color="light"
               onClick={() => onOpenChange(false)}
               style={cancelBtnStyle}
             >
@@ -174,7 +174,7 @@ export const TokenReplaceModal: React.FC<TokenReplaceModalProps> = ({
             </Button>
             <Button
               type="button"
-              kind="destructive"
+              color="red"
               data-token-replace-confirm
               disabled={!selectedId}
               onClick={handleConfirm}

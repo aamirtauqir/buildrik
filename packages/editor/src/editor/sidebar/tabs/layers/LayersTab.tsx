@@ -8,12 +8,13 @@
  */
 
 import * as React from "react";
-import { Button, Input, PanelFrame } from "@/editor/ui";
+import { Input, PanelFrame } from "@/editor/ui";
 import { useComposerSelection } from "../../../canvas/hooks/useComposerSelection";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
 import { LayersPanel } from "../../../panels/layers/index";
 import type { SelectedElementInfo } from "../../../panels/layers/types";
+import { Button } from "flowbite-react";
 
 export interface LayersTabProps {
   composer: Composer | null;

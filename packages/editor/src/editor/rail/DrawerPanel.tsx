@@ -12,7 +12,8 @@
 import * as React from "react";
 import "./DrawerPanel.css";
 import { ChevronLeft, Pin } from "lucide-react";
-import { Button, Tooltip } from "@/editor/ui";
+import { Tooltip } from "@/editor/ui";
+import { Button } from "flowbite-react";
 
 // ============================================
 // Types
@@ -130,12 +131,12 @@ export const DrawerPanel: React.FC<DrawerPanelProps> = ({
           {onPinToggle && (
             <Tooltip label={isPinned ? "Unpin panel" : "Pin panel"}>
               <Button
-                kind="ghost"
-                size="sm"
+                color="light"
+                size="xs"
                 aria-pressed={isPinned}
                 aria-label={isPinned ? "Unpin panel" : "Pin panel"}
                 onClick={onPinToggle}
-                className="drawer-panel__pin-btn"
+                className="drawer-panel__pin-btn tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
               ><Pin size={16} strokeWidth={1.5} /></Button>
             </Tooltip>
           )}
@@ -144,11 +145,11 @@ export const DrawerPanel: React.FC<DrawerPanelProps> = ({
           {onClose && (
             <Tooltip label="Close panel">
               <Button
-                kind="ghost"
-                size="sm"
+                color="light"
+                size="xs"
                 aria-label="Close panel"
                 onClick={handleClose}
-                className="drawer-panel__close-btn"
+                className="drawer-panel__close-btn tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
               ><ChevronLeft size={16} strokeWidth={1.5} /></Button>
             </Tooltip>
           )}

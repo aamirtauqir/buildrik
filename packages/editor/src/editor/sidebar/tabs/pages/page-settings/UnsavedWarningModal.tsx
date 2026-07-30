@@ -12,8 +12,9 @@
  */
 
 import * as React from "react";
-import { Button, ModalContent as VibcoderModalContent, ModalRoot, ModalTitle, Portal, Stack } from "@/editor/ui";
+import { ModalContent as VibcoderModalContent, ModalRoot, ModalTitle, Portal, Stack } from "@/editor/ui";
 import { ROW_MD } from "@shared/constants/layout";
+import { Button } from "flowbite-react";
 
 // Phase 5 escape: Radix.Dialog.Content props (onOpenAutoFocus) are hidden
 // from vibcoder's public ModalContentProps per Contract E2 (no Radix types

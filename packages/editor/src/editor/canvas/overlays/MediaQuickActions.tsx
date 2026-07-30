@@ -5,9 +5,10 @@
  */
 
 import * as React from "react";
-import { Button, Input } from "@/editor/ui";
+import { Input } from "@/editor/ui";
 import { Edit2, Image, Type, Check, Palette } from "lucide-react";
 import type { Composer } from "../../../engine";
+import { Button } from "flowbite-react";
 
 interface MediaQuickActionsProps {
   composer: Composer;

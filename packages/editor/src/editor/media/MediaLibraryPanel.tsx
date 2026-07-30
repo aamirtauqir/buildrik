@@ -11,7 +11,6 @@ import type { Composer } from "../../engine";
 import { InputField, FileField } from "../../shared/forms";
 import type { MediaAsset, MediaAssetType, MediaViewMode } from "../../shared/types/media";
 import {
-  Button,
   ConfirmDialog,
   ModalClose,
   ModalContent,
@@ -26,6 +25,7 @@ import { AssetCard } from "./AssetCard";
 import { mediaLibraryStyles as styles } from "./MediaLibraryStyles";
 import { OptimizationPanel } from "./OptimizationPanel";
 import { VideoPreview } from "./VideoPreview";
+import { Button } from "flowbite-react";
 
 // ============================================
 // Types
@@ -169,16 +169,18 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
               </div>
               <div style={styles.viewToggle}>
                 <Button
-                  kind={viewMode === "grid" ? "primary" : "ghost"}
-                  size="sm"
+                  color={viewMode === "grid" ? undefined : "light"}
+                  size="xs"
                   onClick={() => setViewMode("grid")}
+                  className={viewMode === "grid" ? undefined : "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"}
                 >
                   Grid
                 </Button>
                 <Button
-                  kind={viewMode === "list" ? "primary" : "ghost"}
-                  size="sm"
+                  color={viewMode === "list" ? undefined : "light"}
+                  size="xs"
                   onClick={() => setViewMode("list")}
+                  className={viewMode === "list" ? undefined : "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"}
                 >
                   List
                 </Button>

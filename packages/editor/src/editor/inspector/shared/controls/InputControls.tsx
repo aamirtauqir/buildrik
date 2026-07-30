@@ -7,7 +7,8 @@
 
 import { Info, X } from "lucide-react";
 import * as React from "react";
-import { Button, Input, Select, Textarea, Tooltip } from "@/editor/ui";
+import { Input, Select, Textarea, Tooltip } from "@/editor/ui";
+import { Button } from "flowbite-react";
 
 // ============================================================================
 // HELPERS
@@ -236,8 +237,8 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
           />
           {showReset && (
             <Button
-              kind="ghost"
-              size="sm"
+              color="light"
+              size="xs"
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
@@ -263,7 +264,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-              }}
+              }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
             >
               <X size={9} aria-hidden="true" />
             </Button>

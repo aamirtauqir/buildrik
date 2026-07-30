@@ -10,7 +10,7 @@
 
 import { ChevronDown, Layers, Plus } from "lucide-react";
 import * as React from "react";
-import { Button, ConfirmDialog, EmptyState, EmptyStateDesc, EmptyStateTitle, Input, ModalClose, ModalContent, ModalRoot, ModalTitle, Portal, PanelFrame, SkeletonListItem, Stack } from "@/editor/ui";
+import { ConfirmDialog, EmptyState, EmptyStateDesc, EmptyStateTitle, Input, ModalClose, ModalContent, ModalRoot, ModalTitle, Portal, PanelFrame, SkeletonListItem, Stack } from "@/editor/ui";
 import { useToast } from "@/editor/ui";
 import { PanelErrorState } from "../shared/PanelErrorState";
 import { SearchBar } from "../shared/SearchBar";
@@ -29,6 +29,7 @@ import type { ComponentsTabProps } from "./component-library/types";
 import { useComponentsState } from "./component-library/useComponentsState";
 import { type ComponentFilter, FILTER_CHIPS } from "./componentsData";
 import "./component-library/ComponentsTab.css";
+import { Button } from "flowbite-react";
 
 export type { ComponentsTabProps };
 

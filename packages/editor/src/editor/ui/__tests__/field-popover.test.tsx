@@ -5,7 +5,8 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import React from "react";
-import { FormField, Input, Tag, Popover, Menu, MenuItem, MenuGroup, MenuLabel, Button, Cluster, HelperText } from "../index";
+import { FormField, Input, Tag, Popover, Menu, MenuItem, MenuGroup, MenuLabel, Cluster, HelperText } from "../index";
+import { Button } from "flowbite-react";
 
 describe("FormField", () => {
   it("wires label, hint and control together", () => {

@@ -5,9 +5,10 @@
  */
 
 import * as React from "react";
-import { Button, Input } from "@/editor/ui";
+import { Input } from "@/editor/ui";
 import { SelectField } from "../../../../shared/forms";
 import { type Interaction, ANIMATION_PRESETS, EASING_OPTIONS } from "./types";
+import { Button } from "flowbite-react";
 
 // ============================================================================
 // TYPES
@@ -150,8 +151,8 @@ export const InteractionEditor: React.FC<InteractionEditorProps> = ({
       <div style={styles.buttonRow}>
         <Button
           onClick={() => onPreview?.(interaction)}
-          kind="secondary"
-          size="sm"
+          color="light"
+          size="xs"
           style={{ flex: 1 }}
         >
           Preview
@@ -163,16 +164,16 @@ export const InteractionEditor: React.FC<InteractionEditorProps> = ({
       <div style={styles.buttonRowSecondary}>
         <Button
           onClick={() => onToggleEnabled(interaction.id)}
-          kind="secondary"
-          size="sm"
+          color="light"
+          size="xs"
           style={{ flex: 1 }}
         >
           {interaction.enabled ? "Disable" : "Enable"}
         </Button>
         <Button
           onClick={() => onRemove(interaction.id)}
-          kind="destructive"
-          size="sm"
+          color="red"
+          size="xs"
           style={{ flex: 1 }}
         >
           Delete

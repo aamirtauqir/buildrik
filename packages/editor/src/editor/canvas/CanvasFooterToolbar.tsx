@@ -16,9 +16,10 @@
 
 import * as React from "react";
 import { useClickOutside } from "@/shared/hooks";
-import { BreakpointSwitcher, Button, Tooltip, type Breakpoint } from "@/editor/ui";
+import { BreakpointSwitcher, Tooltip, type Breakpoint } from "@/editor/ui";
 import { ZOOM_PRESETS } from "./shared";
 import { ROW_SM } from "@/shared/constants/layout";
+import { Button } from "flowbite-react";
 
 // Undo/redo/device switching moved OFF the topbar and onto this canvas toolbar
 // (Figma contract §2: viewport + edit controls belong to the canvas, the topbar
@@ -169,7 +170,7 @@ const OverlayButton: React.FC<OverlayButtonProps> = ({
   <Tooltip label={shortcut ? `${label} · ${shortcut}` : label}>
     <Button
       type="button"
-      kind="ghost"
+      color="light"
       className={`canvas-footer-btn ${active ? "canvas-footer-btn--active" : ""}`}
       onClick={onClick}
       aria-pressed={active}
@@ -243,8 +244,8 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
               <Tooltip label="Undo · ⌘Z">
                 <Button
                   type="button"
-                  kind="ghost"
-                  className="canvas-footer-btn"
+                  color="light"
+                  className="canvas-footer-btn tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
                   onClick={onUndo}
                   disabled={canUndo === false}
                   aria-label="Undo"
@@ -258,8 +259,8 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
               <Tooltip label="Redo · ⌘⇧Z">
                 <Button
                   type="button"
-                  kind="ghost"
-                  className="canvas-footer-btn"
+                  color="light"
+                  className="canvas-footer-btn tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
                   onClick={onRedo}
                   disabled={canRedo === false}
                   aria-label="Redo"
@@ -326,11 +327,11 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
       <div style={{ ...zoomGroupStyles, position: "relative" }} ref={presetsRef}>
         <Button
           type="button"
-          kind="ghost"
+          color="light"
           style={zoomBtnStyles}
           onClick={handleZoomOut}
           aria-label="Zoom out"
-          disabled={zoom <= ZOOM_PRESETS[0]}
+          disabled={zoom <= ZOOM_PRESETS[0]} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
         >
           −
         </Button>
@@ -338,22 +339,22 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
         {/* % display — click to open preset dropdown */}
         <Button
           type="button"
-          kind="ghost"
+          color="light"
           style={zoomPctStyles}
           onClick={() => setShowPresets((v) => !v)}
           aria-label="Zoom presets"
-          title="Click for zoom presets"
+          title="Click for zoom presets" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
         >
           {Math.round(zoom)}%
         </Button>
 
         <Button
           type="button"
-          kind="ghost"
+          color="light"
           style={zoomBtnStyles}
           onClick={handleZoomIn}
           aria-label="Zoom in"
-          disabled={zoom >= ZOOM_PRESETS[ZOOM_PRESETS.length - 1]}
+          disabled={zoom >= ZOOM_PRESETS[ZOOM_PRESETS.length - 1]} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
         >
           +
         </Button>
@@ -365,7 +366,7 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
               <Button
                 key={preset}
                 type="button"
-                kind="ghost"
+                color="light"
                 onClick={() => {
                   onZoomChange(preset);
                   setShowPresets(false);
@@ -377,7 +378,7 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
                     Math.round(zoom) === preset
                       ? "var(--bk-ink)"
                       : "var(--bk-ink-soft)",
-                }}
+                }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
               >
                 {preset}%
               </Button>
@@ -387,12 +388,12 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
                 <div style={presetDividerStyles} />
                 <Button
                   type="button"
-                  kind="ghost"
+                  color="light"
                   onClick={() => {
                     onFitToScreen();
                     setShowPresets(false);
                   }}
-                  style={presetItemStyles}
+                  style={presetItemStyles} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
                 >
                   Fit to screen
                 </Button>
@@ -408,10 +409,10 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
           <Tooltip label="Keyboard shortcuts · ?">
             <Button
               type="button"
-              kind="ghost"
+              color="light"
               style={{ ...zoomBtnStyles, width: ROW_SM, height: ROW_SM }}
               onClick={onHelpClick}
-              aria-label="Show keyboard shortcuts (press ? key)"
+              aria-label="Show keyboard shortcuts (press ? key)" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
             >
               <HelpIcon />
             </Button>

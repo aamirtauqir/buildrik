@@ -12,8 +12,8 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import { Section, type SectionTier } from "../shared/controls";
+import { Button } from "flowbite-react";
 
 export interface QuickActionsSectionProps {
   styles: Record<string, string>;

@@ -9,7 +9,8 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import React from "react";
-import { Modal, CommandPalette, Drawer, RightPanel, Rail, RailItem, Topbar, Footer, Button } from "../index";
+import { Modal, CommandPalette, Drawer, RightPanel, Rail, RailItem, Topbar, Footer } from "../index";
+import { Button } from "flowbite-react";
 
 describe("Modal", () => {
   it("is a labelled dialog", () => {
