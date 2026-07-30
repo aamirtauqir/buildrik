@@ -18,6 +18,7 @@ import type { Composer } from "../../../../../engine";
 import type { PageItem } from "../types";
 import { getStatusLabel } from "../utils/statusLabel";
 import { Button } from "flowbite-react";
+import { TextField } from "@/editor/chrome-ui";
 
 interface Props {
   page: PageItem;
@@ -230,7 +231,7 @@ export const PageRow = React.memo<Props>(
 
           {isRenaming ? (
             <>
-              <input
+              <TextField
                 ref={inputRef}
                 className="bd-pg-row-rename"
                 value={renameValue}

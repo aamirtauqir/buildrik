@@ -18,6 +18,7 @@ import { TimeTravelScrubber } from "./components/TimeTravelScrubber";
 import { MilestoneSuggestionBanner } from "./components/MilestoneSuggestionBanner";
 import type { HistoryView, HistoryTabProps } from "./types";
 import { Button } from "flowbite-react";
+import { TextField } from "@/editor/chrome-ui";
 
 const HELPER_TEXT: Record<HistoryView, string> = {
   changes: "Your recent edits",
@@ -140,7 +141,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
         <span className="search-icon" aria-hidden="true">
           <SearchIconSvg />
         </span>
-        <input
+        <TextField
           className="search-input"
           type="search"
           value={searchQuery}

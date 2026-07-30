@@ -15,6 +15,7 @@ import {
   calcContrastRatio,
 } from "../../utils/colorUtils";
 import { Button } from "flowbite-react";
+import { TextField } from "@/editor/chrome-ui";
 
 export interface ColorPickerProps {
   initialHex: string;
@@ -286,7 +287,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
           className={`buildrick-design-picker__hex-input-wrap${hexError ? " buildrick-design-picker__hex-input-wrap--error" : ""}`}
         >
           <span className="buildrick-design-picker__hash">#</span>
-          <input
+          <TextField
             type="text"
             value={hexInput.replace("#", "")}
             onChange={handleHexInput}

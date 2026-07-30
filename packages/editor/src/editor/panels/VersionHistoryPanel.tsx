@@ -25,6 +25,7 @@ import { CompareView } from "./version-history/CompareView";
 import { ToastStack, useToasts } from "./version-history/Toasts";
 import { useAISummary } from "./version-history/useAISummary";
 import { Button } from "flowbite-react";
+import { TextField } from "@/editor/chrome-ui";
 
 // CompareView + toggle-pill style constants moved to
 // ./version-history/CompareView.tsx (D3 Stage 2, audit-remediation 2026-05-08).
@@ -264,7 +265,7 @@ export function VersionHistoryPanel({
                 <label className="form-label" htmlFor="bd-save-name">
                   Version name *
                 </label>
-                <input
+                <TextField
                   id="bd-save-name"
                   type="text"
                   value={newVersionName}

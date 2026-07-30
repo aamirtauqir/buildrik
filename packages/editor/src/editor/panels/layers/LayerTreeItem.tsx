@@ -10,6 +10,7 @@ import type { Composer } from "../../../engine";
 import { ELEMENT_TYPE_LABELS } from "../../../shared/constants/elementTypeLabels";
 import type { LayerItem, DragState, LayerDisplayPrefs } from "./types";
 import { Button } from "flowbite-react";
+import { TextField } from "@/editor/chrome-ui";
 
 export interface LayerTreeItemProps {
   layer: LayerItem;
@@ -193,7 +194,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
         </span>
 
         {isEditing ? (
-          <input
+          <TextField
             ref={editInputRef}
             type="text"
             className="bdc-lr-edit"

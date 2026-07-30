@@ -19,6 +19,7 @@ import { AssetCell } from "./AssetCell";
 import { UploadZone } from "./UploadZone";
 import "./SlimLauncher.css";
 import { Button } from "flowbite-react";
+import { TextField } from "@/editor/chrome-ui";
 
 interface SlimLauncherProps {
   composer: Composer;
@@ -90,7 +91,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
       </div>
       <div className="sl-search">
         <Search size={14} className="sl-search__icon" aria-hidden="true" />
-        <input
+        <TextField
           type="text"
           className="sl-search__input"
           placeholder="Search library…"

@@ -8,3 +8,4 @@
 export { getOverlayRoot } from "./OverlayRoot";
 export { Portal } from "./Portal";
 export { useFocusTrap, isModalOpen } from "./focus";
+export { TextField, type TextFieldProps } from "./TextField";

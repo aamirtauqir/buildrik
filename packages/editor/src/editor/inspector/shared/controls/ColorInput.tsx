@@ -15,6 +15,7 @@ import { DSBindingChip } from "../../sections/DSBindingChip";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
 import { Button } from "flowbite-react";
+import { TextField } from "@/editor/chrome-ui";
 
 // ============================================================================
 // HELPERS
@@ -162,7 +163,7 @@ export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange, 
                 </>
               ) : (
                 <>
-                  <input
+                  <TextField
                     type="text"
                     className="bdi-hx"
                     value={display}

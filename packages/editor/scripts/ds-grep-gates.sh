@@ -548,6 +548,7 @@ GATE24_FILE_COUNT=$(find packages/editor/src/editor -name '*.tsx' \
   -not -path '*/preview/*' \
   -not -path '*/shared/vibcoder/*' \
   -not -path '*/editor/ui/*' \
+  -not -path '*/editor/chrome-ui/*' \
   -not -name '*.test.tsx' 2>/dev/null | wc -l | tr -d ' ')
 
 if [ "$GATE24_FILE_COUNT" -eq 0 ]; then
@@ -555,11 +556,17 @@ if [ "$GATE24_FILE_COUNT" -eq 0 ]; then
 else
   # editor/ui/ is the component library itself — its whole job is to own the
   # native <button>/<input> elements so no one else has to (ds/fresh-token-system).
+  # editor/chrome-ui/ = successor native-element owner (flowbite migration T13
+  # pulls this forward): TextField is the one sanctioned raw-<input> owner for
+  # call sites whose bespoke className can't reach flowbite TextInput's real
+  # <input> (className lands on an outer wrapper div only — see
+  # src/editor/ui/textInputTheme.ts).
   GATE24_HITS=$(find packages/editor/src/editor -name '*.tsx' \
     -not -path '*/__tests__/*' \
     -not -path '*/preview/*' \
     -not -path '*/shared/vibcoder/*' \
     -not -path '*/editor/ui/*' \
+    -not -path '*/editor/chrome-ui/*' \
     -not -name '*.test.tsx' 2>/dev/null \
     | xargs npx tsx packages/editor/scripts/jsx-inline-element-scanner.ts 2>/dev/null \
     | jq -s 'add | length' 2>/dev/null || echo "0")

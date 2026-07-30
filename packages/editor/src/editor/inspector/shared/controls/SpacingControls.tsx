@@ -12,6 +12,7 @@
 import { Link, Unlink } from "lucide-react";
 import * as React from "react";
 import { Stack } from "@/editor/ui";
+import { TextField } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
 import { DSBindingChip } from "../../sections/DSBindingChip";
@@ -83,7 +84,7 @@ const AxisInput: React.FC<AxisInputProps> = ({ side, value, onChange, disabled, 
 
   return (
     <>
-      <input
+      <TextField
         type="text"
         className={`bdi-ax ${SIDE_POS[side]}${local.isKeyword ? " muted" : ""}`}
         value={display}

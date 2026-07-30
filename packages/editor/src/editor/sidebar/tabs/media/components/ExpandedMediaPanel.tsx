@@ -31,6 +31,7 @@ import { ReplaceAcrossDialog } from "./ReplaceAcrossDialog";
 import "../MediaTab.css";
 import "./ExpandedMediaPanel.css";
 import { Button } from "flowbite-react";
+import { TextField } from "@/editor/chrome-ui";
 
 export interface ExpandedMediaPanelProps {
   composer: Composer;
@@ -381,7 +382,7 @@ export function ExpandedMediaPanel({
                 onDrop={(e) => handleFolderDrop(e, f.id)}
               >
                 {renamingFolderId === f.id ? (
-                  <input
+                  <TextField
                     type="text"
                     className="exp-folder-item__rename-input"
                     value={renameDraft}

@@ -25,6 +25,7 @@ import {
   type AssetVersion,
 } from "../../../../../services/MediaVersionService";
 import { Button } from "flowbite-react";
+import { TextField } from "@/editor/chrome-ui";
 
 type Tab = "preview" | "used" | "versions" | "edit" | "optimize";
 
@@ -270,7 +271,7 @@ export function AssetDetailOverlay({
               )}
             </div>
             <div className="med-detail-meta-section">
-              <input
+              <TextField
                 ref={inputRef}
                 className="med-detail-name"
                 value={name}
@@ -391,7 +392,7 @@ export function AssetDetailOverlay({
           <div className="med-detail-edit-pane">
             <label className="med-detail-edit-field">
               <span className="med-detail-edit-label">Alt text</span>
-              <input
+              <TextField
                 className="med-detail-alt-input"
                 value={altDraft}
                 onChange={(e) => setAltDraft(e.target.value)}

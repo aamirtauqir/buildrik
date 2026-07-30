@@ -1660,7 +1660,7 @@ component wrapper):
 hit:** a full AST sweep (`ts-morph`, not the brief's literal `rg` command —
 same over-match problem `Button` already documented) found **128 real
 `<Input` JSX call sites across 74 files** via the `@/editor/ui` import path.
-Of those, **26 sites across 24 files** passed a bespoke local CSS
+Of those, **26 sites across 18 files** passed a bespoke local CSS
 `className` (`bdi-text`, `ie-slider`, `bd-pg-row-rename`, `search-input`,
 etc.) doing FULL custom re-skinning (search bars, inline-rename fields,
 range sliders styled as custom tracks, hex swatches) — verified against
@@ -1669,16 +1669,42 @@ each class's own CSS that none of them relied on `.bk-input`'s box at all
 Since `Input.tsx` was itself just `<input ref className aria-invalid
 {...rest}>` — literally nothing beyond a className merge + aria-invalid
 computation + ref forwarding — and flowbite's `TextInput` cannot route a
-`className` prop to the real `<input>` at all, converting these 26 sites to
-plain **raw native `<input>`** elements is a byte-identical-behavior,
+`className` prop to the real `<input>` at all, converting **25** of those
+26 sites to plain **raw native `<input>`** was a byte-identical-behavior,
 zero-regression swap (not a new "KEEP" carve-out; `Input` was contributing
 zero value at these sites once its `className`-forwarding path is
-structurally gone). This is the same class of move as Button's
+structurally gone) — the 26th (`InputControls.tsx`'s `InputWithUnit`,
+toggling a conditional `"auto"`/`""` class) needed the class to be dynamic
+per-render, so it went the `theme`-prop route instead (documented above),
+not the raw-element route. This is the same class of move as Button's
 `PanelHeader.tsx`/`PanelFrame.tsx` raw-`<button>` sites and Radio's orphan
 `FormatRow.tsx` — except here the sites are live, heavily-used UI (search
 bars, inline rename), not orphans; the shared reasoning is "the wrapper
 component was a thin className-forwarding shell, and this call site no
 longer benefits from it," not "unused code."
+
+**Fix round 1 (reviewer finding, post-commit): one-owner discipline for
+Gate 24.** The 25 raw `<input>` conversions above were real inline lowercase
+JSX in `editor/` — Gate 24 (`scripts/jsx-inline-element-scanner.ts`, AST-based,
+zero-tolerance, baseline 0) caught all 25 as new violations, confirmed by
+running the scanner directly (`find packages/editor/src/editor -name
+'*.tsx' -not -path '*/__tests__/*' -not -path '*/editor/ui/*' | xargs npx
+tsx packages/editor/scripts/jsx-inline-element-scanner.ts` → 25 hits across
+18 files, matching exactly). `editor/ui/` was already Gate 24's one sanctioned
+native-element owner; scattering 25 more raw `<input>`s outside it broke
+that discipline even though each one was individually correct. Fixed by
+creating `src/editor/chrome-ui/TextField.tsx` — the deleted `Input.tsx`
+ported verbatim (same className-merge + `aria-invalid` + ref-forwarding
+contract, not a redesign) as the ONE sanctioned raw-`<input>` owner outside
+`editor/ui/` and outside flowbite. All 25 sites repointed to import
+`TextField` from `@/editor/chrome-ui` instead of rendering a bare `<input>`
+directly. `scripts/ds-grep-gates.sh`'s Gate 24 block gained a
+`-not -path '*/editor/chrome-ui/*'` exclusion (both the file-count guard and
+the hit-count scan, mirroring the existing `editor/ui/` exclusion) — this is
+the T13-planned owner change (`editor/ui` → `editor/chrome-ui` as the
+flowbite migration's native-element home) pulled forward one line, per the
+controller. Re-ran the scanner over `src/editor` minus `editor/ui` AND minus
+`editor/chrome-ui`: **0 hits** — Gate 24 back to baseline.
 
 **Range-input caveat, checked not assumed:** several `type="range"` sites
 (`ZoomControls.tsx`, `SliderControls.tsx` ×2, `SliderControl.tsx`,

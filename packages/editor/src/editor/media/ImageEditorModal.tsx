@@ -9,6 +9,7 @@
  */
 
 import * as React from "react";
+import { TextField } from "@/editor/chrome-ui";
 import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 import Cropper from "react-easy-crop";
 import type { Area, Point } from "react-easy-crop";
@@ -404,7 +405,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
                   {/* Rotation */}
                   <div className="ie-section-label">Rotation</div>
                   <div className="ie-slider-row">
-                    <input
+                    <TextField
                       type="range"
                       className="ie-slider"
                       min={-180}
@@ -435,7 +436,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
                   {/* Zoom */}
                   <div className="ie-section-label">Zoom</div>
                   <div className="ie-slider-row">
-                    <input
+                    <TextField
                       type="range"
                       className="ie-slider"
                       min={1}
@@ -453,7 +454,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
                 <>
                   <div className="ie-section-label">Brightness</div>
                   <div className="ie-slider-row">
-                    <input type="range" className="ie-slider" min={-100} max={100}
+                    <TextField type="range" className="ie-slider" min={-100} max={100}
                       value={adjustments.brightness}
                       onChange={(e) => setAdjustments((a) => ({ ...a, brightness: Number(e.target.value) }))}
                     />
@@ -462,7 +463,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
 
                   <div className="ie-section-label">Contrast</div>
                   <div className="ie-slider-row">
-                    <input type="range" className="ie-slider" min={-100} max={100}
+                    <TextField type="range" className="ie-slider" min={-100} max={100}
                       value={adjustments.contrast}
                       onChange={(e) => setAdjustments((a) => ({ ...a, contrast: Number(e.target.value) }))}
                     />
@@ -471,7 +472,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
 
                   <div className="ie-section-label">Saturation</div>
                   <div className="ie-slider-row">
-                    <input type="range" className="ie-slider" min={-100} max={100}
+                    <TextField type="range" className="ie-slider" min={-100} max={100}
                       value={adjustments.saturation}
                       onChange={(e) => setAdjustments((a) => ({ ...a, saturation: Number(e.target.value) }))}
                     />
@@ -480,7 +481,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
 
                   <div className="ie-section-label">Blur</div>
                   <div className="ie-slider-row">
-                    <input type="range" className="ie-slider" min={0} max={20} step={0.5}
+                    <TextField type="range" className="ie-slider" min={0} max={20} step={0.5}
                       value={adjustments.blur}
                       onChange={(e) => setAdjustments((a) => ({ ...a, blur: Number(e.target.value) }))}
                     />

@@ -29,6 +29,7 @@ import { DEFAULT_TOKENS } from "../../../design-system/constants";
 import { ApplyProgressOverlay } from "./ApplyProgressOverlay";
 import "./TemplatesTab.css";
 import { Button } from "flowbite-react";
+import { TextField } from "@/editor/chrome-ui";
 
 // Re-export for external consumers
 export type { TemplateItem, RecentTemplate } from "./templatesData";
@@ -316,7 +317,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
         <div className="tpl-search-wrap">
           <div className="tpl-search-input-box">
             <Search size={16} className="tpl-search-icon" />
-            <input
+            <TextField
               className="tpl-search-input"
               placeholder="Search templates..."
               value={sel.searchQ}

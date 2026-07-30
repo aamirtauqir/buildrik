@@ -93,11 +93,14 @@ const SETTINGS_TEXT_INPUT_THEME: NonNullable<CustomFlowbiteTheme["textInput"]> =
   },
 };
 
-type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
+// `className` is intentionally NOT part of this props type: flowbite's
+// TextInput only ever applies `className` to its OUTER wrapper div (never
+// the real <input> — see SETTINGS_TEXT_INPUT_THEME's comment above), so
+// accepting one here would silently promise styling it can't deliver. No
+// consumer passes one today (verified); the type omission keeps it that way.
+type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, "className">;
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, ...rest }, ref) => (
-    <FlowbiteTextInput ref={ref} className={className} theme={SETTINGS_TEXT_INPUT_THEME} {...rest} />
-  )
+  (props, ref) => <FlowbiteTextInput ref={ref} theme={SETTINGS_TEXT_INPUT_THEME} {...props} />
 );
 Input.displayName = "Input";
 

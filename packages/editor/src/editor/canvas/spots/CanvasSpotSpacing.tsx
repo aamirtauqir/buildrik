@@ -5,6 +5,7 @@
  */
 
 import * as React from "react";
+import { TextField } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
 import type { SpacingIndicator } from "../../../shared/types/canvas";
 import "./CanvasSpotSpacing.css";
@@ -81,7 +82,7 @@ export const CanvasSpotSpacing: React.FC<CanvasSpotSpacingProps> = ({
             {indicator.position.width > 20 && indicator.position.height > 20 && (
               <div className="bd-spacing-indicator-label" style={{ backgroundColor: color }}>
                 {isEditing ? (
-                  <input
+                  <TextField
                     type="number"
                     value={tempValue}
                     onChange={handleValueChange}
