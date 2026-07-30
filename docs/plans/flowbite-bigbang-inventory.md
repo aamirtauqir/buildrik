@@ -1268,3 +1268,95 @@ Checkbox's, already compiled).
 Verified: `tsc --noEmit` clean; 58 tests green (`atoms.test.tsx`,
 `molecules.test.tsx`, `ExportSection.test.tsx`) + full `ui/__tests__` +
 `design-system` sweep, 718 passed / 1 skipped / 1 todo, 84 files.
+
+### Toggle → `flowbite-react` `ToggleSwitch`
+
+`src/editor/ui/Toggle.tsx` (native `<input type="checkbox" role="switch">`,
+extends `InputHTMLAttributes`) →
+`node_modules/flowbite-react/dist/components/ToggleSwitch/ToggleSwitch.d.ts`
+— a structurally different component, not a same-shape swap.
+
+**API shape change, not a rename.** flowbite's `ToggleSwitch` renders a
+`<button role="switch">` (plus a hidden `sr-only` checkbox purely for form
+semantics) instead of a real interactive `<input type="checkbox">`. Two
+consequences, checked against real usage before assuming either was safe:
+
+1. `onChange` is `(checked: boolean) => void`, not a `ChangeEvent` handler
+   — a real signature change from ours. **Turned out to be a non-issue for
+   every real call site**: all 5 existing `onChange` bodies were already
+   `() => setX(!x)` (unconditional flip, ignoring the callback argument
+   entirely) — confirmed by reading each one before relying on it, not
+   assumed from the pattern looking common.
+2. `checked` + `onChange` are **both required** (controlled-only, no
+   `defaultChecked`/uncontrolled mode) — `ReviewTab.tsx`'s call site only
+   had `onClick={() => setShowResolved((v) => !v)}` with no `onChange` at
+   all, which would have failed to typecheck. flowbite's own `handleClick`
+   is what calls `onChange(!checked)` internally and is assigned to the
+   button's `onClick` before `...restProps` spreads — so simply adding
+   `onChange` *alongside* a leftover `onClick` would have been actively
+   dangerous: a consumer `onClick` in `restProps` overrides flowbite's own
+   `handleClick` in the object-literal spread order (verified by reading
+   `ToggleSwitch.js`), silently breaking the whole change-notification
+   path while looking like a normal working toggle. `onClick` was
+   converted to `onChange` outright, not kept alongside a new `onChange`.
+
+**Color/size — nothing to override, unlike Checkbox/Radio.** Checked hex
+values before assuming this differed from Checkbox/Radio's pattern: for
+`ToggleSwitch` specifically, `color`'s **default** entry is
+`bg-primary-700` (`#1A56DB`, exact `--bk-accent` match) — unlike
+Checkbox/Radio's default (`primary-600`, a real mismatch). Unchecked fill
+`bg-gray-200` (`#E5E7EB`) is an exact match to `--bk-border`; thumb
+`bg-white` matches `--bk-bg-card` exactly. Size: default `sizing="md"` is
+`h-6 w-11` (24×44) with a `h-5 w-5` (20px) thumb inset `left-0.5 top-0.5`
+(2px) — byte-identical to the deleted `.bk-toggle`'s 44×24 pill / 20px
+thumb / 2px inset. Every real call site needed zero props beyond
+`checked`/`onChange`/`aria-label` — no `color`, no `className`.
+
+**Accessible-name gap checked empirically, not assumed from source.**
+`ToggleSwitch` always sets `aria-labelledby` pointing at its own internal
+`<span id="{id}-flowbite-toggleswitch-label">`, but that span only renders
+when a `label` prop is passed (`!!label?.length`) — every real call site
+here uses an *external* adjacent label (a sibling `<span>` in
+`ContentViews.tsx`, a wrapping `<span>` in `ReviewTab.tsx`, an external
+`<Label>` in `AdvancedTab.tsx`), so passing `label=` would have doubled
+the visible text. That leaves `aria-labelledby` dangling (pointing at a
+nonexistent id) with `aria-label` set alongside it via `...restProps`.
+Rather than trust the accname spec's fallback behavior from reading it,
+wrote and ran a throwaway probe test rendering `<ToggleSwitch aria-label="Force HTTPS" .../>` and querying
+`getByRole("switch", { name: "Force HTTPS" })` — it resolved correctly
+(testing-library's accessible-name computation falls back to `aria-label`
+when `aria-labelledby` doesn't resolve to any element), so no `label` prop
+needed anywhere. Deleted the probe file after confirming.
+
+**Consumers swept:** 3 real files via `@/editor/ui`, 5 JSX call sites —
+`ContentViews.tsx` (×2), `ReviewTab.tsx` (×1, the `onClick`→`onChange`
+site), `AdvancedTab.tsx` (×2). 4 more files matched the alias sweep
+(`PageRow.tsx`, `FontPicker.tsx`, `shell/modals/CreateComponentModal.tsx`,
+`TypeTokenList.tsx`) but on inspection had zero real `<Toggle` JSX — all
+false positives from comments/unrelated identifiers (`onToggleSelect`,
+"Toggle Button" comment, a `GAP-FIX: Toggle variant` comment, a local
+`StyleToggle` component). `ExportOptions.tsx`'s `<ToggleOption>` JSX
+matched the bare-word sweep too, but that's a locally-defined component in
+the same file built on the already-swapped flowbite `Checkbox` — visually
+a checkbox row, unrelated to the shared `Toggle`/`ToggleSwitch` primitive,
+not touched.
+
+**Test fix (real regression, not vacuous):** `AdvancedTab.test.tsx`'s
+`"reflects allowIndex / allowFollow as switch checked state"` cast the
+`getByRole("switch", ...)` result to `HTMLInputElement` and read `.checked`
+— that property doesn't exist on a `<button>` (returns `undefined`, caught
+by the targeted run, not preemptively guessed). Rewritten to read
+`aria-checked` off the element directly. The sibling "toggles ... to the
+opposite" tests already used `fireEvent.click` + asserted on the mock
+callback, so they needed no change — further confirmation the
+`onClick`→`handleClick`→`onChange` wiring works as intended.
+`atoms.test.tsx`'s own `Toggle` contract test rewritten the same way
+(`defaultChecked` doesn't exist on `ToggleSwitch` either — swapped for
+`checked` + `onChange={() => {}}`, `.checked` swapped for `aria-checked`).
+
+**Class-list regen:** 55 new prefixed entries (`ToggleSwitch` is
+structurally its own theme, no overlap with Checkbox/Radio's).
+
+Verified: `tsc --noEmit` clean; 47 tests green
+(`atoms.test.tsx`/`ReviewTab.test.tsx`/`ContentTab.test.tsx`/
+`AdvancedTab.test.tsx`) + full `ui/__tests__` 130/130.

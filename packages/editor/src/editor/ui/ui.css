@@ -42,28 +42,6 @@
 .bk-select:focus { outline: none; border-color: var(--bk-accent); box-shadow: var(--bk-shadow-focus); }
 .bk-select:disabled { background: var(--bk-bg-subtle); color: var(--bk-ink-disabled); cursor: not-allowed; }
 
-/* ── Toggle · Figma 14:14 · 44×24 · State ───────────────────────────────── */
-.bk-toggle {
-  appearance: none;
-  position: relative;
-  width: 44px; height: var(--bk-space-24);
-  border-radius: var(--bk-radius-full);
-  background: var(--bk-border);
-  cursor: pointer;
-  transition: var(--bk-transition-fast);
-  flex: none;
-}
-.bk-toggle::after {
-  content: ""; position: absolute; top: 2px; left: 2px;
-  width: 20px; height: 20px; border-radius: var(--bk-radius-full);
-  background: var(--bk-bg-card); box-shadow: var(--bk-shadow-raised);
-  transition: var(--bk-transition-fast);
-}
-.bk-toggle:checked { background: var(--bk-accent); }
-.bk-toggle:checked::after { transform: translateX(20px); }
-.bk-toggle:focus-visible { outline: none; box-shadow: var(--bk-shadow-focus); }
-.bk-toggle:disabled { opacity: 0.5; cursor: not-allowed; }
-
 /* ── Status dot · Figma 10:27 · State ───────────────────────────────────── */
 .bk-dot { width: var(--bk-space-8); height: var(--bk-space-8); border-radius: var(--bk-radius-full); flex: none; display: inline-block; }
 .bk-dot--live    { background: var(--bk-success); }

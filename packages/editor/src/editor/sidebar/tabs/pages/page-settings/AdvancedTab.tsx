@@ -5,9 +5,9 @@
  */
 
 import * as React from "react";
-import { Cluster, HelperText, Input, Label, Stack, Textarea, Toggle } from "@/editor/ui";
+import { Cluster, HelperText, Input, Label, Stack, Textarea } from "@/editor/ui";
 import type { UsePageSettingsReturn } from "./usePageSettings";
-import { Button } from "flowbite-react";
+import { Button, ToggleSwitch } from "flowbite-react";
 
 interface Props {
   s: UsePageSettingsReturn;
@@ -85,14 +85,14 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
             <Label>Allow indexing</Label>
             <HelperText>Let search engines list this page in results.</HelperText>
           </Stack>
-          <Toggle checked={s.allowIndex} onChange={() => s.setAllowIndex(!s.allowIndex)} aria-label="Allow indexing" />
+          <ToggleSwitch checked={s.allowIndex} onChange={() => s.setAllowIndex(!s.allowIndex)} aria-label="Allow indexing" />
         </Cluster>
         <Cluster justify="between" nowrap>
           <Stack gap="xs">
             <Label>Follow links</Label>
             <HelperText>Let search engines follow outbound links on this page.</HelperText>
           </Stack>
-          <Toggle checked={s.allowFollow} onChange={() => s.setAllowFollow(!s.allowFollow)} aria-label="Follow links" />
+          <ToggleSwitch checked={s.allowFollow} onChange={() => s.setAllowFollow(!s.allowFollow)} aria-label="Follow links" />
         </Cluster>
       </Stack>
       {/* Head code */}

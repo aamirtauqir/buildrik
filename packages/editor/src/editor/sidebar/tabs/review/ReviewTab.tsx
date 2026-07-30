@@ -18,7 +18,7 @@
 
 import * as React from "react";
 import { AlertCircle, CheckCircle2, ChevronLeft, History } from "lucide-react";
-import { ConfirmDialog, PanelHeader, Spinner, Textarea, Toggle } from "@/editor/ui";
+import { ConfirmDialog, PanelHeader, Spinner, Textarea } from "@/editor/ui";
 import { ApprovedCompareView } from "@/editor/panels/version-history/ApprovedCompareView";
 import type { PublishPage } from "@/editor/shell/exportPublishPages";
 import {
@@ -32,7 +32,7 @@ import {
   type CurrentRound,
   type ReviewComment,
 } from "../../../../services/ReviewService";
-import { Badge, Button } from "flowbite-react";
+import { Badge, Button, ToggleSwitch } from "flowbite-react";
 
 /** Review's own status words onto flowbite Badge color + text-color override
  *  (flowbite's badge color presets don't hex-match --bk-success-text/
@@ -396,7 +396,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
         <span style={S.meta}>{visible.length} comment{visible.length === 1 ? "" : "s"}</span>
         <span style={S.toggle}>
           Show resolved
-          <Toggle checked={showResolved} aria-label="Show resolved" onClick={() => setShowResolved((v) => !v)} />
+          <ToggleSwitch checked={showResolved} aria-label="Show resolved" onChange={() => setShowResolved((v) => !v)} />
         </span>
       </div>
 

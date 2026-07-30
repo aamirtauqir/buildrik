@@ -9,8 +9,8 @@
  */
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { Input, Select, Toggle, Slider, StatusDot } from "../index";
-import { Avatar, Checkbox, Radio } from "flowbite-react";
+import { Input, Select, Slider, StatusDot } from "../index";
+import { Avatar, Checkbox, Radio, ToggleSwitch } from "flowbite-react";
 import { avatarInitials, AVATAR_TONE_THEME, type AvatarTone } from "../avatarTone";
 
 describe("Input", () => {
@@ -53,11 +53,19 @@ describe("Checkbox", () => {
   });
 });
 
-describe("Toggle", () => {
-  it("is a switch so screen readers announce on/off", () => {
-    render(<Toggle aria-label="Force HTTPS" defaultChecked />);
+describe("Toggle (flowbite ToggleSwitch)", () => {
+  it("is a switch so screen readers announce on/off — aria-label survives the internal dangling aria-labelledby", () => {
+    // ToggleSwitch is a controlled-only <button role="switch"> (plus a
+    // hidden sr-only checkbox for form semantics) — no defaultChecked/
+    // uncontrolled mode, unlike the deleted ui/Toggle.tsx. It always sets
+    // aria-labelledby pointing at its own internal label span, but that
+    // span only renders when a `label` prop is passed — with none here,
+    // aria-labelledby dangles. Verified empirically (not just read from
+    // spec) that testing-library's accessible-name computation still
+    // falls back to aria-label in that case.
+    render(<ToggleSwitch checked aria-label="Force HTTPS" onChange={() => {}} />);
     const el = screen.getByRole("switch", { name: "Force HTTPS" });
-    expect((el as HTMLInputElement).checked).toBe(true);
+    expect(el.getAttribute("aria-checked")).toBe("true");
   });
 });
 

@@ -11,7 +11,6 @@
 /* ── Atoms ──────────────────────────────────────────────────────────────── */
 export { Input, type InputProps } from "./Input";
 export { Select, type SelectProps } from "./Select";
-export { Toggle, type ToggleProps } from "./Toggle";
 export { Slider, type SliderProps } from "./Slider";
 export { StatusDot, type StatusDotProps, type StatusDotState } from "./StatusDot";
 export { Textarea, type TextareaProps } from "./Textarea";

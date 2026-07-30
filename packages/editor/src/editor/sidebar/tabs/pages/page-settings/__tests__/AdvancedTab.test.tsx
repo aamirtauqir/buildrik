@@ -147,13 +147,15 @@ describe("AdvancedTab password box", () => {
 
 describe("AdvancedTab indexing switches", () => {
   it("reflects allowIndex / allowFollow as switch checked state", () => {
+    // flowbite's ToggleSwitch is a <button role="switch" aria-checked>, not
+    // an <input> — the checked state lives in aria-checked now.
     render(<AdvancedTab s={makeSettings({ allowIndex: true, allowFollow: false })} />);
     expect(
-      (screen.getByRole("switch", { name: "Allow indexing" }) as HTMLInputElement).checked
-    ).toBe(true);
+      screen.getByRole("switch", { name: "Allow indexing" }).getAttribute("aria-checked")
+    ).toBe("true");
     expect(
-      (screen.getByRole("switch", { name: "Follow links" }) as HTMLInputElement).checked
-    ).toBe(false);
+      screen.getByRole("switch", { name: "Follow links" }).getAttribute("aria-checked")
+    ).toBe("false");
   });
 
   it("toggles allowIndex to the opposite of its current value", () => {

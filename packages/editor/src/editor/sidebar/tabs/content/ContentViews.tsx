@@ -8,12 +8,12 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { ConfirmDialog, Input, Select, Textarea, Toggle } from "@/editor/ui";
+import { ConfirmDialog, Input, Select, Textarea } from "@/editor/ui";
 import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
 import type { ConditionExpression, ConditionOperator, DataSource } from "@/shared/types/data";
 import { conditionSummary, fieldDefault, isValidVariableKey, type SiteVariable } from "./contentPanelUtils";
 import type { ConditionRow } from "./useContentPanel";
-import { Button, Checkbox } from "flowbite-react";
+import { Button, Checkbox, ToggleSwitch } from "flowbite-react";
 
 export const S: Record<string, React.CSSProperties> = {
   body: { display: "flex", flexDirection: "column", height: "100%", minHeight: 0 },
@@ -336,7 +336,7 @@ export function RecordView({
             {f.type === "boolean" ? (
               <div style={S.toggleRow}>
                 <span style={{ fontSize: 13 }}>{f.name}</span>
-                <Toggle
+                <ToggleSwitch
                   checked={Boolean(data[f.slug])}
                   aria-label={f.name}
                   onChange={() => setField(f.slug, !data[f.slug])}
@@ -367,7 +367,7 @@ export function RecordView({
         ))}
         <div style={S.toggleRow}>
           <span style={{ fontSize: 13 }}>Published</span>
-          <Toggle checked={published} aria-label="Published" onChange={() => setPublished((v) => !v)} />
+          <ToggleSwitch checked={published} aria-label="Published" onChange={() => setPublished((v) => !v)} />
         </div>
         {record && onDelete && (
           <Button style={{ ...S.addLink, color: "var(--bk-error)" }} onClick={onDelete}>
