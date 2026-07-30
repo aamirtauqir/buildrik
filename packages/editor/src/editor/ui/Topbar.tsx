@@ -199,14 +199,14 @@ function ReviewBadge({ label, tone, title, onClick }: ReviewPill) {
   const className = `bk-topbar__review bk-topbar__review--${tone}`;
   if (!onClick) {
     return (
-      <span className={className} title={title}>
-        {label}
+      <span className={className} title={title ?? label}>
+        <span className="bk-topbar__review-label">{label}</span>
       </span>
     );
   }
   return (
-    <button type="button" className={className} title={title} onClick={onClick}>
-      {label}
+    <button type="button" className={className} title={title ?? label} onClick={onClick}>
+      <span className="bk-topbar__review-label">{label}</span>
     </button>
   );
 }

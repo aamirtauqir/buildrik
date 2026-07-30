@@ -121,6 +121,16 @@ export function useExportHandlers({
   const handleVercelPublish = React.useCallback(() => runPublish(false), [runPublish]);
   const handlePublishAcknowledged = React.useCallback(() => runPublish(true), [runPublish]);
 
+  // The retry door below needs `runPublish`, but `runPublish` rotates identity
+  // every render (`usePublishJob` returns a fresh object literal), and the
+  // outcome effect fires on its deps. Depending on it directly re-toasted the
+  // same outcome on every render for as long as the job sat in `published`.
+  // The ref keeps the door live while the effect stays keyed on the outcome.
+  const runPublishRef = React.useRef(runPublish);
+  React.useEffect(() => {
+    runPublishRef.current = runPublish;
+  }, [runPublish]);
+
   // needs-approval has no acknowledge path — there is no review to over-ride —
   // so surface it as an informational toast, not a dialog. Clear the block after
   // so it doesn't re-fire. (stale-approval is handled by the dialog in the shell.)
@@ -138,14 +148,19 @@ export function useExportHandlers({
     }
   }, [publishJob.blockedReason, dismissBlock, addToast]);
 
-  // Surface publish completion / failure as toasts.
+  // Surface publish completion / failure as toasts. This effect is the ONE
+  // owner of outcome UX (eng D10) — the topbar renders the transient
+  // "✓ Published" state and announces, but never toasts.
   React.useEffect(() => {
     if (publishJob.uiState === "published" && publishJob.publishedUrl) {
+      const url = publishJob.publishedUrl;
       addToast({
-        title: "Site published",
-        description: publishJob.publishedUrl,
+        title: "Published — site is live",
+        description: url,
         tone: "success",
         duration: 6000,
+        // D10: the victory moment carries its own door — the live site.
+        action: { label: "View live", onClick: () => window.open(url, "_blank", "noopener,noreferrer") },
       });
     } else if (publishJob.uiState === "failed" && publishJob.error) {
       const msg = publishJob.error;
@@ -168,7 +183,14 @@ export function useExportHandlers({
           action: { label: "Reconnect", onClick: openIntegrations },
         });
       } else {
-        addToast({ title: "Publish failed", description: msg, tone: "error" });
+        // D10: a failure without a retry door strands the user. Re-export on
+        // retry so it ships what's on the canvas now, not a stale payload.
+        addToast({
+          title: "Publish failed",
+          description: msg,
+          tone: "error",
+          action: { label: "Try again", onClick: () => void runPublishRef.current(false) },
+        });
       }
     }
   }, [publishJob.uiState, publishJob.publishedUrl, publishJob.error, addToast]);

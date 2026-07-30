@@ -2,9 +2,13 @@
  * SaveStatus — Figma 697:461.
  *
  * Autosave has five truths and the old topbar drew one ("Saved 2m ago").
- * `conflict`, `offline` and `error` are the ones that matter: they are the only
- * signal a user gets that their work is not where they think it is, so those
- * three interrupt (aria-live="assertive") while the rest wait their turn.
+ * `conflict`, `offline` and `error` are the ones that matter: they are the
+ * only signal a user gets that their work is not where they think it is.
+ *
+ * PRESENTATION ONLY (eng D5, 2026-07-30): this component carries NO
+ * aria-live — the topbar's single announcement region (StudioHeader) speaks
+ * for save transitions. Two live regions saying the same thing double-
+ * announce, which is how an a11y feature becomes an a11y bug.
  *
  * @license BSD-3-Clause
  */
@@ -45,21 +49,20 @@ const COPY: Record<Exclude<SaveState, "saved">, string> = {
 
 export function SaveStatus({ state, savedAt, onRetry, className, ...rest }: SaveStatusProps) {
   const label = state === "saved" ? ago(savedAt) : COPY[state];
-  const urgent = state === "conflict" || state === "error";
   const actionable = Boolean(onRetry) && (state === "error" || state === "unsaved");
   const classes = ["bk-save", `bk-save--${state}`, className].filter(Boolean).join(" ");
   const dot = <span className="bk-save__dot" aria-hidden="true" />;
 
   if (actionable) {
     return (
-      <button type="button" className={classes} aria-live={urgent ? "assertive" : "polite"} onClick={onRetry}>
+      <button type="button" className={classes} onClick={onRetry}>
         {dot}
         {label}
       </button>
     );
   }
   return (
-    <span className={classes} role="status" aria-live={urgent ? "assertive" : "polite"} {...rest}>
+    <span className={classes} {...rest}>
       {dot}
       {label}
     </span>

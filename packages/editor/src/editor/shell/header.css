@@ -12,6 +12,19 @@
   z-index: var(--bk-z-topbar);
 }
 
+/* Screen-reader-only announcement regions (F24/eng D5). */
+.bk-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* Anchored under the bar's right edge, where the bell that opened it lives. */
 .bk-header__dropdown {
   position: absolute;

@@ -126,6 +126,9 @@ export interface StudioHeaderProps {
   publishLoading?: boolean;
   /** Live URL after successful publish */
   publishedUrl?: string | null;
+  /** T5 (D10): 2s outcome flash — drives "✓ Published" and the announcement
+   *  region. Toasts stay with useExportHandlers (eng D10), never here. */
+  publishOutcome?: "published" | "failed" | null;
 
   // Toast notifications
   addToast: (input: ToastInput) => string;
@@ -139,6 +142,17 @@ const REVIEW_PILL: Record<ReviewStatus["state"], Omit<ReviewPill, "onClick"> | n
   "changes-requested": { label: "Changes requested", tone: "warning" },
   approved: { label: "Approved", tone: "success" },
   "approved-edited-since": { label: "Approved · edited since", tone: "warning" },
+};
+
+/**
+ * Save transitions worth announcing (T5/eng D5). `conflict` is listed even
+ * though today's derivation never yields it (D11 — blocked on the
+ * save-honesty arc): the pipe is ready for the day it does.
+ */
+const SAVE_ANNOUNCEMENTS: Partial<Record<SaveState, { assertive: boolean; msg: string }>> = {
+  error: { assertive: true, msg: "Save failed" },
+  conflict: { assertive: true, msg: "Sync conflict — reload" },
+  offline: { assertive: false, msg: "Offline — changes queued" },
 };
 
 /** "· 2d ago" suffix on the approved pill (S5.6 board 131:2). */
@@ -181,6 +195,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   onVercelPublish,
   publishLoading,
   publishedUrl,
+  publishOutcome = null,
   addToast,
 }) => {
   const { users, currentUser, state: collaborationState, isConnected } = useCollaboration(composer);
@@ -473,7 +488,34 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
       : offline
         ? "Can't publish while offline"
         : undefined;
-  const publish: PublishState = publishBlockedReason ? "disabled" : errorCount > 0 ? "anyway" : "ready";
+  const publish: PublishState =
+    publishOutcome === "published"
+      ? "published"
+      : publishBlockedReason
+        ? "disabled"
+        : errorCount > 0
+          ? "anyway"
+          : "ready";
+
+  // ── T5/F24 · the ONE announcement pipe (eng D5 — centralized) ────────────
+  // SaveStatus is presentation-only; these two visually-hidden regions speak
+  // for every save transition and publish outcome, exactly once each.
+  const [politeMsg, setPoliteMsg] = React.useState("");
+  const [alertMsg, setAlertMsg] = React.useState("");
+  const prevSaveRef = React.useRef<SaveState>(save);
+  React.useEffect(() => {
+    const prev = prevSaveRef.current;
+    if (prev === save) return;
+    prevSaveRef.current = save;
+    const a = SAVE_ANNOUNCEMENTS[save];
+    if (a) (a.assertive ? setAlertMsg : setPoliteMsg)(a.msg);
+    else if (save === "saved" && prev === "saving") setPoliteMsg("Saved");
+    // `unsaved` and `saving` are not announced — they fire on every keystroke.
+  }, [save]);
+  React.useEffect(() => {
+    if (publishOutcome === "published") setPoliteMsg("Published — site is live");
+    else if (publishOutcome === "failed") setAlertMsg("Publish failed");
+  }, [publishOutcome]);
 
   // ── T4 · publish-anyway confirm (plan §5, D12/D13, eng D9) ────────────────
   // Errors > 0 opens a confirm instead of publishing in one click; warnings
@@ -534,6 +576,15 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
 
   return (
     <div className="bk-header" ref={headerRef}>
+      {/* F24/eng D5 — the single live pipe; visually hidden, never removed. */}
+      <div className="bk-sr-only" role="status" aria-live="polite">
+        {politeMsg}
+      </div>
+      {/* aria-live (not role=alert) so the exit dialog's role=alert stays the
+          only alert in the tree — two alerts break getByRole and SR focus. */}
+      <div className="bk-sr-only" aria-live="assertive" data-testid="bk-announce-assertive">
+        {alertMsg}
+      </div>
       <Topbar
         siteName={siteName}
         onExit={exitToDashboard}

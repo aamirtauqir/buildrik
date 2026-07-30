@@ -35,6 +35,7 @@ import { useEditorEventListeners } from "./hooks/useEditorEventListeners";
 import { useEditorShortcuts } from "./hooks/useEditorShortcuts";
 import { useExportHandlers } from "./hooks/useExportHandlers";
 import { useHistoryFeedback } from "./hooks/useHistoryFeedback";
+import { usePublishOutcomeFlash } from "./hooks/usePublishOutcomeFlash";
 import { useSaveCallback } from "./hooks/useSaveCallback";
 import { useStudioHandlers } from "./hooks/useStudioHandlers";
 import { useStudioModals } from "./hooks/useStudioModals";
@@ -320,6 +321,11 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     setExportLoading: modals.setExportLoading,
   });
 
+  // T5 (topbar plan D10/eng D11): the 2s outcome flash behind the topbar's
+  // "✓ Published" transient. Display state only — toasts stay owned by
+  // useExportHandlers, announcements by StudioHeader.
+  const publishOutcome = usePublishOutcomeFlash(publishJob.uiState);
+
   // Auto-enable spacing on first selection. Deps are the specific values read
   // (not the whole `state` object, which is a fresh literal every render and
   // made this effect run on every render).
@@ -390,6 +396,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           onVercelPublish={handleVercelPublish}
           publishLoading={publishJob.uiState === "publishing"}
           publishedUrl={publishJob.publishedUrl}
+          publishOutcome={publishOutcome}
           addToast={addToast}
         />
       </header>

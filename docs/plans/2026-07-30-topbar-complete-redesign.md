@@ -368,7 +368,7 @@ finding above. Run with Claude Code or Codex; checkbox as you ship.
   - Surfaced by: TODOS.md:96 founder decision + D12 + D13 + D14 (title errors-only)
   - Files: `src/editor/shell/StudioHeader.tsx` (onPublish callsite)
   - Verify: errors>0 → modal with top-3 rows; warnings-only publishes direct; open-review note renders when pill ≠ none
-- [ ] **T5 (P2, human: ~4h / CC: ~25min)** — shell+ui — publish outcome states + centralized announcements
+- [x] **T5 (P2) — SHIPPED 2026-07-30** (useExportHandlers toasts gain [View live]/[Try again] doors + re-toast regression fixed via runPublish ref; PublishState "published" 2s flash via usePublishOutcomeFlash; header = single announcement pipe, SaveStatus presentation-only; exactly-once regression tests green) — shell+ui — publish outcome states + centralized announcements
   - Surfaced by: F4/F5/F11 (CRITICAL) + eng D5 (centralize) + eng D10 (owner = useExportHandlers, NOT a new header pipe) + eng D11 (Topbar contract)
   - Files: `useExportHandlers.ts` (the EXISTING outcome-toast owner at `:141` — enhance: success toast gains `action: {label:"View live"}`, failure toast gains `action: {label:"Try again"}` re-invoking publish; integrations-link failure branch untouched), `Topbar.tsx` (`PublishState` += `"published"` — transient "✓ Published" success tint, label in `PUBLISH_LABEL`), `AquibraStudio.tsx` (drive the transient from `publishJob.uiState === "published"` with a 2s timer back to ready), `StudioHeader.tsx` (header `aria-live` region announcing save + publish transitions), `SaveStatus.tsx` (REMOVE its own aria-live — the header region is the single pipe)
   - NOT here: a second toast source in StudioHeader (eng D10 killed it), a `publishError` prop for toasts (owner already has the error)
@@ -381,7 +381,7 @@ finding above. Run with Claude Code or Codex; checkbox as you ship.
   - Surfaced by: F16 (1 error + 2 warnings currently reads "3 errors")
   - Files: `StudioHeader.tsx:448-454`
   - Verify: mixed counts render total + breakdown in tooltip/aria
-- [ ] **T8 (P2, human: ~1.5h / CC: ~12min)** — ui/shell — status grammar + compact modes
+- [x] **T8 (P2) — SHIPPED 2026-07-30, one honest deferral** (review pill label capped 140px + truncate + title; site name min-width 120 + flex-shrink — shrinks LAST. Deferred: the save-timestamp-drop compact mode — no clean width signal without a viewport media query the DS bans outside a11y.css, and the rebuilt §7 budget fits the 1152px floor without it. D7 grammar tints land with T1's Figma variants.) — ui/shell — status grammar + compact modes
   - Surfaced by: D7 + F23 (review pill 140px cap, save timestamp drop) — presence overflow ALREADY SHIPPED as passive span (eng D14; only the visible-avatar cap may need tuning)
   - Files: `ui.css`, `SaveStatus.tsx` (timestamp-drop compact mode), `Presence.tsx` (cap tuning only)
   - Verify: worst-case bar (error save + red chip + "Publish anyway" + approved pill) fits 1152px

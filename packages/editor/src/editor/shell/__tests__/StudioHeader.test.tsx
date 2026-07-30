@@ -179,13 +179,28 @@ describe("StudioHeader", () => {
       expect(screen.getByText("Saving…")).toBeTruthy();
     });
 
-    it("a failed save interrupts, and becomes the retry button", () => {
+    it("a failed save becomes the retry button", () => {
       const onSave = vi.fn();
       save({ saveStatus: "error", onSave });
       const pill = screen.getByRole("button", { name: /Save failed/ });
-      expect(pill.getAttribute("aria-live")).toBe("assertive");
+      // eng D5: the pill carries no live region of its own — the header pipe speaks.
+      expect(pill.getAttribute("aria-live")).toBeNull();
       fireEvent.click(pill);
       expect(onSave).toHaveBeenCalled();
+    });
+
+    // eng D5 (regression): transitions announce exactly ONCE, via the header's
+    // single pipe — assertive for failure, and never doubled by SaveStatus.
+    it("a save failure announces once through the header's assertive region", () => {
+      const { rerender } = render(<StudioHeader {...makeProps({ saveStatus: "idle" })} />);
+      rerender(<StudioHeader {...makeProps({ saveStatus: "error" })} />);
+      expect(screen.getByTestId("bk-announce-assertive").textContent).toBe("Save failed");
+      expect(document.querySelectorAll('[aria-live="assertive"]').length).toBe(1);
+    });
+
+    it("mounting already-failed does not announce — announcements are transitions", () => {
+      render(<StudioHeader {...makeProps({ saveStatus: "error" })} />);
+      expect(screen.getByTestId("bk-announce-assertive").textContent).toBe("");
     });
 
     it("dirty work can be saved from the pill", () => {
@@ -342,6 +357,25 @@ describe("StudioHeader", () => {
       fireEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Publish anyway" }));
       expect(onVercelPublish).toHaveBeenCalledTimes(1);
       expect(screen.queryByRole("dialog")).toBeNull();
+    });
+  });
+
+  // ── T5 publish outcome (plan D10, eng D10/D11) ────────────────────────────
+  describe("publish outcome flash", () => {
+    it("published flashes '✓ Published' and announces politely", () => {
+      vi.mocked(isFeatureEnabled).mockReturnValue(true);
+      render(<StudioHeader {...makeProps({ publishOutcome: "published" })} />);
+      const btn = screen.getByRole("button", { name: "✓ Published" });
+      expect(btn).toBeDisabled();
+      expect(screen.getByRole("status").textContent).toBe("Published — site is live");
+    });
+
+    it("failed announces assertively — the toast (useExportHandlers) owns the retry door", () => {
+      vi.mocked(isFeatureEnabled).mockReturnValue(true);
+      render(<StudioHeader {...makeProps({ publishOutcome: "failed" })} />);
+      expect(screen.getByTestId("bk-announce-assertive").textContent).toBe("Publish failed");
+      // the button returns to its normal state — no error styling lingers
+      expect(screen.getByRole("button", { name: "Publish" })).toBeTruthy();
     });
   });
 

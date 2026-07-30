@@ -43,7 +43,10 @@ vi.mock("../usePublishJob", () => {
   };
   const ref = { current: { ...baseResult } };
   return {
-    usePublishJob: () => ref.current,
+    // A fresh object per call, exactly like the real hook — it returns an
+    // object literal. Handing back one stable instance would hide every
+    // identity-rotation bug the consumer's effects can have.
+    usePublishJob: () => ({ ...ref.current }),
     __setPublishState: (next: Partial<typeof baseResult>) => {
       ref.current = { ...baseResult, ...next };
     },
@@ -147,14 +150,14 @@ describe("useExportHandlers — publish failure error mapping", () => {
     );
   });
 
-  it("any other failure message → generic 'Publish failed' toast with NO action", async () => {
+  it("any other failure message → generic 'Publish failed' toast with a Try again door (D10)", async () => {
     await failWith("build exploded: exit 1");
     const toast = lastToast();
     expect(toast).toMatchObject({
       title: "Publish failed",
       tone: "error",
     });
-    expect(toast.action).toBeUndefined();
+    expect(toast.action?.label).toBe("Try again");
     expect((toast as { description?: string }).description).toBe(
       "build exploded: exit 1",
     );
@@ -163,5 +166,55 @@ describe("useExportHandlers — publish failure error mapping", () => {
   it("failed state with a null error message fires no toast at all", async () => {
     await failWith(null as unknown as string);
     expect(opts.addToast).not.toHaveBeenCalled();
+  });
+
+  // T5 regression: the outcome effect once depended on `runPublish`, which
+  // rotates identity every render (the hook returns a fresh object). Every
+  // re-render while the job sat in an outcome fired the toast again.
+  it("one outcome, one toast — re-renders while published do not re-toast", async () => {
+    const { rerender } = renderHook(() => useExportHandlers(opts));
+    setPublishState({ uiState: "published", publishedUrl: "https://live.test/" });
+    await act(async () => {
+      rerender();
+      await flushMicrotasks();
+    });
+    expect(opts.addToast).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      rerender();
+      rerender();
+      rerender();
+      await flushMicrotasks();
+    });
+    expect(opts.addToast).toHaveBeenCalledTimes(1);
+  });
+
+  it("one outcome, one toast — the same holds for a failure", async () => {
+    const { rerender } = renderHook(() => useExportHandlers(opts));
+    setPublishState({ uiState: "failed", error: "build exploded: exit 1" });
+    await act(async () => {
+      rerender();
+      await flushMicrotasks();
+    });
+    expect(opts.addToast).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      rerender();
+      rerender();
+      await flushMicrotasks();
+    });
+    expect(opts.addToast).toHaveBeenCalledTimes(1);
+  });
+
+  // The ref that fixes the double-toast must still hand the user a live door.
+  it("the Try again door runs a fresh publish attempt", async () => {
+    await failWith("build exploded: exit 1");
+    const toast = lastToast();
+    const before = opts.addToast.mock.calls.length;
+    await act(async () => {
+      toast.action!.onClick();
+      await flushMicrotasks();
+    });
+    expect(opts.addToast.mock.calls.length).toBeGreaterThan(before);
   });
 });

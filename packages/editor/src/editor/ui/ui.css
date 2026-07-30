@@ -782,7 +782,10 @@
 }
 .bk-topbar__name {
   font-size: var(--bk-text-13); font-weight: var(--bk-weight-medium); color: var(--bk-ink);
-  max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  /* F23 compact order: the name shrinks LAST (200 → 120px) — identity
+     survives crowding; the pill cap below gives way first. */
+  max-width: 200px; min-width: 120px; flex-shrink: 1;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .bk-topbar__spacer { flex: 1; }
 .bk-topbar__bell { position: relative; display: inline-flex; flex: none; }
@@ -834,6 +837,13 @@
 }
 button.bk-topbar__review { cursor: pointer; }
 button.bk-topbar__review:focus-visible { outline: none; box-shadow: var(--bk-shadow-focus); }
+/* F23: reviewer names are unbounded — cap the pill, keep the truth in `title`. */
+.bk-topbar__review-label {
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .bk-topbar__review--info { background: var(--bk-accent-subtle); color: var(--bk-accent-text); }
 .bk-topbar__review--warning { background: var(--bk-warning-tint); color: var(--bk-warning-text); }
 .bk-topbar__review--success { background: var(--bk-success-tint); color: var(--bk-success-text); }

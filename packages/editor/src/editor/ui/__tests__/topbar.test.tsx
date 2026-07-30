@@ -149,16 +149,23 @@ describe("Topbar", () => {
 });
 
 describe("SaveStatus", () => {
-  it.each(["saving", "unsaved", "conflict", "offline"] as const)("renders the %s truth", (state) => {
+  it.each([
+    ["saving", "Saving…"],
+    ["unsaved", "Unsaved changes"],
+    ["conflict", "Conflict — reload"],
+    ["offline", "Offline — saved locally"],
+  ] as const)("renders the %s truth", (state, copy) => {
     render(<SaveStatus state={state} />);
-    expect(screen.getByRole("status")).toBeTruthy();
+    expect(screen.getByText(copy)).toBeTruthy();
   });
 
-  it("a conflict interrupts — everything else waits", () => {
-    const { rerender } = render(<SaveStatus state="saved" savedAt={Date.now()} />);
-    expect(screen.getByRole("status").getAttribute("aria-live")).toBe("polite");
+  // eng D5 (regression): SaveStatus is presentation-only — the topbar's single
+  // announcement region speaks; a second live region here double-announces.
+  it("carries NO live semantics of its own", () => {
+    const { container, rerender } = render(<SaveStatus state="saved" savedAt={Date.now()} />);
     rerender(<SaveStatus state="conflict" />);
-    expect(screen.getByRole("status").getAttribute("aria-live")).toBe("assertive");
+    expect(container.querySelector("[aria-live]")).toBeNull();
+    expect(container.querySelector('[role="status"]')).toBeNull();
     expect(screen.getByText("Conflict — reload")).toBeTruthy();
   });
 
