@@ -3,7 +3,7 @@ import { useState, useRef } from "react";
 import { ToggleSwitch } from "flowbite-react";
 import { trpc } from "@lib/trpc/client";
 import { useUnsavedChanges } from "@lib/hooks/use-unsaved-changes";
-import { Button, SectionCard } from "@/components/dashboard/primitives";
+import { Button, InputField, SectionCard } from "@/components/dashboard/primitives";
 import { useToast } from "@/components/dashboard/toast-provider";
 
 const SOCIAL_PLATFORMS = ["twitter", "instagram", "linkedin", "youtube", "github"] as const;
@@ -190,21 +190,17 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
       <SectionCard title="General">
         <div className="space-y-4">
           <Field label="Site Name" hint="This appears in browser tabs and search results">
-            <input
+            <InputField
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full rounded-lg border px-3 py-2 text-body"
-              style={{ borderColor: "var(--color-border-default)" }}
             />
           </Field>
           <Field label="Slug" hint="Used in your site's URL.">
-            <input
+            <InputField
               type="text"
               value={slug}
               onChange={(e) => setSlug(e.target.value)}
-              className="w-full rounded-lg border px-3 py-2 text-body"
-              style={{ borderColor: "var(--color-border-default)" }}
             />
           </Field>
         </div>
@@ -275,13 +271,11 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
           </div>
           {passwordEnabled && (
             <div className="mt-3">
-              <input
+              <InputField
                 type="text"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter site password"
-                className="w-full rounded-lg border px-3 py-2 text-body"
-                style={{ borderColor: "var(--color-border-default)" }}
               />
             </div>
           )}
@@ -326,13 +320,12 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
               <label className="w-28 shrink-0 text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
                 {PLATFORM_LABELS[platform]}
               </label>
-              <input
+              <InputField
                 type="url"
                 value={socialLinks[platform] ?? ""}
                 onChange={(e) => updateSocialLink(platform, e.target.value)}
                 placeholder={`https://${platform}.com/...`}
-                className="flex-1 rounded-lg border px-3 py-2 text-body"
-                style={{ borderColor: "var(--color-border-default)" }}
+                wrapperClassName="flex-1"
               />
               <button
                 type="button"

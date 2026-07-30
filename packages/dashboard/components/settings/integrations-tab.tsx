@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Pill, Button } from "@/components/dashboard/primitives";
+import { Pill, Button, InputField } from "@/components/dashboard/primitives";
 
 export const INTEGRATION_CONFIGS = [
   {
@@ -105,13 +105,12 @@ function GoogleAnalyticsConfig({
         <label className="block text-xs font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
           Tracking ID
         </label>
-        <input
+        <InputField
           type="text"
           value={values["trackingId"] ?? ""}
           onChange={(e) => onChange("trackingId", e.target.value)}
           placeholder="G-XXXXXXXXXX"
-          className="w-full px-3 py-2 text-sm rounded-md border outline-none"
-          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+          wrapperClassName="w-full"
         />
       </div>
       <div className="flex items-center justify-between">
@@ -149,26 +148,24 @@ function MailchimpConfig({
         <label className="block text-xs font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
           API Key
         </label>
-        <input
+        <InputField
           type="text"
           value={values["apiKey"] ?? ""}
           onChange={(e) => onChange("apiKey", e.target.value)}
           placeholder="Enter your Mailchimp API key"
-          className="w-full px-3 py-2 text-sm rounded-md border outline-none"
-          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+          wrapperClassName="w-full"
         />
       </div>
       <div>
         <label className="block text-xs font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
           Audience ID
         </label>
-        <input
+        <InputField
           type="text"
           value={values["audienceId"] ?? ""}
           onChange={(e) => onChange("audienceId", e.target.value)}
           placeholder="Enter your audience ID"
-          className="w-full px-3 py-2 text-sm rounded-md border outline-none"
-          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+          wrapperClassName="w-full"
         />
       </div>
       {values["audienceId"] && (
@@ -210,13 +207,12 @@ function ZapierConfig({
         <label className="block text-xs font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
           Webhook URL
         </label>
-        <input
+        <InputField
           type="text"
           value={values["webhookUrl"] ?? ""}
           onChange={(e) => onChange("webhookUrl", e.target.value)}
           placeholder="https://hooks.zapier.com/\u2026"
-          className="w-full px-3 py-2 text-sm rounded-md border outline-none"
-          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+          wrapperClassName="w-full"
         />
       </div>
       <div>
@@ -261,26 +257,24 @@ function SlackConfig({
         <label className="block text-xs font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
           Webhook URL
         </label>
-        <input
+        <InputField
           type="text"
           value={values["webhookUrl"] ?? ""}
           onChange={(e) => onChange("webhookUrl", e.target.value)}
           placeholder="https://hooks.slack.com/\u2026"
-          className="w-full px-3 py-2 text-sm rounded-md border outline-none"
-          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+          wrapperClassName="w-full"
         />
       </div>
       <div>
         <label className="block text-xs font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
           Channel name
         </label>
-        <input
+        <InputField
           type="text"
           value={values["channelName"] ?? ""}
           onChange={(e) => onChange("channelName", e.target.value)}
           placeholder="#general"
-          className="w-full px-3 py-2 text-sm rounded-md border outline-none"
-          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+          wrapperClassName="w-full"
         />
       </div>
       <div className="flex items-center justify-between">

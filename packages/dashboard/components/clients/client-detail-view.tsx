@@ -6,7 +6,7 @@ import { ArrowLeft, Globe, Plus, Palette, UserPlus } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { StateEmpty, LoadingSkeleton, ErrorState, DeniedState } from "@/components/states";
-import { Button, Modal } from "@/components/dashboard/primitives";
+import { Button, InputField, Modal } from "@/components/dashboard/primitives";
 
 interface Branding {
   logoUrl: string | null;
@@ -36,7 +36,6 @@ function BrandingDialog({
   const [brandColor, setBrandColor] = useState(initial.brandColor ?? "");
   const [customDomain, setCustomDomain] = useState(initial.customDomain ?? "");
   const [hideBuildrik, setHideBuildrik] = useState(initial.hideBuildrik);
-  const field = "mt-1 w-full rounded-lg border px-3 py-2 text-sm";
   const label = "text-xs font-semibold";
   return (
     <Modal
@@ -60,16 +59,16 @@ function BrandingDialog({
           <label className={label} style={{ color: "var(--color-text-secondary)" }}>Brand color</label>
           <div className="mt-1 flex items-center gap-2">
             <input type="color" value={brandColor} onChange={(e) => setBrandColor(e.target.value)} className="h-9 w-12 rounded border" style={{ borderColor: "var(--color-border-default)" }} aria-label="Brand color" />
-            <input type="text" value={brandColor} onChange={(e) => setBrandColor(e.target.value)} className="flex-1 rounded-lg border px-3 py-2 text-sm" style={{ borderColor: "var(--color-border-default)" }} />
+            <InputField type="text" value={brandColor} onChange={(e) => setBrandColor(e.target.value)} wrapperClassName="flex-1" />
           </div>
         </div>
         <div>
           <label className={label} style={{ color: "var(--color-text-secondary)" }}>Logo URL</label>
-          <input type="text" value={logoUrl} placeholder="https://…/logo.svg" onChange={(e) => setLogoUrl(e.target.value)} className={field} style={{ borderColor: "var(--color-border-default)" }} />
+          <InputField type="text" value={logoUrl} placeholder="https://…/logo.svg" onChange={(e) => setLogoUrl(e.target.value)} wrapperClassName="mt-1 w-full" />
         </div>
         <div>
           <label className={label} style={{ color: "var(--color-text-secondary)" }}>Custom domain</label>
-          <input type="text" value={customDomain} placeholder="clients.agency.com" onChange={(e) => setCustomDomain(e.target.value)} className={field} style={{ borderColor: "var(--color-border-default)" }} />
+          <InputField type="text" value={customDomain} placeholder="clients.agency.com" onChange={(e) => setCustomDomain(e.target.value)} wrapperClassName="mt-1 w-full" />
         </div>
         <label className="flex items-center gap-2 pt-1 text-sm" style={{ color: "var(--color-text-primary)" }}>
           <input type="checkbox" checked={hideBuildrik} onChange={(e) => setHideBuildrik(e.target.checked)} className="accent-[var(--color-primary)]" />
@@ -147,13 +146,12 @@ function InviteEditorDialog({
         They&apos;ll join as a <strong>Content editor</strong> with access to {clientName}&apos;s{" "}
         {siteCount} {siteCount === 1 ? "site" : "sites"} — and nothing else.
       </p>
-      <input
+      <InputField
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="name@client.com"
-        className="mt-4 w-full rounded-lg border px-3 py-2 text-sm"
-        style={{ borderColor: "var(--color-border-default)" }}
+        wrapperClassName="mt-4 w-full"
         autoFocus
       />
       <textarea

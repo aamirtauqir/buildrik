@@ -194,23 +194,16 @@ export function WorkspaceForm({
             <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
               Workspace URL
             </label>
-            <div
-              className="flex h-[42px] items-center overflow-hidden rounded-lg shadow-[var(--shadow-ring)] transition-shadow focus-within:shadow-[inset_0_0_0_1.5px_var(--color-primary)]"
-              style={{ backgroundColor: "var(--color-bg-surface)" }}
-            >
-              <span
-                className="flex h-full shrink-0 items-center border-r px-[13px] text-[13.5px]"
-                style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-page)", color: "var(--color-text-secondary)" }}
-              >
+            <div className="flex items-center gap-2">
+              <span className="shrink-0 text-[13.5px]" style={{ color: "var(--color-text-secondary)" }}>
                 buildrik.io/
               </span>
-              <input
+              <InputField
                 type="text"
                 value={slug}
                 onChange={(e) => setSlug(slugify(e.target.value))}
                 placeholder="acme"
-                className="h-full flex-1 bg-transparent px-[13px] text-[13.5px] outline-none"
-                style={{ color: "var(--color-text-primary)" }}
+                wrapperClassName="flex-1"
               />
             </div>
             {slug && (
@@ -311,17 +304,15 @@ export function WorkspaceForm({
                   className="w-9 h-9 rounded-md border cursor-pointer"
                   style={{ borderColor: "var(--color-border-default)" }}
                 />
-                <input
+                <InputField
                   type="text"
                   value={hexInput.toUpperCase()}
                   onChange={(e) => handleHexChange(e.target.value)}
                   maxLength={7}
-                  className="w-24 h-9 px-2.5 text-[13.5px] font-mono rounded-lg shadow-[var(--shadow-ring)] outline-none transition-shadow focus:shadow-[inset_0_0_0_1.5px_var(--color-primary)]"
-                  style={{
-                    boxShadow: isValidHex(hexInput) ? undefined : "inset 0 0 0 1.5px var(--color-error)",
-                    backgroundColor: "var(--color-bg-surface)",
-                    color: "var(--color-text-primary)",
-                  }}
+                  className="font-mono"
+                  wrapperClassName="w-24"
+                  invalid={!isValidHex(hexInput)}
+                  aria-invalid={!isValidHex(hexInput)}
                 />
                 <div
                   className="w-9 h-9 rounded-md border"

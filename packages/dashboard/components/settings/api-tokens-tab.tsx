@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Key, Plus, Copy, Check, Trash2 } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
-import { Pill, MetricValue, Button, Modal } from "@/components/dashboard/primitives";
+import { Pill, MetricValue, Button, Modal, InputField } from "@/components/dashboard/primitives";
 import { ErrorState } from "@/components/states";
 
 const SCOPE_LABELS: Record<string, string> = {
@@ -194,13 +194,12 @@ export function ApiTokensTab({ workspaceId }: { workspaceId: string }) {
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>Name</label>
-            <input
+            <InputField
               autoFocus
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="CI deploy"
-              className="mt-1 w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-[var(--color-primary)]"
-              style={{ borderColor: "var(--color-border-default)" }}
+              wrapperClassName="mt-1 w-full"
             />
           </div>
           <div>

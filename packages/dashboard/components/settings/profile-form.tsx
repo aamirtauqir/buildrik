@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import { trpc } from "@lib/trpc/client";
-import { Button } from "@/components/dashboard/primitives";
+import { Button, InputField } from "@/components/dashboard/primitives";
 import { useToast } from "@/components/dashboard/toast-provider";
 
 const LANGUAGES = [
@@ -186,13 +186,11 @@ export function ProfileForm({ initialData, onSave, saving }: ProfileFormProps) {
           <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
             Full name
           </label>
-          <input
+          <InputField
             type="text"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
             placeholder="Jane Smith"
-            className="w-full px-3 py-2 text-sm rounded-md border outline-none focus:ring-2"
-            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
           />
           <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>
             Appears on published sites.
@@ -203,13 +201,11 @@ export function ProfileForm({ initialData, onSave, saving }: ProfileFormProps) {
           <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
             Display name
           </label>
-          <input
+          <InputField
             type="text"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
             placeholder="jane"
-            className="w-full px-3 py-2 text-sm rounded-md border outline-none focus:ring-2"
-            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
           />
           <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>
             Shown to team members.
@@ -221,12 +217,10 @@ export function ProfileForm({ initialData, onSave, saving }: ProfileFormProps) {
         <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
           Email
         </label>
-        <input
+        <InputField
           type="email"
           value={initialData?.email ?? ""}
           readOnly
-          className="w-full px-3 py-2 text-sm rounded-md border outline-none"
-          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)", backgroundColor: "var(--color-bg-page)" }}
         />
         <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>
           Read-only. Change in Account tab.

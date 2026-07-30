@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { MailCheck } from "lucide-react";
-import { SectionCard, Pill, Button } from "@/components/dashboard/primitives";
+import { SectionCard, Pill, Button, InputField } from "@/components/dashboard/primitives";
 
 interface ConnectedAccount {
   provider: "google" | "github";
@@ -155,13 +155,11 @@ export function AccountTab({
               <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
                 Current password
               </label>
-              <input
+              <InputField
                 type="password"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 required
-                className="w-full px-3 py-2 text-sm rounded-md border outline-none"
-                style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
               />
             </div>
           )}
@@ -170,14 +168,12 @@ export function AccountTab({
             <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
               New password
             </label>
-            <input
+            <InputField
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               required
               minLength={8}
-              className="w-full px-3 py-2 text-sm rounded-md border outline-none"
-              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
             />
             <PasswordStrengthBar password={newPassword} />
             <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>
@@ -189,7 +185,7 @@ export function AccountTab({
             <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
               Confirm new password
             </label>
-            <input
+            <InputField
               type="password"
               value={confirmPassword}
               onChange={(e) => {
@@ -197,14 +193,11 @@ export function AccountTab({
                 if (confirmError) setConfirmError("");
               }}
               required
-              className="w-full px-3 py-2 text-sm rounded-md border outline-none"
-              style={{
-                borderColor: confirmError ? "var(--color-primary)" : "var(--color-border-default)",
-                color: "var(--color-text-primary)",
-              }}
+              invalid={!!confirmError}
+              aria-invalid={!!confirmError}
             />
             {confirmError && (
-              <p className="text-xs mt-1" style={{ color: "var(--color-primary)" }}>
+              <p className="text-xs mt-1" style={{ color: "var(--color-error-text)" }}>
                 {confirmError}
               </p>
             )}
@@ -263,17 +256,14 @@ export function AccountTab({
             <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
               New email
             </label>
-            <input
+            <InputField
               type="email"
               value={newEmail}
               onChange={(e) => { setNewEmail(e.target.value); if (emailError) setEmailError(""); }}
               required
               placeholder="you@example.com"
-              className="w-full px-3 py-2 text-sm rounded-md border outline-none"
-              style={{
-                borderColor: emailError ? "var(--color-primary)" : "var(--color-border-default)",
-                color: "var(--color-text-primary)",
-              }}
+              invalid={!!emailError}
+              aria-invalid={!!emailError}
             />
           </div>
 
@@ -282,19 +272,17 @@ export function AccountTab({
               <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
                 Current password
               </label>
-              <input
+              <InputField
                 type="password"
                 value={emailPassword}
                 onChange={(e) => { setEmailPassword(e.target.value); if (emailError) setEmailError(""); }}
                 required
-                className="w-full px-3 py-2 text-sm rounded-md border outline-none"
-                style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
               />
             </div>
           )}
 
           {emailError && (
-            <p className="text-xs" style={{ color: "var(--color-primary)" }}>
+            <p className="text-xs" style={{ color: "var(--color-error-text)" }}>
               {emailError}
             </p>
           )}
