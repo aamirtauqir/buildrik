@@ -9,8 +9,8 @@
  */
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { Input, Select, Radio, Toggle, Slider, StatusDot } from "../index";
-import { Avatar, Checkbox } from "flowbite-react";
+import { Input, Select, Toggle, Slider, StatusDot } from "../index";
+import { Avatar, Checkbox, Radio } from "flowbite-react";
 import { avatarInitials, AVATAR_TONE_THEME, type AvatarTone } from "../avatarTone";
 
 describe("Input", () => {

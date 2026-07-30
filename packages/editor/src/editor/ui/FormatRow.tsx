@@ -8,6 +8,7 @@
  * @license BSD-3-Clause
  */
 import React from "react";
+import { Radio } from "flowbite-react";
 
 export interface FormatRowProps extends Omit<React.HTMLAttributes<HTMLLabelElement>, "onChange"> {
   name: string;
@@ -28,9 +29,9 @@ export function FormatRow({
       aria-checked={Boolean(checked)}
       {...rest}
     >
-      <input
-        type="radio"
-        className="bk-radio"
+      <Radio
+        color="blue"
+        className="tw:bg-white"
         name={name}
         value={value}
         checked={Boolean(checked)}

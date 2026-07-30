@@ -1229,3 +1229,42 @@ Verified: `tsc --noEmit` clean; 243 tests green (28 files: `atoms.test.tsx`
 sweep for the 4 consumer files — `WebhooksScreen.tsx`,
 `LayerDisplaySettings.tsx`, `PropertyField.tsx`, `TemplatesTabModals.tsx`
 — with no component-specific dedicated test file).
+
+### Radio → `flowbite-react` `Radio`
+
+`src/editor/ui/Radio.tsx` (thin native-input wrapper, no extra props) →
+`node_modules/flowbite-react/dist/components/Radio/Radio.d.ts` (`color`,
+native input props). Same shape and same 2 real gaps as Checkbox, since
+`radioTheme` is structurally the Checkbox theme with `rounded-full` instead
+of `rounded`: `color="blue"` (flowbite's default `color` is `primary-600`,
+not the exact `--bk-accent` match) + `className="tw:bg-white"` (flowbite's
+unchecked fill is `bg-gray-100`, ours is white) added at every call site.
+`border-gray-300`/`h-4 w-4`/`rounded-full` all matched our
+`--bk-border-medium`/16px/`--bk-radius-full` exactly, no override needed.
+No `indeterminate` concept for radio inputs, so no equivalent gap to
+document.
+
+**Consumers swept:** 1 real file via `@/editor/ui`
+(`design-system/ui/sections/ExportSection.tsx`, 2 call sites: export-format
+picker, dark-mode-strategy picker) — **plus a raw-element trap found only
+by grepping `bk-radio` after deleting the CSS** (same class of miss as
+Button's `PanelHeader.tsx`/`PanelFrame.tsx` in fix round 1):
+`src/editor/ui/FormatRow.tsx` rendered a raw `<input type="radio"
+className="bk-radio">` that never imported the `Radio` component at all —
+it has zero real consumers anywhere in the app (only its own contract test
+in `molecules.test.tsx`, role-based, so it would have kept passing green
+while silently rendering fully unstyled). Fixed by swapping the raw
+`<input>` for flowbite's `Radio` with the same `color="blue"`/
+`tw:bg-white` treatment, even though nothing in the live app currently
+renders `FormatRow` — it's still exported from the public `editor/ui` API
+surface, so a de-facto CSS dependency left dangling there is exactly the
+kind of orphan-CSS trap this task exists to close, not a "no consumers,
+skip it" case.
+
+**Class-list regen:** 2 new prefixed entries (`radioTheme`'s own
+`bg-dot-icon` + `rounded-full`; the rest of its class list overlaps with
+Checkbox's, already compiled).
+
+Verified: `tsc --noEmit` clean; 58 tests green (`atoms.test.tsx`,
+`molecules.test.tsx`, `ExportSection.test.tsx`) + full `ui/__tests__` +
+`design-system` sweep, 718 passed / 1 skipped / 1 todo, 84 files.
