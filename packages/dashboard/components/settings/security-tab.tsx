@@ -266,7 +266,7 @@ export function SecurityTab() {
               Enter the 6-digit code from your authenticator app to complete setup.
             </p>
             {error && (
-              <p className="text-sm" style={{ color: "#991b1b" }}>
+              <p className="text-sm" style={{ color: "#9B1C1C" }}>
                 {error}
               </p>
             )}
@@ -320,7 +320,7 @@ export function SecurityTab() {
                 : "Enter the 6-digit code from your authenticator app to disable 2FA."}
             </p>
             {error && (
-              <p className="text-sm" style={{ color: "#991b1b" }}>
+              <p className="text-sm" style={{ color: "#9B1C1C" }}>
                 {error}
               </p>
             )}

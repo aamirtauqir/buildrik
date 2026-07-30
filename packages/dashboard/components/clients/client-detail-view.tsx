@@ -83,7 +83,7 @@ function BrandingDialog({
 const STATUS_COLOR: Record<string, string> = {
   PUBLISHED: "var(--color-success)",
   DRAFT: "var(--color-text-muted)",
-  ARCHIVED: "#F59E0B",
+  ARCHIVED: "#C27803",
 };
 
 function SiteRow({ name, status, right }: { name: string; status: string; right: React.ReactNode }) {

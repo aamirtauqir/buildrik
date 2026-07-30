@@ -64,7 +64,7 @@ export function PublishProgress({ jobId, onComplete, onCancel, onRetry }: Publis
     <div className="mx-auto max-w-lg space-y-6">
       {/* Error state */}
       {isFailed && (
-        <div className="rounded-xl border p-4" style={{ borderColor: "#FCA5A5", backgroundColor: "#FEF2F2" }}>
+        <div className="rounded-xl border p-4" style={{ borderColor: "#F8B4B4", backgroundColor: "#FDF2F2" }}>
           <div className="flex items-start gap-3">
             <XCircle className="mt-0.5 h-5 w-5 shrink-0" style={{ color: "var(--color-error)" }} />
             <div className="flex-1">

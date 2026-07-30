@@ -262,7 +262,7 @@ export default function MarketplacePage() {
               <p className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>{confirming.name}</p>
               <p className="mt-0.5 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>{confirming.description}</p>
               {/* Honesty: first-party apps are tracked but not yet functional. */}
-              <p className="mt-2 text-body-sm" style={{ color: "#92400e" }}>
+              <p className="mt-2 text-body-sm" style={{ color: "#723B13" }}>
                 Preview — installing marks this app as enabled for your workspace, but it isn&apos;t active yet.
               </p>
             </div>

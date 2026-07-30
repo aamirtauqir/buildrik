@@ -231,9 +231,9 @@ function BillingPageInner() {
       {cancelAtPeriodEnd && overview?.currentPeriodEnd && (
         <div
           className="mb-4 flex items-center justify-between rounded-xl border px-5 py-3"
-          style={{ borderColor: "#F59E0B", backgroundColor: "#FFFBEB" }}
+          style={{ borderColor: "#C27803", backgroundColor: "#FDFDEA" }}
         >
-          <p className="text-body font-medium" style={{ color: "#92400E" }}>
+          <p className="text-body font-medium" style={{ color: "#723B13" }}>
             Your plan cancels on <MetricValue>{formatDate(overview.currentPeriodEnd)}</MetricValue>
           </p>
           <button

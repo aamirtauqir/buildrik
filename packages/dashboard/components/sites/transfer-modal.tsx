@@ -100,7 +100,7 @@ export function TransferModal({ open, onClose, siteId, siteName }: TransferModal
 
       {/* Confirmation text */}
       {selectedMember && (
-        <p className="mt-4 rounded-lg p-3 text-sm" style={{ backgroundColor: "#FEF9C3", color: "#854D0E" }}>
+        <p className="mt-4 rounded-lg p-3 text-sm" style={{ backgroundColor: "#FDF6B2", color: "#723B13" }}>
           Transfer ownership of &apos;{siteName}&apos; to {selectedMember.fullName}. You will become an Editor on this site.
         </p>
       )}

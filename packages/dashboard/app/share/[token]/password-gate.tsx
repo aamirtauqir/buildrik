@@ -50,7 +50,7 @@ export function SharePasswordGate() {
       <div className="w-full max-w-sm mx-auto px-4">
         <div className="bg-white rounded-2xl p-8 shadow-sm" style={{ border: "1px solid var(--color-border-default)" }}>
           <div className="flex justify-center mb-6">
-            <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: "#FEF2F2" }}>
+            <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: "#FDF2F2" }}>
               <Lock className="w-6 h-6" style={{ color: "var(--color-primary)" }} />
             </div>
           </div>
@@ -68,13 +68,13 @@ export function SharePasswordGate() {
               onChange={(e) => setPassword(e.target.value)}
               className="w-full h-11 px-3 rounded-lg text-sm"
               style={{
-                border: error ? "2px solid #EF4444" : "1px solid var(--color-border-default)",
-                backgroundColor: error ? "#FEF2F2" : "#FFFFFF",
+                border: error ? "2px solid #F05252" : "1px solid var(--color-border-default)",
+                backgroundColor: error ? "#FDF2F2" : "#FFFFFF",
               }}
               autoFocus
             />
             {error && (
-              <p className="text-xs mt-1.5" style={{ color: "#EF4444" }}>{error}</p>
+              <p className="text-xs mt-1.5" style={{ color: "#F05252" }}>{error}</p>
             )}
             <button
               type="submit"

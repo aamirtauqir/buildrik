@@ -17,7 +17,7 @@ import { SUPPORT_EMAIL } from "@lib/constants/contact";
 export default function TwoFALockedPage() {
   return (
     <AuthMessage
-      icon={<Shield size={26} strokeWidth={1.7} className="text-[#B7791F]" />}
+      icon={<Shield size={26} strokeWidth={1.7} className="text-[#C27803]" />}
       title="Too many attempts"
       subtitle="For your security we've paused two-factor verification. Log in again to try another code or a backup code."
     >

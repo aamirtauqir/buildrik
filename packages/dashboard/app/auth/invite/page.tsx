@@ -161,7 +161,7 @@ function InviteContent() {
   if (effectiveView === "wrong-account") {
     return (
       <StatusView
-        icon={<AlertCircle className="h-[26px] w-[26px] text-[#B7791F]" strokeWidth={1.7} />}
+        icon={<AlertCircle className="h-[26px] w-[26px] text-[#C27803]" strokeWidth={1.7} />}
         title="This invite is for another email"
         subtitle={
           <>
@@ -207,7 +207,7 @@ function InviteContent() {
   if (effectiveView === "decline-confirm") {
     return (
       <StatusView
-        icon={<AlertCircle className="h-[26px] w-[26px] text-[#B7791F]" strokeWidth={1.7} />}
+        icon={<AlertCircle className="h-[26px] w-[26px] text-[#C27803]" strokeWidth={1.7} />}
         title="Decline this invitation?"
         subtitle="You can always ask the workspace owner to invite you again later."
       >

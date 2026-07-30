@@ -53,8 +53,8 @@ export function CancelModal({ periodEnd, planFeatures = [], onConfirm, onClose, 
           <button
             onClick={handleSubmit}
             disabled={!reason || isLoading}
-            className="flex-1 rounded-lg border py-2.5 text-body font-semibold transition-colors hover:bg-[#FEF2F2] disabled:opacity-40"
-            style={{ borderColor: "#EF4444", color: "#EF4444" }}
+            className="flex-1 rounded-lg border py-2.5 text-body font-semibold transition-colors hover:bg-[#FDF2F2] disabled:opacity-40"
+            style={{ borderColor: "#F05252", color: "#F05252" }}
           >
             {isLoading ? "Cancelling..." : "Cancel Plan"}
           </button>
@@ -65,7 +65,7 @@ export function CancelModal({ periodEnd, planFeatures = [], onConfirm, onClose, 
         We're sorry to see you go.
       </p>
 
-      <div className="mt-4 rounded-lg border border-[#FDE8E8] bg-[#FEF2F2] px-4 py-3 text-body" style={{ color: "#B91C1C" }}>
+      <div className="mt-4 rounded-lg border border-[#FDE8E8] bg-[#FDF2F2] px-4 py-3 text-body" style={{ color: "#C81E1E" }}>
         Your plan features will remain active until <strong>{formatDate(periodEnd)}</strong>. After that, your workspace will be downgraded to Free.
       </div>
 
@@ -77,7 +77,7 @@ export function CancelModal({ periodEnd, planFeatures = [], onConfirm, onClose, 
           <ul className="space-y-1.5">
             {planFeatures.map((feature) => (
               <li key={feature} className="flex items-center gap-2 text-body" style={{ color: "var(--color-text-secondary)" }}>
-                <span style={{ color: "#EF4444" }}>✕</span>
+                <span style={{ color: "#F05252" }}>✕</span>
                 {feature}
               </li>
             ))}

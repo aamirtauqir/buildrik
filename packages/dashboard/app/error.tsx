@@ -15,7 +15,7 @@ export default function GlobalError({
       style={{ backgroundColor: "var(--color-bg-page)" }}
     >
       <div className="text-center max-w-md mx-auto px-4">
-        <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full" style={{ backgroundColor: "#FEF2F2" }}>
+        <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full" style={{ backgroundColor: "#FDF2F2" }}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-8 w-8"

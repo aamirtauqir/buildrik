@@ -11,7 +11,7 @@ export default function DashboardError({
   return (
     <div className="flex flex-1 items-center justify-center py-24">
       <div className="text-center max-w-sm mx-auto px-4">
-        <div className="mx-auto mb-6 flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: "#FEF2F2" }}>
+        <div className="mx-auto mb-6 flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: "#FDF2F2" }}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-6 w-6"

@@ -8,9 +8,9 @@ import { LoadingSkeleton, ErrorState } from "@/components/states";
 import { UseTemplateModal } from "@/components/templates/use-template-modal";
 
 const DIFFICULTY_STYLES: Record<string, { bg: string; text: string; label: string }> = {
-  BEGINNER: { bg: "#DEF7EC", text: "#166534", label: "Beginner" },
-  INTERMEDIATE: { bg: "#DBEAFE", text: "#1E40AF", label: "Intermediate" },
-  ADVANCED: { bg: "#FDFDEA", text: "#92400E", label: "Advanced" },
+  BEGINNER: { bg: "#DEF7EC", text: "#03543F", label: "Beginner" },
+  INTERMEDIATE: { bg: "#E1EFFE", text: "#1E40AF", label: "Intermediate" },
+  ADVANCED: { bg: "#FDFDEA", text: "#723B13", label: "Advanced" },
 };
 
 export default function TemplateDetailPage({ params }: { params: Promise<{ id: string }> }) {

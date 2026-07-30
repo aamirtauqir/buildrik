@@ -64,7 +64,7 @@ export function CreateSiteModal({ open, onClose, onSubmit }: CreateSiteModalProp
         </div>
       </div>
       {atSiteLimit ? (
-        <div className="mt-6 rounded-xl border p-5 text-center" style={{ borderColor: "#FCA5A5", backgroundColor: "#FEF2F2" }}>
+        <div className="mt-6 rounded-xl border p-5 text-center" style={{ borderColor: "#F8B4B4", backgroundColor: "#FDF2F2" }}>
           <Lock className="mx-auto h-8 w-8 mb-2" style={{ color: "var(--color-primary)" }} />
           <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
             Site limit reached ({sitesUsed}/{sitesLimit})

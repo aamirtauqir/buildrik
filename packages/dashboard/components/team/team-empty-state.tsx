@@ -14,14 +14,14 @@ const ROLE_CARDS = [
   {
     role: "Admin",
     description: "Manage team members, sites, and settings. No billing access.",
-    bg: "#EFF6FF",
-    color: "#3B82F6",
+    bg: "#EBF5FF",
+    color: "#1A56DB",
     Icon: ShieldCheck,
   },
   {
     role: "Content editor",
     description: "Create and edit site content. Cannot publish or manage team.",
-    bg: "#F0FDF4",
+    bg: "#F3FAF7",
     color: "var(--color-success)",
     Icon: Pencil,
   },

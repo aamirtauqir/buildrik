@@ -173,7 +173,7 @@ export function AICreditsTab({
                           View site
                         </Link>
                       ) : isProcessing ? (
-                        <span className="text-xs" style={{ color: "#854d0e" }}>
+                        <span className="text-xs" style={{ color: "#723B13" }}>
                           Generating...
                         </span>
                       ) : (

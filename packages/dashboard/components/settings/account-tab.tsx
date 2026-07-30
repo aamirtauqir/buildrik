@@ -31,7 +31,7 @@ function PasswordStrengthBar({ password }: { password: string }) {
   ].filter(Boolean).length;
 
   const label = ["", "Weak", "Fair", "Good", "Strong", "Very strong"][score];
-  const colors = ["", "var(--color-primary)", "#f59e0b", "#3b82f6", "var(--color-success)", "#16a34a"];
+  const colors = ["", "var(--color-primary)", "#C27803", "#1A56DB", "var(--color-success)", "#0E9F6E"];
   const width = `${(score / 5) * 100}%`;
 
   if (!password) return null;

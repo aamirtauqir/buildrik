@@ -358,7 +358,7 @@ export function IntegrationsTab({ connected = [], onAdd, onRemove, onUpdate, onT
           <div
             key={cfg.provider}
             className="rounded-lg border overflow-hidden"
-            style={{ borderColor: connection ? "#bbf7d0" : "var(--color-border-default)" }}
+            style={{ borderColor: connection ? "#BCF0DA" : "var(--color-border-default)" }}
           >
             <div className="flex items-center justify-between px-4 py-3">
               <div className="flex items-center gap-3">

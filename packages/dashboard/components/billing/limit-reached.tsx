@@ -37,7 +37,7 @@ export function LimitReached({
       <div className="flex items-start gap-4">
         <div
           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
-          style={{ backgroundColor: "#FEF2F2" }}
+          style={{ backgroundColor: "#FDF2F2" }}
         >
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
             <path

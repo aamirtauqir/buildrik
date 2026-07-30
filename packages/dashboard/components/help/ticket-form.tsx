@@ -149,7 +149,7 @@ export function TicketForm() {
       <div className="flex flex-col items-center gap-4 py-8 text-center">
         <div
           className="flex h-12 w-12 items-center justify-center rounded-full"
-          style={{ backgroundColor: "#F0FDF4" }}
+          style={{ backgroundColor: "#F3FAF7" }}
         >
           <CheckCircle className="h-6 w-6" style={{ color: "#0E9F6E" }} />
         </div>

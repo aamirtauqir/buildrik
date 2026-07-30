@@ -26,7 +26,7 @@ function AccessRemovedContent() {
 
   return (
     <AuthMessage
-      icon={<UserX size={26} strokeWidth={1.7} className="text-[#B7791F]" />}
+      icon={<UserX size={26} strokeWidth={1.7} className="text-[#C27803]" />}
       title="Your access was removed"
       subtitle={`An admin removed your access to ${where}. If you think this was a mistake, reach out to the workspace owner.`}
     >

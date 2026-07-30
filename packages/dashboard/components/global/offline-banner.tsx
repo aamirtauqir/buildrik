@@ -62,11 +62,11 @@ export function OfflineBanner() {
     return (
       <div
         className="fixed left-0 right-0 top-0 z-[10000] flex items-center justify-center gap-3 px-4 py-2"
-        style={{ backgroundColor: "#F0FDF4", borderBottom: "1px solid var(--color-success)" }}
+        style={{ backgroundColor: "#F3FAF7", borderBottom: "1px solid var(--color-success)" }}
         role="status"
       >
-        <Wifi className="h-4 w-4" style={{ color: "#166534" }} />
-        <p className="text-sm font-medium" style={{ color: "#166534" }}>
+        <Wifi className="h-4 w-4" style={{ color: "#03543F" }} />
+        <p className="text-sm font-medium" style={{ color: "#03543F" }}>
           Back online
         </p>
       </div>
@@ -78,11 +78,11 @@ export function OfflineBanner() {
   return (
     <div
       className="fixed left-0 right-0 top-0 z-[10000] flex items-center justify-center gap-3 px-4 py-2"
-      style={{ backgroundColor: "#FEFCE8", borderBottom: "1px solid #EAB308" }}
+      style={{ backgroundColor: "#FDFDEA", borderBottom: "1px solid #C27803" }}
       role="alert"
     >
-      <WifiOff className="h-4 w-4" style={{ color: "#854D0E" }} />
-      <p className="text-sm font-medium" style={{ color: "#854D0E" }}>
+      <WifiOff className="h-4 w-4" style={{ color: "#723B13" }} />
+      <p className="text-sm font-medium" style={{ color: "#723B13" }}>
         You&apos;re offline. Auto-retrying in {countdown}s...
       </p>
       <button
@@ -91,7 +91,7 @@ export function OfflineBanner() {
           else setCountdown(RETRY_INTERVAL);
         }}
         className="flex items-center gap-1 rounded px-2 py-1 text-xs font-medium"
-        style={{ backgroundColor: "#EAB308", color: "white" }}
+        style={{ backgroundColor: "#C27803", color: "white" }}
       >
         <RefreshCw className="h-3 w-3" />
         Retry Now

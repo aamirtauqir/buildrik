@@ -8,7 +8,7 @@ import { Button, Modal } from "@/components/dashboard/primitives";
 
 const STATUS_ICON = {
   pass: <CheckCircle2 className="h-5 w-5" style={{ color: "var(--color-success)" }} />,
-  warning: <AlertTriangle className="h-5 w-5" style={{ color: "#F59E0B" }} />,
+  warning: <AlertTriangle className="h-5 w-5" style={{ color: "#C27803" }} />,
   fail: <XCircle className="h-5 w-5" style={{ color: "var(--color-primary)" }} />,
 } as const;
 

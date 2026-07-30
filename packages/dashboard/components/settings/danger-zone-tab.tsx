@@ -90,7 +90,7 @@ export function DangerZoneTab({
           <ul className="space-y-1">
             {EXPORT_INCLUDES.map((item) => (
               <li key={item} className="flex items-center gap-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>
-                <span style={{ color: "#16a34a" }}>&#10003;</span>
+                <span style={{ color: "#0E9F6E" }}>&#10003;</span>
                 {item}
               </li>
             ))}
@@ -158,7 +158,7 @@ export function DangerZoneTab({
 
       {/* Delete Account Section */}
       <section>
-        <h2 className="text-base font-semibold mb-1" style={{ color: "#7F1D1D" }}>
+        <h2 className="text-base font-semibold mb-1" style={{ color: "#771D1D" }}>
           Delete account
         </h2>
         <p className="text-sm mb-4" style={{ color: "var(--color-text-secondary)" }}>
@@ -169,20 +169,20 @@ export function DangerZoneTab({
         {(isSoleOwner || hasActiveSubscription) && (
           <div
             className="p-4 rounded-lg border mb-4"
-            style={{ borderColor: "#fbbf24", backgroundColor: "#fffbeb" }}
+            style={{ borderColor: "#E3A008", backgroundColor: "#FDFDEA" }}
           >
-            <p className="text-sm font-medium mb-2" style={{ color: "#92400e" }}>
+            <p className="text-sm font-medium mb-2" style={{ color: "#723B13" }}>
               Before you can delete your account:
             </p>
             <ul className="space-y-1">
               {isSoleOwner && (
-                <li className="flex items-start gap-2 text-sm" style={{ color: "#92400e" }}>
+                <li className="flex items-start gap-2 text-sm" style={{ color: "#723B13" }}>
                   <span className="mt-0.5 font-bold">!</span>
                   You are the sole owner of a workspace. Transfer ownership or delete the workspace first.
                 </li>
               )}
               {hasActiveSubscription && (
-                <li className="flex items-start gap-2 text-sm" style={{ color: "#92400e" }}>
+                <li className="flex items-start gap-2 text-sm" style={{ color: "#723B13" }}>
                   <span className="mt-0.5 font-bold">!</span>
                   You have an active paid subscription. Cancel it before deleting your account.
                 </li>
@@ -193,14 +193,14 @@ export function DangerZoneTab({
 
         <div
           className="p-4 rounded-lg border mb-4"
-          style={{ borderColor: "#fca5a5", backgroundColor: "#fff5f5" }}
+          style={{ borderColor: "#F8B4B4", backgroundColor: "#FDF2F2" }}
         >
-          <p className="text-sm font-medium mb-1" style={{ color: "#7F1D1D" }}>
+          <p className="text-sm font-medium mb-1" style={{ color: "#771D1D" }}>
             What happens when you delete your account
           </p>
           <ul className="space-y-1 mt-2">
             {DELETE_WARNINGS.map((item) => (
-              <li key={item} className="flex items-start gap-2 text-sm" style={{ color: "#7F1D1D" }}>
+              <li key={item} className="flex items-start gap-2 text-sm" style={{ color: "#771D1D" }}>
                 <span className="mt-0.5">!</span>
                 {item}
               </li>
@@ -208,7 +208,7 @@ export function DangerZoneTab({
           </ul>
         </div>
 
-        <p className="text-xs mb-4" style={{ color: "#991b1b" }}>
+        <p className="text-xs mb-4" style={{ color: "#9B1C1C" }}>
           Your data will be permanently deleted after 30 days.
         </p>
 
@@ -250,7 +250,7 @@ export function DangerZoneTab({
                 onChange={(e) => setConfirmText(e.target.value)}
                 placeholder="DELETE"
                 className="w-full px-3 py-2 text-sm rounded-md border outline-none font-mono"
-                style={{ borderColor: canDelete ? "#7F1D1D" : "var(--color-border-default)", color: "var(--color-text-primary)" }}
+                style={{ borderColor: canDelete ? "#771D1D" : "var(--color-border-default)", color: "var(--color-text-primary)" }}
               />
             </div>
 

@@ -166,8 +166,8 @@ export function GenerationProgress({
 
       {/* Error state */}
       {isFailed && error && (
-        <div className="mt-6 rounded-lg p-4" style={{ backgroundColor: "#FEF2F2" }}>
-          <p className="text-sm" style={{ color: "#991B1B" }}>
+        <div className="mt-6 rounded-lg p-4" style={{ backgroundColor: "#FDF2F2" }}>
+          <p className="text-sm" style={{ color: "#9B1C1C" }}>
             {error}
           </p>
           <div className="mt-3 flex flex-wrap justify-center gap-2">
