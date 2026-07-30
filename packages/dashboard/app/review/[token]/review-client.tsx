@@ -39,23 +39,23 @@ function SitePreview({ pages }: { pages: { path: string; html: string }[] | null
   const [active, setActive] = useState(0);
   if (!pages || pages.length === 0) {
     return (
-      <div className="flex h-[420px] items-center justify-center rounded-lg border border-dashed border-[#CBD5E1]">
-        <p className="text-[13px] text-[#64748B]">Preview unavailable for this version.</p>
+      <div className="flex h-[420px] items-center justify-center rounded-lg border border-dashed border-[#D1D5DB]">
+        <p className="text-[13px] text-[#6B7280]">Preview unavailable for this version.</p>
       </div>
     );
   }
   const idx = Math.min(active, pages.length - 1);
   const label = (p: string) => p.replace(/\.html$/, "").replace(/^index$/, "Home") || "Home";
   return (
-    <div className="overflow-hidden rounded-lg border border-[#E2E8F0]">
+    <div className="overflow-hidden rounded-lg border border-[#E5E7EB]">
       {pages.length > 1 ? (
-        <div className="flex gap-1 overflow-x-auto border-b border-[#E2E8F0] bg-[#F8FAFC] px-2 py-1.5">
+        <div className="flex gap-1 overflow-x-auto border-b border-[#E5E7EB] bg-[#F9FAFB] px-2 py-1.5">
           {pages.map((p, i) => (
             <button
               key={p.path}
               onClick={() => setActive(i)}
               className={`shrink-0 rounded px-2.5 py-1 text-[12px] ${
-                i === idx ? "bg-white font-semibold text-[#0F172A] shadow-sm" : "text-[#64748B]"
+                i === idx ? "bg-white font-semibold text-[#111827] shadow-sm" : "text-[#6B7280]"
               }`}
             >
               {label(p.path)}
@@ -83,18 +83,18 @@ function Shell({
   footer?: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8FAFC]">
+    <div className="min-h-screen flex flex-col bg-[#F9FAFB]">
       {/* The agency's name leads, not ours. The client hired them, not us. */}
-      <header className="h-14 shrink-0 flex items-center gap-3 px-6 bg-white border-b border-[#E2E8F0]">
-        <span className="text-[13px] font-semibold text-[#0F172A]">{agency}</span>
-        <span className="text-[12px] text-[#64748B]">is asking for your feedback</span>
+      <header className="h-14 shrink-0 flex items-center gap-3 px-6 bg-white border-b border-[#E5E7EB]">
+        <span className="text-[13px] font-semibold text-[#111827]">{agency}</span>
+        <span className="text-[12px] text-[#6B7280]">is asking for your feedback</span>
       </header>
       <main className="flex-1 flex flex-col">{children}</main>
       {/* Sticky, not static. At 1280x720 the two buttons this page exists for
           sat at y=733 — past the fold, on the one screen size we call the
           minimum. A client who cannot see "Approve" does not approve. */}
       {footer ? (
-        <footer className="sticky bottom-0 z-40 shrink-0 border-t border-[#E2E8F0] bg-white px-6 py-4">
+        <footer className="sticky bottom-0 z-40 shrink-0 border-t border-[#E5E7EB] bg-white px-6 py-4">
           {footer}
         </footer>
       ) : null}
@@ -105,7 +105,7 @@ function Shell({
 function Centered({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex-1 flex items-center justify-center p-6">
-      <div className="w-full max-w-[440px] rounded-xl border border-[#E2E8F0] bg-white p-8">
+      <div className="w-full max-w-[440px] rounded-xl border border-[#E5E7EB] bg-white p-8">
         {children}
       </div>
     </div>
@@ -134,7 +134,7 @@ export function ReviewClient({ token }: { token: string }) {
     return (
       <Shell agency="Loading">
         <Centered>
-          <p className="text-[13px] text-[#64748B]">Opening your review…</p>
+          <p className="text-[13px] text-[#6B7280]">Opening your review…</p>
         </Centered>
       </Shell>
     );
@@ -149,7 +149,7 @@ export function ReviewClient({ token }: { token: string }) {
     return (
       <Shell agency="Buildrick">
         <Centered>
-          <h1 className="text-[20px] font-semibold text-[#0F172A]">{copy.title}</h1>
+          <h1 className="text-[20px] font-semibold text-[#111827]">{copy.title}</h1>
           <p className="mt-2 text-[13px] leading-relaxed text-[#475569]">{copy.body}</p>
         </Centered>
       </Shell>
@@ -169,7 +169,7 @@ export function ReviewClient({ token }: { token: string }) {
     return (
       <Shell agency={agency}>
         <Centered>
-          <h1 className="text-[20px] font-semibold text-[#0F172A]">
+          <h1 className="text-[20px] font-semibold text-[#111827]">
             {data.siteName} is ready for you to look at
           </h1>
           <p className="mt-2 text-[13px] leading-relaxed text-[#475569]">
@@ -194,7 +194,7 @@ export function ReviewClient({ token }: { token: string }) {
                 onChange={(e) => setName(e.target.value)}
                 required
                 maxLength={120}
-                className="h-9 rounded border border-[#CBD5E1] px-3 text-[13px] outline-none focus:border-[#406ED6]"
+                className="h-9 rounded border border-[#D1D5DB] px-3 text-[13px] outline-none focus:border-[#1A56DB]"
               />
             </label>
             <label className="flex flex-col gap-1.5">
@@ -207,16 +207,16 @@ export function ReviewClient({ token }: { token: string }) {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 maxLength={320}
-                className="h-9 rounded border border-[#CBD5E1] px-3 text-[13px] outline-none focus:border-[#406ED6]"
+                className="h-9 rounded border border-[#D1D5DB] px-3 text-[13px] outline-none focus:border-[#1A56DB]"
               />
             </label>
             {identify.error ? (
-              <p className="text-[12px] text-[#DC2626]">{identify.error.message}</p>
+              <p className="text-[12px] text-[#E02424]">{identify.error.message}</p>
             ) : null}
             <button
               type="submit"
               disabled={identify.isPending}
-              className="h-10 rounded bg-[#406ED6] text-[13px] font-semibold text-white disabled:opacity-40"
+              className="h-10 rounded bg-[#1A56DB] text-[13px] font-semibold text-white disabled:opacity-40"
             >
               {identify.isPending ? "One moment…" : `Look at ${data.siteName}`}
             </button>
@@ -235,7 +235,7 @@ export function ReviewClient({ token }: { token: string }) {
     return (
       <Shell agency={agency}>
         <Centered>
-          <h1 className="text-[20px] font-semibold text-[#0F172A]">
+          <h1 className="text-[20px] font-semibold text-[#111827]">
             {approved ? "You approved this" : "You asked for changes"}
           </h1>
           <p className="mt-2 text-[13px] leading-relaxed text-[#475569]">
@@ -243,7 +243,7 @@ export function ReviewClient({ token }: { token: string }) {
               ? `Thanks — ${agency} can take it from here. You'll hear from your designer when it goes live.`
               : `Your notes are with your designer. They'll send a new link when the changes are ready for you.`}
           </p>
-          <p className="mt-4 text-[12px] text-[#64748B]">
+          <p className="mt-4 text-[12px] text-[#6B7280]">
             Signed as {data.reviewer!.name} · {data.reviewer!.email}
           </p>
         </Centered>
@@ -259,7 +259,7 @@ export function ReviewClient({ token }: { token: string }) {
       agency={agency}
       footer={
         <div className="mx-auto flex w-full max-w-[1100px] items-center gap-3">
-          <p className="flex-1 text-[12px] text-[#64748B]">
+          <p className="flex-1 text-[12px] text-[#6B7280]">
             Signed as {data.reviewer!.name}. You are looking at the version sent to
             you {new Date(data.sentAt).toLocaleDateString()} — later edits will not
             change it.
@@ -272,14 +272,14 @@ export function ReviewClient({ token }: { token: string }) {
               )
             }
             disabled={resolve.isPending}
-            className="h-9 rounded border border-[#CBD5E1] px-4 text-[13px] font-semibold text-[#0F172A] disabled:opacity-40"
+            className="h-9 rounded border border-[#D1D5DB] px-4 text-[13px] font-semibold text-[#111827] disabled:opacity-40"
           >
             Ask for changes
           </button>
           <button
             onClick={() => setAsking(true)}
             disabled={resolve.isPending}
-            className="h-9 rounded bg-[#406ED6] px-4 text-[13px] font-semibold text-white disabled:opacity-40"
+            className="h-9 rounded bg-[#1A56DB] px-4 text-[13px] font-semibold text-white disabled:opacity-40"
           >
             Approve this design
           </button>
@@ -287,10 +287,10 @@ export function ReviewClient({ token }: { token: string }) {
       }
     >
       <div className="mx-auto flex w-full max-w-[1100px] flex-1 gap-6 p-6">
-        <section className="flex-1 rounded-xl border border-[#E2E8F0] bg-white p-8">
+        <section className="flex-1 rounded-xl border border-[#E5E7EB] bg-white p-8">
           {data.changeSummary ? (
-            <div className="mb-6 rounded-lg bg-[#F1F5F9] px-4 py-3">
-              <p className="text-[12px] font-semibold text-[#0F172A]">What&rsquo;s new</p>
+            <div className="mb-6 rounded-lg bg-[#F3F4F6] px-4 py-3">
+              <p className="text-[12px] font-semibold text-[#111827]">What&rsquo;s new</p>
               <p className="mt-1 text-[13px] text-[#475569]">{data.changeSummary}</p>
             </div>
           ) : null}
@@ -301,9 +301,9 @@ export function ReviewClient({ token }: { token: string }) {
           <SitePreview pages={data.snapshotPages} />
         </section>
 
-        <aside className="w-[320px] shrink-0 rounded-xl border border-[#E2E8F0] bg-white">
-          <div className="border-b border-[#E2E8F0] px-4 py-3">
-            <p className="text-[13px] font-semibold text-[#0F172A]">Your notes</p>
+        <aside className="w-[320px] shrink-0 rounded-xl border border-[#E5E7EB] bg-white">
+          <div className="border-b border-[#E5E7EB] px-4 py-3">
+            <p className="text-[13px] font-semibold text-[#111827]">Your notes</p>
           </div>
           <div className="p-4">
             <textarea
@@ -311,7 +311,7 @@ export function ReviewClient({ token }: { token: string }) {
               onChange={(e) => setDraft(e.target.value)}
               placeholder="Anything you'd like changed?"
               maxLength={2000}
-              className="h-28 w-full resize-none rounded border border-[#CBD5E1] p-3 text-[13px] outline-none focus:border-[#406ED6]"
+              className="h-28 w-full resize-none rounded border border-[#D1D5DB] p-3 text-[13px] outline-none focus:border-[#1A56DB]"
             />
             <button
               onClick={() =>
@@ -328,15 +328,15 @@ export function ReviewClient({ token }: { token: string }) {
                 )
               }
               disabled={!draft.trim() || comment.isPending}
-              className="mt-3 h-9 w-full rounded bg-[#406ED6] text-[13px] font-semibold text-white disabled:opacity-40"
+              className="mt-3 h-9 w-full rounded bg-[#1A56DB] text-[13px] font-semibold text-white disabled:opacity-40"
             >
               {comment.isPending ? "Sending…" : "Add note"}
             </button>
             {comment.error ? (
-              <p className="mt-2 text-[12px] text-[#DC2626]">{comment.error.message}</p>
+              <p className="mt-2 text-[12px] text-[#E02424]">{comment.error.message}</p>
             ) : null}
             {comments.data && comments.data.length > 0 ? (
-              <ul className="mt-4 space-y-3 border-t border-[#E2E8F0] pt-4">
+              <ul className="mt-4 space-y-3 border-t border-[#E5E7EB] pt-4">
                 {comments.data.map((c) => (
                   <li key={c.id} className="text-[13px] leading-relaxed text-[#334155]">
                     <p className="whitespace-pre-wrap">{c.body}</p>
@@ -357,7 +357,7 @@ export function ReviewClient({ token }: { token: string }) {
       {asking ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(15,23,42,0.4)] p-6">
           <div className="w-full max-w-[440px] rounded-xl bg-white p-6">
-            <h2 className="text-[16px] font-semibold text-[#0F172A]">
+            <h2 className="text-[16px] font-semibold text-[#111827]">
               Approve {data.siteName}?
             </h2>
             <p className="mt-2 text-[13px] leading-relaxed text-[#475569]">
@@ -367,7 +367,7 @@ export function ReviewClient({ token }: { token: string }) {
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setAsking(false)}
-                className="h-9 rounded border border-[#CBD5E1] px-4 text-[13px] font-semibold text-[#0F172A]"
+                className="h-9 rounded border border-[#D1D5DB] px-4 text-[13px] font-semibold text-[#111827]"
               >
                 Not yet
               </button>
@@ -384,7 +384,7 @@ export function ReviewClient({ token }: { token: string }) {
                   )
                 }
                 disabled={resolve.isPending}
-                className="h-9 rounded bg-[#406ED6] px-4 text-[13px] font-semibold text-white disabled:opacity-40"
+                className="h-9 rounded bg-[#1A56DB] px-4 text-[13px] font-semibold text-white disabled:opacity-40"
               >
                 {resolve.isPending ? "Approving…" : "Yes, approve"}
               </button>

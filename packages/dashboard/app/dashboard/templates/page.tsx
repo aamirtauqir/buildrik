@@ -18,9 +18,9 @@ import {
 const PER_PAGE = 12;
 
 const DIFFICULTY_STYLES: Record<string, { bg: string; text: string; label: string }> = {
-  BEGINNER: { bg: "#DCFCE7", text: "#166534", label: "Beginner" },
+  BEGINNER: { bg: "#DEF7EC", text: "#166534", label: "Beginner" },
   INTERMEDIATE: { bg: "#DBEAFE", text: "#1E40AF", label: "Intermediate" },
-  ADVANCED: { bg: "#FEF3C7", text: "#92400E", label: "Advanced" },
+  ADVANCED: { bg: "#FDFDEA", text: "#92400E", label: "Advanced" },
 };
 
 function formatCount(n: number): string {

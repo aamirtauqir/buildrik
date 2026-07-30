@@ -18,21 +18,22 @@ dashboard's red `#E42313`). See Decisions Log.
 its entire chrome runs on `--bk-*` tokens GENERATED from the Figma file
 (`g4GzQFqzNYz5sosz1QtZXC` → `scripts/tokens/figma-tokens.json` →
 `packages/editor/src/themes/tokens.generated.css`). Palette changes are made in
-Figma and regenerated — never hand-edited. Dashboard, auth and onboarding are
-still on `#406ED6` in code and are **pending the Flowbite migration** (they are
-Next+Tailwind, so Flowbite's native Tailwind form is the expected route).
+Figma and regenerated — never hand-edited. Dashboard, auth and onboarding
+**migrated 2026-07-30** (Tailwind-native route: `flowbite-react` +
+`@plugin "flowbite-react/plugin/tailwindcss"` in `app/globals.css`; token
+values mirror `tokens.generated.css`).
 (The user-facing site-builder default tokens in `editor/design-system/` stay
 their own palette — that is user output, not chrome.)
 
 | Surface | Lives in | Accent | Display font | Body font | Audience |
 |---|---|---|---|---|---|
 | **Editor chrome** (canvas + sidebars + topbar + inspector) | `packages/editor/` | **`#1A56DB`** (generated `--bk-*` DS; SHIPPED 2026-07-28) | Inter | Inter | Power user mid-flow. Quiet. |
-| **Dashboard chrome** (settings, billing, team, sites list, media, home) | `app/dashboard/`, `app/maintenance/`, 404, share | `#406ED6` — **pending Flowbite migration** | Inter | Inter | Signed-in workspace tasks. |
-| **Auth chrome** (signed-out craftwork) | `app/auth/` | `#406ED6` + art rail — **pending Flowbite migration** | Inter Tight | Inter Tight | New visitor / signed-out. |
-| **Onboarding wizard** | `app/onboarding/` | `#406ED6` — **pending Flowbite migration** | Inter | Inter | Post-verification setup. |
+| **Dashboard chrome** (settings, billing, team, sites list, media, home) | `app/dashboard/`, `app/maintenance/`, 404, share | **`#1A56DB`** (dc tokens on Flowbite palette; migrated 2026-07-30) | Inter | Inter | Signed-in workspace tasks. |
+| **Auth chrome** (signed-out craftwork) | `app/auth/` | **`#1A56DB`** + art rail (migrated 2026-07-30) | Inter Tight | Inter Tight | New visitor / signed-out. |
+| **Onboarding wizard** | `app/onboarding/` | **`#1A56DB`** (migrated 2026-07-30) | Inter | Inter | Post-verification setup. |
 | **Marketing site** (separate repo) | n/a in this repo | Own brand; not governed here | General Sans | Inter Tight | Cold traffic. |
 
-**Why one accent:** editor, auth, and dashboard are one continuous signed-in-adjacent product; a single blue accent reads as one brand. Until the pending surfaces migrate, `#406ED6` vs `#1A56DB` is a KNOWN temporary split — new work uses `#1A56DB`.
+**Why one accent:** editor, auth, and dashboard are one continuous signed-in-adjacent product; a single blue accent reads as one brand. The `#406ED6` vs `#1A56DB` split closed 2026-07-30 — every surface now runs `#1A56DB`.
 
 Rules:
 - **`#1A56DB` is the single accent** for CTAs, links, active states and focus rings. (Hover `#1E429F` blue-800, pressed `#233876` blue-900, subtle `#E1EFFE` blue-100, tint `#EBF5FF` blue-50.)
@@ -44,7 +45,7 @@ Rules:
 
 The **`app/auth/**` screens** (login, signup, 2FA, OTP, magic-link, forgot/reset, verify-email, workspace, invite, error/state screens) run a distinct **craftwork** visual language on the shared cobalt accent.
 
-- **Accent = `#406ED6`** (`--color-auth-cta`, hover `#2E56B8`). Same accent as the rest of the product; the craftwork treatment below is what's auth-specific.
+- **Accent = `#1A56DB`** (`--color-auth-cta`, hover `#1E429F`; migrated 2026-07-30). Same accent as the rest of the product; the craftwork treatment below is what's auth-specific.
 - **Art rail** — a two-column floating white card (`AuthCard`) with a cobalt illustration (`AuthArt`) left, form right. The "no gradients / no decorative illustration" aesthetic rule does **not** apply to the auth art rail; it still applies to the rest of the dashboard.
 - **Gray-fill icon inputs** — `--color-auth-input-fill`, left icon, cobalt focus.
 - Source of truth: `app/globals.css` `--color-auth-*` tokens + `components/auth/*`.
@@ -59,9 +60,9 @@ The **`app/auth/**` screens** (login, signup, 2FA, OTP, magic-link, forgot/reset
 
 ### Onboarding Surface — M2 Wizard (2026-07-11; scoped exception RETIRED 2026-07-18)
 
-The **`app/onboarding/**` wizard** (post-verification setup: workspace → first site → path chooser → AI/template/blank → editor) **no longer runs a scoped blue.** It now uses the single product accent `#406ED6`, like the dashboard and auth. History: it shipped on `#2563EB`, was flipped to cobalt `#2D6DFF` on 2026-07-18 to match the v3 frame gallery, and moved to `#406ED6` with the UI-kit adoption the same day. The `.onb-scope` focus-ring override was removed with the exception — there is nothing left to scope.
+The **`app/onboarding/**` wizard** (post-verification setup: workspace → first site → path chooser → AI/template/blank → editor) **no longer runs a scoped blue.** It now uses the single product accent `#1A56DB`, like the dashboard and auth. History: it shipped on `#2563EB`, was flipped to cobalt `#2D6DFF` on 2026-07-18 to match the v3 frame gallery, moved to `#406ED6` with the UI-kit adoption the same day, and to `#1A56DB` with the Flowbite migration 2026-07-30. The `.onb-scope` focus-ring override was removed with the exception — there is nothing left to scope.
 
-- Accent = `--color-onb-primary` `#406ED6` (hover `#2E56B8`, tint `#EBF1FF`). Primary CTAs, active stepper dot, progress fill, selected cards, links inside onboarding.
+- Accent = `--color-onb-primary` `#1A56DB` (hover `#1E429F`, tint `#EBF5FF`; migrated 2026-07-30). Primary CTAs, active stepper dot, progress fill, selected cards, links inside onboarding.
 - Full token set: `--color-onb-*` + `--radius-onb` / `--spacing-onb-*` / `--container-onb` / `--text-onb-*` in `app/globals.css`. Inter type scale (titles 26/700).
 - The `--color-onb-*` token set still exists and still owns onboarding's geometry/neutrals/type; only the accent stopped diverging. The global `*:focus-visible` ring resolves to `--color-primary`, which onboarding now shares, so one blue is on screen without any scoping.
 - **The accent is the only thing that diverges from the M2 frame gallery.** Geometry, neutrals, and type are taken from it literally: 180px header (brand tile 48/40, Skip 48/46, step indicator at 92), 480px content column, 46px inputs, 50px CTA (15px/700).
@@ -364,6 +365,7 @@ Rail is 60px, `--aqb-bg-panel` (`#F8FAFC`), three zones (Creation / Structure / 
 
 | Date | Decision | Rationale |
 |------|----------|-----------|
+| 2026-07-30 | **Dashboard/auth/onboarding Flowbite migration SHIPPED (Tailwind-native)** | Closes the 2026-07-29 "pending Flowbite migration" for the three Next.js surfaces. `flowbite-react` installed in `packages/dashboard`; `@plugin "flowbite-react/plugin/tailwindcss"` wired in `app/globals.css` (no prefix — no customer canvas in the dashboard, so Tailwind preflight is fine). All `@theme` token VALUES flipped to the canonical Flowbite set mirrored from the editor's `tokens.generated.css`: accent `#1A56DB`/`#1E429F`, subtle `#E1EFFE`, tint `#EBF5FF`; neutrals → Flowbite gray (`#111827`/`#4B5563`/`#6B7280`, borders `#E5E7EB`/`#D1D5DB`, bg `#F3F4F6`); semantic triads → Flowbite green/yellow/red (`#0E9F6E`/`#C27803`/`#E02424` + tints); destructive `#9B1C1C`. Token NAMES (`--color-*`, `auth-*`, `onb-*`) unchanged — consumers untouched. Inline old-palette hexes swept in 10 files (review-client, editor-route skeleton/boundary, templates, learn, domains, cancel-modal, ticket-form, review-invite email, workspace-form DEFAULT_ACCENT). Primitives' internals move to flowbite-react components in the same arc (keeper rule: primitive API stays, paint changes). |
 | 2026-07-29 | **Flowbite palette CONFIRMED as the product design language; accent → `#1A56DB`** | Founder confirmed the Flowbite re-base of the Figma foundation (2026-07-28) as final. Single accent moves `#406ED6` → **`#1A56DB`** (blue-700; hover blue-800 `#1E429F`, pressed blue-900 `#233876`, subtle blue-100 `#E1EFFE`, tint blue-50 `#EBF5FF`). Neutrals move slate → Flowbite gray (ink `#111827`/`#4B5563`/`#6B7280`); semantic triads → Flowbite green/yellow/red; radius lg 8px (rounded-lg) on buttons/inputs/cards/modals; focus = accent border + soft 2px ring `rgba(26,86,219,.30)`. Purple ramp allowed as identity/semantic data only (avatar tones, PRO badge) — still banned as accent/gradient. **Editor SHIPPED on this** via `ds/fresh-token-system` (generated `--bk-*` tokens + `src/editor/ui/` library, migration 402→0). Dashboard/auth/onboarding stay on `#406ED6` pending their Flowbite migration (Tailwind-native route expected). Values in this doc's §Color are transcriptions of `tokens.generated.css` — Figma is the source of truth. |
 | 2026-07-26 | **Editor chrome DS replaced with the Figma "Buildrick — Product" foundation** | Founder-directed replacement (Figma file `g4GzQFqzNYz5sosz1QtZXC`): the editor's token layer was rewritten from the file's Foundations page and all 173 shipped components. Concrete flips: editor UI font Inter Tight → **Inter**; accent shades corrected (hover `#2E56B8` — was lighter `#5E86E0`; pressed `#264899`); accent/semantic tints became **pre-mixed opaque** values (`accent-subtle #EBF1FF`, `accent-tint #ECF0FB`, success/warning/error tints `#E3F4E9/#FAECDC/#FBE5E5`) per the Figma "never frame opacity" rule; text ramp darkened onto the ink scale (`#0F172A/#485465/#656F7E`); elevation collapsed to the 3-step raised/drag/overlay scale; focus = 2px accent with **no halo**; motion re-based to 100/160/240ms ease-out with hover lifts/scales retired; weights cap at 600. Legacy token names survive only as references onto the new set — no legacy value survives. Conformance locked by `figma-32-2-conformance.test.ts` (rewritten against the new file). |
 | 2026-07-21 | **Dashboard IA follow-up — Templates → top nav, Help → Resources, Projects → Sites** | Post-IA-v2 cleanup (Codex dashboard audit): Templates moved out of the sidebar into the ecosystem top nav (it's a browse-the-catalog surface, not a workspace destination); the labeled Support group was dropped — Getting started folds into the main sidebar group and Help centre moves into Resources; the `Projects` sidebar item was relabelled **Sites** (route unchanged, `/dashboard/projects`). Sidebar settles at a single 6-item group `Home · Getting started · Sites · Agency (agency-only) · Media · Settings`. SSOT `components/dashboard/shell/nav.ts` reflects this; the shell bullets above were updated to match. No accent/token change. |
@@ -456,7 +458,7 @@ Panel chrome must be visually restrained. Canvas (user content) owns decoration;
 
 Restates and sharpens the existing §Color rules.
 
-1. **The accent is used ONLY where §Color §Accent Usage Rules already allow** — primary CTA, selection outlines and selected-row tint, active rail/tab indicator, focus rings, account avatar. Nowhere else in chrome. (`#406ED6` in design AND code since 2026-07-21.)
+1. **The accent is used ONLY where §Color §Accent Usage Rules already allow** — primary CTA, selection outlines and selected-row tint, active rail/tab indicator, focus rings, account avatar. Nowhere else in chrome. (`#1A56DB` in design AND code since 2026-07-30; was `#406ED6` from 2026-07-21.)
 2. **Semantic colors (`--success`, `--warning`, `--error`, `--info`) are used ONLY in functional status indicators** — Toast, SyncStatusIndicator, save-state badges, validation messages. Never as decoration elsewhere in chrome.
 3. **No decorative tint** in panel headers, sidebar section backgrounds, toolbar fills. Chrome uses the neutral surface tokens (`--aqb-bg-*` / `--buildrick-bg-panel*`) only.
 4. **Chrome must survive any user canvas color.** A user building a hot-pink brand site and a user building a forest-green one must see the same chrome affordances.

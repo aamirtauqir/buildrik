@@ -14,7 +14,7 @@ const SELECT_FIELD_CLASS =
 // Canonical product accent (DESIGN.md §Surface Scope). Must be a real hex — the
 // workspace update schema validates accentColor against /^#[0-9A-Fa-f]{6}$/, so
 // a "var(--color-primary)" default failed validation on any unchanged save.
-const DEFAULT_ACCENT = "#406ED6";
+const DEFAULT_ACCENT = "#1A56DB";
 
 const LANGUAGES = [
   { value: "en", label: "English" },

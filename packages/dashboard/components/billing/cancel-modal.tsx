@@ -65,7 +65,7 @@ export function CancelModal({ periodEnd, planFeatures = [], onConfirm, onClose, 
         We're sorry to see you go.
       </p>
 
-      <div className="mt-4 rounded-lg border border-[#FEE2E2] bg-[#FEF2F2] px-4 py-3 text-body" style={{ color: "#B91C1C" }}>
+      <div className="mt-4 rounded-lg border border-[#FDE8E8] bg-[#FEF2F2] px-4 py-3 text-body" style={{ color: "#B91C1C" }}>
         Your plan features will remain active until <strong>{formatDate(periodEnd)}</strong>. After that, your workspace will be downgraded to Free.
       </div>
 

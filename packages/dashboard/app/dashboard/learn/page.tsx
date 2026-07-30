@@ -50,7 +50,7 @@ function ContinueHero({
         className="mb-8 flex items-center gap-3 rounded-2xl border px-6 py-5"
         style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
       >
-        <span className="flex h-9 w-9 items-center justify-center rounded-full" style={{ backgroundColor: "var(--color-success-bg, #DCFCE7)" }}>
+        <span className="flex h-9 w-9 items-center justify-center rounded-full" style={{ backgroundColor: "var(--color-success-bg, #DEF7EC)" }}>
           <Check className="h-5 w-5" style={{ color: "var(--color-success)" }} strokeWidth={3} />
         </span>
         <div>
@@ -126,7 +126,7 @@ function CourseCard({
               <span
                 className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full"
                 style={{
-                  backgroundColor: l.completed ? "var(--color-success-bg, #DCFCE7)" : "transparent",
+                  backgroundColor: l.completed ? "var(--color-success-bg, #DEF7EC)" : "transparent",
                   boxShadow: l.completed ? "none" : "inset 0 0 0 1.5px var(--color-border-strong)",
                 }}
               >

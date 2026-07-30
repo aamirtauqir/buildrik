@@ -8,7 +8,7 @@ import { LoadingSkeleton, ErrorState, StateEmpty } from "@/components/states";
 const STATUS_STYLE: Record<string, { label: string; color: string; bg: string }> = {
   VERIFIED: { label: "Connected", color: "var(--color-success)", bg: "#ECFDF5" },
   PENDING: { label: "Verifying", color: "#B45309", bg: "#FFFBEB" },
-  FAILED: { label: "Failed", color: "#DC2626", bg: "#FEF2F2" },
+  FAILED: { label: "Failed", color: "#E02424", bg: "#FEF2F2" },
 };
 
 export default function WorkspaceDomainsPage() {

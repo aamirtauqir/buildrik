@@ -63,8 +63,8 @@ export function EditorErrorScreen({
         alignItems: "center",
         justifyContent: "center",
         gap: 16,
-        background: "#F8FAFC",
-        color: "#0F172A",
+        background: "#F9FAFB",
+        color: "#111827",
         fontFamily: "'Inter Tight', sans-serif",
       }}
     >
