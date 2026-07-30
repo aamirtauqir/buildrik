@@ -55,11 +55,11 @@ export function StatCard({
       {delta && <div className="mt-[5px] text-[12px]" style={{ color: "var(--color-text-secondary)" }}>{delta}</div>}
     </>
   );
-  // Artifact stat tile: 12px radius, 16/18 padding, inset-ring.
+  // Flowbite card: 8px radius, 16/18 padding, inset-ring.
   const cardStyle = {
     borderColor: "var(--color-border-default)",
     backgroundColor: "var(--color-bg-surface)",
-    borderRadius: "12px",
+    borderRadius: "8px",
     padding: "16px 18px",
     boxShadow: "var(--shadow-ring)",
   };

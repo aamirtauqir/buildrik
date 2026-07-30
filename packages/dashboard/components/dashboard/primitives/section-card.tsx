@@ -22,7 +22,7 @@ export function SectionCard({
   const hasHeader = Boolean(title || actions);
   return (
     <section
-      className={cn("overflow-hidden rounded-[12px] border shadow-card", className)}
+      className={cn("overflow-hidden rounded-lg border shadow-card", className)}
       style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
     >
       {hasHeader && (

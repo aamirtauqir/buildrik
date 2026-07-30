@@ -98,6 +98,7 @@
   --color-bg-subtle: #F3F4F6;           /* bk-bg-subtle */
   --color-border-default: #E5E7EB;      /* bk-border */
   --color-border-strong: #D1D5DB;       /* bk-border-medium */
+  --color-border-input: #9CA3AF;        /* bk-border-input */
   --color-text-primary: #111827;        /* bk-ink */
   --color-text-secondary: #4B5563;      /* bk-ink-soft */
   --color-text-muted: #6B7280;          /* bk-ink-muted */
@@ -144,11 +145,13 @@
   --topnav-h: 60px;
   --sidebar-w: 293px;
 
-  /* Radius scale (dc: xs4 sm6 md8 lg10 xl12 2xl16 pill). Remaps rounded-* utilities. */
+  /* Radius scale (xs4 sm6 md8 lg8 xl12 2xl16 pill). Remaps rounded-* utilities.
+     lg flipped 10→8 with the Flowbite migration (decision log 2026-07-29:
+     "radius lg 8px on buttons/inputs/cards/modals"; mirrors --bk-radius-lg). */
   --radius-xs: 4px;
   --radius-sm: 6px;
   --radius-md: 8px;
-  --radius-lg: 10px;
+  --radius-lg: 8px;
   --radius-xl: 12px;
   --radius-2xl: 16px;
   --radius-pill: 9999px;

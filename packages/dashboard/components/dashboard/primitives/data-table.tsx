@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow } from "flowbite-react";
 import { cn } from "@lib/utils";
 
 export interface Column<T> {
@@ -9,9 +10,10 @@ export interface Column<T> {
   className?: string;
 }
 
-/** One bordered table shell (header eyebrow, row borders, cell padding) for
- *  domains / partner / members / invoices. Pass `empty` to render a zero-state
- *  instead of an empty table. */
+/** One bordered table shell for domains / partner / members / invoices —
+ *  flowbite-react Table underneath, cell padding kept at the dashboard's
+ *  compact density. Pass `empty` to render a zero-state instead of an empty
+ *  table. */
 export function DataTable<T>({
   columns,
   rows,
@@ -29,32 +31,34 @@ export function DataTable<T>({
   return (
     // overflow-x-auto (not overflow-hidden): a wide table must scroll, not clip.
     // Inherited by every DataTable consumer (domains/partner/invoices/redirects).
-    <div className="overflow-x-auto rounded-[12px] border shadow-card" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}>
-      <table className="w-full text-body">
-        <thead>
-          <tr className="border-b text-left text-eyebrow uppercase tracking-wide" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)", backgroundColor: "var(--color-bg-subtle)" }}>
+    <div className="overflow-x-auto rounded-lg border shadow-card" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}>
+      <Table hoverable={Boolean(onRowClick)}>
+        <TableHead>
+          <TableRow>
             {columns.map((c) => (
-              <th key={c.key} className={cn("px-[18px] py-2.5 font-semibold", c.align === "right" && "text-right")}>{c.header}</th>
+              <TableHeadCell key={c.key} className={cn("px-[18px] py-2.5", c.align === "right" && "text-right")}>
+                {c.header}
+              </TableHeadCell>
             ))}
-          </tr>
-        </thead>
-        <tbody>
+          </TableRow>
+        </TableHead>
+        <TableBody>
           {rows.map((row, i) => (
-            <tr
+            <TableRow
               key={keyOf(row, i)}
               onClick={onRowClick ? () => onRowClick(row) : undefined}
-              className={cn("border-b last:border-0", onRowClick && "cursor-pointer transition-colors hover:bg-[var(--color-bg-subtle)]")}
+              className={cn("border-b last:border-0", onRowClick && "cursor-pointer")}
               style={{ borderColor: "var(--color-border-default)" }}
             >
               {columns.map((c) => (
-                <td key={c.key} className={cn("px-[18px] py-3.5", c.align === "right" && "text-right", c.className)} style={{ color: "var(--color-text-primary)" }}>
+                <TableCell key={c.key} className={cn("px-[18px] py-3.5", c.align === "right" && "text-right", c.className)} style={{ color: "var(--color-text-primary)" }}>
                   {c.render ? c.render(row) : (row as Record<string, ReactNode>)[c.key]}
-                </td>
+                </TableCell>
               ))}
-            </tr>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 }
