@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Plus, LayoutTemplate, Sparkles, Check, X, Lock, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { trpc } from "@lib/trpc/client";
-import { Button, Modal } from "@/components/dashboard/primitives";
+import { Button, InputField, Modal } from "@/components/dashboard/primitives";
 
 interface CreateSiteModalProps {
   open: boolean;
@@ -48,7 +48,7 @@ export function CreateSiteModal({ open, onClose, onSubmit }: CreateSiteModalProp
     >
       <div>
         <label className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>Site Name</label>
-        <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="mt-1 w-full rounded-lg border px-3 py-2 text-sm" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }} />
+        <InputField type="text" value={name} onChange={(e) => setName(e.target.value)} wrapperClassName="mt-1" />
         <div className="mt-1 flex items-center gap-2">
           {debouncedSlug.length >= 3 && slugCheck.data && (
             slugCheck.data.available ? (
@@ -65,7 +65,7 @@ export function CreateSiteModal({ open, onClose, onSubmit }: CreateSiteModalProp
       </div>
       {atSiteLimit ? (
         <div className="mt-6 rounded-lg border p-5 text-center" style={{ borderColor: "#F8B4B4", backgroundColor: "#FDF2F2" }}>
-          <Lock className="mx-auto h-8 w-8 mb-2" style={{ color: "var(--color-primary)" }} />
+          <Lock className="mx-auto h-8 w-8 mb-2" style={{ color: "var(--color-error)" }} />
           <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
             Site limit reached ({sitesUsed}/{sitesLimit})
           </p>

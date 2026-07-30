@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { LayoutTemplate, Sparkles, FileText } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
+import { InputField } from "@/components/dashboard/primitives";
 import { WizardProgress } from "@/components/ai-wizard/wizard-progress";
 import { StepType, BUSINESS_TYPES } from "@/components/ai-wizard/step-type";
 import { StepPages } from "@/components/ai-wizard/step-pages";
@@ -103,12 +104,11 @@ function NewSitePageInner() {
         </p>
         <div className="mt-6 text-left">
           <label className="text-body font-medium" style={{ color: "var(--color-text-secondary)" }}>Site name</label>
-          <input
+          <InputField
             type="text"
             value={siteName}
             onChange={(e) => setSiteName(e.target.value)}
-            className="mt-1 w-full rounded-lg border px-3 py-2 text-body outline-none focus:border-[var(--color-primary)]"
-            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+            wrapperClassName="mt-1 w-full"
             placeholder="My New Site"
           />
         </div>

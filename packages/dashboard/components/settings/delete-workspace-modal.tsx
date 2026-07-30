@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button, Modal } from "@/components/dashboard/primitives";
+import { Button, InputField, Modal } from "@/components/dashboard/primitives";
 
 /** Confirm-by-typing modal for irreversible workspace deletion. Shared by the
  *  consolidated settings page and the /settings/workspace sub-route so the
@@ -52,13 +52,11 @@ export function DeleteWorkspaceModal({
         <label className="block text-body-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
           Type <span className="font-semibold">{workspaceName}</span> to confirm
         </label>
-        <input
+        <InputField
           type="text"
           value={confirmText}
           onChange={(e) => setConfirmText(e.target.value)}
           placeholder={workspaceName}
-          className="w-full px-3 py-2 text-sm rounded-md border outline-none"
-          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
           autoFocus
         />
       </div>

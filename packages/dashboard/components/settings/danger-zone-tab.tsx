@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { SectionCard, MetricValue, Button } from "@/components/dashboard/primitives";
+import { SectionCard, MetricValue, Button, InputField } from "@/components/dashboard/primitives";
 
 interface PreviousExport {
   id: string;
@@ -244,13 +244,13 @@ export function DangerZoneTab({
                 </code>{" "}
                 to confirm
               </label>
-              <input
+              <InputField
                 type="text"
                 value={confirmText}
                 onChange={(e) => setConfirmText(e.target.value)}
                 placeholder="DELETE"
-                className="w-full px-3 py-2 text-sm rounded-md border outline-none font-mono"
-                style={{ borderColor: canDelete ? "#771D1D" : "var(--color-border-default)", color: "var(--color-text-primary)" }}
+                className="font-mono"
+                valid={confirmText === "DELETE"}
               />
             </div>
 

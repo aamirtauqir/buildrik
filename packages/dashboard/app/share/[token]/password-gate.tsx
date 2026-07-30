@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import { Lock } from "lucide-react";
+import { InputField } from "@/components/dashboard/primitives";
 
 export function SharePasswordGate() {
   const params = useParams();
@@ -61,16 +62,13 @@ export function SharePasswordGate() {
             Enter the password to view this site
           </p>
           <form onSubmit={handleSubmit}>
-            <input
+            <InputField
               type="password"
               placeholder="Enter password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full h-11 px-3 rounded-lg text-sm"
-              style={{
-                border: error ? "2px solid #F05252" : "1px solid var(--color-border-default)",
-                backgroundColor: error ? "#FDF2F2" : "#FFFFFF",
-              }}
+              invalid={!!error}
+              aria-invalid={!!error}
               autoFocus
             />
             {error && (

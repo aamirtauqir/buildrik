@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { Paperclip, X, CheckCircle } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
+import { InputField } from "@/components/dashboard/primitives";
 import type { SupportTicketInput } from "@buildrik/shared/schemas/help";
 
 const TICKET_CATEGORIES: { value: SupportTicketInput["category"]; label: string }[] = [
@@ -179,17 +180,17 @@ export function TicketForm() {
         <label className="mb-1.5 block text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
           Subject
         </label>
-        <input
+        <InputField
           type="text"
           value={subject}
           onChange={(e) => setSubject(e.target.value)}
           placeholder="Brief summary of your issue"
           maxLength={200}
-          className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2"
-          style={{ borderColor: errors.subject ? "var(--color-primary)" : "var(--color-border-default)", color: "var(--color-text-primary)" }}
+          invalid={!!errors.subject}
+          aria-invalid={!!errors.subject}
         />
         {errors.subject && (
-          <p className="mt-1 text-xs" style={{ color: "var(--color-primary)" }}>{errors.subject}</p>
+          <p className="mt-1 text-xs" style={{ color: "var(--color-error-text)" }}>{errors.subject}</p>
         )}
         <p className="mt-1 text-right text-xs" style={{ color: "var(--color-text-secondary)" }}>{subject.length}/200</p>
       </div>
@@ -223,10 +224,10 @@ export function TicketForm() {
           rows={6}
           maxLength={5000}
           className="w-full resize-none rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2"
-          style={{ borderColor: errors.description ? "var(--color-primary)" : "var(--color-border-default)", color: "var(--color-text-primary)" }}
+          style={{ borderColor: errors.description ? "var(--color-error)" : "var(--color-border-default)", color: "var(--color-text-primary)" }}
         />
         {errors.description && (
-          <p className="mt-1 text-xs" style={{ color: "var(--color-primary)" }}>{errors.description}</p>
+          <p className="mt-1 text-xs" style={{ color: "var(--color-error-text)" }}>{errors.description}</p>
         )}
         <p className="mt-1 text-right text-xs" style={{ color: "var(--color-text-secondary)" }}>{description.length}/5000</p>
       </div>
@@ -286,7 +287,7 @@ export function TicketForm() {
         />
 
         {errors.attachments && (
-          <p className="mt-1 text-xs" style={{ color: "var(--color-primary)" }}>{errors.attachments}</p>
+          <p className="mt-1 text-xs" style={{ color: "var(--color-error-text)" }}>{errors.attachments}</p>
         )}
       </div>
 

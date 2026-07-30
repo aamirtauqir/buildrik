@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { trpc } from "@lib/trpc/client";
-import { Pill, MetricValue, Button } from "@/components/dashboard/primitives";
+import { Pill, MetricValue, Button, InputField } from "@/components/dashboard/primitives";
 
 function parseUserAgent(ua: string | null | undefined): string {
   if (!ua) return "Unknown device";
@@ -266,19 +266,19 @@ export function SecurityTab() {
               Enter the 6-digit code from your authenticator app to complete setup.
             </p>
             {error && (
-              <p className="text-sm" style={{ color: "#9B1C1C" }}>
+              <p className="text-sm" style={{ color: "var(--color-error-text)" }}>
                 {error}
               </p>
             )}
             <div className="flex gap-2">
-              <input
+              <InputField
                 type="text"
                 value={verifyCode}
                 onChange={(e) => setVerifyCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
                 placeholder="000000"
                 maxLength={6}
-                className="text-sm px-3 py-1.5 rounded-md border w-32 font-mono"
-                style={{ borderColor: "var(--color-border-default)" }}
+                className="font-mono"
+                wrapperClassName="w-32"
               />
               <Button
                 type="button"
@@ -320,20 +320,19 @@ export function SecurityTab() {
                 : "Enter the 6-digit code from your authenticator app to disable 2FA."}
             </p>
             {error && (
-              <p className="text-sm" style={{ color: "#9B1C1C" }}>
+              <p className="text-sm" style={{ color: "var(--color-error-text)" }}>
                 {error}
               </p>
             )}
             <div className="flex gap-2">
-              <input
+              <InputField
                 type={profile.data?.hasPassword ? "password" : "text"}
                 inputMode={profile.data?.hasPassword ? undefined : "numeric"}
                 maxLength={profile.data?.hasPassword ? undefined : 6}
                 value={disablePassword}
                 onChange={(e) => setDisablePassword(e.target.value)}
                 placeholder={profile.data?.hasPassword ? "Your password" : "123456"}
-                className="text-sm px-3 py-1.5 rounded-md border w-48"
-                style={{ borderColor: "var(--color-border-default)" }}
+                wrapperClassName="w-48"
               />
               <Button
                 type="button"

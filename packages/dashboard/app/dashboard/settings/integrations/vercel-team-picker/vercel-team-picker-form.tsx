@@ -75,7 +75,7 @@ export function VercelTeamPickerForm({
       </div>
 
       {finish.error && (
-        <p className="text-body text-red-600">{finish.error.message}</p>
+        <p className="text-body" style={{ color: "var(--color-error-text)" }}>{finish.error.message}</p>
       )}
     </form>
   );

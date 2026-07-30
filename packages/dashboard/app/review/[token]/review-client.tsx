@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { trpc } from "@lib/trpc/client";
+import { InputField } from "@/components/dashboard/primitives";
 
 /**
  * Every state of the client review page, per `2026-07-18-j5-signoff-wireframes.md`
@@ -189,25 +190,23 @@ export function ReviewClient({ token }: { token: string }) {
           >
             <label className="flex flex-col gap-1.5">
               <span className="text-[12px] font-medium text-[#4B5563]">Your name</span>
-              <input
+              <InputField
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
                 maxLength={120}
-                className="h-9 rounded border border-[#D1D5DB] px-3 text-[13px] outline-none focus:border-[#1A56DB]"
               />
             </label>
             <label className="flex flex-col gap-1.5">
               <span className="text-[12px] font-medium text-[#4B5563]">
                 The email this link was sent to
               </span>
-              <input
+              <InputField
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 maxLength={320}
-                className="h-9 rounded border border-[#D1D5DB] px-3 text-[13px] outline-none focus:border-[#1A56DB]"
               />
             </label>
             {identify.error ? (

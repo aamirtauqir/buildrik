@@ -366,7 +366,7 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
           </>
         }
       >
-        <input
+        <InputField
           type="text"
           value={createValue}
           onChange={(e) => setCreateValue(e.target.value)}
@@ -378,8 +378,6 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
           placeholder="Folder name"
           autoFocus
           maxLength={80}
-          className="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-[var(--color-primary)]"
-          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
         />
       </Modal>
 
@@ -404,7 +402,7 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
           </>
         }
       >
-        <input
+        <InputField
           type="text"
           value={renameValue}
           onChange={(e) => setRenameValue(e.target.value)}
@@ -415,8 +413,6 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
           }}
           placeholder="Folder name"
           autoFocus
-          className="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-[var(--color-primary)]"
-          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
         />
       </Modal>
 

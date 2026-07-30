@@ -2,7 +2,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { Copy, Eye, Trash2, Plus, Lock, Calendar, QrCode } from "lucide-react";
 import { shareUrl } from "@lib/utils";
-import { Button, SectionCard, MetricValue } from "@/components/dashboard/primitives";
+import { Button, SectionCard, MetricValue, InputField } from "@/components/dashboard/primitives";
 
 interface ShareLinkEntry { id: string; name: string; token: string; viewCount: number; isActive: boolean; expiresAt: Date | null; passwordHash: string | null; createdAt: Date; }
 
@@ -119,18 +119,15 @@ export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDay
         </p>
         {showCreate && (
           <div className="mb-4 rounded-lg border p-4 space-y-3" style={{ borderColor: "var(--color-border-default)" }}>
-            <input type="text" value={linkName} onChange={(e) => setLinkName(e.target.value)} placeholder="Link name (e.g. Client Review)" className="w-full rounded-lg border px-3 py-2 text-body" style={{ borderColor: "var(--color-border-default)" }} />
-            <div className="relative">
-              <input
-                type="password"
-                value={linkPw}
-                onChange={(e) => setLinkPw(e.target.value)}
-                placeholder={allowPasswords ? "Password (optional)" : "Password (upgrade to PRO)"}
-                disabled={!allowPasswords}
-                className="w-full rounded-lg border px-3 py-2 text-body disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{ borderColor: "var(--color-border-default)" }}
-              />
-            </div>
+            <InputField type="text" value={linkName} onChange={(e) => setLinkName(e.target.value)} placeholder="Link name (e.g. Client Review)" />
+            <InputField
+              type="password"
+              value={linkPw}
+              onChange={(e) => setLinkPw(e.target.value)}
+              placeholder={allowPasswords ? "Password (optional)" : "Password (upgrade to PRO)"}
+              disabled={!allowPasswords}
+              className="disabled:opacity-50 disabled:cursor-not-allowed"
+            />
             <div>
               <label className="block text-body-sm font-medium mb-1" style={{ color: "var(--color-text-secondary)" }}>Expiry</label>
               <div className="flex flex-wrap gap-2">

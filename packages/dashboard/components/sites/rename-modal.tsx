@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Button, Modal } from "@/components/dashboard/primitives";
+import { Button, InputField, Modal } from "@/components/dashboard/primitives";
 
 interface RenameModalProps {
   open: boolean;
@@ -26,7 +26,7 @@ export function RenameModal({ open, currentName, title = "Rename Site", onClose,
         </>
       }
     >
-      <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="w-full rounded-lg border px-3 py-2 text-sm" style={{ borderColor: "var(--color-border-default)" }} autoFocus />
+      <InputField type="text" value={name} onChange={(e) => setName(e.target.value)} autoFocus />
     </Modal>
   );
 }

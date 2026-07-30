@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { ArrowRight, Plus, Trash2, Download, Upload, Pencil } from "lucide-react";
-import { Button, StatCard, MetricValue, DataTable, Pill, type Column } from "@/components/dashboard/primitives";
+import { Button, StatCard, MetricValue, DataTable, Pill, InputField, type Column } from "@/components/dashboard/primitives";
 
 export interface RedirectRow {
   id: string;
@@ -139,12 +139,12 @@ export function RedirectsTab({ redirects, limit, canEdit, onCreate, onUpdate, on
             <div className="flex flex-wrap items-end gap-2">
               <div className="flex-1 min-w-[140px]">
                 <label className="block text-body-sm font-medium text-neutral-500">From</label>
-                <input value={fromPath} onChange={(e) => setFromPath(e.target.value)} placeholder="/old-page" className="mt-1 w-full rounded-md border px-2.5 py-1.5 text-body font-mono outline-none focus:border-[var(--color-primary)]" style={{ borderColor: "var(--color-border-default)" }} />
+                <InputField value={fromPath} onChange={(e) => setFromPath(e.target.value)} placeholder="/old-page" className="font-mono" wrapperClassName="mt-1" />
               </div>
               <ArrowRight size={16} className="mb-2 text-neutral-400" />
               <div className="flex-1 min-w-[140px]">
                 <label className="block text-body-sm font-medium text-neutral-500">To</label>
-                <input value={toUrl} onChange={(e) => setToUrl(e.target.value)} placeholder="/new-page" className="mt-1 w-full rounded-md border px-2.5 py-1.5 text-body font-mono outline-none focus:border-[var(--color-primary)]" style={{ borderColor: "var(--color-border-default)" }} />
+                <InputField value={toUrl} onChange={(e) => setToUrl(e.target.value)} placeholder="/new-page" className="font-mono" wrapperClassName="mt-1" />
               </div>
               <select value={type} onChange={(e) => setType(e.target.value as "301" | "302")} className="rounded-md border px-2 py-1.5 text-body" style={{ borderColor: "var(--color-border-default)" }}>
                 <option value="301">301</option>
