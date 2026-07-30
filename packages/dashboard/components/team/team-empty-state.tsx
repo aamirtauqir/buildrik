@@ -3,35 +3,13 @@
 import { Users, Crown, ShieldCheck, Pencil, Eye } from "lucide-react";
 import { Button } from "@/components/dashboard/primitives";
 
+// Role reference cards: informative, not decorative — neutral icon tiles per
+// the anti-slop rule (no icon-in-colored-circle grids; DESIGN.md).
 const ROLE_CARDS = [
-  {
-    role: "Owner",
-    description: "Full control of workspace, billing, and settings",
-    bg: "var(--color-primary-subtle)",
-    color: "var(--color-primary)",
-    Icon: Crown,
-  },
-  {
-    role: "Admin",
-    description: "Manage team members, sites, and settings. No billing access.",
-    bg: "#EBF5FF",
-    color: "#1A56DB",
-    Icon: ShieldCheck,
-  },
-  {
-    role: "Content editor",
-    description: "Create and edit site content. Cannot publish or manage team.",
-    bg: "#F3FAF7",
-    color: "var(--color-success)",
-    Icon: Pencil,
-  },
-  {
-    role: "Viewer",
-    description: "View published sites only. Read-only access.",
-    bg: "#F3F4F6",
-    color: "var(--color-text-secondary)",
-    Icon: Eye,
-  },
+  { role: "Owner", description: "Full control of workspace, billing, and settings", Icon: Crown },
+  { role: "Admin", description: "Manage team members, sites, and settings. No billing access.", Icon: ShieldCheck },
+  { role: "Content editor", description: "Create and edit site content. Cannot publish or manage team.", Icon: Pencil },
+  { role: "Viewer", description: "View published sites only. Read-only access.", Icon: Eye },
 ];
 
 interface TeamEmptyStateProps {
@@ -67,9 +45,9 @@ export function TeamEmptyState({ onInvite }: TeamEmptyStateProps) {
           >
             <div
               className="mb-2 flex h-8 w-8 items-center justify-center rounded-lg"
-              style={{ backgroundColor: card.bg }}
+              style={{ backgroundColor: "var(--color-bg-subtle)" }}
             >
-              <card.Icon className="h-4 w-4" style={{ color: card.color }} />
+              <card.Icon className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} />
             </div>
             <p className="text-body font-bold" style={{ color: "var(--color-text-primary)" }}>
               {card.role}

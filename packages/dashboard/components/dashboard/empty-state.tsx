@@ -14,7 +14,6 @@ type EmptyStateConfig = {
   heading: string;
   description: string;
   ctas: CTA[];
-  showVideoArea?: boolean;
 };
 
 const ICON_CLASS = "h-10 w-10 text-[var(--color-text-secondary)]";
@@ -26,7 +25,6 @@ function getConfig(variant: EmptyStateVariant): EmptyStateConfig {
         icon: <Sparkles className={ICON_CLASS} />,
         heading: "Welcome to Buildrick!",
         description: "Build your first site in under 5 minutes.",
-        showVideoArea: true,
         ctas: [
           { label: "AI Generate", href: "/dashboard/sites/new?method=ai", icon: <Sparkles className="h-4 w-4" /> },
           { label: "Use Template", href: "/dashboard/templates", icon: <LayoutTemplate className="h-4 w-4" /> },
@@ -84,10 +82,6 @@ export function EmptyState({ variant }: EmptyStateProps) {
       <div className="mb-4">{config.icon}</div>
       <h2 className="text-xl font-semibold text-[var(--color-text-primary)]">{config.heading}</h2>
       <p className="mt-2 max-w-md text-body text-[var(--color-text-secondary)]">{config.description}</p>
-
-      {config.showVideoArea && (
-        <div className="mt-6 h-40 w-72 rounded-lg border border-dashed border-[var(--color-border-default)] bg-white" />
-      )}
 
       {config.ctas.length > 0 && (
         <div className="mt-6 flex flex-wrap justify-center gap-3">
