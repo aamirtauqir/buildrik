@@ -101,7 +101,7 @@ function PreferenceRow({ label, options, value, onChange }: { label: string; opt
       <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>{label}</p>
       <div className="mt-1 flex flex-wrap gap-1">
         {options.map((opt) => (
-          <button key={opt.value} onClick={() => onChange(value === opt.value ? "" : opt.value)} className="rounded-full px-3 py-1 text-xs font-medium transition-colors" style={{ backgroundColor: value === opt.value ? "#FDF2F2" : "var(--color-bg-subtle)", color: value === opt.value ? "var(--color-primary)" : "var(--color-text-secondary)" }}>
+          <button key={opt.value} onClick={() => onChange(value === opt.value ? "" : opt.value)} className="rounded-full px-3 py-1 text-xs font-medium transition-colors" style={{ backgroundColor: value === opt.value ? "#EBF5FF" : "var(--color-bg-subtle)", color: value === opt.value ? "var(--color-primary)" : "var(--color-text-secondary)" }}>
             {opt.label}
           </button>
         ))}

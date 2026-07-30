@@ -123,7 +123,7 @@ export function GenerationProgress({
       <div className="h-2 rounded-full" style={{ backgroundColor: "var(--color-bg-subtle)" }}>
         <div
           className="h-2 rounded-full transition-all duration-500"
-          style={{ width: `${progress}%`, backgroundColor: isFailed ? "var(--color-primary)" : "var(--color-success)" }}
+          style={{ width: `${progress}%`, backgroundColor: isFailed ? "var(--color-error)" : "var(--color-success)" }}
         />
       </div>
       <p className="mt-2 text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
@@ -151,7 +151,7 @@ export function GenerationProgress({
                 />
               )}
               {stepStatus === "failed" && (
-                <XCircle className="h-5 w-5 shrink-0" style={{ color: "var(--color-primary)" }} />
+                <XCircle className="h-5 w-5 shrink-0" style={{ color: "var(--color-error)" }} />
               )}
               <span
                 className="text-sm"
