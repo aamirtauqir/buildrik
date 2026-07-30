@@ -28,7 +28,7 @@ Layout: flex row, 56px (`--bk-size-topbar`), white (`--bk-bg-card`), bottom hair
 
 | # | Child | Behavior | Notes |
 |---|-------|----------|-------|
-| 1 | **Brand monogram + `‹ Exit`** (D15) | 20px Buildrik "B" tile, then the ghost Exit label; the whole group is one exit button via `guardNavigation` | Litmus-#1 fix (both models); Webflow pattern — brand IS the exit affordance |
+| 1 | `‹ Exit` back button (D15-R) | Plain ghost back button via `guardNavigation` → workspace (dashboard/projects) | **D15 REVERSED by user 2026-07-30**: no monogram — just the back door. Litmus-#1 brand fail accepted as deliberate calm-chrome |
 | 2 | Site name | truncate at 200px, `title` tooltip | live via PROJECT_METADATA_CHANGED |
 | 3 | SaveStatus | 6 states (§4) | click = save/retry where meaningful |
 | 4 | Review pill | 5 states (§4), click → Review panel | hidden when `state: none` |
@@ -286,7 +286,7 @@ The cluster and Publish never shrink.
 | D12 | Confirm modal copy | Top-3 issue list from real `Issue` data + explicit fallback |
 | D13 | Publish over open review | Allowed; one-line note in the confirm modal |
 | D14 | Chip copy vocabulary | Total count on chip; breakdown in tooltip/aria; modal title errors-only |
-| D15 | Brand in bar | 20px monogram fused with ‹ Exit |
+| D15 | Brand in bar | ~~20px monogram fused with ‹ Exit~~ **REVERSED (user, 2026-07-30 post-eng): NO monogram — plain ‹ Exit back button to the workspace. Deliberate calm chrome; litmus-#1 accepted.** |
 | D-open-1 | Chip+label redundancy at errors>0 | Accepted — right redundancy before an irreversible-feeling action |
 
 **Eng review decisions (2026-07-30, /plan-eng-review — outside voice = Codex, 7 findings, 5 P1 all resolved):**
@@ -353,7 +353,7 @@ finding above. Run with Claude Code or Codex; checkbox as you ship.
 
 - [ ] **T1 (P1, human: ~1 day / Figma work)** — Figma — draw the missing nodes
   - Surfaced by: §6 component deltas — every code task below needs its node first
-  - Nodes: IssueChip (0/warn/error/99+), 681:122 + cluster child + monogram, 642:3664 regroup (−Exit, "Open client view"), review-pill neutral variants (D7), publish success/failure toasts, confirm modal with top-3 list
+  - Nodes: IssueChip (0/warn/error/99+), 681:122 + cluster child (NO monogram — D15 reversed), 642:3664 regroup (−Exit, "Open client view"), review-pill neutral variants (D7), publish success/failure toasts, confirm modal with top-3 list
   - Variables: NEW `bg-pill-neutral` surface token (eng D3) — add in Figma, re-export `figma-tokens.json`, run `node scripts/tokens/generate.mjs`
   - Verify: node ids recorded in component headers per DS contract
 - [x] **T2 (P1) — SHIPPED 2026-07-30 code-first** (IssueChip + formatIssueSummary SSOT copy + Topbar `tools` data slot + `published` state; Figma node ids pending T1 — as-built ledger pattern; contract tests 11+18 green) — editor/ui — `Topbar` `tools` data props + new `IssueChip`
