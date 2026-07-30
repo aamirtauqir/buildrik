@@ -193,6 +193,26 @@ describe("Tooltip", () => {
     fireEvent.keyDown(btn, { key: "Escape" });
     expect(screen.queryByRole("tooltip")).toBeNull();
   });
+
+  it("anchors below the trigger by default", () => {
+    render(
+      <Tooltip label="Hint">
+        <button>T</button>
+      </Tooltip>,
+    );
+    fireEvent.focus(screen.getByRole("button", { name: "T" }));
+    expect(screen.getByRole("tooltip").className).toBe("bk-tooltip bk-tooltip--bottom");
+  });
+
+  it.each(["bottom", "bottom-end", "top"] as const)("placement=%s lands as a modifier class", (placement) => {
+    render(
+      <Tooltip label="Hint" placement={placement}>
+        <button>T</button>
+      </Tooltip>,
+    );
+    fireEvent.focus(screen.getByRole("button", { name: "T" }));
+    expect(screen.getByRole("tooltip").className).toContain(`bk-tooltip--${placement}`);
+  });
 });
 
 describe("MediaCard / SiteCard", () => {

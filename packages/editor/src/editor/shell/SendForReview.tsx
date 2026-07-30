@@ -13,7 +13,7 @@
  */
 
 import * as React from "react";
-import { Button, FormField, Input, Popover, Textarea } from "@/editor/ui";
+import { Button, FormField, Input, Popover, Textarea, Tooltip } from "@/editor/ui";
 import type { Composer } from "../../engine";
 import { submitForReview } from "../../services/ReviewService";
 import { exportPublishPages } from "./exportPublishPages";
@@ -74,15 +74,28 @@ export const SendForReview: React.FC<SendForReviewProps> = ({ composer, disabled
       placement="bottom-end"
       label="Send for review"
       trigger={
-        <Button
-          kind="primary"
-          size="sm"
-          onClick={() => state !== "sent" && setOpen((v) => !v)}
-          disabled={Boolean(disabledReason) || state === "sending" || state === "sent"}
-          title={disabledReason}
-        >
-          {LABEL[state]}
-        </Button>
+        disabledReason ? (
+          /*
+           * A viewer's trigger stays focusable so the reason is reachable by
+           * keyboard: aria-disabled + tooltip, no onClick (native disabled
+           * would hide the why). sending/sent below keep native disabled —
+           * those are busy states, and busy must stay un-clickable.
+           */
+          <Tooltip label={disabledReason} placement="bottom-end">
+            <Button kind="primary" size="sm" aria-disabled="true" onClick={() => {}}>
+              {LABEL[state]}
+            </Button>
+          </Tooltip>
+        ) : (
+          <Button
+            kind="primary"
+            size="sm"
+            onClick={() => state !== "sent" && setOpen((v) => !v)}
+            disabled={state === "sending" || state === "sent"}
+          >
+            {LABEL[state]}
+          </Button>
+        )
       }
     >
       <div className="bk-send-review">

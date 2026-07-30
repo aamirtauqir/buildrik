@@ -90,3 +90,28 @@ consciously not done, not when they were forgotten.
   `credentials:"include"`. Same treatment as the token-surface audit above — check
   Origin against the allowlist, reject loudly. Surfaced by /autoplan eng phase
   2026-07-22.
+
+## Topbar (surfaced by the 2026-07-30 eng review of the topbar fix plan)
+
+- [ ] **"Publish anyway" confirm modal — founder decision.** Errors > 0 currently
+  publishes in one click (`StudioHeader.tsx:318`, `publish="anyway"`); the label is
+  the only warning. A confirm ("3 errors — publish anyway?") stops accidental broken
+  publishes but adds friction, and no Figma frame exists for it. Product call, not
+  an engineering default. Start: design the frame first, then a small ModalRoot
+  composition at the onPublish callsite.
+
+- [ ] **Worker-based export (engine arc).** `composer.exportHTML()` is synchronous
+  on the main thread — big sites freeze the UI during preview/publish. The F7-B2
+  fix only reorders paint; the export itself still blocks. ExportEngine holds DOM
+  references, so this needs an engine-level worker-safe refactor. Blocked by:
+  engine arc capacity; callers: preview overlay, publish flow, drag ghost.
+
+- [ ] **useSaveCallback honesty (P2 — prior-outage pattern).** Network-failed saves
+  settle to `idle` with a "queued, will sync" toast (`useSaveCallback.ts:96-106`),
+  and `SaveConflictError` also settles to `idle` (`:87-89`) — but the queue dies on
+  navigation, so "idle" is a lie exactly when it matters. Same dev-comfort-hides-
+  prod-failure shape as the three 2026-07 production outages (memory:
+  dev-configured-never-to-fail). The F1 exit-guard defends downstream; the source
+  should still tell the truth (`offline`/`conflict` states). Blast radius:
+  autosave loops, toasts, SaveStatus consumers — own arc + test sweep.
+  Depends on: F1 landed.

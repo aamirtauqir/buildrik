@@ -52,18 +52,13 @@ export interface SiteMenuProps {
    *  owns it — this menu has no way to tell the user it didn't work. */
   onCopyLiveUrl?: () => void;
   clientView?: boolean;
+  /** Client-view toggle is a full-page navigation, so the container owns it —
+   *  it must pass through the dirty-exit guard (F1) like every other exit. */
+  onToggleClientView?: () => void;
 }
 
 function openDashboard(path: string) {
   window.open(`${DASHBOARD_URL}${path}`, "_blank", "noopener,noreferrer");
-}
-
-/** Client view is a URL mode, so toggling it is a navigation, not local state. */
-function toggleClientView(on: boolean) {
-  const url = new URL(window.location.href);
-  if (on) url.searchParams.delete("view");
-  else url.searchParams.set("view", "client");
-  window.location.assign(url.toString());
 }
 
 export const SiteMenu: React.FC<SiteMenuProps> = ({
@@ -85,6 +80,7 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
   publishedUrl,
   onCopyLiveUrl,
   clientView = false,
+  onToggleClientView,
 }) => {
   const [open, setOpen] = React.useState(false);
   const run = (fn?: () => void) => () => {
@@ -160,9 +156,11 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
             </MenuItem>
           ) : null}
           {publishedUrl && onCopyLiveUrl ? <MenuItem onClick={run(onCopyLiveUrl)}>Copy live URL</MenuItem> : null}
-          <MenuItem onClick={run(() => toggleClientView(clientView))}>
-            {clientView ? "Exit client view" : "Preview as client"}
-          </MenuItem>
+          {onToggleClientView ? (
+            <MenuItem onClick={run(onToggleClientView)}>
+              {clientView ? "Exit client view" : "Preview as client"}
+            </MenuItem>
+          ) : null}
           {onAskAI ? <MenuItem onClick={run(onAskAI)}>Ask AI</MenuItem> : null}
           {onStartCollaboration ? (
             <MenuItem onClick={run(onStartCollaboration)}>Start collaboration</MenuItem>

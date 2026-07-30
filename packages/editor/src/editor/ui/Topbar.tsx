@@ -22,6 +22,7 @@ import { Button } from "./Button";
 import { IconButton } from "./Icon";
 import { SaveStatus, type SaveState } from "./SaveStatus";
 import { Presence, type PresenceProps } from "./Presence";
+import { Tooltip } from "./Tooltip";
 
 export type PublishState = "ready" | "disabled" | "anyway";
 
@@ -49,7 +50,7 @@ export interface TopbarProps {
   publish?: PublishState;
   publishBusy?: boolean;
   onPublish?: () => void;
-  /** Why publish is blocked — surfaced as the button title so the reason is reachable. */
+  /** Why publish is blocked — surfaced as a tooltip on the still-focusable button. */
   publishBlockedReason?: string;
   /** Replaces the built-in Publish button — e.g. an editor who sends for review instead. */
   action?: React.ReactNode;
@@ -100,16 +101,32 @@ export function Topbar({
       </span>
 
       {action ?? (
-        <Button
-          kind="primary"
-          size="md"
-          disabled={publish === "disabled"}
-          loading={publishBusy}
-          onClick={onPublish}
-          title={publish === "disabled" ? publishBlockedReason : undefined}
-        >
-          {PUBLISH_LABEL[publish]}
-        </Button>
+        publish === "disabled" ? (
+          /*
+           * Blocked ≠ busy. A natively-disabled button is unfocusable, so a
+           * keyboard user can never reach the reason it is blocked. Blocked
+           * stays focusable with aria-disabled and the reason in a tooltip;
+           * the onClick guard covers Enter/Space too, since keyboard
+           * activation of a native button routes through click. Busy keeps
+           * native disabled (via `loading`) so a double-publish stays
+           * impossible — when both apply, busy's native disabled wins.
+           */
+          <Tooltip label={publishBlockedReason ?? "Publishing is unavailable"} placement="bottom-end">
+            <Button
+              kind="primary"
+              size="md"
+              aria-disabled="true"
+              loading={publishBusy}
+              onClick={() => {}}
+            >
+              {PUBLISH_LABEL[publish]}
+            </Button>
+          </Tooltip>
+        ) : (
+          <Button kind="primary" size="md" loading={publishBusy} onClick={onPublish}>
+            {PUBLISH_LABEL[publish]}
+          </Button>
+        )
       )}
 
       {menu ?? (

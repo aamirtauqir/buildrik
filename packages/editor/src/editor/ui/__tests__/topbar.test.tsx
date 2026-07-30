@@ -19,16 +19,56 @@ describe("Topbar", () => {
     expect(screen.getByText(long).getAttribute("title")).toBe(long);
   });
 
-  it("publish=disabled blocks the click and explains itself", () => {
+  it("publish=disabled blocks the click but stays focusable, with the reason in a tooltip", () => {
     const onPublish = vi.fn();
     render(
       <Topbar siteName="x" save="saved" publish="disabled" publishBlockedReason="Needs approval" onPublish={onPublish} />,
     );
     const btn = screen.getByRole("button", { name: "Publish" });
-    expect(btn).toBeDisabled();
-    expect(btn.getAttribute("title")).toBe("Needs approval");
+    expect(btn.getAttribute("aria-disabled")).toBe("true");
+    expect(btn).not.toBeDisabled();
+    expect(btn.getAttribute("title")).toBeNull();
     fireEvent.click(btn);
     expect(onPublish).not.toHaveBeenCalled();
+    btn.focus();
+    expect(btn).toHaveFocus();
+    fireEvent.focus(btn);
+    expect(screen.getByRole("tooltip").textContent).toBe("Needs approval");
+  });
+
+  it("Enter and Space on a blocked Publish are no-ops", () => {
+    const onPublish = vi.fn();
+    render(
+      <Topbar siteName="x" save="saved" publish="disabled" publishBlockedReason="Needs approval" onPublish={onPublish} />,
+    );
+    const btn = screen.getByRole("button", { name: "Publish" });
+    // Keyboard activation of a native button routes through click.
+    fireEvent.keyDown(btn, { key: "Enter" });
+    fireEvent.keyUp(btn, { key: " " });
+    fireEvent.click(btn);
+    expect(onPublish).not.toHaveBeenCalled();
+  });
+
+  it("publishBusy is truly disabled — a double-publish cannot fire", () => {
+    const onPublish = vi.fn();
+    const { rerender } = render(<Topbar siteName="x" save="saved" publish="ready" onPublish={onPublish} />);
+    const btn = screen.getByRole("button", { name: "Publish" });
+    fireEvent.click(btn);
+    expect(onPublish).toHaveBeenCalledTimes(1);
+    rerender(<Topbar siteName="x" save="saved" publish="ready" publishBusy onPublish={onPublish} />);
+    expect(btn).toBeDisabled();
+    fireEvent.click(btn);
+    fireEvent.click(btn);
+    expect(onPublish).toHaveBeenCalledTimes(1);
+  });
+
+  it("blocked + busy keeps native disabled — busy semantics protect", () => {
+    render(
+      <Topbar siteName="x" save="saved" publish="disabled" publishBusy publishBlockedReason="Needs approval" />,
+    );
+    const btn = screen.getByRole("button", { name: "Publish" });
+    expect(btn).toBeDisabled();
+    expect(btn.getAttribute("aria-disabled")).toBe("true");
   });
 
   it("publish=anyway renames the action rather than hiding the block", () => {

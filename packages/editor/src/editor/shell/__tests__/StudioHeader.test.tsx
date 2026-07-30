@@ -82,7 +82,7 @@ function makeProps(overrides: Partial<StudioHeaderProps> = {}): StudioHeaderProp
     onSetExportLoading: vi.fn(),
     onShowAI: vi.fn(),
     onShowExporter: vi.fn(),
-    onSave: vi.fn(),
+    onSave: vi.fn(async () => "saved" as const),
     onInlinePreview: vi.fn(),
     addToast: vi.fn(() => "id"),
     ...overrides,
@@ -192,11 +192,13 @@ describe("StudioHeader", () => {
   });
 
   describe("publish gating", () => {
-    it("flag off: Publish is disabled and says why", () => {
+    it("flag off: Publish is blocked but focusable, with the reason in a tooltip", () => {
       render(<StudioHeader {...makeProps()} />);
       const btn = screen.getByRole("button", { name: "Publish" });
-      expect(btn).toBeDisabled();
-      expect(btn.getAttribute("title")).toMatch(/isn't switched on/);
+      expect(btn.getAttribute("aria-disabled")).toBe("true");
+      expect(btn).not.toBeDisabled();
+      fireEvent.focus(btn);
+      expect(screen.getByRole("tooltip").textContent).toMatch(/isn't switched on/);
     });
 
     it("flag on: Publish is live and fires the publish job", () => {
@@ -207,12 +209,13 @@ describe("StudioHeader", () => {
       expect(onVercelPublish).toHaveBeenCalled();
     });
 
-    it("offline blocks publish with the reason attached", () => {
+    it("offline blocks publish with the reason reachable on focus", () => {
       vi.mocked(isFeatureEnabled).mockReturnValue(true);
       render(<StudioHeader {...makeProps({ isOffline: true })} />);
       const btn = screen.getByRole("button", { name: "Publish" });
-      expect(btn).toBeDisabled();
-      expect(btn.getAttribute("title")).toBe("Can't publish while offline");
+      expect(btn.getAttribute("aria-disabled")).toBe("true");
+      fireEvent.focus(btn);
+      expect(screen.getByRole("tooltip").textContent).toBe("Can't publish while offline");
     });
 
     it("blocking errors turn it into Publish anyway rather than hiding it", () => {
@@ -227,13 +230,14 @@ describe("StudioHeader", () => {
   });
 
   describe("P6 viewer gating", () => {
-    it("a viewer sees Publish disabled with the reason, never hidden", () => {
+    it("a viewer sees Publish blocked with the reason, never hidden", () => {
       vi.mocked(isFeatureEnabled).mockReturnValue(true);
       roleState.role = "VIEWER";
       render(<StudioHeader {...makeProps()} />);
       const btn = screen.getByRole("button", { name: "Publish" });
-      expect(btn).toBeDisabled();
-      expect(btn.getAttribute("title")).toBe("Viewers can't publish — ask an editor");
+      expect(btn.getAttribute("aria-disabled")).toBe("true");
+      fireEvent.focus(btn);
+      expect(screen.getByRole("tooltip").textContent).toBe("Viewers can't publish — ask an editor");
     });
 
     it("an editor keeps publish enabled", () => {
@@ -248,8 +252,9 @@ describe("StudioHeader", () => {
       roleState.role = "VIEWER";
       render(<StudioHeader {...makeProps()} />);
       const btn = screen.getByRole("button", { name: "Send for review" });
-      expect(btn).toBeDisabled();
-      expect(btn.getAttribute("title")).toMatch(/ask an editor/);
+      expect(btn.getAttribute("aria-disabled")).toBe("true");
+      fireEvent.focus(btn);
+      expect(screen.getByRole("tooltip").textContent).toMatch(/ask an editor/);
     });
   });
 
@@ -472,5 +477,119 @@ describe("StudioHeader", () => {
       fireEvent.click(bell);
       expect(await screen.findByRole("dialog", { name: "Notifications" })).toBeTruthy();
     });
+  });
+});
+
+// ── F1 · dirty-exit guard (plan 2026-07-29, decisions 1A/2A/5A) ─────────────
+describe("F1 dirty-exit guard", () => {
+  function exitBtn() {
+    return screen.getByRole("button", { name: "‹ Exit" });
+  }
+
+  // jsdom's window.location is non-configurable — replace the whole object.
+  const realLocation = window.location;
+  function stubLocation() {
+    const assign = vi.fn();
+    Object.defineProperty(window, "location", {
+      configurable: true,
+      writable: true,
+      value: { ...realLocation, assign, href: realLocation.href },
+    });
+    return assign;
+  }
+  afterEach(() => {
+    Object.defineProperty(window, "location", {
+      configurable: true,
+      writable: true,
+      value: realLocation,
+    });
+  });
+
+  it("clean state: Exit navigates without a dialog", () => {
+    const assign = stubLocation();
+    render(<StudioHeader {...makeProps()} />);
+    fireEvent.click(exitBtn());
+    expect(assign).toHaveBeenCalled();
+    expect(screen.queryByText("Leave the editor?")).toBeNull();
+  });
+
+  it("dirty: Exit opens dialog A with Save & leave, Leave anyway, Stay", () => {
+    const assign = stubLocation();
+    render(<StudioHeader {...makeProps({ isDirty: true })} />);
+    fireEvent.click(exitBtn());
+    expect(assign).not.toHaveBeenCalled();
+    expect(screen.getByText("Leave the editor?")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Save & leave" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Leave anyway" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Stay" })).toBeTruthy();
+  });
+
+  it("Save & leave: saved outcome navigates; dialog closes", async () => {
+    const assign = stubLocation();
+    const onSave = vi.fn(async () => "saved" as const);
+    render(<StudioHeader {...makeProps({ isDirty: true, onSave })} />);
+    fireEvent.click(exitBtn());
+    fireEvent.click(screen.getByRole("button", { name: "Save & leave" }));
+    await waitFor(() => expect(assign).toHaveBeenCalled());
+    expect(onSave).toHaveBeenCalled();
+  });
+
+  it("Save & leave: queued-offline outcome switches to the risky dialog, no navigation", async () => {
+    const assign = stubLocation();
+    const onSave = vi.fn(async () => "queued-offline" as const);
+    render(<StudioHeader {...makeProps({ isDirty: true, onSave })} />);
+    fireEvent.click(exitBtn());
+    fireEvent.click(screen.getByRole("button", { name: "Save & leave" }));
+    await waitFor(() =>
+      expect(screen.getByText(/unsaved edits will be lost/)).toBeTruthy(),
+    );
+    expect(assign).not.toHaveBeenCalled();
+    // risky dialog never offers a fake save
+    expect(screen.queryByRole("button", { name: "Save & leave" })).toBeNull();
+  });
+
+  it("Save & leave: error outcome keeps the dialog open with the error", async () => {
+    const assign = stubLocation();
+    const onSave = vi.fn(async () => "error" as const);
+    render(<StudioHeader {...makeProps({ isDirty: true, onSave })} />);
+    fireEvent.click(exitBtn());
+    fireEvent.click(screen.getByRole("button", { name: "Save & leave" }));
+    await waitFor(() => expect(screen.getByRole("alert").textContent).toMatch(/Save failed/));
+    expect(assign).not.toHaveBeenCalled();
+  });
+
+  it("offline + dirty: Exit goes straight to the risky dialog (5A — never fake-save)", () => {
+    render(<StudioHeader {...makeProps({ isDirty: true, isOffline: true })} />);
+    fireEvent.click(exitBtn());
+    expect(screen.getByText(/unsaved edits will be lost/)).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Save & leave" })).toBeNull();
+  });
+
+  it("Leave anyway navigates and Stay closes without navigating", () => {
+    const assign = stubLocation();
+    const { unmount } = render(<StudioHeader {...makeProps({ isDirty: true })} />);
+    fireEvent.click(exitBtn());
+    fireEvent.click(screen.getByRole("button", { name: "Stay" }));
+    expect(screen.queryByText("Leave the editor?")).toBeNull();
+    expect(assign).not.toHaveBeenCalled();
+    fireEvent.click(exitBtn());
+    fireEvent.click(screen.getByRole("button", { name: "Leave anyway" }));
+    expect(assign).toHaveBeenCalled();
+    unmount();
+  });
+
+  it("beforeunload guard registers only while dirty/saving and honors the bypass", () => {
+    const addSpy = vi.spyOn(window, "addEventListener");
+    const { rerender } = render(<StudioHeader {...makeProps()} />);
+    expect(addSpy.mock.calls.filter(([t]) => t === "beforeunload")).toHaveLength(0);
+    rerender(<StudioHeader {...makeProps({ isDirty: true })} />);
+    expect(addSpy.mock.calls.filter(([t]) => t === "beforeunload")).toHaveLength(1);
+    const handler = addSpy.mock.calls.find(([t]) => t === "beforeunload")?.[1] as (
+      e: Partial<BeforeUnloadEvent>,
+    ) => void;
+    const e = { preventDefault: vi.fn(), returnValue: undefined as unknown };
+    handler(e as BeforeUnloadEvent);
+    expect(e.preventDefault).toHaveBeenCalled();
+    addSpy.mockRestore();
   });
 });

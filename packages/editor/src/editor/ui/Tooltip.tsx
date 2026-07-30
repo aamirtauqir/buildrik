@@ -9,13 +9,17 @@
  */
 import React from "react";
 
+export type TooltipPlacement = "bottom" | "bottom-end" | "top";
+
 export interface TooltipProps {
   label: string;
   children: React.ReactElement;
   id?: string;
+  /** Where the tip anchors relative to the trigger. `bottom-end` for controls at the right viewport edge. */
+  placement?: TooltipPlacement;
 }
 
-export function Tooltip({ label, children, id }: TooltipProps) {
+export function Tooltip({ label, children, id, placement = "bottom" }: TooltipProps) {
   const [open, setOpen] = React.useState(false);
   const generated = React.useId();
   const tipId = id ?? generated;
@@ -35,7 +39,7 @@ export function Tooltip({ label, children, id }: TooltipProps) {
     <span style={{ position: "relative", display: "inline-flex" }}>
       {trigger}
       {open ? (
-        <span role="tooltip" id={tipId} className="bk-tooltip">
+        <span role="tooltip" id={tipId} className={`bk-tooltip bk-tooltip--${placement}`}>
           {label}
         </span>
       ) : null}

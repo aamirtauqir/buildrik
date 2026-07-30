@@ -108,3 +108,13 @@
   color: var(--bk-error-text);
   font-size: var(--bk-text-11);
 }
+
+/* ── F1 exit dialog ─────────────────────────────────────────────────────── */
+.bk-exit-dialog__error {
+  margin: 0 var(--bk-space-24);
+  padding: var(--bk-space-8) var(--bk-space-12);
+  border-radius: var(--bk-radius-md);
+  background: var(--bk-error-tint);
+  color: var(--bk-error-text);
+  font-size: var(--bk-text-12);
+}

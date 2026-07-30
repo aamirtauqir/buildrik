@@ -20,7 +20,20 @@
  */
 
 import * as React from "react";
-import { Topbar, type PublishState, type ReviewPill, type SaveState, type ToastInput } from "@/editor/ui";
+import {
+  Topbar,
+  Button,
+  ModalRoot,
+  ModalContent,
+  ModalTitle,
+  ModalDescription,
+  ModalFooter,
+  type PublishState,
+  type ReviewPill,
+  type SaveState,
+  type ToastInput,
+} from "@/editor/ui";
+import type { SaveOutcome } from "./hooks/useSaveCallback";
 import type { Composer } from "../../engine";
 import { sanitizeHTMLForPreview } from "../export/ExportUtils";
 import { useCollaboration } from "../canvas/hooks/useCollaboration";
@@ -92,7 +105,8 @@ export interface StudioHeaderProps {
   onOpenComponents?: () => void;
 
   // Core actions
-  onSave: () => void;
+  /** Save now. Resolves with the HONEST outcome — the exit guard branches on it. */
+  onSave: () => Promise<SaveOutcome>;
 
   /** Export HTML as zip download */
   onExportHTML?: () => void;
@@ -252,9 +266,120 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
     setTimeout(() => onSetExportLoading(false), 500);
   }, [onSetExportLoading, onShowExporter]);
 
-  const exitToDashboard = React.useCallback(() => {
-    window.location.assign(`${DASHBOARD_URL}/dashboard/projects`);
+  // 60-save-states: "offline" is the browser being offline OR the dashboard sync
+  // being disconnected. Either way edits are queued locally, so it outranks
+  // every other state — a queued edit is not a failed one.
+  const offline = Boolean(isOffline) || studioSyncStatus === "offline";
+
+  // ── F1 · dirty-exit guard (plan 2026-07-29, decisions 1A/2A/5A) ──────────
+  // Every full-page navigation out of the editor goes through here. Four
+  // callers: ‹ Exit, menu "Exit to dashboard", "Preview as client", and
+  // notification row jumps. `nav` is injectable so tests never touch
+  // window.location (redirect-mock pattern).
+  type ExitDialog = { kind: "dirty" | "risky"; error?: string; nav: () => void };
+  const [exitDialog, setExitDialog] = React.useState<ExitDialog | null>(null);
+  const [leaving, setLeaving] = React.useState(false);
+  // 2A: set immediately before a user-confirmed programmatic navigation so the
+  // beforeunload guard doesn't double-prompt. Reset on a timer in case the
+  // navigation is somehow cancelled — a stuck flag would disarm the guard.
+  const bypassRef = React.useRef(false);
+  const bypassAndNavigate = React.useCallback((nav: () => void) => {
+    bypassRef.current = true;
+    try {
+      nav();
+    } finally {
+      window.setTimeout(() => {
+        bypassRef.current = false;
+      }, 1000);
+    }
   }, []);
+
+  const guardNavigation = React.useCallback(
+    (nav: () => void) => {
+      if (bypassRef.current) return nav();
+      // 5A: while offline the save pipeline reports queued saves as clean
+      // (useSaveCallback settles to idle) but the queue dies on navigation —
+      // never offer a fake "Save & leave" here.
+      if (offline && isDirty) return setExitDialog({ kind: "risky", nav });
+      if (isDirty || saveStatus === "saving" || saveStatus === "error") {
+        return setExitDialog({
+          kind: "dirty",
+          error: saveStatus === "error" ? "The last save failed." : undefined,
+          nav,
+        });
+      }
+      nav();
+    },
+    [offline, isDirty, saveStatus],
+  );
+
+  const saveAndLeave = React.useCallback(async () => {
+    if (!exitDialog) return;
+    setLeaving(true);
+    const timeout = new Promise<SaveOutcome>((resolve) =>
+      window.setTimeout(() => resolve("error"), 3000),
+    );
+    const outcome = await Promise.race([onSave(), timeout]);
+    setLeaving(false);
+    if (outcome === "saved") {
+      const { nav } = exitDialog;
+      setExitDialog(null);
+      bypassAndNavigate(nav);
+    } else if (outcome === "queued-offline" || outcome === "conflict") {
+      // The save did NOT durably land — switch to the honest dialog.
+      setExitDialog({ kind: "risky", nav: exitDialog.nav });
+    } else {
+      setExitDialog({
+        kind: "dirty",
+        error: "Save failed — your changes may be lost if you leave.",
+        nav: exitDialog.nav,
+      });
+    }
+  }, [exitDialog, onSave, bypassAndNavigate]);
+
+  const leaveAnyway = React.useCallback(() => {
+    if (!exitDialog) return;
+    const { nav } = exitDialog;
+    setExitDialog(null);
+    bypassAndNavigate(nav);
+  }, [exitDialog, bypassAndNavigate]);
+
+  // 2A: browser-chrome exits (⌘W, refresh, tab close) get the native prompt
+  // while there is anything a navigation would strand.
+  React.useEffect(() => {
+    const shouldGuard = isDirty || saveStatus === "saving";
+    if (!shouldGuard) return;
+    const onBefore = (e: BeforeUnloadEvent) => {
+      if (bypassRef.current) return;
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", onBefore);
+    return () => window.removeEventListener("beforeunload", onBefore);
+  }, [isDirty, saveStatus]);
+
+  const exitToDashboard = React.useCallback(() => {
+    guardNavigation(() => window.location.assign(`${DASHBOARD_URL}/dashboard/projects`));
+  }, [guardNavigation]);
+
+  /** Client view is a URL mode, so toggling it is a navigation, not local state. */
+  const toggleClientView = React.useCallback(() => {
+    guardNavigation(() => {
+      const url = new URL(window.location.href);
+      if (viewMode.clientView) url.searchParams.delete("view");
+      else url.searchParams.set("view", "client");
+      window.location.assign(url.toString());
+    });
+  }, [guardNavigation, viewMode.clientView]);
+
+  const navigateFromNotification = React.useCallback(
+    (url: string) => {
+      guardNavigation(() => {
+        window.location.href = /^https?:\/\//.test(url) ? url : `${DASHBOARD_URL}${url}`;
+      });
+    },
+    [guardNavigation],
+  );
 
   const copyLiveUrl = React.useCallback(() => {
     if (!publishedUrl) return;
@@ -284,10 +409,6 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
       );
   }, [composer, currentUser, addToast]);
 
-  // 60-save-states: "offline" is the browser being offline OR the dashboard sync
-  // being disconnected. Either way edits are queued locally, so it outranks
-  // every other state — a queued edit is not a failed one.
-  const offline = Boolean(isOffline) || studioSyncStatus === "offline";
   const save: SaveState = offline
     ? "offline"
     : saveStatus === "saving"
@@ -383,17 +504,55 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
             publishedUrl={publishedUrl}
             onCopyLiveUrl={copyLiveUrl}
             clientView={viewMode.clientView}
+            onToggleClientView={toggleClientView}
           />
         }
       />
 
       {notifOpen ? (
         <div className="bk-header__dropdown">
-          <NotificationPanel onClose={() => setNotifOpen(false)} onRead={refreshUnread} />
+          <NotificationPanel
+            onClose={() => setNotifOpen(false)}
+            onRead={refreshUnread}
+            onNavigate={navigateFromNotification}
+          />
         </div>
       ) : null}
 
       {cmdOpen ? <CommandPalette onClose={() => setCmdOpen(false)} composer={composer ?? null} /> : null}
+
+      {/* F1 exit dialog — dialog A ("dirty": save is a real option) vs
+          dialog B ("risky": offline/conflict, a save here would be a lie). */}
+      {exitDialog ? (
+        <ModalRoot open onOpenChange={(o) => !o && setExitDialog(null)}>
+          <ModalContent size="question" aria-labelledby="bk-exit-title">
+            <ModalTitle id="bk-exit-title">Leave the editor?</ModalTitle>
+            <ModalDescription>
+              {exitDialog.kind === "risky"
+                ? "You're offline — unsaved edits will be lost if you leave."
+                : "You have unsaved changes."}
+            </ModalDescription>
+            {exitDialog.error ? (
+              <p className="bk-exit-dialog__error" role="alert">
+                {exitDialog.error}
+              </p>
+            ) : null}
+            <ModalFooter>
+              <Button kind="ghost" size="md" onClick={() => setExitDialog(null)}>
+                Stay
+              </Button>
+              <Button kind="destructive" size="md" onClick={leaveAnyway}>
+                Leave anyway
+              </Button>
+              {exitDialog.kind === "dirty" ? (
+                <Button kind="primary" size="md" loading={leaving} onClick={() => void saveAndLeave()}>
+                  Save &amp; leave
+                </Button>
+              ) : null}
+            </ModalFooter>
+          </ModalContent>
+        </ModalRoot>
+      ) : null}
     </div>
   );
 };
