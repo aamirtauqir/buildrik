@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ToggleSwitch } from "flowbite-react";
 import { cn } from "@lib/utils";
 import { PLAN_LIMITS } from "@lib/constants/plan-limits";
 
@@ -92,22 +93,7 @@ export function PlanComparison({
         <span className="text-body font-medium" style={{ color: yearly ? "var(--color-text-secondary)" : "var(--color-text-primary)" }}>
           Monthly
         </span>
-        <button
-          role="switch"
-          aria-checked={yearly}
-          onClick={() => setYearly((v) => !v)}
-          className={cn(
-            "relative inline-flex h-6 w-11 items-center rounded-full transition-colors",
-            yearly ? "bg-[var(--color-primary)]" : "bg-[var(--color-border-default)]"
-          )}
-        >
-          <span
-            className={cn(
-              "inline-block h-4 w-4 translate-x-1 rounded-full bg-white shadow transition-transform",
-              yearly && "translate-x-6"
-            )}
-          />
-        </button>
+        <ToggleSwitch checked={yearly} onChange={setYearly} aria-label="Bill yearly" />
         <span className="flex items-center gap-1.5 text-body font-medium" style={{ color: yearly ? "var(--color-text-primary)" : "var(--color-text-secondary)" }}>
           Yearly
           <span

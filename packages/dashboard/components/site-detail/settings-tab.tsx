@@ -1,5 +1,6 @@
 "use client";
 import { useState, useRef } from "react";
+import { ToggleSwitch } from "flowbite-react";
 import { trpc } from "@lib/trpc/client";
 import { useUnsavedChanges } from "@lib/hooks/use-unsaved-changes";
 import { Button, SectionCard } from "@/components/dashboard/primitives";
@@ -260,22 +261,14 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
       <SectionCard title="Site Password">
         <ProGate isPro={isPro}>
           <div className="flex items-center gap-3">
-            <button
-              type="button"
-              role="switch"
-              aria-checked={passwordEnabled}
-              onClick={() => {
+            <ToggleSwitch
+              checked={passwordEnabled}
+              onChange={(next) => {
                 if (!isPro) return;
-                setPasswordEnabled((v) => !v);
+                setPasswordEnabled(next);
               }}
-              className="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors"
-              style={{ backgroundColor: passwordEnabled ? "var(--color-primary)" : "var(--color-border-default)" }}
-            >
-              <span
-                className="pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-sm transition-transform"
-                style={{ transform: passwordEnabled ? "translateX(20px)" : "translateX(0)" }}
-              />
-            </button>
+              aria-label="Site password"
+            />
             <span className="text-body" style={{ color: "var(--color-text-primary)" }}>
               Require password to view published site
             </span>

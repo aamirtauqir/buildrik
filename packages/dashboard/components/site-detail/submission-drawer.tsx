@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { X, Trash2 } from "lucide-react";
+import { ToggleSwitch } from "flowbite-react";
 import { Button } from "@/components/dashboard/primitives";
 
 export interface FormSubmissionData {
@@ -233,18 +234,7 @@ function ToggleRow({
       <span className="text-body" style={{ color: "var(--color-text-primary)" }}>
         {label}
       </span>
-      <button
-        onClick={() => onChange(!checked)}
-        className="relative h-5 w-9 rounded-full transition-colors"
-        style={{ backgroundColor: checked ? "var(--color-primary)" : "var(--color-border-default)" }}
-        role="switch"
-        aria-checked={checked}
-      >
-        <span
-          className="absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white transition-transform"
-          style={{ transform: checked ? "translateX(16px)" : "translateX(0)" }}
-        />
-      </button>
+      <ToggleSwitch checked={checked} onChange={onChange} aria-label={label} />
     </div>
   );
 }
