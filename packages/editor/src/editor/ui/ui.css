@@ -838,6 +838,48 @@ button.bk-topbar__review:focus-visible { outline: none; box-shadow: var(--bk-sha
 .bk-topbar__review--warning { background: var(--bk-warning-tint); color: var(--bk-warning-text); }
 .bk-topbar__review--success { background: var(--bk-success-tint); color: var(--bk-success-text); }
 
+/* Topbar tools cluster — Quick preview · Comments · IssueChip (plan §2; Figma pending T1) */
+.bk-topbar__tools {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--bk-space-2);
+  padding-right: var(--bk-space-8);
+  margin-right: var(--bk-space-4);
+  border-right: 1px solid var(--bk-border);
+}
+
+/* IssueChip — permanent issues anchor (plan D6/D14; Figma pending T1) */
+.bk-issuechip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--bk-space-4);
+  height: var(--bk-space-28);
+  padding: 0 var(--bk-space-8);
+  border: none;
+  background: transparent;
+  border-radius: var(--bk-radius-md);
+  color: var(--bk-ink-muted);
+  cursor: pointer;
+}
+.bk-issuechip:hover { background: var(--bk-bg-subtle); }
+.bk-issuechip:focus-visible { outline: none; box-shadow: var(--bk-shadow-focus); }
+.bk-issuechip--warning { color: var(--bk-warning-text); }
+.bk-issuechip--warning:hover { background: var(--bk-warning-tint); }
+.bk-issuechip--error { color: var(--bk-error-text); }
+.bk-issuechip--error:hover { background: var(--bk-error-tint); }
+.bk-issuechip__count {
+  font-size: var(--bk-text-12);
+  font-weight: var(--bk-weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Publish success transient — "✓ Published" (plan D10/eng D11; Figma pending T1) */
+.bk-topbar__published:disabled {
+  background: var(--bk-success-tint);
+  color: var(--bk-success-text);
+  opacity: 1;
+}
+
 /* ── Slider · Figma 92:30 ──────────────────────────────────────────────
    Track 4px full-radius, filled portion accent; knob 14px card-on-accent
    ring that grows to 16px while dragging; mono numeric field 46×26. */

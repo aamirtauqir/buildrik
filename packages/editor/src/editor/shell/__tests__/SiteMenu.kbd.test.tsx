@@ -25,7 +25,7 @@ async function historyHint(platform: string): Promise<string | null> {
   vi.resetModules();
   Object.defineProperty(navigator, "platform", { value: platform, configurable: true });
   const { SiteMenu } = await import("../SiteMenu");
-  render(<SiteMenu onExit={() => {}} onOpenHistory={() => {}} />);
+  render(<SiteMenu onOpenHistory={() => {}} />);
   fireEvent.click(screen.getByRole("button", { name: "Site menu" }));
   return screen.getByRole("menuitem", { name: /Version history/ }).textContent;
 }

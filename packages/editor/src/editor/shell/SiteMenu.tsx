@@ -1,15 +1,27 @@
 /**
- * Site menu — the ⋯ overflow in the topbar. Figma `popover/site-menu` 642:3664.
+ * Site menu — the ⋯ overflow in the topbar.
  *
- * The first three groups are the design, item for item, in its order: the four
- * site-level destinations, the three library/help entries, then the way out.
+ * Figma: successor to `popover/site-menu` 642:3664 — regrouped per the topbar
+ * redesign plan (docs/plans/2026-07-30-topbar-complete-redesign.md §3; node
+ * update pending T1). Five named groups, no "More" dump:
  *
- * The fourth group is not in the design. Each item in it is the only way to
- * reach a feature the product already ships, so deleting them to match the
- * mock would have removed working surfaces from the UI rather than redesigning
- * them. They are grouped and labelled apart so the designed set stays the
- * primary one, and so the gap is visible in the product instead of buried in a
- * commit message. Every one of them is a Figma to-do, not a code to-do.
+ *   Site       — settings · version history · publish history · export code
+ *   Build      — templates · components · design system · plugins
+ *   Share      — open client view · view live site · copy live URL
+ *   Workspace  — invite · account · start collaboration (flag-gated)
+ *   (footer)   — keyboard shortcuts
+ *
+ * Moved OUT to the bar's tool cluster (plan §2): Preview, Comments, Issues.
+ * Removed (D8): "Exit to dashboard" — the bar's ‹ Exit is always visible; a
+ * second door in the overflow was dead weight. Renamed (D9): "Preview as
+ * client" → "Open client view".
+ *
+ * A group renders only when at least one of its rows is present (eng D8) —
+ * the Share group is all-conditional and an empty MenuGroup div would still
+ * draw its border-top.
+ *
+ * Ask AI keeps a row ONLY in the legacy four-tool-rail mode (its single home
+ * is the rail's ✨ AI tab); the row retires with that mode.
  *
  * @license BSD-3-Clause
  */
@@ -19,48 +31,34 @@ import { IconButton, Menu, MenuGroup, MenuItem, MenuLabel, Popover, SiteMenuIcon
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 
 export interface SiteMenuProps {
-  // ── Figma 642:3664, in order ──────────────────────────────────────────────
+  // ── Site ──────────────────────────────────────────────────────────────────
   onOpenSiteSettings?: () => void;
   onOpenHistory?: () => void;
   onOpenPublishHistory?: () => void;
   onExportCode?: () => void;
+  // ── Build ─────────────────────────────────────────────────────────────────
   onOpenTemplates?: () => void;
   onOpenComponents?: () => void;
-  onOpenShortcuts?: () => void;
-  onExit: () => void;
-
-  // ── Not in the design; kept because nothing else reaches them ─────────────
-  /**
-   * Shell state 7 — the in-shell preview overlay. ⌘P is a different feature: it
-   * flips `composer.setPreviewMode()` on the canvas. This entry is the only way
-   * to reach the overlay, so it moved here rather than disappearing with the
-   * topbar button.
-   */
-  onPreview?: () => void;
-  /**
-   * Canvas comment mode (shell state 6, board 200:2). The `C` shortcut is the
-   * only other way in — an unlabelled keystroke is not discoverability, so the
-   * feature gets a menu row until Figma gives it a topbar home.
-   */
-  onToggleComments?: () => void;
-  /** Blocking + advisory issues on this page. */
-  issueCount?: number;
-  onOpenIssues?: () => void;
-  /** Only reachable from the bar in the legacy four-tool rail. */
-  onAskAI?: () => void;
-  /** Collaboration is flag-gated; when it is on, the session has to be startable. */
-  onStartCollaboration?: () => void;
   onOpenDesignSystem?: () => void;
   onOpenPlugins?: () => void;
+  // ── Share ─────────────────────────────────────────────────────────────────
+  clientView?: boolean;
+  /** Client-view toggle is a full-page navigation, so the container owns it —
+   *  it must pass through the dirty-exit guard (F1) like every other exit. */
+  onToggleClientView?: () => void;
   /** Live URL once the site has been published. */
   publishedUrl?: string | null;
   /** Copying can fail (no clipboard on insecure origins), so the container
    *  owns it — this menu has no way to tell the user it didn't work. */
   onCopyLiveUrl?: () => void;
-  clientView?: boolean;
-  /** Client-view toggle is a full-page navigation, so the container owns it —
-   *  it must pass through the dirty-exit guard (F1) like every other exit. */
-  onToggleClientView?: () => void;
+  // ── Workspace ─────────────────────────────────────────────────────────────
+  /** Collaboration is flag-gated; when it is on, the session has to be startable. */
+  onStartCollaboration?: () => void;
+  /** Legacy four-tool rail only — the rail's ✨ AI tab is the canonical home. */
+  onAskAI?: () => void;
+  // ── Footer ────────────────────────────────────────────────────────────────
+  /** Open Keyboard Shortcuts panel (`?`) */
+  onOpenShortcuts?: () => void;
 }
 
 function openDashboard(path: string) {
@@ -83,26 +81,25 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
   onExportCode,
   onOpenTemplates,
   onOpenComponents,
-  onOpenShortcuts,
-  onExit,
-  onPreview,
-  onToggleComments,
-  issueCount = 0,
-  onOpenIssues,
-  onAskAI,
-  onStartCollaboration,
   onOpenDesignSystem,
   onOpenPlugins,
-  publishedUrl,
-  onCopyLiveUrl,
   clientView = false,
   onToggleClientView,
+  publishedUrl,
+  onCopyLiveUrl,
+  onStartCollaboration,
+  onAskAI,
+  onOpenShortcuts,
 }) => {
   const [open, setOpen] = React.useState(false);
   const run = (fn?: () => void) => () => {
     setOpen(false);
     fn?.();
   };
+
+  const hasSite = Boolean(onOpenSiteSettings || onOpenHistory || onOpenPublishHistory || onExportCode);
+  const hasBuild = Boolean(onOpenTemplates || onOpenComponents || onOpenDesignSystem || onOpenPlugins);
+  const hasShare = Boolean(onToggleClientView || publishedUrl);
 
   return (
     <Popover
@@ -117,78 +114,78 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
       }
     >
       <Menu label="Site menu">
-        <MenuGroup>
-          {onOpenSiteSettings ? (
-            <MenuItem kbd="⌘," onClick={run(onOpenSiteSettings)}>
-              Site settings
-            </MenuItem>
-          ) : null}
-          {onOpenHistory ? (
-            <MenuItem kbd={HISTORY_KBD} onClick={run(onOpenHistory)}>
-              Version history
-            </MenuItem>
-          ) : null}
-          {onOpenPublishHistory ? (
-            <MenuItem onClick={run(onOpenPublishHistory)}>Publish history</MenuItem>
-          ) : null}
-          {onExportCode ? <MenuItem onClick={run(onExportCode)}>Export code</MenuItem> : null}
-        </MenuGroup>
+        {hasSite && (
+          <MenuGroup>
+            <MenuLabel>Site</MenuLabel>
+            {onOpenSiteSettings ? (
+              <MenuItem kbd="⌘," onClick={run(onOpenSiteSettings)}>
+                Site settings
+              </MenuItem>
+            ) : null}
+            {onOpenHistory ? (
+              <MenuItem kbd={HISTORY_KBD} onClick={run(onOpenHistory)}>
+                Version history
+              </MenuItem>
+            ) : null}
+            {onOpenPublishHistory ? (
+              <MenuItem onClick={run(onOpenPublishHistory)}>Publish history</MenuItem>
+            ) : null}
+            {onExportCode ? <MenuItem onClick={run(onExportCode)}>Export code</MenuItem> : null}
+          </MenuGroup>
+        )}
+
+        {hasBuild && (
+          <MenuGroup>
+            <MenuLabel>Build</MenuLabel>
+            {/* The design labels Templates "T", which is also the device-switcher
+                chip (W · D · T · M) on the canvas toolbar. Showing a shortcut the
+                product cannot honour is worse than showing none, so it is omitted
+                until Figma resolves the collision. */}
+            {onOpenTemplates ? <MenuItem onClick={run(onOpenTemplates)}>Templates</MenuItem> : null}
+            {onOpenComponents ? (
+              <MenuItem kbd="⇧A" onClick={run(onOpenComponents)}>
+                Components
+              </MenuItem>
+            ) : null}
+            {onOpenDesignSystem ? <MenuItem onClick={run(onOpenDesignSystem)}>Design system</MenuItem> : null}
+            {onOpenPlugins ? <MenuItem onClick={run(onOpenPlugins)}>Plugins</MenuItem> : null}
+          </MenuGroup>
+        )}
+
+        {hasShare && (
+          <MenuGroup>
+            <MenuLabel>Share</MenuLabel>
+            {onToggleClientView ? (
+              <MenuItem onClick={run(onToggleClientView)}>
+                {clientView ? "Exit client view" : "Open client view"}
+              </MenuItem>
+            ) : null}
+            {publishedUrl ? (
+              <MenuItem onClick={run(() => window.open(publishedUrl, "_blank", "noopener,noreferrer"))}>
+                View live site
+              </MenuItem>
+            ) : null}
+            {publishedUrl && onCopyLiveUrl ? <MenuItem onClick={run(onCopyLiveUrl)}>Copy live URL</MenuItem> : null}
+          </MenuGroup>
+        )}
 
         <MenuGroup>
-          {/* The design labels this "T", which is also its own device-switcher
-              chip (W · D · T · M) on the canvas toolbar. Showing a shortcut the
-              product cannot honour is worse than showing none, so it is omitted
-              until Figma resolves the collision. */}
-          {onOpenTemplates ? <MenuItem onClick={run(onOpenTemplates)}>Templates</MenuItem> : null}
-          {onOpenComponents ? (
-            <MenuItem kbd="⇧A" onClick={run(onOpenComponents)}>
-              Components
-            </MenuItem>
-          ) : null}
-          {onOpenShortcuts ? (
-            <MenuItem kbd="?" onClick={run(onOpenShortcuts)}>
-              Keyboard shortcuts
-            </MenuItem>
-          ) : null}
-        </MenuGroup>
-
-        <MenuGroup>
-          <MenuItem onClick={run(onExit)}>Exit to dashboard</MenuItem>
-        </MenuGroup>
-
-        <MenuGroup>
-          <MenuLabel>More</MenuLabel>
-          {onPreview ? <MenuItem onClick={run(onPreview)}>Preview site</MenuItem> : null}
-          {onToggleComments ? (
-            <MenuItem kbd="C" onClick={run(onToggleComments)}>
-              Comments
-            </MenuItem>
-          ) : null}
-          {onOpenIssues ? (
-            <MenuItem onClick={run(onOpenIssues)}>
-              {issueCount > 0 ? `Issues (${issueCount})` : "Issues"}
-            </MenuItem>
-          ) : null}
-          {onOpenDesignSystem ? <MenuItem onClick={run(onOpenDesignSystem)}>Design system</MenuItem> : null}
-          {onOpenPlugins ? <MenuItem onClick={run(onOpenPlugins)}>Plugins</MenuItem> : null}
-          {publishedUrl ? (
-            <MenuItem onClick={run(() => window.open(publishedUrl, "_blank", "noopener,noreferrer"))}>
-              View live site
-            </MenuItem>
-          ) : null}
-          {publishedUrl && onCopyLiveUrl ? <MenuItem onClick={run(onCopyLiveUrl)}>Copy live URL</MenuItem> : null}
-          {onToggleClientView ? (
-            <MenuItem onClick={run(onToggleClientView)}>
-              {clientView ? "Exit client view" : "Preview as client"}
-            </MenuItem>
-          ) : null}
-          {onAskAI ? <MenuItem onClick={run(onAskAI)}>Ask AI</MenuItem> : null}
+          <MenuLabel>Workspace</MenuLabel>
+          <MenuItem onClick={run(() => openDashboard("/dashboard/settings/team"))}>Invite teammates</MenuItem>
+          <MenuItem onClick={run(() => openDashboard("/dashboard/settings/account"))}>Account settings</MenuItem>
           {onStartCollaboration ? (
             <MenuItem onClick={run(onStartCollaboration)}>Start collaboration</MenuItem>
           ) : null}
-          <MenuItem onClick={run(() => openDashboard("/dashboard/settings/team"))}>Invite teammates</MenuItem>
-          <MenuItem onClick={run(() => openDashboard("/dashboard/settings/account"))}>Account settings</MenuItem>
+          {onAskAI ? <MenuItem onClick={run(onAskAI)}>Ask AI</MenuItem> : null}
         </MenuGroup>
+
+        {onOpenShortcuts ? (
+          <MenuGroup>
+            <MenuItem kbd="?" onClick={run(onOpenShortcuts)}>
+              Keyboard shortcuts
+            </MenuItem>
+          </MenuGroup>
+        ) : null}
       </Menu>
     </Popover>
   );

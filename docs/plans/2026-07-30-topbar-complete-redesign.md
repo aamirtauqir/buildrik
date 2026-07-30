@@ -356,11 +356,11 @@ finding above. Run with Claude Code or Codex; checkbox as you ship.
   - Nodes: IssueChip (0/warn/error/99+), 681:122 + cluster child + monogram, 642:3664 regroup (−Exit, "Open client view"), review-pill neutral variants (D7), publish success/failure toasts, confirm modal with top-3 list
   - Variables: NEW `bg-pill-neutral` surface token (eng D3) — add in Figma, re-export `figma-tokens.json`, run `node scripts/tokens/generate.mjs`
   - Verify: node ids recorded in component headers per DS contract
-- [ ] **T2 (P1, human: ~1 day / CC: ~45min)** — editor/ui — `Topbar` `tools` data props + new `IssueChip`
+- [x] **T2 (P1) — SHIPPED 2026-07-30 code-first** (IssueChip + formatIssueSummary SSOT copy + Topbar `tools` data slot + `published` state; Figma node ids pending T1 — as-built ledger pattern; contract tests 11+18 green) — editor/ui — `Topbar` `tools` data props + new `IssueChip`
   - Surfaced by: F21 (ReactNode slot reopens drift) + F15 (anatomy) + D6/D14
   - Files: `src/editor/ui/Topbar.tsx`, `src/editor/ui/IssueChip.tsx` (also exports `formatIssueSummary(errors, warnings)` — the ONE source for chip tooltip / aria / modal / announcement copy, eng D7), `ui.css`, contract tests
   - Verify: contract tests 0/warn/error/99+ + formatIssueSummary cases (0·0, warn-only, error-only, mixed, 99+); Gate 24 clean
-- [ ] **T3 (P1, human: ~2h / CC: ~15min)** — shell — SiteMenu regroup to §3
+- [x] **T3 (P1) — SHIPPED 2026-07-30** (5 named groups + labels, Exit row removed, "Open client view", ≥1-row group guard; regression asserts in StudioHeader.test) — shell — SiteMenu regroup to §3
   - Surfaced by: Pass 1 (12-orphan "More" dump) + D8 + D9 + eng D8 (all-conditional Share group)
   - Files: `src/editor/shell/SiteMenu.tsx` (+ guard: a group renders only when ≥1 row is present — the Share group is all-conditional and an empty `MenuGroup` div still draws its border-top)
   - Verify: existing menu tests + no "More" group renders + unpublished-site menu shows no empty group border
@@ -373,11 +373,11 @@ finding above. Run with Claude Code or Codex; checkbox as you ship.
   - Files: `useExportHandlers.ts` (the EXISTING outcome-toast owner at `:141` — enhance: success toast gains `action: {label:"View live"}`, failure toast gains `action: {label:"Try again"}` re-invoking publish; integrations-link failure branch untouched), `Topbar.tsx` (`PublishState` += `"published"` — transient "✓ Published" success tint, label in `PUBLISH_LABEL`), `AquibraStudio.tsx` (drive the transient from `publishJob.uiState === "published"` with a 2s timer back to ready), `StudioHeader.tsx` (header `aria-live` region announcing save + publish transitions), `SaveStatus.tsx` (REMOVE its own aria-live — the header region is the single pipe)
   - NOT here: a second toast source in StudioHeader (eng D10 killed it), a `publishError` prop for toasts (owner already has the error)
   - Verify: exactly ONE toast per outcome; "✓ Published" appears 2s then ready (Topbar contract test); each transition announces exactly ONCE (regression test for the SaveStatus removal)
-- [x] **T6 (P2) — LAYER SIDE SHIPPED 2026-07-30** (state broadcast + unmount cleanup + header event-map comment updated; 3 new tests green. The StudioHeader SUBSCRIBE side lands with T2 — a subscription with no cluster to feed would be dead code.) — canvas+shell — `ui:comment-mode-changed` read path
+- [x] **T6 (P2) — FULLY SHIPPED 2026-07-30** (layer broadcast + unmount cleanup + header mirror wired into the cluster's aria-pressed. NOTE — plan amendment at implementation: NO bar-side PAGE_CHANGED reset; CommentLayer survives page switches and re-scopes itself, so a bar reset would CREATE the desync the event prevents. The unmount emit covers real unmounts.) — canvas+shell — `ui:comment-mode-changed` read path
   - Surfaced by: F20 (one-way wiring) + eng D4 (state owner = CommentLayer, not engine)
   - Files: `editor/canvas/comments/CommentLayer.tsx` (emit `{on}` on every state change INCLUDING unmount cleanup — page switch mid-mode must emit `{on:false}` or the bar toggle sticks pressed, eng D16; also update its line-8 event-map header comment — stale diagrams mislead), `StudioHeader.tsx` (subscribe + reset pressed-state on PAGE/PROJECT change events as belt-and-braces)
   - Verify: Esc on canvas un-presses the bar button; page switch while comment mode ON un-presses; command event `ui:comment-mode` callers untouched
-- [ ] **T7 (P2, human: ~1h / CC: ~10min)** — shell — D14 copy rule replaces `issueNoun`
+- [x] **T7 (P2) — SHIPPED 2026-07-30** (issueNoun/issueLabel deleted; IssueChip owns copy; mixed-count regression test green) — shell — D14 copy rule replaces `issueNoun`
   - Surfaced by: F16 (1 error + 2 warnings currently reads "3 errors")
   - Files: `StudioHeader.tsx:448-454`
   - Verify: mixed counts render total + breakdown in tooltip/aria

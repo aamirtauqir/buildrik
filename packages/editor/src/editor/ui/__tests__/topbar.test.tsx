@@ -104,6 +104,48 @@ describe("Topbar", () => {
     render(<Topbar siteName="x" save="saved" unreadCount={4} />);
     expect(screen.getByRole("button", { name: "Notifications, 4 unread" })).toBeTruthy();
   });
+
+  // ── tools cluster (plan §2, eng D12) ──────────────────────────────────────
+  it("no tools, no cluster — the bar renders exactly what it receives", () => {
+    render(<Topbar siteName="x" save="saved" />);
+    expect(screen.queryByRole("button", { name: "Quick preview" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Comments" })).toBeNull();
+  });
+
+  it("the container composes the cluster: only passed fields render", () => {
+    render(<Topbar siteName="x" save="saved" tools={{ onToggleComments: vi.fn() }} />);
+    expect(screen.getByRole("button", { name: "Comments" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Quick preview" })).toBeNull();
+  });
+
+  it("previewBusy is disabled + aria-busy — re-clicks cannot stack exports", () => {
+    const onPreview = vi.fn();
+    render(<Topbar siteName="x" save="saved" tools={{ onPreview, previewBusy: true }} />);
+    const btn = screen.getByRole("button", { name: "Quick preview" });
+    expect(btn).toBeDisabled();
+    expect(btn.getAttribute("aria-busy")).toBe("true");
+    fireEvent.click(btn);
+    expect(onPreview).not.toHaveBeenCalled();
+  });
+
+  it("Comments carries aria-pressed from the container's mirrored state", () => {
+    const { rerender } = render(
+      <Topbar siteName="x" save="saved" tools={{ onToggleComments: vi.fn(), commentsPressed: false }} />,
+    );
+    expect(screen.getByRole("button", { name: "Comments" }).getAttribute("aria-pressed")).toBe("false");
+    rerender(
+      <Topbar siteName="x" save="saved" tools={{ onToggleComments: vi.fn(), commentsPressed: true }} />,
+    );
+    expect(screen.getByRole("button", { name: "Comments" }).getAttribute("aria-pressed")).toBe("true");
+  });
+
+  // ── publish=published (plan D10, eng D11) ─────────────────────────────────
+  it("published is the 2s success transient — disabled, restyled, honest label", () => {
+    render(<Topbar siteName="x" save="saved" publish="published" />);
+    const btn = screen.getByRole("button", { name: "✓ Published" });
+    expect(btn).toBeDisabled();
+    expect(btn.className).toContain("bk-topbar__published");
+  });
 });
 
 describe("SaveStatus", () => {

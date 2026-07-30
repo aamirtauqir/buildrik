@@ -195,6 +195,20 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
 
   const [cmdOpen, setCmdOpen] = React.useState(false);
   const [notifOpen, setNotifOpen] = React.useState(false);
+  // T6 (read path): the bar MIRRORS comment-mode state — CommentLayer owns it
+  // and broadcasts ui:comment-mode-changed on every change including its
+  // unmount cleanup. Deliberately NO reset here on PAGE_CHANGED: the layer
+  // survives page switches (it re-scopes itself), so a bar-side reset would
+  // create the exact desync the state event exists to prevent.
+  const [commentsOn, setCommentsOn] = React.useState(false);
+  React.useEffect(() => {
+    if (!composer) return;
+    const onChanged = (p: { on?: boolean }) => setCommentsOn(Boolean(p?.on));
+    composer.on("ui:comment-mode-changed", onChanged);
+    return () => {
+      composer.off("ui:comment-mode-changed", onChanged);
+    };
+  }, [composer]);
   const headerRef = React.useRef<HTMLDivElement | null>(null);
   const { count: unread, refresh: refreshUnread } = useUnreadCount();
 
@@ -447,11 +461,8 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
 
   const errorCount = issues.filter((i) => i.type === "error").length;
   const warnCount = issues.filter((i) => i.type === "warning").length;
-  const issueCount = errorCount + warnCount;
-  // Errors decide the word and the colour: one error among nine warnings is
-  // still the thing that blocks a publish.
-  const issueNoun = errorCount > 0 ? "error" : "warning";
-  const issueLabel = `${issueNoun}${issueCount === 1 ? "" : "s"}`;
+  // T7/D14: the old errors-noun label ("3 errors" for 1 error + 2 warnings)
+  // is gone — the IssueChip owns count copy via formatIssueSummary.
 
   // A blocked publish is shown disabled with its reason, never hidden — the
   // user must be able to find out why (P6 permissions boards).
@@ -463,6 +474,26 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         ? "Can't publish while offline"
         : undefined;
   const publish: PublishState = publishBlockedReason ? "disabled" : errorCount > 0 ? "anyway" : "ready";
+
+  // Plan §2/eng D12: the CONTAINER composes the tool cluster per role/view —
+  // the bar renders exactly what it receives. Client view is itself a preview,
+  // so it gets Comments only; viewers keep the chip with the fix door
+  // labelled shut.
+  const toggleComments = composer ? () => composer.emit("ui:comment-mode", {}) : undefined;
+  const tools = viewMode.clientView
+    ? { commentsPressed: commentsOn, onToggleComments: toggleComments }
+    : {
+        onPreview: handlePreview,
+        previewBusy: previewLoading,
+        commentsPressed: commentsOn,
+        onToggleComments: toggleComments,
+        issues: {
+          errors: errorCount,
+          warnings: warnCount,
+          onClick: onOpenIssues,
+          readOnlyReason: isViewer ? "ask an editor to fix these" : undefined,
+        },
+      };
 
   const pill = REVIEW_PILL[reviewStatus.state];
   const review: ReviewPill | null = pill
@@ -487,6 +518,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         savedAt={lastSavedAt ?? lastSaved?.getTime()}
         onSave={onSave}
         review={review}
+        tools={tools}
         presence={
           // A reconnecting session still has collaborators in it — hiding them
           // mid-drop reads as "everyone left", which is the wrong alarm.
@@ -522,11 +554,6 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
             onOpenTemplates={onOpenTemplates}
             onOpenComponents={onOpenComponents}
             onOpenShortcuts={onOpenShortcuts}
-            onExit={exitToDashboard}
-            onPreview={handlePreview}
-            onToggleComments={composer ? () => composer.emit("ui:comment-mode", {}) : undefined}
-            issueCount={issueCount}
-            onOpenIssues={onOpenIssues}
             onAskAI={viewMode.fourToolRail ? onShowAI : undefined}
             onStartCollaboration={collabOn && !isConnected ? startCollab : undefined}
             onOpenDesignSystem={onOpenDesignSystem}

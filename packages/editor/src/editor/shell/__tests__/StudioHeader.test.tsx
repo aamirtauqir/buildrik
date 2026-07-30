@@ -129,15 +129,44 @@ describe("StudioHeader", () => {
       },
     );
 
-    it("carries no issue pill — issues are a site-menu entry now", () => {
+    // Topbar redesign D6/D14: the IssueChip is a permanent bar anchor with the
+    // honest total+breakdown copy (the old errors-noun label mislabelled
+    // 1 error + 2 warnings as "3 errors" — regression-critical).
+    it("carries the IssueChip with total count and severity breakdown", () => {
       render(
         <StudioHeader
           {...makeProps({
-            issues: [{ id: "1", type: "error", message: "x" }] as StudioHeaderProps["issues"],
+            onOpenIssues: vi.fn(),
+            issues: [
+              { id: "1", type: "error", message: "x" },
+              { id: "2", type: "warning", message: "y" },
+              { id: "3", type: "warning", message: "z" },
+            ] as StudioHeaderProps["issues"],
           })}
         />,
       );
-      expect(screen.queryByRole("button", { name: /error|warning|issue/i })).toBeNull();
+      const chip = screen.getByRole("button", { name: "3 issues, 1 error" });
+      expect(chip.textContent).toBe("3");
+    });
+
+    it("the chip stays visible at zero issues — the all-clear anchor (D6)", () => {
+      render(<StudioHeader {...makeProps({ onOpenIssues: vi.fn(), issues: [] })} />);
+      expect(screen.getByRole("button", { name: "No issues" })).toBeTruthy();
+    });
+
+    it("viewers get the chip with the fix door labelled shut", () => {
+      roleState.role = "VIEWER";
+      render(
+        <StudioHeader
+          {...makeProps({
+            onOpenIssues: vi.fn(),
+            issues: [{ id: "1", type: "warning", message: "x" }] as StudioHeaderProps["issues"],
+          })}
+        />,
+      );
+      expect(
+        screen.getByRole("button", { name: /1 issue, 1 warning — ask an editor to fix these/ }),
+      ).toBeTruthy();
     });
   });
 
@@ -368,12 +397,13 @@ describe("StudioHeader", () => {
       onOpenIssues: vi.fn(),
     };
 
-    // Figma popover/site-menu 642:3664 — items, order and grouping.
-    it("opens with the designed items first, in the designed order", () => {
+    // Topbar redesign §3 (D8/D9, eng D8) — five named groups, no "More" dump,
+    // no Exit row, "Open client view" naming.
+    it("opens with the regrouped items in plan order", () => {
       render(<StudioHeader {...makeProps(menuProps)} />);
       fireEvent.click(screen.getByRole("button", { name: "Site menu" }));
       const labels = screen.getAllByRole("menuitem").map((i) => i.textContent);
-      expect(labels.slice(0, 8)).toEqual([
+      expect(labels).toEqual([
         "Site settings⌘,",
         // F6: jsdom's navigator.platform is not macOS, so the hint is the
         // chord that actually works there (the handler takes ctrl OR meta).
@@ -382,22 +412,27 @@ describe("StudioHeader", () => {
         "Export code",
         "Templates",
         "Components⇧A",
+        "Open client view",
+        "Invite teammates",
+        "Account settings",
         "Keyboard shortcuts?",
-        "Exit to dashboard",
       ]);
     });
 
-    it("keeps the designed items and the extras in separate groups", () => {
+    it("groups carry their plan names — the 'More' dump is gone (regression D8)", () => {
       render(<StudioHeader {...makeProps(menuProps)} />);
       fireEvent.click(screen.getByRole("button", { name: "Site menu" }));
-      expect(screen.getByRole("menu").querySelectorAll('[role="group"]').length).toBe(4);
-      expect(screen.getByText("More")).toBeTruthy();
+      expect(screen.getByText("Site")).toBeTruthy();
+      expect(screen.getByText("Build")).toBeTruthy();
+      expect(screen.getByText("Share")).toBeTruthy();
+      expect(screen.getByText("Workspace")).toBeTruthy();
+      expect(screen.queryByText("More")).toBeNull();
+      // D8: Exit lives ONLY on the bar's ‹ Exit — no menu duplicate.
+      expect(screen.queryByRole("menuitem", { name: /Exit/ })).toBeNull();
     });
 
-    // Each of these is the only way to reach a feature that ships. They live
-    // below the designed set rather than being deleted to match the mock.
-    it.each(["Preview site", "Issues", "Preview as client", "Invite teammates", "Account settings"])(
-      "keeps %s reachable, since the design names no other home for it",
+    it.each(["Open client view", "Invite teammates", "Account settings"])(
+      "keeps %s reachable in the menu",
       (label) => {
         render(<StudioHeader {...makeProps(menuProps)} />);
         fireEvent.click(screen.getByRole("button", { name: "Site menu" }));
@@ -405,51 +440,44 @@ describe("StudioHeader", () => {
       },
     );
 
-    it("Preview site opens the shell overlay — ⌘P is a different feature", async () => {
+    it("Quick preview in the bar opens the shell overlay — ⌘P is a different feature", async () => {
       const onInlinePreview = vi.fn();
       render(<StudioHeader {...makeProps({ ...menuProps, onInlinePreview })} />);
-      fireEvent.click(screen.getByRole("button", { name: "Site menu" }));
-      fireEvent.click(screen.getByRole("menuitem", { name: "Preview site" }));
+      fireEvent.click(screen.getByRole("button", { name: "Quick preview" }));
       // F7-B2: the export runs a tick later so the loading state can paint.
       await waitFor(() => expect(onInlinePreview).toHaveBeenCalledTimes(1));
     });
 
-    it("Comments toggles canvas comment mode — the menu row for the C shortcut", () => {
-      const emit = vi.fn();
+    it("the bar's Comments toggle emits the command and mirrors the state event", () => {
+      const handlers = new Map<string, Set<(p?: unknown) => void>>();
+      const emit = vi.fn((ev: string, p?: unknown) => {
+        handlers.get(ev)?.forEach((fn) => fn(p));
+      });
       const composer = {
-        on: vi.fn(),
-        off: vi.fn(),
+        on: vi.fn((ev: string, fn: (p?: unknown) => void) => {
+          if (!handlers.has(ev)) handlers.set(ev, new Set());
+          handlers.get(ev)!.add(fn);
+        }),
+        off: vi.fn((ev: string, fn: (p?: unknown) => void) => handlers.get(ev)?.delete(fn)),
         emit,
         getProjectMetadata: vi.fn(() => ({ name: "x" })),
         exportHTML: vi.fn(() => ({ combined: "" })),
       } as unknown as StudioHeaderProps["composer"];
       render(<StudioHeader {...makeProps({ composer })} />);
-      fireEvent.click(screen.getByRole("button", { name: "Site menu" }));
-      fireEvent.click(screen.getByRole("menuitem", { name: /^Comments/ }));
+      const btn = screen.getByRole("button", { name: "Comments" });
+      expect(btn.getAttribute("aria-pressed")).toBe("false");
+      fireEvent.click(btn);
       expect(emit).toHaveBeenCalledWith("ui:comment-mode", {});
+      // T6: pressed state follows the layer's broadcast, not the click.
+      act(() => emit("ui:comment-mode-changed", { on: true }));
+      expect(screen.getByRole("button", { name: "Comments" }).getAttribute("aria-pressed")).toBe("true");
+      act(() => emit("ui:comment-mode-changed", { on: false }));
+      expect(screen.getByRole("button", { name: "Comments" }).getAttribute("aria-pressed")).toBe("false");
     });
 
-    it("no composer, no Comments row — a toggle with nothing to toggle", () => {
+    it("no composer, no Comments toggle — nothing to toggle", () => {
       render(<StudioHeader {...makeProps()} />);
-      fireEvent.click(screen.getByRole("button", { name: "Site menu" }));
-      expect(screen.queryByRole("menuitem", { name: /^Comments/ })).toBeNull();
-    });
-
-    it("counts open issues on the row", () => {
-      render(
-        <StudioHeader
-          {...makeProps({
-            ...menuProps,
-            onOpenIssues: vi.fn(),
-            issues: [
-              { id: "1", type: "error", message: "x" },
-              { id: "2", type: "warning", message: "y" },
-            ] as StudioHeaderProps["issues"],
-          })}
-        />,
-      );
-      fireEvent.click(screen.getByRole("button", { name: "Site menu" }));
-      expect(screen.getByRole("menuitem", { name: "Issues (2)" })).toBeTruthy();
+      expect(screen.queryByRole("button", { name: "Comments" })).toBeNull();
     });
 
     it("offers the live URL only once the site has one", () => {
@@ -702,8 +730,7 @@ describe("F7 perf pair", () => {
           {...makeProps({ composer: asComposer(composer), onSetPreviewLoading, onInlinePreview })}
         />,
       );
-      fireEvent.click(screen.getByRole("button", { name: "Site menu" }));
-      fireEvent.click(screen.getByRole("menuitem", { name: "Preview site" }));
+      fireEvent.click(screen.getByRole("button", { name: "Quick preview" }));
       expect(onSetPreviewLoading).toHaveBeenCalledWith(true);
       expect(composer.exportHTML).not.toHaveBeenCalled();
       act(() => {
