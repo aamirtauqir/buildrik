@@ -2221,3 +2221,123 @@ Verified: `npx tsc --noEmit` clean (no orphan import). `grep -rn
 2-test `ProgressRow` block was removed with the component it tested).
 No `pnpm flowbite:classlist` run needed — no flowbite import was ever
 added (deletion, not a swap).
+
+### SkeletonCompounds → `editor/ui/` → `chrome-ui/Skeleton.tsx` (partial swap: base→`tw:animate-pulse`, boot spinner→flowbite `Spinner`)
+
+Scoped exactly as the Round-5 handoff note predicted: `SkeletonListItem`/
+`StudioSkeleton` are genuine layout compositions (a whole boot-screen
+layout, a whole list-row layout), not a single primitive with a direct
+flowbite target — only the internal `SkeletonBlock` pulse piece and
+`StudioSkeleton`'s rotating loader map onto flowbite/Tailwind concepts.
+3 real consumers via a JSX-tag sweep: `sidebar/SidebarFallbacks.tsx`,
+`sidebar/tabs/ComponentsTab.tsx` (`SkeletonListItem`), `shell/
+AquibraStudio.tsx` (`StudioSkeleton`) — none in `shared/forms/`, so unlike
+`FormField`/`Slider` the `shared/→editor` edge constraint doesn't apply
+and the move to `chrome-ui/` (the brief's own instruction, "they're chrome
+layouts... unless consumer-edge says otherwise") goes through with no
+override needed.
+
+**SkeletonBlock** (internal helper, was `.bk-skeleton`/`.bk-skeleton--circle`
++ a hand-rolled `@keyframes bk-skeleton-pulse`) → Tailwind's own
+`tw:animate-pulse` utility + `tw:bg-gray-100` (`--bk-bg-subtle` = `#F3F4F6`
+= `gray-100` exactly) + `tw:rounded`/`tw:rounded-full`. Accepted as a shape
+difference, same bar every prior component used for a flowbite/Tailwind
+default: 2s pulse duration vs the deleted rule's 1.4s, min-opacity 0.5 vs
+0.55 — cosmetic, not a regression, for a decorative loading placeholder.
+Kept `bk-skeleton`/`bk-skeleton--circle` as vestigial marker classNames
+(no CSS rule backs them anymore) — same "stable test-selector hook" role
+`chrome-ui/TextField.tsx` established for `bk-input`.
+
+**StudioSkeleton's rotating boot spinner** (was a plain div using the
+`border-top-color` CSS trick + `@keyframes bk-studio-spin`) → flowbite-
+react's `Spinner` (an SVG double-ring icon, `role="status"` — a small a11y
+upgrade over a bare unlabelled div, verified harmless: its content never
+changes so no announcement fires). Checked `Spinner`'s theme/rendering
+before assuming any prop shape (`Spinner.js`): unlike most swapped
+components, top-level `className` lands directly on the real `<svg>` — no
+wrapper-div gap — so no `theme`-prop adapter was needed for sizing.
+**Color did need one, though**, same "-700 is the only exact step, don't
+assume from a prior component" finding this arc keeps re-confirming: read
+`flowbite-react/plugin/tailwindcss/colors.js` directly rather than
+guessing — `primary.700 = "#1A56DB"` (exact `--bk-accent` match),
+`primary.600 = "#1C64F2"` (flowbite `Spinner`'s **default** `color`,
+`fill-primary-600` — one step off, same gap as Checkbox/Radio's default).
+Fixed via `theme={{ color: { default: "tw:fill-primary-700" } }}`. Size:
+none of `xs`/`sm`/`md`/`lg`/`xl` (12/16/24/32/40px) reach the deleted
+rule's 48px, so `size="xl"` + `className="tw:h-12 tw:w-12"` (a real
+Tailwind step, 3rem = 48px, exact match to `--bk-space-48` — no arbitrary
+value needed) evicts `theme.size.xl`'s `h-10 w-10` via ordinary
+tailwind-merge conflict resolution. Track-ring color needed no override —
+flowbite's `theme.base` default `text-gray-200` (`#E5E7EB`) already
+matches `--bk-border` exactly.
+
+**Reduced-motion handling simplified, not just ported**: the deleted
+component had a `useReducedMotion()` hook (`matchMedia` + a change
+listener) that set `style={{ animation: "none" }}` on the spinner div.
+Replaced with Tailwind's own `tw:motion-reduce:animate-none` variant
+class on the `Spinner` — a real `@media (prefers-reduced-motion: reduce)`
+block Tailwind's own build emits (verified in the compiled CSS, correctly
+wrapped in the media query, not a bare unconditional rule), not a new
+hand-authored file competing with `a11y.css`'s "only file allowed
+`@media (prefers-*)`" rule (that rule is about hand-written CSS files;
+Tailwind's own generated variant output is a different, already-sanctioned
+mechanism — the same one every `tw:hover:`/`tw:focus:` class already
+relies on). The hook and its `useEffect`/listener are gone — dead code
+that would otherwise have had to be ported for no behavioral gain.
+
+**Layout-only CSS moved verbatim, not converted.** Every `--bk-space-N`
+value in the deleted `ui.css` block turns out to map onto Tailwind's
+default spacing scale *exactly* (`--bk-space-36` = `w-9`/`h-9`,
+`--bk-space-48` = `h-12`, etc. — `0.25rem` per step, confirmed via the
+already-compiled `h-2 { height: calc(var(--tw-spacing) * 2) }` rule from
+an earlier round), which made a full tw:* rewrite of the remaining
+row/boot-screen layout genuinely possible — but the STANDING RULES'
+"tw:* only" mandate is about draining flowbite-adjacent CSS ownership, not
+about rewriting every unrelated layout rule a moving component happens to
+carry (same principle `slider.css` already established: bespoke,
+non-flowbite layout stays as plain `--bk-*`-token CSS, just relocated).
+Moved the row/boot-screen rules (`.bk-skeleton-list-item*`,
+`.bk-studio-skeleton*` minus `__spinner`/`@keyframes bk-studio-spin`,
+which are gone) **verbatim** to a new unlayered stylesheet,
+`chrome-ui/skeleton.css`, imported directly by the new `Skeleton.tsx` —
+same precedent `editor/ui/slider.css` set this round, now proven to
+extend cleanly into `chrome-ui/` too (the "unlayered wins" mechanism is
+about the import path, not the folder).
+
+**Deleted:** `src/editor/ui/SkeletonCompounds.tsx`, its `ui.css` block (all
+of `.bk-skeleton*`/`@keyframes bk-skeleton-pulse`/`.bk-skeleton-list-item*`
+/`.bk-studio-skeleton*`/`@keyframes bk-studio-spin`), its `editor/ui/
+index.ts` export line. **Added:** `chrome-ui/Skeleton.tsx`,
+`chrome-ui/skeleton.css`, `chrome-ui/index.ts` export line,
+`chrome-ui/__tests__/Skeleton.test.tsx` (moved + updated from
+`ui/__tests__/molecules.test.tsx`'s `describe("SkeletonCompounds", ...)`
+block — `.bk-skeleton` queries stay valid via the vestigial marker class;
+the spinner assertion now queries `role="status"` and checks for
+`tw:animate-spin` on the real, runtime-prefixed class list rather than
+the deleted `.bk-studio-skeleton__spinner` CSS selector).
+
+**Orphan check:** `grep -rn "bk-skeleton\|bk-studio-skeleton\|
+SkeletonCompounds" src` after the move found zero hits outside the 3 new
+`chrome-ui/` files.
+
+**Compiled-CSS proof**: ran `npx vite build`, grepped the emitted CSS —
+`.tw\:fill-primary-700{fill:#1a56db}`, `.tw\:animate-spin{...}`, and
+`@media(prefers-reduced-motion:reduce){.tw\:motion-reduce\:animate-none
+{animation:none}}` (correctly media-wrapped, not unconditional) all
+present; `.bk-studio-skeleton__label{...}` (an unlayered `skeleton.css`
+rule) also present and untouched by the layer system. `dist/` removed
+after the check (gitignored).
+
+**Class-list regen:** `pnpm flowbite:classlist` — 11 new entries
+(`tw:animate-spin`, `tw:inline`, `tw:text-gray-200`, and the 8
+`tw:fill-*` color-map entries `Spinner` newly needed). `.flowbite-react/
+init.tsx` byproduct deleted again (same standing reason every prior round
+gives).
+
+Verified: `npx tsc --noEmit` clean. Targeted run: `chrome-ui/__tests__/
+Skeleton.test.tsx` + `ui/__tests__` + `sidebar/tabs/component-library/
+__tests__/ComponentsTab.test.tsx` + `sidebar/__tests__/
+LeftSidebarRailClick.test.tsx` + `sidebar/__tests__/TabRouter.mapping.
+test.tsx` + `rail/__tests__/LayoutShell.test.tsx` + `shell/__tests__/
+AquibraStudio.wiring.test.ts` + `shell/modals/__tests__/ConflictModal.
+test.tsx` — 18 test files / 183 tests green.

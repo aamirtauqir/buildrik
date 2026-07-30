@@ -80,5 +80,4 @@ export { HelpTooltip, type HelpTooltipProps } from "./HelpTooltip";
 /* ── Extensions drain · ported from shared/extensions ───────────────────── */
 export { PanelHeaderActions, type PanelHeaderActionsProps } from "./PanelHeader";
 export { CopyButton, type CopyButtonProps } from "./CopyButton";
-export { SkeletonListItem, StudioSkeleton, type SkeletonListItemProps } from "./SkeletonCompounds";
 export { UpgradeModal, type UpgradeModalProps } from "./UpgradeModal";

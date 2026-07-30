@@ -6,7 +6,8 @@
  */
 
 import * as React from "react";
-import { SkeletonListItem, Stack } from "@/editor/ui";
+import { Stack } from "@/editor/ui";
+import { SkeletonListItem } from "@/editor/chrome-ui";
 import { Button } from "flowbite-react";
 
 /** Loading skeleton shown while lazy-loaded tab chunks download */

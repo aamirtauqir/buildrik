@@ -205,7 +205,7 @@ describe("BreakpointSwitcher", () => {
 });
 
 /* ── Extensions drain · ported from shared/extensions ───────────────────── */
-import { PanelHeaderActions, CopyButton, SkeletonListItem, StudioSkeleton, UpgradeModal, ToastProvider } from "../index";
+import { PanelHeaderActions, CopyButton, UpgradeModal, ToastProvider } from "../index";
 
 describe("PanelHeaderActions", () => {
   it("renders only the buttons whose callbacks are provided, labelled by context", () => {
@@ -237,22 +237,6 @@ describe("CopyButton", () => {
     expect(writeText).toHaveBeenCalledWith("hello");
     expect(await screen.findByRole("button", { name: "Copied" })).toBeTruthy();
     expect(screen.getByText("Copied!")).toBeTruthy();
-  });
-});
-
-describe("SkeletonCompounds", () => {
-  it("SkeletonListItem hides its blocks from assistive tech and honours the flags", () => {
-    const { container } = render(<SkeletonListItem hasAvatar avatarSize={24} textLines={1} hasAction />);
-    const blocks = container.querySelectorAll(".bk-skeleton");
-    expect(blocks.length).toBe(3); // avatar + one line + action
-    blocks.forEach((b) => expect(b.getAttribute("aria-hidden")).toBe("true"));
-    expect(container.querySelector(".bk-skeleton--circle")).toBeTruthy();
-  });
-
-  it("StudioSkeleton renders the boot screen with its loading label", () => {
-    const { container } = render(<StudioSkeleton />);
-    expect(screen.getByText("INITIALIZING ENGINE")).toBeTruthy();
-    expect(container.querySelector(".bk-studio-skeleton__spinner")).toBeTruthy();
   });
 });
 

@@ -10,8 +10,9 @@
 
 import { ChevronDown, Layers, Plus } from "lucide-react";
 import * as React from "react";
-import { ConfirmDialog, EmptyState, EmptyStateDesc, EmptyStateTitle, ModalClose, ModalContent, ModalRoot, ModalTitle, Portal, PanelFrame, SkeletonListItem, Stack } from "@/editor/ui";
+import { ConfirmDialog, EmptyState, EmptyStateDesc, EmptyStateTitle, ModalClose, ModalContent, ModalRoot, ModalTitle, Portal, PanelFrame, Stack } from "@/editor/ui";
 import { useToast } from "@/editor/ui";
+import { SkeletonListItem } from "@/editor/chrome-ui";
 import { PanelErrorState } from "../shared/PanelErrorState";
 import { SearchBar } from "../shared/SearchBar";
 import { ComponentDetailScreen } from "./component-library/ComponentDetailScreen";
