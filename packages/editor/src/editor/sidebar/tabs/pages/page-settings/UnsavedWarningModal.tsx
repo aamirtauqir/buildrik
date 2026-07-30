@@ -12,7 +12,7 @@
  */
 
 import * as React from "react";
-import { ModalContent as VibcoderModalContent, ModalRoot, ModalTitle, Portal, Stack } from "@/editor/ui";
+import { ModalContent as VibcoderModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/ui";
 import { ROW_MD } from "@shared/constants/layout";
 import { Button } from "flowbite-react";
 
@@ -60,7 +60,7 @@ export const UnsavedWarningModal: React.FC<Props> = ({
           }}
         >
           <div className="bd-modal__body">
-      <Stack gap="xs">
+      <div className="tw:flex tw:flex-col tw:gap-1">
         {/* Title */}
         <ModalTitle
           style={{
@@ -113,7 +113,7 @@ export const UnsavedWarningModal: React.FC<Props> = ({
             Save &amp; Switch
           </Button>
         </div>
-      </Stack>
+      </div>
           </div>
         </ModalContent>
       </ModalRoot>

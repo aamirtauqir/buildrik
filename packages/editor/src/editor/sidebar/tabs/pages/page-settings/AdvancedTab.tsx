@@ -5,7 +5,6 @@
  */
 
 import * as React from "react";
-import { Stack } from "@/editor/ui";
 import type { UsePageSettingsReturn } from "./usePageSettings";
 import { Button, HelperText, Label, Textarea, ToggleSwitch, TextInput } from "flowbite-react";
 import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
@@ -17,9 +16,9 @@ interface Props {
 
 export const AdvancedTab: React.FC<Props> = ({ s }) => {
   return (
-    <Stack gap="lg" style={{ gap: 18 }}>
+    <div className="tw:flex tw:flex-col tw:gap-[18px]">
       {/* Visibility */}
-      <Stack gap="sm">
+      <div className="tw:flex tw:flex-col tw:gap-2">
         <div style={{ font: "600 11px var(--bk-font-ui)", color: "var(--bk-ink)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
           Visibility
         </div>
@@ -54,7 +53,7 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
           {s.visibility === "hidden" && "Page is not linked in menus but reachable via direct URL."}
           {s.visibility === "password" && "Visitors must enter a password to view this page."}
         </HelperText>
-      </Stack>
+      </div>
       {/* Password input — only when visibility=password */}
       {s.visibility === "password" && (
         <div style={{ padding: 10, background: "var(--bk-bg-subtle)", border: "1px solid var(--bk-border)", borderRadius: 4, display: "flex", flexDirection: "column", gap: "var(--bk-space-8)" }}>
@@ -78,27 +77,27 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
         </div>
       )}
       {/* Indexing */}
-      <Stack gap="sm">
+      <div className="tw:flex tw:flex-col tw:gap-2">
         <div style={{ font: "600 11px var(--bk-font-ui)", color: "var(--bk-ink)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
           Search Engine Indexing
         </div>
         <div className="tw:flex tw:flex-nowrap tw:items-center tw:justify-between tw:gap-2">
-          <Stack gap="xs">
+          <div className="tw:flex tw:flex-col tw:gap-1">
             <Label className={BK_LABEL_CLASS}>Allow indexing</Label>
             <HelperText className={BK_HELPER_CLASS}>Let search engines list this page in results.</HelperText>
-          </Stack>
+          </div>
           <ToggleSwitch checked={s.allowIndex} onChange={() => s.setAllowIndex(!s.allowIndex)} aria-label="Allow indexing" />
         </div>
         <div className="tw:flex tw:flex-nowrap tw:items-center tw:justify-between tw:gap-2">
-          <Stack gap="xs">
+          <div className="tw:flex tw:flex-col tw:gap-1">
             <Label className={BK_LABEL_CLASS}>Follow links</Label>
             <HelperText className={BK_HELPER_CLASS}>Let search engines follow outbound links on this page.</HelperText>
-          </Stack>
+          </div>
           <ToggleSwitch checked={s.allowFollow} onChange={() => s.setAllowFollow(!s.allowFollow)} aria-label="Follow links" />
         </div>
-      </Stack>
+      </div>
       {/* Head code */}
-      <Stack gap="sm">
+      <div className="tw:flex tw:flex-col tw:gap-2">
         <div style={{ font: "600 11px var(--bk-font-ui)", color: "var(--bk-ink)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
           Custom &lt;head&gt; code
         </div>
@@ -114,8 +113,8 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
         />
         {s.headCodeError && <HelperText color="failure" className={BK_HELPER_ERROR_CLASS}>{s.headCodeError}</HelperText>}
         <HelperText className={BK_HELPER_CLASS}>Injected into the &lt;head&gt; of this page only. Sanitized before save.</HelperText>
-      </Stack>
-    </Stack>
+      </div>
+    </div>
   );
 };
 

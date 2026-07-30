@@ -2392,3 +2392,139 @@ change the verdict — it's recorded for completeness, not as the reason.
 
 **Verdict: KEEP, unchanged.** No code touched, no commit for this
 component — this entry is the decision record.
+
+### Stack dissolve → `tw:flex` at call sites (Round: sidebar/tabs/pages/page-settings group 1/N)
+
+**Scoping correction made before touching anything.** The remaining-work
+list names this item "Stack + Row dissolve" with a prop mapping
+("gap/align/justify map to tw:gap-N/tw:items-*/tw:justify-*") that matches
+`Stack`'s actual API (`gap`/`row`/`separator`) but does **not** match the
+separate `src/editor/ui/Row.tsx` component's real API (`size`/
+`interactive`/`selected`/`disabled` — a Figma component-set 8:47
+interactive list-row primitive with keyboard handling, ARIA `aria-selected`
+/`aria-disabled`, hover/focus-visible states, 5 height variants). Read
+`Row.tsx` in full before assuming it was in scope: it is not a plain flex
+wrapper — dissolving it to raw `tw:flex` divs at its ~10 real call sites
+would delete real behavior (keyboard activation, selection/disabled
+semantics) for a component every list surface in the editor depends on. It
+almost certainly stayed in the plan text from an earlier draft that didn't
+survive contact with the actual code (`Cluster`, already dissolved in
+Round 5, is the component this line's description actually matches).
+**Verdict: `Row` is out of scope for this dissolve — it needs the same
+"KEEP or move-to-chrome-ui-and-restyle" treatment Task 4's Modal/Dropdown/
+Popover/Toast got, not a dissolve, and that's a separate decision for
+whoever picks up the remaining Stack surfaces to make explicitly (not
+silently assumed) when they get there.** Only `Stack` itself is being
+dissolved under this task item.
+
+**`Stack.tsx` prop → CSS mapping** (read `Stack.tsx` + its `ui.css` block
+before writing any call site):
+
+| Stack prop | Old CSS | `tw:*` equivalent |
+|---|---|---|
+| (base, column) | `display:flex; flex-direction:column;` | `tw:flex tw:flex-col` |
+| `row` | `flex-direction:row; align-items:center;` | `tw:flex-row tw:items-center` (replaces `tw:flex-col`) |
+| `gap="xs"` | `gap: var(--bk-space-4)` (4px) | `tw:gap-1` |
+| `gap="sm"` | `gap: var(--bk-space-8)` (8px) | `tw:gap-2` |
+| `gap="md"` (default) | `gap: var(--bk-space-12)` (12px) | `tw:gap-3` |
+| `gap="lg"` | `gap: var(--bk-space-16)` (16px) | `tw:gap-4` |
+| `gap="xl"` | `gap: var(--bk-space-24)` (24px) | `tw:gap-6` |
+| `separator` (column only — no real call site combines `row`+`separator`, confirmed by grep) | `> * + * { border-top: 1px solid var(--bk-border); padding-top: var(--bk-space-12); }` | `tw:divide-y tw:divide-gray-200 tw:[&>*+*]:pt-3` (`--bk-border` = `#E5E7EB` = `gray-200` exactly) |
+
+Every `--bk-space-N` step maps **exactly** onto Tailwind's default spacing
+scale (`0.25rem` per step, confirmed against the already-compiled
+`h-2 { height: calc(var(--tw-spacing) * 2) }` rule from an earlier round)
+— no arbitrary values needed for any of the enum steps themselves.
+**Real call sites frequently override the enum via an inline `style={{
+gap: N }}`**, though — inline style always wins the cascade, so the
+*effective* rendered gap is the style value, not the `gap=` prop's
+semantic one, and the dissolve has to preserve the effective value, not
+the prop. Where that literal doesn't land on a Tailwind step (`18`, `14`,
+`2`→`0.5` step, `6`→`1.5` step, `10`→arbitrary), used the most exact means
+available: real steps first (`gap-0.5`=2px, `gap-1.5`=6px
+are both real half-step entries in Tailwind's scale, not arbitrary),
+`tw:gap-[Npx]` arbitrary values only when no real step lands on the exact
+pixel value (18px, 14px). One site (`SocialTab.tsx`'s OG-card meta block)
+also carried a `padding: "10px var(--bk-space-12)"` inline style on the
+same element — split into `tw:px-3` (12px, a real step) + `tw:py-[10px]`
+(10px, arbitrary — Tailwind has no 2.5-step) rather than left as a
+residual inline style, since fully draining the `<Stack>` usage to a
+plain `<div>` with only `className` was achievable without any accuracy
+loss.
+
+**Group 1: `sidebar/tabs/pages/page-settings/` — `AdvancedTab.tsx`,
+`SocialTab.tsx`, `SeoTab.tsx`, `UnsavedWarningModal.tsx`.** 15 of the 51
+real `<Stack` JSX sites (52 raw grep hits total across 29 files; one hit
+was a false-position collision, confirmed by the JSX-tag-only recount).
+Chose this cluster first because it's self-contained (one directory,
+already-swapped consumers of `TextInput`/`Textarea`/`Label`/`HelperText`/
+`ToggleSwitch`/`Tooltip` from earlier rounds, no cross-file coupling) and
+because it's the single densest concentration in the whole remaining set.
+Every site in this group converts 1:1 to `<div className="tw:flex
+tw:flex-col tw:gap-N">...</div>` — none used `row` or (except one) 
+`separator`; none needed the `divide-y` treatment since the sole
+`separator` user — `InspectorTabContent.tsx` — lives in a different
+surface group, not this one. `Stack` import line removed from all 4 files
+(each file's only `@/editor/ui` import was `Stack` alone, or `Stack`
+alongside other names now trimmed).
+
+**Not deleted this round:** `src/editor/ui/Stack.tsx` and its `.bk-stack*`
+`ui.css` block stay — 36 more real `<Stack` sites remain across the other
+25 files (`shell/`, `export/`, `inspector/`, `canvas/`, `animation/`,
+`media/`, `onboarding/`, `panels/`, plus the rest of `sidebar/`). Deleting
+the component now would break every one of those. Whoever picks up the
+next group: re-run `grep -rn "<Stack\b" src --include="*.tsx" | grep -v
+__tests__` fresh (don't trust this count — files may have moved) and
+repeat this group's pattern; only delete `Stack.tsx`/`ui.css`'s `.bk-stack*`
+block/its `index.ts` export **after the very last real site is converted**,
+same "delete only when truly orphaned" discipline every earlier component
+in this arc used.
+
+**Compiled-CSS proof:** `npx vite build`, grepped the emitted CSS —
+`.tw\:gap-\[18px\]{gap:18px}`, `.tw\:gap-\[14px\]{gap:14px}`,
+`.tw\:py-\[10px\]{padding-block:10px}`, `.tw\:gap-0\.5{gap:calc(var(--tw-spacing)
+* .5)}`, `.tw\:gap-1\.5{gap:calc(var(--tw-spacing) * 1.5)}` all present and
+correct. `dist/` removed after (gitignored). No `pnpm flowbite:classlist`
+run needed — no new flowbite import, only first-party `tw:*` utilities
+already covered by `tw.css`'s `@source "../editor"` glob.
+
+Verified: `npx tsc --noEmit` clean. Targeted run:
+`sidebar/tabs/pages/page-settings/__tests__/{AdvancedTab,SeoTab,
+SocialTab}.test.tsx` + full `sidebar/tabs/pages/` sweep (`UnsavedWarningModal`
+has no dedicated test) — 18 test files / 194 tests green.
+
+## Next session should resume at
+
+**Stack dissolve, group 2 of N.** Re-run `grep -rn "<Stack\b" src
+--include="*.tsx" | grep -v __tests__` to get the current real-site list
+(29 files minus the 4 done = 25 remain: `shell/AquibraStudio.tsx`,
+`shell/modals/{ProjectSettingsModal,CMSCollectionSetupModal,
+CreateComponentModal,CommandPalette}.tsx`, `sidebar/SidebarFallbacks.tsx`,
+`sidebar/tabs/ComponentsTab.tsx`, `sidebar/tabs/settings/screens/
+SiteSettingsScreen.tsx`, `sidebar/tabs/publish/PublishTab.tsx`,
+`sidebar/tabs/component-library/CreateComponentModal.tsx`,
+`inspector/tabs/InspectorTabContent.tsx` (the one real `separator` user —
+use the `divide-y` mapping above), `inspector/sections/layout/previews.tsx`,
+`inspector/sections/typography/FontPicker.tsx`,
+`inspector/shared/TokenPickerPopover.tsx`,
+`inspector/shared/controls/{ControlRow,SpacingControls}.tsx`,
+`panels/KeyboardShortcutsPanel.tsx`, `animation/AnimationEditor.tsx`,
+`canvas/overlays/ElementHoverOverlaySubComponents.tsx`,
+`canvas/controls/CommandPalette.tsx`, `export/{CodePreview,ExportOptions,
+ExportModal}.tsx`, `onboarding/OnboardingChecklist.tsx`,
+`media/VideoPreview.tsx`). Several of these have multi-line `<Stack`
+openers (props spread across lines, e.g. `AquibraStudio.tsx`,
+`FontPicker.tsx`, `ControlRow.tsx`, the two `CommandPalette.tsx` files,
+`ExportOptions.tsx`, `ExportModal.tsx`, `VideoPreview.tsx`) — read each
+before editing rather than assuming a single-line `gap="x"` shape. Suggest
+grouping by directory the same way this round did (`shell/` + its
+`modals/`, then `inspector/` + `canvas/`, then `export/` +
+`animation/media/onboarding/panels/` as a last small group) for the
+remaining 2 commits. **After the last real site converts**, delete
+`Stack.tsx`, its `.bk-stack*` `ui.css` block, its `index.ts` export, and
+sweep `__tests__` for any `Stack` contract test that needs to go with it —
+then resolve the deferred **`Row` KEEP-or-move verdict** this round
+explicitly scoped out.
+
+Also still open: **Drawer** parity-check verdict is now recorded (KEEP,
+see above) — nothing left gating it.
