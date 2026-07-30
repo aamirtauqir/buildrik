@@ -141,7 +141,7 @@ function BillingPageInner() {
     return (
       <div className="space-y-4">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-32 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
+          <div key={i} className="h-32 animate-pulse rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
         ))}
       </div>
     );
@@ -230,7 +230,7 @@ function BillingPageInner() {
       {/* B) Reactivation banner */}
       {cancelAtPeriodEnd && overview?.currentPeriodEnd && (
         <div
-          className="mb-4 flex items-center justify-between rounded-xl border px-5 py-3"
+          className="mb-4 flex items-center justify-between rounded-lg border px-5 py-3"
           style={{ borderColor: "#C27803", backgroundColor: "#FDFDEA" }}
         >
           <p className="text-body font-medium" style={{ color: "#723B13" }}>
@@ -272,7 +272,7 @@ function BillingPageInner() {
                 (sets cancelAtPeriodEnd; Reactivate undoes it). */}
             {planKey !== "FREE" && !cancelAtPeriodEnd && (
               <div
-                className="flex items-center justify-between rounded-xl border px-5 py-4"
+                className="flex items-center justify-between rounded-lg border px-5 py-4"
                 style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
               >
                 <div>
@@ -336,7 +336,7 @@ export default function BillingPage() {
   // useSearchParams (?checkout=success post-Stripe-return) needs a Suspense
   // boundary to prerender — matches every other useSearchParams page here.
   return (
-    <Suspense fallback={<div className="h-64 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />}>
+    <Suspense fallback={<div className="h-64 animate-pulse rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }} />}>
       <BillingPageInner />
     </Suspense>
   );

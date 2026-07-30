@@ -34,21 +34,21 @@ export default function WorkspaceDomainsPage() {
       ) : (
         <>
           <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
-            <div className="rounded-xl border p-4" style={{ borderColor: "var(--color-border-default)" }}>
+            <div className="rounded-lg border p-4" style={{ borderColor: "var(--color-border-default)" }}>
               <p className="text-body-sm uppercase tracking-wide text-neutral-500">Connected</p>
               <p className="mt-1 text-2xl font-bold" style={{ color: "var(--color-text-primary)" }}>{connected}</p>
             </div>
-            <div className="rounded-xl border p-4" style={{ borderColor: "var(--color-border-default)" }}>
+            <div className="rounded-lg border p-4" style={{ borderColor: "var(--color-border-default)" }}>
               <p className="text-body-sm uppercase tracking-wide text-neutral-500">Verifying</p>
               <p className="mt-1 text-2xl font-bold" style={{ color: "var(--color-text-primary)" }}>{pending}</p>
             </div>
-            <div className="rounded-xl border p-4" style={{ borderColor: "var(--color-border-default)" }}>
+            <div className="rounded-lg border p-4" style={{ borderColor: "var(--color-border-default)" }}>
               <p className="text-body-sm uppercase tracking-wide text-neutral-500">Total</p>
               <p className="mt-1 text-2xl font-bold" style={{ color: "var(--color-text-primary)" }}>{domains.length}</p>
             </div>
           </div>
 
-          <div className="overflow-hidden rounded-xl border" style={{ borderColor: "var(--color-border-default)" }}>
+          <div className="overflow-hidden rounded-lg border" style={{ borderColor: "var(--color-border-default)" }}>
             <table className="w-full text-body">
               <thead>
                 <tr className="border-b text-left text-body-sm uppercase tracking-wide text-neutral-500" style={{ borderColor: "var(--color-border-default)" }}>

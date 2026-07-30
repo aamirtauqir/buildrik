@@ -423,7 +423,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-[20vh]">
       <div className="fixed inset-0" style={{ backgroundColor: "rgba(18, 22, 32, 0.45)" }} onClick={onClose} />
       <div
-        className="relative w-full overflow-hidden rounded-xl border bg-white shadow-2xl"
+        className="relative w-full overflow-hidden rounded-lg border bg-white shadow-2xl"
         style={{ maxWidth: 640, maxHeight: 480, borderColor: "var(--color-border-default)" }}
       >
         {/* Search input */}

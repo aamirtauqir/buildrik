@@ -59,7 +59,7 @@ export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
       </Link>
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-lg font-bold text-white" style={{ backgroundColor: "var(--color-ink)" }}>
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-lg font-bold text-white" style={{ backgroundColor: "var(--color-ink)" }}>
             {site.name.charAt(0).toUpperCase()}
           </div>
           <div className="min-w-0">
@@ -132,7 +132,7 @@ export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
               <MoreHorizontal className="h-4 w-4" />More
             </button>
             {menuOpen && (
-              <div role="menu" className="absolute right-0 top-full z-20 mt-1 w-52 rounded-xl border bg-white py-1 shadow-lg" style={{ borderColor: "var(--color-border-default)" }}>
+              <div role="menu" className="absolute right-0 top-full z-20 mt-1 w-52 rounded-lg border bg-white py-1 shadow-lg" style={{ borderColor: "var(--color-border-default)" }}>
                 <EditorLink
                   siteId={site.id}
                   target="_blank"

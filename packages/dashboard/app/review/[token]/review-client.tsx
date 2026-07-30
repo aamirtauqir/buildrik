@@ -105,7 +105,7 @@ function Shell({
 function Centered({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex-1 flex items-center justify-center p-6">
-      <div className="w-full max-w-[440px] rounded-xl border border-[#E5E7EB] bg-white p-8">
+      <div className="w-full max-w-[440px] rounded-lg border border-[#E5E7EB] bg-white p-8">
         {children}
       </div>
     </div>
@@ -287,7 +287,7 @@ export function ReviewClient({ token }: { token: string }) {
       }
     >
       <div className="mx-auto flex w-full max-w-[1100px] flex-1 gap-6 p-6">
-        <section className="flex-1 rounded-xl border border-[#E5E7EB] bg-white p-8">
+        <section className="flex-1 rounded-lg border border-[#E5E7EB] bg-white p-8">
           {data.changeSummary ? (
             <div className="mb-6 rounded-lg bg-[#F3F4F6] px-4 py-3">
               <p className="text-[12px] font-semibold text-[#111827]">What&rsquo;s new</p>
@@ -301,7 +301,7 @@ export function ReviewClient({ token }: { token: string }) {
           <SitePreview pages={data.snapshotPages} />
         </section>
 
-        <aside className="w-[320px] shrink-0 rounded-xl border border-[#E5E7EB] bg-white">
+        <aside className="w-[320px] shrink-0 rounded-lg border border-[#E5E7EB] bg-white">
           <div className="border-b border-[#E5E7EB] px-4 py-3">
             <p className="text-[13px] font-semibold text-[#111827]">Your notes</p>
           </div>
@@ -356,7 +356,7 @@ export function ReviewClient({ token }: { token: string }) {
           rather than "Are you sure?". */}
       {asking ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(15,23,42,0.4)] p-6">
-          <div className="w-full max-w-[440px] rounded-xl bg-white p-6">
+          <div className="w-full max-w-[440px] rounded-lg bg-white p-6">
             <h2 className="text-[16px] font-semibold text-[#111827]">
               Approve {data.siteName}?
             </h2>

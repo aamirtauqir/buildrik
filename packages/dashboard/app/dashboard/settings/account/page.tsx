@@ -34,7 +34,7 @@ export default function AccountPage() {
     return (
       <div className="space-y-4">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-24 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
+          <div key={i} className="h-24 animate-pulse rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
         ))}
       </div>
     );

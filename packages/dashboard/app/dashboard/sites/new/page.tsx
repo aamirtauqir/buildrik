@@ -115,7 +115,7 @@ function NewSitePageInner() {
         <div className="mt-6 space-y-3">
           <button
             onClick={() => router.push("/dashboard/templates")}
-            className="flex w-full items-center gap-4 rounded-xl border p-5 text-left transition-colors hover:bg-[var(--color-bg-page)]"
+            className="flex w-full items-center gap-4 rounded-lg border p-5 text-left transition-colors hover:bg-[var(--color-bg-page)]"
             style={{ borderColor: "var(--color-border-default)" }}
           >
             <div className="flex h-12 w-12 items-center justify-center rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }}>
@@ -128,7 +128,7 @@ function NewSitePageInner() {
           </button>
           <button
             onClick={() => setView("ai-type")}
-            className="flex w-full items-center gap-4 rounded-xl border p-5 text-left transition-colors hover:bg-[var(--color-primary-subtle)]/30"
+            className="flex w-full items-center gap-4 rounded-lg border p-5 text-left transition-colors hover:bg-[var(--color-primary-subtle)]/30"
             style={{ borderColor: "var(--color-border-default)" }}
           >
             <div className="flex h-12 w-12 items-center justify-center rounded-lg" style={{ backgroundColor: "var(--color-primary-subtle)" }}>
@@ -142,7 +142,7 @@ function NewSitePageInner() {
           <button
             onClick={() => createSiteMutation.mutate({ name: siteName.trim() || "My New Site", method: "blank" })}
             disabled={createSiteMutation.isPending}
-            className="flex w-full items-center gap-4 rounded-xl border p-5 text-left transition-colors hover:bg-[var(--color-bg-page)] disabled:opacity-50"
+            className="flex w-full items-center gap-4 rounded-lg border p-5 text-left transition-colors hover:bg-[var(--color-bg-page)] disabled:opacity-50"
             style={{ borderColor: "var(--color-border-default)" }}
           >
             <div className="flex h-12 w-12 items-center justify-center rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }}>

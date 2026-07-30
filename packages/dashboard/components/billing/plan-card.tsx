@@ -47,7 +47,7 @@ export function PlanCard({
   return (
     <div
       className={cn(
-        "rounded-2xl border p-6",
+        "rounded-lg border p-6",
         isCurrent ? "border-[var(--color-primary)]" : "border-[var(--color-border-default)]"
       )}
       style={{ backgroundColor: "var(--color-bg-surface)" }}

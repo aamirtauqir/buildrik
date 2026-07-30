@@ -20,7 +20,7 @@ export function OnbEmpty({ icon, title, body, action, className }: OnbEmptyProps
   return (
     <div className={cn("flex flex-col items-center gap-4 text-center", className)}>
       {icon ? (
-        <div className="flex h-14 w-14 items-center justify-center rounded-[14px] bg-gray-100">{icon}</div>
+        <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-gray-100">{icon}</div>
       ) : null}
       <p className="text-base font-semibold text-onb-text">{title}</p>
       <p className="text-[13px] text-onb-muted">{body}</p>

@@ -32,7 +32,7 @@ function formatVisitors(count: number): string {
 export function SiteCardFull({ site, selected, onSelect, onAction }: SiteCardFullProps) {
   return (
     <div
-      className={cn("group relative overflow-hidden rounded-xl border bg-white shadow-card transition-shadow hover:shadow-md", selected && "ring-2 ring-[var(--color-primary)]")}
+      className={cn("group relative overflow-hidden rounded-lg border bg-white shadow-card transition-shadow hover:shadow-md", selected && "ring-2 ring-[var(--color-primary)]")}
       style={{ borderColor: "var(--color-border-default)" }}
     >
       <div className="absolute left-3 top-3 z-10">
@@ -80,7 +80,7 @@ export function SiteCardFull({ site, selected, onSelect, onAction }: SiteCardFul
           </div>
         </div>
       </Link>
-      <div className="absolute inset-x-0 bottom-0 flex items-center gap-2 rounded-b-xl bg-white/95 px-4 py-3 opacity-0 transition-opacity group-hover:opacity-100" style={{ borderTop: "1px solid var(--color-border-default)" }}>
+      <div className="absolute inset-x-0 bottom-0 flex items-center gap-2 rounded-b-lg bg-white/95 px-4 py-3 opacity-0 transition-opacity group-hover:opacity-100" style={{ borderTop: "1px solid var(--color-border-default)" }}>
         <EditorLink siteId={site.id} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-body-sm font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}>
           <Pencil className="h-3.5 w-3.5" />Edit
         </EditorLink>

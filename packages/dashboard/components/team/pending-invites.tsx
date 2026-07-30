@@ -43,14 +43,14 @@ interface PendingInvitesProps {
 export function PendingInvites({ invites, onResend, onRevoke, resendingId, revokingId }: PendingInvitesProps) {
   if (invites.length === 0) {
     return (
-      <div className="rounded-xl border border-[var(--color-border-default)] bg-white px-6 py-10 text-center">
+      <div className="rounded-lg border border-[var(--color-border-default)] bg-white px-6 py-10 text-center">
         <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>No pending invitations.</p>
       </div>
     );
   }
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-[var(--color-border-default)] bg-white">
+    <div className="overflow-x-auto rounded-lg border border-[var(--color-border-default)] bg-white">
       <table className="w-full text-body">
         <thead>
           <tr className="border-b border-[var(--color-border-default)]" style={{ backgroundColor: "var(--color-bg-page)" }}>

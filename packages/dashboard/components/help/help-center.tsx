@@ -106,7 +106,7 @@ export function HelpCenter({ onSearch, onSelectCategory, onContactSupport, searc
               key={cat.key}
               type="button"
               onClick={() => onSelectCategory(cat.key, cat.label)}
-              className="flex cursor-pointer flex-col rounded-xl border p-5 text-left shadow-card transition-colors hover:border-[var(--color-border-strong)]"
+              className="flex cursor-pointer flex-col rounded-lg border p-5 text-left shadow-card transition-colors hover:border-[var(--color-border-strong)]"
               style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
             >
               <IconChip color={style?.color} className="mb-3">
@@ -126,7 +126,7 @@ export function HelpCenter({ onSearch, onSelectCategory, onContactSupport, searc
       <button
         type="button"
         onClick={onContactSupport}
-        className="flex w-full cursor-pointer items-center gap-4 rounded-xl border p-5 text-left shadow-card transition-colors hover:border-[var(--color-border-strong)]"
+        className="flex w-full cursor-pointer items-center gap-4 rounded-lg border p-5 text-left shadow-card transition-colors hover:border-[var(--color-border-strong)]"
         style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
       >
         <IconChip color="var(--color-text-secondary)">

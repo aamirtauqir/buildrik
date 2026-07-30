@@ -43,7 +43,7 @@ export default function TemplatePreviewPage() {
   return (
     <div className="flex min-h-dvh bg-onb-surface">
       <div className="flex flex-1 flex-col bg-gray-100 p-8">
-        <div className="flex h-[45px] items-center justify-between rounded-t-xl bg-white px-6 shadow-[inset_0_0_0_1px_var(--color-onb-line)]">
+        <div className="flex h-[45px] items-center justify-between rounded-t-lg bg-white px-6 shadow-[inset_0_0_0_1px_var(--color-onb-line)]">
           <div className="flex gap-2">
             <span className="h-2 w-2 rounded-full bg-red-400" />
             <span className="h-2 w-2 rounded-full bg-amber-400" />
@@ -55,7 +55,7 @@ export default function TemplatePreviewPage() {
           <MoreHorizontal className="h-4 w-4 text-onb-subtle" />
         </div>
 
-        <div className="flex flex-1 items-center justify-center overflow-hidden rounded-b-xl border border-t-0 border-onb-line bg-white">
+        <div className="flex flex-1 items-center justify-center overflow-hidden rounded-b-lg border border-t-0 border-onb-line bg-white">
           {preview ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={preview} alt={t.name} className="h-full w-full object-cover object-top" />

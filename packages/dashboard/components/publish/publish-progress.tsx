@@ -64,7 +64,7 @@ export function PublishProgress({ jobId, onComplete, onCancel, onRetry }: Publis
     <div className="mx-auto max-w-lg space-y-6">
       {/* Error state */}
       {isFailed && (
-        <div className="rounded-xl border p-4" style={{ borderColor: "#F8B4B4", backgroundColor: "#FDF2F2" }}>
+        <div className="rounded-lg border p-4" style={{ borderColor: "#F8B4B4", backgroundColor: "#FDF2F2" }}>
           <div className="flex items-start gap-3">
             <XCircle className="mt-0.5 h-5 w-5 shrink-0" style={{ color: "var(--color-error)" }} />
             <div className="flex-1">
@@ -152,7 +152,7 @@ export function PublishProgress({ jobId, onComplete, onCancel, onRetry }: Publis
       {!isFailed && !isCompleted && (
         <>
           {showConfirm ? (
-            <div className="flex items-center gap-3 rounded-xl border p-3" style={{ borderColor: "var(--color-border-default)" }}>
+            <div className="flex items-center gap-3 rounded-lg border p-3" style={{ borderColor: "var(--color-border-default)" }}>
               <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>Cancel this publish?</p>
               <Button size="sm" onClick={handleCancelPublish} disabled={cancelMutation.isPending}>
                 {cancelMutation.isPending ? "Cancelling..." : "Yes, cancel"}

@@ -83,7 +83,7 @@ export default function ArticleDetailPage() {
           </div>
 
           {/* Was this helpful? */}
-          <div className="mt-10 rounded-xl border p-6 text-center" style={{ borderColor: "var(--color-border-default)" }}>
+          <div className="mt-10 rounded-lg border p-6 text-center" style={{ borderColor: "var(--color-border-default)" }}>
             {feedbackGiven ? (
               <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
                 Thanks for your feedback!

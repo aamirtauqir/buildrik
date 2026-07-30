@@ -55,7 +55,7 @@ export default function TemplateDetailPage({ params }: { params: Promise<{ id: s
             : [];
           return (
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1.4fr_1fr]">
-              <div className="overflow-hidden rounded-xl border" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-subtle)" }}>
+              <div className="overflow-hidden rounded-lg border" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-subtle)" }}>
                 {t.previewUrl ? (
                   <iframe src={t.previewUrl} title={t.name} className="h-[520px] w-full" />
                 ) : (

@@ -19,7 +19,7 @@ export function StateEmpty({
   secondary?: StateAction;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[var(--color-border-default)] bg-[var(--color-bg-subtle)] px-8 py-14 text-center">
+    <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-[var(--color-border-default)] bg-[var(--color-bg-subtle)] px-8 py-14 text-center">
       {icon && (
         <div className="mb-3 text-[var(--color-text-muted)]" aria-hidden>
           {icon}

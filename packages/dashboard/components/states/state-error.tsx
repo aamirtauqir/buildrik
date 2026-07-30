@@ -20,7 +20,7 @@ export function ErrorState({
   return (
     <div
       role="alert"
-      className="flex flex-col items-center justify-center rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-8 py-14 text-center"
+      className="flex flex-col items-center justify-center rounded-lg border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-8 py-14 text-center"
     >
       <AlertTriangle className="mb-3 h-8 w-8 text-[var(--color-error)]" aria-hidden />
       <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">{title}</h3>

@@ -34,7 +34,7 @@ function EditorPreview() {
   return (
     <div
       aria-hidden
-      className="flex h-[280px] w-[600px] flex-col overflow-hidden rounded-[12px] bg-[#F9FAFB] shadow-[inset_0_0_0_1px_#E5E7EB]"
+      className="flex h-[280px] w-[600px] flex-col overflow-hidden rounded-lg bg-[#F9FAFB] shadow-[inset_0_0_0_1px_#E5E7EB]"
     >
       <div className="flex h-10 items-center justify-between bg-white px-4 shadow-[inset_0_0_0_1px_#E5E7EB]">
         <div className="flex gap-3">
@@ -92,7 +92,7 @@ export default function ReadyPage() {
           </p>
         </div>
 
-        <div className="flex w-[500px] flex-col overflow-hidden rounded-[12px] bg-onb-surface shadow-[inset_0_0_0_1px_var(--color-onb-line)]">
+        <div className="flex w-[500px] flex-col overflow-hidden rounded-lg bg-onb-surface shadow-[inset_0_0_0_1px_var(--color-onb-line)]">
           <Row label="Site">
             <Value>{data.site?.name ?? "Untitled site"}</Value>
           </Row>

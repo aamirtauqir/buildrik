@@ -57,7 +57,7 @@ export function PaymentMethodCard({ paymentMethod }: PaymentMethodCardProps) {
   });
 
   return (
-    <div className="rounded-xl border border-[var(--color-border-default)] bg-white px-5 py-4">
+    <div className="rounded-lg border border-[var(--color-border-default)] bg-white px-5 py-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <CardBrandIcon brand={paymentMethod.brand} />

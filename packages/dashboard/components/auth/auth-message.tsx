@@ -17,7 +17,7 @@ export function AuthMessage({ title, subtitle, children, noArt, icon }: AuthMess
   return (
     <AuthCard noArt={noArt}>
       {icon && (
-        <span className="mb-4 flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] bg-auth-btn-secondary">
+        <span className="mb-4 flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-auth-btn-secondary">
           {icon}
         </span>
       )}

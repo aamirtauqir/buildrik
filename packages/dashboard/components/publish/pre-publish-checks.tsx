@@ -41,7 +41,7 @@ export function PrePublishChecks({ checks, onPublish, onCancel }: PrePublishChec
       <div>
         <div className="space-y-3">
           {checks.checks.map((check) => (
-            <div key={check.label} className="flex items-start gap-3 rounded-xl border p-3" style={{ borderColor: "var(--color-border-default)" }}>
+            <div key={check.label} className="flex items-start gap-3 rounded-lg border p-3" style={{ borderColor: "var(--color-border-default)" }}>
               <div className="mt-0.5 shrink-0">{STATUS_ICON[check.status]}</div>
               <div>
                 <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>{check.label}</p>

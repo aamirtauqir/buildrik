@@ -46,7 +46,7 @@ export function AnalyticsTab({ data, range, onRangeChange, isLoading }: Analytic
 
       {isLoading && (
         <div className="grid grid-cols-3 gap-4">
-          {[1, 2, 3, 4, 5, 6].map((i) => <div key={i} className="h-24 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />)}
+          {[1, 2, 3, 4, 5, 6].map((i) => <div key={i} className="h-24 animate-pulse rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }} />)}
         </div>
       )}
 
@@ -119,7 +119,7 @@ export function AnalyticsTab({ data, range, onRangeChange, isLoading }: Analytic
       )}
 
       {!isLoading && !data && (
-        <div className="rounded-xl border-2 border-dashed py-16 text-center" style={{ borderColor: "var(--color-border-default)" }}>
+        <div className="rounded-lg border-2 border-dashed py-16 text-center" style={{ borderColor: "var(--color-border-default)" }}>
           <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>No analytics data yet</p>
           <p className="mt-1 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>Publish your site to start tracking visitors.</p>
         </div>

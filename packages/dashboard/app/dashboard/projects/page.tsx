@@ -543,7 +543,7 @@ export default function ProjectsPage() {
       {/* True-empty: the workspace has no sites at all */}
       {!sitesQuery.isLoading && !sitesQuery.isError && sites.length === 0 && !hasActiveFilters && (
         <div
-          className="mt-8 flex flex-col items-center rounded-xl border-2 border-dashed py-16 text-center"
+          className="mt-8 flex flex-col items-center rounded-lg border-2 border-dashed py-16 text-center"
           style={{ borderColor: "var(--color-border-default)" }}
         >
           <p

@@ -64,7 +64,7 @@ export function CreateSiteModal({ open, onClose, onSubmit }: CreateSiteModalProp
         </div>
       </div>
       {atSiteLimit ? (
-        <div className="mt-6 rounded-xl border p-5 text-center" style={{ borderColor: "#F8B4B4", backgroundColor: "#FDF2F2" }}>
+        <div className="mt-6 rounded-lg border p-5 text-center" style={{ borderColor: "#F8B4B4", backgroundColor: "#FDF2F2" }}>
           <Lock className="mx-auto h-8 w-8 mb-2" style={{ color: "var(--color-primary)" }} />
           <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
             Site limit reached ({sitesUsed}/{sitesLimit})
@@ -83,11 +83,11 @@ export function CreateSiteModal({ open, onClose, onSubmit }: CreateSiteModalProp
         </div>
       ) : (
         <div className="mt-6 space-y-3">
-          <button onClick={() => onSubmit({ name, method: "template" })} className="flex w-full items-center gap-3 rounded-xl border p-4 text-left transition-colors hover:bg-[var(--color-bg-subtle)]" style={{ borderColor: "var(--color-border-default)" }}>
+          <button onClick={() => onSubmit({ name, method: "template" })} className="flex w-full items-center gap-3 rounded-lg border p-4 text-left transition-colors hover:bg-[var(--color-bg-subtle)]" style={{ borderColor: "var(--color-border-default)" }}>
             <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }}><LayoutTemplate className="h-5 w-5" style={{ color: "var(--color-text-secondary)" }} /></div>
             <div><p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>Use a Template</p><p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>Browse 50+ templates</p></div>
           </button>
-          <button onClick={() => onSubmit({ name, method: "ai" })} className="flex w-full items-center gap-3 rounded-xl border p-4 text-left transition-colors hover:bg-[var(--color-primary-subtle)]/50" style={{ borderColor: "var(--color-border-default)" }}>
+          <button onClick={() => onSubmit({ name, method: "ai" })} className="flex w-full items-center gap-3 rounded-lg border p-4 text-left transition-colors hover:bg-[var(--color-primary-subtle)]/50" style={{ borderColor: "var(--color-border-default)" }}>
             <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: "var(--color-primary-subtle)" }}><Sparkles className="h-5 w-5" style={{ color: "var(--color-primary)" }} /></div>
             <div className="flex-1">
               <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>Generate with AI</p>
@@ -107,7 +107,7 @@ export function CreateSiteModal({ open, onClose, onSubmit }: CreateSiteModalProp
               </div>
             )}
           </button>
-          <button onClick={() => onSubmit({ name, method: "blank" })} className="flex w-full items-center gap-3 rounded-xl border p-4 text-left transition-colors hover:bg-[var(--color-bg-subtle)]" style={{ borderColor: "var(--color-border-default)" }}>
+          <button onClick={() => onSubmit({ name, method: "blank" })} className="flex w-full items-center gap-3 rounded-lg border p-4 text-left transition-colors hover:bg-[var(--color-bg-subtle)]" style={{ borderColor: "var(--color-border-default)" }}>
             <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }}><Plus className="h-5 w-5" style={{ color: "var(--color-text-secondary)" }} /></div>
             <div><p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>Start from Scratch</p><p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>Full creative control</p></div>
           </button>

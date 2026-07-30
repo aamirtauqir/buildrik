@@ -251,7 +251,7 @@ export function ClientDetailView({ clientId }: { clientId: string }) {
       <header className="mb-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <span
-            className="flex h-11 w-11 items-center justify-center rounded-xl text-base font-semibold text-white"
+            className="flex h-11 w-11 items-center justify-center rounded-lg text-base font-semibold text-white"
             style={{ backgroundColor: client?.brandColor ?? "var(--color-primary)" }}
           >
             {(client?.name ?? "··").slice(0, 2).toUpperCase()}

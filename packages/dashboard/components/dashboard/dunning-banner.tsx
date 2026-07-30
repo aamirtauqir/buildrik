@@ -45,7 +45,7 @@ export function DunningBanner({ graceEndsAt }: DunningBannerProps) {
         : "Payment failed. Your workspace has been restricted.";
 
   return (
-    <div className="flex items-center justify-between rounded-xl border border-red-200 bg-red-50 px-5 py-3">
+    <div className="flex items-center justify-between rounded-lg border border-red-200 bg-red-50 px-5 py-3">
       <div className="flex items-center gap-3">
         <AlertCircle className="h-5 w-5 shrink-0 text-red-600" />
         <p className="text-body text-red-700">{message}</p>

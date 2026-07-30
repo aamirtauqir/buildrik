@@ -34,7 +34,7 @@ export default function SiteDetailLayout({
       <div>
         <div className="h-6 w-48 animate-pulse rounded" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
         <div className="mt-4 h-10 w-full animate-pulse rounded" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
-        <div className="mt-6 h-64 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
+        <div className="mt-6 h-64 animate-pulse rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
       </div>
     );
   }

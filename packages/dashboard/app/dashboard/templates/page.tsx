@@ -115,7 +115,7 @@ function TemplatesBrowserInner() {
                     <Link
                       key={t.id}
                       href={`/dashboard/templates/${t.id}`}
-                      className="group overflow-hidden rounded-xl border shadow-card transition-shadow hover:shadow-md"
+                      className="group overflow-hidden rounded-lg border shadow-card transition-shadow hover:shadow-md"
                       style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
                     >
                       {/* Deterministic tinted cover with the template initial so the

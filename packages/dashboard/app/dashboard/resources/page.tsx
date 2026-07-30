@@ -24,7 +24,7 @@ export default function ResourcesPage() {
           <Link
             key={title}
             href={href}
-            className="group rounded-xl border p-[18px] shadow-card transition-colors hover:border-[var(--color-primary)]"
+            className="group rounded-lg border p-[18px] shadow-card transition-colors hover:border-[var(--color-primary)]"
             style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
           >
             <IconChip color={color} className="mb-3">

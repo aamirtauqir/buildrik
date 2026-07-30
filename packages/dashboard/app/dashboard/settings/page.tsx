@@ -11,7 +11,7 @@ function SettingsCard({ entry }: { entry: SettingsSection }) {
   return (
     <Link
       href={entry.href}
-      className="flex items-center gap-3.5 rounded-xl border px-[18px] py-4 transition-colors hover:border-[var(--color-border-strong)]"
+      className="flex items-center gap-3.5 rounded-lg border px-[18px] py-4 transition-colors hover:border-[var(--color-border-strong)]"
       style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
     >
       <IconChip>

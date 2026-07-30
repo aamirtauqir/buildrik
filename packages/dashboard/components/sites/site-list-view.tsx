@@ -39,7 +39,7 @@ function getTimeAgo(date: Date): string {
 
 export function SiteListView({ sites, selectedIds, onSelect, onSelectAll, allSelected, onAction }: SiteListViewProps) {
   return (
-    <div className="overflow-hidden rounded-xl border shadow-card" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}>
+    <div className="overflow-hidden rounded-lg border shadow-card" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}>
       <table className="w-full text-body">
         <thead>
           <tr className="border-b text-left text-eyebrow uppercase tracking-wide" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)", backgroundColor: "var(--color-bg-subtle)" }}>

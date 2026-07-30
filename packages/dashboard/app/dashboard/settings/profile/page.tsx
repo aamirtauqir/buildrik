@@ -15,7 +15,7 @@ export default function ProfilePage() {
     onError: (err) => addToast("error", "Failed", err.message),
   });
 
-  if (profileQuery.isLoading) return <div className="h-64 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />;
+  if (profileQuery.isLoading) return <div className="h-64 animate-pulse rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }} />;
   if (!profileQuery.data) return <ErrorState title="Couldn't load your profile" onRetry={() => profileQuery.refetch()} />;
 
   const profile = profileQuery.data;

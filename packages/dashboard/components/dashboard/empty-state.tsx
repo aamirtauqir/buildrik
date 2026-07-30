@@ -80,7 +80,7 @@ export function EmptyState({ variant }: EmptyStateProps) {
   const config = getConfig(variant);
 
   return (
-    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[var(--color-border-default)] bg-[var(--color-bg-subtle)] px-8 py-16 text-center">
+    <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-[var(--color-border-default)] bg-[var(--color-bg-subtle)] px-8 py-16 text-center">
       <div className="mb-4">{config.icon}</div>
       <h2 className="text-xl font-semibold text-[var(--color-text-primary)]">{config.heading}</h2>
       <p className="mt-2 max-w-md text-body text-[var(--color-text-secondary)]">{config.description}</p>

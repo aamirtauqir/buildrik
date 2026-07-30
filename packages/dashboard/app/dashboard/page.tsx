@@ -61,12 +61,12 @@ export default function DashboardPage() {
         <PageHeader title={greeting} description="Here's what's happening across your workspace." />
         <div className="grid grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-24 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
+            <div key={i} className="h-24 animate-pulse rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
           ))}
         </div>
         <div className="mt-6 grid gap-6" style={{ gridTemplateColumns: "1.6fr 1fr" }}>
-          <div className="h-72 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
-          <div className="h-72 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
+          <div className="h-72 animate-pulse rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
+          <div className="h-72 animate-pulse rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
         </div>
       </div>
     );
@@ -150,7 +150,7 @@ export default function DashboardPage() {
         <div className="space-y-4">
           {noneLive && (
             <div
-              className="flex flex-wrap items-center justify-between gap-4 rounded-xl border p-5"
+              className="flex flex-wrap items-center justify-between gap-4 rounded-lg border p-5"
               style={{ borderColor: "var(--color-primary)", backgroundColor: "var(--color-primary-subtle)" }}
             >
               <div className="min-w-0">

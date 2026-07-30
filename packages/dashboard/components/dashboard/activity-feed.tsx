@@ -60,7 +60,7 @@ function ActivityRow({ entry, count, isLast }: { entry: ActivityEntry; count: nu
         const { Icon, tone } = activityVisual(`${entry.action} ${entry.description ?? ""}`);
         return (
           <span
-            className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-[8px]"
+            className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-lg"
             style={{ backgroundColor: `color-mix(in srgb, ${tone} 12%, transparent)`, color: tone }}
           >
             <Icon className="h-4 w-4" strokeWidth={2} />

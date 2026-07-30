@@ -72,7 +72,7 @@ export default function WorkspaceSelectPage() {
               disabled={!!switchingId}
               className="flex w-full items-center gap-3 rounded-auth-input border border-[#E5E7EB] bg-white px-[15px] py-[13px] text-left transition-colors hover:border-auth-text-body disabled:opacity-60"
             >
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-[10px] bg-auth-cta text-[15px] font-bold tracking-[-0.02em] text-white">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-auth-cta text-[15px] font-bold tracking-[-0.02em] text-white">
                 {ws.iconUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={ws.iconUrl} alt="" className="h-full w-full object-cover" />

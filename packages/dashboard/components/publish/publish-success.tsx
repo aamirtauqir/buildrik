@@ -53,7 +53,7 @@ export function PublishSuccess({ siteId, publishedUrl, customDomain, plan = "FRE
 
       {/* Custom domain upgrade nudge for FREE plan users without a custom domain */}
       {plan === "FREE" && !customDomain && (
-        <div className="mt-4 rounded-xl border p-4 text-left" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-page)" }}>
+        <div className="mt-4 rounded-lg border p-4 text-left" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-page)" }}>
           <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
             Your site is live on <span style={{ color: "var(--color-primary)" }}>{liveHost ?? "its Vercel URL"}</span>
           </p>
@@ -75,7 +75,7 @@ export function PublishSuccess({ siteId, publishedUrl, customDomain, plan = "FRE
       <div className="mt-6 grid grid-cols-2 gap-3">
         <Link
           href={`/dashboard/sites/${siteId}/access`}
-          className="flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white"
+          className="flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold text-white"
           style={{ backgroundColor: "var(--color-primary)" }}
         >
           <Share2 className="h-4 w-4" />
@@ -83,7 +83,7 @@ export function PublishSuccess({ siteId, publishedUrl, customDomain, plan = "FRE
         </Link>
         <Link
           href={`/dashboard/sites/${siteId}/analytics`}
-          className="flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold"
+          className="flex items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold"
           style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
         >
           <BarChart3 className="h-4 w-4" />
@@ -91,7 +91,7 @@ export function PublishSuccess({ siteId, publishedUrl, customDomain, plan = "FRE
         </Link>
         <Link
           href={`/dashboard/sites/${siteId}`}
-          className="flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold"
+          className="flex items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold"
           style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
         >
           <Pencil className="h-4 w-4" />
@@ -99,7 +99,7 @@ export function PublishSuccess({ siteId, publishedUrl, customDomain, plan = "FRE
         </Link>
         <Link
           href="/dashboard/projects"
-          className="flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold"
+          className="flex items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold"
           style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
         >
           <LayoutDashboard className="h-4 w-4" />
@@ -117,7 +117,7 @@ function UrlRow({ label, url, isCopied, onCopy }: { label: string; url: string; 
         <Globe className="mr-1 inline-block h-3.5 w-3.5" />
         {label}
       </p>
-      <div className="flex items-center gap-2 rounded-xl border p-3" style={{ borderColor: "var(--color-border-default)" }}>
+      <div className="flex items-center gap-2 rounded-lg border p-3" style={{ borderColor: "var(--color-border-default)" }}>
         <span className="flex-1 truncate text-left text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>{url}</span>
         <button
           onClick={onCopy}

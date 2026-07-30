@@ -39,7 +39,7 @@ export function QuickActions() {
       <button
         type="button"
         onClick={() => setCreateOpen(true)}
-        className="flex items-center gap-[9px] rounded-[9px] bg-[var(--color-primary)] px-[14px] py-[11px] text-[13.5px] font-semibold text-white transition-colors hover:bg-[var(--color-primary-hover)]"
+        className="flex items-center gap-[9px] rounded-lg bg-[var(--color-primary)] px-[14px] py-[11px] text-[13.5px] font-semibold text-white transition-colors hover:bg-[var(--color-primary-hover)]"
       >
         <Plus className="h-4 w-4" strokeWidth={2} /> Create a site
       </button>
@@ -50,7 +50,7 @@ export function QuickActions() {
           <Link
             key={action.label}
             href={action.href}
-            className="flex items-center gap-[9px] rounded-[9px] border px-[14px] py-[11px] text-[13.5px] font-semibold transition-colors hover:border-[var(--color-primary)]"
+            className="flex items-center gap-[9px] rounded-lg border px-[14px] py-[11px] text-[13.5px] font-semibold transition-colors hover:border-[var(--color-primary)]"
             style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
           >
             <Icon className="h-4 w-4" strokeWidth={2} /> {action.label}

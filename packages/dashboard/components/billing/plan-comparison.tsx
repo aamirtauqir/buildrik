@@ -119,7 +119,7 @@ export function PlanComparison({
         </span>
       </div>
 
-      <div className="overflow-x-auto rounded-2xl border border-[var(--color-border-default)]">
+      <div className="overflow-x-auto rounded-lg border border-[var(--color-border-default)]">
         <table className="w-full text-body">
           <thead>
             <tr style={{ backgroundColor: "var(--color-bg-page)" }}>

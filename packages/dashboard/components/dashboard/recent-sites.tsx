@@ -28,7 +28,7 @@ export function RecentSites({ sites }: RecentSitesProps) {
         {showEmptySlot && (
           <Link
             href="/dashboard/sites/new"
-            className="flex h-full min-h-[160px] flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[var(--color-border-default)] bg-[var(--color-bg-subtle)] hover:border-[var(--color-primary)]/40 transition-colors"
+            className="flex h-full min-h-[160px] flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-[var(--color-border-default)] bg-[var(--color-bg-subtle)] hover:border-[var(--color-primary)]/40 transition-colors"
           >
             <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--color-border-default)] bg-white">
               <Plus className="h-4 w-4 text-[var(--color-text-secondary)]" />

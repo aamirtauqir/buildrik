@@ -46,7 +46,7 @@ function StatusView({
   return (
     <AuthCard>
       <div className="flex flex-col items-center text-center gap-4">
-        <span className="flex h-12 w-12 items-center justify-center rounded-[14px] bg-[#F5F5F6]">{icon}</span>
+        <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-[#F5F5F6]">{icon}</span>
         <div className="flex flex-col gap-2">
           <h1 className="text-auth-title text-auth-text-primary">{title}</h1>
           <p className="text-auth-subtitle text-auth-text-muted">{subtitle}</p>
@@ -230,7 +230,7 @@ function InviteContent() {
   return (
     <AuthCard>
       <div className="flex flex-col items-center text-center gap-[14px]">
-        <span className="flex h-[52px] w-[52px] items-center justify-center overflow-hidden rounded-[13px] bg-auth-cta text-[19px] font-bold tracking-[-0.02em] text-white">
+        <span className="flex h-[52px] w-[52px] items-center justify-center overflow-hidden rounded-lg bg-auth-cta text-[19px] font-bold tracking-[-0.02em] text-white">
           {invite.workspaceIconUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={invite.workspaceIconUrl} alt={invite.workspaceName} className="h-full w-full object-cover" />

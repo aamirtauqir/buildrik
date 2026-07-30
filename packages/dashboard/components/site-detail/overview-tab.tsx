@@ -88,7 +88,7 @@ export function OverviewTab({
 
   if (isError) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-xl border bg-white py-16" style={{ borderColor: "var(--color-border-default)" }}>
+      <div className="flex flex-col items-center justify-center rounded-lg border bg-white py-16" style={{ borderColor: "var(--color-border-default)" }}>
         <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>Failed to load site details</p>
         <p className="mt-1 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>Something went wrong. Please try again.</p>
         <div className="mt-4 flex items-center gap-3">
@@ -316,18 +316,18 @@ function OverviewSkeleton() {
     <div className="space-y-8">
       <div className="grid grid-cols-3 gap-4">
         {[1, 2, 3, 4, 5, 6].map((i) => (
-          <div key={i} className="rounded-xl border bg-white p-4" style={{ borderColor: "var(--color-border-default)" }}>
+          <div key={i} className="rounded-lg border bg-white p-4" style={{ borderColor: "var(--color-border-default)" }}>
             <div className="h-3 w-20 animate-pulse rounded" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
             <div className="mt-3 h-6 w-16 animate-pulse rounded" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
             <div className="mt-2 h-3 w-24 animate-pulse rounded" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
           </div>
         ))}
       </div>
-      <div className="rounded-xl border bg-white p-5" style={{ borderColor: "var(--color-border-default)" }}>
+      <div className="rounded-lg border bg-white p-5" style={{ borderColor: "var(--color-border-default)" }}>
         <div className="h-4 w-32 animate-pulse rounded" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
         <div className="mt-3 h-2 w-full animate-pulse rounded-full" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
       </div>
-      <div className="rounded-xl border bg-white p-5" style={{ borderColor: "var(--color-border-default)" }}>
+      <div className="rounded-lg border bg-white p-5" style={{ borderColor: "var(--color-border-default)" }}>
         <div className="h-4 w-28 animate-pulse rounded" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
         <div className="mt-4 space-y-3">
           {[1, 2, 3].map((i) => (

@@ -101,7 +101,7 @@ export default function TemplateGalleryPage() {
                 key={t.id}
                 type="button"
                 onClick={() => saveAndGo("/onboarding/template/preview", { template: { id: t.id } })}
-                className="flex flex-col overflow-hidden rounded-xl bg-white text-left shadow-[inset_0_0_0_1px_var(--color-onb-line)] transition-shadow hover:shadow-[inset_0_0_0_2px_var(--color-onb-primary)]"
+                className="flex flex-col overflow-hidden rounded-lg bg-white text-left shadow-[inset_0_0_0_1px_var(--color-onb-line)] transition-shadow hover:shadow-[inset_0_0_0_2px_var(--color-onb-primary)]"
               >
                 <div className="flex h-[170px] items-center justify-center border-b border-onb-line bg-gray-100">
                   {t.thumbnail ? (

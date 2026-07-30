@@ -90,7 +90,7 @@ export function CommentPreview({
         <div
           ref={stageRef}
           onClick={onStageClick}
-          className="relative mx-auto w-full max-w-3xl cursor-crosshair overflow-hidden rounded-xl border"
+          className="relative mx-auto w-full max-w-3xl cursor-crosshair overflow-hidden rounded-lg border"
           style={{ borderColor: "var(--color-border-default)", aspectRatio: "16 / 10", backgroundColor: "var(--color-bg-subtle)" }}
         >
           {previewUrl ? (

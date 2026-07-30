@@ -279,7 +279,7 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
             // Was "No assets yet" on a failed query — a fake-empty hiding the error.
             <ErrorState title="Couldn't load your media" description="Something went wrong on our end." onRetry={() => assets.refetch()} />
           ) : items.length === 0 ? (
-            <div className="rounded-xl border border-dashed p-12 text-center" style={{ borderColor: "var(--color-border-default)" }}>
+            <div className="rounded-lg border border-dashed p-12 text-center" style={{ borderColor: "var(--color-border-default)" }}>
               <ImageOff size={26} className="mx-auto mb-2" style={{ color: "var(--color-text-placeholder)" }} />
               <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>{search ? "No assets match your search" : "No assets yet"}</p>
               <p className="mt-0.5 text-body" style={{ color: "var(--color-text-secondary)" }}>{search ? "Try a different term." : "Upload images, video, or fonts to use across your sites."}</p>

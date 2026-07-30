@@ -98,7 +98,7 @@ export default function PlansPage() {
     return (
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-80 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
+          <div key={i} className="h-80 animate-pulse rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
         ))}
       </div>
     );
@@ -193,7 +193,7 @@ export default function PlansPage() {
           const checkColor = isInk ? "var(--color-teal)" : "var(--color-success)";
 
           return (
-            <div key={plan.name} className="relative flex flex-col rounded-xl border p-5" style={cardStyle}>
+            <div key={plan.name} className="relative flex flex-col rounded-lg border p-5" style={cardStyle}>
               {popular && (
                 <span
                   className="absolute -top-2.5 left-5 rounded-pill px-2.5 py-0.5 text-eyebrow font-semibold text-white"

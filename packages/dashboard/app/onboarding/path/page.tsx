@@ -88,7 +88,7 @@ export default function PathPage() {
             <div
               key={c.path}
               className={cn(
-                "flex min-h-80 w-80 flex-col justify-between gap-4 rounded-xl bg-white p-6",
+                "flex min-h-80 w-80 flex-col justify-between gap-4 rounded-lg bg-white p-6",
                 "transition-[box-shadow,transform] duration-150",
                 "hover:-translate-y-[3px] hover:shadow-[0_12px_28px_color-mix(in_srgb,var(--color-onb-primary)_15%,transparent),inset_0_0_0_2px_var(--color-onb-primary)]",
                 isRec
@@ -111,7 +111,7 @@ export default function PathPage() {
                     />
                   </span>
                   {isRec ? (
-                    <span className="rounded-[20px] bg-onb-primary px-2.5 py-1 text-[10px] font-bold text-white">
+                    <span className="rounded-pill bg-onb-primary px-2.5 py-1 text-[10px] font-bold text-white">
                       Recommended
                     </span>
                   ) : null}

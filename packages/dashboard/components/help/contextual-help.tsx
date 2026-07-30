@@ -97,7 +97,7 @@ export function ContextualHelp() {
 
       {open && (
         <div
-          className="absolute right-0 top-full z-50 mt-2 w-72 rounded-xl border bg-white shadow-lg"
+          className="absolute right-0 top-full z-50 mt-2 w-72 rounded-lg border bg-white shadow-lg"
           style={{ borderColor: "var(--color-border-default)" }}
         >
           <div className="border-b px-4 py-3" style={{ borderColor: "var(--color-border-default)" }}>

@@ -11,7 +11,7 @@ export default function ApiTokensPage() {
   // Only skeleton while genuinely loading. On error (workspace.get throws
   // NOT_FOUND with no active workspace) show a retry — the page used to spin
   // forever because workspaceId simply stayed undefined.
-  if (wsQuery.isLoading) return <div className="h-64 animate-pulse rounded-xl bg-neutral-100" />;
+  if (wsQuery.isLoading) return <div className="h-64 animate-pulse rounded-lg bg-neutral-100" />;
   if (!workspaceId) {
     return (
       <ErrorState

@@ -48,7 +48,7 @@ export function SharePasswordGate() {
   return (
     <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "var(--color-bg-page)" }}>
       <div className="w-full max-w-sm mx-auto px-4">
-        <div className="bg-white rounded-2xl p-8 shadow-sm" style={{ border: "1px solid var(--color-border-default)" }}>
+        <div className="bg-white rounded-lg p-8 shadow-sm" style={{ border: "1px solid var(--color-border-default)" }}>
           <div className="flex justify-center mb-6">
             <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: "#FDF2F2" }}>
               <Lock className="w-6 h-6" style={{ color: "var(--color-primary)" }} />

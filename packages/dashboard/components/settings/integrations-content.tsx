@@ -212,7 +212,7 @@ export function IntegrationsContent() {
     return (
       <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))" }}>
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="h-[74px] animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
+          <div key={i} className="h-[74px] animate-pulse rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
         ))}
       </div>
     );

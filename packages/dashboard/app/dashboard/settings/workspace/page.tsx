@@ -42,7 +42,7 @@ export default function WorkspaceSettingsPage() {
     onError: (err) => addToast("error", "Failed", err.message),
   });
 
-  if (wsQuery.isLoading) return <div className="h-64 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />;
+  if (wsQuery.isLoading) return <div className="h-64 animate-pulse rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }} />;
   if (!wsQuery.data) return <ErrorState title="Couldn't load workspace settings" onRetry={() => wsQuery.refetch()} />;
 
   const ws = wsQuery.data;

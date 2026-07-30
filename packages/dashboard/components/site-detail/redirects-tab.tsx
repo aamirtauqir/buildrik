@@ -130,7 +130,7 @@ export function RedirectsTab({ redirects, limit, canEdit, onCreate, onUpdate, on
 
       {/* Add / edit row — shown at limit too when editing (edit doesn't add). */}
       {canEdit && (!atLimit || editingId) && (
-        <div className="rounded-xl border p-4" style={{ borderColor: "var(--color-border-default)" }}>
+        <div className="rounded-lg border p-4" style={{ borderColor: "var(--color-border-default)" }}>
           {atLimit && !editingId ? (
             <p className="text-body text-amber-700">
               You&apos;ve hit your plan&apos;s redirect limit. <a href="/dashboard/settings/billing" className="font-medium underline">Upgrade</a> to add more.
@@ -169,7 +169,7 @@ export function RedirectsTab({ redirects, limit, canEdit, onCreate, onUpdate, on
         rows={redirects}
         keyOf={(r) => r.id}
         empty={
-          <div className="rounded-xl border border-dashed p-8 text-center" style={{ borderColor: "var(--color-border-default)" }}>
+          <div className="rounded-lg border border-dashed p-8 text-center" style={{ borderColor: "var(--color-border-default)" }}>
             <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>No redirects yet</p>
             <p className="mt-0.5 text-body" style={{ color: "var(--color-text-secondary)" }}>Renaming a page slug auto-creates one, or add yours above.</p>
           </div>

@@ -37,7 +37,7 @@ export function BulkActionBar({ selectedCount, onAction, onClear, folders = [] }
   if (selectedCount === 0) return null;
 
   return (
-    <div className="fixed bottom-6 left-1/2 z-40 flex -translate-x-1/2 items-center gap-2 rounded-xl border bg-white px-4 py-2.5 shadow-xl" style={{ borderColor: "var(--color-border-default)" }}>
+    <div className="fixed bottom-6 left-1/2 z-40 flex -translate-x-1/2 items-center gap-2 rounded-lg border bg-white px-4 py-2.5 shadow-xl" style={{ borderColor: "var(--color-border-default)" }}>
       <span className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>{selectedCount} selected</span>
       <div className="mx-2 h-5 w-px" style={{ backgroundColor: "var(--color-border-default)" }} />
       {BULK_ACTIONS.map((item) => {

@@ -114,7 +114,7 @@ export function DashboardChecklist({
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 w-80 rounded-2xl border border-[var(--color-border-default)] bg-white shadow-lg">
+    <div className="fixed bottom-6 right-6 z-50 w-80 rounded-lg border border-[var(--color-border-default)] bg-white shadow-lg">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--color-border-default)]">
         <div className="flex items-center gap-2">

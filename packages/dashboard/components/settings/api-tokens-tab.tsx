@@ -100,18 +100,18 @@ export function ApiTokensTab({ workspaceId }: { workspaceId: string }) {
 
       {/* Token list */}
       {list.isLoading ? (
-        <div className="h-40 animate-pulse rounded-xl bg-neutral-100" />
+        <div className="h-40 animate-pulse rounded-lg bg-neutral-100" />
       ) : list.isError ? (
         // Was "No API tokens yet" on a failed query — a fake-empty that hid the error.
         <ErrorState title="Couldn't load API tokens" description="Something went wrong on our end." onRetry={() => list.refetch()} />
       ) : (list.data?.length ?? 0) === 0 ? (
-        <div className="rounded-xl border border-dashed p-8 text-center" style={{ borderColor: "var(--color-border-default)" }}>
+        <div className="rounded-lg border border-dashed p-8 text-center" style={{ borderColor: "var(--color-border-default)" }}>
           <Key size={22} className="mx-auto mb-2 text-neutral-400" />
           <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>No API tokens yet</p>
           <p className="mt-0.5 text-sm" style={{ color: "var(--color-text-secondary)" }}>Create one to script deploys, exports, or redirects.</p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-xl border" style={{ borderColor: "var(--color-border-default)" }}>
+        <div className="overflow-hidden rounded-lg border" style={{ borderColor: "var(--color-border-default)" }}>
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b text-left text-xs uppercase tracking-wide text-neutral-500" style={{ borderColor: "var(--color-border-default)" }}>

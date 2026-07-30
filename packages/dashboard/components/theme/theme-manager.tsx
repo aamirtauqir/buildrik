@@ -115,7 +115,7 @@ export function ThemeManager() {
       ) : (
         <div className="space-y-6">
           {/* Captured-theme + capture/push controls */}
-          <div className="rounded-xl border bg-white p-4" style={{ borderColor: "var(--color-border-default)" }}>
+          <div className="rounded-lg border bg-white p-4" style={{ borderColor: "var(--color-border-default)" }}>
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-2">
                 <Palette className="h-4 w-4" style={{ color: "var(--color-primary)" }} />
@@ -250,7 +250,7 @@ export function ThemeManager() {
               {targets.map((s) => (
                 <div
                   key={s.id}
-                  className="flex items-center justify-between gap-4 rounded-xl border bg-white p-3"
+                  className="flex items-center justify-between gap-4 rounded-lg border bg-white p-3"
                   style={{ borderColor: "var(--color-border-default)" }}
                 >
                   <span className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>{s.name}</span>
