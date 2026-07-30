@@ -5,13 +5,13 @@
  */
 
 import * as React from "react";
-import { Input } from "@/editor/ui";
 import { useRef } from "react";
 import { Upload } from "lucide-react";
 import { SUPPORTED_FORMATS_LABEL } from "../../../../../shared/constants/media";
 import { EMPTY_MSGS } from "../data/mediaData";
 import type { MediaTypeFilter } from "../data/mediaTypes";
-import { Button } from "flowbite-react";
+import { Button, TextInput } from "flowbite-react";
+import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
 interface OnboardingEmptyStateProps {
   activeType: MediaTypeFilter;
@@ -48,7 +48,7 @@ export function OnboardingEmptyState({
       >
         Upload files
       </Button>
-      <Input
+      <TextInput theme={BK_TEXT_INPUT_THEME}
         ref={inputRef}
         type="file"
         multiple

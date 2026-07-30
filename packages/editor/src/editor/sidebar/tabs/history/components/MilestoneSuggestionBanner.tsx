@@ -6,9 +6,9 @@
  */
 
 import * as React from "react";
-import { Input } from "@/editor/ui";
 import type { MilestoneSuggestion } from "../../../../../shared/hooks/useAutoMilestone";
-import { Button } from "flowbite-react";
+import { Button, TextInput } from "flowbite-react";
+import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
 interface MilestoneSuggestionBannerProps {
   suggestion: MilestoneSuggestion;
@@ -92,7 +92,7 @@ export const MilestoneSuggestionBanner: React.FC<MilestoneSuggestionBannerProps>
           {triggerLabel}
         </div>
         {isEditing ? (
-          <Input
+          <TextInput theme={BK_TEXT_INPUT_THEME}
             ref={inputRef}
             type="text"
             value={editValue}

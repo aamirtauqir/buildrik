@@ -9,7 +9,6 @@
  */
 
 /* ── Atoms ──────────────────────────────────────────────────────────────── */
-export { Input, type InputProps } from "./Input";
 export { Slider, type SliderProps } from "./Slider";
 export { StatusDot, type StatusDotProps, type StatusDotState } from "./StatusDot";
 

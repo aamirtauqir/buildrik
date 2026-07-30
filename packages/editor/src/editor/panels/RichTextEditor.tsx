@@ -6,9 +6,10 @@
 
 import * as React from "react";
 import { ColorField } from "../../shared/forms";
-import { Input, Cluster, Popover } from "@/editor/ui";
+import { Cluster, Popover } from "@/editor/ui";
 import { BK_SELECT_BASE_THEME } from "@/editor/ui/selectTheme";
-import { Button, Select, Tooltip } from "flowbite-react";
+import { Button, Select, Tooltip, TextInput } from "flowbite-react";
+import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
 export interface RichTextEditorProps {
   onCommand: (command: string, value?: string) => void;
@@ -265,7 +266,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
         }
       >
         <div style={{ width: 250 }}>
-          <Input
+          <TextInput theme={BK_TEXT_INPUT_THEME}
             type="text"
             value={linkUrl}
             onChange={(e) => setLinkUrl(e.target.value)}

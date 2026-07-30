@@ -6,7 +6,6 @@
  */
 
 import * as React from "react";
-import { Input } from "@/editor/ui";
 import type { ColorHSB } from "../../types";
 import {
   hexToHsb,
@@ -287,7 +286,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
           className={`buildrick-design-picker__hex-input-wrap${hexError ? " buildrick-design-picker__hex-input-wrap--error" : ""}`}
         >
           <span className="buildrick-design-picker__hash">#</span>
-          <Input
+          <input
             type="text"
             value={hexInput.replace("#", "")}
             onChange={handleHexInput}

@@ -10,7 +10,7 @@
 
 import { ChevronDown, Layers, Plus } from "lucide-react";
 import * as React from "react";
-import { ConfirmDialog, EmptyState, EmptyStateDesc, EmptyStateTitle, Input, ModalClose, ModalContent, ModalRoot, ModalTitle, Portal, PanelFrame, SkeletonListItem, Stack } from "@/editor/ui";
+import { ConfirmDialog, EmptyState, EmptyStateDesc, EmptyStateTitle, ModalClose, ModalContent, ModalRoot, ModalTitle, Portal, PanelFrame, SkeletonListItem, Stack } from "@/editor/ui";
 import { useToast } from "@/editor/ui";
 import { PanelErrorState } from "../shared/PanelErrorState";
 import { SearchBar } from "../shared/SearchBar";
@@ -29,7 +29,8 @@ import type { ComponentsTabProps } from "./component-library/types";
 import { useComponentsState } from "./component-library/useComponentsState";
 import { type ComponentFilter, FILTER_CHIPS } from "./componentsData";
 import "./component-library/ComponentsTab.css";
-import { Button } from "flowbite-react";
+import { Button, TextInput } from "flowbite-react";
+import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
 export type { ComponentsTabProps };
 
@@ -381,7 +382,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             </ModalClose>
             <div className="bd-modal__body">
               <Stack>
-                <Input
+                <TextInput theme={BK_TEXT_INPUT_THEME}
                   type="text"
                   value={renameInput}
                   onChange={(e) => setRenameInput(e.target.value)}

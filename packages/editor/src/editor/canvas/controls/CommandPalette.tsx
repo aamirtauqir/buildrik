@@ -15,9 +15,10 @@
  */
 
 import * as React from "react";
-import { Input, Stack } from "@/editor/ui";
+import { Stack } from "@/editor/ui";
 import { CANVAS_COLORS, PANEL_STYLE, Z_INDEX } from "../shared";
-import { Button } from "flowbite-react";
+import { Button, TextInput } from "flowbite-react";
+import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
 // =============================================================================
 // TYPES
@@ -295,7 +296,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
       >
         {/* Search Input */}
         <div style={{ padding: 12, borderBottom: `1px solid ${CANVAS_COLORS.border}` }}>
-          <Input
+          <TextInput theme={BK_TEXT_INPUT_THEME}
             ref={inputRef}
             type="text"
             placeholder="Type a command or search..."

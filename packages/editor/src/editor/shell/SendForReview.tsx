@@ -13,11 +13,12 @@
  */
 
 import * as React from "react";
-import { FormField, Input, Popover } from "@/editor/ui";
+import { FormField, Popover } from "@/editor/ui";
 import type { Composer } from "../../engine";
 import { submitForReview, type ReviewStatus } from "../../services/ReviewService";
 import { exportPublishPages } from "./exportPublishPages";
-import { Button, Textarea, Tooltip } from "flowbite-react";
+import { Button, Textarea, Tooltip, TextInput } from "flowbite-react";
+import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
 export interface SendForReviewProps {
   composer: Composer | null;
@@ -132,7 +133,7 @@ export const SendForReview: React.FC<SendForReviewProps> = ({
       <div className="bk-send-review">
         <FormField label="Client email" hint="Leave blank to keep this internal.">
           {(wiring) => (
-            <Input
+            <TextInput theme={BK_TEXT_INPUT_THEME}
               {...wiring}
               type="email"
               value={email}
@@ -143,7 +144,7 @@ export const SendForReview: React.FC<SendForReviewProps> = ({
         </FormField>
         <FormField label="What changed?">
           {(wiring) => (
-            <Input
+            <TextInput theme={BK_TEXT_INPUT_THEME}
               {...wiring}
               value={summary}
               onChange={(e) => setSummary(e.target.value)}

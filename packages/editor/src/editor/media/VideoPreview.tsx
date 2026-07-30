@@ -5,8 +5,9 @@
  */
 
 import * as React from "react";
-import { Input, ModalClose, ModalContent, ModalRoot, ModalTitle, Portal, Stack } from "@/editor/ui";
-import { Button } from "flowbite-react";
+import { ModalClose, ModalContent, ModalRoot, ModalTitle, Portal, Stack } from "@/editor/ui";
+import { Button, TextInput } from "flowbite-react";
+import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
 // ============================================================================
 // TYPES
@@ -342,7 +343,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
             >
               {state.isMuted || state.volume === 0 ? "🔇" : "🔊"}
             </Button>
-            <Input
+            <TextInput theme={BK_TEXT_INPUT_THEME}
               type="range"
               min={0}
               max={1}

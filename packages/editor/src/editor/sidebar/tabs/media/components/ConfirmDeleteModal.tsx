@@ -7,7 +7,7 @@
  */
 
 import * as React from "react";
-import { Input, ModalContent, ModalRoot } from "@/editor/ui";
+import { ModalContent, ModalRoot } from "@/editor/ui";
 import { useState } from "react";
 import type { ConfirmDeletePayload } from "../data/mediaTypes";
 import { Button } from "flowbite-react";
@@ -63,7 +63,7 @@ export function ConfirmDeleteModal({ payload, onConfirm, onCancel }: ConfirmDele
             <p className="med-modal-gate-label">
               Type <strong>DELETE</strong> to confirm:
             </p>
-            <Input
+            <input
               className="med-modal-gate-input"
               value={confirmInput}
               onChange={(e) => setConfirmInput(e.target.value)}

@@ -7,8 +7,8 @@
 
 import { Link, Link2Off } from "lucide-react";
 import * as React from "react";
-import { Input } from "@/editor/ui";
-import { Button } from "flowbite-react";
+import { Button, TextInput } from "flowbite-react";
+import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
 export interface LinkedGapInputProps {
   styles: Record<string, string>;
@@ -56,7 +56,7 @@ const NumField: React.FC<{
       style={disabled ? { opacity: 0.5, pointerEvents: "none" } : undefined}
     >
       {icon && <span className="bdi-flb">{icon}</span>}
-      <Input
+      <TextInput theme={BK_TEXT_INPUT_THEME}
         type="text"
         value={num}
         onChange={(e) => {

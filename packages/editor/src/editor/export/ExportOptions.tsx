@@ -5,10 +5,11 @@
  */
 
 import * as React from "react";
-import { Input, Stack } from "@/editor/ui";
+import { Stack } from "@/editor/ui";
 import type { CMSExportMode, TemplateSyntax } from "../../engine/cms/CMSExportResolver";
 import type { ExportConfig, CSSExportStyle, ExportFormat } from "../../shared/types/export";
-import { Button, Checkbox } from "flowbite-react";
+import { Button, Checkbox, TextInput } from "flowbite-react";
+import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
 // ============================================================================
 // FORMAT CONFIG
@@ -235,7 +236,7 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
       {/* Page Title */}
       <div>
         <label style={{ display: "block", fontSize: 12, marginBottom: 6 }}>Page Title</label>
-        <Input
+        <TextInput theme={BK_TEXT_INPUT_THEME}
           type="text"
           value={config.pageTitle || ""}
           onChange={(e) => onChange({ pageTitle: e.target.value })}

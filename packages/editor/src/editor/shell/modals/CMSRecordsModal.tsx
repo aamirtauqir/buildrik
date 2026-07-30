@@ -14,7 +14,6 @@ import { Plus, Trash2, Pencil } from "lucide-react";
 import type { Composer } from "../../../engine";
 import type { CMSCollection, CMSContentItem, CMSField } from "../../../shared/types/cms";
 import {
-  Input,
   ModalClose,
   ModalContent,
   ModalRoot,
@@ -22,7 +21,8 @@ import {
   Portal,
 } from "@/editor/ui";
 import { BK_SELECT_BASE_THEME } from "@/editor/ui/selectTheme";
-import { Button, Checkbox, Select, Textarea } from "flowbite-react";
+import { Button, Checkbox, Select, Textarea, TextInput } from "flowbite-react";
+import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
 export interface CMSRecordsModalProps {
   composer: Composer | null;
@@ -176,7 +176,7 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
     return (
       <div {...common}>
         <FieldLabel field={field} />
-        <Input
+        <TextInput theme={BK_TEXT_INPUT_THEME}
           type={inputType}
           value={String(value ?? "")}
           onChange={(e) =>

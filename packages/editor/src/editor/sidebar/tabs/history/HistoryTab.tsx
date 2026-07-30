@@ -9,7 +9,7 @@
  */
 
 import * as React from "react";
-import { Input, PanelFrame } from "@/editor/ui";
+import { PanelFrame } from "@/editor/ui";
 import { useHistoryState } from "../../../../shared/hooks/useHistoryState";
 import { useAutoMilestone } from "../../../../shared/hooks/useAutoMilestone";
 import { VersionHistoryPanel } from "../../../panels/VersionHistoryPanel";
@@ -140,7 +140,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
         <span className="search-icon" aria-hidden="true">
           <SearchIconSvg />
         </span>
-        <Input
+        <input
           className="search-input"
           type="search"
           value={searchQuery}

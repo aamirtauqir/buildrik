@@ -8,11 +8,11 @@
  */
 
 import * as React from "react";
-import { Input } from "@/editor/ui";
 import { Upload, AlertTriangle, XCircle, RotateCcw } from "lucide-react";
 import type { UploadZoneProps } from "../data/mediaTypes";
 import { StorageQuotaBar } from "./StorageQuotaBar";
-import { Button } from "flowbite-react";
+import { Button, TextInput } from "flowbite-react";
+import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
 const ACCEPT_TYPES = "image/*,video/*,.ttf,.otf,.woff,.woff2,.svg";
 const MAX_FILE_BYTES = 50 * 1024 * 1024; // 50MB hard ceiling at the UI layer
@@ -125,7 +125,7 @@ export function UploadZone({
       >
         <Icon size={20} className="med-upload-zone-icon" />
         <span className="med-upload-zone__label">{label}</span>
-        <Input
+        <TextInput theme={BK_TEXT_INPUT_THEME}
           ref={inputRef}
           type="file"
           multiple

@@ -5,10 +5,11 @@
  */
 
 import * as React from "react";
-import { Cluster, HelperText, Input, Label, Stack } from "@/editor/ui";
-import { Textarea } from "flowbite-react";
+import { Cluster, HelperText, Label, Stack } from "@/editor/ui";
+import { Textarea, TextInput } from "flowbite-react";
 import type { PageItem } from "../types";
 import type { UsePageSettingsReturn } from "./usePageSettings";
+import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
 interface Props {
   s: UsePageSettingsReturn;
@@ -43,7 +44,7 @@ export const SocialTab: React.FC<Props> = ({ s, page }) => {
           <Label htmlFor="og-title">Open Graph Title</Label>
           <span style={{ font: "500 10.5px var(--bk-font-mono)", color: "var(--bk-ink-muted)" }}>{s.ogTitle.length}/60</span>
         </Cluster>
-        <Input
+        <TextInput theme={BK_TEXT_INPUT_THEME}
           id="og-title"
           value={s.ogTitle}
           onChange={(e) => s.setOgTitle(e.target.value)}
@@ -68,7 +69,7 @@ export const SocialTab: React.FC<Props> = ({ s, page }) => {
       {/* OG Image URL */}
       <Stack gap="xs" style={{ gap: 6 }}>
         <Label htmlFor="og-image">Image URL</Label>
-        <Input
+        <TextInput theme={BK_TEXT_INPUT_THEME}
           id="og-image"
           value={s.ogImageUrl ?? ""}
           onChange={(e) => s.setOgImageUrl(e.target.value || null)}

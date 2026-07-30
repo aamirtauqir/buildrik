@@ -13,8 +13,7 @@ import {
   EmptyStateActions,
   EmptyStateDesc,
   EmptyStateTitle,
-  IconButton,
-  Input,
+  IconButton
 } from "@/editor/ui";
 import type { Composer } from "../../../../../engine";
 import type { FolderItem, PageItem } from "../types";
@@ -23,7 +22,8 @@ import { AddPageButton } from "./AddPageButton";
 import { BulkToolbar } from "./BulkToolbar";
 import { PageFolder } from "./PageFolder";
 import { PageRow } from "./PageRow";
-import { Button } from "flowbite-react";
+import { Button, TextInput } from "flowbite-react";
+import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
 interface Props {
   pages: PageItem[];
@@ -152,7 +152,7 @@ export const PageList: React.FC<Props> = ({
               <circle cx="11" cy="11" r="8" />
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
-            <Input
+            <TextInput theme={BK_TEXT_INPUT_THEME}
               ref={searchRef}
               type="text"
               placeholder="Search pages..."

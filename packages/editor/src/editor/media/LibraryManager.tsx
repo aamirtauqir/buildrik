@@ -10,7 +10,6 @@
  */
 
 import * as React from "react";
-import { Input } from "@/editor/ui";
 import {
   Upload, Plus, X, Search, FolderOpen, Download, AlertCircle,
 } from "lucide-react";
@@ -32,7 +31,8 @@ import { formatBytes } from "@shared/utils/helpers/number";
 import { generateAltTextRemote } from "../../services/AltTextService";
 import { DEFAULT_MODEL } from "@buildrik/shared/schemas/ai";
 import "./LibraryManager.css";
-import { Button } from "flowbite-react";
+import { Button, TextInput } from "flowbite-react";
+import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
 interface LibraryManagerProps {
   composer: Composer;
@@ -264,7 +264,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           />
           <div className="mgr-search">
             <Search size={14} />
-            <Input
+            <TextInput theme={BK_TEXT_INPUT_THEME}
               ref={searchRef}
               type="text"
               placeholder="Search across all folders..."
@@ -393,7 +393,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
         </div>
       </div>
       {/* Hidden file input */}
-      <Input
+      <TextInput theme={BK_TEXT_INPUT_THEME}
         ref={fileInputRef}
         type="file"
         multiple

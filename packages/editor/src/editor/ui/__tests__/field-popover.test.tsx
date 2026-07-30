@@ -5,14 +5,14 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import React from "react";
-import { FormField, Input, Tag, Popover, Menu, MenuItem, MenuGroup, MenuLabel, Cluster, HelperText } from "../index";
+import { FormField, Tag, Popover, Menu, MenuItem, MenuGroup, MenuLabel, Cluster, HelperText } from "../index";
 import { Button } from "flowbite-react";
 
 describe("FormField", () => {
   it("wires label, hint and control together", () => {
     render(
       <FormField label="Domain" hint="No protocol, no trailing slash">
-        {(p) => <Input {...p} />}
+        {(p) => <input {...p} />}
       </FormField>,
     );
     const input = screen.getByLabelText("Domain");
@@ -23,7 +23,7 @@ describe("FormField", () => {
   it("an error replaces the hint, is announced, and marks the control invalid", () => {
     render(
       <FormField label="Slug" hint="Lowercase" error="That slug is taken">
-        {(p) => <Input {...p} />}
+        {(p) => <input {...p} />}
       </FormField>,
     );
     const input = screen.getByLabelText("Slug");
@@ -33,7 +33,7 @@ describe("FormField", () => {
   });
 
   it("marks required fields", () => {
-    const { container } = render(<FormField label="Name" required>{(p) => <Input {...p} />}</FormField>);
+    const { container } = render(<FormField label="Name" required>{(p) => <input {...p} />}</FormField>);
     expect(container.querySelector(".bk-label__required")).toBeTruthy();
   });
 });

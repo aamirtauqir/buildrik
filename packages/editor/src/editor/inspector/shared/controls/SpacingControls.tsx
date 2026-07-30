@@ -11,12 +11,13 @@
 
 import { Link, Unlink } from "lucide-react";
 import * as React from "react";
-import { Input, Stack } from "@/editor/ui";
+import { Stack } from "@/editor/ui";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
 import { DSBindingChip } from "../../sections/DSBindingChip";
 import { isTokenVar, extractVarName, cssVarToTokenId } from "../tokenBindingDetection";
-import { Button } from "flowbite-react";
+import { Button, TextInput } from "flowbite-react";
+import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
 // ============================================================================
 // AXIS INPUT — absolutely positioned input inside a box edge
@@ -82,7 +83,7 @@ const AxisInput: React.FC<AxisInputProps> = ({ side, value, onChange, disabled, 
 
   return (
     <>
-      <Input
+      <input
         type="text"
         className={`bdi-ax ${SIDE_POS[side]}${local.isKeyword ? " muted" : ""}`}
         value={display}
@@ -206,7 +207,8 @@ export const CornerRadiusInput: React.FC<CornerRadiusInputProps> = ({
         const { num, unit } = parseValue(values[corner]);
         return (
           <div key={corner} className="bdi-num axis" data-axis={corner.toUpperCase()}>
-            <Input
+            <TextInput
+              theme={BK_TEXT_INPUT_THEME}
               type="text"
               value={num}
               onChange={(e) => {

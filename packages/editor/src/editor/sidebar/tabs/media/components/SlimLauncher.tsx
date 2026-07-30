@@ -9,7 +9,7 @@
  */
 
 import * as React from "react";
-import { Input, PanelFrame } from "@/editor/ui";
+import { PanelFrame } from "@/editor/ui";
 import { Search } from "lucide-react";
 import type { Composer } from "@/engine/Composer";
 import type { LibraryItem, MediaTypeFilter, TypeCounts, UploadProgress } from "../data/mediaTypes";
@@ -90,7 +90,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
       </div>
       <div className="sl-search">
         <Search size={14} className="sl-search__icon" aria-hidden="true" />
-        <Input
+        <input
           type="text"
           className="sl-search__input"
           placeholder="Search library…"

@@ -11,7 +11,6 @@
  */
 
 import * as React from "react";
-import { Input } from "@/editor/ui";
 import { BK_SELECT_BASE_THEME } from "@/editor/ui/selectTheme";
 import type {
   ColorField,
@@ -26,7 +25,8 @@ import type {
   TextField,
   ToggleField,
 } from "./schema";
-import { Button, Checkbox, Select } from "flowbite-react";
+import { Button, Checkbox, Select, TextInput } from "flowbite-react";
+import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
 // ============================================================================
 // SHARED STYLE TOKENS — keep each control file-local so future sections can
@@ -77,7 +77,7 @@ const LengthControl: React.FC<ControlProps<LengthField>> = ({
     <label style={labelStyle} htmlFor={`field-${field.prop}`}>
       {field.label}
     </label>
-    <Input
+    <TextInput theme={BK_TEXT_INPUT_THEME}
       id={`field-${field.prop}`}
       type="text"
       value={value}
@@ -101,7 +101,7 @@ const NumberControl: React.FC<ControlProps<NumberField>> = ({
     <label style={labelStyle} htmlFor={`field-${field.prop}`}>
       {field.label}
     </label>
-    <Input
+    <TextInput theme={BK_TEXT_INPUT_THEME}
       id={`field-${field.prop}`}
       type="number"
       value={value}
@@ -181,7 +181,7 @@ const ColorControl: React.FC<ControlProps<ColorField>> = ({
     <label style={labelStyle} htmlFor={`field-${field.prop}`}>
       {field.label}
     </label>
-    <Input
+    <TextInput theme={BK_TEXT_INPUT_THEME}
       id={`field-${field.prop}`}
       type="color"
       value={value || "#000000"}
@@ -266,7 +266,7 @@ const Spacing4Control: React.FC<ControlProps<Spacing4Field>> = ({
           >
             {side}
           </label>
-          <Input
+          <TextInput theme={BK_TEXT_INPUT_THEME}
             id={`field-${field.group}-${side}`}
             type="text"
             value={values[side]}
@@ -292,7 +292,7 @@ const TextControl: React.FC<ControlProps<TextField>> = ({
     <label style={labelStyle} htmlFor={`field-${field.prop}`}>
       {field.label}
     </label>
-    <Input
+    <TextInput theme={BK_TEXT_INPUT_THEME}
       id={`field-${field.prop}`}
       type="text"
       value={value}
@@ -368,7 +368,7 @@ const Corners4Control: React.FC<ControlProps<Corners4Field>> = ({
           <label style={labelStyle} htmlFor={`field-${c.prop}`}>
             {c.label}
           </label>
-          <Input
+          <TextInput theme={BK_TEXT_INPUT_THEME}
             id={`field-${c.prop}`}
             type="text"
             value={cornerValues[c.id]}

@@ -20,14 +20,14 @@
  */
 
 import * as React from "react";
-import { Input } from "@/editor/ui";
 import type { DesignToken, TokenDiff } from "../../types";
 import { calcWcagLevel, calcContrastRatio } from "../../utils/colorUtils";
 import { suggestContrastFix } from "../../utils/contrastFix";
 import { TokenRow } from "../sections/TokenRow";
 import type { LintIssue } from "../../../../engine/designSystem/LintState";
 import type { Composer } from "../../../../engine/Composer";
-import { Button } from "flowbite-react";
+import { Button, TextInput } from "flowbite-react";
+import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
 export interface ColorTokenListProps {
   tokens: DesignToken[];
@@ -306,7 +306,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
         }}
       >
         <div style={{ flex: 1, position: "relative", minWidth: 100 }}>
-          <Input
+          <TextInput theme={BK_TEXT_INPUT_THEME}
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}

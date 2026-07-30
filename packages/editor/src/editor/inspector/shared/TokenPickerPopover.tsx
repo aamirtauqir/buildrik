@@ -20,8 +20,9 @@
  */
 
 import * as React from "react";
-import { Input, Stack } from "@/editor/ui";
-import { Button } from "flowbite-react";
+import { Stack } from "@/editor/ui";
+import { Button, TextInput } from "flowbite-react";
+import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
 // ============================================================================
 // TYPES
@@ -224,7 +225,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
         <div onKeyDown={handleKeyDown}>
           {/* Search */}
           <div style={{ padding: "8px 8px 4px" }}>
-            <Input
+            <TextInput theme={BK_TEXT_INPUT_THEME}
               ref={searchRef}
               type="text"
               value={query}
@@ -449,7 +450,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
                 flexShrink: 0,
               }}
             />
-            <Input
+            <TextInput theme={BK_TEXT_INPUT_THEME}
               type="text"
               value={customInput}
               autoFocus

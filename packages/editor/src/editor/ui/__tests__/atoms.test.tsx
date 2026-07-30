@@ -9,19 +9,37 @@
  */
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { Input, Slider, StatusDot } from "../index";
-import { Avatar, Checkbox, Radio, Select, ToggleSwitch } from "flowbite-react";
+import { Slider, StatusDot } from "../index";
+import { Avatar, Checkbox, Radio, Select, TextInput, ToggleSwitch } from "flowbite-react";
 import { avatarInitials, AVATAR_TONE_THEME, type AvatarTone } from "../avatarTone";
 import { BK_SELECT_BASE_THEME } from "../selectTheme";
+import { BK_TEXT_INPUT_THEME } from "../textInputTheme";
 
-describe("Input", () => {
-  it("marks the error state for assistive tech, not just visually", () => {
-    render(<Input error aria-label="Domain" defaultValue="bellacucina.com" />);
-    expect(screen.getByLabelText("Domain").getAttribute("aria-invalid")).toBe("true");
+describe("TextInput", () => {
+  it("puts `className` on the OUTER wrapper div, never on the <input> itself — the theme prop is the only way to restyle the field", () => {
+    // Same structural gap as Select (see the "Select" describe block below):
+    // flowbite's TextInput.js destructures `className` and applies it only
+    // to `theme.base`'s wrapping <div>; the <input> only ever receives
+    // classes resolved from `theme.field.input.*`. Every real consumer that
+    // needs the input's own border/background/focus-ring corrected uses the
+    // `theme` prop (textInputTheme.ts) instead of `className`.
+    const { container } = render(
+      <TextInput className="probe-outer" theme={BK_TEXT_INPUT_THEME} aria-label="Domain" />,
+    );
+    expect(container.querySelector("input")?.className).not.toMatch(/probe-outer/);
+    expect(container.querySelector(".probe-outer")?.tagName).toBe("DIV");
+    expect(container.querySelector("input")?.className).toMatch(/tw:bg-white/);
+  });
+
+  it("marks the error state for assistive tech via the built-in aria-invalid variant", () => {
+    render(<TextInput theme={BK_TEXT_INPUT_THEME} aria-invalid aria-label="Domain" defaultValue="bellacucina.com" />);
+    const input = screen.getByLabelText("Domain");
+    expect(input.getAttribute("aria-invalid")).toBe("true");
+    expect(input.className).toMatch(/aria-invalid:border-\[var\(--bk-error\)\]/);
   });
 
   it("has no aria-invalid when healthy", () => {
-    render(<Input aria-label="Domain" />);
+    render(<TextInput theme={BK_TEXT_INPUT_THEME} aria-label="Domain" />);
     expect(screen.getByLabelText("Domain").getAttribute("aria-invalid")).toBeNull();
   });
 });

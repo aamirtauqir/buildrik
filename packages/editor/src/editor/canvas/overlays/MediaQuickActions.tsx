@@ -5,10 +5,10 @@
  */
 
 import * as React from "react";
-import { Input } from "@/editor/ui";
 import { Edit2, Image, Type, Check, Palette } from "lucide-react";
 import type { Composer } from "../../../engine";
-import { Button } from "flowbite-react";
+import { Button, TextInput } from "flowbite-react";
+import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
 interface MediaQuickActionsProps {
   composer: Composer;
@@ -144,7 +144,7 @@ export const MediaQuickActions: React.FC<MediaQuickActionsProps> = ({
         <div style={popoverStyle}>
           <div style={popoverTitleStyle}>Alt Text (SEO)</div>
           <div style={{ display: "flex", gap: "4px" }}>
-            <Input
+            <TextInput theme={BK_TEXT_INPUT_THEME}
               autoFocus
               type="text"
               value={altValue}

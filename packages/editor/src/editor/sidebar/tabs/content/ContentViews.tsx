@@ -8,13 +8,14 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { ConfirmDialog, Input } from "@/editor/ui";
+import { ConfirmDialog } from "@/editor/ui";
 import { BK_SELECT_BASE_THEME } from "@/editor/ui/selectTheme";
 import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
 import type { ConditionExpression, ConditionOperator, DataSource } from "@/shared/types/data";
 import { conditionSummary, fieldDefault, isValidVariableKey, type SiteVariable } from "./contentPanelUtils";
 import type { ConditionRow } from "./useContentPanel";
-import { Button, Checkbox, Select, Textarea, ToggleSwitch } from "flowbite-react";
+import { Button, Checkbox, Select, Textarea, ToggleSwitch, TextInput } from "flowbite-react";
+import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
 export const S: Record<string, React.CSSProperties> = {
   body: { display: "flex", flexDirection: "column", height: "100%", minHeight: 0 },
@@ -355,7 +356,7 @@ export function RecordView({
                     aria-label={f.name}
                   />
                 ) : (
-                  <Input
+                  <TextInput theme={BK_TEXT_INPUT_THEME}
                     style={S.input}
                     type={f.type === "number" ? "number" : "text"}
                     value={String(data[f.slug] ?? "")}
@@ -446,7 +447,7 @@ export function FieldsView({
         ))}
         {adding ? (
           <div style={S.inlineForm}>
-            <Input
+            <TextInput theme={BK_TEXT_INPUT_THEME}
               style={{ ...S.input, margin: 0, width: "auto" }}
               placeholder="Field name"
               value={name}
@@ -607,7 +608,7 @@ export function VariablesView({
             <span style={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0, flex: 1 }}>
               <span style={S.mono}>{`{{site.${v.key}}}`}</span>
               {editKey === v.key ? (
-                <Input
+                <TextInput theme={BK_TEXT_INPUT_THEME}
                   style={{ ...S.input, margin: "4px 0 0", width: "auto" }}
                   value={editValue}
                   onChange={(e) => setEditValue(e.target.value)}
@@ -652,7 +653,7 @@ export function VariablesView({
         ))}
         {adding ? (
           <div style={S.inlineForm}>
-            <Input
+            <TextInput theme={BK_TEXT_INPUT_THEME}
               style={{ ...S.input, margin: 0, width: "auto" }}
               placeholder="key (e.g. phone)"
               value={key}
@@ -665,7 +666,7 @@ export function VariablesView({
                 {dupError ? "A variable with this key already exists." : "Keys are letters/digits/dashes, starting with a letter."}
               </div>
             )}
-            <Input
+            <TextInput theme={BK_TEXT_INPUT_THEME}
               style={{ ...S.input, margin: 0, width: "auto" }}
               placeholder="value"
               value={value}
@@ -755,7 +756,7 @@ export function ConditionsView({
         {pickedElementId ? (
           <div style={S.inlineForm} data-testid="condition-form">
             <div style={{ fontSize: 12, color: "var(--bk-ink-muted)" }}>Show the picked element when…</div>
-            <Input
+            <TextInput theme={BK_TEXT_INPUT_THEME}
               style={{ ...S.input, margin: 0, width: "auto" }}
               placeholder="site.hours or menu.available"
               value={left}
@@ -776,7 +777,7 @@ export function ConditionsView({
                 ))}
               </Select>
               {needsRight && (
-                <Input
+                <TextInput theme={BK_TEXT_INPUT_THEME}
                   style={{ ...S.input, margin: 0, width: "auto", flex: 1 }}
                   placeholder="value"
                   value={right}

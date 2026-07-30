@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { Input, PanelFrame, useToast } from "@/editor/ui";
+import { PanelFrame, useToast } from "@/editor/ui";
 import { Search, X } from "lucide-react";
 import type { Composer } from "../../../../engine";
 import { DrillInHeader } from "../../shared/DrillInHeader";
@@ -316,7 +316,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
         <div className="tpl-search-wrap">
           <div className="tpl-search-input-box">
             <Search size={16} className="tpl-search-icon" />
-            <Input
+            <input
               className="tpl-search-input"
               placeholder="Search templates..."
               value={sel.searchQ}

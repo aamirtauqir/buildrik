@@ -18,7 +18,6 @@
 
 import * as React from "react";
 import {
-  Input,
   ModalClose,
   ModalContent,
   ModalRoot,
@@ -32,7 +31,8 @@ import {
   dialogInputStyles,
   dialogPrimaryBtnStyles,
 } from "./styles";
-import { Button, Checkbox, Select } from "flowbite-react";
+import { Button, Checkbox, Select, TextInput } from "flowbite-react";
+import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
 export interface SelectionContext {
   selectionIds: readonly string[];
@@ -119,7 +119,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
                 <label htmlFor="create-component-name" style={labelStyle}>
                   Name
                 </label>
-                <Input
+                <TextInput theme={BK_TEXT_INPUT_THEME}
                   id="create-component-name"
                   type="text"
                   value={name}

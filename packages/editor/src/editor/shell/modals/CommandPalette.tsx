@@ -8,12 +8,13 @@
  */
 
 import * as React from "react";
-import { Input, Stack } from "@/editor/ui";
+import { Stack } from "@/editor/ui";
 import type { Composer } from "../../../engine";
 import { EVENTS } from "../../../shared/constants/events";
 import { GROUPED_TABS_CONFIG } from "../../rail/tabsConfig";
 import { getRecentCommandIds, recordCommandRun } from "./commandRecents";
-import { Button } from "flowbite-react";
+import { Button, TextInput } from "flowbite-react";
+import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
 // =============================================================================
 // TYPES
@@ -388,7 +389,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
             <line x1={21} y1={21} x2={16.65} y2={16.65} />
           </svg>
 
-          <Input
+          <TextInput theme={BK_TEXT_INPUT_THEME}
             ref={inputRef}
             type="text"
             placeholder="Search commands..."

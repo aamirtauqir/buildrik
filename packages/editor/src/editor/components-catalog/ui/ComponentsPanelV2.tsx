@@ -22,7 +22,7 @@
  */
 
 import * as React from "react";
-import { Input, PanelHeader } from "@/editor/ui";
+import { PanelHeader } from "@/editor/ui";
 import { useToast } from "@/editor/ui";
 import type { Composer } from "@/engine";
 import { CatalogSection } from "./CatalogSection";
@@ -30,7 +30,8 @@ import { UserSavedSection } from "./UserSavedSection";
 import { DSStatusChip } from "./DSStatusChip";
 import { AIPromptModal } from "@/editor/design-system/ui/AIPromptModal";
 import { EVENTS } from "@/shared/constants/events";
-import { Button } from "flowbite-react";
+import { Button, TextInput } from "flowbite-react";
+import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
 type FilterMode = "all" | "ds" | "yours";
 
@@ -225,7 +226,7 @@ export const ComponentsPanelV2: React.FC<ComponentsPanelV2Props> = ({
       </div>
 
       <div style={{ padding: "0 12px" }}>
-        <Input
+        <TextInput theme={BK_TEXT_INPUT_THEME}
           type="search"
           placeholder="Search components…"
           value={search}

@@ -7,10 +7,10 @@
  */
 
 import * as React from "react";
-import { Input } from "@/editor/ui";
 import type { GoogleFont, FontCategory } from "../../../../services/GoogleFontsService";
 import type { SystemFont } from "./FontPicker";
-import { Button } from "flowbite-react";
+import { Button, TextInput } from "flowbite-react";
+import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
 // Category labels for display
 export const CATEGORY_LABELS: Record<FontCategory | "system", string> = {
@@ -33,7 +33,7 @@ interface FontSearchInputProps {
 
 export const FontSearchInput: React.FC<FontSearchInputProps> = ({ value, onChange }) => (
   <div style={{ padding: 8, borderBottom: `1px solid ${"var(--bk-border)"}` }}>
-    <Input
+    <TextInput theme={BK_TEXT_INPUT_THEME}
       type="text"
       value={value}
       onChange={(e) => onChange(e.target.value)}

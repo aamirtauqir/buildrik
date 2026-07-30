@@ -5,12 +5,12 @@
  */
 
 import * as React from "react";
-import { Input } from "@/editor/ui";
 import { BK_SELECT_BASE_THEME } from "@/editor/ui/selectTheme";
 import type { ResponsiveMode } from "../../state/useTypeTokens";
 import type { DesignToken } from "../../types";
 import { TokenUsageChip } from "../sections/TokenUsageChip";
-import { Button, Select } from "flowbite-react";
+import { Button, Select, TextInput } from "flowbite-react";
+import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
 export interface TypeTokenListProps {
   tokens: DesignToken[];
@@ -174,7 +174,7 @@ const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
       </div>
 
       {/* Size input */}
-      <Input
+      <TextInput theme={BK_TEXT_INPUT_THEME}
         type="number"
         value={size}
         min={1}

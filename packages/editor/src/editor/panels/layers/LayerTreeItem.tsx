@@ -5,7 +5,6 @@
  */
 
 import * as React from "react";
-import { Input, } from "@/editor/ui";
 import { getElementIcon } from "@/editor/shared/elementIcons";
 import type { Composer } from "../../../engine";
 import { ELEMENT_TYPE_LABELS } from "../../../shared/constants/elementTypeLabels";
@@ -194,7 +193,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
         </span>
 
         {isEditing ? (
-          <Input
+          <input
             ref={editInputRef}
             type="text"
             className="bdc-lr-edit"

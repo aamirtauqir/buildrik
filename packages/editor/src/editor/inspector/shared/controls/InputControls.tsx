@@ -7,9 +7,8 @@
 
 import { Info, X } from "lucide-react";
 import * as React from "react";
-import { Input } from "@/editor/ui";
 import { BK_SELECT_BARE_UNIT_THEME, BK_SELECT_BARE_VALUE_THEME } from "@/editor/ui/selectTheme";
-import { Button, Select, Textarea, Tooltip } from "flowbite-react";
+import { Button, Select, Textarea, TextInput, Tooltip } from "flowbite-react";
 
 // ============================================================================
 // HELPERS
@@ -74,7 +73,7 @@ export const InputRow: React.FC<InputRowProps> = ({
           placeholder={placeholder}
         />
       ) : (
-        <Input
+        <input
           className="bdi-text"
           type={type}
           value={value}
@@ -221,14 +220,20 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
           title={isInvalid ? "Invalid number — press Escape to revert" : disabledReason}
         >
           {fieldIcon && <span className="bdi-flb">{fieldIcon}</span>}
-          <Input
+          <TextInput
             type="text"
             value={isKeywordUnit && !isTokenVar(inputValue) ? unit : inputValue}
             onChange={(e) => handleInputChange(e.target.value)}
             onBlur={handleInputBlur}
             onKeyDown={handleInputKeyDown}
             placeholder={placeholder}
-            className={isKeywordUnit ? "auto" : ""}
+            // `.bdi-fld input.auto` (inspector.css) is a real, unlayered CSS
+            // rule keyed off a class on the actual <input> — flowbite's
+            // TextInput only ever puts `className` on the OUTER wrapper div
+            // (same structural gap `selectTheme.ts` documents for Select),
+            // so the "auto" class has to reach the input through `theme`,
+            // not `className`.
+            theme={{ field: { input: { base: isKeywordUnit ? "auto" : "" } } }}
             disabled={disabled || (isKeywordUnit && !isTokenVar(inputValue))}
             aria-invalid={isInvalid}
             style={{

@@ -18,7 +18,6 @@
  */
 
 import * as React from "react";
-import { Input } from "@/editor/ui";
 import type { Composer } from "../../../../../engine";
 import type { HistoryDisplayEntry } from "../../../../../engine/HistoryManager";
 import type { NamedVersion } from "../../../../../shared/types/versions";
@@ -320,7 +319,7 @@ export const TimeTravelScrubber: React.FC<TimeTravelScrubberProps> = ({
                   ? `Previewing: ${formatTime(currentEntry.timestamp)} — ${currentEntry.label}`
                   : "No entry selected"}
               </div>
-              <Input
+              <input
                 type="range"
                 className="tt-slider"
                 min={0}

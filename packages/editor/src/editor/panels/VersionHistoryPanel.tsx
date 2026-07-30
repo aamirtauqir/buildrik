@@ -10,7 +10,6 @@
  */
 
 import * as React from "react";
-import { Input } from "@/editor/ui";
 import { useVersionHistory } from "../../shared/hooks/useVersionHistory";
 import type { CompareResult } from "../../shared/types/versions";
 import type { Composer } from "../../engine";
@@ -265,7 +264,7 @@ export function VersionHistoryPanel({
                 <label className="form-label" htmlFor="bd-save-name">
                   Version name *
                 </label>
-                <Input
+                <input
                   id="bd-save-name"
                   type="text"
                   value={newVersionName}

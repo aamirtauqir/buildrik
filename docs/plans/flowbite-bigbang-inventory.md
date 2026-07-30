@@ -1601,3 +1601,174 @@ test file (`CommentLayer`, `AiPromptPopover`, `AIPromptModal`, `ImportCard`,
 `SeoTab`, `SocialTab`, `ReviewTab`, `ContentTab`, settings-tab tests,
 `ui/__tests__`, `flowbite-parity.test.tsx`, `chrome-reset.test.ts`) — 26 test
 files / 285 tests + 20 more, all green.
+
+### Input → `flowbite-react` `TextInput`
+
+`src/editor/ui/Input.tsx` (bare `<input className="bk-input">`, with a single
+`error?: boolean` prop) → `node_modules/flowbite-react/dist/components/TextInput/TextInput.js`/`theme.js`.
+
+**Structural finding, same shape as Select's:** `TextInput.js`'s consumer
+`className` is destructured and applied ONLY to an outer wrapper
+`<div className={twMerge(theme.base, className)}>` (`theme.base = "flex"`);
+the real `<input>` only ever receives classes resolved from
+`theme.field.input.*`. Confirmed by reading the component source, not
+assumed from Select's precedent. `ref` forwards correctly to the real
+`<input>` (`ForwardRefExoticComponent<TextInputProps & RefAttributes<HTMLInputElement>>`),
+unaffected by the wrapper.
+
+**`src/editor/ui/textInputTheme.ts` created** (adapter, same justification
+class as `selectTheme.ts`/`avatarTone.ts` — CLAUDE.md rule 3, not a
+component wrapper):
+
+- `BK_TEXT_INPUT_THEME` — every plain call site's fix: `TextInputColors` has
+  no `"blue"` entry the way Checkbox/Radio do
+  (`Pick<FlowbiteColors, "gray" | "info" | "failure" | "warning" | "success">`),
+  so the color correction is a `field.input.colors.gray` override, not a
+  `color` prop swap: `tw:bg-white tw:focus:border-primary-700
+  tw:focus:ring-primary-700` (flowbite's default `bg-gray-50`/`primary-500`
+  focus is one ramp step off `--bk-bg-card`/`--bk-accent`) — same shallow
+  "fix color, accept flowbite's own `p-2.5 text-sm` box" precedent Select
+  and Textarea already established (checked `withAddon.off` — TextInput's
+  default already resolves to `rounded-lg`, unlike the false read during
+  investigation; no radius fix needed here, verified against the raw
+  `theme.js` source directly with `sed`, not the first `cat` pass which
+  mis-rendered it). Also bakes the deleted `.bk-input[aria-invalid="true"]`
+  rule's error-border behavior in as Tailwind's built-in `aria-invalid:`
+  variant (`tw:aria-invalid:border-[var(--bk-error)]` +
+  `tw:aria-invalid:focus:border/ring-[var(--bk-error)]`, the compound
+  focus+invalid variant reproducing the old CSS's "invalid wins over focus
+  on equal specificity by source order" behavior via a higher-specificity
+  compound selector instead) — every plain call site gets correct error
+  styling for free just by passing `aria-invalid` through; no per-site
+  branching needed.
+- `SETTINGS_TEXT_INPUT_THEME` (inline in `settings/shared.tsx`, not
+  `textInputTheme.ts` — a different local design token, same non-extraction
+  reasoning as `SETTINGS_SELECT_THEME`) — reproduces `.bd-set-input`'s exact
+  box (`settings.css:240`) for the settings tab's local `Input` wrapper.
+  Same `withAddon.off` radius-override requirement Select's
+  `SETTINGS_SELECT_THEME` already documented (flowbite's own `rounded-lg`
+  lives there, positioned after `colors`/`sizes` in the component's own
+  `twMerge` call).
+- A third, one-off **inline dynamic theme** (not a named export — a single
+  call site, not shared) at `InputControls.tsx`'s `InputWithUnit`: the old
+  `className={isKeywordUnit ? "auto" : ""}` toggled `.bdi-fld input.auto`
+  (an unlayered unit-select-adjacent CSS rule keyed off a class on the real
+  `<input>`) — since `className` can't reach the real input, the toggle
+  moved to `theme={{ field: { input: { base: isKeywordUnit ? "auto" : "" } } }}`.
+
+**Consumer-shape finding, much larger blast radius than Select/Textarea
+hit:** a full AST sweep (`ts-morph`, not the brief's literal `rg` command —
+same over-match problem `Button` already documented) found **128 real
+`<Input` JSX call sites across 74 files** via the `@/editor/ui` import path.
+Of those, **26 sites across 24 files** passed a bespoke local CSS
+`className` (`bdi-text`, `ie-slider`, `bd-pg-row-rename`, `search-input`,
+etc.) doing FULL custom re-skinning (search bars, inline-rename fields,
+range sliders styled as custom tracks, hex swatches) — verified against
+each class's own CSS that none of them relied on `.bk-input`'s box at all
+(fully self-sufficient: own width/height/padding/border/background/font).
+Since `Input.tsx` was itself just `<input ref className aria-invalid
+{...rest}>` — literally nothing beyond a className merge + aria-invalid
+computation + ref forwarding — and flowbite's `TextInput` cannot route a
+`className` prop to the real `<input>` at all, converting these 26 sites to
+plain **raw native `<input>`** elements is a byte-identical-behavior,
+zero-regression swap (not a new "KEEP" carve-out; `Input` was contributing
+zero value at these sites once its `className`-forwarding path is
+structurally gone). This is the same class of move as Button's
+`PanelHeader.tsx`/`PanelFrame.tsx` raw-`<button>` sites and Radio's orphan
+`FormatRow.tsx` — except here the sites are live, heavily-used UI (search
+bars, inline rename), not orphans; the shared reasoning is "the wrapper
+component was a thin className-forwarding shell, and this call site no
+longer benefits from it," not "unused code."
+
+**Range-input caveat, checked not assumed:** several `type="range"` sites
+(`ZoomControls.tsx`, `SliderControls.tsx` ×2, `SliderControl.tsx`,
+`OptimizationPanel.tsx`, `flexbox/controls.tsx`'s `GapSlider`) had no
+`className` (routed through the `theme`-bucket, not raw) but DO need a
+custom flat-track look, achieved via a complete inline `style` object
+(`appearance: "none"`, explicit `background`/`height`/`border-radius`) —
+`style` always reaches the real `<input>` under `TextInput` (flows through
+`...restProps`, unlike `className`), so these render identically to the old
+`bk-input` + same-`style` combination. 3 range sites
+(`BackgroundSection.tsx`'s gradient angle, `VideoPreview.tsx`'s volume,
+`IconPickerModal.tsx`'s stroke width) pass only a partial `style` (no
+track re-skin) — same category of "boxed native range slider" look under
+old `bk-input` styling too (not a new regression, `bk-input` never had
+range-specific styling either); left as `TextInput` + `BK_TEXT_INPUT_THEME`,
+not treated as a `className`-bucket case.
+
+**Sites needing hand judgment (not the blanket codemod path), each
+individually resolved:** `shared/forms/InputField.tsx`,
+`shared/forms/NumberField.tsx`, `shared/forms/ColorField.tsx` (the
+sanctioned `shared/forms/` → `@/editor/ui` edge — `FormField`'s
+render-prop `wiring` already supplies correct `aria-invalid`, so no
+extra per-site error handling needed once `error={...}` was dropped in
+favor of the wiring/explicit-aria-invalid path); `AddTokenModal.tsx` (×2)
+and `SeoTab.tsx` (×2) (`error={!!x}` → `aria-invalid={!!x || undefined}`,
+exactly reproducing old `Input.tsx`'s own `aria-invalid={error ||
+undefined}` computation; `SeoTab.tsx`'s slug input already had a
+**separately, redundantly** passed `aria-invalid` prop pre-migration —
+verified the duplicate and just deleted the now-meaningless `error=` line
+rather than doubling up); `settings/shared.tsx`'s local `Input` wrapper
+(theme adapter above); `InputControls.tsx` (1 raw `bdi-text` site + 1
+dynamic-theme site, both above); `ImageEditorModal.tsx` /
+`SpacingControls.tsx` (the two files whose `<Input>` sites split across
+BOTH buckets — 6 raw + 2 themed, and 1 raw + 1 themed, respectively).
+
+**Remaining ~91 plain sites across 51 files:** mechanical
+tag-rename + theme-prop + import swap via a `ts-morph` codemod (scratch,
+not committed). **Codemod correctness trap, found and fixed, worth
+recording:** `JsxSelfClosingElement#insertAttribute(0, text)` silently
+failed to insert the attribute text in this ts-morph version (28.0.0) —
+verified via an isolated repro (a lone `<Foo bar="1" baz="2" />` fixture);
+the call reported success and `saveSync()` wrote *something* (a stray
+space) but never the actual `theme={...}` text. A **second** ts-morph
+attempt via `tagNameNode.replaceWithText(...)` worked for a single target
+per file but threw a tree-diff `ManipulationError` on the second target in
+the same file (processing multiple manipulations against the same
+`SourceFile` object invalidates other live node references, regardless of
+processing order — reversing the target list did not help). The reliable
+fix: use `ts-morph` in **read-only** mode only (to get accurate character
+offsets via `tagNameNode.getEnd()`), then splice the insertion string
+directly into the raw file text via plain `fs` read/write, processing
+offsets in descending order per file so earlier insertions don't shift
+already-computed offsets. Caught by a **positive** verification, not an
+absence-of-error check — a second AST-based "does this `<TextInput>` element
+have a `theme` attribute" pass (independent script, real query not a text
+heuristic) confirmed 91/91 fixed only after the `fs`-splice rewrite; the
+`insertAttribute`-based first pass had reported "sites touched: 91" and
+`tsc --noEmit` clean (since a missing `theme` prop is not a type error —
+`theme` is optional) while having silently fixed **zero** of them, which a
+naive "no exception + tsc clean" check would have missed entirely.
+
+**Consumer sweep totals:** 128 `@/editor/ui`-aliased sites (26 raw + 91
+`TextInput`+theme via codemod + 11 hand-edited `TextInput`+theme in
+special-case files, roughly) + 2 test-file sites (`atoms.test.tsx`,
+`field-popover.test.tsx`, both rewritten — see below) + 1 local wrapper
+(`settings/shared.tsx`). `grep -rn "bk-input" src` after deleting the CSS
+block found zero orphan raw-element usages.
+
+**Test files:** `atoms.test.tsx`'s old `describe("Input")` block (asserted
+`aria-invalid` wiring against the deleted component) replaced with a
+`describe("TextInput")` block: one new test matching the Select precedent's
+"`className` lands on the OUTER wrapper, `theme` is the only way to
+restyle the field" structural-gap assertion, one asserting
+`BK_TEXT_INPUT_THEME`'s `aria-invalid:` variant is actually present in the
+resolved className (real positive assertion, not just "no error"), one
+"healthy" no-`aria-invalid` case. `field-popover.test.tsx`'s `FormField`
+block (tests `FormField`'s own label/hint/error wiring, not `Input`
+specifically) rewritten to render a plain native `<input {...p} />` in the
+render-prop slot — decouples the `FormField` contract test from whichever
+control implementation happens to fill it.
+
+**Class-list regen:** `pnpm flowbite:classlist` — new prefixed
+`TextInput` theme entries present; `.flowbite-react/init.tsx` byproduct
+deleted again (same standing reason every prior round gives).
+
+Verified: `npx tsc --noEmit` clean. `npx vitest run src/editor/ui/__tests__
+src/shared/forms` — 11 files / 148 tests green (run before the
+`insertAttribute` codemod bug above was caught and fixed). Full re-run
+after the `theme`-prop fix, across every touched top-level directory plus
+`ui/__tests__` and `shared/forms` (`inspector`, `media`, `sidebar`,
+`canvas`, `panels`, `shell`, `design-system`, `export`,
+`components-catalog`) — **414 test files / 3539 tests green, 1 skipped,
+1 todo** (pre-existing, unrelated to this change).

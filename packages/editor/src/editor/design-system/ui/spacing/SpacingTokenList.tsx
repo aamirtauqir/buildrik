@@ -14,11 +14,11 @@
  */
 
 import * as React from "react";
-import { Input } from "@/editor/ui";
 import type { SpacingPreset } from "../../state/useSpacingTokens";
 import type { DesignToken } from "../../types";
 import { TokenUsageChip } from "../sections/TokenUsageChip";
-import { Button } from "flowbite-react";
+import { Button, TextInput } from "flowbite-react";
+import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
 export interface SpacingTokenListProps {
   tokens: DesignToken[];
@@ -169,7 +169,7 @@ const EditDrawer: React.FC<EditDrawerProps> = ({
       >
         {token.name}
       </span>
-      <Input
+      <TextInput theme={BK_TEXT_INPUT_THEME}
         type="number"
         aria-label={`Value for ${token.name}`}
         value={Number.isFinite(num) ? num : 0}

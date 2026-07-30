@@ -3,11 +3,11 @@
  */
 
 import * as React from "react";
-import { Input } from "@/editor/ui";
 import type { MediaAsset, MediaAssetType } from "../../../shared/types/media";
 import { extractGradientUI, composeGradient, deriveBgType } from "../../../shared/utils/parsers/gradientHelpers";
 import { Section, ColorInput, SelectRow, InputRow, MoreSettingsToggle, type SectionTier, MixedValueIndicator } from "../shared/controls";
-import { Button } from "flowbite-react";
+import { Button, TextInput } from "flowbite-react";
+import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
 export interface BackgroundSectionProps {
   styles: Record<string, string>;
@@ -232,7 +232,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
               >
                 Angle
               </label>
-              <Input
+              <TextInput theme={BK_TEXT_INPUT_THEME}
                 type="range"
                 min="0"
                 max="360"

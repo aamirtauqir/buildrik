@@ -13,7 +13,7 @@
  */
 
 import * as React from "react";
-import { Input, Kbd } from "@/editor/ui";
+import { Kbd } from "@/editor/ui";
 import type { PageItem } from "../types";
 import { getStatusLabel } from "../utils/statusLabel";
 
@@ -98,7 +98,7 @@ export const PageCommandPalette: React.FC<Props> = ({ pages, onSelect, onClose }
       onClick={handleBackdropClick}
     >
       <div className="bd-pg-palette">
-        <Input
+        <input
           ref={inputRef}
           type="text"
           className="bd-pg-palette-input"

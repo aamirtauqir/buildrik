@@ -4,9 +4,9 @@
  */
 
 import * as React from "react";
-import { Input } from "@/editor/ui";
 import { constraintBtnStyle, fixedInputStyle } from "./styles";
-import { Button } from "flowbite-react";
+import { Button, TextInput } from "flowbite-react";
+import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
 // ============================================================================
 // TYPES
@@ -136,7 +136,7 @@ export const ConstraintControl: React.FC<ConstraintControlProps> = ({ label, val
           <span style={{ fontSize: 12, color: "var(--bk-ink-muted)", width: 32 }}>
             {isWidth ? "W" : "H"}
           </span>
-          <Input
+          <TextInput theme={BK_TEXT_INPUT_THEME}
             type="text"
             value={value}
             onChange={(e) => onChange(e.target.value)}

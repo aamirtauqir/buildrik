@@ -13,7 +13,7 @@
  */
 
 import * as React from "react";
-import { ConfirmDialog, Input, useToast } from "@/editor/ui";
+import { ConfirmDialog, useToast } from "@/editor/ui";
 import { Maximize2, Minimize2, Plus, Upload, X } from "lucide-react";
 import type { Composer } from "../../../../../engine/Composer";
 import type { LibraryItem, MediaStateResult } from "../data/mediaTypes";
@@ -381,7 +381,7 @@ export function ExpandedMediaPanel({
                 onDrop={(e) => handleFolderDrop(e, f.id)}
               >
                 {renamingFolderId === f.id ? (
-                  <Input
+                  <input
                     type="text"
                     className="exp-folder-item__rename-input"
                     value={renameDraft}

@@ -27,7 +27,6 @@
  */
 
 import * as React from "react";
-import { Input } from "@/editor/ui";
 import type { Composer } from "../../../../engine/Composer";
 import type { DesignToken } from "../../types";
 import type { LintIssue } from "../../../../engine/designSystem/LintState";
@@ -36,7 +35,8 @@ import { ELEMENT_TYPE_LABELS } from "../../../../shared/constants/elementTypeLab
 import { useDSModeOptional } from "../../state/DSModeContext";
 import { ColorPicker } from "../colors/ColorPicker";
 import { TokenReplaceModal } from "./TokenReplaceModal";
-import { Button } from "flowbite-react";
+import { Button, TextInput } from "flowbite-react";
+import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
 export interface TokenDetailViewProps {
   token: DesignToken;
@@ -603,7 +603,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
           {isColor ? (
             <>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <Input
+                <TextInput theme={BK_TEXT_INPUT_THEME}
                   type="text"
                   value={token.value}
                   onChange={(e) => onValueChange?.(token.id, e.target.value)}
@@ -628,7 +628,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
               )}
             </>
           ) : (
-            <Input
+            <TextInput theme={BK_TEXT_INPUT_THEME}
               type="text"
               value={token.value}
               onChange={(e) => onValueChange?.(token.id, e.target.value)}
@@ -644,7 +644,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
         <div style={fieldRowStyle}>
           <div style={fieldLabelStyle}>Dark value</div>
           <div style={fieldValueStyle}>
-            <Input
+            <TextInput theme={BK_TEXT_INPUT_THEME}
               type="text"
               value={darkInput}
               placeholder={token.darkValue ? "" : "+ add (currently falls back)"}

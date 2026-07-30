@@ -4,9 +4,9 @@
  */
 
 import * as React from "react";
-import { Input } from "@/editor/ui";
 import { generateColorTokenId } from "../../utils/exportUtils";
-import { Button } from "flowbite-react";
+import { Button, TextInput } from "flowbite-react";
+import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
 export interface AddTokenModalProps {
   existingIds: string[];
@@ -86,12 +86,13 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
         >
           Token name
         </label>
-        <Input
+        <TextInput
+          theme={BK_TEXT_INPUT_THEME}
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="e.g., Purple"
-          error={!!nameError}
+          aria-invalid={!!nameError || undefined}
           style={{
             width: "100%",
             padding: "8px 10px",
@@ -130,12 +131,13 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
               flexShrink: 0,
             }}
           />
-          <Input
+          <TextInput
+            theme={BK_TEXT_INPUT_THEME}
             type="text"
             value={hex}
             onChange={(e) => setHex(e.target.value)}
             placeholder="#3B82F6"
-            error={!!hexError}
+            aria-invalid={!!hexError || undefined}
             style={{
               flex: 1,
               padding: "8px 10px",

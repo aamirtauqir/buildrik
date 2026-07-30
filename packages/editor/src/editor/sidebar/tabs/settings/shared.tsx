@@ -18,10 +18,9 @@
  */
 
 import * as React from "react";
-import { Input as VibcoderInput } from "@/editor/ui";
 import { SIDEBAR_WIDE } from "@/shared/constants/layout";
 import "./settings.css";
-import { Button, Select as FlowbiteSelect, Textarea as FlowbiteTextarea } from "flowbite-react";
+import { Button, Select as FlowbiteSelect, Textarea as FlowbiteTextarea, TextInput as FlowbiteTextInput } from "flowbite-react";
 import type { CustomFlowbiteTheme } from "flowbite-react/types";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -67,14 +66,37 @@ export const Field: React.FC<FieldProps> = ({ label, hint, htmlFor, children }) 
 // Input / Textarea / Select
 // ─────────────────────────────────────────────────────────────────────────────
 
+// flowbite's TextInput applies the consumer's `className` to an OUTER
+// wrapper div (TextInput.js), never to the actual <input> — same structural
+// gap as Select below. Reproduced `.bd-set-input`'s exact box
+// (settings.css:240: 7×9px padding, 5px radius, 11.5px/500 font,
+// `--bk-border` border, `--bk-accent`/`--bk-accent-tint` focus ring) via a
+// per-instance `theme` override, same shape as SETTINGS_SELECT_THEME below:
+// the radius override has to live in `withAddon.off` (flowbite's own
+// `rounded-lg` default lives there too, positioned after `colors`/`sizes`
+// in TextInput.js's own twMerge call, so a `colors.gray`-only override
+// would lose the merge).
+const SETTINGS_TEXT_INPUT_THEME: NonNullable<CustomFlowbiteTheme["textInput"]> = {
+  field: {
+    input: {
+      colors: {
+        gray:
+          "tw:border-[var(--bk-border)] tw:bg-white tw:text-[var(--bk-ink)] tw:focus:border-[var(--bk-accent)] tw:focus:ring-[3px] tw:focus:ring-[var(--bk-accent-tint)] tw:focus:outline-none",
+      },
+      sizes: {
+        md: "tw:py-[7px] tw:px-[9px] tw:text-[11.5px] tw:font-medium tw:[font-family:var(--bk-font-ui)]",
+      },
+      withAddon: {
+        off: "tw:rounded-[5px]",
+      },
+    },
+  },
+};
+
 type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, ...rest }, ref) => (
-    <VibcoderInput
-      ref={ref}
-      className={`bd-set-input${className ? " " + className : ""}`}
-      {...rest}
-    />
+    <FlowbiteTextInput ref={ref} className={className} theme={SETTINGS_TEXT_INPUT_THEME} {...rest} />
   )
 );
 Input.displayName = "Input";

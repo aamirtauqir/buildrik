@@ -8,11 +8,12 @@
  */
 
 import * as React from "react";
-import { Input, Spinner } from "@/editor/ui";
+import { Spinner } from "@/editor/ui";
 import { MediaOptimizer } from "../../engine/media";
 import { formatBytes } from "@shared/utils/helpers/number";
 import type { ImageExportFormat } from "../../shared/types/media";
-import { Button } from "flowbite-react";
+import { Button, TextInput } from "flowbite-react";
+import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
 // ============================================================================
 // TYPES
@@ -276,7 +277,7 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
       <div style={styles.section}>
         <label style={styles.label}>Quality</label>
         <div style={styles.sliderContainer}>
-          <Input
+          <TextInput theme={BK_TEXT_INPUT_THEME}
             type="range"
             min={10}
             max={100}
@@ -290,7 +291,7 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
       {/* §18 — Max dimension override */}
       <div style={styles.section}>
         <label style={styles.label} htmlFor="opt-max-dim">Max dimension (px)</label>
-        <Input
+        <TextInput theme={BK_TEXT_INPUT_THEME}
           id="opt-max-dim"
           type="number"
           min={1}

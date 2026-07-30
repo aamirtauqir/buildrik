@@ -1,10 +1,10 @@
 import * as React from "react";
-import { Input } from "@/editor/ui";
 import type { DesignToken } from "../../types";
 import { useDSModeOptional } from "../../state/DSModeContext";
 import { TokenUsageChip } from "../sections/TokenUsageChip";
 import type { LintIssue } from "../../../../engine/designSystem/LintState";
-import { Button } from "flowbite-react";
+import { Button, TextInput } from "flowbite-react";
+import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
 interface GenericTokenListProps {
   tokens: DesignToken[];
@@ -172,7 +172,7 @@ export const GenericTokenList: React.FC<GenericTokenListProps> = ({
                   </div>
                 )}
               </div>
-              <Input
+              <TextInput theme={BK_TEXT_INPUT_THEME}
                 type="text"
                 value={t.value}
                 onChange={(e) => onTokenChange(t.id, e.target.value)}

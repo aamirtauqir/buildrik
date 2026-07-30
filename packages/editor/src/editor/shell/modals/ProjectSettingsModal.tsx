@@ -5,11 +5,12 @@
  */
 
 import * as React from "react";
-import { Input, ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal, Stack } from "@/editor/ui";
+import { ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal, Stack } from "@/editor/ui";
 import type { Composer } from "../../../engine";
 import { useToast } from "@/editor/ui";
 import { devError } from "../../../shared/utils/devLogger";
-import { Button, Checkbox } from "flowbite-react";
+import { Button, Checkbox, TextInput } from "flowbite-react";
+import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
 export interface ProjectSettingsModalProps {
   isOpen: boolean;
@@ -123,7 +124,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
           {activeTab === "general" && (
             <Stack gap="md">
               <label style={labelStyles}>Project name</label>
-              <Input
+              <TextInput theme={BK_TEXT_INPUT_THEME}
                 type="text"
                 value={projectName}
                 onChange={(e) => setProjectName(e.target.value)}
@@ -132,7 +133,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
               />
 
               <label style={labelStyles}>Author / description</label>
-              <Input
+              <TextInput theme={BK_TEXT_INPUT_THEME}
                 type="text"
                 value={projectDescription}
                 onChange={(e) => setProjectDescription(e.target.value)}
@@ -146,7 +147,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
             <Stack gap="md">
               <label style={labelStyles}>Grid size (px)</label>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <Input
+                <TextInput theme={BK_TEXT_INPUT_THEME}
                   type="number"
                   value={gridSize}
                   onChange={(e) => setGridSize(Number(e.target.value))}
@@ -176,7 +177,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
           {activeTab === "seo" && (
             <Stack gap="md">
               <label style={labelStyles}>Site name (SEO default)</label>
-              <Input
+              <TextInput theme={BK_TEXT_INPUT_THEME}
                 type="text"
                 value={siteTitle}
                 onChange={(e) => setSiteTitle(e.target.value)}

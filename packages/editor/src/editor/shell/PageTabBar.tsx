@@ -4,7 +4,7 @@
  */
 
 import * as React from "react";
-import { ConfirmDialog, Input } from "@/editor/ui";
+import { ConfirmDialog } from "@/editor/ui";
 import { createPortal } from "react-dom";
 import type { Composer } from "../../engine";
 import { EVENTS } from "../../shared/constants";
@@ -13,7 +13,8 @@ import { useToast } from "@/editor/ui";
 import { useClickOutside } from "@/shared/hooks";
 import { getDefaultPageName } from "../../shared/utils/pageUtils";
 import { normalizeSlug } from "../sidebar/tabs/pages/utils/slug";
-import { Button } from "flowbite-react";
+import { Button, TextInput } from "flowbite-react";
+import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
 // ============================================================================
 // TYPES
@@ -249,7 +250,7 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
               {page.isHome && <span style={homeIconStyles}>🏠</span>}
               {editingPageId === page.id ? (
                 <span style={{ position: "relative" }}>
-                  <Input
+                  <TextInput theme={BK_TEXT_INPUT_THEME}
                     type="text"
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}

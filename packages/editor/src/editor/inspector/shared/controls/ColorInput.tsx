@@ -1,4 +1,4 @@
-import { Input, Popover } from "@/editor/ui";
+import { Popover } from "@/editor/ui";
 /**
  * ColorInput — Figma Fill row. Ported to .bdi-fill per comp-inspector.html v2.
  * Checkerboard swatch + hex + % opacity + eye toggle. Token binding preserved.
@@ -162,7 +162,7 @@ export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange, 
                 </>
               ) : (
                 <>
-                  <Input
+                  <input
                     type="text"
                     className="bdi-hx"
                     value={display}

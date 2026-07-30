@@ -14,7 +14,6 @@
  */
 
 import * as React from "react";
-import { Input } from "@/editor/ui";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { OptimizationPanel } from "@/editor/media/OptimizationPanel";
 import type { LibraryItem } from "../data/mediaTypes";
@@ -271,7 +270,7 @@ export function AssetDetailOverlay({
               )}
             </div>
             <div className="med-detail-meta-section">
-              <Input
+              <input
                 ref={inputRef}
                 className="med-detail-name"
                 value={name}
@@ -392,7 +391,7 @@ export function AssetDetailOverlay({
           <div className="med-detail-edit-pane">
             <label className="med-detail-edit-field">
               <span className="med-detail-edit-label">Alt text</span>
-              <Input
+              <input
                 className="med-detail-alt-input"
                 value={altDraft}
                 onChange={(e) => setAltDraft(e.target.value)}

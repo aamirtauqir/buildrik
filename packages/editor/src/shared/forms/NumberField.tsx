@@ -1,6 +1,6 @@
 /**
  * NumberField — labelled numeric input.
- * Internal: composes ui <FormField> + <Input type="number">.
+ * Internal: composes ui <FormField> + flowbite's <TextInput type="number">.
  *
  * The vibcoder-era −/+ stepper buttons are gone (the Figma design has no
  * stepper); the native number input keeps ArrowUp/ArrowDown stepping.
@@ -10,7 +10,9 @@
  */
 
 import * as React from "react";
-import { FormField, Input } from "@/editor/ui";
+import { FormField } from "@/editor/ui";
+import { TextInput } from "flowbite-react";
+import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
 export interface NumberFieldProps {
   label?: string;
@@ -51,16 +53,16 @@ export const NumberField: React.FC<NumberFieldProps> = ({
     "aria-invalid": true | undefined;
   }) => {
     const input = (
-      <Input
+      <TextInput
         id={id}
         {...extra}
+        theme={BK_TEXT_INPUT_THEME}
         type="number"
         value={value}
         min={min}
         max={max}
         step={step}
         disabled={disabled}
-        error={!!error}
         onChange={(e) => {
           const n = Number(e.target.value);
           if (!Number.isNaN(n)) onChange?.(clamp(n));

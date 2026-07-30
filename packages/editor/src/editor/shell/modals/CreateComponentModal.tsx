@@ -5,10 +5,11 @@
  */
 
 import * as React from "react";
-import { Input, ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal, Stack } from "@/editor/ui";
+import { ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal, Stack } from "@/editor/ui";
 import type { Composer } from "../../../engine";
 import { useToast } from "@/editor/ui";
-import { Button, Checkbox, Textarea } from "flowbite-react";
+import { Button, Checkbox, Textarea, TextInput } from "flowbite-react";
+import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
 export interface CreateComponentModalProps {
   isOpen: boolean;
@@ -140,7 +141,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
           <label style={labelStyles}>
             Name <span style={{ color: "var(--bk-accent)" }}>*</span>
           </label>
-          <Input
+          <TextInput theme={BK_TEXT_INPUT_THEME}
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -163,7 +164,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
 
         <div>
           <label style={labelStyles}>Category</label>
-          <Input
+          <TextInput theme={BK_TEXT_INPUT_THEME}
             type="text"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
@@ -174,7 +175,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
 
         <div>
           <label style={labelStyles}>Tags</label>
-          <Input
+          <TextInput theme={BK_TEXT_INPUT_THEME}
             type="text"
             value={tags}
             onChange={(e) => setTags(e.target.value)}

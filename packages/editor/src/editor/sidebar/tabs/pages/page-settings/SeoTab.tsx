@@ -8,11 +8,12 @@
  */
 
 import * as React from "react";
-import { Cluster, HelperText, Input, Label, Stack } from "@/editor/ui";
+import { Cluster, HelperText, Label, Stack } from "@/editor/ui";
 import { generateContent } from "@/shared/utils/openai";
 import type { PageItem } from "../types";
 import type { UsePageSettingsReturn } from "./usePageSettings";
-import { Button, Textarea, Tooltip } from "flowbite-react";
+import { Button, Textarea, TextInput, Tooltip } from "flowbite-react";
+import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
 interface Props {
   s: UsePageSettingsReturn;
@@ -157,7 +158,8 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
             Write with AI
           </Button>
         )}
-        <Input
+        <TextInput
+          theme={BK_TEXT_INPUT_THEME}
           id="seo-title"
           value={s.seoTitle}
           onChange={(e) => s.setSeoTitle(e.target.value.slice(0, 60))}
@@ -215,9 +217,9 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
           <span style={{ display: "inline-flex", alignItems: "center", padding: "0 var(--bk-space-8)", border: "1px solid var(--bk-border)", borderRight: 0, borderRadius: "4px 0 0 4px", background: "var(--bk-bg-subtle)", color: "var(--bk-ink-soft)", font: "500 11px var(--bk-font-mono)" }}>
             {domain}/
           </span>
-          <Input
+          <TextInput
+            theme={BK_TEXT_INPUT_THEME}
             id="seo-slug"
-            error={!!s.slugError}
             value={s.slug}
             onChange={(e) => s.setSlug(e.target.value)}
             aria-describedby="seo-slug-hint"

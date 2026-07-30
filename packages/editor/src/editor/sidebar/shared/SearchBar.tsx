@@ -5,9 +5,9 @@
  */
 
 import * as React from "react";
-import { Input } from "@/editor/ui";
 import { trackSidebar } from "../../../shared/utils/sidebarAnalytics";
-import { Button } from "flowbite-react";
+import { Button, TextInput } from "flowbite-react";
+import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
 export interface SearchBarProps {
   value: string;
@@ -84,7 +84,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   return (
     <div style={containerStyles} role="search">
       <SearchIcon />
-      <Input
+      <TextInput theme={BK_TEXT_INPUT_THEME}
         type="text"
         id={id}
         value={inputValue}
