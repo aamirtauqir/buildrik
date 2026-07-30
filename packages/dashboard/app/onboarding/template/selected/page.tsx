@@ -47,7 +47,7 @@ export default function TemplateSelectedPage() {
         </div>
 
         <div className="w-[400px] max-w-full overflow-hidden rounded-xl bg-white shadow-[inset_0_0_0_1px_var(--color-onb-line)]">
-          <div className="flex h-[220px] items-center justify-center bg-slate-100">
+          <div className="flex h-[220px] items-center justify-center bg-gray-100">
             {q.data?.thumbnail ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={q.data.thumbnail} alt={q.data.name} className="h-full w-full object-cover" />

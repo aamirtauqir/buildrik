@@ -71,7 +71,7 @@ export function OTPInput({ length = 6, value, onChange, error }: OTPInputProps) 
               ? "border-auth-input-error"
               : digits[i]
                 ? "border-[#1C1C1E]"
-                : "border-[#ECECEE] focus:border-auth-input-focus"
+                : "border-[#E5E7EB] focus:border-auth-input-focus"
           )}
           style={{ caretColor: "transparent" }}
         />

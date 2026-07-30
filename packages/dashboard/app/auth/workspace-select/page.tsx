@@ -70,7 +70,7 @@ export default function WorkspaceSelectPage() {
               key={ws.id}
               onClick={() => select(ws.id)}
               disabled={!!switchingId}
-              className="flex w-full items-center gap-3 rounded-auth-input border border-[#ECECEE] bg-white px-[15px] py-[13px] text-left transition-colors hover:border-auth-text-body disabled:opacity-60"
+              className="flex w-full items-center gap-3 rounded-auth-input border border-[#E5E7EB] bg-white px-[15px] py-[13px] text-left transition-colors hover:border-auth-text-body disabled:opacity-60"
             >
               <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-[10px] bg-auth-cta text-[15px] font-bold tracking-[-0.02em] text-white">
                 {ws.iconUrl ? (

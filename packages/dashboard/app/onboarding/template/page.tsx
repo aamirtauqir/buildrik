@@ -103,7 +103,7 @@ export default function TemplateGalleryPage() {
                 onClick={() => saveAndGo("/onboarding/template/preview", { template: { id: t.id } })}
                 className="flex flex-col overflow-hidden rounded-xl bg-white text-left shadow-[inset_0_0_0_1px_var(--color-onb-line)] transition-shadow hover:shadow-[inset_0_0_0_2px_var(--color-onb-primary)]"
               >
-                <div className="flex h-[170px] items-center justify-center border-b border-onb-line bg-slate-100">
+                <div className="flex h-[170px] items-center justify-center border-b border-onb-line bg-gray-100">
                   {t.thumbnail ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={t.thumbnail} alt={t.name} className="h-full w-full object-cover" />

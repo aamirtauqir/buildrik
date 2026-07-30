@@ -214,7 +214,7 @@ function InviteContent() {
         <AuthButton
           loading={declineMutation.isPending}
           onClick={() => declineMutation.mutate({ token })}
-          className="border border-[#E5484D]/50 bg-white text-[#E5484D] hover:bg-[#E5484D]/5"
+          className="border border-[#E02424]/50 bg-white text-[#E02424] hover:bg-[#E02424]/5"
         >
           Yes, decline
         </AuthButton>

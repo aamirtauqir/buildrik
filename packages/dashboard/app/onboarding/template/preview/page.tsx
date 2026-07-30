@@ -42,14 +42,14 @@ export default function TemplatePreviewPage() {
 
   return (
     <div className="flex min-h-dvh bg-onb-surface">
-      <div className="flex flex-1 flex-col bg-slate-100 p-8">
+      <div className="flex flex-1 flex-col bg-gray-100 p-8">
         <div className="flex h-[45px] items-center justify-between rounded-t-xl bg-white px-6 shadow-[inset_0_0_0_1px_var(--color-onb-line)]">
           <div className="flex gap-2">
             <span className="h-2 w-2 rounded-full bg-red-400" />
             <span className="h-2 w-2 rounded-full bg-amber-400" />
             <span className="h-2 w-2 rounded-full bg-emerald-400" />
           </div>
-          <span className="rounded-md bg-slate-100 px-8 py-1 text-[11px] text-onb-muted">
+          <span className="rounded-md bg-gray-100 px-8 py-1 text-[11px] text-onb-muted">
             {t.slug}-preview.buildrick.site
           </span>
           <MoreHorizontal className="h-4 w-4 text-onb-subtle" />

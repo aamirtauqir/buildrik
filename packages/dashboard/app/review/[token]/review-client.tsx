@@ -150,7 +150,7 @@ export function ReviewClient({ token }: { token: string }) {
       <Shell agency="Buildrick">
         <Centered>
           <h1 className="text-[20px] font-semibold text-[#111827]">{copy.title}</h1>
-          <p className="mt-2 text-[13px] leading-relaxed text-[#475569]">{copy.body}</p>
+          <p className="mt-2 text-[13px] leading-relaxed text-[#4B5563]">{copy.body}</p>
         </Centered>
       </Shell>
     );
@@ -172,7 +172,7 @@ export function ReviewClient({ token }: { token: string }) {
           <h1 className="text-[20px] font-semibold text-[#111827]">
             {data.siteName} is ready for you to look at
           </h1>
-          <p className="mt-2 text-[13px] leading-relaxed text-[#475569]">
+          <p className="mt-2 text-[13px] leading-relaxed text-[#4B5563]">
             Before you start, tell us who you are. This goes on your comments and
             your approval so your designer knows who said what — it is not an
             account, and there is no password.
@@ -188,7 +188,7 @@ export function ReviewClient({ token }: { token: string }) {
             }}
           >
             <label className="flex flex-col gap-1.5">
-              <span className="text-[12px] font-medium text-[#475569]">Your name</span>
+              <span className="text-[12px] font-medium text-[#4B5563]">Your name</span>
               <input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -198,7 +198,7 @@ export function ReviewClient({ token }: { token: string }) {
               />
             </label>
             <label className="flex flex-col gap-1.5">
-              <span className="text-[12px] font-medium text-[#475569]">
+              <span className="text-[12px] font-medium text-[#4B5563]">
                 The email this link was sent to
               </span>
               <input
@@ -238,7 +238,7 @@ export function ReviewClient({ token }: { token: string }) {
           <h1 className="text-[20px] font-semibold text-[#111827]">
             {approved ? "You approved this" : "You asked for changes"}
           </h1>
-          <p className="mt-2 text-[13px] leading-relaxed text-[#475569]">
+          <p className="mt-2 text-[13px] leading-relaxed text-[#4B5563]">
             {approved
               ? `Thanks — ${agency} can take it from here. You'll hear from your designer when it goes live.`
               : `Your notes are with your designer. They'll send a new link when the changes are ready for you.`}
@@ -291,7 +291,7 @@ export function ReviewClient({ token }: { token: string }) {
           {data.changeSummary ? (
             <div className="mb-6 rounded-lg bg-[#F3F4F6] px-4 py-3">
               <p className="text-[12px] font-semibold text-[#111827]">What&rsquo;s new</p>
-              <p className="mt-1 text-[13px] text-[#475569]">{data.changeSummary}</p>
+              <p className="mt-1 text-[13px] text-[#4B5563]">{data.changeSummary}</p>
             </div>
           ) : null}
           {/* The site frozen at send, rendered by the editor's ExportEngine and
@@ -338,9 +338,9 @@ export function ReviewClient({ token }: { token: string }) {
             {comments.data && comments.data.length > 0 ? (
               <ul className="mt-4 space-y-3 border-t border-[#E5E7EB] pt-4">
                 {comments.data.map((c) => (
-                  <li key={c.id} className="text-[13px] leading-relaxed text-[#334155]">
+                  <li key={c.id} className="text-[13px] leading-relaxed text-[#374151]">
                     <p className="whitespace-pre-wrap">{c.body}</p>
-                    <p className="mt-1 text-[11px] text-[#94A3B8]">
+                    <p className="mt-1 text-[11px] text-[#9CA3AF]">
                       {new Date(c.createdAt).toLocaleString()}
                     </p>
                   </li>
@@ -360,7 +360,7 @@ export function ReviewClient({ token }: { token: string }) {
             <h2 className="text-[16px] font-semibold text-[#111827]">
               Approve {data.siteName}?
             </h2>
-            <p className="mt-2 text-[13px] leading-relaxed text-[#475569]">
+            <p className="mt-2 text-[13px] leading-relaxed text-[#4B5563]">
               This tells your designer the design is settled and they can put it
               live. You are approving the version you have been looking at.
             </p>
