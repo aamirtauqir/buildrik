@@ -37,6 +37,12 @@ export interface SiteMenuProps {
    * topbar button.
    */
   onPreview?: () => void;
+  /**
+   * Canvas comment mode (shell state 6, board 200:2). The `C` shortcut is the
+   * only other way in — an unlabelled keystroke is not discoverability, so the
+   * feature gets a menu row until Figma gives it a topbar home.
+   */
+  onToggleComments?: () => void;
   /** Blocking + advisory issues on this page. */
   issueCount?: number;
   onOpenIssues?: () => void;
@@ -80,6 +86,7 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
   onOpenShortcuts,
   onExit,
   onPreview,
+  onToggleComments,
   issueCount = 0,
   onOpenIssues,
   onAskAI,
@@ -152,6 +159,11 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
         <MenuGroup>
           <MenuLabel>More</MenuLabel>
           {onPreview ? <MenuItem onClick={run(onPreview)}>Preview site</MenuItem> : null}
+          {onToggleComments ? (
+            <MenuItem kbd="C" onClick={run(onToggleComments)}>
+              Comments
+            </MenuItem>
+          ) : null}
           {onOpenIssues ? (
             <MenuItem onClick={run(onOpenIssues)}>
               {issueCount > 0 ? `Issues (${issueCount})` : "Issues"}

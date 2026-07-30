@@ -414,6 +414,27 @@ describe("StudioHeader", () => {
       await waitFor(() => expect(onInlinePreview).toHaveBeenCalledTimes(1));
     });
 
+    it("Comments toggles canvas comment mode — the menu row for the C shortcut", () => {
+      const emit = vi.fn();
+      const composer = {
+        on: vi.fn(),
+        off: vi.fn(),
+        emit,
+        getProjectMetadata: vi.fn(() => ({ name: "x" })),
+        exportHTML: vi.fn(() => ({ combined: "" })),
+      } as unknown as StudioHeaderProps["composer"];
+      render(<StudioHeader {...makeProps({ composer })} />);
+      fireEvent.click(screen.getByRole("button", { name: "Site menu" }));
+      fireEvent.click(screen.getByRole("menuitem", { name: /^Comments/ }));
+      expect(emit).toHaveBeenCalledWith("ui:comment-mode", {});
+    });
+
+    it("no composer, no Comments row — a toggle with nothing to toggle", () => {
+      render(<StudioHeader {...makeProps()} />);
+      fireEvent.click(screen.getByRole("button", { name: "Site menu" }));
+      expect(screen.queryByRole("menuitem", { name: /^Comments/ })).toBeNull();
+    });
+
     it("counts open issues on the row", () => {
       render(
         <StudioHeader

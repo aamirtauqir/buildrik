@@ -524,6 +524,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
             onOpenShortcuts={onOpenShortcuts}
             onExit={exitToDashboard}
             onPreview={handlePreview}
+            onToggleComments={composer ? () => composer.emit("ui:comment-mode", {}) : undefined}
             issueCount={issueCount}
             onOpenIssues={onOpenIssues}
             onAskAI={viewMode.fourToolRail ? onShowAI : undefined}
