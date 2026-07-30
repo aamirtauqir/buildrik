@@ -91,13 +91,16 @@ function ActivityRow({ entry, count, isLast }: { entry: ActivityEntry; count: nu
 
 type ActivityFeedProps = {
   feed: ActivityFeedData;
+  limit?: number;
 };
 
 /** Flat "Recent activity" list — colored dot + text + right-aligned mono
  *  timestamp per row. Renders rows only; the surrounding SectionCard owns the
- *  title, "View all" action, and card chrome. */
-export function ActivityFeed({ feed }: ActivityFeedProps) {
-  const rows = collapseEntries(feed.groups.flatMap((group) => group.entries));
+ *  title, "View all" action, and card chrome. `limit` caps the rows for embeds
+ *  (home) — the full list lives at /dashboard/activity. */
+export function ActivityFeed({ feed, limit }: ActivityFeedProps) {
+  const all = collapseEntries(feed.groups.flatMap((group) => group.entries));
+  const rows = limit ? all.slice(0, limit) : all;
 
   if (rows.length === 0) {
     return (

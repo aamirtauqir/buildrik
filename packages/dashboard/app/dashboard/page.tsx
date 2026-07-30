@@ -260,7 +260,7 @@ export default function DashboardPage() {
                 </Link>
               }
             >
-              <ActivityFeed feed={activity.data ?? { groups: [] }} />
+              <ActivityFeed feed={activity.data ?? { groups: [] }} limit={6} />
             </SectionCard>
 
             <SectionCard title="Quick actions">
