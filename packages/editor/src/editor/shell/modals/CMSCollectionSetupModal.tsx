@@ -11,9 +11,10 @@
 
 import { X, Plus, Trash2, Check } from "lucide-react";
 import * as React from "react";
-import { Input, ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal, Select, Stack, Textarea } from "@/editor/ui";
+import { Input, ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal, Stack, Textarea } from "@/editor/ui";
+import { BK_SELECT_BASE_THEME } from "@/editor/ui/selectTheme";
 import type { Composer } from "../../../engine";
-import { Button } from "flowbite-react";
+import { Button, Select } from "flowbite-react";
 
 // =============================================================================
 // TYPES
@@ -134,6 +135,7 @@ const s: Record<string, React.CSSProperties> = {
     outline: "none",
     cursor: "pointer",
     boxSizing: "border-box" as const,
+    appearance: "auto" as const,
   },
   textarea: {
     width: "100%",
@@ -176,6 +178,7 @@ const s: Record<string, React.CSSProperties> = {
     fontSize: 12,
     outline: "none",
     cursor: "pointer",
+    appearance: "auto" as const,
   },
   removeBtn: {
     width: 24,
@@ -433,6 +436,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
           <div>
             <label style={s.label}>Content type</label>
             <Select
+              theme={BK_SELECT_BASE_THEME}
               style={s.select}
               value={contentType}
               onChange={(e) => setContentType(e.target.value as ContentType)}
@@ -515,6 +519,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
                   onChange={(e) => updateFieldName(field.id, e.target.value)}
                 />
                 <Select
+                  theme={BK_SELECT_BASE_THEME}
                   style={s.fieldTypeSelect}
                   value={field.type}
                   onChange={(e) => updateFieldType(field.id, e.target.value as FieldType)}

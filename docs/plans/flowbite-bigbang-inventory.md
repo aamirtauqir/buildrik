@@ -1360,3 +1360,146 @@ structurally its own theme, no overlap with Checkbox/Radio's).
 Verified: `tsc --noEmit` clean; 47 tests green
 (`atoms.test.tsx`/`ReviewTab.test.tsx`/`ContentTab.test.tsx`/
 `AdvancedTab.test.tsx`) + full `ui/__tests__` 130/130.
+
+### Select → `flowbite-react` `Select`
+
+`src/editor/ui/Select.tsx` (bare `<select className="bk-select">`) →
+`node_modules/flowbite-react/dist/components/Select/Select.js`/`theme.js`.
+
+**Structural finding, load-bearing for every remaining swap that reads
+`className` for box-level styling:** flowbite's `Select` renders TWO
+wrapper elements — an outer `<div className={twMerge(theme.base,
+className)}>` and an inner `<div className={theme.field.base}>` — around
+the real `<select>`. Confirmed by reading `Select.js` line by line: the
+consumer's `className` prop is destructured and applied **only to the
+outer div**; the `<select>` itself only ever receives classes resolved
+from `theme.field.select.*`. There is no code path by which a plain
+`className` prop can change the select's own border/background/focus-ring
+— `style` (an ordinary prop that isn't destructured, so it flows through
+`...restProps` onto the real `<select>`) still works fine, but any
+consumer that previously relied on `className` to restyle the box itself
+needs the per-instance `theme` prop instead (same mechanism `avatarTone.ts`
+established for `Avatar`, `resolve-theme.js` deep-merges custom theme
+strings via `twMerge`, confirmed **empirically** via a throwaway
+render+className probe, not just source-reading, because getting this
+wrong would have broken every Select silently).
+
+**`src/editor/ui/selectTheme.ts` created** (adapter, not a component
+wrapper — same justification class as `avatarTone.ts`, CLAUDE.md rule 3):
+
+- `BK_SELECT_BASE_THEME` — the fix every plain form-row `<Select>` needs
+  identically: flowbite's default `color="gray"` background (`bg-gray-50`)
+  is one ramp step off `--bk-bg-card` (#FFFFFF), and its default focus
+  ring/border (`primary-500` / #3F83F8) is not the exact `--bk-accent`
+  (#1A56DB = `primary-700`/`blue-700`). `SelectColors` has **no `"blue"`
+  entry** the way Checkbox/Radio do (`Pick<FlowbiteColors, "gray" | "info"
+  | "failure" | "warning" | "success">`) — there is no `color` prop escape
+  hatch here, the fix has to override `field.select.colors.gray` itself.
+  Override string: `tw:bg-white tw:focus:border-primary-700
+  tw:focus:ring-primary-700`. Applied at every "plain" call site (13 of
+  the 15 real call sites below).
+- `BK_SELECT_BARE_THEME` — for the 2 `InputControls.tsx` sites (`.bdi-u`
+  unit select, `.bdi-ddn .bdi-v` type select with its own `.bdi-c` chevron
+  span) that embed the select inside custom pill chrome supplying its own
+  border/background via a class landing on the (harmless-to-reuse) outer
+  div — `.bdi-fld .bdi-u` / `.bdi-ddn .bdi-v` are descendant selectors,
+  indifferent to whether the matched element is a `<select>` or the outer
+  `<div>`. Without a bare theme, the real `<select>` nested inside would
+  render flowbite's own full boxed chrome (border, `bg-gray-50`, arrow
+  icon) *inside* the pill — a double-box, double-arrow regression.
+  Override needed in **two** leaves, verified empirically because getting
+  the leaf wrong silently drops the override: `colors.gray` (border/bg/
+  shadow/focus-ring resets) **and** `sizes.md` (padding reset to
+  `tw:p-0`) — `sizes.md`'s `p-2.5` only loses to a later-merged `p-0`
+  because Select.js's own `twMerge(base, colors[c], sizes[s], ...)` call
+  puts `sizes` *after* `colors`, so a padding override placed only in
+  `colors.gray` loses that final merge. Residual `border-gray-300` /
+  `focus:border-primary-500` / `focus:ring-primary-500` classes survive in
+  the resolved string — they're *color* utilities, not the *width*
+  utilities (`border-0`/`ring-0`) doing the actual visual suppression, so
+  they're inert once width is zeroed. Confirmed by reading the merged
+  output, not assumed.
+
+**A third, one-off theme lives inline in `shared.tsx`** (settings tab),
+not in `selectTheme.ts` — `SETTINGS_SELECT_THEME` reproduces
+`.bd-set-input`'s exact box (`settings.css:240`: 7×9px padding, 5px
+radius, 11.5px/500 font, `--bk-border` #E5E7EB border, focus
+`--bk-accent`/`--bk-accent-tint` ring) via `tw:` arbitrary-value classes.
+Not shared with `BK_SELECT_BASE_THEME`/`BK_SELECT_BARE_THEME` because the
+visual spec is genuinely different (a different local design token, not
+the same correction) — CLAUDE.md's "don't extract things that merely look
+similar" line. **Second empirically-found merge-order trap here:**
+flowbite's `rounded-lg` (the default corner radius) does **not** come from
+`colors` or `sizes` at all — it comes from `theme.field.select.withAddon.off`
+(`"off"` = no `addon` prop, the always-true case here), which sits *after*
+`sizes` in Select.js's own twMerge call. A `rounded-[5px]` placed in
+`colors.gray` silently loses to it; the override has to live in
+`withAddon.off` instead.
+
+**Widespread arrow-loss regression found and fixed, not part of the
+original mapping — a byproduct of React inline `style`, not a flowbite
+bug.** ~9 of the 15 real call sites pass an inline `style` object with a
+`background` **shorthand** (e.g. `background: "var(--bk-gray-900)"`).
+`style` always wins the cascade over any class (correctly reaching the
+real `<select>`, per the structural finding above) — but setting the
+`background` *shorthand* resets `background-image` to its initial value
+too, silently killing flowbite's own drawn arrow (`bg-arrow-down-icon`,
+also class-based, also loses to `style`). The **old** `.bk-select` never
+had this failure mode — it never set `appearance: none` at all, so the
+browser's native OS arrow always rendered regardless of any `background`
+override. Fixed by adding `appearance: "auto"` to each affected style
+object/call site (restores the native arrow, matching old behavior
+exactly, rather than inventing a new drawn-arrow look nobody asked for) —
+touched both call-site-local style literals and 3 shared style objects
+reused by non-Select controls too (`inputStyle` in `controlRegistry.tsx`,
+`dialogInputStyles` in `component-library/styles.ts`, `s.select`/
+`fieldTypeSelect` in `CMSCollectionSetupModal.tsx`) — harmless there since
+`appearance: auto` is already an `<input>`'s default UA value, so it's a
+no-op on every non-select consumer of those shared objects, confirmed by
+checking each one's other usages before touching the shared object.
+`OverflowVisibilityControls.tsx`'s 2 sites reuse `baseStyles.input`, not
+the already-arrow-aware `baseStyles.select` sibling in the same shared
+module — a pre-existing minor inconsistency, left alone (out of scope to
+"fix" a pre-existing design choice); patched locally at the 2 JSX call
+sites instead of touching the shared `baseStyles.input` object, which has
+many non-Select consumers elsewhere.
+
+**Consumers swept:** precise import-based sweep (not the brief's literal
+`rg -l "Select"`, which over-matches worse than `Button` did — collides
+with `selectedItem`, `handleSelect`, `useSelectionBehavior`,
+`SelectionToolbar`, and dozens more). Multiline `-U` sweep for `Select`
+inside `@/editor/ui` import blocks (catches the same "second import
+statement" trap Button/Checkbox hit) found **13 files**, 2 only visible
+with `-U` (`CMSRecordsModal.tsx`, `component-library/CreateComponentModal.tsx`
+— both had `Select` inside a multi-line `{ ... }` import block a
+single-line grep would miss). `shared.tsx` (settings tab) matched the
+sweep but had zero real `<Select` JSX — it's a local wrapper re-exporting
+its own `Select` built on `@/editor/ui`'s (now rewritten to wrap
+flowbite's directly, see above). `grep -rn "bk-select" src` after deleting
+the CSS block found zero orphan raw-element usages (no `FormatRow`-style
+trap this round). Total: **15 real `<Select` JSX call sites** across 12
+consumer files + the 1 local-wrapper file (`shared.tsx`).
+
+**Consumer files touched:** `RichTextEditor.tsx` (×2),
+`ApprovedCompareView.tsx` (×1), `CMSRecordsModal.tsx` (×2),
+`CMSCollectionSetupModal.tsx` (×2), `InputControls.tsx` (×2, bare theme),
+`shared/forms/SelectField.tsx` (×1), `TypeTokenList.tsx` (×1),
+`controlRegistry.tsx` (×1), `ContentViews.tsx` (×2), `SizeSection.tsx`
+(×1), `component-library/CreateComponentModal.tsx` (×1),
+`OverflowVisibilityControls.tsx` (×2), plus the local-wrapper rewrite in
+`settings/shared.tsx`.
+
+**Debt item folded into this commit** (per the task instructions): added
+an Escape-dismiss assertion to the Tooltip block in
+`flowbite-parity.test.tsx` — `useDismiss(context)` is unconditionally
+wired into `useFloatingInteractions` (`hooks/use-floating.js`), independent
+of the `trigger` prop, confirmed by reading the source and then by a
+passing render-level assertion (focus opens it via `useFocus`, an Escape
+keydown on the same focused element closes it).
+
+**Class-list regen:** 43 new prefixed entries.
+
+Verified: `tsc --noEmit` clean; targeted run across all touched consumer
+tests + `atoms.test.tsx` + `flowbite-parity.test.tsx` + every inspector
+section test that renders `SelectRow`/`SelectControl` transitively — 28
+files, 253 tests, all green.

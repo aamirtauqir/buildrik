@@ -6,8 +6,9 @@
 
 import * as React from "react";
 import { ColorField } from "../../shared/forms";
-import { Select, Input, Cluster, Popover } from "@/editor/ui";
-import { Button, Tooltip } from "flowbite-react";
+import { Input, Cluster, Popover } from "@/editor/ui";
+import { BK_SELECT_BASE_THEME } from "@/editor/ui/selectTheme";
+import { Button, Select, Tooltip } from "flowbite-react";
 
 export interface RichTextEditorProps {
   onCommand: (command: string, value?: string) => void;
@@ -125,6 +126,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
     >
       {/* Heading Selector */}
       <Select
+        theme={BK_SELECT_BASE_THEME}
         onChange={(e) => onCommand("formatBlock", e.target.value)}
         style={{
           padding: "4px 8px",
@@ -134,6 +136,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
           color: "var(--bk-ink)",
           fontSize: 12,
           cursor: "pointer",
+          appearance: "auto",
         }}
       >
         {headings.map((h) => (
@@ -144,6 +147,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
       </Select>
       {/* Font Size */}
       <Select
+        theme={BK_SELECT_BASE_THEME}
         onChange={(e) => onCommand("fontSize", e.target.value)}
         style={{
           padding: "4px 8px",
@@ -153,6 +157,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
           color: "var(--bk-ink)",
           fontSize: 12,
           cursor: "pointer",
+          appearance: "auto",
         }}
       >
         {fontSizes.map((s) => (

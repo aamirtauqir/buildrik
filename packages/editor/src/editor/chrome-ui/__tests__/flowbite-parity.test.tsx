@@ -298,6 +298,25 @@ describe("flowbite Tooltip vs anchored show/hide contract (ui/Popover.tsx:1-13)"
     fireEvent.focus(screen.getByText("target"));
     expect(wrapper.className).not.toMatch(/tw:invisible/);
   });
+
+  it("closes on Escape — useDismiss(context) is unconditionally wired into useFloatingInteractions (hooks/use-floating.js), independent of the `trigger` prop", () => {
+    // Batch-2 review found this coverage had dropped from the old
+    // TooltipParts-era suite. useDismiss's default `escapeKey: true` option
+    // listens on the floating tree's root document for a keydown, not on
+    // the trigger element specifically — verified below by focusing the
+    // trigger (which opens via useFocus, asserted above) then firing the
+    // Escape keydown on that same focused element.
+    render(
+      <Tooltip content="tip text">
+        <button type="button">target</button>
+      </Tooltip>,
+    );
+    const wrapper = screen.getByTestId("flowbite-tooltip");
+    fireEvent.focus(screen.getByText("target"));
+    expect(wrapper.className).not.toMatch(/tw:invisible/);
+    fireEvent.keyDown(screen.getByText("target"), { key: "Escape" });
+    expect(wrapper.className).toMatch(/tw:invisible/);
+  });
 });
 
 describe("flowbite Toast vs one-action lifecycle contract (ui/Toast.tsx:1-16, ui/Toast.tsx:49-135)", () => {

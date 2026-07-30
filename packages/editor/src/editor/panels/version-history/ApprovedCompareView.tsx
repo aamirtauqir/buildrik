@@ -28,14 +28,15 @@ import {
   RefreshCw,
   type LucideIcon,
 } from "lucide-react";
-import { Select, Slider } from "@/editor/ui";
+import { Slider } from "@/editor/ui";
+import { BK_SELECT_BASE_THEME } from "@/editor/ui/selectTheme";
 import {
   compareApprovedToCurrent,
   type ComparePage,
   type CompareChange,
   type CompareChangeKind,
 } from "@/shared/utils/html";
-import { Button } from "flowbite-react";
+import { Button, Select } from "flowbite-react";
 
 export interface ApprovedCompareViewProps {
   /** Pages frozen at approval. `null` = this round has no stored snapshot. */
@@ -156,6 +157,7 @@ export const ApprovedCompareView: React.FC<ApprovedCompareViewProps> = ({
         <div style={S.spacer} />
         {paths.length > 1 && (
           <Select
+            theme={BK_SELECT_BASE_THEME}
             value={path}
             onChange={(e) => setActivePath(e.target.value)}
             aria-label="Page to compare"

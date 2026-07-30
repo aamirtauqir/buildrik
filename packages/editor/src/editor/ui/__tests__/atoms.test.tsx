@@ -9,9 +9,10 @@
  */
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { Input, Select, Slider, StatusDot } from "../index";
-import { Avatar, Checkbox, Radio, ToggleSwitch } from "flowbite-react";
+import { Input, Slider, StatusDot } from "../index";
+import { Avatar, Checkbox, Radio, Select, ToggleSwitch } from "flowbite-react";
 import { avatarInitials, AVATAR_TONE_THEME, type AvatarTone } from "../avatarTone";
+import { BK_SELECT_BASE_THEME } from "../selectTheme";
 
 describe("Input", () => {
   it("marks the error state for assistive tech, not just visually", () => {
@@ -34,6 +35,24 @@ describe("Select", () => {
       </Select>,
     );
     expect((screen.getByLabelText("Locale") as HTMLSelectElement).value).toBe("en");
+  });
+
+  it("puts `className` on the OUTER wrapper div, never on the <select> itself — the theme prop is the only way to restyle the field", () => {
+    // Structural gap vs the deleted ui/Select.tsx (a bare <select
+    // className="bk-select">): flowbite's Select.js destructures
+    // `className` and applies it only to `theme.base`'s wrapping <div>;
+    // the <select> only ever receives theme.field.select.* classes. Every
+    // real consumer that needs the select's own border/background/focus
+    // ring corrected uses the `theme` prop (selectTheme.ts) instead of
+    // `className` for exactly this reason.
+    const { container } = render(
+      <Select className="probe-outer" theme={BK_SELECT_BASE_THEME} aria-label="x">
+        <option value="a">a</option>
+      </Select>,
+    );
+    expect(container.querySelector("select")?.className).not.toMatch(/probe-outer/);
+    expect(container.querySelector(".probe-outer")?.tagName).toBe("DIV");
+    expect(container.querySelector("select")?.className).toMatch(/tw:bg-white/);
   });
 });
 

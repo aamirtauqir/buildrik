@@ -26,6 +26,7 @@ export const dialogInputStyles: React.CSSProperties = {
   color: "var(--bk-ink)",
   outline: "none",
   width: "100%",
+  appearance: "auto",
 };
 
 export const dialogCancelBtnStyles: React.CSSProperties = {

@@ -24,15 +24,15 @@ import {
   ModalRoot,
   ModalTitle,
   Portal,
-  Select,
   Stack,
 } from "@/editor/ui";
+import { BK_SELECT_BASE_THEME } from "@/editor/ui/selectTheme";
 import {
   dialogCancelBtnStyles,
   dialogInputStyles,
   dialogPrimaryBtnStyles,
 } from "./styles";
-import { Button, Checkbox } from "flowbite-react";
+import { Button, Checkbox, Select } from "flowbite-react";
 
 export interface SelectionContext {
   selectionIds: readonly string[];
@@ -140,6 +140,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
                 </label>
                 <Select
                   id="create-component-group"
+                  theme={BK_SELECT_BASE_THEME}
                   value={group}
                   onChange={(e) => setGroup(e.target.value)}
                   style={dialogInputStyles}

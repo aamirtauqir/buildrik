@@ -11,7 +11,8 @@
  */
 
 import * as React from "react";
-import { Input, Select } from "@/editor/ui";
+import { Input } from "@/editor/ui";
+import { BK_SELECT_BASE_THEME } from "@/editor/ui/selectTheme";
 import type {
   ColorField,
   ControlProps,
@@ -25,7 +26,7 @@ import type {
   TextField,
   ToggleField,
 } from "./schema";
-import { Button, Checkbox } from "flowbite-react";
+import { Button, Checkbox, Select } from "flowbite-react";
 
 // ============================================================================
 // SHARED STYLE TOKENS — keep each control file-local so future sections can
@@ -55,6 +56,7 @@ const inputStyle: React.CSSProperties = {
   background: "var(--bk-bg-card)",
   border: "1px solid var(--bk-border)",
   borderRadius: 4,
+  appearance: "auto",
 };
 
 // File-local so the value lives near the style it drives, and so the chrome
@@ -127,6 +129,7 @@ const SelectControl: React.FC<ControlProps<SelectField>> = ({
     </label>
     <Select
       id={`field-${field.prop}`}
+      theme={BK_SELECT_BASE_THEME}
       value={value}
       onChange={(e) => onChange(e.target.value)}
       style={inputStyle}

@@ -8,12 +8,13 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { ConfirmDialog, Input, Select, Textarea } from "@/editor/ui";
+import { ConfirmDialog, Input, Textarea } from "@/editor/ui";
+import { BK_SELECT_BASE_THEME } from "@/editor/ui/selectTheme";
 import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
 import type { ConditionExpression, ConditionOperator, DataSource } from "@/shared/types/data";
 import { conditionSummary, fieldDefault, isValidVariableKey, type SiteVariable } from "./contentPanelUtils";
 import type { ConditionRow } from "./useContentPanel";
-import { Button, Checkbox, ToggleSwitch } from "flowbite-react";
+import { Button, Checkbox, Select, ToggleSwitch } from "flowbite-react";
 
 export const S: Record<string, React.CSSProperties> = {
   body: { display: "flex", flexDirection: "column", height: "100%", minHeight: 0 },
@@ -121,6 +122,7 @@ export const S: Record<string, React.CSSProperties> = {
     background: "var(--bk-bg-card)",
     color: "var(--bk-ink)",
     fontFamily: "inherit",
+    appearance: "auto",
   },
 };
 
@@ -453,7 +455,7 @@ export function FieldsView({
               autoFocus
             />
             <div style={S.formRow}>
-              <Select style={S.select} value={type} onChange={(e) => setType(e.target.value)} aria-label="Field type">
+              <Select theme={BK_SELECT_BASE_THEME} style={S.select} value={type} onChange={(e) => setType(e.target.value)} aria-label="Field type">
                 {FIELD_TYPES.map((t) => (
                   <option key={t} value={t}>{t}</option>
                 ))}
@@ -763,6 +765,7 @@ export function ConditionsView({
             />
             <div style={S.formRow}>
               <Select
+                theme={BK_SELECT_BASE_THEME}
                 style={S.select}
                 value={operator}
                 onChange={(e) => setOperator(e.target.value as ConditionOperator)}

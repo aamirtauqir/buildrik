@@ -4,10 +4,10 @@
  */
 
 import * as React from "react";
-import { Select } from "@/editor/ui";
+import { BK_SELECT_BASE_THEME } from "@/editor/ui/selectTheme";
 import { baseStyles } from "../../shared/controls/controlStyles";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
-import { Button } from "flowbite-react";
+import { Button, Select } from "flowbite-react";
 
 // ============================================================================
 // TYPES
@@ -124,9 +124,10 @@ const OverflowXYControls: React.FC<OverflowXYControlsProps> = ({
     <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
       <span style={{ fontSize: 12, color: "var(--bk-ink-muted)", width: 14 }}>X</span>
       <Select
+        theme={BK_SELECT_BASE_THEME}
         value={styles["overflow-x"] || ""}
         onChange={(e) => onChange("overflow-x", e.target.value)}
-        style={{ ...inputStyle, cursor: "pointer" }}
+        style={{ ...inputStyle, cursor: "pointer", appearance: "auto" }}
       >
         <option value="">Default</option>
         <option value="visible">visible</option>
@@ -138,9 +139,10 @@ const OverflowXYControls: React.FC<OverflowXYControlsProps> = ({
     <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
       <span style={{ fontSize: 12, color: "var(--bk-ink-muted)", width: 14 }}>Y</span>
       <Select
+        theme={BK_SELECT_BASE_THEME}
         value={styles["overflow-y"] || ""}
         onChange={(e) => onChange("overflow-y", e.target.value)}
-        style={{ ...inputStyle, cursor: "pointer" }}
+        style={{ ...inputStyle, cursor: "pointer", appearance: "auto" }}
       >
         <option value="">Default</option>
         <option value="visible">visible</option>

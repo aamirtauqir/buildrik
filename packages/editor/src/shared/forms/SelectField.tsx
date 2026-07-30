@@ -7,7 +7,9 @@
  */
 
 import * as React from "react";
-import { FormField, Select } from "@/editor/ui";
+import { FormField } from "@/editor/ui";
+import { BK_SELECT_BASE_THEME } from "@/editor/ui/selectTheme";
+import { Select } from "flowbite-react";
 
 export interface SelectOption {
   value: string;
@@ -62,6 +64,7 @@ export const SelectField: React.FC<SelectFieldProps> = ({
   }) => (
     <Select
       id={id}
+      theme={BK_SELECT_BASE_THEME}
       {...extra}
       value={value}
       onChange={(e) => onChange?.(e.target.value)}

@@ -5,11 +5,12 @@
  */
 
 import * as React from "react";
-import { Input, Select } from "@/editor/ui";
+import { Input } from "@/editor/ui";
+import { BK_SELECT_BASE_THEME } from "@/editor/ui/selectTheme";
 import type { ResponsiveMode } from "../../state/useTypeTokens";
 import type { DesignToken } from "../../types";
 import { TokenUsageChip } from "../sections/TokenUsageChip";
-import { Button } from "flowbite-react";
+import { Button, Select } from "flowbite-react";
 
 export interface TypeTokenListProps {
   tokens: DesignToken[];
@@ -366,6 +367,7 @@ const FontFamilyRow: React.FC<FontRowProps> = ({ token, onChange, usageCount, on
         )}
       </div>
       <Select
+        theme={BK_SELECT_BASE_THEME}
         value={token.value}
         onChange={(e) => onChange(token.id, e.target.value)}
         style={{
@@ -376,6 +378,7 @@ const FontFamilyRow: React.FC<FontRowProps> = ({ token, onChange, usageCount, on
           color: "var(--bk-ink)",
           fontSize: 12,
           cursor: "pointer",
+          appearance: "auto",
         }}
       >
         {FONT_OPTIONS.map((f) => (

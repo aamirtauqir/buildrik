@@ -18,10 +18,11 @@
  */
 
 import * as React from "react";
-import { Input as VibcoderInput, Select as VibcoderSelect, Textarea as VibcoderTextarea } from "@/editor/ui";
+import { Input as VibcoderInput, Textarea as VibcoderTextarea } from "@/editor/ui";
 import { SIDEBAR_WIDE } from "@/shared/constants/layout";
 import "./settings.css";
-import { Button } from "flowbite-react";
+import { Button, Select as FlowbiteSelect } from "flowbite-react";
+import type { CustomFlowbiteTheme } from "flowbite-react/types";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Section
@@ -90,16 +91,40 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
 );
 Textarea.displayName = "Textarea";
 
+// flowbite's Select applies the consumer's `className` to an OUTER wrapper
+// div (Select.js), never to the actual <select> — so the `.bd-set-input`
+// class this component used to forward can't reach the select's own
+// border/padding/font/focus-ring the way it did through the old
+// vibcoder <Select>. Reproduced `.bd-set-input`'s exact box (settings.css:240)
+// via a per-instance `theme` override instead — verified empirically
+// (render + className probe) that `withAddon.off` is what actually has to
+// carry the radius override: flowbite's own `rounded-lg` comes from
+// `theme.field.select.withAddon.off` ("off" = no addon, our case), which is
+// positioned AFTER `colors`/`sizes` in Select.js's own twMerge call, so a
+// radius override placed in `colors.gray` loses the merge unless it's also
+// (or instead) placed here.
+const SETTINGS_SELECT_THEME: NonNullable<CustomFlowbiteTheme["select"]> = {
+  field: {
+    select: {
+      colors: {
+        gray: "tw:border-gray-200 tw:bg-white tw:text-gray-900 tw:font-medium tw:focus:border-blue-700 tw:focus:ring-[3px] tw:focus:ring-blue-50 tw:focus:outline-none",
+      },
+      sizes: {
+        md: "tw:py-[7px] tw:px-[9px] tw:text-[11.5px]",
+      },
+      withAddon: {
+        off: "tw:rounded-[5px]",
+      },
+    },
+  },
+};
+
 type SelectProps = Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "size">;
 export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
   ({ className, children, ...rest }, ref) => (
-    <VibcoderSelect
-      ref={ref}
-      className={`bd-set-input${className ? " " + className : ""}`}
-      {...rest}
-    >
+    <FlowbiteSelect ref={ref} className={className} theme={SETTINGS_SELECT_THEME} {...rest}>
       {children}
-    </VibcoderSelect>
+    </FlowbiteSelect>
   )
 );
 Select.displayName = "Select";
