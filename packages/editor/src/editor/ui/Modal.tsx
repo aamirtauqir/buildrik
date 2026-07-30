@@ -23,6 +23,20 @@ export interface ModalProps {
   dismissOnScrimClick?: boolean;
 }
 
+/**
+ * Is ANY modal dialog holding the keyboard right now?
+ *
+ * The F9 rule, exported from the modal owner so every window-level keyboard
+ * handler can honour it: an open `aria-modal` dialog owns the keyboard —
+ * global shortcuts (C, ?, ⌘K, ⌘S, undo) and capture-phase Esc handlers must
+ * stand down, or they fire behind the dialog (live-reproduced: C mounted the
+ * comment layer under the shortcuts modal; Esc killed comment mode and left
+ * the modal open).
+ */
+export function isModalOpen(): boolean {
+  return Boolean(document.querySelector('[role="dialog"][aria-modal="true"]'));
+}
+
 export function Modal({
   open, onClose, title, subtitle, kind = "question", children, footer, dismissOnScrimClick,
 }: ModalProps) {

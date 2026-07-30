@@ -204,6 +204,28 @@ describe("CommentLayer", () => {
     expect(changedCalls(composer).map(([, p]) => p)).toContainEqual({ on: false });
   });
 
+  // Investigate 2026-07-30: capture-phase Esc outranked every dialog — it
+  // killed comment mode UNDER an open modal and its stopPropagation left the
+  // modal open (live-reproduced). Esc must close the topmost layer.
+  it("Esc yields to an open modal — comment mode survives underneath", async () => {
+    const composer = makeComposer();
+    mount(composer);
+    act(() => composer.emit("ui:comment-mode", { on: true }));
+    await screen.findByTestId("comment-capture-layer");
+    const dialog = document.createElement("div");
+    dialog.setAttribute("role", "dialog");
+    dialog.setAttribute("aria-modal", "true");
+    document.body.appendChild(dialog);
+    try {
+      composer.emit.mockClear();
+      fireEvent.keyDown(window, { key: "Escape" });
+      expect(composer.emit).not.toHaveBeenCalledWith("ui:comment-mode", { on: false });
+      expect(screen.getByTestId("comment-capture-layer")).toBeInTheDocument();
+    } finally {
+      dialog.remove();
+    }
+  });
+
   it("unmounting while mode is off broadcasts nothing extra", async () => {
     const composer = makeComposer();
     const view = mount(composer);

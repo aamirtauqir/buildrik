@@ -129,6 +129,43 @@ describe("useEditorShortcuts", () => {
     expect(saveProject).toHaveBeenCalledTimes(1);
   });
 
+  // SITE-MENU CHORDS -----------------------------------------------------------
+  // T9: the site menu prints these on its rows, so a row and its chord have to
+  // land on the same handler. ⌃, exists because macOS browsers eat ⌘,.
+  it("Ctrl+, opens site settings — the same door as the menu row", () => {
+    const openSiteSettings = vi.fn();
+    const openLeftPanelToTab = vi.fn();
+    mount({ openSiteSettings, openLeftPanelToTab });
+    const ev = dispatchKey({ key: ",", ctrlKey: true });
+    expect(openSiteSettings).toHaveBeenCalledTimes(1);
+    expect(ev.defaultPrevented).toBe(true);
+    // Regression: it used to open the left panel's settings tab instead.
+    expect(openLeftPanelToTab).not.toHaveBeenCalled();
+  });
+
+  it("Cmd+, does the same, for platforms whose browser lets it through", () => {
+    const openSiteSettings = vi.fn();
+    mount({ openSiteSettings });
+    dispatchKey({ key: ",", metaKey: true });
+    expect(openSiteSettings).toHaveBeenCalledTimes(1);
+  });
+
+  it("a bare comma types a comma — no modifier, no navigation", () => {
+    const openSiteSettings = vi.fn();
+    mount({ openSiteSettings });
+    dispatchKey({ key: "," });
+    expect(openSiteSettings).not.toHaveBeenCalled();
+  });
+
+  it("Ctrl+H opens version history, Shift+A opens components", () => {
+    const openLeftPanelToTab = vi.fn();
+    mount({ openLeftPanelToTab });
+    dispatchKey({ key: "h", ctrlKey: true });
+    expect(openLeftPanelToTab).toHaveBeenCalledWith("history");
+    dispatchKey({ key: "A", shiftKey: true });
+    expect(openLeftPanelToTab).toHaveBeenCalledWith("components");
+  });
+
   // MODALS ---------------------------------------------------------------------
   it("Cmd+/ opens shortcuts modal", () => {
     mount();
@@ -199,6 +236,28 @@ describe("useEditorShortcuts", () => {
     dispatchKey({ key: "z", metaKey: true, target: ta });
     expect(composer.history.undo).not.toHaveBeenCalled();
     document.body.removeChild(ta);
+  });
+
+  // MODAL GUARD (investigate 2026-07-30) ---------------------------------------
+  // Live-reproduced: with the shortcuts modal open, plain C mounted the comment
+  // layer BEHIND the dialog. An open aria-modal dialog owns the keyboard — every
+  // global shortcut stands down, including ⌘S and undo.
+  it("an open modal silences every shortcut", () => {
+    mount();
+    const dialog = document.createElement("div");
+    dialog.setAttribute("role", "dialog");
+    dialog.setAttribute("aria-modal", "true");
+    document.body.appendChild(dialog);
+    try {
+      dispatchKey({ key: "c" });
+      dispatchKey({ key: "s", metaKey: true });
+      dispatchKey({ key: "z", metaKey: true });
+      expect(composer.emit).not.toHaveBeenCalled();
+      expect(saveProject).not.toHaveBeenCalled();
+      expect(composer.history.undo).not.toHaveBeenCalled();
+    } finally {
+      dialog.remove();
+    }
   });
 
   // CLEANUP --------------------------------------------------------------------

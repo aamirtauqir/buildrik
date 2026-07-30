@@ -44,7 +44,7 @@ export { SiteCard, type SiteCardProps } from "./SiteCard";
 export { OverlayMount, type OverlayMountProps } from "./OverlayMount";
 export { Portal } from "./Portal";
 export { useFocusTrap } from "./useFocusTrap";
-export { Modal, type ModalProps, type ModalKind } from "./Modal";
+export { Modal, isModalOpen, type ModalProps, type ModalKind } from "./Modal";
 export { Drawer, type DrawerProps, type DrawerLayout } from "./Drawer";
 export { RightPanel, type RightPanelProps } from "./RightPanel";
 export { Rail, RailItem, RailSpacer, type RailProps, type RailItemProps } from "./Rail";

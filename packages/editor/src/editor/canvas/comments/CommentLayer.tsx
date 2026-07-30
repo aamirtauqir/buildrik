@@ -22,7 +22,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button, ModalContent, ModalFooter, ModalRoot, ModalTitle, Textarea } from "@/editor/ui";
+import { Button, ModalContent, ModalFooter, ModalRoot, ModalTitle, Textarea, isModalOpen } from "@/editor/ui";
 import { useToast } from "@/editor/ui";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants";
@@ -206,6 +206,11 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
     if (!modeOn && !reattachingId) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
+      // A capture-phase window listener outranks every dialog — so it must
+      // yield when one is open. Without this, Esc killed comment mode UNDER
+      // the modal and the stopPropagation left the modal open (live-repro).
+      // Esc closes the topmost layer; the modal is topmost.
+      if (isModalOpen()) return;
       e.stopPropagation();
       if (draft) {
         setDraft(null);

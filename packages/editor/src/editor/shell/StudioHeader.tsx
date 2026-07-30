@@ -28,8 +28,10 @@ import {
   ModalTitle,
   ModalDescription,
   ModalFooter,
+  isModalOpen,
   type PublishState,
   type ReviewPill,
+  type ReviewTone,
   type SaveState,
   type ToastInput,
 } from "@/editor/ui";
@@ -243,7 +245,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         // F9: a modal dialog (exit guard, confirm) owns the keyboard — opening
         // the palette on top of it would stack two focus traps.
-        if (document.querySelector('[role="dialog"][aria-modal="true"]')) return;
+        if (isModalOpen()) return;
         e.preventDefault();
         setCmdOpen((v) => !v);
       }
@@ -561,9 +563,17 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
       };
 
   const pill = REVIEW_PILL[reviewStatus.state];
+  // T8/D7 rule 6 — at most two amber signals at once. Offline-or-unsaved save
+  // and an amber Issues chip are both about *this* publish; a warning review
+  // pill is about the last one, so it is the signal that steps back. Demoted to
+  // `info`, which D7 rule 3 already renders neutral — the copy still says
+  // "Changes requested", it just stops shouting alongside two louder ambers.
+  const amberElsewhere = (save === "offline" || save === "unsaved") && warnCount > 0;
+  const tone: ReviewTone = pill?.tone === "warning" && amberElsewhere ? "info" : (pill?.tone ?? "info");
   const review: ReviewPill | null = pill
     ? {
         ...pill,
+        tone,
         label:
           reviewStatus.state === "approved" && reviewStatus.reviewerName
             ? `Approved by ${reviewStatus.reviewerName}${pillAgo(reviewStatus.at)}`
@@ -600,6 +610,12 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
             ? {
                 users: toPresenceUsers(users, currentUser, collaborationState),
                 connection: collaborationState === "connected" ? "live" : "reconnecting",
+                // T8 compact tier 3 (plan §7): two faces, then "+N". Not
+                // width-conditional on purpose — CSS can hide a third avatar
+                // but it cannot re-count the overflow badge, and a "+N" that
+                // disagrees with the faces beside it is worse than a tighter
+                // stack at every width.
+                max: 2,
               }
             : null
         }
