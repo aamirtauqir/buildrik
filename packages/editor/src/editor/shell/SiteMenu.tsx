@@ -73,6 +73,13 @@ function openDashboard(path: string) {
  */
 const IS_MAC = typeof navigator !== "undefined" && /Mac|iP(hone|ad|od)/.test(navigator.platform);
 const HISTORY_KBD = IS_MAC ? "⌃H" : "Ctrl H";
+/**
+ * T9 (F22): ⌘, is the browser's own Preferences accelerator on macOS — Chrome,
+ * Safari and Firefox all take it before the page, exactly like ⌘H above. Same
+ * fix, same reason: the handler already accepts ctrl OR meta, so the control
+ * chord is the one that reaches us, and the hint says so.
+ */
+const SETTINGS_KBD = IS_MAC ? "⌃," : "Ctrl ,";
 
 export const SiteMenu: React.FC<SiteMenuProps> = ({
   onOpenSiteSettings,
@@ -118,7 +125,7 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
           <MenuGroup>
             <MenuLabel>Site</MenuLabel>
             {onOpenSiteSettings ? (
-              <MenuItem kbd="⌘," onClick={run(onOpenSiteSettings)}>
+              <MenuItem kbd={SETTINGS_KBD} onClick={run(onOpenSiteSettings)}>
                 Site settings
               </MenuItem>
             ) : null}

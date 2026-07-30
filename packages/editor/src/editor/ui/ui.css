@@ -715,16 +715,21 @@
   white-space: nowrap;
 }
 .bk-save__dot { width: 6px; height: 6px; border-radius: var(--bk-radius-full); flex: none; }
-.bk-save--saved    { background: var(--bk-success-tint); color: var(--bk-success-text); }
+/* T8/D7 rule 4 — text-first: saved · saving · unsaved are plain muted text on
+   no surface; the coloured dot carries the state. Only `offline` and `error`
+   (and future `conflict`) earn a tinted pill, because they are the only two
+   that mean "your work is not where you think it is". A green pill on every
+   successful autosave spent the bar's loudest signal on its calmest event. */
+.bk-save--saved    { background: transparent; color: var(--bk-ink-muted); }
 .bk-save--saved .bk-save__dot { background: var(--bk-success); }
-.bk-save--saving   { background: var(--bk-bg-subtle); color: var(--bk-ink-soft); }
+.bk-save--saving   { background: transparent; color: var(--bk-ink-muted); }
 .bk-save--saving .bk-save__dot { background: var(--bk-ink-muted); }
-.bk-save--unsaved  { background: var(--bk-warning-tint); color: var(--bk-warning-text); }
+.bk-save--unsaved  { background: transparent; color: var(--bk-ink-muted); }
 .bk-save--unsaved .bk-save__dot { background: var(--bk-warning); }
-.bk-save--conflict { background: var(--bk-error-tint); color: var(--bk-error-text); }
-.bk-save--conflict .bk-save__dot { background: var(--bk-error); }
-.bk-save--offline  { background: var(--bk-bg-subtle); color: var(--bk-ink-soft); }
-.bk-save--offline .bk-save__dot { background: var(--bk-ink-muted); }
+.bk-save--conflict { background: var(--bk-warning-tint); color: var(--bk-warning-text); }
+.bk-save--conflict .bk-save__dot { background: var(--bk-warning); }
+.bk-save--offline  { background: var(--bk-warning-tint); color: var(--bk-warning-text); }
+.bk-save--offline .bk-save__dot { background: var(--bk-warning); }
 .bk-save--error    { background: var(--bk-error-tint); color: var(--bk-error-text); }
 .bk-save--error .bk-save__dot { background: var(--bk-error); }
 
@@ -774,6 +779,9 @@
 .bk-topbar {
   display: flex; align-items: center; gap: var(--bk-space-12);
   height: var(--bk-size-topbar); flex: none;
+  /* The bar measures itself so the compact tiers of plan §7 key off the space
+     it actually has, not the viewport — the shell's rails eat into it. */
+  container-type: inline-size;
   padding: 0 var(--bk-space-16);
   background: var(--bk-bg-card);
   border-bottom: 1px solid var(--bk-border);
@@ -844,9 +852,23 @@ button.bk-topbar__review:focus-visible { outline: none; box-shadow: var(--bk-sha
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.bk-topbar__review--info { background: var(--bk-accent-subtle); color: var(--bk-accent-text); }
+/* T8/D7 rule 3 — neutral-unless-blocking. "In review" and "Approved" are
+   information, not instructions: they sit on gray so the bar's colour budget
+   stays with the two signals that gate a publish (Issues chip, save trouble).
+   Only "Changes requested" — the one review state that blocks — keeps amber.
+   Surface uses the generated `--bk-bg-subtle`; the purpose-named
+   `bg-pill-neutral` of D7 is a Figma-side follow-up (T1), and tokens are
+   generated, never hand-added. */
+.bk-topbar__review--info { background: var(--bk-bg-subtle); color: var(--bk-ink-soft); }
+.bk-topbar__review--success { background: var(--bk-bg-subtle); color: var(--bk-ink-soft); }
 .bk-topbar__review--warning { background: var(--bk-warning-tint); color: var(--bk-warning-text); }
-.bk-topbar__review--success { background: var(--bk-success-tint); color: var(--bk-success-text); }
+
+/* T8 compact tier 2 (plan §7) — the save timestamp goes before the review pill
+   truncates further and long before the site name gives up its width. Ordered
+   deliberately: identity and the publish gate outlast "· 2m ago". */
+@container (max-width: 1200px) {
+  .bk-save__ago { display: none; }
+}
 
 /* Topbar tools cluster — Quick preview · Comments · IssueChip (plan §2; Figma pending T1) */
 .bk-topbar__tools {

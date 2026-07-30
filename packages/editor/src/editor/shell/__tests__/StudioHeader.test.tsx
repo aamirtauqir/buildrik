@@ -48,8 +48,16 @@ vi.mock("../../../services/NotificationService", () => ({
   markAllNotificationsRead: vi.fn(() => Promise.resolve()),
 }));
 
+// Mutable so presence tests can seat a room; default is the solo, offline case.
+const COLLAB_IDLE = {
+  users: [] as unknown[],
+  currentUser: null as unknown,
+  state: "disconnected",
+  isConnected: false,
+};
+const collab = { current: { ...COLLAB_IDLE } };
 vi.mock("../../canvas/hooks/useCollaboration", () => ({
-  useCollaboration: () => ({ users: [], currentUser: null, state: "disconnected", isConnected: false }),
+  useCollaboration: () => collab.current,
 }));
 
 vi.mock("../modals/CommandPalette", () => ({
@@ -106,6 +114,7 @@ describe("StudioHeader", () => {
     cleanup();
     vi.clearAllMocks();
     roleState.role = null;
+    collab.current = { ...COLLAB_IDLE };
   });
 
   describe("the bar carries exactly what Figma 681:122 draws", () => {
@@ -211,14 +220,17 @@ describe("StudioHeader", () => {
     });
 
     it("a settled state is a status, not a button that does nothing", () => {
-      save({ lastSavedAt: Date.now() });
-      expect(screen.getByRole("status")).toBeTruthy();
+      // Asserted on the pill itself: since eng D5 the only role=status in the
+      // tree is the header's announcement region, so querying by role here
+      // would pass no matter what SaveStatus rendered.
+      const { container } = save({ lastSavedAt: Date.now() });
+      expect(container.querySelector(".bk-save")!.tagName).toBe("SPAN");
       expect(screen.queryByRole("button", { name: /Saved/ })).toBeNull();
     });
 
     it("clean and saved", () => {
-      save({ lastSavedAt: Date.now() });
-      expect(screen.getByText("Saved just now")).toBeTruthy();
+      const { container } = save({ lastSavedAt: Date.now() });
+      expect(container.querySelector(".bk-save")!.textContent).toBe("Saved · just now");
     });
 
     it("offline outranks a save error — queued is not lost", () => {
@@ -528,9 +540,9 @@ describe("StudioHeader", () => {
       fireEvent.click(screen.getByRole("button", { name: "Site menu" }));
       const labels = screen.getAllByRole("menuitem").map((i) => i.textContent);
       expect(labels).toEqual([
-        "Site settings⌘,",
-        // F6: jsdom's navigator.platform is not macOS, so the hint is the
+        // F6/T9: jsdom's navigator.platform is not macOS, so both hints show the
         // chord that actually works there (the handler takes ctrl OR meta).
+        "Site settingsCtrl ,",
         "Version historyCtrl H",
         "Publish history",
         "Export code",
@@ -793,6 +805,81 @@ describe("F3 review pill", () => {
     const pill = await screen.findByText(/Approved by Sara/);
     expect(pill.textContent).toMatch(/59m ago/);
     expect(pill.textContent).not.toMatch(/just now/);
+  });
+});
+
+// ── T8/D7 · status grammar ──────────────────────────────────────────────────
+describe("T8 status grammar", () => {
+  /** The tone lives on the pill root, one level above the label element. */
+  const toneOf = (labelEl: HTMLElement) => labelEl.closest(".bk-topbar__review")!.className;
+
+  it("a blocking review keeps the warning tone when it is the only amber", async () => {
+    vi.mocked(fetchReviewStatus).mockResolvedValue({
+      state: "changes-requested",
+      reviewerName: "Sara",
+      at: new Date().toISOString(),
+    });
+    render(<StudioHeader {...makeProps()} />);
+    const label = await screen.findByText("Changes requested");
+    expect(toneOf(label)).toContain("bk-topbar__review--warning");
+  });
+
+  it("D7 rule 6: with an amber save AND amber issues, the review pill steps back", async () => {
+    vi.mocked(fetchReviewStatus).mockResolvedValue({
+      state: "changes-requested",
+      reviewerName: "Sara",
+      at: new Date().toISOString(),
+    });
+    render(
+      <StudioHeader
+        {...makeProps({
+          isDirty: true, // save → unsaved (amber)
+          issues: [{ id: "i1", type: "warning", message: "Missing alt text" }],
+        })}
+      />,
+    );
+    const label = await screen.findByText("Changes requested");
+    // Demoted, not hidden — the copy is unchanged, only the shouting stops.
+    expect(toneOf(label)).toContain("bk-topbar__review--info");
+    expect(toneOf(label)).not.toContain("warning");
+  });
+
+  // T8 compact tier 3: two faces then "+N", so a crowded room cannot push the
+  // publish action off the bar.
+  it("presence shows two avatars and counts the rest", () => {
+    vi.mocked(isFeatureEnabled).mockReturnValue(true);
+    collab.current = {
+      users: [
+        { id: "u1", name: "Sara" },
+        { id: "u2", name: "Bilal" },
+        { id: "u3", name: "Hina" },
+        { id: "u4", name: "Omar" },
+      ],
+      currentUser: { id: "u1", name: "Sara" },
+      state: "connected",
+      isConnected: true,
+    };
+    const { container } = render(<StudioHeader {...makeProps()} />);
+    expect(container.querySelectorAll(".bk-presence__stack .bk-avatar").length).toBe(2);
+    expect(screen.getByLabelText("2 more")).toBeTruthy();
+  });
+
+  it("errors do not spend the amber budget — an error chip is red, not amber", async () => {
+    vi.mocked(fetchReviewStatus).mockResolvedValue({
+      state: "changes-requested",
+      reviewerName: "Sara",
+      at: new Date().toISOString(),
+    });
+    render(
+      <StudioHeader
+        {...makeProps({
+          isDirty: true,
+          issues: [{ id: "i1", type: "error", message: "Broken link" }],
+        })}
+      />,
+    );
+    const label = await screen.findByText("Changes requested");
+    expect(toneOf(label)).toContain("bk-topbar__review--warning");
   });
 });
 

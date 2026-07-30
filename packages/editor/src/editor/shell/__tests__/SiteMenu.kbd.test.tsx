@@ -30,6 +30,15 @@ async function historyHint(platform: string): Promise<string | null> {
   return screen.getByRole("menuitem", { name: /Version history/ }).textContent;
 }
 
+async function settingsHint(platform: string): Promise<string | null> {
+  vi.resetModules();
+  Object.defineProperty(navigator, "platform", { value: platform, configurable: true });
+  const { SiteMenu } = await import("../SiteMenu");
+  render(<SiteMenu onOpenSiteSettings={() => {}} />);
+  fireEvent.click(screen.getByRole("button", { name: "Site menu" }));
+  return screen.getByRole("menuitem", { name: /Site settings/ }).textContent;
+}
+
 describe("F6 platform-aware history shortcut hint", () => {
   it("macOS shows ⌃H — ⌘H is the OS hide-window chord", async () => {
     expect(await historyHint("MacIntel")).toBe("Version history⌃H");
@@ -37,5 +46,17 @@ describe("F6 platform-aware history shortcut hint", () => {
 
   it("everywhere else shows Ctrl H", async () => {
     expect(await historyHint("Win32")).toBe("Version historyCtrl H");
+  });
+});
+
+// T9 (F22): same class of lie as ⌘H — Chrome, Safari and Firefox all take ⌘,
+// for their own Preferences before the page can see it.
+describe("T9 platform-aware site-settings shortcut hint", () => {
+  it("macOS shows ⌃, — ⌘, is the browser's Preferences chord", async () => {
+    expect(await settingsHint("MacIntel")).toBe("Site settings⌃,");
+  });
+
+  it("everywhere else shows Ctrl ,", async () => {
+    expect(await settingsHint("Win32")).toBe("Site settingsCtrl ,");
   });
 });

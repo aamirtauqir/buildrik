@@ -304,7 +304,14 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   }, []);
 
   // Keyboard shortcuts (extracted into useEditorShortcuts — D2 stage 1)
-  useEditorShortcuts({ composer, modals, saveProject, openLeftPanelToTab: state.openLeftPanelToTab });
+  useEditorShortcuts({
+    composer,
+    modals,
+    saveProject,
+    openLeftPanelToTab: state.openLeftPanelToTab,
+    // T9: same handler the site menu's "Site settings" row uses.
+    openSiteSettings: modals.openProjectSettings,
+  });
 
   // Export + publish lifecycle (HTML zip, Vercel deploy, publish-toast effect,
   // usePublishJob) extracted into useExportHandlers — D2 stage 4. The hook

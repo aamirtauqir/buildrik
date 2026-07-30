@@ -170,8 +170,24 @@ describe("SaveStatus", () => {
   });
 
   it("formats the saved timestamp", () => {
-    render(<SaveStatus state="saved" savedAt={Date.now() - 120_000} />);
-    expect(screen.getByText("Saved 2m ago")).toBeTruthy();
+    const { container } = render(<SaveStatus state="saved" savedAt={Date.now() - 120_000} />);
+    expect(container.querySelector(".bk-save")!.textContent).toBe("Saved · 2m ago");
+  });
+
+  // T8 compact tier 2: the timestamp is the bar's first concession, so it has to
+  // be droppable on its own — hence its own element, with "Saved" left behind.
+  it("keeps the timestamp in its own element so the compact tier can drop it", () => {
+    const { container } = render(<SaveStatus state="saved" savedAt={Date.now() - 120_000} />);
+    const stamp = container.querySelector(".bk-save__ago");
+    expect(stamp!.textContent).toBe(" · 2m ago");
+    stamp!.remove();
+    expect(container.querySelector(".bk-save")!.textContent).toBe("Saved");
+  });
+
+  it("no timestamp yet → 'Saved' alone, with nothing to drop", () => {
+    const { container } = render(<SaveStatus state="saved" />);
+    expect(container.querySelector(".bk-save")!.textContent).toBe("Saved");
+    expect(container.querySelector(".bk-save__ago")).toBeNull();
   });
 });
 

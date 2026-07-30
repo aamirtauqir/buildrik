@@ -30,9 +30,8 @@ export interface SaveStatusProps extends React.HTMLAttributes<HTMLSpanElement> {
 }
 
 /** U1: one relative-time SSOT — seconds granularity preserved for saves. */
-function ago(ts?: number): string {
-  if (!ts) return "Saved";
-  return `Saved ${formatRelativeTime(ts, {
+function ago(ts: number): string {
+  return ` · ${formatRelativeTime(ts, {
     fallback: "days",
     showSeconds: true,
     justNowLabel: "just now",
@@ -48,16 +47,25 @@ const COPY: Record<Exclude<SaveState, "saved">, string> = {
 };
 
 export function SaveStatus({ state, savedAt, onRetry, className, ...rest }: SaveStatusProps) {
-  const label = state === "saved" ? ago(savedAt) : COPY[state];
+  const label = state === "saved" ? "Saved" : COPY[state];
   const actionable = Boolean(onRetry) && (state === "error" || state === "unsaved");
   const classes = ["bk-save", `bk-save--${state}`, className].filter(Boolean).join(" ");
   const dot = <span className="bk-save__dot" aria-hidden="true" />;
+  /**
+   * T8 compact tier 2 (plan §7): the timestamp is the first thing the bar gives
+   * up when it runs out of room, so it is its own element — CSS drops it while
+   * "Saved" stays. The suffix is decoration on a state the label already
+   * carries, which is why hiding it costs the user nothing.
+   */
+  const stamp =
+    state === "saved" && savedAt ? <span className="bk-save__ago">{ago(savedAt)}</span> : null;
 
   if (actionable) {
     return (
       <button type="button" className={classes} onClick={onRetry}>
         {dot}
         {label}
+        {stamp}
       </button>
     );
   }
@@ -65,6 +73,7 @@ export function SaveStatus({ state, savedAt, onRetry, className, ...rest }: Save
     <span className={classes} {...rest}>
       {dot}
       {label}
+      {stamp}
     </span>
   );
 }
