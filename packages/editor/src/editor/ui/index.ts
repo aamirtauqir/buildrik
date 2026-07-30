@@ -27,7 +27,6 @@ export { NavItem, type NavItemProps } from "./NavItem";
 export { SectionHeader, type SectionHeaderProps } from "./SectionHeader";
 export { PanelHeader, type PanelHeaderProps } from "./PanelHeader";
 export { EmptyState, EmptyStateTitle, EmptyStateDesc, EmptyStateActions, type EmptyStateProps, type EmptyStateSize } from "./EmptyState";
-export { ProgressRow, type ProgressRowProps, type ProgressTone } from "./ProgressRow";
 export { MediaCard, type MediaCardProps } from "./MediaCard";
 export { SiteCard, type SiteCardProps } from "./SiteCard";
 

@@ -2165,3 +2165,59 @@ standard the controller set for Slider: **`src/editor/ui/Tabs.tsx` and
 its `ui.css` block are unchanged.** No commit for this component (no code
 touched) — this entry is the decision record, so the verdict isn't left
 implicit or silently skipped.
+
+### ProgressRow → `flowbite-react` `Progress` — **DELETED outright, 0 real consumers**
+
+Before designing any mapping, ran the same fresh-consumer-sweep discipline
+every prior component used: `grep -rln "ProgressRow" packages/editor/src`
+(then re-verified with an import-line-only pass to rule out a barrel
+false-positive) returned exactly 3 hits — `editor/ui/ProgressRow.tsx`
+itself (the definition), `editor/ui/index.ts` (its own export line), and
+`editor/ui/__tests__/molecules.test.tsx` (its own contract test,
+`describe("ProgressRow", ...)`). **Zero real application consumers** —
+nothing in `editor/`, `shared/`, `blocks/`, or anywhere else in the app
+renders it. Unlike `Tabs`/`Slider` (real consumers, needed real design
+work) or `Tag` (Round 5's 0-consumer precedent, but for code that would
+have had to be newly authored elsewhere), this is a case where the
+component already exists, is already unused, and doing a full swap design
+(and this one would have needed real design work — see the color-ramp
+findings below) would mean writing/maintaining a themed adapter for code
+nothing renders.
+
+Per CLAUDE.md's no-dead-code rule ("Don't commit unused functions, unused
+imports, unused exports... Delete it. Git has history.") and the same
+"authoring dead code on arrival" reasoning Round 5 used to delete `Tag`
+outright rather than port it to a 0-consumer `chrome-ui/Tag.tsx` —
+**deleted `ProgressRow` outright**: `src/editor/ui/ProgressRow.tsx`, its
+`.bk-progress*` block in `ui.css` (8 rules), its `index.ts` export line,
+and its `molecules.test.tsx` `describe` block + the now-unused
+`ProgressRow` name in that file's import list.
+
+**Recorded here for whoever eventually needs a real progress bar** (worth
+capturing since the color-ramp research is real, reusable work even
+though nothing consumes it today): flowbite's `Progress` has no color key
+that reaches `--bk-accent` (`#1A56DB`) exactly — its `color.default`/
+`color.blue` are `bg-primary-600`/`bg-blue-600`, one ramp step off (only
+`blue-700` is the exact match, confirmed directly against
+`flowbite-react/plugin/tailwindcss/colors.js`: `blue.700 = "#1A56DB"`,
+`blue.600 = "#1C64F2"` — the same "only `-700`/`-600` reaches the exact
+brand blue, check every component's own theme, don't assume" trap
+Checkbox/Radio hit). Useful exact matches confirmed from the same source
+for a future `done`/`failed` tone mapping: `green.500 = "#0E9F6E"` =
+`--bk-success` exactly (flowbite's `color.green` default is `bg-green-600`
+= `#057A55`, NOT the match — would need `tw:bg-green-500` override);
+`red.600 = "#E02424"` = `--bk-error` exactly (flowbite's `color.red` is
+already `bg-red-600` — no override needed, the one tone that matches out
+of the box). Track background: flowbite's `theme.base` default is
+`bg-gray-200` (`#E5E7EB` = `--bk-border`), one step off the deleted
+`.bk-progress__track`'s `--bk-bg-subtle` (`#F3F4F6` = `gray-100`) — would
+need `tw:bg-gray-100`. Track/fill height: flowbite's `size.md = "h-2.5"`
+(10px) vs the deleted component's 4px — `tw:h-1` (a real Tailwind step,
+0.25rem = 4px) is an exact, non-arbitrary match to `--bk-space-4`.
+
+Verified: `npx tsc --noEmit` clean (no orphan import). `grep -rn
+"bk-progress\|ProgressRow" src` after the delete — zero hits anywhere.
+`ui/__tests__` — 9 test files / 131 tests green (was 133 before the
+2-test `ProgressRow` block was removed with the component it tested).
+No `pnpm flowbite:classlist` run needed — no flowbite import was ever
+added (deletion, not a swap).

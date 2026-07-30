@@ -159,15 +159,6 @@
 .bk-empty__title { font-weight: var(--bk-weight-medium); color: var(--bk-ink); }
 .bk-empty__body { color: var(--bk-ink-muted); font-size: var(--bk-text-12); max-width: 34ch; }
 
-/* ── Progress row · Figma 17:23 ─────────────────────────────────────────── */
-.bk-progress { display: flex; flex-direction: column; gap: var(--bk-space-8); font-family: var(--bk-font-ui); }
-.bk-progress__head { display: flex; align-items: center; gap: var(--bk-space-8); font-size: var(--bk-text-12); color: var(--bk-ink); }
-.bk-progress__value { margin-left: auto; color: var(--bk-ink-muted); }
-.bk-progress__track { height: var(--bk-space-4); border-radius: var(--bk-radius-full); background: var(--bk-bg-subtle); overflow: hidden; }
-.bk-progress__fill { height: 100%; border-radius: var(--bk-radius-full); background: var(--bk-accent); transition: var(--bk-transition-base); }
-.bk-progress__fill--failed { background: var(--bk-error); }
-.bk-progress__fill--done { background: var(--bk-success); }
-
 /* ── Media card · Figma 17:6 · Badge ────────────────────────────────────── */
 .bk-media-card { display: flex; flex-direction: column; gap: var(--bk-space-4); border: 0; background: none; padding: 0; cursor: pointer; text-align: left; }
 .bk-media-card__thumb {

@@ -10,7 +10,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import {
   Row, ListRow, TreeRow, VersionRow, RecordRow, FormatRow, IntegrationRow, CommentRow,
-  FieldRow, NavItem, SectionHeader, PanelHeader, EmptyState, ProgressRow,
+  FieldRow, NavItem, SectionHeader, PanelHeader, EmptyState,
   MediaCard, SiteCard,
 } from "../index";
 import { Button } from "flowbite-react";
@@ -151,20 +151,6 @@ describe("EmptyState", () => {
   it("carries an action, because an empty state without one is a dead end", () => {
     render(<EmptyState title="No pages yet" body="Add your first page." action={<Button>Add page</Button>} />);
     expect(screen.getByRole("button", { name: "Add page" })).toBeTruthy();
-  });
-});
-
-describe("ProgressRow", () => {
-  it("reports progress to assistive tech", () => {
-    render(<ProgressRow label="Applying template" value={3} max={6} />);
-    const bar = screen.getByRole("progressbar", { name: "Applying template" });
-    expect(bar.getAttribute("aria-valuenow")).toBe("3");
-    expect(bar.getAttribute("aria-valuemax")).toBe("6");
-  });
-
-  it("clamps out-of-range values instead of overflowing the track", () => {
-    render(<ProgressRow label="x" value={99} max={10} valueLabel="done" />);
-    expect(screen.getByText("done")).toBeTruthy();
   });
 });
 
