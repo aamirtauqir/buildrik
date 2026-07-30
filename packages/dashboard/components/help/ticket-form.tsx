@@ -158,12 +158,12 @@ export function TicketForm() {
           <h3 className="text-lg font-semibold" style={{ color: "var(--color-text-primary)" }}>
             Ticket #{confirmation.ticketNumber} Created
           </h3>
-          <p className="mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>
+          <p className="mt-1 text-body" style={{ color: "var(--color-text-secondary)" }}>
             We&apos;ve received your support request.
           </p>
         </div>
         <div
-          className="w-full rounded-lg border px-4 py-3 text-left text-sm"
+          className="w-full rounded-lg border px-4 py-3 text-left text-body"
           style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
         >
           <p className="font-medium">Expected response time</p>
@@ -177,7 +177,7 @@ export function TicketForm() {
     <form onSubmit={handleSubmit} className="space-y-5">
       {/* Subject */}
       <div>
-        <label className="mb-1.5 block text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
+        <label className="mb-1.5 block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
           Subject
         </label>
         <InputField
@@ -190,20 +190,20 @@ export function TicketForm() {
           aria-invalid={!!errors.subject}
         />
         {errors.subject && (
-          <p className="mt-1 text-xs" style={{ color: "var(--color-error-text)" }}>{errors.subject}</p>
+          <p className="mt-1 text-body-sm" style={{ color: "var(--color-error-text)" }}>{errors.subject}</p>
         )}
-        <p className="mt-1 text-right text-xs" style={{ color: "var(--color-text-secondary)" }}>{subject.length}/200</p>
+        <p className="mt-1 text-right text-body-sm" style={{ color: "var(--color-text-secondary)" }}>{subject.length}/200</p>
       </div>
 
       {/* Category */}
       <div>
-        <label className="mb-1.5 block text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
+        <label className="mb-1.5 block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
           Category
         </label>
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value as SupportTicketInput["category"])}
-          className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2"
+          className="w-full rounded-lg border px-3 py-2 text-body focus:outline-none focus:ring-2"
           style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
         >
           {TICKET_CATEGORIES.map((opt) => (
@@ -214,7 +214,7 @@ export function TicketForm() {
 
       {/* Description */}
       <div>
-        <label className="mb-1.5 block text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
+        <label className="mb-1.5 block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
           Description
         </label>
         <textarea
@@ -223,18 +223,18 @@ export function TicketForm() {
           placeholder="Describe your issue in detail. Include steps to reproduce if it's a bug."
           rows={6}
           maxLength={5000}
-          className="w-full resize-none rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2"
+          className="w-full resize-none rounded-lg border px-3 py-2 text-body focus:outline-none focus:ring-2"
           style={{ borderColor: errors.description ? "var(--color-error)" : "var(--color-border-default)", color: "var(--color-text-primary)" }}
         />
         {errors.description && (
-          <p className="mt-1 text-xs" style={{ color: "var(--color-error-text)" }}>{errors.description}</p>
+          <p className="mt-1 text-body-sm" style={{ color: "var(--color-error-text)" }}>{errors.description}</p>
         )}
-        <p className="mt-1 text-right text-xs" style={{ color: "var(--color-text-secondary)" }}>{description.length}/5000</p>
+        <p className="mt-1 text-right text-body-sm" style={{ color: "var(--color-text-secondary)" }}>{description.length}/5000</p>
       </div>
 
       {/* Attachments */}
       <div>
-        <label className="mb-1.5 block text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
+        <label className="mb-1.5 block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
           Attachments
           <span className="ml-1 font-normal" style={{ color: "var(--color-text-secondary)" }}>
             (optional, max {MAX_ATTACHMENTS})
@@ -249,7 +249,7 @@ export function TicketForm() {
                 className="flex items-center justify-between rounded-lg border px-3 py-2"
                 style={{ borderColor: "var(--color-border-default)" }}
               >
-                <span className="truncate text-sm" style={{ color: "var(--color-text-primary)" }}>
+                <span className="truncate text-body" style={{ color: "var(--color-text-primary)" }}>
                   {file.name}
                 </span>
                 <button
@@ -269,7 +269,7 @@ export function TicketForm() {
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm transition-colors hover:bg-[var(--color-bg-subtle)]"
+            className="flex items-center gap-1.5 rounded-lg border px-3 py-2 text-body transition-colors hover:bg-[var(--color-bg-subtle)]"
             style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
           >
             <Paperclip className="h-4 w-4" />
@@ -287,14 +287,14 @@ export function TicketForm() {
         />
 
         {errors.attachments && (
-          <p className="mt-1 text-xs" style={{ color: "var(--color-error-text)" }}>{errors.attachments}</p>
+          <p className="mt-1 text-body-sm" style={{ color: "var(--color-error-text)" }}>{errors.attachments}</p>
         )}
       </div>
 
       <button
         type="submit"
         disabled={uploading || createTicket.isPending}
-        className="w-full rounded-lg py-2.5 text-sm font-medium text-white transition-opacity disabled:opacity-60"
+        className="w-full rounded-lg py-2.5 text-body font-medium text-white transition-opacity disabled:opacity-60"
         style={{ backgroundColor: "var(--color-primary)" }}
       >
         {uploading ? "Uploading attachments…" : createTicket.isPending ? "Submitting..." : "Submit Ticket"}

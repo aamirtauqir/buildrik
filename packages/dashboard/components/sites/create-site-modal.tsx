@@ -47,16 +47,16 @@ export function CreateSiteModal({ open, onClose, onSubmit }: CreateSiteModalProp
       footer={<Button variant="ghost" onClick={onClose} className="w-full">Cancel</Button>}
     >
       <div>
-        <label className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>Site Name</label>
+        <label className="text-body font-medium" style={{ color: "var(--color-text-secondary)" }}>Site Name</label>
         <InputField type="text" value={name} onChange={(e) => setName(e.target.value)} wrapperClassName="mt-1" />
         <div className="mt-1 flex items-center gap-2">
           {debouncedSlug.length >= 3 && slugCheck.data && (
             slugCheck.data.available ? (
-              <span className="flex items-center gap-1 text-xs text-green-600">
+              <span className="flex items-center gap-1 text-body-sm text-green-600">
                 <Check className="h-3 w-3" /> Available
               </span>
             ) : (
-              <span className="flex items-center gap-1 text-xs text-red-500">
+              <span className="flex items-center gap-1 text-body-sm text-red-500">
                 <X className="h-3 w-3" /> Taken
               </span>
             )
@@ -66,16 +66,16 @@ export function CreateSiteModal({ open, onClose, onSubmit }: CreateSiteModalProp
       {atSiteLimit ? (
         <div className="mt-6 rounded-lg border p-5 text-center" style={{ borderColor: "#F8B4B4", backgroundColor: "#FDF2F2" }}>
           <Lock className="mx-auto h-8 w-8 mb-2" style={{ color: "var(--color-error)" }} />
-          <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
+          <p className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>
             Site limit reached ({sitesUsed}/{sitesLimit})
           </p>
-          <p className="mt-1 text-xs" style={{ color: "var(--color-text-secondary)" }}>
+          <p className="mt-1 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
             Upgrade your plan to create more sites.
           </p>
           <Link
             href="/dashboard/settings/billing"
             onClick={onClose}
-            className="mt-4 inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold text-white"
+            className="mt-4 inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-body font-semibold text-white"
             style={{ backgroundColor: "var(--color-primary)" }}
           >
             Upgrade Plan <ArrowUpRight className="h-3.5 w-3.5" />
@@ -85,22 +85,22 @@ export function CreateSiteModal({ open, onClose, onSubmit }: CreateSiteModalProp
         <div className="mt-6 space-y-3">
           <button onClick={() => onSubmit({ name, method: "template" })} className="flex w-full items-center gap-3 rounded-lg border p-4 text-left transition-colors hover:bg-[var(--color-bg-subtle)]" style={{ borderColor: "var(--color-border-default)" }}>
             <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }}><LayoutTemplate className="h-5 w-5" style={{ color: "var(--color-text-secondary)" }} /></div>
-            <div><p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>Use a Template</p><p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>Browse 50+ templates</p></div>
+            <div><p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>Use a Template</p><p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>Browse 50+ templates</p></div>
           </button>
           <button onClick={() => onSubmit({ name, method: "ai" })} className="flex w-full items-center gap-3 rounded-lg border p-4 text-left transition-colors hover:bg-[var(--color-primary-subtle)]/50" style={{ borderColor: "var(--color-border-default)" }}>
             <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: "var(--color-primary-subtle)" }}><Sparkles className="h-5 w-5" style={{ color: "var(--color-primary)" }} /></div>
             <div className="flex-1">
-              <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>Generate with AI</p>
-              <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>AI-powered site creation</p>
+              <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>Generate with AI</p>
+              <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>AI-powered site creation</p>
             </div>
             {aiCredits && (
               <div className="text-right">
                 {aiCredits.used < aiCredits.limit ? (
-                  <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+                  <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
                     {aiCredits.used}/{aiCredits.limit} credits remaining
                   </p>
                 ) : (
-                  <p className="flex items-center gap-1 text-xs" style={{ color: "var(--color-text-muted)" }}>
+                  <p className="flex items-center gap-1 text-body-sm" style={{ color: "var(--color-text-muted)" }}>
                     <Lock className="h-3 w-3" /> Upgrade for more
                   </p>
                 )}
@@ -109,7 +109,7 @@ export function CreateSiteModal({ open, onClose, onSubmit }: CreateSiteModalProp
           </button>
           <button onClick={() => onSubmit({ name, method: "blank" })} className="flex w-full items-center gap-3 rounded-lg border p-4 text-left transition-colors hover:bg-[var(--color-bg-subtle)]" style={{ borderColor: "var(--color-border-default)" }}>
             <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }}><Plus className="h-5 w-5" style={{ color: "var(--color-text-secondary)" }} /></div>
-            <div><p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>Start from Scratch</p><p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>Full creative control</p></div>
+            <div><p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>Start from Scratch</p><p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>Full creative control</p></div>
           </button>
         </div>
       )}

@@ -126,7 +126,7 @@ export function GenerationProgress({
           style={{ width: `${progress}%`, backgroundColor: isFailed ? "var(--color-error)" : "var(--color-success)" }}
         />
       </div>
-      <p className="mt-2 text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
+      <p className="mt-2 text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
         {progress}%
       </p>
 
@@ -154,7 +154,7 @@ export function GenerationProgress({
                 <XCircle className="h-5 w-5 shrink-0" style={{ color: "var(--color-error)" }} />
               )}
               <span
-                className="text-sm"
+                className="text-body"
                 style={{ color: stepStatus === "pending" ? "var(--color-text-muted)" : "var(--color-text-primary)" }}
               >
                 {step.label}
@@ -167,14 +167,14 @@ export function GenerationProgress({
       {/* Error state */}
       {isFailed && error && (
         <div className="mt-6 rounded-lg p-4" style={{ backgroundColor: "#FDF2F2" }}>
-          <p className="text-sm" style={{ color: "#9B1C1C" }}>
+          <p className="text-body" style={{ color: "#9B1C1C" }}>
             {error}
           </p>
           <div className="mt-3 flex flex-wrap justify-center gap-2">
             {failCount < 2 && (
               <button
                 onClick={onRetry}
-                className="rounded-lg px-4 py-1.5 text-sm font-medium text-white"
+                className="rounded-lg px-4 py-1.5 text-body font-medium text-white"
                 style={{ backgroundColor: "var(--color-primary)" }}
               >
                 Retry
@@ -183,7 +183,7 @@ export function GenerationProgress({
             {onUseTemplate && (
               <button
                 onClick={onUseTemplate}
-                className="rounded-lg border px-4 py-1.5 text-sm font-medium"
+                className="rounded-lg border px-4 py-1.5 text-body font-medium"
                 style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
               >
                 Use Template Instead
@@ -192,7 +192,7 @@ export function GenerationProgress({
             {onStartBlank && (
               <button
                 onClick={onStartBlank}
-                className="rounded-lg px-4 py-1.5 text-sm font-medium"
+                className="rounded-lg px-4 py-1.5 text-body font-medium"
                 style={{ color: "var(--color-text-secondary)" }}
               >
                 Start Blank
@@ -205,12 +205,12 @@ export function GenerationProgress({
       {/* Success state */}
       {isComplete && siteId && (
         <div className="mt-6">
-          <p className="text-sm font-medium" style={{ color: "var(--color-success)" }}>
+          <p className="text-body font-medium" style={{ color: "var(--color-success)" }}>
             Site generated successfully!
           </p>
           <button
             onClick={() => onViewSite(siteId)}
-            className="mt-3 rounded-lg px-6 py-2 text-sm font-medium text-white"
+            className="mt-3 rounded-lg px-6 py-2 text-body font-medium text-white"
             style={{ backgroundColor: "var(--color-primary)" }}
           >
             Open in Editor
@@ -222,7 +222,7 @@ export function GenerationProgress({
       {isInProgress && (
         <button
           onClick={handleCancelClick}
-          className="mt-6 text-sm font-medium"
+          className="mt-6 text-body font-medium"
           style={{ color: "var(--color-text-secondary)" }}
         >
           Cancel
@@ -246,14 +246,14 @@ export function GenerationProgress({
           </>
         }
       >
-        <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+        <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>
           All progress will be lost.
         </p>
       </Modal>
 
       {/* Credits exhausted modal */}
       <Modal open={showCreditsModal} onClose={() => setShowCreditsModal(false)} title="AI credits used up" width={400}>
-        <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+        <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>
           Upgrade for more AI generations.
         </p>
         <div className="mt-5 flex flex-col gap-2">

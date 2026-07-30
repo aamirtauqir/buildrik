@@ -72,19 +72,19 @@ export function NotificationItem({
       onClick={handleClick}
     >
       <div className="flex-1 min-w-0">
-        <p className="text-sm" style={{ color: "var(--color-text-primary)" }}>
+        <p className="text-body" style={{ color: "var(--color-text-primary)" }}>
           {notification.actorName && (
             <span className="font-semibold">{notification.actorName} </span>
           )}
           {notification.message}
         </p>
         <div className="mt-1 flex items-center gap-2">
-          <span className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+          <span className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
             {timeAgo(notification.createdAt)}
           </span>
           {notification.actionUrl && (
             <button
-              className="text-xs font-medium hover:underline"
+              className="text-body-sm font-medium hover:underline"
               style={{ color: "var(--color-primary)" }}
               onClick={(e) => { e.stopPropagation(); navigate(notification.actionUrl!); }}
             >
@@ -119,7 +119,7 @@ export function NotificationItem({
               {onMuteType && (
                 <button
                   onClick={() => { onMuteType(notification.type); setMenuOpen(false); }}
-                  className="w-full px-3 py-2 text-left text-sm transition-colors hover:bg-[var(--color-bg-subtle)]"
+                  className="w-full px-3 py-2 text-left text-body transition-colors hover:bg-[var(--color-bg-subtle)]"
                   style={{ color: "var(--color-text-primary)" }}
                 >
                   Mute this type
@@ -128,7 +128,7 @@ export function NotificationItem({
               {onDelete && (
                 <button
                   onClick={() => { onDelete(notification.id); setMenuOpen(false); }}
-                  className="w-full px-3 py-2 text-left text-sm transition-colors hover:bg-[var(--color-bg-subtle)]"
+                  className="w-full px-3 py-2 text-left text-body transition-colors hover:bg-[var(--color-bg-subtle)]"
                   style={{ color: "var(--color-primary)" }}
                 >
                   Delete

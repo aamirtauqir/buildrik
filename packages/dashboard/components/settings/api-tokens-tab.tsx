@@ -82,7 +82,7 @@ export function ApiTokensTab({ workspaceId }: { workspaceId: string }) {
       <div className="flex items-start justify-between">
         <div>
           <h2 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>API tokens</h2>
-          <p className="mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>
+          <p className="mt-1 text-body" style={{ color: "var(--color-text-secondary)" }}>
             For scripting and CI. Scoped, revocable, and never expire unless you set an expiry.
           </p>
         </div>
@@ -93,7 +93,7 @@ export function ApiTokensTab({ workspaceId }: { workspaceId: string }) {
 
       {/* Honesty note: the public API that consumes these tokens isn't live yet
           (no scopedProcedure consumers). Don't imply a working integration. */}
-      <div className="rounded-lg border px-3 py-2.5 text-sm" style={{ borderColor: "#E3A008", backgroundColor: "#FDFDEA", color: "#723B13" }}>
+      <div className="rounded-lg border px-3 py-2.5 text-body" style={{ borderColor: "#E3A008", backgroundColor: "#FDFDEA", color: "#723B13" }}>
         The public API is coming soon. You can create and manage tokens now, but
         they won&apos;t authenticate requests until the API launches.
       </div>
@@ -107,14 +107,14 @@ export function ApiTokensTab({ workspaceId }: { workspaceId: string }) {
       ) : (list.data?.length ?? 0) === 0 ? (
         <div className="rounded-lg border border-dashed p-8 text-center" style={{ borderColor: "var(--color-border-default)" }}>
           <Key size={22} className="mx-auto mb-2 text-neutral-400" />
-          <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>No API tokens yet</p>
-          <p className="mt-0.5 text-sm" style={{ color: "var(--color-text-secondary)" }}>Create one to script deploys, exports, or redirects.</p>
+          <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>No API tokens yet</p>
+          <p className="mt-0.5 text-body" style={{ color: "var(--color-text-secondary)" }}>Create one to script deploys, exports, or redirects.</p>
         </div>
       ) : (
         <div className="overflow-hidden rounded-lg border" style={{ borderColor: "var(--color-border-default)" }}>
-          <table className="w-full text-sm">
+          <table className="w-full text-body">
             <thead>
-              <tr className="border-b text-left text-xs uppercase tracking-wide text-neutral-500" style={{ borderColor: "var(--color-border-default)" }}>
+              <tr className="border-b text-left text-body-sm uppercase tracking-wide text-neutral-500" style={{ borderColor: "var(--color-border-default)" }}>
                 <th className="px-4 py-2.5 font-medium">Name</th>
                 <th className="px-4 py-2.5 font-medium">Token</th>
                 <th className="px-4 py-2.5 font-medium">Scopes</th>
@@ -134,7 +134,7 @@ export function ApiTokensTab({ workspaceId }: { workspaceId: string }) {
                       {revoked && <Pill tone="error" className="ml-2">revoked</Pill>}
                       {!revoked && expired && <Pill tone="warning" className="ml-2">expired</Pill>}
                     </td>
-                    <td className="px-4 py-3 text-xs text-neutral-500"><MetricValue>{t.prefix}…</MetricValue></td>
+                    <td className="px-4 py-3 text-body-sm text-neutral-500"><MetricValue>{t.prefix}…</MetricValue></td>
                     <td className="px-4 py-3">
                       <div className="flex flex-wrap gap-1">
                         {(t.scopes as string[]).map((s) => (
@@ -149,7 +149,7 @@ export function ApiTokensTab({ workspaceId }: { workspaceId: string }) {
                         <button
                           type="button"
                           onClick={() => del.mutate({ id: t.id })}
-                          className="inline-flex items-center gap-1 text-xs text-neutral-500 hover:text-red-600"
+                          className="inline-flex items-center gap-1 text-body-sm text-neutral-500 hover:text-red-600"
                         >
                           <Trash2 size={13} /> Delete
                         </button>
@@ -157,7 +157,7 @@ export function ApiTokensTab({ workspaceId }: { workspaceId: string }) {
                         <button
                           type="button"
                           onClick={() => revoke.mutate({ id: t.id })}
-                          className="text-xs font-medium text-red-600 hover:text-red-700"
+                          className="text-body-sm font-medium text-red-600 hover:text-red-700"
                         >
                           Revoke
                         </button>
@@ -193,7 +193,7 @@ export function ApiTokensTab({ workspaceId }: { workspaceId: string }) {
       >
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>Name</label>
+            <label className="block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>Name</label>
             <InputField
               autoFocus
               value={name}
@@ -203,10 +203,10 @@ export function ApiTokensTab({ workspaceId }: { workspaceId: string }) {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>Scopes</label>
+            <label className="block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>Scopes</label>
             <div className="mt-1.5 grid grid-cols-2 gap-1.5">
               {ALL_SCOPES.map((s) => (
-                <label key={s} className="flex cursor-pointer items-center gap-2 rounded-md border px-2.5 py-1.5 text-xs" style={{ borderColor: scopes.includes(s) ? "var(--color-primary)" : "var(--color-border-default)" }}>
+                <label key={s} className="flex cursor-pointer items-center gap-2 rounded-md border px-2.5 py-1.5 text-body-sm" style={{ borderColor: scopes.includes(s) ? "var(--color-primary)" : "var(--color-border-default)" }}>
                   <input type="checkbox" checked={scopes.includes(s)} onChange={() => toggleScope(s)} className="accent-[var(--color-primary)]" />
                   <span style={{ color: "var(--color-text-primary)" }}>{SCOPE_LABELS[s]}</span>
                 </label>
@@ -214,14 +214,14 @@ export function ApiTokensTab({ workspaceId }: { workspaceId: string }) {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>Expiry</label>
+            <label className="block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>Expiry</label>
             <div className="mt-1.5 flex gap-1.5">
               {EXPIRY_OPTIONS.map((o) => (
                 <button
                   key={o.label}
                   type="button"
                   onClick={() => setExpiryDays(o.days)}
-                  className="rounded-md border px-2.5 py-1.5 text-xs"
+                  className="rounded-md border px-2.5 py-1.5 text-body-sm"
                   style={{
                     borderColor: expiryDays === o.days ? "var(--color-primary)" : "var(--color-border-default)",
                     color: expiryDays === o.days ? "var(--color-primary)" : "var(--color-text-secondary)",
@@ -247,15 +247,15 @@ export function ApiTokensTab({ workspaceId }: { workspaceId: string }) {
           </Button>
         }
       >
-        <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+        <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>
           Copy it now — for security, it won&apos;t be shown again.
         </p>
         <div className="mt-3 flex items-center gap-2 rounded-md border bg-neutral-50 p-2.5" style={{ borderColor: "var(--color-border-default)" }}>
-          <code className="flex-1 break-all font-mono text-xs" style={{ color: "var(--color-text-primary)" }}>{plaintext}</code>
+          <code className="flex-1 break-all font-mono text-body-sm" style={{ color: "var(--color-text-primary)" }}>{plaintext}</code>
           <button
             type="button"
             onClick={() => { if (plaintext) { navigator.clipboard.writeText(plaintext); setCopied(true); } }}
-            className="inline-flex shrink-0 items-center gap-1 rounded-md border px-2 py-1 text-xs"
+            className="inline-flex shrink-0 items-center gap-1 rounded-md border px-2 py-1 text-body-sm"
             style={{ borderColor: "var(--color-border-default)" }}
           >
             {copied ? <><Check size={13} /> Copied</> : <><Copy size={13} /> Copy</>}

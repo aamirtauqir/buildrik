@@ -82,27 +82,27 @@ export function DangerZoneTab({
         <h2 className="text-base font-semibold mb-1" style={{ color: "var(--color-text-primary)" }}>
           Export your data
         </h2>
-        <p className="text-sm mb-4" style={{ color: "var(--color-text-secondary)" }}>
+        <p className="text-body mb-4" style={{ color: "var(--color-text-secondary)" }}>
           Download a copy of everything we store about you and your workspace.
         </p>
 
         <SectionCard title="What's included" className="mb-4">
           <ul className="space-y-1">
             {EXPORT_INCLUDES.map((item) => (
-              <li key={item} className="flex items-center gap-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>
+              <li key={item} className="flex items-center gap-2 text-body" style={{ color: "var(--color-text-secondary)" }}>
                 <span style={{ color: "#0E9F6E" }}>&#10003;</span>
                 {item}
               </li>
             ))}
           </ul>
-          <p className="text-xs mt-3" style={{ color: "var(--color-text-muted)" }}>
+          <p className="text-body-sm mt-3" style={{ color: "var(--color-text-muted)" }}>
             Estimated size: <MetricValue>{estimatedSize}</MetricValue>
           </p>
         </SectionCard>
 
         {previousExports.length > 0 && (
           <div className="mb-4">
-            <p className="text-sm font-medium mb-2" style={{ color: "var(--color-text-primary)" }}>
+            <p className="text-body font-medium mb-2" style={{ color: "var(--color-text-primary)" }}>
               Previous exports
             </p>
             <div
@@ -116,15 +116,15 @@ export function DangerZoneTab({
                   style={{ borderBottom: idx < previousExports.length - 1 ? "1px solid var(--color-border-default)" : undefined }}
                 >
                   <div>
-                    <p className="text-sm" style={{ color: "var(--color-text-primary)" }}>
+                    <p className="text-body" style={{ color: "var(--color-text-primary)" }}>
                       <MetricValue>{exp.date}</MetricValue>
                     </p>
                     <div className="flex items-center gap-2">
-                      <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+                      <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
                         <MetricValue>{exp.size}</MetricValue>
                       </p>
                       {exp.expiresAt && (
-                        <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+                        <p className="text-body-sm" style={{ color: "var(--color-text-muted)" }}>
                           {getExpiryText(exp.expiresAt)}
                         </p>
                       )}
@@ -133,13 +133,13 @@ export function DangerZoneTab({
                   {exp.status === "ready" && exp.downloadUrl ? (
                     <a
                       href={exp.downloadUrl}
-                      className="text-sm font-medium"
+                      className="text-body font-medium"
                       style={{ color: "var(--color-primary)" }}
                     >
                       Download
                     </a>
                   ) : (
-                    <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+                    <span className="text-body-sm" style={{ color: "var(--color-text-muted)" }}>
                       Processing...
                     </span>
                   )}
@@ -161,7 +161,7 @@ export function DangerZoneTab({
         <h2 className="text-base font-semibold mb-1" style={{ color: "#771D1D" }}>
           Delete account
         </h2>
-        <p className="text-sm mb-4" style={{ color: "var(--color-text-secondary)" }}>
+        <p className="text-body mb-4" style={{ color: "var(--color-text-secondary)" }}>
           Once you delete your account, there is no going back. All your data will be permanently removed.
         </p>
 
@@ -171,18 +171,18 @@ export function DangerZoneTab({
             className="p-4 rounded-lg border mb-4"
             style={{ borderColor: "#E3A008", backgroundColor: "#FDFDEA" }}
           >
-            <p className="text-sm font-medium mb-2" style={{ color: "#723B13" }}>
+            <p className="text-body font-medium mb-2" style={{ color: "#723B13" }}>
               Before you can delete your account:
             </p>
             <ul className="space-y-1">
               {isSoleOwner && (
-                <li className="flex items-start gap-2 text-sm" style={{ color: "#723B13" }}>
+                <li className="flex items-start gap-2 text-body" style={{ color: "#723B13" }}>
                   <span className="mt-0.5 font-bold">!</span>
                   You are the sole owner of a workspace. Transfer ownership or delete the workspace first.
                 </li>
               )}
               {hasActiveSubscription && (
-                <li className="flex items-start gap-2 text-sm" style={{ color: "#723B13" }}>
+                <li className="flex items-start gap-2 text-body" style={{ color: "#723B13" }}>
                   <span className="mt-0.5 font-bold">!</span>
                   You have an active paid subscription. Cancel it before deleting your account.
                 </li>
@@ -195,12 +195,12 @@ export function DangerZoneTab({
           className="p-4 rounded-lg border mb-4"
           style={{ borderColor: "#F8B4B4", backgroundColor: "#FDF2F2" }}
         >
-          <p className="text-sm font-medium mb-1" style={{ color: "#771D1D" }}>
+          <p className="text-body font-medium mb-1" style={{ color: "#771D1D" }}>
             What happens when you delete your account
           </p>
           <ul className="space-y-1 mt-2">
             {DELETE_WARNINGS.map((item) => (
-              <li key={item} className="flex items-start gap-2 text-sm" style={{ color: "#771D1D" }}>
+              <li key={item} className="flex items-start gap-2 text-body" style={{ color: "#771D1D" }}>
                 <span className="mt-0.5">!</span>
                 {item}
               </li>
@@ -208,7 +208,7 @@ export function DangerZoneTab({
           </ul>
         </div>
 
-        <p className="text-xs mb-4" style={{ color: "#9B1C1C" }}>
+        <p className="text-body-sm mb-4" style={{ color: "#9B1C1C" }}>
           Your data will be permanently deleted after 30 days.
         </p>
 
@@ -219,7 +219,7 @@ export function DangerZoneTab({
         ) : (
           <form onSubmit={handleDelete} className="space-y-4 max-w-sm">
             <div>
-              <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+              <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
                 Reason (optional)
               </label>
               <textarea
@@ -228,16 +228,16 @@ export function DangerZoneTab({
                 rows={3}
                 maxLength={500}
                 placeholder="Tell us why you're leaving..."
-                className="w-full px-3 py-2 text-sm rounded-md border outline-none resize-none"
+                className="w-full px-3 py-2 text-body rounded-md border outline-none resize-none"
                 style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+              <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
                 Type{" "}
                 <code
-                  className="px-1 py-0.5 rounded text-xs font-mono"
+                  className="px-1 py-0.5 rounded text-body-sm font-mono"
                   style={{ backgroundColor: "var(--color-border-default)" }}
                 >
                   DELETE

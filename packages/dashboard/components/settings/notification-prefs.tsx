@@ -79,7 +79,7 @@ export function NotificationPrefs() {
   const rows = prefs ?? DEFAULT_PREFS;
 
   if (isLoading) {
-    return <div className="h-40 flex items-center justify-center text-sm" style={{ color: "var(--color-text-secondary)" }}>Loading preferences...</div>;
+    return <div className="h-40 flex items-center justify-center text-body" style={{ color: "var(--color-text-secondary)" }}>Loading preferences...</div>;
   }
 
   if (isError) {
@@ -96,7 +96,7 @@ export function NotificationPrefs() {
     <div>
       <div className="rounded-lg border overflow-hidden" style={{ borderColor: "var(--color-border-default)" }}>
         <div
-          className="grid px-4 py-2.5 text-xs font-medium"
+          className="grid px-4 py-2.5 text-body-sm font-medium"
           style={{
             gridTemplateColumns: "1fr 80px 160px",
             backgroundColor: "var(--color-bg-page)",
@@ -121,12 +121,12 @@ export function NotificationPrefs() {
               }}
             >
               <div>
-                <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
+                <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
                   {pref.category}
                   {isSecurity && LOCK_ICON}
                 </p>
                 {isSecurity && (
-                  <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>
+                  <p className="text-body-sm mt-0.5" style={{ color: "var(--color-text-muted)" }}>
                     Required for security
                   </p>
                 )}
@@ -157,7 +157,7 @@ export function NotificationPrefs() {
                   value={pref.email}
                   disabled={isSecurity}
                   onChange={(e) => update(pref.category, { email: e.target.value as EmailFrequency })}
-                  className="text-xs px-2 py-1 rounded-md border outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="text-body-sm px-2 py-1 rounded-md border outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
                 >
                   <option value="instant">Instant</option>

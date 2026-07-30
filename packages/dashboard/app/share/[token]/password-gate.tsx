@@ -58,7 +58,7 @@ export function SharePasswordGate() {
           <h1 className="text-lg font-semibold text-center" style={{ color: "var(--color-text-primary)" }}>
             This site is password protected
           </h1>
-          <p className="text-sm text-center mt-1 mb-6" style={{ color: "var(--color-text-secondary)" }}>
+          <p className="text-body text-center mt-1 mb-6" style={{ color: "var(--color-text-secondary)" }}>
             Enter the password to view this site
           </p>
           <form onSubmit={handleSubmit}>
@@ -72,12 +72,12 @@ export function SharePasswordGate() {
               autoFocus
             />
             {error && (
-              <p className="text-xs mt-1.5" style={{ color: "#F05252" }}>{error}</p>
+              <p className="text-body-sm mt-1.5" style={{ color: "#F05252" }}>{error}</p>
             )}
             <button
               type="submit"
               disabled={loading || !password}
-              className="w-full h-11 mt-4 rounded-lg text-sm font-medium text-white disabled:opacity-50"
+              className="w-full h-11 mt-4 rounded-lg text-body font-medium text-white disabled:opacity-50"
               style={{ backgroundColor: "var(--color-primary)" }}
             >
               {loading ? "Verifying..." : "View Site"}

@@ -76,10 +76,10 @@ export function NotificationDropdown() {
       {open && (
         <div className="absolute right-0 top-full mt-2 w-80 overflow-hidden rounded-lg border bg-white shadow-lg" style={{ borderColor: "var(--color-border-default)" }}>
           <div className="flex items-center justify-between border-b px-4 py-3" style={{ borderColor: "var(--color-border-default)" }}>
-            <span className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Notifications</span>
+            <span className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>Notifications</span>
             <button
               onClick={() => markAllRead.mutate()}
-              className="text-xs font-medium hover:underline"
+              className="text-body-sm font-medium hover:underline"
               style={{ color: "var(--color-text-secondary)" }}
             >
               Mark all read
@@ -87,7 +87,7 @@ export function NotificationDropdown() {
           </div>
           <div className="max-h-80 overflow-y-auto">
             {notifications.length === 0 ? (
-              <p className="px-4 py-8 text-center text-sm" style={{ color: "var(--color-text-secondary)" }}>
+              <p className="px-4 py-8 text-center text-body" style={{ color: "var(--color-text-secondary)" }}>
                 No notifications yet
               </p>
             ) : (
@@ -103,7 +103,7 @@ export function NotificationDropdown() {
           <div className="border-t px-4 py-2 text-center" style={{ borderColor: "var(--color-border-default)" }}>
             <a
               href="/dashboard/notifications"
-              className="text-xs font-medium hover:underline"
+              className="text-body-sm font-medium hover:underline"
               style={{ color: "var(--color-text-secondary)" }}
             >
               View All &rarr;

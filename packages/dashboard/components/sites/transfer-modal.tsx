@@ -61,7 +61,7 @@ export function TransferModal({ open, onClose, siteId, siteName }: TransferModal
         </>
       }
     >
-      <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+      <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>
         Select a team member to transfer ownership of this site.
       </p>
 
@@ -69,7 +69,7 @@ export function TransferModal({ open, onClose, siteId, siteName }: TransferModal
       <div className="relative mt-4">
         <button
           onClick={() => setDropdownOpen(!dropdownOpen)}
-          className="flex w-full items-center justify-between rounded-lg border px-3 py-2 text-sm"
+          className="flex w-full items-center justify-between rounded-lg border px-3 py-2 text-body"
           style={{ borderColor: "var(--color-border-default)", color: selectedMember ? "var(--color-text-primary)" : "var(--color-text-muted)" }}
         >
           {selectedMember ? selectedMember.fullName : "Select a member..."}
@@ -78,20 +78,20 @@ export function TransferModal({ open, onClose, siteId, siteName }: TransferModal
         {dropdownOpen && (
           <div className="absolute left-0 right-0 top-full z-10 mt-1 max-h-48 overflow-y-auto rounded-lg border bg-white shadow-lg" style={{ borderColor: "var(--color-border-default)" }}>
             {membersQuery.isLoading && (
-              <p className="px-3 py-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>Loading...</p>
+              <p className="px-3 py-2 text-body" style={{ color: "var(--color-text-secondary)" }}>Loading...</p>
             )}
             {eligibleMembers.length === 0 && !membersQuery.isLoading && (
-              <p className="px-3 py-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>No eligible members</p>
+              <p className="px-3 py-2 text-body" style={{ color: "var(--color-text-secondary)" }}>No eligible members</p>
             )}
             {eligibleMembers.map((member) => (
               <button
                 key={member.userId}
                 onClick={() => { setSelectedMemberId(member.userId); setDropdownOpen(false); }}
-                className="flex w-full items-center justify-between px-3 py-2 text-sm transition-colors hover:bg-[var(--color-bg-subtle)]"
+                className="flex w-full items-center justify-between px-3 py-2 text-body transition-colors hover:bg-[var(--color-bg-subtle)]"
                 style={{ color: "var(--color-text-primary)" }}
               >
                 <span>{member.fullName}</span>
-                <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{member.role.toLowerCase()}</span>
+                <span className="text-body-sm" style={{ color: "var(--color-text-muted)" }}>{member.role.toLowerCase()}</span>
               </button>
             ))}
           </div>
@@ -100,7 +100,7 @@ export function TransferModal({ open, onClose, siteId, siteName }: TransferModal
 
       {/* Confirmation text */}
       {selectedMember && (
-        <p className="mt-4 rounded-lg p-3 text-sm" style={{ backgroundColor: "#FDF6B2", color: "#723B13" }}>
+        <p className="mt-4 rounded-lg p-3 text-body" style={{ backgroundColor: "#FDF6B2", color: "#723B13" }}>
           Transfer ownership of &apos;{siteName}&apos; to {selectedMember.fullName}. You will become an Editor on this site.
         </p>
       )}

@@ -53,7 +53,7 @@ export default function MaintenancePage() {
         >
           We&apos;ll be back shortly
         </h2>
-        <p className="mt-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>
+        <p className="mt-2 text-body" style={{ color: "var(--color-text-secondary)" }}>
           We&apos;re performing scheduled maintenance. This page will
           automatically refresh when we&apos;re back online.
         </p>

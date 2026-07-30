@@ -66,7 +66,7 @@ export function OfflineBanner() {
         role="status"
       >
         <Wifi className="h-4 w-4" style={{ color: "#03543F" }} />
-        <p className="text-sm font-medium" style={{ color: "#03543F" }}>
+        <p className="text-body font-medium" style={{ color: "#03543F" }}>
           Back online
         </p>
       </div>
@@ -82,7 +82,7 @@ export function OfflineBanner() {
       role="alert"
     >
       <WifiOff className="h-4 w-4" style={{ color: "#723B13" }} />
-      <p className="text-sm font-medium" style={{ color: "#723B13" }}>
+      <p className="text-body font-medium" style={{ color: "#723B13" }}>
         You&apos;re offline. Auto-retrying in {countdown}s...
       </p>
       <button
@@ -90,7 +90,7 @@ export function OfflineBanner() {
           if (navigator.onLine) goOnline();
           else setCountdown(RETRY_INTERVAL);
         }}
-        className="flex items-center gap-1 rounded px-2 py-1 text-xs font-medium"
+        className="flex items-center gap-1 rounded px-2 py-1 text-body-sm font-medium"
         style={{ backgroundColor: "#C27803", color: "white" }}
       >
         <RefreshCw className="h-3 w-3" />

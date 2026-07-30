@@ -82,7 +82,7 @@ export function NotificationPage() {
         <h1 className="text-xl font-bold" style={{ color: "var(--color-text-primary)" }}>Notifications</h1>
         <button
           onClick={() => markAllRead.mutate()}
-          className="rounded-lg px-3 py-1.5 text-sm font-medium transition-colors hover:bg-[var(--color-bg-subtle)]"
+          className="rounded-lg px-3 py-1.5 text-body font-medium transition-colors hover:bg-[var(--color-bg-subtle)]"
           style={{ color: "var(--color-text-secondary)" }}
         >
           Mark All Read
@@ -94,7 +94,7 @@ export function NotificationPage() {
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className="px-4 py-2 text-sm font-medium transition-colors"
+            className="px-4 py-2 text-body font-medium transition-colors"
             style={{
               color: activeTab === tab.key ? "var(--color-text-primary)" : "var(--color-text-secondary)",
               borderBottom: activeTab === tab.key ? "2px solid var(--color-text-primary)" : "2px solid transparent",
@@ -154,7 +154,7 @@ export function NotificationPage() {
                 />
                 <button
                   onClick={() => toggleGroup(group.id)}
-                  className="flex w-full items-center gap-1 px-4 py-1.5 text-xs font-medium transition-colors hover:bg-[var(--color-bg-subtle)]"
+                  className="flex w-full items-center gap-1 px-4 py-1.5 text-body-sm font-medium transition-colors hover:bg-[var(--color-bg-subtle)]"
                   style={{ color: "var(--color-text-secondary)" }}
                 >
                   {isExpanded ? (

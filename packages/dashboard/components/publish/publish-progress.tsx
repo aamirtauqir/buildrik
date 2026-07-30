@@ -68,8 +68,8 @@ export function PublishProgress({ jobId, onComplete, onCancel, onRetry }: Publis
           <div className="flex items-start gap-3">
             <XCircle className="mt-0.5 h-5 w-5 shrink-0" style={{ color: "var(--color-error)" }} />
             <div className="flex-1">
-              <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Publish failed</p>
-              <p className="mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>
+              <p className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>Publish failed</p>
+              <p className="mt-1 text-body" style={{ color: "var(--color-text-secondary)" }}>
                 {job?.error ?? "An unexpected error occurred during publishing."}
               </p>
               <Button onClick={onRetry} className="mt-3">
@@ -85,8 +85,8 @@ export function PublishProgress({ jobId, onComplete, onCancel, onRetry }: Publis
       {!isFailed && (
         <div>
           <div className="flex items-center justify-between">
-            <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Publishing...</p>
-            <p className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>{progress}%</p>
+            <p className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>Publishing...</p>
+            <p className="text-body font-medium" style={{ color: "var(--color-text-secondary)" }}>{progress}%</p>
           </div>
           <div className="mt-2 h-2 overflow-hidden rounded-full" style={{ backgroundColor: "var(--color-bg-subtle)" }}>
             <div
@@ -116,7 +116,7 @@ export function PublishProgress({ jobId, onComplete, onCancel, onRetry }: Publis
                     <Circle className="h-5 w-5 shrink-0" style={{ color: "var(--color-border-strong)" }} />
                   )}
                   <span
-                    className="text-sm font-medium"
+                    className="text-body font-medium"
                     style={{ color: isDone ? "var(--color-success)" : isActive ? "var(--color-text-primary)" : isFail ? "var(--color-error)" : "var(--color-text-muted)" }}
                   >
                     {step.name}
@@ -138,7 +138,7 @@ export function PublishProgress({ jobId, onComplete, onCancel, onRetry }: Publis
                     <Circle className="h-5 w-5 shrink-0" style={{ color: "var(--color-border-strong)" }} />
                   )}
                   <span
-                    className="text-sm font-medium"
+                    className="text-body font-medium"
                     style={{ color: isStepCompleted ? "var(--color-success)" : isCurrent ? "var(--color-text-primary)" : "var(--color-text-muted)" }}
                   >
                     {step}
@@ -153,7 +153,7 @@ export function PublishProgress({ jobId, onComplete, onCancel, onRetry }: Publis
         <>
           {showConfirm ? (
             <div className="flex items-center gap-3 rounded-lg border p-3" style={{ borderColor: "var(--color-border-default)" }}>
-              <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>Cancel this publish?</p>
+              <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>Cancel this publish?</p>
               <Button size="sm" onClick={handleCancelPublish} disabled={cancelMutation.isPending}>
                 {cancelMutation.isPending ? "Cancelling..." : "Yes, cancel"}
               </Button>
@@ -164,7 +164,7 @@ export function PublishProgress({ jobId, onComplete, onCancel, onRetry }: Publis
           ) : (
             <button
               onClick={() => setShowConfirm(true)}
-              className="text-sm font-medium"
+              className="text-body font-medium"
               style={{ color: "var(--color-text-secondary)" }}
             >
               Cancel publish

@@ -95,7 +95,7 @@ function ConfirmDeleteDialog({
         </>
       }
     >
-      <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+      <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>
         Its {client.siteCount} {client.siteCount === 1 ? "site" : "sites"} become unassigned, not deleted.
         You can reassign them to another client later.
       </p>

@@ -29,7 +29,7 @@ export function PublishSuccess({ siteId, publishedUrl, customDomain, plan = "FRE
     <div className="mx-auto max-w-lg text-center">
       <CheckCircle2 className="mx-auto h-16 w-16" style={{ color: "var(--color-success)" }} />
       <h2 className="mt-4 text-2xl font-bold" style={{ color: "var(--color-text-primary)" }}>Site Published!</h2>
-      <p className="mt-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>Your site is now live and accessible to the world.</p>
+      <p className="mt-2 text-body" style={{ color: "var(--color-text-secondary)" }}>Your site is now live and accessible to the world.</p>
 
       {/* The deployment's own URL, in the workspace's Vercel account */}
       {publishedUrl && (
@@ -54,15 +54,15 @@ export function PublishSuccess({ siteId, publishedUrl, customDomain, plan = "FRE
       {/* Custom domain upgrade nudge for FREE plan users without a custom domain */}
       {plan === "FREE" && !customDomain && (
         <div className="mt-4 rounded-lg border p-4 text-left" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-page)" }}>
-          <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
+          <p className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>
             Your site is live on <span style={{ color: "var(--color-primary)" }}>{liveHost ?? "its Vercel URL"}</span>
           </p>
-          <p className="mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>
+          <p className="mt-1 text-body" style={{ color: "var(--color-text-secondary)" }}>
             Connect your own domain on PRO — Buildrick sets it up on Vercel and verifies the DNS for you.
           </p>
           <Link
             href="/dashboard/settings/billing"
-            className="mt-3 inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-semibold text-white"
+            className="mt-3 inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-body font-semibold text-white"
             style={{ backgroundColor: "var(--color-primary)" }}
           >
             Connect a custom domain
@@ -75,7 +75,7 @@ export function PublishSuccess({ siteId, publishedUrl, customDomain, plan = "FRE
       <div className="mt-6 grid grid-cols-2 gap-3">
         <Link
           href={`/dashboard/sites/${siteId}/access`}
-          className="flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold text-white"
+          className="flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-body font-semibold text-white"
           style={{ backgroundColor: "var(--color-primary)" }}
         >
           <Share2 className="h-4 w-4" />
@@ -83,7 +83,7 @@ export function PublishSuccess({ siteId, publishedUrl, customDomain, plan = "FRE
         </Link>
         <Link
           href={`/dashboard/sites/${siteId}/analytics`}
-          className="flex items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold"
+          className="flex items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-body font-semibold"
           style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
         >
           <BarChart3 className="h-4 w-4" />
@@ -91,7 +91,7 @@ export function PublishSuccess({ siteId, publishedUrl, customDomain, plan = "FRE
         </Link>
         <Link
           href={`/dashboard/sites/${siteId}`}
-          className="flex items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold"
+          className="flex items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-body font-semibold"
           style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
         >
           <Pencil className="h-4 w-4" />
@@ -99,7 +99,7 @@ export function PublishSuccess({ siteId, publishedUrl, customDomain, plan = "FRE
         </Link>
         <Link
           href="/dashboard/projects"
-          className="flex items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold"
+          className="flex items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-body font-semibold"
           style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
         >
           <LayoutDashboard className="h-4 w-4" />
@@ -113,12 +113,12 @@ export function PublishSuccess({ siteId, publishedUrl, customDomain, plan = "FRE
 function UrlRow({ label, url, isCopied, onCopy }: { label: string; url: string; isCopied: boolean; onCopy: () => void }) {
   return (
     <div className="mt-4">
-      <p className="mb-1 text-left text-xs font-medium" style={{ color: "var(--color-text-secondary)" }}>
+      <p className="mb-1 text-left text-body-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>
         <Globe className="mr-1 inline-block h-3.5 w-3.5" />
         {label}
       </p>
       <div className="flex items-center gap-2 rounded-lg border p-3" style={{ borderColor: "var(--color-border-default)" }}>
-        <span className="flex-1 truncate text-left text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>{url}</span>
+        <span className="flex-1 truncate text-left text-body font-medium" style={{ color: "var(--color-text-primary)" }}>{url}</span>
         <button
           onClick={onCopy}
           className="shrink-0 rounded-lg p-2 hover:bg-gray-100"

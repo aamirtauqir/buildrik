@@ -36,7 +36,7 @@ function BrandingDialog({
   const [brandColor, setBrandColor] = useState(initial.brandColor ?? "");
   const [customDomain, setCustomDomain] = useState(initial.customDomain ?? "");
   const [hideBuildrik, setHideBuildrik] = useState(initial.hideBuildrik);
-  const label = "text-xs font-semibold";
+  const label = "text-body-sm font-semibold";
   return (
     <Modal
       open={true}
@@ -70,7 +70,7 @@ function BrandingDialog({
           <label className={label} style={{ color: "var(--color-text-secondary)" }}>Custom domain</label>
           <InputField type="text" value={customDomain} placeholder="clients.agency.com" onChange={(e) => setCustomDomain(e.target.value)} wrapperClassName="mt-1 w-full" />
         </div>
-        <label className="flex items-center gap-2 pt-1 text-sm" style={{ color: "var(--color-text-primary)" }}>
+        <label className="flex items-center gap-2 pt-1 text-body" style={{ color: "var(--color-text-primary)" }}>
           <input type="checkbox" checked={hideBuildrik} onChange={(e) => setHideBuildrik(e.target.checked)} className="accent-[var(--color-primary)]" />
           Hide Buildrick branding for this client
         </label>
@@ -93,8 +93,8 @@ function SiteRow({ name, status, right }: { name: string; status: string; right:
     >
       <div className="flex items-center gap-3">
         <Globe className="h-4 w-4" style={{ color: "var(--color-text-muted)" }} />
-        <span className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>{name}</span>
-        <span className="text-xs font-medium" style={{ color: STATUS_COLOR[status] ?? "var(--color-text-muted)" }}>
+        <span className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>{name}</span>
+        <span className="text-body-sm font-medium" style={{ color: STATUS_COLOR[status] ?? "var(--color-text-muted)" }}>
           {status.charAt(0) + status.slice(1).toLowerCase()}
         </span>
       </div>
@@ -142,7 +142,7 @@ function InviteEditorDialog({
         </>
       }
     >
-      <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+      <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>
         They&apos;ll join as a <strong>Content editor</strong> with access to {clientName}&apos;s{" "}
         {siteCount} {siteCount === 1 ? "site" : "sites"} — and nothing else.
       </p>
@@ -159,7 +159,7 @@ function InviteEditorDialog({
         onChange={(e) => setMessage(e.target.value)}
         placeholder="Add a note (optional)"
         rows={2}
-        className="mt-2 w-full rounded-lg border px-3 py-2 text-sm"
+        className="mt-2 w-full rounded-lg border px-3 py-2 text-body"
         style={{ borderColor: "var(--color-border-default)" }}
       />
     </Modal>
@@ -239,7 +239,7 @@ export function ClientDetailView({ clientId }: { clientId: string }) {
     <div>
       <Link
         href="/dashboard/agency"
-        className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium"
+        className="mb-4 inline-flex items-center gap-1.5 text-body font-medium"
         style={{ color: "var(--color-text-secondary)" }}
       >
         <ArrowLeft className="h-4 w-4" />
@@ -258,7 +258,7 @@ export function ClientDetailView({ clientId }: { clientId: string }) {
             <h1 className="text-xl font-bold" style={{ color: "var(--color-text-primary)" }}>
               {client?.name ?? "Client"}
             </h1>
-            <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+            <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>
               {client?.siteCount ?? 0} {client?.siteCount === 1 ? "site" : "sites"}
             </p>
           </div>
@@ -300,7 +300,7 @@ export function ClientDetailView({ clientId }: { clientId: string }) {
               right={
                 <button
                   onClick={() => assignMut.mutate({ siteId: s.id, clientId: null })}
-                  className="text-xs font-medium hover:underline"
+                  className="text-body-sm font-medium hover:underline"
                   style={{ color: "var(--color-text-secondary)" }}
                 >
                   Remove
@@ -342,7 +342,7 @@ export function ClientDetailView({ clientId }: { clientId: string }) {
           {unassignedQuery.isLoading ? (
             <LoadingSkeleton rows={3} variant="list" />
           ) : unassigned.length === 0 ? (
-            <p className="px-2 py-6 text-center text-sm" style={{ color: "var(--color-text-secondary)" }}>
+            <p className="px-2 py-6 text-center text-body" style={{ color: "var(--color-text-secondary)" }}>
               No unassigned sites. Every site already belongs to a client.
             </p>
           ) : (

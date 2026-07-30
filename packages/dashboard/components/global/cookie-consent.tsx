@@ -70,10 +70,10 @@ export function CookieConsent() {
               style={{ borderColor: "var(--color-border-default)" }}
             >
               <div>
-                <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
+                <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
                   {cat.label}
                 </p>
-                <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+                <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
                   {cat.description}
                 </p>
               </div>
@@ -103,7 +103,7 @@ export function CookieConsent() {
       <div className="mx-auto flex w-full max-w-[1220px] flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-start gap-3 sm:items-center">
           <Shield className="h-5 w-5 shrink-0" style={{ color: "var(--color-text-secondary)" }} />
-          <p className="text-sm" style={{ color: "var(--color-text-primary)" }}>
+          <p className="text-body" style={{ color: "var(--color-text-primary)" }}>
             We use cookies to improve your experience. You can manage your
             preferences at any time.
           </p>
@@ -117,7 +117,7 @@ export function CookieConsent() {
           </Button>
           <button
             onClick={() => setShowManage(true)}
-            className="text-sm font-medium underline"
+            className="text-body font-medium underline"
             style={{ color: "var(--color-text-secondary)" }}
           >
             Manage Preferences

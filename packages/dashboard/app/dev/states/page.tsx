@@ -20,13 +20,13 @@ export default function StatesGalleryPage() {
         <h1 className="text-xl font-bold text-[var(--color-text-primary)]">
           State primitives (E0)
         </h1>
-        <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+        <p className="mt-1 text-body text-[var(--color-text-secondary)]">
           Dashboard accent should be red <code>var(--color-primary)</code>, font Inter Tight.
         </p>
       </header>
 
       <section className="space-y-2">
-        <h2 className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">
+        <h2 className="text-body-sm font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">
           Empty
         </h2>
         <StateEmpty
@@ -39,7 +39,7 @@ export default function StatesGalleryPage() {
       </section>
 
       <section className="space-y-2">
-        <h2 className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">
+        <h2 className="text-body-sm font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">
           Loading (list / card / table)
         </h2>
         <LoadingSkeleton rows={2} variant="list" />
@@ -48,7 +48,7 @@ export default function StatesGalleryPage() {
       </section>
 
       <section className="space-y-2">
-        <h2 className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">
+        <h2 className="text-body-sm font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">
           Error
         </h2>
         <ErrorState
@@ -59,7 +59,7 @@ export default function StatesGalleryPage() {
       </section>
 
       <section className="space-y-2">
-        <h2 className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">
+        <h2 className="text-body-sm font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">
           Denied
         </h2>
         <DeniedState

@@ -437,7 +437,7 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
       >
         <div className="flex items-start gap-3 rounded-lg p-3" style={{ backgroundColor: "var(--color-error-subtle)" }}>
           <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" style={{ color: "var(--color-error)" }} />
-          <p className="text-sm" style={{ color: "var(--color-error)" }}>
+          <p className="text-body" style={{ color: "var(--color-error)" }}>
             Delete <strong>{deleteTarget?.name}</strong>? Assets in this folder stay in your library and move to <strong>All</strong>. This can’t be undone.
           </p>
         </div>
@@ -464,7 +464,7 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
       >
         <div className="flex items-start gap-3 rounded-lg p-3" style={{ backgroundColor: "var(--color-error-subtle)" }}>
           <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" style={{ color: "var(--color-error)" }} />
-          <p className="text-sm" style={{ color: "var(--color-error)" }}>
+          <p className="text-body" style={{ color: "var(--color-error)" }}>
             Delete <strong>{deleteAssetTarget?.name}</strong>? If a published site uses this file, it will break. This can’t be undone.
           </p>
         </div>

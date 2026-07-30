@@ -31,7 +31,7 @@ export function DeleteConfirmModal({ open, siteName, title = "Delete Site", onCl
     >
       <div className="flex items-start gap-3 rounded-lg p-3" style={{ backgroundColor: "#FDF2F2" }}>
         <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" style={{ color: "var(--color-error)" }} />
-        <p className="text-sm" style={{ color: "var(--color-error-text)" }}>This action cannot be undone. Type <strong>{siteName}</strong> to confirm.</p>
+        <p className="text-body" style={{ color: "var(--color-error-text)" }}>This action cannot be undone. Type <strong>{siteName}</strong> to confirm.</p>
       </div>
       <InputField type="text" value={input} onChange={(e) => setInput(e.target.value)} placeholder={`Type "${siteName}" to confirm`} wrapperClassName="mt-4" valid={input === siteName} autoFocus />
     </Modal>

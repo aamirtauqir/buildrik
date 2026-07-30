@@ -44,7 +44,7 @@ function PasswordStrengthBar({ password }: { password: string }) {
           style={{ width, backgroundColor: colors[score] }}
         />
       </div>
-      <p className="text-xs mt-1" style={{ color: colors[score] }}>
+      <p className="text-body-sm mt-1" style={{ color: colors[score] }}>
         {label}
       </p>
     </div>
@@ -152,7 +152,7 @@ export function AccountTab({
         <form onSubmit={handlePasswordSubmit} className="space-y-4 max-w-sm">
           {!isSocialOnly && (
             <div>
-              <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+              <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
                 Current password
               </label>
               <InputField
@@ -165,7 +165,7 @@ export function AccountTab({
           )}
 
           <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+            <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
               New password
             </label>
             <InputField
@@ -176,13 +176,13 @@ export function AccountTab({
               minLength={8}
             />
             <PasswordStrengthBar password={newPassword} />
-            <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>
+            <p className="text-body-sm mt-1" style={{ color: "var(--color-text-secondary)" }}>
               Min 8 chars with uppercase, number, and symbol.
             </p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+            <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
               Confirm new password
             </label>
             <InputField
@@ -197,7 +197,7 @@ export function AccountTab({
               aria-invalid={!!confirmError}
             />
             {confirmError && (
-              <p className="text-xs mt-1" style={{ color: "var(--color-error-text)" }}>
+              <p className="text-body-sm mt-1" style={{ color: "var(--color-error-text)" }}>
                 {confirmError}
               </p>
             )}
@@ -218,15 +218,15 @@ export function AccountTab({
             <div className="flex items-start gap-3">
               <MailCheck className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: "var(--color-primary)" }} />
               <div className="space-y-1">
-                <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
+                <p className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>
                   Confirm your new email
                 </p>
-                <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+                <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>
                   We sent a verification link to{" "}
                   <span className="font-medium" style={{ color: "var(--color-text-primary)" }}>{dsEmailChangePending}</span>.
                   Click it to finish changing your email. The link expires in 24 hours.
                 </p>
-                <p className="text-xs pt-1" style={{ color: "var(--color-text-secondary)" }}>
+                <p className="text-body-sm pt-1" style={{ color: "var(--color-text-secondary)" }}>
                   {email ? <>Your current address <span style={{ color: "var(--color-text-primary)" }}>{email}</span> stays active until you confirm. </> : "Your current address stays active until you confirm. "}
                   Didn&apos;t get it? Check your spam folder.
                 </p>
@@ -235,7 +235,7 @@ export function AccountTab({
             <button
               type="button"
               onClick={() => setDsEmailChangePending(null)}
-              className="mt-3 text-sm font-medium"
+              className="mt-3 text-body font-medium"
               style={{ color: "var(--color-primary)" }}
             >
               Use a different email
@@ -243,7 +243,7 @@ export function AccountTab({
           </div>
         ) : (
         <>
-        <p className="text-sm mb-4" style={{ color: "var(--color-text-secondary)" }}>
+        <p className="text-body mb-4" style={{ color: "var(--color-text-secondary)" }}>
           {email ? (
             <>Currently <span style={{ color: "var(--color-text-primary)" }}>{email}</span>. We'll send a confirmation link to the new address before switching.</>
           ) : (
@@ -253,7 +253,7 @@ export function AccountTab({
 
         <form onSubmit={handleEmailSubmit} className="space-y-4 max-w-sm">
           <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+            <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
               New email
             </label>
             <InputField
@@ -269,7 +269,7 @@ export function AccountTab({
 
           {hasPassword && (
             <div>
-              <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+              <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
                 Current password
               </label>
               <InputField
@@ -282,7 +282,7 @@ export function AccountTab({
           )}
 
           {emailError && (
-            <p className="text-xs" style={{ color: "var(--color-error-text)" }}>
+            <p className="text-body-sm" style={{ color: "var(--color-error-text)" }}>
               {emailError}
             </p>
           )}
@@ -307,11 +307,11 @@ export function AccountTab({
               >
                 <div className="flex items-center gap-3">
                   <span className="flex-shrink-0">{PROVIDER_ICONS[provider]}</span>
-                  <span className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
+                  <span className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
                     {provider === "google" ? "Google" : "GitHub"}
                   </span>
                   {connected ? (
-                    <span className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+                    <span className="text-body" style={{ color: "var(--color-text-secondary)" }}>
                       {connected.email}
                     </span>
                   ) : (

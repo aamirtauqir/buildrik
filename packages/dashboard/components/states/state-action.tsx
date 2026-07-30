@@ -20,8 +20,8 @@ export function ActionButton({
   primary?: boolean;
 }) {
   const cls = primary
-    ? "inline-flex items-center gap-2 rounded-lg bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[var(--color-primary-hover)]"
-    : "inline-flex items-center gap-2 rounded-lg border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-4 py-2 text-sm font-medium text-[var(--color-text-primary)] transition-colors hover:bg-[var(--color-bg-subtle)]";
+    ? "inline-flex items-center gap-2 rounded-lg bg-[var(--color-primary)] px-4 py-2 text-body font-medium text-white transition-colors hover:bg-[var(--color-primary-hover)]"
+    : "inline-flex items-center gap-2 rounded-lg border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-4 py-2 text-body font-medium text-[var(--color-text-primary)] transition-colors hover:bg-[var(--color-bg-subtle)]";
 
   if (action.href) {
     return (
