@@ -128,3 +128,20 @@ consciously not done, not when they were forgotten.
   habituation Codex flagged. Pros: modal AND Issues panel both improve. Cons:
   producers are scattered; small audit. Depends on: nothing — independent of
   the topbar implementation.
+
+## Deferred from /design-review 2026-07-30 (dashboard Flowbite audit) — ALL CLOSED 2026-07-31
+
+- [x] **InputField adoption** — 45 fields converted across settings, site-detail, clients, modals and standalone pages (`FINDING-018a`/`018b`). Primitive gained `invalid` + `valid` props. Checkboxes/radios/file/color inputs, selects and textareas intentionally out of scope; auth + onboarding skins exempt.
+- [x] **Type ramp** — `text-sm`/`text-xs` codemodded to `text-body`/`text-body-sm` across 49 dashboard files, 363 sites → 0 (`FINDING-019`). Same pixel values, so no visual delta. Auth/onboarding keep their own scales (42 sites, deliberate).
+- [x] **Toggle primitive** — 4 hand-rolled `role="switch"` implementations → flowbite `ToggleSwitch` (`FINDING-015`).
+- [x] **submission-drawer a11y** — now `role="dialog"` + `aria-modal` with the Modal focus-trap/restore contract (`FINDING-016`).
+- [x] **SearchField** — projects + templates moved onto InputField; help-center, media-library and marketplace were already there (`FINDING-017`). No separate primitive needed.
+
+Found and fixed while closing these (not in the original audit):
+- [x] `filter-chip.tsx` was never committed — its three consumers shipped, so a fresh checkout failed to build. Pathspec commits do not stage untracked files.
+- [x] 8 semantic-color bugs: account-tab (2), invite-modal (2 + textarea error border), ticket-form (3 + textarea error border), delete-confirm-modal and create-site-modal blue icons inside red danger panels — all rendered accent blue where an error was meant.
+- [x] A THIRD palette family: raw Tailwind color CLASSES (`FINDING-020`, 13 sites / 6 files). The whole dunning banner was off-palette. `FINDING-002` had swept the hex form only.
+
+Remaining known gaps (not blocking, no owner yet):
+- [ ] **[LOW · design] Arbitrary `text-[Npx]` values** — ~24 distinct sizes still coexist (`13px`, `13.5px`, `12.5px`…). DESIGN.md permits artifact-matched pixels, so this needs a design decision on which survive, not a codemod.
+- [ ] **[LOW · design] No Select primitive** — `SELECT_FIELD_CLASS` in workspace-form is hand-matched to InputField chrome and copied by other selects. Extract if a third consumer appears.
