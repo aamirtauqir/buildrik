@@ -114,7 +114,7 @@ export function ApiTokensTab({ workspaceId }: { workspaceId: string }) {
         <div className="overflow-hidden rounded-lg border" style={{ borderColor: "var(--color-border-default)" }}>
           <table className="w-full text-body">
             <thead>
-              <tr className="border-b text-left text-body-sm uppercase tracking-wide text-neutral-500" style={{ borderColor: "var(--color-border-default)" }}>
+              <tr className="border-b text-left text-body-sm uppercase tracking-wide text-[var(--color-text-muted)]" style={{ borderColor: "var(--color-border-default)" }}>
                 <th className="px-4 py-2.5 font-medium">Name</th>
                 <th className="px-4 py-2.5 font-medium">Token</th>
                 <th className="px-4 py-2.5 font-medium">Scopes</th>
@@ -134,7 +134,7 @@ export function ApiTokensTab({ workspaceId }: { workspaceId: string }) {
                       {revoked && <Pill tone="error" className="ml-2">revoked</Pill>}
                       {!revoked && expired && <Pill tone="warning" className="ml-2">expired</Pill>}
                     </td>
-                    <td className="px-4 py-3 text-body-sm text-neutral-500"><MetricValue>{t.prefix}…</MetricValue></td>
+                    <td className="px-4 py-3 text-body-sm text-[var(--color-text-muted)]"><MetricValue>{t.prefix}…</MetricValue></td>
                     <td className="px-4 py-3">
                       <div className="flex flex-wrap gap-1">
                         {(t.scopes as string[]).map((s) => (
@@ -142,14 +142,14 @@ export function ApiTokensTab({ workspaceId }: { workspaceId: string }) {
                         ))}
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-neutral-500"><MetricValue>{relativeTime(t.lastUsedAt)}</MetricValue></td>
-                    <td className="px-4 py-3 text-neutral-500"><MetricValue>{t.expiresAt ? relativeTime(t.expiresAt).replace(" ago", "") : "never"}</MetricValue></td>
+                    <td className="px-4 py-3 text-[var(--color-text-muted)]"><MetricValue>{relativeTime(t.lastUsedAt)}</MetricValue></td>
+                    <td className="px-4 py-3 text-[var(--color-text-muted)]"><MetricValue>{t.expiresAt ? relativeTime(t.expiresAt).replace(" ago", "") : "never"}</MetricValue></td>
                     <td className="px-4 py-3 text-right">
                       {revoked ? (
                         <button
                           type="button"
                           onClick={() => del.mutate({ id: t.id })}
-                          className="inline-flex items-center gap-1 text-body-sm text-neutral-500 hover:text-red-600"
+                          className="inline-flex items-center gap-1 text-body-sm text-[var(--color-text-muted)] hover:text-[var(--color-error)]"
                         >
                           <Trash2 size={13} /> Delete
                         </button>
@@ -157,7 +157,7 @@ export function ApiTokensTab({ workspaceId }: { workspaceId: string }) {
                         <button
                           type="button"
                           onClick={() => revoke.mutate({ id: t.id })}
-                          className="text-body-sm font-medium text-red-600 hover:text-red-700"
+                          className="text-body-sm font-medium text-[var(--color-error)] hover:text-[var(--color-error-text)]"
                         >
                           Revoke
                         </button>

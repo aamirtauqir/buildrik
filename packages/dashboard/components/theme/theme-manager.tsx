@@ -207,7 +207,7 @@ export function ThemeManager() {
                       ) : r.status === "skipped-locked" ? (
                         <span className="inline-flex items-center gap-1 text-neutral-400"><Lock className="h-3 w-3" /> Locked — kept own</span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 text-red-600" title={r.error}><AlertTriangle className="h-3 w-3" /> Failed</span>
+                        <span className="inline-flex items-center gap-1 text-[var(--color-error)]" title={r.error}><AlertTriangle className="h-3 w-3" /> Failed</span>
                       )}
                     </li>
                   ))}

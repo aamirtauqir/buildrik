@@ -52,11 +52,11 @@ export function CreateSiteModal({ open, onClose, onSubmit }: CreateSiteModalProp
         <div className="mt-1 flex items-center gap-2">
           {debouncedSlug.length >= 3 && slugCheck.data && (
             slugCheck.data.available ? (
-              <span className="flex items-center gap-1 text-body-sm text-green-600">
+              <span className="flex items-center gap-1 text-body-sm text-[var(--color-success)]">
                 <Check className="h-3 w-3" /> Available
               </span>
             ) : (
-              <span className="flex items-center gap-1 text-body-sm text-red-500">
+              <span className="flex items-center gap-1 text-body-sm text-[var(--color-error)]">
                 <X className="h-3 w-3" /> Taken
               </span>
             )

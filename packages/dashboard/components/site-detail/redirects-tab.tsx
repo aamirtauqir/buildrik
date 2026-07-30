@@ -87,11 +87,11 @@ export function RedirectsTab({ redirects, limit, canEdit, onCreate, onUpdate, on
         canEdit ? (
           <div className="inline-flex items-center gap-3">
             {onUpdate && (
-              <button type="button" onClick={() => startEdit(r)} className="inline-flex items-center gap-1 text-body-sm text-neutral-500 hover:text-[var(--color-primary)]">
+              <button type="button" onClick={() => startEdit(r)} className="inline-flex items-center gap-1 text-body-sm text-[var(--color-text-muted)] hover:text-[var(--color-primary)]">
                 <Pencil size={13} /> Edit
               </button>
             )}
-            <button type="button" onClick={() => onDelete(r.id)} className="inline-flex items-center gap-1 text-body-sm text-neutral-500 hover:text-red-600">
+            <button type="button" onClick={() => onDelete(r.id)} className="inline-flex items-center gap-1 text-body-sm text-[var(--color-text-muted)] hover:text-[var(--color-error)]">
               <Trash2 size={13} /> Delete
             </button>
           </div>
@@ -132,18 +132,18 @@ export function RedirectsTab({ redirects, limit, canEdit, onCreate, onUpdate, on
       {canEdit && (!atLimit || editingId) && (
         <div className="rounded-lg border p-4" style={{ borderColor: "var(--color-border-default)" }}>
           {atLimit && !editingId ? (
-            <p className="text-body text-amber-700">
+            <p className="text-body text-[var(--color-warning-text)]">
               You&apos;ve hit your plan&apos;s redirect limit. <a href="/dashboard/settings/billing" className="font-medium underline">Upgrade</a> to add more.
             </p>
           ) : (
             <div className="flex flex-wrap items-end gap-2">
               <div className="flex-1 min-w-[140px]">
-                <label className="block text-body-sm font-medium text-neutral-500">From</label>
+                <label className="block text-body-sm font-medium text-[var(--color-text-muted)]">From</label>
                 <InputField value={fromPath} onChange={(e) => setFromPath(e.target.value)} placeholder="/old-page" className="font-mono" wrapperClassName="mt-1" />
               </div>
               <ArrowRight size={16} className="mb-2 text-neutral-400" />
               <div className="flex-1 min-w-[140px]">
-                <label className="block text-body-sm font-medium text-neutral-500">To</label>
+                <label className="block text-body-sm font-medium text-[var(--color-text-muted)]">To</label>
                 <InputField value={toUrl} onChange={(e) => setToUrl(e.target.value)} placeholder="/new-page" className="font-mono" wrapperClassName="mt-1" />
               </div>
               <select value={type} onChange={(e) => setType(e.target.value as "301" | "302")} className="rounded-md border px-2 py-1.5 text-body" style={{ borderColor: "var(--color-border-default)" }}>
