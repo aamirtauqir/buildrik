@@ -51,6 +51,9 @@ import { SAVE_CONFLICT_EVENT, setBaselineLastEditedAt } from "@/services/Buildri
 import "../../themes/default.css";
 import "../../themes/ux-fixes.css";
 import "./chrome.css";
+// flowbite-bigbang Task 2: configure flowbite-react's tw: class prefix
+// (spec §4.1) before any flowbite-react component can mount in the real app.
+import "../chrome-ui/flowbiteStore";
 
 // Run localStorage migration on app startup (module load)
 migrateStorageKeys();

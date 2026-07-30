@@ -1,0 +1,14 @@
+/* Chrome Tailwind layer — prefixed, preflight intentionally ABSENT:
+   the canvas mounts customer HTML+CSS in this same document (spec §4.1). */
+@layer tw-theme, tw-utilities;
+@import "tailwindcss/theme.css" layer(tw-theme) prefix(tw);
+@import "tailwindcss/utilities.css" layer(tw-utilities) prefix(tw);
+@plugin "flowbite-react/plugin/tailwindcss";
+@source "../editor";
+@source "../shared/forms";
+@source "../templates";
+
+@theme {
+  --font-sans: "Inter Tight", Inter, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
+}

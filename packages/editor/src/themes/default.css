@@ -22,6 +22,13 @@
 
 @import "./design-system/index.css";
 
+/* Flowbite big-bang (Task 2): tw:-prefixed Tailwind utilities + flowbite-react
+ * plugin theme, and the chrome-local reset that replaces Tailwind preflight
+ * without touching canvas-mounted user content. Coexists with ui.css/vibcoder
+ * until Task 14 flips the switch. */
+@import "./tw.css";
+@import "./chrome-reset.css";
+
 /* Buildrick UI — the component library (see src/editor/ui/). */
 @import "../editor/ui/ui.css" layer(components);
 

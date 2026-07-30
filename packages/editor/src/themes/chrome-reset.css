@@ -1,0 +1,15 @@
+/* Minimal reset scoped to chrome — replaces preflight WITHOUT touching
+   canvas-mounted user content. Scope = shell root, never global.
+
+   Root class verified 2026-07-30 (flowbite-bigbang Task 2): the brief's
+   example selector `.bk-studio-root` does not exist in the tree. The real
+   mounted shell root is `.bd-studio`, set on AquibraStudio's outer <Stack>
+   (src/editor/shell/AquibraStudio.tsx). `.bk-shell` (editor/ui/EditorShell.tsx)
+   is exported from the ui library but has zero consumers outside its own
+   barrel — it is not what actually mounts. */
+.bd-studio, .bd-studio *, .bd-studio *::before, .bd-studio *::after {
+  box-sizing: border-box;
+}
+.bd-studio button, .bd-studio input, .bd-studio select, .bd-studio textarea {
+  font: inherit; color: inherit;
+}
