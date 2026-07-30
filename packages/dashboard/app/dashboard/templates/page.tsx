@@ -9,6 +9,8 @@ import { cn, coverFromSeed } from "@lib/utils";
 import { LoadingSkeleton, ErrorState, StateEmpty } from "@/components/states";
 import { TemplateFilterRail } from "@/components/templates/template-filter-rail";
 import { paginationRange } from "@/components/templates/pagination-range";
+import { DIFFICULTY_PILL } from "@/components/templates/difficulty";
+import { Pill } from "@/components/dashboard/primitives";
 import {
   type TemplateFilters,
   templateFiltersFromParams,
@@ -17,11 +19,6 @@ import {
 
 const PER_PAGE = 12;
 
-const DIFFICULTY_STYLES: Record<string, { bg: string; text: string; label: string }> = {
-  BEGINNER: { bg: "#DEF7EC", text: "#03543F", label: "Beginner" },
-  INTERMEDIATE: { bg: "#E1EFFE", text: "#1E40AF", label: "Intermediate" },
-  ADVANCED: { bg: "#FDFDEA", text: "#723B13", label: "Advanced" },
-};
 
 function formatCount(n: number): string {
   if (n >= 1000) return `${(n / 1000).toFixed(1).replace(/\.0$/, "")}K`;
@@ -109,7 +106,7 @@ function TemplatesBrowserInner() {
             <>
               <div className="grid grid-cols-1 gap-[18px] sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {items.map((t) => {
-                  const diff = DIFFICULTY_STYLES[t.difficulty] ?? DIFFICULTY_STYLES.BEGINNER;
+                  const diff = DIFFICULTY_PILL[t.difficulty] ?? DIFFICULTY_PILL.BEGINNER;
                   const cover = coverFromSeed(t.id);
                   return (
                     <Link
@@ -139,9 +136,7 @@ function TemplatesBrowserInner() {
                           <span className="rounded-full px-2 py-0.5 text-[11px] font-medium" style={{ backgroundColor: "var(--color-bg-subtle)", color: "var(--color-text-secondary)" }}>
                             {t.category.toLowerCase()}
                           </span>
-                          <span className="rounded-full px-2 py-0.5 text-[11px] font-medium" style={{ backgroundColor: diff.bg, color: diff.text }}>
-                            {diff.label}
-                          </span>
+                          <Pill tone={diff.tone}>{diff.label}</Pill>
                         </div>
                         <p className="mt-1.5 text-[11px]" style={{ color: "var(--color-text-muted)" }}>{formatCount(t.usageCount)} {t.usageCount === 1 ? "site" : "sites"}</p>
                       </div>
