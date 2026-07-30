@@ -475,6 +475,29 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         : undefined;
   const publish: PublishState = publishBlockedReason ? "disabled" : errorCount > 0 ? "anyway" : "ready";
 
+  // ── T4 · publish-anyway confirm (plan §5, D12/D13, eng D9) ────────────────
+  // Errors > 0 opens a confirm instead of publishing in one click; warnings
+  // alone never confirm — the chip already carried that signal. Gate
+  // precedence (D9): this fires only when publish isn't `disabled` (the
+  // blocked reasons above win); the SERVER approval gate can still reject the
+  // attempt afterwards — its acknowledge flow owns that path, not this modal.
+  const [pubConfirm, setPubConfirm] = React.useState(false);
+  const publishNow = onVercelPublish ?? onOpenPublish ?? handleExport;
+  const handlePublishClick = React.useCallback(() => {
+    if (errorCount > 0) {
+      setPubConfirm(true);
+      return;
+    }
+    publishNow();
+  }, [errorCount, publishNow]);
+  // D12: top-3 concrete rows, errors first — real messages from the shipped
+  // Issue shape, never invented categories.
+  const confirmRows = issues
+    .filter((i) => i.type !== "info")
+    .sort((a, b) => (a.type === b.type ? 0 : a.type === "error" ? -1 : 1))
+    .slice(0, 3);
+  const confirmMore = errorCount + warnCount - confirmRows.length;
+
   // Plan §2/eng D12: the CONTAINER composes the tool cluster per role/view —
   // the bar renders exactly what it receives. Client view is itself a preview,
   // so it gets Comments only; viewers keep the chip with the fix door
@@ -534,7 +557,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         publish={publish}
         publishBusy={publishLoading}
         publishBlockedReason={publishBlockedReason}
-        onPublish={onVercelPublish ?? onOpenPublish ?? handleExport}
+        onPublish={handlePublishClick}
         action={
           viewMode.clientView ? (
             <SendForReview
@@ -578,6 +601,67 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
       ) : null}
 
       {cmdOpen ? <CommandPalette onClose={() => setCmdOpen(false)} composer={composer ?? null} /> : null}
+
+      {/* T4 publish-anyway confirm — the missing frame (TODOS.md founder
+          decision, resolved D12/D13). Focus opens on the safe door (F26);
+          ModalRoot's trap returns focus to Publish on close. */}
+      {pubConfirm ? (
+        <ModalRoot open onOpenChange={(o) => !o && setPubConfirm(false)}>
+          <ModalContent size="question" aria-labelledby="bk-pubconfirm-title">
+            <ModalTitle id="bk-pubconfirm-title">
+              Publish with {errorCount} error{errorCount === 1 ? "" : "s"}?
+            </ModalTitle>
+            <div className="bk-pubconfirm__list">
+              {confirmRows.map((i) => (
+                <p key={i.id} className={`bk-pubconfirm__row bk-pubconfirm__row--${i.type}`}>
+                  {i.message || `A ${i.type} will go live exactly as it looks now.`}
+                </p>
+              ))}
+              {confirmMore > 0 ? (
+                <Button
+                  kind="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setPubConfirm(false);
+                    onOpenIssues?.();
+                  }}
+                >
+                  +{confirmMore} more
+                </Button>
+              ) : null}
+            </div>
+            <ModalDescription>
+              You can review the issues first, or publish and fix later.
+              {reviewStatus.state !== "none"
+                ? ` A review round is open — ${reviewStatus.reviewerName ?? "your reviewer"} will see the published site.`
+                : ""}
+            </ModalDescription>
+            <ModalFooter>
+              <Button
+                kind="ghost"
+                size="md"
+                autoFocus
+                onClick={() => {
+                  setPubConfirm(false);
+                  onOpenIssues?.();
+                }}
+              >
+                Review issues first
+              </Button>
+              <Button
+                kind="primary"
+                size="md"
+                onClick={() => {
+                  setPubConfirm(false);
+                  publishNow();
+                }}
+              >
+                Publish anyway
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </ModalRoot>
+      ) : null}
 
       {/* F1 exit dialog — dialog A ("dirty": save is a real option) vs
           dialog B ("risky": offline/conflict, a save here would be a lie). */}

@@ -109,6 +109,25 @@
   font-size: var(--bk-text-11);
 }
 
+/* ── T4 publish-anyway confirm ──────────────────────────────────────────── */
+.bk-pubconfirm__list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--bk-space-4);
+  margin: 0 var(--bk-space-24) var(--bk-space-8);
+  padding: var(--bk-space-8) var(--bk-space-12);
+  border-radius: var(--bk-radius-md);
+  background: var(--bk-warning-tint);
+}
+.bk-pubconfirm__row {
+  margin: 0;
+  font-size: var(--bk-text-12);
+  line-height: var(--bk-leading-normal);
+}
+.bk-pubconfirm__row--error { color: var(--bk-error-text); }
+.bk-pubconfirm__row--warning { color: var(--bk-warning-text); }
+
 /* ── F1 exit dialog ─────────────────────────────────────────────────────── */
 .bk-exit-dialog__error {
   margin: 0 var(--bk-space-24);

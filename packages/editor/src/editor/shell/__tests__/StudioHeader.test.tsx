@@ -12,7 +12,7 @@
  */
 
 import * as React from "react";
-import { render, screen, fireEvent, cleanup, waitFor, act } from "@testing-library/react";
+import { render, screen, fireEvent, cleanup, waitFor, act, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // ── controllable module mocks ────────────────────────────────────────────────
@@ -252,6 +252,96 @@ describe("StudioHeader", () => {
         />,
       );
       expect(screen.getByRole("button", { name: "Publish anyway" })).toBeTruthy();
+    });
+  });
+
+  // ── T4 publish-anyway confirm (plan §5, D12/D13, eng D9) ──────────────────
+  describe("publish-anyway confirm modal", () => {
+    const err = (id: string, message: string) => ({ id, type: "error" as const, message });
+    const warn = (id: string, message: string) => ({ id, type: "warning" as const, message });
+    const setup = (issues: unknown[], extra: Partial<StudioHeaderProps> = {}) => {
+      vi.mocked(isFeatureEnabled).mockReturnValue(true);
+      const onVercelPublish = vi.fn();
+      const onOpenIssues = vi.fn();
+      render(
+        <StudioHeader
+          {...makeProps({
+            onVercelPublish,
+            onOpenIssues,
+            issues: issues as StudioHeaderProps["issues"],
+            ...extra,
+          })}
+        />,
+      );
+      return { onVercelPublish, onOpenIssues };
+    };
+
+    it("errors > 0 opens the confirm instead of publishing in one click", () => {
+      const { onVercelPublish } = setup([err("1", "Broken link — Home / CTA")]);
+      fireEvent.click(screen.getByRole("button", { name: "Publish anyway" }));
+      expect(onVercelPublish).not.toHaveBeenCalled();
+      expect(screen.getByRole("dialog")).toBeTruthy();
+      expect(screen.getByText("Publish with 1 error?")).toBeTruthy();
+      expect(screen.getByText("Broken link — Home / CTA")).toBeTruthy();
+    });
+
+    it("warnings alone publish directly — the chip already carried the signal", () => {
+      const { onVercelPublish } = setup([warn("1", "Missing alt")]);
+      fireEvent.click(screen.getByRole("button", { name: "Publish" }));
+      expect(onVercelPublish).toHaveBeenCalledTimes(1);
+      expect(screen.queryByRole("dialog")).toBeNull();
+    });
+
+    it("shows at most three rows, errors first, and +N more opens the panel", () => {
+      const { onOpenIssues } = setup([
+        warn("w1", "warn one"),
+        err("e1", "error one"),
+        warn("w2", "warn two"),
+        warn("w3", "warn three"),
+        err("e2", "error two"),
+      ]);
+      fireEvent.click(screen.getByRole("button", { name: "Publish anyway" }));
+      expect(screen.getByText("error one")).toBeTruthy();
+      expect(screen.getByText("error two")).toBeTruthy();
+      expect(screen.getByText("warn one")).toBeTruthy();
+      expect(screen.queryByText("warn three")).toBeNull();
+      fireEvent.click(screen.getByRole("button", { name: "+2 more" }));
+      expect(onOpenIssues).toHaveBeenCalled();
+      expect(screen.queryByRole("dialog")).toBeNull();
+    });
+
+    it("an open review round adds the D13 note", async () => {
+      vi.mocked(fetchReviewStatus).mockResolvedValueOnce({
+        state: "pending",
+        reviewerName: "Sana",
+        at: null,
+      });
+      setup([err("1", "x")]);
+      await screen.findByText("In review");
+      fireEvent.click(screen.getByRole("button", { name: "Publish anyway" }));
+      expect(screen.getByText(/A review round is open — Sana will see the published site/)).toBeTruthy();
+    });
+
+    it("no review round, no note", () => {
+      setup([err("1", "x")]);
+      fireEvent.click(screen.getByRole("button", { name: "Publish anyway" }));
+      expect(screen.queryByText(/review round is open/)).toBeNull();
+    });
+
+    it("'Review issues first' is the safe door — panel opens, nothing publishes", () => {
+      const { onVercelPublish, onOpenIssues } = setup([err("1", "x")]);
+      fireEvent.click(screen.getByRole("button", { name: "Publish anyway" }));
+      fireEvent.click(screen.getByRole("button", { name: "Review issues first" }));
+      expect(onOpenIssues).toHaveBeenCalled();
+      expect(onVercelPublish).not.toHaveBeenCalled();
+    });
+
+    it("confirming publishes", () => {
+      const { onVercelPublish } = setup([err("1", "x")]);
+      fireEvent.click(screen.getByRole("button", { name: "Publish anyway" }));
+      fireEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Publish anyway" }));
+      expect(onVercelPublish).toHaveBeenCalledTimes(1);
+      expect(screen.queryByRole("dialog")).toBeNull();
     });
   });
 

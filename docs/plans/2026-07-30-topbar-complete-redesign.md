@@ -364,7 +364,7 @@ finding above. Run with Claude Code or Codex; checkbox as you ship.
   - Surfaced by: Pass 1 (12-orphan "More" dump) + D8 + D9 + eng D8 (all-conditional Share group)
   - Files: `src/editor/shell/SiteMenu.tsx` (+ guard: a group renders only when ≥1 row is present — the Share group is all-conditional and an empty `MenuGroup` div still draws its border-top)
   - Verify: existing menu tests + no "More" group renders + unpublished-site menu shows no empty group border
-- [ ] **T4 (P1, human: ~3h / CC: ~20min)** — shell — publish-anyway confirm modal
+- [x] **T4 (P1) — SHIPPED 2026-07-30** (confirm at onPublish callsite; top-3 rows errors-first from real Issue messages + explicit fallback; +N more → panel; D13 open-review note; D9 precedence comment — server approval gate owns post-attempt rejects; F26 focus on safe door; 7 tests green) — shell — publish-anyway confirm modal
   - Surfaced by: TODOS.md:96 founder decision + D12 + D13 + D14 (title errors-only)
   - Files: `src/editor/shell/StudioHeader.tsx` (onPublish callsite)
   - Verify: errors>0 → modal with top-3 rows; warnings-only publishes direct; open-review note renders when pill ≠ none
