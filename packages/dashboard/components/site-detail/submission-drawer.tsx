@@ -58,14 +58,45 @@ export function SubmissionDrawer({
 }: SubmissionDrawerProps) {
   const drawerRef = useRef<HTMLDivElement>(null);
 
+  // Same dialog contract as primitives/Modal: Escape closes, Tab is trapped in
+  // the panel, and focus returns to the opener on close.
   useEffect(() => {
+    if (!open) return;
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+
+    function focusables(): HTMLElement[] {
+      const panel = drawerRef.current;
+      if (!panel) return [];
+      return Array.from(
+        panel.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter((el) => el.offsetParent !== null);
+    }
+
     function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") { onClose(); return; }
+      if (e.key !== "Tab") return;
+      const items = focusables();
+      if (items.length === 0) { e.preventDefault(); drawerRef.current?.focus(); return; }
+      const first = items[0];
+      const last = items[items.length - 1];
+      const active = document.activeElement;
+      if (e.shiftKey && (active === first || active === drawerRef.current)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      }
     }
-    if (open) {
-      document.addEventListener("keydown", handleKeyDown);
-      return () => document.removeEventListener("keydown", handleKeyDown);
-    }
+    document.addEventListener("keydown", handleKeyDown);
+    const panel = drawerRef.current;
+    if (panel && !panel.contains(document.activeElement)) panel.focus();
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      previouslyFocused?.focus?.();
+    };
   }, [open, onClose]);
 
   if (!open || !submission) return null;
@@ -84,7 +115,11 @@ export function SubmissionDrawer({
       {/* Drawer */}
       <div
         ref={drawerRef}
-        className="relative flex h-full w-[480px] max-w-full flex-col bg-white shadow-xl"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Submission details"
+        tabIndex={-1}
+        className="relative flex h-full w-[480px] max-w-full flex-col bg-white shadow-xl outline-none"
       >
         {/* Header */}
         <div
