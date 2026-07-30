@@ -7,6 +7,17 @@
 @source "../editor";
 @source "../shared/forms";
 @source "../templates";
+/* flowbite-react's own component theme.js files (bg-primary-700, rounded-lg,
+   h-10, ...) live in node_modules, so no @source glob above ever scans them —
+   Tailwind only compiles a utility it has SEEN a candidate string for. The
+   generated class-list (`npx flowbite-react build` from packages/editor,
+   config at ../../.flowbite-react/config.json — prefix "tw" MUST match
+   flowbiteStore.ts's setStore({prefix: "tw"}) exactly, or these compile
+   unprefixed and reintroduce the canvas collision the prefix exists to
+   prevent) is the literal-string source Tailwind needs. Regenerate whenever
+   a new flowbite-react component gets imported (`pnpm flowbite:classlist`
+   from this package). */
+@source "../../.flowbite-react/class-list.json";
 
 @theme {
   --font-sans: "Inter Tight", Inter, system-ui, sans-serif;

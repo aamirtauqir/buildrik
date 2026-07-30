@@ -22,12 +22,12 @@
 import React from "react";
 import { Button } from "flowbite-react";
 import { IconButton } from "./Icon";
-
-const GHOST_BTN_CLASS = "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900";
 import { IssueChip } from "./IssueChip";
 import { SaveStatus, type SaveState } from "./SaveStatus";
 import { Presence, type PresenceProps } from "./Presence";
 import { Tooltip } from "./Tooltip";
+
+const GHOST_BTN_CLASS = "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900";
 
 /**
  * `published` is the 2-second success transient after a publish lands (plan
