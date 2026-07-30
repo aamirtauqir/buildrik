@@ -23,7 +23,7 @@
  */
 
 import * as React from "react";
-import { Input, Textarea } from "@/editor/ui";
+import { Input } from "@/editor/ui";
 import { useToast } from "@/editor/ui";
 import { parseImportJSON, diffTokens, type DiffResult } from "../../utils/importUtils";
 import { useImportTokens } from "../../state/useImportTokens";
@@ -35,7 +35,7 @@ import {
   useIconRegistry, useImageryRegistry,
 } from "../../state/TokenRegistryContext";
 import type { DesignToken } from "../../types";
-import { Button } from "flowbite-react";
+import { Button, Textarea } from "flowbite-react";
 
 type ConflictStrategy = "replace" | "keep-mine" | "keep-theirs";
 

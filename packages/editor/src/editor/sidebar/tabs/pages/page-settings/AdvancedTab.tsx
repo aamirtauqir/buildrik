@@ -5,9 +5,9 @@
  */
 
 import * as React from "react";
-import { Cluster, HelperText, Input, Label, Stack, Textarea } from "@/editor/ui";
+import { Cluster, HelperText, Input, Label, Stack } from "@/editor/ui";
 import type { UsePageSettingsReturn } from "./usePageSettings";
-import { Button, ToggleSwitch } from "flowbite-react";
+import { Button, Textarea, ToggleSwitch } from "flowbite-react";
 
 interface Props {
   s: UsePageSettingsReturn;
@@ -101,6 +101,7 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
           Custom &lt;head&gt; code
         </div>
         <Textarea
+          className="tw:bg-white tw:focus:border-primary-700 tw:focus:ring-primary-700"
           value={s.customHead}
           onChange={(e) => s.setCustomHead(e.target.value)}
           placeholder="<!-- analytics, meta tags, fonts -->"

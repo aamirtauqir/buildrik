@@ -18,10 +18,10 @@
  */
 
 import * as React from "react";
-import { Input as VibcoderInput, Textarea as VibcoderTextarea } from "@/editor/ui";
+import { Input as VibcoderInput } from "@/editor/ui";
 import { SIDEBAR_WIDE } from "@/shared/constants/layout";
 import "./settings.css";
-import { Button, Select as FlowbiteSelect } from "flowbite-react";
+import { Button, Select as FlowbiteSelect, Textarea as FlowbiteTextarea } from "flowbite-react";
 import type { CustomFlowbiteTheme } from "flowbite-react/types";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -82,7 +82,7 @@ Input.displayName = "Input";
 type TextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement>;
 export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ className, ...rest }, ref) => (
-    <VibcoderTextarea
+    <FlowbiteTextarea
       ref={ref}
       className={`bd-set-input${className ? " " + className : ""}`}
       {...rest}

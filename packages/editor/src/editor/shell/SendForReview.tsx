@@ -13,11 +13,11 @@
  */
 
 import * as React from "react";
-import { FormField, Input, Popover, Textarea } from "@/editor/ui";
+import { FormField, Input, Popover } from "@/editor/ui";
 import type { Composer } from "../../engine";
 import { submitForReview, type ReviewStatus } from "../../services/ReviewService";
 import { exportPublishPages } from "./exportPublishPages";
-import { Button, Tooltip } from "flowbite-react";
+import { Button, Textarea, Tooltip } from "flowbite-react";
 
 export interface SendForReviewProps {
   composer: Composer | null;
@@ -154,7 +154,14 @@ export const SendForReview: React.FC<SendForReviewProps> = ({
         </FormField>
         <FormField label="Note to the reviewer" hint="Optional.">
           {(wiring) => (
-            <Textarea {...wiring} value={note} onChange={(e) => setNote(e.target.value)} maxLength={500} rows={3} />
+            <Textarea
+              className="tw:bg-white tw:focus:border-primary-700 tw:focus:ring-primary-700"
+              {...wiring}
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              maxLength={500}
+              rows={3}
+            />
           )}
         </FormField>
         {state === "error" ? (

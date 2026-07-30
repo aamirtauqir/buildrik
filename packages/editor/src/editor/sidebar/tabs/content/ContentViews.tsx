@@ -8,13 +8,13 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { ConfirmDialog, Input, Textarea } from "@/editor/ui";
+import { ConfirmDialog, Input } from "@/editor/ui";
 import { BK_SELECT_BASE_THEME } from "@/editor/ui/selectTheme";
 import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
 import type { ConditionExpression, ConditionOperator, DataSource } from "@/shared/types/data";
 import { conditionSummary, fieldDefault, isValidVariableKey, type SiteVariable } from "./contentPanelUtils";
 import type { ConditionRow } from "./useContentPanel";
-import { Button, Checkbox, Select, ToggleSwitch } from "flowbite-react";
+import { Button, Checkbox, Select, Textarea, ToggleSwitch } from "flowbite-react";
 
 export const S: Record<string, React.CSSProperties> = {
   body: { display: "flex", flexDirection: "column", height: "100%", minHeight: 0 },

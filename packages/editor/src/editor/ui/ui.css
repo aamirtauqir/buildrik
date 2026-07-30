@@ -359,26 +359,6 @@
 .bk-shell__band { flex: 1; display: flex; min-height: 0; }
 .bk-shell__canvas { flex: 1; min-width: 0; display: flex; flex-direction: column; background: var(--bk-bg-app); overflow: hidden; }
 
-/* ── Textarea · sibling of Input ────────────────────────────────────────── */
-.bk-textarea {
-  padding: var(--bk-space-8) var(--bk-space-12);
-  border-radius: var(--bk-radius-lg);
-  border: 1px solid var(--bk-border-medium);
-  background: var(--bk-bg-card);
-  color: var(--bk-ink);
-  font-family: var(--bk-font-ui);
-  font-size: var(--bk-text-13);
-  line-height: var(--bk-leading-20);
-  width: 100%; min-height: 72px; resize: vertical;
-  transition: var(--bk-transition-fast);
-}
-.bk-textarea::placeholder { color: var(--bk-ink-muted); }
-.bk-textarea:focus { outline: none; border-color: var(--bk-accent); box-shadow: var(--bk-shadow-focus); }
-.bk-textarea[aria-invalid="true"] { border-color: var(--bk-error); }
-.bk-textarea:disabled { background: var(--bk-bg-subtle); color: var(--bk-ink-disabled); cursor: not-allowed; }
-.bk-textarea--fixed { resize: none; }
-.bk-textarea--mono { font-family: var(--bk-font-mono); font-size: var(--bk-text-12); }
-
 /* ── Stack · the layout primitive ───────────────────────────────────────── */
 .bk-stack { display: flex; flex-direction: column; }
 .bk-stack--row { flex-direction: row; align-items: center; }

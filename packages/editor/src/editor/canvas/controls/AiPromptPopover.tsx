@@ -5,7 +5,6 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Textarea } from "@/editor/ui";
 import type { Composer } from "../../../engine";
 import { Z_LAYERS } from "../../../shared/constants/canvas";
 import { useStreamPrompt } from "../../sidebar/tabs/ai/hooks/useStreamPrompt";
@@ -14,7 +13,7 @@ import { DiffRows } from "../../sidebar/tabs/ai/DiffRows";
 import { DEFAULT_MODEL } from "../../sidebar/tabs/ai/types";
 import { trackAiEditApplied } from "@/services/ai/adoptionTracker";
 import "./AiPromptPopover.css";
-import { Button } from "flowbite-react";
+import { Button, Textarea } from "flowbite-react";
 
 export interface AiPromptPopoverProps {
   composer: Composer;
@@ -102,7 +101,7 @@ export const AiPromptPopover: React.FC<AiPromptPopoverProps> = ({
       ) : (
         <>
           <Textarea
-            className="bd-ai-popover-input"
+            className="bd-ai-popover-input tw:bg-white tw:focus:border-primary-700 tw:focus:ring-primary-700"
             placeholder="Describe a change… e.g. make this dark"
             aria-label="AI prompt"
             value={text}

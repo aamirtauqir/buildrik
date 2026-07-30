@@ -20,12 +20,12 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { ModalContent, ModalDescription, ModalFooter, ModalRoot, ModalTitle, Textarea } from "@/editor/ui";
+import { ModalContent, ModalDescription, ModalFooter, ModalRoot, ModalTitle } from "@/editor/ui";
 import type {
   AIAssistService,
   ComponentSchema,
 } from "../../../engine/designSystem/services/AIAssistService";
-import { Button } from "flowbite-react";
+import { Button, Textarea } from "flowbite-react";
 
 type ModalState =
   | { kind: "idle" }
@@ -131,6 +131,7 @@ export const AIPromptModal: React.FC<AIPromptModalProps> = ({
 
         <div style={{ padding: "20px 28px", display: "flex", flexDirection: "column", gap: 12 }}>
           <Textarea
+            className="tw:bg-white tw:focus:border-primary-700 tw:focus:ring-primary-700"
             aria-label="Component description"
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}

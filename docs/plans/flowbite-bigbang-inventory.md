@@ -1503,3 +1503,92 @@ Verified: `tsc --noEmit` clean; targeted run across all touched consumer
 tests + `atoms.test.tsx` + `flowbite-parity.test.tsx` + every inspector
 section test that renders `SelectRow`/`SelectControl` transitively — 28
 files, 253 tests, all green.
+
+### Textarea → `flowbite-react` `Textarea`
+
+`src/editor/ui/Textarea.tsx` (bare `<textarea className="bk-textarea">`, with
+`error`/`fixed`/`mono` boolean props) →
+`node_modules/flowbite-react/dist/components/Textarea/Textarea.js`/`theme.js`.
+
+**Structural finding — the opposite of Select's gap:** flowbite's `Textarea`
+applies the consumer's `className` **directly to the real `<textarea>`**
+(`Textarea.js` has no wrapper div at all, unlike `Select.js`'s two-div
+nesting). No `theme` prop or adapter file was needed anywhere — every call
+site's existing `className`/`style` reaches the actual form control the same
+way the deleted `bk-textarea` class did.
+
+**API mapping:**
+
+| Our prop | Flowbite equivalent |
+|---|---|
+| `error` (boolean, drove `aria-invalid` + a `.bk-textarea[aria-invalid="true"]` CSS attribute selector) | No `error` prop exists. `aria-invalid` itself still carries correct a11y semantics unchanged (ordinary DOM attribute, passes through `...restProps`); only the *visual* red-border state needed reproducing, done locally in `TextareaField.tsx` via a `BASE_CLASS`/`ERROR_CLASS` className swap (`tw:border-red-600 tw:focus:border-red-600 tw:focus:ring-red-600` when `error`). |
+| `fixed` (boolean, `resize: none`) | Not passed by any real call site (checked every JSX call site's props before deleting) — no adapter needed for an unused capability, per "don't add features beyond what's asked." |
+| `mono` (boolean, `font-family: var(--bk-font-mono)`) | Same — zero real consumers pass it. `ContentViews.tsx`'s monospace JSON textarea already used an inline `style={{ fontFamily: "var(--bk-font-mono)" }}` object, not the deleted component's `mono` prop, so it needed no change. |
+
+**Color/box override, checked against `theme.js` per the standing rule (never
+assume from a prior component's default):** flowbite's `Textarea` default
+`color="gray"` is `border-gray-300 bg-gray-50` — one ramp step off
+`--bk-bg-card` (#FFFFFF) and `--bk-border`, and its focus ring
+(`primary-500`) is not the exact `--bk-accent` match (`primary-700`). Same
+`SelectColors`-shaped gap as Select: `TextareaColors` has no `"blue"` entry
+either, so the fix is a literal className override, not a `color=` prop:
+`tw:bg-white tw:focus:border-primary-700 tw:focus:ring-primary-700`, applied
+inline at every plain call site (10 of 15 real sites) rather than centralized
+— CLAUDE.md rule 3 territory only when the *rule* differs per site (see
+below), and here it's the same literal string reused verbatim, so it stayed
+an inlined className string rather than a new adapter file, consistent with
+Button/Badge's precedent of not extracting single reused literals into a
+utility module.
+
+**3 sites skipped the override, each for a distinct, checked reason (not
+assumed):**
+- `InputControls.tsx` — `className="bdi-text"`. `inspector.css` has no
+  `@layer` wrapper (confirmed by grep), so its rules are unlayered and beat
+  any of flowbite's own `tw-utilities`-layer classes regardless of Tailwind's
+  layer order — same precedent Checkbox's `LayerDisplaySettings.tsx` (round
+  2) established for `bdc-switch`. `.bdi-text`/`textarea.bdi-text` already
+  fully specify background/border/color/focus.
+- `CreateComponentModal.tsx`, `CMSCollectionSetupModal.tsx`,
+  `ImportCard.tsx` — all pass an inline `style` object
+  (`textareaStyles`/`s.textarea`/`pasteAreaStyle`) that already sets
+  `background`/`border`/`color` explicitly. Inline `style` always wins the
+  cascade over any class (highest specificity short of `!important`), and
+  each object was read line-by-line to confirm it actually sets all three
+  properties rather than assumed from the pattern.
+- `settings/shared.tsx`'s local `Textarea` wrapper — `.bd-set-input`
+  (`settings.css`, also unlayered, no `@layer` wrapper) already fully styles
+  the box; wrapper now imports flowbite's `Textarea` as `FlowbiteTextarea`
+  and forwards `className={\`bd-set-input...\`}` unchanged, same shape as the
+  pre-swap `VibcoderTextarea` forwarding.
+
+**Consumers swept:** import-based sweep for `Textarea` inside `@/editor/ui`
+import blocks (checked for the two-statement trap on every match) plus a
+full-repo `<Textarea` JSX grep to catch relative-import siblings and confirm
+no site was missed. Found **1 file** still on the old import after this
+round picked up an in-flight WIP state (`settings/shared.tsx`, its local
+wrapper's `VibcoderTextarea` → `FlowbiteTextarea`); the other 15 real call
+sites across 15 files (`TextareaField.tsx`, `CommentLayer.tsx`,
+`Composer.tsx`, `AIPromptModal.tsx`, `ReviewTab.tsx`, `AiPromptPopover.tsx`,
+`AdvancedTab.tsx`, `SocialTab.tsx`, `SeoTab.tsx`, `ImportCard.tsx`,
+`ContentViews.tsx` ×2, `SendForReview.tsx`, `CreateComponentModal.tsx`,
+`CMSCollectionSetupModal.tsx`, `CMSRecordsModal.tsx`, `InputControls.tsx`,
+`AssetDetailsPanel.tsx`) had already been converted before this session
+picked up the branch. `grep -rn "bk-textarea" src` after deleting the CSS
+block found zero orphan raw-element usages (no `FormatRow`-style trap this
+round — the only `bk-textarea` references left were the ones inside
+`Textarea.tsx` itself and a code comment in `TextareaField.tsx`, both
+removed/harmless).
+
+**Class-list regen:** zero-diff — `Textarea`'s prefixed theme classes were
+already compiled during this same in-flight session's earlier work (its
+import already existed in multiple consumer files before this round's
+commit), same "already covered by an earlier partial run" case Tooltip hit
+in round 2.
+
+Verified: `tsc --noEmit` clean; targeted run across every touched consumer's
+test file (`CommentLayer`, `AiPromptPopover`, `AIPromptModal`, `ImportCard`,
+`AssetDetailsPanel` ×2, `SendForReview`, `CMSCollectionSetupModal`,
+`CMSRecordsModal`, `CreateComponentModal` ×2, `Composer`, `AdvancedTab`,
+`SeoTab`, `SocialTab`, `ReviewTab`, `ContentTab`, settings-tab tests,
+`ui/__tests__`, `flowbite-parity.test.tsx`, `chrome-reset.test.ts`) — 26 test
+files / 285 tests + 20 more, all green.

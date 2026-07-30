@@ -11,10 +11,10 @@
 
 import { X, Plus, Trash2, Check } from "lucide-react";
 import * as React from "react";
-import { Input, ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal, Stack, Textarea } from "@/editor/ui";
+import { Input, ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal, Stack } from "@/editor/ui";
 import { BK_SELECT_BASE_THEME } from "@/editor/ui/selectTheme";
 import type { Composer } from "../../../engine";
-import { Button, Select } from "flowbite-react";
+import { Button, Select, Textarea } from "flowbite-react";
 
 // =============================================================================
 // TYPES

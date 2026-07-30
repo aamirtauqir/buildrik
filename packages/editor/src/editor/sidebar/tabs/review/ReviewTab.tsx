@@ -18,7 +18,7 @@
 
 import * as React from "react";
 import { AlertCircle, CheckCircle2, ChevronLeft, History } from "lucide-react";
-import { ConfirmDialog, PanelHeader, Spinner, Textarea } from "@/editor/ui";
+import { ConfirmDialog, PanelHeader, Spinner } from "@/editor/ui";
 import { ApprovedCompareView } from "@/editor/panels/version-history/ApprovedCompareView";
 import type { PublishPage } from "@/editor/shell/exportPublishPages";
 import {
@@ -32,7 +32,7 @@ import {
   type CurrentRound,
   type ReviewComment,
 } from "../../../../services/ReviewService";
-import { Badge, Button, ToggleSwitch } from "flowbite-react";
+import { Badge, Button, Textarea, ToggleSwitch } from "flowbite-react";
 
 /** Review's own status words onto flowbite Badge color + text-color override
  *  (flowbite's badge color presets don't hex-match --bk-success-text/
@@ -478,6 +478,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
 
       <div style={S.composer}>
         <Textarea
+          className="tw:bg-white tw:focus:border-primary-700 tw:focus:ring-primary-700"
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           placeholder="Reply to the client…"

@@ -22,7 +22,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { ModalContent, ModalFooter, ModalRoot, ModalTitle, Textarea, isModalOpen } from "@/editor/ui";
+import { ModalContent, ModalFooter, ModalRoot, ModalTitle, isModalOpen } from "@/editor/ui";
 import { useToast } from "@/editor/ui";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants";
@@ -40,7 +40,7 @@ import {
   pinPosition,
   pointToFractions,
 } from "./commentAnchors";
-import { Button } from "flowbite-react";
+import { Button, Textarea } from "flowbite-react";
 
 interface CommentLayerProps {
   composer: Composer | null;
@@ -420,6 +420,7 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
             onClick={(e) => e.stopPropagation()}
           >
             <Textarea
+              className="tw:bg-white tw:focus:border-primary-700 tw:focus:ring-primary-700"
               autoFocus
               rows={3}
               maxLength={2000}

@@ -12,7 +12,6 @@
 export { Input, type InputProps } from "./Input";
 export { Slider, type SliderProps } from "./Slider";
 export { StatusDot, type StatusDotProps, type StatusDotState } from "./StatusDot";
-export { Textarea, type TextareaProps } from "./Textarea";
 
 /* ── Molecules ──────────────────────────────────────────────────────────── */
 export { Row, type RowProps, type RowSize } from "./Row";

@@ -5,7 +5,8 @@
  */
 
 import * as React from "react";
-import { Cluster, HelperText, Input, Label, Stack, Textarea } from "@/editor/ui";
+import { Cluster, HelperText, Input, Label, Stack } from "@/editor/ui";
+import { Textarea } from "flowbite-react";
 import type { PageItem } from "../types";
 import type { UsePageSettingsReturn } from "./usePageSettings";
 
@@ -57,6 +58,7 @@ export const SocialTab: React.FC<Props> = ({ s, page }) => {
           <span style={{ font: "500 10.5px var(--bk-font-mono)", color: "var(--bk-ink-muted)" }}>{s.ogDesc.length}/160</span>
         </Cluster>
         <Textarea
+          className="tw:bg-white tw:focus:border-primary-700 tw:focus:ring-primary-700"
           id="og-desc"
           value={s.ogDesc}
           onChange={(e) => s.setOgDesc(e.target.value)}

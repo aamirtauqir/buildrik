@@ -19,11 +19,10 @@
 
 import { Download, FolderOpen, Pencil, Replace, Sparkles, Trash2, X } from "lucide-react";
 import * as React from "react";
-import { Textarea } from "@/editor/ui";
 import type { Composer } from "../../../engine/Composer";
 import type { LibraryItem } from "../../sidebar/tabs/media/data/mediaTypes";
 import { formatBytes } from "@shared/utils/helpers/number";
-import { Button } from "flowbite-react";
+import { Button, Textarea } from "flowbite-react";
 
 // P7 — alt-text upper bound matches the server prompt's "Under 125 characters" rule.
 const ALT_TEXT_MAX = 125;
@@ -469,6 +468,7 @@ function AltTextSection({
         Alt text
       </label>
       <Textarea
+        className="tw:bg-white tw:focus:border-primary-700 tw:focus:ring-primary-700"
         id={`alt-text-${item.key}`}
         value={item.altText ?? ""}
         maxLength={ALT_TEXT_MAX}

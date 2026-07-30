@@ -20,10 +20,9 @@ import {
   ModalRoot,
   ModalTitle,
   Portal,
-  Textarea,
 } from "@/editor/ui";
 import { BK_SELECT_BASE_THEME } from "@/editor/ui/selectTheme";
-import { Button, Checkbox, Select } from "flowbite-react";
+import { Button, Checkbox, Select, Textarea } from "flowbite-react";
 
 export interface CMSRecordsModalProps {
   composer: Composer | null;
@@ -152,6 +151,7 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
         <div {...common}>
           <FieldLabel field={field} />
           <Textarea
+            className="tw:bg-white tw:focus:border-primary-700 tw:focus:ring-primary-700"
             value={String(value ?? "")}
             onChange={(e) => setField(field.slug, e.target.value)}
             placeholder={field.placeholder}
