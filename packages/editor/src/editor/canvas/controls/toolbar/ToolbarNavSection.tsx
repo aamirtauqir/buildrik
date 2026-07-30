@@ -5,7 +5,6 @@
  */
 
 import * as React from "react";
-import { Tooltip } from "@/editor/ui";
 import {
   parentBtnStyles,
   nameBtnStyles,
@@ -13,7 +12,7 @@ import {
   dropdownStyles,
   menuItemStyles,
 } from "./toolbarStyles";
-import { Button } from "flowbite-react";
+import { Button, Tooltip } from "flowbite-react";
 
 export interface ToolbarNavSectionProps {
   hasParent: boolean;
@@ -39,7 +38,7 @@ export const ToolbarNavSection: React.FC<ToolbarNavSectionProps> = ({
   <>
     {/* Parent button */}
     {hasParent && (
-      <Tooltip label="Select Parent · ⌥↑">
+      <Tooltip content="Select Parent · ⌥↑" placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
         <Button color="light" onClick={onSelectParent} style={parentBtnStyles} aria-label="Select parent element" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
           <svg
             width="12"

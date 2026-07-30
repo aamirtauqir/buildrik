@@ -6,8 +6,8 @@
 
 import * as React from "react";
 import { ColorField } from "../../shared/forms";
-import { Tooltip, Select, Input, Cluster, Popover } from "@/editor/ui";
-import { Button } from "flowbite-react";
+import { Select, Input, Cluster, Popover } from "@/editor/ui";
+import { Button, Tooltip } from "flowbite-react";
 
 export interface RichTextEditorProps {
   onCommand: (command: string, value?: string) => void;
@@ -170,7 +170,13 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
             const isActive = "active" in item ? item.active : false;
             const itemStyle = "style" in item ? item.style : {};
             return (
-              <Tooltip key={item.command} label={item.label}>
+              <Tooltip
+                key={item.command}
+                content={item.label}
+                placement="bottom"
+                arrow={false}
+                className="tw:max-w-[280px] tw:whitespace-normal"
+              >
                 <Button
                   color="light"
                   onClick={() => onCommand(item.command)}
@@ -281,7 +287,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
         </div>
       </Popover>
       {/* Clear Formatting */}
-      <Tooltip label="Clear Formatting">
+      <Tooltip content="Clear Formatting" placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
         <Button color="light" onClick={() => onCommand("removeFormat")} style={toolbarButtonStyle} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
           ✕
         </Button>

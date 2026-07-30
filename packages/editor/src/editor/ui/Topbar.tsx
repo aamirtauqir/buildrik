@@ -20,12 +20,11 @@
  * @license BSD-3-Clause
  */
 import React from "react";
-import { Button } from "flowbite-react";
+import { Button, Tooltip } from "flowbite-react";
 import { IconButton } from "./Icon";
 import { IssueChip } from "./IssueChip";
 import { SaveStatus, type SaveState } from "./SaveStatus";
 import { Presence, type PresenceProps } from "./Presence";
-import { Tooltip } from "./Tooltip";
 
 const GHOST_BTN_CLASS = "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900";
 
@@ -179,7 +178,12 @@ export function Topbar({
            * native disabled (via `loading`) so a double-publish stays
            * impossible — when both apply, busy's native disabled wins.
            */
-          <Tooltip label={publishBlockedReason ?? "Publishing is unavailable"} placement="bottom-end">
+          <Tooltip
+            content={publishBlockedReason ?? "Publishing is unavailable"}
+            placement="bottom-end"
+            arrow={false}
+            className="tw:max-w-[280px] tw:whitespace-normal"
+          >
             <Button
               aria-disabled="true"
               disabled={publishBusy}

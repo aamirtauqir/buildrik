@@ -10,7 +10,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import {
   Row, ListRow, TreeRow, VersionRow, RecordRow, FormatRow, IntegrationRow, CommentRow,
-  FieldRow, NavItem, SectionHeader, PanelHeader, EmptyState, ProgressRow, Tooltip,
+  FieldRow, NavItem, SectionHeader, PanelHeader, EmptyState, ProgressRow,
   MediaCard, SiteCard,
 } from "../index";
 import { Button } from "flowbite-react";
@@ -165,54 +165,6 @@ describe("ProgressRow", () => {
   it("clamps out-of-range values instead of overflowing the track", () => {
     render(<ProgressRow label="x" value={99} max={10} valueLabel="done" />);
     expect(screen.getByText("done")).toBeTruthy();
-  });
-});
-
-describe("Tooltip", () => {
-  it("opens on focus, not just hover", () => {
-    render(
-      <Tooltip label="Publish the site">
-        <button>Publish</button>
-      </Tooltip>,
-    );
-    const btn = screen.getByRole("button", { name: "Publish" });
-    expect(screen.queryByRole("tooltip")).toBeNull();
-    fireEvent.focus(btn);
-    expect(screen.getByRole("tooltip").textContent).toBe("Publish the site");
-    expect(btn.getAttribute("aria-describedby")).toBeTruthy();
-  });
-
-  it("closes on Escape", () => {
-    render(
-      <Tooltip label="Hint">
-        <button>T</button>
-      </Tooltip>,
-    );
-    const btn = screen.getByRole("button", { name: "T" });
-    fireEvent.mouseEnter(btn);
-    expect(screen.getByRole("tooltip")).toBeTruthy();
-    fireEvent.keyDown(btn, { key: "Escape" });
-    expect(screen.queryByRole("tooltip")).toBeNull();
-  });
-
-  it("anchors below the trigger by default", () => {
-    render(
-      <Tooltip label="Hint">
-        <button>T</button>
-      </Tooltip>,
-    );
-    fireEvent.focus(screen.getByRole("button", { name: "T" }));
-    expect(screen.getByRole("tooltip").className).toBe("bk-tooltip bk-tooltip--bottom");
-  });
-
-  it.each(["bottom", "bottom-end", "top"] as const)("placement=%s lands as a modifier class", (placement) => {
-    render(
-      <Tooltip label="Hint" placement={placement}>
-        <button>T</button>
-      </Tooltip>,
-    );
-    fireEvent.focus(screen.getByRole("button", { name: "T" }));
-    expect(screen.getByRole("tooltip").className).toContain(`bk-tooltip--${placement}`);
   });
 });
 

@@ -8,11 +8,11 @@
  */
 
 import * as React from "react";
-import { Cluster, HelperText, Input, Label, Stack, Textarea, Tooltip } from "@/editor/ui";
+import { Cluster, HelperText, Input, Label, Stack, Textarea } from "@/editor/ui";
 import { generateContent } from "@/shared/utils/openai";
 import type { PageItem } from "../types";
 import type { UsePageSettingsReturn } from "./usePageSettings";
-import { Button } from "flowbite-react";
+import { Button, Tooltip } from "flowbite-react";
 
 interface Props {
   s: UsePageSettingsReturn;
@@ -172,7 +172,12 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
           {/* label + info icon in a flex row — button must NOT be inside <label> (HTML spec) */}
           <Cluster>
             <Label htmlFor="seo-desc">Meta Description</Label>
-            <Tooltip label="A short summary of your page shown in Google search results (keep under 160 characters)">
+            <Tooltip
+              content="A short summary of your page shown in Google search results (keep under 160 characters)"
+              placement="bottom"
+              arrow={false}
+              className="tw:max-w-[280px] tw:whitespace-normal"
+            >
               <Button
                 color="light"
                 size="xs"

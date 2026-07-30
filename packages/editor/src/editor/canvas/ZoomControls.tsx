@@ -4,9 +4,9 @@
  */
 
 import * as React from "react";
-import { Input, Tooltip } from "@/editor/ui";
+import { Input } from "@/editor/ui";
 import { ZOOM_PRESETS } from "./shared";
-import { Button } from "flowbite-react";
+import { Button, Tooltip } from "flowbite-react";
 
 export interface ZoomControlsProps {
   zoom: number;
@@ -46,7 +46,7 @@ export const ZoomControls: React.FC<ZoomControlsProps> = ({
 
   return (
     <div style={containerStyles}>
-      <Tooltip label="Zoom Out">
+      <Tooltip content="Zoom Out" placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
         <Button
           color="light"
           size="xs"
@@ -65,7 +65,7 @@ export const ZoomControls: React.FC<ZoomControlsProps> = ({
           style={sliderStyles}
         />
       </div>
-      <Tooltip label="Zoom In">
+      <Tooltip content="Zoom In" placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
         <Button
           color="light"
           size="xs"
@@ -86,7 +86,7 @@ export const ZoomControls: React.FC<ZoomControlsProps> = ({
       {onFitToScreen && (
         <>
           <div style={dividerStyles} />
-          <Tooltip label="Fit to Screen">
+          <Tooltip content="Fit to Screen" placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
             <Button
               color="light"
               size="xs"

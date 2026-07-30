@@ -34,8 +34,7 @@ import {
   Rocket,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { Tooltip } from "@/editor/ui";
-import { Button } from "flowbite-react";
+import { Button, Tooltip } from "flowbite-react";
 
 // ============================================
 // Icon map — lucide icon name → component
@@ -135,7 +134,13 @@ function RailZone({
         const isDirty = dirtyTabIds?.has(tab.id) ?? false;
 
         return (
-          <Tooltip key={tab.id} label={tab.shortcut ? `${tab.label} · ${tab.shortcut}` : tab.label}>
+          <Tooltip
+            key={tab.id}
+            content={tab.shortcut ? `${tab.label} · ${tab.shortcut}` : tab.label}
+            placement="bottom"
+            arrow={false}
+            className="tw:max-w-[280px] tw:whitespace-normal"
+          >
             <Button
               color="light"
               className={`ls-btn${showLabels ? " ls-btn--labeled" : ""}${isSelectedTab ? " ls-btn--active" : ""}${!drawerOpen && isSelectedTab ? " ls-btn--last" : ""}`}
@@ -232,7 +237,13 @@ function FourToolRail({
         const isSelected = tool === activeTool;
         const isVisibleActive = isSelected && drawerOpen;
         return (
-          <Tooltip key={tool} label={meta.label}>
+          <Tooltip
+            key={tool}
+            content={meta.label}
+            placement="bottom"
+            arrow={false}
+            className="tw:max-w-[280px] tw:whitespace-normal"
+          >
             <Button
               color="light"
               className={`ls-btn${isSelected ? " ls-btn--active" : ""}${!drawerOpen && isSelected ? " ls-btn--last" : ""}`}

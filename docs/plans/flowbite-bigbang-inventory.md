@@ -987,3 +987,147 @@ Verified: `tsc --noEmit` clean; `ui/__tests__` 136/136,
 `collaboration/__tests__/PresenceIndicators.test.tsx` 11/11,
 `canvas/comments/__tests__/CommentLayer.test.tsx` 10/10 (renders
 `CommentRow` transitively).
+
+### Tooltip + TooltipParts + HelpTooltip → `flowbite-react` `Tooltip`
+
+Per the Task 4 verdict table above, Tooltip is the only KEEP/SWAP candidate
+that came back **SWAP** — treated as one unit since `HelpTooltip` rode the
+same `bk-tooltip` surface and `TooltipParts` only existed as a
+Radix-shaped adapter in front of the same `Tooltip`.
+
+`src/editor/ui/Tooltip.tsx` (`label`, `placement`, `id`) →
+`node_modules/flowbite-react/dist/components/Tooltip/Tooltip.d.ts`
+(`content`, `placement`, `arrow`, `trigger`, `style`).
+
+| Our prop | Flowbite prop | Notes |
+|---|---|---|
+| `label` (string) | `content` (ReactNode) | rename + widened type — flowbite's slot takes any node, which is what let `HelpTooltip`'s docs-link composition drop its own controlled-open state entirely (see below). |
+| `placement="bottom"` (our default) \| `"bottom-end"` \| `"top"` | `placement` | same 3 string values are valid `@floating-ui/core` `Placement`s, so no value-translation table needed — but flowbite's own default is `"top"`, not `"bottom"`, so every call site that relied on the old default now passes `placement="bottom"` explicitly to hold position parity. |
+| *(no equivalent — trigger was always hover+focus+Escape)* | `trigger="hover"` (default) | left at default: `Floating.js` unconditionally adds `useFocus(context)` regardless of `trigger` (verified live in `flowbite-parity.test.tsx`, Task 4), and `useDismiss(context)` (always included) closes on Escape — so hover, focus-open and Escape-to-close all still hold with zero prop needed. |
+| `id` | *(dropped)* | flowbite generates its own floating id internally (`useRole`'s `floatingId`) and wires `aria-describedby` onto the wrapping reference `<div>` itself — no caller ever consumed the old `id` prop for anything external, confirmed via the consumer sweep below. |
+| *(never had one)* | `arrow` (default `true`) | our Figma-sourced tooltip (`Tooltip — Figma 14:43`) never drew a pointer triangle — `arrow={false}` added at every call site to hold that shape. |
+| *(bg/text were exact hex matches already)* | `style="dark"` (default) | left at default — `bg-gray-900`/`text-white` is byte-exact to `--bk-gray-900` (`#111827`) / `--bk-accent-on` (`#FFFFFF`), the same "omit the prop, default already matches" pattern as Button's `color`. |
+
+**Shape differences accepted (no override), same tier as Button/Badge's
+accepted diffs:** border-radius (flowbite `rounded-lg` 8px vs our
+`--bk-radius-md` 6px), horizontal padding (`px-3` 12px vs our
+`--bk-space-8` 8px — vertical `py-2`/`--bk-space-4`+`--bk-space-8` both
+land at 8px, matches), font-size (flowbite `text-sm` 14px vs our
+`--bk-text-12` 12px), box-shadow (`shadow-sm` vs `--bk-shadow-drag`).
+
+**Wrapping behavior fixed, not accepted as shape drift.** The old
+`.bk-tooltip` CSS set `max-width: 280px; white-space: normal` globally —
+without it, flowbite's floating `<div>` has no width constraint at all
+(only `theme.target`'s `w-fit` applies, and that's on the *reference*
+wrapper, not the floating content), so a long dynamic string (e.g.
+`disabledReason`, `publishBlockedReason`) would render as one
+unconstrained-width line instead of wrapping — a real overflow risk, not
+a cosmetic one. Every call site now carries
+`className="tw:max-w-[280px] tw:whitespace-normal"` (HelpTooltip uses its
+own prior `220px`/`1.4` values instead, preserved as
+`tw:max-w-[220px] tw:whitespace-normal tw:leading-[1.4]`).
+
+**Structural shape change, accepted per the Task 4 SWAP verdict itself:**
+flowbite's `Floating.js` wraps `children` in its own reference `<div
+className="w-fit">` rather than cloning props onto the child element (our
+old implementation used `React.cloneElement`). Every call site now renders
+one extra DOM node per tooltip trigger; none of the 13 real call sites
+target the trigger via a parent-child CSS combinator (all styling is
+`className`/`style` on the child itself), so this is invisible in
+practice — confirmed by the full targeted test run below, all green.
+
+**`TooltipParts.tsx` — deleted outright, not swapped.** Zero real
+consumers: grepped `TooltipRoot`/`TooltipTrigger`/`TooltipContent`/
+`TooltipProvider`/`TooltipPortal` across all of `src` (including tests) and
+the only hits were the file's own definitions and its `index.ts` export
+line. The file's own header comment ("kept so the 24 surfaces... migrate
+without being restructured") was stale — those surfaces had already all
+moved off the Radix-shaped API by the time this task started, leaving a
+dead Fragment-returning shim consuming nothing. Confirmed via `tsc
+--noEmit` after deletion: 0 errors.
+
+**`HelpTooltip.tsx` — rewritten, not just re-pointed.** It used to
+hand-roll the exact same hover/focus/Escape/aria-describedby bookkeeping
+`Tooltip.tsx` did (predates the extraction), rendering its own
+`<span role="tooltip" className="bk-tooltip">` conditionally on local
+`open` state. Now composes flowbite's `Tooltip` directly: the manual
+`open` state, `tipId`, and all 5 event handlers are gone, replaced by
+`<Tooltip content={<>...docs link...</>}>`. The docs-link anchor's color
+(`var(--bk-accent)`) carried forward as the exact-hex `tw:text-[#1A56DB]`
+per the standing hex-parity rule. One accepted behavior note: the old
+implementation never applied a placement modifier class at all (a
+pre-existing shape quirk, not something introduced here — `bk-tooltip`
+had no default top/left/bottom/right without `--bottom`/`--top`/
+`--bottom-end`), so there was no "old default" to preserve; the new
+version lets flowbite's own default (`placement="top"`) apply. The
+`position` prop stays "accepted and ignored" exactly as documented before
+(2 consumers pass `position="right"`; flowbite could now honor arbitrary
+placements, but wiring that up is a behavior change beyond this swap's
+scope, not requested).
+
+**Consumers swept:** 11 files via `@/editor/ui` (`LeftSidebar.tsx` ×2,
+`SeoTab.tsx`, `InputControls.tsx`, `MultiSelectToolbar.tsx` ×8,
+`SendForReview.tsx`, `RichTextEditor.tsx` ×2, `ZoomControls.tsx` ×3,
+`CanvasFooterToolbar.tsx` ×4, `ToolbarNavSection.tsx`,
+`ToolbarActionsSection.tsx` ×4, `DrawerPanel.tsx` ×2) + 1 relative-import
+sibling inside `editor/ui/` itself (`Topbar.tsx`) — 21 JSX call sites
+total across 12 files. All 12 already had `import { Button } from
+"flowbite-react"` from the Button-swap commit, so the edit was `import {
+Tooltip } from "@/editor/ui"` deleted and merged into the existing
+`flowbite-react` import line, not a new import line. `HelpTooltip`'s own
+2 consumers (`DisplayControls.tsx`, `PositionControls.tsx`) needed no
+changes — its public prop API (`content`, `docsLink`, `position`, `size`)
+is unchanged. Several `rg` hits for the bare string "Tooltip" were
+confirmed false positives before editing anything: `deleteTooltip` (local
+variable in `PageContextMenu.tsx`), `useTooltipPresets`/`tooltipPresets`
+(`DesignSystemTab.tsx`), a code comment in `AquibraStudio.tsx`, and
+`DragTooltip` (`LayerContextMenu.tsx` — an unrelated component that only
+shares a name).
+
+**Test-time gotcha found and documented (applies to every future
+component that renders conditionally on hover/focus):** flowbite's
+`Floating.js` always renders `theme.content` in the DOM — the open/hidden
+toggle is a CSS class (`tw:invisible tw:opacity-0`) on the floating
+wrapper, not conditional rendering. `screen.getByRole("tooltip")` and
+`screen.getByText(...)` therefore find the tooltip **regardless of open
+state** in jsdom (which doesn't compute Tailwind's cascade, so the
+`invisible` class has no effect on the accessibility-tree visibility
+check testing-library relies on) — asserting presence/absence of tooltip
+text is vacuous post-swap. Task 4's own `flowbite-parity.test.tsx` had
+already found and documented this; `molecules.test.tsx`'s `Tooltip`
+`describe` block (open/Escape/placement-class assertions) was deleted
+outright rather than patched, since flowbite's own behavior is now the
+contract and `flowbite-parity.test.tsx` already documents it — no
+information would have survived a rewrite. `HelpTooltip.test.tsx`'s
+focus-opens-content test was rewritten to assert the
+`[data-testid="flowbite-tooltip"]` wrapper's `className` toggle (mirroring
+`flowbite-parity.test.tsx`'s own pattern) instead of relying on text
+presence, so it still actually tests something.
+
+**`.bk-tooltip` CSS block deleted** from `ui.css` (base rule + 3 placement
+modifier classes). `--bk-z-tooltip`/`--bk-gray-900`/`--bk-accent-on` etc.
+are generated tokens (`tokens.generated.css`), untouched — deleting a
+consumer of a token is not grounds to delete the token itself.
+
+**Class-list regen:** `pnpm flowbite:classlist` produced a byte-identical
+`class-list.json` (0 diff) — `Tooltip`'s theme classes (`tw:invisible`,
+`tw:opacity-0`, etc.) were already present from the Task 5 round-1 run,
+because `src/editor/chrome-ui/__tests__/flowbite-parity.test.tsx` (written
+during Task 4, predates any real consumer) already had `import { ...,
+Tooltip, ... } from "flowbite-react"` — the CLI's `extractComponentImports`
+scans all matching import lines project-wide, test files included, so
+Tooltip was inadvertently pre-compiled a full task early. Confirmed by
+reading `build.js`/`extract-component-imports.js` directly rather than
+assuming. `.flowbite-react/init.tsx` regenerated itself on this run too
+(same duplicate-mechanism issue as fix round 1) — deleted again, same
+justification (CLAUDE.md rule 3, one source of truth for the prefix pair).
+
+Verified: `tsc --noEmit` clean; 193 tests green across
+`ui/__tests__/molecules.test.tsx`, `ui/__tests__/HelpTooltip.test.tsx`,
+`chrome-ui/__tests__/flowbite-parity.test.tsx`, `SeoTab.test.tsx`,
+`MultiSelectToolbar.test.tsx`, `SendForReview.test.tsx`,
+`RichTextEditor.test.tsx`, `ZoomControls.test.tsx`,
+`CanvasFooterToolbar.test.tsx`, `DrawerPanel.test.tsx`, `topbar.test.tsx`,
+`DisplayControls.test.tsx`, `PositionControls.test.tsx`,
+`LeftSidebarRailClick.test.tsx`, `InputWithUnit.test.tsx`; plus full
+`ui/__tests__` 130/130.

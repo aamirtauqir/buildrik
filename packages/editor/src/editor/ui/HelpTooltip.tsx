@@ -3,19 +3,25 @@
  * "What's this?" helper for complex properties
  * UX Audit 2026 - Task 9: Help tooltips for inspector
  *
- * Slice 3 rebuild: rides the ui Tooltip pattern (bk-tooltip surface, hover +
- * focus open, Escape closes) instead of the retired Radix compound. The open
- * state is managed here rather than through <Tooltip label> because the docs
- * link must render inside the tooltip, and label is a plain string.
+ * Slice 3 rebuild: rides the ui Tooltip pattern (hover + focus open, Escape
+ * closes) instead of the retired Radix compound.
  *
  * Slice 6B: moved here from src/shared/ui/ — it was already built on ui
  * primitives and had no reason to live outside the library.
+ *
+ * Flowbite swap (Task 5): rides flowbite-react's Tooltip directly. Hover,
+ * focus and Escape-to-dismiss are all built in — @floating-ui/react's
+ * useFocus is unconditionally wired regardless of `trigger`, verified live in
+ * flowbite-parity.test.tsx — so the manual open-state/aria-describedby
+ * bookkeeping this component used to do by hand is gone. flowbite's
+ * `content` is a ReactNode slot, so the docs link composes directly instead
+ * of needing a second controlled element.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { Button } from "flowbite-react";
+import { Button, Tooltip } from "flowbite-react";
 
 export interface HelpTooltipProps {
   /** Help text explaining the property */
@@ -45,26 +51,35 @@ export const HelpTooltip: React.FC<HelpTooltipProps> = ({
   size = "sm",
 }) => {
   const iconSize = size === "sm" ? 14 : 16;
-  const [open, setOpen] = React.useState(false);
-  const tipId = React.useId();
 
   return (
-    <span style={{ position: "relative", display: "inline-flex" }}>
+    <Tooltip
+      arrow={false}
+      className="tw:max-w-[220px] tw:whitespace-normal tw:leading-[1.4]"
+      content={
+        <>
+          {content}
+          {docsLink && (
+            <a
+              href={docsLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="tw:mt-1 tw:block tw:text-[12px] tw:text-[#1A56DB] tw:no-underline"
+              onClick={(e) => e.stopPropagation()}
+            >
+              Learn more →
+            </a>
+          )}
+        </>
+      }
+    >
       <Button
         color="light"
         size="xs"
         type="button"
         aria-label="What's this?"
-        aria-describedby={open ? tipId : undefined}
         style={buttonStyles}
         className="tw:border-transparent tw:bg-transparent"
-        onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
-        onFocus={() => setOpen(true)}
-        onBlur={() => setOpen(false)}
-        onKeyDown={(e) => {
-          if (e.key === "Escape") setOpen(false);
-        }}
       >
         <svg
           width={iconSize}
@@ -82,34 +97,7 @@ export const HelpTooltip: React.FC<HelpTooltipProps> = ({
           <line x1="12" y1="17" x2="12.01" y2="17" />
         </svg>
       </Button>
-      {open ? (
-        <span
-          role="tooltip"
-          id={tipId}
-          className="bk-tooltip"
-          style={{ maxWidth: 220, whiteSpace: "normal", lineHeight: 1.4 }}
-        >
-          <span>{content}</span>
-          {docsLink && (
-            <a
-              href={docsLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: "block",
-                marginTop: 4,
-                color: "var(--bk-accent)",
-                fontSize: 12,
-                textDecoration: "none",
-              }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              Learn more →
-            </a>
-          )}
-        </span>
-      ) : null}
-    </span>
+    </Tooltip>
   );
 };
 

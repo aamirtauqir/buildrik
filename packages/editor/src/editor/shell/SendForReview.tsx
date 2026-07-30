@@ -13,11 +13,11 @@
  */
 
 import * as React from "react";
-import { FormField, Input, Popover, Textarea, Tooltip } from "@/editor/ui";
+import { FormField, Input, Popover, Textarea } from "@/editor/ui";
 import type { Composer } from "../../engine";
 import { submitForReview, type ReviewStatus } from "../../services/ReviewService";
 import { exportPublishPages } from "./exportPublishPages";
-import { Button } from "flowbite-react";
+import { Button, Tooltip } from "flowbite-react";
 
 export interface SendForReviewProps {
   composer: Composer | null;
@@ -108,7 +108,12 @@ export const SendForReview: React.FC<SendForReviewProps> = ({
            * would hide the why). sending/sent below keep native disabled —
            * those are busy states, and busy must stay un-clickable.
            */
-          <Tooltip label={disabledReason} placement="bottom-end">
+          <Tooltip
+            content={disabledReason}
+            placement="bottom-end"
+            arrow={false}
+            className="tw:max-w-[280px] tw:whitespace-normal"
+          >
             <Button size="xs" aria-disabled="true" onClick={() => {}}>
               {LABEL[state]}
             </Button>

@@ -5,7 +5,6 @@
  */
 
 import * as React from "react";
-import { Tooltip } from "@/editor/ui";
 import { canvasTokens } from "../../../../styles/tokens";
 import {
   actionBtnStyles,
@@ -16,7 +15,7 @@ import {
   menuItemStyles,
   menuDividerStyles,
 } from "./toolbarStyles";
-import { Button } from "flowbite-react";
+import { Button, Tooltip } from "flowbite-react";
 
 const { colors } = canvasTokens;
 
@@ -49,7 +48,7 @@ export const ToolbarActionsSection: React.FC<ToolbarActionsSectionProps> = ({
     <div style={dividerStyles} />
 
     {/* Add button */}
-    <Tooltip label="Add Element">
+    <Tooltip content="Add Element" placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
       <Button color="light" onClick={onAdd} style={actionBtnStyles} aria-label="Add child element" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
         <svg
           width="12"
@@ -67,7 +66,7 @@ export const ToolbarActionsSection: React.FC<ToolbarActionsSectionProps> = ({
     </Tooltip>
 
     {/* Duplicate button */}
-    <Tooltip label="Duplicate · ⌘D">
+    <Tooltip content="Duplicate · ⌘D" placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
       <Button color="light" onClick={onDuplicate} style={actionBtnStyles} aria-label="Duplicate element" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
         <svg
           width="12"
@@ -89,7 +88,7 @@ export const ToolbarActionsSection: React.FC<ToolbarActionsSectionProps> = ({
 
     {/* More button + dropdown */}
     <div style={{ position: "relative" }}>
-      <Tooltip label="More">
+      <Tooltip content="More" placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
         <Button
           color="light"
           onClick={onMoreMenuToggle}
@@ -186,7 +185,7 @@ export const ToolbarActionsSection: React.FC<ToolbarActionsSectionProps> = ({
 
     {/* Delete button — spatially separated at far right */}
     <div style={deleteContainerStyles}>
-      <Tooltip label="Delete · ⌫">
+      <Tooltip content="Delete · ⌫" placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
         <Button color="light" onClick={onDelete} style={isolatedDeleteStyles} aria-label="Delete element" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
           <svg
             width="12"

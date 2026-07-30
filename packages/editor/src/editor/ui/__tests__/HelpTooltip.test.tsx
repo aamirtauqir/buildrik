@@ -16,15 +16,22 @@ describe("HelpTooltip", () => {
     expect(screen.getByRole("button", { name: "What's this?" })).toBeInTheDocument();
   });
 
-  it("shows the help content when the trigger receives focus", async () => {
+  it("shows the help content when the trigger receives focus", () => {
+    // flowbite's Tooltip always renders its content div — the show/hide
+    // toggle is the "invisible" class on the floating wrapper
+    // ([data-testid="flowbite-tooltip"], Floating.js), not presence of the
+    // text node. See flowbite-parity.test.tsx for the same pattern.
     render(<HelpTooltip content="Controls how this element flows in the layout." />);
+
+    const wrapper = screen.getByTestId("flowbite-tooltip");
+    expect(wrapper.className).toMatch(/tw:invisible/);
 
     fireEvent.focus(screen.getByRole("button", { name: "What's this?" }));
 
-    const contents = await screen.findAllByText(
-      "Controls how this element flows in the layout."
-    );
-    expect(contents.length).toBeGreaterThan(0);
+    expect(wrapper.className).not.toMatch(/tw:invisible/);
+    expect(
+      screen.getByText("Controls how this element flows in the layout.")
+    ).toBeInTheDocument();
   });
 
   it("renders a docs link inside the tooltip when docsLink is set", async () => {

@@ -7,8 +7,8 @@
 
 import { Info, X } from "lucide-react";
 import * as React from "react";
-import { Input, Select, Textarea, Tooltip } from "@/editor/ui";
-import { Button } from "flowbite-react";
+import { Input, Select, Textarea } from "@/editor/ui";
+import { Button, Tooltip } from "flowbite-react";
 
 // ============================================================================
 // HELPERS
@@ -19,7 +19,7 @@ const OverrideDot: React.FC = () => (
 );
 
 const HelperIcon: React.FC<{ text: string }> = ({ text }) => (
-  <Tooltip label={text}>
+  <Tooltip content={text} placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
     <span
       style={{
         marginLeft: 4,

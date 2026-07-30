@@ -33,7 +33,6 @@ export { SectionHeader, type SectionHeaderProps } from "./SectionHeader";
 export { PanelHeader, type PanelHeaderProps } from "./PanelHeader";
 export { EmptyState, EmptyStateTitle, EmptyStateDesc, EmptyStateActions, type EmptyStateProps, type EmptyStateSize } from "./EmptyState";
 export { ProgressRow, type ProgressRowProps, type ProgressTone } from "./ProgressRow";
-export { Tooltip, type TooltipProps } from "./Tooltip";
 export { MediaCard, type MediaCardProps } from "./MediaCard";
 export { SiteCard, type SiteCardProps } from "./SiteCard";
 
@@ -69,7 +68,6 @@ export {
   ModalRoot, ModalContent, ModalTitle, ModalDescription, ModalBody, ModalFooter, ModalClose,
   type ModalContentProps, type ModalSize,
 } from "./ModalParts";
-export { TooltipProvider, TooltipRoot, TooltipTrigger, TooltipContent, TooltipPortal } from "./TooltipParts";
 export { Cluster, Label, HelperText, FormField, Tag, type ClusterProps, type LabelProps, type HelperTextProps, type FormFieldProps, type TagProps } from "./Field";
 export { Popover, Menu, MenuItem, MenuGroup, MenuLabel, MenuSeparator } from "./Popover";
 export type { PopoverProps, PopoverPlacement, MenuProps, MenuItemProps } from "./Popover";

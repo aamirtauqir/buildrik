@@ -257,22 +257,6 @@
 .bk-progress__fill--failed { background: var(--bk-error); }
 .bk-progress__fill--done { background: var(--bk-success); }
 
-/* ── Tooltip · Figma 14:43 ──────────────────────────────────────────────── */
-.bk-tooltip {
-  position: absolute; z-index: var(--bk-z-tooltip);
-  padding: var(--bk-space-4) var(--bk-space-8);
-  border-radius: var(--bk-radius-md);
-  background: var(--bk-gray-900);
-  color: var(--bk-accent-on);
-  font-family: var(--bk-font-ui); font-size: var(--bk-text-12);
-  max-width: 280px; width: max-content; white-space: normal;
-  pointer-events: none;
-  box-shadow: var(--bk-shadow-drag);
-}
-.bk-tooltip--bottom { top: calc(100% + var(--bk-space-4)); left: 0; }
-.bk-tooltip--bottom-end { top: calc(100% + var(--bk-space-4)); right: 0; }
-.bk-tooltip--top { bottom: calc(100% + var(--bk-space-4)); left: 0; }
-
 /* ── Media card · Figma 17:6 · Badge ────────────────────────────────────── */
 .bk-media-card { display: flex; flex-direction: column; gap: var(--bk-space-4); border: 0; background: none; padding: 0; cursor: pointer; text-align: left; }
 .bk-media-card__thumb {

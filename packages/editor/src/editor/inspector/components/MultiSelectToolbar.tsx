@@ -18,9 +18,8 @@ import type { Composer } from "../../../engine";
 import { AlignmentHandler } from "../../../engine/canvas/AlignmentHandler";
 import type { PseudoStateId } from "../../../shared/types";
 import type { BreakpointId } from "../../../shared/types/breakpoints";
-import { Tooltip } from "@/editor/ui";
 import { BatchStylePanel } from "./BatchStylePanel";
-import { Button } from "flowbite-react";
+import { Button, Tooltip } from "flowbite-react";
 
 // ============================================================================
 // TYPES
@@ -158,7 +157,7 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
       <div style={sectionStyles}>
         <span style={sectionLabelStyles}>Align Horizontal</span>
         <div style={buttonGroupStyles}>
-          <Tooltip label={getAlignTooltip("Align Left")}>
+          <Tooltip content={getAlignTooltip("Align Left")} placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
             <Button
               color="light"
               size="xs"
@@ -167,7 +166,7 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
               disabled={isDisabled} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
             ><AlignLeft size={16} /></Button>
           </Tooltip>
-          <Tooltip label={getAlignTooltip("Align Center")}>
+          <Tooltip content={getAlignTooltip("Align Center")} placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
             <Button
               color="light"
               size="xs"
@@ -176,7 +175,7 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
               disabled={isDisabled} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
             ><AlignCenter size={16} /></Button>
           </Tooltip>
-          <Tooltip label={getAlignTooltip("Align Right")}>
+          <Tooltip content={getAlignTooltip("Align Right")} placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
             <Button
               color="light"
               size="xs"
@@ -192,7 +191,7 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
       <div style={sectionStyles}>
         <span style={sectionLabelStyles}>Align Vertical</span>
         <div style={buttonGroupStyles}>
-          <Tooltip label={getAlignTooltip("Align Top")}>
+          <Tooltip content={getAlignTooltip("Align Top")} placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
             <Button
               color="light"
               size="xs"
@@ -201,7 +200,7 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
               disabled={isDisabled} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
             ><AlignStartVertical size={16} /></Button>
           </Tooltip>
-          <Tooltip label={getAlignTooltip("Align Middle")}>
+          <Tooltip content={getAlignTooltip("Align Middle")} placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
             <Button
               color="light"
               size="xs"
@@ -210,7 +209,7 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
               disabled={isDisabled} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
             ><AlignCenterVertical size={16} /></Button>
           </Tooltip>
-          <Tooltip label={getAlignTooltip("Align Bottom")}>
+          <Tooltip content={getAlignTooltip("Align Bottom")} placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
             <Button
               color="light"
               size="xs"
@@ -226,7 +225,7 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
       <div style={sectionStyles}>
         <span style={sectionLabelStyles}>Distribute</span>
         <div style={buttonGroupStyles}>
-          <Tooltip label={getDistributeTooltip("Horizontally")}>
+          <Tooltip content={getDistributeTooltip("Horizontally")} placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
             <Button
               color="light"
               size="xs"
@@ -241,7 +240,7 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
               </svg>
             </Button>
           </Tooltip>
-          <Tooltip label={getDistributeTooltip("Vertically")}>
+          <Tooltip content={getDistributeTooltip("Vertically")} placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
             <Button
               color="light"
               size="xs"

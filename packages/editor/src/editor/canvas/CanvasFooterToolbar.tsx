@@ -16,10 +16,10 @@
 
 import * as React from "react";
 import { useClickOutside } from "@/shared/hooks";
-import { BreakpointSwitcher, Tooltip, type Breakpoint } from "@/editor/ui";
+import { BreakpointSwitcher, type Breakpoint } from "@/editor/ui";
 import { ZOOM_PRESETS } from "./shared";
 import { ROW_SM } from "@/shared/constants/layout";
-import { Button } from "flowbite-react";
+import { Button, Tooltip } from "flowbite-react";
 
 // Undo/redo/device switching moved OFF the topbar and onto this canvas toolbar
 // (Figma contract §2: viewport + edit controls belong to the canvas, the topbar
@@ -167,7 +167,12 @@ const OverlayButton: React.FC<OverlayButtonProps> = ({
   active,
   onClick,
 }) => (
-  <Tooltip label={shortcut ? `${label} · ${shortcut}` : label}>
+  <Tooltip
+    content={shortcut ? `${label} · ${shortcut}` : label}
+    placement="bottom"
+    arrow={false}
+    className="tw:max-w-[280px] tw:whitespace-normal"
+  >
     <Button
       type="button"
       color="light"
@@ -241,7 +246,7 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
         <>
           <div style={overlaysGroupStyles}>
             {onUndo && (
-              <Tooltip label="Undo · ⌘Z">
+              <Tooltip content="Undo · ⌘Z" placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
                 <Button
                   type="button"
                   color="light"
@@ -256,7 +261,7 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
               </Tooltip>
             )}
             {onRedo && (
-              <Tooltip label="Redo · ⌘⇧Z">
+              <Tooltip content="Redo · ⌘⇧Z" placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
                 <Button
                   type="button"
                   color="light"
@@ -406,7 +411,7 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
       {onHelpClick && (
         <>
           <div style={dividerStyles} />
-          <Tooltip label="Keyboard shortcuts · ?">
+          <Tooltip content="Keyboard shortcuts · ?" placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
             <Button
               type="button"
               color="light"
