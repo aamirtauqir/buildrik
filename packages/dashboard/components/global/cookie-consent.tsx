@@ -1,6 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
-import { X, Shield } from "lucide-react";
+import { Shield } from "lucide-react";
+import { ToggleSwitch } from "flowbite-react";
+import { Button, Modal } from "@/components/dashboard/primitives";
 
 export const COOKIE_CATEGORIES = [
   {
@@ -59,56 +61,34 @@ export function CookieConsent() {
 
   if (showManage) {
     return (
-      <div
-        className="fixed inset-0 z-[9998] flex items-center justify-center"
-        style={{ backgroundColor: "rgba(18, 22, 32, 0.45)" }}
-      >
-        <div className="w-[480px] rounded-xl bg-white p-6 shadow-xl">
-          <div className="flex items-center justify-between">
-            <h3 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>
-              Cookie Preferences
-            </h3>
-            <button onClick={() => setShowManage(false)}>
-              <X className="h-5 w-5" style={{ color: "var(--color-text-secondary)" }} />
-            </button>
-          </div>
-          <div className="mt-4 space-y-3">
-            {COOKIE_CATEGORIES.map((cat) => (
-              <div
-                key={cat.key}
-                className="flex items-center justify-between rounded-lg border p-3"
-                style={{ borderColor: "var(--color-border-default)" }}
-              >
-                <div>
-                  <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
-                    {cat.label}
-                  </p>
-                  <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
-                    {cat.description}
-                  </p>
-                </div>
-                <label className="relative inline-flex cursor-pointer items-center">
-                  <input
-                    type="checkbox"
-                    checked={cat.key === "essential" ? true : analytics}
-                    disabled={!cat.canDisable}
-                    onChange={() => cat.canDisable && setAnalytics(!analytics)}
-                    className="sr-only peer"
-                  />
-                  <div className="h-6 w-11 rounded-full bg-gray-200 peer-checked:bg-[var(--color-success)] peer-disabled:opacity-70 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all peer-checked:after:translate-x-full" />
-                </label>
+      <Modal open onClose={() => setShowManage(false)} title="Cookie Preferences" width={480}>
+        <div className="space-y-3">
+          {COOKIE_CATEGORIES.map((cat) => (
+            <div
+              key={cat.key}
+              className="flex items-center justify-between rounded-lg border p-3"
+              style={{ borderColor: "var(--color-border-default)" }}
+            >
+              <div>
+                <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
+                  {cat.label}
+                </p>
+                <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+                  {cat.description}
+                </p>
               </div>
-            ))}
-          </div>
-          <button
-            onClick={() => saveConsent("manage")}
-            className="mt-4 w-full rounded-lg py-2 text-sm font-medium text-white"
-            style={{ backgroundColor: "var(--color-primary)" }}
-          >
-            Save Preferences
-          </button>
+              <ToggleSwitch
+                checked={cat.key === "essential" ? true : analytics}
+                disabled={!cat.canDisable}
+                onChange={() => cat.canDisable && setAnalytics(!analytics)}
+              />
+            </div>
+          ))}
         </div>
-      </div>
+        <Button className="mt-4 w-full" onClick={() => saveConsent("manage")}>
+          Save Preferences
+        </Button>
+      </Modal>
     );
   }
 
@@ -129,20 +109,12 @@ export function CookieConsent() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2 sm:shrink-0 sm:flex-nowrap">
-          <button
-            onClick={() => saveConsent("accept_all")}
-            className="rounded-lg px-4 py-2 text-sm font-medium text-white"
-            style={{ backgroundColor: "var(--color-primary)" }}
-          >
+          <Button size="sm" onClick={() => saveConsent("accept_all")}>
             Accept All
-          </button>
-          <button
-            onClick={() => saveConsent("essential_only")}
-            className="rounded-lg border px-4 py-2 text-sm font-medium"
-            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
-          >
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => saveConsent("essential_only")}>
             Essential Only
-          </button>
+          </Button>
           <button
             onClick={() => setShowManage(true)}
             className="text-sm font-medium underline"

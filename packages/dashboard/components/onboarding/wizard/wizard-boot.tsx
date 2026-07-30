@@ -1,5 +1,6 @@
 "use client";
 
+import { Spinner } from "flowbite-react";
 import { trpc } from "@lib/trpc/client";
 import { wizardDataSchema, type WizardData } from "@buildrik/shared/schemas/onboarding";
 import { WizardProvider } from "./wizard-context";
@@ -21,7 +22,7 @@ export function WizardBoot({ children }: { children: React.ReactNode }) {
   if (isLoading) {
     return (
       <div className="min-h-dvh bg-white flex items-center justify-center">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-onb-line border-t-onb-primary" />
+        <Spinner size="md" />
       </div>
     );
   }

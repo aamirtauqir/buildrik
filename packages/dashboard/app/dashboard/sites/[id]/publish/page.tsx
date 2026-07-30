@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { trpc } from "@lib/trpc/client";
+import { Spinner } from "flowbite-react";import { trpc } from "@lib/trpc/client";
 import { PrePublishChecks } from "@/components/publish/pre-publish-checks";
 import { PublishProgress } from "@/components/publish/publish-progress";
 import { PublishSuccess } from "@/components/publish/publish-success";
@@ -65,7 +65,7 @@ export default function PublishPage() {
     if (checks.isLoading) {
       return (
         <div className="flex min-h-[400px] items-center justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-200" style={{ borderTopColor: "var(--color-primary)" }} />
+          <Spinner size="lg" />
         </div>
       );
     }

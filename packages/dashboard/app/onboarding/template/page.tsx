@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Search, LayoutTemplate } from "lucide-react";
+import { Spinner } from "flowbite-react";
 import { trpc } from "@lib/trpc/client";
 import { cn } from "@lib/utils";
 import { WizardShell } from "@/components/onboarding/wizard/wizard-shell";
@@ -71,7 +72,7 @@ export default function TemplateGalleryPage() {
 
         {list.isLoading ? (
           <div className="flex min-h-[300px] items-center justify-center self-stretch">
-            <div className="h-6 w-6 animate-spin rounded-full border-2 border-onb-line border-t-onb-primary" />
+            <Spinner size="md" />
           </div>
         ) : templates.length === 0 ? (
           <div className="flex min-h-[300px] items-center justify-center self-stretch">

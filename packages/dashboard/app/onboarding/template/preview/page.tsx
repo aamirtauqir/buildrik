@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Check, LayoutTemplate, MoreHorizontal } from "lucide-react";
+import { Spinner } from "flowbite-react";
 import { trpc } from "@lib/trpc/client";
 import { OnbBack } from "@/components/onboarding/wizard/onb-back";
 import { OnbButton } from "@/components/onboarding/wizard/onb-button";
@@ -32,7 +33,7 @@ export default function TemplatePreviewPage() {
   if (q.isLoading || !t) {
     return (
       <div className="flex min-h-dvh items-center justify-center bg-onb-surface">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-onb-line border-t-onb-primary" />
+        <Spinner size="md" />
       </div>
     );
   }

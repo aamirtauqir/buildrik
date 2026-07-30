@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, CheckCircle, XCircle } from "lucide-react";
 import { getEditorHref, useUnifiedEditorFlag } from "@/components/editor-route/unified-flag";
+import { Button, Modal } from "@/components/dashboard/primitives";
 
 export const GENERATION_STEPS = [
   { key: "QUEUED", label: "Queued" },
@@ -229,74 +230,58 @@ export function GenerationProgress({
       )}
 
       {/* Cancel confirmation modal */}
-      {showCancelModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: "rgba(18, 22, 32, 0.45)" }}>
-          <div className="mx-4 w-full max-w-sm rounded-xl bg-white p-6 shadow-xl">
-            <h2 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>
-              Cancel generation?
-            </h2>
-            <p className="mt-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>
-              All progress will be lost.
-            </p>
-            <div className="mt-5 flex justify-end gap-2">
-              <button
-                onClick={() => setShowCancelModal(false)}
-                className="rounded-lg border px-4 py-2 text-sm font-medium"
-                style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
-              >
-                Keep Generating
-              </button>
-              <button
-                onClick={handleConfirmCancel}
-                className="rounded-lg px-4 py-2 text-sm font-medium text-white"
-                style={{ backgroundColor: "var(--color-primary)" }}
-              >
-                Cancel Generation
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <Modal
+        open={showCancelModal}
+        onClose={() => setShowCancelModal(false)}
+        title="Cancel generation?"
+        width={400}
+        footer={
+          <>
+            <Button variant="ghost" size="sm" onClick={() => setShowCancelModal(false)}>
+              Keep Generating
+            </Button>
+            <Button size="sm" onClick={handleConfirmCancel}>
+              Cancel Generation
+            </Button>
+          </>
+        }
+      >
+        <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+          All progress will be lost.
+        </p>
+      </Modal>
 
       {/* Credits exhausted modal */}
-      {showCreditsModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: "rgba(18, 22, 32, 0.45)" }}>
-          <div className="mx-4 w-full max-w-sm rounded-xl bg-white p-6 shadow-xl">
-            <h2 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>
-              AI credits used up
-            </h2>
-            <p className="mt-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>
-              Upgrade for more AI generations.
-            </p>
-            <div className="mt-5 flex flex-col gap-2">
-              {onUpgrade && (
-                <button
-                  onClick={() => {
-                    setShowCreditsModal(false);
-                    onUpgrade();
-                  }}
-                  className="rounded-lg px-4 py-2 text-sm font-medium text-white"
-                  style={{ backgroundColor: "var(--color-primary)" }}
-                >
-                  Upgrade Plan
-                </button>
-              )}
-              {onUseTemplate && (
-                <button
-                  onClick={() => {
-                    setShowCreditsModal(false);
-                    onUseTemplate();
-                  }}
-                  className="rounded-lg border px-4 py-2 text-sm font-medium"
-                  style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
-                >
-                  Use a Template Instead
-                </button>
-              )}
-            </div>
-          </div>
+      <Modal open={showCreditsModal} onClose={() => setShowCreditsModal(false)} title="AI credits used up" width={400}>
+        <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+          Upgrade for more AI generations.
+        </p>
+        <div className="mt-5 flex flex-col gap-2">
+          {onUpgrade && (
+            <Button
+              className="w-full"
+              onClick={() => {
+                setShowCreditsModal(false);
+                onUpgrade();
+              }}
+            >
+              Upgrade Plan
+            </Button>
+          )}
+          {onUseTemplate && (
+            <Button
+              variant="ghost"
+              className="w-full"
+              onClick={() => {
+                setShowCreditsModal(false);
+                onUseTemplate();
+              }}
+            >
+              Use a Template Instead
+            </Button>
+          )}
         </div>
-      )}
+      </Modal>
     </div>
   );
 }
