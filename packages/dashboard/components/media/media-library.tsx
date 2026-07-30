@@ -305,7 +305,7 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
                       )}
                     </div>
                     {/* Always-on filename/size caption */}
-                    <div className="pointer-events-none absolute inset-x-0 bottom-0 px-2.5 pb-2 pt-5" style={{ background: "linear-gradient(rgba(15,23,42,0), rgba(15,23,42,0.55))" }}>
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 px-2.5 pb-2 pt-5" style={{ background: "linear-gradient(rgba(17,24,39,0), rgba(17,24,39,0.55))" }}>
                       <p className="truncate text-[11.5px] font-semibold text-white">{a.filename}</p>
                       <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.78)" }}>{formatBytes(a.bytes)}</p>
                     </div>
