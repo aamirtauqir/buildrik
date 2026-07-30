@@ -145,8 +145,7 @@
   --shadow-modal: 0 24px 60px -12px rgba(17,24,39,0.35);
 
   /* Dashboard shell + design-system contract (dc parity 2026-07-12).
-     Two-level shell: full-width top nav (56px) above the 244px sidebar
-     (narrowed from 272px in the reskin, 2026-07-18). */
+     Two-level shell: full-width 60px top nav above the 293px sidebar. */
   --topnav-h: 60px;
   --sidebar-w: 293px;
 
