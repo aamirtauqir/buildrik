@@ -2341,3 +2341,54 @@ LeftSidebarRailClick.test.tsx` + `sidebar/__tests__/TabRouter.mapping.
 test.tsx` + `rail/__tests__/LayoutShell.test.tsx` + `shell/__tests__/
 AquibraStudio.wiring.test.ts` + `shell/modals/__tests__/ConflictModal.
 test.tsx` — 18 test files / 183 tests green.
+
+### Drawer — **KEEP** (gated mini parity check: different category of component, not a shape mismatch)
+
+Per the task's own gate: run a mini parity check against flowbite's
+`Drawer` (focus/dismiss/portal) BEFORE any swap attempt; "inadequate"
+means KEEP and record the reason, not a forced swap.
+
+**Read `src/editor/ui/Drawer.tsx` first.** It is a permanently-mounted
+`<aside>` layout shell — title header (`PanelHeader`) + a body region with
+a `list`/`grid`/`table` layout variant + an optional footer. It has **no**
+`open`/`onClose` prop, no backdrop, no portal, no focus trap, no dismiss
+behavior of any kind — its own header comment says exactly what it is:
+"the 320px left panel every rail tool opens into." "Closing" it is the
+*parent's* job (unmounting the tree), not something `Drawer` itself does.
+
+**Read flowbite's `Drawer.d.ts` next.** `onClose: () => void` is a
+**required** prop; `open?: boolean`, `backdrop?: boolean`, `edge?: boolean`,
+`position?: "top" | "right" | "bottom" | "left"` — this is a slide-in/out
+**overlay** with a backdrop and dismiss semantics, the same category as
+Modal/Drawer-as-overlay in every other component library. The gate's
+"focus/dismiss/portal" comparison doesn't even apply in the direction the
+brief expected — it's not that our `Drawer` does those things differently
+or worse than flowbite's; it's that our `Drawer` doesn't attempt any of
+them at all, because it isn't an overlay. These are two different
+*categories* of component that happen to share a name, not two
+implementations of the same contract (a starker mismatch than `Tabs`,
+which at least shared the "tab switching" concept). Forcing the swap would
+mean turning a permanently-visible layout region into a dismissible
+overlay — an actual behavior change for any real consumer, not a
+restyling.
+
+**Consumer sweep (bonus finding, not the deciding factor):** a JSX-tag
+sweep for real `<Drawer` usage via `@/editor/ui` found **zero** — every
+text-match hit (`TimeTravelScrubber.tsx`, `TemplateUsageDrawer.tsx`,
+`StudioPanels.tsx`, `chrome-ui/OverlayRoot.tsx`, `rail/LayoutShell.tsx`)
+was a false positive: a comment, an unrelated locally-defined component of
+the same name, or `LayoutShell`'s own `LayoutShell.Drawer` compound-slot
+(a different component entirely). It IS exercised by real contract tests
+(`ui/__tests__/organisms.test.tsx` — labelled-landmark + layout-variant
+assertions; `ui/__tests__/shell.test.tsx` — filled in as `EditorShell`'s
+`drawer` slot example) and is a documented "shell" library primitive, not
+authored-and-abandoned code — same distinction Round 5 drew between
+`FieldRow` (0 consumers, KEEP, genuine primitive per its own header) and
+`Tag` (0 consumers, DELETE, would have needed porting to newly-authored
+dead code). Since keeping `Drawer` costs nothing (it already lives where
+it lives, already has passing tests) and the category mismatch above
+already rules out a swap on its own merits, the 0-consumer finding doesn't
+change the verdict — it's recorded for completeness, not as the reason.
+
+**Verdict: KEEP, unchanged.** No code touched, no commit for this
+component — this entry is the decision record.
