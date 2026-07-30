@@ -13,6 +13,7 @@ import * as React from "react";
 import { getBlockDefinitions } from "../../blocks/blockRegistry";
 import type { Composer } from "../../engine";
 import { useElementFlash } from "../../shared/hooks";
+import { EVENTS } from "../../shared/constants";
 import type { ComposerConfig, ProjectData, BlockData } from "../../shared/types";
 import { Button, Stack, StudioSkeleton, ToastProvider, UpgradeModal, useToast } from "@/editor/ui";
 import { StaleApprovalModal } from "./modals/StaleApprovalModal";
@@ -230,6 +231,21 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     setIsDirty: state.setIsDirty,
   });
 
+  // T10 (topbar plan): the Issues panel's page scope needs to know which page
+  // the user is on, reactively — a page switch must re-scope the list.
+  const [activePageId, setActivePageId] = React.useState<string | null>(null);
+  React.useEffect(() => {
+    if (!composer) return;
+    const read = () => setActivePageId(composer.elements.getActivePage()?.id ?? null);
+    read();
+    composer.on(EVENTS.PAGE_CHANGED, read);
+    composer.on(EVENTS.PROJECT_LOADED, read);
+    return () => {
+      composer.off(EVENTS.PAGE_CHANGED, read);
+      composer.off(EVENTS.PROJECT_LOADED, read);
+    };
+  }, [composer]);
+
   // The Issues panel had a state slot but no producer, so it rendered "No
   // issues" no matter how many the DS linter had found. Bridge the one real
   // source we have (designSystem.lintState) into it, and keep it live — the
@@ -445,6 +461,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         >
           <IssuesPanel
             issues={state.issues}
+            activePageId={activePageId}
             onClose={() => setIssuesOpen(false)}
             // Jump-to-element is a refinement: an Issue id is the issue's id,
             // not reliably an element id (lint/link/alt issues aren't 1:1 with

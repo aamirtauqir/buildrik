@@ -5,7 +5,12 @@
  * Self-contained: mounts inside the canvas content root (same coordinate space
  * as the page, so pins inherit the zoom transform) and talks to the rest of
  * the shell only through composer events:
- *   "ui:comment-mode"          {on}   Topbar toggle ↔ layer state
+ *   "ui:comment-mode"          {on?}  COMMAND in: toggle ({}) or set ({on})
+ *   "ui:comment-mode-changed"  {on}   STATE out: layer → topbar pressed state.
+ *                                     Fires on every mode change AND from the
+ *                                     unmount cleanup while mode is on — a
+ *                                     page/project switch mid-mode must
+ *                                     un-press the bar toggle.
  *   "comments:refresh"                anyone → refetch pins
  *   "comments:orphans"         {ids}  layer → ReviewTab Detached group
  *   "comments:reattach-start"  {id}   ReviewTab → layer pick-to-reattach
@@ -170,6 +175,23 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
     window.addEventListener("resize", bump);
     return () => window.removeEventListener("resize", bump);
   }, []);
+
+  // ── State broadcast (ui:comment-mode-changed) ──────────────────────────────
+  // The command event above can't tell subscribers the CURRENT state (its
+  // payload is toggle-or-set), so the layer — the state owner — broadcasts
+  // every change. The unmount emit is ref-guarded to fire only while mode is
+  // on: without it, a page switch mid-mode leaves the topbar toggle pressed.
+  const modeOnRef = React.useRef(false);
+  React.useEffect(() => {
+    modeOnRef.current = modeOn;
+    composer?.emit("ui:comment-mode-changed", { on: modeOn });
+  }, [composer, modeOn]);
+  React.useEffect(() => {
+    if (!composer) return;
+    return () => {
+      if (modeOnRef.current) composer.emit("ui:comment-mode-changed", { on: false });
+    };
+  }, [composer]);
 
   // Initial + mode-entry fetch.
   React.useEffect(() => {

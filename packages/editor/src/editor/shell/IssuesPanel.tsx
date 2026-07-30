@@ -17,11 +17,18 @@
 import * as React from "react";
 import { AlertCircle, CheckCircle2, Info } from "lucide-react";
 import { Button, PanelHeader } from "@/editor/ui";
-import type { Issue } from "./hooks/useStudioState";
+import { issueAppliesToPage, type Issue } from "./hooks/useStudioState";
 
 export interface IssuesPanelProps {
   issues: Issue[];
   onClose: () => void;
+  /**
+   * The page the user is looking at (topbar plan T10). Enables the
+   * "This page / All pages" scope filter — which only renders when at least
+   * one issue actually carries a pageId, so the control never shows two
+   * identical views (today's DS-lint issues are all site-wide).
+   */
+  activePageId?: string | null;
   /** Jump to the element/target an issue points at (its id). */
   onSelectElement?: (id: string) => void;
   /**
@@ -83,14 +90,22 @@ const FILTERS: { key: Filter; label: string }[] = [
 export const IssuesPanel: React.FC<IssuesPanelProps> = ({
   issues,
   onClose,
+  activePageId = null,
   onSelectElement,
   onFix,
   onOpenBrand,
   onIgnore,
 }) => {
   const [filter, setFilter] = React.useState<Filter>("all");
+  // T10 page scope. Defaults to "page" — "what's wrong with what I'm looking
+  // at" is the question the panel opens to answer. Site-wide issues pass the
+  // page scope too (they apply everywhere), so nothing publish-blocking hides.
+  const [scope, setScope] = React.useState<"page" | "site">("page");
   const [fixing, setFixing] = React.useState<Issue | null>(null);
   const [failed, setFailed] = React.useState<Issue | null>(null);
+  const anyPageBound = issues.some((i) => i.pageId != null);
+  const scoped =
+    anyPageBound && scope === "page" ? issues.filter((i) => issueAppliesToPage(i, activePageId)) : issues;
 
   const runFix = async (issue: Issue) => {
     if (!onFix) return;
@@ -107,9 +122,9 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
       setFixing(null);
     }
   };
-  const errorCount = issues.filter((i) => i.type === "error").length;
-  const warnCount = issues.filter((i) => i.type === "warning").length;
-  const visible = filter === "all" ? issues : issues.filter((i) => i.type === filter);
+  const errorCount = scoped.filter((i) => i.type === "error").length;
+  const warnCount = scoped.filter((i) => i.type === "warning").length;
+  const visible = filter === "all" ? scoped : scoped.filter((i) => i.type === filter);
 
   return (
     <div style={S.body}>
@@ -123,6 +138,16 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
         </div>
       ) : (
         <>
+          {anyPageBound && (
+            <div style={S.toolbar} role="group" aria-label="Issue scope">
+              <Button kind={scope === "page" ? "primary" : "ghost"} size="sm" onClick={() => setScope("page")}>
+                This page
+              </Button>
+              <Button kind={scope === "site" ? "primary" : "ghost"} size="sm" onClick={() => setScope("site")}>
+                All pages
+              </Button>
+            </div>
+          )}
           <div style={S.toolbar}>
             {FILTERS.map((f) => (
               <Button

@@ -114,4 +114,17 @@ consciously not done, not when they were forgotten.
   dev-configured-never-to-fail). The F1 exit-guard defends downstream; the source
   should still tell the truth (`offline`/`conflict` states). Blast radius:
   autosave loops, toasts, SaveStatus consumers — own arc + test sweep.
-  Depends on: F1 landed.
+  Depends on: F1 landed. Note (2026-07-30 design review): the topbar redesign
+  plan specs the `conflict` SaveStatus pill and marks it FUTURE, blocked on this
+  item (decision D11 in `docs/plans/2026-07-30-topbar-complete-redesign.md`).
+
+- [ ] **Issue producer message quality (surfaced by the 2026-07-30 topbar design
+  review, finding F19/D16).** The publish-anyway confirm modal now specs top-3
+  concrete issue rows rendered from the `Issue` shape (type + message) — the
+  safety gate is only as good as those messages. What: audit every Issue
+  producer; ensure each issue carries a human-readable message + an element
+  reference ("Broken link — Home / CTA", not "Validation failed"). Why: vague
+  messages degrade the D12 modal to an abstract count, which is exactly the
+  habituation Codex flagged. Pros: modal AND Issues panel both improve. Cons:
+  producers are scattered; small audit. Depends on: nothing — independent of
+  the topbar implementation.
