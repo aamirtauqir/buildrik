@@ -1824,6 +1824,25 @@ moved from `Field.tsx` to a new `editor/ui/FormField.tsx`, same render-prop
 API, same id/`aria-describedby` wiring, only the internals changed (flowbite
 `Label`+`HelperText` instead of the deleted bespoke ones).
 
+**T13 RESOLUTION REQUIRED (forward collision, deferred, not silent):**
+this decision — `FormField` (and `FieldRow`, and any other `editor/ui/`
+survivor still standing when that task runs) staying in `editor/ui/` —
+collides with plan Task 13, which deletes `editor/ui/` wholesale and locks
+`gate:editor-ui-gone` to fail any `@/editor/ui` import. `shared/forms/`'s
+*only* sanctioned `shared/→editor` edge is `@/editor/ui` (CLAUDE.md,
+verbatim) — so at T13 teardown, the one edge target `shared/forms/`'s 4
+real `FormField` consumers (`InputField.tsx`, `SelectField.tsx`,
+`TextareaField.tsx`, `NumberField.tsx`) are allowed to use disappears out
+from under them. This is not resolved here — T13 hasn't run yet, and
+moving `FormField` to `chrome-ui/` now would just relocate today's
+collision one file earlier for no benefit — but it must be resolved **in
+the same commit** as the T13 teardown: (1) move the surviving `editor/ui/`
+primitives to `chrome-ui/`, and (2) update CLAUDE.md's `shared/forms/`
+exception line from `@/editor/ui` to `@/editor/chrome-ui` in that same
+commit (a one-line doc change — same edge, new target, not a new
+exception). Whoever executes T13 should treat this paragraph as the
+trigger for that pairing, not discover the gate failure cold.
+
 **Tag deleted outright, not ported to `chrome-ui/`.** A fresh consumer
 sweep (JSX-tag grep across all of `src`, not just files matching a text
 search for the word "Tag") found **zero** real consumers — the only two
@@ -1915,15 +1934,18 @@ Consumers: 8 `Label` sites (`SocialTab.tsx` ×3, `SeoTab.tsx` ×3,
 `shared/forms/`, which imports concrete `flowbite-react` components in
 6 of its 8 files; the CLAUDE.md `shared/→editor` restriction is about the
 internal `editor/` layer, not the third-party npm package) = 9 total.
-11 `HelperText` sites across the same 3 page-settings files + 1 in
-`InspectorTabContent.tsx` (2 of the 11 are the `error`/`color="failure"`
-variant: `SeoTab.tsx`'s slug error, `AdvancedTab.tsx`'s head-code error).
+12 `HelperText` sites across the same 3 page-settings files (`SeoTab.tsx`
+×4, `SocialTab.tsx` ×2, `AdvancedTab.tsx` ×6) + 1 in
+`InspectorTabContent.tsx` = 13 total (2 of the 12 page-settings sites are
+the `error`/`color="failure"` variant: `SeoTab.tsx`'s slug error,
+`AdvancedTab.tsx`'s head-code error).
 None of the real call sites pass `required` to `FormField` today (grepped
 every site) — kept working regardless, since it's part of the component's
 declared public API, not a newly-invented capability.
 
-**Consumer sweep totals:** Cluster 11, Label 9, HelperText 12 (11 plain +
-the `InspectorTabContent.tsx` one, 2 error-variant), FormField 7 call
+**Consumer sweep totals:** Cluster 11, Label 9, HelperText 13 (12 across
+the 3 page-settings files + the `InspectorTabContent.tsx` one, 2
+error-variant), FormField 7 call
 sites across 5 files (`InputField.tsx`, `SelectField.tsx`,
 `TextareaField.tsx`, `NumberField.tsx` ×1 each, `SendForReview.tsx` ×3 —
 none needed an import-path change since `FormField` stayed in
