@@ -631,6 +631,7 @@ ${html}
       updatedAt: new Date().toISOString(),
     };
     this.markDirty();
+    this.emit(EVENTS.PROJECT_METADATA_CHANGED, this.getProjectMetadata());
   }
 
   /**
@@ -648,6 +649,9 @@ ${html}
       ...this.projectMetadata,
       ...metadata,
     };
+    // Deliberately no markDirty (load path), but consumers of the name —
+    // the topbar — still need to hear about it (F7).
+    this.emit(EVENTS.PROJECT_METADATA_CHANGED, this.getProjectMetadata());
   }
 
   // ============================================

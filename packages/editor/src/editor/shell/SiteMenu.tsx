@@ -61,6 +61,15 @@ function openDashboard(path: string) {
   window.open(`${DASHBOARD_URL}${path}`, "_blank", "noopener,noreferrer");
 }
 
+/**
+ * F6 (OV#5): ⌘H is macOS's OS-level window-hide — the browser never sees the
+ * keydown, so advertising it is a lie. The handler (useEditorShortcuts:88)
+ * accepts ctrl OR meta on every platform; the hint shows the chord that
+ * actually works where the user is.
+ */
+const IS_MAC = typeof navigator !== "undefined" && /Mac|iP(hone|ad|od)/.test(navigator.platform);
+const HISTORY_KBD = IS_MAC ? "⌃H" : "Ctrl H";
+
 export const SiteMenu: React.FC<SiteMenuProps> = ({
   onOpenSiteSettings,
   onOpenHistory,
@@ -95,7 +104,7 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
       placement="bottom-end"
       label="Site menu"
       trigger={
-        <IconButton label="Site menu" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
+        <IconButton label="Site menu" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
           <SiteMenuIcon />
         </IconButton>
       }
@@ -108,7 +117,7 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
             </MenuItem>
           ) : null}
           {onOpenHistory ? (
-            <MenuItem kbd="⌘H" onClick={run(onOpenHistory)}>
+            <MenuItem kbd={HISTORY_KBD} onClick={run(onOpenHistory)}>
               Version history
             </MenuItem>
           ) : null}

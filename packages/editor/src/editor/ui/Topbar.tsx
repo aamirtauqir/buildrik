@@ -54,8 +54,7 @@ export interface TopbarProps {
   publishBlockedReason?: string;
   /** Replaces the built-in Publish button — e.g. an editor who sends for review instead. */
   action?: React.ReactNode;
-  onOpenMenu?: () => void;
-  /** Replaces the built-in ⋯ button — for a menu that owns its own trigger. */
+  /** The ⋯ site menu — a node that owns its own trigger (SiteMenu). */
   menu?: React.ReactNode;
 }
 
@@ -68,7 +67,7 @@ const PUBLISH_LABEL: Record<PublishState, string> = {
 export function Topbar({
   siteName, onExit, save, savedAt, onSave, review, presence,
   unreadCount = 0, onOpenNotifications, publish = "ready", publishBusy, onPublish,
-  publishBlockedReason, action, onOpenMenu, menu,
+  publishBlockedReason, action, menu,
 }: TopbarProps) {
   return (
     <header className="bk-topbar">
@@ -129,11 +128,7 @@ export function Topbar({
         )
       )}
 
-      {menu ?? (
-        <IconButton label="Site menu" onClick={onOpenMenu}>
-          <SiteMenuIcon />
-        </IconButton>
-      )}
+      {menu}
     </header>
   );
 }

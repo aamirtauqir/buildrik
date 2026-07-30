@@ -12,7 +12,7 @@
  */
 
 import * as React from "react";
-import { render, screen, fireEvent, cleanup, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, cleanup, waitFor, act } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // ── controllable module mocks ────────────────────────────────────────────────
@@ -58,10 +58,6 @@ vi.mock("../modals/CommandPalette", () => ({
       <button onClick={props.onClose}>close</button>
     </div>
   ),
-}));
-
-vi.mock("@/editor/design-system/ui/ColorModeIconCycle", () => ({
-  ColorModeIconCycle: () => <div data-testid="color-mode-cycle" />,
 }));
 
 import { StudioHeader, type StudioHeaderProps } from "../StudioHeader";
@@ -379,7 +375,9 @@ describe("StudioHeader", () => {
       const labels = screen.getAllByRole("menuitem").map((i) => i.textContent);
       expect(labels.slice(0, 8)).toEqual([
         "Site settings⌘,",
-        "Version history⌘H",
+        // F6: jsdom's navigator.platform is not macOS, so the hint is the
+        // chord that actually works there (the handler takes ctrl OR meta).
+        "Version historyCtrl H",
         "Publish history",
         "Export code",
         "Templates",
@@ -407,12 +405,13 @@ describe("StudioHeader", () => {
       },
     );
 
-    it("Preview site opens the shell overlay — ⌘P is a different feature", () => {
+    it("Preview site opens the shell overlay — ⌘P is a different feature", async () => {
       const onInlinePreview = vi.fn();
       render(<StudioHeader {...makeProps({ ...menuProps, onInlinePreview })} />);
       fireEvent.click(screen.getByRole("button", { name: "Site menu" }));
       fireEvent.click(screen.getByRole("menuitem", { name: "Preview site" }));
-      expect(onInlinePreview).toHaveBeenCalledTimes(1);
+      // F7-B2: the export runs a tick later so the loading state can paint.
+      await waitFor(() => expect(onInlinePreview).toHaveBeenCalledTimes(1));
     });
 
     it("counts open issues on the row", () => {
@@ -621,5 +620,107 @@ describe("F3 review pill", () => {
     const pill = await screen.findByText(/Approved by Sara/);
     expect(pill.textContent).toMatch(/59m ago/);
     expect(pill.textContent).not.toMatch(/just now/);
+  });
+});
+
+// ── F7 · perf pair ──────────────────────────────────────────────────────────
+describe("F7 perf pair", () => {
+  function makeComposer(meta: { name: string }) {
+    const handlers = new Map<string, Set<(...args: unknown[]) => void>>();
+    return {
+      on: vi.fn((ev: string, fn: (...args: unknown[]) => void) => {
+        if (!handlers.has(ev)) handlers.set(ev, new Set());
+        handlers.get(ev)!.add(fn);
+      }),
+      off: vi.fn((ev: string, fn: (...args: unknown[]) => void) => {
+        handlers.get(ev)?.delete(fn);
+      }),
+      emit: (ev: string) => {
+        handlers.get(ev)?.forEach((fn) => fn());
+      },
+      getProjectMetadata: vi.fn(() => meta),
+      exportHTML: vi.fn(() => ({ combined: "<html><body>x</body></html>" })),
+    };
+  }
+  type FakeComposer = ReturnType<typeof makeComposer>;
+  const asComposer = (c: FakeComposer) => c as unknown as StudioHeaderProps["composer"];
+
+  it("subscribes to the composer once, not once per canvas selection", () => {
+    const composer = makeComposer({ name: "Acme" });
+    const { rerender } = render(<StudioHeader {...makeProps({ composer: asComposer(composer) })} />);
+    const callsAfterMount = composer.on.mock.calls.length;
+    for (const id of ["a", "b", "c"]) {
+      rerender(
+        <StudioHeader
+          {...makeProps({ composer: asComposer(composer), selectedElement: { id, type: "text" } })}
+        />,
+      );
+    }
+    expect(composer.on.mock.calls.length).toBe(callsAfterMount);
+    expect(composer.off).not.toHaveBeenCalled();
+  });
+
+  it("a rename reaches the bar via PROJECT_METADATA_CHANGED", async () => {
+    const meta = { name: "Before" };
+    const composer = makeComposer(meta);
+    render(<StudioHeader {...makeProps({ composer: asComposer(composer) })} />);
+    expect(screen.getByText("Before")).toBeTruthy();
+    meta.name = "After";
+    act(() => composer.emit("project:metadata-changed"));
+    expect(screen.getByText("After")).toBeTruthy();
+  });
+
+  it("the preview loading state paints before the export blocks the thread", () => {
+    vi.useFakeTimers();
+    try {
+      const composer = makeComposer({ name: "Acme" });
+      const onSetPreviewLoading = vi.fn();
+      const onInlinePreview = vi.fn();
+      render(
+        <StudioHeader
+          {...makeProps({ composer: asComposer(composer), onSetPreviewLoading, onInlinePreview })}
+        />,
+      );
+      fireEvent.click(screen.getByRole("button", { name: "Site menu" }));
+      fireEvent.click(screen.getByRole("menuitem", { name: "Preview site" }));
+      expect(onSetPreviewLoading).toHaveBeenCalledWith(true);
+      expect(composer.exportHTML).not.toHaveBeenCalled();
+      act(() => {
+        vi.runAllTimers();
+      });
+      expect(composer.exportHTML).toHaveBeenCalledTimes(1);
+      expect(onInlinePreview).toHaveBeenCalledTimes(1);
+      expect(onSetPreviewLoading).toHaveBeenLastCalledWith(false);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
+
+// ── F9 · a11y pass ──────────────────────────────────────────────────────────
+describe("F9 a11y", () => {
+  it("the site-menu trigger announces itself as a menu button", () => {
+    render(<StudioHeader {...makeProps()} />);
+    expect(screen.getByRole("button", { name: "Site menu" }).getAttribute("aria-haspopup")).toBe("menu");
+  });
+
+  it("focus moves into the notification panel on open and returns to the bell on close", async () => {
+    render(<StudioHeader {...makeProps()} />);
+    const bell = screen.getByRole("button", { name: "Notifications" });
+    bell.focus();
+    fireEvent.click(bell);
+    const panel = await screen.findByRole("dialog", { name: "Notifications" });
+    expect(document.activeElement).toBe(panel);
+    fireEvent.keyDown(document, { key: "Escape" });
+    await waitFor(() => expect(screen.queryByRole("dialog", { name: "Notifications" })).toBeNull());
+    expect(document.activeElement).toBe(bell);
+  });
+
+  it("⌘K is a no-op while a modal dialog owns the keyboard", () => {
+    render(<StudioHeader {...makeProps({ isDirty: true })} />);
+    fireEvent.click(screen.getByRole("button", { name: "‹ Exit" }));
+    expect(screen.getByText("Leave the editor?")).toBeTruthy();
+    fireEvent.keyDown(document, { key: "k", metaKey: true });
+    expect(screen.queryByTestId("command-palette")).toBeNull();
   });
 });

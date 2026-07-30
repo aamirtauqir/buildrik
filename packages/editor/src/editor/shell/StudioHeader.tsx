@@ -52,7 +52,6 @@ import { getEditorViewMode } from "../../shared/utils/editorViewMode";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import type { SyncStatus, Issue } from "./hooks/useStudioState";
 import { useEditorRole } from "./hooks/useEditorRole";
-import { ColorModeIconCycle } from "@/editor/design-system/ui/ColorModeIconCycle";
 import { CommandPalette } from "./modals/CommandPalette";
 import { NotificationPanel, useUnreadCount } from "./NotificationPanel";
 import { SendForReview } from "./SendForReview";
@@ -213,6 +212,9 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   React.useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        // F9: a modal dialog (exit guard, confirm) owns the keyboard — opening
+        // the palette on top of it would stack two focus traps.
+        if (document.querySelector('[role="dialog"][aria-modal="true"]')) return;
         e.preventDefault();
         setCmdOpen((v) => !v);
       }
@@ -255,27 +257,33 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   }, [lastSavedAt, lastSaved]);
 
   // Redesign P5: the live site name, read from the composer rather than a
-  // "My project" placeholder. Reactive to project load and page switch;
-  // selectedElement is a dep so an inspector rename re-reads.
+  // "My project" placeholder. F7: PROJECT_METADATA_CHANGED fires from every
+  // metadata writer, so the old selectedElement-dep hack (which resubscribed
+  // these listeners on every canvas click) is gone.
   const [siteName, setSiteName] = React.useState("Untitled site");
   React.useEffect(() => {
     if (!composer) return;
     const read = () => setSiteName(composer.getProjectMetadata?.()?.name || "Untitled site");
     read();
     composer.on(EVENTS.PROJECT_LOADED, read);
-    composer.on(EVENTS.PAGE_CHANGED, read);
+    composer.on(EVENTS.PROJECT_METADATA_CHANGED, read);
     return () => {
       composer.off(EVENTS.PROJECT_LOADED, read);
-      composer.off(EVENTS.PAGE_CHANGED, read);
+      composer.off(EVENTS.PROJECT_METADATA_CHANGED, read);
     };
-  }, [composer, selectedElement]);
+  }, [composer]);
 
   const handlePreview = React.useCallback(() => {
     if (previewLoading) return;
     onSetPreviewLoading(true);
-    const rawHtml = composer?.exportHTML().combined || "<!DOCTYPE html><html><body>No content</body></html>";
-    onInlinePreview(sanitizeHTMLForPreview(rawHtml));
-    setTimeout(() => onSetPreviewLoading(false), 300);
+    // F7-B2: exportHTML is synchronous and can be heavy on big sites — yield a
+    // tick so the loading state PAINTS before the export blocks the thread.
+    // (The old fake 300ms timer pretended to load; the real work replaces it.)
+    setTimeout(() => {
+      const rawHtml = composer?.exportHTML().combined || "<!DOCTYPE html><html><body>No content</body></html>";
+      onInlinePreview(sanitizeHTMLForPreview(rawHtml));
+      onSetPreviewLoading(false);
+    }, 0);
   }, [composer, previewLoading, onSetPreviewLoading, onInlinePreview]);
 
   const handleExport = React.useCallback(() => {

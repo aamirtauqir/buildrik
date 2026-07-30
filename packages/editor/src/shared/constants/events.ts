@@ -24,6 +24,7 @@ export const EVENTS = {
   PROJECT_SAVED: "project:saved",
   PROJECT_LOADED: "project:loaded",
   PROJECT_CLEARED: "project:cleared",
+  PROJECT_METADATA_CHANGED: "project:metadata-changed",
   SETTINGS_CHANGE: "settings:change",
 
   // ============================================

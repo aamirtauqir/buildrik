@@ -63,6 +63,15 @@ type LoadState = "loading" | "ready" | "error";
 export const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose, onRead, onNavigate, addToast }) => {
   const [state, setState] = React.useState<LoadState>("loading");
   const [rows, setRows] = React.useState<EditorNotification[]>([]);
+  const panelRef = React.useRef<HTMLDivElement | null>(null);
+
+  // F9: keyboard users land inside the dialog they opened, and get put back on
+  // the bell when it closes — otherwise Escape strands focus on <body>.
+  React.useEffect(() => {
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    panelRef.current?.focus();
+    return () => opener?.focus();
+  }, []);
 
   const load = React.useCallback(async () => {
     setState("loading");
@@ -119,7 +128,7 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose, o
   });
 
   return (
-    <div className="bk-notifications" role="dialog" aria-label="Notifications">
+    <div ref={panelRef} tabIndex={-1} className="bk-notifications" role="dialog" aria-label="Notifications">
       <div className="bk-notifications__head">
         <span className="bk-notifications__title">Notifications</span>
         {/* F5: no mark-all while there is nothing loaded to mark. */}
