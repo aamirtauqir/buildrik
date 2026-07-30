@@ -10,24 +10,12 @@
  */
 import React from "react";
 import { createPortal } from "react-dom";
-
-const ROOT_ID = "bk-overlay-root";
-
-function overlayRoot(): HTMLElement | null {
-  if (typeof document === "undefined") return null;
-  let root = document.getElementById(ROOT_ID);
-  if (!root) {
-    root = document.createElement("div");
-    root.id = ROOT_ID;
-    document.body.appendChild(root);
-  }
-  return root;
-}
+import { getOverlayRoot } from "./OverlayRoot";
 
 export function Portal({ children }: { children: React.ReactNode }) {
   const [root, setRoot] = React.useState<HTMLElement | null>(null);
   React.useEffect(() => {
-    setRoot(overlayRoot());
+    setRoot(getOverlayRoot());
   }, []);
   if (!root) return null;
   return createPortal(children, root);

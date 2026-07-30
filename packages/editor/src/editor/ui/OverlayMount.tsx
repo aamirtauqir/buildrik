@@ -10,7 +10,7 @@
  */
 import React from "react";
 import { createPortal } from "react-dom";
-import { useFocusTrap } from "./useFocusTrap";
+import { useFocusTrap } from "../chrome-ui/focus";
 
 export interface OverlayMountProps {
   open: boolean;

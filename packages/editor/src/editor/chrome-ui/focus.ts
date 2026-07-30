@@ -63,3 +63,17 @@ export function useFocusTrap(active: boolean, onEscape?: () => void) {
 
   return ref;
 }
+
+/**
+ * Is ANY modal dialog holding the keyboard right now?
+ *
+ * The F9 rule, exported alongside the focus trap so every window-level
+ * keyboard handler can honour it: an open `aria-modal` dialog owns the
+ * keyboard — global shortcuts (C, ?, ⌘K, ⌘S, undo) and capture-phase Esc
+ * handlers must stand down, or they fire behind the dialog (live-reproduced:
+ * C mounted the comment layer under the shortcuts modal; Esc killed comment
+ * mode and left the modal open).
+ */
+export function isModalOpen(): boolean {
+  return Boolean(document.querySelector('[role="dialog"][aria-modal="true"]'));
+}

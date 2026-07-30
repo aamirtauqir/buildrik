@@ -1,0 +1,10 @@
+/**
+ * chrome-ui — the flowbite-react chrome layer (spec §4.3-4.4).
+ *
+ * Barrel exports only — no logic here.
+ *
+ * @license BSD-3-Clause
+ */
+export { getOverlayRoot } from "./OverlayRoot";
+export { Portal } from "./Portal";
+export { useFocusTrap, isModalOpen } from "./focus";
