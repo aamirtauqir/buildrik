@@ -8,7 +8,7 @@
 import { Info, X } from "lucide-react";
 import * as React from "react";
 import { Input } from "@/editor/ui";
-import { BK_SELECT_BARE_THEME } from "@/editor/ui/selectTheme";
+import { BK_SELECT_BARE_UNIT_THEME, BK_SELECT_BARE_VALUE_THEME } from "@/editor/ui/selectTheme";
 import { Button, Select, Textarea, Tooltip } from "flowbite-react";
 
 // ============================================================================
@@ -273,7 +273,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
           {!isKeywordUnit && (
             <Select
               className="bdi-u"
-              theme={BK_SELECT_BARE_THEME}
+              theme={BK_SELECT_BARE_UNIT_THEME}
               value={unit}
               onChange={(e) => handleUnitChange(e.target.value)}
               disabled={disabled}
@@ -326,7 +326,7 @@ export const SelectRow: React.FC<SelectRowProps> = ({
       <div className="bdi-ddn">
         <Select
           className="bdi-v"
-          theme={BK_SELECT_BARE_THEME}
+          theme={BK_SELECT_BARE_VALUE_THEME}
           value={value}
           onChange={(e) => onChange(e.target.value)}
         >

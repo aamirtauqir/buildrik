@@ -1504,6 +1504,15 @@ tests + `atoms.test.tsx` + `flowbite-parity.test.tsx` + every inspector
 section test that renders `SelectRow`/`SelectControl` transitively — 28
 files, 253 tests, all green.
 
+**Fix round 1 (reviewer finding, post-commit):** `BK_SELECT_BARE_THEME` split
+into `BK_SELECT_BARE_UNIT_THEME` / `BK_SELECT_BARE_VALUE_THEME` —
+`sizes.md`'s `tw:p-0` neutralized the default `p-2.5` but left flowbite's
+`text-sm` (also in `sizes.md`) unneutralized, since `text-inherit` (this
+theme's color reset) and `text-sm` are different tailwind-merge conflict
+groups. Full mechanism + fix documented in `selectTheme.ts`'s own header
+comment (kept as the single source, not duplicated here). See
+`task-5-report.md`'s "Fix round 1" section for verification evidence.
+
 ### Textarea → `flowbite-react` `Textarea`
 
 `src/editor/ui/Textarea.tsx` (bare `<textarea className="bk-textarea">`, with
