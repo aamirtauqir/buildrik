@@ -33,18 +33,26 @@ describe("flowbite Modal vs modal-owns-keyboard + focus contract (chrome-ui/focu
   // `document.querySelector('[role="dialog"][aria-modal="true"]')` — the
   // sole enforcement point for the ff230492 fix ("an open modal owns the
   // keyboard — everywhere") depended on by StudioHeader.tsx:248,
-  // useEditorShortcuts.ts:75 and CommentLayer.tsx:213. Our own OverlayMount
-  // already stamps both attributes together (ui/OverlayMount.tsx:39) — proof
-  // the pairing is load-bearing, not incidental. A caller CAN work around the
-  // gap by passing `aria-modal="true"` manually (it lands via the
-  // restProps -> getFloatingProps spread onto the dialog div — verified
-  // below), but nothing requires it: the prop is optional, TypeScript will
-  // not flag its absence, and omitting it silently reproduces the exact
-  // production bug ff230492 fixed (global shortcuts fire behind an open
-  // modal). Secondary finding: Escape-to-close is opt-in via `dismissible`
-  // (default false) rather than the always-on behavior our useFocusTrap
-  // gives every overlay; focus-trap-on-open does work, but only after an
-  // async flush, not synchronously on mount.
+  // useEditorShortcuts.ts:75 and canvas/comments/CommentLayer.tsx:213. Our
+  // own OverlayMount already stamps both attributes together
+  // (ui/OverlayMount.tsx:39) — proof the pairing is load-bearing, not
+  // incidental. A caller CAN work around the gap by passing
+  // `aria-modal="true"` manually (it lands via the restProps ->
+  // getFloatingProps spread onto the dialog div — verified below), but
+  // nothing requires it: the prop is optional, TypeScript will not flag its
+  // absence, and omitting it silently reproduces the exact production bug
+  // ff230492 fixed (global shortcuts fire behind an open modal). Decisive
+  // evidence #2: even WITH dismissible + a manually-added aria-modal, Escape
+  // still LEAKS to a bubble-phase document keydown listener (verified
+  // below) — @floating-ui/react's useDismiss registers its own Escape
+  // handler on `document` in the bubble phase and never calls
+  // stopPropagation (floating-ui.react.mjs:2772-2773), unlike our
+  // useFocusTrap's capture-phase handler (chrome-ui/focus.ts:39,57) which
+  // stops the event before any bubble listener sees it. Secondary finding:
+  // Escape-to-close is opt-in via `dismissible` (default false) rather than
+  // the always-on behavior our useFocusTrap gives every overlay; focus-
+  // trap-on-open does work, but only after an async flush, not
+  // synchronously on mount.
 
   it("accepts a root prop that targets the shared overlay root (spec §4.4)", () => {
     render(
@@ -87,7 +95,16 @@ describe("flowbite Modal vs modal-owns-keyboard + focus contract (chrome-ui/focu
     expect(onClose).not.toHaveBeenCalled();
   });
 
-  it("Escape DOES call onClose once dismissible is passed, and does not leak to a document listener (ff230492)", () => {
+  it("Escape DOES call onClose once dismissible is passed, but the event LEAKS to a bubble-phase document listener (decisive KEEP evidence #2, ff230492)", () => {
+    // useFocusTrap (chrome-ui/focus.ts:57) registers its Escape handler in
+    // the CAPTURE phase and calls e.stopPropagation() (focus.ts:39) before
+    // any bubble-phase listener runs — that is what stops a global keydown
+    // handler (like useEditorShortcuts.ts) from double-reacting to the same
+    // Escape a modal just consumed. flowbite's dismiss handler
+    // (@floating-ui/react useDismiss, floating-ui.react.mjs:2772-2773) is
+    // registered on `document` in the BUBBLE phase and never calls
+    // stopPropagation, so a bubble-phase document listener registered by
+    // application code still sees the same Escape keydown. Verified: it does.
     const leaked = vi.fn();
     document.addEventListener("keydown", leaked);
     const onClose = vi.fn();
@@ -99,6 +116,7 @@ describe("flowbite Modal vs modal-owns-keyboard + focus contract (chrome-ui/focu
     );
     fireEvent.keyDown(document.activeElement ?? document.body, { key: "Escape" });
     expect(onClose).toHaveBeenCalled();
+    expect(leaked).toHaveBeenCalled();
 
     document.removeEventListener("keydown", leaked);
   });
@@ -255,10 +273,18 @@ describe("flowbite Tooltip vs anchored show/hide contract (ui/Popover.tsx:1-13)"
   });
 
   it("shows the tooltip content on hover trigger (default trigger mode)", () => {
+    // getByText("tip text") resolves theme.content (Tooltip/theme.js) — an
+    // INNER div flowbite always renders regardless of open state. The real
+    // show/hide toggle is theme.hidden ("invisible opacity-0", applied with
+    // the tw: prefix as "tw:invisible tw:opacity-0") on the OUTER wrapper,
+    // `[data-testid="flowbite-tooltip"]` (Floating.js). Asserting on the
+    // inner text node alone is vacuous — it never changes. Assert the
+    // wrapper's class toggle instead.
     render(<Tooltip content="tip text">hover me</Tooltip>);
-    const target = screen.getByText("hover me");
-    fireEvent.mouseEnter(target);
-    expect(screen.getByText("tip text")).toBeInTheDocument();
+    const wrapper = screen.getByTestId("flowbite-tooltip");
+    expect(wrapper.className).toMatch(/tw:invisible/);
+    fireEvent.mouseEnter(screen.getByText("hover me"));
+    expect(wrapper.className).not.toMatch(/tw:invisible/);
   });
 
   it("also shows on keyboard focus even though trigger defaults to hover — useFocus is always wired in", () => {
@@ -267,9 +293,10 @@ describe("flowbite Tooltip vs anchored show/hide contract (ui/Popover.tsx:1-13)"
         <button type="button">target</button>
       </Tooltip>,
     );
+    const wrapper = screen.getByTestId("flowbite-tooltip");
+    expect(wrapper.className).toMatch(/tw:invisible/);
     fireEvent.focus(screen.getByText("target"));
-    const tip = screen.getByText("tip text");
-    expect(tip.className).not.toMatch(/tw:invisible/);
+    expect(wrapper.className).not.toMatch(/tw:invisible/);
   });
 });
 
@@ -296,10 +323,17 @@ describe("flowbite Toast vs one-action lifecycle contract (ui/Toast.tsx:1-16, ui
     vi.useRealTimers();
   });
 
-  it("exposes no queue/store — each Toast is a standalone container the caller must manage", () => {
+  it("renders a single role=alert container, with no aria-live viewport wiring beyond it", () => {
+    // This only asserts what's directly observable in the DOM: one static
+    // role="alert" node, no aria-live attribute anywhere. The broader
+    // queue/store fact (no module-level store, no multi-item viewport) is
+    // a source-code claim, not something a single render can assert against
+    // — it's recorded as a citation in the inventory verdict instead
+    // (Toast.js has no store; contrast ui/Toast.tsx:49 store +
+    // ui/Toast.tsx:112-128 ToastViewport).
     render(<Toast>content</Toast>);
-    // role="alert" per Toast.js — a single static alert, not a multi-item
-    // aria-live viewport like ToastViewport (ui/Toast.tsx:112-128).
-    expect(screen.getByRole("alert")).toBeInTheDocument();
+    const alert = screen.getByRole("alert");
+    expect(alert).toBeInTheDocument();
+    expect(document.querySelectorAll("[aria-live]").length).toBe(0);
   });
 });
