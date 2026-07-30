@@ -606,10 +606,6 @@ src/editor/sidebar/tabs/templates/TemplatesTab.css
 src/editor/sidebar/tabs/templates/TemplatesTabModals.tsx
 src/editor/sidebar/tabs/templates/components/TemplateDetail.tsx
 src/editor/sidebar/tabs/templates/components/TemplateUsageDrawer.tsx
-src/editor/ui/HelpTooltip.tsx
-src/editor/ui/Slider.tsx
-src/editor/ui/TreeRow.tsx
-src/editor/ui/ui.css
 src/engine/canvas/constants.ts
 src/engine/elements/__tests__/ElementDataSchema.test.ts
 src/shared/constants/canvas.ts
