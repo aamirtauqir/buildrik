@@ -2078,3 +2078,90 @@ since the class name itself didn't change, only its file location.
 Verified: `npx tsc --noEmit` clean. Targeted run: `ui/__tests__` +
 `shared/forms` + `editor/animation` + `editor/panels/version-history` —
 14 test files / 175 tests green.
+
+### Tabs — **KEEP** (never run through the Task 4 process; structural mismatch found this round)
+
+`Tabs` wasn't in the Task 4 "Behavior parity verdicts" table above (that
+table only covers Modal/Dropdown/Popover/Tooltip/Toast) — same gap the
+Round-4 report already flagged for Input/Field ("apparently was never run
+through that same process"). No existing verdict to execute; this is a
+fresh judgment call, made under the same authority the controller granted
+Slider's round ("if composition proves genuinely worse than keeping ours…
+record KEEP — reason… parity-of-outcome beats forced swap").
+
+**Consumer sweep first** (JSX-tag, not text grep — `Tabs`/`tabs` collide
+with `tabsConfig`, `getTabsByZone`, a hand-rolled unrelated tab bar in
+`ProjectSettingsModal.tsx` built from `Button`s, and others): exactly 4
+real consumers of `<Tabs` from `@/editor/ui` —
+`editor/animation/AnimationEditor.tsx`, `editor/export/ExportModal.tsx`,
+`editor/export/CodePreview.tsx`, `editor/media/MediaLibraryPanel.tsx`.
+Every one uses the identical shape: `const [activeTab, setActiveTab] =
+useState(...)`, `<Tabs tabs={[...]} value={activeTab}
+onChange={setActiveTab} />`, then the active panel's content rendered as
+a **sibling**, conditionally, sometimes visually and structurally distant
+from the `<Tabs>` element itself (`MediaLibraryPanel.tsx`'s tab content
+lives in a separate `<div style={styles.container}>` after the Tabs;
+`ExportModal.tsx`'s Tabs sit in one wrapper div, its content in a
+different one 8 lines later). No consumer switches tabs from outside the
+`onChange` handler (checked every file for a second `setActiveTab(...)`
+call site — none found).
+
+**Read `Tabs.js`/`TabItem.js`/`theme.js` in full before judging** (same
+discipline every prior component's "map the API first" step used) and
+found a structural mismatch bigger than any prior SWAP candidate's:
+
+1. **flowbite's `Tabs` bundles trigger + panel ownership.** Panel content
+   must be passed as `<TabItem title="…">{content}</TabItem>` *children*
+   of `<Tabs>` itself — `Tabs.js` reads `Children.toArray(children)` to
+   build both the tablist buttons AND the panel `<div>`s
+   (`tab.children` rendered inside `role="tabpanel"` divs it owns). Our
+   `Tabs` is deliberately headless — it renders `role="tablist"` and
+   nothing else; every real consumer's panel content lives completely
+   outside it. Adopting flowbite's `Tabs` as-is would force every one of
+   the 4 consumers to physically relocate its panel JSX inside `<TabItem>`
+   children — a real structural rewrite of each file's render tree, not a
+   prop-mapping exercise.
+2. **No externally-controlled `value` prop exists at all.** `activeTab`
+   is `useState(Math.max(0, tabs.findIndex(tab => tab.active)))` —
+   evaluated **once**, at mount, from the initial `active` prop on each
+   `TabItem`. After mount, the only way to change it from outside a click
+   is the imperative `ref.setActiveTab(index)` exposed via
+   `useImperativeHandle` — there is no prop that keeps `activeTab` in
+   sync with external state the way our `value` does. Every real consumer
+   here relies on ordinary React controlled-component semantics
+   (`value={activeTab}`); porting to flowbite's `Tabs` would mean either
+   accepting one-way-uncontrolled behavior after the first click, or
+   wiring a `useEffect` that calls a ref method on every external state
+   change — a strictly worse pattern than the prop we'd be deleting, for
+   a component whose whole existence in this codebase is 47 lines of
+   plain ARIA-tablist keyboard handling.
+3. **Index-identity, not id-identity.** `TabItem`s are matched by array
+   position (`index === activeTab`); our `Tab.id` string-keyed API would
+   need an id→index translation layer at every call site for zero
+   behavioral gain.
+4. **Even the visual match needs work, not a freebie.** `tabsTheme`'s
+   active-tab color for every variant (`default`, `underline`, `pills`,
+   `fullWidth`) is keyed to `primary-600`/`primary-500` — the same
+   one-ramp-step-off-`#1A56DB` gap `Checkbox`/`Radio` hit (`text-primary-600`
+   vs the exact-match `text-blue-700`; flowbite's Tabs has no `color` prop
+   at all to reach it, only a full `theme` override) — so even a
+   from-scratch composition would need the same per-call-site `theme`
+   surgery already documented for those two components, on top of the
+   structural rewrite above.
+
+**Cost/benefit:** swapping would require restructuring the render tree of
+all 4 consumer files (relocating conditionally-rendered, sometimes
+visually distant panel JSX into `TabItem` children), replacing a clean
+`value`-controlled API with an imperative-ref workaround, translating
+id-keyed tab state to index-keyed, and still writing a `theme` override
+for the color match — against a KEEP baseline that is 47 lines of
+standard WAI-ARIA tablist behavior (arrow-key roving focus, Home/End,
+`aria-selected`) with a 12-line CSS block, zero bespoke visual tricks
+(no fill-bar/gradient/CSS-var complexity like Slider's), and already
+byte-exact on `--bk-accent`. No visual or UX improvement would result —
+only a larger, more coupled component in every consumer for the same
+rendered outcome. Per the same "parity-of-outcome beats forced swap"
+standard the controller set for Slider: **`src/editor/ui/Tabs.tsx` and
+its `ui.css` block are unchanged.** No commit for this component (no code
+touched) — this entry is the decision record, so the verdict isn't left
+implicit or silently skipped.
