@@ -89,10 +89,10 @@ export default function PathPage() {
               key={c.path}
               className={cn(
                 "flex min-h-80 w-80 flex-col justify-between gap-4 rounded-lg bg-white p-6",
-                "transition-[box-shadow,transform] duration-150",
-                "hover:-translate-y-[3px] hover:shadow-[0_12px_28px_color-mix(in_srgb,var(--color-onb-primary)_15%,transparent),inset_0_0_0_2px_var(--color-onb-primary)]",
+                "transition-shadow duration-150",
+                "hover:shadow-[0_4px_12px_rgba(0,0,0,0.03),inset_0_0_0_2px_var(--color-onb-primary)]",
                 isRec
-                  ? "border-l-4 border-onb-primary shadow-[0_4px_12px_rgba(0,0,0,0.03),inset_0_0_0_1px_var(--color-onb-primary)]"
+                  ? "shadow-[0_4px_12px_rgba(0,0,0,0.03),inset_0_0_0_2px_var(--color-onb-primary)]"
                   : "shadow-[0_4px_12px_rgba(0,0,0,0.03),inset_0_0_0_1px_var(--color-onb-line)]"
               )}
             >
