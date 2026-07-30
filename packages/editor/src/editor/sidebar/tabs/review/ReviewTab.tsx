@@ -18,7 +18,7 @@
 
 import * as React from "react";
 import { AlertCircle, CheckCircle2, ChevronLeft, History } from "lucide-react";
-import { Badge, ConfirmDialog, PanelHeader, Spinner, Textarea, Toggle } from "@/editor/ui";
+import { ConfirmDialog, PanelHeader, Spinner, Textarea, Toggle } from "@/editor/ui";
 import { ApprovedCompareView } from "@/editor/panels/version-history/ApprovedCompareView";
 import type { PublishPage } from "@/editor/shell/exportPublishPages";
 import {
@@ -32,15 +32,20 @@ import {
   type CurrentRound,
   type ReviewComment,
 } from "../../../../services/ReviewService";
-import { Button } from "flowbite-react";
+import { Badge, Button } from "flowbite-react";
 
-/** Review's own status words onto Badge kinds. Named, not inlined, so a new
- *  status shows up as a type error instead of silently rendering neutral. */
-const BADGE_KIND: Record<string, "neutral" | "success" | "warning" | "danger"> = {
-  published: "success",
-  syncing: "warning",
-  issues: "danger",
+/** Review's own status words onto flowbite Badge color + text-color override
+ *  (flowbite's badge color presets don't hex-match --bk-success-text/
+ *  --bk-warning-tint/--bk-error-text exactly — see docs/plans/
+ *  flowbite-bigbang-inventory.md "Task 5" Badge mapping). Named, not
+ *  inlined, so a new status shows up as a type error instead of silently
+ *  rendering neutral. */
+const BADGE_KIND: Record<string, { color: string; className?: string }> = {
+  published: { color: "success", className: "tw:text-green-600" },
+  syncing: { color: "warning", className: "tw:bg-yellow-50" },
+  issues: { color: "failure", className: "tw:text-red-700" },
 };
+const BADGE_NEUTRAL = { color: "gray" } as const;
 
 
 export interface ReviewTabProps {
@@ -355,8 +360,8 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
       <div style={S.header}>
         <div style={S.headRow}>
           <div style={S.actions}>
-            <Badge kind={BADGE_KIND[round.revoked ? "issues" : tone.variant] ?? "neutral"}>{round.revoked ? "Link revoked" : tone.label}</Badge>
-            {round.openCommentCount > 0 && <Badge kind="neutral">{round.openCommentCount} open</Badge>}
+            <Badge {...(BADGE_KIND[round.revoked ? "issues" : tone.variant] ?? BADGE_NEUTRAL)}>{round.revoked ? "Link revoked" : tone.label}</Badge>
+            {round.openCommentCount > 0 && <Badge color="gray">{round.openCommentCount} open</Badge>}
           </div>
           <div style={S.actions}>
             {round.status === "APPROVED" && onExportCurrentPages && (

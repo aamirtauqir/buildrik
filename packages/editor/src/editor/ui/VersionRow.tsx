@@ -5,7 +5,7 @@
  */
 import React from "react";
 import { Row, type RowProps } from "./Row";
-import { Badge } from "./Badge";
+import { Badge } from "flowbite-react";
 import { StatusDot, type StatusDotState } from "./StatusDot";
 
 export interface VersionRowProps extends Omit<RowProps, "children" | "size"> {
@@ -27,7 +27,7 @@ export function VersionRow({ title, meta, state, current, actions, className, ..
       <span className="bk-version-row__top">
         {state ? <StatusDot state={state} /> : null}
         <span className="bk-version-row__title">{title}</span>
-        {current ? <Badge kind="success">CURRENT</Badge> : null}
+        {current ? <Badge color="success" className="tw:text-green-600">CURRENT</Badge> : null}
         {actions}
       </span>
       <span className="bk-row__meta">{meta}</span>

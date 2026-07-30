@@ -4,14 +4,17 @@
  * @license BSD-3-Clause
  */
 import React from "react";
-import { Badge } from "./Badge";
+import { Badge } from "flowbite-react";
 
 export type IntegrationStatus = "connected" | "available" | "error";
 
-const STATUS: Record<IntegrationStatus, { kind: "success" | "neutral" | "danger"; label: string }> = {
-  connected: { kind: "success", label: "CONNECTED" },
-  available: { kind: "neutral", label: "AVAILABLE" },
-  error: { kind: "danger", label: "ERROR" },
+/** flowbite badge color + text-color override per status (flowbite's color
+ *  presets don't hex-match --bk-success-text/--bk-error-text exactly — see
+ *  docs/plans/flowbite-bigbang-inventory.md "Task 5" Badge mapping). */
+const STATUS: Record<IntegrationStatus, { color: string; className?: string; label: string }> = {
+  connected: { color: "success", className: "tw:text-green-600", label: "CONNECTED" },
+  available: { color: "gray", label: "AVAILABLE" },
+  error: { color: "failure", className: "tw:text-red-700", label: "ERROR" },
 };
 
 export interface IntegrationRowProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -34,8 +37,8 @@ export function IntegrationRow({
         <span className="bk-integration-row__name">{name}</span>
         <span className="bk-integration-row__scope">{scope}</span>
       </span>
-      {pro ? <Badge kind="pro">PRO</Badge> : null}
-      <Badge kind={s.kind}>{s.label}</Badge>
+      {pro ? <Badge color="purple">PRO</Badge> : null}
+      <Badge color={s.color} className={s.className}>{s.label}</Badge>
       {action}
     </div>
   );

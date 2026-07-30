@@ -6,9 +6,8 @@
 
 import * as React from "react";
 import { InputField } from "../shared/forms";
-import { Badge } from "@/editor/ui";
 import type { Template } from "./types";
-import { Button } from "flowbite-react";
+import { Badge, Button } from "flowbite-react";
 
 // ============================================================================
 // TYPES
@@ -247,7 +246,7 @@ export const MyTemplates: React.FC<MyTemplatesProps> = ({
 
       {/* Count */}
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <Badge kind="neutral">{templates.length}</Badge>
+        <Badge color="gray">{templates.length}</Badge>
         <span style={{ fontSize: 12, color: "var(--bk-ink-muted)" }}>
           saved template{templates.length !== 1 ? "s" : ""}
         </span>

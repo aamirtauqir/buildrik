@@ -9,7 +9,7 @@
  */
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { Input, Select, Checkbox, Radio, Toggle, Slider, Badge, StatusDot, Avatar } from "../index";
+import { Input, Select, Checkbox, Radio, Toggle, Slider, StatusDot, Avatar } from "../index";
 
 describe("Input", () => {
   it("marks the error state for assistive tech, not just visually", () => {
@@ -54,13 +54,6 @@ describe("Radio", () => {
   it("renders as a radio input", () => {
     render(<Radio name="g" aria-label="Static HTML" />);
     expect(screen.getByRole("radio", { name: "Static HTML" })).toBeTruthy();
-  });
-});
-
-describe("Badge", () => {
-  it.each(["neutral", "success", "warning", "danger", "pro"] as const)("renders the %s kind", (kind) => {
-    render(<Badge kind={kind}>LIVE</Badge>);
-    expect(screen.getByText("LIVE").className).toContain(`bk-badge--${kind}`);
   });
 });
 

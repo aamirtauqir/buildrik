@@ -10,8 +10,7 @@
  */
 import React from "react";
 import { Modal } from "./Modal";
-import { Button } from "flowbite-react";
-import { Badge } from "./Badge";
+import { Button, Badge } from "flowbite-react";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 
 export interface UpgradeModalProps {
@@ -85,7 +84,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
       }
     >
       <div className="bk-upgrade">
-        <Badge kind="pro">{requiredPlan}</Badge>
+        <Badge color="purple">{requiredPlan}</Badge>
 
         <p className="bk-upgrade__message">
           {feature

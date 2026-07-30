@@ -97,25 +97,6 @@
 .bk-toggle:focus-visible { outline: none; box-shadow: var(--bk-shadow-focus); }
 .bk-toggle:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* ── Badge · Figma 12:16 · Kind ─────────────────────────────────────────── */
-.bk-badge {
-  display: inline-flex; align-items: center;
-  height: var(--bk-space-20);
-  padding: 0 var(--bk-space-8);
-  border-radius: var(--bk-radius-md);
-  border: 1px solid transparent;
-  font-family: var(--bk-font-ui);
-  font-size: var(--bk-text-11);
-  font-weight: var(--bk-weight-medium);
-  letter-spacing: var(--bk-tracking-wide);
-  white-space: nowrap;
-}
-.bk-badge--neutral { background: var(--bk-gray-100); color: var(--bk-gray-800); border-color: var(--bk-gray-400); }
-.bk-badge--success { background: var(--bk-success-tint); color: var(--bk-success-text); border-color: var(--bk-success); }
-.bk-badge--warning { background: var(--bk-warning-tint); color: var(--bk-warning-text); border-color: var(--bk-warning); }
-.bk-badge--danger  { background: var(--bk-error-tint);   color: var(--bk-error-text);   border-color: var(--bk-error); }
-.bk-badge--pro     { background: var(--bk-purple-100);   color: var(--bk-purple-800);   border-color: var(--bk-purple-500); }
-
 /* ── Status dot · Figma 10:27 · State ───────────────────────────────────── */
 .bk-dot { width: var(--bk-space-8); height: var(--bk-space-8); border-radius: var(--bk-radius-full); flex: none; display: inline-block; }
 .bk-dot--live    { background: var(--bk-success); }

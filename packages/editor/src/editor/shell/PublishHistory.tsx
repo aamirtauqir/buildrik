@@ -14,7 +14,8 @@
 
 import * as React from "react";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
-import { Badge, ConfirmDialog, Spinner } from "@/editor/ui";
+import { ConfirmDialog, Spinner } from "@/editor/ui";
+import { Badge } from "flowbite-react";
 import { useEditorRole } from "./hooks/useEditorRole";
 import { roleAtLeast } from "@/services/RoleService";
 import {
@@ -133,7 +134,7 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
             <div style={S.left}>
               <span style={S.ver}>
                 Version {r.version}
-                {isLive && <Badge kind="neutral">Live</Badge>}
+                {isLive && <Badge color="gray">Live</Badge>}
                 {fromVersion !== undefined && <span style={S.meta}>↩ from v{fromVersion}</span>}
               </span>
               <span style={S.meta}>{relTime(r.completedAt)}</span>

@@ -851,3 +851,58 @@ on the same element (higher specificity than any class, layered or not) that
 already sets `background`/`border`/`color` unconditionally
 (`CanvasFooterToolbar.tsx`'s `zoomBtnStyles`/`zoomPctStyles`, its
 `OverlayButton`'s own `style`).
+
+### Badge → `flowbite-react` `Badge`
+
+`src/editor/ui/Badge.tsx` (`kind`) →
+`node_modules/flowbite-react/dist/components/Badge/Badge.d.ts` (`color`,
+`size`, `icon`). Default flowbite color is `"info"` (cyan) — every kind
+below needs an explicit `color`, unlike Button's primary/default overlap.
+
+| Our `kind` | Flowbite `color` | `className` override | Why |
+|---|---|---|---|
+| `neutral` | `gray` | *(none)* | `bg-gray-100`/`text-gray-800` are exact hex matches to `--bk-gray-100`/`--bk-gray-800`. |
+| `success` | `success` (≡ `green`) | `tw:text-green-600` | bg `green-100` exact match to `--bk-success-tint`; flowbite's preset text is `green-800` (`#03543F`) but `--bk-success-text` is `green-600` (`#057A55`) — one ramp step off, overridden. |
+| `warning` | `warning` (≡ `yellow`) | `tw:bg-yellow-50` | flowbite's preset text `yellow-800` (`#723B13`) already exact-matches `--bk-warning-text` — no text override needed. Its bg `yellow-100` (`#FDF6B2`) does NOT match `--bk-warning-tint` (`#FDFDEA` = `yellow-50`) — overridden. |
+| `danger` | `failure` (≡ `red`) | `tw:text-red-700` | bg `red-100` exact match to `--bk-error-tint`; flowbite's preset text `red-800` (`#9B1C1C`) vs `--bk-error-text` `red-700` (`#C81E1E`) — overridden. |
+| `pro` | `purple` | *(none)* | `bg-purple-100`/`text-purple-800` exact hex matches to `--bk-purple-100`/`--bk-purple-800` (this one pre-existing purple usage is a deliberate Figma-generated "premium" semantic token, not a new accent-color choice — DESIGN.md's purple ban is about the brand accent, left as-is, not introduced by this task). |
+
+**Border dropped.** `.bk-badge` always had a 1px kind-colored border;
+flowbite's `Badge` theme has no border class at all (`root.base` has none,
+neither does `icon.off`/`icon.on`). Accepted as a shape difference (pill vs.
+bordered chip) rather than reproduced via a `tw:border-*` add-on — consistent
+with letting flowbite's own visual language stand for structural properties,
+reserving exact-hex-match effort for color only.
+
+**Adapter judgment call:** the kind→{color,className} mapping is genuine
+prop transformation (not pass-through) and is duplicated identically across
+9 consumer files (`ReviewTab.tsx`, `IntegrationRow.tsx`, `MediaCard.tsx`,
+plus 6 more with a single literal kind). Did **not** promote it to a shared
+utility/wrapper: each of the 5 kind→props pairs is inlined at its call site
+(literal `color="gray"`, or a small local `Record` when the kind is dynamic
+— `ReviewTab.tsx`'s `BADGE_KIND`, `IntegrationRow.tsx`'s `STATUS`,
+`MediaCard.tsx`'s `BADGE_KIND_PROPS`). A one-function shared file for 5
+literal prop pairs would violate CLAUDE.md's "don't create utility files
+with one function" and add a lookup indirection for something this small;
+same precedent as Button's ghost-class string, which is also just repeated
+inline rather than centralized.
+
+**Consumers swept:** 5 via `@/editor/ui` (`PublishHistory.tsx`,
+`ReviewTab.tsx`, `LockedScreen.tsx`, `MyTemplates.tsx`,
+`TemplatePreview.tsx`) + 4 relative-import siblings inside `editor/ui/`
+(`IntegrationRow.tsx`, `MediaCard.tsx`, `UpgradeModal.tsx`,
+`VersionRow.tsx` — same blind spot as Button's internal consumers) + 1 test
+file (`atoms.test.tsx`, `describe("Badge", ...)` block deleted — its
+`bk-badge--${kind}` class assertions have no flowbite equivalent worth
+re-testing, coverage now lives in the 9 consumer files' own tests).
+`MediaCard.tsx`'s exported `BadgeKind` type (used by its own `badgeKind`
+prop, zero external consumers per the import scan) redefined locally in the
+same file rather than re-sourced from the deleted `Badge.tsx`.
+`src/themes/__tests__/badge.contrast.test.ts` left untouched — pre-existing
+failure unrelated to this component (reads a `themes/components/atoms/
+badge.css` path deleted years ago in the vibcoder cleanup, tracked
+separately per `progress.md`, not `editor/ui/Badge.tsx`).
+
+Verified: `tsc --noEmit` clean; 251 tests green across `ui/__tests__`,
+`sidebar/tabs/review`, `sidebar/tabs/settings/screens`, `templates/`, plus
+`shell/__tests__/PublishHistory.test.tsx` (8/8).

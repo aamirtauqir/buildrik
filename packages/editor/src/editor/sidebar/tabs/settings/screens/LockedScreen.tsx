@@ -4,7 +4,7 @@
  */
 
 import * as React from "react";
-import { Badge } from "@/editor/ui";
+import { Badge } from "flowbite-react";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import {
   LockedContainer,
@@ -66,7 +66,7 @@ export const LockedScreen: React.FC<LockedScreenProps> = ({
   return (
     <LockedContainer>
       <LockedIcon>
-        <Badge kind="pro">PRO</Badge>
+        <Badge color="purple">PRO</Badge>
       </LockedIcon>
       <LockedTitle>Available in {variant === "pro" ? "Pro" : "Enterprise"}</LockedTitle>
       <LockedDesc>{message ?? "Upgrade your plan to unlock this feature."}</LockedDesc>
