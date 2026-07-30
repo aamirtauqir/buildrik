@@ -18,7 +18,6 @@
 
 import * as React from "react";
 import {
-  Checkbox,
   Input,
   ModalClose,
   ModalContent,
@@ -33,7 +32,7 @@ import {
   dialogInputStyles,
   dialogPrimaryBtnStyles,
 } from "./styles";
-import { Button } from "flowbite-react";
+import { Button, Checkbox } from "flowbite-react";
 
 export interface SelectionContext {
   selectionIds: readonly string[];
@@ -153,6 +152,8 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
                 <div style={bindingsCardStyle}>
                   <label style={bindingsCheckboxStyle}>
                     <Checkbox
+                      color="blue"
+                      className="tw:bg-white"
                       checked={prefillBindings}
                       onChange={(e) => setPrefillBindings(e.target.checked)}
                       aria-label="Pre-fill bindings from DS"

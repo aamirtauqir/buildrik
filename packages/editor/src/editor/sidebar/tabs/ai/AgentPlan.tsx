@@ -1,8 +1,7 @@
 import * as React from "react";
-import { Checkbox } from "@/editor/ui";
 import { DiffRows } from "./DiffRows";
 import type { RunStep, RunPhase } from "./hooks/useAgentRunner";
-import { Button } from "flowbite-react";
+import { Button, Checkbox } from "flowbite-react";
 
 /**
  * P4 agent run surface: the ordered plan with per-step status, and on the step
@@ -44,7 +43,12 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
 }) => {
   const autoApplyToggle = (
     <label className="bd-ai-agent-autoapply">
-      <Checkbox checked={autoApply} onChange={(e) => onAutoApplyChange(e.target.checked)} />
+      <Checkbox
+        color="blue"
+        className="tw:bg-white"
+        checked={autoApply}
+        onChange={(e) => onAutoApplyChange(e.target.checked)}
+      />
       <span>Auto-apply steps (skip per-step approval)</span>
     </label>
   );

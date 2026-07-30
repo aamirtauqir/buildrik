@@ -14,7 +14,6 @@ import { Plus, Trash2, Pencil } from "lucide-react";
 import type { Composer } from "../../../engine";
 import type { CMSCollection, CMSContentItem, CMSField } from "../../../shared/types/cms";
 import {
-  Checkbox,
   Input,
   ModalClose,
   ModalContent,
@@ -24,7 +23,7 @@ import {
   Select,
   Textarea,
 } from "@/editor/ui";
-import { Button } from "flowbite-react";
+import { Button, Checkbox } from "flowbite-react";
 
 export interface CMSRecordsModalProps {
   composer: Composer | null;
@@ -138,6 +137,8 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
         <div {...common}>
           <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer" }}>
             <Checkbox
+              color="blue"
+              className="tw:bg-white"
               checked={Boolean(value)}
               onChange={(e) => setField(field.slug, e.target.checked)}
             />

@@ -5,10 +5,10 @@
  */
 
 import * as React from "react";
-import { Checkbox, Input, ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal, Stack, Textarea } from "@/editor/ui";
+import { Input, ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal, Stack, Textarea } from "@/editor/ui";
 import type { Composer } from "../../../engine";
 import { useToast } from "@/editor/ui";
-import { Button } from "flowbite-react";
+import { Button, Checkbox } from "flowbite-react";
 
 export interface CreateComponentModalProps {
   isOpen: boolean;
@@ -189,6 +189,8 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
           <label style={labelStyles}>Variant Options</label>
           <label style={checkboxLabelStyles}>
             <Checkbox
+              color="blue"
+              className="tw:bg-white"
               checked={isVariantSet}
               onChange={(e) => setIsVariantSet(e.target.checked)}
               style={checkboxStyles} />
@@ -228,6 +230,8 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
         <div style={variantSectionStyles}>
           <label style={checkboxLabelStyles}>
             <Checkbox
+              color="blue"
+              className="tw:bg-white"
               checked={prefillFromDs}
               onChange={(e) => setPrefillFromDs(e.target.checked)}
               style={checkboxStyles}

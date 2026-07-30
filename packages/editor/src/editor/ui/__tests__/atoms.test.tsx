@@ -9,8 +9,8 @@
  */
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { Input, Select, Checkbox, Radio, Toggle, Slider, StatusDot } from "../index";
-import { Avatar } from "flowbite-react";
+import { Input, Select, Radio, Toggle, Slider, StatusDot } from "../index";
+import { Avatar, Checkbox } from "flowbite-react";
 import { avatarInitials, AVATAR_TONE_THEME, type AvatarTone } from "../avatarTone";
 
 describe("Input", () => {
@@ -38,9 +38,18 @@ describe("Select", () => {
 });
 
 describe("Checkbox", () => {
-  it("applies indeterminate as a DOM property", () => {
+  it("indeterminate is CSS-only in flowbite — it does not set the native DOM property", () => {
+    // Structural gap vs the deleted ui/Checkbox.tsx (which set
+    // ref.current.indeterminate via a useEffect): flowbite's Checkbox only
+    // uses `indeterminate` to switch a dash-icon CSS class in
+    // (Checkbox/theme.js) — it never touches the DOM property, so
+    // `:indeterminate` CSS matching and native tri-state a11y semantics
+    // don't fire. Confirmed via a full-repo sweep that no consumer passes
+    // `indeterminate` today, so this is documented rather than adapted —
+    // a future consumer needing the real DOM property will need a small
+    // ref-based fix at that time.
     render(<Checkbox indeterminate aria-label="Select all" />);
-    expect((screen.getByLabelText("Select all") as HTMLInputElement).indeterminate).toBe(true);
+    expect((screen.getByLabelText("Select all") as HTMLInputElement).indeterminate).toBe(false);
   });
 });
 

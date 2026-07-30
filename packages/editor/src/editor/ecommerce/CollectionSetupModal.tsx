@@ -6,9 +6,9 @@
 
 import { ShoppingBag, Package, Check } from "lucide-react";
 import * as React from "react";
-import { Checkbox, ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/ui";
+import { ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/ui";
 import { useState } from "react";
-import { Button } from "flowbite-react";
+import { Button, Checkbox } from "flowbite-react";
 
 export interface CollectionSetupModalProps {
   isOpen: boolean;
@@ -82,6 +82,8 @@ export const CollectionSetupModal: React.FC<CollectionSetupModalProps> = ({
         <div style={checkboxContainerStyles}>
           <label style={checkboxLabelStyles}>
             <Checkbox
+              color="blue"
+              className="tw:bg-white"
               checked={includeSample}
               onChange={(e) => setIncludeSample(e.target.checked)}
               style={checkboxStyles} />

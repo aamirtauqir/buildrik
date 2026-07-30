@@ -1131,3 +1131,101 @@ Verified: `tsc --noEmit` clean; 193 tests green across
 `DisplayControls.test.tsx`, `PositionControls.test.tsx`,
 `LeftSidebarRailClick.test.tsx`, `InputWithUnit.test.tsx`; plus full
 `ui/__tests__` 130/130.
+
+### Checkbox → `flowbite-react` `Checkbox`
+
+`src/editor/ui/Checkbox.tsx` (`indeterminate`, native input props) →
+`node_modules/flowbite-react/dist/components/Checkbox/Checkbox.d.ts`
+(`color`, `indeterminate`, native input props).
+
+| Our (implicit) | Flowbite prop | Notes |
+|---|---|---|
+| always accent-colored | `color="blue"` | **not** the default. Flowbite's `color="default"` (the implicit value if omitted) uses `text-primary-600` (`#1c64f2`) for the checked fill — a real color mismatch against `--bk-accent` (`#1A56DB`). `color="blue"` uses `text-blue-700` (`#1A56DB`), the exact match — same "closest named ramp step" lookup as Badge, but here the *default* is wrong, unlike Button where omitting `color` already matched. Added explicitly at all 19 call sites. |
+| `background: var(--bk-bg-card)` (white, unchecked) | `className="tw:bg-white"` | flowbite's own unchecked fill is `bg-gray-100` (`#F3F4F6`) — a real visible mismatch, not shape drift, so fixed at every call site that renders as an actual checkbox (16 of 19 — see the 3-site carve-out below). |
+| `border-color: var(--bk-border-medium)` | *(default, no override)* | flowbite's `border-gray-300` is `#D1D5DB` — exact match to `--bk-border-medium`, confirmed via `tokens.generated.css`. |
+| `border-radius: var(--bk-radius-sm)` (4px) | *(default, no override)* | flowbite's `rounded` utility is 4px — exact match. |
+| `width/height: var(--bk-space-16)` (16px) | *(default, no override)* | flowbite's `h-4 w-4` is 16px — exact match. |
+| `indeterminate` (real DOM property, set via ref+`useEffect`) | `indeterminate` (CSS-class-only) | **Structural gap, accepted and documented rather than adapted — see below.** |
+
+**3-site carve-out for the `tw:bg-white` fix:** `LayerDisplaySettings.tsx`'s
+3 call sites pass `className="bdc-switch"` — a pre-existing, fully custom
+toggle-switch visual (pill + thumb, `layers-v2.css`) that already
+overrides `background` outright via the CSS `background` **shorthand**
+(clearing whatever `background-image`/`background-color` flowbite's own
+theme classes set, since `layers-v2.css` is imported as a plain
+`import "./styles/layers-v2.css"` — unlayered CSS, confirmed via the same
+"unlayered always wins" rule Button's fix round 1 established). Adding
+`tw:bg-white` there would be dead: verified by reading the cascade, not
+assumed. Those 3 sites get `color="blue"` only (still real — it governs
+the focus-ring color, `focus:ring-blue-600` vs the unwanted default
+`focus:ring-primary-600`, independent of the background question).
+
+**Structural gap, accepted not adapted: `indeterminate` is CSS-only in
+flowbite.** Our old `Checkbox.tsx` set the real DOM property
+(`inner.current.indeterminate = indeterminate`) via a ref + `useEffect`,
+because `indeterminate` has never been a settable HTML attribute — reading
+`Checkbox.js` directly confirms flowbite's version only uses the prop to
+switch a `bg-dash-icon` CSS class (`theme.indeterminate`), never touches
+`ref.current.indeterminate`. This means `:indeterminate` CSS matching and
+the native tri-state accessibility semantics don't fire on a flowbite
+Checkbox, even though `CheckboxProps.indeterminate` still type-checks as
+accepted. Checked the actual impact before deciding whether to build an
+adapter: a full-repo sweep found **zero** real consumers ever pass
+`indeterminate` (only the old component's own contract test exercised it).
+Per the "don't add features/wrappers beyond what's asked" rule, no adapter
+was built for a capability nothing depends on today — the gap is
+documented instead, in both this doc and a rewritten test assertion (see
+below), so a future consumer that needs real indeterminate semantics has
+a paper trail instead of a silent surprise.
+
+**Consumers swept:** 15 files via `@/editor/ui`, 19 JSX call sites total —
+`WebhooksScreen.tsx`, `ContentViews.tsx`, `CreateComponentModal.tsx` (×2,
+two different files sharing a name: `sidebar/tabs/component-library/` and
+`shell/modals/`, the latter with 2 call sites), `AgentPlan.tsx`,
+`TemplatesTabModals.tsx` (×2), `ReplaceAcrossDialog.tsx`,
+`CollectionSetupModal.tsx`, `PropertyField.tsx`, `controlRegistry.tsx`,
+`ProjectSettingsModal.tsx`, `CMSRecordsModal.tsx`,
+`LayerDisplaySettings.tsx` (×3), `ExportOptions.tsx`,
+`ReplaceAcrossModal.tsx`. 2 of those (`component-library/
+CreateComponentModal.tsx`, `CMSRecordsModal.tsx`) hid their `Checkbox`
+import inside a multi-line `{ ... } from "@/editor/ui"` block that a
+single-line-only grep missed on the first pass — caught by re-checking
+every file the alias-sweep flagged, not just the ones an `import.*Checkbox`
+single-line grep matched (the same "second import statement" class of trap
+as Button's `LeftSidebar.tsx` miss, one line-wrapping variant of it). No
+consumer passes `ref`, `color`, or `disabled` on `Checkbox` — confirmed via
+grep before relying on that to skip building any disabled-state override
+(flowbite's `checkboxTheme.base` has no `disabled:opacity-*` styling at
+all, unlike ours — a latent gap, undocumented further since nothing
+exercises it).
+
+**Contract test rewritten, not deleted:** `ui/__tests__/atoms.test.tsx`'s
+`describe("Checkbox", ...)` block asserted `indeterminate` sets the real
+DOM property — now asserts the opposite (`false`) with a comment
+explaining the structural gap above, so the test suite documents actual
+behavior instead of either lying (old assertion, now false) or going
+silent (deletion, matching `Tooltip`'s treatment) — deletion was right for
+`Tooltip` because `flowbite-parity.test.tsx` already carried the same
+information; nothing else in the repo documents the indeterminate gap, so
+here a rewrite was the correct call instead.
+
+**Class-list regen:** `pnpm flowbite:classlist` added 35 new prefixed
+entries (`tw:appearance-none`, `tw:checked:bg-check-icon`, etc.) — this
+time a real diff, unlike Tooltip's accidental early compile.
+`.flowbite-react/init.tsx` regenerated and deleted again (3rd occurrence
+of the same CLI side-effect, same fix each time).
+
+Verified: `tsc --noEmit` clean; 243 tests green (28 files: `atoms.test.tsx`
++ both `CreateComponentModal.test.tsx` + `StudioModals.test.tsx` +
+`Section21_per_page.test.tsx` + `CollectionSetupModal.test.tsx` +
+`CMSCollectionSetupModal.dynamicPages.test.tsx` +
+`CMSRecordsModal.publish.test.tsx` + `ExportOptions.test.tsx` +
+`ReplaceAcrossModal.test.tsx` + `ContentTab.test.tsx` + all
+`settings/screens/__tests__` + `SchemaDrivenSection.test.tsx` +
+`InspectorRenderer.test.tsx` + `ElementPropertiesSection.test.tsx` + all
+`sidebar/tabs/ai/__tests__`); plus 314 more green across
+`panels/layers`, `sidebar/tabs/settings`, `sidebar/tabs/templates`,
+`inspector/sections/elementProperties` full test directories (broader
+sweep for the 4 consumer files — `WebhooksScreen.tsx`,
+`LayerDisplaySettings.tsx`, `PropertyField.tsx`, `TemplatesTabModals.tsx`
+— with no component-specific dedicated test file).

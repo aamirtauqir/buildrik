@@ -5,11 +5,10 @@
  */
 
 import * as React from "react";
-import { Checkbox } from "@/editor/ui";
 import type { MediaAsset, MediaAssetType } from "../../../../shared/types/media";
 import { InputRow, SelectRow } from "../../shared/controls";
 import type { PropertyConfig } from "./config";
-import { Button } from "flowbite-react";
+import { Button, Checkbox } from "flowbite-react";
 
 const styles = {
   checkboxRow: {
@@ -99,6 +98,8 @@ export const PropertyField: React.FC<PropertyFieldProps> = ({
         <label style={styles.checkboxLabel}>{prop.label}</label>
         <label style={styles.checkboxWrapper}>
           <Checkbox
+            color="blue"
+            className="tw:bg-white"
             checked={value === "true" || value === prop.id}
             onChange={(e) => onChange(prop.id, e.target.checked ? "true" : "")}
             style={{ width: 16, height: 16 }} />

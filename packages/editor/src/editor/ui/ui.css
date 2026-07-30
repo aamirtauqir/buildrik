@@ -42,23 +42,6 @@
 .bk-select:focus { outline: none; border-color: var(--bk-accent); box-shadow: var(--bk-shadow-focus); }
 .bk-select:disabled { background: var(--bk-bg-subtle); color: var(--bk-ink-disabled); cursor: not-allowed; }
 
-/* ── Checkbox · Figma 12:26 · State ─────────────────────────────────────── */
-.bk-checkbox {
-  appearance: none;
-  width: var(--bk-space-16); height: var(--bk-space-16);
-  border-radius: var(--bk-radius-sm);
-  border: 1px solid var(--bk-border-medium);
-  background: var(--bk-bg-card);
-  display: inline-grid; place-content: center;
-  cursor: pointer;
-  transition: var(--bk-transition-fast);
-}
-.bk-checkbox:checked, .bk-checkbox:indeterminate { background: var(--bk-accent); border-color: var(--bk-accent); }
-.bk-checkbox:checked::after { content: ""; width: 9px; height: 5px; border: 2px solid var(--bk-accent-on); border-top: 0; border-right: 0; transform: rotate(-45deg) translateY(-1px); }
-.bk-checkbox:indeterminate::after { content: ""; width: 8px; height: 2px; background: var(--bk-accent-on); }
-.bk-checkbox:focus-visible { outline: none; box-shadow: var(--bk-shadow-focus); }
-.bk-checkbox:disabled { opacity: 0.5; cursor: not-allowed; }
-
 /* ── Radio · Figma 14:20 · State ────────────────────────────────────────── */
 .bk-radio {
   appearance: none;

@@ -5,10 +5,10 @@
  */
 
 import * as React from "react";
-import { Checkbox, Input, Stack } from "@/editor/ui";
+import { Input, Stack } from "@/editor/ui";
 import type { CMSExportMode, TemplateSyntax } from "../../engine/cms/CMSExportResolver";
 import type { ExportConfig, CSSExportStyle, ExportFormat } from "../../shared/types/export";
-import { Button } from "flowbite-react";
+import { Button, Checkbox } from "flowbite-react";
 
 // ============================================================================
 // FORMAT CONFIG
@@ -197,6 +197,8 @@ const ToggleOption: React.FC<ToggleOptionProps> = ({ label, checked, onChange })
     }}
   >
     <Checkbox
+      color="blue"
+      className="tw:bg-white"
       checked={checked}
       onChange={(e) => onChange(e.target.checked)}
       style={{ cursor: "pointer" }} />

@@ -8,12 +8,12 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Checkbox, ConfirmDialog, Input, Select, Textarea, Toggle } from "@/editor/ui";
+import { ConfirmDialog, Input, Select, Textarea, Toggle } from "@/editor/ui";
 import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
 import type { ConditionExpression, ConditionOperator, DataSource } from "@/shared/types/data";
 import { conditionSummary, fieldDefault, isValidVariableKey, type SiteVariable } from "./contentPanelUtils";
 import type { ConditionRow } from "./useContentPanel";
-import { Button } from "flowbite-react";
+import { Button, Checkbox } from "flowbite-react";
 
 export const S: Record<string, React.CSSProperties> = {
   body: { display: "flex", flexDirection: "column", height: "100%", minHeight: 0 },
@@ -460,6 +460,8 @@ export function FieldsView({
               </Select>
               <label style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, cursor: "pointer" }}>
                 <Checkbox
+                  color="blue"
+                  className="tw:bg-white"
                   checked={required}
                   onChange={(e) => setRequired(e.target.checked)}
                 />

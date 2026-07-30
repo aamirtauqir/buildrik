@@ -13,12 +13,11 @@
  */
 
 import * as React from "react";
-import { Checkbox } from "@/editor/ui";
 import { createBuildrikApiClient } from "@/services/api-client";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { Field, Input, Screen, Section } from "../shared";
 import type { ScreenProps } from "../types";
-import { Button } from "flowbite-react";
+import { Button, Checkbox } from "flowbite-react";
 
 const EVENTS = [
   { id: "site.publish", label: "site.publish — fires after every successful publish" },
@@ -201,6 +200,8 @@ export const WebhooksScreen: React.FC<ScreenProps> = ({ onDirtyChange }) => {
                 {EVENTS.map((ev) => (
                   <label key={ev.id} className="bd-set-webhook-event">
                     <Checkbox
+                      color="blue"
+                      className="tw:bg-white"
                       checked={events.includes(ev.id)}
                       onChange={(e) => toggleEvent(ev.id, e.target.checked)}
                     />

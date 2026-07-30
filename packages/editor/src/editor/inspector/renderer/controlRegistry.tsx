@@ -11,7 +11,7 @@
  */
 
 import * as React from "react";
-import { Checkbox, Input, Select } from "@/editor/ui";
+import { Input, Select } from "@/editor/ui";
 import type {
   ColorField,
   ControlProps,
@@ -25,7 +25,7 @@ import type {
   TextField,
   ToggleField,
 } from "./schema";
-import { Button } from "flowbite-react";
+import { Button, Checkbox } from "flowbite-react";
 
 // ============================================================================
 // SHARED STYLE TOKENS — keep each control file-local so future sections can
@@ -156,6 +156,8 @@ const ToggleControl: React.FC<ControlProps<ToggleField>> = ({
         {field.label}
       </label>
       <Checkbox
+        color="blue"
+        className="tw:bg-white"
         id={`field-${field.prop}`}
         checked={checked}
         onChange={(e) => onChange(e.target.checked ? field.on : field.off)} />

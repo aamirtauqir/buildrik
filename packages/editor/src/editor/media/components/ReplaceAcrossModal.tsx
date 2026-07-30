@@ -12,8 +12,8 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Checkbox, ModalContent, ModalDescription, ModalRoot, ModalTitle } from "@/editor/ui";
-import { Button } from "flowbite-react";
+import { ModalContent, ModalDescription, ModalRoot, ModalTitle } from "@/editor/ui";
+import { Button, Checkbox } from "flowbite-react";
 
 export interface ReplaceAcrossPageEntry {
   pageId: string;
@@ -267,6 +267,8 @@ function PageRow({ page, checked, onToggle, thumbW, thumbH }: PageRowProps) {
       }}
     >
       <Checkbox
+        color="blue"
+        className="tw:bg-white"
         checked={checked}
         onChange={onToggle}
         aria-label={`Replace on ${page.pageName}`}

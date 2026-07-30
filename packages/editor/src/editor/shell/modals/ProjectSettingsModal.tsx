@@ -5,11 +5,11 @@
  */
 
 import * as React from "react";
-import { Checkbox, Input, ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal, Stack } from "@/editor/ui";
+import { Input, ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal, Stack } from "@/editor/ui";
 import type { Composer } from "../../../engine";
 import { useToast } from "@/editor/ui";
 import { devError } from "../../../shared/utils/devLogger";
-import { Button } from "flowbite-react";
+import { Button, Checkbox } from "flowbite-react";
 
 export interface ProjectSettingsModalProps {
   isOpen: boolean;
@@ -162,6 +162,8 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
               <div style={{ marginTop: 16 }}>
                 <label style={checkboxLabelStyles}>
                   <Checkbox
+                    color="blue"
+                    className="tw:bg-white"
                     checked={snapToGrid}
                     onChange={(e) => setSnapToGrid(e.target.checked)}
                     style={checkboxStyles} />
