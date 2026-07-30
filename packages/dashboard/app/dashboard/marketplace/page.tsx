@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { BarChart3, ShoppingCart, Mail, FileText, Search, MessageSquare, Lock, Check, Settings2, Users, TrendingUp, Video, Pin, ShieldCheck, type LucideIcon } from "lucide-react";
 import { CATALOG_APPS, MARKETPLACE_CATEGORIES, FEATURED_APP, type AppCategory, type CatalogApp } from "@/lib/marketplace-catalog";
-import { PageHeader, IconChip, InputField, Button, ButtonLink, Modal } from "@/components/dashboard/primitives";
+import { PageHeader, IconChip, InputField, Button, ButtonLink, Modal, FilterChip } from "@/components/dashboard/primitives";
 import { trpc } from "@lib/trpc/client";
 
 const iconMap: Record<string, LucideIcon> = {
@@ -110,19 +110,9 @@ export default function MarketplacePage() {
         {filters.map((filter) => {
           const selected = filter === category;
           return (
-            <button
-              key={filter}
-              type="button"
-              onClick={() => setCategory(filter)}
-              className="rounded-full border px-3.5 py-1.5 text-[13px] font-semibold transition-colors"
-              style={
-                selected
-                  ? { borderColor: "var(--color-ink)", backgroundColor: "var(--color-ink)", color: "#fff" }
-                  : { borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)", color: "var(--color-text-secondary)" }
-              }
-            >
+            <FilterChip key={filter} active={selected} onClick={() => setCategory(filter)}>
               {filter}
-            </button>
+            </FilterChip>
           );
         })}
       </div>

@@ -10,3 +10,4 @@ export { IconChip } from "./icon-chip";
 export { Modal } from "./modal";
 export { InputField } from "./input-field";
 export { FilterTabs } from "./filter-tabs";
+export { FilterChip } from "./filter-chip";
