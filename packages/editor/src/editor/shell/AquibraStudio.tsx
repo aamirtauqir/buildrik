@@ -367,6 +367,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           onOpenTemplates={() => state.openLeftPanelToTab("templates")}
           onOpenComponents={() => state.openLeftPanelToTab("components")}
           onOpenIssues={() => setIssuesOpen(true)}
+          onOpenReview={() => state.openLeftPanelToTab("review")}
           onOpenShortcuts={modals.toggleShortcuts}
           onSave={saveProject}
           onExportHTML={handleExportHTML}

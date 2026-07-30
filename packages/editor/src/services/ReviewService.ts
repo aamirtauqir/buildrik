@@ -41,6 +41,23 @@ export async function fetchReviewStatus(): Promise<ReviewStatus> {
 }
 
 /**
+ * Refetch variant that tells the truth about transport failure (F3, 6A).
+ * `null` = "couldn't reach the dashboard — keep what you had"; a real
+ * `state: "none"` still means "no review". The mount path keeps the
+ * fail-closed `fetchReviewStatus` above; only periodic refreshes use this,
+ * so a flaky request can never erase an "Approved by X" pill mid-session.
+ */
+export async function fetchReviewStatusOrNull(): Promise<ReviewStatus | null> {
+  const siteId = currentSiteId();
+  if (!siteId) return { state: "none", reviewerName: null, at: null };
+  try {
+    return await getBuildrikClient(DASHBOARD_URL).reviews.status.query({ siteId });
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Submit the current site for review.
  *
  * `clientEmail` is what turns this from an internal request into a client

@@ -31,6 +31,7 @@ vi.mock("../../../shared/utils/editorViewMode", () => ({
 vi.mock("../../../services/ReviewService", () => ({
   submitForReview: vi.fn(() => Promise.resolve()),
   fetchReviewStatus: vi.fn(() => Promise.resolve({ state: "none", reviewerName: null, at: null })),
+  fetchReviewStatusOrNull: vi.fn(() => Promise.resolve(null)),
   // RoleService (P6) resolves the site id through ReviewService — null keeps
   // the role "unknown" so no chrome gating kicks in during these tests.
   currentSiteId: vi.fn(() => null),
@@ -588,8 +589,37 @@ describe("F1 dirty-exit guard", () => {
       e: Partial<BeforeUnloadEvent>,
     ) => void;
     const e = { preventDefault: vi.fn(), returnValue: undefined as unknown };
-    handler(e as BeforeUnloadEvent);
+    handler(e as unknown as BeforeUnloadEvent);
     expect(e.preventDefault).toHaveBeenCalled();
     addSpy.mockRestore();
+  });
+});
+
+// ── F3 · review pill is a door ──────────────────────────────────────────────
+describe("F3 review pill", () => {
+  it("renders the pill as a button and clicking opens the review panel", async () => {
+    vi.mocked(fetchReviewStatus).mockResolvedValue({
+      state: "pending",
+      reviewerName: null,
+      at: new Date().toISOString(),
+    });
+    const onOpenReview = vi.fn();
+    render(<StudioHeader {...makeProps({ onOpenReview })} />);
+    const pill = await screen.findByRole("button", { name: "In review" });
+    fireEvent.click(pill);
+    expect(onOpenReview).toHaveBeenCalled();
+  });
+
+  it("59-minute-old approval reads in minutes, not 'just now' (U1)", async () => {
+    const at = new Date(Date.now() - 59 * 60_000).toISOString();
+    vi.mocked(fetchReviewStatus).mockResolvedValue({
+      state: "approved",
+      reviewerName: "Sara",
+      at,
+    });
+    render(<StudioHeader {...makeProps()} />);
+    const pill = await screen.findByText(/Approved by Sara/);
+    expect(pill.textContent).toMatch(/59m ago/);
+    expect(pill.textContent).not.toMatch(/just now/);
   });
 });

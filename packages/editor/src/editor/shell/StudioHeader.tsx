@@ -39,7 +39,13 @@ import { sanitizeHTMLForPreview } from "../export/ExportUtils";
 import { useCollaboration } from "../canvas/hooks/useCollaboration";
 import { toPresenceUsers } from "../collaboration/PresenceIndicators";
 import { getSiteIdFromUrl } from "../../services/BuildrikSyncProvider";
-import { fetchReviewStatus, type ReviewStatus } from "../../services/ReviewService";
+import {
+  fetchReviewStatus,
+  fetchReviewStatusOrNull,
+  type ReviewStatus,
+} from "../../services/ReviewService";
+import { useRefetchOnFocus } from "../../shared/hooks";
+import { formatRelativeTime } from "../../shared/utils/relativeTime";
 import { EVENTS } from "../../shared/constants";
 import { isFeatureEnabled } from "../../shared/utils/featureFlags";
 import { getEditorViewMode } from "../../shared/utils/editorViewMode";
@@ -103,6 +109,8 @@ export interface StudioHeaderProps {
   onOpenPublishHistory?: () => void;
   onOpenTemplates?: () => void;
   onOpenComponents?: () => void;
+  /** F3 — the review pill is a door, not a label: opens the Review panel. */
+  onOpenReview?: () => void;
 
   // Core actions
   /** Save now. Resolves with the HONEST outcome — the exit guard branches on it. */
@@ -137,11 +145,9 @@ const REVIEW_PILL: Record<ReviewStatus["state"], Omit<ReviewPill, "onClick"> | n
 /** "· 2d ago" suffix on the approved pill (S5.6 board 131:2). */
 function pillAgo(at?: string | Date | null): string {
   if (!at) return "";
-  const diff = Math.floor((Date.now() - new Date(at).getTime()) / 1000);
-  if (!Number.isFinite(diff) || diff < 0) return "";
-  if (diff < 3600) return " · just now";
-  if (diff < 86400) return ` · ${Math.floor(diff / 3600)}h ago`;
-  return ` · ${Math.floor(diff / 86400)}d ago`;
+  const ts = new Date(at).getTime();
+  if (!Number.isFinite(ts) || ts > Date.now()) return "";
+  return ` · ${formatRelativeTime(ts, { fallback: "days", justNowLabel: "just now" })}`;
 }
 
 export const StudioHeader: React.FC<StudioHeaderProps> = ({
@@ -169,6 +175,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   onOpenPublishHistory,
   onOpenTemplates,
   onOpenComponents,
+  onOpenReview,
   onSave,
   onExportHTML,
   onInlinePreview,
@@ -227,6 +234,17 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   React.useEffect(() => {
     refreshReview();
   }, [refreshReview]);
+  // F3/6A: approval usually lands while the editor is backgrounded — refresh
+  // on return. The OrNull variant keeps the last-known pill on transport
+  // failure instead of erasing it (fail-closed is for the mount only).
+  useRefetchOnFocus(
+    React.useCallback(() => {
+      void fetchReviewStatusOrNull().then((s) => {
+        if (s) setReviewStatus(s);
+      });
+    }, []),
+  );
+  useRefetchOnFocus(refreshUnread);
 
   // Keeps "Saved · 2m ago" honest without a render on every tick.
   const [, setTick] = React.useState(0);
@@ -447,6 +465,8 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
             ? `Approved by ${reviewStatus.reviewerName}${pillAgo(reviewStatus.at)}`
             : pill.label,
         title: reviewStatus.reviewerName ? `${pill.label} — ${reviewStatus.reviewerName}` : undefined,
+        // F3: every review state opens the same door — the Review panel.
+        onClick: onOpenReview,
       }
     : null;
 
@@ -481,6 +501,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
               composer={composer}
               disabledReason={isViewer ? "Viewers can't send for review — ask an editor" : undefined}
               onSent={refreshReview}
+              reviewStatus={reviewStatus}
             />
           ) : undefined
         }
@@ -515,6 +536,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
             onClose={() => setNotifOpen(false)}
             onRead={refreshUnread}
             onNavigate={navigateFromNotification}
+            addToast={addToast}
           />
         </div>
       ) : null}

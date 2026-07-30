@@ -15,7 +15,7 @@
 import * as React from "react";
 import { Button, FormField, Input, Popover, Textarea, Tooltip } from "@/editor/ui";
 import type { Composer } from "../../engine";
-import { submitForReview } from "../../services/ReviewService";
+import { submitForReview, type ReviewStatus } from "../../services/ReviewService";
 import { exportPublishPages } from "./exportPublishPages";
 
 export interface SendForReviewProps {
@@ -24,25 +24,51 @@ export interface SendForReviewProps {
   disabledReason?: string;
   /** Refresh the topbar's review pill once a send lands. */
   onSent?: () => void;
+  /**
+   * The review round's current truth (F4). When a new round lands after our
+   * send — the `at` timestamp moves, even on a pending→pending re-send — the
+   * terminal "Sent ✓" unlocks into "Send again". Without this the control
+   * wedged until a full reload (finding D4).
+   */
+  reviewStatus?: ReviewStatus | null;
 }
 
-type SendState = "idle" | "sending" | "sent" | "error";
+type SendState = "idle" | "sending" | "sent" | "again" | "error";
 
 const LABEL: Record<SendState, string> = {
   idle: "Send for review",
   sending: "Sending…",
   sent: "Sent for review ✓",
+  again: "Send again",
   error: "Retry send",
 };
 
-export const SendForReview: React.FC<SendForReviewProps> = ({ composer, disabledReason, onSent }) => {
+export const SendForReview: React.FC<SendForReviewProps> = ({
+  composer,
+  disabledReason,
+  onSent,
+  reviewStatus,
+}) => {
   const [state, setState] = React.useState<SendState>("idle");
   const [open, setOpen] = React.useState(false);
   const [email, setEmail] = React.useState("");
   const [summary, setSummary] = React.useState("");
   const [note, setNote] = React.useState("");
+  /** Round timestamp as of send-start — a different `at` means OUR send landed. */
+  const atBeforeSendRef = React.useRef<string | null>(null);
+
+  // F4 (decision 4A): status-driven unlock, with a short minimum display of
+  // the confirmation so "Sent ✓" registers before flipping to "Send again".
+  React.useEffect(() => {
+    if (state !== "sent") return;
+    const seenAt = reviewStatus?.at ? String(reviewStatus.at) : null;
+    if (seenAt === null || seenAt === atBeforeSendRef.current) return;
+    const id = window.setTimeout(() => setState("again"), 1500);
+    return () => window.clearTimeout(id);
+  }, [state, reviewStatus?.at]);
 
   const send = React.useCallback(async () => {
+    atBeforeSendRef.current = reviewStatus?.at ? String(reviewStatus.at) : null;
     setState("sending");
     try {
       let snapshotPages;
@@ -65,7 +91,7 @@ export const SendForReview: React.FC<SendForReviewProps> = ({ composer, disabled
     } catch {
       setState("error");
     }
-  }, [composer, note, summary, email, onSent]);
+  }, [composer, note, summary, email, onSent, reviewStatus?.at]);
 
   return (
     <Popover

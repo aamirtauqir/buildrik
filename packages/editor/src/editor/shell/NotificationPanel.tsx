@@ -13,8 +13,9 @@
  */
 
 import * as React from "react";
-import { Button, EmptyState, Row, Spinner, StatusDot } from "@/editor/ui";
+import { Button, EmptyState, Row, Spinner, StatusDot, type ToastInput } from "@/editor/ui";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
+import { formatRelativeTime } from "@/shared/utils/relativeTime";
 import {
   fetchRecentNotifications,
   fetchUnreadCount,
@@ -23,16 +24,14 @@ import {
   type EditorNotification,
 } from "../../services/NotificationService";
 
+/** U1: one relative-time SSOT — shared/utils/relativeTime, days fallback. */
 function relTime(iso: string | Date): string {
   const then = new Date(iso).getTime();
   if (Number.isNaN(then)) return "";
-  const s = Math.max(0, Math.round((Date.now() - then) / 1000));
-  if (s < 60) return "just now";
-  const m = Math.round(s / 60);
-  if (m < 60) return `${m}m ago`;
-  const h = Math.round(m / 60);
-  if (h < 24) return `${h}h ago`;
-  return `${Math.round(h / 24)}d ago`;
+  return formatRelativeTime(Math.min(then, Date.now()), {
+    fallback: "days",
+    justNowLabel: "just now",
+  });
 }
 
 /** Unread badge count, refreshable after a read lands. */
@@ -55,11 +54,13 @@ export interface NotificationPanelProps {
   onRead?: () => void;
   /** Injectable navigation (tests / custom routing). */
   onNavigate?: (url: string) => void;
+  /** F5 — a failed mark-all must say so, not silently do nothing. */
+  addToast?: (input: ToastInput) => string;
 }
 
 type LoadState = "loading" | "ready" | "error";
 
-export const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose, onRead, onNavigate }) => {
+export const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose, onRead, onNavigate, addToast }) => {
   const [state, setState] = React.useState<LoadState>("loading");
   const [rows, setRows] = React.useState<EditorNotification[]>([]);
 
@@ -105,7 +106,9 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose, o
       setRows((rs) => rs.map((r) => ({ ...r, read: true })));
       onRead?.();
     } catch {
-      /* leave the rows as they are; the button can be pressed again */
+      // F5: rows stay as they are AND the user hears about it — a button that
+      // silently does nothing teaches distrust (finding S3).
+      addToast?.({ title: "Couldn't mark read", description: "Try again in a moment.", tone: "error" });
     }
   };
 
@@ -119,9 +122,12 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose, o
     <div className="bk-notifications" role="dialog" aria-label="Notifications">
       <div className="bk-notifications__head">
         <span className="bk-notifications__title">Notifications</span>
-        <Button kind="ghost" size="sm" onClick={() => void markAll()}>
-          Mark all read
-        </Button>
+        {/* F5: no mark-all while there is nothing loaded to mark. */}
+        {state === "ready" ? (
+          <Button kind="ghost" size="sm" onClick={() => void markAll()}>
+            Mark all read
+          </Button>
+        ) : null}
       </div>
 
       {state === "loading" ? (

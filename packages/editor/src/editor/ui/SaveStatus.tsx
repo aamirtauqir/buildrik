@@ -9,6 +9,7 @@
  * @license BSD-3-Clause
  */
 import React from "react";
+import { formatRelativeTime } from "@/shared/utils/relativeTime";
 
 export type SaveState = "saved" | "saving" | "unsaved" | "conflict" | "offline" | "error";
 
@@ -24,14 +25,14 @@ export interface SaveStatusProps extends React.HTMLAttributes<HTMLSpanElement> {
   onRetry?: () => void;
 }
 
+/** U1: one relative-time SSOT — seconds granularity preserved for saves. */
 function ago(ts?: number): string {
   if (!ts) return "Saved";
-  const s = Math.floor((Date.now() - ts) / 1000);
-  if (s < 10) return "Saved just now";
-  if (s < 60) return `Saved ${s}s ago`;
-  if (s < 3600) return `Saved ${Math.floor(s / 60)}m ago`;
-  if (s < 86400) return `Saved ${Math.floor(s / 3600)}h ago`;
-  return `Saved ${Math.floor(s / 86400)}d ago`;
+  return `Saved ${formatRelativeTime(ts, {
+    fallback: "days",
+    showSeconds: true,
+    justNowLabel: "just now",
+  })}`;
 }
 
 const COPY: Record<Exclude<SaveState, "saved">, string> = {
