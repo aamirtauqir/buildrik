@@ -3,7 +3,9 @@
 @source '../.flowbite-react/class-list.json';
 
 @theme inline {
-  --font-sans: 'Inter Tight', sans-serif;
+  /* Dashboard body/UI font is Inter (DESIGN.md surface table); the auth
+     craftwork surface alone runs Inter Tight, scoped in [data-auth-layout]. */
+  --font-sans: 'Inter', sans-serif;
   --font-mono: 'Geist Mono', ui-monospace, monospace;
 
   /* Auth colors — craftwork surface (Flowbite blue accent, auth-only; see DESIGN.md §Auth Surface) */
@@ -209,6 +211,11 @@
   --text-onb-title: 26px;
   --text-onb-title--line-height: 1.25;
   --text-onb-title--font-weight: 700;
+}
+
+/* Auth craftwork surface keeps Inter Tight (DESIGN.md §Auth Surface). */
+[data-auth-layout] {
+  font-family: 'Inter Tight', sans-serif;
 }
 
 /* Focus indicators — one accent for every surface (UI kit §6: never remove the
