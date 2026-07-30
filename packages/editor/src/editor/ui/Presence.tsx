@@ -11,7 +11,8 @@
  * @license BSD-3-Clause
  */
 import React from "react";
-import { Avatar, type AvatarTone } from "./Avatar";
+import { Avatar } from "flowbite-react";
+import { avatarInitials, AVATAR_TONE_THEME, type AvatarTone } from "./avatarTone";
 
 export type ConnectionState = "live" | "reconnecting" | "offline";
 
@@ -55,7 +56,21 @@ export function Presence({ users, connection = "live", max = 3, className, ...re
     <div className={["bk-presence", className].filter(Boolean).join(" ")} {...rest}>
       <div className="bk-presence__stack">
         {shown.map((u) => (
-          <Avatar key={u.id} name={u.name} src={u.src} tone={toneFor(u.id)} self={u.self} />
+          <Avatar
+            key={u.id}
+            className={["bk-avatar", u.self && "tw:outline tw:outline-2 tw:outline-blue-700 tw:outline-offset-2"]
+              .filter(Boolean)
+              .join(" ")}
+            rounded
+            size="xs"
+            alt=""
+            img={u.src}
+            placeholderInitials={avatarInitials(u.name)}
+            theme={AVATAR_TONE_THEME[toneFor(u.id)]}
+            role="img"
+            aria-label={u.name}
+            title={u.name}
+          />
         ))}
         {overflow > 0 ? (
           <span className="bk-presence__overflow" aria-label={`${overflow} more`}>

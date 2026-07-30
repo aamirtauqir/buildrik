@@ -906,3 +906,84 @@ separately per `progress.md`, not `editor/ui/Badge.tsx`).
 Verified: `tsc --noEmit` clean; 251 tests green across `ui/__tests__`,
 `sidebar/tabs/review`, `sidebar/tabs/settings/screens`, `templates/`, plus
 `shell/__tests__/PublishHistory.test.tsx` (8/8).
+
+### Avatar → `flowbite-react` `Avatar`
+
+`src/editor/ui/Avatar.tsx` (`size`, `tone`, `self`, `name`, `src`) →
+`node_modules/flowbite-react/dist/components/Avatar/Avatar.d.ts` (`size`,
+`color`, `bordered`, `rounded`, `img`, `alt`, `placeholderInitials`).
+
+| Our prop | Flowbite prop | Notes |
+|---|---|---|
+| `name` (required, auto-derives initials) | `placeholderInitials` | flowbite never derives initials itself — moved the derivation into a small shared `avatarInitials()` helper (`editor/ui/avatarTone.ts`), called at each of the 2 call sites. |
+| `src` | `img` | rename only. |
+| *(implicit — ours is always circular)* | `rounded` (now required at every call site) | flowbite defaults to **square** (`rounded` defaults `false`) — every call site now passes `rounded` explicitly. |
+| `size="sm"` (default) | `size="xs"` | flowbite's smallest preset (24px) is still bigger than our 20px default; no exact size match exists, same "closest step down" precedent as Button. Both real consumers only ever use the default, so `size="md"` was never exercised — not mapped. |
+| `tone` | *(no direct prop — see below)* | **Structural gap, not a simple rename.** |
+| `self` | *(no direct prop — see below)* | **Structural gap, not a simple rename.** |
+| `role="img"`, `aria-label={name}`, `title={name}` | unchanged, pass through | flowbite's `Avatar` root is a plain unstyled `<div>` — no `role`/`aria-label` of its own (verified: zero occurrences in `Avatar.js`) — these land via the `...restProps` spread onto the same element exactly as before. |
+
+**Structural gap — `color` doesn't reach the initials bubble.** Verified via
+`Avatar.js`/`theme.js`: flowbite's `color` prop only recolors the
+`bordered` ring (`theme.root.color[color]`, applied only when
+`bordered={true}`); the initials-placeholder background/text
+(`theme.root.img.off` / `theme.root.initials.text`) are **hardcoded**
+`bg-gray-100`/`text-gray-600` regardless of `color`. Since `Presence.tsx`'s
+whole point is recoloring each collaborator's avatar by a hash of their id
+(`toneFor()`), this is not a cosmetic nice-to-have — it's the feature.
+Fixed via flowbite's per-instance `theme` prop (`ThemingProps<AvatarTheme>`,
+deep-merged through flowbite's own `twMerge` in `resolve-theme.js` — a
+`tw:bg-*`/`tw:text-*` override there correctly *replaces* the default
+rather than concatenating alongside it, verified by reading
+`resolveTheme()`'s `deepMergeStrings(twMerge)` call). `self`'s accent-ring
+outline has no flowbite equivalent either (`bordered`+`color` produces a
+`ring-*` box-shadow that isn't `--bk-accent`-colorable per-tone
+independent of the initials color) — replicated instead as a plain
+`tw:outline tw:outline-2 tw:outline-blue-700 tw:outline-offset-2`
+className on the outer wrapper (`blue-700` = exact hex match to
+`--bk-accent`).
+
+| Our tone | flowbite `theme` override | Hex check |
+|---|---|---|
+| `neutral` | `tw:bg-gray-200` / `tw:text-gray-700` | exact match to `--bk-gray-200`/`--bk-gray-700` (flowbite's own untouched default is `gray-100`/`gray-600` — one step lighter, so `neutral` needs an override too, not just the 4 named tones). |
+| `blue` | `tw:bg-blue-100` / `tw:text-blue-800` | exact match to `--bk-blue-100`/`--bk-blue-800`. |
+| `green` | `tw:bg-green-100` / `tw:text-green-800` | exact match to `--bk-green-100`/`--bk-green-800`. |
+| `purple` | `tw:bg-purple-100` / `tw:text-purple-800` | exact match to `--bk-purple-100`/`--bk-purple-800`. |
+| `amber` | `tw:bg-yellow-100` / `tw:text-yellow-800` | exact match to `--bk-yellow-100`/`--bk-yellow-800`. |
+
+**Adapter judgment call (justification per Task 5 brief):** created
+`src/editor/ui/avatarTone.ts` — a plain data/function module (`avatarInitials()`
++ the `AVATAR_TONE_THEME` table above), **not** a React component wrapper
+around `Avatar`. Both of Avatar's 2 real consumers (`CommentRow.tsx`,
+`Presence.tsx`) need the identical initials algorithm and identical 5-tone
+table; duplicating a `for`-loop-derived initials function and a 5-entry
+nested-object theme table across 2 files is exactly the "same concept, same
+calculation" case CLAUDE.md rule 3 (no duplicate logic) targets, so it was
+extracted rather than repeated (unlike Button's ghost-class string or
+Badge's kind→color table, which stayed inlined because those really are
+just literal prop values, not an algorithm or a structurally-necessary
+`theme`-prop object). Consumers still import `Avatar` from `flowbite-react`
+directly — the helper module exports no component, only data and a pure
+function, so it doesn't reintroduce the pass-through-wrapper pattern this
+task drains.
+
+**Consumers swept:** 0 external (`Avatar` was never imported via the
+`@/editor/ui` alias — confirmed via the import-map scan) — its only 2 real
+consumers, `CommentRow.tsx` and `Presence.tsx`, import `./Avatar` relatively
+from inside `editor/ui/` itself (the same blind spot Button's and Badge's
+sweeps hit). A third `catalog.ts` "Avatar" hit is a component-picker
+display-name string, not an import. `atoms.test.tsx`'s `describe("Avatar",
+...)` block rewritten (not deleted) to test `avatarInitials()` directly
+plus flowbite's own image/initials rendering, since those are genuine
+behavior worth covering and neither had a home in `CommentRow`/`Presence`
+(neither has its own dedicated test file).
+`collaboration/__tests__/PresenceIndicators.test.tsx` — 2 assertions
+rewritten from `bk-avatar--self`/`bk-avatar--{tone}` class-string matches to
+`tw:outline-blue-700` and a `tw:bg-*` match on the initials-bubble testid
+(`role`/`aria-label` assertions elsewhere in the same file needed no
+change, since those attributes pass through unchanged).
+
+Verified: `tsc --noEmit` clean; `ui/__tests__` 136/136,
+`collaboration/__tests__/PresenceIndicators.test.tsx` 11/11,
+`canvas/comments/__tests__/CommentLayer.test.tsx` 10/10 (renders
+`CommentRow` transitively).

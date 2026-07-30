@@ -16,7 +16,6 @@ export { Radio, type RadioProps } from "./Radio";
 export { Toggle, type ToggleProps } from "./Toggle";
 export { Slider, type SliderProps } from "./Slider";
 export { StatusDot, type StatusDotProps, type StatusDotState } from "./StatusDot";
-export { Avatar, type AvatarProps, type AvatarSize, type AvatarTone } from "./Avatar";
 export { Textarea, type TextareaProps } from "./Textarea";
 
 /* ── Molecules ──────────────────────────────────────────────────────────── */

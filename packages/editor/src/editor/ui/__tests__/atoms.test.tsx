@@ -9,7 +9,9 @@
  */
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { Input, Select, Checkbox, Radio, Toggle, Slider, StatusDot, Avatar } from "../index";
+import { Input, Select, Checkbox, Radio, Toggle, Slider, StatusDot } from "../index";
+import { Avatar } from "flowbite-react";
+import { avatarInitials, AVATAR_TONE_THEME, type AvatarTone } from "../avatarTone";
 
 describe("Input", () => {
   it("marks the error state for assistive tech, not just visually", () => {
@@ -69,16 +71,28 @@ describe("StatusDot", () => {
   });
 });
 
-describe("Avatar", () => {
+describe("Avatar (flowbite-react + avatarTone helper)", () => {
+  it("avatarInitials derives up to 2 initials from a name", () => {
+    expect(avatarInitials("Sara Ahmed")).toBe("SA");
+    expect(avatarInitials("Cher")).toBe("C");
+  });
+
   it("falls back to initials when there is no image", () => {
-    render(<Avatar name="Sara Ahmed" />);
+    render(<Avatar rounded placeholderInitials={avatarInitials("Sara Ahmed")} />);
     expect(screen.getByText("SA")).toBeTruthy();
   });
 
   it("renders the image with an empty alt, since the title carries the name", () => {
-    const { container } = render(<Avatar name="Imran Q." src="/a.png" />);
+    const { container } = render(<Avatar rounded alt="" img="/a.png" title="Imran Q." />);
     const img = container.querySelector("img");
     expect(img?.getAttribute("alt")).toBe("");
+  });
+
+  it("AVATAR_TONE_THEME covers every AvatarTone with a recolored initials background", () => {
+    const tones: AvatarTone[] = ["neutral", "blue", "green", "purple", "amber"];
+    for (const tone of tones) {
+      expect(AVATAR_TONE_THEME[tone].root?.img?.off).toMatch(/^tw:bg-/);
+    }
   });
 });
 

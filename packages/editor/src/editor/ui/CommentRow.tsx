@@ -9,7 +9,8 @@
  */
 import React from "react";
 import { Row, type RowProps } from "./Row";
-import { Avatar } from "./Avatar";
+import { Avatar } from "flowbite-react";
+import { avatarInitials, AVATAR_TONE_THEME } from "./avatarTone";
 
 export interface CommentRowProps extends Omit<RowProps, "children" | "size"> {
   author: string;
@@ -31,7 +32,16 @@ export function CommentRow({
         .join(" ")}
       {...rest}
     >
-      <Avatar name={author} />
+      <Avatar
+        rounded
+        size="xs"
+        alt=""
+        placeholderInitials={avatarInitials(author)}
+        theme={AVATAR_TONE_THEME.neutral}
+        role="img"
+        aria-label={author}
+        title={author}
+      />
       <span className="bk-comment-row__body">
         <span className="bk-comment-row__author">
           {author}

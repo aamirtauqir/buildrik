@@ -91,8 +91,8 @@ describe("PresenceIndicators — who is shown", () => {
   it("marks the avatar matching currentUser.id as you", () => {
     const me = makeUser("me", "Me Self");
     render(<PresenceIndicators users={[me, makeUser("u2", "Other Person")]} currentUser={me} state="connected" />);
-    expect(screen.getByRole("img", { name: "Me Self" }).className).toContain("bk-avatar--self");
-    expect(screen.getByRole("img", { name: "Other Person" }).className).not.toContain("bk-avatar--self");
+    expect(screen.getByRole("img", { name: "Me Self" }).className).toContain("tw:outline-blue-700");
+    expect(screen.getByRole("img", { name: "Other Person" }).className).not.toContain("tw:outline-blue-700");
   });
 
   it("uses the profile image when there is one, initials when there is not", () => {
@@ -119,6 +119,7 @@ describe("PresenceIndicators — who is shown", () => {
     );
     const avatar = screen.getByRole("img", { name: "Colored User" });
     expect(avatar.style.backgroundColor).toBe("");
-    expect(avatar.className).toMatch(/bk-avatar--(neutral|blue|green|purple|amber)/);
+    const initialsBubble = avatar.querySelector('[data-testid="flowbite-avatar-initials-placeholder"]');
+    expect(initialsBubble?.className).toMatch(/tw:bg-(gray|blue|green|purple|yellow)-(100|200)/);
   });
 });

@@ -105,20 +105,6 @@
 .bk-dot--draft   { background: var(--bk-border-strong); }
 .bk-dot--failed  { background: var(--bk-error); }
 
-/* ── Avatar · Figma 14:42 · Size ────────────────────────────────────────── */
-.bk-avatar {
-  display: inline-flex; align-items: center; justify-content: center;
-  border-radius: var(--bk-radius-full);
-  background: var(--bk-gray-100);
-  color: var(--bk-gray-600);
-  font-family: var(--bk-font-ui);
-  font-weight: var(--bk-weight-medium);
-  overflow: hidden; flex: none;
-}
-.bk-avatar--sm { width: var(--bk-space-20); height: var(--bk-space-20); font-size: var(--bk-text-11); }
-.bk-avatar--md { width: var(--bk-space-28); height: var(--bk-space-28); font-size: var(--bk-text-12); }
-.bk-avatar img { width: 100%; height: 100%; object-fit: cover; }
-
 /* ═══ MOLECULES ═════════════════════════════════════════════════════════════ */
 
 /* ── Row · Figma 8:47 · Size × State · base for every row below ─────────── */
@@ -710,19 +696,11 @@
 .bk-presence__conn--offline { background: var(--bk-error-tint); color: var(--bk-error-text); }
 .bk-presence__conn--offline .bk-presence__conn-dot { background: var(--bk-error); }
 
-/* Avatar tones — Figma 691:450. Tone is derived from the user id. */
-/* The stacking ring belongs to the stack, not to every avatar in the product —
-   an avatar in a comment row has nothing to separate itself from. */
+/* Stacking ring belongs to the stack, not to every avatar in the product —
+   an avatar in a comment row has nothing to separate itself from. flowbite
+   Avatar carries this className through untouched (Task 5); tone recolor +
+   self-outline moved to inline tw: utilities (see editor/ui/avatarTone.ts). */
 .bk-presence__stack .bk-avatar { box-shadow: 0 0 0 2px var(--bk-bg-card); }
-.bk-avatar--self {
-  outline: var(--bk-focus-ring-width) solid var(--bk-accent);
-  outline-offset: var(--bk-focus-ring-offset);
-}
-.bk-avatar--neutral { background: var(--bk-gray-200); color: var(--bk-gray-700); }
-.bk-avatar--blue    { background: var(--bk-blue-100); color: var(--bk-blue-800); }
-.bk-avatar--green   { background: var(--bk-green-100); color: var(--bk-green-800); }
-.bk-avatar--purple  { background: var(--bk-purple-100); color: var(--bk-purple-800); }
-.bk-avatar--amber   { background: var(--bk-yellow-100); color: var(--bk-yellow-800); }
 
 /* ── Topbar · Figma 681:122 ─────────────────────────────────────────────── */
 .bk-topbar {
