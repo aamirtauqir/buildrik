@@ -14,3 +14,4 @@ export { StatusDot, type StatusDotProps, type StatusDotState } from "./StatusDot
 export { Icon, IconButton, Kbd, Spinner, type IconProps, type IconButtonProps, type KbdProps, type SpinnerProps } from "./Icon";
 export { CopyButton, type CopyButtonProps } from "./CopyButton";
 export { SectionHeader, type SectionHeaderProps } from "./SectionHeader";
+export { NavItem, type NavItemProps } from "./NavItem";

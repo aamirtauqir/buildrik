@@ -96,20 +96,6 @@
 .bk-field-row--stacked { flex-direction: column; align-items: stretch; gap: var(--bk-space-4); }
 .bk-field-row--stacked .bk-field-row__label { width: auto; }
 
-/* ── Nav item · Figma 16:26 · State ─────────────────────────────────────── */
-.bk-nav-item {
-  display: flex; align-items: center; gap: var(--bk-space-8);
-  height: var(--bk-size-row); padding: 0 var(--bk-space-12);
-  border-radius: var(--bk-radius-lg);
-  border: 0; background: transparent; width: 100%; text-align: left;
-  font-family: var(--bk-font-ui); font-size: var(--bk-text-13);
-  color: var(--bk-ink-muted); cursor: pointer;
-  transition: var(--bk-transition-fast);
-}
-.bk-nav-item:hover { background: var(--bk-bg-subtle); color: var(--bk-ink); }
-.bk-nav-item[aria-current="page"] { background: var(--bk-accent-tint); color: var(--bk-accent-text); font-weight: var(--bk-weight-medium); }
-.bk-nav-item:focus-visible { outline: none; box-shadow: var(--bk-shadow-focus); }
-
 /* ── Panel header · Figma 16:6 ──────────────────────────────────────────── */
 .bk-panel-header {
   display: flex; align-items: center; gap: var(--bk-space-8);

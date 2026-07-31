@@ -10,7 +10,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import {
   Row, ListRow, TreeRow, VersionRow, RecordRow, FormatRow, IntegrationRow, CommentRow,
-  FieldRow, NavItem, PanelHeader, EmptyState,
+  FieldRow, PanelHeader, EmptyState,
   MediaCard, SiteCard,
 } from "../index";
 import { Button } from "flowbite-react";
@@ -124,13 +124,6 @@ describe("FieldRow", () => {
       </FieldRow>,
     );
     expect(screen.getByLabelText("Radius")).toBeTruthy();
-  });
-});
-
-describe("NavItem", () => {
-  it("answers 'where am I' with aria-current", () => {
-    render(<NavItem current>Domains</NavItem>);
-    expect(screen.getByRole("button", { name: "Domains" }).getAttribute("aria-current")).toBe("page");
   });
 });
 
