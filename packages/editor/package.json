@@ -17,7 +17,7 @@
     "test:coverage": "vitest run --coverage",
     "check:no-legacy-settings-path": "grep -r 'components/Panels/LeftSidebar/tabs/settings' src/ --include='*.ts' --include='*.tsx' && echo 'FAIL: legacy settings path found' && exit 1 || echo 'PASS: no legacy settings path'",
     "lint:ds": "bash scripts/ds-grep-gates.sh",
-    "verify:ds": "node scripts/verify-design-baselines.mjs && bash scripts/ds-grep-gates.sh && node scripts/check-ds-ssot.mjs && node scripts/conformance/check-token-resolution.mjs && node scripts/check-tsc-baseline.mjs && npm run gate:tokens-generated && npm run gate:vibcoder-ratchet",
+    "verify:ds": "node scripts/verify-design-baselines.mjs && bash scripts/ds-grep-gates.sh && node scripts/check-ds-ssot.mjs && node scripts/conformance/check-token-resolution.mjs && node scripts/check-tsc-baseline.mjs && npm run gate:tokens-generated && npm run gate:vibcoder-ratchet && npm run gate:editor-ui-gone",
     "gate:tokens": "node scripts/conformance/check-token-resolution.mjs",
     "gate:tsc": "node scripts/check-tsc-baseline.mjs",
     "hooks:install": "bash scripts/install-git-hooks.sh",
@@ -32,7 +32,8 @@
     "phase5:inventory:strict": "node scripts/phase5-shim-inventory.mjs --strict",
     "tokens:generate": "node scripts/tokens/generate.mjs",
     "gate:tokens-generated": "node scripts/check-tokens-generated.mjs",
-    "gate:vibcoder-ratchet": "node scripts/check-vibcoder-ratchet.mjs"
+    "gate:vibcoder-ratchet": "node scripts/check-vibcoder-ratchet.mjs",
+    "gate:editor-ui-gone": "node scripts/check-editor-ui-gone.mjs"
   },
   "dependencies": {
     "@buildrik/shared": "workspace:*",

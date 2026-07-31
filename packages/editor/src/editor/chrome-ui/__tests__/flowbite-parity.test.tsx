@@ -22,7 +22,7 @@ import { vi } from "vitest";
 import { Modal, Dropdown, DropdownItem, Popover, Tooltip, Toast } from "flowbite-react";
 import { getOverlayRoot } from "../OverlayRoot";
 
-describe("flowbite Modal vs modal-owns-keyboard + focus contract (chrome-ui/focus.ts:78, ui/OverlayMount.tsx:39)", () => {
+describe("flowbite Modal vs modal-owns-keyboard + focus contract (chrome-ui/focus.ts:78, chrome-ui/OverlayMount.tsx:39)", () => {
   // Verdict: KEEP. Modal DOES accept `root` (Modal.d.ts: `root?: HTMLElement`)
   // so portal-targeting #bk-overlay-root (spec §4.4) works — that alone would
   // read as SWAP. The decisive gap is aria-modal: @floating-ui/react's
@@ -35,7 +35,7 @@ describe("flowbite Modal vs modal-owns-keyboard + focus contract (chrome-ui/focu
   // keyboard — everywhere") depended on by StudioHeader.tsx:248,
   // useEditorShortcuts.ts:75 and canvas/comments/CommentLayer.tsx:213. Our
   // own OverlayMount already stamps both attributes together
-  // (ui/OverlayMount.tsx:39) — proof the pairing is load-bearing, not
+  // (chrome-ui/OverlayMount.tsx:39) — proof the pairing is load-bearing, not
   // incidental. A caller CAN work around the gap by passing
   // `aria-modal="true"` manually (it lands via the restProps ->
   // getFloatingProps spread onto the dialog div — verified below), but
@@ -137,12 +137,12 @@ describe("flowbite Modal vs modal-owns-keyboard + focus contract (chrome-ui/focu
   });
 });
 
-describe("flowbite Dropdown vs Menu contract (ui/Popover.tsx:66-165)", () => {
+describe("flowbite Dropdown vs Menu contract (chrome-ui/Popover.tsx:66-165)", () => {
   // Verdict: KEEP. Not because of portalling — Dropdown never portals at all
   // (grepping Dropdown.js for createPortal/FloatingPortal returns zero
   // matches, unlike Modal); it renders inline in the React tree, which
   // already matches our "anchored, not portalled" philosophy
-  // (ui/Popover.tsx:4) — spec §4.4's portal-targeting requirement does not
+  // (chrome-ui/Popover.tsx:4) — spec §4.4's portal-targeting requirement does not
   // even apply here. Roving arrow-key focus and return-focus-to-trigger-on-
   // Escape DO work (@floating-ui/react useListNavigation +
   // FloatingFocusManager, Dropdown.js:100/154) — verified below, though only
@@ -150,7 +150,7 @@ describe("flowbite Dropdown vs Menu contract (ui/Popover.tsx:66-165)", () => {
   // DropdownItemProps (DropdownItem.d.ts) has no checked/selected field and
   // DropdownItem always renders role="menuitem" (DropdownItem.js:41) — never
   // "menuitemcheckbox" — while our Menu's roving-focus selector explicitly
-  // includes both roles (ITEM_SELECTOR, ui/Popover.tsx:86) because MenuItem
+  // includes both roles (ITEM_SELECTOR, chrome-ui/Popover.tsx:86) because MenuItem
   // supports a checkable variant (`selected` prop). Any caller using a
   // checkable menu item has no flowbite equivalent to move to without a
   // rewrite.
@@ -200,7 +200,7 @@ describe("flowbite Dropdown vs Menu contract (ui/Popover.tsx:66-165)", () => {
   });
 });
 
-describe("flowbite Popover vs anchored, non-trapping contract (ui/Popover.tsx:1-13, :18-29)", () => {
+describe("flowbite Popover vs anchored, non-trapping contract (chrome-ui/Popover.tsx:1-13, :18-29)", () => {
   // Verdict: KEEP. Structurally it already matches "anchored, not portalled"
   // (Popover.js has no createPortal/FloatingPortal call — same inline
   // Fragment pattern as Tooltip) so §4.4 portal-targeting doesn't even
@@ -211,11 +211,11 @@ describe("flowbite Popover vs anchored, non-trapping contract (ui/Popover.tsx:1-
   //     focus-guard elements AND marks the trigger `aria-hidden="true"` +
   //     `data-floating-ui-inert=""` (i.e. the rest of the page is made inert
   //     while it's open) — while our Popover intentionally traps nothing; it
-  //     only closes on Escape/outside pointer-down (ui/Popover.tsx:1-11) so
+  //     only closes on Escape/outside pointer-down (chrome-ui/Popover.tsx:1-11) so
   //     e.g. a filter popover next to other toolbar buttons stays reachable.
   // (2) PopoverProps.content is a single fixed ReactNode slot (Popover.d.ts)
   //     while ours takes `trigger` + arbitrary composed `children` as the
-  //     panel body (PopoverProps, ui/Popover.tsx:18-29) — real callers that
+  //     panel body (PopoverProps, chrome-ui/Popover.tsx:18-29) — real callers that
   //     compose our Menu inside a Popover would need restructuring around
   //     the `content` prop shape independent of the trap-behavior question.
 
@@ -245,13 +245,13 @@ describe("flowbite Popover vs anchored, non-trapping contract (ui/Popover.tsx:1-
     );
     // FloatingFocusManager brackets the trap with guard elements and marks
     // everything outside it inert — evidence of a real, unconditional trap,
-    // unlike ui/Popover.tsx which has none.
+    // unlike chrome-ui/Popover.tsx which has none.
     expect(document.querySelectorAll("[data-floating-ui-focus-guard]").length).toBeGreaterThan(0);
     expect(screen.getByText("trigger").getAttribute("aria-hidden")).toBe("true");
   });
 });
 
-describe("flowbite Tooltip vs anchored show/hide contract (ui/Popover.tsx:1-13)", () => {
+describe("flowbite Tooltip vs anchored show/hide contract (chrome-ui/Popover.tsx:1-13)", () => {
   // Verdict: SWAP. Floating.js — the primitive Tooltip is built on — never
   // calls createPortal (grep = zero matches); trigger and floating content
   // render as plain sibling <div>s in React's own tree, which already
@@ -319,16 +319,16 @@ describe("flowbite Tooltip vs anchored show/hide contract (ui/Popover.tsx:1-13)"
   });
 });
 
-describe("flowbite Toast vs one-action lifecycle contract (ui/Toast.tsx:1-16, ui/Toast.tsx:49-135)", () => {
+describe("flowbite Toast vs one-action lifecycle contract (chrome-ui/Toast.tsx:1-16, chrome-ui/Toast.tsx:49-135)", () => {
   // Verdict: KEEP. flowbite-react's Toast (Toast.js) is a single static
   // container: no queue/store, no auto-dismiss timer (its `duration` prop
   // only picks a CSS transition-duration class — the durationClasses map,
   // Toast.js — nothing calls setTimeout), no built-in action-button slot,
   // and no aria-live viewport. Every one of those is load-bearing in ours:
-  // the module-level `store` (ui/Toast.tsx:49) feeds `useToast().addToast()`
+  // the module-level `store` (chrome-ui/Toast.tsx:49) feeds `useToast().addToast()`
   // call sites, `ToastItem` self-dismisses via a real timer
-  // (ui/Toast.tsx:135), and `ToastViewport` sets aria-live polite/assertive
-  // by tone (ui/Toast.tsx:119). flowbite-react gives us a styled shell to
+  // (chrome-ui/Toast.tsx:135), and `ToastViewport` sets aria-live polite/assertive
+  // by tone (chrome-ui/Toast.tsx:119). flowbite-react gives us a styled shell to
   // build that on top of, not the lifecycle itself.
 
   it("does not auto-dismiss after its stated duration — no timer is wired to unmount", () => {
@@ -348,8 +348,8 @@ describe("flowbite Toast vs one-action lifecycle contract (ui/Toast.tsx:1-16, ui
     // queue/store fact (no module-level store, no multi-item viewport) is
     // a source-code claim, not something a single render can assert against
     // — it's recorded as a citation in the inventory verdict instead
-    // (Toast.js has no store; contrast ui/Toast.tsx:49 store +
-    // ui/Toast.tsx:112-128 ToastViewport).
+    // (Toast.js has no store; contrast chrome-ui/Toast.tsx:49 store +
+    // chrome-ui/Toast.tsx:112-128 ToastViewport).
     render(<Toast>content</Toast>);
     const alert = screen.getByRole("alert");
     expect(alert).toBeInTheDocument();

@@ -12,7 +12,7 @@ export { TextField, type TextFieldProps } from "./TextField";
 export { SkeletonListItem, StudioSkeleton, type SkeletonListItemProps } from "./Skeleton";
 export { StatusDot, type StatusDotProps, type StatusDotState } from "./StatusDot";
 export { SaveStatus, type SaveStatusProps, type SaveState } from "./SaveStatus";
-export { IssueChip, formatIssueSummary, type IssueChipProps } from "./IssueChip";
+export { IssueChip, formatIssueSummary, plural, type IssueChipProps } from "./IssueChip";
 export { Presence, toneFor, type PresenceProps, type PresenceUser, type ConnectionState } from "./Presence";
 export { BreakpointSwitcher, type Breakpoint, type BreakpointSwitcherProps } from "./BreakpointSwitcher";
 export { Topbar, SiteMenuIcon } from "./Topbar";

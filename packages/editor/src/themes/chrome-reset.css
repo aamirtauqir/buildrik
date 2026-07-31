@@ -4,9 +4,10 @@
    Root class verified 2026-07-30 (flowbite-bigbang Task 2): the brief's
    example selector `.bk-studio-root` does not exist in the tree. The real
    mounted shell root is `.bd-studio`, set on AquibraStudio's outer div
-   (src/editor/shell/AquibraStudio.tsx). `.bk-shell` (editor/ui/EditorShell.tsx)
-   is exported from the ui library but has zero consumers outside its own
-   barrel — it is not what actually mounts.
+   (src/editor/shell/AquibraStudio.tsx). `chrome-ui/EditorShell.tsx` (the
+   successor to the deleted editor/ui/EditorShell.tsx, Task 13) has no
+   `.bk-shell` class at all — it styles itself entirely with `tw:` utility
+   classes — so it was never what actually mounts either.
 
    Canvas exclusion added 2026-07-30 (fix round 1, reviewer finding #1 —
    CRITICAL): `.bd-studio` is an ANCESTOR of the canvas mount point,

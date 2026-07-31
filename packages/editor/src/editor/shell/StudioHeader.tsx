@@ -28,6 +28,7 @@ import {
   ModalDescription,
   ModalFooter,
   isModalOpen,
+  plural,
   type PublishState,
   type ReviewPill,
   type ReviewTone,
@@ -676,7 +677,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         <ModalRoot open onOpenChange={(o) => !o && setPubConfirm(false)}>
           <ModalContent size="question" aria-labelledby="bk-pubconfirm-title">
             <ModalTitle id="bk-pubconfirm-title">
-              Publish with {errorCount} error{errorCount === 1 ? "" : "s"}?
+              Publish with {plural(errorCount, "error")}?
             </ModalTitle>
             <div className="bk-pubconfirm__list">
               {confirmRows.map((i) => (

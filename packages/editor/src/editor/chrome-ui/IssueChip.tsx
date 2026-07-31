@@ -14,8 +14,10 @@
  * will read "Publish anyway".
  *
  * Copy rule (D14): the chip shows the TOTAL count; the breakdown lives in the
- * tooltip and accessible name via `formatIssueSummary` — the ONE source for
- * this copy (chip, confirm modal, announcements all import it).
+ * tooltip and accessible name via `formatIssueSummary`. StudioHeader's
+ * publish-anyway confirm modal does NOT import `formatIssueSummary` — its
+ * title is errors-only copy (that modal only opens when errorCount > 0), so
+ * it shares only the `plural` primitive below, not the full summary string.
  *
  * @license BSD-3-Clause
  */
@@ -29,14 +31,23 @@ export interface IssueChipProps {
   readOnlyReason?: string;
 }
 
-function plural(n: number, word: string): string {
+/**
+ * The one pluralization primitive for issue counts — used directly by
+ * `formatIssueSummary` below (chip tooltip/aria) and by StudioHeader's
+ * publish-anyway confirm modal (its title only ever needs the error count,
+ * since that modal is gated on errorCount > 0 and warnings alone never
+ * trigger it — reusing the full `formatIssueSummary` string there would wrongly
+ * surface warnings in a title that's specifically about errors).
+ */
+export function plural(n: number, word: string): string {
   return `${n} ${word}${n === 1 ? "" : "s"}`;
 }
 
 /**
- * The one source for issue-count copy (plan D14, eng D7). Locus-free on
- * purpose (eng D13/T10): counts may mix page-bound and site-wide issues, so
- * naming a scope here would lie in one of them.
+ * The one source for the FULL issue-count summary copy (plan D14, eng D7).
+ * Locus-free on purpose (eng D13/T10): counts may mix page-bound and
+ * site-wide issues, so naming a scope here would lie in one of them. Used by
+ * IssueChip's tooltip and accessible name.
  */
 export function formatIssueSummary(errors: number, warnings: number): string {
   const total = errors + warnings;
