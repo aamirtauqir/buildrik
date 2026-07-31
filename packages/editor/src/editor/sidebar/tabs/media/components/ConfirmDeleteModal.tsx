@@ -65,7 +65,6 @@ export function ConfirmDeleteModal({ payload, onConfirm, onCancel }: ConfirmDele
               Type <strong>DELETE</strong> to confirm:
             </p>
             <TextField
-              className="med-modal-gate-input"
               value={confirmInput}
               onChange={(e) => setConfirmInput(e.target.value)}
               placeholder="DELETE"
