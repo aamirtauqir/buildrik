@@ -58,6 +58,47 @@ Both were caught by deliberately planting a violation and watching the gate pass
    `document.body`, now recorded in the Gate 22 allowlist as documented debt rather than
    silently passing. Two are context menus that deliberately do not trap focus.
 
+## Addendum — chrome-ui-single-surface B1-B4, 2026-07-31
+
+Follow-on spec (`2026-07-31-chrome-ui-single-surface.md`, rev 3) closed the second
+architectural gap this arc's own end-state left open: `chrome-ui/` (45 editor
+components) and 249 files importing `flowbite-react` directly were two competing
+answers to "where do I import a form control from," and `TextInput`/`Select`'s theme
+contract was opt-in and silently skippable at 73 call sites.
+
+| Task | Outcome |
+|---|---|
+| B1 | `chrome-ui/index.ts` barrel: 14 pure flowbite-react re-exports, `TextInput`/`Select` `forwardRef` wrappers (`mergeTheme.ts` deep-merge, caller wins per leaf), `CustomFlowbiteTheme` + every `BK_*` constant. |
+| B2 | `gate:chrome-ui-surface` shipped WARN mode in the same commit as the barrel (not last) — no window where the barrel existed without its guard. |
+| B3 | 249-file sweep, 6 surface-sized commits (inspector 52, sidebar 82, shell 20, design-system+shared/forms+templates 39, canvas+media+export+panels 49, ecommerce+animation+rail+components-catalog+onboarding 7) + 1 gate-flip commit. Two ts-morph codemods (`scripts/codemods/chrome-ui-sweep.ts`, `chrome-ui-drop-default-theme.ts`) did the mechanical relocation and the AST-precise theme-prop drop; every commit individually `tsc --noEmit` clean with that surface's targeted tests green. |
+| B4 | This addendum + `packages/editor/CLAUDE.md`'s Chrome Routing Rules section rewritten to name chrome-ui as the single surface and the closed 2-wrapper set. |
+
+**Decision:** `chrome-ui/index.ts` is the only file under `packages/editor/src` allowed
+a `flowbite-react` specifier (bare or subpath) — enforced, not just documented, by
+`gate:chrome-ui-surface` in ERROR mode. Deep imports of `chrome-ui/<file>` (e.g.
+`chrome-ui/selectTheme`) are equally banned outside `chrome-ui/` itself; all 65
+pre-existing deep importers were re-pointed to the barrel in the same sweep. The
+2-wrapper set (`TextInput`, `Select`) is closed by construction — `gate:chrome-ui-surface`
+guard #3 fails the build on a 3rd wrapper until `WRAPPER_FILES` is amended deliberately.
+
+**Theme-prop cleanup, not just relocation:** 109 `theme={BK_TEXT_INPUT_THEME}` /
+`theme={BK_SELECT_BASE_THEME}` JSX props across 61 files were dropped as part of the
+same sweep (now redundant — the wrapper applies that exact default) via an AST-precise
+codemod matching only the bare identifier on a `<TextInput>`/`<Select>` element, never a
+blanket text regex — per plan §4 B3's explicit ban on a blanket codemod for this rule.
+The three documented exemptions (`InputControls.tsx`'s inline theme object,
+`BK_SELECT_BARE_UNIT_THEME`, `BK_SELECT_BARE_VALUE_THEME`) use different identifiers
+entirely and were never matched.
+
+**Verification:** `grep -rn 'from "flowbite-react' packages/editor/src | grep -v
+chrome-ui/` → empty (subpaths and deep `chrome-ui/*` imports included). `gate:chrome-ui-surface`
+ERROR mode, all 4 negative tests re-run against the flipped gate (direct import, subpath
+import, barrel-wrapping-export, clean tree) — 3 fail as required, clean tree passes.
+`npx tsc --noEmit` clean after every commit. Full targeted-test sweep across all 6
+surfaces: 1 timeout in `LibraryManager.test.tsx` under full-batch load, reproduced clean
+in isolation (4/4, 9s) — inside the flake band this doc's §"Known open items" #1 already
+documents, not a regression from B3.
+
 ## Process notes worth keeping
 
 - A parallel session committed to this same branch throughout, including one

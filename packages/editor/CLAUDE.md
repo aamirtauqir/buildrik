@@ -567,7 +567,7 @@ Use the `/browse` skill from gstack for all web browsing. Never use `mcp__claude
 - /unfreeze
 - /gstack-upgrade
 
-## Chrome Routing Rules — chrome-ui + flowbite-react (editor/ui DELETED 2026-07-31)
+## Chrome Routing Rules — chrome-ui is the single public surface (2026-07-31)
 
 The chrome layer (sidebar/rail/inspector/topbar/footer) is built exclusively
 from `src/editor/chrome-ui/` composing `flowbite-react` primitives, styled
@@ -581,6 +581,43 @@ was itself deleted at Task 13 of the flowbite big-bang migration
 (`docs/plans/flowbite-bigbang-inventory.md`) once every consumer was
 re-pointed to `chrome-ui/` and flowbite-react across Tasks 2-12.
 
+**`chrome-ui/index.ts` is the single import surface for everything
+flowbite-sourced** (chrome-ui-single-surface spec,
+`docs/plans/2026-07-31-chrome-ui-single-surface.md`). Every file under
+`packages/editor/src` outside `chrome-ui/` itself imports Button, TextInput,
+Select, Badge, etc. — and the `BK_*` theme constants, and the
+`CustomFlowbiteTheme` type — from `@/editor/chrome-ui`, never directly from
+`flowbite-react` (bare or subpath, e.g. `flowbite-react/types`) and never from
+a deep `@/editor/chrome-ui/<file>` path (e.g. `chrome-ui/selectTheme`). The
+barrel aggregates three kinds of export: pure `export { X } from
+"flowbite-react"` re-exports (Button, Badge, Avatar, AvatarGroup, Checkbox,
+Radio, ToggleSwitch, Tooltip, Textarea, Label, HelperText, RangeSlider,
+Progress, Card), the 45+ editor-specific components already canonical here
+(Topbar, IssueChip, Modal, Toast, etc.), and the closed 2-wrapper set below.
+The B3 sweep (task report:
+`.superpowers/sdd/2026-07-30-flowbite-bigbang-implementation/task-B-report.md`)
+re-pointed all 249 pre-existing direct imports across 6 surface-sized commits.
+
+**The closed 2-wrapper set — never a 3rd without amending both
+`chrome-ui/index.ts` and the gate's `WRAPPER_FILES` in the same commit:**
+
+| Wrapper | Default theme | File |
+|---|---|---|
+| `TextInput` | `BK_TEXT_INPUT_THEME` | `chrome-ui/TextInput.tsx` |
+| `Select` | `BK_SELECT_BASE_THEME` | `chrome-ui/Select.tsx` |
+
+Both are `forwardRef` (ref reaches the real `<input>`/`<select>` — load-bearing
+for rename/search focus and hidden file-input clicks) and deep-merge
+(`chrome-ui/mergeTheme.ts`) a caller-supplied `theme` prop on top of the
+default — caller key wins per leaf, untouched default keys survive. Passing
+`theme={BK_TEXT_INPUT_THEME}` / `theme={BK_SELECT_BASE_THEME}` at a call site
+is now redundant (the wrapper already applies it) and should be omitted;
+`theme={BK_SELECT_BARE_UNIT_THEME}` / `theme={BK_SELECT_BARE_VALUE_THEME}`
+and other genuinely different overrides still need the explicit prop — the
+wrapper composes it on top of the base, it does not replace it. `Label` has no
+wrapper (its contract is `className`-based — `BK_LABEL_CLASS`/
+`BK_HELPER_CLASS`/`BK_HELPER_ERROR_CLASS`, plain re-export).
+
 ### When modifying chrome
 
 - **Existing component:** edit `src/editor/chrome-ui/<Name>.tsx` — styles are inline `tw:` utility classes on the component itself, no companion CSS file to keep in sync. Contract tests in `src/editor/chrome-ui/__tests__/`.
@@ -590,6 +627,7 @@ re-pointed to `chrome-ui/` and flowbite-react across Tasks 2-12.
 
 ### CI gates relevant to the library
 
+- `gate:chrome-ui-surface` — **ERROR mode**, locked at **0**: (1) no `flowbite-react` import (bare or subpath) outside `chrome-ui/`, (2) barrel purity — every flowbite-sourced export in `chrome-ui/index.ts` is a pure re-export, never a component definition, (3) closed wrapper set is exactly `[TextInput.tsx, Select.tsx]`. Checks 2/3 have been ERROR since the gate shipped; check 1 flipped from WARN once the B3 sweep drained the count to 0.
 - `gate:tokens-generated` — generated files current, zero legacy chrome tokens
 - `gate:vibcoder-ratchet` — locked at **0**: any import of the deleted vibcoder/shared-ui paths fails the build
 - `gate:editor-ui-gone` — locked at **0**: any import of the deleted `@/editor/ui` path fails the build
