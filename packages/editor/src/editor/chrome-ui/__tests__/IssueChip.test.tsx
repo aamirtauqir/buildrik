@@ -1,10 +1,17 @@
 /**
  * IssueChip — contract tests (plan D6/D14/F25; Figma node pending T1).
+ *
+ * Moved from `editor/ui/__tests__/issuechip.test.tsx` (Task 6, flowbite
+ * big-bang) when IssueChip ported to chrome-ui. The two `bk-issuechip--*`
+ * modifier-class assertions rewrote to the applied tone utility (`tw:text-*`)
+ * — the tw:* classname now IS the styling contract, same "assert the applied
+ * utility, not a deleted implementation class" rule the rest of Task 6 used.
+ *
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { IssueChip, formatIssueSummary } from "../index";
+import { IssueChip, formatIssueSummary } from "../IssueChip";
 
 describe("formatIssueSummary — the ONE source for issue-count copy (D14)", () => {
   it("zero is calm", () => {
@@ -38,14 +45,14 @@ describe("IssueChip", () => {
     render(<IssueChip errors={0} warnings={2} />);
     const chip = screen.getByRole("button", { name: "2 issues, 2 warnings" });
     expect(chip.textContent).toBe("2");
-    expect(chip.className).toContain("bk-issuechip--warning");
+    expect(chip.className).toContain("tw:text-yellow-800");
   });
 
   it("errors win the tone even among warnings (D14)", () => {
     render(<IssueChip errors={1} warnings={2} />);
     const chip = screen.getByRole("button", { name: "3 issues, 1 error" });
     expect(chip.textContent).toBe("3");
-    expect(chip.className).toContain("bk-issuechip--error");
+    expect(chip.className).toContain("tw:text-red-700");
   });
 
   it("caps the display at 99+ without lying in the tooltip", () => {

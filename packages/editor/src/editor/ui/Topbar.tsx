@@ -22,7 +22,7 @@
 import React from "react";
 import { Button, Tooltip } from "flowbite-react";
 import { IconButton } from "../chrome-ui/Icon";
-import { IssueChip } from "./IssueChip";
+import { IssueChip } from "../chrome-ui/IssueChip";
 import { SaveStatus, type SaveState } from "../chrome-ui/SaveStatus";
 import { Presence, type PresenceProps } from "./Presence";
 

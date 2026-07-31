@@ -77,8 +77,8 @@ export { SaveStatus, type SaveStatusProps, type SaveState } from "../chrome-ui/S
 export { Presence, toneFor, type PresenceProps, type PresenceUser, type ConnectionState } from "./Presence";
 export { Topbar, SiteMenuIcon } from "./Topbar";
 export type { TopbarProps, TopbarTools, PublishState, ReviewPill, ReviewTone } from "./Topbar";
-export { IssueChip, formatIssueSummary } from "./IssueChip";
-export type { IssueChipProps } from "./IssueChip";
+export { IssueChip, formatIssueSummary } from "../chrome-ui/IssueChip";
+export type { IssueChipProps } from "../chrome-ui/IssueChip";
 
 /* ── BreakpointSwitcher · ported from vibcoder ──────────────────────────── */
 export { BreakpointSwitcher, type Breakpoint, type BreakpointSwitcherProps } from "./BreakpointSwitcher";

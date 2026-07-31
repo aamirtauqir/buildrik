@@ -77,6 +77,16 @@ const Octagon = () => (
   </svg>
 );
 
+const BASE_CLASS =
+  "tw:inline-flex tw:items-center tw:gap-1 tw:h-7 tw:px-2 tw:border-0 tw:bg-transparent " +
+  "tw:rounded-md tw:cursor-pointer tw:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
+
+const TONE_CLASS: Record<"neutral" | "warning" | "error", string> = {
+  neutral: "tw:text-gray-500 tw:hover:bg-gray-100",
+  warning: "tw:text-yellow-800 tw:hover:bg-yellow-50",
+  error: "tw:text-red-700 tw:hover:bg-red-100",
+};
+
 export function IssueChip({ errors, warnings, onClick, readOnlyReason }: IssueChipProps) {
   const total = errors + warnings;
   const tone = errors > 0 ? "error" : warnings > 0 ? "warning" : "neutral";
@@ -86,13 +96,15 @@ export function IssueChip({ errors, warnings, onClick, readOnlyReason }: IssueCh
   return (
     <button
       type="button"
-      className={`bk-issuechip bk-issuechip--${tone}`}
+      className={`${BASE_CLASS} ${TONE_CLASS[tone]}`}
       aria-label={label}
       title={title}
       onClick={onClick}
     >
       {tone === "neutral" ? <ShieldCheck /> : tone === "warning" ? <Triangle /> : <Octagon />}
-      {total > 0 ? <span className="bk-issuechip__count">{total > 99 ? "99+" : total}</span> : null}
+      {total > 0 ? (
+        <span className="tw:text-xs tw:font-semibold tw:tabular-nums">{total > 99 ? "99+" : total}</span>
+      ) : null}
     </button>
   );
 }
