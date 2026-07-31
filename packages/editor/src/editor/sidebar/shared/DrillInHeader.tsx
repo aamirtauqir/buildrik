@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { PanelHeaderActions } from "@/editor/ui";
+import { PanelHeaderActions } from "@/editor/chrome-ui";
 import { BackArrowIcon } from "./headerIcons";
 import { drillInHeaderContainerStyles } from "./headerStyles";
 import { Button } from "flowbite-react";

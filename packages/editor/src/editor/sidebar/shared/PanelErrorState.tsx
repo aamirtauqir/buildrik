@@ -6,7 +6,7 @@
  */
 
 import * as React from "react";
-import { EmptyState } from "@/editor/ui";
+import { EmptyState } from "@/editor/chrome-ui";
 import { Button } from "flowbite-react";
 
 export interface PanelErrorStateProps {

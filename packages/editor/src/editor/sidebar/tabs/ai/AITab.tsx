@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ConfirmDialog, PanelFrame } from "@/editor/ui";
+import { ConfirmDialog, PanelFrame } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import { ScopeChip } from "./ScopeChip";
 import { ChatThread } from "./ChatThread";

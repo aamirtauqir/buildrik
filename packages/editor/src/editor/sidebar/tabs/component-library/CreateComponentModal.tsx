@@ -23,7 +23,7 @@ import {
   ModalRoot,
   ModalTitle,
   Portal,
-} from "@/editor/ui";
+} from "@/editor/chrome-ui";
 import { BK_SELECT_BASE_THEME } from "@/editor/chrome-ui/selectTheme";
 import {
   dialogCancelBtnStyles,

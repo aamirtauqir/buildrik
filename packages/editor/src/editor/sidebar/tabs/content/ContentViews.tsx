@@ -8,7 +8,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { ConfirmDialog } from "@/editor/ui";
+import { ConfirmDialog } from "@/editor/chrome-ui";
 import { BK_SELECT_BASE_THEME } from "@/editor/chrome-ui/selectTheme";
 import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
 import type { ConditionExpression, ConditionOperator, DataSource } from "@/shared/types/data";
