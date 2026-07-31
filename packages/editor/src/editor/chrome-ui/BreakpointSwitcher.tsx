@@ -42,6 +42,21 @@ const CORE_BREAKPOINTS: ReadonlyArray<BreakpointEntry> = [
 
 const WIDE_BREAKPOINT: BreakpointEntry = { id: "wide", glyph: "W", label: "Wide" };
 
+const WELL_CLASS =
+  "tw:inline-flex tw:p-0.5 tw:gap-0.5 tw:bg-gray-100 tw:rounded-lg tw:border tw:border-gray-200";
+
+/* Icon-only cells are fixed-size (w-8); labelled cells hug their text
+   (w-auto + horizontal padding) — the `labelled` prop is known at render
+   time, so branching in JS reproduces the old `.bk-bp-switcher--labelled
+   .bk-bp-switcher__btn` descendant override without a modifier class. */
+const BTN_BASE_CLASS =
+  "tw:h-6 tw:rounded-md tw:border-0 tw:cursor-pointer tw:bg-transparent tw:text-gray-600 " +
+  "tw:inline-flex tw:items-center tw:justify-center tw:font-medium tw:text-xs tw:leading-none " +
+  "tw:[font-family:var(--bk-font-ui)] tw:[transition:var(--bk-transition-fast)] tw:hover:text-gray-900 " +
+  "tw:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)] " +
+  "tw:aria-[pressed=true]:bg-white tw:aria-[pressed=true]:text-blue-700 " +
+  "tw:aria-[pressed=true]:[box-shadow:var(--bk-shadow-raised)]";
+
 export const BreakpointSwitcher = React.forwardRef<HTMLDivElement, BreakpointSwitcherProps>(
   function BreakpointSwitcher(
     { value, onChange, labelled = false, includeWide = false, glyphs, className, ...rest },
@@ -55,16 +70,14 @@ export const BreakpointSwitcher = React.forwardRef<HTMLDivElement, BreakpointSwi
         ref={ref}
         role="group"
         aria-label="Breakpoint"
-        className={["bk-bp-switcher", labelled && "bk-bp-switcher--labelled", className]
-          .filter(Boolean)
-          .join(" ")}
+        className={[WELL_CLASS, className].filter(Boolean).join(" ")}
         {...rest}
       >
         {entries.map((bp) => (
           <button
             key={bp.id}
             type="button"
-            className="bk-bp-switcher__btn"
+            className={`${BTN_BASE_CLASS} ${labelled ? "tw:w-auto tw:px-3" : "tw:w-8"}`}
             aria-pressed={value === bp.id}
             aria-label={bp.label}
             onClick={() => onChange(bp.id)}

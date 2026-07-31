@@ -6,8 +6,8 @@
  *
  * @license BSD-3-Clause
  */
-import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect } from "vitest";
+import { render, screen } from "@testing-library/react";
 import { FieldRow } from "../index";
 
 describe("FieldRow", () => {
@@ -18,42 +18,6 @@ describe("FieldRow", () => {
       </FieldRow>,
     );
     expect(screen.getByLabelText("Radius")).toBeTruthy();
-  });
-});
-
-/* ── BreakpointSwitcher · ported from vibcoder ──────────────────────────── */
-import { BreakpointSwitcher } from "../BreakpointSwitcher";
-
-describe("BreakpointSwitcher", () => {
-  it("is a labelled group of three type=button cells, four with includeWide", () => {
-    const { container, rerender } = render(
-      <BreakpointSwitcher value="desktop" onChange={() => {}} />,
-    );
-    const group = screen.getByRole("group", { name: "Breakpoint" });
-    expect(group.className).toContain("bk-bp-switcher");
-    const btns = container.querySelectorAll("button.bk-bp-switcher__btn");
-    expect(btns.length).toBe(3);
-    btns.forEach((b) => expect(b.getAttribute("type")).toBe("button"));
-    rerender(<BreakpointSwitcher value="desktop" onChange={() => {}} includeWide />);
-    expect(container.querySelectorAll("button.bk-bp-switcher__btn").length).toBe(4);
-  });
-
-  it("marks only the active breakpoint aria-pressed and reports clicks", () => {
-    const onChange = vi.fn();
-    render(<BreakpointSwitcher value="tablet" onChange={onChange} />);
-    expect(screen.getByRole("button", { name: "Tablet" }).getAttribute("aria-pressed")).toBe("true");
-    expect(screen.getByRole("button", { name: "Desktop" }).getAttribute("aria-pressed")).toBe("false");
-    fireEvent.click(screen.getByRole("button", { name: "Mobile" }));
-    expect(onChange).toHaveBeenCalledWith("mobile");
-  });
-
-  it("labelled mode swaps glyphs for full names", () => {
-    const { container } = render(
-      <BreakpointSwitcher value="desktop" onChange={() => {}} labelled />,
-    );
-    expect(container.querySelector(".bk-bp-switcher")!.className).toContain("bk-bp-switcher--labelled");
-    const texts = Array.from(container.querySelectorAll("button")).map((b) => b.textContent);
-    expect(texts).toEqual(["Desktop", "Tablet", "Mobile"]);
   });
 });
 

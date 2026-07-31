@@ -80,8 +80,8 @@ export type { TopbarProps, TopbarTools, PublishState, ReviewPill, ReviewTone } f
 export { IssueChip, formatIssueSummary } from "../chrome-ui/IssueChip";
 export type { IssueChipProps } from "../chrome-ui/IssueChip";
 
-/* ── BreakpointSwitcher · ported from vibcoder ──────────────────────────── */
-export { BreakpointSwitcher, type Breakpoint, type BreakpointSwitcherProps } from "./BreakpointSwitcher";
+/* ── BreakpointSwitcher · moved to chrome-ui (Task 6, flowbite big-bang) ── */
+export { BreakpointSwitcher, type Breakpoint, type BreakpointSwitcherProps } from "../chrome-ui/BreakpointSwitcher";
 
 /* ── HelpTooltip · moved from shared/ui (Slice 6B) ──────────────────────── */
 export { HelpTooltip, type HelpTooltipProps } from "../chrome-ui/HelpTooltip";
