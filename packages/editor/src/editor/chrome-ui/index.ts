@@ -59,3 +59,8 @@ export { RightPanel, type RightPanelProps } from "./RightPanel";
 export { EditorShell, type EditorShellProps } from "./EditorShell";
 export { Footer, FooterSpacer, type FooterProps } from "./Footer";
 export { Rail, RailItem, RailSpacer, type RailProps, type RailItemProps } from "./Rail";
+export { FieldRow, type FieldRowProps } from "./FieldRow";
+export { HelpTooltip, type HelpTooltipProps } from "./HelpTooltip";
+export { Slider, type SliderProps } from "./Slider";
+export { Tabs, type TabsProps, type Tab } from "./Tabs";
+export { Drawer, type DrawerProps, type DrawerLayout } from "./Drawer";

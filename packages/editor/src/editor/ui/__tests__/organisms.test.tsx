@@ -146,8 +146,9 @@ describe("Shell frames", () => {
   });
 
   it("Drawer grid layout is opt-in", () => {
-    const { container } = render(<Drawer title="Media" layout="grid">tiles</Drawer>);
-    expect(container.querySelector(".bk-drawer__body--grid")).toBeTruthy();
+    render(<Drawer title="Media" layout="grid">tiles</Drawer>);
+    const body = screen.getByRole("complementary", { name: "Media" }).children[1];
+    expect(body.className).toMatch(/tw:grid\b/);
   });
 
   it("Rail marks the open tool with aria-current", () => {

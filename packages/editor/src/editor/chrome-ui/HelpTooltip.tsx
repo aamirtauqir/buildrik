@@ -34,6 +34,11 @@ export interface HelpTooltipProps {
   size?: "sm" | "md";
 }
 
+const TRIGGER_CLASS =
+  "tw:inline-flex tw:items-center tw:justify-center tw:w-[18px] tw:h-[18px] tw:p-0 tw:ml-1 " +
+  "tw:border-transparent tw:bg-transparent tw:rounded-full tw:text-gray-500 tw:cursor-help tw:align-middle " +
+  "tw:[transition:color_0.15s,background_0.15s]";
+
 /**
  * HelpTooltip - "?" icon that shows explanation on hover
  *
@@ -64,7 +69,7 @@ export const HelpTooltip: React.FC<HelpTooltipProps> = ({
               href={docsLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="tw:mt-1 tw:block tw:text-[12px] tw:text-[#1A56DB] tw:no-underline"
+              className="tw:mt-1 tw:block tw:text-[12px] tw:text-blue-700 tw:no-underline"
               onClick={(e) => e.stopPropagation()}
             >
               Learn more →
@@ -78,8 +83,7 @@ export const HelpTooltip: React.FC<HelpTooltipProps> = ({
         size="xs"
         type="button"
         aria-label="What's this?"
-        style={buttonStyles}
-        className="tw:border-transparent tw:bg-transparent"
+        className={TRIGGER_CLASS}
       >
         <svg
           width={iconSize}
@@ -99,23 +103,6 @@ export const HelpTooltip: React.FC<HelpTooltipProps> = ({
       </Button>
     </Tooltip>
   );
-};
-
-const buttonStyles: React.CSSProperties = {
-  display: "inline-flex",
-  alignItems: "center",
-  justifyContent: "center",
-  width: 18,
-  height: 18,
-  padding: 0,
-  marginLeft: 4,
-  background: "transparent",
-  border: "none",
-  borderRadius: "var(--bk-radius-full)",
-  color: "var(--bk-ink-muted)",
-  cursor: "help",
-  transition: "color 0.15s, background 0.15s",
-  verticalAlign: "middle",
 };
 
 export default HelpTooltip;

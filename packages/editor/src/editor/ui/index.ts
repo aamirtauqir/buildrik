@@ -9,8 +9,8 @@
  */
 
 /* ── Atoms ──────────────────────────────────────────────────────────────── */
-export { Slider, type SliderProps } from "./Slider";
 /* ── Moved to chrome-ui (Task 6, flowbite big-bang) — bridge dies at Task 14 ─ */
+export { Slider, type SliderProps } from "../chrome-ui/Slider";
 export { StatusDot, type StatusDotProps, type StatusDotState } from "../chrome-ui/StatusDot";
 
 /* ── Molecules ──────────────────────────────────────────────────────────── */
@@ -30,7 +30,7 @@ export { RecordRow, type RecordRowProps } from "../chrome-ui/RecordRow";
 export { FormatRow, type FormatRowProps } from "../chrome-ui/FormatRow";
 export { IntegrationRow, type IntegrationRowProps, type IntegrationStatus } from "../chrome-ui/IntegrationRow";
 export { CommentRow, type CommentRowProps } from "../chrome-ui/CommentRow";
-export { FieldRow, type FieldRowProps } from "./FieldRow";
+export { FieldRow, type FieldRowProps } from "../chrome-ui/FieldRow";
 export { FormField, type FormFieldProps } from "./FormField";
 export { NavItem, type NavItemProps } from "../chrome-ui/NavItem";
 export { SectionHeader, type SectionHeaderProps } from "../chrome-ui/SectionHeader";
@@ -46,7 +46,7 @@ export { Portal } from "../chrome-ui/Portal";
 export { useFocusTrap, isModalOpen } from "../chrome-ui/focus";
 export { getOverlayRoot } from "../chrome-ui/OverlayRoot";
 export { Modal, type ModalProps, type ModalKind } from "./Modal";
-export { Drawer, type DrawerProps, type DrawerLayout } from "./Drawer";
+export { Drawer, type DrawerProps, type DrawerLayout } from "../chrome-ui/Drawer";
 export { RightPanel, type RightPanelProps } from "../chrome-ui/RightPanel";
 export { Rail, RailItem, RailSpacer, type RailProps, type RailItemProps } from "../chrome-ui/Rail";
 export { Footer, FooterSpacer, type FooterProps } from "../chrome-ui/Footer";
@@ -57,7 +57,7 @@ export { EditorShell, type EditorShellProps } from "../chrome-ui/EditorShell";
 
 /* ── Layout + compositions ──────────────────────────────────────────────── */
 export { PanelFrame, type PanelFrameProps, type PanelFrameHeaderProps, type PanelFrameBodyProps, type PanelWidth } from "../chrome-ui/PanelFrame";
-export { Tabs, type TabsProps, type Tab } from "./Tabs";
+export { Tabs, type TabsProps, type Tab } from "../chrome-ui/Tabs";
 export { ConfirmDialog, type ConfirmDialogProps } from "./ConfirmDialog";
 export {
   ToastProvider, useToast,
@@ -83,7 +83,7 @@ export type { IssueChipProps } from "./IssueChip";
 export { BreakpointSwitcher, type Breakpoint, type BreakpointSwitcherProps } from "./BreakpointSwitcher";
 
 /* ── HelpTooltip · moved from shared/ui (Slice 6B) ──────────────────────── */
-export { HelpTooltip, type HelpTooltipProps } from "./HelpTooltip";
+export { HelpTooltip, type HelpTooltipProps } from "../chrome-ui/HelpTooltip";
 
 /* ── Extensions drain · ported from shared/extensions ───────────────────── */
 export { PanelHeaderActions, type PanelHeaderActionsProps } from "../chrome-ui/PanelHeader";
