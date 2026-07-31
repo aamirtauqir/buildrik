@@ -57,7 +57,7 @@ export {
 } from "./Toast";
 
 /* ── Compatibility surfaces for trees written against the old API ───────── */
-export { Icon, IconButton, Kbd, Spinner, type IconProps, type IconButtonProps, type KbdProps, type SpinnerProps } from "./Icon";
+export { Icon, IconButton, Kbd, Spinner, type IconProps, type IconButtonProps, type KbdProps, type SpinnerProps } from "../chrome-ui/Icon";
 export {
   ModalRoot, ModalContent, ModalTitle, ModalDescription, ModalBody, ModalFooter, ModalClose,
   type ModalContentProps, type ModalSize,

@@ -21,7 +21,7 @@
  */
 import React from "react";
 import { Button, Tooltip } from "flowbite-react";
-import { IconButton } from "./Icon";
+import { IconButton } from "../chrome-ui/Icon";
 import { IssueChip } from "./IssueChip";
 import { SaveStatus, type SaveState } from "./SaveStatus";
 import { Presence, type PresenceProps } from "./Presence";

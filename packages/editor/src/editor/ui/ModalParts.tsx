@@ -13,7 +13,7 @@
  */
 import React from "react";
 import { OverlayMount } from "./OverlayMount";
-import { IconButton } from "./Icon";
+import { IconButton } from "../chrome-ui/Icon";
 
 export type ModalSize = "sm" | "question" | "form" | "lg" | "xl";
 
