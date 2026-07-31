@@ -5,9 +5,9 @@
  */
 
 import * as React from "react";
-import { ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal } from "@/editor/ui";
+import { ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
-import { useToast } from "@/editor/ui";
+import { useToast } from "@/editor/chrome-ui";
 import { devError } from "../../../shared/utils/devLogger";
 import { Button, Checkbox, TextInput } from "flowbite-react";
 import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";

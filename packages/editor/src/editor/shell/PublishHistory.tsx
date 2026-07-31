@@ -14,7 +14,7 @@
 
 import * as React from "react";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
-import { ConfirmDialog, Spinner } from "@/editor/ui";
+import { ConfirmDialog, Spinner } from "@/editor/chrome-ui";
 import { Badge } from "flowbite-react";
 import { useEditorRole } from "./hooks/useEditorRole";
 import { roleAtLeast } from "@/services/RoleService";

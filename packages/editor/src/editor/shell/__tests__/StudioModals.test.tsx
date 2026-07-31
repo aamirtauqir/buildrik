@@ -62,7 +62,7 @@ vi.mock("../modals/ProjectSettingsModal", () => ({
 }));
 
 import { StudioModals, type StudioModalsProps } from "../StudioModals";
-import { ToastProvider } from "@/editor/ui";
+import { ToastProvider } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
 
 function makeComposer() {

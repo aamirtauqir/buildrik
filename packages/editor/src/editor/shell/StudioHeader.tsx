@@ -33,7 +33,7 @@ import {
   type ReviewTone,
   type SaveState,
   type ToastInput,
-} from "@/editor/ui";
+} from "@/editor/chrome-ui";
 import type { SaveOutcome } from "./hooks/useSaveCallback";
 import type { Composer } from "../../engine";
 import { sanitizeHTMLForPreview } from "../export/ExportUtils";

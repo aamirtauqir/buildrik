@@ -7,7 +7,7 @@
  */
 
 import * as React from "react";
-import { ToastInput } from "@/editor/ui";
+import { ToastInput } from "@/editor/chrome-ui";
 import { getBlockDefinitions, insertBlock } from "../../../blocks/blockRegistry";
 import type { Composer } from "../../../engine";
 import { STORAGE_KEYS } from "../../../shared/constants/config";

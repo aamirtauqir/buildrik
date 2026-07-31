@@ -13,7 +13,7 @@
  */
 
 import * as React from "react";
-import { EmptyState, ROW_META_CLASS, Row, Spinner, StatusDot, type ToastInput } from "@/editor/ui";
+import { EmptyState, ROW_META_CLASS, Row, Spinner, StatusDot, type ToastInput } from "@/editor/chrome-ui";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { formatRelativeTime } from "@/shared/utils/relativeTime";
 import {

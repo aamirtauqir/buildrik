@@ -7,7 +7,7 @@
  */
 
 import * as React from "react";
-import { ToastInput } from "@/editor/ui";
+import { ToastInput } from "@/editor/chrome-ui";
 import { createComposer, Composer } from "../../../engine";
 import { ProductCollectionService } from "../../../engine/cms";
 import type { Element } from "../../../engine/elements/Element";

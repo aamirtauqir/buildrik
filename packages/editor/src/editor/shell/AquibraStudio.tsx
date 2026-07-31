@@ -15,7 +15,7 @@ import type { Composer } from "../../engine";
 import { useElementFlash } from "../../shared/hooks";
 import { EVENTS } from "../../shared/constants";
 import type { ComposerConfig, ProjectData, BlockData } from "../../shared/types";
-import { ToastProvider, UpgradeModal, useToast } from "@/editor/ui";
+import { ToastProvider, UpgradeModal, useToast } from "@/editor/chrome-ui";
 import { StudioSkeleton } from "@/editor/chrome-ui";
 import { StaleApprovalModal } from "./modals/StaleApprovalModal";
 import { PreviewOverlay } from "./PreviewOverlay";

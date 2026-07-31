@@ -4,12 +4,12 @@
  */
 
 import * as React from "react";
-import { ConfirmDialog } from "@/editor/ui";
+import { ConfirmDialog } from "@/editor/chrome-ui";
 import { createPortal } from "react-dom";
 import type { Composer } from "../../engine";
 import { EVENTS } from "../../shared/constants";
 import type { PageData } from "../../shared/types";
-import { useToast } from "@/editor/ui";
+import { useToast } from "@/editor/chrome-ui";
 import { useClickOutside } from "@/shared/hooks";
 import { getDefaultPageName } from "../../shared/utils/pageUtils";
 import { normalizeSlug } from "../sidebar/tabs/pages/utils/slug";
