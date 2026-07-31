@@ -145,3 +145,29 @@ Found and fixed while closing these (not in the original audit):
 Remaining known gaps (not blocking, no owner yet):
 - [ ] **[LOW · design] Arbitrary `text-[Npx]` values** — ~24 distinct sizes still coexist (`13px`, `13.5px`, `12.5px`…). DESIGN.md permits artifact-matched pixels, so this needs a design decision on which survive, not a codemod.
 - [ ] **[LOW · design] No Select primitive** — `SELECT_FIELD_CLASS` in workspace-form is hand-matched to InputField chrome and copied by other selects. Extract if a third consumer appears.
+
+## From /qa 2026-07-31 (whole-dashboard deep QA) — NOT fixed, need decisions
+
+Fixed in this pass: notification-prefs wipe, DS gate, drawer focus churn,
+danger-zone valid state, modal z-index + sticky footer, InputField
+disabled/readOnly affordance, workspace-rename stale sidebar.
+
+### Critical — verified, need a product/architecture decision (not safe QA fixes)
+
+- [ ] **Dashboard "Publish" cannot publish in production.** `app/dashboard/sites/[id]/publish/page.tsx:42` calls `publishMutation.mutate({ siteId })` with no page payload; the worker throws "No page content to deploy" when `pages.length === 0 && NODE_ENV === production` (`app/api/workers/publish/[jobId]/route.ts:88`). Only the editor's `PublishService` supplies pages. In dev the same click runs `runSimulation` and marks the site PUBLISHED with a `.dev-simulated.invalid` URL, so this is invisible locally. Decide: wire the page payload into the dashboard publish, or remove the dashboard button and route to the editor.
+- [ ] **"Cancel subscription" never reaches Stripe.** `server/services/billing.service.ts:286` only writes `cancelAtPeriodEnd: true` locally; there is no `subscriptions.update` call anywhere in `server/services/`. The customer sees "cancels on <date>", the card is charged at renewal, and the incoming `customer.subscription.updated` webhook resets the flag so the banner disappears. Same shape in `reactivateSubscription:312`. This is real money — fix deliberately with Stripe test-mode verification, not blind.
+- [ ] **Session revocation is cosmetic.** `server/auth.config.ts:41` is `strategy: "jwt"` and `token.sid` is only copied into the session object (`:168`), never validated against the Session row. "Revoke session", "Revoke all other sessions" and the password-reset "signs you out everywhere" all delete rows while the JWT cookie stays valid for its full 30 days. Needs a real decision: DB-session strategy, or a token version/denylist check in the jwt callback.
+
+### High — verified by source read, worth a follow-up pass
+
+- [ ] `server/services/template.service.ts:150` — `templates.use` does an unscoped `findUnique`, so any authenticated user can instantiate another workspace's private template (including its page content). The sibling `getTemplate:89` already scopes with `OR: [{workspaceId: null}, {workspaceId}]` and carries a comment about this exact leak.
+- [ ] `server/services/sites.service.ts:102` — site cards and "Copy Site URL" use `domains: { take: 1 }` with no `where: { status: "VERIFIED" }`, so an unverified/pending domain is shown and copied as the live address. The publish worker gets it right.
+- [ ] Settings has no role gating at all (`app/dashboard/settings/layout.tsx`), so ADMIN/EDITOR/VIEWER see billing, plans, api-token, integration and danger-zone controls that always 403. `sites.myRole` exists and is never called from the dashboard.
+- [ ] The dominant bug shape found repo-wide: `useQuery` consumers rendering `data ?? []` / `?? 0` without branching on `isLoading`/`isError`, which turns a transient failure into a confident false statement ("No templates found", "0 credits remaining", "you're on Free"). Worth one sweep rather than 20 fixes.
+
+### Medium — from today's migration, deferred deliberately
+
+- [ ] **flowbite `ToggleSwitch` ships a dangling `aria-labelledby`.** It always sets `aria-labelledby="<id>-flowbite-toggleswitch-label"` but only renders that span when the `label` PROP is set; our five call sites pass `aria-label`, which `aria-labelledby` outranks in the accname algorithm. Fix is to pass `label` instead — deferred because flowbite renders the label after the switch and all five sites have a visible label on the left of a justify-between row, so it needs a per-site visual check.
+- [ ] **`Button`'s default `type` silently changed from `submit` to `button`** with the flowbite swap. Every current in-form Button carries an explicit type so nothing is broken today, but the next one added without `type="submit"` will look right and do nothing.
+- [ ] 76 `<label>` elements across the dashboard, zero `htmlFor` — clicking a label focuses nothing and screen readers cannot pair label to field. Pre-existing, not from the migration. Cheapest real fix now that every field is one primitive: give `InputField` a `label` prop that owns the association.
+- [ ] Control-height mismatches after the InputField swap: 2FA code fields (`security-tab.tsx:279,331`) and redirect From/To (`redirects-tab.tsx:142,147`) are now 42px next to 36px buttons/selects they used to align with.
