@@ -6,7 +6,30 @@
  */
 import React from "react";
 import { Copy, Check } from "lucide-react";
-import { useToast } from "./Toast";
+import { useToast } from "../ui/Toast";
+
+const BASE =
+  "tw:inline-flex tw:items-center tw:gap-1 tw:border tw:border-transparent tw:rounded-sm tw:cursor-pointer " +
+  "tw:font-medium tw:text-xs tw:[font-family:var(--bk-font-ui)] tw:[transition:var(--bk-transition-fast)] " +
+  "tw:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
+
+const SIZE: Record<NonNullable<CopyButtonProps["size"]>, string> = {
+  sm: "tw:py-1 tw:px-2",
+  md: "tw:py-1 tw:px-3",
+};
+
+/** `text` is split from `base` so the copied state can swap ONLY the text
+ *  colour without relying on Tailwind's compiled rule order to arbitrate
+ *  two competing `text-*` utilities of equal specificity (unlike the old
+ *  CSS, where `.bk-copy-btn--copied`'s later source position deterministically
+ *  won over `.bk-copy-btn--{variant}`'s colour). */
+const VARIANT: Record<NonNullable<CopyButtonProps["variant"]>, { base: string; text: string }> = {
+  ghost: { base: "tw:bg-transparent tw:hover:bg-gray-100", text: "tw:text-gray-600 tw:hover:text-gray-900" },
+  outline: { base: "tw:bg-transparent tw:border-gray-400", text: "tw:text-gray-600 tw:hover:text-gray-900" },
+  solid: { base: "tw:bg-gray-100 tw:hover:bg-[rgba(17,24,39,0.08)]", text: "tw:text-gray-900" },
+};
+
+const COPIED_TEXT = "tw:text-green-500 tw:hover:text-green-500";
 
 export interface CopyButtonProps {
   /** Content to copy to clipboard */
@@ -51,10 +74,10 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
       type="button"
       onClick={handleCopy}
       className={[
-        "bk-copy-btn",
-        `bk-copy-btn--${variant}`,
-        `bk-copy-btn--${size}`,
-        copied && "bk-copy-btn--copied",
+        BASE,
+        SIZE[size],
+        VARIANT[variant].base,
+        copied ? COPIED_TEXT : VARIANT[variant].text,
         className,
       ]
         .filter(Boolean)

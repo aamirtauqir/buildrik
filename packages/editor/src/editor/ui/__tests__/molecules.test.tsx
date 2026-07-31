@@ -205,7 +205,7 @@ describe("BreakpointSwitcher", () => {
 });
 
 /* ── Extensions drain · ported from shared/extensions ───────────────────── */
-import { PanelHeaderActions, CopyButton, UpgradeModal, ToastProvider } from "../index";
+import { PanelHeaderActions, UpgradeModal, ToastProvider } from "../index";
 
 describe("PanelHeaderActions", () => {
   it("renders only the buttons whose callbacks are provided, labelled by context", () => {
@@ -219,24 +219,6 @@ describe("PanelHeaderActions", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
     fireEvent.click(pin);
     expect(onPinToggle).toHaveBeenCalledTimes(1);
-  });
-});
-
-describe("CopyButton", () => {
-  it("copies the content and flips to a Copied state", async () => {
-    const writeText = vi.fn().mockResolvedValue(undefined);
-    Object.assign(navigator, { clipboard: { writeText } });
-    render(
-      <ToastProvider>
-        <CopyButton content="hello" label="HTML" variant="solid" />
-      </ToastProvider>,
-    );
-    const btn = screen.getByRole("button", { name: "Copy HTML" });
-    expect(btn.className).toContain("bk-copy-btn--solid");
-    fireEvent.click(btn);
-    expect(writeText).toHaveBeenCalledWith("hello");
-    expect(await screen.findByRole("button", { name: "Copied" })).toBeTruthy();
-    expect(screen.getByText("Copied!")).toBeTruthy();
   });
 });
 

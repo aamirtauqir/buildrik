@@ -664,33 +664,6 @@ button.bk-topbar__review:focus-visible { outline: none; box-shadow: var(--bk-sha
   padding: 0 var(--bk-space-12);
 }
 
-/* ── CopyButton · ported from shared/extensions ────────────────────────
-   Copy-to-clipboard button: icon + label, flips to a success-toned
-   checkmark for 2s after a copy. */
-.bk-copy-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--bk-space-4);
-  border: 1px solid transparent;
-  border-radius: var(--bk-radius-sm);
-  cursor: pointer;
-  font-family: var(--bk-font-ui);
-  font-weight: var(--bk-weight-medium);
-  font-size: var(--bk-text-12);
-  transition: var(--bk-transition-fast);
-}
-.bk-copy-btn--sm { padding: var(--bk-space-4) var(--bk-space-8); }
-.bk-copy-btn--md { padding: var(--bk-space-4) var(--bk-space-12); }
-.bk-copy-btn--ghost { background: transparent; color: var(--bk-ink-soft); }
-.bk-copy-btn--ghost:hover { background: var(--bk-bg-subtle); color: var(--bk-ink); }
-.bk-copy-btn--outline { background: transparent; border-color: var(--bk-border-input); color: var(--bk-ink-soft); }
-.bk-copy-btn--outline:hover { border-color: var(--bk-border-strong); color: var(--bk-ink); }
-.bk-copy-btn--solid { background: var(--bk-bg-subtle); color: var(--bk-ink); }
-.bk-copy-btn--solid:hover { background: var(--bk-alpha-ink-08); }
-.bk-copy-btn--copied { color: var(--bk-success); }
-.bk-copy-btn--copied:hover { color: var(--bk-success); }
-.bk-copy-btn:focus-visible { outline: none; box-shadow: var(--bk-shadow-focus); }
-
 /* ── UpgradeModal · ported from shared/extensions ──────────────────────
    Modal body: PRO badge, message, feature checklist. Buttons live in the
    standard modal footer. */
