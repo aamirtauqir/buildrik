@@ -8,7 +8,7 @@ import * as React from "react";
 import { SelectField, NumberField, SliderField } from "../../shared/forms";
 import type { AnimationConfig } from "../../shared/types/animations";
 import { DEFAULT_ANIMATION } from "../../shared/types/animations";
-import { Tabs } from "@/editor/ui";
+import { Tabs } from "@/editor/chrome-ui";
 import { Button } from "flowbite-react";
 
 // Re-export for backwards compatibility

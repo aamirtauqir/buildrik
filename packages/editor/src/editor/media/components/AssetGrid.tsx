@@ -60,7 +60,7 @@ import type { SmartFolder } from "./FolderTree";
 import { formatBytes } from "@shared/utils/helpers/number";
 import { Button } from "flowbite-react";
 
-// ─── Toast contract (matches @/editor/ui useToast) ───────────────────────
+// ─── Toast contract (matches @/editor/chrome-ui useToast) ───────────────────────
 
 type ToastTone = "info" | "success" | "error" | "warning";
 interface ToastInput {

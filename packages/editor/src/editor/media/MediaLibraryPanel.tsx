@@ -19,7 +19,7 @@ import {
   Portal,
   Spinner,
   Tabs,
-} from "@/editor/ui";
+} from "@/editor/chrome-ui";
 import { useMediaManager } from "../shell/hooks";
 import { AssetCard } from "./AssetCard";
 import { mediaLibraryStyles as styles } from "./MediaLibraryStyles";

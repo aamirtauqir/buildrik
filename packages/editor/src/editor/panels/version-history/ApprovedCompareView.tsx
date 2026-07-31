@@ -28,7 +28,7 @@ import {
   RefreshCw,
   type LucideIcon,
 } from "lucide-react";
-import { Slider } from "@/editor/ui";
+import { Slider } from "@/editor/chrome-ui";
 import { BK_SELECT_BASE_THEME } from "@/editor/chrome-ui/selectTheme";
 import {
   compareApprovedToCurrent,

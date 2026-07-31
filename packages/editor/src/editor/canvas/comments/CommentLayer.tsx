@@ -22,8 +22,8 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { ModalContent, ModalFooter, ModalRoot, ModalTitle, isModalOpen } from "@/editor/ui";
-import { useToast } from "@/editor/ui";
+import { ModalContent, ModalFooter, ModalRoot, ModalTitle, isModalOpen } from "@/editor/chrome-ui";
+import { useToast } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants";
 import { Z_LAYERS } from "@/shared/constants/canvas";

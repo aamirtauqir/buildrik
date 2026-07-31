@@ -12,7 +12,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { ModalContent, ModalDescription, ModalRoot, ModalTitle } from "@/editor/ui";
+import { ModalContent, ModalDescription, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
 import { Button, Checkbox } from "flowbite-react";
 
 export interface ReplaceAcrossPageEntry {

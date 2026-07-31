@@ -18,7 +18,7 @@ import {
   Portal,
   Spinner,
   Tabs,
-} from "@/editor/ui";
+} from "@/editor/chrome-ui";
 import { devError } from "../../shared/utils/devLogger";
 import { CodePreview } from "./CodePreview";
 import { FormatGrid, OptionsPanel } from "./ExportOptions";

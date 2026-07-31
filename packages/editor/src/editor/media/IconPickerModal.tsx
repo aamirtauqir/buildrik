@@ -7,7 +7,7 @@
  */
 
 import * as React from "react";
-import { ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/ui";
+import { ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/chrome-ui";
 import {
   ICON_CATEGORIES,
   getAllIcons,

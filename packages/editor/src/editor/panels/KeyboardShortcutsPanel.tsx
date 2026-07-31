@@ -6,7 +6,7 @@
  */
 
 import * as React from "react";
-import { ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/ui";
+import { ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/chrome-ui";
 import { GROUPED_TABS_CONFIG } from "../rail/tabsConfig";
 
 // =============================================================================

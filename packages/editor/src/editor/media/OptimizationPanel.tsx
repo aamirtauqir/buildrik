@@ -8,7 +8,7 @@
  */
 
 import * as React from "react";
-import { Spinner } from "@/editor/ui";
+import { Spinner } from "@/editor/chrome-ui";
 import { MediaOptimizer } from "../../engine/media";
 import { formatBytes } from "@shared/utils/helpers/number";
 import type { ImageExportFormat } from "../../shared/types/media";

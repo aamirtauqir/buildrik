@@ -3,8 +3,8 @@
  *
  * Moved from `editor/ui/__tests__/shell.test.tsx` (Task 6, flowbite
  * big-bang) when EditorShell/Rail/Footer/RightPanel ported to chrome-ui.
- * Topbar and Drawer haven't ported yet (later Task 6 batches) — imported
- * from `@/editor/ui`, which still bridges them.
+ * Topbar and Drawer ported in a later Task 6 batch (Group B) — all six now
+ * import from the local chrome-ui barrel, not the editor/ui bridge.
  *
  * Slot-order assertions were rewritten from raw `bk-*` classNames (deleted
  * with the CSS block) to tag-name structure — the semantics they were
@@ -15,8 +15,7 @@
  */
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { Topbar, Drawer } from "@/editor/ui";
-import { EditorShell, Footer, Rail, RailItem, RightPanel } from "../index";
+import { EditorShell, Footer, Rail, RailItem, RightPanel, Topbar, Drawer } from "../index";
 
 function shell(extra: Partial<React.ComponentProps<typeof EditorShell>> = {}) {
   return render(

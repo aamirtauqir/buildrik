@@ -10,8 +10,7 @@
  */
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { CopyButton } from "../index";
-import { ToastProvider } from "@/editor/ui";
+import { CopyButton, ToastProvider } from "../index";
 
 describe("CopyButton", () => {
   it("copies the content and flips to a Copied state", async () => {

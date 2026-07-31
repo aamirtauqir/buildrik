@@ -22,8 +22,8 @@
  */
 
 import * as React from "react";
-import { PanelHeader } from "@/editor/ui";
-import { useToast } from "@/editor/ui";
+import { PanelHeader } from "@/editor/chrome-ui";
+import { useToast } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import { CatalogSection } from "./CatalogSection";
 import { UserSavedSection } from "./UserSavedSection";

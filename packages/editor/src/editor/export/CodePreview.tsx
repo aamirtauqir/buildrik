@@ -12,7 +12,7 @@
 
 import * as React from "react";
 import type { CodeTab } from "../../shared/types/export";
-import { CopyButton, Tabs } from "@/editor/ui";
+import { CopyButton, Tabs } from "@/editor/chrome-ui";
 
 // ============================================================================
 // TYPES

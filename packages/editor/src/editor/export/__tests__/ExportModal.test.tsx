@@ -12,7 +12,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, cleanup, fireEvent, waitFor } from "@testing-library/react";
 import type { Composer } from "../../../engine/Composer";
 import type { ExportResult } from "../../../shared/types/export";
-import { ToastProvider } from "@/editor/ui";
+import { ToastProvider } from "@/editor/chrome-ui";
 import { ExportModal } from "../ExportModal";
 
 const mocks = vi.hoisted(() => ({

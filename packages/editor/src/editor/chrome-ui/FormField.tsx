@@ -7,14 +7,14 @@
  * `Label`/`HelperText` instead of the deleted `Field.tsx` versions (see
  * `labelTheme.ts` for the className-override reasoning).
  *
- * Moved here from `editor/ui/` in the Tasks 7-12 consolidated surface sweep
- * (controller decision): `editor/ui/` is being drained to zero ahead of its
- * Task 13 deletion, so this had to land somewhere. `shared/forms/` (4 of its
- * 5 real consumers) gets its one intentional `shared/→editor` edge updated
- * in lockstep — CLAUDE.md's Import Direction Rules now name
- * `@/editor/chrome-ui`, not `@/editor/ui`, as that exception. The rule's
- * intent is unchanged: `shared/forms/` composes the chrome component
- * library, wherever it lives.
+ * Moved here from the old bridge library in the Tasks 7-12 consolidated
+ * surface sweep (controller decision): that library is being drained to
+ * zero ahead of its Task 13 deletion, so this had to land somewhere.
+ * `shared/forms/` (4 of its 5 real consumers) gets its one intentional
+ * `shared/→editor` edge updated in lockstep — CLAUDE.md's Import Direction
+ * Rules now name this chrome-ui package as that exception, not the deleted
+ * one. The rule's intent is unchanged: `shared/forms/` composes the chrome
+ * component library, wherever it lives.
  *
  * @license BSD-3-Clause
  */

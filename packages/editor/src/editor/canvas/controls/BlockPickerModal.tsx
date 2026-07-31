@@ -6,7 +6,7 @@
  */
 
 import * as React from "react";
-import { ModalContent, ModalRoot } from "@/editor/ui";
+import { ModalContent, ModalRoot } from "@/editor/chrome-ui";
 import { getBlockById, insertBlock } from "../../../blocks/blockRegistry";
 import type { Composer } from "../../../engine";
 import type { BlockData } from "../../../shared/types";

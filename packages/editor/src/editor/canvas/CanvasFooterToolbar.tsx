@@ -16,7 +16,7 @@
 
 import * as React from "react";
 import { useClickOutside } from "@/shared/hooks";
-import { BreakpointSwitcher, type Breakpoint } from "@/editor/ui";
+import { BreakpointSwitcher, type Breakpoint } from "@/editor/chrome-ui";
 import { ZOOM_PRESETS } from "./shared";
 import { ROW_SM } from "@/shared/constants/layout";
 import { Button, Tooltip } from "flowbite-react";
