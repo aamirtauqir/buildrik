@@ -47,9 +47,15 @@ Both were caught by deliberately planting a violation and watching the gate pass
 
 ## Known open items at merge-decision time
 
-1. **43 failing tests / 7857 passing** on the first full-suite run. Per-commit targeted
-   runs were green throughout; the failures are cross-surface consumers those runs never
-   loaded. Enumeration + fix wave in progress — **the branch does not merge until green.**
+1. **Flake band under full-suite load — NOT regressions.** Three consecutive full runs gave
+   **43 / 0 / 1** failures out of ~7900. An earlier draft of this doc called the first run's
+   43 "cross-surface regressions"; that was wrong and is retracted — the same tests pass in
+   isolation and under surface-level load (e.g. the whole sidebar, 1022 tests green), and
+   run 2 was clean at 7900/7900. What is real: **suite wall time roughly doubled**
+   (1224s → 2438s) because flowbite renders heavier in jsdom (floating-ui, per-render theme
+   resolution), which pushes timing-sensitive `waitFor` assertions over the edge under
+   parallel load. Merge criterion is therefore "each failing test identified and confirmed
+   inside this band", not "zero failures on one run".
 2. Live-browser checks not yet run (Task 14 remainder): canvas-isolation baseline diff on
    a real customer site, keyboard/focus parity walk, publish E2E, bundle-size delta.
 3. Deferred minors carried in the SDD ledger (cosmetic codemod formatting, a few stale
