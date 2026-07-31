@@ -42,3 +42,20 @@ export {
 export { MediaCard, type MediaCardProps } from "./MediaCard";
 export { SiteCard, type SiteCardProps } from "./SiteCard";
 export { UpgradeModal, type UpgradeModalProps } from "./UpgradeModal";
+export {
+  PanelHeader,
+  PanelHeaderActions,
+  type PanelHeaderProps,
+  type PanelHeaderActionsProps,
+} from "./PanelHeader";
+export {
+  PanelFrame,
+  type PanelFrameProps,
+  type PanelFrameHeaderProps,
+  type PanelFrameBodyProps,
+  type PanelWidth,
+} from "./PanelFrame";
+export { RightPanel, type RightPanelProps } from "./RightPanel";
+export { EditorShell, type EditorShellProps } from "./EditorShell";
+export { Footer, FooterSpacer, type FooterProps } from "./Footer";
+export { Rail, RailItem, RailSpacer, type RailProps, type RailItemProps } from "./Rail";

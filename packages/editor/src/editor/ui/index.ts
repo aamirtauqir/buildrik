@@ -34,7 +34,7 @@ export { FieldRow, type FieldRowProps } from "./FieldRow";
 export { FormField, type FormFieldProps } from "./FormField";
 export { NavItem, type NavItemProps } from "../chrome-ui/NavItem";
 export { SectionHeader, type SectionHeaderProps } from "../chrome-ui/SectionHeader";
-export { PanelHeader, type PanelHeaderProps } from "./PanelHeader";
+export { PanelHeader, type PanelHeaderProps } from "../chrome-ui/PanelHeader";
 export { EmptyState, EmptyStateTitle, EmptyStateDesc, EmptyStateActions, type EmptyStateProps, type EmptyStateSize } from "../chrome-ui/EmptyState";
 export { MediaCard, type MediaCardProps } from "../chrome-ui/MediaCard";
 export { SiteCard, type SiteCardProps } from "../chrome-ui/SiteCard";
@@ -47,16 +47,16 @@ export { useFocusTrap, isModalOpen } from "../chrome-ui/focus";
 export { getOverlayRoot } from "../chrome-ui/OverlayRoot";
 export { Modal, type ModalProps, type ModalKind } from "./Modal";
 export { Drawer, type DrawerProps, type DrawerLayout } from "./Drawer";
-export { RightPanel, type RightPanelProps } from "./RightPanel";
-export { Rail, RailItem, RailSpacer, type RailProps, type RailItemProps } from "./Rail";
-export { Footer, FooterSpacer, type FooterProps } from "./Footer";
+export { RightPanel, type RightPanelProps } from "../chrome-ui/RightPanel";
+export { Rail, RailItem, RailSpacer, type RailProps, type RailItemProps } from "../chrome-ui/Rail";
+export { Footer, FooterSpacer, type FooterProps } from "../chrome-ui/Footer";
 export { CommandPalette, type CommandPaletteProps, type Command } from "./CommandPalette";
 
 /* ── Shell ──────────────────────────────────────────────────────────────── */
-export { EditorShell, type EditorShellProps } from "./EditorShell";
+export { EditorShell, type EditorShellProps } from "../chrome-ui/EditorShell";
 
 /* ── Layout + compositions ──────────────────────────────────────────────── */
-export { PanelFrame, type PanelFrameProps, type PanelFrameHeaderProps, type PanelFrameBodyProps, type PanelWidth } from "./PanelFrame";
+export { PanelFrame, type PanelFrameProps, type PanelFrameHeaderProps, type PanelFrameBodyProps, type PanelWidth } from "../chrome-ui/PanelFrame";
 export { Tabs, type TabsProps, type Tab } from "./Tabs";
 export { ConfirmDialog, type ConfirmDialogProps } from "./ConfirmDialog";
 export {
@@ -86,6 +86,6 @@ export { BreakpointSwitcher, type Breakpoint, type BreakpointSwitcherProps } fro
 export { HelpTooltip, type HelpTooltipProps } from "./HelpTooltip";
 
 /* ── Extensions drain · ported from shared/extensions ───────────────────── */
-export { PanelHeaderActions, type PanelHeaderActionsProps } from "./PanelHeader";
+export { PanelHeaderActions, type PanelHeaderActionsProps } from "../chrome-ui/PanelHeader";
 export { CopyButton, type CopyButtonProps } from "../chrome-ui/CopyButton";
 export { UpgradeModal, type UpgradeModalProps } from "../chrome-ui/UpgradeModal";

@@ -30,7 +30,7 @@ export function PanelHeaderActions({
   label, isPinned, onPinToggle, onHelpClick, onClose, children, className, style,
 }: PanelHeaderActionsProps) {
   return (
-    <span className={["bk-panel-header__actions", className].filter(Boolean).join(" ")} style={style}>
+    <span className={["tw:flex tw:items-center tw:gap-1", className].filter(Boolean).join(" ")} style={style}>
       {children}
       {onPinToggle ? (
         <Button
@@ -81,10 +81,16 @@ export function PanelHeader({ title, actions, isPinned, onPinToggle, onHelpClick
     <div
       role="heading"
       aria-level={2}
-      className={["bk-panel-header", className].filter(Boolean).join(" ")}
+      className={[
+        "tw:flex tw:items-center tw:gap-2 tw:h-11 tw:py-0 tw:pl-4 tw:pr-3 tw:bg-white tw:border-b tw:border-gray-200 " +
+          "tw:[font-family:var(--bk-font-ui)] tw:text-[11px] tw:font-medium tw:tracking-[0.08em] tw:text-gray-600 tw:uppercase tw:flex-none",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
       {...rest}
     >
-      <span className="bk-panel-header__title">{title}</span>
+      <span className="tw:flex-1">{title}</span>
       <PanelHeaderActions
         label={title}
         isPinned={isPinned}

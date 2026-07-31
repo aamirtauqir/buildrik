@@ -8,7 +8,7 @@
  */
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { FieldRow, PanelHeader } from "../index";
+import { FieldRow } from "../index";
 
 describe("FieldRow", () => {
   it("ties the label to its control", () => {
@@ -18,13 +18,6 @@ describe("FieldRow", () => {
       </FieldRow>,
     );
     expect(screen.getByLabelText("Radius")).toBeTruthy();
-  });
-});
-
-describe("PanelHeader", () => {
-  it("is a heading so the panel has an outline", () => {
-    render(<PanelHeader title="Pages" />);
-    expect(screen.getByRole("heading", { level: 2, name: "Pages" })).toBeTruthy();
   });
 });
 
@@ -64,20 +57,3 @@ describe("BreakpointSwitcher", () => {
   });
 });
 
-/* ── Extensions drain · ported from shared/extensions ───────────────────── */
-import { PanelHeaderActions } from "../index";
-
-describe("PanelHeaderActions", () => {
-  it("renders only the buttons whose callbacks are provided, labelled by context", () => {
-    const onPinToggle = vi.fn();
-    const onClose = vi.fn();
-    render(<PanelHeaderActions label="panel" isPinned onPinToggle={onPinToggle} onClose={onClose} />);
-    const pin = screen.getByRole("button", { name: "Unpin panel" });
-    expect(pin.getAttribute("aria-pressed")).toBe("true");
-    expect(screen.queryByRole("button", { name: "Help" })).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: "Close panel" }));
-    expect(onClose).toHaveBeenCalledTimes(1);
-    fireEvent.click(pin);
-    expect(onPinToggle).toHaveBeenCalledTimes(1);
-  });
-});

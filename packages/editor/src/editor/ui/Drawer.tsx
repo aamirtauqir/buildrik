@@ -4,7 +4,7 @@
  * @license BSD-3-Clause
  */
 import React from "react";
-import { PanelHeader } from "./PanelHeader";
+import { PanelHeader } from "../chrome-ui/PanelHeader";
 
 export type DrawerLayout = "list" | "grid" | "table";
 

@@ -30,12 +30,20 @@ export function EditorShell({
   topbar, rail, drawer, inspector, footer, children, canvasLabel = "Canvas", className, ...rest
 }: EditorShellProps) {
   return (
-    <div className={["bk-shell", className].filter(Boolean).join(" ")} {...rest}>
+    <div
+      className={[
+        "tw:flex tw:flex-col tw:h-full tw:min-h-0 tw:bg-gray-100 tw:[font-family:var(--bk-font-ui)] tw:text-gray-900",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      {...rest}
+    >
       {topbar}
-      <div className="bk-shell__band">
+      <div className="tw:flex-1 tw:flex tw:min-h-0">
         {rail}
         {drawer}
-        <main className="bk-shell__canvas" aria-label={canvasLabel}>
+        <main className="tw:flex-1 tw:min-w-0 tw:flex tw:flex-col tw:bg-gray-100 tw:overflow-hidden" aria-label={canvasLabel}>
           {children}
         </main>
         {inspector}

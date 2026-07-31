@@ -1,10 +1,22 @@
 /**
  * EditorShell — structural contract.
+ *
+ * Moved from `editor/ui/__tests__/shell.test.tsx` (Task 6, flowbite
+ * big-bang) when EditorShell/Rail/Footer/RightPanel ported to chrome-ui.
+ * Topbar and Drawer haven't ported yet (later Task 6 batches) — imported
+ * from `@/editor/ui`, which still bridges them.
+ *
+ * Slot-order assertions were rewritten from raw `bk-*` classNames (deleted
+ * with the CSS block) to tag-name structure — the semantics they were
+ * actually protecting (rail/drawer/canvas/inspector order), not the
+ * implementation classes.
+ *
  * @license BSD-3-Clause
  */
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { EditorShell, Topbar, Footer, Rail, RailItem, Drawer, RightPanel } from "../index";
+import { Topbar, Drawer } from "@/editor/ui";
+import { EditorShell, Footer, Rail, RailItem, RightPanel } from "../index";
 
 function shell(extra: Partial<React.ComponentProps<typeof EditorShell>> = {}) {
   return render(
@@ -33,22 +45,19 @@ describe("EditorShell", () => {
   });
 
   it("keeps slot order stable when optional slots appear", () => {
-    const { container } = shell({
+    shell({
       drawer: <Drawer title="Pages">rows</Drawer>,
       inspector: <RightPanel title="Inspector">fields</RightPanel>,
     });
-    const band = container.querySelector(".bk-shell__band")!;
-    const order = Array.from(band.children).map((c) => c.className.split(" ")[0]);
-    expect(order).toEqual(["bk-rail", "bk-drawer", "bk-shell__canvas", "bk-right-panel"]);
+    const band = screen.getByRole("navigation", { name: "Editor tools" }).parentElement!;
+    const order = Array.from(band.children).map((c) => c.tagName.toLowerCase());
+    expect(order).toEqual(["nav", "aside", "main", "aside"]);
   });
 
   it("renders without drawer or inspector — the canvas still holds the middle", () => {
-    const { container } = shell();
-    const band = container.querySelector(".bk-shell__band")!;
-    expect(Array.from(band.children).map((c) => c.className.split(" ")[0])).toEqual([
-      "bk-rail",
-      "bk-shell__canvas",
-    ]);
+    shell();
+    const band = screen.getByRole("navigation", { name: "Editor tools" }).parentElement!;
+    expect(Array.from(band.children).map((c) => c.tagName.toLowerCase())).toEqual(["nav", "main"]);
   });
 
   it("lets a full-page surface relabel the main region", () => {
