@@ -9,8 +9,7 @@ import { SelectField, NumberField, SliderField } from "../../shared/forms";
 import type { AnimationConfig } from "../../shared/types/animations";
 import { DEFAULT_ANIMATION } from "../../shared/types/animations";
 import { Tabs } from "@/editor/chrome-ui";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 // Re-export for backwards compatibility
 export type { AnimationConfig } from "../../shared/types/animations";
 

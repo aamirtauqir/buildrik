@@ -30,9 +30,7 @@ import { UserSavedSection } from "./UserSavedSection";
 import { DSStatusChip } from "./DSStatusChip";
 import { AIPromptModal } from "@/editor/design-system/ui/AIPromptModal";
 import { EVENTS } from "@/shared/constants/events";
-import { Button, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
-
+import { Button, TextInput } from "@/editor/chrome-ui";
 type FilterMode = "all" | "ds" | "yours";
 
 interface ComponentsPanelV2Props {
@@ -226,7 +224,7 @@ export const ComponentsPanelV2: React.FC<ComponentsPanelV2Props> = ({
       </div>
 
       <div style={{ padding: "0 12px" }}>
-        <TextInput theme={BK_TEXT_INPUT_THEME}
+        <TextInput
           type="search"
           placeholder="Search components…"
           value={search}

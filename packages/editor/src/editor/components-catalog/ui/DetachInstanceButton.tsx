@@ -16,7 +16,7 @@
 import * as React from "react";
 import type { Composer } from "@/engine";
 import { useDSModeOptional } from "@/editor/design-system/state/DSModeContext";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 interface DetachInstanceButtonProps {
   composer: Composer | null;

@@ -8,7 +8,7 @@ import { ShoppingBag, Package, Check } from "lucide-react";
 import * as React from "react";
 import { ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/chrome-ui";
 import { useState } from "react";
-import { Button, Checkbox } from "flowbite-react";
+import { Button, Checkbox } from "@/editor/chrome-ui";
 
 export interface CollectionSetupModalProps {
   isOpen: boolean;

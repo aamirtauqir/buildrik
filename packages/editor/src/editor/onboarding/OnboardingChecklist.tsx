@@ -23,8 +23,7 @@
 import * as React from "react";
 import { Check, ChevronUp, ChevronDown, Minus, X, ArrowRight } from "lucide-react";
 import type { OnboardingStep } from "../../shared/constants/onboardingSteps";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 // ── Props ───────────────────────────────────────────────────────────────────
 
 export interface OnboardingChecklistProps {

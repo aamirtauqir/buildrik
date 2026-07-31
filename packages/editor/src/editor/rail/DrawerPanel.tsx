@@ -12,8 +12,7 @@
 import * as React from "react";
 import "./DrawerPanel.css";
 import { ChevronLeft, Pin } from "lucide-react";
-import { Button, Tooltip } from "flowbite-react";
-
+import { Button, Tooltip } from "@/editor/chrome-ui";
 // ============================================
 // Types
 // ============================================
