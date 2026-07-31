@@ -1,6 +1,4 @@
 @import 'tailwindcss';
-@import 'flowbite-react/plugin/tailwindcss';
-@source '../.flowbite-react/class-list.json';
 
 @theme inline {
   /* Dashboard body/UI font is Inter (DESIGN.md surface table); the auth

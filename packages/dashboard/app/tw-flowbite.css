@@ -1,0 +1,35 @@
+/* Flowbite chrome layer — PREFIXED, a SEPARATE Next.js CSS entry point from
+ * globals.css (imported directly in app/layout.tsx, not via `@import` inside
+ * globals.css) so Turbopack gives it its own clean Tailwind processing pass
+ * rather than merging two `tailwindcss/utilities.css` imports into one file,
+ * which was found (by build, not assumption) to suppress automatic content
+ * detection for globals.css's own unprefixed utilities.
+ *
+ * flowbite-react's class-name prefix is a plain module-level singleton
+ * (flowbite-react/store), not per-package: packages/editor and this package
+ * resolve `flowbite-react` to the SAME physical node_modules install, and
+ * `next.config.mjs` transpiles the editor package into this app's bundle.
+ * The editor sets that singleton's prefix to `tw:` unconditionally at load
+ * (src/editor/chrome-ui/flowbiteStore.ts); this app now does the same
+ * (components/global/flowbiteStore.ts, imported first in app/layout.tsx) so
+ * dashboard flowbite components render correctly regardless of whether the
+ * unified editor route has loaded in this tab — the bug this fixes was a
+ * plain unprefixed compile going stale the moment ANYTHING in the tab set
+ * the prefix, surviving client-side back-navigation until a hard refresh.
+ *
+ * flowbite-react's own component theme classes (bg-primary-700, rounded-lg,
+ * h-10, ...) live in node_modules, so Tailwind's default content scan never
+ * sees them as candidates — globals.css's unprefixed `@import 'tailwindcss'`
+ * never compiled them either, before this fix; they simply relied on
+ * flowbite-react's own shipped defaults resolving unprefixed. The generated,
+ * `tw:`-prefixed `.flowbite-react/class-list.json` below is the literal-
+ * string source Tailwind needs to compile the prefixed forms (mirrors
+ * packages/editor/src/themes/tw.css exactly). Regenerate with
+ * `npx flowbite-react build` (run from packages/dashboard) whenever a new
+ * flowbite-react component is imported, or this goes stale again.
+ */
+@layer tw-theme, tw-utilities;
+@import "tailwindcss/theme.css" layer(tw-theme) prefix(tw);
+@import "tailwindcss/utilities.css" layer(tw-utilities) prefix(tw);
+@plugin "flowbite-react/plugin/tailwindcss";
+@source '../.flowbite-react/class-list.json';
