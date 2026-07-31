@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import { Kbd, ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/chrome-ui";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 export interface DeleteConfirmModalProps {
   isOpen: boolean;

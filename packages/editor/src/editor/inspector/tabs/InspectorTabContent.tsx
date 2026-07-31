@@ -44,9 +44,7 @@ import {
   type TabId,
 } from "../sections/registry";
 import type { SectionTier } from "../shared/controls";
-import { BK_HELPER_CLASS } from "@/editor/chrome-ui/labelTheme";
-import { Button, HelperText } from "flowbite-react";
-
+import { BK_HELPER_CLASS, Button, HelperText } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================

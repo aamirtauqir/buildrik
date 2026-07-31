@@ -6,8 +6,7 @@
 import * as React from "react";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
 import { DirectionIcon } from "./icons";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 const visualBtn = (active: boolean): React.CSSProperties => ({
   flex: 1,
   padding: "10px 6px",

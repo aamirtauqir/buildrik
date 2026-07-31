@@ -8,8 +8,7 @@ import * as React from "react";
 import type { MediaAsset, MediaAssetType } from "../../../../shared/types/media";
 import { InputRow, SelectRow } from "../../shared/controls";
 import type { PropertyConfig } from "./config";
-import { Button, Checkbox } from "flowbite-react";
-
+import { Button, Checkbox } from "@/editor/chrome-ui";
 const styles = {
   checkboxRow: {
     display: "flex",

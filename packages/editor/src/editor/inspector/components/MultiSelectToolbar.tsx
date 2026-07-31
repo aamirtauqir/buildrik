@@ -19,8 +19,7 @@ import { AlignmentHandler } from "../../../engine/canvas/AlignmentHandler";
 import type { PseudoStateId } from "../../../shared/types";
 import type { BreakpointId } from "../../../shared/types/breakpoints";
 import { BatchStylePanel } from "./BatchStylePanel";
-import { Button, Tooltip } from "flowbite-react";
-
+import { Button, Tooltip } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================

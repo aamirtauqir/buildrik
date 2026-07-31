@@ -8,7 +8,7 @@ import { MousePointerClick } from "lucide-react";
 import { Kbd, } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
 import { EVENTS } from "../../../shared/constants/events";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 /**
  * Empty state shown when no element is selected in the Inspector.

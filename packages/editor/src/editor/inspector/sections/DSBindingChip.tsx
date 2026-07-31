@@ -16,8 +16,7 @@
  */
 import * as React from "react";
 import { useDSModeOptional } from "../../design-system/state/DSModeContext";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 export type DSBindingState = "token" | "preset" | "off-ds";
 
 export interface DSBindingChipProps {

@@ -11,8 +11,7 @@ import { DirectionControls } from "./DirectionControls";
 import { EnableFlexPrompt } from "./EnableFlexPrompt";
 import { FlexItemControls } from "./FlexItemControls";
 import { GapControls } from "./GapControls";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================

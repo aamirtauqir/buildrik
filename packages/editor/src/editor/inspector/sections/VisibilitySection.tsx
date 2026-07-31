@@ -8,7 +8,7 @@
 import * as React from "react";
 import { BREAKPOINTS as SHARED_BREAKPOINTS } from "../../../shared/constants/breakpoints";
 import { Section, type SectionTier } from "../shared/controls/Section";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 export interface VisibilitySectionProps {
   styles: Record<string, string>;

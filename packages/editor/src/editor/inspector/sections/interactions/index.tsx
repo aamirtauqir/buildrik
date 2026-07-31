@@ -10,8 +10,7 @@ import { Section } from "../../shared/controls";
 import { AddInteractionPanel } from "./AddInteractionPanel";
 import { InteractionItem } from "./InteractionItem";
 import { type Interaction, type InteractionTrigger, type InteractionsSectionProps } from "./types";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 // Re-export types for external use
 export type { Interaction, InteractionTrigger, InteractionsSectionProps };
 

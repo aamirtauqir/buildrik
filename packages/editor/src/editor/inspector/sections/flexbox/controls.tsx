@@ -5,9 +5,7 @@
  */
 
 import * as React from "react";
-import { Button, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
-
+import { Button, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // ALIGNMENT GRID - 9-dot visual alignment picker
 // ============================================================================
@@ -127,7 +125,7 @@ export const GapSlider: React.FC<GapSliderProps> = ({ value, onChange, disabled 
 
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1 }}>
-      <TextInput theme={BK_TEXT_INPUT_THEME}
+      <TextInput
         type="range"
         min="0"
         max={maxGap}
@@ -148,7 +146,7 @@ export const GapSlider: React.FC<GapSliderProps> = ({ value, onChange, disabled 
           opacity: disabled ? 0.5 : 1,
         }}
       />
-      <TextInput theme={BK_TEXT_INPUT_THEME}
+      <TextInput
         type="text"
         value={value || "0"}
         onChange={(e) => onChange(e.target.value)}

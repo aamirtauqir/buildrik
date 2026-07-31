@@ -24,8 +24,7 @@ import {
   getCurrentIconConfig,
 } from "./handlers";
 import { PropertyField } from "./PropertyField";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 const styles = {
   dataAttributesSection: {
     marginTop: 16,

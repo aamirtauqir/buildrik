@@ -10,8 +10,7 @@ import type { Composer } from "../../../engine";
 import { InputField } from "../../../shared/forms/InputField";
 import { runTransaction } from "../../../shared/utils/helpers";
 import { Section, type SectionTier } from "../shared/controls";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================

@@ -10,9 +10,7 @@ import { baseStyles } from "../../shared/controls/controlStyles";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
 import { PositionPreview } from "./previews";
 import { cardBtn, positionOffsetContainerStyle, positionOffsetBoxStyle } from "./styles";
-import { Button, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
-
+import { Button, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -179,7 +177,7 @@ const PositionOffsetControls: React.FC<PositionOffsetControlsProps> = ({
       >
         {/* Top */}
         <div />
-        <TextInput theme={BK_TEXT_INPUT_THEME}
+        <TextInput
           type="text"
           value={styles.top || ""}
           onChange={(e) => onChange("top", e.target.value)}
@@ -191,7 +189,7 @@ const PositionOffsetControls: React.FC<PositionOffsetControlsProps> = ({
         <div />
 
         {/* Left - Box - Right */}
-        <TextInput theme={BK_TEXT_INPUT_THEME}
+        <TextInput
           type="text"
           value={styles.left || ""}
           onChange={(e) => onChange("left", e.target.value)}
@@ -201,7 +199,7 @@ const PositionOffsetControls: React.FC<PositionOffsetControlsProps> = ({
           title={reason("left")}
         />
         <div style={positionOffsetBoxStyle} />
-        <TextInput theme={BK_TEXT_INPUT_THEME}
+        <TextInput
           type="text"
           value={styles.right || ""}
           onChange={(e) => onChange("right", e.target.value)}
@@ -213,7 +211,7 @@ const PositionOffsetControls: React.FC<PositionOffsetControlsProps> = ({
 
         {/* Bottom */}
         <div />
-        <TextInput theme={BK_TEXT_INPUT_THEME}
+        <TextInput
           type="text"
           value={styles.bottom || ""}
           onChange={(e) => onChange("bottom", e.target.value)}

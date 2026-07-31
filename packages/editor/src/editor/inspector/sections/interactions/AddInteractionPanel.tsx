@@ -6,8 +6,7 @@
 
 import * as React from "react";
 import { type InteractionTrigger, TRIGGER_GROUPS } from "./types";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================

@@ -19,8 +19,7 @@ import { Copy, ClipboardPaste, CopyPlus, MoreHorizontal, Trash2 } from "lucide-r
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import { useClickOutside } from "../../../shared/hooks/useClickOutside";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================================================
 // STYLE CLIPBOARD — module-level so it survives across element selections
 // ============================================================================

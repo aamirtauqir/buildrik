@@ -6,8 +6,7 @@
  */
 
 import * as React from "react";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================================================
 // BUTTON GROUP (segmented, sits in a .bdi-row-ctrl row when labeled)
 // ============================================================================

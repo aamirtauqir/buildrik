@@ -6,8 +6,7 @@
  */
 
 import * as React from "react";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TEMPLATE BUTTON GRID (dense preset row, e.g., grid templates)
 // ============================================================================

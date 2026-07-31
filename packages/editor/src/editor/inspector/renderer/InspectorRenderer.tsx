@@ -28,7 +28,7 @@ import type {
   Field,
   SectionSchema,
 } from "./schema";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 export interface InspectorRendererProps {
   schema: SectionSchema;

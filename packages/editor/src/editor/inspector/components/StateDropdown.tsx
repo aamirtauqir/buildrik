@@ -15,8 +15,7 @@
 import { ChevronDown } from "lucide-react";
 import * as React from "react";
 import type { PseudoStateId } from "../../../shared/types";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 const PSEUDO_LABELS: Record<PseudoStateId, string> = {
   normal: "Base",
   hover: ":hover",

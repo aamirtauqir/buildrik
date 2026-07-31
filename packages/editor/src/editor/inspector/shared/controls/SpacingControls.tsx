@@ -16,9 +16,7 @@ import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
 import { DSBindingChip } from "../../sections/DSBindingChip";
 import { isTokenVar, extractVarName, cssVarToTokenId } from "../tokenBindingDetection";
-import { Button, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
-
+import { Button, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // AXIS INPUT — absolutely positioned input inside a box edge
 // ============================================================================
@@ -208,7 +206,6 @@ export const CornerRadiusInput: React.FC<CornerRadiusInputProps> = ({
         return (
           <div key={corner} className="bdi-num axis" data-axis={corner.toUpperCase()}>
             <TextInput
-              theme={BK_TEXT_INPUT_THEME}
               type="text"
               value={num}
               onChange={(e) => {

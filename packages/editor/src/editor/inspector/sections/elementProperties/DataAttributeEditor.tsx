@@ -8,9 +8,7 @@
 
 import * as React from "react";
 import type { Composer } from "../../../../engine";
-import { Button, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
-
+import { Button, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -80,14 +78,14 @@ export const DataAttributeEditor: React.FC<DataAttributeEditorProps> = ({
   return (
     <div>
       <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
-        <TextInput theme={BK_TEXT_INPUT_THEME}
+        <TextInput
           type="text"
           value={newKey}
           onChange={(e) => setNewKey(e.target.value)}
           placeholder="data-*"
           style={styles.input}
         />
-        <TextInput theme={BK_TEXT_INPUT_THEME}
+        <TextInput
           type="text"
           value={newValue}
           onChange={(e) => setNewValue(e.target.value)}

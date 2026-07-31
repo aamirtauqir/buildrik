@@ -38,8 +38,7 @@ import { detectMixedValues } from "./shared/detectMixedValues";
 import type { Element } from "../../engine";
 import { InspectorTabContent } from "./tabs/InspectorTabContent";
 import "./styles/inspector.css";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================

@@ -14,7 +14,7 @@ import { TokenPickerPopover } from "../TokenPickerPopover";
 import { DSBindingChip } from "../../sections/DSBindingChip";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 import { TextField } from "@/editor/chrome-ui";
 
 // ============================================================================

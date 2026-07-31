@@ -15,8 +15,7 @@ import {
   type FontCategory,
 } from "../../../../services/GoogleFontsService";
 import { FontSearchInput, CategoryTabs, FontList } from "./FontPickerDropdown";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================

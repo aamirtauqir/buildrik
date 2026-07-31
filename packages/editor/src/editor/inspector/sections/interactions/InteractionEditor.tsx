@@ -7,9 +7,7 @@
 import * as React from "react";
 import { SelectField } from "../../../../shared/forms";
 import { type Interaction, ANIMATION_PRESETS, EASING_OPTIONS } from "./types";
-import { Button, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
-
+import { Button, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -119,7 +117,7 @@ export const InteractionEditor: React.FC<InteractionEditorProps> = ({
       <div style={styles.inputRow}>
         <div style={styles.inputWrapper}>
           <label style={styles.label}>Duration</label>
-          <TextInput theme={BK_TEXT_INPUT_THEME}
+          <TextInput
             type="number"
             value={interaction.animation.duration / 1000}
             onChange={handleDurationChange}
@@ -131,7 +129,7 @@ export const InteractionEditor: React.FC<InteractionEditorProps> = ({
         </div>
         <div style={styles.inputWrapper}>
           <label style={styles.label}>Delay</label>
-          <TextInput theme={BK_TEXT_INPUT_THEME}
+          <TextInput
             type="number"
             value={interaction.animation.delay / 1000}
             onChange={handleDelayChange}

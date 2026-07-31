@@ -26,7 +26,7 @@
 import * as React from "react";
 import { ChevronDown } from "lucide-react";
 import type { Composer } from "../../../engine";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 interface ScopeDropdownProps {
   composer: Composer | null | undefined;

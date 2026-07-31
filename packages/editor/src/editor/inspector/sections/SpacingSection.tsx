@@ -7,7 +7,7 @@ import { Link, Link2Off } from "lucide-react";
 import { Section, SpacingBox, InputWithUnit, MoreSettingsToggle, type SectionTier, MixedValueIndicator } from "../shared/controls";
 import { MixedValueBadge } from "../shared/MixedValueBadge";
 import { parseCssShorthand } from "../shared/utils/parseCssShorthand";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 export interface SpacingSectionProps {
   styles: Record<string, string>;

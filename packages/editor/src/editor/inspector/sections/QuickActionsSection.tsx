@@ -13,7 +13,7 @@
 
 import * as React from "react";
 import { Section, type SectionTier } from "../shared/controls";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 export interface QuickActionsSectionProps {
   styles: Record<string, string>;

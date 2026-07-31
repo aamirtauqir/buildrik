@@ -10,8 +10,7 @@ import type { Composer } from "../../../engine";
 import { devWarn } from "../../../shared/utils/devLogger";
 import { runTransaction } from "../../../shared/utils/helpers";
 import { Section, type SectionTier } from "../shared/controls";
-import { Button, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
+import { Button, TextInput } from "@/editor/chrome-ui";
 
 export interface CSSClassesSectionProps {
   selectedElement: {
@@ -143,7 +142,7 @@ export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
         {addingInline ? (
           <span className="bdi-chip bdi-chip-input" role="presentation">
             <span aria-hidden="true" style={{ opacity: 0.5 }}>.</span>
-            <TextInput theme={BK_TEXT_INPUT_THEME}
+            <TextInput
               ref={inlineInputRef}
               type="text"
               value={newClass}

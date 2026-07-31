@@ -21,8 +21,7 @@ import {
   BREAKPOINT_ORDER,
 } from "../../../shared/constants/breakpoints";
 import type { BreakpointId } from "../../../shared/types/breakpoints";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 const BP_ICONS: Record<BreakpointId, React.ReactNode> = {
   desktop: <Monitor size={11} aria-hidden="true" />,
   tablet: <Tablet size={11} aria-hidden="true" />,

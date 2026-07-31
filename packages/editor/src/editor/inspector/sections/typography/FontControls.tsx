@@ -18,8 +18,7 @@ import { useTypeRegistry } from "../../../design-system/state/TokenRegistryConte
 import { TokenPickerPopover } from "../../shared/TokenPickerPopover";
 import { SelectRow, ButtonGroup, InputWithUnit, MixedValueIndicator } from "../../shared/controls";
 import { getCssVariable } from "@/shared/utils/getCssVariable";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 // Font weight options
 export const FONT_WEIGHTS = [
   { value: "100", label: "Thin (100)" },

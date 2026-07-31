@@ -6,8 +6,7 @@
 import * as React from "react";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
 import { FlexAlignmentGrid } from "./controls";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
