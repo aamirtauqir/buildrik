@@ -49,17 +49,35 @@ describe("TextField", () => {
     expect(screen.getByLabelText("Domain").getAttribute("aria-invalid")).toBeNull();
   });
 
-  it("keeps a caller-supplied className on the real <input> — base classes first so the caller's own box-owning class wins the merge", () => {
+  it("keeps a caller-supplied className on the real <input> — the caller's own box-owning class wins the merge via CSS layers, not string position", () => {
     render(<TextField aria-label="Rename page" className="bd-pg-row-rename" />);
     const input = screen.getByLabelText("Rename page");
     // Caller class survives the merge...
     expect(input.className).toMatch(/\bbd-pg-row-rename\b/);
-    // ...and is the LAST class in the merged string, so it wins the
-    // cascade against the base tw:* utilities for any property a caller
-    // stylesheet chooses to re-declare (same contract call sites like
-    // `.tt-slider` / `.exp-folder-item__rename-input` depend on).
+    // ...and wins the cascade against BASE's tw:* utilities for any
+    // property a caller stylesheet chooses to re-declare (same contract
+    // call sites like `.tt-slider` / `.exp-folder-item__rename-input`
+    // depend on) — but NOT because it happens to be last in the joined
+    // className string. Position within a `class="a b c"` attribute has no
+    // effect on the cascade; browsers don't consult DOM attribute order
+    // when resolving conflicting declarations. The real reason: BASE's
+    // `tw:*` utilities compile into the named `tw-utilities` CSS layer
+    // (packages/editor/src/themes/tw.css's `@layer tw-theme, tw-utilities;`
+    // + default.css's `@layer reset, components, overrides;` chain), while
+    // a caller's own class like `bd-pg-row-rename` is defined in that
+    // caller's own plain CSS file, imported directly (not routed through
+    // the `@layer` system) and therefore genuinely UNLAYERED. Per the CSS
+    // cascade-layers spec, ANY unlayered declaration beats EVERY layered
+    // one, regardless of specificity or source order — this is why the
+    // merge order in TextField.tsx's
+    // `["bk-input", BASE, className].filter(Boolean).join(" ")` array
+    // could be written in any order with the same visual result. A future
+    // caller passing a `tw:*` override instead of their own unlayered class
+    // would NOT get this same guarantee — that override would land in the
+    // `tw-utilities` layer too, and resolve by Tailwind's own internal
+    // utility order, not by "comes after BASE in the array."
     const classes = input.className.trim().split(/\s+/);
-    expect(classes[classes.length - 1]).toBe("bd-pg-row-rename");
+    expect(classes).toContain("bd-pg-row-rename");
   });
 
   it("forwards ref to the real <input> element", () => {

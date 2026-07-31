@@ -18,61 +18,83 @@
  * Before this fix, the dashboard's own Tailwind build never compiled a
  * `tw:`-prefixed form of flowbite's classes — only unprefixed ones — so
  * this exact scenario rendered genuinely unstyled markup in production.
+ * The fix: packages/dashboard/components/global/flowbiteStore.ts sets the
+ * same prefix itself, unconditionally, and is imported first in
+ * app/layout.tsx.
  *
- * This test simulates that scenario directly (calling setStore, the same
- * side effect packages/editor/src/editor/chrome-ui/flowbiteStore.ts
- * performs — it does not import the editor package itself) and proves BOTH
- * halves of the fix together:
+ * FIX ROUND 1 (this file): the previous version of this test called
+ * `setStore({prefix:"tw", ...})` itself instead of exercising the real
+ * import chain (app/layout.tsx -> components/global/flowbiteStore.ts). That
+ * version stayed green even when someone neutered flowbiteStore.ts's own
+ * setStore call, and even when the import line was removed from
+ * app/layout.tsx — it was testing that flowbite-react's setStore() API
+ * works, not that THIS APP actually wires it up. This is the 5th instance
+ * in this arc of "a guard that passes when the thing it guards is broken";
+ * see the arc's fix-round history for the prior four.
  *
- *   1. a flowbite-react component this dashboard actually renders
- *      (ToggleSwitch — see components/global/cookie-consent.tsx, rendered
- *      from the root layout) emits `tw:`-prefixed classes once the global
- *      prefix is "tw".
- *   2. this package's compiled Tailwind output — app/tw-flowbite.css,
- *      sourced from `.flowbite-react/class-list.json` — actually contains
- *      every one of those classes, i.e. the CSS this app ships backs the
- *      classes flowbite renders under that prefix.
+ * This version proves both halves for real:
+ *   1. importing the real module (not calling setStore inline) is what
+ *      flips flowbite-react's global prefix to "tw", and ToggleSwitch (the
+ *      component this app actually renders — components/global/cookie-
+ *      consent.tsx) then emits classes this package's compiled CSS backs.
+ *   2. app/layout.tsx's actual source imports that exact module — a static
+ *      check, because a runtime test cannot observe Next's root layout
+ *      render tree.
  *
- * If someone reverts .flowbite-react/config.json's prefix, deletes/stops
- * importing app/tw-flowbite.css, or regenerates class-list.json without
- * the "tw" prefix, this test must fail — that is its entire purpose.
+ * If someone neuters flowbiteStore.ts's setStore call, or removes the
+ * import from app/layout.tsx, or reverts .flowbite-react/config.json's
+ * prefix, or regenerates class-list.json without the "tw" prefix, this
+ * file must fail — that is its entire purpose. (Proven by breaking each of
+ * the first two and watching it fail — see the fix-round commit.)
  */
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { render, screen } from "@testing-library/react";
 import { ToggleSwitch } from "flowbite-react";
-import { setStore } from "flowbite-react/store";
+import { getPrefix, setStore } from "flowbite-react/store";
 import classList from "../../../.flowbite-react/class-list.json";
 
 const classListSet = new Set<string>(classList as string[]);
 
-describe("dashboard flowbite prefix parity (flowbite-bigbang collision fix)", () => {
-  it("renders tw:-prefixed classes once the global store prefix is 'tw' (simulating the editor having loaded in this tab), and every one of those classes is in this package's compiled class-list", () => {
-    // Simulates packages/editor/src/editor/chrome-ui/flowbiteStore.ts having
-    // run in this same module/browser-tab context — the exact trigger for
-    // the bug this fix closes.
-    setStore({ prefix: "tw", version: 4 });
+describe("dashboard flowbite prefix wiring (flowbite-bigbang collision fix)", () => {
+  it("importing components/global/flowbiteStore — the exact module app/layout.tsx imports — sets flowbite-react's global prefix to 'tw', and ToggleSwitch then renders classes this package's compiled CSS backs", async () => {
+    // The repo's shared vitest setupFile (packages/editor/src/test-setup.ts)
+    // already imports the EDITOR's OWN flowbiteStore module for every test
+    // in the repo (editor and dashboard alike), which alone would leave
+    // getPrefix() === "tw" even if the dashboard's own wiring were entirely
+    // broken or absent. Reset first, so the assertions below can only pass
+    // because of the dynamic import that follows — not because of that
+    // ambient priming from a different package's module.
+    setStore({ prefix: undefined, version: undefined, dark: undefined });
+    expect(getPrefix()).not.toBe("tw");
+
+    // THE REAL ARTIFACT UNDER TEST — not a hand-rolled setStore() call.
+    // Dynamic + inside the test body so it runs after the reset above.
+    await import("@/components/global/flowbiteStore");
+
+    expect(getPrefix()).toBe("tw");
 
     render(<ToggleSwitch checked={false} label="Analytics" onChange={() => {}} />);
 
     const switchEl = screen.getByRole("switch");
     const knob = screen.getByTestId("flowbite-toggleswitch-toggle");
     const label = screen.getByTestId("flowbite-toggleswitch-label");
-
     const allClasses = [switchEl, knob, label].flatMap((el) => Array.from(el.classList));
     expect(allClasses.length).toBeGreaterThan(0);
 
     // Every class flowbite-react's OWN theme puts on these elements must
     // carry the tw: prefix — none of flowbite's default (unprefixed) theme
-    // classes may leak through once the global prefix is set.
+    // classes may leak through once the real import above has run.
     for (const cls of allClasses) {
       expect(cls.startsWith("tw:")).toBe(true);
     }
 
     // And the dashboard's own compiled CSS must actually back every one of
     // those exact class strings — this is the half a jsdom-only assertion
-    // on classNames can never catch on its own (jsdom doesn't know what
-    // CSS exists), which is why this cross-checks the generated class-list
-    // that app/tw-flowbite.css's `@source` compiles from.
+    // on classNames can never catch on its own (jsdom doesn't know what CSS
+    // exists), which is why this cross-checks the generated class-list that
+    // app/tw-flowbite.css's `@source` compiles from.
     //
     // `dark:` variants are excluded here, not swept under the rug: neither
     // this app's flowbiteStore.ts nor the editor's calls `setStore({dark:
@@ -84,29 +106,17 @@ describe("dashboard flowbite prefix parity (flowbite-bigbang collision fix)", ()
     // is light-theme-only (DESIGN.md), so an uncompiled `dark:` rule is
     // inert (it only matters if OS dark-mode preference is ever honored,
     // which this app deliberately never does), not a visible defect. This
-    // test's job is the prefix-collision regression, not that pre-existing,
-    // accepted, pattern-wide characteristic — asserting on `dark:` classes
-    // here would fail for a reason this task did not create and is not
-    // scoped to fix.
+    // test's job is the prefix-wiring regression, not that pre-existing,
+    // accepted, pattern-wide characteristic.
     const liveClasses = allClasses.filter((cls) => !cls.includes(":dark:") && !cls.startsWith("tw:dark:"));
     expect(liveClasses.length).toBeGreaterThan(0);
     const uncompiled = liveClasses.filter((cls) => !classListSet.has(cls));
     expect(uncompiled).toEqual([]);
   });
 
-  it("renders unprefixed classes when the global store prefix is unset (dashboard's own default, editor never loaded)", () => {
-    // Reset to flowbite-react's own runtime default (undefined) — the state
-    // every dashboard page is in until something in the tab opts into "tw".
-    setStore({ prefix: undefined, version: undefined });
-
-    render(<ToggleSwitch checked={false} label="Analytics" onChange={() => {}} />);
-
-    const switchEl = screen.getByRole("switch");
-    const allClasses = Array.from(switchEl.classList);
-
-    expect(allClasses.length).toBeGreaterThan(0);
-    for (const cls of allClasses) {
-      expect(cls.startsWith("tw:")).toBe(false);
-    }
+  it("STATIC WIRING CHECK (not a render test — a runtime test cannot observe Next's root layout render): app/layout.tsx's source actually imports components/global/flowbiteStore", () => {
+    const layoutSource = readFileSync(path.resolve(__dirname, "../../../app/layout.tsx"), "utf-8");
+    const importsFlowbiteStore = /^\s*import\s+["']@\/components\/global\/flowbiteStore["'];?\s*$/m.test(layoutSource);
+    expect(importsFlowbiteStore).toBe(true);
   });
 });
