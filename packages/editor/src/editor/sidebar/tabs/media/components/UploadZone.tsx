@@ -12,7 +12,7 @@ import { Upload, AlertTriangle, XCircle, RotateCcw } from "lucide-react";
 import type { UploadZoneProps } from "../data/mediaTypes";
 import { StorageQuotaBar } from "./StorageQuotaBar";
 import { Button, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
+import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
 
 const ACCEPT_TYPES = "image/*,video/*,.ttf,.otf,.woff,.woff2,.svg";
 const MAX_FILE_BYTES = 50 * 1024 * 1024; // 50MB hard ceiling at the UI layer

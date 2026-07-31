@@ -12,7 +12,7 @@
  */
 import React from "react";
 import { Avatar } from "flowbite-react";
-import { avatarInitials, AVATAR_TONE_THEME, type AvatarTone } from "../ui/avatarTone";
+import { avatarInitials, AVATAR_TONE_THEME, type AvatarTone } from "./avatarTone";
 
 export type ConnectionState = "live" | "reconnecting" | "offline";
 

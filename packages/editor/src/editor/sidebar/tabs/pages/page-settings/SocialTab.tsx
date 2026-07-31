@@ -8,8 +8,8 @@ import * as React from "react";
 import { HelperText, Label, Textarea, TextInput } from "flowbite-react";
 import type { PageItem } from "../types";
 import type { UsePageSettingsReturn } from "./usePageSettings";
-import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
-import { BK_LABEL_CLASS, BK_HELPER_CLASS } from "@/editor/ui/labelTheme";
+import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
+import { BK_LABEL_CLASS, BK_HELPER_CLASS } from "@/editor/chrome-ui/labelTheme";
 
 interface Props {
   s: UsePageSettingsReturn;

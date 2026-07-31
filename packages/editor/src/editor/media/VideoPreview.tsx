@@ -7,7 +7,7 @@
 import * as React from "react";
 import { ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/ui";
 import { Button, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
+import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
 
 // ============================================================================
 // TYPES

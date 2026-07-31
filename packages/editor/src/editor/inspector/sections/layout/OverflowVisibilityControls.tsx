@@ -4,7 +4,7 @@
  */
 
 import * as React from "react";
-import { BK_SELECT_BASE_THEME } from "@/editor/ui/selectTheme";
+import { BK_SELECT_BASE_THEME } from "@/editor/chrome-ui/selectTheme";
 import { baseStyles } from "../../shared/controls/controlStyles";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
 import { Button, Select } from "flowbite-react";

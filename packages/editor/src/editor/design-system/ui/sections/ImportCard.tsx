@@ -35,7 +35,7 @@ import {
 } from "../../state/TokenRegistryContext";
 import type { DesignToken } from "../../types";
 import { Button, Textarea, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
+import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
 
 type ConflictStrategy = "replace" | "keep-mine" | "keep-theirs";
 

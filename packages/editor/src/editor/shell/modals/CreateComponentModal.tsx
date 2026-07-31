@@ -9,7 +9,7 @@ import { ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal } 
 import type { Composer } from "../../../engine";
 import { useToast } from "@/editor/ui";
 import { Button, Checkbox, Textarea, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
+import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
 
 export interface CreateComponentModalProps {
   isOpen: boolean;

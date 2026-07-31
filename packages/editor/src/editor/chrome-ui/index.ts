@@ -66,6 +66,7 @@ export { EditorShell, type EditorShellProps } from "./EditorShell";
 export { Footer, FooterSpacer, type FooterProps } from "./Footer";
 export { Rail, RailItem, RailSpacer, type RailProps, type RailItemProps } from "./Rail";
 export { FieldRow, type FieldRowProps } from "./FieldRow";
+export { FormField, type FormFieldProps } from "./FormField";
 export { HelpTooltip, type HelpTooltipProps } from "./HelpTooltip";
 export { Slider, type SliderProps } from "./Slider";
 export { Tabs, type TabsProps, type Tab } from "./Tabs";

@@ -8,7 +8,7 @@
 import { Link, Link2Off } from "lucide-react";
 import * as React from "react";
 import { Button, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
+import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
 
 export interface LinkedGapInputProps {
   styles: Record<string, string>;

@@ -10,7 +10,7 @@ import * as React from "react";
 import type { GoogleFont, FontCategory } from "../../../../services/GoogleFontsService";
 import type { SystemFont } from "./FontPicker";
 import { Button, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
+import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
 
 // Category labels for display
 export const CATEGORY_LABELS: Record<FontCategory | "system", string> = {

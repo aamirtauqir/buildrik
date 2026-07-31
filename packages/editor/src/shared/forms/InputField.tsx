@@ -7,9 +7,9 @@
  */
 
 import * as React from "react";
-import { FormField } from "@/editor/ui";
+import { FormField } from "@/editor/chrome-ui";
 import { TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
+import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
 
 export interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;

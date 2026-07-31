@@ -7,7 +7,7 @@
 import * as React from "react";
 import { sliderStyles as styles } from "./ImageEditorStyles";
 import { TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
+import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
 
 export interface SliderControlProps {
   label: string;

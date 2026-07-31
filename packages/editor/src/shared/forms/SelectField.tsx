@@ -7,8 +7,8 @@
  */
 
 import * as React from "react";
-import { FormField } from "@/editor/ui";
-import { BK_SELECT_BASE_THEME } from "@/editor/ui/selectTheme";
+import { FormField } from "@/editor/chrome-ui";
+import { BK_SELECT_BASE_THEME } from "@/editor/chrome-ui/selectTheme";
 import { Select } from "flowbite-react";
 
 export interface SelectOption {

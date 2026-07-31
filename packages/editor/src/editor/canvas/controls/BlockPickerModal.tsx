@@ -16,7 +16,7 @@ import { runTransaction } from "../../../shared/utils/helpers";
 import { canNestElement } from "../../../shared/utils/nesting";
 import { ElementsTab } from "../../sidebar/tabs/ElementsTab";
 import { Button, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
+import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
 
 export interface BlockPickerModalProps {
   composer: Composer;

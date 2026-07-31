@@ -17,7 +17,7 @@
 import * as React from "react";
 import { CANVAS_COLORS, PANEL_STYLE, Z_INDEX } from "../shared";
 import { Button, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
+import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
 
 // =============================================================================
 // TYPES

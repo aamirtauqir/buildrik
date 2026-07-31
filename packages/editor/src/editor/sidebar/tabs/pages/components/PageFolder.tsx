@@ -18,7 +18,7 @@ import type { Composer } from "../../../../../engine";
 import type { FolderItem, PageItem } from "../types";
 import { PageRow } from "./PageRow";
 import { TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
+import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
 
 interface Props {
   folder: FolderItem;

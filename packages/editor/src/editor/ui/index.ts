@@ -31,7 +31,7 @@ export { FormatRow, type FormatRowProps } from "../chrome-ui/FormatRow";
 export { IntegrationRow, type IntegrationRowProps, type IntegrationStatus } from "../chrome-ui/IntegrationRow";
 export { CommentRow, type CommentRowProps } from "../chrome-ui/CommentRow";
 export { FieldRow, type FieldRowProps } from "../chrome-ui/FieldRow";
-export { FormField, type FormFieldProps } from "./FormField";
+export { FormField, type FormFieldProps } from "../chrome-ui/FormField";
 export { NavItem, type NavItemProps } from "../chrome-ui/NavItem";
 export { SectionHeader, type SectionHeaderProps } from "../chrome-ui/SectionHeader";
 export { PanelHeader, type PanelHeaderProps } from "../chrome-ui/PanelHeader";

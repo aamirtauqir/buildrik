@@ -10,7 +10,7 @@
 
 import * as React from "react";
 import { TextField } from "@/editor/chrome-ui";
-import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
+import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
 import Cropper from "react-easy-crop";
 import type { Area, Point } from "react-easy-crop";
 import {

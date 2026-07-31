@@ -17,7 +17,7 @@ import { EVENTS } from "../../../../shared/constants/events";
 import { DSBindingChip } from "../../sections/DSBindingChip";
 import { isTokenVar, extractVarName, cssVarToTokenId } from "../tokenBindingDetection";
 import { Button, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
+import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
 
 // ============================================================================
 // AXIS INPUT — absolutely positioned input inside a box edge

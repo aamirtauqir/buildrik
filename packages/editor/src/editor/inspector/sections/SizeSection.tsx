@@ -1,5 +1,5 @@
 import { Popover } from "@/editor/ui";
-import { BK_SELECT_BASE_THEME } from "@/editor/ui/selectTheme";
+import { BK_SELECT_BASE_THEME } from "@/editor/chrome-ui/selectTheme";
 /**
  * Size Section - Width, Height, Min/Max dimensions
  * CP3: W and H rows each have a hover-reveal chain button that opens a spacing

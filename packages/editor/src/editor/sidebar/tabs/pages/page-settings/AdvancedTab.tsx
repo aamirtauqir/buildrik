@@ -7,8 +7,8 @@
 import * as React from "react";
 import type { UsePageSettingsReturn } from "./usePageSettings";
 import { Button, HelperText, Label, Textarea, ToggleSwitch, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
-import { BK_LABEL_CLASS, BK_HELPER_CLASS, BK_HELPER_ERROR_CLASS } from "@/editor/ui/labelTheme";
+import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
+import { BK_LABEL_CLASS, BK_HELPER_CLASS, BK_HELPER_ERROR_CLASS } from "@/editor/chrome-ui/labelTheme";
 
 interface Props {
   s: UsePageSettingsReturn;

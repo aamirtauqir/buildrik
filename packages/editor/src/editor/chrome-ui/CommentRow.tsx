@@ -10,7 +10,7 @@
 import React from "react";
 import { Row, type RowProps, ROW_META_CLASS } from "./Row";
 import { Avatar } from "flowbite-react";
-import { avatarInitials, AVATAR_TONE_THEME } from "../ui/avatarTone";
+import { avatarInitials, AVATAR_TONE_THEME } from "./avatarTone";
 
 export interface CommentRowProps extends Omit<RowProps, "children" | "size"> {
   author: string;

@@ -15,7 +15,7 @@ import { EVENTS } from "../../../../shared/constants/events";
 import { LayersPanel } from "../../../panels/layers/index";
 import type { SelectedElementInfo } from "../../../panels/layers/types";
 import { Button, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
+import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
 
 export interface LayersTabProps {
   composer: Composer | null;

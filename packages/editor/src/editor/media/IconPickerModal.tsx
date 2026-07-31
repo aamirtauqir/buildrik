@@ -21,7 +21,7 @@ import {
 import { InputField } from "../../shared/forms";
 import type { IconConfig, IconLibrary } from "../../shared/types/media";
 import { Button, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
+import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
 
 // ============================================
 // Types

@@ -7,7 +7,7 @@
  */
 
 import * as React from "react";
-import { FormField } from "@/editor/ui";
+import { FormField } from "@/editor/chrome-ui";
 import { Textarea } from "flowbite-react";
 
 export interface TextareaFieldProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {

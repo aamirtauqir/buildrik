@@ -4,7 +4,7 @@ import { useDSModeOptional } from "../../state/DSModeContext";
 import { TokenUsageChip } from "../sections/TokenUsageChip";
 import type { LintIssue } from "../../../../engine/designSystem/LintState";
 import { Button, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
+import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
 
 interface GenericTokenListProps {
   tokens: DesignToken[];

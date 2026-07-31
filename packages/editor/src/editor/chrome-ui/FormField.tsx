@@ -5,14 +5,16 @@
  * Ported from the deleted `Field.tsx` (same render-prop API, same id/aria
  * wiring) — the only change is what it composes internally: flowbite's own
  * `Label`/`HelperText` instead of the deleted `Field.tsx` versions (see
- * `labelTheme.ts` for the className-override reasoning). Stays in
- * `editor/ui/`, not `chrome-ui/`: 4 of its 5 real consumers live in
- * `shared/forms/`, and CLAUDE.md's architecture rules grant `shared/forms/`
- * exactly one intentional `shared/→editor` edge — `@/editor/ui` — not
- * `@/editor/chrome-ui`. `editor/ui/` already composes concrete
- * `flowbite-react` components directly in several files (`Topbar.tsx`,
- * `Toast.tsx`, `ConfirmDialog.tsx`, …), so there's no boundary reason to
- * relocate this one.
+ * `labelTheme.ts` for the className-override reasoning).
+ *
+ * Moved here from `editor/ui/` in the Tasks 7-12 consolidated surface sweep
+ * (controller decision): `editor/ui/` is being drained to zero ahead of its
+ * Task 13 deletion, so this had to land somewhere. `shared/forms/` (4 of its
+ * 5 real consumers) gets its one intentional `shared/→editor` edge updated
+ * in lockstep — CLAUDE.md's Import Direction Rules now name
+ * `@/editor/chrome-ui`, not `@/editor/ui`, as that exception. The rule's
+ * intent is unchanged: `shared/forms/` composes the chrome component
+ * library, wherever it lives.
  *
  * @license BSD-3-Clause
  */

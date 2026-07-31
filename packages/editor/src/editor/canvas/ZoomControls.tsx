@@ -6,7 +6,7 @@
 import * as React from "react";
 import { ZOOM_PRESETS } from "./shared";
 import { Button, Tooltip, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
+import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
 
 export interface ZoomControlsProps {
   zoom: number;

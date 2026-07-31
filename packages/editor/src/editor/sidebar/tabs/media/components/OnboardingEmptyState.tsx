@@ -11,7 +11,7 @@ import { SUPPORTED_FORMATS_LABEL } from "../../../../../shared/constants/media";
 import { EMPTY_MSGS } from "../data/mediaData";
 import type { MediaTypeFilter } from "../data/mediaTypes";
 import { Button, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
+import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
 
 interface OnboardingEmptyStateProps {
   activeType: MediaTypeFilter;

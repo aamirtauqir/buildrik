@@ -9,13 +9,13 @@
  */
 import * as React from "react";
 import { ConfirmDialog } from "@/editor/ui";
-import { BK_SELECT_BASE_THEME } from "@/editor/ui/selectTheme";
+import { BK_SELECT_BASE_THEME } from "@/editor/chrome-ui/selectTheme";
 import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
 import type { ConditionExpression, ConditionOperator, DataSource } from "@/shared/types/data";
 import { conditionSummary, fieldDefault, isValidVariableKey, type SiteVariable } from "./contentPanelUtils";
 import type { ConditionRow } from "./useContentPanel";
 import { Button, Checkbox, Select, Textarea, ToggleSwitch, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
+import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
 
 export const S: Record<string, React.CSSProperties> = {
   body: { display: "flex", flexDirection: "column", height: "100%", minHeight: 0 },

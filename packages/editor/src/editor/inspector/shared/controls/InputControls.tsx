@@ -8,7 +8,7 @@
 import { Info, X } from "lucide-react";
 import * as React from "react";
 import { TextField } from "@/editor/chrome-ui";
-import { BK_SELECT_BARE_UNIT_THEME, BK_SELECT_BARE_VALUE_THEME } from "@/editor/ui/selectTheme";
+import { BK_SELECT_BARE_UNIT_THEME, BK_SELECT_BARE_VALUE_THEME } from "@/editor/chrome-ui/selectTheme";
 import { Button, Select, Textarea, TextInput, Tooltip } from "flowbite-react";
 
 // ============================================================================

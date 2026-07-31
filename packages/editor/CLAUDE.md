@@ -205,7 +205,7 @@ src/
 │   ├── hooks/       # Reusable React hooks
 │   ├── utils/       # Pure utility functions
 │   └── forms/       # Form field compositions (label/hint/error wiring on
-│                    # @/editor/ui controls — the one shared/→editor edge)
+│                    # @/editor/chrome-ui controls — the one shared/→editor edge)
 │
 │                    # NOTE: shared/ui/ + shared/extensions/ DELETED 2026-07-28
 │                    # (stage 6 of ds/fresh-token-system). Their survivors were
@@ -235,7 +235,7 @@ engine/    → shared/ (ONLY)
 editor/    → engine/, shared/, blocks/, templates/
 services/  → shared/ (ONLY)
 shared/    → NOTHING from other src/ folders (leaf dependency).
-            EXCEPTION: shared/forms/ files MAY import from @/editor/ui
+            EXCEPTION: shared/forms/ files MAY import from @/editor/chrome-ui
             (the component library). This is the only intentional
             shared/→editor/ edge in the graph — forms/ exists
             specifically to compose library controls with field wiring.

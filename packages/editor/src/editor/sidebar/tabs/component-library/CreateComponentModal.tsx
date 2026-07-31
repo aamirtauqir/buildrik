@@ -24,14 +24,14 @@ import {
   ModalTitle,
   Portal,
 } from "@/editor/ui";
-import { BK_SELECT_BASE_THEME } from "@/editor/ui/selectTheme";
+import { BK_SELECT_BASE_THEME } from "@/editor/chrome-ui/selectTheme";
 import {
   dialogCancelBtnStyles,
   dialogInputStyles,
   dialogPrimaryBtnStyles,
 } from "./styles";
 import { Button, Checkbox, Select, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
+import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
 
 export interface SelectionContext {
   selectionIds: readonly string[];

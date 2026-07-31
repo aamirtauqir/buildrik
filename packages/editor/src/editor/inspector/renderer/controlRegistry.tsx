@@ -11,7 +11,7 @@
  */
 
 import * as React from "react";
-import { BK_SELECT_BASE_THEME } from "@/editor/ui/selectTheme";
+import { BK_SELECT_BASE_THEME } from "@/editor/chrome-ui/selectTheme";
 import type {
   ColorField,
   ControlProps,
@@ -26,7 +26,7 @@ import type {
   ToggleField,
 } from "./schema";
 import { Button, Checkbox, Select, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
+import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
 
 // ============================================================================
 // SHARED STYLE TOKENS — keep each control file-local so future sections can

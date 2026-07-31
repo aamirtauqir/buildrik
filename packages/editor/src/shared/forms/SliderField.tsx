@@ -9,7 +9,7 @@
 
 import * as React from "react";
 import { Slider } from "@/editor/ui";
-import { BK_LABEL_CLASS } from "@/editor/ui/labelTheme";
+import { BK_LABEL_CLASS } from "@/editor/chrome-ui/labelTheme";
 import { Label } from "flowbite-react";
 
 export interface SliderFieldProps {

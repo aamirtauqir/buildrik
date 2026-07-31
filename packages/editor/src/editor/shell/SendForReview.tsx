@@ -13,12 +13,12 @@
  */
 
 import * as React from "react";
-import { FormField, Popover } from "@/editor/ui";
+import { FormField, Popover } from "@/editor/chrome-ui";
 import type { Composer } from "../../engine";
 import { submitForReview, type ReviewStatus } from "../../services/ReviewService";
 import { exportPublishPages } from "./exportPublishPages";
 import { Button, Textarea, Tooltip, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
+import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
 
 export interface SendForReviewProps {
   composer: Composer | null;
