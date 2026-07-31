@@ -9,7 +9,7 @@
  * @license BSD-3-Clause
  */
 import React from "react";
-import { Modal } from "@/editor/ui/Modal";
+import { Modal } from "./Modal";
 import { Button, Badge } from "flowbite-react";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 

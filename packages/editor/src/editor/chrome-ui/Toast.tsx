@@ -22,6 +22,18 @@ const GHOST_BTN_CLASS = "tw:border-transparent tw:bg-transparent tw:text-gray-60
 
 export type ToastTone = "info" | "success" | "warning" | "error" | "neutral";
 
+/* Each tone supplies its own left-border color — same-property values can't
+   be additive (Row/PanelFrame precedent). Base CSS had no `.bk-toast--neutral`
+   rule, meaning "neutral" fell through to the shorthand's own default
+   (--bk-ink-muted, i.e. gray-500) — reproduced explicitly here. */
+const TONE_BORDER_CLASS: Record<ToastTone, string> = {
+  neutral: "tw:border-l-gray-500",
+  info: "tw:border-l-blue-700",
+  success: "tw:border-l-green-500",
+  warning: "tw:border-l-yellow-500",
+  error: "tw:border-l-red-600",
+};
+
 export interface ToastActionPayload {
   label: string;
   onClick: () => void;
@@ -116,7 +128,7 @@ function ToastViewport({ toasts, onDismiss }: { toasts: QueuedToast[]; onDismiss
   const hasError = toasts.some((t) => t.tone === "error");
   return createPortal(
     <div
-      className="bk-toast-viewport"
+      className="tw:fixed tw:bottom-4 tw:right-4 tw:z-[80] tw:flex tw:flex-col tw:gap-2 tw:w-[360px] tw:max-w-[calc(100vw-32px)] tw:pointer-events-none"
       role="status"
       aria-live={hasError ? "assertive" : "polite"}
       aria-atomic="false"
@@ -139,10 +151,16 @@ function ToastItem({ toast, onDismiss }: { toast: QueuedToast; onDismiss: (id: s
   }, [id, duration, onDismiss]);
 
   return (
-    <div className={`bk-toast bk-toast--${tone}`}>
-      <div className="bk-toast__body">
-        {title ? <span className="bk-toast__title">{title}</span> : null}
-        <span className="bk-toast__desc">{description}</span>
+    <div
+      className={[
+        "tw:pointer-events-auto tw:flex tw:items-start tw:gap-2 tw:p-3 tw:rounded-lg tw:border tw:border-gray-200 tw:border-l-[3px] " +
+          "tw:bg-white tw:[box-shadow:var(--bk-shadow-overlay)] tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:text-gray-900",
+        TONE_BORDER_CLASS[tone],
+      ].join(" ")}
+    >
+      <div className="tw:flex-1 tw:flex tw:flex-col tw:gap-0.5 tw:min-w-0">
+        {title ? <span className="tw:font-medium">{title}</span> : null}
+        <span className="tw:text-gray-600 tw:text-xs">{description}</span>
       </div>
       {action ? (
         <Button color="light" size="xs" onClick={action.onClick} className={GHOST_BTN_CLASS}>
@@ -152,7 +170,7 @@ function ToastItem({ toast, onDismiss }: { toast: QueuedToast; onDismiss: (id: s
       <Button
         color="light"
         size="xs"
-        className={`bk-toast__close ${GHOST_BTN_CLASS}`}
+        className={`tw:flex-none ${GHOST_BTN_CLASS}`}
         aria-label="Dismiss notification"
         onClick={() => onDismiss(id)}
       >

@@ -13,9 +13,25 @@
  */
 import React from "react";
 import { OverlayMount } from "./OverlayMount";
-import { IconButton } from "../chrome-ui/Icon";
+import { IconButton } from "./Icon";
+import {
+  MODAL_FRAME_BASE_CLASS,
+  MODAL_HEAD_CLASS,
+  MODAL_TITLE_CLASS,
+  MODAL_SUBTITLE_CLASS,
+  MODAL_BODY_CLASS,
+  MODAL_FOOT_CLASS,
+} from "./Modal";
 
 export type ModalSize = "sm" | "question" | "form" | "lg" | "xl";
+
+const SIZE_WIDTH_CLASS: Record<ModalSize, string> = {
+  sm: "tw:w-[360px]",
+  question: "tw:w-[440px]",
+  form: "tw:w-[560px]",
+  lg: "tw:w-[720px]",
+  xl: "tw:w-[960px]",
+};
 
 /** Lets ModalClose inherit the root's close without per-consumer wiring. */
 const ModalCloseContext = React.createContext<(() => void) | null>(null);
@@ -55,8 +71,7 @@ export const ModalContent = React.forwardRef<HTMLDivElement, ModalContentProps>(
   return (
     <div
       ref={ref}
-      className={["bk-modal", `bk-modal--${size}`, className].filter(Boolean).join(" ")}
-      style={{ position: "relative", ...rest.style }}
+      className={[MODAL_FRAME_BASE_CLASS, SIZE_WIDTH_CLASS[size], "tw:relative", className].filter(Boolean).join(" ")}
       aria-label={srTitle}
       {...rest}
     >
@@ -68,7 +83,7 @@ export const ModalContent = React.forwardRef<HTMLDivElement, ModalContentProps>(
 export const ModalTitle = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(
   function ModalTitle({ className, children, ...rest }, ref) {
     return (
-      <h2 ref={ref} className={["bk-modal__title", className].filter(Boolean).join(" ")} {...rest}>
+      <h2 ref={ref} className={[MODAL_TITLE_CLASS, className].filter(Boolean).join(" ")} {...rest}>
         {children}
       </h2>
     );
@@ -78,7 +93,7 @@ export const ModalTitle = React.forwardRef<HTMLHeadingElement, React.HTMLAttribu
 export const ModalDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
   function ModalDescription({ className, children, ...rest }, ref) {
     return (
-      <p ref={ref} className={["bk-modal__subtitle", className].filter(Boolean).join(" ")} {...rest}>
+      <p ref={ref} className={[MODAL_SUBTITLE_CLASS, className].filter(Boolean).join(" ")} {...rest}>
         {children}
       </p>
     );
@@ -88,7 +103,7 @@ export const ModalDescription = React.forwardRef<HTMLParagraphElement, React.HTM
 export const ModalBody = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   function ModalBody({ className, children, ...rest }, ref) {
     return (
-      <div ref={ref} className={["bk-modal__body", className].filter(Boolean).join(" ")} {...rest}>
+      <div ref={ref} className={[MODAL_BODY_CLASS, className].filter(Boolean).join(" ")} {...rest}>
         {children}
       </div>
     );
@@ -98,7 +113,7 @@ export const ModalBody = React.forwardRef<HTMLDivElement, React.HTMLAttributes<H
 export const ModalFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   function ModalFooter({ className, children, ...rest }, ref) {
     return (
-      <div ref={ref} className={["bk-modal__foot", className].filter(Boolean).join(" ")} {...rest}>
+      <div ref={ref} className={[MODAL_FOOT_CLASS, className].filter(Boolean).join(" ")} {...rest}>
         {children}
       </div>
     );
@@ -118,7 +133,7 @@ export const ModalClose = React.forwardRef<HTMLButtonElement, ModalCloseProps>(f
     <IconButton
       ref={ref}
       label={label}
-      className={["bk-modal__close", className].filter(Boolean).join(" ")}
+      className={["tw:absolute tw:top-3 tw:right-3", className].filter(Boolean).join(" ")}
       onClick={(e) => {
         onClick?.(e);
         if (!e.defaultPrevented) close?.();

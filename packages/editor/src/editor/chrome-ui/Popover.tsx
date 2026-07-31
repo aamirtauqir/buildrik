@@ -13,9 +13,30 @@
  * @license BSD-3-Clause
  */
 import React from "react";
-import { ROW_ICON_CLASS } from "../chrome-ui/Row";
+import { ROW_ICON_CLASS } from "./Row";
 
 export type PopoverPlacement = "bottom" | "bottom-end" | "top" | "top-end" | "right";
+
+/* inline/block and each placement supply their own full set — same-property
+   values (display; top/bottom/left/right) can't be additive across variants
+   (Row/PanelFrame precedent). */
+const ANCHOR_CLASS: Record<"inline" | "block", string> = {
+  inline: "tw:relative tw:inline-flex",
+  block: "tw:relative tw:flex tw:flex-1 tw:min-w-0",
+};
+const PLACEMENT_CLASS: Record<PopoverPlacement, string> = {
+  bottom: "tw:top-[calc(100%+4px)] tw:left-0",
+  "bottom-end": "tw:top-[calc(100%+4px)] tw:right-0",
+  top: "tw:bottom-[calc(100%+4px)] tw:left-0",
+  "top-end": "tw:bottom-[calc(100%+4px)] tw:right-0",
+  right: "tw:left-[calc(100%+4px)] tw:top-0",
+};
+/** Exported for the rare cross-file borrower that wraps its own positioned
+ *  box in the popover "look" without using the Popover component itself
+ *  (e.g. AddPageButton.tsx). */
+export const POPOVER_BASE_CLASS =
+  "tw:absolute tw:z-40 tw:min-w-[180px] tw:p-2 tw:rounded-lg tw:border tw:border-gray-200 tw:bg-white " +
+  "tw:[box-shadow:var(--bk-shadow-overlay)] tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:text-gray-900";
 
 export interface PopoverProps {
   open: boolean;
@@ -49,14 +70,10 @@ export function Popover({ open, onClose, trigger, placement = "bottom", children
   }, [open, onClose]);
 
   return (
-    <span className={["bk-popover-anchor", block && "bk-popover-anchor--block"].filter(Boolean).join(" ")} ref={wrap}>
+    <span className={ANCHOR_CLASS[block ? "block" : "inline"]} ref={wrap}>
       {trigger}
       {open ? (
-        <div
-          className={["bk-popover", `bk-popover--${placement}`, className].filter(Boolean).join(" ")}
-          role="dialog"
-          aria-label={label}
-        >
+        <div className={[POPOVER_BASE_CLASS, PLACEMENT_CLASS[placement], className].filter(Boolean).join(" ")} role="dialog" aria-label={label}>
           {children}
         </div>
       ) : null}
@@ -138,7 +155,7 @@ export function Menu({ label = "Actions", autoFocus = true, className, children,
   return (
     <div
       ref={root}
-      className={["bk-menu", className].filter(Boolean).join(" ")}
+      className={["tw:p-1 tw:min-w-[200px]", className].filter(Boolean).join(" ")}
       role="menu"
       aria-label={label}
       onKeyDown={(e) => {
@@ -174,28 +191,53 @@ export interface MenuItemProps extends Omit<React.ButtonHTMLAttributes<HTMLButto
   danger?: boolean;
 }
 
+const MENU_ITEM_BASE =
+  "tw:flex tw:items-center tw:gap-2 tw:w-full tw:h-8 tw:py-0 tw:px-2 tw:border-0 tw:rounded-md tw:bg-transparent " +
+  "tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:text-left " +
+  "tw:focus-visible:outline-none tw:focus-visible:bg-blue-50";
+
 export function MenuItem({ icon, kbd, selected, danger, disabled, className, children, ...rest }: MenuItemProps) {
+  const stateClass = disabled
+    ? "tw:cursor-default tw:pointer-events-none tw:text-gray-300 tw:focus-visible:text-gray-300"
+    : danger
+      ? "tw:cursor-pointer tw:hover:bg-gray-100 tw:text-red-700 tw:focus-visible:text-red-700"
+      : "tw:cursor-pointer tw:hover:bg-gray-100 tw:text-gray-900 tw:focus-visible:text-blue-700";
+
   return (
     <button
       type="button"
       role={selected === undefined ? "menuitem" : "menuitemcheckbox"}
       aria-checked={selected === undefined ? undefined : selected}
-      className={["bk-menu-item", danger && "bk-menu-item--destructive", className].filter(Boolean).join(" ")}
+      className={[MENU_ITEM_BASE, stateClass, className].filter(Boolean).join(" ")}
       disabled={disabled}
       aria-disabled={disabled || undefined}
       tabIndex={-1}
       {...rest}
     >
+      {selected !== undefined ? (
+        <span aria-hidden="true" className="tw:w-3 tw:flex-none tw:text-blue-700">
+          {selected ? "✓" : ""}
+        </span>
+      ) : null}
       {icon ? <span className={ROW_ICON_CLASS}>{icon}</span> : null}
-      <span className="bk-menu-item__label">{children}</span>
-      {kbd ? <span className="bk-menu-item__kbd">{kbd}</span> : null}
+      <span className="tw:flex-1 tw:text-left">{children}</span>
+      {kbd ? <span className="tw:ml-auto tw:text-gray-500 tw:text-[11px]">{kbd}</span> : null}
     </button>
   );
 }
 
 export function MenuGroup({ className, children, ...rest }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div role="group" className={["bk-menu__group", className].filter(Boolean).join(" ")} {...rest}>
+    <div
+      role="group"
+      className={[
+        "tw:mt-1 tw:pt-1 tw:border-t tw:border-gray-200 tw:first:mt-0 tw:first:pt-0 tw:first:border-t-0",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      {...rest}
+    >
       {children}
     </div>
   );
@@ -203,12 +245,20 @@ export function MenuGroup({ className, children, ...rest }: React.HTMLAttributes
 
 export function MenuLabel({ className, children, ...rest }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={["bk-menu__label", className].filter(Boolean).join(" ")} {...rest}>
+    <div
+      className={[
+        "tw:pt-1 tw:px-2 tw:pb-0.5 tw:text-gray-500 tw:text-[11px] tw:font-medium tw:tracking-[0.08em] tw:uppercase tw:[font-family:var(--bk-font-ui)]",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      {...rest}
+    >
       {children}
     </div>
   );
 }
 
 export function MenuSeparator() {
-  return <div className="bk-menu__separator" role="separator" />;
+  return <div className="tw:h-px tw:my-1 tw:bg-gray-200" role="separator" />;
 }

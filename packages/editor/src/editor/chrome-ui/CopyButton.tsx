@@ -6,7 +6,7 @@
  */
 import React from "react";
 import { Copy, Check } from "lucide-react";
-import { useToast } from "../ui/Toast";
+import { useToast } from "./Toast";
 
 const BASE =
   "tw:inline-flex tw:items-center tw:gap-1 tw:border tw:border-transparent tw:rounded-sm tw:cursor-pointer " +

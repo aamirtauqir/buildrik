@@ -10,7 +10,15 @@
  */
 import React from "react";
 import { createPortal } from "react-dom";
-import { useFocusTrap } from "../chrome-ui/focus";
+import { useFocusTrap } from "./focus";
+
+/* center/top each supply their own align-items — same-property values can't
+   be additive (Tailwind utilities of equal specificity have no
+   className-order-to-cascade-order guarantee, see Row/PanelFrame precedent). */
+const SCRIM_ALIGN_CLASS: Record<"center" | "top", string> = {
+  center: "tw:items-center",
+  top: "tw:items-start tw:pt-[12vh]",
+};
 
 export interface OverlayMountProps {
   open: boolean;
@@ -31,7 +39,9 @@ export function OverlayMount({
 
   return createPortal(
     <div
-      className={["bk-scrim", align === "top" && "bk-scrim--top"].filter(Boolean).join(" ")}
+      className={["tw:fixed tw:inset-0 tw:z-50 tw:bg-[var(--bk-alpha-ink-40)] tw:flex tw:justify-center", SCRIM_ALIGN_CLASS[align]]
+        .filter(Boolean)
+        .join(" ")}
       onMouseDown={(e) => {
         if (dismissOnScrimClick && e.target === e.currentTarget) onClose();
       }}

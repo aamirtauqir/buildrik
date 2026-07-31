@@ -1,4 +1,4 @@
-import { IconButton, Menu, MenuItem } from "@/editor/ui";
+import { IconButton, Menu, MenuItem, POPOVER_BASE_CLASS } from "@/editor/ui";
 /**
  * AddPageButton — sticky cobalt CTA in pages footer.
  * Overflow (⋮) menu reveals secondary actions: "From template" + "New folder".
@@ -54,7 +54,7 @@ export const AddPageButton: React.FC<AddPageButtonProps> = ({
           </IconButton>
           {menuOpen && (
             <div
-              className="bk-popover"
+              className={POPOVER_BASE_CLASS}
               role="presentation"
               style={{ position: "absolute", bottom: "calc(100% + 4px)", right: 0, zIndex: 10 }}
             >

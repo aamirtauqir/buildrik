@@ -31,6 +31,14 @@ export interface CommandPaletteProps {
   emptyLabel?: string;
 }
 
+/* idle/selected/disabled each supply their own bg + text color — same-property
+   values can't be additive (Row/PanelFrame precedent). */
+const ITEM_STATE_CLASS: Record<"idle" | "selected" | "disabled", string> = {
+  idle: "tw:bg-transparent tw:text-gray-900",
+  selected: "tw:bg-blue-50 tw:text-blue-700",
+  disabled: "tw:bg-transparent tw:text-gray-300 tw:pointer-events-none",
+};
+
 export function CommandPalette({
   open, onClose, commands, onRun, placeholder = "Type a command or search…", emptyLabel = "No matching commands",
 }: CommandPaletteProps) {
@@ -77,10 +85,10 @@ export function CommandPalette({
 
   return (
     <OverlayMount open={open} onClose={onClose} align="top">
-      <div className="bk-palette">
-        <div className="bk-palette__query">
+      <div className="tw:z-[70] tw:w-[640px] tw:max-w-[calc(100vw-32px)] tw:max-h-[420px] tw:flex tw:flex-col tw:bg-white tw:rounded-lg tw:[box-shadow:var(--bk-shadow-overlay)] tw:overflow-hidden tw:[font-family:var(--bk-font-ui)]">
+        <div className="tw:h-14 tw:flex-none tw:flex tw:items-center tw:px-4 tw:border-b tw:border-gray-200">
           <input
-            className="bk-palette__input"
+            className="tw:flex-1 tw:border-0 tw:bg-transparent tw:outline-none tw:[font-family:var(--bk-font-ui)] tw:text-base tw:text-gray-900 tw:placeholder:text-gray-300"
             placeholder={placeholder}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -92,9 +100,15 @@ export function CommandPalette({
             aria-label={placeholder}
           />
         </div>
-        <div className="bk-palette__list" id={listId} role="listbox" aria-label="Commands">
+        <div className="tw:flex-1 tw:overflow-auto tw:py-1" id={listId} role="listbox" aria-label="Commands">
           {results.length === 0 ? (
-            <div className="bk-palette__item" aria-disabled="true">
+            <div
+              className={[
+                "tw:flex tw:items-center tw:gap-2 tw:h-10 tw:px-4 tw:text-[13px] tw:cursor-pointer tw:border-0 tw:w-full tw:text-left",
+                ITEM_STATE_CLASS.disabled,
+              ].join(" ")}
+              aria-disabled="true"
+            >
               {emptyLabel}
             </div>
           ) : (
@@ -105,12 +119,15 @@ export function CommandPalette({
                 role="option"
                 aria-selected={i === index}
                 aria-disabled={c.disabled || undefined}
-                className="bk-palette__item"
+                className={[
+                  "tw:flex tw:items-center tw:gap-2 tw:h-10 tw:px-4 tw:text-[13px] tw:cursor-pointer tw:border-0 tw:w-full tw:text-left",
+                  ITEM_STATE_CLASS[c.disabled ? "disabled" : i === index ? "selected" : "idle"],
+                ].join(" ")}
                 onMouseEnter={() => !c.disabled && setIndex(i)}
                 onClick={() => !c.disabled && onRun(c)}
               >
                 <span>{c.label}</span>
-                {c.kbd ? <span className="bk-palette__kbd">{c.kbd}</span> : null}
+                {c.kbd ? <span className="tw:ml-auto tw:text-gray-500 tw:text-[11px]">{c.kbd}</span> : null}
               </div>
             ))
           )}

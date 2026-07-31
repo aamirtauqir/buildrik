@@ -40,17 +40,17 @@ export { MediaCard, type MediaCardProps } from "../chrome-ui/MediaCard";
 export { SiteCard, type SiteCardProps } from "../chrome-ui/SiteCard";
 
 /* ── Organisms ──────────────────────────────────────────────────────────── */
-export { OverlayMount, type OverlayMountProps } from "./OverlayMount";
+export { OverlayMount, type OverlayMountProps } from "../chrome-ui/OverlayMount";
 /* ── Moved to chrome-ui (Task 3, spec §4.3-4.4) — bridge dies at Task 14 ─── */
 export { Portal } from "../chrome-ui/Portal";
 export { useFocusTrap, isModalOpen } from "../chrome-ui/focus";
 export { getOverlayRoot } from "../chrome-ui/OverlayRoot";
-export { Modal, type ModalProps, type ModalKind } from "./Modal";
+export { Modal, type ModalProps, type ModalKind } from "../chrome-ui/Modal";
 export { Drawer, type DrawerProps, type DrawerLayout } from "../chrome-ui/Drawer";
 export { RightPanel, type RightPanelProps } from "../chrome-ui/RightPanel";
 export { Rail, RailItem, RailSpacer, type RailProps, type RailItemProps } from "../chrome-ui/Rail";
 export { Footer, FooterSpacer, type FooterProps } from "../chrome-ui/Footer";
-export { CommandPalette, type CommandPaletteProps, type Command } from "./CommandPalette";
+export { CommandPalette, type CommandPaletteProps, type Command } from "../chrome-ui/CommandPalette";
 
 /* ── Shell ──────────────────────────────────────────────────────────────── */
 export { EditorShell, type EditorShellProps } from "../chrome-ui/EditorShell";
@@ -58,20 +58,20 @@ export { EditorShell, type EditorShellProps } from "../chrome-ui/EditorShell";
 /* ── Layout + compositions ──────────────────────────────────────────────── */
 export { PanelFrame, type PanelFrameProps, type PanelFrameHeaderProps, type PanelFrameBodyProps, type PanelWidth } from "../chrome-ui/PanelFrame";
 export { Tabs, type TabsProps, type Tab } from "../chrome-ui/Tabs";
-export { ConfirmDialog, type ConfirmDialogProps } from "./ConfirmDialog";
+export { ConfirmDialog, type ConfirmDialogProps } from "../chrome-ui/ConfirmDialog";
 export {
   ToastProvider, useToast,
   type ToastInput, type QueuedToast, type ToastTone, type ToastActionPayload, type UseToastReturn,
-} from "./Toast";
+} from "../chrome-ui/Toast";
 
 /* ── Compatibility surfaces for trees written against the old API ───────── */
 export { Icon, IconButton, Kbd, Spinner, type IconProps, type IconButtonProps, type KbdProps, type SpinnerProps } from "../chrome-ui/Icon";
 export {
   ModalRoot, ModalContent, ModalTitle, ModalDescription, ModalBody, ModalFooter, ModalClose,
   type ModalContentProps, type ModalSize,
-} from "./ModalParts";
-export { Popover, Menu, MenuItem, MenuGroup, MenuLabel, MenuSeparator } from "./Popover";
-export type { PopoverProps, PopoverPlacement, MenuProps, MenuItemProps } from "./Popover";
+} from "../chrome-ui/ModalParts";
+export { Popover, Menu, MenuItem, MenuGroup, MenuLabel, MenuSeparator, POPOVER_BASE_CLASS } from "../chrome-ui/Popover";
+export type { PopoverProps, PopoverPlacement, MenuProps, MenuItemProps } from "../chrome-ui/Popover";
 export { SaveStatus, type SaveStatusProps, type SaveState } from "./SaveStatus";
 export { Presence, toneFor, type PresenceProps, type PresenceUser, type ConnectionState } from "./Presence";
 export { Topbar, SiteMenuIcon } from "./Topbar";
