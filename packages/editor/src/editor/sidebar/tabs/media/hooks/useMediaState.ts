@@ -6,7 +6,7 @@
  */
 
 import * as React from "react";
-import { useToast } from "@/editor/ui";
+import { useToast } from "@/editor/chrome-ui";
 import { useCallback, useEffect, useState } from "react";
 import type { Composer } from "../../../../../engine/Composer";
 import { MEDIA_EVENTS } from "@/shared/constants/media";

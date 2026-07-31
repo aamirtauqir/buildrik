@@ -9,7 +9,7 @@
  */
 
 import * as React from "react";
-import { PanelFrame } from "@/editor/ui";
+import { PanelFrame } from "@/editor/chrome-ui";
 import { Search } from "lucide-react";
 import type { Composer } from "@/engine/Composer";
 import type { LibraryItem, MediaTypeFilter, TypeCounts, UploadProgress } from "../data/mediaTypes";

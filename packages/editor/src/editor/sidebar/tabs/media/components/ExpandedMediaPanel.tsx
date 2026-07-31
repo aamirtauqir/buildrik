@@ -13,7 +13,7 @@
  */
 
 import * as React from "react";
-import { ConfirmDialog, useToast } from "@/editor/ui";
+import { ConfirmDialog, useToast } from "@/editor/chrome-ui";
 import { Maximize2, Minimize2, Plus, Upload, X } from "lucide-react";
 import type { Composer } from "../../../../../engine/Composer";
 import type { LibraryItem, MediaStateResult } from "../data/mediaTypes";

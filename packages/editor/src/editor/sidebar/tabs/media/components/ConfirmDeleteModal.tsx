@@ -7,7 +7,7 @@
  */
 
 import * as React from "react";
-import { ModalContent, ModalRoot } from "@/editor/ui";
+import { ModalContent, ModalRoot } from "@/editor/chrome-ui";
 import { useState } from "react";
 import type { ConfirmDeletePayload } from "../data/mediaTypes";
 import { Button } from "flowbite-react";

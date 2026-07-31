@@ -1,4 +1,4 @@
-import { ToastProvider } from "@/editor/ui";
+import { ToastProvider } from "@/editor/chrome-ui";
 /**
  * §15 AssetDetailOverlay footer Replace action — Phase 6 Task 37.
  *

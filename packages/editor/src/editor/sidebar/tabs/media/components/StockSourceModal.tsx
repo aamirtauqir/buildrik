@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { ModalContent, ModalRoot } from "@/editor/ui";
+import { ModalContent, ModalRoot } from "@/editor/chrome-ui";
 import { X, Download, SquareArrowOutUpRight } from "lucide-react";
 import { SearchBar } from "../../../shared/SearchBar";
 import type {

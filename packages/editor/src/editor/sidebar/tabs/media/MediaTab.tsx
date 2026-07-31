@@ -6,7 +6,7 @@
  */
 
 import * as React from "react";
-import { PanelFrame, useToast } from "@/editor/ui";
+import { PanelFrame, useToast } from "@/editor/chrome-ui";
 import { Upload, Plus } from "lucide-react";
 import type { Composer } from "../../../../engine/Composer";
 import { ROW_LG } from "@shared/constants/layout";

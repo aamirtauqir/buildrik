@@ -1,4 +1,4 @@
-import { ToastProvider } from "@/editor/ui";
+import { ToastProvider } from "@/editor/chrome-ui";
 /**
  * §13 folder context menu tests — Phase 4 Task 24.
  *

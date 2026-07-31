@@ -3,8 +3,8 @@ import { renderHook } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { useMediaState } from "../useMediaState";
 
-vi.mock("@/editor/ui", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@/editor/ui")>()),
+vi.mock("@/editor/chrome-ui", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/editor/chrome-ui")>()),
   ...{
   useToast: () => ({ addToast: vi.fn() }),
 },
