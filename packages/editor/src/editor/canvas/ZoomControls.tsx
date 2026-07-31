@@ -5,8 +5,7 @@
 
 import * as React from "react";
 import { ZOOM_PRESETS } from "./shared";
-import { Button, Tooltip, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
+import { Button, TextInput, Tooltip } from "@/editor/chrome-ui";
 
 export interface ZoomControlsProps {
   zoom: number;
@@ -56,7 +55,7 @@ export const ZoomControls: React.FC<ZoomControlsProps> = ({
         ><ZoomOutIcon /></Button>
       </Tooltip>
       <div style={sliderContainerStyles}>
-        <TextInput theme={BK_TEXT_INPUT_THEME}
+        <TextInput
           type="range"
           min={minZoom}
           max={maxZoom}

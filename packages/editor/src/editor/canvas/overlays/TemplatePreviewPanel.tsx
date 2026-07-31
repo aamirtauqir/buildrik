@@ -12,8 +12,7 @@
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import type { TemplateItem } from "../../sidebar/tabs/templates";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================

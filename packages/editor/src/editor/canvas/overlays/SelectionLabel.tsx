@@ -9,7 +9,7 @@ import type { Composer } from "../../../engine";
 import { Z_INDEX } from "../../../shared/constants/canvas";
 import { canvasTokens } from "../../../styles/tokens";
 import { getElementNameFromType, getTypeIcon } from "../utils/elementInfo";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 export interface SelectionLabelProps {
   composer: Composer;

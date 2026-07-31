@@ -11,8 +11,7 @@
 
 import * as React from "react";
 import type { DeviceType } from "../../shared/types";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 // ─── Types ──────────────────────────────────────────────────────────────────
 
 export interface DeviceFramePreviewProps {

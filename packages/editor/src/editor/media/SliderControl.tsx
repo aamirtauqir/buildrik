@@ -6,8 +6,7 @@
 
 import * as React from "react";
 import { sliderStyles as styles } from "./ImageEditorStyles";
-import { TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
+import { TextInput } from "@/editor/chrome-ui";
 
 export interface SliderControlProps {
   label: string;
@@ -26,7 +25,7 @@ export const SliderControl: React.FC<SliderControlProps> = ({
 }) => (
   <div style={styles.container}>
     <span style={styles.label}>{label}</span>
-    <TextInput theme={BK_TEXT_INPUT_THEME}
+    <TextInput
       type="range"
       min={min}
       max={max}

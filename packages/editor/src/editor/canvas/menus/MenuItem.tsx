@@ -8,7 +8,7 @@ import * as React from "react";
 import { CANVAS_COLORS } from "../shared";
 import type { ContextAction } from "./contextMenuRegistry";
 import { MenuIcon } from "./MenuIcon";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 interface MenuItemProps {
   action: ContextAction;

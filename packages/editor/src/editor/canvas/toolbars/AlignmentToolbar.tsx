@@ -8,8 +8,7 @@ import * as React from "react";
 import type { Composer } from "../../../engine";
 import { AlignmentHandler } from "../../../engine/canvas/AlignmentHandler";
 import { canvasTokens } from "../../../styles/tokens";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================

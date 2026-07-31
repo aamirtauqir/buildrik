@@ -12,9 +12,7 @@ import { Spinner } from "@/editor/chrome-ui";
 import { MediaOptimizer } from "../../engine/media";
 import { formatBytes } from "@shared/utils/helpers/number";
 import type { ImageExportFormat } from "../../shared/types/media";
-import { Button, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
-
+import { Button, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -277,7 +275,7 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
       <div style={styles.section}>
         <label style={styles.label}>Quality</label>
         <div style={styles.sliderContainer}>
-          <TextInput theme={BK_TEXT_INPUT_THEME}
+          <TextInput
             type="range"
             min={10}
             max={100}
@@ -291,7 +289,7 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
       {/* §18 — Max dimension override */}
       <div style={styles.section}>
         <label style={styles.label} htmlFor="opt-max-dim">Max dimension (px)</label>
-        <TextInput theme={BK_TEXT_INPUT_THEME}
+        <TextInput
           id="opt-max-dim"
           type="number"
           min={1}

@@ -4,7 +4,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 interface LayerSelectionBannerProps {
   count: number;

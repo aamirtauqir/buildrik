@@ -25,8 +25,7 @@ import { FormatGrid, OptionsPanel } from "./ExportOptions";
 import { downloadFile } from "./ExportUtils";
 import { formatBytes } from "@shared/utils/helpers/number";
 import { PreviewFrame } from "./PreviewFrame";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================

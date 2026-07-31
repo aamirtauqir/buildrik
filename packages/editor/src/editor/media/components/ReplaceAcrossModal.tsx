@@ -13,7 +13,7 @@
  */
 import * as React from "react";
 import { ModalContent, ModalDescription, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
-import { Button, Checkbox } from "flowbite-react";
+import { Button, Checkbox } from "@/editor/chrome-ui";
 
 export interface ReplaceAcrossPageEntry {
   pageId: string;

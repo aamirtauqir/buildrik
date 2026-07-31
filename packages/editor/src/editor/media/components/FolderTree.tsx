@@ -26,8 +26,7 @@ import {
 } from "lucide-react";
 import * as React from "react";
 import type { LibraryItem, MediaFolder } from "../../sidebar/tabs/media/data/mediaTypes";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 // ─── Types ────────────────────────────────────────────────────────────────
 
 export type SmartFolder = null | "recent" | "in-use" | "unused";

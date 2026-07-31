@@ -15,7 +15,7 @@ import {
   SIZES,
   Z_INDEX,
 } from "../shared";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 export interface ZoomControlProps {
   zoom: number;

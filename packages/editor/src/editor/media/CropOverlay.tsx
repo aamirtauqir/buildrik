@@ -10,8 +10,7 @@
 import * as React from "react";
 import type { CropConfig, AspectRatioPreset } from "../../shared/types/media";
 import { ASPECT_RATIO_PRESETS } from "../../shared/types/media";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================

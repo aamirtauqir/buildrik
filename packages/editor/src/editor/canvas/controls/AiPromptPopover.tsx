@@ -13,7 +13,7 @@ import { DiffRows } from "../../sidebar/tabs/ai/DiffRows";
 import { DEFAULT_MODEL } from "../../sidebar/tabs/ai/types";
 import { trackAiEditApplied } from "@/services/ai/adoptionTracker";
 import "./AiPromptPopover.css";
-import { Button, Textarea } from "flowbite-react";
+import { Button, Textarea } from "@/editor/chrome-ui";
 
 export interface AiPromptPopoverProps {
   composer: Composer;

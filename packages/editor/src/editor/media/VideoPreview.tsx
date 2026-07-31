@@ -6,9 +6,7 @@
 
 import * as React from "react";
 import { ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/chrome-ui";
-import { Button, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
-
+import { Button, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -341,7 +339,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
             >
               {state.isMuted || state.volume === 0 ? "🔇" : "🔊"}
             </Button>
-            <TextInput theme={BK_TEXT_INPUT_THEME}
+            <TextInput
               type="range"
               min={0}
               max={1}

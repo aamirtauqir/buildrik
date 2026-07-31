@@ -12,7 +12,7 @@ import {
   dropdownStyles,
   menuItemStyles,
 } from "./toolbarStyles";
-import { Button, Tooltip } from "flowbite-react";
+import { Button, Tooltip } from "@/editor/chrome-ui";
 
 export interface ToolbarNavSectionProps {
   hasParent: boolean;

@@ -7,9 +7,7 @@
 import * as React from "react";
 import { ColorField } from "../../shared/forms";
 import { Popover } from "@/editor/chrome-ui";
-import { BK_SELECT_BASE_THEME } from "@/editor/chrome-ui/selectTheme";
-import { Button, Select, Tooltip, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
+import { Button, Select, TextInput, Tooltip } from "@/editor/chrome-ui";
 
 export interface RichTextEditorProps {
   onCommand: (command: string, value?: string) => void;
@@ -127,7 +125,6 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
     >
       {/* Heading Selector */}
       <Select
-        theme={BK_SELECT_BASE_THEME}
         onChange={(e) => onCommand("formatBlock", e.target.value)}
         style={{
           padding: "4px 8px",
@@ -148,7 +145,6 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
       </Select>
       {/* Font Size */}
       <Select
-        theme={BK_SELECT_BASE_THEME}
         onChange={(e) => onCommand("fontSize", e.target.value)}
         style={{
           padding: "4px 8px",
@@ -266,7 +262,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
         }
       >
         <div style={{ width: 250 }}>
-          <TextInput theme={BK_TEXT_INPUT_THEME}
+          <TextInput
             type="text"
             value={linkUrl}
             onChange={(e) => setLinkUrl(e.target.value)}

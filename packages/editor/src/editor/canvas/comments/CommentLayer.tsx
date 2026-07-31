@@ -40,7 +40,7 @@ import {
   pinPosition,
   pointToFractions,
 } from "./commentAnchors";
-import { Button, Textarea } from "flowbite-react";
+import { Button, Textarea } from "@/editor/chrome-ui";
 
 interface CommentLayerProps {
   composer: Composer | null;

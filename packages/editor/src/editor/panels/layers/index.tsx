@@ -17,8 +17,7 @@ import { useLayerContextActions } from "./hooks/useLayerContextActions";
 import { useLayersState } from "./hooks/useLayersState";
 import { LayerTreeItem } from "./LayerTreeItem";
 import type { LayersPanelProps } from "./types";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 export type { LayersPanelProps, SelectedElementInfo } from "./types";
 
 export const LayersPanel: React.FC<LayersPanelProps> = ({

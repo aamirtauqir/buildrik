@@ -22,8 +22,7 @@ import * as React from "react";
 import type { Composer } from "../../../engine/Composer";
 import type { LibraryItem } from "../../sidebar/tabs/media/data/mediaTypes";
 import { formatBytes } from "@shared/utils/helpers/number";
-import { Button, Textarea } from "flowbite-react";
-
+import { Button, Textarea } from "@/editor/chrome-ui";
 // P7 — alt-text upper bound matches the server prompt's "Under 125 characters" rule.
 const ALT_TEXT_MAX = 125;
 

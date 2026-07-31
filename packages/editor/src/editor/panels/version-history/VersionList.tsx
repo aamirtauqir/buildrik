@@ -31,7 +31,7 @@ import { SnapshotPreview } from "../../../editor/sidebar/tabs/history/components
 // strict.
 // @ts-expect-error — no declaration file for react-window@1.8.x
 import { FixedSizeList as FixedSizeListUntyped } from "react-window";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 interface ListChildComponentProps {
   index: number;

@@ -9,7 +9,7 @@ import { getElementIcon } from "@/editor/shared/elementIcons";
 import type { Composer } from "../../../engine";
 import { ELEMENT_TYPE_LABELS } from "../../../shared/constants/elementTypeLabels";
 import type { LayerItem, DragState, LayerDisplayPrefs } from "./types";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 import { TextField } from "@/editor/chrome-ui";
 
 export interface LayerTreeItemProps {

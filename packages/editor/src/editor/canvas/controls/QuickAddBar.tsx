@@ -7,7 +7,7 @@
 import { Type, Heading, ImageIcon, Square, LayoutTemplate, LucideIcon } from "lucide-react";
 import * as React from "react";
 import type { BlockData } from "../../../shared/types";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 interface QuickAddBarProps {
   blocks: BlockData[];

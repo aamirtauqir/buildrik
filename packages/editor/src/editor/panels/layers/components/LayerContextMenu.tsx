@@ -6,7 +6,7 @@
 import * as React from "react";
 import { useClickOutside } from "../../../../shared/hooks/useClickOutside";
 import type { LayerAction } from "../types";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 interface LayerContextMenuProps {
   x: number;

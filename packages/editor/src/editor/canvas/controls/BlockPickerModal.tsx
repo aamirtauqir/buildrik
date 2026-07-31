@@ -15,8 +15,7 @@ import { devLogger } from "../../../shared/utils/devLogger";
 import { runTransaction } from "../../../shared/utils/helpers";
 import { canNestElement } from "../../../shared/utils/nesting";
 import { ElementsTab } from "../../sidebar/tabs/ElementsTab";
-import { Button, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
+import { Button, TextInput } from "@/editor/chrome-ui";
 
 export interface BlockPickerModalProps {
   composer: Composer;
@@ -174,7 +173,7 @@ export const BlockPickerModal: React.FC<BlockPickerModalProps> = ({
             <circle cx="11" cy="11" r="8" />
             <path d="M21 21l-4.35-4.35" />
           </svg>
-          <TextInput theme={BK_TEXT_INPUT_THEME}
+          <TextInput
             type="text"
             placeholder="Search elements..."
             value={searchQuery}

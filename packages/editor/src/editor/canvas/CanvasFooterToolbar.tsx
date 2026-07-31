@@ -19,8 +19,7 @@ import { useClickOutside } from "@/shared/hooks";
 import { BreakpointSwitcher, type Breakpoint } from "@/editor/chrome-ui";
 import { ZOOM_PRESETS } from "./shared";
 import { ROW_SM } from "@/shared/constants/layout";
-import { Button, Tooltip } from "flowbite-react";
-
+import { Button, Tooltip } from "@/editor/chrome-ui";
 // Undo/redo/device switching moved OFF the topbar and onto this canvas toolbar
 // (Figma contract §2: viewport + edit controls belong to the canvas, the topbar
 // stays minimal). Device values are the BreakpointSwitcher's 4-way union.

@@ -25,8 +25,7 @@ import { AssetCard } from "./AssetCard";
 import { mediaLibraryStyles as styles } from "./MediaLibraryStyles";
 import { OptimizationPanel } from "./OptimizationPanel";
 import { VideoPreview } from "./VideoPreview";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================
 // Types
 // ============================================

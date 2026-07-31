@@ -58,8 +58,7 @@ import type {
 } from "../../sidebar/tabs/media/data/mediaTypes";
 import type { SmartFolder } from "./FolderTree";
 import { formatBytes } from "@shared/utils/helpers/number";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 // ─── Toast contract (matches @/editor/chrome-ui useToast) ───────────────────────
 
 type ToastTone = "info" | "success" | "error" | "warning";

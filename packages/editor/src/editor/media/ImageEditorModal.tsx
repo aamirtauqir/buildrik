@@ -10,7 +10,6 @@
 
 import * as React from "react";
 import { TextField } from "@/editor/chrome-ui";
-import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
 import Cropper from "react-easy-crop";
 import type { Area, Point } from "react-easy-crop";
 import {
@@ -18,8 +17,7 @@ import {
   Crop, SlidersHorizontal, Maximize, Download, AlertTriangle, Eye,
 } from "lucide-react";
 import "./ImageEditorModal.css";
-import { Button, TextInput } from "flowbite-react";
-
+import { Button, TextInput } from "@/editor/chrome-ui";
 // ============================================
 // Types
 // ============================================
@@ -525,7 +523,6 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
                     <label className="ie-resize-field">
                       <span>W</span>
                       <TextInput
-                        theme={BK_TEXT_INPUT_THEME}
                         type="number"
                         placeholder={String(croppedArea.width || "auto")}
                         value={resizeW ?? ""}
@@ -537,7 +534,6 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
                     <label className="ie-resize-field">
                       <span>H</span>
                       <TextInput
-                        theme={BK_TEXT_INPUT_THEME}
                         type="number"
                         placeholder={String(croppedArea.height || "auto")}
                         value={resizeH ?? ""}

@@ -24,7 +24,7 @@ import {
 import { CompareView } from "./version-history/CompareView";
 import { ToastStack, useToasts } from "./version-history/Toasts";
 import { useAISummary } from "./version-history/useAISummary";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 import { TextField } from "@/editor/chrome-ui";
 
 // CompareView + toggle-pill style constants moved to

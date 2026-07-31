@@ -9,7 +9,7 @@ import type { Composer } from "../../../engine";
 import { EVENTS } from "../../../shared/constants/events";
 import type { ElementBadge } from "../../../shared/types/canvas";
 import "./CanvasSpotBadge.css";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 export interface CanvasSpotBadgeProps {
   composer: Composer | null;

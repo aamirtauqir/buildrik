@@ -10,7 +10,7 @@
 import * as React from "react";
 import { useClickOutside } from "../../../../shared/hooks/useClickOutside";
 import type { LayerDisplayPrefs } from "../types";
-import { Button, Checkbox } from "flowbite-react";
+import { Button, Checkbox } from "@/editor/chrome-ui";
 
 interface LayerDisplaySettingsProps {
   prefs: LayerDisplayPrefs;
