@@ -5,7 +5,6 @@
  */
 
 import * as React from "react";
-import { Stack } from "@/editor/ui";
 
 // ============================================================================
 // DISPLAY PREVIEW
@@ -18,10 +17,10 @@ export const DisplayPreview: React.FC<{ type: string }> = ({ type }) => {
   switch (type) {
     case "block":
       return (
-        <Stack style={{ gap: 2, width: 28 }}>
+        <div className="tw:flex tw:flex-col tw:gap-0.5 tw:w-7">
           <div style={{ ...box, height: 5 }} />
           <div style={{ ...box, height: 5 }} />
-        </Stack>
+        </div>
       );
     case "flex":
       return (

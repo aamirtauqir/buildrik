@@ -7,7 +7,6 @@
  */
 
 import * as React from "react";
-import { Stack } from "@/editor/ui";
 import {
   GoogleFontsService,
   loadGoogleFont,
@@ -137,12 +136,12 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange }) => {
       </Button>
       {/* Font Picker Dropdown */}
       {showFontPicker && (
-        <Stack
+        <div
+          className="tw:flex tw:flex-col tw:gap-0"
           id="font-picker-listbox"
           role="listbox"
           aria-label="Font family selection"
           style={{
-            gap: 0,
             position: "absolute",
             left: 0,
             right: 0,
@@ -175,7 +174,7 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange }) => {
             currentValue={value}
             onSelect={handleFontSelect}
           />
-        </Stack>
+        </div>
       )}
     </div>
   );

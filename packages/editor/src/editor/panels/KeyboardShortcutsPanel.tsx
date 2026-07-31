@@ -6,7 +6,7 @@
  */
 
 import * as React from "react";
-import { ModalClose, ModalContent, ModalRoot, ModalTitle, Portal, Stack } from "@/editor/ui";
+import { ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/ui";
 import { GROUPED_TABS_CONFIG } from "../rail/tabsConfig";
 
 // =============================================================================
@@ -142,7 +142,7 @@ export const KeyboardShortcutsPanel: React.FC<KeyboardShortcutsPanelProps> = ({
             </div>
 
             {/* Shortcut rows */}
-            <Stack gap="sm">
+            <div className="tw:flex tw:flex-col tw:gap-2">
               {group.shortcuts.map((row, idx) => (
                 <div
                   key={idx}
@@ -169,7 +169,7 @@ export const KeyboardShortcutsPanel: React.FC<KeyboardShortcutsPanelProps> = ({
                   <KeyBadge>{row.key}</KeyBadge>
                 </div>
               ))}
-            </Stack>
+            </div>
           </div>
         ))}
       </div>

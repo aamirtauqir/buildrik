@@ -11,7 +11,6 @@
 
 import { Link, Unlink } from "lucide-react";
 import * as React from "react";
-import { Stack } from "@/editor/ui";
 import { TextField } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
@@ -176,7 +175,7 @@ export const CornerRadiusInput: React.FC<CornerRadiusInputProps> = ({
   linked = false,
   onLinkToggle,
 }) => (
-  <Stack gap="xs">
+  <div className="tw:flex tw:flex-col tw:gap-1">
     <div
       style={{
         display: "flex",
@@ -225,5 +224,5 @@ export const CornerRadiusInput: React.FC<CornerRadiusInputProps> = ({
         );
       })}
     </div>
-  </Stack>
+  </div>
 );

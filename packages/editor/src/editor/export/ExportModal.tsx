@@ -17,7 +17,6 @@ import {
   ModalTitle,
   Portal,
   Spinner,
-  Stack,
   Tabs,
 } from "@/editor/ui";
 import { devError } from "../../shared/utils/devLogger";
@@ -324,32 +323,23 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
 // ============================================================================
 
 const LoadingState: React.FC = () => (
-  <Stack
-    gap="lg"
-    style={{
-      alignItems: "center",
-      justifyContent: "center",
-      height: 300,
-    }}
+  <div
+    className="tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-4"
+    style={{ height: 300 }}
   >
     <Spinner size="lg" />
     <span style={{ color: "var(--bk-ink-muted)" }}>Generating export...</span>
-  </Stack>
+  </div>
 );
 
 const ErrorState: React.FC<{ error: string }> = ({ error }) => (
-  <Stack
-    gap="lg"
-    style={{
-      alignItems: "center",
-      justifyContent: "center",
-      height: 300,
-      color: "var(--bk-error)",
-    }}
+  <div
+    className="tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-4"
+    style={{ height: 300, color: "var(--bk-error)" }}
   >
     <span style={{ fontSize: 32 }}>Error</span>
     <span>{error}</span>
-  </Stack>
+  </div>
 );
 
 const PreviewTab: React.FC<{
@@ -383,19 +373,14 @@ const PreviewTab: React.FC<{
 );
 
 const NoPreviewMessage: React.FC<{ format: string }> = ({ format }) => (
-  <Stack
-    gap="lg"
-    style={{
-      alignItems: "center",
-      justifyContent: "center",
-      height: 300,
-      color: "var(--bk-ink-muted)",
-    }}
+  <div
+    className="tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-4"
+    style={{ height: 300, color: "var(--bk-ink-muted)" }}
   >
     <span style={{ fontSize: 32 }}>⚛</span>
     <span>{format} components cannot be previewed directly.</span>
     <span style={{ fontSize: 12 }}>Download and run locally to preview.</span>
-  </Stack>
+  </div>
 );
 
 const ReactCodePreview: React.FC<{ files: NonNullable<ExportResult["files"]> }> = ({ files }) => {

@@ -20,7 +20,6 @@
  */
 
 import * as React from "react";
-import { Stack } from "@/editor/ui";
 import { Button, TextInput } from "flowbite-react";
 import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
@@ -343,7 +342,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
                     }}
                     onFocus={() => setFocusedIndex(idx)}
                   >
-                    <Stack style={{ gap: 3, alignItems: "center" }}>
+                    <div className="tw:flex tw:flex-col tw:items-center tw:gap-[3px]">
                       {/* Swatch */}
                       <div
                         style={{
@@ -371,7 +370,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
                       >
                         {token.name}
                       </span>
-                    </Stack>
+                    </div>
                   </Button>)
                 ) : (
                   // ── List item (spacing / type) ──

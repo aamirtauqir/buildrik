@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { ModalClose, ModalContent, ModalRoot, ModalTitle, Portal, Stack } from "@/editor/ui";
+import { ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/ui";
 import { Button, TextInput } from "flowbite-react";
 import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
 
@@ -176,20 +176,18 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
 
   if (state.error) {
     return (
-      <Stack
+      <div
+        className="tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-0"
         style={{
-          alignItems: "center",
-          justifyContent: "center",
           padding: 40,
           background: "var(--bk-bg-subtle)",
           borderRadius: 8,
           color: "var(--bk-ink-muted)",
-          gap: 0,
         }}
       >
         <span style={{ fontSize: 32, marginBottom: 12 }}>⚠️</span>
         <span>{state.error}</span>
-      </Stack>
+      </div>
     );
   }
 

@@ -15,7 +15,6 @@
  */
 
 import * as React from "react";
-import { Stack } from "@/editor/ui";
 import { CANVAS_COLORS, PANEL_STYLE, Z_INDEX } from "../shared";
 import { Button, TextInput } from "flowbite-react";
 import { BK_TEXT_INPUT_THEME } from "@/editor/ui/textInputTheme";
@@ -277,7 +276,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         onClick={onClose}
       />
       {/* Palette */}
-      <Stack
+      <div
+        className="tw:flex tw:flex-col tw:gap-0"
         style={{
           ...PANEL_STYLE,
           position: "fixed",
@@ -288,7 +288,6 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           maxWidth: "90vw",
           maxHeight: "60vh",
           zIndex: Z_INDEX.modal,
-          gap: 0,
           overflow: "hidden",
         }}
         role="dialog"
@@ -438,7 +437,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           <span>↵ Select</span>
           <span>Esc Close</span>
         </div>
-      </Stack>
+      </div>
     </>
   );
 };

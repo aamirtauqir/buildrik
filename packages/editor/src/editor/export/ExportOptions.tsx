@@ -5,7 +5,6 @@
  */
 
 import * as React from "react";
-import { Stack } from "@/editor/ui";
 import type { CMSExportMode, TemplateSyntax } from "../../engine/cms/CMSExportResolver";
 import type { ExportConfig, CSSExportStyle, ExportFormat } from "../../shared/types/export";
 import { Button, Checkbox, TextInput } from "flowbite-react";
@@ -75,7 +74,7 @@ export const FormatGrid: React.FC<FormatGridProps> = ({ selectedFormat, onFormat
               textAlign: "left",
             }}
           >
-            <Stack gap="sm">
+            <div className="tw:flex tw:flex-col tw:gap-2">
               {/* Icon placeholder */}
               <div
                 style={{
@@ -104,16 +103,16 @@ export const FormatGrid: React.FC<FormatGridProps> = ({ selectedFormat, onFormat
               >
                 {FORMAT_DESCRIPTIONS[fmt]}
               </div>
-            </Stack>
+            </div>
           </Button>
         );
       })}
 
       {/* Coming soon formats — non-interactive */}
       {COMING_SOON_FORMATS.map((fmt) => (
-        <Stack
+        <div
           key={fmt}
-          gap="sm"
+          className="tw:flex tw:flex-col tw:gap-2"
           title="Coming soon"
           style={{
             background: "var(--bk-bg-subtle)",
@@ -171,7 +170,7 @@ export const FormatGrid: React.FC<FormatGridProps> = ({ selectedFormat, onFormat
           >
             {FORMAT_DESCRIPTIONS[fmt]}
           </div>
-        </Stack>
+        </div>
       ))}
     </div>
   </div>
@@ -232,7 +231,7 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
   hasCMSBindings = false,
 }) => {
   return (
-    <Stack gap="lg">
+    <div className="tw:flex tw:flex-col tw:gap-4">
       {/* Page Title */}
       <div>
         <label style={{ display: "block", fontSize: 12, marginBottom: 6 }}>Page Title</label>
@@ -279,7 +278,7 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
         </div>
       </div>
       {/* Toggle Options */}
-      <Stack gap="sm">
+      <div className="tw:flex tw:flex-col tw:gap-2">
         <ToggleOption
           label="Minify output"
           checked={config.minify}
@@ -300,7 +299,7 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
           checked={config.includeViewport}
           onChange={(includeViewport) => onChange({ includeViewport })}
         />
-      </Stack>
+      </div>
       {/* CMS Export Options - only show if project has CMS bindings */}
       {hasCMSBindings && onCMSChange && (
         <div style={{ borderTop: "1px solid var(--bk-border)", paddingTop: 16 }}>
@@ -376,7 +375,7 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
           </div>
         </div>
       )}
-    </Stack>
+    </div>
   );
 };
 

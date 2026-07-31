@@ -6,7 +6,6 @@
  */
 
 import * as React from "react";
-import { Stack } from "@/editor/ui";
 
 export interface ControlRowProps {
   label: string;
@@ -41,8 +40,8 @@ export const ControlRow: React.FC<ControlRowProps> = ({
 
   if (variant === "stacked") {
     return (
-      <Stack
-        gap="xs"
+      <div
+        className="tw:flex tw:flex-col tw:gap-1"
         role="group"
         aria-label={label}
         title={titleText}
@@ -67,7 +66,7 @@ export const ControlRow: React.FC<ControlRowProps> = ({
         <div style={{ display: "flex", alignItems: "center", gap: 4, minWidth: 0 }}>
           {children}
         </div>
-      </Stack>
+      </div>
     );
   }
 
