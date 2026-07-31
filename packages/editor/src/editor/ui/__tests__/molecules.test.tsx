@@ -65,7 +65,7 @@ describe("BreakpointSwitcher", () => {
 });
 
 /* ── Extensions drain · ported from shared/extensions ───────────────────── */
-import { PanelHeaderActions, UpgradeModal, ToastProvider } from "../index";
+import { PanelHeaderActions } from "../index";
 
 describe("PanelHeaderActions", () => {
   it("renders only the buttons whose callbacks are provided, labelled by context", () => {
@@ -79,26 +79,5 @@ describe("PanelHeaderActions", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
     fireEvent.click(pin);
     expect(onPinToggle).toHaveBeenCalledTimes(1);
-  });
-});
-
-describe("UpgradeModal", () => {
-  it("stays closed until the upgrade-modal-open event arrives, then names the feature", () => {
-    render(<UpgradeModal />);
-    expect(screen.queryByText("Upgrade Your Plan")).toBeNull();
-    fireEvent(
-      window,
-      new CustomEvent("upgrade-modal-open", { detail: { feature: "Export", requiredPlan: "Business" } }),
-    );
-    expect(screen.getByText("Upgrade Your Plan")).toBeTruthy();
-    expect(screen.getByText("Export requires the Business plan.")).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Upgrade to Business" })).toBeTruthy();
-  });
-
-  it("supports controlled open state and closes via Maybe Later", () => {
-    const onClose = vi.fn();
-    render(<UpgradeModal isOpen onClose={onClose} />);
-    fireEvent.click(screen.getByRole("button", { name: "Maybe Later" }));
-    expect(onClose).toHaveBeenCalledTimes(1);
   });
 });

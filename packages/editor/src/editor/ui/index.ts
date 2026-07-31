@@ -88,4 +88,4 @@ export { HelpTooltip, type HelpTooltipProps } from "./HelpTooltip";
 /* ── Extensions drain · ported from shared/extensions ───────────────────── */
 export { PanelHeaderActions, type PanelHeaderActionsProps } from "./PanelHeader";
 export { CopyButton, type CopyButtonProps } from "../chrome-ui/CopyButton";
-export { UpgradeModal, type UpgradeModalProps } from "./UpgradeModal";
+export { UpgradeModal, type UpgradeModalProps } from "../chrome-ui/UpgradeModal";

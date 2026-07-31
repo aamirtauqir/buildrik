@@ -9,7 +9,7 @@
  * @license BSD-3-Clause
  */
 import React from "react";
-import { Modal } from "./Modal";
+import { Modal } from "@/editor/ui/Modal";
 import { Button, Badge } from "flowbite-react";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 
@@ -83,19 +83,19 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
         </>
       }
     >
-      <div className="bk-upgrade">
+      <div className="tw:flex tw:flex-col tw:items-center tw:gap-4 tw:py-2 tw:text-center">
         <Badge color="purple">{requiredPlan}</Badge>
 
-        <p className="bk-upgrade__message">
+        <p className="tw:m-0 tw:text-sm tw:text-gray-600 tw:leading-normal">
           {feature
             ? `${feature} requires the ${requiredPlan} plan.`
             : `This feature requires the ${requiredPlan} plan.`}
         </p>
 
-        <div className="bk-upgrade__features">
+        <div className="tw:flex tw:flex-col tw:gap-2 tw:w-full tw:py-3 tw:px-4 tw:bg-gray-100 tw:rounded-md tw:border tw:border-gray-200 tw:text-left">
           {FEATURES.map((item) => (
-            <div key={item} className="bk-upgrade__feature">
-              <span className="bk-upgrade__check" aria-hidden="true">
+            <div key={item} className="tw:flex tw:items-center tw:gap-2 tw:text-[13px] tw:text-gray-900">
+              <span className="tw:text-green-500 tw:font-semibold tw:text-sm" aria-hidden="true">
                 ✓
               </span>
               <span>{item}</span>
