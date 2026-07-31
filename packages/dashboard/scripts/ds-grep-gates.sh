@@ -67,19 +67,25 @@ pass "D2: no purple/violet/indigo bleed in dashboard chrome"
 
 # ─────────────────────────────────────────────────────────────
 # Gate D3 — --color-primary must be the brand accent.
-# #406ED6 since the 2026-07-18 single-product-accent flip (DESIGN.md L26:
-# "#406ED6 is the single accent ... across dashboard + auth + onboarding").
-# Editor chrome keeps cobalt #2D6DFF in its own DS — separate migration, not
-# guarded here. This gate guarded #2D6DFF from 2026-07-13 and was not updated
-# when the accent flipped, so it went red on 07-18 and blocked every push after
-# it. DESIGN.md is the SSOT; when they disagree, the gate is what's stale.
+# #1A56DB (Flowbite blue-700) since the 2026-07-30 Flowbite migration.
+# Editor chrome converges on the same accent through its own generated --bk-*
+# DS and is not guarded here.
+#
+# THIS GATE HAS NOW GONE STALE TWICE, identically: it guarded #2D6DFF from
+# 2026-07-13 and was not updated when the accent flipped on 07-18; it then
+# guarded #406ED6 and was not updated when the accent flipped again on 07-30.
+# Both times it went red and blocked every push. Worse, the script is `set -e`
+# + `exit 1`, so a stale D3 stops D4-D7 running at all — the NO-BLACK,
+# layout-token, @theme and hardcoded-hex invariants go unguarded while nobody
+# notices. When you change the accent, change it HERE in the same commit.
+# DESIGN.md is the SSOT; when they disagree, the gate is what's stale.
 # ─────────────────────────────────────────────────────────────
-if ! grep -qE "^\s*--color-primary:\s*#406ED6\s*;" packages/dashboard/app/globals.css 2>/dev/null; then
-  echo "GATE FAIL: D3 — --color-primary in globals.css must be #406ED6 (DESIGN.md L26)"
+if ! grep -qE "^\s*--color-primary:\s*#1A56DB\s*;" packages/dashboard/app/globals.css 2>/dev/null; then
+  echo "GATE FAIL: D3 — --color-primary in globals.css must be #1A56DB (DESIGN.md L26)"
   grep -nE "^\s*--color-primary:" packages/dashboard/app/globals.css 2>/dev/null
   exit 1
 fi
-pass "D3: --color-primary = #406ED6 (DESIGN.md single product accent)"
+pass "D3: --color-primary = #1A56DB (DESIGN.md single product accent)"
 
 # ─────────────────────────────────────────────────────────────
 # Gate D4 — NO BLACK rule.
