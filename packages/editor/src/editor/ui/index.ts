@@ -74,7 +74,7 @@ export { Popover, Menu, MenuItem, MenuGroup, MenuLabel, MenuSeparator, POPOVER_B
 export type { PopoverProps, PopoverPlacement, MenuProps, MenuItemProps } from "../chrome-ui/Popover";
 /* ── Moved to chrome-ui (Task 6, flowbite big-bang, Group B) — bridge dies at Task 14 ─ */
 export { SaveStatus, type SaveStatusProps, type SaveState } from "../chrome-ui/SaveStatus";
-export { Presence, toneFor, type PresenceProps, type PresenceUser, type ConnectionState } from "./Presence";
+export { Presence, toneFor, type PresenceProps, type PresenceUser, type ConnectionState } from "../chrome-ui/Presence";
 export { Topbar, SiteMenuIcon } from "./Topbar";
 export type { TopbarProps, TopbarTools, PublishState, ReviewPill, ReviewTone } from "./Topbar";
 export { IssueChip, formatIssueSummary } from "../chrome-ui/IssueChip";

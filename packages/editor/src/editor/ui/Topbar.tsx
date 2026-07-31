@@ -24,7 +24,7 @@ import { Button, Tooltip } from "flowbite-react";
 import { IconButton } from "../chrome-ui/Icon";
 import { IssueChip } from "../chrome-ui/IssueChip";
 import { SaveStatus, type SaveState } from "../chrome-ui/SaveStatus";
-import { Presence, type PresenceProps } from "./Presence";
+import { Presence, type PresenceProps } from "../chrome-ui/Presence";
 
 const GHOST_BTN_CLASS = "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900";
 

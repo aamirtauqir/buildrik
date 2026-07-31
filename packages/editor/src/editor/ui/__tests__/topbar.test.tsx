@@ -1,15 +1,16 @@
 /**
  * Topbar — contract tests against the Figma component (681:122).
  *
- * SaveStatus's describe block moved to `chrome-ui/__tests__/SaveStatus.test.tsx`
- * (Task 6, flowbite big-bang, Group B) when SaveStatus ported. Topbar/Presence
- * stay here until they port too (same batch, later in the sequence).
+ * SaveStatus's and Presence's describe blocks moved to
+ * `chrome-ui/__tests__/SaveStatus.test.tsx` / `Presence.test.tsx` (Task 6,
+ * flowbite big-bang, Group B) as each ported. Topbar itself stays here until
+ * it ports too (same batch, last).
  *
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { Topbar, Presence, toneFor } from "../index";
+import { Topbar } from "../index";
 
 describe("Topbar", () => {
   it("is a banner carrying the site name", () => {
@@ -150,38 +151,5 @@ describe("Topbar", () => {
     const btn = screen.getByRole("button", { name: "✓ Published" });
     expect(btn).toBeDisabled();
     expect(btn.className).toContain("bk-topbar__published");
-  });
-});
-
-describe("Presence", () => {
-  const others = [
-    { id: "u1", name: "Sara Ahmed", self: true },
-    { id: "u2", name: "Imran Q." },
-    { id: "u3", name: "Hina Raza" },
-  ];
-
-  it("renders nothing when you are alone and connected", () => {
-    const { container } = render(<Presence users={[{ id: "u1", name: "Sara", self: true }]} />);
-    expect(container.firstChild).toBeNull();
-  });
-
-  it("still speaks up when you are alone but offline", () => {
-    render(<Presence users={[{ id: "u1", name: "Sara", self: true }]} connection="offline" />);
-    expect(screen.getByText("Offline")).toBeTruthy();
-  });
-
-  it("shows an overflow badge past the max", () => {
-    const many = [...others, { id: "u4", name: "Zoya M." }, { id: "u5", name: "Kamran" }];
-    render(<Presence users={many} />);
-    expect(screen.getByLabelText("2 more")).toBeTruthy();
-  });
-
-  it("offline is announced assertively — the user must not miss it", () => {
-    render(<Presence users={others} connection="offline" />);
-    expect(screen.getByRole("status").getAttribute("aria-live")).toBe("assertive");
-  });
-
-  it("tone is stable for the same id", () => {
-    expect(toneFor("u2")).toBe(toneFor("u2"));
   });
 });

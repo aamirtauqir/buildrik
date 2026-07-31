@@ -861,8 +861,10 @@ describe("T8 status grammar", () => {
       state: "connected",
       isConnected: true,
     };
-    const { container } = render(<StudioHeader {...makeProps()} />);
-    expect(container.querySelectorAll(".bk-presence__stack .bk-avatar").length).toBe(2);
+    render(<StudioHeader {...makeProps()} />);
+    // Each Avatar carries role="img" + aria-label — count those (icons in the
+    // rest of the bar are aria-hidden, so this can't over-count).
+    expect(within(screen.getByRole("banner")).getAllByRole("img")).toHaveLength(2);
     expect(screen.getByLabelText("2 more")).toBeTruthy();
   });
 

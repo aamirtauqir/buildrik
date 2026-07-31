@@ -10,40 +10,6 @@
 
 /* ═══ ORGANISMS ═════════════════════════════════════════════════════════════ */
 
-/* ── Presence · Figma 692:472 ───────────────────────────────────────────── */
-.bk-presence { display: inline-flex; align-items: center; gap: var(--bk-space-8); }
-.bk-presence__stack { display: inline-flex; align-items: center; }
-.bk-presence__stack > * + * { margin-left: calc(-1 * var(--bk-space-8)); }
-.bk-presence__overflow {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: var(--bk-space-20); height: var(--bk-space-20);
-  border-radius: var(--bk-radius-full);
-  background: var(--bk-gray-200); color: var(--bk-gray-700);
-  box-shadow: 0 0 0 2px var(--bk-bg-card);
-  font-family: var(--bk-font-ui); font-size: var(--bk-text-11); font-weight: var(--bk-weight-medium);
-  flex: none;
-}
-.bk-presence__conn {
-  display: inline-flex; align-items: center; gap: var(--bk-space-4);
-  height: var(--bk-space-20); padding: 0 var(--bk-space-8);
-  border-radius: var(--bk-radius-full);
-  font-family: var(--bk-font-ui); font-size: var(--bk-text-11); font-weight: var(--bk-weight-medium);
-  white-space: nowrap;
-}
-.bk-presence__conn-dot { width: var(--bk-space-8); height: var(--bk-space-8); border-radius: var(--bk-radius-full); flex: none; }
-.bk-presence__conn--live { background: var(--bk-success-tint); color: var(--bk-success-text); }
-.bk-presence__conn--live .bk-presence__conn-dot { background: var(--bk-success); }
-.bk-presence__conn--reconnecting { background: var(--bk-warning-tint); color: var(--bk-warning-text); }
-.bk-presence__conn--reconnecting .bk-presence__conn-dot { background: var(--bk-warning); }
-.bk-presence__conn--offline { background: var(--bk-error-tint); color: var(--bk-error-text); }
-.bk-presence__conn--offline .bk-presence__conn-dot { background: var(--bk-error); }
-
-/* Stacking ring belongs to the stack, not to every avatar in the product —
-   an avatar in a comment row has nothing to separate itself from. flowbite
-   Avatar carries this className through untouched (Task 5); tone recolor +
-   self-outline moved to inline tw: utilities (see editor/ui/avatarTone.ts). */
-.bk-presence__stack .bk-avatar { box-shadow: 0 0 0 2px var(--bk-bg-card); }
-
 /* ── Topbar · Figma 681:122 ─────────────────────────────────────────────── */
 .bk-topbar {
   display: flex; align-items: center; gap: var(--bk-space-12);

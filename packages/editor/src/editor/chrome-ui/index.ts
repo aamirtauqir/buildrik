@@ -13,6 +13,7 @@ export { SkeletonListItem, StudioSkeleton, type SkeletonListItemProps } from "./
 export { StatusDot, type StatusDotProps, type StatusDotState } from "./StatusDot";
 export { SaveStatus, type SaveStatusProps, type SaveState } from "./SaveStatus";
 export { IssueChip, formatIssueSummary, type IssueChipProps } from "./IssueChip";
+export { Presence, toneFor, type PresenceProps, type PresenceUser, type ConnectionState } from "./Presence";
 export { Icon, IconButton, Kbd, Spinner, type IconProps, type IconButtonProps, type KbdProps, type SpinnerProps } from "./Icon";
 export { CopyButton, type CopyButtonProps } from "./CopyButton";
 export { SectionHeader, type SectionHeaderProps } from "./SectionHeader";
