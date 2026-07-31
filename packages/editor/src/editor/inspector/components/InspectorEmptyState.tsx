@@ -5,7 +5,7 @@
 
 import * as React from "react";
 import { MousePointerClick } from "lucide-react";
-import { Kbd, } from "@/editor/ui";
+import { Kbd, } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
 import { EVENTS } from "../../../shared/constants/events";
 import { Button } from "flowbite-react";

@@ -1,4 +1,4 @@
-import { Popover } from "@/editor/ui";
+import { Popover } from "@/editor/chrome-ui";
 import { BK_SELECT_BASE_THEME } from "@/editor/chrome-ui/selectTheme";
 /**
  * Size Section - Width, Height, Min/Max dimensions

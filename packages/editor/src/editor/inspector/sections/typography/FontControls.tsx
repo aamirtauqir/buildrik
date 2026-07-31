@@ -1,4 +1,4 @@
-import { Popover } from "@/editor/ui";
+import { Popover } from "@/editor/chrome-ui";
 /**
  * FontControls - Font weight, style, and decoration controls
  * Part of Typography section refactoring

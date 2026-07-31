@@ -1,4 +1,4 @@
-import { Popover } from "@/editor/ui";
+import { Popover } from "@/editor/chrome-ui";
 /**
  * ColorInput — Figma Fill row. Ported to .bdi-fill per comp-inspector.html v2.
  * Checkerboard swatch + hex + % opacity + eye toggle. Token binding preserved.
