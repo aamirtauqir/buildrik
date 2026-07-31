@@ -11,6 +11,7 @@ export { useFocusTrap, isModalOpen } from "./focus";
 export { TextField, type TextFieldProps } from "./TextField";
 export { SkeletonListItem, StudioSkeleton, type SkeletonListItemProps } from "./Skeleton";
 export { StatusDot, type StatusDotProps, type StatusDotState } from "./StatusDot";
+export { SaveStatus, type SaveStatusProps, type SaveState } from "./SaveStatus";
 export { Icon, IconButton, Kbd, Spinner, type IconProps, type IconButtonProps, type KbdProps, type SpinnerProps } from "./Icon";
 export { CopyButton, type CopyButtonProps } from "./CopyButton";
 export { SectionHeader, type SectionHeaderProps } from "./SectionHeader";

@@ -10,33 +10,6 @@
 
 /* ═══ ORGANISMS ═════════════════════════════════════════════════════════════ */
 
-/* ── Save status · Figma 697:461 · five truths, one pill ────────────────── */
-.bk-save {
-  display: inline-flex; align-items: center; gap: var(--bk-space-8);
-  height: var(--bk-space-24); padding: 0 var(--bk-space-8);
-  border-radius: var(--bk-radius-full);
-  font-family: var(--bk-font-ui); font-size: var(--bk-text-12);
-  white-space: nowrap;
-}
-.bk-save__dot { width: 6px; height: 6px; border-radius: var(--bk-radius-full); flex: none; }
-/* T8/D7 rule 4 — text-first: saved · saving · unsaved are plain muted text on
-   no surface; the coloured dot carries the state. Only `offline` and `error`
-   (and future `conflict`) earn a tinted pill, because they are the only two
-   that mean "your work is not where you think it is". A green pill on every
-   successful autosave spent the bar's loudest signal on its calmest event. */
-.bk-save--saved    { background: transparent; color: var(--bk-ink-muted); }
-.bk-save--saved .bk-save__dot { background: var(--bk-success); }
-.bk-save--saving   { background: transparent; color: var(--bk-ink-muted); }
-.bk-save--saving .bk-save__dot { background: var(--bk-ink-muted); }
-.bk-save--unsaved  { background: transparent; color: var(--bk-ink-muted); }
-.bk-save--unsaved .bk-save__dot { background: var(--bk-warning); }
-.bk-save--conflict { background: var(--bk-warning-tint); color: var(--bk-warning-text); }
-.bk-save--conflict .bk-save__dot { background: var(--bk-warning); }
-.bk-save--offline  { background: var(--bk-warning-tint); color: var(--bk-warning-text); }
-.bk-save--offline .bk-save__dot { background: var(--bk-warning); }
-.bk-save--error    { background: var(--bk-error-tint); color: var(--bk-error-text); }
-.bk-save--error .bk-save__dot { background: var(--bk-error); }
-
 /* ── Presence · Figma 692:472 ───────────────────────────────────────────── */
 .bk-presence { display: inline-flex; align-items: center; gap: var(--bk-space-8); }
 .bk-presence__stack { display: inline-flex; align-items: center; }
@@ -132,12 +105,9 @@ button.bk-topbar__review:focus-visible { outline: none; box-shadow: var(--bk-sha
 .bk-topbar__review--success { background: var(--bk-bg-subtle); color: var(--bk-ink-soft); }
 .bk-topbar__review--warning { background: var(--bk-warning-tint); color: var(--bk-warning-text); }
 
-/* T8 compact tier 2 (plan §7) — the save timestamp goes before the review pill
-   truncates further and long before the site name gives up its width. Ordered
-   deliberately: identity and the publish gate outlast "· 2m ago". */
-@container (max-width: 1200px) {
-  .bk-save__ago { display: none; }
-}
+/* T8 compact tier 2 (plan §7) moved to SaveStatus.tsx's own `tw:@max-[1200px]:hidden`
+   class (Task 6, flowbite big-bang) — SaveStatus ported before Topbar this
+   batch, so the rule left this file with SaveStatus's own CSS block. */
 
 /* Topbar tools cluster — Quick preview · Comments · IssueChip (plan §2; Figma pending T1) */
 .bk-topbar__tools {

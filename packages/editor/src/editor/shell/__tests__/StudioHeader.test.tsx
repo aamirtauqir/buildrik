@@ -222,15 +222,17 @@ describe("StudioHeader", () => {
     it("a settled state is a status, not a button that does nothing", () => {
       // Asserted on the pill itself: since eng D5 the only role=status in the
       // tree is the header's announcement region, so querying by role here
-      // would pass no matter what SaveStatus rendered.
-      const { container } = save({ lastSavedAt: Date.now() });
-      expect(container.querySelector(".bk-save")!.tagName).toBe("SPAN");
+      // would pass no matter what SaveStatus rendered. `getByText("Saved")`
+      // resolves to the pill's own root element — RTL matches on a node's
+      // direct text, excluding its nested dot/stamp elements' contribution.
+      save({ lastSavedAt: Date.now() });
+      expect(screen.getByText("Saved").tagName).toBe("SPAN");
       expect(screen.queryByRole("button", { name: /Saved/ })).toBeNull();
     });
 
     it("clean and saved", () => {
-      const { container } = save({ lastSavedAt: Date.now() });
-      expect(container.querySelector(".bk-save")!.textContent).toBe("Saved · just now");
+      save({ lastSavedAt: Date.now() });
+      expect(screen.getByText("Saved").textContent).toBe("Saved · just now");
     });
 
     it("offline outranks a save error — queued is not lost", () => {

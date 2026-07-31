@@ -1,10 +1,15 @@
 /**
  * Topbar — contract tests against the Figma component (681:122).
+ *
+ * SaveStatus's describe block moved to `chrome-ui/__tests__/SaveStatus.test.tsx`
+ * (Task 6, flowbite big-bang, Group B) when SaveStatus ported. Topbar/Presence
+ * stay here until they port too (same batch, later in the sequence).
+ *
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { Topbar, SaveStatus, Presence, toneFor } from "../index";
+import { Topbar, Presence, toneFor } from "../index";
 
 describe("Topbar", () => {
   it("is a banner carrying the site name", () => {
@@ -145,49 +150,6 @@ describe("Topbar", () => {
     const btn = screen.getByRole("button", { name: "✓ Published" });
     expect(btn).toBeDisabled();
     expect(btn.className).toContain("bk-topbar__published");
-  });
-});
-
-describe("SaveStatus", () => {
-  it.each([
-    ["saving", "Saving…"],
-    ["unsaved", "Unsaved changes"],
-    ["conflict", "Conflict — reload"],
-    ["offline", "Offline — saved locally"],
-  ] as const)("renders the %s truth", (state, copy) => {
-    render(<SaveStatus state={state} />);
-    expect(screen.getByText(copy)).toBeTruthy();
-  });
-
-  // eng D5 (regression): SaveStatus is presentation-only — the topbar's single
-  // announcement region speaks; a second live region here double-announces.
-  it("carries NO live semantics of its own", () => {
-    const { container, rerender } = render(<SaveStatus state="saved" savedAt={Date.now()} />);
-    rerender(<SaveStatus state="conflict" />);
-    expect(container.querySelector("[aria-live]")).toBeNull();
-    expect(container.querySelector('[role="status"]')).toBeNull();
-    expect(screen.getByText("Conflict — reload")).toBeTruthy();
-  });
-
-  it("formats the saved timestamp", () => {
-    const { container } = render(<SaveStatus state="saved" savedAt={Date.now() - 120_000} />);
-    expect(container.querySelector(".bk-save")!.textContent).toBe("Saved · 2m ago");
-  });
-
-  // T8 compact tier 2: the timestamp is the bar's first concession, so it has to
-  // be droppable on its own — hence its own element, with "Saved" left behind.
-  it("keeps the timestamp in its own element so the compact tier can drop it", () => {
-    const { container } = render(<SaveStatus state="saved" savedAt={Date.now() - 120_000} />);
-    const stamp = container.querySelector(".bk-save__ago");
-    expect(stamp!.textContent).toBe(" · 2m ago");
-    stamp!.remove();
-    expect(container.querySelector(".bk-save")!.textContent).toBe("Saved");
-  });
-
-  it("no timestamp yet → 'Saved' alone, with nothing to drop", () => {
-    const { container } = render(<SaveStatus state="saved" />);
-    expect(container.querySelector(".bk-save")!.textContent).toBe("Saved");
-    expect(container.querySelector(".bk-save__ago")).toBeNull();
   });
 });
 
