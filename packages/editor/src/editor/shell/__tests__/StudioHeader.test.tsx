@@ -812,8 +812,16 @@ describe("F3 review pill", () => {
 
 // ── T8/D7 · status grammar ──────────────────────────────────────────────────
 describe("T8 status grammar", () => {
-  /** The tone lives on the pill root, one level above the label element. */
-  const toneOf = (labelEl: HTMLElement) => labelEl.closest(".bk-topbar__review")!.className;
+  /**
+   * The tone lives on the pill root, the label's direct parent (ReviewBadge
+   * renders exactly `<span/button className={pillClasses}><span>{label}</span></span>`).
+   * Checks the applied tone utility, not a deleted modifier class — "info"
+   * and "success" render byte-identical classes by design (T8/D7 rule 3), so
+   * this can only distinguish warning from not-warning, same as the visual
+   * result always could.
+   */
+  const toneOf = (labelEl: HTMLElement) => labelEl.parentElement!.className;
+  const isWarningTone = (labelEl: HTMLElement) => toneOf(labelEl).includes("tw:bg-yellow-50");
 
   it("a blocking review keeps the warning tone when it is the only amber", async () => {
     vi.mocked(fetchReviewStatus).mockResolvedValue({
@@ -823,7 +831,7 @@ describe("T8 status grammar", () => {
     });
     render(<StudioHeader {...makeProps()} />);
     const label = await screen.findByText("Changes requested");
-    expect(toneOf(label)).toContain("bk-topbar__review--warning");
+    expect(isWarningTone(label)).toBe(true);
   });
 
   it("D7 rule 6: with an amber save AND amber issues, the review pill steps back", async () => {
@@ -842,8 +850,8 @@ describe("T8 status grammar", () => {
     );
     const label = await screen.findByText("Changes requested");
     // Demoted, not hidden — the copy is unchanged, only the shouting stops.
-    expect(toneOf(label)).toContain("bk-topbar__review--info");
-    expect(toneOf(label)).not.toContain("warning");
+    expect(toneOf(label)).toContain("tw:bg-gray-100");
+    expect(isWarningTone(label)).toBe(false);
   });
 
   // T8 compact tier 3: two faces then "+N", so a crowded room cannot push the
@@ -883,7 +891,7 @@ describe("T8 status grammar", () => {
       />,
     );
     const label = await screen.findByText("Changes requested");
-    expect(toneOf(label)).toContain("bk-topbar__review--warning");
+    expect(isWarningTone(label)).toBe(true);
   });
 });
 

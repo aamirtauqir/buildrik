@@ -1,16 +1,25 @@
 /**
  * Topbar — contract tests against the Figma component (681:122).
  *
- * SaveStatus's and Presence's describe blocks moved to
- * `chrome-ui/__tests__/SaveStatus.test.tsx` / `Presence.test.tsx` (Task 6,
- * flowbite big-bang, Group B) as each ported. Topbar itself stays here until
- * it ports too (same batch, last).
+ * Moved from `editor/ui/__tests__/topbar.test.tsx` (Task 6, flowbite
+ * big-bang, Group B) — the last component in that file, so the file itself
+ * is deleted. The one bk-topbar__published classname assertion rewritten to
+ * check the applied green tone utility (tw:bg-green-100), the same "assert
+ * the applied utility, not a deleted implementation class" rule used
+ * throughout this batch — the className was purely a leftover identity hook
+ * with no CSS behind it even before this move (its `:disabled` rule was
+ * already superseded by inline tw: utilities in an earlier session).
+ *
+ * "Shell frames" folded in from `editor/ui/__tests__/organisms.test.tsx`
+ * (deleted — this was its last describe block): it mixed Drawer/RightPanel/
+ * Rail/Footer (already chrome-ui) with Topbar (chrome-ui as of this move),
+ * so all its dependencies now live here together.
  *
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { Topbar } from "../index";
+import { Topbar, Drawer, RightPanel, Rail, RailItem, Footer } from "../index";
 
 describe("Topbar", () => {
   it("is a banner carrying the site name", () => {
@@ -150,6 +159,57 @@ describe("Topbar", () => {
     render(<Topbar siteName="x" save="saved" publish="published" />);
     const btn = screen.getByRole("button", { name: "✓ Published" });
     expect(btn).toBeDisabled();
-    expect(btn.className).toContain("bk-topbar__published");
+    expect(btn.className).toContain("tw:bg-green-100");
+  });
+});
+
+describe("Shell frames", () => {
+  it("Drawer and RightPanel are labelled landmarks", () => {
+    render(
+      <>
+        <Drawer title="Pages">rows</Drawer>
+        <RightPanel title="Inspector">fields</RightPanel>
+      </>,
+    );
+    expect(screen.getByRole("complementary", { name: "Pages" })).toBeTruthy();
+    expect(screen.getByRole("complementary", { name: "Inspector" })).toBeTruthy();
+  });
+
+  it("Drawer grid layout is opt-in", () => {
+    render(<Drawer title="Media" layout="grid">tiles</Drawer>);
+    const body = screen.getByRole("complementary", { name: "Media" }).children[1];
+    expect(body.className).toMatch(/tw:grid\b/);
+  });
+
+  it("Rail marks the open tool with aria-current", () => {
+    render(
+      <Rail>
+        <RailItem icon="+" label="Insert" active />
+        <RailItem icon="L" label="Layers" />
+      </Rail>,
+    );
+    expect(screen.getByRole("navigation", { name: "Editor tools" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Insert" }).getAttribute("aria-current")).toBe("true");
+    expect(screen.getByRole("button", { name: "Layers" }).getAttribute("aria-current")).toBeNull();
+  });
+
+  it("icon-only rail items keep an accessible name", () => {
+    render(
+      <Rail>
+        <RailItem icon="+" label="Insert" showLabel={false} />
+      </Rail>,
+    );
+    expect(screen.getByRole("button", { name: "Insert" })).toBeTruthy();
+  });
+
+  it("Topbar and Footer are banner and contentinfo landmarks", () => {
+    render(
+      <>
+        <Topbar siteName="Bella Cucina" save="saved" />
+        <Footer>bottom</Footer>
+      </>,
+    );
+    expect(screen.getByRole("banner")).toBeTruthy();
+    expect(screen.getByRole("contentinfo")).toBeTruthy();
   });
 });

@@ -5,90 +5,10 @@
  * Geometry mirrors the Figma component sets 1:1 (see each block's comment for
  * the node id it was measured from).
  *
+ * All component rules have moved to `chrome-ui/*.tsx` (tw:* utilities inline,
+ * Task 6, flowbite big-bang). This file intentionally has zero rules left —
+ * `default.css`'s `ui.css` import stays wired until Task 13 formally deletes
+ * `src/editor/ui/`.
+ *
  * @license BSD-3-Clause
  */
-
-/* ═══ ORGANISMS ═════════════════════════════════════════════════════════════ */
-
-/* ── Topbar · Figma 681:122 ─────────────────────────────────────────────── */
-.bk-topbar {
-  display: flex; align-items: center; gap: var(--bk-space-12);
-  height: var(--bk-size-topbar); flex: none;
-  /* The bar measures itself so the compact tiers of plan §7 key off the space
-     it actually has, not the viewport — the shell's rails eat into it. */
-  container-type: inline-size;
-  padding: 0 var(--bk-space-16);
-  background: var(--bk-bg-card);
-  border-bottom: 1px solid var(--bk-border);
-  font-family: var(--bk-font-ui); font-size: var(--bk-text-13);
-  color: var(--bk-ink);
-}
-.bk-topbar__name {
-  font-size: var(--bk-text-13); font-weight: var(--bk-weight-medium); color: var(--bk-ink);
-  /* F23 compact order: the name shrinks LAST (200 → 120px) — identity
-     survives crowding; the pill cap below gives way first. */
-  max-width: 200px; min-width: 120px; flex-shrink: 1;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-.bk-topbar__spacer { flex: 1; }
-.bk-topbar__bell { position: relative; display: inline-flex; flex: none; }
-.bk-topbar__unread {
-  position: absolute; top: var(--bk-space-4); right: var(--bk-space-2);
-  width: var(--bk-space-8); height: var(--bk-space-8); border-radius: var(--bk-radius-full);
-  background: var(--bk-accent); box-shadow: 0 0 0 2px var(--bk-bg-card);
-}
-
-/* Topbar review pill — one shape, three tones (Figma 681:122 Review variants) */
-.bk-topbar__review {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--bk-space-4);
-  height: var(--bk-space-24);
-  padding: 0 var(--bk-space-8);
-  border: none;
-  border-radius: var(--bk-radius-full);
-  font-size: var(--bk-text-12);
-  font-weight: var(--bk-weight-medium);
-  white-space: nowrap;
-}
-button.bk-topbar__review { cursor: pointer; }
-button.bk-topbar__review:focus-visible { outline: none; box-shadow: var(--bk-shadow-focus); }
-/* F23: reviewer names are unbounded — cap the pill, keep the truth in `title`. */
-.bk-topbar__review-label {
-  max-width: 140px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-/* T8/D7 rule 3 — neutral-unless-blocking. "In review" and "Approved" are
-   information, not instructions: they sit on gray so the bar's colour budget
-   stays with the two signals that gate a publish (Issues chip, save trouble).
-   Only "Changes requested" — the one review state that blocks — keeps amber.
-   Surface uses the generated `--bk-bg-subtle`; the purpose-named
-   `bg-pill-neutral` of D7 is a Figma-side follow-up (T1), and tokens are
-   generated, never hand-added. */
-.bk-topbar__review--info { background: var(--bk-bg-subtle); color: var(--bk-ink-soft); }
-.bk-topbar__review--success { background: var(--bk-bg-subtle); color: var(--bk-ink-soft); }
-.bk-topbar__review--warning { background: var(--bk-warning-tint); color: var(--bk-warning-text); }
-
-/* T8 compact tier 2 (plan §7) moved to SaveStatus.tsx's own `tw:@max-[1200px]:hidden`
-   class (Task 6, flowbite big-bang) — SaveStatus ported before Topbar this
-   batch, so the rule left this file with SaveStatus's own CSS block. */
-
-/* Topbar tools cluster — Quick preview · Comments · IssueChip (plan §2; Figma pending T1) */
-.bk-topbar__tools {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--bk-space-2);
-  padding-right: var(--bk-space-8);
-  margin-right: var(--bk-space-4);
-  border-right: 1px solid var(--bk-border);
-}
-
-/* Publish success transient — "✓ Published" (plan D10/eng D11; Figma pending T1) */
-.bk-topbar__published:disabled {
-  background: var(--bk-success-tint);
-  color: var(--bk-success-text);
-  opacity: 1;
-}
-

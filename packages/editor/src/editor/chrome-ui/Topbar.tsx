@@ -21,10 +21,10 @@
  */
 import React from "react";
 import { Button, Tooltip } from "flowbite-react";
-import { IconButton } from "../chrome-ui/Icon";
-import { IssueChip } from "../chrome-ui/IssueChip";
-import { SaveStatus, type SaveState } from "../chrome-ui/SaveStatus";
-import { Presence, type PresenceProps } from "../chrome-ui/Presence";
+import { IconButton } from "./Icon";
+import { IssueChip } from "./IssueChip";
+import { SaveStatus, type SaveState } from "./SaveStatus";
+import { Presence, type PresenceProps } from "./Presence";
 
 const GHOST_BTN_CLASS = "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900";
 
@@ -103,12 +103,26 @@ export function Topbar({
 }: TopbarProps) {
   const hasTools = Boolean(tools && (tools.onPreview || tools.onToggleComments || tools.issues));
   return (
-    <header className="bk-topbar">
+    <header
+      className={
+        /* The bar measures itself so the compact tiers of plan §7 key off the
+           space it actually has, not the viewport — the shell's rails eat
+           into it. `tw:@container` sets `container-type: inline-size`;
+           SaveStatus's own `tw:@max-[1200px]:hidden` (its timestamp) keys
+           off this ancestor. */
+        "tw:flex tw:items-center tw:gap-3 tw:h-14 tw:flex-none tw:@container " +
+        "tw:px-4 tw:bg-white tw:border-b tw:border-gray-200 " +
+        "tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:text-gray-900"
+      }
+    >
       <Button color="light" size="xs" onClick={onExit} className={GHOST_BTN_CLASS}>
         ‹ Exit
       </Button>
 
-      <span className="bk-topbar__name" title={siteName}>
+      <span
+        className="tw:text-[13px] tw:font-medium tw:text-gray-900 tw:max-w-[200px] tw:min-w-[120px] tw:shrink tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap"
+        title={siteName}
+      >
         {siteName}
       </span>
 
@@ -118,10 +132,10 @@ export function Topbar({
         <ReviewBadge {...review} />
       ) : null}
 
-      <span className="bk-topbar__spacer" />
+      <span className="tw:flex-1" />
 
       {hasTools && tools ? (
-        <span className="bk-topbar__tools">
+        <span className="tw:inline-flex tw:items-center tw:gap-0.5 tw:pr-2 tw:mr-1 tw:border-r tw:border-gray-200">
           {tools.onPreview ? (
             <IconButton
               label="Quick preview"
@@ -143,28 +157,30 @@ export function Topbar({
 
       {presence ? <Presence {...presence} /> : null}
 
-      <span className="bk-topbar__bell">
+      <span className="tw:relative tw:inline-flex tw:flex-none">
         <IconButton
           label={unreadCount > 0 ? `Notifications, ${unreadCount} unread` : "Notifications"}
           onClick={onOpenNotifications}
         >
           <BellIcon />
         </IconButton>
-        {unreadCount > 0 ? <span className="bk-topbar__unread" aria-hidden="true" /> : null}
+        {unreadCount > 0 ? (
+          <span
+            className="tw:absolute tw:top-1 tw:right-0.5 tw:w-2 tw:h-2 tw:rounded-full tw:bg-blue-700 tw:[box-shadow:0_0_0_2px_var(--bk-bg-card)]"
+            aria-hidden="true"
+          />
+        ) : null}
       </span>
 
       {action ?? (
         publish === "published" ? (
-          /* Success transient — disabled for its 2s beat, restyled not re-built.
-             bk-topbar__published's old :disabled bg/color rule lived in the
-             components layer, weaker than flowbite's tw-utilities — baked the
-             green look into tw: utilities directly (green-100/green-600 are
-             exact hex matches for --bk-success-tint/--bk-success-text). */
+          /* Success transient — disabled for its 2s beat. green-100/green-600
+             are exact hex matches for --bk-success-tint/--bk-success-text. */
           <Button
             color="light"
             size="xs"
             disabled
-            className="bk-topbar__published tw:border-transparent tw:bg-green-100 tw:text-green-600 tw:opacity-100"
+            className="tw:border-transparent tw:bg-green-100 tw:text-green-600 tw:opacity-100"
           >
             {PUBLISH_LABEL[publish]}
           </Button>
@@ -205,22 +221,46 @@ export function Topbar({
   );
 }
 
+const REVIEW_BASE_CLASS =
+  "tw:inline-flex tw:items-center tw:gap-1 tw:h-6 tw:px-2 tw:border-0 tw:rounded-full " +
+  "tw:text-xs tw:font-medium tw:whitespace-nowrap";
+
+/* T8/D7 rule 3 — neutral-unless-blocking. "In review" and "Approved" are
+   information, not instructions: they sit on gray so the bar's colour budget
+   stays with the two signals that gate a publish (Issues chip, save trouble).
+   Only "Changes requested" — the one review state that blocks — keeps amber.
+   `info` and `success` are visually identical by design (same neutral
+   surface); only `warning` gets its own look. */
+const REVIEW_TONE_CLASS: Record<ReviewTone, string> = {
+  info: "tw:bg-gray-100 tw:text-gray-600",
+  success: "tw:bg-gray-100 tw:text-gray-600",
+  warning: "tw:bg-yellow-50 tw:text-yellow-800",
+};
+
+/* F23: reviewer names are unbounded — cap the pill, keep the truth in `title`. */
+const REVIEW_LABEL_CLASS = "tw:max-w-[140px] tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap";
+
 /**
  * A clickable pill when there is somewhere to go, plain text when there is not.
  * A button that does nothing is worse than a label that never claimed to.
  */
 function ReviewBadge({ label, tone, title, onClick }: ReviewPill) {
-  const className = `bk-topbar__review bk-topbar__review--${tone}`;
+  const className = `${REVIEW_BASE_CLASS} ${REVIEW_TONE_CLASS[tone]}`;
   if (!onClick) {
     return (
       <span className={className} title={title ?? label}>
-        <span className="bk-topbar__review-label">{label}</span>
+        <span className={REVIEW_LABEL_CLASS}>{label}</span>
       </span>
     );
   }
   return (
-    <button type="button" className={className} title={title ?? label} onClick={onClick}>
-      <span className="bk-topbar__review-label">{label}</span>
+    <button
+      type="button"
+      className={`${className} tw:cursor-pointer tw:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]`}
+      title={title ?? label}
+      onClick={onClick}
+    >
+      <span className={REVIEW_LABEL_CLASS}>{label}</span>
     </button>
   );
 }
