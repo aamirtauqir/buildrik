@@ -373,7 +373,10 @@ export function SecurityTab() {
               className="text-body font-medium disabled:opacity-60"
               style={{ color: "var(--color-primary)" }}
             >
-              {revokingAll ? "Revoking..." : "Revoke all other sessions"}
+              {/* Says "everywhere" because that is what it does: revocation is a
+                  per-user version bump, which invalidates this device's token
+                  too. See revokeAllOtherSessions in account.service.ts. */}
+              {revokingAll ? "Signing out…" : "Sign out on all devices"}
             </button>
           )}
         </div>
@@ -447,7 +450,12 @@ export function SecurityTab() {
                           className="text-body disabled:opacity-60"
                           style={{ color: "var(--color-primary)" }}
                         >
-                          {revoking === session.id ? "Revoking..." : "Revoke"}
+                          {/* Removes the row from this list. It does NOT end that
+                              device's session — revocation has no per-device
+                              granularity until the sid path ships (TODOS). The
+                              label says what it actually does rather than
+                              promising a revoke that never happened. */}
+                          {revoking === session.id ? "Removing…" : "Remove from list"}
                         </button>
                       )}
                     </td>

@@ -19,8 +19,17 @@ export async function POST(req: NextRequest) {
       });
 
       const userId = typeof decoded?.userId === "string" ? decoded.userId : null;
+      const sid = typeof decoded?.sid === "string" ? decoded.sid : null;
       if (userId) {
-        await prisma.session.deleteMany({ where: { userId } });
+        // Delete THIS session's row only. This used to delete every row for the
+        // user, so signing out on a laptop erased the phone's entry from the
+        // Security tab while the phone stayed signed in — the list then lied in
+        // the opposite direction from the revoke buttons. Deliberately no
+        // sessionVersion bump: logging out of one device must not sign the user
+        // out of the others.
+        // A token minted before `sid` existed has none, so fall back to the old
+        // user-wide delete for it rather than leaving a row behind forever.
+        await prisma.session.deleteMany({ where: sid ? { id: sid, userId } : { userId } });
         await logAuditEvent("LOGOUT", "success", { userId });
       }
     } catch {

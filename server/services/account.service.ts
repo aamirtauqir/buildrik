@@ -15,9 +15,11 @@ export async function changePassword(userId: string, currentPassword: string, ne
   if (!valid) throw new Error("WRONG_PASSWORD");
 
   const hash = await bcrypt.hash(newPassword, 10);
+  // Bump sessionVersion with the password: changing your password is a claim
+  // that old sessions end. This path did not even attempt revocation before.
   await prisma.user.update({
     where: { id: userId },
-    data: { passwordHash: hash },
+    data: { passwordHash: hash, sessionVersion: { increment: 1 } },
   });
 
   createNotification({
@@ -151,13 +153,29 @@ export async function revokeSession(sessionId: string, userId: string) {
   });
 }
 
+/**
+ * SCOPE — read before changing the UI copy that calls this.
+ *
+ * A version counter has no per-token granularity: bumping it invalidates EVERY
+ * token for this user, the caller's included. So this signs you out everywhere,
+ * not "everywhere except here". The row delete still exempts the current
+ * session, but the row delete was never what ended a session — the version is.
+ *
+ * That is a deliberate trade, not an oversight. The alternative was to keep
+ * relying on the cosmetic delete, which is the bug. Genuine per-device
+ * revocation needs a `sid` check on every request, which in turn needs OAuth
+ * logins to create Session rows with full parity (rememberMe expiry, IP/UA,
+ * the 10-session cap, the audit entry, device alerts) — a second session-mint
+ * pipeline, deferred to TODOS.
+ *
+ * The button that calls this is labelled to match this behaviour. If you make
+ * revocation per-device later, change the label back.
+ */
 export async function revokeAllOtherSessions(userId: string, currentSessionId: string) {
-  return prisma.session.deleteMany({
-    where: {
-      userId,
-      id: { not: currentSessionId },
-    },
-  });
+  return prisma.$transaction([
+    prisma.user.update({ where: { id: userId }, data: { sessionVersion: { increment: 1 } } }),
+    prisma.session.deleteMany({ where: { userId, id: { not: currentSessionId } } }),
+  ]);
 }
 
 export async function getLoginHistory(userId: string) {

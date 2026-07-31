@@ -28,6 +28,8 @@ declare module "@auth/core/jwt" {
     userId?: string;
     workspaceId?: string | null;
     sid?: string;
+    /** Revocation version, compared against User.sessionVersion on every request. */
+    sv?: number;
   }
 }
 
@@ -36,5 +38,7 @@ declare module "next-auth/jwt" {
     userId?: string;
     workspaceId?: string | null;
     sid?: string;
+    /** Revocation version, compared against User.sessionVersion on every request. */
+    sv?: number;
   }
 }

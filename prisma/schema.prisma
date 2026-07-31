@@ -33,6 +33,23 @@ model User {
   emailBounceCount  Int       @default(0)
   deletedAt         DateTime?
   passwordChangedAt DateTime?
+  /// Bumped by every action that CLAIMS to end sessions (password reset,
+  /// change password, "revoke all other sessions", workspace member removal).
+  /// The JWT carries the value it was minted with; `auth.config.ts`'s jwt
+  /// callback compares `token.sv ?? 0` against this on every request and kills
+  /// the session on mismatch.
+  ///
+  /// Sessions are JWT-strategy with no adapter, so the `sessions` table is a
+  /// display list, not a gate — deleting rows from it never invalidated a
+  /// cookie. This column is the gate.
+  ///
+  /// Deliberately NOT reusing `passwordChangedAt` above (which is itself dead —
+  /// zero readers and zero writers repo-wide): it carries password semantics,
+  /// and three of the four revocation triggers have nothing to do with
+  /// passwords. Defaulted to 0 so every existing row reads as 0 and every
+  /// already-issued cookie (which has no `sv` claim, also read as 0) stays
+  /// valid on deploy — no mass logout.
+  sessionVersion    Int       @default(0)
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 
@@ -116,6 +133,11 @@ model Session {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  /// Every read and every revoke on this table filters by userId
+  /// (account.service listActiveSessions/revokeSession/revokeAllOtherSessions,
+  /// auth.service resetPassword, the logout route). Without this each of them
+  /// is a sequential scan.
+  @@index([userId])
   @@map("sessions")
 }
 
