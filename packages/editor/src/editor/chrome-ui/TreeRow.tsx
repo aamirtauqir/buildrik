@@ -7,7 +7,7 @@
  * @license BSD-3-Clause
  */
 import React from "react";
-import { Row, type RowProps } from "./Row";
+import { Row, type RowProps, ROW_ICON_CLASS, ROW_LABEL_CLASS, ROW_META_CLASS } from "./Row";
 
 export interface TreeRowProps extends Omit<RowProps, "children" | "size"> {
   label: string;
@@ -18,6 +18,10 @@ export interface TreeRowProps extends Omit<RowProps, "children" | "size"> {
   icon?: React.ReactNode;
   meta?: React.ReactNode;
 }
+
+const TWISTY_CLASS =
+  "tw:h-4 tw:w-4 tw:inline-grid tw:place-content-center tw:bg-none tw:border-0 tw:p-0 tw:cursor-pointer " +
+  "tw:text-gray-500 tw:flex-none tw:[transition:var(--bk-transition-fast)] tw:aria-expanded:rotate-90";
 
 export function TreeRow({
   label, depth = 0, expandable, expanded, onToggle, icon, meta, style, ...rest
@@ -35,7 +39,7 @@ export function TreeRow({
       {expandable ? (
         <button
           type="button"
-          className="bk-tree-row__twisty"
+          className={TWISTY_CLASS}
           aria-expanded={Boolean(expanded)}
           aria-label={expanded ? `Collapse ${label}` : `Expand ${label}`}
           onClick={(e) => {
@@ -46,11 +50,11 @@ export function TreeRow({
           ›
         </button>
       ) : (
-        <span className="bk-tree-row__twisty" aria-hidden="true" />
+        <span className={TWISTY_CLASS} aria-hidden="true" />
       )}
-      {icon ? <span className="bk-row__icon">{icon}</span> : null}
-      <span className="bk-row__label">{label}</span>
-      {meta ? <span className="bk-row__meta">{meta}</span> : null}
+      {icon ? <span className={ROW_ICON_CLASS}>{icon}</span> : null}
+      <span className={ROW_LABEL_CLASS}>{label}</span>
+      {meta ? <span className={ROW_META_CLASS}>{meta}</span> : null}
     </Row>
   );
 }

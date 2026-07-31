@@ -4,8 +4,8 @@
  * @license BSD-3-Clause
  */
 import React from "react";
-import { Row, type RowProps } from "./Row";
-import { StatusDot } from "../chrome-ui/StatusDot";
+import { Row, type RowProps, ROW_LABEL_CLASS, ROW_META_CLASS } from "./Row";
+import { StatusDot } from "./StatusDot";
 
 export interface RecordRowProps extends Omit<RowProps, "children" | "size"> {
   label: string;
@@ -17,8 +17,8 @@ export function RecordRow({ label, meta, published, ...rest }: RecordRowProps) {
   return (
     <Row interactive {...rest}>
       <StatusDot state={published ? "live" : "draft"} label={published ? "Published" : "Draft"} />
-      <span className="bk-row__label">{label}</span>
-      {meta ? <span className="bk-row__meta">{meta}</span> : null}
+      <span className={ROW_LABEL_CLASS}>{label}</span>
+      {meta ? <span className={ROW_META_CLASS}>{meta}</span> : null}
     </Row>
   );
 }

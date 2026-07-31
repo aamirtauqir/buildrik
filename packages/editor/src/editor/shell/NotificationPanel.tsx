@@ -13,7 +13,7 @@
  */
 
 import * as React from "react";
-import { EmptyState, Row, Spinner, StatusDot, type ToastInput } from "@/editor/ui";
+import { EmptyState, ROW_META_CLASS, Row, Spinner, StatusDot, type ToastInput } from "@/editor/ui";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { formatRelativeTime } from "@/shared/utils/relativeTime";
 import {
@@ -187,7 +187,7 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose, o
                     The target is gone — the note is kept, but there&rsquo;s nothing to jump to.
                   </span>
                 )}
-                <span className="bk-row__meta">
+                <span className={ROW_META_CLASS}>
                   {n.type} · {relTime(n.createdAt)}
                 </span>
               </span>

@@ -14,14 +14,22 @@ export { Slider, type SliderProps } from "./Slider";
 export { StatusDot, type StatusDotProps, type StatusDotState } from "../chrome-ui/StatusDot";
 
 /* ── Molecules ──────────────────────────────────────────────────────────── */
-export { Row, type RowProps, type RowSize } from "./Row";
-export { ListRow, type ListRowProps } from "./ListRow";
-export { TreeRow, type TreeRowProps } from "./TreeRow";
-export { VersionRow, type VersionRowProps } from "./VersionRow";
-export { RecordRow, type RecordRowProps } from "./RecordRow";
-export { FormatRow, type FormatRowProps } from "./FormatRow";
-export { IntegrationRow, type IntegrationRowProps, type IntegrationStatus } from "./IntegrationRow";
-export { CommentRow, type CommentRowProps } from "./CommentRow";
+export {
+  Row,
+  type RowProps,
+  type RowSize,
+  ROW_LABEL_CLASS,
+  ROW_META_CLASS,
+  ROW_CHEVRON_CLASS,
+  ROW_ICON_CLASS,
+} from "../chrome-ui/Row";
+export { ListRow, type ListRowProps } from "../chrome-ui/ListRow";
+export { TreeRow, type TreeRowProps } from "../chrome-ui/TreeRow";
+export { VersionRow, type VersionRowProps } from "../chrome-ui/VersionRow";
+export { RecordRow, type RecordRowProps } from "../chrome-ui/RecordRow";
+export { FormatRow, type FormatRowProps } from "../chrome-ui/FormatRow";
+export { IntegrationRow, type IntegrationRowProps, type IntegrationStatus } from "../chrome-ui/IntegrationRow";
+export { CommentRow, type CommentRowProps } from "../chrome-ui/CommentRow";
 export { FieldRow, type FieldRowProps } from "./FieldRow";
 export { FormField, type FormFieldProps } from "./FormField";
 export { NavItem, type NavItemProps } from "../chrome-ui/NavItem";

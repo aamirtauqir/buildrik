@@ -5,6 +5,7 @@
  */
 import React from "react";
 import { Badge } from "flowbite-react";
+import { ROW_ICON_CLASS } from "./Row";
 
 export type IntegrationStatus = "connected" | "available" | "error";
 
@@ -26,16 +27,23 @@ export interface IntegrationRowProps extends React.HTMLAttributes<HTMLDivElement
   action?: React.ReactNode;
 }
 
+/** Self-contained recreation of the former `.bk-row` + `.bk-integration-row`
+ *  combined effect (same rationale as FormatRow's BASE, in the same commit). */
+const BASE =
+  "tw:flex tw:items-center tw:gap-3 tw:h-16 tw:px-4 tw:w-full tw:text-left tw:border tw:border-gray-200 " +
+  "tw:rounded-lg tw:bg-white tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:text-gray-900 " +
+  "tw:[transition:var(--bk-transition-fast)]";
+
 export function IntegrationRow({
   name, scope, status = "available", pro, logo, action, className, ...rest
 }: IntegrationRowProps) {
   const s = STATUS[status];
   return (
-    <div className={["bk-row", "bk-integration-row", className].filter(Boolean).join(" ")} {...rest}>
-      {logo ? <span className="bk-row__icon">{logo}</span> : null}
-      <span className="bk-integration-row__body">
-        <span className="bk-integration-row__name">{name}</span>
-        <span className="bk-integration-row__scope">{scope}</span>
+    <div className={[BASE, className].filter(Boolean).join(" ")} {...rest}>
+      {logo ? <span className={ROW_ICON_CLASS}>{logo}</span> : null}
+      <span className="tw:flex-1 tw:flex tw:flex-col tw:gap-0.5 tw:min-w-0">
+        <span className="tw:font-medium">{name}</span>
+        <span className="tw:text-gray-500 tw:text-xs">{scope}</span>
       </span>
       {pro ? <Badge color="purple">PRO</Badge> : null}
       <Badge color={s.color} className={s.className}>{s.label}</Badge>

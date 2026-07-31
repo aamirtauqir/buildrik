@@ -13,6 +13,7 @@
  * @license BSD-3-Clause
  */
 import React from "react";
+import { ROW_ICON_CLASS } from "../chrome-ui/Row";
 
 export type PopoverPlacement = "bottom" | "bottom-end" | "top" | "top-end" | "right";
 
@@ -185,7 +186,7 @@ export function MenuItem({ icon, kbd, selected, danger, disabled, className, chi
       tabIndex={-1}
       {...rest}
     >
-      {icon ? <span className="bk-row__icon">{icon}</span> : null}
+      {icon ? <span className={ROW_ICON_CLASS}>{icon}</span> : null}
       <span className="bk-menu-item__label">{children}</span>
       {kbd ? <span className="bk-menu-item__kbd">{kbd}</span> : null}
     </button>
