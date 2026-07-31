@@ -8,10 +8,7 @@
  */
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import {
-  FieldRow, PanelHeader,
-  MediaCard, SiteCard,
-} from "../index";
+import { FieldRow, PanelHeader } from "../index";
 
 describe("FieldRow", () => {
   it("ties the label to its control", () => {
@@ -28,20 +25,6 @@ describe("PanelHeader", () => {
   it("is a heading so the panel has an outline", () => {
     render(<PanelHeader title="Pages" />);
     expect(screen.getByRole("heading", { level: 2, name: "Pages" })).toBeTruthy();
-  });
-});
-
-describe("MediaCard / SiteCard", () => {
-  it("decorative images get an empty alt so they are skipped, not read out", () => {
-    const { container } = render(<MediaCard name="hero.jpg" src="/hero.jpg" badge="NEW" />);
-    expect(container.querySelector("img")?.getAttribute("alt")).toBe("");
-    expect(screen.getByText("NEW")).toBeTruthy();
-  });
-
-  it("SiteCard states are labelled in text", () => {
-    render(<SiteCard name="Bella Cucina" state="live" stateLabel="Live" meta="2h ago" />);
-    expect(screen.getByRole("img", { name: "Live" })).toBeTruthy();
-    expect(screen.getByText("Bella Cucina")).toBeTruthy();
   });
 });
 

@@ -29,16 +29,27 @@ export interface MediaCardProps extends React.ButtonHTMLAttributes<HTMLButtonEle
 
 export function MediaCard({ name, src, badge, badgeKind = "neutral", className, ...rest }: MediaCardProps) {
   return (
-    <button type="button" className={["bk-media-card", className].filter(Boolean).join(" ")} {...rest}>
-      <span className="bk-media-card__thumb">
-        {src ? <img src={src} alt="" /> : null}
+    <button
+      type="button"
+      className={["tw:group tw:flex tw:flex-col tw:gap-1 tw:border-0 tw:bg-none tw:p-0 tw:cursor-pointer tw:text-left", className]
+        .filter(Boolean)
+        .join(" ")}
+      {...rest}
+    >
+      {/* `group-focus-visible:` replicates the old `.bk-media-card:focus-visible
+         .bk-media-card__thumb` descendant selector — parent-state-driven child
+         styling, Tailwind's own mechanism for exactly this case. */}
+      <span className="tw:relative tw:aspect-[4/3] tw:rounded-md tw:border tw:border-gray-200 tw:bg-gray-100 tw:overflow-hidden tw:outline-none tw:group-focus-visible:[box-shadow:var(--bk-shadow-focus)]">
+        {src ? <img src={src} alt="" className="tw:w-full tw:h-full tw:object-cover tw:block" /> : null}
         {badge ? (
-          <span className="bk-media-card__badge">
+          <span className="tw:absolute tw:top-1 tw:left-1">
             <Badge {...BADGE_KIND_PROPS[badgeKind]}>{badge}</Badge>
           </span>
         ) : null}
       </span>
-      <span className="bk-media-card__name">{name}</span>
+      <span className="tw:[font-family:var(--bk-font-ui)] tw:text-xs tw:text-gray-900 tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap">
+        {name}
+      </span>
     </button>
   );
 }
