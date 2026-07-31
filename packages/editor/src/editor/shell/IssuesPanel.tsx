@@ -18,7 +18,7 @@ import * as React from "react";
 import { AlertCircle, CheckCircle2, Info } from "lucide-react";
 import { PanelHeader } from "@/editor/chrome-ui";
 import { issueAppliesToPage, type Issue } from "./hooks/useStudioState";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 export interface IssuesPanelProps {
   issues: Issue[];

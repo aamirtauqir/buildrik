@@ -15,7 +15,7 @@ import type { Composer } from "../../engine";
 import { X } from "lucide-react";
 import { LayersPanel } from "../panels/layers";
 import type { SelectedElementInfo } from "../panels/layers";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 interface StructurePopoverProps {
   open: boolean;

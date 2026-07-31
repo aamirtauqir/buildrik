@@ -12,9 +12,7 @@ import type { Composer } from "../../../engine";
 import { EVENTS } from "../../../shared/constants/events";
 import { GROUPED_TABS_CONFIG } from "../../rail/tabsConfig";
 import { getRecentCommandIds, recordCommandRun } from "./commandRecents";
-import { Button, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
-
+import { Button, TextInput } from "@/editor/chrome-ui";
 // =============================================================================
 // TYPES
 // =============================================================================
@@ -388,7 +386,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
             <line x1={21} y1={21} x2={16.65} y2={16.65} />
           </svg>
 
-          <TextInput theme={BK_TEXT_INPUT_THEME}
+          <TextInput
             ref={inputRef}
             type="text"
             placeholder="Search commands..."

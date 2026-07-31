@@ -17,8 +17,7 @@ import { FormField, Popover } from "@/editor/chrome-ui";
 import type { Composer } from "../../engine";
 import { submitForReview, type ReviewStatus } from "../../services/ReviewService";
 import { exportPublishPages } from "./exportPublishPages";
-import { Button, Textarea, Tooltip, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
+import { Button, Textarea, TextInput, Tooltip } from "@/editor/chrome-ui";
 
 export interface SendForReviewProps {
   composer: Composer | null;
@@ -133,7 +132,7 @@ export const SendForReview: React.FC<SendForReviewProps> = ({
       <div className="bk-send-review">
         <FormField label="Client email" hint="Leave blank to keep this internal.">
           {(wiring) => (
-            <TextInput theme={BK_TEXT_INPUT_THEME}
+            <TextInput
               {...wiring}
               type="email"
               value={email}
@@ -144,7 +143,7 @@ export const SendForReview: React.FC<SendForReviewProps> = ({
         </FormField>
         <FormField label="What changed?">
           {(wiring) => (
-            <TextInput theme={BK_TEXT_INPUT_THEME}
+            <TextInput
               {...wiring}
               value={summary}
               onChange={(e) => setSummary(e.target.value)}

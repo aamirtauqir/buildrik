@@ -15,7 +15,7 @@
 import * as React from "react";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
 import { ConfirmDialog, Spinner } from "@/editor/chrome-ui";
-import { Badge } from "flowbite-react";
+import { Badge, Button } from "@/editor/chrome-ui";
 import { useEditorRole } from "./hooks/useEditorRole";
 import { roleAtLeast } from "@/services/RoleService";
 import {
@@ -23,7 +23,6 @@ import {
   rollbackToVersion,
   type PublishHistoryRow,
 } from "../../services/PublishService";
-import { Button } from "flowbite-react";
 
 export interface PublishHistoryProps {
   siteId: string;

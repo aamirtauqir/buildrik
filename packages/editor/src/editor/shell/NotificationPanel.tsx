@@ -23,7 +23,7 @@ import {
   markAllNotificationsRead,
   type EditorNotification,
 } from "../../services/NotificationService";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 /** U1: one relative-time SSOT — shared/utils/relativeTime, days fallback. */
 function relTime(iso: string | Date): string {

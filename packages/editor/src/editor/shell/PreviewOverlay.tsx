@@ -11,7 +11,7 @@
  */
 import * as React from "react";
 import { Z_LAYERS } from "@/shared/constants/canvas";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 interface PreviewOverlayProps {
   /** Sanitized page HTML. null → overlay hidden. */

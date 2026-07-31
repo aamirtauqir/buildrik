@@ -13,9 +13,7 @@ import { useToast } from "@/editor/chrome-ui";
 import { useClickOutside } from "@/shared/hooks";
 import { getDefaultPageName } from "../../shared/utils/pageUtils";
 import { normalizeSlug } from "../sidebar/tabs/pages/utils/slug";
-import { Button, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
-
+import { Button, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -250,7 +248,7 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
               {page.isHome && <span style={homeIconStyles}>🏠</span>}
               {editingPageId === page.id ? (
                 <span style={{ position: "relative" }}>
-                  <TextInput theme={BK_TEXT_INPUT_THEME}
+                  <TextInput
                     type="text"
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}

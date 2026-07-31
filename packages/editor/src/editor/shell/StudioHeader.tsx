@@ -59,7 +59,7 @@ import { NotificationPanel, useUnreadCount } from "./NotificationPanel";
 import { SendForReview } from "./SendForReview";
 import { SiteMenu } from "./SiteMenu";
 import "./header.css";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 /** Selected element minimal info */
 export interface SelectedElementInfo {

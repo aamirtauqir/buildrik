@@ -20,7 +20,7 @@ import {
   submitForReview,
   type CurrentRound,
 } from "@/services/ReviewService";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 interface StaleApprovalModalProps {
   isOpen: boolean;

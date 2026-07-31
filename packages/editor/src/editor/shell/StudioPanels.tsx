@@ -29,8 +29,7 @@ import { StarterGalleryMount } from "@/editor/design-system/ui/StarterGalleryMou
 import { useBlockInsertion } from "./hooks/useBlockInsertion";
 import { useAltTextAutoTrigger } from "./hooks/useAltTextAutoTrigger";
 import { PageTabBar } from "./PageTabBar";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================

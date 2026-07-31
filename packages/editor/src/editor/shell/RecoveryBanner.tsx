@@ -14,7 +14,7 @@
 
 import * as React from "react";
 import { RecoveryManager } from "@/engine/recovery/RecoveryManager";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 export interface RecoveryBannerProps {
   /** How many pages the recovered draft holds — the scope of what was kept. */

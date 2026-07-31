@@ -12,11 +12,8 @@
 import { X, Plus, Trash2, Check } from "lucide-react";
 import * as React from "react";
 import { ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal } from "@/editor/chrome-ui";
-import { BK_SELECT_BASE_THEME } from "@/editor/chrome-ui/selectTheme";
 import type { Composer } from "../../../engine";
-import { Button, Select, Textarea, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
-
+import { Button, Select, Textarea, TextInput } from "@/editor/chrome-ui";
 // =============================================================================
 // TYPES
 // =============================================================================
@@ -415,7 +412,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
             <label style={s.label}>
               Collection name <span style={{ color: "var(--bk-error)" }}>*</span>
             </label>
-            <TextInput theme={BK_TEXT_INPUT_THEME}
+            <TextInput
               style={s.input}
               type="text"
               placeholder="Blog Posts"
@@ -437,7 +434,6 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
           <div>
             <label style={s.label}>Content type</label>
             <Select
-              theme={BK_SELECT_BASE_THEME}
               style={s.select}
               value={contentType}
               onChange={(e) => setContentType(e.target.value as ContentType)}
@@ -512,7 +508,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
           <div style={{ maxHeight: 240, overflowY: "auto" }}>
             {fields.map((field) => (
               <div key={field.id} style={s.fieldRow}>
-                <TextInput theme={BK_TEXT_INPUT_THEME}
+                <TextInput
                   style={s.fieldNameInput}
                   type="text"
                   placeholder="field_name"
@@ -520,7 +516,6 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
                   onChange={(e) => updateFieldName(field.id, e.target.value)}
                 />
                 <Select
-                  theme={BK_SELECT_BASE_THEME}
                   style={s.fieldTypeSelect}
                   value={field.type}
                   onChange={(e) => updateFieldType(field.id, e.target.value as FieldType)}
@@ -564,10 +559,10 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
             </Button>
             {genPages && (
               <div style={{ marginTop: 10, display: "grid", gap: 8 }}>
-                <TextInput theme={BK_TEXT_INPUT_THEME}   type="text" placeholder="Slug pattern — /blog/{slug}" value={pageSlug} onChange={(e) => setPageSlug(e.target.value)} />
-                <TextInput theme={BK_TEXT_INPUT_THEME}   type="text" placeholder="Template page path — blog/_template/index.html" value={pageTemplate} onChange={(e) => setPageTemplate(e.target.value)} />
-                <TextInput theme={BK_TEXT_INPUT_THEME}   type="text" placeholder="SEO title — {title} — Blog" value={pageSeoTitle} onChange={(e) => setPageSeoTitle(e.target.value)} />
-                <TextInput theme={BK_TEXT_INPUT_THEME}   type="text" placeholder="SEO description — Read about {title}" value={pageSeoDesc} onChange={(e) => setPageSeoDesc(e.target.value)} />
+                <TextInput   type="text" placeholder="Slug pattern — /blog/{slug}" value={pageSlug} onChange={(e) => setPageSlug(e.target.value)} />
+                <TextInput   type="text" placeholder="Template page path — blog/_template/index.html" value={pageTemplate} onChange={(e) => setPageTemplate(e.target.value)} />
+                <TextInput   type="text" placeholder="SEO title — {title} — Blog" value={pageSeoTitle} onChange={(e) => setPageSeoTitle(e.target.value)} />
+                <TextInput   type="text" placeholder="SEO description — Read about {title}" value={pageSeoDesc} onChange={(e) => setPageSeoDesc(e.target.value)} />
               </div>
             )}
           </div>

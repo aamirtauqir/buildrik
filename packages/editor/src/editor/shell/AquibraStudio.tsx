@@ -55,8 +55,7 @@ import "./chrome.css";
 // flowbite-bigbang Task 2: configure flowbite-react's tw: class prefix
 // (spec §4.1) before any flowbite-react component can mount in the real app.
 import "../chrome-ui/flowbiteStore";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 // Run localStorage migration on app startup (module load)
 migrateStorageKeys();
 migrateAqbKeys();

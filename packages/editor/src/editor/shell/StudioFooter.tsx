@@ -11,8 +11,7 @@ import { ListTree } from "lucide-react";
 import { getEditorViewMode } from "../../shared/utils/editorViewMode";
 import type { Composer } from "../../engine";
 import type { DeviceType } from "../../shared/types";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 const VERSION = "v2.14.0";
 const ZOOM_PRESETS = [25, 50, 75, 100, 125, 150, 200] as const;
 

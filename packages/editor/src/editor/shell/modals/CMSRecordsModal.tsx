@@ -20,9 +20,7 @@ import {
   ModalTitle,
   Portal,
 } from "@/editor/chrome-ui";
-import { BK_SELECT_BASE_THEME } from "@/editor/chrome-ui/selectTheme";
-import { Button, Checkbox, Select, Textarea, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
+import { Button, Checkbox, Select, Textarea, TextInput } from "@/editor/chrome-ui";
 
 export interface CMSRecordsModalProps {
   composer: Composer | null;
@@ -163,7 +161,7 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
       return (
         <div {...common}>
           <FieldLabel field={field} />
-          <Select theme={BK_SELECT_BASE_THEME} value={String(value ?? "")} onChange={(e) => setField(field.slug, e.target.value)}>
+          <Select value={String(value ?? "")} onChange={(e) => setField(field.slug, e.target.value)}>
             <option value="">—</option>
             {field.options.map((o) => (
               <option key={o} value={o}>{o}</option>
@@ -176,7 +174,7 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
     return (
       <div {...common}>
         <FieldLabel field={field} />
-        <TextInput theme={BK_TEXT_INPUT_THEME}
+        <TextInput
           type={inputType}
           value={String(value ?? "")}
           onChange={(e) =>
@@ -207,7 +205,6 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
               <>
                 <div style={{ marginBottom: 12, maxWidth: 280 }}>
                   <Select
-                    theme={BK_SELECT_BASE_THEME}
                     value={collectionId}
                     onChange={(e) => {
                       setCollectionId(e.target.value);

@@ -9,8 +9,7 @@ import { ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal } 
 import type { Composer } from "../../../engine";
 import { useToast } from "@/editor/chrome-ui";
 import { devError } from "../../../shared/utils/devLogger";
-import { Button, Checkbox, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
+import { Button, Checkbox, TextInput } from "@/editor/chrome-ui";
 
 export interface ProjectSettingsModalProps {
   isOpen: boolean;
@@ -124,7 +123,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
           {activeTab === "general" && (
             <div className="tw:flex tw:flex-col tw:gap-3">
               <label style={labelStyles}>Project name</label>
-              <TextInput theme={BK_TEXT_INPUT_THEME}
+              <TextInput
                 type="text"
                 value={projectName}
                 onChange={(e) => setProjectName(e.target.value)}
@@ -133,7 +132,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
               />
 
               <label style={labelStyles}>Author / description</label>
-              <TextInput theme={BK_TEXT_INPUT_THEME}
+              <TextInput
                 type="text"
                 value={projectDescription}
                 onChange={(e) => setProjectDescription(e.target.value)}
@@ -147,7 +146,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
             <div className="tw:flex tw:flex-col tw:gap-3">
               <label style={labelStyles}>Grid size (px)</label>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <TextInput theme={BK_TEXT_INPUT_THEME}
+                <TextInput
                   type="number"
                   value={gridSize}
                   onChange={(e) => setGridSize(Number(e.target.value))}
@@ -177,7 +176,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
           {activeTab === "seo" && (
             <div className="tw:flex tw:flex-col tw:gap-3">
               <label style={labelStyles}>Site name (SEO default)</label>
-              <TextInput theme={BK_TEXT_INPUT_THEME}
+              <TextInput
                 type="text"
                 value={siteTitle}
                 onChange={(e) => setSiteTitle(e.target.value)}
