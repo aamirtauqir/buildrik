@@ -4,8 +4,7 @@
  */
 
 import * as React from "react";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 export const TabGuardModal: React.FC<{
   changedTabs: string[];
   onDiscard: () => void;

@@ -27,8 +27,7 @@ import {
 } from "../../state/StylePresetRegistryContext";
 import { StyleCategoryRow } from "./StyleCategoryRow";
 import { PresetDetailPane } from "./PresetDetailPane";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 type View =
   | { kind: "list" }
   | { kind: "detail"; category: PresetCategory; variant: string };

@@ -21,7 +21,7 @@
  */
 import * as React from "react";
 import { ModalContent, ModalDescription, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 export interface MigrationStep {
   /** Migration toVersion. */

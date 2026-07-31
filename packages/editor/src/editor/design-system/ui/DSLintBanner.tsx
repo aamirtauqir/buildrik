@@ -20,7 +20,7 @@
  */
 import * as React from "react";
 import type { LintIssue, LintRuleId } from "../../../engine/designSystem/linter";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 export interface DSLintBannerProps {
   issues: readonly LintIssue[];

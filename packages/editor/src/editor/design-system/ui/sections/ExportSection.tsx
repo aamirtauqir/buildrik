@@ -27,8 +27,7 @@ import { buildExport, downloadFile, type ExportFormat } from "../../utils/export
 import type { DesignToken } from "../../types";
 import type { BundleOptions } from "../../../../engine/designSystem/bundler/CSSBundler";
 import { ImportCard } from "./ImportCard";
-import { Button, Radio } from "flowbite-react";
-
+import { Button, Radio } from "@/editor/chrome-ui";
 // Local format type widens exportUtils ExportFormat with a stub "figma" entry
 // so the s05 prototype's 4-row selector renders without touching the shared
 // exporter contract. Figma JSON download emits a minimal envelope until a

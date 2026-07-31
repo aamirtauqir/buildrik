@@ -7,8 +7,7 @@
  */
 
 import * as React from "react";
-import { TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
+import { TextInput } from "@/editor/chrome-ui";
 
 export interface ColorFieldProps {
   label?: string;
@@ -88,7 +87,6 @@ export const ColorField: React.FC<ColorFieldProps> = ({
         </div>
         {showInput && (
           <TextInput
-            theme={BK_TEXT_INPUT_THEME}
             type="text"
             value={localValue}
             onChange={(e) => handleColorChange(e.target.value)}

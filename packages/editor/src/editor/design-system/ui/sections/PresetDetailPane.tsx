@@ -13,8 +13,7 @@
 import * as React from "react";
 import type { PresetCategory, StylePreset } from "../../types";
 import { PresetBindingRow } from "./PresetBindingRow";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 const CATEGORY_LABELS: Record<PresetCategory, string> = {
   button: "Button",
   card: "Card",

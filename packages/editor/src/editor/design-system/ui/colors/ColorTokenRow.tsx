@@ -9,8 +9,7 @@ import { useClickOutside } from "../../../../shared/hooks/useClickOutside";
 import type { DesignToken, WcagLevel } from "../../types";
 import { calcWcagLevel, wcagTooltip, calcContrastRatio } from "../../utils/colorUtils";
 import { ColorPicker } from "./ColorPicker";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 // ─── WCAG Badge ───────────────────────────────────────────────────────────────
 
 const WCAG_BADGE_STYLES: Record<WcagLevel, React.CSSProperties> = {

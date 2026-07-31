@@ -11,8 +11,7 @@
 
 import * as React from "react";
 import { FormField } from "@/editor/chrome-ui";
-import { TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
+import { TextInput } from "@/editor/chrome-ui";
 
 export interface NumberFieldProps {
   label?: string;
@@ -56,7 +55,6 @@ export const NumberField: React.FC<NumberFieldProps> = ({
       <TextInput
         id={id}
         {...extra}
-        theme={BK_TEXT_INPUT_THEME}
         type="number"
         value={value}
         min={min}

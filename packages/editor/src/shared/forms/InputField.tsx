@@ -8,8 +8,7 @@
 
 import * as React from "react";
 import { FormField } from "@/editor/chrome-ui";
-import { TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
+import { TextInput } from "@/editor/chrome-ui";
 
 export interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -56,14 +55,14 @@ export const InputField: React.FC<InputFieldProps> = ({
 
   if (!label && !error && !hint) {
     const bare = withIcon(
-      <TextInput {...props} theme={BK_TEXT_INPUT_THEME} aria-invalid={!!error || undefined} style={inputStyle} />,
+      <TextInput {...props} aria-invalid={!!error || undefined} style={inputStyle} />,
     );
     return className ? <div className={className}>{bare}</div> : <>{bare}</>;
   }
 
   return (
     <FormField label={label ?? ""} hint={hint} error={error} className={className}>
-      {(wiring) => withIcon(<TextInput {...props} {...wiring} theme={BK_TEXT_INPUT_THEME} style={inputStyle} />)}
+      {(wiring) => withIcon(<TextInput {...props} {...wiring} style={inputStyle} />)}
     </FormField>
   );
 };

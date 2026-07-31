@@ -25,8 +25,7 @@ import type {
   AIAssistService,
   ComponentSchema,
 } from "../../../engine/designSystem/services/AIAssistService";
-import { Button, Textarea } from "flowbite-react";
-
+import { Button, Textarea } from "@/editor/chrome-ui";
 type ModalState =
   | { kind: "idle" }
   | { kind: "generating"; abort: AbortController }

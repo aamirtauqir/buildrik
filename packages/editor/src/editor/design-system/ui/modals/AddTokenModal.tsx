@@ -5,8 +5,7 @@
 
 import * as React from "react";
 import { generateColorTokenId } from "../../utils/exportUtils";
-import { Button, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
+import { Button, TextInput } from "@/editor/chrome-ui";
 
 export interface AddTokenModalProps {
   existingIds: string[];
@@ -87,7 +86,6 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
           Token name
         </label>
         <TextInput
-          theme={BK_TEXT_INPUT_THEME}
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -132,7 +130,6 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
             }}
           />
           <TextInput
-            theme={BK_TEXT_INPUT_THEME}
             type="text"
             value={hex}
             onChange={(e) => setHex(e.target.value)}

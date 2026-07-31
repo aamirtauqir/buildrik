@@ -3,8 +3,7 @@ import type { DesignToken } from "../../types";
 import { useDSModeOptional } from "../../state/DSModeContext";
 import { TokenUsageChip } from "../sections/TokenUsageChip";
 import type { LintIssue } from "../../../../engine/designSystem/LintState";
-import { Button, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
+import { Button, TextInput } from "@/editor/chrome-ui";
 
 interface GenericTokenListProps {
   tokens: DesignToken[];
@@ -172,7 +171,7 @@ export const GenericTokenList: React.FC<GenericTokenListProps> = ({
                   </div>
                 )}
               </div>
-              <TextInput theme={BK_TEXT_INPUT_THEME}
+              <TextInput
                 type="text"
                 value={t.value}
                 onChange={(e) => onTokenChange(t.id, e.target.value)}

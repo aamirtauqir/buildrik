@@ -63,8 +63,7 @@ import { TokensSection } from "./sections/TokensSection";
 import { StylesSection, useStylesSectionTotalDirty } from "./sections/StylesSection";
 import { ComponentsSection } from "./sections/ComponentsSection";
 import { ExportSection } from "./sections/ExportSection";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 // ─── Layout ───────────────────────────────────────────────────────────────────
 
 const containerStyles: React.CSSProperties = {

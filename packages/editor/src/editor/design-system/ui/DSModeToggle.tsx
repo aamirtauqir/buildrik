@@ -13,8 +13,7 @@
  */
 import * as React from "react";
 import { useDSMode, type DSMode } from "../state/DSModeContext";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 const SEGMENTS: ReadonlyArray<{ value: DSMode; label: string; hint: string }> = [
   { value: "beginner", label: "Beginner", hint: "Friendly · hides token IDs and empty foundations" },
   { value: "pro", label: "Pro", hint: "Full power · token IDs, every kind, off-DS allowed silently" },

@@ -9,8 +9,7 @@ import { useFormHandler } from "../hooks/useFormHandler";
 import type { Composer } from "../../engine";
 import type { Element } from "../../engine/elements/Element";
 import type { FormConfig } from "../../engine/forms/FormHandler";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================

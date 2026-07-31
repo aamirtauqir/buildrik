@@ -23,8 +23,7 @@ import type { Composer } from "../../../../engine/Composer";
 import { CATALOG } from "../../../components-catalog/catalog";
 import type { ComponentType } from "../../../components-catalog/types";
 import type { ComponentDefinition } from "../../../../shared/types/components";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 const CATALOG_LAST_UPDATED = "2026-04-12";
 
 export interface ComponentsSectionProps {

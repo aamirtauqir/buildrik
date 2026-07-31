@@ -6,8 +6,7 @@
 
 import * as React from "react";
 import type { FormState } from "../../engine/forms/FormHandler";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================

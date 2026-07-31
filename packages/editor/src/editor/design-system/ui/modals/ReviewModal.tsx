@@ -5,7 +5,7 @@
 
 import * as React from "react";
 import type { DesignToken } from "../../types";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 export interface ReviewModalProps {
   colorTokens: DesignToken[];

@@ -14,7 +14,7 @@ import {
   expandShorthand,
   calcContrastRatio,
 } from "../../utils/colorUtils";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 import { TextField } from "@/editor/chrome-ui";
 
 export interface ColorPickerProps {

@@ -34,9 +34,7 @@ import {
   useIconRegistry, useImageryRegistry,
 } from "../../state/TokenRegistryContext";
 import type { DesignToken } from "../../types";
-import { Button, Textarea, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
-
+import { Button, Textarea, TextInput } from "@/editor/chrome-ui";
 type ConflictStrategy = "replace" | "keep-mine" | "keep-theirs";
 
 interface ParsedState {
@@ -382,7 +380,7 @@ export const ImportCard: React.FC = () => {
             <div style={{ color: "var(--bk-ink-muted)" }}>
               or click to browse
             </div>
-            <TextInput theme={BK_TEXT_INPUT_THEME}
+            <TextInput
               ref={fileInputRef}
               type="file"
               accept="application/json,.json,.ts,.js"

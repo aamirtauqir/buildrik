@@ -10,7 +10,7 @@
 
 import * as React from "react";
 import type { PresetCategory } from "../../types";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 export interface StyleCategoryRowProps {
   category: PresetCategory;

@@ -16,7 +16,7 @@
 import * as React from "react";
 import type { DesignToken } from "../../types";
 import { TokenPickerPopover, type TokenEntry } from "@/editor/inspector/shared/TokenPickerPopover";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 interface BindingRowProps {
   cssProperty: string;

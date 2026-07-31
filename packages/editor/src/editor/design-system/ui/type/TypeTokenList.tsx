@@ -5,12 +5,10 @@
  */
 
 import * as React from "react";
-import { BK_SELECT_BASE_THEME } from "@/editor/chrome-ui/selectTheme";
 import type { ResponsiveMode } from "../../state/useTypeTokens";
 import type { DesignToken } from "../../types";
 import { TokenUsageChip } from "../sections/TokenUsageChip";
-import { Button, Select, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
+import { Button, Select, TextInput } from "@/editor/chrome-ui";
 
 export interface TypeTokenListProps {
   tokens: DesignToken[];
@@ -174,7 +172,7 @@ const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
       </div>
 
       {/* Size input */}
-      <TextInput theme={BK_TEXT_INPUT_THEME}
+      <TextInput
         type="number"
         value={size}
         min={1}
@@ -367,7 +365,6 @@ const FontFamilyRow: React.FC<FontRowProps> = ({ token, onChange, usageCount, on
         )}
       </div>
       <Select
-        theme={BK_SELECT_BASE_THEME}
         value={token.value}
         onChange={(e) => onChange(token.id, e.target.value)}
         style={{

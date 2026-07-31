@@ -19,7 +19,7 @@
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import { useColorMode } from "../state/useColorMode";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 export interface ColorModeToggleProps {
   composer: Composer;

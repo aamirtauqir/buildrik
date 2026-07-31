@@ -4,7 +4,7 @@
  */
 
 import * as React from "react";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 export interface FooterProps {
   isDirty: boolean;

@@ -7,8 +7,7 @@
 import * as React from "react";
 import { InputField } from "../shared/forms";
 import type { Template } from "./types";
-import { Badge, Button } from "flowbite-react";
-
+import { Badge, Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================

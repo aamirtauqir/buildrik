@@ -23,7 +23,7 @@ import {
   ModalFooter,
 } from "@/editor/chrome-ui";
 import type { DesignToken } from "../../types";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 export interface TokenReplaceModalProps {
   open: boolean;

@@ -6,8 +6,7 @@
 import * as React from "react";
 import { useClickOutside } from "../../../shared/hooks/useClickOutside";
 import type { ExportFormat } from "../utils/exportUtils";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 const EXPORT_OPTIONS = [
   { fmt: "css", label: "CSS Variables", desc: "for custom CSS / SCSS" },
   { fmt: "tailwind", label: "Tailwind Config", desc: "for Tailwind CSS projects" },
