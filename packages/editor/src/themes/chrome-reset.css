@@ -3,7 +3,7 @@
 
    Root class verified 2026-07-30 (flowbite-bigbang Task 2): the brief's
    example selector `.bk-studio-root` does not exist in the tree. The real
-   mounted shell root is `.bd-studio`, set on AquibraStudio's outer <Stack>
+   mounted shell root is `.bd-studio`, set on AquibraStudio's outer div
    (src/editor/shell/AquibraStudio.tsx). `.bk-shell` (editor/ui/EditorShell.tsx)
    is exported from the ui library but has zero consumers outside its own
    barrel — it is not what actually mounts.

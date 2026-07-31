@@ -47,7 +47,6 @@ export { CommandPalette, type CommandPaletteProps, type Command } from "./Comman
 export { EditorShell, type EditorShellProps } from "./EditorShell";
 
 /* ── Layout + compositions ──────────────────────────────────────────────── */
-export { Stack, type StackProps, type StackGap } from "./Stack";
 export { PanelFrame, type PanelFrameProps, type PanelFrameHeaderProps, type PanelFrameBodyProps, type PanelWidth } from "./PanelFrame";
 export { Tabs, type TabsProps, type Tab } from "./Tabs";
 export { ConfirmDialog, type ConfirmDialogProps } from "./ConfirmDialog";

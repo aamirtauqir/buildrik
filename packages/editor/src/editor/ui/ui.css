@@ -332,17 +332,6 @@
 .bk-shell__band { flex: 1; display: flex; min-height: 0; }
 .bk-shell__canvas { flex: 1; min-width: 0; display: flex; flex-direction: column; background: var(--bk-bg-app); overflow: hidden; }
 
-/* ── Stack · the layout primitive ───────────────────────────────────────── */
-.bk-stack { display: flex; flex-direction: column; }
-.bk-stack--row { flex-direction: row; align-items: center; }
-.bk-stack--xs { gap: var(--bk-space-4); }
-.bk-stack--sm { gap: var(--bk-space-8); }
-.bk-stack--md { gap: var(--bk-space-12); }
-.bk-stack--lg { gap: var(--bk-space-16); }
-.bk-stack--xl { gap: var(--bk-space-24); }
-.bk-stack--separator > * + * { border-top: 1px solid var(--bk-border); padding-top: var(--bk-space-12); }
-.bk-stack--row.bk-stack--separator > * + * { border-top: 0; border-left: 1px solid var(--bk-border); padding-top: 0; padding-left: var(--bk-space-12); }
-
 /* ── Panel frame · width contract for panel and full-page surfaces ──────── */
 .bk-panel-frame { display: flex; flex-direction: column; min-height: 0; background: var(--bk-bg-panel); }
 .bk-panel-frame--narrow { width: var(--bk-size-drawer); flex: none; }

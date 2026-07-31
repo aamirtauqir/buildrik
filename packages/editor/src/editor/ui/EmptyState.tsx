@@ -37,7 +37,7 @@ export function EmptyStateDesc({ className, children, ...rest }: React.HTMLAttri
 }
 export function EmptyStateActions({ className, children, ...rest }: React.HTMLAttributes<HTMLSpanElement>) {
   return (
-    <span className={["bk-stack bk-stack--row bk-stack--sm", className].filter(Boolean).join(" ")} {...rest}>
+    <span className={["tw:flex tw:items-center tw:gap-2", className].filter(Boolean).join(" ")} {...rest}>
       {children}
     </span>
   );

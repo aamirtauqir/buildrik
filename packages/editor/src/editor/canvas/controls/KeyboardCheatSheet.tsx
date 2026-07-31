@@ -9,7 +9,7 @@
  */
 
 import * as React from "react";
-import { Kbd, ModalContent, ModalRoot, Stack } from "@/editor/ui";
+import { Kbd, ModalContent, ModalRoot } from "@/editor/ui";
 import { tokens } from "../shared/tokens";
 import { Button } from "flowbite-react";
 
