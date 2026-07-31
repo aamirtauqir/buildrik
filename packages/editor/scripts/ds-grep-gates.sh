@@ -609,7 +609,7 @@ fi
 # See memory/project_gate24_codemod_arc_20260518.md,
 #     memory/project_radio_primitive_20260518.md, and
 #     memory/project_bare_button_variant_20260518.md.
-check_gate 24 "$GATE24_HITS" "0" "inline <button>/<input>/<select>/<textarea> in editor/ (use vibcoder shim @/shared/ui) — ZERO TOLERANCE" || exit 1
+check_gate 24 "$GATE24_HITS" "0" "inline <button>/<input>/<select>/<textarea> in editor/ (use @/editor/chrome-ui) — ZERO TOLERANCE" || exit 1
 
 # Gate 25: Orphan codemod fixtures.
 # Every `*.input.tsx`/`*.output.tsx` must be referenced by SOME test file —

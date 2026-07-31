@@ -1,27 +1,26 @@
 # Gate 22 overlay-allowlist — file-level exceptions to "createPortal/
 # document.body must route through the chrome-ui overlay root."
-#
 # Matched with `grep -F -f` (fixed-string, substring match) against
 # "path:line:content" hits, so one path per line excludes every hit in
-# that file. Lines starting with `#` are inert comments — they don't match
-# any real source line, so they're safe as section headers.
-#
-# NO BLANK LINES in this file: `grep -F -f` treats an empty pattern as a
-# substring of every line, which would silently exclude ALL hits (caught
-# during Task 13 verification — a blank-line version of this file made
-# Gate 22 pass for the wrong reason on every run).
-#
+# that file. Only long, specific comment lines (like the section headers
+# below) are safe here — a SHORT or PUNCTUATION-ONLY line is NOT inert
+# under -F: a lone `#` is a one-character literal that matches any hit
+# line containing `#` ANYWHERE (href="#", a hex literal, "// see #1234"),
+# the same way an empty line matches every hit line. Both shapes were
+# caught during Task 13 verification/review as silent-pass holes — a
+# blank-line version of this file, and a bare-`#`-divider version, each
+# made Gate 22 pass regardless of what was actually in the allowlist.
+# NEVER add a blank line or a bare punctuation-only line to this file —
+# every line must be either a real path or a long descriptive comment.
 # Re-verified 2026-07-31 (Task 13, flowbite big-bang teardown): every path
 # below was re-grepped against the current tree, not carried over blind
 # from the pre-migration list.
-#
 # ── Drag ghosts — an offscreen element used as the native HTML5 drag image,
 # not a floating UI overlay. Never visible in the layout; removed on dragend.
 packages/editor/src/editor/canvas/hooks/useCanvasElementDrag.ts
 packages/editor/src/editor/sidebar/tabs/elements/useElementsState.ts
 packages/editor/src/editor/sidebar/tabs/elements/ElementCard.tsx
 packages/editor/src/editor/media/AssetCard.tsx
-#
 # ── Download anchors — the createObjectURL + <a> + click() + remove()
 # pattern for triggering a browser file download. Never rendered, never a
 # UI surface, so the overlay-root/portal discipline doesn't apply.
@@ -32,12 +31,10 @@ packages/editor/src/engine/components/ComponentStorage.ts
 packages/editor/src/engine/export/ExportEngine.ts
 packages/editor/src/engine/export/ExportHelpers.ts
 packages/editor/src/engine/storage/VersionHistoryStorage.ts
-#
 # ── Capture / offscreen measurement nodes — mounted briefly to rasterize or
 # measure, then torn down. Not user-facing overlay chrome.
 packages/editor/src/editor/shell/captureThumbnail.ts
 packages/editor/src/shared/utils/html/accessibility.ts
-#
 # ── Pre-existing portal-discipline gaps — these createPortal(x, document.body)
 # directly instead of composing chrome-ui's OverlayMount/Portal. All predate
 # Gate 22 entirely: the ORIGINAL gate scoped only to the since-deleted
