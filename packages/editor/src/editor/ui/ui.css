@@ -38,18 +38,6 @@
 .bk-panel-header__title { flex: 1; }
 .bk-panel-header__actions { display: flex; align-items: center; gap: var(--bk-space-4); }
 
-/* ── Empty state · Figma 17:18 ──────────────────────────────────────────── */
-.bk-empty {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: var(--bk-space-8); padding: var(--bk-space-32) var(--bk-space-24);
-  text-align: center;
-  font-family: var(--bk-font-ui); font-size: var(--bk-text-13);
-  color: var(--bk-ink-soft);
-}
-.bk-empty--sm { padding: var(--bk-space-16) var(--bk-space-12); gap: var(--bk-space-4); }
-.bk-empty__title { font-weight: var(--bk-weight-medium); color: var(--bk-ink); }
-.bk-empty__body { color: var(--bk-ink-muted); font-size: var(--bk-text-12); max-width: 34ch; }
-
 /* ── Media card · Figma 17:6 · Badge ────────────────────────────────────── */
 .bk-media-card { display: flex; flex-direction: column; gap: var(--bk-space-4); border: 0; background: none; padding: 0; cursor: pointer; text-align: left; }
 .bk-media-card__thumb {

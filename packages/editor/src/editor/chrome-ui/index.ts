@@ -31,3 +31,11 @@ export { RecordRow, type RecordRowProps } from "./RecordRow";
 export { FormatRow, type FormatRowProps } from "./FormatRow";
 export { IntegrationRow, type IntegrationRowProps, type IntegrationStatus } from "./IntegrationRow";
 export { CommentRow, type CommentRowProps } from "./CommentRow";
+export {
+  EmptyState,
+  EmptyStateTitle,
+  EmptyStateDesc,
+  EmptyStateActions,
+  type EmptyStateProps,
+  type EmptyStateSize,
+} from "./EmptyState";

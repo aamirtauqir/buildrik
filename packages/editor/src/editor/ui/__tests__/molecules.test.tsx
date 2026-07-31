@@ -9,10 +9,9 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import {
-  FieldRow, PanelHeader, EmptyState,
+  FieldRow, PanelHeader,
   MediaCard, SiteCard,
 } from "../index";
-import { Button } from "flowbite-react";
 
 describe("FieldRow", () => {
   it("ties the label to its control", () => {
@@ -29,13 +28,6 @@ describe("PanelHeader", () => {
   it("is a heading so the panel has an outline", () => {
     render(<PanelHeader title="Pages" />);
     expect(screen.getByRole("heading", { level: 2, name: "Pages" })).toBeTruthy();
-  });
-});
-
-describe("EmptyState", () => {
-  it("carries an action, because an empty state without one is a dead end", () => {
-    render(<EmptyState title="No pages yet" body="Add your first page." action={<Button>Add page</Button>} />);
-    expect(screen.getByRole("button", { name: "Add page" })).toBeTruthy();
   });
 });
 
