@@ -72,22 +72,27 @@ export function Modal({
   if (!open) return null;
 
   return (
+    // z-[9997]: above the cookie-consent banner (9998 is the banner's own
+    // dialog, 10000 the offline banner) — at z-60 the banner sat on top of
+    // every modal and covered its footer actions.
     <div
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-gray-900/50 p-4"
+      className="fixed inset-0 z-[9997] flex items-center justify-center bg-gray-900/50 p-4"
       onClick={onClose}
     >
+      {/* Only the body scrolls: a footer inside the scroll container put the
+          primary action below the fold on tall modals (publish checks). */}
       <div
         ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-label={title}
         tabIndex={-1}
-        className="max-h-[90vh] w-full overflow-y-auto rounded-lg shadow-modal outline-none"
+        className="flex max-h-[90vh] w-full flex-col overflow-hidden rounded-lg shadow-modal outline-none"
         style={{ maxWidth: width, backgroundColor: "var(--color-bg-surface)" }}
         onClick={(e) => e.stopPropagation()}
       >
         <div
-          className="flex items-center justify-between border-b px-5 py-4"
+          className="flex shrink-0 items-center justify-between border-b px-5 py-4"
           style={{ borderColor: "var(--color-border-default)" }}
         >
           <h2 className="text-section-title" style={{ color: "var(--color-text-primary)" }}>{title}</h2>
@@ -102,11 +107,11 @@ export function Modal({
           </button>
         </div>
 
-        <div className="px-5 py-4">{children}</div>
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">{children}</div>
 
         {footer && (
           <div
-            className="flex items-center justify-end gap-2 border-t px-5 py-4"
+            className="flex shrink-0 items-center justify-end gap-2 border-t px-5 py-4"
             style={{ borderColor: "var(--color-border-default)" }}
           >
             {footer}

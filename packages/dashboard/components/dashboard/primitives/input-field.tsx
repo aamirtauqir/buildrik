@@ -13,6 +13,10 @@ export const InputField = forwardRef<
   HTMLInputElement,
   InputHTMLAttributes<HTMLInputElement> & { leading?: ReactNode; wrapperClassName?: string; invalid?: boolean; valid?: boolean }
 >(({ leading, wrapperClassName, className, invalid, valid, ...props }, ref) => (
+  // The ring and background live on the wrapper, so a `disabled:` variant on
+  // the input can never reach them — the wrapper reads the state directly and
+  // dims the whole field. Without this a locked field rendered at full
+  // strength with faint text, which reads as broken rather than unavailable.
   <div
     className={cn(
       "flex h-[42px] items-center gap-2.5 rounded-lg px-[13px] transition-shadow",
@@ -21,9 +25,10 @@ export const InputField = forwardRef<
         : valid
           ? "shadow-[inset_0_0_0_1px_var(--color-success)] focus-within:shadow-[inset_0_0_0_1px_var(--color-success),0_0_0_2px_rgba(14,159,110,0.25)]"
           : "shadow-[inset_0_0_0_1px_var(--color-border-input)] focus-within:shadow-[inset_0_0_0_1px_var(--color-primary),0_0_0_2px_rgba(26,86,219,0.30)]",
+      (props.disabled || props.readOnly) && "opacity-60",
       wrapperClassName
     )}
-    style={{ backgroundColor: "var(--color-bg-surface)" }}
+    style={{ backgroundColor: props.disabled || props.readOnly ? "var(--color-bg-subtle)" : "var(--color-bg-surface)" }}
   >
     {leading && (
       <span className="flex shrink-0 items-center" style={{ color: "var(--color-text-placeholder)" }} aria-hidden>

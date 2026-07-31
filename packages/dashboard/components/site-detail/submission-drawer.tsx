@@ -57,6 +57,13 @@ export function SubmissionDrawer({
   onDelete,
 }: SubmissionDrawerProps) {
   const drawerRef = useRef<HTMLDivElement>(null);
+  // onClose arrives as an inline arrow from the panel that also owns the
+  // drawer's state, so its identity changes on every toggle and refetch. Read
+  // it through a ref: with onClose in the dep array the trap tore down and
+  // re-ran on each re-render, restoring focus to the row behind the scrim and
+  // then yanking it back — the user lost their place after every switch.
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
   // Same dialog contract as primitives/Modal: Escape closes, Tab is trapped in
   // the panel, and focus returns to the opener on close.
@@ -75,7 +82,7 @@ export function SubmissionDrawer({
     }
 
     function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") { onClose(); return; }
+      if (e.key === "Escape") { onCloseRef.current(); return; }
       if (e.key !== "Tab") return;
       const items = focusables();
       if (items.length === 0) { e.preventDefault(); drawerRef.current?.focus(); return; }
@@ -97,7 +104,7 @@ export function SubmissionDrawer({
       document.removeEventListener("keydown", handleKeyDown);
       previouslyFocused?.focus?.();
     };
-  }, [open, onClose]);
+  }, [open]);
 
   if (!open || !submission) return null;
 

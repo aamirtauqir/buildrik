@@ -250,7 +250,7 @@ export function DangerZoneTab({
                 onChange={(e) => setConfirmText(e.target.value)}
                 placeholder="DELETE"
                 className="font-mono"
-                valid={confirmText === "DELETE"}
+                valid={canDelete}
               />
             </div>
 
