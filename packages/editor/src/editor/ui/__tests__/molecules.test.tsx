@@ -10,7 +10,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import {
   Row, ListRow, TreeRow, VersionRow, RecordRow, FormatRow, IntegrationRow, CommentRow,
-  FieldRow, NavItem, SectionHeader, PanelHeader, EmptyState,
+  FieldRow, NavItem, PanelHeader, EmptyState,
   MediaCard, SiteCard,
 } from "../index";
 import { Button } from "flowbite-react";
@@ -134,16 +134,10 @@ describe("NavItem", () => {
   });
 });
 
-describe("SectionHeader / PanelHeader", () => {
-  it("both are headings so the panel has an outline", () => {
-    render(
-      <>
-        <PanelHeader title="Pages" />
-        <SectionHeader count={3}>Collections</SectionHeader>
-      </>,
-    );
+describe("PanelHeader", () => {
+  it("is a heading so the panel has an outline", () => {
+    render(<PanelHeader title="Pages" />);
     expect(screen.getByRole("heading", { level: 2, name: "Pages" })).toBeTruthy();
-    expect(screen.getByRole("heading", { level: 3 })).toBeTruthy();
   });
 });
 

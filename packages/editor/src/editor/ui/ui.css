@@ -110,19 +110,6 @@
 .bk-nav-item[aria-current="page"] { background: var(--bk-accent-tint); color: var(--bk-accent-text); font-weight: var(--bk-weight-medium); }
 .bk-nav-item:focus-visible { outline: none; box-shadow: var(--bk-shadow-focus); }
 
-/* ── Section header · Figma 16:16 · Tint × Count ────────────────────────── */
-.bk-section-header {
-  display: flex; align-items: center; gap: var(--bk-space-8);
-  height: var(--bk-space-28); padding: 0 var(--bk-space-16);
-  font-family: var(--bk-font-ui); font-size: var(--bk-text-11);
-  font-weight: var(--bk-weight-medium);
-  letter-spacing: var(--bk-tracking-wide);
-  color: var(--bk-ink-muted);
-  text-transform: uppercase;
-}
-.bk-section-header--tint { background: var(--bk-bg-subtle); }
-.bk-section-header__count { margin-left: auto; color: var(--bk-ink-muted); }
-
 /* ── Panel header · Figma 16:6 ──────────────────────────────────────────── */
 .bk-panel-header {
   display: flex; align-items: center; gap: var(--bk-space-8);

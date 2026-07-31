@@ -25,7 +25,7 @@ export { CommentRow, type CommentRowProps } from "./CommentRow";
 export { FieldRow, type FieldRowProps } from "./FieldRow";
 export { FormField, type FormFieldProps } from "./FormField";
 export { NavItem, type NavItemProps } from "./NavItem";
-export { SectionHeader, type SectionHeaderProps } from "./SectionHeader";
+export { SectionHeader, type SectionHeaderProps } from "../chrome-ui/SectionHeader";
 export { PanelHeader, type PanelHeaderProps } from "./PanelHeader";
 export { EmptyState, EmptyStateTitle, EmptyStateDesc, EmptyStateActions, type EmptyStateProps, type EmptyStateSize } from "./EmptyState";
 export { MediaCard, type MediaCardProps } from "./MediaCard";
