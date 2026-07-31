@@ -32,8 +32,7 @@ import {
   type CurrentRound,
   type ReviewComment,
 } from "../../../../services/ReviewService";
-import { Badge, Button, Textarea, ToggleSwitch } from "flowbite-react";
-
+import { Badge, Button, Textarea, ToggleSwitch } from "@/editor/chrome-ui";
 /** Review's own status words onto flowbite Badge color + text-color override
  *  (flowbite's badge color presets don't hex-match --bk-success-text/
  *  --bk-warning-tint/--bk-error-text exactly — see docs/plans/

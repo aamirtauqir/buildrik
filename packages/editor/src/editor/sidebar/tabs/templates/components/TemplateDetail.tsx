@@ -15,7 +15,7 @@
 
 import * as React from "react";
 import type { TemplateItem } from "../templatesData";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 interface TemplateDetailProps {
   template: TemplateItem;

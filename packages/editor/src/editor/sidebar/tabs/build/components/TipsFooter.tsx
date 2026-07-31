@@ -12,7 +12,7 @@
 import * as React from "react";
 import { Lightbulb, ChevronLeft, ChevronRight, ChevronDown, ChevronUp } from "lucide-react";
 import { TIPS } from "../catalog/tips";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 export interface TipsFooterProps {
   tipIdx: number;

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { DiffRows } from "./DiffRows";
 import type { RunStep, RunPhase } from "./hooks/useAgentRunner";
-import { Button, Checkbox } from "flowbite-react";
+import { Button, Checkbox } from "@/editor/chrome-ui";
 
 /**
  * P4 agent run surface: the ordered plan with per-step status, and on the step

@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Upload } from "lucide-react";
-import { TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
+import { TextInput } from "@/editor/chrome-ui";
 
 interface Props {
   folderName: string;
@@ -57,7 +56,7 @@ export function EmptyFolderDropZone({ folderName, onFiles }: Props) {
         Drop files into &lsquo;{folderName}&rsquo;
       </div>
       <div className="med-empty-folder-zone__sub">or click to upload</div>
-      <TextInput theme={BK_TEXT_INPUT_THEME}
+      <TextInput
         ref={inputRef}
         type="file"
         multiple

@@ -10,7 +10,7 @@ import * as React from "react";
 import { ModalContent, ModalRoot } from "@/editor/chrome-ui";
 import { useState } from "react";
 import type { ConfirmDeletePayload } from "../data/mediaTypes";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 import { TextField } from "@/editor/chrome-ui";
 
 interface ConfirmDeleteModalProps {

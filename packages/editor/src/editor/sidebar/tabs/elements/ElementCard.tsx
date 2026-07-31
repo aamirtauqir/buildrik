@@ -9,8 +9,7 @@ import * as React from "react";
 import { getBlockById } from "../../../../blocks/blockRegistry";
 import type { BlockData } from "../../../../shared/types";
 import { BLOCK_ICONS, BLOCK_DESCRIPTIONS } from "./constants";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 // ─── ElementCard ──────────────────────────────────────────────────────────────
 
 export interface ElementCardProps {

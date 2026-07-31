@@ -1,6 +1,6 @@
 import * as React from "react";
 import { FolderInput, Trash2, X } from "lucide-react";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 interface MultiSelectBannerProps {
   count: number;

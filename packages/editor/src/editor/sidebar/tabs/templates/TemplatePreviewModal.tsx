@@ -14,8 +14,7 @@ import * as React from "react";
 import { createPortal } from "react-dom";
 import type { TemplateItem } from "./templatesData";
 import "./TemplatePreviewModal.css";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================

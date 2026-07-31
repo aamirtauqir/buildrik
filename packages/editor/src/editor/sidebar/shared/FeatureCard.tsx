@@ -8,7 +8,7 @@
  */
 
 import * as React from "react";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 export interface FeatureCardProps {
   /** Card title (e.g., "Elements", "Templates") */

@@ -11,9 +11,7 @@ import * as React from "react";
 import { generateContent } from "@/shared/utils/openai";
 import type { PageItem } from "../types";
 import type { UsePageSettingsReturn } from "./usePageSettings";
-import { Button, HelperText, Label, Textarea, TextInput, Tooltip } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
-import { BK_LABEL_CLASS, BK_HELPER_CLASS, BK_HELPER_ERROR_CLASS } from "@/editor/chrome-ui/labelTheme";
+import { BK_HELPER_CLASS, BK_HELPER_ERROR_CLASS, BK_LABEL_CLASS, Button, HelperText, Label, Textarea, TextInput, Tooltip } from "@/editor/chrome-ui";
 
 interface Props {
   s: UsePageSettingsReturn;
@@ -159,7 +157,6 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
           </Button>
         )}
         <TextInput
-          theme={BK_TEXT_INPUT_THEME}
           id="seo-title"
           value={s.seoTitle}
           onChange={(e) => s.setSeoTitle(e.target.value.slice(0, 60))}
@@ -218,7 +215,6 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
             {domain}/
           </span>
           <TextInput
-            theme={BK_TEXT_INPUT_THEME}
             id="seo-slug"
             value={s.slug}
             onChange={(e) => s.setSlug(e.target.value)}

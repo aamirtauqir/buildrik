@@ -17,8 +17,7 @@ import { createBuildrikApiClient } from "@/services/api-client";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { Field, Input, Screen, Section } from "../shared";
 import type { ScreenProps } from "../types";
-import { Button, Checkbox } from "flowbite-react";
-
+import { Button, Checkbox } from "@/editor/chrome-ui";
 const EVENTS = [
   { id: "site.publish", label: "site.publish — fires after every successful publish" },
   { id: "form.submit", label: "form.submit — fires on every form submission" },

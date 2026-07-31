@@ -25,7 +25,7 @@ import { usePages } from "./usePages";
 import { useFolders } from "./useFolders";
 import { useBulkSelect } from "./useBulkSelect";
 import "./PagesTab.css";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 export interface PagesTabProps {
   composer: Composer | null;

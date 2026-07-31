@@ -27,8 +27,7 @@ import {
 import { TimeTravelIcon } from "../icons";
 import type { ActivityViewProps } from "../types";
 import type { HistoryDisplayEntry } from "../../../../../engine/historyTypes";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 const MAX_VISIBLE_CHANGES = 5;
 
 // Row sizing constants (see spec §2.5)

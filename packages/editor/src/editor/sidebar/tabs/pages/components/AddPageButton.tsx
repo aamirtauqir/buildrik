@@ -8,7 +8,7 @@ import { IconButton, Menu, MenuItem, POPOVER_BASE_CLASS } from "@/editor/chrome-
 
 import * as React from "react";
 import { useClickOutside } from "@/shared/hooks";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 export interface AddPageButtonProps {
   onAddBlank: () => void;

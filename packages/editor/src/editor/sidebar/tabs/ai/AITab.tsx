@@ -14,7 +14,7 @@ import { applyAiEdit } from "./applySetStyle";
 import { trackAiEditApplied } from "@/services/ai/adoptionTracker";
 import { DEFAULT_MODEL, type AIModel, type ChatMessage, type DiffEdit } from "./types";
 import "./AITab.css";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 export interface AITabProps {
   composer: Composer | null;

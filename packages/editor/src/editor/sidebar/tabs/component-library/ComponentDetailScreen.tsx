@@ -13,8 +13,7 @@ import type { ComponentDefinition, VariantProperty } from "../../../../shared/ty
 import { useDSModeOptional } from "@/editor/design-system/state/DSModeContext";
 import { DrillInHeader } from "../../shared/DrillInHeader";
 import { DetachConfirmModal } from "./DetachConfirmModal";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================
 // Types
 // ============================================

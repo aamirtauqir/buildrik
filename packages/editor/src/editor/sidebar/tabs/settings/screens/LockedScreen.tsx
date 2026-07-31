@@ -4,7 +4,7 @@
  */
 
 import * as React from "react";
-import { Badge } from "flowbite-react";
+import { Badge } from "@/editor/chrome-ui";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import {
   LockedContainer,

@@ -6,9 +6,7 @@
 
 import * as React from "react";
 import type { UsePageSettingsReturn } from "./usePageSettings";
-import { Button, HelperText, Label, Textarea, ToggleSwitch, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
-import { BK_LABEL_CLASS, BK_HELPER_CLASS, BK_HELPER_ERROR_CLASS } from "@/editor/chrome-ui/labelTheme";
+import { BK_HELPER_CLASS, BK_HELPER_ERROR_CLASS, BK_LABEL_CLASS, Button, HelperText, Label, Textarea, TextInput, ToggleSwitch } from "@/editor/chrome-ui";
 
 interface Props {
   s: UsePageSettingsReturn;
@@ -58,7 +56,7 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
       {s.visibility === "password" && (
         <div style={{ padding: 10, background: "var(--bk-bg-subtle)", border: "1px solid var(--bk-border)", borderRadius: 4, display: "flex", flexDirection: "column", gap: "var(--bk-space-8)" }}>
           <div className="tw:flex tw:flex-nowrap tw:items-center tw:gap-2">
-            <TextInput theme={BK_TEXT_INPUT_THEME}
+            <TextInput
               type={s.showPassword ? "text" : "password"}
               value={s.password}
               onChange={(e) => s.setPassword(e.target.value)}

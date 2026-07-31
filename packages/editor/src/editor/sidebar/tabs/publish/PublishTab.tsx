@@ -15,8 +15,7 @@ import type { UsePublishJobResult } from "../../../shell/hooks/usePublishJob";
 import { useToast } from "@/editor/chrome-ui";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { PublishHistory } from "../../../shell/PublishHistory";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================
 // Types
 // ============================================

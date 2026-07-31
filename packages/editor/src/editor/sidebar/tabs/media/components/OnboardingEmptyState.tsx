@@ -10,8 +10,7 @@ import { Upload } from "lucide-react";
 import { SUPPORTED_FORMATS_LABEL } from "../../../../../shared/constants/media";
 import { EMPTY_MSGS } from "../data/mediaData";
 import type { MediaTypeFilter } from "../data/mediaTypes";
-import { Button, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
+import { Button, TextInput } from "@/editor/chrome-ui";
 
 interface OnboardingEmptyStateProps {
   activeType: MediaTypeFilter;
@@ -48,7 +47,7 @@ export function OnboardingEmptyState({
       >
         Upload files
       </Button>
-      <TextInput theme={BK_TEXT_INPUT_THEME}
+      <TextInput
         ref={inputRef}
         type="file"
         multiple

@@ -24,14 +24,12 @@ import {
   ModalTitle,
   Portal,
 } from "@/editor/chrome-ui";
-import { BK_SELECT_BASE_THEME } from "@/editor/chrome-ui/selectTheme";
 import {
   dialogCancelBtnStyles,
   dialogInputStyles,
   dialogPrimaryBtnStyles,
 } from "./styles";
-import { Button, Checkbox, Select, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
+import { Button, Checkbox, Select, TextInput } from "@/editor/chrome-ui";
 
 export interface SelectionContext {
   selectionIds: readonly string[];
@@ -118,7 +116,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
                 <label htmlFor="create-component-name" style={labelStyle}>
                   Name
                 </label>
-                <TextInput theme={BK_TEXT_INPUT_THEME}
+                <TextInput
                   id="create-component-name"
                   type="text"
                   value={name}
@@ -139,7 +137,6 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
                 </label>
                 <Select
                   id="create-component-group"
-                  theme={BK_SELECT_BASE_THEME}
                   value={group}
                   onChange={(e) => setGroup(e.target.value)}
                   style={dialogInputStyles}

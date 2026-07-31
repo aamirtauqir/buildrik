@@ -30,7 +30,7 @@ import { StockSourceModal } from "./StockSourceModal";
 import { ReplaceAcrossDialog } from "./ReplaceAcrossDialog";
 import "../MediaTab.css";
 import "./ExpandedMediaPanel.css";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 import { TextField } from "@/editor/chrome-ui";
 
 export interface ExpandedMediaPanelProps {

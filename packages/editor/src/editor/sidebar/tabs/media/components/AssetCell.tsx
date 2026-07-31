@@ -14,7 +14,7 @@ import { Play, FileType, Lock } from "lucide-react";
 import type { DragEvent, MouseEvent } from "react";
 import type { LibraryItem } from "../data/mediaTypes";
 import { UsagePips } from "./UsagePips";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 interface AssetCellProps {
   item: LibraryItem;

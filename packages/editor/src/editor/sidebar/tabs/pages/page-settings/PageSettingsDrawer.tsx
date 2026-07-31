@@ -18,8 +18,7 @@ import { SeoTab } from "./SeoTab";
 import { SocialTab } from "./SocialTab";
 import { AdvancedTab } from "./AdvancedTab";
 import { UnsavedWarningModal } from "./UnsavedWarningModal";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 const TABS: { id: DrawerTab; label: string }[] = [
   { id: "seo", label: "SEO" },
   { id: "social", label: "Social" },

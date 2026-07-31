@@ -9,7 +9,7 @@
 import * as React from "react";
 import { Plus, Image, Layers, FileText, Diamond, Clock, LayoutGrid } from "lucide-react";
 import "./EmptyStates.css";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 interface EmptyStateProps {
   icon: React.ReactNode;

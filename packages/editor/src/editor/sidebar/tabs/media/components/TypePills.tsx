@@ -7,7 +7,7 @@
 
 import * as React from "react";
 import type { MediaTypeFilter, TypeCounts } from "../data/mediaTypes";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 interface TypePillsProps {
   activeType: MediaTypeFilter;

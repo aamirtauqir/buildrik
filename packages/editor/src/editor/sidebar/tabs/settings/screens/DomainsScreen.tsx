@@ -18,7 +18,7 @@ import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
 import { roleAtLeast } from "@/services/RoleService";
 import { Field, Input, Screen, Section } from "../shared";
 import type { ScreenProps } from "../types";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 interface DnsRecordRow {
   id: string;

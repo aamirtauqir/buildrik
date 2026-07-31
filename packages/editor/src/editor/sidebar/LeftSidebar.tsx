@@ -34,8 +34,7 @@ import {
   Rocket,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { Button, Tooltip } from "flowbite-react";
-
+import { Button, Tooltip } from "@/editor/chrome-ui";
 // ============================================
 // Icon map — lucide icon name → component
 // ============================================

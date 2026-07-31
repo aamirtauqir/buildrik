@@ -30,9 +30,7 @@ import type { ComponentsTabProps } from "./component-library/types";
 import { useComponentsState } from "./component-library/useComponentsState";
 import { type ComponentFilter, FILTER_CHIPS } from "./componentsData";
 import "./component-library/ComponentsTab.css";
-import { Button, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
-
+import { Button, TextInput } from "@/editor/chrome-ui";
 export type { ComponentsTabProps };
 
 export const ComponentsTab: React.FC<ComponentsTabProps> = ({
@@ -383,7 +381,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             </ModalClose>
             <div className="bd-modal__body">
               <div className="tw:flex tw:flex-col tw:gap-3">
-                <TextInput theme={BK_TEXT_INPUT_THEME}
+                <TextInput
                   type="text"
                   value={renameInput}
                   onChange={(e) => setRenameInput(e.target.value)}

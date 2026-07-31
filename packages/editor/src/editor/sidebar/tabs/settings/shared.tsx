@@ -20,9 +20,7 @@
 import * as React from "react";
 import { SIDEBAR_WIDE } from "@/shared/constants/layout";
 import "./settings.css";
-import { Button, Select as FlowbiteSelect, Textarea as FlowbiteTextarea, TextInput as FlowbiteTextInput } from "flowbite-react";
-import type { CustomFlowbiteTheme } from "flowbite-react/types";
-
+import { Button, type CustomFlowbiteTheme, Select as FlowbiteSelect, Textarea as FlowbiteTextarea, TextInput as FlowbiteTextInput } from "@/editor/chrome-ui";
 // ─────────────────────────────────────────────────────────────────────────────
 // Section
 // ─────────────────────────────────────────────────────────────────────────────

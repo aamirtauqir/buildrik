@@ -45,8 +45,7 @@ import { PublishHistory } from "@/editor/shell/PublishHistory";
 import { EVENTS } from "@/shared/constants/events";
 import { currentSiteId } from "@/services/ReviewService";
 import "./settings.css";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 // ─── Nav definition ──────────────────────────────────────────────────────────
 //
 // A1 day-1: nav reshuffle to 10 in-tab sections + 8 workspace deep-links,

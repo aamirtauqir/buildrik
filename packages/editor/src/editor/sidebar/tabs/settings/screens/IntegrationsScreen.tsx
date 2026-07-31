@@ -8,8 +8,7 @@ import * as React from "react";
 import { INTEGRATION_CATALOG } from "../constants";
 import { Screen, Section } from "../shared";
 import type { ScreenProps } from "../types";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 const categories = [...new Set(INTEGRATION_CATALOG.map((i) => i.category))];
 
 const cardStyles: React.CSSProperties = {

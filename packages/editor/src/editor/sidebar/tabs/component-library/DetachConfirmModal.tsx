@@ -11,7 +11,7 @@
  */
 import * as React from "react";
 import { ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/chrome-ui";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 export interface DetachConfirmModalProps {
   /** Label for the instance being detached, e.g. "#3". */

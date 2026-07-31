@@ -16,7 +16,7 @@ import type {
   MediaTypeFilter,
 } from "../data/mediaTypes";
 import type { IconConfig } from "../../../../../shared/types/media";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 interface StockSourceModalProps extends DiscoveryViewProps {
   open: boolean;

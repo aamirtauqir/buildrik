@@ -5,11 +5,9 @@
  */
 
 import * as React from "react";
-import { HelperText, Label, Textarea, TextInput } from "flowbite-react";
+import { BK_HELPER_CLASS, BK_LABEL_CLASS, HelperText, Label, Textarea, TextInput } from "@/editor/chrome-ui";
 import type { PageItem } from "../types";
 import type { UsePageSettingsReturn } from "./usePageSettings";
-import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
-import { BK_LABEL_CLASS, BK_HELPER_CLASS } from "@/editor/chrome-ui/labelTheme";
 
 interface Props {
   s: UsePageSettingsReturn;
@@ -44,7 +42,7 @@ export const SocialTab: React.FC<Props> = ({ s, page }) => {
           <Label htmlFor="og-title" className={BK_LABEL_CLASS}>Open Graph Title</Label>
           <span style={{ font: "500 10.5px var(--bk-font-mono)", color: "var(--bk-ink-muted)" }}>{s.ogTitle.length}/60</span>
         </div>
-        <TextInput theme={BK_TEXT_INPUT_THEME}
+        <TextInput
           id="og-title"
           value={s.ogTitle}
           onChange={(e) => s.setOgTitle(e.target.value)}
@@ -69,7 +67,7 @@ export const SocialTab: React.FC<Props> = ({ s, page }) => {
       {/* OG Image URL */}
       <div className="tw:flex tw:flex-col tw:gap-1.5">
         <Label htmlFor="og-image" className={BK_LABEL_CLASS}>Image URL</Label>
-        <TextInput theme={BK_TEXT_INPUT_THEME}
+        <TextInput
           id="og-image"
           value={s.ogImageUrl ?? ""}
           onChange={(e) => s.setOgImageUrl(e.target.value || null)}

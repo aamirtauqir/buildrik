@@ -28,7 +28,7 @@ import "./MediaTab.css";
 import type { LibraryItem } from "./data/mediaTypes";
 import { createAssetVersion } from "../../../../services/MediaVersionService";
 import type { IconConfig } from "@shared/types/media";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 interface MediaTabProps {
   composer: Composer | null;

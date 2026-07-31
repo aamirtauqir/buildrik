@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Folder, FolderRoot } from "lucide-react";
 import type { MediaFolder } from "@shared/types/media";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 interface Props {
   folders: MediaFolder[];

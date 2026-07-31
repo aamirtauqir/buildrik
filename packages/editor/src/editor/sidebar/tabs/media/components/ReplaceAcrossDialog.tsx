@@ -16,7 +16,7 @@
 import * as React from "react";
 import type { Composer } from "../../../../../engine/Composer";
 import type { ReplaceAcrossResult } from "../../../../../engine/media/MediaCommandLayer";
-import { Button, Checkbox } from "flowbite-react";
+import { Button, Checkbox } from "@/editor/chrome-ui";
 
 interface ReplaceAcrossDialogProps {
   composer: Composer;

@@ -9,14 +9,11 @@
  */
 import * as React from "react";
 import { ConfirmDialog } from "@/editor/chrome-ui";
-import { BK_SELECT_BASE_THEME } from "@/editor/chrome-ui/selectTheme";
 import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
 import type { ConditionExpression, ConditionOperator, DataSource } from "@/shared/types/data";
 import { conditionSummary, fieldDefault, isValidVariableKey, type SiteVariable } from "./contentPanelUtils";
 import type { ConditionRow } from "./useContentPanel";
-import { Button, Checkbox, Select, Textarea, ToggleSwitch, TextInput } from "flowbite-react";
-import { BK_TEXT_INPUT_THEME } from "@/editor/chrome-ui/textInputTheme";
-
+import { Button, Checkbox, Select, Textarea, TextInput, ToggleSwitch } from "@/editor/chrome-ui";
 export const S: Record<string, React.CSSProperties> = {
   body: { display: "flex", flexDirection: "column", height: "100%", minHeight: 0 },
   scroll: { flex: 1, minHeight: 0, overflowY: "auto" },
@@ -356,7 +353,7 @@ export function RecordView({
                     aria-label={f.name}
                   />
                 ) : (
-                  <TextInput theme={BK_TEXT_INPUT_THEME}
+                  <TextInput
                     style={S.input}
                     type={f.type === "number" ? "number" : "text"}
                     value={String(data[f.slug] ?? "")}
@@ -447,7 +444,7 @@ export function FieldsView({
         ))}
         {adding ? (
           <div style={S.inlineForm}>
-            <TextInput theme={BK_TEXT_INPUT_THEME}
+            <TextInput
               style={{ ...S.input, margin: 0, width: "auto" }}
               placeholder="Field name"
               value={name}
@@ -456,7 +453,7 @@ export function FieldsView({
               autoFocus
             />
             <div style={S.formRow}>
-              <Select theme={BK_SELECT_BASE_THEME} style={S.select} value={type} onChange={(e) => setType(e.target.value)} aria-label="Field type">
+              <Select style={S.select} value={type} onChange={(e) => setType(e.target.value)} aria-label="Field type">
                 {FIELD_TYPES.map((t) => (
                   <option key={t} value={t}>{t}</option>
                 ))}
@@ -608,7 +605,7 @@ export function VariablesView({
             <span style={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0, flex: 1 }}>
               <span style={S.mono}>{`{{site.${v.key}}}`}</span>
               {editKey === v.key ? (
-                <TextInput theme={BK_TEXT_INPUT_THEME}
+                <TextInput
                   style={{ ...S.input, margin: "4px 0 0", width: "auto" }}
                   value={editValue}
                   onChange={(e) => setEditValue(e.target.value)}
@@ -653,7 +650,7 @@ export function VariablesView({
         ))}
         {adding ? (
           <div style={S.inlineForm}>
-            <TextInput theme={BK_TEXT_INPUT_THEME}
+            <TextInput
               style={{ ...S.input, margin: 0, width: "auto" }}
               placeholder="key (e.g. phone)"
               value={key}
@@ -666,7 +663,7 @@ export function VariablesView({
                 {dupError ? "A variable with this key already exists." : "Keys are letters/digits/dashes, starting with a letter."}
               </div>
             )}
-            <TextInput theme={BK_TEXT_INPUT_THEME}
+            <TextInput
               style={{ ...S.input, margin: 0, width: "auto" }}
               placeholder="value"
               value={value}
@@ -756,7 +753,7 @@ export function ConditionsView({
         {pickedElementId ? (
           <div style={S.inlineForm} data-testid="condition-form">
             <div style={{ fontSize: 12, color: "var(--bk-ink-muted)" }}>Show the picked element when…</div>
-            <TextInput theme={BK_TEXT_INPUT_THEME}
+            <TextInput
               style={{ ...S.input, margin: 0, width: "auto" }}
               placeholder="site.hours or menu.available"
               value={left}
@@ -766,7 +763,6 @@ export function ConditionsView({
             />
             <div style={S.formRow}>
               <Select
-                theme={BK_SELECT_BASE_THEME}
                 style={S.select}
                 value={operator}
                 onChange={(e) => setOperator(e.target.value as ConditionOperator)}
@@ -777,7 +773,7 @@ export function ConditionsView({
                 ))}
               </Select>
               {needsRight && (
-                <TextInput theme={BK_TEXT_INPUT_THEME}
+                <TextInput
                   style={{ ...S.input, margin: 0, width: "auto", flex: 1 }}
                   placeholder="value"
                   value={right}

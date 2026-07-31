@@ -13,8 +13,7 @@ import { createBuildrikApiClient } from "@/services/api-client";
 import { Field, Input, Screen, Section, Select, Textarea } from "../shared";
 import type { ScreenProps } from "../types";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
-import { Button } from "flowbite-react";
-
+import { Button } from "@/editor/chrome-ui";
 let _client: ReturnType<typeof createBuildrikApiClient> | null = null;
 function getClient() {
   if (!_client) _client = createBuildrikApiClient(DASHBOARD_URL);

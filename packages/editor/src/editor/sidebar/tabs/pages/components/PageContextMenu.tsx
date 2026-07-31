@@ -13,7 +13,7 @@ import * as React from "react";
 import { Kbd } from "@/editor/chrome-ui";
 import { createPortal } from "react-dom";
 import type { PageItem } from "../types";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 interface Props {
   pageId: string;

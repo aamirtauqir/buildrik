@@ -9,7 +9,7 @@
 
 import * as React from "react";
 import { captureError } from "../../../../../shared/utils/errorTracking";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 interface Props {
   children: React.ReactNode;

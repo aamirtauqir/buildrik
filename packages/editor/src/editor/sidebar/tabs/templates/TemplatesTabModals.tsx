@@ -7,8 +7,7 @@
 import * as React from "react";
 import { createPortal } from "react-dom";
 import type { TemplateItem } from "./templatesData";
-import { Button, Checkbox } from "flowbite-react";
-
+import { Button, Checkbox } from "@/editor/chrome-ui";
 // ============================================================================
 // Replace Modal — matches .pen Screen 7 "State/Confirm"
 // ============================================================================

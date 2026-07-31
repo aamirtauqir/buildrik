@@ -15,7 +15,7 @@
 import * as React from "react";
 import { ChevronRight } from "lucide-react";
 import type { MediaFolder } from "@shared/types/media";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 export interface FolderBreadcrumbProps {
   folders: MediaFolder[];

@@ -14,7 +14,7 @@ import { createBuildrikApiClient } from "@/services/api-client";
 import { Field, Screen, Section, Select } from "../shared";
 import type { ScreenProps } from "../types";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 interface FormBlockRow {
   id: string;

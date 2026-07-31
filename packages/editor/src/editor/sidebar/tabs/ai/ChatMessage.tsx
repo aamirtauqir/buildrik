@@ -1,7 +1,7 @@
 import * as React from "react";
 import type { ChatMessage as ChatMessageType, DiffEdit } from "./types";
 import { DiffRows } from "./DiffRows";
-import { Button } from "flowbite-react";
+import { Button } from "@/editor/chrome-ui";
 
 export interface ChatMessageProps {
   message: ChatMessageType;
