@@ -2528,3 +2528,34 @@ explicitly scoped out.
 
 Also still open: **Drawer** parity-check verdict is now recorded (KEEP,
 see above) — nothing left gating it.
+
+## Correction — MenuItem destructive colour (controller ruling, Task 6 Group B session)
+
+Task 6 batch-2's own report (`task-6-report.md`, "Genuinely new findings
+this batch" #3) claimed: *"Traced the original CSS's real cascade order
+(`:focus-visible` before `--destructive` in source, so destructive's red
+wins over the focus accent-blue)."* **This is wrong** — the two rules
+don't have equal specificity, so source order never mattered:
+
+```css
+.bk-menu-item:focus-visible   { color: var(--bk-accent-text); }  /* (0,2,0) — a class + a pseudo-class */
+.bk-menu-item--destructive    { color: var(--bk-error-text); }   /* (0,1,0) — one class */
+```
+
+(Original rules confirmed via `git log -p -- packages/editor/src/editor/ui/ui.css`,
+commit `049bcb2f`.) `:focus-visible` is HIGHER specificity (0,2,0 vs
+0,1,0), so it would have won regardless of which rule was declared
+later — meaning the ORIGINAL `.bk-menu-item` design, tabbing to a
+destructive item (e.g. "Delete"), actually flashed the accent-BLUE
+focus color, not red. A keyboard user reaching the most dangerous item
+in the menu momentarily lost its red warning.
+
+The shipped `chrome-ui/Popover.tsx` behavior — danger items supply their
+own `focus-visible:text-red-700` so destructive-red wins on keyboard
+focus too — is therefore a **deliberate, controller-approved deviation**
+from the original CSS's actual (undesirable) cascade outcome, not a
+fidelity reproduction of it. Nothing depended on the blue flash; keeping
+destructive items visibly red under keyboard focus is the correct call.
+Recorded here since the inventory doc is the authoritative source later
+tasks read from — task-6-report.md's batch-2 section text is corrected
+in place alongside this entry.
