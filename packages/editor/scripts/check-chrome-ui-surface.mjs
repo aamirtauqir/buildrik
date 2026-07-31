@@ -5,13 +5,15 @@
  *
  * Three checks:
  *
- *  1. NO_DIRECT_IMPORT (WARN MODE — see banner below) — no specifier matching
- *     `^flowbite-react(/.*)?$` anywhere under packages/editor/src outside
- *     chrome-ui/, subpaths and `import("flowbite-react")` included. 249
- *     pre-existing violations are grandfathered until the B3 sweep task
- *     re-points them — this check currently only REPORTS the count, it does
- *     not fail the build. Flip `MODE` below to `"error"` in the B3 dispatch's
- *     final commit, once the count reaches 0.
+ *  1. NO_DIRECT_IMPORT (ERROR MODE — B3 sweep complete) — no specifier
+ *     matching `^flowbite-react(/.*)?$` anywhere under packages/editor/src
+ *     outside chrome-ui/, subpaths and `import("flowbite-react")` included.
+ *     The 249 pre-existing violations recorded when this gate first shipped
+ *     (WARN mode) were all re-pointed onto @/editor/chrome-ui across the B3
+ *     sweep's 6 surface-sized commits (inspector, sidebar, shell,
+ *     design-system+shared/forms+templates, canvas+media+export+panels,
+ *     ecommerce+animation+rail+components-catalog+onboarding). Count is 0;
+ *     this check now fails the build on any regression.
  *
  *  2. BARREL_PURITY (error, from day one) — every line in chrome-ui/index.ts
  *     that references a `flowbite-react` specifier must be
@@ -58,7 +60,9 @@ import { fileURLToPath } from "node:url";
 // "error" — check 1 fails the build if the count is not exactly 0.
 // Checks 2 and 3 are ALWAYS enforced as errors, in both modes — there is no
 // pre-existing backlog for them to grandfather.
-const MODE = "warn";
+// Flipped to "error" at the end of the B3 sweep (count reached 0 — see the
+// commit history for the 6 surface-sized commits that drained it).
+const MODE = "error";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const EDITOR_ROOT = resolve(HERE, "..");
