@@ -289,55 +289,113 @@ describe("Billing Service", () => {
     });
   });
 
+  /**
+   * These cases exist because the previous versions of them passed while the
+   * feature was completely broken. They mocked `getStripe` and then asserted
+   * `prisma.subscription.update`'s own mocked return value — a tautology that
+   * stayed green for as long as cancelSubscription never called Stripe at all.
+   * The assertions below are the ones that would have caught it: that Stripe is
+   * called with the right arguments, and that the local row is NOT written when
+   * Stripe rejects.
+   */
   describe("cancelSubscription", () => {
-    it("sets cancelAtPeriodEnd to true", async () => {
-      const { cancelSubscription } = await import(
-        "@/server/services/billing.service"
-      );
+    function stripeMock(update: ReturnType<typeof vi.fn>) {
+      vi.mocked(getStripe).mockReturnValue({ subscriptions: { update } } as any);
+    }
+
+    it("tells Stripe to cancel at period end, with the mapped feedback reason", async () => {
+      const { cancelSubscription } = await import("@/server/services/billing.service");
+      const update = vi.fn().mockResolvedValue({ cancel_at_period_end: true });
+      stripeMock(update);
       vi.mocked(prisma.subscription.findUnique).mockResolvedValue({
-        id: "sub1",
-        plan: "PRO",
-        cancelAtPeriodEnd: false,
+        id: "sub1", plan: "PRO", cancelAtPeriodEnd: false, stripeSubscriptionId: "sub_live_1",
       } as any);
-      vi.mocked(prisma.subscription.update).mockResolvedValue({
-        id: "sub1",
-        cancelAtPeriodEnd: true,
-      } as any);
-      const result = await cancelSubscription("ws1", {
-        reason: "TOO_EXPENSIVE",
-      });
-      expect(result.cancelAtPeriodEnd).toBe(true);
+      vi.mocked(prisma.subscription.update).mockResolvedValue({ id: "sub1", cancelAtPeriodEnd: true } as any);
+
+      await cancelSubscription("ws1", { reason: "TOO_EXPENSIVE", feedback: "too pricey" });
+
+      expect(update).toHaveBeenCalledWith(
+        "sub_live_1",
+        expect.objectContaining({
+          cancel_at_period_end: true,
+          cancellation_details: { feedback: "too_expensive", comment: "too pricey" },
+        }),
+        expect.objectContaining({ idempotencyKey: expect.stringContaining("sub_live_1") }),
+      );
     });
 
-    it("throws if already cancelled", async () => {
-      const { cancelSubscription } = await import(
-        "@/server/services/billing.service"
-      );
+    it("does NOT write the local row when Stripe rejects", async () => {
+      const { cancelSubscription } = await import("@/server/services/billing.service");
+      const update = vi.fn().mockRejectedValue(new Error("Stripe is down"));
+      stripeMock(update);
       vi.mocked(prisma.subscription.findUnique).mockResolvedValue({
-        id: "sub1",
-        cancelAtPeriodEnd: true,
+        id: "sub1", cancelAtPeriodEnd: false, stripeSubscriptionId: "sub_live_1",
       } as any);
-      await expect(
-        cancelSubscription("ws1", { reason: "NOT_USING" }),
-      ).rejects.toThrow("ALREADY_CANCELLED");
+
+      await expect(cancelSubscription("ws1", { reason: "NOT_USING" })).rejects.toThrow();
+      expect(prisma.subscription.update).not.toHaveBeenCalled();
+    });
+
+    it("surfaces a grandfathered/bogus Stripe id as GRANDFATHERED_NO_PORTAL, not a 500", async () => {
+      const { cancelSubscription } = await import("@/server/services/billing.service");
+      const update = vi.fn().mockRejectedValue(Object.assign(new Error("No such subscription"), { code: "resource_missing" }));
+      stripeMock(update);
+      vi.mocked(prisma.subscription.findUnique).mockResolvedValue({
+        id: "sub1", cancelAtPeriodEnd: false, stripeSubscriptionId: "legacy_placeholder",
+      } as any);
+
+      await expect(cancelSubscription("ws1", { reason: "OTHER" })).rejects.toThrow("GRANDFATHERED_NO_PORTAL");
+      expect(prisma.subscription.update).not.toHaveBeenCalled();
+    });
+
+    it("is idempotent when Stripe already reads cancelled (the user's intent already holds)", async () => {
+      const { cancelSubscription } = await import("@/server/services/billing.service");
+      const update = vi.fn().mockResolvedValue({ cancel_at_period_end: true });
+      stripeMock(update);
+      vi.mocked(prisma.subscription.findUnique).mockResolvedValue({
+        id: "sub1", cancelAtPeriodEnd: true, stripeSubscriptionId: "sub_live_1",
+      } as any);
+      vi.mocked(prisma.subscription.update).mockResolvedValue({ id: "sub1", cancelAtPeriodEnd: true } as any);
+
+      const result = await cancelSubscription("ws1", { reason: "NOT_USING" });
+      expect(result.cancelAtPeriodEnd).toBe(true);
     });
   });
 
   describe("reactivateSubscription", () => {
-    it("sets cancelAtPeriodEnd to false", async () => {
-      const { reactivateSubscription } = await import(
-        "@/server/services/billing.service"
-      );
+    it("tells Stripe to clear cancel_at_period_end and mirrors the response", async () => {
+      const { reactivateSubscription } = await import("@/server/services/billing.service");
+      const update = vi.fn().mockResolvedValue({ cancel_at_period_end: false });
+      vi.mocked(getStripe).mockReturnValue({ subscriptions: { update } } as any);
       vi.mocked(prisma.subscription.findUnique).mockResolvedValue({
-        id: "sub1",
-        cancelAtPeriodEnd: true,
+        id: "sub1", cancelAtPeriodEnd: true, stripeSubscriptionId: "sub_live_1",
       } as any);
-      vi.mocked(prisma.subscription.update).mockResolvedValue({
-        id: "sub1",
-        cancelAtPeriodEnd: false,
-      } as any);
+      vi.mocked(prisma.subscription.update).mockResolvedValue({ id: "sub1", cancelAtPeriodEnd: false } as any);
+
       const result = await reactivateSubscription("ws1");
+
+      expect(update).toHaveBeenCalledWith(
+        "sub_live_1",
+        expect.objectContaining({ cancel_at_period_end: false }),
+        expect.anything(),
+      );
+      // cancel_at must NOT be sent — on this API version it is a separate
+      // mechanism and mixing them produces a cancel that never clears.
+      expect(update.mock.calls[0][1]).not.toHaveProperty("cancel_at");
       expect(result.cancelAtPeriodEnd).toBe(false);
+    });
+
+    it("does NOT write the local row when Stripe rejects", async () => {
+      const { reactivateSubscription } = await import("@/server/services/billing.service");
+      vi.mocked(getStripe).mockReturnValue({
+        subscriptions: { update: vi.fn().mockRejectedValue(new Error("Stripe is down")) },
+      } as any);
+      vi.mocked(prisma.subscription.findUnique).mockResolvedValue({
+        id: "sub1", cancelAtPeriodEnd: true, stripeSubscriptionId: "sub_live_1",
+      } as any);
+
+      await expect(reactivateSubscription("ws1")).rejects.toThrow();
+      expect(prisma.subscription.update).not.toHaveBeenCalled();
     });
   });
 });
