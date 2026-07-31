@@ -37,15 +37,18 @@ const LOCK_ICON = (
 );
 
 export function NotificationPrefs() {
+  // Overlay stored rows onto the full default list — never replace it. Rows are
+  // created one at a time (upsert per toggle), so replacing meant the first
+  // toggle left exactly ONE category on screen and the other seven became
+  // unreachable for good.
   const { data: prefs, isLoading, isError, refetch } = trpc.account.notifications.list.useQuery(undefined, {
-    select: (data) =>
-      data.length > 0
-        ? data.map((d) => ({
-            category: d.category as Category,
-            inApp: d.inApp,
-            email: d.email as EmailFrequency,
-          }))
-        : DEFAULT_PREFS,
+    select: (data) => {
+      const stored = new Map(data.map((d) => [d.category, d]));
+      return DEFAULT_PREFS.map((def) => {
+        const row = stored.get(def.category);
+        return row ? { category: def.category, inApp: row.inApp, email: row.email as EmailFrequency } : def;
+      });
+    },
   });
 
   const utils = trpc.useUtils();
