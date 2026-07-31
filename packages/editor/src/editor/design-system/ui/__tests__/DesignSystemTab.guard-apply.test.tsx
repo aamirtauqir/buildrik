@@ -23,7 +23,7 @@ import { DesignSystemTab } from "../DesignSystemTab";
 import { TokenRegistryProvider } from "../../state/TokenRegistryContext";
 import { StylePresetRegistryProvider, useButtonPresets } from "../../state/StylePresetRegistryContext";
 import { DSModeProvider } from "../../state/DSModeContext";
-import { ToastProvider } from "@/editor/ui";
+import { ToastProvider } from "@/editor/chrome-ui";
 import { CURRENT_SCHEMA_VERSION } from "../../migrations";
 
 type ComposerProp = NonNullable<Parameters<typeof DesignSystemTab>[0]["composer"]>;

@@ -6,12 +6,12 @@
  */
 
 import * as React from "react";
-import { PanelHeader } from "@/editor/ui";
+import { PanelHeader } from "@/editor/chrome-ui";
 import { PanelErrorState } from "../../../editor/sidebar/shared/PanelErrorState";
 import type { Composer } from "../../../engine/Composer";
 import { EVENTS } from "../../../shared/constants/events";
 import type { DesignTokenRecord } from "../../../shared/types/project";
-import { useToast } from "@/editor/ui";
+import { useToast } from "@/editor/chrome-ui";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { DEFAULT_TOKENS } from "../constants";
 import {

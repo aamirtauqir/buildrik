@@ -18,7 +18,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { ModalContent, ModalDescription, ModalFooter, ModalRoot, ModalTitle } from "@/editor/ui";
+import { ModalContent, ModalDescription, ModalFooter, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
 import { STARTER_DS_REGISTRY, type StarterDS } from "../starters";
 import { Button } from "flowbite-react";
 

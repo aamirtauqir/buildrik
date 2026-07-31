@@ -20,7 +20,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { ModalContent, ModalDescription, ModalFooter, ModalRoot, ModalTitle } from "@/editor/ui";
+import { ModalContent, ModalDescription, ModalFooter, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
 import type {
   AIAssistService,
   ComponentSchema,

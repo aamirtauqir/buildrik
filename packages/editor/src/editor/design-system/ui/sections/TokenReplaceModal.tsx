@@ -21,7 +21,7 @@ import {
   ModalTitle,
   ModalDescription,
   ModalFooter,
-} from "@/editor/ui";
+} from "@/editor/chrome-ui";
 import type { DesignToken } from "../../types";
 import { Button } from "flowbite-react";
 

@@ -8,7 +8,7 @@
  */
 
 import * as React from "react";
-import { Slider } from "@/editor/ui";
+import { Slider } from "@/editor/chrome-ui";
 import { BK_LABEL_CLASS } from "@/editor/chrome-ui/labelTheme";
 import { Label } from "flowbite-react";
 

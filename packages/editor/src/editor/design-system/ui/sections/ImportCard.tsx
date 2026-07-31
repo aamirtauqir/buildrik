@@ -23,7 +23,7 @@
  */
 
 import * as React from "react";
-import { useToast } from "@/editor/ui";
+import { useToast } from "@/editor/chrome-ui";
 import { parseImportJSON, diffTokens, type DiffResult } from "../../utils/importUtils";
 import { useImportTokens } from "../../state/useImportTokens";
 import {
