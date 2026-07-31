@@ -13,7 +13,7 @@
  */
 
 import * as React from "react";
-import { ConfirmDialog, EmptyState, EmptyStateActions, EmptyStateDesc, EmptyStateTitle, PanelFrame } from "@/editor/ui";
+import { ConfirmDialog, EmptyState, EmptyStateActions, EmptyStateDesc, EmptyStateTitle, PanelFrame } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import { PageCommandPalette } from "./components/PageCommandPalette";
 import { PageContextMenu } from "./components/PageContextMenu";

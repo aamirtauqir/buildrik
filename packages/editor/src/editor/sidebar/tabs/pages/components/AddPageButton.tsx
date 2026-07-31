@@ -1,4 +1,4 @@
-import { IconButton, Menu, MenuItem, POPOVER_BASE_CLASS } from "@/editor/ui";
+import { IconButton, Menu, MenuItem, POPOVER_BASE_CLASS } from "@/editor/chrome-ui";
 /**
  * AddPageButton — sticky cobalt CTA in pages footer.
  * Overflow (⋮) menu reveals secondary actions: "From template" + "New folder".

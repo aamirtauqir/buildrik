@@ -13,7 +13,7 @@
  */
 
 import * as React from "react";
-import { Kbd } from "@/editor/ui";
+import { Kbd } from "@/editor/chrome-ui";
 import { TextField } from "@/editor/chrome-ui";
 import type { PageItem } from "../types";
 import { getStatusLabel } from "../utils/statusLabel";

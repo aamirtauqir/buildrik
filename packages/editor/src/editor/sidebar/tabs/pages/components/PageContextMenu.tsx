@@ -10,7 +10,7 @@
  */
 
 import * as React from "react";
-import { Kbd } from "@/editor/ui";
+import { Kbd } from "@/editor/chrome-ui";
 import { createPortal } from "react-dom";
 import type { PageItem } from "../types";
 import { Button } from "flowbite-react";

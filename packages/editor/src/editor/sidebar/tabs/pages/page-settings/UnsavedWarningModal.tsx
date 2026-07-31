@@ -12,7 +12,7 @@
  */
 
 import * as React from "react";
-import { ModalContent as VibcoderModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/ui";
+import { ModalContent as VibcoderModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/chrome-ui";
 import { ROW_MD } from "@shared/constants/layout";
 import { Button } from "flowbite-react";
 

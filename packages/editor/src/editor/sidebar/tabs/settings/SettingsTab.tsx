@@ -11,7 +11,7 @@
  */
 
 import * as React from "react";
-import { ConfirmDialog, PanelFrame } from "@/editor/ui";
+import { ConfirmDialog, PanelFrame } from "@/editor/chrome-ui";
 import { usePanelNavigation } from "../../shared/usePanelNavigation";
 import { DrillInHeader } from "../../shared/DrillInHeader";
 import {

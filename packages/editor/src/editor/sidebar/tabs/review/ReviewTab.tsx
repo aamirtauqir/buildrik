@@ -18,7 +18,7 @@
 
 import * as React from "react";
 import { AlertCircle, CheckCircle2, ChevronLeft, History } from "lucide-react";
-import { ConfirmDialog, PanelHeader, Spinner } from "@/editor/ui";
+import { ConfirmDialog, PanelHeader, Spinner } from "@/editor/chrome-ui";
 import { ApprovedCompareView } from "@/editor/panels/version-history/ApprovedCompareView";
 import type { PublishPage } from "@/editor/shell/exportPublishPages";
 import {

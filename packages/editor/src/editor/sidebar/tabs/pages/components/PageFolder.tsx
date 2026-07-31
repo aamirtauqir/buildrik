@@ -13,7 +13,7 @@
  */
 
 import * as React from "react";
-import { IconButton } from "@/editor/ui";
+import { IconButton } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../../engine";
 import type { FolderItem, PageItem } from "../types";
 import { PageRow } from "./PageRow";

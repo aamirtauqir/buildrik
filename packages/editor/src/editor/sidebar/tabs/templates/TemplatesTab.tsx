@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { PanelFrame, useToast } from "@/editor/ui";
+import { PanelFrame, useToast } from "@/editor/chrome-ui";
 import { Search, X } from "lucide-react";
 import type { Composer } from "../../../../engine";
 import { DrillInHeader } from "../../shared/DrillInHeader";
