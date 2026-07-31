@@ -231,8 +231,11 @@ export async function startPublish(
   // runVercelDeploy and throws — but only after the job has queued, shown a
   // progress bar, and marked the site PUBLISHING. Checking here means the user
   // sees "connect Vercel" instead of a build that pretends to run and then dies.
-  // Dev keeps its no-credentials loop: runSimulation covers it there.
-  if (process.env.NODE_ENV !== "development") {
+  // Skipped only when simulation is explicitly opted into. Keying this on
+  // NODE_ENV meant dev silently exercised a different publish path than
+  // production, which is how the dashboard's no-payload publish stayed
+  // invisible locally while failing every time in prod.
+  if (process.env.PUBLISH_ALLOW_SIMULATION !== "true") {
     const vercel = await getActiveVercelConnection(site.workspaceId);
     if (!vercel) throw new Error("VERCEL_NOT_CONNECTED");
   }
@@ -504,10 +507,11 @@ export async function runVercelDeploy(
 ): Promise<{ url: string; deploymentId: string } | null> {
   const conn = await getActiveVercelConnection(workspaceId);
   if (!conn) {
-    // Dev returns null so the worker can fall through to runSimulation
-    // (preserves no-credentials dev loop). Prod throws so the editor toast
-    // can surface a reconnect link (Task 14 wires the toast).
-    if (process.env.NODE_ENV === "development") return null;
+    // Returns null ONLY when simulation is explicitly opted into, so the worker
+    // can fall through to runSimulation for a no-credentials local loop.
+    // Otherwise throw, so the editor toast can surface a reconnect link. Was
+    // keyed on NODE_ENV, which made dev and prod take different publish paths.
+    if (process.env.PUBLISH_ALLOW_SIMULATION === "true") return null;
     throw new Error("VERCEL_NOT_CONNECTED");
   }
 

@@ -120,12 +120,28 @@ describe("publish.service Vercel connection gating", () => {
     ).rejects.toThrow("VERCEL_NOT_CONNECTED");
   });
 
-  it("falls through to simulation in development when no active connection", async () => {
+  /**
+   * Simulation is opt-in via PUBLISH_ALLOW_SIMULATION, NOT inferred from
+   * NODE_ENV. Keying it on NODE_ENV meant dev and production ran different
+   * publish paths, which is why the dashboard's no-payload publish looked fine
+   * locally for months while failing every time in production.
+   */
+  it("does NOT fall through to simulation in development — NODE_ENV grants no free pass", async () => {
     vi.stubEnv("NODE_ENV", "development");
     getConnMock.mockResolvedValueOnce(null);
 
-    // runVercelDeploy returns null in dev/no-connection so caller can fall to sim
-    const result = await runVercelDeploy("ws_1", "buildrik-site-test",[]);
+    await expect(
+      runVercelDeploy("ws_1", "buildrik-site-test", []),
+    ).rejects.toThrow("VERCEL_NOT_CONNECTED");
+  });
+
+  it("falls through to simulation only when PUBLISH_ALLOW_SIMULATION is explicitly set", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("PUBLISH_ALLOW_SIMULATION", "true");
+    getConnMock.mockResolvedValueOnce(null);
+
+    // Returns null so the worker can fall through to runSimulation.
+    const result = await runVercelDeploy("ws_1", "buildrik-site-test", []);
     expect(result).toBeNull();
   });
 

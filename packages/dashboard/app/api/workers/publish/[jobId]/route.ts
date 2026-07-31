@@ -84,11 +84,19 @@ export async function POST(
   );
 
   try {
-    // Honesty guard: in production, a job with no page payload cannot really
-    // deploy — falling through to runSimulation would mark it COMPLETED and the
-    // user would believe a non-existent site went live. Fail loudly instead.
-    // (Dev keeps the simulation path so local flows work without Vercel.)
-    if (pages.length === 0 && process.env.NODE_ENV === "production") {
+    // Honesty guard: a job with no page payload cannot really deploy. Falling
+    // through to runSimulation marks it COMPLETED and tells the user a
+    // non-existent site went live, with a `.dev-simulated.invalid` URL stored
+    // as `publishedUrl`.
+    //
+    // This used to be keyed on NODE_ENV, which is exactly why the dashboard's
+    // Publish button shipped broken and stayed broken: it sends no pages
+    // (only the editor does), so in production every dashboard publish failed
+    // here — while locally the same click produced a green "Published" state
+    // and nobody could see the bug. Simulation is now opt-in via an explicit
+    // flag, so no environment can silently fake a successful deploy.
+    const simulationAllowed = process.env.PUBLISH_ALLOW_SIMULATION === "true";
+    if (pages.length === 0 && !simulationAllowed) {
       throw new Error(
         "No page content to deploy. Open the site in the editor and publish from there.",
       );
