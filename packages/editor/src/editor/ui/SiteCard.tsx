@@ -4,7 +4,7 @@
  * @license BSD-3-Clause
  */
 import React from "react";
-import { StatusDot, type StatusDotState } from "./StatusDot";
+import { StatusDot, type StatusDotState } from "../chrome-ui/StatusDot";
 
 export interface SiteCardProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   name: string;

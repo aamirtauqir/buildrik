@@ -5,7 +5,7 @@
  */
 import React from "react";
 import { Row, type RowProps } from "./Row";
-import { StatusDot } from "./StatusDot";
+import { StatusDot } from "../chrome-ui/StatusDot";
 
 export interface RecordRowProps extends Omit<RowProps, "children" | "size"> {
   label: string;

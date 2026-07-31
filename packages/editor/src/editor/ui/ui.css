@@ -8,14 +8,6 @@
  * @license BSD-3-Clause
  */
 
-/* ── Status dot · Figma 10:27 · State ───────────────────────────────────── */
-.bk-dot { width: var(--bk-space-8); height: var(--bk-space-8); border-radius: var(--bk-radius-full); flex: none; display: inline-block; }
-.bk-dot--live    { background: var(--bk-success); }
-.bk-dot--review  { background: var(--bk-warning); }
-.bk-dot--changes { background: var(--bk-accent); }
-.bk-dot--draft   { background: var(--bk-border-strong); }
-.bk-dot--failed  { background: var(--bk-error); }
-
 /* ═══ MOLECULES ═════════════════════════════════════════════════════════════ */
 
 /* ── Row · Figma 8:47 · Size × State · base for every row below ─────────── */

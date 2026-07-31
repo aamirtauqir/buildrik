@@ -9,7 +9,7 @@
  */
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { Slider, StatusDot } from "../index";
+import { Slider } from "../index";
 import { Avatar, Checkbox, Radio, Select, TextInput, ToggleSwitch } from "flowbite-react";
 import { avatarInitials, AVATAR_TONE_THEME, type AvatarTone } from "../avatarTone";
 import { BK_SELECT_BASE_THEME } from "../selectTheme";
@@ -110,18 +110,6 @@ describe("Radio", () => {
   it("renders as a radio input", () => {
     render(<Radio name="g" aria-label="Static HTML" />);
     expect(screen.getByRole("radio", { name: "Static HTML" })).toBeTruthy();
-  });
-});
-
-describe("StatusDot", () => {
-  it("never leans on colour alone", () => {
-    render(<StatusDot state="failed" />);
-    expect(screen.getByRole("img", { name: "Failed" })).toBeTruthy();
-  });
-
-  it("accepts a caller label", () => {
-    render(<StatusDot state="live" label="Published 2m ago" />);
-    expect(screen.getByRole("img", { name: "Published 2m ago" })).toBeTruthy();
   });
 });
 

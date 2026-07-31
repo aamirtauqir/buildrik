@@ -10,7 +10,8 @@
 
 /* ── Atoms ──────────────────────────────────────────────────────────────── */
 export { Slider, type SliderProps } from "./Slider";
-export { StatusDot, type StatusDotProps, type StatusDotState } from "./StatusDot";
+/* ── Moved to chrome-ui (Task 6, flowbite big-bang) — bridge dies at Task 14 ─ */
+export { StatusDot, type StatusDotProps, type StatusDotState } from "../chrome-ui/StatusDot";
 
 /* ── Molecules ──────────────────────────────────────────────────────────── */
 export { Row, type RowProps, type RowSize } from "./Row";

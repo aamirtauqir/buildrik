@@ -6,7 +6,7 @@
 import React from "react";
 import { Row, type RowProps } from "./Row";
 import { Badge } from "flowbite-react";
-import { StatusDot, type StatusDotState } from "./StatusDot";
+import { StatusDot, type StatusDotState } from "../chrome-ui/StatusDot";
 
 export interface VersionRowProps extends Omit<RowProps, "children" | "size"> {
   title: string;
