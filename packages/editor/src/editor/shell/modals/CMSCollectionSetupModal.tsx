@@ -11,7 +11,7 @@
 
 import { X, Plus, Trash2, Check } from "lucide-react";
 import * as React from "react";
-import { ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal, Stack } from "@/editor/ui";
+import { ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal } from "@/editor/ui";
 import { BK_SELECT_BASE_THEME } from "@/editor/ui/selectTheme";
 import type { Composer } from "../../../engine";
 import { Button, Select, Textarea, TextInput } from "flowbite-react";
@@ -409,7 +409,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
         </div>
       </div>
       {step === 1 && (
-        <Stack gap="lg">
+        <div className="tw:flex tw:flex-col tw:gap-4">
           {/* Collection name */}
           <div>
             <label style={s.label}>
@@ -468,7 +468,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
               }}
             />
           </div>
-        </Stack>
+        </div>
       )}
       {step === 2 && (
         <div>

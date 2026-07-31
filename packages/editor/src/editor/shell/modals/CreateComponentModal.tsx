@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal, Stack } from "@/editor/ui";
+import { ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal } from "@/editor/ui";
 import type { Composer } from "../../../engine";
 import { useToast } from "@/editor/ui";
 import { Button, Checkbox, Textarea, TextInput } from "flowbite-react";
@@ -136,7 +136,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
             </svg>
           </ModalClose>
           <div className="bd-modal__body">
-      <Stack gap="lg" onKeyDown={handleKeyPress}>
+      <div className="tw:flex tw:flex-col tw:gap-4" onKeyDown={handleKeyPress}>
         <div>
           <label style={labelStyles}>
             Name <span style={{ color: "var(--bk-accent)" }}>*</span>
@@ -243,7 +243,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
             Lift matching values into token / preset bindings on save. Recommended.
           </small>
         </div>
-      </Stack>
+      </div>
           </div>
           <ModalFooter>
             <Button color="light" onClick={onClose} disabled={isCreating} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">

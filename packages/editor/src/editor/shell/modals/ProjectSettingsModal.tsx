@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal, Stack } from "@/editor/ui";
+import { ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal } from "@/editor/ui";
 import type { Composer } from "../../../engine";
 import { useToast } from "@/editor/ui";
 import { devError } from "../../../shared/utils/devLogger";
@@ -122,7 +122,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
         {/* Tab Content */}
         <div style={contentStyles}>
           {activeTab === "general" && (
-            <Stack gap="md">
+            <div className="tw:flex tw:flex-col tw:gap-3">
               <label style={labelStyles}>Project name</label>
               <TextInput theme={BK_TEXT_INPUT_THEME}
                 type="text"
@@ -140,11 +140,11 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
                 style={inputStyles}
                 placeholder="John Doe"
               />
-            </Stack>
+            </div>
           )}
 
           {activeTab === "canvas" && (
-            <Stack gap="md">
+            <div className="tw:flex tw:flex-col tw:gap-3">
               <label style={labelStyles}>Grid size (px)</label>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <TextInput theme={BK_TEXT_INPUT_THEME}
@@ -171,11 +171,11 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
                   <span>Snap to grid</span>
                 </label>
               </div>
-            </Stack>
+            </div>
           )}
 
           {activeTab === "seo" && (
-            <Stack gap="md">
+            <div className="tw:flex tw:flex-col tw:gap-3">
               <label style={labelStyles}>Site name (SEO default)</label>
               <TextInput theme={BK_TEXT_INPUT_THEME}
                 type="text"
@@ -188,7 +188,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
                 This will be used as the default title for your site if not overridden on individual
                 pages.
               </small>
-            </Stack>
+            </div>
           )}
         </div>
       </div>

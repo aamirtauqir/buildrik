@@ -23,7 +23,6 @@ import {
   ModalRoot,
   ModalTitle,
   Portal,
-  Stack,
 } from "@/editor/ui";
 import { BK_SELECT_BASE_THEME } from "@/editor/ui/selectTheme";
 import {
@@ -114,8 +113,8 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
             </svg>
           </ModalClose>
           <div className="bd-modal__body">
-            <Stack gap="md">
-              <Stack gap="xs">
+            <div className="tw:flex tw:flex-col tw:gap-3">
+              <div className="tw:flex tw:flex-col tw:gap-1">
                 <label htmlFor="create-component-name" style={labelStyle}>
                   Name
                 </label>
@@ -132,9 +131,9 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
                   autoFocus
                   style={dialogInputStyles}
                 />
-              </Stack>
+              </div>
 
-              <Stack gap="xs">
+              <div className="tw:flex tw:flex-col tw:gap-1">
                 <label htmlFor="create-component-group" style={labelStyle}>
                   Group
                 </label>
@@ -147,7 +146,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
                 >
                   <option value="">Your symbols</option>
                 </Select>
-              </Stack>
+              </div>
 
               {selectionContext && (
                 <div style={bindingsCardStyle}>
@@ -168,7 +167,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
                   </p>
                 </div>
               )}
-            </Stack>
+            </div>
           </div>
           <div className="bd-modal__foot">
             <Button onClick={onClose} style={dialogCancelBtnStyles}>

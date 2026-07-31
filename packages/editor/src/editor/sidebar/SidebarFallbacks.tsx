@@ -6,17 +6,16 @@
  */
 
 import * as React from "react";
-import { Stack } from "@/editor/ui";
 import { SkeletonListItem } from "@/editor/chrome-ui";
 import { Button } from "flowbite-react";
 
 /** Loading skeleton shown while lazy-loaded tab chunks download */
 export const PanelSkeleton: React.FC = () => (
-  <Stack style={{ padding: "16px 12px", gap: 10 }}>
+  <div className="tw:flex tw:flex-col tw:gap-2.5" style={{ padding: "16px 12px" }}>
     {Array.from({ length: 5 }).map((_, i) => (
       <SkeletonListItem key={i} hasAvatar avatarSize={24} textLines={1} />
     ))}
-  </Stack>
+  </div>
 );
 
 /** Error fallback shown when a tab panel crashes */

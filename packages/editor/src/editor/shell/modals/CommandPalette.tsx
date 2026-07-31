@@ -8,7 +8,6 @@
  */
 
 import * as React from "react";
-import { Stack } from "@/editor/ui";
 import type { Composer } from "../../../engine";
 import { EVENTS } from "../../../shared/constants/events";
 import { GROUPED_TABS_CONFIG } from "../../rail/tabsConfig";
@@ -341,12 +340,12 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
         }}
       />
       {/* Panel */}
-      <Stack
+      <div
+        className="tw:flex tw:flex-col tw:gap-0"
         role="dialog"
         aria-label="Command Palette"
         aria-modal="true"
         style={{
-          gap: 0,
           position: "fixed",
           top: "20%",
           left: "50%",
@@ -591,7 +590,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
           <span>↵ run</span>
           <span>Esc close</span>
         </div>
-      </Stack>
+      </div>
     </>
   );
 };

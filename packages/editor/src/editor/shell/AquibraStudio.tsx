@@ -15,7 +15,7 @@ import type { Composer } from "../../engine";
 import { useElementFlash } from "../../shared/hooks";
 import { EVENTS } from "../../shared/constants";
 import type { ComposerConfig, ProjectData, BlockData } from "../../shared/types";
-import { Stack, ToastProvider, UpgradeModal, useToast } from "@/editor/ui";
+import { ToastProvider, UpgradeModal, useToast } from "@/editor/ui";
 import { StudioSkeleton } from "@/editor/chrome-ui";
 import { StaleApprovalModal } from "./modals/StaleApprovalModal";
 import { PreviewOverlay } from "./PreviewOverlay";
@@ -91,7 +91,8 @@ class StudioErrorBoundary extends React.Component<
   render() {
     if (this.state.hasError) {
       return (
-        <Stack
+        <div
+          className="tw:flex tw:flex-col tw:gap-3"
           style={{
             padding: 24,
             color: "var(--bk-ink)",
@@ -119,7 +120,7 @@ class StudioErrorBoundary extends React.Component<
           >
             Reload
           </Button>
-        </Stack>
+        </div>
       );
     }
     return this.props.children;
@@ -353,10 +354,9 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   }
 
   return (
-    <Stack
-      className={`bd-studio ${className}`}
+    <div
+      className={`tw:flex tw:flex-col tw:gap-0 bd-studio ${className}`}
       style={{
-        gap: 0,
         height: "100%",
         background: "var(--bk-bg-app, var(--bk-bg-panel))",
         color: "var(--bk-ink)",
@@ -617,7 +617,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         onClose={publishJob.dismissBlock}
         onPublishAnyway={handlePublishAcknowledged}
       />
-    </Stack>
+    </div>
   );
 };
 

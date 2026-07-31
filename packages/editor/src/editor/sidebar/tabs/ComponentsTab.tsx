@@ -10,7 +10,7 @@
 
 import { ChevronDown, Layers, Plus } from "lucide-react";
 import * as React from "react";
-import { ConfirmDialog, EmptyState, EmptyStateDesc, EmptyStateTitle, ModalClose, ModalContent, ModalRoot, ModalTitle, Portal, PanelFrame, Stack } from "@/editor/ui";
+import { ConfirmDialog, EmptyState, EmptyStateDesc, EmptyStateTitle, ModalClose, ModalContent, ModalRoot, ModalTitle, Portal, PanelFrame } from "@/editor/ui";
 import { useToast } from "@/editor/ui";
 import { SkeletonListItem } from "@/editor/chrome-ui";
 import { PanelErrorState } from "../shared/PanelErrorState";
@@ -382,7 +382,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
               </svg>
             </ModalClose>
             <div className="bd-modal__body">
-              <Stack>
+              <div className="tw:flex tw:flex-col tw:gap-3">
                 <TextInput theme={BK_TEXT_INPUT_THEME}
                   type="text"
                   value={renameInput}
@@ -401,7 +401,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
                     Rename
                   </Button>
                 </div>
-              </Stack>
+              </div>
             </div>
           </ModalContent>
         </ModalRoot>
@@ -416,7 +416,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
               </svg>
             </ModalClose>
             <div className="bd-modal__body">
-              <Stack gap="sm">
+              <div className="tw:flex tw:flex-col tw:gap-2">
                 {state.variantPicker?.variants.map((v) => {
                   const isCurrent = v.id === state.variantPicker?.currentVariantId;
                   return (
@@ -445,7 +445,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
                     </Button>
                   );
                 })}
-              </Stack>
+              </div>
             </div>
           </ModalContent>
         </ModalRoot>
