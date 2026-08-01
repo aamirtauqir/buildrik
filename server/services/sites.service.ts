@@ -185,8 +185,12 @@ export async function createSite(
   const slug = await generateUniqueSlug(input.name);
 
   if (input.method === "template" && input.templateId) {
-    const template = await prisma.template.findUnique({
-      where: { id: input.templateId },
+    // Scoped read: global built-ins or this workspace's own templates only.
+    // An unscoped findUnique here copied another workspace's PRIVATE template
+    // pages into a site the caller owns — the same leak fixed in
+    // template.service.ts's three call sites.
+    const template = await prisma.template.findFirst({
+      where: { id: input.templateId, OR: [{ workspaceId: null }, { workspaceId }] },
     });
     if (!template) throw new Error("TEMPLATE_NOT_FOUND");
 

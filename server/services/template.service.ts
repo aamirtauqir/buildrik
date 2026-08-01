@@ -147,8 +147,13 @@ export async function useTemplate(
     throw new Error("SITE_LIMIT");
   }
 
-  const template = await prisma.template.findUnique({
-    where: { id: templateId },
+  // Scoped read, same predicate as getTemplate. An unscoped findUnique here
+  // let any authenticated caller instantiate another workspace's PRIVATE
+  // template and copy its full page content into a site they own. 56de0d4d
+  // added this filter to getTemplate and applyTemplateToSite and missed this
+  // third call site.
+  const template = await prisma.template.findFirst({
+    where: { id: templateId, OR: [{ workspaceId: null }, { workspaceId }] },
   });
 
   if (!template) {
