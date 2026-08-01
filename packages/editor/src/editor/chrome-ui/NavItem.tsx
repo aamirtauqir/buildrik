@@ -7,6 +7,7 @@
  * @license BSD-3-Clause
  */
 import React from "react";
+import { ROW_LABEL_CLASS } from "./Row";
 
 export interface NavItemProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: React.ReactNode;
@@ -34,7 +35,7 @@ export const NavItem = React.forwardRef<HTMLButtonElement, NavItemProps>(functio
       {...rest}
     >
       {icon ? <span className="tw:flex-none tw:inline-flex tw:text-gray-500">{icon}</span> : null}
-      <span className="tw:flex-1 tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap">{children}</span>
+      <span className={ROW_LABEL_CLASS}>{children}</span>
       {trailing}
     </button>
   );

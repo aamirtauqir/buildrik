@@ -14,8 +14,8 @@
 import { render, act } from "@testing-library/react";
 import { describe, it, expect, beforeAll, beforeEach, afterAll, vi } from "vitest";
 import * as React from "react";
-import { Composer } from "../Composer";
-import { TokenRegistryProvider } from "../../editor/design-system";
+import { Composer } from "@/engine/Composer";
+import { TokenRegistryProvider } from "@/editor/design-system";
 
 describe("dark-mode trilogy · end-to-end", () => {
   let originalGetContext: any;

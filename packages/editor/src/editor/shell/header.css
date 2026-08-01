@@ -3,7 +3,7 @@
  * the positioning context its dropdowns hang from, and the panels themselves.
  *
  * Tokens only. Anything here that turns out to be reusable belongs in
- * `editor/ui/ui.css` instead.
+ * `editor/chrome-ui/` component styles instead.
  */
 
 .bk-header {

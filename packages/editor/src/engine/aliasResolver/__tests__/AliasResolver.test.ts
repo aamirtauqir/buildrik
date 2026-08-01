@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { AliasResolver } from "../AliasResolver";
 import { AliasCycleError, AliasDepthError } from "../errors";
-import type { DesignToken } from "../../../editor/design-system";
+import type { DesignToken } from "../../designSystem/types";
 import type { EventEmitter } from "../../EventEmitter";
 import validFixture from "../__fixtures__/valid-alias.json";
 import cycle2Fixture from "../__fixtures__/cycle-2-node.json";

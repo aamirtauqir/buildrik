@@ -20,12 +20,12 @@
 import { render, fireEvent, act, waitFor } from "@testing-library/react";
 import { describe, it, expect, beforeAll, beforeEach, afterAll, vi } from "vitest";
 import * as React from "react";
-import { Composer } from "../Composer";
-import { TokenRegistryProvider } from "../../editor/design-system/state/TokenRegistryContext";
-import { TokensSection } from "../../editor/design-system/ui/sections/TokensSection";
-import { DSModeProvider } from "../../editor/design-system/state/DSModeContext";
+import { Composer } from "@/engine/Composer";
+import { TokenRegistryProvider } from "@/editor/design-system/state/TokenRegistryContext";
+import { TokensSection } from "@/editor/design-system/ui/sections/TokensSection";
+import { DSModeProvider } from "@/editor/design-system/state/DSModeContext";
 import { ToastProvider } from "@/editor/chrome-ui";
-import type { LintIssue } from "../designSystem/LintState";
+import type { LintIssue } from "@/engine/designSystem/LintState";
 
 describe("Arc D6.c · Auto-fix history-awareness", () => {
   let originalGetContext: any;

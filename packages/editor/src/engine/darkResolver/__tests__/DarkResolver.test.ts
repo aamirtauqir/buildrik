@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { DarkResolver } from "../DarkResolver";
-import type { DesignToken } from "../../../editor/design-system";
+import type { DesignToken } from "../../designSystem/types";
 import type { EventEmitter } from "../../EventEmitter";
 
 function makeEvents(): EventEmitter & { emit: ReturnType<typeof vi.fn> } {
