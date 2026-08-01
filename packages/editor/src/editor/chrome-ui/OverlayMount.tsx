@@ -1,16 +1,19 @@
 /**
  * OverlayMount — portal + scrim + focus trap.
  *
- * The ONLY component in the library allowed to touch document.body (Gate 22).
  * Everything that floats above the canvas — modals, the command palette,
  * confirmations — mounts through here, so scrim behaviour, escape handling and
  * focus restoration are written once instead of per surface.
+ *
+ * Mounts into the shared overlay root (Gate 22), NOT document.body directly:
+ * one container means one stacking context for every floating surface.
  *
  * @license BSD-3-Clause
  */
 import React from "react";
 import { createPortal } from "react-dom";
 import { useFocusTrap } from "./focus";
+import { getOverlayRoot } from "./OverlayRoot";
 
 /* center/top each supply their own align-items — same-property values can't
    be additive (Tailwind utilities of equal specificity have no
@@ -50,6 +53,6 @@ export function OverlayMount({
         {children}
       </div>
     </div>,
-    document.body,
+    getOverlayRoot(),
   );
 }

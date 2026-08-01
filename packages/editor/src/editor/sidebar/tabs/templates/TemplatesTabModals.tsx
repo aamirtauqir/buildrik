@@ -5,9 +5,8 @@
  */
 
 import * as React from "react";
-import { createPortal } from "react-dom";
 import type { TemplateItem } from "./templatesData";
-import { Button, Checkbox } from "@/editor/chrome-ui";
+import { Button, Checkbox, Portal } from "@/editor/chrome-ui";
 // ============================================================================
 // Replace Modal — matches .pen Screen 7 "State/Confirm"
 // ============================================================================
@@ -36,7 +35,7 @@ export const ReplaceModal: React.FC<ReplaceModalProps> = ({
   onCancel,
   onApply,
 }) =>
-  createPortal(
+  <Portal>
     <div className="tpl-modal-overlay" onClick={onCancel}>
       <div className="tpl-modal tpl-modal--replace" onClick={(e) => e.stopPropagation()}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
@@ -90,9 +89,8 @@ export const ReplaceModal: React.FC<ReplaceModalProps> = ({
           </Button>
         </div>
       </div>
-    </div>,
-    document.body
-  );
+    </div>
+    </Portal>;
 
 // ============================================================================
 // Pro Intercept Modal
@@ -113,7 +111,7 @@ const PRO_FEATURES: readonly string[] = [
 ];
 
 export const ProModal: React.FC<ProModalProps> = ({ templateName, onCancel, onUpgrade }) =>
-  createPortal(
+  <Portal>
     <div className="tpl-modal-overlay" onClick={onCancel}>
       <div className="tpl-modal" onClick={(e) => e.stopPropagation()} style={{ textAlign: "center" }}>
         <div
@@ -164,9 +162,8 @@ export const ProModal: React.FC<ProModalProps> = ({ templateName, onCancel, onUp
           </Button>
         </div>
       </div>
-    </div>,
-    document.body
-  );
+    </div>
+    </Portal>;
 
 // ============================================================================
 // Create Page Confirm Modal (fiLNZ) — 420px wide
@@ -183,7 +180,7 @@ export const CreatePageConfirmModal: React.FC<CreatePageConfirmModalProps> = ({
   onCancel,
   onConfirm,
 }) =>
-  createPortal(
+  <Portal>
     <div className="tpl-modal-overlay" onClick={onCancel}>
       <div className="tpl-modal tpl-modal--create" onClick={(e) => e.stopPropagation()}>
         <h3 className="tpl-modal-title">Create page?</h3>
@@ -199,9 +196,8 @@ export const CreatePageConfirmModal: React.FC<CreatePageConfirmModalProps> = ({
           <Button className="tpl-modal-btn tpl-modal-btn--primary" onClick={onConfirm}>Create page</Button>
         </div>
       </div>
-    </div>,
-    document.body
-  );
+    </div>
+    </Portal>;
 
 // ============================================================================
 // Create Page Success Modal (uMJFZ) — 420px wide
@@ -216,7 +212,7 @@ export const CreatePageSuccessModal: React.FC<CreatePageSuccessModalProps> = ({
   onClose,
   onGoToPage,
 }) =>
-  createPortal(
+  <Portal>
     <div className="tpl-modal-overlay" onClick={onClose}>
       <div className="tpl-modal tpl-modal--create" onClick={(e) => e.stopPropagation()}>
         <div className="tpl-modal-icon tpl-modal-icon--success">
@@ -232,9 +228,8 @@ export const CreatePageSuccessModal: React.FC<CreatePageSuccessModalProps> = ({
           <Button className="tpl-modal-btn tpl-modal-btn--primary" onClick={onGoToPage}>Go to page</Button>
         </div>
       </div>
-    </div>,
-    document.body
-  );
+    </div>
+    </Portal>;
 
 // ============================================================================
 // Create Page Error Modal (9NalZ) — 420px wide
@@ -249,7 +244,7 @@ export const CreatePageErrorModal: React.FC<CreatePageErrorModalProps> = ({
   onCancel,
   onRetry,
 }) =>
-  createPortal(
+  <Portal>
     <div className="tpl-modal-overlay" onClick={onCancel}>
       <div className="tpl-modal tpl-modal--create" onClick={(e) => e.stopPropagation()}>
         <div className="tpl-modal-icon">
@@ -269,6 +264,5 @@ export const CreatePageErrorModal: React.FC<CreatePageErrorModalProps> = ({
           <Button className="tpl-modal-btn tpl-modal-btn--primary" onClick={onRetry}>Try again</Button>
         </div>
       </div>
-    </div>,
-    document.body
-  );
+    </div>
+    </Portal>;

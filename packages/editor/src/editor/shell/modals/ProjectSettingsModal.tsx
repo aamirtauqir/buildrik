@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal } from "@/editor/chrome-ui";
+import { ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
 import { useToast } from "@/editor/chrome-ui";
 import { devError } from "../../../shared/utils/devLogger";
@@ -90,119 +90,117 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
   };
 
   return (
-    <Portal>
-      <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
-        <ModalContent size="lg">
-          <ModalTitle>Project settings</ModalTitle>
-          <ModalClose aria-label="Close modal">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-              <path d="M18 6L6 18M6 6l12 12" />
-            </svg>
-          </ModalClose>
-          <div className="bd-modal__body">
-      <div style={containerStyles}>
-        {/* Tabs */}
-        <div style={tabBarStyles}>
-          {(["general", "canvas", "seo"] as const).map((tab) => (
-            <Button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              style={{
-                ...tabButtonStyles,
-                borderBottomColor: activeTab === tab ? "var(--bk-accent)" : "transparent",
-                color: activeTab === tab ? "var(--bk-ink)" : "var(--bk-ink-muted)",
-              }}
-            >
-              {TAB_LABELS[tab]}
-            </Button>
-          ))}
-        </div>
-
-        {/* Tab Content */}
-        <div style={contentStyles}>
-          {activeTab === "general" && (
-            <div className="tw:flex tw:flex-col tw:gap-3">
-              <label style={labelStyles}>Project name</label>
-              <TextInput
-                type="text"
-                value={projectName}
-                onChange={(e) => setProjectName(e.target.value)}
-                style={inputStyles}
-                placeholder="My Awesome Project"
-              />
-
-              <label style={labelStyles}>Author / description</label>
-              <TextInput
-                type="text"
-                value={projectDescription}
-                onChange={(e) => setProjectDescription(e.target.value)}
-                style={inputStyles}
-                placeholder="John Doe"
-              />
-            </div>
-          )}
-
-          {activeTab === "canvas" && (
-            <div className="tw:flex tw:flex-col tw:gap-3">
-              <label style={labelStyles}>Grid size (px)</label>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <TextInput
-                  type="number"
-                  value={gridSize}
-                  onChange={(e) => setGridSize(Number(e.target.value))}
-                  style={{ ...inputStyles, width: 80 }}
-                  min={1}
-                  max={100}
-                />
-                <span style={{ fontSize: 12, color: "var(--bk-ink-muted)" }}>
-                  Width / height in pixels
-                </span>
-              </div>
-
-              <div style={{ marginTop: 16 }}>
-                <label style={checkboxLabelStyles}>
-                  <Checkbox
-                    color="blue"
-                    className="tw:bg-white"
-                    checked={snapToGrid}
-                    onChange={(e) => setSnapToGrid(e.target.checked)}
-                    style={checkboxStyles} />
-                  <span>Snap to grid</span>
-                </label>
-              </div>
-            </div>
-          )}
-
-          {activeTab === "seo" && (
-            <div className="tw:flex tw:flex-col tw:gap-3">
-              <label style={labelStyles}>Site name (SEO default)</label>
-              <TextInput
-                type="text"
-                value={siteTitle}
-                onChange={(e) => setSiteTitle(e.target.value)}
-                style={inputStyles}
-                placeholder="The formal name of your website"
-              />
-              <small style={hintStyles}>
-                This will be used as the default title for your site if not overridden on individual
-                pages.
-              </small>
-            </div>
-          )}
-        </div>
+    <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
+      <ModalContent size="lg">
+        <ModalTitle>Project settings</ModalTitle>
+        <ModalClose aria-label="Close modal">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+        </ModalClose>
+        <div className="bd-modal__body">
+    <div style={containerStyles}>
+      {/* Tabs */}
+      <div style={tabBarStyles}>
+        {(["general", "canvas", "seo"] as const).map((tab) => (
+          <Button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            style={{
+              ...tabButtonStyles,
+              borderBottomColor: activeTab === tab ? "var(--bk-accent)" : "transparent",
+              color: activeTab === tab ? "var(--bk-ink)" : "var(--bk-ink-muted)",
+            }}
+          >
+            {TAB_LABELS[tab]}
+          </Button>
+        ))}
       </div>
+
+      {/* Tab Content */}
+      <div style={contentStyles}>
+        {activeTab === "general" && (
+          <div className="tw:flex tw:flex-col tw:gap-3">
+            <label style={labelStyles}>Project name</label>
+            <TextInput
+              type="text"
+              value={projectName}
+              onChange={(e) => setProjectName(e.target.value)}
+              style={inputStyles}
+              placeholder="My Awesome Project"
+            />
+
+            <label style={labelStyles}>Author / description</label>
+            <TextInput
+              type="text"
+              value={projectDescription}
+              onChange={(e) => setProjectDescription(e.target.value)}
+              style={inputStyles}
+              placeholder="John Doe"
+            />
           </div>
-          <ModalFooter>
-            <Button color="light" onClick={onClose} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
-              Cancel
-            </Button>
-            <Button onClick={handleSave}>
-              Save changes
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </ModalRoot>
-    </Portal>
+        )}
+
+        {activeTab === "canvas" && (
+          <div className="tw:flex tw:flex-col tw:gap-3">
+            <label style={labelStyles}>Grid size (px)</label>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <TextInput
+                type="number"
+                value={gridSize}
+                onChange={(e) => setGridSize(Number(e.target.value))}
+                style={{ ...inputStyles, width: 80 }}
+                min={1}
+                max={100}
+              />
+              <span style={{ fontSize: 12, color: "var(--bk-ink-muted)" }}>
+                Width / height in pixels
+              </span>
+            </div>
+
+            <div style={{ marginTop: 16 }}>
+              <label style={checkboxLabelStyles}>
+                <Checkbox
+                  color="blue"
+                  className="tw:bg-white"
+                  checked={snapToGrid}
+                  onChange={(e) => setSnapToGrid(e.target.checked)}
+                  style={checkboxStyles} />
+                <span>Snap to grid</span>
+              </label>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "seo" && (
+          <div className="tw:flex tw:flex-col tw:gap-3">
+            <label style={labelStyles}>Site name (SEO default)</label>
+            <TextInput
+              type="text"
+              value={siteTitle}
+              onChange={(e) => setSiteTitle(e.target.value)}
+              style={inputStyles}
+              placeholder="The formal name of your website"
+            />
+            <small style={hintStyles}>
+              This will be used as the default title for your site if not overridden on individual
+              pages.
+            </small>
+          </div>
+        )}
+      </div>
+    </div>
+        </div>
+        <ModalFooter>
+          <Button color="light" onClick={onClose} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+            Cancel
+          </Button>
+          <Button onClick={handleSave}>
+            Save changes
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </ModalRoot>
   );
 };
 

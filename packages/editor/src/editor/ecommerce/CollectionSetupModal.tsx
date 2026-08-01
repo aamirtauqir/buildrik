@@ -6,7 +6,7 @@
 
 import { ShoppingBag, Package, Check } from "lucide-react";
 import * as React from "react";
-import { ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/chrome-ui";
+import { ModalClose, ModalContent, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
 import { useState } from "react";
 import { Button, Checkbox } from "@/editor/chrome-ui";
 
@@ -59,71 +59,69 @@ export const CollectionSetupModal: React.FC<CollectionSetupModalProps> = ({
   };
 
   return (
-    <Portal>
-      <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
-        <ModalContent size="lg">
-          <ModalTitle>Set Up Products Collection</ModalTitle>
-          <ModalClose aria-label="Close modal">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-              <path d="M18 6L6 18M6 6l12 12" />
-            </svg>
-          </ModalClose>
-          <div className="bd-modal__body">
-      <div style={containerStyles}>
-        <div style={iconContainerStyles}>
-          <ShoppingBag size={48} style={{ color: "var(--bk-accent)" }} />
-        </div>
+    <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
+      <ModalContent size="lg">
+        <ModalTitle>Set Up Products Collection</ModalTitle>
+        <ModalClose aria-label="Close modal">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+        </ModalClose>
+        <div className="bd-modal__body">
+    <div style={containerStyles}>
+      <div style={iconContainerStyles}>
+        <ShoppingBag size={48} style={{ color: "var(--bk-accent)" }} />
+      </div>
 
-        <p style={descriptionStyles}>
-          E-commerce blocks require a Products collection in your CMS. Would you like to create one
-          now?
-        </p>
+      <p style={descriptionStyles}>
+        E-commerce blocks require a Products collection in your CMS. Would you like to create one
+        now?
+      </p>
 
-        <div style={checkboxContainerStyles}>
-          <label style={checkboxLabelStyles}>
-            <Checkbox
-              color="blue"
-              className="tw:bg-white"
-              checked={includeSample}
-              onChange={(e) => setIncludeSample(e.target.checked)}
-              style={checkboxStyles} />
-            <div style={checkboxContentStyles}>
-              <div style={checkboxTitleStyles}>
-                <Package size={16} />
-                Include sample products
-              </div>
-              <div style={checkboxDescStyles}>Add 3 example products to get started quickly</div>
+      <div style={checkboxContainerStyles}>
+        <label style={checkboxLabelStyles}>
+          <Checkbox
+            color="blue"
+            className="tw:bg-white"
+            checked={includeSample}
+            onChange={(e) => setIncludeSample(e.target.checked)}
+            style={checkboxStyles} />
+          <div style={checkboxContentStyles}>
+            <div style={checkboxTitleStyles}>
+              <Package size={16} />
+              Include sample products
             </div>
-          </label>
-        </div>
+            <div style={checkboxDescStyles}>Add 3 example products to get started quickly</div>
+          </div>
+        </label>
+      </div>
 
-        <div style={featuresListStyles}>
-          <div style={featureItemStyles}>
-            <Check size={16} style={{ color: "var(--bk-success)" }} />
-            <span>8 product fields (name, price, image, etc.)</span>
-          </div>
-          <div style={featureItemStyles}>
-            <Check size={16} style={{ color: "var(--bk-success)" }} />
-            <span>Validation rules included</span>
-          </div>
-          <div style={featureItemStyles}>
-            <Check size={16} style={{ color: "var(--bk-success)" }} />
-            <span>Ready for CMS data binding</span>
-          </div>
+      <div style={featuresListStyles}>
+        <div style={featureItemStyles}>
+          <Check size={16} style={{ color: "var(--bk-success)" }} />
+          <span>8 product fields (name, price, image, etc.)</span>
+        </div>
+        <div style={featureItemStyles}>
+          <Check size={16} style={{ color: "var(--bk-success)" }} />
+          <span>Validation rules included</span>
+        </div>
+        <div style={featureItemStyles}>
+          <Check size={16} style={{ color: "var(--bk-success)" }} />
+          <span>Ready for CMS data binding</span>
         </div>
       </div>
-      <div style={footerStyles}>
-        <Button color="light" onClick={handleSkip} disabled={isCreating} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
-          Skip for now
-        </Button>
-        <Button onClick={handleConfirm} disabled={isCreating}>
-          {isCreating ? "Creating..." : "Create Collection"}
-        </Button>
-      </div>
-          </div>
-        </ModalContent>
-      </ModalRoot>
-    </Portal>
+    </div>
+    <div style={footerStyles}>
+      <Button color="light" onClick={handleSkip} disabled={isCreating} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+        Skip for now
+      </Button>
+      <Button onClick={handleConfirm} disabled={isCreating}>
+        {isCreating ? "Creating..." : "Create Collection"}
+      </Button>
+    </div>
+        </div>
+      </ModalContent>
+    </ModalRoot>
   );
 };
 

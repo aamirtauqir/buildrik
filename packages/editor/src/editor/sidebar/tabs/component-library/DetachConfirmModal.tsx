@@ -10,7 +10,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/chrome-ui";
+import { ModalClose, ModalContent, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
 import { Button } from "@/editor/chrome-ui";
 
 export interface DetachConfirmModalProps {
@@ -94,57 +94,55 @@ export function DetachConfirmModal({
     masterInstanceCount === 1 ? "1 instance" : `${masterInstanceCount} instances`;
 
   return (
-    <Portal>
-      <ModalRoot
-        open
-        onOpenChange={(next) => {
-          if (!next) onCancel();
-        }}
-      >
-        <ModalContent size="lg">
-          <ModalTitle>Detach instance {instanceLabel} from master?</ModalTitle>
-          <ModalClose aria-label="Close modal" onClick={onCancel}>
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              aria-hidden="true"
-            >
-              <path d="M18 6L6 18M6 6l12 12" />
-            </svg>
-          </ModalClose>
-          <div className="bd-modal__body">
-            <p style={metaStyle}>
-              Master: {masterName} &middot; {instancesLabel} total
-            </p>
-            <ul style={bulletsStyle}>
-              {BULLETS.map((b, i) => (
-                <li key={i} style={bulletItemStyle}>
-                  <span
-                    style={{ ...bulletIconStyle, color: b.color }}
-                    aria-hidden="true"
-                  >
-                    {b.icon}
-                  </span>
-                  <span>{b.text}</span>
-                </li>
-              ))}
-            </ul>
-            <div style={footerStyle}>
-              <Button color="light" onClick={onCancel} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
-                Cancel
-              </Button>
-              <Button onClick={onConfirm}>
-                Detach
-              </Button>
-            </div>
+    <ModalRoot
+      open
+      onOpenChange={(next) => {
+        if (!next) onCancel();
+      }}
+    >
+      <ModalContent size="lg">
+        <ModalTitle>Detach instance {instanceLabel} from master?</ModalTitle>
+        <ModalClose aria-label="Close modal" onClick={onCancel}>
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            aria-hidden="true"
+          >
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+        </ModalClose>
+        <div className="bd-modal__body">
+          <p style={metaStyle}>
+            Master: {masterName} &middot; {instancesLabel} total
+          </p>
+          <ul style={bulletsStyle}>
+            {BULLETS.map((b, i) => (
+              <li key={i} style={bulletItemStyle}>
+                <span
+                  style={{ ...bulletIconStyle, color: b.color }}
+                  aria-hidden="true"
+                >
+                  {b.icon}
+                </span>
+                <span>{b.text}</span>
+              </li>
+            ))}
+          </ul>
+          <div style={footerStyle}>
+            <Button color="light" onClick={onCancel} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+              Cancel
+            </Button>
+            <Button onClick={onConfirm}>
+              Detach
+            </Button>
           </div>
-        </ModalContent>
-      </ModalRoot>
-    </Portal>
+        </div>
+      </ModalContent>
+    </ModalRoot>
   );
 }
 

@@ -11,10 +11,9 @@
  */
 
 import * as React from "react";
-import { createPortal } from "react-dom";
 import type { TemplateItem } from "./templatesData";
 import "./TemplatePreviewModal.css";
-import { Button } from "@/editor/chrome-ui";
+import { Button, Portal } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -151,7 +150,7 @@ export const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({
     return () => document.removeEventListener("keydown", handleKey);
   }, [handleClose]);
 
-  return createPortal(
+  return <Portal>
     <div className="tmpl-preview-backdrop" onClick={handleClose}>
       <div
         ref={modalRef}
@@ -229,9 +228,8 @@ export const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({
           </Button>
         </div>
       </div>
-    </div>,
-    document.body
-  );
+    </div>
+    </Portal>;
 };
 
 export default TemplatePreviewModal;

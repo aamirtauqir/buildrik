@@ -7,7 +7,7 @@
  */
 
 import * as React from "react";
-import { ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/chrome-ui";
+import { ModalClose, ModalContent, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
 import {
   ICON_CATEGORIES,
   getAllIcons,
@@ -321,204 +321,202 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
   };
 
   return (
-    <Portal>
-      <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
-        <ModalContent size="lg">
-          <ModalTitle>Select Icon</ModalTitle>
-          <ModalClose aria-label="Close modal">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-              <path d="M18 6L6 18M6 6l12 12" />
-            </svg>
-          </ModalClose>
-          <div className="bd-modal__body">
-      <div style={styles.container}>
-        {/* Header with icon count */}
-        <div style={styles.header}>
-          <span style={styles.iconCount}>{getIconCount()} icons available</span>
-        </div>
+    <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
+      <ModalContent size="lg">
+        <ModalTitle>Select Icon</ModalTitle>
+        <ModalClose aria-label="Close modal">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+        </ModalClose>
+        <div className="bd-modal__body">
+    <div style={styles.container}>
+      {/* Header with icon count */}
+      <div style={styles.header}>
+        <span style={styles.iconCount}>{getIconCount()} icons available</span>
+      </div>
 
-        {/* Search */}
-        <div style={styles.toolbar}>
-          <div style={styles.searchInput}>
-            <InputField
-              placeholder="Search icons by name or keyword..."
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setSelectedCategory("all");
-              }}
-            />
-          </div>
+      {/* Search */}
+      <div style={styles.toolbar}>
+        <div style={styles.searchInput}>
+          <InputField
+            placeholder="Search icons by name or keyword..."
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setSelectedCategory("all");
+            }}
+          />
         </div>
+      </div>
 
-        {/* Categories */}
-        <div style={styles.categories}>
+      {/* Categories */}
+      <div style={styles.categories}>
+        <Button
+          style={{
+            ...styles.categoryBtn,
+            ...(selectedCategory === "all" ? styles.categoryBtnActive : {}),
+          }}
+          onClick={() => {
+            setSelectedCategory("all");
+            setSearchQuery("");
+          }}
+        >
+          All
+        </Button>
+        {ICON_CATEGORY_IDS.map((catId) => (
           <Button
+            key={catId}
             style={{
               ...styles.categoryBtn,
-              ...(selectedCategory === "all" ? styles.categoryBtnActive : {}),
+              ...(selectedCategory === catId ? styles.categoryBtnActive : {}),
             }}
             onClick={() => {
-              setSelectedCategory("all");
+              setSelectedCategory(catId);
               setSearchQuery("");
             }}
           >
-            All
+            {categoryLabels[catId] || catId}
           </Button>
-          {ICON_CATEGORY_IDS.map((catId) => (
-            <Button
-              key={catId}
-              style={{
-                ...styles.categoryBtn,
-                ...(selectedCategory === catId ? styles.categoryBtnActive : {}),
-              }}
-              onClick={() => {
-                setSelectedCategory(catId);
-                setSearchQuery("");
-              }}
-            >
-              {categoryLabels[catId] || catId}
-            </Button>
-          ))}
-        </div>
+        ))}
+      </div>
 
-        {/* Recent Icons */}
-        {!searchQuery && selectedCategory === "all" && recentIconDefs.length > 0 && (
-          <div>
-            <div style={styles.sectionTitle}>Recently Used</div>
-            <div style={{ ...styles.grid, maxHeight: "none" }}>
-              {recentIconDefs.map((icon) => (
-                <Button
-                  key={`recent-${icon.name}`}
-                  style={{
-                    ...styles.iconBtn,
-                    ...(selectedIcon?.name === icon.name ? styles.iconBtnSelected : {}),
-                  }}
-                  onClick={() => setSelectedIcon(icon)}
-                  title={icon.name}
-                >
-                  {renderIcon(icon)}
-                </Button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Icon Grid */}
+      {/* Recent Icons */}
+      {!searchQuery && selectedCategory === "all" && recentIconDefs.length > 0 && (
         <div>
-          {!searchQuery && selectedCategory === "all" && (
-            <div style={styles.sectionTitle}>All Icons</div>
-          )}
-          {searchQuery && (
-            <div style={styles.sectionTitle}>
-              {filteredIcons.length} results for &quot;{searchQuery}&quot;
-            </div>
-          )}
-          {filteredIcons.length > 0 ? (
-            <div style={styles.grid}>
-              {filteredIcons.map((icon) => (
-                <Button
-                  key={icon.name}
-                  style={{
-                    ...styles.iconBtn,
-                    ...(selectedIcon?.name === icon.name ? styles.iconBtnSelected : {}),
-                  }}
-                  onClick={() => setSelectedIcon(icon)}
-                  title={icon.name}
-                >
-                  {renderIcon(icon)}
-                </Button>
-              ))}
-            </div>
-          ) : (
-            <div style={styles.noResults}>No icons found for &quot;{searchQuery}&quot;</div>
-          )}
+          <div style={styles.sectionTitle}>Recently Used</div>
+          <div style={{ ...styles.grid, maxHeight: "none" }}>
+            {recentIconDefs.map((icon) => (
+              <Button
+                key={`recent-${icon.name}`}
+                style={{
+                  ...styles.iconBtn,
+                  ...(selectedIcon?.name === icon.name ? styles.iconBtnSelected : {}),
+                }}
+                onClick={() => setSelectedIcon(icon)}
+                title={icon.name}
+              >
+                {renderIcon(icon)}
+              </Button>
+            ))}
+          </div>
         </div>
+      )}
 
-        {/* Preview & Controls */}
-        {selectedIcon && (
-          <div style={styles.preview}>
-            <div style={{ ...styles.previewIcon, color: iconColor }}>
-              {renderIcon(selectedIcon, iconSize)}
-            </div>
-            <div style={styles.previewInfo}>
-              <div style={styles.previewName}>{selectedIcon.name}</div>
-              <div style={styles.previewTags}>{selectedIcon.tags.join(", ")}</div>
-            </div>
-            <div style={styles.controls}>
-              <div style={styles.controlGroup}>
-                <span style={styles.controlLabel}>Size</span>
-                <TextInput
-                  type="number"
-                  value={iconSize}
-                  onChange={(e) => setIconSize(Math.max(12, Math.min(96, Number(e.target.value))))}
-                  style={styles.sizeInput}
-                  min={12}
-                  max={96}
-                />
-              </div>
-              <div style={styles.controlGroup}>
-                <span style={styles.controlLabel}>Stroke</span>
-                {/* Phase D: range slider replaces numeric input — matches v3
-                    prototype § 20. Live value shown to right of track. */}
-                <div style={{ display: "flex", alignItems: "center", gap: 6, flex: 1 }}>
-                  <TextInput
-                    type="range"
-                    value={strokeWidth}
-                    onChange={(e) =>
-                      setStrokeWidth(Math.max(0.5, Math.min(4, Number(e.target.value))))
-                    }
-                    style={{ flex: 1, minWidth: 80 }}
-                    min={0.5}
-                    max={4}
-                    step={0.5}
-                    aria-label="Stroke width"
-                  />
-                  <span
-                    style={{
-                      fontSize: 11,
-                      fontFamily: "var(--bk-font-mono, ui-monospace, monospace)",
-                      color: "var(--bk-ink-muted)",
-                      minWidth: 24,
-                      textAlign: "right",
-                    }}
-                  >
-                    {strokeWidth.toFixed(1)}
-                  </span>
-                </div>
-              </div>
-              <div style={styles.controlGroup}>
-                <span style={styles.controlLabel}>Color</span>
-                <TextInput
-                  type="color"
-                  value={iconColor}
-                  onChange={(e) => setIconColor(e.target.value)}
-                  style={styles.colorInput}
-                />
-              </div>
-            </div>
+      {/* Icon Grid */}
+      <div>
+        {!searchQuery && selectedCategory === "all" && (
+          <div style={styles.sectionTitle}>All Icons</div>
+        )}
+        {searchQuery && (
+          <div style={styles.sectionTitle}>
+            {filteredIcons.length} results for &quot;{searchQuery}&quot;
           </div>
         )}
-
-        {/* Footer */}
-        <div style={styles.footer}>
-          <span style={{ fontSize: 12, color: "var(--bk-ink-muted)" }}>
-            Powered by Lucide Icons
-          </span>
-          <div style={{ display: "flex", gap: 8 }}>
-            <Button color="light" onClick={onClose} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
-              Cancel
-            </Button>
-            <Button onClick={handleSelect} disabled={!selectedIcon}>
-              Select Icon
-            </Button>
+        {filteredIcons.length > 0 ? (
+          <div style={styles.grid}>
+            {filteredIcons.map((icon) => (
+              <Button
+                key={icon.name}
+                style={{
+                  ...styles.iconBtn,
+                  ...(selectedIcon?.name === icon.name ? styles.iconBtnSelected : {}),
+                }}
+                onClick={() => setSelectedIcon(icon)}
+                title={icon.name}
+              >
+                {renderIcon(icon)}
+              </Button>
+            ))}
           </div>
+        ) : (
+          <div style={styles.noResults}>No icons found for &quot;{searchQuery}&quot;</div>
+        )}
+      </div>
+
+      {/* Preview & Controls */}
+      {selectedIcon && (
+        <div style={styles.preview}>
+          <div style={{ ...styles.previewIcon, color: iconColor }}>
+            {renderIcon(selectedIcon, iconSize)}
+          </div>
+          <div style={styles.previewInfo}>
+            <div style={styles.previewName}>{selectedIcon.name}</div>
+            <div style={styles.previewTags}>{selectedIcon.tags.join(", ")}</div>
+          </div>
+          <div style={styles.controls}>
+            <div style={styles.controlGroup}>
+              <span style={styles.controlLabel}>Size</span>
+              <TextInput
+                type="number"
+                value={iconSize}
+                onChange={(e) => setIconSize(Math.max(12, Math.min(96, Number(e.target.value))))}
+                style={styles.sizeInput}
+                min={12}
+                max={96}
+              />
+            </div>
+            <div style={styles.controlGroup}>
+              <span style={styles.controlLabel}>Stroke</span>
+              {/* Phase D: range slider replaces numeric input — matches v3
+                  prototype § 20. Live value shown to right of track. */}
+              <div style={{ display: "flex", alignItems: "center", gap: 6, flex: 1 }}>
+                <TextInput
+                  type="range"
+                  value={strokeWidth}
+                  onChange={(e) =>
+                    setStrokeWidth(Math.max(0.5, Math.min(4, Number(e.target.value))))
+                  }
+                  style={{ flex: 1, minWidth: 80 }}
+                  min={0.5}
+                  max={4}
+                  step={0.5}
+                  aria-label="Stroke width"
+                />
+                <span
+                  style={{
+                    fontSize: 11,
+                    fontFamily: "var(--bk-font-mono, ui-monospace, monospace)",
+                    color: "var(--bk-ink-muted)",
+                    minWidth: 24,
+                    textAlign: "right",
+                  }}
+                >
+                  {strokeWidth.toFixed(1)}
+                </span>
+              </div>
+            </div>
+            <div style={styles.controlGroup}>
+              <span style={styles.controlLabel}>Color</span>
+              <TextInput
+                type="color"
+                value={iconColor}
+                onChange={(e) => setIconColor(e.target.value)}
+                style={styles.colorInput}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Footer */}
+      <div style={styles.footer}>
+        <span style={{ fontSize: 12, color: "var(--bk-ink-muted)" }}>
+          Powered by Lucide Icons
+        </span>
+        <div style={{ display: "flex", gap: 8 }}>
+          <Button color="light" onClick={onClose} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+            Cancel
+          </Button>
+          <Button onClick={handleSelect} disabled={!selectedIcon}>
+            Select Icon
+          </Button>
         </div>
       </div>
-          </div>
-        </ModalContent>
-      </ModalRoot>
-    </Portal>
+    </div>
+        </div>
+      </ModalContent>
+    </ModalRoot>
   );
 };
 

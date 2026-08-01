@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/chrome-ui";
+import { ModalClose, ModalContent, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
 import { Button, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
@@ -381,35 +381,33 @@ export const VideoPreview: React.FC<VideoPreviewProps> = (props) => {
   if (props.isModal) {
     const handleClose = props.onClose || (() => {});
     return (
-      <Portal>
-        <ModalRoot
-          open={props.isOpen || false}
-          onOpenChange={(next) => !next && handleClose()}
-        >
-          <ModalContent size="lg">
-            <ModalTitle>{props.title || "Video Preview"}</ModalTitle>
-            <ModalClose aria-label="Close modal">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                <path d="M18 6L6 18M6 6l12 12" />
-              </svg>
-            </ModalClose>
-            <div className="bd-modal__body">
-              <VideoPlayerCore {...props} />
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "flex-end",
-                  marginTop: 16,
-                }}
-              >
-                <Button color="light" onClick={props.onClose} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
-                  Close
-                </Button>
-              </div>
+      <ModalRoot
+        open={props.isOpen || false}
+        onOpenChange={(next) => !next && handleClose()}
+      >
+        <ModalContent size="lg">
+          <ModalTitle>{props.title || "Video Preview"}</ModalTitle>
+          <ModalClose aria-label="Close modal">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </ModalClose>
+          <div className="bd-modal__body">
+            <VideoPlayerCore {...props} />
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                marginTop: 16,
+              }}
+            >
+              <Button color="light" onClick={props.onClose} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+                Close
+              </Button>
             </div>
-          </ModalContent>
-        </ModalRoot>
-      </Portal>
+          </div>
+        </ModalContent>
+      </ModalRoot>
     );
   }
 

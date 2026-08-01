@@ -12,7 +12,7 @@
  */
 
 import * as React from "react";
-import { ModalContent as VibcoderModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/chrome-ui";
+import { ModalContent as VibcoderModalContent, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
 import { ROW_MD } from "@shared/constants/layout";
 import { Button } from "@/editor/chrome-ui";
 // Phase 5 escape: Radix.Dialog.Content props (onOpenAutoFocus) are hidden
@@ -47,76 +47,74 @@ export const UnsavedWarningModal: React.FC<Props> = ({
   const tabLabel = pendingTab === "social" ? "Social" : pendingTab === "advanced" ? "Advanced" : "SEO";
 
   return (
-    <Portal>
-      <ModalRoot open={isOpen} onOpenChange={(next) => !next && onCancel()}>
-        <ModalContent
-          size="lg"
-          onOpenAutoFocus={(e) => {
-            if (discardRef.current) {
-              e.preventDefault();
-              discardRef.current.focus();
-            }
-          }}
-        >
-          <div className="bd-modal__body">
-            <div className="tw:flex tw:flex-col tw:gap-1">
-              {/* Title */}
-              <ModalTitle
-                style={{
-                  fontSize: 15,
-                  fontWeight: 600,
-                  color: "var(--bk-ink)",
-                  margin: "0 0 8px",
-                  letterSpacing: "-0.01em",
-                }}
-              >
-                Unsaved changes
-              </ModalTitle>
+    <ModalRoot open={isOpen} onOpenChange={(next) => !next && onCancel()}>
+      <ModalContent
+        size="lg"
+        onOpenAutoFocus={(e) => {
+          if (discardRef.current) {
+            e.preventDefault();
+            discardRef.current.focus();
+          }
+        }}
+      >
+        <div className="bd-modal__body">
+          <div className="tw:flex tw:flex-col tw:gap-1">
+            {/* Title */}
+            <ModalTitle
+              style={{
+                fontSize: 15,
+                fontWeight: 600,
+                color: "var(--bk-ink)",
+                margin: "0 0 8px",
+                letterSpacing: "-0.01em",
+              }}
+            >
+              Unsaved changes
+            </ModalTitle>
 
-              {/* Message */}
-              <div
-                style={{
-                  fontSize: 13,
-                  color: "var(--bk-ink-muted)",
-                  lineHeight: 1.5,
-                  marginBottom: 20,
-                }}
-              >
-                You have unsaved changes in{" "}
-                <span style={{ color: "var(--bk-ink)", fontWeight: 500 }}>{tabLabel}</span> tab.
-                What would you like to do?
-              </div>
+            {/* Message */}
+            <div
+              style={{
+                fontSize: 13,
+                color: "var(--bk-ink-muted)",
+                lineHeight: 1.5,
+                marginBottom: 20,
+              }}
+            >
+              You have unsaved changes in{" "}
+              <span style={{ color: "var(--bk-ink)", fontWeight: 500 }}>{tabLabel}</span> tab.
+              What would you like to do?
+            </div>
 
-              {/* Actions */}
-              <div style={{ display: "flex", gap: 6, justifyContent: "flex-end" }}>
-                <Button
-                  ref={discardRef}
-                  onClick={onDiscard}
-                  style={discardBtn}
-                  aria-label="Discard changes and switch tab"
-                >
-                  Discard
-                </Button>
-                <Button
-                  onClick={onCancel}
-                  style={cancelBtn}
-                  aria-label="Cancel and stay on current tab"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={onSaveAndSwitch}
-                  style={saveBtn}
-                  aria-label="Save changes and switch tab"
-                >
-                  Save &amp; Switch
-                </Button>
-              </div>
+            {/* Actions */}
+            <div style={{ display: "flex", gap: 6, justifyContent: "flex-end" }}>
+              <Button
+                ref={discardRef}
+                onClick={onDiscard}
+                style={discardBtn}
+                aria-label="Discard changes and switch tab"
+              >
+                Discard
+              </Button>
+              <Button
+                onClick={onCancel}
+                style={cancelBtn}
+                aria-label="Cancel and stay on current tab"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={onSaveAndSwitch}
+                style={saveBtn}
+                aria-label="Save changes and switch tab"
+              >
+                Save &amp; Switch
+              </Button>
             </div>
           </div>
-        </ModalContent>
-      </ModalRoot>
-    </Portal>
+        </div>
+      </ModalContent>
+    </ModalRoot>
   );
 };
 

@@ -18,7 +18,6 @@ import {
   ModalContent,
   ModalRoot,
   ModalTitle,
-  Portal,
 } from "@/editor/chrome-ui";
 import { Button, Checkbox, Select, Textarea, TextInput } from "@/editor/chrome-ui";
 
@@ -187,126 +186,124 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
   };
 
   return (
-    <Portal>
-      <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
-        <ModalContent size="lg">
-          <ModalTitle>CMS Records</ModalTitle>
-          <ModalClose aria-label="Close modal" onClick={onClose}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-              <path d="M18 6L6 18M6 6l12 12" />
-            </svg>
-          </ModalClose>
-          <div className="bd-modal__body" style={{ minHeight: "20rem" }}>
-            {collections.length === 0 ? (
-              <p style={{ color: "var(--bk-ink-soft)" }}>
-                No collections yet. Create one from an element&apos;s CMS binding first.
-              </p>
-            ) : (
-              <>
-                <div style={{ marginBottom: 12, maxWidth: 280 }}>
-                  <Select
-                    value={collectionId}
-                    onChange={(e) => {
-                      setCollectionId(e.target.value);
-                      setEditingId(null);
-                    }}
-                  >
-                    {collections.map((c) => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
-                    ))}
-                  </Select>
-                </div>
+    <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
+      <ModalContent size="lg">
+        <ModalTitle>CMS Records</ModalTitle>
+        <ModalClose aria-label="Close modal" onClick={onClose}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+        </ModalClose>
+        <div className="bd-modal__body" style={{ minHeight: "20rem" }}>
+          {collections.length === 0 ? (
+            <p style={{ color: "var(--bk-ink-soft)" }}>
+              No collections yet. Create one from an element&apos;s CMS binding first.
+            </p>
+          ) : (
+            <>
+              <div style={{ marginBottom: 12, maxWidth: 280 }}>
+                <Select
+                  value={collectionId}
+                  onChange={(e) => {
+                    setCollectionId(e.target.value);
+                    setEditingId(null);
+                  }}
+                >
+                  {collections.map((c) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </Select>
+              </div>
 
-                {editingId !== null && collection ? (
-                  <div>
-                    {collection.fields.map(renderField)}
-                    <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-                      <Button size="xs" disabled={busy} onClick={save} aria-busy={busy || undefined}>
-                        {editingId === "" ? "Add record" : "Save"}
-                      </Button>
-                      <Button color="light" size="xs" onClick={() => setEditingId(null)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
-                        Cancel
-                      </Button>
-                    </div>
+              {editingId !== null && collection ? (
+                <div>
+                  {collection.fields.map(renderField)}
+                  <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+                    <Button size="xs" disabled={busy} onClick={save} aria-busy={busy || undefined}>
+                      {editingId === "" ? "Add record" : "Save"}
+                    </Button>
+                    <Button color="light" size="xs" onClick={() => setEditingId(null)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+                      Cancel
+                    </Button>
                   </div>
-                ) : (
-                  <>
-                    {hasDynamicPages && publishedCount === 0 && (
-                      <div
-                        role="status"
-                        style={{
-                          marginBottom: 10,
-                          padding: "8px 10px",
-                          fontSize: 12,
-                          borderRadius: 4,
-                          color: "var(--bk-warning-text, var(--bk-warning))",
-                          background: "var(--bk-warning-tint)",
-                          border: "1px solid var(--bk-warning-text)",
-                        }}
-                      >
-                        No records published yet — this collection generates a page per entry, but
-                        dynamic pages won&apos;t generate until at least one record is published.
-                      </div>
+                </div>
+              ) : (
+                <>
+                  {hasDynamicPages && publishedCount === 0 && (
+                    <div
+                      role="status"
+                      style={{
+                        marginBottom: 10,
+                        padding: "8px 10px",
+                        fontSize: 12,
+                        borderRadius: 4,
+                        color: "var(--bk-warning-text, var(--bk-warning))",
+                        background: "var(--bk-warning-tint)",
+                        border: "1px solid var(--bk-warning-text)",
+                      }}
+                    >
+                      No records published yet — this collection generates a page per entry, but
+                      dynamic pages won&apos;t generate until at least one record is published.
+                    </div>
+                  )}
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                    <span style={{ fontSize: 12, color: "var(--bk-ink-soft)" }}>
+                      {items.length} record{items.length === 1 ? "" : "s"}
+                    </span>
+                    <Button color="light" size="xs" onClick={startAdd} disabled={!collection}>
+                      <Plus size={13} /> Add record
+                    </Button>
+                  </div>
+                  <div>
+                    {items.length === 0 ? (
+                      <p style={{ color: "var(--bk-ink-soft)", fontSize: 13 }}>No records yet.</p>
+                    ) : (
+                      items.map((item) => (
+                        <div
+                          key={item.id}
+                          style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid var(--bk-border)" }}
+                        >
+                          <span style={{ fontSize: 13 }}>
+                            {collection ? displayValue(item, collection) : item.id}
+                            <span
+                              style={{
+                                marginLeft: 8,
+                                fontSize: 11,
+                                fontWeight: 500,
+                                color: item.status === "published" ? "var(--bk-success)" : "var(--bk-ink-muted)",
+                              }}
+                            >
+                              {item.status}
+                            </span>
+                          </span>
+                          <span style={{ display: "flex", gap: 4 }}>
+                            <Button
+                              color="light"
+                              size="xs"
+                              disabled={busy}
+                              onClick={() => setStatus(item.id, item.status === "published" ? "draft" : "published")}
+                              aria-label={item.status === "published" ? "Unpublish record" : "Publish record"} aria-busy={busy || undefined} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+                            >
+                              {item.status === "published" ? "Unpublish" : "Publish"}
+                            </Button>
+                            <Button color="light" size="xs" onClick={() => startEdit(item)} aria-label="Edit record" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+                              <Pencil size={13} />
+                            </Button>
+                            <Button color="light" size="xs" disabled={busy} onClick={() => remove(item.id)} aria-label="Delete record" aria-busy={busy || undefined} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+                              <Trash2 size={13} />
+                            </Button>
+                          </span>
+                        </div>
+                      ))
                     )}
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                      <span style={{ fontSize: 12, color: "var(--bk-ink-soft)" }}>
-                        {items.length} record{items.length === 1 ? "" : "s"}
-                      </span>
-                      <Button color="light" size="xs" onClick={startAdd} disabled={!collection}>
-                        <Plus size={13} /> Add record
-                      </Button>
-                    </div>
-                    <div>
-                      {items.length === 0 ? (
-                        <p style={{ color: "var(--bk-ink-soft)", fontSize: 13 }}>No records yet.</p>
-                      ) : (
-                        items.map((item) => (
-                          <div
-                            key={item.id}
-                            style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid var(--bk-border)" }}
-                          >
-                            <span style={{ fontSize: 13 }}>
-                              {collection ? displayValue(item, collection) : item.id}
-                              <span
-                                style={{
-                                  marginLeft: 8,
-                                  fontSize: 11,
-                                  fontWeight: 500,
-                                  color: item.status === "published" ? "var(--bk-success)" : "var(--bk-ink-muted)",
-                                }}
-                              >
-                                {item.status}
-                              </span>
-                            </span>
-                            <span style={{ display: "flex", gap: 4 }}>
-                              <Button
-                                color="light"
-                                size="xs"
-                                disabled={busy}
-                                onClick={() => setStatus(item.id, item.status === "published" ? "draft" : "published")}
-                                aria-label={item.status === "published" ? "Unpublish record" : "Publish record"} aria-busy={busy || undefined} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
-                              >
-                                {item.status === "published" ? "Unpublish" : "Publish"}
-                              </Button>
-                              <Button color="light" size="xs" onClick={() => startEdit(item)} aria-label="Edit record" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
-                                <Pencil size={13} />
-                              </Button>
-                              <Button color="light" size="xs" disabled={busy} onClick={() => remove(item.id)} aria-label="Delete record" aria-busy={busy || undefined} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
-                                <Trash2 size={13} />
-                              </Button>
-                            </span>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  </>
-                )}
-              </>
-            )}
-          </div>
-        </ModalContent>
-      </ModalRoot>
-    </Portal>
+                  </div>
+                </>
+              )}
+            </>
+          )}
+        </div>
+      </ModalContent>
+    </ModalRoot>
   );
 };
 

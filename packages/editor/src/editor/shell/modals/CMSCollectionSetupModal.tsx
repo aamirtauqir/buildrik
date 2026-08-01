@@ -11,7 +11,7 @@
 
 import { X, Plus, Trash2, Check } from "lucide-react";
 import * as React from "react";
-import { ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal } from "@/editor/chrome-ui";
+import { ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
 import { Button, Select, Textarea, TextInput } from "@/editor/chrome-ui";
 // =============================================================================
@@ -369,233 +369,231 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
   );
 
   return (
-    <Portal>
-      <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
-        <ModalContent size="lg">
-          <ModalTitle>Create Collection</ModalTitle>
-          <ModalClose aria-label="Close modal">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-              <path d="M18 6L6 18M6 6l12 12" />
-            </svg>
-          </ModalClose>
-          <div className="bd-modal__body">
-      {/* Step indicator */}
-      <div style={s.stepIndicator}>
-        <div style={s.step}>
-          <div
-            style={{
-              ...s.stepDot,
-              ...(step === 1 ? s.stepDotActive : s.stepDotDone),
-            }}
-          >
-            {step > 1 ? <Check size={11} /> : "1"}
-          </div>
-          <span style={step === 1 ? s.stepActive : s.stepDone}>Name &amp; Type</span>
+    <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
+      <ModalContent size="lg">
+        <ModalTitle>Create Collection</ModalTitle>
+        <ModalClose aria-label="Close modal">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+        </ModalClose>
+        <div className="bd-modal__body">
+    {/* Step indicator */}
+    <div style={s.stepIndicator}>
+      <div style={s.step}>
+        <div
+          style={{
+            ...s.stepDot,
+            ...(step === 1 ? s.stepDotActive : s.stepDotDone),
+          }}
+        >
+          {step > 1 ? <Check size={11} /> : "1"}
         </div>
-        <div style={s.stepDivider} />
-        <div style={s.step}>
-          <div
-            style={{
-              ...s.stepDot,
-              ...(step === 2 ? s.stepDotActive : {}),
+        <span style={step === 1 ? s.stepActive : s.stepDone}>Name &amp; Type</span>
+      </div>
+      <div style={s.stepDivider} />
+      <div style={s.step}>
+        <div
+          style={{
+            ...s.stepDot,
+            ...(step === 2 ? s.stepDotActive : {}),
+          }}
+        >
+          2
+        </div>
+        <span style={step === 2 ? s.stepActive : {}}>Fields</span>
+      </div>
+    </div>
+    {step === 1 && (
+      <div className="tw:flex tw:flex-col tw:gap-4">
+        {/* Collection name */}
+        <div>
+          <label style={s.label}>
+            Collection name <span style={{ color: "var(--bk-error)" }}>*</span>
+          </label>
+          <TextInput
+            style={s.input}
+            type="text"
+            placeholder="Blog Posts"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            autoFocus
+            onFocus={(e) => {
+              (e.currentTarget as HTMLInputElement).style.borderColor =
+                "var(--bk-accent)";
             }}
+            onBlur={(e) => {
+              (e.currentTarget as HTMLInputElement).style.borderColor =
+                "var(--bk-border)";
+            }}
+          />
+        </div>
+
+        {/* Content type */}
+        <div>
+          <label style={s.label}>Content type</label>
+          <Select
+            style={s.select}
+            value={contentType}
+            onChange={(e) => setContentType(e.target.value as ContentType)}
           >
-            2
-          </div>
-          <span style={step === 2 ? s.stepActive : {}}>Fields</span>
+            {CONTENT_TYPES.map((ct) => (
+              <option key={ct.value} value={ct.value}>
+                {ct.label}
+              </option>
+            ))}
+          </Select>
+        </div>
+
+        {/* Description */}
+        <div>
+          <label style={s.label}>Description (optional)</label>
+          <Textarea
+            style={s.textarea}
+            placeholder="Describe the purpose of this collection…"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            onFocus={(e) => {
+              (e.currentTarget as HTMLTextAreaElement).style.borderColor =
+                "var(--bk-accent)";
+            }}
+            onBlur={(e) => {
+              (e.currentTarget as HTMLTextAreaElement).style.borderColor =
+                "var(--bk-border)";
+            }}
+          />
         </div>
       </div>
-      {step === 1 && (
-        <div className="tw:flex tw:flex-col tw:gap-4">
-          {/* Collection name */}
-          <div>
-            <label style={s.label}>
-              Collection name <span style={{ color: "var(--bk-error)" }}>*</span>
-            </label>
-            <TextInput
-              style={s.input}
-              type="text"
-              placeholder="Blog Posts"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              autoFocus
-              onFocus={(e) => {
-                (e.currentTarget as HTMLInputElement).style.borderColor =
-                  "var(--bk-accent)";
-              }}
-              onBlur={(e) => {
-                (e.currentTarget as HTMLInputElement).style.borderColor =
-                  "var(--bk-border)";
-              }}
-            />
-          </div>
-
-          {/* Content type */}
-          <div>
-            <label style={s.label}>Content type</label>
-            <Select
-              style={s.select}
-              value={contentType}
-              onChange={(e) => setContentType(e.target.value as ContentType)}
-            >
-              {CONTENT_TYPES.map((ct) => (
-                <option key={ct.value} value={ct.value}>
-                  {ct.label}
-                </option>
-              ))}
-            </Select>
-          </div>
-
-          {/* Description */}
-          <div>
-            <label style={s.label}>Description (optional)</label>
-            <Textarea
-              style={s.textarea}
-              placeholder="Describe the purpose of this collection…"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              onFocus={(e) => {
-                (e.currentTarget as HTMLTextAreaElement).style.borderColor =
-                  "var(--bk-accent)";
-              }}
-              onBlur={(e) => {
-                (e.currentTarget as HTMLTextAreaElement).style.borderColor =
-                  "var(--bk-border)";
-              }}
-            />
-          </div>
+    )}
+    {step === 2 && (
+      <div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 10,
+          }}
+        >
+          <span style={{ fontSize: 12, color: "var(--bk-ink-soft)" }}>
+            Fields for <strong style={{ color: "var(--bk-ink)" }}>{name}</strong>
+          </span>
+          <Button color="light" size="xs" onClick={addField} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+            <Plus size={12} aria-hidden="true" />
+            Add Field
+          </Button>
         </div>
-      )}
-      {step === 2 && (
-        <div>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 10,
-            }}
-          >
-            <span style={{ fontSize: 12, color: "var(--bk-ink-soft)" }}>
-              Fields for <strong style={{ color: "var(--bk-ink)" }}>{name}</strong>
-            </span>
-            <Button color="light" size="xs" onClick={addField} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
-              <Plus size={12} aria-hidden="true" />
-              Add Field
-            </Button>
-          </div>
 
-          {/* Header row */}
-          <div
-            style={{
-              display: "flex",
-              gap: 8,
-              paddingBottom: 6,
-              borderBottom: "1px solid var(--bk-border)",
-              marginBottom: 2,
-            }}
-          >
-            <span style={{ flex: 1, fontSize: 11, color: "var(--bk-ink-muted)", fontWeight: 500 }}>
-              FIELD NAME
-            </span>
-            <span style={{ width: 110, fontSize: 11, color: "var(--bk-ink-muted)", fontWeight: 500 }}>
-              TYPE
-            </span>
-            <span style={{ width: 24 }} />
-          </div>
+        {/* Header row */}
+        <div
+          style={{
+            display: "flex",
+            gap: 8,
+            paddingBottom: 6,
+            borderBottom: "1px solid var(--bk-border)",
+            marginBottom: 2,
+          }}
+        >
+          <span style={{ flex: 1, fontSize: 11, color: "var(--bk-ink-muted)", fontWeight: 500 }}>
+            FIELD NAME
+          </span>
+          <span style={{ width: 110, fontSize: 11, color: "var(--bk-ink-muted)", fontWeight: 500 }}>
+            TYPE
+          </span>
+          <span style={{ width: 24 }} />
+        </div>
 
-          {/* Field rows */}
-          <div style={{ maxHeight: 240, overflowY: "auto" }}>
-            {fields.map((field) => (
-              <div key={field.id} style={s.fieldRow}>
-                <TextInput
-                  style={s.fieldNameInput}
-                  type="text"
-                  placeholder="field_name"
-                  value={field.name}
-                  onChange={(e) => updateFieldName(field.id, e.target.value)}
-                />
-                <Select
-                  style={s.fieldTypeSelect}
-                  value={field.type}
-                  onChange={(e) => updateFieldType(field.id, e.target.value as FieldType)}
-                >
-                  {FIELD_TYPES.map((ft) => (
-                    <option key={ft} value={ft}>
-                      {ft}
-                    </option>
-                  ))}
-                </Select>
-                <Button
-                  type="button"
-                  style={s.removeBtn}
-                  onClick={() => removeField(field.id)}
-                  title="Remove field"
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLElement).style.color = "var(--bk-error)";
-                    (e.currentTarget as HTMLElement).style.background =
-                      "rgba(243,139,168,0.1)";
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLElement).style.color = "var(--bk-ink-muted)";
-                    (e.currentTarget as HTMLElement).style.background = "transparent";
-                  }}
-                >
-                  <Trash2 size={12} aria-hidden />
-                </Button>
-              </div>
-            ))}
-          </div>
-
-          {/* E7 — dynamic-page binding */}
-          <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid var(--bk-border)" }}>
-            <Button
-              type="button"
-              color={genPages ? undefined : "light"}
-              onClick={() => setGenPages((v) => !v)}
-              style={{ fontSize: 12 }}
-            >
-              {genPages ? "✓ " : ""}Generate a page per entry
-            </Button>
-            {genPages && (
-              <div style={{ marginTop: 10, display: "grid", gap: 8 }}>
-                <TextInput   type="text" placeholder="Slug pattern — /blog/{slug}" value={pageSlug} onChange={(e) => setPageSlug(e.target.value)} />
-                <TextInput   type="text" placeholder="Template page path — blog/_template/index.html" value={pageTemplate} onChange={(e) => setPageTemplate(e.target.value)} />
-                <TextInput   type="text" placeholder="SEO title — {title} — Blog" value={pageSeoTitle} onChange={(e) => setPageSeoTitle(e.target.value)} />
-                <TextInput   type="text" placeholder="SEO description — Read about {title}" value={pageSeoDesc} onChange={(e) => setPageSeoDesc(e.target.value)} />
-              </div>
-            )}
-          </div>
-
-          {error && (
-            <div
-              style={{
-                marginTop: 10,
-                padding: "8px 12px",
-                background: "rgba(243,139,168,0.1)",
-                border: "1px solid rgba(243,139,168,0.25)",
-                borderRadius: "var(--bk-radius-lg)",
-                color: "var(--bk-error)",
-                fontSize: 12,
-              }}
-            >
-              {error}
+        {/* Field rows */}
+        <div style={{ maxHeight: 240, overflowY: "auto" }}>
+          {fields.map((field) => (
+            <div key={field.id} style={s.fieldRow}>
+              <TextInput
+                style={s.fieldNameInput}
+                type="text"
+                placeholder="field_name"
+                value={field.name}
+                onChange={(e) => updateFieldName(field.id, e.target.value)}
+              />
+              <Select
+                style={s.fieldTypeSelect}
+                value={field.type}
+                onChange={(e) => updateFieldType(field.id, e.target.value as FieldType)}
+              >
+                {FIELD_TYPES.map((ft) => (
+                  <option key={ft} value={ft}>
+                    {ft}
+                  </option>
+                ))}
+              </Select>
+              <Button
+                type="button"
+                style={s.removeBtn}
+                onClick={() => removeField(field.id)}
+                title="Remove field"
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.color = "var(--bk-error)";
+                  (e.currentTarget as HTMLElement).style.background =
+                    "rgba(243,139,168,0.1)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.color = "var(--bk-ink-muted)";
+                  (e.currentTarget as HTMLElement).style.background = "transparent";
+                }}
+              >
+                <Trash2 size={12} aria-hidden />
+              </Button>
             </div>
-          )}
+          ))}
+        </div>
 
-          {success && (
-            <div style={s.successBanner}>
-              <Check size={16} />
-              Collection "{name}" created successfully!
+        {/* E7 — dynamic-page binding */}
+        <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid var(--bk-border)" }}>
+          <Button
+            type="button"
+            color={genPages ? undefined : "light"}
+            onClick={() => setGenPages((v) => !v)}
+            style={{ fontSize: 12 }}
+          >
+            {genPages ? "✓ " : ""}Generate a page per entry
+          </Button>
+          {genPages && (
+            <div style={{ marginTop: 10, display: "grid", gap: 8 }}>
+              <TextInput   type="text" placeholder="Slug pattern — /blog/{slug}" value={pageSlug} onChange={(e) => setPageSlug(e.target.value)} />
+              <TextInput   type="text" placeholder="Template page path — blog/_template/index.html" value={pageTemplate} onChange={(e) => setPageTemplate(e.target.value)} />
+              <TextInput   type="text" placeholder="SEO title — {title} — Blog" value={pageSeoTitle} onChange={(e) => setPageSeoTitle(e.target.value)} />
+              <TextInput   type="text" placeholder="SEO description — Read about {title}" value={pageSeoDesc} onChange={(e) => setPageSeoDesc(e.target.value)} />
             </div>
           )}
         </div>
-      )}
+
+        {error && (
+          <div
+            style={{
+              marginTop: 10,
+              padding: "8px 12px",
+              background: "rgba(243,139,168,0.1)",
+              border: "1px solid rgba(243,139,168,0.25)",
+              borderRadius: "var(--bk-radius-lg)",
+              color: "var(--bk-error)",
+              fontSize: 12,
+            }}
+          >
+            {error}
           </div>
-          <ModalFooter>{footer}</ModalFooter>
-        </ModalContent>
-      </ModalRoot>
-    </Portal>
+        )}
+
+        {success && (
+          <div style={s.successBanner}>
+            <Check size={16} />
+            Collection "{name}" created successfully!
+          </div>
+        )}
+      </div>
+    )}
+        </div>
+        <ModalFooter>{footer}</ModalFooter>
+      </ModalContent>
+    </ModalRoot>
   );
 };
 

@@ -6,7 +6,7 @@
 
 import DOMPurify from "dompurify";
 import * as React from "react";
-import { ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/chrome-ui";
+import { ModalClose, ModalContent, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
 import type { Template } from "./types";
 import { Badge, Button } from "@/editor/chrome-ui";
 // ============================================================================
@@ -136,104 +136,102 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
   const previewWidth = deviceWidths[device];
 
   return (
-    <Portal>
-      <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
-        <ModalContent size="xl" style={{ maxWidth: "90vw" }}>
-          <ModalClose aria-label="Close modal" onClick={onClose}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-              <path d="M18 6L6 18M6 6l12 12" />
-            </svg>
-          </ModalClose>
-          <div className="bd-modal__body">
-      <div style={{ display: "flex", flexDirection: "column", height: "80vh" }}>
-        {/* Header */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: "12px 16px",
-            borderBottom: "1px solid var(--bk-border)",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <span style={{ fontSize: 24 }}>{template.thumbnail || "📄"}</span>
-            <div>
-              <ModalTitle style={{ fontWeight: 600, fontSize: 16, margin: 0 }}>{template.name}</ModalTitle>
-              <div style={{ fontSize: 12, color: "var(--bk-ink-muted)" }}>
-                {template.description}
-              </div>
-            </div>
-            <Badge color="gray">{template.category}</Badge>
-          </div>
-
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <DeviceSelector device={device} onChange={setDevice} />
-            <Button onClick={() => onUse(template)}>Use Template</Button>
-          </div>
-        </div>
-
-        {/* Preview Area */}
-        <div
-          style={{
-            flex: 1,
-            background: /* @lint-hex-policy: template preview/thumbnail color — not editor chrome */ "#1a1a2e",
-            display: "flex",
-            justifyContent: "center",
-            padding: 24,
-            overflow: "auto",
-          }}
-        >
-          <div
-            style={{
-              width: previewWidth,
-              height: "100%",
-              background: /* @lint-hex-policy: template preview/thumbnail color — not editor chrome */ "#fff",
-              borderRadius: 8,
-              overflow: "hidden",
-              boxShadow: "0 10px 40px rgba(0,0,0,0.3)",
-              transition: "width 0.3s ease",
-            }}
-          >
-            <PreviewFrame html={template.html} />
-          </div>
-        </div>
-
-        {/* Template Info Panel */}
-        <div
-          style={{
-            padding: 16,
-            borderTop: "1px solid var(--bk-border)",
-            display: "flex",
-            gap: 24,
-          }}
-        >
+    <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
+      <ModalContent size="xl" style={{ maxWidth: "90vw" }}>
+        <ModalClose aria-label="Close modal" onClick={onClose}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+        </ModalClose>
+        <div className="bd-modal__body">
+    <div style={{ display: "flex", flexDirection: "column", height: "80vh" }}>
+      {/* Header */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          padding: "12px 16px",
+          borderBottom: "1px solid var(--bk-border)",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <span style={{ fontSize: 24 }}>{template.thumbnail || "📄"}</span>
           <div>
-            <div style={{ fontSize: 11, color: "var(--bk-ink-muted)", marginBottom: 4 }}>
-              Category
+            <ModalTitle style={{ fontWeight: 600, fontSize: 16, margin: 0 }}>{template.name}</ModalTitle>
+            <div style={{ fontSize: 12, color: "var(--bk-ink-muted)" }}>
+              {template.description}
             </div>
-            <div style={{ fontWeight: 500 }}>{template.category}</div>
           </div>
-          {template.tags && template.tags.length > 0 && (
-            <div>
-              <div style={{ fontSize: 11, color: "var(--bk-ink-muted)", marginBottom: 4 }}>
-                Tags
-              </div>
-              <div style={{ display: "flex", gap: 4 }}>
-                {template.tags.map((tag) => (
-                  <Badge key={tag} color="gray">
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          )}
+          <Badge color="gray">{template.category}</Badge>
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <DeviceSelector device={device} onChange={setDevice} />
+          <Button onClick={() => onUse(template)}>Use Template</Button>
         </div>
       </div>
+
+      {/* Preview Area */}
+      <div
+        style={{
+          flex: 1,
+          background: /* @lint-hex-policy: template preview/thumbnail color — not editor chrome */ "#1a1a2e",
+          display: "flex",
+          justifyContent: "center",
+          padding: 24,
+          overflow: "auto",
+        }}
+      >
+        <div
+          style={{
+            width: previewWidth,
+            height: "100%",
+            background: /* @lint-hex-policy: template preview/thumbnail color — not editor chrome */ "#fff",
+            borderRadius: 8,
+            overflow: "hidden",
+            boxShadow: "0 10px 40px rgba(0,0,0,0.3)",
+            transition: "width 0.3s ease",
+          }}
+        >
+          <PreviewFrame html={template.html} />
+        </div>
+      </div>
+
+      {/* Template Info Panel */}
+      <div
+        style={{
+          padding: 16,
+          borderTop: "1px solid var(--bk-border)",
+          display: "flex",
+          gap: 24,
+        }}
+      >
+        <div>
+          <div style={{ fontSize: 11, color: "var(--bk-ink-muted)", marginBottom: 4 }}>
+            Category
           </div>
-        </ModalContent>
-      </ModalRoot>
-    </Portal>
+          <div style={{ fontWeight: 500 }}>{template.category}</div>
+        </div>
+        {template.tags && template.tags.length > 0 && (
+          <div>
+            <div style={{ fontSize: 11, color: "var(--bk-ink-muted)", marginBottom: 4 }}>
+              Tags
+            </div>
+            <div style={{ display: "flex", gap: 4 }}>
+              {template.tags.map((tag) => (
+                <Badge key={tag} color="gray">
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+        </div>
+      </ModalContent>
+    </ModalRoot>
   );
 };
 

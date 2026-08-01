@@ -17,6 +17,7 @@
 import React from "react";
 import { createPortal } from "react-dom";
 import { Button } from "flowbite-react";
+import { getOverlayRoot } from "./OverlayRoot";
 
 const GHOST_BTN_CLASS = "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900";
 
@@ -137,7 +138,7 @@ function ToastViewport({ toasts, onDismiss }: { toasts: QueuedToast[]; onDismiss
         <ToastItem key={t.id} toast={t} onDismiss={onDismiss} />
       ))}
     </div>,
-    document.body,
+    getOverlayRoot(),
   );
 }
 

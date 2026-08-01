@@ -10,7 +10,7 @@
 
 import { ChevronDown, Layers, Plus } from "lucide-react";
 import * as React from "react";
-import { ConfirmDialog, EmptyState, EmptyStateDesc, EmptyStateTitle, ModalClose, ModalContent, ModalRoot, ModalTitle, Portal, PanelFrame } from "@/editor/chrome-ui";
+import { ConfirmDialog, EmptyState, EmptyStateDesc, EmptyStateTitle, ModalClose, ModalContent, ModalRoot, ModalTitle, PanelFrame } from "@/editor/chrome-ui";
 import { useToast } from "@/editor/chrome-ui";
 import { SkeletonListItem } from "@/editor/chrome-ui";
 import { PanelErrorState } from "../shared/PanelErrorState";
@@ -370,84 +370,80 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         confirmLabel="Delete"
         destructive
       />
-      <Portal>
-        <ModalRoot open={!!state.renameTarget} onOpenChange={(next) => !next && state.setRenameTarget(null)}>
-          <ModalContent size="lg">
-            <ModalTitle>Rename Component</ModalTitle>
-            <ModalClose aria-label="Close modal">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                <path d="M18 6L6 18M6 6l12 12" />
-              </svg>
-            </ModalClose>
-            <div className="bd-modal__body">
-              <div className="tw:flex tw:flex-col tw:gap-3">
-                <TextInput
-                  type="text"
-                  value={renameInput}
-                  onChange={(e) => setRenameInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") state.confirmRename(renameInput);
-                  }}
-                  placeholder="Component name"
-                  style={dialogInputStyles}
-                />
-                <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-                  <Button onClick={() => state.setRenameTarget(null)} style={dialogCancelBtnStyles}>
-                    Cancel
-                  </Button>
-                  <Button onClick={() => state.confirmRename(renameInput)} style={dialogPrimaryBtnStyles}>
-                    Rename
-                  </Button>
-                </div>
+      <ModalRoot open={!!state.renameTarget} onOpenChange={(next) => !next && state.setRenameTarget(null)}>
+        <ModalContent size="lg">
+          <ModalTitle>Rename Component</ModalTitle>
+          <ModalClose aria-label="Close modal">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </ModalClose>
+          <div className="bd-modal__body">
+            <div className="tw:flex tw:flex-col tw:gap-3">
+              <TextInput
+                type="text"
+                value={renameInput}
+                onChange={(e) => setRenameInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") state.confirmRename(renameInput);
+                }}
+                placeholder="Component name"
+                style={dialogInputStyles}
+              />
+              <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+                <Button onClick={() => state.setRenameTarget(null)} style={dialogCancelBtnStyles}>
+                  Cancel
+                </Button>
+                <Button onClick={() => state.confirmRename(renameInput)} style={dialogPrimaryBtnStyles}>
+                  Rename
+                </Button>
               </div>
             </div>
-          </ModalContent>
-        </ModalRoot>
-      </Portal>
-      <Portal>
-        <ModalRoot open={!!state.variantPicker} onOpenChange={(next) => !next && state.setVariantPicker(null)}>
-          <ModalContent size="lg">
-            <ModalTitle>{`Select Variant — ${state.variantPicker?.componentName ?? ""}`}</ModalTitle>
-            <ModalClose aria-label="Close modal">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                <path d="M18 6L6 18M6 6l12 12" />
-              </svg>
-            </ModalClose>
-            <div className="bd-modal__body">
-              <div className="tw:flex tw:flex-col tw:gap-2">
-                {state.variantPicker?.variants.map((v) => {
-                  const isCurrent = v.id === state.variantPicker?.currentVariantId;
-                  return (
-                    <Button
-                      key={v.id}
-                      onClick={() => state.confirmVariant(v.id)}
-                      style={{
-                        padding: "10px 14px",
-                        borderRadius: "var(--bk-radius-sm)",
-                        fontSize: 13,
-                        cursor: "pointer",
-                        textAlign: "left" as const,
-                        background: isCurrent ? "var(--bk-alpha-accent-15)" : "var(--bk-bg-subtle)",
-                        border: isCurrent
-                          ? "1px solid var(--bk-accent)"
-                          : "1px solid var(--bk-border)",
-                        color: "var(--bk-ink)",
-                      }}
-                    >
-                      {v.name}
-                      {isCurrent && (
-                        <span style={{ marginLeft: 8, fontSize: 12, color: "var(--bk-accent)" }}>
-                          (current)
-                        </span>
-                      )}
-                    </Button>
-                  );
-                })}
-              </div>
+          </div>
+        </ModalContent>
+      </ModalRoot>
+      <ModalRoot open={!!state.variantPicker} onOpenChange={(next) => !next && state.setVariantPicker(null)}>
+        <ModalContent size="lg">
+          <ModalTitle>{`Select Variant — ${state.variantPicker?.componentName ?? ""}`}</ModalTitle>
+          <ModalClose aria-label="Close modal">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </ModalClose>
+          <div className="bd-modal__body">
+            <div className="tw:flex tw:flex-col tw:gap-2">
+              {state.variantPicker?.variants.map((v) => {
+                const isCurrent = v.id === state.variantPicker?.currentVariantId;
+                return (
+                  <Button
+                    key={v.id}
+                    onClick={() => state.confirmVariant(v.id)}
+                    style={{
+                      padding: "10px 14px",
+                      borderRadius: "var(--bk-radius-sm)",
+                      fontSize: 13,
+                      cursor: "pointer",
+                      textAlign: "left" as const,
+                      background: isCurrent ? "var(--bk-alpha-accent-15)" : "var(--bk-bg-subtle)",
+                      border: isCurrent
+                        ? "1px solid var(--bk-accent)"
+                        : "1px solid var(--bk-border)",
+                      color: "var(--bk-ink)",
+                    }}
+                  >
+                    {v.name}
+                    {isCurrent && (
+                      <span style={{ marginLeft: 8, fontSize: 12, color: "var(--bk-accent)" }}>
+                        (current)
+                      </span>
+                    )}
+                  </Button>
+                );
+              })}
             </div>
-          </ModalContent>
-        </ModalRoot>
-      </Portal>
+          </div>
+        </ModalContent>
+      </ModalRoot>
     </PanelFrame>
   );
 };

@@ -15,7 +15,6 @@ import {
   ModalContent,
   ModalRoot,
   ModalTitle,
-  Portal,
   Spinner,
   Tabs,
 } from "@/editor/chrome-ui";
@@ -154,166 +153,164 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
         : `Export as ${config.format.toUpperCase()}`;
 
   return (
-    <Portal>
-      <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
-        <ModalContent size="lg">
-          <ModalTitle>Export</ModalTitle>
-          <ModalClose aria-label="Close modal" onClick={onClose}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-              <path d="M18 6L6 18M6 6l12 12" />
-            </svg>
-          </ModalClose>
-          <div className="bd-modal__body">
-          {/* Format grid — always visible at top */}
-          <div style={{ marginBottom: 20 }}>
-            <FormatGrid
-              selectedFormat={config.format}
-              onFormatChange={(fmt) => handleConfigChange({ format: fmt })}
-            />
-          </div>
+    <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
+      <ModalContent size="lg">
+        <ModalTitle>Export</ModalTitle>
+        <ModalClose aria-label="Close modal" onClick={onClose}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+        </ModalClose>
+        <div className="bd-modal__body">
+        {/* Format grid — always visible at top */}
+        <div style={{ marginBottom: 20 }}>
+          <FormatGrid
+            selectedFormat={config.format}
+            onFormatChange={(fmt) => handleConfigChange({ format: fmt })}
+          />
+        </div>
 
-          {/* Tabs */}
-          <div style={{ marginBottom: 16 }}>
-            <Tabs
-              tabs={[
-                { id: "preview", label: "Preview" },
-                { id: "code", label: "Code" },
-                { id: "options", label: "Options" },
-              ]}
-              value={activeTab}
-              onChange={(tab) => setActiveTab(tab as ExportTab)}
-            />
-          </div>
+        {/* Tabs */}
+        <div style={{ marginBottom: 16 }}>
+          <Tabs
+            tabs={[
+              { id: "preview", label: "Preview" },
+              { id: "code", label: "Code" },
+              { id: "options", label: "Options" },
+            ]}
+            value={activeTab}
+            onChange={(tab) => setActiveTab(tab as ExportTab)}
+          />
+        </div>
 
-          {/* Content */}
-          <div style={{ minHeight: 300 }}>
-            {loading ? (
-              <LoadingState />
-            ) : result?.error ? (
-              <ErrorState error={result.error} />
-            ) : (
-              <>
-                {activeTab === "preview" && result?.html && (
-                  <PreviewTab
-                    html={result.html}
-                    previewDevice={previewDevice}
-                    onDeviceChange={setPreviewDevice}
-                  />
-                )}
-                {activeTab === "preview" && config.format === "react" && result?.files && (
-                  <NoPreviewMessage format="React" />
-                )}
-                {activeTab === "code" && result?.html && (
-                  <CodePreview html={result.html} cssCode={result.css || ""} showLineNumbers />
-                )}
-                {activeTab === "code" && config.format === "react" && result?.files && (
-                  <ReactCodePreview files={result.files} />
-                )}
-                {activeTab === "options" && (
-                  <OptionsPanel config={config} onChange={handleConfigChange} />
-                )}
-              </>
-            )}
-          </div>
-
-          {/* Stats row */}
-          {result?.stats && config.format !== "react" && (
-            <div
-              style={{
-                fontSize: 12,
-                color: "var(--bk-ink-muted)",
-                marginTop: 16,
-                marginBottom: 4,
-              }}
-            >
-              {result.stats.elementCount} elements · {formatBytes(result.stats.htmlSize)} HTML
-              {result.stats.cssSize > 0 && ` · ${formatBytes(result.stats.cssSize)} CSS`}
-            </div>
+        {/* Content */}
+        <div style={{ minHeight: 300 }}>
+          {loading ? (
+            <LoadingState />
+          ) : result?.error ? (
+            <ErrorState error={result.error} />
+          ) : (
+            <>
+              {activeTab === "preview" && result?.html && (
+                <PreviewTab
+                  html={result.html}
+                  previewDevice={previewDevice}
+                  onDeviceChange={setPreviewDevice}
+                />
+              )}
+              {activeTab === "preview" && config.format === "react" && result?.files && (
+                <NoPreviewMessage format="React" />
+              )}
+              {activeTab === "code" && result?.html && (
+                <CodePreview html={result.html} cssCode={result.css || ""} showLineNumbers />
+              )}
+              {activeTab === "code" && config.format === "react" && result?.files && (
+                <ReactCodePreview files={result.files} />
+              )}
+              {activeTab === "options" && (
+                <OptionsPanel config={config} onChange={handleConfigChange} />
+              )}
+            </>
           )}
+        </div>
 
-          {/* Primary export button */}
-          <Button
-            onClick={
-              config.format === "zip"
-                ? handleDownloadZip
-                : config.format === "react"
-                  ? handleDownloadReact
-                  : handleDownloadHTML
-            }
-            disabled={
+        {/* Stats row */}
+        {result?.stats && config.format !== "react" && (
+          <div
+            style={{
+              fontSize: 12,
+              color: "var(--bk-ink-muted)",
+              marginTop: 16,
+              marginBottom: 4,
+            }}
+          >
+            {result.stats.elementCount} elements · {formatBytes(result.stats.htmlSize)} HTML
+            {result.stats.cssSize > 0 && ` · ${formatBytes(result.stats.cssSize)} CSS`}
+          </div>
+        )}
+
+        {/* Primary export button */}
+        <Button
+          onClick={
+            config.format === "zip"
+              ? handleDownloadZip
+              : config.format === "react"
+                ? handleDownloadReact
+                : handleDownloadHTML
+          }
+          disabled={
+            (config.format === "react" ? !result?.files?.length : !result?.html) ||
+            loading ||
+            zipLoading
+          }
+          style={{
+            width: "100%",
+            height: 44,
+            marginTop: 16,
+            background: "var(--bk-accent)",
+            color: "var(--bk-accent-on)",
+            border: "none",
+            borderRadius: "var(--bk-radius-lg)",
+            fontSize: 14,
+            fontWeight: 600,
+            cursor:
               (config.format === "react" ? !result?.files?.length : !result?.html) ||
               loading ||
               zipLoading
-            }
-            style={{
-              width: "100%",
-              height: 44,
-              marginTop: 16,
-              background: "var(--bk-accent)",
-              color: "var(--bk-accent-on)",
-              border: "none",
-              borderRadius: "var(--bk-radius-lg)",
-              fontSize: 14,
-              fontWeight: 600,
-              cursor:
-                (config.format === "react" ? !result?.files?.length : !result?.html) ||
-                loading ||
-                zipLoading
-                  ? "not-allowed"
-                  : "pointer",
-              opacity:
-                (config.format === "react" ? !result?.files?.length : !result?.html) ||
-                loading ||
-                zipLoading
-                  ? 0.6
-                  : 1,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 8,
-              transition: "opacity 0.15s",
-            }}
-            aria-label={exportLabel}
-          >
-            {(loading || zipLoading) ? (
-              <>
-                <Spinner size="sm" />
-                Exporting…
-              </>
-            ) : (
-              exportLabel
-            )}
-          </Button>
+                ? "not-allowed"
+                : "pointer",
+            opacity:
+              (config.format === "react" ? !result?.files?.length : !result?.html) ||
+              loading ||
+              zipLoading
+                ? 0.6
+                : 1,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+            transition: "opacity 0.15s",
+          }}
+          aria-label={exportLabel}
+        >
+          {(loading || zipLoading) ? (
+            <>
+              <Spinner size="sm" />
+              Exporting…
+            </>
+          ) : (
+            exportLabel
+          )}
+        </Button>
 
-          {/* Secondary actions row */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginTop: 12,
-            }}
-          >
-            <Button color="light" onClick={onClose} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
-              Cancel
-            </Button>
-            <div style={{ display: "flex", gap: 8 }}>
-              {config.format !== "react" && config.cssStyle === "external" && (
-                <Button color="light" onClick={handleDownloadCSS} disabled={!result?.css}>
-                  Download CSS
-                </Button>
-              )}
-              {config.format !== "react" && (
-                <Button color="light" onClick={handleDownloadAll} disabled={!result?.html}>
-                  Download All
-                </Button>
-              )}
-            </div>
+        {/* Secondary actions row */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginTop: 12,
+          }}
+        >
+          <Button color="light" onClick={onClose} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+            Cancel
+          </Button>
+          <div style={{ display: "flex", gap: 8 }}>
+            {config.format !== "react" && config.cssStyle === "external" && (
+              <Button color="light" onClick={handleDownloadCSS} disabled={!result?.css}>
+                Download CSS
+              </Button>
+            )}
+            {config.format !== "react" && (
+              <Button color="light" onClick={handleDownloadAll} disabled={!result?.html}>
+                Download All
+              </Button>
+            )}
           </div>
-          </div>
-        </ModalContent>
-      </ModalRoot>
-    </Portal>
+        </div>
+        </div>
+      </ModalContent>
+    </ModalRoot>
   );
 };
 

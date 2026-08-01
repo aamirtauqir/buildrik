@@ -9,9 +9,8 @@
  */
 
 import * as React from "react";
-import { createPortal } from "react-dom";
 import "./ApplyProgressOverlay.css";
-import { Button } from "@/editor/chrome-ui";
+import { Button, Portal } from "@/editor/chrome-ui";
 
 export interface ApplyProgressOverlayProps {
   templateName: string;
@@ -69,7 +68,7 @@ export const ApplyProgressOverlay: React.FC<ApplyProgressOverlayProps> = ({
     return () => clearTimeout(timer);
   }, [onError]);
 
-  return createPortal(
+  return <Portal>
     <div className="tmpl-progress" role="status" aria-label="Applying template" aria-live="polite">
       <div className="tmpl-progress__inner">
         <span className="tmpl-progress__spinner" style={{ width: 32, height: 32, borderWidth: 3 }} />
@@ -120,9 +119,8 @@ export const ApplyProgressOverlay: React.FC<ApplyProgressOverlayProps> = ({
           </Button>
         )}
       </div>
-    </div>,
-    document.body
-  );
+    </div>
+    </Portal>;
 };
 
 export default ApplyProgressOverlay;

@@ -6,7 +6,7 @@
  */
 
 import * as React from "react";
-import { ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/chrome-ui";
+import { ModalClose, ModalContent, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
 import { GROUPED_TABS_CONFIG } from "../rail/tabsConfig";
 
 // =============================================================================
@@ -103,94 +103,92 @@ export const KeyboardShortcutsPanel: React.FC<KeyboardShortcutsPanelProps> = ({
   onClose,
 }) => {
   return (
-    <Portal>
-      <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
-        <ModalContent size="lg">
-          <ModalTitle>Keyboard Shortcuts</ModalTitle>
-          <ModalClose aria-label="Close modal">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-              <path d="M18 6L6 18M6 6l12 12" />
-            </svg>
-          </ModalClose>
-          <div className="bd-modal__body">
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(3, 1fr)",
-          gap: 24,
-          maxHeight: "60vh",
-          overflowY: "auto",
-          padding: "8px 0",
-        }}
-      >
-        {SHORTCUT_GROUPS.map((group) => (
-          <div key={group.label}>
-            {/* Group heading */}
-            <div
-              style={{
-                fontSize: 12,
-                textTransform: "uppercase",
-                letterSpacing: "0.5px",
-                color: "var(--bk-ink-muted)",
-                marginBottom: 8,
-                paddingBottom: 6,
-                borderBottom: "1px solid var(--bk-border)",
-                fontWeight: 600,
-              }}
-            >
-              {group.label}
-            </div>
+    <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
+      <ModalContent size="lg">
+        <ModalTitle>Keyboard Shortcuts</ModalTitle>
+        <ModalClose aria-label="Close modal">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+        </ModalClose>
+        <div className="bd-modal__body">
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(3, 1fr)",
+        gap: 24,
+        maxHeight: "60vh",
+        overflowY: "auto",
+        padding: "8px 0",
+      }}
+    >
+      {SHORTCUT_GROUPS.map((group) => (
+        <div key={group.label}>
+          {/* Group heading */}
+          <div
+            style={{
+              fontSize: 12,
+              textTransform: "uppercase",
+              letterSpacing: "0.5px",
+              color: "var(--bk-ink-muted)",
+              marginBottom: 8,
+              paddingBottom: 6,
+              borderBottom: "1px solid var(--bk-border)",
+              fontWeight: 600,
+            }}
+          >
+            {group.label}
+          </div>
 
-            {/* Shortcut rows */}
-            <div className="tw:flex tw:flex-col tw:gap-2">
-              {group.shortcuts.map((row, idx) => (
-                <div
-                  key={idx}
+          {/* Shortcut rows */}
+          <div className="tw:flex tw:flex-col tw:gap-2">
+            {group.shortcuts.map((row, idx) => (
+              <div
+                key={idx}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: 8,
+                  padding: "3px 0",
+                }}
+              >
+                <span
                   style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    gap: 8,
-                    padding: "3px 0",
+                    fontSize: 13,
+                    color: "var(--bk-ink-soft)",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                    minWidth: 0,
                   }}
                 >
-                  <span
-                    style={{
-                      fontSize: 13,
-                      color: "var(--bk-ink-soft)",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                      minWidth: 0,
-                    }}
-                  >
-                    {row.desc}
-                  </span>
-                  <KeyBadge>{row.key}</KeyBadge>
-                </div>
-              ))}
-            </div>
+                  {row.desc}
+                </span>
+                <KeyBadge>{row.key}</KeyBadge>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
+    </div>
 
-      <div
-        style={{
-          marginTop: 16,
-          padding: "8px 12px",
-          background: "var(--bk-bg-subtle)",
-          borderRadius: "var(--bk-radius-sm)",
-          fontSize: 12,
-          color: "var(--bk-ink-muted)",
-          textAlign: "center",
-        }}
-      >
-        On Mac, use ⌘ Command instead of Ctrl
-      </div>
-          </div>
-        </ModalContent>
-      </ModalRoot>
-    </Portal>
+    <div
+      style={{
+        marginTop: 16,
+        padding: "8px 12px",
+        background: "var(--bk-bg-subtle)",
+        borderRadius: "var(--bk-radius-sm)",
+        fontSize: 12,
+        color: "var(--bk-ink-muted)",
+        textAlign: "center",
+      }}
+    >
+      On Mac, use ⌘ Command instead of Ctrl
+    </div>
+        </div>
+      </ModalContent>
+    </ModalRoot>
   );
 };
 

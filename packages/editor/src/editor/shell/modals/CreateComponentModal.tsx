@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal } from "@/editor/chrome-ui";
+import { ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
 import { useToast } from "@/editor/chrome-ui";
 import { Button, Checkbox, Textarea, TextInput } from "@/editor/chrome-ui";
@@ -125,136 +125,134 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
   };
 
   return (
-    <Portal>
-      <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
-        <ModalContent size="lg">
-          <ModalTitle>Create Component</ModalTitle>
-          <ModalClose aria-label="Close modal">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-              <path d="M18 6L6 18M6 6l12 12" />
-            </svg>
-          </ModalClose>
-          <div className="bd-modal__body">
-      <div className="tw:flex tw:flex-col tw:gap-4" onKeyDown={handleKeyPress}>
-        <div>
-          <label style={labelStyles}>
-            Name <span style={{ color: "var(--bk-accent)" }}>*</span>
-          </label>
-          <TextInput
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="e.g., Hero Section"
-            style={inputStyles}
-            autoFocus
-          />
-        </div>
-
-        <div>
-          <label style={labelStyles}>Description</label>
-          <Textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Optional description..."
-            rows={3}
-            style={textareaStyles}
-          />
-        </div>
-
-        <div>
-          <label style={labelStyles}>Category</label>
-          <TextInput
-            type="text"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            placeholder="e.g., Headers, Footers, Cards"
-            style={inputStyles}
-          />
-        </div>
-
-        <div>
-          <label style={labelStyles}>Tags</label>
-          <TextInput
-            type="text"
-            value={tags}
-            onChange={(e) => setTags(e.target.value)}
-            placeholder="e.g., responsive, dark-mode (comma-separated)"
-            style={inputStyles}
-          />
-          <small style={hintStyles}>Comma-separated tags for easier searching</small>
-        </div>
-
-        {/* GAP-FIX: Variant Options Section */}
-        <div style={variantSectionStyles}>
-          <label style={labelStyles}>Variant Options</label>
-          <label style={checkboxLabelStyles}>
-            <Checkbox
-              color="blue"
-              className="tw:bg-white"
-              checked={isVariantSet}
-              onChange={(e) => setIsVariantSet(e.target.checked)}
-              style={checkboxStyles} />
-            <span>This is a variant set (has multiple variants)</span>
-          </label>
-
-          {isVariantSet && (
-            <div style={variantPropsContainerStyles}>
-              <small style={hintStyles}>Select variant properties:</small>
-              <div style={variantChipsStyles}>
-                {VARIANT_PRESETS.map((preset) => (
-                  <Button
-                    key={preset.name}
-                    type="button"
-                    onClick={() => toggleVariantProp(preset.name)}
-                    style={{
-                      ...variantChipStyles,
-                      background: selectedVariantProps.includes(preset.name)
-                        ? "var(--bk-accent)"
-                        : "var(--bk-bg-subtle)",
-                      color: selectedVariantProps.includes(preset.name)
-                        ? "var(--bk-accent-on)"
-                        : "var(--bk-ink-soft)",
-                    }}
-                  >
-                    {preset.name}
-                    <span style={variantChipValuesStyles}>({preset.values.join(", ")})</span>
-                  </Button>
-                ))}
-              </div>
-              <small style={hintStyles}>You can configure variant values after creation</small>
-            </div>
-          )}
-        </div>
-
-        {/* Spec §6.3 / D7: "Pre-fill from DS styles" toggle (default ON) */}
-        <div style={variantSectionStyles}>
-          <label style={checkboxLabelStyles}>
-            <Checkbox
-              color="blue"
-              className="tw:bg-white"
-              checked={prefillFromDs}
-              onChange={(e) => setPrefillFromDs(e.target.checked)}
-              style={checkboxStyles}
-            />
-            <span>Pre-fill from DS styles</span>
-          </label>
-          <small style={hintStyles}>
-            Lift matching values into token / preset bindings on save. Recommended.
-          </small>
-        </div>
+    <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
+      <ModalContent size="lg">
+        <ModalTitle>Create Component</ModalTitle>
+        <ModalClose aria-label="Close modal">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+        </ModalClose>
+        <div className="bd-modal__body">
+    <div className="tw:flex tw:flex-col tw:gap-4" onKeyDown={handleKeyPress}>
+      <div>
+        <label style={labelStyles}>
+          Name <span style={{ color: "var(--bk-accent)" }}>*</span>
+        </label>
+        <TextInput
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="e.g., Hero Section"
+          style={inputStyles}
+          autoFocus
+        />
       </div>
+
+      <div>
+        <label style={labelStyles}>Description</label>
+        <Textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Optional description..."
+          rows={3}
+          style={textareaStyles}
+        />
+      </div>
+
+      <div>
+        <label style={labelStyles}>Category</label>
+        <TextInput
+          type="text"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          placeholder="e.g., Headers, Footers, Cards"
+          style={inputStyles}
+        />
+      </div>
+
+      <div>
+        <label style={labelStyles}>Tags</label>
+        <TextInput
+          type="text"
+          value={tags}
+          onChange={(e) => setTags(e.target.value)}
+          placeholder="e.g., responsive, dark-mode (comma-separated)"
+          style={inputStyles}
+        />
+        <small style={hintStyles}>Comma-separated tags for easier searching</small>
+      </div>
+
+      {/* GAP-FIX: Variant Options Section */}
+      <div style={variantSectionStyles}>
+        <label style={labelStyles}>Variant Options</label>
+        <label style={checkboxLabelStyles}>
+          <Checkbox
+            color="blue"
+            className="tw:bg-white"
+            checked={isVariantSet}
+            onChange={(e) => setIsVariantSet(e.target.checked)}
+            style={checkboxStyles} />
+          <span>This is a variant set (has multiple variants)</span>
+        </label>
+
+        {isVariantSet && (
+          <div style={variantPropsContainerStyles}>
+            <small style={hintStyles}>Select variant properties:</small>
+            <div style={variantChipsStyles}>
+              {VARIANT_PRESETS.map((preset) => (
+                <Button
+                  key={preset.name}
+                  type="button"
+                  onClick={() => toggleVariantProp(preset.name)}
+                  style={{
+                    ...variantChipStyles,
+                    background: selectedVariantProps.includes(preset.name)
+                      ? "var(--bk-accent)"
+                      : "var(--bk-bg-subtle)",
+                    color: selectedVariantProps.includes(preset.name)
+                      ? "var(--bk-accent-on)"
+                      : "var(--bk-ink-soft)",
+                  }}
+                >
+                  {preset.name}
+                  <span style={variantChipValuesStyles}>({preset.values.join(", ")})</span>
+                </Button>
+              ))}
+            </div>
+            <small style={hintStyles}>You can configure variant values after creation</small>
           </div>
-          <ModalFooter>
-            <Button color="light" onClick={onClose} disabled={isCreating} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
-              Cancel
-            </Button>
-            <Button onClick={handleSubmit} disabled={!name.trim() || isCreating}>
-              {isCreating ? "Creating..." : "Create Component"}
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </ModalRoot>
-    </Portal>
+        )}
+      </div>
+
+      {/* Spec §6.3 / D7: "Pre-fill from DS styles" toggle (default ON) */}
+      <div style={variantSectionStyles}>
+        <label style={checkboxLabelStyles}>
+          <Checkbox
+            color="blue"
+            className="tw:bg-white"
+            checked={prefillFromDs}
+            onChange={(e) => setPrefillFromDs(e.target.checked)}
+            style={checkboxStyles}
+          />
+          <span>Pre-fill from DS styles</span>
+        </label>
+        <small style={hintStyles}>
+          Lift matching values into token / preset bindings on save. Recommended.
+        </small>
+      </div>
+    </div>
+        </div>
+        <ModalFooter>
+          <Button color="light" onClick={onClose} disabled={isCreating} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+            Cancel
+          </Button>
+          <Button onClick={handleSubmit} disabled={!name.trim() || isCreating}>
+            {isCreating ? "Creating..." : "Create Component"}
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </ModalRoot>
   );
 };
 

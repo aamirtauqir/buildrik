@@ -2,7 +2,7 @@
  * PageContextMenu — portal context menu for page actions.
  *
  * Rules:
- * - Renders via createPortal(menu, document.body)
+ * - Renders through <Portal> into the shared chrome overlay root
  * - "Delete Page" is DISABLED (not hidden) when: page is homepage OR only page
  * - Keyboard: Escape closes, ↑↓ rove focus
  *
@@ -10,10 +10,8 @@
  */
 
 import * as React from "react";
-import { Kbd } from "@/editor/chrome-ui";
-import { createPortal } from "react-dom";
 import type { PageItem } from "../types";
-import { Button } from "@/editor/chrome-ui";
+import { Button, Kbd, Portal } from "@/editor/chrome-ui";
 
 interface Props {
   pageId: string;
@@ -165,5 +163,5 @@ export const PageContextMenu: React.FC<Props> = ({
     </div>
   );
 
-  return createPortal(menu, document.body);
+  return <Portal>{menu}</Portal>;
 };

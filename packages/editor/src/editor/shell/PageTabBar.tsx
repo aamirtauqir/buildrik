@@ -4,16 +4,13 @@
  */
 
 import * as React from "react";
-import { ConfirmDialog } from "@/editor/chrome-ui";
-import { createPortal } from "react-dom";
+import { Button, ConfirmDialog, Portal, TextInput, useToast } from "@/editor/chrome-ui";
 import type { Composer } from "../../engine";
 import { EVENTS } from "../../shared/constants";
 import type { PageData } from "../../shared/types";
-import { useToast } from "@/editor/chrome-ui";
 import { useClickOutside } from "@/shared/hooks";
 import { getDefaultPageName } from "../../shared/utils/pageUtils";
 import { normalizeSlug } from "../sidebar/tabs/pages/utils/slug";
-import { Button, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -331,8 +328,8 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
         </Button>
       </div>
       {/* Context menu — portal so it escapes overflow:hidden parents */}
-      {contextMenu &&
-        createPortal(
+      {contextMenu && (
+        <Portal>
           <div
             ref={ctxMenuRef}
             className="ptb-ctx-menu"
@@ -387,9 +384,9 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
                 🗑️ Delete
               </Button>
             )}
-          </div>,
-          document.body
-        )}
+          </div>
+        </Portal>
+      )}
       {/* Delete confirmation dialog */}
       <ConfirmDialog
         open={!!deleteConfirmPageId}

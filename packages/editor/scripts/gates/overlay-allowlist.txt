@@ -35,20 +35,12 @@ packages/editor/src/engine/storage/VersionHistoryStorage.ts
 # measure, then torn down. Not user-facing overlay chrome.
 packages/editor/src/editor/shell/captureThumbnail.ts
 packages/editor/src/shared/utils/html/accessibility.ts
-# ── Pre-existing portal-discipline gaps — these createPortal(x, document.body)
-# directly instead of composing chrome-ui's OverlayMount/Portal. All predate
-# Gate 22 entirely: the ORIGINAL gate scoped only to the since-deleted
-# shared/vibcoder/ tree, so these editor/sidebar + editor/shell context menus
-# and bespoke modals were never covered by any gate. Broadening Gate 22 to
-# all of packages/editor/src (Task 13) surfaces them for the first time.
-# Flagged here, not fixed here — rewriting 6 call sites' portal target is
-# component-behavior work outside T13's delete-editor/ui-and-rewrite-gates
-# scope, and two of them (context menus) intentionally want Portal's anchored
-# non-trapping behavior, not OverlayMount's scrim + focus trap. Left as
-# documented debt for a dedicated portal-discipline pass.
-packages/editor/src/editor/sidebar/tabs/media/components/FolderContextMenu.tsx
-packages/editor/src/editor/sidebar/tabs/pages/components/PageContextMenu.tsx
-packages/editor/src/editor/shell/PageTabBar.tsx
-packages/editor/src/editor/sidebar/tabs/templates/ApplyProgressOverlay.tsx
-packages/editor/src/editor/sidebar/tabs/templates/TemplatePreviewModal.tsx
-packages/editor/src/editor/sidebar/tabs/templates/TemplatesTabModals.tsx
+# ── Pre-existing portal-discipline gaps: DRAINED 2026-08-01.
+# All six sites listed here previously called createPortal(x, document.body)
+# directly. They now route through chrome-ui's <Portal>, which mounts into the
+# shared overlay root. The three context menus keep Portal's anchored,
+# non-trapping behaviour (they never wanted OverlayMount's scrim + focus trap);
+# the three template surfaces keep their own bespoke scrim markup and only
+# changed WHERE they mount, so their appearance and close behaviour are
+# untouched. Nothing replaced these entries — this section is intentionally
+# empty of paths now.

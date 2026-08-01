@@ -1,6 +1,5 @@
 import * as React from "react";
-import { createPortal } from "react-dom";
-import { Button } from "@/editor/chrome-ui";
+import { Button, Portal } from "@/editor/chrome-ui";
 
 interface Props {
   folderId: string;
@@ -100,5 +99,5 @@ export function FolderContextMenu({
     </div>
   );
 
-  return createPortal(menu, document.body);
+  return <Portal>{menu}</Portal>;
 }

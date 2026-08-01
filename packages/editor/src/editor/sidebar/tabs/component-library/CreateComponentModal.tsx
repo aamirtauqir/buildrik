@@ -22,7 +22,6 @@ import {
   ModalContent,
   ModalRoot,
   ModalTitle,
-  Portal,
 } from "@/editor/chrome-ui";
 import {
   dialogCancelBtnStyles,
@@ -101,89 +100,87 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
   };
 
   return (
-    <Portal>
-      <ModalRoot open onOpenChange={(next) => !next && onClose()}>
-        <ModalContent size="lg">
-          <ModalTitle>Save as component</ModalTitle>
-          <ModalClose aria-label="Close modal" onClick={onClose}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-              <path d="M18 6L6 18M6 6l12 12" />
-            </svg>
-          </ModalClose>
-          <div className="bd-modal__body">
-            <div className="tw:flex tw:flex-col tw:gap-3">
-              <div className="tw:flex tw:flex-col tw:gap-1">
-                <label htmlFor="create-component-name" style={labelStyle}>
-                  Name
-                </label>
-                <TextInput
-                  id="create-component-name"
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") handleSubmit();
-                    if (e.key === "Escape") onClose();
-                  }}
-                  placeholder="Component name"
-                  autoFocus
-                  style={dialogInputStyles}
-                />
-              </div>
-
-              <div className="tw:flex tw:flex-col tw:gap-1">
-                <label htmlFor="create-component-group" style={labelStyle}>
-                  Group
-                </label>
-                <Select
-                  id="create-component-group"
-                  value={group}
-                  onChange={(e) => setGroup(e.target.value)}
-                  style={dialogInputStyles}
-                >
-                  <option value="">Your symbols</option>
-                </Select>
-              </div>
-
-              {selectionContext && (
-                <div style={bindingsCardStyle}>
-                  <label style={bindingsCheckboxStyle}>
-                    <Checkbox
-                      color="blue"
-                      className="tw:bg-white"
-                      checked={prefillBindings}
-                      onChange={(e) => setPrefillBindings(e.target.checked)}
-                      aria-label="Pre-fill bindings from DS"
-                    />
-                    <span>Pre-fill bindings from DS</span>
-                  </label>
-                  <p style={bindingsHintStyle}>
-                    {bindingCount === 1
-                      ? "1 style will bind to your DS tokens. Editing tokens later updates this component too."
-                      : `${bindingCount} styles will bind to your DS tokens. Editing tokens later updates this component too.`}
-                  </p>
-                </div>
-              )}
+    <ModalRoot open onOpenChange={(next) => !next && onClose()}>
+      <ModalContent size="lg">
+        <ModalTitle>Save as component</ModalTitle>
+        <ModalClose aria-label="Close modal" onClick={onClose}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+        </ModalClose>
+        <div className="bd-modal__body">
+          <div className="tw:flex tw:flex-col tw:gap-3">
+            <div className="tw:flex tw:flex-col tw:gap-1">
+              <label htmlFor="create-component-name" style={labelStyle}>
+                Name
+              </label>
+              <TextInput
+                id="create-component-name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSubmit();
+                  if (e.key === "Escape") onClose();
+                }}
+                placeholder="Component name"
+                autoFocus
+                style={dialogInputStyles}
+              />
             </div>
+
+            <div className="tw:flex tw:flex-col tw:gap-1">
+              <label htmlFor="create-component-group" style={labelStyle}>
+                Group
+              </label>
+              <Select
+                id="create-component-group"
+                value={group}
+                onChange={(e) => setGroup(e.target.value)}
+                style={dialogInputStyles}
+              >
+                <option value="">Your symbols</option>
+              </Select>
+            </div>
+
+            {selectionContext && (
+              <div style={bindingsCardStyle}>
+                <label style={bindingsCheckboxStyle}>
+                  <Checkbox
+                    color="blue"
+                    className="tw:bg-white"
+                    checked={prefillBindings}
+                    onChange={(e) => setPrefillBindings(e.target.checked)}
+                    aria-label="Pre-fill bindings from DS"
+                  />
+                  <span>Pre-fill bindings from DS</span>
+                </label>
+                <p style={bindingsHintStyle}>
+                  {bindingCount === 1
+                    ? "1 style will bind to your DS tokens. Editing tokens later updates this component too."
+                    : `${bindingCount} styles will bind to your DS tokens. Editing tokens later updates this component too.`}
+                </p>
+              </div>
+            )}
           </div>
-          <div className="bd-modal__foot">
-            <Button onClick={onClose} style={dialogCancelBtnStyles}>
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSubmit}
-              disabled={!name.trim()}
-              style={{
-                ...dialogPrimaryBtnStyles,
-                opacity: name.trim() ? 1 : 0.5,
-                cursor: name.trim() ? "pointer" : "not-allowed",
-              }}
-            >
-              Save component
-            </Button>
-          </div>
-        </ModalContent>
-      </ModalRoot>
-    </Portal>
+        </div>
+        <div className="bd-modal__foot">
+          <Button onClick={onClose} style={dialogCancelBtnStyles}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            disabled={!name.trim()}
+            style={{
+              ...dialogPrimaryBtnStyles,
+              opacity: name.trim() ? 1 : 0.5,
+              cursor: name.trim() ? "pointer" : "not-allowed",
+            }}
+          >
+            Save component
+          </Button>
+        </div>
+      </ModalContent>
+    </ModalRoot>
   );
 };
