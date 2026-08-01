@@ -26,10 +26,14 @@ const baseProps = {
 };
 
 describe("PageContextMenu", () => {
-  it("uses .bd-pg-menu class namespace", () => {
+  // The .bd-pg-menu namespace is gone: this renders through chrome-ui's Menu
+  // family now. Assert the ARIA contract, which is what actually has to hold,
+  // rather than a class name that was only ever an implementation detail.
+  it("renders a labelled menu of menuitems", () => {
     render(<PageContextMenu pageId="p2" {...baseProps} />);
-    expect(document.querySelector(".bd-pg-menu")).not.toBeNull();
-    expect(document.querySelector(".pg-ctx-menu")).toBeNull();
+    const menu = screen.getByRole("menu");
+    expect(menu).toHaveAttribute("aria-label", expect.stringContaining("Options for"));
+    expect(screen.getAllByRole("menuitem").length).toBeGreaterThan(1);
   });
 
   it("Rename click invokes onRename + onClose", () => {
@@ -69,7 +73,9 @@ describe("PageContextMenu", () => {
     render(
       <PageContextMenu {...baseProps} pageId="p1" onDelete={onDelete} />,
     );
-    const deleteItem = screen.getByText("Delete Page");
+    // MenuItem wraps its children in a span, so the text node is not the
+    // element carrying the ARIA state — walk to the menuitem itself.
+    const deleteItem = screen.getByText("Delete Page").closest('[role="menuitem"]')!;
     expect(deleteItem.getAttribute("aria-disabled")).toBe("true");
     fireEvent.click(deleteItem);
     expect(onDelete).not.toHaveBeenCalled();

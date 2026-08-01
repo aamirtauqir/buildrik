@@ -600,53 +600,6 @@
 }
 
 /* ─── CONTEXT MENU ────────────────────────────────────────────────────── */
-.bd-pg-menu {
-  background: var(--bk-bg-card);
-  border: 1px solid var(--bk-border);
-  border-radius: var(--bk-radius-lg);
-  box-shadow: 0 8px 32px rgba(15,23,42,0.12);
-  padding: var(--bk-space-4);
-  min-width: 200px;
-  z-index: 100;
-}
-.bd-pg-menu-item {
-  display: flex;
-  align-items: center;
-  gap: var(--bk-space-8);
-  width: 100%;
-  padding: 6px 10px;
-  border: 0;
-  border-radius: 4px;
-  background: transparent;
-  text-align: left;
-  font: 500 12.5px var(--bk-font-ui);
-  color: var(--bk-ink);
-  cursor: pointer;
-}
-.bd-pg-menu-item:hover:not(.disabled) { background: var(--bk-bg-subtle); }
-.bd-pg-menu-item.danger { color: var(--bk-error); }
-.bd-pg-menu-item.danger:hover:not(.disabled) {
-  background: rgba(220, 38, 38, 0.08);
-  color: var(--bk-error);
-}
-.bd-pg-menu-item.disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-.bd-pg-menu-item kbd {
-  margin-left: auto;
-  padding: 0 var(--bk-space-4);
-  border-radius: 3px;
-  background: var(--bk-bg-subtle);
-  border: 1px solid var(--bk-border);
-  font: 500 10px var(--bk-font-mono);
-  color: var(--bk-ink-muted);
-}
-.bd-pg-menu-divider {
-  height: 1px;
-  background: var(--bk-border);
-  margin: var(--bk-space-4) 0;
-}
 
 /* ─── SETTINGS DRAWER (Task 9a — shell + tabs strip) ──────────────────── */
 .bd-pg-drawer {

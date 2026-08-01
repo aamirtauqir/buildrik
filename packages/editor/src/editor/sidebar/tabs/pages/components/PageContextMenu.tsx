@@ -4,14 +4,15 @@
  * Rules:
  * - Renders through <Portal> into the shared chrome overlay root
  * - "Delete Page" is DISABLED (not hidden) when: page is homepage OR only page
- * - Keyboard: Escape closes, ↑↓ rove focus
+ * - Keyboard: Escape closes here; <Menu> owns ↑↓/Home/End roving and, unlike
+ *   the hand-rolled version this replaced, SKIPS the disabled Delete item
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
 import type { PageItem } from "../types";
-import { Button, Kbd, Portal } from "@/editor/chrome-ui";
+import { Menu, MenuItem, MenuSeparator, Portal } from "@/editor/chrome-ui";
 
 interface Props {
   pageId: string;
@@ -52,30 +53,11 @@ export const PageContextMenu: React.FC<Props> = ({
       ? "A site needs at least 1 page. Add another page first."
       : undefined;
 
-  React.useEffect(() => {
-    const first = menuRef.current?.querySelector<HTMLElement>(
-      '[role="menuitem"]:not([aria-disabled="true"])',
-    );
-    first?.focus();
-  }, []);
-
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Escape") {
       e.preventDefault();
       onClose();
-      return;
     }
-    if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
-    e.preventDefault();
-    const items = Array.from(
-      menuRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? [],
-    );
-    const idx = items.indexOf(document.activeElement as HTMLElement);
-    const next =
-      e.key === "ArrowDown"
-        ? (idx + 1) % items.length
-        : (idx - 1 + items.length) % items.length;
-    items[next]?.focus();
   };
 
   const style: React.CSSProperties = {
@@ -91,75 +73,31 @@ export const PageContextMenu: React.FC<Props> = ({
   };
 
   const menu = (
-    <div
-      ref={menuRef}
-      className="bd-pg-menu"
-      style={style}
-      role="menu"
-      aria-label={`Options for ${page?.name ?? "page"}`}
-      onKeyDown={handleKeyDown}
-    >
-      <Button
-        type="button"
-        className="bd-pg-menu-item"
-        role="menuitem"
-        tabIndex={-1}
-        onClick={() => act(() => onRename(pageId))}
-      >
-        Rename <Kbd>F2</Kbd>
-      </Button>
-      <Button
-        type="button"
-        className="bd-pg-menu-item"
-        role="menuitem"
-        tabIndex={-1}
-        onClick={() => act(() => onDuplicate(pageId))}
-      >
-        Duplicate <Kbd>⌘D</Kbd>
-      </Button>
-      {!isHome && (
-        <Button
-          type="button"
-          className="bd-pg-menu-item"
-          role="menuitem"
-          tabIndex={-1}
-          onClick={() => act(() => onSetHomepage(pageId))}
+    <div ref={menuRef} style={style}>
+      <Menu label={`Options for ${page?.name ?? "page"}`} onKeyDown={handleKeyDown}>
+        <MenuItem kbd="F2" onClick={() => act(() => onRename(pageId))}>
+          Rename
+        </MenuItem>
+        <MenuItem kbd="⌘D" onClick={() => act(() => onDuplicate(pageId))}>
+          Duplicate
+        </MenuItem>
+        {!isHome && (
+          <MenuItem onClick={() => act(() => onSetHomepage(pageId))}>Set as Homepage</MenuItem>
+        )}
+        <MenuItem onClick={() => act(() => onCopyLink(pageId))}>Copy Page Link</MenuItem>
+        <MenuItem kbd="⌘," onClick={() => act(() => onSettings(pageId))}>
+          Page Settings
+        </MenuItem>
+        <MenuSeparator />
+        <MenuItem
+          danger
+          disabled={deleteDisabled}
+          title={deleteTooltip}
+          onClick={() => act(() => onDelete(pageId))}
         >
-          Set as Homepage
-        </Button>
-      )}
-      <Button
-        type="button"
-        className="bd-pg-menu-item"
-        role="menuitem"
-        tabIndex={-1}
-        onClick={() => act(() => onCopyLink(pageId))}
-      >
-        Copy Page Link
-      </Button>
-      <Button
-        type="button"
-        className="bd-pg-menu-item"
-        role="menuitem"
-        tabIndex={-1}
-        onClick={() => act(() => onSettings(pageId))}
-      >
-        Page Settings <Kbd>⌘,</Kbd>
-      </Button>
-      <div className="bd-pg-menu-divider" role="separator" />
-      <Button
-        type="button"
-        className={`bd-pg-menu-item danger${deleteDisabled ? " disabled" : ""}`}
-        role="menuitem"
-        tabIndex={-1}
-        aria-disabled={deleteDisabled}
-        title={deleteTooltip}
-        onClick={() => {
-          if (!deleteDisabled) act(() => onDelete(pageId));
-        }}
-      >
-        Delete Page
-      </Button>
+          Delete Page
+        </MenuItem>
+      </Menu>
     </div>
   );
 
