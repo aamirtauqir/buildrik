@@ -35,7 +35,9 @@
     "gate:vibcoder-ratchet": "node scripts/check-vibcoder-ratchet.mjs",
     "gate:editor-ui-gone": "node scripts/check-editor-ui-gone.mjs",
     "gate:chrome-ui-surface": "node scripts/check-chrome-ui-surface.mjs",
-    "gate:styling-ratchet": "node scripts/check-styling-ratchet.mjs"
+    "gate:styling-ratchet": "node scripts/check-styling-ratchet.mjs",
+    "test:parity": "playwright test",
+    "test:parity:update": "UPDATE_PARITY=true playwright test"
   },
   "dependencies": {
     "@buildrik/shared": "workspace:*",
@@ -57,6 +59,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",
+    "@playwright/test": "^1.61.1",
     "@tailwindcss/vite": "^4.3.3",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",

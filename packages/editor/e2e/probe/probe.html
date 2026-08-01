@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>style parity probe</title>
+  </head>
+  <body>
+    <!-- .bd-studio is load-bearing: chrome-reset.css and most chrome selectors
+         are scoped to it, so a probe mounted outside it measures the wrong
+         cascade and every parity baseline would be quietly wrong. -->
+    <div class="bd-studio">
+      <div id="probe-root"></div>
+    </div>
+    <script type="module" src="./probe.tsx"></script>
+  </body>
+</html>
