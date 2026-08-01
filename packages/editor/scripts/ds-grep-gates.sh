@@ -638,5 +638,38 @@ if [ -n "$GATE25_ORPHANS" ]; then
 fi
 pass "Gate 25: no orphan codemod fixtures"
 
+# Gate 26: customer output must not reference editor chrome tokens.
+#
+# Scope is src/blocks ONLY. src/templates looks adjacent but is editor UI —
+# MyTemplates.tsx is the saved-template gallery, TemplatePreview.tsx is a modal
+# with a device switcher. Both render inside chrome and use --bk-* correctly.
+# An earlier draft of this gate included them and failed on correct code.
+#
+# blocks/ becomes the CUSTOMER's published page. A published page
+# defines no custom properties at all: --bk-* is chrome and never leaves the
+# editor, and the site-builder --buildrick-design-* bundle comes from
+# CSSBundler, which only the design-system panel's export button calls — the
+# publish path never runs it. So a var(--bk-*) here resolves in the editor
+# canvas and resolves to NOTHING on the live site, where the declaration is
+# invalid at computed-value time and silently drops.
+#
+# This shipped for months: two hex→token codemods (12d0d298, be52e1a8) swept
+# 49 + 33 files without excluding customer output, then 82350776 renamed that
+# layer to --bk-*. 37 references across 11 block files. Blocks looked correct
+# in the editor and published unstyled; HeroSection's CTA rendered brand blue
+# in the editor and #00d4aa teal on the live site.
+#
+# Locked at 0. Block defaults live in src/blocks/blockPalette.ts as literals.
+GATE26_HITS=$(grep -rn 'var(--bk-' \
+  packages/editor/src/blocks \
+  --include='*.ts' --include='*.tsx' 2>/dev/null \
+  | grep -v '/__tests__/' \
+  || true)
+if [ -n "$GATE26_HITS" ]; then
+  echo "$GATE26_HITS"
+  fail "Gate 26: chrome token (--bk-*) in customer output — published pages never define it; use src/blocks/blockPalette.ts"
+fi
+pass "Gate 26: customer output free of chrome tokens"
+
 echo ""
 echo "=== DS V1 gates: 14 passed + 4 chrome-axiom gates at baseline + green-panel check ==="

@@ -4,6 +4,7 @@
  */
 
 import * as React from "react";
+import { BLOCK_COLORS } from "../blockPalette";
 
 export interface SocialLink {
   platform: string;
@@ -42,7 +43,7 @@ export const SocialIcons: React.FC<SocialIconsProps> = ({
   links = defaultLinks,
   size = "md",
   variant = "filled",
-  color = "var(--bk-accent, #00d4aa)",
+  color = BLOCK_COLORS.accent,
 }) => {
   const sizeMap = { sm: 32, md: 40, lg: 48 };
   const iconSize = sizeMap[size];
@@ -65,7 +66,7 @@ export const SocialIcons: React.FC<SocialIconsProps> = ({
             borderRadius: "50%",
             background: variant === "filled" ? color : "transparent",
             border: variant === "outline" ? `2px solid ${color}` : "none",
-            color: variant === "filled" ? /* @lint-hex-policy: block default color — exported user-site content, not editor chrome */ "#fff" : color,
+            color: variant === "filled" ? "#fff" : color,
             fontSize: iconSize * 0.5,
             textDecoration: "none",
             transition: "transform 0.2s ease",
@@ -86,10 +87,10 @@ export const socialIconsBlockConfig = {
   elementType: "social" as const,
   content:
     '<div class="buildrick-social-icons" data-buildrick-type="social-icons" style="display:flex;gap:12px;">' +
-    '<a href="#" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--bk-accent,#00d4aa);color:#fff;text-decoration:none;">📘</a>' +
-    '<a href="#" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--bk-accent,#00d4aa);color:#fff;text-decoration:none;">🐦</a>' +
-    '<a href="#" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--bk-accent,#00d4aa);color:#fff;text-decoration:none;">📷</a>' +
-    '<a href="#" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--bk-accent,#00d4aa);color:#fff;text-decoration:none;">💼</a>' +
+    '<a href="#" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:#1A56DB;color:#fff;text-decoration:none;">📘</a>' +
+    '<a href="#" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:#1A56DB;color:#fff;text-decoration:none;">🐦</a>' +
+    '<a href="#" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:#1A56DB;color:#fff;text-decoration:none;">📷</a>' +
+    '<a href="#" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:#1A56DB;color:#fff;text-decoration:none;">💼</a>' +
     "</div>",
 };
 

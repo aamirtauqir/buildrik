@@ -5,6 +5,7 @@
  */
 
 import type { BlockBuildConfig, Composer } from "../types";
+import { BLOCK_COLORS } from "../blockPalette";
 
 /**
  * Build tabbed interface component
@@ -32,7 +33,7 @@ function buildTabs(composer: Composer, parentId: string, dropIndex?: number): st
     },
     styles: {
       display: "flex",
-      borderBottom: "2px solid var(--bk-border)",
+      borderBottom: "2px solid " + BLOCK_COLORS.border,
       marginBottom: "16px",
     },
   });
@@ -58,7 +59,7 @@ function buildTabs(composer: Composer, parentId: string, dropIndex?: number): st
         cursor: "pointer",
         fontSize: "14px",
         fontWeight: index === 0 ? "600" : "500",
-        color: index === 0 ? "#8b5cf6" : "var(--bk-ink-soft)",
+        color: index === 0 ? "#8b5cf6" : BLOCK_COLORS.text,
         transition: "all 0.2s ease",
       },
     });
@@ -82,7 +83,7 @@ function buildTabs(composer: Composer, parentId: string, dropIndex?: number): st
       styles: {
         display: index === 0 ? "block" : "none",
         padding: "20px",
-        background: "var(--bk-bg-panel)",
+        background: BLOCK_COLORS.surface,
         borderRadius: "8px",
         minHeight: "120px",
       },
@@ -94,7 +95,7 @@ function buildTabs(composer: Composer, parentId: string, dropIndex?: number): st
       content: `Content for ${tabLabel}. Click to edit this text and add your own content.`,
       styles: {
         margin: "0",
-        color: "var(--bk-ink-soft)",
+        color: BLOCK_COLORS.text,
         lineHeight: "1.6",
       },
     });

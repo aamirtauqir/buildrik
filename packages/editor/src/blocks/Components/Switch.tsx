@@ -5,6 +5,7 @@
  */
 
 import type { BlockBuildConfig, Composer } from "../types";
+import { BLOCK_COLORS } from "../blockPalette";
 
 /**
  * Build toggle switch component
@@ -52,7 +53,7 @@ function buildSwitch(composer: Composer, parentId: string, dropIndex?: number): 
       position: "relative",
       width: "44px",
       height: "24px",
-      background: "var(--bk-border-medium)",
+      background: BLOCK_COLORS.borderStrong,
       borderRadius: "24px",
       transition: "background 0.2s ease",
     },
@@ -71,7 +72,7 @@ function buildSwitch(composer: Composer, parentId: string, dropIndex?: number): 
       left: "2px",
       width: "20px",
       height: "20px",
-      background: "var(--bk-bg-card)",
+      background: BLOCK_COLORS.surface,
       borderRadius: "50%",
       boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
       transition: "transform 0.2s ease",

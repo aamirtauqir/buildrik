@@ -5,6 +5,7 @@
  */
 
 import type { BlockBuildConfig, Composer } from "../types";
+import { BLOCK_COLORS } from "../blockPalette";
 
 /**
  * Build vertical stack container
@@ -36,9 +37,9 @@ function buildStack(composer: Composer, parentId: string, dropIndex?: number): s
       },
       styles: {
         padding: "16px",
-        background: "var(--bk-bg-panel)",
+        background: BLOCK_COLORS.surface,
         borderRadius: "8px",
-        border: "1px solid var(--bk-border)",
+        border: "1px solid " + BLOCK_COLORS.border,
       },
     });
     composer.elements.addElement(child, stackId);
@@ -48,7 +49,7 @@ function buildStack(composer: Composer, parentId: string, dropIndex?: number): s
       content: `Stack Item ${i}`,
       styles: {
         margin: "0",
-        color: "var(--bk-ink-soft)",
+        color: BLOCK_COLORS.text,
       },
     });
     composer.elements.addElement(text, child.getId());

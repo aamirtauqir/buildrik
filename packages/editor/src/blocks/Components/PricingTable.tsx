@@ -4,6 +4,7 @@
  */
 
 import * as React from "react";
+import { BLOCK_COLORS } from "../blockPalette";
 
 export interface PricingPlan {
   name: string;
@@ -91,7 +92,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
             position: "relative",
             padding: 32,
             background: plan.highlighted
-              ? "var(--bk-accent-subtle, rgba(0,212,170,0.1))"
+              ? BLOCK_COLORS.accentSubtle
               : "var(--buildrick-design-color-background)",
             border: plan.highlighted
               ? "2px solid var(--buildrick-design-color-primary)"
@@ -110,7 +111,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
                 transform: "translateX(-50%)",
                 padding: "4px 16px",
                 background: "var(--buildrick-design-color-primary)",
-                color: /* @lint-hex-policy: block default color — exported user-site content, not editor chrome */ "#fff",
+                color: "#fff",
                 fontSize: 12,
                 fontWeight: 600,
                 borderRadius: 20,
@@ -199,7 +200,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
               padding: "12px 24px",
               background: plan.highlighted ? "var(--buildrick-design-color-primary)" : "transparent",
               border: plan.highlighted ? "none" : "2px solid var(--buildrick-design-color-primary)",
-              color: plan.highlighted ? /* @lint-hex-policy: block default color — exported user-site content, not editor chrome */ "#fff" : "var(--buildrick-design-color-primary)",
+              color: plan.highlighted ? "#fff" : "var(--buildrick-design-color-primary)",
               fontSize: 14,
               fontWeight: 600,
               borderRadius: 8,

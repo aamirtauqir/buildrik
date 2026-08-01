@@ -4,6 +4,7 @@
  */
 
 import * as React from "react";
+import { BLOCK_COLORS } from "../blockPalette";
 
 export interface HeroSectionProps {
   title?: string;
@@ -61,7 +62,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           style={{
             fontSize: 48,
             fontWeight: 700,
-            color: /* @lint-hex-policy: block default color — exported user-site content, not editor chrome */ "#fff",
+            color: "#fff",
             marginBottom: 16,
             lineHeight: 1.2,
           }}
@@ -86,8 +87,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             style={{
               display: "inline-block",
               padding: "14px 32px",
-              background: /* @lint-hex-policy: block default color — exported user-site content, not editor chrome */ "var(--bk-accent, #00d4aa)",
-              color: /* @lint-hex-policy: block default color — exported user-site content, not editor chrome */ "#fff",
+              background: BLOCK_COLORS.accent,
+              color: "#fff",
               fontSize: 16,
               fontWeight: 600,
               borderRadius: 8,

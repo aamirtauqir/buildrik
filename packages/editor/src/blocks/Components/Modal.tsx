@@ -5,6 +5,7 @@
  */
 
 import type { BlockBuildConfig, Composer } from "../types";
+import { BLOCK_COLORS } from "../blockPalette";
 
 /**
  * Build modal dialog component
@@ -19,7 +20,7 @@ function buildModal(composer: Composer, parentId: string, dropIndex?: number): s
     styles: {
       padding: "12px 24px",
       background: "#8b5cf6",
-      color: "var(--bk-accent-on)",
+      color: BLOCK_COLORS.accentOn,
       border: "none",
       borderRadius: "8px",
       fontSize: "14px",
@@ -68,7 +69,7 @@ function buildModal(composer: Composer, parentId: string, dropIndex?: number): s
       class: "modal-content",
     },
     styles: {
-      background: "var(--bk-bg-card)",
+      background: BLOCK_COLORS.surface,
       borderRadius: "12px",
       maxWidth: "480px",
       width: "100%",
@@ -90,7 +91,7 @@ function buildModal(composer: Composer, parentId: string, dropIndex?: number): s
       justifyContent: "space-between",
       alignItems: "center",
       padding: "20px 24px",
-      borderBottom: "1px solid var(--bk-border)",
+      borderBottom: "1px solid " + BLOCK_COLORS.border,
     },
   });
   composer.elements.addElement(header, modalContent.getId());
@@ -116,7 +117,7 @@ function buildModal(composer: Composer, parentId: string, dropIndex?: number): s
       border: "none",
       fontSize: "24px",
       cursor: "pointer",
-      color: "var(--bk-ink-muted)",
+      color: BLOCK_COLORS.textMuted,
       padding: "0",
       lineHeight: "1",
     },
@@ -146,7 +147,7 @@ function buildModal(composer: Composer, parentId: string, dropIndex?: number): s
     content: "This is the modal content. Add your text, forms, or any other content here.",
     styles: {
       margin: "0",
-      color: "var(--bk-ink-soft)",
+      color: BLOCK_COLORS.text,
       lineHeight: "1.6",
     },
   });
