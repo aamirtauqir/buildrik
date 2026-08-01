@@ -1,6 +1,3 @@
-import { Select } from "@/editor/shared/vibcoder/Select";
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Textarea } from "@/editor/shared/vibcoder/Textarea";
 /**
  * @lint-hex-policy: component-theme
  *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
@@ -14,18 +11,9 @@ import { Textarea } from "@/editor/shared/vibcoder/Textarea";
 
 import { X, Plus, Trash2, Check } from "lucide-react";
 import * as React from "react";
+import { ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import {
-  Modal,
-  ModalContent,
-  ModalTitle,
-  ModalClose,
-  ModalFooter,
-  OverlayMount,
-} from "@/editor/shared/vibcoder";
-import { Stack } from "@/editor/shared/vibcoder";
-
+import { Button, Select, Textarea, TextInput } from "@/editor/chrome-ui";
 // =============================================================================
 // TYPES
 // =============================================================================
@@ -74,27 +62,27 @@ const s: Record<string, React.CSSProperties> = {
     gap: 8,
     padding: "0 0 16px",
     marginBottom: 16,
-    borderBottom: "1px solid var(--buildrick-border)",
+    borderBottom: "1px solid var(--bk-border)",
   },
   step: {
     display: "flex",
     alignItems: "center",
     gap: 6,
     fontSize: 12,
-    color: "var(--buildrick-text-muted)",
+    color: "var(--bk-ink-muted)",
   },
   stepActive: {
-    color: "var(--buildrick-accent)",
+    color: "var(--bk-accent)",
     fontWeight: 600,
   },
   stepDone: {
-    color: "var(--buildrick-text-muted)",
+    color: "var(--bk-ink-muted)",
   },
   stepDot: {
     width: 20,
     height: 20,
-    borderRadius: "var(--bd-radius-full)",
-    background: "var(--buildrick-border)",
+    borderRadius: "var(--bk-radius-full)",
+    background: "var(--bk-border)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -103,32 +91,32 @@ const s: Record<string, React.CSSProperties> = {
     flexShrink: 0,
   },
   stepDotActive: {
-    background: "var(--buildrick-accent)",
-    color: "var(--buildrick-text-on-accent)",
+    background: "var(--bk-accent)",
+    color: "var(--bk-accent-on)",
   },
   stepDotDone: {
-    background: "var(--buildrick-accent)",
-    color: "var(--buildrick-text-on-accent)",
+    background: "var(--bk-accent)",
+    color: "var(--bk-accent-on)",
   },
   stepDivider: {
     flex: 1,
     height: 1,
-    background: "var(--buildrick-border)",
+    background: "var(--bk-border)",
   },
   label: {
     display: "block",
     fontSize: 12,
     fontWeight: 500,
-    color: "var(--buildrick-text-secondary)",
+    color: "var(--bk-ink-soft)",
     marginBottom: 6,
   },
   input: {
     width: "100%",
     padding: "8px 12px",
-    background: "var(--buildrick-bg-panel-secondary)",
-    border: "1px solid var(--buildrick-border)",
-    borderRadius: "var(--buildrick-radius-md)",
-    color: "var(--buildrick-text-primary)",
+    background: "var(--bk-bg-subtle)",
+    border: "1px solid var(--bk-border)",
+    borderRadius: "var(--bk-radius-lg)",
+    color: "var(--bk-ink)",
     fontSize: 13,
     outline: "none",
     boxSizing: "border-box" as const,
@@ -137,22 +125,23 @@ const s: Record<string, React.CSSProperties> = {
   select: {
     width: "100%",
     padding: "8px 12px",
-    background: "var(--buildrick-bg-panel-secondary)",
-    border: "1px solid var(--buildrick-border)",
-    borderRadius: "var(--buildrick-radius-md)",
-    color: "var(--buildrick-text-primary)",
+    background: "var(--bk-bg-subtle)",
+    border: "1px solid var(--bk-border)",
+    borderRadius: "var(--bk-radius-lg)",
+    color: "var(--bk-ink)",
     fontSize: 13,
     outline: "none",
     cursor: "pointer",
     boxSizing: "border-box" as const,
+    appearance: "auto" as const,
   },
   textarea: {
     width: "100%",
     padding: "8px 12px",
-    background: "var(--buildrick-bg-panel-secondary)",
-    border: "1px solid var(--buildrick-border)",
-    borderRadius: "var(--buildrick-radius-md)",
-    color: "var(--buildrick-text-primary)",
+    background: "var(--bk-bg-subtle)",
+    border: "1px solid var(--bk-border)",
+    borderRadius: "var(--bk-radius-lg)",
+    color: "var(--bk-ink)",
     fontSize: 13,
     outline: "none",
     resize: "vertical" as const,
@@ -165,28 +154,29 @@ const s: Record<string, React.CSSProperties> = {
     alignItems: "center",
     gap: 8,
     padding: "6px 0",
-    borderBottom: "1px solid var(--buildrick-border-subtle)",
+    borderBottom: "1px solid var(--bk-border)",
   },
   fieldNameInput: {
     flex: 1,
     padding: "6px 10px",
-    background: "var(--buildrick-bg-panel-secondary)",
-    border: "1px solid var(--buildrick-border)",
-    borderRadius: "var(--buildrick-radius-sm)",
-    color: "var(--buildrick-text-primary)",
+    background: "var(--bk-bg-subtle)",
+    border: "1px solid var(--bk-border)",
+    borderRadius: "var(--bk-radius-sm)",
+    color: "var(--bk-ink)",
     fontSize: 12,
     outline: "none",
   },
   fieldTypeSelect: {
     width: 110,
     padding: "6px 8px",
-    background: "var(--buildrick-bg-panel-secondary)",
-    border: "1px solid var(--buildrick-border)",
-    borderRadius: "var(--buildrick-radius-sm)",
-    color: "var(--buildrick-text-primary)",
+    background: "var(--bk-bg-subtle)",
+    border: "1px solid var(--bk-border)",
+    borderRadius: "var(--bk-radius-sm)",
+    color: "var(--bk-ink)",
     fontSize: 12,
     outline: "none",
     cursor: "pointer",
+    appearance: "auto" as const,
   },
   removeBtn: {
     width: 24,
@@ -196,8 +186,8 @@ const s: Record<string, React.CSSProperties> = {
     justifyContent: "center",
     background: "transparent",
     border: "none",
-    borderRadius: "var(--buildrick-radius-sm)",
-    color: "var(--buildrick-text-muted)",
+    borderRadius: "var(--bk-radius-sm)",
+    color: "var(--bk-ink-muted)",
     cursor: "pointer",
     flexShrink: 0,
     transition: "color 0.15s, background 0.15s",
@@ -209,7 +199,7 @@ const s: Record<string, React.CSSProperties> = {
     padding: "12px 14px",
     background: "rgba(34, 197, 94, 0.1)",
     border: "1px solid rgba(34, 197, 94, 0.25)",
-    borderRadius: "var(--buildrick-radius-md)",
+    borderRadius: "var(--bk-radius-lg)",
     color: "#86efac",
     fontSize: 13,
     marginTop: 12,
@@ -219,7 +209,7 @@ const s: Record<string, React.CSSProperties> = {
     justifyContent: "flex-end",
     gap: 8,
     paddingTop: 16,
-    borderTop: "1px solid var(--buildrick-border)",
+    borderTop: "1px solid var(--bk-border)",
     marginTop: 8,
   },
 };
@@ -354,13 +344,12 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
 
   const footer = (
     <div style={s.footer}>
-      <Button variant="ghost" size="sm" onClick={onClose} disabled={creating}>
+      <Button color="light" size="xs" onClick={onClose} disabled={creating} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
         Cancel
       </Button>
       {step === 1 ? (
         <Button
-          variant="primary"
-          size="sm"
+          size="xs"
           disabled={!canProceed}
           onClick={() => setStep(2)}
         >
@@ -368,11 +357,10 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
         </Button>
       ) : (
         <Button
-          variant="primary"
-          size="sm"
-          busy={creating}
+          size="xs"
           disabled={!canProceed || creating}
           onClick={handleCreate}
+          aria-busy={creating || undefined}
         >
           Create Collection
         </Button>
@@ -381,8 +369,8 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
   );
 
   return (
-    <OverlayMount>
-      <Modal open={isOpen} onOpenChange={(next) => !next && onClose()}>
+    <Portal>
+      <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
         <ModalContent size="lg">
           <ModalTitle>Create Collection</ModalTitle>
           <ModalClose aria-label="Close modal">
@@ -418,13 +406,13 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
         </div>
       </div>
       {step === 1 && (
-        <Stack gap="lg">
+        <div className="tw:flex tw:flex-col tw:gap-4">
           {/* Collection name */}
           <div>
             <label style={s.label}>
-              Collection name <span style={{ color: "var(--buildrick-error)" }}>*</span>
+              Collection name <span style={{ color: "var(--bk-error)" }}>*</span>
             </label>
-            <Input
+            <TextInput
               style={s.input}
               type="text"
               placeholder="Blog Posts"
@@ -433,11 +421,11 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
               autoFocus
               onFocus={(e) => {
                 (e.currentTarget as HTMLInputElement).style.borderColor =
-                  "var(--buildrick-accent)";
+                  "var(--bk-accent)";
               }}
               onBlur={(e) => {
                 (e.currentTarget as HTMLInputElement).style.borderColor =
-                  "var(--buildrick-border)";
+                  "var(--bk-border)";
               }}
             />
           </div>
@@ -468,15 +456,15 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
               onChange={(e) => setDescription(e.target.value)}
               onFocus={(e) => {
                 (e.currentTarget as HTMLTextAreaElement).style.borderColor =
-                  "var(--buildrick-accent)";
+                  "var(--bk-accent)";
               }}
               onBlur={(e) => {
                 (e.currentTarget as HTMLTextAreaElement).style.borderColor =
-                  "var(--buildrick-border)";
+                  "var(--bk-border)";
               }}
             />
           </div>
-        </Stack>
+        </div>
       )}
       {step === 2 && (
         <div>
@@ -488,10 +476,10 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
               marginBottom: 10,
             }}
           >
-            <span style={{ fontSize: 12, color: "var(--buildrick-text-secondary)" }}>
-              Fields for <strong style={{ color: "var(--buildrick-text-primary)" }}>{name}</strong>
+            <span style={{ fontSize: 12, color: "var(--bk-ink-soft)" }}>
+              Fields for <strong style={{ color: "var(--bk-ink)" }}>{name}</strong>
             </span>
-            <Button variant="ghost" size="sm" onClick={addField}>
+            <Button color="light" size="xs" onClick={addField} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
               <Plus size={12} aria-hidden="true" />
               Add Field
             </Button>
@@ -503,14 +491,14 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
               display: "flex",
               gap: 8,
               paddingBottom: 6,
-              borderBottom: "1px solid var(--buildrick-border)",
+              borderBottom: "1px solid var(--bk-border)",
               marginBottom: 2,
             }}
           >
-            <span style={{ flex: 1, fontSize: 11, color: "var(--buildrick-text-muted)", fontWeight: 500 }}>
+            <span style={{ flex: 1, fontSize: 11, color: "var(--bk-ink-muted)", fontWeight: 500 }}>
               FIELD NAME
             </span>
-            <span style={{ width: 110, fontSize: 11, color: "var(--buildrick-text-muted)", fontWeight: 500 }}>
+            <span style={{ width: 110, fontSize: 11, color: "var(--bk-ink-muted)", fontWeight: 500 }}>
               TYPE
             </span>
             <span style={{ width: 24 }} />
@@ -520,7 +508,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
           <div style={{ maxHeight: 240, overflowY: "auto" }}>
             {fields.map((field) => (
               <div key={field.id} style={s.fieldRow}>
-                <Input
+                <TextInput
                   style={s.fieldNameInput}
                   type="text"
                   placeholder="field_name"
@@ -544,12 +532,12 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
                   onClick={() => removeField(field.id)}
                   title="Remove field"
                   onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLElement).style.color = "var(--buildrick-error)";
+                    (e.currentTarget as HTMLElement).style.color = "var(--bk-error)";
                     (e.currentTarget as HTMLElement).style.background =
                       "rgba(243,139,168,0.1)";
                   }}
                   onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLElement).style.color = "var(--buildrick-text-muted)";
+                    (e.currentTarget as HTMLElement).style.color = "var(--bk-ink-muted)";
                     (e.currentTarget as HTMLElement).style.background = "transparent";
                   }}
                 >
@@ -560,10 +548,10 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
           </div>
 
           {/* E7 — dynamic-page binding */}
-          <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid var(--buildrick-border)" }}>
+          <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid var(--bk-border)" }}>
             <Button
               type="button"
-              variant={genPages ? "primary" : "secondary"}
+              color={genPages ? undefined : "light"}
               onClick={() => setGenPages((v) => !v)}
               style={{ fontSize: 12 }}
             >
@@ -571,10 +559,10 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
             </Button>
             {genPages && (
               <div style={{ marginTop: 10, display: "grid", gap: 8 }}>
-                <Input type="text" placeholder="Slug pattern — /blog/{slug}" value={pageSlug} onChange={(e) => setPageSlug(e.target.value)} />
-                <Input type="text" placeholder="Template page path — blog/_template/index.html" value={pageTemplate} onChange={(e) => setPageTemplate(e.target.value)} />
-                <Input type="text" placeholder="SEO title — {title} — Blog" value={pageSeoTitle} onChange={(e) => setPageSeoTitle(e.target.value)} />
-                <Input type="text" placeholder="SEO description — Read about {title}" value={pageSeoDesc} onChange={(e) => setPageSeoDesc(e.target.value)} />
+                <TextInput   type="text" placeholder="Slug pattern — /blog/{slug}" value={pageSlug} onChange={(e) => setPageSlug(e.target.value)} />
+                <TextInput   type="text" placeholder="Template page path — blog/_template/index.html" value={pageTemplate} onChange={(e) => setPageTemplate(e.target.value)} />
+                <TextInput   type="text" placeholder="SEO title — {title} — Blog" value={pageSeoTitle} onChange={(e) => setPageSeoTitle(e.target.value)} />
+                <TextInput   type="text" placeholder="SEO description — Read about {title}" value={pageSeoDesc} onChange={(e) => setPageSeoDesc(e.target.value)} />
               </div>
             )}
           </div>
@@ -586,8 +574,8 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
                 padding: "8px 12px",
                 background: "rgba(243,139,168,0.1)",
                 border: "1px solid rgba(243,139,168,0.25)",
-                borderRadius: "var(--buildrick-radius-md)",
-                color: "var(--buildrick-error)",
+                borderRadius: "var(--bk-radius-lg)",
+                color: "var(--bk-error)",
                 fontSize: 12,
               }}
             >
@@ -606,8 +594,8 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
           </div>
           <ModalFooter>{footer}</ModalFooter>
         </ModalContent>
-      </Modal>
-    </OverlayMount>
+      </ModalRoot>
+    </Portal>
   );
 };
 

@@ -4,7 +4,7 @@ import * as React from "react";
 import { TokensSection } from "../TokensSection";
 import { TokenRegistryProvider } from "../../../state/TokenRegistryContext";
 import { DSModeProvider } from "../../../state/DSModeContext";
-import { ToastProvider } from "@/editor/shared/vibcoder";
+import { ToastProvider } from "@/editor/chrome-ui";
 
 // document.fonts polyfill lives in test-setup.ts (jsdom-wide).
 
@@ -95,7 +95,7 @@ describe("TokensSection", () => {
       const card = container.querySelector('[data-token-kind-card="color"]') as HTMLElement;
       const button = card.querySelector(":scope > button") as HTMLButtonElement;
       // Inline style assertion — jsdom preserves the inline string verbatim.
-      expect(button.style.fontFamily).toContain("var(--buildrick-font-family-mono");
+      expect(button.style.fontFamily).toContain("var(--bk-font-mono");
       expect(button.style.textTransform).toBe("uppercase");
       expect(button.style.letterSpacing).toBe("0.08em");
     });

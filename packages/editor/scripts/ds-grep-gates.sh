@@ -197,14 +197,15 @@ check_gate 11 "$GRADIENT_COUNT" "$BASE_11" "A1.1 — no chrome gradients" || exi
 
 # Gate 12: Chrome Axiom A1.2 — box-shadow must use shadow/glow token (--buildrick-* OR --bd-* alias).
 # Broadened: CSS (box-shadow:) + TSX camelCase (boxShadow:). Exempts lines
-# where the next non-whitespace token is var(--buildrick-shadow|glow) or
-# var(--bd-shadow|glow). The --bd-* aliases (added 2026-04-25) point at canonical
-# --buildrick-shadow-* tokens — both qualify as tokenized.
+# where the next non-whitespace token is var(--buildrick-shadow|glow),
+# var(--bd-shadow|glow), or var(--bk-shadow*) — the generated flat namespace
+# (ds/fresh-token-system, 2026-07-27) whose shadow tokens are the Figma
+# elevation scale. All three qualify as tokenized.
 # Match all box-shadow / boxShadow occurrences first, then subtract token-bound ones.
 SHADOW_ALL=$(count_chrome '(box-shadow|boxShadow)[[:space:]]*:')
-SHADOW_TOKENIZED=$(count_chrome "(box-shadow|boxShadow)[[:space:]]*:[[:space:]]*[\"']?var\(--(buildrick|bd)-(shadow|glow)")
+SHADOW_TOKENIZED=$(count_chrome "(box-shadow|boxShadow)[[:space:]]*:[[:space:]]*([\"']?var\(--(buildrick|bd|bk)-(shadow|glow)|[\"']?none)")
 SHADOW_COUNT=$((SHADOW_ALL - SHADOW_TOKENIZED))
-check_gate 12 "$SHADOW_COUNT" "$BASE_12" "A1.2 — box-shadow via shadow/glow token (--buildrick-*|--bd-*)" || exit 1
+check_gate 12 "$SHADOW_COUNT" "$BASE_12" "A1.2 — box-shadow via shadow/glow token (--buildrick-*|--bd-*|--bk-*)" || exit 1
 
 # Gate 13: Chrome Axiom A1.3 — border-radius ≤ 4px on panel chrome (form atoms exempt).
 # Broadened: CSS (border-radius:) + TSX camelCase (borderRadius:).
@@ -283,8 +284,9 @@ for p in data.get('files', []):
       # since grep's no-match would append a second "0" and break arithmetic.
       file_gradients=$(grep -cE '(linear-gradient|radial-gradient|conic-gradient)' "$green_file" 2>/dev/null); file_gradients=${file_gradients:-0}
       file_shadow_all=$(grep -cE '(box-shadow|boxShadow)[[:space:]]*:' "$green_file" 2>/dev/null); file_shadow_all=${file_shadow_all:-0}
-      # Token-bound shadow check allows both ' and " quote styles AND --bd-* aliases.
-      file_shadow_tok=$(grep -cE "(box-shadow|boxShadow)[[:space:]]*:[[:space:]]*[\"']?var\(--(buildrick|bd)-(shadow|glow)" "$green_file" 2>/dev/null); file_shadow_tok=${file_shadow_tok:-0}
+      # Token-bound shadow check allows both ' and " quote styles, --bd-* aliases,
+      # the generated --bk-shadow-* namespace, and box-shadow: none.
+      file_shadow_tok=$(grep -cE "(box-shadow|boxShadow)[[:space:]]*:[[:space:]]*([\"']?var\(--(buildrick|bd|bk)-(shadow|glow)|[\"']?none)" "$green_file" 2>/dev/null); file_shadow_tok=${file_shadow_tok:-0}
       file_shadow_raw=$((file_shadow_all - file_shadow_tok))
       file_radius=$(grep -cE "(border-radius|borderRadius)[[:space:]]*:[[:space:]]*[\"']?([5-9]|1[0-9]|2[0-9]|3[0-9]|50%|999)" "$green_file" 2>/dev/null); file_radius=${file_radius:-0}
       # Layout literal: CSS (Npx) + TSX bare-number (camelCase property).
@@ -309,13 +311,10 @@ for p in data.get('files', []):
   set -e
 fi
 
-# Gate 15: --bd-* SSOT — alias tokens defined only in bd-aliases.css and _aliases.css.
-# The --bd-* namespace is the chrome shorthand alias layer (contract documented
-# in bd-aliases.css header). Every --bd-* name must be defined in exactly one
-# of two canonical locations:
-#   1. themes/design-system/bd-aliases.css (hand-written core chrome aliases)
-#   2. themes/components/_aliases.css (vibcoder R2-namespace alias map)
-# Any other file defining --bd-* (literal or var()) is a cascade-override risk.
+# Gate 15: --bd-* namespace is RETIRED (ds/fresh-token-system stage 6).
+# Both former canonical homes (bd-aliases.css, _aliases.css) were deleted with
+# the old token system; the only chrome token namespace is the generated
+# --bk-* set. Any file defining --bd-* today is resurrecting a dead namespace.
 # Enforces the SSOT rule that was broken by themes/bridge-tokens.css (deleted 2026-04-24)
 # and the src/new-design/project/ reference snapshot (deleted 2026-04-24).
 #
@@ -358,7 +357,10 @@ pass "Gate 15: --bd-* defs only in bd-aliases.css"
 # canonical file only — ghosts must be fixed by adding aliases to bd-aliases.css,
 # not by defining them in random consumer files.
 GHOST_DEFINED=$(grep -oE -- '--bd-[a-z0-9-]+:' "$CANONICAL" 2>/dev/null | sed 's/:$//' | sort -u)
-GHOST_USED=$(grep -rohE -- 'var\(--bd-[a-z0-9-]+' \
+# Code files only — audit .md notes inside src/ carry historical snippets and
+# must not count as consumers (they went ghost when bd-aliases.css was deleted
+# in the ds/fresh-token-system stage-0 cutover).
+GHOST_USED=$(grep -rohE --include='*.ts' --include='*.tsx' --include='*.css' -- 'var\(--bd-[a-z0-9-]+' \
   packages/editor/src/shared/ui \
   packages/editor/src/editor \
   packages/editor/src/shared/forms \
@@ -443,6 +445,32 @@ pass "Gate 16: editor-scoped hex at or below baseline (REGRESSION mode)"
 #     editor/sidebar/tabs/media/components/StockSourceModal.tsx — stock photo
 #                                                                  color filter
 #     editor/sidebar/tabs/media/data/mediaTypes.ts — stock filter type union
+#   Extended (ds/fresh-token-system 2026-07-28 — Figma-generated palette):
+#     themes/tokens.generated.{css,ts}  — full Flowbite ramp from the Figma
+#                                          Primitives collection (purple ramp
+#                                          feeds PRO badge + avatar tones)
+#     editor/chrome-ui/{IntegrationRow,MediaCard,UpgradeModal,Presence}.tsx,
+#     editor/chrome-ui/avatarTone.ts,
+#     editor/sidebar/tabs/settings/screens/LockedScreen.tsx
+#                                        — PRO badge + avatar identity tones.
+#                                          DESIGN.md §Color is explicit: "the
+#                                          Flowbite purple ramp as identity/
+#                                          semantic data — avatar identity
+#                                          tones (tone derived from user id)
+#                                          and the PRO badge (--bk-purple-*),
+#                                          founder-confirmed with the palette
+#                                          2026-07-29" (DESIGN.md:41, :192,
+#                                          :369). Data/identity colour, not an
+#                                          accent — never a CTA, link, focus
+#                                          ring, or gradient (same precedent
+#                                          as dashboard brand tiles, DESIGN.md
+#                                          anti-slop #11). Moved here from
+#                                          editor/ui/{ui.css,Avatar.tsx,
+#                                          Presence.tsx} at Task 13 (flowbite
+#                                          big-bang teardown) — re-grepped,
+#                                          not carried over blind: LockedScreen
+#                                          was a 7th real site the pre-Task-13
+#                                          allowlist had missed.
 #   Extended (C-arc 2026-04-26 — user-facing token displays / published HTML):
 #     blocks/Ecommerce/                — published HTML for user's website
 #     features/design-system/           — user design system token UI
@@ -470,7 +498,7 @@ GATE18_RAW=$(grep -rniE '#1D4ED8|#1E40AF|#4F46E5|#EFF6FF|#DBEAFE|#BFDBFE|#60A5FA
   --exclude-dir=node_modules \
   --exclude-dir=dist 2>/dev/null || true)
 GATE18_VIOLATIONS=$(echo "$GATE18_RAW" | grep -vE \
-  'shared/utils/parsers/colorTypes\.ts|shared/utils/devLogger\.ts|engine/collaboration/CollaborationManager\.ts|engine/canvas/constants\.ts|engine/ai/PageGenerator\.ts|engine/designSystem/|features/design-system/|editor/design-system/|editor/inspector/sections/DSBindingChip\.tsx|themes/design-system/design\.css|blocks/Ecommerce/|blocks/Components/|shared/forms/ColorField\.tsx|shared/forms/GradientPicker\.tsx|shared/ui/index\.tsx|shared/constants/config\.ts|ai/ColorPalette\.tsx|editor/collaboration/PresenceIndicators\.tsx|editor/ecommerce/CollectionSetupModal\.tsx|editor/sidebar/tabs/templates/templatesData\.ts|editor/canvas/overlays/MediaQuickActions\.tsx|editor/sidebar/tabs/media/components/StockSourceModal\.tsx|editor/sidebar/tabs/media/data/mediaTypes\.ts|\.test\.ts' \
+  'shared/utils/parsers/colorTypes\.ts|shared/utils/devLogger\.ts|engine/collaboration/CollaborationManager\.ts|engine/canvas/constants\.ts|engine/ai/PageGenerator\.ts|engine/designSystem/|features/design-system/|editor/design-system/|editor/inspector/sections/DSBindingChip\.tsx|themes/design-system/design\.css|blocks/Ecommerce/|blocks/Components/|shared/forms/ColorField\.tsx|shared/forms/GradientPicker\.tsx|shared/ui/index\.tsx|shared/constants/config\.ts|ai/ColorPalette\.tsx|editor/collaboration/PresenceIndicators\.tsx|editor/ecommerce/CollectionSetupModal\.tsx|editor/sidebar/tabs/templates/templatesData\.ts|editor/canvas/overlays/MediaQuickActions\.tsx|editor/sidebar/tabs/media/components/StockSourceModal\.tsx|editor/sidebar/tabs/media/data/mediaTypes\.ts|themes/tokens\.generated\.(css|ts)|editor/chrome-ui/(IntegrationRow|MediaCard|UpgradeModal|Presence)\.tsx|editor/chrome-ui/avatarTone\.ts|editor/sidebar/tabs/settings/screens/LockedScreen\.tsx|\.test\.ts' \
   | grep -v '^$' || true)
 if [ -n "$GATE18_VIOLATIONS" ]; then
   echo "$GATE18_VIOLATIONS" | head -20
@@ -497,48 +525,50 @@ pass "Gate 18: no banned Tailwind/indigo/violet/purple bleed"
 # (not just src/editor/) — that mismatch was the root cause of the rollback.
 # Excludes: barrel files themselves (index.ts, index.tsx) which legitimately
 # re-export from sibling shim files.
-LEAK=$(grep -rEn 'from\s+"(@/shared/ui|(\.\./)+shared/ui)"' packages/editor/src --include='*.ts' --include='*.tsx' --exclude-dir=__tests__ 2>/dev/null \
-  | grep -v 'shared/ui/index\.ts\(x\)\?:' \
-  || true)
-if [ -n "$LEAK" ]; then
-  echo "$LEAK"
-  fail "Gate 20: barrel import of @/shared/ui — use direct named path (e.g. @/shared/ui/Button)"
-fi
-pass "Gate 20: no barrel imports of @/shared/ui"
+# RETIRED (Slice 6B, shared/ui drain 2026-07-28): src/shared/ui/ was deleted
+# entirely — last primitives (Icons/ErrorState/HelpTooltip/SemanticBadge) were
+# drained onto editor/ui + lucide, and panel/PanelShell went with the
+# shared/extensions drain. No shared/ui import can resolve anymore, so the
+# gate has nothing left to guard.
+pass "Gate 20: retired — shared/ui deleted (Slice 6B)"
 
-# Gate 22: E3 portal discipline — no document.body in vibcoder wrappers (except OverlayMount)
-# Phase 3 overlays MUST portal through #vibcoder-overlay-root via useOverlayContainer().
-# OverlayMount.tsx is allow-listed because it owns the root.
-# Test files (*.test.tsx, *.test.ts) are exempt — they may reference document.body
-# for fixture cleanup or assertions about portal containment.
-GATE22_HITS=$(grep -RIn 'document\.body' \
-  packages/editor/src/editor/shared/vibcoder/ \
-  --include='*.tsx' --include='*.ts' \
-  | grep -v '^[^:]*OverlayMount\.tsx:' \
+# Gate 22 (successor, Task 13 flowbite big-bang): portal discipline — one
+# overlay root. createPortal targets and body-appended overlay nodes must
+# route through chrome-ui's overlay-root primitives (OverlayMount, OverlayRoot
+# / getOverlayRoot(), Portal, Toast — the files that ARE the overlay-root
+# infrastructure, excluded below by path) or be a documented non-overlay use
+# (scripts/gates/overlay-allowlist.txt: drag ghosts, download anchors,
+# capture/measurement nodes, plus pre-existing portal-discipline gaps that
+# predate any gate coverage — see the allowlist file for the breakdown).
+#
+# The ORIGINAL Gate 22 only scanned the since-deleted
+# packages/editor/src/editor/shared/vibcoder/ tree. Broadened here to all of
+# packages/editor/src now that vibcoder is gone — the old narrow scope is
+# what let every site in the allowlist's last section ship unaudited.
+# Test files (*.test.tsx, *.test.ts) are exempt — they may reference
+# document.body / createPortal for fixture cleanup or portal-containment
+# assertions.
+GATE22_HITS=$(grep -rnE 'createPortal\(|document\.body\.appendChild' \
+  packages/editor/src \
+  --include='*.ts' --include='*.tsx' \
+  | grep -v '/__tests__/' \
   | grep -v '\.test\.tsx:' \
   | grep -v '\.test\.ts:' \
+  | grep -vE 'chrome-ui/(OverlayMount|OverlayRoot|Portal|Toast)\.tsx' \
+  | grep -v -F -f "$SCRIPT_DIR/gates/overlay-allowlist.txt" \
+  | grep -v 'getOverlayRoot()' \
   || true)
 if [ -n "$GATE22_HITS" ]; then
   echo "$GATE22_HITS"
-  fail "Gate 22: document.body referenced outside OverlayMount.tsx (E3 portal discipline)"
+  fail "Gate 22: portal outside the overlay root (createPortal/document.body must route through chrome-ui's OverlayMount/OverlayRoot/Portal/Toast, or be listed in scripts/gates/overlay-allowlist.txt)"
 fi
-pass "Gate 22: E3 portal discipline (no document.body outside OverlayMount)"
+pass "Gate 22: portal discipline (createPortal/document.body routed through the overlay root or allowlisted)"
 
-# Gate 23: Shim layer is gate-keeper for mapped primitives.
-# Forbids direct imports of `@/shared/ui/<MappedPrimitive>` outside
-# `shared/ui/` itself. Every consumer must go through the barrel which
-# goes through the shim which goes through vibcoder. Bypass is regression.
-# Mapped primitives = the shims actually shipped by Phase 4 T1-T6.
-GATE23_PRIMITIVES='Button|Input|Select|Switch|Checkbox|Slider|Spinner|Skeleton|Icon|IconButton|Kbd|Badge|Tag|Card|Tabs|FormField|TextInput|PanelHeader|Popover|Tooltip|Toast'
-GATE23_HITS=$(grep -rE "from ['\"]@/shared/ui/(${GATE23_PRIMITIVES})['\"]" packages/editor/src --include='*.ts' --include='*.tsx' --exclude-dir=__tests__ --exclude-dir=project 2>/dev/null \
-  | grep -v 'shared/ui/' \
-  | grep -vE '^[[:space:]]*//|:[[:space:]]*/?\*' \
-  || true)
-if [ -n "$GATE23_HITS" ]; then
-  echo "$GATE23_HITS"
-  fail "Gate 23: direct shim-primitive import outside shared/ui/ (use barrel @/shared/ui)"
-fi
-pass "Gate 23: shim layer is gate-keeper for mapped primitives"
+# Gate 23: RETIRED (Slice 6 · stage 6, 2026-07-28). The shared/ui shim layer
+# and the vibcoder library behind it were deleted; the import path this gate
+# policed no longer exists. Kept as an explicit pass so gate numbering and CI
+# logs stay stable.
+pass "Gate 23: retired — shared/ui shim layer deleted (stage 6)"
 
 # Gate 24: Inline-pattern enforcement (AST-based — catches multi-line JSX).
 # Forbids inline lowercase HTML JSX (<button>, <input>, <select>, <textarea>) in editor/.
@@ -548,15 +578,24 @@ GATE24_FILE_COUNT=$(find packages/editor/src/editor -name '*.tsx' \
   -not -path '*/__tests__/*' \
   -not -path '*/preview/*' \
   -not -path '*/shared/vibcoder/*' \
+  -not -path '*/editor/chrome-ui/*' \
   -not -name '*.test.tsx' 2>/dev/null | wc -l | tr -d ' ')
 
 if [ "$GATE24_FILE_COUNT" -eq 0 ]; then
   GATE24_HITS=0
 else
+  # editor/chrome-ui/ is the component library — its whole job is to own the
+  # native <button>/<input> elements so no one else has to. It is the sole
+  # successor: the OLD owner, editor/ui/, was deleted at Task 13 (flowbite
+  # big-bang teardown) once every consumer was re-pointed here. TextField is
+  # the one sanctioned raw-<input> owner for call sites whose bespoke
+  # className can't reach flowbite TextInput's real <input> (className lands
+  # on an outer wrapper div only — see src/editor/chrome-ui/textInputTheme.ts).
   GATE24_HITS=$(find packages/editor/src/editor -name '*.tsx' \
     -not -path '*/__tests__/*' \
     -not -path '*/preview/*' \
     -not -path '*/shared/vibcoder/*' \
+    -not -path '*/editor/chrome-ui/*' \
     -not -name '*.test.tsx' 2>/dev/null \
     | xargs npx tsx packages/editor/scripts/jsx-inline-element-scanner.ts 2>/dev/null \
     | jq -s 'add | length' 2>/dev/null || echo "0")
@@ -570,7 +609,7 @@ fi
 # See memory/project_gate24_codemod_arc_20260518.md,
 #     memory/project_radio_primitive_20260518.md, and
 #     memory/project_bare_button_variant_20260518.md.
-check_gate 24 "$GATE24_HITS" "0" "inline <button>/<input>/<select>/<textarea> in editor/ (use vibcoder shim @/shared/ui) — ZERO TOLERANCE" || exit 1
+check_gate 24 "$GATE24_HITS" "0" "inline <button>/<input>/<select>/<textarea> in editor/ (use @/editor/chrome-ui) — ZERO TOLERANCE" || exit 1
 
 # Gate 25: Orphan codemod fixtures.
 # Every `*.input.tsx`/`*.output.tsx` must be referenced by SOME test file —

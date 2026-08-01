@@ -1,5 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * SearchBar - Search input for sidebar tabs
  * Debounces onChange to parent (300ms default) while keeping input visually instant
@@ -8,6 +6,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import * as React from "react";
 import { trackSidebar } from "../../../shared/utils/sidebarAnalytics";
+import { Button, TextInput } from "@/editor/chrome-ui";
 
 export interface SearchBarProps {
   value: string;
@@ -84,7 +83,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   return (
     <div style={containerStyles} role="search">
       <SearchIcon />
-      <Input
+      <TextInput
         type="text"
         id={id}
         value={inputValue}
@@ -139,10 +138,10 @@ const containerStyles: React.CSSProperties = {
   margin: 0,
   padding: "0 8px",
   height: 36,
-  background: "var(--buildrick-bg-card, var(--bd-bg-card))",
-  border: "1px solid var(--buildrick-border)",
+  background: "var(--bk-bg-card, var(--bk-bg-card))",
+  border: "1px solid var(--bk-border)",
   borderRadius: 4,
-  color: "var(--buildrick-text-secondary, var(--bd-fg-muted))",
+  color: "var(--bk-ink-soft, var(--bk-ink-muted))",
   transition: "border-color 0.15s ease, box-shadow 0.15s ease",
 };
 
@@ -150,7 +149,7 @@ const inputStyles: React.CSSProperties = {
   flex: 1,
   background: "transparent",
   border: "none",
-  color: "var(--buildrick-text-primary)",
+  color: "var(--bk-ink)",
   fontSize: 12,
   outline: "none",
   lineHeight: "18px",
@@ -165,7 +164,7 @@ const clearButtonStyles: React.CSSProperties = {
   background: "transparent",
   border: "none",
   cursor: "pointer",
-  color: "var(--buildrick-text-muted, var(--bd-fg-secondary))",
+  color: "var(--bk-ink-muted, var(--bk-ink-soft))",
   borderRadius: 4,
 };
 

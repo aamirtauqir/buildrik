@@ -49,16 +49,16 @@ export interface DropFeedbackOverlayProps {
 /** Professional color palette - using CSS variables from Canvas.css */
 const COLORS = {
   valid: {
-    border: "var(--buildrick-accent)", // Green for valid drops
-    bg: "var(--buildrick-accent-tint)",
-    text: "var(--bd-fg-heading)",
-    badgeBg: "var(--buildrick-text-heading)",
-    badgeText: "var(--buildrick-accent-subtle)",
+    border: "var(--bk-accent)", // Green for valid drops
+    bg: "var(--bk-accent-tint)",
+    text: "var(--bk-ink)",
+    badgeBg: "var(--bk-ink)",
+    badgeText: "var(--bk-accent-subtle)",
   },
   invalid: {
-    border: "var(--buildrick-error)", // Red for invalid drops
-    bg: "var(--buildrick-error-light)",
-    text: "var(--bd-bg-card)",
+    border: "var(--bk-error)", // Red for invalid drops
+    bg: "var(--bk-error-tint)",
+    text: "var(--bk-bg-card)",
   },
 };
 
@@ -174,7 +174,7 @@ const DropFeedbackOverlayComponent: React.FC<DropFeedbackOverlayProps> = ({
                 ? `2px dashed ${COLORS.valid.border}`
                 : `2px solid ${COLORS.invalid.border}`,
               backgroundColor: isValidDrop ? COLORS.valid.bg : COLORS.invalid.bg,
-              borderRadius: "var(--buildrick-radius-sm)",
+              borderRadius: "var(--bk-radius-sm)",
               transition: "border-color 150ms ease, background-color 150ms ease",
               boxSizing: "border-box",
               zIndex: 1,
@@ -267,8 +267,8 @@ const DropSlotPreview: React.FC<DropSlotPreviewProps> = ({ slotRect }) => {
         top: slotRect.y,
         width: slotRect.width,
         height: slotRect.height,
-        backgroundColor: "var(--buildrick-accent-tint)",
-        border: "2px dashed var(--buildrick-accent)",
+        backgroundColor: "var(--bk-accent-tint)",
+        border: "2px dashed var(--bk-accent)",
         borderRadius: 4,
         animation: `${animationName} 150ms ease-out forwards`,
         transformOrigin: slotRect.isHorizontal ? "left center" : "center top",
@@ -372,11 +372,11 @@ const DropBreadcrumb: React.FC<DropBreadcrumbProps> = ({ path, targetRect }) => 
         display: "flex",
         alignItems: "center",
         gap: 2,
-        backgroundColor: "var(--buildrick-toolbar-bg)",
+        backgroundColor: "var(--bk-bg-panel)",
         padding: "4px 8px",
         borderRadius: 4,
         fontSize: 12,
-        color: "var(--buildrick-text-secondary)",
+        color: "var(--bk-ink-soft)",
         boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
         animation: "breadcrumbFadeIn 150ms ease-out forwards",
         zIndex: Z_LAYERS.dropBreadcrumb,
@@ -390,15 +390,15 @@ const DropBreadcrumb: React.FC<DropBreadcrumbProps> = ({ path, targetRect }) => 
           <span
             style={{
               color: item.isCurrent
-                ? "var(--buildrick-text-primary, var(--bd-bg-panel))"
-                : "var(--buildrick-text-secondary)",
+                ? "var(--bk-ink, var(--bk-bg-panel))"
+                : "var(--bk-ink-soft)",
               fontWeight: item.isCurrent ? 600 : 400,
             }}
           >
             {item.label}
           </span>
           {idx < path.length - 1 && (
-            <span style={{ color: "var(--buildrick-text-tertiary)", margin: "0 2px" }}>›</span>
+            <span style={{ color: "var(--bk-ink-muted)", margin: "0 2px" }}>›</span>
           )}
         </React.Fragment>
       ))}
@@ -422,8 +422,8 @@ const DepthBadge: React.FC<DepthBadgeProps> = ({ depth, targetRect }) => {
         position: "absolute",
         left: targetRect.left + targetRect.width - 40,
         top: targetRect.top + targetRect.height + 4,
-        backgroundColor: "var(--buildrick-toolbar-bg)",
-        color: "var(--buildrick-text-secondary)",
+        backgroundColor: "var(--bk-bg-panel)",
+        color: "var(--bk-ink-soft)",
         padding: "2px 8px",
         borderRadius: 10,
         fontSize: 12,

@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * StudioPanels - Main panel layout component
  * Manages left sidebar, canvas area, right inspector, and fullpage views.
@@ -17,7 +16,7 @@ import type { GroupedTabId } from "../rail/tabsConfig";
 import { getTabMode } from "../rail/tabsConfig";
 import type { BlockData, DeviceType } from "../../shared/types";
 import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/media";
-import { useToast } from "@/editor/shared/vibcoder";
+import { useToast } from "@/editor/chrome-ui";
 import { Canvas, type CanvasRef } from "../canvas/Canvas";
 import type { CanvasOverlayState } from "../canvas/CanvasFooterToolbar";
 import { ProInspector } from "../inspector/ProInspector";
@@ -30,7 +29,7 @@ import { StarterGalleryMount } from "@/editor/design-system/ui/StarterGalleryMou
 import { useBlockInsertion } from "./hooks/useBlockInsertion";
 import { useAltTextAutoTrigger } from "./hooks/useAltTextAutoTrigger";
 import { PageTabBar } from "./PageTabBar";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -111,7 +110,7 @@ const previewBannerStyle: React.CSSProperties = {
   background: "rgba(0,0,0,0.82)",
   border: "1px solid rgba(255,255,255,0.12)",
   borderRadius: 8,
-  color: "var(--buildrick-text-on-accent)",
+  color: "var(--bk-accent-on)",
   fontSize: 13,
   zIndex: 50,
   pointerEvents: "auto",
@@ -134,7 +133,7 @@ const styles = {
   container: {
     flex: 1,
     overflow: "hidden",
-    background: "var(--buildrick-bg-panel)",
+    background: "var(--bk-bg-panel)",
   } as React.CSSProperties,
 
   canvasPattern: {

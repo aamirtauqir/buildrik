@@ -74,6 +74,21 @@ export interface Issue {
   autoFixHint?: string;
   /** Where the issue lives, e.g. "Brand › color.accent". Shown under the message. */
   location?: string;
+  /**
+   * The page the issue is bound to (topbar plan T10). Undefined = genuinely
+   * site-wide (DS-lint token issues apply everywhere, so they have no page).
+   * Element-bound producers (broken links, missing alt) stamp this when they
+   * land — the Issues panel's page scope and the topbar chip count read it.
+   */
+  pageId?: string;
+}
+
+/**
+ * Does an issue apply when the user is looking at `pageId`? Site-wide issues
+ * (no pageId) apply on every page — that is why this is not a plain equality.
+ */
+export function issueAppliesToPage(issue: Issue, pageId: string | null): boolean {
+  return issue.pageId == null || issue.pageId === pageId;
 }
 
 /** Hook return type */

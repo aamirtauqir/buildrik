@@ -7,7 +7,7 @@ import { Link, Link2Off } from "lucide-react";
 import { Section, SpacingBox, InputWithUnit, MoreSettingsToggle, type SectionTier, MixedValueIndicator } from "../shared/controls";
 import { MixedValueBadge } from "../shared/MixedValueBadge";
 import { parseCssShorthand } from "../shared/utils/parseCssShorthand";
-import { Button } from "@/editor/shared/vibcoder/Button";
+import { Button } from "@/editor/chrome-ui";
 
 export interface SpacingSectionProps {
   styles: Record<string, string>;
@@ -142,21 +142,23 @@ export const SpacingSection: React.FC<SpacingSectionProps> = ({
           four (margin or padding). */}
       <div style={{ display: "flex", gap: 4, marginBottom: 6 }}>
         <Button
-          variant={marginLinked ? "secondary" : "bare"}
-          size="sm"
+          color="light"
+          size="xs"
           onClick={() => setMarginLinked((v) => !v)}
           aria-pressed={marginLinked}
           title={marginLinked ? "Unlink margin sides" : "Link margin sides"}
+          className={marginLinked ? undefined : "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"}
         >
           {marginLinked ? <Link size={12} /> : <Link2Off size={12} />}
           <span style={{ marginLeft: 4 }}>Margin</span>
         </Button>
         <Button
-          variant={paddingLinked ? "secondary" : "bare"}
-          size="sm"
+          color="light"
+          size="xs"
           onClick={() => setPaddingLinked((v) => !v)}
           aria-pressed={paddingLinked}
           title={paddingLinked ? "Unlink padding sides" : "Link padding sides"}
+          className={paddingLinked ? undefined : "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"}
         >
           {paddingLinked ? <Link size={12} /> : <Link2Off size={12} />}
           <span style={{ marginLeft: 4 }}>Padding</span>

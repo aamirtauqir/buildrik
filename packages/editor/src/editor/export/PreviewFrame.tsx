@@ -135,7 +135,7 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
             border: device === "desktop" ? "none" : /* @lint-hex-policy: device-preview frame mockup color, not editor chrome */ "4px solid #333",
             borderTop: device === "desktop" ? "none" : "none",
             borderRadius: device === "desktop" ? 8 : "0 0 12px 12px",
-            background: "var(--buildrick-bg-card)",
+            background: "var(--bk-bg-card)",
             display: "block",
           }}
           sandbox="allow-same-origin"

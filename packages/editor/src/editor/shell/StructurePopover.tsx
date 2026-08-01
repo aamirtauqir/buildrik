@@ -12,10 +12,10 @@
 
 import * as React from "react";
 import type { Composer } from "../../engine";
-import { Button } from "@/editor/shared/vibcoder/Button";
 import { X } from "lucide-react";
 import { LayersPanel } from "../panels/layers";
 import type { SelectedElementInfo } from "../panels/layers";
+import { Button } from "@/editor/chrome-ui";
 
 interface StructurePopoverProps {
   open: boolean;
@@ -64,8 +64,8 @@ export const StructurePopover: React.FC<StructurePopoverProps> = ({
         maxHeight: "60vh",
         display: "flex",
         flexDirection: "column",
-        background: "var(--bd-bg)",
-        border: "1px solid var(--bd-border)",
+        background: "var(--bk-bg-app)",
+        border: "1px solid var(--bk-border)",
         borderRadius: 8,
         boxShadow: "0 12px 32px rgba(0,0,0,0.18)",
         zIndex: 1000,
@@ -78,16 +78,16 @@ export const StructurePopover: React.FC<StructurePopoverProps> = ({
           alignItems: "center",
           justifyContent: "space-between",
           padding: "8px 10px",
-          borderBottom: "1px solid var(--bd-border)",
+          borderBottom: "1px solid var(--bk-border)",
         }}
       >
-        <span style={{ fontSize: 12, fontWeight: 600, color: "var(--bd-fg)" }}>Structure</span>
+        <span style={{ fontSize: 12, fontWeight: 600, color: "var(--bk-ink)" }}>Structure</span>
         <Button
-          variant="bare"
-          size="sm"
+          color="light"
+          size="xs"
           onClick={onClose}
           aria-label="Close structure"
-          style={{ display: "inline-grid", placeItems: "center", width: 24, height: 24, padding: 0 }}
+          style={{ display: "inline-grid", placeItems: "center", width: 24, height: 24, padding: 0 }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
         >
           <X size={14} />
         </Button>

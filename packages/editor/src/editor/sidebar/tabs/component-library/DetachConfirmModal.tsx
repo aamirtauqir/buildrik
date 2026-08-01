@@ -10,14 +10,8 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import {
-  Modal,
-  ModalContent,
-  ModalTitle,
-  ModalClose,
-  OverlayMount,
-  Button,
-} from "@/editor/shared/vibcoder";
+import { ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/chrome-ui";
+import { Button } from "@/editor/chrome-ui";
 
 export interface DetachConfirmModalProps {
   /** Label for the instance being detached, e.g. "#3". */
@@ -34,7 +28,7 @@ export interface DetachConfirmModalProps {
 
 const metaStyle: React.CSSProperties = {
   fontSize: 12,
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
   margin: "0 0 12px 0",
 };
 
@@ -50,7 +44,7 @@ const bulletItemStyle: React.CSSProperties = {
   gap: 8,
   padding: "6px 0",
   fontSize: 12,
-  color: "var(--bd-fg-secondary)",
+  color: "var(--bk-ink-soft)",
 };
 
 const bulletIconStyle: React.CSSProperties = {
@@ -69,22 +63,22 @@ const footerStyle: React.CSSProperties = {
 const BULLETS: ReadonlyArray<{ icon: string; color: string; text: string }> = [
   {
     icon: "✓",
-    color: "var(--buildrick-success-strong)",
+    color: "var(--bk-success-text)",
     text: "Current resolved bindings will be snapshotted",
   },
   {
     icon: "✓",
-    color: "var(--buildrick-success-strong)",
+    color: "var(--bk-success-text)",
     text: "This instance becomes free-form (edit anything)",
   },
   {
     icon: "⚠",
-    color: "var(--buildrick-warning-strong)",
+    color: "var(--bk-warning-text)",
     text: "Master edits will no longer affect this instance",
   },
   {
     icon: "↩",
-    color: "var(--buildrick-info-strong)",
+    color: "var(--bk-accent-text)",
     text: "Undo restores the link (Cmd+Z)",
   },
 ];
@@ -100,8 +94,8 @@ export function DetachConfirmModal({
     masterInstanceCount === 1 ? "1 instance" : `${masterInstanceCount} instances`;
 
   return (
-    <OverlayMount>
-      <Modal
+    <Portal>
+      <ModalRoot
         open
         onOpenChange={(next) => {
           if (!next) onCancel();
@@ -140,17 +134,17 @@ export function DetachConfirmModal({
               ))}
             </ul>
             <div style={footerStyle}>
-              <Button variant="ghost" onClick={onCancel}>
+              <Button color="light" onClick={onCancel} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                 Cancel
               </Button>
-              <Button variant="primary" onClick={onConfirm}>
+              <Button onClick={onConfirm}>
                 Detach
               </Button>
             </div>
           </div>
         </ModalContent>
-      </Modal>
-    </OverlayMount>
+      </ModalRoot>
+    </Portal>
   );
 }
 

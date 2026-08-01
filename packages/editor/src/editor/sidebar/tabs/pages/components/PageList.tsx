@@ -1,12 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { IconButton } from "@/editor/shared/vibcoder/IconButton";
-import {
-  EmptyState,
-  EmptyStateTitle,
-  EmptyStateDesc,
-  EmptyStateActions,
-} from "@/editor/shared/vibcoder";
 /**
  * PageList — search input + pages tree + bulk toolbar mount + footer + Add CTA.
  * Zero business logic. All state/actions received as props from usePages + useFolders.
@@ -17,6 +8,13 @@ import {
  */
 
 import * as React from "react";
+import {
+  EmptyState,
+  EmptyStateActions,
+  EmptyStateDesc,
+  EmptyStateTitle,
+  IconButton
+} from "@/editor/chrome-ui";
 import type { Composer } from "../../../../../engine";
 import type { FolderItem, PageItem } from "../types";
 import { shouldFocusSearch } from "../utils/keyboardShortcuts";
@@ -24,6 +22,7 @@ import { AddPageButton } from "./AddPageButton";
 import { BulkToolbar } from "./BulkToolbar";
 import { PageFolder } from "./PageFolder";
 import { PageRow } from "./PageRow";
+import { Button, TextInput } from "@/editor/chrome-ui";
 
 interface Props {
   pages: PageItem[];
@@ -124,11 +123,11 @@ export const PageList: React.FC<Props> = ({
             <EmptyStateTitle>No pages yet</EmptyStateTitle>
             <EmptyStateDesc>Add your first page to get started. Pages are the screens visitors see.</EmptyStateDesc>
             <EmptyStateActions>
-              <Button variant="primary" size="sm" type="button" onClick={onAddPage}>
+              <Button size="xs" onClick={onAddPage}>
                 Create blank page
               </Button>
               {onRequestTemplates && (
-                <Button variant="ghost" size="sm" type="button" onClick={onRequestTemplates}>
+                <Button color="light" size="xs" onClick={onRequestTemplates} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                   From template
                 </Button>
               )}
@@ -152,7 +151,7 @@ export const PageList: React.FC<Props> = ({
               <circle cx="11" cy="11" r="8" />
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
-            <Input
+            <TextInput
               ref={searchRef}
               type="text"
               placeholder="Search pages..."
@@ -165,11 +164,9 @@ export const PageList: React.FC<Props> = ({
             />
             {search && (
               <IconButton
-                variant="ghost"
-                size="xs"
-                type="button"
+                size="sm"
                 onClick={() => setSearch("")}
-                aria-label="Clear search"
+                label="Clear search"
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true" style={{ width: 14, height: 14 }}>
                   <line x1="18" y1="6" x2="6" y2="18" />
@@ -217,7 +214,7 @@ export const PageList: React.FC<Props> = ({
           <EmptyState size="compact">
             <EmptyStateTitle>No pages match &ldquo;{search}&rdquo;</EmptyStateTitle>
             <EmptyStateActions>
-              <Button variant="ghost" size="sm" type="button" onClick={() => setSearch("")}>
+              <Button color="light" size="xs" onClick={() => setSearch("")} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                 Clear search
               </Button>
             </EmptyStateActions>

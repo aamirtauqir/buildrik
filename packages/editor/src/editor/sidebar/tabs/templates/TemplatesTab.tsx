@@ -1,5 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * TemplatesTab v4 — Full-page template browser matching .pen Screens 4-7.
  * Light theme, 4-column grid, pagination, inline detail panel, two-stage filtering.
@@ -7,10 +5,9 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { PanelFrame, useToast } from "@/editor/chrome-ui";
 import { Search, X } from "lucide-react";
 import type { Composer } from "../../../../engine";
-import { useToast } from "@/editor/shared/vibcoder";
-import { TabFrame } from "@/shared/extensions/TabFrame";
 import { DrillInHeader } from "../../shared/DrillInHeader";
 import { type TemplateItem, SITE_CATEGORY_PILLS, SITE_TEMPLATES, TEMPLATE_TYPE_PILLS, SUB_CATEGORY_TAGS, type SiteCategory, type TemplateType, DEFAULT_TEMPLATE_VERSION } from "./templatesData";
 import { clearAppliedId, recordTemplateApplied, saveAppliedId } from "./templatesStorage";
@@ -31,6 +28,8 @@ import { snapshotFromComputedStyle } from "./utils/tokenSnapshot";
 import { DEFAULT_TOKENS } from "../../../design-system/constants";
 import { ApplyProgressOverlay } from "./ApplyProgressOverlay";
 import "./TemplatesTab.css";
+import { Button } from "@/editor/chrome-ui";
+import { TextField } from "@/editor/chrome-ui";
 
 // Re-export for external consumers
 export type { TemplateItem, RecentTemplate } from "./templatesData";
@@ -274,7 +273,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
     : "Template";
 
   return (
-    <TabFrame className="tpl-shell">
+    <PanelFrame className="tpl-shell">
       {/* Header — 3 modes via TabFrame.Header / DrillInHeader. Breadcrumb
           mode uses the canonical drill-in pattern (back button + path);
           newpage + default modes use the standard panel header. */}
@@ -290,16 +289,16 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
           onClose={onClose}
         />
       ) : newPageMode ? (
-        <TabFrame.Header title="Choose a template for your new page">
+        <PanelFrame.Header title="Choose a template for your new page">
           <div className="tpl-newpage-chip">New Page</div>
           {onClose && (
             <Button className="tpl-header-btn" onClick={onClose} aria-label="Close templates">
               <X size={16} />
             </Button>
           )}
-        </TabFrame.Header>
+        </PanelFrame.Header>
       ) : (
-        <TabFrame.Header
+        <PanelFrame.Header
           title="Templates"
           subtitle={`${SITE_TEMPLATES.length} templates`}
           onClose={onClose}
@@ -311,14 +310,14 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
           >
             <Search size={16} />
           </Button>
-        </TabFrame.Header>
+        </PanelFrame.Header>
       )}
       {/* Search input */}
       {showSearch && (
         <div className="tpl-search-wrap">
           <div className="tpl-search-input-box">
             <Search size={16} className="tpl-search-icon" />
-            <Input
+            <TextField
               className="tpl-search-input"
               placeholder="Search templates..."
               value={sel.searchQ}
@@ -561,7 +560,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
           />
         );
       })()}
-    </TabFrame>
+    </PanelFrame>
   );
 };
 

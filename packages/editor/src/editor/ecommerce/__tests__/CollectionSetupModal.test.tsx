@@ -15,7 +15,7 @@
 import * as React from "react";
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, cleanup, fireEvent, waitFor } from "@testing-library/react";
-import { ToastProvider } from "@/editor/shared/vibcoder";
+import { ToastProvider } from "@/editor/chrome-ui";
 import { CollectionSetupModal } from "../CollectionSetupModal";
 
 function renderModal(props: Partial<React.ComponentProps<typeof CollectionSetupModal>> = {}) {

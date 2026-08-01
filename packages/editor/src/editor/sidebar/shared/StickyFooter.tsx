@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * StickyFooter - Save/Apply/Cancel footer for drill-in screens
  * Sticks to bottom of panel, shows unsaved indicator
@@ -6,7 +5,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================
 // Types
 // ============================================
@@ -84,8 +83,8 @@ const containerStyles: React.CSSProperties = {
   flexDirection: "column",
   gap: 8,
   padding: "12px",
-  background: "var(--buildrick-surface-2)",
-  borderTop: "1px solid var(--buildrick-border)",
+  background: "var(--bk-bg-subtle)",
+  borderTop: "1px solid var(--bk-border)",
   marginTop: "auto",
 };
 
@@ -94,14 +93,14 @@ const indicatorStyles: React.CSSProperties = {
   alignItems: "center",
   gap: 6,
   fontSize: 12,
-  color: "var(--buildrick-warning)",
+  color: "var(--bk-warning)",
 };
 
 const dotStyles: React.CSSProperties = {
   width: 6,
   height: 6,
-  borderRadius: "var(--bd-radius-full)",
-  background: "var(--buildrick-warning)",
+  borderRadius: "var(--bk-radius-full)",
+  background: "var(--bk-warning)",
 };
 
 const buttonsStyles: React.CSSProperties = {
@@ -113,10 +112,10 @@ const primaryBtnStyles: React.CSSProperties = {
   flex: 1,
   padding: "8px 16px",
   height: 32,
-  background: "var(--buildrick-accent)",
+  background: "var(--bk-accent)",
   border: "none",
   borderRadius: 8,
-  color: "var(--buildrick-text-on-accent)",
+  color: "var(--bk-accent-on)",
   fontSize: 12,
   fontWeight: 600,
   cursor: "pointer",
@@ -128,9 +127,9 @@ const secondaryBtnStyles: React.CSSProperties = {
   padding: "8px 16px",
   height: 32,
   background: "transparent",
-  border: "1px solid var(--buildrick-border)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 8,
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bk-ink-soft)",
   fontSize: 12,
   fontWeight: 500,
   cursor: "pointer",

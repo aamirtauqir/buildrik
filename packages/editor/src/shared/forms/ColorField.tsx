@@ -1,13 +1,13 @@
 /**
  * ColorField — color picker with optional hex input + presets.
- * Internal: uses vibcoder <Input> for hex text + native <input type=color>
- * for the swatch picker.
+ * Internal: uses flowbite's <TextInput> for hex text + native
+ * <input type=color> for the swatch picker.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { Input } from "@/editor/shared/vibcoder";
+import { TextInput } from "@/editor/chrome-ui";
 
 export interface ColorFieldProps {
   label?: string;
@@ -86,7 +86,7 @@ export const ColorField: React.FC<ColorFieldProps> = ({
           />
         </div>
         {showInput && (
-          <Input
+          <TextInput
             type="text"
             value={localValue}
             onChange={(e) => handleColorChange(e.target.value)}
@@ -111,7 +111,7 @@ export const ColorField: React.FC<ColorFieldProps> = ({
                 style={{
                   ...presetButtonStyle,
                   background: isTransparentPreset ? checkerPattern : color,
-                  outline: isSelected ? "2px solid var(--buildrick-accent)" : "none",
+                  outline: isSelected ? "2px solid var(--bk-accent)" : "none",
                   outlineOffset: 2,
                 }}
                 aria-label={`Select color ${color}`}
@@ -132,9 +132,9 @@ const fieldStyle: React.CSSProperties = {
 };
 
 const labelStyle: React.CSSProperties = {
-  fontSize: "var(--buildrick-text-sm)",
+  fontSize: "var(--bk-text-12)",
   fontWeight: 500,
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bk-ink-soft)",
 };
 
 const rowStyle: React.CSSProperties = {
@@ -160,7 +160,7 @@ const nativePickerStyle: React.CSSProperties = {
 const swatchStyle: React.CSSProperties = {
   width: 32,
   height: 32,
-  border: "1px solid var(--buildrick-border)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 6,
   pointerEvents: "none",
 };
@@ -175,7 +175,7 @@ const presetsStyle: React.CSSProperties = {
 const presetButtonStyle: React.CSSProperties = {
   width: 20,
   height: 20,
-  border: "1px solid var(--buildrick-border)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 4,
   cursor: "pointer",
   padding: 0,

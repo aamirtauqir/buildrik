@@ -1,5 +1,3 @@
-import { Kbd } from "@/editor/shared/vibcoder/Kbd";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * ActivityView — Undo/redo activity timeline
  * Pixel-aligned with the History Tab prototype:
@@ -13,6 +11,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Kbd } from "@/editor/chrome-ui";
 // react-window 1.8.x ships JS only; stub the minimal surface we use.
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore — module has no bundled .d.ts (see @types/react-window stub)
@@ -28,7 +27,7 @@ import {
 import { TimeTravelIcon } from "../icons";
 import type { ActivityViewProps } from "../types";
 import type { HistoryDisplayEntry } from "../../../../../engine/historyTypes";
-
+import { Button } from "@/editor/chrome-ui";
 const MAX_VISIBLE_CHANGES = 5;
 
 // Row sizing constants (see spec §2.5)
@@ -85,9 +84,9 @@ const STYLE_USER_CHIP: React.CSSProperties = {
   justifyContent: "center",
   width: 16,
   height: 16,
-  borderRadius: "var(--bd-radius-full)",
-  background: "var(--bd-accent-tint)",
-  color: "var(--bd-accent)",
+  borderRadius: "var(--bk-radius-full)",
+  background: "var(--bk-accent-tint)",
+  color: "var(--bk-accent)",
   fontSize: 10,
   fontWeight: 600,
   lineHeight: 1,
@@ -95,13 +94,13 @@ const STYLE_USER_CHIP: React.CSSProperties = {
 
 const STYLE_RELATIVE_TIME: React.CSSProperties = {
   fontSize: 11,
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
 };
 
 const STYLE_DIFF_COUNT: React.CSSProperties = {
   marginLeft: 6,
   fontSize: 11,
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
   fontVariantNumeric: "tabular-nums",
 };
 

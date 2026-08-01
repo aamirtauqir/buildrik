@@ -24,7 +24,7 @@ vi.mock("@/services/ai/subscriptionClient", () => ({
 }));
 
 import { AITab } from "../AITab";
-import { ToastProvider } from "@/editor/shared/vibcoder/Toast";
+import { ToastProvider } from "@/editor/chrome-ui";
 
 // AITab now uses useToast (via the AI action gate), so it must render inside a
 // ToastProvider. The `wrapper` option also applies to rerender automatically.

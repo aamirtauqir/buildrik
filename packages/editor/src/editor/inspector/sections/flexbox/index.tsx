@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Flexbox Section - Enhanced visual controls with icons and grid picker
  * @license BSD-3-Clause
@@ -12,7 +11,7 @@ import { DirectionControls } from "./DirectionControls";
 import { EnableFlexPrompt } from "./EnableFlexPrompt";
 import { FlexItemControls } from "./FlexItemControls";
 import { GapControls } from "./GapControls";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -80,8 +79,8 @@ export const FlexboxSection: React.FC<FlexboxSectionProps> = ({
     <span
       style={{
         fontSize: 11,
-        color: "var(--buildrick-text-tertiary)",
-        fontFamily: "var(--buildrick-font-family-mono)",
+        color: "var(--bk-ink-muted)",
+        fontFamily: "var(--bk-font-mono)",
         whiteSpace: "nowrap",
       }}
     >

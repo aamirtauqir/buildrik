@@ -7,8 +7,8 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
+import { ToastInput } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
-import type { ToastInput } from "@/editor/shared/vibcoder/Toast";
 import { EVENTS } from "../../../shared/constants/events";
 import type {
   ComponentCreatedPayload,

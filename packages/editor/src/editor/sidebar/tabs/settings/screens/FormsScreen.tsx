@@ -11,10 +11,10 @@
 
 import * as React from "react";
 import { createBuildrikApiClient } from "@/services/api-client";
-import { Button } from "@/editor/shared/vibcoder/Button";
 import { Field, Screen, Section, Select } from "../shared";
 import type { ScreenProps } from "../types";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
+import { Button } from "@/editor/chrome-ui";
 
 interface FormBlockRow {
   id: string;
@@ -261,12 +261,12 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
             <Button
               key={f}
               type="button"
-              variant="ghost"
-              size="sm"
+              color="light"
+              size="xs"
               role="tab"
               aria-selected={filter === f}
               onClick={() => setFilter(f)}
-              style={filter === f ? filterChipActiveStyles : filterChipStyles}
+              style={filter === f ? filterChipActiveStyles : filterChipStyles} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
             >
               {f.charAt(0).toUpperCase() + f.slice(1)}
             </Button>
@@ -277,11 +277,11 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
       <Section title={`Submissions${submissions ? ` (${submissions.total})` : ""}`}>
         <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "8px" }}>
           <Button
-            variant="ghost"
-            size="sm"
+            color="light"
+            size="xs"
             type="button"
             onClick={handleExport}
-            disabled={exporting || subsLoading || !submissions || submissions.total === 0}
+            disabled={exporting || subsLoading || !submissions || submissions.total === 0} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           >
             {exporting ? "Exporting…" : "Export CSV"}
           </Button>
@@ -301,13 +301,13 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
                 <li key={s.id} style={s.isRead ? rowStyles : rowUnreadStyles}>
                   <Button
                     type="button"
-                    variant="ghost"
+                    color="light"
                     onClick={() => {
                       setExpandedId(isExpanded ? null : s.id);
                       if (!s.isRead) void handleUpdate(s.id, { isRead: true });
                     }}
                     style={rowButtonStyles}
-                    aria-expanded={isExpanded}
+                    aria-expanded={isExpanded} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
                   >
                     <div style={summaryRowStyles}>
                       <span style={s.isRead ? subjectReadStyles : subjectUnreadStyles}>
@@ -329,26 +329,26 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
                       </dl>
                       <div style={actionsStyles}>
                         {!s.isSpam && (
-                          <Button variant="ghost" size="sm" type="button" onClick={() => handleUpdate(s.id, { isSpam: true })} style={actionBtnStyles}>
+                          <Button color="light" size="xs" type="button" onClick={() => handleUpdate(s.id, { isSpam: true })} style={actionBtnStyles} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                             Mark spam
                           </Button>
                         )}
                         {s.isSpam && (
-                          <Button variant="ghost" size="sm" type="button" onClick={() => handleUpdate(s.id, { isSpam: false })} style={actionBtnStyles}>
+                          <Button color="light" size="xs" type="button" onClick={() => handleUpdate(s.id, { isSpam: false })} style={actionBtnStyles} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                             Not spam
                           </Button>
                         )}
                         {!s.isArchived && (
-                          <Button variant="ghost" size="sm" type="button" onClick={() => handleUpdate(s.id, { isArchived: true })} style={actionBtnStyles}>
+                          <Button color="light" size="xs" type="button" onClick={() => handleUpdate(s.id, { isArchived: true })} style={actionBtnStyles} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                             Archive
                           </Button>
                         )}
                         {s.isArchived && (
-                          <Button variant="ghost" size="sm" type="button" onClick={() => handleUpdate(s.id, { isArchived: false })} style={actionBtnStyles}>
+                          <Button color="light" size="xs" type="button" onClick={() => handleUpdate(s.id, { isArchived: false })} style={actionBtnStyles} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                             Unarchive
                           </Button>
                         )}
-                        <Button variant="ghost" size="sm" type="button" onClick={() => handleDelete(s.id)} style={deleteBtnStyles}>
+                        <Button color="light" size="xs" type="button" onClick={() => handleDelete(s.id)} style={deleteBtnStyles} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                           Delete
                         </Button>
                       </div>
@@ -362,12 +362,12 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
         {submissions && submissions.total > PER_PAGE && (
           <div style={paginationStyles}>
             <Button
-              variant="ghost"
-              size="sm"
+              color="light"
+              size="xs"
               type="button"
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page <= 1 || subsLoading}
-              style={pageBtnStyles}
+              style={pageBtnStyles} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
             >
               ← Prev
             </Button>
@@ -375,12 +375,12 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
               Page {page} of {totalPages}
             </span>
             <Button
-              variant="ghost"
-              size="sm"
+              color="light"
+              size="xs"
               type="button"
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page >= totalPages || subsLoading}
-              style={pageBtnStyles}
+              style={pageBtnStyles} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
             >
               Next →
             </Button>
@@ -418,17 +418,17 @@ function formatTime(iso: string | Date): string {
 const emptyStyles: React.CSSProperties = {
   padding: "12px 14px",
   fontSize: 12,
-  color: "var(--bd-fg-muted)",
-  background: "var(--bd-bg-sub)",
-  border: "1px dashed var(--bd-border-default)",
+  color: "var(--bk-ink-muted)",
+  background: "var(--bk-bg-subtle)",
+  border: "1px dashed var(--bk-border-medium)",
   borderRadius: 6,
 };
 
 const errorStyles: React.CSSProperties = {
   marginTop: 4,
   padding: "8px 10px",
-  font: "500 11.5px var(--bd-font)",
-  color: "var(--bd-error)",
+  font: "500 11.5px var(--bk-font-ui)",
+  color: "var(--bk-error)",
   background: "rgba(220, 38, 38, 0.06)",
   border: "1px solid rgba(220, 38, 38, 0.25)",
   borderRadius: 6,
@@ -443,21 +443,21 @@ const filterRowStyles: React.CSSProperties = {
 
 const filterChipBaseStyles: React.CSSProperties = {
   padding: "4px 10px",
-  font: "500 11px var(--bd-font)",
+  font: "500 11px var(--bk-font-ui)",
   background: "transparent",
-  border: "1px solid var(--bd-border-default)",
+  border: "1px solid var(--bk-border-medium)",
   borderRadius: 999,
   cursor: "pointer",
-  color: "var(--bd-fg-secondary)",
+  color: "var(--bk-ink-soft)",
 };
 
 const filterChipStyles: React.CSSProperties = filterChipBaseStyles;
 
 const filterChipActiveStyles: React.CSSProperties = {
   ...filterChipBaseStyles,
-  background: "var(--bd-accent-tint)",
-  color: "var(--bd-accent)",
-  borderColor: "var(--bd-accent)",
+  background: "var(--bk-accent-tint)",
+  color: "var(--bk-accent)",
+  borderColor: "var(--bk-accent)",
 };
 
 const listStyles: React.CSSProperties = {
@@ -470,8 +470,8 @@ const listStyles: React.CSSProperties = {
 };
 
 const rowBaseStyles: React.CSSProperties = {
-  background: "var(--bd-bg-sub)",
-  border: "1px solid var(--bd-border-default)",
+  background: "var(--bk-bg-subtle)",
+  border: "1px solid var(--bk-border-medium)",
   borderRadius: 6,
   overflow: "hidden",
 };
@@ -480,7 +480,7 @@ const rowStyles: React.CSSProperties = rowBaseStyles;
 
 const rowUnreadStyles: React.CSSProperties = {
   ...rowBaseStyles,
-  borderLeft: "3px solid var(--bd-accent)",
+  borderLeft: "3px solid var(--bk-accent)",
 };
 
 const rowButtonStyles: React.CSSProperties = {
@@ -503,7 +503,7 @@ const summaryRowStyles: React.CSSProperties = {
 
 const subjectReadStyles: React.CSSProperties = {
   fontSize: 12,
-  color: "var(--bd-fg-secondary)",
+  color: "var(--bk-ink-soft)",
   fontWeight: 500,
   whiteSpace: "nowrap",
   overflow: "hidden",
@@ -512,22 +512,22 @@ const subjectReadStyles: React.CSSProperties = {
 
 const subjectUnreadStyles: React.CSSProperties = {
   ...subjectReadStyles,
-  color: "var(--bd-fg-strong)",
+  color: "var(--bk-ink)",
   fontWeight: 600,
 };
 
 const timestampStyles: React.CSSProperties = {
-  fontFamily: "var(--bd-font-mono)",
+  fontFamily: "var(--bk-font-mono)",
   fontSize: 10,
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
   flexShrink: 0,
 };
 
 const sourceStyles: React.CSSProperties = {
   marginTop: 2,
-  fontFamily: "var(--bd-font-mono)",
+  fontFamily: "var(--bk-font-mono)",
   fontSize: 10,
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
   whiteSpace: "nowrap",
   overflow: "hidden",
   textOverflow: "ellipsis",
@@ -535,8 +535,8 @@ const sourceStyles: React.CSSProperties = {
 
 const detailStyles: React.CSSProperties = {
   padding: "8px 10px 10px",
-  borderTop: "1px solid var(--bd-border-default)",
-  background: "var(--bd-bg-default)",
+  borderTop: "1px solid var(--bk-border-medium)",
+  background: "var(--bk-bg-panel)",
 };
 
 const dlStyles: React.CSSProperties = {
@@ -549,18 +549,18 @@ const dlStyles: React.CSSProperties = {
 };
 
 const dtStyles: React.CSSProperties = {
-  fontFamily: "var(--bd-font-mono)",
+  fontFamily: "var(--bk-font-mono)",
   fontSize: 10,
   textTransform: "uppercase",
   letterSpacing: "0.04em",
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
   paddingTop: 2,
 };
 
 const ddStyles: React.CSSProperties = {
   margin: 0,
   fontSize: 12,
-  color: "var(--bd-fg-strong)",
+  color: "var(--bk-ink)",
   wordBreak: "break-word",
 };
 
@@ -573,17 +573,17 @@ const actionsStyles: React.CSSProperties = {
 
 const actionBtnStyles: React.CSSProperties = {
   padding: "4px 8px",
-  font: "500 11px var(--bd-font)",
-  color: "var(--bd-fg-secondary)",
+  font: "500 11px var(--bk-font-ui)",
+  color: "var(--bk-ink-soft)",
   background: "transparent",
-  border: "1px solid var(--bd-border-default)",
+  border: "1px solid var(--bk-border-medium)",
   borderRadius: 4,
   cursor: "pointer",
 };
 
 const deleteBtnStyles: React.CSSProperties = {
   ...actionBtnStyles,
-  color: "var(--bd-error)",
+  color: "var(--bk-error)",
   borderColor: "rgba(220, 38, 38, 0.4)",
 };
 
@@ -597,16 +597,16 @@ const paginationStyles: React.CSSProperties = {
 
 const pageBtnStyles: React.CSSProperties = {
   padding: "4px 10px",
-  font: "500 11px var(--bd-font)",
-  color: "var(--bd-fg-secondary)",
-  background: "var(--bd-bg-default)",
-  border: "1px solid var(--bd-border-default)",
+  font: "500 11px var(--bk-font-ui)",
+  color: "var(--bk-ink-soft)",
+  background: "var(--bk-bg-panel)",
+  border: "1px solid var(--bk-border-medium)",
   borderRadius: 4,
   cursor: "pointer",
 };
 
 const pageLabelStyles: React.CSSProperties = {
-  fontFamily: "var(--bd-font-mono)",
+  fontFamily: "var(--bk-font-mono)",
   fontSize: 11,
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
 };

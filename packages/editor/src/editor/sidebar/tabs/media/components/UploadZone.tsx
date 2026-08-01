@@ -1,4 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
 /**
  * Media Tab — Upload Zone
  *
@@ -10,10 +9,9 @@ import { Input } from "@/editor/shared/vibcoder/Input";
 
 import * as React from "react";
 import { Upload, AlertTriangle, XCircle, RotateCcw } from "lucide-react";
-import { Button } from "@/editor/shared/vibcoder/Button";
 import type { UploadZoneProps } from "../data/mediaTypes";
 import { StorageQuotaBar } from "./StorageQuotaBar";
-
+import { Button, TextInput } from "@/editor/chrome-ui";
 const ACCEPT_TYPES = "image/*,video/*,.ttf,.otf,.woff,.woff2,.svg";
 const MAX_FILE_BYTES = 50 * 1024 * 1024; // 50MB hard ceiling at the UI layer
 
@@ -125,7 +123,7 @@ export function UploadZone({
       >
         <Icon size={20} className="med-upload-zone-icon" />
         <span className="med-upload-zone__label">{label}</span>
-        <Input
+        <TextInput
           ref={inputRef}
           type="file"
           multiple
@@ -155,9 +153,9 @@ export function UploadZone({
               {onRetryUpload ? (
                 <Button
                   type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="med-upload-queue-item__retry"
+                  color="light"
+                  size="xs"
+                  className="med-upload-queue-item__retry tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
                   onClick={() => onRetryUpload(item.fileName)}
                   aria-label={`Retry ${item.fileName}`}
                 >

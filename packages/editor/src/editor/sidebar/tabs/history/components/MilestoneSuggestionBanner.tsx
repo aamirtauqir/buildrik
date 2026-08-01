@@ -1,5 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * MilestoneSuggestionBanner - Inline banner for auto-milestone suggestions
  * Phase 5: Shows AI-suggested version name with Save/Edit/Dismiss actions
@@ -9,6 +7,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import * as React from "react";
 import type { MilestoneSuggestion } from "../../../../../shared/hooks/useAutoMilestone";
+import { Button, TextInput } from "@/editor/chrome-ui";
 
 interface MilestoneSuggestionBannerProps {
   suggestion: MilestoneSuggestion;
@@ -71,16 +70,16 @@ export const MilestoneSuggestionBanner: React.FC<MilestoneSuggestionBannerProps>
         alignItems: "center",
         gap: 8,
         padding: "8px 12px",
-        background: "var(--bd-accent-tint)",
+        background: "var(--bk-accent-tint)",
         // was a raw rgba of the retired cobalt accent — the accent moved to
         // #406ED6 on 2026-07-21 and this border never followed (board B9.4).
-        border: "1px solid var(--bd-accent-alpha-30)",
-        borderRadius: "var(--bd-radius-md)",
+        border: "1px solid var(--bk-alpha-accent-30)",
+        borderRadius: "var(--bk-radius-lg)",
         margin: "0 12px 8px",
       }}
     >
       {/* Icon */}
-      <div style={{ flexShrink: 0, color: "var(--bd-accent)" }}>
+      <div style={{ flexShrink: 0, color: "var(--bk-accent)" }}>
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
           <circle cx="8" cy="8" r="6" />
           <path d="M8 5v3l2 1" />
@@ -88,11 +87,11 @@ export const MilestoneSuggestionBanner: React.FC<MilestoneSuggestionBannerProps>
       </div>
       {/* Content */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 11, color: "var(--bd-fg-muted)", marginBottom: 2 }}>
+        <div style={{ fontSize: 11, color: "var(--bk-ink-muted)", marginBottom: 2 }}>
           {triggerLabel}
         </div>
         {isEditing ? (
-          <Input
+          <TextInput
             ref={inputRef}
             type="text"
             value={editValue}
@@ -102,12 +101,12 @@ export const MilestoneSuggestionBanner: React.FC<MilestoneSuggestionBannerProps>
             maxLength={50}
             style={{
               width: "100%",
-              background: "var(--bd-bg-subtle)",
-              border: "1px solid var(--bd-accent)",
+              background: "var(--bk-bg-subtle)",
+              border: "1px solid var(--bk-accent)",
               borderRadius: 4,
               padding: "2px 6px",
               fontSize: 13,
-              color: "var(--bd-fg-primary)",
+              color: "var(--bk-ink)",
               outline: "none",
               fontFamily: "inherit",
             }}
@@ -117,7 +116,7 @@ export const MilestoneSuggestionBanner: React.FC<MilestoneSuggestionBannerProps>
             style={{
               fontSize: 13,
               fontWeight: 500,
-              color: "var(--bd-fg-primary)",
+              color: "var(--bk-ink)",
               overflow: "hidden",
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
@@ -131,7 +130,7 @@ export const MilestoneSuggestionBanner: React.FC<MilestoneSuggestionBannerProps>
           <div
             style={{
               fontSize: 11,
-              color: "var(--bd-fg-muted)",
+              color: "var(--bk-ink-muted)",
               marginTop: 2,
               overflow: "hidden",
               textOverflow: "ellipsis",
@@ -148,7 +147,7 @@ export const MilestoneSuggestionBanner: React.FC<MilestoneSuggestionBannerProps>
           <Button
             onClick={handleEditSave}
             className="milestone-btn milestone-btn--primary"
-            style={{ background: "var(--bd-accent)", color: "var(--bd-fg-on-accent)" }}
+            style={{ background: "var(--bk-accent)", color: "var(--bk-accent-on)" }}
           >
             Save
           </Button>

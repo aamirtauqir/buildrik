@@ -6,7 +6,6 @@
  */
 
 import * as React from "react";
-import { Stack } from "@/editor/shared/vibcoder/Stack";
 
 export interface ControlRowProps {
   label: string;
@@ -41,8 +40,8 @@ export const ControlRow: React.FC<ControlRowProps> = ({
 
   if (variant === "stacked") {
     return (
-      <Stack
-        gap="xs"
+      <div
+        className="tw:flex tw:flex-col tw:gap-1"
         role="group"
         aria-label={label}
         title={titleText}
@@ -53,8 +52,8 @@ export const ControlRow: React.FC<ControlRowProps> = ({
       >
         <label
           style={{
-            font: "500 11px var(--bd-font)",
-            color: "var(--bd-fg-secondary)",
+            font: "500 11px var(--bk-font-ui)",
+            color: "var(--bk-ink-soft)",
             letterSpacing: "-0.005em",
             display: "flex",
             alignItems: "center",
@@ -67,7 +66,7 @@ export const ControlRow: React.FC<ControlRowProps> = ({
         <div style={{ display: "flex", alignItems: "center", gap: 4, minWidth: 0 }}>
           {children}
         </div>
-      </Stack>
+      </div>
     );
   }
 

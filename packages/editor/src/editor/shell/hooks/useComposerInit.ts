@@ -7,6 +7,7 @@
  */
 
 import * as React from "react";
+import { ToastInput } from "@/editor/chrome-ui";
 import { createComposer, Composer } from "../../../engine";
 import { ProductCollectionService } from "../../../engine/cms";
 import type { Element } from "../../../engine/elements/Element";
@@ -21,7 +22,6 @@ import {
   saveProject,
 } from "@/services/BuildrikSyncProvider";
 import { createRemoteAssetSync } from "@/services/AssetUploadService";
-import type { ToastInput } from "@/editor/shared/vibcoder";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { ComponentSchemaAIClient } from "@/engine/designSystem/services";

@@ -9,23 +9,14 @@ import { render, screen, fireEvent } from "@testing-library/react";
 // ─── Mock heavy engine/shared deps before importing components ────────────────
 
 vi.mock("@/engine", () => ({ Composer: class {} }));
-vi.mock("@/editor/shared/vibcoder", async () => {
-  const actual = await vi.importActual<Record<string, unknown>>("@/editor/shared/vibcoder");
+vi.mock("@/editor/chrome-ui", async () => {
+  const actual = await vi.importActual<Record<string, unknown>>("@/editor/chrome-ui");
   return {
     ...actual,
     useToast: () => ({ addToast: vi.fn(), removeToast: vi.fn(), toasts: [] }),
     ToastProvider: ({ children }: { children: React.ReactNode }) => children,
   };
 });
-vi.mock("@/shared/extensions/ConfirmDialog", () => ({
-  ConfirmDialog: () => null,
-}));
-vi.mock("@/shared/extensions/PanelHeader", () => ({
-  PanelHeader: ({ title }: { title: string }) => {
-    const React = require("react");
-    return React.createElement("div", { "data-testid": "panel-header" }, title);
-  },
-}));
 vi.mock("../components/PageContextMenu", () => ({
   PageContextMenu: () => null,
 }));

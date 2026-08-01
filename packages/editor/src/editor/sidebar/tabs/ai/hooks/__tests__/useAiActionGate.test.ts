@@ -20,7 +20,10 @@ vi.mock("@/editor/shell/exportPublishPages", () => ({
 }));
 vi.mock("@/services/PublishService", () => ({ fetchPublishStatus: vi.fn(() => Promise.resolve({ status: "QUEUED" })) }));
 const addToast = vi.fn();
-vi.mock("@/editor/shared/vibcoder/Toast", () => ({ useToast: () => ({ addToast }) }));
+vi.mock("@/editor/chrome-ui", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/editor/chrome-ui")>()),
+  useToast: () => ({ addToast }),
+}));
 
 import { useAiActionGate } from "../useAiActionGate";
 

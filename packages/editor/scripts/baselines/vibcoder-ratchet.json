@@ -1,0 +1,6 @@
+{
+  "mode": "ERROR",
+  "count": 0,
+  "note": "May only decrease. Re-baselined 2026-07-27: an earlier sweep switched 21 test files to the no-op TooltipProvider while their components' children still render the Radix one, which broke them. Pinning them back to the real provider is a correction, not growth — those files were on the old library at the true 402 baseline too.",
+  "files": []
+}

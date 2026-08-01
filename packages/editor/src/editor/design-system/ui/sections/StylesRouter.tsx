@@ -10,7 +10,6 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/shared/vibcoder/Button";
 import type { PresetCategory, StylePreset } from "../../types";
 import {
   useButtonPresets,
@@ -28,7 +27,7 @@ import {
 } from "../../state/StylePresetRegistryContext";
 import { StyleCategoryRow } from "./StyleCategoryRow";
 import { PresetDetailPane } from "./PresetDetailPane";
-
+import { Button } from "@/editor/chrome-ui";
 type View =
   | { kind: "list" }
   | { kind: "detail"; category: PresetCategory; variant: string };
@@ -105,21 +104,21 @@ export const StylesRouter: React.FC = () => {
       >
         <Button
           type="button"
-          variant="ghost"
-          size="sm"
+          color="light"
+          size="xs"
           onClick={() => setView({ kind: "list" })}
           style={{
             padding: "6px 12px",
             background: "transparent",
             border: "none",
-            color: "var(--bd-fg-muted)",
+            color: "var(--bk-ink-muted)",
             cursor: "pointer",
             fontSize: 12,
             textAlign: "left" as const,
             display: "flex",
             alignItems: "center",
             gap: 4,
-          }}
+          }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
         >
           ← Back to styles
         </Button>

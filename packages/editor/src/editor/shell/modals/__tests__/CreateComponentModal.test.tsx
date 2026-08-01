@@ -10,8 +10,8 @@ import { CreateComponentModal } from "../CreateComponentModal";
 
 const { addToastMock } = vi.hoisted(() => ({ addToastMock: vi.fn() }));
 
-vi.mock("@/editor/shared/vibcoder", async (importActual) => {
-  const actual = await importActual<typeof import("@/editor/shared/vibcoder")>();
+vi.mock("@/editor/chrome-ui", async (importActual) => {
+  const actual = await importActual<typeof import("@/editor/chrome-ui")>();
   return { ...actual, useToast: () => ({ addToast: addToastMock }) };
 });
 

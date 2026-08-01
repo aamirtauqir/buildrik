@@ -10,7 +10,7 @@
  *
  * Usage:
  *   // Component style
- *   background: tokens.colors.primary  // Returns 'var(--buildrick-accent)'
+ *   background: tokens.colors.primary  // Returns 'var(--bk-accent)'
  *
  * @license BSD-3-Clause
  */
@@ -21,88 +21,88 @@
  */
 export const colors = {
   // Primary brand colors
-  primary: "var(--buildrick-accent)",
-  primaryLight: "var(--buildrick-accent-subtle)",
-  primaryDark: "var(--buildrick-accent-pressed)",
-  primarySubtle: "var(--buildrick-accent-tint)",
+  primary: "var(--bk-accent)",
+  primaryLight: "var(--bk-accent-subtle)",
+  primaryDark: "var(--bk-accent-pressed)",
+  primarySubtle: "var(--bk-accent-tint)",
 
   // Legacy (aliased to primary)
-  secondary: "var(--buildrick-text-muted)",
-  accent: "var(--buildrick-accent)",
+  secondary: "var(--bk-ink-muted)",
+  accent: "var(--bk-accent)",
 
   // Selection
-  selection: "var(--buildrick-selection-color)",
+  selection: "var(--bk-accent)",
 
   // Accent blue (same as primary in current theme)
-  accentBlue: "var(--buildrick-accent)",
-  accentBlueAlpha: "var(--buildrick-accent-tint)",
-  accentBlueHover: "var(--buildrick-accent-hover)",
+  accentBlue: "var(--bk-accent)",
+  accentBlueAlpha: "var(--bk-accent-tint)",
+  accentBlueHover: "var(--bk-accent-hover)",
 
   // Canvas content colors (light theme)
-  background: "var(--buildrick-bg)",
-  text: "var(--buildrick-text-primary)",
-  textMuted: "var(--buildrick-text-muted)",
-  border: "var(--buildrick-border)",
+  background: "var(--bk-bg-app)",
+  text: "var(--bk-ink)",
+  textMuted: "var(--bk-ink-muted)",
+  border: "var(--bk-border)",
 
   // Canvas wrapper
-  canvasWrapper: "var(--buildrick-canvas-wrapper)",
-  canvasContent: "var(--buildrick-canvas-content)",
+  canvasWrapper: "var(--bk-bg-subtle)",
+  canvasContent: "var(--bk-bg-card)",
 
   // UI Text colors (dark theme panels)
-  textPrimary: "var(--buildrick-text-primary)",
-  textSecondary: "var(--buildrick-text-secondary)",
-  textTertiary: "var(--buildrick-text-tertiary)",
+  textPrimary: "var(--bk-ink)",
+  textSecondary: "var(--bk-ink-soft)",
+  textTertiary: "var(--bk-ink-muted)",
 
   // UI Surfaces (dark theme panels)
-  surface1: "var(--buildrick-bg-panel)",
-  surface2: "var(--buildrick-surface-2)",
-  surface3: "var(--buildrick-surface-3)",
-  surface4: "var(--buildrick-surface-4)",
+  surface1: "var(--bk-bg-panel)",
+  surface2: "var(--bk-bg-subtle)",
+  surface3: "var(--bk-bg-subtle)",
+  surface4: "var(--bk-gray-200)",
 
   // Borders
-  borderSubtle: "var(--buildrick-border-subtle)",
-  borderDefault: "var(--buildrick-border-default)",
-  borderStrong: "var(--buildrick-border-strong)",
+  borderSubtle: "var(--bk-border)",
+  borderDefault: "var(--bk-border-medium)",
+  borderStrong: "var(--bk-border-strong)",
 
   // Drop feedback
-  dropValidBorder: "var(--buildrick-drop-valid-border)",
-  dropValidBg: "var(--buildrick-drop-valid-bg)",
-  dropInvalidBorder: "var(--buildrick-drop-invalid-border)",
-  dropInvalidBg: "var(--buildrick-drop-invalid-bg)",
+  dropValidBorder: "var(--bk-success)",
+  dropValidBg: "var(--bk-success-tint)",
+  dropInvalidBorder: "var(--bk-error)",
+  dropInvalidBg: "var(--bk-error-tint)",
 
   // Badge colors
-  badgeTag: "var(--buildrick-badge-tag)",
-  badgeId: "var(--buildrick-badge-id)",
-  badgeClass: "var(--buildrick-badge-class)",
-  badgeData: "var(--buildrick-badge-data)",
-  badgeDefault: "var(--buildrick-badge-default)",
+  badgeTag: "var(--bk-ink-muted)",
+  badgeId: "var(--bk-ink-muted)",
+  badgeClass: "var(--bk-ink-muted)",
+  badgeData: "var(--bk-ink-muted)",
+  badgeDefault: "var(--bk-ink-muted)",
 
   // Feedback colors
-  success: "var(--buildrick-success)",
-  successBg: "var(--buildrick-success-bg)",
-  error: "var(--buildrick-error)",
-  errorBg: "var(--buildrick-error-bg)",
-  warning: "var(--buildrick-warning)",
-  warningBg: "var(--buildrick-warning-bg)",
-  info: "var(--buildrick-info)",
-  infoBg: "var(--buildrick-info-light)",
+  success: "var(--bk-success)",
+  successBg: "var(--bk-success-tint)",
+  error: "var(--bk-error)",
+  errorBg: "var(--bk-error-tint)",
+  warning: "var(--bk-warning)",
+  warningBg: "var(--bk-warning-tint)",
+  info: "var(--bk-accent)",
+  infoBg: "var(--bk-accent-tint)",
 
   // Toolbar colors
-  toolbarBg: "var(--buildrick-toolbar-bg)",
-  toolbarBgHover: "var(--buildrick-toolbar-bg-hover)",
-  toolbarBorder: "var(--buildrick-toolbar-border)",
-  toolbarText: "var(--buildrick-toolbar-text)",
-  toolbarTextHover: "var(--buildrick-toolbar-text-hover)",
-  toolbarTextMuted: "var(--buildrick-toolbar-text-muted)",
-  toolbarTextActive: "var(--buildrick-toolbar-text-active)",
+  toolbarBg: "var(--bk-bg-panel)",
+  toolbarBgHover: "var(--bk-bg-subtle)",
+  toolbarBorder: "var(--bk-border)",
+  toolbarText: "var(--bk-ink)",
+  toolbarTextHover: "var(--bk-ink)",
+  toolbarTextMuted: "var(--bk-ink-muted)",
+  toolbarTextActive: "var(--bk-accent)",
 
   // Guide colors
-  guideColor: "var(--buildrick-guide-color)",
-  guideColorAlt: "var(--buildrick-guide-color-alt)",
+  guideColor: "var(--bk-accent)",
+  guideColorAlt: "var(--bk-alpha-accent-30)",
 
   // Spacing indicator colors
-  spacingMargin: "var(--buildrick-spacing-margin)",
-  spacingPadding: "var(--buildrick-spacing-padding)",
+  spacingMargin: "var(--bk-space-16)",
+  spacingPadding: "var(--bk-space-16)",
 } as const;
 
 /**
@@ -111,16 +111,16 @@ export const colors = {
  */
 export const typography = {
   // Font families
-  fontFamily: "var(--buildrick-font-family)",
-  headingFont: "var(--buildrick-heading-font)",
-  monoFont: "var(--buildrick-font-family-mono)",
+  fontFamily: "var(--bk-font-ui)",
+  headingFont: "var(--bk-font-ui)",
+  monoFont: "var(--bk-font-mono)",
 
   // Font sizes (UX-compliant scale)
-  fontXs: "var(--buildrick-text-xs)", // 10px - hints, very small
-  fontSm: "var(--buildrick-text-sm)", // 11px - labels
-  fontMd: "var(--buildrick-text-sm-plus)", // 13px - body, inputs
-  fontLg: "var(--buildrick-text-md)", // 14px - section headers
-  fontXl: "var(--buildrick-text-lg)", // 16px - titles, headings
+  fontXs: "var(--bk-text-11)", // 10px - hints, very small
+  fontSm: "var(--bk-text-12)", // 11px - labels
+  fontMd: "var(--bk-text-13)", // 13px - body, inputs
+  fontLg: "var(--bk-text-13)", // 14px - section headers
+  fontXl: "var(--bk-text-16)", // 16px - titles, headings
 
   // Font weights
   weightNormal: 400,
@@ -129,24 +129,24 @@ export const typography = {
   weightBold: 700,
 
   // Line height
-  lineHeight: "var(--buildrick-line-normal)",
+  lineHeight: "var(--bk-leading-normal)",
 
   // Semantic presets for consistent usage
   label: {
     fontSize: "11px",
     fontWeight: 500,
-    color: "var(--buildrick-text-secondary)",
+    color: "var(--bk-ink-soft)",
   },
   value: {
     fontSize: "13px",
     fontWeight: 400,
-    color: "var(--buildrick-text-primary)",
+    color: "var(--bk-ink)",
   },
   sectionTitle: {
     fontSize: "12px",
     fontWeight: 600,
     letterSpacing: "0.02em",
-    color: "var(--buildrick-text-primary)",
+    color: "var(--bk-ink)",
   },
 } as const;
 
@@ -155,11 +155,11 @@ export const typography = {
  * Aligned with UX plan: 8px/12px as primary values
  */
 export const spacing = {
-  xs: "var(--buildrick-space-1)", // 4px
-  sm: "var(--buildrick-space-2)", // 8px - small gaps
-  md: "var(--buildrick-space-3)", // 12px - medium gaps
-  lg: "var(--buildrick-space-4)", // 16px
-  xl: "var(--buildrick-space-6)", // 24px
+  xs: "var(--bk-space-4)", // 4px
+  sm: "var(--bk-space-8)", // 8px - small gaps
+  md: "var(--bk-space-12)", // 12px - medium gaps
+  lg: "var(--bk-space-16)", // 16px
+  xl: "var(--bk-space-24)", // 24px
 } as const;
 
 /**
@@ -167,44 +167,44 @@ export const spacing = {
  * Standard: 6px for most UI elements (consistent visual language)
  */
 export const radius = {
-  xs: "var(--buildrick-radius-sm)", // 3px - subtle
-  sm: "var(--buildrick-radius-sm)", // 5px - inputs, badges
+  xs: "var(--bk-radius-sm)", // 3px - subtle
+  sm: "var(--bk-radius-sm)", // 5px - inputs, badges
   default: "6px", // 6px - standard UI elements
-  md: "var(--buildrick-radius-md)", // 8px - cards, panels
-  lg: "var(--buildrick-radius-lg)", // 12px - modals
-  xl: "var(--buildrick-radius-xl)", // 16px - large panels
-  full: "var(--buildrick-radius-full)", // 9999px - pills, circles
+  md: "var(--bk-radius-lg)", // 8px - cards, panels
+  lg: "var(--bk-radius-lg)", // 12px - modals
+  xl: "var(--bk-radius-lg)", // 16px - large panels
+  full: "var(--bk-radius-full)", // 9999px - pills, circles
 } as const;
 
 /**
  * Shadow tokens
  */
 export const shadows = {
-  sm: "var(--buildrick-shadow-sm)",
-  md: "var(--buildrick-shadow-md)",
-  lg: "var(--buildrick-shadow-lg)",
-  accent: "var(--buildrick-shadow-accent)",
-  hover: "var(--buildrick-shadow-hover)",
+  sm: "var(--bk-shadow-raised)",
+  md: "var(--bk-shadow-drag)",
+  lg: "var(--bk-shadow-overlay)",
+  accent: "var(--bk-shadow-drag)",
+  hover: "var(--bk-shadow-drag)",
 } as const;
 
 /**
  * Selection-specific tokens
  */
 export const selection = {
-  color: "var(--buildrick-selection-color)",
-  glow: "var(--buildrick-selection-glow)",
-  glowStrong: "var(--buildrick-selection-glow-strong)",
-  outline: "var(--buildrick-selection-outline)",
-  handleGradient: "var(--buildrick-handle-gradient)",
+  color: "var(--bk-accent)",
+  glow: "var(--bk-shadow-focus)",
+  glowStrong: "var(--bk-shadow-focus)",
+  outline: "var(--bk-accent)",
+  handleGradient: "var(--bk-accent)",
 } as const;
 
 /**
  * Transition tokens
  */
 export const transitions = {
-  fast: "var(--buildrick-transition-fast)", // 150ms ease
-  normal: "var(--buildrick-transition-normal)", // 200ms ease
-  slow: "var(--buildrick-transition-slow)", // 300ms ease
+  fast: "var(--bk-transition-fast)", // 150ms ease
+  normal: "var(--bk-transition-base)", // 200ms ease
+  slow: "var(--bk-transition-base)", // 300ms ease
 } as const;
 
 /**

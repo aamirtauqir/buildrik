@@ -1,0 +1,152 @@
+/**
+ * Editor header chrome — the two things the `Topbar` component cannot own:
+ * the positioning context its dropdowns hang from, and the panels themselves.
+ *
+ * Tokens only. Anything here that turns out to be reusable belongs in
+ * `editor/ui/ui.css` instead.
+ */
+
+.bk-header {
+  position: relative;
+  flex: none;
+  z-index: var(--bk-z-topbar);
+}
+
+/* Screen-reader-only announcement regions (F24/eng D5). */
+.bk-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Anchored under the bar's right edge, where the bell that opened it lives. */
+.bk-header__dropdown {
+  position: absolute;
+  top: 100%;
+  right: var(--bk-space-12);
+  z-index: var(--bk-z-popover);
+}
+
+/* ── Notifications ───────────────────────────────────────────────────────── */
+
+.bk-notifications {
+  width: var(--bk-size-panel-right);
+  max-height: 60vh;
+  overflow-y: auto;
+  background: var(--bk-bg-panel);
+  border: 1px solid var(--bk-border);
+  border-radius: var(--bk-radius-lg);
+  box-shadow: var(--bk-shadow-overlay);
+}
+
+.bk-notifications__head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--bk-space-8);
+  padding: var(--bk-space-8) var(--bk-space-12);
+  background: var(--bk-bg-panel);
+  border-bottom: 1px solid var(--bk-border);
+}
+
+.bk-notifications__title {
+  color: var(--bk-ink);
+  font-size: var(--bk-text-13);
+  font-weight: var(--bk-weight-semibold);
+}
+
+.bk-notifications__center {
+  display: flex;
+  justify-content: center;
+  padding: var(--bk-space-28);
+}
+
+.bk-notif-row {
+  align-items: flex-start;
+  gap: var(--bk-space-8);
+  border-bottom: 1px solid var(--bk-border);
+}
+
+.bk-notif-row--unread { background: var(--bk-accent-subtle); }
+
+.bk-notif-row__spacer {
+  flex: none;
+  width: var(--bk-space-8);
+}
+
+.bk-notif-row__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bk-space-2);
+  min-width: 0;
+}
+
+.bk-notif-row__text {
+  color: var(--bk-ink);
+  font-size: var(--bk-text-13);
+  line-height: var(--bk-leading-normal);
+}
+
+.bk-notif-row__gone {
+  color: var(--bk-warning-text);
+  font-size: var(--bk-text-11);
+}
+
+/* ── Send for review ─────────────────────────────────────────────────────── */
+
+.bk-send-review {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bk-space-12);
+  width: var(--bk-size-drawer);
+}
+
+.bk-send-review__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--bk-space-8);
+}
+
+.bk-send-review__error {
+  margin: 0;
+  color: var(--bk-error-text);
+  font-size: var(--bk-text-11);
+}
+
+/* ── T4 publish-anyway confirm ──────────────────────────────────────────── */
+.bk-pubconfirm__list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--bk-space-4);
+  margin: 0 var(--bk-space-24) var(--bk-space-8);
+  padding: var(--bk-space-8) var(--bk-space-12);
+  border-radius: var(--bk-radius-md);
+  background: var(--bk-warning-tint);
+}
+.bk-pubconfirm__row {
+  margin: 0;
+  font-size: var(--bk-text-12);
+  line-height: var(--bk-leading-normal);
+}
+.bk-pubconfirm__row--error { color: var(--bk-error-text); }
+.bk-pubconfirm__row--warning { color: var(--bk-warning-text); }
+
+/* ── F1 exit dialog ─────────────────────────────────────────────────────── */
+.bk-exit-dialog__error {
+  margin: 0 var(--bk-space-24);
+  padding: var(--bk-space-8) var(--bk-space-12);
+  border-radius: var(--bk-radius-md);
+  background: var(--bk-error-tint);
+  color: var(--bk-error-text);
+  font-size: var(--bk-text-12);
+}

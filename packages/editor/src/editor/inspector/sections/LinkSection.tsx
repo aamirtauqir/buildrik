@@ -31,7 +31,7 @@ const ErrorText: React.FC<{ message: string }> = ({ message }) => (
   <div style={{
     marginTop: 4,
     fontSize: 11,
-    color: "var(--buildrick-error, var(--bd-error))",
+    color: "var(--bk-error, var(--bk-error))",
     display: "flex",
     alignItems: "center",
     gap: 4,
@@ -326,7 +326,7 @@ const hintStyles: React.CSSProperties = {
   background: "rgba(0, 115, 230, 0.1)",
   borderRadius: 6,
   fontSize: 12,
-  color: "var(--buildrick-text-muted)",
+  color: "var(--bk-ink-muted)",
   lineHeight: 1.4,
 };
 

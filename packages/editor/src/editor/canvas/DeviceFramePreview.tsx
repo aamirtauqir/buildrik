@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * @lint-hex-policy: component-theme
  *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
@@ -12,7 +11,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import * as React from "react";
 import type { DeviceType } from "../../shared/types";
-
+import { Button } from "@/editor/chrome-ui";
 // ─── Types ──────────────────────────────────────────────────────────────────
 
 export interface DeviceFramePreviewProps {
@@ -86,10 +85,10 @@ const shellStyle = (spec: FrameSpec): React.CSSProperties => ({
   position: "relative",
   width: spec.outerWidth,
   height: spec.outerHeight,
-  background: "var(--buildrick-text-primary)",
+  background: "var(--bk-ink)",
   borderRadius: spec.outerRadius,
   boxShadow:
-    "var(--bd-shadow-lg), 0 0 0 1px rgba(255,255,255,0.06) inset",
+    "var(--bk-shadow-overlay), 0 0 0 1px rgba(255,255,255,0.06) inset",
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
@@ -103,7 +102,7 @@ const screenStyle = (spec: FrameSpec): React.CSSProperties => ({
   height: spec.screenHeight,
   borderRadius: spec.screenRadius,
   overflow: "auto",
-  background: "var(--buildrick-bg-card)",
+  background: "var(--bk-bg-card)",
   position: "relative",
 });
 
@@ -114,7 +113,7 @@ const notchStyle: React.CSSProperties = {
   transform: "translateX(-50%)",
   width: 150,
   height: 28,
-  background: "var(--buildrick-text-primary)",
+  background: "var(--bk-ink)",
   borderRadius: "0 0 18px 18px",
   zIndex: 2,
   display: "flex",
@@ -125,7 +124,7 @@ const notchStyle: React.CSSProperties = {
 const notchCameraStyle: React.CSSProperties = {
   width: 10,
   height: 10,
-  borderRadius: "var(--bd-radius-full)",
+  borderRadius: "var(--bk-radius-full)",
   background: "#2a2a2e",
   border: "1.5px solid #3a3a3e",
 };
@@ -232,11 +231,11 @@ export function DeviceFrameToggle({ active, onToggle, device }: DeviceFrameToggl
   const style: React.CSSProperties = {
     ...toggleBaseStyle,
     background: active
-      ? "var(--bd-accent-tint)"
+      ? "var(--bk-accent-tint)"
       : isHovered
         ? "rgba(255,255,255,0.08)"
         : "transparent",
-    color: active ? "var(--bd-accent)" : "#a1a1aa",
+    color: active ? "var(--bk-accent)" : "#a1a1aa",
   };
 
   return (

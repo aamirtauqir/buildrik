@@ -1,7 +1,3 @@
-import { Kbd } from "@/editor/shared/vibcoder/Kbd";
-import { Modal, ModalContent } from "@/editor/shared/vibcoder/Modal";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Stack } from "@/editor/shared/vibcoder/Stack";
 /**
  * Keyboard Shortcuts Cheat Sheet
  * Floating overlay triggered by '?' key showing all available shortcuts
@@ -13,7 +9,9 @@ import { Stack } from "@/editor/shared/vibcoder/Stack";
  */
 
 import * as React from "react";
+import { Kbd, ModalContent, ModalRoot } from "@/editor/chrome-ui";
 import { tokens } from "../shared/tokens";
+import { Button } from "@/editor/chrome-ui";
 
 export interface KeyboardCheatSheetProps {
   isOpen: boolean;
@@ -173,7 +171,7 @@ export const KeyboardCheatSheet: React.FC<KeyboardCheatSheetProps> = ({ isOpen, 
   }, [isOpen, onClose]);
 
   return (
-    <Modal open={isOpen} onOpenChange={(o) => { if (!o) onClose(); }}>
+    <ModalRoot open={isOpen} onOpenChange={(o) => { if (!o) onClose(); }}>
       <ModalContent
         srTitle="Keyboard shortcuts"
         aria-labelledby="keyboard-cheatsheet-title"
@@ -311,7 +309,7 @@ export const KeyboardCheatSheet: React.FC<KeyboardCheatSheetProps> = ({ isOpen, 
           </span>
         </div>
       </ModalContent>
-    </Modal>
+    </ModalRoot>
   );
 };
 

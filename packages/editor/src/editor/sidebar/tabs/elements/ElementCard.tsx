@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * ElementCard, AnimatedAccordionContent, ChevronIcon — UI sub-components for ElementsTab
  * Also exports handleDragStart and highlightMatch as standalone helpers.
@@ -10,7 +9,7 @@ import * as React from "react";
 import { getBlockById } from "../../../../blocks/blockRegistry";
 import type { BlockData } from "../../../../shared/types";
 import { BLOCK_ICONS, BLOCK_DESCRIPTIONS } from "./constants";
-
+import { Button } from "@/editor/chrome-ui";
 // ─── ElementCard ──────────────────────────────────────────────────────────────
 
 export interface ElementCardProps {

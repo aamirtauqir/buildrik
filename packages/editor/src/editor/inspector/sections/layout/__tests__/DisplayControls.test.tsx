@@ -6,15 +6,12 @@
 
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
-import { TooltipProvider } from "@/editor/shared/vibcoder/Tooltip";
 import { DisplayControls } from "../DisplayControls";
 
 function renderDisplay(display = "", mixedKeys?: ReadonlySet<string>) {
   const onChange = vi.fn();
   const utils = render(
-    <TooltipProvider>
-      <DisplayControls display={display} onChange={onChange} mixedKeys={mixedKeys} />
-    </TooltipProvider>
+    <DisplayControls display={display} onChange={onChange} mixedKeys={mixedKeys} />
   );
   return { onChange, ...utils };
 }

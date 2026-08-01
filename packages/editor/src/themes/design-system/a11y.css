@@ -6,13 +6,13 @@
  */
 
 :root {
-  --buildrick-focus-ring-offset: 2px;
+  /* focus ring offset comes from the generated layer */
 }
 
 @media (prefers-contrast: high) {
   :root {
-    --buildrick-border: #64748B;
-    --buildrick-border-light: #94A3B8;
+    --bk-border: var(--bk-gray-500);
+    --bk-border-strong: var(--bk-gray-700);
   }
   .buildrick-btn {
     border: 2px solid currentColor;
@@ -78,8 +78,7 @@
   .buildrick-spinner,
   .buildrick-skeleton-pulse,
   .buildrick-skeleton-wave,
-  .tmpl-progress__spinner,
-  .bd-topbar__status--saving > .bd-topbar__status-dot {
+  .tmpl-progress__spinner {
     animation: none !important;
   }
 }
@@ -96,9 +95,9 @@
  * Figma "Buildrick — Product" focus spec: 2px accent border/outline, NO halo.
  */
 *:focus-visible {
-  outline: 2px solid var(--bd-accent);
+  outline: 2px solid var(--bk-accent);
   outline-offset: 2px;
-  border-radius: var(--bd-radius-sm);
+  border-radius: var(--bk-radius-sm);
 }
 
 *:focus:not(:focus-visible) {
@@ -109,7 +108,7 @@ button:focus-visible,
 a:focus-visible,
 [role="button"]:focus-visible,
 [tabindex]:not([tabindex="-1"]):focus-visible {
-  outline: 2px solid var(--bd-accent);
+  outline: 2px solid var(--bk-accent);
   outline-offset: 2px;
 }
 
@@ -120,13 +119,13 @@ a:focus-visible,
   position: absolute;
   top: -100px;
   left: 0;
-  background: var(--bd-accent);
-  color: var(--bd-fg-on-accent);
+  background: var(--bk-accent);
+  color: var(--bk-accent-on);
   padding: 8px 16px;
-  border-radius: var(--bd-radius-md);
-  z-index: var(--buildrick-z-max);
+  border-radius: var(--bk-radius-lg);
+  z-index: var(--bk-z-chrome);
   text-decoration: none;
-  font-weight: var(--bd-weight-semibold);
+  font-weight: var(--bk-weight-semibold);
 }
 
 .bd-skip-link:focus {

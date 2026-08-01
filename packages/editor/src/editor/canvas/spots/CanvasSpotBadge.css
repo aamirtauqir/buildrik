@@ -5,13 +5,13 @@
 .bd-canvas-spot-badge {
   display: inline-flex;
   align-items: center;
-  gap: var(--bd-space-1);
-  padding: var(--bd-space-1) var(--bd-space-2);
+  gap: var(--bk-space-4);
+  padding: var(--bk-space-4) var(--bk-space-8);
   border-radius: 4px;
   font-size: 12px;
   font-weight: 600;
   color: white;
-  box-shadow: var(--bd-shadow-lg);
+  box-shadow: var(--bk-shadow-overlay);
   pointer-events: auto;
   cursor: default;
   transition: all 0.2s ease;
@@ -28,10 +28,10 @@
   width: 16px;
   height: 16px;
   padding: 0;
-  margin-left: var(--bd-space-1);
-  background: var(--buildrick-on-dark-15);
+  margin-left: var(--bk-space-4);
+  background: var(--bk-alpha-on-dark-15);
   border: none;
-  border-radius: var(--bd-radius-full);
+  border-radius: var(--bk-radius-full);
   color: white;
   font-size: 14px;
   line-height: 1;
@@ -40,5 +40,5 @@
 }
 
 .bd-canvas-spot-badge-close:hover {
-  background: var(--buildrick-on-dark-40);
+  background: var(--bk-alpha-on-dark-40);
 }

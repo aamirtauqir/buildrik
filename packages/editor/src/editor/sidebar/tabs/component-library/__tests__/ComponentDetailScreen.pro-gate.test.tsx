@@ -13,9 +13,9 @@
 import { describe, it, expect } from "vitest";
 import { render } from "@testing-library/react";
 import * as React from "react";
+import { ToastProvider } from "@/editor/chrome-ui";
 import { ComponentDetailScreen } from "../ComponentDetailScreen";
 import { DSModeProvider, type DSMode } from "../../../../design-system/state/DSModeContext";
-import { ToastProvider } from "@/editor/shared/vibcoder";
 import type { ComponentDefinition } from "../../../../../shared/types/components";
 
 function makeComponent(): ComponentDefinition {

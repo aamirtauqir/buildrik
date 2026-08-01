@@ -1,6 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Stack } from "@/editor/shared/vibcoder/Stack";
 /**
  * Command Palette Component
  * Searchable action list triggered by Cmd+Shift+P (like VS Code)
@@ -19,7 +16,7 @@ import { Stack } from "@/editor/shared/vibcoder/Stack";
 
 import * as React from "react";
 import { CANVAS_COLORS, PANEL_STYLE, Z_INDEX } from "../shared";
-
+import { Button, TextInput } from "@/editor/chrome-ui";
 // =============================================================================
 // TYPES
 // =============================================================================
@@ -277,7 +274,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         onClick={onClose}
       />
       {/* Palette */}
-      <Stack
+      <div
+        className="tw:flex tw:flex-col tw:gap-0"
         style={{
           ...PANEL_STYLE,
           position: "fixed",
@@ -288,7 +286,6 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           maxWidth: "90vw",
           maxHeight: "60vh",
           zIndex: Z_INDEX.modal,
-          gap: 0,
           overflow: "hidden",
         }}
         role="dialog"
@@ -296,7 +293,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
       >
         {/* Search Input */}
         <div style={{ padding: 12, borderBottom: `1px solid ${CANVAS_COLORS.border}` }}>
-          <Input
+          <TextInput
             ref={inputRef}
             type="text"
             placeholder="Type a command or search..."
@@ -438,7 +435,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           <span>↵ Select</span>
           <span>Esc Close</span>
         </div>
-      </Stack>
+      </div>
     </>
   );
 };

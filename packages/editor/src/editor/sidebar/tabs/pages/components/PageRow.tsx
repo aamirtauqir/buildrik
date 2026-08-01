@@ -1,5 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * PageRow — single page row in the pages tree.
  *
@@ -19,6 +17,8 @@ import * as React from "react";
 import type { Composer } from "../../../../../engine";
 import type { PageItem } from "../types";
 import { getStatusLabel } from "../utils/statusLabel";
+import { Button } from "@/editor/chrome-ui";
+import { TextField } from "@/editor/chrome-ui";
 
 interface Props {
   page: PageItem;
@@ -231,7 +231,7 @@ export const PageRow = React.memo<Props>(
 
           {isRenaming ? (
             <>
-              <Input
+              <TextField
                 ref={inputRef}
                 className="bd-pg-row-rename"
                 value={renameValue}

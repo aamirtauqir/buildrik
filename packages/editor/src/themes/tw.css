@@ -1,0 +1,34 @@
+/* Chrome Tailwind layer — prefixed, preflight intentionally ABSENT:
+   the canvas mounts customer HTML+CSS in this same document (spec §4.1). */
+@layer tw-theme, tw-utilities;
+@import "tailwindcss/theme.css" layer(tw-theme) prefix(tw);
+@import "tailwindcss/utilities.css" layer(tw-utilities) prefix(tw);
+@plugin "flowbite-react/plugin/tailwindcss";
+@source "../editor";
+@source "../shared/forms";
+@source "../templates";
+/* flowbite-react's own component theme.js files (bg-primary-700, rounded-lg,
+   h-10, ...) live in node_modules, so no @source glob above ever scans them —
+   Tailwind only compiles a utility it has SEEN a candidate string for. The
+   generated class-list (`npx flowbite-react build` from packages/editor,
+   config at ../../.flowbite-react/config.json — prefix "tw" MUST match
+   flowbiteStore.ts's setStore({prefix: "tw"}) exactly, or these compile
+   unprefixed and reintroduce the canvas collision the prefix exists to
+   prevent) is the literal-string source Tailwind needs. Regenerate whenever
+   a new flowbite-react component gets imported (`pnpm flowbite:classlist`
+   from this package).
+
+   RESTART `npm run dev` after regenerating. Vite does not re-scan a JSON
+   @source when its contents change, so a running dev server keeps serving
+   the utility set from whenever it started — flowbite's own classes then
+   appear MISSING in dev while the production build has them. Verified
+   2026-08-01: `.tw\:border` absent from the dev stylesheet, present in
+   `dist/assets/index-*.css` from the same tree. If chrome looks unstyled in
+   dev but a `vite build` + `vite preview` looks right, this is why — do not
+   go hunting for a cascade bug. */
+@source "../../.flowbite-react/class-list.json";
+
+@theme {
+  --font-sans: "Inter Tight", Inter, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
+}

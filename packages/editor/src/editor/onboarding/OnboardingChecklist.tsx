@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * @lint-hex-policy: component-theme
  *   Intentional component-specific palette (error boundary / overlay / preview
@@ -23,9 +22,8 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import * as React from "react";
 import { Check, ChevronUp, ChevronDown, Minus, X, ArrowRight } from "lucide-react";
-import { Stack } from "@/editor/shared/vibcoder/Stack";
 import type { OnboardingStep } from "../../shared/constants/onboardingSteps";
-
+import { Button } from "@/editor/chrome-ui";
 // ── Props ───────────────────────────────────────────────────────────────────
 
 export interface OnboardingChecklistProps {
@@ -87,7 +85,7 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
         <span style={pillTextStyles}>
           {allDone ? "All done!" : `${completedCount} / ${totalCount} done`}
         </span>
-        <ChevronUp size={12} style={{ color: "rgba(255,255,255,0.4)", flexShrink: 0 }} />
+        <ChevronUp size={12} style={{ color: "var(--bk-ink-muted)", flexShrink: 0 }} />
       </div>
     );
   }
@@ -97,14 +95,14 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
     <div ref={containerRef} style={panelStyles} role="region" aria-label="Getting started checklist">
       {/* Header */}
       <div style={headerStyles}>
-        <Stack style={{ gap: 2, flex: 1, minWidth: 0 }}>
+        <div className="tw:flex tw:flex-col tw:gap-0.5" style={{ flex: 1, minWidth: 0 }}>
           <span style={headerTitleStyles}>
             {allDone ? "All done — keep building!" : "Get started"}
           </span>
           <span style={headerCountStyles}>
             {completedCount} of {totalCount} complete
           </span>
-        </Stack>
+        </div>
 
         <div style={headerActionsStyles}>
           {/* Minimize */}
@@ -148,7 +146,7 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
           style={{
             ...progressFillStyles,
             width: `${progress}%`,
-            background: allDone ? "var(--buildrick-success)" : "var(--bd-accent)",
+            background: allDone ? "var(--bk-success)" : "var(--bk-accent)",
           }}
         />
       </div>
@@ -164,9 +162,9 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
               style={{
                 ...stepItemStyles,
                 opacity: isCompleted ? 0.55 : 1,
-                background: isActive && !isCompleted ? "var(--bd-accent-subtle)" : "transparent",
+                background: isActive && !isCompleted ? "var(--bk-accent-subtle)" : "transparent",
                 borderLeft: isActive && !isCompleted
-                  ? "2px solid var(--bd-accent)"
+                  ? "2px solid var(--bk-accent)"
                   : "2px solid transparent",
               }}
             >
@@ -181,19 +179,19 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
                 <span
                   style={{
                     ...circleStyles,
-                    background: isCompleted ? "var(--buildrick-success)" : isActive ? "var(--bd-accent)" : "transparent",
-                    borderColor: isCompleted ? "var(--buildrick-success)" : isActive ? "var(--bd-accent)" : "rgba(255,255,255,0.2)",
+                    background: isCompleted ? "var(--bk-success)" : isActive ? "var(--bk-accent)" : "transparent",
+                    borderColor: isCompleted ? "var(--bk-success)" : isActive ? "var(--bk-accent)" : "var(--bk-border-medium)",
                   }}
                   aria-hidden="true"
                 >
-                  {isCompleted && <Check size={10} strokeWidth={3} color="#fff" />}
+                  {isCompleted && <Check size={10} strokeWidth={3} color="var(--bk-accent-on)" />}
                 </span>
 
                 {/* Label */}
                 <span
                   style={{
                     ...stepLabelStyles,
-                    color: isCompleted ? "rgba(255,255,255,0.45)" : isActive ? "var(--bd-bg-panel)" : "rgba(255,255,255,0.8)",
+                    color: isCompleted ? "var(--bk-ink-muted)" : "var(--bk-ink)",
                     textDecoration: isCompleted ? "line-through" : "none",
                   }}
                 >
@@ -202,7 +200,7 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
 
                 {/* Chevron */}
                 {!isCompleted && (
-                  <span style={{ color: "rgba(255,255,255,0.3)", flexShrink: 0, marginLeft: "auto" }}>
+                  <span style={{ color: "var(--bk-ink-disabled)", flexShrink: 0, marginLeft: "auto" }}>
                     {isActive
                       ? <ChevronUp size={12} />
                       : <ChevronDown size={12} />
@@ -253,15 +251,15 @@ const panelStyles: React.CSSProperties = {
   bottom: 80,
   width: 320,
   maxHeight: 540,
-  background: "#1a1d27",
-  border: "1px solid rgba(255,255,255,0.08)",
+  background: "var(--bk-bg-card)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 12,
-  boxShadow: "var(--bd-shadow-lg), 0 1px 0 rgba(255,255,255,0.04) inset",
+  boxShadow: "var(--bk-shadow-overlay)",
   zIndex: 1200,
   overflow: "hidden",
   display: "flex",
   flexDirection: "column",
-  fontFamily: "var(--buildrick-font-family)",
+  fontFamily: "var(--bk-font-ui)",
 };
 
 const pillStyles: React.CSSProperties = {
@@ -272,28 +270,28 @@ const pillStyles: React.CSSProperties = {
   alignItems: "center",
   gap: 8,
   padding: "8px 14px",
-  background: "#1a1d27",
-  border: "1px solid rgba(255,255,255,0.08)",
+  background: "var(--bk-bg-card)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 999,
-  boxShadow: "var(--bd-shadow-lg)",
+  boxShadow: "var(--bk-shadow-overlay)",
   zIndex: 1200,
   cursor: "pointer",
-  fontFamily: "var(--buildrick-font-family)",
+  fontFamily: "var(--bk-font-ui)",
   userSelect: "none",
 };
 
 const pillDotStyles = (done: boolean): React.CSSProperties => ({
   width: 8,
   height: 8,
-  borderRadius: "var(--bd-radius-full)",
-  background: done ? "var(--buildrick-success)" : "var(--bd-accent)",
+  borderRadius: "var(--bk-radius-full)",
+  background: done ? "var(--bk-success)" : "var(--bk-accent)",
   flexShrink: 0,
 });
 
 const pillTextStyles: React.CSSProperties = {
   fontSize: 12,
   fontWeight: 600,
-  color: "rgba(255,255,255,0.8)",
+  color: "var(--bk-ink)",
   whiteSpace: "nowrap",
 };
 
@@ -307,13 +305,13 @@ const headerStyles: React.CSSProperties = {
 const headerTitleStyles: React.CSSProperties = {
   fontSize: 13,
   fontWeight: 600,
-  color: "var(--bd-bg-panel)",
+  color: "var(--bk-ink)",
   letterSpacing: -0.1,
 };
 
 const headerCountStyles: React.CSSProperties = {
   fontSize: 11,
-  color: "rgba(255,255,255,0.45)",
+  color: "var(--bk-ink-muted)",
   fontWeight: 500,
 };
 
@@ -333,7 +331,7 @@ const iconBtnStyles: React.CSSProperties = {
   background: "none",
   border: "none",
   borderRadius: 6,
-  color: "rgba(255,255,255,0.4)",
+  color: "var(--bk-ink-muted)",
   cursor: "pointer",
   padding: 0,
   transition: "background 0.15s, color 0.15s",
@@ -348,15 +346,15 @@ const confirmRowStyles: React.CSSProperties = {
 
 const confirmTextStyles: React.CSSProperties = {
   fontSize: 11,
-  color: "rgba(255,255,255,0.55)",
+  color: "var(--bk-ink-soft)",
   whiteSpace: "nowrap",
 };
 
 const confirmYesStyles: React.CSSProperties = {
   fontSize: 11,
   fontWeight: 600,
-  color: "#f87171",
-  background: "rgba(248,113,113,0.1)",
+  color: "var(--bk-error-text)",
+  background: "var(--bk-error-tint)",
   border: "none",
   borderRadius: 4,
   padding: "3px 8px",
@@ -366,7 +364,7 @@ const confirmYesStyles: React.CSSProperties = {
 const confirmNoStyles: React.CSSProperties = {
   fontSize: 11,
   fontWeight: 500,
-  color: "rgba(255,255,255,0.5)",
+  color: "var(--bk-ink-muted)",
   background: "none",
   border: "none",
   borderRadius: 4,
@@ -376,7 +374,7 @@ const confirmNoStyles: React.CSSProperties = {
 
 const progressTrackStyles: React.CSSProperties = {
   height: 2,
-  background: "rgba(255,255,255,0.06)",
+  background: "var(--bk-bg-subtle)",
   flexShrink: 0,
 };
 
@@ -415,7 +413,7 @@ const stepRowStyles: React.CSSProperties = {
 const circleStyles: React.CSSProperties = {
   width: 18,
   height: 18,
-  borderRadius: "var(--bd-radius-full)",
+  borderRadius: "var(--bk-radius-full)",
   border: "1.5px solid",
   flexShrink: 0,
   display: "flex",
@@ -444,7 +442,7 @@ const stepDescStyles: React.CSSProperties = {
   margin: 0,
   fontSize: 12,
   lineHeight: 1.55,
-  color: "rgba(255,255,255,0.5)",
+  color: "var(--bk-ink-muted)",
 };
 
 const ctaBtnStyles: React.CSSProperties = {
@@ -454,10 +452,10 @@ const ctaBtnStyles: React.CSSProperties = {
   padding: "7px 12px",
   fontSize: 12,
   fontWeight: 600,
-  color: "var(--buildrick-text-on-accent)",
-  background: "var(--buildrick-accent)",
+  color: "var(--bk-accent-on)",
+  background: "var(--bk-accent)",
   border: "none",
-  borderRadius: 7,
+  borderRadius: 8,
   cursor: "pointer",
   letterSpacing: -0.1,
   transition: "background 0.15s",
@@ -465,7 +463,7 @@ const ctaBtnStyles: React.CSSProperties = {
 
 const allDoneFooterStyles: React.CSSProperties = {
   padding: "12px 16px 16px",
-  borderTop: "1px solid rgba(255,255,255,0.06)",
+  borderTop: "1px solid var(--bk-border)",
   display: "flex",
   flexDirection: "column",
   gap: 10,
@@ -474,7 +472,7 @@ const allDoneFooterStyles: React.CSSProperties = {
 const allDoneTextStyles: React.CSSProperties = {
   margin: 0,
   fontSize: 12,
-  color: "rgba(255,255,255,0.5)",
+  color: "var(--bk-ink-muted)",
   lineHeight: 1.5,
 };
 
@@ -482,10 +480,10 @@ const dismissBtnStyles: React.CSSProperties = {
   padding: "8px 14px",
   fontSize: 12,
   fontWeight: 600,
-  color: "rgba(255,255,255,0.6)",
-  background: "rgba(255,255,255,0.06)",
+  color: "var(--bk-ink-soft)",
+  background: "var(--bk-bg-subtle)",
   border: "none",
-  borderRadius: 7,
+  borderRadius: 8,
   cursor: "pointer",
   alignSelf: "flex-start",
 };

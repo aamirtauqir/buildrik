@@ -16,8 +16,7 @@
  */
 import * as React from "react";
 import { useDSModeOptional } from "../../design-system/state/DSModeContext";
-import { Button } from "@/editor/shared/vibcoder/Button";
-
+import { Button } from "@/editor/chrome-ui";
 export type DSBindingState = "token" | "preset" | "off-ds";
 
 export interface DSBindingChipProps {
@@ -62,23 +61,23 @@ const STATE_STYLE: Record<
   }
 > = {
   token: {
-    bg: "var(--bd-success-soft)",
-    fg: "var(--bd-success-strong)",
-    border: "var(--bd-success-border)",
+    bg: "var(--bk-success-tint)",
+    fg: "var(--bk-success-text)",
+    border: "var(--bk-success)",
     prefix: "",
     actionLabel: (l) => `Jump to token ${l} in Design tab`,
   },
   preset: {
-    bg: "var(--bd-info-soft)",
-    fg: "var(--bd-info-strong)",
-    border: "var(--bd-info-border)",
+    bg: "var(--bk-accent-tint)",
+    fg: "var(--bk-accent-text)",
+    border: "var(--bk-accent-tint)",
     prefix: "",
     actionLabel: (l) => `Jump to preset ${l} in Design tab`,
   },
   "off-ds": {
-    bg: "var(--bd-warn-soft)",
-    fg: "var(--bd-warn-strong)",
-    border: "var(--bd-warn-border)",
+    bg: "var(--bk-warning-tint)",
+    fg: "var(--bk-warning-text)",
+    border: "var(--bk-warning-text)",
     prefix: "⚠ ",
     actionLabel: (l) => `Off-design-system value ${l}. Click to bind to a token.`,
   },
@@ -143,18 +142,18 @@ export const DSBindingChip: React.FC<DSBindingChipProps> = ({
     <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
       {chip}
       <Button
-        variant="ghost"
-        size="sm"
+        color="light"
+        size="xs"
         type="button"
         onClick={onBindRequest}
         aria-label={`Bind ${label} to a design token`}
         style={{
           padding: 0,
           fontSize: 11,
-          color: "var(--bd-accent)",
+          color: "var(--bk-accent)",
           textDecoration: "underline dotted",
           textUnderlineOffset: 2,
-        }}
+        }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
       >
         Bind to token
       </Button>

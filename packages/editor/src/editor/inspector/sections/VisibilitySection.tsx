@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Visibility Section — per-breakpoint show/hide toggles.
  * Ported to .bdi-sw-row + .bdi-sw-ctrl pattern per comp-inspector.v1.
@@ -9,6 +8,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 import * as React from "react";
 import { BREAKPOINTS as SHARED_BREAKPOINTS } from "../../../shared/constants/breakpoints";
 import { Section, type SectionTier } from "../shared/controls/Section";
+import { Button } from "@/editor/chrome-ui";
 
 export interface VisibilitySectionProps {
   styles: Record<string, string>;
@@ -58,8 +58,8 @@ export const VisibilitySection: React.FC<VisibilitySectionProps> = ({
         hiddenCount > 0 ? (
           <span
             style={{
-              font: "500 9.5px var(--bd-mono)",
-              color: "var(--bd-warning)",
+              font: "500 9.5px var(--bk-font-mono)",
+              color: "var(--bk-warning)",
               background: "rgba(217, 119, 6, 0.12)",
               padding: "1px 5px",
               borderRadius: 3,

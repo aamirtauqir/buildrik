@@ -14,14 +14,14 @@ import type * as React from "react";
 export const cardBtn = (active: boolean): React.CSSProperties => ({
   flex: 1,
   padding: "7px 4px",
-  background: active ? "var(--bd-accent-tint)" : "var(--bd-bg-subtle)",
-  border: active ? "1px solid var(--buildrick-primary-alpha-30)" : "1px solid transparent",
+  background: active ? "var(--bk-accent-tint)" : "var(--bk-bg-subtle)",
+  border: active ? "1px solid var(--bk-alpha-accent-30)" : "1px solid transparent",
   borderRadius: 5,
-  color: active ? "var(--bd-accent)" : "var(--bd-fg-secondary)",
-  font: "500 9.5px var(--bd-font)",
+  color: active ? "var(--bk-accent)" : "var(--bk-ink-soft)",
+  font: "500 9.5px var(--bk-font-ui)",
   cursor: "pointer",
   transition:
-    "background var(--buildrick-duration-fast), color var(--buildrick-duration-fast), border-color var(--buildrick-duration-fast)",
+    "background var(--bk-motion-fast), color var(--bk-motion-fast), border-color var(--bk-motion-fast)",
   display: "flex",
   flexDirection: "column" as const,
   alignItems: "center",
@@ -36,13 +36,13 @@ export const cardBtn = (active: boolean): React.CSSProperties => ({
 export const constraintBtnStyle = (active: boolean): React.CSSProperties => ({
   flex: 1,
   padding: "6px 4px",
-  background: active ? "var(--bd-accent-tint)" : "var(--bd-bg-subtle)",
-  border: active ? "1px solid var(--buildrick-primary-alpha-30)" : "1px solid transparent",
+  background: active ? "var(--bk-accent-tint)" : "var(--bk-bg-subtle)",
+  border: active ? "1px solid var(--bk-alpha-accent-30)" : "1px solid transparent",
   borderRadius: 4,
-  color: active ? "var(--bd-accent)" : "var(--bd-fg-secondary)",
-  font: "500 10px var(--bd-font)",
+  color: active ? "var(--bk-accent)" : "var(--bk-ink-soft)",
+  font: "500 10px var(--bk-font-ui)",
   cursor: "pointer",
-  transition: "background var(--buildrick-duration-fast), color var(--buildrick-duration-fast)",
+  transition: "background var(--bk-motion-fast), color var(--bk-motion-fast)",
   display: "flex",
   flexDirection: "column" as const,
   alignItems: "center",
@@ -57,11 +57,11 @@ export const fixedInputStyle: React.CSSProperties = {
   flex: 1,
   height: 24,
   padding: "0 8px",
-  background: "var(--bd-bg-subtle)",
+  background: "var(--bk-bg-subtle)",
   border: "1px solid transparent",
   borderRadius: 4,
-  color: "var(--bd-fg-primary)",
-  font: "500 11.5px var(--bd-font)",
+  color: "var(--bk-ink)",
+  font: "500 11.5px var(--bk-font-ui)",
   outline: "none",
 };
 
@@ -70,11 +70,11 @@ export const fixedInputStyle: React.CSSProperties = {
 // ============================================================================
 
 export const positionOffsetContainerStyle: React.CSSProperties = {
-  background: "var(--bd-bg-subtle)",
+  background: "var(--bk-bg-subtle)",
   borderRadius: 6,
   padding: 8,
   marginBottom: 6,
-  border: "1px solid var(--bd-border)",
+  border: "1px solid var(--bk-border)",
 };
 
 // ============================================================================
@@ -84,8 +84,8 @@ export const positionOffsetContainerStyle: React.CSSProperties = {
 export const positionOffsetBoxStyle: React.CSSProperties = {
   width: 30,
   height: 22,
-  background: "var(--bd-accent-tint)",
-  border: "1px solid var(--buildrick-primary-alpha-30)",
+  background: "var(--bk-accent-tint)",
+  border: "1px solid var(--bk-alpha-accent-30)",
   borderRadius: 3,
 };
 
@@ -95,9 +95,9 @@ export const positionOffsetBoxStyle: React.CSSProperties = {
 
 export const tipBoxStyle: React.CSSProperties = {
   padding: "5px 8px",
-  background: "var(--bd-accent-tint)",
+  background: "var(--bk-accent-tint)",
   borderRadius: 4,
   marginTop: 2,
-  font: "500 10.5px var(--bd-font)",
-  color: "var(--bd-accent)",
+  font: "500 10.5px var(--bk-font-ui)",
+  color: "var(--bk-accent)",
 };

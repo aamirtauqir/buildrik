@@ -4,10 +4,9 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/shared/vibcoder/Button";
 import { useClickOutside } from "../../../shared/hooks/useClickOutside";
 import type { ExportFormat } from "../utils/exportUtils";
-
+import { Button } from "@/editor/chrome-ui";
 const EXPORT_OPTIONS = [
   { fmt: "css", label: "CSS Variables", desc: "for custom CSS / SCSS" },
   { fmt: "tailwind", label: "Tailwind Config", desc: "for Tailwind CSS projects" },
@@ -27,12 +26,12 @@ export const ExportDropdown: React.FC<{
   return (
     <div ref={ref} style={{ position: "relative" }}>
       <Button
-        variant="ghost"
-        size="sm"
+        color="light"
+        size="xs"
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="true"
         aria-expanded={open}
-        style={{ display: "flex", alignItems: "center", gap: 4 }}
+        style={{ display: "flex", alignItems: "center", gap: 4 }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
       >
         Export
         <svg
@@ -53,8 +52,8 @@ export const ExportDropdown: React.FC<{
             position: "absolute",
             top: "calc(100% + 4px)",
             right: 0,
-            background: "var(--bd-bg-subtle)",
-            border: "1px solid var(--bd-border)",
+            background: "var(--bk-bg-subtle)",
+            border: "1px solid var(--bk-border)",
             borderRadius: 8,
             overflow: "hidden",
             zIndex: 100,
@@ -66,26 +65,26 @@ export const ExportDropdown: React.FC<{
             <div
               style={{
                 padding: "10px 14px",
-                borderBottom: "1px solid var(--bd-border)",
+                borderBottom: "1px solid var(--bk-border)",
                 background: "rgba(245,158,11,0.06)",
               }}
             >
-              <div style={{ fontSize: 12, color: "var(--bd-warning)", marginBottom: 6, lineHeight: 1.5 }}>
+              <div style={{ fontSize: 12, color: "var(--bk-warning)", marginBottom: 6, lineHeight: 1.5 }}>
                 ⚠ Exporting unsaved changes — not yet live on your site.
               </div>
               <Button
-                variant="ghost"
-                size="sm"
+                color="light"
+                size="xs"
                 onClick={() => {
                   setOpen(false);
                   onSaveFirst();
                 }}
                 style={{
                   fontSize: 12,
-                  color: "var(--bd-accent)",
+                  color: "var(--bk-accent)",
                   padding: 0,
                   textDecoration: "underline",
-                }}
+                }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
               >
                 Save first →
               </Button>
@@ -94,8 +93,8 @@ export const ExportDropdown: React.FC<{
           {EXPORT_OPTIONS.map(({ fmt, label, desc }) => (
             <Button
               key={fmt}
-              variant="ghost"
-              size="sm"
+              color="light"
+              size="xs"
               role="menuitem"
               onClick={() => {
                 onExport(fmt as ExportFormat);
@@ -109,10 +108,10 @@ export const ExportDropdown: React.FC<{
                 border: "none",
                 cursor: "pointer",
                 textAlign: "left",
-              }}
+              }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
             >
-              <div style={{ fontSize: 12, color: "var(--bd-fg-primary)" }}>{label}</div>
-              <div style={{ fontSize: 12, color: "var(--bd-fg-muted)", marginTop: 1 }}>
+              <div style={{ fontSize: 12, color: "var(--bk-ink)" }}>{label}</div>
+              <div style={{ fontSize: 12, color: "var(--bk-ink-muted)", marginTop: 1 }}>
                 {desc}
               </div>
             </Button>

@@ -11,7 +11,6 @@
  */
 
 import * as React from "react";
-import { Stack } from "@/editor/shared/vibcoder/Stack";
 import type { BoxModel, ElementInfo } from "../utils/elementInfo";
 
 /**
@@ -190,7 +189,8 @@ const DIMENSION_HIGHLIGHT_FG = "#a5f3fc";
 const CLASS_NAME_HIGHLIGHT_FG = "#f9e2af";
 
 export const InfoBadge: React.FC<InfoBadgeProps> = ({ rect, info, colors }) => (
-  <Stack
+  <div
+    className="tw:flex tw:flex-col tw:gap-0.5"
     style={{
       position: "absolute",
       left: rect.left,
@@ -202,7 +202,6 @@ export const InfoBadge: React.FC<InfoBadgeProps> = ({ rect, info, colors }) => (
       fontSize: 12,
       fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
       whiteSpace: "nowrap",
-      gap: 2,
       boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
     }}
   >
@@ -221,7 +220,7 @@ export const InfoBadge: React.FC<InfoBadgeProps> = ({ rect, info, colors }) => (
       {info.isFlexContainer && (
         <span
           style={{
-            background: "var(--buildrick-accent)",
+            background: "var(--bk-accent)",
             padding: "0 4px",
             borderRadius: 2,
             fontSize: 12,
@@ -233,7 +232,7 @@ export const InfoBadge: React.FC<InfoBadgeProps> = ({ rect, info, colors }) => (
       {info.isGridContainer && (
         <span
           style={{
-            background: "var(--buildrick-accent)",
+            background: "var(--bk-accent)",
             padding: "0 4px",
             borderRadius: 2,
             fontSize: 12,
@@ -244,7 +243,7 @@ export const InfoBadge: React.FC<InfoBadgeProps> = ({ rect, info, colors }) => (
       )}
     </div>
     <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12 }}>
-      {info.parentName && <span style={{ color: "var(--buildrick-text-muted)" }}>in {info.parentName}</span>}
+      {info.parentName && <span style={{ color: "var(--bk-ink-muted)" }}>in {info.parentName}</span>}
       <span style={{ color: DIMENSION_HIGHLIGHT_FG, fontFamily: "monospace" }}>
         {info.dimensions.width} × {info.dimensions.height}
       </span>
@@ -252,7 +251,7 @@ export const InfoBadge: React.FC<InfoBadgeProps> = ({ rect, info, colors }) => (
         <span style={{ color: CLASS_NAME_HIGHLIGHT_FG, opacity: 0.8 }}>.{info.classes[0]}</span>
       )}
     </div>
-  </Stack>
+  </div>
 );
 
 // =============================================================================

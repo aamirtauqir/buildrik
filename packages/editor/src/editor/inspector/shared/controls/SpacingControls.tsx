@@ -1,5 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Spacing Controls — nested Webflow box (margin + padding) + CornerRadiusInput.
  * Ported to .bdi-box / .bdi-mbox / .bdi-pbox / .bdi-ax per comp-inspector.html v2.
@@ -13,12 +11,12 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import { Link, Unlink } from "lucide-react";
 import * as React from "react";
-import { Stack } from "@/editor/shared/vibcoder";
+import { TextField } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
 import { DSBindingChip } from "../../sections/DSBindingChip";
 import { isTokenVar, extractVarName, cssVarToTokenId } from "../tokenBindingDetection";
-
+import { Button, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // AXIS INPUT — absolutely positioned input inside a box edge
 // ============================================================================
@@ -83,7 +81,7 @@ const AxisInput: React.FC<AxisInputProps> = ({ side, value, onChange, disabled, 
 
   return (
     <>
-      <Input
+      <TextField
         type="text"
         className={`bdi-ax ${SIDE_POS[side]}${local.isKeyword ? " muted" : ""}`}
         value={display}
@@ -175,7 +173,7 @@ export const CornerRadiusInput: React.FC<CornerRadiusInputProps> = ({
   linked = false,
   onLinkToggle,
 }) => (
-  <Stack gap="xs">
+  <div className="tw:flex tw:flex-col tw:gap-1">
     <div
       style={{
         display: "flex",
@@ -195,7 +193,7 @@ export const CornerRadiusInput: React.FC<CornerRadiusInputProps> = ({
           style={{
             width: 18,
             height: 18,
-            color: linked ? "var(--bd-accent)" : "var(--bd-fg-muted)",
+            color: linked ? "var(--bk-accent)" : "var(--bk-ink-muted)",
           }}
         >
           {linked ? <Link size={11} aria-hidden="true" /> : <Unlink size={11} aria-hidden="true" />}
@@ -207,7 +205,7 @@ export const CornerRadiusInput: React.FC<CornerRadiusInputProps> = ({
         const { num, unit } = parseValue(values[corner]);
         return (
           <div key={corner} className="bdi-num axis" data-axis={corner.toUpperCase()}>
-            <Input
+            <TextInput
               type="text"
               value={num}
               onChange={(e) => {
@@ -223,5 +221,5 @@ export const CornerRadiusInput: React.FC<CornerRadiusInputProps> = ({
         );
       })}
     </div>
-  </Stack>
+  </div>
 );

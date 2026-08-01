@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * ComponentRow - Single component item in the component list
  * Handles drag, selection, context menu (insert/rename/duplicate/favorite/delete).
@@ -9,6 +8,7 @@ import { MoreHorizontal, Plus, Copy, Trash2, RefreshCw, Star, Edit3 } from "luci
 import * as React from "react";
 import type { ComponentDefinition } from "../../../../shared/types/components";
 import { ComponentIcon } from "./ComponentIcon";
+import { Button } from "@/editor/chrome-ui";
 
 export interface ComponentRowProps {
   component: ComponentDefinition;

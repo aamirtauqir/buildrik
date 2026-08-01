@@ -17,12 +17,12 @@
  */
 
 import * as React from "react";
-import { Button, Icon, Badge, Textarea, Spinner, Switch } from "@/editor/shared/vibcoder";
-import { PanelHeader } from "@/shared/extensions/PanelHeader";
-import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
+import { AlertCircle, CheckCircle2, ChevronLeft, History } from "lucide-react";
+import { ConfirmDialog, PanelHeader, Spinner } from "@/editor/chrome-ui";
 import { ApprovedCompareView } from "@/editor/panels/version-history/ApprovedCompareView";
 import type { PublishPage } from "@/editor/shell/exportPublishPages";
 import {
+
   fetchCurrentRound,
   fetchReviewComments,
   fetchApprovedSnapshot,
@@ -32,6 +32,20 @@ import {
   type CurrentRound,
   type ReviewComment,
 } from "../../../../services/ReviewService";
+import { Badge, Button, Textarea, ToggleSwitch } from "@/editor/chrome-ui";
+/** Review's own status words onto flowbite Badge color + text-color override
+ *  (flowbite's badge color presets don't hex-match --bk-success-text/
+ *  --bk-warning-tint/--bk-error-text exactly — see docs/plans/
+ *  flowbite-bigbang-inventory.md "Task 5" Badge mapping). Named, not
+ *  inlined, so a new status shows up as a type error instead of silently
+ *  rendering neutral. */
+const BADGE_KIND: Record<string, { color: string; className?: string }> = {
+  published: { color: "success", className: "tw:text-green-600" },
+  syncing: { color: "warning", className: "tw:bg-yellow-50" },
+  issues: { color: "failure", className: "tw:text-red-700" },
+};
+const BADGE_NEUTRAL = { color: "gray" } as const;
+
 
 export interface ReviewTabProps {
   isPinned?: boolean;
@@ -70,28 +84,28 @@ const STATUS_TONE: Record<string, { label: string; variant: "syncing" | "publish
 
 const S: Record<string, React.CSSProperties> = {
   body: { display: "flex", flexDirection: "column", height: "100%", minHeight: 0 },
-  header: { padding: 12, borderBottom: "1px solid var(--bd-border)", display: "flex", flexDirection: "column", gap: 8 },
+  header: { padding: 12, borderBottom: "1px solid var(--bk-border)", display: "flex", flexDirection: "column", gap: 8 },
   headRow: { display: "flex", alignItems: "center", gap: 8, justifyContent: "space-between" },
-  meta: { fontSize: 12, color: "var(--bd-text-muted)", lineHeight: 1.4 },
+  meta: { fontSize: 12, color: "var(--bk-ink-muted)", lineHeight: 1.4 },
   actions: { display: "flex", alignItems: "center", gap: 6 },
   more: { position: "relative" },
-  menu: { position: "absolute", right: 0, top: "calc(100% + 4px)", zIndex: 10, background: "var(--bd-surface)", border: "1px solid var(--bd-border)", borderRadius: 8, padding: 4, minWidth: 160 },
+  menu: { position: "absolute", right: 0, top: "calc(100% + 4px)", zIndex: 10, background: "var(--bk-bg-panel)", border: "1px solid var(--bk-border)", borderRadius: 8, padding: 4, minWidth: 160 },
   scroll: { flex: 1, minHeight: 0, overflowY: "auto", padding: "8px 12px" },
   group: { marginBottom: 12 },
-  groupHead: { fontSize: 11, fontWeight: 600, letterSpacing: ".4px", textTransform: "uppercase", color: "var(--bd-text-muted)", margin: "6px 0" },
-  row: { display: "flex", flexDirection: "column", gap: 4, padding: 8, border: "1px solid var(--bd-border)", borderRadius: 8, marginBottom: 6 },
+  groupHead: { fontSize: 11, fontWeight: 600, letterSpacing: ".4px", textTransform: "uppercase", color: "var(--bk-ink-muted)", margin: "6px 0" },
+  row: { display: "flex", flexDirection: "column", gap: 4, padding: 8, border: "1px solid var(--bk-border)", borderRadius: 8, marginBottom: 6 },
   rowResolved: { opacity: 0.6 },
   rowTop: { display: "flex", alignItems: "center", gap: 6, justifyContent: "space-between" },
-  who: { fontSize: 12, fontWeight: 600, color: "var(--bd-text)" },
-  when: { fontSize: 11, color: "var(--bd-text-muted)" },
-  text: { fontSize: 13, color: "var(--bd-text)", lineHeight: 1.4 },
-  composer: { borderTop: "1px solid var(--bd-border)", padding: "10px 12px", display: "flex", flexDirection: "column", gap: 8 },
-  center: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, padding: 24, textAlign: "center", color: "var(--bd-text-muted)" },
-  centerTitle: { fontSize: 14, fontWeight: 600, color: "var(--bd-text)" },
-  centerHint: { fontSize: 12, color: "var(--bd-text-muted)", maxWidth: 240 },
-  toolbar: { display: "flex", alignItems: "center", gap: 8, justifyContent: "space-between", padding: "8px 12px", borderBottom: "1px solid var(--bd-border)" },
-  toggle: { fontSize: 12, color: "var(--bd-text-muted)", display: "flex", alignItems: "center", gap: 6 },
-  compareBar: { display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", borderBottom: "1px solid var(--bd-border)" },
+  who: { fontSize: 12, fontWeight: 600, color: "var(--bk-ink)" },
+  when: { fontSize: 11, color: "var(--bk-ink-muted)" },
+  text: { fontSize: 13, color: "var(--bk-ink)", lineHeight: 1.4 },
+  composer: { borderTop: "1px solid var(--bk-border)", padding: "10px 12px", display: "flex", flexDirection: "column", gap: 8 },
+  center: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, padding: 24, textAlign: "center", color: "var(--bk-ink-muted)" },
+  centerTitle: { fontSize: 14, fontWeight: 600, color: "var(--bk-ink)" },
+  centerHint: { fontSize: 12, color: "var(--bk-ink-muted)", maxWidth: 240 },
+  toolbar: { display: "flex", alignItems: "center", gap: 8, justifyContent: "space-between", padding: "8px 12px", borderBottom: "1px solid var(--bk-border)" },
+  toggle: { fontSize: 12, color: "var(--bk-ink-muted)", display: "flex", alignItems: "center", gap: 6 },
+  compareBar: { display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", borderBottom: "1px solid var(--bk-border)" },
 };
 
 interface Group { key: string; label: string; comments: ReviewComment[]; }
@@ -275,10 +289,10 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
       <div style={S.body}>
         {header}
         <div style={S.center}>
-          <Icon name="alert-circle" size="lg" />
+          <AlertCircle size={24} aria-hidden="true" />
           <div style={S.centerTitle}>Couldn't load the review</div>
           <div style={S.centerHint}>The dashboard didn't answer. Your feedback is safe — this is just the panel.</div>
-          <Button variant="secondary" size="sm" onClick={() => void load()}>Retry</Button>
+          <Button color="light" size="xs" onClick={() => void load()}>Retry</Button>
         </div>
       </div>
     );
@@ -289,7 +303,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
       <div style={S.body}>
         {header}
         <div style={S.center}>
-          <Icon name="check-circle" size="lg" />
+          <CheckCircle2 size={24} aria-hidden="true" />
           <div style={S.centerTitle}>No review yet</div>
           <div style={S.centerHint}>This site hasn't been sent for review yet. Use “Send for review” in the top bar to invite a client.</div>
         </div>
@@ -301,8 +315,8 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
     return (
       <div style={S.body}>
         <div style={S.compareBar}>
-          <Button variant="ghost" size="sm" onClick={() => setCompareOpen(false)}>
-            <Icon name="chevron-left" size="sm" /> Back
+          <Button color="light" size="xs" onClick={() => setCompareOpen(false)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+            <ChevronLeft size={14} aria-hidden="true" /> Back
           </Button>
           <span style={S.who}>Compare with approved</span>
         </div>
@@ -310,10 +324,10 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
           <div style={S.center}><Spinner size="lg" /><span>Loading approved snapshot…</span></div>
         ) : compareState === "error" ? (
           <div style={S.center}>
-            <Icon name="alert-circle" size="lg" />
+            <AlertCircle size={24} aria-hidden="true" />
             <div style={S.centerTitle}>Couldn't load the approved snapshot</div>
             <div style={S.centerHint}>The dashboard didn't answer. Try again.</div>
-            <Button variant="secondary" size="sm" onClick={() => void openCompare()}>Retry</Button>
+            <Button color="light" size="xs" onClick={() => void openCompare()}>Retry</Button>
           </div>
         ) : (
           <ApprovedCompareView
@@ -345,23 +359,23 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
       <div style={S.header}>
         <div style={S.headRow}>
           <div style={S.actions}>
-            <Badge variant={round.revoked ? "issues" : tone.variant}>{round.revoked ? "Link revoked" : tone.label}</Badge>
-            {round.openCommentCount > 0 && <Badge variant="count">{round.openCommentCount} open</Badge>}
+            <Badge {...(BADGE_KIND[round.revoked ? "issues" : tone.variant] ?? BADGE_NEUTRAL)}>{round.revoked ? "Link revoked" : tone.label}</Badge>
+            {round.openCommentCount > 0 && <Badge color="gray">{round.openCommentCount} open</Badge>}
           </div>
           <div style={S.actions}>
             {round.status === "APPROVED" && onExportCurrentPages && (
-              <Button variant="ghost" size="sm" onClick={() => void openCompare()}>
-                <Icon name="history" size="sm" /> Compare
+              <Button color="light" size="xs" onClick={() => void openCompare()} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+                <History size={14} aria-hidden="true" /> Compare
               </Button>
             )}
-            <Button variant="primary" size="sm" busy={resending} onClick={() => void doResend()}>Re-send</Button>
+            <Button size="xs" disabled={resending} onClick={() => void doResend()} aria-busy={resending || undefined}>Re-send</Button>
             <div style={S.more}>
-              <Button variant="ghost" size="sm" aria-label="More options" onClick={() => setMoreOpen((v) => !v)}>⋯</Button>
+              <Button color="light" size="xs" aria-label="More options" onClick={() => setMoreOpen((v) => !v)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">⋯</Button>
               {moreOpen && (
                 <div style={S.menu} role="menu">
                   <Button
-                    variant="danger"
-                    size="sm"
+                    color="red"
+                    size="xs"
                     onClick={() => { setConfirmRevoke(true); setMoreOpen(false); }}
                   >
                     Revoke link
@@ -381,14 +395,14 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
         <span style={S.meta}>{visible.length} comment{visible.length === 1 ? "" : "s"}</span>
         <span style={S.toggle}>
           Show resolved
-          <Switch checked={showResolved} aria-label="Show resolved" onClick={() => setShowResolved((v) => !v)} />
+          <ToggleSwitch checked={showResolved} aria-label="Show resolved" onChange={() => setShowResolved((v) => !v)} />
         </span>
       </div>
 
       <div style={S.scroll}>
         {visible.length === 0 ? (
           <div style={S.center}>
-            <Icon name="check-circle" size="lg" />
+            <CheckCircle2 size={24} aria-hidden="true" />
             <div style={S.centerTitle}>No feedback yet</div>
             <div style={S.centerHint}>When {round.reviewerName ?? "the client"} leaves a comment, it shows up here.</div>
           </div>
@@ -396,12 +410,12 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
           <>
           {detached.length > 0 && (
             <div style={S.group} data-detached-group>
-              <div style={{ ...S.groupHead, color: "var(--bd-warn-strong)" }}>
+              <div style={{ ...S.groupHead, color: "var(--bk-warning-text)" }}>
                 Detached · {detached.length}
               </div>
               {detached.map((c) => (
                 <div
-                  style={{ ...S.row, background: "var(--bd-warning-tint)" }}
+                  style={{ ...S.row, background: "var(--bk-warning-tint)" }}
                   key={c.id}
                   data-comment-row
                   data-comment-id={c.id}
@@ -415,13 +429,13 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
                   <div style={S.text}>{c.body}</div>
                   <div style={S.actions}>
                     <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => composer?.emit("comments:reattach-start", { id: c.id })}
+                      color="light"
+                      size="xs"
+                      onClick={() => composer?.emit("comments:reattach-start", { id: c.id })} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
                     >
                       Reattach
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={() => void onResolve(c)}>
+                    <Button color="light" size="xs" onClick={() => void onResolve(c)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                       {c.status === "RESOLVED" ? "Reopen" : "Resolve"}
                     </Button>
                   </div>
@@ -448,7 +462,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
                     </div>
                     <div style={S.text}>{c.body}</div>
                     <div style={S.actions}>
-                      <Button variant="ghost" size="sm" onClick={() => void onResolve(c)}>
+                      <Button color="light" size="xs" onClick={() => void onResolve(c)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                         {c.status === "RESOLVED" ? "Reopen" : "Resolve"}
                       </Button>
                     </div>
@@ -463,6 +477,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
 
       <div style={S.composer}>
         <Textarea
+          className="tw:bg-white tw:focus:border-primary-700 tw:focus:ring-primary-700"
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           placeholder="Reply to the client…"
@@ -472,19 +487,19 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
         {replyError && <span style={S.meta}>Couldn't send that reply. Try again.</span>}
         <div style={S.headRow}>
           <span style={S.meta}>Replies are internal notes on the thread.</span>
-          <Button variant="primary" size="sm" busy={sending} disabled={!draft.trim()} onClick={() => void send()}>Send</Button>
+          <Button size="xs" disabled={!draft.trim() || sending} onClick={() => void send()} aria-busy={sending || undefined}>Send</Button>
         </div>
       </div>
 
       <ConfirmDialog
-        isOpen={confirmRevoke}
+        open={confirmRevoke}
         onClose={() => setConfirmRevoke(false)}
         onConfirm={() => void onRevoke()}
-        variant="danger"
+        destructive
         title="Revoke the review link?"
         message="The client's link stops working immediately. Their comments stay. Send a new link any time with Re-send."
-        confirmText="Revoke link"
-        cancelText="Keep it live"
+        confirmLabel="Revoke link"
+        cancelLabel="Keep it live"
       />
     </div>
   );

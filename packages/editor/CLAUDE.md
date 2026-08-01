@@ -2,7 +2,10 @@
 
 ## Project Overview
 
-Visual web builder/editor. React 18 + TypeScript + Vite + Emotion CSS-in-JS.
+Visual web builder/editor. React 18 + TypeScript + Vite. Chrome styling =
+generated `--bk-*` tokens + `flowbite-react` primitives + `tw:`-prefixed
+Tailwind utilities, composed in `src/editor/chrome-ui/`; Emotion is RETIRED
+for chrome (4 residual files pending cleanup, unrelated to the canvas).
 Core engine: `src/engine/Composer.ts` — central orchestrator with 25+ managers.
 Demo app: `demo/main.tsx` on port 5050.
 
@@ -10,7 +13,7 @@ Demo app: `demo/main.tsx` on port 5050.
 
 - **React 18.3** (devDep) + **TypeScript 5.3** (strict mode)
 - **Vite 7.2** (dev server + bundler)
-- **Emotion** (@emotion/react, @emotion/styled) — CSS-in-JS
+- **Generated design tokens** (`src/themes/tokens.generated.css` from Figma) + `flowbite-react` component library, styled with `tw:`-prefixed Tailwind utilities (`src/editor/chrome-ui/`) — no CSS-in-JS for chrome
 - **Lucide React** — icons
 - **GSAP** — animations
 - **Zod** — schema validation
@@ -197,20 +200,19 @@ src/
 │                    # `@components/*` alias removed. ESLint Survivor #6 ban-rule retired.
 │
 
-├── shared/          # SHARED — Types, utils, hooks, UI primitives
+├── shared/          # SHARED — Types, utils, hooks (leaf dependency)
 │   ├── types/       # All TypeScript interfaces/types (SSOT for types)
 │   ├── constants/   # All constants (SSOT for constants)
 │   ├── hooks/       # Reusable React hooks
 │   ├── utils/       # Pure utility functions
-│   ├── ui/          # Design system primitives (Tooltip, Toast, ContextMenu, etc.)
-│   ├── extensions/  # Project-specific compositions on top of vibcoder primitives.
-│   │                # NOT vendored vibcoder code (lives in editor/shared/vibcoder/).
-│   │                # NOT primitives (live in shared/ui/).
-│   │                # Test: "if vibcoder ever ships this exact composition upstream,
-│   │                # this file deletes and consumers swap import paths."
-│   │                # Examples: PanelHeader, ConfirmDialog, CopyButton, PremiumBadge,
-│   │                # UpgradeModal, Skeleton compounds.
-│   └── forms/       # Form field components
+│   └── forms/       # Form field compositions (label/hint/error wiring on
+│                    # @/editor/chrome-ui controls — the one shared/→editor edge)
+│
+│                    # NOTE: shared/ui/ + shared/extensions/ DELETED 2026-07-28
+│                    # (stage 6 of ds/fresh-token-system). Their survivors were
+│                    # ported into src/editor/ui/ (CopyButton, SkeletonCompounds,
+│                    # UpgradeModal, HelpTooltip, PanelHeaderActions) or
+│                    # src/editor/shared/elementIcons.tsx (element glyph map).
 │
 │                    # NOTE: src/features/ DELETED 2026-05-03. Held only
 │                    # `design-system/` (site-builder tokens). Single-tenant
@@ -234,11 +236,10 @@ engine/    → shared/ (ONLY)
 editor/    → engine/, shared/, blocks/, templates/
 services/  → shared/ (ONLY)
 shared/    → NOTHING from other src/ folders (leaf dependency).
-            EXCEPTION: shared/extensions/ files MAY import from
-            @/editor/shared/vibcoder (the vendored vibcoder primitive
-            bundle). This is the only intentional shared/→editor/ edge
-            in the graph — extensions/ exists specifically to compose
-            vibcoder primitives.
+            EXCEPTION: shared/forms/ files MAY import from @/editor/chrome-ui
+            (the component library). This is the only intentional
+            shared/→editor/ edge in the graph — forms/ exists
+            specifically to compose library controls with field wiring.
 blocks/    → shared/ (ONLY)
 templates/ → shared/ (ONLY)
 themes/    → shared/ (ONLY)
@@ -276,43 +277,37 @@ import { designTokens } from '../../editor/design-system'; // NAHI!
 
 ---
 
-## DESIGN SYSTEM — SSOT CONTRACT
+## DESIGN SYSTEM — SSOT CONTRACT (rewritten 2026-07-31, flowbite-bigbang Task 13)
 
 Ek concept = ek canonical home. Duplicate allowed nahi. Violation = auto-reject.
 
 | Concept | Canonical Home | Status |
 |---------|---------------|--------|
-| Design tokens (color/spacing/typography/radius/shadow/motion/z-index) | `src/themes/design-system/*.css` | CANONICAL — hand-edit OK |
-| Vibcoder primitive CSS (atoms/molecules/organisms/layouts) | `src/themes/components/` | CANONICAL — authored, hand-edit OK (vendor pipeline retired 2026-05-06) |
-| Vibcoder primitive React wrappers | `src/editor/shared/vibcoder/` | CANONICAL — authored, hand-edit OK, 286 consumers |
-| Compositions on vibcoder primitives | `src/shared/extensions/` | CANONICAL — PanelHeader, ConfirmDialog, etc. |
-| Buildrik non-vibcoder primitives | `src/shared/ui/` | AUDIT COMPLETE 2026-05-02 — 4 files (SemanticBadge/ErrorState/HelpTooltip/Icons) + `panel/PanelShell` retained, 12 dead files + ds/ + broken index.tsx deleted. Badge → SemanticBadge rename 2026-05-08 (DS SSOT Phase 4). |
-| Site-builder tokens (user output, not chrome) | `src/editor/design-system/` | CANONICAL — different domain, never merge with chrome DS. Moved from `src/features/design-system/` 2026-05-03. |
-| Final residual class rules | `src/themes/legacy-components.css` | DRAINED 2026-05-07 (Phase Final) — 72 LOC, renamed from components.css. DO NOT add new rules. |
-| ~~Legacy chrome components~~ | ~~`src/components/`~~ | DELETED 2026-05-02 — graveyard fully drained |
+| Chrome design tokens (`--bk-*`, ONE flat tier) | `src/themes/tokens.generated.css` + `.ts` | GENERATED from Figma (`scripts/tokens/figma-tokens.json` → `scripts/tokens/generate.mjs`). Hand-edit = build failure (`gate:tokens-generated`). Change a value in Figma, re-export, regenerate. Still the SSOT for chrome tokens post-flowbite — non-chrome consumers depend on it too (`styles/tokens/canvas.tokens.ts`, `legacy-components.css`, site-builder DS). |
+| Component library | `src/editor/chrome-ui/` (React) + `flowbite-react` (behavior/primitives, from `node_modules`) | CANONICAL — every chrome component composes flowbite-react primitives styled with `tw:`-prefixed Tailwind utility classes (no separate CSS bundle). Mirrors a Figma node where one exists. 0 hex, 0 fallbacks. Contract tests in `chrome-ui/__tests__/` (incl. `flowbite-parity.test.tsx`, which documents behavior deltas against flowbite's built-ins). |
+| Tailwind class-list pipeline | `.flowbite-react/class-list.json` (repo root) via `pnpm flowbite:classlist` (`flowbite-react build`) | flowbite-react's own component theme files live in `node_modules`, invisible to Tailwind's `@source` globs. The generated class-list is the literal-string source Tailwind's JIT needs to compile those classes. Regenerate whenever a new flowbite-react component is imported. Prefix is `tw` everywhere — must match `flowbiteStore.ts`'s `setStore({prefix: "tw"})` exactly, or classes compile unprefixed and collide with canvas-mounted customer CSS (spec §4.1). |
+| a11y rules (focus-visible, reduced-motion) | `src/themes/design-system/a11y.css` | CANONICAL — real rules, not tokens. Only file allowed `@media (prefers-*)`. |
+| Site-builder tokens (user output, not chrome) | `src/editor/design-system/` + `themes/design-system/design.css` | CANONICAL — different domain, never merge with chrome DS, never regenerate from Figma (would restyle customers' published sites). |
+| Final residual engine selectors | `src/themes/legacy-components.css` | Canvas container, drag cursor, selection ring, vendor pseudo-elements. DO NOT add new rules. |
+| ~~Vibcoder library~~ | ~~`editor/shared/vibcoder/` + `themes/components/`~~ | DELETED 2026-07-28 (stage 6) — 70 primitives, 76 CSS files, 54 galleries. `shared/extensions/` + `shared/ui/` deleted same day. |
+| ~~`editor/ui/` (ds/fresh-token-system component library)~~ | ~~`src/editor/ui/` + `ui.css`~~ | DELETED 2026-07-31 (flowbite-bigbang Task 13) — its own successor, `editor/chrome-ui/`, absorbed every consumer across Tasks 2-12 first. `gate:editor-ui-gone` locks the import path at zero. |
 
 ### SSOT decision tree (before writing any DS / UI code)
 
-1. Naya token (color/space/etc.)? → `themes/design-system/` only. Never inline hex in chrome CSS (Gate 24).
-2. Naya primitive component? → check `editor/shared/vibcoder/` first. Already hai? Use it.
-3. Composition chahiye (multiple primitives wrapped together)? → `shared/extensions/`.
-4. Vibcoder mein nahi hai aur composition bhi nahi? → Add new primitive directly to `editor/shared/vibcoder/` + matching CSS in `themes/components/<tier>/`. Vibcoder is Buildrik-owned now — extend it, don't fork around it.
-5. Naya chrome layout / panel / view? → `editor/[domain]/` only. Never `components/`.
+1. Naya token? → change it in Figma, re-export `figma-tokens.json`, run `node scripts/tokens/generate.mjs`. NEVER hand-edit `tokens.generated.*`, never define a chrome token anywhere else.
+2. Naya primitive/component? → check `src/editor/chrome-ui/index.ts` first, then flowbite-react's own exports. Already hai? Use it.
+3. Nahi hai? → Add to `src/editor/chrome-ui/<Name>.tsx`, composing a flowbite-react primitive where one fits and styling it with `tw:`-prefixed Tailwind utilities (`--bk-*` tokens via `var(--bk-*)` inside those utilities, weights ≤600, focus `var(--bk-shadow-focus)`) + export from `index.ts` + contract tests. New flowbite-react component import? Run `pnpm flowbite:classlist` so its classes land in the class-list Tailwind compiles from.
+4. Naya chrome layout / panel / view? → `editor/[domain]/`, composed from `@/editor/chrome-ui` + `flowbite-react`. No raw `<button>/<input>/<select>/<textarea>` in chrome (Gate 24; `editor/chrome-ui/` itself is the one exempt owner of native elements — flowbite-react's own internals live in `node_modules`, outside the scan by construction).
 
 ### Forbidden moves
 
-- New file in `src/components/` → REJECT.
-- New `.buildrick-*` className in editor JSX (`src/editor/`) → REJECT — gate `scripts/check-buildrick-baseline.mjs` per-panel growth lock catches.
-- Component duplicating vibcoder primitive in `shared/ui/` → REJECT — gate `gate:ds-ssot` (`scripts/check-ds-ssot.mjs`) ERROR-locks componentDuplicates at zero.
-- Duplicate `@keyframes` across CSS files → REJECT — `gate:ds-ssot` ERROR-locks keyframeDuplicates at zero.
-- Same `--bd-*` token defined in two alias files → REJECT — `gate:ds-ssot` ERROR-locks tokenAliasSSOT at zero.
-- Hex literal in chrome CSS → blocked by Gate 24 (zero-tolerance).
-
-### Retirement targets (deletion mandates)
-
-- ~~`themes/components.css`: <300 lines target, then rename to `legacy-components.css`~~ DONE 2026-05-07 (Phase Final): 274 → 72 LOC, renamed `legacy-components.css`. Contains only canonical engine selectors + 1 single-consumer chrome class + generic input element styling.
-- `src/components/` (371 files): file count must DECREASE per PR touching it. Touch a legacy file? → migrate to `editor/`.
-- `shared/ui/` overlap audit: every primitive checked against `editor/shared/vibcoder/`. Duplicate = delete + redirect imports.
+- Import from `editor/shared/vibcoder`, `shared/extensions`, `shared/ui`, or `editor/ui` → REJECT — `gate:vibcoder-ratchet` is locked at **0** for the first three; `gate:editor-ui-gone` locks `@/editor/ui` at zero (Task 13, all four paths are deleted).
+- Defining `--bd-*` or `--buildrick-*` chrome tokens anywhere → REJECT (Gate 15 — dead namespaces; Gate 17 catches ghost refs).
+- Hand-editing `tokens.generated.css/.ts` → REJECT (`gate:tokens-generated` checksum).
+- Hex literal in chrome → Gate 16 hex-ratchet (may only go down; current drain target: 49 CSS + 143 TSX).
+- Raw box-shadow/gradient in chrome → Gates 11/12 baselines (shadows via `var(--bk-shadow-*)` or `none`).
+- Duplicate `@keyframes` / selector duplicates → `gate:ds-ssot` locks.
+- `createPortal(...)` / `document.body.appendChild(...)` outside chrome-ui's overlay-root primitives (`OverlayMount`, `OverlayRoot`/`getOverlayRoot()`, `Portal`, `Toast`) or `scripts/gates/overlay-allowlist.txt` → REJECT (Gate 22).
 
 ### Why this contract exists
 
@@ -353,7 +348,7 @@ Memory: 4 prior architecture attempts (V1 spec, V2 spec, axioms draft, editor-v2
   - Deleted `src/components/ui/` (2-file redirect barrel) — pure transition shim.
   - Trimmed `shared/ui/index.ts` to surviving exports only (Badge, ErrorState, HelpTooltip).
   - Net: **-485+ files removed from `src/`**, top-level dirs 15 → 13.
-- **2026-05-02 — Decision: `src/preview/` STAYS in `src/`** despite "dev-only" appearance. ESLint rules (`no-gallery-shadow.cjs`, `no-hardcoded-open-prop`) target `src/preview/vibcoder-*.tsx` for drift detection. TypeScript tsconfig `include: ["src", "demo"]` type-checks galleries against vibcoder primitive types. Moving = silent regression on both fronts. Galleries are dev-only at runtime (Vite root=demo/) but **dev-time-active** as type-checked artifacts. If ever moved, must update eslint config + skip-rules.ts + memory.
+- **2026-07-28 — `src/preview/` DELETED** (stage 6): all 54 vibcoder galleries + index + `_lib` removed with the library they previewed. (Supersedes the 2026-05-02 "STAYS" decision — the ESLint rules that pinned it were retired with the vibcoder-fork.)
 - **2026-05-02 — `src/components/` GRAVEYARD KILLED** (Phase 1-5 of "kill-the-graveyard" arc):
   - Phase 1 inventory: only 2 active import lines (`demo/main.tsx` AquibraStudio + Canvas.css). 95% of 219 files were 7-line redirect shims; 2 were L0 stubs returning null; rest were barrels.
   - Phase 2: `demo/main.tsx` redirected to canonical `src/editor/shell/AquibraStudio` + canonical Canvas.css now loads via `editor/canvas/Canvas.tsx` import (the legacy components/Canvas/Canvas.css duplicated styles that canonical overrode anyway).
@@ -400,12 +395,13 @@ composer.on('project:saved', () => { /* show toast */ });
 
 UI components subscribe to Composer events. They do NOT poll state.
 
-### Styling: Emotion + CSS Variables
+### Styling: generated tokens + chrome-ui + flowbite-react (flowbite-bigbang, Task 13 — 2026-07-31)
 
-- Global tokens: `src/themes/default.css` (CSS custom properties)
-- Component styles: Emotion `styled()` or `css` prop
-- NO inline style objects except for dynamic computed values (e.g., position from drag)
-- NO Tailwind, NO CSS modules — Emotion only
+- Tokens: `src/themes/tokens.generated.css` (`--bk-*`, generated from Figma) — loaded via `themes/default.css`
+- Component styles: `tw:`-prefixed Tailwind utility classes inline on each component in `src/editor/chrome-ui/` (no companion CSS file); `--bk-*` tokens reach in via `var(--bk-*)` inside those utilities. Chrome composes `@/editor/chrome-ui` components + `flowbite-react` primitives directly.
+- Feature-level CSS files (e.g. `LeftSidebar.css`) style layout/domain chrome with `var(--bk-*)` only
+- NO inline style objects except dynamic computed values (e.g., position from drag)
+- Tailwind IS used for chrome now (via the `tw:` prefix + `.flowbite-react/class-list.json` pipeline — see DS SSOT table) — this reverses the pre-Task-13 "NO Tailwind" rule. NO CSS modules, NO new Emotion — Emotion is retired for chrome (4 residual files pending cleanup, unrelated to the canvas)
 
 ---
 
@@ -571,51 +567,74 @@ Use the `/browse` skill from gstack for all web browsing. Never use `mcp__claude
 - /unfreeze
 - /gstack-upgrade
 
-## Vibcoder Position 3 — Chrome Routing Rules
+## Chrome Routing Rules — chrome-ui is the single public surface (2026-07-31)
 
-The chrome layer (sidebar/rail/inspector/topbar/footer) is governed by the
-vibcoder primitives at `src/themes/components/` (CSS) and
-`src/editor/shared/vibcoder/` (React wrappers). Position 3 + R2 namespace
-exception: vibcoder canonical names are authoritative; `--bd-*` short aliases
-remain for existing chrome JSX via the single canonical alias layer at
-`src/themes/design-system/bd-aliases.css` (vibcoder-atom-unique tokens
-live in `src/themes/components/_aliases.css`).
+The chrome layer (sidebar/rail/inspector/topbar/footer) is built exclusively
+from `src/editor/chrome-ui/` composing `flowbite-react` primitives, styled
+with `tw:`-prefixed Tailwind utility classes and generated `--bk-*` tokens —
+no separate chrome CSS bundle. Two prior libraries are fully gone: the
+vibcoder system (React wrappers, 76-file CSS bundle, `--bd-*` alias layers,
+shared/extensions compositions, shared/ui primitives, preview galleries) was
+deleted at stage 6 of `docs/plans/2026-07-27-ui-library-roadmap.md`; its own
+successor, `src/editor/ui/` (the ds/fresh-token-system component library),
+was itself deleted at Task 13 of the flowbite big-bang migration
+(`docs/plans/flowbite-bigbang-inventory.md`) once every consumer was
+re-pointed to `chrome-ui/` and flowbite-react across Tasks 2-12.
 
-**Status (2026-05-06):** vibcoder-fork shipped. Vendor pipeline (codemods,
-bundle pin, manifest enforcement) retired. Vibcoder is Buildrik-owned canonical
-authored code, not vendored generated output. Files at `themes/components/` and
-`editor/shared/vibcoder/` may be hand-edited freely.
+**`chrome-ui/index.ts` is the single import surface for everything
+flowbite-sourced** (chrome-ui-single-surface spec,
+`docs/plans/2026-07-31-chrome-ui-single-surface.md`). Every file under
+`packages/editor/src` outside `chrome-ui/` itself imports Button, TextInput,
+Select, Badge, etc. — and the `BK_*` theme constants, and the
+`CustomFlowbiteTheme` type — from `@/editor/chrome-ui`, never directly from
+`flowbite-react` (bare or subpath, e.g. `flowbite-react/types`) and never from
+a deep `@/editor/chrome-ui/<file>` path (e.g. `chrome-ui/selectTheme`). The
+barrel aggregates three kinds of export: pure `export { X } from
+"flowbite-react"` re-exports (Button, Badge, Avatar, AvatarGroup, Checkbox,
+Radio, ToggleSwitch, Tooltip, Textarea, Label, HelperText, RangeSlider,
+Progress, Card), the 45+ editor-specific components already canonical here
+(Topbar, IssueChip, Modal, Toast, etc.), and the closed 2-wrapper set below.
+The B3 sweep (task report:
+`.superpowers/sdd/2026-07-30-flowbite-bigbang-implementation/task-B-report.md`)
+re-pointed all 249 pre-existing direct imports across 6 surface-sized commits.
+
+**The closed 2-wrapper set — never a 3rd without amending both
+`chrome-ui/index.ts` and the gate's `WRAPPER_FILES` in the same commit:**
+
+| Wrapper | Default theme | File |
+|---|---|---|
+| `TextInput` | `BK_TEXT_INPUT_THEME` | `chrome-ui/TextInput.tsx` |
+| `Select` | `BK_SELECT_BASE_THEME` | `chrome-ui/Select.tsx` |
+
+Both are `forwardRef` (ref reaches the real `<input>`/`<select>` — load-bearing
+for rename/search focus and hidden file-input clicks) and deep-merge
+(`chrome-ui/mergeTheme.ts`) a caller-supplied `theme` prop on top of the
+default — caller key wins per leaf, untouched default keys survive. Passing
+`theme={BK_TEXT_INPUT_THEME}` / `theme={BK_SELECT_BASE_THEME}` at a call site
+is now redundant (the wrapper already applies it) and should be omitted;
+`theme={BK_SELECT_BARE_UNIT_THEME}` / `theme={BK_SELECT_BARE_VALUE_THEME}`
+and other genuinely different overrides still need the explicit prop — the
+wrapper composes it on top of the base, it does not replace it. `Label` has no
+wrapper (its contract is `className`-based — `BK_LABEL_CLASS`/
+`BK_HELPER_CLASS`/`BK_HELPER_ERROR_CLASS`, plain re-export).
 
 ### When modifying chrome
 
-- **Existing primitive:** edit the file at `editor/shared/vibcoder/<Name>.tsx` and/or matching CSS at `themes/components/<tier>/<name>.css` directly. No codemod cycle. Tests live next to the source.
-- **New primitive:** add to `editor/shared/vibcoder/` + matching CSS in `themes/components/<tier>/`. Add the CSS `@import` line to `themes/default.css`. Add a preview at `src/preview/vibcoder-<name>.html` if useful for visual QA.
-- **Cascade:** `@layer tokens, components, overrides;`. Component CSS lands in `components`. Emotion remains unlayered (always wins) so existing `styled()` chrome stays authoritative.
-- **Tokens:** Use canonical `--buildrick-*` names in CSS. Use short `--bd-*` aliases in chrome JSX. Single canonical alias map is at `themes/design-system/bd-aliases.css` — extend it for new chrome-wide aliases. `themes/components/_aliases.css` retains 62 vibcoder-atom-unique tokens; do not add chrome-wide aliases there.
+- **Existing component:** edit `src/editor/chrome-ui/<Name>.tsx` — styles are inline `tw:` utility classes on the component itself, no companion CSS file to keep in sync. Contract tests in `src/editor/chrome-ui/__tests__/`.
+- **New component:** compose a flowbite-react primitive where one fits; mirror a Figma node where one exists; `--bk-*` tokens via `var(--bk-*)` inside `tw:` utilities, weights ≤600, focus `var(--bk-shadow-focus)`; export from `index.ts`; add contract tests. Importing a flowbite-react component for the first time? Run `pnpm flowbite:classlist` (see DS SSOT table above) so its classes reach the Tailwind build.
+- **Cascade:** `@layer reset, components, overrides;` (declared in `themes/default.css`). `tw.css` (Tailwind utilities, `tw` prefix) + `chrome-reset.css` (preflight replacement, scoped to `.bd-studio` and excluding the canvas subtree) load unlayered before `legacy-components.css`; tokens + engine selectors win over all layers per CSS spec.
+- **Tokens:** `var(--bk-*)` only, values changed in Figma → re-export → `node scripts/tokens/generate.mjs`.
 
-### CI gates relevant to vibcoder
+### CI gates relevant to the library
 
-- Gate 15: `--bd-*` SSOT — alias tokens defined only in `bd-aliases.css` and `_aliases.css`
-- Gate 22: portal discipline — no `document.body` in vibcoder wrappers (except `OverlayMount`)
-- Gate 23: shim layer is gate-keeper for mapped primitives
-- Gate 24: zero-tolerance inline `<button>/<input>/<select>/<textarea>` in editor chrome
+- `gate:chrome-ui-surface` — **ERROR mode**, locked at **0**: (1) no `flowbite-react` import (bare or subpath) outside `chrome-ui/`, (2) barrel purity — every flowbite-sourced export in `chrome-ui/index.ts` is a pure re-export, never a component definition, (3) closed wrapper set is exactly `[TextInput.tsx, Select.tsx]`. Checks 2/3 have been ERROR since the gate shipped; check 1 flipped from WARN once the B3 sweep drained the count to 0.
+- `gate:tokens-generated` — generated files current, zero legacy chrome tokens
+- `gate:vibcoder-ratchet` — locked at **0**: any import of the deleted vibcoder/shared-ui paths fails the build
+- `gate:editor-ui-gone` — locked at **0**: any import of the deleted `@/editor/ui` path fails the build
+- Gate 15 — `--bd-*` definitions banned (dead namespace) · Gate 17 — ghost `--bd-*` refs
+- Gate 18 — banned Tailwind/indigo/violet/purple bleed (the Flowbite purple ramp is allowlisted for PRO badge + avatar identity tones only — see DESIGN.md §Color, founder-confirmed 2026-07-29 — never as an accent, CTA, link, or gradient)
+- Gate 22 — portal discipline: `createPortal`/`document.body` must route through chrome-ui's overlay-root primitives (`OverlayMount`, `OverlayRoot`, `Portal`, `Toast`) or be listed in `scripts/gates/overlay-allowlist.txt`
+- Gate 24 — zero inline `<button>/<input>/<select>/<textarea>` in chrome (`editor/chrome-ui/` is the exempt owner of native elements)
+- Gates 11/12/13/14 — chrome-axiom ratchets (gradients, tokenized shadows, radius, layout literals)
 
-(Retired with vibcoder-fork on 2026-05-06: Gate 19 `bdr-*` class leak detection, Gate 21 vibcoder-shape token defs, `vibcoder:check-port` manifest validator, ESLint `no-gallery-shadow` and `no-hardcoded-open-prop`.)
-
-### Architecture reference
-
-`docs/architecture/vibcoder-spec/` (untracked, local-only) contains the original
-design rationale + reference CSS + manifest from when vibcoder was treated as
-external. Preserved for future contributors who need to understand the naming
-conventions, component scope decisions, and original tier breakdown. Not loaded
-at runtime; not a source of truth — Buildrik's own `themes/components/` and
-`editor/shared/vibcoder/` are canonical.
-
-### Phase status
-
-Phases 1-5 SHIPPED 2026-04-28 (M5 organisms, M8 chrome re-port, M9 Phase 5
-shim deletion). 19 Phase 4 adapter shims deleted; 6 compositions live at
-`src/shared/extensions/`. Buckets A+B (Popover/Tooltip/Toast Radix backings)
-shipped 2026-04-30 (B1+B2+B3, completes Phase 5 chrome arc).
-**Vibcoder-fork** shipped 2026-05-06: vendor ceremony retired, primitives
-become Buildrik-authored.
+(Retired: Gate 19/21/23, Gate 20 barrel guard, `vibcoder:check-port`, gallery ESLint rules — their subjects no longer exist.)

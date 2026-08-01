@@ -28,7 +28,7 @@ export interface InteractionItemProps {
 
 const styles = {
   container: (enabled: boolean): React.CSSProperties => ({
-    background: "var(--buildrick-bg-subtle)",
+    background: "var(--bk-bg-subtle)",
     borderRadius: 8,
     overflow: "hidden",
     opacity: enabled ? 1 : 0.5,
@@ -39,7 +39,7 @@ const styles = {
     gap: 8,
     padding: "10px 12px",
     cursor: "pointer",
-    background: isEditing ? "var(--buildrick-bg-input)" : "transparent",
+    background: isEditing ? "var(--bk-bg-card)" : "transparent",
   }),
   icon: {
     fontSize: 14,
@@ -47,15 +47,15 @@ const styles = {
   label: {
     flex: 1,
     fontSize: 13,
-    color: "var(--buildrick-text-primary)",
+    color: "var(--bk-ink)",
   },
   type: {
     fontSize: 12,
-    color: "var(--buildrick-text-muted)",
+    color: "var(--bk-ink-muted)",
   },
   arrow: (isEditing: boolean): React.CSSProperties => ({
     transform: isEditing ? "rotate(90deg)" : "none",
-    color: "var(--buildrick-text-muted)",
+    color: "var(--bk-ink-muted)",
     fontSize: 12,
   }),
 };

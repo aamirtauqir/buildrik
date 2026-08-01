@@ -5,9 +5,9 @@
  */
 
 import * as React from "react";
+import { useToast } from "@/editor/chrome-ui";
 import { getBlockDefinitions, getBlockById } from "../../../../blocks/blockRegistry";
 import type { BlockData } from "../../../../shared/types";
-import { useToast } from "@/editor/shared/vibcoder";
 import { trackSidebar } from "../../../../shared/utils/sidebarAnalytics";
 import {
   RECENT_STORAGE_KEY,

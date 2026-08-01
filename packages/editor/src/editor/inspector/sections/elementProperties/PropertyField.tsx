@@ -1,5 +1,3 @@
-import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * PropertyField Component
  * Renders different input types for element properties
@@ -10,7 +8,7 @@ import * as React from "react";
 import type { MediaAsset, MediaAssetType } from "../../../../shared/types/media";
 import { InputRow, SelectRow } from "../../shared/controls";
 import type { PropertyConfig } from "./config";
-
+import { Button, Checkbox } from "@/editor/chrome-ui";
 const styles = {
   checkboxRow: {
     display: "flex",
@@ -20,7 +18,7 @@ const styles = {
   } as React.CSSProperties,
   checkboxLabel: {
     fontSize: 12,
-    color: "var(--buildrick-text-tertiary)",
+    color: "var(--bk-ink-muted)",
     fontWeight: 500,
     minWidth: 70,
   } as React.CSSProperties,
@@ -32,7 +30,7 @@ const styles = {
   } as React.CSSProperties,
   checkboxText: {
     fontSize: 12,
-    color: "var(--buildrick-text-primary)",
+    color: "var(--bk-ink)",
   } as React.CSSProperties,
   srcRow: {
     display: "flex",
@@ -42,10 +40,10 @@ const styles = {
   } as React.CSSProperties,
   browseButton: {
     padding: "8px 12px",
-    background: "var(--bd-accent-tint)",
-    border: "1px solid var(--buildrick-primary-alpha-30)",
+    background: "var(--bk-accent-tint)",
+    border: "1px solid var(--bk-alpha-accent-30)",
     borderRadius: 6,
-    color: "var(--buildrick-accent)",
+    color: "var(--bk-accent)",
     fontSize: 12,
     fontWeight: 600,
     cursor: "pointer",
@@ -99,6 +97,8 @@ export const PropertyField: React.FC<PropertyFieldProps> = ({
         <label style={styles.checkboxLabel}>{prop.label}</label>
         <label style={styles.checkboxWrapper}>
           <Checkbox
+            color="blue"
+            className="tw:bg-white"
             checked={value === "true" || value === prop.id}
             onChange={(e) => onChange(prop.id, e.target.checked ? "true" : "")}
             style={{ width: 16, height: 16 }} />

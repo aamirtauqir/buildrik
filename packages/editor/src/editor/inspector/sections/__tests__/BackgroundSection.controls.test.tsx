@@ -87,7 +87,7 @@ describe("BackgroundSection — gradient writes", () => {
     fireEvent.click(screen.getByRole("button", { name: "Linear" }));
     expect(onChange).toHaveBeenCalledWith(
       "background",
-      "linear-gradient(90deg, var(--buildrick-accent), var(--buildrick-success))"
+      "linear-gradient(90deg, var(--bk-accent), var(--bk-success))"
     );
   });
 
@@ -97,7 +97,7 @@ describe("BackgroundSection — gradient writes", () => {
     fireEvent.click(screen.getByRole("button", { name: "Radial" }));
     expect(onChange).toHaveBeenCalledWith(
       "background",
-      "radial-gradient(circle, var(--buildrick-accent), var(--buildrick-success))"
+      "radial-gradient(circle, var(--bk-accent), var(--bk-success))"
     );
   });
 });

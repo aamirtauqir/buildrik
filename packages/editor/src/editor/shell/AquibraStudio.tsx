@@ -1,5 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Stack } from "@/editor/shared/vibcoder/Stack";
 /**
  * @lint-hex-policy: component-theme
  *   Intentional component-specific palette (error boundary / overlay / preview
@@ -15,11 +13,10 @@ import * as React from "react";
 import { getBlockDefinitions } from "../../blocks/blockRegistry";
 import type { Composer } from "../../engine";
 import { useElementFlash } from "../../shared/hooks";
+import { EVENTS } from "../../shared/constants";
 import type { ComposerConfig, ProjectData, BlockData } from "../../shared/types";
-import { TooltipProvider, ToastProvider, useToast } from "@/editor/shared/vibcoder";
-import { StudioSkeleton } from "@/shared/extensions/SkeletonCompounds";
-import { UpgradeModal } from "@/shared/extensions/UpgradeModal";
-import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
+import { ToastProvider, UpgradeModal, useToast } from "@/editor/chrome-ui";
+import { StudioSkeleton } from "@/editor/chrome-ui";
 import { StaleApprovalModal } from "./modals/StaleApprovalModal";
 import { PreviewOverlay } from "./PreviewOverlay";
 import { migrateStorageKeys, migrateAqbKeys } from "../../shared/utils/storageMigration";
@@ -39,6 +36,7 @@ import { useEditorEventListeners } from "./hooks/useEditorEventListeners";
 import { useEditorShortcuts } from "./hooks/useEditorShortcuts";
 import { useExportHandlers } from "./hooks/useExportHandlers";
 import { useHistoryFeedback } from "./hooks/useHistoryFeedback";
+import { usePublishOutcomeFlash } from "./hooks/usePublishOutcomeFlash";
 import { useSaveCallback } from "./hooks/useSaveCallback";
 import { useStudioHandlers } from "./hooks/useStudioHandlers";
 import { useStudioModals } from "./hooks/useStudioModals";
@@ -54,7 +52,10 @@ import { SAVE_CONFLICT_EVENT, setBaselineLastEditedAt } from "@/services/Buildri
 import "../../themes/default.css";
 import "../../themes/ux-fixes.css";
 import "./chrome.css";
-
+// flowbite-bigbang Task 2: configure flowbite-react's tw: class prefix
+// (spec §4.1) before any flowbite-react component can mount in the real app.
+import "../chrome-ui/flowbiteStore";
+import { Button } from "@/editor/chrome-ui";
 // Run localStorage migration on app startup (module load)
 migrateStorageKeys();
 migrateAqbKeys();
@@ -89,17 +90,18 @@ class StudioErrorBoundary extends React.Component<
   render() {
     if (this.state.hasError) {
       return (
-        <Stack
+        <div
+          className="tw:flex tw:flex-col tw:gap-3"
           style={{
             padding: 24,
-            color: "var(--buildrick-text-primary)",
-            background: "var(--buildrick-bg-panel)",
+            color: "var(--bk-ink)",
+            background: "var(--bk-bg-panel)",
             height: "100vh",
           }}
         >
           <h2 style={{ margin: 0 }}>Something went wrong</h2>
-          <div style={{ color: "var(--buildrick-error)" }}>{this.state.message}</div>
-          <div style={{ fontSize: 13, color: "var(--buildrick-text-secondary)" }}>
+          <div style={{ color: "var(--bk-error)" }}>{this.state.message}</div>
+          <div style={{ fontSize: 13, color: "var(--bk-ink-soft)" }}>
             Please reload the editor.
           </div>
           <Button
@@ -107,17 +109,17 @@ class StudioErrorBoundary extends React.Component<
             style={{
               alignSelf: "flex-start",
               padding: "8px 14px",
-              background: "var(--buildrick-accent)",
+              background: "var(--bk-accent)",
               border: "none",
               borderRadius: 6,
-              color: "var(--buildrick-text-on-accent)",
+              color: "var(--bk-accent-on)",
               fontWeight: 600,
               cursor: "pointer",
             }}
           >
             Reload
           </Button>
-        </Stack>
+        </div>
       );
     }
     return this.props.children;
@@ -235,6 +237,21 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     setIsDirty: state.setIsDirty,
   });
 
+  // T10 (topbar plan): the Issues panel's page scope needs to know which page
+  // the user is on, reactively — a page switch must re-scope the list.
+  const [activePageId, setActivePageId] = React.useState<string | null>(null);
+  React.useEffect(() => {
+    if (!composer) return;
+    const read = () => setActivePageId(composer.elements.getActivePage()?.id ?? null);
+    read();
+    composer.on(EVENTS.PAGE_CHANGED, read);
+    composer.on(EVENTS.PROJECT_LOADED, read);
+    return () => {
+      composer.off(EVENTS.PAGE_CHANGED, read);
+      composer.off(EVENTS.PROJECT_LOADED, read);
+    };
+  }, [composer]);
+
   // The Issues panel had a state slot but no producer, so it rendered "No
   // issues" no matter how many the DS linter had found. Bridge the one real
   // source we have (designSystem.lintState) into it, and keep it live — the
@@ -292,7 +309,14 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   }, []);
 
   // Keyboard shortcuts (extracted into useEditorShortcuts — D2 stage 1)
-  useEditorShortcuts({ composer, modals, saveProject });
+  useEditorShortcuts({
+    composer,
+    modals,
+    saveProject,
+    openLeftPanelToTab: state.openLeftPanelToTab,
+    // T9: same handler the site menu's "Site settings" row uses.
+    openSiteSettings: modals.openProjectSettings,
+  });
 
   // Export + publish lifecycle (HTML zip, Vercel deploy, publish-toast effect,
   // usePublishJob) extracted into useExportHandlers — D2 stage 4. The hook
@@ -309,6 +333,11 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     setExportLoading: modals.setExportLoading,
   });
 
+  // T5 (topbar plan D10/eng D11): the 2s outcome flash behind the topbar's
+  // "✓ Published" transient. Display state only — toasts stay owned by
+  // useExportHandlers, announcements by StudioHeader.
+  const publishOutcome = usePublishOutcomeFlash(publishJob.uiState);
+
   // Auto-enable spacing on first selection. Deps are the specific values read
   // (not the whole `state` object, which is a fresh literal every render and
   // made this effect run on every render).
@@ -324,14 +353,13 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   }
 
   return (
-    <Stack
-      className={`bd-studio ${className}`}
+    <div
+      className={`tw:flex tw:flex-col tw:gap-0 bd-studio ${className}`}
       style={{
-        gap: 0,
         height: "100%",
-        background: "var(--buildrick-bg-app, var(--bd-bg-panel))",
-        color: "var(--buildrick-text-primary)",
-        fontFamily: "var(--buildrick-font-family)",
+        background: "var(--bk-bg-app, var(--bk-bg-panel))",
+        color: "var(--bk-ink)",
+        fontFamily: "var(--bk-font-ui)",
         position: "relative",
         ...style,
       }}
@@ -352,11 +380,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           lastSaved={state.saveState.lastSavedAt ? new Date(state.saveState.lastSavedAt) : null}
           lastSavedAt={state.saveState.lastSavedAt}
           previewLoading={modals.previewLoading}
-          exportLoading={modals.exportLoading}
           selectedElement={selectedElement}
-          showXRay={state.overlays.showXRay}
-          devMode={state.overlays.devMode}
-          showSuggestions={state.overlays.showSuggestions}
           studioSyncStatus={state.syncStatus}
           issues={state.issues}
           onInlinePreview={setPreviewHtml}
@@ -367,35 +391,23 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           // canvas selection itself, so no element context needs threading.
           onShowAI={() => composer.emit("ui:switch-tab", { tab: "ai" })}
           onShowExporter={modals.openExporter}
-          onToggleXRay={() => state.setShowXRay((v) => !v)}
-          onToggleDevMode={state.toggleDevMode}
-          onToggleSuggestions={() => state.setShowSuggestions((v) => !v)}
-          onAddPage={() => {
-            if (
-              composer &&
-              "elements" in composer &&
-              typeof composer.elements?.createPage === "function"
-            ) {
-              composer.elements.createPage("Home");
-            }
-          }}
           onOpenProjectSettings={modals.openProjectSettings}
           onOpenDesignSystem={() => state.openLeftPanelToTab("design")}
           onOpenPublish={() => state.openLeftPanelToTab("publish")}
           onOpenPlugins={() => state.openLeftPanelToTab("settings", "plugins")}
           onOpenHistory={() => state.openLeftPanelToTab("history")}
+          onOpenPublishHistory={() => state.openLeftPanelToTab("settings", "publish-history")}
+          onOpenTemplates={() => state.openLeftPanelToTab("templates")}
+          onOpenComponents={() => state.openLeftPanelToTab("components")}
           onOpenIssues={() => setIssuesOpen(true)}
+          onOpenReview={() => state.openLeftPanelToTab("review")}
           onOpenShortcuts={modals.toggleShortcuts}
           onSave={saveProject}
           onExportHTML={handleExportHTML}
           onVercelPublish={handleVercelPublish}
-          // Live-state is durable (a deployment is serving) = publishedUrl
-          // exists. uiState is transient job-state; a FAILED/CANCELLED
-          // *republish* of an already-live site must not flip the UI back to
-          // "draft" while the previous deployment is still up.
-          publishState={(publishJob.uiState === "published" || publishJob.publishedUrl) ? "published" : "draft"}
           publishLoading={publishJob.uiState === "publishing"}
           publishedUrl={publishJob.publishedUrl}
+          publishOutcome={publishOutcome}
           addToast={addToast}
         />
       </header>
@@ -461,12 +473,13 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
             bottom: 0,
             width: 360,
             zIndex: 45,
-            background: "var(--bd-surface)",
-            borderLeft: "1px solid var(--bd-border)",
+            background: "var(--bk-bg-panel)",
+            borderLeft: "1px solid var(--bk-border)",
           }}
         >
           <IssuesPanel
             issues={state.issues}
+            activePageId={activePageId}
             onClose={() => setIssuesOpen(false)}
             // Jump-to-element is a refinement: an Issue id is the issue's id,
             // not reliably an element id (lint/link/alt issues aren't 1:1 with
@@ -603,7 +616,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         onClose={publishJob.dismissBlock}
         onPublishAnyway={handlePublishAcknowledged}
       />
-    </Stack>
+    </div>
   );
 };
 
@@ -611,20 +624,18 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
  * Main Aquibra Studio Editor (with providers).
  *
  * Provider stack (outer → inner):
- *   TooltipProvider          — Radix.Tooltip ambient (B1 T2, delayDuration=500
- *                              matches deleted shim default).
- *   ToastProvider            — Radix.Toast queue + Viewport (B3). Hosts the
- *                              vibcoder useToast hook for all chrome consumers.
+ *   ToastProvider            — toast queue + viewport. Hosts the useToast
+ *                              hook for all chrome consumers.
  *   StudioErrorBoundary      — last-resort UI fallback.
+ *
+ * (No tooltip provider: the ui Tooltip is self-contained.)
  */
 export const AquibraStudio: React.FC<AquibraStudioProps> = (props) => (
-  <TooltipProvider delayDuration={500}>
-    <ToastProvider>
-      <StudioErrorBoundary>
-        <AquibraStudioShell {...props} />
-      </StudioErrorBoundary>
-    </ToastProvider>
-  </TooltipProvider>
+  <ToastProvider>
+    <StudioErrorBoundary>
+      <AquibraStudioShell {...props} />
+    </StudioErrorBoundary>
+  </ToastProvider>
 );
 
 export default AquibraStudio;

@@ -1,7 +1,3 @@
-import { Select } from "@/editor/shared/vibcoder/Select";
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Textarea } from "@/editor/shared/vibcoder/Textarea";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Input Controls — InputRow, InputWithUnit, SelectRow.
  * Ported to .bdi-num / .bdi-text / .bdi-row-ctrl per comp-inspector.v1 design.
@@ -9,16 +5,10 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  * @license BSD-3-Clause
  */
 
-import { X } from "lucide-react";
+import { Info, X } from "lucide-react";
 import * as React from "react";
-import { IconInfo } from "../../../../shared/ui/Icons";
-import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipPortal,
-  TooltipContent,
-} from "@/editor/shared/vibcoder";
-
+import { TextField } from "@/editor/chrome-ui";
+import { BK_SELECT_BARE_UNIT_THEME, BK_SELECT_BARE_VALUE_THEME, Button, Select, Textarea, TextInput, Tooltip } from "@/editor/chrome-ui";
 // ============================================================================
 // HELPERS
 // ============================================================================
@@ -28,22 +18,17 @@ const OverrideDot: React.FC = () => (
 );
 
 const HelperIcon: React.FC<{ text: string }> = ({ text }) => (
-  <Tooltip>
-    <TooltipTrigger asChild>
-      <span
-        style={{
-          marginLeft: 4,
-          display: "inline-flex",
-          opacity: 0.5,
-          cursor: "help",
-        }}
-      >
-        <IconInfo size="xs" />
-      </span>
-    </TooltipTrigger>
-    <TooltipPortal>
-      <TooltipContent>{text}</TooltipContent>
-    </TooltipPortal>
+  <Tooltip content={text} placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
+    <span
+      style={{
+        marginLeft: 4,
+        display: "inline-flex",
+        opacity: 0.5,
+        cursor: "help",
+      }}
+    >
+      <Info size={12} />
+    </span>
   </Tooltip>
 );
 
@@ -87,7 +72,7 @@ export const InputRow: React.FC<InputRowProps> = ({
           placeholder={placeholder}
         />
       ) : (
-        <Input
+        <TextField
           className="bdi-text"
           type={type}
           value={value}
@@ -234,14 +219,20 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
           title={isInvalid ? "Invalid number — press Escape to revert" : disabledReason}
         >
           {fieldIcon && <span className="bdi-flb">{fieldIcon}</span>}
-          <Input
+          <TextInput
             type="text"
             value={isKeywordUnit && !isTokenVar(inputValue) ? unit : inputValue}
             onChange={(e) => handleInputChange(e.target.value)}
             onBlur={handleInputBlur}
             onKeyDown={handleInputKeyDown}
             placeholder={placeholder}
-            className={isKeywordUnit ? "auto" : ""}
+            // `.bdi-fld input.auto` (inspector.css) is a real, unlayered CSS
+            // rule keyed off a class on the actual <input> — flowbite's
+            // TextInput only ever puts `className` on the OUTER wrapper div
+            // (same structural gap `selectTheme.ts` documents for Select),
+            // so the "auto" class has to reach the input through `theme`,
+            // not `className`.
+            theme={{ field: { input: { base: isKeywordUnit ? "auto" : "" } } }}
             disabled={disabled || (isKeywordUnit && !isTokenVar(inputValue))}
             aria-invalid={isInvalid}
             style={{
@@ -251,6 +242,8 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
           />
           {showReset && (
             <Button
+              color="light"
+              size="xs"
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
@@ -271,12 +264,12 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
                 background: "rgba(15, 23, 42, 0.06)",
                 border: "none",
                 borderRadius: 3,
-                color: "var(--bd-fg-muted)",
+                color: "var(--bk-ink-muted)",
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-              }}
+              }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
             >
               <X size={9} aria-hidden="true" />
             </Button>
@@ -284,6 +277,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
           {!isKeywordUnit && (
             <Select
               className="bdi-u"
+              theme={BK_SELECT_BARE_UNIT_THEME}
               value={unit}
               onChange={(e) => handleUnitChange(e.target.value)}
               disabled={disabled}
@@ -336,6 +330,7 @@ export const SelectRow: React.FC<SelectRowProps> = ({
       <div className="bdi-ddn">
         <Select
           className="bdi-v"
+          theme={BK_SELECT_BARE_VALUE_THEME}
           value={value}
           onChange={(e) => onChange(e.target.value)}
         >

@@ -38,7 +38,6 @@
  * react-window can virtualize.
  */
 
-import { Button } from "@/editor/shared/vibcoder/Button";
 import {
   Check,
   ChevronDown,
@@ -59,8 +58,8 @@ import type {
 } from "../../sidebar/tabs/media/data/mediaTypes";
 import type { SmartFolder } from "./FolderTree";
 import { formatBytes } from "@shared/utils/helpers/number";
-
-// ─── Toast contract (matches @/editor/shared/vibcoder useToast) ──────────
+import { Button } from "@/editor/chrome-ui";
+// ─── Toast contract (matches @/editor/chrome-ui useToast) ───────────────────────
 
 type ToastTone = "info" | "success" | "error" | "warning";
 interface ToastInput {
@@ -180,7 +179,7 @@ export function AssetGrid({
                     >
                       <div
                         className="mgr-folder-dot"
-                        style={{ background: "var(--buildrick-warning)" }}
+                        style={{ background: "var(--bk-warning)" }}
                       />
                       {folder.name}
                     </Button>
@@ -298,7 +297,7 @@ export function AssetGrid({
                   style={{
                     fontSize: viewMode === "list" ? 18 : 32,
                     fontWeight: 700,
-                    color: "var(--buildrick-text-primary)",
+                    color: "var(--bk-ink)",
                   }}
                 >
                   Aa

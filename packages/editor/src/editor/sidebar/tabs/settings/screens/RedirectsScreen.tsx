@@ -7,10 +7,10 @@
 
 import * as React from "react";
 import { createBuildrikApiClient } from "@/services/api-client";
-import { Button } from "@/editor/shared/vibcoder/Button";
 import { Field, Input, Screen, Section, Select } from "../shared";
 import type { ScreenProps } from "../types";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
+import { Button } from "@/editor/chrome-ui";
 
 interface Redirect {
   id: string;
@@ -212,7 +212,7 @@ export const RedirectsScreen: React.FC<ScreenProps> = ({
           {submitError && (
             <div role="alert" style={errorStyles}>{submitError}</div>
           )}
-          <Button type="submit" variant="primary" disabled={submitting} style={addButtonStyles}>
+          <Button type="submit" disabled={submitting} style={addButtonStyles}>
             {submitting ? "Adding…" : "Add redirect"}
           </Button>
         </form>
@@ -238,12 +238,12 @@ export const RedirectsScreen: React.FC<ScreenProps> = ({
                 <div style={metaColStyles}>
                   <span style={typeBadgeStyles}>{r.type}</span>
                   <Button
-                    variant="ghost"
-                    size="sm"
+                    color="light"
+                    size="xs"
                     type="button"
                     onClick={() => handleDelete(r.id)}
                     aria-label={`Delete redirect from ${r.fromPath}`}
-                    style={{ color: "var(--bd-error)" }}
+                    style={{ color: "var(--bk-error)" }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
                   >
                     Delete
                   </Button>
@@ -260,9 +260,9 @@ export const RedirectsScreen: React.FC<ScreenProps> = ({
 const emptyStyles: React.CSSProperties = {
   padding: "12px 14px",
   fontSize: 12,
-  color: "var(--bd-fg-muted)",
-  background: "var(--bd-bg-sub)",
-  border: "1px dashed var(--bd-border-default)",
+  color: "var(--bk-ink-muted)",
+  background: "var(--bk-bg-subtle)",
+  border: "1px dashed var(--bk-border-medium)",
   borderRadius: 6,
 };
 
@@ -271,10 +271,10 @@ const noticeStyles: React.CSSProperties = {
   padding: "10px 12px",
   fontSize: 12,
   lineHeight: 1.5,
-  color: "var(--bd-fg-secondary)",
-  background: "var(--bd-bg-sub)",
-  border: "1px solid var(--bd-border-default)",
-  borderLeft: "3px solid var(--bd-accent)",
+  color: "var(--bk-ink-soft)",
+  background: "var(--bk-bg-subtle)",
+  border: "1px solid var(--bk-border-medium)",
+  borderLeft: "3px solid var(--bk-accent)",
   borderRadius: 6,
 };
 
@@ -282,8 +282,8 @@ const errorStyles: React.CSSProperties = {
   marginTop: 4,
   marginBottom: 8,
   padding: "8px 10px",
-  font: "500 11.5px var(--bd-font)",
-  color: "var(--bd-error)",
+  font: "500 11.5px var(--bk-font-ui)",
+  color: "var(--bk-error)",
   background: "rgba(220, 38, 38, 0.06)",
   border: "1px solid rgba(220, 38, 38, 0.25)",
   borderRadius: 6,
@@ -292,9 +292,9 @@ const errorStyles: React.CSSProperties = {
 const addButtonStyles: React.CSSProperties = {
   marginTop: 8,
   padding: "8px 14px",
-  font: "600 12px var(--bd-font)",
+  font: "600 12px var(--bk-font-ui)",
   color: "#fff",
-  background: "var(--bd-accent)",
+  background: "var(--bk-accent)",
   border: "none",
   borderRadius: 6,
   cursor: "pointer",
@@ -315,8 +315,8 @@ const rowStyles: React.CSSProperties = {
   justifyContent: "space-between",
   gap: 12,
   padding: "8px 10px",
-  background: "var(--bd-bg-sub)",
-  border: "1px solid var(--bd-border-default)",
+  background: "var(--bk-bg-subtle)",
+  border: "1px solid var(--bk-border-medium)",
   borderRadius: 6,
 };
 
@@ -329,24 +329,24 @@ const pathColStyles: React.CSSProperties = {
 };
 
 const fromColStyles: React.CSSProperties = {
-  fontFamily: "var(--bd-font-mono)",
+  fontFamily: "var(--bk-font-mono)",
   fontSize: 11,
-  color: "var(--bd-fg-strong)",
+  color: "var(--bk-ink)",
   whiteSpace: "nowrap",
   overflow: "hidden",
   textOverflow: "ellipsis",
 };
 
 const arrowStyles: React.CSSProperties = {
-  fontFamily: "var(--bd-font-mono)",
+  fontFamily: "var(--bk-font-mono)",
   fontSize: 11,
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
 };
 
 const toColStyles: React.CSSProperties = {
-  fontFamily: "var(--bd-font-mono)",
+  fontFamily: "var(--bk-font-mono)",
   fontSize: 11,
-  color: "var(--bd-fg-secondary)",
+  color: "var(--bk-ink-soft)",
   whiteSpace: "nowrap",
   overflow: "hidden",
   textOverflow: "ellipsis",
@@ -361,22 +361,22 @@ const metaColStyles: React.CSSProperties = {
 
 const typeBadgeStyles: React.CSSProperties = {
   padding: "2px 6px",
-  fontFamily: "var(--bd-font-mono)",
+  fontFamily: "var(--bk-font-mono)",
   fontSize: 10,
   fontWeight: 600,
   letterSpacing: "0.04em",
-  color: "var(--bd-fg-strong)",
-  background: "var(--bd-bg-default)",
-  border: "1px solid var(--bd-border-default)",
+  color: "var(--bk-ink)",
+  background: "var(--bk-bg-panel)",
+  border: "1px solid var(--bk-border-medium)",
   borderRadius: 4,
 };
 
 const deleteBtnStyles: React.CSSProperties = {
   padding: "4px 8px",
-  font: "500 11px var(--bd-font)",
-  color: "var(--bd-fg-secondary)",
+  font: "500 11px var(--bk-font-ui)",
+  color: "var(--bk-ink-soft)",
   background: "transparent",
-  border: "1px solid var(--bd-border-default)",
+  border: "1px solid var(--bk-border-medium)",
   borderRadius: 4,
   cursor: "pointer",
 };

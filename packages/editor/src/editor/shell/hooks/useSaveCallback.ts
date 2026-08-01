@@ -18,8 +18,8 @@
  */
 
 import * as React from "react";
+import { ToastInput } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
-import type { ToastInput } from "@/editor/shared/vibcoder/Toast";
 import type { SaveState } from "./useStudioState";
 import { getSiteIdFromUrl, saveProject, SaveConflictError } from "@/services/BuildrikSyncProvider";
 
@@ -30,7 +30,15 @@ export interface UseSaveCallbackOptions {
   setIsDirty: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export type SaveProjectFn = () => void;
+/**
+ * What actually happened to the save — the honest outcome the exit guard
+ * (F1, plan 2026-07-29) needs. "queued-offline" and "conflict" settle the
+ * visible status to idle for calm UX, but they are NOT a durable save: the
+ * offline queue dies on navigation, and a conflict means a newer copy exists.
+ */
+export type SaveOutcome = "saved" | "queued-offline" | "conflict" | "error";
+
+export type SaveProjectFn = () => Promise<SaveOutcome>;
 
 // Map raw composer error → user-friendly explanation. Pure helper kept
 // alongside the hook so future contributors see all save-error mapping
@@ -57,8 +65,8 @@ export function useSaveCallback({
   setSaveState,
   setIsDirty,
 }: UseSaveCallbackOptions): SaveProjectFn {
-  const save = React.useCallback(() => {
-    if (!composer) return;
+  const save = React.useCallback((): Promise<SaveOutcome> => {
+    if (!composer) return Promise.resolve("error");
     setSaveState((prev) => ({ ...prev, status: "saving", error: undefined }));
     // When the editor is bound to a dashboard site, manual Save / Cmd+S must
     // persist to the dashboard (same path as autosave) — composer.saveProject()
@@ -68,8 +76,8 @@ export function useSaveCallback({
     const savePromise = siteId
       ? saveProject(siteId, composer.exportProject()).then(() => undefined)
       : composer.saveProject();
-    savePromise
-      .then(() => {
+    return savePromise
+      .then((): SaveOutcome => {
         setSaveState({ status: "idle", lastSavedAt: Date.now(), error: undefined });
         setIsDirty(false);
         addToast({
@@ -78,15 +86,16 @@ export function useSaveCallback({
           tone: "success",
           duration: 1800,
         });
+        return "saved";
       })
-      .catch((err) => {
+      .catch((err): SaveOutcome => {
         // 61-conflict: a behind-copy is handled by the conflict dialog (the
         // registered handler in BuildrikSyncProvider already opened it). Don't
         // also show a generic "save failed" toast or a Retry that would re-save
         // over the newer copy — just clear the saving spinner.
         if (err instanceof SaveConflictError) {
           setSaveState((prev) => ({ ...prev, status: "idle" }));
-          return;
+          return "conflict";
         }
         const errorMessage = err?.message || "Unknown error";
         // 60-save-states: a network/connection failure is NOT a lost save — the
@@ -103,7 +112,7 @@ export function useSaveCallback({
             description: "Your edits are saved on this device and will sync when you're back.",
             tone: "info",
           });
-          return;
+          return "queued-offline";
         }
         const userMessage = explainSaveError(errorMessage);
         setSaveState((prev) => ({ ...prev, status: "error", error: errorMessage }));
@@ -111,8 +120,9 @@ export function useSaveCallback({
           title: "Save failed",
           description: userMessage,
           tone: "error",
-          action: { label: "Retry", onClick: () => save() },
+          action: { label: "Retry", onClick: () => void save() },
         });
+        return "error";
       });
   }, [composer, addToast, setSaveState, setIsDirty]);
 

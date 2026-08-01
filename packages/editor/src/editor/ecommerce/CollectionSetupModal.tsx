@@ -1,4 +1,3 @@
-import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
 /**
  * Collection Setup Modal
  * Prompts user to create Products collection when dropping e-commerce blocks
@@ -7,15 +6,9 @@ import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
 
 import { ShoppingBag, Package, Check } from "lucide-react";
 import * as React from "react";
+import { ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/chrome-ui";
 import { useState } from "react";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import {
-  Modal,
-  ModalContent,
-  ModalTitle,
-  ModalClose,
-  OverlayMount,
-} from "@/editor/shared/vibcoder";
+import { Button, Checkbox } from "@/editor/chrome-ui";
 
 export interface CollectionSetupModalProps {
   isOpen: boolean;
@@ -66,8 +59,8 @@ export const CollectionSetupModal: React.FC<CollectionSetupModalProps> = ({
   };
 
   return (
-    <OverlayMount>
-      <Modal open={isOpen} onOpenChange={(next) => !next && onClose()}>
+    <Portal>
+      <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
         <ModalContent size="lg">
           <ModalTitle>Set Up Products Collection</ModalTitle>
           <ModalClose aria-label="Close modal">
@@ -78,7 +71,7 @@ export const CollectionSetupModal: React.FC<CollectionSetupModalProps> = ({
           <div className="bd-modal__body">
       <div style={containerStyles}>
         <div style={iconContainerStyles}>
-          <ShoppingBag size={48} style={{ color: "var(--buildrick-accent)" }} />
+          <ShoppingBag size={48} style={{ color: "var(--bk-accent)" }} />
         </div>
 
         <p style={descriptionStyles}>
@@ -89,6 +82,8 @@ export const CollectionSetupModal: React.FC<CollectionSetupModalProps> = ({
         <div style={checkboxContainerStyles}>
           <label style={checkboxLabelStyles}>
             <Checkbox
+              color="blue"
+              className="tw:bg-white"
               checked={includeSample}
               onChange={(e) => setIncludeSample(e.target.checked)}
               style={checkboxStyles} />
@@ -104,31 +99,31 @@ export const CollectionSetupModal: React.FC<CollectionSetupModalProps> = ({
 
         <div style={featuresListStyles}>
           <div style={featureItemStyles}>
-            <Check size={16} style={{ color: "var(--buildrick-success)" }} />
+            <Check size={16} style={{ color: "var(--bk-success)" }} />
             <span>8 product fields (name, price, image, etc.)</span>
           </div>
           <div style={featureItemStyles}>
-            <Check size={16} style={{ color: "var(--buildrick-success)" }} />
+            <Check size={16} style={{ color: "var(--bk-success)" }} />
             <span>Validation rules included</span>
           </div>
           <div style={featureItemStyles}>
-            <Check size={16} style={{ color: "var(--buildrick-success)" }} />
+            <Check size={16} style={{ color: "var(--bk-success)" }} />
             <span>Ready for CMS data binding</span>
           </div>
         </div>
       </div>
       <div style={footerStyles}>
-        <Button variant="ghost" onClick={handleSkip} disabled={isCreating}>
+        <Button color="light" onClick={handleSkip} disabled={isCreating} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
           Skip for now
         </Button>
-        <Button variant="primary" onClick={handleConfirm} disabled={isCreating}>
+        <Button onClick={handleConfirm} disabled={isCreating}>
           {isCreating ? "Creating..." : "Create Collection"}
         </Button>
       </div>
           </div>
         </ModalContent>
-      </Modal>
-    </OverlayMount>
+      </ModalRoot>
+    </Portal>
   );
 };
 
@@ -146,16 +141,16 @@ const iconContainerStyles: React.CSSProperties = {
 
 const descriptionStyles: React.CSSProperties = {
   margin: 0,
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bk-ink-soft)",
   textAlign: "center",
   lineHeight: 1.5,
 };
 
 const checkboxContainerStyles: React.CSSProperties = {
-  background: "var(--buildrick-bg-elevated)",
-  borderRadius: "var(--bd-radius-md)",
+  background: "var(--bk-bg-card)",
+  borderRadius: "var(--bk-radius-lg)",
   padding: "12px",
-  border: "1px solid var(--buildrick-border)",
+  border: "1px solid var(--bk-border)",
 };
 
 const checkboxLabelStyles: React.CSSProperties = {
@@ -169,7 +164,7 @@ const checkboxStyles: React.CSSProperties = {
   width: "18px",
   height: "18px",
   marginTop: "2px",
-  accentColor: "var(--bd-accent)",
+  accentColor: "var(--bk-accent)",
 };
 
 const checkboxContentStyles: React.CSSProperties = {
@@ -187,7 +182,7 @@ const checkboxTitleStyles: React.CSSProperties = {
 
 const checkboxDescStyles: React.CSSProperties = {
   fontSize: "13px",
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bk-ink-soft)",
 };
 
 const featuresListStyles: React.CSSProperties = {
@@ -202,7 +197,7 @@ const featureItemStyles: React.CSSProperties = {
   alignItems: "center",
   gap: "8px",
   fontSize: "13px",
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bk-ink-soft)",
 };
 
 const footerStyles: React.CSSProperties = {
@@ -211,7 +206,7 @@ const footerStyles: React.CSSProperties = {
   gap: "8px",
   marginTop: "16px",
   paddingTop: "16px",
-  borderTop: "1px solid var(--buildrick-border)",
+  borderTop: "1px solid var(--bk-border)",
 };
 
 export default CollectionSetupModal;

@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * @lint-hex-policy: component-theme
  *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
@@ -9,6 +8,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button } from "@/editor/chrome-ui";
 
 export interface FeatureCardProps {
   /** Card title (e.g., "Elements", "Templates") */
@@ -93,7 +93,7 @@ export const FeatureCardGrid: React.FC<FeatureCardGridProps> = ({ children, colu
             fontSize: 10,
             fontWeight: 600,
             letterSpacing: "0.08em",
-            color: "var(--buildrick-text-muted)",
+            color: "var(--bk-ink-muted)",
             textTransform: "uppercase",
           }}
         >
@@ -128,7 +128,7 @@ const ChevronRightIcon: React.FC = () => (
     strokeWidth="1.5"
     strokeLinecap="round"
     strokeLinejoin="round"
-    style={{ color: "var(--buildrick-text-muted)" }}
+    style={{ color: "var(--bk-ink-muted)" }}
   >
     <path d="M6 4l4 4-4 4" />
   </svg>
@@ -145,8 +145,8 @@ const cardStyles: React.CSSProperties = {
   width: "100%",
   height: 60,
   padding: "10px 14px",
-  background: "var(--buildrick-bg-card)",
-  border: "1px solid var(--buildrick-border)",
+  background: "var(--bk-bg-card)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 8,
   cursor: "pointer",
   transition: "background 0.15s ease, border-color 0.15s ease",
@@ -154,8 +154,8 @@ const cardStyles: React.CSSProperties = {
 };
 
 const cardActiveStyles: React.CSSProperties = {
-  background: "var(--buildrick-accent-subtle)",
-  borderColor: "var(--buildrick-accent)",
+  background: "var(--bk-accent-subtle)",
+  borderColor: "var(--bk-accent)",
 };
 
 const cardDisabledStyles: React.CSSProperties = {
@@ -169,9 +169,9 @@ const iconContainerStyles: React.CSSProperties = {
   justifyContent: "center",
   width: 32,
   height: 32,
-  background: "var(--buildrick-bg-subtle)",
+  background: "var(--bk-bg-subtle)",
   borderRadius: 8,
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bk-ink-soft)",
   flexShrink: 0,
 };
 
@@ -188,7 +188,7 @@ const titleStyles: React.CSSProperties = {
   fontSize: 13,
   fontWeight: 600,
   lineHeight: "18px",
-  color: "var(--buildrick-text-primary)",
+  color: "var(--bk-ink)",
   whiteSpace: "nowrap",
   overflow: "hidden",
   textOverflow: "ellipsis",
@@ -198,7 +198,7 @@ const subtitleStyles: React.CSSProperties = {
   fontSize: 12,
   fontWeight: 400,
   lineHeight: "16px",
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bk-ink-soft)",
   whiteSpace: "nowrap",
   overflow: "hidden",
   textOverflow: "ellipsis",
@@ -218,16 +218,16 @@ const badgeStyles: React.CSSProperties = {
   minWidth: 20,
   height: 20,
   padding: "0 6px",
-  background: "var(--buildrick-surface-4)",
+  background: "var(--bk-gray-200)",
   borderRadius: 10,
   fontSize: 12,
   fontWeight: 600,
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bk-ink-soft)",
 };
 
 const planBadgeStyles: React.CSSProperties = {
-  background: "var(--buildrick-accent-tint)",
-  color: "var(--buildrick-accent)",
+  background: "var(--bk-accent-tint)",
+  color: "var(--bk-accent)",
   fontSize: 10,
   fontWeight: 700,
   textTransform: "uppercase",

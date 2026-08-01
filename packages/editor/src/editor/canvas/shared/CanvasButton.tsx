@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Canvas Button Component
  * Shared button component for canvas UI elements
@@ -7,6 +6,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import * as React from "react";
 import { CANVAS_COLORS, BUTTON_BASE_STYLE } from "../../../shared/constants/canvas";
+import { Button } from "@/editor/chrome-ui";
 
 export interface CanvasButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   onClick: () => void;
@@ -101,7 +101,7 @@ export const CanvasButton: React.FC<CanvasButtonProps> = ({
     ...variantStyle.base,
     ...(active && {
       background: CANVAS_COLORS.primary,
-      color: "var(--buildrick-text-on-accent)",
+      color: "var(--bk-accent-on)",
     }),
     ...(isHovered && !disabled && variantStyle.hover),
     ...(disabled && {

@@ -32,11 +32,11 @@ const cardStyle: React.CSSProperties = {
   alignItems: "center",
   gap: 6,
   padding: "10px 8px",
-  border: "1px solid var(--bd-border)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 6,
-  background: "var(--bd-bg-elevated)",
+  background: "var(--bk-bg-card)",
   fontSize: 11,
-  color: "var(--bd-fg-primary)",
+  color: "var(--bk-ink)",
   cursor: "grab",
   textAlign: "center",
   minHeight: 72,
@@ -49,7 +49,7 @@ const previewBoxStyle: React.CSSProperties = {
   justifyContent: "center",
   width: "100%",
   height: 36,
-  background: "var(--bd-bg-subtle, rgba(255,255,255,0.04))",
+  background: "var(--bk-bg-subtle, rgba(255,255,255,0.04))",
   borderRadius: 4,
   overflow: "hidden",
 };
@@ -57,7 +57,7 @@ const previewBoxStyle: React.CSSProperties = {
 const labelStyle: React.CSSProperties = {
   fontSize: 11,
   lineHeight: 1.2,
-  color: "var(--bd-fg-primary)",
+  color: "var(--bk-ink)",
   width: "100%",
   whiteSpace: "nowrap",
   overflow: "hidden",
@@ -71,8 +71,8 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
       return (
         <div
           style={{
-            background: "var(--bd-accent)",
-            color: "var(--bd-fg-on-accent)",
+            background: "var(--bk-accent)",
+            color: "var(--bk-accent-on)",
             fontSize: 9,
             padding: "3px 8px",
             borderRadius: 3,
@@ -87,11 +87,11 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
       return (
         <div
           style={{
-            border: "1px solid var(--bd-border)",
+            border: "1px solid var(--bk-border)",
             width: "80%",
             height: 18,
             borderRadius: 3,
-            background: "var(--bd-bg-canvas, transparent)",
+            background: "var(--bk-bg-subtle, transparent)",
           }}
         />
       );
@@ -99,7 +99,7 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
       return (
         <div
           style={{
-            border: "1px solid var(--bd-border)",
+            border: "1px solid var(--bk-border)",
             width: "80%",
             height: 18,
             borderRadius: 3,
@@ -108,7 +108,7 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
             justifyContent: "flex-end",
             paddingRight: 4,
             fontSize: 9,
-            color: "var(--bd-fg-secondary)",
+            color: "var(--bk-ink-soft)",
           }}
         >
           ▾
@@ -120,7 +120,7 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
           style={{
             width: 14,
             height: 14,
-            border: "1px solid var(--bd-border)",
+            border: "1px solid var(--bk-border)",
             borderRadius: 2,
           }}
         />
@@ -131,8 +131,8 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
           style={{
             width: 14,
             height: 14,
-            border: "1px solid var(--bd-border)",
-            borderRadius: "var(--bd-radius-full)",
+            border: "1px solid var(--bk-border)",
+            borderRadius: "var(--bk-radius-full)",
           }}
         />
       );
@@ -142,7 +142,7 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
           style={{
             width: 28,
             height: 14,
-            background: "var(--bd-border)",
+            background: "var(--bk-border)",
             borderRadius: 7,
             position: "relative",
           }}
@@ -154,15 +154,15 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
               left: 1,
               width: 12,
               height: 12,
-              background: "var(--bd-bg-card)",
-              borderRadius: "var(--bd-radius-full)",
+              background: "var(--bk-bg-card)",
+              borderRadius: "var(--bk-radius-full)",
             }}
           />
         </div>
       );
     case "label":
       return (
-        <div style={{ fontSize: 10, color: "var(--bd-fg-secondary)" }}>Label</div>
+        <div style={{ fontSize: 10, color: "var(--bk-ink-soft)" }}>Label</div>
       );
     case "spinner":
       return (
@@ -170,9 +170,9 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
           style={{
             width: 14,
             height: 14,
-            border: "2px solid var(--bd-border)",
-            borderTopColor: "var(--bd-accent)",
-            borderRadius: "var(--bd-radius-full)",
+            border: "2px solid var(--bk-border)",
+            borderTopColor: "var(--bk-accent)",
+            borderRadius: "var(--bk-radius-full)",
           }}
         />
       );
@@ -180,8 +180,8 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
       return (
         <div
           style={{
-            background: "var(--bd-bg-canvas)",
-            border: "1px solid var(--bd-border)",
+            background: "var(--bk-bg-subtle)",
+            border: "1px solid var(--bk-border)",
             width: "80%",
             height: 22,
             borderRadius: 3,
@@ -191,12 +191,12 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
     case "form-field":
       return (
         <div style={{ display: "flex", flexDirection: "column", gap: 2, width: "80%" }}>
-          <div style={{ fontSize: 8, color: "var(--bd-fg-secondary)", textAlign: "left" }}>
+          <div style={{ fontSize: 8, color: "var(--bk-ink-soft)", textAlign: "left" }}>
             Label
           </div>
           <div
             style={{
-              border: "1px solid var(--bd-border)",
+              border: "1px solid var(--bk-border)",
               height: 12,
               borderRadius: 2,
             }}
@@ -207,8 +207,8 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
       return (
         <div
           style={{
-            background: "var(--bd-success-soft)",
-            color: "var(--bd-success)",
+            background: "var(--bk-success-tint)",
+            color: "var(--bk-success)",
             fontSize: 8,
             padding: "2px 6px",
             borderRadius: 3,
@@ -224,8 +224,8 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
           style={{
             width: 22,
             height: 22,
-            borderRadius: "var(--bd-radius-full)",
-            background: "var(--bd-border)",
+            borderRadius: "var(--bk-radius-full)",
+            background: "var(--bk-border)",
           }}
         />
       );
@@ -233,8 +233,8 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
       return (
         <div
           style={{
-            background: "var(--bd-success-soft)",
-            color: "var(--bd-success)",
+            background: "var(--bk-success-tint)",
+            color: "var(--bk-success)",
             fontSize: 8,
             padding: "1px 6px",
             borderRadius: 9,
@@ -245,21 +245,21 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
       );
     case "breadcrumb":
       return (
-        <div style={{ fontSize: 9, color: "var(--bd-fg-secondary)" }}>Home / Page</div>
+        <div style={{ fontSize: 9, color: "var(--bk-ink-soft)" }}>Home / Page</div>
       );
     case "tabs":
       return (
-        <div style={{ display: "flex", gap: 4, fontSize: 8, color: "var(--bd-fg-secondary)" }}>
-          <span style={{ borderBottom: "2px solid var(--bd-accent)", paddingBottom: 1 }}>One</span>
+        <div style={{ display: "flex", gap: 4, fontSize: 8, color: "var(--bk-ink-soft)" }}>
+          <span style={{ borderBottom: "2px solid var(--bk-accent)", paddingBottom: 1 }}>One</span>
           <span>Two</span>
         </div>
       );
     case "pagination":
       return (
-        <div style={{ display: "flex", gap: 3, fontSize: 8, color: "var(--bd-fg-secondary)" }}>
+        <div style={{ display: "flex", gap: 3, fontSize: 8, color: "var(--bk-ink-soft)" }}>
           <span>‹</span>
           <span>1</span>
-          <span style={{ color: "var(--bd-accent)" }}>2</span>
+          <span style={{ color: "var(--bk-accent)" }}>2</span>
           <span>3</span>
           <span>›</span>
         </div>
@@ -267,16 +267,16 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
     case "list-item":
       return (
         <div style={{ display: "flex", flexDirection: "column", gap: 1, width: "80%", textAlign: "left" }}>
-          <div style={{ fontSize: 9, color: "var(--bd-fg-primary)" }}>Title</div>
-          <div style={{ fontSize: 7, color: "var(--bd-fg-secondary)" }}>Subtitle</div>
+          <div style={{ fontSize: 9, color: "var(--bk-ink)" }}>Title</div>
+          <div style={{ fontSize: 7, color: "var(--bk-ink-soft)" }}>Subtitle</div>
         </div>
       );
     case "tooltip":
       return (
         <div
           style={{
-            background: "var(--bd-fg-primary)",
-            color: "var(--bd-bg-canvas)",
+            background: "var(--bk-ink)",
+            color: "var(--bk-bg-subtle)",
             fontSize: 8,
             padding: "2px 6px",
             borderRadius: 3,
@@ -289,8 +289,8 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
       return (
         <div
           style={{
-            background: "var(--bd-bg-canvas)",
-            border: "1px solid var(--bd-border)",
+            background: "var(--bk-bg-subtle)",
+            border: "1px solid var(--bk-border)",
             width: "70%",
             height: 22,
             borderRadius: 3,
@@ -300,11 +300,11 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
       );
     case "section":
       return (
-        <div style={{ fontSize: 9, color: "var(--bd-fg-secondary)" }}>§ Section</div>
+        <div style={{ fontSize: 9, color: "var(--bk-ink-soft)" }}>§ Section</div>
       );
     case "hero":
       return (
-        <div style={{ fontSize: 8, color: "var(--bd-fg-secondary)" }}>Hero block</div>
+        <div style={{ fontSize: 8, color: "var(--bk-ink-soft)" }}>Hero block</div>
       );
     case "footer":
       return (
@@ -312,7 +312,7 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
           style={{
             width: "80%",
             height: 10,
-            background: "var(--bd-fg-primary)",
+            background: "var(--bk-ink)",
             opacity: 0.7,
             borderRadius: 2,
           }}
@@ -320,7 +320,7 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
       );
     case "pricing":
       return (
-        <div style={{ display: "flex", gap: 3, fontSize: 8, color: "var(--bd-fg-secondary)" }}>
+        <div style={{ display: "flex", gap: 3, fontSize: 8, color: "var(--bk-ink-soft)" }}>
           <span>$9</span>
           <span>$19</span>
           <span>$29</span>
@@ -330,8 +330,8 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
       return (
         <div
           style={{
-            background: "var(--bd-accent)",
-            color: "var(--bd-fg-on-accent)",
+            background: "var(--bk-accent)",
+            color: "var(--bk-accent-on)",
             fontSize: 9,
             padding: "3px 10px",
             borderRadius: 3,
@@ -349,7 +349,7 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
             alignItems: "center",
             width: "80%",
             fontSize: 8,
-            color: "var(--bd-fg-secondary)",
+            color: "var(--bk-ink-soft)",
           }}
         >
           <span>Logo</span>
@@ -371,7 +371,7 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
               key={i}
               style={{
                 height: 8,
-                background: "var(--bd-border)",
+                background: "var(--bk-border)",
                 borderRadius: 1,
               }}
             />
@@ -380,7 +380,7 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
       );
     default:
       return (
-        <div style={{ fontSize: 9, color: "var(--bd-fg-secondary)" }}>
+        <div style={{ fontSize: 9, color: "var(--bk-ink-soft)" }}>
           {component.name.slice(0, 8)}
         </div>
       );

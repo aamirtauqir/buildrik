@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * DrillInHeader - "← Back to [Parent]" header for drill-in screens
  * Shows breadcrumb path and back button for nested navigation
@@ -6,9 +5,10 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { PanelHeaderActions } from "@/editor/chrome-ui";
 import { BackArrowIcon } from "./headerIcons";
 import { drillInHeaderContainerStyles } from "./headerStyles";
-import { HeaderActions } from "@/shared/extensions/PanelHeader";
+import { Button } from "@/editor/chrome-ui";
 
 export interface DrillInHeaderProps {
   /** Current screen title (e.g., "Elements") */
@@ -171,7 +171,8 @@ export const DrillInHeader: React.FC<DrillInHeaderProps> = ({
         </nav>
       </div>
       {/* Action buttons */}
-      <HeaderActions
+      <PanelHeaderActions
+        label="panel"
         isPinned={isPinned}
         onPinToggle={onPinToggle}
         onHelpClick={onHelpClick}
@@ -202,9 +203,9 @@ const backButtonStyles: React.CSSProperties = {
   margin: "-4px",
   background: "transparent",
   border: "none",
-  borderRadius: "var(--buildrick-radius-md)",
-  color: "var(--buildrick-text-secondary)",
-  fontSize: "var(--buildrick-text-sm-plus)",
+  borderRadius: "var(--bk-radius-lg)",
+  color: "var(--bk-ink-soft)",
+  fontSize: "var(--bk-text-13)",
   fontWeight: 500,
   cursor: "pointer",
   transition: "background 0.15s ease, color 0.15s ease",
@@ -218,18 +219,18 @@ const breadcrumbStyles: React.CSSProperties = {
 };
 
 const breadcrumbItemStyles: React.CSSProperties = {
-  fontSize: "var(--buildrick-text-sm)",
+  fontSize: "var(--bk-text-12)",
   fontWeight: 400,
-  color: "var(--buildrick-text-muted)",
+  color: "var(--bk-ink-muted)",
 };
 
 const breadcrumbSeparatorStyles: React.CSSProperties = {
-  fontSize: "var(--buildrick-text-sm)",
-  color: "var(--buildrick-text-disabled)",
+  fontSize: "var(--bk-text-12)",
+  color: "var(--bk-ink-disabled)",
 };
 
 const breadcrumbCurrentStyles: React.CSSProperties = {
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bk-ink-soft)",
   fontWeight: 500,
 };
 

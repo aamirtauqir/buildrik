@@ -19,8 +19,8 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button } from "@/editor/shared/vibcoder/Button";
 import type { LintIssue, LintRuleId } from "../../../engine/designSystem/linter";
+import { Button } from "@/editor/chrome-ui";
 
 export interface DSLintBannerProps {
   issues: readonly LintIssue[];
@@ -70,8 +70,8 @@ export const DSLintBanner: React.FC<DSLintBannerProps> = ({
       aria-live={tone === "error" ? "assertive" : "polite"}
       className={`bd-ds-lint-banner bd-ds-lint-banner--${tone}`}
       style={{
-        background: tone === "error" ? "var(--bd-error-tint)" : "var(--bd-warning-tint)",
-        borderLeft: `3px solid ${tone === "error" ? "var(--bd-error)" : "var(--bd-warning)"}`,
+        background: tone === "error" ? "var(--bk-error-tint)" : "var(--bk-warning-tint)",
+        borderLeft: `3px solid ${tone === "error" ? "var(--bk-error)" : "var(--bk-warning)"}`,
         padding: "10px 12px",
         borderRadius: "0 6px 6px 0",
         fontSize: 12,
@@ -82,7 +82,7 @@ export const DSLintBanner: React.FC<DSLintBannerProps> = ({
         style={{
           listStyle: "none",
           fontSize: 11,
-          color: "var(--bd-text)",
+          color: "var(--bk-ink)",
           marginTop: 6,
           padding: 0,
           lineHeight: 1.7,
@@ -98,8 +98,7 @@ export const DSLintBanner: React.FC<DSLintBannerProps> = ({
         <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
           {onReviewAll && (
             <Button
-              variant="primary"
-              size="sm"
+              size="xs"
               type="button"
               onClick={onReviewAll}
               style={{ fontSize: 10 }}
@@ -109,11 +108,11 @@ export const DSLintBanner: React.FC<DSLintBannerProps> = ({
           )}
           {onDismiss && (
             <Button
-              variant="ghost"
-              size="sm"
+              color="light"
+              size="xs"
               type="button"
               onClick={onDismiss}
-              style={{ fontSize: 10 }}
+              style={{ fontSize: 10 }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
             >
               Dismiss
             </Button>

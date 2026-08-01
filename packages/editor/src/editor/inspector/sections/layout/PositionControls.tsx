@@ -1,18 +1,16 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Position Controls - Position mode selection and offset inputs
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { HelpTooltip } from "../../../../shared/ui/HelpTooltip";
+import { HelpTooltip } from "@/editor/chrome-ui";
 import { InputRow } from "../../shared/controls";
 import { baseStyles } from "../../shared/controls/controlStyles";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
 import { PositionPreview } from "./previews";
 import { cardBtn, positionOffsetContainerStyle, positionOffsetBoxStyle } from "./styles";
-
+import { Button, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -65,7 +63,7 @@ export const PositionControls: React.FC<PositionControlsProps> = ({
       <div
         style={{
           fontSize: 12,
-          color: "var(--buildrick-text-tertiary)",
+          color: "var(--bk-ink-muted)",
           marginBottom: 6,
           display: "flex",
           alignItems: "center",
@@ -159,7 +157,7 @@ const PositionOffsetControls: React.FC<PositionOffsetControlsProps> = ({
 
   return (
     <div style={positionOffsetContainerStyle}>
-      <div style={{ fontSize: 12, color: "var(--buildrick-text-muted)", marginBottom: 6, display: "flex", alignItems: "center" }}>
+      <div style={{ fontSize: 12, color: "var(--bk-ink-muted)", marginBottom: 6, display: "flex", alignItems: "center" }}>
         {(mixedKeys?.has("top") || mixedKeys?.has("right") || mixedKeys?.has("bottom") || mixedKeys?.has("left")) && (
           <MixedValueBadge compact />
         )}
@@ -179,7 +177,7 @@ const PositionOffsetControls: React.FC<PositionOffsetControlsProps> = ({
       >
         {/* Top */}
         <div />
-        <Input
+        <TextInput
           type="text"
           value={styles.top || ""}
           onChange={(e) => onChange("top", e.target.value)}
@@ -191,7 +189,7 @@ const PositionOffsetControls: React.FC<PositionOffsetControlsProps> = ({
         <div />
 
         {/* Left - Box - Right */}
-        <Input
+        <TextInput
           type="text"
           value={styles.left || ""}
           onChange={(e) => onChange("left", e.target.value)}
@@ -201,7 +199,7 @@ const PositionOffsetControls: React.FC<PositionOffsetControlsProps> = ({
           title={reason("left")}
         />
         <div style={positionOffsetBoxStyle} />
-        <Input
+        <TextInput
           type="text"
           value={styles.right || ""}
           onChange={(e) => onChange("right", e.target.value)}
@@ -213,7 +211,7 @@ const PositionOffsetControls: React.FC<PositionOffsetControlsProps> = ({
 
         {/* Bottom */}
         <div />
-        <Input
+        <TextInput
           type="text"
           value={styles.bottom || ""}
           onChange={(e) => onChange("bottom", e.target.value)}
@@ -229,7 +227,7 @@ const PositionOffsetControls: React.FC<PositionOffsetControlsProps> = ({
         {mixedKeys?.has("z-index") && (
           <div style={{ display: "flex", alignItems: "center", marginBottom: 2 }}>
             <MixedValueBadge compact />
-            <span style={{ fontSize: 11, color: "var(--buildrick-text-muted)" }}>Z-Index</span>
+            <span style={{ fontSize: 11, color: "var(--bk-ink-muted)" }}>Z-Index</span>
           </div>
         )}
         <InputRow

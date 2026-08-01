@@ -29,7 +29,7 @@ const DEFAULT_ICON_SVG = `<svg
   stroke-linejoin="round"
   data-icon="star"
   data-library="lucide"
-  style="color: var(--bd-fg-on-accent);"
+  style="color: var(--bk-accent-on);"
 >
   <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
 </svg>`;
@@ -55,14 +55,14 @@ function buildIconBlock(
     "justify-content": "center",
     width: "32px",
     height: "32px",
-    color: "var(--bd-fg-on-accent)",
+    color: "var(--bk-accent-on)",
   });
 
   // Add data attributes for icon config
   element.setAttribute("data-icon-name", "star");
   element.setAttribute("data-icon-library", "lucide");
   element.setAttribute("data-icon-size", "32");
-  element.setAttribute("data-icon-color", "var(--bd-bg-card)");
+  element.setAttribute("data-icon-color", "var(--bk-bg-card)");
   element.setAttribute("data-icon-stroke", "2");
 
   composer.elements.addElement(element, parentId, dropIndex);

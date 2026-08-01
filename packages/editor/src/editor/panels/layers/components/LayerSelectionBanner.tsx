@@ -1,10 +1,10 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * LayerSelectionBanner - Bulk action bar shown when 2+ layers are selected.
  * Props-only, no hook imports. Escape closes via keyboard listener.
  * @license BSD-3-Clause
  */
 import * as React from "react";
+import { Button } from "@/editor/chrome-ui";
 
 interface LayerSelectionBannerProps {
   count: number;

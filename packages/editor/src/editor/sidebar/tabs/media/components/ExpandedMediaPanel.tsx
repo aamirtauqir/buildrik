@@ -13,26 +13,25 @@
  */
 
 import * as React from "react";
+import { ConfirmDialog, useToast } from "@/editor/chrome-ui";
 import { Maximize2, Minimize2, Plus, Upload, X } from "lucide-react";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Input } from "@/editor/shared/vibcoder/Input";
 import type { Composer } from "../../../../../engine/Composer";
 import type { LibraryItem, MediaStateResult } from "../data/mediaTypes";
 import type { IconConfig, MediaFolder } from "@shared/types/media";
-import { useToast } from "@/editor/shared/vibcoder";
 import { TypePills } from "./TypePills";
 import { LibraryView } from "./LibraryView";
 import { FolderBreadcrumb } from "./FolderBreadcrumb";
 import { AssetDetailOverlay } from "./AssetDetailOverlay";
 import { MediaContextMenu } from "./MediaContextMenu";
 import { ConfirmDeleteModal } from "./ConfirmDeleteModal";
-import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
 import { EmptyFolderDropZone } from "./EmptyFolderDropZone";
 import { FolderContextMenu } from "./FolderContextMenu";
 import { StockSourceModal } from "./StockSourceModal";
 import { ReplaceAcrossDialog } from "./ReplaceAcrossDialog";
 import "../MediaTab.css";
 import "./ExpandedMediaPanel.css";
+import { Button } from "@/editor/chrome-ui";
+import { TextField } from "@/editor/chrome-ui";
 
 export interface ExpandedMediaPanelProps {
   composer: Composer;
@@ -383,7 +382,7 @@ export function ExpandedMediaPanel({
                 onDrop={(e) => handleFolderDrop(e, f.id)}
               >
                 {renamingFolderId === f.id ? (
-                  <Input
+                  <TextField
                     type="text"
                     className="exp-folder-item__rename-input"
                     value={renameDraft}
@@ -561,7 +560,7 @@ export function ExpandedMediaPanel({
         />
       )}
       <ConfirmDialog
-        isOpen={!!deleteFolderTarget}
+        open={!!deleteFolderTarget}
         onClose={() => setDeleteFolderTarget(null)}
         onConfirm={handleConfirmDelete}
         title={
@@ -574,8 +573,8 @@ export function ExpandedMediaPanel({
             ? `This folder contains ${deleteFolderTarget.assetCount} item${deleteFolderTarget.assetCount === 1 ? "" : "s"}${deleteFolderTarget.subFolderCount > 0 ? ` and ${deleteFolderTarget.subFolderCount} subfolder${deleteFolderTarget.subFolderCount === 1 ? "" : "s"}` : ""}. Items will move to the parent folder.`
             : "Are you sure you want to delete this folder?"
         }
-        confirmText="Delete Folder"
-        variant="danger"
+        confirmLabel="Delete Folder"
+        destructive
       />
     </div>
   );

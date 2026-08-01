@@ -1,6 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Stack } from "@/editor/shared/vibcoder/Stack";
 /**
  * CommandPalette — Studio-level Command Palette
  * Triggered by Ctrl+K / ⌘+K
@@ -15,7 +12,7 @@ import type { Composer } from "../../../engine";
 import { EVENTS } from "../../../shared/constants/events";
 import { GROUPED_TABS_CONFIG } from "../../rail/tabsConfig";
 import { getRecentCommandIds, recordCommandRun } from "./commandRecents";
-
+import { Button, TextInput } from "@/editor/chrome-ui";
 // =============================================================================
 // TYPES
 // =============================================================================
@@ -201,11 +198,11 @@ const ShortcutBadge: React.FC<{ shortcut: string }> = ({ shortcut }) => {
     <span
       style={{
         fontSize: 11,
-        color: "var(--buildrick-text-muted)",
-        background: "var(--buildrick-surface-4)",
-        borderRadius: "var(--buildrick-radius-sm)",
+        color: "var(--bk-ink-muted)",
+        background: "var(--bk-gray-200)",
+        borderRadius: "var(--bk-radius-sm)",
         padding: "2px 6px",
-        fontFamily: "var(--buildrick-font-family-mono)",
+        fontFamily: "var(--bk-font-mono)",
         whiteSpace: "nowrap",
         flexShrink: 0,
       }}
@@ -337,27 +334,27 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
           position: "fixed",
           inset: 0,
           background: "rgba(0,0,0,0.6)",
-          zIndex: "calc(var(--buildrick-z-modal) - 1)",
+          zIndex: "calc(var(--bk-z-modal) - 1)",
         }}
       />
       {/* Panel */}
-      <Stack
+      <div
+        className="tw:flex tw:flex-col tw:gap-0"
         role="dialog"
         aria-label="Command Palette"
         aria-modal="true"
         style={{
-          gap: 0,
           position: "fixed",
           top: "20%",
           left: "50%",
           transform: "translateX(-50%)",
           width: 560,
           maxWidth: "90vw",
-          background: "var(--buildrick-surface-3)",
-          border: "1px solid var(--buildrick-border-light)",
-          borderRadius: "var(--buildrick-radius-xl)",
-          boxShadow: "var(--buildrick-shadow-overlay)",
-          zIndex: "var(--buildrick-z-modal)",
+          background: "var(--bk-bg-subtle)",
+          border: "1px solid var(--bk-border)",
+          borderRadius: "var(--bk-radius-lg)",
+          boxShadow: "var(--bk-shadow-overlay)",
+          zIndex: "var(--bk-z-modal)",
           overflow: "hidden",
         }}
       >
@@ -369,7 +366,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
             height: 52,
             padding: "0 16px",
             gap: 10,
-            borderBottom: "1px solid var(--buildrick-border)",
+            borderBottom: "1px solid var(--bk-border)",
           }}
         >
           {/* Search icon */}
@@ -378,7 +375,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
             height={18}
             viewBox="0 0 24 24"
             fill="none"
-            stroke="var(--buildrick-text-muted)"
+            stroke="var(--bk-ink-muted)"
             strokeWidth={2}
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -389,7 +386,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
             <line x1={21} y1={21} x2={16.65} y2={16.65} />
           </svg>
 
-          <Input
+          <TextInput
             ref={inputRef}
             type="text"
             placeholder="Search commands..."
@@ -403,7 +400,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
               border: "none",
               outline: "none",
               fontSize: 16,
-              color: "var(--buildrick-text-primary)",
+              color: "var(--bk-ink)",
               fontFamily: "inherit",
             }}
           />
@@ -416,7 +413,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
             maxHeight: 360,
             overflowY: "auto",
             scrollbarWidth: "thin",
-            scrollbarColor: "var(--buildrick-bg-pressed) transparent",
+            scrollbarColor: "var(--bk-gray-200) transparent",
           }}
         >
           {displayCommands.length === 0 ? (
@@ -427,15 +424,15 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
               <div style={{ padding: "14px 16px" }} data-testid="cmdk-no-results">
                 {query.trim().split(/\s+/).length > 1 ? (
                   <>
-                    <div style={{ fontSize: 13, color: "var(--buildrick-text-primary)" }}>
+                    <div style={{ fontSize: 13, color: "var(--bk-ink)" }}>
                       That isn&rsquo;t a command — send it to AI?
                     </div>
-                    <div style={{ fontSize: 12, color: "var(--buildrick-text-muted)", margin: "6px 0 10px" }}>
+                    <div style={{ fontSize: 12, color: "var(--bk-ink-muted)", margin: "6px 0 10px" }}>
                       AI proposes a diff and never writes directly. Apply lands as one undo step.
                     </div>
                   </>
                 ) : (
-                  <div style={{ fontSize: 13, color: "var(--buildrick-text-primary)", marginBottom: 10 }}>
+                  <div style={{ fontSize: 13, color: "var(--bk-ink)", marginBottom: 10 }}>
                     Nothing matches &lsquo;{query.trim()}&rsquo;.
                   </div>
                 )}
@@ -447,11 +444,11 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
                     alignItems: "center",
                     gap: 8,
                     padding: "8px 12px",
-                    background: "var(--buildrick-accent-tint)",
+                    background: "var(--bk-accent-tint)",
                     border: "none",
-                    borderRadius: "var(--buildrick-radius-sm)",
+                    borderRadius: "var(--bk-radius-sm)",
                     cursor: "pointer",
-                    color: "var(--buildrick-accent)",
+                    color: "var(--bk-accent)",
                     fontSize: 13,
                     fontWeight: 600,
                   }}
@@ -465,7 +462,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
                 style={{
                   padding: "24px 16px",
                   textAlign: "center",
-                  color: "var(--buildrick-text-muted)",
+                  color: "var(--bk-ink-muted)",
                   fontSize: 13,
                 }}
               >
@@ -486,8 +483,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
                       fontSize: 11,
                       textTransform: "uppercase",
                       letterSpacing: "0.5px",
-                      color: "var(--buildrick-text-muted)",
-                      background: "var(--buildrick-surface-2)",
+                      color: "var(--bk-ink-muted)",
+                      background: "var(--bk-bg-subtle)",
                     }}
                   >
                     {group}
@@ -513,7 +510,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
                           padding: "0 16px",
                           gap: 10,
                           background: isSelected
-                            ? "var(--buildrick-accent-tint)"
+                            ? "var(--bk-accent-tint)"
                             : "transparent",
                           border: "none",
                           cursor: cmd.disabled ? "default" : "pointer",
@@ -532,7 +529,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
-                                color: "var(--buildrick-text-muted)",
+                                color: "var(--bk-ink-muted)",
                                 flexShrink: 0,
                                 fontSize: 14,
                               }}
@@ -543,7 +540,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
                           <span
                             style={{
                               fontSize: 14,
-                              color: "var(--buildrick-text-primary)",
+                              color: "var(--bk-ink)",
                               overflow: "hidden",
                               textOverflow: "ellipsis",
                               whiteSpace: "nowrap",
@@ -555,7 +552,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
                             <span
                               style={{
                                 fontSize: 11,
-                                color: "var(--buildrick-text-muted)",
+                                color: "var(--bk-ink-muted)",
                                 whiteSpace: "nowrap",
                                 flexShrink: 0,
                               }}
@@ -581,9 +578,9 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            borderTop: "1px solid var(--buildrick-border)",
+            borderTop: "1px solid var(--bk-border)",
             fontSize: 11,
-            color: "var(--buildrick-text-muted)",
+            color: "var(--bk-ink-muted)",
             gap: 16,
           }}
         >
@@ -591,7 +588,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
           <span>↵ run</span>
           <span>Esc close</span>
         </div>
-      </Stack>
+      </div>
     </>
   );
 };

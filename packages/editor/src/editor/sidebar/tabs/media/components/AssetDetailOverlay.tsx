@@ -15,8 +15,6 @@
 
 import * as React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 import { OptimizationPanel } from "@/editor/media/OptimizationPanel";
 import type { LibraryItem } from "../data/mediaTypes";
 import { fmtDur, fmtSize } from "../data/mediaUtils";
@@ -26,6 +24,8 @@ import {
   restoreAssetVersion,
   type AssetVersion,
 } from "../../../../../services/MediaVersionService";
+import { Button } from "@/editor/chrome-ui";
+import { TextField } from "@/editor/chrome-ui";
 
 type Tab = "preview" | "used" | "versions" | "edit" | "optimize";
 
@@ -223,8 +223,8 @@ export function AssetDetailOverlay({
           <Button
             key={t.id}
             type="button"
-            variant="ghost"
-            size="sm"
+            color="light"
+            size="xs"
             role="tab"
             aria-selected={tab === t.id}
             className={`med-detail-tab${tab === t.id ? " is-active" : ""}`}
@@ -242,7 +242,7 @@ export function AssetDetailOverlay({
       <div className="med-detail-body" role="tabpanel">
         {metaError ? (
           <div className="med-detail-error-body">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--bd-fg-secondary, var(--bd-fg-muted))" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--bk-ink-soft, var(--bk-ink-muted))" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="3" width="18" height="18" rx="2" />
               <line x1="9" y1="9" x2="15" y2="15" />
               <line x1="15" y1="9" x2="9" y2="15" />
@@ -271,7 +271,7 @@ export function AssetDetailOverlay({
               )}
             </div>
             <div className="med-detail-meta-section">
-              <Input
+              <TextField
                 ref={inputRef}
                 className="med-detail-name"
                 value={name}
@@ -340,8 +340,8 @@ export function AssetDetailOverlay({
                   <li key={v.key}>
                     <Button
                       type="button"
-                      variant="ghost"
-                      size="sm"
+                      color="light"
+                      size="xs"
                       className={`med-detail-version-row${v.key === item.key ? " is-current" : ""}`}
                       onClick={() => v.key !== item.key && onOpenItem?.(v)}
                       disabled={v.key === item.key || !onOpenItem}
@@ -374,10 +374,10 @@ export function AssetDetailOverlay({
                         </span>
                         <Button
                           type="button"
-                          variant="ghost"
-                          size="sm"
+                          color="light"
+                          size="xs"
                           onClick={() => handleRestoreVersion(v.id)}
-                          disabled={restoringId !== null}
+                          disabled={restoringId !== null} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
                         >
                           {restoringId === v.id ? "Restoring…" : "Restore"}
                         </Button>
@@ -392,7 +392,7 @@ export function AssetDetailOverlay({
           <div className="med-detail-edit-pane">
             <label className="med-detail-edit-field">
               <span className="med-detail-edit-label">Alt text</span>
-              <Input
+              <TextField
                 className="med-detail-alt-input"
                 value={altDraft}
                 onChange={(e) => setAltDraft(e.target.value)}

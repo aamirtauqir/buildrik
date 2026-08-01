@@ -1,7 +1,3 @@
-import { Input as VibcoderInput } from "@/editor/shared/vibcoder/Input";
-import { Textarea as VibcoderTextarea } from "@/editor/shared/vibcoder/Textarea";
-import { Select as VibcoderSelect } from "@/editor/shared/vibcoder/Select";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Settings tab — shared primitives.
  *
@@ -24,7 +20,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 import * as React from "react";
 import { SIDEBAR_WIDE } from "@/shared/constants/layout";
 import "./settings.css";
-
+import { Button, type CustomFlowbiteTheme, Select as FlowbiteSelect, Textarea as FlowbiteTextarea, TextInput as FlowbiteTextInput } from "@/editor/chrome-ui";
 // ─────────────────────────────────────────────────────────────────────────────
 // Section
 // ─────────────────────────────────────────────────────────────────────────────
@@ -68,22 +64,48 @@ export const Field: React.FC<FieldProps> = ({ label, hint, htmlFor, children }) 
 // Input / Textarea / Select
 // ─────────────────────────────────────────────────────────────────────────────
 
-type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
+// flowbite's TextInput applies the consumer's `className` to an OUTER
+// wrapper div (TextInput.js), never to the actual <input> — same structural
+// gap as Select below. Reproduced `.bd-set-input`'s exact box
+// (settings.css:240: 7×9px padding, 5px radius, 11.5px/500 font,
+// `--bk-border` border, `--bk-accent`/`--bk-accent-tint` focus ring) via a
+// per-instance `theme` override, same shape as SETTINGS_SELECT_THEME below:
+// the radius override has to live in `withAddon.off` (flowbite's own
+// `rounded-lg` default lives there too, positioned after `colors`/`sizes`
+// in TextInput.js's own twMerge call, so a `colors.gray`-only override
+// would lose the merge).
+const SETTINGS_TEXT_INPUT_THEME: NonNullable<CustomFlowbiteTheme["textInput"]> = {
+  field: {
+    input: {
+      colors: {
+        gray:
+          "tw:border-[var(--bk-border)] tw:bg-white tw:text-[var(--bk-ink)] tw:focus:border-[var(--bk-accent)] tw:focus:ring-[3px] tw:focus:ring-[var(--bk-accent-tint)] tw:focus:outline-none",
+      },
+      sizes: {
+        md: "tw:py-[7px] tw:px-[9px] tw:text-[11.5px] tw:font-medium tw:[font-family:var(--bk-font-ui)]",
+      },
+      withAddon: {
+        off: "tw:rounded-[5px]",
+      },
+    },
+  },
+};
+
+// `className` is intentionally NOT part of this props type: flowbite's
+// TextInput only ever applies `className` to its OUTER wrapper div (never
+// the real <input> — see SETTINGS_TEXT_INPUT_THEME's comment above), so
+// accepting one here would silently promise styling it can't deliver. No
+// consumer passes one today (verified); the type omission keeps it that way.
+type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, "className">;
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, ...rest }, ref) => (
-    <VibcoderInput
-      ref={ref}
-      className={`bd-set-input${className ? " " + className : ""}`}
-      {...rest}
-    />
-  )
+  (props, ref) => <FlowbiteTextInput ref={ref} theme={SETTINGS_TEXT_INPUT_THEME} {...props} />
 );
 Input.displayName = "Input";
 
 type TextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement>;
 export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ className, ...rest }, ref) => (
-    <VibcoderTextarea
+    <FlowbiteTextarea
       ref={ref}
       className={`bd-set-input${className ? " " + className : ""}`}
       {...rest}
@@ -92,16 +114,40 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
 );
 Textarea.displayName = "Textarea";
 
+// flowbite's Select applies the consumer's `className` to an OUTER wrapper
+// div (Select.js), never to the actual <select> — so the `.bd-set-input`
+// class this component used to forward can't reach the select's own
+// border/padding/font/focus-ring the way it did through the old
+// vibcoder <Select>. Reproduced `.bd-set-input`'s exact box (settings.css:240)
+// via a per-instance `theme` override instead — verified empirically
+// (render + className probe) that `withAddon.off` is what actually has to
+// carry the radius override: flowbite's own `rounded-lg` comes from
+// `theme.field.select.withAddon.off` ("off" = no addon, our case), which is
+// positioned AFTER `colors`/`sizes` in Select.js's own twMerge call, so a
+// radius override placed in `colors.gray` loses the merge unless it's also
+// (or instead) placed here.
+const SETTINGS_SELECT_THEME: NonNullable<CustomFlowbiteTheme["select"]> = {
+  field: {
+    select: {
+      colors: {
+        gray: "tw:border-gray-200 tw:bg-white tw:text-gray-900 tw:font-medium tw:focus:border-blue-700 tw:focus:ring-[3px] tw:focus:ring-blue-50 tw:focus:outline-none",
+      },
+      sizes: {
+        md: "tw:py-[7px] tw:px-[9px] tw:text-[11.5px]",
+      },
+      withAddon: {
+        off: "tw:rounded-[5px]",
+      },
+    },
+  },
+};
+
 type SelectProps = Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "size">;
 export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
   ({ className, children, ...rest }, ref) => (
-    <VibcoderSelect
-      ref={ref}
-      className={`bd-set-input${className ? " " + className : ""}`}
-      {...rest}
-    >
+    <FlowbiteSelect ref={ref} className={className} theme={SETTINGS_SELECT_THEME} {...rest}>
       {children}
-    </VibcoderSelect>
+    </FlowbiteSelect>
   )
 );
 Select.displayName = "Select";
@@ -187,13 +233,13 @@ const lockedIconStyle: React.CSSProperties = {
   marginBottom: 4,
 };
 const lockedTitleStyle: React.CSSProperties = {
-  font: "600 14px var(--bd-font)",
-  color: "var(--bd-fg-heading)",
+  font: "600 14px var(--bk-font-ui)",
+  color: "var(--bk-ink)",
   margin: 0,
 };
 const lockedDescStyle: React.CSSProperties = {
-  font: "500 12px var(--bd-font)",
-  color: "var(--bd-fg-muted)",
+  font: "500 12px var(--bk-font-ui)",
+  color: "var(--bk-ink-muted)",
   maxWidth: LOCKED_MAX_WIDTH,
   lineHeight: 1.5,
   margin: 0,
@@ -201,11 +247,11 @@ const lockedDescStyle: React.CSSProperties = {
 const lockedBtnStyle: React.CSSProperties = {
   marginTop: 8,
   padding: "8px 16px",
-  borderRadius: "var(--buildrick-radius-sm)",
-  background: "var(--bd-accent)",
-  color: "var(--bd-fg-on-accent)",
+  borderRadius: "var(--bk-radius-sm)",
+  background: "var(--bk-accent)",
+  color: "var(--bk-accent-on)",
   border: "none",
-  font: "600 12px var(--bd-font)",
+  font: "600 12px var(--bk-font-ui)",
   cursor: "pointer",
 };
 

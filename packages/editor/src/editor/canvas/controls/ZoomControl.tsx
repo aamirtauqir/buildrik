@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Aquibra Zoom Control
  * Canvas zoom controls
@@ -16,6 +15,7 @@ import {
   SIZES,
   Z_INDEX,
 } from "../shared";
+import { Button } from "@/editor/chrome-ui";
 
 export interface ZoomControlProps {
   zoom: number;
@@ -50,7 +50,7 @@ export const ZoomControl: React.FC<ZoomControlProps> = ({
         alignItems: "center",
         gap: SIZES.padding.xs,
         padding: SIZES.padding.xs,
-        background: "var(--buildrick-bg-panel-secondary)",
+        background: "var(--bk-bg-subtle)",
         borderRadius: SIZES.borderRadius.lg,
       }}
     >

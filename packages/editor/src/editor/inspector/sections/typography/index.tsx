@@ -71,8 +71,8 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
       <span
         style={{
           fontSize: 11,
-          color: "var(--buildrick-text-tertiary)",
-          fontFamily: "var(--buildrick-font-family-mono)",
+          color: "var(--bk-ink-muted)",
+          fontFamily: "var(--bk-font-mono)",
           whiteSpace: "nowrap",
           maxWidth: 140,
           overflow: "hidden",

@@ -1,5 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * @lint-hex-policy: component-theme
  *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
@@ -22,7 +20,7 @@ import { ConfirmDeleteModal } from "../sidebar/tabs/media/components/ConfirmDele
 import { MediaContextMenu } from "../sidebar/tabs/media/components/MediaContextMenu";
 import { AssetDetailOverlay } from "../sidebar/tabs/media/components/AssetDetailOverlay";
 import { STORAGE_QUOTA_BYTES } from "../../shared/constants/media";
-import { useToast } from "@/editor/shared/vibcoder";
+import { useToast } from "@/editor/chrome-ui";
 import type { LibraryItem } from "../sidebar/tabs/media/data/mediaTypes";
 import type { IconConfig } from "../../shared/types/media";
 import { FolderTree, type SmartFolder } from "./components/FolderTree";
@@ -33,6 +31,7 @@ import { formatBytes } from "@shared/utils/helpers/number";
 import { generateAltTextRemote } from "../../services/AltTextService";
 import { DEFAULT_MODEL } from "@buildrik/shared/schemas/ai";
 import "./LibraryManager.css";
+import { Button, TextInput } from "@/editor/chrome-ui";
 
 interface LibraryManagerProps {
   composer: Composer;
@@ -264,7 +263,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           />
           <div className="mgr-search">
             <Search size={14} />
-            <Input
+            <TextInput
               ref={searchRef}
               type="text"
               placeholder="Search across all folders..."
@@ -379,7 +378,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
       </div>
       {/* ═══ STATUS BAR ═══ */}
       <div className="mgr-status">
-        <span><strong style={{ color: "var(--buildrick-text-secondary)" }}>{state.counts.all}</strong> assets</span>
+        <span><strong style={{ color: "var(--bk-ink-soft)" }}>{state.counts.all}</strong> assets</span>
         <span className="mgr-status-dot" />
         <span>{formatBytes(state.storage.used)} / {formatBytes(state.storage.total)}</span>
         <div className="mgr-status-right">
@@ -393,7 +392,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
         </div>
       </div>
       {/* Hidden file input */}
-      <Input
+      <TextInput
         ref={fileInputRef}
         type="file"
         multiple

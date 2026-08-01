@@ -1,12 +1,15 @@
 /**
- * SliderField — labelled range slider wrapper.
- * Internal: composes vibcoder <Slider> directly.
+ * SliderField — labelled range slider.
+ * Internal: composes ui <Label> + <Slider>. The ui Slider's `label` prop is
+ * aria-only, so the visible label the old vibcoder head row rendered is a
+ * real <Label> here; the value readout is the Slider's numeric field.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { Slider } from "@/editor/shared/vibcoder";
+import { Slider } from "@/editor/chrome-ui";
+import { BK_LABEL_CLASS, Label } from "@/editor/chrome-ui";
 
 export interface SliderFieldProps {
   label?: string;
@@ -30,18 +33,32 @@ export const SliderField: React.FC<SliderFieldProps> = ({
   disabled = false,
   unit,
   id,
-}) => (
-  <Slider
-    id={id}
-    label={label}
-    value={value}
-    onChange={onChange ?? (() => {})}
-    min={min}
-    max={max}
-    step={step}
-    disabled={disabled}
-    unit={unit}
-  />
-);
+}) => {
+  const generatedId = React.useId();
+  const sliderId = id || generatedId;
+
+  const slider = (
+    <Slider
+      id={sliderId}
+      label={label}
+      value={value}
+      onChange={onChange ?? (() => {})}
+      min={min}
+      max={max}
+      step={step}
+      disabled={disabled}
+      unit={unit}
+    />
+  );
+
+  if (!label) return slider;
+
+  return (
+    <div>
+      <Label htmlFor={sliderId} className={BK_LABEL_CLASS}>{label}</Label>
+      {slider}
+    </div>
+  );
+};
 
 export default SliderField;

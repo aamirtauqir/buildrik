@@ -18,13 +18,13 @@ import { SelectionHandles } from "./SelectionHandles";
 
 // CSS variable references for colors - single source of truth is Canvas.css
 const SELECTION_VARS = {
-  primary: "var(--buildrick-accent)",
-  primaryLight: "var(--buildrick-accent-subtle)",
-  glow: "var(--buildrick-glow-selection)",
-  alpha40: "var(--buildrick-accent-tint)",
-  alpha10: "var(--buildrick-accent-tint)",
-  gradient: "var(--buildrick-handle-gradient)",
-  glowSm: "var(--buildrick-selection-glow-sm)",
+  primary: "var(--bk-accent)",
+  primaryLight: "var(--bk-accent-subtle)",
+  glow: "var(--bk-shadow-focus)",
+  alpha40: "var(--bk-accent-tint)",
+  alpha10: "var(--bk-accent-tint)",
+  gradient: "var(--bk-accent)",
+  glowSm: "var(--bk-shadow-raised)",
 };
 
 interface SelectionBoxOverlayProps {
@@ -398,7 +398,7 @@ const SelectionBoxOverlayComponent: React.FC<SelectionBoxOverlayProps> = ({
             width: 20,
             height: 20,
             background: SELECTION_VARS.gradient,
-            borderRadius: "var(--bd-radius-full)",
+            borderRadius: "var(--bk-radius-full)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -433,8 +433,8 @@ const SelectionBoxOverlayComponent: React.FC<SelectionBoxOverlayProps> = ({
             top: top - 20,
             width: 16,
             height: 16,
-            background: "var(--buildrick-warning)",
-            borderRadius: "var(--bd-radius-full)",
+            background: "var(--bk-warning)",
+            borderRadius: "var(--bk-radius-full)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -486,7 +486,7 @@ const SelectionBoxOverlayComponent: React.FC<SelectionBoxOverlayProps> = ({
             height: 12,
             backgroundColor: "white",
             border: `2px solid ${SELECTION_VARS.primary}`,
-            borderRadius: "var(--bd-radius-full)",
+            borderRadius: "var(--bk-radius-full)",
             cursor: "grab",
             pointerEvents: "auto",
             boxShadow: SELECTION_VARS.glowSm,

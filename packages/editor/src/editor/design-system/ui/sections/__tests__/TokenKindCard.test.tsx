@@ -71,7 +71,7 @@ describe("TokenKindCard", () => {
       </TokenKindCard>
     );
     const button = getByRole("button") as HTMLButtonElement;
-    expect(button.style.fontFamily).toContain("var(--buildrick-font-family-mono");
+    expect(button.style.fontFamily).toContain("var(--bk-font-mono");
     expect(button.style.textTransform).toBe("uppercase");
     expect(button.style.letterSpacing).toBe("0.08em");
   });

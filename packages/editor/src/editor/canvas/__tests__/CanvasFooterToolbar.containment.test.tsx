@@ -23,7 +23,6 @@ import { describe, it, expect, vi, beforeAll } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { render as rtlRender, screen } from "@testing-library/react";
-import { TooltipProvider } from "@/editor/shared/vibcoder/Tooltip";
 import { CanvasFooterToolbar } from "../CanvasFooterToolbar";
 
 const ALL_OFF = { guides: false, spacing: false, grid: false, rulers: false, badges: false, xray: false };
@@ -54,14 +53,12 @@ function pill(): HTMLElement {
 
 function render() {
   rtlRender(
-    <TooltipProvider>
-      <CanvasFooterToolbar
-        overlays={ALL_OFF}
-        zoom={100}
-        onOverlayChange={vi.fn()}
-        onZoomChange={vi.fn()}
-      />
-    </TooltipProvider>,
+    <CanvasFooterToolbar
+      overlays={ALL_OFF}
+      zoom={100}
+      onOverlayChange={vi.fn()}
+      onZoomChange={vi.fn()}
+    />,
   );
 }
 
@@ -85,23 +82,26 @@ describe("canvas toolbar tokens", () => {
   const SRC = readFileSync(resolve(__dirname, "../CanvasFooterToolbar.tsx"), "utf8")
     .replace(/\/\*[\s\S]*?\*\//g, "")
     .replace(/\/\/[^\n]*/g, "");
-  const THEME = readFileSync(
-    resolve(__dirname, "../../../themes/design-system/color.css"),
-    "utf8",
-  );
+  // Tokens are generated from Figma now; the old hand-written color.css is gone.
+  const TOKENS = readFileSync(resolve(__dirname, "../../../themes/tokens.generated.css"), "utf8");
 
   it("uses the shadow scale, not a raw dark-theme rgba", () => {
     expect(SRC).not.toMatch(/boxShadow:\s*"0 2px 12px rgba\(0,0,0,0\.3\)"/);
   });
 
-  it("every --buildrick-surface-* it references is actually defined", () => {
-    // 36 bare refs across the editor pointed at an undefined surface scale, so
-    // every active/selected fill rendered transparent.
-    const used = [...SRC.matchAll(/--buildrick-(surface(?:-\d)?)\b/g)].map((m) => m[1]);
+  it("every token it references is actually defined", () => {
+    // The original bug: 36 bare refs across the editor pointed at an undefined
+    // surface scale, so every active/selected fill rendered transparent. Same
+    // invariant, new prefix — an undefined token is still an invisible element.
+    const used = [...SRC.matchAll(/var\(\s*(--bk-[a-z0-9-]+)/g)].map((m) => m[1]);
     for (const token of new Set(used)) {
-      expect(THEME, `--buildrick-${token} must be defined`).toMatch(
-        new RegExp(`--buildrick-${token}:`),
+      expect(TOKENS, `${token} must be defined in the generated tokens`).toMatch(
+        new RegExp(`${token}:`),
       );
     }
+  });
+
+  it("uses no legacy chrome tokens at all", () => {
+    expect(SRC).not.toMatch(/var\(\s*--(?:buildrick|bd)-/);
   });
 });

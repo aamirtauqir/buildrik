@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Button } from "@/editor/shared/vibcoder/Button";
+import { Button } from "@/editor/chrome-ui";
 
 interface TokenKindCardProps {
   kindId: string;
@@ -15,7 +15,7 @@ const STORAGE_PREFIX = "buildrik:design-tab:card-open:";
 // T3: section card shell. Border-top divider lives on the header so consecutive
 // cards present as a continuous accordion stack matching prototype s02.
 const cardStyle: React.CSSProperties = {
-  background: "var(--bd-bg-elevated)",
+  background: "var(--bk-bg-card)",
   overflow: "hidden",
 };
 
@@ -29,14 +29,14 @@ const headerStyle: React.CSSProperties = {
   padding: "10px 12px",
   background: "transparent",
   border: "none",
-  borderTop: "1px solid var(--bd-border)",
+  borderTop: "1px solid var(--bk-border)",
   cursor: "pointer",
-  fontFamily: "var(--buildrick-font-family-mono, ui-monospace, monospace)",
+  fontFamily: "var(--bk-font-mono, ui-monospace, monospace)",
   fontSize: 10.5,
   fontWeight: 600,
   letterSpacing: "0.08em",
   textTransform: "uppercase",
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
   textAlign: "left",
 };
 
@@ -47,8 +47,8 @@ const bodyStyle: React.CSSProperties = {
 const dirtyDotStyle: React.CSSProperties = {
   width: 6,
   height: 6,
-  borderRadius: "var(--bd-radius-full)",
-  background: "var(--bd-warning)",
+  borderRadius: "var(--bk-radius-full)",
+  background: "var(--bk-warning)",
   flexShrink: 0,
 };
 
@@ -87,7 +87,7 @@ export const TokenKindCard: React.FC<TokenKindCardProps> = ({
 
   return (
     <div style={cardStyle} data-token-kind-card={kindId}>
-      <Button type="button" variant="ghost" size="sm" onClick={toggle} style={headerStyle} aria-expanded={open}>
+      <Button type="button" color="light" size="xs" onClick={toggle} style={headerStyle} aria-expanded={open} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
         <span>{title} · {count} TOKENS</span>
         {isDirty && <span aria-label="unsaved changes in this kind" style={dirtyDotStyle} />}
         <span style={spacerStyle} />

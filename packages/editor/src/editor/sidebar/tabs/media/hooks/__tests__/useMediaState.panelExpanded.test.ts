@@ -4,8 +4,11 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useMediaState } from "../useMediaState";
 import { MEDIA_EVENTS } from "@/shared/constants/media";
 
-vi.mock("@/editor/shared/vibcoder", () => ({
+vi.mock("@/editor/chrome-ui", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/editor/chrome-ui")>()),
+  ...{
   useToast: () => ({ addToast: vi.fn() }),
+},
 }));
 
 vi.mock("../useLibraryState", () => ({

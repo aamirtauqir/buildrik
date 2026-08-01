@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Folder, FolderRoot } from "lucide-react";
-import { Button } from "@/editor/shared/vibcoder/Button";
 import type { MediaFolder } from "@shared/types/media";
+import { Button } from "@/editor/chrome-ui";
 
 interface Props {
   folders: MediaFolder[];
@@ -39,9 +39,9 @@ export function MoveToFolderPopover({ folders, onPick, onClose }: Props) {
       <div className="med-move-popover__title">Move to folder</div>
       <Button
         type="button"
-        variant="ghost"
-        size="sm"
-        className="med-move-popover__item"
+        color="light"
+        size="xs"
+        className="med-move-popover__item tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
         role="option"
         aria-selected={false}
         onClick={() => onPick(null)}
@@ -56,9 +56,9 @@ export function MoveToFolderPopover({ folders, onPick, onClose }: Props) {
           <Button
             key={f.id}
             type="button"
-            variant="ghost"
-            size="sm"
-            className="med-move-popover__item"
+            color="light"
+            size="xs"
+            className="med-move-popover__item tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
             role="option"
             aria-selected={false}
             onClick={() => onPick(f.id)}

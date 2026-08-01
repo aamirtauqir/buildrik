@@ -1,5 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Aquibra Image Editor Modal
  * Crop, resize, rotate, flip, and adjust images.
@@ -11,6 +9,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { TextField } from "@/editor/chrome-ui";
 import Cropper from "react-easy-crop";
 import type { Area, Point } from "react-easy-crop";
 import {
@@ -18,7 +17,7 @@ import {
   Crop, SlidersHorizontal, Maximize, Download, AlertTriangle, Eye,
 } from "lucide-react";
 import "./ImageEditorModal.css";
-
+import { Button, TextInput } from "@/editor/chrome-ui";
 // ============================================
 // Types
 // ============================================
@@ -404,7 +403,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
                   {/* Rotation */}
                   <div className="ie-section-label">Rotation</div>
                   <div className="ie-slider-row">
-                    <Input
+                    <TextField
                       type="range"
                       className="ie-slider"
                       min={-180}
@@ -435,7 +434,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
                   {/* Zoom */}
                   <div className="ie-section-label">Zoom</div>
                   <div className="ie-slider-row">
-                    <Input
+                    <TextField
                       type="range"
                       className="ie-slider"
                       min={1}
@@ -453,7 +452,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
                 <>
                   <div className="ie-section-label">Brightness</div>
                   <div className="ie-slider-row">
-                    <Input type="range" className="ie-slider" min={-100} max={100}
+                    <TextField type="range" className="ie-slider" min={-100} max={100}
                       value={adjustments.brightness}
                       onChange={(e) => setAdjustments((a) => ({ ...a, brightness: Number(e.target.value) }))}
                     />
@@ -462,7 +461,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
 
                   <div className="ie-section-label">Contrast</div>
                   <div className="ie-slider-row">
-                    <Input type="range" className="ie-slider" min={-100} max={100}
+                    <TextField type="range" className="ie-slider" min={-100} max={100}
                       value={adjustments.contrast}
                       onChange={(e) => setAdjustments((a) => ({ ...a, contrast: Number(e.target.value) }))}
                     />
@@ -471,7 +470,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
 
                   <div className="ie-section-label">Saturation</div>
                   <div className="ie-slider-row">
-                    <Input type="range" className="ie-slider" min={-100} max={100}
+                    <TextField type="range" className="ie-slider" min={-100} max={100}
                       value={adjustments.saturation}
                       onChange={(e) => setAdjustments((a) => ({ ...a, saturation: Number(e.target.value) }))}
                     />
@@ -480,7 +479,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
 
                   <div className="ie-section-label">Blur</div>
                   <div className="ie-slider-row">
-                    <Input type="range" className="ie-slider" min={0} max={20} step={0.5}
+                    <TextField type="range" className="ie-slider" min={0} max={20} step={0.5}
                       value={adjustments.blur}
                       onChange={(e) => setAdjustments((a) => ({ ...a, blur: Number(e.target.value) }))}
                     />
@@ -501,9 +500,9 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
                           style={{
                             padding: "5px 8px",
                             fontSize: 11,
-                            background: active ? "var(--bd-cobalt-soft)" : "transparent",
-                            border: `1px solid ${active ? "var(--bd-cobalt)" : "var(--bd-border)"}`,
-                            color: active ? "var(--bd-cobalt)" : "var(--bd-fg-secondary)",
+                            background: active ? "var(--bk-accent-subtle)" : "transparent",
+                            border: `1px solid ${active ? "var(--bk-accent)" : "var(--bk-border)"}`,
+                            color: active ? "var(--bk-accent)" : "var(--bk-ink-soft)",
                             borderRadius: 4,
                             cursor: "pointer",
                             fontWeight: active ? 500 : 400,
@@ -523,7 +522,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
                   <div className="ie-resize-inputs">
                     <label className="ie-resize-field">
                       <span>W</span>
-                      <Input
+                      <TextInput
                         type="number"
                         placeholder={String(croppedArea.width || "auto")}
                         value={resizeW ?? ""}
@@ -534,7 +533,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
                     <span className="ie-resize-x">×</span>
                     <label className="ie-resize-field">
                       <span>H</span>
-                      <Input
+                      <TextInput
                         type="number"
                         placeholder={String(croppedArea.height || "auto")}
                         value={resizeH ?? ""}
@@ -543,7 +542,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
                       <span>px</span>
                     </label>
                   </div>
-                  <div style={{ fontSize: 11, color: "var(--buildrick-text-disabled)", marginTop: 8 }}>
+                  <div style={{ fontSize: 11, color: "var(--bk-ink-disabled)", marginTop: 8 }}>
                     Leave empty to keep original crop dimensions
                   </div>
                 </>

@@ -11,22 +11,17 @@
  *     an all-or-nothing gate labelled "Required").
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render as rtlRender, screen, fireEvent, act } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 
 vi.mock("@/shared/utils/openai", () => ({
   generateContent: vi.fn(async () => "AI Suggested Title"),
 }));
 
 import * as React from "react";
-import { TooltipProvider } from "@/editor/shared/vibcoder";
 import { SeoTab } from "../SeoTab";
 import type { UsePageSettingsReturn } from "../usePageSettings";
 import type { PageItem } from "../../types";
 
-// SeoTab mounts a Radix Tooltip (info icon on the description field), which
-// requires a TooltipProvider ancestor.
-const render = (ui: React.ReactElement) =>
-  rtlRender(<TooltipProvider>{ui}</TooltipProvider>);
 
 // ── Factory for the `s` prop (full UsePageSettingsReturn) ────────────────────
 

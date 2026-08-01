@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Menu Item Component
  * Individual menu item with keyboard hint support
@@ -9,6 +8,7 @@ import * as React from "react";
 import { CANVAS_COLORS } from "../shared";
 import type { ContextAction } from "./contextMenuRegistry";
 import { MenuIcon } from "./MenuIcon";
+import { Button } from "@/editor/chrome-ui";
 
 interface MenuItemProps {
   action: ContextAction;

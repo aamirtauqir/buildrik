@@ -7,7 +7,6 @@
 import * as React from "react";
 import { render, screen, fireEvent, waitFor, cleanup, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { TooltipProvider } from "@/editor/shared/vibcoder";
 
 const fetchPublishHistory = vi.fn();
 const rollbackToVersion = vi.fn();
@@ -33,9 +32,7 @@ const ROWS = [
 
 function renderIt(props = {}) {
   return render(
-    <TooltipProvider>
-      <PublishHistory siteId="s1" {...props} />
-    </TooltipProvider>,
+    <PublishHistory siteId="s1" {...props} />,
   );
 }
 

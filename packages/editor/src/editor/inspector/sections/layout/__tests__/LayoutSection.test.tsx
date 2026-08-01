@@ -7,7 +7,6 @@
 
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
-import { TooltipProvider } from "@/editor/shared/vibcoder/Tooltip";
 import { LayoutSection } from "../index";
 
 type Props = React.ComponentProps<typeof LayoutSection>;
@@ -15,9 +14,7 @@ type Props = React.ComponentProps<typeof LayoutSection>;
 function renderLayout(props: Partial<Props> = {}) {
   const onChange = vi.fn();
   const utils = render(
-    <TooltipProvider>
-      <LayoutSection styles={{}} onChange={onChange} isOpen={true} {...props} />
-    </TooltipProvider>
+    <LayoutSection styles={{}} onChange={onChange} isOpen={true} {...props} />
   );
   return { onChange, ...utils };
 }

@@ -1,6 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Modal, ModalContent } from "@/editor/shared/vibcoder/Modal";
 /**
  * Media Tab — Confirm Delete Modal
  * Shows in-use warning, bulk type-DELETE gate, and file names.
@@ -10,8 +7,11 @@ import { Modal, ModalContent } from "@/editor/shared/vibcoder/Modal";
  */
 
 import * as React from "react";
+import { ModalContent, ModalRoot } from "@/editor/chrome-ui";
 import { useState } from "react";
 import type { ConfirmDeletePayload } from "../data/mediaTypes";
+import { Button } from "@/editor/chrome-ui";
+import { TextField } from "@/editor/chrome-ui";
 
 interface ConfirmDeleteModalProps {
   payload: ConfirmDeletePayload;
@@ -31,7 +31,7 @@ export function ConfirmDeleteModal({ payload, onConfirm, onCancel }: ConfirmDele
   const hiddenCount = names.length - visibleNames.length;
 
   return (
-    <Modal open onOpenChange={(o) => { if (!o) onCancel(); }}>
+    <ModalRoot open onOpenChange={(o) => { if (!o) onCancel(); }}>
       <ModalContent srTitle="Delete files" className="med-modal">
         <h3 className="med-modal-title" id="med-del-title">
           {isBulk ? `Delete ${keys.length} files?` : "Delete file?"}
@@ -64,8 +64,7 @@ export function ConfirmDeleteModal({ payload, onConfirm, onCancel }: ConfirmDele
             <p className="med-modal-gate-label">
               Type <strong>DELETE</strong> to confirm:
             </p>
-            <Input
-              className="med-modal-gate-input"
+            <TextField
               value={confirmInput}
               onChange={(e) => setConfirmInput(e.target.value)}
               placeholder="DELETE"
@@ -90,6 +89,6 @@ export function ConfirmDeleteModal({ payload, onConfirm, onCancel }: ConfirmDele
           </Button>
         </div>
       </ModalContent>
-    </Modal>
+    </ModalRoot>
   );
 }

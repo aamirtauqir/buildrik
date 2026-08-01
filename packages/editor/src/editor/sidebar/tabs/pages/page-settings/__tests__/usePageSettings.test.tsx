@@ -12,8 +12,11 @@ import { renderHook, act, waitFor } from "@testing-library/react";
 
 const { addToastMock } = vi.hoisted(() => ({ addToastMock: vi.fn() }));
 
-vi.mock("@/editor/shared/vibcoder", () => ({
+vi.mock("@/editor/chrome-ui", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/editor/chrome-ui")>()),
+  ...{
   useToast: () => ({ addToast: addToastMock, removeToast: vi.fn(), toasts: [] }),
+},
 }));
 
 import { usePageSettings } from "../usePageSettings";

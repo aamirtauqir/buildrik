@@ -9,7 +9,7 @@
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, cleanup, fireEvent } from "@testing-library/react";
-import { ToastProvider } from "@/editor/shared/vibcoder";
+import { ToastProvider } from "@/editor/chrome-ui";
 import { CodePreview, type CodePreviewProps } from "../CodePreview";
 
 const HTML_CODE = "<div>\n  hello world\n</div>"; // 3 lines

@@ -67,7 +67,7 @@ export const CanvasSpot: React.FC<CanvasSpotProps> = ({
  */
 export const PointerBadge: React.FC<PointerBadgeProps> = ({
   label,
-  color = "var(--buildrick-accent)",
+  color = "var(--bk-accent)",
   position,
   visible = true,
 }) => {
@@ -82,7 +82,7 @@ export const PointerBadge: React.FC<PointerBadgeProps> = ({
         left: position.x,
         padding: "2px 8px",
         background: color,
-        color: "var(--buildrick-text-on-accent)",
+        color: "var(--bk-accent-on)",
         fontSize: 12,
         fontWeight: 600,
         borderRadius: 4,

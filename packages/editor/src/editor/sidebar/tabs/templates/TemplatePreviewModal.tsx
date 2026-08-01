@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * @lint-hex-policy: component-theme
  *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
@@ -15,7 +14,7 @@ import * as React from "react";
 import { createPortal } from "react-dom";
 import type { TemplateItem } from "./templatesData";
 import "./TemplatePreviewModal.css";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================

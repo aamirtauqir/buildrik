@@ -164,9 +164,9 @@ const warningBannerStyles: React.CSSProperties = {
   padding: "10px 12px",
   background: "rgba(217, 119, 6, 0.08)",
   border: "1px solid rgba(217, 119, 6, 0.3)",
-  borderRadius: "var(--buildrick-radius-sm)",
-  font: "500 11.5px var(--bd-font)",
-  color: "var(--bd-warning)",
+  borderRadius: "var(--bk-radius-sm)",
+  font: "500 11.5px var(--bk-font-ui)",
+  color: "var(--bk-warning)",
   lineHeight: 1.5,
 };
 
@@ -177,16 +177,16 @@ const validationContainerStyles: React.CSSProperties = {
 };
 
 const validationErrorStyles: React.CSSProperties = {
-  color: "var(--bd-error)",
+  color: "var(--bk-error)",
   padding: "2px 0",
 };
 
 const validationWarningStyles: React.CSSProperties = {
-  color: "var(--bd-warning)",
+  color: "var(--bk-warning)",
   padding: "2px 0",
 };
 
 const validationSuccessStyles: React.CSSProperties = {
-  color: "var(--bd-success)",
+  color: "var(--bk-success)",
   padding: "2px 0",
 };

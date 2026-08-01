@@ -6,15 +6,8 @@
  */
 
 import * as React from "react";
-import {
-  Modal,
-  ModalContent,
-  ModalTitle,
-  ModalClose,
-  OverlayMount,
-} from "@/editor/shared/vibcoder";
+import { ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/chrome-ui";
 import { GROUPED_TABS_CONFIG } from "../rail/tabsConfig";
-import { Stack } from "@/editor/shared/vibcoder";
 
 // =============================================================================
 // SHORTCUT DATA
@@ -81,12 +74,12 @@ const KeyBadge: React.FC<{ children: string }> = ({ children }) => {
         display: "inline-flex",
         alignItems: "center",
         padding: "2px 6px",
-        background: "var(--buildrick-surface-3)",
-        border: "1px solid var(--buildrick-border)",
-        borderRadius: "var(--buildrick-radius-sm)",
+        background: "var(--bk-bg-subtle)",
+        border: "1px solid var(--bk-border)",
+        borderRadius: "var(--bk-radius-sm)",
         fontSize: 11,
-        fontFamily: "var(--buildrick-font-family-mono)",
-        color: "var(--buildrick-text-primary)",
+        fontFamily: "var(--bk-font-mono)",
+        color: "var(--bk-ink)",
         whiteSpace: "nowrap",
         flexShrink: 0,
       }}
@@ -110,8 +103,8 @@ export const KeyboardShortcutsPanel: React.FC<KeyboardShortcutsPanelProps> = ({
   onClose,
 }) => {
   return (
-    <OverlayMount>
-      <Modal open={isOpen} onOpenChange={(next) => !next && onClose()}>
+    <Portal>
+      <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
         <ModalContent size="lg">
           <ModalTitle>Keyboard Shortcuts</ModalTitle>
           <ModalClose aria-label="Close modal">
@@ -138,10 +131,10 @@ export const KeyboardShortcutsPanel: React.FC<KeyboardShortcutsPanelProps> = ({
                 fontSize: 12,
                 textTransform: "uppercase",
                 letterSpacing: "0.5px",
-                color: "var(--buildrick-text-muted)",
+                color: "var(--bk-ink-muted)",
                 marginBottom: 8,
                 paddingBottom: 6,
-                borderBottom: "1px solid var(--buildrick-border)",
+                borderBottom: "1px solid var(--bk-border)",
                 fontWeight: 600,
               }}
             >
@@ -149,7 +142,7 @@ export const KeyboardShortcutsPanel: React.FC<KeyboardShortcutsPanelProps> = ({
             </div>
 
             {/* Shortcut rows */}
-            <Stack gap="sm">
+            <div className="tw:flex tw:flex-col tw:gap-2">
               {group.shortcuts.map((row, idx) => (
                 <div
                   key={idx}
@@ -164,7 +157,7 @@ export const KeyboardShortcutsPanel: React.FC<KeyboardShortcutsPanelProps> = ({
                   <span
                     style={{
                       fontSize: 13,
-                      color: "var(--buildrick-text-secondary)",
+                      color: "var(--bk-ink-soft)",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
                       whiteSpace: "nowrap",
@@ -176,7 +169,7 @@ export const KeyboardShortcutsPanel: React.FC<KeyboardShortcutsPanelProps> = ({
                   <KeyBadge>{row.key}</KeyBadge>
                 </div>
               ))}
-            </Stack>
+            </div>
           </div>
         ))}
       </div>
@@ -185,10 +178,10 @@ export const KeyboardShortcutsPanel: React.FC<KeyboardShortcutsPanelProps> = ({
         style={{
           marginTop: 16,
           padding: "8px 12px",
-          background: "var(--buildrick-bg-panel-secondary)",
-          borderRadius: "var(--buildrick-radius-sm)",
+          background: "var(--bk-bg-subtle)",
+          borderRadius: "var(--bk-radius-sm)",
           fontSize: 12,
-          color: "var(--buildrick-text-muted)",
+          color: "var(--bk-ink-muted)",
           textAlign: "center",
         }}
       >
@@ -196,8 +189,8 @@ export const KeyboardShortcutsPanel: React.FC<KeyboardShortcutsPanelProps> = ({
       </div>
           </div>
         </ModalContent>
-      </Modal>
-    </OverlayMount>
+      </ModalRoot>
+    </Portal>
   );
 };
 

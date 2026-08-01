@@ -8,9 +8,9 @@
  */
 
 import * as React from "react";
+import { ToastInput } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
 import type { Element } from "../../../engine/elements/Element";
-import type { ToastInput } from "@/editor/shared/vibcoder";
 
 interface UseCanvasToolbarActionsParams {
   composer: Composer | null;

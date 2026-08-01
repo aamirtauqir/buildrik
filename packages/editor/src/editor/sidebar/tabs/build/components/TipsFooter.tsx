@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * TipsFooter — PRO TIPS carousel at bottom of Add panel.
  *
@@ -13,6 +12,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 import * as React from "react";
 import { Lightbulb, ChevronLeft, ChevronRight, ChevronDown, ChevronUp } from "lucide-react";
 import { TIPS } from "../catalog/tips";
+import { Button } from "@/editor/chrome-ui";
 
 export interface TipsFooterProps {
   tipIdx: number;
@@ -31,7 +31,7 @@ const wrap: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   gap: 6,
-  fontFamily: "var(--bd-font)",
+  fontFamily: "var(--bk-font-ui)",
 };
 
 const header: React.CSSProperties = {
@@ -45,20 +45,20 @@ const label: React.CSSProperties = {
   display: "inline-flex",
   alignItems: "center",
   gap: 5,
-  fontFamily: "var(--bd-font)",
-  fontSize: "var(--bd-text-2xs)",
+  fontFamily: "var(--bk-font-ui)",
+  fontSize: "var(--bk-text-11)",
   fontWeight: 600,
-  letterSpacing: "var(--bd-track-widest)",
+  letterSpacing: "var(--bk-tracking-wide)",
   textTransform: "uppercase",
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
   flexShrink: 0,
 };
 
 const counter: React.CSSProperties = {
-  fontFamily: "var(--bd-mono)",
-  fontSize: "var(--bd-text-xs)",
+  fontFamily: "var(--bk-font-mono)",
+  fontSize: "var(--bk-text-11)",
   fontWeight: 500,
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
   marginLeft: 8,
   fontVariantNumeric: "tabular-nums",
 };
@@ -81,23 +81,23 @@ const arr: React.CSSProperties = {
   border: "none",
   borderRadius: 4,
   background: "transparent",
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
   cursor: "pointer",
   lineHeight: 1,
   transition: "background 120ms, color 120ms",
 };
 
 const card: React.CSSProperties = {
-  fontFamily: "var(--bd-font)",
-  fontSize: "var(--bd-text-sm-plus)",
+  fontFamily: "var(--bk-font-ui)",
+  fontSize: "var(--bk-text-13)",
   fontWeight: 500,
-  lineHeight: "var(--bd-leading-normal)",
-  color: "var(--bd-fg-secondary)",
+  lineHeight: "var(--bk-leading-normal)",
+  color: "var(--bk-ink-soft)",
   textAlign: "center",
 };
 
 const cardBold: React.CSSProperties = {
-  color: "var(--bd-fg-primary)",
+  color: "var(--bk-ink)",
   fontWeight: 600,
   marginRight: 4,
 };
@@ -116,8 +116,8 @@ const dot = (active: boolean): React.CSSProperties => ({
   minHeight: 5,
   padding: 0,
   border: "none",
-  borderRadius: "var(--buildrick-radius-full)",
-  background: active ? "var(--bd-accent)" : "var(--bd-border-medium)",
+  borderRadius: "var(--bk-radius-full)",
+  background: active ? "var(--bk-accent)" : "var(--bk-border-medium)",
   cursor: "pointer",
   transform: active ? "scale(1.1)" : "none",
   transition: "background 120ms, transform 120ms",
@@ -125,12 +125,12 @@ const dot = (active: boolean): React.CSSProperties => ({
 
 // Simple hover-bg via inline handlers since we're avoiding new CSS classes.
 const hoverIn = (e: React.MouseEvent<HTMLElement>) => {
-  e.currentTarget.style.background = "var(--bd-bg-subtle)";
-  e.currentTarget.style.color = "var(--bd-fg-primary)";
+  e.currentTarget.style.background = "var(--bk-bg-subtle)";
+  e.currentTarget.style.color = "var(--bk-ink)";
 };
 const hoverOut = (e: React.MouseEvent<HTMLElement>) => {
   e.currentTarget.style.background = "transparent";
-  e.currentTarget.style.color = "var(--bd-fg-muted)";
+  e.currentTarget.style.color = "var(--bk-ink-muted)";
 };
 
 // ── Component ────────────────────────────────────────────────────────────────
@@ -165,7 +165,7 @@ export const TipsFooter: React.FC<TipsFooterProps> = ({
         }}
       >
         <span style={label}>
-          <Lightbulb size={12} aria-hidden color="var(--bd-accent)" />
+          <Lightbulb size={12} aria-hidden color="var(--bk-accent)" />
           Pro tips
         </span>
         <span style={counter}>
@@ -182,7 +182,7 @@ export const TipsFooter: React.FC<TipsFooterProps> = ({
     <div style={wrap}>
       <div style={header}>
         <span style={label}>
-          <Lightbulb size={12} aria-hidden color="var(--bd-accent)" />
+          <Lightbulb size={12} aria-hidden color="var(--bk-accent)" />
           Pro tips
         </span>
         <span style={counter}>

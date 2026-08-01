@@ -13,8 +13,8 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/shared/vibcoder/Button";
 import { RecoveryManager } from "@/engine/recovery/RecoveryManager";
+import { Button } from "@/editor/chrome-ui";
 
 export interface RecoveryBannerProps {
   /** How many pages the recovered draft holds — the scope of what was kept. */
@@ -35,7 +35,7 @@ function relTime(at: number): string {
 }
 
 const S: Record<string, React.CSSProperties> = {
-  bar: { display: "flex", alignItems: "center", gap: 12, padding: "10px 16px", background: "var(--bd-accent-subtle, #EEF3FC)", borderBottom: "1px solid var(--bd-border)", fontSize: 13, color: "var(--bd-text)" },
+  bar: { display: "flex", alignItems: "center", gap: 12, padding: "10px 16px", background: "var(--bk-accent-subtle, #EEF3FC)", borderBottom: "1px solid var(--bk-border)", fontSize: 13, color: "var(--bk-ink)" },
   text: { flex: 1, lineHeight: 1.4 },
   strong: { fontWeight: 600 },
   actions: { display: "flex", alignItems: "center", gap: 8 },
@@ -66,8 +66,8 @@ export const RecoveryBanner: React.FC<RecoveryBannerProps> = ({ pageCount, reloa
         <span style={S.strong}>Recovered your work</span> after an unexpected close · {relTime(record.at)}{scope}.
       </div>
       <div style={S.actions}>
-        <Button variant="ghost" size="sm" onClick={discard}>Discard &amp; reload</Button>
-        <Button variant="primary" size="sm" onClick={() => setDismissed(true)}>Keep changes</Button>
+        <Button color="light" size="xs" onClick={discard} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">Discard &amp; reload</Button>
+        <Button size="xs" onClick={() => setDismissed(true)}>Keep changes</Button>
       </div>
     </div>
   );

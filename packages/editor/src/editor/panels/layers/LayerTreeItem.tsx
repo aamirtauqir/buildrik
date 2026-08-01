@@ -1,5 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * LayerTreeItem - Minimal Tree Design
  * Clean rows with hover-reveal actions (Hide/Lock)
@@ -7,10 +5,12 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { getElementIcon } from "@/editor/shared/elementIcons";
 import type { Composer } from "../../../engine";
 import { ELEMENT_TYPE_LABELS } from "../../../shared/constants/elementTypeLabels";
-import { getElementIcon } from "../../../shared/ui/Icons";
 import type { LayerItem, DragState, LayerDisplayPrefs } from "./types";
+import { Button } from "@/editor/chrome-ui";
+import { TextField } from "@/editor/chrome-ui";
 
 export interface LayerTreeItemProps {
   layer: LayerItem;
@@ -194,7 +194,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
         </span>
 
         {isEditing ? (
-          <Input
+          <TextField
             ref={editInputRef}
             type="text"
             className="bdc-lr-edit"

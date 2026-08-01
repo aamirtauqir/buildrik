@@ -10,9 +10,8 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Modal, ModalContent, ModalTitle, ModalFooter } from "@/editor/shared/vibcoder/Modal";
-import { useToast } from "@/editor/shared/vibcoder/Toast";
+import { ModalContent, ModalFooter, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
+import { useToast } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import { exportPublishPages, type PublishPage } from "../exportPublishPages";
 import {
@@ -21,6 +20,7 @@ import {
   submitForReview,
   type CurrentRound,
 } from "@/services/ReviewService";
+import { Button } from "@/editor/chrome-ui";
 
 interface StaleApprovalModalProps {
   isOpen: boolean;
@@ -131,10 +131,10 @@ export const StaleApprovalModal: React.FC<StaleApprovalModalProps> = ({
   };
 
   return (
-    <Modal open={isOpen} onOpenChange={(o) => !o && onClose()}>
+    <ModalRoot open={isOpen} onOpenChange={(o) => !o && onClose()}>
       <ModalContent size="lg" srTitle="Publish un-approved changes?">
         <ModalTitle>Publish work {name} hasn&rsquo;t seen?</ModalTitle>
-        <p style={{ fontSize: 13, color: "var(--bd-fg-muted)", margin: "8px 0 12px" }}>
+        <p style={{ fontSize: 13, color: "var(--bk-ink-muted)", margin: "8px 0 12px" }}>
           {round?.reviewerName ?? "Your client"} approved round {round?.roundNumber ?? "—"}
           {approvedOn(round)}.{" "}
           {changed == null
@@ -152,45 +152,44 @@ export const StaleApprovalModal: React.FC<StaleApprovalModalProps> = ({
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
-                  background: "var(--bd-warning-tint)",
-                  border: "1px solid var(--bd-warning-border)",
-                  borderRadius: "var(--bd-radius-sm)",
+                  background: "var(--bk-warning-tint)",
+                  border: "1px solid var(--bk-warning-text)",
+                  borderRadius: "var(--bk-radius-sm)",
                   padding: "8px 10px",
                   fontSize: 12,
                 }}
               >
-                <span style={{ color: "var(--bd-fg-primary)", fontWeight: 500, textTransform: "capitalize" }}>
+                <span style={{ color: "var(--bk-ink)", fontWeight: 500, textTransform: "capitalize" }}>
                   {pageLabel(c.path)}
                 </span>
-                <span style={{ color: "var(--bd-warn-strong)" }}>{c.kind}</span>
+                <span style={{ color: "var(--bk-warning-text)" }}>{c.kind}</span>
               </div>
             ))}
             {changed.length > 6 && (
-              <div style={{ fontSize: 11, color: "var(--bd-fg-muted)" }}>
+              <div style={{ fontSize: 11, color: "var(--bk-ink-muted)" }}>
                 and {changed.length - 6} more
               </div>
             )}
           </div>
         )}
-        <p style={{ fontSize: 12, color: "var(--bd-fg-muted)", margin: "0 0 4px" }}>
+        <p style={{ fontSize: 12, color: "var(--bk-ink-muted)", margin: "0 0 4px" }}>
           {name === "your client" ? "The" : `${name}’s`} approval still stands — publishing
           now just ships these on top of it.
         </p>
         <ModalFooter>
-          <Button variant="secondary" size="sm" disabled={resending} onClick={() => void handleResend()}>
+          <Button color="light" size="xs" disabled={resending} onClick={() => void handleResend()}>
             {resending ? "Re-sending…" : "Re-send for approval"}
           </Button>
           <Button
-            variant="primary"
-            size="sm"
-            style={{ background: "var(--buildrick-warning)", borderColor: "var(--buildrick-warning)" }}
+            size="xs"
+            style={{ background: "var(--bk-warning)", borderColor: "var(--bk-warning)" }}
             onClick={() => void onPublishAnyway()}
           >
             Publish anyway
           </Button>
         </ModalFooter>
       </ModalContent>
-    </Modal>
+    </ModalRoot>
   );
 };
 

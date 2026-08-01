@@ -58,7 +58,7 @@ const labelStyle: React.CSSProperties = {
   borderRadius: 4,
   fontSize: 12,
   fontWeight: 500,
-  color: "var(--buildrick-text-on-accent)",
+  color: "var(--bk-accent-on)",
   whiteSpace: "nowrap",
   maxWidth: 120,
   overflow: "hidden",
@@ -91,7 +91,7 @@ const CursorPointer: React.FC<CursorPointerProps> = ({ cursor }) => {
         <path
           d="M5.5 3.21V20.8c0 .45.54.67.85.35l4.86-4.86a.5.5 0 0 1 .35-.15h6.87a.5.5 0 0 0 .35-.85L6.35 2.86a.5.5 0 0 0-.85.35Z"
           fill={user.color}
-          style={{ stroke: "var(--buildrick-bg-card)" }}
+          style={{ stroke: "var(--bk-bg-card)" }}
           strokeWidth="1.5"
         />
       </svg>

@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * TemplateDetail — inline detail panel (prototype-v3 §2).
  *
@@ -16,6 +15,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import * as React from "react";
 import type { TemplateItem } from "../templatesData";
+import { Button } from "@/editor/chrome-ui";
 
 interface TemplateDetailProps {
   template: TemplateItem;
@@ -63,8 +63,8 @@ export const TemplateDetail: React.FC<TemplateDetailProps> = ({
         style={{
           background:
             previewState === "ready"
-              ? (template.gradient ?? "var(--bd-bg-subtle, var(--bd-bg-subtle))")
-              : "var(--bd-bg-subtle, var(--bd-bg-subtle))",
+              ? (template.gradient ?? "var(--bk-bg-subtle, var(--bk-bg-subtle))")
+              : "var(--bk-bg-subtle, var(--bk-bg-subtle))",
         }}
       >
         {appliedToCurrentPage && previewState === "ready" && (
@@ -77,11 +77,11 @@ export const TemplateDetail: React.FC<TemplateDetailProps> = ({
         )}
         {previewState === "error" && (
           <div className="tpl-detail-preview-state">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--bd-fg-secondary, var(--bd-fg-muted))" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--bk-ink-soft, var(--bk-ink-muted))" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="10" />
               <path d="M12 8v4M12 16h.01" />
             </svg>
-            <p style={{ fontSize: 11, color: "var(--bd-fg-muted)", margin: "6px 0 0", textAlign: "center" }}>
+            <p style={{ fontSize: 11, color: "var(--bk-ink-muted)", margin: "6px 0 0", textAlign: "center" }}>
               Preview unavailable
             </p>
             {onPreviewRetry && (
@@ -169,9 +169,9 @@ export const TemplateDetail: React.FC<TemplateDetailProps> = ({
           <span>
             Replacing current {pageName} page content.{" "}
             <Button
-              variant="ghost"
-              size="sm"
-              className="tpl-detail-info-note-link"
+              color="light"
+              size="xs"
+              className="tpl-detail-info-note-link tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
               onClick={() => onAddAsNewPage(template.id)}
             >
               Add as new page instead?

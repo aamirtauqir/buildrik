@@ -233,8 +233,10 @@ describe("useExportHandlers", () => {
       expect(opts.addToast).toHaveBeenCalledWith(
         expect.objectContaining({
           tone: "success",
-          title: "Site published",
+          title: "Published — site is live",
           description: "https://my.site/",
+          // D10: the victory moment carries its own door.
+          action: expect.objectContaining({ label: "View live" }),
         }),
       );
     });

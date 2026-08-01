@@ -1,25 +1,18 @@
-import { Select } from "@/editor/shared/vibcoder/Select";
-import { Button } from "@/editor/shared/vibcoder/Button";
+import { Popover } from "@/editor/chrome-ui";
 /**
  * Size Section - Width, Height, Min/Max dimensions
  * CP3: W and H rows each have a hover-reveal chain button that opens a spacing
- * token picker. Selecting a spacing token stores var(--buildrick-space-4) on the
+ * token picker. Selecting a spacing token stores var(--bk-space-16) on the
  * element — not "16px". The picker uses list layout (showSwatch=false).
  */
 
 import { Link2, Link2Off } from "lucide-react";
 import * as React from "react";
 import { useSpacingRegistry } from "@/editor/design-system/state/TokenRegistryContext";
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverPortal,
-  PopoverContent,
-} from "@/editor/shared/vibcoder";
 import { TokenPickerPopover } from "../shared/TokenPickerPopover";
 import { Section, InputWithUnit, MoreSettingsToggle, type SectionTier, MixedValueIndicator } from "../shared/controls";
 import { getCssVariable } from "@/shared/utils/getCssVariable";
-
+import { Button, Select } from "@/editor/chrome-ui";
 // ============================================================================
 // HELPERS
 // ============================================================================
@@ -67,10 +60,10 @@ const ChainButton: React.FC<ChainButtonProps> = ({ property, value, onChange }) 
         title={`Unlink "${boundToken?.name ?? "token"}" — resolves to current value`}
         style={{
           padding: "2px 4px",
-          background: "var(--buildrick-accent-subtle)",
-          border: `1px solid ${"var(--buildrick-accent)"}`,
+          background: "var(--bk-accent-subtle)",
+          border: `1px solid ${"var(--bk-accent)"}`,
           borderRadius: 4,
-          color: "var(--buildrick-accent)",
+          color: "var(--bk-accent)",
           cursor: "pointer",
           display: "flex",
           alignItems: "center",
@@ -92,18 +85,24 @@ const ChainButton: React.FC<ChainButtonProps> = ({ property, value, onChange }) 
   }
 
   return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger asChild>
+    <Popover
+      open={isOpen}
+      onClose={() => setIsOpen(false)}
+      placement="bottom-end"
+      label="Spacing tokens"
+      trigger={
         <Button
           type="button"
+          onClick={() => setIsOpen((v) => !v)}
           aria-label={`Link ${property} to spacing token`}
+          aria-expanded={isOpen}
           title="Link to spacing token"
           className="bd-chain-btn"
           style={{
             padding: 2,
             background: "none",
             border: "none",
-            color: "var(--buildrick-text-muted)",
+            color: "var(--bk-ink-muted)",
             cursor: "pointer",
             display: "flex",
             alignItems: "center",
@@ -114,19 +113,16 @@ const ChainButton: React.FC<ChainButtonProps> = ({ property, value, onChange }) 
         >
           <Link2 size={12} aria-hidden="true" />
         </Button>
-      </PopoverTrigger>
-      <PopoverPortal>
-        <PopoverContent sideOffset={8}>
-          <TokenPickerPopover
-            tokens={tokenEntries}
-            currentValue={value}
-            showSwatch={false}
-            tokenLabel="spacing"
-            onSelect={(_id, cssVarRef) => onChange(cssVarRef)}
-            onCustomValue={onChange}
-          />
-        </PopoverContent>
-      </PopoverPortal>
+      }
+    >
+      <TokenPickerPopover
+        tokens={tokenEntries}
+        currentValue={value}
+        showSwatch={false}
+        tokenLabel="spacing"
+        onSelect={(_id, cssVarRef) => onChange(cssVarRef)}
+        onCustomValue={onChange}
+      />
     </Popover>
   );
 };
@@ -175,8 +171,8 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
       <span
         style={{
           fontSize: 11,
-          color: "var(--buildrick-text-tertiary)",
-          fontFamily: "var(--buildrick-font-family-mono)",
+          color: "var(--bk-ink-muted)",
+          fontFamily: "var(--bk-font-mono)",
           whiteSpace: "nowrap",
         }}
       >
@@ -210,7 +206,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
                 disabled={disabled("width")}
                 disabledReason={reason("width")}
                 isOverridden={propertyStates["width"]?.isOverridden}
-                fieldIcon={<span style={{ font: "600 10px var(--bd-font)" }}>W</span>}
+                fieldIcon={<span style={{ font: "600 10px var(--bk-font-ui)" }}>W</span>}
               />
             </div>
             {!disabled("width") && (
@@ -233,7 +229,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
                 disabled={disabled("height")}
                 disabledReason={reason("height")}
                 isOverridden={propertyStates["height"]?.isOverridden}
-                fieldIcon={<span style={{ font: "600 10px var(--bd-font)" }}>H</span>}
+                fieldIcon={<span style={{ font: "600 10px var(--bk-font-ui)" }}>H</span>}
               />
             </div>
             {!disabled("height") && (
@@ -260,7 +256,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
                     disabled={disabled("min-width")}
                     disabledReason={reason("min-width")}
                     isOverridden={propertyStates["min-width"]?.isOverridden}
-                    fieldIcon={<span style={{ font: "600 9px var(--bd-font)" }}>min</span>}
+                    fieldIcon={<span style={{ font: "600 9px var(--bk-font-ui)" }}>min</span>}
                   />
                 </div>
               ) : <span />}
@@ -275,7 +271,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
                     disabled={disabled("max-width")}
                     disabledReason={reason("max-width")}
                     isOverridden={propertyStates["max-width"]?.isOverridden}
-                    fieldIcon={<span style={{ font: "600 9px var(--bd-font)" }}>max</span>}
+                    fieldIcon={<span style={{ font: "600 9px var(--bk-font-ui)" }}>max</span>}
                   />
                 </div>
               ) : <span />}
@@ -295,7 +291,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
                     disabled={disabled("min-height")}
                     disabledReason={reason("min-height")}
                     isOverridden={propertyStates["min-height"]?.isOverridden}
-                    fieldIcon={<span style={{ font: "600 9px var(--bd-font)" }}>min</span>}
+                    fieldIcon={<span style={{ font: "600 9px var(--bk-font-ui)" }}>min</span>}
                   />
                 </div>
               ) : <span />}
@@ -310,7 +306,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
                     disabled={disabled("max-height")}
                     disabledReason={reason("max-height")}
                     isOverridden={propertyStates["max-height"]?.isOverridden}
-                    fieldIcon={<span style={{ font: "600 9px var(--bd-font)" }}>max</span>}
+                    fieldIcon={<span style={{ font: "600 9px var(--bk-font-ui)" }}>max</span>}
                   />
                 </div>
               ) : <span />}
@@ -324,16 +320,16 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "var(--buildrick-space-2)",
-            marginBottom: "var(--buildrick-space-3)",
+            gap: "var(--bk-space-8)",
+            marginBottom: "var(--bk-space-12)",
             opacity: disabled("object-fit") ? 0.5 : 1,
           }}
           title={reason("object-fit")}
         >
           <label
             style={{
-              fontSize: "var(--buildrick-text-sm)",
-              color: "var(--buildrick-text-tertiary)",
+              fontSize: "var(--bk-text-12)",
+              color: "var(--bk-ink-muted)",
               fontWeight: 500,
               minWidth: 70,
             }}
@@ -345,14 +341,15 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
             onChange={(e) => onChange("object-fit", e.target.value)}
             style={{
               flex: 1,
-              padding: "var(--buildrick-space-2) 10px",
-              background: "var(--bd-bg-subtle)",
-              border: "1px solid var(--buildrick-border)",
-              borderRadius: "var(--buildrick-radius-sm)",
-              color: "var(--buildrick-text-primary)",
-              fontSize: "var(--buildrick-text-sm-plus)",
+              padding: "var(--bk-space-8) 10px",
+              background: "var(--bk-bg-subtle)",
+              border: "1px solid var(--bk-border)",
+              borderRadius: "var(--bk-radius-sm)",
+              color: "var(--bk-ink)",
+              fontSize: "var(--bk-text-13)",
               outline: "none",
               cursor: "pointer",
+              appearance: "auto",
             }}
             disabled={disabled("object-fit")}
           >

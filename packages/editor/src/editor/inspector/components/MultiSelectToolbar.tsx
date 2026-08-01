@@ -18,15 +18,8 @@ import type { Composer } from "../../../engine";
 import { AlignmentHandler } from "../../../engine/canvas/AlignmentHandler";
 import type { PseudoStateId } from "../../../shared/types";
 import type { BreakpointId } from "../../../shared/types/breakpoints";
-import { IconButton } from "@/editor/shared/vibcoder/IconButton";
-import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipPortal,
-  TooltipContent,
-} from "@/editor/shared/vibcoder";
 import { BatchStylePanel } from "./BatchStylePanel";
-
+import { Button, Tooltip } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -49,43 +42,43 @@ export interface MultiSelectToolbarProps {
 const toolbarStyles: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
-  gap: "var(--buildrick-space-4)",
-  padding: "var(--buildrick-space-4)",
+  gap: "var(--bk-space-16)",
+  padding: "var(--bk-space-16)",
 };
 
 const sectionStyles: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
-  gap: "var(--buildrick-space-2)",
+  gap: "var(--bk-space-8)",
 };
 
 const sectionLabelStyles: React.CSSProperties = {
-  fontSize: "var(--buildrick-text-xs)",
+  fontSize: "var(--bk-text-11)",
   fontWeight: 600,
-  color: "var(--buildrick-text-tertiary)",
+  color: "var(--bk-ink-muted)",
   textTransform: "uppercase" as const,
   letterSpacing: "0.05em",
 };
 
 const buttonGroupStyles: React.CSSProperties = {
   display: "flex",
-  gap: "var(--buildrick-space-1)",
-  background: "var(--buildrick-surface-3)",
-  padding: "var(--buildrick-space-1)",
-  borderRadius: "var(--buildrick-radius-md)",
+  gap: "var(--bk-space-4)",
+  background: "var(--bk-bg-subtle)",
+  padding: "var(--bk-space-4)",
+  borderRadius: "var(--bk-radius-lg)",
 };
 
 const countBadgeStyles: React.CSSProperties = {
   display: "inline-flex",
   alignItems: "center",
   justifyContent: "center",
-  background: "var(--buildrick-accent-subtle)",
-  color: "var(--buildrick-accent)",
-  fontSize: "var(--buildrick-text-sm)",
+  background: "var(--bk-accent-subtle)",
+  color: "var(--bk-accent)",
+  fontSize: "var(--bk-text-12)",
   fontWeight: 600,
-  padding: "var(--buildrick-space-2)",
-  borderRadius: "var(--buildrick-radius-md)",
-  marginBottom: "var(--buildrick-space-2)",
+  padding: "var(--bk-space-8)",
+  borderRadius: "var(--bk-radius-lg)",
+  marginBottom: "var(--bk-space-8)",
 };
 
 // ============================================================================
@@ -163,47 +156,32 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
       <div style={sectionStyles}>
         <span style={sectionLabelStyles}>Align Horizontal</span>
         <div style={buttonGroupStyles}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <IconButton
-                size="sm"
-                variant="ghost"
-                aria-label="Align elements to left"
-                onClick={handleAlignLeft}
-                disabled={isDisabled}
-              ><AlignLeft size={16} /></IconButton>
-            </TooltipTrigger>
-            <TooltipPortal>
-              <TooltipContent>{getAlignTooltip("Align Left")}</TooltipContent>
-            </TooltipPortal>
+          <Tooltip content={getAlignTooltip("Align Left")} placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
+            <Button
+              color="light"
+              size="xs"
+              aria-label="Align elements to left"
+              onClick={handleAlignLeft}
+              disabled={isDisabled} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+            ><AlignLeft size={16} /></Button>
           </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <IconButton
-                size="sm"
-                variant="ghost"
-                aria-label="Align elements to center horizontally"
-                onClick={handleAlignCenterH}
-                disabled={isDisabled}
-              ><AlignCenter size={16} /></IconButton>
-            </TooltipTrigger>
-            <TooltipPortal>
-              <TooltipContent>{getAlignTooltip("Align Center")}</TooltipContent>
-            </TooltipPortal>
+          <Tooltip content={getAlignTooltip("Align Center")} placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
+            <Button
+              color="light"
+              size="xs"
+              aria-label="Align elements to center horizontally"
+              onClick={handleAlignCenterH}
+              disabled={isDisabled} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+            ><AlignCenter size={16} /></Button>
           </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <IconButton
-                size="sm"
-                variant="ghost"
-                aria-label="Align elements to right"
-                onClick={handleAlignRight}
-                disabled={isDisabled}
-              ><AlignRight size={16} /></IconButton>
-            </TooltipTrigger>
-            <TooltipPortal>
-              <TooltipContent>{getAlignTooltip("Align Right")}</TooltipContent>
-            </TooltipPortal>
+          <Tooltip content={getAlignTooltip("Align Right")} placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
+            <Button
+              color="light"
+              size="xs"
+              aria-label="Align elements to right"
+              onClick={handleAlignRight}
+              disabled={isDisabled} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+            ><AlignRight size={16} /></Button>
           </Tooltip>
         </div>
       </div>
@@ -212,47 +190,32 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
       <div style={sectionStyles}>
         <span style={sectionLabelStyles}>Align Vertical</span>
         <div style={buttonGroupStyles}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <IconButton
-                size="sm"
-                variant="ghost"
-                aria-label="Align elements to top"
-                onClick={handleAlignTop}
-                disabled={isDisabled}
-              ><AlignStartVertical size={16} /></IconButton>
-            </TooltipTrigger>
-            <TooltipPortal>
-              <TooltipContent>{getAlignTooltip("Align Top")}</TooltipContent>
-            </TooltipPortal>
+          <Tooltip content={getAlignTooltip("Align Top")} placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
+            <Button
+              color="light"
+              size="xs"
+              aria-label="Align elements to top"
+              onClick={handleAlignTop}
+              disabled={isDisabled} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+            ><AlignStartVertical size={16} /></Button>
           </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <IconButton
-                size="sm"
-                variant="ghost"
-                aria-label="Align elements to middle vertically"
-                onClick={handleAlignMiddle}
-                disabled={isDisabled}
-              ><AlignCenterVertical size={16} /></IconButton>
-            </TooltipTrigger>
-            <TooltipPortal>
-              <TooltipContent>{getAlignTooltip("Align Middle")}</TooltipContent>
-            </TooltipPortal>
+          <Tooltip content={getAlignTooltip("Align Middle")} placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
+            <Button
+              color="light"
+              size="xs"
+              aria-label="Align elements to middle vertically"
+              onClick={handleAlignMiddle}
+              disabled={isDisabled} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+            ><AlignCenterVertical size={16} /></Button>
           </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <IconButton
-                size="sm"
-                variant="ghost"
-                aria-label="Align elements to bottom"
-                onClick={handleAlignBottom}
-                disabled={isDisabled}
-              ><AlignEndVertical size={16} /></IconButton>
-            </TooltipTrigger>
-            <TooltipPortal>
-              <TooltipContent>{getAlignTooltip("Align Bottom")}</TooltipContent>
-            </TooltipPortal>
+          <Tooltip content={getAlignTooltip("Align Bottom")} placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
+            <Button
+              color="light"
+              size="xs"
+              aria-label="Align elements to bottom"
+              onClick={handleAlignBottom}
+              disabled={isDisabled} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+            ><AlignEndVertical size={16} /></Button>
           </Tooltip>
         </div>
       </div>
@@ -261,45 +224,35 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
       <div style={sectionStyles}>
         <span style={sectionLabelStyles}>Distribute</span>
         <div style={buttonGroupStyles}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <IconButton
-                size="sm"
-                variant="ghost"
-                aria-label="Distribute elements horizontally with equal spacing"
-                onClick={handleDistributeH}
-                disabled={distributeDisabled}
-              >
-                <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                  <rect x="4" y="5" width="4" height="14" rx="1" />
-                  <rect x="10" y="5" width="4" height="14" rx="1" />
-                  <rect x="16" y="5" width="4" height="14" rx="1" />
-                </svg>
-              </IconButton>
-            </TooltipTrigger>
-            <TooltipPortal>
-              <TooltipContent>{getDistributeTooltip("Horizontally")}</TooltipContent>
-            </TooltipPortal>
+          <Tooltip content={getDistributeTooltip("Horizontally")} placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
+            <Button
+              color="light"
+              size="xs"
+              aria-label="Distribute elements horizontally with equal spacing"
+              onClick={handleDistributeH}
+              disabled={distributeDisabled} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+            >
+              <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <rect x="4" y="5" width="4" height="14" rx="1" />
+                <rect x="10" y="5" width="4" height="14" rx="1" />
+                <rect x="16" y="5" width="4" height="14" rx="1" />
+              </svg>
+            </Button>
           </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <IconButton
-                size="sm"
-                variant="ghost"
-                aria-label="Distribute elements vertically with equal spacing"
-                onClick={handleDistributeV}
-                disabled={distributeDisabled}
-              >
-                <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                  <rect x="5" y="4" width="14" height="4" rx="1" />
-                  <rect x="5" y="10" width="14" height="4" rx="1" />
-                  <rect x="5" y="16" width="14" height="4" rx="1" />
-                </svg>
-              </IconButton>
-            </TooltipTrigger>
-            <TooltipPortal>
-              <TooltipContent>{getDistributeTooltip("Vertically")}</TooltipContent>
-            </TooltipPortal>
+          <Tooltip content={getDistributeTooltip("Vertically")} placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
+            <Button
+              color="light"
+              size="xs"
+              aria-label="Distribute elements vertically with equal spacing"
+              onClick={handleDistributeV}
+              disabled={distributeDisabled} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+            >
+              <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <rect x="5" y="4" width="14" height="4" rx="1" />
+                <rect x="5" y="10" width="14" height="4" rx="1" />
+                <rect x="5" y="16" width="14" height="4" rx="1" />
+              </svg>
+            </Button>
           </Tooltip>
         </div>
       </div>

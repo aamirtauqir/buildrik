@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * ViewSwitcher - Dropdown for switching between views (e.g., Layers/Pages)
  * Replaces horizontal sub-tabs with a cleaner dropdown pattern
@@ -8,6 +7,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 import * as React from "react";
 import { useClickOutside } from "@/shared/hooks";
 import { ChevronIcon, CheckIcon } from "./headerIcons";
+import { Button } from "@/editor/chrome-ui";
 
 export interface ViewOption<T extends string = string> {
   id: T;
@@ -110,10 +110,10 @@ const triggerStyles: React.CSSProperties = {
   gap: 8,
   height: 28,
   padding: "0 10px",
-  background: "var(--buildrick-surface-3)",
-  border: "1px solid var(--buildrick-border)",
-  borderRadius: "var(--buildrick-radius-md)",
-  color: "var(--buildrick-text-primary)",
+  background: "var(--bk-bg-subtle)",
+  border: "1px solid var(--bk-border)",
+  borderRadius: "var(--bk-radius-lg)",
+  color: "var(--bk-ink)",
   fontSize: 12,
   fontWeight: 500,
   cursor: "pointer",
@@ -122,8 +122,8 @@ const triggerStyles: React.CSSProperties = {
 };
 
 const triggerOpenStyles: React.CSSProperties = {
-  background: "var(--buildrick-surface-4)",
-  borderColor: "var(--buildrick-border-hover)",
+  background: "var(--bk-gray-200)",
+  borderColor: "var(--bk-border-strong)",
 };
 
 const labelStyles: React.CSSProperties = {
@@ -133,18 +133,18 @@ const labelStyles: React.CSSProperties = {
 };
 
 const labelPrefixStyles: React.CSSProperties = {
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bk-ink-soft)",
   fontWeight: 400,
 };
 
 const labelValueStyles: React.CSSProperties = {
-  color: "var(--buildrick-text-primary)",
+  color: "var(--bk-ink)",
 };
 
 const iconWrapStyles: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bk-ink-soft)",
 };
 
 const dropdownStyles: React.CSSProperties = {
@@ -154,11 +154,11 @@ const dropdownStyles: React.CSSProperties = {
   right: 0,
   minWidth: 140,
   padding: 4,
-  background: "var(--buildrick-surface-3)",
-  border: "1px solid var(--buildrick-border)",
-  borderRadius: "var(--buildrick-radius-md)",
-  boxShadow: "var(--buildrick-shadow-lg)",
-  zIndex: "var(--buildrick-z-dropdown)",
+  background: "var(--bk-bg-subtle)",
+  border: "1px solid var(--bk-border)",
+  borderRadius: "var(--bk-radius-lg)",
+  boxShadow: "var(--bk-shadow-overlay)",
+  zIndex: "var(--bk-z-popover)",
 };
 
 const optionStyles: React.CSSProperties = {
@@ -169,8 +169,8 @@ const optionStyles: React.CSSProperties = {
   padding: "8px 10px",
   background: "transparent",
   border: "none",
-  borderRadius: "var(--buildrick-radius-sm)",
-  color: "var(--buildrick-text-primary)",
+  borderRadius: "var(--bk-radius-sm)",
+  color: "var(--bk-ink)",
   fontSize: 12,
   fontWeight: 500,
   cursor: "pointer",
@@ -179,14 +179,14 @@ const optionStyles: React.CSSProperties = {
 };
 
 const optionSelectedStyles: React.CSSProperties = {
-  background: "var(--buildrick-accent-tint)",
-  color: "var(--buildrick-accent)",
+  background: "var(--bk-accent-tint)",
+  color: "var(--bk-accent)",
 };
 
 const optionIconStyles: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bk-ink-soft)",
 };
 
 export default ViewSwitcher;

@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * ToolbarActionsSection — Add/Duplicate/More menu/Delete action buttons
  * Extracted sub-component of UnifiedSelectionToolbar.
@@ -6,13 +5,6 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
-import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipPortal,
-  TooltipContent,
-  TooltipKbd,
-} from "@/editor/shared/vibcoder";
 import { canvasTokens } from "../../../../styles/tokens";
 import {
   actionBtnStyles,
@@ -23,7 +15,7 @@ import {
   menuItemStyles,
   menuDividerStyles,
 } from "./toolbarStyles";
-
+import { Button, Tooltip } from "@/editor/chrome-ui";
 const { colors } = canvasTokens;
 
 export interface ToolbarActionsSectionProps {
@@ -55,78 +47,64 @@ export const ToolbarActionsSection: React.FC<ToolbarActionsSectionProps> = ({
     <div style={dividerStyles} />
 
     {/* Add button */}
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <Button onClick={onAdd} style={actionBtnStyles} aria-label="Add child element">
-          <svg
-            width="12"
-            height="12"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            aria-hidden="true"
-          >
-            <path d="M12 5v14M5 12h14" />
-          </svg>
-        </Button>
-      </TooltipTrigger>
-      <TooltipPortal>
-        <TooltipContent side="bottom">Add Element</TooltipContent>
-      </TooltipPortal>
+    <Tooltip content="Add Element" placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
+      <Button color="light" onClick={onAdd} style={actionBtnStyles} aria-label="Add child element" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          aria-hidden="true"
+        >
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+      </Button>
     </Tooltip>
 
     {/* Duplicate button */}
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <Button onClick={onDuplicate} style={actionBtnStyles} aria-label="Duplicate element">
-          <svg
-            width="12"
-            height="12"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            aria-hidden="true"
-          >
-            <rect x="9" y="9" width="13" height="13" rx="2" />
-            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-          </svg>
-        </Button>
-      </TooltipTrigger>
-      <TooltipPortal>
-        <TooltipContent side="bottom">Duplicate <TooltipKbd>⌘D</TooltipKbd></TooltipContent>
-      </TooltipPortal>
+    <Tooltip content="Duplicate · ⌘D" placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
+      <Button color="light" onClick={onDuplicate} style={actionBtnStyles} aria-label="Duplicate element" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          aria-hidden="true"
+        >
+          <rect x="9" y="9" width="13" height="13" rx="2" />
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+        </svg>
+      </Button>
     </Tooltip>
 
     <div style={dividerStyles} />
 
     {/* More button + dropdown */}
     <div style={{ position: "relative" }}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            onClick={onMoreMenuToggle}
-            style={{
-              ...actionBtnStyles,
-              background: showMoreMenu ? colors.surface.border : "transparent",
-            }}
-            aria-label="More actions menu"
-            aria-expanded={showMoreMenu}
-            aria-haspopup="menu"
-          >
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <circle cx="5" cy="12" r="2" />
-              <circle cx="12" cy="12" r="2" />
-              <circle cx="19" cy="12" r="2" />
-            </svg>
-          </Button>
-        </TooltipTrigger>
-        <TooltipPortal>
-          <TooltipContent side="bottom">More</TooltipContent>
-        </TooltipPortal>
+      <Tooltip content="More" placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
+        <Button
+          color="light"
+          onClick={onMoreMenuToggle}
+          style={{
+            ...actionBtnStyles,
+            background: showMoreMenu ? colors.surface.border : "transparent",
+          }}
+          aria-label="More actions menu"
+          aria-expanded={showMoreMenu}
+          aria-haspopup="menu" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <circle cx="5" cy="12" r="2" />
+            <circle cx="12" cy="12" r="2" />
+            <circle cx="19" cy="12" r="2" />
+          </svg>
+        </Button>
       </Tooltip>
 
       {showMoreMenu && (
@@ -136,7 +114,7 @@ export const ToolbarActionsSection: React.FC<ToolbarActionsSectionProps> = ({
           aria-label="More actions"
           style={{ ...dropdownStyles, right: 0, left: "auto" }}
         >
-          <Button role="menuitem" onClick={onCopy} style={menuItemStyles}>
+          <Button color="light" role="menuitem" onClick={onCopy} style={menuItemStyles} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
             <svg
               aria-hidden="true"
               width="12"
@@ -154,7 +132,7 @@ export const ToolbarActionsSection: React.FC<ToolbarActionsSectionProps> = ({
 
           <div role="separator" style={menuDividerStyles} />
 
-          <Button role="menuitem" onClick={onWrap} style={menuItemStyles}>
+          <Button color="light" role="menuitem" onClick={onWrap} style={menuItemStyles} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
             <svg
               aria-hidden="true"
               width="12"
@@ -172,7 +150,7 @@ export const ToolbarActionsSection: React.FC<ToolbarActionsSectionProps> = ({
 
           <div role="separator" style={menuDividerStyles} />
 
-          <Button role="menuitem" onClick={onMoveUp} style={menuItemStyles}>
+          <Button color="light" role="menuitem" onClick={onMoveUp} style={menuItemStyles} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
             <svg
               aria-hidden="true"
               width="12"
@@ -186,7 +164,7 @@ export const ToolbarActionsSection: React.FC<ToolbarActionsSectionProps> = ({
             </svg>
             <span>Bring Forward</span>
           </Button>
-          <Button role="menuitem" onClick={onMoveDown} style={menuItemStyles}>
+          <Button color="light" role="menuitem" onClick={onMoveDown} style={menuItemStyles} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
             <svg
               aria-hidden="true"
               width="12"
@@ -206,26 +184,21 @@ export const ToolbarActionsSection: React.FC<ToolbarActionsSectionProps> = ({
 
     {/* Delete button — spatially separated at far right */}
     <div style={deleteContainerStyles}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button onClick={onDelete} style={isolatedDeleteStyles} aria-label="Delete element">
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              aria-hidden="true"
-            >
-              <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-            </svg>
-          </Button>
-        </TooltipTrigger>
-        <TooltipPortal>
-          <TooltipContent side="bottom">Delete <TooltipKbd>⌫</TooltipKbd></TooltipContent>
-        </TooltipPortal>
+      <Tooltip content="Delete · ⌫" placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
+        <Button color="light" onClick={onDelete} style={isolatedDeleteStyles} aria-label="Delete element" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            aria-hidden="true"
+          >
+            <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+          </svg>
+        </Button>
       </Tooltip>
     </div>
   </>

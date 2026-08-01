@@ -10,7 +10,6 @@
 import * as React from "react";
 import { render, screen, fireEvent, cleanup, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { TooltipProvider } from "@/editor/shared/vibcoder";
 import { IssuesPanel } from "../IssuesPanel";
 import type { Issue } from "../hooks/useStudioState";
 
@@ -30,9 +29,7 @@ const NOT_FIXABLE: Issue = {
 
 function renderPanel(props: Partial<React.ComponentProps<typeof IssuesPanel>> = {}) {
   return render(
-    <TooltipProvider>
-      <IssuesPanel issues={[FIXABLE, NOT_FIXABLE]} onClose={vi.fn()} {...props} />
-    </TooltipProvider>,
+    <IssuesPanel issues={[FIXABLE, NOT_FIXABLE]} onClose={vi.fn()} {...props} />,
   );
 }
 

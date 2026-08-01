@@ -5,7 +5,7 @@
   flex-direction: column;
   width: 100%;
   height: 100%;
-  background: var(--bd-bg);
+  background: var(--bk-bg-app);
   overflow: hidden;
   position: relative;
 }
@@ -16,7 +16,7 @@
   justify-content: space-between;
   height: 48px;
   padding: 0 12px 0 16px;
-  border-bottom: 1px solid var(--bd-border-light);
+  border-bottom: 1px solid var(--bk-border);
   flex-shrink: 0;
 }
 
@@ -28,10 +28,10 @@
 
 .exp-panel__title {
   margin: 0;
-  font-family: var(--bd-font-display);
+  font-family: var(--bk-font-ui);
   font-size: 13px;
   font-weight: 600;
-  color: var(--bd-fg);
+  color: var(--bk-ink);
 }
 
 .exp-panel__badge {
@@ -54,13 +54,13 @@
   padding: 4px 8px;
   border-radius: 4px;
   background: transparent;
-  border: 1px solid var(--bd-border-light);
-  color: var(--bd-fg-secondary);
+  border: 1px solid var(--bk-border);
+  color: var(--bk-ink-soft);
   cursor: pointer;
 }
 .exp-panel__compact-btn:hover {
-  background: var(--bd-bg-soft);
-  color: var(--bd-fg);
+  background: var(--bk-bg-subtle);
+  color: var(--bk-ink);
 }
 
 .exp-panel__icon-btn {
@@ -71,13 +71,13 @@
   height: 28px;
   border: none;
   background: transparent;
-  color: var(--bd-fg-muted);
+  color: var(--bk-ink-muted);
   border-radius: 4px;
   cursor: pointer;
 }
 .exp-panel__icon-btn:hover {
-  background: var(--bd-bg-soft);
-  color: var(--bd-fg);
+  background: var(--bk-bg-subtle);
+  color: var(--bk-ink);
 }
 
 .exp-panel__body {
@@ -90,8 +90,8 @@
 
 .exp-panel__folders {
   width: 180px;
-  border-right: 1px solid var(--bd-border-light);
-  background: var(--bd-bg-soft);
+  border-right: 1px solid var(--bk-border);
+  background: var(--bk-bg-subtle);
   overflow-y: auto;
   flex-shrink: 0;
 }
@@ -106,7 +106,7 @@
 .exp-panel__folders-label {
   font-size: 10px;
   font-weight: 600;
-  color: var(--bd-fg-muted);
+  color: var(--bk-ink-muted);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -128,27 +128,27 @@
   background: transparent;
   border-radius: 4px;
   font-size: 12px;
-  color: var(--bd-fg-secondary);
+  color: var(--bk-ink-soft);
   cursor: pointer;
   text-align: left;
 }
 .exp-folder-item:hover {
-  background: var(--bd-bg);
-  color: var(--bd-fg);
+  background: var(--bk-bg-app);
+  color: var(--bk-ink);
 }
 .exp-folder-item.is-active {
-  background: var(--bd-accent-tint);
-  color: var(--bd-accent);
+  background: var(--bk-accent-tint);
+  color: var(--bk-accent);
   font-weight: 500;
 }
 
 /* §13 — drag-to-folder snap feedback. Outline + soft fill while an asset
    is being dragged over this folder; clears on dragleave / drop. */
 .exp-folder-item.is-drop-target {
-  background: var(--bd-accent-tint);
-  outline: 2px solid var(--bd-accent);
+  background: var(--bk-accent-tint);
+  outline: 2px solid var(--bk-accent);
   outline-offset: -2px;
-  color: var(--bd-accent);
+  color: var(--bk-accent);
 }
 
 .exp-folder-item__name {
@@ -165,11 +165,11 @@
   justify-content: center;
   gap: 12px;
   padding: 32px 24px;
-  border: 2px dashed var(--bd-border);
-  border-radius: var(--bd-radius-md);
+  border: 2px dashed var(--bk-border);
+  border-radius: var(--bk-radius-lg);
   margin: 16px;
   background: transparent;
-  color: var(--bd-fg-muted);
+  color: var(--bk-ink-muted);
   cursor: pointer;
   text-align: center;
   transition: border-color 120ms ease, background 120ms ease;
@@ -177,34 +177,34 @@
 
 .med-empty-folder-zone:hover,
 .med-empty-folder-zone:focus-visible {
-  border-color: var(--bd-accent);
-  background: var(--bd-accent-subtle);
+  border-color: var(--bk-accent);
+  background: var(--bk-accent-subtle);
   outline: none;
 }
 
 .med-empty-folder-zone.is-drag-over {
-  border-color: var(--bd-accent);
-  background: var(--bd-accent-tint);
-  color: var(--bd-fg);
+  border-color: var(--bk-accent);
+  background: var(--bk-accent-tint);
+  color: var(--bk-ink);
 }
 
 .med-empty-folder-zone__title {
-  font-size: var(--bd-font-size-sm);
+  font-size: var(--bk-text-12);
   font-weight: 600;
-  color: var(--bd-fg);
+  color: var(--bk-ink);
 }
 
 .med-empty-folder-zone__sub {
-  font-size: var(--bd-font-size-xs);
-  color: var(--bd-fg-muted);
+  font-size: var(--bk-text-11);
+  color: var(--bk-ink-muted);
 }
 
 .exp-folder-item__rename-input {
   flex: 1;
   min-width: 0;
-  background: var(--bd-surface);
-  border: 1px solid var(--bd-accent);
-  border-radius: var(--bd-radius-sm);
+  background: var(--bk-bg-panel);
+  border: 1px solid var(--bk-accent);
+  border-radius: var(--bk-radius-sm);
   padding: 2px 6px;
   font: inherit;
   color: inherit;
@@ -213,12 +213,12 @@
 
 .exp-folder-item__count {
   font-size: 10px;
-  color: var(--bd-fg-muted);
+  color: var(--bk-ink-muted);
   margin-left: 6px;
   flex-shrink: 0;
 }
 .exp-folder-item.is-active .exp-folder-item__count {
-  color: var(--bd-cobalt);
+  color: var(--bk-accent);
   opacity: 0.7;
 }
 

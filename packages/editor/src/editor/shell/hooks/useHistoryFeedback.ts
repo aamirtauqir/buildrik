@@ -10,9 +10,9 @@
  */
 
 import * as React from "react";
+import { ToastInput } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
 import { EVENTS } from "../../../shared/constants";
-import type { ToastInput } from "@/editor/shared/vibcoder";
 
 /** Map of action labels to user-friendly descriptions */
 const ACTION_DESCRIPTIONS: Record<string, string> = {

@@ -1,5 +1,3 @@
-import { Kbd } from "@/editor/shared/vibcoder/Kbd";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Delete Confirmation Modal
  * Extracted from ProInspector.tsx for 500-line compliance.
@@ -7,13 +5,8 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
-import {
-  Modal,
-  ModalContent,
-  ModalTitle,
-  ModalClose,
-  OverlayMount,
-} from "@/editor/shared/vibcoder";
+import { Kbd, ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/chrome-ui";
+import { Button } from "@/editor/chrome-ui";
 
 export interface DeleteConfirmModalProps {
   isOpen: boolean;
@@ -28,8 +21,8 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
   onConfirm,
   elementLabel,
 }) => (
-  <OverlayMount>
-    <Modal open={isOpen} onOpenChange={(next) => !next && onClose()}>
+  <Portal>
+    <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
       <ModalContent size="lg">
         <ModalTitle>Delete Element</ModalTitle>
         <ModalClose aria-label="Close modal">
@@ -46,28 +39,28 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
           </svg>
         </ModalClose>
         <div className="bd-modal__body">
-          <div style={{ padding: "var(--buildrick-space-4)" }}>
+          <div style={{ padding: "var(--bk-space-16)" }}>
       <p
         role="alert"
         style={{
-          margin: "0 0 var(--buildrick-space-4)",
-          color: "var(--buildrick-text-secondary)",
-          fontSize: "var(--buildrick-text-md)",
+          margin: "0 0 var(--bk-space-16)",
+          color: "var(--bk-ink-soft)",
+          fontSize: "var(--bk-text-13)",
           lineHeight: 1.5,
         }}
       >
         Delete <strong>{elementLabel}</strong>? You can undo this with{" "}
-        <Kbd style={{ fontFamily: "var(--buildrick-font-family-mono)", fontSize: "0.9em" }}>Ctrl+Z</Kbd>.
+        <Kbd style={{ fontFamily: "var(--bk-font-mono)", fontSize: "0.9em" }}>Ctrl+Z</Kbd>.
       </p>
-      <div style={{ display: "flex", gap: "var(--buildrick-space-3)", justifyContent: "flex-end" }}>
+      <div style={{ display: "flex", gap: "var(--bk-space-12)", justifyContent: "flex-end" }}>
         <Button
           onClick={onClose}
           style={{
             padding: "8px 16px",
-            background: "var(--buildrick-surface-4)",
-            border: "1px solid var(--buildrick-border)",
-            borderRadius: "var(--buildrick-radius-md)",
-            color: "var(--buildrick-text-primary)",
+            background: "var(--bk-gray-200)",
+            border: "1px solid var(--bk-border)",
+            borderRadius: "var(--bk-radius-lg)",
+            color: "var(--bk-ink)",
             cursor: "pointer",
             fontWeight: 500,
           }}
@@ -78,9 +71,9 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
           onClick={onConfirm}
           style={{
             padding: "8px 16px",
-            background: "var(--buildrick-error)",
+            background: "var(--bk-error)",
             border: "none",
-            borderRadius: "var(--buildrick-radius-md)",
+            borderRadius: "var(--bk-radius-lg)",
             color: "white",
             cursor: "pointer",
             fontWeight: 600,
@@ -92,6 +85,6 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
     </div>
         </div>
       </ModalContent>
-    </Modal>
-  </OverlayMount>
+    </ModalRoot>
+  </Portal>
 );

@@ -12,9 +12,7 @@
 
 import * as React from "react";
 import type { CodeTab } from "../../shared/types/export";
-import { Tabs, Tab } from "@/editor/shared/vibcoder/Tabs";
-import { CopyButton } from "@/shared/extensions/CopyButton";
-import { Stack } from "@/editor/shared/vibcoder";
+import { CopyButton, Tabs } from "@/editor/chrome-ui";
 
 // ============================================================================
 // TYPES
@@ -84,7 +82,7 @@ function highlightHTML(code: string): React.ReactNode[] {
     } else if (match[5]) {
       // Comments
       parts.push(
-        <span key={key++} style={{ color: "var(--buildrick-text-muted)", fontStyle: "italic" }}>
+        <span key={key++} style={{ color: "var(--bk-ink-muted)", fontStyle: "italic" }}>
           {match[0]}
         </span>
       );
@@ -141,7 +139,7 @@ function highlightCSS(code: string): React.ReactNode[] {
     } else if (match[4]) {
       // Comments
       parts.push(
-        <span key={key++} style={{ color: "var(--buildrick-text-muted)", fontStyle: "italic" }}>
+        <span key={key++} style={{ color: "var(--bk-ink-muted)", fontStyle: "italic" }}>
           {match[0]}
         </span>
       );
@@ -173,7 +171,7 @@ const LineNumbers: React.FC<{ count: number }> = ({ count }) => (
     style={{
       textAlign: "right",
       paddingRight: 16,
-      color: "var(--buildrick-text-muted)",
+      color: "var(--bk-ink-muted)",
       fontSize: 12,
       fontFamily: "monospace",
       userSelect: "none",
@@ -257,17 +255,19 @@ export const CodePreview: React.FC<CodePreviewProps> = ({
   const [activeTab, setActiveTab] = React.useState<CodeTab>(defaultTab);
 
   return (
-    <Stack>
+    <div className="tw:flex tw:flex-col tw:gap-3">
       {/* Tabs */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <Tabs
+          tabs={[
+            { id: "html", label: "HTML" },
+            { id: "css", label: "CSS" },
+          ]}
           value={activeTab}
-          onValueChange={(tab) => setActiveTab(tab as CodeTab)}
-        >
-          <Tab id="html">HTML</Tab>
-          <Tab id="css">CSS</Tab>
-        </Tabs>
-        <span style={{ fontSize: 12, color: "var(--buildrick-text-muted)" }}>
+          onChange={(tab) => setActiveTab(tab as CodeTab)}
+          label="Code language"
+        />
+        <span style={{ fontSize: 12, color: "var(--bk-ink-muted)" }}>
           {activeTab === "html"
             ? `${html.split("\n").length} lines`
             : `${cssCode.split("\n").length} lines`}
@@ -281,7 +281,7 @@ export const CodePreview: React.FC<CodePreviewProps> = ({
       {activeTab === "css" && (
         <CodeBlock code={cssCode} language="css" showLineNumbers={showLineNumbers} />
       )}
-    </Stack>
+    </div>
   );
 };
 

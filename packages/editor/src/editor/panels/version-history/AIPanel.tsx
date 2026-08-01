@@ -24,8 +24,8 @@
  * @license BSD-3-Clause
  */
 
-import { Button } from "@/editor/shared/vibcoder/Button";
 import * as React from "react";
+import { Button } from "@/editor/chrome-ui";
 
 export interface AISummaryState {
   loading: boolean;

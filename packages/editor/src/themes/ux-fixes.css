@@ -19,8 +19,8 @@
  */
 
 .buildrick-input:hover:not(:disabled):not(:focus) {
-  border-color: var(--buildrick-border-hover);
-  background: var(--buildrick-bg-subtle);
+  border-color: var(--bk-border-strong);
+  background: var(--bk-bg-subtle);
   transform: translateY(-1px);
   transition: all 0.15s ease;
 }
@@ -31,13 +31,13 @@
   opacity: 0.6;
   cursor: not-allowed;
   background: rgba(0, 0, 0, 0.15);
-  color: var(--buildrick-text-disabled);
+  color: var(--bk-ink-disabled);
   border-style: dashed;
 }
 
 .buildrick-input::placeholder,
 .buildrick-textarea::placeholder {
-  color: var(--buildrick-text-muted);
+  color: var(--bk-ink-muted);
   opacity: 0.7;
   font-style: italic;
 }
@@ -45,10 +45,10 @@
 .buildrick-input:focus,
 .buildrick-select:focus,
 .buildrick-textarea:focus {
-  border-color: var(--buildrick-accent);
-  background: var(--buildrick-bg-input);
+  border-color: var(--bk-accent);
+  background: var(--bk-bg-card);
   box-shadow:
-    var(--buildrick-input-ring),
+    var(--bk-shadow-focus),
     0 4px 12px rgba(45, 109, 255, 0.15);
   transform: translateY(0);
   transition: all 0.2s ease;
@@ -56,16 +56,16 @@
 
 .buildrick-input-error,
 .buildrick-input.has-error {
-  border-color: var(--buildrick-error);
+  border-color: var(--bk-error);
   background: rgba(239, 68, 68, 0.05);
   animation: shake 0.3s ease;
 }
 
 .buildrick-input-error:focus,
 .buildrick-input.has-error:focus {
-  border-color: var(--buildrick-error);
+  border-color: var(--bk-error);
   box-shadow:
-    var(--buildrick-input-ring-error),
+    var(--bk-shadow-focus),
     0 4px 12px rgba(239, 68, 68, 0.15);
 }
 
@@ -76,8 +76,8 @@
 }
 
 .buildrick-select:hover:not(:disabled):not(:focus) {
-  border-color: var(--buildrick-border-hover);
-  background-color: var(--buildrick-bg-subtle);
+  border-color: var(--bk-border-strong);
+  background-color: var(--bk-bg-subtle);
   cursor: pointer;
   transform: translateY(-1px);
   transition: all 0.15s ease;
@@ -85,7 +85,7 @@
 
 .buildrick-select:active:not(:disabled) {
   transform: translateY(0);
-  border-color: var(--buildrick-accent);
+  border-color: var(--bk-accent);
 }
 
 /* Global button transition + ripple + scale-press + disabled-stripes
@@ -107,8 +107,8 @@ button:disabled,
 }
 
 .buildrick-switch:hover:not(.is-disabled) .buildrick-switch-track {
-  border-color: var(--buildrick-accent);
-  box-shadow: 0 0 0 3px var(--buildrick-accent-subtle);
+  border-color: var(--bk-accent);
+  box-shadow: 0 0 0 3px var(--bk-accent-subtle);
 }
 
 .buildrick-switch-thumb {
@@ -211,30 +211,30 @@ button:disabled,
 
 .buildrick-empty-state {
   text-align: center;
-  padding: var(--buildrick-space-8) var(--buildrick-space-4);
-  color: var(--buildrick-text-muted);
+  padding: var(--bk-space-32) var(--bk-space-16);
+  color: var(--bk-ink-muted);
   animation: bd-uxfix-fade-in 0.4s ease;
 }
 
 .buildrick-empty-state-icon {
   font-size: 48px;
-  margin-bottom: var(--buildrick-space-4);
+  margin-bottom: var(--bk-space-16);
   opacity: 0.4;
   filter: grayscale(0.3);
   animation: float 3s ease-in-out infinite;
 }
 
 .buildrick-empty-state-title {
-  font-size: var(--buildrick-text-lg);
-  font-weight: var(--buildrick-font-weight-semibold);
-  color: var(--buildrick-text-secondary);
-  margin-bottom: var(--buildrick-space-2);
+  font-size: var(--bk-text-16);
+  font-weight: var(--bk-weight-semibold);
+  color: var(--bk-ink-soft);
+  margin-bottom: var(--bk-space-8);
 }
 
 .buildrick-empty-state-desc {
-  font-size: var(--buildrick-text-sm-plus);
-  color: var(--buildrick-text-muted);
-  line-height: var(--buildrick-lh-20);
+  font-size: var(--bk-text-13);
+  color: var(--bk-ink-muted);
+  line-height: var(--bk-space-20);
 }
 
 @keyframes bd-uxfix-fade-in {
@@ -259,15 +259,15 @@ button:disabled,
 
 .buildrick-empty-state-compact .buildrick-empty-state-icon {
   font-size: 32px;
-  margin-bottom: var(--buildrick-space-2);
+  margin-bottom: var(--bk-space-8);
 }
 
 .buildrick-empty-state-compact .buildrick-empty-state-title {
-  font-size: var(--buildrick-text-sm-plus);
+  font-size: var(--bk-text-13);
 }
 
 .buildrick-empty-state-compact .buildrick-empty-state-desc {
-  font-size: var(--buildrick-text-sm);
+  font-size: var(--bk-text-12);
 }
 
 .buildrick-spinner {
@@ -292,11 +292,11 @@ button:disabled,
   right: 24px;
   min-width: 300px;
   padding: 16px 20px;
-  background: var(--buildrick-bg-panel);
-  border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-radius-lg);
-  box-shadow: var(--buildrick-shadow-xl);
-  z-index: var(--buildrick-z-toast);
+  background: var(--bk-bg-panel);
+  border: 1px solid var(--bk-border);
+  border-radius: var(--bk-radius-lg);
+  box-shadow: var(--bk-shadow-overlay);
+  z-index: var(--bk-z-toast);
   animation: slideIn 0.3s ease, bd-uxfix-fade-in 0.3s ease;
 }
 
@@ -340,11 +340,11 @@ button:disabled,
 .buildrick-btn,
 .buildrick-panel,
 .buildrick-card {
-  border-radius: var(--buildrick-radius-md);
+  border-radius: var(--bk-radius-lg);
 }
 
 .buildrick-field + .buildrick-field {
-  margin-top: var(--buildrick-space-4);
+  margin-top: var(--bk-space-16);
 }
 
 /* @media print, prefers-reduced-motion, prefers-contrast — migrated to

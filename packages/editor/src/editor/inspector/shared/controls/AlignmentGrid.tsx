@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * AlignmentGrid — 9-dot justify/align picker. Ported to .bdi-pad per
  * comp-inspector.html v2 mock. Shows a pad + kv meta block side-by-side.
@@ -7,6 +6,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button } from "@/editor/chrome-ui";
 
 export interface AlignmentGridProps {
   justifyItems: string;

@@ -1,15 +1,14 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Display Controls - Display mode selection with visual previews
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { HelpTooltip } from "../../../../shared/ui/HelpTooltip";
+import { HelpTooltip } from "@/editor/chrome-ui";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
 import { DisplayPreview } from "./previews";
 import { cardBtn, tipBoxStyle } from "./styles";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -47,7 +46,7 @@ export const DisplayControls: React.FC<DisplayControlsProps> = ({ display, onCha
       <div
         style={{
           fontSize: 12,
-          color: "var(--buildrick-text-tertiary)",
+          color: "var(--bk-ink-muted)",
           marginBottom: 8,
           display: "flex",
           alignItems: "center",

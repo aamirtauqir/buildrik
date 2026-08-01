@@ -5,12 +5,11 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/shared/vibcoder";
 import { useFormHandler } from "../hooks/useFormHandler";
 import type { Composer } from "../../engine";
 import type { Element } from "../../engine/elements/Element";
 import type { FormConfig } from "../../engine/forms/FormHandler";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -83,7 +82,7 @@ export const FormSettingsSection: React.FC<FormSettingsSectionProps> = ({
   if (!hasFormId) {
     return (
       <div style={sectionStyles}>
-        <Button variant="primary" onClick={handleCreateForm}>
+        <Button onClick={handleCreateForm}>
           Enable Form Handling
         </Button>
         <p style={hintStyles}>
@@ -190,7 +189,7 @@ const headerStyles: React.CSSProperties = {
   justifyContent: "space-between",
   alignItems: "center",
   padding: "8px 12px",
-  background: "var(--buildrick-surface-3)",
+  background: "var(--bk-bg-subtle)",
   borderRadius: "6px",
 };
 
@@ -203,24 +202,24 @@ const fieldStyles: React.CSSProperties = {
 const labelStyles: React.CSSProperties = {
   fontSize: "11px",
   fontWeight: 500,
-  color: "var(--buildrick-text-muted)",
+  color: "var(--bk-ink-muted)",
   textTransform: "uppercase",
   letterSpacing: "0.5px",
 };
 
 const valueStyles: React.CSSProperties = {
   fontSize: "12px",
-  color: "var(--buildrick-text-primary)",
+  color: "var(--bk-ink)",
   fontFamily: "monospace",
 };
 
 const inputStyles: React.CSSProperties = {
   padding: "8px 12px",
-  border: "1px solid var(--buildrick-border)",
+  border: "1px solid var(--bk-border)",
   borderRadius: "6px",
   fontSize: "13px",
-  background: "var(--buildrick-bg-card)",
-  color: "var(--buildrick-text-primary)",
+  background: "var(--bk-bg-card)",
+  color: "var(--bk-ink)",
 };
 
 const selectStyles: React.CSSProperties = {
@@ -230,7 +229,7 @@ const selectStyles: React.CSSProperties = {
 
 const hintStyles: React.CSSProperties = {
   fontSize: "11px",
-  color: "var(--buildrick-text-muted)",
+  color: "var(--bk-ink-muted)",
   margin: 0,
 };
 

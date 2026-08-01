@@ -1,4 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
 /**
  * Text Controls — TextInputRow, InlineInput, SectionLabel, SubSectionTitle.
  * Ported to .bdi-text + .bdi-row-ctrl + .bdi-sub-label.
@@ -7,6 +6,7 @@ import { Input } from "@/editor/shared/vibcoder/Input";
  */
 
 import * as React from "react";
+import { TextField } from "@/editor/chrome-ui";
 
 // ============================================================================
 // TEXT INPUT ROW
@@ -29,7 +29,7 @@ export const TextInputRow: React.FC<TextInputRowProps> = ({
   <div className="bdi-row-ctrl">
     <label className="bdi-lb">{label}</label>
     <div className="bdi-row-content">
-      <Input
+      <TextField
         type="text"
         className="bdi-text"
         value={value}
@@ -61,7 +61,7 @@ export const InlineInput: React.FC<InlineInputProps> = ({
   <div className="bdi-row-ctrl">
     <label className="bdi-lb">{label}</label>
     <div className="bdi-row-content">
-      <Input
+      <TextField
         type="text"
         className="bdi-text"
         value={value}
@@ -84,8 +84,8 @@ export interface SectionLabelProps {
 export const SectionLabel: React.FC<SectionLabelProps> = ({ children, style }) => (
   <label
     style={{
-      font: "500 11px var(--bd-font)",
-      color: "var(--bd-fg-secondary)",
+      font: "500 11px var(--bk-font-ui)",
+      color: "var(--bk-ink-soft)",
       display: "block",
       marginBottom: 4,
       ...style,

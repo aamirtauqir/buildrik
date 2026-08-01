@@ -1,5 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * BlockPickerModal - Block picker modal for UnifiedSelectionToolbar
  * Opens a modal with ElementsTab to select block type for insertion
@@ -8,7 +6,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
-import { Modal, ModalContent } from "@/editor/shared/vibcoder/Modal";
+import { ModalContent, ModalRoot } from "@/editor/chrome-ui";
 import { getBlockById, insertBlock } from "../../../blocks/blockRegistry";
 import type { Composer } from "../../../engine";
 import type { BlockData } from "../../../shared/types";
@@ -17,6 +15,7 @@ import { devLogger } from "../../../shared/utils/devLogger";
 import { runTransaction } from "../../../shared/utils/helpers";
 import { canNestElement } from "../../../shared/utils/nesting";
 import { ElementsTab } from "../../sidebar/tabs/ElementsTab";
+import { Button, TextInput } from "@/editor/chrome-ui";
 
 export interface BlockPickerModalProps {
   composer: Composer;
@@ -137,7 +136,7 @@ export const BlockPickerModal: React.FC<BlockPickerModalProps> = ({
   };
 
   return (
-    <Modal open={isOpen} onOpenChange={(o) => { if (!o) onClose(); }}>
+    <ModalRoot open={isOpen} onOpenChange={(o) => { if (!o) onClose(); }}>
       <ModalContent
         size="xl"
         srTitle={positionLabels[insertionContext.position]}
@@ -174,7 +173,7 @@ export const BlockPickerModal: React.FC<BlockPickerModalProps> = ({
             <circle cx="11" cy="11" r="8" />
             <path d="M21 21l-4.35-4.35" />
           </svg>
-          <Input
+          <TextInput
             type="text"
             placeholder="Search elements..."
             value={searchQuery}
@@ -189,13 +188,13 @@ export const BlockPickerModal: React.FC<BlockPickerModalProps> = ({
           <ElementsTab searchQuery={searchQuery} onBlockClick={handleBlockSelect} />
         </div>
       </ModalContent>
-    </Modal>
+    </ModalRoot>
   );
 };
 
 // Styles
 const modalStyles: React.CSSProperties = {
-  background: "var(--buildrick-bg-panel)",
+  background: "var(--bk-bg-panel)",
   borderRadius: 12,
   boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)",
   width: 380,
@@ -207,7 +206,7 @@ const modalStyles: React.CSSProperties = {
 
 const headerStyles: React.CSSProperties = {
   padding: "14px 16px",
-  borderBottom: "1px solid var(--buildrick-border, rgba(255,255,255,0.08))",
+  borderBottom: "1px solid var(--bk-border, rgba(255,255,255,0.08))",
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
@@ -216,13 +215,13 @@ const headerStyles: React.CSSProperties = {
 const titleStyles: React.CSSProperties = {
   fontWeight: 600,
   fontSize: 14,
-  color: "var(--buildrick-text-primary)",
+  color: "var(--bk-ink)",
 };
 
 const closeButtonStyles: React.CSSProperties = {
   background: "transparent",
   border: "none",
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bk-ink-soft)",
   cursor: "pointer",
   padding: 4,
   borderRadius: 6,
@@ -235,7 +234,7 @@ const searchContainerStyles: React.CSSProperties = {
   alignItems: "center",
   gap: 8,
   padding: "8px 16px",
-  borderBottom: "1px solid var(--buildrick-border, rgba(255,255,255,0.08))",
+  borderBottom: "1px solid var(--bk-border, rgba(255,255,255,0.08))",
 };
 
 const searchInputStyles: React.CSSProperties = {
@@ -243,7 +242,7 @@ const searchInputStyles: React.CSSProperties = {
   background: "transparent",
   border: "none",
   outline: "none",
-  color: "var(--buildrick-text-primary)",
+  color: "var(--bk-ink)",
   fontSize: 13,
 };
 

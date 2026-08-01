@@ -1,6 +1,6 @@
 import * as React from "react";
+import { ConfirmDialog, PanelFrame } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
-import { TabFrame } from "@/shared/extensions/TabFrame";
 import { ScopeChip } from "./ScopeChip";
 import { ChatThread } from "./ChatThread";
 import { AgentPlan } from "./AgentPlan";
@@ -11,11 +11,10 @@ import { gatherTokens, gatherMediaAssets } from "./hooks/aiScopeContext";
 import { useAgentRunner } from "./hooks/useAgentRunner";
 import { useAiActionGate } from "./hooks/useAiActionGate";
 import { applyAiEdit } from "./applySetStyle";
-import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
-import { Button } from "@/editor/shared/vibcoder/Button";
 import { trackAiEditApplied } from "@/services/ai/adoptionTracker";
 import { DEFAULT_MODEL, type AIModel, type ChatMessage, type DiffEdit } from "./types";
 import "./AITab.css";
+import { Button } from "@/editor/chrome-ui";
 
 export interface AITabProps {
   composer: Composer | null;
@@ -161,8 +160,8 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose }) 
   }, [messages, submit]);
 
   return (
-    <TabFrame className="bd-ai-tab">
-      <TabFrame.Header
+    <PanelFrame className="bd-ai-tab">
+      <PanelFrame.Header
         title="AI"
         subtitle="Chat with AI to edit your page"
         onHelpClick={onHelpClick}
@@ -171,7 +170,7 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose }) 
       <div className="bd-ai-mode" role="tablist" aria-label="AI mode">
         <Button
           type="button"
-          variant="bare"
+          color="light"
           role="tab"
           aria-selected={mode === "chat"}
           className={`bd-ai-mode-btn${mode === "chat" ? " bd-ai-mode-active" : ""}`}
@@ -181,7 +180,7 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose }) 
         </Button>
         <Button
           type="button"
-          variant="bare"
+          color="light"
           role="tab"
           aria-selected={mode === "agent"}
           className={`bd-ai-mode-btn${mode === "agent" ? " bd-ai-mode-active" : ""}`}
@@ -221,16 +220,16 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose }) 
         streaming={mode === "agent" ? agent.phase === "planning" || agent.phase === "running" : stream.streaming}
       />
       <ConfirmDialog
-        isOpen={actionGate.state.open}
+        open={actionGate.state.open}
         title={actionGate.state.title}
         message={actionGate.state.consequence}
-        confirmText={actionGate.state.busy ? "Publishing…" : "Publish"}
-        cancelText="Cancel"
-        variant="primary"
+        confirmLabel={actionGate.state.busy ? "Publishing…" : "Publish"}
+        cancelLabel="Cancel"
+        
         onConfirm={actionGate.confirm}
         onClose={actionGate.cancel}
       />
-    </TabFrame>
+    </PanelFrame>
   );
 };
 

@@ -8,10 +8,8 @@ import * as React from "react";
 import { SelectField, NumberField, SliderField } from "../../shared/forms";
 import type { AnimationConfig } from "../../shared/types/animations";
 import { DEFAULT_ANIMATION } from "../../shared/types/animations";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Tabs, Tab } from "@/editor/shared/vibcoder/Tabs";
-import { Stack } from "@/editor/shared/vibcoder";
-
+import { Tabs } from "@/editor/chrome-ui";
+import { Button } from "@/editor/chrome-ui";
 // Re-export for backwards compatibility
 export type { AnimationConfig } from "../../shared/types/animations";
 
@@ -88,11 +86,16 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
   return (
     <div style={{ padding: 12 }}>
       {/* Animation Type */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="bd-tabs--sm">
-        <Tab id="entrance">Entrance</Tab>
-        <Tab id="attention">Attention</Tab>
-        <Tab id="exit">Exit</Tab>
-      </Tabs>
+      <Tabs
+        tabs={[
+          { id: "entrance", label: "Entrance" },
+          { id: "attention", label: "Attention" },
+          { id: "exit", label: "Exit" },
+        ]}
+        value={activeTab}
+        onChange={setActiveTab}
+        label="Animation type"
+      />
       <div style={{ marginTop: 16 }}>
         <div
           style={{
@@ -112,14 +115,14 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
                 padding: "12px 6px",
                 background:
                   animation.type === anim.value
-                    ? "var(--buildrick-accent)"
-                    : "var(--buildrick-bg-app)",
+                    ? "var(--bk-accent)"
+                    : "var(--bk-bg-app)",
                 border:
                   animation.type === anim.value
                     ? "none"
-                    : "1px solid var(--buildrick-border)",
-                borderRadius: "var(--bd-radius-sm)",
-                color: animation.type === anim.value ? "var(--buildrick-bg-card)" : "var(--buildrick-text-secondary)",
+                    : "1px solid var(--bk-border)",
+                borderRadius: "var(--bk-radius-sm)",
+                color: animation.type === anim.value ? "var(--bk-bg-card)" : "var(--bk-ink-soft)",
                 fontSize: 11,
                 cursor: "pointer",
                 transition: "all 0.15s ease",
@@ -137,14 +140,14 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
             fontSize: 12,
             fontWeight: 600,
             textTransform: "uppercase",
-            color: "var(--buildrick-text-muted)",
+            color: "var(--bk-ink-muted)",
             marginBottom: 12,
           }}
         >
           Timing
         </div>
 
-        <Stack gap="lg">
+        <div className="tw:flex tw:flex-col tw:gap-4">
           <SliderField
             label="Duration"
             value={animation.duration}
@@ -177,7 +180,7 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
             min={1}
             max={10}
           />
-        </Stack>
+        </div>
       </div>
       {/* Trigger row removed 2026-05-18 — UI promised load/scroll/hover/click
        * options but engine never honored them (generateAnimationCSS only reads
@@ -188,7 +191,7 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
       <div style={{ marginTop: 24 }}>
         <Button onClick={onPreview} style={{
           width: "100%"
-        }} variant="secondary">
+        }} color="light">
           ▶️ Preview Animation
         </Button>
       </div>
@@ -197,12 +200,12 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
         <div
           style={{
             padding: 12,
-            background: "var(--buildrick-bg-app)",
-            border: "1px solid var(--buildrick-border)",
-            borderRadius: "var(--bd-radius-sm)",
-            fontFamily: "var(--buildrick-font-family-mono)",
+            background: "var(--bk-bg-app)",
+            border: "1px solid var(--bk-border)",
+            borderRadius: "var(--bk-radius-sm)",
+            fontFamily: "var(--bk-font-mono)",
             fontSize: 10,
-            color: "var(--buildrick-text-secondary)",
+            color: "var(--bk-ink-soft)",
           }}
         >
           animation: {animation.type} {animation.duration}ms {animation.easing} {animation.delay}ms{" "}

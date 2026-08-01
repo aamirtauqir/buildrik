@@ -7,26 +7,25 @@
  */
 
 import * as React from "react";
-import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
 import type { Composer } from "../../engine";
 import { InputField, FileField } from "../../shared/forms";
 import type { MediaAsset, MediaAssetType, MediaViewMode } from "../../shared/types/media";
 import {
-  Modal,
-  ModalContent,
-  ModalTitle,
+  ConfirmDialog,
   ModalClose,
-  OverlayMount,
-} from "@/editor/shared/vibcoder";
-import { Tabs, Tab } from "@/editor/shared/vibcoder/Tabs";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Spinner } from "@/editor/shared/vibcoder/Spinner";
+  ModalContent,
+  ModalRoot,
+  ModalTitle,
+  Portal,
+  Spinner,
+  Tabs,
+} from "@/editor/chrome-ui";
 import { useMediaManager } from "../shell/hooks";
 import { AssetCard } from "./AssetCard";
 import { mediaLibraryStyles as styles } from "./MediaLibraryStyles";
 import { OptimizationPanel } from "./OptimizationPanel";
 import { VideoPreview } from "./VideoPreview";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================
 // Types
 // ============================================
@@ -134,22 +133,26 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
   const filteredAssets = assets.filter((asset) => allowedTypes.includes(asset.type));
 
   return (
-    <OverlayMount>
-      <Modal open={isOpen} onOpenChange={(next) => !next && onClose()}>
+    <Portal>
+      <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
         <ModalContent size="lg">
           <ModalTitle>{title}</ModalTitle>
-          <ModalClose aria-label="Close modal">
+          <ModalClose aria-label="Close modal" onClick={onClose}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
               <path d="M18 6L6 18M6 6l12 12" />
             </svg>
           </ModalClose>
           <div className="bd-modal__body">
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <Tab id="library">Library</Tab>
-        <Tab id="upload">Upload</Tab>
-        <Tab id="url">From URL</Tab>
-        <Tab id="optimize">Optimize</Tab>
-      </Tabs>
+      <Tabs
+        tabs={[
+          { id: "library", label: "Library" },
+          { id: "upload", label: "Upload" },
+          { id: "url", label: "From URL" },
+          { id: "optimize", label: "Optimize" },
+        ]}
+        value={activeTab}
+        onChange={setActiveTab}
+      />
 
       <div style={styles.container}>
         {activeTab === "library" && (
@@ -165,16 +168,18 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
               </div>
               <div style={styles.viewToggle}>
                 <Button
-                  variant={viewMode === "grid" ? "primary" : "ghost"}
-                  size="sm"
+                  color={viewMode === "grid" ? undefined : "light"}
+                  size="xs"
                   onClick={() => setViewMode("grid")}
+                  className={viewMode === "grid" ? undefined : "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"}
                 >
                   Grid
                 </Button>
                 <Button
-                  variant={viewMode === "list" ? "primary" : "ghost"}
-                  size="sm"
+                  color={viewMode === "list" ? undefined : "light"}
+                  size="xs"
                   onClick={() => setViewMode("list")}
+                  className={viewMode === "list" ? undefined : "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"}
                 >
                   List
                 </Button>
@@ -224,7 +229,7 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
           <div style={{ ...styles.uploadArea, textAlign: "center", padding: "40px 24px" }}>
             <div style={{ fontSize: 40, marginBottom: 16 }}>🔗</div>
             <div style={{ fontWeight: 600, marginBottom: 8 }}>Import from URL — coming soon</div>
-            <div style={{ fontSize: 13, color: "var(--buildrick-text-muted)", lineHeight: 1.5 }}>
+            <div style={{ fontSize: 13, color: "var(--bk-ink-muted)", lineHeight: 1.5 }}>
               Paste an image or video URL to import it directly.
               <br />
               This feature is launching soon.
@@ -255,7 +260,7 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
                   }
                   return (
                     <div
-                      style={{ textAlign: "center", padding: 40, color: "var(--buildrick-text-muted)" }}
+                      style={{ textAlign: "center", padding: 40, color: "var(--bk-ink-muted)" }}
                     >
                       Select an image to optimize
                     </div>
@@ -263,7 +268,7 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
                 })()}
               </>
             ) : (
-              <div style={{ textAlign: "center", padding: 40, color: "var(--buildrick-text-muted)" }}>
+              <div style={{ textAlign: "center", padding: 40, color: "var(--bk-ink-muted)" }}>
                 <div style={{ fontSize: 48, marginBottom: 12 }}>🖼️</div>
                 <div>Select an image from the Library to optimize</div>
               </div>
@@ -275,7 +280,7 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
       {/* Footer with selection info */}
       {multiple && selectedIds.size > 0 && (
         <div style={styles.footer}>
-          <span style={{ color: "var(--buildrick-text-secondary)", fontSize: 13 }}>
+          <span style={{ color: "var(--bk-ink-soft)", fontSize: 13 }}>
             {selectedIds.size} selected
           </span>
           <Button onClick={handleConfirmSelection}>Use Selected</Button>
@@ -297,18 +302,18 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
       {/* Delete confirmation — shared ConfirmDialog substrate (P5, was a
           hand-rolled fixed overlay at zIndex 9999 with no focus trap). */}
       <ConfirmDialog
-        isOpen={pendingDeleteId != null}
+        open={pendingDeleteId != null}
         onClose={() => setPendingDeleteId(null)}
-        onConfirm={confirmDeleteAsset}
+        onConfirm={() => void confirmDeleteAsset()}
         title="Delete file?"
         message={`"${filteredAssets.find((a) => a.id === pendingDeleteId)?.name ?? "This file"}" will be permanently deleted. This cannot be undone.`}
-        confirmText="Delete"
-        variant="danger"
+        confirmLabel="Delete"
+        destructive
       />
           </div>
         </ModalContent>
-      </Modal>
-    </OverlayMount>
+      </ModalRoot>
+    </Portal>
   );
 };
 

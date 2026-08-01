@@ -8,7 +8,8 @@
  *   - Components dropped from this barrel (Topbar, Canvas, LayersPanel,
  *     StylesPanel, TraitPanel, RichTextEditor, Accordion, Badge, form fields):
  *     2026-05-02 graveyard cleanup. Future consumers import from canonical
- *     paths under src/editor/, src/shared/ui/, or src/shared/forms/ directly.
+ *     paths under src/editor/ (incl. editor/ui/) or src/shared/forms/ directly
+ *     (src/shared/ui/ deleted 2026-07-28, Slice 6B).
  *
  * @module aquibra
  * @version 1.0.0

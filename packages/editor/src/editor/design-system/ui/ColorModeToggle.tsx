@@ -4,7 +4,7 @@
  *
  *   - `role="tablist"` container with `aria-label="Color mode"`.
  *   - Each pill: `role="tab"` + `aria-selected`.
- *   - Active pill uses `var(--bd-accent)` bg + white fg; inactive is transparent.
+ *   - Active pill uses `var(--bk-accent)` bg + white fg; inactive is transparent.
  *   - System mode dropped from UI; composer state preserves auto-detect for
  *     first load. When composer resolves to "dark", Dark pill is active.
  *
@@ -18,8 +18,8 @@
  */
 import * as React from "react";
 import type { Composer } from "../../../engine";
-import { Button } from "@/editor/shared/vibcoder/Button";
 import { useColorMode } from "../state/useColorMode";
+import { Button } from "@/editor/chrome-ui";
 
 export interface ColorModeToggleProps {
   composer: Composer;
@@ -45,9 +45,9 @@ export const ColorModeToggle: React.FC<ColorModeToggleProps> = ({ composer }) =>
         alignItems: "center",
         gap: 2,
         padding: 2,
-        borderRadius: "var(--bd-radius-full)",
-        border: "1px solid var(--bd-border)",
-        background: "var(--bd-bg-subtle)",
+        borderRadius: "var(--bk-radius-full)",
+        border: "1px solid var(--bk-border)",
+        background: "var(--bk-bg-subtle)",
       }}
     >
       <Pill value="light" label="Light" active={active === "light"} composer={composer} />
@@ -66,8 +66,8 @@ interface PillProps {
 const Pill: React.FC<PillProps> = ({ value, label, active, composer }) => (
   <Button
     type="button"
-    variant="ghost"
-    size="sm"
+    color="light"
+    size="xs"
     role="tab"
     aria-selected={active}
     onClick={() => composer.colorMode.set(value)}
@@ -76,12 +76,12 @@ const Pill: React.FC<PillProps> = ({ value, label, active, composer }) => (
       fontSize: 11,
       fontWeight: 600,
       border: "none",
-      borderRadius: "var(--bd-radius-full)",
+      borderRadius: "var(--bk-radius-full)",
       cursor: "pointer",
-      background: active ? "var(--bd-accent)" : "transparent",
-      color: active ? "var(--bd-fg-on-accent)" : "var(--bd-fg-muted)",
+      background: active ? "var(--bk-accent)" : "transparent",
+      color: active ? "var(--bk-accent-on)" : "var(--bk-ink-muted)",
       transition: "background 80ms",
-    }}
+    }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
   >
     {label}
   </Button>

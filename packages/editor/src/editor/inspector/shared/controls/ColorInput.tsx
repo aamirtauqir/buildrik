@@ -1,5 +1,4 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
+import { Popover } from "@/editor/chrome-ui";
 /**
  * ColorInput — Figma Fill row. Ported to .bdi-fill per comp-inspector.html v2.
  * Checkerboard swatch + hex + % opacity + eye toggle. Token binding preserved.
@@ -9,18 +8,14 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import { Eye, EyeOff, Link2, Link2Off } from "lucide-react";
 import * as React from "react";
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverPortal,
-  PopoverContent,
-} from "@/editor/shared/vibcoder";
 import { useColorRegistry } from "../../../design-system/state/TokenRegistryContext";
 import { isTokenVar, extractVarName, cssVarToTokenId } from "../tokenBindingDetection";
 import { TokenPickerPopover } from "../TokenPickerPopover";
 import { DSBindingChip } from "../../sections/DSBindingChip";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
+import { Button } from "@/editor/chrome-ui";
+import { TextField } from "@/editor/chrome-ui";
 
 // ============================================================================
 // HELPERS
@@ -116,12 +111,18 @@ export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange, 
     <div className="bdi-row-ctrl">
       <label className="bdi-lb">{label}</label>
       <div className="bdi-row-content">
-        <Popover open={isOpen} onOpenChange={setIsOpen}>
-          <PopoverTrigger asChild>
+        <Popover
+          open={isOpen}
+          onClose={() => setIsOpen(false)}
+          label={`${label} color tokens`}
+          block
+          trigger={
             <div
               className={`bdi-fill${isBound ? " bound" : ""}`}
               role="button"
               tabIndex={0}
+              aria-expanded={isOpen}
+              onClick={() => setIsOpen((v) => !v)}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();
@@ -135,11 +136,11 @@ export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange, 
 
               {isBound ? (
                 <>
-                  <Link2 size={10} aria-hidden="true" style={{ color: "var(--bd-accent)", flexShrink: 0 }} />
+                  <Link2 size={10} aria-hidden="true" style={{ color: "var(--bk-accent)", flexShrink: 0 }} />
                   <span
                     className="bdi-hx"
                     style={{
-                      color: "var(--bd-accent)",
+                      color: "var(--bk-accent)",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
                       whiteSpace: "nowrap",
@@ -162,7 +163,7 @@ export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange, 
                 </>
               ) : (
                 <>
-                  <Input
+                  <TextField
                     type="text"
                     className="bdi-hx"
                     value={display}
@@ -193,19 +194,16 @@ export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange, 
                 </>
               )}
             </div>
-          </PopoverTrigger>
-          <PopoverPortal>
-            <PopoverContent sideOffset={8}>
-              <TokenPickerPopover
-                tokens={tokenEntries}
-                currentValue={value}
-                showSwatch={true}
-                tokenLabel="color"
-                onSelect={(_tokenId, cssVarRef) => onChange(cssVarRef)}
-                onCustomValue={onChange}
-              />
-            </PopoverContent>
-          </PopoverPortal>
+          }
+        >
+          <TokenPickerPopover
+            tokens={tokenEntries}
+            currentValue={value}
+            showSwatch={true}
+            tokenLabel="color"
+            onSelect={(_tokenId, cssVarRef) => onChange(cssVarRef)}
+            onCustomValue={onChange}
+          />
         </Popover>
         {chip}
       </div>

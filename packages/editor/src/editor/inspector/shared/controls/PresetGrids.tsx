@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Preset Grid Controls — TemplateButtonGrid + PresetButtonGrid.
  * Ported to .bdi-qa pattern per comp-inspector.v1 quick actions row.
@@ -7,7 +6,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TEMPLATE BUTTON GRID (dense preset row, e.g., grid templates)
 // ============================================================================

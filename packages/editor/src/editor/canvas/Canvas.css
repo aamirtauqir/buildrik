@@ -1,69 +1,21 @@
 .buildrick-canvas, .buildrick-canvas-wrapper, [data-buildrick-canvas] {
   /* Canvas-only surfaces (not in canonical) */
-  --buildrick-bg: var(--buildrick-canvas-content);
-  --buildrick-canvas-wrapper-bg: var(--buildrick-bg-panel);
-  --buildrick-canvas-content-bg: var(--buildrick-canvas-content);
-  --buildrick-heading-font: var(--buildrick-font-family);
-  --buildrick-font-size: 16px;
-  --buildrick-heading-size: 32px;
-  --buildrick-line-height: 1.6;
-  --buildrick-spacing-sm: 8px;
-  --buildrick-spacing-md: 16px;
-  --buildrick-spacing-lg: 24px;
 
   /* Canvas-only font scale */
-  --buildrick-font-xs: 12px;
-  --buildrick-font-sm: 13px;
-  --buildrick-font-md: 14px;
-  --buildrick-font-lg: 15px;
-  --buildrick-font-xl: 16px;
-  --buildrick-weight-normal: 400;
-  --buildrick-weight-medium: 500;
-  --buildrick-weight-semibold: 600;
-  --buildrick-weight-bold: 700;
 
   /* Selection (canvas handles) — uses canonical accent */
-  --buildrick-selection-color:       var(--buildrick-accent);
-  --buildrick-selection-glow:        var(--buildrick-glow-selection);
-  --buildrick-selection-glow-sm:     0 2px 8px var(--buildrick-accent-tint);
-  --buildrick-selection-glow-strong: var(--buildrick-glow-selection);
-  --buildrick-selection-outline:     2px solid var(--buildrick-accent);
-  --buildrick-handle-gradient:       var(--buildrick-accent);
 
   /* DevTools box model (Alt+Shift hover) */
-  --buildrick-boxmodel-content: rgba(111, 168, 220, 0.50);
-  --buildrick-boxmodel-padding: rgba(147, 196, 125, 0.45);
-  --buildrick-boxmodel-margin:  rgba(246, 178, 107, 0.50);
 
   /* Badges (unused colors removed, all non-accent become neutral) */
-  --buildrick-badge-tag:     var(--buildrick-success);
-  --buildrick-badge-id:      var(--buildrick-accent);
-  --buildrick-badge-class:   var(--buildrick-warning);
-  --buildrick-badge-data:    var(--buildrick-accent);
-  --buildrick-badge-default: var(--buildrick-text-muted);
 
   /* Toolbar (canvas floating UI) */
-  --buildrick-toolbar-bg:           var(--buildrick-bg-card);
-  --buildrick-toolbar-bg-hover:     var(--buildrick-bg-subtle);
-  --buildrick-toolbar-border:       var(--buildrick-border-medium);
-  --buildrick-toolbar-text:         var(--buildrick-text-secondary);
-  --buildrick-toolbar-text-hover:   var(--buildrick-text-primary);
-  --buildrick-toolbar-text-muted:   var(--buildrick-text-muted);
-  --buildrick-toolbar-text-active:  var(--buildrick-text-primary);
 
   /* Smart guides */
-  --buildrick-guide-color:     var(--buildrick-accent);
-  --buildrick-guide-color-alt: var(--buildrick-accent-hover);
 
   /* Drop feedback */
-  --buildrick-drop-valid-border:    var(--buildrick-accent);
-  --buildrick-drop-valid-bg:        var(--buildrick-accent-tint);
-  --buildrick-drop-invalid-border:  var(--buildrick-error);
-  --buildrick-drop-invalid-bg:      var(--buildrick-error-light);
 
   /* Spacing indicators */
-  --buildrick-spacing-margin:  var(--buildrick-success);
-  --buildrick-spacing-padding: var(--buildrick-accent);
 }
 
 .buildrick-canvas {
@@ -84,14 +36,14 @@
 
 .buildrick-page-root,
 [data-buildrick-type="container"] {
-  font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-font-size);
-  line-height: var(--buildrick-line-height);
-  color: var(--buildrick-text-primary);
+  font-family: var(--bk-font-ui);
+  font-size: var(--bk-text-13);
+  line-height: var(--bk-leading-normal);
+  color: var(--bk-ink);
 }
 
 .buildrick-canvas[data-show-outlines="true"] [data-buildrick-id] {
-  outline: 1px dashed var(--buildrick-primary-alpha-30);
+  outline: 1px dashed var(--bk-alpha-accent-30);
   outline-offset: -1px;
 }
 
@@ -99,7 +51,7 @@
 .buildrick-canvas[data-show-outlines="true"] [data-buildrick-id].section,
 .buildrick-canvas[data-show-outlines="true"] [data-buildrick-id].row,
 .buildrick-canvas[data-show-outlines="true"] [data-buildrick-id].col {
-  outline: 1px dashed var(--buildrick-accent);
+  outline: 1px dashed var(--bk-accent);
 }
 
 .buildrick-canvas[data-show-outlines="true"] [data-buildrick-id][data-selected="true"] {
@@ -112,48 +64,48 @@
 [data-buildrick-id] h4,
 [data-buildrick-id] h5,
 [data-buildrick-id] h6 {
-  font-family: var(--buildrick-heading-font);
-  color: var(--buildrick-text-primary);
-  margin: 0 0 var(--bd-space-4) 0;
+  font-family: var(--bk-font-ui);
+  color: var(--bk-ink);
+  margin: 0 0 var(--bk-space-16) 0;
 }
 
 [data-buildrick-id] h1 {
-  font-size: calc(var(--buildrick-heading-size) * 1.5);
+  font-size: calc(var(--bk-text-16) * 1.5);
 }
 
 [data-buildrick-id] h2 {
-  font-size: var(--buildrick-heading-size);
+  font-size: var(--bk-text-16);
 }
 
 [data-buildrick-id] h3 {
-  font-size: calc(var(--buildrick-heading-size) * 0.75);
+  font-size: calc(var(--bk-text-16) * 0.75);
 }
 
 [data-buildrick-id] h4 {
-  font-size: calc(var(--buildrick-heading-size) * 0.625);
+  font-size: calc(var(--bk-text-16) * 0.625);
 }
 
 [data-buildrick-id] p {
-  color: var(--buildrick-text-primary);
-  margin: 0 0 var(--bd-space-3) 0;
+  color: var(--bk-ink);
+  margin: 0 0 var(--bk-space-12) 0;
 }
 
 [data-buildrick-id] a {
-  color: var(--buildrick-accent);
+  color: var(--bk-accent);
 }
 
 [data-buildrick-id] button {
-  background: var(--buildrick-accent);
-  color: var(--buildrick-bg-card);
+  background: var(--bk-accent);
+  color: var(--bk-bg-card);
   border: none;
-  border-radius: var(--buildrick-radius-md);
-  padding: var(--buildrick-spacing-sm) var(--buildrick-spacing-md);
-  font-family: var(--buildrick-font-family);
+  border-radius: var(--bk-radius-lg);
+  padding: var(--bk-space-8) var(--bk-space-16);
+  font-family: var(--bk-font-ui);
   cursor: pointer;
 }
 
 [data-buildrick-id] button:hover {
-  background: var(--buildrick-text-muted);
+  background: var(--bk-ink-muted);
 }
 
 [data-buildrick-id] img {
@@ -178,20 +130,20 @@
 [data-buildrick-id] input,
 [data-buildrick-id] textarea,
 [data-buildrick-id] select {
-  color: var(--buildrick-text-primary);
-  background: var(--buildrick-bg-card);
-  border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-radius-sm);
-  padding: var(--buildrick-spacing-sm);
-  font-family: var(--buildrick-font-family);
+  color: var(--bk-ink);
+  background: var(--bk-bg-card);
+  border: 1px solid var(--bk-border);
+  border-radius: var(--bk-radius-sm);
+  padding: var(--bk-space-8);
+  font-family: var(--bk-font-ui);
 }
 
 [data-buildrick-type="container"]:empty,
 [data-buildrick-type="columns"]:empty {
   min-height: 60px;
-  background: var(--buildrick-bg-subtle);
-  border: 1px dashed var(--buildrick-border-medium);
-  border-radius: var(--bd-radius-md);
+  background: var(--bk-bg-subtle);
+  border: 1px dashed var(--bk-border-medium);
+  border-radius: var(--bk-radius-lg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -200,35 +152,35 @@
 [data-buildrick-type="container"]:empty::after,
 [data-buildrick-type="columns"]:empty::after {
   content: "Drop blocks here or use Quick Add above ↑";
-  color: var(--buildrick-text-muted);
-  font-size: var(--buildrick-text-sm-plus);
+  color: var(--bk-ink-muted);
+  font-size: var(--bk-text-13);
   font-weight: 500;
   text-align: center;
-  padding: var(--bd-space-2) var(--bd-space-4);
+  padding: var(--bk-space-8) var(--bk-space-16);
 }
 
 .row,
 [data-buildrick-type="columns"] {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--bd-space-4);
+  gap: var(--bk-space-16);
   width: 100%;
 }
 
 .col {
   flex: 1;
   min-width: 0;
-  padding: var(--bd-space-4);
-  background: var(--buildrick-bg-subtle);
-  border: 1px dashed var(--buildrick-border-medium);
-  border-radius: var(--bd-radius-md);
+  padding: var(--bk-space-16);
+  background: var(--bk-bg-subtle);
+  border: 1px dashed var(--bk-border-medium);
+  border-radius: var(--bk-radius-lg);
   min-height: 60px;
 }
 
 .col:empty::after {
   content: "Column";
-  color: var(--buildrick-accent);
-  font-size: var(--buildrick-text-sm-plus);
+  color: var(--bk-accent);
+  font-size: var(--bk-text-13);
 }
 
 [data-buildrick-type="text"] {
@@ -238,11 +190,11 @@
 [data-buildrick-type="image"]:not([src]),
 [data-buildrick-type="image"][src=""] {
   min-height: 100px;
-  background: linear-gradient(135deg, var(--bd-bg-subtle) 0%, var(--bd-border) 100%);
+  background: linear-gradient(135deg, var(--bk-bg-subtle) 0%, var(--bk-border) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--bd-radius-md);
+  border-radius: var(--bk-radius-lg);
 }
 
 [data-buildrick-id]:not([data-buildrick-root="true"]) {
@@ -259,7 +211,7 @@
 }
 
 [data-buildrick-id][data-selected="true"] {
-  outline: 2px solid var(--buildrick-selection-color);
+  outline: 2px solid var(--bk-accent);
   outline-offset: 2px;
   position: relative;
   z-index: 100;
@@ -282,14 +234,14 @@
 }
 
 [data-buildrick-id][data-drop-target="true"] {
-  outline: 2px solid var(--buildrick-drop-valid-border);
+  outline: 2px solid var(--bk-success);
   outline-offset: 2px;
   transition: outline-color 150ms ease;
 }
 
 .bd-clone-mode {
   cursor: copy !important;
-  outline: 2px dashed var(--buildrick-selection-color) !important;
+  outline: 2px dashed var(--bk-accent) !important;
   outline-offset: 2px;
 }
 
@@ -300,10 +252,10 @@
   right: -8px;
   width: 16px;
   height: 16px;
-  background: var(--buildrick-selection-color);
-  color: var(--bd-fg-on-accent);
-  border-radius: var(--bd-radius-full);
-  font-size: var(--buildrick-text-md);
+  background: var(--bk-accent);
+  color: var(--bk-accent-on);
+  border-radius: var(--bk-radius-full);
+  font-size: var(--bk-text-13);
   font-weight: bold;
   display: flex;
   align-items: center;
@@ -319,7 +271,7 @@
 }
 
 [data-buildrick-id][data-drop-invalid="true"] {
-  outline: 2px solid var(--buildrick-drop-invalid-border, var(--bd-error));
+  outline: 2px solid var(--bk-error, var(--bk-error));
   outline-offset: 2px;
   cursor: not-allowed !important;
 }
@@ -337,10 +289,10 @@
   position: absolute;
   pointer-events: none;
   z-index: 1000; /* Z_LAYERS.selectionBox - use unified registry */
-  background: var(--buildrick-accent-subtle);
-  border: 1px solid var(--buildrick-selection-color);
+  background: var(--bk-accent-subtle);
+  border: 1px solid var(--bk-accent);
   border-radius: 4px;
-  box-shadow: var(--buildrick-selection-glow);
+  box-shadow: var(--bk-shadow-focus);
   /* NOTE: Removed infinite selectionBoxPulse animation per Phase 4 cleanup */
 }
 
@@ -350,7 +302,7 @@
   position: absolute;
   width: 6px;
   height: 6px;
-  background: var(--buildrick-selection-color);
+  background: var(--bk-accent);
   border-radius: 2px;
 }
 
@@ -366,12 +318,12 @@
 
 @keyframes emptyCanvasPulse {
   0%, 100% {
-    border-color: var(--bd-border);
+    border-color: var(--bk-border);
     box-shadow: inset 0 0 0 transparent;
   }
   50% {
-    border-color: var(--bd-border-medium);
-    box-shadow: inset 0 0 60px var(--bd-accent-tint);
+    border-color: var(--bk-border-medium);
+    box-shadow: inset 0 0 60px var(--bk-accent-tint);
   }
 }
 
@@ -388,28 +340,28 @@
   justify-content: center;
   z-index: 5;
   text-align: center;
-  padding: var(--bd-space-10);
+  padding: var(--bk-space-40);
   background: transparent;
   animation: bd-fade-in 0.4s ease-out;
 }
 
 .bd-canvas-empty-cta__icon {
-  color: var(--buildrick-text-muted);
-  margin-bottom: var(--bd-space-4);
+  color: var(--bk-ink-muted);
+  margin-bottom: var(--bk-space-16);
   opacity: 0.6;
 }
 
 .bd-canvas-empty-cta__title {
   font-size: 20px;
   font-weight: 600;
-  color: var(--buildrick-text-primary);
-  margin: 0 0 var(--bd-space-2);
+  color: var(--bk-ink);
+  margin: 0 0 var(--bk-space-8);
 }
 
 .bd-canvas-empty-cta__desc {
   font-size: 14px;
-  color: var(--buildrick-text-muted);
-  margin: 0 0 var(--bd-space-6);
+  color: var(--bk-ink-muted);
+  margin: 0 0 var(--bk-space-24);
   max-width: 320px;
   line-height: 1.5;
 }
@@ -418,11 +370,11 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: var(--bd-space-3) var(--bd-space-5);
-  background: var(--buildrick-accent);
-  color: var(--buildrick-bg-card);
+  padding: var(--bk-space-12) var(--bk-space-20);
+  background: var(--bk-accent);
+  color: var(--bk-bg-card);
   border: none;
-  border-radius: var(--buildrick-radius-md);
+  border-radius: var(--bk-radius-lg);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -434,10 +386,10 @@
 }
 
 .bd-canvas-empty-cta__blank {
-  margin-top: var(--bd-space-3);
-  padding: 6px var(--bd-space-4);
+  margin-top: var(--bk-space-12);
+  padding: 6px var(--bk-space-16);
   background: transparent;
-  color: var(--buildrick-text-muted);
+  color: var(--bk-ink-muted);
   border: none;
   font-size: 13px;
   font-weight: 500;
@@ -447,7 +399,7 @@
 }
 
 .bd-canvas-empty-cta__blank:hover {
-  color: var(--buildrick-text-secondary);
+  color: var(--bk-ink-soft);
 }
 
 @keyframes bd-fade-in {
@@ -488,7 +440,7 @@
 
 .bd-canvas--component-view [data-buildrick-type] {
   position: relative;
-  outline: 1px dashed var(--buildrick-accent);
+  outline: 1px dashed var(--bk-accent);
   outline-offset: -1px;
 }
 
@@ -498,12 +450,12 @@
   top: -18px;
   left: 0;
   background: rgba(17, 17, 27, 0.85);
-  border: 1px solid var(--buildrick-accent);
+  border: 1px solid var(--bk-accent);
   border-radius: 4px;
-  padding: 2px var(--bd-space-2);
-  font-size: var(--buildrick-text-xs);
+  padding: 2px var(--bk-space-8);
+  font-size: var(--bk-text-11);
   font-weight: 600;
-  color: var(--buildrick-selection-color);
+  color: var(--bk-accent);
   pointer-events: none;
   z-index: 2000; /* Z_LAYERS.dropFeedback - unified registry */
   white-space: nowrap;
@@ -511,14 +463,10 @@
 }
 
 .bd-canvas--component-view [data-buildrick-type] [data-buildrick-type] {
-  outline-color: var(--buildrick-accent);
+  outline-color: var(--bk-accent);
 }
 
 .buildrick-canvas {
-  --buildrick-drop-valid-border: var(--buildrick-selection-color);
-  --buildrick-drop-valid-bg: var(--buildrick-accent-tint);
-  --buildrick-drop-invalid-border: var(--bd-error);
-  --buildrick-drop-invalid-bg: rgba(220, 38, 38, 0.04);
 }
 
 @keyframes dropLineFadeIn {
@@ -546,13 +494,13 @@
 }
 
 .bd-drop-feedback-target.valid {
-  border-color: var(--buildrick-drop-valid-border) !important;
-  background: var(--buildrick-drop-valid-bg) !important;
+  border-color: var(--bk-success) !important;
+  background: var(--bk-success-tint) !important;
 }
 
 .bd-drop-feedback-target.invalid {
-  border-color: var(--buildrick-drop-invalid-border) !important;
-  background: var(--buildrick-drop-invalid-bg) !important;
+  border-color: var(--bk-error) !important;
+  background: var(--bk-error-tint) !important;
 }
 
 .bd-drop-position-line {
@@ -575,9 +523,9 @@
 }
 
 .bd-layer-hover-highlight {
-  outline: 1px solid var(--buildrick-selection-color) !important;
+  outline: 1px solid var(--bk-accent) !important;
   outline-offset: 1px;
-  background: var(--buildrick-accent-subtle) !important;
+  background: var(--bk-accent-subtle) !important;
   /* NOTE: Removed infinite layerHoverPulse animation - static highlight is cleaner */
 }
 
@@ -592,15 +540,15 @@
 
 .bd-drop-breadcrumb {
   animation: breadcrumbFadeIn 150ms ease-out forwards;
-  font-family: var(--buildrick-font-family);
+  font-family: var(--bk-font-ui);
 }
 
 .bd-depth-badge {
-  font-family: var(--buildrick-font-family);
+  font-family: var(--bk-font-ui);
 }
 
 [data-buildrick-id][data-drop-target="true"][data-drop-valid="true"] {
-  box-shadow: var(--bd-glow-primary);
+  box-shadow: var(--bk-shadow-focus);
   transition: box-shadow 150ms ease, outline 150ms ease;
 }
 
@@ -610,12 +558,12 @@
   bottom: -14px;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--buildrick-drop-valid-border);
+  background: var(--bk-success);
   color: white;
   width: 20px;
   height: 20px;
-  border-radius: var(--bd-radius-full);
-  font-size: var(--buildrick-text-md);
+  border-radius: var(--bk-radius-full);
+  font-size: var(--bk-text-13);
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -659,9 +607,9 @@
 }
 
 .buildrick-canvas[data-xray-mode="true"] [data-buildrick-id] {
-  outline: 1px dashed var(--buildrick-accent) !important;
+  outline: 1px dashed var(--bk-accent) !important;
   outline-offset: -1px;
-  background: var(--buildrick-accent-subtle) !important;
+  background: var(--bk-accent-subtle) !important;
   position: relative;
 }
 
@@ -670,11 +618,11 @@
   position: absolute;
   top: 0;
   left: 0;
-  font-size: var(--buildrick-text-2xs-plus);
+  font-size: var(--bk-text-11);
   font-family: monospace;
   background: rgba(30, 30, 46, 0.9);
-  color: var(--buildrick-selection-color);
-  padding: 1px var(--bd-space-1);
+  color: var(--bk-accent);
+  padding: 1px var(--bk-space-4);
   border-radius: 2px;
   pointer-events: none;
   z-index: 2000; /* Z_LAYERS.dropFeedback - unified registry */
@@ -684,34 +632,34 @@
 
 .buildrick-canvas[data-xray-mode="true"] [data-buildrick-type="container"]::before {
   background: rgba(180, 190, 254, 0.9);
-  color: var(--buildrick-text-heading);
+  color: var(--bk-ink);
 }
 
 .buildrick-canvas[data-xray-mode="true"] [data-buildrick-type="columns"]::before,
 .buildrick-canvas[data-xray-mode="true"] .row::before {
   background: rgba(203, 166, 247, 0.9);
-  color: var(--buildrick-text-heading);
+  color: var(--bk-ink);
 }
 
 .buildrick-canvas[data-xray-mode="true"] .col::before {
   background: rgba(245, 194, 231, 0.9);
-  color: var(--buildrick-text-heading);
+  color: var(--bk-ink);
 }
 
 .buildrick-canvas[data-xray-mode="true"] [data-buildrick-type="text"]::before,
 .buildrick-canvas[data-xray-mode="true"] [data-buildrick-type="heading"]::before {
   background: rgba(148, 226, 213, 0.9);
-  color: var(--buildrick-text-heading);
+  color: var(--bk-ink);
 }
 
 .buildrick-canvas[data-xray-mode="true"] [data-buildrick-type="button"]::before {
   background: rgba(166, 227, 161, 0.9);
-  color: var(--buildrick-text-heading);
+  color: var(--bk-ink);
 }
 
 .buildrick-canvas[data-xray-mode="true"] [data-buildrick-type="image"]::before {
   background: rgba(250, 179, 135, 0.9);
-  color: var(--buildrick-text-heading);
+  color: var(--bk-ink);
 }
 
 .buildrick-canvas[data-xray-mode="true"] [data-buildrick-id][data-selected="true"]::before {
@@ -739,8 +687,8 @@
   font-family: monospace;
   font-weight: 600;
   background: rgba(30, 30, 46, 0.85);
-  color: var(--buildrick-badge-tag);
-  padding: 1px var(--bd-space-1);
+  color: var(--bk-ink-muted);
+  padding: 1px var(--bk-space-4);
   border-radius: 2px;
   pointer-events: none;
   z-index: 1500;
@@ -751,16 +699,16 @@
 }
 
 .buildrick-canvas[data-badges="true"] [data-buildrick-type="container"]::after {
-  color: var(--buildrick-badge-id);
+  color: var(--bk-ink-muted);
 }
 
 .buildrick-canvas[data-badges="true"] [data-buildrick-type="text"]::after,
 .buildrick-canvas[data-badges="true"] [data-buildrick-type="heading"]::after {
-  color: var(--buildrick-badge-class);
+  color: var(--bk-ink-muted);
 }
 
 .buildrick-canvas[data-badges="true"] [data-buildrick-type="button"]::after {
-  color: var(--buildrick-badge-data);
+  color: var(--bk-ink-muted);
 }
 
 .buildrick-canvas[data-badges="true"] [data-buildrick-type="image"]::after {
@@ -772,18 +720,18 @@
 }
 
 [data-buildrick-id][contenteditable="true"] {
-  outline: 2px solid var(--buildrick-accent, #667eea) !important;
+  outline: 2px solid var(--bk-accent, #667eea) !important;
   outline-offset: 2px;
   background: rgba(102, 126, 234, 0.05) !important;
   cursor: text !important;
-  caret-color: var(--buildrick-accent, #667eea);
+  caret-color: var(--bk-accent, #667eea);
   min-height: 1em;
   border-radius: 2px;
 }
 
 [data-buildrick-id][contenteditable="true"]:empty::before {
   content: 'Type here...';
-  color: var(--buildrick-text-muted, #6b7280);
+  color: var(--bk-ink-muted, #6b7280);
   font-style: italic;
   pointer-events: none;
 }
@@ -808,12 +756,12 @@
 }
 
 :focus-visible {
-  outline: 2px solid var(--buildrick-accent, #667eea);
+  outline: 2px solid var(--bk-accent, #667eea);
   outline-offset: 2px;
 }
 
 [data-buildrick-id]:focus-visible {
-  outline: 3px solid var(--buildrick-accent, #667eea);
+  outline: 3px solid var(--bk-accent, #667eea);
   outline-offset: 2px;
   box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
 }
@@ -821,9 +769,9 @@
 .buildrick-input:focus-visible,
 .buildrick-select:focus-visible,
 .buildrick-textarea:focus-visible {
-  outline: 2px solid var(--buildrick-accent, #667eea);
+  outline: 2px solid var(--bk-accent, #667eea);
   outline-offset: 0;
-  border-color: var(--buildrick-accent, #667eea);
+  border-color: var(--bk-accent, #667eea);
 }
 
 /* .buildrick-sr-only deleted 2026-05-07 — duplicate of canonical .bd-sr-only

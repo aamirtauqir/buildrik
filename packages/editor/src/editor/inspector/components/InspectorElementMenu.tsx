@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * InspectorElementMenu — three-dot overflow menu for element actions.
  *
@@ -20,7 +19,7 @@ import { Copy, ClipboardPaste, CopyPlus, MoreHorizontal, Trash2 } from "lucide-r
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import { useClickOutside } from "../../../shared/hooks/useClickOutside";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================================================
 // STYLE CLIPBOARD — module-level so it survives across element selections
 // ============================================================================
@@ -63,7 +62,7 @@ const styles = {
     background: "transparent",
     border: "1px solid transparent",
     borderRadius: 6,
-    color: "var(--buildrick-text-tertiary)",
+    color: "var(--bk-ink-muted)",
     cursor: "pointer",
     display: "flex",
     alignItems: "center",
@@ -71,17 +70,17 @@ const styles = {
     transition: "background 0.15s, color 0.15s, border-color 0.15s",
   },
   triggerHover: {
-    background: "var(--bd-border)",
-    color: "var(--buildrick-text-primary)",
-    borderColor: "var(--buildrick-border)",
+    background: "var(--bk-border)",
+    color: "var(--bk-ink)",
+    borderColor: "var(--bk-border)",
   },
   menu: {
     position: "absolute" as const,
     top: 32,
     right: 0,
     minWidth: 180,
-    background: "var(--buildrick-surface-3)",
-    border: "1px solid var(--buildrick-border)",
+    background: "var(--bk-bg-subtle)",
+    border: "1px solid var(--bk-border)",
     borderRadius: 8,
     boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
     padding: 4,
@@ -99,10 +98,10 @@ const styles = {
     border: "none",
     borderRadius: 4,
     color: disabled
-      ? "var(--buildrick-text-muted)"
+      ? "var(--bk-ink-muted)"
       : danger
-        ? "var(--buildrick-error)"
-        : "var(--buildrick-text-primary)",
+        ? "var(--bk-error)"
+        : "var(--bk-ink)",
     fontSize: 12,
     fontWeight: 500,
     cursor: disabled ? "not-allowed" : "pointer",
@@ -113,7 +112,7 @@ const styles = {
   }),
   divider: {
     height: 1,
-    background: "var(--buildrick-border-subtle)",
+    background: "var(--bk-border)",
     margin: "4px 0",
   },
 };
@@ -253,7 +252,7 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({
                     hoveredItem === item.id && !item.disabled
                       ? item.danger
                         ? "rgba(239,68,68,0.12)"
-                        : "var(--bd-border)"
+                        : "var(--bk-border)"
                       : "transparent",
                 }}
               >

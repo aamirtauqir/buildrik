@@ -42,7 +42,7 @@ export const DeviceSelector: React.FC<DeviceSelectorProps> = ({
         alignItems: "center",
         gap: SIZES.padding.xs,
         padding: SIZES.padding.xs,
-        background: "var(--buildrick-bg-panel-secondary)",
+        background: "var(--bk-bg-subtle)",
         borderRadius: SIZES.borderRadius.lg,
       }}
     >

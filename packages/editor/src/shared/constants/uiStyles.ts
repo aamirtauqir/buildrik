@@ -23,28 +23,28 @@ import type { CSSProperties } from "react";
  */
 export const TEXT_STYLES = {
   xs: {
-    fontSize: "var(--buildrick-font-xs)",
-    fontWeight: "var(--buildrick-weight-medium)",
+    fontSize: "var(--bk-text-11)",
+    fontWeight: "var(--bk-weight-medium)",
     lineHeight: 1.4,
   } as CSSProperties,
   sm: {
-    fontSize: "var(--buildrick-font-sm)",
-    fontWeight: "var(--buildrick-weight-medium)",
+    fontSize: "var(--bk-text-12)",
+    fontWeight: "var(--bk-weight-medium)",
     lineHeight: 1.4,
   } as CSSProperties,
   md: {
-    fontSize: "var(--buildrick-font-md)",
-    fontWeight: "var(--buildrick-weight-normal)",
+    fontSize: "var(--bk-text-13)",
+    fontWeight: "var(--bk-weight-regular)",
     lineHeight: 1.5,
   } as CSSProperties,
   lg: {
-    fontSize: "var(--buildrick-font-lg)",
-    fontWeight: "var(--buildrick-weight-medium)",
+    fontSize: "var(--bk-text-16)",
+    fontWeight: "var(--bk-weight-medium)",
     lineHeight: 1.4,
   } as CSSProperties,
   xl: {
-    fontSize: "var(--buildrick-font-xl)",
-    fontWeight: "var(--buildrick-weight-semibold)",
+    fontSize: "var(--bk-text-20)",
+    fontWeight: "var(--bk-weight-semibold)",
     lineHeight: 1.3,
   } as CSSProperties,
 };
@@ -53,12 +53,12 @@ export const TEXT_STYLES = {
  * Color tokens referencing CSS variables
  */
 export const COLOR = {
-  primary: "var(--buildrick-text-primary)",
-  secondary: "var(--buildrick-text-secondary)",
-  tertiary: "var(--buildrick-text-tertiary)",
-  muted: "var(--buildrick-text-muted)",
-  accent: "var(--buildrick-accent)",
-  accentLight: "var(--buildrick-accent-tint)",
+  primary: "var(--bk-ink)",
+  secondary: "var(--bk-ink-soft)",
+  tertiary: "var(--bk-ink-muted)",
+  muted: "var(--bk-ink-muted)",
+  accent: "var(--bk-accent)",
+  accentLight: "var(--bk-accent-tint)",
 };
 
 /**
@@ -83,22 +83,22 @@ export const CARD_STYLES = {
     alignItems: "center",
     gap: 6,
     padding: "14px 8px",
-    background: "var(--buildrick-surface-3)",
+    background: "var(--bk-bg-subtle)",
     border: "1px solid transparent",
     borderRadius: "var(--buildrick-design-radius-md)",
     cursor: "pointer",
-    transition: "var(--buildrick-transition-fast)",
+    transition: "var(--bk-transition-fast)",
     minHeight: 64,
   } as CSSProperties,
   hover: {
-    background: "var(--buildrick-surface-4)",
-    borderColor: "var(--buildrick-accent-hover)",
+    background: "var(--bk-gray-200)",
+    borderColor: "var(--bk-accent-hover)",
     boxShadow: "var(--buildrick-design-shadow-md)",
     transform: "translateY(-2px)",
   } as CSSProperties,
   selected: {
-    border: "2px solid var(--buildrick-accent)",
-    boxShadow: "0 0 0 4px var(--buildrick-accent-tint)",
+    border: "2px solid var(--bk-accent)",
+    boxShadow: "0 0 0 4px var(--bk-accent-tint)",
   } as CSSProperties,
 };
 
@@ -110,8 +110,8 @@ export const TAB_STYLES = {
     display: "flex",
     gap: 4,
     padding: "8px 8px 0",
-    background: "var(--buildrick-surface-2)",
-    borderBottom: "1px solid var(--buildrick-border-subtle)",
+    background: "var(--bk-bg-subtle)",
+    borderBottom: "1px solid var(--bk-border)",
   } as CSSProperties,
   button: {
     flex: 1,
@@ -125,15 +125,15 @@ export const TAB_STYLES = {
     borderBottom: "2px solid transparent",
     borderRadius: "6px 6px 0 0",
     cursor: "pointer",
-    fontSize: "var(--buildrick-font-md)",
+    fontSize: "var(--bk-text-13)",
     fontWeight: 500,
-    color: "var(--buildrick-text-tertiary)",
-    transition: "var(--buildrick-transition-fast)",
+    color: "var(--bk-ink-muted)",
+    transition: "var(--bk-transition-fast)",
   } as CSSProperties,
   active: {
-    color: "var(--buildrick-text-primary)",
-    borderBottomColor: "var(--buildrick-accent)",
-    background: "var(--buildrick-surface-3)",
+    color: "var(--bk-ink)",
+    borderBottomColor: "var(--bk-accent)",
+    background: "var(--bk-bg-subtle)",
   } as CSSProperties,
 };
 
@@ -147,19 +147,19 @@ export const ACCORDION_STYLES = {
     alignItems: "center",
     justifyContent: "space-between",
     padding: "12px 14px",
-    background: "var(--buildrick-surface-3)",
+    background: "var(--bk-bg-subtle)",
     border: "none",
     borderLeft: "2px solid transparent",
     borderRadius: "var(--buildrick-design-radius-md)",
     cursor: "pointer",
-    fontSize: "var(--buildrick-font-lg)",
+    fontSize: "var(--bk-text-16)",
     fontWeight: 500,
-    color: "var(--buildrick-text-primary)",
-    transition: "var(--buildrick-transition-fast)",
+    color: "var(--bk-ink)",
+    transition: "var(--bk-transition-fast)",
   } as CSSProperties,
   headerOpen: {
-    background: "var(--buildrick-surface-4)",
-    borderLeftColor: "var(--buildrick-accent)",
+    background: "var(--bk-gray-200)",
+    borderLeftColor: "var(--bk-accent)",
   } as CSSProperties,
   content: {
     padding: "8px 4px",
@@ -174,20 +174,20 @@ export const ACCORDION_STYLES = {
  */
 export const BADGE_STYLES = {
   base: {
-    fontSize: "var(--buildrick-font-xs)",
+    fontSize: "var(--bk-text-11)",
     fontWeight: 500,
     padding: "2px 8px",
     borderRadius: 10,
-    background: "var(--buildrick-accent-tint)",
-    color: "var(--buildrick-accent)",
+    background: "var(--bk-accent-tint)",
+    color: "var(--bk-accent)",
   } as CSSProperties,
   count: {
-    fontSize: "var(--buildrick-font-xs)",
+    fontSize: "var(--bk-text-11)",
     fontWeight: 500,
     padding: "2px 6px",
     borderRadius: 10,
     background: "rgba(255, 255, 255, 0.1)",
-    color: "var(--buildrick-text-secondary)",
+    color: "var(--bk-ink-soft)",
   } as CSSProperties,
 };
 
@@ -196,16 +196,16 @@ export const BADGE_STYLES = {
  */
 export const LABEL_STYLES = {
   base: {
-    fontSize: "var(--buildrick-font-sm)",
+    fontSize: "var(--bk-text-12)",
     fontWeight: 500,
-    color: "var(--buildrick-text-secondary)",
+    color: "var(--bk-ink-soft)",
     textTransform: "uppercase" as const,
     letterSpacing: "0.5px",
   } as CSSProperties,
   section: {
-    fontSize: "var(--buildrick-font-xs)",
+    fontSize: "var(--bk-text-11)",
     fontWeight: 600,
-    color: "var(--buildrick-text-tertiary)",
+    color: "var(--bk-ink-muted)",
     textTransform: "uppercase" as const,
     letterSpacing: "0.5px",
     marginBottom: 8,
@@ -217,18 +217,18 @@ export const LABEL_STYLES = {
  */
 export const INPUT_STYLES = {
   base: {
-    fontSize: "var(--buildrick-font-md)",
+    fontSize: "var(--bk-text-13)",
     padding: "8px 10px",
     background: "rgba(255, 255, 255, 0.05)",
-    border: "1px solid var(--buildrick-border-default)",
+    border: "1px solid var(--bk-border-medium)",
     borderRadius: "var(--buildrick-design-radius-sm)",
-    color: "var(--buildrick-text-primary)",
-    transition: "var(--buildrick-transition-fast)",
+    color: "var(--bk-ink)",
+    transition: "var(--bk-transition-fast)",
   } as CSSProperties,
   focus: {
-    borderColor: "var(--buildrick-accent)",
+    borderColor: "var(--bk-accent)",
     outline: "none",
-    boxShadow: "0 0 0 2px var(--buildrick-accent-tint)",
+    boxShadow: "0 0 0 2px var(--bk-accent-tint)",
   } as CSSProperties,
 };
 

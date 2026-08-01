@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Integrations screen — L1: actionable cards with external links
  * Real integration API not yet available; each card links to docs/external setup.
@@ -9,8 +8,7 @@ import * as React from "react";
 import { INTEGRATION_CATALOG } from "../constants";
 import { Screen, Section } from "../shared";
 import type { ScreenProps } from "../types";
-
-
+import { Button } from "@/editor/chrome-ui";
 const categories = [...new Set(INTEGRATION_CATALOG.map((i) => i.category))];
 
 const cardStyles: React.CSSProperties = {
@@ -18,20 +16,20 @@ const cardStyles: React.CSSProperties = {
   alignItems: "center",
   gap: 10,
   padding: "10px 12px",
-  background: "var(--bd-bg-subtle)",
-  borderRadius: "var(--buildrick-radius-sm)",
+  background: "var(--bk-bg-subtle)",
+  borderRadius: "var(--bk-radius-sm)",
   marginBottom: 6,
 };
 
 const nameStyles: React.CSSProperties = {
   fontSize: 13,
   fontWeight: 500,
-  color: "var(--bd-fg-primary)",
+  color: "var(--bk-ink)",
 };
 
 const descStyles: React.CSSProperties = {
   fontSize: 12,
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
   marginTop: 2,
 };
 
@@ -40,8 +38,8 @@ const badgeStyles: React.CSSProperties = {
   fontWeight: 600,
   padding: "2px 6px",
   borderRadius: 4,
-  background: "var(--bd-bg-hover)",
-  color: "var(--bd-fg-muted)",
+  background: "var(--bk-bg-subtle)",
+  color: "var(--bk-ink-muted)",
   whiteSpace: "nowrap",
 };
 
@@ -50,16 +48,16 @@ const learnBtnStyles: React.CSSProperties = {
   fontWeight: 500,
   padding: "4px 10px",
   borderRadius: 4,
-  border: "1px solid var(--bd-border)",
+  border: "1px solid var(--bk-border)",
   background: "transparent",
-  color: "var(--bd-accent)",
+  color: "var(--bk-accent)",
   cursor: "pointer",
   whiteSpace: "nowrap",
 };
 
 const hintStyles: React.CSSProperties = {
   fontSize: 12,
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
   padding: "8px 12px 0",
   lineHeight: 1.4,
 };

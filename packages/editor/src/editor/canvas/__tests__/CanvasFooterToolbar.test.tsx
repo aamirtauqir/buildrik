@@ -14,12 +14,9 @@
  */
 import * as React from "react";
 import { describe, it, expect, vi, beforeAll } from "vitest";
-import { render as rtlRender, screen, fireEvent } from "@testing-library/react";
-import { TooltipProvider } from "@/editor/shared/vibcoder/Tooltip";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { ZOOM_PRESETS } from "../shared";
 import { CanvasFooterToolbar } from "../CanvasFooterToolbar";
-
-const render = (ui: React.ReactElement) => rtlRender(<TooltipProvider>{ui}</TooltipProvider>);
 
 const ALL_OFF = {
   guides: false,

@@ -11,15 +11,8 @@
 
 import * as React from "react";
 import "./DrawerPanel.css";
-import { IconButton } from "@/editor/shared/vibcoder/IconButton";
-import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipPortal,
-  TooltipContent,
-} from "@/editor/shared/vibcoder";
-import { SvgChevronLeft, SvgPin } from "../../shared/ui/Icons";
-
+import { ChevronLeft, Pin } from "lucide-react";
+import { Button, Tooltip } from "@/editor/chrome-ui";
 // ============================================
 // Types
 // ============================================
@@ -134,38 +127,33 @@ export const DrawerPanel: React.FC<DrawerPanelProps> = ({
         <div className="drawer-panel__controls">
           {/* Pin button - keeps panel open */}
           {onPinToggle && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <IconButton
-                  size="sm"
-                  variant="ghost"
-                  pressed={isPinned}
-                  aria-label={isPinned ? "Unpin panel" : "Pin panel"}
-                  onClick={onPinToggle}
-                  className="drawer-panel__pin-btn"
-                ><SvgPin /></IconButton>
-              </TooltipTrigger>
-              <TooltipPortal>
-                <TooltipContent>{isPinned ? "Unpin panel" : "Pin panel"}</TooltipContent>
-              </TooltipPortal>
+            <Tooltip
+              content={isPinned ? "Unpin panel" : "Pin panel"}
+              placement="bottom"
+              arrow={false}
+              className="tw:max-w-[280px] tw:whitespace-normal"
+            >
+              <Button
+                color="light"
+                size="xs"
+                aria-pressed={isPinned}
+                aria-label={isPinned ? "Unpin panel" : "Pin panel"}
+                onClick={onPinToggle}
+                className="drawer-panel__pin-btn tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+              ><Pin size={16} strokeWidth={1.5} /></Button>
             </Tooltip>
           )}
 
           {/* Close button */}
           {onClose && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <IconButton
-                  size="sm"
-                  variant="ghost"
-                  aria-label="Close panel"
-                  onClick={handleClose}
-                  className="drawer-panel__close-btn"
-                ><SvgChevronLeft /></IconButton>
-              </TooltipTrigger>
-              <TooltipPortal>
-                <TooltipContent>Close panel</TooltipContent>
-              </TooltipPortal>
+            <Tooltip content="Close panel" placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
+              <Button
+                color="light"
+                size="xs"
+                aria-label="Close panel"
+                onClick={handleClose}
+                className="drawer-panel__close-btn tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+              ><ChevronLeft size={16} strokeWidth={1.5} /></Button>
             </Tooltip>
           )}
         </div>

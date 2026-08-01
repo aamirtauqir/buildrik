@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * PageSettingsDrawer — 580px slide-over for page-level settings.
  *
@@ -19,7 +18,7 @@ import { SeoTab } from "./SeoTab";
 import { SocialTab } from "./SocialTab";
 import { AdvancedTab } from "./AdvancedTab";
 import { UnsavedWarningModal } from "./UnsavedWarningModal";
-
+import { Button } from "@/editor/chrome-ui";
 const TABS: { id: DrawerTab; label: string }[] = [
   { id: "seo", label: "SEO" },
   { id: "social", label: "Social" },

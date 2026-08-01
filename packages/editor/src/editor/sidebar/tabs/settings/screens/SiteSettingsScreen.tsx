@@ -7,7 +7,6 @@ import * as React from "react";
 import { Field, Input, Screen, Section, Select } from "../shared";
 import { useSettingsScreen } from "../hooks/useSettingsScreen";
 import type { ScreenProps } from "../types";
-import { Stack } from "@/editor/shared/vibcoder";
 
 interface IdentitySettings {
   siteName: string;
@@ -176,12 +175,12 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer, onDirtyCha
       </Section>
 
       <Section title="Legal">
-        <Stack gap="xs">
+        <div className="tw:flex tw:flex-col tw:gap-1">
           <a
             href="/privacy"
             target="_blank"
             rel="noopener noreferrer"
-            style={{ font: "500 11.5px var(--bd-font)", color: "var(--bd-accent)", textDecoration: "none" }}
+            style={{ font: "500 11.5px var(--bk-font-ui)", color: "var(--bk-accent)", textDecoration: "none" }}
           >
             Privacy Policy →
           </a>
@@ -189,14 +188,14 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer, onDirtyCha
             href="/terms"
             target="_blank"
             rel="noopener noreferrer"
-            style={{ font: "500 11.5px var(--bd-font)", color: "var(--bd-accent)", textDecoration: "none" }}
+            style={{ font: "500 11.5px var(--bk-font-ui)", color: "var(--bk-accent)", textDecoration: "none" }}
           >
             Terms of Service →
           </a>
-          <span style={{ fontSize: 12, color: "var(--bd-fg-muted)", marginTop: 4 }}>
+          <span style={{ fontSize: 12, color: "var(--bk-ink-muted)", marginTop: 4 }}>
             Your data is stored securely. We do not sell or share your site data.
           </span>
-        </Stack>
+        </div>
       </Section>
     </Screen>
   );

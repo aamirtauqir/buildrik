@@ -76,7 +76,7 @@ export const FileField: React.FC<FileFieldProps> = ({
             display: "block",
             marginBottom: 6,
             fontSize: 12,
-            color: "var(--buildrick-text-secondary)",
+            color: "var(--bk-ink-soft)",
           }}
         >
           {label}
@@ -93,10 +93,10 @@ export const FileField: React.FC<FileFieldProps> = ({
         style={{
           padding: 24,
           border: `2px dashed ${
-            isDragging ? "var(--buildrick-accent)" : error ? "var(--buildrick-error)" : "var(--buildrick-border)"
+            isDragging ? "var(--bk-accent)" : error ? "var(--bk-error)" : "var(--bk-border)"
           }`,
           borderRadius: 8,
-          background: isDragging ? "var(--buildrick-accent-subtle)" : "var(--buildrick-bg-dark)",
+          background: isDragging ? "var(--bk-accent-subtle)" : "var(--bk-gray-900)",
           textAlign: "center",
           cursor: disabled ? "not-allowed" : "pointer",
           opacity: disabled ? 0.5 : 1,
@@ -113,10 +113,10 @@ export const FileField: React.FC<FileFieldProps> = ({
           style={{ display: "none" }}
         />
         <div style={{ fontSize: 32, marginBottom: 8 }}>📁</div>
-        <div style={{ color: "var(--buildrick-text-primary)", marginBottom: 4 }}>
+        <div style={{ color: "var(--bk-ink)", marginBottom: 4 }}>
           {uploading ? "Uploading..." : "Drop files here or click to upload"}
         </div>
-        <div style={{ fontSize: 12, color: "var(--buildrick-text-muted)" }}>
+        <div style={{ fontSize: 12, color: "var(--bk-ink-muted)" }}>
           {accept ? `Accepted: ${accept}` : "All file types accepted"}
           {maxSize && ` • Max: ${formatSize(maxSize)}`}
         </div>
@@ -132,7 +132,7 @@ export const FileField: React.FC<FileFieldProps> = ({
                 alignItems: "center",
                 gap: 8,
                 padding: "8px 12px",
-                background: "var(--buildrick-bg-panel-secondary)",
+                background: "var(--bk-bg-subtle)",
                 borderRadius: 6,
                 marginTop: 4,
               }}
@@ -147,7 +147,7 @@ export const FileField: React.FC<FileFieldProps> = ({
               >
                 {file.name}
               </span>
-              <span style={{ fontSize: 12, color: "var(--buildrick-text-muted)" }}>
+              <span style={{ fontSize: 12, color: "var(--bk-ink-muted)" }}>
                 {formatSize(file.size)}
               </span>
               <button
@@ -160,7 +160,7 @@ export const FileField: React.FC<FileFieldProps> = ({
                 style={{
                   background: "transparent",
                   border: "none",
-                  color: "var(--buildrick-text-muted)",
+                  color: "var(--bk-ink-muted)",
                   cursor: "pointer",
                   padding: 4,
                 }}
@@ -178,7 +178,7 @@ export const FileField: React.FC<FileFieldProps> = ({
             display: "block",
             marginTop: 4,
             fontSize: 12,
-            color: "var(--buildrick-error)",
+            color: "var(--bk-error)",
           }}
         >
           {error}

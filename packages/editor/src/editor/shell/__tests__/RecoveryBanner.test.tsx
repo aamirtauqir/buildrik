@@ -6,7 +6,6 @@
 import * as React from "react";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { TooltipProvider } from "@/editor/shared/vibcoder";
 import { RecoveryBanner } from "../RecoveryBanner";
 
 const SENTINEL = "buildrick:last-crash";
@@ -20,9 +19,7 @@ function seedCrash(atMsAgo = 30_000) {
 
 function renderBanner(props = {}) {
   return render(
-    <TooltipProvider>
-      <RecoveryBanner pageCount={3} {...props} />
-    </TooltipProvider>,
+    <RecoveryBanner pageCount={3} {...props} />,
   );
 }
 

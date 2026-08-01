@@ -5,8 +5,7 @@
 
 import * as React from "react";
 import { generateColorTokenId } from "../../utils/exportUtils";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Input } from "@/editor/shared/vibcoder/Input";
+import { Button, TextInput } from "@/editor/chrome-ui";
 
 export interface AddTokenModalProps {
   existingIds: string[];
@@ -57,8 +56,8 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
     >
       <div
         style={{
-          background: "var(--bd-bg-subtle)",
-          border: "1px solid var(--bd-border)",
+          background: "var(--bk-bg-subtle)",
+          border: "1px solid var(--bk-border)",
           borderRadius: 12,
           padding: 20,
           width: 280,
@@ -69,7 +68,7 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
           style={{
             fontSize: 14,
             fontWeight: 600,
-            color: "var(--bd-fg-primary)",
+            color: "var(--bk-ink)",
             marginBottom: 16,
           }}
         >
@@ -79,39 +78,39 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
         <label
           style={{
             fontSize: 12,
-            color: "var(--bd-fg-muted)",
+            color: "var(--bk-ink-muted)",
             display: "block",
             marginBottom: 4,
           }}
         >
           Token name
         </label>
-        <Input
+        <TextInput
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="e.g., Purple"
-          error={!!nameError}
+          aria-invalid={!!nameError || undefined}
           style={{
             width: "100%",
             padding: "8px 10px",
             background: "rgba(255,255,255,0.05)",
-            border: `1px solid ${nameError ? /* @lint-hex-policy: input error border red-500, off chrome palette */ "#ef4444" : "var(--bd-border)"}`,
+            border: `1px solid ${nameError ? /* @lint-hex-policy: input error border red-500, off chrome palette */ "#ef4444" : "var(--bk-border)"}`,
             borderRadius: 6,
-            color: "var(--bd-fg-primary)",
+            color: "var(--bk-ink)",
             fontSize: 12,
             boxSizing: "border-box",
             marginBottom: 4,
           }}
         />
         {nameError && (
-          <div style={{ fontSize: 12, color: "var(--bd-error)", marginBottom: 8 }}>{nameError}</div>
+          <div style={{ fontSize: 12, color: "var(--bk-error)", marginBottom: 8 }}>{nameError}</div>
         )}
 
         <label
           style={{
             fontSize: 12,
-            color: "var(--bd-fg-muted)",
+            color: "var(--bk-ink-muted)",
             display: "block",
             marginBottom: 4,
             marginTop: 8,
@@ -126,42 +125,42 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
               height: 32,
               borderRadius: 6,
               background: /^#[0-9A-Fa-f]{6}$/.test(hex) ? hex : /* @lint-hex-policy: neutral swatch fallback for invalid hex input */ "#333",
-              border: "1px solid var(--bd-border)",
+              border: "1px solid var(--bk-border)",
               flexShrink: 0,
             }}
           />
-          <Input
+          <TextInput
             type="text"
             value={hex}
             onChange={(e) => setHex(e.target.value)}
             placeholder="#3B82F6"
-            error={!!hexError}
+            aria-invalid={!!hexError || undefined}
             style={{
               flex: 1,
               padding: "8px 10px",
               background: "rgba(255,255,255,0.05)",
-              border: `1px solid ${hexError ? /* @lint-hex-policy: input error border red-500, off chrome palette */ "#ef4444" : "var(--bd-border)"}`,
+              border: `1px solid ${hexError ? /* @lint-hex-policy: input error border red-500, off chrome palette */ "#ef4444" : "var(--bk-border)"}`,
               borderRadius: 6,
-              color: "var(--bd-fg-primary)",
+              color: "var(--bk-ink)",
               fontSize: 12,
               fontFamily: "monospace",
             }}
           />
         </div>
         {hexError && (
-          <div style={{ fontSize: 12, color: "var(--bd-error)", marginBottom: 8 }}>{hexError}</div>
+          <div style={{ fontSize: 12, color: "var(--bk-error)", marginBottom: 8 }}>{hexError}</div>
         )}
 
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 16 }}>
           <Button
-            variant="secondary"
+            color="light"
             onClick={onClose}
             style={{
               padding: "7px 14px",
               background: "transparent",
-              border: "1px solid var(--bd-border)",
+              border: "1px solid var(--bk-border)",
               borderRadius: 6,
-              color: "var(--bd-fg-secondary)",
+              color: "var(--bk-ink-soft)",
               fontSize: 12,
               cursor: "pointer",
             }}
@@ -169,14 +168,13 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
             Cancel
           </Button>
           <Button
-            variant="primary"
             onClick={handleAdd}
             style={{
               padding: "7px 14px",
-              background: "var(--bd-accent)",
+              background: "var(--bk-accent)",
               border: "none",
               borderRadius: 6,
-              color: "var(--bd-fg-on-accent)",
+              color: "var(--bk-accent-on)",
               fontSize: 12,
               fontWeight: 600,
               cursor: "pointer",

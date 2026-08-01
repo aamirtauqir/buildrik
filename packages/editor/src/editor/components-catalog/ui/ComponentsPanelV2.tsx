@@ -22,17 +22,15 @@
  */
 
 import * as React from "react";
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { useToast } from "@/editor/shared/vibcoder";
-import { PanelHeader } from "@/shared/extensions/PanelHeader";
+import { PanelHeader } from "@/editor/chrome-ui";
+import { useToast } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import { CatalogSection } from "./CatalogSection";
 import { UserSavedSection } from "./UserSavedSection";
 import { DSStatusChip } from "./DSStatusChip";
 import { AIPromptModal } from "@/editor/design-system/ui/AIPromptModal";
 import { EVENTS } from "@/shared/constants/events";
-
+import { Button, TextInput } from "@/editor/chrome-ui";
 type FilterMode = "all" | "ds" | "yours";
 
 interface ComponentsPanelV2Props {
@@ -49,7 +47,7 @@ const containerStyle: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   height: "100%",
-  background: "var(--bd-bg-canvas)",
+  background: "var(--bk-bg-subtle)",
 };
 
 const subHeaderStyle: React.CSSProperties = {
@@ -57,7 +55,7 @@ const subHeaderStyle: React.CSSProperties = {
   alignItems: "center",
   gap: 8,
   padding: "6px 12px 8px",
-  borderBottom: "1px solid var(--bd-border)",
+  borderBottom: "1px solid var(--bk-border)",
   flexWrap: "wrap",
 };
 
@@ -65,15 +63,15 @@ const filterRowStyle: React.CSSProperties = {
   display: "flex",
   gap: 4,
   padding: "8px 12px",
-  borderBottom: "1px solid var(--bd-border)",
+  borderBottom: "1px solid var(--bk-border)",
 };
 
 const pillStyle = (active: boolean): React.CSSProperties => ({
   padding: "3px 10px",
-  background: active ? "var(--bd-accent)" : "transparent",
-  color: active ? "#fff" : "var(--bd-fg-secondary)",
+  background: active ? "var(--bk-accent)" : "transparent",
+  color: active ? "#fff" : "var(--bk-ink-soft)",
   border: "1px solid",
-  borderColor: active ? "var(--bd-accent)" : "var(--bd-border)",
+  borderColor: active ? "var(--bk-accent)" : "var(--bk-border)",
   borderRadius: 12,
   fontSize: 11,
   cursor: "pointer",
@@ -82,9 +80,9 @@ const pillStyle = (active: boolean): React.CSSProperties => ({
 const searchInputStyle: React.CSSProperties = {
   width: "100%",
   padding: "5px 10px",
-  background: "var(--bd-bg-canvas)",
-  color: "var(--bd-fg-primary)",
-  border: "1px solid var(--bd-border)",
+  background: "var(--bk-bg-subtle)",
+  color: "var(--bk-ink)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 6,
   fontSize: 12,
   margin: "8px 12px",
@@ -102,8 +100,8 @@ const bodyScrollStyle: React.CSSProperties = {
 const headerAiButtonStyle: React.CSSProperties = {
   padding: "3px 10px",
   background: "transparent",
-  color: "var(--bd-fg-secondary)",
-  border: "1px solid var(--bd-border)",
+  color: "var(--bk-ink-soft)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 12,
   fontSize: 11,
   cursor: "pointer",
@@ -117,8 +115,8 @@ const footerSaveStyle: React.CSSProperties = {
   margin: "8px 12px 12px",
   padding: "8px 10px",
   background: "transparent",
-  color: "var(--bd-fg-secondary)",
-  border: "1px dashed var(--bd-border)",
+  color: "var(--bk-ink-soft)",
+  border: "1px dashed var(--bk-border)",
   borderRadius: 6,
   fontSize: 11,
   cursor: "pointer",
@@ -196,12 +194,12 @@ export const ComponentsPanelV2: React.FC<ComponentsPanelV2Props> = ({
         <div style={{ marginLeft: "auto" }}>
           <Button
             type="button"
-            variant="ghost"
-            size="sm"
+            color="light"
+            size="xs"
             onClick={handleOpenAI}
             data-components-ai-entry
             aria-label="Add component via AI"
-            style={headerAiButtonStyle}
+            style={headerAiButtonStyle} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           >
             + AI
           </Button>
@@ -213,12 +211,12 @@ export const ComponentsPanelV2: React.FC<ComponentsPanelV2Props> = ({
           <Button
             key={f.id}
             type="button"
-            variant="ghost"
-            size="sm"
+            color="light"
+            size="xs"
             role="radio"
             aria-checked={filter === f.id}
             onClick={() => setFilter(f.id)}
-            style={pillStyle(filter === f.id)}
+            style={pillStyle(filter === f.id)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           >
             {f.label}
           </Button>
@@ -226,7 +224,7 @@ export const ComponentsPanelV2: React.FC<ComponentsPanelV2Props> = ({
       </div>
 
       <div style={{ padding: "0 12px" }}>
-        <Input
+        <TextInput
           type="search"
           placeholder="Search components…"
           value={search}
@@ -252,10 +250,10 @@ export const ComponentsPanelV2: React.FC<ComponentsPanelV2Props> = ({
 
       <Button
         type="button"
-        variant="ghost"
+        color="light"
         onClick={handleSaveSelection}
         data-save-current-selection
-        style={footerSaveStyle}
+        style={footerSaveStyle} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
       >
         + Save current selection
       </Button>

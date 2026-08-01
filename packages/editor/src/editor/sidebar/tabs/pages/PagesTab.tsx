@@ -1,10 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
-import {
-  EmptyState,
-  EmptyStateTitle,
-  EmptyStateDesc,
-  EmptyStateActions,
-} from "@/editor/shared/vibcoder";
 /**
  * PagesTab — Shell component.
  *
@@ -20,9 +13,8 @@ import {
  */
 
 import * as React from "react";
+import { ConfirmDialog, EmptyState, EmptyStateActions, EmptyStateDesc, EmptyStateTitle, PanelFrame } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
-import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
-import { TabFrame } from "@/shared/extensions/TabFrame";
 import { PageCommandPalette } from "./components/PageCommandPalette";
 import { PageContextMenu } from "./components/PageContextMenu";
 import { PageList } from "./components/PageList";
@@ -33,6 +25,7 @@ import { usePages } from "./usePages";
 import { useFolders } from "./useFolders";
 import { useBulkSelect } from "./useBulkSelect";
 import "./PagesTab.css";
+import { Button } from "@/editor/chrome-ui";
 
 export interface PagesTabProps {
   composer: Composer | null;
@@ -195,8 +188,8 @@ export const PagesTab: React.FC<PagesTabProps> = ({
     // `.bulk-mode` toggle activates the row checkbox column when selection exists.
     // No width prop — Pages host (LeftSidebar drawer, width from tabsConfig.ts)
     // controls sizing. TabFrame fills the host via width:100%.
-    <TabFrame className={`bd-pg-panel${bulk.hasSelection ? " bulk-mode" : ""}`}>
-      <TabFrame.Header
+    <PanelFrame className={`bd-pg-panel${bulk.hasSelection ? " bulk-mode" : ""}`}>
+      <PanelFrame.Header
         title="Pages"
         isPinned={isPinned}
         onPinToggle={onPinToggle}
@@ -204,32 +197,32 @@ export const PagesTab: React.FC<PagesTabProps> = ({
         onClose={onClose}
       >
         <Button
-          variant="ghost"
-          size="sm"
+          color="light"
+          size="xs"
           style={{ display: "inline-grid", placeItems: "center", width: 26, height: 22, padding: 0 }}
           onClick={() => setPaletteOpen(true)}
-          aria-label="Open command palette"
+          aria-label="Open command palette" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
         >
-          <span style={{ font: "500 10px var(--bd-mono)", padding: "1px 5px", borderRadius: 3, border: "1px solid var(--bd-border)", background: "var(--bd-bg-subtle)", color: "var(--bd-fg-muted)" }}>
+          <span style={{ font: "500 10px var(--bk-font-mono)", padding: "1px 5px", borderRadius: 3, border: "1px solid var(--bk-border)", background: "var(--bk-bg-subtle)", color: "var(--bk-ink-muted)" }}>
             ⌘K
           </span>
         </Button>
-      </TabFrame.Header>
+      </PanelFrame.Header>
       {/* Error state — takes priority over everything */}
       {p.loadError ? (
-        <TabFrame.Body>
-          <EmptyState size="compact" style={{ margin: "var(--bd-space-3)" }} role="alert" aria-live="assertive">
+        <PanelFrame.Body>
+          <EmptyState size="compact" style={{ margin: "var(--bk-space-12)" }} role="alert" aria-live="assertive">
             <EmptyStateTitle>{p.loadError}</EmptyStateTitle>
             <EmptyStateDesc>Your connection dropped. Work is safe — nothing was lost.</EmptyStateDesc>
             <EmptyStateActions>
-              <Button variant="secondary" size="sm" onClick={p.retrySync}>
+              <Button color="light" size="xs" onClick={p.retrySync}>
                 Try again
               </Button>
             </EmptyStateActions>
           </EmptyState>
-        </TabFrame.Body>
+        </PanelFrame.Body>
       ) : (
-        <TabFrame.Body noScroll>
+        <PanelFrame.Body noScroll>
           {/* View segment — page tree vs whole-site search-listings (50-pages) */}
           <div
             role="tablist"
@@ -237,7 +230,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             style={{
               display: "inline-flex",
               margin: "8px 12px 0",
-              border: "1px solid var(--bd-border)",
+              border: "1px solid var(--bk-border)",
               borderRadius: 4,
               overflow: "hidden",
               alignSelf: "flex-start",
@@ -248,8 +241,8 @@ export const PagesTab: React.FC<PagesTabProps> = ({
               return (
                 <Button
                   key={v}
-                  variant="bare"
-                  size="sm"
+                  color="light"
+                  size="xs"
                   role="tab"
                   aria-selected={on}
                   onClick={() => setView(v)}
@@ -258,10 +251,10 @@ export const PagesTab: React.FC<PagesTabProps> = ({
                     fontSize: 11,
                     fontWeight: on ? 600 : 400,
                     borderRadius: 0,
-                    borderRight: i === 0 ? "1px solid var(--bd-border)" : undefined,
-                    background: on ? "var(--bd-accent)" : "transparent",
-                    color: on ? "var(--bd-fg-on-accent)" : "var(--bd-fg-muted)",
-                  }}
+                    borderRight: i === 0 ? "1px solid var(--bk-border)" : undefined,
+                    background: on ? "var(--bk-accent)" : "transparent",
+                    color: on ? "var(--bk-accent-on)" : "var(--bk-ink-muted)",
+                  }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
                 >
                   {label}
                 </Button>
@@ -303,7 +296,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             onRemovePageFromFolder={f.removePageFromFolder}
           />
           )}
-        </TabFrame.Body>
+        </PanelFrame.Body>
       )}
       {/* Context menu (portal) */}
       {p.contextMenu && (
@@ -323,7 +316,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
       )}
       {/* Delete confirmation dialog */}
       <ConfirmDialog
-        isOpen={!!deleteTargetId}
+        open={!!deleteTargetId}
         onClose={() => setDeleteTargetId(null)}
         onConfirm={() => {
           if (deleteTargetId) p.deletePage(deleteTargetId);
@@ -331,8 +324,8 @@ export const PagesTab: React.FC<PagesTabProps> = ({
         }}
         title={`Delete "${deleteTarget?.name}"?`}
         message="All content on this page will be permanently removed. You can undo immediately after."
-        confirmText="Delete Page"
-        variant="danger"
+        confirmLabel="Delete Page"
+        destructive
       />
       {/* ⌘K command palette */}
       {paletteOpen && (
@@ -353,7 +346,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
           />
         </SettingsErrorBoundary>
       )}
-    </TabFrame>
+    </PanelFrame>
   );
 };
 

@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * SettingsTab — prototype-aligned shell.
  *
@@ -12,7 +11,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
-import { TabFrame } from "@/shared/extensions/TabFrame";
+import { ConfirmDialog, PanelFrame } from "@/editor/chrome-ui";
 import { usePanelNavigation } from "../../shared/usePanelNavigation";
 import { DrillInHeader } from "../../shared/DrillInHeader";
 import {
@@ -38,7 +37,6 @@ import {
   DomainsScreen,
   WebhooksScreen,
 } from "./index";
-import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
 import { useReducedMotion } from "@/shared/hooks/useReducedMotion";
 import type { ProjectSettings } from "@/shared/types/project";
 import { getEditorPlanTier } from "@/services/BuildrikSyncProvider";
@@ -47,7 +45,7 @@ import { PublishHistory } from "@/editor/shell/PublishHistory";
 import { EVENTS } from "@/shared/constants/events";
 import { currentSiteId } from "@/services/ReviewService";
 import "./settings.css";
-
+import { Button } from "@/editor/chrome-ui";
 // ─── Nav definition ──────────────────────────────────────────────────────────
 //
 // A1 day-1: nav reshuffle to 10 in-tab sections + 8 workspace deep-links,
@@ -711,7 +709,7 @@ export const SettingsTab: React.FC<
               Download the whole site as clean HTML/CSS you can host anywhere. Opens the exporter
               with format and scope options.
             </div>
-            <Button variant="secondary" size="sm" onClick={() => composer?.emit(EVENTS.UI_TOGGLE_EXPORTER, undefined)}>
+            <Button color="light" size="xs" onClick={() => composer?.emit(EVENTS.UI_TOGGLE_EXPORTER, undefined)}>
               Open exporter
             </Button>
           </div>
@@ -768,14 +766,14 @@ export const SettingsTab: React.FC<
   NAV.forEach((n) => navByGroup[n.group].push(n));
 
   return (
-    <TabFrame>
-      <TabFrame.Header
+    <PanelFrame>
+      <PanelFrame.Header
         title={isRoot ? "Settings" : current.title}
         subtitle={!isRoot ? current.subtitle : undefined}
         onHelpClick={onHelpClick}
         onClose={onClose}
       />
-      <TabFrame.Body noScroll>
+      <PanelFrame.Body noScroll>
         <div
           className={`bd-set-stack${transitioning ? " transitioning" : ""}${prefersReducedMotion ? " no-motion" : ""}`}
           onTransitionEnd={handleStackTransitionEnd}
@@ -859,9 +857,9 @@ export const SettingsTab: React.FC<
             </div>
           )}
         </div>
-      </TabFrame.Body>
+      </PanelFrame.Body>
       <ConfirmDialog
-        isOpen={guardOpen}
+        open={guardOpen}
         onClose={() => {
           pendingNavRef.current = null;
           setGuardOpen(false);
@@ -924,11 +922,11 @@ export const SettingsTab: React.FC<
         }}
         title="Discard changes?"
         message="You have unsaved changes. Switching will discard them."
-        confirmText="Discard"
-        cancelText="Keep editing"
-        variant="danger"
+        confirmLabel="Discard"
+        cancelLabel="Keep editing"
+        destructive
       />
-    </TabFrame>
+    </PanelFrame>
   );
 };
 

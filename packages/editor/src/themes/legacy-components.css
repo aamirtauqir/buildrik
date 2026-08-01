@@ -11,10 +11,10 @@
 /* keep: canonical engine container, emitted by Canvas.tsx */
 .buildrick-canvas {
   flex: 1;
-  background: var(--buildrick-bg-app);
+  background: var(--bk-bg-app);
   background-image:
-    linear-gradient(var(--buildrick-ink-06) 1px, transparent 1px),
-    linear-gradient(90deg, var(--buildrick-ink-06) 1px, transparent 1px);
+    linear-gradient(var(--bk-alpha-ink-06) 1px, transparent 1px),
+    linear-gradient(90deg, var(--bk-alpha-ink-06) 1px, transparent 1px);
   background-size: 20px 20px;
   display: flex;
   align-items: center;
@@ -29,13 +29,13 @@
 .tbOfflineTooltip {
   position: absolute; top: calc(100% + 6px); right: 0;
   white-space: nowrap;
-  background: var(--buildrick-bg-card);
-  border: 1px solid var(--buildrick-error);
-  border-radius: var(--buildrick-radius-md);
+  background: var(--bk-bg-card);
+  border: 1px solid var(--bk-error);
+  border-radius: var(--bk-radius-lg);
   padding: 4px 10px; font-size: 11px; font-weight: 500;
-  color: var(--buildrick-error);
+  color: var(--bk-error);
   pointer-events: none;
-  z-index: var(--buildrick-z-tooltip);
+  z-index: var(--bk-z-tooltip);
 }
 
 /* keep: cross-folder element-flash; consumers a11y.css; move to atoms/animation-utils.css later */
@@ -46,9 +46,9 @@ input[type="range"]::-webkit-slider-thumb,
 input[type="range"]::-moz-range-thumb {
   appearance: none; width: 14px; height: 14px;
   border-radius: 50%; cursor: pointer;
-  background: var(--buildrick-bg-card);
-  border: 2px solid var(--buildrick-accent);
-  box-shadow: var(--buildrick-shadow-raised);
+  background: var(--bk-bg-card);
+  border: 2px solid var(--bk-accent);
+  box-shadow: var(--bk-shadow-raised);
 }
 /* keep: vendor pseudo-elements need element-level selectors */
 input[type="color"] { cursor: pointer; }
@@ -64,20 +64,20 @@ input[type="color"]::-webkit-color-swatch { border-radius: 4px; border: none; }
 
 /* keep: engine-emitted attribute selector for selection ring — 2px accent, no halo (Figma focus spec) */
 [data-buildrick-id][data-selected="true"] {
-  outline: 2px solid var(--buildrick-accent) !important;
+  outline: 2px solid var(--bk-accent) !important;
   outline-offset: 1px;
 }
 /* keep: engine-emitted attribute selector for hover ring */
 [data-buildrick-id]:hover:not([data-selected="true"]) {
-  outline: 1px dashed var(--buildrick-primary-alpha-30) !important;
+  outline: 1px dashed var(--bk-alpha-accent-30) !important;
   outline-offset: 0px;
 }
 
 /* keep: native disabled state — element selectors required */
 input:disabled, select:disabled, textarea:disabled {
-  background: var(--buildrick-surface-2) !important;
-  color: var(--buildrick-text-muted) !important;
-  border-color: var(--buildrick-border-subtle) !important;
+  background: var(--bk-bg-subtle) !important;
+  color: var(--bk-ink-muted) !important;
+  border-color: var(--bk-border) !important;
   cursor: not-allowed !important;
   opacity: 0.5;
 }

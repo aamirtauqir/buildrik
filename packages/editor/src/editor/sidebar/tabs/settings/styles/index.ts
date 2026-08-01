@@ -33,20 +33,20 @@ export const exportOptionStyles: React.CSSProperties = {
   justifyContent: "center",
   gap: 4,
   padding: "12px 8px",
-  background: "var(--bd-bg-subtle)",
-  border: "1px solid var(--bd-border)",
+  background: "var(--bk-bg-subtle)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 6,
-  color: "var(--bd-fg-primary)",
+  color: "var(--bk-ink)",
   cursor: "pointer",
   fontSize: 18,
-  transition: "background var(--buildrick-duration-fast), border-color var(--buildrick-duration-fast)",
+  transition: "background var(--bk-motion-fast), border-color var(--bk-motion-fast)",
 };
 
 /** Overlay applied to the selected option button. */
 export const activeExportOptionStyles: React.CSSProperties = {
-  background: "var(--bd-accent-subtle)",
-  borderColor: "var(--bd-accent)",
-  color: "var(--bd-accent)",
+  background: "var(--bk-accent-subtle)",
+  borderColor: "var(--bk-accent)",
+  color: "var(--bk-accent)",
 };
 
 /** Footnote / hint shown below an option group. */
@@ -54,5 +54,5 @@ export const noteStyles: React.CSSProperties = {
   marginTop: 8,
   fontSize: 12,
   lineHeight: 1.5,
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
 };

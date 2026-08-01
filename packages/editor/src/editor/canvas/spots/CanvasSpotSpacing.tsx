@@ -1,4 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
 /**
  * Canvas Spot Spacing
  * Interactive spacing editor for elements
@@ -6,6 +5,7 @@ import { Input } from "@/editor/shared/vibcoder/Input";
  */
 
 import * as React from "react";
+import { TextField } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
 import type { SpacingIndicator } from "../../../shared/types/canvas";
 import "./CanvasSpotSpacing.css";
@@ -63,7 +63,7 @@ export const CanvasSpotSpacing: React.FC<CanvasSpotSpacingProps> = ({
     <div className="bd-canvas-spot-spacing">
       {indicators.map((indicator, index) => {
         const isEditing = editing === `${indicator.type}-${indicator.side}`;
-        const color = indicator.type === "margin" ? "#00d4aa" : "var(--bd-accent-pressed)";
+        const color = indicator.type === "margin" ? "#00d4aa" : "var(--bk-accent-pressed)";
 
         return (
           <div
@@ -82,7 +82,7 @@ export const CanvasSpotSpacing: React.FC<CanvasSpotSpacingProps> = ({
             {indicator.position.width > 20 && indicator.position.height > 20 && (
               <div className="bd-spacing-indicator-label" style={{ backgroundColor: color }}>
                 {isEditing ? (
-                  <Input
+                  <TextField
                     type="number"
                     value={tempValue}
                     onChange={handleValueChange}

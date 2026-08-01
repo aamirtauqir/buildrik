@@ -1,6 +1,6 @@
 import * as React from "react";
 import { createPortal } from "react-dom";
-import { Button } from "@/editor/shared/vibcoder/Button";
+import { Button } from "@/editor/chrome-ui";
 
 interface Props {
   folderId: string;

@@ -1,19 +1,11 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * ZoomControls - Canvas zoom slider and controls
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { IconButton } from "@/editor/shared/vibcoder/IconButton";
-import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipPortal,
-  TooltipContent,
-} from "@/editor/shared/vibcoder";
 import { ZOOM_PRESETS } from "./shared";
+import { Button, TextInput, Tooltip } from "@/editor/chrome-ui";
 
 export interface ZoomControlsProps {
   zoom: number;
@@ -53,21 +45,17 @@ export const ZoomControls: React.FC<ZoomControlsProps> = ({
 
   return (
     <div style={containerStyles}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <IconButton
-            size="sm"
-            aria-label="Zoom Out"
-            onClick={handleZoomOut}
-            disabled={zoom <= minZoom}
-          ><ZoomOutIcon /></IconButton>
-        </TooltipTrigger>
-        <TooltipPortal>
-          <TooltipContent>Zoom Out</TooltipContent>
-        </TooltipPortal>
+      <Tooltip content="Zoom Out" placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
+        <Button
+          color="light"
+          size="xs"
+          aria-label="Zoom Out"
+          onClick={handleZoomOut}
+          disabled={zoom <= minZoom} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+        ><ZoomOutIcon /></Button>
       </Tooltip>
       <div style={sliderContainerStyles}>
-        <Input
+        <TextInput
           type="range"
           min={minZoom}
           max={maxZoom}
@@ -76,41 +64,34 @@ export const ZoomControls: React.FC<ZoomControlsProps> = ({
           style={sliderStyles}
         />
       </div>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <IconButton
-            size="sm"
-            aria-label="Zoom In"
-            onClick={handleZoomIn}
-            disabled={zoom >= maxZoom}
-          ><ZoomInIcon /></IconButton>
-        </TooltipTrigger>
-        <TooltipPortal>
-          <TooltipContent>Zoom In</TooltipContent>
-        </TooltipPortal>
+      <Tooltip content="Zoom In" placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
+        <Button
+          color="light"
+          size="xs"
+          aria-label="Zoom In"
+          onClick={handleZoomIn}
+          disabled={zoom >= maxZoom} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+        ><ZoomInIcon /></Button>
       </Tooltip>
       <div style={dividerStyles} />
       <Button
+        color="light"
         onClick={() => setShowPresets(!showPresets)}
         style={percentButtonStyles}
-        title="Zoom presets"
+        title="Zoom presets" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
       >
         {Math.round(zoom)}%
       </Button>
       {onFitToScreen && (
         <>
           <div style={dividerStyles} />
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <IconButton
-                size="sm"
-                aria-label="Fit to Screen"
-                onClick={onFitToScreen}
-              ><FitIcon /></IconButton>
-            </TooltipTrigger>
-            <TooltipPortal>
-              <TooltipContent>Fit to Screen</TooltipContent>
-            </TooltipPortal>
+          <Tooltip content="Fit to Screen" placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
+            <Button
+              color="light"
+              size="xs"
+              aria-label="Fit to Screen"
+              onClick={onFitToScreen} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+            ><FitIcon /></Button>
           </Tooltip>
         </>
       )}
@@ -119,11 +100,12 @@ export const ZoomControls: React.FC<ZoomControlsProps> = ({
           {ZOOM_PRESETS.map((preset) => (
             <Button
               key={preset}
+              color="light"
               onClick={() => handlePresetSelect(preset)}
               style={{
                 ...presetItemStyles,
-                background: zoom === preset ? "var(--buildrick-accent)" : "transparent",
-              }}
+                background: zoom === preset ? "var(--bk-accent)" : "transparent",
+              }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
             >
               {preset}%
             </Button>
@@ -192,9 +174,9 @@ const containerStyles: React.CSSProperties = {
   alignItems: "center",
   gap: 4,
   padding: "6px 10px",
-  background: "var(--buildrick-surface-2)",
-  border: "1px solid var(--buildrick-border)",
-  borderRadius: "var(--buildrick-radius-lg)",
+  background: "var(--bk-bg-subtle)",
+  border: "1px solid var(--bk-border)",
+  borderRadius: "var(--bk-radius-lg)",
   boxShadow: "0 2px 8px rgba(0, 0, 0, 0.2)",
   zIndex: 100,
 };
@@ -209,7 +191,7 @@ const sliderStyles: React.CSSProperties = {
   width: "100%",
   height: 4,
   appearance: "none",
-  background: "var(--buildrick-surface-4)",
+  background: "var(--bk-gray-200)",
   borderRadius: 2,
   outline: "none",
   cursor: "pointer",
@@ -218,7 +200,7 @@ const sliderStyles: React.CSSProperties = {
 const dividerStyles: React.CSSProperties = {
   width: 1,
   height: 16,
-  background: "var(--buildrick-border)",
+  background: "var(--bk-border)",
   margin: "0 4px",
 };
 
@@ -227,8 +209,8 @@ const percentButtonStyles: React.CSSProperties = {
   padding: "4px 8px",
   background: "transparent",
   border: "none",
-  borderRadius: "var(--buildrick-radius-sm)",
-  color: "var(--buildrick-text-secondary)",
+  borderRadius: "var(--bk-radius-sm)",
+  color: "var(--bk-ink-soft)",
   fontSize: 12,
   fontWeight: 500,
   cursor: "pointer",
@@ -243,17 +225,17 @@ const presetsDropdownStyles: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   padding: 4,
-  background: "var(--buildrick-surface-2)",
-  border: "1px solid var(--buildrick-border)",
-  borderRadius: "var(--buildrick-radius-md)",
+  background: "var(--bk-bg-subtle)",
+  border: "1px solid var(--bk-border)",
+  borderRadius: "var(--bk-radius-lg)",
   boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
 };
 
 const presetItemStyles: React.CSSProperties = {
   padding: "6px 12px",
   border: "none",
-  borderRadius: "var(--buildrick-radius-sm)",
-  color: "var(--buildrick-text-primary)",
+  borderRadius: "var(--bk-radius-sm)",
+  color: "var(--bk-ink)",
   fontSize: 12,
   cursor: "pointer",
   textAlign: "right",

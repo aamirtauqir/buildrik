@@ -1,5 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * @lint-hex-policy: component-theme
  *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
@@ -10,7 +8,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import * as React from "react";
 import type { Composer } from "../../../../engine";
-
+import { Button, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -28,26 +26,26 @@ const styles = {
   input: {
     flex: 1,
     padding: "8px 10px",
-    background: "var(--bd-bg-subtle)",
-    border: "1px solid var(--bd-border-medium)",
+    background: "var(--bk-bg-subtle)",
+    border: "1px solid var(--bk-border-medium)",
     borderRadius: 6,
-    color: "var(--bd-fg-primary)",
+    color: "var(--bk-ink)",
     fontSize: 12,
     outline: "none",
   } as React.CSSProperties,
   addButton: {
     padding: "8px 16px",
-    background: "var(--buildrick-accent)",
+    background: "var(--bk-accent)",
     border: "none",
     borderRadius: 6,
-    color: "var(--buildrick-text-on-accent)",
+    color: "var(--bk-accent-on)",
     fontSize: 12,
     fontWeight: 600,
     cursor: "pointer",
   } as React.CSSProperties,
   hint: {
     fontSize: 12,
-    color: "var(--buildrick-text-secondary)",
+    color: "var(--bk-ink-soft)",
   } as React.CSSProperties,
 };
 
@@ -80,14 +78,14 @@ export const DataAttributeEditor: React.FC<DataAttributeEditorProps> = ({
   return (
     <div>
       <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
-        <Input
+        <TextInput
           type="text"
           value={newKey}
           onChange={(e) => setNewKey(e.target.value)}
           placeholder="data-*"
           style={styles.input}
         />
-        <Input
+        <TextInput
           type="text"
           value={newValue}
           onChange={(e) => setNewValue(e.target.value)}

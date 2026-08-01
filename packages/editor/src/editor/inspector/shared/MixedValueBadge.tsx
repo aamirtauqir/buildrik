@@ -13,8 +13,8 @@ export const MixedValueBadge: React.FC<{ compact?: boolean }> = ({ compact = fal
           display: "inline-block",
           width: 6,
           height: 6,
-          borderRadius: "var(--bd-radius-full)",
-          background: "var(--buildrick-warning)",
+          borderRadius: "var(--bk-radius-full)",
+          background: "var(--bk-warning)",
           marginRight: 4,
         }}
         title="Mixed — values differ across selected elements"
@@ -30,12 +30,12 @@ export const MixedValueBadge: React.FC<{ compact?: boolean }> = ({ compact = fal
         gap: 4,
         fontSize: 10,
         fontWeight: 500,
-        color: "var(--buildrick-warning)",
-        background: "var(--buildrick-warning-bg)",
-        border: "1px solid var(--buildrick-warning-border)",
+        color: "var(--bk-warning)",
+        background: "var(--bk-warning-tint)",
+        border: "1px solid var(--bk-warning-text)",
         padding: "1px 6px",
         borderRadius: 3,
-        fontFamily: "var(--buildrick-font-family-mono)",
+        fontFamily: "var(--bk-font-mono)",
         letterSpacing: "0.01em",
       }}
     >
@@ -43,9 +43,9 @@ export const MixedValueBadge: React.FC<{ compact?: boolean }> = ({ compact = fal
         style={{
           width: 4,
           height: 4,
-          borderRadius: "var(--bd-radius-full)",
-          background: "var(--buildrick-warning)",
-          boxShadow: "0 0 4px var(--buildrick-warning)",
+          borderRadius: "var(--bk-radius-full)",
+          background: "var(--bk-warning)",
+          boxShadow: "0 0 4px var(--bk-warning)",
         }}
       />
       Mixed

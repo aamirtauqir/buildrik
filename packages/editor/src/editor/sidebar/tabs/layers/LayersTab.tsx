@@ -1,6 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { TabFrame } from "@/shared/extensions/TabFrame";
 /**
  * LayersTab - Layers sidebar tab.
  *
@@ -11,11 +8,13 @@ import { TabFrame } from "@/shared/extensions/TabFrame";
  */
 
 import * as React from "react";
+import { PanelFrame } from "@/editor/chrome-ui";
 import { useComposerSelection } from "../../../canvas/hooks/useComposerSelection";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
 import { LayersPanel } from "../../../panels/layers/index";
 import type { SelectedElementInfo } from "../../../panels/layers/types";
+import { Button, TextInput } from "@/editor/chrome-ui";
 
 export interface LayersTabProps {
   composer: Composer | null;
@@ -91,8 +90,8 @@ export const LayersTab: React.FC<LayersTabProps> = ({
   const subText = `${stats.total} node${stats.total === 1 ? "" : "s"} · ${stats.selected} selected`;
 
   return (
-    <TabFrame className="bdc-panel bdc-layers">
-      <TabFrame.Header title="Layers" subtitle={subText}>
+    <PanelFrame className="bdc-panel bdc-layers">
+      <PanelFrame.Header title="Layers" subtitle={subText}>
         <Button className="bdc-icon-btn" title="Expand all" aria-label="Expand all layers" onClick={handleExpandAll}>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M8 3v3 M16 3v3 M8 21v-3 M16 21v-3 M3 8h3 M21 8h-3 M3 16h3 M21 16h-3" />
@@ -109,13 +108,13 @@ export const LayersTab: React.FC<LayersTabProps> = ({
             <path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 01-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 01-4 0v-.1a1.7 1.7 0 00-1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 01-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 010-4h.1a1.7 1.7 0 001.5-1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 012.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 014 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 012.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 010 4h-.1a1.7 1.7 0 00-1.5 1z" />
           </svg>
         </Button>
-      </TabFrame.Header>
+      </PanelFrame.Header>
       <label className="bdc-psearch">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
           <circle cx="11" cy="11" r="7" />
           <path d="M21 21l-4.3-4.3" />
         </svg>
-        <Input
+        <TextInput
           type="text"
           placeholder="Find a layer"
           value={search}
@@ -142,7 +141,7 @@ export const LayersTab: React.FC<LayersTabProps> = ({
           </div>
         )}
       </div>
-    </TabFrame>
+    </PanelFrame>
   );
 };
 

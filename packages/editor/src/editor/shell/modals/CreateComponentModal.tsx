@@ -1,6 +1,3 @@
-import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Textarea } from "@/editor/shared/vibcoder/Textarea";
 /**
  * CreateComponentModal - Modal for creating reusable components
  * Allows users to save selected elements as reusable components
@@ -8,18 +5,10 @@ import { Textarea } from "@/editor/shared/vibcoder/Textarea";
  */
 
 import * as React from "react";
+import { ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import {
-  Modal,
-  ModalContent,
-  ModalTitle,
-  ModalClose,
-  ModalFooter,
-  OverlayMount,
-} from "@/editor/shared/vibcoder";
-import { useToast } from "@/editor/shared/vibcoder";
-import { Stack } from "@/editor/shared/vibcoder";
+import { useToast } from "@/editor/chrome-ui";
+import { Button, Checkbox, Textarea, TextInput } from "@/editor/chrome-ui";
 
 export interface CreateComponentModalProps {
   isOpen: boolean;
@@ -136,8 +125,8 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
   };
 
   return (
-    <OverlayMount>
-      <Modal open={isOpen} onOpenChange={(next) => !next && onClose()}>
+    <Portal>
+      <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
         <ModalContent size="lg">
           <ModalTitle>Create Component</ModalTitle>
           <ModalClose aria-label="Close modal">
@@ -146,12 +135,12 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
             </svg>
           </ModalClose>
           <div className="bd-modal__body">
-      <Stack gap="lg" onKeyDown={handleKeyPress}>
+      <div className="tw:flex tw:flex-col tw:gap-4" onKeyDown={handleKeyPress}>
         <div>
           <label style={labelStyles}>
-            Name <span style={{ color: "var(--buildrick-accent)" }}>*</span>
+            Name <span style={{ color: "var(--bk-accent)" }}>*</span>
           </label>
-          <Input
+          <TextInput
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -174,7 +163,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
 
         <div>
           <label style={labelStyles}>Category</label>
-          <Input
+          <TextInput
             type="text"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
@@ -185,7 +174,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
 
         <div>
           <label style={labelStyles}>Tags</label>
-          <Input
+          <TextInput
             type="text"
             value={tags}
             onChange={(e) => setTags(e.target.value)}
@@ -200,6 +189,8 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
           <label style={labelStyles}>Variant Options</label>
           <label style={checkboxLabelStyles}>
             <Checkbox
+              color="blue"
+              className="tw:bg-white"
               checked={isVariantSet}
               onChange={(e) => setIsVariantSet(e.target.checked)}
               style={checkboxStyles} />
@@ -218,11 +209,11 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
                     style={{
                       ...variantChipStyles,
                       background: selectedVariantProps.includes(preset.name)
-                        ? "var(--buildrick-accent)"
-                        : "var(--buildrick-surface-3)",
+                        ? "var(--bk-accent)"
+                        : "var(--bk-bg-subtle)",
                       color: selectedVariantProps.includes(preset.name)
-                        ? "var(--buildrick-text-on-accent)"
-                        : "var(--buildrick-text-secondary)",
+                        ? "var(--bk-accent-on)"
+                        : "var(--bk-ink-soft)",
                     }}
                   >
                     {preset.name}
@@ -239,6 +230,8 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
         <div style={variantSectionStyles}>
           <label style={checkboxLabelStyles}>
             <Checkbox
+              color="blue"
+              className="tw:bg-white"
               checked={prefillFromDs}
               onChange={(e) => setPrefillFromDs(e.target.checked)}
               style={checkboxStyles}
@@ -249,19 +242,19 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
             Lift matching values into token / preset bindings on save. Recommended.
           </small>
         </div>
-      </Stack>
+      </div>
           </div>
           <ModalFooter>
-            <Button variant="ghost" onClick={onClose} disabled={isCreating}>
+            <Button color="light" onClick={onClose} disabled={isCreating} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
               Cancel
             </Button>
-            <Button variant="primary" onClick={handleSubmit} disabled={!name.trim() || isCreating}>
+            <Button onClick={handleSubmit} disabled={!name.trim() || isCreating}>
               {isCreating ? "Creating..." : "Create Component"}
             </Button>
           </ModalFooter>
         </ModalContent>
-      </Modal>
-    </OverlayMount>
+      </ModalRoot>
+    </Portal>
   );
 };
 
@@ -273,17 +266,17 @@ const labelStyles: React.CSSProperties = {
   display: "block",
   fontSize: 12,
   fontWeight: 600,
-  color: "var(--buildrick-text-primary)",
+  color: "var(--bk-ink)",
   marginBottom: 6,
 };
 
 const inputStyles: React.CSSProperties = {
   width: "100%",
   padding: "8px 12px",
-  background: "var(--buildrick-surface-3)",
-  border: "1px solid var(--buildrick-border)",
+  background: "var(--bk-bg-subtle)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 6,
-  color: "var(--buildrick-text-primary)",
+  color: "var(--bk-ink)",
   fontSize: 13,
 };
 
@@ -295,7 +288,7 @@ const textareaStyles: React.CSSProperties = {
 
 const hintStyles: React.CSSProperties = {
   fontSize: 12,
-  color: "var(--buildrick-text-muted)",
+  color: "var(--bk-ink-muted)",
   marginTop: 4,
   display: "block",
 };
@@ -304,7 +297,7 @@ const hintStyles: React.CSSProperties = {
 const variantSectionStyles: React.CSSProperties = {
   marginTop: 8,
   paddingTop: 16,
-  borderTop: "1px solid var(--buildrick-border)",
+  borderTop: "1px solid var(--bk-border)",
 };
 
 const checkboxLabelStyles: React.CSSProperties = {
@@ -312,7 +305,7 @@ const checkboxLabelStyles: React.CSSProperties = {
   alignItems: "center",
   gap: 8,
   fontSize: 13,
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bk-ink-soft)",
   cursor: "pointer",
 };
 
@@ -325,7 +318,7 @@ const checkboxStyles: React.CSSProperties = {
 const variantPropsContainerStyles: React.CSSProperties = {
   marginTop: 12,
   padding: 12,
-  background: "var(--buildrick-surface-2)",
+  background: "var(--bk-bg-subtle)",
   borderRadius: 8,
 };
 
@@ -341,7 +334,7 @@ const variantChipStyles: React.CSSProperties = {
   alignItems: "center",
   gap: 4,
   padding: "6px 12px",
-  border: "1px solid var(--buildrick-border)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 16,
   fontSize: 12,
   fontWeight: 500,

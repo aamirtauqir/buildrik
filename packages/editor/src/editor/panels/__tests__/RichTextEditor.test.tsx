@@ -15,9 +15,6 @@
  *   - Color popovers: foreColor / hiliteColor
  *   - Clear formatting (removeFormat)
  *
- * Radix note: Tooltip.Root throws without a TooltipProvider ancestor
- * (mounted at the app shell in prod) — tests wrap the component in one.
- *
  * @license BSD-3-Clause
  */
 
@@ -25,7 +22,6 @@ import { describe, it, expect, vi, beforeAll, afterEach } from "vitest";
 import { render, screen, fireEvent, cleanup, waitFor } from "@testing-library/react";
 import * as React from "react";
 import { RichTextEditor } from "../RichTextEditor";
-import { TooltipProvider } from "@/editor/shared/vibcoder";
 
 beforeAll(() => {
   // jsdom ships no document.execCommand. RichTextEditor's consumer wires
@@ -41,9 +37,7 @@ afterEach(() => {
 function renderEditor(props: Partial<React.ComponentProps<typeof RichTextEditor>> = {}) {
   const onCommand = vi.fn();
   render(
-    <TooltipProvider>
-      <RichTextEditor onCommand={onCommand} {...props} />
-    </TooltipProvider>
+    <RichTextEditor onCommand={onCommand} {...props} />
   );
   return onCommand;
 }
@@ -124,8 +118,8 @@ describe("RichTextEditor — active-state reflection", () => {
     renderEditor({ activeStyles: { bold: true } });
     const boldBtn = screen.getByText("B");
     const italicBtn = screen.getByText("I");
-    expect(boldBtn.getAttribute("style")).toContain("var(--buildrick-accent)");
-    expect(italicBtn.getAttribute("style")).not.toContain("var(--buildrick-accent)");
+    expect(boldBtn.getAttribute("style")).toContain("var(--bk-accent)");
+    expect(italicBtn.getAttribute("style")).not.toContain("var(--bk-accent)");
   });
 });
 

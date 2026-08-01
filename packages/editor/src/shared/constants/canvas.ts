@@ -18,17 +18,17 @@ import type React from "react";
  */
 export const BRAND_ACCENT = {
   // Core shades — resolve via cobalt accent ramp (color.css:33-37)
-  DEFAULT: "var(--buildrick-accent)", // #406ED6 — Main accent
-  light: "var(--buildrick-accent-subtle)", // Faint accent background
-  dark: "var(--buildrick-accent-pressed)", // Active/pressed states
-  subtle: "var(--buildrick-accent-tint)", // Very light accent tint
+  DEFAULT: "var(--bk-accent)", // #406ED6 — Main accent
+  light: "var(--bk-accent-subtle)", // Faint accent background
+  dark: "var(--bk-accent-pressed)", // Active/pressed states
+  subtle: "var(--bk-accent-tint)", // Very light accent tint
 
   // Alpha variations for glows and overlays — accent alpha ramp
-  alpha10: "var(--buildrick-accent-tint)",
-  alpha15: "var(--buildrick-primary-alpha-15)",
-  alpha20: "var(--buildrick-primary-alpha-15)",
-  alpha30: "var(--buildrick-primary-alpha-30)",
-  alpha40: "var(--buildrick-primary-alpha-30)",
+  alpha10: "var(--bk-accent-tint)",
+  alpha15: "var(--bk-alpha-accent-15)",
+  alpha20: "var(--bk-alpha-accent-15)",
+  alpha30: "var(--bk-alpha-accent-30)",
+  alpha40: "var(--bk-alpha-accent-30)",
 } as const;
 
 /**
@@ -38,20 +38,20 @@ export const BRAND_ACCENT = {
  */
 export const SELECTION_COLORS = {
   // Selection outline and handles - reference CSS vars
-  outline: "var(--buildrick-selection-color)",
-  outlineHover: "var(--buildrick-accent-subtle)",
-  handle: "var(--buildrick-selection-color)",
-  handleHover: "var(--buildrick-accent-subtle)",
-  handleGradient: "var(--buildrick-handle-gradient)",
+  outline: "var(--bk-accent)",
+  outlineHover: "var(--bk-accent-subtle)",
+  handle: "var(--bk-accent)",
+  handleHover: "var(--bk-accent-subtle)",
+  handleGradient: "var(--bk-accent)",
 
   // Glow effects - reference CSS vars
-  glow: "var(--buildrick-selection-glow)",
-  glowStrong: "var(--buildrick-selection-glow-strong)",
-  glowSubtle: "var(--bd-glow-primary)",
+  glow: "var(--bk-shadow-focus)",
+  glowStrong: "var(--bk-shadow-focus)",
+  glowSubtle: "var(--bk-shadow-focus)",
 
   // Multi-select
-  multiSelectOutline: "var(--buildrick-primary-alpha-30)",
-  multiSelectFill: "var(--buildrick-accent-tint)",
+  multiSelectOutline: "var(--bk-alpha-accent-30)",
+  multiSelectFill: "var(--bk-accent-tint)",
 } as const;
 
 /**
@@ -60,16 +60,16 @@ export const SELECTION_COLORS = {
  */
 export const CANVAS_SURFACE = {
   // Canvas wrapper (outer area)
-  wrapper: "var(--bd-bg-panel)",
-  wrapperGradient: "linear-gradient(180deg, #FAFAFB 0%, var(--bd-bg-subtle) 100%)",
+  wrapper: "var(--bk-bg-panel)",
+  wrapperGradient: "linear-gradient(180deg, #FAFAFB 0%, var(--bk-bg-subtle) 100%)",
 
   // Canvas content (white editing area)
-  content: "var(--bd-bg-card)",
+  content: "var(--bk-bg-card)",
   contentBorder: "#E4E4E7",
 
   // Grid/pattern overlay
-  gridDot: "var(--bd-border)",
-  gridLine: "var(--bd-accent-subtle)", // Blue grid lines
+  gridDot: "var(--bk-border)",
+  gridLine: "var(--bk-accent-subtle)", // Blue grid lines
 } as const;
 
 /**
@@ -92,18 +92,18 @@ export const CANVAS_COLORS = {
   // Background
   bgPanel: "#1e1e2e",
   bgPanelSecondary: "#181825",
-  bgInput: "var(--buildrick-bg-input)",
+  bgInput: "var(--bk-bg-card)",
   bgHover: BRAND_ACCENT.alpha15,
 
   // Text
   textPrimary: "#cdd6f4",
-  textSecondary: "var(--buildrick-text-secondary)",
+  textSecondary: "var(--bk-ink-soft)",
   textMuted: "#6c7086",
 
   // Borders
   border: "rgba(255,255,255,0.1)",
   borderLight: "rgba(255,255,255,0.06)",
-  borderInput: "var(--buildrick-border)",
+  borderInput: "var(--bk-border)",
 
   // Accent — cobalt accent ramp via BRAND_ACCENT
   primary: BRAND_ACCENT.DEFAULT,
@@ -122,20 +122,20 @@ export const CANVAS_COLORS = {
 
   // Indicators
   margin: "#10B981", // Emerald green
-  padding: "var(--buildrick-accent-pressed)", // Blue for padding indicator
+  padding: "var(--bk-accent-pressed)", // Blue for padding indicator
 
   // Badges
   badgeTag: "#10B981",
-  badgeId: "var(--buildrick-accent)", // Blue badge for IDs
+  badgeId: "var(--bk-accent)", // Blue badge for IDs
   badgeClass: "#F59E0B",
-  badgeData: "var(--bd-accent)",
-  badgeCustom: "var(--bd-fg-muted)",
+  badgeData: "var(--bk-accent)",
+  badgeCustom: "var(--bk-ink-muted)",
 
   // Status
   success: "#22C55E",
   error: "#EF4444",
   warning: "#F59E0B",
-  info: "var(--bd-accent)",
+  info: "var(--bk-accent)",
   errorBg: "rgba(239, 68, 68, 0.15)",
   errorBorder: "rgba(239, 68, 68, 0.3)",
 } as const;
@@ -149,14 +149,14 @@ export const ANIMATION = {
   duration: {
     instant: "50ms",
     fast: "150ms",
-    normal: "var(--buildrick-duration-normal)",
+    normal: "var(--bk-motion-base)",
     slow: "300ms",
     slower: "400ms",
   },
 
   // Easing functions
   easing: {
-    default: "var(--buildrick-ease-default)",
+    default: "var(--bk-ease-default)",
     smooth: "ease-out",
     spring: "cubic-bezier(0.34, 1.56, 0.64, 1)",
     bounce: "cubic-bezier(0.68, -0.55, 0.265, 1.55)",
@@ -164,11 +164,11 @@ export const ANIMATION = {
 
   // Presets
   transition: {
-    fast: "all 150ms var(--buildrick-ease-default)",
-    normal: "all var(--buildrick-duration-normal) var(--buildrick-ease-default)",
-    slow: "all 300ms var(--buildrick-ease-default)",
+    fast: "all 150ms var(--bk-ease-default)",
+    normal: "all var(--bk-motion-base) var(--bk-ease-default)",
+    slow: "all 300ms var(--bk-ease-default)",
     colors: "background-color 150ms ease, border-color 150ms ease, color 150ms ease",
-    transform: "transform var(--buildrick-duration-normal) var(--buildrick-ease-default)",
+    transform: "transform var(--bk-motion-base) var(--bk-ease-default)",
   },
 } as const;
 
@@ -178,22 +178,22 @@ export const ANIMATION = {
 
 export const SHADOWS = {
   // Elevation shadows
-  sm: "var(--bd-shadow-sm)",
-  md: "var(--bd-shadow-md)",
-  lg: "var(--bd-shadow-lg)",
-  xl: "var(--bd-shadow-lg)",
+  sm: "var(--bk-shadow-raised)",
+  md: "var(--bk-shadow-drag)",
+  lg: "var(--bk-shadow-overlay)",
+  xl: "var(--bk-shadow-overlay)",
 
   // Blue glow shadows (matches primary brand color)
-  glowSm: "0 2px 8px var(--buildrick-primary-alpha-15)",
-  glowMd: "0 4px 14px var(--buildrick-primary-alpha-30)",
-  glowLg: "0 8px 25px var(--buildrick-primary-alpha-30)",
+  glowSm: "0 2px 8px var(--bk-alpha-accent-15)",
+  glowMd: "0 4px 14px var(--bk-alpha-accent-30)",
+  glowLg: "0 8px 25px var(--bk-alpha-accent-30)",
 
   // Selection shadows
   selection: SELECTION_COLORS.glow,
   selectionStrong: SELECTION_COLORS.glowStrong,
 
   // Hover lift shadow
-  hoverLift: "var(--bd-shadow-md)",
+  hoverLift: "var(--bk-shadow-drag)",
 } as const;
 
 // ============================================
@@ -218,7 +218,7 @@ export const PANEL_STYLE: React.CSSProperties = {
   background: CANVAS_COLORS.bgPanel,
   border: `1px solid ${CANVAS_COLORS.border}`,
   borderRadius: 10,
-  boxShadow: "var(--bd-shadow-lg)",
+  boxShadow: "var(--bk-shadow-overlay)",
 };
 
 export const INPUT_STYLE: React.CSSProperties = {
@@ -235,7 +235,7 @@ export const DROPDOWN_STYLE: React.CSSProperties = {
   background: CANVAS_COLORS.bgPanel,
   border: `1px solid ${CANVAS_COLORS.borderInput}`,
   borderRadius: 6,
-  boxShadow: "var(--bd-shadow-md)",
+  boxShadow: "var(--bk-shadow-drag)",
   overflow: "hidden",
   zIndex: 100,
 };

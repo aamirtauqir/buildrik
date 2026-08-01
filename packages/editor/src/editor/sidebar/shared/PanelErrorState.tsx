@@ -1,11 +1,13 @@
 /**
  * PanelErrorState - Standardized error display for sidebar panels
- * Thin wrapper around ui/ErrorState with panel-appropriate defaults
+ * Slice 6B: composes ui EmptyState + Button (was a wrapper around the retired
+ * shared/ui ErrorState).
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { ErrorState } from "../../../shared/ui/ErrorState";
+import { EmptyState } from "@/editor/chrome-ui";
+import { Button } from "@/editor/chrome-ui";
 
 export interface PanelErrorStateProps {
   /** Error message to display */
@@ -18,13 +20,18 @@ export const PanelErrorState: React.FC<PanelErrorStateProps> = ({
   message = "Something went wrong",
   onRetry,
 }) => (
-  <div style={wrapperStyles}>
-    <ErrorState
-      message={message}
-      severity="error"
+  <div style={wrapperStyles} role="alert" aria-live="polite">
+    <EmptyState
       size="sm"
-      onRetry={onRetry}
-      retryLabel="Try again"
+      title="Something went wrong"
+      body={message}
+      action={
+        onRetry ? (
+          <Button size="xs" onClick={onRetry}>
+            Try again
+          </Button>
+        ) : undefined
+      }
     />
   </div>
 );

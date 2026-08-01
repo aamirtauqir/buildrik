@@ -35,15 +35,15 @@ const chipStyle = (clickable: boolean): React.CSSProperties => ({
   border: "1px solid rgba(34, 197, 94, 0.3)",
   borderRadius: 12,
   fontSize: 11,
-  color: "var(--bd-fg-primary)",
+  color: "var(--bk-ink)",
   cursor: clickable ? "pointer" : "default",
 });
 
 const dotStyle: React.CSSProperties = {
   width: 6,
   height: 6,
-  borderRadius: "var(--bd-radius-full)",
-  background: "var(--bd-success)",
+  borderRadius: "var(--bk-radius-full)",
+  background: "var(--bk-success)",
   flexShrink: 0,
 };
 

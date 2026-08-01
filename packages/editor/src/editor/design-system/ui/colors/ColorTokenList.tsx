@@ -26,8 +26,7 @@ import { suggestContrastFix } from "../../utils/contrastFix";
 import { TokenRow } from "../sections/TokenRow";
 import type { LintIssue } from "../../../../engine/designSystem/LintState";
 import type { Composer } from "../../../../engine/Composer";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Input } from "@/editor/shared/vibcoder/Input";
+import { Button, TextInput } from "@/editor/chrome-ui";
 
 export interface ColorTokenListProps {
   tokens: DesignToken[];
@@ -94,22 +93,22 @@ const GroupHeader: React.FC<{ label: string; mini?: string; subtext?: string }> 
           margin: 0,
           fontSize: 10.5,
           fontWeight: 600,
-          color: "var(--bd-fg-muted)",
+          color: "var(--bk-ink-muted)",
           textTransform: "uppercase",
           letterSpacing: "0.08em",
-          fontFamily: "var(--buildrick-font-family-mono, ui-monospace, monospace)",
+          fontFamily: "var(--bk-font-mono, ui-monospace, monospace)",
         }}
       >
         {label}
       </h3>
-      <div style={{ flex: 1, height: 1, background: "var(--bd-border)" }} />
+      <div style={{ flex: 1, height: 1, background: "var(--bk-border)" }} />
       {mini && (
         <span
           style={{
             fontSize: 10,
             fontWeight: 500,
-            color: "var(--bd-fg-secondary)",
-            fontFamily: "var(--buildrick-font-family-mono, ui-monospace, monospace)",
+            color: "var(--bk-ink-soft)",
+            fontFamily: "var(--bk-font-mono, ui-monospace, monospace)",
           }}
         >
           {mini}
@@ -120,7 +119,7 @@ const GroupHeader: React.FC<{ label: string; mini?: string; subtext?: string }> 
       <div
         style={{
           fontSize: 11,
-          color: "var(--bd-fg-muted)",
+          color: "var(--bk-ink-muted)",
           marginTop: 4,
           lineHeight: 1.4,
         }}
@@ -147,8 +146,8 @@ const ColorSwatch: React.FC<{ value: string; isDirty?: boolean }> = ({ value, is
         borderRadius: 4,
         background: value,
         border: isLight
-          ? "1px solid var(--bd-border-medium)"
-          : "1px solid var(--bd-border)",
+          ? "1px solid var(--bk-border-medium)"
+          : "1px solid var(--bk-border)",
       }}
     >
       {isDirty && (
@@ -160,8 +159,8 @@ const ColorSwatch: React.FC<{ value: string; isDirty?: boolean }> = ({ value, is
             right: -2,
             width: 5,
             height: 5,
-            borderRadius: "var(--bd-radius-full)",
-            background: "var(--bd-warning)",
+            borderRadius: "var(--bk-radius-full)",
+            background: "var(--bk-warning)",
           }}
         />
       )}
@@ -306,7 +305,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
         }}
       >
         <div style={{ flex: 1, position: "relative", minWidth: 100 }}>
-          <Input
+          <TextInput
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -314,10 +313,10 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
             style={{
               width: "100%",
               padding: "5px 8px",
-              background: "var(--bd-bg-subtle)",
-              border: "1px solid var(--bd-border)",
+              background: "var(--bk-bg-subtle)",
+              border: "1px solid var(--bk-border)",
               borderRadius: 6,
-              color: "var(--bd-fg-primary)",
+              color: "var(--bk-ink)",
               fontSize: 12,
               boxSizing: "border-box",
               outline: "none",
@@ -326,8 +325,8 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
         </div>
         <Button
           type="button"
-          variant="secondary"
-          size="sm"
+          color="light"
+          size="xs"
           onClick={() => setFilterMode("all")}
           style={{
             padding: "4px 10px",
@@ -336,17 +335,17 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
             fontSize: 11,
             fontWeight: 600,
             cursor: "pointer",
-            background: filterMode === "all" ? "var(--bd-accent)" : "transparent",
-            borderColor: filterMode === "all" ? "var(--bd-accent)" : "var(--bd-border)",
-            color: filterMode === "all" ? "var(--bd-fg-on-accent)" : "var(--bd-fg-muted)",
+            background: filterMode === "all" ? "var(--bk-accent)" : "transparent",
+            borderColor: filterMode === "all" ? "var(--bk-accent)" : "var(--bk-border)",
+            color: filterMode === "all" ? "var(--bk-accent-on)" : "var(--bk-ink-muted)",
           }}
         >
           All
         </Button>
         <Button
           type="button"
-          variant="secondary"
-          size="sm"
+          color="light"
+          size="xs"
           onClick={() => setFilterMode("issues")}
           style={{
             padding: "4px 10px",
@@ -356,8 +355,8 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
             fontWeight: 600,
             cursor: "pointer",
             background: filterMode === "issues" ? /* @lint-hex-policy: issues-filter active red-500, off chrome palette (intentional) */ "#ef4444" : "transparent",
-            borderColor: filterMode === "issues" ? /* @lint-hex-policy: issues-filter active red-500, off chrome palette (intentional) */ "#ef4444" : "var(--bd-border)",
-            color: filterMode === "issues" ? "var(--bd-fg-on-accent)" : "var(--bd-fg-muted)",
+            borderColor: filterMode === "issues" ? /* @lint-hex-policy: issues-filter active red-500, off chrome palette (intentional) */ "#ef4444" : "var(--bk-border)",
+            color: filterMode === "issues" ? "var(--bk-accent-on)" : "var(--bk-ink-muted)",
           }}
           title={`${issuesCount} token${issuesCount !== 1 ? "s" : ""} fail WCAG AA`}
         >
@@ -369,8 +368,8 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
       {resolvedMode === "dark" && missingDarkCount > 0 && (
         <Button
           type="button"
-          variant="ghost"
-          size="sm"
+          color="light"
+          size="xs"
           onClick={handleDarkMissingClick}
           data-dark-missing-chip
           style={{
@@ -380,14 +379,14 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
             padding: "6px 10px",
             marginBottom: 12,
             borderRadius: 6,
-            border: "1px solid var(--buildrick-warning-strong)",
-            background: "var(--buildrick-warning-soft)",
-            color: "var(--buildrick-warning-strong)",
+            border: "1px solid var(--bk-warning-text)",
+            background: "var(--bk-warning-tint)",
+            color: "var(--bk-warning-text)",
             fontSize: 11.5,
             fontWeight: 500,
             cursor: "pointer",
             alignSelf: "flex-start",
-          }}
+          }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
         >
           <span aria-hidden="true">⚠</span>
           <span>
@@ -421,15 +420,15 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
             {Object.keys(contrastFixes).length > 0 && (
               <Button
                 type="button"
-                variant="secondary"
-                size="sm"
+                color="light"
+                size="xs"
                 onClick={applyAllFixes}
                 style={{
                   padding: "3px 10px",
                   borderRadius: 4,
                   border: "1px solid rgba(34,197,94,0.4)",
                   background: "rgba(34,197,94,0.1)",
-                  color: "var(--bd-success)",
+                  color: "var(--bk-success)",
                   fontSize: 12,
                   fontWeight: 600,
                   cursor: "pointer",
@@ -449,10 +448,10 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
       {isIssuesEmpty && (
         <div style={{ padding: "24px 0", textAlign: "center" }}>
           <div style={{ fontSize: 20, marginBottom: 6 }}>✓</div>
-          <div style={{ fontSize: 12, color: "var(--bd-success)", fontWeight: 600 }}>
+          <div style={{ fontSize: 12, color: "var(--bk-success)", fontWeight: 600 }}>
             All colors pass WCAG
           </div>
-          <div style={{ fontSize: 12, color: "var(--bd-fg-muted)", marginTop: 4 }}>
+          <div style={{ fontSize: 12, color: "var(--bk-ink-muted)", marginTop: 4 }}>
             No contrast issues found
           </div>
         </div>
@@ -461,7 +460,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
       {/* Empty search state */}
       {isEmpty && !isIssuesEmpty && (
         <div style={{ padding: "24px 0", textAlign: "center" }}>
-          <div style={{ fontSize: 12, color: "var(--bd-fg-muted)" }}>
+          <div style={{ fontSize: 12, color: "var(--bk-ink-muted)" }}>
             No colors match "{searchQuery}"
           </div>
         </div>
@@ -511,13 +510,13 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
                         padding: "4px 8px",
                         marginTop: 4,
                         fontSize: 11,
-                        color: "var(--bd-fg-muted)",
+                        color: "var(--bk-ink-muted)",
                       }}
                     >
                       <span
                         style={{
                           fontFamily:
-                            "var(--buildrick-font-family-mono, ui-monospace, monospace)",
+                            "var(--bk-font-mono, ui-monospace, monospace)",
                         }}
                       >
                         {t.name} · {ratio.toFixed(1)}:1 → 4.5:1
@@ -529,15 +528,15 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
                           height: 12,
                           borderRadius: 3,
                           background: fix,
-                          border: "1px solid var(--bd-border)",
+                          border: "1px solid var(--bk-border)",
                         }}
                         aria-hidden="true"
                       />
                       <code style={{ fontSize: 11 }}>{fix}</code>
                       <Button
                         type="button"
-                        variant="secondary"
-                        size="sm"
+                        color="light"
+                        size="xs"
                         onClick={() => onColorChange(t.id, fix)}
                         style={{
                           marginLeft: "auto",
@@ -545,7 +544,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
                           borderRadius: 3,
                           border: "1px solid rgba(34,197,94,0.4)",
                           background: "rgba(34,197,94,0.1)",
-                          color: "var(--bd-success)",
+                          color: "var(--bk-success)",
                           fontSize: 11,
                           fontWeight: 600,
                           cursor: "pointer",
@@ -564,19 +563,19 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
       {/* Add token */}
       <Button
         type="button"
-        variant="ghost"
+        color="light"
         onClick={onAddToken}
         style={{
           marginTop: 16,
           width: "100%",
           padding: "10px",
           background: "transparent",
-          border: "1px dashed var(--bd-border)",
+          border: "1px dashed var(--bk-border)",
           borderRadius: 6,
-          color: "var(--bd-fg-muted)",
+          color: "var(--bk-ink-muted)",
           fontSize: 12,
           cursor: "pointer",
-        }}
+        }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
       >
         + Add token
       </Button>

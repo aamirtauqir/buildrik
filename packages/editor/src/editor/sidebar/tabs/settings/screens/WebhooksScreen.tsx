@@ -15,11 +15,9 @@
 import * as React from "react";
 import { createBuildrikApiClient } from "@/services/api-client";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
 import { Field, Input, Screen, Section } from "../shared";
 import type { ScreenProps } from "../types";
-
+import { Button, Checkbox } from "@/editor/chrome-ui";
 const EVENTS = [
   { id: "site.publish", label: "site.publish — fires after every successful publish" },
   { id: "form.submit", label: "form.submit — fires on every form submission" },
@@ -185,7 +183,7 @@ export const WebhooksScreen: React.FC<ScreenProps> = ({ onDirtyChange }) => {
         {!loading && !status && !editing && (
           <div className="bd-set-webhook-empty">
             <div className="bd-set-section-d">No endpoint connected.</div>
-            <Button variant="secondary" size="sm" onClick={() => startEdit(null)}>
+            <Button color="light" size="xs" onClick={() => startEdit(null)}>
               Connect endpoint
             </Button>
           </div>
@@ -201,6 +199,8 @@ export const WebhooksScreen: React.FC<ScreenProps> = ({ onDirtyChange }) => {
                 {EVENTS.map((ev) => (
                   <label key={ev.id} className="bd-set-webhook-event">
                     <Checkbox
+                      color="blue"
+                      className="tw:bg-white"
                       checked={events.includes(ev.id)}
                       onChange={(e) => toggleEvent(ev.id, e.target.checked)}
                     />
@@ -212,14 +212,13 @@ export const WebhooksScreen: React.FC<ScreenProps> = ({ onDirtyChange }) => {
             {submitError && <div className="bd-set-section-d">{submitError}</div>}
             <div className="bd-set-webhook-actions">
               <Button
-                variant="primary"
-                size="sm"
+                size="xs"
                 disabled={submitting || !url.trim() || events.length === 0}
                 onClick={() => void handleSave()}
               >
                 {submitting ? "Saving…" : status ? "Save changes" : "Connect"}
               </Button>
-              <Button variant="ghost" size="sm" onClick={() => setEditing(false)}>
+              <Button color="light" size="xs" onClick={() => setEditing(false)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                 Cancel
               </Button>
             </div>
@@ -246,10 +245,10 @@ export const WebhooksScreen: React.FC<ScreenProps> = ({ onDirtyChange }) => {
             <Field label="Signing secret" hint="Verify deliveries by recomputing the HMAC with this secret">
               <div className="bd-set-webhook-secret">
                 <code>{secretVisible ? status.secret : maskSecret(status.secret)}</code>
-                <Button variant="ghost" size="sm" onClick={() => setSecretVisible((v) => !v)}>
+                <Button color="light" size="xs" onClick={() => setSecretVisible((v) => !v)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                   {secretVisible ? "Hide" : "Reveal"}
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => void navigator.clipboard?.writeText(status.secret)}>
+                <Button color="light" size="xs" onClick={() => void navigator.clipboard?.writeText(status.secret)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                   Copy
                 </Button>
               </div>
@@ -262,8 +261,8 @@ export const WebhooksScreen: React.FC<ScreenProps> = ({ onDirtyChange }) => {
                   with the new secret.
                 </div>
                 <div className="bd-set-webhook-actions">
-                  <Button variant="primary" size="sm" onClick={() => void handleRegenerate()}>Regenerate</Button>
-                  <Button variant="ghost" size="sm" onClick={() => setConfirming(null)}>Cancel</Button>
+                  <Button size="xs" onClick={() => void handleRegenerate()}>Regenerate</Button>
+                  <Button color="light" size="xs" onClick={() => setConfirming(null)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">Cancel</Button>
                 </div>
               </div>
             )}
@@ -274,17 +273,17 @@ export const WebhooksScreen: React.FC<ScreenProps> = ({ onDirtyChange }) => {
                   events immediately.
                 </div>
                 <div className="bd-set-webhook-actions">
-                  <Button variant="primary" size="sm" onClick={() => void handleDisconnect()}>Disconnect</Button>
-                  <Button variant="ghost" size="sm" onClick={() => setConfirming(null)}>Cancel</Button>
+                  <Button size="xs" onClick={() => void handleDisconnect()}>Disconnect</Button>
+                  <Button color="light" size="xs" onClick={() => setConfirming(null)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">Cancel</Button>
                 </div>
               </div>
             )}
 
             {confirming === null && (
               <div className="bd-set-webhook-actions">
-                <Button variant="secondary" size="sm" onClick={() => startEdit(status)}>Edit</Button>
-                <Button variant="ghost" size="sm" onClick={() => setConfirming("regenerate")}>Regenerate secret</Button>
-                <Button variant="ghost" size="sm" onClick={() => setConfirming("disconnect")}>Disconnect</Button>
+                <Button color="light" size="xs" onClick={() => startEdit(status)}>Edit</Button>
+                <Button color="light" size="xs" onClick={() => setConfirming("regenerate")} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">Regenerate secret</Button>
+                <Button color="light" size="xs" onClick={() => setConfirming("disconnect")} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">Disconnect</Button>
               </div>
             )}
           </div>

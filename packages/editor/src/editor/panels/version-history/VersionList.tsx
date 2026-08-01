@@ -20,7 +20,6 @@
  * @license BSD-3-Clause
  */
 
-import { Button } from "@/editor/shared/vibcoder/Button";
 import * as React from "react";
 import type { NamedVersion } from "../../../shared/types/versions";
 import { formatRelativeTime } from "../../../editor/sidebar/tabs/history/helpers";
@@ -32,6 +31,7 @@ import { SnapshotPreview } from "../../../editor/sidebar/tabs/history/components
 // strict.
 // @ts-expect-error — no declaration file for react-window@1.8.x
 import { FixedSizeList as FixedSizeListUntyped } from "react-window";
+import { Button } from "@/editor/chrome-ui";
 
 interface ListChildComponentProps {
   index: number;
@@ -168,8 +168,8 @@ export function VersionRow({
                 <span
                   className="entry-badge"
                   style={{
-                    background: "var(--bd-accent-tint)",
-                    color: "var(--buildrick-accent)",
+                    background: "var(--bk-accent-tint)",
+                    color: "var(--bk-accent)",
                   }}
                 >
                   {elementCount} el

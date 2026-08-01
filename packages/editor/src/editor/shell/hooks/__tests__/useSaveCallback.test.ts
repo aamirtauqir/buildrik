@@ -35,7 +35,7 @@ describe("useSaveCallback", () => {
     vi.clearAllMocks();
   });
 
-  it("no-ops when composer is null", () => {
+  it("no-ops when composer is null", async () => {
     const { result } = renderHook(() =>
       useSaveCallback({
         composer: null,
@@ -44,7 +44,11 @@ describe("useSaveCallback", () => {
         setIsDirty: opts.setIsDirty,
       }),
     );
-    act(() => result.current());
+    // save() now returns a Promise (SaveOutcome) — await the act so React's
+    // act-environment is flushed and later renderHooks aren't poisoned.
+    await act(async () => {
+      await expect(result.current()).resolves.toBe("error");
+    });
     expect(opts.saveProject).not.toHaveBeenCalled();
     expect(opts.addToast).not.toHaveBeenCalled();
     expect(opts.setSaveState).not.toHaveBeenCalled();

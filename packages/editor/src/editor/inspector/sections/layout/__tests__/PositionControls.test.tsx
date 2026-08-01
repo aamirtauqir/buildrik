@@ -7,7 +7,6 @@
 
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
-import { TooltipProvider } from "@/editor/shared/vibcoder/Tooltip";
 import { PositionControls } from "../PositionControls";
 
 type Props = React.ComponentProps<typeof PositionControls>;
@@ -15,9 +14,7 @@ type Props = React.ComponentProps<typeof PositionControls>;
 function renderPos(props: Partial<Props> = {}) {
   const onChange = vi.fn();
   const utils = render(
-    <TooltipProvider>
-      <PositionControls styles={{}} onChange={onChange} {...props} />
-    </TooltipProvider>
+    <PositionControls styles={{}} onChange={onChange} {...props} />
   );
   return { onChange, ...utils };
 }

@@ -14,7 +14,6 @@
  * @license BSD-3-Clause
  */
 
-import { Button } from "@/editor/shared/vibcoder/Button";
 import { ChevronDown, Monitor, Tablet, Smartphone } from "lucide-react";
 import * as React from "react";
 import {
@@ -22,7 +21,7 @@ import {
   BREAKPOINT_ORDER,
 } from "../../../shared/constants/breakpoints";
 import type { BreakpointId } from "../../../shared/types/breakpoints";
-
+import { Button } from "@/editor/chrome-ui";
 const BP_ICONS: Record<BreakpointId, React.ReactNode> = {
   desktop: <Monitor size={11} aria-hidden="true" />,
   tablet: <Tablet size={11} aria-hidden="true" />,
@@ -78,8 +77,8 @@ export const BreakpointPill: React.FC<BreakpointPillProps> = ({
             style={{
               width: 5,
               height: 5,
-              borderRadius: "var(--bd-radius-full)",
-              background: "var(--bd-accent)",
+              borderRadius: "var(--bk-radius-full)",
+              background: "var(--bk-accent)",
             }}
           />
         )}
@@ -93,8 +92,8 @@ export const BreakpointPill: React.FC<BreakpointPillProps> = ({
             top: "calc(100% + 4px)",
             left: 0,
             zIndex: 200,
-            background: "var(--buildrick-bg-card)",
-            border: "1px solid var(--bd-border)",
+            background: "var(--bk-bg-card)",
+            border: "1px solid var(--bk-border)",
             borderRadius: 6,
             padding: 4,
             minWidth: 160,
@@ -120,15 +119,15 @@ export const BreakpointPill: React.FC<BreakpointPillProps> = ({
                   gap: 8,
                   width: "100%",
                   padding: "5px 8px",
-                  background: active ? "var(--bd-accent-tint)" : "transparent",
+                  background: active ? "var(--bk-accent-tint)" : "transparent",
                   border: "none",
                   borderRadius: 4,
-                  color: active ? "var(--bd-accent)" : "var(--bd-fg-primary)",
+                  color: active ? "var(--bk-accent)" : "var(--bk-ink)",
                   fontSize: 11,
                   fontWeight: active ? 600 : 500,
                   cursor: "pointer",
                   textAlign: "left",
-                  fontFamily: "var(--bd-font)",
+                  fontFamily: "var(--bk-font-ui)",
                 }}
               >
                 {BP_ICONS[bp]}
@@ -137,7 +136,7 @@ export const BreakpointPill: React.FC<BreakpointPillProps> = ({
                   <span
                     style={{
                       fontSize: 10,
-                      color: "var(--bd-fg-muted)",
+                      color: "var(--bk-ink-muted)",
                       fontVariantNumeric: "tabular-nums",
                     }}
                   >

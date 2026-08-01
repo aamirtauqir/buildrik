@@ -5,14 +5,8 @@
 
 import * as React from "react";
 import { InputField, TextareaField, SelectField } from "../shared/forms";
-import {
-  Modal,
-  ModalContent,
-  ModalTitle,
-  ModalClose,
-  OverlayMount,
-} from "@/editor/shared/vibcoder";
-import { Button } from "@/editor/shared/vibcoder/Button";
+import { ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/chrome-ui";
+import { Button } from "@/editor/chrome-ui";
 
 export interface SaveTemplateProps {
   isOpen: boolean;
@@ -47,11 +41,11 @@ export const SaveTemplate: React.FC<SaveTemplateProps> = ({
   };
 
   return (
-    <OverlayMount>
-      <Modal open={isOpen} onOpenChange={(next) => !next && onClose()}>
+    <Portal>
+      <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
         <ModalContent size="lg">
           <ModalTitle>Save as Template</ModalTitle>
-          <ModalClose aria-label="Close modal">
+          <ModalClose aria-label="Close modal" onClick={onClose}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
               <path d="M18 6L6 18M6 6l12 12" />
             </svg>
@@ -96,17 +90,17 @@ export const SaveTemplate: React.FC<SaveTemplateProps> = ({
           justifyContent: "flex-end",
         }}
       >
-        <Button variant="ghost" onClick={onClose}>
+        <Button color="light" onClick={onClose} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
           Cancel
         </Button>
-        <Button onClick={handleSave} busy={saving} disabled={!name.trim()}>
+        <Button onClick={handleSave} disabled={!name.trim() || saving} aria-busy={saving || undefined}>
           Save Template
         </Button>
       </div>
           </div>
         </ModalContent>
-      </Modal>
-    </OverlayMount>
+      </ModalRoot>
+    </Portal>
   );
 };
 

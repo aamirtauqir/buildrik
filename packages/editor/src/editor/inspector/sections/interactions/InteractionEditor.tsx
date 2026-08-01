@@ -1,4 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
 /**
  * Interaction Editor Component
  * Editor panel for configuring a single interaction's animation settings
@@ -7,9 +6,8 @@ import { Input } from "@/editor/shared/vibcoder/Input";
 
 import * as React from "react";
 import { SelectField } from "../../../../shared/forms";
-import { Button } from "@/editor/shared/vibcoder/Button";
 import { type Interaction, ANIMATION_PRESETS, EASING_OPTIONS } from "./types";
-
+import { Button, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -29,7 +27,7 @@ export interface InteractionEditorProps {
 const styles = {
   container: {
     padding: 12,
-    borderTop: `1px solid ${"var(--buildrick-border)"}`,
+    borderTop: `1px solid ${"var(--bk-border)"}`,
     display: "flex",
     flexDirection: "column" as const,
     gap: 12,
@@ -44,16 +42,16 @@ const styles = {
   label: {
     display: "block",
     fontSize: 12,
-    color: "var(--buildrick-text-muted)",
+    color: "var(--bk-ink-muted)",
     marginBottom: 4,
   },
   input: {
     width: "100%",
     padding: "8px 10px",
-    background: "var(--buildrick-bg-input)",
-    border: `1px solid ${"var(--buildrick-border-medium)"}`,
+    background: "var(--bk-bg-card)",
+    border: `1px solid ${"var(--bk-border-medium)"}`,
     borderRadius: 6,
-    color: "var(--buildrick-text-primary)",
+    color: "var(--bk-ink)",
     fontSize: 13,
   } as React.CSSProperties,
   buttonRow: {
@@ -119,7 +117,7 @@ export const InteractionEditor: React.FC<InteractionEditorProps> = ({
       <div style={styles.inputRow}>
         <div style={styles.inputWrapper}>
           <label style={styles.label}>Duration</label>
-          <Input
+          <TextInput
             type="number"
             value={interaction.animation.duration / 1000}
             onChange={handleDurationChange}
@@ -131,7 +129,7 @@ export const InteractionEditor: React.FC<InteractionEditorProps> = ({
         </div>
         <div style={styles.inputWrapper}>
           <label style={styles.label}>Delay</label>
-          <Input
+          <TextInput
             type="number"
             value={interaction.animation.delay / 1000}
             onChange={handleDelayChange}
@@ -151,8 +149,8 @@ export const InteractionEditor: React.FC<InteractionEditorProps> = ({
       <div style={styles.buttonRow}>
         <Button
           onClick={() => onPreview?.(interaction)}
-          variant="secondary"
-          size="sm"
+          color="light"
+          size="xs"
           style={{ flex: 1 }}
         >
           Preview
@@ -164,16 +162,16 @@ export const InteractionEditor: React.FC<InteractionEditorProps> = ({
       <div style={styles.buttonRowSecondary}>
         <Button
           onClick={() => onToggleEnabled(interaction.id)}
-          variant="secondary"
-          size="sm"
+          color="light"
+          size="xs"
           style={{ flex: 1 }}
         >
           {interaction.enabled ? "Disable" : "Enable"}
         </Button>
         <Button
           onClick={() => onRemove(interaction.id)}
-          variant="danger"
-          size="sm"
+          color="red"
+          size="xs"
           style={{ flex: 1 }}
         >
           Delete

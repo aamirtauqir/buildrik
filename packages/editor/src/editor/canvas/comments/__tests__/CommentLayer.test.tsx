@@ -19,7 +19,7 @@ vi.mock("@/services/ReviewService", () => ({
   reattachReviewComment: (...a: unknown[]) => reattachReviewComment(...a),
 }));
 
-import { ToastProvider } from "@/editor/shared/vibcoder/Toast";
+import { ToastProvider } from "@/editor/chrome-ui";
 import { CommentLayer } from "../CommentLayer";
 import { anchorSelector } from "../commentAnchors";
 
@@ -174,5 +174,65 @@ describe("CommentLayer", () => {
     await screen.findByTestId("comment-capture-layer");
     fireEvent.keyDown(window, { key: "Escape" });
     expect(composer.emit).toHaveBeenCalledWith("ui:comment-mode", { on: false });
+  });
+
+  // ── ui:comment-mode-changed — the state broadcast (topbar plan T6 / eng D4+D16)
+  const changedCalls = (composer: ReturnType<typeof makeComposer>) =>
+    composer.emit.mock.calls.filter(([ev]) => ev === "ui:comment-mode-changed");
+
+  it("broadcasts ui:comment-mode-changed on every mode change", async () => {
+    const composer = makeComposer();
+    mount(composer);
+    act(() => composer.emit("ui:comment-mode", { on: true }));
+    await waitFor(() =>
+      expect(composer.emit).toHaveBeenCalledWith("ui:comment-mode-changed", { on: true }),
+    );
+    composer.emit.mockClear();
+    act(() => composer.emit("ui:comment-mode", { on: false }));
+    await waitFor(() =>
+      expect(composer.emit).toHaveBeenCalledWith("ui:comment-mode-changed", { on: false }),
+    );
+  });
+
+  it("unmounting while mode is on broadcasts {on:false} — page switch must un-press the bar", async () => {
+    const composer = makeComposer();
+    const view = mount(composer);
+    act(() => composer.emit("ui:comment-mode", { on: true }));
+    await screen.findByTestId("comment-capture-layer");
+    composer.emit.mockClear();
+    view.unmount();
+    expect(changedCalls(composer).map(([, p]) => p)).toContainEqual({ on: false });
+  });
+
+  // Investigate 2026-07-30: capture-phase Esc outranked every dialog — it
+  // killed comment mode UNDER an open modal and its stopPropagation left the
+  // modal open (live-reproduced). Esc must close the topmost layer.
+  it("Esc yields to an open modal — comment mode survives underneath", async () => {
+    const composer = makeComposer();
+    mount(composer);
+    act(() => composer.emit("ui:comment-mode", { on: true }));
+    await screen.findByTestId("comment-capture-layer");
+    const dialog = document.createElement("div");
+    dialog.setAttribute("role", "dialog");
+    dialog.setAttribute("aria-modal", "true");
+    document.body.appendChild(dialog);
+    try {
+      composer.emit.mockClear();
+      fireEvent.keyDown(window, { key: "Escape" });
+      expect(composer.emit).not.toHaveBeenCalledWith("ui:comment-mode", { on: false });
+      expect(screen.getByTestId("comment-capture-layer")).toBeInTheDocument();
+    } finally {
+      dialog.remove();
+    }
+  });
+
+  it("unmounting while mode is off broadcasts nothing extra", async () => {
+    const composer = makeComposer();
+    const view = mount(composer);
+    // let the mount-time {on:false} broadcast land first, then clear
+    await waitFor(() => expect(changedCalls(composer).length).toBeGreaterThan(0));
+    composer.emit.mockClear();
+    view.unmount();
+    expect(changedCalls(composer)).toHaveLength(0);
   });
 });

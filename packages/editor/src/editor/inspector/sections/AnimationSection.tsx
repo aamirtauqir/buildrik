@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Animation Section - CSS Animations with presets
  * AQUI-026: Basic Interactions/Animations
@@ -12,7 +11,7 @@ import type { AnimationConfig } from "../../../shared/types/animations";
 import { DEFAULT_ANIMATION, generateAnimationCSS } from "../../../shared/types/animations";
 import { AnimationEditor } from "../../animation/AnimationEditor";
 import { Section, type SectionTier } from "../shared/controls";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -86,8 +85,8 @@ export const AnimationSection: React.FC<AnimationSectionProps> = ({
       <span
         style={{
           fontSize: 12,
-          color: "var(--buildrick-text-tertiary)",
-          fontFamily: "var(--buildrick-font-family-mono)",
+          color: "var(--bk-ink-muted)",
+          fontFamily: "var(--bk-font-mono)",
         }}
       >
         {localAnimation.type}
@@ -112,17 +111,17 @@ export const AnimationSection: React.FC<AnimationSectionProps> = ({
           justifyContent: "space-between",
           marginBottom: 16,
           padding: "10px 12px",
-          background: enabled ? "var(--bd-accent-tint)" : "var(--bd-bg-subtle)",
+          background: enabled ? "var(--bk-accent-tint)" : "var(--bk-bg-subtle)",
           borderRadius: 8,
           border: enabled
-            ? "1px solid var(--bd-accent-tint)"
-            : "1px solid var(--bd-border)",
+            ? "1px solid var(--bk-accent-tint)"
+            : "1px solid var(--bk-border)",
         }}
       >
         <span
           style={{
             fontSize: 12,
-            color: enabled ? "var(--bd-accent)" : "var(--bd-fg-muted)",
+            color: enabled ? "var(--bk-accent)" : "var(--bk-ink-muted)",
             fontWeight: 500,
           }}
         >
@@ -132,10 +131,10 @@ export const AnimationSection: React.FC<AnimationSectionProps> = ({
           onClick={handleToggle}
           style={{
             padding: "6px 12px",
-            background: enabled ? "var(--bd-accent-tint)" : "var(--bd-border-medium)",
+            background: enabled ? "var(--bk-accent-tint)" : "var(--bk-border-medium)",
             border: "none",
             borderRadius: 6,
-            color: enabled ? "var(--bd-accent)" : "var(--buildrick-text-disabled)",
+            color: enabled ? "var(--bk-accent)" : "var(--bk-ink-disabled)",
             fontSize: 12,
             fontWeight: 600,
             cursor: "pointer",
@@ -161,13 +160,13 @@ export const AnimationSection: React.FC<AnimationSectionProps> = ({
               padding: 12,
               background: "rgba(0, 0, 0, 0.2)",
               borderRadius: 8,
-              fontFamily: "var(--buildrick-font-family-mono)",
+              fontFamily: "var(--bk-font-mono)",
               fontSize: 12,
-              color: "var(--buildrick-text-tertiary)",
+              color: "var(--bk-ink-muted)",
               wordBreak: "break-all",
             }}
           >
-            <div style={{ color: "var(--buildrick-accent)", marginBottom: 4 }}>Generated CSS:</div>
+            <div style={{ color: "var(--bk-accent)", marginBottom: 4 }}>Generated CSS:</div>
             <code>animation: {generateAnimationCSS(localAnimation)};</code>
           </div>
         </>
@@ -181,7 +180,7 @@ export const AnimationSection: React.FC<AnimationSectionProps> = ({
             border: "1px solid rgba(245, 158, 11, 0.2)",
             borderRadius: 8,
             fontSize: 12,
-            color: "var(--buildrick-warning)",
+            color: "var(--bk-warning)",
             lineHeight: 1.5,
           }}
         >

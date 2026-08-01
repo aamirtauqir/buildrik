@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * LeftSidebar — Merged rail + panel component
  * Rail: 60px icon navigation with 3 zones (creation, structure, config)
@@ -16,7 +15,7 @@ import { getTabWidth, getTabConfig, getTabsByZone, getRailTools, getTabsByTool, 
 import { getEditorViewMode } from "../../shared/utils/editorViewMode";
 import type { BlockData } from "../../shared/types";
 import type { UsePublishJobResult } from "../shell/hooks/usePublishJob";
-import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
+import { ConfirmDialog } from "@/editor/chrome-ui";
 import { InspectorErrorBoundary } from "../inspector/components/InspectorErrorBoundary";
 import { PanelSkeleton, SidebarErrorFallback } from "./SidebarFallbacks";
 import { TabRouter } from "./TabRouter";
@@ -35,14 +34,7 @@ import {
   Rocket,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipPortal,
-  TooltipContent,
-  TooltipProvider,
-} from "@/editor/shared/vibcoder/Tooltip";
-
+import { Button, Tooltip } from "@/editor/chrome-ui";
 // ============================================
 // Icon map — lucide icon name → component
 // ============================================
@@ -141,30 +133,27 @@ function RailZone({
         const isDirty = dirtyTabIds?.has(tab.id) ?? false;
 
         return (
-          <Tooltip key={tab.id}>
-            <TooltipTrigger asChild>
-              <Button
-                className={`ls-btn${showLabels ? " ls-btn--labeled" : ""}${isSelectedTab ? " ls-btn--active" : ""}${!drawerOpen && isSelectedTab ? " ls-btn--last" : ""}`}
-                onClick={() => onBtnClick(tab.id)}
-                role="tab"
-                aria-selected={isVisibleActive}
-                aria-label={tab.ariaLabel}
-                data-tab={tab.id}
-              >
-                {isVisibleActive && <div className="ls-btn-bar" />}
-                {isDirty && <div className="ls-btn__dirty-dot" aria-hidden="true" />}
-                <Icon size={20} />
-                {showLabels && <span className="ls-btn__label">{tab.label}</span>}
-              </Button>
-            </TooltipTrigger>
-            <TooltipPortal>
-              <TooltipContent side="right" sideOffset={8}>
-                {tab.label}
-                {tab.shortcut && (
-                  <span style={{ opacity: 0.6, marginLeft: 6 }}>{tab.shortcut}</span>
-                )}
-              </TooltipContent>
-            </TooltipPortal>
+          <Tooltip
+            key={tab.id}
+            content={tab.shortcut ? `${tab.label} · ${tab.shortcut}` : tab.label}
+            placement="bottom"
+            arrow={false}
+            className="tw:max-w-[280px] tw:whitespace-normal"
+          >
+            <Button
+              color="light"
+              className={`ls-btn${showLabels ? " ls-btn--labeled" : ""}${isSelectedTab ? " ls-btn--active" : ""}${!drawerOpen && isSelectedTab ? " ls-btn--last" : ""}`}
+              onClick={() => onBtnClick(tab.id)}
+              role="tab"
+              aria-selected={isVisibleActive}
+              aria-label={tab.ariaLabel}
+              data-tab={tab.id}
+            >
+              {isVisibleActive && <div className="ls-btn-bar" />}
+              {isDirty && <div className="ls-btn__dirty-dot" aria-hidden="true" />}
+              <Icon size={20} />
+              {showLabels && <span className="ls-btn__label">{tab.label}</span>}
+            </Button>
           </Tooltip>
         );
       })}
@@ -247,25 +236,25 @@ function FourToolRail({
         const isSelected = tool === activeTool;
         const isVisibleActive = isSelected && drawerOpen;
         return (
-          <Tooltip key={tool}>
-            <TooltipTrigger asChild>
-              <Button
-                className={`ls-btn${isSelected ? " ls-btn--active" : ""}${!drawerOpen && isSelected ? " ls-btn--last" : ""}`}
-                onClick={() => onBtnClick(TOOL_PRIMARY_TAB[tool])}
-                role="tab"
-                aria-selected={isVisibleActive}
-                aria-label={meta.ariaLabel}
-                data-tool={tool}
-              >
-                {isVisibleActive && <div className="ls-btn-bar" />}
-                <Icon size={20} />
-              </Button>
-            </TooltipTrigger>
-            <TooltipPortal>
-              <TooltipContent side="right" sideOffset={8}>
-                {meta.label}
-              </TooltipContent>
-            </TooltipPortal>
+          <Tooltip
+            key={tool}
+            content={meta.label}
+            placement="bottom"
+            arrow={false}
+            className="tw:max-w-[280px] tw:whitespace-normal"
+          >
+            <Button
+              color="light"
+              className={`ls-btn${isSelected ? " ls-btn--active" : ""}${!drawerOpen && isSelected ? " ls-btn--last" : ""}`}
+              onClick={() => onBtnClick(TOOL_PRIMARY_TAB[tool])}
+              role="tab"
+              aria-selected={isVisibleActive}
+              aria-label={meta.ariaLabel}
+              data-tool={tool}
+            >
+              {isVisibleActive && <div className="ls-btn-bar" />}
+              <Icon size={20} />
+            </Button>
           </Tooltip>
         );
       })}
@@ -295,7 +284,7 @@ function ToolSubNav({
         display: "flex",
         gap: 2,
         padding: "6px 8px",
-        borderBottom: "1px solid var(--bd-border)",
+        borderBottom: "1px solid var(--bk-border)",
       }}
     >
       {subs.map((t) => {
@@ -303,7 +292,8 @@ function ToolSubNav({
         return (
           <Button
             key={t.id}
-            variant="bare"
+            color="light"
+            size="xs"
             role="tab"
             aria-selected={active}
             onClick={() => onSubTabChange(t.id)}
@@ -312,8 +302,8 @@ function ToolSubNav({
               fontWeight: active ? 600 : 500,
               padding: "4px 10px",
               borderRadius: 6,
-              color: active ? "var(--bd-accent)" : "var(--bd-text-secondary)",
-              background: active ? "var(--bd-accent-subtle)" : "transparent",
+              color: active ? "var(--bk-accent)" : "var(--bk-ink-soft)",
+              background: active ? "var(--bk-accent-subtle)" : "transparent",
             }}
           >
             {t.label}
@@ -520,7 +510,6 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   };
 
   return (
-    <TooltipProvider delayDuration={200}>
     <div className="ls-root">
       {/* Rail */}
       <nav
@@ -614,16 +603,15 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
       </div>
       {/* Settings dirty guard */}
       <ConfirmDialog
-        isOpen={tabGuard.open}
+        open={tabGuard.open}
         onClose={cancelTabSwitch}
         onConfirm={confirmTabSwitch}
         title="Unsaved Changes"
         message="You have unsaved changes in Settings. Switching tabs will discard them."
-        confirmText="Discard & Switch"
-        variant="danger"
+        confirmLabel="Discard & Switch"
+        destructive
       />
     </div>
-    </TooltipProvider>
   );
 };
 

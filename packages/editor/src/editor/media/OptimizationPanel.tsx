@@ -1,4 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
 /**
  * @lint-hex-policy: component-theme
  *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
@@ -9,12 +8,11 @@ import { Input } from "@/editor/shared/vibcoder/Input";
  */
 
 import * as React from "react";
+import { Spinner } from "@/editor/chrome-ui";
 import { MediaOptimizer } from "../../engine/media";
 import { formatBytes } from "@shared/utils/helpers/number";
 import type { ImageExportFormat } from "../../shared/types/media";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Spinner } from "@/editor/shared/vibcoder/Spinner";
-
+import { Button, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -50,7 +48,7 @@ const styles: Record<string, React.CSSProperties> = {
     marginBottom: 8,
     fontSize: 12,
     fontWeight: 500,
-    color: "var(--buildrick-text-secondary)",
+    color: "var(--bk-ink-soft)",
   },
   formatRow: {
     display: "flex",
@@ -60,17 +58,17 @@ const styles: Record<string, React.CSSProperties> = {
     flex: 1,
     padding: "8px 12px",
     fontSize: 12,
-    background: "var(--buildrick-bg-panel-secondary)",
-    border: "1px solid var(--buildrick-border)",
+    background: "var(--bk-bg-subtle)",
+    border: "1px solid var(--bk-border)",
     borderRadius: 6,
-    color: "var(--buildrick-text-primary)",
+    color: "var(--bk-ink)",
     cursor: "pointer",
     transition: "all 0.15s ease",
   },
   formatBtnActive: {
-    background: "var(--buildrick-accent)",
-    borderColor: "var(--buildrick-accent)",
-    color: "var(--buildrick-text-on-accent)",
+    background: "var(--bk-accent)",
+    borderColor: "var(--bk-accent)",
+    color: "var(--bk-accent-on)",
   },
   sliderContainer: {
     display: "flex",
@@ -82,7 +80,7 @@ const styles: Record<string, React.CSSProperties> = {
     height: 4,
     WebkitAppearance: "none",
     appearance: "none",
-    background: "var(--buildrick-border)",
+    background: "var(--bk-border)",
     borderRadius: 2,
     outline: "none",
   },
@@ -91,13 +89,13 @@ const styles: Record<string, React.CSSProperties> = {
     textAlign: "right" as const,
     fontSize: 13,
     fontFamily: "monospace",
-    color: "var(--buildrick-text-primary)",
+    color: "var(--bk-ink)",
   },
   statsRow: {
     display: "flex",
     justifyContent: "space-between",
     padding: "12px 16px",
-    background: "var(--buildrick-bg-panel-secondary)",
+    background: "var(--bk-bg-subtle)",
     borderRadius: 8,
     marginBottom: 16,
   },
@@ -106,14 +104,14 @@ const styles: Record<string, React.CSSProperties> = {
   },
   statLabel: {
     fontSize: 12,
-    color: "var(--buildrick-text-muted)",
+    color: "var(--bk-ink-muted)",
     textTransform: "uppercase" as const,
     marginBottom: 4,
   },
   statValue: {
     fontSize: 14,
     fontWeight: 600,
-    color: "var(--buildrick-text-primary)",
+    color: "var(--bk-ink)",
   },
   savings: {
     color: "#a6e3a1",
@@ -125,7 +123,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   previewBox: {
     flex: 1,
-    background: "var(--buildrick-bg-panel-secondary)",
+    background: "var(--bk-bg-subtle)",
     borderRadius: 8,
     padding: 8,
     textAlign: "center" as const,
@@ -137,7 +135,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   previewLabel: {
     fontSize: 12,
-    color: "var(--buildrick-text-muted)",
+    color: "var(--bk-ink-muted)",
     marginTop: 6,
   },
   footer: {
@@ -277,7 +275,7 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
       <div style={styles.section}>
         <label style={styles.label}>Quality</label>
         <div style={styles.sliderContainer}>
-          <Input
+          <TextInput
             type="range"
             min={10}
             max={100}
@@ -291,7 +289,7 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
       {/* §18 — Max dimension override */}
       <div style={styles.section}>
         <label style={styles.label} htmlFor="opt-max-dim">Max dimension (px)</label>
-        <Input
+        <TextInput
           id="opt-max-dim"
           type="number"
           min={1}
@@ -340,7 +338,7 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
       {/* Actions */}
       <div style={styles.footer}>
         {onClose && (
-          <Button variant="ghost" onClick={onClose}>
+          <Button color="light" onClick={onClose} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
             Cancel
           </Button>
         )}

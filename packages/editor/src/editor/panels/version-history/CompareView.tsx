@@ -18,11 +18,10 @@
  * @license BSD-3-Clause
  */
 
-import { Button } from "@/editor/shared/vibcoder/Button";
 import * as React from "react";
 import type { CompareResult, NamedVersion } from "../../../shared/types/versions";
 import { AIResultText, AIControls } from "./AIPanel";
-
+import { Button } from "@/editor/chrome-ui";
 // ─── Style constants ──────────────────────────────────────────────────
 
 const TOGGLE_PILL_CONTAINER: React.CSSProperties = {
@@ -30,7 +29,7 @@ const TOGGLE_PILL_CONTAINER: React.CSSProperties = {
   gap: 2,
   padding: 2,
   background: "rgba(255,255,255,0.04)",
-  border: "1px solid var(--buildrick-border)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 999,
   marginBottom: 8,
 };
@@ -39,7 +38,7 @@ const TOGGLE_PILL_BTN: React.CSSProperties = {
   padding: "4px 10px",
   fontSize: 11,
   fontWeight: 500,
-  color: "var(--buildrick-text-muted)",
+  color: "var(--bk-ink-muted)",
   background: "transparent",
   border: "none",
   borderRadius: 999,
@@ -49,8 +48,8 @@ const TOGGLE_PILL_BTN: React.CSSProperties = {
 
 const TOGGLE_PILL_ACTIVE: React.CSSProperties = {
   ...TOGGLE_PILL_BTN,
-  background: "var(--buildrick-accent)",
-  color: "var(--buildrick-text-on-accent)",
+  background: "var(--bk-accent)",
+  color: "var(--bk-accent-on)",
 };
 
 const TOGGLE_PILL_DISABLED: React.CSSProperties = {
@@ -164,7 +163,7 @@ export function CompareView({
               className="diff-summary-badge"
               style={{
                 background: "rgba(144,141,133,0.15)",
-                color: "var(--buildrick-text-muted)",
+                color: "var(--bk-ink-muted)",
               }}
             >
               {summary.other} other
@@ -174,7 +173,7 @@ export function CompareView({
       )}
       {/* Page-level add/remove counts (Wave 1 CompareSummary fields) */}
       {summary && (summary.pagesAdded > 0 || summary.pagesDeleted > 0) && (
-        <p style={{ fontSize: 11, color: "var(--buildrick-text-muted)", margin: "4px 0 0" }}>
+        <p style={{ fontSize: 11, color: "var(--bk-ink-muted)", margin: "4px 0 0" }}>
           {summary.pagesAdded > 0 &&
             `${summary.pagesAdded} page${summary.pagesAdded === 1 ? "" : "s"} added`}
           {summary.pagesAdded > 0 && summary.pagesDeleted > 0 && ", "}
@@ -204,7 +203,7 @@ export function CompareView({
             </div>
           ))}
           {changes.length > 20 && (
-            <p style={{ fontSize: 11, color: "var(--buildrick-text-muted)", marginTop: 4 }}>
+            <p style={{ fontSize: 11, color: "var(--bk-ink-muted)", marginTop: 4 }}>
               +{changes.length - 20} more changes
             </p>
           )}

@@ -17,13 +17,25 @@
  */
 
 import * as React from "react";
-import { Button, Icon, Select, Slider, type IconName } from "@/editor/shared/vibcoder";
+import {
+  CheckCircle2,
+  File,
+  GripVertical,
+  History,
+  Minus,
+  Palette,
+  Plus,
+  RefreshCw,
+  type LucideIcon,
+} from "lucide-react";
+import { Slider } from "@/editor/chrome-ui";
 import {
   compareApprovedToCurrent,
   type ComparePage,
   type CompareChange,
   type CompareChangeKind,
 } from "@/shared/utils/html";
+import { Button, Select } from "@/editor/chrome-ui";
 
 export interface ApprovedCompareViewProps {
   /** Pages frozen at approval. `null` = this round has no stored snapshot. */
@@ -35,38 +47,38 @@ export interface ApprovedCompareViewProps {
 
 type Mode = "split" | "overlay" | "list";
 
-const KIND: Record<CompareChangeKind, { icon: IconName; color: string; label: string }> = {
-  content: { icon: "file", color: "var(--bd-accent)", label: "Content" },
-  style: { icon: "palette", color: "var(--bd-warning-strong)", label: "Style" },
-  added: { icon: "plus", color: "var(--bd-success)", label: "Added" },
-  removed: { icon: "minus", color: "var(--bd-danger)", label: "Removed" },
-  moved: { icon: "grip-vertical", color: "var(--bd-text-secondary)", label: "Moved" },
+const KIND: Record<CompareChangeKind, { icon: LucideIcon; color: string; label: string }> = {
+  content: { icon: File, color: "var(--bk-accent)", label: "Content" },
+  style: { icon: Palette, color: "var(--bk-warning-text)", label: "Style" },
+  added: { icon: Plus, color: "var(--bk-success)", label: "Added" },
+  removed: { icon: Minus, color: "var(--bk-error)", label: "Removed" },
+  moved: { icon: GripVertical, color: "var(--bk-ink-soft)", label: "Moved" },
 };
 
 const KIND_ORDER: CompareChangeKind[] = ["added", "removed", "moved", "content", "style"];
 
 const S: Record<string, React.CSSProperties> = {
   body: { display: "flex", flexDirection: "column", height: "100%", minHeight: 0 },
-  toolbar: { display: "flex", alignItems: "center", gap: 6, padding: "8px 12px", borderBottom: "1px solid var(--bd-border)", flexWrap: "wrap" },
+  toolbar: { display: "flex", alignItems: "center", gap: 6, padding: "8px 12px", borderBottom: "1px solid var(--bk-border)", flexWrap: "wrap" },
   spacer: { flex: 1 },
   stage: { flex: 1, minHeight: 0, display: "flex", gap: 8, padding: 8, overflow: "hidden" },
-  pane: { flex: 1, minWidth: 0, display: "flex", flexDirection: "column", border: "1px solid var(--bd-border)", borderRadius: "var(--bd-radius-md)", overflow: "hidden", background: "var(--bd-surface)" },
-  paneLabel: { fontSize: 11, fontWeight: 600, color: "var(--bd-text-muted)", padding: "6px 10px", borderBottom: "1px solid var(--bd-border)", textTransform: "uppercase", letterSpacing: "0.04em" },
+  pane: { flex: 1, minWidth: 0, display: "flex", flexDirection: "column", border: "1px solid var(--bk-border)", borderRadius: "var(--bk-radius-lg)", overflow: "hidden", background: "var(--bk-bg-panel)" },
+  paneLabel: { fontSize: 11, fontWeight: 600, color: "var(--bk-ink-muted)", padding: "6px 10px", borderBottom: "1px solid var(--bk-border)", textTransform: "uppercase", letterSpacing: "0.04em" },
   frame: { flex: 1, minHeight: 0, border: "none", width: "100%", background: "#fff" },
   overlayWrap: { flex: 1, position: "relative", minHeight: 0 },
   overlayFrame: { position: "absolute", inset: 0, border: "none", width: "100%", height: "100%", background: "#fff" },
-  placeholder: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, color: "var(--bd-text-muted)", fontSize: 13, textAlign: "center", padding: 24 },
-  legend: { display: "flex", gap: 12, flexWrap: "wrap", padding: "6px 12px", borderTop: "1px solid var(--bd-border)", fontSize: 11, color: "var(--bd-text-muted)" },
+  placeholder: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, color: "var(--bk-ink-muted)", fontSize: 13, textAlign: "center", padding: 24 },
+  legend: { display: "flex", gap: 12, flexWrap: "wrap", padding: "6px 12px", borderTop: "1px solid var(--bk-border)", fontSize: 11, color: "var(--bk-ink-muted)" },
   legendItem: { display: "flex", alignItems: "center", gap: 4 },
   listScroll: { flex: 1, minHeight: 0, overflowY: "auto", padding: "4px 12px 12px" },
-  listRow: { display: "flex", gap: 8, padding: "8px 10px", border: "1px solid var(--bd-border)", borderRadius: "var(--bd-radius-md)", marginBottom: 6, alignItems: "flex-start" },
+  listRow: { display: "flex", gap: 8, padding: "8px 10px", border: "1px solid var(--bk-border)", borderRadius: "var(--bk-radius-lg)", marginBottom: 6, alignItems: "flex-start" },
   listMain: { display: "flex", flexDirection: "column", gap: 2, minWidth: 0 },
-  listLabel: { fontSize: 13, color: "var(--bd-text)", fontWeight: 500 },
-  listDetail: { fontSize: 12, color: "var(--bd-text-muted)" },
+  listLabel: { fontSize: 13, color: "var(--bk-ink)", fontWeight: 500 },
+  listDetail: { fontSize: 12, color: "var(--bk-ink-muted)" },
   kindTag: { fontSize: 11, fontWeight: 600, flexShrink: 0, display: "flex", alignItems: "center", gap: 3 },
-  center: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, padding: 28, textAlign: "center", color: "var(--bd-text-muted)" },
-  centerTitle: { fontSize: 14, fontWeight: 600, color: "var(--bd-text)" },
-  summary: { fontSize: 12, color: "var(--bd-text-muted)", padding: "6px 12px" },
+  center: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, padding: 28, textAlign: "center", color: "var(--bk-ink-muted)" },
+  centerTitle: { fontSize: 14, fontWeight: 600, color: "var(--bk-ink)" },
+  summary: { fontSize: 12, color: "var(--bk-ink-muted)", padding: "6px 12px" },
 };
 
 function findPage(pages: ComparePage[] | null, path: string): ComparePage | undefined {
@@ -108,7 +120,7 @@ export const ApprovedCompareView: React.FC<ApprovedCompareViewProps> = ({
     return (
       <div style={S.body}>
         <div style={S.center}>
-          <Icon name="history" size="lg" />
+          <History size={24} aria-hidden="true" />
           <div style={S.centerTitle}>No approved snapshot for this round</div>
           <div style={S.summary}>
             This review was sent before snapshots were captured, so there's nothing to compare
@@ -131,7 +143,13 @@ export const ApprovedCompareView: React.FC<ApprovedCompareViewProps> = ({
     <div style={S.body}>
       <div style={S.toolbar}>
         {(["split", "overlay", "list"] as Mode[]).map((m) => (
-          <Button key={m} variant={mode === m ? "primary" : "ghost"} size="sm" onClick={() => setMode(m)}>
+          <Button
+            key={m}
+            color={mode === m ? undefined : "light"}
+            size="xs"
+            onClick={() => setMode(m)}
+            className={mode === m ? undefined : "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"}
+          >
             {m === "split" ? "Side by side" : m === "overlay" ? "Overlay" : "List"}
           </Button>
         ))}
@@ -148,8 +166,8 @@ export const ApprovedCompareView: React.FC<ApprovedCompareViewProps> = ({
           </Select>
         )}
         {onRefreshCurrent && (
-          <Button variant="ghost" size="sm" onClick={onRefreshCurrent} title="Re-render the current site">
-            <Icon name="refresh" size="sm" />
+          <Button color="light" size="xs" onClick={onRefreshCurrent} title="Re-render the current site" aria-label="Re-render the current site" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+            <RefreshCw size={14} aria-hidden="true" />
           </Button>
         )}
       </div>
@@ -166,14 +184,16 @@ export const ApprovedCompareView: React.FC<ApprovedCompareViewProps> = ({
           <div style={S.listScroll}>
             {changesForPage.length === 0 ? (
               <div style={S.center}>
-                <Icon name="check-circle" size="lg" />
+                <CheckCircle2 size={24} aria-hidden="true" />
                 <div style={S.centerTitle}>This page matches the approved version</div>
               </div>
             ) : (
-              changesForPage.map((c: CompareChange, i) => (
+              changesForPage.map((c: CompareChange, i) => {
+                const KindIcon = KIND[c.kind].icon;
+                return (
                 <div key={`${c.key}-${c.kind}-${i}`} style={S.listRow}>
                   <span style={{ ...S.kindTag, color: KIND[c.kind].color }}>
-                    <Icon name={KIND[c.kind].icon} size="sm" />
+                    <KindIcon size={14} aria-hidden="true" />
                     {KIND[c.kind].label}
                   </span>
                   <div style={S.listMain}>
@@ -181,7 +201,8 @@ export const ApprovedCompareView: React.FC<ApprovedCompareViewProps> = ({
                     <span style={S.listDetail}>{c.detail}</span>
                   </div>
                 </div>
-              ))
+                );
+              })
             )}
           </div>
         </>
@@ -208,7 +229,8 @@ export const ApprovedCompareView: React.FC<ApprovedCompareViewProps> = ({
                 min={0}
                 max={100}
                 step={2}
-                aria-label="Overlay opacity"
+                label="Overlay opacity"
+                withField={false}
               />
             </div>
             <span style={S.listDetail}>Current</span>
@@ -232,14 +254,17 @@ export const ApprovedCompareView: React.FC<ApprovedCompareViewProps> = ({
       )}
 
       <div style={S.legend}>
-        {KIND_ORDER.map((k) => (
-          <span key={k} style={S.legendItem}>
-            <span style={{ color: KIND[k].color, display: "inline-flex" }}>
-              <Icon name={KIND[k].icon} size="sm" />
+        {KIND_ORDER.map((k) => {
+          const KindIcon = KIND[k].icon;
+          return (
+            <span key={k} style={S.legendItem}>
+              <span style={{ color: KIND[k].color, display: "inline-flex" }}>
+                <KindIcon size={14} aria-hidden="true" />
+              </span>
+              {KIND[k].label}
             </span>
-            {KIND[k].label}
-          </span>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

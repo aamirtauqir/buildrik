@@ -1,5 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * HistoryTab — Version history sidebar panel
  *
@@ -11,14 +9,16 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { PanelFrame } from "@/editor/chrome-ui";
 import { useHistoryState } from "../../../../shared/hooks/useHistoryState";
 import { useAutoMilestone } from "../../../../shared/hooks/useAutoMilestone";
 import { VersionHistoryPanel } from "../../../panels/VersionHistoryPanel";
-import { TabFrame } from "@/shared/extensions/TabFrame";
 import { ActivityView } from "./components/ActivityView";
 import { TimeTravelScrubber } from "./components/TimeTravelScrubber";
 import { MilestoneSuggestionBanner } from "./components/MilestoneSuggestionBanner";
 import type { HistoryView, HistoryTabProps } from "./types";
+import { Button } from "@/editor/chrome-ui";
+import { TextField } from "@/editor/chrome-ui";
 
 const HELPER_TEXT: Record<HistoryView, string> = {
   changes: "Your recent edits",
@@ -112,8 +112,8 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
   }, []);
 
   return (
-    <TabFrame className="bd-history-container">
-      <TabFrame.Header
+    <PanelFrame className="bd-history-container">
+      <PanelFrame.Header
         title="Version History"
         isPinned={isPinned}
         onPinToggle={onPinToggle}
@@ -141,7 +141,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
         <span className="search-icon" aria-hidden="true">
           <SearchIconSvg />
         </span>
-        <Input
+        <TextField
           className="search-input"
           type="search"
           value={searchQuery}
@@ -196,7 +196,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
           onExit={handleScrubberExit}
         />
       )}
-    </TabFrame>
+    </PanelFrame>
   );
 };
 

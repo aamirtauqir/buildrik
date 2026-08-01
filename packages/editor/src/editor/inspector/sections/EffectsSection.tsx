@@ -174,8 +174,8 @@ export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange
       <span
         style={{
           fontSize: 11,
-          color: "var(--buildrick-text-tertiary)",
-          fontFamily: "var(--buildrick-font-family-mono)",
+          color: "var(--bk-ink-muted)",
+          fontFamily: "var(--bk-font-mono)",
           whiteSpace: "nowrap",
         }}
       >
@@ -395,7 +395,7 @@ export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange
         style={{
           marginTop: 16,
           paddingTop: 16,
-          borderTop: "1px solid var(--bd-border)",
+          borderTop: "1px solid var(--bk-border)",
         }}
       >
         <SectionLabel style={{ marginBottom: 12 }}>

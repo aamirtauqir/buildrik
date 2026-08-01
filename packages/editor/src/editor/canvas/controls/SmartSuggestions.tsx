@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Smart Suggestions Component
  * Context-aware action suggestions below selected element
@@ -17,7 +16,7 @@ import type { Composer, Element } from "../../../engine";
 import { Z_LAYERS } from "../../../shared/constants/canvas";
 import { EVENTS } from "../../../shared/constants/events";
 import { CANVAS_COLORS, SIZES } from "../shared";
-
+import { Button } from "@/editor/chrome-ui";
 // =============================================================================
 // TYPES
 // =============================================================================
@@ -273,7 +272,7 @@ export const SmartSuggestions: React.FC<SmartSuggestionsProps> = ({
           marginLeft: 4,
           background: "transparent",
           border: "none",
-          borderRadius: "var(--bd-radius-full)",
+          borderRadius: "var(--bk-radius-full)",
           color: CANVAS_COLORS.textMuted,
           fontSize: 12,
           cursor: "pointer",

@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * ToolbarNavSection — Parent navigation + element name chip + ancestor dropdown
  * Extracted sub-component of UnifiedSelectionToolbar.
@@ -7,19 +6,13 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import * as React from "react";
 import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipPortal,
-  TooltipContent,
-  TooltipKbd,
-} from "@/editor/shared/vibcoder";
-import {
   parentBtnStyles,
   nameBtnStyles,
   nameTextStyles,
   dropdownStyles,
   menuItemStyles,
 } from "./toolbarStyles";
+import { Button, Tooltip } from "@/editor/chrome-ui";
 
 export interface ToolbarNavSectionProps {
   hasParent: boolean;
@@ -45,37 +38,33 @@ export const ToolbarNavSection: React.FC<ToolbarNavSectionProps> = ({
   <>
     {/* Parent button */}
     {hasParent && (
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button onClick={onSelectParent} style={parentBtnStyles} aria-label="Select parent element">
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              aria-hidden="true"
-            >
-              <path d="M18 15l-6-6-6 6" />
-            </svg>
-          </Button>
-        </TooltipTrigger>
-        <TooltipPortal>
-          <TooltipContent side="bottom">Select Parent <TooltipKbd>⌥↑</TooltipKbd></TooltipContent>
-        </TooltipPortal>
+      <Tooltip content="Select Parent · ⌥↑" placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
+        <Button color="light" onClick={onSelectParent} style={parentBtnStyles} aria-label="Select parent element" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            aria-hidden="true"
+          >
+            <path d="M18 15l-6-6-6 6" />
+          </svg>
+        </Button>
       </Tooltip>
     )}
 
     {/* Element name — clickable for ancestor dropdown */}
     <div style={{ position: "relative" }}>
       <Button
+        color="light"
         onClick={onAncestorMenuToggle}
         style={nameBtnStyles}
         aria-label="Show element path"
         aria-expanded={showAncestorMenu}
-        aria-haspopup="menu"
+        aria-haspopup="menu" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
       >
         <span style={nameTextStyles}>{elementName}</span>
         {ancestors.length > 0 && (
@@ -105,9 +94,10 @@ export const ToolbarNavSection: React.FC<ToolbarNavSectionProps> = ({
           {ancestors.map((ancestor, i) => (
             <Button
               key={ancestor.id}
+              color="light"
               role="menuitem"
               onClick={() => onSelectAncestor(ancestor.id)}
-              style={{ ...menuItemStyles, paddingLeft: 10 + i * 8 }}
+              style={{ ...menuItemStyles, paddingLeft: 10 + i * 8 }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
             >
               <span aria-hidden="true" style={{ opacity: 0.5, marginRight: 6 }}>
                 ↑

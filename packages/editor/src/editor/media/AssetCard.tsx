@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * @lint-hex-policy: component-theme
  *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
@@ -11,6 +10,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 import * as React from "react";
 import type { MediaAsset } from "../../shared/types/media";
 import { assetCardStyles as styles } from "./MediaLibraryStyles";
+import { Button } from "@/editor/chrome-ui";
 
 export interface AssetCardProps {
   asset: MediaAsset;
@@ -127,7 +127,7 @@ export const AssetCard: React.FC<AssetCardProps> = ({
       left: -9999px;
       padding: 8px 12px;
       background: linear-gradient(135deg, #89b4fa 0%, #b4befe 100%);
-      border-radius: "var(--bd-radius-md)";
+      border-radius: "var(--bk-radius-lg)";
       color: #fff;
       font-size: 12px;
       font-weight: 500;

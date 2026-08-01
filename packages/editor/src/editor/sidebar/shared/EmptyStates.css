@@ -6,7 +6,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--bd-space-8) var(--bd-space-6);
+  padding: var(--bk-space-32) var(--bk-space-24);
   text-align: center;
   flex: 1;
   min-height: 200px;
@@ -15,36 +15,36 @@
 .empty-icon {
   width: 48px;
   height: 48px;
-  border-radius: var(--bd-radius-lg);
-  background: var(--buildrick-bg-subtle, var(--bd-bg-subtle));
+  border-radius: var(--bk-radius-lg);
+  background: var(--bk-bg-subtle, var(--bk-bg-subtle));
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: var(--bd-space-4);
-  color: var(--buildrick-text-secondary, var(--bd-fg-muted));
+  margin-bottom: var(--bk-space-16);
+  color: var(--bk-ink-soft, var(--bk-ink-muted));
 }
 
 .empty-title {
   font-size: 14px;
   font-weight: 600;
-  color: var(--buildrick-text-primary);
+  color: var(--bk-ink);
   margin: 0 0 6px;
 }
 
 .empty-message {
   font-size: 12px;
-  color: var(--buildrick-text-muted, #475569);
-  margin: 0 0 var(--bd-space-4);
+  color: var(--bk-ink-muted, #475569);
+  margin: 0 0 var(--bk-space-16);
   line-height: 1.5;
   max-width: 240px;
 }
 
 .empty-action {
-  padding: var(--bd-space-2) var(--bd-space-4);
-  border-radius: var(--bd-radius-sm-plus);
+  padding: var(--bk-space-8) var(--bk-space-16);
+  border-radius: var(--bk-radius-md);
   border: none;
-  background: var(--buildrick-accent);
-  color: var(--buildrick-bg-card);
+  background: var(--bk-accent);
+  color: var(--bk-bg-card);
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;

@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Selection Label Component
  * Shows element name with parent navigation and settings at top-left of selection
@@ -10,6 +9,7 @@ import type { Composer } from "../../../engine";
 import { Z_INDEX } from "../../../shared/constants/canvas";
 import { canvasTokens } from "../../../styles/tokens";
 import { getElementNameFromType, getTypeIcon } from "../utils/elementInfo";
+import { Button } from "@/editor/chrome-ui";
 
 export interface SelectionLabelProps {
   composer: Composer;

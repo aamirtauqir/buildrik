@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Media Tab — Standardized Rebuild (10-Star Experience)
  * Flattened hierarchy, canonical SearchBar integration, and high-visibility Bulk Actions.
@@ -7,9 +6,9 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { PanelFrame, useToast } from "@/editor/chrome-ui";
 import { Upload, Plus } from "lucide-react";
 import type { Composer } from "../../../../engine/Composer";
-import { TabFrame } from "@/shared/extensions/TabFrame";
 import { ROW_LG } from "@shared/constants/layout";
 import { SearchBar } from "../../shared/SearchBar";
 import { AssetDetailOverlay } from "./components/AssetDetailOverlay";
@@ -26,10 +25,10 @@ import { SlimLauncher } from "./components/SlimLauncher";
 import { ExpandedMediaPanel } from "./components/ExpandedMediaPanel";
 import { SelectionContextBar } from "./components/SelectionContextBar";
 import "./MediaTab.css";
-import { useToast } from "@/editor/shared/vibcoder";
 import type { LibraryItem } from "./data/mediaTypes";
 import { createAssetVersion } from "../../../../services/MediaVersionService";
 import type { IconConfig } from "@shared/types/media";
+import { Button } from "@/editor/chrome-ui";
 
 interface MediaTabProps {
   composer: Composer | null;
@@ -52,12 +51,12 @@ interface MediaTabProps {
 export function MediaTab(props: MediaTabProps) {
   if (!props.composer) {
     return (
-      <TabFrame className="med-tab">
-        <TabFrame.Header title="Media" {...props} />
-        <TabFrame.Body>
+      <PanelFrame className="med-tab">
+        <PanelFrame.Header title="Media" {...props} />
+        <PanelFrame.Body>
           <div className="med-no-project">Open a project to manage media.</div>
-        </TabFrame.Body>
-      </TabFrame>
+        </PanelFrame.Body>
+      </PanelFrame>
     );
   }
   return <MediaTabWithComposer {...props} composer={props.composer} />;
@@ -271,7 +270,7 @@ function MediaTabWithComposer({
   // ─── Fullpage mode: render full manager content ──────────────────
 
   return (
-    <TabFrame
+    <PanelFrame
       className="med-tab"
       onDragEnter={state.handlePanelDragEnter}
       onDragLeave={state.handlePanelDragLeave}
@@ -299,9 +298,9 @@ function MediaTabWithComposer({
             <Plus size={14} />
             Add from Stock
           </Button>
-          <div style={{ width: 1, height: 24, background: 'var(--bd-border-light)' }} />
+          <div style={{ width: 1, height: 24, background: 'var(--bk-border)' }} />
           <Button onClick={onClose} style={{
-            background: 'none', border: 'none', color: 'var(--bd-fg-muted)',
+            background: 'none', border: 'none', color: 'var(--bk-ink-muted)',
             cursor: 'pointer', padding: 4, display: 'flex'
           }}>
             <Upload size={18} style={{ transform: 'rotate(180deg)' }} />
@@ -414,6 +413,6 @@ function MediaTabWithComposer({
         />
       )}
       {stockModal}
-    </TabFrame>
+    </PanelFrame>
   );
 }

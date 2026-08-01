@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * ComponentDetailScreen - Detail view for a component
  * Shows large preview, info, actions, and variants
@@ -8,14 +7,13 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import { Copy, Trash2, Unlink, RefreshCw } from "lucide-react";
 import * as React from "react";
+import { ConfirmDialog, useToast } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import type { ComponentDefinition, VariantProperty } from "../../../../shared/types/components";
-import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
-import { useToast } from "@/editor/shared/vibcoder";
 import { useDSModeOptional } from "@/editor/design-system/state/DSModeContext";
 import { DrillInHeader } from "../../shared/DrillInHeader";
 import { DetachConfirmModal } from "./DetachConfirmModal";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================
 // Types
 // ============================================
@@ -286,7 +284,7 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
       </div>
       {/* Delete confirmation dialog */}
       <ConfirmDialog
-        isOpen={showDeleteConfirm}
+        open={showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(false)}
         onConfirm={confirmDeleteAction}
         title="Delete Component"
@@ -295,8 +293,8 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
             ? `This component has ${instanceCount} instance(s). Deleting will detach all instances. Continue?`
             : `Are you sure you want to delete "${component.name}"?`
         }
-        confirmText="Delete"
-        variant="danger"
+        confirmLabel="Delete"
+        destructive
       />
       {/* Detach confirmation modal (Task 13) */}
       {pendingDetach && (

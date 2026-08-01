@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Element Properties Section - Per-element specific attributes
  * href, src, alt, placeholder, etc.
@@ -25,26 +24,26 @@ import {
   getCurrentIconConfig,
 } from "./handlers";
 import { PropertyField } from "./PropertyField";
-
+import { Button } from "@/editor/chrome-ui";
 const styles = {
   dataAttributesSection: {
     marginTop: 16,
     paddingTop: 16,
-    borderTop: `1px solid ${"var(--buildrick-border)"}`,
+    borderTop: `1px solid ${"var(--bk-border)"}`,
   } as React.CSSProperties,
   sectionTitle: {
     fontSize: 12,
-    color: "var(--buildrick-text-tertiary)",
+    color: "var(--bk-ink-muted)",
     fontWeight: 500,
     marginBottom: 12,
   } as React.CSSProperties,
   iconPickerButton: {
     width: "100%",
     padding: "12px 16px",
-    background: "var(--bd-accent-tint)",
-    border: "1px solid var(--buildrick-primary-alpha-30)",
+    background: "var(--bk-accent-tint)",
+    border: "1px solid var(--bk-alpha-accent-30)",
     borderRadius: 8,
-    color: "var(--buildrick-accent)",
+    color: "var(--bk-accent)",
     fontSize: 13,
     fontWeight: 600,
     cursor: "pointer",
@@ -55,7 +54,7 @@ const styles = {
   } as React.CSSProperties,
   iconHint: {
     fontSize: 12,
-    color: "var(--buildrick-text-muted)",
+    color: "var(--bk-ink-muted)",
     marginTop: 6,
     textAlign: "center" as const,
   } as React.CSSProperties,

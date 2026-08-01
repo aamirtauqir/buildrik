@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * BulkToolbar — dark floating pill, absolute-positioned at bottom of pages panel.
  * Shown when 2+ pages are selected. Disabled Publish/Unpublish buttons removed
@@ -10,6 +9,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 import * as React from "react";
 import { useClickOutside } from "@/shared/hooks";
 import type { FolderItem } from "../types";
+import { Button } from "@/editor/chrome-ui";
 
 interface Props {
   selectedCount: number;

@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * BindingPopover — Link element content to a CMS collection field (WS-14b)
  * PRD §12.3 — Chain icon button + popover with collection/field selection
@@ -15,7 +14,7 @@ import * as React from "react";
 import type { Composer } from "../../../engine";
 import { useClickOutside } from "../../../shared/hooks/useClickOutside";
 import type { CMSCollection, CMSContentItem } from "../../../shared/types/cms";
-
+import { Button } from "@/editor/chrome-ui";
 // =============================================================================
 // TYPES
 // =============================================================================
@@ -46,7 +45,7 @@ const s: Record<string, React.CSSProperties> = {
     justifyContent: "center",
     background: "transparent",
     border: "none",
-    borderRadius: "var(--buildrick-radius-sm)",
+    borderRadius: "var(--bk-radius-sm)",
     cursor: "pointer",
     transition: "color 0.15s, background 0.15s",
     flexShrink: 0,
@@ -56,19 +55,19 @@ const s: Record<string, React.CSSProperties> = {
     top: "calc(100% + 6px)",
     right: 0,
     width: 240,
-    background: "var(--buildrick-bg-panel)",
-    border: "1px solid var(--buildrick-border)",
-    borderRadius: "var(--buildrick-radius-md)",
-    boxShadow: "var(--buildrick-shadow-lg)",
+    background: "var(--bk-bg-panel)",
+    border: "1px solid var(--bk-border)",
+    borderRadius: "var(--bk-radius-lg)",
+    boxShadow: "var(--bk-shadow-overlay)",
     zIndex: 1000,
     overflow: "hidden",
   },
   popoverHeader: {
     padding: "8px 12px",
-    borderBottom: "1px solid var(--buildrick-border)",
+    borderBottom: "1px solid var(--bk-border)",
     fontSize: 11,
     fontWeight: 600,
-    color: "var(--buildrick-text-muted)",
+    color: "var(--bk-ink-muted)",
     textTransform: "uppercase" as const,
     letterSpacing: "0.06em",
   },
@@ -79,7 +78,7 @@ const s: Record<string, React.CSSProperties> = {
   emptyMsg: {
     padding: "14px 12px",
     fontSize: 12,
-    color: "var(--buildrick-text-muted)",
+    color: "var(--bk-ink-muted)",
     textAlign: "center" as const,
     lineHeight: 1.5,
   },
@@ -87,17 +86,17 @@ const s: Record<string, React.CSSProperties> = {
     padding: "6px 12px 4px",
     fontSize: 10,
     fontWeight: 600,
-    color: "var(--buildrick-text-muted)",
+    color: "var(--bk-ink-muted)",
     textTransform: "uppercase" as const,
     letterSpacing: "0.07em",
-    background: "var(--buildrick-bg-elevated)",
+    background: "var(--bk-bg-card)",
   },
   listItem: {
     display: "flex",
     alignItems: "center",
     padding: "7px 12px",
     fontSize: 12,
-    color: "var(--buildrick-text-secondary)",
+    color: "var(--bk-ink-soft)",
     cursor: "pointer",
     transition: "background 0.1s",
     border: "none",
@@ -106,12 +105,12 @@ const s: Record<string, React.CSSProperties> = {
     background: "transparent",
   },
   listItemActive: {
-    background: "var(--buildrick-accent-tint)",
-    color: "var(--buildrick-accent)",
+    background: "var(--bk-accent-tint)",
+    color: "var(--bk-accent)",
   },
   divider: {
     height: 1,
-    background: "var(--buildrick-border)",
+    background: "var(--bk-border)",
     margin: "4px 0",
   },
   footerLink: {
@@ -120,9 +119,9 @@ const s: Record<string, React.CSSProperties> = {
     justifyContent: "center",
     padding: "8px 12px",
     fontSize: 12,
-    color: "var(--buildrick-accent)",
+    color: "var(--bk-accent)",
     cursor: "pointer",
-    borderTop: "1px solid var(--buildrick-border)",
+    borderTop: "1px solid var(--bk-border)",
     background: "transparent",
     border: "none",
     width: "100%",
@@ -132,20 +131,20 @@ const s: Record<string, React.CSSProperties> = {
   boundIndicator: {
     padding: "8px 12px",
     fontSize: 11,
-    color: "var(--buildrick-text-muted)",
+    color: "var(--bk-ink-muted)",
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    borderBottom: "1px solid var(--buildrick-border)",
+    borderBottom: "1px solid var(--bk-border)",
   },
   unbindBtn: {
     fontSize: 11,
-    color: "var(--buildrick-error)",
+    color: "var(--bk-error)",
     background: "transparent",
     border: "none",
     cursor: "pointer",
     padding: "2px 4px",
-    borderRadius: "var(--buildrick-radius-sm)",
+    borderRadius: "var(--bk-radius-sm)",
   },
 };
 
@@ -240,8 +239,8 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
         type="button"
         style={{
           ...s.chainBtn,
-          color: isActive ? "var(--buildrick-accent)" : "var(--buildrick-text-muted)",
-          background: isActive ? "var(--buildrick-accent-tint)" : "transparent",
+          color: isActive ? "var(--bk-accent)" : "var(--bk-ink-muted)",
+          background: isActive ? "var(--bk-accent-tint)" : "transparent",
         }}
         title="Bind to collection field"
         aria-label="Bind to collection field"
@@ -249,14 +248,14 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
         onClick={() => setOpen((v) => !v)}
         onMouseEnter={(e) => {
           if (!isActive) {
-            (e.currentTarget as HTMLElement).style.color = "var(--buildrick-text-secondary)";
+            (e.currentTarget as HTMLElement).style.color = "var(--bk-ink-soft)";
             (e.currentTarget as HTMLElement).style.background =
-              "var(--buildrick-bg-elevated)";
+              "var(--bk-bg-card)";
           }
         }}
         onMouseLeave={(e) => {
           if (!isActive) {
-            (e.currentTarget as HTMLElement).style.color = "var(--buildrick-text-muted)";
+            (e.currentTarget as HTMLElement).style.color = "var(--bk-ink-muted)";
             (e.currentTarget as HTMLElement).style.background = "transparent";
           }
         }}
@@ -273,7 +272,7 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
             {isBound && boundLabel && (
               <div style={s.boundIndicator}>
                 <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                  <Link size={10} style={{ color: "var(--buildrick-accent)" }} />
+                  <Link size={10} style={{ color: "var(--bk-accent)" }} />
                   {boundLabel}
                 </span>
                 <Button
@@ -308,7 +307,7 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
                     onClick={() => handleSelectCollection(col)}
                     onMouseEnter={(e) => {
                       (e.currentTarget as HTMLElement).style.background =
-                        "var(--buildrick-bg-elevated)";
+                        "var(--bk-bg-card)";
                     }}
                     onMouseLeave={(e) => {
                       (e.currentTarget as HTMLElement).style.background = "transparent";
@@ -319,7 +318,7 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
                       style={{
                         marginLeft: "auto",
                         fontSize: 10,
-                        color: "var(--buildrick-text-muted)",
+                        color: "var(--bk-ink-muted)",
                       }}
                     >
                       {col.fields.length} fields
@@ -336,7 +335,7 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
                   type="button"
                   style={{
                     ...s.listItem,
-                    color: "var(--buildrick-accent)",
+                    color: "var(--bk-accent)",
                     fontSize: 11,
                   }}
                   onClick={() => setSelectedCollection(null)}
@@ -356,7 +355,7 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
                     onClick={() => handleSelectField(field.slug, field.name)}
                     onMouseEnter={(e) => {
                       (e.currentTarget as HTMLElement).style.background =
-                        "var(--buildrick-bg-elevated)";
+                        "var(--bk-bg-card)";
                     }}
                     onMouseLeave={(e) => {
                       (e.currentTarget as HTMLElement).style.background = "transparent";
@@ -367,7 +366,7 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
                       style={{
                         marginLeft: "auto",
                         fontSize: 10,
-                        color: "var(--buildrick-text-muted)",
+                        color: "var(--bk-ink-muted)",
                       }}
                     >
                       {field.type}
@@ -382,7 +381,7 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
               <>
                 <Button
                   type="button"
-                  style={{ ...s.listItem, color: "var(--buildrick-accent)", fontSize: 11 }}
+                  style={{ ...s.listItem, color: "var(--bk-accent)", fontSize: 11 }}
                   onClick={() => {
                     setSelectedField(null);
                     setRecords([]);
@@ -410,7 +409,7 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
                       onClick={() => handleSelectRecord(rec.id)}
                     >
                       {label}
-                      <span style={{ marginLeft: "auto", fontSize: 10, color: "var(--buildrick-text-muted)" }}>
+                      <span style={{ marginLeft: "auto", fontSize: 10, color: "var(--bk-ink-muted)" }}>
                         {rec.status}
                       </span>
                     </Button>
@@ -430,7 +429,7 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
             }}
             onMouseEnter={(e) => {
               (e.currentTarget as HTMLElement).style.background =
-                "var(--buildrick-accent-tint)";
+                "var(--bk-accent-tint)";
             }}
             onMouseLeave={(e) => {
               (e.currentTarget as HTMLElement).style.background = "transparent";

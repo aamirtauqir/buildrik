@@ -13,8 +13,7 @@
  */
 import * as React from "react";
 import { useDSMode, type DSMode } from "../state/DSModeContext";
-import { Button } from "@/editor/shared/vibcoder/Button";
-
+import { Button } from "@/editor/chrome-ui";
 const SEGMENTS: ReadonlyArray<{ value: DSMode; label: string; hint: string }> = [
   { value: "beginner", label: "Beginner", hint: "Friendly · hides token IDs and empty foundations" },
   { value: "pro", label: "Pro", hint: "Full power · token IDs, every kind, off-DS allowed silently" },
@@ -38,8 +37,8 @@ export const DSModeToggle: React.FC<DSModeToggleProps> = ({ className }) => {
         gap: 2,
         padding: 2,
         borderRadius: 6,
-        background: "var(--bd-bg-subtle)",
-        border: "1px solid var(--bd-border)",
+        background: "var(--bk-bg-subtle)",
+        border: "1px solid var(--bk-border)",
       }}
     >
       {SEGMENTS.map((seg) => {
@@ -48,8 +47,8 @@ export const DSModeToggle: React.FC<DSModeToggleProps> = ({ className }) => {
           <Button
             key={seg.value}
             type="button"
-            variant="ghost"
-            size="sm"
+            color="light"
+            size="xs"
             role="radio"
             aria-checked={active}
             title={seg.hint}
@@ -61,11 +60,11 @@ export const DSModeToggle: React.FC<DSModeToggleProps> = ({ className }) => {
               borderRadius: 4,
               fontSize: 12,
               fontWeight: active ? 600 : 500,
-              color: active ? "var(--bd-fg-on-accent)" : "var(--bd-fg-muted)",
-              background: active ? "var(--bd-accent)" : "transparent",
+              color: active ? "var(--bk-accent-on)" : "var(--bk-ink-muted)",
+              background: active ? "var(--bk-accent)" : "transparent",
               transition: "background-color 0.12s, color 0.12s",
               userSelect: "none",
-            }}
+            }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           >
             {seg.label}
           </Button>

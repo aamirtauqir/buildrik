@@ -1,21 +1,19 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * PageTabBar - Horizontal tab bar for page switching
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
+import { ConfirmDialog } from "@/editor/chrome-ui";
 import { createPortal } from "react-dom";
 import type { Composer } from "../../engine";
 import { EVENTS } from "../../shared/constants";
 import type { PageData } from "../../shared/types";
-import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
-import { useToast } from "@/editor/shared/vibcoder";
+import { useToast } from "@/editor/chrome-ui";
 import { useClickOutside } from "@/shared/hooks";
 import { getDefaultPageName } from "../../shared/utils/pageUtils";
 import { normalizeSlug } from "../sidebar/tabs/pages/utils/slug";
-
+import { Button, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -250,7 +248,7 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
               {page.isHome && <span style={homeIconStyles}>🏠</span>}
               {editingPageId === page.id ? (
                 <span style={{ position: "relative" }}>
-                  <Input
+                  <TextInput
                     type="text"
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
@@ -271,10 +269,10 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
                     style={{
                       ...inputStyles,
                       borderColor: nameValidation.error
-                        ? "var(--buildrick-error)"
+                        ? "var(--bk-error)"
                         : nameValidation.warning
-                        ? "var(--buildrick-warning)"
-                        : "var(--buildrick-accent)",
+                        ? "var(--bk-warning)"
+                        : "var(--bk-accent)",
                     }}
                     onClick={(e) => e.stopPropagation()}
                   />
@@ -286,8 +284,8 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
                       top: "100%",
                       left: 0,
                       zIndex: 100,
-                      background: "var(--buildrick-bg-card)",
-                      border: "1px solid var(--buildrick-border)",
+                      background: "var(--bk-bg-card)",
+                      border: "1px solid var(--bk-border)",
                       borderRadius: 4,
                       padding: "4px 8px",
                       marginTop: 2,
@@ -297,17 +295,17 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
                     }}
                   >
                     {nameValidation.error && (
-                      <span style={{ color: "var(--buildrick-error)", display: "block" }}>
+                      <span style={{ color: "var(--bk-error)", display: "block" }}>
                         {nameValidation.error}
                       </span>
                     )}
                     {nameValidation.warning && (
-                      <span style={{ color: "var(--buildrick-warning)", display: "block" }}>
+                      <span style={{ color: "var(--bk-warning)", display: "block" }}>
                         {nameValidation.warning}
                       </span>
                     )}
                     {nameValidation.slug && (
-                      <span style={{ color: "var(--buildrick-text-muted)", display: "block" }}>
+                      <span style={{ color: "var(--bk-ink-muted)", display: "block" }}>
                         /{nameValidation.slug}
                       </span>
                     )}
@@ -382,7 +380,7 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
             </Button>
             {pages.length > 1 && (
               <Button
-                style={{ ...menuItemStyles, color: "var(--buildrick-error)" }}
+                style={{ ...menuItemStyles, color: "var(--bk-error)" }}
                 role="menuitem"
                 onClick={() => handleDeleteRequest(contextMenu.pageId)}
               >
@@ -394,13 +392,13 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
         )}
       {/* Delete confirmation dialog */}
       <ConfirmDialog
-        isOpen={!!deleteConfirmPageId}
+        open={!!deleteConfirmPageId}
         onClose={() => setDeleteConfirmPageId(null)}
         onConfirm={confirmDelete}
         title={`Delete "${pages.find((p) => p.id === deleteConfirmPageId)?.name}"?`}
         message="All content on this page will be permanently removed. You can undo immediately after."
-        confirmText="Delete Page"
-        variant="danger"
+        confirmLabel="Delete Page"
+        destructive
       />
     </div>
   );
@@ -412,12 +410,12 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
 
 const containerStyles: React.CSSProperties = {
   position: "relative",
-  borderBottom: "1px solid var(--buildrick-border)",
+  borderBottom: "1px solid var(--bk-border)",
   // The strip carries the app background so the active tab (bg-card) reads as
   // proud of it. Both were bg-card before, which left the active page marked
   // only by a 500 weight and a 5%-alpha shadow — invisible in practice.
   // Figma board B9.7 is the record.
-  background: "var(--buildrick-bg-app)",
+  background: "var(--bk-bg-app)",
 };
 
 // Outer row: tablist (scrollable) + add button (fixed, outside tablist)
@@ -443,21 +441,21 @@ const tabStyles: React.CSSProperties = {
   padding: "6px 12px",
   background: "transparent",
   border: "none",
-  borderRadius: "var(--bd-radius-sm-plus) var(--bd-radius-sm-plus) 0 0",
+  borderRadius: "var(--bk-radius-md) var(--bk-radius-md) 0 0",
   fontSize: 13,
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bk-ink-soft)",
   cursor: "pointer",
   transition: "all 0.15s ease",
   whiteSpace: "nowrap",
 };
 
 const activeTabStyles: React.CSSProperties = {
-  background: "var(--buildrick-bg-card)",
-  border: "1px solid var(--buildrick-border)",
+  background: "var(--bk-bg-card)",
+  border: "1px solid var(--bk-border)",
   borderBottom: "none",
-  color: "var(--buildrick-text-primary)",
+  color: "var(--bk-ink)",
   fontWeight: 500,
-  boxShadow: "var(--bd-shadow-sm)",
+  boxShadow: "var(--bk-shadow-raised)",
 };
 
 const homeIconStyles: React.CSSProperties = {
@@ -475,15 +473,15 @@ const tabNameStyles: React.CSSProperties = {
 const dirtyDotStyles: React.CSSProperties = {
   width: 6,
   height: 6,
-  borderRadius: "var(--bd-radius-full)",
-  background: "var(--buildrick-accent)",
+  borderRadius: "var(--bk-radius-full)",
+  background: "var(--bk-accent)",
   flexShrink: 0,
 };
 
 const inputStyles: React.CSSProperties = {
   width: 100,
   padding: "2px 4px",
-  border: "1px solid var(--buildrick-accent)",
+  border: "1px solid var(--bk-accent)",
   borderRadius: 3,
   fontSize: 13,
   outline: "none",
@@ -497,10 +495,10 @@ const addButtonStyles: React.CSSProperties = {
   height: 24,
   marginLeft: 4,
   background: "transparent",
-  border: "1px dashed var(--buildrick-border)",
+  border: "1px dashed var(--bk-border)",
   borderRadius: 4,
   fontSize: 16,
-  color: "var(--buildrick-text-muted)",
+  color: "var(--bk-ink-muted)",
   cursor: "pointer",
   transition: "all 0.15s ease",
 };
@@ -508,10 +506,10 @@ const addButtonStyles: React.CSSProperties = {
 const menuStyles: React.CSSProperties = {
   position: "fixed",
   zIndex: 10000,
-  background: "var(--buildrick-bg-card)",
-  border: "1px solid var(--buildrick-border)",
-  borderRadius: "var(--bd-radius-sm-plus)",
-  boxShadow: "var(--bd-shadow-dropdown)",
+  background: "var(--bk-bg-card)",
+  border: "1px solid var(--bk-border)",
+  borderRadius: "var(--bk-radius-md)",
+  boxShadow: "var(--bk-shadow-drag)",
   padding: 4,
   minWidth: 140,
 };
@@ -526,7 +524,7 @@ const menuItemStyles: React.CSSProperties = {
   border: "none",
   borderRadius: 4,
   fontSize: 13,
-  color: "var(--buildrick-text-primary)",
+  color: "var(--bk-ink)",
   cursor: "pointer",
   textAlign: "left",
 };

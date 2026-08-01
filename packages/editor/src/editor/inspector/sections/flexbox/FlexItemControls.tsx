@@ -1,5 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * FlexItemControls - Flex item (child) properties: grow, shrink, basis, order
  * @license BSD-3-Clause
@@ -7,7 +5,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import * as React from "react";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
-
+import { Button, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -43,13 +41,13 @@ export const FlexItemControls: React.FC<FlexItemControlsProps> = ({
     style={{
       marginTop: 10,
       paddingTop: 10,
-      borderTop: `1px solid ${"var(--buildrick-border)"}`,
+      borderTop: `1px solid ${"var(--bk-border)"}`,
     }}
   >
     <div
       style={{
         fontSize: 12,
-        color: "var(--buildrick-text-muted)",
+        color: "var(--bk-ink-muted)",
         fontWeight: 600,
         marginBottom: 8,
         textTransform: "uppercase",
@@ -72,13 +70,13 @@ export const FlexItemControls: React.FC<FlexItemControlsProps> = ({
         <span
           style={{
             fontSize: 12,
-            color: "var(--buildrick-text-muted)",
+            color: "var(--bk-ink-muted)",
             width: 30,
           }}
         >
           Grow
         </span>
-        <Input
+        <TextInput
           type="number"
           value={styles["flex-grow"] || ""}
           onChange={(e) => onChange("flex-grow", e.target.value)}
@@ -98,13 +96,13 @@ export const FlexItemControls: React.FC<FlexItemControlsProps> = ({
         <span
           style={{
             fontSize: 12,
-            color: "var(--buildrick-text-muted)",
+            color: "var(--bk-ink-muted)",
             width: 30,
           }}
         >
           Shrink
         </span>
-        <Input
+        <TextInput
           type="number"
           value={styles["flex-shrink"] || ""}
           onChange={(e) => onChange("flex-shrink", e.target.value)}
@@ -124,13 +122,13 @@ export const FlexItemControls: React.FC<FlexItemControlsProps> = ({
         <span
           style={{
             fontSize: 12,
-            color: "var(--buildrick-text-muted)",
+            color: "var(--bk-ink-muted)",
             width: 30,
           }}
         >
           Basis
         </span>
-        <Input
+        <TextInput
           type="text"
           value={styles["flex-basis"] || ""}
           onChange={(e) => onChange("flex-basis", e.target.value)}
@@ -177,7 +175,7 @@ export const FlexItemControls: React.FC<FlexItemControlsProps> = ({
     {/* Order */}
     <div style={rowStyle}>
       <label style={labelStyle}>Order</label>
-      <Input
+      <TextInput
         type="number"
         value={styles.order || ""}
         onChange={(e) => onChange("order", e.target.value)}

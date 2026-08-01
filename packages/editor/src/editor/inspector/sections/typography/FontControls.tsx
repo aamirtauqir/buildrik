@@ -1,4 +1,4 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
+import { Popover } from "@/editor/chrome-ui";
 /**
  * FontControls - Font weight, style, and decoration controls
  * Part of Typography section refactoring
@@ -15,16 +15,10 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 import { Link2, Link2Off } from "lucide-react";
 import * as React from "react";
 import { useTypeRegistry } from "../../../design-system/state/TokenRegistryContext";
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverPortal,
-  PopoverContent,
-} from "@/editor/shared/vibcoder";
 import { TokenPickerPopover } from "../../shared/TokenPickerPopover";
 import { SelectRow, ButtonGroup, InputWithUnit, MixedValueIndicator } from "../../shared/controls";
 import { getCssVariable } from "@/shared/utils/getCssVariable";
-
+import { Button } from "@/editor/chrome-ui";
 // Font weight options
 export const FONT_WEIGHTS = [
   { value: "100", label: "Thin (100)" },
@@ -81,10 +75,10 @@ const TypeChainButton: React.FC<TypeChainButtonProps> = ({ property, value, onCh
         title={`Unlink "${boundToken?.name ?? "token"}" — resolves to current value`}
         style={{
           padding: "2px 4px",
-          background: "var(--buildrick-accent-subtle)",
-          border: `1px solid ${"var(--buildrick-accent)"}`,
+          background: "var(--bk-accent-subtle)",
+          border: `1px solid ${"var(--bk-accent)"}`,
           borderRadius: 4,
-          color: "var(--buildrick-accent)",
+          color: "var(--bk-accent)",
           cursor: "pointer",
           display: "flex",
           alignItems: "center",
@@ -106,18 +100,24 @@ const TypeChainButton: React.FC<TypeChainButtonProps> = ({ property, value, onCh
   }
 
   return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger asChild>
+    <Popover
+      open={isOpen}
+      onClose={() => setIsOpen(false)}
+      placement="bottom-end"
+      label="Type tokens"
+      trigger={
         <Button
           type="button"
+          onClick={() => setIsOpen((v) => !v)}
           aria-label={`Link ${property} to type token`}
+          aria-expanded={isOpen}
           title="Link to type token"
           className="bd-chain-btn"
           style={{
             padding: 2,
             background: "none",
             border: "none",
-            color: "var(--buildrick-text-muted)",
+            color: "var(--bk-ink-muted)",
             cursor: "pointer",
             display: "flex",
             alignItems: "center",
@@ -128,19 +128,16 @@ const TypeChainButton: React.FC<TypeChainButtonProps> = ({ property, value, onCh
         >
           <Link2 size={12} aria-hidden="true" />
         </Button>
-      </PopoverTrigger>
-      <PopoverPortal>
-        <PopoverContent sideOffset={8}>
-          <TokenPickerPopover
-            tokens={tokenEntries}
-            currentValue={value}
-            showSwatch={false}
-            tokenLabel="type"
-            onSelect={(_id, cssVarRef) => onChange(cssVarRef)}
-            onCustomValue={onChange}
-          />
-        </PopoverContent>
-      </PopoverPortal>
+      }
+    >
+      <TokenPickerPopover
+        tokens={tokenEntries}
+        currentValue={value}
+        showSwatch={false}
+        tokenLabel="type"
+        onSelect={(_id, cssVarRef) => onChange(cssVarRef)}
+        onCustomValue={onChange}
+      />
     </Popover>
   );
 };

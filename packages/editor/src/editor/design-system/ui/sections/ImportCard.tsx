@@ -23,10 +23,7 @@
  */
 
 import * as React from "react";
-import { useToast } from "@/editor/shared/vibcoder";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Textarea } from "@/editor/shared/vibcoder/Textarea";
+import { useToast } from "@/editor/chrome-ui";
 import { parseImportJSON, diffTokens, type DiffResult } from "../../utils/importUtils";
 import { useImportTokens } from "../../state/useImportTokens";
 import {
@@ -37,7 +34,7 @@ import {
   useIconRegistry, useImageryRegistry,
 } from "../../state/TokenRegistryContext";
 import type { DesignToken } from "../../types";
-
+import { Button, Textarea, TextInput } from "@/editor/chrome-ui";
 type ConflictStrategy = "replace" | "keep-mine" | "keep-theirs";
 
 interface ParsedState {
@@ -50,8 +47,8 @@ interface ParsedState {
 }
 
 const cardStyle: React.CSSProperties = {
-  background: "var(--bd-bg-subtle)",
-  border: "1px solid var(--bd-border)",
+  background: "var(--bk-bg-subtle)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 8,
   padding: 12,
 };
@@ -60,17 +57,17 @@ const titleStyle: React.CSSProperties = {
   fontSize: 13,
   fontWeight: 500,
   marginBottom: 8,
-  color: "var(--bd-fg-primary)",
+  color: "var(--bk-ink)",
 };
 
 const dropZoneBaseStyle: React.CSSProperties = {
-  border: "1.5px dashed var(--bd-border)",
+  border: "1.5px dashed var(--bk-border)",
   borderRadius: 8,
   padding: "32px 16px",
   textAlign: "center",
   cursor: "pointer",
-  background: "var(--bd-bg-canvas, transparent)",
-  color: "var(--bd-fg-secondary)",
+  background: "var(--bk-bg-subtle, transparent)",
+  color: "var(--bk-ink-soft)",
   fontSize: 12,
   lineHeight: 1.55,
   transition: "border-color 120ms ease, background 120ms ease",
@@ -78,15 +75,15 @@ const dropZoneBaseStyle: React.CSSProperties = {
 
 const dropZoneActiveStyle: React.CSSProperties = {
   ...dropZoneBaseStyle,
-  borderColor: "var(--bd-accent)",
+  borderColor: "var(--bk-accent)",
   background: "rgba(45,109,255,0.06)",
 };
 
 const detailBlockStyle: React.CSSProperties = {
   marginTop: 12,
   padding: 12,
-  background: "var(--bd-bg-canvas)",
-  border: "1px solid var(--bd-border)",
+  background: "var(--bk-bg-subtle)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 6,
   display: "flex",
   flexDirection: "column",
@@ -102,23 +99,23 @@ const detailRowStyle: React.CSSProperties = {
 };
 
 const detailKeyStyle: React.CSSProperties = {
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
 };
 
 const detailValueStyle: React.CSSProperties = {
-  fontFamily: "var(--bd-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace)",
+  fontFamily: "var(--bk-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace)",
   fontSize: 11,
   textAlign: "right",
-  color: "var(--bd-fg-primary)",
+  color: "var(--bk-ink)",
 };
 
 const recentLabelStyle: React.CSSProperties = {
   marginTop: 12,
-  fontFamily: "var(--bd-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace)",
+  fontFamily: "var(--bk-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace)",
   fontSize: 10,
   textTransform: "uppercase",
   letterSpacing: "0.06em",
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
 };
 
 const conflictBoxStyle: React.CSSProperties = {
@@ -140,9 +137,9 @@ const conflictBtnRowStyle: React.CSSProperties = {
 
 const strategyBtnStyle = (selected: boolean): React.CSSProperties => ({
   padding: "6px 10px",
-  background: selected ? "var(--bd-accent)" : "transparent",
-  color: selected ? "#fff" : "var(--bd-fg-primary)",
-  border: `1px solid ${selected ? "var(--bd-accent)" : "var(--bd-border)"}`,
+  background: selected ? "var(--bk-accent)" : "transparent",
+  color: selected ? "#fff" : "var(--bk-ink)",
+  border: `1px solid ${selected ? "var(--bk-accent)" : "var(--bk-border)"}`,
   borderRadius: 6,
   fontSize: 11,
   cursor: "pointer",
@@ -158,7 +155,7 @@ const actionRowStyle: React.CSSProperties = {
 const applyBtnStyle: React.CSSProperties = {
   flex: 1,
   padding: "8px 14px",
-  background: "var(--bd-accent)",
+  background: "var(--bk-accent)",
   color: "#fff",
   border: "none",
   borderRadius: 6,
@@ -170,8 +167,8 @@ const applyBtnStyle: React.CSSProperties = {
 const cancelBtnStyle: React.CSSProperties = {
   padding: "8px 14px",
   background: "transparent",
-  color: "var(--bd-fg-primary)",
-  border: "1px solid var(--bd-border)",
+  color: "var(--bk-ink)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 6,
   fontSize: 12,
   cursor: "pointer",
@@ -183,7 +180,7 @@ const errorStyle: React.CSSProperties = {
   borderRadius: 6,
   background: "rgba(239,68,68,0.08)",
   border: "1px solid rgba(239,68,68,0.4)",
-  color: "var(--bd-fg-primary)",
+  color: "var(--bk-ink)",
   fontSize: 12,
 };
 
@@ -192,11 +189,11 @@ const pasteAreaStyle: React.CSSProperties = {
   minHeight: 100,
   marginTop: 6,
   padding: 8,
-  background: "var(--bd-bg-canvas)",
-  color: "var(--bd-fg-secondary)",
-  border: "1px solid var(--bd-border)",
+  background: "var(--bk-bg-subtle)",
+  color: "var(--bk-ink-soft)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 6,
-  fontFamily: "var(--bd-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace)",
+  fontFamily: "var(--bk-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace)",
   fontSize: 11,
   lineHeight: 1.55,
   boxSizing: "border-box",
@@ -207,8 +204,8 @@ const pasteSubmitStyle: React.CSSProperties = {
   marginTop: 6,
   padding: "5px 10px",
   background: "transparent",
-  color: "var(--bd-fg-primary)",
-  border: "1px solid var(--bd-border)",
+  color: "var(--bk-ink)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 6,
   fontSize: 11,
   cursor: "pointer",
@@ -377,13 +374,13 @@ export const ImportCard: React.FC = () => {
             onDragLeave={() => setIsDragOver(false)}
             onDrop={handleDrop}
           >
-            <div style={{ fontWeight: 500, color: "var(--bd-fg-primary)", marginBottom: 4 }}>
+            <div style={{ fontWeight: 500, color: "var(--bk-ink)", marginBottom: 4 }}>
               Drop tokens.json or tailwind.config.ts
             </div>
-            <div style={{ color: "var(--bd-fg-muted)" }}>
+            <div style={{ color: "var(--bk-ink-muted)" }}>
               or click to browse
             </div>
-            <Input
+            <TextInput
               ref={fileInputRef}
               type="file"
               accept="application/json,.json,.ts,.js"
@@ -399,20 +396,20 @@ export const ImportCard: React.FC = () => {
 
           <Button
             type="button"
-            variant="ghost"
-            size="sm"
+            color="light"
+            size="xs"
             onClick={() => setShowPaste((v) => !v)}
             style={{
               marginTop: 8,
               padding: 0,
               background: "transparent",
               border: "none",
-              color: "var(--bd-fg-muted)",
+              color: "var(--bk-ink-muted)",
               fontSize: 11,
               cursor: "pointer",
               textDecoration: "underline",
             }}
-            aria-expanded={showPaste}
+            aria-expanded={showPaste} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           >
             or paste JSON
           </Button>
@@ -433,7 +430,6 @@ export const ImportCard: React.FC = () => {
               </label>
               <Button
                 type="button"
-                variant="primary"
                 onClick={() => ingestRaw(pasteBuffer, null)}
                 style={pasteSubmitStyle}
                 disabled={!pasteBuffer.trim()}
@@ -461,7 +457,7 @@ export const ImportCard: React.FC = () => {
             </div>
             <div style={detailRowStyle}>
               <span style={detailKeyStyle}>Valid tokens</span>
-              <span style={{ ...detailValueStyle, color: "var(--bd-fg-success)" }}>
+              <span style={{ ...detailValueStyle, color: "var(--bk-ink-muted)" }}>
                 {parsed.tokens.length}
               </span>
             </div>
@@ -469,7 +465,7 @@ export const ImportCard: React.FC = () => {
               <span style={detailKeyStyle}>Errors</span>
               <span style={{
                 ...detailValueStyle,
-                color: parsed.errors.length > 0 ? "var(--bd-fg-danger)" : "var(--bd-fg-muted)",
+                color: parsed.errors.length > 0 ? "var(--bk-ink-muted)" : "var(--bk-ink-muted)",
               }}>
                 {parsed.errors.length === 0
                   ? "0"
@@ -480,7 +476,7 @@ export const ImportCard: React.FC = () => {
               <span style={detailKeyStyle}>Conflicts</span>
               <span style={{
                 ...detailValueStyle,
-                color: conflictCount > 0 ? "var(--bd-fg-warn)" : "var(--bd-fg-muted)",
+                color: conflictCount > 0 ? "var(--bk-ink-muted)" : "var(--bk-ink-muted)",
               }}>
                 {conflictCount === 0
                   ? "0"
@@ -491,17 +487,17 @@ export const ImportCard: React.FC = () => {
 
           {conflictCount > 0 && (
             <div style={conflictBoxStyle} data-testid="import-resolve-box">
-              <div style={{ fontSize: 12, fontWeight: 500, color: "var(--bd-fg-primary)" }}>
+              <div style={{ fontSize: 12, fontWeight: 500, color: "var(--bk-ink)" }}>
                 Resolve conflicts
               </div>
-              <div style={{ fontSize: 11, color: "var(--bd-fg-muted)" }}>
+              <div style={{ fontSize: 11, color: "var(--bk-ink-muted)" }}>
                 {conflictCount} tokens already exist with the same ID. Choose how to handle them:
               </div>
               <div style={conflictBtnRowStyle}>
                 <Button
                   type="button"
-                  variant="secondary"
-                  size="sm"
+                  color="light"
+                  size="xs"
                   onClick={() => setStrategy("replace")}
                   style={strategyBtnStyle(strategy === "replace")}
                   aria-pressed={strategy === "replace"}
@@ -510,8 +506,8 @@ export const ImportCard: React.FC = () => {
                 </Button>
                 <Button
                   type="button"
-                  variant="secondary"
-                  size="sm"
+                  color="light"
+                  size="xs"
                   onClick={() => setStrategy("keep-mine")}
                   style={strategyBtnStyle(strategy === "keep-mine")}
                   aria-pressed={strategy === "keep-mine"}
@@ -520,8 +516,8 @@ export const ImportCard: React.FC = () => {
                 </Button>
                 <Button
                   type="button"
-                  variant="secondary"
-                  size="sm"
+                  color="light"
+                  size="xs"
                   onClick={() => setStrategy("keep-theirs")}
                   style={strategyBtnStyle(strategy === "keep-theirs")}
                   aria-pressed={strategy === "keep-theirs"}
@@ -535,7 +531,6 @@ export const ImportCard: React.FC = () => {
           <div style={actionRowStyle}>
             <Button
               type="button"
-              variant="primary"
               onClick={handleApply}
               style={applyBtnStyle}
               disabled={applyCount === 0}
@@ -544,7 +539,7 @@ export const ImportCard: React.FC = () => {
             </Button>
             <Button
               type="button"
-              variant="secondary"
+              color="light"
               onClick={handleCancel}
               style={cancelBtnStyle}
             >

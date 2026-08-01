@@ -1,7 +1,7 @@
 /**
  * ComponentsTab — light-theme CSS (comp-* namespace)
  *
- * All colors use var(--bd-*) alias tokens. No raw hex.
+ * All colors use var(--bk-*) generated tokens. No raw hex.
  *
  * Pencil screens: gIKXw (list), E2jan (detail), 65J2Q (empty state)
  */
@@ -10,33 +10,33 @@
 .comp-row {
   display: flex;
   align-items: center;
-  gap: var(--bd-space-2);
-  padding: 0 var(--bd-space-3);
+  gap: var(--bk-space-8);
+  padding: 0 var(--bk-space-12);
   height: 36px;
   cursor: pointer;
-  border-radius: var(--bd-radius-sm-plus);
+  border-radius: var(--bk-radius-md);
   font-size: 13px;
-  color: var(--bd-fg-primary);
+  color: var(--bk-ink);
   transition: background 100ms ease;
 }
 
 .comp-row:hover {
-  background: var(--bd-bg-subtle, var(--bd-bg-subtle));
+  background: var(--bk-bg-subtle, var(--bk-bg-subtle));
 }
 
 .comp-row--selected {
-  background: var(--bd-accent-tint);
-  color: var(--bd-fg-primary);
+  background: var(--bk-accent-tint);
+  color: var(--bk-ink);
 }
 
 /* ── comp-count-badge: usage count "6x" pill ────────────────────────────── */
 .comp-count-badge {
   margin-left: auto;
   padding: 2px 6px;
-  background: var(--bd-bg-subtle, var(--bd-bg-subtle));
-  border-radius: var(--bd-radius-full);
+  background: var(--bk-bg-subtle, var(--bk-bg-subtle));
+  border-radius: var(--bk-radius-full);
   font-size: 11px;
-  color: var(--bd-fg-muted, var(--bd-fg-secondary));
+  color: var(--bk-ink-muted, var(--bk-ink-soft));
   font-weight: 500;
   flex-shrink: 0;
 }
@@ -47,27 +47,27 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--bd-space-2);
-  padding: var(--bd-space-8) var(--bd-space-5);
+  gap: var(--bk-space-8);
+  padding: var(--bk-space-32) var(--bk-space-20);
   text-align: center;
 }
 
 .comp-empty__icon {
   font-size: 32px;
-  color: var(--bd-fg-disabled, var(--bd-border-medium));
+  color: var(--bk-ink-disabled, var(--bk-border-medium));
   line-height: 1;
 }
 
 .comp-empty__title {
   font-size: 14px;
   font-weight: 600;
-  color: var(--bd-fg-primary);
+  color: var(--bk-ink);
   margin: 0;
 }
 
 .comp-empty__body {
   font-size: 12px;
-  color: var(--bd-fg-muted, var(--bd-fg-secondary));
+  color: var(--bk-ink-muted, var(--bk-ink-soft));
   margin: 0;
   max-width: 200px;
   line-height: 1.5;

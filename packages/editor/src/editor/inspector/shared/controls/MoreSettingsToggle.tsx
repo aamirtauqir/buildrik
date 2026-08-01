@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * MoreSettingsToggle — progressive disclosure. Ported to .bdi-adv.
  *
@@ -7,6 +6,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import { ChevronDown, ChevronRight } from "lucide-react";
 import * as React from "react";
+import { Button } from "@/editor/chrome-ui";
 
 export interface MoreSettingsToggleProps {
   isOpen: boolean;
@@ -44,9 +44,9 @@ export const MoreSettingsToggle: React.FC<MoreSettingsToggleProps> = ({
       {!isOpen && advancedCount && advancedCount > 0 && (
         <span
           style={{
-            font: "500 9.5px var(--bd-mono)",
-            color: "var(--bd-fg-muted)",
-            background: "var(--bd-bg-subtle)",
+            font: "500 9.5px var(--bk-font-mono)",
+            color: "var(--bk-ink-muted)",
+            background: "var(--bk-bg-subtle)",
             padding: "0 4px",
             borderRadius: 3,
             marginLeft: 2,

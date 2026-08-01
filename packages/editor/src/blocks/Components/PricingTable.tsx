@@ -91,7 +91,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
             position: "relative",
             padding: 32,
             background: plan.highlighted
-              ? "var(--buildrick-accent-subtle, rgba(0,212,170,0.1))"
+              ? "var(--bk-accent-subtle, rgba(0,212,170,0.1))"
               : "var(--buildrick-design-color-background)",
             border: plan.highlighted
               ? "2px solid var(--buildrick-design-color-primary)"

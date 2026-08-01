@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * TypePills — horizontal filter chips for media type (All / Img / Vid / Ico / Fnt).
  * Emits onTypeChange with the new filter. `counts` populate small badges.
@@ -8,6 +7,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import * as React from "react";
 import type { MediaTypeFilter, TypeCounts } from "../data/mediaTypes";
+import { Button } from "@/editor/chrome-ui";
 
 interface TypePillsProps {
   activeType: MediaTypeFilter;
@@ -45,8 +45,8 @@ export function TypePills({
             key={p.key}
             type="button"
             role="tab"
-            size="sm"
-            variant="ghost"
+            size="xs"
+            color="light"
             aria-selected={isActive}
             aria-label={p.title}
             title={p.title}

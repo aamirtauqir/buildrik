@@ -7,7 +7,7 @@
 
 import * as React from "react";
 import { EVENTS } from "../../shared/constants/events";
-import { useToast } from "@/editor/shared/vibcoder";
+import { useToast } from "@/editor/chrome-ui";
 import { getElementId } from "../../shared/utils/dragDrop";
 import type { CanvasProps, CanvasRef } from "./Canvas.types";
 import { DEVICE_SIZES } from "./Canvas.types";

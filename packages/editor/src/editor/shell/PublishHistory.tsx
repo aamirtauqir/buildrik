@@ -13,8 +13,9 @@
  */
 
 import * as React from "react";
-import { Button, Icon, Badge, Spinner } from "@/editor/shared/vibcoder";
-import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
+import { AlertCircle, CheckCircle2 } from "lucide-react";
+import { ConfirmDialog, Spinner } from "@/editor/chrome-ui";
+import { Badge, Button } from "@/editor/chrome-ui";
 import { useEditorRole } from "./hooks/useEditorRole";
 import { roleAtLeast } from "@/services/RoleService";
 import {
@@ -42,15 +43,15 @@ function relTime(iso: string | Date | null): string {
 
 const S: Record<string, React.CSSProperties> = {
   wrap: { display: "flex", flexDirection: "column", gap: 8, padding: 12, minWidth: 320 },
-  head: { fontSize: 13, fontWeight: 600, color: "var(--bd-text)" },
-  row: { display: "flex", alignItems: "center", gap: 8, justifyContent: "space-between", padding: "8px 10px", border: "1px solid var(--bd-border)", borderRadius: 8 },
+  head: { fontSize: 13, fontWeight: 600, color: "var(--bk-ink)" },
+  row: { display: "flex", alignItems: "center", gap: 8, justifyContent: "space-between", padding: "8px 10px", border: "1px solid var(--bk-border)", borderRadius: 8 },
   left: { display: "flex", flexDirection: "column", gap: 2 },
-  ver: { fontSize: 13, fontWeight: 600, color: "var(--bd-text)", display: "flex", alignItems: "center", gap: 6 },
-  meta: { fontSize: 11, color: "var(--bd-text-muted)" },
-  center: { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, padding: 24, textAlign: "center", color: "var(--bd-text-muted)" },
-  centerTitle: { fontSize: 14, fontWeight: 600, color: "var(--bd-text)" },
-  centerHint: { fontSize: 12, color: "var(--bd-text-muted)", maxWidth: 260 },
-  notice: { fontSize: 12, color: "var(--bd-text-muted)" },
+  ver: { fontSize: 13, fontWeight: 600, color: "var(--bk-ink)", display: "flex", alignItems: "center", gap: 6 },
+  meta: { fontSize: 11, color: "var(--bk-ink-muted)" },
+  center: { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, padding: 24, textAlign: "center", color: "var(--bk-ink-muted)" },
+  centerTitle: { fontSize: 14, fontWeight: 600, color: "var(--bk-ink)" },
+  centerHint: { fontSize: 12, color: "var(--bk-ink-muted)", maxWidth: 260 },
+  notice: { fontSize: 12, color: "var(--bk-ink-muted)" },
 };
 
 export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollbackStarted }) => {
@@ -101,16 +102,16 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
   if (state === "error") {
     return (
       <div style={S.center}>
-        <Icon name="alert-circle" size="lg" />
+        <AlertCircle size={24} aria-hidden="true" />
         <div style={S.centerTitle}>Couldn't load publish history</div>
-        <Button variant="secondary" size="sm" onClick={() => void load()}>Retry</Button>
+        <Button color="light" size="xs" onClick={() => void load()}>Retry</Button>
       </div>
     );
   }
   if (rows.length === 0) {
     return (
       <div style={S.center}>
-        <Icon name="check-circle" size="lg" />
+        <CheckCircle2 size={24} aria-hidden="true" />
         <div style={S.centerTitle}>No published versions yet</div>
         <div style={S.centerHint}>Publish this site and each version shows up here — you can roll back to any of the last 20.</div>
       </div>
@@ -132,15 +133,15 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
             <div style={S.left}>
               <span style={S.ver}>
                 Version {r.version}
-                {isLive && <Badge variant="published">Live</Badge>}
+                {isLive && <Badge color="gray">Live</Badge>}
                 {fromVersion !== undefined && <span style={S.meta}>↩ from v{fromVersion}</span>}
               </span>
               <span style={S.meta}>{relTime(r.completedAt)}</span>
             </div>
             {!isLive && (
               <Button
-                variant="secondary"
-                size="sm"
+                color="light"
+                size="xs"
                 disabled={!r.rollbackable || !canRollback}
                 title={
                   !canRollback
@@ -159,13 +160,13 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
       })}
 
       <ConfirmDialog
-        isOpen={confirm !== null}
+        open={confirm !== null}
         onClose={() => setConfirm(null)}
         onConfirm={() => void doRollback()}
         title={confirm ? `Roll back to version ${confirm.version}?` : "Roll back?"}
         message="This re-publishes that version as a new one — it doesn't delete anything and your current draft is untouched. The live site changes to the older version."
-        confirmText="Roll back now"
-        cancelText="Cancel"
+        confirmLabel="Roll back now"
+        cancelLabel="Cancel"
       />
     </div>
   );

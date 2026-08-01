@@ -7,7 +7,6 @@
 
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { TooltipProvider } from "@/editor/shared/vibcoder/Tooltip";
 import { MultiSelectToolbar } from "../MultiSelectToolbar";
 import { AlignmentHandler } from "@/engine/canvas/AlignmentHandler";
 import { makeMockElement, makeMockComposer } from "@/editor/inspector/__tests__/harness";
@@ -17,9 +16,7 @@ function renderToolbar(
   composer: unknown = makeMockComposer(),
 ) {
   return render(
-    <TooltipProvider>
-      <MultiSelectToolbar selectedIds={selectedIds} composer={composer as never} />
-    </TooltipProvider>
+    <MultiSelectToolbar selectedIds={selectedIds} composer={composer as never} />
   );
 }
 

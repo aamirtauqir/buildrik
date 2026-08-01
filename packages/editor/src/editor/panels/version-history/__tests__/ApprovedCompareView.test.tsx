@@ -8,7 +8,6 @@
 import * as React from "react";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { TooltipProvider } from "@/editor/shared/vibcoder";
 import { ApprovedCompareView } from "../ApprovedCompareView";
 import type { ComparePage } from "@/shared/utils/html";
 
@@ -18,9 +17,7 @@ const CURRENT_CHANGED = wrap(`<div class="root"><section class="hero"><h2>Two</h
 
 function renderView(props: Partial<React.ComponentProps<typeof ApprovedCompareView>> = {}) {
   return render(
-    <TooltipProvider>
-      <ApprovedCompareView approvedPages={APPROVED} currentPages={CURRENT_CHANGED} {...props} />
-    </TooltipProvider>,
+    <ApprovedCompareView approvedPages={APPROVED} currentPages={CURRENT_CHANGED} {...props} />,
   );
 }
 

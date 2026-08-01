@@ -7,14 +7,13 @@
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import { Z_LAYERS } from "../../../shared/constants/canvas";
-import { Textarea } from "@/editor/shared/vibcoder/Textarea";
-import { Button } from "@/editor/shared/vibcoder/Button";
 import { useStreamPrompt } from "../../sidebar/tabs/ai/hooks/useStreamPrompt";
 import { applyAiEdit } from "../../sidebar/tabs/ai/applySetStyle";
 import { DiffRows } from "../../sidebar/tabs/ai/DiffRows";
 import { DEFAULT_MODEL } from "../../sidebar/tabs/ai/types";
 import { trackAiEditApplied } from "@/services/ai/adoptionTracker";
 import "./AiPromptPopover.css";
+import { Button, Textarea } from "@/editor/chrome-ui";
 
 export interface AiPromptPopoverProps {
   composer: Composer;
@@ -89,7 +88,7 @@ export const AiPromptPopover: React.FC<AiPromptPopoverProps> = ({
         <>
           <DiffRows edit={stream.edit!} />
           <div className="bd-ai-popover-actions">
-            <Button type="button" variant="bare" onClick={onClose} aria-label="Discard">
+            <Button type="button" color="light" onClick={onClose} aria-label="Discard" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
               Discard
             </Button>
             <Button type="button" onClick={accept} aria-label="Apply changes">
@@ -102,7 +101,7 @@ export const AiPromptPopover: React.FC<AiPromptPopoverProps> = ({
       ) : (
         <>
           <Textarea
-            className="bd-ai-popover-input"
+            className="bd-ai-popover-input tw:bg-white tw:focus:border-primary-700 tw:focus:ring-primary-700"
             placeholder="Describe a change… e.g. make this dark"
             aria-label="AI prompt"
             value={text}

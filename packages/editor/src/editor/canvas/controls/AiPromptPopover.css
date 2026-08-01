@@ -3,13 +3,13 @@
   width: 248px;
   display: flex;
   flex-direction: column;
-  gap: var(--bd-space-2);
-  padding: var(--bd-space-2);
-  background: var(--bd-bg-panel);
-  border: 1px solid var(--bd-border);
-  border-radius: var(--bd-radius-md);
-  box-shadow: var(--bd-shadow-dropdown);
-  font-family: var(--bd-font);
+  gap: var(--bk-space-8);
+  padding: var(--bk-space-8);
+  background: var(--bk-bg-panel);
+  border: 1px solid var(--bk-border);
+  border-radius: var(--bk-radius-lg);
+  box-shadow: var(--bk-shadow-drag);
+  font-family: var(--bk-font-ui);
   pointer-events: auto;
 }
 
@@ -20,19 +20,19 @@
 .bd-ai-popover-actions {
   display: flex;
   justify-content: flex-end;
-  gap: var(--bd-space-2);
+  gap: var(--bk-space-8);
 }
 
 .bd-ai-popover-loading {
-  padding: var(--bd-space-2);
-  font-size: var(--bd-text-xs);
-  color: var(--bd-fg-muted);
+  padding: var(--bk-space-8);
+  font-size: var(--bk-text-11);
+  color: var(--bk-ink-muted);
 }
 
 .bd-ai-popover-error {
-  padding: var(--bd-space-2);
-  font-size: var(--bd-text-xs);
-  color: var(--bd-error);
+  padding: var(--bk-space-8);
+  font-size: var(--bk-text-11);
+  color: var(--bk-error);
 }
 
 .bd-ai-diff-rows {
@@ -41,33 +41,33 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--bd-space-1);
+  gap: var(--bk-space-4);
 }
 
 .bd-ai-diff-row {
   display: flex;
   align-items: baseline;
-  gap: var(--bd-space-2);
-  font-size: var(--bd-text-xs);
+  gap: var(--bk-space-8);
+  font-size: var(--bk-text-11);
 }
 
 .bd-ai-diff-field {
-  color: var(--bd-fg-muted);
-  font-family: var(--bd-mono);
+  color: var(--bk-ink-muted);
+  font-family: var(--bk-font-mono);
 }
 
 .bd-ai-diff-from {
-  color: var(--bd-fg-muted);
+  color: var(--bk-ink-muted);
   text-decoration: line-through;
 }
 
 .bd-ai-diff-to {
-  color: var(--bd-fg-primary);
-  font-family: var(--bd-mono);
+  color: var(--bk-ink);
+  font-family: var(--bk-font-mono);
   margin-left: auto;
 }
 
 .bd-ai-diff-empty {
-  font-size: var(--bd-text-xs);
-  color: var(--bd-fg-muted);
+  font-size: var(--bk-text-11);
+  color: var(--bk-ink-muted);
 }

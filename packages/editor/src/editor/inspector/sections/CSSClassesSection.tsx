@@ -1,5 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * CSS Classes Section - Add/Remove CSS classes
  * SSOT: reads classes from composer.elements.getElement().getClasses() on each render.
@@ -12,6 +10,7 @@ import type { Composer } from "../../../engine";
 import { devWarn } from "../../../shared/utils/devLogger";
 import { runTransaction } from "../../../shared/utils/helpers";
 import { Section, type SectionTier } from "../shared/controls";
+import { Button, TextInput } from "@/editor/chrome-ui";
 
 export interface CSSClassesSectionProps {
   selectedElement: {
@@ -143,7 +142,7 @@ export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
         {addingInline ? (
           <span className="bdi-chip bdi-chip-input" role="presentation">
             <span aria-hidden="true" style={{ opacity: 0.5 }}>.</span>
-            <Input
+            <TextInput
               ref={inlineInputRef}
               type="text"
               value={newClass}

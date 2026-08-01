@@ -8,15 +8,12 @@
 
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
-import { TooltipProvider } from "@/editor/shared/vibcoder/Tooltip";
 import { TypographyControls } from "../TypographyControls";
 
 function renderTypo(styles: Record<string, string> = {}, mixedKeys?: ReadonlySet<string>) {
   const onChange = vi.fn();
   const utils = render(
-    <TooltipProvider>
-      <TypographyControls styles={styles} onChange={onChange} mixedKeys={mixedKeys} />
-    </TooltipProvider>
+    <TypographyControls styles={styles} onChange={onChange} mixedKeys={mixedKeys} />
   );
   return { onChange, ...utils };
 }

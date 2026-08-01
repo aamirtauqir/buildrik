@@ -25,13 +25,13 @@
 :root {
   /* Widened to Figma 32-2 committed size tokens (2026-07-24, founder-approved).
      These now source from the design-system size tokens — one place to change. */
-  --layout-rail-width: var(--buildrick-size-rail);
-  --layout-drawer-width: var(--buildrick-size-drawer);
-  --layout-inspector-width: var(--buildrick-size-inspector);
-  --layout-topbar-height: var(--buildrick-size-topbar);
-  --layout-footer-height: var(--buildrick-size-footer);
-  --layout-gap: var(--buildrick-space-3);
-  --layout-touch-min: var(--buildrick-touch-min, 44px);
+  --layout-rail-width: var(--bk-size-rail);
+  --layout-drawer-width: var(--bk-size-drawer);
+  --layout-inspector-width: var(--bk-size-inspector);
+  --layout-topbar-height: var(--bk-size-topbar);
+  --layout-footer-height: var(--bk-size-row);
+  --layout-gap: var(--bk-space-12);
+  --layout-touch-min: var(--bk-size-header, 44px);
 }
 
 /* ============================================
@@ -56,9 +56,9 @@
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background: var(--buildrick-bg-app);
-  color: var(--buildrick-text-primary);
-  font-family: var(--buildrick-font-family);
+  background: var(--bk-bg-app);
+  color: var(--bk-ink);
+  font-family: var(--bk-font-ui);
 }
 
 /* No topbar slot provided — collapse the empty topbar row */
@@ -125,9 +125,9 @@
   bottom: 0;
   width: var(--layout-drawer-width, 280px);
   z-index: 200;
-  box-shadow: var(--buildrick-shadow-overlay);
+  box-shadow: var(--bk-shadow-overlay);
   border-right: none;
-  border-radius: 0 var(--buildrick-radius-lg) var(--buildrick-radius-lg) 0;
+  border-radius: 0 var(--bk-radius-lg) var(--bk-radius-lg) 0;
 }
 
 /* When no topbar slot, overlay starts from top */
@@ -144,8 +144,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 0;
-  background: var(--buildrick-bg-card);
-  border-bottom: 1px solid var(--buildrick-border);
+  background: var(--bk-bg-card);
+  border-bottom: 1px solid var(--bk-border);
   z-index: 100;
 }
 
@@ -156,11 +156,11 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 16px;
-  gap: var(--bd-space-4);
-  background: var(--buildrick-bg-card);
-  border-top: 1px solid var(--buildrick-border);
-  font: 500 var(--buildrick-text-xs) / var(--buildrick-lh-16) var(--buildrick-font-family);
-  color: var(--buildrick-text-muted);
+  gap: var(--bk-space-16);
+  background: var(--bk-bg-card);
+  border-top: 1px solid var(--bk-border);
+  font: 500 var(--bk-text-11) / var(--bk-space-16) var(--bk-font-ui);
+  color: var(--bk-ink-muted);
   z-index: 100;
 }
 
@@ -174,8 +174,8 @@
   align-items: center;
   padding: 10px 0 0;
   gap: 4px;
-  background: var(--buildrick-bg-app);
-  border-right: 1px solid var(--buildrick-border);
+  background: var(--bk-bg-app);
+  border-right: 1px solid var(--bk-border);
   z-index: 90;
   overflow-y: auto;
   overflow-x: clip;
@@ -257,16 +257,16 @@
   grid-area: drawer;
   display: flex;
   flex-direction: column;
-  background: var(--buildrick-bg-panel);
-  border-right: 1px solid var(--buildrick-border);
+  background: var(--bk-bg-panel);
+  border-right: 1px solid var(--bk-border);
   overflow: hidden;
   z-index: 80;
 
   transform: translateX(-100%);
   opacity: 0;
   transition:
-    transform var(--buildrick-duration-fast) var(--buildrick-ease-default),
-    opacity var(--buildrick-duration-fast) var(--buildrick-ease-default);
+    transform var(--bk-motion-fast) var(--bk-ease-default),
+    opacity var(--bk-motion-fast) var(--bk-ease-default);
 }
 
 .layout-shell__drawer--open {
@@ -283,7 +283,7 @@
   flex-direction: column;
   position: relative;
   overflow: hidden;
-  background: var(--buildrick-canvas-wrapper);
+  background: var(--bk-bg-subtle);
   min-width: 0; /* Prevent grid blowout */
 }
 
@@ -294,7 +294,7 @@
   inset: 0;
   background-image: radial-gradient(
     circle,
-    var(--buildrick-canvas-dot) 1px,
+    var(--bk-alpha-ink-08) 1px,
     transparent 1px
   );
   background-size: 20px 20px;
@@ -309,16 +309,16 @@
   grid-area: inspector;
   display: flex;
   flex-direction: column;
-  background: var(--buildrick-bg-panel);
-  border-left: 1px solid var(--buildrick-border);
+  background: var(--bk-bg-panel);
+  border-left: 1px solid var(--bk-border);
   overflow: hidden;
   z-index: 80;
 
   transform: translateX(100%);
   opacity: 0;
   transition:
-    transform var(--buildrick-duration-fast) var(--buildrick-ease-default),
-    opacity var(--buildrick-duration-fast) var(--buildrick-ease-default);
+    transform var(--bk-motion-fast) var(--bk-ease-default),
+    opacity var(--bk-motion-fast) var(--bk-ease-default);
 }
 
 .layout-shell__inspector--open {
@@ -345,7 +345,7 @@
   grid-area: fullpage;
   display: flex;
   flex-direction: column;
-  background: var(--buildrick-bg-card);
+  background: var(--bk-bg-card);
   overflow: hidden;
   min-width: 0;
 }
@@ -395,8 +395,8 @@
     right: var(--layout-gap, 12px);
     bottom: var(--layout-gap, 12px);
     width: var(--layout-inspector-width, 280px);
-    border-radius: var(--buildrick-radius-lg);
-    box-shadow: var(--buildrick-shadow-overlay);
+    border-radius: var(--bk-radius-lg);
+    box-shadow: var(--bk-shadow-overlay);
     z-index: 200;
   }
 }
@@ -415,6 +415,6 @@
 .layout-shell__drawer:focus-visible,
 .layout-shell__canvas:focus-visible,
 .layout-shell__inspector:focus-visible {
-  outline: 2px solid var(--buildrick-accent);
+  outline: 2px solid var(--bk-accent);
   outline-offset: -2px;
 }

@@ -10,8 +10,6 @@ export { AquibraStudio } from "./AquibraStudio";
 export type { AquibraStudioProps } from "./AquibraStudio";
 
 // Top bar + header
-export { Topbar } from "./Topbar";
-export type { TopbarProps } from "./Topbar";
 
 // Studio panels (3-column layout orchestrator)
 export { StudioPanels } from "./StudioPanels";

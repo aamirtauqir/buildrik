@@ -13,18 +13,14 @@ import * as React from "react";
 import { Plus, Trash2, Pencil } from "lucide-react";
 import type { Composer } from "../../../engine";
 import type { CMSCollection, CMSContentItem, CMSField } from "../../../shared/types/cms";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Textarea } from "@/editor/shared/vibcoder/Textarea";
-import { Select } from "@/editor/shared/vibcoder/Select";
 import {
-  Modal,
-  ModalContent,
-  ModalTitle,
   ModalClose,
-  OverlayMount,
-} from "@/editor/shared/vibcoder";
+  ModalContent,
+  ModalRoot,
+  ModalTitle,
+  Portal,
+} from "@/editor/chrome-ui";
+import { Button, Checkbox, Select, Textarea, TextInput } from "@/editor/chrome-ui";
 
 export interface CMSRecordsModalProps {
   composer: Composer | null;
@@ -136,11 +132,15 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
     if (field.type === "boolean") {
       return (
         <div {...common}>
-          <Checkbox
-            checked={Boolean(value)}
-            onChange={(e) => setField(field.slug, e.target.checked)}
-            label={field.name}
-          />
+          <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer" }}>
+            <Checkbox
+              color="blue"
+              className="tw:bg-white"
+              checked={Boolean(value)}
+              onChange={(e) => setField(field.slug, e.target.checked)}
+            />
+            <span>{field.name}</span>
+          </label>
         </div>
       );
     }
@@ -149,6 +149,7 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
         <div {...common}>
           <FieldLabel field={field} />
           <Textarea
+            className="tw:bg-white tw:focus:border-primary-700 tw:focus:ring-primary-700"
             value={String(value ?? "")}
             onChange={(e) => setField(field.slug, e.target.value)}
             placeholder={field.placeholder}
@@ -173,7 +174,7 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
     return (
       <div {...common}>
         <FieldLabel field={field} />
-        <Input
+        <TextInput
           type={inputType}
           value={String(value ?? "")}
           onChange={(e) =>
@@ -186,18 +187,18 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
   };
 
   return (
-    <OverlayMount>
-      <Modal open={isOpen} onOpenChange={(next) => !next && onClose()}>
+    <Portal>
+      <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
         <ModalContent size="lg">
           <ModalTitle>CMS Records</ModalTitle>
-          <ModalClose aria-label="Close modal">
+          <ModalClose aria-label="Close modal" onClick={onClose}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
               <path d="M18 6L6 18M6 6l12 12" />
             </svg>
           </ModalClose>
           <div className="bd-modal__body" style={{ minHeight: "20rem" }}>
             {collections.length === 0 ? (
-              <p style={{ color: "var(--bd-fg-secondary)" }}>
+              <p style={{ color: "var(--bk-ink-soft)" }}>
                 No collections yet. Create one from an element&apos;s CMS binding first.
               </p>
             ) : (
@@ -220,10 +221,10 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                   <div>
                     {collection.fields.map(renderField)}
                     <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-                      <Button variant="primary" size="sm" busy={busy} onClick={save}>
+                      <Button size="xs" disabled={busy} onClick={save} aria-busy={busy || undefined}>
                         {editingId === "" ? "Add record" : "Save"}
                       </Button>
-                      <Button variant="ghost" size="sm" onClick={() => setEditingId(null)}>
+                      <Button color="light" size="xs" onClick={() => setEditingId(null)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                         Cancel
                       </Button>
                     </div>
@@ -238,9 +239,9 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                           padding: "8px 10px",
                           fontSize: 12,
                           borderRadius: 4,
-                          color: "var(--bd-warning-strong, var(--bd-warning))",
-                          background: "var(--bd-warning-bg)",
-                          border: "1px solid var(--bd-warning-border)",
+                          color: "var(--bk-warning-text, var(--bk-warning))",
+                          background: "var(--bk-warning-tint)",
+                          border: "1px solid var(--bk-warning-text)",
                         }}
                       >
                         No records published yet — this collection generates a page per entry, but
@@ -248,21 +249,21 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                       </div>
                     )}
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                      <span style={{ fontSize: 12, color: "var(--bd-fg-secondary)" }}>
+                      <span style={{ fontSize: 12, color: "var(--bk-ink-soft)" }}>
                         {items.length} record{items.length === 1 ? "" : "s"}
                       </span>
-                      <Button variant="secondary" size="sm" onClick={startAdd} disabled={!collection}>
+                      <Button color="light" size="xs" onClick={startAdd} disabled={!collection}>
                         <Plus size={13} /> Add record
                       </Button>
                     </div>
                     <div>
                       {items.length === 0 ? (
-                        <p style={{ color: "var(--bd-fg-secondary)", fontSize: 13 }}>No records yet.</p>
+                        <p style={{ color: "var(--bk-ink-soft)", fontSize: 13 }}>No records yet.</p>
                       ) : (
                         items.map((item) => (
                           <div
                             key={item.id}
-                            style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid var(--bd-border)" }}
+                            style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid var(--bk-border)" }}
                           >
                             <span style={{ fontSize: 13 }}>
                               {collection ? displayValue(item, collection) : item.id}
@@ -271,7 +272,7 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                                   marginLeft: 8,
                                   fontSize: 11,
                                   fontWeight: 500,
-                                  color: item.status === "published" ? "var(--bd-success)" : "var(--bd-fg-muted)",
+                                  color: item.status === "published" ? "var(--bk-success)" : "var(--bk-ink-muted)",
                                 }}
                               >
                                 {item.status}
@@ -279,18 +280,18 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                             </span>
                             <span style={{ display: "flex", gap: 4 }}>
                               <Button
-                                variant="ghost"
-                                size="sm"
-                                busy={busy}
+                                color="light"
+                                size="xs"
+                                disabled={busy}
                                 onClick={() => setStatus(item.id, item.status === "published" ? "draft" : "published")}
-                                aria-label={item.status === "published" ? "Unpublish record" : "Publish record"}
+                                aria-label={item.status === "published" ? "Unpublish record" : "Publish record"} aria-busy={busy || undefined} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
                               >
                                 {item.status === "published" ? "Unpublish" : "Publish"}
                               </Button>
-                              <Button variant="ghost" size="sm" onClick={() => startEdit(item)} aria-label="Edit record">
+                              <Button color="light" size="xs" onClick={() => startEdit(item)} aria-label="Edit record" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                                 <Pencil size={13} />
                               </Button>
-                              <Button variant="ghost" size="sm" busy={busy} onClick={() => remove(item.id)} aria-label="Delete record">
+                              <Button color="light" size="xs" disabled={busy} onClick={() => remove(item.id)} aria-label="Delete record" aria-busy={busy || undefined} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                                 <Trash2 size={13} />
                               </Button>
                             </span>
@@ -304,15 +305,15 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
             )}
           </div>
         </ModalContent>
-      </Modal>
-    </OverlayMount>
+      </ModalRoot>
+    </Portal>
   );
 };
 
 const FieldLabel: React.FC<{ field: CMSField }> = ({ field }) => (
-  <label style={{ display: "block", fontSize: 12, marginBottom: 4, color: "var(--bd-fg-secondary)" }}>
+  <label style={{ display: "block", fontSize: 12, marginBottom: 4, color: "var(--bk-ink-soft)" }}>
     {field.name}
-    {field.validation?.required && <span style={{ color: "var(--bd-danger)" }}> *</span>}
+    {field.validation?.required && <span style={{ color: "var(--bk-error)" }}> *</span>}
   </label>
 );
 

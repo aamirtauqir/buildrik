@@ -1,5 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Media Quick Actions Component
  * Floating toolbar for image elements on canvas
@@ -9,6 +7,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 import * as React from "react";
 import { Edit2, Image, Type, Check, Palette } from "lucide-react";
 import type { Composer } from "../../../engine";
+import { Button, TextInput } from "@/editor/chrome-ui";
 
 interface MediaQuickActionsProps {
   composer: Composer;
@@ -18,7 +17,7 @@ interface MediaQuickActionsProps {
 
 // @lint-hex-policy: user-data icon-tint palette (color picker swatches, not chrome theme)
 const ICON_COLORS = [
-  "var(--bd-bg-card)", "#000000", "#3b82f6", "#ef4444", "#10b981", "#f59e0b", "#8b5cf6", "#ec4899"
+  "var(--bk-bg-card)", "#000000", "#3b82f6", "#ef4444", "#10b981", "#f59e0b", "#8b5cf6", "#ec4899"
 ];
 
 export const MediaQuickActions: React.FC<MediaQuickActionsProps> = ({
@@ -79,9 +78,9 @@ export const MediaQuickActions: React.FC<MediaQuickActionsProps> = ({
     <div style={{ position: "relative" }}>
       <div
         style={{
-          background: "var(--buildrick-bg-card)",
-          border: "1px solid var(--buildrick-border-light)",
-          borderRadius: "var(--bd-radius-sm-plus)",
+          background: "var(--bk-bg-card)",
+          border: "1px solid var(--bk-border)",
+          borderRadius: "var(--bk-radius-md)",
           display: "flex",
           alignItems: "center",
           padding: "4px",
@@ -97,7 +96,7 @@ export const MediaQuickActions: React.FC<MediaQuickActionsProps> = ({
 
         {isImage && (
           <>
-            <div style={{ width: 1, height: 16, background: "var(--buildrick-border-light)" }} />
+            <div style={{ width: 1, height: 16, background: "var(--bk-border)" }} />
             <Button onClick={handleEdit} title="Edit Image" style={actionBtnStyle}>
               <Edit2 size={14} />
               <span style={{ fontSize: "11px", fontWeight: 600 }}>Edit</span>
@@ -107,13 +106,13 @@ export const MediaQuickActions: React.FC<MediaQuickActionsProps> = ({
 
         {isIcon && (
           <>
-            <div style={{ width: 1, height: 16, background: "var(--buildrick-border-light)" }} />
+            <div style={{ width: 1, height: 16, background: "var(--bk-border)" }} />
             <Button 
               onClick={() => setShowColorPopover(!showColorPopover)} 
               title="Change Color" 
               style={{
                 ...actionBtnStyle,
-                background: showColorPopover ? "var(--buildrick-bg-subtle)" : "transparent"
+                background: showColorPopover ? "var(--bk-bg-subtle)" : "transparent"
               }}
             >
               <Palette size={14} />
@@ -124,13 +123,13 @@ export const MediaQuickActions: React.FC<MediaQuickActionsProps> = ({
 
         {isImage && (
           <>
-            <div style={{ width: 1, height: 16, background: "var(--buildrick-border-light)" }} />
+            <div style={{ width: 1, height: 16, background: "var(--bk-border)" }} />
             <Button 
               onClick={() => setShowAltPopover(!showAltPopover)} 
               title="Alt Text" 
               style={{
                 ...actionBtnStyle,
-                background: showAltPopover ? "var(--buildrick-bg-subtle)" : "transparent"
+                background: showAltPopover ? "var(--bk-bg-subtle)" : "transparent"
               }}
             >
               <Type size={14} />
@@ -144,7 +143,7 @@ export const MediaQuickActions: React.FC<MediaQuickActionsProps> = ({
         <div style={popoverStyle}>
           <div style={popoverTitleStyle}>Alt Text (SEO)</div>
           <div style={{ display: "flex", gap: "4px" }}>
-            <Input
+            <TextInput
               autoFocus
               type="text"
               value={altValue}
@@ -188,9 +187,9 @@ const popoverStyle: React.CSSProperties = {
   top: "100%",
   left: "50%",
   transform: "translateX(-50%) translateY(8px)",
-  background: "var(--buildrick-bg-card)",
-  border: "1px solid var(--buildrick-border-light)",
-  borderRadius: "var(--bd-radius-sm-plus)",
+  background: "var(--bk-bg-card)",
+  border: "1px solid var(--bk-border)",
+  borderRadius: "var(--bk-radius-md)",
   padding: "10px",
   boxShadow: "0 8px 24px rgba(0,0,0,0.3)",
   display: "flex",
@@ -203,23 +202,23 @@ const popoverStyle: React.CSSProperties = {
 const popoverTitleStyle: React.CSSProperties = {
   fontSize: "10px",
   fontWeight: 600,
-  color: "var(--buildrick-text-disabled)",
+  color: "var(--bk-ink-disabled)",
   textTransform: "uppercase"
 };
 
 const inputStyle: React.CSSProperties = {
   flex: 1,
-  background: "var(--buildrick-bg-subtle)",
-  border: "1px solid var(--buildrick-border-light)",
+  background: "var(--bk-bg-subtle)",
+  border: "1px solid var(--bk-border)",
   borderRadius: "4px",
   padding: "4px 8px",
-  color: "var(--buildrick-text-primary)",
+  color: "var(--bk-ink)",
   fontSize: "12px",
   outline: "none"
 };
 
 const saveBtnStyle: React.CSSProperties = {
-  background: "var(--buildrick-accent)",
+  background: "var(--bk-accent)",
   border: "none",
   borderRadius: "4px",
   width: "24px",
@@ -234,7 +233,7 @@ const saveBtnStyle: React.CSSProperties = {
 const actionBtnStyle: React.CSSProperties = {
   background: "transparent",
   border: "none",
-  color: "var(--buildrick-text-primary)",
+  color: "var(--bk-ink)",
   padding: "4px 8px",
   borderRadius: "4px",
   display: "flex",

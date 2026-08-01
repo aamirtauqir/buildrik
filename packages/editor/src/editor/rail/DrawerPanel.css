@@ -16,7 +16,7 @@
   flex-direction: column;
   width: 100%;
   height: 100%;
-  background: var(--buildrick-bg-panel);
+  background: var(--bk-bg-panel);
   overflow: hidden;
 }
 
@@ -24,7 +24,7 @@
 
 /* Pinned state indicator */
 .drawer-panel--pinned {
-  border-left: 2px solid var(--buildrick-accent);
+  border-left: 2px solid var(--bk-accent);
 }
 
 /* ============================================
@@ -34,33 +34,33 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: var(--buildrick-size-header);
-  padding: 0 var(--bd-space-3) 0 var(--bd-space-4);
-  background: var(--buildrick-bg-panel);
-  border-bottom: 1px solid var(--buildrick-border);
+  min-height: var(--bk-size-header);
+  padding: 0 var(--bk-space-12) 0 var(--bk-space-16);
+  background: var(--bk-bg-panel);
+  border-bottom: 1px solid var(--bk-border);
   flex-shrink: 0;
 }
 
 .drawer-panel__title {
   margin: 0;
-  font-size: var(--buildrick-text-xs);
-  line-height: var(--buildrick-lh-16);
-  font-weight: var(--buildrick-font-weight-medium);
-  color: var(--buildrick-ink-soft);
+  font-size: var(--bk-text-11);
+  line-height: var(--bk-space-16);
+  font-weight: var(--bk-weight-medium);
+  color: var(--bk-ink-soft);
   text-transform: uppercase;
-  letter-spacing: var(--buildrick-tracking-wider);
+  letter-spacing: var(--bk-tracking-normal);
 }
 
 .drawer-panel__controls {
   display: flex;
   align-items: center;
-  gap: var(--bd-space-1);
+  gap: var(--bk-space-4);
 }
 
 /* Pin button styling */
 .drawer-panel__pin-btn {
   opacity: 0.6;
-  transition: opacity var(--buildrick-duration-fast) var(--buildrick-ease-default);
+  transition: opacity var(--bk-motion-fast) var(--bk-ease-default);
 }
 
 .drawer-panel__pin-btn:hover,
@@ -70,12 +70,12 @@
 
 /* Close button — color feedback only, no transform (minimal motion) */
 .drawer-panel__close-btn {
-  color: var(--buildrick-ink-soft);
-  transition: color var(--buildrick-duration-fast) var(--buildrick-ease-default);
+  color: var(--bk-ink-soft);
+  transition: color var(--bk-motion-fast) var(--bk-ease-default);
 }
 
 .drawer-panel__close-btn:hover {
-  color: var(--buildrick-ink);
+  color: var(--bk-ink);
 }
 
 /* ============================================
@@ -98,26 +98,26 @@
 }
 
 .drawer-panel__content::-webkit-scrollbar-thumb {
-  background: var(--buildrick-border-medium);
+  background: var(--bk-border-medium);
   border-radius: 3px;
 }
 
 .drawer-panel__content::-webkit-scrollbar-thumb:hover {
-  background: var(--buildrick-border-strong);
+  background: var(--bk-border-strong);
 }
 
 /* Firefox scrollbar */
 .drawer-panel__content {
   scrollbar-width: thin;
-  scrollbar-color: var(--buildrick-border-medium) transparent;
+  scrollbar-color: var(--bk-border-medium) transparent;
 }
 
 /* ============================================
    Footer (Optional)
    ============================================ */
 .drawer-panel__footer {
-  padding: var(--bd-space-3) var(--bd-space-4);
-  background: var(--buildrick-bg-panel);
-  border-top: 1px solid var(--buildrick-border);
+  padding: var(--bk-space-12) var(--bk-space-16);
+  background: var(--bk-bg-panel);
+  border-top: 1px solid var(--bk-border);
   flex-shrink: 0;
 }

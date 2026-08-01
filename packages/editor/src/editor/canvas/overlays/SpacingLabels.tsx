@@ -23,7 +23,7 @@ const labelStyle: React.CSSProperties = {
   borderRadius: "2px",
   fontSize: "10px",
   fontFamily: "monospace",
-  color: "var(--buildrick-text-primary)",
+  color: "var(--bk-ink)",
   transform: "translateX(-50%)",
 };
 

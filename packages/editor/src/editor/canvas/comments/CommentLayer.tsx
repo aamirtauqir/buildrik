@@ -5,7 +5,12 @@
  * Self-contained: mounts inside the canvas content root (same coordinate space
  * as the page, so pins inherit the zoom transform) and talks to the rest of
  * the shell only through composer events:
- *   "ui:comment-mode"          {on}   Topbar toggle ↔ layer state
+ *   "ui:comment-mode"          {on?}  COMMAND in: toggle ({}) or set ({on})
+ *   "ui:comment-mode-changed"  {on}   STATE out: layer → topbar pressed state.
+ *                                     Fires on every mode change AND from the
+ *                                     unmount cleanup while mode is on — a
+ *                                     page/project switch mid-mode must
+ *                                     un-press the bar toggle.
  *   "comments:refresh"                anyone → refetch pins
  *   "comments:orphans"         {ids}  layer → ReviewTab Detached group
  *   "comments:reattach-start"  {id}   ReviewTab → layer pick-to-reattach
@@ -17,10 +22,8 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Textarea } from "@/editor/shared/vibcoder/Textarea";
-import { Modal, ModalContent, ModalTitle, ModalFooter } from "@/editor/shared/vibcoder/Modal";
-import { useToast } from "@/editor/shared/vibcoder/Toast";
+import { ModalContent, ModalFooter, ModalRoot, ModalTitle, isModalOpen } from "@/editor/chrome-ui";
+import { useToast } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants";
 import { Z_LAYERS } from "@/shared/constants/canvas";
@@ -37,6 +40,7 @@ import {
   pinPosition,
   pointToFractions,
 } from "./commentAnchors";
+import { Button, Textarea } from "@/editor/chrome-ui";
 
 interface CommentLayerProps {
   composer: Composer | null;
@@ -79,11 +83,11 @@ function PinDot({
         top: top - PIN_SIZE / 2,
         width: PIN_SIZE,
         height: PIN_SIZE,
-        borderRadius: "var(--bd-radius-full) var(--bd-radius-full) var(--bd-radius-full) var(--bd-radius-sm)",
-        background: ghost ? "var(--bd-accent-tint)" : "var(--bd-accent)",
-        color: ghost ? "var(--bd-accent)" : "var(--bd-bg-card)",
-        border: "2px solid var(--bd-bg-card)",
-        boxShadow: "var(--bd-shadow-md)",
+        borderRadius: "var(--bk-radius-full) var(--bk-radius-full) var(--bk-radius-full) var(--bk-radius-sm)",
+        background: ghost ? "var(--bk-accent-tint)" : "var(--bk-accent)",
+        color: ghost ? "var(--bk-accent)" : "var(--bk-bg-card)",
+        border: "2px solid var(--bk-bg-card)",
+        boxShadow: "var(--bk-shadow-drag)",
         fontSize: 11,
         fontWeight: 700,
         display: "flex",
@@ -173,6 +177,23 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
     return () => window.removeEventListener("resize", bump);
   }, []);
 
+  // ── State broadcast (ui:comment-mode-changed) ──────────────────────────────
+  // The command event above can't tell subscribers the CURRENT state (its
+  // payload is toggle-or-set), so the layer — the state owner — broadcasts
+  // every change. The unmount emit is ref-guarded to fire only while mode is
+  // on: without it, a page switch mid-mode leaves the topbar toggle pressed.
+  const modeOnRef = React.useRef(false);
+  React.useEffect(() => {
+    modeOnRef.current = modeOn;
+    composer?.emit("ui:comment-mode-changed", { on: modeOn });
+  }, [composer, modeOn]);
+  React.useEffect(() => {
+    if (!composer) return;
+    return () => {
+      if (modeOnRef.current) composer.emit("ui:comment-mode-changed", { on: false });
+    };
+  }, [composer]);
+
   // Initial + mode-entry fetch.
   React.useEffect(() => {
     if (modeOn || reattachingId) refresh();
@@ -186,6 +207,11 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
     if (!modeOn && !reattachingId) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
+      // A capture-phase window listener outranks every dialog — so it must
+      // yield when one is open. Without this, Esc killed comment mode UNDER
+      // the modal and the stopPropagation left the modal open (live-repro).
+      // Esc closes the topmost layer; the modal is topmost.
+      if (isModalOpen()) return;
       e.stopPropagation();
       if (draft) {
         setDraft(null);
@@ -349,9 +375,9 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
             left: "50%",
             transform: "translateX(-50%)",
             padding: "4px 10px",
-            background: "var(--bd-accent)",
-            color: "var(--bd-bg-card)",
-            borderRadius: "var(--bd-radius-full)",
+            background: "var(--bk-accent)",
+            color: "var(--bk-bg-card)",
+            borderRadius: "var(--bk-radius-full)",
             fontSize: 12,
             fontWeight: 600,
             zIndex: Z_LAYERS.floatingPanel,
@@ -384,16 +410,17 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
               left: draft.left + 16,
               top: draft.top + 8,
               width: 236,
-              background: "var(--bd-bg-card)",
-              border: "1px solid var(--bd-border)",
-              borderRadius: "var(--bd-radius-md)",
-              boxShadow: "var(--bd-shadow-dropdown)",
+              background: "var(--bk-bg-card)",
+              border: "1px solid var(--bk-border)",
+              borderRadius: "var(--bk-radius-lg)",
+              boxShadow: "var(--bk-shadow-drag)",
               padding: 10,
               zIndex: Z_LAYERS.floatingPanel,
             }}
             onClick={(e) => e.stopPropagation()}
           >
             <Textarea
+              className="tw:bg-white tw:focus:border-primary-700 tw:focus:ring-primary-700"
               autoFocus
               rows={3}
               maxLength={2000}
@@ -406,16 +433,16 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
             />
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 6, marginTop: 8 }}>
               <Button
-                variant="ghost"
-                size="sm"
+                color="light"
+                size="xs"
                 onClick={() => {
                   setDraft(null);
                   setDraftBody("");
-                }}
+                }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
               >
                 Cancel
               </Button>
-              <Button variant="primary" size="sm" disabled={!draftBody.trim() || posting} onClick={() => void handlePost()}>
+              <Button size="xs" disabled={!draftBody.trim() || posting} onClick={() => void handlePost()}>
                 {posting ? "Posting…" : "Post"}
               </Button>
             </div>
@@ -424,14 +451,14 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
       )}
 
       {/* Orphan-comment modal (board 184:56) */}
-      <Modal open={orphanModal != null} onOpenChange={(o) => !o && setOrphanModal(null)}>
+      <ModalRoot open={orphanModal != null} onOpenChange={(o) => !o && setOrphanModal(null)}>
         <ModalContent size="lg" srTitle="Comments lost their element">
           <ModalTitle>
             {orphanModal?.length === 1
               ? "A comment lost its element"
               : `${orphanModal?.length ?? 0} comments lost their element`}
           </ModalTitle>
-          <p style={{ fontSize: 13, color: "var(--bd-fg-muted)", margin: "8px 0 12px" }}>
+          <p style={{ fontSize: 13, color: "var(--bk-ink-muted)", margin: "8px 0 12px" }}>
             The elements these were pinned to were deleted. The comments are kept — never
             auto-deleted — and moved to the Detached group at the top of the Review panel.
           </p>
@@ -440,22 +467,21 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
               <div
                 key={c.id}
                 style={{
-                  background: "var(--bd-warning-tint)",
-                  border: "1px solid var(--bd-warning-border)",
-                  borderRadius: "var(--bd-radius-sm)",
+                  background: "var(--bk-warning-tint)",
+                  border: "1px solid var(--bk-warning-text)",
+                  borderRadius: "var(--bk-radius-sm)",
                   padding: "8px 10px",
                   fontSize: 12,
                 }}
               >
-                <div style={{ color: "var(--bd-fg-primary)" }}>&ldquo;{c.body.slice(0, 120)}&rdquo;</div>
-                <div style={{ color: "var(--bd-warn-strong)", marginTop: 2 }}>was pinned to a deleted element</div>
+                <div style={{ color: "var(--bk-ink)" }}>&ldquo;{c.body.slice(0, 120)}&rdquo;</div>
+                <div style={{ color: "var(--bk-warning-text)", marginTop: 2 }}>was pinned to a deleted element</div>
               </div>
             ))}
           </div>
           <ModalFooter>
             <Button
-              variant="primary"
-              size="sm"
+              size="xs"
               onClick={() => {
                 setOrphanModal(null);
                 composer?.emit("ui:switch-tab", { tab: "review" });
@@ -465,7 +491,7 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
             </Button>
           </ModalFooter>
         </ModalContent>
-      </Modal>
+      </ModalRoot>
     </>
   );
 };

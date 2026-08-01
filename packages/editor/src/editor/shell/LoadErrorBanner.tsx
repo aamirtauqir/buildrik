@@ -13,8 +13,7 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/shared/vibcoder/Button";
-
+import { Button } from "@/editor/chrome-ui";
 export type LoadErrorKind = "auth" | "network" | null;
 
 export interface LoadErrorBannerProps {
@@ -25,7 +24,7 @@ export interface LoadErrorBannerProps {
 }
 
 const S: Record<string, React.CSSProperties> = {
-  bar: { display: "flex", alignItems: "center", gap: 12, padding: "10px 16px", background: "var(--bd-warning-tint)", borderBottom: "1px solid var(--bd-border)", fontSize: 13, color: "var(--bd-text)" },
+  bar: { display: "flex", alignItems: "center", gap: 12, padding: "10px 16px", background: "var(--bk-warning-tint)", borderBottom: "1px solid var(--bk-border)", fontSize: 13, color: "var(--bk-ink)" },
   text: { flex: 1, lineHeight: 1.4 },
   strong: { fontWeight: 600 },
   actions: { display: "flex", alignItems: "center", gap: 8 },
@@ -49,9 +48,9 @@ export const LoadErrorBanner: React.FC<LoadErrorBannerProps> = ({ kind, onRetry,
         )}
       </div>
       <div style={S.actions}>
-        {onDismiss && <Button variant="ghost" size="sm" onClick={onDismiss}>Dismiss</Button>}
-        {isAuth && <Button variant="secondary" size="sm" onClick={onSignIn}>Sign in</Button>}
-        <Button variant="primary" size="sm" onClick={onRetry}>Retry</Button>
+        {onDismiss && <Button color="light" size="xs" onClick={onDismiss} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">Dismiss</Button>}
+        {isAuth && <Button color="light" size="xs" onClick={onSignIn}>Sign in</Button>}
+        <Button size="xs" onClick={onRetry}>Retry</Button>
       </div>
     </div>
   );

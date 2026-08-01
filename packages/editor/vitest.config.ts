@@ -20,11 +20,24 @@ export default defineConfig({
       "scripts/codemods/*.{test,spec}.{ts,tsx}",
       // Dashboard unification tests (Phase 0-3 spec §550). Co-located in the
       // dashboard package; run from here to reuse RTL + jsdom + setup.
-      "../dashboard/**/__tests__/*.{test,spec}.{ts,tsx}",
+      // Scoped to the dashboard's own source dirs, NOT "../dashboard/**".
+      // packages/dashboard/node_modules/@buildrik/editor is a symlink back to
+      // THIS package, so the wildcard walked into it and collected all 295
+      // editor test files a second time — every failure printed twice and the
+      // suite ran for twice as long. Excluding node_modules does not help:
+      // vitest resolves the symlink to its real path, which has no node_modules
+      // segment left to match. Narrowing the glob is the fix that holds.
+      "../dashboard/{app,components,emails,lib,hooks}/**/__tests__/*.{test,spec}.{ts,tsx}",
       // Server-side unification tests (userCanEditSite auth gate, future
       // route handler tests). Live at the repo-root `server/` tree.
       "../../server/**/__tests__/*.{test,spec}.{ts,tsx}",
     ],
+    // packages/dashboard/node_modules/@buildrik/editor is a SYMLINK back to this
+    // package, so the ../dashboard glob above walks into it and collects all 295
+    // editor test files a second time. Every failure printed twice and the suite
+    // took twice as long. Vitest's default exclude does not cover a symlinked
+    // node_modules reached through an explicit include, so it is spelled out.
+    exclude: ["**/node_modules/**", "**/dist/**", "**/.{idea,git,cache,output,temp}/**"],
     setupFiles: ["./src/test-setup.ts"],
     testTimeout: 15000,
     coverage: {

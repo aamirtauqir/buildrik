@@ -1,4 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
 /**
  * Video Preview Component
  * Video player with controls, thumbnail extraction, and duration display
@@ -6,16 +5,8 @@ import { Input } from "@/editor/shared/vibcoder/Input";
  */
 
 import * as React from "react";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Stack } from "@/editor/shared/vibcoder/Stack";
-import {
-  Modal,
-  ModalContent,
-  ModalTitle,
-  ModalClose,
-  OverlayMount,
-} from "@/editor/shared/vibcoder";
-
+import { ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/chrome-ui";
+import { Button, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -183,20 +174,18 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
 
   if (state.error) {
     return (
-      <Stack
+      <div
+        className="tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-0"
         style={{
-          alignItems: "center",
-          justifyContent: "center",
           padding: 40,
-          background: "var(--buildrick-bg-panel-secondary)",
+          background: "var(--bk-bg-subtle)",
           borderRadius: 8,
-          color: "var(--buildrick-text-muted)",
-          gap: 0,
+          color: "var(--bk-ink-muted)",
         }}
       >
         <span style={{ fontSize: 32, marginBottom: 12 }}>⚠️</span>
         <span>{state.error}</span>
-      </Stack>
+      </div>
     );
   }
 
@@ -218,7 +207,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
         style={{
           width: "100%",
           display: "block",
-          background: "var(--buildrick-text-primary)",
+          background: "var(--bk-ink)",
           maxHeight: 400,
         }}
       />
@@ -234,7 +223,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
             background: "rgba(0,0,0,0.5)",
           }}
         >
-          <span style={{ color: "var(--buildrick-text-on-accent)", fontSize: 14 }}>Loading...</span>
+          <span style={{ color: "var(--bk-accent-on)", fontSize: 14 }}>Loading...</span>
         </div>
       )}
       {/* Controls */}
@@ -264,7 +253,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
             style={{
               height: "100%",
               width: `${progressPercent}%`,
-              background: "var(--buildrick-accent)",
+              background: "var(--bk-accent)",
               borderRadius: 2,
               transition: "width 0.1s linear",
             }}
@@ -285,7 +274,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
             style={{
               background: "transparent",
               border: "none",
-              color: "var(--buildrick-text-on-accent)",
+              color: "var(--bk-accent-on)",
               cursor: "pointer",
               fontSize: 16,
               padding: 4,
@@ -301,7 +290,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
             style={{
               background: "rgba(255,255,255,0.2)",
               border: "none",
-              color: "var(--buildrick-text-on-accent)",
+              color: "var(--bk-accent-on)",
               cursor: "pointer",
               fontSize: 18,
               padding: "8px 12px",
@@ -317,7 +306,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
             style={{
               background: "transparent",
               border: "none",
-              color: "var(--buildrick-text-on-accent)",
+              color: "var(--bk-accent-on)",
               cursor: "pointer",
               fontSize: 16,
               padding: 4,
@@ -328,7 +317,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
           </Button>
 
           {/* Time display */}
-          <span style={{ color: "var(--buildrick-text-on-accent)", fontSize: 12, fontFamily: "monospace" }}>
+          <span style={{ color: "var(--bk-accent-on)", fontSize: 12, fontFamily: "monospace" }}>
             {formatTime(state.currentTime)} / {formatTime(state.duration)}
           </span>
 
@@ -342,7 +331,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
               style={{
                 background: "transparent",
                 border: "none",
-                color: "var(--buildrick-text-on-accent)",
+                color: "var(--bk-accent-on)",
                 cursor: "pointer",
                 fontSize: 16,
                 padding: 4,
@@ -350,7 +339,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
             >
               {state.isMuted || state.volume === 0 ? "🔇" : "🔊"}
             </Button>
-            <Input
+            <TextInput
               type="range"
               min={0}
               max={1}
@@ -372,7 +361,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
             padding: "4px 12px",
             background: "rgba(0,0,0,0.6)",
             borderRadius: 4,
-            color: "var(--buildrick-text-on-accent)",
+            color: "var(--bk-accent-on)",
             fontSize: 13,
             fontWeight: 500,
           }}
@@ -392,8 +381,8 @@ export const VideoPreview: React.FC<VideoPreviewProps> = (props) => {
   if (props.isModal) {
     const handleClose = props.onClose || (() => {});
     return (
-      <OverlayMount>
-        <Modal
+      <Portal>
+        <ModalRoot
           open={props.isOpen || false}
           onOpenChange={(next) => !next && handleClose()}
         >
@@ -413,14 +402,14 @@ export const VideoPreview: React.FC<VideoPreviewProps> = (props) => {
                   marginTop: 16,
                 }}
               >
-                <Button variant="ghost" onClick={props.onClose}>
+                <Button color="light" onClick={props.onClose} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                   Close
                 </Button>
               </div>
             </div>
           </ModalContent>
-        </Modal>
-      </OverlayMount>
+        </ModalRoot>
+      </Portal>
     );
   }
 

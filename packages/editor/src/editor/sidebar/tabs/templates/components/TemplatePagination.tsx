@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * TemplatePagination — page-number bar for the Templates grid.
  *
@@ -9,6 +8,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button } from "@/editor/chrome-ui";
 
 export interface TemplatePaginationProps {
   currentPage: number;

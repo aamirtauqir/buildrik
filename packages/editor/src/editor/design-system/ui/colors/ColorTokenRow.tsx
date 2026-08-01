@@ -9,34 +9,33 @@ import { useClickOutside } from "../../../../shared/hooks/useClickOutside";
 import type { DesignToken, WcagLevel } from "../../types";
 import { calcWcagLevel, wcagTooltip, calcContrastRatio } from "../../utils/colorUtils";
 import { ColorPicker } from "./ColorPicker";
-import { Button } from "@/editor/shared/vibcoder/Button";
-
+import { Button } from "@/editor/chrome-ui";
 // ─── WCAG Badge ───────────────────────────────────────────────────────────────
 
 const WCAG_BADGE_STYLES: Record<WcagLevel, React.CSSProperties> = {
   aaa: {
     background: "rgba(34,197,94,0.15)",
-    color: "var(--bd-success)",
+    color: "var(--bk-success)",
     border: "1px solid rgba(34,197,94,0.3)",
   },
   aa: {
     background: "rgba(45, 109, 255, 0.15)",
-    color: "var(--bd-accent)",
+    color: "var(--bk-accent)",
     border: "1px solid rgba(45, 109, 255, 0.3)",
   },
   "aa-large": {
     background: "rgba(245,158,11,0.12)",
-    color: "var(--bd-warning)",
+    color: "var(--bk-warning)",
     border: "1px solid rgba(245,158,11,0.3)",
   },
   fail: {
     background: "rgba(239,68,68,0.12)",
-    color: "var(--bd-error)",
+    color: "var(--bk-error)",
     border: "1px solid rgba(239,68,68,0.3)",
   },
   na: {
     background: "rgba(113,113,122,0.15)",
-    color: "var(--bd-fg-muted)",
+    color: "var(--bk-ink-muted)",
     border: "1px solid rgba(113,113,122,0.3)",
   },
 };
@@ -161,8 +160,8 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
         flexDirection: "column",
         borderRadius: 8,
         overflow: "hidden",
-        border: isChanged ? "1px solid rgba(245,158,11,0.4)" : "1px solid var(--bd-border)",
-        borderLeft: isChanged ? /* @lint-hex-policy: "changed" indicator amber-500, matches sibling rgba(245,158,11) accents (off chrome palette) */ "3px solid #f59e0b" : "1px solid var(--bd-border)",
+        border: isChanged ? "1px solid rgba(245,158,11,0.4)" : "1px solid var(--bk-border)",
+        borderLeft: isChanged ? /* @lint-hex-policy: "changed" indicator amber-500, matches sibling rgba(245,158,11) accents (off chrome palette) */ "3px solid #f59e0b" : "1px solid var(--bk-border)",
         background: isExpanded ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.03)",
         transition: "border-color 0.15s",
       }}
@@ -212,7 +211,7 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
               style={{
                 fontSize: 12,
                 fontWeight: 500,
-                color: "var(--bd-fg-primary)",
+                color: "var(--bk-ink)",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 whiteSpace: "nowrap",
@@ -226,8 +225,8 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
                 style={{
                   width: 6,
                   height: 6,
-                  borderRadius: "var(--bd-radius-full)",
-                  background: "var(--bd-warning)",
+                  borderRadius: "var(--bk-radius-full)",
+                  background: "var(--bk-warning)",
                   flexShrink: 0,
                 }}
                 title="Unsaved change"
@@ -235,19 +234,19 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
             )}
           </div>
           <Button
-            variant="ghost"
+            color="light"
             onClick={handleCopyHex}
             style={{
               background: "none",
               border: "none",
               padding: 0,
               cursor: "pointer",
-              color: copied ? "var(--bd-success)" : "var(--bd-fg-muted)",
+              color: copied ? "var(--bk-success)" : "var(--bk-ink-muted)",
               fontSize: 12,
               fontFamily: "monospace",
               letterSpacing: "0.3px",
             }}
-            title="Click to copy hex"
+            title="Click to copy hex" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           >
             {copied ? "Copied!" : token.value.toUpperCase()}
           </Button>
@@ -257,10 +256,10 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
         {showWcag && (
           <div ref={popoverRef} style={{ position: "relative" }}>
             <Button
-              variant="ghost"
+              color="light"
               onClick={() => setShowWcagPopover((v) => !v)}
               style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}
-              aria-label={wcagTooltip(wcagLevel)}
+              aria-label={wcagTooltip(wcagLevel)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
             >
               <WcagBadge level={wcagLevel} />
             </Button>
@@ -270,8 +269,8 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
                   position: "absolute",
                   top: "calc(100% + 4px)",
                   right: 0,
-                  background: "var(--bd-bg-subtle)",
-                  border: "1px solid var(--bd-border)",
+                  background: "var(--bk-bg-subtle)",
+                  border: "1px solid var(--bk-border)",
                   borderRadius: 8,
                   padding: "10px 12px",
                   zIndex: 50,
@@ -282,11 +281,11 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
                 {wcagLevel === "fail" ? (
                   <>
                     <div
-                      style={{ fontSize: 12, fontWeight: 600, color: "var(--bd-error)", marginBottom: 4 }}
+                      style={{ fontSize: 12, fontWeight: 600, color: "var(--bk-error)", marginBottom: 4 }}
                     >
                       Low contrast
                     </div>
-                    <div style={{ fontSize: 12, color: "var(--bd-fg-muted)", lineHeight: 1.5 }}>
+                    <div style={{ fontSize: 12, color: "var(--bk-ink-muted)", lineHeight: 1.5 }}>
                       This color may be hard to read. Ratio:{" "}
                       {calcContrastRatio(token.value, "#0A0A0A").toFixed(1)}:1 — needs 4.5:1 for AA.
                     </div>
@@ -303,7 +302,7 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
                     >
                       Good contrast ✓
                     </div>
-                    <div style={{ fontSize: 12, color: "var(--bd-fg-muted)", lineHeight: 1.5 }}>
+                    <div style={{ fontSize: 12, color: "var(--bk-ink-muted)", lineHeight: 1.5 }}>
                       Meets WCAG {wcagLevel?.toUpperCase()}. Ratio:{" "}
                       {calcContrastRatio(token.value, "#0A0A0A").toFixed(1)}:1.
                     </div>
@@ -317,20 +316,20 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
         {/* Undo */}
         {canUndo && (
           <Button
-            variant="ghost"
+            color="light"
             onClick={() => onUndo(token.id)}
             style={{
               background: "none",
               border: "none",
               padding: 4,
               cursor: "pointer",
-              color: "var(--bd-warning)",
+              color: "var(--bk-warning)",
               borderRadius: 4,
               display: "flex",
               alignItems: "center",
             }}
             title="Undo color change"
-            aria-label="Undo"
+            aria-label="Undo" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           >
             <UndoIcon />
           </Button>
@@ -339,20 +338,20 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
         {/* Redo */}
         {canRedo && (
           <Button
-            variant="ghost"
+            color="light"
             onClick={() => onRedo(token.id)}
             style={{
               background: "none",
               border: "none",
               padding: 4,
               cursor: "pointer",
-              color: "var(--bd-fg-muted)",
+              color: "var(--bk-ink-muted)",
               borderRadius: 4,
               display: "flex",
               alignItems: "center",
             }}
             title="Redo color change"
-            aria-label="Redo"
+            aria-label="Redo" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           >
             <RedoIcon />
           </Button>

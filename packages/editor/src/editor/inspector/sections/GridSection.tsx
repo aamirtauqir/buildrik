@@ -118,8 +118,8 @@ export const GridSection: React.FC<GridSectionProps> = ({
     <span
       style={{
         fontSize: 11,
-        color: "var(--buildrick-text-tertiary)",
-        fontFamily: "var(--buildrick-font-family-mono)",
+        color: "var(--bk-ink-muted)",
+        fontFamily: "var(--bk-font-mono)",
         whiteSpace: "nowrap",
       }}
     >
@@ -146,7 +146,7 @@ export const GridSection: React.FC<GridSectionProps> = ({
 
           {/* Quick Templates */}
           <SectionLabel
-            style={{ fontSize: "var(--buildrick-text-2xs)", marginBottom: "var(--buildrick-space-1)" }}
+            style={{ fontSize: "var(--bk-text-11)", marginBottom: "var(--bk-space-4)" }}
           >
             Column Templates
           </SectionLabel>
@@ -196,8 +196,8 @@ export const GridSection: React.FC<GridSectionProps> = ({
             style={{
               display: "grid",
               gridTemplateColumns: "1fr 1fr 1fr",
-              gap: "var(--buildrick-space-1)",
-              marginBottom: "var(--buildrick-space-2)",
+              gap: "var(--bk-space-4)",
+              marginBottom: "var(--bk-space-8)",
             }}
           >
             <InputField
@@ -225,7 +225,7 @@ export const GridSection: React.FC<GridSectionProps> = ({
 
           {/* Visual Alignment Grid */}
           <SectionLabel
-            style={{ fontSize: "var(--buildrick-text-2xs)", marginBottom: "var(--buildrick-space-1)" }}
+            style={{ fontSize: "var(--bk-text-11)", marginBottom: "var(--bk-space-4)" }}
           >
             Item Alignment
           </SectionLabel>
@@ -268,8 +268,8 @@ export const GridSection: React.FC<GridSectionProps> = ({
             style={{
               display: "grid",
               gridTemplateColumns: "1fr 1fr",
-              gap: "var(--buildrick-space-1)",
-              marginBottom: "var(--buildrick-space-2)",
+              gap: "var(--bk-space-4)",
+              marginBottom: "var(--bk-space-8)",
             }}
           >
             <InputField

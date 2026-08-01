@@ -185,8 +185,8 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
   const hintStyle: React.CSSProperties = {
     marginTop: 12,
     padding: "8px 12px",
-    background: "var(--buildrick-info-soft)",
-    color: "var(--buildrick-info-strong)",
+    background: "var(--bk-accent-tint)",
+    color: "var(--bk-accent-text)",
     borderRadius: 6,
     fontSize: 11,
     lineHeight: 1.5,

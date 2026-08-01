@@ -10,12 +10,9 @@
 
 import * as React from "react";
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { render as rtlRender, screen, fireEvent, cleanup } from "@testing-library/react";
-import { TooltipProvider } from "@/editor/shared/vibcoder/Tooltip";
+import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import { ZoomControls } from "../ZoomControls";
 import { ZOOM_PRESETS } from "../shared";
-
-const render = (ui: React.ReactElement) => rtlRender(<TooltipProvider>{ui}</TooltipProvider>);
 
 afterEach(() => {
   cleanup();

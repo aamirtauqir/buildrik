@@ -14,7 +14,7 @@ import { Play, FileType, Lock } from "lucide-react";
 import type { DragEvent, MouseEvent } from "react";
 import type { LibraryItem } from "../data/mediaTypes";
 import { UsagePips } from "./UsagePips";
-import { Button } from "@/editor/shared/vibcoder/Button";
+import { Button } from "@/editor/chrome-ui";
 
 interface AssetCellProps {
   item: LibraryItem;
@@ -66,7 +66,7 @@ export function AssetCell({
   return (
     <Button
       type="button"
-      variant="bare"
+      color="light"
       className={className}
       disabled={isLocked}
       draggable={!isLocked}

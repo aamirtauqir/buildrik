@@ -13,11 +13,11 @@ export const DraftChip: React.FC<{ state: DraftState; count: number }> = ({ stat
       <span
         style={{
           fontSize: 12,
-          color: "var(--bd-success)",
+          color: "var(--bk-success)",
           fontWeight: 500,
           padding: "2px 8px",
           borderRadius: 20,
-          background: "var(--bd-success-light, rgba(34,197,94,0.1))",
+          background: "var(--bk-success-tint, rgba(34,197,94,0.1))",
           border: "1px solid rgba(34,197,94,0.2)",
         }}
       >
@@ -29,11 +29,11 @@ export const DraftChip: React.FC<{ state: DraftState; count: number }> = ({ stat
     <span
       style={{
         fontSize: 11,
-        color: "var(--bd-warning)",
+        color: "var(--bk-warning)",
         fontWeight: 600,
         padding: "2px 8px",
         borderRadius: 20,
-        background: "var(--bd-warning-light, rgba(245,158,11,0.12))",
+        background: "var(--bk-warning-tint, rgba(245,158,11,0.12))",
         border: "1px solid rgba(245,158,11,0.3)",
         display: "inline-flex",
         alignItems: "center",
@@ -44,8 +44,8 @@ export const DraftChip: React.FC<{ state: DraftState; count: number }> = ({ stat
         style={{
           width: 6,
           height: 6,
-          borderRadius: "var(--bd-radius-full)",
-          background: "var(--bd-warning)",
+          borderRadius: "var(--bk-radius-full)",
+          background: "var(--bk-warning)",
           flexShrink: 0,
           animation: "buildrick-dot-pulse 1.5s infinite",
         }}

@@ -16,7 +16,7 @@
 import * as React from "react";
 import type { DesignToken } from "../../types";
 import { TokenPickerPopover, type TokenEntry } from "@/editor/inspector/shared/TokenPickerPopover";
-import { Button } from "@/editor/shared/vibcoder/Button";
+import { Button } from "@/editor/chrome-ui";
 
 interface BindingRowProps {
   cssProperty: string;
@@ -36,8 +36,8 @@ const rowStyle: React.CSSProperties = {
 
 const labelStyle: React.CSSProperties = {
   fontSize: 11,
-  fontFamily: "var(--bd-font-mono, monospace)",
-  color: "var(--bd-fg-secondary)",
+  fontFamily: "var(--bk-font-mono, monospace)",
+  color: "var(--bk-ink-soft)",
   flexShrink: 0,
   minWidth: 120,
 };
@@ -46,20 +46,20 @@ const valueButtonStyle: React.CSSProperties = {
   flex: "1 1 auto",
   minWidth: 0,
   padding: "3px 8px",
-  background: "var(--bd-bg-canvas)",
-  color: "var(--bd-fg-primary)",
-  border: "1px solid var(--bd-border)",
+  background: "var(--bk-bg-subtle)",
+  color: "var(--bk-ink)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 4,
   fontSize: 11,
   textAlign: "left",
   cursor: "pointer",
-  fontFamily: "var(--bd-font-mono, monospace)",
+  fontFamily: "var(--bk-font-mono, monospace)",
 };
 
 const dangerBtnStyle: React.CSSProperties = {
   padding: "3px 8px",
   background: "transparent",
-  color: "var(--bd-error)",
+  color: "var(--bk-error)",
   border: "1px solid rgba(239,68,68,0.3)",
   borderRadius: 4,
   fontSize: 11,
@@ -102,19 +102,19 @@ export const BindingRow: React.FC<BindingRowProps> = ({
         <span style={labelStyle}>{cssProperty}</span>
         <Button
           type="button"
-          variant="ghost"
-          size="sm"
+          color="light"
+          size="xs"
           aria-label={`Edit binding for ${cssProperty}`}
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
-          style={valueButtonStyle}
+          style={valueButtonStyle} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
         >
           {displayName}
         </Button>
         <Button
           type="button"
-          variant="danger"
-          size="sm"
+          color="red"
+          size="xs"
           aria-label={`Delete binding for ${cssProperty}`}
           onClick={onDelete}
           style={dangerBtnStyle}

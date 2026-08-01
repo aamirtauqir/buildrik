@@ -7,14 +7,11 @@
 import * as React from "react";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { TooltipProvider } from "@/editor/shared/vibcoder";
 import { LoadErrorBanner } from "../LoadErrorBanner";
 
 function renderBanner(props: Partial<React.ComponentProps<typeof LoadErrorBanner>> = {}) {
   return render(
-    <TooltipProvider>
-      <LoadErrorBanner kind={null} onRetry={vi.fn()} onSignIn={vi.fn()} {...props} />
-    </TooltipProvider>,
+    <LoadErrorBanner kind={null} onRetry={vi.fn()} onSignIn={vi.fn()} {...props} />,
   );
 }
 

@@ -1,5 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Cluster } from "@/editor/shared/vibcoder/Cluster";
 /**
  * AlignmentSection - Alignment grid and justify/align controls
  * @license BSD-3-Clause
@@ -8,7 +6,7 @@ import { Cluster } from "@/editor/shared/vibcoder/Cluster";
 import * as React from "react";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
 import { FlexAlignmentGrid } from "./controls";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -43,7 +41,7 @@ export const AlignmentSection: React.FC<AlignmentSectionProps> = ({
       <div
         style={{
           fontSize: 12,
-          color: "var(--buildrick-text-tertiary)",
+          color: "var(--bk-ink-muted)",
           marginBottom: 6,
         }}
       >
@@ -64,7 +62,7 @@ export const AlignmentSection: React.FC<AlignmentSectionProps> = ({
         <div
           style={{
             fontSize: 12,
-            color: "var(--buildrick-text-muted)",
+            color: "var(--bk-ink-muted)",
             marginBottom: 4,
             display: "flex",
             alignItems: "center",
@@ -73,7 +71,7 @@ export const AlignmentSection: React.FC<AlignmentSectionProps> = ({
           {mixedKeys?.has("justify-content") && <MixedValueBadge compact />}
           Justify Content
         </div>
-        <Cluster gap="xs">
+        <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
           {["start", "center", "end", "between", "around", "evenly"].map((val) => {
             const actualVal =
               val === "start"
@@ -97,13 +95,13 @@ export const AlignmentSection: React.FC<AlignmentSectionProps> = ({
               </Button>
             );
           })}
-        </Cluster>
+        </div>
       </div>
       <div>
         <div
           style={{
             fontSize: 12,
-            color: "var(--buildrick-text-muted)",
+            color: "var(--bk-ink-muted)",
             marginBottom: 4,
             display: "flex",
             alignItems: "center",
@@ -112,7 +110,7 @@ export const AlignmentSection: React.FC<AlignmentSectionProps> = ({
           {mixedKeys?.has("align-items") && <MixedValueBadge compact />}
           Align Items
         </div>
-        <Cluster gap="xs">
+        <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
           {["start", "center", "end", "stretch", "baseline"].map((val) => {
             const actualVal = val === "start" ? "flex-start" : val === "end" ? "flex-end" : val;
             return (
@@ -125,7 +123,7 @@ export const AlignmentSection: React.FC<AlignmentSectionProps> = ({
               </Button>
             );
           })}
-        </Cluster>
+        </div>
       </div>
     </div>
   </div>

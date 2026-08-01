@@ -5,23 +5,22 @@
  */
 
 import * as React from "react";
-import { Stack } from "@/editor/shared/vibcoder/Stack";
 
 // ============================================================================
 // DISPLAY PREVIEW
 // ============================================================================
 
 export const DisplayPreview: React.FC<{ type: string }> = ({ type }) => {
-  const box = { background: "var(--bd-accent)", borderRadius: 1 };
-  const gray = { background: "var(--bd-fg-muted)", borderRadius: 1 };
+  const box = { background: "var(--bk-accent)", borderRadius: 1 };
+  const gray = { background: "var(--bk-ink-muted)", borderRadius: 1 };
 
   switch (type) {
     case "block":
       return (
-        <Stack style={{ gap: 2, width: 28 }}>
+        <div className="tw:flex tw:flex-col tw:gap-0.5 tw:w-7">
           <div style={{ ...box, height: 5 }} />
           <div style={{ ...box, height: 5 }} />
-        </Stack>
+        </div>
       );
     case "flex":
       return (
@@ -68,7 +67,7 @@ export const DisplayPreview: React.FC<{ type: string }> = ({ type }) => {
           style={{
             width: 16,
             height: 10,
-            border: "1px dashed var(--bd-fg-muted)",
+            border: "1px dashed var(--bk-ink-muted)",
             borderRadius: 2,
             opacity: 0.5,
           }}
@@ -87,16 +86,16 @@ export const PositionPreview: React.FC<{ type: string }> = ({ type }) => {
   const containerStyle: React.CSSProperties = {
     width: 24,
     height: 16,
-    background: "var(--bd-bg-subtle)",
+    background: "var(--bk-bg-subtle)",
     borderRadius: 2,
     position: "relative",
-    border: "1px solid var(--bd-border)",
+    border: "1px solid var(--bk-border)",
   };
 
   const boxStyle: React.CSSProperties = {
     width: 8,
     height: 6,
-    background: "var(--bd-accent)",
+    background: "var(--bk-accent)",
     borderRadius: 1,
     position: "absolute",
   };
@@ -116,7 +115,7 @@ export const PositionPreview: React.FC<{ type: string }> = ({ type }) => {
             style={{
               width: 8,
               height: 6,
-              border: "1px dashed var(--bd-fg-muted)",
+              border: "1px dashed var(--bk-ink-muted)",
               borderRadius: 1,
               position: "absolute",
               top: 5,
@@ -135,7 +134,7 @@ export const PositionPreview: React.FC<{ type: string }> = ({ type }) => {
     case "fixed":
       return (
         <div style={containerStyle}>
-          <div style={{ ...boxStyle, bottom: 2, right: 2, background: "var(--bd-success, var(--bd-success))" }} />
+          <div style={{ ...boxStyle, bottom: 2, right: 2, background: "var(--bk-success, var(--bk-success))" }} />
         </div>
       );
     case "sticky":
@@ -147,7 +146,7 @@ export const PositionPreview: React.FC<{ type: string }> = ({ type }) => {
               top: 0,
               left: "50%",
               transform: "translateX(-50%)",
-              background: "var(--bd-warning)",
+              background: "var(--bk-warning)",
             }}
           />
         </div>

@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * AllCSSSection - Raw CSS property editor (Dev Mode only)
  * Allows adding any CSS property directly
@@ -11,7 +10,7 @@ import type { Composer } from "../../../engine";
 import { InputField } from "../../../shared/forms/InputField";
 import { runTransaction } from "../../../shared/utils/helpers";
 import { Section, type SectionTier } from "../shared/controls";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -49,13 +48,13 @@ const styles = {
   propertyName: {
     flex: "0 0 100px",
     fontSize: 12,
-    color: "var(--buildrick-text-secondary)",
+    color: "var(--bk-ink-soft)",
     fontFamily: "monospace",
   } as React.CSSProperties,
   removeBtn: {
     background: "transparent",
     border: "none",
-    color: "var(--buildrick-text-tertiary)",
+    color: "var(--bk-ink-muted)",
     cursor: "pointer",
     padding: 4,
     fontSize: 12,
@@ -66,14 +65,14 @@ const styles = {
     gap: 8,
     marginTop: 12,
     padding: "12px 0",
-    borderTop: `1px solid ${"var(--buildrick-border)"}`,
+    borderTop: `1px solid ${"var(--bk-border)"}`,
   } as React.CSSProperties,
   addBtn: {
     padding: "8px 16px",
     background: "rgba(0, 115, 230, 0.2)",
     border: "1px solid rgba(0, 115, 230, 0.3)",
     borderRadius: 6,
-    color: "var(--buildrick-accent)",
+    color: "var(--bk-accent)",
     fontSize: 12,
     fontWeight: 600,
     cursor: "pointer",
@@ -164,7 +163,7 @@ export const AllCSSSection: React.FC<AllCSSSectionProps> = ({
     <Section title="All CSS" icon="Code" defaultOpen={false} isOpen={isOpen} onToggle={onToggle} tier={tier} id="inspector-section-all-css">
       {/* Existing properties */}
       {cssProperties.length === 0 ? (
-        <div style={{ color: "var(--buildrick-text-tertiary)", fontSize: 12, padding: "8px 0" }}>
+        <div style={{ color: "var(--bk-ink-muted)", fontSize: 12, padding: "8px 0" }}>
           No inline styles applied
         </div>
       ) : (

@@ -1,5 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * LinkedGapInput — shared linked/unlinked gap input for flex + grid.
  * Ported to .bdi-row-ctrl + .bdi-num.
@@ -9,6 +7,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import { Link, Link2Off } from "lucide-react";
 import * as React from "react";
+import { Button, TextInput } from "@/editor/chrome-ui";
 
 export interface LinkedGapInputProps {
   styles: Record<string, string>;
@@ -56,7 +55,7 @@ const NumField: React.FC<{
       style={disabled ? { opacity: 0.5, pointerEvents: "none" } : undefined}
     >
       {icon && <span className="bdi-flb">{icon}</span>}
-      <Input
+      <TextInput
         type="text"
         value={num}
         onChange={(e) => {
@@ -119,7 +118,7 @@ export const LinkedGapInput: React.FC<LinkedGapInputProps> = ({
           style={{
             width: 16,
             height: 16,
-            color: linked ? "var(--bd-accent)" : "var(--bd-fg-muted)",
+            color: linked ? "var(--bk-accent)" : "var(--bk-ink-muted)",
           }}
         >
           {linked ? <Link size={10} aria-hidden="true" /> : <Link2Off size={10} aria-hidden="true" />}
@@ -141,14 +140,14 @@ export const LinkedGapInput: React.FC<LinkedGapInputProps> = ({
               onChange={(v) => onChange("row-gap", v)}
               disabled={disabled}
               ariaLabel="Row gap"
-              icon={<span style={{ font: "600 10px var(--bd-font)" }}>R</span>}
+              icon={<span style={{ font: "600 10px var(--bk-font-ui)" }}>R</span>}
             />
             <NumField
               value={elementStyles["column-gap"] || ""}
               onChange={(v) => onChange("column-gap", v)}
               disabled={disabled}
               ariaLabel="Column gap"
-              icon={<span style={{ font: "600 10px var(--bd-font)" }}>C</span>}
+              icon={<span style={{ font: "600 10px var(--bk-font-ui)" }}>C</span>}
             />
           </div>
         )}

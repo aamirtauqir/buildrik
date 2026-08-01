@@ -17,23 +17,19 @@
 // right-click, the shell one is the lightweight sidebar header variant.
 
 import * as React from "react";
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Select } from "@/editor/shared/vibcoder/Select";
-import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
 import {
-  Modal,
-  ModalContent,
-  ModalTitle,
   ModalClose,
-  OverlayMount,
-  Stack,
-} from "@/editor/shared/vibcoder";
+  ModalContent,
+  ModalRoot,
+  ModalTitle,
+  Portal,
+} from "@/editor/chrome-ui";
 import {
   dialogCancelBtnStyles,
   dialogInputStyles,
   dialogPrimaryBtnStyles,
 } from "./styles";
+import { Button, Checkbox, Select, TextInput } from "@/editor/chrome-ui";
 
 export interface SelectionContext {
   selectionIds: readonly string[];
@@ -56,13 +52,13 @@ export interface CreateComponentModalProps {
 const labelStyle: React.CSSProperties = {
   display: "block",
   fontSize: 11,
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
   marginBottom: 4,
 };
 
 const bindingsCardStyle: React.CSSProperties = {
-  background: "var(--bd-bg-muted)",
-  border: "1px solid var(--bd-border)",
+  background: "var(--bk-bg-subtle)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 6,
   padding: "10px 12px",
 };
@@ -77,7 +73,7 @@ const bindingsCheckboxStyle: React.CSSProperties = {
 
 const bindingsHintStyle: React.CSSProperties = {
   fontSize: 11,
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
   marginTop: 4,
   paddingLeft: 22,
 };
@@ -105,22 +101,22 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
   };
 
   return (
-    <OverlayMount>
-      <Modal open onOpenChange={(next) => !next && onClose()}>
+    <Portal>
+      <ModalRoot open onOpenChange={(next) => !next && onClose()}>
         <ModalContent size="lg">
           <ModalTitle>Save as component</ModalTitle>
-          <ModalClose aria-label="Close modal">
+          <ModalClose aria-label="Close modal" onClick={onClose}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
               <path d="M18 6L6 18M6 6l12 12" />
             </svg>
           </ModalClose>
           <div className="bd-modal__body">
-            <Stack gap="md">
-              <Stack gap="xs">
+            <div className="tw:flex tw:flex-col tw:gap-3">
+              <div className="tw:flex tw:flex-col tw:gap-1">
                 <label htmlFor="create-component-name" style={labelStyle}>
                   Name
                 </label>
-                <Input
+                <TextInput
                   id="create-component-name"
                   type="text"
                   value={name}
@@ -133,9 +129,9 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
                   autoFocus
                   style={dialogInputStyles}
                 />
-              </Stack>
+              </div>
 
-              <Stack gap="xs">
+              <div className="tw:flex tw:flex-col tw:gap-1">
                 <label htmlFor="create-component-group" style={labelStyle}>
                   Group
                 </label>
@@ -147,17 +143,20 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
                 >
                   <option value="">Your symbols</option>
                 </Select>
-              </Stack>
+              </div>
 
               {selectionContext && (
                 <div style={bindingsCardStyle}>
-                  <Checkbox
-                    style={bindingsCheckboxStyle}
-                    checked={prefillBindings}
-                    onChange={(e) => setPrefillBindings(e.target.checked)}
-                    aria-label="Pre-fill bindings from DS"
-                    label="Pre-fill bindings from DS"
-                  />
+                  <label style={bindingsCheckboxStyle}>
+                    <Checkbox
+                      color="blue"
+                      className="tw:bg-white"
+                      checked={prefillBindings}
+                      onChange={(e) => setPrefillBindings(e.target.checked)}
+                      aria-label="Pre-fill bindings from DS"
+                    />
+                    <span>Pre-fill bindings from DS</span>
+                  </label>
                   <p style={bindingsHintStyle}>
                     {bindingCount === 1
                       ? "1 style will bind to your DS tokens. Editing tokens later updates this component too."
@@ -165,7 +164,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
                   </p>
                 </div>
               )}
-            </Stack>
+            </div>
           </div>
           <div className="bd-modal__foot">
             <Button onClick={onClose} style={dialogCancelBtnStyles}>
@@ -184,7 +183,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
             </Button>
           </div>
         </ModalContent>
-      </Modal>
-    </OverlayMount>
+      </ModalRoot>
+    </Portal>
   );
 };

@@ -20,20 +20,12 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Textarea } from "@/editor/shared/vibcoder/Textarea";
-import {
-  Modal,
-  ModalContent,
-  ModalDescription,
-  ModalFooter,
-  ModalTitle,
-} from "@/editor/shared/vibcoder";
+import { ModalContent, ModalDescription, ModalFooter, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
 import type {
   AIAssistService,
   ComponentSchema,
 } from "../../../engine/designSystem/services/AIAssistService";
-
+import { Button, Textarea } from "@/editor/chrome-ui";
 type ModalState =
   | { kind: "idle" }
   | { kind: "generating"; abort: AbortController }
@@ -125,19 +117,20 @@ export const AIPromptModal: React.FC<AIPromptModalProps> = ({
   const errorMessage = state.kind === "error" ? state.message : null;
 
   return (
-    <Modal open={open} onOpenChange={onOpenChange}>
+    <ModalRoot open={open} onOpenChange={onOpenChange}>
       <ModalContent size="lg" aria-labelledby="ai-prompt-title">
-        <div style={{ padding: "24px 28px", borderBottom: "1px solid var(--bd-border)" }}>
+        <div style={{ padding: "24px 28px", borderBottom: "1px solid var(--bk-border)" }}>
           <ModalTitle id="ai-prompt-title" style={{ fontSize: 18, fontWeight: 600, letterSpacing: "-0.01em" }}>
             Generate component with AI
           </ModalTitle>
-          <ModalDescription style={{ fontSize: 13, color: "var(--bd-text-muted)", marginTop: 4 }}>
+          <ModalDescription style={{ fontSize: 13, color: "var(--bk-ink-muted)", marginTop: 4 }}>
             Describe what you want. The AI returns a structured schema bound to your design system.
           </ModalDescription>
         </div>
 
         <div style={{ padding: "20px 28px", display: "flex", flexDirection: "column", gap: 12 }}>
           <Textarea
+            className="tw:bg-white tw:focus:border-primary-700 tw:focus:ring-primary-700"
             aria-label="Component description"
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
@@ -148,17 +141,17 @@ export const AIPromptModal: React.FC<AIPromptModalProps> = ({
               width: "100%",
               padding: 10,
               borderRadius: 6,
-              border: "1px solid var(--bd-border)",
+              border: "1px solid var(--bk-border)",
               fontFamily: "inherit",
               fontSize: 13,
               resize: "vertical",
-              background: isGenerating ? "var(--bd-bg-subtle)" : "var(--bd-surface)",
-              color: "var(--bd-text)",
+              background: isGenerating ? "var(--bk-bg-subtle)" : "var(--bk-bg-panel)",
+              color: "var(--bk-ink)",
             }}
           />
 
           {isGenerating && (
-            <div role="status" aria-live="polite" style={{ fontSize: 12, color: "var(--bd-text-muted)" }}>
+            <div role="status" aria-live="polite" style={{ fontSize: 12, color: "var(--bk-ink-muted)" }}>
               Generating schema…
             </div>
           )}
@@ -166,9 +159,9 @@ export const AIPromptModal: React.FC<AIPromptModalProps> = ({
           {errorMessage && (
             <div role="alert" style={{
               fontSize: 12,
-              color: "var(--bd-warn-strong)",
-              background: "var(--bd-warn-soft)",
-              border: "1px solid var(--bd-warn-border)",
+              color: "var(--bk-warning-text)",
+              background: "var(--bk-warning-tint)",
+              border: "1px solid var(--bk-warning-text)",
               borderRadius: 6,
               padding: "8px 10px",
             }}>
@@ -179,48 +172,48 @@ export const AIPromptModal: React.FC<AIPromptModalProps> = ({
           {showSuccess && state.kind === "success" && (
             <div data-testid="ai-prompt-schema-preview" style={{
               fontSize: 11,
-              fontFamily: "var(--bd-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace)",
-              background: "var(--bd-bg-subtle)",
-              border: "1px solid var(--bd-border)",
+              fontFamily: "var(--bk-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace)",
+              background: "var(--bk-bg-subtle)",
+              border: "1px solid var(--bk-border)",
               borderRadius: 6,
               padding: 12,
               maxHeight: 220,
               overflow: "auto",
               whiteSpace: "pre-wrap",
-              color: "var(--bd-text)",
+              color: "var(--bk-ink)",
             }}>
               {JSON.stringify(state.schema, null, 2)}
             </div>
           )}
         </div>
 
-        <ModalFooter style={{ padding: "16px 28px", borderTop: "1px solid var(--bd-border)" }}>
+        <ModalFooter style={{ padding: "16px 28px", borderTop: "1px solid var(--bk-border)" }}>
           {state.kind === "idle" && (
             <>
-              <Button variant="ghost" size="sm" type="button" onClick={() => onOpenChange(false)}>
+              <Button color="light" size="xs" type="button" onClick={() => onOpenChange(false)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                 Cancel
               </Button>
-              <Button variant="primary" size="sm" type="button" onClick={handleGenerate}>
+              <Button size="xs" type="button" onClick={handleGenerate}>
                 Generate
               </Button>
             </>
           )}
 
           {isGenerating && (
-            <Button variant="ghost" size="sm" type="button" onClick={handleCancelGeneration}>
+            <Button color="light" size="xs" type="button" onClick={handleCancelGeneration} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
               Cancel generation
             </Button>
           )}
 
           {showSuccess && (
             <>
-              <Button variant="ghost" size="sm" type="button" onClick={handleDiscard}>
+              <Button color="light" size="xs" type="button" onClick={handleDiscard} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                 Discard
               </Button>
-              <Button variant="ghost" size="sm" type="button" onClick={handleGenerate}>
+              <Button color="light" size="xs" type="button" onClick={handleGenerate} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                 Retry
               </Button>
-              <Button variant="primary" size="sm" type="button" onClick={handleAccept}>
+              <Button size="xs" type="button" onClick={handleAccept}>
                 Accept
               </Button>
             </>
@@ -228,16 +221,16 @@ export const AIPromptModal: React.FC<AIPromptModalProps> = ({
 
           {state.kind === "error" && (
             <>
-              <Button variant="ghost" size="sm" type="button" onClick={() => onOpenChange(false)}>
+              <Button color="light" size="xs" type="button" onClick={() => onOpenChange(false)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                 Cancel
               </Button>
-              <Button variant="primary" size="sm" type="button" onClick={handleGenerate}>
+              <Button size="xs" type="button" onClick={handleGenerate}>
                 Retry
               </Button>
             </>
           )}
         </ModalFooter>
       </ModalContent>
-    </Modal>
+    </ModalRoot>
   );
 };

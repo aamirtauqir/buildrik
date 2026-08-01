@@ -1,5 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Background Section - Color, Image, Gradient
  */
@@ -8,6 +6,7 @@ import * as React from "react";
 import type { MediaAsset, MediaAssetType } from "../../../shared/types/media";
 import { extractGradientUI, composeGradient, deriveBgType } from "../../../shared/utils/parsers/gradientHelpers";
 import { Section, ColorInput, SelectRow, InputRow, MoreSettingsToggle, type SectionTier, MixedValueIndicator } from "../shared/controls";
+import { Button, TextInput } from "@/editor/chrome-ui";
 
 export interface BackgroundSectionProps {
   styles: Record<string, string>;
@@ -62,7 +61,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
         height: 14,
         borderRadius: 3,
         background: bgColor,
-        border: "1px solid var(--bd-border-medium)",
+        border: "1px solid var(--bk-border-medium)",
         flexShrink: 0,
       }}
       title={bgColor}
@@ -134,7 +133,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
             <label
               style={{
                 fontSize: 12,
-                color: "var(--buildrick-text-tertiary)",
+                color: "var(--bk-ink-muted)",
                 fontWeight: 500,
                 display: "block",
                 marginBottom: 8,
@@ -145,38 +144,38 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
             <div style={{ display: "flex", gap: 4 }}>
               <Button
                 onClick={() => {
-                  const color1 = "var(--buildrick-accent)";
-                  const color2 = "var(--buildrick-success)";
+                  const color1 = "var(--bk-accent)";
+                  const color2 = "var(--bk-success)";
                   onChange("background", `linear-gradient(90deg, ${color1}, ${color2})`);
                 }}
                 style={{
                   flex: 1,
                   padding: "20px 12px",
-                  background: "linear-gradient(90deg, var(--buildrick-accent), var(--buildrick-success))",
-                  border: "1px solid var(--bd-border-medium)",
+                  background: "linear-gradient(90deg, var(--bk-accent), var(--bk-success))",
+                  border: "1px solid var(--bk-border-medium)",
                   borderRadius: 6,
                   cursor: "pointer",
                   fontSize: 12,
-                  color: "var(--buildrick-text-on-accent)",
+                  color: "var(--bk-accent-on)",
                 }}
               >
                 Linear
               </Button>
               <Button
                 onClick={() => {
-                  const color1 = "var(--buildrick-accent)";
-                  const color2 = "var(--buildrick-success)";
+                  const color1 = "var(--bk-accent)";
+                  const color2 = "var(--bk-success)";
                   onChange("background", `radial-gradient(circle, ${color1}, ${color2})`);
                 }}
                 style={{
                   flex: 1,
                   padding: "20px 12px",
-                  background: "radial-gradient(circle, var(--buildrick-accent), var(--buildrick-success))",
-                  border: "1px solid var(--bd-border-medium)",
+                  background: "radial-gradient(circle, var(--bk-accent), var(--bk-success))",
+                  border: "1px solid var(--bk-border-medium)",
                   borderRadius: 6,
                   cursor: "pointer",
                   fontSize: 12,
-                  color: "var(--buildrick-text-on-accent)",
+                  color: "var(--bk-accent-on)",
                 }}
               >
                 Radial
@@ -187,13 +186,13 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
           {/* Gradient Colors */}
           <ColorInput
             label="Color 1"
-            value={gradientUI?.color1 || "var(--bd-accent)"}
+            value={gradientUI?.color1 || "var(--bk-accent)"}
             onChange={(v) => {
               const result = composeGradient({
                 type: (gradientUI?.gradientType || "linear") as "linear" | "radial",
                 angle: gradientUI?.angle ?? 90,
                 color1: v,
-                color2: gradientUI?.color2 || "var(--buildrick-success)",
+                color2: gradientUI?.color2 || "var(--bk-success)",
               });
               onChange("background", result);
             }}
@@ -205,7 +204,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
               const result = composeGradient({
                 type: (gradientUI?.gradientType || "linear") as "linear" | "radial",
                 angle: gradientUI?.angle ?? 90,
-                color1: gradientUI?.color1 || "var(--buildrick-accent)",
+                color1: gradientUI?.color1 || "var(--bk-accent)",
                 color2: v,
               });
               onChange("background", result);
@@ -225,14 +224,14 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
               <label
                 style={{
                   fontSize: 12,
-                  color: "var(--buildrick-text-tertiary)",
+                  color: "var(--bk-ink-muted)",
                   fontWeight: 500,
                   minWidth: 70,
                 }}
               >
                 Angle
               </label>
-              <Input
+              <TextInput
                 type="range"
                 min="0"
                 max="360"
@@ -241,14 +240,14 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
                   const result = composeGradient({
                     type: "linear",
                     angle: Number(e.target.value),
-                    color1: gradientUI?.color1 || "var(--buildrick-accent)",
-                    color2: gradientUI?.color2 || "var(--buildrick-success)",
+                    color1: gradientUI?.color1 || "var(--bk-accent)",
+                    color2: gradientUI?.color2 || "var(--bk-success)",
                   });
                   onChange("background", result);
                 }}
                 style={{ flex: 1 }}
               />
-              <span style={{ fontSize: 12, color: "var(--buildrick-text-tertiary)", minWidth: 40 }}>{gradientUI?.angle ?? 90}°</span>
+              <span style={{ fontSize: 12, color: "var(--bk-ink-muted)", minWidth: 40 }}>{gradientUI?.angle ?? 90}°</span>
             </div>
           )}
         </>
@@ -275,10 +274,10 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
                 }
                 style={{
                   padding: "8px 12px",
-                  background: "var(--buildrick-accent-subtle)",
-                  border: "1px solid var(--buildrick-accent)",
+                  background: "var(--bk-accent-subtle)",
+                  border: "1px solid var(--bk-accent)",
                   borderRadius: 6,
-                  color: "var(--buildrick-accent)",
+                  color: "var(--bk-accent)",
                   fontSize: 12,
                   fontWeight: 600,
                   cursor: "pointer",

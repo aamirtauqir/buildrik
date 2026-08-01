@@ -1,5 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { IconButton } from "@/editor/shared/vibcoder/IconButton";
 /**
  * PageFolder — collapsible folder row + flat list of child PageRows.
  *
@@ -15,9 +13,11 @@ import { IconButton } from "@/editor/shared/vibcoder/IconButton";
  */
 
 import * as React from "react";
+import { IconButton } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../../engine";
 import type { FolderItem, PageItem } from "../types";
 import { PageRow } from "./PageRow";
+import { TextInput } from "@/editor/chrome-ui";
 
 interface Props {
   folder: FolderItem;
@@ -122,29 +122,27 @@ export const PageFolder: React.FC<Props> = ({
           }}
         >
           <IconButton
-            variant="ghost"
-            size="xs"
-            type="button"
-            aria-label={isExpanded ? `Collapse ${folder.name}` : `Expand ${folder.name}`}
+            size="sm"
+            label={isExpanded ? `Collapse ${folder.name}` : `Expand ${folder.name}`}
             onClick={(e) => {
               e.stopPropagation();
               onToggle();
             }}
-            style={{ width: 12, height: 12, display: "grid", placeItems: "center", color: "var(--bd-fg-muted)", flexShrink: 0 }}
+            style={{ width: 12, height: 12, display: "grid", placeItems: "center", color: "var(--bk-ink-muted)", flexShrink: 0 }}
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true" style={{ width: 10, height: 10, transition: "transform 120ms", transform: isExpanded ? "rotate(90deg)" : undefined }}>
               <polyline points="9 6 15 12 9 18" />
             </svg>
           </IconButton>
 
-          <span style={{ flexShrink: 0, color: "var(--bd-warning)", display: "grid", placeItems: "center" }} aria-hidden="true">
+          <span style={{ flexShrink: 0, color: "var(--bk-warning)", display: "grid", placeItems: "center" }} aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ width: 12, height: 12 }}>
               <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" />
             </svg>
           </span>
 
           {isRenamingFolder ? (
-            <Input
+            <TextInput
               ref={renameInputRef}
               value={renameValue}
               onChange={(e) => setRenameValue(e.target.value)}
@@ -164,7 +162,7 @@ export const PageFolder: React.FC<Props> = ({
             />
           ) : (
             <span
-              style={{ flex: 1, minWidth: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", font: "400 13px var(--bd-font)" }}
+              style={{ flex: 1, minWidth: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", font: "400 13px var(--bk-font-ui)" }}
               title={folder.name}
               onDoubleClick={(e) => {
                 e.stopPropagation();
@@ -175,7 +173,7 @@ export const PageFolder: React.FC<Props> = ({
             </span>
           )}
 
-          <span style={{ display: "inline-flex", alignItems: "center", height: 16, padding: "0 6px", marginLeft: "var(--bd-space-1)", borderRadius: 4, background: "rgba(15, 23, 42, 0.06)", color: "var(--bd-fg-muted)", font: "500 10.5px var(--bd-font)", fontVariantNumeric: "tabular-nums" }} aria-label={`${pages.length} pages in folder`}>
+          <span style={{ display: "inline-flex", alignItems: "center", height: 16, padding: "0 6px", marginLeft: "var(--bk-space-4)", borderRadius: 4, background: "rgba(15, 23, 42, 0.06)", color: "var(--bk-ink-muted)", font: "500 10.5px var(--bk-font-ui)", fontVariantNumeric: "tabular-nums" }} aria-label={`${pages.length} pages in folder`}>
             {pages.length}
           </span>
 
@@ -184,11 +182,9 @@ export const PageFolder: React.FC<Props> = ({
           <div className="bd-pg-folder-actions">
             <IconButton
               className="bd-pg-folder-act"
-              variant="ghost"
-              size="xs"
-              type="button"
+              size="sm"
               title="Rename folder"
-              aria-label={`Rename folder ${folder.name}`}
+              label={`Rename folder ${folder.name}`}
               onClick={(e) => {
                 e.stopPropagation();
                 setIsRenamingFolder(true);
@@ -201,11 +197,9 @@ export const PageFolder: React.FC<Props> = ({
             </IconButton>
             <IconButton
               className="bd-pg-folder-act danger"
-              variant="ghost"
-              size="xs"
-              type="button"
+              size="sm"
               title="Delete folder (pages kept)"
-              aria-label={`Delete folder ${folder.name}`}
+              label={`Delete folder ${folder.name}`}
               onClick={(e) => {
                 e.stopPropagation();
                 onFolderDelete();
@@ -226,11 +220,9 @@ export const PageFolder: React.FC<Props> = ({
             <div key={page.id} className="bd-pg-page-wrap">
               <IconButton
                 className="bd-pg-page-eject"
-                variant="ghost"
-                size="xs"
-                type="button"
+                size="sm"
                 title="Remove from folder"
-                aria-label={`Remove ${page.name} from folder`}
+                label={`Remove ${page.name} from folder`}
                 onClick={() => onPageRemove(page.id)}
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true" style={{ width: 8, height: 8 }}>

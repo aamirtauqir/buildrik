@@ -1,0 +1,226 @@
+/**
+ * GENERATED FILE — DO NOT EDIT.
+ *
+ * Source: Figma file g4GzQFqzNYz5sosz1QtZXC (Buildrick — Product)
+ * Collections: Package (modes: Editor, Dashboard), Primitives (mode: Default)
+ * Mode: Editor
+ *
+ * Regenerate: node scripts/tokens/generate.mjs
+ * Change a value: edit the Figma variable, re-export, regenerate.
+ */
+
+:root {
+  /* ── Palette · the Flowbite ramps ─────────────────────────────── */
+
+  --bk-blue-50: #EBF5FF;
+  --bk-blue-100: #E1EFFE;
+  --bk-blue-200: #C3DDFD;
+  --bk-blue-300: #A4CAFE;
+  --bk-blue-400: #76A9FA;
+  --bk-blue-500: #3F83F8;
+  --bk-blue-600: #1C64F2;
+  --bk-blue-700: #1A56DB;
+  --bk-blue-800: #1E429F;
+  --bk-blue-900: #233876;
+
+  --bk-gray-50: #F9FAFB;
+  --bk-gray-100: #F3F4F6;
+  --bk-gray-200: #E5E7EB;
+  --bk-gray-300: #D1D5DB;
+  --bk-gray-400: #9CA3AF;
+  --bk-gray-500: #6B7280;
+  --bk-gray-600: #4B5563;
+  --bk-gray-700: #374151;
+  --bk-gray-800: #1F2937;
+  --bk-gray-900: #111827;
+
+  --bk-red-50: #FDF2F2;
+  --bk-red-100: #FDE8E8;
+  --bk-red-500: #F05252;
+  --bk-red-600: #E02424;
+  --bk-red-700: #C81E1E;
+  --bk-red-800: #9B1C1C;
+
+  --bk-green-50: #F3FAF7;
+  --bk-green-100: #DEF7EC;
+  --bk-green-400: #31C48D;
+  --bk-green-500: #0E9F6E;
+  --bk-green-600: #057A55;
+  --bk-green-700: #046C4E;
+  --bk-green-800: #03543F;
+
+  --bk-yellow-50: #FDFDEA;
+  --bk-yellow-100: #FDF6B2;
+  --bk-yellow-300: #FACA15;
+  --bk-yellow-400: #E3A008;
+  --bk-yellow-500: #C27803;
+  --bk-yellow-800: #723B13;
+
+  --bk-purple-50: #F6F5FF;
+  --bk-purple-100: #EDEBFE;
+  --bk-purple-500: #9061F9;
+  --bk-purple-600: #7E3AF2;
+  --bk-purple-700: #6C2BD9;
+  --bk-purple-800: #5521B5;
+
+  /* ── Roles · what components actually reference ───────────────── */
+
+  --bk-bg-app: #F3F4F6;
+  --bk-bg-panel: #FFFFFF;
+  --bk-bg-subtle: #F3F4F6;
+  --bk-bg-card: #FFFFFF;
+  --bk-bg-elevated: #FFFFFF;
+  --bk-border: #E5E7EB;
+  --bk-border-medium: #D1D5DB;
+  --bk-border-strong: #9CA3AF;
+  --bk-border-input: #9CA3AF;
+  --bk-ink: #111827;
+  --bk-ink-soft: #4B5563;
+  --bk-ink-muted: #6B7280;
+  --bk-ink-disabled: #D1D5DB;
+  --bk-accent: #1A56DB;
+  --bk-accent-hover: #1E429F;
+  --bk-accent-pressed: #233876;
+  --bk-accent-subtle: #E1EFFE;
+  --bk-accent-tint: #EBF5FF;
+  --bk-accent-text: #1A56DB;
+  --bk-accent-on: #FFFFFF;
+  --bk-success: #0E9F6E;
+  --bk-success-tint: #DEF7EC;
+  --bk-success-text: #057A55;
+  --bk-warning: #C27803;
+  --bk-warning-tint: #FDFDEA;
+  --bk-warning-text: #723B13;
+  --bk-error: #E02424;
+  --bk-error-tint: #FDE8E8;
+  --bk-error-text: #C81E1E;
+
+  /* ── Space · named by pixel value ─────────────────────────────── */
+
+  --bk-space-2: 2px;
+  --bk-space-4: 4px;
+  --bk-space-8: 8px;
+  --bk-space-12: 12px;
+  --bk-space-16: 16px;
+  --bk-space-20: 20px;
+  --bk-space-24: 24px;
+  --bk-space-28: 28px;
+  --bk-space-32: 32px;
+  --bk-space-36: 36px;
+  --bk-space-40: 40px;
+  --bk-space-48: 48px;
+  --bk-space-64: 64px;
+
+  /* ── Radius ───────────────────────────────────────────────────── */
+
+  --bk-radius-sm: 4px;
+  --bk-radius-md: 6px;
+  --bk-radius-lg: 8px;
+  --bk-radius-full: 9999px;
+
+  /* ── Size · the shell's committed numbers ─────────────────────── */
+
+  --bk-size-row-dense: 28px;
+  --bk-size-row: 32px;
+  --bk-size-header: 44px;
+  --bk-size-topbar: 56px;
+  --bk-size-row-tall: 64px;
+  --bk-size-rail: 60px;
+  --bk-size-drawer: 320px;
+  --bk-size-panel-right: 360px;
+  --bk-size-inspector: 300px;
+  --bk-size-nav: 240px;
+  --bk-size-footer: 32px;
+
+  /* ── Z-index ──────────────────────────────────────────────────── */
+
+  --bk-z-canvas: 0;
+  --bk-z-chrome: 10;
+  --bk-z-drawer: 20;
+  --bk-z-topbar: 30;
+  --bk-z-popover: 40;
+  --bk-z-overlay: 50;
+  --bk-z-modal: 60;
+  --bk-z-cmdk: 70;
+  --bk-z-toast: 80;
+  --bk-z-tooltip: 90;
+
+  /* ── Motion ───────────────────────────────────────────────────── */
+
+  --bk-motion-fast: 100ms;
+  --bk-motion-base: 160ms;
+  --bk-motion-slow: 240ms;
+
+  /* ── Focus ────────────────────────────────────────────────────── */
+
+  --bk-focus-ring-width: 2px;
+  --bk-focus-ring-offset: 2px;
+
+  /* ── Typography · mirrors the 11 Figma text styles ────────────── */
+
+  --bk-font-ui: "Inter", "Inter Tight", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --bk-font-mono: "Geist Mono", "SF Mono", Menlo, Consolas, monospace;
+
+  --bk-text-11: 11px;
+  --bk-text-12: 12px;
+  --bk-text-13: 13px;
+  --bk-text-14: 14px;
+  --bk-text-16: 16px;
+  --bk-text-20: 20px;
+  --bk-text-24: 24px;
+
+  --bk-leading-16: 16px;
+  --bk-leading-18: 18px;
+  --bk-leading-20: 20px;
+  --bk-leading-21: 21px;
+  --bk-leading-24: 24px;
+  --bk-leading-30: 30px;
+  --bk-leading-32: 32px;
+
+  --bk-weight-regular: 400;
+  --bk-weight-medium: 500;
+  --bk-weight-semibold: 600;
+
+  --bk-ease-default: cubic-bezier(0.2, 0, 0, 1);
+  --bk-ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --bk-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  --bk-transition-fast: all 100ms cubic-bezier(0.2, 0, 0, 1);
+  --bk-transition-base: all 160ms cubic-bezier(0.2, 0, 0, 1);
+
+  --bk-tracking-tight: -0.01em;
+  --bk-tracking-normal: 0;
+  --bk-tracking-wide: 0.08em;
+
+  --bk-leading-tight: 1.25;
+  --bk-leading-normal: 1.5;
+
+  /* ── Elevation · mirrors the 3 Figma effect styles ─────────────── */
+
+  --bk-shadow-raised: 0 1px 2px rgba(0, 0, 0, 0.08);
+  --bk-shadow-drag: 0 4px 6px rgba(0, 0, 0, 0.10);
+  --bk-shadow-overlay: 0 10px 15px rgba(0, 0, 0, 0.10);
+  --bk-shadow-focus: 0 0 0 2px rgba(26, 86, 219, 0.30);
+
+  /* ── Alpha · derived from the palette ─────────────────────────── */
+
+  --bk-alpha-accent-15: rgba(26, 86, 219, 0.15);
+  --bk-alpha-accent-30: rgba(26, 86, 219, 0.30);
+  --bk-alpha-ink-06: rgba(17, 24, 39, 0.06);
+  --bk-alpha-ink-08: rgba(17, 24, 39, 0.08);
+  --bk-alpha-ink-10: rgba(17, 24, 39, 0.10);
+  --bk-alpha-ink-12: rgba(17, 24, 39, 0.12);
+  --bk-alpha-ink-30: rgba(17, 24, 39, 0.30);
+  --bk-alpha-ink-40: rgba(17, 24, 39, 0.40);
+  --bk-alpha-ink-50: rgba(17, 24, 39, 0.50);
+  --bk-alpha-on-dark-12: rgba(255, 255, 255, 0.12);
+  --bk-alpha-on-dark-15: rgba(255, 255, 255, 0.15);
+  --bk-alpha-on-dark-40: rgba(255, 255, 255, 0.40);
+
+  /* ── Box-model overlay · canvas dev tooling ───────────────────── */
+
+  --bk-boxmodel-margin: rgba(246, 178, 107, 0.45);
+  --bk-boxmodel-border: rgba(255, 229, 153, 0.45);
+  --bk-boxmodel-padding: rgba(147, 196, 125, 0.45);
+  --bk-boxmodel-content: rgba(111, 168, 220, 0.45);
+}

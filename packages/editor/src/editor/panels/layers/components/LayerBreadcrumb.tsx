@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * LayerBreadcrumb - Shows ancestor path when exactly 1 layer is selected.
  * Props-only, no hook imports.
@@ -7,6 +6,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 import * as React from "react";
 import { getAncestors, getDisplayName, findById } from "../data/layerUtils";
 import type { LayerItem } from "../types";
+import { Button } from "@/editor/chrome-ui";
 
 interface LayerBreadcrumbProps {
   selectedId: string;

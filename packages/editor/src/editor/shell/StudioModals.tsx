@@ -13,7 +13,7 @@ import { CollectionSetupModal } from "../ecommerce";
 import { ExportModal } from "../export";
 import { MediaLibraryPanel, ImageEditorModal, IconPickerModal } from "../media";
 import { KeyboardShortcutsPanel } from "../panels/KeyboardShortcutsPanel";
-import { useToast } from "@/editor/shared/vibcoder";
+import { useToast } from "@/editor/chrome-ui";
 import { CMSCollectionSetupModal } from "./modals/CMSCollectionSetupModal";
 import { CMSRecordsModal } from "./modals/CMSRecordsModal";
 import { CommandPalette } from "./modals/CommandPalette";

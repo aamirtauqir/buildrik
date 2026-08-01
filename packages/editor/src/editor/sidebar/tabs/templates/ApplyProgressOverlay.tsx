@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * ApplyProgressOverlay — shows 4-step progress while template apply runs.
  *
@@ -12,6 +11,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 import * as React from "react";
 import { createPortal } from "react-dom";
 import "./ApplyProgressOverlay.css";
+import { Button } from "@/editor/chrome-ui";
 
 export interface ApplyProgressOverlayProps {
   templateName: string;
@@ -83,7 +83,7 @@ export const ApplyProgressOverlay: React.FC<ApplyProgressOverlayProps> = ({
             flexDirection: "column",
             gap: 4,
             fontSize: 12,
-            color: "var(--bd-fg-muted)",
+            color: "var(--bk-ink-muted)",
             textAlign: "left",
             minWidth: 220,
           }}
@@ -99,10 +99,10 @@ export const ApplyProgressOverlay: React.FC<ApplyProgressOverlayProps> = ({
                   alignItems: "center",
                   gap: 8,
                   color: done
-                    ? "var(--bd-success)"
+                    ? "var(--bk-success)"
                     : active
-                      ? "var(--bd-cobalt)"
-                      : "var(--bd-fg-disabled)",
+                      ? "var(--bk-accent)"
+                      : "var(--bk-ink-disabled)",
                   fontWeight: active ? 500 : 400,
                 }}
               >

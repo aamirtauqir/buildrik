@@ -1,5 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Media Tab — Onboarding Empty State
  * Shown when the library is empty. Upload CTA + browse stock.
@@ -12,6 +10,7 @@ import { Upload } from "lucide-react";
 import { SUPPORTED_FORMATS_LABEL } from "../../../../../shared/constants/media";
 import { EMPTY_MSGS } from "../data/mediaData";
 import type { MediaTypeFilter } from "../data/mediaTypes";
+import { Button, TextInput } from "@/editor/chrome-ui";
 
 interface OnboardingEmptyStateProps {
   activeType: MediaTypeFilter;
@@ -37,7 +36,7 @@ export function OnboardingEmptyState({
       aria-label="Upload area — drag files here or click to browse"
     >
       <div className="med-empty-icon" aria-hidden="true">
-        <Upload size={48} color="var(--bd-fg-muted)" />
+        <Upload size={48} color="var(--bk-ink-muted)" />
       </div>
       <h3 className="med-empty-title">{msg.title}</h3>
       <p className="med-empty-sub">{msg.sub}</p>
@@ -48,7 +47,7 @@ export function OnboardingEmptyState({
       >
         Upload files
       </Button>
-      <Input
+      <TextInput
         ref={inputRef}
         type="file"
         multiple

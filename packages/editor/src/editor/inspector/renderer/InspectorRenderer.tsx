@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * InspectorRenderer — turns a SectionSchema into React.
  *
@@ -29,6 +28,7 @@ import type {
   Field,
   SectionSchema,
 } from "./schema";
+import { Button } from "@/editor/chrome-ui";
 
 export interface InspectorRendererProps {
   schema: SectionSchema;
@@ -137,9 +137,9 @@ const discloseButtonStyle: React.CSSProperties = {
   gap: 6,
   padding: "4px 8px",
   fontSize: 12,
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bk-ink-soft)",
   background: "transparent",
-  border: "1px solid var(--buildrick-border)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 4,
   cursor: "pointer",
 };

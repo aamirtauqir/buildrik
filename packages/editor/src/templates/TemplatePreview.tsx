@@ -6,17 +6,9 @@
 
 import DOMPurify from "dompurify";
 import * as React from "react";
-import {
-  Modal,
-  ModalContent,
-  ModalClose,
-  ModalTitle,
-  OverlayMount,
-} from "@/editor/shared/vibcoder";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { SemanticBadge } from "@/shared/ui/SemanticBadge";
+import { ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/chrome-ui";
 import type { Template } from "./types";
-
+import { Badge, Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -100,7 +92,7 @@ const DeviceSelector: React.FC<{
       style={{
         display: "flex",
         gap: 4,
-        background: "var(--buildrick-bg-dark)",
+        background: "var(--bk-gray-900)",
         borderRadius: 8,
         padding: 4,
       }}
@@ -112,7 +104,7 @@ const DeviceSelector: React.FC<{
           title={d.label}
           style={{
             padding: "8px 12px",
-            background: device === d.type ? "var(--buildrick-accent)" : "transparent",
+            background: device === d.type ? "var(--bk-accent)" : "transparent",
             border: "none",
             borderRadius: 6,
             cursor: "pointer",
@@ -144,10 +136,10 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
   const previewWidth = deviceWidths[device];
 
   return (
-    <OverlayMount>
-      <Modal open={isOpen} onOpenChange={(next) => !next && onClose()}>
+    <Portal>
+      <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
         <ModalContent size="xl" style={{ maxWidth: "90vw" }}>
-          <ModalClose aria-label="Close modal">
+          <ModalClose aria-label="Close modal" onClick={onClose}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
               <path d="M18 6L6 18M6 6l12 12" />
             </svg>
@@ -161,18 +153,18 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
             justifyContent: "space-between",
             alignItems: "center",
             padding: "12px 16px",
-            borderBottom: "1px solid var(--buildrick-border)",
+            borderBottom: "1px solid var(--bk-border)",
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <span style={{ fontSize: 24 }}>{template.thumbnail || "📄"}</span>
             <div>
               <ModalTitle style={{ fontWeight: 600, fontSize: 16, margin: 0 }}>{template.name}</ModalTitle>
-              <div style={{ fontSize: 12, color: "var(--buildrick-text-muted)" }}>
+              <div style={{ fontSize: 12, color: "var(--bk-ink-muted)" }}>
                 {template.description}
               </div>
             </div>
-            <SemanticBadge variant="default">{template.category}</SemanticBadge>
+            <Badge color="gray">{template.category}</Badge>
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
@@ -211,27 +203,27 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
         <div
           style={{
             padding: 16,
-            borderTop: "1px solid var(--buildrick-border)",
+            borderTop: "1px solid var(--bk-border)",
             display: "flex",
             gap: 24,
           }}
         >
           <div>
-            <div style={{ fontSize: 11, color: "var(--buildrick-text-muted)", marginBottom: 4 }}>
+            <div style={{ fontSize: 11, color: "var(--bk-ink-muted)", marginBottom: 4 }}>
               Category
             </div>
             <div style={{ fontWeight: 500 }}>{template.category}</div>
           </div>
           {template.tags && template.tags.length > 0 && (
             <div>
-              <div style={{ fontSize: 11, color: "var(--buildrick-text-muted)", marginBottom: 4 }}>
+              <div style={{ fontSize: 11, color: "var(--bk-ink-muted)", marginBottom: 4 }}>
                 Tags
               </div>
               <div style={{ display: "flex", gap: 4 }}>
                 {template.tags.map((tag) => (
-                  <SemanticBadge key={tag} variant="default" size="sm">
+                  <Badge key={tag} color="gray">
                     {tag}
-                  </SemanticBadge>
+                  </Badge>
                 ))}
               </div>
             </div>
@@ -240,8 +232,8 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
       </div>
           </div>
         </ModalContent>
-      </Modal>
-    </OverlayMount>
+      </ModalRoot>
+    </Portal>
   );
 };
 

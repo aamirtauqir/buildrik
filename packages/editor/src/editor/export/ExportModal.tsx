@@ -11,23 +11,21 @@ import { ReactExporter } from "../../engine/export/ReactExporter";
 import type { ExportConfig, ExportResult, PreviewDevice } from "../../shared/types/export";
 import { DEFAULT_EXPORT_CONFIG, PREVIEW_DEVICES } from "../../shared/types/export";
 import {
-  Modal,
-  ModalContent,
-  ModalTitle,
   ModalClose,
-  OverlayMount,
-} from "@/editor/shared/vibcoder";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Stack } from "@/editor/shared/vibcoder/Stack";
-import { Tabs, Tab } from "@/editor/shared/vibcoder/Tabs";
-import { Spinner } from "@/editor/shared/vibcoder/Spinner";
+  ModalContent,
+  ModalRoot,
+  ModalTitle,
+  Portal,
+  Spinner,
+  Tabs,
+} from "@/editor/chrome-ui";
 import { devError } from "../../shared/utils/devLogger";
 import { CodePreview } from "./CodePreview";
 import { FormatGrid, OptionsPanel } from "./ExportOptions";
 import { downloadFile } from "./ExportUtils";
 import { formatBytes } from "@shared/utils/helpers/number";
 import { PreviewFrame } from "./PreviewFrame";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -156,11 +154,11 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
         : `Export as ${config.format.toUpperCase()}`;
 
   return (
-    <OverlayMount>
-      <Modal open={isOpen} onOpenChange={(next) => !next && onClose()}>
+    <Portal>
+      <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
         <ModalContent size="lg">
           <ModalTitle>Export</ModalTitle>
-          <ModalClose aria-label="Close modal">
+          <ModalClose aria-label="Close modal" onClick={onClose}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
               <path d="M18 6L6 18M6 6l12 12" />
             </svg>
@@ -177,13 +175,14 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
           {/* Tabs */}
           <div style={{ marginBottom: 16 }}>
             <Tabs
+              tabs={[
+                { id: "preview", label: "Preview" },
+                { id: "code", label: "Code" },
+                { id: "options", label: "Options" },
+              ]}
               value={activeTab}
-              onValueChange={(tab) => setActiveTab(tab as ExportTab)}
-            >
-              <Tab id="preview">Preview</Tab>
-              <Tab id="code">Code</Tab>
-              <Tab id="options">Options</Tab>
-            </Tabs>
+              onChange={(tab) => setActiveTab(tab as ExportTab)}
+            />
           </div>
 
           {/* Content */}
@@ -222,7 +221,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
             <div
               style={{
                 fontSize: 12,
-                color: "var(--buildrick-text-muted)",
+                color: "var(--bk-ink-muted)",
                 marginTop: 16,
                 marginBottom: 4,
               }}
@@ -250,10 +249,10 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
               width: "100%",
               height: 44,
               marginTop: 16,
-              background: "var(--buildrick-accent)",
-              color: "var(--buildrick-text-on-accent)",
+              background: "var(--bk-accent)",
+              color: "var(--bk-accent-on)",
               border: "none",
-              borderRadius: "var(--buildrick-radius-md)",
+              borderRadius: "var(--bk-radius-lg)",
               fontSize: 14,
               fontWeight: 600,
               cursor:
@@ -295,17 +294,17 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
               marginTop: 12,
             }}
           >
-            <Button variant="ghost" onClick={onClose}>
+            <Button color="light" onClick={onClose} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
               Cancel
             </Button>
             <div style={{ display: "flex", gap: 8 }}>
               {config.format !== "react" && config.cssStyle === "external" && (
-                <Button variant="secondary" onClick={handleDownloadCSS} disabled={!result?.css}>
+                <Button color="light" onClick={handleDownloadCSS} disabled={!result?.css}>
                   Download CSS
                 </Button>
               )}
               {config.format !== "react" && (
-                <Button variant="secondary" onClick={handleDownloadAll} disabled={!result?.html}>
+                <Button color="light" onClick={handleDownloadAll} disabled={!result?.html}>
                   Download All
                 </Button>
               )}
@@ -313,8 +312,8 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
           </div>
           </div>
         </ModalContent>
-      </Modal>
-    </OverlayMount>
+      </ModalRoot>
+    </Portal>
   );
 };
 
@@ -323,32 +322,23 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
 // ============================================================================
 
 const LoadingState: React.FC = () => (
-  <Stack
-    gap="lg"
-    style={{
-      alignItems: "center",
-      justifyContent: "center",
-      height: 300,
-    }}
+  <div
+    className="tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-4"
+    style={{ height: 300 }}
   >
     <Spinner size="lg" />
-    <span style={{ color: "var(--buildrick-text-muted)" }}>Generating export...</span>
-  </Stack>
+    <span style={{ color: "var(--bk-ink-muted)" }}>Generating export...</span>
+  </div>
 );
 
 const ErrorState: React.FC<{ error: string }> = ({ error }) => (
-  <Stack
-    gap="lg"
-    style={{
-      alignItems: "center",
-      justifyContent: "center",
-      height: 300,
-      color: "var(--buildrick-error)",
-    }}
+  <div
+    className="tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-4"
+    style={{ height: 300, color: "var(--bk-error)" }}
   >
     <span style={{ fontSize: 32 }}>Error</span>
     <span>{error}</span>
-  </Stack>
+  </div>
 );
 
 const PreviewTab: React.FC<{
@@ -365,10 +355,10 @@ const PreviewTab: React.FC<{
           style={{
             padding: "6px 12px",
             background:
-              previewDevice === device ? "var(--buildrick-accent)" : "var(--buildrick-bg-panel-secondary)",
+              previewDevice === device ? "var(--bk-accent)" : "var(--bk-bg-subtle)",
             border: "none",
             borderRadius: 6,
-            color: previewDevice === device ? "var(--buildrick-bg-card)" : "var(--buildrick-text-primary)",
+            color: previewDevice === device ? "var(--bk-bg-card)" : "var(--bk-ink)",
             cursor: "pointer",
             fontSize: 12,
           }}
@@ -382,19 +372,14 @@ const PreviewTab: React.FC<{
 );
 
 const NoPreviewMessage: React.FC<{ format: string }> = ({ format }) => (
-  <Stack
-    gap="lg"
-    style={{
-      alignItems: "center",
-      justifyContent: "center",
-      height: 300,
-      color: "var(--buildrick-text-muted)",
-    }}
+  <div
+    className="tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-4"
+    style={{ height: 300, color: "var(--bk-ink-muted)" }}
   >
     <span style={{ fontSize: 32 }}>⚛</span>
     <span>{format} components cannot be previewed directly.</span>
     <span style={{ fontSize: 12 }}>Download and run locally to preview.</span>
-  </Stack>
+  </div>
 );
 
 const ReactCodePreview: React.FC<{ files: NonNullable<ExportResult["files"]> }> = ({ files }) => {

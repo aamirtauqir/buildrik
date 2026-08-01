@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 import { MultiSelectBanner } from "./MultiSelectBanner";
 import { MoveToFolderPopover } from "./MoveToFolderPopover";
 /**
@@ -14,7 +13,7 @@ import { useClickOutside } from "@/shared/hooks";
 import { EMPTY_MSGS, FORMAT_OPTIONS, SORT_OPTIONS } from "../data/mediaData";
 import type { LibraryItem, LibraryViewProps } from "../data/mediaTypes";
 import { extStyle, fmtDur, fmtSize } from "../data/mediaUtils";
-
+import { Button } from "@/editor/chrome-ui";
 // ─── Font @font-face injection ────────────────────────────────────────────────
 
 function useFontFaceInjection(fntItems: LibraryItem[]) {

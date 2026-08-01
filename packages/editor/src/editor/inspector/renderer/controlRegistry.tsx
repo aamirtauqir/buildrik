@@ -1,7 +1,3 @@
-import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
-import { Select } from "@/editor/shared/vibcoder/Select";
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Default control registry — maps each Field discriminator to a React
  * component. Session 1 ships minimal controls for length, number, select,
@@ -28,7 +24,7 @@ import type {
   TextField,
   ToggleField,
 } from "./schema";
-
+import { Button, Checkbox, Select, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // SHARED STYLE TOKENS — keep each control file-local so future sections can
 // diverge without cross-control coupling. Nothing here is exported.
@@ -44,7 +40,7 @@ const rowStyle: React.CSSProperties = {
 const labelStyle: React.CSSProperties = {
   flex: "0 0 88px",
   fontSize: 12,
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bk-ink-soft)",
 };
 
 const inputStyle: React.CSSProperties = {
@@ -53,10 +49,11 @@ const inputStyle: React.CSSProperties = {
   height: 24,
   padding: "0 8px",
   fontSize: 12,
-  color: "var(--buildrick-text-primary)",
-  background: "var(--buildrick-bg-input)",
-  border: "1px solid var(--buildrick-border)",
+  color: "var(--bk-ink)",
+  background: "var(--bk-bg-card)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 4,
+  appearance: "auto",
 };
 
 // File-local so the value lives near the style it drives, and so the chrome
@@ -77,7 +74,7 @@ const LengthControl: React.FC<ControlProps<LengthField>> = ({
     <label style={labelStyle} htmlFor={`field-${field.prop}`}>
       {field.label}
     </label>
-    <Input
+    <TextInput
       id={`field-${field.prop}`}
       type="text"
       value={value}
@@ -101,7 +98,7 @@ const NumberControl: React.FC<ControlProps<NumberField>> = ({
     <label style={labelStyle} htmlFor={`field-${field.prop}`}>
       {field.label}
     </label>
-    <Input
+    <TextInput
       id={`field-${field.prop}`}
       type="number"
       value={value}
@@ -158,6 +155,8 @@ const ToggleControl: React.FC<ControlProps<ToggleField>> = ({
         {field.label}
       </label>
       <Checkbox
+        color="blue"
+        className="tw:bg-white"
         id={`field-${field.prop}`}
         checked={checked}
         onChange={(e) => onChange(e.target.checked ? field.on : field.off)} />
@@ -178,7 +177,7 @@ const ColorControl: React.FC<ControlProps<ColorField>> = ({
     <label style={labelStyle} htmlFor={`field-${field.prop}`}>
       {field.label}
     </label>
-    <Input
+    <TextInput
       id={`field-${field.prop}`}
       type="color"
       value={value || "#000000"}
@@ -243,10 +242,10 @@ const Spacing4Control: React.FC<ControlProps<Spacing4Field>> = ({
               padding: "0 8px",
               fontSize: 11,
               color: linked
-                ? "var(--buildrick-accent)"
-                : "var(--buildrick-text-muted)",
+                ? "var(--bk-accent)"
+                : "var(--bk-ink-muted)",
               background: "transparent",
-              border: "1px solid var(--buildrick-border)",
+              border: "1px solid var(--bk-border)",
               borderRadius: 4,
               cursor: "pointer",
             }}
@@ -263,7 +262,7 @@ const Spacing4Control: React.FC<ControlProps<Spacing4Field>> = ({
           >
             {side}
           </label>
-          <Input
+          <TextInput
             id={`field-${field.group}-${side}`}
             type="text"
             value={values[side]}
@@ -289,7 +288,7 @@ const TextControl: React.FC<ControlProps<TextField>> = ({
     <label style={labelStyle} htmlFor={`field-${field.prop}`}>
       {field.label}
     </label>
-    <Input
+    <TextInput
       id={`field-${field.prop}`}
       type="text"
       value={value}
@@ -348,10 +347,10 @@ const Corners4Control: React.FC<ControlProps<Corners4Field>> = ({
               padding: "0 8px",
               fontSize: 11,
               color: linked
-                ? "var(--buildrick-accent)"
-                : "var(--buildrick-text-muted)",
+                ? "var(--bk-accent)"
+                : "var(--bk-ink-muted)",
               background: "transparent",
-              border: "1px solid var(--buildrick-border)",
+              border: "1px solid var(--bk-border)",
               borderRadius: 4,
               cursor: "pointer",
             }}
@@ -365,7 +364,7 @@ const Corners4Control: React.FC<ControlProps<Corners4Field>> = ({
           <label style={labelStyle} htmlFor={`field-${c.prop}`}>
             {c.label}
           </label>
-          <Input
+          <TextInput
             id={`field-${c.prop}`}
             type="text"
             value={cornerValues[c.id]}
@@ -388,12 +387,12 @@ const GroupHeadingControl: React.FC<ControlProps<GroupHeadingField>> = ({
   <div
     style={{
       fontSize: 12,
-      color: "var(--buildrick-text-tertiary)",
+      color: "var(--bk-ink-muted)",
       fontWeight: 500,
       marginTop: field.divider ? 12 : 8,
       paddingTop: field.divider ? 12 : 0,
       borderTop: field.divider
-        ? "1px solid var(--buildrick-border-light)"
+        ? "1px solid var(--bk-border)"
         : undefined,
     }}
   >

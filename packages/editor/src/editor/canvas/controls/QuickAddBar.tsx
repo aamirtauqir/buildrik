@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Aquibra Quick Add Bar
  * Quick access to common blocks
@@ -8,6 +7,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 import { Type, Heading, ImageIcon, Square, LayoutTemplate, LucideIcon } from "lucide-react";
 import * as React from "react";
 import type { BlockData } from "../../../shared/types";
+import { Button } from "@/editor/chrome-ui";
 
 interface QuickAddBarProps {
   blocks: BlockData[];
@@ -57,7 +57,7 @@ export const QuickAddBar: React.FC<QuickAddBarProps> = ({ blocks, onAdd, disable
           display: "flex",
           alignItems: "center",
           padding: "0 8px 0 4px",
-          color: "var(--buildrick-text-muted)",
+          color: "var(--bk-ink-muted)",
           fontSize: 12,
           fontWeight: 600,
           textTransform: "uppercase",
@@ -83,14 +83,14 @@ export const QuickAddBar: React.FC<QuickAddBarProps> = ({ blocks, onAdd, disable
             padding: "6px 12px",
             background:
               hovered === block.id && !disabled
-                ? "var(--buildrick-accent)"
-                : "var(--buildrick-bg-hover)",
-            border: "1px solid var(--buildrick-border-light)",
+                ? "var(--bk-accent)"
+                : "var(--bk-bg-subtle)",
+            border: "1px solid var(--bk-border)",
             borderRadius: 6,
             color:
               hovered === block.id && !disabled
-                ? "var(--buildrick-text-on-accent)"
-                : "var(--buildrick-text-primary)",
+                ? "var(--bk-accent-on)"
+                : "var(--bk-ink)",
             fontSize: 12,
             fontWeight: 500,
             cursor: disabled ? "not-allowed" : "pointer",

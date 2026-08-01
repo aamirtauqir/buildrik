@@ -1,6 +1,3 @@
-import { Select } from "@/editor/shared/vibcoder/Select";
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Cluster } from "@/editor/shared/vibcoder/Cluster";
 /**
  * Aquibra Rich Text Editor
  * WYSIWYG text editing toolbar
@@ -9,17 +6,8 @@ import { Cluster } from "@/editor/shared/vibcoder/Cluster";
 
 import * as React from "react";
 import { ColorField } from "../../shared/forms";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverPortal,
-  PopoverContent,
-  Tooltip,
-  TooltipTrigger,
-  TooltipPortal,
-  TooltipContent,
-} from "@/editor/shared/vibcoder";
+import { Popover } from "@/editor/chrome-ui";
+import { Button, Select, TextInput, Tooltip } from "@/editor/chrome-ui";
 
 export interface RichTextEditorProps {
   onCommand: (command: string, value?: string) => void;
@@ -126,14 +114,13 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
   ];
 
   return (
-    <Cluster
-      gap="xs"
-     
+    <div
+      className="tw:flex tw:flex-wrap tw:items-center tw:gap-1"
       style={{
         padding: 8,
-        background: "var(--buildrick-bg-panel)",
+        background: "var(--bk-bg-panel)",
         borderRadius: 8,
-        border: "1px solid var(--buildrick-border)",
+        border: "1px solid var(--bk-border)",
       }}
     >
       {/* Heading Selector */}
@@ -141,12 +128,13 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
         onChange={(e) => onCommand("formatBlock", e.target.value)}
         style={{
           padding: "4px 8px",
-          background: "var(--buildrick-bg-dark)",
-          border: "1px solid var(--buildrick-border)",
+          background: "var(--bk-gray-900)",
+          border: "1px solid var(--bk-border)",
           borderRadius: 4,
-          color: "var(--buildrick-text-primary)",
+          color: "var(--bk-ink)",
           fontSize: 12,
           cursor: "pointer",
+          appearance: "auto",
         }}
       >
         {headings.map((h) => (
@@ -160,12 +148,13 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
         onChange={(e) => onCommand("fontSize", e.target.value)}
         style={{
           padding: "4px 8px",
-          background: "var(--buildrick-bg-dark)",
-          border: "1px solid var(--buildrick-border)",
+          background: "var(--bk-gray-900)",
+          border: "1px solid var(--bk-border)",
           borderRadius: 4,
-          color: "var(--buildrick-text-primary)",
+          color: "var(--bk-ink)",
           fontSize: 12,
           cursor: "pointer",
+          appearance: "auto",
         }}
       >
         {fontSizes.map((s) => (
@@ -183,23 +172,25 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
             const isActive = "active" in item ? item.active : false;
             const itemStyle = "style" in item ? item.style : {};
             return (
-              <Tooltip key={item.command}>
-                <TooltipTrigger asChild>
-                  <Button
-                    onClick={() => onCommand(item.command)}
-                    style={{
-                      ...toolbarButtonStyle,
-                      background: isActive ? "var(--buildrick-accent)" : "transparent",
-                      color: isActive ? "var(--buildrick-bg-card)" : "var(--buildrick-text-secondary)",
-                      ...itemStyle,
-                    }}
-                  >
-                    {item.icon}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipPortal>
-                  <TooltipContent>{item.label}</TooltipContent>
-                </TooltipPortal>
+              <Tooltip
+                key={item.command}
+                content={item.label}
+                placement="bottom"
+                arrow={false}
+                className="tw:max-w-[280px] tw:whitespace-normal"
+              >
+                <Button
+                  color="light"
+                  onClick={() => onCommand(item.command)}
+                  style={{
+                    ...toolbarButtonStyle,
+                    background: isActive ? "var(--bk-accent)" : "transparent",
+                    color: isActive ? "var(--bk-bg-card)" : "var(--bk-ink-soft)",
+                    ...itemStyle,
+                  }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+                >
+                  {item.icon}
+                </Button>
               </Tooltip>
             );
           })}
@@ -207,95 +198,103 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
       ))}
       <Divider />
       {/* Colors */}
-      <Popover open={textColorOpen} onOpenChange={setTextColorOpen}>
-        <PopoverTrigger asChild>
-          <Button style={toolbarButtonStyle} title="Text Color" aria-label="Change text color">
-            <span style={{ borderBottom: "2px solid var(--buildrick-accent)" }}>A</span>
-          </Button>
-        </PopoverTrigger>
-        <PopoverPortal>
-          <PopoverContent sideOffset={8}>
-            <ColorField label="Text Color" onChange={(color) => onCommand("foreColor", color)} />
-          </PopoverContent>
-        </PopoverPortal>
-      </Popover>
-      <Popover open={bgColorOpen} onOpenChange={setBgColorOpen}>
-        <PopoverTrigger asChild>
+      <Popover
+        open={textColorOpen}
+        onClose={() => setTextColorOpen(false)}
+        label="Text color"
+        trigger={
           <Button
+            color="light"
+            style={toolbarButtonStyle}
+            title="Text Color"
+            aria-label="Change text color"
+            aria-expanded={textColorOpen}
+            onClick={() => setTextColorOpen((v) => !v)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+          >
+            <span style={{ borderBottom: "2px solid var(--bk-accent)" }}>A</span>
+          </Button>
+        }
+      >
+        <ColorField label="Text Color" onChange={(color) => onCommand("foreColor", color)} />
+      </Popover>
+      <Popover
+        open={bgColorOpen}
+        onClose={() => setBgColorOpen(false)}
+        label="Highlight color"
+        trigger={
+          <Button
+            color="light"
             style={toolbarButtonStyle}
             title="Background Color"
             aria-label="Change background highlight color"
+            aria-expanded={bgColorOpen}
+            onClick={() => setBgColorOpen((v) => !v)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           >
-            <span style={{ background: "var(--buildrick-warning)", padding: "0 4px" }}>A</span>
+            <span style={{ background: "var(--bk-warning)", padding: "0 4px" }}>A</span>
           </Button>
-        </PopoverTrigger>
-        <PopoverPortal>
-          <PopoverContent sideOffset={8}>
-            <ColorField
-              label="Highlight Color"
-              onChange={(color) => onCommand("hiliteColor", color)}
-            />
-          </PopoverContent>
-        </PopoverPortal>
+        }
+      >
+        <ColorField
+          label="Highlight Color"
+          onChange={(color) => onCommand("hiliteColor", color)}
+        />
       </Popover>
       <Divider />
       {/* Link */}
-      <Popover open={linkOpen} onOpenChange={setLinkOpen}>
-        <PopoverTrigger asChild>
+      <Popover
+        open={linkOpen}
+        onClose={() => setLinkOpen(false)}
+        label="Insert link"
+        trigger={
           <Button
+            color="light"
             style={{
               ...toolbarButtonStyle,
-              background: activeStyles.link ? "var(--buildrick-accent)" : "transparent",
-              color: activeStyles.link ? "var(--buildrick-bg-card)" : "var(--buildrick-text-secondary)",
+              background: activeStyles.link ? "var(--bk-accent)" : "transparent",
+              color: activeStyles.link ? "var(--bk-bg-card)" : "var(--bk-ink-soft)",
             }}
             title="Insert Link"
+            aria-expanded={linkOpen}
+            onClick={() => setLinkOpen((v) => !v)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           >
             🔗
           </Button>
-        </PopoverTrigger>
-        <PopoverPortal>
-          <PopoverContent sideOffset={8}>
-            <div style={{ width: 250 }}>
-              <Input
-                type="text"
-                value={linkUrl}
-                onChange={(e) => setLinkUrl(e.target.value)}
-                placeholder="https://..."
-                style={{
-                  width: "100%",
-                  padding: "8px 12px",
-                  background: "var(--buildrick-bg-dark)",
-                  border: "1px solid var(--buildrick-border)",
-                  borderRadius: 6,
-                  color: "var(--buildrick-text-primary)",
-                  fontSize: 13,
-                  marginBottom: 8,
-                }}
-              />
-              <div style={{ display: "flex", gap: 8 }}>
-                <Button size="sm" variant="ghost" onClick={() => onCommand("unlink")}>
-                  Remove
-                </Button>
-                <Button size="sm" onClick={handleLink}>
-                  Apply
-                </Button>
-              </div>
-            </div>
-          </PopoverContent>
-        </PopoverPortal>
+        }
+      >
+        <div style={{ width: 250 }}>
+          <TextInput
+            type="text"
+            value={linkUrl}
+            onChange={(e) => setLinkUrl(e.target.value)}
+            placeholder="https://..."
+            style={{
+              width: "100%",
+              padding: "8px 12px",
+              background: "var(--bk-gray-900)",
+              border: "1px solid var(--bk-border)",
+              borderRadius: 6,
+              color: "var(--bk-ink)",
+              fontSize: 13,
+              marginBottom: 8,
+            }}
+          />
+          <div style={{ display: "flex", gap: 8 }}>
+            <Button size="xs" color="light" onClick={() => onCommand("unlink")} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+              Remove
+            </Button>
+            <Button size="xs" onClick={handleLink}>
+              Apply
+            </Button>
+          </div>
+        </div>
       </Popover>
       {/* Clear Formatting */}
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button onClick={() => onCommand("removeFormat")} style={toolbarButtonStyle}>
-            ✕
-          </Button>
-        </TooltipTrigger>
-        <TooltipPortal>
-          <TooltipContent>Clear Formatting</TooltipContent>
-        </TooltipPortal>
+      <Tooltip content="Clear Formatting" placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
+        <Button color="light" onClick={() => onCommand("removeFormat")} style={toolbarButtonStyle} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+          ✕
+        </Button>
       </Tooltip>
-    </Cluster>
+    </div>
   );
 };
 
@@ -304,7 +303,7 @@ const Divider = () => (
     style={{
       width: 1,
       height: 20,
-      background: "var(--buildrick-border)",
+      background: "var(--bk-border)",
       margin: "0 4px",
     }}
   />
@@ -319,7 +318,7 @@ const toolbarButtonStyle: React.CSSProperties = {
   background: "transparent",
   border: "none",
   borderRadius: 4,
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bk-ink-soft)",
   cursor: "pointer",
   fontSize: 13,
   transition: "all 0.15s ease",
