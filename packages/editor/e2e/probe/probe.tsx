@@ -40,14 +40,18 @@ const CASES: Record<string, () => React.ReactElement> = {
   ),
   // The empty-state render path, so the baseline also covers styles that only
   // appear through real JSX rather than through the S map alone.
-  "content-root-empty": () => (
-    <div data-probe="content-root-empty">
+  // POPULATED. An all-zero RootView early-returns its empty state
+  // (ContentViews.tsx:169), so a zeros-only case renders none of the rows and
+  // would pass parity against code it never executed. That false green is the
+  // exact failure this harness exists to prevent; it caught itself here.
+  "content-root-rows": () => (
+    <div data-probe="content-root-rows">
       <RootView
-        collections={[]}
-        recordCounts={{}}
-        sourcesCount={0}
-        variablesCount={0}
-        conditionsCount={0}
+        collections={[{ id: "c1", name: "Posts" } as never, { id: "c2", name: "Authors" } as never]}
+        recordCounts={{ c1: 12, c2: 3 }}
+        sourcesCount={2}
+        variablesCount={5}
+        conditionsCount={1}
         onOpenCollection={() => {}}
         onCreateCollection={() => {}}
         onOpenSources={() => {}}

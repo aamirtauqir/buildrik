@@ -8,7 +8,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { ConfirmDialog, Button, Checkbox, Select, Textarea, TextInput, ToggleSwitch } from "@/editor/chrome-ui";
+import { ConfirmDialog, Button, Checkbox, ListRow, SectionHeader, Select, Textarea, TextInput, ToggleSwitch } from "@/editor/chrome-ui";
 import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
 import type { ConditionExpression, ConditionOperator, DataSource } from "@/shared/types/data";
 import { conditionSummary, fieldDefault, isValidVariableKey, type SiteVariable } from "./contentPanelUtils";
@@ -180,44 +180,25 @@ export function RootView({
   }
   return (
     <div style={S.scroll}>
-      <div style={S.sectionHead}>
-        <span>Collections</span>
-        <span>{collections.length}</span>
-      </div>
+      <SectionHeader count={collections.length}>Collections</SectionHeader>
       {collections.map((c) => (
-        <Button key={c.id} style={S.row} onClick={() => onOpenCollection(c.id)}>
-          <span>{c.name}</span>
-          <span style={S.rowMeta}>
-            {recordCounts[c.id] ?? "—"} <span style={S.chev}>›</span>
-          </span>
-        </Button>
+        <ListRow
+          key={c.id}
+          label={c.name}
+          count={recordCounts[c.id] ?? "—"}
+          chevron
+          onClick={() => onOpenCollection(c.id)}
+        />
       ))}
       {onCreateCollection && (
         <Button style={S.addLink} onClick={onCreateCollection}>
           + New collection
         </Button>
       )}
-      <div style={S.sectionHead}>
-        <span>Data</span>
-      </div>
-      <Button style={S.row} onClick={onOpenSources}>
-        <span>Sources</span>
-        <span style={S.rowMeta}>
-          {sourcesCount} <span style={S.chev}>›</span>
-        </span>
-      </Button>
-      <Button style={S.row} onClick={onOpenVariables}>
-        <span>Variables</span>
-        <span style={S.rowMeta}>
-          {variablesCount} <span style={S.chev}>›</span>
-        </span>
-      </Button>
-      <Button style={S.row} onClick={onOpenConditions}>
-        <span>Conditions</span>
-        <span style={S.rowMeta}>
-          {conditionsCount} <span style={S.chev}>›</span>
-        </span>
-      </Button>
+      <SectionHeader>Data</SectionHeader>
+      <ListRow label="Sources" count={sourcesCount} chevron onClick={onOpenSources} />
+      <ListRow label="Variables" count={variablesCount} chevron onClick={onOpenVariables} />
+      <ListRow label="Conditions" count={conditionsCount} chevron onClick={onOpenConditions} />
     </div>
   );
 }
