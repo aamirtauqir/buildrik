@@ -10,15 +10,31 @@
  * Retry", never the empty "no feedback yet" state (fake-empty). Reads throw
  * (ReviewService), so the catch here is what distinguishes error from empty.
  *
- * Styling follows the chrome convention (inline style objects + DS primitives,
- * as in Topbar) — the editor tsconfig uses react-jsx, not the Emotion pragma.
+ * Styling is chrome-ui components + `tw:` utilities. The comment rows, group
+ * headings, empty states and the overflow menu are NOT rebuilt here — they are
+ * CommentRow, SectionHeader, EmptyState and Popover/Menu, which is what stops
+ * this panel drifting from every other list surface in the editor.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
 import { AlertCircle, CheckCircle2, ChevronLeft, History } from "lucide-react";
-import { ConfirmDialog, PanelHeader, Spinner, Badge, Button, Textarea, ToggleSwitch } from "@/editor/chrome-ui";
+import {
+  CommentRow,
+  ConfirmDialog,
+  EmptyState,
+  Menu,
+  MenuItem,
+  PanelHeader,
+  Popover,
+  SectionHeader,
+  Spinner,
+  Badge,
+  Button,
+  Textarea,
+  ToggleSwitch,
+} from "@/editor/chrome-ui";
 import { ApprovedCompareView } from "@/editor/panels/version-history/ApprovedCompareView";
 import type { PublishPage } from "@/editor/shell/exportPublishPages";
 import {
@@ -45,6 +61,18 @@ const BADGE_KIND: Record<string, { color: string; className?: string }> = {
 };
 const BADGE_NEUTRAL = { color: "gray" } as const;
 
+/* Layout classes. Named once because six of these appeared verbatim at
+   multiple call sites when they were inline style objects. */
+const BODY = "tw:flex tw:flex-col tw:h-full tw:min-h-0";
+const HEADER = "tw:p-3 tw:border-b tw:border-gray-200 tw:flex tw:flex-col tw:gap-2";
+const HEAD_ROW = "tw:flex tw:items-center tw:gap-2 tw:justify-between";
+const META = "tw:text-xs tw:text-gray-500 tw:leading-[1.4]";
+const ACTIONS = "tw:flex tw:items-center tw:gap-1.5";
+const SCROLL = "tw:flex-1 tw:min-h-0 tw:overflow-y-auto tw:py-2";
+const COMPOSER = "tw:border-t tw:border-gray-200 tw:px-3 tw:py-2.5 tw:flex tw:flex-col tw:gap-2";
+const BAR = "tw:flex tw:items-center tw:gap-2 tw:px-3 tw:py-2 tw:border-b tw:border-gray-200";
+/** The ghost-button look, previously copy-pasted onto six separate Buttons. */
+const GHOST = "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900";
 
 export interface ReviewTabProps {
   isPinned?: boolean;
@@ -79,32 +107,6 @@ const STATUS_TONE: Record<string, { label: string; variant: "syncing" | "publish
   PENDING: { label: "In review", variant: "syncing" },
   APPROVED: { label: "Approved", variant: "published" },
   CHANGES_REQUESTED: { label: "Changes requested", variant: "issues" },
-};
-
-const S: Record<string, React.CSSProperties> = {
-  body: { display: "flex", flexDirection: "column", height: "100%", minHeight: 0 },
-  header: { padding: 12, borderBottom: "1px solid var(--bk-border)", display: "flex", flexDirection: "column", gap: 8 },
-  headRow: { display: "flex", alignItems: "center", gap: 8, justifyContent: "space-between" },
-  meta: { fontSize: 12, color: "var(--bk-ink-muted)", lineHeight: 1.4 },
-  actions: { display: "flex", alignItems: "center", gap: 6 },
-  more: { position: "relative" },
-  menu: { position: "absolute", right: 0, top: "calc(100% + 4px)", zIndex: 10, background: "var(--bk-bg-panel)", border: "1px solid var(--bk-border)", borderRadius: 8, padding: 4, minWidth: 160 },
-  scroll: { flex: 1, minHeight: 0, overflowY: "auto", padding: "8px 12px" },
-  group: { marginBottom: 12 },
-  groupHead: { fontSize: 11, fontWeight: 600, letterSpacing: ".4px", textTransform: "uppercase", color: "var(--bk-ink-muted)", margin: "6px 0" },
-  row: { display: "flex", flexDirection: "column", gap: 4, padding: 8, border: "1px solid var(--bk-border)", borderRadius: 8, marginBottom: 6 },
-  rowResolved: { opacity: 0.6 },
-  rowTop: { display: "flex", alignItems: "center", gap: 6, justifyContent: "space-between" },
-  who: { fontSize: 12, fontWeight: 600, color: "var(--bk-ink)" },
-  when: { fontSize: 11, color: "var(--bk-ink-muted)" },
-  text: { fontSize: 13, color: "var(--bk-ink)", lineHeight: 1.4 },
-  composer: { borderTop: "1px solid var(--bk-border)", padding: "10px 12px", display: "flex", flexDirection: "column", gap: 8 },
-  center: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, padding: 24, textAlign: "center", color: "var(--bk-ink-muted)" },
-  centerTitle: { fontSize: 14, fontWeight: 600, color: "var(--bk-ink)" },
-  centerHint: { fontSize: 12, color: "var(--bk-ink-muted)", maxWidth: 240 },
-  toolbar: { display: "flex", alignItems: "center", gap: 8, justifyContent: "space-between", padding: "8px 12px", borderBottom: "1px solid var(--bk-border)" },
-  toggle: { fontSize: 12, color: "var(--bk-ink-muted)", display: "flex", alignItems: "center", gap: 6 },
-  compareBar: { display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", borderBottom: "1px solid var(--bk-border)" },
 };
 
 interface Group { key: string; label: string; comments: ReviewComment[]; }
@@ -276,58 +278,61 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
 
   if (state === "loading") {
     return (
-      <div style={S.body}>
+      <div className={BODY}>
         {header}
-        <div style={S.center}><Spinner size="lg" /><span>Loading review…</span></div>
+        <EmptyState className="tw:flex-1" icon={<Spinner size="lg" />} body="Loading review…" />
       </div>
     );
   }
 
   if (state === "error") {
     return (
-      <div style={S.body}>
+      <div className={BODY}>
         {header}
-        <div style={S.center}>
-          <AlertCircle size={24} aria-hidden="true" />
-          <div style={S.centerTitle}>Couldn't load the review</div>
-          <div style={S.centerHint}>The dashboard didn't answer. Your feedback is safe — this is just the panel.</div>
-          <Button color="light" size="xs" onClick={() => void load()}>Retry</Button>
-        </div>
+        <EmptyState
+          className="tw:flex-1"
+          icon={<AlertCircle size={24} aria-hidden="true" />}
+          title="Couldn't load the review"
+          body="The dashboard didn't answer. Your feedback is safe — this is just the panel."
+          action={<Button color="light" size="xs" onClick={() => void load()}>Retry</Button>}
+        />
       </div>
     );
   }
 
   if (!round) {
     return (
-      <div style={S.body}>
+      <div className={BODY}>
         {header}
-        <div style={S.center}>
-          <CheckCircle2 size={24} aria-hidden="true" />
-          <div style={S.centerTitle}>No review yet</div>
-          <div style={S.centerHint}>This site hasn't been sent for review yet. Use “Send for review” in the top bar to invite a client.</div>
-        </div>
+        <EmptyState
+          className="tw:flex-1"
+          icon={<CheckCircle2 size={24} aria-hidden="true" />}
+          title="No review yet"
+          body="This site hasn't been sent for review yet. Use “Send for review” in the top bar to invite a client."
+        />
       </div>
     );
   }
 
   if (compareOpen) {
     return (
-      <div style={S.body}>
-        <div style={S.compareBar}>
-          <Button color="light" size="xs" onClick={() => setCompareOpen(false)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+      <div className={BODY}>
+        <div className={BAR}>
+          <Button color="light" size="xs" onClick={() => setCompareOpen(false)} className={GHOST}>
             <ChevronLeft size={14} aria-hidden="true" /> Back
           </Button>
-          <span style={S.who}>Compare with approved</span>
+          <span className="tw:text-xs tw:font-semibold tw:text-gray-900">Compare with approved</span>
         </div>
         {compareState === "loading" ? (
-          <div style={S.center}><Spinner size="lg" /><span>Loading approved snapshot…</span></div>
+          <EmptyState className="tw:flex-1" icon={<Spinner size="lg" />} body="Loading approved snapshot…" />
         ) : compareState === "error" ? (
-          <div style={S.center}>
-            <AlertCircle size={24} aria-hidden="true" />
-            <div style={S.centerTitle}>Couldn't load the approved snapshot</div>
-            <div style={S.centerHint}>The dashboard didn't answer. Try again.</div>
-            <Button color="light" size="xs" onClick={() => void openCompare()}>Retry</Button>
-          </div>
+          <EmptyState
+            className="tw:flex-1"
+            icon={<AlertCircle size={24} aria-hidden="true" />}
+            title="Couldn't load the approved snapshot"
+            body="The dashboard didn't answer. Try again."
+            action={<Button color="light" size="xs" onClick={() => void openCompare()}>Retry</Button>}
+          />
         ) : (
           <ApprovedCompareView
             approvedPages={approvedSnap}
@@ -351,130 +356,133 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
   const attached = visible.filter((c) => !detachedIds.has(c.id));
   const groups = groupByPage(attached);
 
+  const resolveButton = (c: ReviewComment) => (
+    <Button color="light" size="xs" onClick={() => void onResolve(c)} className={GHOST}>
+      {c.status === "RESOLVED" ? "Reopen" : "Resolve"}
+    </Button>
+  );
+
   return (
-    <div style={S.body}>
+    <div className={BODY}>
       {header}
 
-      <div style={S.header}>
-        <div style={S.headRow}>
-          <div style={S.actions}>
+      <div className={HEADER}>
+        <div className={HEAD_ROW}>
+          <div className={ACTIONS}>
             <Badge {...(BADGE_KIND[round.revoked ? "issues" : tone.variant] ?? BADGE_NEUTRAL)}>{round.revoked ? "Link revoked" : tone.label}</Badge>
             {round.openCommentCount > 0 && <Badge color="gray">{round.openCommentCount} open</Badge>}
           </div>
-          <div style={S.actions}>
+          <div className={ACTIONS}>
             {round.status === "APPROVED" && onExportCurrentPages && (
-              <Button color="light" size="xs" onClick={() => void openCompare()} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+              <Button color="light" size="xs" onClick={() => void openCompare()} className={GHOST}>
                 <History size={14} aria-hidden="true" /> Compare
               </Button>
             )}
             <Button size="xs" disabled={resending} onClick={() => void doResend()} aria-busy={resending || undefined}>Re-send</Button>
-            <div style={S.more}>
-              <Button color="light" size="xs" aria-label="More options" onClick={() => setMoreOpen((v) => !v)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">⋯</Button>
-              {moreOpen && (
-                <div style={S.menu} role="menu">
-                  <Button
-                    color="red"
-                    size="xs"
-                    onClick={() => { setConfirmRevoke(true); setMoreOpen(false); }}
-                  >
-                    Revoke link
-                  </Button>
-                </div>
-              )}
-            </div>
+            <Popover
+              open={moreOpen}
+              onClose={() => setMoreOpen(false)}
+              placement="bottom-end"
+              label="Review options"
+              trigger={
+                <Button color="light" size="xs" aria-label="More options" onClick={() => setMoreOpen((v) => !v)} className={GHOST}>⋯</Button>
+              }
+            >
+              <Menu label="Review options">
+                <MenuItem danger onClick={() => { setConfirmRevoke(true); setMoreOpen(false); }}>
+                  Revoke link
+                </MenuItem>
+              </Menu>
+            </Popover>
           </div>
         </div>
-        <div style={S.meta}>
+        <div className={META}>
           {round.invitedEmail ? `Sent to ${round.invitedEmail}` : "Not yet sent to a client"} · Round {round.roundNumber} of {round.totalRounds}
         </div>
-        {notice && <div style={S.meta}>{notice}</div>}
+        {notice && <div className={META}>{notice}</div>}
       </div>
 
-      <div style={S.toolbar}>
-        <span style={S.meta}>{visible.length} comment{visible.length === 1 ? "" : "s"}</span>
-        <span style={S.toggle}>
+      <div className={`${BAR} tw:justify-between`}>
+        <span className={META}>{visible.length} comment{visible.length === 1 ? "" : "s"}</span>
+        <span className="tw:text-xs tw:text-gray-500 tw:flex tw:items-center tw:gap-1.5">
           Show resolved
           <ToggleSwitch checked={showResolved} aria-label="Show resolved" onChange={() => setShowResolved((v) => !v)} />
         </span>
       </div>
 
-      <div style={S.scroll}>
+      <div className={SCROLL}>
         {visible.length === 0 ? (
-          <div style={S.center}>
-            <CheckCircle2 size={24} aria-hidden="true" />
-            <div style={S.centerTitle}>No feedback yet</div>
-            <div style={S.centerHint}>When {round.reviewerName ?? "the client"} leaves a comment, it shows up here.</div>
-          </div>
+          <EmptyState
+            className="tw:flex-1"
+            icon={<CheckCircle2 size={24} aria-hidden="true" />}
+            title="No feedback yet"
+            body={`When ${round.reviewerName ?? "the client"} leaves a comment, it shows up here.`}
+          />
         ) : (
           <>
           {detached.length > 0 && (
-            <div style={S.group} data-detached-group>
-              <div style={{ ...S.groupHead, color: "var(--bk-warning-text)" }}>
-                Detached · {detached.length}
-              </div>
+            <div className="tw:mb-3" data-detached-group>
+              {/* SectionHeader's own colour is a utility of the same specificity
+                  as any className override, so the one genuinely varying value
+                  goes through `style` — the deterministic channel (VersionRow /
+                  CommentRow precedent). */}
+              <SectionHeader style={{ color: "var(--bk-warning-text)" }} count={detached.length}>
+                Detached
+              </SectionHeader>
               {detached.map((c) => (
-                <div
-                  style={{ ...S.row, background: "var(--bk-warning-tint)" }}
+                <CommentRow
                   key={c.id}
+                  interactive={false}
+                  style={{ background: "var(--bk-warning-tint)" }}
+                  author={c.authorKind === "client" ? (c.authorName ?? "Client") : "You"}
+                  authorKind={c.authorKind === "client" ? "client" : "internal"}
+                  body={c.body}
+                  meta={`element deleted · ${relTime(c.createdAt)}`}
+                  resolved={c.status === "RESOLVED"}
                   data-comment-row
                   data-comment-id={c.id}
-                >
-                  <div style={S.rowTop}>
-                    <span style={S.who}>
-                      {c.authorKind === "client" ? `${c.authorName ?? "Client"} · client` : "You"}
-                    </span>
-                    <span style={S.when}>element deleted · {relTime(c.createdAt)}</span>
-                  </div>
-                  <div style={S.text}>{c.body}</div>
-                  <div style={S.actions}>
-                    <Button
-                      color="light"
-                      size="xs"
-                      onClick={() => composer?.emit("comments:reattach-start", { id: c.id })} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
-                    >
-                      Reattach
-                    </Button>
-                    <Button color="light" size="xs" onClick={() => void onResolve(c)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
-                      {c.status === "RESOLVED" ? "Reopen" : "Resolve"}
-                    </Button>
-                  </div>
-                </div>
+                  actions={
+                    <>
+                      <Button
+                        color="light"
+                        size="xs"
+                        onClick={() => composer?.emit("comments:reattach-start", { id: c.id })}
+                        className={GHOST}
+                      >
+                        Reattach
+                      </Button>
+                      {resolveButton(c)}
+                    </>
+                  }
+                />
               ))}
             </div>
           )}
           {groups.map((g) => (
-            <div style={S.group} key={g.key}>
-              <div style={S.groupHead}>{g.label}</div>
-              {g.comments.map((c) => {
-                const who = c.authorKind === "client" ? `${c.authorName ?? "Client"} · client` : "You";
-                const where = c.x != null && c.y != null ? "pinned" : "note";
-                return (
-                  <div
-                    style={c.status === "RESOLVED" ? { ...S.row, ...S.rowResolved } : S.row}
-                    key={c.id}
-                    data-comment-row
-                    data-comment-id={c.id}
-                  >
-                    <div style={S.rowTop}>
-                      <span style={S.who}>{who}</span>
-                      <span style={S.when}>{where} · {relTime(c.createdAt)}</span>
-                    </div>
-                    <div style={S.text}>{c.body}</div>
-                    <div style={S.actions}>
-                      <Button color="light" size="xs" onClick={() => void onResolve(c)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
-                        {c.status === "RESOLVED" ? "Reopen" : "Resolve"}
-                      </Button>
-                    </div>
-                  </div>
-                );
-              })}
+            <div className="tw:mb-3" key={g.key}>
+              <SectionHeader>{g.label}</SectionHeader>
+              {g.comments.map((c) => (
+                <CommentRow
+                  key={c.id}
+                  interactive={false}
+                  style={c.status === "RESOLVED" ? { opacity: 0.6 } : undefined}
+                  author={c.authorKind === "client" ? (c.authorName ?? "Client") : "You"}
+                  authorKind={c.authorKind === "client" ? "client" : "internal"}
+                  body={c.body}
+                  meta={`${c.x != null && c.y != null ? "pinned" : "note"} · ${relTime(c.createdAt)}`}
+                  resolved={c.status === "RESOLVED"}
+                  data-comment-row
+                  data-comment-id={c.id}
+                  actions={resolveButton(c)}
+                />
+              ))}
             </div>
           ))}
           </>
         )}
       </div>
 
-      <div style={S.composer}>
+      <div className={COMPOSER}>
         <Textarea
           className="tw:bg-white tw:focus:border-primary-700 tw:focus:ring-primary-700"
           value={draft}
@@ -483,9 +491,9 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
           rows={2}
           maxLength={2000}
         />
-        {replyError && <span style={S.meta}>Couldn't send that reply. Try again.</span>}
-        <div style={S.headRow}>
-          <span style={S.meta}>Replies are internal notes on the thread.</span>
+        {replyError && <span className={META}>Couldn't send that reply. Try again.</span>}
+        <div className={HEAD_ROW}>
+          <span className={META}>Replies are internal notes on the thread.</span>
           <Button size="xs" disabled={!draft.trim() || sending} onClick={() => void send()} aria-busy={sending || undefined}>Send</Button>
         </div>
       </div>

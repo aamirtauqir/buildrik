@@ -47,7 +47,9 @@ const SIZE: Record<RowSize, string> = {
   default: "tw:h-8 tw:text-[13px] tw:items-center",
   header: "tw:h-11 tw:text-[13px] tw:items-center",
   tall: "tw:h-16 tw:text-[13px] tw:items-center",
-  comment: "tw:h-16 tw:text-[13px] tw:items-start tw:pt-3",
+  /* min-height, not height: a comment body wraps, and a fixed 64px clipped it.
+     Every other variant is a single line and stays exact. */
+  comment: "tw:min-h-16 tw:text-[13px] tw:items-start tw:py-3",
 };
 
 export const Row = React.forwardRef<HTMLDivElement, RowProps>(function Row(

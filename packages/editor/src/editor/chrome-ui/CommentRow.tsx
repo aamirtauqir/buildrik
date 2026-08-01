@@ -18,10 +18,13 @@ export interface CommentRowProps extends Omit<RowProps, "children" | "size"> {
   body: string;
   meta?: string;
   resolved?: boolean;
+  /** Per-comment controls (Resolve, Reattach). They sit under the body rather
+   *  than beside the meta so a long thread keeps one action column. */
+  actions?: React.ReactNode;
 }
 
 export function CommentRow({
-  author, authorKind = "internal", body, meta, resolved, className, style, ...rest
+  author, authorKind = "internal", body, meta, resolved, actions, className, style, ...rest
 }: CommentRowProps) {
   return (
     <Row
@@ -57,6 +60,7 @@ export function CommentRow({
           {authorKind === "client" ? " · Client" : ""}
         </span>
         <span className="tw:text-gray-600">{body}</span>
+        {actions ? <span className="tw:flex tw:items-center tw:gap-2 tw:pt-1">{actions}</span> : null}
       </span>
       {meta ? <span className={ROW_META_CLASS}>{resolved ? `${meta} · Resolved` : meta}</span> : null}
     </Row>

@@ -127,10 +127,13 @@ describe("actions", () => {
   it("revoke is behind an overflow and a confirm, and passes the revision", async () => {
     renderTab();
     await screen.findByText("hero photo is too dark");
-    // revoke is NOT directly visible — it lives behind the More overflow
-    expect(screen.queryByRole("button", { name: /^revoke/i })).not.toBeInTheDocument();
+    // revoke is NOT directly visible — it lives behind the More overflow.
+    // It is a chrome-ui MenuItem, so its role is "menuitem", not "button":
+    // querying for a button here would pass vacuously whether or not the item
+    // rendered.
+    expect(screen.queryByRole("menuitem", { name: /^revoke/i })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /more|options/i }));
-    fireEvent.click(screen.getByRole("button", { name: /^revoke/i }));
+    fireEvent.click(screen.getByRole("menuitem", { name: /^revoke/i }));
     // confirm dialog
     fireEvent.click(screen.getByRole("button", { name: /revoke link/i }));
     await waitFor(() => expect(revokeReview).toHaveBeenCalledWith("r1", "2026-07-21T09:00:00.000Z"));
