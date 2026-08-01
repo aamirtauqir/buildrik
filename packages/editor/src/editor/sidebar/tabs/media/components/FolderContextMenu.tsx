@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Button, Portal } from "@/editor/chrome-ui";
+import { Menu, MenuItem, MenuSeparator, Portal } from "@/editor/chrome-ui";
 
 interface Props {
   folderId: string;
@@ -23,13 +23,6 @@ export function FolderContextMenu({
   const menuRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
-    const first = menuRef.current?.querySelector<HTMLElement>(
-      '[role="menuitem"]:not([aria-disabled="true"])',
-    );
-    first?.focus();
-  }, []);
-
-  React.useEffect(() => {
     const handlePointerDown = (e: PointerEvent) => {
       if (!menuRef.current?.contains(e.target as Node)) onClose();
     };
@@ -37,23 +30,14 @@ export function FolderContextMenu({
     return () => document.removeEventListener("pointerdown", handlePointerDown);
   }, [onClose]);
 
+  // Arrow/Home/End roving lives in <Menu> (it also skips disabled items and
+  // keeps a single tab stop). Escape and click-outside stay here: Menu is the
+  // list, not the surface that owns dismissal.
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Escape") {
       e.preventDefault();
       onClose();
-      return;
     }
-    if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
-    e.preventDefault();
-    const items = Array.from(
-      menuRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? [],
-    );
-    const idx = items.indexOf(document.activeElement as HTMLElement);
-    const next =
-      e.key === "ArrowDown"
-        ? (idx + 1) % items.length
-        : (idx - 1 + items.length) % items.length;
-    items[next]?.focus();
   };
 
   const style: React.CSSProperties = {
@@ -69,33 +53,14 @@ export function FolderContextMenu({
   };
 
   const menu = (
-    <div
-      ref={menuRef}
-      className="bd-pg-menu"
-      style={style}
-      role="menu"
-      aria-label={`Options for ${folderName}`}
-      onKeyDown={handleKeyDown}
-    >
-      <Button
-        type="button"
-        className="bd-pg-menu-item"
-        role="menuitem"
-        tabIndex={-1}
-        onClick={() => act(() => onRename(folderId))}
-      >
-        Rename
-      </Button>
-      <div className="bd-pg-menu-divider" role="separator" />
-      <Button
-        type="button"
-        className="bd-pg-menu-item danger"
-        role="menuitem"
-        tabIndex={-1}
-        onClick={() => act(() => onDelete(folderId))}
-      >
-        Delete
-      </Button>
+    <div ref={menuRef} style={style}>
+      <Menu label={`Options for ${folderName}`} onKeyDown={handleKeyDown}>
+        <MenuItem onClick={() => act(() => onRename(folderId))}>Rename</MenuItem>
+        <MenuSeparator />
+        <MenuItem danger onClick={() => act(() => onDelete(folderId))}>
+          Delete
+        </MenuItem>
+      </Menu>
     </div>
   );
 

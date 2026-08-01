@@ -23,6 +23,7 @@ import { createRoot } from "react-dom/client";
 import "@/themes/default.css";
 
 import { RootView, S as ContentStyles } from "@/editor/sidebar/tabs/content/ContentViews";
+import { FolderContextMenu } from "@/editor/sidebar/tabs/media/components/FolderContextMenu";
 
 /** Every case renders into `.bd-studio` so chrome-scoped CSS applies. */
 const CASES: Record<string, () => React.ReactElement> = {
@@ -37,6 +38,21 @@ const CASES: Record<string, () => React.ReactElement> = {
         </div>
       ))}
     </>
+  ),
+  // Renders the menu itself, not a trigger — the converted markup IS the menu,
+  // so a case that only mounted a button would measure nothing that changed.
+  "folder-context-menu": () => (
+    <div data-probe="folder-context-menu">
+      <FolderContextMenu
+        folderId="f1"
+        folderName="Screenshots"
+        x={40}
+        y={40}
+        onClose={() => {}}
+        onRename={() => {}}
+        onDelete={() => {}}
+      />
+    </div>
   ),
   // The empty-state render path, so the baseline also covers styles that only
   // appear through real JSX rather than through the S map alone.

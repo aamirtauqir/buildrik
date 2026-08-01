@@ -36,7 +36,7 @@ const TRACKED = [
 const HERE = dirname(fileURLToPath(import.meta.url));
 const BASELINE_DIR = join(HERE, "baselines");
 
-const CASES = ["content-style-map", "content-root-rows"] as const;
+const CASES = ["content-style-map", "content-root-rows", "folder-context-menu"] as const;
 
 for (const name of CASES) {
   test(`computed-style parity: ${name}`, async ({ page }) => {
@@ -52,13 +52,31 @@ for (const name of CASES) {
 
     const actual = await page.evaluate((props) => {
       const out: Record<string, Record<string, string>> = {};
-      for (const el of Array.from(document.querySelectorAll<HTMLElement>("[data-probe] , [data-probe] *"))) {
+      // Portalled surfaces (menus, modals) leave the [data-probe] subtree for
+      // #bk-overlay-root, so a [data-probe]-only walk measures the empty
+      // wrapper and passes against nothing. That already happened once here.
+      const roots = Array.from(document.querySelectorAll<HTMLElement>("[data-probe]"));
+      const overlay = document.getElementById("bk-overlay-root");
+      const nodes = new Set<HTMLElement>();
+      for (const r of roots) {
+        nodes.add(r);
+        for (const d of Array.from(r.querySelectorAll<HTMLElement>("*"))) nodes.add(d);
+      }
+      if (overlay) for (const d of Array.from(overlay.querySelectorAll<HTMLElement>("*"))) nodes.add(d);
+      for (const el of Array.from(nodes)) {
         // Key by probe name + position so keys stay stable across a rewrite
         // that changes tag names or class strings but not structure.
-        const host = el.closest("[data-probe]") as HTMLElement;
-        const label = host.getAttribute("data-probe")!;
-        const idx = Array.from(host.querySelectorAll("*")).indexOf(el);
-        const key = el === host ? label : `${label}>${idx}`;
+        const host = el.closest("[data-probe]") as HTMLElement | null;
+        let key: string;
+        if (host) {
+          const label = host.getAttribute("data-probe")!;
+          const idx = Array.from(host.querySelectorAll("*")).indexOf(el);
+          key = el === host ? label : `${label}>${idx}`;
+        } else {
+          // Portalled: key by position under the overlay root.
+          const idx = Array.from(overlay!.querySelectorAll("*")).indexOf(el);
+          key = `overlay>${idx}`;
+        }
         const cs = getComputedStyle(el);
         const rec: Record<string, string> = {};
         for (const p of props) rec[p] = cs.getPropertyValue(p);
