@@ -8,9 +8,9 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import type { MediaAsset } from "../../shared/types/media";
 import { assetCardStyles as styles } from "./MediaLibraryStyles";
+import { Button } from "@/editor/chrome-ui";
 
 export interface AssetCardProps {
   asset: MediaAsset;

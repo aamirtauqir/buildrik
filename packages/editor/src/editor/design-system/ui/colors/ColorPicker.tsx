@@ -6,7 +6,6 @@
  */
 
 import * as React from "react";
-import { Button, Input } from "@/editor/ui";
 import type { ColorHSB } from "../../types";
 import {
   hexToHsb,
@@ -15,6 +14,8 @@ import {
   expandShorthand,
   calcContrastRatio,
 } from "../../utils/colorUtils";
+import { Button } from "@/editor/chrome-ui";
+import { TextField } from "@/editor/chrome-ui";
 
 export interface ColorPickerProps {
   initialHex: string;
@@ -286,7 +287,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
           className={`buildrick-design-picker__hex-input-wrap${hexError ? " buildrick-design-picker__hex-input-wrap--error" : ""}`}
         >
           <span className="buildrick-design-picker__hash">#</span>
-          <Input
+          <TextField
             type="text"
             value={hexInput.replace("#", "")}
             onChange={handleHexInput}
@@ -316,11 +317,10 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
 
       {/* Action buttons */}
       <div className="buildrick-design-picker__actions">
-        <Button kind="ghost" onClick={onCancel} type="button">
+        <Button color="light" onClick={onCancel} type="button" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
           Cancel
         </Button>
         <Button
-          kind="primary"
           onClick={() => onSave(currentHex)}
           type="button"
           disabled={!!hexError}

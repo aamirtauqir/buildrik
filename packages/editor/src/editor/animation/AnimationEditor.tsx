@@ -8,8 +8,8 @@ import * as React from "react";
 import { SelectField, NumberField, SliderField } from "../../shared/forms";
 import type { AnimationConfig } from "../../shared/types/animations";
 import { DEFAULT_ANIMATION } from "../../shared/types/animations";
-import { Button, Tabs, Stack } from "@/editor/ui";
-
+import { Tabs } from "@/editor/chrome-ui";
+import { Button } from "@/editor/chrome-ui";
 // Re-export for backwards compatibility
 export type { AnimationConfig } from "../../shared/types/animations";
 
@@ -147,7 +147,7 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
           Timing
         </div>
 
-        <Stack gap="lg">
+        <div className="tw:flex tw:flex-col tw:gap-4">
           <SliderField
             label="Duration"
             value={animation.duration}
@@ -180,7 +180,7 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
             min={1}
             max={10}
           />
-        </Stack>
+        </div>
       </div>
       {/* Trigger row removed 2026-05-18 — UI promised load/scroll/hover/click
        * options but engine never honored them (generateAnimationCSS only reads
@@ -191,7 +191,7 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
       <div style={{ marginTop: 24 }}>
         <Button onClick={onPreview} style={{
           width: "100%"
-        }} kind="secondary">
+        }} color="light">
           ▶️ Preview Animation
         </Button>
       </div>

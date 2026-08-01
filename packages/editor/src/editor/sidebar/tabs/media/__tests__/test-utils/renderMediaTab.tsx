@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ToastProvider } from "@/editor/ui";
+import { ToastProvider } from "@/editor/chrome-ui";
 import { render, type RenderResult } from "@testing-library/react";
 import { MediaTab } from "../../MediaTab";
 import { mockComposer } from "./mockComposer";

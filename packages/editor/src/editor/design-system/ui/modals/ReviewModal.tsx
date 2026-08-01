@@ -4,8 +4,8 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import type { DesignToken } from "../../types";
+import { Button } from "@/editor/chrome-ui";
 
 export interface ReviewModalProps {
   colorTokens: DesignToken[];
@@ -237,15 +237,14 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 16 }}>
           <Button
             ref={cancelRef}
-            kind="ghost"
-            size="sm"
-            onClick={onClose}
+            color="light"
+            size="xs"
+            onClick={onClose} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           >
             Cancel
           </Button>
           <Button
-            kind="primary"
-            size="sm"
+            size="xs"
             onClick={onConfirm}
           >
             Save to site

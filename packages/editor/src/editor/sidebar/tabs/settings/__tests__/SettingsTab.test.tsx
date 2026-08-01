@@ -159,7 +159,7 @@ describe("SettingsTab v2 — root view", () => {
 
   it("panel header title is 'Settings' at root + section is NOT mounted", () => {
     const { container } = render(<SettingsTab composer={makeComposer() as never} />);
-    expect(document.querySelector(".bk-panel-frame__title")?.textContent).toBe("Settings");
+    expect(document.querySelector('[role="heading"][aria-level="2"]')?.textContent).toBe("Settings");
     expect(container.querySelector(".bd-set-screen--section")).toBeNull();
   });
 });
@@ -321,7 +321,7 @@ describe("SettingsTab v2 — pending-nav guard", () => {
     // the section. Header title flips to SEO. Stack should NOT be
     // .transitioning (no animation lock for in-section swap).
     await waitFor(() => {
-      expect(document.querySelector(".bk-panel-frame__title")?.textContent).toBe("SEO");
+      expect(document.querySelector('[role="heading"][aria-level="2"]')?.textContent).toBe("SEO");
     });
     expect(container.querySelector(".bd-set-screen--section")).not.toBeNull();
     expect(container.querySelector(".bd-set-stack.transitioning")).toBeNull();
@@ -358,6 +358,6 @@ describe("SettingsTab v2 — branding signpost (jump-to via navigateBetweenSecti
     expect(container.querySelector(".bd-set-screen--section")).not.toBeNull();
     expect(container.querySelector(".bd-set-stack.transitioning")).toBeNull();
     // Header reflects new section (General per BRANDING_FIELD_MAP first jump).
-    expect(document.querySelector(".bk-panel-frame__title")?.textContent).toBe("General");
+    expect(document.querySelector('[role="heading"][aria-level="2"]')?.textContent).toBe("General");
   });
 });

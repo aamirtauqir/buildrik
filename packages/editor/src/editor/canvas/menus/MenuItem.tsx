@@ -5,10 +5,10 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import { CANVAS_COLORS } from "../shared";
 import type { ContextAction } from "./contextMenuRegistry";
 import { MenuIcon } from "./MenuIcon";
+import { Button } from "@/editor/chrome-ui";
 
 interface MenuItemProps {
   action: ContextAction;

@@ -11,9 +11,9 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button, ModalContent, ModalDescription, ModalRoot, ModalTitle } from "@/editor/ui";
+import { ModalContent, ModalDescription, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
 import type { TemplateUsageEntry } from "../utils/templateUsage";
-
+import { Button } from "@/editor/chrome-ui";
 type Tab = "preview" | "used" | "versions";
 
 export interface TemplateUsageDrawerProps {
@@ -81,8 +81,8 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
             <Button
               key={t}
               type="button"
-              kind="ghost"
-              size="sm"
+              color="light"
+              size="xs"
               role="tab"
               aria-selected={tab === t}
               onClick={() => setTab(t)}
@@ -96,7 +96,7 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
                 color: tab === t ? "var(--bk-ink)" : "var(--bk-ink-muted)",
                 borderBottom:
                   tab === t ? "2px solid var(--bk-accent)" : "2px solid transparent",
-              }}
+              }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
             >
               {t === "preview" ? "Preview" : t === "used" ? "Used in" : "Versions"}
             </Button>
@@ -187,8 +187,8 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
                   <li key={entry.pageId}>
                     <Button
                       type="button"
-                      kind="ghost"
-                      size="sm"
+                      color="light"
+                      size="xs"
                       onClick={() => onJumpToPage?.(entry.pageId)}
                       disabled={!onJumpToPage}
                       style={{
@@ -202,7 +202,7 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
                         borderRadius: 4,
                         fontSize: 13,
                         color: "var(--bk-ink)",
-                      }}
+                      }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
                     >
                       <span style={{ flex: 1 }}>{entry.pageName}</span>
                       {entry.version && (
@@ -245,11 +245,11 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
           }}
         >
           <Button
-            kind="ghost"
-            size="sm"
+            color="light"
+            size="xs"
             type="button"
             aria-label="Close drawer"
-            onClick={() => onOpenChange(false)}
+            onClick={() => onOpenChange(false)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           >
             Close
           </Button>

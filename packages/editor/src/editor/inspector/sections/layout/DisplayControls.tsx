@@ -1,15 +1,14 @@
-import { Button } from "@/editor/ui";
 /**
  * Display Controls - Display mode selection with visual previews
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { HelpTooltip } from "@/editor/ui";
+import { HelpTooltip } from "@/editor/chrome-ui";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
 import { DisplayPreview } from "./previews";
 import { cardBtn, tipBoxStyle } from "./styles";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================

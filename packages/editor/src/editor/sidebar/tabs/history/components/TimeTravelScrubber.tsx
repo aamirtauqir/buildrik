@@ -18,11 +18,12 @@
  */
 
 import * as React from "react";
-import { Button, Input } from "@/editor/ui";
 import type { Composer } from "../../../../../engine";
 import type { HistoryDisplayEntry } from "../../../../../engine/HistoryManager";
 import type { NamedVersion } from "../../../../../shared/types/versions";
 import { useReducedMotion } from "../../../../../shared/hooks/useReducedMotion";
+import { Button } from "@/editor/chrome-ui";
+import { TextField } from "@/editor/chrome-ui";
 
 interface TimeTravelScrubberProps {
   composer: Composer | null;
@@ -319,7 +320,7 @@ export const TimeTravelScrubber: React.FC<TimeTravelScrubberProps> = ({
                   ? `Previewing: ${formatTime(currentEntry.timestamp)} — ${currentEntry.label}`
                   : "No entry selected"}
               </div>
-              <Input
+              <TextField
                 type="range"
                 className="tt-slider"
                 min={0}

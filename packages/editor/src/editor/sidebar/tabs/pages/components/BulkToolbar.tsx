@@ -7,9 +7,9 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import { useClickOutside } from "@/shared/hooks";
 import type { FolderItem } from "../types";
+import { Button } from "@/editor/chrome-ui";
 
 interface Props {
   selectedCount: number;

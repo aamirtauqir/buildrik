@@ -4,7 +4,6 @@
  */
 
 import * as React from "react";
-import { Stack } from "@/editor/ui";
 import { Field, Input, Screen, Section, Select } from "../shared";
 import { useSettingsScreen } from "../hooks/useSettingsScreen";
 import type { ScreenProps } from "../types";
@@ -176,7 +175,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer, onDirtyCha
       </Section>
 
       <Section title="Legal">
-        <Stack gap="xs">
+        <div className="tw:flex tw:flex-col tw:gap-1">
           <a
             href="/privacy"
             target="_blank"
@@ -196,7 +195,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer, onDirtyCha
           <span style={{ fontSize: 12, color: "var(--bk-ink-muted)", marginTop: 4 }}>
             Your data is stored securely. We do not sell or share your site data.
           </span>
-        </Stack>
+        </div>
       </Section>
     </Screen>
   );

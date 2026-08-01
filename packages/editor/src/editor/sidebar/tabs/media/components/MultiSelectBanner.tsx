@@ -1,6 +1,6 @@
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import { FolderInput, Trash2, X } from "lucide-react";
+import { Button } from "@/editor/chrome-ui";
 
 interface MultiSelectBannerProps {
   count: number;
@@ -25,9 +25,9 @@ export function MultiSelectBanner({
       <div className="med-multi-select-banner__actions">
         <Button
           type="button"
-          kind="ghost"
-          size="sm"
-          className="med-multi-select-banner__btn"
+          color="light"
+          size="xs"
+          className="med-multi-select-banner__btn tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           onClick={onMove}
           aria-label="Move to folder"
         >
@@ -36,9 +36,9 @@ export function MultiSelectBanner({
         </Button>
         <Button
           type="button"
-          kind="ghost"
-          size="sm"
-          className="med-multi-select-banner__btn is-danger"
+          color="light"
+          size="xs"
+          className="med-multi-select-banner__btn is-danger tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           onClick={onDelete}
           aria-label="Delete selected"
         >
@@ -47,9 +47,9 @@ export function MultiSelectBanner({
         </Button>
         <Button
           type="button"
-          kind="ghost"
-          size="sm"
-          className="med-multi-select-banner__btn"
+          color="light"
+          size="xs"
+          className="med-multi-select-banner__btn tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           onClick={onCancel}
           aria-label="Cancel selection"
         >

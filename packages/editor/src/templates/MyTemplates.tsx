@@ -6,9 +6,8 @@
 
 import * as React from "react";
 import { InputField } from "../shared/forms";
-import { Badge, Button } from "@/editor/ui";
 import type { Template } from "./types";
-
+import { Badge, Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -182,7 +181,7 @@ const TemplateItem: React.FC<TemplateItemProps> = ({
         >
           🗑️
         </button>
-        <Button size="sm" onClick={onSelect}>
+        <Button size="xs" onClick={onSelect}>
           Use
         </Button>
       </div>
@@ -246,7 +245,7 @@ export const MyTemplates: React.FC<MyTemplatesProps> = ({
 
       {/* Count */}
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <Badge kind="neutral">{templates.length}</Badge>
+        <Badge color="gray">{templates.length}</Badge>
         <span style={{ fontSize: 12, color: "var(--bk-ink-muted)" }}>
           saved template{templates.length !== 1 ? "s" : ""}
         </span>

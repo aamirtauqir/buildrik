@@ -6,12 +6,12 @@
  */
 
 import * as React from "react";
-import { Button, PanelHeader } from "@/editor/ui";
+import { PanelHeader } from "@/editor/chrome-ui";
 import { PanelErrorState } from "../../../editor/sidebar/shared/PanelErrorState";
 import type { Composer } from "../../../engine/Composer";
 import { EVENTS } from "../../../shared/constants/events";
 import type { DesignTokenRecord } from "../../../shared/types/project";
-import { useToast } from "@/editor/ui";
+import { useToast } from "@/editor/chrome-ui";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { DEFAULT_TOKENS } from "../constants";
 import {
@@ -63,7 +63,7 @@ import { TokensSection } from "./sections/TokensSection";
 import { StylesSection, useStylesSectionTotalDirty } from "./sections/StylesSection";
 import { ComponentsSection } from "./sections/ComponentsSection";
 import { ExportSection } from "./sections/ExportSection";
-
+import { Button } from "@/editor/chrome-ui";
 // ─── Layout ───────────────────────────────────────────────────────────────────
 
 const containerStyles: React.CSSProperties = {
@@ -530,8 +530,8 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
           </div>
         </div>
         <Button
-          kind="secondary"
-          size="sm"
+          color="light"
+          size="xs"
           onClick={() => window.open(`${DASHBOARD_URL}/dashboard/agency/theme`, "_blank", "noopener")}
           title="Open the workspace shared theme"
           style={{ whiteSpace: "nowrap", flexShrink: 0 }}
@@ -563,7 +563,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
             StudioPanels subscribes to EVENTS.UI_OPEN_STARTERS. */}
         <Button
           type="button"
-          kind="ghost"
+          color="light"
           onClick={() => composer?.emit(EVENTS.UI_OPEN_STARTERS, {})}
           aria-label="Browse starter themes"
           title="Browse starter themes"
@@ -579,13 +579,13 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
             cursor: "pointer",
             color: "var(--bk-ink-muted)",
             fontSize: 14,
-          }}
+          }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
         >
           {"🎨"}
         </Button>
         <Button
           type="button"
-          kind="ghost"
+          color="light"
           data-ai-entry
           onClick={() => setAiOpen(true)}
           aria-label="Open AI assist"
@@ -602,7 +602,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
             cursor: "pointer",
             color: "var(--bk-ink-muted)",
             fontSize: 14,
-          }}
+          }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
         >
           {"✨"}
         </Button>
@@ -636,7 +636,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
           return (
             <Button
               key={s.id}
-              kind="ghost"
+              color="light"
               role="tab"
               id={`design-tab-${s.id}`}
               aria-selected={selected}
@@ -661,7 +661,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
                 display: "flex",
                 alignItems: "center",
                 gap: 5,
-              }}
+              }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
             >
               {s.label}
               {dirtyHere && (

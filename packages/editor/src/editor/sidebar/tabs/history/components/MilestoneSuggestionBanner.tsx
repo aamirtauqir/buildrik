@@ -6,8 +6,8 @@
  */
 
 import * as React from "react";
-import { Button, Input } from "@/editor/ui";
 import type { MilestoneSuggestion } from "../../../../../shared/hooks/useAutoMilestone";
+import { Button, TextInput } from "@/editor/chrome-ui";
 
 interface MilestoneSuggestionBannerProps {
   suggestion: MilestoneSuggestion;
@@ -91,7 +91,7 @@ export const MilestoneSuggestionBanner: React.FC<MilestoneSuggestionBannerProps>
           {triggerLabel}
         </div>
         {isEditing ? (
-          <Input
+          <TextInput
             ref={inputRef}
             type="text"
             value={editValue}

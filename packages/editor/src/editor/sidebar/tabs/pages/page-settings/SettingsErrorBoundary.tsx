@@ -8,8 +8,8 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import { captureError } from "../../../../../shared/utils/errorTracking";
+import { Button } from "@/editor/chrome-ui";
 
 interface Props {
   children: React.ReactNode;

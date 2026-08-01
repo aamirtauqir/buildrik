@@ -11,7 +11,6 @@
  */
 
 import * as React from "react";
-import { Button, Checkbox, Input, Select } from "@/editor/ui";
 import type {
   ColorField,
   ControlProps,
@@ -25,7 +24,7 @@ import type {
   TextField,
   ToggleField,
 } from "./schema";
-
+import { Button, Checkbox, Select, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // SHARED STYLE TOKENS — keep each control file-local so future sections can
 // diverge without cross-control coupling. Nothing here is exported.
@@ -54,6 +53,7 @@ const inputStyle: React.CSSProperties = {
   background: "var(--bk-bg-card)",
   border: "1px solid var(--bk-border)",
   borderRadius: 4,
+  appearance: "auto",
 };
 
 // File-local so the value lives near the style it drives, and so the chrome
@@ -74,7 +74,7 @@ const LengthControl: React.FC<ControlProps<LengthField>> = ({
     <label style={labelStyle} htmlFor={`field-${field.prop}`}>
       {field.label}
     </label>
-    <Input
+    <TextInput
       id={`field-${field.prop}`}
       type="text"
       value={value}
@@ -98,7 +98,7 @@ const NumberControl: React.FC<ControlProps<NumberField>> = ({
     <label style={labelStyle} htmlFor={`field-${field.prop}`}>
       {field.label}
     </label>
-    <Input
+    <TextInput
       id={`field-${field.prop}`}
       type="number"
       value={value}
@@ -155,6 +155,8 @@ const ToggleControl: React.FC<ControlProps<ToggleField>> = ({
         {field.label}
       </label>
       <Checkbox
+        color="blue"
+        className="tw:bg-white"
         id={`field-${field.prop}`}
         checked={checked}
         onChange={(e) => onChange(e.target.checked ? field.on : field.off)} />
@@ -175,7 +177,7 @@ const ColorControl: React.FC<ControlProps<ColorField>> = ({
     <label style={labelStyle} htmlFor={`field-${field.prop}`}>
       {field.label}
     </label>
-    <Input
+    <TextInput
       id={`field-${field.prop}`}
       type="color"
       value={value || "#000000"}
@@ -260,7 +262,7 @@ const Spacing4Control: React.FC<ControlProps<Spacing4Field>> = ({
           >
             {side}
           </label>
-          <Input
+          <TextInput
             id={`field-${field.group}-${side}`}
             type="text"
             value={values[side]}
@@ -286,7 +288,7 @@ const TextControl: React.FC<ControlProps<TextField>> = ({
     <label style={labelStyle} htmlFor={`field-${field.prop}`}>
       {field.label}
     </label>
-    <Input
+    <TextInput
       id={`field-${field.prop}`}
       type="text"
       value={value}
@@ -362,7 +364,7 @@ const Corners4Control: React.FC<ControlProps<Corners4Field>> = ({
           <label style={labelStyle} htmlFor={`field-${c.prop}`}>
             {c.label}
           </label>
-          <Input
+          <TextInput
             id={`field-${c.prop}`}
             type="text"
             value={cornerValues[c.id]}

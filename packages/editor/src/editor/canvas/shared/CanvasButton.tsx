@@ -5,8 +5,8 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import { CANVAS_COLORS, BUTTON_BASE_STYLE } from "../../../shared/constants/canvas";
+import { Button } from "@/editor/chrome-ui";
 
 export interface CanvasButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   onClick: () => void;

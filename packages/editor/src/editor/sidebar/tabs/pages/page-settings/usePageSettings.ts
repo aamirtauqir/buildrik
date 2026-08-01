@@ -10,7 +10,7 @@
  */
 
 import * as React from "react";
-import { useToast } from "@/editor/ui";
+import { useToast } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../../engine";
 import type { PageItem, DrawerTab } from "../types";
 import { calculateSeoScore } from "../utils/seoScore";

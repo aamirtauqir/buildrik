@@ -11,23 +11,21 @@ import { ReactExporter } from "../../engine/export/ReactExporter";
 import type { ExportConfig, ExportResult, PreviewDevice } from "../../shared/types/export";
 import { DEFAULT_EXPORT_CONFIG, PREVIEW_DEVICES } from "../../shared/types/export";
 import {
-  Button,
   ModalClose,
   ModalContent,
   ModalRoot,
   ModalTitle,
   Portal,
   Spinner,
-  Stack,
   Tabs,
-} from "@/editor/ui";
+} from "@/editor/chrome-ui";
 import { devError } from "../../shared/utils/devLogger";
 import { CodePreview } from "./CodePreview";
 import { FormatGrid, OptionsPanel } from "./ExportOptions";
 import { downloadFile } from "./ExportUtils";
 import { formatBytes } from "@shared/utils/helpers/number";
 import { PreviewFrame } from "./PreviewFrame";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -296,17 +294,17 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
               marginTop: 12,
             }}
           >
-            <Button kind="ghost" onClick={onClose}>
+            <Button color="light" onClick={onClose} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
               Cancel
             </Button>
             <div style={{ display: "flex", gap: 8 }}>
               {config.format !== "react" && config.cssStyle === "external" && (
-                <Button kind="secondary" onClick={handleDownloadCSS} disabled={!result?.css}>
+                <Button color="light" onClick={handleDownloadCSS} disabled={!result?.css}>
                   Download CSS
                 </Button>
               )}
               {config.format !== "react" && (
-                <Button kind="secondary" onClick={handleDownloadAll} disabled={!result?.html}>
+                <Button color="light" onClick={handleDownloadAll} disabled={!result?.html}>
                   Download All
                 </Button>
               )}
@@ -324,32 +322,23 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
 // ============================================================================
 
 const LoadingState: React.FC = () => (
-  <Stack
-    gap="lg"
-    style={{
-      alignItems: "center",
-      justifyContent: "center",
-      height: 300,
-    }}
+  <div
+    className="tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-4"
+    style={{ height: 300 }}
   >
     <Spinner size="lg" />
     <span style={{ color: "var(--bk-ink-muted)" }}>Generating export...</span>
-  </Stack>
+  </div>
 );
 
 const ErrorState: React.FC<{ error: string }> = ({ error }) => (
-  <Stack
-    gap="lg"
-    style={{
-      alignItems: "center",
-      justifyContent: "center",
-      height: 300,
-      color: "var(--bk-error)",
-    }}
+  <div
+    className="tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-4"
+    style={{ height: 300, color: "var(--bk-error)" }}
   >
     <span style={{ fontSize: 32 }}>Error</span>
     <span>{error}</span>
-  </Stack>
+  </div>
 );
 
 const PreviewTab: React.FC<{
@@ -383,19 +372,14 @@ const PreviewTab: React.FC<{
 );
 
 const NoPreviewMessage: React.FC<{ format: string }> = ({ format }) => (
-  <Stack
-    gap="lg"
-    style={{
-      alignItems: "center",
-      justifyContent: "center",
-      height: 300,
-      color: "var(--bk-ink-muted)",
-    }}
+  <div
+    className="tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-4"
+    style={{ height: 300, color: "var(--bk-ink-muted)" }}
   >
     <span style={{ fontSize: 32 }}>⚛</span>
     <span>{format} components cannot be previewed directly.</span>
     <span style={{ fontSize: 12 }}>Download and run locally to preview.</span>
-  </Stack>
+  </div>
 );
 
 const ReactCodePreview: React.FC<{ files: NonNullable<ExportResult["files"]> }> = ({ files }) => {

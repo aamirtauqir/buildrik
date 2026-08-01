@@ -19,7 +19,7 @@
  */
 
 import * as React from "react";
-import { PanelHeader } from "@/editor/ui";
+import { PanelHeader } from "@/editor/chrome-ui";
 import { EVENTS } from "@/shared/constants";
 import type { Composer } from "@/engine";
 import type { ConditionExpression } from "@/shared/types/data";

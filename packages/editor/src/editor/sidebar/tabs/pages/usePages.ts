@@ -19,7 +19,7 @@
  */
 
 import * as React from "react";
-import { useToast } from "@/editor/ui";
+import { useToast } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
 import { getDefaultPageName } from "../../../../shared/utils/pageUtils";

@@ -5,10 +5,9 @@
  */
 
 import * as React from "react";
-import { Button, Input } from "@/editor/ui";
 import { SelectField } from "../../../../shared/forms";
 import { type Interaction, ANIMATION_PRESETS, EASING_OPTIONS } from "./types";
-
+import { Button, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -118,7 +117,7 @@ export const InteractionEditor: React.FC<InteractionEditorProps> = ({
       <div style={styles.inputRow}>
         <div style={styles.inputWrapper}>
           <label style={styles.label}>Duration</label>
-          <Input
+          <TextInput
             type="number"
             value={interaction.animation.duration / 1000}
             onChange={handleDurationChange}
@@ -130,7 +129,7 @@ export const InteractionEditor: React.FC<InteractionEditorProps> = ({
         </div>
         <div style={styles.inputWrapper}>
           <label style={styles.label}>Delay</label>
-          <Input
+          <TextInput
             type="number"
             value={interaction.animation.delay / 1000}
             onChange={handleDelayChange}
@@ -150,8 +149,8 @@ export const InteractionEditor: React.FC<InteractionEditorProps> = ({
       <div style={styles.buttonRow}>
         <Button
           onClick={() => onPreview?.(interaction)}
-          kind="secondary"
-          size="sm"
+          color="light"
+          size="xs"
           style={{ flex: 1 }}
         >
           Preview
@@ -163,16 +162,16 @@ export const InteractionEditor: React.FC<InteractionEditorProps> = ({
       <div style={styles.buttonRowSecondary}>
         <Button
           onClick={() => onToggleEnabled(interaction.id)}
-          kind="secondary"
-          size="sm"
+          color="light"
+          size="xs"
           style={{ flex: 1 }}
         >
           {interaction.enabled ? "Disable" : "Enable"}
         </Button>
         <Button
           onClick={() => onRemove(interaction.id)}
-          kind="destructive"
-          size="sm"
+          color="red"
+          size="xs"
           style={{ flex: 1 }}
         >
           Delete

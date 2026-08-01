@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { Button, ModalContent, ModalRoot } from "@/editor/ui";
+import { ModalContent, ModalRoot } from "@/editor/chrome-ui";
 import { X, Download, SquareArrowOutUpRight } from "lucide-react";
 import { SearchBar } from "../../../shared/SearchBar";
 import type {
@@ -16,6 +16,7 @@ import type {
   MediaTypeFilter,
 } from "../data/mediaTypes";
 import type { IconConfig } from "../../../../../shared/types/media";
+import { Button } from "@/editor/chrome-ui";
 
 interface StockSourceModalProps extends DiscoveryViewProps {
   open: boolean;
@@ -163,8 +164,8 @@ export function StockSourceModal({
                   <Button
                     key={s.id}
                     type="button"
-                    kind="ghost"
-                    size="sm"
+                    color="light"
+                    size="xs"
                     role="radio"
                     aria-checked={active}
                     onClick={() => onSetSource(s.id)}
@@ -177,7 +178,7 @@ export function StockSourceModal({
                       fontWeight: active ? 600 : 500,
                       color: active ? "var(--bk-accent-on)" : "var(--bk-ink-muted)",
                       background: active ? "var(--bk-accent)" : "transparent",
-                    }}
+                    }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
                   >
                     {s.label}
                   </Button>

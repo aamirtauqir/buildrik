@@ -10,8 +10,8 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import { ACHIEVEMENT_AUTO_DISMISS_MS, type AchievementPromptState } from "./useOnboardingOrchestrator";
+import { Button } from "@/editor/chrome-ui";
 
 export interface AchievementPromptProps extends AchievementPromptState {
   onDismiss: () => void;

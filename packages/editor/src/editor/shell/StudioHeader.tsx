@@ -22,19 +22,19 @@
 import * as React from "react";
 import {
   Topbar,
-  Button,
   ModalRoot,
   ModalContent,
   ModalTitle,
   ModalDescription,
   ModalFooter,
   isModalOpen,
+  plural,
   type PublishState,
   type ReviewPill,
   type ReviewTone,
   type SaveState,
   type ToastInput,
-} from "@/editor/ui";
+} from "@/editor/chrome-ui";
 import type { SaveOutcome } from "./hooks/useSaveCallback";
 import type { Composer } from "../../engine";
 import { sanitizeHTMLForPreview } from "../export/ExportUtils";
@@ -59,6 +59,7 @@ import { NotificationPanel, useUnreadCount } from "./NotificationPanel";
 import { SendForReview } from "./SendForReview";
 import { SiteMenu } from "./SiteMenu";
 import "./header.css";
+import { Button } from "@/editor/chrome-ui";
 
 /** Selected element minimal info */
 export interface SelectedElementInfo {
@@ -676,7 +677,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         <ModalRoot open onOpenChange={(o) => !o && setPubConfirm(false)}>
           <ModalContent size="question" aria-labelledby="bk-pubconfirm-title">
             <ModalTitle id="bk-pubconfirm-title">
-              Publish with {errorCount} error{errorCount === 1 ? "" : "s"}?
+              Publish with {plural(errorCount, "error")}?
             </ModalTitle>
             <div className="bk-pubconfirm__list">
               {confirmRows.map((i) => (
@@ -686,12 +687,12 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
               ))}
               {confirmMore > 0 ? (
                 <Button
-                  kind="ghost"
-                  size="sm"
+                  color="light"
+                  size="xs"
                   onClick={() => {
                     setPubConfirm(false);
                     onOpenIssues?.();
-                  }}
+                  }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
                 >
                   +{confirmMore} more
                 </Button>
@@ -705,19 +706,16 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
             </ModalDescription>
             <ModalFooter>
               <Button
-                kind="ghost"
-                size="md"
+                color="light"
                 autoFocus
                 onClick={() => {
                   setPubConfirm(false);
                   onOpenIssues?.();
-                }}
+                }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
               >
                 Review issues first
               </Button>
               <Button
-                kind="primary"
-                size="md"
                 onClick={() => {
                   setPubConfirm(false);
                   publishNow();
@@ -747,14 +745,14 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
               </p>
             ) : null}
             <ModalFooter>
-              <Button kind="ghost" size="md" onClick={() => setExitDialog(null)}>
+              <Button color="light" onClick={() => setExitDialog(null)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                 Stay
               </Button>
-              <Button kind="destructive" size="md" onClick={leaveAnyway}>
+              <Button color="red" onClick={leaveAnyway}>
                 Leave anyway
               </Button>
               {exitDialog.kind === "dirty" ? (
-                <Button kind="primary" size="md" loading={leaving} onClick={() => void saveAndLeave()}>
+                <Button disabled={leaving} onClick={() => void saveAndLeave()} aria-busy={leaving || undefined}>
                   Save &amp; leave
                 </Button>
               ) : null}

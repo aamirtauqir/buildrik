@@ -4,7 +4,7 @@ import * as React from "react";
 import { TokensSection } from "../TokensSection";
 import { TokenRegistryProvider } from "../../../state/TokenRegistryContext";
 import { DSModeProvider } from "../../../state/DSModeContext";
-import { ToastProvider } from "@/editor/ui";
+import { ToastProvider } from "@/editor/chrome-ui";
 
 // document.fonts polyfill lives in test-setup.ts (jsdom-wide).
 

@@ -10,8 +10,8 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button, ModalContent, ModalFooter, ModalRoot, ModalTitle } from "@/editor/ui";
-import { useToast } from "@/editor/ui";
+import { ModalContent, ModalFooter, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
+import { useToast } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import { exportPublishPages, type PublishPage } from "../exportPublishPages";
 import {
@@ -20,6 +20,7 @@ import {
   submitForReview,
   type CurrentRound,
 } from "@/services/ReviewService";
+import { Button } from "@/editor/chrome-ui";
 
 interface StaleApprovalModalProps {
   isOpen: boolean;
@@ -176,12 +177,11 @@ export const StaleApprovalModal: React.FC<StaleApprovalModalProps> = ({
           now just ships these on top of it.
         </p>
         <ModalFooter>
-          <Button kind="secondary" size="sm" disabled={resending} onClick={() => void handleResend()}>
+          <Button color="light" size="xs" disabled={resending} onClick={() => void handleResend()}>
             {resending ? "Re-sending…" : "Re-send for approval"}
           </Button>
           <Button
-            kind="primary"
-            size="sm"
+            size="xs"
             style={{ background: "var(--bk-warning)", borderColor: "var(--bk-warning)" }}
             onClick={() => void onPublishAnyway()}
           >

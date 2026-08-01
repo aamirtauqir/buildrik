@@ -4,9 +4,9 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import { getAncestors, getDisplayName, findById } from "../data/layerUtils";
 import type { LayerItem } from "../types";
+import { Button } from "@/editor/chrome-ui";
 
 interface LayerBreadcrumbProps {
   selectedId: string;

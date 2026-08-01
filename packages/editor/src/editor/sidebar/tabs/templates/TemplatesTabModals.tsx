@@ -5,10 +5,9 @@
  */
 
 import * as React from "react";
-import { Button, Checkbox } from "@/editor/ui";
 import { createPortal } from "react-dom";
 import type { TemplateItem } from "./templatesData";
-
+import { Button, Checkbox } from "@/editor/chrome-ui";
 // ============================================================================
 // Replace Modal — matches .pen Screen 7 "State/Confirm"
 // ============================================================================
@@ -58,6 +57,8 @@ export const ReplaceModal: React.FC<ReplaceModalProps> = ({
         </div>
         <label style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "var(--bk-ink-muted)", cursor: "pointer", margin: "0 0 6px" }}>
           <Checkbox
+            color="blue"
+            className="tw:bg-white"
             checked={backupCurrentPage}
             onChange={(e) => onBackupChange(e.target.checked)}
             style={{ width: 14, height: 14, cursor: "pointer", marginTop: 2 }} />
@@ -70,6 +71,8 @@ export const ReplaceModal: React.FC<ReplaceModalProps> = ({
         </label>
         <label style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "var(--bk-ink-muted)", cursor: "pointer", margin: "0 0 4px" }}>
           <Checkbox
+            color="blue"
+            className="tw:bg-white"
             checked={resetGlobalStyles}
             onChange={(e) => onResetChange(e.target.checked)}
             style={{ width: 14, height: 14, cursor: "pointer", marginTop: 2 }} />

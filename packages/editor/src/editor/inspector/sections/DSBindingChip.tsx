@@ -15,9 +15,8 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import { useDSModeOptional } from "../../design-system/state/DSModeContext";
-
+import { Button } from "@/editor/chrome-ui";
 export type DSBindingState = "token" | "preset" | "off-ds";
 
 export interface DSBindingChipProps {
@@ -143,8 +142,8 @@ export const DSBindingChip: React.FC<DSBindingChipProps> = ({
     <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
       {chip}
       <Button
-        kind="ghost"
-        size="sm"
+        color="light"
+        size="xs"
         type="button"
         onClick={onBindRequest}
         aria-label={`Bind ${label} to a design token`}
@@ -154,7 +153,7 @@ export const DSBindingChip: React.FC<DSBindingChipProps> = ({
           color: "var(--bk-accent)",
           textDecoration: "underline dotted",
           textUnderlineOffset: 2,
-        }}
+        }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
       >
         Bind to token
       </Button>

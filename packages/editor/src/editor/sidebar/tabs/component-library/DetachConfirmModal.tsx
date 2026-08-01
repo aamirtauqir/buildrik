@@ -10,7 +10,8 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button, ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/ui";
+import { ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/chrome-ui";
+import { Button } from "@/editor/chrome-ui";
 
 export interface DetachConfirmModalProps {
   /** Label for the instance being detached, e.g. "#3". */
@@ -133,10 +134,10 @@ export function DetachConfirmModal({
               ))}
             </ul>
             <div style={footerStyle}>
-              <Button kind="ghost" onClick={onCancel}>
+              <Button color="light" onClick={onCancel} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                 Cancel
               </Button>
-              <Button kind="primary" onClick={onConfirm}>
+              <Button onClick={onConfirm}>
                 Detach
               </Button>
             </div>

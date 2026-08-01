@@ -10,10 +10,9 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import type { Composer } from "../../../engine";
 import type { TemplateItem } from "../../sidebar/tabs/templates";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================

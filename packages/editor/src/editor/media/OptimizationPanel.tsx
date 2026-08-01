@@ -8,11 +8,11 @@
  */
 
 import * as React from "react";
-import { Button, Input, Spinner } from "@/editor/ui";
+import { Spinner } from "@/editor/chrome-ui";
 import { MediaOptimizer } from "../../engine/media";
 import { formatBytes } from "@shared/utils/helpers/number";
 import type { ImageExportFormat } from "../../shared/types/media";
-
+import { Button, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -275,7 +275,7 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
       <div style={styles.section}>
         <label style={styles.label}>Quality</label>
         <div style={styles.sliderContainer}>
-          <Input
+          <TextInput
             type="range"
             min={10}
             max={100}
@@ -289,7 +289,7 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
       {/* §18 — Max dimension override */}
       <div style={styles.section}>
         <label style={styles.label} htmlFor="opt-max-dim">Max dimension (px)</label>
-        <Input
+        <TextInput
           id="opt-max-dim"
           type="number"
           min={1}
@@ -338,7 +338,7 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
       {/* Actions */}
       <div style={styles.footer}>
         {onClose && (
-          <Button kind="ghost" onClick={onClose}>
+          <Button color="light" onClick={onClose} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
             Cancel
           </Button>
         )}

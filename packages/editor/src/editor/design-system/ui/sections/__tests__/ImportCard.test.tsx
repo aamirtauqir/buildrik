@@ -13,7 +13,7 @@ import {
   useColorRegistry,
 } from "../../../state/TokenRegistryContext";
 // useColorRegistry is used in the Apply test via Probe.
-import { ToastProvider } from "@/editor/ui";
+import { ToastProvider } from "@/editor/chrome-ui";
 
 const wrap = (ui: React.ReactNode) => (
   <ToastProvider>

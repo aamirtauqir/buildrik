@@ -6,9 +6,9 @@
 
 import DOMPurify from "dompurify";
 import * as React from "react";
-import { Badge, Button, ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/ui";
+import { ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/chrome-ui";
 import type { Template } from "./types";
-
+import { Badge, Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -164,7 +164,7 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
                 {template.description}
               </div>
             </div>
-            <Badge kind="neutral">{template.category}</Badge>
+            <Badge color="gray">{template.category}</Badge>
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
@@ -221,7 +221,7 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
               </div>
               <div style={{ display: "flex", gap: 4 }}>
                 {template.tags.map((tag) => (
-                  <Badge key={tag} kind="neutral">
+                  <Badge key={tag} color="gray">
                     {tag}
                   </Badge>
                 ))}

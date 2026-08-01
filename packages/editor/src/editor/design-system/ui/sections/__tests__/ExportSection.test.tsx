@@ -3,7 +3,7 @@ import { render, fireEvent } from "@testing-library/react";
 import * as React from "react";
 import { ExportSection } from "../ExportSection";
 import { TokenRegistryProvider } from "../../../state/TokenRegistryContext";
-import { ToastProvider } from "@/editor/ui";
+import { ToastProvider } from "@/editor/chrome-ui";
 import { DEFAULT_TOKENS } from "../../../constants";
 
 const PROJECT_ID = "export-test";

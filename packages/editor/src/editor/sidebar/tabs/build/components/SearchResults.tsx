@@ -5,10 +5,10 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import type { SearchGroup } from "../catalog/types";
 import type { DragStartFn, ElClickFn } from "../hooks/useBuildTab";
 import { ElCard } from "./ElCard";
+import { Button } from "@/editor/chrome-ui";
 
 interface SearchResultsProps {
   query: string;

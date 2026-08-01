@@ -24,9 +24,9 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import { ChevronDown } from "lucide-react";
 import type { Composer } from "../../../engine";
+import { Button } from "@/editor/chrome-ui";
 
 interface ScopeDropdownProps {
   composer: Composer | null | undefined;
@@ -135,31 +135,31 @@ export function ScopeDropdown({ composer, selectedElement, onWholeSite }: ScopeD
           }}
         >
           <Button
-            kind="ghost"
+            color="light"
             style={{ ...optionRow, background: "var(--bk-accent-tint)" }}
-            title="Just this element"
+            title="Just this element" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           >
             <span style={{ ...optTop, color: "var(--bk-accent)" }}>This item</span>
             <span style={optSub}>just here — the default</span>
           </Button>
           <Button
-            kind="ghost"
+            color="light"
             style={optionRow}
             disabled={peers.length === 0}
             onClick={() => setConfirming(true)}
-            title={peers.length === 0 ? `No other ${typeLabel}s on this page` : `Apply to ${othersLabel}`}
+            title={peers.length === 0 ? `No other ${typeLabel}s on this page` : `Apply to ${othersLabel}`} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           >
             <span style={optTop}>All like this</span>
             <span style={optSub}>{peers.length} {peers.length === 1 ? "instance" : "instances"}</span>
           </Button>
           <Button
-            kind="ghost"
+            color="light"
             style={optionRow}
             title="Site-wide colors & fonts live in the Styles tab"
             onClick={() => {
               setOpen(false);
               onWholeSite?.();
-            }}
+            }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           >
             <span style={optTop}>Whole site</span>
             <span style={optSub}>colors & fonts — Styles tab</span>
@@ -171,8 +171,8 @@ export function ScopeDropdown({ composer, selectedElement, onWholeSite }: ScopeD
                 Apply this element&apos;s styles to the <strong>{othersLabel}</strong> on this page?
               </p>
               <div style={{ display: "flex", gap: 6 }}>
-                <Button kind="primary" size="sm" onClick={propagate}>Apply to {peers.length}</Button>
-                <Button kind="ghost" size="sm" onClick={() => setConfirming(false)}>Cancel</Button>
+                <Button size="xs" onClick={propagate}>Apply to {peers.length}</Button>
+                <Button color="light" size="xs" onClick={() => setConfirming(false)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">Cancel</Button>
               </div>
             </div>
           )}

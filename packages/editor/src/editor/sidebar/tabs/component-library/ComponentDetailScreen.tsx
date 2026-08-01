@@ -7,13 +7,13 @@
 
 import { Copy, Trash2, Unlink, RefreshCw } from "lucide-react";
 import * as React from "react";
-import { Button, ConfirmDialog, useToast } from "@/editor/ui";
+import { ConfirmDialog, useToast } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import type { ComponentDefinition, VariantProperty } from "../../../../shared/types/components";
 import { useDSModeOptional } from "@/editor/design-system/state/DSModeContext";
 import { DrillInHeader } from "../../shared/DrillInHeader";
 import { DetachConfirmModal } from "./DetachConfirmModal";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================
 // Types
 // ============================================

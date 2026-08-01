@@ -6,8 +6,7 @@
  */
 
 import * as React from "react";
-import { Input } from "@/editor/ui";
-
+import { TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // SLIDER INPUT
 // ============================================================================
@@ -43,7 +42,7 @@ export const SliderInput: React.FC<SliderInputProps> = ({
   <div className="bdi-row-ctrl">
     <label className="bdi-lb">{label}</label>
     <div className="bdi-row-content">
-      <Input
+      <TextInput
         type="range"
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
@@ -96,7 +95,7 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
   <div className="bdi-row-ctrl">
     <label className="bdi-lb">{label}</label>
     <div className="bdi-row-content">
-      <Input
+      <TextInput
         type="range"
         min={min}
         max={max}

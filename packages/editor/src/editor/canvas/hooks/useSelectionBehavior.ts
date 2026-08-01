@@ -15,7 +15,7 @@
 
 import * as React from "react";
 import type { Composer, Element } from "../../../engine";
-import { useToast } from "@/editor/ui";
+import { useToast } from "@/editor/chrome-ui";
 import { getElementId } from "../../../shared/utils/dragDrop";
 import { buildElementStack, findElementWithHitExpansion } from "../shared/hitTesting";
 

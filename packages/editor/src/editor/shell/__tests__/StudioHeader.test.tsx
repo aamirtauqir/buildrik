@@ -222,15 +222,17 @@ describe("StudioHeader", () => {
     it("a settled state is a status, not a button that does nothing", () => {
       // Asserted on the pill itself: since eng D5 the only role=status in the
       // tree is the header's announcement region, so querying by role here
-      // would pass no matter what SaveStatus rendered.
-      const { container } = save({ lastSavedAt: Date.now() });
-      expect(container.querySelector(".bk-save")!.tagName).toBe("SPAN");
+      // would pass no matter what SaveStatus rendered. `getByText("Saved")`
+      // resolves to the pill's own root element — RTL matches on a node's
+      // direct text, excluding its nested dot/stamp elements' contribution.
+      save({ lastSavedAt: Date.now() });
+      expect(screen.getByText("Saved").tagName).toBe("SPAN");
       expect(screen.queryByRole("button", { name: /Saved/ })).toBeNull();
     });
 
     it("clean and saved", () => {
-      const { container } = save({ lastSavedAt: Date.now() });
-      expect(container.querySelector(".bk-save")!.textContent).toBe("Saved · just now");
+      save({ lastSavedAt: Date.now() });
+      expect(screen.getByText("Saved").textContent).toBe("Saved · just now");
     });
 
     it("offline outranks a save error — queued is not lost", () => {
@@ -810,8 +812,16 @@ describe("F3 review pill", () => {
 
 // ── T8/D7 · status grammar ──────────────────────────────────────────────────
 describe("T8 status grammar", () => {
-  /** The tone lives on the pill root, one level above the label element. */
-  const toneOf = (labelEl: HTMLElement) => labelEl.closest(".bk-topbar__review")!.className;
+  /**
+   * The tone lives on the pill root, the label's direct parent (ReviewBadge
+   * renders exactly `<span/button className={pillClasses}><span>{label}</span></span>`).
+   * Checks the applied tone utility, not a deleted modifier class — "info"
+   * and "success" render byte-identical classes by design (T8/D7 rule 3), so
+   * this can only distinguish warning from not-warning, same as the visual
+   * result always could.
+   */
+  const toneOf = (labelEl: HTMLElement) => labelEl.parentElement!.className;
+  const isWarningTone = (labelEl: HTMLElement) => toneOf(labelEl).includes("tw:bg-yellow-50");
 
   it("a blocking review keeps the warning tone when it is the only amber", async () => {
     vi.mocked(fetchReviewStatus).mockResolvedValue({
@@ -821,7 +831,7 @@ describe("T8 status grammar", () => {
     });
     render(<StudioHeader {...makeProps()} />);
     const label = await screen.findByText("Changes requested");
-    expect(toneOf(label)).toContain("bk-topbar__review--warning");
+    expect(isWarningTone(label)).toBe(true);
   });
 
   it("D7 rule 6: with an amber save AND amber issues, the review pill steps back", async () => {
@@ -840,8 +850,8 @@ describe("T8 status grammar", () => {
     );
     const label = await screen.findByText("Changes requested");
     // Demoted, not hidden — the copy is unchanged, only the shouting stops.
-    expect(toneOf(label)).toContain("bk-topbar__review--info");
-    expect(toneOf(label)).not.toContain("warning");
+    expect(toneOf(label)).toContain("tw:bg-gray-100");
+    expect(isWarningTone(label)).toBe(false);
   });
 
   // T8 compact tier 3: two faces then "+N", so a crowded room cannot push the
@@ -859,8 +869,10 @@ describe("T8 status grammar", () => {
       state: "connected",
       isConnected: true,
     };
-    const { container } = render(<StudioHeader {...makeProps()} />);
-    expect(container.querySelectorAll(".bk-presence__stack .bk-avatar").length).toBe(2);
+    render(<StudioHeader {...makeProps()} />);
+    // Each Avatar carries role="img" + aria-label — count those (icons in the
+    // rest of the bar are aria-hidden, so this can't over-count).
+    expect(within(screen.getByRole("banner")).getAllByRole("img")).toHaveLength(2);
     expect(screen.getByLabelText("2 more")).toBeTruthy();
   });
 
@@ -879,7 +891,7 @@ describe("T8 status grammar", () => {
       />,
     );
     const label = await screen.findByText("Changes requested");
-    expect(toneOf(label)).toContain("bk-topbar__review--warning");
+    expect(isWarningTone(label)).toBe(true);
   });
 });
 

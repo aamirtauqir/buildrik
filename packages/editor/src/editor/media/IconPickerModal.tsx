@@ -7,7 +7,7 @@
  */
 
 import * as React from "react";
-import { Button, Input, ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/ui";
+import { ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/chrome-ui";
 import {
   ICON_CATEGORIES,
   getAllIcons,
@@ -20,7 +20,7 @@ import {
 } from "../../shared/constants/icons";
 import { InputField } from "../../shared/forms";
 import type { IconConfig, IconLibrary } from "../../shared/types/media";
-
+import { Button, TextInput } from "@/editor/chrome-ui";
 // ============================================
 // Types
 // ============================================
@@ -448,7 +448,7 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
             <div style={styles.controls}>
               <div style={styles.controlGroup}>
                 <span style={styles.controlLabel}>Size</span>
-                <Input
+                <TextInput
                   type="number"
                   value={iconSize}
                   onChange={(e) => setIconSize(Math.max(12, Math.min(96, Number(e.target.value))))}
@@ -462,7 +462,7 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
                 {/* Phase D: range slider replaces numeric input — matches v3
                     prototype § 20. Live value shown to right of track. */}
                 <div style={{ display: "flex", alignItems: "center", gap: 6, flex: 1 }}>
-                  <Input
+                  <TextInput
                     type="range"
                     value={strokeWidth}
                     onChange={(e) =>
@@ -489,7 +489,7 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
               </div>
               <div style={styles.controlGroup}>
                 <span style={styles.controlLabel}>Color</span>
-                <Input
+                <TextInput
                   type="color"
                   value={iconColor}
                   onChange={(e) => setIconColor(e.target.value)}
@@ -506,7 +506,7 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
             Powered by Lucide Icons
           </span>
           <div style={{ display: "flex", gap: 8 }}>
-            <Button kind="ghost" onClick={onClose}>
+            <Button color="light" onClick={onClose} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
               Cancel
             </Button>
             <Button onClick={handleSelect} disabled={!selectedIcon}>

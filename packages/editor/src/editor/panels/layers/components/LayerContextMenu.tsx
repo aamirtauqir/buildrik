@@ -4,9 +4,9 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import { useClickOutside } from "../../../../shared/hooks/useClickOutside";
 import type { LayerAction } from "../types";
+import { Button } from "@/editor/chrome-ui";
 
 interface LayerContextMenuProps {
   x: number;

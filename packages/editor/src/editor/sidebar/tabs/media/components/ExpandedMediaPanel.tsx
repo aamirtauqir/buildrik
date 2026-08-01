@@ -13,7 +13,7 @@
  */
 
 import * as React from "react";
-import { Button, ConfirmDialog, Input, useToast } from "@/editor/ui";
+import { ConfirmDialog, useToast } from "@/editor/chrome-ui";
 import { Maximize2, Minimize2, Plus, Upload, X } from "lucide-react";
 import type { Composer } from "../../../../../engine/Composer";
 import type { LibraryItem, MediaStateResult } from "../data/mediaTypes";
@@ -30,6 +30,8 @@ import { StockSourceModal } from "./StockSourceModal";
 import { ReplaceAcrossDialog } from "./ReplaceAcrossDialog";
 import "../MediaTab.css";
 import "./ExpandedMediaPanel.css";
+import { Button } from "@/editor/chrome-ui";
+import { TextField } from "@/editor/chrome-ui";
 
 export interface ExpandedMediaPanelProps {
   composer: Composer;
@@ -380,7 +382,7 @@ export function ExpandedMediaPanel({
                 onDrop={(e) => handleFolderDrop(e, f.id)}
               >
                 {renamingFolderId === f.id ? (
-                  <Input
+                  <TextField
                     type="text"
                     className="exp-folder-item__rename-input"
                     value={renameDraft}

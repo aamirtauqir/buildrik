@@ -5,9 +5,9 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import { useClickOutside } from "@/shared/hooks";
 import { ChevronIcon, CheckIcon } from "./headerIcons";
+import { Button } from "@/editor/chrome-ui";
 
 export interface ViewOption<T extends string = string> {
   id: T;

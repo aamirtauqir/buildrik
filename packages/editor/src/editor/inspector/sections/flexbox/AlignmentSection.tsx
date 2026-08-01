@@ -1,4 +1,3 @@
-import { Button, Cluster } from "@/editor/ui";
 /**
  * AlignmentSection - Alignment grid and justify/align controls
  * @license BSD-3-Clause
@@ -7,7 +6,7 @@ import { Button, Cluster } from "@/editor/ui";
 import * as React from "react";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
 import { FlexAlignmentGrid } from "./controls";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -72,7 +71,7 @@ export const AlignmentSection: React.FC<AlignmentSectionProps> = ({
           {mixedKeys?.has("justify-content") && <MixedValueBadge compact />}
           Justify Content
         </div>
-        <Cluster>
+        <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
           {["start", "center", "end", "between", "around", "evenly"].map((val) => {
             const actualVal =
               val === "start"
@@ -96,7 +95,7 @@ export const AlignmentSection: React.FC<AlignmentSectionProps> = ({
               </Button>
             );
           })}
-        </Cluster>
+        </div>
       </div>
       <div>
         <div
@@ -111,7 +110,7 @@ export const AlignmentSection: React.FC<AlignmentSectionProps> = ({
           {mixedKeys?.has("align-items") && <MixedValueBadge compact />}
           Align Items
         </div>
-        <Cluster>
+        <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
           {["start", "center", "end", "stretch", "baseline"].map((val) => {
             const actualVal = val === "start" ? "flex-start" : val === "end" ? "flex-end" : val;
             return (
@@ -124,7 +123,7 @@ export const AlignmentSection: React.FC<AlignmentSectionProps> = ({
               </Button>
             );
           })}
-        </Cluster>
+        </div>
       </div>
     </div>
   </div>

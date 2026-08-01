@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { Button, Input, PanelFrame, useToast } from "@/editor/ui";
+import { PanelFrame, useToast } from "@/editor/chrome-ui";
 import { Search, X } from "lucide-react";
 import type { Composer } from "../../../../engine";
 import { DrillInHeader } from "../../shared/DrillInHeader";
@@ -28,6 +28,8 @@ import { snapshotFromComputedStyle } from "./utils/tokenSnapshot";
 import { DEFAULT_TOKENS } from "../../../design-system/constants";
 import { ApplyProgressOverlay } from "./ApplyProgressOverlay";
 import "./TemplatesTab.css";
+import { Button } from "@/editor/chrome-ui";
+import { TextField } from "@/editor/chrome-ui";
 
 // Re-export for external consumers
 export type { TemplateItem, RecentTemplate } from "./templatesData";
@@ -315,7 +317,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
         <div className="tpl-search-wrap">
           <div className="tpl-search-input-box">
             <Search size={16} className="tpl-search-icon" />
-            <Input
+            <TextField
               className="tpl-search-input"
               placeholder="Search templates..."
               value={sel.searchQ}

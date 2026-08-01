@@ -4,8 +4,7 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
-
+import { Button } from "@/editor/chrome-ui";
 export const TabGuardModal: React.FC<{
   changedTabs: string[];
   onDiscard: () => void;
@@ -64,22 +63,20 @@ export const TabGuardModal: React.FC<{
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
           <Button
             ref={firstButtonRef}
-            kind="ghost"
-            size="sm"
-            onClick={onKeep}
+            color="light"
+            size="xs"
+            onClick={onKeep} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           >
             Stay
           </Button>
           <Button
-            kind="primary"
-            size="sm"
+            size="xs"
             onClick={onSaveAndSwitch}
           >
             Save and switch
           </Button>
           <Button
-            kind="primary"
-            size="sm"
+            size="xs"
             onClick={onDiscard}
             style={{ background: "var(--bk-error)", border: "none" }}
           >

@@ -5,8 +5,8 @@
  */
 
 import * as React from "react";
-import { Input } from "@/editor/ui";
 import { sliderStyles as styles } from "./ImageEditorStyles";
+import { TextInput } from "@/editor/chrome-ui";
 
 export interface SliderControlProps {
   label: string;
@@ -25,7 +25,7 @@ export const SliderControl: React.FC<SliderControlProps> = ({
 }) => (
   <div style={styles.container}>
     <span style={styles.label}>{label}</span>
-    <Input
+    <TextInput
       type="range"
       min={min}
       max={max}

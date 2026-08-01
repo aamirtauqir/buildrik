@@ -20,8 +20,8 @@ vi.mock("@/editor/shell/exportPublishPages", () => ({
 }));
 vi.mock("@/services/PublishService", () => ({ fetchPublishStatus: vi.fn(() => Promise.resolve({ status: "QUEUED" })) }));
 const addToast = vi.fn();
-vi.mock("@/editor/ui", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@/editor/ui")>()),
+vi.mock("@/editor/chrome-ui", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/editor/chrome-ui")>()),
   useToast: () => ({ addToast }),
 }));
 

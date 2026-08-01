@@ -7,12 +7,11 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import type { AnimationConfig } from "../../../shared/types/animations";
 import { DEFAULT_ANIMATION, generateAnimationCSS } from "../../../shared/types/animations";
 import { AnimationEditor } from "../../animation/AnimationEditor";
 import { Section, type SectionTier } from "../shared/controls";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================

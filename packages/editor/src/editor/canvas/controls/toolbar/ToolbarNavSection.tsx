@@ -5,7 +5,6 @@
  */
 
 import * as React from "react";
-import { Button, Tooltip } from "@/editor/ui";
 import {
   parentBtnStyles,
   nameBtnStyles,
@@ -13,6 +12,7 @@ import {
   dropdownStyles,
   menuItemStyles,
 } from "./toolbarStyles";
+import { Button, Tooltip } from "@/editor/chrome-ui";
 
 export interface ToolbarNavSectionProps {
   hasParent: boolean;
@@ -38,8 +38,8 @@ export const ToolbarNavSection: React.FC<ToolbarNavSectionProps> = ({
   <>
     {/* Parent button */}
     {hasParent && (
-      <Tooltip label="Select Parent · ⌥↑">
-        <Button kind="ghost" onClick={onSelectParent} style={parentBtnStyles} aria-label="Select parent element">
+      <Tooltip content="Select Parent · ⌥↑" placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
+        <Button color="light" onClick={onSelectParent} style={parentBtnStyles} aria-label="Select parent element" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
           <svg
             width="12"
             height="12"
@@ -59,12 +59,12 @@ export const ToolbarNavSection: React.FC<ToolbarNavSectionProps> = ({
     {/* Element name — clickable for ancestor dropdown */}
     <div style={{ position: "relative" }}>
       <Button
-        kind="ghost"
+        color="light"
         onClick={onAncestorMenuToggle}
         style={nameBtnStyles}
         aria-label="Show element path"
         aria-expanded={showAncestorMenu}
-        aria-haspopup="menu"
+        aria-haspopup="menu" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
       >
         <span style={nameTextStyles}>{elementName}</span>
         {ancestors.length > 0 && (
@@ -94,10 +94,10 @@ export const ToolbarNavSection: React.FC<ToolbarNavSectionProps> = ({
           {ancestors.map((ancestor, i) => (
             <Button
               key={ancestor.id}
-              kind="ghost"
+              color="light"
               role="menuitem"
               onClick={() => onSelectAncestor(ancestor.id)}
-              style={{ ...menuItemStyles, paddingLeft: 10 + i * 8 }}
+              style={{ ...menuItemStyles, paddingLeft: 10 + i * 8 }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
             >
               <span aria-hidden="true" style={{ opacity: 0.5, marginRight: 6 }}>
                 ↑

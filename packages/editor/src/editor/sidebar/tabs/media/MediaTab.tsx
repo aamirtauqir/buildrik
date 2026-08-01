@@ -6,7 +6,7 @@
  */
 
 import * as React from "react";
-import { Button, PanelFrame, useToast } from "@/editor/ui";
+import { PanelFrame, useToast } from "@/editor/chrome-ui";
 import { Upload, Plus } from "lucide-react";
 import type { Composer } from "../../../../engine/Composer";
 import { ROW_LG } from "@shared/constants/layout";
@@ -28,6 +28,7 @@ import "./MediaTab.css";
 import type { LibraryItem } from "./data/mediaTypes";
 import { createAssetVersion } from "../../../../services/MediaVersionService";
 import type { IconConfig } from "@shared/types/media";
+import { Button } from "@/editor/chrome-ui";
 
 interface MediaTabProps {
   composer: Composer | null;

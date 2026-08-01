@@ -7,9 +7,9 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import { Trash2, Group, Edit3, Lock, Unlock } from "lucide-react";
 import { useClickOutside } from "@/shared/hooks";
+import { Button } from "@/editor/chrome-ui";
 
 export interface LayerContextMenuProps {
   /** Screen coordinates where the menu should appear */

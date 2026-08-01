@@ -5,9 +5,10 @@
  */
 
 import * as React from "react";
-import { Button, Checkbox, Input, ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal, Stack, Textarea } from "@/editor/ui";
+import { ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
-import { useToast } from "@/editor/ui";
+import { useToast } from "@/editor/chrome-ui";
+import { Button, Checkbox, Textarea, TextInput } from "@/editor/chrome-ui";
 
 export interface CreateComponentModalProps {
   isOpen: boolean;
@@ -134,12 +135,12 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
             </svg>
           </ModalClose>
           <div className="bd-modal__body">
-      <Stack gap="lg" onKeyDown={handleKeyPress}>
+      <div className="tw:flex tw:flex-col tw:gap-4" onKeyDown={handleKeyPress}>
         <div>
           <label style={labelStyles}>
             Name <span style={{ color: "var(--bk-accent)" }}>*</span>
           </label>
-          <Input
+          <TextInput
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -162,7 +163,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
 
         <div>
           <label style={labelStyles}>Category</label>
-          <Input
+          <TextInput
             type="text"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
@@ -173,7 +174,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
 
         <div>
           <label style={labelStyles}>Tags</label>
-          <Input
+          <TextInput
             type="text"
             value={tags}
             onChange={(e) => setTags(e.target.value)}
@@ -188,6 +189,8 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
           <label style={labelStyles}>Variant Options</label>
           <label style={checkboxLabelStyles}>
             <Checkbox
+              color="blue"
+              className="tw:bg-white"
               checked={isVariantSet}
               onChange={(e) => setIsVariantSet(e.target.checked)}
               style={checkboxStyles} />
@@ -227,6 +230,8 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
         <div style={variantSectionStyles}>
           <label style={checkboxLabelStyles}>
             <Checkbox
+              color="blue"
+              className="tw:bg-white"
               checked={prefillFromDs}
               onChange={(e) => setPrefillFromDs(e.target.checked)}
               style={checkboxStyles}
@@ -237,13 +242,13 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
             Lift matching values into token / preset bindings on save. Recommended.
           </small>
         </div>
-      </Stack>
+      </div>
           </div>
           <ModalFooter>
-            <Button kind="ghost" onClick={onClose} disabled={isCreating}>
+            <Button color="light" onClick={onClose} disabled={isCreating} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
               Cancel
             </Button>
-            <Button kind="primary" onClick={handleSubmit} disabled={!name.trim() || isCreating}>
+            <Button onClick={handleSubmit} disabled={!name.trim() || isCreating}>
               {isCreating ? "Creating..." : "Create Component"}
             </Button>
           </ModalFooter>

@@ -7,12 +7,11 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import { ListTree } from "lucide-react";
 import { getEditorViewMode } from "../../shared/utils/editorViewMode";
 import type { Composer } from "../../engine";
 import type { DeviceType } from "../../shared/types";
-
+import { Button } from "@/editor/chrome-ui";
 const VERSION = "v2.14.0";
 const ZOOM_PRESETS = [25, 50, 75, 100, 125, 150, 200] as const;
 
@@ -93,7 +92,7 @@ export const StudioFooter: React.FC<StudioFooterProps> = ({
     <>
       {fourToolRail && onOpenStructure && (
         <Button
-          kind="ghost"
+          color="light"
           onClick={onOpenStructure}
           aria-label="Page structure"
           style={{
@@ -103,7 +102,7 @@ export const StudioFooter: React.FC<StudioFooterProps> = ({
             padding: "2px 6px",
             color: "var(--bk-ink-muted)",
             fontSize: 12,
-          }}
+          }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
         >
           <ListTree size={14} />
           Structure

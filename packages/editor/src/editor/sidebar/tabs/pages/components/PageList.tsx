@@ -9,14 +9,12 @@
 
 import * as React from "react";
 import {
-  Button,
   EmptyState,
   EmptyStateActions,
   EmptyStateDesc,
   EmptyStateTitle,
-  IconButton,
-  Input,
-} from "@/editor/ui";
+  IconButton
+} from "@/editor/chrome-ui";
 import type { Composer } from "../../../../../engine";
 import type { FolderItem, PageItem } from "../types";
 import { shouldFocusSearch } from "../utils/keyboardShortcuts";
@@ -24,6 +22,7 @@ import { AddPageButton } from "./AddPageButton";
 import { BulkToolbar } from "./BulkToolbar";
 import { PageFolder } from "./PageFolder";
 import { PageRow } from "./PageRow";
+import { Button, TextInput } from "@/editor/chrome-ui";
 
 interface Props {
   pages: PageItem[];
@@ -124,11 +123,11 @@ export const PageList: React.FC<Props> = ({
             <EmptyStateTitle>No pages yet</EmptyStateTitle>
             <EmptyStateDesc>Add your first page to get started. Pages are the screens visitors see.</EmptyStateDesc>
             <EmptyStateActions>
-              <Button kind="primary" size="sm" onClick={onAddPage}>
+              <Button size="xs" onClick={onAddPage}>
                 Create blank page
               </Button>
               {onRequestTemplates && (
-                <Button kind="ghost" size="sm" onClick={onRequestTemplates}>
+                <Button color="light" size="xs" onClick={onRequestTemplates} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                   From template
                 </Button>
               )}
@@ -152,7 +151,7 @@ export const PageList: React.FC<Props> = ({
               <circle cx="11" cy="11" r="8" />
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
-            <Input
+            <TextInput
               ref={searchRef}
               type="text"
               placeholder="Search pages..."
@@ -215,7 +214,7 @@ export const PageList: React.FC<Props> = ({
           <EmptyState size="compact">
             <EmptyStateTitle>No pages match &ldquo;{search}&rdquo;</EmptyStateTitle>
             <EmptyStateActions>
-              <Button kind="ghost" size="sm" onClick={() => setSearch("")}>
+              <Button color="light" size="xs" onClick={() => setSearch("")} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                 Clear search
               </Button>
             </EmptyStateActions>

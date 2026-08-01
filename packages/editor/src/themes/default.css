@@ -5,13 +5,18 @@
  * Imports:
  *   design-system/index.css — generated tokens (tokens.generated.css) +
  *     a11y rules + site-builder design.css (user-output tokens, own domain)
- *   ../editor/ui/ui.css — the component library styles (@layer components)
+ *   tw.css / chrome-reset.css — Tailwind utilities (tw:-prefixed) + the
+ *     flowbite-react plugin theme, plus the chrome-local preflight
+ *     replacement that never touches canvas-mounted user content.
  *   legacy-components.css — final residual engine selectors (canvas container,
  *     drag cursor state, selection ring, vendor pseudo-elements)
  *
  * The old vibcoder bundle (themes/components/, 76 files) was deleted at
- * stage 6 of the ds/fresh-token-system migration — src/editor/ui/ is the
- * only component library.
+ * stage 6 of the ds/fresh-token-system migration. Its successor,
+ * src/editor/ui/, was itself deleted at Task 13 of the flowbite big-bang
+ * migration — the component library is now src/editor/chrome-ui/
+ * (composed from flowbite-react + tw:-prefixed utilities; no separate CSS
+ * bundle to import here).
  *
  * @license BSD-3-Clause
  */
@@ -22,7 +27,10 @@
 
 @import "./design-system/index.css";
 
-/* Buildrick UI — the component library (see src/editor/ui/). */
-@import "../editor/ui/ui.css" layer(components);
+/* Flowbite big-bang (Task 2): tw:-prefixed Tailwind utilities + flowbite-react
+ * plugin theme, and the chrome-local reset that replaces Tailwind preflight
+ * without touching canvas-mounted user content. */
+@import "./tw.css";
+@import "./chrome-reset.css";
 
 @import "./legacy-components.css";

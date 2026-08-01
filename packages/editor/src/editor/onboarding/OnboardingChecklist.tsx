@@ -21,10 +21,9 @@
  */
 
 import * as React from "react";
-import { Button, Stack } from "@/editor/ui";
 import { Check, ChevronUp, ChevronDown, Minus, X, ArrowRight } from "lucide-react";
 import type { OnboardingStep } from "../../shared/constants/onboardingSteps";
-
+import { Button } from "@/editor/chrome-ui";
 // ── Props ───────────────────────────────────────────────────────────────────
 
 export interface OnboardingChecklistProps {
@@ -96,14 +95,14 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
     <div ref={containerRef} style={panelStyles} role="region" aria-label="Getting started checklist">
       {/* Header */}
       <div style={headerStyles}>
-        <Stack style={{ gap: 2, flex: 1, minWidth: 0 }}>
+        <div className="tw:flex tw:flex-col tw:gap-0.5" style={{ flex: 1, minWidth: 0 }}>
           <span style={headerTitleStyles}>
             {allDone ? "All done — keep building!" : "Get started"}
           </span>
           <span style={headerCountStyles}>
             {completedCount} of {totalCount} complete
           </span>
-        </Stack>
+        </div>
 
         <div style={headerActionsStyles}>
           {/* Minimize */}

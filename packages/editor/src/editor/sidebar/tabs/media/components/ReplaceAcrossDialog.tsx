@@ -14,9 +14,9 @@
  */
 
 import * as React from "react";
-import { Button, Checkbox } from "@/editor/ui";
 import type { Composer } from "../../../../../engine/Composer";
 import type { ReplaceAcrossResult } from "../../../../../engine/media/MediaCommandLayer";
+import { Button, Checkbox } from "@/editor/chrome-ui";
 
 interface ReplaceAcrossDialogProps {
   composer: Composer;
@@ -175,6 +175,8 @@ export function ReplaceAcrossDialog({
                   <li key={p.id} className="med-rx-page-row">
                     <label className="med-rx-page-label">
                       <Checkbox
+                        color="blue"
+                        className="tw:bg-white"
                         checked={state.selected.has(p.id)}
                         onChange={() => handleTogglePage(p.id)}
                         data-testid={`rx-page-${p.id}`}

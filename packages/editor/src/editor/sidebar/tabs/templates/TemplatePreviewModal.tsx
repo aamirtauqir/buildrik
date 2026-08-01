@@ -11,11 +11,10 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import { createPortal } from "react-dom";
 import type { TemplateItem } from "./templatesData";
 import "./TemplatePreviewModal.css";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================

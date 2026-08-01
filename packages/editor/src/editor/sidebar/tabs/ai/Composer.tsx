@@ -1,6 +1,6 @@
 
 import * as React from "react";
-import { Button, Textarea } from "@/editor/ui";
+import { Button, Textarea } from "@/editor/chrome-ui";
 
 export interface ComposerProps {
   onSubmit: (text: string) => void;

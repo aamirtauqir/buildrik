@@ -4,8 +4,8 @@ import { render, fireEvent } from "@testing-library/react";
 import * as React from "react";
 import type { UsePublishJobResult } from "../../../../shell/hooks/usePublishJob";
 
-vi.mock("@/editor/ui", async () => {
-  const actual = await vi.importActual<Record<string, unknown>>("@/editor/ui");
+vi.mock("@/editor/chrome-ui", async () => {
+  const actual = await vi.importActual<Record<string, unknown>>("@/editor/chrome-ui");
   return {
     ...actual,
     useToast: () => ({ addToast: vi.fn(), removeToast: vi.fn(), toasts: [] }),

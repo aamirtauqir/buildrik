@@ -19,8 +19,8 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import type { LintIssue, LintRuleId } from "../../../engine/designSystem/linter";
+import { Button } from "@/editor/chrome-ui";
 
 export interface DSLintBannerProps {
   issues: readonly LintIssue[];
@@ -98,8 +98,7 @@ export const DSLintBanner: React.FC<DSLintBannerProps> = ({
         <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
           {onReviewAll && (
             <Button
-              kind="primary"
-              size="sm"
+              size="xs"
               type="button"
               onClick={onReviewAll}
               style={{ fontSize: 10 }}
@@ -109,11 +108,11 @@ export const DSLintBanner: React.FC<DSLintBannerProps> = ({
           )}
           {onDismiss && (
             <Button
-              kind="ghost"
-              size="sm"
+              color="light"
+              size="xs"
               type="button"
               onClick={onDismiss}
-              style={{ fontSize: 10 }}
+              style={{ fontSize: 10 }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
             >
               Dismiss
             </Button>

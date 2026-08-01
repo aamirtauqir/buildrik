@@ -9,7 +9,7 @@ import * as React from "react";
 import { Sparkles } from "lucide-react";
 import type { Composer } from "../../../engine";
 import { Z_LAYERS } from "../../../shared/constants/canvas";
-import { IconButton, useToast } from "@/editor/ui";
+import { IconButton, useToast } from "@/editor/chrome-ui";
 import { getElementNameFromType } from "../utils/elementInfo";
 import { BlockPickerModal } from "./BlockPickerModal";
 import { AiPromptPopover } from "./AiPromptPopover";

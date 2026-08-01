@@ -12,7 +12,8 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button, Checkbox, ModalContent, ModalDescription, ModalRoot, ModalTitle } from "@/editor/ui";
+import { ModalContent, ModalDescription, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
+import { Button, Checkbox } from "@/editor/chrome-ui";
 
 export interface ReplaceAcrossPageEntry {
   pageId: string;
@@ -179,14 +180,13 @@ export const ReplaceAcrossModal: React.FC<ReplaceAcrossModalProps> = ({
           <div style={{ display: "flex", gap: 8 }}>
             <Button
               type="button"
-              kind="ghost"
-              onClick={() => onOpenChange(false)}
+              color="light"
+              onClick={() => onOpenChange(false)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
             >
               Cancel
             </Button>
             <Button
               type="button"
-              kind="primary"
               onClick={handleConfirm}
               disabled={selectedCount === 0}
             >
@@ -267,6 +267,8 @@ function PageRow({ page, checked, onToggle, thumbW, thumbH }: PageRowProps) {
       }}
     >
       <Checkbox
+        color="blue"
+        className="tw:bg-white"
         checked={checked}
         onChange={onToggle}
         aria-label={`Replace on ${page.pageName}`}

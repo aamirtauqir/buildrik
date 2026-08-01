@@ -9,13 +9,13 @@
  */
 
 import * as React from "react";
-import { Button, PanelFrame, Stack } from "@/editor/ui";
+import { PanelFrame } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import type { UsePublishJobResult } from "../../../shell/hooks/usePublishJob";
-import { useToast } from "@/editor/ui";
+import { useToast } from "@/editor/chrome-ui";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { PublishHistory } from "../../../shell/PublishHistory";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================
 // Types
 // ============================================
@@ -318,7 +318,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
         {/* Pre-Publish Checklist */}
         <section style={sectionStyles}>
           <h3 style={sectionTitleStyles}>Pre-publish checklist</h3>
-          <Stack gap="sm">
+          <div className="tw:flex tw:flex-col tw:gap-2">
             <ChecklistItem label="Page title set" ok={checks.hasPageTitle} hint="Settings → Site" />
             <ChecklistItem label="Favicon uploaded" ok={checks.hasFavicon} hint="Settings → Site" />
             <ChecklistItem label="At least 1 page" ok={checks.hasPages} required />
@@ -326,7 +326,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
             <ChecklistItem label="SEO title set" ok={checks.hasSeoTitle} hint="Pages → SEO" />
             <ChecklistItem label="Meta description added" ok={checks.hasMetaDesc} hint="Pages → SEO" />
             <ChecklistItem label="Social share image" ok={checks.hasSocialImg} hint="Pages → SEO" />
-          </Stack>
+          </div>
           {projectId && (
             <p style={{ ...metaTextStyles, marginTop: 4 }}>
               Publishing to <strong style={{ color: "var(--bk-ink)" }}>your connected Vercel project</strong>
@@ -359,7 +359,6 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           ) : (
             <>
               <Button
-                kind="primary"
                 onClick={handlePublish}
                 disabled={isPublishing}
                 style={{ width: "100%" }}

@@ -6,8 +6,8 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import type { MediaTypeFilter, TypeCounts } from "../data/mediaTypes";
+import { Button } from "@/editor/chrome-ui";
 
 interface TypePillsProps {
   activeType: MediaTypeFilter;
@@ -45,8 +45,8 @@ export function TypePills({
             key={p.key}
             type="button"
             role="tab"
-            size="sm"
-            kind="ghost"
+            size="xs"
+            color="light"
             aria-selected={isActive}
             aria-label={p.title}
             title={p.title}

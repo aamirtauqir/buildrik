@@ -12,7 +12,7 @@
 
 import * as React from "react";
 import type { CodeTab } from "../../shared/types/export";
-import { CopyButton, Tabs, Stack } from "@/editor/ui";
+import { CopyButton, Tabs } from "@/editor/chrome-ui";
 
 // ============================================================================
 // TYPES
@@ -255,7 +255,7 @@ export const CodePreview: React.FC<CodePreviewProps> = ({
   const [activeTab, setActiveTab] = React.useState<CodeTab>(defaultTab);
 
   return (
-    <Stack>
+    <div className="tw:flex tw:flex-col tw:gap-3">
       {/* Tabs */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <Tabs
@@ -281,7 +281,7 @@ export const CodePreview: React.FC<CodePreviewProps> = ({
       {activeTab === "css" && (
         <CodeBlock code={cssCode} language="css" showLineNumbers={showLineNumbers} />
       )}
-    </Stack>
+    </div>
   );
 };
 

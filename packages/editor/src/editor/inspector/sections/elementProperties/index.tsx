@@ -5,7 +5,6 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import type { Composer } from "../../../../engine";
 import type { MediaAsset, MediaAssetType, IconConfig } from "../../../../shared/types/media";
 import { Section, type SectionTier } from "../../shared/controls";
@@ -25,7 +24,7 @@ import {
   getCurrentIconConfig,
 } from "./handlers";
 import { PropertyField } from "./PropertyField";
-
+import { Button } from "@/editor/chrome-ui";
 const styles = {
   dataAttributesSection: {
     marginTop: 16,

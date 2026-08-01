@@ -5,8 +5,8 @@
  */
 
 import * as React from "react";
-import { Button, Input } from "@/editor/ui";
 import { trackSidebar } from "../../../shared/utils/sidebarAnalytics";
+import { Button, TextInput } from "@/editor/chrome-ui";
 
 export interface SearchBarProps {
   value: string;
@@ -83,7 +83,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   return (
     <div style={containerStyles} role="search">
       <SearchIcon />
-      <Input
+      <TextInput
         type="text"
         id={id}
         value={inputValue}

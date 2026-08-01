@@ -18,7 +18,7 @@
 
 import * as React from "react";
 import { AlertCircle, CheckCircle2, ChevronLeft, History } from "lucide-react";
-import { Badge, Button, ConfirmDialog, PanelHeader, Spinner, Textarea, Toggle } from "@/editor/ui";
+import { ConfirmDialog, PanelHeader, Spinner } from "@/editor/chrome-ui";
 import { ApprovedCompareView } from "@/editor/panels/version-history/ApprovedCompareView";
 import type { PublishPage } from "@/editor/shell/exportPublishPages";
 import {
@@ -32,14 +32,19 @@ import {
   type CurrentRound,
   type ReviewComment,
 } from "../../../../services/ReviewService";
-
-/** Review's own status words onto Badge kinds. Named, not inlined, so a new
- *  status shows up as a type error instead of silently rendering neutral. */
-const BADGE_KIND: Record<string, "neutral" | "success" | "warning" | "danger"> = {
-  published: "success",
-  syncing: "warning",
-  issues: "danger",
+import { Badge, Button, Textarea, ToggleSwitch } from "@/editor/chrome-ui";
+/** Review's own status words onto flowbite Badge color + text-color override
+ *  (flowbite's badge color presets don't hex-match --bk-success-text/
+ *  --bk-warning-tint/--bk-error-text exactly — see docs/plans/
+ *  flowbite-bigbang-inventory.md "Task 5" Badge mapping). Named, not
+ *  inlined, so a new status shows up as a type error instead of silently
+ *  rendering neutral. */
+const BADGE_KIND: Record<string, { color: string; className?: string }> = {
+  published: { color: "success", className: "tw:text-green-600" },
+  syncing: { color: "warning", className: "tw:bg-yellow-50" },
+  issues: { color: "failure", className: "tw:text-red-700" },
 };
+const BADGE_NEUTRAL = { color: "gray" } as const;
 
 
 export interface ReviewTabProps {
@@ -287,7 +292,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
           <AlertCircle size={24} aria-hidden="true" />
           <div style={S.centerTitle}>Couldn't load the review</div>
           <div style={S.centerHint}>The dashboard didn't answer. Your feedback is safe — this is just the panel.</div>
-          <Button kind="secondary" size="sm" onClick={() => void load()}>Retry</Button>
+          <Button color="light" size="xs" onClick={() => void load()}>Retry</Button>
         </div>
       </div>
     );
@@ -310,7 +315,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
     return (
       <div style={S.body}>
         <div style={S.compareBar}>
-          <Button kind="ghost" size="sm" onClick={() => setCompareOpen(false)}>
+          <Button color="light" size="xs" onClick={() => setCompareOpen(false)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
             <ChevronLeft size={14} aria-hidden="true" /> Back
           </Button>
           <span style={S.who}>Compare with approved</span>
@@ -322,7 +327,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
             <AlertCircle size={24} aria-hidden="true" />
             <div style={S.centerTitle}>Couldn't load the approved snapshot</div>
             <div style={S.centerHint}>The dashboard didn't answer. Try again.</div>
-            <Button kind="secondary" size="sm" onClick={() => void openCompare()}>Retry</Button>
+            <Button color="light" size="xs" onClick={() => void openCompare()}>Retry</Button>
           </div>
         ) : (
           <ApprovedCompareView
@@ -354,23 +359,23 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
       <div style={S.header}>
         <div style={S.headRow}>
           <div style={S.actions}>
-            <Badge kind={BADGE_KIND[round.revoked ? "issues" : tone.variant] ?? "neutral"}>{round.revoked ? "Link revoked" : tone.label}</Badge>
-            {round.openCommentCount > 0 && <Badge kind="neutral">{round.openCommentCount} open</Badge>}
+            <Badge {...(BADGE_KIND[round.revoked ? "issues" : tone.variant] ?? BADGE_NEUTRAL)}>{round.revoked ? "Link revoked" : tone.label}</Badge>
+            {round.openCommentCount > 0 && <Badge color="gray">{round.openCommentCount} open</Badge>}
           </div>
           <div style={S.actions}>
             {round.status === "APPROVED" && onExportCurrentPages && (
-              <Button kind="ghost" size="sm" onClick={() => void openCompare()}>
+              <Button color="light" size="xs" onClick={() => void openCompare()} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                 <History size={14} aria-hidden="true" /> Compare
               </Button>
             )}
-            <Button kind="primary" size="sm" loading={resending} onClick={() => void doResend()}>Re-send</Button>
+            <Button size="xs" disabled={resending} onClick={() => void doResend()} aria-busy={resending || undefined}>Re-send</Button>
             <div style={S.more}>
-              <Button kind="ghost" size="sm" aria-label="More options" onClick={() => setMoreOpen((v) => !v)}>⋯</Button>
+              <Button color="light" size="xs" aria-label="More options" onClick={() => setMoreOpen((v) => !v)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">⋯</Button>
               {moreOpen && (
                 <div style={S.menu} role="menu">
                   <Button
-                    kind="destructive"
-                    size="sm"
+                    color="red"
+                    size="xs"
                     onClick={() => { setConfirmRevoke(true); setMoreOpen(false); }}
                   >
                     Revoke link
@@ -390,7 +395,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
         <span style={S.meta}>{visible.length} comment{visible.length === 1 ? "" : "s"}</span>
         <span style={S.toggle}>
           Show resolved
-          <Toggle checked={showResolved} aria-label="Show resolved" onClick={() => setShowResolved((v) => !v)} />
+          <ToggleSwitch checked={showResolved} aria-label="Show resolved" onChange={() => setShowResolved((v) => !v)} />
         </span>
       </div>
 
@@ -424,13 +429,13 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
                   <div style={S.text}>{c.body}</div>
                   <div style={S.actions}>
                     <Button
-                      kind="ghost"
-                      size="sm"
-                      onClick={() => composer?.emit("comments:reattach-start", { id: c.id })}
+                      color="light"
+                      size="xs"
+                      onClick={() => composer?.emit("comments:reattach-start", { id: c.id })} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
                     >
                       Reattach
                     </Button>
-                    <Button kind="ghost" size="sm" onClick={() => void onResolve(c)}>
+                    <Button color="light" size="xs" onClick={() => void onResolve(c)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                       {c.status === "RESOLVED" ? "Reopen" : "Resolve"}
                     </Button>
                   </div>
@@ -457,7 +462,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
                     </div>
                     <div style={S.text}>{c.body}</div>
                     <div style={S.actions}>
-                      <Button kind="ghost" size="sm" onClick={() => void onResolve(c)}>
+                      <Button color="light" size="xs" onClick={() => void onResolve(c)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                         {c.status === "RESOLVED" ? "Reopen" : "Resolve"}
                       </Button>
                     </div>
@@ -472,6 +477,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
 
       <div style={S.composer}>
         <Textarea
+          className="tw:bg-white tw:focus:border-primary-700 tw:focus:ring-primary-700"
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           placeholder="Reply to the client…"
@@ -481,7 +487,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
         {replyError && <span style={S.meta}>Couldn't send that reply. Try again.</span>}
         <div style={S.headRow}>
           <span style={S.meta}>Replies are internal notes on the thread.</span>
-          <Button kind="primary" size="sm" loading={sending} disabled={!draft.trim()} onClick={() => void send()}>Send</Button>
+          <Button size="xs" disabled={!draft.trim() || sending} onClick={() => void send()} aria-busy={sending || undefined}>Send</Button>
         </div>
       </div>
 

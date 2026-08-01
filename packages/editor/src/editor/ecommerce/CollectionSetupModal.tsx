@@ -6,8 +6,9 @@
 
 import { ShoppingBag, Package, Check } from "lucide-react";
 import * as React from "react";
-import { Button, Checkbox, ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/ui";
+import { ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/chrome-ui";
 import { useState } from "react";
+import { Button, Checkbox } from "@/editor/chrome-ui";
 
 export interface CollectionSetupModalProps {
   isOpen: boolean;
@@ -81,6 +82,8 @@ export const CollectionSetupModal: React.FC<CollectionSetupModalProps> = ({
         <div style={checkboxContainerStyles}>
           <label style={checkboxLabelStyles}>
             <Checkbox
+              color="blue"
+              className="tw:bg-white"
               checked={includeSample}
               onChange={(e) => setIncludeSample(e.target.checked)}
               style={checkboxStyles} />
@@ -110,10 +113,10 @@ export const CollectionSetupModal: React.FC<CollectionSetupModalProps> = ({
         </div>
       </div>
       <div style={footerStyles}>
-        <Button kind="ghost" onClick={handleSkip} disabled={isCreating}>
+        <Button color="light" onClick={handleSkip} disabled={isCreating} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
           Skip for now
         </Button>
-        <Button kind="primary" onClick={handleConfirm} disabled={isCreating}>
+        <Button onClick={handleConfirm} disabled={isCreating}>
           {isCreating ? "Creating..." : "Create Collection"}
         </Button>
       </div>

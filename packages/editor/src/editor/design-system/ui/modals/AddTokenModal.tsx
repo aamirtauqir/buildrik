@@ -4,8 +4,8 @@
  */
 
 import * as React from "react";
-import { Button, Input } from "@/editor/ui";
 import { generateColorTokenId } from "../../utils/exportUtils";
+import { Button, TextInput } from "@/editor/chrome-ui";
 
 export interface AddTokenModalProps {
   existingIds: string[];
@@ -85,12 +85,12 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
         >
           Token name
         </label>
-        <Input
+        <TextInput
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="e.g., Purple"
-          error={!!nameError}
+          aria-invalid={!!nameError || undefined}
           style={{
             width: "100%",
             padding: "8px 10px",
@@ -129,12 +129,12 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
               flexShrink: 0,
             }}
           />
-          <Input
+          <TextInput
             type="text"
             value={hex}
             onChange={(e) => setHex(e.target.value)}
             placeholder="#3B82F6"
-            error={!!hexError}
+            aria-invalid={!!hexError || undefined}
             style={{
               flex: 1,
               padding: "8px 10px",
@@ -153,7 +153,7 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
 
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 16 }}>
           <Button
-            kind="secondary"
+            color="light"
             onClick={onClose}
             style={{
               padding: "7px 14px",
@@ -168,7 +168,6 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
             Cancel
           </Button>
           <Button
-            kind="primary"
             onClick={handleAdd}
             style={{
               padding: "7px 14px",

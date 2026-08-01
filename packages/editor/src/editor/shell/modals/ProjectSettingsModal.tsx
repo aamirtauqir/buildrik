@@ -5,10 +5,11 @@
  */
 
 import * as React from "react";
-import { Button, Checkbox, Input, ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal, Stack } from "@/editor/ui";
+import { ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
-import { useToast } from "@/editor/ui";
+import { useToast } from "@/editor/chrome-ui";
 import { devError } from "../../../shared/utils/devLogger";
+import { Button, Checkbox, TextInput } from "@/editor/chrome-ui";
 
 export interface ProjectSettingsModalProps {
   isOpen: boolean;
@@ -120,9 +121,9 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
         {/* Tab Content */}
         <div style={contentStyles}>
           {activeTab === "general" && (
-            <Stack gap="md">
+            <div className="tw:flex tw:flex-col tw:gap-3">
               <label style={labelStyles}>Project name</label>
-              <Input
+              <TextInput
                 type="text"
                 value={projectName}
                 onChange={(e) => setProjectName(e.target.value)}
@@ -131,21 +132,21 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
               />
 
               <label style={labelStyles}>Author / description</label>
-              <Input
+              <TextInput
                 type="text"
                 value={projectDescription}
                 onChange={(e) => setProjectDescription(e.target.value)}
                 style={inputStyles}
                 placeholder="John Doe"
               />
-            </Stack>
+            </div>
           )}
 
           {activeTab === "canvas" && (
-            <Stack gap="md">
+            <div className="tw:flex tw:flex-col tw:gap-3">
               <label style={labelStyles}>Grid size (px)</label>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <Input
+                <TextInput
                   type="number"
                   value={gridSize}
                   onChange={(e) => setGridSize(Number(e.target.value))}
@@ -161,19 +162,21 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
               <div style={{ marginTop: 16 }}>
                 <label style={checkboxLabelStyles}>
                   <Checkbox
+                    color="blue"
+                    className="tw:bg-white"
                     checked={snapToGrid}
                     onChange={(e) => setSnapToGrid(e.target.checked)}
                     style={checkboxStyles} />
                   <span>Snap to grid</span>
                 </label>
               </div>
-            </Stack>
+            </div>
           )}
 
           {activeTab === "seo" && (
-            <Stack gap="md">
+            <div className="tw:flex tw:flex-col tw:gap-3">
               <label style={labelStyles}>Site name (SEO default)</label>
-              <Input
+              <TextInput
                 type="text"
                 value={siteTitle}
                 onChange={(e) => setSiteTitle(e.target.value)}
@@ -184,16 +187,16 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
                 This will be used as the default title for your site if not overridden on individual
                 pages.
               </small>
-            </Stack>
+            </div>
           )}
         </div>
       </div>
           </div>
           <ModalFooter>
-            <Button kind="ghost" onClick={onClose}>
+            <Button color="light" onClick={onClose} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
               Cancel
             </Button>
-            <Button kind="primary" onClick={handleSave}>
+            <Button onClick={handleSave}>
               Save changes
             </Button>
           </ModalFooter>

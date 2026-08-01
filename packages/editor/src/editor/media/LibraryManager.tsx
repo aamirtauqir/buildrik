@@ -10,7 +10,6 @@
  */
 
 import * as React from "react";
-import { Button, Input } from "@/editor/ui";
 import {
   Upload, Plus, X, Search, FolderOpen, Download, AlertCircle,
 } from "lucide-react";
@@ -21,7 +20,7 @@ import { ConfirmDeleteModal } from "../sidebar/tabs/media/components/ConfirmDele
 import { MediaContextMenu } from "../sidebar/tabs/media/components/MediaContextMenu";
 import { AssetDetailOverlay } from "../sidebar/tabs/media/components/AssetDetailOverlay";
 import { STORAGE_QUOTA_BYTES } from "../../shared/constants/media";
-import { useToast } from "@/editor/ui";
+import { useToast } from "@/editor/chrome-ui";
 import type { LibraryItem } from "../sidebar/tabs/media/data/mediaTypes";
 import type { IconConfig } from "../../shared/types/media";
 import { FolderTree, type SmartFolder } from "./components/FolderTree";
@@ -32,6 +31,7 @@ import { formatBytes } from "@shared/utils/helpers/number";
 import { generateAltTextRemote } from "../../services/AltTextService";
 import { DEFAULT_MODEL } from "@buildrik/shared/schemas/ai";
 import "./LibraryManager.css";
+import { Button, TextInput } from "@/editor/chrome-ui";
 
 interface LibraryManagerProps {
   composer: Composer;
@@ -263,7 +263,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           />
           <div className="mgr-search">
             <Search size={14} />
-            <Input
+            <TextInput
               ref={searchRef}
               type="text"
               placeholder="Search across all folders..."
@@ -392,7 +392,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
         </div>
       </div>
       {/* Hidden file input */}
-      <Input
+      <TextInput
         ref={fileInputRef}
         type="file"
         multiple

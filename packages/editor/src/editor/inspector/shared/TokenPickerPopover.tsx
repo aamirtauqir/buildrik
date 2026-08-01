@@ -20,8 +20,7 @@
  */
 
 import * as React from "react";
-import { Button, Input, Stack } from "@/editor/ui";
-
+import { Button, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -223,7 +222,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
         <div onKeyDown={handleKeyDown}>
           {/* Search */}
           <div style={{ padding: "8px 8px 4px" }}>
-            <Input
+            <TextInput
               ref={searchRef}
               type="text"
               value={query}
@@ -341,7 +340,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
                     }}
                     onFocus={() => setFocusedIndex(idx)}
                   >
-                    <Stack style={{ gap: 3, alignItems: "center" }}>
+                    <div className="tw:flex tw:flex-col tw:items-center tw:gap-[3px]">
                       {/* Swatch */}
                       <div
                         style={{
@@ -369,7 +368,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
                       >
                         {token.name}
                       </span>
-                    </Stack>
+                    </div>
                   </Button>)
                 ) : (
                   // ── List item (spacing / type) ──
@@ -448,7 +447,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
                 flexShrink: 0,
               }}
             />
-            <Input
+            <TextInput
               type="text"
               value={customInput}
               autoFocus
