@@ -23,13 +23,13 @@ export default async function NotFound() {
         >
           Page Not Found
         </h2>
-        <p className="mt-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>
+        <p className="mt-2 text-body" style={{ color: "var(--color-text-secondary)" }}>
           The page you&apos;re looking for doesn&apos;t exist or has been moved.
         </p>
         <div className="mt-8 flex gap-3 justify-center">
           <Link
             href={ctaHref}
-            className="px-4 py-2 rounded-lg text-sm font-medium text-white"
+            className="px-4 py-2 rounded-lg text-body font-medium text-white"
             style={{ backgroundColor: "var(--color-primary)" }}
           >
             {ctaLabel}

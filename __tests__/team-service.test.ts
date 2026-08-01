@@ -4,7 +4,9 @@ vi.mock("@/lib/prisma", () => ({
   prisma: {
     workspaceMember: { findMany: vi.fn(), findUnique: vi.fn(), count: vi.fn(), update: vi.fn(), delete: vi.fn() },
     invite: { findMany: vi.fn(), create: vi.fn(), createMany: vi.fn(), update: vi.fn(), delete: vi.fn(), deleteMany: vi.fn(), count: vi.fn(), findUnique: vi.fn() },
-    user: { findUnique: vi.fn(), findMany: vi.fn() },
+    // `update` is needed because revoking/removing a member bumps their
+    // sessionVersion — the row delete alone never ended their session.
+    user: { findUnique: vi.fn(), findMany: vi.fn(), update: vi.fn() },
     workspace: { findUnique: vi.fn() },
     site: { count: vi.fn() },
     activityLog: { findMany: vi.fn(), create: vi.fn() },
@@ -13,6 +15,7 @@ vi.mock("@/lib/prisma", () => ({
     // every deleteMember/revokeMember test has been dead on "Cannot read
     // properties of undefined (reading 'deleteMany')".
     session: { deleteMany: vi.fn() },
+    $transaction: vi.fn((ops: unknown[]) => Promise.all(ops)),
   },
 }));
 

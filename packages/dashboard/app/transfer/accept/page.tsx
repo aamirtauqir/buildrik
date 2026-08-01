@@ -85,7 +85,7 @@ function AcceptTransferContent() {
         Accept ownership
       </AuthButton>
       <div className="h-4" />
-      <Link href="/dashboard" className="text-auth-link text-sm hover:underline">← Back to dashboard</Link>
+      <Link href="/dashboard" className="text-auth-link text-body hover:underline">← Back to dashboard</Link>
     </AuthCard>
   );
 }

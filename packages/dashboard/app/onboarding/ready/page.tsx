@@ -34,30 +34,30 @@ function EditorPreview() {
   return (
     <div
       aria-hidden
-      className="flex h-[280px] w-[600px] flex-col overflow-hidden rounded-[12px] bg-[#F8FAFC] shadow-[inset_0_0_0_1px_#E2E8F0]"
+      className="flex h-[280px] w-[600px] flex-col overflow-hidden rounded-lg bg-[#F9FAFB] shadow-[inset_0_0_0_1px_#E5E7EB]"
     >
-      <div className="flex h-10 items-center justify-between bg-white px-4 shadow-[inset_0_0_0_1px_#E2E8F0]">
+      <div className="flex h-10 items-center justify-between bg-white px-4 shadow-[inset_0_0_0_1px_#E5E7EB]">
         <div className="flex gap-3">
-          <span className="h-3 w-10 rounded-[2px] bg-[#E2E8F0]" />
-          <span className="h-3 w-[60px] rounded-[2px] bg-[#E2E8F0]" />
+          <span className="h-3 w-10 rounded-[2px] bg-[#E5E7EB]" />
+          <span className="h-3 w-[60px] rounded-[2px] bg-[#E5E7EB]" />
         </div>
         <span className="rounded-[4px] bg-onb-primary px-3 py-1.5 text-[10px] font-bold text-white">
           Publish
         </span>
       </div>
       <div className="flex grow">
-        <div className="flex w-10 flex-col gap-2 bg-[#CBD5E1] p-2 shadow-[inset_0_0_0_1px_#E2E8F0]">
-          <span className="h-6 w-6 rounded-[4px] bg-[#E2E8F0]" />
-          <span className="h-6 w-6 rounded-[4px] bg-[#E2E8F0]" />
-          <span className="h-6 w-6 rounded-[4px] bg-[#E2E8F0]" />
+        <div className="flex w-10 flex-col gap-2 bg-[#D1D5DB] p-2 shadow-[inset_0_0_0_1px_#E5E7EB]">
+          <span className="h-6 w-6 rounded-[4px] bg-[#E5E7EB]" />
+          <span className="h-6 w-6 rounded-[4px] bg-[#E5E7EB]" />
+          <span className="h-6 w-6 rounded-[4px] bg-[#E5E7EB]" />
         </div>
         <div className="flex grow items-center justify-center bg-white">
-          <span className="text-base font-semibold text-[#E2E8F0]">Your headline goes here</span>
+          <span className="text-base font-semibold text-[#E5E7EB]">Your headline goes here</span>
         </div>
-        <div className="flex w-40 flex-col gap-3 bg-[#F8FAFC] p-4 shadow-[inset_0_0_0_1px_#E2E8F0]">
-          <span className="h-2.5 self-stretch rounded-[2px] bg-[#E2E8F0]" />
-          <span className="h-2.5 self-stretch rounded-[2px] bg-[#E2E8F0]" />
-          <span className="h-2.5 self-stretch rounded-[2px] bg-[#E2E8F0]" />
+        <div className="flex w-40 flex-col gap-3 bg-[#F9FAFB] p-4 shadow-[inset_0_0_0_1px_#E5E7EB]">
+          <span className="h-2.5 self-stretch rounded-[2px] bg-[#E5E7EB]" />
+          <span className="h-2.5 self-stretch rounded-[2px] bg-[#E5E7EB]" />
+          <span className="h-2.5 self-stretch rounded-[2px] bg-[#E5E7EB]" />
         </div>
       </div>
     </div>
@@ -92,7 +92,7 @@ export default function ReadyPage() {
           </p>
         </div>
 
-        <div className="flex w-[500px] flex-col overflow-hidden rounded-[12px] bg-onb-surface shadow-[inset_0_0_0_1px_var(--color-onb-line)]">
+        <div className="flex w-[500px] flex-col overflow-hidden rounded-lg bg-onb-surface shadow-[inset_0_0_0_1px_var(--color-onb-line)]">
           <Row label="Site">
             <Value>{data.site?.name ?? "Untitled site"}</Value>
           </Row>

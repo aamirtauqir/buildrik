@@ -107,7 +107,7 @@ export default function AiPreviewPage() {
 
         <div className="flex w-[600px] flex-col items-center gap-4">
           {previewTitle ? <span className="text-[13px] font-semibold text-onb-muted">{previewTitle}</span> : null}
-          <div className="flex min-h-[300px] w-full flex-col gap-3 rounded-xl bg-onb-surface p-6 shadow-[inset_0_0_0_1px_var(--color-onb-line)]">
+          <div className="flex min-h-[300px] w-full flex-col gap-3 rounded-lg bg-onb-surface p-6 shadow-[inset_0_0_0_1px_var(--color-onb-line)]">
             {pagesQ.isLoading ? (
               <span className="m-auto text-base font-semibold text-onb-muted opacity-40">
                 Loading your draft…

@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { ChevronRight, Globe, Plus, LayoutGrid } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
-import { Button, Modal } from "@/components/dashboard/primitives";
+import { Button, InputField, Modal } from "@/components/dashboard/primitives";
 import { getEditorHref, useUnifiedEditorFlag } from "@/components/editor-route/unified-flag";
 
 /**
@@ -182,14 +182,12 @@ export function UseTemplateModal(props: UseTemplateModalProps) {
       {step === "new" && (
         <div>
           <label className="mb-1.5 block text-body-sm font-medium" style={{ color: "var(--color-text-primary)" }}>Site name</label>
-          <input
+          <InputField
             autoFocus
             value={siteName}
             onChange={(e) => setSiteName(e.target.value)}
             maxLength={100}
             placeholder="My site"
-            className="w-full rounded-lg border px-3 py-2.5 text-body outline-none transition-colors focus:border-[var(--color-primary)]"
-            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
             onKeyDown={(e) => { if (e.key === "Enter" && siteName.trim().length >= 2 && !busy && props.templateId) createMutation.mutate({ templateId: props.templateId, siteName: siteName.trim() }); }}
           />
           <p className="mt-1.5 text-body-sm" style={{ color: "var(--color-text-muted)" }}>You can rename it later. 2–100 characters.</p>

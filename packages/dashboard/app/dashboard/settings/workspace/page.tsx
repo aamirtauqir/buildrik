@@ -15,6 +15,7 @@ import { ErrorState } from "@/components/states";
 export default function WorkspaceSettingsPage() {
   const { addToast } = useToast();
   const [transferEmail, setTransferEmail] = useState("");
+  const utils = trpc.useUtils();
   const wsQuery = trpc.account.workspace.get.useQuery();
   const pendingTransferQuery = trpc.account.workspace.transfer.pending.useQuery();
 
@@ -33,7 +34,14 @@ export default function WorkspaceSettingsPage() {
   });
 
   const updateMutation = trpc.account.workspace.update.useMutation({
-    onSuccess: () => { wsQuery.refetch(); addToast("success", "Workspace updated"); },
+    // listMine backs the sidebar workspace switcher — without invalidating it a
+    // rename saved fine but the sidebar kept the old name until a hard reload,
+    // so the save read as if nothing had happened.
+    onSuccess: () => {
+      wsQuery.refetch();
+      void utils.account.workspace.listMine.invalidate();
+      addToast("success", "Workspace updated");
+    },
     onError: (err) => addToast("error", "Failed", err.message),
   });
 
@@ -42,7 +50,7 @@ export default function WorkspaceSettingsPage() {
     onError: (err) => addToast("error", "Failed", err.message),
   });
 
-  if (wsQuery.isLoading) return <div className="h-64 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />;
+  if (wsQuery.isLoading) return <div className="h-64 animate-pulse rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }} />;
   if (!wsQuery.data) return <ErrorState title="Couldn't load workspace settings" onRetry={() => wsQuery.refetch()} />;
 
   const ws = wsQuery.data;

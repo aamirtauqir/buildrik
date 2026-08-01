@@ -98,7 +98,7 @@ export default function PlansPage() {
     return (
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-80 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
+          <div key={i} className="h-80 animate-pulse rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
         ))}
       </div>
     );
@@ -178,7 +178,7 @@ export default function PlansPage() {
               ? {
                   backgroundColor: "var(--color-bg-surface)",
                   borderColor: "var(--color-primary)",
-                  boxShadow: "0 0 0 1px var(--color-primary), 0 14px 34px -18px rgba(45,109,255,0.5)",
+                  boxShadow: "0 0 0 1px var(--color-primary), 0 14px 34px -18px rgba(26,86,219,0.5)",
                 }
               : {
                   backgroundColor: "var(--color-bg-surface)",
@@ -193,7 +193,7 @@ export default function PlansPage() {
           const checkColor = isInk ? "var(--color-teal)" : "var(--color-success)";
 
           return (
-            <div key={plan.name} className="relative flex flex-col rounded-xl border p-5" style={cardStyle}>
+            <div key={plan.name} className="relative flex flex-col rounded-lg border p-5" style={cardStyle}>
               {popular && (
                 <span
                   className="absolute -top-2.5 left-5 rounded-pill px-2.5 py-0.5 text-eyebrow font-semibold text-white"
@@ -235,7 +235,7 @@ export default function PlansPage() {
               </ul>
 
               <div className="mt-auto pt-6">
-                <PlanCta planId={planId} popular={popular} isCurrent={isCurrent} currentPlanId={currentPlanId} onSelect={selectPlan} pending={pending} />
+                <PlanCta planId={planId} popular={popular} onInk={isInk} isCurrent={isCurrent} currentPlanId={currentPlanId} onSelect={selectPlan} pending={pending} />
               </div>
             </div>
           );
@@ -248,6 +248,7 @@ export default function PlansPage() {
 function PlanCta({
   planId,
   popular,
+  onInk,
   isCurrent,
   currentPlanId,
   onSelect,
@@ -255,6 +256,7 @@ function PlanCta({
 }: {
   planId: PlanName;
   popular: boolean;
+  onInk: boolean;
   isCurrent: boolean;
   currentPlanId: PlanName;
   onSelect: (planId: PlanName) => void;
@@ -287,7 +289,9 @@ function PlanCta({
       style={
         popular
           ? { backgroundColor: "var(--color-primary)" }
-          : { borderColor: "var(--color-border-strong)", color: "var(--color-text-primary)" }
+          : onInk
+            ? { borderColor: "rgba(255,255,255,0.45)", color: "#FFFFFF" }
+            : { borderColor: "var(--color-border-strong)", color: "var(--color-text-primary)" }
       }
     >
       {pending ? "Opening…" : label}

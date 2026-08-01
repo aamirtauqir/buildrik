@@ -123,17 +123,17 @@ export function InviteModal({ open, onClose, onSubmit, isLoading }: InviteModalP
               placeholder={"alice@example.com\nbob@example.com"}
               className={cn(
                 "w-full resize-none rounded-lg border px-3 py-2.5 text-body outline-none transition-colors focus:border-[var(--color-primary)]",
-                tooMany || hasInvalid ? "border-[var(--color-primary)]" : "border-[var(--color-border-default)]"
+                tooMany || hasInvalid ? "border-[var(--color-error)]" : "border-[var(--color-border-default)]"
               )}
               style={{ color: "var(--color-text-primary)" }}
             />
             {tooMany && (
-              <p className="mt-1 text-body-sm" style={{ color: "var(--color-primary)" }}>
+              <p className="mt-1 text-body-sm" style={{ color: "var(--color-error-text)" }}>
                 Maximum 10 emails allowed. You have {validCount}.
               </p>
             )}
             {hasInvalid && !tooMany && (
-              <p className="mt-1 text-body-sm" style={{ color: "var(--color-primary)" }}>
+              <p className="mt-1 text-body-sm" style={{ color: "var(--color-error-text)" }}>
                 Invalid: {invalidEmails.join(", ")}
               </p>
             )}

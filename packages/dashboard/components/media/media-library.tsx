@@ -279,7 +279,7 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
             // Was "No assets yet" on a failed query — a fake-empty hiding the error.
             <ErrorState title="Couldn't load your media" description="Something went wrong on our end." onRetry={() => assets.refetch()} />
           ) : items.length === 0 ? (
-            <div className="rounded-xl border border-dashed p-12 text-center" style={{ borderColor: "var(--color-border-default)" }}>
+            <div className="rounded-lg border border-dashed p-12 text-center" style={{ borderColor: "var(--color-border-default)" }}>
               <ImageOff size={26} className="mx-auto mb-2" style={{ color: "var(--color-text-placeholder)" }} />
               <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>{search ? "No assets match your search" : "No assets yet"}</p>
               <p className="mt-0.5 text-body" style={{ color: "var(--color-text-secondary)" }}>{search ? "Try a different term." : "Upload images, video, or fonts to use across your sites."}</p>
@@ -305,7 +305,7 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
                       )}
                     </div>
                     {/* Always-on filename/size caption */}
-                    <div className="pointer-events-none absolute inset-x-0 bottom-0 px-2.5 pb-2 pt-5" style={{ background: "linear-gradient(rgba(15,23,42,0), rgba(15,23,42,0.55))" }}>
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 px-2.5 pb-2 pt-5" style={{ background: "linear-gradient(rgba(17,24,39,0), rgba(17,24,39,0.55))" }}>
                       <p className="truncate text-[11.5px] font-semibold text-white">{a.filename}</p>
                       <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.78)" }}>{formatBytes(a.bytes)}</p>
                     </div>
@@ -366,7 +366,7 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
           </>
         }
       >
-        <input
+        <InputField
           type="text"
           value={createValue}
           onChange={(e) => setCreateValue(e.target.value)}
@@ -378,8 +378,6 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
           placeholder="Folder name"
           autoFocus
           maxLength={80}
-          className="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-[var(--color-primary)]"
-          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
         />
       </Modal>
 
@@ -404,7 +402,7 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
           </>
         }
       >
-        <input
+        <InputField
           type="text"
           value={renameValue}
           onChange={(e) => setRenameValue(e.target.value)}
@@ -415,8 +413,6 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
           }}
           placeholder="Folder name"
           autoFocus
-          className="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-[var(--color-primary)]"
-          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
         />
       </Modal>
 
@@ -441,7 +437,7 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
       >
         <div className="flex items-start gap-3 rounded-lg p-3" style={{ backgroundColor: "var(--color-error-subtle)" }}>
           <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" style={{ color: "var(--color-error)" }} />
-          <p className="text-sm" style={{ color: "var(--color-error)" }}>
+          <p className="text-body" style={{ color: "var(--color-error)" }}>
             Delete <strong>{deleteTarget?.name}</strong>? Assets in this folder stay in your library and move to <strong>All</strong>. This can’t be undone.
           </p>
         </div>
@@ -468,7 +464,7 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
       >
         <div className="flex items-start gap-3 rounded-lg p-3" style={{ backgroundColor: "var(--color-error-subtle)" }}>
           <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" style={{ color: "var(--color-error)" }} />
-          <p className="text-sm" style={{ color: "var(--color-error)" }}>
+          <p className="text-body" style={{ color: "var(--color-error)" }}>
             Delete <strong>{deleteAssetTarget?.name}</strong>? If a published site uses this file, it will break. This can’t be undone.
           </p>
         </div>

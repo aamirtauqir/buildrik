@@ -55,7 +55,7 @@ export default function PartnerPage() {
         <ErrorState title="Couldn't load partner data" onRetry={() => query.refetch()} />
       ) : d ? (
         <>
-          <div className="mb-4 flex flex-col gap-4 rounded-xl border p-5 sm:flex-row sm:items-center sm:justify-between" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-primary-subtle)" }}>
+          <div className="mb-4 flex flex-col gap-4 rounded-lg border p-5 sm:flex-row sm:items-center sm:justify-between" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-primary-subtle)" }}>
             <div className="min-w-0 flex-1">
               <p className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>
                 {d.tier.name} Partner · <MetricValue>{d.tier.commissionPct}%</MetricValue> commission
@@ -92,7 +92,7 @@ export default function PartnerPage() {
             rows={d.referrals}
             keyOf={(r) => r.id}
             empty={
-              <div className="rounded-xl border p-8 text-center" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}>
+              <div className="rounded-lg border p-8 text-center" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}>
                 <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>No referrals yet</p>
                 <p className="mt-1 text-body" style={{ color: "var(--color-text-secondary)" }}>Share your referral link to start earning commission.</p>
               </div>

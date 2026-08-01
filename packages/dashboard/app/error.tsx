@@ -15,7 +15,7 @@ export default function GlobalError({
       style={{ backgroundColor: "var(--color-bg-page)" }}
     >
       <div className="text-center max-w-md mx-auto px-4">
-        <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full" style={{ backgroundColor: "#FEF2F2" }}>
+        <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full" style={{ backgroundColor: "#FDF2F2" }}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-8 w-8"
@@ -40,25 +40,25 @@ export default function GlobalError({
         >
           Something Went Wrong
         </h2>
-        <p className="mt-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>
+        <p className="mt-2 text-body" style={{ color: "var(--color-text-secondary)" }}>
           Our team has been notified. Please try again in a moment.
         </p>
         {error.digest && (
-          <p className="mt-3 text-xs font-mono" style={{ color: "var(--color-text-secondary)" }}>
+          <p className="mt-3 text-body-sm font-mono" style={{ color: "var(--color-text-secondary)" }}>
             Error ID: {error.digest}
           </p>
         )}
         <div className="mt-8 flex gap-3 justify-center">
           <button
             onClick={reset}
-            className="px-4 py-2 rounded-lg text-sm font-medium text-white cursor-pointer"
+            className="px-4 py-2 rounded-lg text-body font-medium text-white cursor-pointer"
             style={{ backgroundColor: "var(--color-primary)" }}
           >
             Try Again
           </button>
           <Link
             href="/dashboard"
-            className="px-4 py-2 rounded-lg text-sm font-medium border"
+            className="px-4 py-2 rounded-lg text-body font-medium border"
             style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
           >
             Go to Dashboard

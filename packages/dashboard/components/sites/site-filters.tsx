@@ -3,7 +3,7 @@ import { ChevronDown, ChevronUp, ToggleLeft, ToggleRight } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@lib/utils";
 import { trpc } from "@lib/trpc/client";
-import { MetricValue } from "@/components/dashboard/primitives";
+import { FilterChip as ChipButton, MetricValue } from "@/components/dashboard/primitives";
 
 export const SORT_OPTIONS = [
   { value: "lastEdited", label: "Last edited" },
@@ -51,22 +51,6 @@ interface SiteFiltersProps {
   archivedCount?: number;
 }
 
-// Segmented pill used across the status / date / traffic quick-filters.
-function ChipButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
-  return (
-    <button
-      onClick={onClick}
-      className="rounded-pill border px-3 py-1 text-body-sm font-medium transition-colors"
-      style={
-        active
-          ? { backgroundColor: "var(--color-primary-subtle)", borderColor: "var(--color-primary)", color: "var(--color-primary)" }
-          : { backgroundColor: "var(--color-bg-surface)", borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }
-      }
-    >
-      {children}
-    </button>
-  );
-}
 
 export function SiteFilters({
   status, onStatusChange,

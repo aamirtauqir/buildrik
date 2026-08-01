@@ -6,7 +6,7 @@ import { cn } from "@lib/utils";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { INTEGRATION_CONFIGS } from "@/components/settings/integrations-tab";
-import { SectionCard, Pill, MetricValue, Button } from "@/components/dashboard/primitives";
+import { SectionCard, Pill, MetricValue, Button, InputField } from "@/components/dashboard/primitives";
 
 /** dc categorical tints cycled across the integration tiles (teal→amber→primary→pink). */
 const TILE_TINTS = ["var(--color-teal)", "var(--color-amber)", "var(--color-primary)", "var(--color-pink)"];
@@ -212,7 +212,7 @@ export function IntegrationsContent() {
     return (
       <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))" }}>
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="h-[74px] animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
+          <div key={i} className="h-[74px] animate-pulse rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
         ))}
       </div>
     );
@@ -285,13 +285,11 @@ export function IntegrationsContent() {
                     <label className="mb-1 block text-eyebrow font-medium" style={{ color: "var(--color-text-primary)" }}>
                       {f.label}
                     </label>
-                    <input
+                    <InputField
                       type="text"
                       value={draftValue(cfg.provider, f.key, existing)}
                       onChange={(e) => setDraft(cfg.provider, f.key, e.target.value)}
                       placeholder={f.placeholder}
-                      className="w-full rounded-md border px-3 py-2 text-sm outline-none"
-                      style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)", backgroundColor: "var(--color-bg-surface)" }}
                     />
                   </div>
                 ))}

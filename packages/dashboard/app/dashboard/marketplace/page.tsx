@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { BarChart3, ShoppingCart, Mail, FileText, Search, MessageSquare, Lock, Check, Settings2, Users, TrendingUp, Video, Pin, ShieldCheck, type LucideIcon } from "lucide-react";
 import { CATALOG_APPS, MARKETPLACE_CATEGORIES, FEATURED_APP, type AppCategory, type CatalogApp } from "@/lib/marketplace-catalog";
-import { PageHeader, IconChip, InputField, Button, ButtonLink, Modal } from "@/components/dashboard/primitives";
+import { PageHeader, IconChip, InputField, Button, ButtonLink, Modal, FilterChip } from "@/components/dashboard/primitives";
 import { trpc } from "@lib/trpc/client";
 
 const iconMap: Record<string, LucideIcon> = {
@@ -110,26 +110,16 @@ export default function MarketplacePage() {
         {filters.map((filter) => {
           const selected = filter === category;
           return (
-            <button
-              key={filter}
-              type="button"
-              onClick={() => setCategory(filter)}
-              className="rounded-full border px-3.5 py-1.5 text-[13px] font-semibold transition-colors"
-              style={
-                selected
-                  ? { borderColor: "var(--color-ink)", backgroundColor: "var(--color-ink)", color: "#fff" }
-                  : { borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)", color: "var(--color-text-secondary)" }
-              }
-            >
+            <FilterChip key={filter} active={selected} onClick={() => setCategory(filter)}>
               {filter}
-            </button>
+            </FilterChip>
           );
         })}
       </div>
 
       {/* Featured hero — ink card per the design. */}
       <div
-        className="mb-6 flex flex-col gap-6 rounded-2xl p-6 sm:flex-row sm:items-center sm:justify-between"
+        className="mb-6 flex flex-col gap-6 rounded-lg p-6 sm:flex-row sm:items-center sm:justify-between"
         style={{ backgroundColor: "var(--color-ink)" }}
       >
         <div className="min-w-0">
@@ -138,14 +128,14 @@ export default function MarketplacePage() {
           <p className="mt-2 max-w-[420px] text-[13px]" style={{ color: "rgba(255,255,255,0.6)" }}>{FEATURED_APP.description}</p>
           <Link
             href={INTEGRATIONS_HREF}
-            className="mt-3 inline-flex h-[38px] items-center justify-center rounded-[10px] bg-white px-4 text-[13px] font-semibold transition-opacity hover:opacity-90"
+            className="mt-3 inline-flex h-[38px] items-center justify-center rounded-lg bg-white px-4 text-[13px] font-semibold transition-opacity hover:opacity-90"
             style={{ color: "var(--color-ink)" }}
           >
             {FEATURED_APP.cta}
           </Link>
         </div>
         <div
-          className="hidden h-[128px] w-[178px] shrink-0 items-end justify-center gap-[5px] rounded-xl p-[14px] sm:flex"
+          className="hidden h-[128px] w-[178px] shrink-0 items-end justify-center gap-[5px] rounded-lg p-[14px] sm:flex"
           style={{ backgroundColor: "var(--color-primary)" }}
           aria-hidden
         >
@@ -167,7 +157,7 @@ export default function MarketplacePage() {
       )}
 
       {apps.length === 0 ? (
-        <p className="rounded-xl border p-8 text-center text-body" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)", color: "var(--color-text-secondary)" }}>
+        <p className="rounded-lg border p-8 text-center text-body" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)", color: "var(--color-text-secondary)" }}>
           No apps match your search.
         </p>
       ) : (
@@ -179,7 +169,7 @@ export default function MarketplacePage() {
             return (
               <div
                 key={app.id}
-                className="flex flex-col gap-3 rounded-xl border p-4 shadow-card"
+                className="flex flex-col gap-3 rounded-lg border p-4 shadow-card"
                 style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
               >
                 <div className="flex items-center gap-3">
@@ -262,7 +252,7 @@ export default function MarketplacePage() {
               <p className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>{confirming.name}</p>
               <p className="mt-0.5 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>{confirming.description}</p>
               {/* Honesty: first-party apps are tracked but not yet functional. */}
-              <p className="mt-2 text-body-sm" style={{ color: "#92400e" }}>
+              <p className="mt-2 text-body-sm" style={{ color: "#723B13" }}>
                 Preview — installing marks this app as enabled for your workspace, but it isn&apos;t active yet.
               </p>
             </div>

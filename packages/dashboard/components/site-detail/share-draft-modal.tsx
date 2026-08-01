@@ -5,7 +5,7 @@ import { trpc } from "@lib/trpc/client";
 import { shareUrl } from "@lib/utils";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { PLAN_LIMITS, type PlanName } from "@lib/constants/plan-limits";
-import { Button, Modal } from "@/components/dashboard/primitives";
+import { Button, InputField, Modal } from "@/components/dashboard/primitives";
 
 interface ShareDraftModalProps {
   open: boolean;
@@ -106,14 +106,12 @@ export function ShareDraftModal({ open, onClose, siteId }: ShareDraftModalProps)
             <div className="mt-4 space-y-3">
               <div>
                 <label className="mb-1.5 block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>Link name</label>
-                <input
+                <InputField
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   maxLength={100}
                   placeholder="Draft preview"
-                  className="w-full rounded-lg border px-3 py-2 text-body outline-none transition-colors focus:border-[var(--color-primary)]"
-                  style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
                 />
               </div>
 
@@ -122,14 +120,14 @@ export function ShareDraftModal({ open, onClose, siteId }: ShareDraftModalProps)
                   Password{" "}
                   <span className="font-normal" style={{ color: "var(--color-text-muted)" }}>(optional)</span>
                 </label>
-                <input
+                <InputField
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={!allowPasswords}
                   placeholder={allowPasswords ? "Min 6 characters" : "Password links require PRO"}
-                  className="w-full rounded-lg border px-3 py-2 text-body outline-none transition-colors focus:border-[var(--color-primary)] disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+                  className="disabled:cursor-not-allowed"
+                  wrapperClassName={allowPasswords ? undefined : "opacity-50"}
                 />
               </div>
 

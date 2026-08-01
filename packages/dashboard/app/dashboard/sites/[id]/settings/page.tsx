@@ -21,7 +21,7 @@ export default function SiteSettingsPage() {
   });
 
   if (settingsQuery.isLoading) {
-    return <div className="h-64 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />;
+    return <div className="h-64 animate-pulse rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }} />;
   }
 
   if (!settingsQuery.data) return <ErrorState title="Couldn't load site settings" onRetry={() => settingsQuery.refetch()} />;

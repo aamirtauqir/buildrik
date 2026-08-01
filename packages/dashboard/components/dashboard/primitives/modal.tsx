@@ -3,10 +3,10 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { X } from "lucide-react";
 
-/** Centred dialog on a dark scrim, per the design's modal spec: scrim
- *  rgba(18,22,32,.45), 16px panel, a titled header row and an optional footer
- *  row, both closed by a 1px divider. Escape and a scrim click dismiss it, and
- *  focus moves into the panel so keyboard users are not stranded behind it. */
+/** Centred dialog on a dark scrim — Flowbite modal paint (gray-900/50 scrim,
+ *  rounded-lg panel, gray hover close chip), our own focus trap: flowbite-react's
+ *  Modal quantizes width to size steps, and the trap/restore behavior here is
+ *  live-tested across 26 consumers. Escape and a scrim click dismiss it. */
 export function Modal({
   open,
   onClose,
@@ -72,23 +72,27 @@ export function Modal({
   if (!open) return null;
 
   return (
+    // z-[9997]: above the cookie-consent banner (9998 is the banner's own
+    // dialog, 10000 the offline banner) — at z-60 the banner sat on top of
+    // every modal and covered its footer actions.
     <div
-      className="fixed inset-0 z-[60] flex items-center justify-center p-4"
-      style={{ backgroundColor: "rgba(18, 22, 32, 0.45)" }}
+      className="fixed inset-0 z-[9997] flex items-center justify-center bg-gray-900/50 p-4"
       onClick={onClose}
     >
+      {/* Only the body scrolls: a footer inside the scroll container put the
+          primary action below the fold on tall modals (publish checks). */}
       <div
         ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-label={title}
         tabIndex={-1}
-        className="max-h-[90vh] w-full overflow-y-auto rounded-2xl outline-none"
+        className="flex max-h-[90vh] w-full flex-col overflow-hidden rounded-lg shadow-modal outline-none"
         style={{ maxWidth: width, backgroundColor: "var(--color-bg-surface)" }}
         onClick={(e) => e.stopPropagation()}
       >
         <div
-          className="flex items-center justify-between border-b px-[22px] py-[18px]"
+          className="flex shrink-0 items-center justify-between border-b px-5 py-4"
           style={{ borderColor: "var(--color-border-default)" }}
         >
           <h2 className="text-section-title" style={{ color: "var(--color-text-primary)" }}>{title}</h2>
@@ -96,18 +100,18 @@ export function Modal({
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="rounded-md p-1 transition-colors hover:bg-[var(--color-bg-subtle)]"
-            style={{ color: "var(--color-text-secondary)" }}
+            className="inline-flex h-8 w-8 items-center justify-center rounded-lg transition-colors hover:bg-[var(--color-bg-subtle)] hover:text-[var(--color-text-primary)]"
+            style={{ color: "var(--color-text-muted)" }}
           >
             <X className="h-4 w-4" />
           </button>
         </div>
 
-        <div className="px-[22px] py-4">{children}</div>
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">{children}</div>
 
         {footer && (
           <div
-            className="flex items-center justify-end gap-2 border-t px-[22px] py-4"
+            className="flex shrink-0 items-center justify-end gap-2 border-t px-5 py-4"
             style={{ borderColor: "var(--color-border-default)" }}
           >
             {footer}

@@ -59,7 +59,7 @@ export function WorkspaceSwitcher() {
       </button>
 
       {open && (
-        <div className="absolute inset-x-0 top-full z-40 mt-1 overflow-hidden rounded-xl border bg-white shadow-card" style={{ borderColor: "var(--color-border-default)" }}>
+        <div className="absolute inset-x-0 top-full z-40 mt-1 overflow-hidden rounded-lg border bg-white shadow-card" style={{ borderColor: "var(--color-border-default)" }}>
           <div className="max-h-72 overflow-y-auto p-1">
             {workspaces.map((ws) => (
               <button key={ws.id} onClick={() => switchTo(ws.id)} disabled={!!switching} className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left transition-colors hover:bg-[var(--color-bg-subtle)] disabled:opacity-60">

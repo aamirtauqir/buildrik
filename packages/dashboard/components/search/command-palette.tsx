@@ -423,7 +423,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-[20vh]">
       <div className="fixed inset-0" style={{ backgroundColor: "rgba(18, 22, 32, 0.45)" }} onClick={onClose} />
       <div
-        className="relative w-full overflow-hidden rounded-xl border bg-white shadow-2xl"
+        className="relative w-full overflow-hidden rounded-lg border bg-white shadow-2xl"
         style={{ maxWidth: 640, maxHeight: 480, borderColor: "var(--color-border-default)" }}
       >
         {/* Search input */}
@@ -442,7 +442,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
             onKeyDown={handleKeyDown}
             placeholder="Search or jump to..."
             aria-label="Search Buildrick"
-            className="flex-1 border-0 bg-transparent py-3 text-sm outline-none"
+            className="flex-1 border-0 bg-transparent py-3 text-body outline-none"
             style={{ color: "var(--color-text-primary)" }}
           />
           {query && (
@@ -456,7 +456,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
         <div ref={listRef} className="max-h-[400px] overflow-y-auto py-2">
           {isSearching && flatItems.length === 0 ? (
             <p
-              className="px-4 py-8 text-center text-sm"
+              className="px-4 py-8 text-center text-body"
               style={{ color: "var(--color-text-secondary)" }}
             >
               No results for &ldquo;{term}&rdquo;
@@ -467,7 +467,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
               return (
                 <div key={group.scope}>
                   <p
-                    className="px-4 py-1.5 text-xs font-medium uppercase tracking-wide"
+                    className="px-4 py-1.5 text-body-sm font-medium uppercase tracking-wide"
                     style={{ color: "var(--color-text-secondary)" }}
                   >
                     {group.label}
@@ -479,7 +479,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                         key={item.id}
                         data-index={idx}
                         onClick={() => selectItem(item)}
-                        className="flex w-full items-center gap-3 px-4 py-2 text-left text-sm transition-colors"
+                        className="flex w-full items-center gap-3 px-4 py-2 text-left text-body transition-colors"
                         style={{
                           color: "var(--color-text-primary)",
                           backgroundColor:
@@ -493,7 +493,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                         <span className="flex-1 truncate">{item.label}</span>
                         {item.description && (
                           <span
-                            className="truncate text-xs"
+                            className="truncate text-body-sm"
                             style={{ color: "var(--color-text-secondary)" }}
                           >
                             {item.description}
@@ -516,7 +516,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
           {SEARCH_SCOPES.map((s) => (
             <button
               key={s.key}
-              className="text-xs transition-colors hover:underline"
+              className="text-body-sm transition-colors hover:underline"
               style={{ color: "var(--color-text-secondary)" }}
               onClick={() => {
                 setQuery(`${s.label}: `);

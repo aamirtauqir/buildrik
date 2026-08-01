@@ -106,7 +106,7 @@ export function SubmissionsPanel({ siteId, formBlocks, isLoading }: SubmissionsP
 
   if (!isLoading && formBlocks.length === 0) {
     return (
-      <div className="rounded-xl border border-dashed p-10 text-center" style={{ borderColor: "var(--color-border-default)" }}>
+      <div className="rounded-lg border border-dashed p-10 text-center" style={{ borderColor: "var(--color-border-default)" }}>
         <Inbox className="mx-auto h-6 w-6" style={{ color: "var(--color-text-muted)" }} />
         <p className="mt-2 text-body font-medium" style={{ color: "var(--color-text-primary)" }}>No forms on this site yet</p>
         <p className="mt-0.5 text-body" style={{ color: "var(--color-text-secondary)" }}>Add a form block in the editor to start collecting submissions.</p>
@@ -200,7 +200,7 @@ export function SubmissionsPanel({ siteId, formBlocks, isLoading }: SubmissionsP
             keyOf={(s) => s.id}
             onRowClick={handleOpenDrawer}
             empty={
-              <div className="rounded-xl border border-dashed p-10 text-center" style={{ borderColor: "var(--color-border-default)" }}>
+              <div className="rounded-lg border border-dashed p-10 text-center" style={{ borderColor: "var(--color-border-default)" }}>
                 <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>No submissions found</p>
                 <p className="mt-0.5 text-body" style={{ color: "var(--color-text-secondary)" }}>
                   {filterFormBlockId ? "Try clearing the form filter." : "Submissions from your published site will appear here."}

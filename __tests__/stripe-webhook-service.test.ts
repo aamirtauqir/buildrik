@@ -20,6 +20,10 @@ vi.mock("@/server/services/stripe.client", () => ({
   resolvePlanFromPriceId: vi.fn(),
 }));
 
+vi.mock("@/server/services/billing.service", () => ({
+  reconcileWorkspaceToFreePlan: vi.fn().mockResolvedValue(0),
+}));
+
 import { prisma } from "@/lib/prisma";
 import { getStripe, resolvePlanFromPriceId } from "@/server/services/stripe.client";
 
@@ -214,6 +218,49 @@ describe("Stripe Webhook Service", () => {
 
       expect(prisma.workspace.update).toHaveBeenCalledWith({ where: { id: "ws1" }, data: { plan: "PRO" } });
     });
+
+    /**
+     * Every pre-existing case in this suite hardcoded cancel_at_period_end:false,
+     * so the field the whole cancellation feature hangs on had ZERO coverage —
+     * which is how a cancel that never reached Stripe stayed green.
+     */
+    it("writes cancelAtPeriodEnd when Stripe reports a pending cancellation", async () => {
+      const { handleSubscriptionUpdated } = await import("@/server/services/stripe-webhook.service");
+      vi.mocked(prisma.subscription.findUnique).mockResolvedValue({
+        id: "sub1", workspaceId: "ws1", plan: "PRO", interval: "MONTHLY", price: 2900, stripePriceId: "price_pro_monthly",
+      } as any);
+      vi.mocked(resolvePlanFromPriceId).mockReturnValue({ plan: "PRO", interval: "MONTHLY" } as any);
+
+      await handleSubscriptionUpdated("sub_123", {
+        status: "active",
+        cancel_at_period_end: true,
+        items: { data: [subItem("price_pro_monthly", 2900)] },
+      });
+
+      expect(prisma.subscription.update).toHaveBeenCalledWith(expect.objectContaining({
+        data: expect.objectContaining({ cancelAtPeriodEnd: true }),
+      }));
+    });
+
+    it("clears the local cancel reason when a cancellation is reversed (e.g. via Stripe's Portal)", async () => {
+      const { handleSubscriptionUpdated } = await import("@/server/services/stripe-webhook.service");
+      vi.mocked(prisma.subscription.findUnique).mockResolvedValue({
+        id: "sub1", workspaceId: "ws1", plan: "PRO", interval: "MONTHLY", price: 2900, stripePriceId: "price_pro_monthly",
+      } as any);
+      vi.mocked(resolvePlanFromPriceId).mockReturnValue({ plan: "PRO", interval: "MONTHLY" } as any);
+
+      await handleSubscriptionUpdated("sub_123", {
+        status: "active",
+        cancel_at_period_end: false,
+        items: { data: [subItem("price_pro_monthly", 2900)] },
+      });
+
+      // cancelReason/cancelFeedback are local-only columns Stripe knows nothing
+      // about, so without this they outlive the cancellation they described.
+      expect(prisma.subscription.update).toHaveBeenCalledWith(expect.objectContaining({
+        data: expect.objectContaining({ cancelAtPeriodEnd: false, cancelReason: null, cancelFeedback: null }),
+      }));
+    });
   });
 
   describe("handleSubscriptionDeleted", () => {
@@ -230,6 +277,25 @@ describe("Stripe Webhook Service", () => {
       expect(prisma.workspace.update).toHaveBeenCalledWith(expect.objectContaining({
         data: expect.objectContaining({ plan: "FREE" }),
       }));
+      // Both writes must be in ONE transaction — they were two bare awaits, so a
+      // failure between them left a CANCELLED subscription on a paid workspace.
+      expect(prisma.$transaction).toHaveBeenCalled();
+    });
+
+    it("unpublishes over-cap sites when the workspace drops to FREE", async () => {
+      const { handleSubscriptionDeleted } = await import("@/server/services/stripe-webhook.service");
+      const { reconcileWorkspaceToFreePlan } = await import("@/server/services/billing.service");
+      vi.mocked(prisma.subscription.findUnique).mockResolvedValue({ id: "sub1", workspaceId: "ws1" } as any);
+      vi.mocked(prisma.subscription.update).mockResolvedValue({} as any);
+      vi.mocked(prisma.workspace.update).mockResolvedValue({} as any);
+
+      await handleSubscriptionDeleted("sub_123");
+
+      // Nothing reached this handler before 2026-07-31, because cancelSubscription
+      // never told Stripe anything, so Stripe never emitted the deleted event. Now
+      // that real cancellations land here, a Business workspace at period end would
+      // otherwise drop to FREE with all of its published sites still live.
+      expect(reconcileWorkspaceToFreePlan).toHaveBeenCalledWith("ws1");
     });
   });
 

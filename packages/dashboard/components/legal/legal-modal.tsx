@@ -27,13 +27,13 @@ export function LegalModal({ open, onClose, children }: LegalModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
-      <div className="absolute inset-0 bg-slate-900/40" onClick={onClose} aria-hidden="true" />
-      <div className="relative w-full max-w-lg max-h-[85vh] overflow-y-auto rounded-2xl bg-white p-8 shadow-xl">
+      <div className="absolute inset-0 bg-gray-900/50" onClick={onClose} aria-hidden="true" />
+      <div className="relative w-full max-w-lg max-h-[85vh] overflow-y-auto rounded-lg bg-white p-8 shadow-modal">
         <button
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="absolute right-4 top-4 text-slate-400 hover:text-slate-700"
+          className="absolute right-4 top-4 inline-flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-900"
         >
           <X className="h-5 w-5" />
         </button>

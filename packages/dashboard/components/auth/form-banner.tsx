@@ -17,7 +17,7 @@ export function FormBanner({ variant, title, subtitle }: FormBannerProps) {
   return (
     <div
       className={cn(
-        "flex w-full items-center gap-[9px] rounded-[10px] px-[14px] py-[11px]",
+        "flex w-full items-center gap-[9px] rounded-lg px-[14px] py-[11px]",
         isSuccess ? "bg-[rgb(18_128_92_/_0.09)]" : "bg-[rgb(229_72_77_/_0.09)]"
       )}
     >

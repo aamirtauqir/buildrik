@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Pill, Button } from "@/components/dashboard/primitives";
+import { Pill, Button, InputField } from "@/components/dashboard/primitives";
 
 export const INTEGRATION_CONFIGS = [
   {
@@ -102,20 +102,19 @@ function GoogleAnalyticsConfig({
   return (
     <div className="space-y-3">
       <div>
-        <label className="block text-xs font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+        <label className="block text-body-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
           Tracking ID
         </label>
-        <input
+        <InputField
           type="text"
           value={values["trackingId"] ?? ""}
           onChange={(e) => onChange("trackingId", e.target.value)}
           placeholder="G-XXXXXXXXXX"
-          className="w-full px-3 py-2 text-sm rounded-md border outline-none"
-          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+          wrapperClassName="w-full"
         />
       </div>
       <div className="flex items-center justify-between">
-        <p className="text-xs font-medium" style={{ color: "var(--color-text-primary)" }}>
+        <p className="text-body-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
           Apply to all sites
         </p>
         <Toggle
@@ -124,7 +123,7 @@ function GoogleAnalyticsConfig({
         />
       </div>
       <div className="flex items-center justify-between">
-        <p className="text-xs font-medium" style={{ color: "var(--color-text-primary)" }}>
+        <p className="text-body-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
           Anonymize IP
         </p>
         <Toggle
@@ -146,34 +145,32 @@ function MailchimpConfig({
   return (
     <div className="space-y-3">
       <div>
-        <label className="block text-xs font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+        <label className="block text-body-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
           API Key
         </label>
-        <input
+        <InputField
           type="text"
           value={values["apiKey"] ?? ""}
           onChange={(e) => onChange("apiKey", e.target.value)}
           placeholder="Enter your Mailchimp API key"
-          className="w-full px-3 py-2 text-sm rounded-md border outline-none"
-          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+          wrapperClassName="w-full"
         />
       </div>
       <div>
-        <label className="block text-xs font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+        <label className="block text-body-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
           Audience ID
         </label>
-        <input
+        <InputField
           type="text"
           value={values["audienceId"] ?? ""}
           onChange={(e) => onChange("audienceId", e.target.value)}
           placeholder="Enter your audience ID"
-          className="w-full px-3 py-2 text-sm rounded-md border outline-none"
-          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+          wrapperClassName="w-full"
         />
       </div>
       {values["audienceId"] && (
         <div
-          className="rounded-md p-3 text-xs"
+          className="rounded-md p-3 text-body-sm"
           style={{ backgroundColor: "var(--color-bg-page)", color: "var(--color-text-secondary)" }}
         >
           <p className="font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>Field mapping</p>
@@ -207,20 +204,19 @@ function ZapierConfig({
   return (
     <div className="space-y-3">
       <div>
-        <label className="block text-xs font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+        <label className="block text-body-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
           Webhook URL
         </label>
-        <input
+        <InputField
           type="text"
           value={values["webhookUrl"] ?? ""}
           onChange={(e) => onChange("webhookUrl", e.target.value)}
           placeholder="https://hooks.zapier.com/\u2026"
-          className="w-full px-3 py-2 text-sm rounded-md border outline-none"
-          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+          wrapperClassName="w-full"
         />
       </div>
       <div>
-        <p className="text-xs font-medium mb-2" style={{ color: "var(--color-text-primary)" }}>
+        <p className="text-body-sm font-medium mb-2" style={{ color: "var(--color-text-primary)" }}>
           Trigger events
         </p>
         <div className="space-y-2">
@@ -232,7 +228,7 @@ function ZapierConfig({
                 onChange={() => toggleTrigger(evt.key)}
                 className="rounded"
               />
-              <span className="text-xs" style={{ color: "var(--color-text-primary)" }}>
+              <span className="text-body-sm" style={{ color: "var(--color-text-primary)" }}>
                 {evt.label}
               </span>
             </label>
@@ -258,37 +254,35 @@ function SlackConfig({
   return (
     <div className="space-y-3">
       <div>
-        <label className="block text-xs font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+        <label className="block text-body-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
           Webhook URL
         </label>
-        <input
+        <InputField
           type="text"
           value={values["webhookUrl"] ?? ""}
           onChange={(e) => onChange("webhookUrl", e.target.value)}
           placeholder="https://hooks.slack.com/\u2026"
-          className="w-full px-3 py-2 text-sm rounded-md border outline-none"
-          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+          wrapperClassName="w-full"
         />
       </div>
       <div>
-        <label className="block text-xs font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+        <label className="block text-body-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
           Channel name
         </label>
-        <input
+        <InputField
           type="text"
           value={values["channelName"] ?? ""}
           onChange={(e) => onChange("channelName", e.target.value)}
           placeholder="#general"
-          className="w-full px-3 py-2 text-sm rounded-md border outline-none"
-          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+          wrapperClassName="w-full"
         />
       </div>
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs font-medium" style={{ color: "var(--color-text-primary)" }}>
+          <p className="text-body-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
             Quiet hours
           </p>
-          <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+          <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
             Suppress notifications 10 PM - 8 AM
           </p>
         </div>
@@ -358,16 +352,16 @@ export function IntegrationsTab({ connected = [], onAdd, onRemove, onUpdate, onT
           <div
             key={cfg.provider}
             className="rounded-lg border overflow-hidden"
-            style={{ borderColor: connection ? "#bbf7d0" : "var(--color-border-default)" }}
+            style={{ borderColor: connection ? "#BCF0DA" : "var(--color-border-default)" }}
           >
             <div className="flex items-center justify-between px-4 py-3">
               <div className="flex items-center gap-3">
                 <IconPlaceholder name={cfg.icon} />
                 <div>
-                  <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
+                  <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
                     {cfg.name}
                   </p>
-                  <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+                  <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
                     {cfg.description}
                   </p>
                 </div>

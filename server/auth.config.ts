@@ -125,6 +125,14 @@ export const authConfig: NextAuthConfig = {
       // every request would be wasteful.
       if (user) {
         token.userId = user.id;
+        // OAuth sign-in mints its token here rather than through
+        // /api/auth/create-session, so stamp the revocation version on it too —
+        // otherwise OAuth users would be permanently un-revocable.
+        const fresh = await prisma.user.findUnique({
+          where: { id: user.id },
+          select: { sessionVersion: true },
+        });
+        token.sv = fresh?.sessionVersion ?? 0;
         // `findFirst` with no ordering returned an ARBITRARY workspace for anyone
         // in more than one — so which workspace you landed in was down to whatever
         // Postgres handed back first. Prefer the one they last used; /auth/redirect
@@ -151,6 +159,45 @@ export const authConfig: NextAuthConfig = {
           select: { workspaceId: true },
         });
         if (valid) token.workspaceId = valid.workspaceId;
+      }
+
+      // ── Revocation gate ────────────────────────────────────────────────
+      // Sessions are JWT-strategy with no adapter, so the `sessions` table is a
+      // display list, not a gate: every "Revoke session", "Revoke all other
+      // sessions", and the password-reset "signs you out everywhere" deleted
+      // rows while the cookie stayed valid for its full 30 days. A stolen cookie
+      // survived the victim's password reset. This callback runs on EVERY
+      // `auth()` call (@auth/core lib/actions/session.js), and returning null is
+      // the supported kill switch, so this is where the gate belongs.
+      //
+      //   token.sv ?? 0   vs   user.sessionVersion
+      //   ─────────────────────────────────────────────────────────────
+      //   old cookie, no revocation yet →  0 vs 0  → valid (no mass logout)
+      //   old cookie, after a reset     →  0 vs 1  → NULL  (hole closed now)
+      //   DB unreachable                →  fail OPEN, see below
+      //
+      // Reading a missing claim as 0 is what lets this ship without logging
+      // everyone out AND still kill pre-deploy cookies the moment their owner
+      // revokes anything. Blanket-grandfathering would have kept the exact hole
+      // open for the full cookie lifetime.
+      if (typeof token.userId === "string") {
+        try {
+          const current = await prisma.user.findUnique({
+            where: { id: token.userId },
+            select: { sessionVersion: true },
+          });
+          // User deleted → no session. Version moved on → this cookie predates a
+          // revocation the user asked for.
+          if (!current) return null;
+          if (current.sessionVersion !== (typeof token.sv === "number" ? token.sv : 0)) return null;
+        } catch (e) {
+          // Deliberately fail OPEN. This runs on every request, so failing
+          // closed would turn a transient Postgres blip into a total auth
+          // outage for every signed-in user. The tradeoff is explicit: a
+          // revoked session survives while the DB is unreachable. (Contrast
+          // with billing, where failing closed is correct because money moves.)
+          console.error("[auth] sessionVersion check failed, allowing request", e);
+        }
       }
       return token;
     },

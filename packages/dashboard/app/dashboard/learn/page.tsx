@@ -47,10 +47,10 @@ function ContinueHero({
   if (!current) {
     return (
       <div
-        className="mb-8 flex items-center gap-3 rounded-2xl border px-6 py-5"
+        className="mb-8 flex items-center gap-3 rounded-lg border px-6 py-5"
         style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
       >
-        <span className="flex h-9 w-9 items-center justify-center rounded-full" style={{ backgroundColor: "var(--color-success-bg, #DCFCE7)" }}>
+        <span className="flex h-9 w-9 items-center justify-center rounded-full" style={{ backgroundColor: "var(--color-success-bg, #DEF7EC)" }}>
           <Check className="h-5 w-5" style={{ color: "var(--color-success)" }} strokeWidth={3} />
         </span>
         <div>
@@ -63,7 +63,7 @@ function ContinueHero({
 
   return (
     <div
-      className="mb-8 flex flex-col gap-4 rounded-2xl border p-6 sm:flex-row sm:items-center sm:justify-between"
+      className="mb-8 flex flex-col gap-4 rounded-lg border p-6 sm:flex-row sm:items-center sm:justify-between"
       style={{
         borderColor: "var(--color-border-default)",
         backgroundColor: "var(--color-primary-subtle)",
@@ -100,7 +100,7 @@ function CourseCard({
 
   return (
     <div
-      className="flex flex-col overflow-hidden rounded-xl border shadow-card"
+      className="flex flex-col overflow-hidden rounded-lg border shadow-card"
       style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
     >
       <div className="flex items-start justify-between gap-3 px-5 pt-5">
@@ -126,7 +126,7 @@ function CourseCard({
               <span
                 className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full"
                 style={{
-                  backgroundColor: l.completed ? "var(--color-success-bg, #DCFCE7)" : "transparent",
+                  backgroundColor: l.completed ? "var(--color-success-bg, #DEF7EC)" : "transparent",
                   boxShadow: l.completed ? "none" : "inset 0 0 0 1.5px var(--color-border-strong)",
                 }}
               >
@@ -216,7 +216,7 @@ export default function LearnPage() {
         }
       >
         {embedUrl ? (
-          <div className="overflow-hidden rounded-xl" style={{ aspectRatio: "16 / 9" }}>
+          <div className="overflow-hidden rounded-lg" style={{ aspectRatio: "16 / 9" }}>
             <iframe
               src={embedUrl}
               title={lessonMeta?.title ?? "Lesson video"}
@@ -228,7 +228,7 @@ export default function LearnPage() {
           </div>
         ) : (
           <div
-            className="rounded-xl border px-6 py-12 text-center text-body"
+            className="rounded-lg border px-6 py-12 text-center text-body"
             style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
           >
             This video isn't available right now.

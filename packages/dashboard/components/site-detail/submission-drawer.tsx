@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { X, Trash2 } from "lucide-react";
+import { ToggleSwitch } from "flowbite-react";
 import { Button } from "@/components/dashboard/primitives";
 
 export interface FormSubmissionData {
@@ -56,16 +57,54 @@ export function SubmissionDrawer({
   onDelete,
 }: SubmissionDrawerProps) {
   const drawerRef = useRef<HTMLDivElement>(null);
+  // onClose arrives as an inline arrow from the panel that also owns the
+  // drawer's state, so its identity changes on every toggle and refetch. Read
+  // it through a ref: with onClose in the dep array the trap tore down and
+  // re-ran on each re-render, restoring focus to the row behind the scrim and
+  // then yanking it back — the user lost their place after every switch.
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
+  // Same dialog contract as primitives/Modal: Escape closes, Tab is trapped in
+  // the panel, and focus returns to the opener on close.
   useEffect(() => {
+    if (!open) return;
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+
+    function focusables(): HTMLElement[] {
+      const panel = drawerRef.current;
+      if (!panel) return [];
+      return Array.from(
+        panel.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter((el) => el.offsetParent !== null);
+    }
+
     function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") { onCloseRef.current(); return; }
+      if (e.key !== "Tab") return;
+      const items = focusables();
+      if (items.length === 0) { e.preventDefault(); drawerRef.current?.focus(); return; }
+      const first = items[0];
+      const last = items[items.length - 1];
+      const active = document.activeElement;
+      if (e.shiftKey && (active === first || active === drawerRef.current)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      }
     }
-    if (open) {
-      document.addEventListener("keydown", handleKeyDown);
-      return () => document.removeEventListener("keydown", handleKeyDown);
-    }
-  }, [open, onClose]);
+    document.addEventListener("keydown", handleKeyDown);
+    const panel = drawerRef.current;
+    if (panel && !panel.contains(document.activeElement)) panel.focus();
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      previouslyFocused?.focus?.();
+    };
+  }, [open]);
 
   if (!open || !submission) return null;
 
@@ -83,7 +122,11 @@ export function SubmissionDrawer({
       {/* Drawer */}
       <div
         ref={drawerRef}
-        className="relative flex h-full w-[480px] max-w-full flex-col bg-white shadow-xl"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Submission details"
+        tabIndex={-1}
+        className="relative flex h-full w-[480px] max-w-full flex-col bg-white shadow-xl outline-none"
       >
         {/* Header */}
         <div
@@ -233,18 +276,7 @@ function ToggleRow({
       <span className="text-body" style={{ color: "var(--color-text-primary)" }}>
         {label}
       </span>
-      <button
-        onClick={() => onChange(!checked)}
-        className="relative h-5 w-9 rounded-full transition-colors"
-        style={{ backgroundColor: checked ? "var(--color-primary)" : "var(--color-border-default)" }}
-        role="switch"
-        aria-checked={checked}
-      >
-        <span
-          className="absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white transition-transform"
-          style={{ transform: checked ? "translateX(16px)" : "translateX(0)" }}
-        />
-      </button>
+      <ToggleSwitch checked={checked} onChange={onChange} aria-label={label} />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ToggleSwitch } from "flowbite-react";
 import { cn } from "@lib/utils";
 import { PLAN_LIMITS } from "@lib/constants/plan-limits";
 
@@ -92,34 +93,19 @@ export function PlanComparison({
         <span className="text-body font-medium" style={{ color: yearly ? "var(--color-text-secondary)" : "var(--color-text-primary)" }}>
           Monthly
         </span>
-        <button
-          role="switch"
-          aria-checked={yearly}
-          onClick={() => setYearly((v) => !v)}
-          className={cn(
-            "relative inline-flex h-6 w-11 items-center rounded-full transition-colors",
-            yearly ? "bg-[var(--color-primary)]" : "bg-[var(--color-border-default)]"
-          )}
-        >
-          <span
-            className={cn(
-              "inline-block h-4 w-4 translate-x-1 rounded-full bg-white shadow transition-transform",
-              yearly && "translate-x-6"
-            )}
-          />
-        </button>
+        <ToggleSwitch checked={yearly} onChange={setYearly} aria-label="Bill yearly" />
         <span className="flex items-center gap-1.5 text-body font-medium" style={{ color: yearly ? "var(--color-text-primary)" : "var(--color-text-secondary)" }}>
           Yearly
           <span
             className="rounded-full px-2 py-0.5 text-body-sm font-semibold"
-            style={{ backgroundColor: "#F0FDF4", color: "var(--color-success)" }}
+            style={{ backgroundColor: "#F3FAF7", color: "var(--color-success)" }}
           >
             Save 20%
           </span>
         </span>
       </div>
 
-      <div className="overflow-x-auto rounded-2xl border border-[var(--color-border-default)]">
+      <div className="overflow-x-auto rounded-lg border border-[var(--color-border-default)]">
         <table className="w-full text-body">
           <thead>
             <tr style={{ backgroundColor: "var(--color-bg-page)" }}>
@@ -140,7 +126,7 @@ export function PlanComparison({
                       {isBest && (
                         <span
                           className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide"
-                          style={{ backgroundColor: "#F0FDF4", color: "var(--color-success)" }}
+                          style={{ backgroundColor: "#F3FAF7", color: "var(--color-success)" }}
                         >
                           Best for you
                         </span>
@@ -184,12 +170,12 @@ export function PlanComparison({
                       {showWarning && (
                         <span
                           className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-semibold"
-                          style={{ backgroundColor: "#FEF9C3", color: "#A16207" }}
+                          style={{ backgroundColor: "#FDF6B2", color: "#8E4B10" }}
                           title={pct !== null ? `${pct}% used` : "Near limit"}
                         >
                           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                            <path d="M8 1L15 14H1L8 1Z" fill="#EAB308" stroke="#A16207" strokeWidth="1" />
-                            <text x="8" y="12" textAnchor="middle" fontSize="8" fill="#A16207" fontWeight="bold">!</text>
+                            <path d="M8 1L15 14H1L8 1Z" fill="#C27803" stroke="#8E4B10" strokeWidth="1" />
+                            <text x="8" y="12" textAnchor="middle" fontSize="8" fill="#8E4B10" fontWeight="bold">!</text>
                           </svg>
                           {pct !== null ? `${pct}%` : "Near limit"}
                         </span>

@@ -1,7 +1,7 @@
 "use client";
 
 import { BarChart3 } from "lucide-react";
-import { SectionCard, MetricValue } from "@/components/dashboard/primitives";
+import { FilterChip, SectionCard, MetricValue } from "@/components/dashboard/primitives";
 
 export const DATE_RANGE_OPTIONS = [
   { value: "today", label: "Today" },
@@ -38,15 +38,15 @@ export function AnalyticsTab({ data, range, onRangeChange, isLoading }: Analytic
       {/* Date range picker */}
       <div className="flex items-center gap-2">
         {DATE_RANGE_OPTIONS.map((opt) => (
-          <button key={opt.value} onClick={() => onRangeChange(opt.value)} className="rounded-lg px-3 py-1.5 text-body-sm font-medium transition-colors" style={{ backgroundColor: range === opt.value ? "var(--color-primary-subtle)" : "transparent", color: range === opt.value ? "var(--color-primary)" : "var(--color-text-secondary)" }}>
+          <FilterChip key={opt.value} active={range === opt.value} onClick={() => onRangeChange(opt.value)}>
             {opt.label}
-          </button>
+          </FilterChip>
         ))}
       </div>
 
       {isLoading && (
         <div className="grid grid-cols-3 gap-4">
-          {[1, 2, 3, 4, 5, 6].map((i) => <div key={i} className="h-24 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />)}
+          {[1, 2, 3, 4, 5, 6].map((i) => <div key={i} className="h-24 animate-pulse rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }} />)}
         </div>
       )}
 
@@ -119,7 +119,7 @@ export function AnalyticsTab({ data, range, onRangeChange, isLoading }: Analytic
       )}
 
       {!isLoading && !data && (
-        <div className="rounded-xl border-2 border-dashed py-16 text-center" style={{ borderColor: "var(--color-border-default)" }}>
+        <div className="rounded-lg border-2 border-dashed py-16 text-center" style={{ borderColor: "var(--color-border-default)" }}>
           <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>No analytics data yet</p>
           <p className="mt-1 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>Publish your site to start tracking visitors.</p>
         </div>

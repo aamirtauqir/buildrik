@@ -19,15 +19,15 @@ export function StateEmpty({
   secondary?: StateAction;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[var(--color-border-default)] bg-[var(--color-bg-subtle)] px-8 py-14 text-center">
+    <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-[var(--color-border-default)] bg-[var(--color-bg-subtle)] px-8 py-14 text-center">
       {icon && (
         <div className="mb-3 text-[var(--color-text-muted)]" aria-hidden>
           {icon}
         </div>
       )}
-      <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">{title}</h3>
+      <h3 className="text-body font-semibold text-[var(--color-text-primary)]">{title}</h3>
       {description && (
-        <p className="mt-1.5 max-w-sm text-xs leading-relaxed text-[var(--color-text-secondary)]">
+        <p className="mt-1.5 max-w-sm text-body-sm leading-relaxed text-[var(--color-text-secondary)]">
           {description}
         </p>
       )}

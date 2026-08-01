@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { LayoutTemplate, Sparkles, FileText } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
+import { InputField } from "@/components/dashboard/primitives";
 import { WizardProgress } from "@/components/ai-wizard/wizard-progress";
 import { StepType, BUSINESS_TYPES } from "@/components/ai-wizard/step-type";
 import { StepPages } from "@/components/ai-wizard/step-pages";
@@ -103,19 +104,18 @@ function NewSitePageInner() {
         </p>
         <div className="mt-6 text-left">
           <label className="text-body font-medium" style={{ color: "var(--color-text-secondary)" }}>Site name</label>
-          <input
+          <InputField
             type="text"
             value={siteName}
             onChange={(e) => setSiteName(e.target.value)}
-            className="mt-1 w-full rounded-lg border px-3 py-2 text-body outline-none focus:border-[var(--color-primary)]"
-            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+            wrapperClassName="mt-1 w-full"
             placeholder="My New Site"
           />
         </div>
         <div className="mt-6 space-y-3">
           <button
             onClick={() => router.push("/dashboard/templates")}
-            className="flex w-full items-center gap-4 rounded-xl border p-5 text-left transition-colors hover:bg-[var(--color-bg-page)]"
+            className="flex w-full items-center gap-4 rounded-lg border p-5 text-left transition-colors hover:bg-[var(--color-bg-page)]"
             style={{ borderColor: "var(--color-border-default)" }}
           >
             <div className="flex h-12 w-12 items-center justify-center rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }}>
@@ -128,7 +128,7 @@ function NewSitePageInner() {
           </button>
           <button
             onClick={() => setView("ai-type")}
-            className="flex w-full items-center gap-4 rounded-xl border p-5 text-left transition-colors hover:bg-[var(--color-primary-subtle)]/30"
+            className="flex w-full items-center gap-4 rounded-lg border p-5 text-left transition-colors hover:bg-[var(--color-primary-subtle)]/30"
             style={{ borderColor: "var(--color-border-default)" }}
           >
             <div className="flex h-12 w-12 items-center justify-center rounded-lg" style={{ backgroundColor: "var(--color-primary-subtle)" }}>
@@ -142,7 +142,7 @@ function NewSitePageInner() {
           <button
             onClick={() => createSiteMutation.mutate({ name: siteName.trim() || "My New Site", method: "blank" })}
             disabled={createSiteMutation.isPending}
-            className="flex w-full items-center gap-4 rounded-xl border p-5 text-left transition-colors hover:bg-[var(--color-bg-page)] disabled:opacity-50"
+            className="flex w-full items-center gap-4 rounded-lg border p-5 text-left transition-colors hover:bg-[var(--color-bg-page)] disabled:opacity-50"
             style={{ borderColor: "var(--color-border-default)" }}
           >
             <div className="flex h-12 w-12 items-center justify-center rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }}>

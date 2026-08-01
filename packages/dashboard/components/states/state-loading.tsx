@@ -27,7 +27,7 @@ export function LoadingSkeleton({
         {Array.from({ length: rows }).map((_, i) => (
           <div
             key={i}
-            className="rounded-xl border border-[var(--color-border-default)] p-4"
+            className="rounded-lg border border-[var(--color-border-default)] p-4"
           >
             <Bar className="mb-3 h-24 w-full" />
             <Bar className="mb-2 h-4 w-2/3" />

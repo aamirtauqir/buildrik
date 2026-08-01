@@ -64,7 +64,7 @@ export function AICreditsTab({
         actions={
           <Link
             href="/dashboard/sites/new?method=ai"
-            className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded-md text-white ${
+            className={`inline-flex items-center px-4 py-2 text-body font-medium rounded-md text-white ${
               remaining === 0 ? "pointer-events-none opacity-50" : ""
             }`}
             style={{ backgroundColor: "var(--color-primary)" }}
@@ -75,15 +75,15 @@ export function AICreditsTab({
         }
       >
         <div className="flex items-center justify-between mb-2">
-          <p className="text-sm" style={{ color: "var(--color-text-primary)" }}>
+          <p className="text-body" style={{ color: "var(--color-text-primary)" }}>
             <MetricValue className="text-lg font-semibold">{remaining}</MetricValue> remaining this month
           </p>
-          <p className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>
+          <p className="text-body font-medium" style={{ color: "var(--color-text-secondary)" }}>
             <MetricValue>{used}/{limit}</MetricValue> credits used
           </p>
         </div>
         <ProgressBar pct={usagePercent} tone="accent" />
-        <p className="text-xs mt-2" style={{ color: "var(--color-text-secondary)" }}>
+        <p className="text-body-sm mt-2" style={{ color: "var(--color-text-secondary)" }}>
           Credits reset on the 1st of each month.
         </p>
       </SectionCard>
@@ -92,7 +92,7 @@ export function AICreditsTab({
           surfacing it so users aren't blocked by a number shown nowhere. */}
       <SectionCard title="In-editor AI prompts">
         <div className="flex items-center justify-between mb-2">
-          <p className="text-sm" style={{ color: "var(--color-text-primary)" }}>
+          <p className="text-body" style={{ color: "var(--color-text-primary)" }}>
             {promptsUnlimited ? (
               <MetricValue className="text-lg font-semibold">Unlimited</MetricValue>
             ) : (
@@ -100,13 +100,13 @@ export function AICreditsTab({
             )}
           </p>
           {!promptsUnlimited && (
-            <p className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>
+            <p className="text-body font-medium" style={{ color: "var(--color-text-secondary)" }}>
               <MetricValue>{dailyPromptsUsed}/{dailyPromptsLimit}</MetricValue> prompts used
             </p>
           )}
         </div>
         {!promptsUnlimited && <ProgressBar pct={promptsPercent} tone="accent" />}
-        <p className="text-xs mt-2" style={{ color: "var(--color-text-secondary)" }}>
+        <p className="text-body-sm mt-2" style={{ color: "var(--color-text-secondary)" }}>
           Each AI edit in the editor uses one prompt. Resets daily at midnight UTC.
         </p>
       </SectionCard>
@@ -119,7 +119,7 @@ export function AICreditsTab({
           className="rounded-lg border overflow-hidden"
           style={{ borderColor: "var(--color-border-default)" }}
         >
-          <table className="w-full text-sm">
+          <table className="w-full text-body">
             <thead>
               <tr style={{ borderBottom: "1px solid var(--color-border-default)", backgroundColor: "var(--color-bg-page)" }}>
                 <th className="text-left px-4 py-2.5 font-medium" style={{ color: "var(--color-text-secondary)" }}>
@@ -141,7 +141,7 @@ export function AICreditsTab({
                 <tr>
                   <td
                     colSpan={4}
-                    className="px-4 py-6 text-center text-sm"
+                    className="px-4 py-6 text-center text-body"
                     style={{ color: "var(--color-text-muted)" }}
                   >
                     No generations yet. Use your credits to create your first AI site.
@@ -167,17 +167,17 @@ export function AICreditsTab({
                       {isComplete && record.siteId ? (
                         <Link
                           href={`/dashboard/sites/${record.siteId}`}
-                          className="text-sm font-medium"
+                          className="text-body font-medium"
                           style={{ color: "var(--color-primary)" }}
                         >
                           View site
                         </Link>
                       ) : isProcessing ? (
-                        <span className="text-xs" style={{ color: "#854d0e" }}>
+                        <span className="text-body-sm" style={{ color: "#723B13" }}>
                           Generating...
                         </span>
                       ) : (
-                        <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+                        <span className="text-body-sm" style={{ color: "var(--color-text-muted)" }}>
                           --
                         </span>
                       )}
@@ -205,10 +205,10 @@ export function AICreditsTab({
               <div className="absolute top-3 right-3">
                 <Pill tone="neutral">Coming Soon</Pill>
               </div>
-              <p className="text-sm font-semibold pr-24" style={{ color: "var(--color-text-primary)" }}>
+              <p className="text-body font-semibold pr-24" style={{ color: "var(--color-text-primary)" }}>
                 {tool.name}
               </p>
-              <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>
+              <p className="text-body-sm mt-1" style={{ color: "var(--color-text-secondary)" }}>
                 {tool.description}
               </p>
             </div>

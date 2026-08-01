@@ -83,7 +83,7 @@ export default function ArticleDetailPage() {
           </div>
 
           {/* Was this helpful? */}
-          <div className="mt-10 rounded-xl border p-6 text-center" style={{ borderColor: "var(--color-border-default)" }}>
+          <div className="mt-10 rounded-lg border p-6 text-center" style={{ borderColor: "var(--color-border-default)" }}>
             {feedbackGiven ? (
               <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
                 Thanks for your feedback!
@@ -97,7 +97,7 @@ export default function ArticleDetailPage() {
                   <button
                     onClick={() => handleFeedback(true)}
                     disabled={feedbackMutation.isPending}
-                    className="flex items-center gap-2 rounded-lg border px-4 py-2 text-body font-medium transition-colors hover:border-green-300 hover:bg-green-50"
+                    className="flex items-center gap-2 rounded-lg border px-4 py-2 text-body font-medium transition-colors hover:border-[var(--color-success)] hover:bg-[var(--color-success-subtle)]"
                     style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
                   >
                     <ThumbsUp className="h-4 w-4" />

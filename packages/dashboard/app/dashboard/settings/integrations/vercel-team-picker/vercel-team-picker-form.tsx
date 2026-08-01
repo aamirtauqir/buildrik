@@ -31,7 +31,7 @@ export function VercelTeamPickerForm({
       className="space-y-2"
     >
       <label
-        className={`flex cursor-pointer items-center gap-3 rounded-xl border p-3 hover:bg-neutral-50 ${
+        className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 hover:bg-neutral-50 ${
           selected === null ? "border-black" : "border-neutral-200"
         }`}
       >
@@ -47,7 +47,7 @@ export function VercelTeamPickerForm({
       {candidateTeams.map((t) => (
         <label
           key={t.id}
-          className={`flex cursor-pointer items-center gap-3 rounded-xl border p-3 hover:bg-neutral-50 ${
+          className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 hover:bg-neutral-50 ${
             selected === t.id ? "border-black" : "border-neutral-200"
           }`}
         >
@@ -75,7 +75,7 @@ export function VercelTeamPickerForm({
       </div>
 
       {finish.error && (
-        <p className="text-body text-red-600">{finish.error.message}</p>
+        <p className="text-body" style={{ color: "var(--color-error-text)" }}>{finish.error.message}</p>
       )}
     </form>
   );

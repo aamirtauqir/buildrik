@@ -111,7 +111,7 @@ export default function TeamPage() {
   const currentUserId = session?.user?.id ?? "";
 
   if (isLoading) {
-    return <div className="h-72 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />;
+    return <div className="h-72 animate-pulse rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }} />;
   }
 
   // Team data is ADMIN/OWNER only — a non-admin gets FORBIDDEN, which should read
@@ -206,7 +206,7 @@ export default function TeamPage() {
           )}
 
           {/* Team Activity */}
-          <div className="rounded-xl border bg-white p-5" style={{ borderColor: "var(--color-border-default)" }}>
+          <div className="rounded-lg border bg-white p-5" style={{ borderColor: "var(--color-border-default)" }}>
             <h3 className="mb-3 text-section-title" style={{ color: "var(--color-text-primary)" }}>Team Activity</h3>
             {activityQuery.data && activityQuery.data.length > 0 ? (
               <div className="space-y-3">

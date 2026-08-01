@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { sendPaymentFailedEmail } from "@/server/services/email.service";
 import { getStripe, resolvePlanFromPriceId } from "@/server/services/stripe.client";
+import { reconcileWorkspaceToFreePlan } from "@/server/services/billing.service";
 
 const STRIPE_STATUS_MAP: Record<string, string> = {
   active: "ACTIVE",
@@ -193,6 +194,11 @@ export async function handleSubscriptionUpdated(
         stripeCurrentPeriodStart: periodStart,
         stripeCurrentPeriodEnd: periodEnd,
         cancelAtPeriodEnd: data.cancel_at_period_end,
+        // A reactivate done in Stripe's own Portal comes back through here as
+        // cancel_at_period_end: false. cancelReason/cancelFeedback are local-only
+        // columns Stripe knows nothing about, so without this they survive as a
+        // stale reason attached to a subscription that is no longer cancelling.
+        ...(data.cancel_at_period_end ? {} : { cancelReason: null, cancelFeedback: null }),
         stripePriceId: priceId,
         plan: resolved?.plan ?? subscription.plan,
         interval: resolved?.interval ?? subscription.interval,
@@ -213,15 +219,27 @@ export async function handleSubscriptionDeleted(stripeSubscriptionId: string): P
 
   if (!subscription) return;
 
-  await prisma.subscription.update({
-    where: { stripeSubscriptionId },
-    data: { status: "CANCELLED" },
-  });
+  // One transaction, matching the other two handlers. These were two separate
+  // writes, so a failure between them left the subscription CANCELLED while the
+  // workspace kept its paid plan.
+  await prisma.$transaction([
+    prisma.subscription.update({
+      where: { stripeSubscriptionId },
+      data: { status: "CANCELLED" },
+    }),
+    prisma.workspace.update({
+      where: { id: subscription.workspaceId },
+      data: { plan: "FREE" },
+    }),
+  ]);
 
-  await prisma.workspace.update({
-    where: { id: subscription.workspaceId },
-    data: { plan: "FREE" },
-  });
+  // Drop over-cap published sites, the way the billing-downgrade cron does.
+  // Until 2026-07-31 nothing reached this handler, because cancelSubscription
+  // never told Stripe anything and Stripe therefore never emitted
+  // customer.subscription.deleted. Now that real cancellations land here, a
+  // Business workspace hitting period end would otherwise drop to FREE with all
+  // of its published sites still live.
+  await reconcileWorkspaceToFreePlan(subscription.workspaceId);
 }
 
 export async function handleInvoicePaid(

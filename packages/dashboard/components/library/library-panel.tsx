@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Boxes, Pencil, Trash2, Check, X } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
-import { SectionCard, Pill, Button, Modal } from "@/components/dashboard/primitives";
+import { SectionCard, Pill, Button, Modal, InputField } from "@/components/dashboard/primitives";
 import { StateEmpty, LoadingSkeleton, ErrorState } from "@/components/states";
 
 type LibComponent = { componentId: string; name: string; siteCount: number; updatedAt: string | Date };
@@ -88,14 +88,13 @@ export function LibraryPanel() {
                 <div className="flex items-start justify-between gap-2">
                   {renaming ? (
                     <div className="flex flex-1 items-center gap-1">
-                      <input
+                      <InputField
                         autoFocus
                         value={renameValue}
                         onChange={(e) => setRenameValue(e.target.value)}
                         onKeyDown={(e) => { if (e.key === "Enter") saveRename(c.componentId); if (e.key === "Escape") setRenamingId(null); }}
                         maxLength={200}
-                        className="flex-1 rounded-md border px-2 py-1 text-body-sm"
-                        style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+                        wrapperClassName="flex-1"
                         aria-label="Component name"
                       />
                       <button onClick={() => saveRename(c.componentId)} disabled={renameMut.isPending} aria-label="Save name" className="p-1 disabled:opacity-50" style={{ color: "var(--color-success)" }}>

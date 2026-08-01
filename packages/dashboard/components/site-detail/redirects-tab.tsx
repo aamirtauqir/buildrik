@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { ArrowRight, Plus, Trash2, Download, Upload, Pencil } from "lucide-react";
-import { Button, StatCard, MetricValue, DataTable, Pill, type Column } from "@/components/dashboard/primitives";
+import { Button, StatCard, MetricValue, DataTable, Pill, InputField, type Column } from "@/components/dashboard/primitives";
 
 export interface RedirectRow {
   id: string;
@@ -87,11 +87,11 @@ export function RedirectsTab({ redirects, limit, canEdit, onCreate, onUpdate, on
         canEdit ? (
           <div className="inline-flex items-center gap-3">
             {onUpdate && (
-              <button type="button" onClick={() => startEdit(r)} className="inline-flex items-center gap-1 text-body-sm text-neutral-500 hover:text-[var(--color-primary)]">
+              <button type="button" onClick={() => startEdit(r)} className="inline-flex items-center gap-1 text-body-sm text-[var(--color-text-muted)] hover:text-[var(--color-primary)]">
                 <Pencil size={13} /> Edit
               </button>
             )}
-            <button type="button" onClick={() => onDelete(r.id)} className="inline-flex items-center gap-1 text-body-sm text-neutral-500 hover:text-red-600">
+            <button type="button" onClick={() => onDelete(r.id)} className="inline-flex items-center gap-1 text-body-sm text-[var(--color-text-muted)] hover:text-[var(--color-error)]">
               <Trash2 size={13} /> Delete
             </button>
           </div>
@@ -130,21 +130,21 @@ export function RedirectsTab({ redirects, limit, canEdit, onCreate, onUpdate, on
 
       {/* Add / edit row — shown at limit too when editing (edit doesn't add). */}
       {canEdit && (!atLimit || editingId) && (
-        <div className="rounded-xl border p-4" style={{ borderColor: "var(--color-border-default)" }}>
+        <div className="rounded-lg border p-4" style={{ borderColor: "var(--color-border-default)" }}>
           {atLimit && !editingId ? (
-            <p className="text-body text-amber-700">
+            <p className="text-body text-[var(--color-warning-text)]">
               You&apos;ve hit your plan&apos;s redirect limit. <a href="/dashboard/settings/billing" className="font-medium underline">Upgrade</a> to add more.
             </p>
           ) : (
             <div className="flex flex-wrap items-end gap-2">
               <div className="flex-1 min-w-[140px]">
-                <label className="block text-body-sm font-medium text-neutral-500">From</label>
-                <input value={fromPath} onChange={(e) => setFromPath(e.target.value)} placeholder="/old-page" className="mt-1 w-full rounded-md border px-2.5 py-1.5 text-body font-mono outline-none focus:border-[var(--color-primary)]" style={{ borderColor: "var(--color-border-default)" }} />
+                <label className="block text-body-sm font-medium text-[var(--color-text-muted)]">From</label>
+                <InputField value={fromPath} onChange={(e) => setFromPath(e.target.value)} placeholder="/old-page" className="font-mono" wrapperClassName="mt-1" />
               </div>
               <ArrowRight size={16} className="mb-2 text-neutral-400" />
               <div className="flex-1 min-w-[140px]">
-                <label className="block text-body-sm font-medium text-neutral-500">To</label>
-                <input value={toUrl} onChange={(e) => setToUrl(e.target.value)} placeholder="/new-page" className="mt-1 w-full rounded-md border px-2.5 py-1.5 text-body font-mono outline-none focus:border-[var(--color-primary)]" style={{ borderColor: "var(--color-border-default)" }} />
+                <label className="block text-body-sm font-medium text-[var(--color-text-muted)]">To</label>
+                <InputField value={toUrl} onChange={(e) => setToUrl(e.target.value)} placeholder="/new-page" className="font-mono" wrapperClassName="mt-1" />
               </div>
               <select value={type} onChange={(e) => setType(e.target.value as "301" | "302")} className="rounded-md border px-2 py-1.5 text-body" style={{ borderColor: "var(--color-border-default)" }}>
                 <option value="301">301</option>
@@ -169,7 +169,7 @@ export function RedirectsTab({ redirects, limit, canEdit, onCreate, onUpdate, on
         rows={redirects}
         keyOf={(r) => r.id}
         empty={
-          <div className="rounded-xl border border-dashed p-8 text-center" style={{ borderColor: "var(--color-border-default)" }}>
+          <div className="rounded-lg border border-dashed p-8 text-center" style={{ borderColor: "var(--color-border-default)" }}>
             <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>No redirects yet</p>
             <p className="mt-0.5 text-body" style={{ color: "var(--color-text-secondary)" }}>Renaming a page slug auto-creates one, or add yours above.</p>
           </div>

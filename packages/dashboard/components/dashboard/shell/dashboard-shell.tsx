@@ -9,7 +9,7 @@ import { isFullWidthRoute } from "./nav";
 import { CommandPalette } from "@/components/search/command-palette";
 
 /** The dashboard app shell: a full-width top nav above a fixed var(--sidebar-w)
- *  (244px) sidebar, with the content region offset by both. Content column is
+ *  (293px) sidebar, with the content region offset by both. Content column is
  *  the dc mockup's 1120px max-width with 32/40/60 padding and tabular figures.
  *  The ⌘K command palette lives here so its trigger can sit in the top bar
  *  (per the design). */

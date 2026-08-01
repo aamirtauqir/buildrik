@@ -53,6 +53,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      flowbite-react:
+        specifier: ^0.12.17
+        version: 0.12.17(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tailwindcss@4.2.2)
       isomorphic-dompurify:
         specifier: ^3.16.0
         version: 3.16.0
@@ -153,6 +156,9 @@ importers:
       '@emotion/react':
         specifier: ^11.14.0
         version: 11.14.0(@types/react@19.2.14)(react@19.2.4)
+      flowbite-react:
+        specifier: ^0.12.17
+        version: 0.12.17(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tailwindcss@4.3.3)
     devDependencies:
       '@playwright/test':
         specifier: ^1.61.1
@@ -4073,12 +4079,8 @@ packages:
     resolution: {integrity: sha512-Qohcme7V1inbAfvjItgw0EaxVX5q2rdVEZHRBrEQdRZTssLDGsL8Lwrznl8oQ/6kuTJONLaDcGjkNP247XEhcA==}
     engines: {node: '>=10.13.0'}
 
-  enhanced-resolve@5.21.6:
-    resolution: {integrity: sha512-aNnGCvbJ/RIyWo1IuhNdVjnNF+EjH9wpzpNHt+ci/m9He9LJvUN8wrCcXjp9cWsGNAuvSpVFTx/vraAFQ8qGjQ==}
-    engines: {node: '>=10.13.0'}
-
-  enhanced-resolve@5.24.5:
-    resolution: {integrity: sha512-L1l8TNvomm6UVW5B253AGxQagSQr+vGwhMlrrfRS2qmhx46AMpMVJKQYLvWYbysTMY8VoicOvzHzoHMbyzB+4A==}
+  enhanced-resolve@5.24.4:
+    resolution: {integrity: sha512-GVoi+ICHocoOIU7qVVM48wOJziRsqrsyqlI0Ce0LdowRn6v3bcH2zUa9kp85ncx0nwIb9/HOCOLS3fdThDG/XQ==}
     engines: {node: '>=10.13.0'}
 
   entities@4.5.0:
@@ -8560,7 +8562,7 @@ snapshots:
   '@tailwindcss/node@4.3.3':
     dependencies:
       '@jridgewell/remapping': 2.3.5
-      enhanced-resolve: 5.24.5
+      enhanced-resolve: 5.24.4
       jiti: 2.7.0
       lightningcss: 1.32.0
       magic-string: 0.30.21
@@ -9840,12 +9842,7 @@ snapshots:
       graceful-fs: 4.2.11
       tapable: 2.3.2
 
-  enhanced-resolve@5.21.6:
-    dependencies:
-      graceful-fs: 4.2.11
-      tapable: 2.3.3
-
-  enhanced-resolve@5.24.5:
+  enhanced-resolve@5.24.4:
     dependencies:
       graceful-fs: 4.2.11
       tapable: 2.3.3
@@ -10313,6 +10310,28 @@ snapshots:
   flatted@3.4.2: {}
 
   flow-parser@0.311.0: {}
+
+  flowbite-react@0.12.17(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tailwindcss@4.2.2):
+    dependencies:
+      '@floating-ui/core': 1.7.4
+      '@floating-ui/react': 0.27.17(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@iarna/toml': 2.2.5
+      chokidar: 4.0.3
+      comment-json: 4.5.1
+      debounce: 3.0.0
+      deepmerge-ts: 7.1.5
+      klona: 2.0.6
+      magic-string: 0.30.21
+      oxc-parser: 0.112.0(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.1)
+      package-manager-detector: 1.6.0
+      react: 19.2.4
+      react-dom: 19.2.4(react@19.2.4)
+      tailwind-merge-v2: tailwind-merge@2.6.1
+      tailwind-merge-v3: tailwind-merge@3.4.0
+      tailwindcss: 4.2.2
+    transitivePeerDependencies:
+      - '@emnapi/core'
+      - '@emnapi/runtime'
 
   flowbite-react@0.12.17(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tailwindcss@4.3.3):
     dependencies:
@@ -12357,7 +12376,7 @@ snapshots:
       acorn-import-phases: 1.0.4(acorn@8.16.0)
       browserslist: 4.28.2
       chrome-trace-event: 1.0.4
-      enhanced-resolve: 5.21.6
+      enhanced-resolve: 5.24.4
       es-module-lexer: 2.1.0
       eslint-scope: 5.1.1
       events: 3.3.0

@@ -6,6 +6,7 @@ import { SiteHeader } from "@/components/site-detail/site-header";
 import { TabNav } from "@/components/site-detail/tab-nav";
 import { Breadcrumb } from "@/components/dashboard/breadcrumb";
 import { useToast } from "@/components/dashboard/toast-provider";
+import { getEditorHref, useUnifiedEditorFlag } from "@/components/editor-route/unified-flag";
 
 export default function SiteDetailLayout({
   children,
@@ -14,6 +15,7 @@ export default function SiteDetailLayout({
 }) {
   const params = useParams();
   const router = useRouter();
+  const unified = useUnifiedEditorFlag();
   const siteId = params.id as string;
   const { addToast } = useToast();
 
@@ -34,7 +36,7 @@ export default function SiteDetailLayout({
       <div>
         <div className="h-6 w-48 animate-pulse rounded" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
         <div className="mt-4 h-10 w-full animate-pulse rounded" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
-        <div className="mt-6 h-64 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
+        <div className="mt-6 h-64 animate-pulse rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
       </div>
     );
   }
@@ -63,7 +65,14 @@ export default function SiteDetailLayout({
       />
       <SiteHeader
         site={site}
-        onPublish={() => router.push(`/dashboard/sites/${siteId}/publish`)}
+        // Publishing needs the rendered page payload, and only the editor can
+        // produce it — ExportEngine runs against a live Composer. The dashboard
+        // route sent {siteId} with no pages, so in production the worker
+        // rejected every one of these ("No page content to deploy") while dev
+        // silently simulated success. Send the user where publishing actually
+        // works instead of offering a button that cannot deliver. Restoring the
+        // in-dashboard flow needs a server-side renderer — see TODOS.
+        onPublish={() => router.push(getEditorHref(siteId, unified))}
         onUnpublish={() => unpublishMutation.mutate({ siteId })}
       />
       <div className="mt-4">

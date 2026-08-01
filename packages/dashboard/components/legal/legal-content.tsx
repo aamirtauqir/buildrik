@@ -12,16 +12,16 @@ const email = (addr: string) => (
 
 function Wrap({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="text-[15px] leading-relaxed text-slate-700">
-      <h1 className="text-2xl font-semibold text-slate-900">{title}</h1>
-      <p className="mt-2 text-sm text-slate-500">Last updated: May 18, 2026</p>
+    <div className="text-[15px] leading-relaxed text-gray-700">
+      <h1 className="text-2xl font-semibold text-gray-900">{title}</h1>
+      <p className="mt-2 text-body text-gray-500">Last updated: May 18, 2026</p>
       <section className="mt-6 space-y-4">{children}</section>
     </div>
   );
 }
 
 const H = ({ children }: { children: React.ReactNode }) => (
-  <h2 className="text-lg font-semibold text-slate-900">{children}</h2>
+  <h2 className="text-lg font-semibold text-gray-900">{children}</h2>
 );
 
 export function TermsContent() {

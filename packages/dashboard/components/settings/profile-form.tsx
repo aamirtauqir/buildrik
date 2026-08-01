@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import { trpc } from "@lib/trpc/client";
-import { Button } from "@/components/dashboard/primitives";
+import { Button, InputField } from "@/components/dashboard/primitives";
 import { useToast } from "@/components/dashboard/toast-provider";
 
 const LANGUAGES = [
@@ -29,8 +29,8 @@ const TIMEZONES = [
 ];
 
 const INITIALS_COLORS = [
-  "var(--color-primary)", "#3b82f6", "#0d9488", "#059669", "#d97706",
-  "#dc2626", "#db2777", "#0891b2", "#be185d", "#0284c7",
+  "var(--color-primary)", "#1A56DB", "#0d9488", "#059669", "#C27803",
+  "#E02424", "#db2777", "#0891b2", "#be185d", "#0284c7",
 ];
 
 function getInitialsColor(name: string): string {
@@ -175,7 +175,7 @@ export function ProfileForm({ initialData, onSave, saving }: ProfileFormProps) {
             onChange={handleFileSelect}
             className="hidden"
           />
-          <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>
+          <p className="text-body-sm mt-1" style={{ color: "var(--color-text-secondary)" }}>
             JPG or PNG. Max 5 MB.
           </p>
         </div>
@@ -183,58 +183,52 @@ export function ProfileForm({ initialData, onSave, saving }: ProfileFormProps) {
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div>
-          <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+          <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
             Full name
           </label>
-          <input
+          <InputField
             type="text"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
             placeholder="Jane Smith"
-            className="w-full px-3 py-2 text-sm rounded-md border outline-none focus:ring-2"
-            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
           />
-          <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>
+          <p className="text-body-sm mt-1" style={{ color: "var(--color-text-secondary)" }}>
             Appears on published sites.
           </p>
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+          <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
             Display name
           </label>
-          <input
+          <InputField
             type="text"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
             placeholder="jane"
-            className="w-full px-3 py-2 text-sm rounded-md border outline-none focus:ring-2"
-            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
           />
-          <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>
+          <p className="text-body-sm mt-1" style={{ color: "var(--color-text-secondary)" }}>
             Shown to team members.
           </p>
         </div>
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+        <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
           Email
         </label>
-        <input
+        <InputField
           type="email"
           value={initialData?.email ?? ""}
           readOnly
-          className="w-full px-3 py-2 text-sm rounded-md border outline-none"
-          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)", backgroundColor: "var(--color-bg-page)" }}
         />
-        <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>
+        <p className="text-body-sm mt-1" style={{ color: "var(--color-text-secondary)" }}>
           Read-only. Change in Account tab.
         </p>
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+        <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
           Bio
         </label>
         <textarea
@@ -243,11 +237,11 @@ export function ProfileForm({ initialData, onSave, saving }: ProfileFormProps) {
           rows={3}
           maxLength={500}
           placeholder="A short bio about yourself..."
-          className="w-full px-3 py-2 text-sm rounded-md border outline-none focus:ring-2 resize-none"
+          className="w-full px-3 py-2 text-body rounded-md border outline-none focus:ring-2 resize-none"
           style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
         />
         <p
-          className="text-xs mt-1"
+          className="text-body-sm mt-1"
           style={{ color: bio.length > 500 ? "var(--color-error)" : "var(--color-text-secondary)" }}
         >
           Optional. Shown on your profile. {bio.length}/500
@@ -256,13 +250,13 @@ export function ProfileForm({ initialData, onSave, saving }: ProfileFormProps) {
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div>
-          <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+          <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
             Language
           </label>
           <select
             value={language}
             onChange={(e) => setLanguage(e.target.value)}
-            className="w-full px-3 py-2 text-sm rounded-md border outline-none focus:ring-2"
+            className="w-full px-3 py-2 text-body rounded-md border outline-none focus:ring-2"
             style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
           >
             {LANGUAGES.map((l) => (
@@ -271,19 +265,19 @@ export function ProfileForm({ initialData, onSave, saving }: ProfileFormProps) {
               </option>
             ))}
           </select>
-          <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>
+          <p className="text-body-sm mt-1" style={{ color: "var(--color-text-secondary)" }}>
             Used for email and date formatting.
           </p>
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+          <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
             Timezone
           </label>
           <select
             value={timezone}
             onChange={(e) => setTimezone(e.target.value)}
-            className="w-full px-3 py-2 text-sm rounded-md border outline-none focus:ring-2"
+            className="w-full px-3 py-2 text-body rounded-md border outline-none focus:ring-2"
             style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
           >
             {TIMEZONES.map((tz) => (
@@ -292,7 +286,7 @@ export function ProfileForm({ initialData, onSave, saving }: ProfileFormProps) {
               </option>
             ))}
           </select>
-          <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>
+          <p className="text-body-sm mt-1" style={{ color: "var(--color-text-secondary)" }}>
             Used for email and date formatting.
           </p>
         </div>

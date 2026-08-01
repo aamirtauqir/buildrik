@@ -60,7 +60,7 @@ function ActivityRow({ entry, count, isLast }: { entry: ActivityEntry; count: nu
         const { Icon, tone } = activityVisual(`${entry.action} ${entry.description ?? ""}`);
         return (
           <span
-            className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-[8px]"
+            className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-lg"
             style={{ backgroundColor: `color-mix(in srgb, ${tone} 12%, transparent)`, color: tone }}
           >
             <Icon className="h-4 w-4" strokeWidth={2} />
@@ -91,13 +91,16 @@ function ActivityRow({ entry, count, isLast }: { entry: ActivityEntry; count: nu
 
 type ActivityFeedProps = {
   feed: ActivityFeedData;
+  limit?: number;
 };
 
 /** Flat "Recent activity" list — colored dot + text + right-aligned mono
  *  timestamp per row. Renders rows only; the surrounding SectionCard owns the
- *  title, "View all" action, and card chrome. */
-export function ActivityFeed({ feed }: ActivityFeedProps) {
-  const rows = collapseEntries(feed.groups.flatMap((group) => group.entries));
+ *  title, "View all" action, and card chrome. `limit` caps the rows for embeds
+ *  (home) — the full list lives at /dashboard/activity. */
+export function ActivityFeed({ feed, limit }: ActivityFeedProps) {
+  const all = collapseEntries(feed.groups.flatMap((group) => group.entries));
+  const rows = limit ? all.slice(0, limit) : all;
 
   if (rows.length === 0) {
     return (

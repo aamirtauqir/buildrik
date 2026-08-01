@@ -33,11 +33,11 @@ export function LimitReached({
   const pct = limit === 0 ? 100 : Math.min(100, Math.round((used / limit) * 100));
 
   return (
-    <div className="rounded-2xl border border-[var(--color-border-default)] bg-white p-6">
+    <div className="rounded-lg border border-[var(--color-border-default)] bg-white p-6">
       <div className="flex items-start gap-4">
         <div
           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
-          style={{ backgroundColor: "#FEF2F2" }}
+          style={{ backgroundColor: "#FDF2F2" }}
         >
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
             <path

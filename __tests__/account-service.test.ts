@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     user: { findUnique: vi.fn(), update: vi.fn() },
+    $transaction: vi.fn((ops: unknown[]) => Promise.all(ops)),
     account: { deleteMany: vi.fn() },
     session: { findMany: vi.fn(), deleteMany: vi.fn(), delete: vi.fn() },
     loginAttempt: { findMany: vi.fn() },
@@ -64,11 +65,29 @@ describe("Account Service", () => {
   });
 
   describe("revokeAllOtherSessions", () => {
-    it("deletes non-current sessions", async () => {
+    /**
+     * The previous version of this test asserted that `deleteMany` was called
+     * and returned 3. It passed for as long as the feature was completely
+     * broken: sessions are JWT-strategy, so deleting rows never invalidated a
+     * cookie. The assertion that matters is the sessionVersion bump — that is
+     * the thing the jwt callback checks, and therefore the thing that actually
+     * ends a session.
+     */
+    it("bumps sessionVersion, which is what actually ends the sessions", async () => {
       const { revokeAllOtherSessions } = await import("@/server/services/account.service");
       vi.mocked(prisma.session.deleteMany).mockResolvedValue({ count: 3 });
-      const result = await revokeAllOtherSessions("u1", "s1");
-      expect(result.count).toBe(3);
+      vi.mocked(prisma.user.update).mockResolvedValue({} as never);
+
+      await revokeAllOtherSessions("u1", "s1");
+
+      expect(prisma.user.update).toHaveBeenCalledWith({
+        where: { id: "u1" },
+        data: { sessionVersion: { increment: 1 } },
+      });
+      // Still exempts the caller's row from the display-list delete.
+      expect(prisma.session.deleteMany).toHaveBeenCalledWith({
+        where: { userId: "u1", id: { not: "s1" } },
+      });
     });
   });
 

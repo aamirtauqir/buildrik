@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { trpc } from "@lib/trpc/client";
-import { Pill, MetricValue, Button } from "@/components/dashboard/primitives";
+import { Pill, MetricValue, Button, InputField } from "@/components/dashboard/primitives";
 
 function parseUserAgent(ua: string | null | undefined): string {
   if (!ua) return "Unknown device";
@@ -163,10 +163,10 @@ export function SecurityTab() {
           style={{ borderColor: "var(--color-border-default)" }}
         >
           <div>
-            <h2 className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
+            <h2 className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>
               Two-factor authentication
             </h2>
-            <p className="text-sm mt-0.5" style={{ color: "var(--color-text-secondary)" }}>
+            <p className="text-body mt-0.5" style={{ color: "var(--color-text-secondary)" }}>
               {is2FAEnabled
                 ? "2FA is active. Your account has extra protection."
                 : "Add an extra layer of security to your account."}
@@ -180,7 +180,7 @@ export function SecurityTab() {
               type="button"
               onClick={is2FAEnabled ? () => setShowDisableModal(true) : handleEnable}
               disabled={enableMutation.isPending}
-              className="text-sm px-3 py-1.5 rounded-md font-medium text-white disabled:opacity-60"
+              className="text-body px-3 py-1.5 rounded-md font-medium text-white disabled:opacity-60"
               style={{ backgroundColor: is2FAEnabled ? "var(--color-text-secondary)" : "var(--color-primary)" }}
             >
               {enableMutation.isPending ? "Setting up..." : is2FAEnabled ? "Disable" : "Enable 2FA"}
@@ -194,10 +194,10 @@ export function SecurityTab() {
             className="mt-4 p-4 rounded-lg border space-y-3"
             style={{ borderColor: "var(--color-border-default)" }}
           >
-            <h3 className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
+            <h3 className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>
               Step 1: Scan QR code
             </h3>
-            <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+            <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>
               Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.)
             </p>
             <div className="flex items-center justify-center p-4 rounded-lg" style={{ backgroundColor: "var(--color-bg-page)" }}>
@@ -209,11 +209,11 @@ export function SecurityTab() {
               />
             </div>
             <div>
-              <p className="text-xs mb-1" style={{ color: "var(--color-text-secondary)" }}>
+              <p className="text-body-sm mb-1" style={{ color: "var(--color-text-secondary)" }}>
                 Or enter this key manually:
               </p>
               <code
-                className="text-xs px-2 py-1 rounded block break-all"
+                className="text-body-sm px-2 py-1 rounded block break-all"
                 style={{ backgroundColor: "#f5f5f5", color: "var(--color-text-primary)" }}
               >
                 {setupData.secret}
@@ -231,10 +231,10 @@ export function SecurityTab() {
             className="mt-4 p-4 rounded-lg border space-y-3"
             style={{ borderColor: "var(--color-border-default)" }}
           >
-            <h3 className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
+            <h3 className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>
               Step 2: Save backup codes
             </h3>
-            <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+            <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>
               Store these codes in a safe place. Each code can only be used once.
             </p>
             <div
@@ -242,7 +242,7 @@ export function SecurityTab() {
               style={{ backgroundColor: "var(--color-bg-page)" }}
             >
               {setupData.backupCodes.map((code) => (
-                <code key={code} className="text-xs font-mono" style={{ color: "var(--color-text-primary)" }}>
+                <code key={code} className="text-body-sm font-mono" style={{ color: "var(--color-text-primary)" }}>
                   {code}
                 </code>
               ))}
@@ -259,26 +259,26 @@ export function SecurityTab() {
             className="mt-4 p-4 rounded-lg border space-y-3"
             style={{ borderColor: "var(--color-border-default)" }}
           >
-            <h3 className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
+            <h3 className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>
               Step 3: Verify your authenticator
             </h3>
-            <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+            <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>
               Enter the 6-digit code from your authenticator app to complete setup.
             </p>
             {error && (
-              <p className="text-sm" style={{ color: "#991b1b" }}>
+              <p className="text-body" style={{ color: "var(--color-error-text)" }}>
                 {error}
               </p>
             )}
             <div className="flex gap-2">
-              <input
+              <InputField
                 type="text"
                 value={verifyCode}
                 onChange={(e) => setVerifyCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
                 placeholder="000000"
                 maxLength={6}
-                className="text-sm px-3 py-1.5 rounded-md border w-32 font-mono"
-                style={{ borderColor: "var(--color-border-default)" }}
+                className="font-mono"
+                wrapperClassName="w-32"
               />
               <Button
                 type="button"
@@ -297,7 +297,7 @@ export function SecurityTab() {
                 setVerifyCode("");
                 setError("");
               }}
-              className="text-sm"
+              className="text-body"
               style={{ color: "var(--color-text-secondary)" }}
             >
               Cancel setup
@@ -311,29 +311,28 @@ export function SecurityTab() {
             className="mt-4 p-4 rounded-lg border space-y-3"
             style={{ borderColor: "var(--color-border-default)" }}
           >
-            <h3 className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
+            <h3 className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>
               Disable two-factor authentication
             </h3>
-            <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+            <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>
               {profile.data?.hasPassword
                 ? "Enter your password to disable 2FA. This will remove the extra security layer."
                 : "Enter the 6-digit code from your authenticator app to disable 2FA."}
             </p>
             {error && (
-              <p className="text-sm" style={{ color: "#991b1b" }}>
+              <p className="text-body" style={{ color: "var(--color-error-text)" }}>
                 {error}
               </p>
             )}
             <div className="flex gap-2">
-              <input
+              <InputField
                 type={profile.data?.hasPassword ? "password" : "text"}
                 inputMode={profile.data?.hasPassword ? undefined : "numeric"}
                 maxLength={profile.data?.hasPassword ? undefined : 6}
                 value={disablePassword}
                 onChange={(e) => setDisablePassword(e.target.value)}
                 placeholder={profile.data?.hasPassword ? "Your password" : "123456"}
-                className="text-sm px-3 py-1.5 rounded-md border w-48"
-                style={{ borderColor: "var(--color-border-default)" }}
+                wrapperClassName="w-48"
               />
               <Button
                 type="button"
@@ -351,7 +350,7 @@ export function SecurityTab() {
                 setDisablePassword("");
                 setError("");
               }}
-              className="text-sm"
+              className="text-body"
               style={{ color: "var(--color-text-secondary)" }}
             >
               Cancel
@@ -371,10 +370,13 @@ export function SecurityTab() {
               type="button"
               onClick={handleRevokeAll}
               disabled={revokingAll}
-              className="text-sm font-medium disabled:opacity-60"
+              className="text-body font-medium disabled:opacity-60"
               style={{ color: "var(--color-primary)" }}
             >
-              {revokingAll ? "Revoking..." : "Revoke all other sessions"}
+              {/* Says "everywhere" because that is what it does: revocation is a
+                  per-user version bump, which invalidates this device's token
+                  too. See revokeAllOtherSessions in account.service.ts. */}
+              {revokingAll ? "Signing out…" : "Sign out on all devices"}
             </button>
           )}
         </div>
@@ -383,7 +385,7 @@ export function SecurityTab() {
           className="rounded-lg border overflow-hidden"
           style={{ borderColor: "var(--color-border-default)" }}
         >
-          <table className="w-full text-sm">
+          <table className="w-full text-body">
             <thead>
               <tr style={{ borderBottom: "1px solid var(--color-border-default)", backgroundColor: "var(--color-bg-page)" }}>
                 <th className="text-left px-4 py-2.5 font-medium" style={{ color: "var(--color-text-secondary)" }}>
@@ -401,14 +403,14 @@ export function SecurityTab() {
             <tbody>
               {sessions.isLoading && (
                 <tr>
-                  <td colSpan={4} className="px-4 py-6 text-center text-sm" style={{ color: "var(--color-text-muted)" }}>
+                  <td colSpan={4} className="px-4 py-6 text-center text-body" style={{ color: "var(--color-text-muted)" }}>
                     Loading sessions...
                   </td>
                 </tr>
               )}
               {sessions.isError && (
                 <tr>
-                  <td colSpan={4} className="px-4 py-6 text-center text-sm" style={{ color: "var(--color-error)" }}>
+                  <td colSpan={4} className="px-4 py-6 text-center text-body" style={{ color: "var(--color-error)" }}>
                     Couldn&apos;t load sessions.{" "}
                     <button onClick={() => sessions.refetch()} className="font-medium underline" style={{ color: "var(--color-primary)" }}>
                       Retry
@@ -418,7 +420,7 @@ export function SecurityTab() {
               )}
               {!sessions.isLoading && !sessions.isError && sessionList.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="px-4 py-6 text-center text-sm" style={{ color: "var(--color-text-muted)" }}>
+                  <td colSpan={4} className="px-4 py-6 text-center text-body" style={{ color: "var(--color-text-muted)" }}>
                     No active sessions found.
                   </td>
                 </tr>
@@ -445,10 +447,15 @@ export function SecurityTab() {
                           type="button"
                           onClick={() => handleRevoke(session.id)}
                           disabled={revoking === session.id}
-                          className="text-sm disabled:opacity-60"
+                          className="text-body disabled:opacity-60"
                           style={{ color: "var(--color-primary)" }}
                         >
-                          {revoking === session.id ? "Revoking..." : "Revoke"}
+                          {/* Removes the row from this list. It does NOT end that
+                              device's session — revocation has no per-device
+                              granularity until the sid path ships (TODOS). The
+                              label says what it actually does rather than
+                              promising a revoke that never happened. */}
+                          {revoking === session.id ? "Removing…" : "Remove from list"}
                         </button>
                       )}
                     </td>
@@ -469,7 +476,7 @@ export function SecurityTab() {
           className="rounded-lg border overflow-hidden"
           style={{ borderColor: "var(--color-border-default)" }}
         >
-          <table className="w-full text-sm">
+          <table className="w-full text-body">
             <thead>
               <tr style={{ borderBottom: "1px solid var(--color-border-default)", backgroundColor: "var(--color-bg-page)" }}>
                 <th className="text-left px-4 py-2.5 font-medium" style={{ color: "var(--color-text-secondary)" }}>
@@ -489,14 +496,14 @@ export function SecurityTab() {
             <tbody>
               {loginHistory.isLoading && (
                 <tr>
-                  <td colSpan={4} className="px-4 py-6 text-center text-sm" style={{ color: "var(--color-text-muted)" }}>
+                  <td colSpan={4} className="px-4 py-6 text-center text-body" style={{ color: "var(--color-text-muted)" }}>
                     Loading history...
                   </td>
                 </tr>
               )}
               {loginHistory.isError && (
                 <tr>
-                  <td colSpan={4} className="px-4 py-6 text-center text-sm" style={{ color: "var(--color-error)" }}>
+                  <td colSpan={4} className="px-4 py-6 text-center text-body" style={{ color: "var(--color-error)" }}>
                     Couldn&apos;t load login history.{" "}
                     <button onClick={() => loginHistory.refetch()} className="font-medium underline" style={{ color: "var(--color-primary)" }}>
                       Retry
@@ -506,7 +513,7 @@ export function SecurityTab() {
               )}
               {!loginHistory.isLoading && !loginHistory.isError && historyList.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="px-4 py-6 text-center text-sm" style={{ color: "var(--color-text-muted)" }}>
+                  <td colSpan={4} className="px-4 py-6 text-center text-body" style={{ color: "var(--color-text-muted)" }}>
                     No login history yet.
                   </td>
                 </tr>

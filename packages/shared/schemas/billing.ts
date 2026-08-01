@@ -43,6 +43,28 @@ export const cancelReasonSchema = z.enum([
   "OTHER",
 ]);
 
+export type CancelReason = z.infer<typeof cancelReasonSchema>;
+
+/**
+ * Our cancel reasons -> Stripe's `cancellation_details.feedback` enum, which is
+ * a closed set Stripe rejects anything outside of:
+ * customer_service | low_quality | missing_features | other | switched_service
+ * | too_complex | too_expensive | unused.
+ *
+ * TEMPORARY has no Stripe equivalent (pausing is not a cancellation reason
+ * there), so it maps to `other` and survives verbatim in `cancelReason`
+ * locally. Lives here rather than in billing.service because schemas are the
+ * SSOT for anything derived from the enum.
+ */
+export const STRIPE_CANCEL_FEEDBACK: Record<CancelReason, string> = {
+  TOO_EXPENSIVE: "too_expensive",
+  MISSING_FEATURES: "missing_features",
+  SWITCHING: "switched_service",
+  NOT_USING: "unused",
+  TEMPORARY: "other",
+  OTHER: "other",
+};
+
 export const cancelSchema = z.object({
   reason: cancelReasonSchema,
   feedback: z.string().max(500).optional(),

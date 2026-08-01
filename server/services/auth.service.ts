@@ -293,8 +293,15 @@ export async function resetPassword(token: string, newPassword: string) {
 
   await logAuditEvent("PASSWORD_RESET_COMPLETED", "success", { userId });
 
-  // Invalidate all sessions
-  await prisma.session.deleteMany({ where: { userId } });
+  // Invalidate all sessions. The deleteMany alone was cosmetic — sessions are
+  // JWT-strategy, so clearing the display table left every issued cookie valid
+  // for its remaining 30 days. An attacker holding a stolen cookie kept full
+  // access straight through the victim's password reset, which is the single
+  // worst instance of this bug. The version bump is what actually kills them.
+  await prisma.$transaction([
+    prisma.user.update({ where: { id: userId }, data: { sessionVersion: { increment: 1 } } }),
+    prisma.session.deleteMany({ where: { userId } }),
+  ]);
 }
 
 export async function sendMagicLink(email: string) {

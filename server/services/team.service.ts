@@ -179,9 +179,15 @@ export async function revokeMember(memberId: string, workspaceId: string, actorU
     where: { id: memberId },
     data: { status: "SUSPENDED", suspendedAt: new Date() },
   });
-  // Cut the suspended member's active sessions immediately (defense-in-depth;
-  // per-request resolveWorkspaceId also revokes their workspace access).
-  await prisma.session.deleteMany({ where: { userId: member.userId } });
+  // Cut the suspended member's active sessions immediately. The deleteMany on
+  // its own was zero-depth, not defense-in-depth: sessions are JWT-strategy, so
+  // clearing rows left their cookie working. resolveWorkspaceId does block
+  // workspace access per request, but the session itself stayed alive. The
+  // version bump is what actually signs them out.
+  await prisma.$transaction([
+    prisma.user.update({ where: { id: member.userId }, data: { sessionVersion: { increment: 1 } } }),
+    prisma.session.deleteMany({ where: { userId: member.userId } }),
+  ]);
   return updated;
 }
 
@@ -207,7 +213,11 @@ export async function deleteMember(memberId: string, workspaceId: string) {
   if (!member || member.workspaceId !== workspaceId) throw new Error("MEMBER_NOT_FOUND");
   if (member.role === "OWNER") throw new Error("CANNOT_DELETE_OWNER");
 
-  await prisma.session.deleteMany({ where: { userId: member.userId } });
+  // Same as revokeMember: the row delete alone never ended their session.
+  await prisma.$transaction([
+    prisma.user.update({ where: { id: member.userId }, data: { sessionVersion: { increment: 1 } } }),
+    prisma.session.deleteMany({ where: { userId: member.userId } }),
+  ]);
   return prisma.workspaceMember.delete({ where: { id: memberId } });
 }
 

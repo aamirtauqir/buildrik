@@ -112,7 +112,7 @@ export function FolderCardGrid({
             <div
               key={folder.id}
               className={cn(
-                "relative flex min-h-[167px] flex-col overflow-hidden rounded-xl border shadow-card transition-colors",
+                "relative flex min-h-[167px] flex-col overflow-hidden rounded-lg border shadow-card transition-colors",
                 active && "ring-2 ring-[var(--color-primary)]"
               )}
               style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}

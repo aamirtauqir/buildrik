@@ -7,7 +7,7 @@ import { ErrorState } from "@/components/states";
 export default function AICreditsPage() {
   const creditsQuery = trpc.account.aiCredits.useQuery();
 
-  if (creditsQuery.isLoading) return <div className="h-64 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />;
+  if (creditsQuery.isLoading) return <div className="h-64 animate-pulse rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }} />;
   if (!creditsQuery.data) return <ErrorState title="Couldn't load AI credits" onRetry={() => creditsQuery.refetch()} />;
 
   return (

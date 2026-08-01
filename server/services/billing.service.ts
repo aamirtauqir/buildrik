@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
-import type { UpgradeInput, CancelInput } from "@buildrik/shared/schemas/billing";
+import { STRIPE_CANCEL_FEEDBACK, type UpgradeInput, type CancelInput } from "@buildrik/shared/schemas/billing";
 import { getStripe, isStripeConfigured, getStripePriceId } from "@/server/services/stripe.client";
 
 async function getUsageCounts(workspaceId: string) {
@@ -283,6 +283,57 @@ export async function reconcileWorkspaceToFreePlan(workspaceId: string): Promise
   return excess.length;
 }
 
+/**
+ * Flip `cancel_at_period_end` on Stripe, then mirror Stripe's answer locally.
+ *
+ *   caller ──▶ Stripe subscriptions.update ──▶ mirror response into Prisma
+ *                      │                                  │
+ *                      │ throws ──▶ NO local write        │ throws ──▶ webhook
+ *                      ▼                                  ▼   reconciles from
+ *              user sees a real error            customer.subscription.updated
+ *
+ * The order is the whole point. Until 2026-07-31 these two functions wrote the
+ * local flag and never called Stripe at all: the banner said "cancels on
+ * <date>", the card was charged at renewal, and the next
+ * customer.subscription.updated wrote Stripe's `false` back over our `true`, so
+ * the banner vanished with no error anywhere. Local-first has no reconciler.
+ * Stripe-first does: `handleSubscriptionUpdated` already writes
+ * `cancel_at_period_end` authoritatively, so a Prisma failure after a
+ * successful Stripe call self-heals on the webhook.
+ */
+async function updateStripeCancelAtPeriodEnd(
+  subscription: { stripeSubscriptionId: string },
+  cancelAtPeriodEnd: boolean,
+  details?: { feedback: string; comment?: string },
+) {
+  try {
+    return await getStripe().subscriptions.update(
+      subscription.stripeSubscriptionId,
+      {
+        cancel_at_period_end: cancelAtPeriodEnd,
+        ...(details
+          ? {
+              cancellation_details: {
+                feedback: details.feedback as "other",
+                ...(details.comment ? { comment: details.comment } : {}),
+              },
+            }
+          : {}),
+      },
+      // A double-clicked Cancel would otherwise fire two updates and emit two
+      // customer.subscription.updated events for the same intent.
+      { idempotencyKey: `cancel:${subscription.stripeSubscriptionId}:${cancelAtPeriodEnd}` },
+    );
+  } catch (e: unknown) {
+    // Grandfathered rows carry a placeholder id Stripe 404s on (the same case
+    // createPortalSession already anticipates). Surface it as its own domain
+    // error rather than a 500 — and never write the local flag.
+    const code = (e as { code?: string })?.code;
+    if (code === "resource_missing") throw new Error("GRANDFATHERED_NO_PORTAL");
+    throw e;
+  }
+}
+
 export async function cancelSubscription(
   workspaceId: string,
   input: CancelInput,
@@ -295,14 +346,19 @@ export async function cancelSubscription(
     throw new Error("NO_SUBSCRIPTION");
   }
 
-  if (subscription.cancelAtPeriodEnd) {
-    throw new Error("ALREADY_CANCELLED");
-  }
+  const updated = await updateStripeCancelAtPeriodEnd(subscription, true, {
+    feedback: STRIPE_CANCEL_FEEDBACK[input.reason],
+    comment: input.feedback,
+  });
 
+  // Idempotent by intent: if Stripe already reads cancelled, the user's goal is
+  // satisfied, so reconcile and return instead of erroring. The old
+  // ALREADY_CANCELLED guard fired off our local mirror, which could be stale in
+  // either direction — including stale-true from the very bug being fixed here.
   return prisma.subscription.update({
     where: { workspaceId },
     data: {
-      cancelAtPeriodEnd: true,
+      cancelAtPeriodEnd: updated.cancel_at_period_end,
       cancelReason: input.reason,
       cancelFeedback: input.feedback,
     },
@@ -318,14 +374,16 @@ export async function reactivateSubscription(workspaceId: string) {
     throw new Error("NO_SUBSCRIPTION");
   }
 
-  if (!subscription.cancelAtPeriodEnd) {
-    throw new Error("NOT_CANCELLED");
-  }
+  // Deliberately NOT sending `cancel_at`. On this API version that is a
+  // separate mechanism, and mixing the two produces a cancellation that never
+  // clears. Also deliberately not subscriptions.cancel(), which terminates
+  // immediately and contradicts "stays active until the end of your period".
+  const updated = await updateStripeCancelAtPeriodEnd(subscription, false);
 
   return prisma.subscription.update({
     where: { workspaceId },
     data: {
-      cancelAtPeriodEnd: false,
+      cancelAtPeriodEnd: updated.cancel_at_period_end,
       cancelReason: null,
       cancelFeedback: null,
     },

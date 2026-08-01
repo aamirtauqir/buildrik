@@ -1,5 +1,13 @@
 import type { Metadata } from "next";
 import "./globals.css";
+// Separate Next.js CSS entry point (not `@import`ed from globals.css) — see
+// its file header for why the prefixed flowbite layer needs its own
+// Turbopack processing pass rather than sharing globals.css's.
+import "./tw-flowbite.css";
+// Side-effect only — sets flowbite-react's global prefix before any
+// flowbite-react component renders. See file header for why this must be
+// unconditional, not just a reaction to the editor loading.
+import "@/components/global/flowbiteStore";
 import { TRPCProvider } from "@lib/trpc/client";
 import { AgentationWrapper } from "@/components/agentation-wrapper";
 import { ToastProvider } from "@/components/dashboard/toast-provider";

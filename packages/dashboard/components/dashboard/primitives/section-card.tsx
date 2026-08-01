@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { cn } from "@lib/utils";
 
 /** Surface card with an optional titled header bar. One radius/border/padding
- *  contract for every "boxed section" — replaces ad-hoc rounded-xl border blocks
+ *  contract for every "boxed section" — replaces ad-hoc rounded-lg border blocks
  *  and the site-detail local Section components. Pass padding="none" for tables. */
 export function SectionCard({
   title,
@@ -22,7 +22,7 @@ export function SectionCard({
   const hasHeader = Boolean(title || actions);
   return (
     <section
-      className={cn("overflow-hidden rounded-[12px] border shadow-card", className)}
+      className={cn("overflow-hidden rounded-lg border shadow-card", className)}
       style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
     >
       {hasHeader && (

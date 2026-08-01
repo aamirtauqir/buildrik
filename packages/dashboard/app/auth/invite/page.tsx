@@ -46,7 +46,7 @@ function StatusView({
   return (
     <AuthCard>
       <div className="flex flex-col items-center text-center gap-4">
-        <span className="flex h-12 w-12 items-center justify-center rounded-[14px] bg-[#F5F5F6]">{icon}</span>
+        <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-[#F5F5F6]">{icon}</span>
         <div className="flex flex-col gap-2">
           <h1 className="text-auth-title text-auth-text-primary">{title}</h1>
           <p className="text-auth-subtitle text-auth-text-muted">{subtitle}</p>
@@ -161,7 +161,7 @@ function InviteContent() {
   if (effectiveView === "wrong-account") {
     return (
       <StatusView
-        icon={<AlertCircle className="h-[26px] w-[26px] text-[#B7791F]" strokeWidth={1.7} />}
+        icon={<AlertCircle className="h-[26px] w-[26px] text-[#C27803]" strokeWidth={1.7} />}
         title="This invite is for another email"
         subtitle={
           <>
@@ -207,14 +207,14 @@ function InviteContent() {
   if (effectiveView === "decline-confirm") {
     return (
       <StatusView
-        icon={<AlertCircle className="h-[26px] w-[26px] text-[#B7791F]" strokeWidth={1.7} />}
+        icon={<AlertCircle className="h-[26px] w-[26px] text-[#C27803]" strokeWidth={1.7} />}
         title="Decline this invitation?"
         subtitle="You can always ask the workspace owner to invite you again later."
       >
         <AuthButton
           loading={declineMutation.isPending}
           onClick={() => declineMutation.mutate({ token })}
-          className="border border-[#E5484D]/50 bg-white text-[#E5484D] hover:bg-[#E5484D]/5"
+          className="border border-[#E02424]/50 bg-white text-[#E02424] hover:bg-[#E02424]/5"
         >
           Yes, decline
         </AuthButton>
@@ -230,7 +230,7 @@ function InviteContent() {
   return (
     <AuthCard>
       <div className="flex flex-col items-center text-center gap-[14px]">
-        <span className="flex h-[52px] w-[52px] items-center justify-center overflow-hidden rounded-[13px] bg-auth-cta text-[19px] font-bold tracking-[-0.02em] text-white">
+        <span className="flex h-[52px] w-[52px] items-center justify-center overflow-hidden rounded-lg bg-auth-cta text-[19px] font-bold tracking-[-0.02em] text-white">
           {invite.workspaceIconUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={invite.workspaceIconUrl} alt={invite.workspaceName} className="h-full w-full object-cover" />

@@ -1,5 +1,6 @@
 "use client";
 
+import { ToggleSwitch } from "flowbite-react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { SectionCard } from "@/components/dashboard/primitives";
@@ -44,21 +45,12 @@ export function AgencyLayerToggle() {
         default. Existing client review links keep working even if this is later switched off.
       </p>
       <div className="flex items-center gap-3">
-        <button
-          type="button"
-          role="switch"
-          aria-checked={enabled}
-          aria-label="Agency layer"
+        <ToggleSwitch
+          checked={enabled}
           disabled={busy}
-          onClick={() => setFeature.mutate({ key: "agency_layer", enabled: !enabled })}
-          className="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors disabled:cursor-not-allowed disabled:opacity-60"
-          style={{ backgroundColor: enabled ? "var(--color-primary)" : "var(--color-border-default)" }}
-        >
-          <span
-            className="pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-sm transition-transform"
-            style={{ transform: enabled ? "translateX(20px)" : "translateX(0)" }}
-          />
-        </button>
+          onChange={(next) => setFeature.mutate({ key: "agency_layer", enabled: next })}
+          aria-label="Agency layer"
+        />
         <span className="text-body" style={{ color: loadFailed ? "var(--color-error-text)" : "var(--color-text-primary)" }}>
           {loadFailed
             ? "Couldn't load — reload the page"

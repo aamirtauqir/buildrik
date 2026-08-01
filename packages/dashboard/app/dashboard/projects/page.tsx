@@ -13,7 +13,7 @@ import { RenameModal } from "@/components/sites/rename-modal";
 import { DeleteConfirmModal } from "@/components/sites/delete-confirm-modal";
 import { TransferModal } from "@/components/sites/transfer-modal";
 import { ErrorState, LoadingSkeleton, StateEmpty } from "@/components/states";
-import { Button, Modal, PageHeader } from "@/components/dashboard/primitives";
+import { Button, InputField, Modal, PageHeader } from "@/components/dashboard/primitives";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { useRouter } from "next/navigation";
 import { Plus, Search, CheckSquare, Folder } from "lucide-react";
@@ -469,15 +469,15 @@ export default function ProjectsPage() {
       {/* Search + filters */}
       <div className="mt-4 flex flex-col gap-3">
         <div className="relative max-w-md">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" style={{ color: "var(--color-text-muted)" }} />
-          <input
+          <InputField
             ref={searchRef}
+            leading={<Search className="h-4 w-4" />}
             type="text"
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
             placeholder="Search sites…"
-            className="w-full rounded-md border py-2 pl-9 pr-10 text-body outline-none focus:border-[var(--color-primary)]"
-            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)", backgroundColor: "var(--color-bg-surface)" }}
+            aria-label="Search sites"
+            className="pr-8"
           />
           <kbd
             className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 rounded border px-1.5 py-0.5 text-eyebrow font-medium"
@@ -543,7 +543,7 @@ export default function ProjectsPage() {
       {/* True-empty: the workspace has no sites at all */}
       {!sitesQuery.isLoading && !sitesQuery.isError && sites.length === 0 && !hasActiveFilters && (
         <div
-          className="mt-8 flex flex-col items-center rounded-xl border-2 border-dashed py-16 text-center"
+          className="mt-8 flex flex-col items-center rounded-lg border-2 border-dashed py-16 text-center"
           style={{ borderColor: "var(--color-border-default)" }}
         >
           <p

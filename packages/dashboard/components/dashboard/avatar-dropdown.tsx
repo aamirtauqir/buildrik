@@ -80,7 +80,7 @@ export function AvatarDropdown({ initials, name, email, loading = false }: Avata
       </button>
 
       {open && (
-        <div className="absolute right-0 top-11 z-50 w-56 rounded-xl border border-[var(--color-border-default)] bg-white shadow-lg">
+        <div className="absolute right-0 top-11 z-50 w-56 rounded-lg border border-[var(--color-border-default)] bg-white shadow-lg">
           <div className="border-b border-[var(--color-border-default)] px-4 py-3">
             <p className="text-body font-medium text-[var(--color-text-primary)]">{name}</p>
             <p className="text-body-sm text-[var(--color-text-muted)]">{email}</p>

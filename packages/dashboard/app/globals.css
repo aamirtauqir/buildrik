@@ -1,19 +1,21 @@
 @import 'tailwindcss';
 
 @theme inline {
-  --font-sans: 'Inter Tight', sans-serif;
+  /* Dashboard body/UI font is Inter (DESIGN.md surface table); the auth
+     craftwork surface alone runs Inter Tight, scoped in [data-auth-layout]. */
+  --font-sans: 'Inter', sans-serif;
   --font-mono: 'Geist Mono', ui-monospace, monospace;
 
-  /* Auth colors — craftwork surface (cobalt accent, auth-only; see DESIGN.md §Auth Surface) */
-  --color-auth-cta: #406ED6;
-  --color-auth-cta-hover: #2E56B8;
-  --color-auth-input-border: #E2E8F0;
-  --color-auth-input-focus: #406ED6;
-  --color-auth-input-error: #E5484D;
-  --color-auth-error-text: #C0343A;
-  --color-auth-input-fill: #EAF1FF;
-  --color-auth-input-fill-border: #D3E1FF;
-  --color-auth-input-fill-focus: #DCE7FF;
+  /* Auth colors — craftwork surface (Flowbite blue accent, auth-only; see DESIGN.md §Auth Surface) */
+  --color-auth-cta: #1A56DB;
+  --color-auth-cta-hover: #1E429F;
+  --color-auth-input-border: #E5E7EB;
+  --color-auth-input-focus: #1A56DB;
+  --color-auth-input-error: #E02424;
+  --color-auth-error-text: #C81E1E;
+  --color-auth-input-fill: #EBF5FF;
+  --color-auth-input-fill-border: #C3DDFD;
+  --color-auth-input-fill-focus: #E1EFFE;
   --color-auth-btn-secondary: #EFEFF0;
   --color-auth-btn-secondary-hover: #E5E5E7;
   --color-auth-page: #FFFFFF;
@@ -23,12 +25,12 @@
   --color-auth-text-secondary: #111113;
   --color-auth-text-muted: #6B6B70;
   --color-auth-text-placeholder: #9A9AA0;
-  --color-auth-link: #406ED6;
+  --color-auth-link: #1A56DB;
   /* Banner fills are tinted inline (9% of the status colour); the frames carry
      no border, so the old bg/border pairs are gone rather than left dead. */
-  --color-auth-success-text: #12805C;
-  --color-auth-strength-bg: #F8FAFC;
-  --color-auth-strength-pass: #16A34A;
+  --color-auth-success-text: #057A55;
+  --color-auth-strength-bg: #F9FAFB;
+  --color-auth-strength-pass: #0E9F6E;
 
   /* Auth shadows — floating craftwork card */
   --shadow-auth-card: 0 26px 60px -24px rgba(17, 17, 25, 0.22), 0 10px 28px -18px rgba(17, 17, 25, 0.14);
@@ -81,73 +83,77 @@
      Unified with editor + auth 2026-07-12; replaces the former red #E42313 accent
      AND the pure-gray neutrals with the mockup's slate-tinted scale. Error and
      destructive stay red: red now means error/danger only. */
-  /* UI-kit tokens (docs/design/dashboard-ui-kit.md, adopted 2026-07-18 —
-     founder chose the kit over the prior cobalt reskin values). #406ED6 is now
-     the single product accent: dashboard, auth and onboarding all run it, so
-     only one blue is on screen anywhere. Editor chrome still ships cobalt in
-     its own --buildrick-* DS and is a separate migration. */
-  --color-primary: #406ED6;
-  --color-primary-hover: #2E56B8;
-  --color-primary-subtle: #ECF0FB;      /* Figma 32-2 accent-tint (was #EBF1FF) */
-  --color-destructive: #7F1D1D;
-  /* Neutral scale reconciled to Figma 32-2 foundations 2026-07-24 — unifies the
-     dashboard with the editor on one slate scale (ink darkened, surfaces cooler). */
-  --color-bg-page: #F1F5F9;             /* Figma bg-app (was #F9FAFC) */
-  --color-bg-surface: #FFFFFF;          /* Figma bg-card */
-  --color-bg-subtle: #F8FAFC;           /* Figma bg-panel (was #F3F5F8) */
-  --color-border-default: #E2E8F0;      /* Figma border (was #E8EAEF) */
-  --color-border-strong: #CBD5E1;       /* Figma border-medium (was #D6DAE1) */
-  --color-text-primary: #0F172A;        /* Figma ink (was #1C212C) */
-  --color-text-secondary: #485465;      /* Figma ink-soft (was #6B7380) */
-  --color-text-muted: #656F7E;          /* Figma ink-muted (was #98A0AF) */
-  --color-text-placeholder: #656F7E;    /* Figma ink-muted (was #98A0AF) */
-  --color-success: #16A34A;             /* Figma success (was #059669 emerald) */
-  --color-success-subtle: #DCFCE7;
-  --color-warning: #D97706;
-  --color-warning-subtle: #FEF3C7;
-  --color-error: #DC2626;
-  --color-error-subtle: #FEE2E2;
+  /* UI-kit tokens (docs/design/dashboard-ui-kit.md, adopted 2026-07-18).
+     Flowbite blue #1A56DB adopted 2026-07-30 (was #406ED6) — matches the
+     flowbite-react defaults and the re-based Figma, so no Flowbite theme
+     override is needed. Single product accent: dashboard, auth and onboarding
+     all run it. Editor chrome converges on it via the flowbite big-bang arc. */
+  --color-primary: #1A56DB;
+  --color-primary-hover: #1E429F;
+  --color-primary-subtle: #E1EFFE;      /* Flowbite blue-100 accent-subtle (was #ECF0FB) */
+  --color-destructive: #9B1C1C;         /* Flowbite red-800 */
+  /* Neutral scale moved to Flowbite gray 2026-07-30 (decision log 2026-07-29;
+     was Figma 32-2 slate). Values mirror the editor's tokens.generated.css. */
+  --color-bg-page: #F3F4F6;             /* bk-bg-app */
+  --color-bg-surface: #FFFFFF;          /* bk-bg-card */
+  --color-bg-subtle: #F3F4F6;           /* bk-bg-subtle */
+  --color-border-default: #E5E7EB;      /* bk-border */
+  --color-border-strong: #D1D5DB;       /* bk-border-medium */
+  --color-border-input: #9CA3AF;        /* bk-border-input */
+  --color-text-primary: #111827;        /* bk-ink */
+  --color-text-secondary: #4B5563;      /* bk-ink-soft */
+  --color-text-muted: #6B7280;          /* bk-ink-muted */
+  --color-text-placeholder: #6B7280;    /* bk-ink-muted */
+  --color-success: #0E9F6E;             /* bk-success */
+  --color-success-subtle: #DEF7EC;
+  --color-warning: #C27803;
+  --color-warning-subtle: #FDFDEA;
+  --color-error: #E02424;
+  --color-error-subtle: #FDE8E8;
   /* semantic text-on-subtle — darker shades for AA contrast on the pale *-subtle fills */
-  --color-success-text: #166534;
-  --color-warning-text: #854D0E;
-  --color-error-text: #991B1B;
-  --color-info: #406ED6;
+  --color-success-text: #057A55;
+  --color-warning-text: #723B13;
+  --color-error-text: #C81E1E;
+  --color-info: #1A56DB;
   /* Categorical/illustrative colors — charts, avatars, app icon chips.
      Decorative tints only, never actions (UI kit §7.2). */
   --color-teal: #0D94A6;
   --color-amber: #EA8E1E;
   --color-pink: #DB508C;
-  --color-ink: #0F172A;                 /* Figma ink (was #141924) */
+  --color-ink: #111827;                 /* bk-ink */
   /* Sidebar nav item states (design: Shell.dc.html) */
-  --color-nav-item-active-bg: #ECF0FB;  /* Figma accent-tint */
-  --color-nav-label: #485465;           /* Figma ink-soft */
-  --color-nav-label-active: #2E56B8;
+  --color-nav-item-active-bg: #EBF5FF;  /* Flowbite blue-50 accent-tint */
+  --color-nav-label: #4B5563;           /* bk-ink-soft */
+  --color-nav-label-active: #1E429F;
   /* Status fg/bg — status.live=success, review=warning, failed=error, draft=neutral */
-  --color-status-live-bg: #DCFCE7;   --color-status-live-fg: #15803D;
-  --color-status-review-bg: #FEF3C7; --color-status-review-fg: #D97706;
-  --color-status-failed-bg: #FEE2E2; --color-status-failed-fg: #DC2626;
-  --color-status-draft-bg: #F7FAFA;  --color-status-draft-fg: #6B7380;
+  --color-status-live-bg: #DEF7EC;   --color-status-live-fg: #057A55;
+  --color-status-review-bg: #FDFDEA; --color-status-review-fg: #C27803;
+  --color-status-failed-bg: #FDE8E8; --color-status-failed-fg: #E02424;
+  --color-status-draft-bg: #F3F4F6;  --color-status-draft-fg: #6B7280;
 
   /* dc card shadow — soft depth on surface cards / tiles / tables.
      Premium shadow set (dc reskin 2026-07-18): ring + card + card-hover +
      panel + modal, replacing the single flat --shadow-card. */
+  /* All shadow inks sit on Flowbite gray-900 #111827 (rgb 17,24,39) — one ink,
+     matching the modal scrim; slate-900 and #101828 variants retired 2026-07-30. */
   --shadow-ring: inset 0 0 0 1px var(--color-border-default);
-  --shadow-card: 0 1px 2px rgba(15,23,42,0.04), 0 10px 26px -20px rgba(15,23,42,0.28);
-  --shadow-card-hover: inset 0 0 0 1px var(--color-border-strong), 0 4px 10px -4px rgba(16,24,40,0.12), 0 1px 3px rgba(16,24,40,0.07);
-  --shadow-panel: 0 0 0 1px rgba(15,23,42,0.10), 0 18px 40px -24px rgba(15,23,42,0.16);
-  --shadow-modal: 0 24px 60px -12px rgba(15,23,42,0.35);
+  --shadow-card: 0 1px 2px rgba(17,24,39,0.04), 0 10px 26px -20px rgba(17,24,39,0.28);
+  --shadow-card-hover: inset 0 0 0 1px var(--color-border-strong), 0 4px 10px -4px rgba(17,24,39,0.12), 0 1px 3px rgba(17,24,39,0.07);
+  --shadow-panel: 0 0 0 1px rgba(17,24,39,0.10), 0 18px 40px -24px rgba(17,24,39,0.16);
+  --shadow-modal: 0 24px 60px -12px rgba(17,24,39,0.35);
 
   /* Dashboard shell + design-system contract (dc parity 2026-07-12).
-     Two-level shell: full-width top nav (56px) above the 244px sidebar
-     (narrowed from 272px in the reskin, 2026-07-18). */
+     Two-level shell: full-width 60px top nav above the 293px sidebar. */
   --topnav-h: 60px;
   --sidebar-w: 293px;
 
-  /* Radius scale (dc: xs4 sm6 md8 lg10 xl12 2xl16 pill). Remaps rounded-* utilities. */
+  /* Radius scale (xs4 sm6 md8 lg8 xl12 2xl16 pill). Remaps rounded-* utilities.
+     lg flipped 10→8 with the Flowbite migration (decision log 2026-07-29:
+     "radius lg 8px on buttons/inputs/cards/modals"; mirrors --bk-radius-lg). */
   --radius-xs: 4px;
   --radius-sm: 6px;
   --radius-md: 8px;
-  --radius-lg: 10px;
+  --radius-lg: 8px;
   --radius-xl: 12px;
   --radius-2xl: 16px;
   --radius-pill: 9999px;
@@ -173,21 +179,21 @@
 
   /* Onboarding (M2 wizard) — no longer a scoped blue. It tracked the v3 gallery
      at cobalt #2D6DFF (2026-07-18, which had already reversed the earlier
-     #2563EB), and now follows the single product accent #406ED6. Fields are
+     #2563EB), and now follows the single product accent #1A56DB. Fields are
      white/outlined; the numbered stepper + neutrals track the v3 gallery. */
-  --color-onb-primary: #406ED6;
-  --color-onb-primary-hover: #2E56B8;
-  --color-onb-primary-tint: #EBF1FF;
-  --color-onb-text: #334155;
-  --color-onb-muted: #63748B;
-  --color-onb-subtle: #94A3B8;
-  --color-onb-line: #E3E8F0;
+  --color-onb-primary: #1A56DB;
+  --color-onb-primary-hover: #1E429F;
+  --color-onb-primary-tint: #EBF5FF;
+  --color-onb-text: #374151;
+  --color-onb-muted: #6B7280;
+  --color-onb-subtle: #9CA3AF;
+  --color-onb-line: #E5E7EB;
   /* Inputs are filled, not outlined: pale blue field on a 1px ring. */
   --color-onb-field: #FFFFFF;
-  --color-onb-field-ring: #E3E8F0;
-  --color-onb-surface: #F8FAFC;
-  --color-onb-success: #21966B;
-  --color-onb-error: #DC2626;
+  --color-onb-field-ring: #E5E7EB;
+  --color-onb-surface: #F9FAFB;
+  --color-onb-success: #0E9F6E;
+  --color-onb-error: #E02424;
   --radius-onb: 8px;
   /* v3 header is a compact 64px bar (brand left + skip right) closed by a 1px
      onb-line divider; the stepper/progress indicator sits OUTSIDE it, in the
@@ -204,8 +210,13 @@
   --text-onb-title--font-weight: 700;
 }
 
+/* Auth craftwork surface keeps Inter Tight (DESIGN.md §Auth Surface). */
+[data-auth-layout] {
+  font-family: 'Inter Tight', sans-serif;
+}
+
 /* Focus indicators — one accent for every surface (UI kit §6: never remove the
-   ring). Dashboard, auth and onboarding all resolve to #406ED6. */
+   ring). Dashboard, auth and onboarding all resolve to #1A56DB. */
 *:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;

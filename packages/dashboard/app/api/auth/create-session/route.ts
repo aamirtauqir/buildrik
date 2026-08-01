@@ -96,6 +96,10 @@ export async function POST(req: NextRequest) {
       userId: user.id,
       workspaceId: member?.workspaceId ?? null,
       sid: dbSession.id,
+      // Revocation version at mint time. auth.config.ts's jwt callback compares
+      // this against User.sessionVersion on every request, so anything that
+      // bumps the column kills every token minted before it.
+      sv: user.sessionVersion,
     },
     secret: process.env.NEXTAUTH_SECRET!,
     salt: cookieName,

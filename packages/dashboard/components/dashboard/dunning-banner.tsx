@@ -45,21 +45,21 @@ export function DunningBanner({ graceEndsAt }: DunningBannerProps) {
         : "Payment failed. Your workspace has been restricted.";
 
   return (
-    <div className="flex items-center justify-between rounded-xl border border-red-200 bg-red-50 px-5 py-3">
+    <div className="flex items-center justify-between rounded-lg border border-[var(--color-error-subtle)] bg-[var(--color-error-subtle)] px-5 py-3">
       <div className="flex items-center gap-3">
-        <AlertCircle className="h-5 w-5 shrink-0 text-red-600" />
-        <p className="text-body text-red-700">{message}</p>
+        <AlertCircle className="h-5 w-5 shrink-0 text-[var(--color-error)]" />
+        <p className="text-body text-[var(--color-error-text)]">{message}</p>
       </div>
       <div className="ml-4 flex items-center gap-2">
         <Link
           href="/dashboard/settings/billing"
-          className="shrink-0 rounded-lg bg-red-600 px-4 py-1.5 text-body font-medium text-white hover:bg-red-700"
+          className="shrink-0 rounded-lg bg-[var(--color-error)] px-4 py-1.5 text-body font-medium text-white hover:bg-[var(--color-error-text)]"
         >
           Update Payment
         </Link>
         <button
           onClick={handleDismiss}
-          className="shrink-0 rounded p-1 text-red-400 hover:text-red-600"
+          className="shrink-0 rounded p-1 text-[var(--color-text-muted)] hover:text-[var(--color-error)]"
           aria-label="Dismiss"
         >
           <X className="h-4 w-4" />

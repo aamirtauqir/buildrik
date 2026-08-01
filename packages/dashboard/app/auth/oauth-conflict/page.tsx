@@ -10,7 +10,7 @@ function OAuthConflictContent() {
   const email = useSearchParams().get("email") ?? "your email";
   return (
     <AuthMessage
-      icon={<AlertCircle size={26} strokeWidth={1.7} className="text-[#B7791F]" />}
+      icon={<AlertCircle size={26} strokeWidth={1.7} className="text-[#C27803]" />}
       title="Account already exists"
       // The mockup ends "…to link Google", but no account-linking exists:
       // auth.config.ts sets no `allowDangerousEmailAccountLinking` and there is

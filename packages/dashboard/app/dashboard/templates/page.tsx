@@ -9,6 +9,8 @@ import { cn, coverFromSeed } from "@lib/utils";
 import { LoadingSkeleton, ErrorState, StateEmpty } from "@/components/states";
 import { TemplateFilterRail } from "@/components/templates/template-filter-rail";
 import { paginationRange } from "@/components/templates/pagination-range";
+import { DIFFICULTY_PILL } from "@/components/templates/difficulty";
+import { InputField, Pill } from "@/components/dashboard/primitives";
 import {
   type TemplateFilters,
   templateFiltersFromParams,
@@ -17,11 +19,6 @@ import {
 
 const PER_PAGE = 12;
 
-const DIFFICULTY_STYLES: Record<string, { bg: string; text: string; label: string }> = {
-  BEGINNER: { bg: "#DCFCE7", text: "#166534", label: "Beginner" },
-  INTERMEDIATE: { bg: "#DBEAFE", text: "#1E40AF", label: "Intermediate" },
-  ADVANCED: { bg: "#FEF3C7", text: "#92400E", label: "Advanced" },
-};
 
 function formatCount(n: number): string {
   if (n >= 1000) return `${(n / 1000).toFixed(1).replace(/\.0$/, "")}K`;
@@ -75,17 +72,14 @@ function TemplatesBrowserInner() {
         <h1 className="text-[19px] font-[680] tracking-tight" style={{ color: "var(--color-text-primary)" }}>
           Templates
         </h1>
-        <div className="ml-auto flex h-9 w-[280px] items-center gap-2 rounded-lg border px-3"
-          style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}>
-          <Search className="h-4 w-4" style={{ color: "var(--color-text-muted)" }} />
-          <input
-            value={filters.search}
-            onChange={(e) => applyFilters({ search: e.target.value, page: 1 })}
-            placeholder="Search templates…"
-            className="w-full bg-transparent text-[13px] outline-none"
-            style={{ color: "var(--color-text-primary)" }}
-          />
-        </div>
+        <InputField
+          wrapperClassName="ml-auto w-[280px]"
+          leading={<Search className="h-4 w-4" />}
+          value={filters.search}
+          onChange={(e) => applyFilters({ search: e.target.value, page: 1 })}
+          placeholder="Search templates…"
+          aria-label="Search templates"
+        />
       </div>
 
       <div className="flex gap-8">
@@ -109,13 +103,13 @@ function TemplatesBrowserInner() {
             <>
               <div className="grid grid-cols-1 gap-[18px] sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {items.map((t) => {
-                  const diff = DIFFICULTY_STYLES[t.difficulty] ?? DIFFICULTY_STYLES.BEGINNER;
+                  const diff = DIFFICULTY_PILL[t.difficulty] ?? DIFFICULTY_PILL.BEGINNER;
                   const cover = coverFromSeed(t.id);
                   return (
                     <Link
                       key={t.id}
                       href={`/dashboard/templates/${t.id}`}
-                      className="group overflow-hidden rounded-xl border shadow-card transition-shadow hover:shadow-md"
+                      className="group overflow-hidden rounded-lg border shadow-card transition-shadow hover:shadow-md"
                       style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
                     >
                       {/* Deterministic tinted cover with the template initial so the
@@ -139,9 +133,7 @@ function TemplatesBrowserInner() {
                           <span className="rounded-full px-2 py-0.5 text-[11px] font-medium" style={{ backgroundColor: "var(--color-bg-subtle)", color: "var(--color-text-secondary)" }}>
                             {t.category.toLowerCase()}
                           </span>
-                          <span className="rounded-full px-2 py-0.5 text-[11px] font-medium" style={{ backgroundColor: diff.bg, color: diff.text }}>
-                            {diff.label}
-                          </span>
+                          <Pill tone={diff.tone}>{diff.label}</Pill>
                         </div>
                         <p className="mt-1.5 text-[11px]" style={{ color: "var(--color-text-muted)" }}>{formatCount(t.usageCount)} {t.usageCount === 1 ? "site" : "sites"}</p>
                       </div>

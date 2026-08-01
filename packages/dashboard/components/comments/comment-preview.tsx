@@ -77,7 +77,7 @@ export function CommentPreview({
     <div>
       <header className="mb-4">
         <h1 className="text-xl font-bold" style={{ color: "var(--color-text-primary)" }}>Feedback — {siteName}</h1>
-        <p className="mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>
+        <p className="mt-1 text-body" style={{ color: "var(--color-text-secondary)" }}>
           Click anywhere on the preview to pin a change-request.
         </p>
       </header>
@@ -90,7 +90,7 @@ export function CommentPreview({
         <div
           ref={stageRef}
           onClick={onStageClick}
-          className="relative mx-auto w-full max-w-3xl cursor-crosshair overflow-hidden rounded-xl border"
+          className="relative mx-auto w-full max-w-3xl cursor-crosshair overflow-hidden rounded-lg border"
           style={{ borderColor: "var(--color-border-default)", aspectRatio: "16 / 10", backgroundColor: "var(--color-bg-subtle)" }}
         >
           {previewUrl ? (
@@ -98,7 +98,7 @@ export function CommentPreview({
           ) : thumbnail ? (
             <img src={thumbnail} alt={siteName} className="pointer-events-none h-full w-full object-cover object-top" />
           ) : (
-            <div className="flex h-full items-center justify-center text-sm" style={{ color: "var(--color-text-muted)" }}>
+            <div className="flex h-full items-center justify-center text-body" style={{ color: "var(--color-text-muted)" }}>
               Publish this site to preview it — pins still work for now.
             </div>
           )}
@@ -127,12 +127,12 @@ export function CommentPreview({
                 className="absolute z-10 w-56 -translate-x-1/2 rounded-lg border bg-white p-3 shadow-lg"
                 style={{ left: `${(pin.x ?? 0) * 100}%`, top: `calc(${(pin.y ?? 0) * 100}% + 16px)`, borderColor: "var(--color-border-default)" }}
               >
-                <p className="text-sm" style={{ color: "var(--color-text-primary)" }}>{pin.body}</p>
+                <p className="text-body" style={{ color: "var(--color-text-primary)" }}>{pin.body}</p>
                 {canResolve && (
                   <button
                     onClick={() => resolveMut.mutate({ id: pin.id, siteId, status: "RESOLVED" })}
                     disabled={resolveMut.isPending}
-                    className="mt-2 flex items-center gap-1 text-xs font-medium disabled:opacity-50"
+                    className="mt-2 flex items-center gap-1 text-body-sm font-medium disabled:opacity-50"
                     style={{ color: "var(--color-primary)" }}
                   >
                     <Check className="h-3.5 w-3.5" /> Resolve
@@ -149,7 +149,7 @@ export function CommentPreview({
               style={{ left: `${draft.x * 100}%`, top: `calc(${draft.y * 100}% + 8px)`, borderColor: "var(--color-border-default)" }}
             >
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold" style={{ color: "var(--color-text-secondary)" }}>New comment</span>
+                <span className="text-body-sm font-semibold" style={{ color: "var(--color-text-secondary)" }}>New comment</span>
                 <button onClick={() => setDraft(null)} aria-label="Cancel"><X className="h-4 w-4" style={{ color: "var(--color-text-muted)" }} /></button>
               </div>
               <textarea
@@ -158,13 +158,13 @@ export function CommentPreview({
                 placeholder="Describe the change…"
                 rows={2}
                 autoFocus
-                className="mt-2 w-full rounded border px-2 py-1.5 text-sm"
+                className="mt-2 w-full rounded border px-2 py-1.5 text-body"
                 style={{ borderColor: "var(--color-border-default)" }}
               />
               <button
                 onClick={() => createMut.mutate({ siteId, x: draft.x, y: draft.y, body: draftBody.trim() })}
                 disabled={!draftBody.trim() || createMut.isPending}
-                className="mt-2 w-full rounded-lg px-3 py-1.5 text-xs font-medium text-white disabled:opacity-50"
+                className="mt-2 w-full rounded-lg px-3 py-1.5 text-body-sm font-medium text-white disabled:opacity-50"
                 style={{ backgroundColor: "var(--color-primary)" }}
               >
                 {createMut.isPending ? "Adding…" : "Add comment"}

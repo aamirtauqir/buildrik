@@ -97,11 +97,11 @@ export function ContextualHelp() {
 
       {open && (
         <div
-          className="absolute right-0 top-full z-50 mt-2 w-72 rounded-xl border bg-white shadow-lg"
+          className="absolute right-0 top-full z-50 mt-2 w-72 rounded-lg border bg-white shadow-lg"
           style={{ borderColor: "var(--color-border-default)" }}
         >
           <div className="border-b px-4 py-3" style={{ borderColor: "var(--color-border-default)" }}>
-            <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Helpful Articles</p>
+            <p className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>Helpful Articles</p>
           </div>
           <div className="divide-y" style={{ borderColor: "var(--color-border-default)" }}>
             {articles.map((article) => (
@@ -111,10 +111,10 @@ export function ContextualHelp() {
                 onClick={() => setOpen(false)}
                 className="flex flex-col gap-1 px-4 py-3 transition-colors hover:bg-[#FFF5F4]"
               >
-                <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>{article.title}</p>
+                <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>{article.title}</p>
                 <div className="flex items-center gap-1" style={{ color: "var(--color-text-secondary)" }}>
                   <Clock className="h-3 w-3" />
-                  <span className="text-xs">{article.readTime} min read</span>
+                  <span className="text-body-sm">{article.readTime} min read</span>
                 </div>
               </Link>
             ))}
@@ -123,7 +123,7 @@ export function ContextualHelp() {
             <Link
               href="/dashboard/help"
               onClick={() => setOpen(false)}
-              className="flex items-center gap-1.5 text-sm font-medium transition-colors hover:underline"
+              className="flex items-center gap-1.5 text-body font-medium transition-colors hover:underline"
               style={{ color: "var(--color-primary)" }}
             >
               View Help Center

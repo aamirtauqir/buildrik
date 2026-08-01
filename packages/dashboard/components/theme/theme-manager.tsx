@@ -115,18 +115,18 @@ export function ThemeManager() {
       ) : (
         <div className="space-y-6">
           {/* Captured-theme + capture/push controls */}
-          <div className="rounded-xl border bg-white p-4" style={{ borderColor: "var(--color-border-default)" }}>
+          <div className="rounded-lg border bg-white p-4" style={{ borderColor: "var(--color-border-default)" }}>
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-2">
                 <Palette className="h-4 w-4" style={{ color: "var(--color-primary)" }} />
-                <span className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
+                <span className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>
                   {theme ? `Theme captured ${timeAgo(theme.updatedAt)}` : "No shared theme captured yet"}
                 </span>
               </div>
               <button
                 onClick={openConfirm}
                 disabled={!theme || busy || followingCount === 0}
-                className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-white disabled:opacity-50"
+                className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-body-sm font-medium text-white disabled:opacity-50"
                 style={{ backgroundColor: "var(--color-primary)" }}
               >
                 <UploadCloud className="h-3.5 w-3.5" />
@@ -140,20 +140,20 @@ export function ThemeManager() {
                 <div className="flex items-start gap-2">
                   <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" style={{ color: "var(--color-primary)" }} />
                   <div className="flex-1">
-                    <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
+                    <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
                       Re-style {followingCount} following site{followingCount === 1 ? "" : "s"}?
                     </p>
                     {previewMut.isPending ? (
-                      <p className="mt-0.5 text-xs" style={{ color: "var(--color-text-secondary)" }}>Checking impact…</p>
+                      <p className="mt-0.5 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>Checking impact…</p>
                     ) : preview ? (
                       // Accurate blast radius from the server dry-run.
-                      <p className="mt-0.5 text-xs" style={{ color: "var(--color-text-secondary)" }}>
+                      <p className="mt-0.5 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
                         <strong>{preview.filter((p) => p.status === "would-push" && p.willChange).length}</strong> will change ·{" "}
                         {preview.filter((p) => p.status === "would-push" && !p.willChange).length} already match ·{" "}
                         {preview.filter((p) => p.status === "skipped-locked").length} locked (kept)
                       </p>
                     ) : (
-                      <p className="mt-0.5 text-xs" style={{ color: "var(--color-text-secondary)" }}>
+                      <p className="mt-0.5 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
                         Every following site adopts this theme&apos;s tokens.
                         {lockedCount > 0 && ` ${lockedCount} locked site${lockedCount === 1 ? "" : "s"} keep their own and won't change.`}
                       </p>
@@ -162,14 +162,14 @@ export function ThemeManager() {
                       <button
                         onClick={() => pushMut.mutate({})}
                         disabled={pushMut.isPending}
-                        className="rounded-md px-3 py-1.5 text-xs font-medium text-white disabled:opacity-50"
+                        className="rounded-md px-3 py-1.5 text-body-sm font-medium text-white disabled:opacity-50"
                         style={{ backgroundColor: "var(--color-primary)" }}
                       >
                         {pushMut.isPending ? "Pushing…" : `Push to ${followingCount} site${followingCount === 1 ? "" : "s"}`}
                       </button>
                       <button
                         onClick={() => { setConfirming(false); setPreview(null); }}
-                        className="rounded-md border px-3 py-1.5 text-xs font-medium"
+                        className="rounded-md border px-3 py-1.5 text-body-sm font-medium"
                         style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
                       >
                         Cancel
@@ -184,12 +184,12 @@ export function ThemeManager() {
             {pushResults && pushResults.length > 0 && (
               <div className="mt-4 overflow-hidden rounded-lg border" style={{ borderColor: "var(--color-border-default)" }}>
                 <div className="flex items-center justify-between border-b px-3 py-2" style={{ borderColor: "var(--color-border-default)" }}>
-                  <span className="text-xs font-semibold" style={{ color: "var(--color-text-primary)" }}>Push result</span>
+                  <span className="text-body-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Push result</span>
                   <button onClick={() => setPushResults(null)} className="text-neutral-400 hover:text-neutral-600"><X className="h-3.5 w-3.5" /></button>
                 </div>
                 <ul>
                   {pushResults.map((r) => (
-                    <li key={r.siteId} className="flex items-center justify-between border-b px-3 py-1.5 text-xs last:border-0" style={{ borderColor: "var(--color-border-default)" }}>
+                    <li key={r.siteId} className="flex items-center justify-between border-b px-3 py-1.5 text-body-sm last:border-0" style={{ borderColor: "var(--color-border-default)" }}>
                       <span style={{ color: "var(--color-text-primary)" }}>{r.name}</span>
                       {r.status === "pushed" ? (
                         <span className="inline-flex items-center gap-2">
@@ -207,7 +207,7 @@ export function ThemeManager() {
                       ) : r.status === "skipped-locked" ? (
                         <span className="inline-flex items-center gap-1 text-neutral-400"><Lock className="h-3 w-3" /> Locked — kept own</span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 text-red-600" title={r.error}><AlertTriangle className="h-3 w-3" /> Failed</span>
+                        <span className="inline-flex items-center gap-1 text-[var(--color-error)]" title={r.error}><AlertTriangle className="h-3 w-3" /> Failed</span>
                       )}
                     </li>
                   ))}
@@ -219,7 +219,7 @@ export function ThemeManager() {
               <select
                 value={source}
                 onChange={(e) => setSource(e.target.value)}
-                className="flex-1 rounded-lg border px-3 py-1.5 text-sm"
+                className="flex-1 rounded-lg border px-3 py-1.5 text-body"
                 style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
               >
                 <option value="">Choose a site to capture from…</option>
@@ -230,7 +230,7 @@ export function ThemeManager() {
               <button
                 onClick={() => source && captureMut.mutate({ sourceSiteId: source })}
                 disabled={!source || busy}
-                className="flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium disabled:opacity-50"
+                className="flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-body-sm font-medium disabled:opacity-50"
                 style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
               >
                 Capture from this site
@@ -250,14 +250,14 @@ export function ThemeManager() {
               {targets.map((s) => (
                 <div
                   key={s.id}
-                  className="flex items-center justify-between gap-4 rounded-xl border bg-white p-3"
+                  className="flex items-center justify-between gap-4 rounded-lg border bg-white p-3"
                   style={{ borderColor: "var(--color-border-default)" }}
                 >
-                  <span className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>{s.name}</span>
+                  <span className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>{s.name}</span>
                   <button
                     onClick={() => lockMut.mutate({ siteId: s.id, locked: !s.themeLocked })}
                     disabled={lockMut.isPending}
-                    className="flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium disabled:opacity-50"
+                    className="flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-body-sm font-medium disabled:opacity-50"
                     style={{
                       borderColor: "var(--color-border-default)",
                       color: s.themeLocked ? "var(--color-text-primary)" : "var(--color-text-muted)",

@@ -35,7 +35,7 @@ export default function ActivityPage() {
       {activity.isError ? (
         <ErrorState title="Couldn't load activity" description="Something went wrong on our end." onRetry={() => activity.refetch()} />
       ) : activity.isLoading ? (
-        <div className="h-64 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
+        <div className="h-64 animate-pulse rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
       ) : (
         <SectionCard title="Recent activity" padding="none">
           <ActivityFeed feed={activity.data ?? { groups: [] }} />

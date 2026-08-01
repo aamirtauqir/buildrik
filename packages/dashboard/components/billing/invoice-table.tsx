@@ -99,7 +99,7 @@ export function InvoiceTable({ invoices, page = 1, totalPages = 1, onPageChange 
         keyOf={(inv) => inv.id}
         empty={
           <div
-            className="rounded-xl border px-6 py-12 text-center text-body"
+            className="rounded-lg border px-6 py-12 text-center text-body"
             style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)", color: "var(--color-text-secondary)" }}
           >
             No invoices yet.

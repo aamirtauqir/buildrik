@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Search, LayoutTemplate } from "lucide-react";
+import { Spinner } from "flowbite-react";
 import { trpc } from "@lib/trpc/client";
 import { cn } from "@lib/utils";
 import { WizardShell } from "@/components/onboarding/wizard/wizard-shell";
@@ -71,7 +72,7 @@ export default function TemplateGalleryPage() {
 
         {list.isLoading ? (
           <div className="flex min-h-[300px] items-center justify-center self-stretch">
-            <div className="h-6 w-6 animate-spin rounded-full border-2 border-onb-line border-t-onb-primary" />
+            <Spinner size="md" />
           </div>
         ) : templates.length === 0 ? (
           <div className="flex min-h-[300px] items-center justify-center self-stretch">
@@ -100,9 +101,9 @@ export default function TemplateGalleryPage() {
                 key={t.id}
                 type="button"
                 onClick={() => saveAndGo("/onboarding/template/preview", { template: { id: t.id } })}
-                className="flex flex-col overflow-hidden rounded-xl bg-white text-left shadow-[inset_0_0_0_1px_var(--color-onb-line)] transition-shadow hover:shadow-[inset_0_0_0_2px_var(--color-onb-primary)]"
+                className="flex flex-col overflow-hidden rounded-lg bg-white text-left shadow-[inset_0_0_0_1px_var(--color-onb-line)] transition-shadow hover:shadow-[inset_0_0_0_2px_var(--color-onb-primary)]"
               >
-                <div className="flex h-[170px] items-center justify-center border-b border-onb-line bg-slate-100">
+                <div className="flex h-[170px] items-center justify-center border-b border-onb-line bg-gray-100">
                   {t.thumbnail ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={t.thumbnail} alt={t.name} className="h-full w-full object-cover" />

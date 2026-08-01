@@ -15,7 +15,7 @@ import { AuthButton } from "@/components/auth/auth-button";
 export default function SuspiciousPage() {
   return (
     <AuthMessage
-      icon={<ShieldAlert size={26} strokeWidth={1.7} className="text-[#B7791F]" />}
+      icon={<ShieldAlert size={26} strokeWidth={1.7} className="text-[#C27803]" />}
       title="New sign-in detected"
       subtitle="We noticed a sign-in from a device or location we don't recognize. Confirm it was you."
     >

@@ -6,12 +6,8 @@ import { ArrowLeft, ExternalLink, Globe } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { LoadingSkeleton, ErrorState } from "@/components/states";
 import { UseTemplateModal } from "@/components/templates/use-template-modal";
-
-const DIFFICULTY_STYLES: Record<string, { bg: string; text: string; label: string }> = {
-  BEGINNER: { bg: "#DCFCE7", text: "#166534", label: "Beginner" },
-  INTERMEDIATE: { bg: "#DBEAFE", text: "#1E40AF", label: "Intermediate" },
-  ADVANCED: { bg: "#FEF3C7", text: "#92400E", label: "Advanced" },
-};
+import { DIFFICULTY_PILL } from "@/components/templates/difficulty";
+import { Pill } from "@/components/dashboard/primitives";
 
 export default function TemplateDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -47,7 +43,7 @@ export default function TemplateDetailPage({ params }: { params: Promise<{ id: s
       ) : (
         (() => {
           const t = query.data;
-          const diff = DIFFICULTY_STYLES[t.difficulty] ?? DIFFICULTY_STYLES.BEGINNER;
+          const diff = DIFFICULTY_PILL[t.difficulty] ?? DIFFICULTY_PILL.BEGINNER;
           // No hosted preview URL for most templates, so show what's actually
           // inside — the page list — instead of a blank placeholder.
           const pages = Array.isArray(t.pages)
@@ -55,7 +51,7 @@ export default function TemplateDetailPage({ params }: { params: Promise<{ id: s
             : [];
           return (
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1.4fr_1fr]">
-              <div className="overflow-hidden rounded-xl border" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-subtle)" }}>
+              <div className="overflow-hidden rounded-lg border" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-subtle)" }}>
                 {t.previewUrl ? (
                   <iframe src={t.previewUrl} title={t.name} className="h-[520px] w-full" />
                 ) : (
@@ -87,9 +83,7 @@ export default function TemplateDetailPage({ params }: { params: Promise<{ id: s
                   <span className="rounded-full px-2.5 py-0.5 text-[12px] font-medium" style={{ backgroundColor: "var(--color-bg-subtle)", color: "var(--color-text-secondary)" }}>
                     {t.category.toLowerCase()}
                   </span>
-                  <span className="rounded-full px-2.5 py-0.5 text-[12px] font-medium" style={{ backgroundColor: diff.bg, color: diff.text }}>
-                    {diff.label}
-                  </span>
+                  <Pill tone={diff.tone}>{diff.label}</Pill>
                   <span className="text-[12px]" style={{ color: "var(--color-text-muted)" }}>{t.usageCount} sites</span>
                 </div>
 

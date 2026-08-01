@@ -48,7 +48,7 @@ export function WorkspaceHealth({ data }: WorkspaceHealthProps) {
   if (!hasUsage || !anyOver50) return null;
 
   return (
-    <div className="rounded-xl border border-[var(--color-border-default)] bg-white p-5">
+    <div className="rounded-lg border border-[var(--color-border-default)] bg-white p-5">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-section-title text-[var(--color-text-primary)]">Workspace Usage</h3>
         <Link href="/dashboard/settings/billing" className="text-body-sm text-[var(--color-primary)] hover:underline">

@@ -33,20 +33,20 @@ export function StepType({ selected, onSelect, onNext }: StepTypeProps) {
           const Icon = iconMap[type.icon as keyof typeof iconMap];
           const isSelected = selected === type.value;
           return (
-            <button key={type.value} onClick={() => onSelect(type.value)} className={cn("flex items-start gap-3 rounded-xl border p-4 text-left transition-all", isSelected ? "border-[var(--color-primary)] bg-red-50/50 ring-1 ring-[var(--color-primary)]" : "hover:border-[var(--color-border-strong)]")} style={{ borderColor: isSelected ? "var(--color-primary)" : "var(--color-border-default)" }}>
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg" style={{ backgroundColor: isSelected ? "#FEF2F2" : "var(--color-bg-subtle)" }}>
+            <button key={type.value} onClick={() => onSelect(type.value)} className={cn("flex items-start gap-3 rounded-lg border p-4 text-left transition-all", isSelected ? "border-[var(--color-primary)] bg-[#EBF5FF] ring-1 ring-[var(--color-primary)]" : "hover:border-[var(--color-border-strong)]")} style={{ borderColor: isSelected ? "var(--color-primary)" : "var(--color-border-default)" }}>
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg" style={{ backgroundColor: isSelected ? "#E1EFFE" : "var(--color-bg-subtle)" }}>
                 <Icon className="h-5 w-5" style={{ color: isSelected ? "var(--color-primary)" : "var(--color-text-secondary)" }} />
               </div>
               <div>
-                <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>{type.label}</p>
-                <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>{type.description}</p>
+                <p className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>{type.label}</p>
+                <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>{type.description}</p>
               </div>
             </button>
           );
         })}
       </div>
       <div className="mt-8 text-center">
-        <button onClick={onNext} disabled={!selected} className="rounded-lg px-8 py-2.5 text-sm font-medium text-white disabled:opacity-50" style={{ backgroundColor: "var(--color-primary)" }}>Next</button>
+        <button onClick={onNext} disabled={!selected} className="rounded-lg px-8 py-2.5 text-body font-medium text-white disabled:opacity-50" style={{ backgroundColor: "var(--color-primary)" }}>Next</button>
       </div>
     </div>
   );

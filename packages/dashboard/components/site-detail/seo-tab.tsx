@@ -43,7 +43,7 @@ export function SeoTab({ site }: SeoTabProps) {
   return (
     <div className="space-y-6">
       <div
-        className="flex items-center justify-between rounded-xl border bg-white p-4"
+        className="flex items-center justify-between rounded-lg border bg-white p-4"
         style={{ borderColor: "var(--color-border-default)" }}
       >
         <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>

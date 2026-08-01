@@ -61,7 +61,7 @@ export default function ReviewInvite({
           <Section style={{ textAlign: "center" as const, marginTop: "28px" }}>
             <Button
               href={reviewUrl}
-              style={{ backgroundColor: "#406ED6", color: "white", padding: "12px 28px", borderRadius: "8px", fontSize: "14px", fontWeight: "600", textDecoration: "none" }}
+              style={{ backgroundColor: "#1A56DB", color: "white", padding: "12px 28px", borderRadius: "8px", fontSize: "14px", fontWeight: "600", textDecoration: "none" }}
             >
               Look at {siteName}
             </Button>

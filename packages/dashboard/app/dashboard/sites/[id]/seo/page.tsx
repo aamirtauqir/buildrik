@@ -12,7 +12,7 @@ export default function SiteSeoPage() {
   const settingsQuery = trpc.siteDetail.settings.get.useQuery({ siteId });
 
   if (settingsQuery.isLoading) {
-    return <div className="h-64 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />;
+    return <div className="h-64 animate-pulse rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }} />;
   }
   if (settingsQuery.isError) {
     return (

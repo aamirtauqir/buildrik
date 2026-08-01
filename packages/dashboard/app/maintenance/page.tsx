@@ -32,7 +32,7 @@ export default function MaintenancePage() {
             Buildrick
           </h1>
         </div>
-        <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full" style={{ backgroundColor: "#FEF2F2" }}>
+        <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full" style={{ backgroundColor: "#FDF2F2" }}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-8 w-8"
@@ -53,7 +53,7 @@ export default function MaintenancePage() {
         >
           We&apos;ll be back shortly
         </h2>
-        <p className="mt-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>
+        <p className="mt-2 text-body" style={{ color: "var(--color-text-secondary)" }}>
           We&apos;re performing scheduled maintenance. This page will
           automatically refresh when we&apos;re back online.
         </p>

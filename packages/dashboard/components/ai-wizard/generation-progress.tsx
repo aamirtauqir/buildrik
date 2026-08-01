@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, CheckCircle, XCircle } from "lucide-react";
 import { getEditorHref, useUnifiedEditorFlag } from "@/components/editor-route/unified-flag";
+import { Button, Modal } from "@/components/dashboard/primitives";
 
 export const GENERATION_STEPS = [
   { key: "QUEUED", label: "Queued" },
@@ -122,10 +123,10 @@ export function GenerationProgress({
       <div className="h-2 rounded-full" style={{ backgroundColor: "var(--color-bg-subtle)" }}>
         <div
           className="h-2 rounded-full transition-all duration-500"
-          style={{ width: `${progress}%`, backgroundColor: isFailed ? "var(--color-primary)" : "var(--color-success)" }}
+          style={{ width: `${progress}%`, backgroundColor: isFailed ? "var(--color-error)" : "var(--color-success)" }}
         />
       </div>
-      <p className="mt-2 text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
+      <p className="mt-2 text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
         {progress}%
       </p>
 
@@ -150,10 +151,10 @@ export function GenerationProgress({
                 />
               )}
               {stepStatus === "failed" && (
-                <XCircle className="h-5 w-5 shrink-0" style={{ color: "var(--color-primary)" }} />
+                <XCircle className="h-5 w-5 shrink-0" style={{ color: "var(--color-error)" }} />
               )}
               <span
-                className="text-sm"
+                className="text-body"
                 style={{ color: stepStatus === "pending" ? "var(--color-text-muted)" : "var(--color-text-primary)" }}
               >
                 {step.label}
@@ -165,15 +166,15 @@ export function GenerationProgress({
 
       {/* Error state */}
       {isFailed && error && (
-        <div className="mt-6 rounded-lg p-4" style={{ backgroundColor: "#FEF2F2" }}>
-          <p className="text-sm" style={{ color: "#991B1B" }}>
+        <div className="mt-6 rounded-lg p-4" style={{ backgroundColor: "#FDF2F2" }}>
+          <p className="text-body" style={{ color: "#9B1C1C" }}>
             {error}
           </p>
           <div className="mt-3 flex flex-wrap justify-center gap-2">
             {failCount < 2 && (
               <button
                 onClick={onRetry}
-                className="rounded-lg px-4 py-1.5 text-sm font-medium text-white"
+                className="rounded-lg px-4 py-1.5 text-body font-medium text-white"
                 style={{ backgroundColor: "var(--color-primary)" }}
               >
                 Retry
@@ -182,7 +183,7 @@ export function GenerationProgress({
             {onUseTemplate && (
               <button
                 onClick={onUseTemplate}
-                className="rounded-lg border px-4 py-1.5 text-sm font-medium"
+                className="rounded-lg border px-4 py-1.5 text-body font-medium"
                 style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
               >
                 Use Template Instead
@@ -191,7 +192,7 @@ export function GenerationProgress({
             {onStartBlank && (
               <button
                 onClick={onStartBlank}
-                className="rounded-lg px-4 py-1.5 text-sm font-medium"
+                className="rounded-lg px-4 py-1.5 text-body font-medium"
                 style={{ color: "var(--color-text-secondary)" }}
               >
                 Start Blank
@@ -204,12 +205,12 @@ export function GenerationProgress({
       {/* Success state */}
       {isComplete && siteId && (
         <div className="mt-6">
-          <p className="text-sm font-medium" style={{ color: "var(--color-success)" }}>
+          <p className="text-body font-medium" style={{ color: "var(--color-success)" }}>
             Site generated successfully!
           </p>
           <button
             onClick={() => onViewSite(siteId)}
-            className="mt-3 rounded-lg px-6 py-2 text-sm font-medium text-white"
+            className="mt-3 rounded-lg px-6 py-2 text-body font-medium text-white"
             style={{ backgroundColor: "var(--color-primary)" }}
           >
             Open in Editor
@@ -221,7 +222,7 @@ export function GenerationProgress({
       {isInProgress && (
         <button
           onClick={handleCancelClick}
-          className="mt-6 text-sm font-medium"
+          className="mt-6 text-body font-medium"
           style={{ color: "var(--color-text-secondary)" }}
         >
           Cancel
@@ -229,74 +230,58 @@ export function GenerationProgress({
       )}
 
       {/* Cancel confirmation modal */}
-      {showCancelModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: "rgba(18, 22, 32, 0.45)" }}>
-          <div className="mx-4 w-full max-w-sm rounded-xl bg-white p-6 shadow-xl">
-            <h2 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>
-              Cancel generation?
-            </h2>
-            <p className="mt-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>
-              All progress will be lost.
-            </p>
-            <div className="mt-5 flex justify-end gap-2">
-              <button
-                onClick={() => setShowCancelModal(false)}
-                className="rounded-lg border px-4 py-2 text-sm font-medium"
-                style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
-              >
-                Keep Generating
-              </button>
-              <button
-                onClick={handleConfirmCancel}
-                className="rounded-lg px-4 py-2 text-sm font-medium text-white"
-                style={{ backgroundColor: "var(--color-primary)" }}
-              >
-                Cancel Generation
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <Modal
+        open={showCancelModal}
+        onClose={() => setShowCancelModal(false)}
+        title="Cancel generation?"
+        width={400}
+        footer={
+          <>
+            <Button variant="ghost" size="sm" onClick={() => setShowCancelModal(false)}>
+              Keep Generating
+            </Button>
+            <Button size="sm" onClick={handleConfirmCancel}>
+              Cancel Generation
+            </Button>
+          </>
+        }
+      >
+        <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>
+          All progress will be lost.
+        </p>
+      </Modal>
 
       {/* Credits exhausted modal */}
-      {showCreditsModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: "rgba(18, 22, 32, 0.45)" }}>
-          <div className="mx-4 w-full max-w-sm rounded-xl bg-white p-6 shadow-xl">
-            <h2 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>
-              AI credits used up
-            </h2>
-            <p className="mt-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>
-              Upgrade for more AI generations.
-            </p>
-            <div className="mt-5 flex flex-col gap-2">
-              {onUpgrade && (
-                <button
-                  onClick={() => {
-                    setShowCreditsModal(false);
-                    onUpgrade();
-                  }}
-                  className="rounded-lg px-4 py-2 text-sm font-medium text-white"
-                  style={{ backgroundColor: "var(--color-primary)" }}
-                >
-                  Upgrade Plan
-                </button>
-              )}
-              {onUseTemplate && (
-                <button
-                  onClick={() => {
-                    setShowCreditsModal(false);
-                    onUseTemplate();
-                  }}
-                  className="rounded-lg border px-4 py-2 text-sm font-medium"
-                  style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
-                >
-                  Use a Template Instead
-                </button>
-              )}
-            </div>
-          </div>
+      <Modal open={showCreditsModal} onClose={() => setShowCreditsModal(false)} title="AI credits used up" width={400}>
+        <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>
+          Upgrade for more AI generations.
+        </p>
+        <div className="mt-5 flex flex-col gap-2">
+          {onUpgrade && (
+            <Button
+              className="w-full"
+              onClick={() => {
+                setShowCreditsModal(false);
+                onUpgrade();
+              }}
+            >
+              Upgrade Plan
+            </Button>
+          )}
+          {onUseTemplate && (
+            <Button
+              variant="ghost"
+              className="w-full"
+              onClick={() => {
+                setShowCreditsModal(false);
+                onUseTemplate();
+              }}
+            >
+              Use a Template Instead
+            </Button>
+          )}
         </div>
-      )}
+      </Modal>
     </div>
   );
 }

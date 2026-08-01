@@ -6,7 +6,7 @@ import { Briefcase, Pencil, Trash2, MoreHorizontal } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { StateEmpty, LoadingSkeleton, ErrorState, DeniedState } from "@/components/states";
-import { Button, StatCard, MetricValue, DataTable, Pill, Modal, type Column } from "@/components/dashboard/primitives";
+import { Button, StatCard, MetricValue, DataTable, Pill, Modal, InputField, type Column } from "@/components/dashboard/primitives";
 
 interface ClientRow {
   id: string;
@@ -55,13 +55,11 @@ function NameDialog({
         </>
       }
     >
-      <input
+      <InputField
         type="text"
         value={name}
         onChange={(e) => setName(e.target.value)}
         placeholder="Client name"
-        className="w-full rounded-lg border px-3 py-2 text-sm"
-        style={{ borderColor: "var(--color-border-default)" }}
         autoFocus
         onKeyDown={(e) => {
           if (e.key === "Enter" && trimmed) onSubmit(trimmed);
@@ -97,7 +95,7 @@ function ConfirmDeleteDialog({
         </>
       }
     >
-      <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+      <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>
         Its {client.siteCount} {client.siteCount === 1 ? "site" : "sites"} become unassigned, not deleted.
         You can reassign them to another client later.
       </p>
