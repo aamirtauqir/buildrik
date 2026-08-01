@@ -5,8 +5,7 @@
 
 import * as React from "react";
 import { InputField, TextareaField, SelectField } from "../shared/forms";
-import { ModalClose, ModalContent, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
-import { Button } from "@/editor/chrome-ui";
+import { ModalClose, ModalContent, ModalRoot, ModalTitle, Button } from "@/editor/chrome-ui";
 
 export interface SaveTemplateProps {
   isOpen: boolean;

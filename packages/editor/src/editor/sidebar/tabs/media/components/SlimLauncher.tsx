@@ -9,7 +9,7 @@
  */
 
 import * as React from "react";
-import { PanelFrame } from "@/editor/chrome-ui";
+import { PanelFrame, Button, TextField } from "@/editor/chrome-ui";
 import { Search } from "lucide-react";
 import type { Composer } from "@/engine/Composer";
 import type { LibraryItem, MediaTypeFilter, TypeCounts, UploadProgress } from "../data/mediaTypes";
@@ -18,8 +18,6 @@ import { SelectionContextBar } from "./SelectionContextBar";
 import { AssetCell } from "./AssetCell";
 import { UploadZone } from "./UploadZone";
 import "./SlimLauncher.css";
-import { Button } from "@/editor/chrome-ui";
-import { TextField } from "@/editor/chrome-ui";
 
 interface SlimLauncherProps {
   composer: Composer;

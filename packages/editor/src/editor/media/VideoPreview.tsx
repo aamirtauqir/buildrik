@@ -5,8 +5,7 @@
  */
 
 import * as React from "react";
-import { ModalClose, ModalContent, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
-import { Button, TextInput } from "@/editor/chrome-ui";
+import { ModalClose, ModalContent, ModalRoot, ModalTitle, Button, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================

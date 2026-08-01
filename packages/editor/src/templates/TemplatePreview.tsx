@@ -6,9 +6,8 @@
 
 import DOMPurify from "dompurify";
 import * as React from "react";
-import { ModalClose, ModalContent, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
+import { ModalClose, ModalContent, ModalRoot, ModalTitle, Badge, Button } from "@/editor/chrome-ui";
 import type { Template } from "./types";
-import { Badge, Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================

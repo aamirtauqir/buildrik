@@ -10,21 +10,12 @@ import * as React from "react";
 import type { Composer } from "../../engine";
 import { InputField, FileField } from "../../shared/forms";
 import type { MediaAsset, MediaAssetType, MediaViewMode } from "../../shared/types/media";
-import {
-  ConfirmDialog,
-  ModalClose,
-  ModalContent,
-  ModalRoot,
-  ModalTitle,
-  Spinner,
-  Tabs,
-} from "@/editor/chrome-ui";
+import { ConfirmDialog, ModalClose, ModalContent, ModalRoot, ModalTitle, Spinner, Tabs, Button } from "@/editor/chrome-ui";
 import { useMediaManager } from "../shell/hooks";
 import { AssetCard } from "./AssetCard";
 import { mediaLibraryStyles as styles } from "./MediaLibraryStyles";
 import { OptimizationPanel } from "./OptimizationPanel";
 import { VideoPreview } from "./VideoPreview";
-import { Button } from "@/editor/chrome-ui";
 // ============================================
 // Types
 // ============================================

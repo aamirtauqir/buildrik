@@ -5,10 +5,8 @@
  */
 
 import * as React from "react";
-import { ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
+import { ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, useToast, Button, Checkbox, Textarea, TextInput } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
-import { useToast } from "@/editor/chrome-ui";
-import { Button, Checkbox, Textarea, TextInput } from "@/editor/chrome-ui";
 
 export interface CreateComponentModalProps {
   isOpen: boolean;

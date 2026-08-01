@@ -28,14 +28,13 @@ import {
   RefreshCw,
   type LucideIcon,
 } from "lucide-react";
-import { Slider } from "@/editor/chrome-ui";
+import { Slider, Button, Select } from "@/editor/chrome-ui";
 import {
   compareApprovedToCurrent,
   type ComparePage,
   type CompareChange,
   type CompareChangeKind,
 } from "@/shared/utils/html";
-import { Button, Select } from "@/editor/chrome-ui";
 
 export interface ApprovedCompareViewProps {
   /** Pages frozen at approval. `null` = this round has no stored snapshot. */

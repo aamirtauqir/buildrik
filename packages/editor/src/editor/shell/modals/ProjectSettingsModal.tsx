@@ -5,11 +5,9 @@
  */
 
 import * as React from "react";
-import { ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
+import { ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, useToast, Button, Checkbox, TextInput } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
-import { useToast } from "@/editor/chrome-ui";
 import { devError } from "../../../shared/utils/devLogger";
-import { Button, Checkbox, TextInput } from "@/editor/chrome-ui";
 
 export interface ProjectSettingsModalProps {
   isOpen: boolean;

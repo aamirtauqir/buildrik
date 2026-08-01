@@ -24,8 +24,7 @@ import {
   restoreAssetVersion,
   type AssetVersion,
 } from "../../../../../services/MediaVersionService";
-import { Button } from "@/editor/chrome-ui";
-import { TextField } from "@/editor/chrome-ui";
+import { Button, TextField } from "@/editor/chrome-ui";
 
 type Tab = "preview" | "used" | "versions" | "edit" | "optimize";
 

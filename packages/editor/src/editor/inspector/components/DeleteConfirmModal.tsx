@@ -5,8 +5,7 @@
  */
 
 import * as React from "react";
-import { Kbd, ModalClose, ModalContent, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
-import { Button } from "@/editor/chrome-ui";
+import { Kbd, ModalClose, ModalContent, ModalRoot, ModalTitle, Button } from "@/editor/chrome-ui";
 
 export interface DeleteConfirmModalProps {
   isOpen: boolean;

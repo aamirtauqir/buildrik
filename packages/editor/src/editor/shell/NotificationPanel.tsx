@@ -13,7 +13,7 @@
  */
 
 import * as React from "react";
-import { EmptyState, ROW_META_CLASS, Row, Spinner, StatusDot, type ToastInput } from "@/editor/chrome-ui";
+import { EmptyState, ROW_META_CLASS, Row, Spinner, StatusDot, Button, type ToastInput } from "@/editor/chrome-ui";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { formatRelativeTime } from "@/shared/utils/relativeTime";
 import {
@@ -23,7 +23,6 @@ import {
   markAllNotificationsRead,
   type EditorNotification,
 } from "../../services/NotificationService";
-import { Button } from "@/editor/chrome-ui";
 
 /** U1: one relative-time SSOT — shared/utils/relativeTime, days fallback. */
 function relTime(iso: string | Date): string {

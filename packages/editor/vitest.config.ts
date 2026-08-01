@@ -16,8 +16,6 @@ export default defineConfig({
       "scripts/__tests__/*.mjs",
       "scripts/__tests__/*.{test,spec}.{ts,tsx}",
       "scripts/audit/__tests__/*.mjs",
-      "scripts/codemods/**/__tests__/*.{test,spec}.{ts,tsx}",
-      "scripts/codemods/*.{test,spec}.{ts,tsx}",
       // Dashboard unification tests (Phase 0-3 spec §550). Co-located in the
       // dashboard package; run from here to reuse RTL + jsdom + setup.
       // Scoped to the dashboard's own source dirs, NOT "../dashboard/**".

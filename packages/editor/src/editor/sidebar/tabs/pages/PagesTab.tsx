@@ -13,7 +13,7 @@
  */
 
 import * as React from "react";
-import { ConfirmDialog, EmptyState, EmptyStateActions, EmptyStateDesc, EmptyStateTitle, PanelFrame } from "@/editor/chrome-ui";
+import { ConfirmDialog, EmptyState, EmptyStateActions, EmptyStateDesc, EmptyStateTitle, PanelFrame, Button } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import { PageCommandPalette } from "./components/PageCommandPalette";
 import { PageContextMenu } from "./components/PageContextMenu";
@@ -25,7 +25,6 @@ import { usePages } from "./usePages";
 import { useFolders } from "./useFolders";
 import { useBulkSelect } from "./useBulkSelect";
 import "./PagesTab.css";
-import { Button } from "@/editor/chrome-ui";
 
 export interface PagesTabProps {
   composer: Composer | null;

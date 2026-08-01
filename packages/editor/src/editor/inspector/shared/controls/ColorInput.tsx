@@ -1,4 +1,4 @@
-import { Popover } from "@/editor/chrome-ui";
+import { Popover, Button, TextField } from "@/editor/chrome-ui";
 /**
  * ColorInput — Figma Fill row. Ported to .bdi-fill per comp-inspector.html v2.
  * Checkerboard swatch + hex + % opacity + eye toggle. Token binding preserved.
@@ -14,8 +14,6 @@ import { TokenPickerPopover } from "../TokenPickerPopover";
 import { DSBindingChip } from "../../sections/DSBindingChip";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
-import { Button } from "@/editor/chrome-ui";
-import { TextField } from "@/editor/chrome-ui";
 
 // ============================================================================
 // HELPERS

@@ -17,8 +17,7 @@ import * as React from "react";
 import type { Composer } from "../../../../../engine";
 import type { PageItem } from "../types";
 import { getStatusLabel } from "../utils/statusLabel";
-import { Button } from "@/editor/chrome-ui";
-import { TextField } from "@/editor/chrome-ui";
+import { Button, TextField } from "@/editor/chrome-ui";
 
 interface Props {
   page: PageItem;

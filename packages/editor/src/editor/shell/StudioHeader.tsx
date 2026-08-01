@@ -20,21 +20,7 @@
  */
 
 import * as React from "react";
-import {
-  Topbar,
-  ModalRoot,
-  ModalContent,
-  ModalTitle,
-  ModalDescription,
-  ModalFooter,
-  isModalOpen,
-  plural,
-  type PublishState,
-  type ReviewPill,
-  type ReviewTone,
-  type SaveState,
-  type ToastInput,
-} from "@/editor/chrome-ui";
+import { Topbar, ModalRoot, ModalContent, ModalTitle, ModalDescription, ModalFooter, isModalOpen, plural, Button, type PublishState, type ReviewPill, type ReviewTone, type SaveState, type ToastInput } from "@/editor/chrome-ui";
 import type { SaveOutcome } from "./hooks/useSaveCallback";
 import type { Composer } from "../../engine";
 import { sanitizeHTMLForPreview } from "../export/ExportUtils";
@@ -59,7 +45,6 @@ import { NotificationPanel, useUnreadCount } from "./NotificationPanel";
 import { SendForReview } from "./SendForReview";
 import { SiteMenu } from "./SiteMenu";
 import "./header.css";
-import { Button } from "@/editor/chrome-ui";
 
 /** Selected element minimal info */
 export interface SelectedElementInfo {

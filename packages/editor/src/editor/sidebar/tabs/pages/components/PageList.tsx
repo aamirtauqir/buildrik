@@ -8,13 +8,7 @@
  */
 
 import * as React from "react";
-import {
-  EmptyState,
-  EmptyStateActions,
-  EmptyStateDesc,
-  EmptyStateTitle,
-  IconButton
-} from "@/editor/chrome-ui";
+import { EmptyState, EmptyStateActions, EmptyStateDesc, EmptyStateTitle, IconButton, Button, TextInput } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../../engine";
 import type { FolderItem, PageItem } from "../types";
 import { shouldFocusSearch } from "../utils/keyboardShortcuts";
@@ -22,7 +16,6 @@ import { AddPageButton } from "./AddPageButton";
 import { BulkToolbar } from "./BulkToolbar";
 import { PageFolder } from "./PageFolder";
 import { PageRow } from "./PageRow";
-import { Button, TextInput } from "@/editor/chrome-ui";
 
 interface Props {
   pages: PageItem[];

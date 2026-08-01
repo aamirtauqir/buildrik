@@ -13,7 +13,7 @@
  */
 
 import * as React from "react";
-import { ConfirmDialog, useToast } from "@/editor/chrome-ui";
+import { ConfirmDialog, useToast, Button, TextField } from "@/editor/chrome-ui";
 import { Maximize2, Minimize2, Plus, Upload, X } from "lucide-react";
 import type { Composer } from "../../../../../engine/Composer";
 import type { LibraryItem, MediaStateResult } from "../data/mediaTypes";
@@ -30,8 +30,6 @@ import { StockSourceModal } from "./StockSourceModal";
 import { ReplaceAcrossDialog } from "./ReplaceAcrossDialog";
 import "../MediaTab.css";
 import "./ExpandedMediaPanel.css";
-import { Button } from "@/editor/chrome-ui";
-import { TextField } from "@/editor/chrome-ui";
 
 export interface ExpandedMediaPanelProps {
   composer: Composer;

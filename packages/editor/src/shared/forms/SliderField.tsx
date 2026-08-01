@@ -8,8 +8,7 @@
  */
 
 import * as React from "react";
-import { Slider } from "@/editor/chrome-ui";
-import { BK_LABEL_CLASS, Label } from "@/editor/chrome-ui";
+import { Slider, BK_LABEL_CLASS, Label } from "@/editor/chrome-ui";
 
 export interface SliderFieldProps {
   label?: string;

@@ -22,15 +22,13 @@
  */
 
 import * as React from "react";
-import { PanelHeader } from "@/editor/chrome-ui";
-import { useToast } from "@/editor/chrome-ui";
+import { PanelHeader, useToast, Button, TextInput } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import { CatalogSection } from "./CatalogSection";
 import { UserSavedSection } from "./UserSavedSection";
 import { DSStatusChip } from "./DSStatusChip";
 import { AIPromptModal } from "@/editor/design-system/ui/AIPromptModal";
 import { EVENTS } from "@/shared/constants/events";
-import { Button, TextInput } from "@/editor/chrome-ui";
 type FilterMode = "all" | "ds" | "yours";
 
 interface ComponentsPanelV2Props {

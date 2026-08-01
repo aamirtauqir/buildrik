@@ -6,8 +6,7 @@
 
 import * as React from "react";
 import { ColorField } from "../../shared/forms";
-import { Popover } from "@/editor/chrome-ui";
-import { Button, Select, TextInput, Tooltip } from "@/editor/chrome-ui";
+import { Popover, Button, Select, TextInput, Tooltip } from "@/editor/chrome-ui";
 
 export interface RichTextEditorProps {
   onCommand: (command: string, value?: string) => void;

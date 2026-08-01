@@ -6,7 +6,7 @@
  */
 
 import * as React from "react";
-import { ModalContent, ModalRoot } from "@/editor/chrome-ui";
+import { ModalContent, ModalRoot, Button, TextInput } from "@/editor/chrome-ui";
 import { getBlockById, insertBlock } from "../../../blocks/blockRegistry";
 import type { Composer } from "../../../engine";
 import type { BlockData } from "../../../shared/types";
@@ -15,7 +15,6 @@ import { devLogger } from "../../../shared/utils/devLogger";
 import { runTransaction } from "../../../shared/utils/helpers";
 import { canNestElement } from "../../../shared/utils/nesting";
 import { ElementsTab } from "../../sidebar/tabs/ElementsTab";
-import { Button, TextInput } from "@/editor/chrome-ui";
 
 export interface BlockPickerModalProps {
   composer: Composer;

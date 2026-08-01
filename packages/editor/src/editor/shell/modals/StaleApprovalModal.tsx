@@ -10,8 +10,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { ModalContent, ModalFooter, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
-import { useToast } from "@/editor/chrome-ui";
+import { ModalContent, ModalFooter, ModalRoot, ModalTitle, useToast, Button } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import { exportPublishPages, type PublishPage } from "../exportPublishPages";
 import {
@@ -20,7 +19,6 @@ import {
   submitForReview,
   type CurrentRound,
 } from "@/services/ReviewService";
-import { Button } from "@/editor/chrome-ui";
 
 interface StaleApprovalModalProps {
   isOpen: boolean;

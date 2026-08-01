@@ -9,7 +9,7 @@
  */
 
 import * as React from "react";
-import { PanelFrame } from "@/editor/chrome-ui";
+import { PanelFrame, Button, TextField } from "@/editor/chrome-ui";
 import { useHistoryState } from "../../../../shared/hooks/useHistoryState";
 import { useAutoMilestone } from "../../../../shared/hooks/useAutoMilestone";
 import { VersionHistoryPanel } from "../../../panels/VersionHistoryPanel";
@@ -17,8 +17,6 @@ import { ActivityView } from "./components/ActivityView";
 import { TimeTravelScrubber } from "./components/TimeTravelScrubber";
 import { MilestoneSuggestionBanner } from "./components/MilestoneSuggestionBanner";
 import type { HistoryView, HistoryTabProps } from "./types";
-import { Button } from "@/editor/chrome-ui";
-import { TextField } from "@/editor/chrome-ui";
 
 const HELPER_TEXT: Record<HistoryView, string> = {
   changes: "Your recent edits",

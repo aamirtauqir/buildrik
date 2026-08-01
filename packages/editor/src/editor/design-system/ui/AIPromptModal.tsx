@@ -20,12 +20,11 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { ModalContent, ModalDescription, ModalFooter, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
+import { ModalContent, ModalDescription, ModalFooter, ModalRoot, ModalTitle, Button, Textarea } from "@/editor/chrome-ui";
 import type {
   AIAssistService,
   ComponentSchema,
 } from "../../../engine/designSystem/services/AIAssistService";
-import { Button, Textarea } from "@/editor/chrome-ui";
 type ModalState =
   | { kind: "idle" }
   | { kind: "generating"; abort: AbortController }

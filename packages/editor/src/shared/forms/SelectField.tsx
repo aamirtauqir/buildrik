@@ -7,8 +7,7 @@
  */
 
 import * as React from "react";
-import { FormField } from "@/editor/chrome-ui";
-import { Select } from "@/editor/chrome-ui";
+import { FormField, Select } from "@/editor/chrome-ui";
 
 export interface SelectOption {
   value: string;

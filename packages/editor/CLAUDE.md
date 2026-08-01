@@ -592,7 +592,7 @@ a deep `@/editor/chrome-ui/<file>` path (e.g. `chrome-ui/selectTheme`). The
 barrel aggregates three kinds of export: pure `export { X } from
 "flowbite-react"` re-exports (Button, Badge, Avatar, AvatarGroup, Checkbox,
 Radio, ToggleSwitch, Tooltip, Textarea, Label, HelperText, RangeSlider,
-Progress, Card), the 45+ editor-specific components already canonical here
+Progress, Card), the 47 editor-specific components already canonical here
 (Topbar, IssueChip, Modal, Toast, etc.), and the closed 2-wrapper set below.
 The B3 sweep (task report:
 `.superpowers/sdd/2026-07-30-flowbite-bigbang-implementation/task-B-report.md`)

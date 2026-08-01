@@ -23,7 +23,7 @@
  */
 
 import * as React from "react";
-import { useToast } from "@/editor/chrome-ui";
+import { useToast, Button, Textarea, TextInput } from "@/editor/chrome-ui";
 import { parseImportJSON, diffTokens, type DiffResult } from "../../utils/importUtils";
 import { useImportTokens } from "../../state/useImportTokens";
 import {
@@ -34,7 +34,6 @@ import {
   useIconRegistry, useImageryRegistry,
 } from "../../state/TokenRegistryContext";
 import type { DesignToken } from "../../types";
-import { Button, Textarea, TextInput } from "@/editor/chrome-ui";
 type ConflictStrategy = "replace" | "keep-mine" | "keep-theirs";
 
 interface ParsedState {

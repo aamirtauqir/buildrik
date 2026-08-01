@@ -6,8 +6,7 @@
  */
 
 import * as React from "react";
-import { SkeletonListItem } from "@/editor/chrome-ui";
-import { Button } from "@/editor/chrome-ui";
+import { SkeletonListItem, Button } from "@/editor/chrome-ui";
 /** Loading skeleton shown while lazy-loaded tab chunks download */
 export const PanelSkeleton: React.FC = () => (
   <div className="tw:flex tw:flex-col tw:gap-2.5" style={{ padding: "16px 12px" }}>

@@ -14,8 +14,7 @@ import {
   expandShorthand,
   calcContrastRatio,
 } from "../../utils/colorUtils";
-import { Button } from "@/editor/chrome-ui";
-import { TextField } from "@/editor/chrome-ui";
+import { Button, TextField } from "@/editor/chrome-ui";
 
 export interface ColorPickerProps {
   initialHex: string;

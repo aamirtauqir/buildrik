@@ -8,12 +8,11 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { ConfirmDialog } from "@/editor/chrome-ui";
+import { ConfirmDialog, Button, Checkbox, Select, Textarea, TextInput, ToggleSwitch } from "@/editor/chrome-ui";
 import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
 import type { ConditionExpression, ConditionOperator, DataSource } from "@/shared/types/data";
 import { conditionSummary, fieldDefault, isValidVariableKey, type SiteVariable } from "./contentPanelUtils";
 import type { ConditionRow } from "./useContentPanel";
-import { Button, Checkbox, Select, Textarea, TextInput, ToggleSwitch } from "@/editor/chrome-ui";
 export const S: Record<string, React.CSSProperties> = {
   body: { display: "flex", flexDirection: "column", height: "100%", minHeight: 0 },
   scroll: { flex: 1, minHeight: 0, overflowY: "auto" },

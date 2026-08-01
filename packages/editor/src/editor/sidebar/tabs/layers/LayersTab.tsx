@@ -8,13 +8,12 @@
  */
 
 import * as React from "react";
-import { PanelFrame } from "@/editor/chrome-ui";
+import { PanelFrame, Button, TextInput } from "@/editor/chrome-ui";
 import { useComposerSelection } from "../../../canvas/hooks/useComposerSelection";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
 import { LayersPanel } from "../../../panels/layers/index";
 import type { SelectedElementInfo } from "../../../panels/layers/types";
-import { Button, TextInput } from "@/editor/chrome-ui";
 
 export interface LayersTabProps {
   composer: Composer | null;

@@ -15,15 +15,8 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import {
-  ModalRoot,
-  ModalContent,
-  ModalTitle,
-  ModalDescription,
-  ModalFooter,
-} from "@/editor/chrome-ui";
+import { ModalRoot, ModalContent, ModalTitle, ModalDescription, ModalFooter, Button } from "@/editor/chrome-ui";
 import type { DesignToken } from "../../types";
-import { Button } from "@/editor/chrome-ui";
 
 export interface TokenReplaceModalProps {
   open: boolean;

@@ -4,13 +4,12 @@
  */
 
 import * as React from "react";
-import { HelpTooltip } from "@/editor/chrome-ui";
+import { HelpTooltip, Button, TextInput } from "@/editor/chrome-ui";
 import { InputRow } from "../../shared/controls";
 import { baseStyles } from "../../shared/controls/controlStyles";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
 import { PositionPreview } from "./previews";
 import { cardBtn, positionOffsetContainerStyle, positionOffsetBoxStyle } from "./styles";
-import { Button, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================

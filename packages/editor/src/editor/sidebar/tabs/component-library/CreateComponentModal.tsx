@@ -17,18 +17,12 @@
 // right-click, the shell one is the lightweight sidebar header variant.
 
 import * as React from "react";
-import {
-  ModalClose,
-  ModalContent,
-  ModalRoot,
-  ModalTitle,
-} from "@/editor/chrome-ui";
+import { ModalClose, ModalContent, ModalRoot, ModalTitle, Button, Checkbox, Select, TextInput } from "@/editor/chrome-ui";
 import {
   dialogCancelBtnStyles,
   dialogInputStyles,
   dialogPrimaryBtnStyles,
 } from "./styles";
-import { Button, Checkbox, Select, TextInput } from "@/editor/chrome-ui";
 
 export interface SelectionContext {
   selectionIds: readonly string[];

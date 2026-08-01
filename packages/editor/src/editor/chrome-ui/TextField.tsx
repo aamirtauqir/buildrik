@@ -3,8 +3,8 @@
  *
  * flowbite-react's `TextInput` structurally cannot route a consumer
  * `className` to the real `<input>` (it lands on an outer wrapper `<div>`
- * only — see `src/editor/ui/textInputTheme.ts`'s header for the full
- * finding). A real slice of call sites in this codebase supply a bespoke,
+ * only — flowbite's own theme has no slot for it, which is why this
+ * component exists at all). A real slice of call sites supply a bespoke,
  * fully self-sufficient local CSS class for a control that doesn't look
  * like a form text field at all (search bars, inline-rename fields, range
  * sliders drawn as flat tracks, hex swatches) — `TextInput`'s wrapper-div

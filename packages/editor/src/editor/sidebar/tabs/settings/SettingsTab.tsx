@@ -11,7 +11,7 @@
  */
 
 import * as React from "react";
-import { ConfirmDialog, PanelFrame } from "@/editor/chrome-ui";
+import { ConfirmDialog, PanelFrame, Button } from "@/editor/chrome-ui";
 import { usePanelNavigation } from "../../shared/usePanelNavigation";
 import { DrillInHeader } from "../../shared/DrillInHeader";
 import {
@@ -45,7 +45,6 @@ import { PublishHistory } from "@/editor/shell/PublishHistory";
 import { EVENTS } from "@/shared/constants/events";
 import { currentSiteId } from "@/services/ReviewService";
 import "./settings.css";
-import { Button } from "@/editor/chrome-ui";
 // ─── Nav definition ──────────────────────────────────────────────────────────
 //
 // A1 day-1: nav reshuffle to 10 in-tab sections + 8 workspace deep-links,

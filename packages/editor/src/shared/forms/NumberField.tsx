@@ -10,8 +10,7 @@
  */
 
 import * as React from "react";
-import { FormField } from "@/editor/chrome-ui";
-import { TextInput } from "@/editor/chrome-ui";
+import { FormField, TextInput } from "@/editor/chrome-ui";
 
 export interface NumberFieldProps {
   label?: string;

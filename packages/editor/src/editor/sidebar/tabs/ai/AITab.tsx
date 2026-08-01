@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ConfirmDialog, PanelFrame } from "@/editor/chrome-ui";
+import { ConfirmDialog, PanelFrame, Button } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import { ScopeChip } from "./ScopeChip";
 import { ChatThread } from "./ChatThread";
@@ -14,7 +14,6 @@ import { applyAiEdit } from "./applySetStyle";
 import { trackAiEditApplied } from "@/services/ai/adoptionTracker";
 import { DEFAULT_MODEL, type AIModel, type ChatMessage, type DiffEdit } from "./types";
 import "./AITab.css";
-import { Button } from "@/editor/chrome-ui";
 
 export interface AITabProps {
   composer: Composer | null;

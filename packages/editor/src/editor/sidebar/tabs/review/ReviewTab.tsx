@@ -18,7 +18,7 @@
 
 import * as React from "react";
 import { AlertCircle, CheckCircle2, ChevronLeft, History } from "lucide-react";
-import { ConfirmDialog, PanelHeader, Spinner } from "@/editor/chrome-ui";
+import { ConfirmDialog, PanelHeader, Spinner, Badge, Button, Textarea, ToggleSwitch } from "@/editor/chrome-ui";
 import { ApprovedCompareView } from "@/editor/panels/version-history/ApprovedCompareView";
 import type { PublishPage } from "@/editor/shell/exportPublishPages";
 import {
@@ -32,7 +32,6 @@ import {
   type CurrentRound,
   type ReviewComment,
 } from "../../../../services/ReviewService";
-import { Badge, Button, Textarea, ToggleSwitch } from "@/editor/chrome-ui";
 /** Review's own status words onto flowbite Badge color + text-color override
  *  (flowbite's badge color presets don't hex-match --bk-success-text/
  *  --bk-warning-tint/--bk-error-text exactly — see docs/plans/

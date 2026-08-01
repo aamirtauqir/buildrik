@@ -10,8 +10,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { ModalClose, ModalContent, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
-import { Button } from "@/editor/chrome-ui";
+import { ModalClose, ModalContent, ModalRoot, ModalTitle, Button } from "@/editor/chrome-ui";
 
 export interface DetachConfirmModalProps {
   /** Label for the instance being detached, e.g. "#3". */

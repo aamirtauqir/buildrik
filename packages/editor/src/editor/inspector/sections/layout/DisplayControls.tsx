@@ -4,11 +4,10 @@
  */
 
 import * as React from "react";
-import { HelpTooltip } from "@/editor/chrome-ui";
+import { HelpTooltip, Button } from "@/editor/chrome-ui";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
 import { DisplayPreview } from "./previews";
 import { cardBtn, tipBoxStyle } from "./styles";
-import { Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================

@@ -6,8 +6,7 @@
  */
 
 import * as React from "react";
-import { EmptyState } from "@/editor/chrome-ui";
-import { Button } from "@/editor/chrome-ui";
+import { EmptyState, Button } from "@/editor/chrome-ui";
 
 export interface PanelErrorStateProps {
   /** Error message to display */

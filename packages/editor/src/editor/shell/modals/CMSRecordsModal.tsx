@@ -13,13 +13,7 @@ import * as React from "react";
 import { Plus, Trash2, Pencil } from "lucide-react";
 import type { Composer } from "../../../engine";
 import type { CMSCollection, CMSContentItem, CMSField } from "../../../shared/types/cms";
-import {
-  ModalClose,
-  ModalContent,
-  ModalRoot,
-  ModalTitle,
-} from "@/editor/chrome-ui";
-import { Button, Checkbox, Select, Textarea, TextInput } from "@/editor/chrome-ui";
+import { ModalClose, ModalContent, ModalRoot, ModalTitle, Button, Checkbox, Select, Textarea, TextInput } from "@/editor/chrome-ui";
 
 export interface CMSRecordsModalProps {
   composer: Composer | null;

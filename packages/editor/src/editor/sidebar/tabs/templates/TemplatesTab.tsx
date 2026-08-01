@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { PanelFrame, useToast } from "@/editor/chrome-ui";
+import { PanelFrame, useToast, Button, TextField } from "@/editor/chrome-ui";
 import { Search, X } from "lucide-react";
 import type { Composer } from "../../../../engine";
 import { DrillInHeader } from "../../shared/DrillInHeader";
@@ -28,8 +28,6 @@ import { snapshotFromComputedStyle } from "./utils/tokenSnapshot";
 import { DEFAULT_TOKENS } from "../../../design-system/constants";
 import { ApplyProgressOverlay } from "./ApplyProgressOverlay";
 import "./TemplatesTab.css";
-import { Button } from "@/editor/chrome-ui";
-import { TextField } from "@/editor/chrome-ui";
 
 // Re-export for external consumers
 export type { TemplateItem, RecentTemplate } from "./templatesData";

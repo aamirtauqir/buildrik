@@ -13,11 +13,10 @@
  */
 
 import * as React from "react";
-import { IconButton } from "@/editor/chrome-ui";
+import { IconButton, TextInput } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../../engine";
 import type { FolderItem, PageItem } from "../types";
 import { PageRow } from "./PageRow";
-import { TextInput } from "@/editor/chrome-ui";
 
 interface Props {
   folder: FolderItem;

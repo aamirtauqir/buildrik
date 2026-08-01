@@ -9,7 +9,7 @@
  */
 
 import * as React from "react";
-import { TextField } from "@/editor/chrome-ui";
+import { TextField, Button, TextInput } from "@/editor/chrome-ui";
 import Cropper from "react-easy-crop";
 import type { Area, Point } from "react-easy-crop";
 import {
@@ -17,7 +17,6 @@ import {
   Crop, SlidersHorizontal, Maximize, Download, AlertTriangle, Eye,
 } from "lucide-react";
 import "./ImageEditorModal.css";
-import { Button, TextInput } from "@/editor/chrome-ui";
 // ============================================
 // Types
 // ============================================

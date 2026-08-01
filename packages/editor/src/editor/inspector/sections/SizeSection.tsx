@@ -1,4 +1,4 @@
-import { Popover } from "@/editor/chrome-ui";
+import { Popover, Button, Select } from "@/editor/chrome-ui";
 /**
  * Size Section - Width, Height, Min/Max dimensions
  * CP3: W and H rows each have a hover-reveal chain button that opens a spacing
@@ -12,7 +12,6 @@ import { useSpacingRegistry } from "@/editor/design-system/state/TokenRegistryCo
 import { TokenPickerPopover } from "../shared/TokenPickerPopover";
 import { Section, InputWithUnit, MoreSettingsToggle, type SectionTier, MixedValueIndicator } from "../shared/controls";
 import { getCssVariable } from "@/shared/utils/getCssVariable";
-import { Button, Select } from "@/editor/chrome-ui";
 // ============================================================================
 // HELPERS
 // ============================================================================

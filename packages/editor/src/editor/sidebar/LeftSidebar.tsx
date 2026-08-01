@@ -15,7 +15,7 @@ import { getTabWidth, getTabConfig, getTabsByZone, getRailTools, getTabsByTool, 
 import { getEditorViewMode } from "../../shared/utils/editorViewMode";
 import type { BlockData } from "../../shared/types";
 import type { UsePublishJobResult } from "../shell/hooks/usePublishJob";
-import { ConfirmDialog } from "@/editor/chrome-ui";
+import { ConfirmDialog, Button, Tooltip } from "@/editor/chrome-ui";
 import { InspectorErrorBoundary } from "../inspector/components/InspectorErrorBoundary";
 import { PanelSkeleton, SidebarErrorFallback } from "./SidebarFallbacks";
 import { TabRouter } from "./TabRouter";
@@ -34,7 +34,6 @@ import {
   Rocket,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { Button, Tooltip } from "@/editor/chrome-ui";
 // ============================================
 // Icon map — lucide icon name → component
 // ============================================

@@ -6,12 +6,11 @@
  */
 
 import * as React from "react";
-import { PanelHeader } from "@/editor/chrome-ui";
+import { PanelHeader, useToast, Button } from "@/editor/chrome-ui";
 import { PanelErrorState } from "../../../editor/sidebar/shared/PanelErrorState";
 import type { Composer } from "../../../engine/Composer";
 import { EVENTS } from "../../../shared/constants/events";
 import type { DesignTokenRecord } from "../../../shared/types/project";
-import { useToast } from "@/editor/chrome-ui";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { DEFAULT_TOKENS } from "../constants";
 import {
@@ -63,7 +62,6 @@ import { TokensSection } from "./sections/TokensSection";
 import { StylesSection, useStylesSectionTotalDirty } from "./sections/StylesSection";
 import { ComponentsSection } from "./sections/ComponentsSection";
 import { ExportSection } from "./sections/ExportSection";
-import { Button } from "@/editor/chrome-ui";
 // ─── Layout ───────────────────────────────────────────────────────────────────
 
 const containerStyles: React.CSSProperties = {

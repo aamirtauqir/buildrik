@@ -9,9 +9,8 @@
  */
 
 import * as React from "react";
-import { Kbd, ModalContent, ModalRoot } from "@/editor/chrome-ui";
+import { Kbd, ModalContent, ModalRoot, Button } from "@/editor/chrome-ui";
 import { tokens } from "../shared/tokens";
-import { Button } from "@/editor/chrome-ui";
 
 export interface KeyboardCheatSheetProps {
   isOpen: boolean;

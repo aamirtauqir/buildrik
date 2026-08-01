@@ -7,8 +7,7 @@
 
 import { Info, X } from "lucide-react";
 import * as React from "react";
-import { TextField } from "@/editor/chrome-ui";
-import { BK_SELECT_BARE_UNIT_THEME, BK_SELECT_BARE_VALUE_THEME, Button, Select, Textarea, TextInput, Tooltip } from "@/editor/chrome-ui";
+import { TextField, BK_SELECT_BARE_UNIT_THEME, BK_SELECT_BARE_VALUE_THEME, Button, Select, Textarea, TextInput, Tooltip } from "@/editor/chrome-ui";
 // ============================================================================
 // HELPERS
 // ============================================================================

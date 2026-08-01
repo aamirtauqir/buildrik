@@ -20,7 +20,7 @@ import { ConfirmDeleteModal } from "../sidebar/tabs/media/components/ConfirmDele
 import { MediaContextMenu } from "../sidebar/tabs/media/components/MediaContextMenu";
 import { AssetDetailOverlay } from "../sidebar/tabs/media/components/AssetDetailOverlay";
 import { STORAGE_QUOTA_BYTES } from "../../shared/constants/media";
-import { useToast } from "@/editor/chrome-ui";
+import { useToast, Button, TextInput } from "@/editor/chrome-ui";
 import type { LibraryItem } from "../sidebar/tabs/media/data/mediaTypes";
 import type { IconConfig } from "../../shared/types/media";
 import { FolderTree, type SmartFolder } from "./components/FolderTree";
@@ -31,7 +31,6 @@ import { formatBytes } from "@shared/utils/helpers/number";
 import { generateAltTextRemote } from "../../services/AltTextService";
 import { DEFAULT_MODEL } from "@buildrik/shared/schemas/ai";
 import "./LibraryManager.css";
-import { Button, TextInput } from "@/editor/chrome-ui";
 
 interface LibraryManagerProps {
   composer: Composer;

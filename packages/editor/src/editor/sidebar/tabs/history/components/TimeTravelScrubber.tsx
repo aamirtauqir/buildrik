@@ -22,8 +22,7 @@ import type { Composer } from "../../../../../engine";
 import type { HistoryDisplayEntry } from "../../../../../engine/HistoryManager";
 import type { NamedVersion } from "../../../../../shared/types/versions";
 import { useReducedMotion } from "../../../../../shared/hooks/useReducedMotion";
-import { Button } from "@/editor/chrome-ui";
-import { TextField } from "@/editor/chrome-ui";
+import { Button, TextField } from "@/editor/chrome-ui";
 
 interface TimeTravelScrubberProps {
   composer: Composer | null;

@@ -11,9 +11,8 @@
 
 import { X, Plus, Trash2, Check } from "lucide-react";
 import * as React from "react";
-import { ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
+import { ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Button, Select, Textarea, TextInput } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
-import { Button, Select, Textarea, TextInput } from "@/editor/chrome-ui";
 // =============================================================================
 // TYPES
 // =============================================================================

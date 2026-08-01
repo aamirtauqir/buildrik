@@ -7,8 +7,7 @@
  */
 
 import * as React from "react";
-import { FormField } from "@/editor/chrome-ui";
-import { Textarea } from "@/editor/chrome-ui";
+import { FormField, Textarea } from "@/editor/chrome-ui";
 
 export interface TextareaFieldProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;

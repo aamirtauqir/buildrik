@@ -7,7 +7,7 @@
  */
 
 import * as React from "react";
-import { ModalClose, ModalContent, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
+import { ModalClose, ModalContent, ModalRoot, ModalTitle, Button, TextInput } from "@/editor/chrome-ui";
 import {
   ICON_CATEGORIES,
   getAllIcons,
@@ -20,7 +20,6 @@ import {
 } from "../../shared/constants/icons";
 import { InputField } from "../../shared/forms";
 import type { IconConfig, IconLibrary } from "../../shared/types/media";
-import { Button, TextInput } from "@/editor/chrome-ui";
 // ============================================
 // Types
 // ============================================

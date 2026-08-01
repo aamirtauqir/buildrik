@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { ModalContent, ModalRoot } from "@/editor/chrome-ui";
+import { ModalContent, ModalRoot, Button } from "@/editor/chrome-ui";
 import { X, Download, SquareArrowOutUpRight } from "lucide-react";
 import { SearchBar } from "../../../shared/SearchBar";
 import type {
@@ -16,7 +16,6 @@ import type {
   MediaTypeFilter,
 } from "../data/mediaTypes";
 import type { IconConfig } from "../../../../../shared/types/media";
-import { Button } from "@/editor/chrome-ui";
 
 interface StockSourceModalProps extends DiscoveryViewProps {
   open: boolean;

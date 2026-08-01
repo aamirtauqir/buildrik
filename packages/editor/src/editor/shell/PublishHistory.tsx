@@ -14,8 +14,7 @@
 
 import * as React from "react";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
-import { ConfirmDialog, Spinner } from "@/editor/chrome-ui";
-import { Badge, Button } from "@/editor/chrome-ui";
+import { ConfirmDialog, Spinner, Badge, Button } from "@/editor/chrome-ui";
 import { useEditorRole } from "./hooks/useEditorRole";
 import { roleAtLeast } from "@/services/RoleService";
 import {

@@ -12,9 +12,8 @@
  */
 
 import * as React from "react";
-import { ModalContent as VibcoderModalContent, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
+import { ModalContent as VibcoderModalContent, ModalRoot, ModalTitle, Button } from "@/editor/chrome-ui";
 import { ROW_MD } from "@shared/constants/layout";
-import { Button } from "@/editor/chrome-ui";
 // Phase 5 escape: Radix.Dialog.Content props (onOpenAutoFocus) are hidden
 // from vibcoder's public ModalContentProps per Contract E2 (no Radix types
 // leaked). Vibcoder's ModalContent still spreads these to Radix at runtime.

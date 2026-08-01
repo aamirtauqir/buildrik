@@ -10,9 +10,7 @@
 
 import { ChevronDown, Layers, Plus } from "lucide-react";
 import * as React from "react";
-import { ConfirmDialog, EmptyState, EmptyStateDesc, EmptyStateTitle, ModalClose, ModalContent, ModalRoot, ModalTitle, PanelFrame } from "@/editor/chrome-ui";
-import { useToast } from "@/editor/chrome-ui";
-import { SkeletonListItem } from "@/editor/chrome-ui";
+import { ConfirmDialog, EmptyState, EmptyStateDesc, EmptyStateTitle, ModalClose, ModalContent, ModalRoot, ModalTitle, PanelFrame, useToast, SkeletonListItem, Button, TextInput } from "@/editor/chrome-ui";
 import { PanelErrorState } from "../shared/PanelErrorState";
 import { SearchBar } from "../shared/SearchBar";
 import { ComponentDetailScreen } from "./component-library/ComponentDetailScreen";
@@ -30,7 +28,6 @@ import type { ComponentsTabProps } from "./component-library/types";
 import { useComponentsState } from "./component-library/useComponentsState";
 import { type ComponentFilter, FILTER_CHIPS } from "./componentsData";
 import "./component-library/ComponentsTab.css";
-import { Button, TextInput } from "@/editor/chrome-ui";
 export type { ComponentsTabProps };
 
 export const ComponentsTab: React.FC<ComponentsTabProps> = ({
