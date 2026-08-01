@@ -11,12 +11,15 @@
  * to earn it. `applyAutoFix` returns the new value, or null when it cannot
  * safely rewrite the token; null is the fix-failed branch.
  *
+ * The issue line is chrome-ui's Row, not a hand-built role="button" div: Row
+ * already owns that exact contract (role, tabIndex, Enter/Space, disabled).
+ *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
 import { AlertCircle, CheckCircle2, Info } from "lucide-react";
-import { PanelHeader, Button } from "@/editor/chrome-ui";
+import { PanelHeader, Button, EmptyState, Progress, Row } from "@/editor/chrome-ui";
 import { issueAppliesToPage, type Issue } from "./hooks/useStudioState";
 
 export interface IssuesPanelProps {
@@ -50,36 +53,20 @@ function isFixable(i: Issue): boolean {
   return Boolean(i.tokenId && i.autoFixHint);
 }
 
-const TONE: Record<Issue["type"], { icon: React.ReactNode; color: string }> = {
-  error: { icon: <AlertCircle size={14} aria-hidden="true" />, color: "var(--bk-error)" },
-  warning: { icon: <AlertCircle size={14} aria-hidden="true" />, color: "var(--bk-warning-text)" },
-  info: { icon: <Info size={14} aria-hidden="true" />, color: "var(--bk-ink-muted)" },
+const TONE: Record<Issue["type"], { icon: React.ReactNode; className: string }> = {
+  error: { icon: <AlertCircle size={14} aria-hidden="true" />, className: "tw:text-[var(--bk-error)]" },
+  warning: { icon: <AlertCircle size={14} aria-hidden="true" />, className: "tw:text-[var(--bk-warning-text)]" },
+  info: { icon: <Info size={14} aria-hidden="true" />, className: "tw:text-gray-500" },
 };
 
-const S: Record<string, React.CSSProperties> = {
-  body: { display: "flex", flexDirection: "column", height: "100%", minHeight: 0 },
-  toolbar: { display: "flex", alignItems: "center", gap: 6, padding: "8px 12px", borderBottom: "1px solid var(--bk-border)" },
-  summary: { fontSize: 12, color: "var(--bk-ink-muted)", padding: "6px 12px" },
-  scroll: { flex: 1, minHeight: 0, overflowY: "auto", padding: "4px 12px 12px" },
-  rowShell: { display: "flex", alignItems: "flex-start", gap: 6, marginBottom: 6 },
-  row: { display: "flex", gap: 8, padding: "8px 10px", border: "1px solid var(--bk-border)", borderRadius: "var(--bk-radius-lg)", cursor: "pointer", alignItems: "flex-start", flex: 1, minWidth: 0, textAlign: "left", background: "transparent" },
-  msg: { fontSize: 13, color: "var(--bk-ink)", lineHeight: 1.4 },
-  loc: { fontSize: 11, fontWeight: 500, color: "var(--bk-ink-muted)", marginTop: 2 },
-  rowMain: { display: "flex", flexDirection: "column", minWidth: 0, flex: 1 },
-  // fixing — accent-tint band (Figma 164:48)
-  fixing: { background: "var(--bk-accent-tint)", padding: "10px 12px", borderBottom: "1px solid var(--bk-border)" },
-  fixingLabel: { fontSize: 12, color: "var(--bk-accent-text)" },
-  track: { height: 6, background: "var(--bk-bg-card)", borderRadius: "var(--bk-radius-sm)", overflow: "hidden", margin: "8px 0 6px" },
-  fill: { height: 6, background: "var(--bk-accent)", borderRadius: "var(--bk-radius-sm)", width: "60%" },
-  undoNote: { fontSize: 11, fontWeight: 500, color: "var(--bk-ink-muted)" },
-  // fix-failed — warning-tint band (Figma 164:63)
-  failed: { background: "var(--bk-warning-tint)", padding: "10px 12px", borderBottom: "1px solid var(--bk-border)" },
-  failedTitle: { fontSize: 12, color: "var(--bk-error-text)" },
-  failedWhy: { fontSize: 11, fontWeight: 500, color: "var(--bk-ink-muted)", lineHeight: 1.45, marginTop: 6 },
-  failedActions: { display: "flex", gap: 8, marginTop: 8 },
-  center: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, padding: 28, textAlign: "center", color: "var(--bk-ink-muted)" },
-  centerTitle: { fontSize: 14, fontWeight: 600, color: "var(--bk-ink)" },
-};
+const BODY = "tw:flex tw:flex-col tw:h-full tw:min-h-0";
+const TOOLBAR = "tw:flex tw:items-center tw:gap-1.5 tw:px-3 tw:py-2 tw:border-b tw:border-gray-200";
+const SUMMARY = "tw:text-xs tw:text-gray-500 tw:px-3 tw:py-1.5";
+const SCROLL = "tw:flex-1 tw:min-h-0 tw:overflow-y-auto tw:pt-1 tw:px-3 tw:pb-3";
+/** The fixing / fix-failed bands differ only by tint. */
+const BAND = "tw:px-3 tw:py-2.5 tw:border-b tw:border-gray-200";
+/** The quiet button look, previously copy-pasted onto six separate Buttons. */
+const GHOST = "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900";
 
 const FILTERS: { key: Filter; label: string }[] = [
   { key: "all", label: "All" },
@@ -126,122 +113,122 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
   const warnCount = scoped.filter((i) => i.type === "warning").length;
   const visible = filter === "all" ? scoped : scoped.filter((i) => i.type === filter);
 
+  /** Selected reads as the primary action, unselected as a quiet one. */
+  const segment = (selected: boolean) => ({
+    color: selected ? undefined : ("light" as const),
+    className: selected ? undefined : GHOST,
+  });
+
   return (
-    <div style={S.body}>
+    <div className={BODY}>
       <PanelHeader title="Issues" onClose={onClose} />
 
       {issues.length === 0 ? (
-        <div style={S.center}>
-          <CheckCircle2 size={24} aria-hidden="true" />
-          <div style={S.centerTitle}>No issues</div>
-          <div style={S.summary}>Your site is clean — nothing to fix.</div>
-        </div>
+        <EmptyState
+          className="tw:flex-1"
+          icon={<CheckCircle2 size={24} aria-hidden="true" />}
+          title="No issues"
+          body="Your site is clean — nothing to fix."
+        />
       ) : (
         <>
           {anyPageBound && (
-            <div style={S.toolbar} role="group" aria-label="Issue scope">
-              <Button
-                color={scope === "page" ? undefined : "light"}
-                size="xs"
-                onClick={() => setScope("page")}
-                className={scope === "page" ? undefined : "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"}
-              >
+            <div className={TOOLBAR} role="group" aria-label="Issue scope">
+              <Button size="xs" onClick={() => setScope("page")} {...segment(scope === "page")}>
                 This page
               </Button>
-              <Button
-                color={scope === "site" ? undefined : "light"}
-                size="xs"
-                onClick={() => setScope("site")}
-                className={scope === "site" ? undefined : "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"}
-              >
+              <Button size="xs" onClick={() => setScope("site")} {...segment(scope === "site")}>
                 All pages
               </Button>
             </div>
           )}
-          <div style={S.toolbar}>
+          <div className={TOOLBAR}>
             {FILTERS.map((f) => (
-              <Button
-                key={f.key}
-                color={filter === f.key ? undefined : "light"}
-                size="xs"
-                onClick={() => setFilter(f.key)}
-                className={filter === f.key ? undefined : "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"}
-              >
+              <Button key={f.key} size="xs" onClick={() => setFilter(f.key)} {...segment(filter === f.key)}>
                 {f.label}
               </Button>
             ))}
           </div>
-          <div style={S.summary}>
+          <div className={SUMMARY}>
             {errorCount} error{errorCount === 1 ? "" : "s"} · {warnCount} warning{warnCount === 1 ? "" : "s"}
           </div>
 
           {fixing && (
-            <div style={S.fixing} role="status" aria-live="polite">
-              <div style={S.fixingLabel}>Fixing {fixing.message.toLowerCase()}…</div>
-              <div style={S.track}>
-                <div style={S.fill} />
+            <div className={`${BAND} tw:bg-[var(--bk-accent-tint)]`} role="status" aria-live="polite">
+              <div className="tw:text-xs tw:text-[var(--bk-accent-text)]">
+                Fixing {fixing.message.toLowerCase()}…
               </div>
-              <div style={S.undoNote}>Auto-fix lands as ONE undo step.</div>
+              {/* The engine reports no percentage, so this bar has always been a
+                  fixed activity indicator rather than real progress. It is
+                  flowbite's Progress now instead of a hand-built track+fill. */}
+              <div className="tw:my-2">
+                <Progress progress={60} size="sm" aria-label="Applying the fix" />
+              </div>
+              <div className="tw:text-[11px] tw:font-medium tw:text-gray-500">
+                Auto-fix lands as ONE undo step.
+              </div>
             </div>
           )}
 
           {failed && (
-            <div style={S.failed} role="alert">
-              <div style={S.failedTitle}>Couldn&apos;t fix this automatically.</div>
-              <div style={S.failedWhy}>
+            <div className={`${BAND} tw:bg-[var(--bk-warning-tint)]`} role="alert">
+              <div className="tw:text-xs tw:text-[var(--bk-error-text)]">Couldn&apos;t fix this automatically.</div>
+              <div className="tw:text-[11px] tw:font-medium tw:text-gray-500 tw:leading-[1.45] tw:mt-1.5">
                 {failed.location ?? "This value"} comes from your brand tokens, so changing it here
                 would change every site using them.
               </div>
-              <div style={S.failedActions}>
-                <Button color="light" size="xs" onClick={() => { setFailed(null); onOpenBrand?.(); }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+              <div className="tw:flex tw:gap-2 tw:mt-2">
+                <Button color="light" size="xs" className={GHOST} onClick={() => { setFailed(null); onOpenBrand?.(); }}>
                   Open Brand
                 </Button>
                 <Button
                   color="light"
                   size="xs"
+                  className={GHOST}
                   onClick={() => {
                     if (failed.tokenId) onIgnore?.(failed.tokenId);
                     setFailed(null);
-                  }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+                  }}
                 >
                   Ignore once
                 </Button>
               </div>
             </div>
           )}
-          <div style={S.scroll}>
+          <div className={SCROLL}>
             {visible.length === 0 ? (
-              <div style={S.center}>
-                <CheckCircle2 size={24} aria-hidden="true" />
-                <div style={S.centerTitle}>No {filter === "error" ? "errors" : "warnings"}</div>
-              </div>
+              <EmptyState
+                className="tw:flex-1"
+                icon={<CheckCircle2 size={24} aria-hidden="true" />}
+                title={`No ${filter === "error" ? "errors" : "warnings"}`}
+              />
             ) : (
               visible.map((i) => (
                 // Fix sits BESIDE the navigate target, never inside it — a
                 // button nested in a role="button" is invalid, and it also
                 // swallows the outer element's accessible name.
-                <div key={i.id} style={S.rowShell}>
-                  <div
-                    role="button"
-                    tabIndex={0}
-                    style={S.row}
+                <div key={i.id} className="tw:flex tw:items-start tw:gap-1.5 tw:mb-1.5">
+                  <Row
+                    size="comment"
+                    interactive
+                    className="tw:flex-1 tw:min-w-0"
                     onClick={() => onSelectElement?.(i.id)}
-                    onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onSelectElement?.(i.id); } }}
                   >
-                    <span style={{ color: TONE[i.type].color, marginTop: 1, flexShrink: 0 }}>
-                      {TONE[i.type].icon}
+                    <span className={`tw:flex-none tw:mt-px ${TONE[i.type].className}`}>{TONE[i.type].icon}</span>
+                    <span className="tw:flex tw:flex-col tw:flex-1 tw:min-w-0">
+                      <span>{i.message}</span>
+                      {i.location && (
+                        <span className="tw:text-[11px] tw:font-medium tw:text-gray-500 tw:mt-0.5">{i.location}</span>
+                      )}
                     </span>
-                    <span style={S.rowMain}>
-                      <span style={S.msg}>{i.message}</span>
-                      {i.location && <span style={S.loc}>{i.location}</span>}
-                    </span>
-                  </div>
+                  </Row>
                   {isFixable(i) && onFix && (
                     <Button
                       color="light"
                       size="xs"
+                      className={GHOST}
                       disabled={fixing !== null}
-                      onClick={() => void runFix(i)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+                      onClick={() => void runFix(i)}
                     >
                       Fix ›
                     </Button>
