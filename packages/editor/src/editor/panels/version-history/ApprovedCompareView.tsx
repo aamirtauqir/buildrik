@@ -28,7 +28,7 @@ import {
   RefreshCw,
   type LucideIcon,
 } from "lucide-react";
-import { Slider, Button, Select } from "@/editor/chrome-ui";
+import { Slider, Button, EmptyState, Select, Toolbar, ToolbarSpacer } from "@/editor/chrome-ui";
 import {
   compareApprovedToCurrent,
   type ComparePage,
@@ -46,49 +46,48 @@ export interface ApprovedCompareViewProps {
 
 type Mode = "split" | "overlay" | "list";
 
-const KIND: Record<CompareChangeKind, { icon: LucideIcon; color: string; label: string }> = {
-  content: { icon: File, color: "var(--bk-accent)", label: "Content" },
-  style: { icon: Palette, color: "var(--bk-warning-text)", label: "Style" },
-  added: { icon: Plus, color: "var(--bk-success)", label: "Added" },
-  removed: { icon: Minus, color: "var(--bk-error)", label: "Removed" },
-  moved: { icon: GripVertical, color: "var(--bk-ink-soft)", label: "Moved" },
+const KIND: Record<CompareChangeKind, { icon: LucideIcon; className: string; label: string }> = {
+  content: { icon: File, className: "tw:text-blue-700", label: "Content" },
+  style: { icon: Palette, className: "tw:text-[var(--bk-warning-text)]", label: "Style" },
+  added: { icon: Plus, className: "tw:text-[var(--bk-success)]", label: "Added" },
+  removed: { icon: Minus, className: "tw:text-[var(--bk-error)]", label: "Removed" },
+  moved: { icon: GripVertical, className: "tw:text-gray-400", label: "Moved" },
 };
 
 const KIND_ORDER: CompareChangeKind[] = ["added", "removed", "moved", "content", "style"];
 
-const S: Record<string, React.CSSProperties> = {
-  body: { display: "flex", flexDirection: "column", height: "100%", minHeight: 0 },
-  toolbar: { display: "flex", alignItems: "center", gap: 6, padding: "8px 12px", borderBottom: "1px solid var(--bk-border)", flexWrap: "wrap" },
-  spacer: { flex: 1 },
-  stage: { flex: 1, minHeight: 0, display: "flex", gap: 8, padding: 8, overflow: "hidden" },
-  pane: { flex: 1, minWidth: 0, display: "flex", flexDirection: "column", border: "1px solid var(--bk-border)", borderRadius: "var(--bk-radius-lg)", overflow: "hidden", background: "var(--bk-bg-panel)" },
-  paneLabel: { fontSize: 11, fontWeight: 600, color: "var(--bk-ink-muted)", padding: "6px 10px", borderBottom: "1px solid var(--bk-border)", textTransform: "uppercase", letterSpacing: "0.04em" },
-  frame: { flex: 1, minHeight: 0, border: "none", width: "100%", background: "#fff" },
-  overlayWrap: { flex: 1, position: "relative", minHeight: 0 },
-  overlayFrame: { position: "absolute", inset: 0, border: "none", width: "100%", height: "100%", background: "#fff" },
-  placeholder: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, color: "var(--bk-ink-muted)", fontSize: 13, textAlign: "center", padding: 24 },
-  legend: { display: "flex", gap: 12, flexWrap: "wrap", padding: "6px 12px", borderTop: "1px solid var(--bk-border)", fontSize: 11, color: "var(--bk-ink-muted)" },
-  legendItem: { display: "flex", alignItems: "center", gap: 4 },
-  listScroll: { flex: 1, minHeight: 0, overflowY: "auto", padding: "4px 12px 12px" },
-  listRow: { display: "flex", gap: 8, padding: "8px 10px", border: "1px solid var(--bk-border)", borderRadius: "var(--bk-radius-lg)", marginBottom: 6, alignItems: "flex-start" },
-  listMain: { display: "flex", flexDirection: "column", gap: 2, minWidth: 0 },
-  listLabel: { fontSize: 13, color: "var(--bk-ink)", fontWeight: 500 },
-  listDetail: { fontSize: 12, color: "var(--bk-ink-muted)" },
-  kindTag: { fontSize: 11, fontWeight: 600, flexShrink: 0, display: "flex", alignItems: "center", gap: 3 },
-  center: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, padding: 28, textAlign: "center", color: "var(--bk-ink-muted)" },
-  centerTitle: { fontSize: 14, fontWeight: 600, color: "var(--bk-ink)" },
-  summary: { fontSize: 12, color: "var(--bk-ink-muted)", padding: "6px 12px" },
-};
-
+const BODY = "tw:flex tw:flex-col tw:h-full tw:min-h-0";
+const STAGE = "tw:flex-1 tw:min-h-0 tw:flex tw:gap-2 tw:p-2 tw:overflow-hidden";
+const PANE =
+  "tw:flex-1 tw:min-w-0 tw:flex tw:flex-col tw:border tw:border-gray-200 tw:rounded-lg " +
+  "tw:overflow-hidden tw:bg-gray-50";
+const PANE_LABEL =
+  "tw:text-[11px] tw:font-semibold tw:text-gray-500 tw:px-2.5 tw:py-1.5 tw:border-b tw:border-gray-200 " +
+  "tw:uppercase tw:tracking-[0.04em]";
+/** The sandboxed iframe fills its pane. White, because it is the customer's
+ *  page — not a chrome surface that should follow a chrome background. */
+const FRAME = "tw:flex-1 tw:min-h-0 tw:border-0 tw:w-full tw:bg-white";
+const OVERLAY_FRAME = "tw:absolute tw:inset-0 tw:border-0 tw:w-full tw:h-full tw:bg-white";
+const PLACEHOLDER =
+  "tw:flex-1 tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-2 tw:text-gray-500 " +
+  "tw:text-[13px] tw:text-center tw:p-6";
+const LEGEND =
+  "tw:flex tw:gap-3 tw:flex-wrap tw:px-3 tw:py-1.5 tw:border-t tw:border-gray-200 tw:text-[11px] tw:text-gray-500";
+const LIST_SCROLL = "tw:flex-1 tw:min-h-0 tw:overflow-y-auto tw:pt-1 tw:px-3 tw:pb-3";
+const LIST_ROW = "tw:flex tw:gap-2 tw:px-2.5 tw:py-2 tw:border tw:border-gray-200 tw:rounded-lg tw:mb-1.5 tw:items-start";
+const LIST_DETAIL = "tw:text-xs tw:text-gray-500";
+const SUMMARY = "tw:text-xs tw:text-gray-500 tw:px-3 tw:py-1.5";
+/** The quiet button look, previously copy-pasted onto four separate Buttons. */
+const GHOST = "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900";
 function findPage(pages: ComparePage[] | null, path: string): ComparePage | undefined {
   return pages?.find((p) => p.path === path);
 }
 
-function Frame({ page, style }: { page: ComparePage | undefined; style: React.CSSProperties }) {
+function Frame({ page, className }: { page: ComparePage | undefined; className: string }) {
   if (!page) {
-    return <div style={S.placeholder}>Not present on this side</div>;
+    return <div className={PLACEHOLDER}>Not present on this side</div>;
   }
-  return <iframe title="compare" sandbox="" srcDoc={page.html} style={style} />;
+  return <iframe title="compare" sandbox="" srcDoc={page.html} className={className} />;
 }
 
 export const ApprovedCompareView: React.FC<ApprovedCompareViewProps> = ({
@@ -117,15 +116,13 @@ export const ApprovedCompareView: React.FC<ApprovedCompareViewProps> = ({
   // No stored snapshot — an explicit state, not an error (§3).
   if (approvedPages == null) {
     return (
-      <div style={S.body}>
-        <div style={S.center}>
-          <History size={24} aria-hidden="true" />
-          <div style={S.centerTitle}>No approved snapshot for this round</div>
-          <div style={S.summary}>
-            This review was sent before snapshots were captured, so there's nothing to compare
-            against. The next round you send will support Compare.
-          </div>
-        </div>
+      <div className={BODY}>
+        <EmptyState
+          className="tw:flex-1"
+          icon={<History size={24} aria-hidden="true" />}
+          title="No approved snapshot for this round"
+          body="This review was sent before snapshots were captured, so there's nothing to compare against. The next round you send will support Compare."
+        />
       </div>
     );
   }
@@ -139,20 +136,20 @@ export const ApprovedCompareView: React.FC<ApprovedCompareViewProps> = ({
     .sort((a, b) => KIND_ORDER.indexOf(a.kind) - KIND_ORDER.indexOf(b.kind));
 
   return (
-    <div style={S.body}>
-      <div style={S.toolbar}>
+    <div className={BODY}>
+      <Toolbar>
         {(["split", "overlay", "list"] as Mode[]).map((m) => (
           <Button
             key={m}
             color={mode === m ? undefined : "light"}
             size="xs"
             onClick={() => setMode(m)}
-            className={mode === m ? undefined : "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"}
+            className={mode === m ? undefined : GHOST}
           >
             {m === "split" ? "Side by side" : m === "overlay" ? "Overlay" : "List"}
           </Button>
         ))}
-        <div style={S.spacer} />
+        <ToolbarSpacer />
         {paths.length > 1 && (
           <Select
             value={path}
@@ -165,39 +162,40 @@ export const ApprovedCompareView: React.FC<ApprovedCompareViewProps> = ({
           </Select>
         )}
         {onRefreshCurrent && (
-          <Button color="light" size="xs" onClick={onRefreshCurrent} title="Re-render the current site" aria-label="Re-render the current site" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+          <Button color="light" size="xs" onClick={onRefreshCurrent} title="Re-render the current site" aria-label="Re-render the current site" className={GHOST}>
             <RefreshCw size={14} aria-hidden="true" />
           </Button>
         )}
-      </div>
+      </Toolbar>
 
       {mode === "list" ? (
         <>
-          <div style={S.summary}>
+          <div className={SUMMARY}>
             {result.changes.length === 0
               ? "No changes since approval."
               : KIND_ORDER.filter((k) => result.counts[k] > 0)
                   .map((k) => `${result.counts[k]} ${KIND[k].label.toLowerCase()}`)
                   .join(" · ")}
           </div>
-          <div style={S.listScroll}>
+          <div className={LIST_SCROLL}>
             {changesForPage.length === 0 ? (
-              <div style={S.center}>
-                <CheckCircle2 size={24} aria-hidden="true" />
-                <div style={S.centerTitle}>This page matches the approved version</div>
-              </div>
+              <EmptyState
+                className="tw:flex-1"
+                icon={<CheckCircle2 size={24} aria-hidden="true" />}
+                title="This page matches the approved version"
+              />
             ) : (
               changesForPage.map((c: CompareChange, i) => {
                 const KindIcon = KIND[c.kind].icon;
                 return (
-                <div key={`${c.key}-${c.kind}-${i}`} style={S.listRow}>
-                  <span style={{ ...S.kindTag, color: KIND[c.kind].color }}>
+                <div key={`${c.key}-${c.kind}-${i}`} className={LIST_ROW}>
+                  <span className={`tw:text-[11px] tw:font-semibold tw:flex-none tw:flex tw:items-center tw:gap-1 ${KIND[c.kind].className}`}>
                     <KindIcon size={14} aria-hidden="true" />
                     {KIND[c.kind].label}
                   </span>
-                  <div style={S.listMain}>
-                    <span style={S.listLabel}>{c.label}</span>
-                    <span style={S.listDetail}>{c.detail}</span>
+                  <div className="tw:flex tw:flex-col tw:gap-0.5 tw:min-w-0">
+                    <span className="tw:text-[13px] tw:font-medium tw:text-gray-900">{c.label}</span>
+                    <span className={LIST_DETAIL}>{c.detail}</span>
                   </div>
                 </div>
                 );
@@ -207,21 +205,23 @@ export const ApprovedCompareView: React.FC<ApprovedCompareViewProps> = ({
         </>
       ) : mode === "overlay" ? (
         <>
-          <div style={S.stage}>
-            <div style={S.overlayWrap}>
-              <Frame page={approvedPage} style={S.overlayFrame} />
+          <div className={STAGE}>
+            <div className="tw:flex-1 tw:relative tw:min-h-0">
+              <Frame page={approvedPage} className={OVERLAY_FRAME} />
               {currentReady ? (
-                <div style={{ ...S.overlayFrame, opacity: overlayOpacity }}>
-                  <Frame page={currentPage} style={S.overlayFrame} />
+                /* opacity is the slider's live value — a genuinely computed
+                   style, which is what an inline style is still for. */
+                <div className={OVERLAY_FRAME} style={{ opacity: overlayOpacity }}>
+                  <Frame page={currentPage} className={OVERLAY_FRAME} />
                 </div>
               ) : (
-                <div style={{ ...S.placeholder, position: "absolute", inset: 0 }}>Rendering current…</div>
+                <div className={`${PLACEHOLDER} tw:absolute tw:inset-0`}>Rendering current…</div>
               )}
             </div>
           </div>
-          <div style={S.toolbar}>
-            <span style={S.listDetail}>Approved</span>
-            <div style={{ flex: 1 }}>
+          <Toolbar edge="top">
+            <span className={LIST_DETAIL}>Approved</span>
+            <div className="tw:flex-1">
               <Slider
                 value={Math.round(overlayOpacity * 100)}
                 onChange={(v) => setOverlayOpacity(v / 100)}
@@ -232,32 +232,32 @@ export const ApprovedCompareView: React.FC<ApprovedCompareViewProps> = ({
                 withField={false}
               />
             </div>
-            <span style={S.listDetail}>Current</span>
-          </div>
+            <span className={LIST_DETAIL}>Current</span>
+          </Toolbar>
         </>
       ) : (
-        <div style={S.stage}>
-          <div style={S.pane}>
-            <div style={S.paneLabel}>Approved</div>
-            <Frame page={approvedPage} style={S.frame} />
+        <div className={STAGE}>
+          <div className={PANE}>
+            <div className={PANE_LABEL}>Approved</div>
+            <Frame page={approvedPage} className={FRAME} />
           </div>
-          <div style={S.pane}>
-            <div style={S.paneLabel}>Current</div>
+          <div className={PANE}>
+            <div className={PANE_LABEL}>Current</div>
             {currentReady ? (
-              <Frame page={currentPage} style={S.frame} />
+              <Frame page={currentPage} className={FRAME} />
             ) : (
-              <div style={S.placeholder}>Rendering current…</div>
+              <div className={PLACEHOLDER}>Rendering current…</div>
             )}
           </div>
         </div>
       )}
 
-      <div style={S.legend}>
+      <div className={LEGEND}>
         {KIND_ORDER.map((k) => {
           const KindIcon = KIND[k].icon;
           return (
-            <span key={k} style={S.legendItem}>
-              <span style={{ color: KIND[k].color, display: "inline-flex" }}>
+            <span key={k} className="tw:flex tw:items-center tw:gap-1">
+              <span className={`tw:inline-flex ${KIND[k].className}`}>
                 <KindIcon size={14} aria-hidden="true" />
               </span>
               {KIND[k].label}

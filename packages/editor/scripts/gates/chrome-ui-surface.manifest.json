@@ -1,5 +1,5 @@
 {
-  "$comment": "chrome-ui-single-surface export manifest (gate:chrome-ui-surface, EXPORT_SURFACE_MANIFEST check). Records every name chrome-ui/index.ts currently exports and its provenance: 'flowbite-reexport' (pure `export { X } from \"flowbite-react...\"`), 'wrapper' (a local chrome-ui/ file that renames a flowbite-react import AND calls mergeTheme() to compose a default theme with a caller's — the closed 2-member set, TextInput + Select, today), or 'local' (everything else sourced from a chrome-ui/ file, including the ~18 components that compose flowbite-react internally without being a themed default-wrapper, e.g. CommentRow, MediaCard, Presence, Popover, Modal, Toast, Slider). Any drift between this file and the barrel's ACTUAL current export surface fails the gate — new export, removed export, or changed provenance. Update this file in the SAME commit as any change to chrome-ui/index.ts's export list; that edit is the review checkpoint the spec calls for. Regenerate by re-running the classification in scripts/check-chrome-ui-surface.mjs's parseBarrelExports() + classifyProvenance() against the current barrel, then hand-review the diff before committing — never bulk-accept without reading it, the same discipline that applies to every other ratchet baseline in this repo.",
+  "$comment": "chrome-ui-single-surface export manifest (gate:chrome-ui-surface, EXPORT_SURFACE_MANIFEST check). Records every name chrome-ui/index.ts currently exports and its provenance: 'flowbite-reexport' (pure `export { X } from \"flowbite-react...\"`), 'wrapper' (a local chrome-ui/ file that renames a flowbite-react import AND calls mergeTheme() to compose a default theme with a caller's \u2014 the closed 2-member set, TextInput + Select, today), or 'local' (everything else sourced from a chrome-ui/ file, including the ~18 components that compose flowbite-react internally without being a themed default-wrapper, e.g. CommentRow, MediaCard, Presence, Popover, Modal, Toast, Slider). Any drift between this file and the barrel's ACTUAL current export surface fails the gate \u2014 new export, removed export, or changed provenance. Update this file in the SAME commit as any change to chrome-ui/index.ts's export list; that edit is the review checkpoint the spec calls for. Regenerate by re-running the classification in scripts/check-chrome-ui-surface.mjs's parseBarrelExports() + classifyProvenance() against the current barrel, then hand-review the diff before committing \u2014 never bulk-accept without reading it, the same discipline that applies to every other ratchet baseline in this repo.",
   "exports": {
     "Avatar": "flowbite-reexport",
     "AvatarGroup": "flowbite-reexport",
@@ -169,6 +169,9 @@
     "ToastProvider": "local",
     "ToastTone": "local",
     "ToggleSwitch": "flowbite-reexport",
+    "Toolbar": "local",
+    "ToolbarProps": "local",
+    "ToolbarSpacer": "local",
     "Tooltip": "flowbite-reexport",
     "Topbar": "local",
     "TopbarProps": "local",

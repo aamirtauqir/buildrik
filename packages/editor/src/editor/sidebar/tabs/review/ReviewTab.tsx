@@ -30,6 +30,7 @@ import {
   Popover,
   SectionHeader,
   Spinner,
+  Toolbar,
   Badge,
   Button,
   Textarea,
@@ -70,7 +71,6 @@ const META = "tw:text-xs tw:text-gray-500 tw:leading-[1.4]";
 const ACTIONS = "tw:flex tw:items-center tw:gap-1.5";
 const SCROLL = "tw:flex-1 tw:min-h-0 tw:overflow-y-auto tw:py-2";
 const COMPOSER = "tw:border-t tw:border-gray-200 tw:px-3 tw:py-2.5 tw:flex tw:flex-col tw:gap-2";
-const BAR = "tw:flex tw:items-center tw:gap-2 tw:px-3 tw:py-2 tw:border-b tw:border-gray-200";
 /** The ghost-button look, previously copy-pasted onto six separate Buttons. */
 const GHOST = "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900";
 
@@ -317,12 +317,12 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
   if (compareOpen) {
     return (
       <div className={BODY}>
-        <div className={BAR}>
+        <Toolbar>
           <Button color="light" size="xs" onClick={() => setCompareOpen(false)} className={GHOST}>
             <ChevronLeft size={14} aria-hidden="true" /> Back
           </Button>
           <span className="tw:text-xs tw:font-semibold tw:text-gray-900">Compare with approved</span>
-        </div>
+        </Toolbar>
         {compareState === "loading" ? (
           <EmptyState className="tw:flex-1" icon={<Spinner size="lg" />} body="Loading approved snapshot…" />
         ) : compareState === "error" ? (
@@ -402,13 +402,13 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
         {notice && <div className={META}>{notice}</div>}
       </div>
 
-      <div className={`${BAR} tw:justify-between`}>
+      <Toolbar className="tw:justify-between">
         <span className={META}>{visible.length} comment{visible.length === 1 ? "" : "s"}</span>
         <span className="tw:text-xs tw:text-gray-500 tw:flex tw:items-center tw:gap-1.5">
           Show resolved
           <ToggleSwitch checked={showResolved} aria-label="Show resolved" onChange={() => setShowResolved((v) => !v)} />
         </span>
-      </div>
+      </Toolbar>
 
       <div className={SCROLL}>
         {visible.length === 0 ? (

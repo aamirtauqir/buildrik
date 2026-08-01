@@ -94,6 +94,7 @@ export { FormField, type FormFieldProps } from "./FormField";
 export { HelpTooltip, type HelpTooltipProps } from "./HelpTooltip";
 export { Slider, type SliderProps } from "./Slider";
 export { Tabs, type TabsProps, type Tab } from "./Tabs";
+export { Toolbar, ToolbarSpacer, type ToolbarProps } from "./Toolbar";
 export { Drawer, type DrawerProps, type DrawerLayout } from "./Drawer";
 export { OverlayMount, type OverlayMountProps } from "./OverlayMount";
 export {

@@ -7,7 +7,10 @@ import React from "react";
 import { Badge } from "flowbite-react";
 import { ROW_ICON_CLASS } from "./Row";
 
-export type IntegrationStatus = "connected" | "available" | "error";
+/** `available` means connectable today. `soon` means the catalogue lists it
+ *  but nothing can be connected yet — a real and different answer to "can I
+ *  use this", and the state every entry in the shipped catalogue is in. */
+export type IntegrationStatus = "connected" | "available" | "soon" | "error";
 
 /** flowbite badge color + text-color override per status (flowbite's color
  *  presets don't hex-match --bk-success-text/--bk-error-text exactly — see
@@ -15,6 +18,7 @@ export type IntegrationStatus = "connected" | "available" | "error";
 const STATUS: Record<IntegrationStatus, { color: string; className?: string; label: string }> = {
   connected: { color: "success", className: "tw:text-green-600", label: "CONNECTED" },
   available: { color: "gray", label: "AVAILABLE" },
+  soon: { color: "gray", label: "COMING SOON" },
   error: { color: "failure", className: "tw:text-red-700", label: "ERROR" },
 };
 

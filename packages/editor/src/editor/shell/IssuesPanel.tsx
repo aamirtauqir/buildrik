@@ -19,7 +19,7 @@
 
 import * as React from "react";
 import { AlertCircle, CheckCircle2, Info } from "lucide-react";
-import { PanelHeader, Button, EmptyState, Progress, Row } from "@/editor/chrome-ui";
+import { PanelHeader, Button, EmptyState, Progress, Row, Toolbar } from "@/editor/chrome-ui";
 import { issueAppliesToPage, type Issue } from "./hooks/useStudioState";
 
 export interface IssuesPanelProps {
@@ -60,7 +60,6 @@ const TONE: Record<Issue["type"], { icon: React.ReactNode; className: string }> 
 };
 
 const BODY = "tw:flex tw:flex-col tw:h-full tw:min-h-0";
-const TOOLBAR = "tw:flex tw:items-center tw:gap-1.5 tw:px-3 tw:py-2 tw:border-b tw:border-gray-200";
 const SUMMARY = "tw:text-xs tw:text-gray-500 tw:px-3 tw:py-1.5";
 const SCROLL = "tw:flex-1 tw:min-h-0 tw:overflow-y-auto tw:pt-1 tw:px-3 tw:pb-3";
 /** The fixing / fix-failed bands differ only by tint. */
@@ -133,22 +132,22 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
       ) : (
         <>
           {anyPageBound && (
-            <div className={TOOLBAR} role="group" aria-label="Issue scope">
+            <Toolbar role="group" aria-label="Issue scope">
               <Button size="xs" onClick={() => setScope("page")} {...segment(scope === "page")}>
                 This page
               </Button>
               <Button size="xs" onClick={() => setScope("site")} {...segment(scope === "site")}>
                 All pages
               </Button>
-            </div>
+            </Toolbar>
           )}
-          <div className={TOOLBAR}>
+          <Toolbar>
             {FILTERS.map((f) => (
               <Button key={f.key} size="xs" onClick={() => setFilter(f.key)} {...segment(filter === f.key)}>
                 {f.label}
               </Button>
             ))}
-          </div>
+          </Toolbar>
           <div className={SUMMARY}>
             {errorCount} error{errorCount === 1 ? "" : "s"} · {warnCount} warning{warnCount === 1 ? "" : "s"}
           </div>
