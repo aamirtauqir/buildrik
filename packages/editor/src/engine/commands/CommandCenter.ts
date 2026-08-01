@@ -36,6 +36,22 @@ const WIDGET_ROLES = [
   .map((role) => `[role="${role}"]`)
   .join(", ");
 
+/**
+ * Canvas commands whose shortcut a focused text field has a stronger claim on.
+ * Each of these is a chord the OS/browser already binds to text editing, so
+ * when the caret is in a field the user means the text, not the canvas.
+ */
+const TEXT_OWNED_COMMANDS = new Set(["select-all", "cut", "copy", "paste", "undo", "redo"]);
+
+/** Is the keystroke aimed at somewhere the user is typing? */
+function isTextEntry(el: HTMLElement | null): boolean {
+  if (!el) return false;
+  if (el.isContentEditable) return true;
+  return typeof el.closest === "function"
+    ? !!el.closest("input, textarea, [contenteditable='true']")
+    : false;
+}
+
 export class CommandCenter {
   private composer: Composer;
   private commands: Map<string, CommandData> = new Map();
@@ -134,14 +150,35 @@ export class CommandCenter {
    * `defaultPrevented`, and stood down. Found via the topbar site menu, where
    * ArrowDown did nothing while Home and End (unregistered) worked.
    *
-   * Modified shortcuts are left alone. Ctrl/Cmd combinations are the ones a
-   * user expects to keep working while typing — ⌘S saves mid-sentence — and
-   * they do not collide with a widget's own arrow-key contract.
+   * Ctrl/Cmd combinations mostly ARE meant to keep working while typing — ⌘S
+   * saves mid-sentence — but "mostly" is not "always", and treating every mod
+   * chord as ours was a real bug (see the two carve-outs below).
    */
-  private shouldHandleShortcut(e: KeyboardEvent, _commandId: string): boolean {
-    if (e.metaKey || e.ctrlKey) return true;
-
+  private shouldHandleShortcut(e: KeyboardEvent, commandId: string): boolean {
     const target = e.target as HTMLElement | null;
+
+    if (e.metaKey || e.ctrlKey) {
+      // Carve-out 1: the clipboard/undo/select chords belong to the caret.
+      // ⌘A, ⌘X, ⌘C, ⌘V, ⌘Z all exist as canvas commands AND as the text
+      // editing a user is doing right now. Because this listener is
+      // capture-phase on `window` it wins every time and then calls
+      // preventDefault(), so before this guard existed, ⌘A in the page-rename
+      // field selected every element on the canvas instead of the filename,
+      // ⌘Z undid a canvas operation instead of the typo, and ⌘X cut the
+      // selected element out of the document. Nothing downstream could stop
+      // it — capture on window runs before any element handler.
+      if (TEXT_OWNED_COMMANDS.has(commandId) && isTextEntry(target)) return false;
+
+      // Carve-out 2: an open modal owns the keyboard. Same contract the chrome
+      // enforces via isModalOpen(); expressed here as a DOM query rather than
+      // an import because engine/ must not depend on editor/.
+      if (typeof document !== "undefined" && document.querySelector('[role="dialog"][aria-modal="true"]')) {
+        return false;
+      }
+
+      return true;
+    }
+
     if (!target?.closest) return true;
 
     // Text entry owns every bare key it receives.

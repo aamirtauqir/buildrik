@@ -220,14 +220,32 @@ describe("shortcut guard (shouldHandleShortcut)", () => {
     expect(composer.selection.getSelected).toHaveBeenCalled();
   });
 
-  it("lets a modified shortcut through inside an input — ⌘S must save mid-sentence", () => {
+  it("lets an app-level modified shortcut through inside an input — ⌘S must save mid-sentence", () => {
+    const { composer } = makeCenter();
+    const input = document.createElement("input");
+    document.body.appendChild(input);
+
+    input.dispatchEvent(new KeyboardEvent("keydown", { key: "s", ctrlKey: true, bubbles: true }));
+
+    expect(composer.saveProject).toHaveBeenCalled();
+    input.remove();
+  });
+
+  // This case used to be folded into the test above, which fired ⌘Z and asserted
+  // the CANVAS undo ran while the caret sat in an input — the test name said
+  // "⌘S" but the body locked in a real bug. The listener is capture-phase on
+  // window and calls preventDefault(), so that behaviour meant a user pressing
+  // ⌘Z to fix a typo in the page-rename field undid a canvas operation instead,
+  // and ⌘X cut the selected element rather than the text.
+  it("leaves the clipboard/undo chords to the caret when it is in an input", () => {
     const { composer } = makeCenter();
     const input = document.createElement("input");
     document.body.appendChild(input);
 
     input.dispatchEvent(new KeyboardEvent("keydown", { key: "z", ctrlKey: true, bubbles: true }));
 
-    expect(composer.history.undo).toHaveBeenCalled();
+    expect(composer.history.undo).not.toHaveBeenCalled();
+    input.remove();
   });
 
   // The listener is global, capture-phase, and calls preventDefault(). With the
