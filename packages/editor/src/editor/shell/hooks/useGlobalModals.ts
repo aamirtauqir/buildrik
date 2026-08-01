@@ -26,17 +26,11 @@ export interface UseGlobalModalsReturn {
   showProjectSettings: boolean;
   openProjectSettings: () => void;
   closeProjectSettings: () => void;
-
-  // Command Palette modal
-  showCommandPalette: boolean;
-  openCommandPalette: () => void;
-  closeCommandPalette: () => void;
 }
 
 export function useGlobalModals(): UseGlobalModalsReturn {
   const [showShortcuts, setShowShortcuts] = React.useState(false);
   const [showProjectSettings, setShowProjectSettings] = React.useState(false);
-  const [showCommandPalette, setShowCommandPalette] = React.useState(false);
 
   const toggleShortcuts = React.useCallback(() => {
     setShowShortcuts((prev) => !prev);
@@ -46,9 +40,6 @@ export function useGlobalModals(): UseGlobalModalsReturn {
   const openProjectSettings = React.useCallback(() => setShowProjectSettings(true), []);
   const closeProjectSettings = React.useCallback(() => setShowProjectSettings(false), []);
 
-  const openCommandPalette = React.useCallback(() => setShowCommandPalette(true), []);
-  const closeCommandPalette = React.useCallback(() => setShowCommandPalette(false), []);
-
   return {
     showShortcuts,
     setShowShortcuts,
@@ -57,8 +48,5 @@ export function useGlobalModals(): UseGlobalModalsReturn {
     showProjectSettings,
     openProjectSettings,
     closeProjectSettings,
-    showCommandPalette,
-    openCommandPalette,
-    closeCommandPalette,
   };
 }

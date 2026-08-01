@@ -21,8 +21,8 @@ export type { UnifiedSelectionToolbarProps } from "./UnifiedSelectionToolbar";
 export { InspectorToggle, useInspectorMode } from "./InspectorToggle";
 export type { InspectorToggleProps } from "./InspectorToggle";
 
-export { CommandPalette, useCommandPalette } from "./CommandPalette";
-export type { CommandPaletteProps, CommandAction, UseCommandPaletteResult } from "./CommandPalette";
+export { CommandPalette } from "./CommandPalette";
+export type { CommandPaletteProps, CommandAction } from "./CommandPalette";
 
 export { SmartSuggestions } from "./SmartSuggestions";
 export type { SmartSuggestionsProps, Suggestion } from "./SmartSuggestions";

@@ -28,7 +28,6 @@ describe("useStudioModals", () => {
     expect(m.showProjectSettings).toBe(false);
     expect(m.showCMSCollectionSetup).toBe(false);
     expect(m.showCMSRecords).toBe(false);
-    expect(m.showCommandPalette).toBe(false);
     expect(m.mediaLibraryContext).toBeNull();
     expect(m.imageEditorContext).toBeNull();
     expect(m.iconPickerContext).toBeNull();
@@ -46,7 +45,6 @@ describe("useStudioModals", () => {
     ["projectSettings", "openProjectSettings", "closeProjectSettings", "showProjectSettings"],
     ["cmsCollectionSetup", "openCMSCollectionSetup", "closeCMSCollectionSetup", "showCMSCollectionSetup"],
     ["cmsRecords", "openCMSRecords", "closeCMSRecords", "showCMSRecords"],
-    ["commandPalette", "openCommandPalette", "closeCommandPalette", "showCommandPalette"],
   ] as const)("%s: open sets flag, close clears it", (_name, open, close, flag) => {
     const { result } = renderHook(() => useStudioModals());
     act(() => (result.current[open] as () => void)());
@@ -165,7 +163,6 @@ describe("useStudioModals", () => {
       result.current.openProjectSettings();
       result.current.openCMSCollectionSetup();
       result.current.openCMSRecords();
-      result.current.openCommandPalette();
     });
     act(() => result.current.closeAll());
     const m = result.current;
@@ -181,7 +178,6 @@ describe("useStudioModals", () => {
     expect(m.showProjectSettings).toBe(false);
     expect(m.showCMSCollectionSetup).toBe(false);
     expect(m.showCMSRecords).toBe(false);
-    expect(m.showCommandPalette).toBe(false);
     expect(m.mediaLibraryContext).toBeNull();
     expect(m.imageEditorContext).toBeNull();
     expect(m.iconPickerContext).toBeNull();

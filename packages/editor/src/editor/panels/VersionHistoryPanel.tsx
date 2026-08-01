@@ -22,17 +22,13 @@ import {
   formatTime,
 } from "./version-history/VersionList";
 import { CompareView } from "./version-history/CompareView";
-import { ToastStack, useToasts } from "./version-history/Toasts";
 import { useAISummary } from "./version-history/useAISummary";
-import { Button } from "@/editor/chrome-ui";
-import { TextField } from "@/editor/chrome-ui";
+import { Button, TextField, useToast } from "@/editor/chrome-ui";
 
 // CompareView + toggle-pill style constants moved to
 // ./version-history/CompareView.tsx (D3 Stage 2, audit-remediation 2026-05-08).
 // VersionRow + EmptyState moved to ./version-history/VersionList.tsx
 // (D3 Stage 1, audit-remediation 2026-05-08).
-// ToastStack + useToasts moved to ./version-history/Toasts.tsx
-// (D3 Stage 4, audit-remediation 2026-05-08).
 // AI summary state machinery (rate-limit + cooldown tick + handler) moved to
 // ./version-history/useAISummary.ts (D3 Stage 4, audit-remediation 2026-05-08).
 
@@ -72,8 +68,13 @@ export function VersionHistoryPanel({
   const [compareResults, setCompareResults] = React.useState<Record<string, CompareResult | null>>({});
   const [currentVisualSnapshot, setCurrentVisualSnapshot] = React.useState<string | null>(null);
 
-  // Toast state — hook owns the timer + id generation.
-  const { toasts, pushToast } = useToasts();
+  // Canonical chrome toast — one queue, one viewport, one timer owner.
+  const { addToast } = useToast();
+  const pushToast = React.useCallback(
+    (message: string, kind: "success" | "error" = "success") =>
+      addToast({ description: message, tone: kind }),
+    [addToast],
+  );
 
   // AI summary state — hook owns the rate-limit + cooldown tick + handler.
   const { aiSummaryStates, handleGetAiSummary, getCooldownSeconds } =
@@ -315,8 +316,6 @@ export function VersionHistoryPanel({
           </Button>
         )}
       </div>
-      {/* Toast stack — fixed bottom-right, above FAB z-index */}
-      <ToastStack toasts={toasts} />
     </div>
   );
 }

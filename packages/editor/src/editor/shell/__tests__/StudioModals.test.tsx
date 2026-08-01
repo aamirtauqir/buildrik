@@ -44,10 +44,6 @@ vi.mock("../modals/CMSRecordsModal", () => ({
   CMSRecordsModal: ({ isOpen }: { isOpen: boolean }) =>
     isOpen ? <div data-testid="modal-cms-records" /> : null,
 }));
-// CommandPalette has no isOpen prop — StudioModals conditionally mounts it.
-vi.mock("../modals/CommandPalette", () => ({
-  CommandPalette: () => <div data-testid="modal-command-palette" />,
-}));
 vi.mock("../modals/CreateComponentModal", () => ({
   CreateComponentModal: ({ isOpen }: { isOpen: boolean }) =>
     isOpen ? <div data-testid="modal-create-component" /> : null,
@@ -109,8 +105,6 @@ function makeProps(over: Partial<StudioModalsProps> = {}): StudioModalsProps {
     onCloseCMSCollectionSetup: vi.fn(),
     showCMSRecords: false,
     onCloseCMSRecords: vi.fn(),
-    showCommandPalette: false,
-    onCloseCommandPalette: vi.fn(),
     ...over,
   };
 }
@@ -160,7 +154,6 @@ describe("StudioModals — mounting contract", () => {
     ["showProjectSettings", "modal-project-settings"],
     ["showCMSCollectionSetup", "modal-cms-setup"],
     ["showCMSRecords", "modal-cms-records"],
-    ["showCommandPalette", "modal-command-palette"],
   ] as [keyof StudioModalsProps, string][])(
     "%s: true mounts only %s",
     (flag, marker) => {
@@ -208,9 +201,8 @@ describe("StudioModals — mounting contract", () => {
   });
 
   it("multiple flags can be open at once (modals are independent)", () => {
-    renderModals({ showSaveTemplate: true, showExporter: true, showCommandPalette: true });
+    renderModals({ showSaveTemplate: true, showExporter: true });
     expect(screen.getByTestId("modal-save-template")).toBeInTheDocument();
     expect(screen.getByTestId("modal-export")).toBeInTheDocument();
-    expect(screen.getByTestId("modal-command-palette")).toBeInTheDocument();
   });
 });

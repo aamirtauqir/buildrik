@@ -158,9 +158,6 @@ export interface UseStudioModalsReturn {
   closeCMSRecords: () => void;
 
   // Command Palette modal
-  showCommandPalette: boolean;
-  openCommandPalette: () => void;
-  closeCommandPalette: () => void;
 
   // Loading states
   previewLoading: boolean;
@@ -201,17 +198,15 @@ export function useStudioModals(): UseStudioModalsReturn {
   // individual stable callbacks (each is `useCallback([], ...)` in its
   // sub-hook) rather than the unstable parent objects, so closeAll itself
   // stays referentially stable across parent renders.
-  const { closeShortcuts, closeProjectSettings, closeCommandPalette } = globalModals;
+  const { closeShortcuts, closeProjectSettings } = globalModals;
   const closeAll = React.useCallback(() => {
     closeShortcuts();
     closeProjectSettings();
-    closeCommandPalette();
     resetContentModals();
     resetDomainModals();
   }, [
     closeShortcuts,
     closeProjectSettings,
-    closeCommandPalette,
     resetContentModals,
     resetDomainModals,
   ]);

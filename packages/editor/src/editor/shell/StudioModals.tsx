@@ -16,7 +16,6 @@ import { KeyboardShortcutsPanel } from "../panels/KeyboardShortcutsPanel";
 import { useToast } from "@/editor/chrome-ui";
 import { CMSCollectionSetupModal } from "./modals/CMSCollectionSetupModal";
 import { CMSRecordsModal } from "./modals/CMSRecordsModal";
-import { CommandPalette } from "./modals/CommandPalette";
 import { CreateComponentModal } from "./modals/CreateComponentModal";
 import { CreateComponentModal as SaveAsComponentModal } from "../sidebar/tabs/component-library/CreateComponentModal";
 import { ProjectSettingsModal } from "./modals/ProjectSettingsModal";
@@ -96,8 +95,6 @@ export interface StudioModalsProps {
   onCloseCMSRecords: () => void;
 
   // Command Palette
-  showCommandPalette: boolean;
-  onCloseCommandPalette: () => void;
 }
 
 // ============================================================================
@@ -138,8 +135,6 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
   onCloseCMSCollectionSetup,
   showCMSRecords,
   onCloseCMSRecords,
-  showCommandPalette,
-  onCloseCommandPalette,
 }) => {
   const { addToast } = useToast();
 
@@ -282,14 +277,6 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
         onClose={onCloseCMSRecords}
         composer={composer}
       />
-
-      {/* Command Palette */}
-      {showCommandPalette && (
-        <CommandPalette
-          onClose={onCloseCommandPalette}
-          composer={composer}
-        />
-      )}
     </>
   );
 };

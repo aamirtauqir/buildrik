@@ -19,10 +19,15 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent, cleanup, waitFor } from "@testing-library/react";
+import { render as rtlRender, screen, fireEvent, cleanup, waitFor } from "@testing-library/react";
 import * as React from "react";
 import type { Composer } from "@/engine";
 import type { NamedVersion } from "@/shared/types/versions";
+
+// The panel calls useToast(); in the app it sits inside AquibraStudio's
+// ToastProvider. Supply the same context here rather than mocking it away.
+import { ToastProvider } from "@/editor/chrome-ui";
+const render = (ui: React.ReactElement) => rtlRender(ui, { wrapper: ToastProvider });
 
 // ─── Mocks (same shape as VersionHistoryPanel.test.tsx) ───────────────
 
