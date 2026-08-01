@@ -30,7 +30,7 @@ import {
   FieldsView,
   RecordView,
   RootView,
-  S,
+  CONTENT_BODY,
   SourcesView,
   VariablesView,
 } from "./ContentViews";
@@ -224,7 +224,7 @@ export const ContentTab: React.FC<ContentTabProps> = ({
   }
 
   return (
-    <div style={S.body}>
+    <div className={CONTENT_BODY}>
       <PanelHeader
         title="Content"
         isPinned={isPinned}

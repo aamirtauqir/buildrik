@@ -5,137 +5,62 @@
  * conditions 151:87. Pure presentation + callbacks; state lives in
  * useContentPanel.
  *
+ * Every list line here is a chrome-ui row (ListRow / RecordRow / Row), not a
+ * local rebuild of one. The panel used to carry a 24-key style object that
+ * reimplemented exactly those three.
+ *
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { ConfirmDialog, Button, Checkbox, ListRow, SectionHeader, Select, Textarea, TextInput, ToggleSwitch } from "@/editor/chrome-ui";
+import {
+  ConfirmDialog,
+  Button,
+  Checkbox,
+  EmptyState,
+  ListRow,
+  RecordRow,
+  Row,
+  SectionHeader,
+  Select,
+  Textarea,
+  TextInput,
+  ToggleSwitch,
+} from "@/editor/chrome-ui";
 import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
 import type { ConditionExpression, ConditionOperator, DataSource } from "@/shared/types/data";
 import { conditionSummary, fieldDefault, isValidVariableKey, type SiteVariable } from "./contentPanelUtils";
 import type { ConditionRow } from "./useContentPanel";
-export const S: Record<string, React.CSSProperties> = {
-  body: { display: "flex", flexDirection: "column", height: "100%", minHeight: 0 },
-  scroll: { flex: 1, minHeight: 0, overflowY: "auto" },
-  crumb: {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: 4,
-    margin: "10px 12px 2px",
-    background: "none",
-    border: "none",
-    padding: 0,
-    fontSize: 13,
-    color: "var(--bk-accent)",
-    cursor: "pointer",
-    fontFamily: "inherit",
-  },
-  sectionHead: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "6px 12px",
-    background: "var(--bk-bg-panel)",
-    fontSize: 11,
-    fontWeight: 600,
-    letterSpacing: "0.04em",
-    textTransform: "uppercase" as const,
-    color: "var(--bk-ink-muted)",
-  },
-  row: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    width: "100%",
-    padding: "9px 12px",
-    background: "none",
-    border: "none",
-    borderBottom: "1px solid var(--bk-border)",
-    cursor: "pointer",
-    textAlign: "left" as const,
-    fontFamily: "inherit",
-    fontSize: 13,
-    color: "var(--bk-ink)",
-  },
-  rowMeta: { marginLeft: "auto", display: "inline-flex", alignItems: "center", gap: 4, fontSize: 12, color: "var(--bk-ink-muted)", flexShrink: 0 },
-  chev: { color: "var(--bk-ink-muted)", fontSize: 12 },
-  addLink: {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: 6,
-    margin: "8px 12px",
-    background: "none",
-    border: "none",
-    padding: 0,
-    fontSize: 13,
-    color: "var(--bk-accent)",
-    cursor: "pointer",
-    fontFamily: "inherit",
-  },
-  label: { fontSize: 12, color: "var(--bk-ink-muted)", margin: "10px 12px 4px" },
-  input: {
-    display: "block",
-    width: "calc(100% - 24px)",
-    margin: "0 12px",
-    padding: "7px 9px",
-    fontSize: 13,
-    border: "1px solid var(--bk-border-input, var(--bk-border))",
-    borderRadius: "var(--bk-radius-lg)",
-    background: "var(--bk-bg-card)",
-    color: "var(--bk-ink)",
-    fontFamily: "inherit",
-  },
-  toggleRow: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px" },
-  savebar: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    padding: "10px 12px",
-    borderTop: "1px solid var(--bk-border)",
-    background: "var(--bk-bg-panel)",
-  },
-  hint: { fontSize: 12, color: "var(--bk-ink-muted)", lineHeight: 1.5, padding: "10px 12px", borderTop: "1px solid var(--bk-border)" },
-  mono: { fontFamily: "var(--bk-font-mono)", fontSize: 12, color: "var(--bk-accent-text, var(--bk-accent))" },
-  sub: { fontSize: 12, color: "var(--bk-ink-muted)", marginTop: 2 },
-  center: {
-    flex: 1,
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 12,
-    padding: 24,
-    textAlign: "center" as const,
-    color: "var(--bk-ink-muted)",
-    fontSize: 13,
-    lineHeight: 1.5,
-  },
-  inlineForm: { display: "flex", flexDirection: "column", gap: 8, padding: 12, borderBottom: "1px solid var(--bk-border)" },
-  formRow: { display: "flex", gap: 8, alignItems: "center" },
-  select: {
-    padding: "6px 8px",
-    fontSize: 13,
-    border: "1px solid var(--bk-border-input, var(--bk-border))",
-    borderRadius: "var(--bk-radius-lg)",
-    background: "var(--bk-bg-card)",
-    color: "var(--bk-ink)",
-    fontFamily: "inherit",
-    appearance: "auto",
-  },
-};
 
-function statusDot(published: boolean): React.CSSProperties {
-  return {
-    width: 8,
-    height: 8,
-    borderRadius: "var(--bk-radius-full)",
-    background: published ? "var(--bk-success)" : "var(--bk-ink-muted)",
-    flexShrink: 0,
-  };
-}
+/** The panel column. Exported because ContentTab wraps these views in it. */
+export const CONTENT_BODY = "tw:flex tw:flex-col tw:h-full tw:min-h-0";
+
+const SCROLL = "tw:flex-1 tw:min-h-0 tw:overflow-y-auto";
+/** A text button that reads as a link: breadcrumbs and every "+ New …". */
+const LINK_BTN =
+  "tw:inline-flex tw:items-center tw:gap-1.5 tw:bg-transparent tw:border-transparent tw:p-0 " +
+  "tw:text-[13px] tw:text-blue-700 tw:hover:text-blue-800 tw:enabled:hover:bg-transparent";
+/** The quiet row-action button, previously copy-pasted at eleven call sites. */
+const GHOST = "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900";
+const FIELD_LABEL = "tw:text-xs tw:text-gray-500 tw:mx-3 tw:mt-2.5 tw:mb-1";
+/** Inputs sit in a padded wrapper rather than carrying their own margin, so
+ *  the field keeps the TextInput/Select wrapper theme untouched. */
+const FIELD_WRAP = "tw:px-3";
+const TOGGLE_ROW = "tw:flex tw:items-center tw:justify-between tw:p-3";
+const SAVEBAR = "tw:flex tw:items-center tw:gap-2 tw:px-3 tw:py-2.5 tw:border-t tw:border-gray-200 tw:bg-gray-50";
+const HINT = "tw:text-xs tw:text-gray-500 tw:leading-normal tw:px-3 tw:py-2.5 tw:border-t tw:border-gray-200";
+const MONO = "tw:[font-family:var(--bk-font-mono)] tw:text-xs tw:text-blue-700";
+const SUB = "tw:text-xs tw:text-gray-500";
+const INLINE_FORM = "tw:flex tw:flex-col tw:gap-2 tw:p-3 tw:border-b tw:border-gray-200";
+const FORM_ROW = "tw:flex tw:gap-2 tw:items-center";
+const SPACER = "tw:flex-1";
+/** Two stacked lines inside a row (name over type, key over value). */
+const ROW_STACK = "tw:flex tw:flex-col tw:gap-0.5 tw:min-w-0 tw:flex-1";
+const ROW_ACTIONS = "tw:ml-auto tw:inline-flex tw:items-center tw:gap-1 tw:flex-none";
+const ERROR_TEXT = "tw:text-xs tw:text-[var(--bk-error)]";
 
 function Crumb({ label, onClick }: { label: string; onClick: () => void }) {
   return (
-    <Button style={S.crumb} onClick={onClick} aria-label={`Back to ${label}`}>
+    <Button className={`${LINK_BTN} tw:mx-3 tw:mt-2.5 tw:mb-0.5`} onClick={onClick} aria-label={`Back to ${label}`}>
       ‹ {label}
     </Button>
   );
@@ -168,18 +93,22 @@ export function RootView({
 }) {
   if (collections.length === 0 && sourcesCount === 0 && variablesCount === 0 && conditionsCount === 0) {
     return (
-      <div style={S.center} data-testid="content-empty">
-        <div>Collections turn a spreadsheet into pages — one page per row, updated when the data changes.</div>
-        {onCreateCollection && (
-          <Button size="xs" onClick={onCreateCollection}>
-            Create a collection
-          </Button>
-        )}
-      </div>
+      <EmptyState
+        className="tw:flex-1"
+        data-testid="content-empty"
+        body="Collections turn a spreadsheet into pages — one page per row, updated when the data changes."
+        action={
+          onCreateCollection ? (
+            <Button size="xs" onClick={onCreateCollection}>
+              Create a collection
+            </Button>
+          ) : undefined
+        }
+      />
     );
   }
   return (
-    <div style={S.scroll}>
+    <div className={SCROLL}>
       <SectionHeader count={collections.length}>Collections</SectionHeader>
       {collections.map((c) => (
         <ListRow
@@ -191,7 +120,7 @@ export function RootView({
         />
       ))}
       {onCreateCollection && (
-        <Button style={S.addLink} onClick={onCreateCollection}>
+        <Button className={`${LINK_BTN} tw:mx-3 tw:my-2`} onClick={onCreateCollection}>
           + New collection
         </Button>
       )}
@@ -228,43 +157,32 @@ export function CollectionView({
     return typeof v === "string" && v.trim() ? v : `Record ${r.id.slice(-4)}`;
   };
   return (
-    <div style={S.body}>
+    <div className={CONTENT_BODY}>
       <Crumb label={collection.name} onClick={onBack} />
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "4px 12px 8px" }}>
-        <span style={{ fontSize: 12, color: "var(--bk-ink-muted)" }}>
+      <div className="tw:flex tw:justify-between tw:items-center tw:px-3 tw:pt-1 tw:pb-2">
+        <span className={SUB}>
           {records.length} record{records.length === 1 ? "" : "s"}
         </span>
-        <Button style={{ ...S.addLink, margin: 0 }} onClick={onAddRecord}>
+        <Button className={LINK_BTN} onClick={onAddRecord}>
           + Add
         </Button>
       </div>
-      <div style={S.scroll}>
+      <div className={SCROLL}>
         {records.map((r) => (
-          <Button key={r.id} style={S.row} onClick={() => onOpenRecord(r.id)} data-record-row>
-            <span style={statusDot(r.status === "published")} aria-hidden="true" />
-            <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{recordName(r)}</span>
-            <span style={S.rowMeta}>
-              <span style={S.chev}>›</span>
-            </span>
-          </Button>
+          <RecordRow
+            key={r.id}
+            data-record-row
+            label={recordName(r)}
+            published={r.status === "published"}
+            chevron
+            onClick={() => onOpenRecord(r.id)}
+          />
         ))}
-        {records.length === 0 && <div style={{ ...S.sub, padding: 12 }}>No records yet — add the first one.</div>}
+        {records.length === 0 && <div className={`${SUB} tw:p-3`}>No records yet — add the first one.</div>}
       </div>
-      <div>
-        <Button style={{ ...S.row, borderTop: "1px solid var(--bk-border)" }} onClick={onOpenFields}>
-          <span>Fields</span>
-          <span style={S.rowMeta}>
-            {collection.fields.length} <span style={S.chev}>›</span>
-          </span>
-        </Button>
-        {onOpenDynamicPages && (
-          <Button style={S.row} onClick={onOpenDynamicPages}>
-            <span>Dynamic pages</span>
-            <span style={S.rowMeta}>
-              <span style={S.chev}>›</span>
-            </span>
-          </Button>
-        )}
+      <div className="tw:border-t tw:border-gray-200">
+        <ListRow label="Fields" count={collection.fields.length} chevron onClick={onOpenFields} />
+        {onOpenDynamicPages && <ListRow label="Dynamic pages" chevron onClick={onOpenDynamicPages} />}
       </div>
     </div>
   );
@@ -308,14 +226,14 @@ export function RecordView({
   const setField = (slug: string, value: unknown) => setData((d) => ({ ...d, [slug]: value }));
 
   return (
-    <div style={S.body}>
+    <div className={CONTENT_BODY}>
       <Crumb label={title} onClick={onBack} />
-      <div style={S.scroll}>
+      <div className={SCROLL}>
         {collection.fields.map((f) => (
           <div key={f.id}>
             {f.type === "boolean" ? (
-              <div style={S.toggleRow}>
-                <span style={{ fontSize: 13 }}>{f.name}</span>
+              <div className={TOGGLE_ROW}>
+                <span className="tw:text-[13px]">{f.name}</span>
                 <ToggleSwitch
                   checked={Boolean(data[f.slug])}
                   aria-label={f.name}
@@ -324,42 +242,51 @@ export function RecordView({
               </div>
             ) : (
               <>
-                <div style={S.label}>{f.name}</div>
-                {f.type === "textarea" || f.type === "richtext" ? (
-                  <Textarea
-                    style={{ ...S.input, minHeight: 64, resize: "vertical" }}
-                    value={String(data[f.slug] ?? "")}
-                    onChange={(e) => setField(f.slug, e.target.value)}
-                    aria-label={f.name}
-                  />
-                ) : (
-                  <TextInput
-                    style={S.input}
-                    type={f.type === "number" ? "number" : "text"}
-                    value={String(data[f.slug] ?? "")}
-                    onChange={(e) => setField(f.slug, f.type === "number" ? Number(e.target.value) : e.target.value)}
-                    aria-label={f.name}
-                  />
-                )}
+                <div className={FIELD_LABEL}>{f.name}</div>
+                <div className={FIELD_WRAP}>
+                  {f.type === "textarea" || f.type === "richtext" ? (
+                    <Textarea
+                      className="tw:bg-white tw:min-h-16 tw:resize-y"
+                      value={String(data[f.slug] ?? "")}
+                      onChange={(e) => setField(f.slug, e.target.value)}
+                      aria-label={f.name}
+                    />
+                  ) : (
+                    <TextInput
+                      type={f.type === "number" ? "number" : "text"}
+                      value={String(data[f.slug] ?? "")}
+                      onChange={(e) => setField(f.slug, f.type === "number" ? Number(e.target.value) : e.target.value)}
+                      aria-label={f.name}
+                    />
+                  )}
+                </div>
               </>
             )}
           </div>
         ))}
-        <div style={S.toggleRow}>
-          <span style={{ fontSize: 13 }}>Published</span>
+        <div className={TOGGLE_ROW}>
+          <span className="tw:text-[13px]">Published</span>
           <ToggleSwitch checked={published} aria-label="Published" onChange={() => setPublished((v) => !v)} />
         </div>
         {record && onDelete && (
-          <Button style={{ ...S.addLink, color: "var(--bk-error)" }} onClick={onDelete}>
+          <Button
+            className={`${LINK_BTN} tw:mx-3 tw:my-2 tw:text-[var(--bk-error)] tw:hover:text-[var(--bk-error)]`}
+            onClick={onDelete}
+          >
             Delete record
           </Button>
         )}
       </div>
       {(dirty || !record) && (
-        <div style={S.savebar} role="region" aria-label="Unsaved changes">
-          <span style={{ fontSize: 12, color: "var(--bk-warning-text)" }}>Unsaved changes</span>
-          <span style={{ flex: 1 }} />
-          <Button color="light" size="xs" onClick={() => { setData(initial); setPublished(record?.status === "published"); }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+        <div className={SAVEBAR} role="region" aria-label="Unsaved changes">
+          <span className="tw:text-xs tw:text-[var(--bk-warning-text)]">Unsaved changes</span>
+          <span className={SPACER} />
+          <Button
+            color="light"
+            size="xs"
+            className={GHOST}
+            onClick={() => { setData(initial); setPublished(record?.status === "published"); }}
+          >
             Discard
           </Button>
           <Button
@@ -400,45 +327,45 @@ export function FieldsView({
   const [confirmDelete, setConfirmDelete] = React.useState<CMSField | null>(null);
 
   return (
-    <div style={S.body}>
+    <div className={CONTENT_BODY}>
       <Crumb label={`${collection.name} · fields`} onClick={onBack} />
-      <div style={S.scroll}>
+      <div className={SCROLL}>
         {collection.fields.map((f) => (
-          <div key={f.id} style={{ ...S.row, cursor: "default" }} data-field-row>
-            <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          <Row key={f.id} size="comment" data-field-row>
+            <span className={ROW_STACK}>
               <span>{f.name}</span>
-              <span style={S.sub}>{f.type}</span>
+              <span className={SUB}>{f.type}</span>
             </span>
-            <span style={S.rowMeta}>
-              {f.validation?.required && <span style={{ color: "var(--bk-ink-muted)" }}>required</span>}
+            <span className={ROW_ACTIONS}>
+              {f.validation?.required && <span className={SUB}>required</span>}
               <Button
                 color="light"
                 size="xs"
+                className={GHOST}
                 aria-label={`Delete field ${f.name}`}
-                onClick={() => setConfirmDelete(f)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+                onClick={() => setConfirmDelete(f)}
               >
                 ✕
               </Button>
             </span>
-          </div>
+          </Row>
         ))}
         {adding ? (
-          <div style={S.inlineForm}>
+          <div className={INLINE_FORM}>
             <TextInput
-              style={{ ...S.input, margin: 0, width: "auto" }}
               placeholder="Field name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               aria-label="Field name"
               autoFocus
             />
-            <div style={S.formRow}>
-              <Select style={S.select} value={type} onChange={(e) => setType(e.target.value)} aria-label="Field type">
+            <div className={FORM_ROW}>
+              <Select value={type} onChange={(e) => setType(e.target.value)} aria-label="Field type">
                 {FIELD_TYPES.map((t) => (
                   <option key={t} value={t}>{t}</option>
                 ))}
               </Select>
-              <label style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, cursor: "pointer" }}>
+              <label className="tw:inline-flex tw:items-center tw:gap-1.5 tw:text-[13px] tw:cursor-pointer">
                 <Checkbox
                   color="blue"
                   className="tw:bg-white"
@@ -447,8 +374,8 @@ export function FieldsView({
                 />
                 <span>required</span>
               </label>
-              <span style={{ flex: 1 }} />
-              <Button color="light" size="xs" onClick={() => setAdding(false)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">Cancel</Button>
+              <span className={SPACER} />
+              <Button color="light" size="xs" className={GHOST} onClick={() => setAdding(false)}>Cancel</Button>
               <Button
                 size="xs"
                 disabled={!name.trim()}
@@ -465,7 +392,7 @@ export function FieldsView({
             </div>
           </div>
         ) : (
-          <Button style={S.addLink} onClick={() => setAdding(true)}>
+          <Button className={`${LINK_BTN} tw:mx-3 tw:my-2`} onClick={() => setAdding(true)}>
             + Add field
           </Button>
         )}
@@ -501,34 +428,32 @@ export function SourcesView({
   const [json, setJson] = React.useState("");
   const [error, setError] = React.useState<string | null>(null);
   return (
-    <div style={S.body}>
+    <div className={CONTENT_BODY}>
       <Crumb label="Sources" onClick={onBack} />
-      <div style={S.scroll}>
+      <div className={SCROLL}>
         {sources.map((s) => (
-          <div key={s.id} style={{ ...S.row, cursor: "default" }} data-source-row>
-            <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          <Row key={s.id} size="comment" data-source-row>
+            <span className={ROW_STACK}>
               <span>{s.name}</span>
-              <span style={S.sub}>{s.type}</span>
+              <span className={SUB}>{s.type}</span>
             </span>
-          </div>
+          </Row>
         ))}
-        {sources.length === 0 && !adding && (
-          <div style={{ ...S.sub, padding: 12 }}>No data sources yet.</div>
-        )}
+        {sources.length === 0 && !adding && <div className={`${SUB} tw:p-3`}>No data sources yet.</div>}
         {adding ? (
-          <div style={S.inlineForm}>
+          <div className={INLINE_FORM}>
             <Textarea
-              style={{ ...S.input, margin: 0, width: "auto", minHeight: 96, resize: "vertical", fontFamily: "var(--bk-font-mono)", fontSize: 12 }}
+              className="tw:bg-white tw:min-h-24 tw:resize-y tw:[font-family:var(--bk-font-mono)] tw:text-xs"
               placeholder='{"products": [{"name": "…"}]}'
               value={json}
               onChange={(e) => setJson(e.target.value)}
               aria-label="Source JSON"
               autoFocus
             />
-            {error && <div style={{ fontSize: 12, color: "var(--bk-error)" }} role="alert">{error}</div>}
-            <div style={S.formRow}>
-              <span style={{ flex: 1 }} />
-              <Button color="light" size="xs" onClick={() => { setAdding(false); setError(null); }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">Cancel</Button>
+            {error && <div className={ERROR_TEXT} role="alert">{error}</div>}
+            <div className={FORM_ROW}>
+              <span className={SPACER} />
+              <Button color="light" size="xs" className={GHOST} onClick={() => { setAdding(false); setError(null); }}>Cancel</Button>
               <Button
                 size="xs"
                 disabled={!json.trim()}
@@ -547,12 +472,12 @@ export function SourcesView({
             </div>
           </div>
         ) : (
-          <Button style={S.addLink} onClick={() => setAdding(true)}>
+          <Button className={`${LINK_BTN} tw:mx-3 tw:my-2`} onClick={() => setAdding(true)}>
             + Add a source (JSON)
           </Button>
         )}
       </div>
-      <div style={S.hint}>A source feeds a collection. Edits sync one way — from the source in.</div>
+      <div className={HINT}>A source feeds a collection. Edits sync one way — from the source in.</div>
     </div>
   );
 }
@@ -577,16 +502,16 @@ export function VariablesView({
   const dupError = variables.some((v) => v.key === key.trim());
 
   return (
-    <div style={S.body}>
+    <div className={CONTENT_BODY}>
       <Crumb label="Variables" onClick={onBack} />
-      <div style={S.scroll}>
+      <div className={SCROLL}>
         {variables.map((v) => (
-          <div key={v.key} style={{ ...S.row, cursor: "default", alignItems: "flex-start" }} data-variable-row>
-            <span style={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0, flex: 1 }}>
-              <span style={S.mono}>{`{{site.${v.key}}}`}</span>
+          <Row key={v.key} size="comment" data-variable-row>
+            <span className={ROW_STACK}>
+              <span className={MONO}>{`{{site.${v.key}}}`}</span>
               {editKey === v.key ? (
                 <TextInput
-                  style={{ ...S.input, margin: "4px 0 0", width: "auto" }}
+                  className="tw:mt-1"
                   value={editValue}
                   onChange={(e) => setEditValue(e.target.value)}
                   aria-label={`Value for ${v.key}`}
@@ -600,38 +525,50 @@ export function VariablesView({
                   }}
                 />
               ) : (
-                <span style={S.sub}>{v.value || "—"}</span>
+                <span className={SUB}>{v.value || "—"}</span>
               )}
             </span>
-            <span style={S.rowMeta}>
+            <span className={ROW_ACTIONS}>
               {editKey === v.key ? (
                 <Button
                   color="light"
                   size="xs"
+                  className={GHOST}
                   onClick={() => {
                     onChange(variables.map((x) => (x.key === v.key ? { ...x, value: editValue } : x)));
                     setEditKey(null);
-                  }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+                  }}
                 >
                   Save
                 </Button>
               ) : (
                 <>
-                  <Button color="light" size="xs" aria-label={`Edit ${v.key}`} onClick={() => { setEditKey(v.key); setEditValue(v.value); }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+                  <Button
+                    color="light"
+                    size="xs"
+                    className={GHOST}
+                    aria-label={`Edit ${v.key}`}
+                    onClick={() => { setEditKey(v.key); setEditValue(v.value); }}
+                  >
                     Edit
                   </Button>
-                  <Button color="light" size="xs" aria-label={`Delete ${v.key}`} onClick={() => onChange(variables.filter((x) => x.key !== v.key))} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+                  <Button
+                    color="light"
+                    size="xs"
+                    className={GHOST}
+                    aria-label={`Delete ${v.key}`}
+                    onClick={() => onChange(variables.filter((x) => x.key !== v.key))}
+                  >
                     ✕
                   </Button>
                 </>
               )}
             </span>
-          </div>
+          </Row>
         ))}
         {adding ? (
-          <div style={S.inlineForm}>
+          <div className={INLINE_FORM}>
             <TextInput
-              style={{ ...S.input, margin: 0, width: "auto" }}
               placeholder="key (e.g. phone)"
               value={key}
               onChange={(e) => setKey(e.target.value)}
@@ -639,20 +576,19 @@ export function VariablesView({
               autoFocus
             />
             {(keyError || dupError) && (
-              <div style={{ fontSize: 12, color: "var(--bk-error)" }} role="alert">
+              <div className={ERROR_TEXT} role="alert">
                 {dupError ? "A variable with this key already exists." : "Keys are letters/digits/dashes, starting with a letter."}
               </div>
             )}
             <TextInput
-              style={{ ...S.input, margin: 0, width: "auto" }}
               placeholder="value"
               value={value}
               onChange={(e) => setValue(e.target.value)}
               aria-label="Variable value"
             />
-            <div style={S.formRow}>
-              <span style={{ flex: 1 }} />
-              <Button color="light" size="xs" onClick={() => setAdding(false)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">Cancel</Button>
+            <div className={FORM_ROW}>
+              <span className={SPACER} />
+              <Button color="light" size="xs" className={GHOST} onClick={() => setAdding(false)}>Cancel</Button>
               <Button
                 size="xs"
                 disabled={!key.trim() || keyError || dupError}
@@ -668,7 +604,7 @@ export function VariablesView({
             </div>
           </div>
         ) : (
-          <Button style={S.addLink} onClick={() => setAdding(true)}>
+          <Button className={`${LINK_BTN} tw:mx-3 tw:my-2`} onClick={() => setAdding(true)}>
             + New variable
           </Button>
         )}
@@ -706,44 +642,48 @@ export function ConditionsView({
   const needsRight = !["exists", "not_exists", "empty", "not_empty"].includes(operator);
 
   return (
-    <div style={S.body}>
+    <div className={CONTENT_BODY}>
       <Crumb label="Conditions" onClick={onBack} />
-      <div style={S.scroll}>
+      <div className={SCROLL}>
         {conditions.map((c) => (
-          <div key={`${c.elementId}`} style={{ ...S.row, cursor: "default", alignItems: "flex-start" }} data-condition-row>
-            <span style={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0, flex: 1 }}>
-              <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.label}</span>
-              <span style={S.sub}>{conditionSummary(c.binding)}</span>
+          <Row key={`${c.elementId}`} size="comment" data-condition-row>
+            <span className={ROW_STACK}>
+              <span className="tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap">{c.label}</span>
+              <span className={SUB}>{conditionSummary(c.binding)}</span>
             </span>
-            <span style={S.rowMeta}>
-              <Button color="light" size="xs" onClick={() => onSelectElement(c.elementId)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+            <span className={ROW_ACTIONS}>
+              <Button color="light" size="xs" className={GHOST} onClick={() => onSelectElement(c.elementId)}>
                 Select
               </Button>
-              <Button color="light" size="xs" aria-label="Remove condition" onClick={() => onRemove(c.elementId)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+              <Button
+                color="light"
+                size="xs"
+                className={GHOST}
+                aria-label="Remove condition"
+                onClick={() => onRemove(c.elementId)}
+              >
                 ✕
               </Button>
             </span>
-          </div>
+          </Row>
         ))}
         {conditions.length === 0 && !pickedElementId && (
-          <div style={{ ...S.sub, padding: 12 }}>
+          <div className={`${SUB} tw:p-3`}>
             No conditions yet. A condition shows or hides an element based on data.
           </div>
         )}
         {pickedElementId ? (
-          <div style={S.inlineForm} data-testid="condition-form">
-            <div style={{ fontSize: 12, color: "var(--bk-ink-muted)" }}>Show the picked element when…</div>
+          <div className={INLINE_FORM} data-testid="condition-form">
+            <div className={SUB}>Show the picked element when…</div>
             <TextInput
-              style={{ ...S.input, margin: 0, width: "auto" }}
               placeholder="site.hours or menu.available"
               value={left}
               onChange={(e) => setLeft(e.target.value)}
               aria-label="Condition path"
               autoFocus
             />
-            <div style={S.formRow}>
+            <div className={FORM_ROW}>
               <Select
-                style={S.select}
                 value={operator}
                 onChange={(e) => setOperator(e.target.value as ConditionOperator)}
                 aria-label="Operator"
@@ -753,18 +693,19 @@ export function ConditionsView({
                 ))}
               </Select>
               {needsRight && (
-                <TextInput
-                  style={{ ...S.input, margin: 0, width: "auto", flex: 1 }}
-                  placeholder="value"
-                  value={right}
-                  onChange={(e) => setRight(e.target.value)}
-                  aria-label="Condition value"
-                />
+                <div className={SPACER}>
+                  <TextInput
+                    placeholder="value"
+                    value={right}
+                    onChange={(e) => setRight(e.target.value)}
+                    aria-label="Condition value"
+                  />
+                </div>
               )}
             </div>
-            <div style={S.formRow}>
-              <span style={{ flex: 1 }} />
-              <Button color="light" size="xs" onClick={onCancelPick} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">Cancel</Button>
+            <div className={FORM_ROW}>
+              <span className={SPACER} />
+              <Button color="light" size="xs" className={GHOST} onClick={onCancelPick}>Cancel</Button>
               <Button
                 size="xs"
                 disabled={!left.trim() || (needsRight && !right.trim())}
@@ -781,13 +722,13 @@ export function ConditionsView({
             </div>
           </div>
         ) : (
-          <Button style={S.addLink} onClick={onStartPick}>
+          <Button className={`${LINK_BTN} tw:mx-3 tw:my-2`} onClick={onStartPick}>
             + New condition
           </Button>
         )}
       </div>
       {!pickedElementId && (
-        <div style={S.hint}>"+ New condition" starts by picking the element on the canvas it controls.</div>
+        <div className={HINT}>"+ New condition" starts by picking the element on the canvas it controls.</div>
       )}
     </div>
   );
