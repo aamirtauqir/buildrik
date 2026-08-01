@@ -15,8 +15,8 @@ import { render, screen } from "@testing-library/react";
 import * as React from "react";
 import type { PublishTabProps } from "../PublishTab";
 
-vi.mock("@/editor/ui", async () => {
-  const actual = await vi.importActual<Record<string, unknown>>("@/editor/ui");
+vi.mock("@/editor/chrome-ui", async () => {
+  const actual = await vi.importActual<Record<string, unknown>>("@/editor/chrome-ui");
   return {
     ...actual,
     useToast: () => ({ addToast: vi.fn(), removeToast: vi.fn(), toasts: [] }),

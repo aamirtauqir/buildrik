@@ -4,9 +4,8 @@
  */
 
 import * as React from "react";
-import { Button, Input } from "@/editor/ui";
 import { constraintBtnStyle, fixedInputStyle } from "./styles";
-
+import { Button, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -135,7 +134,7 @@ export const ConstraintControl: React.FC<ConstraintControlProps> = ({ label, val
           <span style={{ fontSize: 12, color: "var(--bk-ink-muted)", width: 32 }}>
             {isWidth ? "W" : "H"}
           </span>
-          <Input
+          <TextInput
             type="text"
             value={value}
             onChange={(e) => onChange(e.target.value)}

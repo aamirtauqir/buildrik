@@ -14,7 +14,8 @@
 
 import * as React from "react";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
-import { Badge, Button, ConfirmDialog, Spinner } from "@/editor/ui";
+import { ConfirmDialog, Spinner } from "@/editor/chrome-ui";
+import { Badge, Button } from "@/editor/chrome-ui";
 import { useEditorRole } from "./hooks/useEditorRole";
 import { roleAtLeast } from "@/services/RoleService";
 import {
@@ -103,7 +104,7 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
       <div style={S.center}>
         <AlertCircle size={24} aria-hidden="true" />
         <div style={S.centerTitle}>Couldn't load publish history</div>
-        <Button kind="secondary" size="sm" onClick={() => void load()}>Retry</Button>
+        <Button color="light" size="xs" onClick={() => void load()}>Retry</Button>
       </div>
     );
   }
@@ -132,15 +133,15 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
             <div style={S.left}>
               <span style={S.ver}>
                 Version {r.version}
-                {isLive && <Badge kind="neutral">Live</Badge>}
+                {isLive && <Badge color="gray">Live</Badge>}
                 {fromVersion !== undefined && <span style={S.meta}>↩ from v{fromVersion}</span>}
               </span>
               <span style={S.meta}>{relTime(r.completedAt)}</span>
             </div>
             {!isLive && (
               <Button
-                kind="secondary"
-                size="sm"
+                color="light"
+                size="xs"
                 disabled={!r.rollbackable || !canRollback}
                 title={
                   !canRollback

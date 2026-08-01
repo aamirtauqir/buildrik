@@ -1,13 +1,14 @@
 /**
  * InputField — labelled input wrapper.
- * Internal: composes ui <FormField> + <Input>.
- * Bare path (no label/error/hint) renders just <Input>.
+ * Internal: composes ui <FormField> + flowbite's <TextInput>.
+ * Bare path (no label/error/hint) renders just <TextInput>.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { FormField, Input } from "@/editor/ui";
+import { FormField } from "@/editor/chrome-ui";
+import { TextInput } from "@/editor/chrome-ui";
 
 export interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -53,13 +54,15 @@ export const InputField: React.FC<InputFieldProps> = ({
     );
 
   if (!label && !error && !hint) {
-    const bare = withIcon(<Input {...props} error={!!error} style={inputStyle} />);
+    const bare = withIcon(
+      <TextInput {...props} aria-invalid={!!error || undefined} style={inputStyle} />,
+    );
     return className ? <div className={className}>{bare}</div> : <>{bare}</>;
   }
 
   return (
     <FormField label={label ?? ""} hint={hint} error={error} className={className}>
-      {(wiring) => withIcon(<Input {...props} {...wiring} error={!!error} style={inputStyle} />)}
+      {(wiring) => withIcon(<TextInput {...props} {...wiring} style={inputStyle} />)}
     </FormField>
   );
 };

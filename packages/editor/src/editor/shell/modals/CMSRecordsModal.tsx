@@ -14,17 +14,13 @@ import { Plus, Trash2, Pencil } from "lucide-react";
 import type { Composer } from "../../../engine";
 import type { CMSCollection, CMSContentItem, CMSField } from "../../../shared/types/cms";
 import {
-  Button,
-  Checkbox,
-  Input,
   ModalClose,
   ModalContent,
   ModalRoot,
   ModalTitle,
   Portal,
-  Select,
-  Textarea,
-} from "@/editor/ui";
+} from "@/editor/chrome-ui";
+import { Button, Checkbox, Select, Textarea, TextInput } from "@/editor/chrome-ui";
 
 export interface CMSRecordsModalProps {
   composer: Composer | null;
@@ -138,6 +134,8 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
         <div {...common}>
           <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer" }}>
             <Checkbox
+              color="blue"
+              className="tw:bg-white"
               checked={Boolean(value)}
               onChange={(e) => setField(field.slug, e.target.checked)}
             />
@@ -151,6 +149,7 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
         <div {...common}>
           <FieldLabel field={field} />
           <Textarea
+            className="tw:bg-white tw:focus:border-primary-700 tw:focus:ring-primary-700"
             value={String(value ?? "")}
             onChange={(e) => setField(field.slug, e.target.value)}
             placeholder={field.placeholder}
@@ -175,7 +174,7 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
     return (
       <div {...common}>
         <FieldLabel field={field} />
-        <Input
+        <TextInput
           type={inputType}
           value={String(value ?? "")}
           onChange={(e) =>
@@ -222,10 +221,10 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                   <div>
                     {collection.fields.map(renderField)}
                     <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-                      <Button kind="primary" size="sm" loading={busy} onClick={save}>
+                      <Button size="xs" disabled={busy} onClick={save} aria-busy={busy || undefined}>
                         {editingId === "" ? "Add record" : "Save"}
                       </Button>
-                      <Button kind="ghost" size="sm" onClick={() => setEditingId(null)}>
+                      <Button color="light" size="xs" onClick={() => setEditingId(null)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                         Cancel
                       </Button>
                     </div>
@@ -253,7 +252,7 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                       <span style={{ fontSize: 12, color: "var(--bk-ink-soft)" }}>
                         {items.length} record{items.length === 1 ? "" : "s"}
                       </span>
-                      <Button kind="secondary" size="sm" onClick={startAdd} disabled={!collection}>
+                      <Button color="light" size="xs" onClick={startAdd} disabled={!collection}>
                         <Plus size={13} /> Add record
                       </Button>
                     </div>
@@ -281,18 +280,18 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                             </span>
                             <span style={{ display: "flex", gap: 4 }}>
                               <Button
-                                kind="ghost"
-                                size="sm"
-                                loading={busy}
+                                color="light"
+                                size="xs"
+                                disabled={busy}
                                 onClick={() => setStatus(item.id, item.status === "published" ? "draft" : "published")}
-                                aria-label={item.status === "published" ? "Unpublish record" : "Publish record"}
+                                aria-label={item.status === "published" ? "Unpublish record" : "Publish record"} aria-busy={busy || undefined} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
                               >
                                 {item.status === "published" ? "Unpublish" : "Publish"}
                               </Button>
-                              <Button kind="ghost" size="sm" onClick={() => startEdit(item)} aria-label="Edit record">
+                              <Button color="light" size="xs" onClick={() => startEdit(item)} aria-label="Edit record" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                                 <Pencil size={13} />
                               </Button>
-                              <Button kind="ghost" size="sm" loading={busy} onClick={() => remove(item.id)} aria-label="Delete record">
+                              <Button color="light" size="xs" disabled={busy} onClick={() => remove(item.id)} aria-label="Delete record" aria-busy={busy || undefined} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                                 <Trash2 size={13} />
                               </Button>
                             </span>

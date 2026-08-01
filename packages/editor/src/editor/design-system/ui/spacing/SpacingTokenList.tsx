@@ -14,10 +14,10 @@
  */
 
 import * as React from "react";
-import { Button, Input } from "@/editor/ui";
 import type { SpacingPreset } from "../../state/useSpacingTokens";
 import type { DesignToken } from "../../types";
 import { TokenUsageChip } from "../sections/TokenUsageChip";
+import { Button, TextInput } from "@/editor/chrome-ui";
 
 export interface SpacingTokenListProps {
   tokens: DesignToken[];
@@ -55,8 +55,8 @@ const PresetChip: React.FC<{
 }> = ({ preset, isActive, onApply }) => (
   <Button
     type="button"
-    kind="ghost"
-    size="sm"
+    color="light"
+    size="xs"
     onClick={onApply}
     style={{
       padding: "4px 10px",
@@ -68,7 +68,7 @@ const PresetChip: React.FC<{
       fontSize: 11,
       fontWeight: isActive ? 600 : 500,
       cursor: "pointer",
-    }}
+    }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
   >
     {PRESET_LABELS[preset]}
   </Button>
@@ -89,8 +89,8 @@ const ValueChip: React.FC<ValueChipProps> = ({ token, isActive, isDirty, onClick
   return (
     <Button
       type="button"
-      kind="ghost"
-      size="sm"
+      color="light"
+      size="xs"
       role="listitem"
       aria-label={`Edit spacing ${token.name} (${token.value})`}
       aria-pressed={isActive}
@@ -105,7 +105,7 @@ const ValueChip: React.FC<ValueChipProps> = ({ token, isActive, isDirty, onClick
         font: "500 11px var(--bk-font-mono, ui-monospace, monospace)",
         cursor: "pointer",
         outline: "none",
-      }}
+      }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
     >
       {display}
       {isDirty && (
@@ -168,7 +168,7 @@ const EditDrawer: React.FC<EditDrawerProps> = ({
       >
         {token.name}
       </span>
-      <Input
+      <TextInput
         type="number"
         aria-label={`Value for ${token.name}`}
         value={Number.isFinite(num) ? num : 0}
@@ -201,12 +201,12 @@ const EditDrawer: React.FC<EditDrawerProps> = ({
       {canUndo && (
         <Button
           type="button"
-          kind="ghost"
-          size="sm"
+          color="light"
+          size="xs"
           onClick={() => onUndo(token.id)}
           title="Undo"
           aria-label={`Undo change to ${token.name}`}
-          style={iconBtnStyle("var(--bk-warning)")}
+          style={iconBtnStyle("var(--bk-warning)")} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
         >
           ↩
         </Button>
@@ -214,20 +214,20 @@ const EditDrawer: React.FC<EditDrawerProps> = ({
       {canRedo && (
         <Button
           type="button"
-          kind="ghost"
-          size="sm"
+          color="light"
+          size="xs"
           onClick={() => onRedo(token.id)}
           title="Redo"
           aria-label={`Redo change to ${token.name}`}
-          style={iconBtnStyle("var(--bk-accent)")}
+          style={iconBtnStyle("var(--bk-accent)")} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
         >
           ↪
         </Button>
       )}
       <Button
         type="button"
-        kind="ghost"
-        size="sm"
+        color="light"
+        size="xs"
         onClick={onClose}
         aria-label="Close edit drawer"
         style={{
@@ -237,7 +237,7 @@ const EditDrawer: React.FC<EditDrawerProps> = ({
           cursor: "pointer",
           color: "var(--bk-ink-muted)",
           fontSize: 13,
-        }}
+        }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
       >
         ×
       </Button>
@@ -295,8 +295,8 @@ export const SpacingTokenList: React.FC<SpacingTokenListProps> = ({
         ))}
         <Button
           type="button"
-          kind="secondary"
-          size="sm"
+          color="light"
+          size="xs"
           onClick={onResetToDefaults}
           title="Reset all spacing to factory defaults"
           style={{
@@ -401,8 +401,8 @@ export const SpacingTokenList: React.FC<SpacingTokenListProps> = ({
             {onRowClick ? (
               <Button
                 type="button"
-                kind="ghost"
-                size="sm"
+                color="light"
+                size="xs"
                 onClick={() => onRowClick(t.id)}
                 aria-label={`Open details for ${t.name}`}
                 style={{
@@ -411,7 +411,7 @@ export const SpacingTokenList: React.FC<SpacingTokenListProps> = ({
                   padding: 0,
                   cursor: "pointer",
                   display: "inline-flex",
-                }}
+                }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
               >
                 <TokenUsageChip count={usageByTokenId?.get(t.id) ?? 0} />
               </Button>

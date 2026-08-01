@@ -8,6 +8,9 @@
  * @license BSD-3-Clause
  */
 import "@testing-library/jest-dom";
+// flowbite-bigbang Task 2: configure flowbite-react's tw: class prefix
+// (spec §4.1) before any flowbite-react component renders in a test.
+import "./editor/chrome-ui/flowbiteStore";
 
 if (typeof globalThis.ResizeObserver === "undefined") {
   class ResizeObserverPolyfill {

@@ -11,12 +11,13 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "flowbite:classlist": "flowbite-react build",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "check:no-legacy-settings-path": "grep -r 'components/Panels/LeftSidebar/tabs/settings' src/ --include='*.ts' --include='*.tsx' && echo 'FAIL: legacy settings path found' && exit 1 || echo 'PASS: no legacy settings path'",
     "lint:ds": "bash scripts/ds-grep-gates.sh",
-    "verify:ds": "node scripts/verify-design-baselines.mjs && bash scripts/ds-grep-gates.sh && node scripts/check-ds-ssot.mjs && node scripts/conformance/check-token-resolution.mjs && node scripts/check-tsc-baseline.mjs && npm run gate:tokens-generated && npm run gate:vibcoder-ratchet",
+    "verify:ds": "node scripts/verify-design-baselines.mjs && bash scripts/ds-grep-gates.sh && node scripts/check-ds-ssot.mjs && node scripts/conformance/check-token-resolution.mjs && node scripts/check-tsc-baseline.mjs && npm run gate:tokens-generated && npm run gate:vibcoder-ratchet && npm run gate:editor-ui-gone && npm run gate:chrome-ui-surface",
     "gate:tokens": "node scripts/conformance/check-token-resolution.mjs",
     "gate:tsc": "node scripts/check-tsc-baseline.mjs",
     "hooks:install": "bash scripts/install-git-hooks.sh",
@@ -31,7 +32,9 @@
     "phase5:inventory:strict": "node scripts/phase5-shim-inventory.mjs --strict",
     "tokens:generate": "node scripts/tokens/generate.mjs",
     "gate:tokens-generated": "node scripts/check-tokens-generated.mjs",
-    "gate:vibcoder-ratchet": "node scripts/check-vibcoder-ratchet.mjs"
+    "gate:vibcoder-ratchet": "node scripts/check-vibcoder-ratchet.mjs",
+    "gate:editor-ui-gone": "node scripts/check-editor-ui-gone.mjs",
+    "gate:chrome-ui-surface": "node scripts/check-chrome-ui-surface.mjs"
   },
   "dependencies": {
     "@buildrik/shared": "workspace:*",
@@ -47,6 +50,7 @@
     "@types/dompurify": "^3.0.5",
     "cmdk": "^1.1.1",
     "dompurify": "^3.3.1",
+    "flowbite-react": "^0.12.17",
     "gsap": "^3.14.2",
     "html2canvas": "^1.4.1",
     "jszip": "^3.10.1",
@@ -55,10 +59,12 @@
     "react-colorful": "^5.6.1",
     "react-easy-crop": "^5.5.7",
     "react-window": "^1.8.11",
+    "tailwindcss": "^4.3.3",
     "zod": "^3.25.76"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",
+    "@tailwindcss/vite": "^4.3.3",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",

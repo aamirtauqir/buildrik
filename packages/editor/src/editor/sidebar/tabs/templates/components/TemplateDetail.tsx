@@ -14,8 +14,8 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import type { TemplateItem } from "../templatesData";
+import { Button } from "@/editor/chrome-ui";
 
 interface TemplateDetailProps {
   template: TemplateItem;
@@ -169,9 +169,9 @@ export const TemplateDetail: React.FC<TemplateDetailProps> = ({
           <span>
             Replacing current {pageName} page content.{" "}
             <Button
-              kind="ghost"
-              size="sm"
-              className="tpl-detail-info-note-link"
+              color="light"
+              size="xs"
+              className="tpl-detail-info-note-link tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
               onClick={() => onAddAsNewPage(template.id)}
             >
               Add as new page instead?

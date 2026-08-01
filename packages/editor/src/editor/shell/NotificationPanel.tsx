@@ -13,7 +13,7 @@
  */
 
 import * as React from "react";
-import { Button, EmptyState, Row, Spinner, StatusDot, type ToastInput } from "@/editor/ui";
+import { EmptyState, ROW_META_CLASS, Row, Spinner, StatusDot, type ToastInput } from "@/editor/chrome-ui";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { formatRelativeTime } from "@/shared/utils/relativeTime";
 import {
@@ -23,6 +23,7 @@ import {
   markAllNotificationsRead,
   type EditorNotification,
 } from "../../services/NotificationService";
+import { Button } from "@/editor/chrome-ui";
 
 /** U1: one relative-time SSOT — shared/utils/relativeTime, days fallback. */
 function relTime(iso: string | Date): string {
@@ -133,7 +134,7 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose, o
         <span className="bk-notifications__title">Notifications</span>
         {/* F5: no mark-all while there is nothing loaded to mark. */}
         {state === "ready" ? (
-          <Button kind="ghost" size="sm" onClick={() => void markAll()}>
+          <Button color="light" size="xs" onClick={() => void markAll()} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
             Mark all read
           </Button>
         ) : null}
@@ -150,7 +151,7 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose, o
           title="Couldn't load notifications"
           body="The list didn't come back. Nothing was lost."
           action={
-            <Button kind="secondary" size="sm" onClick={() => void load()}>
+            <Button color="light" size="xs" onClick={() => void load()}>
               Retry
             </Button>
           }
@@ -186,7 +187,7 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose, o
                     The target is gone — the note is kept, but there&rsquo;s nothing to jump to.
                   </span>
                 )}
-                <span className="bk-row__meta">
+                <span className={ROW_META_CLASS}>
                   {n.type} · {relTime(n.createdAt)}
                 </span>
               </span>

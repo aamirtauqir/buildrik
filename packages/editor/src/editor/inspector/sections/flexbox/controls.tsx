@@ -5,8 +5,7 @@
  */
 
 import * as React from "react";
-import { Button, Input } from "@/editor/ui";
-
+import { Button, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // ALIGNMENT GRID - 9-dot visual alignment picker
 // ============================================================================
@@ -126,7 +125,7 @@ export const GapSlider: React.FC<GapSliderProps> = ({ value, onChange, disabled 
 
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1 }}>
-      <Input
+      <TextInput
         type="range"
         min="0"
         max={maxGap}
@@ -147,7 +146,7 @@ export const GapSlider: React.FC<GapSliderProps> = ({ value, onChange, disabled 
           opacity: disabled ? 0.5 : 1,
         }}
       />
-      <Input
+      <TextInput
         type="text"
         value={value || "0"}
         onChange={(e) => onChange(e.target.value)}

@@ -8,12 +8,13 @@
  */
 
 import * as React from "react";
-import { Button, Input, PanelFrame } from "@/editor/ui";
+import { PanelFrame } from "@/editor/chrome-ui";
 import { useComposerSelection } from "../../../canvas/hooks/useComposerSelection";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
 import { LayersPanel } from "../../../panels/layers/index";
 import type { SelectedElementInfo } from "../../../panels/layers/types";
+import { Button, TextInput } from "@/editor/chrome-ui";
 
 export interface LayersTabProps {
   composer: Composer | null;
@@ -113,7 +114,7 @@ export const LayersTab: React.FC<LayersTabProps> = ({
           <circle cx="11" cy="11" r="7" />
           <path d="M21 21l-4.3-4.3" />
         </svg>
-        <Input
+        <TextInput
           type="text"
           placeholder="Find a layer"
           value={search}

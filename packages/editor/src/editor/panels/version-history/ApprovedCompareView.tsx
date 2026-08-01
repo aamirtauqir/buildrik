@@ -28,13 +28,14 @@ import {
   RefreshCw,
   type LucideIcon,
 } from "lucide-react";
-import { Button, Select, Slider } from "@/editor/ui";
+import { Slider } from "@/editor/chrome-ui";
 import {
   compareApprovedToCurrent,
   type ComparePage,
   type CompareChange,
   type CompareChangeKind,
 } from "@/shared/utils/html";
+import { Button, Select } from "@/editor/chrome-ui";
 
 export interface ApprovedCompareViewProps {
   /** Pages frozen at approval. `null` = this round has no stored snapshot. */
@@ -142,7 +143,13 @@ export const ApprovedCompareView: React.FC<ApprovedCompareViewProps> = ({
     <div style={S.body}>
       <div style={S.toolbar}>
         {(["split", "overlay", "list"] as Mode[]).map((m) => (
-          <Button key={m} kind={mode === m ? "primary" : "ghost"} size="sm" onClick={() => setMode(m)}>
+          <Button
+            key={m}
+            color={mode === m ? undefined : "light"}
+            size="xs"
+            onClick={() => setMode(m)}
+            className={mode === m ? undefined : "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"}
+          >
             {m === "split" ? "Side by side" : m === "overlay" ? "Overlay" : "List"}
           </Button>
         ))}
@@ -159,7 +166,7 @@ export const ApprovedCompareView: React.FC<ApprovedCompareViewProps> = ({
           </Select>
         )}
         {onRefreshCurrent && (
-          <Button kind="ghost" size="sm" onClick={onRefreshCurrent} title="Re-render the current site" aria-label="Re-render the current site">
+          <Button color="light" size="xs" onClick={onRefreshCurrent} title="Re-render the current site" aria-label="Re-render the current site" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
             <RefreshCw size={14} aria-hidden="true" />
           </Button>
         )}

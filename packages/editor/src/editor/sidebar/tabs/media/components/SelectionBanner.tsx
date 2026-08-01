@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
+import { Button } from "@/editor/chrome-ui";
 
 interface SelectionBannerProps {
   count: number;

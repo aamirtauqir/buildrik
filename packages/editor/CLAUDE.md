@@ -3,8 +3,9 @@
 ## Project Overview
 
 Visual web builder/editor. React 18 + TypeScript + Vite. Chrome styling =
-generated `--bk-*` tokens + the `src/editor/ui/` component library (plain CSS
-in `ui.css`); Emotion is RETIRED for chrome (4 residual files pending cleanup).
+generated `--bk-*` tokens + `flowbite-react` primitives + `tw:`-prefixed
+Tailwind utilities, composed in `src/editor/chrome-ui/`; Emotion is RETIRED
+for chrome (4 residual files pending cleanup, unrelated to the canvas).
 Core engine: `src/engine/Composer.ts` — central orchestrator with 25+ managers.
 Demo app: `demo/main.tsx` on port 5050.
 
@@ -12,7 +13,7 @@ Demo app: `demo/main.tsx` on port 5050.
 
 - **React 18.3** (devDep) + **TypeScript 5.3** (strict mode)
 - **Vite 7.2** (dev server + bundler)
-- **Generated design tokens** (`src/themes/tokens.generated.css` from Figma) + plain CSS component library (`src/editor/ui/`) — no CSS-in-JS for chrome
+- **Generated design tokens** (`src/themes/tokens.generated.css` from Figma) + `flowbite-react` component library, styled with `tw:`-prefixed Tailwind utilities (`src/editor/chrome-ui/`) — no CSS-in-JS for chrome
 - **Lucide React** — icons
 - **GSAP** — animations
 - **Zod** — schema validation
@@ -205,7 +206,7 @@ src/
 │   ├── hooks/       # Reusable React hooks
 │   ├── utils/       # Pure utility functions
 │   └── forms/       # Form field compositions (label/hint/error wiring on
-│                    # @/editor/ui controls — the one shared/→editor edge)
+│                    # @/editor/chrome-ui controls — the one shared/→editor edge)
 │
 │                    # NOTE: shared/ui/ + shared/extensions/ DELETED 2026-07-28
 │                    # (stage 6 of ds/fresh-token-system). Their survivors were
@@ -235,7 +236,7 @@ engine/    → shared/ (ONLY)
 editor/    → engine/, shared/, blocks/, templates/
 services/  → shared/ (ONLY)
 shared/    → NOTHING from other src/ folders (leaf dependency).
-            EXCEPTION: shared/forms/ files MAY import from @/editor/ui
+            EXCEPTION: shared/forms/ files MAY import from @/editor/chrome-ui
             (the component library). This is the only intentional
             shared/→editor/ edge in the graph — forms/ exists
             specifically to compose library controls with field wiring.
@@ -276,34 +277,37 @@ import { designTokens } from '../../editor/design-system'; // NAHI!
 
 ---
 
-## DESIGN SYSTEM — SSOT CONTRACT (rewritten 2026-07-28, ds/fresh-token-system)
+## DESIGN SYSTEM — SSOT CONTRACT (rewritten 2026-07-31, flowbite-bigbang Task 13)
 
 Ek concept = ek canonical home. Duplicate allowed nahi. Violation = auto-reject.
 
 | Concept | Canonical Home | Status |
 |---------|---------------|--------|
-| Chrome design tokens (`--bk-*`, ONE flat tier) | `src/themes/tokens.generated.css` + `.ts` | GENERATED from Figma (`scripts/tokens/figma-tokens.json` → `scripts/tokens/generate.mjs`). Hand-edit = build failure (`gate:tokens-generated`). Change a value in Figma, re-export, regenerate. |
-| Component library (React + CSS) | `src/editor/ui/` (+ `ui.css`) | CANONICAL — 50+ components, every one mirrors a Figma node (id in file header), styles only from `--bk-*` tokens. 0 hex, 0 fallbacks, contract tests co-located. |
+| Chrome design tokens (`--bk-*`, ONE flat tier) | `src/themes/tokens.generated.css` + `.ts` | GENERATED from Figma (`scripts/tokens/figma-tokens.json` → `scripts/tokens/generate.mjs`). Hand-edit = build failure (`gate:tokens-generated`). Change a value in Figma, re-export, regenerate. Still the SSOT for chrome tokens post-flowbite — non-chrome consumers depend on it too (`styles/tokens/canvas.tokens.ts`, `legacy-components.css`, site-builder DS). |
+| Component library | `src/editor/chrome-ui/` (React) + `flowbite-react` (behavior/primitives, from `node_modules`) | CANONICAL — every chrome component composes flowbite-react primitives styled with `tw:`-prefixed Tailwind utility classes (no separate CSS bundle). Mirrors a Figma node where one exists. 0 hex, 0 fallbacks. Contract tests in `chrome-ui/__tests__/` (incl. `flowbite-parity.test.tsx`, which documents behavior deltas against flowbite's built-ins). |
+| Tailwind class-list pipeline | `.flowbite-react/class-list.json` (repo root) via `pnpm flowbite:classlist` (`flowbite-react build`) | flowbite-react's own component theme files live in `node_modules`, invisible to Tailwind's `@source` globs. The generated class-list is the literal-string source Tailwind's JIT needs to compile those classes. Regenerate whenever a new flowbite-react component is imported. Prefix is `tw` everywhere — must match `flowbiteStore.ts`'s `setStore({prefix: "tw"})` exactly, or classes compile unprefixed and collide with canvas-mounted customer CSS (spec §4.1). |
 | a11y rules (focus-visible, reduced-motion) | `src/themes/design-system/a11y.css` | CANONICAL — real rules, not tokens. Only file allowed `@media (prefers-*)`. |
 | Site-builder tokens (user output, not chrome) | `src/editor/design-system/` + `themes/design-system/design.css` | CANONICAL — different domain, never merge with chrome DS, never regenerate from Figma (would restyle customers' published sites). |
 | Final residual engine selectors | `src/themes/legacy-components.css` | Canvas container, drag cursor, selection ring, vendor pseudo-elements. DO NOT add new rules. |
 | ~~Vibcoder library~~ | ~~`editor/shared/vibcoder/` + `themes/components/`~~ | DELETED 2026-07-28 (stage 6) — 70 primitives, 76 CSS files, 54 galleries. `shared/extensions/` + `shared/ui/` deleted same day. |
+| ~~`editor/ui/` (ds/fresh-token-system component library)~~ | ~~`src/editor/ui/` + `ui.css`~~ | DELETED 2026-07-31 (flowbite-bigbang Task 13) — its own successor, `editor/chrome-ui/`, absorbed every consumer across Tasks 2-12 first. `gate:editor-ui-gone` locks the import path at zero. |
 
 ### SSOT decision tree (before writing any DS / UI code)
 
 1. Naya token? → change it in Figma, re-export `figma-tokens.json`, run `node scripts/tokens/generate.mjs`. NEVER hand-edit `tokens.generated.*`, never define a chrome token anywhere else.
-2. Naya primitive/component? → check `src/editor/ui/index.ts` first. Already hai? Use it.
-3. Nahi hai? → Add to `src/editor/ui/<Name>.tsx` + styles in `ui.css` (bk- class prefix, `--bk-*` tokens only, weights ≤600, focus `var(--bk-shadow-focus)`) + export from `index.ts` + contract tests. Component must mirror a Figma node — put the node id in the header.
-4. Naya chrome layout / panel / view? → `editor/[domain]/`, composed from `@/editor/ui` components. No raw `<button>/<input>/<select>/<textarea>` in chrome (Gate 24; `editor/ui/` itself is the one exempt owner of native elements).
+2. Naya primitive/component? → check `src/editor/chrome-ui/index.ts` first, then flowbite-react's own exports. Already hai? Use it.
+3. Nahi hai? → Add to `src/editor/chrome-ui/<Name>.tsx`, composing a flowbite-react primitive where one fits and styling it with `tw:`-prefixed Tailwind utilities (`--bk-*` tokens via `var(--bk-*)` inside those utilities, weights ≤600, focus `var(--bk-shadow-focus)`) + export from `index.ts` + contract tests. New flowbite-react component import? Run `pnpm flowbite:classlist` so its classes land in the class-list Tailwind compiles from.
+4. Naya chrome layout / panel / view? → `editor/[domain]/`, composed from `@/editor/chrome-ui` + `flowbite-react`. No raw `<button>/<input>/<select>/<textarea>` in chrome (Gate 24; `editor/chrome-ui/` itself is the one exempt owner of native elements — flowbite-react's own internals live in `node_modules`, outside the scan by construction).
 
 ### Forbidden moves
 
-- Import from `editor/shared/vibcoder`, `shared/extensions`, or `shared/ui` → REJECT — `gate:vibcoder-ratchet` is locked at **0**; any legacy import fails the build.
+- Import from `editor/shared/vibcoder`, `shared/extensions`, `shared/ui`, or `editor/ui` → REJECT — `gate:vibcoder-ratchet` is locked at **0** for the first three; `gate:editor-ui-gone` locks `@/editor/ui` at zero (Task 13, all four paths are deleted).
 - Defining `--bd-*` or `--buildrick-*` chrome tokens anywhere → REJECT (Gate 15 — dead namespaces; Gate 17 catches ghost refs).
 - Hand-editing `tokens.generated.css/.ts` → REJECT (`gate:tokens-generated` checksum).
 - Hex literal in chrome → Gate 16 hex-ratchet (may only go down; current drain target: 49 CSS + 143 TSX).
 - Raw box-shadow/gradient in chrome → Gates 11/12 baselines (shadows via `var(--bk-shadow-*)` or `none`).
 - Duplicate `@keyframes` / selector duplicates → `gate:ds-ssot` locks.
+- `createPortal(...)` / `document.body.appendChild(...)` outside chrome-ui's overlay-root primitives (`OverlayMount`, `OverlayRoot`/`getOverlayRoot()`, `Portal`, `Toast`) or `scripts/gates/overlay-allowlist.txt` → REJECT (Gate 22).
 
 ### Why this contract exists
 
@@ -391,13 +395,13 @@ composer.on('project:saved', () => { /* show toast */ });
 
 UI components subscribe to Composer events. They do NOT poll state.
 
-### Styling: generated tokens + the ui library (2026-07-28)
+### Styling: generated tokens + chrome-ui + flowbite-react (flowbite-bigbang, Task 13 — 2026-07-31)
 
 - Tokens: `src/themes/tokens.generated.css` (`--bk-*`, generated from Figma) — loaded via `themes/default.css`
-- Component styles: `src/editor/ui/ui.css` classes (`bk-*` prefix) shipped with the library components; chrome composes `@/editor/ui` components
+- Component styles: `tw:`-prefixed Tailwind utility classes inline on each component in `src/editor/chrome-ui/` (no companion CSS file); `--bk-*` tokens reach in via `var(--bk-*)` inside those utilities. Chrome composes `@/editor/chrome-ui` components + `flowbite-react` primitives directly.
 - Feature-level CSS files (e.g. `LeftSidebar.css`) style layout/domain chrome with `var(--bk-*)` only
 - NO inline style objects except dynamic computed values (e.g., position from drag)
-- NO Tailwind, NO CSS modules, NO new Emotion — Emotion is retired for chrome (4 residual files pending cleanup)
+- Tailwind IS used for chrome now (via the `tw:` prefix + `.flowbite-react/class-list.json` pipeline — see DS SSOT table) — this reverses the pre-Task-13 "NO Tailwind" rule. NO CSS modules, NO new Emotion — Emotion is retired for chrome (4 residual files pending cleanup, unrelated to the canvas)
 
 ---
 
@@ -563,29 +567,74 @@ Use the `/browse` skill from gstack for all web browsing. Never use `mcp__claude
 - /unfreeze
 - /gstack-upgrade
 
-## Chrome Routing Rules — the ui library (vibcoder DELETED 2026-07-28)
+## Chrome Routing Rules — chrome-ui is the single public surface (2026-07-31)
 
 The chrome layer (sidebar/rail/inspector/topbar/footer) is built exclusively
-from `src/editor/ui/` — the Figma-driven component library on generated
-`--bk-*` tokens. The entire vibcoder system (React wrappers, 76-file CSS
-bundle, `--bd-*` alias layers, shared/extensions compositions, shared/ui
-primitives, preview galleries) was migrated off across 6 slices and deleted at
-stage 6 of `docs/plans/2026-07-27-ui-library-roadmap.md`.
+from `src/editor/chrome-ui/` composing `flowbite-react` primitives, styled
+with `tw:`-prefixed Tailwind utility classes and generated `--bk-*` tokens —
+no separate chrome CSS bundle. Two prior libraries are fully gone: the
+vibcoder system (React wrappers, 76-file CSS bundle, `--bd-*` alias layers,
+shared/extensions compositions, shared/ui primitives, preview galleries) was
+deleted at stage 6 of `docs/plans/2026-07-27-ui-library-roadmap.md`; its own
+successor, `src/editor/ui/` (the ds/fresh-token-system component library),
+was itself deleted at Task 13 of the flowbite big-bang migration
+(`docs/plans/flowbite-bigbang-inventory.md`) once every consumer was
+re-pointed to `chrome-ui/` and flowbite-react across Tasks 2-12.
+
+**`chrome-ui/index.ts` is the single import surface for everything
+flowbite-sourced** (chrome-ui-single-surface spec,
+`docs/plans/2026-07-31-chrome-ui-single-surface.md`). Every file under
+`packages/editor/src` outside `chrome-ui/` itself imports Button, TextInput,
+Select, Badge, etc. — and the `BK_*` theme constants, and the
+`CustomFlowbiteTheme` type — from `@/editor/chrome-ui`, never directly from
+`flowbite-react` (bare or subpath, e.g. `flowbite-react/types`) and never from
+a deep `@/editor/chrome-ui/<file>` path (e.g. `chrome-ui/selectTheme`). The
+barrel aggregates three kinds of export: pure `export { X } from
+"flowbite-react"` re-exports (Button, Badge, Avatar, AvatarGroup, Checkbox,
+Radio, ToggleSwitch, Tooltip, Textarea, Label, HelperText, RangeSlider,
+Progress, Card), the 45+ editor-specific components already canonical here
+(Topbar, IssueChip, Modal, Toast, etc.), and the closed 2-wrapper set below.
+The B3 sweep (task report:
+`.superpowers/sdd/2026-07-30-flowbite-bigbang-implementation/task-B-report.md`)
+re-pointed all 249 pre-existing direct imports across 6 surface-sized commits.
+
+**The closed 2-wrapper set — never a 3rd without amending both
+`chrome-ui/index.ts` and the gate's `WRAPPER_FILES` in the same commit:**
+
+| Wrapper | Default theme | File |
+|---|---|---|
+| `TextInput` | `BK_TEXT_INPUT_THEME` | `chrome-ui/TextInput.tsx` |
+| `Select` | `BK_SELECT_BASE_THEME` | `chrome-ui/Select.tsx` |
+
+Both are `forwardRef` (ref reaches the real `<input>`/`<select>` — load-bearing
+for rename/search focus and hidden file-input clicks) and deep-merge
+(`chrome-ui/mergeTheme.ts`) a caller-supplied `theme` prop on top of the
+default — caller key wins per leaf, untouched default keys survive. Passing
+`theme={BK_TEXT_INPUT_THEME}` / `theme={BK_SELECT_BASE_THEME}` at a call site
+is now redundant (the wrapper already applies it) and should be omitted;
+`theme={BK_SELECT_BARE_UNIT_THEME}` / `theme={BK_SELECT_BARE_VALUE_THEME}`
+and other genuinely different overrides still need the explicit prop — the
+wrapper composes it on top of the base, it does not replace it. `Label` has no
+wrapper (its contract is `className`-based — `BK_LABEL_CLASS`/
+`BK_HELPER_CLASS`/`BK_HELPER_ERROR_CLASS`, plain re-export).
 
 ### When modifying chrome
 
-- **Existing component:** edit `src/editor/ui/<Name>.tsx` + its `ui.css` block. Contract tests in `src/editor/ui/__tests__/`.
-- **New component:** must mirror a Figma node (id in file header); `--bk-*` tokens only, `bk-` class prefix, weights ≤600, focus `var(--bk-shadow-focus)`; export from `index.ts`; add contract tests.
-- **Cascade:** `@layer reset, components, overrides;` (declared in `themes/default.css`). `ui.css` loads into `components`; tokens + engine selectors are unlayered and win.
+- **Existing component:** edit `src/editor/chrome-ui/<Name>.tsx` — styles are inline `tw:` utility classes on the component itself, no companion CSS file to keep in sync. Contract tests in `src/editor/chrome-ui/__tests__/`.
+- **New component:** compose a flowbite-react primitive where one fits; mirror a Figma node where one exists; `--bk-*` tokens via `var(--bk-*)` inside `tw:` utilities, weights ≤600, focus `var(--bk-shadow-focus)`; export from `index.ts`; add contract tests. Importing a flowbite-react component for the first time? Run `pnpm flowbite:classlist` (see DS SSOT table above) so its classes reach the Tailwind build.
+- **Cascade:** `@layer reset, components, overrides;` (declared in `themes/default.css`). `tw.css` (Tailwind utilities, `tw` prefix) + `chrome-reset.css` (preflight replacement, scoped to `.bd-studio` and excluding the canvas subtree) load unlayered before `legacy-components.css`; tokens + engine selectors win over all layers per CSS spec.
 - **Tokens:** `var(--bk-*)` only, values changed in Figma → re-export → `node scripts/tokens/generate.mjs`.
 
 ### CI gates relevant to the library
 
+- `gate:chrome-ui-surface` — **ERROR mode**, locked at **0**: (1) no `flowbite-react` import (bare or subpath) outside `chrome-ui/`, (2) barrel purity — every flowbite-sourced export in `chrome-ui/index.ts` is a pure re-export, never a component definition, (3) closed wrapper set is exactly `[TextInput.tsx, Select.tsx]`. Checks 2/3 have been ERROR since the gate shipped; check 1 flipped from WARN once the B3 sweep drained the count to 0.
 - `gate:tokens-generated` — generated files current, zero legacy chrome tokens
-- `gate:vibcoder-ratchet` — locked at **0**: any import of the deleted legacy paths fails the build
+- `gate:vibcoder-ratchet` — locked at **0**: any import of the deleted vibcoder/shared-ui paths fails the build
+- `gate:editor-ui-gone` — locked at **0**: any import of the deleted `@/editor/ui` path fails the build
 - Gate 15 — `--bd-*` definitions banned (dead namespace) · Gate 17 — ghost `--bd-*` refs
-- Gate 22 — portal discipline: no `document.body` outside `OverlayMount`
-- Gate 24 — zero inline `<button>/<input>/<select>/<textarea>` in chrome (`editor/ui/` is the exempt owner of native elements)
+- Gate 18 — banned Tailwind/indigo/violet/purple bleed (the Flowbite purple ramp is allowlisted for PRO badge + avatar identity tones only — see DESIGN.md §Color, founder-confirmed 2026-07-29 — never as an accent, CTA, link, or gradient)
+- Gate 22 — portal discipline: `createPortal`/`document.body` must route through chrome-ui's overlay-root primitives (`OverlayMount`, `OverlayRoot`, `Portal`, `Toast`) or be listed in `scripts/gates/overlay-allowlist.txt`
+- Gate 24 — zero inline `<button>/<input>/<select>/<textarea>` in chrome (`editor/chrome-ui/` is the exempt owner of native elements)
 - Gates 11/12/13/14 — chrome-axiom ratchets (gradients, tokenized shadows, radius, layout literals)
 
 (Retired: Gate 19/21/23, Gate 20 barrel guard, `vibcoder:check-port`, gallery ESLint rules — their subjects no longer exist.)

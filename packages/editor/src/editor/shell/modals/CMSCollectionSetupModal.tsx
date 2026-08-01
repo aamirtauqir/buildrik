@@ -11,9 +11,9 @@
 
 import { X, Plus, Trash2, Check } from "lucide-react";
 import * as React from "react";
-import { Button, Input, ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal, Select, Stack, Textarea } from "@/editor/ui";
+import { ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
-
+import { Button, Select, Textarea, TextInput } from "@/editor/chrome-ui";
 // =============================================================================
 // TYPES
 // =============================================================================
@@ -133,6 +133,7 @@ const s: Record<string, React.CSSProperties> = {
     outline: "none",
     cursor: "pointer",
     boxSizing: "border-box" as const,
+    appearance: "auto" as const,
   },
   textarea: {
     width: "100%",
@@ -175,6 +176,7 @@ const s: Record<string, React.CSSProperties> = {
     fontSize: 12,
     outline: "none",
     cursor: "pointer",
+    appearance: "auto" as const,
   },
   removeBtn: {
     width: 24,
@@ -342,13 +344,12 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
 
   const footer = (
     <div style={s.footer}>
-      <Button kind="ghost" size="sm" onClick={onClose} disabled={creating}>
+      <Button color="light" size="xs" onClick={onClose} disabled={creating} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
         Cancel
       </Button>
       {step === 1 ? (
         <Button
-          kind="primary"
-          size="sm"
+          size="xs"
           disabled={!canProceed}
           onClick={() => setStep(2)}
         >
@@ -356,11 +357,10 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
         </Button>
       ) : (
         <Button
-          kind="primary"
-          size="sm"
-          loading={creating}
+          size="xs"
           disabled={!canProceed || creating}
           onClick={handleCreate}
+          aria-busy={creating || undefined}
         >
           Create Collection
         </Button>
@@ -406,13 +406,13 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
         </div>
       </div>
       {step === 1 && (
-        <Stack gap="lg">
+        <div className="tw:flex tw:flex-col tw:gap-4">
           {/* Collection name */}
           <div>
             <label style={s.label}>
               Collection name <span style={{ color: "var(--bk-error)" }}>*</span>
             </label>
-            <Input
+            <TextInput
               style={s.input}
               type="text"
               placeholder="Blog Posts"
@@ -464,7 +464,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
               }}
             />
           </div>
-        </Stack>
+        </div>
       )}
       {step === 2 && (
         <div>
@@ -479,7 +479,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
             <span style={{ fontSize: 12, color: "var(--bk-ink-soft)" }}>
               Fields for <strong style={{ color: "var(--bk-ink)" }}>{name}</strong>
             </span>
-            <Button kind="ghost" size="sm" onClick={addField}>
+            <Button color="light" size="xs" onClick={addField} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
               <Plus size={12} aria-hidden="true" />
               Add Field
             </Button>
@@ -508,7 +508,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
           <div style={{ maxHeight: 240, overflowY: "auto" }}>
             {fields.map((field) => (
               <div key={field.id} style={s.fieldRow}>
-                <Input
+                <TextInput
                   style={s.fieldNameInput}
                   type="text"
                   placeholder="field_name"
@@ -551,7 +551,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
           <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid var(--bk-border)" }}>
             <Button
               type="button"
-              kind={genPages ? "primary" : "secondary"}
+              color={genPages ? undefined : "light"}
               onClick={() => setGenPages((v) => !v)}
               style={{ fontSize: 12 }}
             >
@@ -559,10 +559,10 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
             </Button>
             {genPages && (
               <div style={{ marginTop: 10, display: "grid", gap: 8 }}>
-                <Input type="text" placeholder="Slug pattern — /blog/{slug}" value={pageSlug} onChange={(e) => setPageSlug(e.target.value)} />
-                <Input type="text" placeholder="Template page path — blog/_template/index.html" value={pageTemplate} onChange={(e) => setPageTemplate(e.target.value)} />
-                <Input type="text" placeholder="SEO title — {title} — Blog" value={pageSeoTitle} onChange={(e) => setPageSeoTitle(e.target.value)} />
-                <Input type="text" placeholder="SEO description — Read about {title}" value={pageSeoDesc} onChange={(e) => setPageSeoDesc(e.target.value)} />
+                <TextInput   type="text" placeholder="Slug pattern — /blog/{slug}" value={pageSlug} onChange={(e) => setPageSlug(e.target.value)} />
+                <TextInput   type="text" placeholder="Template page path — blog/_template/index.html" value={pageTemplate} onChange={(e) => setPageTemplate(e.target.value)} />
+                <TextInput   type="text" placeholder="SEO title — {title} — Blog" value={pageSeoTitle} onChange={(e) => setPageSeoTitle(e.target.value)} />
+                <TextInput   type="text" placeholder="SEO description — Read about {title}" value={pageSeoDesc} onChange={(e) => setPageSeoDesc(e.target.value)} />
               </div>
             )}
           </div>

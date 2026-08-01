@@ -8,12 +8,11 @@
  */
 
 import * as React from "react";
-import { Button, Input, Stack } from "@/editor/ui";
 import type { Composer } from "../../../engine";
 import { EVENTS } from "../../../shared/constants/events";
 import { GROUPED_TABS_CONFIG } from "../../rail/tabsConfig";
 import { getRecentCommandIds, recordCommandRun } from "./commandRecents";
-
+import { Button, TextInput } from "@/editor/chrome-ui";
 // =============================================================================
 // TYPES
 // =============================================================================
@@ -339,12 +338,12 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
         }}
       />
       {/* Panel */}
-      <Stack
+      <div
+        className="tw:flex tw:flex-col tw:gap-0"
         role="dialog"
         aria-label="Command Palette"
         aria-modal="true"
         style={{
-          gap: 0,
           position: "fixed",
           top: "20%",
           left: "50%",
@@ -387,7 +386,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
             <line x1={21} y1={21} x2={16.65} y2={16.65} />
           </svg>
 
-          <Input
+          <TextInput
             ref={inputRef}
             type="text"
             placeholder="Search commands..."
@@ -589,7 +588,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
           <span>↵ run</span>
           <span>Esc close</span>
         </div>
-      </Stack>
+      </div>
     </>
   );
 };

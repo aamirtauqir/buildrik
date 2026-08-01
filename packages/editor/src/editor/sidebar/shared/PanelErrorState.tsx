@@ -6,7 +6,8 @@
  */
 
 import * as React from "react";
-import { Button, EmptyState } from "@/editor/ui";
+import { EmptyState } from "@/editor/chrome-ui";
+import { Button } from "@/editor/chrome-ui";
 
 export interface PanelErrorStateProps {
   /** Error message to display */
@@ -26,7 +27,7 @@ export const PanelErrorState: React.FC<PanelErrorStateProps> = ({
       body={message}
       action={
         onRetry ? (
-          <Button kind="primary" size="sm" onClick={onRetry}>
+          <Button size="xs" onClick={onRetry}>
             Try again
           </Button>
         ) : undefined

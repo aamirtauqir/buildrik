@@ -4,16 +4,16 @@
  */
 
 import * as React from "react";
-import { Button, ConfirmDialog, Input } from "@/editor/ui";
+import { ConfirmDialog } from "@/editor/chrome-ui";
 import { createPortal } from "react-dom";
 import type { Composer } from "../../engine";
 import { EVENTS } from "../../shared/constants";
 import type { PageData } from "../../shared/types";
-import { useToast } from "@/editor/ui";
+import { useToast } from "@/editor/chrome-ui";
 import { useClickOutside } from "@/shared/hooks";
 import { getDefaultPageName } from "../../shared/utils/pageUtils";
 import { normalizeSlug } from "../sidebar/tabs/pages/utils/slug";
-
+import { Button, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -248,7 +248,7 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
               {page.isHome && <span style={homeIconStyles}>🏠</span>}
               {editingPageId === page.id ? (
                 <span style={{ position: "relative" }}>
-                  <Input
+                  <TextInput
                     type="text"
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}

@@ -13,10 +13,11 @@
  */
 
 import * as React from "react";
-import { IconButton, Input } from "@/editor/ui";
+import { IconButton } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../../engine";
 import type { FolderItem, PageItem } from "../types";
 import { PageRow } from "./PageRow";
+import { TextInput } from "@/editor/chrome-ui";
 
 interface Props {
   folder: FolderItem;
@@ -141,7 +142,7 @@ export const PageFolder: React.FC<Props> = ({
           </span>
 
           {isRenamingFolder ? (
-            <Input
+            <TextInput
               ref={renameInputRef}
               value={renameValue}
               onChange={(e) => setRenameValue(e.target.value)}

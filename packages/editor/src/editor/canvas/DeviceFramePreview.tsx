@@ -10,9 +10,8 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import type { DeviceType } from "../../shared/types";
-
+import { Button } from "@/editor/chrome-ui";
 // ─── Types ──────────────────────────────────────────────────────────────────
 
 export interface DeviceFramePreviewProps {

@@ -15,7 +15,8 @@ import type { Composer } from "../../engine";
 import { useElementFlash } from "../../shared/hooks";
 import { EVENTS } from "../../shared/constants";
 import type { ComposerConfig, ProjectData, BlockData } from "../../shared/types";
-import { Button, Stack, StudioSkeleton, ToastProvider, UpgradeModal, useToast } from "@/editor/ui";
+import { ToastProvider, UpgradeModal, useToast } from "@/editor/chrome-ui";
+import { StudioSkeleton } from "@/editor/chrome-ui";
 import { StaleApprovalModal } from "./modals/StaleApprovalModal";
 import { PreviewOverlay } from "./PreviewOverlay";
 import { migrateStorageKeys, migrateAqbKeys } from "../../shared/utils/storageMigration";
@@ -51,7 +52,10 @@ import { SAVE_CONFLICT_EVENT, setBaselineLastEditedAt } from "@/services/Buildri
 import "../../themes/default.css";
 import "../../themes/ux-fixes.css";
 import "./chrome.css";
-
+// flowbite-bigbang Task 2: configure flowbite-react's tw: class prefix
+// (spec §4.1) before any flowbite-react component can mount in the real app.
+import "../chrome-ui/flowbiteStore";
+import { Button } from "@/editor/chrome-ui";
 // Run localStorage migration on app startup (module load)
 migrateStorageKeys();
 migrateAqbKeys();
@@ -86,7 +90,8 @@ class StudioErrorBoundary extends React.Component<
   render() {
     if (this.state.hasError) {
       return (
-        <Stack
+        <div
+          className="tw:flex tw:flex-col tw:gap-3"
           style={{
             padding: 24,
             color: "var(--bk-ink)",
@@ -114,7 +119,7 @@ class StudioErrorBoundary extends React.Component<
           >
             Reload
           </Button>
-        </Stack>
+        </div>
       );
     }
     return this.props.children;
@@ -348,10 +353,9 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   }
 
   return (
-    <Stack
-      className={`bd-studio ${className}`}
+    <div
+      className={`tw:flex tw:flex-col tw:gap-0 bd-studio ${className}`}
       style={{
-        gap: 0,
         height: "100%",
         background: "var(--bk-bg-app, var(--bk-bg-panel))",
         color: "var(--bk-ink)",
@@ -612,7 +616,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         onClose={publishJob.dismissBlock}
         onPublishAnyway={handlePublishAcknowledged}
       />
-    </Stack>
+    </div>
   );
 };
 

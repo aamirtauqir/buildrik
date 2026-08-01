@@ -9,7 +9,7 @@
  */
 
 import * as React from "react";
-import { Button, Input, PanelFrame } from "@/editor/ui";
+import { PanelFrame } from "@/editor/chrome-ui";
 import { useHistoryState } from "../../../../shared/hooks/useHistoryState";
 import { useAutoMilestone } from "../../../../shared/hooks/useAutoMilestone";
 import { VersionHistoryPanel } from "../../../panels/VersionHistoryPanel";
@@ -17,6 +17,8 @@ import { ActivityView } from "./components/ActivityView";
 import { TimeTravelScrubber } from "./components/TimeTravelScrubber";
 import { MilestoneSuggestionBanner } from "./components/MilestoneSuggestionBanner";
 import type { HistoryView, HistoryTabProps } from "./types";
+import { Button } from "@/editor/chrome-ui";
+import { TextField } from "@/editor/chrome-ui";
 
 const HELPER_TEXT: Record<HistoryView, string> = {
   changes: "Your recent edits",
@@ -139,7 +141,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
         <span className="search-icon" aria-hidden="true">
           <SearchIconSvg />
         </span>
-        <Input
+        <TextField
           className="search-input"
           type="search"
           value={searchQuery}

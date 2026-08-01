@@ -13,10 +13,11 @@
  */
 
 import * as React from "react";
-import { Button, FormField, Input, Popover, Textarea, Tooltip } from "@/editor/ui";
+import { FormField, Popover } from "@/editor/chrome-ui";
 import type { Composer } from "../../engine";
 import { submitForReview, type ReviewStatus } from "../../services/ReviewService";
 import { exportPublishPages } from "./exportPublishPages";
+import { Button, Textarea, TextInput, Tooltip } from "@/editor/chrome-ui";
 
 export interface SendForReviewProps {
   composer: Composer | null;
@@ -107,15 +108,19 @@ export const SendForReview: React.FC<SendForReviewProps> = ({
            * would hide the why). sending/sent below keep native disabled —
            * those are busy states, and busy must stay un-clickable.
            */
-          <Tooltip label={disabledReason} placement="bottom-end">
-            <Button kind="primary" size="sm" aria-disabled="true" onClick={() => {}}>
+          <Tooltip
+            content={disabledReason}
+            placement="bottom-end"
+            arrow={false}
+            className="tw:max-w-[280px] tw:whitespace-normal"
+          >
+            <Button size="xs" aria-disabled="true" onClick={() => {}}>
               {LABEL[state]}
             </Button>
           </Tooltip>
         ) : (
           <Button
-            kind="primary"
-            size="sm"
+            size="xs"
             onClick={() => state !== "sent" && setOpen((v) => !v)}
             disabled={state === "sending" || state === "sent"}
           >
@@ -127,7 +132,7 @@ export const SendForReview: React.FC<SendForReviewProps> = ({
       <div className="bk-send-review">
         <FormField label="Client email" hint="Leave blank to keep this internal.">
           {(wiring) => (
-            <Input
+            <TextInput
               {...wiring}
               type="email"
               value={email}
@@ -138,7 +143,7 @@ export const SendForReview: React.FC<SendForReviewProps> = ({
         </FormField>
         <FormField label="What changed?">
           {(wiring) => (
-            <Input
+            <TextInput
               {...wiring}
               value={summary}
               onChange={(e) => setSummary(e.target.value)}
@@ -149,7 +154,14 @@ export const SendForReview: React.FC<SendForReviewProps> = ({
         </FormField>
         <FormField label="Note to the reviewer" hint="Optional.">
           {(wiring) => (
-            <Textarea {...wiring} value={note} onChange={(e) => setNote(e.target.value)} maxLength={500} rows={3} />
+            <Textarea
+              className="tw:bg-white tw:focus:border-primary-700 tw:focus:ring-primary-700"
+              {...wiring}
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              maxLength={500}
+              rows={3}
+            />
           )}
         </FormField>
         {state === "error" ? (
@@ -158,10 +170,10 @@ export const SendForReview: React.FC<SendForReviewProps> = ({
           </p>
         ) : null}
         <div className="bk-send-review__actions">
-          <Button kind="ghost" size="sm" onClick={() => setOpen(false)}>
+          <Button color="light" size="xs" onClick={() => setOpen(false)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
             Cancel
           </Button>
-          <Button kind="primary" size="sm" loading={state === "sending"} onClick={() => void send()}>
+          <Button size="xs" disabled={state === "sending"} onClick={() => void send()} aria-busy={state === "sending" || undefined}>
             Send
           </Button>
         </div>

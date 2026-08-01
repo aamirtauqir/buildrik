@@ -35,7 +35,7 @@
  */
 
 import * as React from "react";
-import { isModalOpen } from "@/editor/ui";
+import { isModalOpen } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
 import { cycleRegion } from "../regionCycle";
 

@@ -11,12 +11,12 @@
 
 import { Link, Unlink } from "lucide-react";
 import * as React from "react";
-import { Button, Input, Stack } from "@/editor/ui";
+import { TextField } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
 import { DSBindingChip } from "../../sections/DSBindingChip";
 import { isTokenVar, extractVarName, cssVarToTokenId } from "../tokenBindingDetection";
-
+import { Button, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // AXIS INPUT — absolutely positioned input inside a box edge
 // ============================================================================
@@ -81,7 +81,7 @@ const AxisInput: React.FC<AxisInputProps> = ({ side, value, onChange, disabled, 
 
   return (
     <>
-      <Input
+      <TextField
         type="text"
         className={`bdi-ax ${SIDE_POS[side]}${local.isKeyword ? " muted" : ""}`}
         value={display}
@@ -173,7 +173,7 @@ export const CornerRadiusInput: React.FC<CornerRadiusInputProps> = ({
   linked = false,
   onLinkToggle,
 }) => (
-  <Stack gap="xs">
+  <div className="tw:flex tw:flex-col tw:gap-1">
     <div
       style={{
         display: "flex",
@@ -205,7 +205,7 @@ export const CornerRadiusInput: React.FC<CornerRadiusInputProps> = ({
         const { num, unit } = parseValue(values[corner]);
         return (
           <div key={corner} className="bdi-num axis" data-axis={corner.toUpperCase()}>
-            <Input
+            <TextInput
               type="text"
               value={num}
               onChange={(e) => {
@@ -221,5 +221,5 @@ export const CornerRadiusInput: React.FC<CornerRadiusInputProps> = ({
         );
       })}
     </div>
-  </Stack>
+  </div>
 );

@@ -12,12 +12,11 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import type { Composer, Element } from "../../../engine";
 import { Z_LAYERS } from "../../../shared/constants/canvas";
 import { EVENTS } from "../../../shared/constants/events";
 import { CANVAS_COLORS, SIZES } from "../shared";
-
+import { Button } from "@/editor/chrome-ui";
 // =============================================================================
 // TYPES
 // =============================================================================

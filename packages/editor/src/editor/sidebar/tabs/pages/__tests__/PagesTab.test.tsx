@@ -9,8 +9,8 @@ import { render, screen, fireEvent } from "@testing-library/react";
 // ─── Mock heavy engine/shared deps before importing components ────────────────
 
 vi.mock("@/engine", () => ({ Composer: class {} }));
-vi.mock("@/editor/ui", async () => {
-  const actual = await vi.importActual<Record<string, unknown>>("@/editor/ui");
+vi.mock("@/editor/chrome-ui", async () => {
+  const actual = await vi.importActual<Record<string, unknown>>("@/editor/chrome-ui");
   return {
     ...actual,
     useToast: () => ({ addToast: vi.fn(), removeToast: vi.fn(), toasts: [] }),

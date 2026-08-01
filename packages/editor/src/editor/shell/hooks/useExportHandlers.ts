@@ -22,7 +22,7 @@
  */
 
 import * as React from "react";
-import { ToastInput } from "@/editor/ui";
+import { ToastInput } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
 import { ExportEngine } from "../../../engine/export";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";

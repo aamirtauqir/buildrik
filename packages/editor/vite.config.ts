@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
 import { resolve } from "path";
 
 export default defineConfig({
@@ -7,6 +8,7 @@ export default defineConfig({
     react({
       jsxImportSource: "@emotion/react",
     }),
+    tailwindcss(),
   ],
   root: "./demo",
   // Read env from monorepo root so a single `.env.local` serves both

@@ -6,7 +6,7 @@
  */
 
 import * as React from "react";
-import { Input } from "@/editor/ui";
+import { TextField } from "@/editor/chrome-ui";
 
 // ============================================================================
 // TEXT INPUT ROW
@@ -29,7 +29,7 @@ export const TextInputRow: React.FC<TextInputRowProps> = ({
   <div className="bdi-row-ctrl">
     <label className="bdi-lb">{label}</label>
     <div className="bdi-row-content">
-      <Input
+      <TextField
         type="text"
         className="bdi-text"
         value={value}
@@ -61,7 +61,7 @@ export const InlineInput: React.FC<InlineInputProps> = ({
   <div className="bdi-row-ctrl">
     <label className="bdi-lb">{label}</label>
     <div className="bdi-row-content">
-      <Input
+      <TextField
         type="text"
         className="bdi-text"
         value={value}

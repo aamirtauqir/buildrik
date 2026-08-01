@@ -22,8 +22,8 @@ const mocks = vi.hoisted(() => ({
   animateDropSuccess: vi.fn(() => Promise.resolve()),
 }));
 
-vi.mock("@/editor/ui", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@/editor/ui")>()),
+vi.mock("@/editor/chrome-ui", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/editor/chrome-ui")>()),
   ...{
   useToast: () => ({ addToast: mocks.addToast }),
 },

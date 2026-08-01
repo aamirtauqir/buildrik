@@ -1,0 +1,98 @@
+/* ── Skeleton compounds — layout chrome ──────────────────────────────────
+   Moved verbatim from editor/ui/ui.css (flowbite big-bang: SkeletonCompounds
+   → chrome-ui/Skeleton.tsx). The pulsing base block and the boot-screen
+   spinner are gone from here — they're `tw:animate-pulse`/flowbite `Spinner`
+   now (see Skeleton.tsx). Everything below is pure row/boot-screen layout
+   with no flowbite equivalent, same class as reasons `layers-v2.css`/
+   `inspector.css` stay outside the `@layer` chain. Imported directly by
+   Skeleton.tsx (`import "./skeleton.css"`), not routed through
+   themes/default.css. */
+
+.bk-skeleton-list-item {
+  display: flex;
+  align-items: center;
+  gap: var(--bk-space-12);
+  padding: var(--bk-space-12) var(--bk-space-16);
+  background: var(--bk-bg-card);
+  border-radius: var(--bk-radius-lg);
+  border: 1px solid var(--bk-border);
+}
+.bk-skeleton-list-item__text { flex: 1; }
+.bk-skeleton-list-item__line-primary { height: var(--bk-space-12); width: 50%; margin-bottom: var(--bk-space-4); }
+.bk-skeleton-list-item__line-secondary { height: var(--bk-space-12); width: 80%; }
+.bk-skeleton-list-item__action { height: var(--bk-space-32); width: var(--bk-space-32); border-radius: var(--bk-radius-lg); }
+
+.bk-studio-skeleton {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  background: var(--bk-bg-app);
+  overflow: hidden;
+}
+.bk-studio-skeleton__topbar {
+  height: var(--bk-size-topbar);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 var(--bk-space-16);
+  gap: var(--bk-space-12);
+  border-bottom: 1px solid var(--bk-border);
+  background: var(--bk-bg-panel);
+  z-index: var(--bk-z-chrome);
+}
+.bk-studio-skeleton__topbar-group {
+  display: flex;
+  gap: var(--bk-space-12);
+  margin-right: var(--bk-space-24);
+}
+.bk-studio-skeleton__chip { width: var(--bk-space-32); height: var(--bk-space-32); }
+.bk-studio-skeleton__title { width: 160px; height: var(--bk-space-32); border-radius: var(--bk-radius-lg); }
+.bk-studio-skeleton__action { width: 80px; height: var(--bk-space-32); border-radius: var(--bk-radius-lg); }
+.bk-studio-skeleton__spring { flex: 1; }
+.bk-studio-skeleton__body { flex: 1; display: flex; overflow: hidden; }
+.bk-studio-skeleton__rail {
+  width: var(--bk-size-rail);
+  flex-shrink: 0;
+  border-right: 1px solid var(--bk-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: var(--bk-space-16);
+  gap: var(--bk-space-20);
+  background: var(--bk-bg-panel);
+}
+.bk-studio-skeleton__rail-item { width: var(--bk-space-36); height: var(--bk-space-36); border-radius: var(--bk-radius-lg); }
+.bk-studio-skeleton__avatar { width: var(--bk-space-36); height: var(--bk-space-36); margin-bottom: var(--bk-space-16); }
+.bk-studio-skeleton__canvas {
+  flex: 1;
+  background: var(--bk-bg-app);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.bk-studio-skeleton__page {
+  width: 70%;
+  height: 70%;
+  background: var(--bk-bg-card);
+  border-radius: var(--bk-radius-sm);
+  box-shadow: var(--bk-shadow-raised);
+}
+.bk-studio-skeleton__center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--bk-space-16);
+}
+.bk-studio-skeleton__label {
+  color: var(--bk-ink-muted);
+  font-family: var(--bk-font-ui);
+  font-size: var(--bk-text-13);
+  font-weight: var(--bk-weight-medium);
+  letter-spacing: var(--bk-tracking-wide);
+}

@@ -8,12 +8,12 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button, Checkbox, ConfirmDialog, Input, Select, Textarea, Toggle } from "@/editor/ui";
+import { ConfirmDialog } from "@/editor/chrome-ui";
 import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
 import type { ConditionExpression, ConditionOperator, DataSource } from "@/shared/types/data";
 import { conditionSummary, fieldDefault, isValidVariableKey, type SiteVariable } from "./contentPanelUtils";
 import type { ConditionRow } from "./useContentPanel";
-
+import { Button, Checkbox, Select, Textarea, TextInput, ToggleSwitch } from "@/editor/chrome-ui";
 export const S: Record<string, React.CSSProperties> = {
   body: { display: "flex", flexDirection: "column", height: "100%", minHeight: 0 },
   scroll: { flex: 1, minHeight: 0, overflowY: "auto" },
@@ -120,6 +120,7 @@ export const S: Record<string, React.CSSProperties> = {
     background: "var(--bk-bg-card)",
     color: "var(--bk-ink)",
     fontFamily: "inherit",
+    appearance: "auto",
   },
 };
 
@@ -171,7 +172,7 @@ export function RootView({
       <div style={S.center} data-testid="content-empty">
         <div>Collections turn a spreadsheet into pages — one page per row, updated when the data changes.</div>
         {onCreateCollection && (
-          <Button kind="primary" size="sm" onClick={onCreateCollection}>
+          <Button size="xs" onClick={onCreateCollection}>
             Create a collection
           </Button>
         )}
@@ -335,7 +336,7 @@ export function RecordView({
             {f.type === "boolean" ? (
               <div style={S.toggleRow}>
                 <span style={{ fontSize: 13 }}>{f.name}</span>
-                <Toggle
+                <ToggleSwitch
                   checked={Boolean(data[f.slug])}
                   aria-label={f.name}
                   onChange={() => setField(f.slug, !data[f.slug])}
@@ -352,7 +353,7 @@ export function RecordView({
                     aria-label={f.name}
                   />
                 ) : (
-                  <Input
+                  <TextInput
                     style={S.input}
                     type={f.type === "number" ? "number" : "text"}
                     value={String(data[f.slug] ?? "")}
@@ -366,7 +367,7 @@ export function RecordView({
         ))}
         <div style={S.toggleRow}>
           <span style={{ fontSize: 13 }}>Published</span>
-          <Toggle checked={published} aria-label="Published" onChange={() => setPublished((v) => !v)} />
+          <ToggleSwitch checked={published} aria-label="Published" onChange={() => setPublished((v) => !v)} />
         </div>
         {record && onDelete && (
           <Button style={{ ...S.addLink, color: "var(--bk-error)" }} onClick={onDelete}>
@@ -378,12 +379,11 @@ export function RecordView({
         <div style={S.savebar} role="region" aria-label="Unsaved changes">
           <span style={{ fontSize: 12, color: "var(--bk-warning-text)" }}>Unsaved changes</span>
           <span style={{ flex: 1 }} />
-          <Button kind="ghost" size="sm" onClick={() => { setData(initial); setPublished(record?.status === "published"); }}>
+          <Button color="light" size="xs" onClick={() => { setData(initial); setPublished(record?.status === "published"); }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
             Discard
           </Button>
           <Button
-            kind="primary"
-            size="sm"
+            size="xs"
             disabled={saving}
             onClick={() => {
               setSaving(true);
@@ -432,10 +432,10 @@ export function FieldsView({
             <span style={S.rowMeta}>
               {f.validation?.required && <span style={{ color: "var(--bk-ink-muted)" }}>required</span>}
               <Button
-                kind="ghost"
-                size="sm"
+                color="light"
+                size="xs"
                 aria-label={`Delete field ${f.name}`}
-                onClick={() => setConfirmDelete(f)}
+                onClick={() => setConfirmDelete(f)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
               >
                 ✕
               </Button>
@@ -444,7 +444,7 @@ export function FieldsView({
         ))}
         {adding ? (
           <div style={S.inlineForm}>
-            <Input
+            <TextInput
               style={{ ...S.input, margin: 0, width: "auto" }}
               placeholder="Field name"
               value={name}
@@ -460,16 +460,17 @@ export function FieldsView({
               </Select>
               <label style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, cursor: "pointer" }}>
                 <Checkbox
+                  color="blue"
+                  className="tw:bg-white"
                   checked={required}
                   onChange={(e) => setRequired(e.target.checked)}
                 />
                 <span>required</span>
               </label>
               <span style={{ flex: 1 }} />
-              <Button kind="ghost" size="sm" onClick={() => setAdding(false)}>Cancel</Button>
+              <Button color="light" size="xs" onClick={() => setAdding(false)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">Cancel</Button>
               <Button
-                kind="primary"
-                size="sm"
+                size="xs"
                 disabled={!name.trim()}
                 onClick={() => {
                   void onAddField(name, type, required).then(() => {
@@ -547,10 +548,9 @@ export function SourcesView({
             {error && <div style={{ fontSize: 12, color: "var(--bk-error)" }} role="alert">{error}</div>}
             <div style={S.formRow}>
               <span style={{ flex: 1 }} />
-              <Button kind="ghost" size="sm" onClick={() => { setAdding(false); setError(null); }}>Cancel</Button>
+              <Button color="light" size="xs" onClick={() => { setAdding(false); setError(null); }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">Cancel</Button>
               <Button
-                kind="primary"
-                size="sm"
+                size="xs"
                 disabled={!json.trim()}
                 onClick={() => {
                   const err = onImportJson(json);
@@ -605,7 +605,7 @@ export function VariablesView({
             <span style={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0, flex: 1 }}>
               <span style={S.mono}>{`{{site.${v.key}}}`}</span>
               {editKey === v.key ? (
-                <Input
+                <TextInput
                   style={{ ...S.input, margin: "4px 0 0", width: "auto" }}
                   value={editValue}
                   onChange={(e) => setEditValue(e.target.value)}
@@ -626,21 +626,21 @@ export function VariablesView({
             <span style={S.rowMeta}>
               {editKey === v.key ? (
                 <Button
-                  kind="ghost"
-                  size="sm"
+                  color="light"
+                  size="xs"
                   onClick={() => {
                     onChange(variables.map((x) => (x.key === v.key ? { ...x, value: editValue } : x)));
                     setEditKey(null);
-                  }}
+                  }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
                 >
                   Save
                 </Button>
               ) : (
                 <>
-                  <Button kind="ghost" size="sm" aria-label={`Edit ${v.key}`} onClick={() => { setEditKey(v.key); setEditValue(v.value); }}>
+                  <Button color="light" size="xs" aria-label={`Edit ${v.key}`} onClick={() => { setEditKey(v.key); setEditValue(v.value); }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                     Edit
                   </Button>
-                  <Button kind="ghost" size="sm" aria-label={`Delete ${v.key}`} onClick={() => onChange(variables.filter((x) => x.key !== v.key))}>
+                  <Button color="light" size="xs" aria-label={`Delete ${v.key}`} onClick={() => onChange(variables.filter((x) => x.key !== v.key))} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                     ✕
                   </Button>
                 </>
@@ -650,7 +650,7 @@ export function VariablesView({
         ))}
         {adding ? (
           <div style={S.inlineForm}>
-            <Input
+            <TextInput
               style={{ ...S.input, margin: 0, width: "auto" }}
               placeholder="key (e.g. phone)"
               value={key}
@@ -663,7 +663,7 @@ export function VariablesView({
                 {dupError ? "A variable with this key already exists." : "Keys are letters/digits/dashes, starting with a letter."}
               </div>
             )}
-            <Input
+            <TextInput
               style={{ ...S.input, margin: 0, width: "auto" }}
               placeholder="value"
               value={value}
@@ -672,10 +672,9 @@ export function VariablesView({
             />
             <div style={S.formRow}>
               <span style={{ flex: 1 }} />
-              <Button kind="ghost" size="sm" onClick={() => setAdding(false)}>Cancel</Button>
+              <Button color="light" size="xs" onClick={() => setAdding(false)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">Cancel</Button>
               <Button
-                kind="primary"
-                size="sm"
+                size="xs"
                 disabled={!key.trim() || keyError || dupError}
                 onClick={() => {
                   onChange([...variables, { key: key.trim(), value }]);
@@ -737,10 +736,10 @@ export function ConditionsView({
               <span style={S.sub}>{conditionSummary(c.binding)}</span>
             </span>
             <span style={S.rowMeta}>
-              <Button kind="ghost" size="sm" onClick={() => onSelectElement(c.elementId)}>
+              <Button color="light" size="xs" onClick={() => onSelectElement(c.elementId)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                 Select
               </Button>
-              <Button kind="ghost" size="sm" aria-label="Remove condition" onClick={() => onRemove(c.elementId)}>
+              <Button color="light" size="xs" aria-label="Remove condition" onClick={() => onRemove(c.elementId)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                 ✕
               </Button>
             </span>
@@ -754,7 +753,7 @@ export function ConditionsView({
         {pickedElementId ? (
           <div style={S.inlineForm} data-testid="condition-form">
             <div style={{ fontSize: 12, color: "var(--bk-ink-muted)" }}>Show the picked element when…</div>
-            <Input
+            <TextInput
               style={{ ...S.input, margin: 0, width: "auto" }}
               placeholder="site.hours or menu.available"
               value={left}
@@ -774,7 +773,7 @@ export function ConditionsView({
                 ))}
               </Select>
               {needsRight && (
-                <Input
+                <TextInput
                   style={{ ...S.input, margin: 0, width: "auto", flex: 1 }}
                   placeholder="value"
                   value={right}
@@ -785,10 +784,9 @@ export function ConditionsView({
             </div>
             <div style={S.formRow}>
               <span style={{ flex: 1 }} />
-              <Button kind="ghost" size="sm" onClick={onCancelPick}>Cancel</Button>
+              <Button color="light" size="xs" onClick={onCancelPick} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">Cancel</Button>
               <Button
-                kind="primary"
-                size="sm"
+                size="xs"
                 disabled={!left.trim() || (needsRight && !right.trim())}
                 onClick={() =>
                   onCreate({

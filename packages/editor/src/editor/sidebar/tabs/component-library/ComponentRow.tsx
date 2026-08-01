@@ -6,9 +6,9 @@
 
 import { MoreHorizontal, Plus, Copy, Trash2, RefreshCw, Star, Edit3 } from "lucide-react";
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import type { ComponentDefinition } from "../../../../shared/types/components";
 import { ComponentIcon } from "./ComponentIcon";
+import { Button } from "@/editor/chrome-ui";
 
 export interface ComponentRowProps {
   component: ComponentDefinition;

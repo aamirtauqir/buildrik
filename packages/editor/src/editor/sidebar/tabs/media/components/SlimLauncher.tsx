@@ -9,7 +9,7 @@
  */
 
 import * as React from "react";
-import { Button, Input, PanelFrame } from "@/editor/ui";
+import { PanelFrame } from "@/editor/chrome-ui";
 import { Search } from "lucide-react";
 import type { Composer } from "@/engine/Composer";
 import type { LibraryItem, MediaTypeFilter, TypeCounts, UploadProgress } from "../data/mediaTypes";
@@ -18,6 +18,8 @@ import { SelectionContextBar } from "./SelectionContextBar";
 import { AssetCell } from "./AssetCell";
 import { UploadZone } from "./UploadZone";
 import "./SlimLauncher.css";
+import { Button } from "@/editor/chrome-ui";
+import { TextField } from "@/editor/chrome-ui";
 
 interface SlimLauncherProps {
   composer: Composer;
@@ -89,7 +91,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
       </div>
       <div className="sl-search">
         <Search size={14} className="sl-search__icon" aria-hidden="true" />
-        <Input
+        <TextField
           type="text"
           className="sl-search__input"
           placeholder="Search library…"

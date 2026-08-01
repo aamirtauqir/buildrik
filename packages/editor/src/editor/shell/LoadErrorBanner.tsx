@@ -13,8 +13,7 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
-
+import { Button } from "@/editor/chrome-ui";
 export type LoadErrorKind = "auth" | "network" | null;
 
 export interface LoadErrorBannerProps {
@@ -49,9 +48,9 @@ export const LoadErrorBanner: React.FC<LoadErrorBannerProps> = ({ kind, onRetry,
         )}
       </div>
       <div style={S.actions}>
-        {onDismiss && <Button kind="ghost" size="sm" onClick={onDismiss}>Dismiss</Button>}
-        {isAuth && <Button kind="secondary" size="sm" onClick={onSignIn}>Sign in</Button>}
-        <Button kind="primary" size="sm" onClick={onRetry}>Retry</Button>
+        {onDismiss && <Button color="light" size="xs" onClick={onDismiss} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">Dismiss</Button>}
+        {isAuth && <Button color="light" size="xs" onClick={onSignIn}>Sign in</Button>}
+        <Button size="xs" onClick={onRetry}>Retry</Button>
       </div>
     </div>
   );

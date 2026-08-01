@@ -16,13 +16,12 @@
 
 import { ChevronDown, Monitor, Tablet, Smartphone } from "lucide-react";
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import {
   BREAKPOINTS,
   BREAKPOINT_ORDER,
 } from "../../../shared/constants/breakpoints";
 import type { BreakpointId } from "../../../shared/types/breakpoints";
-
+import { Button } from "@/editor/chrome-ui";
 const BP_ICONS: Record<BreakpointId, React.ReactNode> = {
   desktop: <Monitor size={11} aria-hidden="true" />,
   tablet: <Tablet size={11} aria-hidden="true" />,

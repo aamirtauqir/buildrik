@@ -1,4 +1,4 @@
-import { ToastActionPayload, ToastTone } from "@/editor/ui";
+import { ToastActionPayload, ToastTone } from "@/editor/chrome-ui";
 /**
  * Context Menu Registry
  * Simplified context menu with 4 main groups and nested submenus

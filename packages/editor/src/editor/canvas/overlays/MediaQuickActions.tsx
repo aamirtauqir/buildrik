@@ -5,9 +5,9 @@
  */
 
 import * as React from "react";
-import { Button, Input } from "@/editor/ui";
 import { Edit2, Image, Type, Check, Palette } from "lucide-react";
 import type { Composer } from "../../../engine";
+import { Button, TextInput } from "@/editor/chrome-ui";
 
 interface MediaQuickActionsProps {
   composer: Composer;
@@ -143,7 +143,7 @@ export const MediaQuickActions: React.FC<MediaQuickActionsProps> = ({
         <div style={popoverStyle}>
           <div style={popoverTitleStyle}>Alt Text (SEO)</div>
           <div style={{ display: "flex", gap: "4px" }}>
-            <Input
+            <TextInput
               autoFocus
               type="text"
               value={altValue}

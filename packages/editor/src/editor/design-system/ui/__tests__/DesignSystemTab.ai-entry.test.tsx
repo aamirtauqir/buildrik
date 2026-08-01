@@ -14,7 +14,7 @@ import { DesignSystemTab } from "../DesignSystemTab";
 import { TokenRegistryProvider } from "../../state/TokenRegistryContext";
 import { StylePresetRegistryProvider } from "../../state/StylePresetRegistryContext";
 import { DSModeProvider } from "../../state/DSModeContext";
-import { ToastProvider } from "@/editor/ui";
+import { ToastProvider } from "@/editor/chrome-ui";
 import { AIAssistService } from "../../../../engine/designSystem/services/AIAssistService";
 import { EventEmitter } from "../../../../engine/EventEmitter";
 

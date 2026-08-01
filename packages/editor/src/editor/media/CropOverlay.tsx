@@ -8,10 +8,9 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import type { CropConfig, AspectRatioPreset } from "../../shared/types/media";
 import { ASPECT_RATIO_PRESETS } from "../../shared/types/media";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================

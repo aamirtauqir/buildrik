@@ -5,7 +5,6 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import {
   CanvasButton,
   CANVAS_COLORS,
@@ -16,6 +15,7 @@ import {
   SIZES,
   Z_INDEX,
 } from "../shared";
+import { Button } from "@/editor/chrome-ui";
 
 export interface ZoomControlProps {
   zoom: number;

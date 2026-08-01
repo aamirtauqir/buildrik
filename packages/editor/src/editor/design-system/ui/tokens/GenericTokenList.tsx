@@ -1,9 +1,9 @@
 import * as React from "react";
-import { Button, Input } from "@/editor/ui";
 import type { DesignToken } from "../../types";
 import { useDSModeOptional } from "../../state/DSModeContext";
 import { TokenUsageChip } from "../sections/TokenUsageChip";
 import type { LintIssue } from "../../../../engine/designSystem/LintState";
+import { Button, TextInput } from "@/editor/chrome-ui";
 
 interface GenericTokenListProps {
   tokens: DesignToken[];
@@ -171,7 +171,7 @@ export const GenericTokenList: React.FC<GenericTokenListProps> = ({
                   </div>
                 )}
               </div>
-              <Input
+              <TextInput
                 type="text"
                 value={t.value}
                 onChange={(e) => onTokenChange(t.id, e.target.value)}
@@ -183,8 +183,8 @@ export const GenericTokenList: React.FC<GenericTokenListProps> = ({
               />
               <Button
                 type="button"
-                kind="ghost"
-                size="sm"
+                color="light"
+                size="xs"
                 disabled={!undoable}
                 onClick={() => onUndo(t.id)}
                 style={{
@@ -192,7 +192,7 @@ export const GenericTokenList: React.FC<GenericTokenListProps> = ({
                   opacity: undoable ? 1 : 0.4,
                   cursor: undoable ? "pointer" : "not-allowed",
                 }}
-                aria-label={`Restore ${friendly}`}
+                aria-label={`Restore ${friendly}`} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
               >
                 Restore
               </Button>

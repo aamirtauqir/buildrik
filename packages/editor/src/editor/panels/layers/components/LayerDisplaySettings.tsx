@@ -8,9 +8,9 @@
  */
 
 import * as React from "react";
-import { Button, Checkbox } from "@/editor/ui";
 import { useClickOutside } from "../../../../shared/hooks/useClickOutside";
 import type { LayerDisplayPrefs } from "../types";
+import { Button, Checkbox } from "@/editor/chrome-ui";
 
 interface LayerDisplaySettingsProps {
   prefs: LayerDisplayPrefs;
@@ -42,6 +42,7 @@ export function LayerDisplaySettings({ prefs, onChange, onClose }: LayerDisplayS
           <span> div, section, h1…</span>
         </span>
         <Checkbox
+          color="blue"
           className="bdc-switch"
           checked={prefs.showHtmlBadges}
           onChange={(e) => onChange({ showHtmlBadges: e.target.checked })}
@@ -53,6 +54,7 @@ export function LayerDisplaySettings({ prefs, onChange, onClose }: LayerDisplayS
           <span> #abc123 format</span>
         </span>
         <Checkbox
+          color="blue"
           className="bdc-switch"
           checked={prefs.showElementIds}
           onChange={(e) => onChange({ showElementIds: e.target.checked })}
@@ -61,6 +63,7 @@ export function LayerDisplaySettings({ prefs, onChange, onClose }: LayerDisplayS
       <label className="bdc-toggle-row">
         <span>Compact rows</span>
         <Checkbox
+          color="blue"
           className="bdc-switch"
           checked={prefs.treeDensity === "compact"}
           onChange={(e) => onChange({ treeDensity: e.target.checked ? "compact" : "comfortable" })}

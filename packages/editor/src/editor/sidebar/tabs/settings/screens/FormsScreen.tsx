@@ -10,11 +10,11 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import { createBuildrikApiClient } from "@/services/api-client";
 import { Field, Screen, Section, Select } from "../shared";
 import type { ScreenProps } from "../types";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
+import { Button } from "@/editor/chrome-ui";
 
 interface FormBlockRow {
   id: string;
@@ -261,12 +261,12 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
             <Button
               key={f}
               type="button"
-              kind="ghost"
-              size="sm"
+              color="light"
+              size="xs"
               role="tab"
               aria-selected={filter === f}
               onClick={() => setFilter(f)}
-              style={filter === f ? filterChipActiveStyles : filterChipStyles}
+              style={filter === f ? filterChipActiveStyles : filterChipStyles} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
             >
               {f.charAt(0).toUpperCase() + f.slice(1)}
             </Button>
@@ -277,11 +277,11 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
       <Section title={`Submissions${submissions ? ` (${submissions.total})` : ""}`}>
         <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "8px" }}>
           <Button
-            kind="ghost"
-            size="sm"
+            color="light"
+            size="xs"
             type="button"
             onClick={handleExport}
-            disabled={exporting || subsLoading || !submissions || submissions.total === 0}
+            disabled={exporting || subsLoading || !submissions || submissions.total === 0} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           >
             {exporting ? "Exporting…" : "Export CSV"}
           </Button>
@@ -301,13 +301,13 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
                 <li key={s.id} style={s.isRead ? rowStyles : rowUnreadStyles}>
                   <Button
                     type="button"
-                    kind="ghost"
+                    color="light"
                     onClick={() => {
                       setExpandedId(isExpanded ? null : s.id);
                       if (!s.isRead) void handleUpdate(s.id, { isRead: true });
                     }}
                     style={rowButtonStyles}
-                    aria-expanded={isExpanded}
+                    aria-expanded={isExpanded} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
                   >
                     <div style={summaryRowStyles}>
                       <span style={s.isRead ? subjectReadStyles : subjectUnreadStyles}>
@@ -329,26 +329,26 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
                       </dl>
                       <div style={actionsStyles}>
                         {!s.isSpam && (
-                          <Button kind="ghost" size="sm" type="button" onClick={() => handleUpdate(s.id, { isSpam: true })} style={actionBtnStyles}>
+                          <Button color="light" size="xs" type="button" onClick={() => handleUpdate(s.id, { isSpam: true })} style={actionBtnStyles} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                             Mark spam
                           </Button>
                         )}
                         {s.isSpam && (
-                          <Button kind="ghost" size="sm" type="button" onClick={() => handleUpdate(s.id, { isSpam: false })} style={actionBtnStyles}>
+                          <Button color="light" size="xs" type="button" onClick={() => handleUpdate(s.id, { isSpam: false })} style={actionBtnStyles} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                             Not spam
                           </Button>
                         )}
                         {!s.isArchived && (
-                          <Button kind="ghost" size="sm" type="button" onClick={() => handleUpdate(s.id, { isArchived: true })} style={actionBtnStyles}>
+                          <Button color="light" size="xs" type="button" onClick={() => handleUpdate(s.id, { isArchived: true })} style={actionBtnStyles} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                             Archive
                           </Button>
                         )}
                         {s.isArchived && (
-                          <Button kind="ghost" size="sm" type="button" onClick={() => handleUpdate(s.id, { isArchived: false })} style={actionBtnStyles}>
+                          <Button color="light" size="xs" type="button" onClick={() => handleUpdate(s.id, { isArchived: false })} style={actionBtnStyles} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                             Unarchive
                           </Button>
                         )}
-                        <Button kind="ghost" size="sm" type="button" onClick={() => handleDelete(s.id)} style={deleteBtnStyles}>
+                        <Button color="light" size="xs" type="button" onClick={() => handleDelete(s.id)} style={deleteBtnStyles} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                           Delete
                         </Button>
                       </div>
@@ -362,12 +362,12 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
         {submissions && submissions.total > PER_PAGE && (
           <div style={paginationStyles}>
             <Button
-              kind="ghost"
-              size="sm"
+              color="light"
+              size="xs"
               type="button"
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page <= 1 || subsLoading}
-              style={pageBtnStyles}
+              style={pageBtnStyles} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
             >
               ← Prev
             </Button>
@@ -375,12 +375,12 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
               Page {page} of {totalPages}
             </span>
             <Button
-              kind="ghost"
-              size="sm"
+              color="light"
+              size="xs"
               type="button"
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page >= totalPages || subsLoading}
-              style={pageBtnStyles}
+              style={pageBtnStyles} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
             >
               Next →
             </Button>

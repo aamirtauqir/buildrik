@@ -9,8 +9,8 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import type { PresetCategory } from "../../types";
+import { Button } from "@/editor/chrome-ui";
 
 export interface StyleCategoryRowProps {
   category: PresetCategory;
@@ -43,8 +43,8 @@ export const StyleCategoryRow: React.FC<StyleCategoryRowProps> = ({
   return (
     <Button
       type="button"
-      kind="ghost"
-      size="sm"
+      color="light"
+      size="xs"
       data-category-row={category}
       data-active={isActive ? "true" : undefined}
       onClick={onClick}
@@ -70,7 +70,7 @@ export const StyleCategoryRow: React.FC<StyleCategoryRowProps> = ({
         fontSize: 12.5,
         color: isActive ? "var(--bk-accent)" : "var(--bk-ink)",
         fontWeight: isActive ? 600 : 500,
-      }}
+      }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
     >
       <span>
         {CATEGORY_LABELS[category]} · {variantCount}{" "}

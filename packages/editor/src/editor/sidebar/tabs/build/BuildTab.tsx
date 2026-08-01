@@ -12,7 +12,7 @@
  */
 
 import * as React from "react";
-import { PanelFrame } from "@/editor/ui";
+import { PanelFrame } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import type { BlockData } from "../../../../shared/types";
 import { SearchBar } from "../../shared/SearchBar";

@@ -1,4 +1,4 @@
-import { ToastProvider } from "@/editor/ui";
+import { ToastProvider } from "@/editor/chrome-ui";
 /**
  * §14 MultiSelectBanner integration — Phase 5 Task 28.
  *

@@ -19,7 +19,7 @@ vi.mock("@/services/ReviewService", () => ({
   reattachReviewComment: (...a: unknown[]) => reattachReviewComment(...a),
 }));
 
-import { ToastProvider } from "@/editor/ui";
+import { ToastProvider } from "@/editor/chrome-ui";
 import { CommentLayer } from "../CommentLayer";
 import { anchorSelector } from "../commentAnchors";
 

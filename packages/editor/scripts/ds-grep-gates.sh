@@ -449,11 +449,28 @@ pass "Gate 16: editor-scoped hex at or below baseline (REGRESSION mode)"
 #     themes/tokens.generated.{css,ts}  — full Flowbite ramp from the Figma
 #                                          Primitives collection (purple ramp
 #                                          feeds PRO badge + avatar tones)
-#     editor/ui/{ui.css,Avatar.tsx,Presence.tsx} — PRO badge + avatar identity
-#                                          tones per the Figma components;
-#                                          data/identity colour, not an accent
-#                                          (same precedent as dashboard brand
-#                                          tiles, DESIGN.md anti-slop #11)
+#     editor/chrome-ui/{IntegrationRow,MediaCard,UpgradeModal,Presence}.tsx,
+#     editor/chrome-ui/avatarTone.ts,
+#     editor/sidebar/tabs/settings/screens/LockedScreen.tsx
+#                                        — PRO badge + avatar identity tones.
+#                                          DESIGN.md §Color is explicit: "the
+#                                          Flowbite purple ramp as identity/
+#                                          semantic data — avatar identity
+#                                          tones (tone derived from user id)
+#                                          and the PRO badge (--bk-purple-*),
+#                                          founder-confirmed with the palette
+#                                          2026-07-29" (DESIGN.md:41, :192,
+#                                          :369). Data/identity colour, not an
+#                                          accent — never a CTA, link, focus
+#                                          ring, or gradient (same precedent
+#                                          as dashboard brand tiles, DESIGN.md
+#                                          anti-slop #11). Moved here from
+#                                          editor/ui/{ui.css,Avatar.tsx,
+#                                          Presence.tsx} at Task 13 (flowbite
+#                                          big-bang teardown) — re-grepped,
+#                                          not carried over blind: LockedScreen
+#                                          was a 7th real site the pre-Task-13
+#                                          allowlist had missed.
 #   Extended (C-arc 2026-04-26 — user-facing token displays / published HTML):
 #     blocks/Ecommerce/                — published HTML for user's website
 #     features/design-system/           — user design system token UI
@@ -481,7 +498,7 @@ GATE18_RAW=$(grep -rniE '#1D4ED8|#1E40AF|#4F46E5|#EFF6FF|#DBEAFE|#BFDBFE|#60A5FA
   --exclude-dir=node_modules \
   --exclude-dir=dist 2>/dev/null || true)
 GATE18_VIOLATIONS=$(echo "$GATE18_RAW" | grep -vE \
-  'shared/utils/parsers/colorTypes\.ts|shared/utils/devLogger\.ts|engine/collaboration/CollaborationManager\.ts|engine/canvas/constants\.ts|engine/ai/PageGenerator\.ts|engine/designSystem/|features/design-system/|editor/design-system/|editor/inspector/sections/DSBindingChip\.tsx|themes/design-system/design\.css|blocks/Ecommerce/|blocks/Components/|shared/forms/ColorField\.tsx|shared/forms/GradientPicker\.tsx|shared/ui/index\.tsx|shared/constants/config\.ts|ai/ColorPalette\.tsx|editor/collaboration/PresenceIndicators\.tsx|editor/ecommerce/CollectionSetupModal\.tsx|editor/sidebar/tabs/templates/templatesData\.ts|editor/canvas/overlays/MediaQuickActions\.tsx|editor/sidebar/tabs/media/components/StockSourceModal\.tsx|editor/sidebar/tabs/media/data/mediaTypes\.ts|themes/tokens\.generated\.(css|ts)|editor/ui/(ui\.css|Avatar\.tsx|Presence\.tsx)|\.test\.ts' \
+  'shared/utils/parsers/colorTypes\.ts|shared/utils/devLogger\.ts|engine/collaboration/CollaborationManager\.ts|engine/canvas/constants\.ts|engine/ai/PageGenerator\.ts|engine/designSystem/|features/design-system/|editor/design-system/|editor/inspector/sections/DSBindingChip\.tsx|themes/design-system/design\.css|blocks/Ecommerce/|blocks/Components/|shared/forms/ColorField\.tsx|shared/forms/GradientPicker\.tsx|shared/ui/index\.tsx|shared/constants/config\.ts|ai/ColorPalette\.tsx|editor/collaboration/PresenceIndicators\.tsx|editor/ecommerce/CollectionSetupModal\.tsx|editor/sidebar/tabs/templates/templatesData\.ts|editor/canvas/overlays/MediaQuickActions\.tsx|editor/sidebar/tabs/media/components/StockSourceModal\.tsx|editor/sidebar/tabs/media/data/mediaTypes\.ts|themes/tokens\.generated\.(css|ts)|editor/chrome-ui/(IntegrationRow|MediaCard|UpgradeModal|Presence)\.tsx|editor/chrome-ui/avatarTone\.ts|editor/sidebar/tabs/settings/screens/LockedScreen\.tsx|\.test\.ts' \
   | grep -v '^$' || true)
 if [ -n "$GATE18_VIOLATIONS" ]; then
   echo "$GATE18_VIOLATIONS" | head -20
@@ -515,23 +532,37 @@ pass "Gate 18: no banned Tailwind/indigo/violet/purple bleed"
 # gate has nothing left to guard.
 pass "Gate 20: retired — shared/ui deleted (Slice 6B)"
 
-# Gate 22: E3 portal discipline — no document.body in vibcoder wrappers (except OverlayMount)
-# Phase 3 overlays MUST portal through #vibcoder-overlay-root via useOverlayContainer().
-# OverlayMount.tsx is allow-listed because it owns the root.
-# Test files (*.test.tsx, *.test.ts) are exempt — they may reference document.body
-# for fixture cleanup or assertions about portal containment.
-GATE22_HITS=$(grep -RIn 'document\.body' \
-  packages/editor/src/editor/shared/vibcoder/ \
-  --include='*.tsx' --include='*.ts' \
-  | grep -v '^[^:]*OverlayMount\.tsx:' \
+# Gate 22 (successor, Task 13 flowbite big-bang): portal discipline — one
+# overlay root. createPortal targets and body-appended overlay nodes must
+# route through chrome-ui's overlay-root primitives (OverlayMount, OverlayRoot
+# / getOverlayRoot(), Portal, Toast — the files that ARE the overlay-root
+# infrastructure, excluded below by path) or be a documented non-overlay use
+# (scripts/gates/overlay-allowlist.txt: drag ghosts, download anchors,
+# capture/measurement nodes, plus pre-existing portal-discipline gaps that
+# predate any gate coverage — see the allowlist file for the breakdown).
+#
+# The ORIGINAL Gate 22 only scanned the since-deleted
+# packages/editor/src/editor/shared/vibcoder/ tree. Broadened here to all of
+# packages/editor/src now that vibcoder is gone — the old narrow scope is
+# what let every site in the allowlist's last section ship unaudited.
+# Test files (*.test.tsx, *.test.ts) are exempt — they may reference
+# document.body / createPortal for fixture cleanup or portal-containment
+# assertions.
+GATE22_HITS=$(grep -rnE 'createPortal\(|document\.body\.appendChild' \
+  packages/editor/src \
+  --include='*.ts' --include='*.tsx' \
+  | grep -v '/__tests__/' \
   | grep -v '\.test\.tsx:' \
   | grep -v '\.test\.ts:' \
+  | grep -vE 'chrome-ui/(OverlayMount|OverlayRoot|Portal|Toast)\.tsx' \
+  | grep -v -F -f "$SCRIPT_DIR/gates/overlay-allowlist.txt" \
+  | grep -v 'getOverlayRoot()' \
   || true)
 if [ -n "$GATE22_HITS" ]; then
   echo "$GATE22_HITS"
-  fail "Gate 22: document.body referenced outside OverlayMount.tsx (E3 portal discipline)"
+  fail "Gate 22: portal outside the overlay root (createPortal/document.body must route through chrome-ui's OverlayMount/OverlayRoot/Portal/Toast, or be listed in scripts/gates/overlay-allowlist.txt)"
 fi
-pass "Gate 22: E3 portal discipline (no document.body outside OverlayMount)"
+pass "Gate 22: portal discipline (createPortal/document.body routed through the overlay root or allowlisted)"
 
 # Gate 23: RETIRED (Slice 6 · stage 6, 2026-07-28). The shared/ui shim layer
 # and the vibcoder library behind it were deleted; the import path this gate
@@ -547,19 +578,24 @@ GATE24_FILE_COUNT=$(find packages/editor/src/editor -name '*.tsx' \
   -not -path '*/__tests__/*' \
   -not -path '*/preview/*' \
   -not -path '*/shared/vibcoder/*' \
-  -not -path '*/editor/ui/*' \
+  -not -path '*/editor/chrome-ui/*' \
   -not -name '*.test.tsx' 2>/dev/null | wc -l | tr -d ' ')
 
 if [ "$GATE24_FILE_COUNT" -eq 0 ]; then
   GATE24_HITS=0
 else
-  # editor/ui/ is the component library itself — its whole job is to own the
-  # native <button>/<input> elements so no one else has to (ds/fresh-token-system).
+  # editor/chrome-ui/ is the component library — its whole job is to own the
+  # native <button>/<input> elements so no one else has to. It is the sole
+  # successor: the OLD owner, editor/ui/, was deleted at Task 13 (flowbite
+  # big-bang teardown) once every consumer was re-pointed here. TextField is
+  # the one sanctioned raw-<input> owner for call sites whose bespoke
+  # className can't reach flowbite TextInput's real <input> (className lands
+  # on an outer wrapper div only — see src/editor/chrome-ui/textInputTheme.ts).
   GATE24_HITS=$(find packages/editor/src/editor -name '*.tsx' \
     -not -path '*/__tests__/*' \
     -not -path '*/preview/*' \
     -not -path '*/shared/vibcoder/*' \
-    -not -path '*/editor/ui/*' \
+    -not -path '*/editor/chrome-ui/*' \
     -not -name '*.test.tsx' 2>/dev/null \
     | xargs npx tsx packages/editor/scripts/jsx-inline-element-scanner.ts 2>/dev/null \
     | jq -s 'add | length' 2>/dev/null || echo "0")
@@ -573,7 +609,7 @@ fi
 # See memory/project_gate24_codemod_arc_20260518.md,
 #     memory/project_radio_primitive_20260518.md, and
 #     memory/project_bare_button_variant_20260518.md.
-check_gate 24 "$GATE24_HITS" "0" "inline <button>/<input>/<select>/<textarea> in editor/ (use vibcoder shim @/shared/ui) — ZERO TOLERANCE" || exit 1
+check_gate 24 "$GATE24_HITS" "0" "inline <button>/<input>/<select>/<textarea> in editor/ (use @/editor/chrome-ui) — ZERO TOLERANCE" || exit 1
 
 # Gate 25: Orphan codemod fixtures.
 # Every `*.input.tsx`/`*.output.tsx` must be referenced by SOME test file —

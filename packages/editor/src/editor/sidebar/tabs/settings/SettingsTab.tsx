@@ -11,7 +11,7 @@
  */
 
 import * as React from "react";
-import { Button, ConfirmDialog, PanelFrame } from "@/editor/ui";
+import { ConfirmDialog, PanelFrame } from "@/editor/chrome-ui";
 import { usePanelNavigation } from "../../shared/usePanelNavigation";
 import { DrillInHeader } from "../../shared/DrillInHeader";
 import {
@@ -45,7 +45,7 @@ import { PublishHistory } from "@/editor/shell/PublishHistory";
 import { EVENTS } from "@/shared/constants/events";
 import { currentSiteId } from "@/services/ReviewService";
 import "./settings.css";
-
+import { Button } from "@/editor/chrome-ui";
 // ─── Nav definition ──────────────────────────────────────────────────────────
 //
 // A1 day-1: nav reshuffle to 10 in-tab sections + 8 workspace deep-links,
@@ -709,7 +709,7 @@ export const SettingsTab: React.FC<
               Download the whole site as clean HTML/CSS you can host anywhere. Opens the exporter
               with format and scope options.
             </div>
-            <Button kind="secondary" size="sm" onClick={() => composer?.emit(EVENTS.UI_TOGGLE_EXPORTER, undefined)}>
+            <Button color="light" size="xs" onClick={() => composer?.emit(EVENTS.UI_TOGGLE_EXPORTER, undefined)}>
               Open exporter
             </Button>
           </div>

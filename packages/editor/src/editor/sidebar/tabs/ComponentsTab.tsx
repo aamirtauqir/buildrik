@@ -10,8 +10,9 @@
 
 import { ChevronDown, Layers, Plus } from "lucide-react";
 import * as React from "react";
-import { Button, ConfirmDialog, EmptyState, EmptyStateDesc, EmptyStateTitle, Input, ModalClose, ModalContent, ModalRoot, ModalTitle, Portal, PanelFrame, SkeletonListItem, Stack } from "@/editor/ui";
-import { useToast } from "@/editor/ui";
+import { ConfirmDialog, EmptyState, EmptyStateDesc, EmptyStateTitle, ModalClose, ModalContent, ModalRoot, ModalTitle, Portal, PanelFrame } from "@/editor/chrome-ui";
+import { useToast } from "@/editor/chrome-ui";
+import { SkeletonListItem } from "@/editor/chrome-ui";
 import { PanelErrorState } from "../shared/PanelErrorState";
 import { SearchBar } from "../shared/SearchBar";
 import { ComponentDetailScreen } from "./component-library/ComponentDetailScreen";
@@ -29,7 +30,7 @@ import type { ComponentsTabProps } from "./component-library/types";
 import { useComponentsState } from "./component-library/useComponentsState";
 import { type ComponentFilter, FILTER_CHIPS } from "./componentsData";
 import "./component-library/ComponentsTab.css";
-
+import { Button, TextInput } from "@/editor/chrome-ui";
 export type { ComponentsTabProps };
 
 export const ComponentsTab: React.FC<ComponentsTabProps> = ({
@@ -379,8 +380,8 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
               </svg>
             </ModalClose>
             <div className="bd-modal__body">
-              <Stack>
-                <Input
+              <div className="tw:flex tw:flex-col tw:gap-3">
+                <TextInput
                   type="text"
                   value={renameInput}
                   onChange={(e) => setRenameInput(e.target.value)}
@@ -398,7 +399,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
                     Rename
                   </Button>
                 </div>
-              </Stack>
+              </div>
             </div>
           </ModalContent>
         </ModalRoot>
@@ -413,7 +414,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
               </svg>
             </ModalClose>
             <div className="bd-modal__body">
-              <Stack gap="sm">
+              <div className="tw:flex tw:flex-col tw:gap-2">
                 {state.variantPicker?.variants.map((v) => {
                   const isCurrent = v.id === state.variantPicker?.currentVariantId;
                   return (
@@ -442,7 +443,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
                     </Button>
                   );
                 })}
-              </Stack>
+              </div>
             </div>
           </ModalContent>
         </ModalRoot>

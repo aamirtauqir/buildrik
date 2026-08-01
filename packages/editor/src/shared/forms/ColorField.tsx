@@ -1,13 +1,13 @@
 /**
  * ColorField — color picker with optional hex input + presets.
- * Internal: uses vibcoder <Input> for hex text + native <input type=color>
- * for the swatch picker.
+ * Internal: uses flowbite's <TextInput> for hex text + native
+ * <input type=color> for the swatch picker.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { Input } from "@/editor/ui";
+import { TextInput } from "@/editor/chrome-ui";
 
 export interface ColorFieldProps {
   label?: string;
@@ -86,7 +86,7 @@ export const ColorField: React.FC<ColorFieldProps> = ({
           />
         </div>
         {showInput && (
-          <Input
+          <TextInput
             type="text"
             value={localValue}
             onChange={(e) => handleColorChange(e.target.value)}

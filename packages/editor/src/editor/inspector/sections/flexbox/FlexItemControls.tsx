@@ -4,9 +4,8 @@
  */
 
 import * as React from "react";
-import { Button, Input } from "@/editor/ui";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
-
+import { Button, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -77,7 +76,7 @@ export const FlexItemControls: React.FC<FlexItemControlsProps> = ({
         >
           Grow
         </span>
-        <Input
+        <TextInput
           type="number"
           value={styles["flex-grow"] || ""}
           onChange={(e) => onChange("flex-grow", e.target.value)}
@@ -103,7 +102,7 @@ export const FlexItemControls: React.FC<FlexItemControlsProps> = ({
         >
           Shrink
         </span>
-        <Input
+        <TextInput
           type="number"
           value={styles["flex-shrink"] || ""}
           onChange={(e) => onChange("flex-shrink", e.target.value)}
@@ -129,7 +128,7 @@ export const FlexItemControls: React.FC<FlexItemControlsProps> = ({
         >
           Basis
         </span>
-        <Input
+        <TextInput
           type="text"
           value={styles["flex-basis"] || ""}
           onChange={(e) => onChange("flex-basis", e.target.value)}
@@ -176,7 +175,7 @@ export const FlexItemControls: React.FC<FlexItemControlsProps> = ({
     {/* Order */}
     <div style={rowStyle}>
       <label style={labelStyle}>Order</label>
-      <Input
+      <TextInput
         type="number"
         value={styles.order || ""}
         onChange={(e) => onChange("order", e.target.value)}

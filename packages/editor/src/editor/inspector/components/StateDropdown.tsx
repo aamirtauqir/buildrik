@@ -14,9 +14,8 @@
 
 import { ChevronDown } from "lucide-react";
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import type { PseudoStateId } from "../../../shared/types";
-
+import { Button } from "@/editor/chrome-ui";
 const PSEUDO_LABELS: Record<PseudoStateId, string> = {
   normal: "Base",
   hover: ":hover",

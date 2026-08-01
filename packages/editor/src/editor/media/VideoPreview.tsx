@@ -5,8 +5,8 @@
  */
 
 import * as React from "react";
-import { Button, Input, ModalClose, ModalContent, ModalRoot, ModalTitle, Portal, Stack } from "@/editor/ui";
-
+import { ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/chrome-ui";
+import { Button, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -174,20 +174,18 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
 
   if (state.error) {
     return (
-      <Stack
+      <div
+        className="tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-0"
         style={{
-          alignItems: "center",
-          justifyContent: "center",
           padding: 40,
           background: "var(--bk-bg-subtle)",
           borderRadius: 8,
           color: "var(--bk-ink-muted)",
-          gap: 0,
         }}
       >
         <span style={{ fontSize: 32, marginBottom: 12 }}>⚠️</span>
         <span>{state.error}</span>
-      </Stack>
+      </div>
     );
   }
 
@@ -341,7 +339,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
             >
               {state.isMuted || state.volume === 0 ? "🔇" : "🔊"}
             </Button>
-            <Input
+            <TextInput
               type="range"
               min={0}
               max={1}
@@ -404,7 +402,7 @@ export const VideoPreview: React.FC<VideoPreviewProps> = (props) => {
                   marginTop: 16,
                 }}
               >
-                <Button kind="ghost" onClick={props.onClose}>
+                <Button color="light" onClick={props.onClose} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                   Close
                 </Button>
               </div>

@@ -1,4 +1,4 @@
-import { ToastProvider } from "@/editor/ui";
+import { ToastProvider } from "@/editor/chrome-ui";
 /**
  * §15 AssetDetailOverlay Edit tab — alt-text input — Phase 6 Task 35.
  *

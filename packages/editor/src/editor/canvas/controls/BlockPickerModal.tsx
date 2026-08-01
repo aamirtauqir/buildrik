@@ -6,7 +6,7 @@
  */
 
 import * as React from "react";
-import { Button, Input, ModalContent, ModalRoot } from "@/editor/ui";
+import { ModalContent, ModalRoot } from "@/editor/chrome-ui";
 import { getBlockById, insertBlock } from "../../../blocks/blockRegistry";
 import type { Composer } from "../../../engine";
 import type { BlockData } from "../../../shared/types";
@@ -15,6 +15,7 @@ import { devLogger } from "../../../shared/utils/devLogger";
 import { runTransaction } from "../../../shared/utils/helpers";
 import { canNestElement } from "../../../shared/utils/nesting";
 import { ElementsTab } from "../../sidebar/tabs/ElementsTab";
+import { Button, TextInput } from "@/editor/chrome-ui";
 
 export interface BlockPickerModalProps {
   composer: Composer;
@@ -172,7 +173,7 @@ export const BlockPickerModal: React.FC<BlockPickerModalProps> = ({
             <circle cx="11" cy="11" r="8" />
             <path d="M21 21l-4.35-4.35" />
           </svg>
-          <Input
+          <TextInput
             type="text"
             placeholder="Search elements..."
             value={searchQuery}

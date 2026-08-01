@@ -4,7 +4,6 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import "./styles/layers-v2.css";
 import type { Element } from "../../../engine/elements/Element";
 import type { ElementType } from "../../../shared/types";
@@ -18,7 +17,7 @@ import { useLayerContextActions } from "./hooks/useLayerContextActions";
 import { useLayersState } from "./hooks/useLayersState";
 import { LayerTreeItem } from "./LayerTreeItem";
 import type { LayersPanelProps } from "./types";
-
+import { Button } from "@/editor/chrome-ui";
 export type { LayersPanelProps, SelectedElementInfo } from "./types";
 
 export const LayersPanel: React.FC<LayersPanelProps> = ({

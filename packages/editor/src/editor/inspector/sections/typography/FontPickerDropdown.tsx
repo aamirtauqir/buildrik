@@ -7,10 +7,9 @@
  */
 
 import * as React from "react";
-import { Button, Input } from "@/editor/ui";
 import type { GoogleFont, FontCategory } from "../../../../services/GoogleFontsService";
 import type { SystemFont } from "./FontPicker";
-
+import { Button, TextInput } from "@/editor/chrome-ui";
 // Category labels for display
 export const CATEGORY_LABELS: Record<FontCategory | "system", string> = {
   "sans-serif": "Sans Serif",
@@ -32,7 +31,7 @@ interface FontSearchInputProps {
 
 export const FontSearchInput: React.FC<FontSearchInputProps> = ({ value, onChange }) => (
   <div style={{ padding: 8, borderBottom: `1px solid ${"var(--bk-border)"}` }}>
-    <Input
+    <TextInput
       type="text"
       value={value}
       onChange={(e) => onChange(e.target.value)}

@@ -27,8 +27,7 @@ import { buildExport, downloadFile, type ExportFormat } from "../../utils/export
 import type { DesignToken } from "../../types";
 import type { BundleOptions } from "../../../../engine/designSystem/bundler/CSSBundler";
 import { ImportCard } from "./ImportCard";
-import { Button, Radio } from "@/editor/ui";
-
+import { Button, Radio } from "@/editor/chrome-ui";
 // Local format type widens exportUtils ExportFormat with a stub "figma" entry
 // so the s05 prototype's 4-row selector renders without touching the shared
 // exporter contract. Figma JSON download emits a minimal envelope until a
@@ -320,6 +319,8 @@ export const ExportSection: React.FC = () => {
             return (
               <label key={id} style={selected ? formatRowSelectedStyle : formatRowStyle}>
                 <Radio
+                  color="blue"
+                  className="tw:bg-white"
                   data-testid={`format-row-${id}`}
                   name="export-format"
                   value={id}
@@ -368,6 +369,8 @@ export const ExportSection: React.FC = () => {
               {DARK_OPTIONS.map(({ id, label }) => (
                 <label key={id} style={radioLabelStyle}>
                   <Radio
+                    color="blue"
+                    className="tw:bg-white"
                     name="dark-strategy"
                     value={id}
                     checked={darkStrategy === id}
@@ -389,7 +392,7 @@ export const ExportSection: React.FC = () => {
         <pre data-testid="export-preview" style={previewStyle}>
           {preview}
         </pre>
-        <Button kind="primary" onClick={handleDownload} style={downloadButtonStyle}>
+        <Button onClick={handleDownload} style={downloadButtonStyle}>
           {downloadLabelFor(format)}
         </Button>
       </div>

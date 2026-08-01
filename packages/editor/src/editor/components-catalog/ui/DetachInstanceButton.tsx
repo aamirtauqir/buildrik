@@ -14,9 +14,9 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import type { Composer } from "@/engine";
 import { useDSModeOptional } from "@/editor/design-system/state/DSModeContext";
+import { Button } from "@/editor/chrome-ui";
 
 interface DetachInstanceButtonProps {
   composer: Composer | null;
@@ -82,8 +82,8 @@ export const DetachInstanceButton: React.FC<DetachInstanceButtonProps> = ({
   return (
     <Button
       type="button"
-      kind="secondary"
-      size="sm"
+      color="light"
+      size="xs"
       onClick={handleDetach}
       style={buttonStyle}
       data-detach-instance-button

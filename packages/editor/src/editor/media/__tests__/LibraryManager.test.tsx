@@ -39,8 +39,8 @@ vi.mock("../../sidebar/tabs/media/hooks/useMediaState", () => ({
   useMediaState: () => mocks.state.mediaState,
 }));
 
-vi.mock("@/editor/ui", async () => {
-  const actual: Record<string, unknown> = await vi.importActual("@/editor/ui");
+vi.mock("@/editor/chrome-ui", async () => {
+  const actual: Record<string, unknown> = await vi.importActual("@/editor/chrome-ui");
   return {
     ...actual,
     useToast: () => ({ addToast: vi.fn() }),

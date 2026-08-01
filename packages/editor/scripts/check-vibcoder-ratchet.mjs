@@ -50,7 +50,7 @@ if (count > baseline.count) {
   console.error(
     `[vibcoder-ratchet] FAIL — legacy component imports grew: ${baseline.count} → ${count} (+${count - baseline.count}).`,
   );
-  console.error("  The old library is being migrated away from. Import from @/editor/ui instead.");
+  console.error("  The old library is being migrated away from. Import from flowbite-react or @/editor/chrome-ui instead.");
   for (const f of added.slice(0, 15)) console.error(`    new: ${f}`);
   process.exit(1);
 }

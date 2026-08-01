@@ -16,7 +16,7 @@
  */
 
 import * as React from "react";
-import { Presence, type ConnectionState, type PresenceUser } from "@/editor/ui";
+import { Presence, type ConnectionState, type PresenceUser } from "@/editor/chrome-ui";
 import type { CollaborationUser, CollaborationState } from "@/shared/types/collaboration";
 import { IS_DEV_BUILD } from "@/shared/utils/runtimeEnv";
 

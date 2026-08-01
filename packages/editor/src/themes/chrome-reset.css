@@ -1,0 +1,48 @@
+/* Minimal reset scoped to chrome — replaces preflight WITHOUT touching
+   canvas-mounted user content. Scope = shell root, never global.
+
+   Root class verified 2026-07-30 (flowbite-bigbang Task 2): the brief's
+   example selector `.bk-studio-root` does not exist in the tree. The real
+   mounted shell root is `.bd-studio`, set on AquibraStudio's outer div
+   (src/editor/shell/AquibraStudio.tsx). `chrome-ui/EditorShell.tsx` (the
+   successor to the deleted editor/ui/EditorShell.tsx, Task 13) has no
+   `.bk-shell` class at all — it styles itself entirely with `tw:` utility
+   classes — so it was never what actually mounts either.
+
+   Canvas exclusion added 2026-07-30 (fix round 1, reviewer finding #1 —
+   CRITICAL): `.bd-studio` is an ANCESTOR of the canvas mount point,
+   `.buildrick-canvas` (src/editor/canvas/Canvas.tsx:503 — the div that
+   receives customer HTML via dangerouslySetInnerHTML). A bare `.bd-studio *`
+   reset restyles that customer-mounted subtree, which is exactly the §4.1
+   violation this task exists to prevent — and this file is imported
+   unlayered in default.css, which maximizes its cascade priority, so a leak
+   here would very likely win over the customer's own CSS. Every selector
+   below therefore carries `:not(.buildrick-canvas, .buildrick-canvas *)` —
+   verified by src/themes/__tests__/chrome-reset.test.ts, which parses this
+   file's selectors and fails if any `.bd-studio`-rooted selector is missing
+   the guard. */
+
+/* LAYER (fix, 2026-08-01): these rules live in the `reset` layer, NOT unlayered.
+   Unlayered author CSS beats every layered rule, so an unlayered `font: inherit;
+   color: inherit` on button/input/select/textarea silently defeated EVERY
+   `tw:text-*` size and colour utility on form controls — the editor's primary
+   Publish CTA rendered dark-on-blue, and compact toolbar buttons fell back to the
+   16px body font and overflowed their boxes. Tailwind's own preflight does the
+   same normalisation from a base layer precisely so utilities can win. `reset` is
+   declared first in default.css's `@layer reset, components, overrides` and
+   before tw-theme/tw-utilities, so utilities now win — which is the intent. */
+@layer reset {
+
+.bd-studio:not(.buildrick-canvas, .buildrick-canvas *),
+.bd-studio *:not(.buildrick-canvas, .buildrick-canvas *),
+.bd-studio *:not(.buildrick-canvas, .buildrick-canvas *)::before,
+.bd-studio *:not(.buildrick-canvas, .buildrick-canvas *)::after {
+  box-sizing: border-box;
+}
+.bd-studio button:not(.buildrick-canvas, .buildrick-canvas *),
+.bd-studio input:not(.buildrick-canvas, .buildrick-canvas *),
+.bd-studio select:not(.buildrick-canvas, .buildrick-canvas *),
+.bd-studio textarea:not(.buildrick-canvas, .buildrick-canvas *) {
+  font: inherit; color: inherit;
+}
+}

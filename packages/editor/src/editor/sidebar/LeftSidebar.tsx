@@ -15,7 +15,7 @@ import { getTabWidth, getTabConfig, getTabsByZone, getRailTools, getTabsByTool, 
 import { getEditorViewMode } from "../../shared/utils/editorViewMode";
 import type { BlockData } from "../../shared/types";
 import type { UsePublishJobResult } from "../shell/hooks/usePublishJob";
-import { ConfirmDialog } from "@/editor/ui";
+import { ConfirmDialog } from "@/editor/chrome-ui";
 import { InspectorErrorBoundary } from "../inspector/components/InspectorErrorBoundary";
 import { PanelSkeleton, SidebarErrorFallback } from "./SidebarFallbacks";
 import { TabRouter } from "./TabRouter";
@@ -34,8 +34,7 @@ import {
   Rocket,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { Button, Tooltip } from "@/editor/ui";
-
+import { Button, Tooltip } from "@/editor/chrome-ui";
 // ============================================
 // Icon map — lucide icon name → component
 // ============================================
@@ -134,9 +133,15 @@ function RailZone({
         const isDirty = dirtyTabIds?.has(tab.id) ?? false;
 
         return (
-          <Tooltip key={tab.id} label={tab.shortcut ? `${tab.label} · ${tab.shortcut}` : tab.label}>
+          <Tooltip
+            key={tab.id}
+            content={tab.shortcut ? `${tab.label} · ${tab.shortcut}` : tab.label}
+            placement="bottom"
+            arrow={false}
+            className="tw:max-w-[280px] tw:whitespace-normal"
+          >
             <Button
-              kind="ghost"
+              color="light"
               className={`ls-btn${showLabels ? " ls-btn--labeled" : ""}${isSelectedTab ? " ls-btn--active" : ""}${!drawerOpen && isSelectedTab ? " ls-btn--last" : ""}`}
               onClick={() => onBtnClick(tab.id)}
               role="tab"
@@ -231,9 +236,15 @@ function FourToolRail({
         const isSelected = tool === activeTool;
         const isVisibleActive = isSelected && drawerOpen;
         return (
-          <Tooltip key={tool} label={meta.label}>
+          <Tooltip
+            key={tool}
+            content={meta.label}
+            placement="bottom"
+            arrow={false}
+            className="tw:max-w-[280px] tw:whitespace-normal"
+          >
             <Button
-              kind="ghost"
+              color="light"
               className={`ls-btn${isSelected ? " ls-btn--active" : ""}${!drawerOpen && isSelected ? " ls-btn--last" : ""}`}
               onClick={() => onBtnClick(TOOL_PRIMARY_TAB[tool])}
               role="tab"
@@ -281,8 +292,8 @@ function ToolSubNav({
         return (
           <Button
             key={t.id}
-            kind="ghost"
-            size="sm"
+            color="light"
+            size="xs"
             role="tab"
             aria-selected={active}
             onClick={() => onSubTabChange(t.id)}

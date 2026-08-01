@@ -5,9 +5,8 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import { type InteractionTrigger, TRIGGER_GROUPS } from "./types";
-
+import { Button } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================

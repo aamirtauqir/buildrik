@@ -16,14 +16,14 @@
  */
 import * as React from "react";
 import {
-  Button,
   ModalRoot,
   ModalContent,
   ModalTitle,
   ModalDescription,
   ModalFooter,
-} from "@/editor/ui";
+} from "@/editor/chrome-ui";
 import type { DesignToken } from "../../types";
+import { Button } from "@/editor/chrome-ui";
 
 export interface TokenReplaceModalProps {
   open: boolean;
@@ -166,7 +166,7 @@ export const TokenReplaceModal: React.FC<TokenReplaceModalProps> = ({
           <div style={btnRowStyle}>
             <Button
               type="button"
-              kind="secondary"
+              color="light"
               onClick={() => onOpenChange(false)}
               style={cancelBtnStyle}
             >
@@ -174,7 +174,7 @@ export const TokenReplaceModal: React.FC<TokenReplaceModalProps> = ({
             </Button>
             <Button
               type="button"
-              kind="destructive"
+              color="red"
               data-token-replace-confirm
               disabled={!selectedId}
               onClick={handleConfirm}

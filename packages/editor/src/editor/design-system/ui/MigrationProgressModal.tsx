@@ -20,7 +20,8 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button, ModalContent, ModalDescription, ModalRoot, ModalTitle } from "@/editor/ui";
+import { ModalContent, ModalDescription, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
+import { Button } from "@/editor/chrome-ui";
 
 export interface MigrationStep {
   /** Migration toVersion. */
@@ -186,8 +187,7 @@ export const MigrationProgressModal: React.FC<MigrationProgressModalProps> = ({
               <div style={{ display: "flex", gap: 6, marginTop: 16 }}>
                 {onRestoreSnapshot && (
                   <Button
-                    kind="primary"
-                    size="sm"
+                    size="xs"
                     type="button"
                     onClick={onRestoreSnapshot}
                   >
@@ -195,7 +195,7 @@ export const MigrationProgressModal: React.FC<MigrationProgressModalProps> = ({
                   </Button>
                 )}
                 {onRetry && stuckAt !== undefined && (
-                  <Button kind="secondary" size="sm" type="button" onClick={onRetry}>
+                  <Button color="light" size="xs" type="button" onClick={onRetry}>
                     Retry v{stuckAt}
                   </Button>
                 )}

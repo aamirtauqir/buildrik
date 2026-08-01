@@ -44,8 +44,7 @@ import {
   type TabId,
 } from "../sections/registry";
 import type { SectionTier } from "../shared/controls";
-import { Button, HelperText, Stack } from "@/editor/ui";
-
+import { BK_HELPER_CLASS, Button, HelperText } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -233,23 +232,23 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
           reversible way back to full controls — density is a preference, never
           a permission (so this is a "hidden", not a "locked", affordance). */}
       {density === "fewer" && visibleIds.length > renderIds.length && (
-        <Stack gap="sm" separator>
-          <HelperText>
+        <div className="tw:flex tw:flex-col tw:gap-2 tw:divide-y tw:divide-gray-200 tw:[&>*+*]:pt-3">
+          <HelperText className={BK_HELPER_CLASS}>
             Simplified view — {visibleIds.length - renderIds.length} more control
             {visibleIds.length - renderIds.length === 1 ? "" : "s"} hidden. It&apos;s a preference, not a limit.
           </HelperText>
           <Button
-            kind="ghost"
-            size="sm"
+            color="light"
+            size="xs"
             onClick={() => {
               const url = new URL(window.location.href);
               url.searchParams.set("density", "full");
               window.location.assign(url.toString());
-            }}
+            }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           >
             Show all controls
           </Button>
-        </Stack>
+        </div>
       )}
     </>
   );

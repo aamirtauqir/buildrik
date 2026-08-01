@@ -7,9 +7,8 @@
  */
 
 import * as React from "react";
-import { Button, Input } from "@/editor/ui";
 import type { Composer } from "../../../../engine";
-
+import { Button, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -79,14 +78,14 @@ export const DataAttributeEditor: React.FC<DataAttributeEditorProps> = ({
   return (
     <div>
       <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
-        <Input
+        <TextInput
           type="text"
           value={newKey}
           onChange={(e) => setNewKey(e.target.value)}
           placeholder="data-*"
           style={styles.input}
         />
-        <Input
+        <TextInput
           type="text"
           value={newValue}
           onChange={(e) => setNewValue(e.target.value)}

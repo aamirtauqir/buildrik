@@ -9,7 +9,7 @@
  */
 
 import * as React from "react";
-import { Button, Input } from "@/editor/ui";
+import { TextField } from "@/editor/chrome-ui";
 import Cropper from "react-easy-crop";
 import type { Area, Point } from "react-easy-crop";
 import {
@@ -17,7 +17,7 @@ import {
   Crop, SlidersHorizontal, Maximize, Download, AlertTriangle, Eye,
 } from "lucide-react";
 import "./ImageEditorModal.css";
-
+import { Button, TextInput } from "@/editor/chrome-ui";
 // ============================================
 // Types
 // ============================================
@@ -403,7 +403,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
                   {/* Rotation */}
                   <div className="ie-section-label">Rotation</div>
                   <div className="ie-slider-row">
-                    <Input
+                    <TextField
                       type="range"
                       className="ie-slider"
                       min={-180}
@@ -434,7 +434,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
                   {/* Zoom */}
                   <div className="ie-section-label">Zoom</div>
                   <div className="ie-slider-row">
-                    <Input
+                    <TextField
                       type="range"
                       className="ie-slider"
                       min={1}
@@ -452,7 +452,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
                 <>
                   <div className="ie-section-label">Brightness</div>
                   <div className="ie-slider-row">
-                    <Input type="range" className="ie-slider" min={-100} max={100}
+                    <TextField type="range" className="ie-slider" min={-100} max={100}
                       value={adjustments.brightness}
                       onChange={(e) => setAdjustments((a) => ({ ...a, brightness: Number(e.target.value) }))}
                     />
@@ -461,7 +461,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
 
                   <div className="ie-section-label">Contrast</div>
                   <div className="ie-slider-row">
-                    <Input type="range" className="ie-slider" min={-100} max={100}
+                    <TextField type="range" className="ie-slider" min={-100} max={100}
                       value={adjustments.contrast}
                       onChange={(e) => setAdjustments((a) => ({ ...a, contrast: Number(e.target.value) }))}
                     />
@@ -470,7 +470,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
 
                   <div className="ie-section-label">Saturation</div>
                   <div className="ie-slider-row">
-                    <Input type="range" className="ie-slider" min={-100} max={100}
+                    <TextField type="range" className="ie-slider" min={-100} max={100}
                       value={adjustments.saturation}
                       onChange={(e) => setAdjustments((a) => ({ ...a, saturation: Number(e.target.value) }))}
                     />
@@ -479,7 +479,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
 
                   <div className="ie-section-label">Blur</div>
                   <div className="ie-slider-row">
-                    <Input type="range" className="ie-slider" min={0} max={20} step={0.5}
+                    <TextField type="range" className="ie-slider" min={0} max={20} step={0.5}
                       value={adjustments.blur}
                       onChange={(e) => setAdjustments((a) => ({ ...a, blur: Number(e.target.value) }))}
                     />
@@ -522,7 +522,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
                   <div className="ie-resize-inputs">
                     <label className="ie-resize-field">
                       <span>W</span>
-                      <Input
+                      <TextInput
                         type="number"
                         placeholder={String(croppedArea.width || "auto")}
                         value={resizeW ?? ""}
@@ -533,7 +533,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
                     <span className="ie-resize-x">×</span>
                     <label className="ie-resize-field">
                       <span>H</span>
-                      <Input
+                      <TextInput
                         type="number"
                         placeholder={String(croppedArea.height || "auto")}
                         value={resizeH ?? ""}

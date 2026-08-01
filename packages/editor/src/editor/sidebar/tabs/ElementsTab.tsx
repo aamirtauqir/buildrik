@@ -10,12 +10,12 @@
 
 import { History, Star, X, Lightbulb } from "lucide-react";
 import * as React from "react";
-import { Button, EmptyState, EmptyStateDesc } from "@/editor/ui";
+import { EmptyState, EmptyStateDesc } from "@/editor/chrome-ui";
 import { CATEGORY_ICONS } from "./elements/constants";
 import { ElementCard, AnimatedAccordionContent, ChevronIcon } from "./elements/ElementCard";
 import type { ElementsTabProps } from "./elements/types";
 import { useElementsState } from "./elements/useElementsState";
-
+import { Button } from "@/editor/chrome-ui";
 export type { ElementsTabProps };
 
 export const ElementsTab: React.FC<ElementsTabProps> = ({
