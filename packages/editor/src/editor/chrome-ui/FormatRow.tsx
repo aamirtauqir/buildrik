@@ -18,6 +18,11 @@ export interface FormatRowProps extends Omit<React.HTMLAttributes<HTMLLabelEleme
   checked?: boolean;
   onChange?: (value: string) => void;
   trailing?: React.ReactNode;
+  /** An option that exists but cannot be picked yet ("coming soon"). It renders
+   *  NO radio at all rather than a disabled one: a disabled radio still answers
+   *  to `getByRole("radio")` and still occupies an arrow-key stop in the group,
+   *  so the option would read as pickable to a keyboard user. */
+  disabled?: boolean;
 }
 
 /** FormatRow never went through the Row component — it borrowed `.bk-row` +
@@ -26,33 +31,48 @@ export interface FormatRowProps extends Omit<React.HTMLAttributes<HTMLLabelEleme
  *  this same commit), this is one self-contained class list recreating
  *  both former rules' combined effect — no Row-BASE-vs-override composition
  *  ambiguity here since there's only one static string. */
+/* min-height, not height: a description wraps once the row is narrow (the
+   export picker lays these out two per column). Same fix as Row's `comment`. */
 const BASE =
-  "tw:flex tw:items-center tw:gap-3 tw:h-16 tw:px-4 tw:w-full tw:text-left tw:border tw:border-gray-200 " +
+  "tw:flex tw:items-center tw:gap-3 tw:min-h-16 tw:py-2 tw:px-4 tw:w-full tw:text-left tw:border tw:border-gray-200 " +
   "tw:rounded-lg tw:bg-white tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:text-gray-900 " +
   "tw:[transition:var(--bk-transition-fast)] " +
-  "tw:aria-[checked=true]:border-blue-700 tw:aria-[checked=true]:bg-blue-50";
+  "tw:aria-[checked=true]:border-blue-700 tw:aria-[checked=true]:bg-blue-50 " +
+  "tw:aria-disabled:opacity-50 tw:aria-disabled:pointer-events-none tw:aria-disabled:select-none";
 
 export function FormatRow({
-  name, value, title, description, checked, onChange, trailing, className, ...rest
+  name, value, title, description, checked, onChange, trailing, disabled, className, ...rest
 }: FormatRowProps) {
   return (
     <label
       className={[BASE, className].filter(Boolean).join(" ")}
-      aria-checked={Boolean(checked)}
+      aria-checked={disabled ? undefined : Boolean(checked)}
+      aria-disabled={disabled || undefined}
       {...rest}
     >
-      <Radio
-        color="blue"
-        className="tw:bg-white"
-        name={name}
-        value={value}
-        checked={Boolean(checked)}
-        onChange={() => onChange?.(value)}
-      />
-      <span className="tw:flex-1 tw:flex tw:flex-col tw:gap-0.5 tw:min-w-0">
-        <span>{title}</span>
-        {description ? <span className="tw:text-gray-500 tw:text-xs">{description}</span> : null}
-      </span>
+      {disabled ? (
+        /* Holds the radio's column so a disabled row still lines up with its
+           pickable siblings in the same grid. */
+        <span className="tw:size-4 tw:flex-none tw:rounded-full tw:border tw:border-gray-200" aria-hidden="true" />
+      ) : (
+        <Radio
+          color="blue"
+          className="tw:bg-white"
+          name={name}
+          value={value}
+          checked={Boolean(checked)}
+          onChange={() => onChange?.(value)}
+        />
+      )}
+      {/* Blocks, not spans. The radio's accessible name is computed from this
+          label's contents, and the name algorithm only separates them when
+          they are block-level — as inline spans it read "HTMLStatic HTML file
+          with…". `tw:block` would not fix it: the utility resolves from a
+          stylesheet, and the algorithm reads computed display. */}
+      <div className="tw:flex-1 tw:flex tw:flex-col tw:gap-0.5 tw:min-w-0">
+        <div>{title}</div>
+        {description ? <div className="tw:text-gray-500 tw:text-xs">{description}</div> : null}
+      </div>
       {trailing}
     </label>
   );

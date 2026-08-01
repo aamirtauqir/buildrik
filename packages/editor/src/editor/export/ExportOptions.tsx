@@ -1,13 +1,19 @@
 /**
  * Export Options Panel
  * Configuration UI for export settings
+ *
+ * The format picker is a real radiogroup built from chrome-ui's FormatRow
+ * (Figma 249:6) — the atom written for exactly this surface. Picking one of
+ * several exclusive options is a radio group, not a row of buttons that happen
+ * to look selected.
+ *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
 import type { CMSExportMode, TemplateSyntax } from "../../engine/cms/CMSExportResolver";
 import type { ExportConfig, CSSExportStyle, ExportFormat } from "../../shared/types/export";
-import { Button, Checkbox, TextInput } from "@/editor/chrome-ui";
+import { Badge, Button, Checkbox, FormatRow, Label, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // FORMAT CONFIG
 // ============================================================================
@@ -36,8 +42,17 @@ const FORMAT_DESCRIPTIONS: Record<ExportFormat, string> = {
   nextjs: "Next.js page component",
 };
 
+/** One field label style, not five copies of the same inline object. */
+const FIELD_LABEL = "tw:block tw:mb-1.5";
+/** The segmented single-choice strip (CSS style, CMS mode, template syntax). */
+const SEGMENTED = "tw:flex tw:gap-2";
+
+/** Selected reads as the primary action, unselected as a quiet one — flowbite's
+ *  own colour system, so the states cannot drift from every other Button. */
+const segmentColor = (selected: boolean) => (selected ? undefined : ("light" as const));
+
 // ============================================================================
-// FORMAT GRID — 2-column card selector used in ExportModal header
+// FORMAT GRID — 2-column selector used in ExportModal header
 // ============================================================================
 
 export interface FormatGridProps {
@@ -46,131 +61,31 @@ export interface FormatGridProps {
 }
 
 export const FormatGrid: React.FC<FormatGridProps> = ({ selectedFormat, onFormatChange }) => (
-  <div>
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr",
-        gap: 10,
-      }}
-    >
-      {/* Available formats — selectable */}
-      {AVAILABLE_FORMATS.map((fmt) => {
-        const isSelected = selectedFormat === fmt;
-        return (
-          <Button
-            key={fmt}
-            onClick={() => onFormatChange(fmt)}
-            style={{
-              background: isSelected ? "var(--bk-accent-subtle)" : "var(--bk-bg-subtle)",
-              border: isSelected
-                ? "2px solid var(--bk-accent)"
-                : "1px solid var(--bk-border)",
-              borderRadius: "var(--bk-radius-lg)",
-              padding: 16,
-              cursor: "pointer",
-              textAlign: "left",
-            }}
-          >
-            <div className="tw:flex tw:flex-col tw:gap-2">
-              {/* Icon placeholder */}
-              <div
-                style={{
-                  width: 32,
-                  height: 32,
-                  background: "var(--bk-gray-200)",
-                  borderRadius: "var(--bk-radius-sm)",
-                  flexShrink: 0,
-                }}
-              />
-              <div
-                style={{
-                  fontSize: 14,
-                  fontWeight: 500,
-                  color: "var(--bk-ink)",
-                }}
-              >
-                {FORMAT_LABELS[fmt]}
-              </div>
-              <div
-                style={{
-                  fontSize: 12,
-                  color: "var(--bk-ink-muted)",
-                  lineHeight: 1.4,
-                }}
-              >
-                {FORMAT_DESCRIPTIONS[fmt]}
-              </div>
-            </div>
-          </Button>
-        );
-      })}
+  <div role="radiogroup" aria-label="Export format" className="tw:grid tw:grid-cols-2 tw:gap-2.5">
+    {AVAILABLE_FORMATS.map((fmt) => (
+      <FormatRow
+        key={fmt}
+        name="export-format"
+        value={fmt}
+        title={FORMAT_LABELS[fmt]}
+        description={FORMAT_DESCRIPTIONS[fmt]}
+        checked={selectedFormat === fmt}
+        onChange={(value) => onFormatChange(value as ExportFormat)}
+      />
+    ))}
 
-      {/* Coming soon formats — non-interactive */}
-      {COMING_SOON_FORMATS.map((fmt) => (
-        <div
-          key={fmt}
-          className="tw:flex tw:flex-col tw:gap-2"
-          title="Coming soon"
-          style={{
-            background: "var(--bk-bg-subtle)",
-            border: "1px solid var(--bk-border)",
-            borderRadius: "var(--bk-radius-lg)",
-            padding: 16,
-            textAlign: "left",
-            opacity: 0.5,
-            pointerEvents: "none",
-            userSelect: "none",
-          }}
-        >
-          {/* Icon placeholder */}
-          <div
-            style={{
-              width: 32,
-              height: 32,
-              background: "var(--bk-gray-200)",
-              borderRadius: "var(--bk-radius-sm)",
-              flexShrink: 0,
-            }}
-          />
-          <div
-            style={{
-              fontSize: 14,
-              fontWeight: 500,
-              color: "var(--bk-ink)",
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-            }}
-          >
-            {FORMAT_LABELS[fmt]}
-            {/* Coming soon badge */}
-            <span
-              style={{
-                fontSize: 10,
-                color: "var(--bk-ink-muted)",
-                background: "var(--bk-gray-200)",
-                borderRadius: 10,
-                padding: "1px 6px",
-                fontWeight: 500,
-                letterSpacing: "0.02em",
-              }}
-            >
-              Soon
-            </span>
-          </div>
-          <div
-            style={{
-              fontSize: 12,
-              color: "var(--bk-ink-muted)",
-              lineHeight: 1.4,
-            }}
-          >
-            {FORMAT_DESCRIPTIONS[fmt]}
-          </div>
-        </div>
-      ))}
-    </div>
+    {/* Unimplemented stubs: same row, no radio, not reachable. */}
+    {COMING_SOON_FORMATS.map((fmt) => (
+      <FormatRow
+        key={fmt}
+        disabled
+        name="export-format"
+        value={fmt}
+        title={FORMAT_LABELS[fmt]}
+        description={FORMAT_DESCRIPTIONS[fmt]}
+        trailing={<Badge color="gray">Soon</Badge>}
+      />
+    ))}
   </div>
 );
 
@@ -185,21 +100,13 @@ interface ToggleOptionProps {
 }
 
 const ToggleOption: React.FC<ToggleOptionProps> = ({ label, checked, onChange }) => (
-  <label
-    style={{
-      display: "flex",
-      alignItems: "center",
-      gap: 8,
-      cursor: "pointer",
-      fontSize: 13,
-    }}
-  >
+  <label className="tw:flex tw:items-center tw:gap-2 tw:cursor-pointer tw:text-[13px]">
     <Checkbox
       color="blue"
-      className="tw:bg-white"
+      className="tw:bg-white tw:cursor-pointer"
       checked={checked}
       onChange={(e) => onChange(e.target.checked)}
-      style={{ cursor: "pointer" }} />
+    />
     {label}
   </label>
 );
@@ -232,43 +139,30 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
     <div className="tw:flex tw:flex-col tw:gap-4">
       {/* Page Title */}
       <div>
-        <label style={{ display: "block", fontSize: 12, marginBottom: 6 }}>Page Title</label>
+        <Label htmlFor="export-page-title" className={FIELD_LABEL}>Page Title</Label>
+        {/* No style prop: the TextInput wrapper already applies
+            BK_TEXT_INPUT_THEME. The override this replaced painted the field
+            --bk-gray-900 — a near-black background left over from the dark
+            theme, on a light-theme surface. */}
         <TextInput
+          id="export-page-title"
           type="text"
           value={config.pageTitle || ""}
           onChange={(e) => onChange({ pageTitle: e.target.value })}
-          style={{
-            width: "100%",
-            padding: "8px 12px",
-            background: "var(--bk-gray-900)",
-            border: "1px solid var(--bk-border)",
-            borderRadius: 6,
-            color: "var(--bk-ink)",
-          }}
         />
       </div>
       {/* CSS Style */}
       <div>
-        <label style={{ display: "block", fontSize: 12, marginBottom: 6 }}>CSS Style</label>
-        <div style={{ display: "flex", gap: 8 }}>
+        <Label className={FIELD_LABEL}>CSS Style</Label>
+        <div className={SEGMENTED}>
           {(["embedded", "external", "inline"] as CSSExportStyle[]).map((style) => (
             <Button
               key={style}
+              size="xs"
+              color={segmentColor(config.cssStyle === style)}
+              aria-pressed={config.cssStyle === style}
+              className="tw:flex-1 tw:capitalize"
               onClick={() => onChange({ cssStyle: style })}
-              style={{
-                flex: 1,
-                padding: "8px 12px",
-                background:
-                  config.cssStyle === style
-                    ? "var(--bk-accent)"
-                    : "var(--bk-bg-subtle)",
-                border: "none",
-                borderRadius: 6,
-                color: config.cssStyle === style ? "var(--bk-bg-card)" : "var(--bk-ink)",
-                cursor: "pointer",
-                fontSize: 12,
-                textTransform: "capitalize",
-              }}
             >
               {style}
             </Button>
@@ -300,28 +194,17 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
       </div>
       {/* CMS Export Options - only show if project has CMS bindings */}
       {hasCMSBindings && onCMSChange && (
-        <div style={{ borderTop: "1px solid var(--bk-border)", paddingTop: 16 }}>
-          <label style={{ display: "block", fontSize: 12, marginBottom: 6, fontWeight: 600 }}>
-            CMS Content
-          </label>
-          <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+        <div className="tw:border-t tw:border-gray-200 tw:pt-4">
+          <Label className={`${FIELD_LABEL} tw:font-semibold`}>CMS Content</Label>
+          <div className={`${SEGMENTED} tw:mb-3`}>
             {(["none", "static", "template"] as CMSExportMode[]).map((mode) => (
               <Button
                 key={mode}
+                size="xs"
+                color={segmentColor(cmsSettings.mode === mode)}
+                aria-pressed={cmsSettings.mode === mode}
+                className="tw:flex-1"
                 onClick={() => onCMSChange({ mode })}
-                style={{
-                  flex: 1,
-                  padding: "8px 12px",
-                  background:
-                    cmsSettings.mode === mode
-                      ? "var(--bk-accent)"
-                      : "var(--bk-bg-subtle)",
-                  border: "none",
-                  borderRadius: 6,
-                  color: cmsSettings.mode === mode ? "var(--bk-bg-card)" : "var(--bk-ink)",
-                  cursor: "pointer",
-                  fontSize: 12,
-                }}
               >
                 {mode === "none" ? "None" : mode === "static" ? "Embed Data" : "Template"}
               </Button>
@@ -330,33 +213,16 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
 
           {cmsSettings.mode === "template" && (
             <div>
-              <label
-                style={{
-                  display: "block",
-                  fontSize: 12,
-                  marginBottom: 6,
-                  color: "var(--bk-ink-muted)",
-                }}
-              >
-                Template Syntax
-              </label>
-              <div style={{ display: "flex", gap: 8 }}>
+              <Label className={`${FIELD_LABEL} tw:text-gray-500`}>Template Syntax</Label>
+              <div className={SEGMENTED}>
                 {(["handlebars", "liquid"] as TemplateSyntax[]).map((syntax) => (
                   <Button
                     key={syntax}
+                    size="xs"
+                    color={segmentColor(cmsSettings.syntax === syntax)}
+                    aria-pressed={cmsSettings.syntax === syntax}
+                    className="tw:flex-1 tw:capitalize"
                     onClick={() => onCMSChange({ syntax })}
-                    style={{
-                      flex: 1,
-                      padding: "6px 10px",
-                      background:
-                        cmsSettings.syntax === syntax ? /* @lint-hex-policy: syntax-theme swatch color (Catppuccin), not chrome */ "#a6e3a1" : "var(--bk-bg-subtle)",
-                      border: "none",
-                      borderRadius: 4,
-                      color: cmsSettings.syntax === syntax ? "var(--bk-ink)" : "var(--bk-ink)",
-                      cursor: "pointer",
-                      fontSize: 12,
-                      textTransform: "capitalize",
-                    }}
                   >
                     {syntax}
                   </Button>
@@ -365,7 +231,7 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
             </div>
           )}
 
-          <div style={{ fontSize: 12, color: "var(--bk-ink-muted)", marginTop: 8 }}>
+          <div className="tw:text-xs tw:text-gray-500 tw:mt-2">
             {cmsSettings.mode === "none" && "CMS bindings will not be resolved in export."}
             {cmsSettings.mode === "static" && "CMS data will be embedded directly in HTML."}
             {cmsSettings.mode === "template" &&

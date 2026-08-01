@@ -116,9 +116,9 @@ describe("ExportModal — rendering + export generation", () => {
     renderModal();
     await screen.findByText(/5 elements/);
     // Card accessible names = label + description text.
-    expect(screen.getByRole("button", { name: /^HTML Static/ })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /^ZIP All files/ })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /^React React component/ })).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: /^HTML Static/ })).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: /^ZIP All files/ })).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: /^React React component/ })).toBeInTheDocument();
     // KNOWN pin: Vue/Next.js are coming-soon stubs, not buttons.
     expect(screen.getAllByText("Soon")).toHaveLength(2);
     expect(screen.queryByRole("button", { name: /Vue/ })).toBeNull();
@@ -210,7 +210,7 @@ describe("ExportModal — download flows", () => {
     renderModal();
     await screen.findByText(/5 elements/);
 
-    fireEvent.click(screen.getByRole("button", { name: /^ZIP All files/ }));
+    fireEvent.click(screen.getByRole("radio", { name: /^ZIP All files/ }));
     // Format change regenerates the export, then the label flips.
     const zipBtn = await screen.findByRole("button", { name: "Export as ZIP" });
     await waitFor(() => expect(zipBtn).toBeEnabled());
@@ -242,7 +242,7 @@ describe("ExportModal — download flows", () => {
     renderModal();
     await screen.findByText(/5 elements/);
 
-    fireEvent.click(screen.getByRole("button", { name: /^React React component/ }));
+    fireEvent.click(screen.getByRole("radio", { name: /^React React component/ }));
     // Pin the current label casing for the react format.
     const reactBtn = await screen.findByRole("button", { name: "Export as REACT" });
     await waitFor(() => expect(reactBtn).toBeEnabled());
@@ -268,7 +268,7 @@ describe("ExportModal — download flows", () => {
     });
     renderModal();
     await screen.findByText(/5 elements/);
-    fireEvent.click(screen.getByRole("button", { name: /^React React component/ }));
+    fireEvent.click(screen.getByRole("radio", { name: /^React React component/ }));
 
     expect(
       await screen.findByText("React components cannot be previewed directly.")

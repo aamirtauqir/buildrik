@@ -12,37 +12,49 @@ import { FormatGrid, OptionsPanel } from "../ExportOptions";
 afterEach(cleanup);
 
 describe("FormatGrid", () => {
-  it("renders the three available formats as selectable buttons", () => {
+  // The picker is a radiogroup of chrome-ui FormatRows, not a row of buttons:
+  // picking an export format is one exclusive choice, so the control that
+  // carries the choice is a radio. Queries below use that role.
+  it("renders the three available formats as selectable radios in one group", () => {
     render(<FormatGrid selectedFormat="html" onFormatChange={vi.fn()} />);
-    expect(screen.getByRole("button", { name: /HTML/ })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /ZIP/ })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /React/ })).toBeInTheDocument();
+    expect(screen.getByRole("radiogroup", { name: "Export format" })).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: /HTML/ })).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: /ZIP/ })).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: /React/ })).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: /HTML/ })).toBeChecked();
   });
 
   it("fires onFormatChange with the clicked format", () => {
     const onFormatChange = vi.fn();
     render(<FormatGrid selectedFormat="html" onFormatChange={onFormatChange} />);
-    fireEvent.click(screen.getByRole("button", { name: /React/ }));
+    fireEvent.click(screen.getByRole("radio", { name: /React/ }));
     expect(onFormatChange).toHaveBeenCalledWith("react");
-    fireEvent.click(screen.getByRole("button", { name: /ZIP/ }));
+    fireEvent.click(screen.getByRole("radio", { name: /ZIP/ }));
     expect(onFormatChange).toHaveBeenCalledWith("zip");
   });
 
-  it("pins the Vue/Next.js stubs: non-interactive cards with a Soon badge", () => {
+  it("pins the Vue/Next.js stubs: non-interactive rows with a Soon badge", () => {
     // KNOWN pin — Vue and Next.js exports are unimplemented stubs. They must
-    // render as disabled "coming soon" cards, NOT as buttons.
+    // stay unpickable. Asserted on what actually makes them unpickable now:
+    // no radio at all (so neither a click nor an arrow key can reach them) and
+    // aria-disabled on the row. A disabled radio would still be a radio.
     render(<FormatGrid selectedFormat="html" onFormatChange={vi.fn()} />);
 
     expect(screen.getByText("Vue")).toBeInTheDocument();
     expect(screen.getByText("Next.js")).toBeInTheDocument();
     expect(screen.getAllByText("Soon")).toHaveLength(2);
+    expect(screen.queryByRole("radio", { name: /Vue/ })).toBeNull();
+    expect(screen.queryByRole("radio", { name: /Next\.js/ })).toBeNull();
     expect(screen.queryByRole("button", { name: /Vue/ })).toBeNull();
     expect(screen.queryByRole("button", { name: /Next\.js/ })).toBeNull();
 
-    const vueCard = screen.getByText("Vue").closest('[title="Coming soon"]');
-    expect(vueCard).not.toBeNull();
-    expect((vueCard as HTMLElement).style.pointerEvents).toBe("none");
-    expect((vueCard as HTMLElement).style.opacity).toBe("0.5");
+    const vueRow = screen.getByText("Vue").closest("label");
+    expect(vueRow).not.toBeNull();
+    expect(vueRow).toHaveAttribute("aria-disabled", "true");
+    expect(vueRow?.querySelector("input")).toBeNull();
+    // pointer-events:none is what stops the click; it now arrives as the
+    // aria-disabled: variant rather than an inline style.
+    expect(vueRow?.className).toMatch(/aria-disabled:pointer-events-none/);
   });
 
   it("does not render a JSON card even though the format type includes it", () => {
