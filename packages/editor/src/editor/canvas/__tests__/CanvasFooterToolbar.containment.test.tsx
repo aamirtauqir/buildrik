@@ -13,8 +13,14 @@
  *    opens) but the controls kept their intrinsic ~1076px, so the right-hand
  *    group ran 276px UNDER the inspector panel and could not be clicked.
  *
- * jsdom does no layout, so the assertions are on the declared style contract —
- * the layout consequence was verified in a real browser.
+ * jsdom does no layout, AND it computes nothing from a `tw:` class, so the
+ * contract now lives in the class list rather than in `element.style`. That is
+ * a weaker check than the inline-style one it replaces — it proves the classes
+ * are applied, not that they resolve — so the real measurement moved to the
+ * Playwright parity harness (`e2e/style-parity.spec.ts`, case
+ * "canvas-footer-toolbar"), which reads genuine computed values with the real
+ * CSS pipeline loaded. Both are needed: this one fails fast on a refactor that
+ * drops a utility, that one fails on a utility that does not compile.
  *
  * @license BSD-3-Clause
  */
@@ -40,13 +46,14 @@ beforeAll(() => {
   }
 });
 
+const CONTAINMENT = ["tw:max-w-full", "tw:min-w-0", "tw:overflow-x-auto"];
+
 function pill(): HTMLElement {
   render();
-  // the bar is the toggle's nearest ancestor that declares the containment
-  // contract — the toggle itself also carries radius+padding, so match on the
-  // property that only the container sets
+  // the bar is the toggle's nearest ancestor carrying the containment
+  // utilities — the toggle itself has radius+padding but never these
   let n: HTMLElement | null = screen.getByRole("button", { name: "Snap Guides" });
-  while (n && n.style.maxWidth !== "100%") n = n.parentElement;
+  while (n && !CONTAINMENT.every((c) => n!.classList.contains(c))) n = n.parentElement;
   if (!n) throw new Error("toolbar container not found");
   return n;
 }
@@ -65,16 +72,16 @@ function render() {
 describe("canvas toolbar containment", () => {
   it("stays inside its column instead of spilling under the inspector", () => {
     const bar = pill();
-    expect(bar.style.maxWidth).toBe("100%");
-    expect(bar.style.overflowX).toBe("auto");
-    // min-width:auto is what lets a flex row refuse to shrink
-    expect(bar.style.minWidth).toBe("0px");
+    // min-width:0 is what lets a flex row refuse to shrink; without it the
+    // controls kept their intrinsic width and ran under the inspector.
+    for (const cls of CONTAINMENT) expect(bar.classList.contains(cls)).toBe(true);
   });
 
   it("is opaque — a floating bar cannot show canvas content through itself", () => {
     const bar = pill();
-    expect(bar.style.background).toBeTruthy();
-    expect(bar.style.background).not.toMatch(/surface-3/);
+    const fill = [...bar.classList].filter((c) => /^tw:bg-/.test(c));
+    expect(fill, "the bar declares no background at all").not.toHaveLength(0);
+    expect(fill.join(" ")).not.toMatch(/transparent|surface-3/);
   });
 });
 

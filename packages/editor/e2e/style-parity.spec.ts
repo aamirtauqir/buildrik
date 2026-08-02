@@ -34,13 +34,16 @@ const TRACKED = [
      from an inline `textDecoration` to a class, and without this the probe
      measured 43 nodes and none of the property it was added to protect. */
   "text-decoration-line",
+  /* Added with the canvas-footer-toolbar case: the bar's containment contract
+     is min-width/overflow-x, and overflow-x is not implied by "overflow". */
+  "min-width", "overflow-x",
 ] as const;
 
 // ESM: no __dirname. The package is type:module, so derive it.
 const HERE = dirname(fileURLToPath(import.meta.url));
 const BASELINE_DIR = join(HERE, "baselines");
 
-const CASES = ["content-collection-rows", "content-field-rows", "content-root-rows", "folder-context-menu", "onboarding-steps"] as const;
+const CASES = ["content-collection-rows", "content-field-rows", "content-root-rows", "folder-context-menu", "onboarding-steps", "canvas-footer-toolbar"] as const;
 
 for (const name of CASES) {
   test(`computed-style parity: ${name}`, async ({ page }) => {

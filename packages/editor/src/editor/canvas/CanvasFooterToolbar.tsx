@@ -16,9 +16,8 @@
 
 import * as React from "react";
 import { useClickOutside } from "@/shared/hooks";
-import { BreakpointSwitcher, Button, Tooltip, type Breakpoint } from "@/editor/chrome-ui";
+import { BreakpointSwitcher, Button, POPOVER_BASE_CLASS, Tooltip, type Breakpoint } from "@/editor/chrome-ui";
 import { ZOOM_PRESETS } from "./shared";
-import { ROW_SM } from "@/shared/constants/layout";
 // Undo/redo/device switching moved OFF the topbar and onto this canvas toolbar
 // (Figma contract §2: viewport + edit controls belong to the canvas, the topbar
 // stays minimal). Device values are the BreakpointSwitcher's 4-way union.
@@ -131,20 +130,32 @@ const RedoIcon = () => (
   </svg>
 );
 
-const editBtnStyles: React.CSSProperties = {
-  display: "inline-flex",
-  alignItems: "center",
-  justifyContent: "center",
-  width: ROW_SM,
-  height: ROW_SM,
-  padding: 0,
-  color: "var(--bk-ink-soft)",
-  background: "transparent",
-  border: "1px solid transparent",
-  borderRadius: "var(--bk-radius-sm)",
-  cursor: "pointer",
-  transition: "all 0.15s ease",
-};
+/** Square icon control in the bar — undo/redo/help all share this box. */
+const EDIT_BTN =
+  "tw:inline-flex tw:items-center tw:justify-center tw:size-7 tw:p-0 tw:rounded " +
+  "tw:border tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] " +
+  "tw:hover:bg-gray-100 tw:hover:text-gray-900";
+
+/** The floating bar itself. maxWidth/minWidth/overflow keep it inside the
+ *  canvas column when the inspector opens — without them it ran ~276px under
+ *  the inspector at 1440 and hid controls behind another panel. */
+const BAR =
+  "tw:flex tw:items-center tw:justify-center tw:gap-3 tw:h-10 tw:px-4 tw:py-2 tw:rounded-lg " +
+  "tw:border tw:border-gray-200 tw:bg-white tw:[box-shadow:var(--bk-shadow-drag)] " +
+  "tw:whitespace-nowrap tw:max-w-full tw:min-w-0 tw:overflow-x-auto";
+const GROUP = "tw:flex tw:items-center tw:gap-1";
+const DIVIDER = "tw:w-px tw:h-5 tw:mx-1 tw:bg-gray-200";
+const ZOOM_GROUP = "tw:flex tw:items-center tw:gap-0.5 tw:p-0.5 tw:rounded tw:bg-[var(--bk-bg-subtle)]";
+const ZOOM_BTN =
+  "tw:flex tw:items-center tw:justify-center tw:size-6 tw:p-0 tw:rounded tw:border-0 " +
+  "tw:bg-transparent tw:text-sm tw:font-medium tw:text-[var(--bk-ink-soft)] " +
+  "tw:hover:bg-gray-100 tw:hover:text-gray-900";
+const ZOOM_PCT =
+  "tw:flex tw:items-center tw:justify-center tw:min-w-12 tw:h-6 tw:p-0 tw:border-0 " +
+  "tw:bg-transparent tw:text-[11px] tw:font-semibold tw:text-gray-900";
+const PRESET_ITEM =
+  "tw:w-full tw:px-3 tw:py-[5px] tw:rounded tw:border-0 tw:text-xs tw:font-medium tw:text-right";
+const PRESET_DIVIDER = "tw:h-px tw:my-1 tw:bg-gray-200";
 
 // ============================================
 // Overlay Button Component
@@ -174,29 +185,18 @@ const OverlayButton: React.FC<OverlayButtonProps> = ({
     <Button
       type="button"
       color="light"
-      className={`canvas-footer-btn ${active ? "canvas-footer-btn--active" : ""}`}
+      className={`tw:inline-flex tw:items-center tw:gap-1 tw:h-7 tw:px-2 tw:py-1 tw:rounded tw:border tw:text-[11px] tw:font-medium ${
+        active
+          ? "tw:border-blue-700 tw:bg-[var(--bk-bg-subtle)] tw:text-gray-900"
+          : "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:bg-gray-100"
+      }`}
       onClick={onClick}
       aria-pressed={active}
       aria-label={label}
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: "4px",
-        padding: "4px 8px",
-        height: "28px",
-        fontSize: "11px",
-        fontWeight: 500,
-        color: active ? "var(--bk-ink)" : "var(--bk-ink-soft)",
-        background: active ? "var(--bk-bg-subtle)" : "transparent",
-        border: active ? "1px solid var(--bk-accent)" : "1px solid transparent",
-        borderRadius: "var(--bk-radius-sm)",
-        cursor: "pointer",
-        transition: "all 0.15s ease",
-      }}
     >
-      <span style={{ display: "flex", opacity: active ? 1 : 0.7 }}>{icon}</span>
+      <span className={active ? "tw:flex" : "tw:flex tw:opacity-70"}>{icon}</span>
       <span>{label}</span>
-      {active && <span style={{ marginLeft: "2px", color: "var(--bk-accent-text)" }}>✓</span>}
+      {active && <span className="tw:ml-0.5 tw:text-blue-700">✓</span>}
     </Button>
   </Tooltip>
 );
@@ -238,21 +238,20 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
   const showEditGroup = Boolean(onUndo || onRedo || (device && onDeviceChange));
 
   return (
-    <div style={containerStyles}>
+    <div className={BAR}>
       {/* Edit + viewport group — undo/redo + device switcher (moved off topbar) */}
       {showEditGroup && (
         <>
-          <div style={overlaysGroupStyles}>
+          <div className={GROUP}>
             {onUndo && (
               <Tooltip content="Undo · ⌘Z" placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
                 <Button
                   type="button"
                   color="light"
-                  className="canvas-footer-btn tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+                  className={EDIT_BTN}
                   onClick={onUndo}
                   disabled={canUndo === false}
                   aria-label="Undo"
-                  style={editBtnStyles}
                 >
                   <UndoIcon />
                 </Button>
@@ -263,11 +262,10 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
                 <Button
                   type="button"
                   color="light"
-                  className="canvas-footer-btn tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+                  className={EDIT_BTN}
                   onClick={onRedo}
                   disabled={canRedo === false}
                   aria-label="Redo"
-                  style={editBtnStyles}
                 >
                   <RedoIcon />
                 </Button>
@@ -282,11 +280,11 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
               />
             )}
           </div>
-          <div style={dividerStyles} />
+          <div className={DIVIDER} />
         </>
       )}
       {/* Overlay Toggles */}
-      <div style={overlaysGroupStyles}>
+      <div className={GROUP}>
         <OverlayButton
           icon={<GuidesIcon />}
           label="Snap Guides"
@@ -325,16 +323,16 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
         />
       </div>
       {/* Divider */}
-      <div style={dividerStyles} />
+      <div className={DIVIDER} />
       {/* Zoom Controls */}
-      <div style={{ ...zoomGroupStyles, position: "relative" }} ref={presetsRef}>
+      <div className={`${ZOOM_GROUP} tw:relative`} ref={presetsRef}>
         <Button
           type="button"
           color="light"
-          style={zoomBtnStyles}
+          className={ZOOM_BTN}
           onClick={handleZoomOut}
           aria-label="Zoom out"
-          disabled={zoom <= ZOOM_PRESETS[0]} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+          disabled={zoom <= ZOOM_PRESETS[0]}
         >
           −
         </Button>
@@ -343,10 +341,10 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
         <Button
           type="button"
           color="light"
-          style={zoomPctStyles}
+          className={ZOOM_PCT}
           onClick={() => setShowPresets((v) => !v)}
           aria-label="Zoom presets"
-          title="Click for zoom presets" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+          title="Click for zoom presets"
         >
           {Math.round(zoom)}%
         </Button>
@@ -354,17 +352,17 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
         <Button
           type="button"
           color="light"
-          style={zoomBtnStyles}
+          className={ZOOM_BTN}
           onClick={handleZoomIn}
           aria-label="Zoom in"
-          disabled={zoom >= ZOOM_PRESETS[ZOOM_PRESETS.length - 1]} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+          disabled={zoom >= ZOOM_PRESETS[ZOOM_PRESETS.length - 1]}
         >
           +
         </Button>
 
         {/* Preset dropdown */}
         {showPresets && (
-          <div style={presetsDropdownStyles}>
+          <div className={`${POPOVER_BASE_CLASS} tw:flex tw:flex-col tw:bottom-[calc(100%+6px)] tw:left-1/2 tw:-translate-x-1/2 tw:min-w-25 tw:p-1`}>
             {ZOOM_PRESETS.map((preset) => (
               <Button
                 key={preset}
@@ -374,21 +372,18 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
                   onZoomChange(preset);
                   setShowPresets(false);
                 }}
-                style={{
-                  ...presetItemStyles,
-                  background: Math.round(zoom) === preset ? "var(--bk-bg-subtle)" : "transparent",
-                  color:
-                    Math.round(zoom) === preset
-                      ? "var(--bk-ink)"
-                      : "var(--bk-ink-soft)",
-                }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+                className={`${PRESET_ITEM} ${
+                  Math.round(zoom) === preset
+                    ? "tw:bg-[var(--bk-bg-subtle)] tw:text-gray-900"
+                    : "tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:bg-gray-100"
+                }`}
               >
                 {preset}%
               </Button>
             ))}
             {onFitToScreen && (
               <>
-                <div style={presetDividerStyles} />
+                <div className={PRESET_DIVIDER} />
                 <Button
                   type="button"
                   color="light"
@@ -396,7 +391,7 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
                     onFitToScreen();
                     setShowPresets(false);
                   }}
-                  style={presetItemStyles} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+                  className={`${PRESET_ITEM} tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:bg-gray-100`}
                 >
                   Fit to screen
                 </Button>
@@ -408,14 +403,14 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
       {/* Help Button */}
       {onHelpClick && (
         <>
-          <div style={dividerStyles} />
+          <div className={DIVIDER} />
           <Tooltip content="Keyboard shortcuts · ?" placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
             <Button
               type="button"
               color="light"
-              style={{ ...zoomBtnStyles, width: ROW_SM, height: ROW_SM }}
+              className={EDIT_BTN}
               onClick={onHelpClick}
-              aria-label="Show keyboard shortcuts (press ? key)" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+              aria-label="Show keyboard shortcuts (press ? key)"
             >
               <HelpIcon />
             </Button>
@@ -424,122 +419,6 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
       )}
     </div>
   );
-};
-
-// ============================================
-// Styles
-// ============================================
-
-const containerStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  gap: "12px",
-  padding: "8px 16px",        /* PRD §10.7: 8px padding */
-  height: "40px",
-  // was --buildrick-surface-3, which is defined nowhere: the floating bar
-  // rendered with NO fill, so canvas content showed straight through a
-  // toolbar that is supposed to sit above it.
-  background: "var(--bk-bg-card)",
-  border: "1px solid var(--bk-border)",        /* PRD §10.7: all-sides border */
-  borderRadius: "var(--bk-radius-lg)",         /* PRD §10.7: lg corner radius */
-  // 30%-black was a dark-theme weight; the light chrome uses the shadow scale.
-  boxShadow: "var(--bk-shadow-drag)",
-  whiteSpace: "nowrap" as const,
-  // The bar is centred over the canvas column, which narrows when the
-  // inspector opens. Without these the row kept its intrinsic width and ran
-  // ~276px under the inspector at 1440. Now it stays inside the column and
-  // scrolls instead of hiding controls behind another panel.
-  maxWidth: "100%",
-  minWidth: 0,
-  overflowX: "auto",
-};
-
-const overlaysGroupStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: "4px",
-};
-
-const dividerStyles: React.CSSProperties = {
-  width: "1px",
-  height: "20px",
-  background: "var(--bk-border)",
-  margin: "0 4px",
-};
-
-const zoomGroupStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: "2px",
-  background: "var(--bk-bg-subtle)",
-  borderRadius: "var(--bk-radius-sm)",
-  padding: "2px",
-};
-
-const zoomBtnStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  width: "24px",
-  height: "24px",
-  fontSize: "14px",
-  fontWeight: 500,
-  color: "var(--bk-ink-soft)",
-  background: "transparent",
-  border: "none",
-  borderRadius: "var(--bk-radius-sm)",
-  cursor: "pointer",
-  transition: "all 0.15s ease",
-};
-
-const zoomPctStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  minWidth: "48px",
-  height: "24px",
-  fontSize: "11px",
-  fontWeight: 600,
-  color: "var(--bk-ink)",
-  background: "transparent",
-  border: "none",
-  cursor: "pointer",
-};
-
-const presetsDropdownStyles: React.CSSProperties = {
-  position: "absolute",
-  bottom: "calc(100% + 6px)",
-  left: "50%",
-  transform: "translateX(-50%)",
-  display: "flex",
-  flexDirection: "column",
-  padding: "4px",
-  background: "var(--bk-bg-subtle)",
-  border: "1px solid var(--bk-border)",
-  borderRadius: "var(--bk-radius-lg)",
-  boxShadow: "0 4px 16px rgba(0, 0, 0, 0.35)",
-  zIndex: 500,
-  minWidth: "100px",
-};
-
-const presetItemStyles: React.CSSProperties = {
-  padding: "5px 12px",
-  border: "none",
-  borderRadius: "var(--bk-radius-sm)",
-  color: "var(--bk-ink-soft)",
-  fontSize: "12px",
-  fontWeight: 500,
-  cursor: "pointer",
-  textAlign: "right",
-  background: "transparent",
-  transition: "background 0.1s",
-};
-
-const presetDividerStyles: React.CSSProperties = {
-  height: "1px",
-  background: "var(--bk-border)",
-  margin: "4px 0",
 };
 
 export default CanvasFooterToolbar;

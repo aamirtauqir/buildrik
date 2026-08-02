@@ -25,6 +25,7 @@ import "@/themes/default.css";
 import { CollectionView, FieldsView, RootView } from "@/editor/sidebar/tabs/content/ContentViews";
 import { FolderContextMenu } from "@/editor/sidebar/tabs/media/components/FolderContextMenu";
 import { OnboardingChecklist } from "@/editor/onboarding/OnboardingChecklist";
+import { CanvasFooterToolbar } from "@/editor/canvas/CanvasFooterToolbar";
 
 /** Every case renders into `.bd-studio` so chrome-scoped CSS applies. */
 const CASES: Record<string, () => React.ReactElement> = {
@@ -80,6 +81,23 @@ const CASES: Record<string, () => React.ReactElement> = {
         onMinimize={() => {}}
         isMinimized={false}
         onRestore={() => {}}
+      />
+    </div>
+  ),
+  // The floating canvas bar. Its containment contract (max-width:100%,
+  // min-width:0, overflow-x:auto) and its opaque fill used to be inline styles
+  // asserted in jsdom; both are classes now, so only a real browser can say
+  // whether the bar still refuses to spill under the inspector.
+  "canvas-footer-toolbar": () => (
+    <div data-probe="canvas-footer-toolbar">
+      <CanvasFooterToolbar
+        overlays={{ guides: true, spacing: false, grid: false, rulers: false, badges: false, xray: false }}
+        zoom={100}
+        onOverlayChange={() => {}}
+        onZoomChange={() => {}}
+        onUndo={() => {}}
+        onRedo={() => {}}
+        onHelpClick={() => {}}
       />
     </div>
   ),
