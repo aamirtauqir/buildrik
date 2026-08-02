@@ -128,52 +128,32 @@ const contrastFails = (
   surfaceId?: string,
 ) => t.id !== surfaceId && calcWcagLevel(shownValue(t, mode), surfaceBg) === "fail";
 
+/* Classes. The only genuinely computed values left in this file are a token's
+   own colour on its swatch and a suggested fix's colour — both the user's data.
+   `#ef4444` and its two "intentional, off chrome palette" exemptions are gone:
+   Tailwind's red-500 IS that value. */
+const GROUP_HEAD =
+  "tw:m-0 tw:text-[10.5px] tw:font-semibold tw:text-gray-500 tw:uppercase tw:tracking-[0.08em] " +
+  "tw:[font-family:var(--bk-font-mono)]";
+const MONO_MINI = "tw:text-[10px] tw:font-medium tw:text-[var(--bk-ink-soft)] tw:[font-family:var(--bk-font-mono)]";
+const TOOLBAR = "tw:flex tw:items-center tw:gap-1.5 tw:pt-2 tw:pb-2.5 tw:flex-wrap";
+const PILL = "tw:px-2.5 tw:py-1 tw:rounded-[20px] tw:text-[11px] tw:font-semibold";
+const BANNER = "tw:px-2.5 tw:py-2 tw:bg-[var(--bk-error-tint)] tw:border tw:border-red-200 tw:rounded-md tw:mb-2";
+const FIX_BTN = "tw:border tw:border-green-200 tw:bg-[var(--bk-success-tint)] tw:text-[var(--bk-success)] tw:font-semibold";
+const GHOST = "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900";
+
 // ─── Group header (mono-uppercase per prototype) ──────────────────────────────
 
 const GroupHeader: React.FC<{ label: string; mini?: string; subtext?: string }> = ({
   label, mini, subtext,
 }) => (
-  <div style={{ marginTop: 12, marginBottom: 8 }}>
-    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-      <h3
-        style={{
-          margin: 0,
-          fontSize: 10.5,
-          fontWeight: 600,
-          color: "var(--bk-ink-muted)",
-          textTransform: "uppercase",
-          letterSpacing: "0.08em",
-          fontFamily: "var(--bk-font-mono, ui-monospace, monospace)",
-        }}
-      >
-        {label}
-      </h3>
-      <div style={{ flex: 1, height: 1, background: "var(--bk-border)" }} />
-      {mini && (
-        <span
-          style={{
-            fontSize: 10,
-            fontWeight: 500,
-            color: "var(--bk-ink-soft)",
-            fontFamily: "var(--bk-font-mono, ui-monospace, monospace)",
-          }}
-        >
-          {mini}
-        </span>
-      )}
+  <div className="tw:mt-3 tw:mb-2">
+    <div className="tw:flex tw:items-center tw:gap-2">
+      <h3 className={GROUP_HEAD}>{label}</h3>
+      <div className="tw:flex-1 tw:h-px tw:bg-gray-200" />
+      {mini && <span className={MONO_MINI}>{mini}</span>}
     </div>
-    {subtext && (
-      <div
-        style={{
-          fontSize: 11,
-          color: "var(--bk-ink-muted)",
-          marginTop: 4,
-          lineHeight: 1.4,
-        }}
-      >
-        {subtext}
-      </div>
-    )}
+    {subtext && <div className="tw:text-[11px] tw:text-gray-500 tw:mt-1 tw:leading-[1.4]">{subtext}</div>}
   </div>
 );
 
@@ -185,30 +165,13 @@ const ColorSwatch: React.FC<{ value: string; isDirty?: boolean }> = ({ value, is
   return (
     <span
       aria-hidden="true"
-      style={{
-        position: "relative",
-        display: "inline-block",
-        width: 16,
-        height: 16,
-        borderRadius: 4,
-        background: value,
-        border: isLight
-          ? "1px solid var(--bk-border-medium)"
-          : "1px solid var(--bk-border)",
-      }}
+      className={`tw:relative tw:inline-block tw:size-4 tw:rounded tw:border ${isLight ? "tw:border-gray-300" : "tw:border-gray-200"}`}
+      style={{ background: value }}
     >
       {isDirty && (
         <span
           aria-label="unsaved changes"
-          style={{
-            position: "absolute",
-            top: -2,
-            right: -2,
-            width: 5,
-            height: 5,
-            borderRadius: "var(--bk-radius-full)",
-            background: "var(--bk-warning)",
-          }}
+          className="tw:absolute tw:-top-0.5 tw:-right-0.5 tw:size-[5px] tw:rounded-full tw:bg-[var(--bk-warning)]"
         />
       )}
     </span>
@@ -348,71 +311,35 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
     filterMode === "issues" && issuesCount === 0 && searchQuery === "";
 
   return (
-    <div data-color-token-list style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+    <div data-color-token-list className="tw:flex tw:flex-col">
       {/* Controls row — search + filter pills */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 6,
-          padding: "8px 0 10px",
-          flexWrap: "wrap",
-        }}
-      >
-        <div style={{ flex: 1, position: "relative", minWidth: 100 }}>
+      <div className={TOOLBAR}>
+        <div className="tw:flex-1 tw:relative tw:min-w-25">
           <TextInput
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search colors…"
-            style={{
-              width: "100%",
-              padding: "5px 8px",
-              background: "var(--bk-bg-subtle)",
-              border: "1px solid var(--bk-border)",
-              borderRadius: 6,
-              color: "var(--bk-ink)",
-              fontSize: 12,
-              boxSizing: "border-box",
-              outline: "none",
-            }}
+            className="tw:w-full"
           />
         </div>
         <Button
           type="button"
-          color="light"
           size="xs"
           onClick={() => setFilterMode("all")}
-          style={{
-            padding: "4px 10px",
-            borderRadius: 20,
-            border: "1px solid",
-            fontSize: 11,
-            fontWeight: 600,
-            cursor: "pointer",
-            background: filterMode === "all" ? "var(--bk-accent)" : "transparent",
-            borderColor: filterMode === "all" ? "var(--bk-accent)" : "var(--bk-border)",
-            color: filterMode === "all" ? "var(--bk-accent-on)" : "var(--bk-ink-muted)",
-          }}
+          color={filterMode === "all" ? undefined : "light"}
+          aria-pressed={filterMode === "all"}
+          className={PILL}
         >
           All
         </Button>
         <Button
           type="button"
-          color="light"
           size="xs"
           onClick={() => setFilterMode("issues")}
-          style={{
-            padding: "4px 10px",
-            borderRadius: 20,
-            border: "1px solid",
-            fontSize: 11,
-            fontWeight: 600,
-            cursor: "pointer",
-            background: filterMode === "issues" ? /* @lint-hex-policy: issues-filter active red-500, off chrome palette (intentional) */ "#ef4444" : "transparent",
-            borderColor: filterMode === "issues" ? /* @lint-hex-policy: issues-filter active red-500, off chrome palette (intentional) */ "#ef4444" : "var(--bk-border)",
-            color: filterMode === "issues" ? "var(--bk-accent-on)" : "var(--bk-ink-muted)",
-          }}
+          color={filterMode === "issues" ? "failure" : "light"}
+          aria-pressed={filterMode === "issues"}
+          className={PILL}
           title={`${issuesCount} token${issuesCount !== 1 ? "s" : ""} fail WCAG AA`}
         >
           Issues{issuesCount > 0 ? ` (${issuesCount})` : ""}
@@ -427,21 +354,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
           size="xs"
           onClick={handleDarkMissingClick}
           data-dark-missing-chip
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 6,
-            padding: "6px 10px",
-            marginBottom: 12,
-            borderRadius: 6,
-            border: "1px solid var(--bk-warning-text)",
-            background: "var(--bk-warning-tint)",
-            color: "var(--bk-warning-text)",
-            fontSize: 11.5,
-            fontWeight: 500,
-            cursor: "pointer",
-            alignSelf: "flex-start",
-          }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+          className="tw:inline-flex tw:items-center tw:gap-1.5 tw:mb-3 tw:self-start tw:border tw:border-yellow-300 tw:bg-[var(--bk-warning-tint)] tw:text-[var(--bk-warning-text)] tw:text-[11.5px] tw:font-medium"
         >
           <span aria-hidden="true">⚠</span>
           <span>
@@ -452,24 +365,9 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
 
       {/* WCAG filter banner */}
       {filterMode === "issues" && issuesCount > 0 && (
-        <div
-          style={{
-            padding: "8px 10px",
-            background: "rgba(239,68,68,0.08)",
-            border: "1px solid rgba(239,68,68,0.2)",
-            borderRadius: 7,
-            marginBottom: 8,
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: 8,
-            }}
-          >
-            <span style={{ fontSize: 12, color: "rgba(239,68,68,0.9)", lineHeight: 1.5 }}>
+        <div className={BANNER}>
+          <div className="tw:flex tw:items-center tw:justify-between tw:gap-2">
+            <span className="tw:text-xs tw:text-red-500 tw:leading-normal">
               {issuesCount} token{issuesCount !== 1 ? "s" : ""} with low contrast — fails WCAG AA.
             </span>
             {Object.keys(contrastFixes).length > 0 && (
@@ -478,18 +376,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
                 color="light"
                 size="xs"
                 onClick={applyAllFixes}
-                style={{
-                  padding: "3px 10px",
-                  borderRadius: 4,
-                  border: "1px solid rgba(34,197,94,0.4)",
-                  background: "rgba(34,197,94,0.1)",
-                  color: "var(--bk-success)",
-                  fontSize: 12,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  whiteSpace: "nowrap",
-                  flexShrink: 0,
-                }}
+                className={`${FIX_BTN} tw:whitespace-nowrap tw:flex-none`}
                 aria-label={`Fix all ${Object.keys(contrastFixes).length} contrast issues`}
               >
                 Fix all ({Object.keys(contrastFixes).length})
@@ -501,12 +388,12 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
 
       {/* WCAG pass state */}
       {isIssuesEmpty && (
-        <div style={{ padding: "24px 0", textAlign: "center" }}>
-          <div style={{ fontSize: 20, marginBottom: 6 }}>✓</div>
-          <div style={{ fontSize: 12, color: "var(--bk-success)", fontWeight: 600 }}>
+        <div className="tw:py-6 tw:text-center">
+          <div className="tw:text-xl tw:mb-1.5">✓</div>
+          <div className="tw:text-xs tw:text-[var(--bk-success)] tw:font-semibold">
             All colors pass WCAG
           </div>
-          <div style={{ fontSize: 12, color: "var(--bk-ink-muted)", marginTop: 4 }}>
+          <div className="tw:text-xs tw:text-gray-500 tw:mt-1">
             No contrast issues found
           </div>
         </div>
@@ -514,8 +401,8 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
 
       {/* Empty search state */}
       {isEmpty && !isIssuesEmpty && (
-        <div style={{ padding: "24px 0", textAlign: "center" }}>
-          <div style={{ fontSize: 12, color: "var(--bk-ink-muted)" }}>
+        <div className="tw:py-6 tw:text-center">
+          <div className="tw:text-xs tw:text-gray-500">
             No colors match "{searchQuery}"
           </div>
         </div>
@@ -532,7 +419,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
                 mini={mini}
                 subtext={group.subtext}
               />
-              <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <div className="tw:flex tw:flex-col tw:gap-0.5">
                 {group.tokens.map((token) => {
                   const currentValue = pendingDiff[token.id]?.currentValue ?? token.value;
                   const isDirty = pendingDiff[token.id] !== undefined;
@@ -554,56 +441,27 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
                 group.tokens.map((t) => {
                   const fix = contrastFixes[t.id];
                   if (!fix) return null;
-                  const ratio = calcContrastRatio(t.value, surfaceBg);
+                  const ratio = calcContrastRatio(shownValue(t, resolvedMode), surfaceBg);
                   return (
                     <div
                       key={`${t.id}-fix`}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 8,
-                        padding: "4px 8px",
-                        marginTop: 4,
-                        fontSize: 11,
-                        color: "var(--bk-ink-muted)",
-                      }}
+                      className="tw:flex tw:items-center tw:gap-2 tw:px-2 tw:py-1 tw:mt-1 tw:text-[11px] tw:text-gray-500"
                     >
-                      <span
-                        style={{
-                          fontFamily:
-                            "var(--bk-font-mono, ui-monospace, monospace)",
-                        }}
-                      >
+                      <span className="tw:[font-family:var(--bk-font-mono)]">
                         {t.name} · {ratio.toFixed(1)}:1 → 4.5:1
                       </span>
                       <span
-                        style={{
-                          display: "inline-block",
-                          width: 12,
-                          height: 12,
-                          borderRadius: 3,
-                          background: fix,
-                          border: "1px solid var(--bk-border)",
-                        }}
+                        className="tw:inline-block tw:size-3 tw:rounded-sm tw:border tw:border-gray-200"
+                        style={{ background: fix }}
                         aria-hidden="true"
                       />
-                      <code style={{ fontSize: 11 }}>{fix}</code>
+                      <code className="tw:text-[11px]">{fix}</code>
                       <Button
                         type="button"
                         color="light"
                         size="xs"
                         onClick={() => onColorChange(t.id, fix)}
-                        style={{
-                          marginLeft: "auto",
-                          padding: "2px 8px",
-                          borderRadius: 3,
-                          border: "1px solid rgba(34,197,94,0.4)",
-                          background: "rgba(34,197,94,0.1)",
-                          color: "var(--bk-success)",
-                          fontSize: 11,
-                          fontWeight: 600,
-                          cursor: "pointer",
-                        }}
+                        className={`${FIX_BTN} tw:ml-auto`}
                         aria-label={`Fix contrast for ${t.name}`}
                       >
                         Fix
@@ -620,17 +478,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
         type="button"
         color="light"
         onClick={onAddToken}
-        style={{
-          marginTop: 16,
-          width: "100%",
-          padding: "10px",
-          background: "transparent",
-          border: "1px dashed var(--bk-border)",
-          borderRadius: 6,
-          color: "var(--bk-ink-muted)",
-          fontSize: 12,
-          cursor: "pointer",
-        }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+        className={`${GHOST} tw:mt-4 tw:w-full tw:border tw:border-dashed tw:border-gray-300 tw:text-xs`}
       >
         + Add token
       </Button>
