@@ -190,12 +190,12 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
   if (!composer || pages.length === 0) return null;
 
   return (
-    <div style={containerStyles}>
+    <div className={BAR}>
       {/* Outer flex row — tablist + add button side by side */}
-      <div style={tabRowStyles}>
+      <div className={ROW}>
         {/* Tab list with keyboard navigation */}
         <div
-          style={tabsContainerStyles}
+          className={TABS}
           role="tablist"
           aria-label="Site pages"
           onKeyDown={(e) => {
@@ -237,14 +237,11 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
                   setContextMenu({ pageId: page.id, x: rect.left, y });
                 }
               }}
-              style={{
-                ...tabStyles,
-                ...(page.id === activePageId ? activeTabStyles : {}),
-              }}
+              className={`${TAB} ${page.id === activePageId ? TAB_ACTIVE : TAB_RESTING}`}
             >
-              {page.isHome && <span style={homeIconStyles}>🏠</span>}
+              {page.isHome && <span className="tw:text-xs">🏠</span>}
               {editingPageId === page.id ? (
-                <span style={{ position: "relative" }}>
+                <span className="tw:relative">
                   <TextInput
                     type="text"
                     value={editName}
@@ -263,56 +260,42 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
                     autoFocus
                     aria-describedby="ptb-rename-feedback"
                     aria-invalid={!!nameValidation.error}
-                    style={{
-                      ...inputStyles,
-                      borderColor: nameValidation.error
-                        ? "var(--bk-error)"
+                    className={`${RENAME_INPUT} ${
+                      nameValidation.error
+                        ? "tw:[&_input]:border-[var(--bk-error)]"
                         : nameValidation.warning
-                        ? "var(--bk-warning)"
-                        : "var(--bk-accent)",
-                    }}
+                          ? "tw:[&_input]:border-[var(--bk-warning)]"
+                          : "tw:[&_input]:border-blue-700"
+                    }`}
                     onClick={(e) => e.stopPropagation()}
                   />
                   <span
                     id="ptb-rename-feedback"
                     role={nameValidation.error ? "alert" : undefined}
-                    style={{
-                      position: "absolute",
-                      top: "100%",
-                      left: 0,
-                      zIndex: 100,
-                      background: "var(--bk-bg-card)",
-                      border: "1px solid var(--bk-border)",
-                      borderRadius: 4,
-                      padding: "4px 8px",
-                      marginTop: 2,
-                      whiteSpace: "nowrap",
-                      fontSize: 12,
-                      lineHeight: 1.4,
-                    }}
+                    className={RENAME_FEEDBACK}
                   >
                     {nameValidation.error && (
-                      <span style={{ color: "var(--bk-error)", display: "block" }}>
+                      <span className="tw:block tw:text-[var(--bk-error)]">
                         {nameValidation.error}
                       </span>
                     )}
                     {nameValidation.warning && (
-                      <span style={{ color: "var(--bk-warning)", display: "block" }}>
+                      <span className="tw:block tw:text-[var(--bk-warning)]">
                         {nameValidation.warning}
                       </span>
                     )}
                     {nameValidation.slug && (
-                      <span style={{ color: "var(--bk-ink-muted)", display: "block" }}>
+                      <span className="tw:block tw:text-gray-500">
                         /{nameValidation.slug}
                       </span>
                     )}
                   </span>
                 </span>
               ) : (
-                <span style={tabNameStyles}>{page.name}</span>
+                <span className={TAB_NAME}>{page.name}</span>
               )}
               {dirtyPages.has(page.id) && (
-                <span style={dirtyDotStyles} aria-hidden="true" title="Unsaved changes" />
+                <span className={DIRTY_DOT} aria-hidden="true" title="Unsaved changes" />
               )}
             </div>
           ))}
@@ -320,7 +303,7 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
         {/* Add button outside tablist — ARIA: only role="tab" may be tablist children */}
         <Button
           onClick={handleAddPage}
-          style={addButtonStyles}
+          className={ADD_BTN}
           title="Add page"
           aria-label="Add new page"
         >
@@ -332,8 +315,8 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
         <Portal>
           <div
             ref={ctxMenuRef}
-            className="ptb-ctx-menu"
-            style={{ ...menuStyles, left: contextMenu.x, top: contextMenu.y }}
+            className={CTX_MENU}
+            style={{ left: contextMenu.x, top: contextMenu.y }}
             role="menu"
             aria-label={`Options for ${pages.find((p) => p.id === contextMenu.pageId)?.name ?? "page"}`}
             onKeyDown={(e) => {
@@ -355,21 +338,21 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
             }}
           >
             <Button
-              style={menuItemStyles}
+              className={MENU_ITEM}
               role="menuitem"
               onClick={() => handleRename(contextMenu.pageId)}
             >
               ✏️ Rename
             </Button>
             <Button
-              style={menuItemStyles}
+              className={MENU_ITEM}
               role="menuitem"
               onClick={() => handleDuplicate(contextMenu.pageId)}
             >
               📋 Duplicate
             </Button>
             <Button
-              style={menuItemStyles}
+              className={MENU_ITEM}
               role="menuitem"
               onClick={() => handleSetHome(contextMenu.pageId)}
             >
@@ -377,7 +360,7 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
             </Button>
             {pages.length > 1 && (
               <Button
-                style={{ ...menuItemStyles, color: "var(--bk-error)" }}
+                className={`${MENU_ITEM} tw:text-[var(--bk-error)]`}
                 role="menuitem"
                 onClick={() => handleDeleteRequest(contextMenu.pageId)}
               >
@@ -402,128 +385,38 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
 };
 
 // ============================================================================
-// STYLES
+// CLASSES
 // ============================================================================
 
-const containerStyles: React.CSSProperties = {
-  position: "relative",
-  borderBottom: "1px solid var(--bk-border)",
-  // The strip carries the app background so the active tab (bg-card) reads as
-  // proud of it. Both were bg-card before, which left the active page marked
-  // only by a 500 weight and a 5%-alpha shadow — invisible in practice.
-  // Figma board B9.7 is the record.
-  background: "var(--bk-bg-app)",
-};
-
-// Outer row: tablist (scrollable) + add button (fixed, outside tablist)
-const tabRowStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  padding: "4px 8px",
-  gap: 4,
-};
-
-const tabsContainerStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: 2,
-  flex: 1,
-  overflowX: "auto",
-};
-
-const tabStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: 4,
-  padding: "6px 12px",
-  background: "transparent",
-  border: "none",
-  borderRadius: "var(--bk-radius-md) var(--bk-radius-md) 0 0",
-  fontSize: 13,
-  color: "var(--bk-ink-soft)",
-  cursor: "pointer",
-  transition: "all 0.15s ease",
-  whiteSpace: "nowrap",
-};
-
-const activeTabStyles: React.CSSProperties = {
-  background: "var(--bk-bg-card)",
-  border: "1px solid var(--bk-border)",
-  borderBottom: "none",
-  color: "var(--bk-ink)",
-  fontWeight: 500,
-  boxShadow: "var(--bk-shadow-raised)",
-};
-
-const homeIconStyles: React.CSSProperties = {
-  fontSize: 12,
-};
-
-const tabNameStyles: React.CSSProperties = {
-  display: "inline-block", // required for overflow:hidden + text-overflow to trigger on span
-  maxWidth: 120,
-  overflow: "hidden",
-  textOverflow: "ellipsis",
-  verticalAlign: "middle",
-};
-
-const dirtyDotStyles: React.CSSProperties = {
-  width: 6,
-  height: 6,
-  borderRadius: "var(--bk-radius-full)",
-  background: "var(--bk-accent)",
-  flexShrink: 0,
-};
-
-const inputStyles: React.CSSProperties = {
-  width: 100,
-  padding: "2px 4px",
-  border: "1px solid var(--bk-accent)",
-  borderRadius: 3,
-  fontSize: 13,
-  outline: "none",
-};
-
-const addButtonStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  width: 24,
-  height: 24,
-  marginLeft: 4,
-  background: "transparent",
-  border: "1px dashed var(--bk-border)",
-  borderRadius: 4,
-  fontSize: 16,
-  color: "var(--bk-ink-muted)",
-  cursor: "pointer",
-  transition: "all 0.15s ease",
-};
-
-const menuStyles: React.CSSProperties = {
-  position: "fixed",
-  zIndex: 10000,
-  background: "var(--bk-bg-card)",
-  border: "1px solid var(--bk-border)",
-  borderRadius: "var(--bk-radius-md)",
-  boxShadow: "var(--bk-shadow-drag)",
-  padding: 4,
-  minWidth: 140,
-};
-
-const menuItemStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: 8,
-  width: "100%",
-  padding: "8px 12px",
-  background: "transparent",
-  border: "none",
-  borderRadius: 4,
-  fontSize: 13,
-  color: "var(--bk-ink)",
-  cursor: "pointer",
-  textAlign: "left",
-};
+/** The strip carries the app background so the active tab (bg-card) reads as
+ *  proud of it. Both were bg-card before, which left the active page marked
+ *  only by a 500 weight and a 5%-alpha shadow — invisible in practice.
+ *  Figma board B9.7 is the record. */
+const BAR = "tw:relative tw:border-b tw:border-gray-200 tw:bg-[var(--bk-bg-app)]";
+const ROW = "tw:flex tw:items-center tw:gap-1 tw:px-2 tw:py-1";
+const TABS = "tw:flex tw:flex-1 tw:items-center tw:gap-0.5 tw:overflow-x-auto";
+const TAB =
+  "tw:flex tw:items-center tw:gap-1 tw:px-3 tw:py-1.5 tw:whitespace-nowrap tw:cursor-pointer " +
+  "tw:rounded-t-md tw:rounded-b-none tw:text-[13px]";
+const TAB_RESTING = "tw:border-0 tw:bg-transparent tw:text-[var(--bk-ink-soft)]";
+const TAB_ACTIVE =
+  "tw:border tw:border-b-0 tw:border-gray-200 tw:bg-white tw:font-medium tw:text-gray-900 " +
+  "tw:[box-shadow:var(--bk-shadow-raised)]";
+/** inline-block is required for overflow+ellipsis to trigger on a span. */
+const TAB_NAME = "tw:inline-block tw:max-w-30 tw:overflow-hidden tw:text-ellipsis tw:align-middle";
+const DIRTY_DOT = "tw:size-1.5 tw:flex-none tw:rounded-full tw:bg-blue-700";
+const RENAME_INPUT = "tw:w-25 tw:[&_input]:px-1 tw:[&_input]:py-0.5 tw:[&_input]:text-[13px] tw:[&_input]:rounded-[3px]";
+const ADD_BTN =
+  "tw:flex tw:items-center tw:justify-center tw:size-6 tw:ml-1 tw:p-0 tw:rounded tw:text-base " +
+  "tw:border tw:border-dashed tw:border-gray-200 tw:bg-transparent tw:text-gray-500 tw:hover:bg-gray-100";
+const RENAME_FEEDBACK =
+  "tw:absolute tw:top-full tw:left-0 tw:z-100 tw:mt-0.5 tw:px-2 tw:py-1 tw:whitespace-nowrap " +
+  "tw:rounded tw:border tw:border-gray-200 tw:bg-white tw:text-xs tw:leading-snug";
+const MENU_ITEM =
+  "tw:flex tw:w-full tw:items-center tw:gap-2 tw:px-3 tw:py-2 tw:rounded tw:border-0 " +
+  "tw:bg-transparent tw:text-left tw:text-[13px] tw:text-gray-900 tw:hover:bg-gray-100";
+const CTX_MENU =
+  "tw:fixed tw:z-[10000] tw:min-w-35 tw:p-1 tw:rounded-md tw:border tw:border-gray-200 " +
+  "tw:bg-white tw:[box-shadow:var(--bk-shadow-drag)]";
 
 export default PageTabBar;
