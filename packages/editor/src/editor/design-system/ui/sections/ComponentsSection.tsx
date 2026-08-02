@@ -34,214 +34,48 @@ export interface ComponentsSectionProps {
 
 // ─── Layout / style tokens (inline per chrome convention) ────────────────────
 
-const containerStyle: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  height: "100%",
-  minHeight: 0,
-  overflowY: "auto",
-};
-
-const headerRowStyle: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-  padding: "12px 12px 4px",
-  gap: 8,
-};
-
-const headerTitleStyle: React.CSSProperties = {
-  fontSize: 12,
-  fontWeight: 600,
-  color: "var(--bk-ink)",
-};
-
-const headerSubtitleStyle: React.CSSProperties = {
-  padding: "0 12px 10px",
-  fontSize: 11,
-  color: "var(--bk-ink-muted)",
-};
-
-const openPanelButtonStyle: React.CSSProperties = {
-  padding: "4px 10px",
-  background: "var(--bk-accent)",
-  color: "#fff",
-  border: "1px solid var(--bk-accent)",
-  borderRadius: 6,
-  fontSize: 11,
-  fontWeight: 500,
-  cursor: "pointer",
-};
-
-const cardGridStyle: React.CSSProperties = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fill, minmax(110px, 1fr))",
-  gap: 8,
-  padding: "0 12px",
-};
-
-const cardStyle: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  padding: 8,
-  border: "1px solid var(--bk-border)",
-  borderRadius: 8,
-  background: "var(--bk-bg-card, var(--bk-bg-app))",
-  minHeight: 116,
-};
-
-const previewBoxStyle: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  height: 44,
-  marginBottom: 6,
-  borderRadius: 4,
-  background: "var(--bk-bg-subtle)",
-  fontSize: 10,
-  color: "var(--bk-ink-muted)",
-};
-
-const cardNameStyle: React.CSSProperties = {
-  fontSize: 11,
-  fontWeight: 600,
-  color: "var(--bk-ink)",
-  marginBottom: 2,
-};
-
-const cardMetaStyle: React.CSSProperties = {
-  fontSize: 10,
-  color: "var(--bk-ink-muted)",
-  lineHeight: 1.4,
-};
-
-const aiRowStyle: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-  padding: "16px 12px 4px",
-  gap: 8,
-};
-
-const aiCtaTextStyle: React.CSSProperties = {
-  fontSize: 12,
-  fontWeight: 500,
-  color: "var(--bk-accent)",
-};
-
-const aiDescStyle: React.CSSProperties = {
-  padding: "0 12px 12px",
-  fontSize: 11,
-  color: "var(--bk-ink-muted)",
-};
-
-const aiButtonStyle: React.CSSProperties = {
-  padding: "4px 10px",
-  background: "transparent",
-  color: "var(--bk-accent)",
-  border: "1px solid var(--bk-accent)",
-  borderRadius: 6,
-  fontSize: 11,
-  fontWeight: 500,
-  cursor: "pointer",
-};
-
-const savedHeaderStyle: React.CSSProperties = {
-  padding: "8px 12px 6px",
-  fontSize: 11,
-  fontWeight: 600,
-  color: "var(--bk-ink-soft)",
-  textTransform: "uppercase",
-  letterSpacing: "0.04em",
-};
-
-const emptySavedStyle: React.CSSProperties = {
-  margin: "0 12px 16px",
-  padding: "12px",
-  border: "1px dashed var(--bk-border)",
-  borderRadius: 8,
-  fontSize: 11,
-  color: "var(--bk-ink-muted)",
-  textAlign: "center",
-};
-
-const footerCalloutStyle: React.CSSProperties = {
-  margin: "16px 12px 16px",
-  padding: "10px 12px",
-  background: "var(--bk-accent-tint, rgba(45,109,255,0.06))",
-  border: "1px solid var(--bk-accent-tint, rgba(45,109,255,0.16))",
-  borderRadius: 8,
-  fontSize: 11,
-  color: "var(--bk-ink-soft)",
-  lineHeight: 1.5,
-};
+/* Two token fallbacks in here fell back to a hand-mixed copy of the token
+   itself — `var(--bk-accent-tint, rgba(45,109,255,0.06))`. If the token ever
+   failed to resolve, the fallback would silently ship a different blue; it
+   resolves, so the second argument was dead weight carrying a second source of
+   truth for the same colour. */
+const CONTAINER = "tw:flex tw:flex-col tw:h-full tw:min-h-0 tw:overflow-y-auto";
+const HEADER_ROW = "tw:flex tw:items-center tw:justify-between tw:px-3 tw:pt-3 tw:pb-1 tw:gap-2";
+const HEADER_TITLE = "tw:text-xs tw:font-semibold tw:text-gray-900";
+const HEADER_SUB = "tw:px-3 tw:pb-2.5 tw:text-[11px] tw:text-gray-500";
+const CARD_GRID = "tw:grid tw:[grid-template-columns:repeat(auto-fill,minmax(110px,1fr))] tw:gap-2 tw:px-3";
+const CARD = "tw:flex tw:flex-col tw:p-2 tw:border tw:border-gray-200 tw:rounded-lg tw:bg-white tw:min-h-29";
+const PREVIEW_BOX =
+  "tw:flex tw:items-center tw:justify-center tw:h-11 tw:mb-1.5 tw:rounded tw:bg-gray-50 tw:text-[10px] tw:text-gray-500";
+const CARD_NAME = "tw:text-[11px] tw:font-semibold tw:text-gray-900 tw:mb-0.5";
+const CARD_META = "tw:text-[10px] tw:text-gray-500 tw:leading-[1.4]";
+const AI_ROW = "tw:flex tw:items-center tw:justify-between tw:px-3 tw:pt-4 tw:pb-1 tw:gap-2";
+const AI_CTA = "tw:text-xs tw:font-medium tw:text-blue-700";
+const AI_DESC = "tw:px-3 tw:pb-3 tw:text-[11px] tw:text-gray-500";
+const SAVED_HEADER =
+  "tw:px-3 tw:pt-2 tw:pb-1.5 tw:text-[11px] tw:font-semibold tw:text-[var(--bk-ink-soft)] tw:uppercase tw:tracking-[0.04em]";
+const EMPTY_SAVED =
+  "tw:mx-3 tw:mb-4 tw:p-3 tw:border tw:border-dashed tw:border-gray-200 tw:rounded-lg tw:text-[11px] tw:text-gray-500 tw:text-center";
+const FOOTER_CALLOUT =
+  "tw:m-4 tw:mx-3 tw:px-3 tw:py-2.5 tw:bg-[var(--bk-accent-tint)] tw:border tw:border-[var(--bk-accent-subtle)] " +
+  "tw:rounded-lg tw:text-[11px] tw:text-[var(--bk-ink-soft)] tw:leading-normal";
+/** The sketch vocabulary — a fake control on a muted plate. */
+const SKETCH = "tw:bg-gray-50 tw:border tw:border-gray-200 tw:rounded-sm";
 
 // ─── Mini preview swatches per catalog id ────────────────────────────────────
 
 function CatalogPreview({ component }: { component: ComponentType }): React.ReactElement {
   switch (component.id) {
     case "button":
-      return (
-        <div
-          style={{
-            padding: "3px 10px",
-            background: "var(--bk-accent)",
-            color: "var(--bk-accent-on)",
-            borderRadius: 4,
-            fontSize: 10,
-          }}
-        >
-          Btn
-        </div>
-      );
+      return <div className="tw:px-2.5 tw:py-[3px] tw:bg-blue-700 tw:text-white tw:rounded tw:text-[10px]">Btn</div>;
     case "input":
-      return (
-        <div
-          style={{
-            width: "70%",
-            height: 16,
-            background: "var(--bk-bg-app)",
-            border: "1px solid var(--bk-border)",
-            borderRadius: 3,
-          }}
-        />
-      );
+      return <div className={`${SKETCH} tw:w-[70%] tw:h-4`} />;
     case "card":
-      return (
-        <div
-          style={{
-            width: "70%",
-            height: 28,
-            border: "1px solid var(--bk-border)",
-            borderRadius: 4,
-            background: "var(--bk-bg-app)",
-          }}
-        />
-      );
+      return <div className={`${SKETCH} tw:w-[70%] tw:h-7 tw:rounded`} />;
     case "modal":
-      return (
-        <div
-          style={{
-            width: "70%",
-            height: 28,
-            background: "var(--bk-bg-app)",
-            border: "1px solid var(--bk-border)",
-            boxShadow: "0 2px 4px rgba(0,0,0,0.08)",
-            borderRadius: 4,
-          }}
-        />
-      );
+      return <div className={`${SKETCH} tw:w-[70%] tw:h-7 tw:rounded tw:[box-shadow:var(--bk-shadow-raised)]`} />;
     case "section":
-      return (
-        <div
-          style={{
-            width: "80%",
-            height: 22,
-            background: "var(--bk-bg-subtle)",
-            borderRadius: 3,
-          }}
-        />
-      );
+      return <div className="tw:w-4/5 tw:h-5.5 tw:bg-gray-100 tw:rounded-sm" />;
     default:
       return <span>{component.name.slice(0, 4)}</span>;
   }
@@ -293,37 +127,35 @@ export const ComponentsSection: React.FC<ComponentsSectionProps> = ({
   const savedComponents = React.useMemo(() => getSavedComponents(composer), [composer]);
 
   return (
-    <div style={containerStyle} data-components-catalog data-mode="summary">
-      <div style={headerRowStyle}>
-        <div style={headerTitleStyle}>
+    <div className={CONTAINER} data-components-catalog data-mode="summary">
+      <div className={HEADER_ROW}>
+        <div className={HEADER_TITLE}>
           Catalog · {CATALOG.length} polished components shipped
         </div>
         <Button
           type="button"
-          color="light"
           size="xs"
           onClick={() => dispatchOpenComponentsPanel(composer)}
           data-open-components-panel
-          style={openPanelButtonStyle}
         >
           Open Components
         </Button>
       </div>
-      <div style={headerSubtitleStyle}>
+      <div className={HEADER_SUB}>
         Buildrick catalog v3 · last updated {CATALOG_LAST_UPDATED}
       </div>
 
-      <div style={cardGridStyle} data-catalog-grid>
+      <div className={CARD_GRID} data-catalog-grid>
         {CATALOG.map((component) => {
           const variantCount = component.variants.length;
           const instanceCount = getInstanceCount(composer, component.id);
           return (
-            <div key={component.id} data-catalog-card={component.id} style={cardStyle}>
-              <div style={previewBoxStyle}>
+            <div key={component.id} data-catalog-card={component.id} className={CARD}>
+              <div className={PREVIEW_BOX}>
                 <CatalogPreview component={component} />
               </div>
-              <div style={cardNameStyle}>{component.name}</div>
-              <div style={cardMetaStyle}>
+              <div className={CARD_NAME}>{component.name}</div>
+              <div className={CARD_META}>
                 {variantCount} variant{variantCount === 1 ? "" : "s"} ·{" "}
                 {instanceCount} instance{instanceCount === 1 ? "" : "s"}
               </div>
@@ -332,8 +164,8 @@ export const ComponentsSection: React.FC<ComponentsSectionProps> = ({
         })}
       </div>
 
-      <div style={aiRowStyle}>
-        <div style={aiCtaTextStyle} data-ai-assist-cta>
+      <div className={AI_ROW}>
+        <div className={AI_CTA} data-ai-assist-cta>
           + Add via AI-assist
         </div>
         <Button
@@ -343,44 +175,40 @@ export const ComponentsSection: React.FC<ComponentsSectionProps> = ({
           onClick={onOpenAIAssist}
           disabled={!onOpenAIAssist}
           data-open-ai-assist
-          style={{
-            ...aiButtonStyle,
-            opacity: onOpenAIAssist ? 1 : 0.5,
-            cursor: onOpenAIAssist ? "pointer" : "not-allowed",
-          }}
+          className="tw:border-blue-700 tw:bg-transparent tw:text-blue-700"
         >
           Open AI-assist
         </Button>
       </div>
-      <div style={aiDescStyle}>
+      <div className={AI_DESC}>
         Describe a component — Claude drafts a schema. Preview before adopt.
       </div>
 
-      <div style={savedHeaderStyle} data-saved-header>
+      <div className={SAVED_HEADER} data-saved-header>
         Your saved components · {savedComponents.length}
       </div>
 
       {savedComponents.length === 0 ? (
-        <div style={emptySavedStyle} data-saved-empty>
+        <div className={EMPTY_SAVED} data-saved-empty>
           No saved components yet — save a selection from the canvas to start.
         </div>
       ) : (
-        <div style={{ ...cardGridStyle, paddingBottom: 4 }} data-saved-grid>
+        <div className={`${CARD_GRID} tw:pb-1`} data-saved-grid>
           {savedComponents.map((component) => {
             const instanceCount = getInstanceCount(composer, component.id);
             return (
               <div
                 key={component.id}
                 data-saved-card={component.id}
-                style={cardStyle}
+                className={CARD}
               >
-                <div style={previewBoxStyle}>
-                  <span style={{ fontSize: 10, color: "var(--bk-ink-muted)" }}>
+                <div className={PREVIEW_BOX}>
+                  <span className="tw:text-[10px] tw:text-gray-500">
                     {component.name.slice(0, 4)}
                   </span>
                 </div>
-                <div style={cardNameStyle}>{component.name}</div>
-                <div style={cardMetaStyle}>
+                <div className={CARD_NAME}>{component.name}</div>
+                <div className={CARD_META}>
                   1 master · {instanceCount} instance{instanceCount === 1 ? "" : "s"}
                 </div>
               </div>
@@ -389,7 +217,7 @@ export const ComponentsSection: React.FC<ComponentsSectionProps> = ({
         </div>
       )}
 
-      <div style={footerCalloutStyle} data-readonly-footer>
+      <div className={FOOTER_CALLOUT} data-readonly-footer>
         <strong>Read-only by design:</strong> Components live as their own rail
         panel. The Design tab summary lets users see what's installed without
         leaving Design context — but every CTA on this page jumps to the
