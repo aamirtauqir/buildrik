@@ -1,7 +1,7 @@
 {
-  "inline_literal": 1020,
-  "inline_hoisted": 502,
-  "css_lines": 10827,
+  "inline_literal": 1000,
+  "inline_hoisted": 473,
+  "css_lines": 10651,
   "css_files": {
     "inspector/styles/inspector.css": 1038,
     "media/ImageEditorModal.css": 326,
@@ -11,9 +11,7 @@
     "rail/LayoutShell.css": 421,
     "shell/chrome.css": 45,
     "shell/header.css": 153,
-    "sidebar/LeftSidebar.css": 417,
-    "sidebar/shared/EmptyStates.css": 58,
-    "sidebar/shared/SkeletonStates.css": 116,
+    "sidebar/LeftSidebar.css": 415,
     "sidebar/tabs/ai/AITab.css": 296,
     "sidebar/tabs/build/BuildTab.css": 425,
     "sidebar/tabs/component-library/ComponentsTab.css": 75,

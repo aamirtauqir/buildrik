@@ -3,8 +3,6 @@
    .buildrick-form-group/.bd-input-error/.bd-settings-pane, zero consumers). */
 @import "../design-system/styles/design-tokens.css";
 @import "./tabs/media/MediaTab.css";
-@import "./shared/SkeletonStates.css";
-@import "./shared/EmptyStates.css";
 
 /* ─────────────────────────────────────────────
    FULLPAGE CONTAINER
