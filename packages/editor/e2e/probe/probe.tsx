@@ -22,22 +22,60 @@ import * as React from "react";
 import { createRoot } from "react-dom/client";
 import "@/themes/default.css";
 
-import { RootView, S as ContentStyles } from "@/editor/sidebar/tabs/content/ContentViews";
+import { CollectionView, FieldsView, RootView } from "@/editor/sidebar/tabs/content/ContentViews";
 import { FolderContextMenu } from "@/editor/sidebar/tabs/media/components/FolderContextMenu";
 
 /** Every case renders into `.bd-studio` so chrome-scoped CSS applies. */
 const CASES: Record<string, () => React.ReactElement> = {
-  // Exercises the hoisted `S` style map directly — one node per entry, so the
-  // baseline captures every style the map defines rather than only the subset
-  // the default render path happens to reach.
-  "content-style-map": () => (
-    <>
-      {Object.entries(ContentStyles).map(([name, style]) => (
-        <div key={name} data-probe={name} style={style}>
-          {name}
-        </div>
-      ))}
-    </>
+  // Was "content-style-map", which mapped over ContentViews' exported `S`
+  // object. That object is gone (the panel now composes chrome-ui rows), and
+  // because tsconfig's `include` did not cover e2e/, its import kept compiling
+  // to nothing while every gate stayed green — the probe silently measured
+  // an empty page. e2e/ is typechecked now, and the coverage `S` used to give
+  // is replaced by rendering the real converted views below.
+  "content-collection-rows": () => (
+    <div data-probe="content-collection-rows">
+      <CollectionView
+        collection={
+          {
+            id: "c1",
+            name: "Posts",
+            displayField: "title",
+            fields: [{ id: "f1", name: "Title", slug: "title", type: "text" }],
+          } as never
+        }
+        records={[
+          { id: "r0001", status: "published", data: { title: "Margherita" } } as never,
+          { id: "r0002", status: "draft", data: { title: "Marinara" } } as never,
+        ]}
+        onBack={() => {}}
+        onOpenRecord={() => {}}
+        onAddRecord={() => {}}
+        onOpenFields={() => {}}
+        onOpenDynamicPages={() => {}}
+      />
+    </div>
+  ),
+  // Covers the non-interactive Row variant plus the required-badge and the
+  // row-action button, none of which the collection case reaches.
+  "content-field-rows": () => (
+    <div data-probe="content-field-rows">
+      <FieldsView
+        collection={
+          {
+            id: "c1",
+            name: "Posts",
+            fields: [
+              { id: "f1", name: "Title", slug: "title", type: "text", validation: { required: true } },
+              { id: "f2", name: "Body", slug: "body", type: "richtext" },
+            ],
+          } as never
+        }
+        onBack={() => {}}
+        onAddField={async () => {}}
+        onDeleteField={async () => {}}
+      />
+    </div>
   ),
   // Renders the menu itself, not a trigger — the converted markup IS the menu,
   // so a case that only mounted a button would measure nothing that changed.

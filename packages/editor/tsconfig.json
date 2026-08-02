@@ -30,6 +30,6 @@
       "@buildrik/shared/*": ["../shared/*"]
     }
   },
-  "include": ["src", "demo", "../../types/**/*.ts"],
+  "include": ["src", "demo", "e2e", "../../types/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }

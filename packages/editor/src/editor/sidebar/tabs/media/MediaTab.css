@@ -787,14 +787,6 @@
   font-weight: 500;
 }
 
-/* Sort-by inline group + selection bar wrap */
-.med-tab .med-sort-by,
-.exp-panel .med-sort-by {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
 /* ─── LibraryView toolbar + sections ─────────────────────────────────── */
 
 .med-library-view {
@@ -979,13 +971,6 @@
   text-align: center;
 }
 
-/* Upload ghost cards */
-.med-upload-ghosts {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 6px;
-  margin-top: 8px;
-}
 .med-upload-ghost {
   position: relative;
   aspect-ratio: 1;

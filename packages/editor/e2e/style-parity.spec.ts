@@ -36,7 +36,7 @@ const TRACKED = [
 const HERE = dirname(fileURLToPath(import.meta.url));
 const BASELINE_DIR = join(HERE, "baselines");
 
-const CASES = ["content-style-map", "content-root-rows", "folder-context-menu"] as const;
+const CASES = ["content-collection-rows", "content-field-rows", "content-root-rows", "folder-context-menu"] as const;
 
 for (const name of CASES) {
   test(`computed-style parity: ${name}`, async ({ page }) => {

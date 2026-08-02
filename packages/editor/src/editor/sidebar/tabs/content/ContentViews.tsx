@@ -35,9 +35,15 @@ import type { ConditionRow } from "./useContentPanel";
 export const CONTENT_BODY = "tw:flex tw:flex-col tw:h-full tw:min-h-0";
 
 const SCROLL = "tw:flex-1 tw:min-h-0 tw:overflow-y-auto";
-/** A text button that reads as a link: breadcrumbs and every "+ New …". */
+/** A text button that reads as a link: breadcrumbs and every "+ New …".
+ *
+ *  `border-0` is the one that matters, and it is NOT interchangeable with
+ *  `border-transparent`: that sets only a colour, so the browser's own
+ *  `2px outset` button border survives and the control grows 4px in both
+ *  axes. The parity harness caught exactly that. With the width at 0 the
+ *  colour is unobservable, so no `border-transparent` here. */
 const LINK_BTN =
-  "tw:inline-flex tw:items-center tw:gap-1.5 tw:bg-transparent tw:border-transparent tw:p-0 " +
+  "tw:inline-flex tw:items-center tw:gap-1.5 tw:bg-transparent tw:border-0 tw:p-0 " +
   "tw:text-[13px] tw:text-blue-700 tw:hover:text-blue-800 tw:enabled:hover:bg-transparent";
 /** The quiet row-action button, previously copy-pasted at eleven call sites. */
 const GHOST = "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900";
