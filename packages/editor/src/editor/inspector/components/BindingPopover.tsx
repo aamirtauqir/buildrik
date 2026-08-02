@@ -12,9 +12,16 @@
 import { Link, Link2Off } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "../../../engine";
-import { useClickOutside } from "../../../shared/hooks/useClickOutside";
 import type { CMSCollection, CMSContentItem } from "../../../shared/types/cms";
-import { Button } from "@/editor/chrome-ui";
+import {
+  Button,
+  IconButton,
+  Menu,
+  MenuItem,
+  MenuLabel,
+  MenuSeparator,
+  Popover,
+} from "@/editor/chrome-ui";
 // =============================================================================
 // TYPES
 // =============================================================================
@@ -29,124 +36,19 @@ export interface BindingPopoverProps {
 }
 
 // =============================================================================
-// STYLES
+// CLASSES
 // =============================================================================
 
-const s: Record<string, React.CSSProperties> = {
-  wrapper: {
-    position: "relative",
-    display: "inline-block",
-  },
-  chainBtn: {
-    width: 24,
-    height: 24,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    background: "transparent",
-    border: "none",
-    borderRadius: "var(--bk-radius-sm)",
-    cursor: "pointer",
-    transition: "color 0.15s, background 0.15s",
-    flexShrink: 0,
-  },
-  popover: {
-    position: "absolute",
-    top: "calc(100% + 6px)",
-    right: 0,
-    width: 240,
-    background: "var(--bk-bg-panel)",
-    border: "1px solid var(--bk-border)",
-    borderRadius: "var(--bk-radius-lg)",
-    boxShadow: "var(--bk-shadow-overlay)",
-    zIndex: 1000,
-    overflow: "hidden",
-  },
-  popoverHeader: {
-    padding: "8px 12px",
-    borderBottom: "1px solid var(--bk-border)",
-    fontSize: 11,
-    fontWeight: 600,
-    color: "var(--bk-ink-muted)",
-    textTransform: "uppercase" as const,
-    letterSpacing: "0.06em",
-  },
-  popoverBody: {
-    maxHeight: 280,
-    overflowY: "auto" as const,
-  },
-  emptyMsg: {
-    padding: "14px 12px",
-    fontSize: 12,
-    color: "var(--bk-ink-muted)",
-    textAlign: "center" as const,
-    lineHeight: 1.5,
-  },
-  sectionTitle: {
-    padding: "6px 12px 4px",
-    fontSize: 10,
-    fontWeight: 600,
-    color: "var(--bk-ink-muted)",
-    textTransform: "uppercase" as const,
-    letterSpacing: "0.07em",
-    background: "var(--bk-bg-card)",
-  },
-  listItem: {
-    display: "flex",
-    alignItems: "center",
-    padding: "7px 12px",
-    fontSize: 12,
-    color: "var(--bk-ink-soft)",
-    cursor: "pointer",
-    transition: "background 0.1s",
-    border: "none",
-    width: "100%",
-    textAlign: "left" as const,
-    background: "transparent",
-  },
-  listItemActive: {
-    background: "var(--bk-accent-tint)",
-    color: "var(--bk-accent)",
-  },
-  divider: {
-    height: 1,
-    background: "var(--bk-border)",
-    margin: "4px 0",
-  },
-  footerLink: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: "8px 12px",
-    fontSize: 12,
-    color: "var(--bk-accent)",
-    cursor: "pointer",
-    borderTop: "1px solid var(--bk-border)",
-    background: "transparent",
-    border: "none",
-    width: "100%",
-    borderRadius: 0,
-    transition: "background 0.1s",
-  },
-  boundIndicator: {
-    padding: "8px 12px",
-    fontSize: 11,
-    color: "var(--bk-ink-muted)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    borderBottom: "1px solid var(--bk-border)",
-  },
-  unbindBtn: {
-    fontSize: 11,
-    color: "var(--bk-error)",
-    background: "transparent",
-    border: "none",
-    cursor: "pointer",
-    padding: "2px 4px",
-    borderRadius: "var(--bk-radius-sm)",
-  },
-};
+/** Popover body scrolls; the header and the footer link stay put. */
+const MENU_CLASS = "tw:max-h-70 tw:overflow-y-auto tw:min-w-0";
+const EMPTY_CLASS = "tw:px-3 tw:py-3 tw:text-xs tw:text-gray-500 tw:text-center tw:leading-normal";
+const BOUND_CLASS =
+  "tw:flex tw:items-center tw:justify-between tw:gap-2 tw:px-2 tw:pb-2 tw:mb-1 " +
+  "tw:border-b tw:border-gray-200 tw:text-[11px] tw:text-gray-500";
+const LINK_BTN_CLASS =
+  "tw:border-transparent tw:bg-transparent tw:text-blue-700 tw:hover:bg-blue-50 tw:hover:text-blue-700";
+const UNBIND_BTN_CLASS =
+  "tw:border-transparent tw:bg-transparent tw:text-red-700 tw:hover:bg-red-50 tw:hover:text-red-700";
 
 // =============================================================================
 // COMPONENT
@@ -164,7 +66,6 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
   const [records, setRecords] = React.useState<CMSContentItem[]>([]);
   const [isBound, setIsBound] = React.useState(false);
   const [boundLabel, setBoundLabel] = React.useState<string | null>(null);
-  const wrapperRef = React.useRef<HTMLDivElement>(null);
 
   // Load collections when popover opens
   React.useEffect(() => {
@@ -173,12 +74,12 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
     setCollections(all);
   }, [open, composer]);
 
-  // Close on outside click — clear selection too so reopening starts fresh.
-  const handleClickOutside = React.useCallback(() => {
+  // Close on outside click or Escape — clear selection too so reopening starts
+  // fresh. Popover owns both listeners; this stays the state half of it.
+  const handleClose = React.useCallback(() => {
     setOpen(false);
     setSelectedCollection(null);
   }, []);
-  useClickOutside(wrapperRef, handleClickOutside, { enabled: open });
 
   const handleSelectCollection = React.useCallback(
     (col: CMSCollection) => {
@@ -231,215 +132,146 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
   }, [elementId, composer]);
 
   const isActive = isBound;
-
   return (
-    <div ref={wrapperRef} style={s.wrapper}>
-      {/* Chain icon button */}
-      <Button
-        type="button"
-        style={{
-          ...s.chainBtn,
-          color: isActive ? "var(--bk-accent)" : "var(--bk-ink-muted)",
-          background: isActive ? "var(--bk-accent-tint)" : "transparent",
-        }}
-        title="Bind to collection field"
-        aria-label="Bind to collection field"
-        aria-expanded={open}
-        onClick={() => setOpen((v) => !v)}
-        onMouseEnter={(e) => {
-          if (!isActive) {
-            (e.currentTarget as HTMLElement).style.color = "var(--bk-ink-soft)";
-            (e.currentTarget as HTMLElement).style.background =
-              "var(--bk-bg-card)";
-          }
-        }}
-        onMouseLeave={(e) => {
-          if (!isActive) {
-            (e.currentTarget as HTMLElement).style.color = "var(--bk-ink-muted)";
-            (e.currentTarget as HTMLElement).style.background = "transparent";
-          }
-        }}
-      >
-        {isActive ? <Link size={12} aria-hidden /> : <Link size={12} aria-hidden />}
-      </Button>
-      {/* Popover */}
-      {open && (
-        <div style={s.popover} role="dialog" aria-label="Bind to collection field">
-          <div style={s.popoverHeader}>Bind to collection</div>
-
-          <div style={s.popoverBody}>
-            {/* Current binding status */}
-            {isBound && boundLabel && (
-              <div style={s.boundIndicator}>
-                <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                  <Link size={10} style={{ color: "var(--bk-accent)" }} />
-                  {boundLabel}
-                </span>
-                <Button
-                  type="button"
-                  style={s.unbindBtn}
-                  onClick={handleUnbind}
-                  title="Remove binding"
-                >
-                  <Link2Off size={10} />
-                </Button>
-              </div>
-            )}
-
-            {/* No collections */}
-            {collections.length === 0 && (
-              <div style={s.emptyMsg}>
-                No collections yet.
-                <br />
-                Create one first.
-              </div>
-            )}
-
-            {/* Collection list (when no collection selected) */}
-            {collections.length > 0 && !selectedCollection && (
-              <>
-                <div style={s.sectionTitle}>Collections</div>
-                {collections.map((col) => (
-                  <Button
-                    key={col.id}
-                    type="button"
-                    style={s.listItem}
-                    onClick={() => handleSelectCollection(col)}
-                    onMouseEnter={(e) => {
-                      (e.currentTarget as HTMLElement).style.background =
-                        "var(--bk-bg-card)";
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLElement).style.background = "transparent";
-                    }}
-                  >
-                    {col.name}
-                    <span
-                      style={{
-                        marginLeft: "auto",
-                        fontSize: 10,
-                        color: "var(--bk-ink-muted)",
-                      }}
-                    >
-                      {col.fields.length} fields
-                    </span>
-                  </Button>
-                ))}
-              </>
-            )}
-
-            {/* Field list (collection selected, no field yet) */}
-            {selectedCollection && !selectedField && (
-              <>
-                <Button
-                  type="button"
-                  style={{
-                    ...s.listItem,
-                    color: "var(--bk-accent)",
-                    fontSize: 11,
-                  }}
-                  onClick={() => setSelectedCollection(null)}
-                >
-                  ← {selectedCollection.name}
-                </Button>
-                <div style={s.divider} />
-                <div style={s.sectionTitle}>Fields</div>
-                {selectedCollection.fields.length === 0 && (
-                  <div style={{ ...s.emptyMsg, padding: "10px 12px" }}>No fields defined</div>
-                )}
-                {selectedCollection.fields.map((field) => (
-                  <Button
-                    key={field.id}
-                    type="button"
-                    style={s.listItem}
-                    onClick={() => handleSelectField(field.slug, field.name)}
-                    onMouseEnter={(e) => {
-                      (e.currentTarget as HTMLElement).style.background =
-                        "var(--bk-bg-card)";
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLElement).style.background = "transparent";
-                    }}
-                  >
-                    {field.name}
-                    <span
-                      style={{
-                        marginLeft: "auto",
-                        fontSize: 10,
-                        color: "var(--bk-ink-muted)",
-                      }}
-                    >
-                      {field.type}
-                    </span>
-                  </Button>
-                ))}
-              </>
-            )}
-
-            {/* Record list (field selected) — pick which record to bind. */}
-            {selectedCollection && selectedField && (
-              <>
-                <Button
-                  type="button"
-                  style={{ ...s.listItem, color: "var(--bk-accent)", fontSize: 11 }}
-                  onClick={() => {
-                    setSelectedField(null);
-                    setRecords([]);
-                  }}
-                >
-                  ← {selectedField.name}
-                </Button>
-                <div style={s.divider} />
-                <div style={s.sectionTitle}>Record</div>
-                {records.length === 0 && (
-                  <div style={{ ...s.emptyMsg, padding: "10px 12px" }}>
-                    No records yet. Add records via the command palette → “Manage CMS Records”.
-                  </div>
-                )}
-                {records.map((rec) => {
-                  const key = selectedCollection.displayField || selectedCollection.fields[0]?.slug;
-                  const label = key && rec.data[key] != null && rec.data[key] !== ""
-                    ? String(rec.data[key])
-                    : "(untitled)";
-                  return (
-                    <Button
-                      key={rec.id}
-                      type="button"
-                      style={s.listItem}
-                      onClick={() => handleSelectRecord(rec.id)}
-                    >
-                      {label}
-                      <span style={{ marginLeft: "auto", fontSize: 10, color: "var(--bk-ink-muted)" }}>
-                        {rec.status}
-                      </span>
-                    </Button>
-                  );
-                })}
-              </>
-            )}
-          </div>
-
-          {/* Create collection link */}
+    <Popover
+      open={open}
+      onClose={handleClose}
+      placement="bottom-end"
+      label="Bind to collection field"
+      className="tw:w-60"
+      trigger={
+        <IconButton
+          size="sm"
+          label="Bind to collection field"
+          pressed={isActive}
+          aria-expanded={open}
+          onClick={() => (open ? handleClose() : setOpen(true))}
+        >
+          <Link size={12} aria-hidden />
+        </IconButton>
+      }
+    >
+      {/* Current binding status */}
+      {isBound && boundLabel && (
+        <div className={BOUND_CLASS}>
+          <span className="tw:flex tw:items-center tw:gap-1 tw:min-w-0 tw:truncate">
+            <Link size={10} className="tw:text-blue-700" />
+            {boundLabel}
+          </span>
           <Button
+            color="light"
+            size="xs"
             type="button"
-            style={s.footerLink}
-            onClick={() => {
-              setOpen(false);
-              onOpenCreateCollection?.();
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.background =
-                "var(--bk-accent-tint)";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.background = "transparent";
-            }}
+            className={UNBIND_BTN_CLASS}
+            onClick={handleUnbind}
+            title="Remove binding"
+            aria-label="Remove binding"
           >
-            + Create Collection
+            <Link2Off size={10} />
           </Button>
         </div>
       )}
-    </div>
+
+      <Menu label="Bind to collection" className={MENU_CLASS} autoFocus={false}>
+        {/* No collections */}
+        {collections.length === 0 && (
+          <div className={EMPTY_CLASS}>
+            No collections yet.
+            <br />
+            Create one first.
+          </div>
+        )}
+
+        {/* Collection list (when no collection selected) */}
+        {collections.length > 0 && !selectedCollection && (
+          <>
+            <MenuLabel>Collections</MenuLabel>
+            {collections.map((col) => (
+              <MenuItem
+                key={col.id}
+                onClick={() => handleSelectCollection(col)}
+                kbd={`${col.fields.length} fields`}
+              >
+                {col.name}
+              </MenuItem>
+            ))}
+          </>
+        )}
+
+        {/* Field list (collection selected, no field yet) */}
+        {selectedCollection && !selectedField && (
+          <>
+            <MenuItem
+              className="tw:text-blue-700"
+              onClick={() => setSelectedCollection(null)}
+            >
+              ← {selectedCollection.name}
+            </MenuItem>
+            <MenuSeparator />
+            <MenuLabel>Fields</MenuLabel>
+            {selectedCollection.fields.length === 0 && (
+              <div className={EMPTY_CLASS}>No fields defined</div>
+            )}
+            {selectedCollection.fields.map((field) => (
+              <MenuItem
+                key={field.id}
+                onClick={() => handleSelectField(field.slug, field.name)}
+                kbd={field.type}
+              >
+                {field.name}
+              </MenuItem>
+            ))}
+          </>
+        )}
+
+        {/* Record list (field selected) — pick which record to bind. */}
+        {selectedCollection && selectedField && (
+          <>
+            <MenuItem
+              className="tw:text-blue-700"
+              onClick={() => {
+                setSelectedField(null);
+                setRecords([]);
+              }}
+            >
+              ← {selectedField.name}
+            </MenuItem>
+            <MenuSeparator />
+            <MenuLabel>Record</MenuLabel>
+            {records.length === 0 && (
+              <div className={EMPTY_CLASS}>
+                No records yet. Add records via the command palette → “Manage CMS Records”.
+              </div>
+            )}
+            {records.map((rec) => {
+              const key = selectedCollection.displayField || selectedCollection.fields[0]?.slug;
+              const label = key && rec.data[key] != null && rec.data[key] !== ""
+                ? String(rec.data[key])
+                : "(untitled)";
+              return (
+                <MenuItem key={rec.id} onClick={() => handleSelectRecord(rec.id)} kbd={rec.status}>
+                  {label}
+                </MenuItem>
+              );
+            })}
+          </>
+        )}
+      </Menu>
+
+      {/* Create collection link */}
+      <Button
+        color="light"
+        size="xs"
+        type="button"
+        className={`tw:w-full tw:mt-1 ${LINK_BTN_CLASS}`}
+        onClick={() => {
+          setOpen(false);
+          onOpenCreateCollection?.();
+        }}
+      >
+        + Create Collection
+      </Button>
+    </Popover>
   );
 };
 
