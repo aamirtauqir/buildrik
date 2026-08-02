@@ -677,80 +677,6 @@
   to { transform: rotate(360deg); }
 }
 
-/* ── Modal overlay (ReplaceModal + ProModal) ── */
-.tpl-modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.5);
-  backdrop-filter: blur(4px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1100;
-}
-.tpl-modal {
-  background: var(--bk-bg-card, var(--bk-bg-card));
-  border: 1px solid var(--bk-border, var(--bk-border));
-  border-radius: var(--bk-radius-lg);
-  padding: var(--bk-space-20);
-  width: 440px;
-  max-height: 90%;
-  overflow-y: auto;
-}
-.tpl-modal--replace {
-  width: 480px;
-}
-.tpl-modal-title {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--bk-ink);
-  margin: 0 0 var(--bk-space-16);
-}
-.tpl-modal-warning {
-  padding: var(--bk-space-12);
-  border-radius: var(--bk-radius-md);
-  background: var(--bk-warning-tint);
-  border: 1px solid var(--bk-warning-text);
-  margin-bottom: var(--bk-space-16);
-}
-.tpl-modal-warning-text {
-  font-size: 13px;
-  color: var(--bk-warning);
-  line-height: 1.5;
-  margin: 0;
-}
-.tpl-modal-btns {
-  display: flex;
-  gap: var(--bk-space-8);
-  justify-content: flex-end;
-}
-.tpl-modal-btn {
-  height: 32px;
-  padding: 0 var(--bk-space-12);
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  transition: opacity 0.12s;
-}
-.tpl-modal-btn--ghost {
-  background: transparent;
-  border: 1px solid var(--bk-border, var(--bk-border-medium));
-  color: var(--bk-ink-muted, var(--bk-ink));
-}
-.tpl-modal-btn--ghost:hover {
-  background: var(--bk-bg-subtle, var(--bk-bg-subtle));
-}
-.tpl-modal-btn--primary {
-  background: var(--bk-accent);
-  border: none;
-  color: var(--bk-bg-card, var(--bk-bg-card));
-}
-.tpl-modal-btn--primary:hover {
-  opacity: 0.9;
-}
-
 /* ── Responsive: detail panel width clamp on very narrow viewports ── */
 @media (max-width: 900px) {
   .tpl-detail {
@@ -771,45 +697,6 @@
   align-items: center;
   white-space: nowrap;
 }
-/* .tpl-newpage-header + .tpl-header-title--sm removed 2026-05-24 —
-   newpage mode now uses TabFrame.Header with chip as a child. */
-
-/* ── Create flow modal variants ── */
-.tpl-modal--create {
-  width: 420px;
-  min-height: 200px;
-  display: flex;
-  flex-direction: column;
-  gap: var(--bk-space-16);
-  box-shadow: var(--bk-shadow-overlay);
-  border-color: var(--bk-border-medium, var(--bk-border));
-}
-.tpl-modal-row {
-  display: flex;
-  align-items: center;
-  gap: var(--bk-space-8);
-}
-.tpl-modal-row-text {
-  font-size: 13px;
-  color: var(--bk-ink-muted, var(--bk-ink-soft));
-}
-.tpl-modal-icon {
-  display: flex;
-  justify-content: center;
-}
-.tpl-modal-icon--success svg {
-  stroke: var(--bk-success, var(--bk-success));
-}
-.tpl-modal-title--lg {
-  font-size: 18px;
-}
-.tpl-modal-desc {
-  font-size: 13px;
-  color: var(--bk-ink-muted, var(--bk-ink-soft));
-  line-height: 1.5;
-  margin: 0;
-}
-
 /* ── Detail preview loading/error states (Ba4uo / Onr0C) ── */
 .tpl-detail-preview-state {
   position: absolute;

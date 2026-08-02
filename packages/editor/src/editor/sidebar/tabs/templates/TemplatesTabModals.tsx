@@ -1,12 +1,55 @@
 /**
- * TemplatesTabModals — Replace confirm + Pro intercept modals
- * Restyled to match .pen Screen 7 design (light theme).
+ * TemplatesTabModals — Replace confirm, Pro intercept, and the three
+ * create-page outcome dialogs.
+ *
+ * All five compose `chrome-ui/Modal`, which brings the focus trap, Escape and
+ * scrim dismissal these hand-rolled overlays never had. Each is mounted
+ * conditionally by TemplatesTab, so `open` is always true — the prop exists
+ * because Modal owns the mount/unmount transition, not the caller.
+ *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
 import type { TemplateItem } from "./templatesData";
-import { Button, Checkbox, Portal } from "@/editor/chrome-ui";
+import { Button, Checkbox, Modal } from "@/editor/chrome-ui";
+
+// ============================================================================
+// Shared bits
+// ============================================================================
+
+/** Checkbox + two-line explanation, used twice by ReplaceModal. */
+const OPTION_ROW = "tw:flex tw:items-start tw:gap-2 tw:mb-1.5 tw:text-[13px] tw:text-gray-500 tw:cursor-pointer";
+const OPTION_TITLE = "tw:block tw:font-medium tw:text-gray-900";
+const OPTION_HINT = "tw:block tw:mt-px tw:text-[11px]";
+
+/** Circular hero glyph above a modal's copy (Pro upsell, create outcomes). */
+const HERO = "tw:flex tw:items-center tw:justify-center tw:mx-auto tw:rounded-full";
+
+interface OptionProps {
+  checked: boolean;
+  onChange: (v: boolean) => void;
+  title: React.ReactNode;
+  hint: string;
+}
+
+function Option({ checked, onChange, title, hint }: OptionProps) {
+  return (
+    <label className={OPTION_ROW}>
+      <Checkbox
+        color="blue"
+        className="tw:bg-white tw:mt-0.5 tw:size-3.5 tw:cursor-pointer"
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+      />
+      <span>
+        <span className={OPTION_TITLE}>{title}</span>
+        <span className={OPTION_HINT}>{hint}</span>
+      </span>
+    </label>
+  );
+}
+
 // ============================================================================
 // Replace Modal — matches .pen Screen 7 "State/Confirm"
 // ============================================================================
@@ -34,63 +77,42 @@ export const ReplaceModal: React.FC<ReplaceModalProps> = ({
   onBackupChange,
   onCancel,
   onApply,
-}) =>
-  <Portal>
-    <div className="tpl-modal-overlay" onClick={onCancel}>
-      <div className="tpl-modal tpl-modal--replace" onClick={(e) => e.stopPropagation()}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-          <div style={{ width: 32, height: 32, background: "var(--bk-warning-tint)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--bk-warning)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M12 9v2m0 4h.01M5 21h14a2 2 0 0 0 1.84-2.75L13.74 4a2 2 0 0 0-3.48 0L3.16 18.25A2 2 0 0 0 5 21z"/>
-            </svg>
-          </div>
-          <div>
-            <h3 className="tpl-modal-title" style={{ margin: 0 }}>Replace current page content?</h3>
-            <div style={{ fontSize: 12, color: "var(--bk-ink-muted)", marginTop: 2 }}>
-              {currentPageName ? `${currentPageName} page` : "Current page"} has {currentPageCount} element{currentPageCount === 1 ? "" : "s"} that will be replaced.
-            </div>
-          </div>
-        </div>
-        <div style={{ fontSize: 12, color: "var(--bk-ink-soft)", marginBottom: 12 }}>
-          Applying <b style={{ color: "var(--bk-ink)" }}>{template.name}</b> will replace all elements on the current page. You can:
-        </div>
-        <label style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "var(--bk-ink-muted)", cursor: "pointer", margin: "0 0 6px" }}>
-          <Checkbox
-            color="blue"
-            className="tw:bg-white"
-            checked={backupCurrentPage}
-            onChange={(e) => onBackupChange(e.target.checked)}
-            style={{ width: 14, height: 14, cursor: "pointer", marginTop: 2 }} />
-          <span>
-            <span style={{ display: "block", fontWeight: 500, color: "var(--bk-ink)" }}>
-              Backup current page as &ldquo;{currentPageName || "Current"} (backup)&rdquo;
-            </span>
-            <span style={{ display: "block", fontSize: 11, marginTop: 1 }}>Preserves your work in a new page.</span>
-          </span>
-        </label>
-        <label style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "var(--bk-ink-muted)", cursor: "pointer", margin: "0 0 4px" }}>
-          <Checkbox
-            color="blue"
-            className="tw:bg-white"
-            checked={resetGlobalStyles}
-            onChange={(e) => onResetChange(e.target.checked)}
-            style={{ width: 14, height: 14, cursor: "pointer", marginTop: 2 }} />
-          <span>
-            <span style={{ display: "block", fontWeight: 500, color: "var(--bk-ink)" }}>Reset global styles to template defaults</span>
-            <span style={{ display: "block", fontSize: 11, marginTop: 1 }}>Override your brand colors with template colors.</span>
-          </span>
-        </label>
-        <div className="tpl-modal-btns">
-          <Button className="tpl-modal-btn tpl-modal-btn--ghost" onClick={onCancel}>
-            Cancel
-          </Button>
-          <Button className="tpl-modal-btn tpl-modal-btn--primary" onClick={onApply}>
-            Replace content
-          </Button>
-        </div>
-      </div>
+}) => (
+  <Modal
+    open
+    onClose={onCancel}
+    dismissOnScrimClick
+    title="Replace current page content?"
+    subtitle={`${currentPageName ? `${currentPageName} page` : "Current page"} has ${currentPageCount} element${
+      currentPageCount === 1 ? "" : "s"
+    } that will be replaced.`}
+    footer={
+      <>
+        <Button color="light" onClick={onCancel}>
+          Cancel
+        </Button>
+        <Button onClick={onApply}>Replace content</Button>
+      </>
+    }
+  >
+    <div className="tw:mb-3">
+      Applying <b className="tw:text-gray-900">{template.name}</b> will replace all elements on the current
+      page. You can:
     </div>
-    </Portal>;
+    <Option
+      checked={backupCurrentPage}
+      onChange={onBackupChange}
+      title={<>Backup current page as &ldquo;{currentPageName || "Current"} (backup)&rdquo;</>}
+      hint="Preserves your work in a new page."
+    />
+    <Option
+      checked={resetGlobalStyles}
+      onChange={onResetChange}
+      title="Reset global styles to template defaults"
+      hint="Override your brand colors with template colors."
+    />
+  </Modal>
+);
 
 // ============================================================================
 // Pro Intercept Modal
@@ -110,63 +132,46 @@ const PRO_FEATURES: readonly string[] = [
   "Priority support",
 ];
 
-export const ProModal: React.FC<ProModalProps> = ({ templateName, onCancel, onUpgrade }) =>
-  <Portal>
-    <div className="tpl-modal-overlay" onClick={onCancel}>
-      <div className="tpl-modal" onClick={(e) => e.stopPropagation()} style={{ textAlign: "center" }}>
-        <div
-          style={{
-            width: 56,
-            height: 56,
-            margin: "4px auto 16px",
-            background: /* @lint-hex-policy: warm illustrative gradient for template-warning hero */ "linear-gradient(135deg, #fff7ed, #fed7aa)",
-            borderRadius: "var(--bk-radius-full)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-          aria-hidden="true"
-        >
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--bk-warning)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 2l3 7h7l-5.5 5L18 22l-6-4-6 4 1.5-8L2 9h7z" />
-          </svg>
-        </div>
-        <h3 className="tpl-modal-title" style={{ margin: "0 0 6px" }}>
-          &ldquo;{templateName}&rdquo; is a Pro template
-        </h3>
-        <p style={{ fontSize: 13, color: "var(--bk-ink-muted, var(--bk-ink-soft))", lineHeight: 1.5, margin: "0 0 20px" }}>
-          Unlock 80+ premium templates with conversion-tested layouts.
-        </p>
-        <div
-          style={{
-            textAlign: "left",
-            background: "var(--bk-bg-subtle)",
-            padding: "14px 16px",
-            borderRadius: 6,
-            margin: "0 0 20px",
-          }}
-        >
-          <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8 }}>Pro includes</div>
-          <div style={{ fontSize: 12, color: "var(--bk-ink-soft)", display: "flex", flexDirection: "column", gap: 4 }}>
-            {PRO_FEATURES.map((feat) => (
-              <div key={feat}>✓ {feat}</div>
-            ))}
-          </div>
-        </div>
-        <div className="tpl-modal-btns">
-          <Button className="tpl-modal-btn tpl-modal-btn--ghost" onClick={onCancel} style={{ flex: 1 }}>
-            Maybe later
-          </Button>
-          <Button className="tpl-modal-btn tpl-modal-btn--primary" onClick={onUpgrade} style={{ flex: 1 }}>
-            Upgrade to Pro
-          </Button>
-        </div>
+export const ProModal: React.FC<ProModalProps> = ({ templateName, onCancel, onUpgrade }) => (
+  <Modal
+    open
+    onClose={onCancel}
+    dismissOnScrimClick
+    title={`“${templateName}” is a Pro template`}
+    subtitle="Unlock 80+ premium templates with conversion-tested layouts."
+    footer={
+      <>
+        <Button color="light" className="tw:flex-1" onClick={onCancel}>
+          Maybe later
+        </Button>
+        <Button className="tw:flex-1" onClick={onUpgrade}>
+          Upgrade to Pro
+        </Button>
+      </>
+    }
+  >
+    <div
+      /* @lint-hex-policy: warm illustrative gradient for the Pro upsell hero */
+      className={`${HERO} tw:size-14 tw:mt-1 tw:mb-4 tw:[background-image:linear-gradient(135deg,#fff7ed,#fed7aa)]`}
+      aria-hidden="true"
+    >
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--bk-warning)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 2l3 7h7l-5.5 5L18 22l-6-4-6 4 1.5-8L2 9h7z" />
+      </svg>
+    </div>
+    <div className="tw:p-4 tw:rounded-md tw:bg-[var(--bk-bg-subtle)]">
+      <div className="tw:mb-2 tw:text-xs tw:font-semibold tw:text-gray-900">Pro includes</div>
+      <div className="tw:flex tw:flex-col tw:gap-1 tw:text-xs">
+        {PRO_FEATURES.map((feat) => (
+          <div key={feat}>✓ {feat}</div>
+        ))}
       </div>
     </div>
-    </Portal>;
+  </Modal>
+);
 
 // ============================================================================
-// Create Page Confirm Modal (fiLNZ) — 420px wide
+// Create Page Confirm Modal (fiLNZ)
 // ============================================================================
 
 export interface CreatePageConfirmModalProps {
@@ -179,28 +184,33 @@ export const CreatePageConfirmModal: React.FC<CreatePageConfirmModalProps> = ({
   templateName,
   onCancel,
   onConfirm,
-}) =>
-  <Portal>
-    <div className="tpl-modal-overlay" onClick={onCancel}>
-      <div className="tpl-modal tpl-modal--create" onClick={(e) => e.stopPropagation()}>
-        <h3 className="tpl-modal-title">Create page?</h3>
-        <div className="tpl-modal-row">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--bk-ink-muted, var(--bk-ink-soft))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="3" y="3" width="18" height="18" rx="2" />
-            <path d="M3 9h18M9 21V9" />
-          </svg>
-          <span className="tpl-modal-row-text">Using: {templateName}</span>
-        </div>
-        <div className="tpl-modal-btns">
-          <Button className="tpl-modal-btn tpl-modal-btn--ghost" onClick={onCancel}>Cancel</Button>
-          <Button className="tpl-modal-btn tpl-modal-btn--primary" onClick={onConfirm}>Create page</Button>
-        </div>
-      </div>
+}) => (
+  <Modal
+    open
+    onClose={onCancel}
+    dismissOnScrimClick
+    title="Create page?"
+    footer={
+      <>
+        <Button color="light" onClick={onCancel}>
+          Cancel
+        </Button>
+        <Button onClick={onConfirm}>Create page</Button>
+      </>
+    }
+  >
+    <div className="tw:flex tw:items-center tw:gap-2">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <rect x="3" y="3" width="18" height="18" rx="2" />
+        <path d="M3 9h18M9 21V9" />
+      </svg>
+      <span>Using: {templateName}</span>
     </div>
-    </Portal>;
+  </Modal>
+);
 
 // ============================================================================
-// Create Page Success Modal (uMJFZ) — 420px wide
+// Create Page Success Modal (uMJFZ)
 // ============================================================================
 
 export interface CreatePageSuccessModalProps {
@@ -211,28 +221,35 @@ export interface CreatePageSuccessModalProps {
 export const CreatePageSuccessModal: React.FC<CreatePageSuccessModalProps> = ({
   onClose,
   onGoToPage,
-}) =>
-  <Portal>
-    <div className="tpl-modal-overlay" onClick={onClose}>
-      <div className="tpl-modal tpl-modal--create" onClick={(e) => e.stopPropagation()}>
-        <div className="tpl-modal-icon tpl-modal-icon--success">
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--bk-success)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="10" />
-            <path d="M9 12l2 2 4-4" />
-          </svg>
-        </div>
-        <h3 className="tpl-modal-title tpl-modal-title--lg">Page created!</h3>
-        <p className="tpl-modal-desc">Your new page has been created from the template and is ready to edit.</p>
-        <div className="tpl-modal-btns">
-          <Button className="tpl-modal-btn tpl-modal-btn--ghost" onClick={onClose}>Close</Button>
-          <Button className="tpl-modal-btn tpl-modal-btn--primary" onClick={onGoToPage}>Go to page</Button>
-        </div>
-      </div>
+}) => (
+  <Modal
+    open
+    onClose={onClose}
+    dismissOnScrimClick
+    title="Page created!"
+    footer={
+      <>
+        <Button color="light" onClick={onClose}>
+          Close
+        </Button>
+        <Button onClick={onGoToPage}>Go to page</Button>
+      </>
+    }
+  >
+    <div className={`${HERO} tw:size-12 tw:mb-3 tw:bg-[var(--bk-success-tint)]`} aria-hidden="true">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--bk-success)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10" />
+        <path d="M9 12l2 2 4-4" />
+      </svg>
     </div>
-    </Portal>;
+    <p className="tw:text-center">
+      Your new page has been created from the template and is ready to edit.
+    </p>
+  </Modal>
+);
 
 // ============================================================================
-// Create Page Error Modal (9NalZ) — 420px wide
+// Create Page Error Modal (9NalZ)
 // ============================================================================
 
 export interface CreatePageErrorModalProps {
@@ -243,26 +260,29 @@ export interface CreatePageErrorModalProps {
 export const CreatePageErrorModal: React.FC<CreatePageErrorModalProps> = ({
   onCancel,
   onRetry,
-}) =>
-  <Portal>
-    <div className="tpl-modal-overlay" onClick={onCancel}>
-      <div className="tpl-modal tpl-modal--create" onClick={(e) => e.stopPropagation()}>
-        <div className="tpl-modal-icon">
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--bk-error, var(--bk-error))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="10" />
-            <path d="M12 8v4M12 16h.01" />
-          </svg>
-        </div>
-        <h3 className="tpl-modal-title tpl-modal-title--lg">Couldn&apos;t create page</h3>
-        <div className="tpl-modal-warning" style={{ background: "var(--bk-error-tint)", borderColor: "transparent" }}>
-          <p className="tpl-modal-warning-text" style={{ color: "var(--bk-ink-muted)" }}>
-            Something went wrong creating your page. Your existing pages were not affected.
-          </p>
-        </div>
-        <div className="tpl-modal-btns">
-          <Button className="tpl-modal-btn tpl-modal-btn--ghost" onClick={onCancel}>Cancel</Button>
-          <Button className="tpl-modal-btn tpl-modal-btn--primary" onClick={onRetry}>Try again</Button>
-        </div>
-      </div>
+}) => (
+  <Modal
+    open
+    onClose={onCancel}
+    dismissOnScrimClick
+    title="Couldn't create page"
+    footer={
+      <>
+        <Button color="light" onClick={onCancel}>
+          Cancel
+        </Button>
+        <Button onClick={onRetry}>Try again</Button>
+      </>
+    }
+  >
+    <div className={`${HERO} tw:size-12 tw:mb-3 tw:bg-[var(--bk-error-tint)]`} aria-hidden="true">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--bk-error)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10" />
+        <path d="M12 8v4M12 16h.01" />
+      </svg>
     </div>
-    </Portal>;
+    <p className="tw:p-3 tw:rounded-md tw:bg-[var(--bk-error-tint)] tw:text-gray-500">
+      Something went wrong creating your page. Your existing pages were not affected.
+    </p>
+  </Modal>
+);

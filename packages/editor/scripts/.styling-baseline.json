@@ -1,7 +1,7 @@
 {
-  "inline_literal": 1148,
+  "inline_literal": 1123,
   "inline_hoisted": 527,
-  "css_lines": 10940,
+  "css_lines": 10827,
   "css_files": {
     "inspector/styles/inspector.css": 1038,
     "media/ImageEditorModal.css": 326,
@@ -25,6 +25,6 @@
     "sidebar/tabs/settings/settings.css": 581,
     "sidebar/tabs/templates/ApplyProgressOverlay.css": 58,
     "sidebar/tabs/templates/TemplatePreviewModal.css": 221,
-    "sidebar/tabs/templates/TemplatesTab.css": 839
+    "sidebar/tabs/templates/TemplatesTab.css": 726
   }
 }
