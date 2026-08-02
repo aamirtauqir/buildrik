@@ -61,19 +61,23 @@ const extractVarName = (v: string) => {
 // SUB-COMPONENTS
 // ============================================================================
 
-const valueBadgeStyle: React.CSSProperties = {
-  fontSize: 10,
-  fontFamily: "var(--bk-font-mono)",
-  color: "var(--bk-accent)",
-  background: "var(--bk-accent-subtle)",
-  padding: "1px 5px",
-  borderRadius: 4,
-  whiteSpace: "nowrap",
-  maxWidth: 80,
-  overflow: "hidden",
-  textOverflow: "ellipsis",
-  flexShrink: 0,
-};
+const VALUE_BADGE =
+  "tw:flex-none tw:max-w-20 tw:px-[5px] tw:py-px tw:rounded tw:overflow-hidden tw:text-ellipsis " +
+  "tw:whitespace-nowrap tw:text-[10px] tw:text-blue-700 tw:bg-[var(--bk-accent-subtle)] " +
+  "tw:[font-family:var(--bk-font-mono)]";
+
+/** Selected / keyboard-focused / resting frame, shared by both layouts. */
+const optionState = (selected: boolean, focused: boolean) =>
+  selected
+    ? "tw:bg-[var(--bk-accent-subtle)] tw:border-blue-700"
+    : focused
+      ? "tw:bg-[var(--bk-accent-subtle)] tw:border-[var(--bk-alpha-accent-30)]"
+      : "tw:bg-transparent tw:border-transparent tw:hover:bg-[var(--bk-accent-subtle)]";
+
+const SWATCH = "tw:size-7 tw:flex-none tw:rounded-[5px] tw:border tw:border-[var(--bk-border-medium)]";
+const PICKER_INPUT =
+  "tw:[&_input]:px-2 tw:[&_input]:py-[5px] tw:[&_input]:rounded-[5px] " +
+  "tw:[&_input]:border-[var(--bk-border-medium)] tw:[&_input]:bg-white";
 
 // ============================================================================
 // COMPONENT
@@ -178,41 +182,22 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
 
   return (
     <div
-      style={{
-        width: showSwatch ? 228 : 240,
-        background: "var(--bk-bg-panel)",
-        border: `1px solid ${"var(--bk-border)"}`,
-        borderRadius: 8,
-        boxShadow: "var(--bk-shadow-overlay)",
-        overflow: "hidden",
-      }}
+      className={`tw:overflow-hidden tw:rounded-lg tw:border tw:border-gray-200 tw:bg-[var(--bk-bg-panel)] tw:[box-shadow:var(--bk-shadow-overlay)] ${
+        showSwatch ? "tw:w-57" : "tw:w-60"
+      }`}
     >
       {/* Tab strip */}
-      <div
-        style={{
-          display: "flex",
-          borderBottom: `1px solid ${"var(--bk-border)"}`,
-        }}
-      >
+      <div className="tw:flex tw:border-b tw:border-gray-200">
         {(["tokens", "custom"] as const).map((t) => (
           <Button
             key={t}
             type="button"
             onClick={() => setTab(t)}
-            style={{
-              flex: 1,
-              padding: "7px 0",
-              background: tab === t ? "var(--bk-accent-subtle)" : "transparent",
-              border: "none",
-              borderBottom: tab === t ? `2px solid ${"var(--bk-accent)"}` : "2px solid transparent",
-              color: tab === t ? "var(--bk-accent)" : "var(--bk-ink-muted)",
-              fontSize: 11,
-              fontWeight: 600,
-              cursor: "pointer",
-              letterSpacing: "0.04em",
-              textTransform: "uppercase",
-              transition: "color 0.15s, border-color 0.15s",
-            }}
+            className={`tw:flex-1 tw:px-0 tw:py-[7px] tw:rounded-none tw:border-0 tw:border-b-2 tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.04em] ${
+              tab === t
+                ? "tw:border-b-blue-700 tw:bg-[var(--bk-accent-subtle)] tw:text-blue-700"
+                : "tw:border-b-transparent tw:bg-transparent tw:text-gray-500 tw:hover:text-gray-900"
+            }`}
           >
             {t === "tokens" ? "Tokens" : "Custom"}
           </Button>
@@ -221,7 +206,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
       {tab === "tokens" && (
         <div onKeyDown={handleKeyDown}>
           {/* Search */}
-          <div style={{ padding: "8px 8px 4px" }}>
+          <div className="tw:px-2 tw:pt-2 tw:pb-1">
             <TextInput
               ref={searchRef}
               type="text"
@@ -232,48 +217,24 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
               }}
               placeholder="Search tokens…"
               aria-label="Search tokens"
-              style={{
-                width: "100%",
-                padding: "5px 8px",
-                background: "var(--bk-bg-card)",
-                border: `1px solid ${"var(--bk-border-medium)"}`,
-                borderRadius: 5,
-                color: "var(--bk-ink)",
-                fontSize: 11,
-                outline: "none",
-                boxSizing: "border-box",
-              }}
+              className={`${PICKER_INPUT} tw:[&_input]:text-[11px]`}
             />
           </div>
 
           {/* Empty state — zero tokens */}
           {hasNoTokens && (
-            <div
-              style={{
-                padding: "20px 12px",
-                textAlign: "center",
-              }}
-            >
-              <div style={{ fontSize: 18, marginBottom: 6, opacity: 0.4 }}>🎨</div>
-              <div style={{ fontSize: 11, color: "var(--bk-ink-soft)", marginBottom: 4 }}>
+            <div className="tw:px-3 tw:py-5 tw:text-center">
+              <div className="tw:mb-1.5 tw:text-lg tw:opacity-40">🎨</div>
+              <div className="tw:mb-1 tw:text-[11px] tw:text-[var(--bk-ink-soft)]">
                 No {tokenLabel} tokens yet
               </div>
-              <div style={{ fontSize: 10, color: "var(--bk-ink-muted)" }}>
-                Add tokens in the Design tab
-              </div>
+              <div className="tw:text-[10px] tw:text-gray-500">Add tokens in the Design tab</div>
             </div>
           )}
 
           {/* Empty state — search no-results */}
           {hasNoResults && (
-            <div
-              style={{
-                padding: "16px 12px",
-                textAlign: "center",
-                fontSize: 11,
-                color: "var(--bk-ink-muted)",
-              }}
-            >
+            <div className="tw:px-3 tw:py-4 tw:text-center tw:text-[11px] tw:text-gray-500">
               No tokens found
             </div>
           )}
@@ -284,22 +245,11 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
               ref={listRef}
               role="listbox"
               aria-label={`${tokenLabel} tokens`}
-              style={{
-                padding: showSwatch ? "4px 8px 8px" : "4px 8px 6px",
-                maxHeight: 220,
-                overflowY: "auto",
-                ...(showSwatch
-                  ? {
-                      display: "grid",
-                      gridTemplateColumns: "repeat(4, 1fr)",
-                      gap: 6,
-                    }
-                  : {
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: 2,
-                    }),
-              }}
+              className={`tw:px-2 tw:pt-1 tw:max-h-55 tw:overflow-y-auto ${
+                showSwatch
+                  ? "tw:pb-2 tw:grid tw:grid-cols-4 tw:gap-1.5"
+                  : "tw:pb-1.5 tw:flex tw:flex-col tw:gap-0.5"
+              }`}
             >
               {filtered.map((token, idx) => {
                 const selected = isSelected(token);
@@ -316,56 +266,14 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
                     title={`${token.name}: ${token.value}`}
                     tabIndex={focused ? 0 : -1}
                     onClick={() => onSelect(token.id, cssVarRef)}
-                    style={{
-                      padding: "4px 2px",
-                      background: selected || focused ? "var(--bk-accent-subtle)" : "transparent",
-                      border: selected
-                        ? `1px solid ${"var(--bk-accent)"}`
-                        : focused
-                          ? "1px solid var(--bk-alpha-accent-30)"
-                          : "1px solid transparent",
-                      borderRadius: 5,
-                      cursor: "pointer",
-                      transition: "background 0.12s",
-                      outline: "none",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!selected)
-                        (e.currentTarget as HTMLButtonElement).style.background =
-                          "var(--bk-accent-subtle)";
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!selected)
-                        (e.currentTarget as HTMLButtonElement).style.background = "transparent";
-                    }}
+                    className={`tw:px-0.5 tw:py-1 tw:rounded-[5px] tw:border ${optionState(selected, focused)}`}
                     onFocus={() => setFocusedIndex(idx)}
                   >
                     <div className="tw:flex tw:flex-col tw:items-center tw:gap-[3px]">
                       {/* Swatch */}
-                      <div
-                        style={{
-                          width: 28,
-                          height: 28,
-                          borderRadius: 5,
-                          background: token.value,
-                          border: `1px solid var(--bk-border-medium)`,
-                          flexShrink: 0,
-                        }}
-                      />
+                      <div className={SWATCH} style={{ background: token.value }} />
                       {/* Name */}
-                      <span
-                        style={{
-                          fontSize: 9,
-                          color: "var(--bk-ink-muted)",
-                          textAlign: "center",
-                          lineHeight: 1.2,
-                          wordBreak: "break-word",
-                          maxWidth: 44,
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          whiteSpace: "nowrap",
-                        }}
-                      >
+                      <span className="tw:max-w-11 tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap tw:text-center tw:text-[9px] tw:leading-tight tw:text-gray-500">
                         {token.name}
                       </span>
                     </div>
@@ -380,49 +288,13 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
                     title={`${token.name}: ${token.value}`}
                     tabIndex={focused ? 0 : -1}
                     onClick={() => onSelect(token.id, cssVarRef)}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      gap: 8,
-                      padding: "5px 6px",
-                      background: selected || focused ? "var(--bk-accent-subtle)" : "transparent",
-                      border: selected
-                        ? `1px solid ${"var(--bk-accent)"}`
-                        : focused
-                          ? "1px solid var(--bk-alpha-accent-30)"
-                          : "1px solid transparent",
-                      borderRadius: 5,
-                      cursor: "pointer",
-                      transition: "background 0.12s",
-                      width: "100%",
-                      textAlign: "left",
-                      outline: "none",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!selected)
-                        (e.currentTarget as HTMLButtonElement).style.background =
-                          "var(--bk-accent-subtle)";
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!selected)
-                        (e.currentTarget as HTMLButtonElement).style.background = "transparent";
-                    }}
+                    className={`tw:flex tw:w-full tw:items-center tw:justify-between tw:gap-2 tw:px-1.5 tw:py-[5px] tw:rounded-[5px] tw:border tw:text-left ${optionState(selected, focused)}`}
                     onFocus={() => setFocusedIndex(idx)}
                   >
-                    <span
-                      style={{
-                        fontSize: 11,
-                        color: "var(--bk-ink-soft)",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                        flex: 1,
-                      }}
-                    >
+                    <span className="tw:flex-1 tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap tw:text-[11px] tw:text-[var(--bk-ink-soft)]">
                       {token.name}
                     </span>
-                    <span style={valueBadgeStyle}>{token.value}</span>
+                    <span className={VALUE_BADGE}>{token.value}</span>
                   </Button>)
                 );
               })}
@@ -431,22 +303,11 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
         </div>
       )}
       {tab === "custom" && (
-        <div style={{ padding: 10 }}>
-          <div style={{ fontSize: 11, color: "var(--bk-ink-muted)", marginBottom: 6 }}>
-            Enter any CSS color value
-          </div>
-          <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+        <div className="tw:p-2.5">
+          <div className="tw:mb-1.5 tw:text-[11px] tw:text-gray-500">Enter any CSS color value</div>
+          <div className="tw:flex tw:items-center tw:gap-1.5">
             {/* Preview swatch */}
-            <div
-              style={{
-                width: 28,
-                height: 28,
-                borderRadius: 5,
-                background: customInput,
-                border: `1px solid ${"var(--bk-border-medium)"}`,
-                flexShrink: 0,
-              }}
-            />
+            <div className={SWATCH} style={{ background: customInput }} />
             <TextInput
               type="text"
               value={customInput}
@@ -457,25 +318,10 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
                 if (e.key === "Enter") commitCustom();
               }}
               placeholder="#000000"
-              style={{
-                flex: 1,
-                padding: "5px 8px",
-                background: "var(--bk-bg-card)",
-                border: `1px solid ${"var(--bk-border-medium)"}`,
-                borderRadius: 5,
-                color: "var(--bk-ink)",
-                fontSize: 12,
-                outline: "none",
-              }}
+              className={`tw:flex-1 ${PICKER_INPUT} tw:[&_input]:text-xs`}
             />
           </div>
-          <div
-            style={{
-              marginTop: 8,
-              fontSize: 10,
-              color: "var(--bk-ink-muted)",
-            }}
-          >
+          <div className="tw:mt-2 tw:text-[10px] tw:text-gray-500">
             Accepts hex, rgb(), hsl(), or any CSS keyword
           </div>
         </div>
