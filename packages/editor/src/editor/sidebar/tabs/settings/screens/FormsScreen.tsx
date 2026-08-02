@@ -206,7 +206,7 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
     return (
       <Screen>
         <Section title="Forms">
-          <div style={emptyStyles}>Open this site from the dashboard to manage forms.</div>
+          <div className={EMPTY}>Open this site from the dashboard to manage forms.</div>
         </Section>
       </Screen>
     );
@@ -216,7 +216,7 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
     return (
       <Screen>
         <Section title="Forms">
-          <div style={emptyStyles}>Loading forms…</div>
+          <div className={EMPTY}>Loading forms…</div>
         </Section>
       </Screen>
     );
@@ -226,7 +226,7 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
     return (
       <Screen>
         <Section title="Forms">
-          <div role="alert" style={errorStyles}>{formsError}</div>
+          <div role="alert" className={ERROR_BOX}>{formsError}</div>
         </Section>
       </Screen>
     );
@@ -236,7 +236,7 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
     return (
       <Screen>
         <Section title="Forms" desc="No form blocks on this site yet. Drop a Form block onto a page in the canvas to start collecting submissions.">
-          <div style={emptyStyles}>No forms yet.</div>
+          <div className={EMPTY}>No forms yet.</div>
         </Section>
       </Screen>
     );
@@ -256,17 +256,17 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
             ))}
           </Select>
         </Field>
-        <div style={filterRowStyles} role="tablist" aria-label="Submission filter">
+        <div className={FILTER_ROW} role="tablist" aria-label="Submission filter">
           {(["inbox", "unread", "spam", "archived"] as const).map((f) => (
             <Button
               key={f}
               type="button"
-              color="light"
               size="xs"
+              color={filter === f ? undefined : "light"}
               role="tab"
               aria-selected={filter === f}
               onClick={() => setFilter(f)}
-              style={filter === f ? filterChipActiveStyles : filterChipStyles} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+              className={CHIP}
             >
               {f.charAt(0).toUpperCase() + f.slice(1)}
             </Button>
@@ -275,7 +275,7 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
       </Section>
 
       <Section title={`Submissions${submissions ? ` (${submissions.total})` : ""}`}>
-        <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "8px" }}>
+        <div className="tw:flex tw:justify-end tw:mb-2">
           <Button
             color="light"
             size="xs"
@@ -286,19 +286,19 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
             {exporting ? "Exporting…" : "Export CSV"}
           </Button>
         </div>
-        {subsLoading && <div style={emptyStyles}>Loading…</div>}
+        {subsLoading && <div className={EMPTY}>Loading…</div>}
         {!subsLoading && subsError && (
-          <div role="alert" style={errorStyles}>{subsError}</div>
+          <div role="alert" className={ERROR_BOX}>{subsError}</div>
         )}
         {!subsLoading && !subsError && submissions && submissions.data.length === 0 && (
-          <div style={emptyStyles}>No submissions in {filter}.</div>
+          <div className={EMPTY}>No submissions in {filter}.</div>
         )}
         {!subsLoading && submissions && submissions.data.length > 0 && (
-          <ul style={listStyles}>
+          <ul className={LIST}>
             {submissions.data.map((s) => {
               const isExpanded = expandedId === s.id;
               return (
-                <li key={s.id} style={s.isRead ? rowStyles : rowUnreadStyles}>
+                <li key={s.id} className={`${ROW} ${s.isRead ? "tw:border-l-gray-300" : "tw:border-l-blue-700"}`}>
                   <Button
                     type="button"
                     color="light"
@@ -306,49 +306,49 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
                       setExpandedId(isExpanded ? null : s.id);
                       if (!s.isRead) void handleUpdate(s.id, { isRead: true });
                     }}
-                    style={rowButtonStyles}
-                    aria-expanded={isExpanded} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+                    className={ROW_BTN}
+                    aria-expanded={isExpanded}
                   >
-                    <div style={summaryRowStyles}>
-                      <span style={s.isRead ? subjectReadStyles : subjectUnreadStyles}>
+                    <div className={SUMMARY_ROW}>
+                      <span className={`${SUBJECT} ${s.isRead ? "tw:text-[var(--bk-ink-soft)] tw:font-medium" : "tw:text-gray-900 tw:font-semibold"}`}>
                         {summarize(s.data)}
                       </span>
-                      <span style={timestampStyles}>{formatTime(s.createdAt)}</span>
+                      <span className={MONO_MICRO}>{formatTime(s.createdAt)}</span>
                     </div>
-                    {s.sourceUrl && <div style={sourceStyles}>{s.sourceUrl}</div>}
+                    {s.sourceUrl && <div className={SOURCE}>{s.sourceUrl}</div>}
                   </Button>
                   {isExpanded && (
-                    <div style={detailStyles}>
-                      <dl style={dlStyles}>
+                    <div className={DETAIL}>
+                      <dl className={DL}>
                         {Object.entries(s.data).map(([k, v]) => (
                           <React.Fragment key={k}>
-                            <dt style={dtStyles}>{k}</dt>
-                            <dd style={ddStyles}>{String(v)}</dd>
+                            <dt className={DT}>{k}</dt>
+                            <dd className={DD}>{String(v)}</dd>
                           </React.Fragment>
                         ))}
                       </dl>
-                      <div style={actionsStyles}>
+                      <div className={ACTIONS}>
                         {!s.isSpam && (
-                          <Button color="light" size="xs" type="button" onClick={() => handleUpdate(s.id, { isSpam: true })} style={actionBtnStyles} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+                          <Button color="light" size="xs" type="button" onClick={() => handleUpdate(s.id, { isSpam: true })} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                             Mark spam
                           </Button>
                         )}
                         {s.isSpam && (
-                          <Button color="light" size="xs" type="button" onClick={() => handleUpdate(s.id, { isSpam: false })} style={actionBtnStyles} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+                          <Button color="light" size="xs" type="button" onClick={() => handleUpdate(s.id, { isSpam: false })} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                             Not spam
                           </Button>
                         )}
                         {!s.isArchived && (
-                          <Button color="light" size="xs" type="button" onClick={() => handleUpdate(s.id, { isArchived: true })} style={actionBtnStyles} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+                          <Button color="light" size="xs" type="button" onClick={() => handleUpdate(s.id, { isArchived: true })} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                             Archive
                           </Button>
                         )}
                         {s.isArchived && (
-                          <Button color="light" size="xs" type="button" onClick={() => handleUpdate(s.id, { isArchived: false })} style={actionBtnStyles} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+                          <Button color="light" size="xs" type="button" onClick={() => handleUpdate(s.id, { isArchived: false })} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                             Unarchive
                           </Button>
                         )}
-                        <Button color="light" size="xs" type="button" onClick={() => handleDelete(s.id)} style={deleteBtnStyles} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+                        <Button color="light" size="xs" type="button" onClick={() => handleDelete(s.id)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                           Delete
                         </Button>
                       </div>
@@ -360,18 +360,17 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
           </ul>
         )}
         {submissions && submissions.total > PER_PAGE && (
-          <div style={paginationStyles}>
+          <div className={PAGINATION}>
             <Button
               color="light"
               size="xs"
               type="button"
               onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page <= 1 || subsLoading}
-              style={pageBtnStyles} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+              disabled={page <= 1 || subsLoading} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
             >
               ← Prev
             </Button>
-            <span style={pageLabelStyles}>
+            <span className={PAGE_LABEL}>
               Page {page} of {totalPages}
             </span>
             <Button
@@ -379,8 +378,7 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
               size="xs"
               type="button"
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page >= totalPages || subsLoading}
-              style={pageBtnStyles} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+              disabled={page >= totalPages || subsLoading} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
             >
               Next →
             </Button>
@@ -415,198 +413,31 @@ function formatTime(iso: string | Date): string {
   return d.toLocaleDateString();
 }
 
-const emptyStyles: React.CSSProperties = {
-  padding: "12px 14px",
-  fontSize: 12,
-  color: "var(--bk-ink-muted)",
-  background: "var(--bk-bg-subtle)",
-  border: "1px dashed var(--bk-border-medium)",
-  borderRadius: 6,
-};
-
-const errorStyles: React.CSSProperties = {
-  marginTop: 4,
-  padding: "8px 10px",
-  font: "500 11.5px var(--bk-font-ui)",
-  color: "var(--bk-error)",
-  background: "rgba(220, 38, 38, 0.06)",
-  border: "1px solid rgba(220, 38, 38, 0.25)",
-  borderRadius: 6,
-};
-
-const filterRowStyles: React.CSSProperties = {
-  display: "flex",
-  gap: 4,
-  marginTop: 8,
-  flexWrap: "wrap",
-};
-
-const filterChipBaseStyles: React.CSSProperties = {
-  padding: "4px 10px",
-  font: "500 11px var(--bk-font-ui)",
-  background: "transparent",
-  border: "1px solid var(--bk-border-medium)",
-  borderRadius: 999,
-  cursor: "pointer",
-  color: "var(--bk-ink-soft)",
-};
-
-const filterChipStyles: React.CSSProperties = filterChipBaseStyles;
-
-const filterChipActiveStyles: React.CSSProperties = {
-  ...filterChipBaseStyles,
-  background: "var(--bk-accent-tint)",
-  color: "var(--bk-accent)",
-  borderColor: "var(--bk-accent)",
-};
-
-const listStyles: React.CSSProperties = {
-  listStyle: "none",
-  padding: 0,
-  margin: 0,
-  display: "flex",
-  flexDirection: "column",
-  gap: 4,
-};
-
-const rowBaseStyles: React.CSSProperties = {
-  background: "var(--bk-bg-subtle)",
-  border: "1px solid var(--bk-border-medium)",
-  borderRadius: 6,
-  overflow: "hidden",
-};
-
-const rowStyles: React.CSSProperties = rowBaseStyles;
-
-const rowUnreadStyles: React.CSSProperties = {
-  ...rowBaseStyles,
-  borderLeft: "3px solid var(--bk-accent)",
-};
-
-const rowButtonStyles: React.CSSProperties = {
-  display: "block",
-  width: "100%",
-  padding: "8px 10px",
-  textAlign: "left",
-  background: "transparent",
-  border: "none",
-  cursor: "pointer",
-  font: "inherit",
-};
-
-const summaryRowStyles: React.CSSProperties = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  gap: 8,
-};
-
-const subjectReadStyles: React.CSSProperties = {
-  fontSize: 12,
-  color: "var(--bk-ink-soft)",
-  fontWeight: 500,
-  whiteSpace: "nowrap",
-  overflow: "hidden",
-  textOverflow: "ellipsis",
-};
-
-const subjectUnreadStyles: React.CSSProperties = {
-  ...subjectReadStyles,
-  color: "var(--bk-ink)",
-  fontWeight: 600,
-};
-
-const timestampStyles: React.CSSProperties = {
-  fontFamily: "var(--bk-font-mono)",
-  fontSize: 10,
-  color: "var(--bk-ink-muted)",
-  flexShrink: 0,
-};
-
-const sourceStyles: React.CSSProperties = {
-  marginTop: 2,
-  fontFamily: "var(--bk-font-mono)",
-  fontSize: 10,
-  color: "var(--bk-ink-muted)",
-  whiteSpace: "nowrap",
-  overflow: "hidden",
-  textOverflow: "ellipsis",
-};
-
-const detailStyles: React.CSSProperties = {
-  padding: "8px 10px 10px",
-  borderTop: "1px solid var(--bk-border-medium)",
-  background: "var(--bk-bg-panel)",
-};
-
-const dlStyles: React.CSSProperties = {
-  display: "grid",
-  gridTemplateColumns: "minmax(80px, 25%) 1fr",
-  rowGap: 4,
-  columnGap: 8,
-  margin: 0,
-  padding: 0,
-};
-
-const dtStyles: React.CSSProperties = {
-  fontFamily: "var(--bk-font-mono)",
-  fontSize: 10,
-  textTransform: "uppercase",
-  letterSpacing: "0.04em",
-  color: "var(--bk-ink-muted)",
-  paddingTop: 2,
-};
-
-const ddStyles: React.CSSProperties = {
-  margin: 0,
-  fontSize: 12,
-  color: "var(--bk-ink)",
-  wordBreak: "break-word",
-};
-
-const actionsStyles: React.CSSProperties = {
-  display: "flex",
-  gap: 4,
-  marginTop: 10,
-  flexWrap: "wrap",
-};
-
-const actionBtnStyles: React.CSSProperties = {
-  padding: "4px 8px",
-  font: "500 11px var(--bk-font-ui)",
-  color: "var(--bk-ink-soft)",
-  background: "transparent",
-  border: "1px solid var(--bk-border-medium)",
-  borderRadius: 4,
-  cursor: "pointer",
-};
-
-const deleteBtnStyles: React.CSSProperties = {
-  ...actionBtnStyles,
-  color: "var(--bk-error)",
-  borderColor: "rgba(220, 38, 38, 0.4)",
-};
-
-const paginationStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  gap: 8,
-  marginTop: 10,
-};
-
-const pageBtnStyles: React.CSSProperties = {
-  padding: "4px 10px",
-  font: "500 11px var(--bk-font-ui)",
-  color: "var(--bk-ink-soft)",
-  background: "var(--bk-bg-panel)",
-  border: "1px solid var(--bk-border-medium)",
-  borderRadius: 4,
-  cursor: "pointer",
-};
-
-const pageLabelStyles: React.CSSProperties = {
-  fontFamily: "var(--bk-font-mono)",
-  fontSize: 11,
-  color: "var(--bk-ink-muted)",
-};
+/* `filterChipStyles` and `rowStyles` were aliases of their own base with no
+   difference at all — a read/unread and active/idle distinction that existed in
+   the names and nowhere in the values. Both states are real class ternaries
+   now, so the difference is in the pixels rather than only the identifier. */
+const EMPTY =
+  "tw:px-3.5 tw:py-3 tw:text-xs tw:text-gray-500 tw:bg-gray-50 tw:border tw:border-dashed tw:border-gray-300 tw:rounded-md";
+const ERROR_BOX =
+  "tw:mt-1 tw:px-2.5 tw:py-2 tw:text-[11.5px] tw:font-medium tw:[font-family:var(--bk-font-ui)] " +
+  "tw:text-[var(--bk-error)] tw:bg-[var(--bk-error-tint)] tw:border tw:border-red-200 tw:rounded-md";
+const FILTER_ROW = "tw:flex tw:gap-1 tw:mt-2 tw:flex-wrap";
+const CHIP = "tw:px-2.5 tw:py-1 tw:text-[11px] tw:font-medium tw:rounded-full";
+const LIST = "tw:list-none tw:p-0 tw:m-0 tw:flex tw:flex-col tw:gap-1";
+const ROW = "tw:bg-gray-50 tw:border tw:border-gray-300 tw:rounded-md tw:overflow-hidden tw:border-l-[3px]";
+const ROW_BTN =
+  "tw:block tw:w-full tw:px-2.5 tw:py-2 tw:text-left tw:bg-transparent tw:border-0 tw:cursor-pointer tw:font-inherit";
+const SUMMARY_ROW = "tw:flex tw:justify-between tw:items-center tw:gap-2";
+const SUBJECT = "tw:text-xs tw:whitespace-nowrap tw:overflow-hidden tw:text-ellipsis";
+const MONO_MICRO = "tw:[font-family:var(--bk-font-mono)] tw:text-[10px] tw:text-gray-500 tw:flex-none";
+const SOURCE =
+  "tw:mt-0.5 tw:[font-family:var(--bk-font-mono)] tw:text-[10px] tw:text-gray-500 tw:whitespace-nowrap tw:overflow-hidden tw:text-ellipsis";
+const DETAIL = "tw:px-2.5 tw:pt-2 tw:pb-2.5 tw:border-t tw:border-gray-300 tw:bg-white";
+const DL = "tw:grid tw:[grid-template-columns:minmax(80px,25%)_1fr] tw:gap-x-2 tw:gap-y-1 tw:m-0 tw:p-0";
+const DT =
+  "tw:[font-family:var(--bk-font-mono)] tw:text-[10px] tw:uppercase tw:tracking-[0.04em] tw:text-gray-500 tw:pt-0.5";
+const DD = "tw:m-0 tw:text-xs tw:text-gray-900 tw:break-words";
+const ACTIONS = "tw:flex tw:gap-1 tw:mt-2.5 tw:flex-wrap";
+const PAGINATION = "tw:flex tw:items-center tw:justify-center tw:gap-2 tw:mt-2.5";
+const PAGE_LABEL = "tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:text-gray-500";
