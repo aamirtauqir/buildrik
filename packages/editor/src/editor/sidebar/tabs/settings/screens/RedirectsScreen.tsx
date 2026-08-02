@@ -7,7 +7,16 @@
 
 import * as React from "react";
 import { createBuildrikApiClient } from "@/services/api-client";
-import { Field, Input, Screen, Section, Select } from "../shared";
+import {
+  Field,
+  Input,
+  SCREEN_EMPTY,
+  SCREEN_ERROR,
+  SCREEN_NOTICE,
+  Screen,
+  Section,
+  Select,
+} from "../shared";
 import type { ScreenProps } from "../types";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { Button } from "@/editor/chrome-ui";
@@ -162,7 +171,7 @@ export const RedirectsScreen: React.FC<ScreenProps> = ({
     return (
       <Screen>
         <Section title="Redirects">
-          <div style={emptyStyles}>
+          <div className={SCREEN_EMPTY}>
             Open this site from the dashboard to manage redirects.
           </div>
         </Section>
@@ -172,8 +181,8 @@ export const RedirectsScreen: React.FC<ScreenProps> = ({
 
   return (
     <Screen>
-      <div role="status" style={noticeStyles}>
-        <strong style={{ fontWeight: 600 }}>Saved, not yet live.</strong>{" "}
+      <div role="status" className={SCREEN_NOTICE}>
+        <strong className="tw:font-semibold">Saved, not yet live.</strong>{" "}
         Redirect rules are stored but aren't served on your published site yet —
         visitors hitting the old URL won't be forwarded until deployment wiring
         ships. Your rules are safe and will apply automatically once it's live.
@@ -210,40 +219,40 @@ export const RedirectsScreen: React.FC<ScreenProps> = ({
             </Select>
           </Field>
           {submitError && (
-            <div role="alert" style={errorStyles}>{submitError}</div>
+            <div role="alert" className={SCREEN_ERROR}>{submitError}</div>
           )}
-          <Button type="submit" disabled={submitting} style={addButtonStyles}>
+          <Button type="submit" disabled={submitting} className={ADD_BTN}>
             {submitting ? "Adding…" : "Add redirect"}
           </Button>
         </form>
       </Section>
 
       <Section title={`Active redirects${rows.length ? ` (${rows.length})` : ""}`}>
-        {loading && <div style={emptyStyles}>Loading…</div>}
+        {loading && <div className={SCREEN_EMPTY}>Loading…</div>}
         {!loading && loadError && (
-          <div role="alert" style={errorStyles}>{loadError}</div>
+          <div role="alert" className={SCREEN_ERROR}>{loadError}</div>
         )}
         {!loading && !loadError && rows.length === 0 && (
-          <div style={emptyStyles}>No redirects yet. Add one above.</div>
+          <div className={SCREEN_EMPTY}>No redirects yet. Add one above.</div>
         )}
         {!loading && rows.length > 0 && (
-          <ul style={listStyles}>
+          <ul className={LIST}>
             {rows.map((r) => (
-              <li key={r.id} style={rowStyles}>
-                <div style={pathColStyles}>
-                  <div style={fromColStyles}>{r.fromPath}</div>
-                  <div style={arrowStyles}>→</div>
-                  <div style={toColStyles}>{r.toUrl}</div>
+              <li key={r.id} className={ROW}>
+                <div className={PATH_COL}>
+                  <div className={`${MONO_CELL} tw:text-gray-900`}>{r.fromPath}</div>
+                  <div className={`${MONO_CELL} tw:text-gray-500`}>→</div>
+                  <div className={`${MONO_CELL} tw:text-[var(--bk-ink-soft)]`}>{r.toUrl}</div>
                 </div>
-                <div style={metaColStyles}>
-                  <span style={typeBadgeStyles}>{r.type}</span>
+                <div className="tw:flex tw:flex-none tw:items-center tw:gap-2">
+                  <span className={TYPE_BADGE}>{r.type}</span>
                   <Button
                     color="light"
                     size="xs"
                     type="button"
                     onClick={() => handleDelete(r.id)}
                     aria-label={`Delete redirect from ${r.fromPath}`}
-                    style={{ color: "var(--bk-error)" }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+                    className="tw:px-2 tw:py-1 tw:rounded tw:border tw:border-[var(--bk-border-medium)] tw:bg-transparent tw:text-[11px] tw:font-medium tw:text-[var(--bk-error)]"
                   >
                     Delete
                   </Button>
@@ -257,126 +266,16 @@ export const RedirectsScreen: React.FC<ScreenProps> = ({
   );
 };
 
-const emptyStyles: React.CSSProperties = {
-  padding: "12px 14px",
-  fontSize: 12,
-  color: "var(--bk-ink-muted)",
-  background: "var(--bk-bg-subtle)",
-  border: "1px dashed var(--bk-border-medium)",
-  borderRadius: 6,
-};
-
-const noticeStyles: React.CSSProperties = {
-  marginBottom: 12,
-  padding: "10px 12px",
-  fontSize: 12,
-  lineHeight: 1.5,
-  color: "var(--bk-ink-soft)",
-  background: "var(--bk-bg-subtle)",
-  border: "1px solid var(--bk-border-medium)",
-  borderLeft: "3px solid var(--bk-accent)",
-  borderRadius: 6,
-};
-
-const errorStyles: React.CSSProperties = {
-  marginTop: 4,
-  marginBottom: 8,
-  padding: "8px 10px",
-  font: "500 11.5px var(--bk-font-ui)",
-  color: "var(--bk-error)",
-  background: "rgba(220, 38, 38, 0.06)",
-  border: "1px solid rgba(220, 38, 38, 0.25)",
-  borderRadius: 6,
-};
-
-const addButtonStyles: React.CSSProperties = {
-  marginTop: 8,
-  padding: "8px 14px",
-  font: "600 12px var(--bk-font-ui)",
-  color: "#fff",
-  background: "var(--bk-accent)",
-  border: "none",
-  borderRadius: 6,
-  cursor: "pointer",
-};
-
-const listStyles: React.CSSProperties = {
-  listStyle: "none",
-  padding: 0,
-  margin: 0,
-  display: "flex",
-  flexDirection: "column",
-  gap: 6,
-};
-
-const rowStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-  gap: 12,
-  padding: "8px 10px",
-  background: "var(--bk-bg-subtle)",
-  border: "1px solid var(--bk-border-medium)",
-  borderRadius: 6,
-};
-
-const pathColStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: 8,
-  minWidth: 0,
-  flex: 1,
-};
-
-const fromColStyles: React.CSSProperties = {
-  fontFamily: "var(--bk-font-mono)",
-  fontSize: 11,
-  color: "var(--bk-ink)",
-  whiteSpace: "nowrap",
-  overflow: "hidden",
-  textOverflow: "ellipsis",
-};
-
-const arrowStyles: React.CSSProperties = {
-  fontFamily: "var(--bk-font-mono)",
-  fontSize: 11,
-  color: "var(--bk-ink-muted)",
-};
-
-const toColStyles: React.CSSProperties = {
-  fontFamily: "var(--bk-font-mono)",
-  fontSize: 11,
-  color: "var(--bk-ink-soft)",
-  whiteSpace: "nowrap",
-  overflow: "hidden",
-  textOverflow: "ellipsis",
-};
-
-const metaColStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: 8,
-  flexShrink: 0,
-};
-
-const typeBadgeStyles: React.CSSProperties = {
-  padding: "2px 6px",
-  fontFamily: "var(--bk-font-mono)",
-  fontSize: 10,
-  fontWeight: 600,
-  letterSpacing: "0.04em",
-  color: "var(--bk-ink)",
-  background: "var(--bk-bg-panel)",
-  border: "1px solid var(--bk-border-medium)",
-  borderRadius: 4,
-};
-
-const deleteBtnStyles: React.CSSProperties = {
-  padding: "4px 8px",
-  font: "500 11px var(--bk-font-ui)",
-  color: "var(--bk-ink-soft)",
-  background: "transparent",
-  border: "1px solid var(--bk-border-medium)",
-  borderRadius: 4,
-  cursor: "pointer",
-};
+const ADD_BTN = "tw:mt-2 tw:px-3.5 tw:py-2 tw:rounded-md tw:text-xs tw:font-semibold";
+const LIST = "tw:flex tw:flex-col tw:gap-1.5 tw:list-none tw:m-0 tw:p-0";
+const ROW =
+  "tw:flex tw:items-center tw:justify-between tw:gap-3 tw:px-2.5 tw:py-2 tw:rounded-md " +
+  "tw:border tw:border-[var(--bk-border-medium)] tw:bg-[var(--bk-bg-subtle)]";
+const PATH_COL = "tw:flex tw:flex-1 tw:items-center tw:gap-2 tw:min-w-0";
+const MONO_CELL =
+  "tw:whitespace-nowrap tw:overflow-hidden tw:text-ellipsis tw:text-[11px] " +
+  "tw:[font-family:var(--bk-font-mono)]";
+const TYPE_BADGE =
+  "tw:px-1.5 tw:py-0.5 tw:rounded tw:border tw:border-[var(--bk-border-medium)] " +
+  "tw:bg-[var(--bk-bg-panel)] tw:text-[10px] tw:font-semibold tw:tracking-[0.04em] " +
+  "tw:text-gray-900 tw:[font-family:var(--bk-font-mono)]";

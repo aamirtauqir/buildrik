@@ -275,3 +275,47 @@ export const LockedBtn: React.FC<
     {children}
   </Button>
 );
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Screen note classes
+//
+// Every screen under screens/ had grown its own copy of these: RedirectsScreen,
+// LocalizationScreen and HeadersScreen each declared a byte-identical
+// `errorStyles` with the same `rgba(220, 38, 38, 0.06)` fill, and three of them
+// the same `emptyStyles`. One home, and the two tinted notes use the error /
+// success tokens rather than a hand-mixed rgba per screen.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Dashed placeholder shown where a list has no rows yet. */
+export const SCREEN_EMPTY =
+  "tw:px-3.5 tw:py-3 tw:rounded-md tw:border tw:border-dashed tw:border-[var(--bk-border-medium)] " +
+  "tw:bg-[var(--bk-bg-subtle)] tw:text-xs tw:text-gray-500";
+
+/** Inline validation / load failure. */
+export const SCREEN_ERROR =
+  "tw:mt-1 tw:mb-2 tw:px-2.5 tw:py-2 tw:rounded-md tw:border tw:border-[var(--bk-error)] " +
+  "tw:bg-[var(--bk-error-tint)] tw:text-[11.5px] tw:font-medium tw:text-[var(--bk-error)]";
+
+/** Field-level hint under an input, error tone. */
+export const SCREEN_FIELD_ERROR =
+  "tw:mt-1 tw:text-[10.5px] tw:font-medium tw:text-[var(--bk-error)]";
+
+/** Confirmation that a value saved. */
+export const SCREEN_SUCCESS =
+  "tw:px-3 tw:py-2.5 tw:rounded tw:border tw:border-[var(--bk-success)] " +
+  "tw:bg-[var(--bk-success-tint)] tw:text-[11.5px] tw:font-medium tw:leading-normal " +
+  "tw:text-[var(--bk-success)]";
+
+/** Neutral explanatory box. */
+export const SCREEN_INFO =
+  "tw:px-3 tw:py-2.5 tw:rounded tw:border tw:border-gray-200 tw:bg-[var(--bk-bg-subtle)] " +
+  "tw:text-[11.5px] tw:font-medium tw:leading-normal tw:text-gray-900";
+
+/** Accent-edged "saved, not live yet" banner. */
+export const SCREEN_NOTICE =
+  "tw:mb-3 tw:px-3 tw:py-2.5 tw:rounded-md tw:border tw:border-[var(--bk-border-medium)] " +
+  "tw:border-l-[3px] tw:border-l-blue-700 tw:bg-[var(--bk-bg-subtle)] tw:text-xs " +
+  "tw:leading-normal tw:text-[var(--bk-ink-soft)]";
+
+/** Paragraph of explanatory copy above a field group. */
+export const SCREEN_NOTE = "tw:mt-0 tw:mb-3 tw:text-[13px] tw:leading-normal tw:text-[var(--bk-ink-soft)]";

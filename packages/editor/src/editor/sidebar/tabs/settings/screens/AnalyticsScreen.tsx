@@ -4,7 +4,17 @@
  */
 
 import * as React from "react";
-import { Field, Input, Screen, Section, SwitchRow } from "../shared";
+import {
+  Field,
+  Input,
+  SCREEN_FIELD_ERROR,
+  SCREEN_INFO,
+  SCREEN_NOTE,
+  SCREEN_SUCCESS,
+  Screen,
+  Section,
+  SwitchRow,
+} from "../shared";
 import { EVENTS } from "../../../../../shared/constants/events";
 import type { ScreenProps } from "../types";
 
@@ -94,7 +104,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange
         </div>
       </div>
       <Section title="Google Analytics">
-        <p style={privacyNoteStyles}>
+        <p className={SCREEN_NOTE}>
           Track visitor behavior on your published site. When enabled, Google&apos;s analytics
           script is added to every page — visitors&apos; page views, clicks, and sessions are sent
           to your Google Analytics account.
@@ -117,7 +127,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange
             aria-invalid={!!gaError}
           />
           {gaError && (
-            <div id="ga-error" role="alert" style={errorHintStyles}>
+            <div id="ga-error" role="alert" className={SCREEN_FIELD_ERROR}>
               This doesn&apos;t look right. Your Google Analytics ID should start with G- followed
               by 10 characters, like G-ABCD123456.
             </div>
@@ -132,14 +142,14 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange
           }}
         />
         {gaEnabled && gaId && isValidGA && (
-          <div style={successNoteStyles}>
+          <div className={SCREEN_SUCCESS}>
             ✓ Tracking will be added to your published site automatically
           </div>
         )}
       </Section>
 
       <Section title="Meta Pixel">
-        <p style={privacyNoteStyles}>
+        <p className={SCREEN_NOTE}>
           Measure ad performance and build retargeting audiences. When enabled, Meta&apos;s
           tracking pixel is loaded on every page — visitor interactions are reported to your
           Meta Events Manager.
@@ -162,7 +172,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange
             aria-invalid={!!pixelError}
           />
           {pixelError && (
-            <div id="pixel-error" role="alert" style={errorHintStyles}>
+            <div id="pixel-error" role="alert" className={SCREEN_FIELD_ERROR}>
               Pixel IDs are 15 or 16 digits. Check your Meta Events Manager for the correct ID.
             </div>
           )}
@@ -176,14 +186,14 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange
           }}
         />
         {metaPixelEnabled && metaPixelId && isValidPixel && (
-          <div style={successNoteStyles}>
+          <div className={SCREEN_SUCCESS}>
             ✓ Tracking will be added to your published site automatically
           </div>
         )}
       </Section>
 
       <Section title="Microsoft Clarity">
-        <p style={privacyNoteStyles}>
+        <p className={SCREEN_NOTE}>
           Free heatmaps and session recordings — see exactly where visitors click and scroll.
           When enabled, Clarity&apos;s script is added to every published page.
         </p>
@@ -204,7 +214,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange
             aria-invalid={!!clarityError}
           />
           {clarityError && (
-            <div role="alert" style={errorHintStyles}>
+            <div role="alert" className={SCREEN_FIELD_ERROR}>
               A Clarity project ID is a short alphanumeric code (6–15 characters).
             </div>
           )}
@@ -218,14 +228,14 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange
           }}
         />
         {clarityEnabled && clarityId && !clarityError && (
-          <div style={successNoteStyles}>
+          <div className={SCREEN_SUCCESS}>
             ✓ Clarity will be added to your published site automatically
           </div>
         )}
       </Section>
 
       <Section title="Google Tag Manager">
-        <p style={privacyNoteStyles}>
+        <p className={SCREEN_NOTE}>
           Manage all your marketing tags and pixels from one GTM container without editing code.
           When enabled, the GTM container loads on every published page.
         </p>
@@ -246,7 +256,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange
             aria-invalid={!!gtmError}
           />
           {gtmError && (
-            <div role="alert" style={errorHintStyles}>
+            <div role="alert" className={SCREEN_FIELD_ERROR}>
               A GTM container ID looks like GTM-XXXXXXX.
             </div>
           )}
@@ -260,7 +270,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange
           }}
         />
         {gtmEnabled && gtmId && !gtmError && (
-          <div style={successNoteStyles}>
+          <div className={SCREEN_SUCCESS}>
             ✓ GTM will be added to your published site automatically
           </div>
         )}
@@ -275,44 +285,11 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange
             setHasChanges(true);
           }}
         />
-        <div style={infoNoteStyles}>
+        <div className={SCREEN_INFO}>
           Displays a banner asking visitors to accept cookies before tracking begins. Required in
           the EU (GDPR) and recommended everywhere else.
         </div>
       </Section>
     </Screen>
   );
-};
-
-const privacyNoteStyles: React.CSSProperties = {
-  margin: "0 0 12px",
-  fontSize: 13,
-  lineHeight: 1.5,
-  color: "var(--bk-ink-soft)",
-};
-
-const errorHintStyles: React.CSSProperties = {
-  marginTop: 4,
-  font: "500 10.5px var(--bk-font-ui)",
-  color: "var(--bk-error)",
-};
-
-const successNoteStyles: React.CSSProperties = {
-  padding: "10px 12px",
-  background: "rgba(22, 163, 74, 0.08)",
-  border: "1px solid rgba(22, 163, 74, 0.3)",
-  borderRadius: "var(--bk-radius-sm)",
-  font: "500 11.5px var(--bk-font-ui)",
-  color: "var(--bk-success)",
-  lineHeight: 1.5,
-};
-
-const infoNoteStyles: React.CSSProperties = {
-  padding: "10px 12px",
-  background: "var(--bk-bg-subtle)",
-  border: "1px solid var(--bk-border)",
-  borderRadius: "var(--bk-radius-sm)",
-  font: "500 11.5px var(--bk-font-ui)",
-  color: "var(--bk-ink)",
-  lineHeight: 1.5,
 };

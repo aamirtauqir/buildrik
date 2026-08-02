@@ -17,7 +17,7 @@
 
 import * as React from "react";
 import { createBuildrikApiClient } from "@/services/api-client";
-import { Field, Screen, Section, Select } from "../shared";
+import { Field, SCREEN_EMPTY, SCREEN_ERROR, Screen, Section, Select } from "../shared";
 import type { ScreenProps } from "../types";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { Button } from "@/editor/chrome-ui";
@@ -157,7 +157,7 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
     return (
       <Screen>
         <Section title="Localization">
-          <div style={emptyStyles}>Open this site from the dashboard to manage locales.</div>
+          <div className={SCREEN_EMPTY}>Open this site from the dashboard to manage locales.</div>
         </Section>
       </Screen>
     );
@@ -167,7 +167,7 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
     return (
       <Screen>
         <Section title="Localization">
-          <div style={emptyStyles}>Loading…</div>
+          <div className={SCREEN_EMPTY}>Loading…</div>
         </Section>
       </Screen>
     );
@@ -177,7 +177,7 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
     return (
       <Screen>
         <Section title="Localization">
-          <div role="alert" style={errorStyles}>{loadError}</div>
+          <div role="alert" className={SCREEN_ERROR}>{loadError}</div>
         </Section>
       </Screen>
     );
@@ -274,7 +274,7 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
           rest of the chain can be built against real data.
         </div>
         {saveError && (
-          <div role="alert" style={errorStyles}>{saveError}</div>
+          <div role="alert" className={SCREEN_ERROR}>{saveError}</div>
         )}
         <Button
           size="xs"
@@ -287,26 +287,6 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
       </Section>
     </Screen>
   );
-};
-
-const emptyStyles: React.CSSProperties = {
-  padding: "12px 14px",
-  fontSize: 12,
-  color: "var(--bk-ink-muted)",
-  background: "var(--bk-bg-subtle)",
-  border: "1px dashed var(--bk-border-medium)",
-  borderRadius: 6,
-};
-
-const errorStyles: React.CSSProperties = {
-  marginTop: 4,
-  marginBottom: 8,
-  padding: "8px 10px",
-  font: "500 11.5px var(--bk-font-ui)",
-  color: "var(--bk-error)",
-  background: "rgba(220, 38, 38, 0.06)",
-  border: "1px solid rgba(220, 38, 38, 0.25)",
-  borderRadius: 6,
 };
 
 const listStyles: React.CSSProperties = {
