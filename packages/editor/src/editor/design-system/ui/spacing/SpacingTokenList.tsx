@@ -40,6 +40,12 @@ export interface SpacingTokenListProps {
   onRowClick?: (tokenId: string) => void;
 }
 
+const MONO = "tw:[font-family:var(--bk-font-mono)]";
+/** Pill-shaped preset/reset control. */
+const PILL = "tw:px-2.5 tw:py-1 tw:rounded-[20px] tw:border tw:text-[11px]";
+/** Bare icon glyph button inside the edit drawer. */
+const ICON_BTN = "tw:p-1 tw:border-transparent tw:bg-transparent tw:text-[13px]";
+
 const PRESET_LABELS: Record<SpacingPreset, string> = {
   compact: "Compact (2px)",
   normal: "Normal (4px)",
@@ -58,17 +64,11 @@ const PresetChip: React.FC<{
     color="light"
     size="xs"
     onClick={onApply}
-    style={{
-      padding: "4px 10px",
-      borderRadius: 20,
-      border: "1px solid",
-      borderColor: isActive ? "var(--bk-accent)" : "var(--bk-border)",
-      background: isActive ? "rgba(45, 109, 255, 0.15)" : "transparent",
-      color: isActive ? "var(--bk-accent)" : "var(--bk-ink-muted)",
-      fontSize: 11,
-      fontWeight: isActive ? 600 : 500,
-      cursor: "pointer",
-    }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+    className={`${PILL} ${
+      isActive
+        ? "tw:border-blue-700 tw:bg-[var(--bk-accent-tint)] tw:text-blue-700 tw:font-semibold"
+        : "tw:border-gray-200 tw:bg-transparent tw:text-gray-500 tw:font-medium tw:hover:text-gray-900"
+    }`}
   >
     {PRESET_LABELS[preset]}
   </Button>
@@ -95,31 +95,17 @@ const ValueChip: React.FC<ValueChipProps> = ({ token, isActive, isDirty, onClick
       aria-label={`Edit spacing ${token.name} (${token.value})`}
       aria-pressed={isActive}
       onClick={onClick}
-      style={{
-        position: "relative",
-        padding: "5px 12px",
-        borderRadius: 5,
-        background: isActive ? "var(--bk-accent-tint, rgba(45,109,255,0.10))" : "var(--bk-bg-subtle)",
-        color: isActive ? "var(--bk-accent)" : "var(--bk-ink)",
-        border: isActive ? "1px solid var(--bk-accent)" : "1px solid transparent",
-        font: "500 11px var(--bk-font-mono, ui-monospace, monospace)",
-        cursor: "pointer",
-        outline: "none",
-      }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+      className={`tw:relative tw:px-3 tw:py-[5px] tw:rounded-[5px] tw:border tw:text-[11px] tw:font-medium ${MONO} ${
+        isActive
+          ? "tw:border-blue-700 tw:bg-[var(--bk-accent-tint)] tw:text-blue-700"
+          : "tw:border-transparent tw:bg-[var(--bk-bg-subtle)] tw:text-gray-900 tw:hover:bg-gray-100"
+      }`}
     >
       {display}
       {isDirty && (
         <span
           aria-label="unsaved changes"
-          style={{
-            position: "absolute",
-            top: -2,
-            right: -2,
-            width: 6,
-            height: 6,
-            borderRadius: "var(--bk-radius-full)",
-            background: "var(--bk-warning)",
-          }}
+          className="tw:absolute tw:-top-0.5 tw:-right-0.5 tw:size-1.5 tw:rounded-full tw:bg-[var(--bk-warning)]"
         />
       )}
     </Button>
@@ -147,25 +133,8 @@ const EditDrawer: React.FC<EditDrawerProps> = ({
     if (!Number.isNaN(next) && next >= 0) onChange(token.id, `${next}px`);
   };
   return (
-    <div
-      style={{
-        marginTop: 8,
-        padding: 10,
-        background: "var(--bk-bg-subtle)",
-        border: "1px solid var(--bk-border)",
-        borderRadius: 8,
-        display: "flex",
-        alignItems: "center",
-        gap: 8,
-      }}
-    >
-      <span
-        style={{
-          font: "500 11px var(--bk-font-mono, ui-monospace, monospace)",
-          color: "var(--bk-ink)",
-          flex: 1,
-        }}
-      >
+    <div className="tw:flex tw:items-center tw:gap-2 tw:mt-2 tw:p-2.5 tw:rounded-lg tw:border tw:border-gray-200 tw:bg-[var(--bk-bg-subtle)]">
+      <span className={`tw:flex-1 tw:text-[11px] tw:font-medium tw:text-gray-900 ${MONO}`}>
         {token.name}
       </span>
       <TextInput
@@ -177,22 +146,13 @@ const EditDrawer: React.FC<EditDrawerProps> = ({
         step={1}
         onChange={handleChange}
         autoFocus
-        style={{
-          width: 60,
-          padding: "4px 6px",
-          background: "var(--bk-bg-card)",
-          border: "1px solid var(--bk-border)",
-          borderRadius: 4,
-          color: "var(--bk-ink)",
-          font: "500 11px var(--bk-font-mono, ui-monospace, monospace)",
-          textAlign: "right",
-        }}
+        className="tw:w-15 tw:[&_input]:h-6 tw:[&_input]:py-1 tw:[&_input]:px-1.5 tw:[&_input]:text-right tw:[&_input]:text-[11px] tw:[&_input]:font-medium tw:[&_input]:[font-family:var(--bk-font-mono)]"
       />
-      <span style={{ fontSize: 11, color: "var(--bk-ink-muted)" }}>px</span>
+      <span className="tw:text-[11px] tw:text-gray-500">px</span>
       {num === 0 && (
         <span
           title="Zero spacing will collapse layout gaps"
-          style={{ color: "var(--bk-warning)", fontSize: 12 }}
+          className="tw:text-xs tw:text-[var(--bk-warning)]"
           aria-label="zero-spacing warning"
         >
           ⚠
@@ -206,7 +166,7 @@ const EditDrawer: React.FC<EditDrawerProps> = ({
           onClick={() => onUndo(token.id)}
           title="Undo"
           aria-label={`Undo change to ${token.name}`}
-          style={iconBtnStyle("var(--bk-warning)")} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+          className={`${ICON_BTN} tw:text-[var(--bk-warning)]`}
         >
           ↩
         </Button>
@@ -219,7 +179,7 @@ const EditDrawer: React.FC<EditDrawerProps> = ({
           onClick={() => onRedo(token.id)}
           title="Redo"
           aria-label={`Redo change to ${token.name}`}
-          style={iconBtnStyle("var(--bk-accent)")} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+          className={`${ICON_BTN} tw:text-blue-700`}
         >
           ↪
         </Button>
@@ -230,31 +190,13 @@ const EditDrawer: React.FC<EditDrawerProps> = ({
         size="xs"
         onClick={onClose}
         aria-label="Close edit drawer"
-        style={{
-          background: "none",
-          border: "none",
-          padding: 4,
-          cursor: "pointer",
-          color: "var(--bk-ink-muted)",
-          fontSize: 13,
-        }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+        className={`${ICON_BTN} tw:text-gray-500 tw:hover:text-gray-900`}
       >
         ×
       </Button>
     </div>
   );
 };
-
-function iconBtnStyle(color: string): React.CSSProperties {
-  return {
-    background: "none",
-    border: "none",
-    padding: 4,
-    cursor: "pointer",
-    color,
-    fontSize: 13,
-  };
-}
 
 // ─── SpacingTokenList ─────────────────────────────────────────────────────────
 
@@ -282,9 +224,9 @@ export const SpacingTokenList: React.FC<SpacingTokenListProps> = ({
   // a savedTokens reference, which the parent passes via the dirty banner.
 
   return (
-    <div style={{ display: "flex", flexDirection: "column" }}>
+    <div className="tw:flex tw:flex-col">
       {/* Preset chips + Reset defaults */}
-      <div style={{ display: "flex", gap: 6, marginBottom: 12, alignItems: "center" }}>
+      <div className="tw:flex tw:items-center tw:gap-1.5 tw:mb-3">
         {(["compact", "normal", "spacious"] as SpacingPreset[]).map((p) => (
           <PresetChip
             key={p}
@@ -299,16 +241,7 @@ export const SpacingTokenList: React.FC<SpacingTokenListProps> = ({
           size="xs"
           onClick={onResetToDefaults}
           title="Reset all spacing to factory defaults"
-          style={{
-            padding: "4px 10px",
-            background: "transparent",
-            border: "1px solid var(--bk-border)",
-            borderRadius: 20,
-            color: "var(--bk-ink-muted)",
-            fontSize: 11,
-            cursor: "pointer",
-            marginLeft: "auto",
-          }}
+          className={`${PILL} tw:ml-auto tw:border-gray-200 tw:bg-transparent tw:text-gray-500 tw:hover:text-gray-900`}
         >
           Reset defaults
         </Button>
@@ -316,19 +249,8 @@ export const SpacingTokenList: React.FC<SpacingTokenListProps> = ({
 
       {/* Preset change warning banner */}
       {activePreset !== savedPreset && isDirty && (
-        <div
-          style={{
-            margin: "0 0 10px",
-            padding: "8px 10px",
-            background: "rgba(245,158,11,0.08)",
-            border: "1px solid rgba(245,158,11,0.2)",
-            borderRadius: 7,
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-          }}
-        >
-          <span style={{ fontSize: 12, color: "rgba(245,158,11,0.9)", lineHeight: 1.5 }}>
+        <div className="tw:flex tw:items-center tw:gap-1.5 tw:mb-2.5 tw:px-2.5 tw:py-2 tw:rounded-[7px] tw:border tw:border-[var(--bk-warning-text)] tw:bg-[var(--bk-warning-tint)]">
+          <span className="tw:text-xs tw:leading-normal tw:text-[var(--bk-warning)]">
             ⚠ {tokens.length} spacing tokens updated. Review before applying.
           </span>
         </div>
@@ -337,32 +259,13 @@ export const SpacingTokenList: React.FC<SpacingTokenListProps> = ({
       {/* Mono mini metadata header — wrapped with chip grid + drawer in a
        * maxWidth column so the whole composition keeps prototype-sidebar
        * density even in the live editor's fullpage Design drawer. */}
-      <div style={{ maxWidth: 320 }}>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 8,
-          marginBottom: 8,
-        }}
-      >
-        <span
-          style={{
-            font: "600 10px var(--bk-font-mono, ui-monospace, monospace)",
-            color: "var(--bk-ink-muted)",
-            textTransform: "uppercase",
-            letterSpacing: "0.08em",
-          }}
-        >
+      <div className="tw:max-w-80">
+      <div className="tw:flex tw:items-center tw:gap-2 tw:mb-2">
+        <span className={`tw:text-[10px] tw:font-semibold tw:uppercase tw:tracking-[0.08em] tw:text-gray-500 ${MONO}`}>
           Scale
         </span>
-        <div style={{ flex: 1, height: 1, background: "var(--bk-border)" }} />
-        <span
-          style={{
-            font: "500 10px var(--bk-font-mono, ui-monospace, monospace)",
-            color: "var(--bk-ink-soft)",
-          }}
-        >
+        <div className="tw:flex-1 tw:h-px tw:bg-gray-200" />
+        <span className={`tw:text-[10px] tw:font-medium tw:text-[var(--bk-ink-soft)] ${MONO}`}>
           4-pt grid
         </span>
       </div>
@@ -371,18 +274,13 @@ export const SpacingTokenList: React.FC<SpacingTokenListProps> = ({
       <div
         role="list"
         aria-label="Spacing tokens"
-        style={{ display: "flex", flexWrap: "wrap", gap: 8 }}
+        className="tw:flex tw:flex-wrap tw:gap-2"
       >
         {tokens.map((t) => (
           <div
             key={t.id}
             data-token-row={t.id}
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: 3,
-            }}
+            className="tw:flex tw:flex-col tw:items-center tw:gap-[3px]"
             onContextMenu={
               onRowClick
                 ? (e) => {
@@ -405,13 +303,7 @@ export const SpacingTokenList: React.FC<SpacingTokenListProps> = ({
                 size="xs"
                 onClick={() => onRowClick(t.id)}
                 aria-label={`Open details for ${t.name}`}
-                style={{
-                  background: "transparent",
-                  border: "none",
-                  padding: 0,
-                  cursor: "pointer",
-                  display: "inline-flex",
-                }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+                className="tw:inline-flex tw:p-0 tw:border-transparent tw:bg-transparent"
               >
                 <TokenUsageChip count={usageByTokenId?.get(t.id) ?? 0} />
               </Button>
