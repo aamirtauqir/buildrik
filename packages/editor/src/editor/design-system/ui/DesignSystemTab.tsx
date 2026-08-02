@@ -64,18 +64,17 @@ import { ComponentsSection } from "./sections/ComponentsSection";
 import { ExportSection } from "./sections/ExportSection";
 // ─── Layout ───────────────────────────────────────────────────────────────────
 
-const containerStyles: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  height: "100%",
-  background: "var(--bk-bg-subtle)",
-};
-
-const sectionBodyStyles: React.CSSProperties = {
-  flex: 1,
-  overflow: "auto",
-  padding: 12,
-};
+const PANEL = "tw:relative tw:flex tw:flex-col tw:h-full tw:bg-[var(--bk-bg-subtle)]";
+const SECTION_BODY = "tw:flex-1 tw:overflow-auto tw:p-3";
+/** Header strip shared by the brand banner, the toolbar and the tablist. */
+const STRIP = "tw:flex tw:items-center tw:flex-none tw:border-b tw:border-gray-200";
+/** Square icon button in the toolbar (themes, AI). */
+const TOOL_BTN =
+  "tw:inline-flex tw:items-center tw:justify-center tw:w-7 tw:h-6 tw:p-0 tw:rounded-md " +
+  "tw:border tw:border-gray-200 tw:bg-transparent tw:text-sm tw:text-gray-500 tw:hover:bg-gray-100";
+const SECTION_TAB =
+  "tw:flex tw:items-center tw:gap-[5px] tw:h-9 tw:px-3 tw:rounded-t-md tw:rounded-b-none " +
+  "tw:border-0 tw:border-b-2 tw:bg-transparent tw:text-[13px]";
 
 // ─── Section types ────────────────────────────────────────────────────────────
 
@@ -495,7 +494,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
   const changedSectionLabels = isDirty ? ["Tokens"] : [];
 
   return (
-    <div data-ds-preview={resolvedMode} style={{ ...containerStyles, position: "relative" }}>
+    <div data-ds-preview={resolvedMode} className={PANEL}>
       <PanelHeader
         title={headerTitle}
         isPinned={isPinned}
@@ -503,7 +502,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
         onHelpClick={onHelpClick}
         onClose={onClose}
       >
-        <div aria-live="polite" aria-atomic="true" style={{ marginRight: 4 }}>
+        <div aria-live="polite" aria-atomic="true" className="tw:mr-1">
           <DraftChip state={isDirty ? "dirty" : "saved"} count={totalDirty} />
         </div>
       </PanelHeader>
@@ -513,17 +512,11 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
           lives dashboard-side and client sites sync from or override. Surface that
           relationship + a link out, instead of pretending the DS tab is the only home. */}
       <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 8,
-          padding: "8px 12px",
-          borderBottom: "1px solid var(--bk-border)",
-        }}
+        className={`${STRIP} tw:gap-2 tw:px-3 tw:py-2`}
       >
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 11, fontWeight: 600, color: "var(--bk-ink)" }}>Brand &amp; shared theme</div>
-          <div style={{ fontSize: 10, color: "var(--bk-ink-muted)", lineHeight: 1.4 }}>
+        <div className="tw:flex-1 tw:min-w-0">
+          <div className="tw:text-[11px] tw:font-semibold tw:text-gray-900">Brand &amp; shared theme</div>
+          <div className="tw:text-[10px] tw:leading-snug tw:text-gray-500">
             Everyday styling lives here. The brand syncs from your workspace shared theme.
           </div>
         </div>
@@ -532,7 +525,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
           size="xs"
           onClick={() => window.open(`${DASHBOARD_URL}/dashboard/agency/theme`, "_blank", "noopener")}
           title="Open the workspace shared theme"
-          style={{ whiteSpace: "nowrap", flexShrink: 0 }}
+          className="tw:flex-none tw:whitespace-nowrap"
         >
           Open Shared theme ↗
         </Button>
@@ -542,20 +535,11 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
           so the 320px DS panel doesn't overflow (title was wrapping under
           the action cluster). */}
       <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 6,
-          padding: "6px 12px",
-          borderBottom: "1px solid var(--bk-border)",
-          background: "var(--bk-bg-subtle)",
-          flexShrink: 0,
-          flexWrap: "wrap",
-        }}
+        className={`${STRIP} tw:flex-wrap tw:gap-1.5 tw:px-3 tw:py-1.5 tw:bg-[var(--bk-bg-subtle)]`}
       >
         <DSModeToggle />
         {composer && composer.colorMode ? <ColorModeToggle composer={composer} /> : null}
-        <span style={{ flex: 1 }} />
+        <span className="tw:flex-1" />
         {/* Browse themes — re-opens StarterGalleryModal after the 2026-05-22
             D3 onboarding fix hid the auto-open. StarterGalleryMount in
             StudioPanels subscribes to EVENTS.UI_OPEN_STARTERS. */}
@@ -565,19 +549,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
           onClick={() => composer?.emit(EVENTS.UI_OPEN_STARTERS, {})}
           aria-label="Browse starter themes"
           title="Browse starter themes"
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "center",
-            width: 28,
-            height: 24,
-            background: "transparent",
-            border: "1px solid var(--bk-border)",
-            borderRadius: "var(--bk-radius-md)",
-            cursor: "pointer",
-            color: "var(--bk-ink-muted)",
-            fontSize: 14,
-          }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+          className={TOOL_BTN}
         >
           {"🎨"}
         </Button>
@@ -588,19 +560,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
           onClick={() => setAiOpen(true)}
           aria-label="Open AI assist"
           title="AI assist · component schema generate"
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "center",
-            width: 28,
-            height: 24,
-            background: "transparent",
-            border: "1px solid var(--bk-border)",
-            borderRadius: 6,
-            cursor: "pointer",
-            color: "var(--bk-ink-muted)",
-            fontSize: 14,
-          }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+          className={TOOL_BTN}
         >
           {"✨"}
         </Button>
@@ -617,14 +577,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
       <div
         role="tablist"
         aria-label="Design workspace sections"
-        style={{
-          display: "flex",
-          padding: "8px 12px 0",
-          gap: 2,
-          borderBottom: "1px solid var(--bk-border)",
-          background: "var(--bk-bg-subtle)",
-          flexShrink: 0,
-        }}
+        className={`${STRIP} tw:gap-0.5 tw:px-3 tw:pt-2 tw:bg-[var(--bk-bg-subtle)]`}
       >
         {SECTIONS.map((s) => {
           const dirtyHere =
@@ -643,34 +596,16 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
               data-section-id={s.id}
               onClick={() => handleSectionClick(s.id)}
               onKeyDown={handleSectionKeyDown}
-              style={{
-                height: 36,
-                padding: "0 12px",
-                borderRadius: "var(--bk-radius-md) var(--bk-radius-md) 0 0",
-                border: "none",
-                background: "transparent",
-                color: activeSection === s.id ? "var(--bk-ink)" : "var(--bk-ink-muted)",
-                fontSize: 13,
-                fontWeight: activeSection === s.id ? 500 : 400,
-                cursor: "pointer",
-                borderBottom:
-                  activeSection === s.id ? "2px solid var(--bk-accent)" : "2px solid transparent",
-                transition: "color 0.15s",
-                display: "flex",
-                alignItems: "center",
-                gap: 5,
-              }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+              className={`${SECTION_TAB} ${
+                selected
+                  ? "tw:border-b-blue-700 tw:font-medium tw:text-gray-900"
+                  : "tw:border-b-transparent tw:font-normal tw:text-gray-500 tw:hover:text-gray-900"
+              }`}
             >
               {s.label}
               {dirtyHere && (
                 <span
-                  style={{
-                    width: 5,
-                    height: 5,
-                    borderRadius: "var(--bk-radius-full)",
-                    background: "var(--bk-warning)",
-                    flexShrink: 0,
-                  }}
+                  className="tw:size-[5px] tw:flex-none tw:rounded-full tw:bg-[var(--bk-warning)]"
                   aria-label="unsaved changes"
                 />
               )}
@@ -680,18 +615,11 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
       </div>
 
       <div
-        style={{
-          padding: "5px 12px",
-          fontSize: 12,
-          color: "var(--bk-ink-muted)",
-          background: "var(--bk-bg-subtle)",
-          borderBottom: "1px solid var(--bk-border)",
-          flexShrink: 0,
-        }}
+        className="tw:flex-none tw:px-3 tw:py-[5px] tw:border-b tw:border-gray-200 tw:bg-[var(--bk-bg-subtle)] tw:text-xs tw:text-gray-500"
       >
         Changes here apply to every page on your site
         {totalUsageCount > 0 && (
-          <span style={{ marginLeft: 6 }}>
+          <span className="tw:ml-1.5">
             · {totalUsageCount} token binding{totalUsageCount === 1 ? "" : "s"} in use
           </span>
         )}
@@ -707,19 +635,11 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
           role="tabpanel"
           id={`design-tabpanel-${activeSection}`}
           aria-labelledby={`design-tab-${activeSection}`}
-          style={sectionBodyStyles}
+          className={SECTION_BODY}
         >
           {isFirstLoad && activeSection === "tokens" && (
-            <div
-              style={{
-                margin: "10px 10px 0",
-                padding: "8px 12px",
-                background: "var(--bk-accent-tint, rgba(45,109,255,0.07))",
-                border: "1px solid var(--bk-accent-tint, rgba(45,109,255,0.2))",
-                borderRadius: 8,
-              }}
-            >
-              <span style={{ fontSize: 12, color: "var(--bk-ink)", lineHeight: 1.6 }}>
+            <div className="tw:mx-2.5 tw:mt-2.5 tw:px-3 tw:py-2 tw:rounded-lg tw:border tw:border-[var(--bk-accent-tint)] tw:bg-[var(--bk-accent-tint)]">
+              <span className="tw:text-xs tw:leading-relaxed tw:text-gray-900">
                 These are your site's default design tokens. Customize them and click{" "}
                 <strong>Review &amp; Apply</strong> to go live.
               </span>
