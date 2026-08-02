@@ -58,34 +58,35 @@ const MobileIcon: React.FC = () => (
 
 // ─── Style toggle (B / I) ─────────────────────────────────────────────────────
 
+/* Five `rgba(255,255,255,0.0x)` values in this file were dark-theme leftovers:
+   white at 3-5% opacity on a white panel is nothing at all, so the type-scale
+   and font rows had no visible separator and two controls had no visible fill.
+   Real tokens now. */
+const ROW = "tw:flex tw:items-center tw:gap-2 tw:py-2 tw:border-b tw:border-gray-200";
+const ROW_NAME = "tw:text-xs tw:font-medium tw:text-gray-900";
+const ROW_ID = "tw:text-xs tw:text-gray-500 tw:mt-px";
+const MUTED = "tw:text-xs tw:text-gray-500 tw:flex-none";
+const MODE_BTN = "tw:flex tw:items-center tw:gap-1.5 tw:px-2.5 tw:py-1.5 tw:text-xs";
+
 const StyleToggle: React.FC<{
   label: string;
   active: boolean;
   onToggle: () => void;
-  fontStyle?: React.CSSProperties;
-}> = ({ label, active, onToggle, fontStyle }) => (
+  /** How the letter itself is drawn — B is bold, I is italic. Static per
+   *  button, not derived from the token. */
+  labelClass?: string;
+}> = ({ label, active, onToggle, labelClass }) => (
   <Button
     color="light"
     size="xs"
     onClick={onToggle}
     aria-pressed={active}
-    style={{
-      width: 24,
-      height: 24,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      borderRadius: 4,
-      border: "1px solid",
-      borderColor: active ? "var(--bk-accent)" : "var(--bk-border)",
-      background: active ? "rgba(45, 109, 255, 0.15)" : "transparent",
-      color: active ? "var(--bk-accent)" : "var(--bk-ink-muted)",
-      fontSize: 12,
-      fontWeight: 700,
-      cursor: "pointer",
-      ...fontStyle,
-    }}
-    title={`Toggle ${label}`} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+    className={`${labelClass ?? ""} tw:size-6 tw:flex tw:items-center tw:justify-center tw:rounded tw:text-xs tw:font-bold tw:border ${
+      active
+        ? "tw:border-blue-700 tw:bg-[var(--bk-accent-tint)] tw:text-blue-700"
+        : "tw:border-gray-200 tw:bg-transparent tw:text-gray-500"
+    }`}
+    title={`Toggle ${label}`}
   >
     {label}
   </Button>
@@ -140,13 +141,7 @@ const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
 
   return (
     <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 8,
-        padding: "8px 0",
-        borderBottom: "1px solid rgba(255,255,255,0.04)",
-      }}
+      className={ROW}
     >
       {/* Semantic label */}
       <div
@@ -163,12 +158,10 @@ const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
               }
             : undefined
         }
-        style={{ width: 64, flexShrink: 0, cursor: onRowClick ? "pointer" : undefined }}
+        className={`tw:w-16 tw:flex-none ${onRowClick ? "tw:cursor-pointer" : ""}`}
       >
-        <div style={{ fontSize: 12, fontWeight: 500, color: "var(--bk-ink)" }}>
-          {info?.semantic ?? token.name}
-        </div>
-        <div style={{ fontSize: 12, color: "var(--bk-ink-muted)", marginTop: 1 }}>{token.id}</div>
+        <div className={ROW_NAME}>{info?.semantic ?? token.name}</div>
+        <div className={ROW_ID}>{token.id}</div>
       </div>
 
       {/* Size input */}
@@ -179,33 +172,23 @@ const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
         max={200}
         step={1}
         onChange={handleSizeInput}
-        style={{
-          width: 44,
-          padding: "4px 6px",
-          background: "rgba(255,255,255,0.05)",
-          border: "1px solid var(--bk-border)",
-          borderRadius: 4,
-          color: "var(--bk-ink)",
-          fontSize: 12,
-          textAlign: "right",
-          flexShrink: 0,
-        }}
+        className="tw:w-11 tw:text-right tw:flex-none"
       />
-      <span style={{ fontSize: 12, color: "var(--bk-ink-muted)", flexShrink: 0 }}>{unit}</span>
+      <span className={MUTED}>{unit}</span>
 
       {/* Style toggles */}
-      <div style={{ display: "flex", gap: 3 }}>
+      <div className="tw:flex tw:gap-[3px]">
         <StyleToggle
           label="B"
           active={bold}
           onToggle={() => setBold((v) => !v)}
-          fontStyle={{ fontWeight: 800 }}
+          labelClass="tw:font-extrabold"
         />
         <StyleToggle
           label="I"
           active={italic}
           onToggle={() => setItalic((v) => !v)}
-          fontStyle={{ fontStyle: "italic" }}
+          labelClass="tw:italic"
         />
       </div>
 
@@ -230,7 +213,7 @@ const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
       {isExtreme && (
         <span
           title="Extreme font size may break layout"
-          style={{ color: "var(--bk-warning)", fontSize: 12, flexShrink: 0 }}
+          className="tw:text-[var(--bk-warning)] tw:text-xs tw:flex-none"
         >
           ⚠
         </span>
@@ -243,15 +226,7 @@ const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
           size="xs"
           onClick={() => onUndo(token.id)}
           title="Undo"
-          style={{
-            background: "none",
-            border: "none",
-            padding: 4,
-            cursor: "pointer",
-            color: "var(--bk-warning)",
-            fontSize: 13,
-            flexShrink: 0,
-          }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+          className="tw:border-transparent tw:bg-transparent tw:p-1 tw:text-[13px] tw:flex-none tw:text-[var(--bk-warning)]"
         >
           ↩
         </Button>
@@ -264,22 +239,14 @@ const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
           size="xs"
           onClick={() => onRedo(token.id)}
           title="Redo"
-          style={{
-            background: "none",
-            border: "none",
-            padding: 4,
-            cursor: "pointer",
-            color: "var(--bk-accent)",
-            fontSize: 13,
-            flexShrink: 0,
-          }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+          className="tw:border-transparent tw:bg-transparent tw:p-1 tw:text-[13px] tw:flex-none tw:text-[var(--bk-accent)]"
         >
           ↪
         </Button>
       )}
 
       {/* Usage chip */}
-      <div style={{ flexShrink: 0 }}>
+      <div className="tw:flex-none">
         <TokenUsageChip count={usageCount} />
       </div>
     </div>
@@ -321,13 +288,7 @@ const FontFamilyRow: React.FC<FontRowProps> = ({ token, onChange, usageCount, on
 
   return (
     <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 8,
-        padding: "8px 0",
-        borderBottom: "1px solid rgba(255,255,255,0.04)",
-      }}
+      className={ROW}
     >
       <div
         role={onRowClick ? "button" : undefined}
@@ -343,9 +304,9 @@ const FontFamilyRow: React.FC<FontRowProps> = ({ token, onChange, usageCount, on
               }
             : undefined
         }
-        style={{ flex: 1, cursor: onRowClick ? "pointer" : undefined }}
+        className={`tw:flex-1 ${onRowClick ? "tw:cursor-pointer" : ""}`}
       >
-        <div style={{ fontSize: 12, fontWeight: 500, color: "var(--bk-ink)" }}>
+        <div className={ROW_NAME}>
           {token.name}
         </div>
         <div
@@ -359,7 +320,7 @@ const FontFamilyRow: React.FC<FontRowProps> = ({ token, onChange, usageCount, on
           Aa Bb Cc 123
         </div>
         {fontLoadFailed && (
-          <div style={{ fontSize: 12, color: "var(--bk-warning)", marginTop: 2 }}>
+          <div className="tw:text-xs tw:text-[var(--bk-warning)] tw:mt-0.5">
             Font unavailable — may fall back to system font
           </div>
         )}
@@ -367,16 +328,7 @@ const FontFamilyRow: React.FC<FontRowProps> = ({ token, onChange, usageCount, on
       <Select
         value={token.value}
         onChange={(e) => onChange(token.id, e.target.value)}
-        style={{
-          padding: "5px 8px",
-          background: "rgba(255,255,255,0.05)",
-          border: "1px solid var(--bk-border)",
-          borderRadius: 6,
-          color: "var(--bk-ink)",
-          fontSize: 12,
-          cursor: "pointer",
-          appearance: "auto",
-        }}
+        className="tw:cursor-pointer"
       >
         {FONT_OPTIONS.map((f) => (
           <option key={f} value={f}>
@@ -385,7 +337,7 @@ const FontFamilyRow: React.FC<FontRowProps> = ({ token, onChange, usageCount, on
         ))}
         {!FONT_OPTIONS.includes(token.value) && <option value={token.value}>{token.value}</option>}
       </Select>
-      <div style={{ flexShrink: 0 }}>
+      <div className="tw:flex-none">
         <TokenUsageChip count={usageCount} />
       </div>
     </div>
@@ -419,15 +371,7 @@ const TypePreviewBand: React.FC<TypePreviewBandProps> = ({
 
   return (
     <div
-      style={{
-        padding: 12,
-        background: "rgba(255,255,255,0.03)",
-        borderRadius: 8,
-        border: "1px solid var(--bk-border)",
-        display: "flex",
-        flexDirection: "column",
-        gap: 8,
-      }}
+      className="tw:p-3 tw:bg-gray-50 tw:rounded-lg tw:border tw:border-gray-200 tw:flex tw:flex-col tw:gap-2"
     >
       <div
         style={{
@@ -462,12 +406,7 @@ const TypePreviewBand: React.FC<TypePreviewBandProps> = ({
         Body text — the quick brown fox jumps over the lazy dog.
       </div>
       <div
-        style={{
-          fontSize: 12,
-          color: "var(--bk-ink-muted)",
-          textAlign: "right",
-          letterSpacing: "0.3px",
-        }}
+        className="tw:text-xs tw:text-gray-500 tw:text-right tw:tracking-[0.3px]"
       >
         Live preview — updates as you type
       </div>
@@ -503,59 +442,37 @@ export const TypeTokenList: React.FC<TypeTokenListProps> = ({
   const sizeTokens = tokens.filter((t) => t.type === "font-size");
 
   return (
-    <div style={{ display: "flex", flexDirection: "column" }}>
+    <div className="tw:flex tw:flex-col">
       {/* Device hint */}
       <div
-        style={{ fontSize: 12, color: "var(--bk-ink-muted)", marginBottom: 6, lineHeight: 1.5 }}
+        className="tw:text-xs tw:text-gray-500 tw:mb-1.5 tw:leading-normal"
       >
         Type scale per device — changes here only affect the selected breakpoint.
       </div>
 
       {/* Responsive toggle */}
       <div
-        style={{ display: "flex", gap: 4, marginBottom: 8 }}
+        className="tw:flex tw:gap-1 tw:mb-2"
         title="Preview only — font sizes scale automatically for mobile. You cannot set separate mobile values here."
       >
         <Button
-          color="light"
           size="xs"
           onClick={() => onResponsiveModeChange("desktop")}
           title="Desktop preview"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 5,
-            padding: "5px 10px",
-            borderRadius: 6,
-            border: "1px solid",
-            borderColor: responsiveMode === "desktop" ? "var(--bk-accent)" : "var(--bk-border)",
-            background: responsiveMode === "desktop" ? "rgba(45, 109, 255, 0.12)" : "transparent",
-            color: responsiveMode === "desktop" ? "var(--bk-accent)" : "var(--bk-ink-muted)",
-            fontSize: 12,
-            cursor: "pointer",
-          }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+          aria-pressed={responsiveMode === "desktop"}
+          color={responsiveMode === "desktop" ? undefined : "light"}
+          className={MODE_BTN}
         >
           <DesktopIcon />
           Desktop preview
         </Button>
         <Button
-          color="light"
           size="xs"
           onClick={() => onResponsiveModeChange("mobile")}
           title="Mobile preview"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 5,
-            padding: "5px 10px",
-            borderRadius: 6,
-            border: "1px solid",
-            borderColor: responsiveMode === "mobile" ? "var(--bk-accent)" : "var(--bk-border)",
-            background: responsiveMode === "mobile" ? "rgba(45, 109, 255, 0.12)" : "transparent",
-            color: responsiveMode === "mobile" ? "var(--bk-accent)" : "var(--bk-ink-muted)",
-            fontSize: 12,
-            cursor: "pointer",
-          }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+          aria-pressed={responsiveMode === "mobile"}
+          color={responsiveMode === "mobile" ? undefined : "light"}
+          className={MODE_BTN}
         >
           <MobileIcon />
           Mobile preview (85%)
