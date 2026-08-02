@@ -45,170 +45,30 @@ interface ParsedState {
   errors: string[];
 }
 
-const cardStyle: React.CSSProperties = {
-  background: "var(--bk-bg-subtle)",
-  border: "1px solid var(--bk-border)",
-  borderRadius: 8,
-  padding: 12,
-};
-
-const titleStyle: React.CSSProperties = {
-  fontSize: 13,
-  fontWeight: 500,
-  marginBottom: 8,
-  color: "var(--bk-ink)",
-};
-
-const dropZoneBaseStyle: React.CSSProperties = {
-  border: "1.5px dashed var(--bk-border)",
-  borderRadius: 8,
-  padding: "32px 16px",
-  textAlign: "center",
-  cursor: "pointer",
-  background: "var(--bk-bg-subtle, transparent)",
-  color: "var(--bk-ink-soft)",
-  fontSize: 12,
-  lineHeight: 1.55,
-  transition: "border-color 120ms ease, background 120ms ease",
-};
-
-const dropZoneActiveStyle: React.CSSProperties = {
-  ...dropZoneBaseStyle,
-  borderColor: "var(--bk-accent)",
-  background: "rgba(45,109,255,0.06)",
-};
-
-const detailBlockStyle: React.CSSProperties = {
-  marginTop: 12,
-  padding: 12,
-  background: "var(--bk-bg-subtle)",
-  border: "1px solid var(--bk-border)",
-  borderRadius: 6,
-  display: "flex",
-  flexDirection: "column",
-  gap: 6,
-};
-
-const detailRowStyle: React.CSSProperties = {
-  display: "flex",
-  alignItems: "baseline",
-  justifyContent: "space-between",
-  gap: 8,
-  fontSize: 12,
-};
-
-const detailKeyStyle: React.CSSProperties = {
-  color: "var(--bk-ink-muted)",
-};
-
-const detailValueStyle: React.CSSProperties = {
-  fontFamily: "var(--bk-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace)",
-  fontSize: 11,
-  textAlign: "right",
-  color: "var(--bk-ink)",
-};
-
-const recentLabelStyle: React.CSSProperties = {
-  marginTop: 12,
-  fontFamily: "var(--bk-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace)",
-  fontSize: 10,
-  textTransform: "uppercase",
-  letterSpacing: "0.06em",
-  color: "var(--bk-ink-muted)",
-};
-
-const conflictBoxStyle: React.CSSProperties = {
-  marginTop: 12,
-  padding: 12,
-  background: "rgba(245,158,11,0.08)",
-  border: "1px solid rgba(245,158,11,0.4)",
-  borderRadius: 6,
-  display: "flex",
-  flexDirection: "column",
-  gap: 8,
-};
-
-const conflictBtnRowStyle: React.CSSProperties = {
-  display: "flex",
-  gap: 6,
-  flexWrap: "wrap",
-};
-
-const strategyBtnStyle = (selected: boolean): React.CSSProperties => ({
-  padding: "6px 10px",
-  background: selected ? "var(--bk-accent)" : "transparent",
-  color: selected ? "#fff" : "var(--bk-ink)",
-  border: `1px solid ${selected ? "var(--bk-accent)" : "var(--bk-border)"}`,
-  borderRadius: 6,
-  fontSize: 11,
-  cursor: "pointer",
-});
-
-const actionRowStyle: React.CSSProperties = {
-  marginTop: 12,
-  display: "flex",
-  gap: 8,
-  alignItems: "center",
-};
-
-const applyBtnStyle: React.CSSProperties = {
-  flex: 1,
-  padding: "8px 14px",
-  background: "var(--bk-accent)",
-  color: "#fff",
-  border: "none",
-  borderRadius: 6,
-  fontSize: 12,
-  fontWeight: 500,
-  cursor: "pointer",
-};
-
-const cancelBtnStyle: React.CSSProperties = {
-  padding: "8px 14px",
-  background: "transparent",
-  color: "var(--bk-ink)",
-  border: "1px solid var(--bk-border)",
-  borderRadius: 6,
-  fontSize: 12,
-  cursor: "pointer",
-};
-
-const errorStyle: React.CSSProperties = {
-  marginTop: 8,
-  padding: 8,
-  borderRadius: 6,
-  background: "rgba(239,68,68,0.08)",
-  border: "1px solid rgba(239,68,68,0.4)",
-  color: "var(--bk-ink)",
-  fontSize: 12,
-};
-
-const pasteAreaStyle: React.CSSProperties = {
-  width: "100%",
-  minHeight: 100,
-  marginTop: 6,
-  padding: 8,
-  background: "var(--bk-bg-subtle)",
-  color: "var(--bk-ink-soft)",
-  border: "1px solid var(--bk-border)",
-  borderRadius: 6,
-  fontFamily: "var(--bk-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace)",
-  fontSize: 11,
-  lineHeight: 1.55,
-  boxSizing: "border-box",
-  resize: "vertical",
-};
-
-const pasteSubmitStyle: React.CSSProperties = {
-  marginTop: 6,
-  padding: "5px 10px",
-  background: "transparent",
-  color: "var(--bk-ink)",
-  border: "1px solid var(--bk-border)",
-  borderRadius: 6,
-  fontSize: 11,
-  cursor: "pointer",
-};
+const CARD = "tw:bg-gray-50 tw:border tw:border-gray-200 tw:rounded-lg tw:p-3";
+const TITLE = "tw:text-[13px] tw:font-medium tw:mb-2 tw:text-gray-900";
+/* base/active supply their own border-colour and background together — never
+   two competing utilities for the same property (Row precedent). */
+const DROP_BASE =
+  "tw:border-[1.5px] tw:border-dashed tw:rounded-lg tw:px-4 tw:py-8 tw:text-center tw:cursor-pointer " +
+  "tw:text-[var(--bk-ink-soft)] tw:text-xs tw:leading-relaxed tw:[transition:var(--bk-transition-fast)]";
+const DROP_IDLE = "tw:border-gray-200 tw:bg-gray-50";
+const DROP_ACTIVE = "tw:border-blue-700 tw:bg-[var(--bk-accent-tint)]";
+const DETAIL_BLOCK =
+  "tw:mt-3 tw:p-3 tw:bg-gray-50 tw:border tw:border-gray-200 tw:rounded-md tw:flex tw:flex-col tw:gap-1.5";
+const DETAIL_ROW = "tw:flex tw:items-baseline tw:justify-between tw:gap-2 tw:text-xs";
+const DETAIL_KEY = "tw:text-gray-500";
+const DETAIL_VALUE = "tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:text-right tw:text-gray-900";
+const RECENT_LABEL =
+  "tw:mt-3 tw:[font-family:var(--bk-font-mono)] tw:text-[10px] tw:uppercase tw:tracking-[0.06em] tw:text-gray-500";
+const CONFLICT_BOX =
+  "tw:mt-3 tw:p-3 tw:bg-[var(--bk-warning-tint)] tw:border tw:border-yellow-200 tw:rounded-md tw:flex tw:flex-col tw:gap-2";
+const ERROR_BOX =
+  "tw:mt-2 tw:p-2 tw:rounded-md tw:bg-[var(--bk-error-tint)] tw:border tw:border-red-200 tw:text-gray-900 tw:text-xs";
+const PASTE_AREA =
+  "tw:w-full tw:min-h-25 tw:mt-1.5 tw:bg-gray-50 tw:[font-family:var(--bk-font-mono)] tw:text-[11px] " +
+  "tw:leading-relaxed tw:resize-y";
+const GHOST = "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900";
 
 /**
  * Cheap heuristic — peek at first ~200 chars to label the file format in the
@@ -351,8 +211,8 @@ export const ImportCard: React.FC = () => {
     : validCount;
 
   return (
-    <div style={cardStyle}>
-      <div style={titleStyle}>Import tokens</div>
+    <div className={CARD}>
+      <div className={TITLE}>Import tokens</div>
 
       {!parsed && (
         <>
@@ -361,7 +221,7 @@ export const ImportCard: React.FC = () => {
             tabIndex={0}
             aria-label="Drop tokens.json or tailwind.config.ts, or click to browse"
             data-testid="import-drop-zone"
-            style={isDragOver ? dropZoneActiveStyle : dropZoneBaseStyle}
+            className={`${DROP_BASE} ${isDragOver ? DROP_ACTIVE : DROP_IDLE}`}
             onClick={() => fileInputRef.current?.click()}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
@@ -373,17 +233,17 @@ export const ImportCard: React.FC = () => {
             onDragLeave={() => setIsDragOver(false)}
             onDrop={handleDrop}
           >
-            <div style={{ fontWeight: 500, color: "var(--bk-ink)", marginBottom: 4 }}>
+            <div className="tw:font-medium tw:text-gray-900 tw:mb-1">
               Drop tokens.json or tailwind.config.ts
             </div>
-            <div style={{ color: "var(--bk-ink-muted)" }}>
+            <div className="tw:text-gray-500">
               or click to browse
             </div>
             <TextInput
               ref={fileInputRef}
               type="file"
               accept="application/json,.json,.ts,.js"
-              style={{ display: "none" }}
+              className="tw:hidden"
               onChange={(e) => {
                 const f = e.target.files?.[0];
                 if (f) void handleFile(f);
@@ -398,17 +258,8 @@ export const ImportCard: React.FC = () => {
             color="light"
             size="xs"
             onClick={() => setShowPaste((v) => !v)}
-            style={{
-              marginTop: 8,
-              padding: 0,
-              background: "transparent",
-              border: "none",
-              color: "var(--bk-ink-muted)",
-              fontSize: 11,
-              cursor: "pointer",
-              textDecoration: "underline",
-            }}
-            aria-expanded={showPaste} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+            aria-expanded={showPaste}
+            className={`${GHOST} tw:mt-2 tw:p-0 tw:text-[11px] tw:underline`}
           >
             or paste JSON
           </Button>
@@ -416,7 +267,7 @@ export const ImportCard: React.FC = () => {
           {showPaste && (
             <div>
               <label>
-                <span style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0,0,0,0)" }}>
+                <span className="tw:sr-only">
                   Paste JSON
                 </span>
                 <Textarea
@@ -424,13 +275,15 @@ export const ImportCard: React.FC = () => {
                   value={pasteBuffer}
                   onChange={(e) => setPasteBuffer(e.target.value)}
                   placeholder='[{"id": "color-brand", "value": "#0055FF", ...}]'
-                  style={pasteAreaStyle}
+                  className={PASTE_AREA}
                 />
               </label>
               <Button
                 type="button"
                 onClick={() => ingestRaw(pasteBuffer, null)}
-                style={pasteSubmitStyle}
+                color="light"
+                size="xs"
+                className="tw:mt-1.5"
                 disabled={!pasteBuffer.trim()}
               >
                 Parse
@@ -439,7 +292,7 @@ export const ImportCard: React.FC = () => {
           )}
 
           {parseErrors.length > 0 && (
-            <div style={errorStyle} role="alert">
+            <div className={ERROR_BOX} role="alert">
               {parseErrors.map((msg, i) => <div key={i}>{msg}</div>)}
             </div>
           )}
@@ -448,35 +301,30 @@ export const ImportCard: React.FC = () => {
 
       {parsed && (
         <>
-          <div style={recentLabelStyle}>RECENT</div>
-          <div style={detailBlockStyle} data-testid="import-detail-block">
-            <div style={detailRowStyle}>
-              <span style={detailKeyStyle}>Detected</span>
-              <span style={detailValueStyle}>{parsed.detected}</span>
+          <div className={RECENT_LABEL}>RECENT</div>
+          <div className={DETAIL_BLOCK} data-testid="import-detail-block">
+            <div className={DETAIL_ROW}>
+              <span className={DETAIL_KEY}>Detected</span>
+              <span className={DETAIL_VALUE}>{parsed.detected}</span>
             </div>
-            <div style={detailRowStyle}>
-              <span style={detailKeyStyle}>Valid tokens</span>
-              <span style={{ ...detailValueStyle, color: "var(--bk-ink-muted)" }}>
+            <div className={DETAIL_ROW}>
+              <span className={DETAIL_KEY}>Valid tokens</span>
+              <span className={`${DETAIL_VALUE} tw:text-gray-500`}>
                 {parsed.tokens.length}
               </span>
             </div>
-            <div style={detailRowStyle}>
-              <span style={detailKeyStyle}>Errors</span>
-              <span style={{
-                ...detailValueStyle,
-                color: parsed.errors.length > 0 ? "var(--bk-ink-muted)" : "var(--bk-ink-muted)",
-              }}>
+            <div className={DETAIL_ROW}>
+              <span className={DETAIL_KEY}>Errors</span>
+              {/* This carried a ternary whose branches were the same colour. */}
+              <span className={`${DETAIL_VALUE} tw:text-gray-500`}>
                 {parsed.errors.length === 0
                   ? "0"
                   : `${parsed.errors.length} (${parsed.errors[0]})`}
               </span>
             </div>
-            <div style={detailRowStyle}>
-              <span style={detailKeyStyle}>Conflicts</span>
-              <span style={{
-                ...detailValueStyle,
-                color: conflictCount > 0 ? "var(--bk-ink-muted)" : "var(--bk-ink-muted)",
-              }}>
+            <div className={DETAIL_ROW}>
+              <span className={DETAIL_KEY}>Conflicts</span>
+              <span className={`${DETAIL_VALUE} tw:text-gray-500`}>
                 {conflictCount === 0
                   ? "0"
                   : `${conflictCount} ID collisions`}
@@ -485,41 +333,38 @@ export const ImportCard: React.FC = () => {
           </div>
 
           {conflictCount > 0 && (
-            <div style={conflictBoxStyle} data-testid="import-resolve-box">
-              <div style={{ fontSize: 12, fontWeight: 500, color: "var(--bk-ink)" }}>
+            <div className={CONFLICT_BOX} data-testid="import-resolve-box">
+              <div className="tw:text-xs tw:font-medium tw:text-gray-900">
                 Resolve conflicts
               </div>
-              <div style={{ fontSize: 11, color: "var(--bk-ink-muted)" }}>
+              <div className="tw:text-[11px] tw:text-gray-500">
                 {conflictCount} tokens already exist with the same ID. Choose how to handle them:
               </div>
-              <div style={conflictBtnRowStyle}>
+              <div className="tw:flex tw:gap-1.5 tw:flex-wrap">
                 <Button
                   type="button"
-                  color="light"
                   size="xs"
-                  onClick={() => setStrategy("replace")}
-                  style={strategyBtnStyle(strategy === "replace")}
+                  color={strategy === "replace" ? undefined : "light"}
                   aria-pressed={strategy === "replace"}
+                  onClick={() => setStrategy("replace")}
                 >
                   Replace
                 </Button>
                 <Button
                   type="button"
-                  color="light"
                   size="xs"
-                  onClick={() => setStrategy("keep-mine")}
-                  style={strategyBtnStyle(strategy === "keep-mine")}
+                  color={strategy === "keep-mine" ? undefined : "light"}
                   aria-pressed={strategy === "keep-mine"}
+                  onClick={() => setStrategy("keep-mine")}
                 >
                   Merge · keep mine
                 </Button>
                 <Button
                   type="button"
-                  color="light"
                   size="xs"
-                  onClick={() => setStrategy("keep-theirs")}
-                  style={strategyBtnStyle(strategy === "keep-theirs")}
+                  color={strategy === "keep-theirs" ? undefined : "light"}
                   aria-pressed={strategy === "keep-theirs"}
+                  onClick={() => setStrategy("keep-theirs")}
                 >
                   Merge · keep theirs
                 </Button>
@@ -527,11 +372,11 @@ export const ImportCard: React.FC = () => {
             </div>
           )}
 
-          <div style={actionRowStyle}>
+          <div className="tw:mt-3 tw:flex tw:gap-2 tw:items-center">
             <Button
               type="button"
               onClick={handleApply}
-              style={applyBtnStyle}
+              className="tw:flex-1"
               disabled={applyCount === 0}
             >
               Apply {applyCount} valid only
@@ -540,7 +385,6 @@ export const ImportCard: React.FC = () => {
               type="button"
               color="light"
               onClick={handleCancel}
-              style={cancelBtnStyle}
             >
               Cancel
             </Button>
