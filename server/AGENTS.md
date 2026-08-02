@@ -15,7 +15,7 @@ Owns all business logic and DB access for the dashboard app. Does NOT own: UI (p
 - Flow: Page → tRPC mutation → Router → Service → Prisma/External API. Routers never touch Prisma. Services never import from routers or components.
 - Services throw domain errors (`AuthError` etc.); routers catch and translate to `TRPCError`. Never swallow errors.
 - Input validation: import Zod schemas from `packages/shared/schemas/` — never redefine inline.
-- External clients (Resend, Stripe, Anthropic, Vercel) are lazy-initialized inside a getter; module-level instantiation is banned.
+- External clients (Nodemailer/SMTP, Stripe, OpenAI, Anthropic, Vercel) are lazy-initialized inside a getter; module-level instantiation is banned. (This line said "Resend" until 2026-08-03 — email has been Nodemailer over SMTP; `resend` is not a dependency and nothing reads `RESEND_API_KEY`.)
 - Tokens at rest (Vercel OAuth, future integrations) are AES-256-GCM encrypted via `ENCRYPTION_KEY` — see `vercel-oauth.service.ts` for the canonical pattern.
 - Outbound webhook URLs must pass the SSRF guard (see integrations service) before any fetch.
 - Raw SQL (`$queryRaw`) must use the **physical** table name from `@@map` in the Prisma schema, not the model name.

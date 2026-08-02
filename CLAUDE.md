@@ -9,7 +9,7 @@ Next.js 16 (App Router, Turbopack) | React 19 | Tailwind CSS 4 | tRPC 11 | NextA
 ```
 packages/
   dashboard/          → Next.js app (pages, components, emails)
-  editor/             → Vite editor app (untouched source)
+  editor/             → Vite editor app (chrome, engine, canvas — actively developed)
   shared/             → Transport-safe contracts (API client, Zod schemas)
 server/
   auth.ts             → NextAuth init

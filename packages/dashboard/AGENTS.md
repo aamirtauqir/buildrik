@@ -75,7 +75,7 @@ screen means one of the three above was skipped.
 
 - The editor is bundled into this app via `transpilePackages` — `import.meta.env` throws inside editor source when loaded here. Use the editor's `runtimeEnv.ts` helper instead.
 - `NEXT_PUBLIC_*` vars are baked at build time into client AND server bundles; runtime env cannot override. Use `.env.production.local` for prod builds.
-- Dev has no Resend: log in by minting a `magic_link` token with the USER ID (not email) and hitting `/auth/callback`.
+- Dev usually can't send mail (SMTP creds are prod-only; email goes through Nodemailer, not Resend — that name was wrong here until 2026-08-03). Log in by minting a `magic_link` token with the USER ID (not the email) and hitting `/auth/callback`.
 
 ## Related Context
 
