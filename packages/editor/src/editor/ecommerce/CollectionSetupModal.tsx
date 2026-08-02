@@ -6,7 +6,7 @@
 
 import { ShoppingBag, Package, Check } from "lucide-react";
 import * as React from "react";
-import { ModalClose, ModalContent, ModalRoot, ModalTitle, Button, Checkbox } from "@/editor/chrome-ui";
+import { Button, Checkbox, ModalBody, ModalClose, ModalContent, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
 import { useState } from "react";
 
 export interface CollectionSetupModalProps {
@@ -66,7 +66,7 @@ export const CollectionSetupModal: React.FC<CollectionSetupModalProps> = ({
             <path d="M18 6L6 18M6 6l12 12" />
           </svg>
         </ModalClose>
-        <div className="bd-modal__body">
+        <ModalBody>
     <div style={containerStyles}>
       <div style={iconContainerStyles}>
         <ShoppingBag size={48} style={{ color: "var(--bk-accent)" }} />
@@ -118,7 +118,7 @@ export const CollectionSetupModal: React.FC<CollectionSetupModalProps> = ({
         {isCreating ? "Creating..." : "Create Collection"}
       </Button>
     </div>
-        </div>
+        </ModalBody>
       </ModalContent>
     </ModalRoot>
   );

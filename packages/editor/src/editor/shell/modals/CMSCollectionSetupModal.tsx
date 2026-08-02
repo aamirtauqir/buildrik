@@ -11,7 +11,7 @@
 
 import { X, Plus, Trash2, Check } from "lucide-react";
 import * as React from "react";
-import { ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Button, Select, Textarea, TextInput } from "@/editor/chrome-ui";
+import { Button, ModalBody, ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Select, TextInput, Textarea } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
 // =============================================================================
 // TYPES
@@ -242,7 +242,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
             <path d="M18 6L6 18M6 6l12 12" />
           </svg>
         </ModalClose>
-        <div className="bd-modal__body">
+        <ModalBody>
     {/* Step indicator */}
     <div className={STEP_BAR}>
       <div className={STEP}>
@@ -416,7 +416,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
         )}
       </div>
     )}
-        </div>
+        </ModalBody>
         <ModalFooter>{footer}</ModalFooter>
       </ModalContent>
     </ModalRoot>

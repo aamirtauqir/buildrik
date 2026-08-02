@@ -12,7 +12,7 @@
  */
 
 import * as React from "react";
-import { ModalContent as VibcoderModalContent, ModalRoot, ModalTitle, Button } from "@/editor/chrome-ui";
+import { Button, ModalBody, ModalContent as VibcoderModalContent, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
 import { ROW_MD } from "@shared/constants/layout";
 // Phase 5 escape: Radix.Dialog.Content props (onOpenAutoFocus) are hidden
 // from vibcoder's public ModalContentProps per Contract E2 (no Radix types
@@ -56,7 +56,7 @@ export const UnsavedWarningModal: React.FC<Props> = ({
           }
         }}
       >
-        <div className="bd-modal__body">
+        <ModalBody>
           <div className="tw:flex tw:flex-col tw:gap-1">
             {/* Title */}
             <ModalTitle
@@ -111,7 +111,7 @@ export const UnsavedWarningModal: React.FC<Props> = ({
               </Button>
             </div>
           </div>
-        </div>
+        </ModalBody>
       </ModalContent>
     </ModalRoot>
   );

@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, useToast, Button, Checkbox, Textarea, TextInput } from "@/editor/chrome-ui";
+import { Button, Checkbox, ModalBody, ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, TextInput, Textarea, useToast } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
 
 export interface CreateComponentModalProps {
@@ -131,7 +131,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
             <path d="M18 6L6 18M6 6l12 12" />
           </svg>
         </ModalClose>
-        <div className="bd-modal__body">
+        <ModalBody>
     <div className="tw:flex tw:flex-col tw:gap-4" onKeyDown={handleKeyPress}>
       <div>
         <label style={labelStyles}>
@@ -240,7 +240,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
         </small>
       </div>
     </div>
-        </div>
+        </ModalBody>
         <ModalFooter>
           <Button color="light" onClick={onClose} disabled={isCreating} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
             Cancel

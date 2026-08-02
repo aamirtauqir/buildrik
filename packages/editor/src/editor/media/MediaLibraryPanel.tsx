@@ -10,7 +10,7 @@ import * as React from "react";
 import type { Composer } from "../../engine";
 import { InputField, FileField } from "../../shared/forms";
 import type { MediaAsset, MediaAssetType, MediaViewMode } from "../../shared/types/media";
-import { ConfirmDialog, ModalClose, ModalContent, ModalRoot, ModalTitle, Spinner, Tabs, Button } from "@/editor/chrome-ui";
+import { Button, ConfirmDialog, ModalBody, ModalClose, ModalContent, ModalRoot, ModalTitle, Spinner, Tabs } from "@/editor/chrome-ui";
 import { useMediaManager } from "../shell/hooks";
 import { AssetCard } from "./AssetCard";
 import { mediaLibraryStyles as styles } from "./MediaLibraryStyles";
@@ -131,7 +131,7 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
             <path d="M18 6L6 18M6 6l12 12" />
           </svg>
         </ModalClose>
-        <div className="bd-modal__body">
+        <ModalBody>
     <Tabs
       tabs={[
         { id: "library", label: "Library" },
@@ -299,7 +299,7 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
       confirmLabel="Delete"
       destructive
     />
-        </div>
+        </ModalBody>
       </ModalContent>
     </ModalRoot>
   );

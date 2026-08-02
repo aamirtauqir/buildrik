@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { Kbd, ModalClose, ModalContent, ModalRoot, ModalTitle, Button } from "@/editor/chrome-ui";
+import { Button, Kbd, ModalBody, ModalClose, ModalContent, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
 
 export interface DeleteConfirmModalProps {
   isOpen: boolean;
@@ -36,7 +36,7 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
           <path d="M18 6L6 18M6 6l12 12" />
         </svg>
       </ModalClose>
-      <div className="bd-modal__body">
+      <ModalBody>
         <div style={{ padding: "var(--bk-space-16)" }}>
     <p
       role="alert"
@@ -81,7 +81,7 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
       </Button>
     </div>
   </div>
-      </div>
+      </ModalBody>
     </ModalContent>
   </ModalRoot>
 );

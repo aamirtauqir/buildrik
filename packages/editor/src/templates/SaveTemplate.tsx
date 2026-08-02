@@ -5,7 +5,7 @@
 
 import * as React from "react";
 import { InputField, TextareaField, SelectField } from "../shared/forms";
-import { ModalClose, ModalContent, ModalRoot, ModalTitle, Button } from "@/editor/chrome-ui";
+import { Button, ModalBody, ModalClose, ModalContent, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
 
 export interface SaveTemplateProps {
   isOpen: boolean;
@@ -48,7 +48,7 @@ export const SaveTemplate: React.FC<SaveTemplateProps> = ({
             <path d="M18 6L6 18M6 6l12 12" />
           </svg>
         </ModalClose>
-        <div className="bd-modal__body">
+        <ModalBody>
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <InputField
         label="Template Name"
@@ -95,7 +95,7 @@ export const SaveTemplate: React.FC<SaveTemplateProps> = ({
         Save Template
       </Button>
     </div>
-        </div>
+        </ModalBody>
       </ModalContent>
     </ModalRoot>
   );

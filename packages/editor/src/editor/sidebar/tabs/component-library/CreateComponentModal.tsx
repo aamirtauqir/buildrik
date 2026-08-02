@@ -17,7 +17,7 @@
 // right-click, the shell one is the lightweight sidebar header variant.
 
 import * as React from "react";
-import { ModalClose, ModalContent, ModalRoot, ModalTitle, Button, Checkbox, Select, TextInput } from "@/editor/chrome-ui";
+import { Button, Checkbox, ModalBody, ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Select, TextInput } from "@/editor/chrome-ui";
 import {
   dialogCancelBtnStyles,
   dialogInputStyles,
@@ -102,7 +102,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
             <path d="M18 6L6 18M6 6l12 12" />
           </svg>
         </ModalClose>
-        <div className="bd-modal__body">
+        <ModalBody>
           <div className="tw:flex tw:flex-col tw:gap-3">
             <div className="tw:flex tw:flex-col tw:gap-1">
               <label htmlFor="create-component-name" style={labelStyle}>
@@ -157,8 +157,8 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
               </div>
             )}
           </div>
-        </div>
-        <div className="bd-modal__foot">
+        </ModalBody>
+        <ModalFooter>
           <Button onClick={onClose} style={dialogCancelBtnStyles}>
             Cancel
           </Button>
@@ -173,7 +173,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
           >
             Save component
           </Button>
-        </div>
+        </ModalFooter>
       </ModalContent>
     </ModalRoot>
   );

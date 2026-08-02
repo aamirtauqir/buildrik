@@ -13,7 +13,7 @@ import * as React from "react";
 import { Plus, Trash2, Pencil } from "lucide-react";
 import type { Composer } from "../../../engine";
 import type { CMSCollection, CMSContentItem, CMSField } from "../../../shared/types/cms";
-import { ModalClose, ModalContent, ModalRoot, ModalTitle, Button, Checkbox, Select, Textarea, TextInput } from "@/editor/chrome-ui";
+import { Button, Checkbox, ModalBody, ModalClose, ModalContent, ModalRoot, ModalTitle, Select, TextInput, Textarea } from "@/editor/chrome-ui";
 
 export interface CMSRecordsModalProps {
   composer: Composer | null;
@@ -188,7 +188,7 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
             <path d="M18 6L6 18M6 6l12 12" />
           </svg>
         </ModalClose>
-        <div className="bd-modal__body" style={{ minHeight: "20rem" }}>
+        <ModalBody className="tw:min-h-80">
           {collections.length === 0 ? (
             <p style={{ color: "var(--bk-ink-soft)" }}>
               No collections yet. Create one from an element&apos;s CMS binding first.
@@ -295,7 +295,7 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
               )}
             </>
           )}
-        </div>
+        </ModalBody>
       </ModalContent>
     </ModalRoot>
   );

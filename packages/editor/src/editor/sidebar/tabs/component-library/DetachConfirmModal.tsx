@@ -10,7 +10,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { ModalClose, ModalContent, ModalRoot, ModalTitle, Button } from "@/editor/chrome-ui";
+import { Button, ModalBody, ModalClose, ModalContent, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
 
 export interface DetachConfirmModalProps {
   /** Label for the instance being detached, e.g. "#3". */
@@ -114,7 +114,7 @@ export function DetachConfirmModal({
             <path d="M18 6L6 18M6 6l12 12" />
           </svg>
         </ModalClose>
-        <div className="bd-modal__body">
+        <ModalBody>
           <p style={metaStyle}>
             Master: {masterName} &middot; {instancesLabel} total
           </p>
@@ -139,7 +139,7 @@ export function DetachConfirmModal({
               Detach
             </Button>
           </div>
-        </div>
+        </ModalBody>
       </ModalContent>
     </ModalRoot>
   );

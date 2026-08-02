@@ -6,7 +6,7 @@
  */
 
 import * as React from "react";
-import { ModalClose, ModalContent, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
+import { ModalBody, ModalClose, ModalContent, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
 import { GROUPED_TABS_CONFIG } from "../rail/tabsConfig";
 
 // =============================================================================
@@ -111,7 +111,7 @@ export const KeyboardShortcutsPanel: React.FC<KeyboardShortcutsPanelProps> = ({
             <path d="M18 6L6 18M6 6l12 12" />
           </svg>
         </ModalClose>
-        <div className="bd-modal__body">
+        <ModalBody>
     <div
       style={{
         display: "grid",
@@ -186,7 +186,7 @@ export const KeyboardShortcutsPanel: React.FC<KeyboardShortcutsPanelProps> = ({
     >
       On Mac, use ⌘ Command instead of Ctrl
     </div>
-        </div>
+        </ModalBody>
       </ModalContent>
     </ModalRoot>
   );

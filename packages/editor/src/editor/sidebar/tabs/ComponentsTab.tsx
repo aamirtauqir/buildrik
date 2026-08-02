@@ -10,7 +10,7 @@
 
 import { ChevronDown, Layers, Plus } from "lucide-react";
 import * as React from "react";
-import { ConfirmDialog, EmptyState, EmptyStateDesc, EmptyStateTitle, ModalClose, ModalContent, ModalRoot, ModalTitle, PanelFrame, useToast, SkeletonListItem, Button, TextInput } from "@/editor/chrome-ui";
+import { Button, ConfirmDialog, EmptyState, EmptyStateDesc, EmptyStateTitle, ModalBody, ModalClose, ModalContent, ModalRoot, ModalTitle, PanelFrame, SkeletonListItem, TextInput, useToast } from "@/editor/chrome-ui";
 import { PanelErrorState } from "../shared/PanelErrorState";
 import { SearchBar } from "../shared/SearchBar";
 import { ComponentDetailScreen } from "./component-library/ComponentDetailScreen";
@@ -375,7 +375,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
               <path d="M18 6L6 18M6 6l12 12" />
             </svg>
           </ModalClose>
-          <div className="bd-modal__body">
+          <ModalBody>
             <div className="tw:flex tw:flex-col tw:gap-3">
               <TextInput
                 type="text"
@@ -396,7 +396,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
                 </Button>
               </div>
             </div>
-          </div>
+          </ModalBody>
         </ModalContent>
       </ModalRoot>
       <ModalRoot open={!!state.variantPicker} onOpenChange={(next) => !next && state.setVariantPicker(null)}>
@@ -407,7 +407,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
               <path d="M18 6L6 18M6 6l12 12" />
             </svg>
           </ModalClose>
-          <div className="bd-modal__body">
+          <ModalBody>
             <div className="tw:flex tw:flex-col tw:gap-2">
               {state.variantPicker?.variants.map((v) => {
                 const isCurrent = v.id === state.variantPicker?.currentVariantId;
@@ -438,7 +438,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
                 );
               })}
             </div>
-          </div>
+          </ModalBody>
         </ModalContent>
       </ModalRoot>
     </PanelFrame>

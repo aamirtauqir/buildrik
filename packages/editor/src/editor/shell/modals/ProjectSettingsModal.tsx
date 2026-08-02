@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, useToast, Button, Checkbox, TextInput } from "@/editor/chrome-ui";
+import { Button, Checkbox, ModalBody, ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, TextInput, useToast } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
 import { devError } from "../../../shared/utils/devLogger";
 
@@ -96,7 +96,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
             <path d="M18 6L6 18M6 6l12 12" />
           </svg>
         </ModalClose>
-        <div className="bd-modal__body">
+        <ModalBody>
     <div style={containerStyles}>
       {/* Tabs */}
       <div style={tabBarStyles}>
@@ -188,7 +188,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
         )}
       </div>
     </div>
-        </div>
+        </ModalBody>
         <ModalFooter>
           <Button color="light" onClick={onClose} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
             Cancel

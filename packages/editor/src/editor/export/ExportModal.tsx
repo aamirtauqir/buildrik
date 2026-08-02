@@ -10,7 +10,7 @@ import { ExportEngine } from "../../engine/export";
 import { ReactExporter } from "../../engine/export/ReactExporter";
 import type { ExportConfig, ExportResult, PreviewDevice } from "../../shared/types/export";
 import { DEFAULT_EXPORT_CONFIG, PREVIEW_DEVICES } from "../../shared/types/export";
-import { ModalClose, ModalContent, ModalRoot, ModalTitle, Spinner, Tabs, Button } from "@/editor/chrome-ui";
+import { Button, ModalBody, ModalClose, ModalContent, ModalRoot, ModalTitle, Spinner, Tabs } from "@/editor/chrome-ui";
 import { devError } from "../../shared/utils/devLogger";
 import { CodePreview } from "./CodePreview";
 import { FormatGrid, OptionsPanel } from "./ExportOptions";
@@ -153,7 +153,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
             <path d="M18 6L6 18M6 6l12 12" />
           </svg>
         </ModalClose>
-        <div className="bd-modal__body">
+        <ModalBody>
         {/* Format grid — always visible at top */}
         <div style={{ marginBottom: 20 }}>
           <FormatGrid
@@ -300,7 +300,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
             )}
           </div>
         </div>
-        </div>
+        </ModalBody>
       </ModalContent>
     </ModalRoot>
   );

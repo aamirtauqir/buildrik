@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { ModalClose, ModalContent, ModalRoot, ModalTitle, Button, TextInput } from "@/editor/chrome-ui";
+import { Button, ModalBody, ModalClose, ModalContent, ModalRoot, ModalTitle, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -391,7 +391,7 @@ export const VideoPreview: React.FC<VideoPreviewProps> = (props) => {
               <path d="M18 6L6 18M6 6l12 12" />
             </svg>
           </ModalClose>
-          <div className="bd-modal__body">
+          <ModalBody>
             <VideoPlayerCore {...props} />
             <div
               style={{
@@ -404,7 +404,7 @@ export const VideoPreview: React.FC<VideoPreviewProps> = (props) => {
                 Close
               </Button>
             </div>
-          </div>
+          </ModalBody>
         </ModalContent>
       </ModalRoot>
     );

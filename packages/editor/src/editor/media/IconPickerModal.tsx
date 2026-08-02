@@ -7,7 +7,7 @@
  */
 
 import * as React from "react";
-import { ModalClose, ModalContent, ModalRoot, ModalTitle, Button, Slider, TextInput } from "@/editor/chrome-ui";
+import { Button, ModalBody, ModalClose, ModalContent, ModalRoot, ModalTitle, Slider, TextInput } from "@/editor/chrome-ui";
 import {
   ICON_CATEGORIES,
   getAllIcons,
@@ -172,7 +172,7 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
             <path d="M18 6L6 18M6 6l12 12" />
           </svg>
         </ModalClose>
-        <div className="bd-modal__body">
+        <ModalBody>
     <div className={CONTAINER}>
       {/* Header with icon count */}
       <div className="tw:flex tw:justify-between tw:items-center">
@@ -352,7 +352,7 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
         </div>
       </div>
     </div>
-        </div>
+        </ModalBody>
       </ModalContent>
     </ModalRoot>
   );

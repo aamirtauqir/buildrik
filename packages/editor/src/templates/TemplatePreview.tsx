@@ -6,7 +6,7 @@
 
 import DOMPurify from "dompurify";
 import * as React from "react";
-import { ModalClose, ModalContent, ModalRoot, ModalTitle, Badge, Button } from "@/editor/chrome-ui";
+import { Badge, Button, ModalBody, ModalClose, ModalContent, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
 import type { Template } from "./types";
 // ============================================================================
 // TYPES
@@ -142,7 +142,7 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
             <path d="M18 6L6 18M6 6l12 12" />
           </svg>
         </ModalClose>
-        <div className="bd-modal__body">
+        <ModalBody>
     <div style={{ display: "flex", flexDirection: "column", height: "80vh" }}>
       {/* Header */}
       <div
@@ -228,7 +228,7 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
         )}
       </div>
     </div>
-        </div>
+        </ModalBody>
       </ModalContent>
     </ModalRoot>
   );
