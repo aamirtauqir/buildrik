@@ -41,6 +41,12 @@ Page → tRPC mutation → Router → Service → Prisma/External API
 
 **Before modifying code in a subdirectory, read its AGENTS.md (or CLAUDE.md) first** to understand local patterns, invariants, and known pitfalls.
 
+These documents drift. `pnpm run audit:rules` checks every backticked repo path,
+`npm run` script and `gate:*` name in all seven of them against what is actually
+on disk, and separates present-tense claims from deletion history. It found a
+whole stale section that two careful readings missed. It is an audit, not a gate
+— read the line before believing the finding.
+
 - **Server (tRPC + services)**: `server/AGENTS.md` — data-flow chain, domain errors, raw-SQL and external-client rules
 - **Dashboard (Next.js app)**: `packages/dashboard/AGENTS.md` — routing, tRPC-only data access, Flowbite-first UI system (+ the prefix/class-list traps), embedded-editor traps
 - **Editor package root**: `packages/editor/CLAUDE.md` — stack, path aliases, architecture rules (pre-existing node)
