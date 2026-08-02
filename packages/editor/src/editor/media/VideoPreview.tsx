@@ -6,6 +6,10 @@
 
 import * as React from "react";
 import { Button, ModalBody, ModalClose, ModalContent, ModalRoot, ModalTitle, TextInput } from "@/editor/chrome-ui";
+
+/** Transport glyph over the video — white on dark, no chrome of its own. */
+const GLYPH_BTN =
+  "tw:p-1 tw:border-0 tw:bg-transparent tw:text-base tw:text-white tw:hover:bg-white/20";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -173,25 +177,17 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
 
   if (state.error) {
     return (
-      <div
-        className="tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-0"
-        style={{
-          padding: 40,
-          background: "var(--bk-bg-subtle)",
-          borderRadius: 8,
-          color: "var(--bk-ink-muted)",
-        }}
-      >
-        <span style={{ fontSize: 32, marginBottom: 12 }}>⚠️</span>
+      <div className="tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-0 tw:p-10 tw:rounded-lg tw:bg-[var(--bk-bg-subtle)] tw:text-gray-500">
+        <span className="tw:mb-3 tw:text-3xl">⚠️</span>
         <span>{state.error}</span>
       </div>
     );
   }
 
   return (
-    <div style={{ position: "relative", borderRadius: 8, overflow: "hidden" }}>
+    <div className="tw:relative tw:rounded-lg tw:overflow-hidden">
       {/* Hidden canvas for thumbnail extraction */}
-      <canvas ref={canvasRef} style={{ display: "none" }} />
+      <canvas ref={canvasRef} className="tw:hidden" />
       {/* Video element */}
       <video
         ref={videoRef}
@@ -203,81 +199,35 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
         onPlay={() => setState((s) => ({ ...s, isPlaying: true }))}
         onPause={() => setState((s) => ({ ...s, isPlaying: false }))}
         onEnded={() => setState((s) => ({ ...s, isPlaying: false }))}
-        style={{
-          width: "100%",
-          display: "block",
-          background: "var(--bk-ink)",
-          maxHeight: 400,
-        }}
+        className="tw:block tw:w-full tw:max-h-100 tw:bg-gray-900"
       />
       {/* Loading overlay */}
       {state.isLoading && (
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            background: "rgba(0,0,0,0.5)",
-          }}
-        >
-          <span style={{ color: "var(--bk-accent-on)", fontSize: 14 }}>Loading...</span>
+        <div className="tw:absolute tw:inset-0 tw:flex tw:items-center tw:justify-center tw:bg-black/50">
+          <span className="tw:text-sm tw:text-white">Loading...</span>
         </div>
       )}
       {/* Controls */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          right: 0,
-          padding: 12,
-          background: "linear-gradient(transparent, rgba(0,0,0,0.8))",
-        }}
-      >
+      <div className="tw:absolute tw:inset-x-0 tw:bottom-0 tw:p-3 tw:bg-linear-to-b tw:from-transparent tw:to-black/80">
         {/* Progress bar */}
         <div
           ref={progressRef}
           onClick={handleProgressClick}
-          style={{
-            height: 4,
-            background: "rgba(255,255,255,0.3)",
-            borderRadius: 2,
-            marginBottom: 12,
-            cursor: "pointer",
-          }}
+          className="tw:h-1 tw:mb-3 tw:rounded-sm tw:cursor-pointer tw:bg-white/30"
         >
+          {/* width is the playhead — data, not style */}
           <div
-            style={{
-              height: "100%",
-              width: `${progressPercent}%`,
-              background: "var(--bk-accent)",
-              borderRadius: 2,
-              transition: "width 0.1s linear",
-            }}
+            className="tw:h-full tw:rounded-sm tw:bg-blue-700 tw:transition-[width]"
+            style={{ width: `${progressPercent}%` }}
           />
         </div>
 
         {/* Control buttons */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
-          }}
-        >
+        <div className="tw:flex tw:items-center tw:gap-3">
           {/* Skip back */}
           <Button
             onClick={() => skipSeconds(-10)}
-            style={{
-              background: "transparent",
-              border: "none",
-              color: "var(--bk-accent-on)",
-              cursor: "pointer",
-              fontSize: 16,
-              padding: 4,
-            }}
+            className={GLYPH_BTN}
             title="Skip back 10s"
           >
             ⏪
@@ -286,15 +236,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
           {/* Play/Pause */}
           <Button
             onClick={togglePlay}
-            style={{
-              background: "rgba(255,255,255,0.2)",
-              border: "none",
-              color: "var(--bk-accent-on)",
-              cursor: "pointer",
-              fontSize: 18,
-              padding: "8px 12px",
-              borderRadius: 6,
-            }}
+            className="tw:px-3 tw:py-2 tw:rounded-md tw:border-0 tw:text-lg tw:text-white tw:bg-white/20 tw:hover:bg-white/30"
           >
             {state.isPlaying ? "⏸️" : "▶️"}
           </Button>
@@ -302,40 +244,23 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
           {/* Skip forward */}
           <Button
             onClick={() => skipSeconds(10)}
-            style={{
-              background: "transparent",
-              border: "none",
-              color: "var(--bk-accent-on)",
-              cursor: "pointer",
-              fontSize: 16,
-              padding: 4,
-            }}
+            className={GLYPH_BTN}
             title="Skip forward 10s"
           >
             ⏩
           </Button>
 
           {/* Time display */}
-          <span style={{ color: "var(--bk-accent-on)", fontSize: 12, fontFamily: "monospace" }}>
+          <span className="tw:text-xs tw:text-white tw:[font-family:var(--bk-font-mono)]">
             {formatTime(state.currentTime)} / {formatTime(state.duration)}
           </span>
 
           {/* Spacer */}
-          <div style={{ flex: 1 }} />
+          <div className="tw:flex-1" />
 
           {/* Volume */}
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <Button
-              onClick={toggleMute}
-              style={{
-                background: "transparent",
-                border: "none",
-                color: "var(--bk-accent-on)",
-                cursor: "pointer",
-                fontSize: 16,
-                padding: 4,
-              }}
-            >
+          <div className="tw:flex tw:items-center tw:gap-2">
+            <Button onClick={toggleMute} className={GLYPH_BTN}>
               {state.isMuted || state.volume === 0 ? "🔇" : "🔊"}
             </Button>
             <TextInput
@@ -345,26 +270,14 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
               step={0.1}
               value={state.volume}
               onChange={handleVolumeChange}
-              style={{ width: 60 }}
+              className="tw:w-15"
             />
           </div>
         </div>
       </div>
       {/* Title overlay */}
       {title && (
-        <div
-          style={{
-            position: "absolute",
-            top: 12,
-            left: 12,
-            padding: "4px 12px",
-            background: "rgba(0,0,0,0.6)",
-            borderRadius: 4,
-            color: "var(--bk-accent-on)",
-            fontSize: 13,
-            fontWeight: 500,
-          }}
-        >
+        <div className="tw:absolute tw:top-3 tw:left-3 tw:px-3 tw:py-1 tw:rounded tw:bg-black/60 tw:text-[13px] tw:font-medium tw:text-white">
           {title}
         </div>
       )}
@@ -393,13 +306,7 @@ export const VideoPreview: React.FC<VideoPreviewProps> = (props) => {
           </ModalClose>
           <ModalBody>
             <VideoPlayerCore {...props} />
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "flex-end",
-                marginTop: 16,
-              }}
-            >
+            <div className="tw:flex tw:justify-end tw:mt-4">
               <Button color="light" onClick={props.onClose} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                 Close
               </Button>
