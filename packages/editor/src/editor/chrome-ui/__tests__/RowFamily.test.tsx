@@ -75,6 +75,24 @@ describe("VersionRow", () => {
     expect(screen.getByText("CURRENT")).toBeTruthy();
     expect(screen.getByRole("img", { name: "Live" })).toBeTruthy();
   });
+
+  it("renders a leading slot ahead of the title without displacing the badge", () => {
+    // The media library puts the asset thumbnail here; the history panel puts
+    // nothing and gets a status dot instead. Both must coexist in one row.
+    render(
+      <VersionRow
+        title="hero.png"
+        meta="240 KB"
+        current
+        currentLabel="LATEST"
+        leading={<img alt="hero.png thumbnail" src="/t.png" />}
+        actions={<button type="button">Revert</button>}
+      />,
+    );
+    expect(screen.getByRole("img", { name: "hero.png thumbnail" })).toBeTruthy();
+    expect(screen.getByText("LATEST")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Revert" })).toBeTruthy();
+  });
 });
 
 describe("RecordRow", () => {

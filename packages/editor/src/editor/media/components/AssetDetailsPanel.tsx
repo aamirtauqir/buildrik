@@ -22,7 +22,20 @@ import * as React from "react";
 import type { Composer } from "../../../engine/Composer";
 import type { LibraryItem } from "../../sidebar/tabs/media/data/mediaTypes";
 import { formatBytes } from "@shared/utils/helpers/number";
-import { Button, Textarea } from "@/editor/chrome-ui";
+import {
+  Button,
+  ModalBody,
+  ModalClose,
+  ModalContent,
+  ModalRoot,
+  ModalTitle,
+  Textarea,
+  VersionRow,
+} from "@/editor/chrome-ui";
+
+/** Small dense button matching the panel's `mgr-btn` chrome. */
+const MINI_BTN = "tw:h-6 tw:px-2 tw:py-0 tw:text-[10px]";
+const MUTED_SM = "tw:text-xs tw:text-[var(--bk-ink-disabled)]";
 // P7 — alt-text upper bound matches the server prompt's "Under 125 characters" rule.
 const ALT_TEXT_MAX = 125;
 
@@ -95,18 +108,10 @@ export function AssetDetailsPanel({
   if (!selectedItem) {
     return (
       <div className="mgr-details">
-        <div
-          style={{
-            flex: 1,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: 32,
-          }}
-        >
-          <div style={{ textAlign: "center", color: "var(--bk-ink-disabled)" }}>
-            <FolderOpen size={32} style={{ marginBottom: 12, opacity: 0.4 }} />
-            <div style={{ fontSize: 13 }}>Select an asset to view details</div>
+        <div className="tw:flex tw:flex-1 tw:items-center tw:justify-center tw:p-8">
+          <div className="tw:text-center tw:text-[var(--bk-ink-disabled)]">
+            <FolderOpen size={32} className="tw:mb-3 tw:opacity-40" />
+            <div className="tw:text-[13px]">Select an asset to view details</div>
           </div>
         </div>
       </div>
@@ -130,17 +135,9 @@ export function AssetDetailsPanel({
           {selectedItem.type === "img" || selectedItem.type === "vid" ? (
             <img src={selectedItem.src} alt={selectedItem.name} />
           ) : selectedItem.type === "ico" ? (
-            <img src={selectedItem.src} alt={selectedItem.name} style={{ width: 64, height: 64 }} />
+            <img src={selectedItem.src} alt={selectedItem.name} className="tw:size-16" />
           ) : selectedItem.type === "fnt" ? (
-            <span
-              style={{
-                fontSize: 48,
-                fontWeight: 700,
-                color: "var(--bk-ink)",
-              }}
-            >
-              Aa Bb
-            </span>
+            <span className="tw:text-5xl tw:font-bold tw:text-gray-900">Aa Bb</span>
           ) : null}
         </div>
         <div className="mgr-det-tabs">
@@ -203,67 +200,40 @@ export function AssetDetailsPanel({
           {detailTab === "versions" && (
             <div className="mgr-version-list">
               {versions.map((v, i) => (
-                <div
+                <VersionRow
                   key={v.key}
-                  className={`mgr-version-row${v.key === selectedItem.key ? " active" : ""}`}
+                  title={v.name}
+                  meta={`${formatBytes(v.size)} · ${new Date(v.createdAt).toLocaleString()}`}
+                  current={i === 0}
+                  selected={v.key === selectedItem.key}
                   onClick={() => onSelectAsset(v.key)}
-                >
-                  <div className="mgr-version-thumb">
-                    {v.thumb ? (
-                      <img src={v.thumb || v.src} alt={v.name} />
-                    ) : (
-                      <span style={{ fontSize: 10 }}>{v.type.toUpperCase()}</span>
-                    )}
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div
-                      style={{
-                        fontSize: 12,
-                        fontWeight: 500,
-                        color: "var(--bk-ink)",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {v.name}
-                      {i === 0 && (
-                        <span
-                          style={{
-                            marginLeft: 6,
-                            fontSize: 9,
-                            background: "var(--bk-accent-tint)",
-                            color: "var(--bk-ink)",
-                            padding: "1px 5px",
-                            borderRadius: 6,
-                            fontWeight: 700,
-                          }}
-                        >
-                          CURRENT
-                        </span>
+                  leading={
+                    <span className="mgr-version-thumb">
+                      {v.thumb ? (
+                        <img src={v.thumb || v.src} alt={v.name} />
+                      ) : (
+                        <span className="tw:text-[10px]">{v.type.toUpperCase()}</span>
                       )}
-                    </div>
-                    <div style={{ fontSize: 10, color: "var(--bk-ink-disabled)" }}>
-                      {formatBytes(v.size)} · {new Date(v.createdAt).toLocaleString()}
-                    </div>
-                  </div>
-                  {i > 0 && v.key !== selectedItem.key && (
-                    <Button
-                      className="mgr-btn"
-                      style={{ height: 24, fontSize: 10, padding: "0 8px" }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        // Revert: replace all usages of current version with this one.
-                        if (versions[0]) {
-                          composer.mediaOps.replaceAcross(versions[0].src, v.src);
-                          addToast({ description: `Reverted to ${v.name}`, tone: "success" });
-                        }
-                      }}
-                    >
-                      Revert
-                    </Button>
-                  )}
-                </div>
+                    </span>
+                  }
+                  actions={
+                    i > 0 && v.key !== selectedItem.key ? (
+                      <Button
+                        className={`mgr-btn ${MINI_BTN}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // Revert: replace all usages of current version with this one.
+                          if (versions[0]) {
+                            composer.mediaOps.replaceAcross(versions[0].src, v.src);
+                            addToast({ description: `Reverted to ${v.name}`, tone: "success" });
+                          }
+                        }}
+                      >
+                        Revert
+                      </Button>
+                    ) : undefined
+                  }
+                />
               ))}
             </div>
           )}
@@ -273,15 +243,9 @@ export function AssetDetailsPanel({
                 Used in <span className="mgr-used-count">{usageCount} places</span>
               </div>
               {usageCount === 0 ? (
-                <div
-                  style={{ fontSize: 12, color: "var(--bk-ink-disabled)", padding: 8 }}
-                >
-                  Not used on any page yet
-                </div>
+                <div className={`tw:p-2 ${MUTED_SM}`}>Not used on any page yet</div>
               ) : (
-                <div
-                  style={{ fontSize: 12, color: "var(--bk-ink-disabled)", padding: 8 }}
-                >
+                <div className={`tw:p-2 ${MUTED_SM}`}>
                   {usageCount} element{usageCount !== 1 ? "s" : ""} reference this asset
                 </div>
               )}
@@ -326,91 +290,62 @@ export function AssetDetailsPanel({
 
       {/* Replace-all picker modal — co-located with the panel that
           launches it because it only exists while selectedItem is set. */}
-      {replaceAllPickerOpen && (
-        <div
-          className="stock-modal-backdrop"
-          onClick={() => setReplaceAllPickerOpen(false)}
-        >
-          <div
-            className="stock-modal"
-            onClick={(e) => e.stopPropagation()}
-            style={{ width: "min(640px, 90vw)" }}
-          >
-            <div className="stock-modal-header">
-              <h3 className="stock-modal-title">
-                Replace "{selectedItem.name}" across {usageCount} use
-                {usageCount !== 1 ? "s" : ""}
-              </h3>
-              <Button
-                className="stock-modal-close"
-                onClick={() => setReplaceAllPickerOpen(false)}
-              >
-                <X size={18} />
-              </Button>
-            </div>
-            <div className="stock-modal-content">
-              <p
-                style={{
-                  fontSize: 12,
-                  color: "var(--bk-ink-disabled)",
-                  marginBottom: 12,
-                }}
-              >
-                Pick a replacement asset. All canvas usages will be swapped atomically
-                (one undo reverses everything).
-              </p>
-              <div className="med-grid" data-cols="3">
-                {replaceCandidates.map((i) => (
-                  <div
-                    key={i.key}
-                    className="med-img-card"
-                    onClick={() => {
-                      const result = composer.mediaOps.replaceAcross(selectedItem.src, i.src);
-                      if (result.replaced.length > 0) {
-                        addToast({
-                          description: `Replaced in ${result.replaced.length} element${result.replaced.length > 1 ? "s" : ""}`,
-                          tone: "success",
-                        });
-                      }
-                      if (result.failed.length > 0) {
-                        addToast({
-                          description: `${result.failed.length} replacement${result.failed.length > 1 ? "s" : ""} failed`,
-                          tone: "error",
-                        });
-                      }
-                      setReplaceAllPickerOpen(false);
-                    }}
-                  >
-                    <div className="med-img-card-bg">
-                      {i.thumb || i.type === "img" || i.type === "vid" ? (
-                        <img src={i.thumb || i.src} alt={i.name} loading="lazy" />
-                      ) : null}
-                    </div>
-                    <div
-                      style={{
-                        padding: "4px 6px",
-                        fontSize: 11,
-                        color: "var(--bk-ink-soft)",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {i.name}
-                    </div>
+      <ModalRoot open={replaceAllPickerOpen} onOpenChange={setReplaceAllPickerOpen}>
+        <ModalContent size="lg">
+          <ModalTitle>
+            Replace "{selectedItem.name}" across {usageCount} use
+            {usageCount !== 1 ? "s" : ""}
+          </ModalTitle>
+          <ModalClose aria-label="Close replace picker">
+            <X size={18} />
+          </ModalClose>
+          <ModalBody>
+            <p className={`tw:mb-3 ${MUTED_SM}`}>
+              Pick a replacement asset. All canvas usages will be swapped atomically
+              (one undo reverses everything).
+            </p>
+            <div className="med-grid" data-cols="3">
+              {replaceCandidates.map((i) => (
+                <div
+                  key={i.key}
+                  className="med-img-card"
+                  onClick={() => {
+                    const result = composer.mediaOps.replaceAcross(selectedItem.src, i.src);
+                    if (result.replaced.length > 0) {
+                      addToast({
+                        description: `Replaced in ${result.replaced.length} element${result.replaced.length > 1 ? "s" : ""}`,
+                        tone: "success",
+                      });
+                    }
+                    if (result.failed.length > 0) {
+                      addToast({
+                        description: `${result.failed.length} replacement${result.failed.length > 1 ? "s" : ""} failed`,
+                        tone: "error",
+                      });
+                    }
+                    setReplaceAllPickerOpen(false);
+                  }}
+                >
+                  <div className="med-img-card-bg">
+                    {i.thumb || i.type === "img" || i.type === "vid" ? (
+                      <img src={i.thumb || i.src} alt={i.name} loading="lazy" />
+                    ) : null}
                   </div>
-                ))}
-              </div>
-              {replaceCandidates.length === 0 && (
-                <div className="stock-empty">
-                  No other {selectedItem.type === "img" ? "images" : "assets of the same type"} in
-                  your library.
+                  <div className="tw:px-1.5 tw:py-1 tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap tw:text-[11px] tw:text-[var(--bk-ink-soft)]">
+                    {i.name}
+                  </div>
                 </div>
-              )}
+              ))}
             </div>
-          </div>
-        </div>
-      )}
+            {replaceCandidates.length === 0 && (
+              <div className="stock-empty">
+                No other {selectedItem.type === "img" ? "images" : "assets of the same type"} in
+                your library.
+              </div>
+            )}
+          </ModalBody>
+        </ModalContent>
+      </ModalRoot>
     </>
   );
 }
@@ -459,10 +394,10 @@ function AltTextSection({
   };
 
   return (
-    <div data-testid="alt-text-section" style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 6 }}>
+    <div data-testid="alt-text-section" className="tw:flex tw:flex-col tw:gap-1.5 tw:mt-4">
       <label
         htmlFor={`alt-text-${item.key}`}
-        style={{ fontSize: 11, fontWeight: 600, color: "var(--bk-ink-soft)" }}
+        className="tw:text-[11px] tw:font-semibold tw:text-[var(--bk-ink-soft)]"
       >
         Alt text
       </label>
@@ -474,30 +409,10 @@ function AltTextSection({
         rows={2}
         placeholder="Describe this image for screen readers"
         onChange={(e) => onUpdateAltText(item.key, e.target.value)}
-        style={{
-          width: "100%",
-          fontSize: 12,
-          padding: "6px 8px",
-          borderRadius: 4,
-          border: "1px solid var(--bk-border)",
-          background: "var(--bk-bg-card)",
-          color: "var(--bk-ink)",
-          resize: "vertical",
-          fontFamily: "inherit",
-        }}
       />
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 8,
-          fontSize: 10,
-          color: "var(--bk-ink-disabled)",
-        }}
-      >
+      <div className="tw:flex tw:items-center tw:justify-between tw:gap-2 tw:text-[10px] tw:text-[var(--bk-ink-disabled)]">
         {provenance ? (
-          <span data-testid="alt-text-provenance" style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          <span data-testid="alt-text-provenance" className="tw:flex tw:items-center tw:gap-1">
             <Sparkles size={10} />
             AI-generated by {provenance.model} on{" "}
             {new Date(provenance.generatedAt).toLocaleDateString()}
@@ -508,8 +423,7 @@ function AltTextSection({
         {onRegenerateAltText && (
           <Button
             data-testid="alt-text-regenerate"
-            className="mgr-btn"
-            style={{ height: 22, fontSize: 10, padding: "0 8px" }}
+            className={`mgr-btn ${MINI_BTN}`}
             onClick={handleRegenerate}
             disabled={regenerating}
           >
