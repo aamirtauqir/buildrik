@@ -74,11 +74,19 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
     setCollections(all);
   }, [open, composer]);
 
-  // Close on outside click or Escape — clear selection too so reopening starts
-  // fresh. Popover owns both listeners; this stays the state half of it.
+  // Close on outside click or Escape. Popover owns both listeners; this is the
+  // state half of it — and it must clear the WHOLE drill-down, not just the
+  // collection. Clearing only `selectedCollection` (what the old
+  // useClickOutside handler did) leaves `selectedField` and `records` behind:
+  // reopen, pick a different collection, and the field step is skipped because
+  // selectedField is still set, so the record list shown belongs to the
+  // PREVIOUS collection — and binding one sends that collection's itemId with
+  // the new collection's id.
   const handleClose = React.useCallback(() => {
     setOpen(false);
     setSelectedCollection(null);
+    setSelectedField(null);
+    setRecords([]);
   }, []);
 
   const handleSelectCollection = React.useCallback(
@@ -265,7 +273,7 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
         type="button"
         className={`tw:w-full tw:mt-1 ${LINK_BTN_CLASS}`}
         onClick={() => {
-          setOpen(false);
+          handleClose();
           onOpenCreateCollection?.();
         }}
       >

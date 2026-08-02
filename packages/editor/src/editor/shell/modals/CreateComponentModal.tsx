@@ -134,108 +134,100 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
         <ModalBody>
     <div className="tw:flex tw:flex-col tw:gap-4" onKeyDown={handleKeyPress}>
       <div>
-        <label style={labelStyles}>
-          Name <span style={{ color: "var(--bk-accent)" }}>*</span>
+        <label className={FIELD_LABEL}>
+          Name <span className="tw:text-blue-700">*</span>
         </label>
         <TextInput
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="e.g., Hero Section"
-          style={inputStyles}
           autoFocus
         />
       </div>
 
       <div>
-        <label style={labelStyles}>Description</label>
+        <label className={FIELD_LABEL}>Description</label>
         <Textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Optional description..."
           rows={3}
-          style={textareaStyles}
+          className="tw:min-h-15 tw:resize-y tw:bg-white"
         />
       </div>
 
       <div>
-        <label style={labelStyles}>Category</label>
+        <label className={FIELD_LABEL}>Category</label>
         <TextInput
           type="text"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
           placeholder="e.g., Headers, Footers, Cards"
-          style={inputStyles}
         />
       </div>
 
       <div>
-        <label style={labelStyles}>Tags</label>
+        <label className={FIELD_LABEL}>Tags</label>
         <TextInput
           type="text"
           value={tags}
           onChange={(e) => setTags(e.target.value)}
           placeholder="e.g., responsive, dark-mode (comma-separated)"
-          style={inputStyles}
         />
-        <small style={hintStyles}>Comma-separated tags for easier searching</small>
+        <small className={HINT}>Comma-separated tags for easier searching</small>
       </div>
 
       {/* GAP-FIX: Variant Options Section */}
-      <div style={variantSectionStyles}>
-        <label style={labelStyles}>Variant Options</label>
-        <label style={checkboxLabelStyles}>
+      <div className={SUB_SECTION}>
+        <label className={FIELD_LABEL}>Variant Options</label>
+        <label className={CHECK_LABEL}>
           <Checkbox
             color="blue"
-            className="tw:bg-white"
+            className="tw:bg-white tw:size-4 tw:cursor-pointer"
             checked={isVariantSet}
             onChange={(e) => setIsVariantSet(e.target.checked)}
-            style={checkboxStyles} />
+          />
           <span>This is a variant set (has multiple variants)</span>
         </label>
 
         {isVariantSet && (
-          <div style={variantPropsContainerStyles}>
-            <small style={hintStyles}>Select variant properties:</small>
-            <div style={variantChipsStyles}>
+          <div className="tw:mt-3 tw:p-3 tw:rounded-lg tw:bg-[var(--bk-bg-subtle)]">
+            <small className={HINT}>Select variant properties:</small>
+            <div className="tw:flex tw:flex-wrap tw:gap-2 tw:mt-2">
               {VARIANT_PRESETS.map((preset) => (
                 <Button
                   key={preset.name}
                   type="button"
                   onClick={() => toggleVariantProp(preset.name)}
-                  style={{
-                    ...variantChipStyles,
-                    background: selectedVariantProps.includes(preset.name)
-                      ? "var(--bk-accent)"
-                      : "var(--bk-bg-subtle)",
-                    color: selectedVariantProps.includes(preset.name)
-                      ? "var(--bk-accent-on)"
-                      : "var(--bk-ink-soft)",
-                  }}
+                  className={`${CHIP} ${
+                    selectedVariantProps.includes(preset.name)
+                      ? "tw:bg-blue-700 tw:text-white"
+                      : "tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink-soft)] tw:hover:bg-gray-100"
+                  }`}
                 >
                   {preset.name}
-                  <span style={variantChipValuesStyles}>({preset.values.join(", ")})</span>
+                  <span className="tw:ml-0.5 tw:text-xs tw:opacity-70">({preset.values.join(", ")})</span>
                 </Button>
               ))}
             </div>
-            <small style={hintStyles}>You can configure variant values after creation</small>
+            <small className={HINT}>You can configure variant values after creation</small>
           </div>
         )}
       </div>
 
       {/* Spec §6.3 / D7: "Pre-fill from DS styles" toggle (default ON) */}
-      <div style={variantSectionStyles}>
-        <label style={checkboxLabelStyles}>
+      <div className={SUB_SECTION}>
+        <label className={CHECK_LABEL}>
           <Checkbox
             color="blue"
-            className="tw:bg-white"
+            className="tw:bg-white tw:size-4 tw:cursor-pointer"
             checked={prefillFromDs}
             onChange={(e) => setPrefillFromDs(e.target.checked)}
-            style={checkboxStyles}
           />
           <span>Pre-fill from DS styles</span>
         </label>
-        <small style={hintStyles}>
+        <small className={HINT}>
           Lift matching values into token / preset bindings on save. Recommended.
         </small>
       </div>
@@ -255,93 +247,14 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
 };
 
 // ============================================================================
-// STYLES
+// CLASSES
 // ============================================================================
 
-const labelStyles: React.CSSProperties = {
-  display: "block",
-  fontSize: 12,
-  fontWeight: 600,
-  color: "var(--bk-ink)",
-  marginBottom: 6,
-};
-
-const inputStyles: React.CSSProperties = {
-  width: "100%",
-  padding: "8px 12px",
-  background: "var(--bk-bg-subtle)",
-  border: "1px solid var(--bk-border)",
-  borderRadius: 6,
-  color: "var(--bk-ink)",
-  fontSize: 13,
-};
-
-const textareaStyles: React.CSSProperties = {
-  ...inputStyles,
-  resize: "vertical" as const,
-  minHeight: 60,
-};
-
-const hintStyles: React.CSSProperties = {
-  fontSize: 12,
-  color: "var(--bk-ink-muted)",
-  marginTop: 4,
-  display: "block",
-};
-
-// GAP-FIX: Variant section styles
-const variantSectionStyles: React.CSSProperties = {
-  marginTop: 8,
-  paddingTop: 16,
-  borderTop: "1px solid var(--bk-border)",
-};
-
-const checkboxLabelStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: 8,
-  fontSize: 13,
-  color: "var(--bk-ink-soft)",
-  cursor: "pointer",
-};
-
-const checkboxStyles: React.CSSProperties = {
-  width: 16,
-  height: 16,
-  cursor: "pointer",
-};
-
-const variantPropsContainerStyles: React.CSSProperties = {
-  marginTop: 12,
-  padding: 12,
-  background: "var(--bk-bg-subtle)",
-  borderRadius: 8,
-};
-
-const variantChipsStyles: React.CSSProperties = {
-  display: "flex",
-  flexWrap: "wrap",
-  gap: 8,
-  marginTop: 8,
-};
-
-const variantChipStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: 4,
-  padding: "6px 12px",
-  border: "1px solid var(--bk-border)",
-  borderRadius: 16,
-  fontSize: 12,
-  fontWeight: 500,
-  cursor: "pointer",
-  transition: "all 0.15s ease",
-};
-
-const variantChipValuesStyles: React.CSSProperties = {
-  fontSize: 12,
-  opacity: 0.7,
-  marginLeft: 2,
-};
+const FIELD_LABEL = "tw:block tw:mb-1.5 tw:text-xs tw:font-semibold tw:text-gray-900";
+const HINT = "tw:block tw:mt-1 tw:text-xs tw:text-gray-500";
+/** Section separated by a rule — variant options, DS prefill. */
+const SUB_SECTION = "tw:mt-2 tw:pt-4 tw:border-t tw:border-gray-200";
+const CHECK_LABEL = "tw:flex tw:items-center tw:gap-2 tw:text-[13px] tw:text-[var(--bk-ink-soft)] tw:cursor-pointer";
+const CHIP = "tw:flex tw:items-center tw:gap-1 tw:px-3 tw:py-1.5 tw:rounded-2xl tw:border tw:border-gray-200 tw:text-xs tw:font-medium";
 
 export default CreateComponentModal;
