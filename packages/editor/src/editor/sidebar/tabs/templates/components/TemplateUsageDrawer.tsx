@@ -41,6 +41,21 @@ function formatRelative(iso: string): string {
   return date.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
 }
 
+/* `all: "unset"` appeared on two Buttons here. It nukes flowbite's entire
+   button styling — including its focus ring — and then re-adds padding and
+   colour by hand, which is how a control ends up with no visible keyboard
+   focus. Both are ordinary Buttons now. */
+const HEAD = "tw:px-6 tw:py-5 tw:border-b tw:border-gray-200";
+const TABLIST = "tw:flex tw:gap-1 tw:px-3 tw:py-2 tw:border-b tw:border-gray-200";
+const TAB = "tw:px-3 tw:py-1.5 tw:text-[13px] tw:rounded tw:border-b-2 tw:bg-transparent";
+const PANEL = "tw:px-6 tw:py-4 tw:max-h-90 tw:overflow-auto";
+const LIST = "tw:list-none tw:m-0 tw:p-0 tw:flex tw:flex-col tw:gap-1";
+const ROW = "tw:flex tw:items-center tw:gap-3 tw:w-full tw:px-2.5 tw:py-2 tw:rounded tw:text-[13px]";
+const VERSION_CHIP = "tw:text-[11px] tw:px-1.5 tw:py-0.5 tw:rounded-sm tw:bg-gray-50 tw:text-gray-500";
+const META = "tw:text-[11px] tw:text-gray-500";
+const CENTERED_EMPTY = "tw:text-[13px] tw:text-gray-500 tw:py-8 tw:text-center";
+const FOOTER = "tw:flex tw:justify-end tw:px-6 tw:py-3 tw:border-t tw:border-gray-200";
+
 export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
   open,
   onOpenChange,
@@ -57,11 +72,11 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
   return (
     <ModalRoot open={open} onOpenChange={onOpenChange}>
       <ModalContent size="lg" aria-labelledby={`tpl-usage-title-${templateId}`}>
-        <div style={{ padding: "20px 24px", borderBottom: "1px solid var(--bk-border)" }}>
-          <ModalTitle id={`tpl-usage-title-${templateId}`} style={{ fontSize: 16, fontWeight: 600 }}>
+        <div className={HEAD}>
+          <ModalTitle id={`tpl-usage-title-${templateId}`} className="tw:text-base tw:font-semibold">
             {templateName}
           </ModalTitle>
-          <ModalDescription style={{ fontSize: 12, color: "var(--bk-ink-muted)", marginTop: 2 }}>
+          <ModalDescription className="tw:text-xs tw:text-gray-500 tw:mt-0.5">
             Where this template is in use across pages
           </ModalDescription>
         </div>
@@ -69,12 +84,7 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
         <div
           role="tablist"
           aria-label="Drawer sections"
-          style={{
-            display: "flex",
-            gap: 4,
-            padding: "8px 12px",
-            borderBottom: "1px solid var(--bk-border)",
-          }}
+          className={TABLIST}
         >
           {(["preview", "used", "versions"] as const).map((t) => (
             <Button
@@ -85,61 +95,31 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
               role="tab"
               aria-selected={tab === t}
               onClick={() => setTab(t)}
-              style={{
-                all: "unset",
-                cursor: "pointer",
-                padding: "6px 12px",
-                borderRadius: 4,
-                fontSize: 13,
-                fontWeight: tab === t ? 600 : 500,
-                color: tab === t ? "var(--bk-ink)" : "var(--bk-ink-muted)",
-                borderBottom:
-                  tab === t ? "2px solid var(--bk-accent)" : "2px solid transparent",
-              }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+              className={`${TAB} ${
+                tab === t
+                  ? "tw:font-semibold tw:text-gray-900 tw:border-b-blue-700"
+                  : "tw:font-medium tw:text-gray-500 tw:border-b-transparent"
+              }`}
             >
               {t === "preview" ? "Preview" : t === "used" ? "Used in" : "Versions"}
             </Button>
           ))}
         </div>
 
-        <div role="tabpanel" style={{ padding: "16px 24px", maxHeight: 360, overflow: "auto" }}>
+        <div role="tabpanel" className={PANEL}>
           {tab === "preview" && (
             <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: 16,
-                padding: "8px 0",
-              }}
+              className="tw:flex tw:flex-col tw:items-center tw:gap-4 tw:py-2"
             >
               {templateThumbnail ? (
                 <img
                   src={templateThumbnail}
                   alt={`${templateName} preview`}
-                  style={{
-                    width: "100%",
-                    maxHeight: 240,
-                    objectFit: "contain",
-                    borderRadius: 4,
-                    border: "1px solid var(--bk-border)",
-                    background: "var(--bk-bg-subtle)",
-                  }}
+                  className="tw:w-full tw:max-h-60 tw:object-contain tw:rounded tw:border tw:border-gray-200 tw:bg-gray-50"
                 />
               ) : (
                 <div
-                  style={{
-                    width: "100%",
-                    height: 160,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    borderRadius: 4,
-                    border: "1px dashed var(--bk-border)",
-                    background: "var(--bk-bg-subtle)",
-                    fontSize: 12,
-                    color: "var(--bk-ink-muted)",
-                  }}
+                  className="tw:w-full tw:h-40 tw:flex tw:items-center tw:justify-center tw:rounded tw:border tw:border-dashed tw:border-gray-200 tw:bg-gray-50 tw:text-xs tw:text-gray-500"
                 >
                   No preview thumbnail
                 </div>
@@ -148,11 +128,7 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
                 type="button"
                 onClick={() => onOpenPreview?.()}
                 disabled={!onOpenPreview}
-                style={{
-                  fontSize: 12,
-                  fontWeight: 500,
-                  padding: "8px 16px",
-                }}
+                size="sm"
               >
                 Open full preview →
               </Button>
@@ -162,25 +138,13 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
           {tab === "used" && (
             usage.length === 0 ? (
               <div
-                style={{
-                  fontSize: 13,
-                  color: "var(--bk-ink-muted)",
-                  padding: "32px 0",
-                  textAlign: "center",
-                }}
+                className={CENTERED_EMPTY}
               >
                 Not applied to any page yet
               </div>
             ) : (
               <ul
-                style={{
-                  listStyle: "none",
-                  margin: 0,
-                  padding: 0,
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 4,
-                }}
+                className={LIST}
               >
                 {usage.map((entry) => (
                   <li key={entry.pageId}>
@@ -190,34 +154,17 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
                       size="xs"
                       onClick={() => onJumpToPage?.(entry.pageId)}
                       disabled={!onJumpToPage}
-                      style={{
-                        all: "unset",
-                        cursor: onJumpToPage ? "pointer" : "default",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 12,
-                        width: "100%",
-                        padding: "8px 10px",
-                        borderRadius: 4,
-                        fontSize: 13,
-                        color: "var(--bk-ink)",
-                      }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+                      className={`${ROW} tw:border-transparent tw:bg-transparent tw:text-gray-900`}
                     >
-                      <span style={{ flex: 1 }}>{entry.pageName}</span>
+                      <span className="tw:flex-1">{entry.pageName}</span>
                       {entry.version && (
                         <span
-                          style={{
-                            fontSize: 11,
-                            padding: "2px 6px",
-                            borderRadius: 3,
-                            background: "var(--bk-bg-subtle)",
-                            color: "var(--bk-ink-muted)",
-                          }}
+                          className={VERSION_CHIP}
                         >
                           v{entry.version}
                         </span>
                       )}
-                      <span style={{ fontSize: 11, color: "var(--bk-ink-muted)" }}>
+                      <span className={META}>
                         {formatRelative(entry.appliedAt)}
                       </span>
                     </Button>
@@ -236,12 +183,7 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
         </div>
 
         <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            padding: "12px 24px",
-            borderTop: "1px solid var(--bk-border)",
-          }}
+          className={FOOTER}
         >
           <Button
             color="light"
@@ -275,39 +217,25 @@ function VersionsPanel({ usage, currentVersion }: VersionsPanelProps) {
   }, [usage]);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+    <div className="tw:flex tw:flex-col tw:gap-3">
       {currentVersion && (
         <div
           data-testid="versions-current"
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: "8px 10px",
-            borderRadius: 6,
-            background: "var(--bk-bg-subtle)",
-            border: "1px solid var(--bk-border)",
-            fontSize: 12,
-          }}
+          className="tw:flex tw:justify-between tw:items-center tw:px-2.5 tw:py-2 tw:rounded-md tw:bg-gray-50 tw:border tw:border-gray-200 tw:text-xs"
         >
-          <span style={{ color: "var(--bk-ink-muted)" }}>Current version</span>
-          <span style={{ fontWeight: 600 }}>v{currentVersion}</span>
+          <span className="tw:text-gray-500">Current version</span>
+          <span className="tw:font-semibold">v{currentVersion}</span>
         </div>
       )}
 
       {timeline.length === 0 ? (
         <div
-          style={{
-            fontSize: 13,
-            color: "var(--bk-ink-muted)",
-            padding: "24px 0",
-            textAlign: "center",
-          }}
+          className="tw:text-[13px] tw:text-gray-500 tw:py-6 tw:text-center"
         >
           No applies yet — when you apply this template, the history will appear here.
         </div>
       ) : (
-        <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 4 }}>
+        <ul className={LIST}>
           {timeline.map((entry, idx) => {
             const stale =
               currentVersion !== undefined &&
@@ -316,40 +244,26 @@ function VersionsPanel({ usage, currentVersion }: VersionsPanelProps) {
             return (
               <li
                 key={`${entry.pageId}-${idx}`}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 12,
-                  padding: "8px 10px",
-                  borderRadius: 4,
-                  fontSize: 13,
-                  color: "var(--bk-ink)",
-                  border: stale
-                    ? "1px solid var(--bk-warning-text)"
-                    : "1px solid transparent",
-                  background: stale ? "var(--bk-warning-tint)" : "transparent",
-                }}
+                className={`${ROW} tw:border tw:text-gray-900 ${
+                  stale
+                    ? "tw:border-[var(--bk-warning-text)] tw:bg-[var(--bk-warning-tint)]"
+                    : "tw:border-transparent tw:bg-transparent"
+                }`}
               >
-                <span style={{ flex: 1 }}>{entry.pageName}</span>
+                <span className="tw:flex-1">{entry.pageName}</span>
                 {entry.version && (
                   <span
-                    style={{
-                      fontSize: 11,
-                      padding: "2px 6px",
-                      borderRadius: 3,
-                      background: "var(--bk-bg-subtle)",
-                      color: "var(--bk-ink-muted)",
-                    }}
+                    className={VERSION_CHIP}
                   >
                     v{entry.version}
                   </span>
                 )}
                 {stale && (
-                  <span style={{ fontSize: 11, color: "var(--bk-warning-text)", fontWeight: 600 }}>
+                  <span className="tw:text-[11px] tw:text-[var(--bk-warning-text)] tw:font-semibold">
                     update available
                   </span>
                 )}
-                <span style={{ fontSize: 11, color: "var(--bk-ink-muted)" }}>
+                <span className={META}>
                   {formatRelative(entry.appliedAt)}
                 </span>
               </li>
