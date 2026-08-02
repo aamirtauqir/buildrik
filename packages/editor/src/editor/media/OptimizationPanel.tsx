@@ -1,14 +1,16 @@
 /**
- * @lint-hex-policy: component-theme
- *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
- *
  * Optimization Panel Component
- * Quality slider, format picker, and compression preview
+ * Quality slider, format picker, and compression preview.
+ *
+ * The hex-policy exemption this file used to carry is gone with its only hex:
+ * the savings figure was #a6e3a1, a Catppuccin swatch, where the meaning is
+ * "this succeeded" and the token is --bk-success.
+ *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { Spinner, Button, TextInput } from "@/editor/chrome-ui";
+import { Spinner, Button, Label, Slider, TextInput } from "@/editor/chrome-ui";
 import { MediaOptimizer } from "../../engine/media";
 import { formatBytes } from "@shared/utils/helpers/number";
 import type { ImageExportFormat } from "../../shared/types/media";
@@ -31,119 +33,16 @@ interface OptimizationState {
   isProcessing: boolean;
 }
 
-// ============================================================================
-// STYLES
-// ============================================================================
-
-const styles: Record<string, React.CSSProperties> = {
-  container: {
-    padding: 16,
-  },
-  section: {
-    marginBottom: 20,
-  },
-  label: {
-    display: "block",
-    marginBottom: 8,
-    fontSize: 12,
-    fontWeight: 500,
-    color: "var(--bk-ink-soft)",
-  },
-  formatRow: {
-    display: "flex",
-    gap: 8,
-  },
-  formatBtn: {
-    flex: 1,
-    padding: "8px 12px",
-    fontSize: 12,
-    background: "var(--bk-bg-subtle)",
-    border: "1px solid var(--bk-border)",
-    borderRadius: 6,
-    color: "var(--bk-ink)",
-    cursor: "pointer",
-    transition: "all 0.15s ease",
-  },
-  formatBtnActive: {
-    background: "var(--bk-accent)",
-    borderColor: "var(--bk-accent)",
-    color: "var(--bk-accent-on)",
-  },
-  sliderContainer: {
-    display: "flex",
-    alignItems: "center",
-    gap: 12,
-  },
-  slider: {
-    flex: 1,
-    height: 4,
-    WebkitAppearance: "none",
-    appearance: "none",
-    background: "var(--bk-border)",
-    borderRadius: 2,
-    outline: "none",
-  },
-  qualityValue: {
-    minWidth: 40,
-    textAlign: "right" as const,
-    fontSize: 13,
-    fontFamily: "monospace",
-    color: "var(--bk-ink)",
-  },
-  statsRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    padding: "12px 16px",
-    background: "var(--bk-bg-subtle)",
-    borderRadius: 8,
-    marginBottom: 16,
-  },
-  stat: {
-    textAlign: "center" as const,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: "var(--bk-ink-muted)",
-    textTransform: "uppercase" as const,
-    marginBottom: 4,
-  },
-  statValue: {
-    fontSize: 14,
-    fontWeight: 600,
-    color: "var(--bk-ink)",
-  },
-  savings: {
-    color: "#a6e3a1",
-  },
-  previewContainer: {
-    display: "flex",
-    gap: 12,
-    marginBottom: 16,
-  },
-  previewBox: {
-    flex: 1,
-    background: "var(--bk-bg-subtle)",
-    borderRadius: 8,
-    padding: 8,
-    textAlign: "center" as const,
-  },
-  previewImg: {
-    maxWidth: "100%",
-    maxHeight: 120,
-    borderRadius: 4,
-  },
-  previewLabel: {
-    fontSize: 12,
-    color: "var(--bk-ink-muted)",
-    marginTop: 6,
-  },
-  footer: {
-    display: "flex",
-    justifyContent: "flex-end",
-    gap: 8,
-    marginTop: 16,
-  },
-};
+/* Layout classes. The quality control is chrome-ui's Slider now, so the
+   hand-rolled range-input restyle that used to live here is gone. */
+const SECTION = "tw:mb-5";
+const FIELD_LABEL = "tw:block tw:mb-2";
+const SEGMENTED = "tw:flex tw:gap-2";
+const STAT_LABEL = "tw:text-xs tw:text-gray-500 tw:uppercase tw:mb-1";
+const STAT_VALUE = "tw:text-sm tw:font-semibold tw:text-gray-900";
+const PREVIEW_BOX = "tw:flex-1 tw:bg-gray-50 tw:rounded-lg tw:p-2 tw:text-center";
+const PREVIEW_LABEL = "tw:text-xs tw:text-gray-500 tw:mt-1.5";
+const GHOST = "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900";
 
 // ============================================================================
 // COMPONENT
@@ -224,10 +123,6 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
     setState((s) => ({ ...s, format }));
   };
 
-  const handleQualityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setState((s) => ({ ...s, quality: parseInt(e.target.value, 10) }));
-  };
-
   const handleApply = () => {
     if (state.optimizedSrc) {
       onOptimized(state.optimizedSrc);
@@ -247,22 +142,20 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
   ];
 
   return (
-    <div style={styles.container}>
+    <div className="tw:p-4">
       {/* Format Selection */}
-      <div style={styles.section}>
-        <label style={styles.label}>Output Format</label>
-        <div style={styles.formatRow}>
+      <div className={SECTION}>
+        <Label className={FIELD_LABEL}>Output Format</Label>
+        <div className={SEGMENTED}>
           {formats.map(({ id, label, supported }) => (
             <Button
               key={id}
+              size="xs"
+              color={state.format === id ? undefined : "light"}
+              aria-pressed={state.format === id}
+              className="tw:flex-1"
               onClick={() => supported && handleFormatChange(id)}
               disabled={!supported}
-              style={{
-                ...styles.formatBtn,
-                ...(state.format === id ? styles.formatBtnActive : {}),
-                opacity: supported ? 1 : 0.5,
-                cursor: supported ? "pointer" : "not-allowed",
-              }}
             >
               {label}
               {id === "webp" && " (Recommended)"}
@@ -271,23 +164,29 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
         </div>
       </div>
       {/* Quality Slider */}
-      <div style={styles.section}>
-        <label style={styles.label}>Quality</label>
-        <div style={styles.sliderContainer}>
-          <TextInput
-            type="range"
-            min={10}
-            max={100}
-            value={state.quality}
-            onChange={handleQualityChange}
-            style={styles.slider}
-          />
-          <span style={styles.qualityValue}>{state.quality}%</span>
+      <div className={SECTION}>
+        <Label className={FIELD_LABEL}>Quality</Label>
+        <div className="tw:flex tw:items-center tw:gap-3">
+          <div className="tw:flex-1">
+            {/* chrome-ui Slider, not a restyled range input. Its own readout is
+                off because this panel shows a percentage, not the raw value. */}
+            <Slider
+              value={state.quality}
+              onChange={(v) => setState((s) => ({ ...s, quality: v }))}
+              min={10}
+              max={100}
+              label="Quality"
+              withField={false}
+            />
+          </div>
+          <span className="tw:min-w-10 tw:text-right tw:text-[13px] tw:[font-family:var(--bk-font-mono)] tw:text-gray-900">
+            {state.quality}%
+          </span>
         </div>
       </div>
       {/* §18 — Max dimension override */}
-      <div style={styles.section}>
-        <label style={styles.label} htmlFor="opt-max-dim">Max dimension (px)</label>
+      <div className={SECTION}>
+        <Label className={FIELD_LABEL} htmlFor="opt-max-dim">Max dimension (px)</Label>
         <TextInput
           id="opt-max-dim"
           type="number"
@@ -301,43 +200,43 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
         />
       </div>
       {/* Stats */}
-      <div style={styles.statsRow}>
-        <div style={styles.stat}>
-          <div style={styles.statLabel}>Original</div>
-          <div style={styles.statValue}>{formatBytes(state.originalSize)}</div>
+      <div className="tw:flex tw:justify-between tw:px-4 tw:py-3 tw:bg-gray-50 tw:rounded-lg tw:mb-4">
+        <div className="tw:text-center">
+          <div className={STAT_LABEL}>Original</div>
+          <div className={STAT_VALUE}>{formatBytes(state.originalSize)}</div>
         </div>
-        <div style={styles.stat}>
-          <div style={styles.statLabel}>Optimized</div>
-          <div style={styles.statValue}>
+        <div className="tw:text-center">
+          <div className={STAT_LABEL}>Optimized</div>
+          <div className={STAT_VALUE}>
             {state.isProcessing ? "..." : formatBytes(state.optimizedSize)}
           </div>
         </div>
-        <div style={styles.stat}>
-          <div style={styles.statLabel}>Savings</div>
-          <div style={{ ...styles.statValue, ...styles.savings }}>
+        <div className="tw:text-center">
+          <div className={STAT_LABEL}>Savings</div>
+          <div className={`${STAT_VALUE} tw:text-[var(--bk-success)]`}>
             {state.isProcessing ? "..." : `${savings}%`}
           </div>
         </div>
       </div>
       {/* Preview Comparison */}
-      <div style={styles.previewContainer}>
-        <div style={styles.previewBox}>
-          <img src={imageSrc} alt="Original" style={styles.previewImg} />
-          <div style={styles.previewLabel}>Original</div>
+      <div className="tw:flex tw:gap-3 tw:mb-4">
+        <div className={PREVIEW_BOX}>
+          <img src={imageSrc} alt="Original" className="tw:max-w-full tw:max-h-30 tw:rounded" />
+          <div className={PREVIEW_LABEL}>Original</div>
         </div>
-        <div style={styles.previewBox}>
+        <div className={PREVIEW_BOX}>
           {state.isProcessing ? (
             <Spinner size="sm" />
           ) : state.optimizedSrc ? (
-            <img src={state.optimizedSrc} alt="Optimized" style={styles.previewImg} />
+            <img src={state.optimizedSrc} alt="Optimized" className="tw:max-w-full tw:max-h-30 tw:rounded" />
           ) : null}
-          <div style={styles.previewLabel}>Optimized</div>
+          <div className={PREVIEW_LABEL}>Optimized</div>
         </div>
       </div>
       {/* Actions */}
-      <div style={styles.footer}>
+      <div className="tw:flex tw:justify-end tw:gap-2 tw:mt-4">
         {onClose && (
-          <Button color="light" onClick={onClose} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+          <Button color="light" onClick={onClose} className={GHOST}>
             Cancel
           </Button>
         )}
