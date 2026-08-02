@@ -13,9 +13,14 @@ import type { MediaAsset, MediaAssetType, MediaViewMode } from "../../shared/typ
 import { Button, ConfirmDialog, ModalBody, ModalClose, ModalContent, ModalRoot, ModalTitle, Spinner, Tabs } from "@/editor/chrome-ui";
 import { useMediaManager } from "../shell/hooks";
 import { AssetCard } from "./AssetCard";
-import { mediaLibraryStyles as styles } from "./MediaLibraryStyles";
 import { OptimizationPanel } from "./OptimizationPanel";
 import { VideoPreview } from "./VideoPreview";
+
+const EMPTY = "tw:p-15 tw:text-center tw:text-gray-500";
+const PAD = "tw:p-5";
+/** Both scroll containers cap at the same height as the panel body. */
+const GRID = "tw:grid tw:grid-cols-[repeat(auto-fill,minmax(140px,1fr))] tw:gap-3 tw:p-1 tw:max-h-100 tw:overflow-auto";
+const LIST = "tw:flex tw:flex-col tw:gap-2 tw:max-h-100 tw:overflow-auto";
 // ============================================
 // Types
 // ============================================
@@ -143,19 +148,19 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
       onChange={setActiveTab}
     />
 
-    <div style={styles.container}>
+    <div className="tw:flex tw:flex-col tw:gap-4 tw:min-h-100">
       {activeTab === "library" && (
         <>
           {/* Toolbar */}
-          <div style={styles.toolbar}>
-            <div style={styles.searchInput}>
+          <div className="tw:flex tw:items-center tw:gap-2">
+            <div className="tw:flex-1">
               <InputField
                 placeholder="Search assets..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            <div style={styles.viewToggle}>
+            <div className="tw:flex tw:gap-1">
               <Button
                 color={viewMode === "grid" ? undefined : "light"}
                 size="xs"
@@ -177,17 +182,17 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
 
           {/* Assets Display */}
           {isLoading || uploading ? (
-            <div style={styles.emptyState}>
+            <div className={EMPTY}>
               <Spinner size="lg" />
             </div>
           ) : filteredAssets.length === 0 ? (
-            <div style={styles.emptyState}>
-              <div style={{ fontSize: 48, marginBottom: 12 }}>📁</div>
+            <div className={EMPTY}>
+              <div className="tw:mb-3 tw:text-5xl">📁</div>
               <div>No assets found</div>
-              <div style={{ fontSize: 12, marginTop: 4 }}>Upload files to get started</div>
+              <div className="tw:mt-1 tw:text-xs">Upload files to get started</div>
             </div>
           ) : (
-            <div style={viewMode === "grid" ? styles.grid : styles.listView}>
+            <div className={viewMode === "grid" ? GRID : LIST}>
               {filteredAssets.map((asset) => (
                 <AssetCard
                   key={asset.id}
@@ -204,7 +209,7 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
       )}
 
       {activeTab === "upload" && (
-        <div style={styles.uploadArea}>
+        <div className={PAD}>
           <FileField
             accept="image/*,video/*,audio/*"
             multiple
@@ -215,10 +220,10 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
       )}
 
       {activeTab === "url" && (
-        <div style={{ ...styles.uploadArea, textAlign: "center", padding: "40px 24px" }}>
-          <div style={{ fontSize: 40, marginBottom: 16 }}>🔗</div>
-          <div style={{ fontWeight: 600, marginBottom: 8 }}>Import from URL — coming soon</div>
-          <div style={{ fontSize: 13, color: "var(--bk-ink-muted)", lineHeight: 1.5 }}>
+        <div className="tw:px-6 tw:py-10 tw:text-center">
+          <div className="tw:mb-4 tw:text-4xl">🔗</div>
+          <div className="tw:mb-2 tw:font-semibold">Import from URL — coming soon</div>
+          <div className="tw:text-[13px] tw:leading-normal tw:text-gray-500">
             Paste an image or video URL to import it directly.
             <br />
             This feature is launching soon.
@@ -227,7 +232,7 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
       )}
 
       {activeTab === "optimize" && (
-        <div style={styles.uploadArea}>
+        <div className={PAD}>
           {selectedIds.size > 0 ? (
             <>
               {(() => {
@@ -249,7 +254,7 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
                 }
                 return (
                   <div
-                    style={{ textAlign: "center", padding: 40, color: "var(--bk-ink-muted)" }}
+                    className="tw:p-10 tw:text-center tw:text-gray-500"
                   >
                     Select an image to optimize
                   </div>
@@ -257,8 +262,8 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
               })()}
             </>
           ) : (
-            <div style={{ textAlign: "center", padding: 40, color: "var(--bk-ink-muted)" }}>
-              <div style={{ fontSize: 48, marginBottom: 12 }}>🖼️</div>
+            <div className="tw:p-10 tw:text-center tw:text-gray-500">
+              <div className="tw:mb-3 tw:text-5xl">🖼️</div>
               <div>Select an image from the Library to optimize</div>
             </div>
           )}
@@ -268,8 +273,8 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
 
     {/* Footer with selection info */}
     {multiple && selectedIds.size > 0 && (
-      <div style={styles.footer}>
-        <span style={{ color: "var(--bk-ink-soft)", fontSize: 13 }}>
+      <div className="tw:flex tw:items-center tw:justify-between tw:mt-4 tw:pt-4 tw:border-t tw:border-gray-200">
+        <span className="tw:text-[13px] tw:text-[var(--bk-ink-soft)]">
           {selectedIds.size} selected
         </span>
         <Button onClick={handleConfirmSelection}>Use Selected</Button>
