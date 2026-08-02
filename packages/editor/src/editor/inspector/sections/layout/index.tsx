@@ -5,7 +5,8 @@
  */
 
 import * as React from "react";
-import { Section, baseStyles, MoreSettingsToggle, type SectionTier } from "../../shared/controls";
+import { Section, MoreSettingsToggle, type SectionTier } from "../../shared/controls";
+import { SECTION_PREVIEW, SECTION_SUBTITLE } from "../../shared/controls/controlClasses";
 import { ConstraintControl } from "./ConstraintControl";
 import { DisplayControls } from "./DisplayControls";
 import { OverflowControls, VisibilityFloatControls } from "./OverflowVisibilityControls";
@@ -34,8 +35,6 @@ export interface LayoutSectionProps {
   isMultiSelect?: boolean;
 }
 
-// Use shared styles
-const { sectionTitle } = baseStyles;
 
 // ============================================================================
 // COMPONENT
@@ -62,14 +61,7 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
   if (position && position !== "static") layoutPreviewParts.push(position);
   const layoutPreview =
     layoutPreviewParts.length > 0 ? (
-      <span
-        style={{
-          fontSize: 11,
-          color: "var(--bk-ink-muted)",
-          fontFamily: "var(--bk-font-mono)",
-          whiteSpace: "nowrap",
-        }}
-      >
+      <span className={SECTION_PREVIEW}>
         {layoutPreviewParts.join(" · ")}
       </span>
     ) : undefined;
@@ -93,7 +85,7 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
       <DisplayControls display={styles.display || ""} onChange={onChange} mixedKeys={mixedKeys} />
 
       {/* Size Constraints (essential) */}
-      <div style={sectionTitle}>Size Constraints</div>
+      <div className={SECTION_SUBTITLE}>Size Constraints</div>
       <ConstraintControl
         label="Width"
         value={styles.width || "auto"}
@@ -106,7 +98,7 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
       />
 
       {/* Position - essential (position type + anchor) */}
-      <div style={sectionTitle}>Position</div>
+      <div className={SECTION_SUBTITLE}>Position</div>
       <PositionControls styles={styles} onChange={onChange} propertyStates={propertyStates} mixedKeys={mixedKeys} />
 
       {/* ═══════════════════════════════════════════════════════════════════
@@ -116,11 +108,11 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
       {advancedExpanded && (
         <>
           {/* Overflow (advanced) */}
-          <div style={sectionTitle}>Overflow</div>
+          <div className={SECTION_SUBTITLE}>Overflow</div>
           <OverflowControls styles={styles} onChange={onChange} mixedKeys={mixedKeys} />
 
           {/* Visibility & Float (advanced) */}
-          <div style={sectionTitle}>Visibility & Float</div>
+          <div className={SECTION_SUBTITLE}>Visibility & Float</div>
           <VisibilityFloatControls styles={styles} onChange={onChange} mixedKeys={mixedKeys} />
         </>
       )}

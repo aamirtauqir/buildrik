@@ -5,7 +5,19 @@
 
 import * as React from "react";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
+import {
+  CONTROL_BTN_GROUP,
+  CONTROL_INPUT_WRAP,
+  CONTROL_LABEL,
+  CONTROL_ROW,
+  compactBtnClass,
+} from "../../shared/controls/controlClasses";
 import { Button, TextInput } from "@/editor/chrome-ui";
+
+/** grow / shrink / basis share one narrow cell each. */
+const TRIPLE_CELL = "tw:flex tw:items-center tw:gap-1";
+const TRIPLE_LABEL = "tw:w-[30px] tw:text-xs tw:text-gray-500";
+const TRIPLE_INPUT = `${CONTROL_INPUT_WRAP} tw:[&_input]:px-[5px]`;
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -15,10 +27,6 @@ export interface FlexItemControlsProps {
   onChange: (prop: string, val: string) => void;
   disabled: (prop: string) => boolean | undefined;
   reason: (prop: string) => string | undefined;
-  inputStyle: React.CSSProperties;
-  rowStyle: React.CSSProperties;
-  labelStyle: React.CSSProperties;
-  compactBtn: (active: boolean) => React.CSSProperties;
   mixedKeys?: ReadonlySet<string>;
 }
 
@@ -31,113 +39,52 @@ export const FlexItemControls: React.FC<FlexItemControlsProps> = ({
   onChange,
   disabled,
   reason,
-  inputStyle,
-  rowStyle,
-  labelStyle,
-  compactBtn,
   mixedKeys,
 }) => (
-  <div
-    style={{
-      marginTop: 10,
-      paddingTop: 10,
-      borderTop: `1px solid ${"var(--bk-border)"}`,
-    }}
-  >
-    <div
-      style={{
-        fontSize: 12,
-        color: "var(--bk-ink-muted)",
-        fontWeight: 600,
-        marginBottom: 8,
-        textTransform: "uppercase",
-      }}
-    >
+  <div className="tw:mt-2.5 tw:pt-2.5 tw:border-t tw:border-gray-200">
+    <div className="tw:mb-2 tw:text-xs tw:font-semibold tw:text-gray-500 tw:uppercase">
       Flex Item (Self)
     </div>
 
     {/* Grow, Shrink, Basis */}
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr 1fr",
-        gap: 4,
-        marginBottom: 6,
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+    <div className="tw:grid tw:grid-cols-3 tw:gap-1 tw:mb-1.5">
+      <div className={TRIPLE_CELL}>
         {mixedKeys?.has("flex-grow") && <MixedValueBadge compact />}
-        <span
-          style={{
-            fontSize: 12,
-            color: "var(--bk-ink-muted)",
-            width: 30,
-          }}
-        >
-          Grow
-        </span>
+        <span className={TRIPLE_LABEL}>Grow</span>
         <TextInput
           type="number"
           value={styles["flex-grow"] || ""}
           onChange={(e) => onChange("flex-grow", e.target.value)}
           placeholder="0"
           min="0"
-          style={{
-            ...inputStyle,
-            padding: "4px 5px",
-            opacity: disabled("flex-grow") ? 0.5 : 1,
-          }}
+          className={TRIPLE_INPUT}
           title={reason("flex-grow")}
           disabled={disabled("flex-grow")}
         />
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+      <div className={TRIPLE_CELL}>
         {mixedKeys?.has("flex-shrink") && <MixedValueBadge compact />}
-        <span
-          style={{
-            fontSize: 12,
-            color: "var(--bk-ink-muted)",
-            width: 30,
-          }}
-        >
-          Shrink
-        </span>
+        <span className={TRIPLE_LABEL}>Shrink</span>
         <TextInput
           type="number"
           value={styles["flex-shrink"] || ""}
           onChange={(e) => onChange("flex-shrink", e.target.value)}
           placeholder="1"
           min="0"
-          style={{
-            ...inputStyle,
-            padding: "4px 5px",
-            opacity: disabled("flex-shrink") ? 0.5 : 1,
-          }}
+          className={TRIPLE_INPUT}
           title={reason("flex-shrink")}
           disabled={disabled("flex-shrink")}
         />
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+      <div className={TRIPLE_CELL}>
         {mixedKeys?.has("flex-basis") && <MixedValueBadge compact />}
-        <span
-          style={{
-            fontSize: 12,
-            color: "var(--bk-ink-muted)",
-            width: 30,
-          }}
-        >
-          Basis
-        </span>
+        <span className={TRIPLE_LABEL}>Basis</span>
         <TextInput
           type="text"
           value={styles["flex-basis"] || ""}
           onChange={(e) => onChange("flex-basis", e.target.value)}
           placeholder="auto"
-          style={{
-            ...inputStyle,
-            padding: "4px 5px",
-            opacity: disabled("flex-basis") ? 0.5 : 1,
-          }}
+          className={TRIPLE_INPUT}
           title={reason("flex-basis")}
           disabled={disabled("flex-basis")}
         />
@@ -145,9 +92,9 @@ export const FlexItemControls: React.FC<FlexItemControlsProps> = ({
     </div>
 
     {/* Align Self */}
-    <div style={rowStyle}>
-      <label style={labelStyle}>A-Self</label>
-      <div style={{ display: "flex", gap: 2, flex: 1 }}>
+    <div className={CONTROL_ROW}>
+      <label className={CONTROL_LABEL}>A-Self</label>
+      <div className={CONTROL_BTN_GROUP}>
         {["auto", "start", "center", "end", "stretch", "base"].map((val) => {
           const actualVal =
             val === "start"
@@ -160,7 +107,8 @@ export const FlexItemControls: React.FC<FlexItemControlsProps> = ({
           return (
             <Button
               key={val}
-              style={compactBtn(styles["align-self"] === actualVal)}
+              size="xs"
+              className={compactBtnClass(styles["align-self"] === actualVal)}
               onClick={() => onChange("align-self", actualVal)}
               disabled={disabled("align-self")}
               title={reason("align-self")}
@@ -173,17 +121,14 @@ export const FlexItemControls: React.FC<FlexItemControlsProps> = ({
     </div>
 
     {/* Order */}
-    <div style={rowStyle}>
-      <label style={labelStyle}>Order</label>
+    <div className={CONTROL_ROW}>
+      <label className={CONTROL_LABEL}>Order</label>
       <TextInput
         type="number"
         value={styles.order || ""}
         onChange={(e) => onChange("order", e.target.value)}
         placeholder="0"
-        style={{
-          ...inputStyle,
-          opacity: disabled("order") ? 0.5 : 1,
-        }}
+        className={CONTROL_INPUT_WRAP}
         disabled={disabled("order")}
         title={reason("order")}
       />

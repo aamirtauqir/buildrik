@@ -1,15 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import { Section } from "../shared/controls/Section";
-
-// Suppress style warnings from jsdom
-vi.mock("../shared/controls/controlStyles", () => ({
-  baseStyles: {
-    section: {},
-    sectionHeader: () => ({}),
-    sectionContent: {},
-  },
-}));
 
 describe("Section — aria-label", () => {
   it("button has aria-label including title and collapsed state", () => {

@@ -4,9 +4,6 @@
  * @license BSD-3-Clause
  */
 
-// Styles
-export { baseStyles } from "./controlStyles";
-
 // Unified ControlRow system
 export { ControlRow, CompactRow, StackedRow, SubTitle } from "./ControlRow";
 export type { ControlRowProps, SubTitleProps } from "./ControlRow";

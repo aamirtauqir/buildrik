@@ -6,6 +6,7 @@
 import * as React from "react";
 import { HelpTooltip, Button, TextInput } from "@/editor/chrome-ui";
 import { InputRow } from "../../shared/controls";
+import { CONTROL_INPUT_WRAP } from "../../shared/controls/controlClasses";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
 import { CLUSTER_CAPTION, OFFSET_ANCHOR, OFFSET_PANEL, cardBtnClass } from "./classes";
 import { PositionPreview } from "./previews";
@@ -39,11 +40,8 @@ const POSITION_OPTIONS = [
 // CLASSES
 // ============================================================================
 
-/** flowbite puts `className` on TextInput's wrapper; the real <input> needs a
- *  descendant variant (chrome-ui/textInputTheme documents the split). */
-const OFFSET_INPUT =
-  "tw:w-[50px] tw:[&_input]:h-6 tw:[&_input]:p-1 tw:[&_input]:text-center " +
-  "tw:[&_input]:text-[11.5px] tw:[&_input]:font-medium tw:[&_input]:[font-family:var(--bk-font-ui)]";
+/** The shared control input, narrowed and centred for the offset cross. */
+const OFFSET_INPUT = `${CONTROL_INPUT_WRAP} tw:flex-none tw:w-[50px] tw:[&_input]:px-1 tw:[&_input]:text-center`;
 
 // ============================================================================
 // COMPONENT

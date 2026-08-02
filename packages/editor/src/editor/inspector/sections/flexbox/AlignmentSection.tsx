@@ -5,8 +5,12 @@
 
 import * as React from "react";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
+import { compactBtnClass } from "../../shared/controls/controlClasses";
 import { FlexAlignmentGrid } from "./controls";
 import { Button } from "@/editor/chrome-ui";
+
+/** Caption above each alignment cluster. */
+const CAPTION = "tw:flex tw:items-center tw:mb-1 tw:text-xs tw:text-gray-500";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -14,7 +18,6 @@ import { Button } from "@/editor/chrome-ui";
 export interface AlignmentSectionProps {
   styles: Record<string, string>;
   onChange: (prop: string, val: string) => void;
-  compactBtn: (active: boolean) => React.CSSProperties;
   mixedKeys?: ReadonlySet<string>;
 }
 
@@ -25,28 +28,12 @@ export interface AlignmentSectionProps {
 export const AlignmentSection: React.FC<AlignmentSectionProps> = ({
   styles,
   onChange,
-  compactBtn,
   mixedKeys,
 }) => (
-  <div
-    style={{
-      display: "flex",
-      gap: 12,
-      marginBottom: 12,
-      alignItems: "flex-start",
-    }}
-  >
+  <div className="tw:flex tw:items-start tw:gap-3 tw:mb-3">
     {/* 9-Dot Grid */}
     <div>
-      <div
-        style={{
-          fontSize: 12,
-          color: "var(--bk-ink-muted)",
-          marginBottom: 6,
-        }}
-      >
-        Alignment
-      </div>
+      <div className={`${CAPTION} tw:mb-1.5`}>Alignment</div>
       <FlexAlignmentGrid
         justifyContent={styles["justify-content"] || "flex-start"}
         alignItems={styles["align-items"] || "flex-start"}
@@ -57,17 +44,9 @@ export const AlignmentSection: React.FC<AlignmentSectionProps> = ({
     </div>
 
     {/* Justify/Align Labels */}
-    <div style={{ flex: 1 }}>
-      <div style={{ marginBottom: 8 }}>
-        <div
-          style={{
-            fontSize: 12,
-            color: "var(--bk-ink-muted)",
-            marginBottom: 4,
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
+    <div className="tw:flex-1">
+      <div className="tw:mb-2">
+        <div className={CAPTION}>
           {mixedKeys?.has("justify-content") && <MixedValueBadge compact />}
           Justify Content
         </div>
@@ -88,7 +67,8 @@ export const AlignmentSection: React.FC<AlignmentSectionProps> = ({
             return (
               <Button
                 key={val}
-                style={compactBtn(styles["justify-content"] === actualVal)}
+                size="xs"
+                className={compactBtnClass(styles["justify-content"] === actualVal)}
                 onClick={() => onChange("justify-content", actualVal)}
               >
                 {val.slice(0, 3)}
@@ -98,15 +78,7 @@ export const AlignmentSection: React.FC<AlignmentSectionProps> = ({
         </div>
       </div>
       <div>
-        <div
-          style={{
-            fontSize: 12,
-            color: "var(--bk-ink-muted)",
-            marginBottom: 4,
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
+        <div className={CAPTION}>
           {mixedKeys?.has("align-items") && <MixedValueBadge compact />}
           Align Items
         </div>
@@ -116,7 +88,8 @@ export const AlignmentSection: React.FC<AlignmentSectionProps> = ({
             return (
               <Button
                 key={val}
-                style={compactBtn(styles["align-items"] === actualVal)}
+                size="xs"
+                className={compactBtnClass(styles["align-items"] === actualVal)}
                 onClick={() => onChange("align-items", actualVal)}
               >
                 {val.slice(0, 3)}

@@ -4,7 +4,14 @@
  */
 
 import * as React from "react";
-import { Section, baseStyles, type SectionTier } from "../../shared/controls";
+import { Section, type SectionTier } from "../../shared/controls";
+import {
+  CONTROL_BTN_GROUP,
+  CONTROL_LABEL,
+  CONTROL_ROW,
+  SECTION_PREVIEW,
+  compactBtnClass,
+} from "../../shared/controls/controlClasses";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
 import { AlignmentSection } from "./AlignmentSection";
 import { DirectionControls } from "./DirectionControls";
@@ -35,7 +42,6 @@ export interface FlexboxSectionProps {
 }
 
 // Use shared styles
-const { compactBtn, row: rowStyle, label: labelStyle, input: inputStyle } = baseStyles;
 
 // ============================================================================
 // COMPONENT
@@ -76,14 +82,7 @@ export const FlexboxSection: React.FC<FlexboxSectionProps> = ({
   };
   const flexPreviewText = buildFlexPreview();
   const flexPreview = flexPreviewText ? (
-    <span
-      style={{
-        fontSize: 11,
-        color: "var(--bk-ink-muted)",
-        fontFamily: "var(--bk-font-mono)",
-        whiteSpace: "nowrap",
-      }}
-    >
+    <span className={SECTION_PREVIEW}>
       {flexPreviewText}
     </span>
   ) : undefined;
@@ -106,17 +105,18 @@ export const FlexboxSection: React.FC<FlexboxSectionProps> = ({
           <DirectionControls currentDirection={styles["flex-direction"]} onChange={onChange} mixedKeys={mixedKeys} />
 
           {/* Alignment Grid + Justify/Align */}
-          <AlignmentSection styles={styles} onChange={onChange} compactBtn={compactBtn} mixedKeys={mixedKeys} />
+          <AlignmentSection styles={styles} onChange={onChange} mixedKeys={mixedKeys} />
 
           {/* Wrap Toggle */}
-          <div style={rowStyle}>
+          <div className={CONTROL_ROW}>
             {mixedKeys?.has("flex-wrap") && <MixedValueBadge compact />}
-            <label style={labelStyle}>Wrap</label>
-            <div style={{ display: "flex", gap: 2, flex: 1 }}>
+            <label className={CONTROL_LABEL}>Wrap</label>
+            <div className={CONTROL_BTN_GROUP}>
               {["nowrap", "wrap", "wrap-reverse"].map((val) => (
                 <Button
                   key={val}
-                  style={compactBtn(styles["flex-wrap"] === val)}
+                  size="xs"
+                  className={compactBtnClass(styles["flex-wrap"] === val)}
                   onClick={() => onChange("flex-wrap", val)}
                 >
                   {val === "wrap-reverse" ? "rev" : val}
@@ -135,10 +135,10 @@ export const FlexboxSection: React.FC<FlexboxSectionProps> = ({
           />
 
           {/* Align Content */}
-          <div style={rowStyle}>
+          <div className={CONTROL_ROW}>
             {mixedKeys?.has("align-content") && <MixedValueBadge compact />}
-            <label style={labelStyle}>A-Cont</label>
-            <div style={{ display: "flex", gap: 2, flex: 1 }}>
+            <label className={CONTROL_LABEL}>A-Cont</label>
+            <div className={CONTROL_BTN_GROUP}>
               {["start", "center", "end", "stretch", "between", "around"].map((val) => {
                 const actualVal =
                   val === "start"
@@ -153,7 +153,8 @@ export const FlexboxSection: React.FC<FlexboxSectionProps> = ({
                 return (
                   <Button
                     key={val}
-                    style={compactBtn(styles["align-content"] === actualVal)}
+                    size="xs"
+                    className={compactBtnClass(styles["align-content"] === actualVal)}
                     onClick={() => onChange("align-content", actualVal)}
                   >
                     {val.slice(0, 3)}
@@ -171,10 +172,6 @@ export const FlexboxSection: React.FC<FlexboxSectionProps> = ({
           onChange={onChange}
           disabled={disabled}
           reason={reason}
-          inputStyle={inputStyle}
-          rowStyle={rowStyle}
-          labelStyle={labelStyle}
-          compactBtn={compactBtn}
           mixedKeys={mixedKeys}
         />
       )}

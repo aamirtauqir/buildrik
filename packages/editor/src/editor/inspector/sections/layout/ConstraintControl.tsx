@@ -4,14 +4,9 @@
  */
 
 import * as React from "react";
+import { CONTROL_INPUT_WRAP } from "../../shared/controls/controlClasses";
 import { CLUSTER_CAPTION, constraintBtnClass } from "./classes";
 import { Button, TextInput } from "@/editor/chrome-ui";
-
-/** flowbite puts `className` on TextInput's wrapper — the real <input> is
- *  reached with a descendant variant (chrome-ui/textInputTheme documents it). */
-const FIXED_INPUT =
-  "tw:flex-1 tw:min-w-0 tw:[&_input]:h-6 tw:[&_input]:py-0 tw:[&_input]:px-2 " +
-  "tw:[&_input]:text-[11.5px] tw:[&_input]:font-medium tw:[&_input]:[font-family:var(--bk-font-ui)]";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -137,7 +132,7 @@ export const ConstraintControl: React.FC<ConstraintControlProps> = ({ label, val
             value={value}
             onChange={(e) => onChange(e.target.value)}
             placeholder={isWidth ? "200px" : "auto"}
-            className={FIXED_INPUT}
+            className={CONTROL_INPUT_WRAP}
           />
         </div>
       )}
