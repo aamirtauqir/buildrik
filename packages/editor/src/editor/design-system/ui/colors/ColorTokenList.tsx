@@ -78,8 +78,55 @@ const GROUP_META: Record<string, { label: string; subtext: string }> = {
   },
 };
 
-// Background used for WCAG contrast checks. Editor canvas dark surface.
-const BG = "#0A0A0A";
+/**
+ * The surface every colour token is contrast-checked against.
+ *
+ * This used to be a hardcoded `#0A0A0A` with the comment "Editor canvas dark
+ * surface", and it was wrong twice over. The editor is light (theme
+ * unification, 2026-04-18). And the editor's own background is irrelevant
+ * anyway — these are the CUSTOMER's site tokens, so the only meaningful
+ * question is whether they read on the CUSTOMER's page.
+ *
+ * The effect was a fully inverted lint. Measured against #0A0A0A:
+ *   #FFFFFF -> 19.80 aaa   (white text on a white page)
+ *   #F5F5F5 -> 18.16 aaa   (1.09 on the real surface — unreadable)
+ *   #111827 ->  1.12 fail  (17.74 on the real surface — perfectly readable)
+ * and `suggestContrastFix` aimed at that same wrong target, so "Fix all"
+ * would have walked a readable palette toward an unreadable one.
+ *
+ * Resolved from the customer's own background token, honouring their colour
+ * mode. Falls back to white, which is what a web page is when nobody says
+ * otherwise — never to near-black.
+ */
+const FALLBACK_BG = "#FFFFFF";
+
+function findSurfaceToken(tokens: readonly DesignToken[]): DesignToken | undefined {
+  return (
+    tokens.find((t) => t.id === "color-background") ??
+    tokens.find((t) => t.group === "surface" && /background/i.test(t.name))
+  );
+}
+
+function resolveSurface(bg: DesignToken | undefined, mode: "light" | "dark"): string {
+  if (!bg) return FALLBACK_BG;
+  return (mode === "dark" ? bg.darkValue : bg.value) || bg.value || FALLBACK_BG;
+}
+
+/** In dark mode a token is shown as its dark value, so that is the value that
+ *  has to survive the dark surface. Comparing the light value against a dark
+ *  page measures a pairing the customer never sees. */
+const shownValue = (t: DesignToken, mode: "light" | "dark") =>
+  (mode === "dark" ? t.darkValue : t.value) || t.value;
+
+/** The page colour itself is not "text on the page". Comparing it to itself is
+ *  always 1:1, so without this every palette would report its own background as
+ *  a failure — noise the old hardcoded surface hid by accident. */
+const contrastFails = (
+  t: DesignToken,
+  surfaceBg: string,
+  mode: "light" | "dark",
+  surfaceId?: string,
+) => t.id !== surfaceId && calcWcagLevel(shownValue(t, mode), surfaceBg) === "fail";
 
 // ─── Group header (mono-uppercase per prototype) ──────────────────────────────
 
@@ -216,6 +263,14 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
     };
   }, [composer]);
 
+  /** The customer's page colour, not the editor's. Recomputed when their
+   *  background token or colour mode changes. */
+  const surfaceToken = React.useMemo(() => findSurfaceToken(tokens), [tokens]);
+  const surfaceBg = React.useMemo(
+    () => resolveSurface(surfaceToken, resolvedMode),
+    [surfaceToken, resolvedMode],
+  );
+
   // T6: count tokens missing darkValue. `tokens` prop is already filtered
   // to color-only upstream by TokensSection (useColorTokens hook), so the
   // explicit `t.kind === "color"` check from the spec was redundant AND
@@ -244,10 +299,10 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
       );
     }
     if (filterMode === "issues") {
-      result = result.filter((t) => calcWcagLevel(t.value, BG) === "fail");
+      result = result.filter((t) => contrastFails(t, surfaceBg, resolvedMode, surfaceToken?.id));
     }
     return result;
-  }, [tokens, searchQuery, filterMode]);
+  }, [tokens, searchQuery, filterMode, surfaceBg, surfaceToken, resolvedMode]);
 
   const groups: ColorGroup[] = React.useMemo(() => {
     const groupMap = new Map<string, DesignToken[]>();
@@ -269,20 +324,20 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
   }, [visibleTokens]);
 
   const issuesCount = React.useMemo(
-    () => tokens.filter((t) => calcWcagLevel(t.value, BG) === "fail").length,
-    [tokens],
+    () => tokens.filter((t) => contrastFails(t, surfaceBg, resolvedMode, surfaceToken?.id)).length,
+    [tokens, surfaceBg, surfaceToken, resolvedMode],
   );
 
   const contrastFixes = React.useMemo(() => {
     const fixes: Record<string, string> = {};
     tokens.forEach((t) => {
-      if (calcWcagLevel(t.value, BG) === "fail") {
-        const fix = suggestContrastFix(t.value, BG);
+      if (contrastFails(t, surfaceBg, resolvedMode, surfaceToken?.id)) {
+        const fix = suggestContrastFix(shownValue(t, resolvedMode), surfaceBg);
         if (fix) fixes[t.id] = fix;
       }
     });
     return fixes;
-  }, [tokens]);
+  }, [tokens, surfaceBg, surfaceToken, resolvedMode]);
 
   const applyAllFixes = () => {
     Object.entries(contrastFixes).forEach(([id, hex]) => onColorChange(id, hex));
@@ -499,7 +554,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
                 group.tokens.map((t) => {
                   const fix = contrastFixes[t.id];
                   if (!fix) return null;
-                  const ratio = calcContrastRatio(t.value, BG);
+                  const ratio = calcContrastRatio(t.value, surfaceBg);
                   return (
                     <div
                       key={`${t.id}-fix`}
