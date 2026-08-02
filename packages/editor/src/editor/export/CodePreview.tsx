@@ -14,6 +14,16 @@ import * as React from "react";
 import type { CodeTab } from "../../shared/types/export";
 import { CopyButton, Tabs } from "@/editor/chrome-ui";
 
+/* @lint-hex-policy: code-syntax highlight theme (One Dark), not editor chrome.
+   These are a SYNTAX theme for the customer's exported code, deliberately dark
+   and deliberately not the chrome palette — the same standing exception the
+   inline versions carried. */
+const SYN_TAG = "tw:text-[#e06c75]";
+const SYN_ATTR = "tw:text-[#d19a66]";
+const SYN_STRING = "tw:text-[#98c379]";
+const SYN_ENTITY = "tw:text-[#56b6c2]";
+const SYN_TEXT = "tw:text-[#abb2bf]";
+
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -54,35 +64,35 @@ function highlightHTML(code: string): React.ReactNode[] {
     if (match[1]) {
       // Tags
       parts.push(
-        <span key={key++} style={{ color: /* @lint-hex-policy: code-syntax highlight theme (One Dark), not editor chrome */ "#e06c75" }}>
+        <span key={key++} className={SYN_TAG}>
           {match[0]}
         </span>
       );
     } else if (match[2]) {
       // Attributes
       parts.push(
-        <span key={key++} style={{ color: /* @lint-hex-policy: code-syntax highlight theme (One Dark), not editor chrome */ "#d19a66" }}>
+        <span key={key++} className={SYN_ATTR}>
           {match[0]}
         </span>
       );
     } else if (match[3]) {
       // Strings
       parts.push(
-        <span key={key++} style={{ color: /* @lint-hex-policy: code-syntax highlight theme (One Dark), not editor chrome */ "#98c379" }}>
+        <span key={key++} className={SYN_STRING}>
           {match[0]}
         </span>
       );
     } else if (match[4]) {
       // Entities
       parts.push(
-        <span key={key++} style={{ color: /* @lint-hex-policy: code-syntax highlight theme (One Dark), not editor chrome */ "#56b6c2" }}>
+        <span key={key++} className={SYN_ENTITY}>
           {match[0]}
         </span>
       );
     } else if (match[5]) {
       // Comments
       parts.push(
-        <span key={key++} style={{ color: "var(--bk-ink-muted)", fontStyle: "italic" }}>
+        <span key={key++} className="tw:italic tw:text-gray-500">
           {match[0]}
         </span>
       );
@@ -118,35 +128,35 @@ function highlightCSS(code: string): React.ReactNode[] {
     if (match[1]) {
       // Selectors
       parts.push(
-        <span key={key++} style={{ color: /* @lint-hex-policy: code-syntax highlight theme (One Dark), not editor chrome */ "#e06c75" }}>
+        <span key={key++} className={SYN_TAG}>
           {match[0]}
         </span>
       );
     } else if (match[2]) {
       // Properties
       parts.push(
-        <span key={key++} style={{ color: /* @lint-hex-policy: code-syntax highlight theme (One Dark), not editor chrome */ "#56b6c2" }}>
+        <span key={key++} className={SYN_ENTITY}>
           {match[0]}
         </span>
       );
     } else if (match[3]) {
       // Values
       parts.push(
-        <span key={key++} style={{ color: /* @lint-hex-policy: code-syntax highlight theme (One Dark), not editor chrome */ "#98c379" }}>
+        <span key={key++} className={SYN_STRING}>
           {match[0]}
         </span>
       );
     } else if (match[4]) {
       // Comments
       parts.push(
-        <span key={key++} style={{ color: "var(--bk-ink-muted)", fontStyle: "italic" }}>
+        <span key={key++} className="tw:italic tw:text-gray-500">
           {match[0]}
         </span>
       );
     } else if (match[5]) {
       // Braces
       parts.push(
-        <span key={key++} style={{ color: /* @lint-hex-policy: code-syntax highlight theme (One Dark), not editor chrome */ "#abb2bf" }}>
+        <span key={key++} className={SYN_TEXT}>
           {match[0]}
         </span>
       );
@@ -167,17 +177,7 @@ function highlightCSS(code: string): React.ReactNode[] {
 // ============================================================================
 
 const LineNumbers: React.FC<{ count: number }> = ({ count }) => (
-  <div
-    style={{
-      textAlign: "right",
-      paddingRight: 16,
-      color: "var(--bk-ink-muted)",
-      fontSize: 12,
-      fontFamily: "monospace",
-      userSelect: "none",
-      borderRight: /* @lint-hex-policy: code-syntax highlight theme (One Dark), not editor chrome */ "1px solid #3e4451",
-    }}
-  >
+  <div className="tw:pr-4 tw:text-right tw:text-xs tw:text-gray-500 tw:select-none tw:border-r tw:border-r-[#3e4451] tw:[font-family:var(--bk-font-mono)]">
     {Array.from({ length: count }, (_, i) => (
       <div key={i}>{i + 1}</div>
     ))}
@@ -197,42 +197,22 @@ const CodeBlock: React.FC<{
   const highlighted = language === "html" ? highlightHTML(code) : highlightCSS(code);
 
   return (
-    <div style={{ position: "relative" }}>
+    <div className="tw:relative">
       {/* Copy button with toast feedback */}
       <div
-        style={{
-          position: "absolute",
-          top: 8,
-          right: 8,
-          zIndex: 10,
-        }}
+        className="tw:absolute tw:top-2 tw:right-2 tw:z-10"
       >
         <CopyButton content={code} label="Copy" variant="solid" size="sm" />
       </div>
 
       <div
-        style={{
-          display: "flex",
-          background: /* @lint-hex-policy: code-syntax highlight theme (One Dark), not editor chrome */ "#282c34",
-          borderRadius: 8,
-          padding: 16,
-          overflow: "auto",
-          maxHeight: 400,
-        }}
+        className="tw:flex tw:p-4 tw:max-h-100 tw:overflow-auto tw:rounded-lg tw:bg-[#282c34]"
       >
         {showLineNumbers && <LineNumbers count={lines.length} />}
         <pre
-          style={{
-            flex: 1,
-            margin: 0,
-            paddingLeft: showLineNumbers ? 16 : 0,
-            fontSize: 13,
-            lineHeight: 1.6,
-            fontFamily: "'Fira Code', 'Monaco', 'Consolas', monospace",
-            color: /* @lint-hex-policy: code-syntax highlight theme (One Dark), not editor chrome */ "#abb2bf",
-            whiteSpace: "pre-wrap",
-            wordBreak: "break-word",
-          }}
+          className={`tw:flex-1 tw:m-0 tw:text-[13px] tw:leading-relaxed tw:whitespace-pre-wrap tw:break-words ${SYN_TEXT} tw:[font-family:var(--bk-font-mono)] ${
+            showLineNumbers ? "tw:pl-4" : "tw:pl-0"
+          }`}
         >
           {highlighted}
         </pre>
@@ -257,7 +237,7 @@ export const CodePreview: React.FC<CodePreviewProps> = ({
   return (
     <div className="tw:flex tw:flex-col tw:gap-3">
       {/* Tabs */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div className="tw:flex tw:items-center tw:justify-between">
         <Tabs
           tabs={[
             { id: "html", label: "HTML" },
@@ -267,7 +247,7 @@ export const CodePreview: React.FC<CodePreviewProps> = ({
           onChange={(tab) => setActiveTab(tab as CodeTab)}
           label="Code language"
         />
-        <span style={{ fontSize: 12, color: "var(--bk-ink-muted)" }}>
+        <span className="tw:text-xs tw:text-gray-500">
           {activeTab === "html"
             ? `${html.split("\n").length} lines`
             : `${cssCode.split("\n").length} lines`}
