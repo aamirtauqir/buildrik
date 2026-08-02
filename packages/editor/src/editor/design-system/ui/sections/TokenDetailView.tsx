@@ -35,7 +35,7 @@ import { ELEMENT_TYPE_LABELS } from "../../../../shared/constants/elementTypeLab
 import { useDSModeOptional } from "../../state/DSModeContext";
 import { ColorPicker } from "../colors/ColorPicker";
 import { TokenReplaceModal } from "./TokenReplaceModal";
-import { Button, TextInput } from "@/editor/chrome-ui";
+import { Button, FieldRow, TextInput } from "@/editor/chrome-ui";
 
 export interface TokenDetailViewProps {
   token: DesignToken;
@@ -59,240 +59,37 @@ export interface TokenDetailViewProps {
   onRename?: (id: string, newId: string) => void;
 }
 
-// ─── Inline styles (no orphan classNames — feedback_orphan_classes_pattern) ───
+/* Classes, not a style-const wall. The label+value pairs are chrome-ui's
+   FieldRow now — its label is `w-24`, which is the 96px this file had been
+   re-declaring five times. */
 
-const containerStyle: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: 16,
-  padding: "12px 4px",
-};
-
-const backBtnStyle: React.CSSProperties = {
-  display: "inline-flex",
-  alignItems: "center",
-  gap: 6,
-  padding: "4px 8px",
-  background: "transparent",
-  border: "none",
-  color: "var(--bk-ink-muted)",
-  fontSize: 12,
-  cursor: "pointer",
-  alignSelf: "flex-start",
-  borderRadius: 4,
-};
-
-const headerStyle: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: 12,
-};
-
-const nameStyle: React.CSSProperties = {
-  fontSize: 16,
-  fontWeight: 600,
-  color: "var(--bk-ink)",
-  lineHeight: 1.2,
-};
-
-const idMonoStyle: React.CSSProperties = {
-  fontSize: 12,
-  fontFamily: "var(--bk-font-mono, ui-monospace, monospace)",
-  color: "var(--bk-ink-muted)",
-};
-
-const cssVarStyle: React.CSSProperties = {
-  fontSize: 11,
-  fontFamily: "var(--bk-font-mono, ui-monospace, monospace)",
-  color: "var(--bk-ink-muted)",
-  marginTop: 2,
-};
-
-const fieldRowStyle: React.CSSProperties = {
-  display: "flex",
-  alignItems: "flex-start",
-  gap: 12,
-  padding: "8px 0",
-  borderTop: "1px solid var(--bk-border)",
-};
-
-const fieldLabelStyle: React.CSSProperties = {
-  width: 96,
-  flexShrink: 0,
-  fontSize: 12,
-  color: "var(--bk-ink-muted)",
-  paddingTop: 4,
-};
-
-const fieldValueStyle: React.CSSProperties = {
-  flex: 1,
-  minWidth: 0,
-  fontSize: 12,
-  color: "var(--bk-ink)",
-};
-
-const inputStyle: React.CSSProperties = {
-  width: "100%",
-  padding: "6px 8px",
-  border: "1px solid var(--bk-border)",
-  borderRadius: 6,
-  background: "var(--bk-bg-card)",
-  color: "var(--bk-ink)",
-  fontSize: 12,
-  fontFamily: "var(--bk-font-mono, ui-monospace, monospace)",
-  boxSizing: "border-box",
-};
-
-const lintPassStyle: React.CSSProperties = {
-  display: "inline-flex",
-  alignItems: "center",
-  gap: 6,
-  fontSize: 12,
-  color: "var(--bk-success)",
-};
-
-const lintFailStyle: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: 6,
-  fontSize: 12,
-  color: "var(--bk-warning-text)",
-};
-
-const lintActionRowStyle: React.CSSProperties = {
-  display: "flex",
-  gap: 6,
-};
-
-const smallBtnStyle: React.CSSProperties = {
-  padding: "3px 8px",
-  borderRadius: 4,
-  border: "1px solid var(--bk-border)",
-  background: "transparent",
-  color: "var(--bk-ink)",
-  fontSize: 11,
-  fontWeight: 500,
-  cursor: "pointer",
-};
-
-const actionRowStyle: React.CSSProperties = {
-  display: "flex",
-  gap: 8,
-  marginTop: 8,
-};
-
-const actionBtnStyle: React.CSSProperties = {
-  padding: "6px 12px",
-  borderRadius: 6,
-  border: "1px solid var(--bk-border)",
-  background: "var(--bk-bg-card)",
-  color: "var(--bk-ink)",
-  fontSize: 12,
-  fontWeight: 500,
-  cursor: "pointer",
-};
-
-const dangerBtnStyle: React.CSSProperties = {
-  ...actionBtnStyle,
-  color: "var(--bk-error)",
-  borderColor: "var(--bk-error)",
-};
-
-// ─ Used-by expand styles (D6.b drill-in list) ─────────────────────────────
-const usageToggleStyle: React.CSSProperties = {
-  display: "inline-flex",
-  alignItems: "center",
-  gap: 6,
-  padding: "0",
-  background: "transparent",
-  border: "none",
-  color: "var(--bk-ink)",
-  fontSize: 12,
-  cursor: "pointer",
-  textAlign: "left",
-};
-
-const usageCaretStyle: React.CSSProperties = {
-  display: "inline-block",
-  width: 10,
-  fontSize: 10,
-  color: "var(--bk-ink-muted)",
-};
-
-const usageListStyle: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: 2,
-  marginTop: 6,
-  paddingLeft: 14,
-};
-
-const usageEntryBtnStyle: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: 6,
-  padding: "4px 6px",
-  background: "transparent",
-  border: "none",
-  borderRadius: 4,
-  color: "var(--bk-ink)",
-  fontSize: 11.5,
-  cursor: "pointer",
-  textAlign: "left",
-  width: "100%",
-};
-
-const usagePropStyle: React.CSSProperties = {
-  color: "var(--bk-ink-muted)",
-  fontFamily: "var(--bk-font-mono, ui-monospace, monospace)",
-  fontSize: 11,
-};
-
-const beginnerNoticeStyle: React.CSSProperties = {
-  marginTop: 12,
-  padding: "10px 12px",
-  background: "var(--bk-accent-tint)",
-  color: "var(--bk-accent-text)",
-  borderRadius: 6,
-  fontSize: 11.5,
-  lineHeight: 1.5,
-};
+const CONTAINER = "tw:flex tw:flex-col tw:gap-4 tw:px-1 tw:py-3";
+const FIELD_ROW = "tw:border-t tw:border-gray-200 tw:py-2";
+const MONO = "tw:[font-family:var(--bk-font-mono)]";
+const NAME = "tw:text-base tw:font-semibold tw:text-gray-900 tw:leading-tight";
+const ID_MONO = `tw:text-xs tw:text-gray-500 ${MONO}`;
+const CSS_VAR = `tw:text-[11px] tw:text-gray-500 tw:mt-0.5 ${MONO}`;
+/** The quiet button look, previously six copies of the same class list. */
+const GHOST = "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900";
+const LINK_BTN = `${GHOST} tw:p-0 tw:text-left tw:inline-flex tw:items-center tw:gap-1.5`;
 
 // ─── Preview slot ─────────────────────────────────────────────────────────────
 
+/* Each swatch is static chrome plus ONE genuinely computed value — the token's
+   own colour, font or size. The static half is classes; only the computed half
+   stays inline, which is exactly the exception CLAUDE.md carves out. */
+const SWATCH = "tw:inline-block tw:size-6 tw:rounded tw:border tw:border-gray-200 tw:flex-none";
+
 const previewSlot = (token: DesignToken): React.ReactNode => {
   if (token.kind === "color" || token.category === "colors") {
-    return (
-      <span
-        aria-hidden="true"
-        style={{
-          display: "inline-block",
-          width: 24,
-          height: 24,
-          borderRadius: 4,
-          background: token.value,
-          border: "1px solid var(--bk-border)",
-          flexShrink: 0,
-        }}
-      />
-    );
+    return <span aria-hidden="true" className={SWATCH} style={{ background: token.value }} />;
   }
   if (token.kind === "type" || token.category === "typography") {
     return (
       <span
         aria-hidden="true"
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          justifyContent: "center",
-          width: 24,
-          height: 24,
-          fontSize: 14,
-          fontWeight: 600,
-          fontFamily: token.type === "font-family" ? token.value : undefined,
-          color: "var(--bk-ink)",
-          flexShrink: 0,
-        }}
+        className="tw:inline-flex tw:items-center tw:justify-center tw:size-6 tw:text-sm tw:font-semibold tw:text-gray-900 tw:flex-none"
+        style={token.type === "font-family" ? { fontFamily: token.value } : undefined}
       >
         Aa
       </span>
@@ -304,45 +101,17 @@ const previewSlot = (token: DesignToken): React.ReactNode => {
     return (
       <span
         aria-hidden="true"
-        style={{
-          display: "inline-block",
-          width: 24,
-          height: 8,
-          background: "var(--bk-border)",
-          borderRadius: 2,
-          flexShrink: 0,
-          position: "relative",
-        }}
+        className="tw:inline-block tw:w-6 tw:h-2 tw:bg-gray-200 tw:rounded-sm tw:flex-none tw:relative"
       >
         <span
-          style={{
-            position: "absolute",
-            left: 0,
-            top: 0,
-            width: widthPx,
-            height: "100%",
-            background: "var(--bk-accent)",
-            borderRadius: 2,
-          }}
+          className="tw:absolute tw:left-0 tw:top-0 tw:h-full tw:bg-blue-700 tw:rounded-sm"
+          style={{ width: widthPx }}
         />
       </span>
     );
   }
-  // Default — neutral chip.
-  return (
-    <span
-      aria-hidden="true"
-      style={{
-        display: "inline-block",
-        width: 24,
-        height: 24,
-        borderRadius: 4,
-        background: "var(--bk-bg-subtle)",
-        border: "1px solid var(--bk-border)",
-        flexShrink: 0,
-      }}
-    />
-  );
+  // Default — neutral chip. Nothing computed here at all.
+  return <span aria-hidden="true" className={`${SWATCH} tw:bg-gray-50`} />;
 };
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -530,7 +299,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
   const lintRow = (() => {
     if (lintIssues.length === 0) {
       return (
-        <div style={lintPassStyle} data-lint-status="pass">
+        <div className="tw:inline-flex tw:items-center tw:gap-1.5 tw:text-xs tw:text-[var(--bk-success)]" data-lint-status="pass">
           <span aria-hidden="true">✓</span>
           <span>pass</span>
         </div>
@@ -538,20 +307,20 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
     }
     const issue = lintIssues[0];
     return (
-      <div style={lintFailStyle} data-lint-status="fail">
+      <div className="tw:flex tw:flex-col tw:gap-1.5 tw:text-xs tw:text-[var(--bk-warning-text)]" data-lint-status="fail">
         <span>
           <span aria-hidden="true">△ </span>
           {issue.message}
         </span>
-        <div style={lintActionRowStyle}>
+        <div className="tw:flex tw:gap-1.5">
           {issue.autoFixHint && (
             <Button
               type="button"
               color="light"
               size="xs"
               onClick={handleAutoFix}
-              style={smallBtnStyle}
-              aria-label="Auto-fix lint issue" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+              aria-label="Auto-fix lint issue"
+              className={GHOST}
             >
               Auto-fix
             </Button>
@@ -561,8 +330,8 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
             color="light"
             size="xs"
             onClick={handleIgnore}
-            style={smallBtnStyle}
-            aria-label="Ignore lint issue" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+            aria-label="Ignore lint issue"
+            className={GHOST}
           >
             Ignore
           </Button>
@@ -572,46 +341,46 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
   })();
 
   return (
-    <div style={containerStyle} data-token-detail-view={token.id}>
+    <div className={CONTAINER} data-token-detail-view={token.id}>
       {/* Back arrow */}
       <Button
         type="button"
         color="light"
         onClick={onBack}
-        style={backBtnStyle}
-        aria-label="Back to tokens" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+        size="xs"
+        aria-label="Back to tokens"
+        className={`${GHOST} tw:self-start`}
       >
         <span aria-hidden="true">←</span>
         <span>Back to tokens</span>
       </Button>
 
       {/* Header — preview + name + id + cssVar(Pro) */}
-      <div style={headerStyle}>
+      <div className="tw:flex tw:items-center tw:gap-3">
         {previewSlot(token)}
-        <div style={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
-          <span style={nameStyle}>{token.friendlyName ?? token.name}</span>
-          {isPro && <span style={idMonoStyle}>{token.id}</span>}
-          {isPro && <span style={cssVarStyle}>{cssVarName}</span>}
+        <div className="tw:flex tw:flex-col tw:min-w-0">
+          <span className={NAME}>{token.friendlyName ?? token.name}</span>
+          {isPro && <span className={ID_MONO}>{token.id}</span>}
+          {isPro && <span className={CSS_VAR}>{cssVarName}</span>}
         </div>
       </div>
 
       {/* Light value */}
-      <div style={fieldRowStyle}>
-        <div style={fieldLabelStyle}>Light value</div>
-        <div style={fieldValueStyle}>
+      <FieldRow label="Light value" className={FIELD_ROW}>
+        <div className="tw:flex tw:flex-col tw:w-full tw:min-w-0">
           {isColor ? (
             <>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <div className="tw:flex tw:items-center tw:gap-2">
                 <TextInput
                   type="text"
                   value={token.value}
                   onChange={(e) => onValueChange?.(token.id, e.target.value)}
-                  style={inputStyle}
+                  className={MONO}
                   aria-label="Light value"
                 />
               </div>
               {pickerOpen && (
-                <div style={{ marginTop: 8 }}>
+                <div className="tw:mt-2">
                   <ColorPicker
                     initialHex={token.value}
                     onChange={() => {
@@ -631,18 +400,17 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
               type="text"
               value={token.value}
               onChange={(e) => onValueChange?.(token.id, e.target.value)}
-              style={inputStyle}
+              className={MONO}
               aria-label="Light value"
             />
           )}
         </div>
-      </div>
+      </FieldRow>
 
       {/* Dark value — color tokens only */}
       {isColor && (
-        <div style={fieldRowStyle}>
-          <div style={fieldLabelStyle}>Dark value</div>
-          <div style={fieldValueStyle}>
+        <FieldRow label="Dark value" className={FIELD_ROW}>
+          <div className="tw:w-full tw:min-w-0">
             <TextInput
               type="text"
               value={darkInput}
@@ -655,30 +423,30 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
                 // T8 ships only the local input — engine-side dark commit is a
                 // separate follow-up (D4).
               }}
-              style={inputStyle}
+              className={MONO}
               aria-label="Dark value"
             />
           </div>
-        </div>
+        </FieldRow>
       )}
 
       {/* Used by — click-to-expand element list (D6.b) */}
-      <div style={fieldRowStyle}>
-        <div style={fieldLabelStyle}>Used by</div>
-        <div style={fieldValueStyle}>
+      <FieldRow label="Used by" className={FIELD_ROW}>
+        <div className="tw:flex tw:flex-col tw:w-full tw:min-w-0">
           <Button
             type="button"
             color="light"
             onClick={() => {
               if (usageCount > 0) setUsageExpanded((v) => !v);
             }}
-            style={usageToggleStyle}
+            size="xs"
+            className={LINK_BTN}
             aria-expanded={usageExpanded}
             aria-disabled={usageCount === 0 || undefined}
             disabled={usageCount === 0}
-            data-used-by-toggle className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+            data-used-by-toggle
           >
-            <span aria-hidden="true" style={usageCaretStyle}>
+            <span aria-hidden="true" className="tw:inline-block tw:w-2.5 tw:text-[10px] tw:text-gray-500">
               {usageCount === 0 ? "" : usageExpanded ? "▾" : "▸"}
             </span>
             <span data-used-count={usageCount}>
@@ -686,7 +454,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
             </span>
           </Button>
           {usageExpanded && usageCount > 0 && (
-            <ul style={usageListStyle} data-used-by-list role="list">
+            <ul className="tw:flex tw:flex-col tw:gap-0.5 tw:mt-1.5 tw:pl-3.5" data-used-by-list role="list">
               {usageRefs.map((ref, idx) => {
                 const el = composer?.elements?.getElement?.(ref.elementId);
                 const type = el?.getType?.();
@@ -705,12 +473,13 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
                         );
                         if (target) composer?.selection?.select(target);
                       }}
-                      style={usageEntryBtnStyle}
+                      size="xs"
                       aria-label={`Select ${name} · ${ref.styleProp}`}
-                      data-used-by-entry={ref.elementId} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+                      data-used-by-entry={ref.elementId}
+                      className={`${LINK_BTN} tw:w-full`}
                     >
                       <span>{name}</span>
-                      <span style={usagePropStyle}>· {ref.styleProp}</span>
+                      <span className={`tw:text-gray-500 tw:text-[11px] ${MONO}`}>· {ref.styleProp}</span>
                     </Button>
                   </li>
                 );
@@ -718,33 +487,29 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
             </ul>
           )}
         </div>
-      </div>
+      </FieldRow>
 
       {/* Aliased by — hidden when empty (D6.a) */}
       {aliases.length > 0 && (
-        <div style={fieldRowStyle}>
-          <div style={fieldLabelStyle}>Aliased by</div>
-          <div style={fieldValueStyle}>
-            <span data-aliased-by-count={aliases.length}>
-              {aliases.length} ·{" "}
-              {aliases.map((a) => a.friendlyName ?? a.name).join(", ")}
-            </span>
-          </div>
-        </div>
+        <FieldRow label="Aliased by" className={FIELD_ROW}>
+          <span data-aliased-by-count={aliases.length}>
+            {aliases.length} ·{" "}
+            {aliases.map((a) => a.friendlyName ?? a.name).join(", ")}
+          </span>
+        </FieldRow>
       )}
 
       {/* Lint */}
-      <div style={fieldRowStyle}>
-        <div style={fieldLabelStyle}>Lint</div>
-        <div style={fieldValueStyle}>{lintRow}</div>
-      </div>
+      <FieldRow label="Lint" className={FIELD_ROW}>
+        <div className="tw:w-full tw:min-w-0">{lintRow}</div>
+      </FieldRow>
 
       {/* Action row */}
-      <div style={actionRowStyle}>
+      <div className="tw:flex tw:gap-2 tw:mt-2">
         <Button
           type="button"
+          size="xs"
           onClick={handleReplaceValue}
-          style={actionBtnStyle}
           aria-label="Replace value"
         >
           Replace value
@@ -752,11 +517,8 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
         <Button
           type="button"
           color="light"
+          size="xs"
           onClick={handleRenameId}
-          style={{
-            ...actionBtnStyle,
-            ...(onRename ? {} : { opacity: 0.5, cursor: "not-allowed" }),
-          }}
           aria-label="Rename ID"
           aria-disabled={!onRename || undefined}
           disabled={!onRename}
@@ -767,8 +529,8 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
         <Button
           type="button"
           color="red"
+          size="xs"
           onClick={handleDelete}
-          style={dangerBtnStyle}
           aria-label="Delete token"
           aria-disabled={!isPro || undefined}
           disabled={!isPro}
@@ -779,8 +541,12 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
 
       {/* Beginner notice */}
       {!isPro && (
-        <div style={beginnerNoticeStyle} role="note" data-beginner-notice>
-          <strong style={{ display: "block", marginBottom: 4 }}>
+        <div
+          className="tw:mt-3 tw:px-3 tw:py-2.5 tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-accent-text)] tw:rounded-md tw:text-[11.5px] tw:leading-normal"
+          role="note"
+          data-beginner-notice
+        >
+          <strong className="tw:block tw:mb-1">
             Delete blocked in Beginner mode.
           </strong>
           <span>
