@@ -59,3 +59,25 @@ export const SECTION_PREVIEW =
 export const SECTION_SUBTITLE =
   "tw:mt-0.5 tw:mb-1 tw:text-[9px] tw:font-semibold tw:uppercase tw:tracking-[0.08em] " +
   "tw:text-gray-500 tw:[font-family:var(--bk-font-ui)]";
+
+/**
+ * Row that reveals a token-link chain button on hover or keyboard focus.
+ *
+ * The reveal used to be an inline `opacity: 0` plus `className="bd-chain-row"`
+ * / `"bd-chain-btn"` and a comment claiming CSS did the rest. No rule for
+ * either class has ever existed in this repo, and an inline style cannot be
+ * beaten by one anyway — so the button was permanently invisible. Tailwind's
+ * `group` does what the comment described, and `group-focus-within` adds the
+ * keyboard path the CSS version never had.
+ */
+export const CHAIN_ROW = "tw:group tw:relative tw:flex tw:items-center";
+export const CHAIN_TRIGGER =
+  "tw:flex tw:items-center tw:flex-none tw:p-0.5 tw:border-0 tw:bg-transparent tw:text-gray-500 " +
+  "tw:opacity-0 tw:transition-opacity tw:group-hover:opacity-100 tw:group-focus-within:opacity-100 " +
+  "tw:focus-visible:opacity-100 tw:hover:text-gray-900";
+/** The chain button once a token IS bound — always visible, accent-tinted. */
+export const CHAIN_BOUND =
+  "tw:flex tw:items-center tw:gap-[3px] tw:flex-none tw:whitespace-nowrap tw:px-1 tw:py-0.5 " +
+  "tw:rounded tw:border tw:border-blue-700 tw:bg-[var(--bk-accent-subtle)] tw:text-blue-700 tw:text-[9px]";
+/** Absolute slot the chain button sits in, vertically centred in the field. */
+export const CHAIN_SLOT = "tw:absolute tw:right-1.5 tw:top-1/2 tw:-translate-y-1/2 tw:z-[2]";

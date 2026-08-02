@@ -11,6 +11,14 @@ import * as React from "react";
 import { useSpacingRegistry } from "@/editor/design-system/state/TokenRegistryContext";
 import { TokenPickerPopover } from "../shared/TokenPickerPopover";
 import { Section, InputWithUnit, MoreSettingsToggle, type SectionTier, MixedValueIndicator } from "../shared/controls";
+import {
+  CHAIN_BOUND,
+  CHAIN_ROW,
+  CHAIN_SLOT,
+  CHAIN_TRIGGER,
+  CONTROL_SELECT_WRAP,
+  SECTION_PREVIEW,
+} from "../shared/controls/controlClasses";
 import { getCssVariable } from "@/shared/utils/getCssVariable";
 // ============================================================================
 // HELPERS
@@ -57,28 +65,13 @@ const ChainButton: React.FC<ChainButtonProps> = ({ property, value, onChange }) 
         onClick={() => onChange(resolveVar(value))}
         aria-label={`Unlink ${property} spacing token`}
         title={`Unlink "${boundToken?.name ?? "token"}" — resolves to current value`}
-        style={{
-          padding: "2px 4px",
-          background: "var(--bk-accent-subtle)",
-          border: `1px solid ${"var(--bk-accent)"}`,
-          borderRadius: 4,
-          color: "var(--bk-accent)",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          gap: 3,
-          fontSize: 9,
-          whiteSpace: "nowrap",
-          flexShrink: 0,
-        }}
+        className={CHAIN_BOUND}
       >
         <Link2 size={10} aria-hidden="true" />
         {boundToken?.name && (
-          <span style={{ maxWidth: 48, overflow: "hidden", textOverflow: "ellipsis" }}>
-            {boundToken.name}
-          </span>
+          <span className="tw:max-w-12 tw:overflow-hidden tw:text-ellipsis">{boundToken.name}</span>
         )}
-        <Link2Off size={9} aria-hidden="true" style={{ opacity: 0.7 }} />
+        <Link2Off size={9} aria-hidden="true" className="tw:opacity-70" />
       </Button>
     );
   }
@@ -96,19 +89,7 @@ const ChainButton: React.FC<ChainButtonProps> = ({ property, value, onChange }) 
           aria-label={`Link ${property} to spacing token`}
           aria-expanded={isOpen}
           title="Link to spacing token"
-          className="bd-chain-btn"
-          style={{
-            padding: 2,
-            background: "none",
-            border: "none",
-            color: "var(--bk-ink-muted)",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            opacity: 0, // revealed by parent row :hover via CSS
-            transition: "opacity 0.12s, color 0.12s",
-            flexShrink: 0,
-          }}
+          className={CHAIN_TRIGGER}
         >
           <Link2 size={12} aria-hidden="true" />
         </Button>
@@ -125,6 +106,10 @@ const ChainButton: React.FC<ChainButtonProps> = ({ property, value, onChange }) 
     </Popover>
   );
 };
+
+/** The W/H/min/max glyph inside a field — 600-weight, tiny. */
+const FIELD_GLYPH = "tw:text-[10px] tw:font-semibold tw:[font-family:var(--bk-font-ui)]";
+const FIELD_GLYPH_SM = "tw:text-[9px] tw:font-semibold tw:[font-family:var(--bk-font-ui)]";
 
 // ============================================================================
 // SIZE SECTION
@@ -167,14 +152,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
   const h = styles.height || "";
   const sizePreview =
     w || h ? (
-      <span
-        style={{
-          fontSize: 11,
-          color: "var(--bk-ink-muted)",
-          fontFamily: "var(--bk-font-mono)",
-          whiteSpace: "nowrap",
-        }}
-      >
+      <span className={SECTION_PREVIEW}>
         {w || "auto"} × {h || "auto"}
       </span>
     ) : undefined;
@@ -192,12 +170,9 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
       {/* W | link | H pair */}
       {showDimensions && !hidden("width") && !hidden("height") && (
         <div className="bdi-pair" role="group" aria-label="Width and height">
-          <div
-            style={{ position: "relative", display: "flex", alignItems: "center" }}
-            className="bd-chain-row"
-          >
+          <div className={CHAIN_ROW}>
             <MixedValueIndicator prop="width" mixedKeys={mixedKeys} />
-            <div style={{ flex: 1 }}>
+            <div className="tw:flex-1">
               <InputWithUnit
                 label=""
                 value={styles.width || ""}
@@ -205,22 +180,19 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
                 disabled={disabled("width")}
                 disabledReason={reason("width")}
                 isOverridden={propertyStates["width"]?.isOverridden}
-                fieldIcon={<span style={{ font: "600 10px var(--bk-font-ui)" }}>W</span>}
+                fieldIcon={<span className={FIELD_GLYPH}>W</span>}
               />
             </div>
             {!disabled("width") && (
-              <div style={{ position: "absolute", right: 6, top: "50%", transform: "translateY(-50%)", zIndex: 2 }}>
+              <div className={CHAIN_SLOT}>
                 <ChainButton property="width" value={styles.width || ""} onChange={(v) => onChange("width", v)} />
               </div>
             )}
           </div>
           <span className="bdi-pair-sep" aria-hidden="true" />
-          <div
-            style={{ position: "relative", display: "flex", alignItems: "center" }}
-            className="bd-chain-row"
-          >
+          <div className={CHAIN_ROW}>
             <MixedValueIndicator prop="height" mixedKeys={mixedKeys} />
-            <div style={{ flex: 1 }}>
+            <div className="tw:flex-1">
               <InputWithUnit
                 label=""
                 value={styles.height || ""}
@@ -228,11 +200,11 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
                 disabled={disabled("height")}
                 disabledReason={reason("height")}
                 isOverridden={propertyStates["height"]?.isOverridden}
-                fieldIcon={<span style={{ font: "600 10px var(--bk-font-ui)" }}>H</span>}
+                fieldIcon={<span className={FIELD_GLYPH}>H</span>}
               />
             </div>
             {!disabled("height") && (
-              <div style={{ position: "absolute", right: 6, top: "50%", transform: "translateY(-50%)", zIndex: 2 }}>
+              <div className={CHAIN_SLOT}>
                 <ChainButton property="height" value={styles.height || ""} onChange={(v) => onChange("height", v)} />
               </div>
             )}
@@ -246,7 +218,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
           {(!hidden("min-width") || !hidden("max-width")) && (
             <div className="bdi-pair" role="group" aria-label="Width constraints">
               {!hidden("min-width") ? (
-                <div style={{ position: "relative" }}>
+                <div className="tw:relative">
                   <MixedValueIndicator prop="min-width" mixedKeys={mixedKeys} />
                   <InputWithUnit
                     label=""
@@ -255,13 +227,13 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
                     disabled={disabled("min-width")}
                     disabledReason={reason("min-width")}
                     isOverridden={propertyStates["min-width"]?.isOverridden}
-                    fieldIcon={<span style={{ font: "600 9px var(--bk-font-ui)" }}>min</span>}
+                    fieldIcon={<span className={FIELD_GLYPH_SM}>min</span>}
                   />
                 </div>
               ) : <span />}
               <span className="bdi-pair-sep" aria-hidden="true" />
               {!hidden("max-width") ? (
-                <div style={{ position: "relative" }}>
+                <div className="tw:relative">
                   <MixedValueIndicator prop="max-width" mixedKeys={mixedKeys} />
                   <InputWithUnit
                     label=""
@@ -270,7 +242,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
                     disabled={disabled("max-width")}
                     disabledReason={reason("max-width")}
                     isOverridden={propertyStates["max-width"]?.isOverridden}
-                    fieldIcon={<span style={{ font: "600 9px var(--bk-font-ui)" }}>max</span>}
+                    fieldIcon={<span className={FIELD_GLYPH_SM}>max</span>}
                   />
                 </div>
               ) : <span />}
@@ -281,7 +253,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
           {(!hidden("min-height") || !hidden("max-height")) && (
             <div className="bdi-pair" role="group" aria-label="Height constraints">
               {!hidden("min-height") ? (
-                <div style={{ position: "relative" }}>
+                <div className="tw:relative">
                   <MixedValueIndicator prop="min-height" mixedKeys={mixedKeys} />
                   <InputWithUnit
                     label=""
@@ -290,13 +262,13 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
                     disabled={disabled("min-height")}
                     disabledReason={reason("min-height")}
                     isOverridden={propertyStates["min-height"]?.isOverridden}
-                    fieldIcon={<span style={{ font: "600 9px var(--bk-font-ui)" }}>min</span>}
+                    fieldIcon={<span className={FIELD_GLYPH_SM}>min</span>}
                   />
                 </div>
               ) : <span />}
               <span className="bdi-pair-sep" aria-hidden="true" />
               {!hidden("max-height") ? (
-                <div style={{ position: "relative" }}>
+                <div className="tw:relative">
                   <MixedValueIndicator prop="max-height" mixedKeys={mixedKeys} />
                   <InputWithUnit
                     label=""
@@ -305,7 +277,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
                     disabled={disabled("max-height")}
                     disabledReason={reason("max-height")}
                     isOverridden={propertyStates["max-height"]?.isOverridden}
-                    fieldIcon={<span style={{ font: "600 9px var(--bk-font-ui)" }}>max</span>}
+                    fieldIcon={<span className={FIELD_GLYPH_SM}>max</span>}
                   />
                 </div>
               ) : <span />}
@@ -316,40 +288,14 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
       {/* Object Fit (for images/videos) */}
       {!hidden("object-fit") && (
         <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "var(--bk-space-8)",
-            marginBottom: "var(--bk-space-12)",
-            opacity: disabled("object-fit") ? 0.5 : 1,
-          }}
+          className={`tw:flex tw:items-center tw:gap-2 tw:mb-3 ${disabled("object-fit") ? "tw:opacity-50" : ""}`}
           title={reason("object-fit")}
         >
-          <label
-            style={{
-              fontSize: "var(--bk-text-12)",
-              color: "var(--bk-ink-muted)",
-              fontWeight: 500,
-              minWidth: 70,
-            }}
-          >
-            Object Fit
-          </label>
+          <label className="tw:min-w-[70px] tw:text-xs tw:font-medium tw:text-gray-500">Object Fit</label>
+          <div className={CONTROL_SELECT_WRAP}>
           <Select
             value={styles["object-fit"] || ""}
             onChange={(e) => onChange("object-fit", e.target.value)}
-            style={{
-              flex: 1,
-              padding: "var(--bk-space-8) 10px",
-              background: "var(--bk-bg-subtle)",
-              border: "1px solid var(--bk-border)",
-              borderRadius: "var(--bk-radius-sm)",
-              color: "var(--bk-ink)",
-              fontSize: "var(--bk-text-13)",
-              outline: "none",
-              cursor: "pointer",
-              appearance: "auto",
-            }}
             disabled={disabled("object-fit")}
           >
             <option value="">Default</option>
@@ -359,6 +305,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
             <option value="none">None</option>
             <option value="scale-down">Scale Down</option>
           </Select>
+          </div>
         </div>
       )}
       {onAdvancedToggle && (

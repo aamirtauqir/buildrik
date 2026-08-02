@@ -17,6 +17,7 @@ import * as React from "react";
 import { useTypeRegistry } from "../../../design-system/state/TokenRegistryContext";
 import { TokenPickerPopover } from "../../shared/TokenPickerPopover";
 import { SelectRow, ButtonGroup, InputWithUnit, MixedValueIndicator } from "../../shared/controls";
+import { CHAIN_BOUND, CHAIN_ROW, CHAIN_SLOT, CHAIN_TRIGGER } from "../../shared/controls/controlClasses";
 import { getCssVariable } from "@/shared/utils/getCssVariable";
 // Font weight options
 export const FONT_WEIGHTS = [
@@ -72,28 +73,13 @@ const TypeChainButton: React.FC<TypeChainButtonProps> = ({ property, value, onCh
         onClick={() => onChange(resolveVar(value))}
         aria-label={`Unlink ${property} type token`}
         title={`Unlink "${boundToken?.name ?? "token"}" — resolves to current value`}
-        style={{
-          padding: "2px 4px",
-          background: "var(--bk-accent-subtle)",
-          border: `1px solid ${"var(--bk-accent)"}`,
-          borderRadius: 4,
-          color: "var(--bk-accent)",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          gap: 3,
-          fontSize: 9,
-          whiteSpace: "nowrap",
-          flexShrink: 0,
-        }}
+        className={CHAIN_BOUND}
       >
         <Link2 size={10} aria-hidden="true" />
         {boundToken?.name && (
-          <span style={{ maxWidth: 48, overflow: "hidden", textOverflow: "ellipsis" }}>
-            {boundToken.name}
-          </span>
+          <span className="tw:max-w-12 tw:overflow-hidden tw:text-ellipsis">{boundToken.name}</span>
         )}
-        <Link2Off size={9} aria-hidden="true" style={{ opacity: 0.7 }} />
+        <Link2Off size={9} aria-hidden="true" className="tw:opacity-70" />
       </Button>
     );
   }
@@ -111,19 +97,7 @@ const TypeChainButton: React.FC<TypeChainButtonProps> = ({ property, value, onCh
           aria-label={`Link ${property} to type token`}
           aria-expanded={isOpen}
           title="Link to type token"
-          className="bd-chain-btn"
-          style={{
-            padding: 2,
-            background: "none",
-            border: "none",
-            color: "var(--bk-ink-muted)",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            opacity: 0,
-            transition: "opacity 0.12s, color 0.12s",
-            flexShrink: 0,
-          }}
+          className={CHAIN_TRIGGER}
         >
           <Link2 size={12} aria-hidden="true" />
         </Button>
@@ -156,12 +130,9 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mi
   return (
     <>
       {/* Font Size — CP5: chain button for type token binding */}
-      <div
-        style={{ position: "relative", display: "flex", alignItems: "center" }}
-        className="bd-chain-row"
-      >
+      <div className={CHAIN_ROW}>
         <MixedValueIndicator prop="font-size" mixedKeys={mixedKeys} />
-        <div style={{ flex: 1 }}>
+        <div className="tw:flex-1">
           <InputWithUnit
             label="Size"
             value={styles["font-size"] || "16px"}
@@ -169,7 +140,7 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mi
             units={["px", "em", "rem", "%", "vw"]}
           />
         </div>
-        <div style={{ position: "absolute", right: 6, top: "50%", transform: "translateY(-50%)", zIndex: 2 }}>
+        <div className={CHAIN_SLOT}>
           <TypeChainButton
             property="font-size"
             value={styles["font-size"] || ""}
@@ -179,7 +150,7 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mi
       </div>
 
       {/* Font Weight */}
-      <div style={{ position: "relative" }}>
+      <div className="tw:relative">
         <MixedValueIndicator prop="font-weight" mixedKeys={mixedKeys} />
         <SelectRow
           label="Weight"
@@ -190,12 +161,9 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mi
       </div>
 
       {/* Line Height — CP5: chain button for type token binding */}
-      <div
-        style={{ position: "relative", display: "flex", alignItems: "center" }}
-        className="bd-chain-row"
-      >
+      <div className={CHAIN_ROW}>
         <MixedValueIndicator prop="line-height" mixedKeys={mixedKeys} />
-        <div style={{ flex: 1 }}>
+        <div className="tw:flex-1">
           <InputWithUnit
             label="Line height"
             value={styles["line-height"] || ""}
@@ -203,7 +171,7 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mi
             units={["px", "em", "%", "normal"]}
           />
         </div>
-        <div style={{ position: "absolute", right: 6, top: "50%", transform: "translateY(-50%)", zIndex: 2 }}>
+        <div className={CHAIN_SLOT}>
           <TypeChainButton
             property="line-height"
             value={styles["line-height"] || ""}
@@ -213,7 +181,7 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mi
       </div>
 
       {/* Letter Spacing */}
-      <div style={{ position: "relative" }}>
+      <div className="tw:relative">
         <MixedValueIndicator prop="letter-spacing" mixedKeys={mixedKeys} />
         <InputWithUnit
           label="Letter spacing"
@@ -224,7 +192,7 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mi
       </div>
 
       {/* Text Decoration */}
-      <div style={{ position: "relative" }}>
+      <div className="tw:relative">
         <MixedValueIndicator prop="text-decoration" mixedKeys={mixedKeys} />
         <ButtonGroup
           label="Decoration"
