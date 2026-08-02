@@ -24,37 +24,18 @@ import type {
   TextField,
   ToggleField,
 } from "./schema";
-import { Button, Checkbox, Select, TextInput } from "@/editor/chrome-ui";
+import { Button, Checkbox, Select, TextInput, FieldRow } from "@/editor/chrome-ui";
 // ============================================================================
 // SHARED STYLE TOKENS — keep each control file-local so future sections can
 // diverge without cross-control coupling. Nothing here is exported.
 // ============================================================================
 
-const rowStyle: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: 8,
-  minHeight: 24,
-};
-
-const labelStyle: React.CSSProperties = {
-  flex: "0 0 88px",
-  fontSize: 12,
-  color: "var(--bk-ink-soft)",
-};
-
-const inputStyle: React.CSSProperties = {
-  flex: 1,
-  minWidth: 0,
-  height: 24,
-  padding: "0 8px",
-  fontSize: 12,
-  color: "var(--bk-ink)",
-  background: "var(--bk-bg-card)",
-  border: "1px solid var(--bk-border)",
-  borderRadius: 4,
-  appearance: "auto",
-};
+/* rowStyle + labelStyle WAS FieldRow, at 88px instead of its 96px — literally
+   the case FieldRow's own header names as why the Inspector never looked like
+   one panel. inputStyle re-declared height, padding, border, radius and
+   background on controls the TextInput/Select wrappers already theme. */
+const LINKED_BTN =
+  "tw:h-6 tw:px-2 tw:text-[11px] tw:bg-transparent tw:border tw:border-gray-200 tw:rounded";
 
 // File-local so the value lives near the style it drives, and so the chrome
 // gate's TSX bare-number check doesn't see a magic literal.
@@ -70,19 +51,15 @@ const LengthControl: React.FC<ControlProps<LengthField>> = ({
   value,
   onChange,
 }) => (
-  <div style={rowStyle}>
-    <label style={labelStyle} htmlFor={`field-${field.prop}`}>
-      {field.label}
-    </label>
+  <FieldRow label={field.label} htmlFor={`field-${field.prop}`}>
     <TextInput
       id={`field-${field.prop}`}
       type="text"
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={field.defaultUnit ? `0${field.defaultUnit}` : "auto"}
-      style={inputStyle}
     />
-  </div>
+  </FieldRow>
 );
 
 // ============================================================================
@@ -94,10 +71,7 @@ const NumberControl: React.FC<ControlProps<NumberField>> = ({
   value,
   onChange,
 }) => (
-  <div style={rowStyle}>
-    <label style={labelStyle} htmlFor={`field-${field.prop}`}>
-      {field.label}
-    </label>
+  <FieldRow label={field.label} htmlFor={`field-${field.prop}`}>
     <TextInput
       id={`field-${field.prop}`}
       type="number"
@@ -106,9 +80,8 @@ const NumberControl: React.FC<ControlProps<NumberField>> = ({
       max={field.max}
       step={field.step ?? 1}
       onChange={(e) => onChange(e.target.value)}
-      style={inputStyle}
     />
-  </div>
+  </FieldRow>
 );
 
 // ============================================================================
@@ -120,15 +93,11 @@ const SelectControl: React.FC<ControlProps<SelectField>> = ({
   value,
   onChange,
 }) => (
-  <div style={rowStyle}>
-    <label style={labelStyle} htmlFor={`field-${field.prop}`}>
-      {field.label}
-    </label>
+  <FieldRow label={field.label} htmlFor={`field-${field.prop}`}>
     <Select
       id={`field-${field.prop}`}
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      style={inputStyle}
     >
       {field.options.map((opt) => (
         <option key={opt.value} value={opt.value}>
@@ -136,7 +105,7 @@ const SelectControl: React.FC<ControlProps<SelectField>> = ({
         </option>
       ))}
     </Select>
-  </div>
+  </FieldRow>
 );
 
 // ============================================================================
@@ -150,17 +119,14 @@ const ToggleControl: React.FC<ControlProps<ToggleField>> = ({
 }) => {
   const checked = value === field.on;
   return (
-    <div style={rowStyle}>
-      <label style={labelStyle} htmlFor={`field-${field.prop}`}>
-        {field.label}
-      </label>
+    <FieldRow label={field.label} htmlFor={`field-${field.prop}`}>
       <Checkbox
         color="blue"
         className="tw:bg-white"
         id={`field-${field.prop}`}
         checked={checked}
         onChange={(e) => onChange(e.target.checked ? field.on : field.off)} />
-    </div>
+    </FieldRow>
   );
 };
 
@@ -173,23 +139,16 @@ const ColorControl: React.FC<ControlProps<ColorField>> = ({
   value,
   onChange,
 }) => (
-  <div style={rowStyle}>
-    <label style={labelStyle} htmlFor={`field-${field.prop}`}>
-      {field.label}
-    </label>
+  <FieldRow label={field.label} htmlFor={`field-${field.prop}`}>
     <TextInput
       id={`field-${field.prop}`}
       type="color"
       value={value || "#000000"}
       onChange={(e) => onChange(e.target.value)}
-      style={{
-        ...inputStyle,
-        padding: 2,
-        width: COLOR_SWATCH_PX,
-        flex: `0 0 ${COLOR_SWATCH_PX}px`,
-      }}
+      className="tw:p-0.5 tw:flex-none"
+      style={{ width: COLOR_SWATCH_PX }}
     />
-  </div>
+  </FieldRow>
 );
 
 // ============================================================================
@@ -229,47 +188,31 @@ const Spacing4Control: React.FC<ControlProps<Spacing4Field>> = ({
 
   return (
     <div>
-      <div style={rowStyle}>
-        <span style={labelStyle}>{field.label}</span>
+      <div className="tw:flex tw:items-center tw:gap-2 tw:min-h-6">
+        <span className="tw:flex-none tw:w-24 tw:text-xs tw:text-[var(--bk-ink-soft)]">{field.label}</span>
         {field.linkable !== false && (
           <Button
             type="button"
             onClick={() => setLinked((v) => !v)}
             aria-pressed={linked}
             aria-label={linked ? "Unlink sides" : "Link sides"}
-            style={{
-              height: 24,
-              padding: "0 8px",
-              fontSize: 11,
-              color: linked
-                ? "var(--bk-accent)"
-                : "var(--bk-ink-muted)",
-              background: "transparent",
-              border: "1px solid var(--bk-border)",
-              borderRadius: 4,
-              cursor: "pointer",
-            }}
+            size="xs"
+            color={linked ? undefined : "light"}
+            className={LINKED_BTN}
           >
             {linked ? "Linked" : "Link"}
           </Button>
         )}
       </div>
       {SIDES.map((side) => (
-        <div key={side} style={rowStyle}>
-          <label
-            style={labelStyle}
-            htmlFor={`field-${field.group}-${side}`}
-          >
-            {side}
-          </label>
+        <FieldRow key={side} label={side} htmlFor={`field-${field.group}-${side}`}>
           <TextInput
             id={`field-${field.group}-${side}`}
             type="text"
             value={values[side]}
             onChange={(e) => handleSide(side, e.target.value)}
-            style={inputStyle}
           />
-        </div>
+        </FieldRow>
       ))}
     </div>
   );
@@ -284,19 +227,15 @@ const TextControl: React.FC<ControlProps<TextField>> = ({
   value,
   onChange,
 }) => (
-  <div style={rowStyle}>
-    <label style={labelStyle} htmlFor={`field-${field.prop}`}>
-      {field.label}
-    </label>
+  <FieldRow label={field.label} htmlFor={`field-${field.prop}`}>
     <TextInput
       id={`field-${field.prop}`}
       type="text"
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={field.placeholder}
-      style={inputStyle}
     />
-  </div>
+  </FieldRow>
 );
 
 // ============================================================================
@@ -334,44 +273,31 @@ const Corners4Control: React.FC<ControlProps<Corners4Field>> = ({
 
   return (
     <div>
-      <div style={rowStyle}>
-        <span style={labelStyle}>{field.label}</span>
+      <div className="tw:flex tw:items-center tw:gap-2 tw:min-h-6">
+        <span className="tw:flex-none tw:w-24 tw:text-xs tw:text-[var(--bk-ink-soft)]">{field.label}</span>
         {field.linkable !== false && (
           <Button
             type="button"
             onClick={() => setLinked((v) => !v)}
             aria-pressed={linked}
             aria-label={linked ? "Unlink corners" : "Link corners"}
-            style={{
-              height: 24,
-              padding: "0 8px",
-              fontSize: 11,
-              color: linked
-                ? "var(--bk-accent)"
-                : "var(--bk-ink-muted)",
-              background: "transparent",
-              border: "1px solid var(--bk-border)",
-              borderRadius: 4,
-              cursor: "pointer",
-            }}
+            size="xs"
+            color={linked ? undefined : "light"}
+            className={LINKED_BTN}
           >
             {linked ? "Linked" : "Link"}
           </Button>
         )}
       </div>
       {CORNERS.map((c) => (
-        <div key={c.id} style={rowStyle}>
-          <label style={labelStyle} htmlFor={`field-${c.prop}`}>
-            {c.label}
-          </label>
+        <FieldRow key={c.id} label={c.label} htmlFor={`field-${c.prop}`}>
           <TextInput
             id={`field-${c.prop}`}
             type="text"
             value={cornerValues[c.id]}
             onChange={(e) => handleCorner(c.id, e.target.value)}
-            style={inputStyle}
           />
-        </div>
+        </FieldRow>
       ))}
     </div>
   );
@@ -385,16 +311,9 @@ const GroupHeadingControl: React.FC<ControlProps<GroupHeadingField>> = ({
   field,
 }) => (
   <div
-    style={{
-      fontSize: 12,
-      color: "var(--bk-ink-muted)",
-      fontWeight: 500,
-      marginTop: field.divider ? 12 : 8,
-      paddingTop: field.divider ? 12 : 0,
-      borderTop: field.divider
-        ? "1px solid var(--bk-border)"
-        : undefined,
-    }}
+    className={`tw:text-xs tw:text-gray-500 tw:font-medium ${
+      field.divider ? "tw:mt-3 tw:pt-3 tw:border-t tw:border-gray-200" : "tw:mt-2"
+    }`}
   >
     {field.label}
   </div>
