@@ -6,10 +6,9 @@
 import * as React from "react";
 import { HelpTooltip, Button, TextInput } from "@/editor/chrome-ui";
 import { InputRow } from "../../shared/controls";
-import { baseStyles } from "../../shared/controls/controlStyles";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
+import { CLUSTER_CAPTION, OFFSET_ANCHOR, OFFSET_PANEL, cardBtnClass } from "./classes";
 import { PositionPreview } from "./previews";
-import { cardBtn, positionOffsetContainerStyle, positionOffsetBoxStyle } from "./styles";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -37,10 +36,14 @@ const POSITION_OPTIONS = [
 ] as const;
 
 // ============================================================================
-// SHARED STYLES
+// CLASSES
 // ============================================================================
 
-const { input: inputStyle } = baseStyles;
+/** flowbite puts `className` on TextInput's wrapper; the real <input> needs a
+ *  descendant variant (chrome-ui/textInputTheme documents the split). */
+const OFFSET_INPUT =
+  "tw:w-[50px] tw:[&_input]:h-6 tw:[&_input]:p-1 tw:[&_input]:text-center " +
+  "tw:[&_input]:text-[11.5px] tw:[&_input]:font-medium tw:[&_input]:[font-family:var(--bk-font-ui)]";
 
 // ============================================================================
 // COMPONENT
@@ -59,15 +62,7 @@ export const PositionControls: React.FC<PositionControlsProps> = ({
   return (
     <>
       {/* Section label with help tooltip */}
-      <div
-        style={{
-          fontSize: 12,
-          color: "var(--bk-ink-muted)",
-          marginBottom: 6,
-          display: "flex",
-          alignItems: "center",
-        }}
-      >
+      <div className={CLUSTER_CAPTION}>
         {mixedKeys?.has("position") && <MixedValueBadge compact />}
         Position
         <HelpTooltip
@@ -79,28 +74,20 @@ export const PositionControls: React.FC<PositionControlsProps> = ({
       <div
         role="group"
         aria-label="Position type"
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(5, 1fr)",
-          gap: 3,
-          marginBottom: 8,
-        }}
+        className="tw:grid tw:grid-cols-5 tw:gap-[3px] tw:mb-2"
       >
         {POSITION_OPTIONS.map((option) => (
           <Button
             key={option.value}
-            style={{
-              ...cardBtn(styles.position === option.value),
-              minHeight: 30,
-              padding: "4px 3px",
-            }}
+            size="xs"
+            className={`${cardBtnClass(styles.position === option.value)} tw:min-h-[30px] tw:px-[3px] tw:py-1`}
             onClick={() => onChange("position", option.value)}
             title={option.tooltip}
             aria-pressed={styles.position === option.value}
             aria-label={option.tooltip}
           >
             <PositionPreview type={option.value} />
-            <span style={{ fontSize: 9 }}>{option.label}</span>
+            <span className="tw:text-[9px]">{option.label}</span>
           </Button>
         ))}
       </div>
@@ -109,7 +96,6 @@ export const PositionControls: React.FC<PositionControlsProps> = ({
         <PositionOffsetControls
           styles={styles}
           onChange={onChange}
-          inputStyle={inputStyle}
           disabled={disabled}
           reason={reason}
           propertyStates={propertyStates}
@@ -127,7 +113,6 @@ export const PositionControls: React.FC<PositionControlsProps> = ({
 interface PositionOffsetControlsProps {
   styles: Record<string, string>;
   onChange: (property: string, value: string) => void;
-  inputStyle: React.CSSProperties;
   disabled: (prop: string) => boolean | undefined;
   reason: (prop: string) => string | undefined;
   propertyStates?: Record<
@@ -140,40 +125,21 @@ interface PositionOffsetControlsProps {
 const PositionOffsetControls: React.FC<PositionOffsetControlsProps> = ({
   styles,
   onChange,
-  inputStyle,
   disabled,
   reason,
   propertyStates = {},
   mixedKeys,
 }) => {
-  const offsetInputStyle = (prop: string): React.CSSProperties => ({
-    ...inputStyle,
-    width: 50,
-    textAlign: "center" as const,
-    padding: "4px",
-    opacity: disabled(prop) ? 0.5 : 1,
-  });
-
   return (
-    <div style={positionOffsetContainerStyle}>
-      <div style={{ fontSize: 12, color: "var(--bk-ink-muted)", marginBottom: 6, display: "flex", alignItems: "center" }}>
+    <div className={OFFSET_PANEL}>
+      <div className={CLUSTER_CAPTION}>
         {(mixedKeys?.has("top") || mixedKeys?.has("right") || mixedKeys?.has("bottom") || mixedKeys?.has("left")) && (
           <MixedValueBadge compact />
         )}
         Position Offset
       </div>
       {/* Visual position box */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr auto 1fr",
-          gridTemplateRows: "auto auto auto",
-          gap: 4,
-          alignItems: "center",
-          justifyItems: "center",
-          marginBottom: 8,
-        }}
-      >
+      <div className="tw:grid tw:grid-cols-[1fr_auto_1fr] tw:grid-rows-[auto_auto_auto] tw:gap-1 tw:items-center tw:justify-items-center tw:mb-2">
         {/* Top */}
         <div />
         <TextInput
@@ -181,7 +147,7 @@ const PositionOffsetControls: React.FC<PositionOffsetControlsProps> = ({
           value={styles.top || ""}
           onChange={(e) => onChange("top", e.target.value)}
           placeholder="top"
-          style={offsetInputStyle("top")}
+          className={OFFSET_INPUT}
           disabled={disabled("top")}
           title={reason("top")}
         />
@@ -193,17 +159,17 @@ const PositionOffsetControls: React.FC<PositionOffsetControlsProps> = ({
           value={styles.left || ""}
           onChange={(e) => onChange("left", e.target.value)}
           placeholder="left"
-          style={offsetInputStyle("left")}
+          className={OFFSET_INPUT}
           disabled={disabled("left")}
           title={reason("left")}
         />
-        <div style={positionOffsetBoxStyle} />
+        <div className={OFFSET_ANCHOR} />
         <TextInput
           type="text"
           value={styles.right || ""}
           onChange={(e) => onChange("right", e.target.value)}
           placeholder="right"
-          style={offsetInputStyle("right")}
+          className={OFFSET_INPUT}
           disabled={disabled("right")}
           title={reason("right")}
         />
@@ -215,18 +181,18 @@ const PositionOffsetControls: React.FC<PositionOffsetControlsProps> = ({
           value={styles.bottom || ""}
           onChange={(e) => onChange("bottom", e.target.value)}
           placeholder="bottom"
-          style={offsetInputStyle("bottom")}
+          className={OFFSET_INPUT}
           disabled={disabled("bottom")}
           title={reason("bottom")}
         />
         <div />
       </div>
       {/* Z-Index */}
-      <div style={{ marginTop: 8 }}>
+      <div className="tw:mt-2">
         {mixedKeys?.has("z-index") && (
-          <div style={{ display: "flex", alignItems: "center", marginBottom: 2 }}>
+          <div className="tw:flex tw:items-center tw:mb-0.5">
             <MixedValueBadge compact />
-            <span style={{ fontSize: 11, color: "var(--bk-ink-muted)" }}>Z-Index</span>
+            <span className="tw:text-[11px] tw:text-gray-500">Z-Index</span>
           </div>
         )}
         <InputRow

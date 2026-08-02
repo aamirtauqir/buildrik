@@ -6,8 +6,8 @@
 import * as React from "react";
 import { HelpTooltip, Button } from "@/editor/chrome-ui";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
+import { CLUSTER_CAPTION, TIP_BOX, cardBtnClass } from "./classes";
 import { DisplayPreview } from "./previews";
-import { cardBtn, tipBoxStyle } from "./styles";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -42,15 +42,7 @@ export const DisplayControls: React.FC<DisplayControlsProps> = ({ display, onCha
   return (
     <>
       {/* Section label with help tooltip */}
-      <div
-        style={{
-          fontSize: 12,
-          color: "var(--bk-ink-muted)",
-          marginBottom: 8,
-          display: "flex",
-          alignItems: "center",
-        }}
-      >
+      <div className={`${CLUSTER_CAPTION} tw:mb-2`}>
         {mixedKeys?.has("display") && <MixedValueBadge compact />}
         Display Mode
         <HelpTooltip
@@ -59,18 +51,12 @@ export const DisplayControls: React.FC<DisplayControlsProps> = ({ display, onCha
         />
       </div>
       {/* Display mode buttons */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(3, 1fr)",
-          gap: 4,
-          marginBottom: 12,
-        }}
-      >
+      <div className="tw:grid tw:grid-cols-3 tw:gap-1 tw:mb-3">
         {DISPLAY_OPTIONS.map((option) => (
           <Button
             key={option.value}
-            style={cardBtn(display === option.value)}
+            size="xs"
+            className={`${cardBtnClass(display === option.value)} tw:min-h-[42px]`}
             onClick={() => onChange("display", option.value)}
             title={option.tooltip}
           >
@@ -81,7 +67,7 @@ export const DisplayControls: React.FC<DisplayControlsProps> = ({ display, onCha
       </div>
       {/* Tip for Flex/Grid */}
       {(isFlex || isGrid) && (
-        <div style={tipBoxStyle}>
+        <div className={TIP_BOX}>
           {isFlex ? "See Flexbox section for flex controls" : "See Grid controls below"}
         </div>
       )}

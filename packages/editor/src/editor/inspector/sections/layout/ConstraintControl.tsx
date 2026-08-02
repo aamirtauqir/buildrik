@@ -4,8 +4,14 @@
  */
 
 import * as React from "react";
-import { constraintBtnStyle, fixedInputStyle } from "./styles";
+import { CLUSTER_CAPTION, constraintBtnClass } from "./classes";
 import { Button, TextInput } from "@/editor/chrome-ui";
+
+/** flowbite puts `className` on TextInput's wrapper — the real <input> is
+ *  reached with a descendant variant (chrome-ui/textInputTheme documents it). */
+const FIXED_INPUT =
+  "tw:flex-1 tw:min-w-0 tw:[&_input]:h-6 tw:[&_input]:py-0 tw:[&_input]:px-2 " +
+  "tw:[&_input]:text-[11.5px] tw:[&_input]:font-medium tw:[&_input]:[font-family:var(--bk-font-ui)]";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -49,14 +55,13 @@ export const ConstraintControl: React.FC<ConstraintControlProps> = ({ label, val
   };
 
   return (
-    <div style={{ marginBottom: 10 }}>
-      <div style={{ fontSize: 12, color: "var(--bk-ink-muted)", marginBottom: 6 }}>
-        {label}
-      </div>
-      <div style={{ display: "flex", gap: 4 }}>
+    <div className="tw:mb-2.5">
+      <div className={CLUSTER_CAPTION}>{label}</div>
+      <div className="tw:flex tw:gap-1">
         {/* Fixed */}
         <Button
-          style={constraintBtnStyle(currentType === "fixed")}
+          size="xs"
+          className={constraintBtnClass(currentType === "fixed")}
           onClick={() => handleConstraintChange("fixed")}
           title="Fixed size - element has a specific pixel or unit value"
         >
@@ -77,7 +82,8 @@ export const ConstraintControl: React.FC<ConstraintControlProps> = ({ label, val
 
         {/* Fill */}
         <Button
-          style={constraintBtnStyle(currentType === "fill")}
+          size="xs"
+          className={constraintBtnClass(currentType === "fill")}
           onClick={() => handleConstraintChange("fill")}
           title="Fill - element expands to fill available space (100%)"
         >
@@ -100,7 +106,8 @@ export const ConstraintControl: React.FC<ConstraintControlProps> = ({ label, val
 
         {/* Hug */}
         <Button
-          style={constraintBtnStyle(currentType === "hug")}
+          size="xs"
+          className={constraintBtnClass(currentType === "hug")}
           onClick={() => handleConstraintChange("hug")}
           title="Hug content - element shrinks to fit its content (fit-content)"
         >
@@ -123,23 +130,14 @@ export const ConstraintControl: React.FC<ConstraintControlProps> = ({ label, val
       </div>
       {/* Fixed value input - only show when in fixed mode */}
       {currentType === "fixed" && (
-        <div
-          style={{
-            marginTop: 6,
-            display: "flex",
-            alignItems: "center",
-            gap: 4,
-          }}
-        >
-          <span style={{ fontSize: 12, color: "var(--bk-ink-muted)", width: 32 }}>
-            {isWidth ? "W" : "H"}
-          </span>
+        <div className="tw:flex tw:items-center tw:gap-1 tw:mt-1.5">
+          <span className="tw:w-8 tw:text-xs tw:text-gray-500">{isWidth ? "W" : "H"}</span>
           <TextInput
             type="text"
             value={value}
             onChange={(e) => onChange(e.target.value)}
             placeholder={isWidth ? "200px" : "auto"}
-            style={fixedInputStyle}
+            className={FIXED_INPUT}
           />
         </div>
       )}
