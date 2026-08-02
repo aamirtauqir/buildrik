@@ -2,3 +2,4 @@
 # playwright
 test-results/
 playwright-report/
+scripts/audit/dead-css.report.json

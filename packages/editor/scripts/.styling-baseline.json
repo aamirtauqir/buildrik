@@ -1,5 +1,30 @@
 {
   "inline_literal": 1503,
   "inline_hoisted": 869,
-  "css_lines": 12378
+  "css_lines": 10940,
+  "css_files": {
+    "inspector/styles/inspector.css": 1038,
+    "media/ImageEditorModal.css": 326,
+    "media/LibraryManager.css": 955,
+    "panels/layers/styles/layers-v2.css": 646,
+    "rail/DrawerPanel.css": 124,
+    "rail/LayoutShell.css": 421,
+    "shell/chrome.css": 45,
+    "shell/header.css": 153,
+    "sidebar/LeftSidebar.css": 417,
+    "sidebar/shared/EmptyStates.css": 58,
+    "sidebar/shared/SkeletonStates.css": 116,
+    "sidebar/tabs/ai/AITab.css": 296,
+    "sidebar/tabs/build/BuildTab.css": 425,
+    "sidebar/tabs/component-library/ComponentsTab.css": 75,
+    "sidebar/tabs/history/styles/history.css": 1237,
+    "sidebar/tabs/media/MediaTab.css": 1778,
+    "sidebar/tabs/media/components/ExpandedMediaPanel.css": 234,
+    "sidebar/tabs/media/components/SlimLauncher.css": 113,
+    "sidebar/tabs/pages/PagesTab.css": 784,
+    "sidebar/tabs/settings/settings.css": 581,
+    "sidebar/tabs/templates/ApplyProgressOverlay.css": 58,
+    "sidebar/tabs/templates/TemplatePreviewModal.css": 221,
+    "sidebar/tabs/templates/TemplatesTab.css": 839
+  }
 }
