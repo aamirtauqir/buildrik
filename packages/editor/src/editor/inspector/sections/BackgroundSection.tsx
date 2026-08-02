@@ -8,6 +8,12 @@ import { extractGradientUI, composeGradient, deriveBgType } from "../../../share
 import { Section, ColorInput, SelectRow, InputRow, MoreSettingsToggle, type SectionTier, MixedValueIndicator } from "../shared/controls";
 import { Button, TextInput } from "@/editor/chrome-ui";
 
+const FIELD_LABEL = "tw:text-xs tw:font-medium tw:text-gray-500";
+/** Gradient preset tile — the fill IS the preview, so it is a real gradient. */
+const GRADIENT_SWATCH =
+  "tw:flex-1 tw:px-3 tw:py-5 tw:rounded-md tw:border tw:border-[var(--bk-border-medium)] " +
+  "tw:text-xs tw:text-white";
+
 export interface BackgroundSectionProps {
   styles: Record<string, string>;
   onChange: (property: string, value: string) => void;
@@ -55,15 +61,9 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
   const bgColor = styles["background-color"] || styles["background"];
   const preview = bgColor ? (
     <span
-      style={{
-        display: "inline-block",
-        width: 14,
-        height: 14,
-        borderRadius: 3,
-        background: bgColor,
-        border: "1px solid var(--bk-border-medium)",
-        flexShrink: 0,
-      }}
+      className="tw:inline-block tw:size-3.5 tw:flex-none tw:rounded-[3px] tw:border tw:border-[var(--bk-border-medium)]"
+      /* the swatch IS the value */
+      style={{ background: bgColor }}
       title={bgColor}
     />
   ) : undefined;
@@ -101,14 +101,13 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
       id="inspector-section-background"
     >
       {/* Background Type Selector — segmented */}
-      <div className="bdi-seg" style={{ marginBottom: 6 }}>
+      <div className="bdi-seg tw:mb-1.5">
         {(["color", "gradient", "image"] as const).map((type) => (
           <Button
             key={type}
             type="button"
             onClick={() => setBgType(type)}
-            className={bgType === type ? "on" : ""}
-            style={{ textTransform: "capitalize" }}
+            className={`tw:capitalize ${bgType === type ? "on" : ""}`}
             aria-pressed={bgType === type}
           >
             {type}
@@ -117,7 +116,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
       </div>
       {/* Color Background */}
       {bgType === "color" && (
-        <div style={{ position: "relative" }}>
+        <div className="tw:relative">
           <MixedValueIndicator prop="background-color" mixedKeys={mixedKeys} />
           <ColorInput
             label="Color"
@@ -129,35 +128,18 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
       {/* Gradient Background */}
       {bgType === "gradient" && (
         <>
-          <div style={{ marginBottom: 12 }}>
-            <label
-              style={{
-                fontSize: 12,
-                color: "var(--bk-ink-muted)",
-                fontWeight: 500,
-                display: "block",
-                marginBottom: 8,
-              }}
-            >
+          <div className="tw:mb-3">
+            <label className={`${FIELD_LABEL} tw:block tw:mb-2`}>
               Gradient Type
             </label>
-            <div style={{ display: "flex", gap: 4 }}>
+            <div className="tw:flex tw:gap-1">
               <Button
                 onClick={() => {
                   const color1 = "var(--bk-accent)";
                   const color2 = "var(--bk-success)";
                   onChange("background", `linear-gradient(90deg, ${color1}, ${color2})`);
                 }}
-                style={{
-                  flex: 1,
-                  padding: "20px 12px",
-                  background: "linear-gradient(90deg, var(--bk-accent), var(--bk-success))",
-                  border: "1px solid var(--bk-border-medium)",
-                  borderRadius: 6,
-                  cursor: "pointer",
-                  fontSize: 12,
-                  color: "var(--bk-accent-on)",
-                }}
+                className={`${GRADIENT_SWATCH} tw:bg-linear-to-r tw:from-[var(--bk-accent)] tw:to-[var(--bk-success)]`}
               >
                 Linear
               </Button>
@@ -167,16 +149,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
                   const color2 = "var(--bk-success)";
                   onChange("background", `radial-gradient(circle, ${color1}, ${color2})`);
                 }}
-                style={{
-                  flex: 1,
-                  padding: "20px 12px",
-                  background: "radial-gradient(circle, var(--bk-accent), var(--bk-success))",
-                  border: "1px solid var(--bk-border-medium)",
-                  borderRadius: 6,
-                  cursor: "pointer",
-                  fontSize: 12,
-                  color: "var(--bk-accent-on)",
-                }}
+                className={`${GRADIENT_SWATCH} tw:bg-radial tw:from-[var(--bk-accent)] tw:to-[var(--bk-success)]`}
               >
                 Radial
               </Button>
@@ -213,24 +186,8 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
 
           {/* Gradient Angle (for linear) */}
           {(gradientUI?.gradientType !== "radial") && (
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                marginBottom: 12,
-              }}
-            >
-              <label
-                style={{
-                  fontSize: 12,
-                  color: "var(--bk-ink-muted)",
-                  fontWeight: 500,
-                  minWidth: 70,
-                }}
-              >
-                Angle
-              </label>
+            <div className="tw:flex tw:items-center tw:gap-2 tw:mb-3">
+              <label className={`${FIELD_LABEL} tw:min-w-[70px]`}>Angle</label>
               <TextInput
                 type="range"
                 min="0"
@@ -245,9 +202,9 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
                   });
                   onChange("background", result);
                 }}
-                style={{ flex: 1 }}
+                className="tw:flex-1"
               />
-              <span style={{ fontSize: 12, color: "var(--bk-ink-muted)", minWidth: 40 }}>{gradientUI?.angle ?? 90}°</span>
+              <span className={`${FIELD_LABEL} tw:min-w-10`}>{gradientUI?.angle ?? 90}°</span>
             </div>
           )}
         </>
@@ -255,8 +212,8 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
       {/* Image Background */}
       {bgType === "image" && (
         <>
-          <div style={{ display: "flex", gap: 8, alignItems: "flex-end", marginBottom: 12 }}>
-            <div style={{ flex: 1, position: "relative" }}>
+          <div className="tw:flex tw:items-end tw:gap-2 tw:mb-3">
+            <div className="tw:relative tw:flex-1">
               <MixedValueIndicator prop="background-image" mixedKeys={mixedKeys} />
               <InputRow
                 label="Image URL"
@@ -272,18 +229,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
                     onChange("background-image", `url('${asset.src}')`);
                   })
                 }
-                style={{
-                  padding: "8px 12px",
-                  background: "var(--bk-accent-subtle)",
-                  border: "1px solid var(--bk-accent)",
-                  borderRadius: 6,
-                  color: "var(--bk-accent)",
-                  fontSize: 12,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  whiteSpace: "nowrap",
-                  marginBottom: 12,
-                }}
+                className="tw:mb-3 tw:whitespace-nowrap tw:px-3 tw:py-2 tw:rounded-md tw:border tw:border-blue-700 tw:bg-[var(--bk-accent-subtle)] tw:text-xs tw:font-semibold tw:text-blue-700"
                 title="Browse media library"
               >
                 Browse
@@ -294,7 +240,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
           {/* ─── Advanced: size/position/repeat/attachment (behind More settings) ─── */}
           {advancedExpanded && (
             <>
-              <div style={{ position: "relative" }}>
+              <div className="tw:relative">
                 <MixedValueIndicator prop="background-size" mixedKeys={mixedKeys} />
                 <SelectRow
                   label="Size"
@@ -309,7 +255,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
                 />
               </div>
 
-              <div style={{ position: "relative" }}>
+              <div className="tw:relative">
                 <MixedValueIndicator prop="background-position" mixedKeys={mixedKeys} />
                 <SelectRow
                   label="Position"
@@ -329,7 +275,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
                 />
               </div>
 
-              <div style={{ position: "relative" }}>
+              <div className="tw:relative">
                 <MixedValueIndicator prop="background-repeat" mixedKeys={mixedKeys} />
                 <SelectRow
                   label="Repeat"
