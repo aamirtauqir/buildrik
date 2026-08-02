@@ -7,7 +7,7 @@
  */
 
 import * as React from "react";
-import { ModalClose, ModalContent, ModalRoot, ModalTitle, Button, TextInput } from "@/editor/chrome-ui";
+import { ModalClose, ModalContent, ModalRoot, ModalTitle, Button, Slider, TextInput } from "@/editor/chrome-ui";
 import {
   ICON_CATEGORIES,
   getAllIcons,
@@ -42,174 +42,18 @@ const MAX_RECENT_ICONS = 12;
 // Styles
 // ============================================
 
-const styles = {
-  container: {
-    display: "flex",
-    flexDirection: "column" as const,
-    gap: 16,
-    minHeight: 500,
-  },
-  header: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  iconCount: {
-    fontSize: 12,
-    color: "var(--bk-ink-muted)",
-  },
-  toolbar: {
-    display: "flex",
-    gap: 12,
-    alignItems: "center",
-  },
-  searchInput: {
-    flex: 1,
-  },
-  categories: {
-    display: "flex",
-    gap: 4,
-    flexWrap: "wrap" as const,
-    paddingBottom: 12,
-    borderBottom: "1px solid var(--bk-border)",
-  },
-  categoryBtn: {
-    padding: "4px 10px",
-    fontSize: 12,
-    border: "1px solid var(--bk-border)",
-    borderRadius: 16,
-    background: "transparent",
-    color: "var(--bk-ink-soft)",
-    cursor: "pointer",
-    transition: "all 0.15s ease",
-  },
-  categoryBtnActive: {
-    background: "var(--bk-accent)",
-    borderColor: "var(--bk-accent)",
-    color: "var(--bk-accent-on)",
-  },
-  sectionTitle: {
-    fontSize: 12,
-    fontWeight: 600,
-    color: "var(--bk-ink-soft)",
-    textTransform: "uppercase" as const,
-    letterSpacing: "0.5px",
-    marginBottom: 8,
-  },
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(48px, 1fr))",
-    gap: 6,
-    maxHeight: 280,
-    overflow: "auto",
-    padding: 4,
-  },
-  iconBtn: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    width: 48,
-    height: 48,
-    border: "1px solid var(--bk-border)",
-    borderRadius: 8,
-    background: "var(--bk-bg-panel)",
-    cursor: "pointer",
-    transition: "all 0.15s ease",
-    color: "var(--bk-ink)",
-  },
-  iconBtnHover: {
-    background: "var(--bk-accent-tint)",
-    borderColor: "var(--bk-alpha-accent-30)",
-  },
-  iconBtnSelected: {
-    border: "2px solid var(--bk-accent)",
-    background: "var(--bk-alpha-accent-15)",
-  },
-  preview: {
-    display: "flex",
-    alignItems: "center",
-    gap: 16,
-    padding: 16,
-    background: "var(--bk-bg-subtle)",
-    borderRadius: 8,
-  },
-  previewIcon: {
-    width: 64,
-    height: 64,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    background: "var(--bk-bg-panel)",
-    borderRadius: 8,
-    border: "1px solid var(--bk-border)",
-  },
-  previewInfo: {
-    flex: 1,
-  },
-  previewName: {
-    fontWeight: 600,
-    fontSize: 14,
-    marginBottom: 4,
-  },
-  previewTags: {
-    fontSize: 12,
-    color: "var(--bk-ink-muted)",
-  },
-  controls: {
-    display: "flex",
-    gap: 12,
-    alignItems: "center",
-  },
-  controlGroup: {
-    display: "flex",
-    flexDirection: "column" as const,
-    gap: 4,
-  },
-  controlLabel: {
-    fontSize: 12,
-    color: "var(--bk-ink-muted)",
-    textTransform: "uppercase" as const,
-  },
-  sizeInput: {
-    width: 60,
-    padding: "6px 8px",
-    borderRadius: 6,
-    border: "1px solid var(--bk-border)",
-    background: "var(--bk-bg-panel)",
-    color: "var(--bk-ink)",
-    fontSize: 12,
-    textAlign: "center" as const,
-  },
-  colorInput: {
-    width: 40,
-    height: 32,
-    borderRadius: 6,
-    border: "1px solid var(--bk-border)",
-    cursor: "pointer",
-    padding: 2,
-  },
-  strokeInput: {
-    width: 60,
-    padding: "6px 8px",
-    borderRadius: 6,
-    border: "1px solid var(--bk-border)",
-    background: "var(--bk-bg-panel)",
-    color: "var(--bk-ink)",
-    fontSize: 12,
-  },
-  footer: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingTop: 16,
-    borderTop: "1px solid var(--bk-border)",
-  },
-  noResults: {
-    padding: 40,
-    textAlign: "center" as const,
-    color: "var(--bk-ink-muted)",
-  },
-};
+/* Classes. The one genuinely computed value in this file is the preview icon's
+   colour, which the user picks — that stays inline. */
+const CONTAINER = "tw:flex tw:flex-col tw:gap-4 tw:min-h-[500px]";
+const SECTION_TITLE = "tw:text-xs tw:font-semibold tw:text-[var(--bk-ink-soft)] tw:uppercase tw:tracking-[0.5px] tw:mb-2";
+const GRID = "tw:grid tw:[grid-template-columns:repeat(auto-fill,minmax(48px,1fr))] tw:gap-1.5 tw:overflow-auto tw:p-1";
+const ICON_BTN =
+  "tw:flex tw:items-center tw:justify-center tw:size-12 tw:rounded-lg tw:bg-white tw:cursor-pointer " +
+  "tw:text-gray-900 tw:[transition:var(--bk-transition-fast)] tw:hover:bg-[var(--bk-accent-tint)] " +
+  "tw:aria-pressed:border-2 tw:aria-pressed:border-blue-700 tw:aria-pressed:bg-[var(--bk-alpha-accent-15)]";
+const CONTROL_GROUP = "tw:flex tw:flex-col tw:gap-1";
+const CONTROL_LABEL = "tw:text-xs tw:text-gray-500 tw:uppercase";
+const GHOST = "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900";
 
 // ============================================
 // Component
@@ -329,15 +173,15 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
           </svg>
         </ModalClose>
         <div className="bd-modal__body">
-    <div style={styles.container}>
+    <div className={CONTAINER}>
       {/* Header with icon count */}
-      <div style={styles.header}>
-        <span style={styles.iconCount}>{getIconCount()} icons available</span>
+      <div className="tw:flex tw:justify-between tw:items-center">
+        <span className="tw:text-xs tw:text-gray-500">{getIconCount()} icons available</span>
       </div>
 
       {/* Search */}
-      <div style={styles.toolbar}>
-        <div style={styles.searchInput}>
+      <div className="tw:flex tw:gap-3 tw:items-center">
+        <div className="tw:flex-1">
           <InputField
             placeholder="Search icons by name or keyword..."
             value={searchQuery}
@@ -350,12 +194,12 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
       </div>
 
       {/* Categories */}
-      <div style={styles.categories}>
+      <div className="tw:flex tw:gap-1 tw:flex-wrap tw:pb-3 tw:border-b tw:border-gray-200">
         <Button
-          style={{
-            ...styles.categoryBtn,
-            ...(selectedCategory === "all" ? styles.categoryBtnActive : {}),
-          }}
+          size="xs"
+          color={selectedCategory === "all" ? undefined : "light"}
+          aria-pressed={selectedCategory === "all"}
+          className="tw:rounded-full"
           onClick={() => {
             setSelectedCategory("all");
             setSearchQuery("");
@@ -366,10 +210,10 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
         {ICON_CATEGORY_IDS.map((catId) => (
           <Button
             key={catId}
-            style={{
-              ...styles.categoryBtn,
-              ...(selectedCategory === catId ? styles.categoryBtnActive : {}),
-            }}
+            size="xs"
+            color={selectedCategory === catId ? undefined : "light"}
+            aria-pressed={selectedCategory === catId}
+            className="tw:rounded-full"
             onClick={() => {
               setSelectedCategory(catId);
               setSearchQuery("");
@@ -383,15 +227,14 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
       {/* Recent Icons */}
       {!searchQuery && selectedCategory === "all" && recentIconDefs.length > 0 && (
         <div>
-          <div style={styles.sectionTitle}>Recently Used</div>
-          <div style={{ ...styles.grid, maxHeight: "none" }}>
+          <div className={SECTION_TITLE}>Recently Used</div>
+          <div className={GRID}>
             {recentIconDefs.map((icon) => (
               <Button
                 key={`recent-${icon.name}`}
-                style={{
-                  ...styles.iconBtn,
-                  ...(selectedIcon?.name === icon.name ? styles.iconBtnSelected : {}),
-                }}
+                color="light"
+                className={ICON_BTN}
+                aria-pressed={selectedIcon?.name === icon.name}
                 onClick={() => setSelectedIcon(icon)}
                 title={icon.name}
               >
@@ -405,22 +248,21 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
       {/* Icon Grid */}
       <div>
         {!searchQuery && selectedCategory === "all" && (
-          <div style={styles.sectionTitle}>All Icons</div>
+          <div className={SECTION_TITLE}>All Icons</div>
         )}
         {searchQuery && (
-          <div style={styles.sectionTitle}>
+          <div className={SECTION_TITLE}>
             {filteredIcons.length} results for &quot;{searchQuery}&quot;
           </div>
         )}
         {filteredIcons.length > 0 ? (
-          <div style={styles.grid}>
+          <div className={`${GRID} tw:max-h-70`}>
             {filteredIcons.map((icon) => (
               <Button
                 key={icon.name}
-                style={{
-                  ...styles.iconBtn,
-                  ...(selectedIcon?.name === icon.name ? styles.iconBtnSelected : {}),
-                }}
+                color="light"
+                className={ICON_BTN}
+                aria-pressed={selectedIcon?.name === icon.name}
                 onClick={() => setSelectedIcon(icon)}
                 title={icon.name}
               >
@@ -429,69 +271,68 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
             ))}
           </div>
         ) : (
-          <div style={styles.noResults}>No icons found for &quot;{searchQuery}&quot;</div>
+          <div className="tw:text-center tw:text-xs tw:text-gray-500 tw:py-6">No icons found for &quot;{searchQuery}&quot;</div>
         )}
       </div>
 
       {/* Preview & Controls */}
       {selectedIcon && (
-        <div style={styles.preview}>
-          <div style={{ ...styles.previewIcon, color: iconColor }}>
+        <div className="tw:flex tw:items-center tw:gap-4 tw:p-4 tw:bg-gray-50 tw:rounded-lg">
+          {/* The picked colour is the user's live choice — the one value here
+              that genuinely cannot be a class. */}
+          <div
+            className="tw:size-16 tw:flex tw:items-center tw:justify-center tw:bg-white tw:rounded-lg tw:border tw:border-gray-200"
+            style={{ color: iconColor }}
+          >
             {renderIcon(selectedIcon, iconSize)}
           </div>
-          <div style={styles.previewInfo}>
-            <div style={styles.previewName}>{selectedIcon.name}</div>
-            <div style={styles.previewTags}>{selectedIcon.tags.join(", ")}</div>
+          <div className="tw:flex-1">
+            <div className="tw:font-semibold tw:text-sm tw:mb-1">{selectedIcon.name}</div>
+            <div className="tw:text-xs tw:text-gray-500">{selectedIcon.tags.join(", ")}</div>
           </div>
-          <div style={styles.controls}>
-            <div style={styles.controlGroup}>
-              <span style={styles.controlLabel}>Size</span>
+          <div className="tw:flex tw:gap-3 tw:items-center">
+            <div className={CONTROL_GROUP}>
+              <span className={CONTROL_LABEL}>Size</span>
               <TextInput
                 type="number"
                 value={iconSize}
                 onChange={(e) => setIconSize(Math.max(12, Math.min(96, Number(e.target.value))))}
-                style={styles.sizeInput}
+                className="tw:w-15 tw:text-center"
                 min={12}
                 max={96}
               />
             </div>
-            <div style={styles.controlGroup}>
-              <span style={styles.controlLabel}>Stroke</span>
+            <div className={CONTROL_GROUP}>
+              <span className={CONTROL_LABEL}>Stroke</span>
               {/* Phase D: range slider replaces numeric input — matches v3
                   prototype § 20. Live value shown to right of track. */}
-              <div style={{ display: "flex", alignItems: "center", gap: 6, flex: 1 }}>
-                <TextInput
-                  type="range"
-                  value={strokeWidth}
-                  onChange={(e) =>
-                    setStrokeWidth(Math.max(0.5, Math.min(4, Number(e.target.value))))
-                  }
-                  style={{ flex: 1, minWidth: 80 }}
-                  min={0.5}
-                  max={4}
-                  step={0.5}
-                  aria-label="Stroke width"
-                />
-                <span
-                  style={{
-                    fontSize: 11,
-                    fontFamily: "var(--bk-font-mono, ui-monospace, monospace)",
-                    color: "var(--bk-ink-muted)",
-                    minWidth: 24,
-                    textAlign: "right",
-                  }}
-                >
+              <div className="tw:flex tw:items-center tw:gap-1.5 tw:flex-1">
+                <div className="tw:flex-1 tw:min-w-20">
+                  {/* chrome-ui Slider, not a restyled range input — same swap
+                      as OptimizationPanel. Its own field is off because the
+                      readout beside it is formatted to one decimal. */}
+                  <Slider
+                    value={strokeWidth}
+                    onChange={(v) => setStrokeWidth(Math.max(0.5, Math.min(4, v)))}
+                    min={0.5}
+                    max={4}
+                    step={0.5}
+                    label="Stroke width"
+                    withField={false}
+                  />
+                </div>
+                <span className="tw:text-[11px] tw:[font-family:var(--bk-font-mono)] tw:text-gray-500 tw:min-w-6 tw:text-right">
                   {strokeWidth.toFixed(1)}
                 </span>
               </div>
             </div>
-            <div style={styles.controlGroup}>
-              <span style={styles.controlLabel}>Color</span>
+            <div className={CONTROL_GROUP}>
+              <span className={CONTROL_LABEL}>Color</span>
               <TextInput
                 type="color"
                 value={iconColor}
                 onChange={(e) => setIconColor(e.target.value)}
-                style={styles.colorInput}
+                className="tw:w-10 tw:h-8 tw:p-0.5 tw:cursor-pointer"
               />
             </div>
           </div>
@@ -499,12 +340,10 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
       )}
 
       {/* Footer */}
-      <div style={styles.footer}>
-        <span style={{ fontSize: 12, color: "var(--bk-ink-muted)" }}>
-          Powered by Lucide Icons
-        </span>
-        <div style={{ display: "flex", gap: 8 }}>
-          <Button color="light" onClick={onClose} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+      <div className="tw:flex tw:justify-between tw:items-center tw:pt-4 tw:border-t tw:border-gray-200">
+        <span className="tw:text-xs tw:text-gray-500">Powered by Lucide Icons</span>
+        <div className="tw:flex tw:gap-2">
+          <Button color="light" onClick={onClose} className={GHOST}>
             Cancel
           </Button>
           <Button onClick={handleSelect} disabled={!selectedIcon}>
