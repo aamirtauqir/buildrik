@@ -1,6 +1,6 @@
 {
-  "inline_literal": 1225,
-  "inline_hoisted": 569,
+  "inline_literal": 1213,
+  "inline_hoisted": 556,
   "css_lines": 10940,
   "css_files": {
     "inspector/styles/inspector.css": 1038,
