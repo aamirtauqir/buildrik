@@ -121,19 +121,11 @@ function StarterCard({ starter, selected, onSelect }: StarterCardProps) {
       role="radio"
       aria-checked={selected}
       onClick={onSelect}
-      style={{
-        all: "unset",
-        cursor: "pointer",
-        borderRadius: 8,
-        overflow: "hidden",
-        border: selected
-          ? "2px solid var(--bk-accent)"
-          : "1px solid var(--bk-border)",
-        boxShadow: selected ? "0 0 0 2px rgba(45, 109, 255, 0.16)" : "none",
-        display: "flex",
-        flexDirection: "column",
-        background: "var(--bk-bg-panel)",
-      }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+      className={`tw:rounded-lg tw:overflow-hidden tw:flex tw:flex-col tw:bg-white tw:p-0 ${
+        selected
+          ? "tw:border-2 tw:border-blue-700 tw:[box-shadow:0_0_0_2px_var(--bk-accent-subtle)]"
+          : "tw:border tw:border-gray-200 tw:shadow-none"
+      }`}
     >
       <div
         style={{

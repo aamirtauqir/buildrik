@@ -168,16 +168,11 @@ export function StockSourceModal({
                     role="radio"
                     aria-checked={active}
                     onClick={() => onSetSource(s.id)}
-                    style={{
-                      all: "unset",
-                      cursor: "pointer",
-                      padding: "4px 10px",
-                      borderRadius: 4,
-                      fontSize: 12,
-                      fontWeight: active ? 600 : 500,
-                      color: active ? "var(--bk-accent-on)" : "var(--bk-ink-muted)",
-                      background: active ? "var(--bk-accent)" : "transparent",
-                    }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+                    className={`tw:px-2.5 tw:py-1 tw:text-xs tw:rounded ${
+                      active
+                        ? "tw:bg-blue-700 tw:text-white tw:font-semibold tw:border-blue-700"
+                        : "tw:bg-transparent tw:text-gray-500 tw:font-medium tw:border-transparent"
+                    }`}
                   >
                     {s.label}
                   </Button>

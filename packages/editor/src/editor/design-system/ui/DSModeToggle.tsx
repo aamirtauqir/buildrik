@@ -53,18 +53,11 @@ export const DSModeToggle: React.FC<DSModeToggleProps> = ({ className }) => {
             aria-checked={active}
             title={seg.hint}
             onClick={() => setMode(seg.value)}
-            style={{
-              all: "unset",
-              cursor: "pointer",
-              padding: "4px 10px",
-              borderRadius: 4,
-              fontSize: 12,
-              fontWeight: active ? 600 : 500,
-              color: active ? "var(--bk-accent-on)" : "var(--bk-ink-muted)",
-              background: active ? "var(--bk-accent)" : "transparent",
-              transition: "background-color 0.12s, color 0.12s",
-              userSelect: "none",
-            }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+            className={`tw:px-2.5 tw:py-1 tw:text-xs tw:rounded tw:select-none tw:[transition:var(--bk-transition-fast)] ${
+              active
+                ? "tw:bg-blue-700 tw:text-white tw:font-semibold tw:border-blue-700"
+                : "tw:bg-transparent tw:text-gray-500 tw:font-medium tw:border-transparent"
+            }`}
           >
             {seg.label}
           </Button>
