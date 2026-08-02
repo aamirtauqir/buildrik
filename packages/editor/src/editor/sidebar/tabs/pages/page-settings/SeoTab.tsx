@@ -34,6 +34,14 @@ const rangeLabel: Record<TitleRange, string> = {
   long: " · Too long",
 };
 
+const UI = "tw:[font-family:var(--bk-font-ui)]";
+const MONO = "tw:[font-family:var(--bk-font-mono)]";
+const CARD = "tw:bg-[var(--bk-bg-subtle)] tw:border tw:border-gray-200 tw:rounded";
+const BANNER = "tw:bg-[var(--bk-warning-tint)] tw:border tw:border-[var(--bk-warning-text)] tw:rounded tw:text-[var(--bk-warning)]";
+const FIELD = "tw:flex tw:flex-col tw:gap-1.5";
+const FIELD_HEAD = "tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2";
+const COUNTER = `tw:text-[10.5px] tw:font-medium ${MONO}`;
+const GHOST_BTN = "tw:border-transparent tw:bg-transparent";
 
 export const SeoTab: React.FC<Props> = ({ s, page }) => {
   const domain = s.domain ?? "yoursite.com";
@@ -60,33 +68,37 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
   return (
     <div className="tw:flex tw:flex-col tw:gap-4">
       {/* ── 1. GOOGLE PREVIEW — TOP ────────────────────────────────────── */}
-      <div style={{ font: "500 11px var(--bk-font-ui)", color: "var(--bk-ink-muted)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+      <div className={`tw:text-[11px] tw:font-medium tw:text-gray-500 tw:uppercase tw:tracking-[0.04em] ${UI}`}>
         How your page looks in Google Search
       </div>
       {/* Google preview — prototype .gpreview */}
-      <div style={{ padding: 14, background: "var(--bk-bg-subtle)", border: "1px solid var(--bk-border)", borderRadius: 4 }}>
-        <div style={{ font: "500 10.5px var(--bk-font-mono)", color: "var(--bk-ink-soft)" }}>
+      <div className={`tw:p-3.5 ${CARD}`}>
+        <div className={`tw:text-[10.5px] tw:font-medium tw:text-[var(--bk-ink-soft)] ${MONO}`}>
           {s.domain ?? "yoursite.com"} › {page.slug?.replace(/^\//, "") || page.id}
         </div>
-        <div style={{ margin: "var(--bk-space-4) 0 2px", font: "500 16px var(--bk-font-ui)", color: "var(--bk-accent)" }}>
+        <div className={`tw:mt-1 tw:mb-0.5 tw:text-base tw:font-medium tw:text-blue-700 ${UI}`}>
           {s.seoTitle || page.name}
         </div>
-        <div style={{ font: "400 12.5px var(--bk-font-ui)", color: s.seoDesc ? "var(--bk-ink)" : "var(--bk-ink-muted)", fontStyle: s.seoDesc ? undefined : "italic", lineHeight: 1.4 }}>
+        <div
+          className={`tw:text-[12.5px] tw:leading-snug ${UI} ${
+            s.seoDesc ? "tw:text-[var(--bk-ink)]" : "tw:text-gray-500 tw:italic"
+          }`}
+        >
           {s.seoDesc || "No description — add one below to improve ranking"}
         </div>
       </div>
       {/* ── 2. SEO SCORE ────────────────────────────────────────────────── */}
       {!s.allowIndex ? (
-        <div style={{ padding: "10px var(--bk-space-12)", background: "var(--bk-warning-tint)", border: "1px solid var(--bk-warning-text)", borderRadius: 4, font: "400 var(--bk-radius-lg) var(--bk-font-ui)", color: "var(--bk-warning)" }} role="alert">
+        <div className={`tw:px-3 tw:py-2.5 tw:text-xs ${UI} ${BANNER}`} role="alert">
           <div>
-            <strong style={{ color: "var(--bk-ink)" }}>noIndex is ON</strong> — search engines won&apos;t index this page regardless of your
+            <strong className="tw:text-[var(--bk-ink)]">noIndex is ON</strong> — search engines won&apos;t index this page regardless of your
             SEO settings.
             <Button
               color="light"
               size="xs"
               type="button"
-              style={{ marginLeft: 6, padding: "2px 6px", color: "var(--bk-accent)", font: "500 11.5px var(--bk-font-ui)" }}
-              onClick={() => s.setAllowIndex(true)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+              onClick={() => s.setAllowIndex(true)}
+              className={`tw:ml-1.5 tw:text-[11.5px] tw:font-medium tw:text-blue-700 tw:hover:text-blue-800 ${GHOST_BTN} ${UI}`}
             >
               Turn indexing on →
             </Button>
@@ -95,15 +107,19 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
       ) : (
         <>
           {/* Score row + checks grid — prototype .seo-score-row + .seo-checks */}
-          <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "var(--bk-space-12)", background: "var(--bk-bg-subtle)", border: "1px solid var(--bk-border)", borderRadius: 4 }}>
-            <div style={{ font: "500 28px var(--bk-font-mono)", color: s.seoScore >= 80 ? "var(--bk-success)" : "var(--bk-warning)", fontVariantNumeric: "tabular-nums", minWidth: 48 }}>
+          <div className={`tw:flex tw:items-center tw:gap-3.5 tw:p-3 ${CARD}`}>
+            <div
+              className={`tw:text-[28px] tw:font-medium tw:tabular-nums tw:min-w-12 ${MONO} ${
+                s.seoScore >= 80 ? "tw:text-[var(--bk-success)]" : "tw:text-[var(--bk-warning)]"
+              }`}
+            >
               {s.seoScore}
             </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ font: "500 11.5px var(--bk-font-ui)", color: "var(--bk-ink-soft)" }}>
+            <div className="tw:flex-1 tw:min-w-0">
+              <div className={`tw:text-[11.5px] tw:font-medium tw:text-[var(--bk-ink-soft)] ${UI}`}>
                 {s.seoScore >= 80 ? "Looks good" : "Needs work"}
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--bk-space-4) 10px", marginTop: "var(--bk-space-8)" }}>
+              <div className="tw:grid tw:grid-cols-2 tw:gap-x-2.5 tw:gap-y-1 tw:mt-2">
                 {[
                   // Point labels mirror calculateSeoScore's real max weights:
                   // title 20 (+10 at ≥30 chars) = 30; slug 20 (+10 non-empty) = 30;
@@ -114,10 +130,19 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
                   { label: "Clean URL slug", ok: s.seoChecks.slugClean, pts: "+30 pts" },
                   { label: "Allow indexing", ok: s.seoChecks.indexingOn, pts: "Required" },
                 ].map((c) => (
-                  <div key={c.label} style={{ display: "flex", alignItems: "center", gap: 6, font: "400 11px var(--bk-font-ui)", color: c.ok ? "var(--bk-ink)" : "var(--bk-ink-muted)" }}>
-                    <span style={{ width: 6, height: 6, borderRadius: "var(--bk-radius-full)", background: c.ok ? "var(--bk-success)" : "var(--bk-ink-muted)", flexShrink: 0 }} />
+                  <div
+                    key={c.label}
+                    className={`tw:flex tw:items-center tw:gap-1.5 tw:text-[11px] ${UI} ${
+                      c.ok ? "tw:text-[var(--bk-ink)]" : "tw:text-gray-500"
+                    }`}
+                  >
+                    <span
+                      className={`tw:size-1.5 tw:rounded-full tw:flex-none ${
+                        c.ok ? "tw:bg-[var(--bk-success)]" : "tw:bg-gray-400"
+                      }`}
+                    />
                     <span>{c.label}</span>
-                    <span style={{ marginLeft: "auto", font: "500 10px var(--bk-font-mono)", color: "var(--bk-ink-muted)" }}>{c.pts}</span>
+                    <span className={`tw:ml-auto tw:text-[10px] tw:font-medium tw:text-gray-500 ${MONO}`}>{c.pts}</span>
                   </div>
                 ))}
               </div>
@@ -126,17 +151,25 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
 
           {/* Reach 80+ banner — shown when score < 80 and indexing is on */}
           {s.seoScore < 80 && s.allowIndex && (
-            <div style={{ padding: "var(--bk-space-8) 10px", background: "var(--bk-warning-tint)", border: "1px solid var(--bk-warning-text)", borderRadius: 4, font: "400 11.5px var(--bk-font-ui)", color: "var(--bk-warning)" }} role="note">
+            <div className={`tw:px-2.5 tw:py-2 tw:text-[11.5px] ${UI} ${BANNER}`} role="note">
               Reach 80+ before publishing{s.seoChecks.descSet ? "" : " — add a meta description (+30 pts)"}
             </div>
           )}
         </>
       )}
       {/* ── 3. TITLE ────────────────────────────────────────────────────── */}
-      <div className="tw:flex tw:flex-col tw:gap-1.5">
-        <div className="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
+      <div className={FIELD}>
+        <div className={FIELD_HEAD}>
           <Label htmlFor="seo-title" className={BK_LABEL_CLASS}>Title</Label>
-          <span style={{ font: "500 10.5px var(--bk-font-mono)", color: range === "ok" || range === "ideal" ? "var(--bk-success)" : range === "short" ? "var(--bk-warning)" : "var(--bk-error)" }}>
+          <span
+            className={`${COUNTER} ${
+              range === "ok" || range === "ideal"
+                ? "tw:text-[var(--bk-success)]"
+                : range === "short"
+                  ? "tw:text-[var(--bk-warning)]"
+                  : "tw:text-[var(--bk-error)]"
+            }`}
+          >
             {s.seoTitle.length}/60{rangeLabel[range]}
           </span>
         </div>
@@ -145,10 +178,11 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
             color="light"
             size="xs"
             type="button"
-            style={{ alignSelf: "flex-start", display: "inline-flex", alignItems: "center", gap: "var(--bk-space-4)", padding: "3px var(--bk-space-8)", border: "1px solid var(--bk-accent)", borderRadius: "var(--bk-radius-full)", background: "var(--bk-accent-subtle)", color: "var(--bk-accent)", font: "500 10.5px var(--bk-font-ui)", transition: "background 100ms" }}
             aria-label="Suggest SEO title"
             disabled={aiBusy}
-            onClick={suggestTitle} aria-busy={aiBusy || undefined} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+            onClick={suggestTitle}
+            aria-busy={aiBusy || undefined}
+            className={`tw:self-start tw:inline-flex tw:items-center tw:gap-1 tw:px-2 tw:py-[3px] tw:border tw:border-blue-700 tw:rounded-full tw:bg-blue-50 tw:text-blue-700 tw:hover:bg-blue-100 tw:text-[10.5px] tw:font-medium ${UI}`}
           >
             <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
               <path d="M5 3l14 9-14 9V3z" />
@@ -166,8 +200,8 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
         <HelperText className={BK_HELPER_CLASS}>Aim for 50–60 characters for best Google ranking</HelperText>
       </div>
       {/* ── 4. META DESCRIPTION ─────────────────────────────────────────── */}
-      <div className="tw:flex tw:flex-col tw:gap-1.5">
-        <div className="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
+      <div className={FIELD}>
+        <div className={FIELD_HEAD}>
           {/* label + info icon in a flex row — button must NOT be inside <label> (HTML spec) */}
           <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
             <Label htmlFor="seo-desc" className={BK_LABEL_CLASS}>Meta Description</Label>
@@ -182,7 +216,7 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
                 size="xs"
                 type="button"
                 aria-label="About Meta Description"
-                style={{ padding: 2, color: "var(--bk-ink-muted)", display: "inline-flex", lineHeight: 0 }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+                className={`tw:p-0.5 tw:inline-flex tw:leading-none tw:text-gray-500 tw:hover:text-gray-900 ${GHOST_BTN}`}
               >
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                   <circle cx="12" cy="12" r="10" />
@@ -192,7 +226,15 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
               </Button>
             </Tooltip>
           </div>
-          <span style={{ font: "500 10.5px var(--bk-font-mono)", color: s.seoDesc.length > 160 ? "var(--bk-error)" : s.seoDesc.length > 50 ? "var(--bk-success)" : "var(--bk-ink-muted)" }}>
+          <span
+            className={`${COUNTER} ${
+              s.seoDesc.length > 160
+                ? "tw:text-[var(--bk-error)]"
+                : s.seoDesc.length > 50
+                  ? "tw:text-[var(--bk-success)]"
+                  : "tw:text-gray-500"
+            }`}
+          >
             {s.seoDesc.length}/160
           </span>
         </div>
@@ -208,25 +250,31 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
         <HelperText className={BK_HELPER_CLASS}>Briefly describe this page (150–160 chars). Appears in Google results below your title.</HelperText>
       </div>
       {/* ── 5. URL SLUG ─────────────────────────────────────────────────── */}
-      <div className="tw:flex tw:flex-col tw:gap-1.5">
+      <div className={FIELD}>
         <Label htmlFor="seo-slug" className={BK_LABEL_CLASS}>URL Slug</Label>
-        <div style={{ display: "flex", alignItems: "stretch" }}>
-          <span style={{ display: "inline-flex", alignItems: "center", padding: "0 var(--bk-space-8)", border: "1px solid var(--bk-border)", borderRight: 0, borderRadius: "4px 0 0 4px", background: "var(--bk-bg-subtle)", color: "var(--bk-ink-soft)", font: "500 11px var(--bk-font-mono)" }}>
+        <div className="tw:flex tw:items-stretch">
+          <span
+            className={`tw:inline-flex tw:items-center tw:px-2 tw:border tw:border-r-0 tw:border-gray-200 tw:rounded-l tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink-soft)] tw:text-[11px] tw:font-medium ${MONO}`}
+          >
             {domain}/
           </span>
-          <TextInput
-            id="seo-slug"
-            value={s.slug}
-            onChange={(e) => s.setSlug(e.target.value)}
-            aria-describedby="seo-slug-hint"
-            aria-invalid={!!s.slugError}
-            style={{ borderRadius: "0 4px 4px 0", fontFamily: "var(--bk-font-mono)", fontSize: "11.5px" }}
-          />
+          {/* The input's own border-radius/type face live on theme.field.input,
+              which a caller theme would REPLACE leaf-wise (losing the token
+              colours) — so reach the real <input> with a descendant variant. */}
+          <div className={`tw:flex-1 tw:min-w-0 tw:[&_input]:rounded-l-none tw:[&_input]:text-[11.5px] tw:[&_input]:[font-family:var(--bk-font-mono)]`}>
+            <TextInput
+              id="seo-slug"
+              value={s.slug}
+              onChange={(e) => s.setSlug(e.target.value)}
+              aria-describedby="seo-slug-hint"
+              aria-invalid={!!s.slugError}
+            />
+          </div>
         </div>
         {/* Slug destructive warning — shown when slug changes on a live page */}
         {s.slug !== page.slug && page.status === "live" && !s.slugError && (
-          <div style={{ display: "flex", gap: "var(--bk-space-8)", padding: "var(--bk-space-8) 10px", background: "var(--bk-warning-tint)", border: "1px solid var(--bk-warning-text)", borderRadius: 4, font: "400 11.5px var(--bk-font-ui)", color: "var(--bk-warning)" }} role="alert">
-            <svg style={{ flexShrink: 0, marginTop: 1 }} viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <div className={`tw:flex tw:gap-2 tw:px-2.5 tw:py-2 tw:text-[11.5px] ${UI} ${BANNER}`} role="alert">
+            <svg className="tw:flex-none tw:mt-px" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
               <line x1="12" y1="9" x2="12" y2="13" />
               <line x1="12" y1="17" x2="12.01" y2="17" />
