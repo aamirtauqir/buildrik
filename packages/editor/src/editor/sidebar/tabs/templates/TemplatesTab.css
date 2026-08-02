@@ -102,7 +102,6 @@
   border-bottom: 1px solid var(--bk-border, var(--bk-border));
 }
 
-
 .tpl-pill {
   height: 28px;
   padding: 0 var(--bk-space-12);
@@ -758,41 +757,6 @@
     width: 360px;
   }
 }
-
-/* Custom header rules deleted 2026-05-24 in header-pattern migration
-   (commit 54f16df4). Templates 3-mode header now uses canonical
-   TabFrame.Header + DrillInHeader (mode-routing). Removed: .tpl-header,
-   .tpl-header-title, .tpl-header-title-group, .tpl-header-subtitle,
-   .tpl-header-actions. */
-
-/* ── Breadcrumb (Screen cV3OT) ── */
-.tpl-breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.tpl-breadcrumb-back {
-  display: flex;
-  align-items: center;
-  gap: var(--bk-space-4);
-  background: none;
-  border: none;
-  color: var(--bk-ink-muted, var(--bk-ink-soft));
-  font-size: 11px;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  padding: 0;
-}
-.tpl-breadcrumb-back:hover {
-  color: var(--bk-ink);
-}
-.tpl-breadcrumb-cat {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--bk-ink);
-}
-
 
 /* ── New page chip (still live in TabFrame.Header children slot) ── */
 .tpl-newpage-chip {

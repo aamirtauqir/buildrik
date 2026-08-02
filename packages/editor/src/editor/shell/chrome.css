@@ -40,7 +40,5 @@
 .bdc-btn:hover { background: var(--bk-bg-subtle); }
 .bdc-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .bdc-btn.bdc-icon { padding: 6px; }
-.bdc-btn.bdc-secondary { background: var(--bk-bg-card); border-color: var(--bk-border-medium); color: var(--bk-ink); }
-.bdc-btn.bdc-secondary:hover { background: var(--bk-bg-subtle); }
 .bdc-btn.bdc-primary { background: var(--bk-accent); color: var(--bk-accent-on); }
 .bdc-btn.bdc-primary:hover { background: var(--bk-accent-hover); }

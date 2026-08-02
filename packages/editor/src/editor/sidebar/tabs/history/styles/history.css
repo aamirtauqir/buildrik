@@ -1054,10 +1054,6 @@
   color: var(--bk-ink);
 }
 
-.tt-canvas-preview.active {
-  opacity: 0.4;
-}
-
 .toast {
   padding: var(--bk-space-12) var(--bk-space-16);
   background: var(--bk-bg-subtle);

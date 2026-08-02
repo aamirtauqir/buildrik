@@ -54,21 +54,6 @@
   transition: all 0.2s ease;
 }
 
-.buildrick-input-error,
-.buildrick-input.has-error {
-  border-color: var(--bk-error);
-  background: rgba(239, 68, 68, 0.05);
-  animation: shake 0.3s ease;
-}
-
-.buildrick-input-error:focus,
-.buildrick-input.has-error:focus {
-  border-color: var(--bk-error);
-  box-shadow:
-    var(--bk-shadow-focus),
-    0 4px 12px rgba(239, 68, 68, 0.15);
-}
-
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
   25% { transform: translateX(-4px); }
@@ -100,34 +85,6 @@ button:disabled,
 .pill:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-}
-
-.buildrick-switch-track {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.buildrick-switch:hover:not(.is-disabled) .buildrick-switch-track {
-  border-color: var(--bk-accent);
-  box-shadow: 0 0 0 3px var(--bk-accent-subtle);
-}
-
-.buildrick-switch-thumb {
-  box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.3),
-    0 1px 2px rgba(0, 0, 0, 0.2);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.buildrick-switch:hover:not(.is-disabled) .buildrick-switch-thumb {
-  box-shadow:
-    0 2px 4px rgba(0, 0, 0, 0.35),
-    0 1px 3px rgba(0, 0, 0, 0.25);
-}
-
-.buildrick-switch-input:checked + .buildrick-switch-track .buildrick-switch-thumb {
-  box-shadow:
-    0 2px 6px rgba(45, 109, 255, 0.5),
-    0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .buildrick-slider {
@@ -176,67 +133,6 @@ button:disabled,
     0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.buildrick-color-swatch-wrapper:hover .buildrick-color-swatch {
-  transform: scale(1.05);
-  box-shadow:
-    inset 0 0 0 1px rgba(0, 0, 0, 0.2),
-    0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-.buildrick-color-preset {
-  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.buildrick-color-preset:hover:not(:disabled) {
-  transform: scale(1.15);
-  box-shadow:
-    inset 0 0 0 1px rgba(0, 0, 0, 0.15),
-    0 2px 6px rgba(0, 0, 0, 0.2);
-}
-
-.buildrick-color-preset:active:not(:disabled) {
-  transform: scale(1.05);
-}
-
-/* .buildrick-btn-group gradient overlay + selected-item inset shadows
- * DELETED 2026-04-25. Violations:
- *   - linear-gradient() in chrome (Gate 11)
- *   - inset box-shadow (DESIGN.md §Pressed states: "No inset shadow")
- * btn-group component (if still used) should express selection via
- * background/color tokens rather than decorative gradient overlays. */
-
-/* .buildrick-layer-row — DELETED 2026-04-25. Zero consumers remaining
- * after LayersTab rewrite (commits 0ed8d40 + 1f02f4d + 34189df).
- * Class name replaced by .bdc-* namespace in editor/sidebar/tabs/layers/. */
-
-.buildrick-empty-state {
-  text-align: center;
-  padding: var(--bk-space-32) var(--bk-space-16);
-  color: var(--bk-ink-muted);
-  animation: bd-uxfix-fade-in 0.4s ease;
-}
-
-.buildrick-empty-state-icon {
-  font-size: 48px;
-  margin-bottom: var(--bk-space-16);
-  opacity: 0.4;
-  filter: grayscale(0.3);
-  animation: float 3s ease-in-out infinite;
-}
-
-.buildrick-empty-state-title {
-  font-size: var(--bk-text-16);
-  font-weight: var(--bk-weight-semibold);
-  color: var(--bk-ink-soft);
-  margin-bottom: var(--bk-space-8);
-}
-
-.buildrick-empty-state-desc {
-  font-size: var(--bk-text-13);
-  color: var(--bk-ink-muted);
-  line-height: var(--bk-space-20);
-}
-
 @keyframes bd-uxfix-fade-in {
   from {
     opacity: 0;
@@ -255,19 +151,6 @@ button:disabled,
   50% {
     transform: translateY(-10px);
   }
-}
-
-.buildrick-empty-state-compact .buildrick-empty-state-icon {
-  font-size: 32px;
-  margin-bottom: var(--bk-space-8);
-}
-
-.buildrick-empty-state-compact .buildrick-empty-state-title {
-  font-size: var(--bk-text-13);
-}
-
-.buildrick-empty-state-compact .buildrick-empty-state-desc {
-  font-size: var(--bk-text-12);
 }
 
 .buildrick-spinner {
@@ -315,36 +198,11 @@ button:disabled,
   }
 }
 
-/* button 40px min-height global — DELETED 2026-04-25.
- * Removed per v3 plan Week 3. Primitives (Button, FormInput, etc) now
- * set their own height explicitly via Emotion styled props. Inspector
- * and LeftSidebar overrides that defeated this rule are removed in
- * the same commit.
- *
- * sm/lg variants retained on legacy input/select/btn classes only. */
-
-.buildrick-input-sm,
-.buildrick-select-sm,
-.buildrick-btn-sm {
-  min-height: 32px;
-}
-
-.buildrick-input-lg,
-.buildrick-select-lg,
-.buildrick-btn-lg {
-  min-height: 48px;
-}
-
 .buildrick-input,
 .buildrick-select,
 .buildrick-btn,
-.buildrick-panel,
-.buildrick-card {
+.buildrick-panel {
   border-radius: var(--bk-radius-lg);
-}
-
-.buildrick-field + .buildrick-field {
-  margin-top: var(--bk-space-16);
 }
 
 /* @media print, prefers-reduced-motion, prefers-contrast — migrated to

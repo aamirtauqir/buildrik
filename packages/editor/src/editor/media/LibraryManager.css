@@ -49,24 +49,6 @@
   min-width: 0;
 }
 
-.mgr-breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  color: var(--bk-ink-soft, #475569);
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.mgr-breadcrumb .mgr-crumb { cursor: pointer; }
-
-.mgr-breadcrumb .mgr-crumb:hover { color: var(--bk-accent); }
-
-.mgr-breadcrumb .mgr-crumb-current { color: var(--bk-ink); font-weight: 600; }
-
-.mgr-breadcrumb .mgr-sep { color: var(--bk-ink-disabled, var(--bk-border-medium)); }
-
 .mgr-search {
   flex: 1;
   max-width: 420px;
