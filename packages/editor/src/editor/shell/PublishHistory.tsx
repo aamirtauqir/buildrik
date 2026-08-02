@@ -14,7 +14,7 @@
 
 import * as React from "react";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
-import { ConfirmDialog, Spinner, Badge, Button } from "@/editor/chrome-ui";
+import { ConfirmDialog, EmptyState, Spinner, Button, VersionRow } from "@/editor/chrome-ui";
 import { useEditorRole } from "./hooks/useEditorRole";
 import { roleAtLeast } from "@/services/RoleService";
 import {
@@ -40,18 +40,12 @@ function relTime(iso: string | Date | null): string {
   return `${d}d ago`;
 }
 
-const S: Record<string, React.CSSProperties> = {
-  wrap: { display: "flex", flexDirection: "column", gap: 8, padding: 12, minWidth: 320 },
-  head: { fontSize: 13, fontWeight: 600, color: "var(--bk-ink)" },
-  row: { display: "flex", alignItems: "center", gap: 8, justifyContent: "space-between", padding: "8px 10px", border: "1px solid var(--bk-border)", borderRadius: 8 },
-  left: { display: "flex", flexDirection: "column", gap: 2 },
-  ver: { fontSize: 13, fontWeight: 600, color: "var(--bk-ink)", display: "flex", alignItems: "center", gap: 6 },
-  meta: { fontSize: 11, color: "var(--bk-ink-muted)" },
-  center: { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, padding: 24, textAlign: "center", color: "var(--bk-ink-muted)" },
-  centerTitle: { fontSize: 14, fontWeight: 600, color: "var(--bk-ink)" },
-  centerHint: { fontSize: 12, color: "var(--bk-ink-muted)", maxWidth: 260 },
-  notice: { fontSize: 12, color: "var(--bk-ink-muted)" },
-};
+/* The version line is chrome-ui's VersionRow — Figma 240:6, whose own header
+   names "Publish history" as a surface it was drawn for. */
+const WRAP = "tw:flex tw:flex-col tw:gap-2 tw:p-3 tw:min-w-80";
+const HEAD = "tw:text-[13px] tw:font-semibold tw:text-gray-900";
+const NOTICE = "tw:text-xs tw:text-gray-500";
+
 
 export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollbackStarted }) => {
   // P6 permissions boards: rollback is admin-scoped — non-admins see the
@@ -96,31 +90,31 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
   };
 
   if (state === "loading") {
-    return <div style={S.center}><Spinner size="lg" /><span>Loading versions…</span></div>;
+    return <EmptyState icon={<Spinner size="lg" />} body="Loading versions…" />;
   }
   if (state === "error") {
     return (
-      <div style={S.center}>
-        <AlertCircle size={24} aria-hidden="true" />
-        <div style={S.centerTitle}>Couldn't load publish history</div>
-        <Button color="light" size="xs" onClick={() => void load()}>Retry</Button>
-      </div>
+      <EmptyState
+        icon={<AlertCircle size={24} aria-hidden="true" />}
+        title="Couldn't load publish history"
+        action={<Button color="light" size="xs" onClick={() => void load()}>Retry</Button>}
+      />
     );
   }
   if (rows.length === 0) {
     return (
-      <div style={S.center}>
-        <CheckCircle2 size={24} aria-hidden="true" />
-        <div style={S.centerTitle}>No published versions yet</div>
-        <div style={S.centerHint}>Publish this site and each version shows up here — you can roll back to any of the last 20.</div>
-      </div>
+      <EmptyState
+        icon={<CheckCircle2 size={24} aria-hidden="true" />}
+        title="No published versions yet"
+        body="Publish this site and each version shows up here — you can roll back to any of the last 20."
+      />
     );
   }
 
   return (
-    <div style={S.wrap}>
-      <div style={S.head}>Published versions</div>
-      {notice && <div style={S.notice}>{notice}</div>}
+    <div className={WRAP}>
+      <div className={HEAD}>Published versions</div>
+      {notice && <div className={NOTICE}>{notice}</div>}
       {rows.map((r, i) => {
         const isLive = i === 0;
         // rolledBackFrom is a job id — map it to that version's number for the label.
@@ -128,33 +122,38 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
           ? rows.find((x) => x.id === r.rolledBackFrom)?.version
           : undefined;
         return (
-          <div style={S.row} key={r.id} data-version-row data-version={r.version}>
-            <div style={S.left}>
-              <span style={S.ver}>
-                Version {r.version}
-                {isLive && <Badge color="gray">Live</Badge>}
-                {fromVersion !== undefined && <span style={S.meta}>↩ from v{fromVersion}</span>}
-              </span>
-              <span style={S.meta}>{relTime(r.completedAt)}</span>
-            </div>
-            {!isLive && (
-              <Button
-                color="light"
-                size="xs"
-                disabled={!r.rollbackable || !canRollback}
-                title={
-                  !canRollback
-                    ? "Ask an admin to roll back"
-                    : r.rollbackable
-                      ? undefined
-                      : "This version's snapshot is no longer stored"
-                }
-                onClick={() => setConfirm(r)}
-              >
-                Roll back
-              </Button>
-            )}
-          </div>
+          <VersionRow
+            key={r.id}
+            data-version-row
+            data-version={r.version}
+            /* No row-level click target here — the only action is the button
+               inside it, and a focusable role=button that does nothing is a
+               keyboard trap with no payoff. */
+            interactive={false}
+            title={`Version ${r.version}`}
+            current={isLive}
+            currentLabel="Live"
+            meta={fromVersion !== undefined ? `↩ from v${fromVersion} · ${relTime(r.completedAt)}` : relTime(r.completedAt)}
+            actions={
+              !isLive ? (
+                <Button
+                  color="light"
+                  size="xs"
+                  disabled={!r.rollbackable || !canRollback}
+                  title={
+                    !canRollback
+                      ? "Ask an admin to roll back"
+                      : r.rollbackable
+                        ? undefined
+                        : "This version's snapshot is no longer stored"
+                  }
+                  onClick={() => setConfirm(r)}
+                >
+                  Roll back
+                </Button>
+              ) : undefined
+            }
+          />
         );
       })}
 

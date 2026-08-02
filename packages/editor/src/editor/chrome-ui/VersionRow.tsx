@@ -13,10 +13,16 @@ export interface VersionRowProps extends Omit<RowProps, "children" | "size"> {
   meta: string;
   state?: StatusDotState;
   current?: boolean;
+  /** What "current" is called on this surface. The history panel says CURRENT;
+   *  publish history says LIVE, because the site is actually serving that
+   *  version. Forcing one word on both would make one of them less true. */
+  currentLabel?: string;
   actions?: React.ReactNode;
 }
 
-export function VersionRow({ title, meta, state, current, actions, className, style, ...rest }: VersionRowProps) {
+export function VersionRow({
+  title, meta, state, current, currentLabel = "CURRENT", actions, className, style, ...rest
+}: VersionRowProps) {
   return (
     <Row
       size="tall"
@@ -37,7 +43,7 @@ export function VersionRow({ title, meta, state, current, actions, className, st
       <span className="tw:flex tw:items-center tw:gap-2">
         {state ? <StatusDot state={state} /> : null}
         <span className="tw:font-medium tw:flex-1">{title}</span>
-        {current ? <Badge color="success" className="tw:text-green-600">CURRENT</Badge> : null}
+        {current ? <Badge color="success" className="tw:text-green-600">{currentLabel}</Badge> : null}
         {actions}
       </span>
       <span className={ROW_META_CLASS}>{meta}</span>
