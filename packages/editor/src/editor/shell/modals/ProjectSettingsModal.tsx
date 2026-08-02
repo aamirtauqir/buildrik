@@ -97,18 +97,18 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
           </svg>
         </ModalClose>
         <ModalBody>
-    <div style={containerStyles}>
+    <div className="tw:flex tw:flex-col tw:min-h-75">
       {/* Tabs */}
-      <div style={tabBarStyles}>
+      <div className="tw:flex tw:gap-5 tw:mb-5 tw:border-b tw:border-gray-200">
         {(["general", "canvas", "seo"] as const).map((tab) => (
           <Button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            style={{
-              ...tabButtonStyles,
-              borderBottomColor: activeTab === tab ? "var(--bk-accent)" : "transparent",
-              color: activeTab === tab ? "var(--bk-ink)" : "var(--bk-ink-muted)",
-            }}
+            className={`${TAB_BTN} ${
+              activeTab === tab
+                ? "tw:border-b-blue-700 tw:text-gray-900"
+                : "tw:border-b-transparent tw:text-gray-500 tw:hover:text-gray-900"
+            }`}
           >
             {TAB_LABELS[tab]}
           </Button>
@@ -116,24 +116,22 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
       </div>
 
       {/* Tab Content */}
-      <div style={contentStyles}>
+      <div className="tw:flex-1">
         {activeTab === "general" && (
           <div className="tw:flex tw:flex-col tw:gap-3">
-            <label style={labelStyles}>Project name</label>
+            <label className={FIELD_LABEL}>Project name</label>
             <TextInput
               type="text"
               value={projectName}
               onChange={(e) => setProjectName(e.target.value)}
-              style={inputStyles}
               placeholder="My Awesome Project"
             />
 
-            <label style={labelStyles}>Author / description</label>
+            <label className={FIELD_LABEL}>Author / description</label>
             <TextInput
               type="text"
               value={projectDescription}
               onChange={(e) => setProjectDescription(e.target.value)}
-              style={inputStyles}
               placeholder="John Doe"
             />
           </div>
@@ -141,29 +139,29 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
 
         {activeTab === "canvas" && (
           <div className="tw:flex tw:flex-col tw:gap-3">
-            <label style={labelStyles}>Grid size (px)</label>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <label className={FIELD_LABEL}>Grid size (px)</label>
+            <div className="tw:flex tw:items-center tw:gap-2">
               <TextInput
                 type="number"
                 value={gridSize}
                 onChange={(e) => setGridSize(Number(e.target.value))}
-                style={{ ...inputStyles, width: 80 }}
+                className="tw:w-20"
                 min={1}
                 max={100}
               />
-              <span style={{ fontSize: 12, color: "var(--bk-ink-muted)" }}>
+              <span className="tw:text-xs tw:text-gray-500">
                 Width / height in pixels
               </span>
             </div>
 
-            <div style={{ marginTop: 16 }}>
-              <label style={checkboxLabelStyles}>
+            <div className="tw:mt-4">
+              <label className="tw:flex tw:items-center tw:gap-2 tw:text-[13px] tw:cursor-pointer">
                 <Checkbox
                   color="blue"
-                  className="tw:bg-white"
+                  className="tw:bg-white tw:size-4"
                   checked={snapToGrid}
                   onChange={(e) => setSnapToGrid(e.target.checked)}
-                  style={checkboxStyles} />
+                />
                 <span>Snap to grid</span>
               </label>
             </div>
@@ -172,15 +170,14 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
 
         {activeTab === "seo" && (
           <div className="tw:flex tw:flex-col tw:gap-3">
-            <label style={labelStyles}>Site name (SEO default)</label>
+            <label className={FIELD_LABEL}>Site name (SEO default)</label>
             <TextInput
               type="text"
               value={siteTitle}
               onChange={(e) => setSiteTitle(e.target.value)}
-              style={inputStyles}
               placeholder="The formal name of your website"
             />
-            <small style={hintStyles}>
+            <small className={HINT}>
               This will be used as the default title for your site if not overridden on individual
               pages.
             </small>
@@ -203,72 +200,13 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
 };
 
 // ============================================================================
-// STYLES
+// CLASSES
 // ============================================================================
 
-const containerStyles: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  minHeight: 300,
-};
-
-const tabBarStyles: React.CSSProperties = {
-  display: "flex",
-  gap: 20,
-  borderBottom: "1px solid var(--bk-border)",
-  marginBottom: 20,
-};
-
-const tabButtonStyles: React.CSSProperties = {
-  background: "none",
-  border: "none",
-  borderBottom: "2px solid transparent",
-  padding: "8px 0",
-  fontSize: 13,
-  fontWeight: 600,
-  cursor: "pointer",
-  transition: "all 0.15s ease",
-};
-
-const contentStyles: React.CSSProperties = {
-  flex: 1,
-};
-
-const labelStyles: React.CSSProperties = {
-  fontSize: 12,
-  fontWeight: 600,
-  color: "var(--bk-ink-soft)",
-  marginBottom: 4,
-};
-
-const inputStyles: React.CSSProperties = {
-  padding: "8px 12px",
-  // was --buildrick-surface-3, which is defined nowhere — the field rendered
-  // with no background at all on the light theme (Figma board B9.6).
-  background: "var(--bk-bg-card)",
-  border: "1px solid var(--bk-border)",
-  borderRadius: "var(--bk-radius-sm)",
-  color: "var(--bk-ink)",
-  fontSize: 13,
-};
-
-const checkboxLabelStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: 8,
-  fontSize: 13,
-  cursor: "pointer",
-};
-
-const checkboxStyles: React.CSSProperties = {
-  width: 16,
-  height: 16,
-};
-
-const hintStyles: React.CSSProperties = {
-  fontSize: 12,
-  color: "var(--bk-ink-muted)",
-  marginTop: 4,
-};
+const TAB_BTN =
+  "tw:px-0 tw:py-2 tw:rounded-none tw:border-0 tw:border-b-2 tw:bg-transparent " +
+  "tw:text-[13px] tw:font-semibold";
+const FIELD_LABEL = "tw:mb-1 tw:text-xs tw:font-semibold tw:text-[var(--bk-ink-soft)]";
+const HINT = "tw:mt-1 tw:text-xs tw:text-gray-500";
 
 export default ProjectSettingsModal;

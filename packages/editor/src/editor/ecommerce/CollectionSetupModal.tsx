@@ -9,6 +9,8 @@ import * as React from "react";
 import { Button, Checkbox, ModalBody, ModalClose, ModalContent, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
 import { useState } from "react";
 
+const FEATURE = "tw:flex tw:items-center tw:gap-2 tw:text-[13px] tw:text-[var(--bk-ink-soft)]";
+
 export interface CollectionSetupModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -67,50 +69,52 @@ export const CollectionSetupModal: React.FC<CollectionSetupModalProps> = ({
           </svg>
         </ModalClose>
         <ModalBody>
-    <div style={containerStyles}>
-      <div style={iconContainerStyles}>
-        <ShoppingBag size={48} style={{ color: "var(--bk-accent)" }} />
+    <div className="tw:flex tw:flex-col tw:gap-4">
+      <div className="tw:flex tw:justify-center tw:py-2">
+        <ShoppingBag size={48} className="tw:text-blue-700" />
       </div>
 
-      <p style={descriptionStyles}>
+      <p className="tw:m-0 tw:text-center tw:leading-normal tw:text-[var(--bk-ink-soft)]">
         E-commerce blocks require a Products collection in your CMS. Would you like to create one
         now?
       </p>
 
-      <div style={checkboxContainerStyles}>
-        <label style={checkboxLabelStyles}>
+      <div className="tw:p-3 tw:rounded-lg tw:border tw:border-gray-200 tw:bg-white">
+        <label className="tw:flex tw:items-start tw:gap-3 tw:cursor-pointer">
           <Checkbox
             color="blue"
-            className="tw:bg-white"
             checked={includeSample}
             onChange={(e) => setIncludeSample(e.target.checked)}
-            style={checkboxStyles} />
-          <div style={checkboxContentStyles}>
-            <div style={checkboxTitleStyles}>
+            className="tw:bg-white tw:mt-0.5 tw:size-4.5"
+          />
+          <div className="tw:flex tw:flex-col tw:gap-1">
+            <div className="tw:flex tw:items-center tw:gap-2 tw:font-medium">
               <Package size={16} />
               Include sample products
             </div>
-            <div style={checkboxDescStyles}>Add 3 example products to get started quickly</div>
+            <div className="tw:text-[13px] tw:text-[var(--bk-ink-soft)]">
+              Add 3 example products to get started quickly
+            </div>
           </div>
         </label>
       </div>
 
-      <div style={featuresListStyles}>
-        <div style={featureItemStyles}>
-          <Check size={16} style={{ color: "var(--bk-success)" }} />
+      <div className="tw:flex tw:flex-col tw:gap-2 tw:py-2">
+        <div className={FEATURE}>
+          <Check size={16} className="tw:text-[var(--bk-success)]" />
           <span>8 product fields (name, price, image, etc.)</span>
         </div>
-        <div style={featureItemStyles}>
-          <Check size={16} style={{ color: "var(--bk-success)" }} />
+        <div className={FEATURE}>
+          <Check size={16} className="tw:text-[var(--bk-success)]" />
           <span>Validation rules included</span>
         </div>
-        <div style={featureItemStyles}>
-          <Check size={16} style={{ color: "var(--bk-success)" }} />
+        <div className={FEATURE}>
+          <Check size={16} className="tw:text-[var(--bk-success)]" />
           <span>Ready for CMS data binding</span>
         </div>
       </div>
     </div>
-    <div style={footerStyles}>
+    <div className="tw:flex tw:justify-end tw:gap-2 tw:mt-4 tw:pt-4 tw:border-t tw:border-gray-200">
       <Button color="light" onClick={handleSkip} disabled={isCreating} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
         Skip for now
       </Button>
@@ -122,88 +126,6 @@ export const CollectionSetupModal: React.FC<CollectionSetupModalProps> = ({
       </ModalContent>
     </ModalRoot>
   );
-};
-
-const containerStyles: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: "16px",
-};
-
-const iconContainerStyles: React.CSSProperties = {
-  display: "flex",
-  justifyContent: "center",
-  padding: "8px 0",
-};
-
-const descriptionStyles: React.CSSProperties = {
-  margin: 0,
-  color: "var(--bk-ink-soft)",
-  textAlign: "center",
-  lineHeight: 1.5,
-};
-
-const checkboxContainerStyles: React.CSSProperties = {
-  background: "var(--bk-bg-card)",
-  borderRadius: "var(--bk-radius-lg)",
-  padding: "12px",
-  border: "1px solid var(--bk-border)",
-};
-
-const checkboxLabelStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "flex-start",
-  gap: "12px",
-  cursor: "pointer",
-};
-
-const checkboxStyles: React.CSSProperties = {
-  width: "18px",
-  height: "18px",
-  marginTop: "2px",
-  accentColor: "var(--bk-accent)",
-};
-
-const checkboxContentStyles: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: "4px",
-};
-
-const checkboxTitleStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: "8px",
-  fontWeight: 500,
-};
-
-const checkboxDescStyles: React.CSSProperties = {
-  fontSize: "13px",
-  color: "var(--bk-ink-soft)",
-};
-
-const featuresListStyles: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: "8px",
-  padding: "8px 0",
-};
-
-const featureItemStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: "8px",
-  fontSize: "13px",
-  color: "var(--bk-ink-soft)",
-};
-
-const footerStyles: React.CSSProperties = {
-  display: "flex",
-  justifyContent: "flex-end",
-  gap: "8px",
-  marginTop: "16px",
-  paddingTop: "16px",
-  borderTop: "1px solid var(--bk-border)",
 };
 
 export default CollectionSetupModal;
