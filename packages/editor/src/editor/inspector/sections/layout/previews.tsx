@@ -1,78 +1,67 @@
 /**
- * Layout Visual Previews — Display + Position tiny icons. Ported to --bd-*.
+ * Layout Visual Previews — Display + Position tiny icons.
+ *
+ * Every value here is static: these are 28px diagrams of what `display: flex`
+ * or `position: absolute` mean, not anything derived from the selected
+ * element. So they are classes, with no inline styles left at all.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
 
+/** The accent block every diagram is built from, and its muted counterpart. */
+const BOX = "tw:bg-blue-700 tw:rounded-[1px]";
+const GRAY = "tw:bg-gray-400 tw:rounded-[1px]";
+const GHOST = "tw:border tw:border-dashed tw:border-gray-400 tw:opacity-50";
+
 // ============================================================================
 // DISPLAY PREVIEW
 // ============================================================================
 
 export const DisplayPreview: React.FC<{ type: string }> = ({ type }) => {
-  const box = { background: "var(--bk-accent)", borderRadius: 1 };
-  const gray = { background: "var(--bk-ink-muted)", borderRadius: 1 };
-
   switch (type) {
     case "block":
       return (
         <div className="tw:flex tw:flex-col tw:gap-0.5 tw:w-7">
-          <div style={{ ...box, height: 5 }} />
-          <div style={{ ...box, height: 5 }} />
+          <div className={`${BOX} tw:h-[5px]`} />
+          <div className={`${BOX} tw:h-[5px]`} />
         </div>
       );
     case "flex":
       return (
-        <div style={{ display: "flex", gap: 2, width: 28 }}>
-          <div style={{ ...box, flex: 1, height: 10 }} />
-          <div style={{ ...box, flex: 1, height: 10 }} />
-          <div style={{ ...box, flex: 1, height: 10 }} />
+        <div className="tw:flex tw:gap-0.5 tw:w-7">
+          <div className={`${BOX} tw:flex-1 tw:h-2.5`} />
+          <div className={`${BOX} tw:flex-1 tw:h-2.5`} />
+          <div className={`${BOX} tw:flex-1 tw:h-2.5`} />
         </div>
       );
     case "grid":
       return (
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 2,
-            width: 28,
-          }}
-        >
-          <div style={{ ...box, height: 5 }} />
-          <div style={{ ...box, height: 5 }} />
-          <div style={{ ...box, height: 5 }} />
-          <div style={{ ...box, height: 5 }} />
+        <div className="tw:grid tw:grid-cols-2 tw:gap-0.5 tw:w-7">
+          <div className={`${BOX} tw:h-[5px]`} />
+          <div className={`${BOX} tw:h-[5px]`} />
+          <div className={`${BOX} tw:h-[5px]`} />
+          <div className={`${BOX} tw:h-[5px]`} />
         </div>
       );
     case "inline-block":
       return (
-        <div style={{ display: "flex", gap: 2, alignItems: "center", width: 28 }}>
-          <div style={{ ...box, width: 10, height: 8 }} />
-          <div style={{ ...box, width: 14, height: 8 }} />
+        <div className="tw:flex tw:gap-0.5 tw:items-center tw:w-7">
+          <div className={`${BOX} tw:w-2.5 tw:h-2`} />
+          <div className={`${BOX} tw:w-3.5 tw:h-2`} />
         </div>
       );
     case "inline":
       return (
-        <div style={{ display: "flex", gap: 1, alignItems: "center", width: 28 }}>
-          <div style={{ ...gray, width: 6, height: 4 }} />
-          <div style={{ ...box, width: 10, height: 6 }} />
-          <div style={{ ...gray, width: 6, height: 4 }} />
+        <div className="tw:flex tw:gap-px tw:items-center tw:w-7">
+          <div className={`${GRAY} tw:w-1.5 tw:h-1`} />
+          <div className={`${BOX} tw:w-2.5 tw:h-1.5`} />
+          <div className={`${GRAY} tw:w-1.5 tw:h-1`} />
         </div>
       );
     case "none":
-      return (
-        <div
-          style={{
-            width: 16,
-            height: 10,
-            border: "1px dashed var(--bk-ink-muted)",
-            borderRadius: 2,
-            opacity: 0.5,
-          }}
-        />
-      );
+      return <div className={`${GHOST} tw:w-4 tw:h-2.5 tw:rounded-sm`} />;
     default:
       return null;
   }
@@ -82,73 +71,42 @@ export const DisplayPreview: React.FC<{ type: string }> = ({ type }) => {
 // POSITION PREVIEW
 // ============================================================================
 
+const FRAME = "tw:w-6 tw:h-4 tw:bg-gray-50 tw:rounded-sm tw:relative tw:border tw:border-gray-200";
+const DOT = "tw:w-2 tw:h-1.5 tw:rounded-[1px] tw:absolute";
+
 export const PositionPreview: React.FC<{ type: string }> = ({ type }) => {
-  const containerStyle: React.CSSProperties = {
-    width: 24,
-    height: 16,
-    background: "var(--bk-bg-subtle)",
-    borderRadius: 2,
-    position: "relative",
-    border: "1px solid var(--bk-border)",
-  };
-
-  const boxStyle: React.CSSProperties = {
-    width: 8,
-    height: 6,
-    background: "var(--bk-accent)",
-    borderRadius: 1,
-    position: "absolute",
-  };
-
   switch (type) {
     case "static":
       return (
-        <div style={containerStyle}>
-          <div style={{ ...boxStyle, position: "relative", margin: "5px auto" }} />
+        <div className={FRAME}>
+          <div className={`${DOT} tw:relative tw:my-[5px] tw:mx-auto tw:bg-blue-700`} />
         </div>
       );
     case "relative":
       return (
-        <div style={containerStyle}>
-          <div style={{ ...boxStyle, top: 2, left: 2 }} />
-          <div
-            style={{
-              width: 8,
-              height: 6,
-              border: "1px dashed var(--bk-ink-muted)",
-              borderRadius: 1,
-              position: "absolute",
-              top: 5,
-              left: 8,
-              opacity: 0.5,
-            }}
-          />
+        <div className={FRAME}>
+          <div className={`${DOT} tw:top-0.5 tw:left-0.5 tw:bg-blue-700`} />
+          {/* the outline it moved away from */}
+          <div className={`${GHOST} tw:w-2 tw:h-1.5 tw:rounded-[1px] tw:absolute tw:top-[5px] tw:left-2`} />
         </div>
       );
     case "absolute":
       return (
-        <div style={containerStyle}>
-          <div style={{ ...boxStyle, top: 2, right: 2 }} />
+        <div className={FRAME}>
+          <div className={`${DOT} tw:top-0.5 tw:right-0.5 tw:bg-blue-700`} />
         </div>
       );
     case "fixed":
+      /* was `var(--bk-success, var(--bk-success))` — a fallback to itself. */
       return (
-        <div style={containerStyle}>
-          <div style={{ ...boxStyle, bottom: 2, right: 2, background: "var(--bk-success, var(--bk-success))" }} />
+        <div className={FRAME}>
+          <div className={`${DOT} tw:bottom-0.5 tw:right-0.5 tw:bg-[var(--bk-success)]`} />
         </div>
       );
     case "sticky":
       return (
-        <div style={containerStyle}>
-          <div
-            style={{
-              ...boxStyle,
-              top: 0,
-              left: "50%",
-              transform: "translateX(-50%)",
-              background: "var(--bk-warning)",
-            }}
-          />
+        <div className={FRAME}>
+          <div className={`${DOT} tw:top-0 tw:left-1/2 tw:-translate-x-1/2 tw:bg-[var(--bk-warning)]`} />
         </div>
       );
     default:
