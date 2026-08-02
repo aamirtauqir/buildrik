@@ -36,9 +36,16 @@ export interface ReplaceAcrossModalProps {
   onConfirm: (selectedPageIds: ReadonlyArray<string>) => void;
 }
 
-const SQUARE = 56;
-const ROW_THUMB_W = 56;
-const ROW_THUMB_H = 40;
+/* @lint-hex-policy: warm-tint illustrative gradient for replace-across hero */
+const TINT_WARM = "tw:[background-image:linear-gradient(135deg,#fff4e8,#fde9d2)]";
+/* @lint-hex-policy: warm-tint illustrative gradient for replace-across hero */
+const TINT_ACCENT = "tw:[background-image:linear-gradient(135deg,var(--bk-accent-subtle),#e9f0fc)]";
+
+const SECTION_X = "tw:px-5";
+const HAIRLINE = "tw:border-gray-200";
+/** Hero thumb (square) and per-row thumb (4:3-ish) — the two fixed art sizes. */
+const HERO_THUMB = "tw:size-14 tw:rounded";
+const ROW_THUMB = "tw:w-14 tw:h-10 tw:rounded-[3px] tw:flex-none";
 
 export const ReplaceAcrossModal: React.FC<ReplaceAcrossModalProps> = ({
   open,
@@ -89,61 +96,35 @@ export const ReplaceAcrossModal: React.FC<ReplaceAcrossModalProps> = ({
     <ModalRoot open={open} onOpenChange={onOpenChange}>
       <ModalContent size="xl" aria-labelledby="replace-across-title">
         {/* Header */}
-        <div
-          style={{
-            padding: "16px 20px",
-            borderBottom: "1px solid var(--bk-border)",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
+        <div className={`tw:flex tw:items-center tw:justify-between tw:py-4 ${SECTION_X} tw:border-b ${HAIRLINE}`}>
           <div>
-            <ModalTitle id="replace-across-title" style={{ fontSize: 15, fontWeight: 600 }}>
+            <ModalTitle id="replace-across-title" className="tw:text-[15px] tw:font-semibold">
               Replace {oldName} across pages
             </ModalTitle>
-            <ModalDescription
-              style={{ fontSize: 11, color: "var(--bk-ink-muted)", marginTop: 2 }}
-            >
+            <ModalDescription className="tw:mt-0.5 tw:text-[11px] tw:text-gray-500">
               Used in {pages.length} {pages.length === 1 ? "page" : "pages"} · review before applying
             </ModalDescription>
           </div>
         </div>
 
         {/* Replacing / With strip */}
-        <div
-          style={{
-            padding: "12px 20px",
-            display: "flex",
-            gap: 16,
-            borderBottom: "1px solid var(--bk-border)",
-          }}
-        >
-          <ThumbBlock label="Replacing" name={oldName} kind="old" size={SQUARE} />
-          <div style={{ display: "flex", alignItems: "center", padding: "0 8px" }}>
+        <div className={`tw:flex tw:gap-4 tw:py-3 ${SECTION_X} tw:border-b ${HAIRLINE}`}>
+          <ThumbBlock label="Replacing" name={oldName} kind="old" />
+          <div className="tw:flex tw:items-center tw:px-2">
             <ArrowRight />
           </div>
-          <ThumbBlock label="With" name={newName} kind="new" size={SQUARE} />
+          <ThumbBlock label="With" name={newName} kind="new" />
         </div>
 
         {/* Per-page list */}
-        <div style={{ flex: 1, padding: "12px 20px", overflowY: "auto", maxHeight: 360 }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "4px 0 8px",
-              fontSize: 11,
-              color: "var(--bk-ink-muted)",
-            }}
-          >
+        <div className={`tw:flex-1 tw:py-3 ${SECTION_X} tw:overflow-y-auto tw:max-h-90`}>
+          <div className="tw:flex tw:items-center tw:justify-between tw:pt-1 tw:pb-2 tw:text-[11px] tw:text-gray-500">
             <span>Choose pages</span>
             <span>
               {selectedCount} of {pages.length} selected
             </span>
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          <div className="tw:flex tw:flex-col tw:gap-1.5">
             {pages.map((p) => {
               const checked = selected.has(p.pageId);
               return (
@@ -152,8 +133,6 @@ export const ReplaceAcrossModal: React.FC<ReplaceAcrossModalProps> = ({
                   page={p}
                   checked={checked}
                   onToggle={() => togglePage(p.pageId)}
-                  thumbW={ROW_THUMB_W}
-                  thumbH={ROW_THUMB_H}
                 />
               );
             })}
@@ -162,21 +141,13 @@ export const ReplaceAcrossModal: React.FC<ReplaceAcrossModalProps> = ({
 
         {/* Footer */}
         <div
-          style={{
-            padding: "12px 20px",
-            background: "var(--bk-bg-subtle)",
-            borderTop: "1px solid var(--bk-border)",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: 8,
-          }}
+          className={`tw:flex tw:items-center tw:justify-between tw:gap-2 tw:py-3 ${SECTION_X} tw:border-t ${HAIRLINE} tw:bg-[var(--bk-bg-subtle)]`}
         >
-          <span style={{ fontSize: 12, color: "var(--bk-ink-muted)" }}>
+          <span className="tw:text-xs tw:text-gray-500">
             {selectedCount} of {pages.length} pages selected · ~{totalPlaces}{" "}
             {totalPlaces === 1 ? "element change" : "element changes"}
           </span>
-          <div style={{ display: "flex", gap: 8 }}>
+          <div className="tw:flex tw:gap-2">
             <Button
               type="button"
               color="light"
@@ -204,39 +175,24 @@ interface ThumbBlockProps {
   label: string;
   name: string;
   kind: "old" | "new";
-  size: number;
 }
 
-function ThumbBlock({ label, name, kind, size }: ThumbBlockProps) {
-  const accent = kind === "new" ? "var(--bk-accent)" : "var(--bk-ink-muted)";
-  const bg =
-    kind === "new"
-      ? /* @lint-hex-policy: warm-tint illustrative gradient for replace-across hero */ "linear-gradient(135deg, var(--bk-accent-subtle), #e9f0fc)"
-      : /* @lint-hex-policy: warm-tint illustrative gradient for replace-across hero */ "linear-gradient(135deg, #fff4e8, #fde9d2)";
+function ThumbBlock({ label, name, kind }: ThumbBlockProps) {
+  const isNew = kind === "new";
   return (
-    <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 10 }}>
+    <div className="tw:flex tw:flex-1 tw:items-center tw:gap-2.5">
       <div
-        style={{
-          width: size,
-          height: size,
-          background: bg,
-          borderRadius: 4,
-          border: kind === "new" ? `2px solid ${accent}` : "1px solid var(--bk-border)",
-        }}
+        className={`${HERO_THUMB} ${isNew ? `${TINT_ACCENT} tw:border-2 tw:border-blue-700` : `${TINT_WARM} tw:border ${HAIRLINE}`}`}
       />
       <div>
         <div
-          style={{
-            fontSize: 11,
-            color: accent,
-            textTransform: "uppercase",
-            letterSpacing: "0.04em",
-            fontWeight: 600,
-          }}
+          className={`tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.04em] ${
+            isNew ? "tw:text-blue-700" : "tw:text-gray-500"
+          }`}
         >
           {label}
         </div>
-        <div style={{ fontSize: 13, fontWeight: 500 }}>{name}</div>
+        <div className="tw:text-[13px] tw:font-medium">{name}</div>
       </div>
     </div>
   );
@@ -246,69 +202,45 @@ interface PageRowProps {
   page: ReplaceAcrossPageEntry;
   checked: boolean;
   onToggle: () => void;
-  thumbW: number;
-  thumbH: number;
 }
 
-function PageRow({ page, checked, onToggle, thumbW, thumbH }: PageRowProps) {
+function PageRow({ page, checked, onToggle }: PageRowProps) {
   return (
     <label
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 12,
-        padding: 10,
-        border: checked ? "1px solid var(--bk-accent)" : "1px solid var(--bk-border)",
-        background: checked ? "var(--bk-ink-muted)" : "transparent",
-        borderRadius: 6,
-        cursor: "pointer",
-        opacity: checked ? 1 : 0.7,
-      }}
+      className={`tw:flex tw:items-center tw:gap-3 tw:p-2.5 tw:rounded-md tw:border tw:cursor-pointer ${
+        checked
+          ? "tw:border-blue-700 tw:bg-[var(--bk-accent-tint)]"
+          : `${HAIRLINE} tw:bg-transparent tw:opacity-70`
+      }`}
     >
       <Checkbox
         color="blue"
-        className="tw:bg-white"
+        className="tw:bg-white tw:size-4"
         checked={checked}
         onChange={onToggle}
         aria-label={`Replace on ${page.pageName}`}
-        style={{ width: 16, height: 16 }}
       />
-      <div style={{ display: "flex", gap: 6, flex: 1 }}>
-        <div
-          style={{
-            width: thumbW,
-            height: thumbH,
-            background: /* @lint-hex-policy: warm-tint illustrative gradient for replace-across hero */ "linear-gradient(135deg, #fff4e8, #fde9d2)",
-            borderRadius: 3,
-          }}
-        />
-        <div style={{ display: "flex", alignItems: "center", padding: "0 4px" }}>
+      <div className="tw:flex tw:flex-1 tw:gap-1.5">
+        <div className={`${ROW_THUMB} ${TINT_WARM}`} />
+        <div className="tw:flex tw:items-center tw:px-1">
           <ArrowRight small />
         </div>
         <div
-          style={{
-            width: thumbW,
-            height: thumbH,
-            background: checked
-              ? /* @lint-hex-policy: warm-tint illustrative gradient for replace-across hero */ "linear-gradient(135deg, var(--bk-accent-subtle), #e9f0fc)"
-              : "var(--bk-bg-subtle)",
-            borderRadius: 3,
-            border: checked
-              ? "1px solid var(--bk-accent)"
-              : "1px dashed var(--bk-border)",
-          }}
+          className={`${ROW_THUMB} ${
+            checked
+              ? `${TINT_ACCENT} tw:border tw:border-blue-700`
+              : `tw:bg-[var(--bk-bg-subtle)] tw:border tw:border-dashed ${HAIRLINE}`
+          }`}
         />
       </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 13, fontWeight: 500 }}>
+      <div className="tw:flex-1 tw:min-w-0">
+        <div className="tw:text-[13px] tw:font-medium">
           {page.pageName}
           {!checked && (
-            <span style={{ fontSize: 10, color: "var(--bk-ink-muted)", fontWeight: 400, marginLeft: 6 }}>
-              (skipped)
-            </span>
+            <span className="tw:ml-1.5 tw:text-[10px] tw:font-normal tw:text-gray-500">(skipped)</span>
           )}
         </div>
-        <div style={{ fontSize: 11, color: "var(--bk-ink-muted)" }}>
+        <div className="tw:text-[11px] tw:text-gray-500">
           {page.placeCount} {page.placeCount === 1 ? "place" : "places"}
           {!checked ? " · won't change" : ""}
         </div>
