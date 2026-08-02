@@ -77,38 +77,38 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
   // ── Minimized pill ──────────────────────────────────────────────────────
   if (isMinimized) {
     return (
-      <div style={pillStyles} onClick={onRestore} role="button" tabIndex={0}
+      <div className={PILL} onClick={onRestore} role="button" tabIndex={0}
         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onRestore(); }}
         aria-label={`Get started — ${completedCount} of ${totalCount} complete. Click to expand.`}
       >
-        <span style={pillDotStyles(allDone)} />
-        <span style={pillTextStyles}>
+        <span className={`${PILL_DOT} ${allDone ? "tw:bg-[var(--bk-success)]" : "tw:bg-blue-700"}`} />
+        <span className={PILL_TEXT}>
           {allDone ? "All done!" : `${completedCount} / ${totalCount} done`}
         </span>
-        <ChevronUp size={12} style={{ color: "var(--bk-ink-muted)", flexShrink: 0 }} />
+        <ChevronUp size={12} className="tw:text-gray-500 tw:flex-none" />
       </div>
     );
   }
 
   // ── Full panel ──────────────────────────────────────────────────────────
   return (
-    <div ref={containerRef} style={panelStyles} role="region" aria-label="Getting started checklist">
+    <div ref={containerRef} className={PANEL} role="region" aria-label="Getting started checklist">
       {/* Header */}
-      <div style={headerStyles}>
-        <div className="tw:flex tw:flex-col tw:gap-0.5" style={{ flex: 1, minWidth: 0 }}>
-          <span style={headerTitleStyles}>
+      <div className={HEADER}>
+        <div className="tw:flex tw:flex-col tw:gap-0.5 tw:flex-1 tw:min-w-0">
+          <span className={HEADER_TITLE}>
             {allDone ? "All done — keep building!" : "Get started"}
           </span>
-          <span style={headerCountStyles}>
+          <span className={HEADER_COUNT}>
             {completedCount} of {totalCount} complete
           </span>
         </div>
 
-        <div style={headerActionsStyles}>
+        <div className="tw:flex tw:items-center tw:gap-0.5 tw:flex-none">
           {/* Minimize */}
           <Button
             type="button"
-            style={iconBtnStyles}
+            className={ICON_BTN}
             onClick={onMinimize}
             aria-label="Minimize checklist"
             title="Minimize"
@@ -118,19 +118,19 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
 
           {/* Close / Confirm */}
           {confirmingDismiss ? (
-            <div style={confirmRowStyles}>
-              <span style={confirmTextStyles}>Hide this?</span>
-              <Button type="button" style={confirmYesStyles} onClick={onDismiss}>
+            <div className="tw:flex tw:items-center tw:gap-1.5 tw:pl-1">
+              <span className={CONFIRM_TEXT}>Hide this?</span>
+              <Button type="button" size="xs" className="tw:border-0 tw:bg-[var(--bk-error-tint)] tw:text-[var(--bk-error-text)] tw:text-[11px] tw:font-semibold" onClick={onDismiss}>
                 Yes
               </Button>
-              <Button type="button" style={confirmNoStyles} onClick={() => setConfirmingDismiss(false)}>
+              <Button type="button" size="xs" color="light" className="tw:border-0 tw:bg-transparent tw:text-gray-500 tw:text-[11px]" onClick={() => setConfirmingDismiss(false)}>
                 No
               </Button>
             </div>
           ) : (
             <Button
               type="button"
-              style={iconBtnStyles}
+              className={ICON_BTN}
               onClick={() => setConfirmingDismiss(true)}
               aria-label="Close checklist"
               title="Close"
@@ -141,17 +141,15 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
         </div>
       </div>
       {/* Progress bar */}
-      <div style={progressTrackStyles}>
+      <div className={PROGRESS_TRACK}>
+        {/* width is the only genuinely computed value in this file. */}
         <div
-          style={{
-            ...progressFillStyles,
-            width: `${progress}%`,
-            background: allDone ? "var(--bk-success)" : "var(--bk-accent)",
-          }}
+          className={`tw:h-full tw:rounded-[1px] tw:[transition:width_400ms_ease] ${allDone ? "tw:bg-[var(--bk-success)]" : "tw:bg-blue-700"}`}
+          style={{ width: `${progress}%` }}
         />
       </div>
       {/* Steps */}
-      <ul style={listStyles} aria-label="Onboarding steps">
+      <ul className={LIST} aria-label="Onboarding steps">
         {steps.map((step) => {
           const isActive = activeStepId === step.id;
           const isCompleted = step.completed;
@@ -159,29 +157,30 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
           return (
             <li
               key={step.id}
-              style={{
-                ...stepItemStyles,
-                opacity: isCompleted ? 0.55 : 1,
-                background: isActive && !isCompleted ? "var(--bk-accent-subtle)" : "transparent",
-                borderLeft: isActive && !isCompleted
-                  ? "2px solid var(--bk-accent)"
-                  : "2px solid transparent",
-              }}
+              className={[
+                "tw:[transition:var(--bk-transition-fast)] tw:border-l-2",
+                isCompleted ? "tw:opacity-55" : "tw:opacity-100",
+                isActive && !isCompleted
+                  ? "tw:bg-[var(--bk-accent-subtle)] tw:border-l-blue-700"
+                  : "tw:bg-transparent tw:border-l-transparent",
+              ].join(" ")}
             >
               {/* Step header row */}
               <Button
                 type="button"
-                style={stepRowStyles}
+                className={STEP_ROW}
                 onClick={() => onSetActiveStepId(isActive ? null : step.id)}
                 aria-expanded={isActive}
               >
                 {/* Circle indicator */}
                 <span
-                  style={{
-                    ...circleStyles,
-                    background: isCompleted ? "var(--bk-success)" : isActive ? "var(--bk-accent)" : "transparent",
-                    borderColor: isCompleted ? "var(--bk-success)" : isActive ? "var(--bk-accent)" : "var(--bk-border-medium)",
-                  }}
+                  className={`${CIRCLE} ${
+                    isCompleted
+                      ? "tw:bg-[var(--bk-success)] tw:border-[var(--bk-success)]"
+                      : isActive
+                        ? "tw:bg-blue-700 tw:border-blue-700"
+                        : "tw:bg-transparent tw:border-gray-300"
+                  }`}
                   aria-hidden="true"
                 >
                   {isCompleted && <Check size={10} strokeWidth={3} color="var(--bk-accent-on)" />}
@@ -189,18 +188,14 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
 
                 {/* Label */}
                 <span
-                  style={{
-                    ...stepLabelStyles,
-                    color: isCompleted ? "var(--bk-ink-muted)" : "var(--bk-ink)",
-                    textDecoration: isCompleted ? "line-through" : "none",
-                  }}
+                  className={`${STEP_LABEL} ${isCompleted ? "tw:text-gray-500 tw:line-through" : "tw:text-gray-900 tw:no-underline"}`}
                 >
                   {step.label}
                 </span>
 
                 {/* Chevron */}
                 {!isCompleted && (
-                  <span style={{ color: "var(--bk-ink-disabled)", flexShrink: 0, marginLeft: "auto" }}>
+                  <span className="tw:text-gray-300 tw:flex-none tw:ml-auto">
                     {isActive
                       ? <ChevronUp size={12} />
                       : <ChevronDown size={12} />
@@ -210,16 +205,17 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
               </Button>
               {/* Expanded body */}
               {isActive && !isCompleted && (
-                <div style={stepBodyStyles}>
-                  <p style={stepDescStyles}>{step.description}</p>
+                <div className={STEP_BODY}>
+                  <p className={STEP_DESC}>{step.description}</p>
                   {step.actionKey && step.actionLabel && (
                     <Button
                       type="button"
-                      style={ctaBtnStyles}
+                      size="xs"
+                      className="tw:self-start tw:font-semibold"
                       onClick={() => onAction(step.actionKey!)}
                     >
                       {step.actionLabel}
-                      <ArrowRight size={12} style={{ marginLeft: 6, flexShrink: 0 }} />
+                      <ArrowRight size={12} className="tw:ml-1.5 tw:flex-none" />
                     </Button>
                   )}
                 </div>
@@ -230,11 +226,11 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
       </ul>
       {/* All-done footer */}
       {allDone && (
-        <div style={allDoneFooterStyles}>
-          <p style={allDoneTextStyles}>
+        <div className={FOOTER}>
+          <p className={FOOTER_TEXT}>
             You have completed all the getting started steps. Go build something great.
           </p>
-          <Button type="button" style={dismissBtnStyles} onClick={onDismiss}>
+          <Button type="button" size="xs" color="light" className="tw:self-start tw:font-semibold" onClick={onDismiss}>
             Close checklist
           </Button>
         </div>
@@ -245,247 +241,38 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
 
 // ── Styles ──────────────────────────────────────────────────────────────────
 
-const panelStyles: React.CSSProperties = {
-  position: "fixed",
-  right: 24,
-  bottom: 80,
-  width: 320,
-  maxHeight: 540,
-  background: "var(--bk-bg-card)",
-  border: "1px solid var(--bk-border)",
-  borderRadius: 12,
-  boxShadow: "var(--bk-shadow-overlay)",
-  zIndex: 1200,
-  overflow: "hidden",
-  display: "flex",
-  flexDirection: "column",
-  fontFamily: "var(--bk-font-ui)",
-};
-
-const pillStyles: React.CSSProperties = {
-  position: "fixed",
-  right: 24,
-  bottom: 80,
-  display: "flex",
-  alignItems: "center",
-  gap: 8,
-  padding: "8px 14px",
-  background: "var(--bk-bg-card)",
-  border: "1px solid var(--bk-border)",
-  borderRadius: 999,
-  boxShadow: "var(--bk-shadow-overlay)",
-  zIndex: 1200,
-  cursor: "pointer",
-  fontFamily: "var(--bk-font-ui)",
-  userSelect: "none",
-};
-
-const pillDotStyles = (done: boolean): React.CSSProperties => ({
-  width: 8,
-  height: 8,
-  borderRadius: "var(--bk-radius-full)",
-  background: done ? "var(--bk-success)" : "var(--bk-accent)",
-  flexShrink: 0,
-});
-
-const pillTextStyles: React.CSSProperties = {
-  fontSize: 12,
-  fontWeight: 600,
-  color: "var(--bk-ink)",
-  whiteSpace: "nowrap",
-};
-
-const headerStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "flex-start",
-  gap: 10,
-  padding: "14px 14px 12px",
-};
-
-const headerTitleStyles: React.CSSProperties = {
-  fontSize: 13,
-  fontWeight: 600,
-  color: "var(--bk-ink)",
-  letterSpacing: -0.1,
-};
-
-const headerCountStyles: React.CSSProperties = {
-  fontSize: 11,
-  color: "var(--bk-ink-muted)",
-  fontWeight: 500,
-};
-
-const headerActionsStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: 2,
-  flexShrink: 0,
-};
-
-const iconBtnStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  width: 26,
-  height: 26,
-  background: "none",
-  border: "none",
-  borderRadius: 6,
-  color: "var(--bk-ink-muted)",
-  cursor: "pointer",
-  padding: 0,
-  transition: "background 0.15s, color 0.15s",
-};
-
-const confirmRowStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: 6,
-  paddingLeft: 4,
-};
-
-const confirmTextStyles: React.CSSProperties = {
-  fontSize: 11,
-  color: "var(--bk-ink-soft)",
-  whiteSpace: "nowrap",
-};
-
-const confirmYesStyles: React.CSSProperties = {
-  fontSize: 11,
-  fontWeight: 600,
-  color: "var(--bk-error-text)",
-  background: "var(--bk-error-tint)",
-  border: "none",
-  borderRadius: 4,
-  padding: "3px 8px",
-  cursor: "pointer",
-};
-
-const confirmNoStyles: React.CSSProperties = {
-  fontSize: 11,
-  fontWeight: 500,
-  color: "var(--bk-ink-muted)",
-  background: "none",
-  border: "none",
-  borderRadius: 4,
-  padding: "3px 8px",
-  cursor: "pointer",
-};
-
-const progressTrackStyles: React.CSSProperties = {
-  height: 2,
-  background: "var(--bk-bg-subtle)",
-  flexShrink: 0,
-};
-
-const progressFillStyles: React.CSSProperties = {
-  height: "100%",
-  borderRadius: 1,
-  transition: "width 400ms ease, background 400ms ease",
-};
-
-const listStyles: React.CSSProperties = {
-  listStyle: "none",
-  margin: 0,
-  padding: "6px 0",
-  overflowY: "auto",
-  flex: 1,
-};
-
-const stepItemStyles: React.CSSProperties = {
-  transition: "background 0.15s, border-color 0.15s, opacity 0.2s",
-  borderRadius: 0,
-};
-
-const stepRowStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: 10,
-  width: "100%",
-  padding: "9px 14px",
-  background: "none",
-  border: "none",
-  cursor: "pointer",
-  textAlign: "left",
-  color: "inherit",
-};
-
-const circleStyles: React.CSSProperties = {
-  width: 18,
-  height: 18,
-  borderRadius: "var(--bk-radius-full)",
-  border: "1.5px solid",
-  flexShrink: 0,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  transition: "background 0.2s, border-color 0.2s",
-};
-
-const stepLabelStyles: React.CSSProperties = {
-  fontSize: 13,
-  fontWeight: 500,
-  flex: 1,
-  minWidth: 0,
-  transition: "color 0.15s",
-  lineHeight: 1.35,
-};
-
-const stepBodyStyles: React.CSSProperties = {
-  padding: "2px 14px 12px 42px",
-  display: "flex",
-  flexDirection: "column",
-  gap: 10,
-};
-
-const stepDescStyles: React.CSSProperties = {
-  margin: 0,
-  fontSize: 12,
-  lineHeight: 1.55,
-  color: "var(--bk-ink-muted)",
-};
-
-const ctaBtnStyles: React.CSSProperties = {
-  display: "inline-flex",
-  alignItems: "center",
-  alignSelf: "flex-start",
-  padding: "7px 12px",
-  fontSize: 12,
-  fontWeight: 600,
-  color: "var(--bk-accent-on)",
-  background: "var(--bk-accent)",
-  border: "none",
-  borderRadius: 8,
-  cursor: "pointer",
-  letterSpacing: -0.1,
-  transition: "background 0.15s",
-};
-
-const allDoneFooterStyles: React.CSSProperties = {
-  padding: "12px 16px 16px",
-  borderTop: "1px solid var(--bk-border)",
-  display: "flex",
-  flexDirection: "column",
-  gap: 10,
-};
-
-const allDoneTextStyles: React.CSSProperties = {
-  margin: 0,
-  fontSize: 12,
-  color: "var(--bk-ink-muted)",
-  lineHeight: 1.5,
-};
-
-const dismissBtnStyles: React.CSSProperties = {
-  padding: "8px 14px",
-  fontSize: 12,
-  fontWeight: 600,
-  color: "var(--bk-ink-soft)",
-  background: "var(--bk-bg-subtle)",
-  border: "none",
-  borderRadius: 8,
-  cursor: "pointer",
-  alignSelf: "flex-start",
-};
+/* The only value here that is genuinely computed is the progress bar's width.
+   Everything else was a static object, including the three-state step circle
+   and label, which are now class ternaries. */
+const PANEL =
+  "tw:fixed tw:right-6 tw:bottom-20 tw:w-80 tw:max-h-[540px] tw:bg-white tw:border tw:border-gray-200 " +
+  "tw:rounded-xl tw:[box-shadow:var(--bk-shadow-overlay)] tw:z-[1200] tw:overflow-hidden tw:flex " +
+  "tw:flex-col tw:[font-family:var(--bk-font-ui)]";
+const PILL =
+  "tw:fixed tw:right-6 tw:bottom-20 tw:flex tw:items-center tw:gap-2 tw:px-3.5 tw:py-2 tw:bg-white " +
+  "tw:border tw:border-gray-200 tw:rounded-full tw:[box-shadow:var(--bk-shadow-overlay)] tw:z-[1200] " +
+  "tw:cursor-pointer tw:[font-family:var(--bk-font-ui)] tw:select-none";
+const PILL_DOT = "tw:size-2 tw:rounded-full tw:flex-none";
+const PILL_TEXT = "tw:text-xs tw:font-semibold tw:text-gray-900 tw:whitespace-nowrap";
+const HEADER = "tw:flex tw:items-start tw:gap-2.5 tw:px-3.5 tw:pt-3.5 tw:pb-3";
+const HEADER_TITLE = "tw:text-[13px] tw:font-semibold tw:text-gray-900 tw:tracking-[-0.1px]";
+const HEADER_COUNT = "tw:text-[11px] tw:text-gray-500 tw:font-medium";
+const ICON_BTN =
+  "tw:flex tw:items-center tw:justify-center tw:size-6.5 tw:bg-transparent tw:border-0 tw:rounded-md " +
+  "tw:text-gray-500 tw:p-0 tw:[transition:var(--bk-transition-fast)]";
+const CONFIRM_TEXT = "tw:text-[11px] tw:text-[var(--bk-ink-soft)] tw:whitespace-nowrap";
+const PROGRESS_TRACK = "tw:h-0.5 tw:bg-gray-100 tw:flex-none";
+const LIST = "tw:list-none tw:m-0 tw:py-1.5 tw:overflow-y-auto tw:flex-1";
+const STEP_ROW =
+  "tw:flex tw:items-center tw:gap-2.5 tw:w-full tw:px-3.5 tw:py-2 tw:bg-transparent tw:border-0 " +
+  "tw:text-left tw:text-inherit";
+const CIRCLE =
+  "tw:size-4.5 tw:rounded-full tw:border-[1.5px] tw:flex-none tw:flex tw:items-center tw:justify-center " +
+  "tw:[transition:var(--bk-transition-fast)]";
+const STEP_LABEL = "tw:text-[13px] tw:font-medium tw:flex-1 tw:min-w-0 tw:leading-[1.35]";
+const STEP_BODY = "tw:pt-0.5 tw:pr-3.5 tw:pb-3 tw:pl-[42px] tw:flex tw:flex-col tw:gap-2.5";
+const STEP_DESC = "tw:m-0 tw:text-xs tw:leading-relaxed tw:text-gray-500";
+const FOOTER = "tw:px-4 tw:pt-3 tw:pb-4 tw:border-t tw:border-gray-200 tw:flex tw:flex-col tw:gap-2.5";
+const FOOTER_TEXT = "tw:m-0 tw:text-xs tw:text-gray-500 tw:leading-normal";
 
 export default OnboardingChecklist;

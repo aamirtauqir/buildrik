@@ -124,13 +124,20 @@ describe("full panel header + progress", () => {
 // ─── Step states + interaction ────────────────────────────────────────
 
 describe("step items", () => {
+  // This read `.style.textDecoration` while the strike-through was an inline
+  // style. It is a class now, and jsdom loads no stylesheet, so the computed
+  // value here would be "" whether the class applied or not. Asserting the
+  // class is the honest jsdom-level check; the COMPUTED value is asserted in a
+  // real browser by e2e/style-parity.spec.ts's `onboarding-steps` case, which
+  // is what actually proves the strike-through renders.
   it("completed steps render struck-through; pending steps do not", () => {
     render(<OnboardingChecklist {...makeProps({ completedCount: 1, steps: stepsWithCompleted(1) })} />);
 
     const doneLabel = screen.getByText("Name your project");
     const pendingLabel = screen.getByText("Choose a starting point");
-    expect(doneLabel.style.textDecoration).toBe("line-through");
-    expect(pendingLabel.style.textDecoration).toBe("none");
+    expect(doneLabel.className).toMatch(/tw:line-through/);
+    expect(pendingLabel.className).toMatch(/tw:no-underline/);
+    expect(pendingLabel.className).not.toMatch(/tw:line-through/);
   });
 
   it("active step row has aria-expanded=true and shows description + CTA", () => {

@@ -24,6 +24,7 @@ import "@/themes/default.css";
 
 import { CollectionView, FieldsView, RootView } from "@/editor/sidebar/tabs/content/ContentViews";
 import { FolderContextMenu } from "@/editor/sidebar/tabs/media/components/FolderContextMenu";
+import { OnboardingChecklist } from "@/editor/onboarding/OnboardingChecklist";
 
 /** Every case renders into `.bd-studio` so chrome-scoped CSS applies. */
 const CASES: Record<string, () => React.ReactElement> = {
@@ -53,6 +54,32 @@ const CASES: Record<string, () => React.ReactElement> = {
         onAddRecord={() => {}}
         onOpenFields={() => {}}
         onOpenDynamicPages={() => {}}
+      />
+    </div>
+  ),
+  // The strike-through on a completed step used to be an inline
+  // `textDecoration`, asserted in jsdom. It is a class now, and jsdom computes
+  // "" for classes, so that assertion could no longer prove anything. This
+  // case measures the real computed value in a browser instead — one completed
+  // step, one pending, one expanded so the body and CTA render too.
+  "onboarding-steps": () => (
+    <div data-probe="onboarding-steps">
+      <OnboardingChecklist
+        steps={[
+          { id: "a", label: "Name your project", description: "Give it a name.", completed: true } as never,
+          { id: "b", label: "Choose a starting point", description: "Pick a template.",
+            actionLabel: "Browse templates", actionKey: "templates", completed: false } as never,
+          { id: "c", label: "Publish", description: "Ship it.", completed: false } as never,
+        ]}
+        completedCount={1}
+        totalCount={3}
+        activeStepId="b"
+        onSetActiveStepId={() => {}}
+        onAction={() => {}}
+        onDismiss={() => {}}
+        onMinimize={() => {}}
+        isMinimized={false}
+        onRestore={() => {}}
       />
     </div>
   ),

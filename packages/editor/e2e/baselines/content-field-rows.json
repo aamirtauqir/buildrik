@@ -33,7 +33,8 @@
     "box-shadow": "none",
     "overflow": "visible",
     "text-overflow": "clip",
-    "white-space": "normal"
+    "white-space": "normal",
+    "text-decoration-line": "none"
   },
   "content-field-rows>0": {
     "display": "flex",
@@ -69,7 +70,8 @@
     "box-shadow": "none",
     "overflow": "visible",
     "text-overflow": "clip",
-    "white-space": "normal"
+    "white-space": "normal",
+    "text-decoration-line": "none"
   },
   "content-field-rows>1": {
     "display": "flex",
@@ -105,7 +107,8 @@
     "box-shadow": "none",
     "overflow": "visible",
     "text-overflow": "clip",
-    "white-space": "normal"
+    "white-space": "normal",
+    "text-decoration-line": "none"
   },
   "content-field-rows>2": {
     "display": "block",
@@ -141,7 +144,8 @@
     "box-shadow": "none",
     "overflow": "auto",
     "text-overflow": "clip",
-    "white-space": "normal"
+    "white-space": "normal",
+    "text-decoration-line": "none"
   },
   "content-field-rows>3": {
     "display": "flex",
@@ -177,7 +181,8 @@
     "box-shadow": "none",
     "overflow": "visible",
     "text-overflow": "clip",
-    "white-space": "normal"
+    "white-space": "normal",
+    "text-decoration-line": "none"
   },
   "content-field-rows>4": {
     "display": "flex",
@@ -213,7 +218,8 @@
     "box-shadow": "none",
     "overflow": "visible",
     "text-overflow": "clip",
-    "white-space": "normal"
+    "white-space": "normal",
+    "text-decoration-line": "none"
   },
   "content-field-rows>5": {
     "display": "block",
@@ -249,7 +255,8 @@
     "box-shadow": "none",
     "overflow": "visible",
     "text-overflow": "clip",
-    "white-space": "normal"
+    "white-space": "normal",
+    "text-decoration-line": "none"
   },
   "content-field-rows>6": {
     "display": "block",
@@ -285,7 +292,8 @@
     "box-shadow": "none",
     "overflow": "visible",
     "text-overflow": "clip",
-    "white-space": "normal"
+    "white-space": "normal",
+    "text-decoration-line": "none"
   },
   "content-field-rows>7": {
     "display": "flex",
@@ -321,7 +329,8 @@
     "box-shadow": "none",
     "overflow": "visible",
     "text-overflow": "clip",
-    "white-space": "normal"
+    "white-space": "normal",
+    "text-decoration-line": "none"
   },
   "content-field-rows>8": {
     "display": "block",
@@ -357,7 +366,8 @@
     "box-shadow": "none",
     "overflow": "visible",
     "text-overflow": "clip",
-    "white-space": "normal"
+    "white-space": "normal",
+    "text-decoration-line": "none"
   },
   "content-field-rows>9": {
     "display": "block",
@@ -393,7 +403,8 @@
     "box-shadow": "none",
     "overflow": "visible",
     "text-overflow": "clip",
-    "white-space": "normal"
+    "white-space": "normal",
+    "text-decoration-line": "none"
   },
   "content-field-rows>10": {
     "display": "flex",
@@ -429,7 +440,8 @@
     "box-shadow": "none",
     "overflow": "visible",
     "text-overflow": "clip",
-    "white-space": "normal"
+    "white-space": "normal",
+    "text-decoration-line": "none"
   },
   "content-field-rows>11": {
     "display": "flex",
@@ -465,7 +477,8 @@
     "box-shadow": "none",
     "overflow": "visible",
     "text-overflow": "clip",
-    "white-space": "normal"
+    "white-space": "normal",
+    "text-decoration-line": "none"
   },
   "content-field-rows>12": {
     "display": "block",
@@ -501,7 +514,8 @@
     "box-shadow": "none",
     "overflow": "visible",
     "text-overflow": "clip",
-    "white-space": "normal"
+    "white-space": "normal",
+    "text-decoration-line": "none"
   },
   "content-field-rows>13": {
     "display": "block",
@@ -537,7 +551,8 @@
     "box-shadow": "none",
     "overflow": "visible",
     "text-overflow": "clip",
-    "white-space": "normal"
+    "white-space": "normal",
+    "text-decoration-line": "none"
   },
   "content-field-rows>14": {
     "display": "flex",
@@ -573,7 +588,8 @@
     "box-shadow": "none",
     "overflow": "visible",
     "text-overflow": "clip",
-    "white-space": "normal"
+    "white-space": "normal",
+    "text-decoration-line": "none"
   },
   "content-field-rows>15": {
     "display": "block",
@@ -609,7 +625,8 @@
     "box-shadow": "none",
     "overflow": "visible",
     "text-overflow": "clip",
-    "white-space": "normal"
+    "white-space": "normal",
+    "text-decoration-line": "none"
   },
   "content-field-rows>16": {
     "display": "inline-flex",
@@ -645,6 +662,7 @@
     "box-shadow": "none",
     "overflow": "visible",
     "text-overflow": "clip",
-    "white-space": "normal"
+    "white-space": "normal",
+    "text-decoration-line": "none"
   }
 }

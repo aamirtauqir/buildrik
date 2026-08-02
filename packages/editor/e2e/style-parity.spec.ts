@@ -30,13 +30,17 @@ const TRACKED = [
   "border-radius",
   "font-family", "font-size", "font-weight", "line-height",
   "opacity", "box-shadow", "overflow", "text-overflow", "white-space",
+  /* Added with the onboarding case: a completed step's strike-through moved
+     from an inline `textDecoration` to a class, and without this the probe
+     measured 43 nodes and none of the property it was added to protect. */
+  "text-decoration-line",
 ] as const;
 
 // ESM: no __dirname. The package is type:module, so derive it.
 const HERE = dirname(fileURLToPath(import.meta.url));
 const BASELINE_DIR = join(HERE, "baselines");
 
-const CASES = ["content-collection-rows", "content-field-rows", "content-root-rows", "folder-context-menu"] as const;
+const CASES = ["content-collection-rows", "content-field-rows", "content-root-rows", "folder-context-menu", "onboarding-steps"] as const;
 
 for (const name of CASES) {
   test(`computed-style parity: ${name}`, async ({ page }) => {
