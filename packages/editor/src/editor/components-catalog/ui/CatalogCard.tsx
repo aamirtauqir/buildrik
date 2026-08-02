@@ -6,7 +6,7 @@
  * from CatalogRow: onDragStart sets the catalog-component dataTransfer
  * payload so canvas-side drop handlers route correctly.
  *
- * Mini preview is a CSS-only sketch per component id — ComponentType in
+ * Mini preview is a class-only sketch per component id — ComponentType in
  * catalog.ts has no preview/thumbnail field. The schema interpreter could
  * render real previews in a follow-up; v1 ships per-id stand-ins matching
  * the prototype's visual vocabulary.
@@ -26,301 +26,114 @@ interface CatalogCardProps {
   onSelect?: (id: string) => void;
 }
 
-const cardStyle: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  gap: 6,
-  padding: "10px 8px",
-  border: "1px solid var(--bk-border)",
-  borderRadius: 6,
-  background: "var(--bk-bg-card)",
-  fontSize: 11,
-  color: "var(--bk-ink)",
-  cursor: "grab",
-  textAlign: "center",
-  minHeight: 72,
-  boxSizing: "border-box",
-};
+/* Card chrome. */
+const CARD =
+  "tw:flex tw:flex-col tw:items-center tw:gap-1.5 tw:px-2 tw:py-2.5 tw:border tw:border-gray-200 " +
+  "tw:rounded-md tw:bg-white tw:text-[11px] tw:text-gray-900 tw:cursor-grab tw:text-center tw:min-h-18";
+const PREVIEW_BOX = "tw:flex tw:items-center tw:justify-center tw:w-full tw:h-9 tw:bg-gray-50 tw:rounded tw:overflow-hidden";
+const LABEL = "tw:text-[11px] tw:leading-tight tw:text-gray-900 tw:w-full tw:whitespace-nowrap tw:overflow-hidden tw:text-ellipsis";
 
-const previewBoxStyle: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  width: "100%",
-  height: 36,
-  background: "var(--bk-bg-subtle, rgba(255,255,255,0.04))",
-  borderRadius: 4,
-  overflow: "hidden",
-};
-
-const labelStyle: React.CSSProperties = {
-  fontSize: 11,
-  lineHeight: 1.2,
-  color: "var(--bk-ink)",
-  width: "100%",
-  whiteSpace: "nowrap",
-  overflow: "hidden",
-  textOverflow: "ellipsis",
-};
+/* Sketch vocabulary. Tokens are written as arbitrary values rather than mapped
+   to the nearest Tailwind shade, so nothing shifts colour in translation. */
+const MUTED = "tw:text-[var(--bk-ink-soft)]";
+const OUTLINE = "tw:border tw:border-gray-200 tw:rounded-sm";
+const FILL = "tw:bg-gray-200";
+const PILL = "tw:bg-[var(--bk-success-tint)] tw:text-[var(--bk-success)] tw:text-[8px]";
 
 /** Per-id mini sketch — matches the prototype s06 visual vocabulary. */
 function MiniPreview({ component }: { component: ComponentType }): React.ReactElement {
   switch (component.id) {
     case "button":
       return (
-        <div
-          style={{
-            background: "var(--bk-accent)",
-            color: "var(--bk-accent-on)",
-            fontSize: 9,
-            padding: "3px 8px",
-            borderRadius: 3,
-            fontWeight: 500,
-          }}
-        >
+        <div className="tw:bg-blue-700 tw:text-white tw:text-[9px] tw:px-2 tw:py-[3px] tw:rounded-sm tw:font-medium">
           Btn
         </div>
       );
     case "input":
     case "search-bar":
-      return (
-        <div
-          style={{
-            border: "1px solid var(--bk-border)",
-            width: "80%",
-            height: 18,
-            borderRadius: 3,
-            background: "var(--bk-bg-subtle, transparent)",
-          }}
-        />
-      );
+      return <div className={`${OUTLINE} tw:w-4/5 tw:h-[18px] tw:bg-gray-50`} />;
     case "select":
       return (
-        <div
-          style={{
-            border: "1px solid var(--bk-border)",
-            width: "80%",
-            height: 18,
-            borderRadius: 3,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "flex-end",
-            paddingRight: 4,
-            fontSize: 9,
-            color: "var(--bk-ink-soft)",
-          }}
-        >
+        <div className={`${OUTLINE} tw:w-4/5 tw:h-[18px] tw:flex tw:items-center tw:justify-end tw:pr-1 tw:text-[9px] ${MUTED}`}>
           ▾
         </div>
       );
     case "checkbox":
-      return (
-        <div
-          style={{
-            width: 14,
-            height: 14,
-            border: "1px solid var(--bk-border)",
-            borderRadius: 2,
-          }}
-        />
-      );
+      return <div className="tw:size-3.5 tw:border tw:border-gray-200 tw:rounded-[2px]" />;
     case "radio":
-      return (
-        <div
-          style={{
-            width: 14,
-            height: 14,
-            border: "1px solid var(--bk-border)",
-            borderRadius: "var(--bk-radius-full)",
-          }}
-        />
-      );
+      return <div className="tw:size-3.5 tw:border tw:border-gray-200 tw:rounded-full" />;
     case "switch":
       return (
-        <div
-          style={{
-            width: 28,
-            height: 14,
-            background: "var(--bk-border)",
-            borderRadius: 7,
-            position: "relative",
-          }}
-        >
-          <div
-            style={{
-              position: "absolute",
-              top: 1,
-              left: 1,
-              width: 12,
-              height: 12,
-              background: "var(--bk-bg-card)",
-              borderRadius: "var(--bk-radius-full)",
-            }}
-          />
+        <div className={`tw:w-7 tw:h-3.5 ${FILL} tw:rounded-full tw:relative`}>
+          <div className="tw:absolute tw:top-px tw:left-px tw:size-3 tw:bg-white tw:rounded-full" />
         </div>
       );
     case "label":
-      return (
-        <div style={{ fontSize: 10, color: "var(--bk-ink-soft)" }}>Label</div>
-      );
+      return <div className={`tw:text-[10px] ${MUTED}`}>Label</div>;
     case "spinner":
-      return (
-        <div
-          style={{
-            width: 14,
-            height: 14,
-            border: "2px solid var(--bk-border)",
-            borderTopColor: "var(--bk-accent)",
-            borderRadius: "var(--bk-radius-full)",
-          }}
-        />
-      );
+      return <div className="tw:size-3.5 tw:border-2 tw:border-gray-200 tw:border-t-blue-700 tw:rounded-full" />;
     case "card":
-      return (
-        <div
-          style={{
-            background: "var(--bk-bg-subtle)",
-            border: "1px solid var(--bk-border)",
-            width: "80%",
-            height: 22,
-            borderRadius: 3,
-          }}
-        />
-      );
+      return <div className={`tw:bg-gray-50 ${OUTLINE} tw:w-4/5 tw:h-[22px]`} />;
     case "form-field":
       return (
-        <div style={{ display: "flex", flexDirection: "column", gap: 2, width: "80%" }}>
-          <div style={{ fontSize: 8, color: "var(--bk-ink-soft)", textAlign: "left" }}>
-            Label
-          </div>
-          <div
-            style={{
-              border: "1px solid var(--bk-border)",
-              height: 12,
-              borderRadius: 2,
-            }}
-          />
+        <div className="tw:flex tw:flex-col tw:gap-0.5 tw:w-4/5">
+          <div className={`tw:text-[8px] tw:text-left ${MUTED}`}>Label</div>
+          <div className="tw:border tw:border-gray-200 tw:h-3 tw:rounded-[2px]" />
         </div>
       );
     case "alert":
+      /* border-green-200 IS #BBF7D0 — the hex this carried, and the
+         @lint-hex-policy exemption that came with it, are both gone. */
       return (
-        <div
-          style={{
-            background: "var(--bk-success-tint)",
-            color: "var(--bk-success)",
-            fontSize: 8,
-            padding: "2px 6px",
-            borderRadius: 3,
-            border: /* @lint-hex-policy: alert-preview green-200 border, no exact chrome token */ "1px solid #BBF7D0",
-          }}
-        >
-          Alert
-        </div>
+        <div className={`${PILL} tw:px-1.5 tw:py-0.5 tw:rounded-sm tw:border tw:border-green-200`}>Alert</div>
       );
     case "avatar":
-      return (
-        <div
-          style={{
-            width: 22,
-            height: 22,
-            borderRadius: "var(--bk-radius-full)",
-            background: "var(--bk-border)",
-          }}
-        />
-      );
+      return <div className={`tw:size-[22px] tw:rounded-full ${FILL}`} />;
     case "badge":
-      return (
-        <div
-          style={{
-            background: "var(--bk-success-tint)",
-            color: "var(--bk-success)",
-            fontSize: 8,
-            padding: "1px 6px",
-            borderRadius: 9,
-          }}
-        >
-          New
-        </div>
-      );
+      return <div className={`${PILL} tw:px-1.5 tw:py-px tw:rounded-lg`}>New</div>;
     case "breadcrumb":
-      return (
-        <div style={{ fontSize: 9, color: "var(--bk-ink-soft)" }}>Home / Page</div>
-      );
+      return <div className={`tw:text-[9px] ${MUTED}`}>Home / Page</div>;
     case "tabs":
       return (
-        <div style={{ display: "flex", gap: 4, fontSize: 8, color: "var(--bk-ink-soft)" }}>
-          <span style={{ borderBottom: "2px solid var(--bk-accent)", paddingBottom: 1 }}>One</span>
+        <div className={`tw:flex tw:gap-1 tw:text-[8px] ${MUTED}`}>
+          <span className="tw:border-b-2 tw:border-blue-700 tw:pb-px">One</span>
           <span>Two</span>
         </div>
       );
     case "pagination":
       return (
-        <div style={{ display: "flex", gap: 3, fontSize: 8, color: "var(--bk-ink-soft)" }}>
+        <div className={`tw:flex tw:gap-[3px] tw:text-[8px] ${MUTED}`}>
           <span>‹</span>
           <span>1</span>
-          <span style={{ color: "var(--bk-accent)" }}>2</span>
+          <span className="tw:text-blue-700">2</span>
           <span>3</span>
           <span>›</span>
         </div>
       );
     case "list-item":
       return (
-        <div style={{ display: "flex", flexDirection: "column", gap: 1, width: "80%", textAlign: "left" }}>
-          <div style={{ fontSize: 9, color: "var(--bk-ink)" }}>Title</div>
-          <div style={{ fontSize: 7, color: "var(--bk-ink-soft)" }}>Subtitle</div>
+        <div className="tw:flex tw:flex-col tw:gap-px tw:w-4/5 tw:text-left">
+          <div className="tw:text-[9px] tw:text-gray-900">Title</div>
+          <div className={`tw:text-[7px] ${MUTED}`}>Subtitle</div>
         </div>
       );
     case "tooltip":
       return (
-        <div
-          style={{
-            background: "var(--bk-ink)",
-            color: "var(--bk-bg-subtle)",
-            fontSize: 8,
-            padding: "2px 6px",
-            borderRadius: 3,
-          }}
-        >
-          Tip
-        </div>
+        <div className="tw:bg-gray-900 tw:text-gray-50 tw:text-[8px] tw:px-1.5 tw:py-0.5 tw:rounded-sm">Tip</div>
       );
     case "modal":
       return (
-        <div
-          style={{
-            background: "var(--bk-bg-subtle)",
-            border: "1px solid var(--bk-border)",
-            width: "70%",
-            height: 22,
-            borderRadius: 3,
-            boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-          }}
-        />
+        <div className={`tw:bg-gray-50 ${OUTLINE} tw:w-[70%] tw:h-[22px] tw:[box-shadow:var(--bk-shadow-raised)]`} />
       );
     case "section":
-      return (
-        <div style={{ fontSize: 9, color: "var(--bk-ink-soft)" }}>§ Section</div>
-      );
+      return <div className={`tw:text-[9px] ${MUTED}`}>§ Section</div>;
     case "hero":
-      return (
-        <div style={{ fontSize: 8, color: "var(--bk-ink-soft)" }}>Hero block</div>
-      );
+      return <div className={`tw:text-[8px] ${MUTED}`}>Hero block</div>;
     case "footer":
-      return (
-        <div
-          style={{
-            width: "80%",
-            height: 10,
-            background: "var(--bk-ink)",
-            opacity: 0.7,
-            borderRadius: 2,
-          }}
-        />
-      );
+      return <div className="tw:w-4/5 tw:h-2.5 tw:bg-gray-900 tw:opacity-70 tw:rounded-[2px]" />;
     case "pricing":
       return (
-        <div style={{ display: "flex", gap: 3, fontSize: 8, color: "var(--bk-ink-soft)" }}>
+        <div className={`tw:flex tw:gap-[3px] tw:text-[8px] ${MUTED}`}>
           <span>$9</span>
           <span>$19</span>
           <span>$29</span>
@@ -328,69 +141,32 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
       );
     case "cta":
       return (
-        <div
-          style={{
-            background: "var(--bk-accent)",
-            color: "var(--bk-accent-on)",
-            fontSize: 9,
-            padding: "3px 10px",
-            borderRadius: 3,
-          }}
-        >
-          Start
-        </div>
+        <div className="tw:bg-blue-700 tw:text-white tw:text-[9px] tw:px-2.5 tw:py-[3px] tw:rounded-sm">Start</div>
       );
     case "header":
       return (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            width: "80%",
-            fontSize: 8,
-            color: "var(--bk-ink-soft)",
-          }}
-        >
+        <div className={`tw:flex tw:justify-between tw:items-center tw:w-4/5 tw:text-[8px] ${MUTED}`}>
           <span>Logo</span>
           <span>≡</span>
         </div>
       );
     case "feature-grid":
       return (
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: 2,
-            width: "60%",
-          }}
-        >
+        <div className="tw:grid tw:grid-cols-3 tw:gap-0.5 tw:w-[60%]">
           {[0, 1, 2].map((i) => (
-            <div
-              key={i}
-              style={{
-                height: 8,
-                background: "var(--bk-border)",
-                borderRadius: 1,
-              }}
-            />
+            <div key={i} className={`tw:h-2 ${FILL} tw:rounded-[1px]`} />
           ))}
         </div>
       );
     default:
-      return (
-        <div style={{ fontSize: 9, color: "var(--bk-ink-soft)" }}>
-          {component.name.slice(0, 8)}
-        </div>
-      );
+      return <div className={`tw:text-[9px] ${MUTED}`}>{component.name.slice(0, 8)}</div>;
   }
 }
 
 export const CatalogCard: React.FC<CatalogCardProps> = ({ component, onSelect }) => {
   return (
     <div
-      style={cardStyle}
+      className={CARD}
       data-catalog-card={component.id}
       data-catalog-row={component.id}
       draggable
@@ -406,10 +182,10 @@ export const CatalogCard: React.FC<CatalogCardProps> = ({ component, onSelect })
       tabIndex={0}
       title={`${component.name} · ${component.variants.length} variant${component.variants.length === 1 ? "" : "s"}`}
     >
-      <div style={previewBoxStyle} aria-hidden="true">
+      <div className={PREVIEW_BOX} aria-hidden="true">
         <MiniPreview component={component} />
       </div>
-      <div style={labelStyle}>{component.name}</div>
+      <div className={LABEL}>{component.name}</div>
     </div>
   );
 };
