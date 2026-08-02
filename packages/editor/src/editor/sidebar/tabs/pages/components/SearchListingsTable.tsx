@@ -76,30 +76,20 @@ function buildRows(pages: PageItem[]): Row[] {
   });
 }
 
-const srcBase: React.CSSProperties = {
-  fontSize: 8.5,
-  letterSpacing: "0.02em",
-  textTransform: "uppercase",
-  borderRadius: 3,
-  padding: "1px 5px",
-  marginLeft: 5,
-  whiteSpace: "nowrap",
-  flexShrink: 0,
-};
-const fieldLabel: React.CSSProperties = {
-  fontSize: 9,
-  letterSpacing: "0.03em",
-  textTransform: "uppercase",
-  color: "var(--bk-ink-muted)",
-  width: 34,
-  flexShrink: 0,
-};
+/** "custom" / "site default" tag after a value. */
+const SRC_TAG =
+  "tw:flex-none tw:whitespace-nowrap tw:ml-[5px] tw:px-[5px] tw:py-px tw:rounded-[3px] " +
+  "tw:text-[8.5px] tw:uppercase tw:tracking-[0.02em]";
+const FIELD_LABEL =
+  "tw:w-[34px] tw:flex-none tw:text-[9px] tw:uppercase tw:tracking-[0.03em] tw:text-gray-500";
+const FLAG_PILL = "tw:whitespace-nowrap tw:px-1.5 tw:py-px tw:rounded-[3px] tw:border tw:text-[9px]";
+const ELLIPSIS = "tw:overflow-hidden tw:text-ellipsis";
 
 function SourceTag({ source }: { source: Source }) {
   return source === "custom" ? (
-    <span style={{ ...srcBase, background: "var(--bk-accent)", color: "var(--bk-accent-on)" }}>custom</span>
+    <span className={`${SRC_TAG} tw:bg-blue-700 tw:text-white`}>custom</span>
   ) : (
-    <span style={{ ...srcBase, border: "1px dashed var(--bk-border)", color: "var(--bk-ink-muted)" }}>
+    <span className={`${SRC_TAG} tw:border tw:border-dashed tw:border-gray-200 tw:text-gray-500`}>
       site default
     </span>
   );
@@ -109,15 +99,11 @@ function FlagPill({ flag }: { flag: Flag }) {
   const ok = flag.tone === "ok";
   return (
     <span
-      style={{
-        fontSize: 9,
-        borderRadius: 3,
-        padding: "1px 6px",
-        whiteSpace: "nowrap",
-        border: ok ? "1px solid var(--bk-border)" : "1px solid var(--bk-ink)",
-        color: ok ? "var(--bk-ink-muted)" : "var(--bk-ink)",
-        fontWeight: ok ? 400 : 600,
-      }}
+      className={`${FLAG_PILL} ${
+        ok
+          ? "tw:border-gray-200 tw:font-normal tw:text-gray-500"
+          : "tw:border-gray-900 tw:font-semibold tw:text-gray-900"
+      }`}
     >
       {flag.label}
     </span>
@@ -126,9 +112,9 @@ function FlagPill({ flag }: { flag: Flag }) {
 
 function FieldRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div style={{ display: "flex", alignItems: "baseline", gap: 6, minWidth: 0 }}>
-      <span style={fieldLabel}>{label}</span>
-      <span style={{ fontSize: 11, color: "var(--bk-ink)", minWidth: 0, display: "flex", alignItems: "center", flexWrap: "wrap" }}>
+    <div className="tw:flex tw:items-baseline tw:gap-1.5 tw:min-w-0">
+      <span className={FIELD_LABEL}>{label}</span>
+      <span className="tw:flex tw:flex-wrap tw:items-center tw:min-w-0 tw:text-[11px] tw:text-gray-900">
         {children}
       </span>
     </div>
@@ -140,28 +126,20 @@ export function SearchListingsTable({ pages, onEditPage }: SearchListingsTablePr
   const issues = rows.filter((r) => r.flag.tone === "warn");
 
   return (
-    <div style={{ padding: "8px 10px", overflowY: "auto", display: "flex", flexDirection: "column", gap: 6 }}>
+    <div className="tw:flex tw:flex-col tw:gap-1.5 tw:px-2.5 tw:py-2 tw:overflow-y-auto">
       {rows.map((r) => (
         <div
           key={r.page.id}
           onClick={() => onEditPage(r.page.id)}
           title={`Edit ${r.page.name}'s search listing`}
-          style={{
-            cursor: "pointer",
-            border: "1px solid var(--bk-border)",
-            borderRadius: 6,
-            padding: "7px 9px",
-            display: "flex",
-            flexDirection: "column",
-            gap: 4,
-          }}
+          className="tw:flex tw:flex-col tw:gap-1 tw:px-[9px] tw:py-[7px] tw:rounded-md tw:border tw:border-gray-200 tw:cursor-pointer tw:hover:bg-gray-50"
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <strong style={{ fontSize: 12, color: "var(--bk-ink)" }}>{r.page.name}</strong>
-            <span style={{ fontSize: 10, color: "var(--bk-ink-muted)" }}>{r.path}</span>
-            <span style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 5 }}>
+          <div className="tw:flex tw:items-center tw:gap-1.5">
+            <strong className="tw:text-xs tw:text-gray-900">{r.page.name}</strong>
+            <span className="tw:text-[10px] tw:text-gray-500">{r.path}</span>
+            <span className="tw:flex tw:items-center tw:gap-[5px] tw:ml-auto">
               {!r.indexed && (
-                <span style={{ fontSize: 9, color: "var(--bk-ink-muted)", whiteSpace: "nowrap" }}>
+                <span className="tw:whitespace-nowrap tw:text-[9px] tw:text-gray-500">
                   hidden from Google
                 </span>
               )}
@@ -169,27 +147,27 @@ export function SearchListingsTable({ pages, onEditPage }: SearchListingsTablePr
             </span>
           </div>
           <FieldRow label="Title">
-            <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>{r.title}</span>
+            <span className={ELLIPSIS}>{r.title}</span>
             <SourceTag source={r.titleSource} />
           </FieldRow>
           <FieldRow label="Desc">
             {r.description ? (
               <>
-                <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>{r.description}</span>
+                <span className={ELLIPSIS}>{r.description}</span>
                 <SourceTag source={r.descriptionSource} />
               </>
             ) : (
-              <span style={{ color: "var(--bk-ink-muted)" }}>— missing —</span>
+              <span className="tw:text-gray-500">— missing —</span>
             )}
           </FieldRow>
         </div>
       ))}
-      <p style={{ margin: "4px 2px 0", fontSize: 11, color: "var(--bk-ink-muted)", lineHeight: 1.5 }}>
+      <p className="tw:mx-0.5 tw:mt-1 tw:mb-0 tw:text-[11px] tw:leading-normal tw:text-gray-500">
         {issues.length === 0 ? (
           <>All pages have a title &amp; description Google can use.</>
         ) : (
           <>
-            <strong style={{ color: "var(--bk-ink)" }}>{issues.length}</strong>{" "}
+            <strong className="tw:text-gray-900">{issues.length}</strong>{" "}
             {issues.length === 1 ? "page needs" : "pages need"} attention — click a card to fix its search listing.
           </>
         )}

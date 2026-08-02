@@ -36,114 +36,17 @@ type UIExportFormat = ExportFormat | "figma";
 
 const TOKEN_KINDS_COUNT = 14;
 
-const containerStyle: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: 12,
-  padding: 12,
-};
-
-const cardStyle: React.CSSProperties = {
-  background: "var(--bk-bg-subtle)",
-  border: "1px solid var(--bk-border)",
-  borderRadius: 8,
-  padding: 12,
-};
-
-const formatListStyle: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: 6,
-  marginTop: 4,
-};
-
-const formatRowStyle: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: 8,
-  padding: "6px 8px",
-  border: "1px solid var(--bk-border)",
-  borderRadius: 6,
-  cursor: "pointer",
-  fontSize: 12,
-  color: "var(--bk-ink)",
-};
-
-const formatRowSelectedStyle: React.CSSProperties = {
-  ...formatRowStyle,
-  borderColor: "var(--bk-accent)",
-  background: "var(--bk-bg-card, var(--bk-bg-subtle))",
-};
-
-const chipBaseStyle: React.CSSProperties = {
-  marginLeft: "auto",
-  fontSize: 10,
-  fontWeight: 500,
-  padding: "2px 6px",
-  borderRadius: 999,
-  border: "1px solid transparent",
-  whiteSpace: "nowrap",
-};
-
-const statsLineStyle: React.CSSProperties = {
-  marginTop: 10,
-  fontSize: 11,
-  color: "var(--bk-ink-muted)",
-};
-
-const warningCalloutStyle: React.CSSProperties = {
-  marginTop: 10,
-  padding: "8px 10px",
-  borderLeft: "3px solid #d97706",
-  background: "rgba(217, 119, 6, 0.08)",
-  borderRadius: 4,
-  fontSize: 11,
-  color: "var(--bk-ink)",
-  lineHeight: 1.5,
-};
-
-const previewStyle: React.CSSProperties = {
-  margin: 0,
-  padding: 12,
-  background: "var(--bk-bg-subtle)",
-  color: "var(--bk-ink-soft)",
-  border: "1px solid var(--bk-border)",
-  borderRadius: 6,
-  fontFamily: "var(--bk-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace)",
-  fontSize: 11,
-  lineHeight: 1.55,
-  maxHeight: 320,
-  overflow: "auto",
-  whiteSpace: "pre",
-};
-
-const downloadButtonStyle: React.CSSProperties = {
-  marginTop: 8,
-  padding: "8px 14px",
-  background: "var(--bk-accent)",
-  color: "#fff",
-  border: "none",
-  borderRadius: 6,
-  fontSize: 12,
-  fontWeight: 500,
-  cursor: "pointer",
-  width: "100%",
-};
-
-const radioRowStyle: React.CSSProperties = {
-  display: "flex",
-  gap: 16,
-  flexWrap: "wrap",
-  fontSize: 12,
-  color: "var(--bk-ink)",
-};
-
-const radioLabelStyle: React.CSSProperties = {
-  display: "inline-flex",
-  alignItems: "center",
-  gap: 6,
-  cursor: "pointer",
-};
+const CARD = "tw:p-3 tw:rounded-lg tw:border tw:border-gray-200 tw:bg-[var(--bk-bg-subtle)]";
+const FORMAT_ROW =
+  "tw:flex tw:items-center tw:gap-2 tw:px-2 tw:py-1.5 tw:rounded-md tw:border tw:cursor-pointer " +
+  "tw:text-xs tw:text-gray-900";
+const CHIP = "tw:ml-auto tw:whitespace-nowrap tw:px-1.5 tw:py-0.5 tw:rounded-full tw:border tw:text-[10px] tw:font-medium";
+const PREVIEW =
+  "tw:m-0 tw:p-3 tw:max-h-80 tw:overflow-auto tw:whitespace-pre tw:rounded-md tw:border " +
+  "tw:border-gray-200 tw:bg-[var(--bk-bg-subtle)] tw:text-[11px] tw:leading-relaxed " +
+  "tw:text-[var(--bk-ink-soft)] tw:[font-family:var(--bk-font-mono)]";
+const RADIO_LABEL = "tw:inline-flex tw:items-center tw:gap-1.5 tw:cursor-pointer";
+const CAPTION = "tw:text-xs tw:text-gray-500";
 
 const FORMAT_OPTIONS: Array<{
   id: UIExportFormat;
@@ -221,26 +124,19 @@ function downloadLabelFor(format: UIExportFormat): string {
 
 interface ChipSpec {
   label: string;
-  bg: string;
-  fg: string;
-  border: string;
+  /** Tone classes rather than three hand-mixed rgba() strings — the two tones
+   *  here are the warning and success ramps every other surface uses. */
+  className: string;
 }
 
 function chipForFormat(format: UIExportFormat, droppedCount: number): ChipSpec {
   if (format === "tailwind") {
     return {
       label: droppedCount > 0 ? `${droppedCount} dropped` : "dark variants dropped",
-      bg: "rgba(217, 119, 6, 0.12)",
-      fg: "#92400e",
-      border: "rgba(217, 119, 6, 0.40)",
+      className: "tw:bg-amber-100 tw:border-amber-300 tw:text-amber-800",
     };
   }
-  return {
-    label: "lossless",
-    bg: "rgba(22, 163, 74, 0.12)",
-    fg: "#166534",
-    border: "rgba(22, 163, 74, 0.40)",
-  };
+  return { label: "lossless", className: "tw:bg-green-100 tw:border-green-300 tw:text-green-800" };
 }
 
 export const ExportSection: React.FC = () => {
@@ -306,18 +202,23 @@ export const ExportSection: React.FC = () => {
     `${stats.aliasEdges} alias edges · ${stats.darkVariants} dark variants`;
 
   return (
-    <div style={containerStyle}>
-      <div style={cardStyle}>
-        <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.06em", color: "var(--bk-ink-muted)" }}>
+    <div className="tw:flex tw:flex-col tw:gap-3 tw:p-3">
+      <div className={CARD}>
+        <div className="tw:text-[11px] tw:font-semibold tw:tracking-[0.06em] tw:text-gray-500">
           FORMAT
         </div>
-        <div style={formatListStyle} role="radiogroup" aria-label="Export format">
+        <div className="tw:flex tw:flex-col tw:gap-1.5 tw:mt-1" role="radiogroup" aria-label="Export format">
           {FORMAT_OPTIONS.map(({ id, label, desc }) => {
             const selected = format === id;
             const droppedCount = id === "tailwind" ? tailwindDropped : 0;
             const chip = chipForFormat(id, droppedCount);
             return (
-              <label key={id} style={selected ? formatRowSelectedStyle : formatRowStyle}>
+              <label
+                key={id}
+                className={`${FORMAT_ROW} ${
+                  selected ? "tw:border-blue-700 tw:bg-white" : "tw:border-gray-200"
+                }`}
+              >
                 <Radio
                   color="blue"
                   className="tw:bg-white"
@@ -330,16 +231,11 @@ export const ExportSection: React.FC = () => {
                 />
                 <span>
                   {label}
-                  <span style={{ marginLeft: 4, color: "var(--bk-ink-muted)" }}>· {desc}</span>
+                  <span className="tw:ml-1 tw:text-gray-500">· {desc}</span>
                 </span>
                 <span
                   data-testid={`format-chip-${id}`}
-                  style={{
-                    ...chipBaseStyle,
-                    background: chip.bg,
-                    color: chip.fg,
-                    borderColor: chip.border,
-                  }}
+                  className={`${CHIP} ${chip.className}`}
                 >
                   {chip.label}
                 </span>
@@ -348,12 +244,15 @@ export const ExportSection: React.FC = () => {
           })}
         </div>
 
-        <div data-testid="export-stats" style={statsLineStyle}>
+        <div data-testid="export-stats" className="tw:mt-2.5 tw:text-[11px] tw:text-gray-500">
           {statsLine}
         </div>
 
         {format === "tailwind" && (
-          <div data-testid="tailwind-warning" style={warningCalloutStyle}>
+          <div
+            data-testid="tailwind-warning"
+            className="tw:mt-2.5 tw:px-2.5 tw:py-2 tw:rounded tw:border-l-[3px] tw:border-l-[var(--bk-warning-text)] tw:bg-[var(--bk-warning-tint)] tw:text-[11px] tw:leading-normal tw:text-gray-900"
+          >
             <strong>Tailwind warning:</strong>{" "}
             {tailwindDropped} tokens drop because Tailwind doesn&apos;t model dark variants per token.
             Dark mode disabled on round-trip — banner surfaces this before commit.
@@ -361,13 +260,15 @@ export const ExportSection: React.FC = () => {
         )}
 
         {format === "css" && (
-          <div style={{ marginTop: 12 }}>
-            <div style={{ fontSize: 12, color: "var(--bk-ink-muted)", marginBottom: 6 }}>
-              Dark mode strategy
-            </div>
-            <div style={radioRowStyle} role="radiogroup" aria-label="Dark mode strategy">
+          <div className="tw:mt-3">
+            <div className={`${CAPTION} tw:mb-1.5`}>Dark mode strategy</div>
+            <div
+              className="tw:flex tw:flex-wrap tw:gap-4 tw:text-xs tw:text-gray-900"
+              role="radiogroup"
+              aria-label="Dark mode strategy"
+            >
               {DARK_OPTIONS.map(({ id, label }) => (
-                <label key={id} style={radioLabelStyle}>
+                <label key={id} className={RADIO_LABEL}>
                   <Radio
                     color="blue"
                     className="tw:bg-white"
@@ -385,14 +286,12 @@ export const ExportSection: React.FC = () => {
         )}
       </div>
 
-      <div style={cardStyle}>
-        <div style={{ fontSize: 13, fontWeight: 500, color: "var(--bk-ink)", marginBottom: 8 }}>
-          Preview
-        </div>
-        <pre data-testid="export-preview" style={previewStyle}>
+      <div className={CARD}>
+        <div className="tw:mb-2 tw:text-[13px] tw:font-medium tw:text-gray-900">Preview</div>
+        <pre data-testid="export-preview" className={PREVIEW}>
           {preview}
         </pre>
-        <Button onClick={handleDownload} style={downloadButtonStyle}>
+        <Button onClick={handleDownload} className="tw:w-full tw:mt-2">
           {downloadLabelFor(format)}
         </Button>
       </div>
