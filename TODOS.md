@@ -78,11 +78,15 @@ consciously not done, not when they were forgotten.
   Nothing measures activation, drop-off, or whether the Vercel-OAuth publish step
   costs users. Decisions about what to build next are currently unmeasurable.
 
-- [ ] **J5 client sign-off has no client-facing screen.** Founder-locked as the
-  #1 priority on 2026-07-18 (`docs/prd/editor/14-screen-specs.md:338`). The
-  comment backend exists; `app/review/[token]/` does not. `app/share/[token]/`
-  already ships the pattern to copy. Either build it or revoke the lock — do not
-  let it decay by neglect.
+- [x] **J5 client sign-off has no client-facing screen.** ~~The comment backend
+  exists; `app/review/[token]/` does not.~~ **STALE — it has existed since
+  2026-07-20** (`packages/dashboard/app/review/[token]/page.tsx`, plus
+  `review-client.tsx`), and `docs/prd/editor/14-screen-specs.md:355` already
+  marked the "missing" claim stale. Surfaced by the /autoplan CEO phase
+  2026-08-02, which flagged it as a governance problem rather than a product
+  one: this list was being used to justify scheduling decisions while being
+  wrong about the flagship wedge. What remains open is not the screen, it is
+  whether the loop is instrumented — see the analytics item above.
 
 - [ ] **Origin-pin `/api/asset-upload` (and the other cookie-authenticated non-tRPC
   routes).** The tRPC endpoint checks `EDITOR_ORIGIN`; `asset-upload` accepts
