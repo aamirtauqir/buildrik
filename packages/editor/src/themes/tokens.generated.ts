@@ -128,7 +128,7 @@ export const motion = {
 } as const;
 
 export const font = {
-  "ui": "\"Inter\", \"Inter Tight\", -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+  "ui": "\"Inter\", \"Inter Tight\", sans-serif",
   "mono": "\"Geist Mono\", \"SF Mono\", Menlo, Consolas, monospace",
 } as const;
 

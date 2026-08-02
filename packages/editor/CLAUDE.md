@@ -423,7 +423,7 @@ npx vitest           # Run tests
 npx tsc --noEmit     # Type check
 ```
 
-### Pre-push gate hook (WARN mode)
+### Pre-push gate hook (BLOCKING)
 
 Once per clone:
 
@@ -431,11 +431,16 @@ Once per clone:
 pnpm run hooks:install
 ```
 
-Installs `.git/hooks/pre-push` which runs `pnpm run verify:ds` and prints
-gate state before every push. **Currently WARN-only** — does not block.
-After CI backlog drained (Gate 17 ghost aliases + Gates 18-25 verification),
-flip `BLOCK_ON_FAIL=true` in `packages/editor/scripts/hooks/pre-push` to make
-it enforce.
+Installs `.git/hooks/pre-push`, which runs `pnpm run verify:ds` (editor +
+dashboard gates) and **refuses the push if any gate fails** —
+`BLOCK_ON_FAIL=true` in `scripts/hooks/pre-push:27`, flipped 2026-05-18 once
+verify:ds ran green end to end.
+
+This section said "WARN-only — does not block" until 2026-08-03, which was
+wrong for two and a half months and is the likely explanation for pushes that
+appear to hang: the hook is running the full gate suite (~2 min), not
+stalling. If you genuinely need to bypass it, `git push --no-verify` — and say
+so, because the gates exist to catch what tests do not.
 
 ---
 
@@ -447,7 +452,7 @@ set in the host platform (Vercel project settings → Environment Variables).
 
 | Var | Purpose | Dev default | Production value |
 |-----|---------|-------------|-----------------|
-| `VITE_DASHBOARD_URL` | tRPC API base for dashboard package (publish jobs, BuildrikSyncProvider) | `http://localhost:3000` | `https://app.buildrik.com` (or canonical dashboard host) |
+| `VITE_DASHBOARD_URL` | tRPC API base for dashboard package (publish jobs, BuildrikSyncProvider) | `http://localhost:3000` | `https://app.buildrick.io` — the live dashboard host. This row said `app.buildrik.com` until 2026-08-03; that domain is not what production runs (see root `CLAUDE.md` `NEXT_PUBLIC_APP_URL`, and the deploy target `app.buildrick.io`). Only needed for a STANDALONE editor build — when the editor is bundled into the dashboard (`NEXT_PUBLIC_UNIFIED_EDITOR`), `runtimeEnv.ts` falls back to the dashboard's own origin. |
 | `VITE_SENTRY_DSN` | Sentry error reporting DSN | unset → console-only | Sentry project DSN (required) |
 | `VITE_FEATURE_PUBLISH` | Gate for Publish dropdown + publish flow | `false` | `true` once Vercel pipeline live |
 

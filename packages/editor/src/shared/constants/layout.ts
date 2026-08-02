@@ -20,13 +20,13 @@
 /** Left icon rail width. Canonical across DESIGN.md + CSS + prior layout.ts. */
 export const RAIL_W = 60;
 
-/** Left sidebar panel width in NAV mode (Layers, Pages, Components, Settings, History). */
-export const SIDEBAR_W = 240;
-
 /**
- * Left sidebar panel width in AUTHORING mode (Add, Templates, Media, Build).
+ * Left sidebar drawer width — ONE width for every panel.
  * Converged 2026-07-24 (founder-approved): LayoutShell.css `--layout-drawer-width`
- * now sources `--buildrick-size-drawer` (320), matching this + Figma 32-2 drawer.
+ * sources `--bk-size-drawer` (320), matching this + Figma 32-2 drawer.
+ * A `SIDEBAR_W = 240` "nav mode" companion sat here until 2026-08-03 with zero
+ * consumers — only its own assertion in layout.test.ts kept it alive. The
+ * two-width rule it encoded left DESIGN.md's §Sidebar table the same day.
  */
 export const SIDEBAR_WIDE = 320;
 

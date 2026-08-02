@@ -6,9 +6,9 @@ import { describe, it, expect } from "vitest";
 import * as layout from "../layout";
 
 describe("layout.ts SSOT", () => {
-  it("exports 11 named dimension constants", () => {
+  it("exports 10 named dimension constants", () => {
     const expected = [
-      "RAIL_W", "SIDEBAR_W", "SIDEBAR_WIDE", "INSPECTOR_W",
+      "RAIL_W", "SIDEBAR_WIDE", "INSPECTOR_W",
       "TOPBAR_H", "HEADER_H", "TOOLBAR_H", "FOOTER_H",
       "ROW_SM", "ROW_MD", "ROW_LG",
     ];
@@ -20,7 +20,6 @@ describe("layout.ts SSOT", () => {
 
   it("canonical values match DESIGN.md §Layout", () => {
     expect(layout.RAIL_W).toBe(60);
-    expect(layout.SIDEBAR_W).toBe(240);
     expect(layout.SIDEBAR_WIDE).toBe(320);
     expect(layout.INSPECTOR_W).toBe(300);
     expect(layout.TOPBAR_H).toBe(56);

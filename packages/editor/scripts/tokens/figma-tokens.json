@@ -144,8 +144,9 @@
     "ring-offset": 2
   },
   "$typographyComment": "Mirrors the 11 Figma text styles (ui/* and data/*). Sizes and line heights are named by pixel value for the same reason spacing is.",
+  "$fontComment": "DESIGN.md forbids system fallbacks by name: no system-ui, -apple-system, Roboto, Helvetica, Arial or Segoe UI in ANY stack (anti-slop rule 8). The ui stack shipped with -apple-system, BlinkMacSystemFont and Segoe UI until 2026-08-03 — a component was being corrected for exactly that stack while the canonical token carried it. If a Figma re-export reintroduces them, fix the Figma text style rather than re-adding them here.",
   "font": {
-    "ui": "\"Inter\", \"Inter Tight\", -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+    "ui": "\"Inter\", \"Inter Tight\", sans-serif",
     "mono": "\"Geist Mono\", \"SF Mono\", Menlo, Consolas, monospace"
   },
   "text": {

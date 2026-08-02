@@ -123,9 +123,17 @@ If you are tempted to reach for black for emphasis, use `--accent` (cobalt) inst
 **Canonical CSS (editor chrome):**
 
 ```css
---buildrick-font-family: "Inter", "Inter Tight", "Geist", sans-serif;  /* Inter Tight = transition fallback only */
---buildrick-font-family-mono: "Geist Mono", "SF Mono", Menlo, monospace;
+/* Generated from Figma — src/themes/tokens.generated.css. Do not hand-edit:
+   change the Figma text style, re-export figma-tokens.json, regenerate. */
+--bk-font-ui:   "Inter", "Inter Tight", sans-serif;   /* Inter Tight = transition fallback only */
+--bk-font-mono: "Geist Mono", "SF Mono", Menlo, Consolas, monospace;
 ```
+
+*(This block named `--buildrick-font-family` until 2026-08-03. That namespace is
+banned — Gate 15 rejects any `--buildrick-*` / `--bd-*` chrome token definition —
+so following the doc produced a build failure. The `ui` stack also carried
+`-apple-system, BlinkMacSystemFont, "Segoe UI"`, which is what the rule directly
+above this block forbids; removed from the token source the same day.)*
 
 **Type ramp (Figma "Type — 11 styles"):** ui/11 caption (11/16, 500) · ui/12 small (12/16) · ui/13 row label (13/20, 400/500) · ui/14 panel title (14/20, 600) · ui/16 heading (16/24, 600, −0.06em) · ui/20 heading lg (20/28, 600) · ui/24 title (24/32, 600) · data/11–13 in Geist Mono. **Weights cap at 600 — no 700 anywhere in chrome.** Editor chrome lives mostly at 12–14. Panel/drawer headers = 11/500 UPPERCASE ink-soft.
 
@@ -260,19 +268,23 @@ same machine with different cargo.
 Original spec listed 8 tabs (Add/Templates/Media/Layers/Pages/Components/Settings/History).
 "Add" renamed to "elements". AI/Build/Publish added since the 2026-04-16 spec.
 
-### Grammar — TabFrame (was PanelShell pre-2026-05)
+### Grammar — panel zones (was TabFrame; PanelShell before that)
 
 ```
-TabFrame
-├── TabFrame.Header    (44px, required)   title · subtitle · actions · close
-├── TabFrame.Toolbar   (36px, optional)   search · filters · primary action
-├── TabFrame.Content   (flex, scrollable) 12px padding · 4px gap rhythm
-└── TabFrame.Footer    (40px, optional)   selection count · batch actions · status
+Panel
+├── PanelHeader        (44px, required)   title · subtitle · actions · close
+├── Toolbar            (36px, optional)   search · filters · primary action
+├── Content            (flex, scrollable) 12px padding · 4px gap rhythm
+└── Footer             (32px, optional)   selection count · batch actions · status
 ```
 
-All tabs compose these four zones. Lives at
-`packages/editor/src/shared/extensions/TabFrame.tsx`. Canonical classnames
-`bd-surface-head__*` (header internals) + `bd-*` tab-specific prefixes.
+**`TabFrame` no longer exists as a component** (it lived at
+`src/shared/extensions/TabFrame.tsx`, deleted 2026-07-28 with `shared/extensions/`).
+The four zones are still the grammar, now composed from `@/editor/chrome-ui`:
+`PanelHeader` (44px, `chrome-ui/PanelHeader.tsx`), `Toolbar` (36px), the panel's
+own scroll container, and `Footer` (32px, `chrome-ui/Footer.tsx`) — drill-in
+panels swap the header for `sidebar/shared/DrillInHeader`. What survives of the
+old name is comments and a few `bd-*` class prefixes.
 
 Pre-2026-05 name `PanelShell` + `ps-*` classes are dead — drained during sidebar
 header canonicalization (commits `0a2410a4`..`f9377302`).
@@ -281,9 +293,13 @@ header canonicalization (commits `0a2410a4`..`f9377302`).
 
 | Width | Mode | Tabs | Purpose |
 |-------|------|------|---------|
-| **240px** | nav | Layers, Pages, Components | Browse a tree / list. Dense. |
-| **320px** | authoring | Add, Publish, History | Drag sources out, read details, scan a timeline. |
+| **320px** | drawer | every drawer panel | One drawer width, one token: `--bk-size-drawer: 320px`. |
 | **Fullpage** | surface | Templates, Media, Settings, Design | Grids, forms, token editors. |
+
+*(A 240px "nav mode" row sat here until 2026-08-03, contradicting §Layout above
+— which already said "Drawer 320px — all six panels" — and the shipped shell,
+which resolves `--layout-drawer-width` from the single 320 token. The matching
+`SIDEBAR_W = 240` constant had no consumers left.)*
 
 ### Row Density
 

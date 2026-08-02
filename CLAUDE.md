@@ -46,7 +46,7 @@ Page → tRPC mutation → Router → Service → Prisma/External API
 - **Editor package root**: `packages/editor/CLAUDE.md` — stack, path aliases, architecture rules (pre-existing node)
 - **Editor engine (headless)**: `packages/editor/src/engine/AGENTS.md` — Composer, history/undo invariants, sanitize boundary
 - **Editor chrome (React UI)**: `packages/editor/src/editor/AGENTS.md` — canvas mount model, DS gates, orphan-CSS traps
-- **Vibcoder (component library)**: `packages/editor/src/editor/shared/vibcoder/AGENTS.md` — primitive contracts, CSS bundle rules
+- **Editor chrome library**: `packages/editor/CLAUDE.md` §Chrome Routing Rules — `chrome-ui/` is the single import surface; `flowbite-react` may not be imported directly outside it. (This entry pointed at `shared/vibcoder/AGENTS.md` until 2026-08-03; vibcoder was deleted 2026-07-28 and its ratchet is locked at 0.)
 
 ### Global Invariants
 
@@ -138,7 +138,7 @@ In QA mode, flag any code that doesn't match DESIGN.md — especially: purple/vi
 Key constraints:
 - Editor chrome uses the canonical light theme per DESIGN.md (see Color / Token Namespace Contract sections). Desktop-only. Dark-only direction was flipped 2026-04-18 in the theme unification.
 - Single accent color: `#1A56DB` (Flowbite blue-700, hover `#1E429F`; migrated 2026-07-30 from `#406ED6` across dashboard, auth, onboarding — editor already shipped it 2026-07-28; legacy indigo/violet tokens fully drained as of 2026-06-12). One blue everywhere per DESIGN.md.
-- Typography: General Sans (display), Inter Tight or Geist (body/UI), Geist Mono (data). No Arial/Helvetica/Roboto fallbacks.
+- Typography: **Inter** for body/UI everywhere — editor chrome and dashboard (moved off Inter Tight 2026-07-26 with the DS replacement; auth + onboarding still run Inter Tight until their own reskin). General Sans is display, marketing site only. Geist Mono is data, with `tabular-nums`. **No system fallbacks named in any stack** — no `system-ui`, `-apple-system`, `Roboto`, `Helvetica`, `Arial`, `Segoe UI` (DESIGN.md §Typography, anti-slop rule 8). This line said "Inter Tight or Geist" until 2026-08-03.
 - 4px base spacing, compact density.
 - Minimal motion. No spring physics, no scroll choreography.
 

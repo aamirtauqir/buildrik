@@ -158,7 +158,7 @@
 
   /* ── Typography · mirrors the 11 Figma text styles ────────────── */
 
-  --bk-font-ui: "Inter", "Inter Tight", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --bk-font-ui: "Inter", "Inter Tight", sans-serif;
   --bk-font-mono: "Geist Mono", "SF Mono", Menlo, Consolas, monospace;
 
   --bk-text-11: 11px;
