@@ -195,18 +195,7 @@ const ShortcutBadge: React.FC<{ shortcut: string }> = ({ shortcut }) => {
     .replace(/Alt/g, isMac ? "⌥" : "Alt");
 
   return (
-    <span
-      style={{
-        fontSize: 11,
-        color: "var(--bk-ink-muted)",
-        background: "var(--bk-gray-200)",
-        borderRadius: "var(--bk-radius-sm)",
-        padding: "2px 6px",
-        fontFamily: "var(--bk-font-mono)",
-        whiteSpace: "nowrap",
-        flexShrink: 0,
-      }}
-    >
+    <span className="tw:flex-none tw:whitespace-nowrap tw:px-1.5 tw:py-0.5 tw:rounded tw:bg-gray-200 tw:text-[11px] tw:text-gray-500 tw:[font-family:var(--bk-font-mono)]">
       {display}
     </span>
   );
@@ -330,44 +319,18 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
       {/* Backdrop */}
       <div
         onClick={onClose}
-        style={{
-          position: "fixed",
-          inset: 0,
-          background: "rgba(0,0,0,0.6)",
-          zIndex: "calc(var(--bk-z-modal) - 1)",
-        }}
+        className="tw:fixed tw:inset-0 tw:bg-black/60 tw:[z-index:calc(var(--bk-z-modal)-1)]"
       />
       {/* Panel */}
       <div
-        className="tw:flex tw:flex-col tw:gap-0"
         role="dialog"
         aria-label="Command Palette"
         aria-modal="true"
-        style={{
-          position: "fixed",
-          top: "20%",
-          left: "50%",
-          transform: "translateX(-50%)",
-          width: 560,
-          maxWidth: "90vw",
-          background: "var(--bk-bg-subtle)",
-          border: "1px solid var(--bk-border)",
-          borderRadius: "var(--bk-radius-lg)",
-          boxShadow: "var(--bk-shadow-overlay)",
-          zIndex: "var(--bk-z-modal)",
-          overflow: "hidden",
-        }}
+        className="tw:flex tw:flex-col tw:gap-0 tw:fixed tw:top-1/5 tw:left-1/2 tw:-translate-x-1/2 tw:w-140 tw:max-w-[90vw] tw:overflow-hidden tw:rounded-lg tw:border tw:border-gray-200 tw:bg-[var(--bk-bg-subtle)] tw:[box-shadow:var(--bk-shadow-overlay)] tw:[z-index:var(--bk-z-modal)]"
       >
         {/* Search row */}
         <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            height: 52,
-            padding: "0 16px",
-            gap: 10,
-            borderBottom: "1px solid var(--bk-border)",
-          }}
+          className="tw:flex tw:items-center tw:h-13 tw:px-4 tw:gap-2.5 tw:border-b tw:border-gray-200"
         >
           {/* Search icon */}
           <svg
@@ -380,7 +343,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
             strokeLinecap="round"
             strokeLinejoin="round"
             aria-hidden="true"
-            style={{ flexShrink: 0 }}
+            className="tw:flex-none"
           >
             <circle cx={11} cy={11} r={8} />
             <line x1={21} y1={21} x2={16.65} y2={16.65} />
@@ -393,79 +356,46 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            style={{
-              flex: 1,
-              height: "100%",
-              background: "transparent",
-              border: "none",
-              outline: "none",
-              fontSize: 16,
-              color: "var(--bk-ink)",
-              fontFamily: "inherit",
-            }}
+            className="tw:flex-1 tw:[&_input]:h-full tw:[&_input]:border-0 tw:[&_input]:bg-transparent tw:[&_input]:text-base"
           />
         </div>
 
         {/* Results list */}
         <div
           ref={listRef}
-          style={{
-            maxHeight: 360,
-            overflowY: "auto",
-            scrollbarWidth: "thin",
-            scrollbarColor: "var(--bk-gray-200) transparent",
-          }}
+          className="tw:max-h-90 tw:overflow-y-auto tw:[scrollbar-width:thin] tw:[scrollbar-color:var(--bk-gray-200)_transparent]"
         >
           {displayCommands.length === 0 ? (
             query.trim() ? (
               // Boards 166:45 / 166:51 — a garbage query gets "nothing
               // matches"; a natural-language one gets the AI hand-off with the
               // diff-not-direct-writes explainer. Both route to the AI panel.
-              <div style={{ padding: "14px 16px" }} data-testid="cmdk-no-results">
+              <div className="tw:px-4 tw:py-3.5" data-testid="cmdk-no-results">
                 {query.trim().split(/\s+/).length > 1 ? (
                   <>
-                    <div style={{ fontSize: 13, color: "var(--bk-ink)" }}>
+                    <div className="tw:text-[13px] tw:text-gray-900">
                       That isn&rsquo;t a command — send it to AI?
                     </div>
-                    <div style={{ fontSize: 12, color: "var(--bk-ink-muted)", margin: "6px 0 10px" }}>
+                    <div className="tw:mt-1.5 tw:mb-2.5 tw:text-xs tw:text-gray-500">
                       AI proposes a diff and never writes directly. Apply lands as one undo step.
                     </div>
                   </>
                 ) : (
-                  <div style={{ fontSize: 13, color: "var(--bk-ink)", marginBottom: 10 }}>
+                  <div className="tw:mb-2.5 tw:text-[13px] tw:text-gray-900">
                     Nothing matches &lsquo;{query.trim()}&rsquo;.
                   </div>
                 )}
                 <Button
                   onClick={askAI}
                   data-idx={0}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    padding: "8px 12px",
-                    background: "var(--bk-accent-tint)",
-                    border: "none",
-                    borderRadius: "var(--bk-radius-sm)",
-                    cursor: "pointer",
-                    color: "var(--bk-accent)",
-                    fontSize: 13,
-                    fontWeight: 600,
-                  }}
+                  className="tw:flex tw:items-center tw:gap-2 tw:px-3 tw:py-2 tw:rounded tw:border-0 tw:bg-[var(--bk-accent-tint)] tw:text-[13px] tw:font-semibold tw:text-blue-700"
                 >
                   <span aria-hidden="true">✨</span>
                   {query.trim().split(/\s+/).length > 1 ? "Ask AI ›" : "Ask AI instead ›"}
                 </Button>
               </div>
             ) : (
-              <div
-                style={{
-                  padding: "24px 16px",
-                  textAlign: "center",
-                  color: "var(--bk-ink-muted)",
-                  fontSize: 13,
-                }}
-              >
+              <div className="tw:px-4 tw:py-6 tw:text-center tw:text-[13px] tw:text-gray-500">
                 No commands found
               </div>
             )
@@ -475,17 +405,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
                 <div key={group}>
                   {/* Section header */}
                   <div
-                    style={{
-                      height: 28,
-                      display: "flex",
-                      alignItems: "center",
-                      padding: "0 16px",
-                      fontSize: 11,
-                      textTransform: "uppercase",
-                      letterSpacing: "0.5px",
-                      color: "var(--bk-ink-muted)",
-                      background: "var(--bk-bg-subtle)",
-                    }}
+                    className="tw:flex tw:items-center tw:h-7 tw:px-4 tw:text-[11px] tw:uppercase tw:tracking-[0.5px] tw:text-gray-500 tw:bg-[var(--bk-bg-subtle)]"
                   >
                     {group}
                   </div>
@@ -501,62 +421,24 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
                         onClick={() => runCommand(cmd)}
                         onMouseEnter={() => setSelectedIndex(globalIdx)}
                         aria-disabled={cmd.disabled || undefined}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          width: "100%",
-                          height: 44,
-                          padding: "0 16px",
-                          gap: 10,
-                          background: isSelected
-                            ? "var(--bk-accent-tint)"
-                            : "transparent",
-                          border: "none",
-                          cursor: cmd.disabled ? "default" : "pointer",
-                          opacity: cmd.disabled ? 0.55 : 1,
-                          textAlign: "left",
-                          transition: "background 0.1s",
-                        }}
+                        className={`tw:flex tw:items-center tw:justify-between tw:w-full tw:h-11 tw:px-4 tw:gap-2.5 tw:rounded-none tw:border-0 tw:text-left ${
+                          isSelected ? "tw:bg-[var(--bk-accent-tint)]" : "tw:bg-transparent"
+                        } ${cmd.disabled ? "tw:opacity-55 tw:cursor-default" : ""}`}
                       >
-                        <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
+                        <div className="tw:flex tw:items-center tw:gap-2.5 tw:min-w-0">
                           {cmd.icon && (
                             <span
                               aria-hidden="true"
-                              style={{
-                                width: 16,
-                                height: 16,
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                color: "var(--bk-ink-muted)",
-                                flexShrink: 0,
-                                fontSize: 14,
-                              }}
+                              className="tw:flex tw:flex-none tw:items-center tw:justify-center tw:size-4 tw:text-sm tw:text-gray-500"
                             >
                               {cmd.icon}
                             </span>
                           )}
-                          <span
-                            style={{
-                              fontSize: 14,
-                              color: "var(--bk-ink)",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              whiteSpace: "nowrap",
-                            }}
-                          >
+                          <span className="tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap tw:text-sm tw:text-gray-900">
                             {cmd.label}
                           </span>
                           {cmd.disabled && cmd.disabledReason && (
-                            <span
-                              style={{
-                                fontSize: 11,
-                                color: "var(--bk-ink-muted)",
-                                whiteSpace: "nowrap",
-                                flexShrink: 0,
-                              }}
-                            >
+                            <span className="tw:flex-none tw:whitespace-nowrap tw:text-[11px] tw:text-gray-500">
                               {cmd.disabledReason}
                             </span>
                           )}
@@ -573,16 +455,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
 
         {/* Footer */}
         <div
-          style={{
-            height: 36,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            borderTop: "1px solid var(--bk-border)",
-            fontSize: 11,
-            color: "var(--bk-ink-muted)",
-            gap: 16,
-          }}
+          className="tw:flex tw:items-center tw:justify-center tw:h-9 tw:gap-4 tw:border-t tw:border-gray-200 tw:text-[11px] tw:text-gray-500"
         >
           <span>↑↓ navigate</span>
           <span>↵ run</span>

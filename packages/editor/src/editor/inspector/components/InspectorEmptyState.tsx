@@ -44,16 +44,18 @@ export const InspectorEmptyState: React.FC<InspectorEmptyStateProps> = ({
   // Phase 7: Post-apply state
   if (appliedName) {
     return (
-      <div role="status" aria-live="polite" style={containerStyle}>
-        <div style={appliedBannerStyle}>
-          <h3 style={{ ...titleStyle, color: "var(--bk-success)", marginBottom: 4 }}>Template applied!</h3>
-          <p style={{ ...descriptionStyle, color: "var(--bk-success-tint)", marginBottom: 12 }}>
+      <div role="status" aria-live="polite" className={CONTAINER}>
+        <div className={APPLIED_BANNER}>
+          <h3 className={`${TITLE} tw:mb-1 tw:text-[var(--bk-success)]`}>Template applied!</h3>
+          {/* was color: var(--bk-success-tint) — a BACKGROUND tone used as text,
+              i.e. pale green on pale green. The name was barely readable. */}
+          <p className={`${DESCRIPTION} tw:mb-3 tw:text-gray-900`}>
             {appliedName}
           </p>
           {composer && (
             <Button
               onClick={() => composer.emit(EVENTS.UI_OPEN_DESIGN_PANEL, {})}
-              style={appliedActionStyle}
+              className={APPLIED_ACTION}
               aria-label="Set brand colors in Global Styles"
             >
               Set Brand Colors
@@ -61,32 +63,32 @@ export const InspectorEmptyState: React.FC<InspectorEmptyStateProps> = ({
           )}
         </div>
         {/* Still show default tips below */}
-        <div style={{ ...tipStyle, marginTop: 12 }}>
-          <span style={{ opacity: 0.7 }}>Tip:</span> Click an element to edit its properties
+        <div className={`${TIP} tw:mt-3`}>
+          <span className="tw:opacity-70">Tip:</span> Click an element to edit its properties
         </div>
       </div>
     );
   }
 
   return (
-    <div role="status" aria-live="polite" aria-label="No element selected" style={containerStyle}>
+    <div role="status" aria-live="polite" aria-label="No element selected" className={CONTAINER}>
       {/* Icon */}
-      <div style={iconCircleStyle} aria-hidden="true">
-        <MousePointerClick size={16} strokeWidth={1.5} style={{ opacity: 0.5 }} />
+      <div className={ICON_CIRCLE} aria-hidden="true">
+        <MousePointerClick size={16} strokeWidth={1.5} className="tw:opacity-50" />
       </div>
       {/* Title */}
-      <h3 style={titleStyle}>Nothing Selected</h3>
+      <h3 className={TITLE}>Nothing Selected</h3>
       {/* Description */}
-      <p style={descriptionStyle}>
+      <p className={DESCRIPTION}>
         Click an element on the canvas or use the Layers panel to select and edit properties.
       </p>
       {/* CTA Buttons */}
-      <div style={ctaContainerStyle}>
+      <div className={CTA_STACK}>
         {composer && (
           <>
             <Button
               onClick={() => composer.emit(EVENTS.UI_OPEN_BUILD_PANEL, {})}
-              style={primaryButtonStyle}
+              className={PRIMARY_BTN}
               aria-label="Open Build panel to add elements"
             >
               <svg
@@ -106,7 +108,7 @@ export const InspectorEmptyState: React.FC<InspectorEmptyStateProps> = ({
             </Button>
             <Button
               onClick={() => composer.emit(EVENTS.UI_BROWSE_TEMPLATES, {})}
-              style={secondaryButtonStyle}
+              className={SECONDARY_BTN}
               aria-label="Browse available templates"
             >
               Browse Templates
@@ -115,137 +117,39 @@ export const InspectorEmptyState: React.FC<InspectorEmptyStateProps> = ({
         )}
       </div>
       {/* Keyboard Tips */}
-      <div style={tipStyle}>
-        <span style={{ opacity: 0.7 }}>Tip:</span> Press <Kbd style={kbdStyle}>A</Kbd> to open Build
+      <div className={TIP}>
+        <span className="tw:opacity-70">Tip:</span> Press <Kbd>A</Kbd> to open Build
         panel{" · "}
-        <Kbd style={kbdStyle}>Esc</Kbd> to deselect
+        <Kbd>Esc</Kbd> to deselect
       </div>
     </div>
   );
 };
 
 // ============================================================================
-// STYLES
+// CLASSES
 // ============================================================================
 
-const containerStyle: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  justifyContent: "center",
-  height: "100%",
-  padding: "24px",
-  textAlign: "center",
-  color: "var(--bk-ink-soft)",
-  marginTop: "40px",
-};
-
-const iconCircleStyle: React.CSSProperties = {
-  width: 48,
-  height: 48,
-  borderRadius: "var(--bk-radius-full)",
-  background: "var(--bk-bg-subtle)",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  marginBottom: 16,
-  border: "1px solid var(--bk-bg-subtle)",
-};
-
-const titleStyle: React.CSSProperties = {
-  margin: "0 0 8px 0",
-  fontSize: "14px",
-  fontWeight: 600,
-  color: "var(--bk-ink)",
-};
-
-const descriptionStyle: React.CSSProperties = {
-  margin: 0,
-  fontSize: "13px",
-  lineHeight: 1.5,
-  color: "var(--bk-ink-muted)",
-  maxWidth: "220px",
-};
-
-const ctaContainerStyle: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: "8px",
-  marginTop: "20px",
-  width: "100%",
-  maxWidth: "200px",
-};
-
-const primaryButtonStyle: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  gap: "6px",
-  padding: "8px 16px",
-  background: "var(--bk-accent)",
-  color: "var(--bk-accent-on)",
-  border: "none",
-  borderRadius: "var(--bk-radius-md)",
-  fontSize: "12px",
-  fontWeight: 600,
-  cursor: "pointer",
-  transition: "opacity 0.15s ease",
-};
-
-const secondaryButtonStyle: React.CSSProperties = {
-  padding: "6px 12px",
-  background: "transparent",
-  color: "var(--bk-ink-soft)",
-  border: "none",
-  borderRadius: "4px",
-  fontSize: "12px",
-  fontWeight: 500,
-  cursor: "pointer",
-  textDecoration: "underline",
-  textUnderlineOffset: "2px",
-  transition: "color 0.15s ease",
-};
-
-const tipStyle: React.CSSProperties = {
-  marginTop: 20,
-  padding: "8px 12px",
-  background: "rgba(137, 180, 250, 0.08)",
-  borderRadius: 6,
-  fontSize: "11px",
-  color: "var(--bk-ink-soft)",
-};
-
-const kbdStyle: React.CSSProperties = {
-  display: "inline-block",
-  padding: "2px 6px",
-  background: "var(--bk-border)",
-  borderRadius: 4,
-  fontSize: "10px",
-  fontFamily: "monospace",
-  border: "1px solid var(--bk-border-medium)",
-};
-
-// Phase 7: Post-apply banner styles
-const appliedBannerStyle: React.CSSProperties = {
-  padding: "12px 16px",
-  background: "rgba(74, 222, 128, 0.07)",
-  border: "1px solid rgba(74, 222, 128, 0.2)",
-  borderRadius: 8,
-  textAlign: "center",
-  width: "100%",
-  maxWidth: 220,
-};
-
-const appliedActionStyle: React.CSSProperties = {
-  display: "block",
-  width: "100%",
-  padding: "6px 10px",
-  fontSize: "11px",
-  fontFamily: "inherit",
-  color: "var(--bk-accent)",
-  background: "var(--bk-accent-subtle)",
-  border: "1px solid var(--bk-alpha-accent-15)",
-  borderRadius: 6,
-  cursor: "pointer",
-  textAlign: "center",
-};
+const CONTAINER =
+  "tw:flex tw:flex-col tw:items-center tw:justify-center tw:h-full tw:mt-10 tw:p-6 " +
+  "tw:text-center tw:text-[var(--bk-ink-soft)]";
+const ICON_CIRCLE =
+  "tw:flex tw:items-center tw:justify-center tw:size-12 tw:mb-4 tw:rounded-full " +
+  "tw:border tw:border-[var(--bk-bg-subtle)] tw:bg-[var(--bk-bg-subtle)]";
+const TITLE = "tw:mb-2 tw:text-sm tw:font-semibold tw:text-gray-900";
+const DESCRIPTION = "tw:m-0 tw:max-w-55 tw:text-[13px] tw:leading-normal tw:text-gray-500";
+const CTA_STACK = "tw:flex tw:flex-col tw:gap-2 tw:mt-5 tw:w-full tw:max-w-50";
+const PRIMARY_BTN =
+  "tw:flex tw:items-center tw:justify-center tw:gap-1.5 tw:w-full tw:px-4 tw:py-2 tw:rounded-md " +
+  "tw:border-0 tw:bg-blue-700 tw:text-white tw:text-xs tw:font-semibold tw:hover:bg-blue-800";
+const SECONDARY_BTN =
+  "tw:px-3 tw:py-1.5 tw:rounded tw:border-0 tw:bg-transparent tw:text-xs tw:font-medium " +
+  "tw:text-[var(--bk-ink-soft)] tw:underline tw:underline-offset-2 tw:hover:text-gray-900";
+const TIP = "tw:mt-5 tw:px-3 tw:py-2 tw:rounded-md tw:bg-blue-50 tw:text-[11px] tw:text-[var(--bk-ink-soft)]";
+/** Success banner after a template applies — success tokens, not a hand-mixed green. */
+const APPLIED_BANNER =
+  "tw:w-full tw:max-w-55 tw:px-4 tw:py-3 tw:rounded-lg tw:text-center " +
+  "tw:border tw:border-[var(--bk-success)] tw:bg-[var(--bk-success-tint)]";
+const APPLIED_ACTION =
+  "tw:block tw:w-full tw:px-2.5 tw:py-1.5 tw:rounded-md tw:text-[11px] tw:text-center " +
+  "tw:border tw:border-[var(--bk-alpha-accent-15)] tw:bg-[var(--bk-accent-subtle)] tw:text-blue-700";
