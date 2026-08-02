@@ -4,16 +4,32 @@ import { render, fireEvent } from "@testing-library/react";
 import * as React from "react";
 import type { UsePublishJobResult } from "../../../../shell/hooks/usePublishJob";
 
+/**
+ * Only `useToast` is stubbed, and only for what this file renders directly.
+ *
+ * `ToastProvider` used to be stubbed here too, as `({children}) => children` —
+ * a provider that provides nothing. That is a landmine, not a shortcut: any
+ * chrome-ui component that reaches toast through its own internal import
+ * (`chrome-ui/Toast`, not the barrel) misses the barrel mock, finds no context,
+ * and `useToast` throws. CopyButton is the first component to hit it. The real
+ * provider is used below instead, so the context genuinely exists.
+ */
 vi.mock("@/editor/chrome-ui", async () => {
   const actual = await vi.importActual<Record<string, unknown>>("@/editor/chrome-ui");
   return {
     ...actual,
     useToast: () => ({ addToast: vi.fn(), removeToast: vi.fn(), toasts: [] }),
-    ToastProvider: ({ children }: { children: React.ReactNode }) => children,
   };
 });
 
+import { ToastProvider } from "@/editor/chrome-ui";
 import { PublishTab } from "../PublishTab";
+
+/** The real provider, so chrome-ui components that reach toast through their
+ *  own internal import find a context instead of throwing. */
+function renderTab(ui: React.ReactElement) {
+  return render(<ToastProvider>{ui}</ToastProvider>);
+}
 
 const composer = {
   getProjectSettings: () => ({ seo: { metaTitle: "T", metaDescription: "D", ogImage: "img.png" } }),
@@ -31,7 +47,7 @@ function makeJob(over: Partial<UsePublishJobResult> = {}): UsePublishJobResult {
 
 describe("PublishTab SEO readiness", () => {
   it("shows SEO checks as true when settings are present", () => {
-    const { container } = render(<PublishTab composer={composer} />);
+    const { container } = renderTab(<PublishTab composer={composer} />);
     expect(container.textContent).toContain("SEO title set");
     expect(container.textContent).toContain("Meta description added");
   });
@@ -39,13 +55,13 @@ describe("PublishTab SEO readiness", () => {
 
 describe("PublishTab — canonical publish wiring (B1)", () => {
   it("shows 'not configured' when no canonical handler is wired (flag off / inert)", () => {
-    const { container } = render(<PublishTab composer={composer} publishJob={makeJob()} />);
+    const { container } = renderTab(<PublishTab composer={composer} publishJob={makeJob()} />);
     expect(container.textContent).toContain("Publishing not configured");
   });
 
   it("enables Publish and fires the canonical handler when wired", () => {
     const onVercelPublish = vi.fn().mockResolvedValue(undefined);
-    const { getByText } = render(
+    const { getByText } = renderTab(
       <PublishTab composer={composer} publishJob={makeJob()} onVercelPublish={onVercelPublish} />
     );
     const btn = getByText("Publish Site");
@@ -54,7 +70,7 @@ describe("PublishTab — canonical publish wiring (B1)", () => {
   });
 
   it("reflects the canonical 'publishing' state (no second state machine)", () => {
-    const { container } = render(
+    const { container } = renderTab(
       <PublishTab composer={composer} publishJob={makeJob({ uiState: "publishing", progress: 40 })} onVercelPublish={vi.fn()} />
     );
     expect(container.textContent).toContain("Publishing...");
@@ -62,7 +78,7 @@ describe("PublishTab — canonical publish wiring (B1)", () => {
   });
 
   it("shows the published URL + Update label from canonical state", () => {
-    const { container, getByText } = render(
+    const { container, getByText } = renderTab(
       <PublishTab composer={composer} publishJob={makeJob({ uiState: "published", publishedUrl: "https://x.vercel.app" })} onVercelPublish={vi.fn()} />
     );
     expect(getByText("Update Site")).toBeTruthy();
@@ -72,7 +88,7 @@ describe("PublishTab — canonical publish wiring (B1)", () => {
   // codex review P2: a FAILED republish of an already-live site must NOT read
   // as Draft — live-state is durable (publishedUrl), not the transient job state.
   it("stays 'published' (Update) after a failed republish while a deployment is still live", () => {
-    const { getByText, queryByText } = render(
+    const { getByText, queryByText } = renderTab(
       <PublishTab composer={composer} publishJob={makeJob({ uiState: "failed", publishedUrl: "https://x.vercel.app", error: "deploy failed" })} onVercelPublish={vi.fn()} />
     );
     expect(getByText("Update Site")).toBeTruthy();

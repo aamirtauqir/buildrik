@@ -9,7 +9,7 @@
  */
 
 import * as React from "react";
-import { PanelFrame, useToast, Button } from "@/editor/chrome-ui";
+import { CopyButton, PanelFrame, Button } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import type { UsePublishJobResult } from "../../../shell/hooks/usePublishJob";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
@@ -56,30 +56,16 @@ export interface PublishTabProps {
 const StatusBadge: React.FC<{ isPublished: boolean }> = ({ isPublished }) => (
   <span
     aria-label={`Publication status: ${isPublished ? "Published" : "Draft"}`}
-    style={{
-      display: "inline-flex",
-      alignItems: "center",
-      gap: 6,
-      padding: "4px 10px",
-      borderRadius: "var(--bk-radius-full)",
-      fontSize: "var(--bk-text-11, 12px)",
-      fontWeight: 600,
-      letterSpacing: "0.02em",
-      background: isPublished
-        ? "var(--bk-success-tint, rgba(34, 197, 94, 0.12))"
-        : "rgba(245, 158, 11, 0.15)",
-      color: isPublished ? "var(--bk-success)" : "var(--bk-warning)",
-    }}
+    className={[
+      "tw:inline-flex tw:items-center tw:gap-1.5 tw:px-2.5 tw:py-1 tw:rounded-full",
+      "tw:text-xs tw:font-semibold tw:tracking-[0.02em]",
+      isPublished
+        ? "tw:bg-[var(--bk-success-tint)] tw:text-[var(--bk-success)]"
+        : "tw:bg-[var(--bk-warning-tint)] tw:text-[var(--bk-warning)]",
+    ].join(" ")}
   >
     <span
-      style={{
-        width: 6,
-        height: 6,
-        borderRadius: "var(--bk-radius-full)",
-        background: isPublished
-          ? "var(--bk-success)"
-          : "var(--bk-warning)",
-      }}
+      className={`tw:size-1.5 tw:rounded-full ${isPublished ? "tw:bg-[var(--bk-success)]" : "tw:bg-[var(--bk-warning)]"}`}
     />
     {isPublished ? "Published" : "Draft"}
   </span>
@@ -92,32 +78,21 @@ const ChecklistItem: React.FC<{
   hint?: string;
 }> = ({ label, ok, required, hint }) => (
   <div
-    style={{
-      display: "flex",
-      alignItems: "center",
-      gap: 8,
-      padding: "6px 8px",
-      borderRadius: 6,
-      background: ok ? "rgba(34,197,94,0.06)" : "rgba(255,255,255,0.02)",
-      border: `1px solid ${ok ? "rgba(34,197,94,0.15)" : "var(--bk-border, var(--bk-border))"}`,
-      fontSize: 13,
-    }}
+    className={[
+      "tw:flex tw:items-center tw:gap-2 tw:px-2 tw:py-1.5 tw:rounded-md tw:border tw:text-[13px]",
+      ok
+        ? "tw:bg-[var(--bk-success-tint)] tw:border-green-200"
+        : "tw:bg-transparent tw:border-gray-200",
+    ].join(" ")}
     aria-label={`${label}: ${ok ? "complete" : "incomplete"}`}
   >
-    {/* 16×16 checkbox — filled with success color when checked */}
+    {/* 16x16 checkbox — filled with success colour when checked */}
     <span
-      style={{
-        width: 16,
-        height: 16,
-        borderRadius: "var(--bk-radius-sm)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background: ok ? "var(--bk-success)" : "transparent",
-        border: ok ? "none" : "1px solid var(--bk-border, var(--bk-border))",
-        flexShrink: 0,
-        transition: "background 0.15s",
-      }}
+      className={[
+        "tw:size-4 tw:rounded-sm tw:flex tw:items-center tw:justify-center tw:flex-none",
+        "tw:[transition:var(--bk-transition-fast)]",
+        ok ? "tw:bg-[var(--bk-success)] tw:border-0" : "tw:bg-transparent tw:border tw:border-gray-200",
+      ].join(" ")}
       aria-hidden="true"
     >
       {ok && (
@@ -127,67 +102,36 @@ const ChecklistItem: React.FC<{
       )}
     </span>
     <span
-      style={{
-        flex: 1,
-        color: ok ? "var(--bk-ink-muted)" : "var(--bk-ink-soft)",
-        textDecoration: ok ? "line-through" : "none",
-        fontSize: 13,
-      }}
+      className={`tw:flex-1 tw:text-[13px] ${ok ? "tw:text-gray-500 tw:line-through" : "tw:text-[var(--bk-ink-soft)] tw:no-underline"}`}
     >
       {label}
     </span>
     {required && !ok && (
-      <span style={{ fontSize: 12, color: "var(--bk-error)", fontWeight: 500 }}>Required</span>
+      <span className="tw:text-xs tw:font-medium tw:text-[var(--bk-error)]">Required</span>
     )}
-    {hint && !ok && (
-      <span style={{ fontSize: 12, color: "var(--bk-ink-muted)" }}>{hint}</span>
-    )}
+    {hint && !ok && <span className="tw:text-xs tw:text-gray-500">{hint}</span>}
   </div>
 );
 
-const UrlDisplay: React.FC<{ url: string }> = ({ url }) => {
-  const { addToast } = useToast();
-  const handleCopy = () => {
-    navigator.clipboard
-      .writeText(url)
-      .then(() => {
-        addToast?.({ description: "URL copied to clipboard", tone: "success", duration: 2000 });
-      })
-      .catch(() => {
-        addToast?.({ description: "Failed to copy URL", tone: "error" });
-      });
-  };
-
-  return (
-    <div style={urlContainerStyles}>
-      <label style={labelStyles}>Published URL</label>
-      <div style={urlRowStyles}>
-        <a href={url} target="_blank" rel="noopener noreferrer" style={urlLinkStyles} title={url}>
-          {url.replace(/^https?:\/\//, "")}
-        </a>
-        <Button
-          onClick={handleCopy}
-          style={copyButtonStyles}
-          title="Copy URL"
-          aria-label="Copy published URL"
-        >
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            aria-hidden="true"
-          >
-            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-          </svg>
-        </Button>
-      </div>
+const UrlDisplay: React.FC<{ url: string }> = ({ url }) => (
+  <div className="tw:flex tw:flex-col">
+    <label className={LABEL}>Published URL</label>
+    <div className="tw:flex tw:items-center tw:gap-1.5 tw:px-2 tw:py-1.5 tw:bg-gray-50 tw:rounded tw:border tw:border-gray-200">
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="tw:flex-1 tw:text-xs tw:text-blue-700 tw:no-underline tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap"
+        title={url}
+      >
+        {url.replace(/^https?:\/\//, "")}
+      </a>
+      {/* chrome-ui's CopyButton owns the clipboard write, the copied-state
+          checkmark and the toast. This file had its own copy of all three. */}
+      <CopyButton content={url} label="" aria-label="Copy published URL" />
     </div>
-  );
-};
+  </div>
+);
 
 // ============================================
 // Main Component
@@ -294,28 +238,28 @@ export const PublishTab: React.FC<PublishTabProps> = ({
         onHelpClick={onHelpClick}
         onClose={onClose}
       />
-      <div style={contentStyles}>
+      <div className={CONTENT}>
         {/* Status Section */}
-        <section style={sectionStyles}>
-          <div style={sectionHeaderStyles}>
-            <h3 style={sectionTitleStyles}>Status</h3>
+        <section className={SECTION}>
+          <div className="tw:flex tw:items-center tw:justify-between">
+            <h3 className={SECTION_TITLE}>Status</h3>
             <StatusBadge isPublished={isPublished} />
           </div>
           {isPublishing && publishJob && publishJob.progress > 0 && (
-            <p style={metaTextStyles}>Publishing… {publishJob.progress}%</p>
+            <p className={META}>Publishing… {publishJob.progress}%</p>
           )}
         </section>
 
         {/* Published URL */}
         {isPublished && publishedUrl && (
-          <section style={sectionStyles}>
+          <section className={SECTION}>
             <UrlDisplay url={publishedUrl} />
           </section>
         )}
 
         {/* Pre-Publish Checklist */}
-        <section style={sectionStyles}>
-          <h3 style={sectionTitleStyles}>Pre-publish checklist</h3>
+        <section className={SECTION}>
+          <h3 className={SECTION_TITLE}>Pre-publish checklist</h3>
           <div className="tw:flex tw:flex-col tw:gap-2">
             <ChecklistItem label="Page title set" ok={checks.hasPageTitle} hint="Settings → Site" />
             <ChecklistItem label="Favicon uploaded" ok={checks.hasFavicon} hint="Settings → Site" />
@@ -326,32 +270,24 @@ export const PublishTab: React.FC<PublishTabProps> = ({
             <ChecklistItem label="Social share image" ok={checks.hasSocialImg} hint="Pages → SEO" />
           </div>
           {projectId && (
-            <p style={{ ...metaTextStyles, marginTop: 4 }}>
-              Publishing to <strong style={{ color: "var(--bk-ink)" }}>your connected Vercel project</strong>
+            <p className={`${META} tw:mt-1`}>
+              Publishing to <strong className="tw:text-gray-900">your connected Vercel project</strong>
             </p>
           )}
         </section>
 
         {/* Trust signal */}
-        <div style={trustBadgeStyles}>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" style={{ flexShrink: 0, color: "var(--bk-success)" }}>
+        <div className="tw:flex tw:items-center tw:gap-1.5 tw:px-2.5 tw:py-[7px] tw:bg-[var(--bk-success-tint)] tw:rounded-lg tw:border tw:border-green-200 tw:text-xs tw:text-gray-500 tw:leading-snug">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" className="tw:flex-none tw:text-[var(--bk-success)]">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
           </svg>
           <span>Your site data is encrypted and stored securely.</span>
         </div>
 
         {/* Actions */}
-        <section style={sectionStyles}>
+        <section className={SECTION}>
           {!canPublish ? (
-            <div style={{
-              padding: "12px",
-              background: "rgba(245, 158, 11, 0.08)",
-              border: "1px solid rgba(245, 158, 11, 0.2)",
-              borderRadius: "var(--bk-radius-lg)",
-              fontSize: 12,
-              color: "var(--bk-ink-soft)",
-              lineHeight: 1.5,
-            }}>
+            <div className="tw:p-3 tw:bg-[var(--bk-warning-tint)] tw:border tw:border-yellow-200 tw:rounded-lg tw:text-xs tw:text-[var(--bk-ink-soft)] tw:leading-normal">
               Publishing not configured. Contact your administrator to link this project.
             </div>
           ) : (
@@ -359,12 +295,12 @@ export const PublishTab: React.FC<PublishTabProps> = ({
               <Button
                 onClick={handlePublish}
                 disabled={isPublishing}
-                style={{ width: "100%" }}
+                className="tw:w-full"
               >
                 {isPublishing ? (isPublished ? "Updating..." : "Publishing...") : isPublished ? "Update Site" : "Publish Site"}
               </Button>
               {isPublishing && (
-                <p style={disabledReasonStyles}>
+                <p className="tw:m-0 tw:text-[11px] tw:text-gray-500 tw:leading-[1.4]">
                   {isPublished ? "Update" : "Publishing"} in progress — please wait.
                 </p>
               )}
@@ -373,11 +309,11 @@ export const PublishTab: React.FC<PublishTabProps> = ({
         </section>
 
         {/* Info Section */}
-        <section style={infoSectionStyles}>
+        <section className="tw:flex tw:gap-3 tw:p-3 tw:bg-[var(--bk-accent-tint)] tw:rounded-lg tw:border tw:border-[var(--bk-accent-subtle)]">
           <RocketIcon />
           <div>
-            <p style={infoTitleStyles}>{isPublished ? "Your site is live" : "Ready to go live?"}</p>
-            <p style={infoDescStyles}>
+            <p className={SECTION_TITLE}>{isPublished ? "Your site is live" : "Ready to go live?"}</p>
+            <p className="tw:mt-1 tw:mb-0 tw:text-xs tw:leading-normal tw:text-[var(--bk-ink-soft)]">
               {isPublished
                 ? "Changes made after publishing require an update to go live."
                 : "Complete the checklist above, then hit Publish to make your site public."}
@@ -387,9 +323,18 @@ export const PublishTab: React.FC<PublishTabProps> = ({
 
         {/* Error display */}
         {error && (
-          <div style={errorStyles} role="alert">
+          <div
+            className="tw:flex tw:items-center tw:justify-between tw:gap-2 tw:px-3 tw:py-2 tw:bg-[var(--bk-error-tint)] tw:rounded-lg tw:border tw:border-red-200 tw:text-[var(--bk-error)] tw:text-xs"
+            role="alert"
+          >
             <span>{error}</span>
-            <Button onClick={() => publishJob?.reset?.()} style={errorDismissStyles} aria-label="Dismiss error">
+            <Button
+              color="light"
+              size="xs"
+              onClick={() => publishJob?.reset?.()}
+              aria-label="Dismiss error"
+              className="tw:border-transparent tw:bg-transparent tw:text-current tw:flex-none tw:p-0 tw:size-5"
+            >
               <svg
                 width="12"
                 height="12"
@@ -407,19 +352,19 @@ export const PublishTab: React.FC<PublishTabProps> = ({
 
         {/* P1: published-version history + rollback (contract §5) */}
         {projectId && (
-          <section style={sectionStyles}>
+          <section className={SECTION}>
             <PublishHistory siteId={projectId} onRollbackStarted={() => publishJob?.reset?.()} />
           </section>
         )}
       </div>
       {/* Privacy & Terms footer */}
-      <div style={privacyFooterStyles}>
+      <div className="tw:px-4 tw:py-2.5 tw:border-t tw:border-gray-200 tw:text-xs tw:leading-normal tw:text-gray-500 tw:text-center">
         By publishing, your site is deployed to your connected Vercel account.{" "}
-        <a href={`${DASHBOARD_URL}/privacy`} target="_blank" rel="noopener noreferrer" style={privacyLinkStyles}>
+        <a href={`${DASHBOARD_URL}/privacy`} target="_blank" rel="noopener noreferrer" className="tw:text-blue-700 tw:no-underline">
           Privacy policy
         </a>
         {" · "}
-        <a href={`${DASHBOARD_URL}/terms`} target="_blank" rel="noopener noreferrer" style={privacyLinkStyles}>
+        <a href={`${DASHBOARD_URL}/terms`} target="_blank" rel="noopener noreferrer" className="tw:text-blue-700 tw:no-underline">
           Terms of service
         </a>
       </div>
@@ -439,7 +384,7 @@ const RocketIcon: React.FC = () => (
     fill="none"
     stroke="var(--bk-accent)"
     strokeWidth="1.5"
-    style={{ flexShrink: 0, marginTop: 2 }}
+    className="tw:flex-none tw:mt-0.5"
     aria-hidden="true"
   >
     <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
@@ -450,176 +395,13 @@ const RocketIcon: React.FC = () => (
 );
 
 // ============================================
-// Styles
+// Classes
 // ============================================
 
-const contentStyles: React.CSSProperties = {
-  flex: 1,
-  overflowY: "auto",
-  padding: 16,
-  display: "flex",
-  flexDirection: "column",
-  gap: 16,
-};
-
-const sectionStyles: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: 8,
-  padding: 12,
-  background: "var(--bk-bg-subtle)",
-  borderRadius: "var(--bk-radius-lg)",
-  border: "1px solid var(--bk-border)",
-};
-
-const sectionHeaderStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-};
-
-const sectionTitleStyles: React.CSSProperties = {
-  margin: 0,
-  fontSize: "var(--bk-text-12, 13px)",
-  fontWeight: 600,
-  color: "var(--bk-ink)",
-};
-
-const metaTextStyles: React.CSSProperties = {
-  margin: 0,
-  fontSize: "var(--bk-text-11, 12px)",
-  color: "var(--bk-ink-muted)",
-};
-
-const labelStyles: React.CSSProperties = {
-  fontSize: "var(--bk-text-11, 12px)",
-  fontWeight: 500,
-  color: "var(--bk-ink-soft)",
-  marginBottom: 4,
-};
-
-const urlContainerStyles: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-};
-
-const urlRowStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: 6,
-  padding: "6px 8px",
-  background: "var(--bk-bg-subtle)",
-  borderRadius: "var(--bk-radius-sm)",
-  border: "1px solid var(--bk-border)",
-};
-
-const urlLinkStyles: React.CSSProperties = {
-  flex: 1,
-  fontSize: "var(--bk-text-11, 12px)",
-  color: "var(--bk-accent)",
-  textDecoration: "none",
-  overflow: "hidden",
-  textOverflow: "ellipsis",
-  whiteSpace: "nowrap",
-};
-
-const copyButtonStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  width: 24,
-  height: 24,
-  padding: 0,
-  background: "transparent",
-  border: "none",
-  borderRadius: "var(--bk-radius-sm)",
-  color: "var(--bk-ink-soft)",
-  cursor: "pointer",
-  flexShrink: 0,
-};
-
-const disabledReasonStyles: React.CSSProperties = {
-  margin: 0,
-  fontSize: 11,
-  color: "var(--bk-ink-muted)",
-  lineHeight: 1.4,
-};
-
-const infoSectionStyles: React.CSSProperties = {
-  display: "flex",
-  gap: 12,
-  padding: 12,
-  background: "var(--bk-accent-tint)",
-  borderRadius: "var(--bk-radius-lg)",
-  border: "1px solid var(--bk-accent-subtle)",
-};
-
-const infoTitleStyles: React.CSSProperties = {
-  margin: 0,
-  fontSize: "var(--bk-text-12, 13px)",
-  fontWeight: 600,
-  color: "var(--bk-ink)",
-};
-
-const infoDescStyles: React.CSSProperties = {
-  margin: "4px 0 0",
-  fontSize: "var(--bk-text-11, 12px)",
-  lineHeight: 1.5,
-  color: "var(--bk-ink-soft)",
-};
-
-const errorStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-  gap: 8,
-  padding: "8px 12px",
-  background: "var(--bk-error-tint, rgba(239, 68, 68, 0.1))",
-  borderRadius: "var(--bk-radius-lg)",
-  border: "1px solid var(--bk-error-tint, rgba(239, 68, 68, 0.2))",
-  color: "var(--bk-error)",
-  fontSize: "var(--bk-text-11, 12px)",
-};
-
-const errorDismissStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  width: 20,
-  height: 20,
-  padding: 0,
-  background: "transparent",
-  border: "none",
-  color: "inherit",
-  cursor: "pointer",
-  flexShrink: 0,
-};
-
-const trustBadgeStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: 6,
-  padding: "7px 10px",
-  background: "rgba(34, 197, 94, 0.06)",
-  borderRadius: "var(--bk-radius-lg)",
-  border: "1px solid rgba(34, 197, 94, 0.15)",
-  fontSize: 12,
-  color: "var(--bk-ink-muted)",
-  lineHeight: 1.4,
-};
-
-const privacyFooterStyles: React.CSSProperties = {
-  padding: "10px 16px",
-  borderTop: "1px solid var(--bk-border)",
-  fontSize: 12,
-  lineHeight: 1.5,
-  color: "var(--bk-ink-muted)",
-  textAlign: "center",
-};
-
-const privacyLinkStyles: React.CSSProperties = {
-  color: "var(--bk-accent)",
-  textDecoration: "none",
-};
+const CONTENT = "tw:flex-1 tw:overflow-y-auto tw:p-4 tw:flex tw:flex-col tw:gap-4";
+const SECTION = "tw:flex tw:flex-col tw:gap-2 tw:p-3 tw:bg-gray-50 tw:rounded-lg tw:border tw:border-gray-200";
+const SECTION_TITLE = "tw:m-0 tw:text-[13px] tw:font-semibold tw:text-gray-900";
+const META = "tw:m-0 tw:text-xs tw:text-gray-500";
+const LABEL = "tw:text-xs tw:font-medium tw:text-[var(--bk-ink-soft)] tw:mb-1";
 
 export default PublishTab;
