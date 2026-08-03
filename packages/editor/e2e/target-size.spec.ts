@@ -41,6 +41,9 @@ const CASES = [
   "folder-context-menu",
   "onboarding-steps",
   "canvas-footer-toolbar",
+  // T2: the shared drawer header carries pin / help / close on every one of the
+  // seven drawers, so a regression here is a regression seven times over.
+  "panel-frame-header",
 ] as const;
 
 /**

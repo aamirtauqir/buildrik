@@ -31,6 +31,7 @@ import { CollectionView, FieldsView, RootView } from "@/editor/sidebar/tabs/cont
 import { FolderContextMenu } from "@/editor/sidebar/tabs/media/components/FolderContextMenu";
 import { OnboardingChecklist } from "@/editor/onboarding/OnboardingChecklist";
 import { CanvasFooterToolbar } from "@/editor/canvas/CanvasFooterToolbar";
+import { PanelFrame } from "@/editor/chrome-ui";
 
 /** Every case renders into `.bd-studio` so chrome-scoped CSS applies. */
 const CASES: Record<string, () => React.ReactElement> = {
@@ -162,6 +163,38 @@ const CASES: Record<string, () => React.ReactElement> = {
         onOpenVariables={() => {}}
         onOpenConditions={() => {}}
       />
+    </div>
+  ),
+  /**
+   * T2 — the component all seven drawers share, and the one nothing measured.
+   *
+   * `8160d7d3` moved every drawer header to 11px UPPERCASE with 0.08em
+   * tracking. No probe case rendered it, and `TRACKED` did not carry
+   * `text-transform` until T1, so the property the header decision turns on was
+   * invisible to every instrument in the repo. This case plus those two
+   * properties is what makes T3's reversal to Title Case a visible change
+   * rather than a silent one.
+   *
+   * The subtitle is not decoration here: `PanelFrame.tsx:88` re-normalises case
+   * and tracking for it (`tw:normal-case tw:tracking-normal`), so a case
+   * without one would measure the header's treatment and miss the exception
+   * sitting inside it.
+   */
+  "panel-frame-header": () => (
+    <div data-probe="panel-frame-header">
+      <PanelFrame>
+        <PanelFrame.Header
+          title="Media"
+          subtitle="53 blocks · 6 categories"
+          isPinned={false}
+          onPinToggle={() => {}}
+          onHelpClick={() => {}}
+          onClose={() => {}}
+        />
+        <PanelFrame.Body>
+          <div />
+        </PanelFrame.Body>
+      </PanelFrame>
     </div>
   ),
 };
