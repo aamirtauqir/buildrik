@@ -383,6 +383,39 @@ const resetState = async () => {
   await page.waitForTimeout(150);
 };
 
+/**
+ * SCREENSHOTS — captured for every target, every run, not only on failure.
+ *
+ * The browser is open here and nowhere else: diff.mjs runs later, against JSON,
+ * with no page to photograph. Capturing on demand would mean booting a second
+ * browser and re-driving the surface, which is slower AND measures a different
+ * render than the one that produced the numbers. Five small PNGs per surface is
+ * the cheaper trade.
+ *
+ * Code side only. The Figma half of a side-by-side needs an MCP call, which CI
+ * cannot make (see README §"Why extraction is an agent step"), so diff.mjs
+ * prints the board nodeId instead and a local run can fetch it. Committing
+ * reference PNGs was considered and rejected: they would be a second artifact
+ * that goes stale silently, which is the failure this harness exists to stop.
+ */
+const SHOT_DIR = join(OUT_DIR, surfaceId);
+mkdirSync(SHOT_DIR, { recursive: true });
+const shots = {};
+try {
+  await page.screenshot({ path: join(SHOT_DIR, "__surface.png") });
+  shots.__surface = join(surfaceId, "__surface.png");
+  for (const t of recipe.targets ?? []) {
+    const sel = refToSelector(t, `target ${t.name}`);
+    const file = `${t.name.replace(/[^a-z0-9-]/gi, "_")}.png`;
+    await page.locator(sel).screenshot({ path: join(SHOT_DIR, file) });
+    shots[t.name] = join(surfaceId, file);
+  }
+} catch (err) {
+  // A screenshot failing must not lose the measurement — the numbers are the
+  // point, the picture is the convenience.
+  console.error(`[measure] screenshot capture incomplete: ${err.message.split("\n")[0]}`);
+}
+
 const baseline = await readAll();
 const states = {};
 for (const st of recipe.states ?? []) {
@@ -429,6 +462,7 @@ const out = {
   measuredAt: new Date().toISOString(),
   ...baseline,
   states,
+  shots,
 };
 const outPath = join(OUT_DIR, `${surfaceId}.json`);
 writeFileSync(outPath, JSON.stringify(out, null, 2));

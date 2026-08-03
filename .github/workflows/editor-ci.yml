@@ -251,4 +251,5 @@ jobs:
           path: |
             packages/editor/playwright-report/
             packages/editor/test-results/
+            packages/editor/scripts/conformance/measured/
           retention-days: 7

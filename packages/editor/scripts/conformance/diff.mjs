@@ -188,6 +188,24 @@ if (fails.length) {
       console.log(`      ${pad(f.target, 20)} figma ${f.expected}  code ${f.actual}${f.delta != null ? `  (off by ${f.delta})` : ""}`);
     }
   }
+
+  // Point at what failed, so the report is legible rather than a number pair.
+  // Code side is a real file measure.mjs captured while the browser was open.
+  // Figma side is a node reference — fetching the board image needs an MCP call
+  // CI cannot make, so a local run pulls it and CI names it.
+  const failedTargets = [...new Set(fails.map((f) => f.target))];
+  console.log(`\nEVIDENCE`);
+  for (const name of failedTargets) {
+    const shot = measured.shots?.[name];
+    const row = fails.find((f) => f.target === name);
+    console.log(`  ${name}`);
+    console.log(`    rendered  ${shot ? join(MEASURED, shot) : "(no screenshot captured)"}`);
+    console.log(`    board     ${measured.board ?? "?"}  node ${row.nodeId}`);
+    console.log(`    open      https://figma.com/design/${specCache.get(recipe.targets.find((t) => t.name === name)?.spec)?.fileKey ?? ""}?node-id=${String(row.nodeId).replace(":", "-")}`);
+  }
+  if (measured.shots?.__surface) {
+    console.log(`  whole surface  ${join(MEASURED, measured.shots.__surface)}`);
+  }
 }
 
 // ── SKIPPED baseline: coverage may grow, never shrink ─────────────────────
