@@ -160,7 +160,16 @@ harness works at all.**
 
 ### 2.1 — Two-step extraction
 
-Node cannot call the Figma MCP — `conformance/README.md:14` says so. So:
+**Corrected 2026-08-03.** This step used to say "node cannot call the Figma MCP,
+`conformance/README.md:14` says so." That was wrong and unverified. The MCP is a
+remote HTTP endpoint (`https://mcp.figma.com/mcp`, streamable-http) that node can
+reach with `fetch`; it answers 401 with `www-authenticate: Bearer
+scope="mcp:connect"`. The blocker is OAuth, not transport: the token comes from an
+interactive browser flow and lives in the macOS Keychain under
+`Claude Code-credentials`. So a local script could only authenticate by reading
+Claude Code's private credential store, and CI has neither a keychain nor an
+interactive flow. Extraction stays an agent step for those reasons. Full write-up
+in `scripts/conformance/README.md` § "Why extraction is an agent step". So:
 
 ```
 step 1 (agent, local)    get_design_context(nodeId)
