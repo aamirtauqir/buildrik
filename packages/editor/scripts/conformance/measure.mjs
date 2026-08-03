@@ -68,16 +68,79 @@ if (fontStatus !== "loaded") {
   process.exit(3);
 }
 
+/**
+ * Resolve a step/target reference to a CSS selector string.
+ *
+ * `testId` is the contract (see the recipe's own _note). A raw `selector` is
+ * still accepted for state waits — "the panel has finished opening" is a class,
+ * not an element — but never for targets, which is enforced below.
+ */
+const refToSelector = (ref, where) => {
+  if (ref.testId) return `[data-testid="${ref.testId}"]`;
+  if (ref.selector) return ref.selector;
+  throw new Error(`${where} has neither testId nor selector: ${JSON.stringify(ref)}`);
+};
+
+// A target addressed by CSS class is how this recipe rotted in the first place:
+// `.bd-topbar` and `.bd-bp-switcher` were named here and exist nowhere in src/,
+// so the run died before measuring anything. Reject it at read time with the
+// file named, rather than 120 seconds later as a selector timeout.
+for (const t of recipe.targets ?? []) {
+  if (!t.testId) {
+    console.error(
+      `[measure] target "${t.name}" in ${surfaceId}.json is addressed by CSS ` +
+      `("${t.selector}"). Targets must use testId — a class-based selector ` +
+      `breaks on the next styling change and unhooks measurement silently. ` +
+      `Add a data-testid to the element and name it here.`
+    );
+    await browser.close();
+    process.exit(3);
+  }
+}
+
 for (const step of recipe.steps ?? []) {
-  if (step.action === "click") await page.click(step.selector);
-  else if (step.action === "hover") await page.hover(step.selector);
-  else if (step.action === "waitFor") await page.waitForSelector(step.selector, { timeout: 120000 });
-  else if (step.action === "press") await page.keyboard.press(step.key);
-  else if (step.action === "wait") await page.waitForTimeout(step.ms ?? 300);
-  else throw new Error(`unknown step action: ${step.action}`);
+  const sel = step.action === "press" || step.action === "wait" ? null : refToSelector(step, `step ${step.action}`);
+  try {
+    if (step.action === "click") await page.click(sel, { timeout: 15000 });
+    else if (step.action === "hover") await page.hover(sel, { timeout: 15000 });
+    else if (step.action === "waitFor") await page.waitForSelector(sel, { timeout: 15000 });
+    else if (step.action === "press") await page.keyboard.press(step.key);
+    else if (step.action === "wait") await page.waitForTimeout(step.ms ?? 300);
+    else throw new Error(`unknown step action: ${step.action}`);
+  } catch (err) {
+    // A step that cannot find its element is a MISSING measurement, not a
+    // failed one, and certainly not an unhandled TimeoutError dumped as a
+    // stack trace (which is what this used to do — exit 1, 120s wait, no
+    // indication of which step or which surface).
+    console.error(
+      `[measure] surface "${surfaceId}": step ${JSON.stringify(step)} could not ` +
+      `resolve "${sel}". Nothing was measured.\n` +
+      `          ${err.message.split("\n")[0]}`
+    );
+    await browser.close();
+    process.exit(3);
+  }
 }
 // Let transitions settle before reading computed styles.
 await page.waitForTimeout(400);
+
+// Every target must resolve to EXACTLY one element before anything is read.
+// Zero means the anchor is gone; more than one means the id is ambiguous and
+// whichever element happens to be first would be measured — a silently wrong
+// number is worse than no number.
+const resolution = await page.evaluate(
+  (sels) => sels.map(({ name, sel }) => ({ name, sel, count: document.querySelectorAll(sel).length })),
+  (recipe.targets ?? []).map((t) => ({ name: t.name, sel: refToSelector(t, `target ${t.name}`) })),
+);
+const unresolved = resolution.filter((r) => r.count !== 1);
+if (unresolved.length) {
+  console.error(`[measure] surface "${surfaceId}": ${unresolved.length} target(s) did not resolve to exactly one element:`);
+  for (const r of unresolved) {
+    console.error(`          ${r.name.padEnd(22)} ${r.sel}  ->  ${r.count} match(es)`);
+  }
+  await browser.close();
+  process.exit(3);
+}
 
 const result = await page.evaluate(({ targets, contrastScope, ignore }) => {
   const lum = (r, g, b) => {
@@ -144,7 +207,9 @@ const result = await page.evaluate(({ targets, contrastScope, ignore }) => {
     };
   };
 
-  const targets_ = (targets ?? []).map((t) => readTarget(t.name, t.selector));
+  // `sel` is resolved node-side (testId -> [data-testid="..."]) and passed in,
+  // so this browser-side code never needs to know the recipe's addressing rules.
+  const targets_ = (targets ?? []).map((t) => readTarget(t.name, t.sel));
 
   // Contrast sweep: every visible element painting text directly, page-wide
   // (or scoped by the recipe's contrastScope selector).
@@ -184,7 +249,11 @@ const result = await page.evaluate(({ targets, contrastScope, ignore }) => {
     }
   }
   return { targets: targets_, contrastFailures: pairs };
-}, { targets: recipe.targets, contrastScope: recipe.contrastScope, ignore: recipe.ignore });
+}, {
+  targets: (recipe.targets ?? []).map((t) => ({ name: t.name, sel: refToSelector(t, `target ${t.name}`) })),
+  contrastScope: recipe.contrastScope,
+  ignore: recipe.ignore,
+});
 
 await browser.close();
 
