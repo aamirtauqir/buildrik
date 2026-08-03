@@ -340,3 +340,39 @@ and deliberately left OUT of that arc.
   contract can express failure. **This is the one real exception to the design doc's
   "zero new endpoints" premise** — the server is fine; the editor-side return type changes.
   **Depends on:** decide before building the Media load-error state.
+
+### Media badges — provenance has no server-side home (2026-08-04 plan re-review)
+
+Found re-reading `shahg-main-design-20260803-200524.md` against the code after
+it was approved. **Both block T8 (the Media grid restructure), and the first one
+needs a founder decision, not an implementation.**
+
+- [x] **DECIDED 2026-08-04 — option (b): badges are fixture-conformed, and the recipe
+  says so.** No schema column, no endpoint change; "zero new endpoints" survives. The
+  recipe for `144:2` MUST carry a note that a green badge target proves the *rendering*,
+  not that provenance persists — otherwise the gate reads as "provenance works" and lies.
+  Persisting `assetSource` stays open as a later arc; the finding below is the record of
+  why. Original finding kept verbatim:
+- [ ] ~~**DECISION: `assetSource` never reaches the server, so STOCK/AI badges cannot
+  be conformed against real data.**~~ (decided above) `prisma/schema.prisma:1015` `MediaAsset` has no
+  `assetSource` column, and `MediaManager.updateAsset:969` mirrors **only `folderId`**
+  server-side (`:992-1001`) — everything else stays in local storage. An asset loaded
+  from the server, opened on a second machine, or seen after a storage clear has
+  `assetSource === undefined` and renders **no badge**. Figma `144:2` deliberately
+  shows STOCK / AI / no-badge in one grid, so the badge target passes only against
+  fixtures. The design doc's "What already exists" table claimed `media.ts:139
+  assetSource — drives the badges`; that line is `shared/types/media.ts:140`, an
+  editor type, not a server field — while the same doc's Open Question 3 said "not
+  checked". **Two options:** (a) add the column + persist it through the upload/import
+  path — a second breach of the "zero new endpoints" premise, alongside the
+  StockService error contract above; or (b) accept badges as fixture-only and record
+  that in the recipe so nobody reads a green gate as "provenance works".
+  **Depends on:** decide before T8.
+
+- [ ] **`assetSource: "ai"` has no writer, and would render wrong if it did.** The
+  union has three members; only two are ever set — `MediaManager.ts:464`
+  (`"uploaded"`) and `useDiscoveryState.ts:208` (`"stock"`). Nothing produces `"ai"`,
+  so Figma's AI badge has no data behind it. And `AssetGrid.tsx:365` maps `"ai"` onto
+  the **`stock`** CSS class, so a future writer would ship the wrong badge silently.
+  Either wire the AI-generated import path to stamp it, or drop the AI badge from the
+  T8 scope — do not build a badge whose only possible value is unreachable.
