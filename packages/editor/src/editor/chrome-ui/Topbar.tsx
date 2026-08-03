@@ -26,8 +26,6 @@ import { IssueChip } from "./IssueChip";
 import { SaveStatus, type SaveState } from "./SaveStatus";
 import { Presence, type PresenceProps } from "./Presence";
 
-const GHOST_BTN_CLASS = "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900";
-
 /* Publish geometry (2026-08-03). Both Publish branches used to render a bare
    `<Button>` with no `size`, so they took flowbite's default md — 40px tall,
    14px text — while every other Button in this bar declares `size="xs"`. The
@@ -36,6 +34,24 @@ const GHOST_BTN_CLASS = "tw:border-transparent tw:bg-transparent tw:text-gray-60
    reason it stood 8px taller than the design and than the bar's own rhythm.
    Stated once here so the two branches cannot drift apart again. */
 const PUBLISH_BTN_CLASS = "tw:h-8 tw:px-5 tw:text-[13px] tw:font-medium";
+
+/* Exit geometry + colour (2026-08-03), from board 681:26 `btn/exit`: 28 tall,
+   10 horizontal padding, 12px REGULAR, ink at gray-900. It rendered 32 / 12 /
+   medium / gray-600.
+
+   The colour needed a decision rather than a copy. The shared ghost treatment
+   runs gray-600 at rest and gray-900 on hover, so simply taking the board's gray-900
+   for the resting state would have left hover with nowhere to go and quietly
+   deleted the affordance. The board only draws a rest state, so it cannot
+   settle the question by itself. Resolved by moving the hover signal from ink
+   to surface — `hover:bg-gray-100`, which is what IconButton already does — so
+   the resting colour matches the board AND hover still visibly responds.
+
+   Scoped to this button on purpose: the shared ghost class is used widely, and re-inking
+   every ghost button in the editor is not what the topbar board says. */
+const EXIT_BTN_CLASS =
+  "tw:border-transparent tw:bg-transparent tw:h-7 tw:px-2.5 tw:text-[12px] tw:font-normal " +
+  "tw:text-gray-900 tw:enabled:hover:bg-gray-100";
 
 /**
  * `published` is the 2-second success transient after a publish lands (plan
@@ -130,7 +146,7 @@ export function Topbar({
         "tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:text-gray-900"
       }
     >
-      <Button color="light" size="xs" onClick={onExit} className={GHOST_BTN_CLASS}>
+      <Button color="light" size="xs" onClick={onExit} className={EXIT_BTN_CLASS}>
         ‹ Exit
       </Button>
 
