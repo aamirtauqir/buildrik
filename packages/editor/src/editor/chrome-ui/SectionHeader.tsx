@@ -19,13 +19,25 @@ const BASE =
 export function SectionHeader({ tint, count, level = 3, className, children, ...rest }: SectionHeaderProps) {
   return (
     <div
-      role="heading"
-      aria-level={level}
       className={[BASE, tint && "tw:bg-gray-100", className].filter(Boolean).join(" ")}
       {...rest}
     >
-      <span>{children}</span>
-      {count !== undefined ? <span className="tw:ml-auto tw:text-gray-500">{count}</span> : null}
+      {/* The heading is the LABEL, not the bar — with the role on the container
+          the accessible name came out "Collections3". Same shape as the bug
+          PanelHeader had. */}
+      <span role="heading" aria-level={level}>
+        {children}
+      </span>
+      {count !== undefined ? (
+        /* Mono + tabular-nums, per 16:16's own note: "The right-aligned count is
+           mono so the numbers do not jitter as a list filters — that is the
+           whole reason data/* is a separate family." It was rendering in the UI
+           font, so a filtering list shifted its own count sideways. Tracking is
+           reset because the label's .08em caps spacing is wrong for digits. */
+        <span className="tw:ml-auto tw:[font-family:var(--bk-font-mono)] tw:tabular-nums tw:tracking-normal tw:text-gray-500">
+          {count}
+        </span>
+      ) : null}
     </div>
   );
 }
