@@ -17,27 +17,10 @@ import { test, expect } from "@playwright/test";
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-
-/** Properties that actually carry the look. Layout + colour + type + edges. */
-const TRACKED = [
-  "display", "flex-direction", "align-items", "justify-content", "gap",
-  "width", "height", "min-height", "max-width",
-  "padding-top", "padding-right", "padding-bottom", "padding-left",
-  "margin-top", "margin-right", "margin-bottom", "margin-left",
-  "color", "background-color",
-  "border-top-width", "border-top-style", "border-top-color",
-  "border-bottom-width", "border-bottom-color",
-  "border-radius",
-  "font-family", "font-size", "font-weight", "line-height",
-  "opacity", "box-shadow", "overflow", "text-overflow", "white-space",
-  /* Added with the onboarding case: a completed step's strike-through moved
-     from an inline `textDecoration` to a class, and without this the probe
-     measured 43 nodes and none of the property it was added to protect. */
-  "text-decoration-line",
-  /* Added with the canvas-footer-toolbar case: the bar's containment contract
-     is min-width/overflow-x, and overflow-x is not implied by "overflow". */
-  "min-width", "overflow-x",
-] as const;
+// The tracked-property list and the font gate are shared with
+// scripts/conformance/measure.mjs — same mechanics, different question. See
+// e2e/lib/measure-lib.mjs for what is shared and what deliberately is not.
+import { TRACKED, fontsLoadedStatus } from "./lib/measure-lib.mjs";
 
 // ESM: no __dirname. The package is type:module, so derive it.
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -57,23 +40,16 @@ for (const name of CASES) {
     expect(err, "probe reported an unknown case").toBeNull();
     await expect(page.locator("#probe-root")).toHaveAttribute("data-probe-ready", name);
 
-    // Fonts must be resolved BEFORE anything is measured. Every tracked
-    // property that depends on text metrics — width, height, line-height and
-    // any layout derived from them — is wrong if the read happens while a
-    // fallback face is still painted. Until 2026-08-03 this probe loaded no
-    // webfont at all (see themes/fonts.css), which is why 106 baseline entries
-    // recorded `font-family: "Times"`.
-    //
-    // The status is ASSERTED, not assumed: `await page.evaluate(() =>
-    // document.fonts.ready)` serializes to `{}`, so if the expression ever
-    // became undefined the await would silently no-op and the baselines would
-    // quietly go back to being captured mid-load. Returning the status turns
-    // that into a visible failure.
-    const fontStatus = await page.evaluate(async () => {
-      await document.fonts.ready;
-      return document.fonts.status;
-    });
-    expect(fontStatus, "fonts must be fully loaded before measuring").toBe("loaded");
+    // Fonts must be resolved BEFORE anything is measured — width, height,
+    // line-height and everything laid out from them are wrong if the read
+    // happens while a fallback face is painted. Until 2026-08-03 this probe
+    // loaded no webfont at all, which is why 106 baseline entries recorded
+    // `font-family: "Times"`. The gate asserts rather than assumes; see
+    // measure-lib.mjs for why the obvious one-liner degrades to a no-op.
+    expect(
+      await fontsLoadedStatus(page),
+      "fonts must be fully loaded before measuring"
+    ).toBe("loaded");
 
     const actual = await page.evaluate((props) => {
       const out: Record<string, Record<string, string>> = {};

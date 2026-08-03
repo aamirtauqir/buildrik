@@ -15,7 +15,10 @@
 import { readFileSync, readdirSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { chromium } from "playwright-core";
+import * as playwright from "playwright-core";
+// Browser pin + font gate are shared with e2e/style-parity.spec.ts — same
+// mechanics, different question. See e2e/lib/measure-lib.mjs.
+import { launchPinnedBrowser, fontsLoadedStatus } from "../../e2e/lib/measure-lib.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SURFACES = join(HERE, "surfaces");
@@ -35,16 +38,18 @@ const urlFlag = args.indexOf("--url");
 const recipe = JSON.parse(readFileSync(join(SURFACES, `${surfaceId}.json`), "utf8"));
 const baseUrl = urlFlag !== -1 ? args[urlFlag + 1] : (recipe.url ?? "http://localhost:5050/");
 
-async function launch() {
-  try {
-    return await chromium.launch();
-  } catch {
-    // No bundled chromium for this playwright-core build — use installed Chrome.
-    return await chromium.launch({ channel: "chrome" });
-  }
+// The `channel: "chrome"` fallback that used to live here is gone (2026-08-03).
+// Falling back meant the same commit could be measured in two different
+// renderers; CI is Ubuntu and development is macOS, so that is a font and
+// layout difference presented as a conformance result. Exit 3 instead — an
+// instrument we cannot trust yields MISSING, never a pass.
+let browser;
+try {
+  browser = await launchPinnedBrowser(playwright);
+} catch (err) {
+  console.error(`[measure] ${err.message}`);
+  process.exit(3);
 }
-
-const browser = await launch();
 const page = await browser.newPage({ viewport: recipe.viewport ?? { width: 1440, height: 900 } });
 // domcontentloaded + the recipe's own waitFor steps — networkidle is flaky
 // under load (vite dev serves hundreds of modules) and never settles on
@@ -53,17 +58,10 @@ await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120000 });
 
 // Fonts before geometry. `domcontentloaded` says nothing about whether the UI
 // typeface has resolved, and every text-dependent measurement below is wrong if
-// it is taken against a fallback face. Fonts are self-hosted as of 2026-08-03
-// (themes/fonts.css) so this settles in milliseconds.
-//
-// The status is checked, not assumed: `page.evaluate(() =>
-// document.fonts.ready)` serializes to `{}`, so a future edit that breaks the
-// expression would silently no-op and every measurement after it would be taken
-// mid-load. Exit 3 — a measurement we cannot trust is MISSING, not a pass.
-const fontStatus = await page.evaluate(async () => {
-  await document.fonts.ready;
-  return document.fonts.status;
-});
+// taken against a fallback face. Self-hosted since 2026-08-03 so this settles
+// in milliseconds; the gate is for determinism, not speed. Exit 3 on anything
+// but "loaded" — see measure-lib.mjs for why the obvious one-liner no-ops.
+const fontStatus = await fontsLoadedStatus(page);
 if (fontStatus !== "loaded") {
   console.error(`[measure] fonts did not finish loading (status=${fontStatus}) — refusing to measure`);
   await browser.close();
