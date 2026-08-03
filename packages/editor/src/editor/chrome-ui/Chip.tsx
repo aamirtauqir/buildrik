@@ -25,10 +25,12 @@ export interface ChipProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonEle
   selected?: boolean;
   /** ARIA role — `tab` inside a tablist, `button` on its own. */
   role?: "tab" | "button";
+  /** Anchor for the count itself — the mono treatment is measured separately. */
+  countTestId?: string;
 }
 
 export const Chip = React.forwardRef<HTMLButtonElement, ChipProps>(function Chip(
-  { label, count, selected = false, role = "button", className, ...rest },
+  { label, count, selected = false, role = "button", countTestId, className, ...rest },
   ref,
 ) {
   return (
@@ -55,7 +57,10 @@ export const Chip = React.forwardRef<HTMLButtonElement, ChipProps>(function Chip
     >
       {label}
       {count ? (
-        <span className="tw:[font-family:var(--bk-font-mono)] tw:font-medium tw:tabular-nums tw:text-gray-600">
+        <span
+          data-testid={countTestId}
+          className="tw:[font-family:var(--bk-font-mono)] tw:font-medium tw:tabular-nums tw:text-gray-600"
+        >
           {count}
         </span>
       ) : null}

@@ -71,6 +71,7 @@ export function TypePills({
             aria-label={p.title}
             title={p.title}
             data-testid={`media-type-chip-${p.key}`}
+            countTestId={`media-type-count-${p.key}`}
             className={isActive ? "med-type-pill med-type-pill--active" : "med-type-pill"}
             onClick={() => onTypeChange(p.key)}
           />
