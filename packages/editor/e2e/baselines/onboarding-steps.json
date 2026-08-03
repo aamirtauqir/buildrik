@@ -36,7 +36,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "0px",
-    "overflow-x": "visible"
+    "overflow-x": "visible",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>0": {
     "display": "flex",
@@ -75,7 +77,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "0px",
-    "overflow-x": "hidden"
+    "overflow-x": "hidden",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>1": {
     "display": "flex",
@@ -114,7 +118,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "auto",
-    "overflow-x": "visible"
+    "overflow-x": "visible",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>2": {
     "display": "flex",
@@ -153,7 +159,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "0px",
-    "overflow-x": "visible"
+    "overflow-x": "visible",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>3": {
     "display": "block",
@@ -192,7 +200,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "auto",
-    "overflow-x": "visible"
+    "overflow-x": "visible",
+    "text-transform": "none",
+    "letter-spacing": "-0.1px"
   },
   "onboarding-steps>4": {
     "display": "block",
@@ -231,7 +241,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "auto",
-    "overflow-x": "visible"
+    "overflow-x": "visible",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>5": {
     "display": "flex",
@@ -270,7 +282,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "auto",
-    "overflow-x": "visible"
+    "overflow-x": "visible",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>6": {
     "display": "flex",
@@ -309,7 +323,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "auto",
-    "overflow-x": "visible"
+    "overflow-x": "visible",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>7": {
     "display": "block",
@@ -348,7 +364,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "auto",
-    "overflow-x": "hidden"
+    "overflow-x": "hidden",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>8": {
     "display": "inline",
@@ -387,7 +405,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "0px",
-    "overflow-x": "visible"
+    "overflow-x": "visible",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>9": {
     "display": "flex",
@@ -426,7 +446,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "auto",
-    "overflow-x": "visible"
+    "overflow-x": "visible",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>10": {
     "display": "block",
@@ -465,7 +487,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "auto",
-    "overflow-x": "hidden"
+    "overflow-x": "hidden",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>11": {
     "display": "inline",
@@ -504,7 +528,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "0px",
-    "overflow-x": "visible"
+    "overflow-x": "visible",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>12": {
     "display": "inline",
@@ -543,7 +569,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "0px",
-    "overflow-x": "visible"
+    "overflow-x": "visible",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>13": {
     "display": "block",
@@ -582,7 +610,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "auto",
-    "overflow-x": "visible"
+    "overflow-x": "visible",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>14": {
     "display": "block",
@@ -621,7 +651,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "0px",
-    "overflow-x": "visible"
+    "overflow-x": "visible",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>15": {
     "display": "block",
@@ -660,7 +692,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "auto",
-    "overflow-x": "auto"
+    "overflow-x": "auto",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>16": {
     "display": "list-item",
@@ -699,7 +733,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "0px",
-    "overflow-x": "visible"
+    "overflow-x": "visible",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>17": {
     "display": "flex",
@@ -738,7 +774,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "0px",
-    "overflow-x": "visible"
+    "overflow-x": "visible",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>18": {
     "display": "flex",
@@ -777,7 +815,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "auto",
-    "overflow-x": "visible"
+    "overflow-x": "visible",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>19": {
     "display": "block",
@@ -816,7 +856,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "auto",
-    "overflow-x": "hidden"
+    "overflow-x": "hidden",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>20": {
     "display": "inline",
@@ -855,7 +897,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "0px",
-    "overflow-x": "visible"
+    "overflow-x": "visible",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>21": {
     "display": "block",
@@ -894,7 +938,9 @@
     "white-space": "normal",
     "text-decoration-line": "line-through",
     "min-width": "0px",
-    "overflow-x": "visible"
+    "overflow-x": "visible",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>22": {
     "display": "list-item",
@@ -933,7 +979,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "0px",
-    "overflow-x": "visible"
+    "overflow-x": "visible",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>23": {
     "display": "flex",
@@ -972,7 +1020,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "0px",
-    "overflow-x": "visible"
+    "overflow-x": "visible",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>24": {
     "display": "flex",
@@ -1011,7 +1061,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "auto",
-    "overflow-x": "visible"
+    "overflow-x": "visible",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>25": {
     "display": "block",
@@ -1050,7 +1102,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "0px",
-    "overflow-x": "visible"
+    "overflow-x": "visible",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>26": {
     "display": "block",
@@ -1089,7 +1143,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "auto",
-    "overflow-x": "visible"
+    "overflow-x": "visible",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>27": {
     "display": "inline",
@@ -1128,7 +1184,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "0px",
-    "overflow-x": "hidden"
+    "overflow-x": "hidden",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>28": {
     "display": "inline",
@@ -1167,7 +1225,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "0px",
-    "overflow-x": "visible"
+    "overflow-x": "visible",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>29": {
     "display": "flex",
@@ -1206,7 +1266,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "0px",
-    "overflow-x": "visible"
+    "overflow-x": "visible",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>30": {
     "display": "block",
@@ -1245,7 +1307,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "auto",
-    "overflow-x": "visible"
+    "overflow-x": "visible",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>31": {
     "display": "block",
@@ -1284,7 +1348,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "auto",
-    "overflow-x": "visible"
+    "overflow-x": "visible",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>32": {
     "display": "inline",
@@ -1323,7 +1389,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "0px",
-    "overflow-x": "hidden"
+    "overflow-x": "hidden",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>33": {
     "display": "inline",
@@ -1362,7 +1430,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "0px",
-    "overflow-x": "visible"
+    "overflow-x": "visible",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>34": {
     "display": "inline",
@@ -1401,7 +1471,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "0px",
-    "overflow-x": "visible"
+    "overflow-x": "visible",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>35": {
     "display": "list-item",
@@ -1440,7 +1512,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "0px",
-    "overflow-x": "visible"
+    "overflow-x": "visible",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>36": {
     "display": "flex",
@@ -1479,7 +1553,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "0px",
-    "overflow-x": "visible"
+    "overflow-x": "visible",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>37": {
     "display": "flex",
@@ -1518,7 +1594,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "auto",
-    "overflow-x": "visible"
+    "overflow-x": "visible",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>38": {
     "display": "block",
@@ -1557,7 +1635,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "0px",
-    "overflow-x": "visible"
+    "overflow-x": "visible",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>39": {
     "display": "block",
@@ -1596,7 +1676,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "auto",
-    "overflow-x": "visible"
+    "overflow-x": "visible",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>40": {
     "display": "inline",
@@ -1635,7 +1717,9 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "0px",
-    "overflow-x": "hidden"
+    "overflow-x": "hidden",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   },
   "onboarding-steps>41": {
     "display": "inline",
@@ -1674,6 +1758,8 @@
     "white-space": "normal",
     "text-decoration-line": "none",
     "min-width": "0px",
-    "overflow-x": "visible"
+    "overflow-x": "visible",
+    "text-transform": "none",
+    "letter-spacing": "normal"
   }
 }

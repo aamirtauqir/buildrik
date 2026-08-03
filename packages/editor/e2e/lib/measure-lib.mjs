@@ -39,6 +39,12 @@
  *     measured 43 nodes and none of the property it was added to protect.
  *   - `min-width` / `overflow-x`: the canvas footer toolbar's containment
  *     contract. `overflow-x` is not implied by `overflow`.
+ *   - `text-transform` / `letter-spacing` (T1, 2026-08-04): the panel header's
+ *     case treatment. `8160d7d3` moved all seven drawers to UPPERCASE with
+ *     0.08em tracking and every instrument in this repo was blind to it — the
+ *     one property the header decision turns on was untracked, so the change
+ *     landed with nothing watching and the reversal would have too. Added
+ *     BEFORE the header is changed back, not after.
  *
  * Adding to this list invalidates every committed baseline — the new property
  * is absent from the old records, so the diff reports it on every node. That
@@ -59,6 +65,7 @@ export const TRACKED = [
   "opacity", "box-shadow", "overflow", "text-overflow", "white-space",
   "text-decoration-line",
   "min-width", "overflow-x",
+  "text-transform", "letter-spacing",
 ];
 
 /**
