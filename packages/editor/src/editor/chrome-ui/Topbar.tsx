@@ -28,6 +28,15 @@ import { Presence, type PresenceProps } from "./Presence";
 
 const GHOST_BTN_CLASS = "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900";
 
+/* Publish geometry (2026-08-03). Both Publish branches used to render a bare
+   `<Button>` with no `size`, so they took flowbite's default md — 40px tall,
+   14px text — while every other Button in this bar declares `size="xs"`. The
+   board (681:26 `btn/publish`, and Button 9:102 `Kind=primary, Size=md`) puts
+   the primary CTA at 32px with 13px medium text. The omission was the only
+   reason it stood 8px taller than the design and than the bar's own rhythm.
+   Stated once here so the two branches cannot drift apart again. */
+const PUBLISH_BTN_CLASS = "tw:h-8 tw:px-5 tw:text-[13px] tw:font-medium";
+
 /**
  * `published` is the 2-second success transient after a publish lands (plan
  * D10/eng D11) — the container's timer returns it to `ready`; the button is
@@ -211,12 +220,20 @@ export function Topbar({
               disabled={publishBusy}
               aria-busy={publishBusy || undefined}
               onClick={() => {}}
+              size="xs"
+              className={PUBLISH_BTN_CLASS}
             >
               {PUBLISH_LABEL[publish]}
             </Button>
           </Tooltip>
         ) : (
-          <Button disabled={publishBusy} aria-busy={publishBusy || undefined} onClick={onPublish}>
+          <Button
+            disabled={publishBusy}
+            aria-busy={publishBusy || undefined}
+            onClick={onPublish}
+            size="xs"
+            className={PUBLISH_BTN_CLASS}
+          >
             {PUBLISH_LABEL[publish]}
           </Button>
         )
