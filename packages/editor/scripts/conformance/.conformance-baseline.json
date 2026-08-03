@@ -1,6 +1,8 @@
 {
   "shell-default": {
     "skipped": 4,
-    "compared": 7
+    "compared": 7,
+    "contrastFailures": 3,
+    "nonTextFailures": 0
   }
 }

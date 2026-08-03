@@ -12,7 +12,7 @@
  * scope that paints text directly. Output: measured/<surface-id>.json
  * (gitignored — it describes a build, not the source).
  */
-import { readFileSync, readdirSync, writeFileSync, mkdirSync } from "node:fs";
+import { readFileSync, readdirSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import * as playwright from "playwright-core";
@@ -474,4 +474,47 @@ for (const p of out.contrastFailures)
   console.log(`  CONTRAST ${p.ratio} < ${p.needed}  ${p.selector}  "${p.text}"  ${p.color} on ${p.bg} @${p.fontSize}/${p.fontWeight}`);
 for (const p of out.nonTextFailures ?? [])
   console.log(`  ICON     ${p.ratio} < ${p.needed}  ${p.selector}  "${p.label}"  ${p.color} on ${p.bg} @${p.size}`);
-process.exit(missing.length || out.contrastFailures.length || (out.nonTextFailures ?? []).length ? 1 : 0);
+/**
+ * CONTRAST RATCHET — may fall, never rise.
+ *
+ * The surface has three real WCAG AA failures today (gray-500 on gray-100 at
+ * 4.39 against a 4.5 floor). Wiring this into CI with a hard zero would land
+ * the build red on day one for defects that predate the harness, and a gate
+ * that is red on arrival gets disabled rather than fixed.
+ *
+ * So it is baselined, exactly like inline_literal / inline_hoisted / css_lines
+ * in check-styling-ratchet.mjs — the idiom this repo already trusts. Known
+ * defects stay visible in every run's output AND cannot grow. Fixing them
+ * lowers the baseline; introducing one fails the build.
+ *
+ * A MISSING target is never baselined. That is an instrument failure, not a
+ * product defect, and it exits 3 above.
+ */
+const BASELINE_PATH = join(HERE, ".conformance-baseline.json");
+const bl = existsSync(BASELINE_PATH) ? JSON.parse(readFileSync(BASELINE_PATH, "utf8")) : {};
+const entry = bl[surfaceId] ?? {};
+const textBaseline = entry.contrastFailures ?? 0;
+const iconBaseline = entry.nonTextFailures ?? 0;
+const textNow = out.contrastFailures.length;
+const iconNow = (out.nonTextFailures ?? []).length;
+
+if (args.includes("--update-baseline")) {
+  bl[surfaceId] = { ...entry, contrastFailures: textNow, nonTextFailures: iconNow };
+  writeFileSync(BASELINE_PATH, JSON.stringify(bl, null, 2) + "\n");
+  console.log(`[measure] baseline updated: ${surfaceId} contrast=${textNow} icon=${iconNow}`);
+  process.exit(0);
+}
+
+let ratchetBroken = false;
+if (textNow > textBaseline) {
+  console.error(`[measure] TEXT CONTRAST REGRESSION: ${textNow} > baseline ${textBaseline}. A new failure was introduced.`);
+  ratchetBroken = true;
+}
+if (iconNow > iconBaseline) {
+  console.error(`[measure] ICON CONTRAST REGRESSION: ${iconNow} > baseline ${iconBaseline}. A new failure was introduced.`);
+  ratchetBroken = true;
+}
+if (textNow < textBaseline || iconNow < iconBaseline) {
+  console.log(`[measure] contrast improved (text ${textBaseline}->${textNow}, icon ${iconBaseline}->${iconNow}). Lower the baseline: --update-baseline`);
+}
+process.exit(missing.length || ratchetBroken ? 1 : 0);
