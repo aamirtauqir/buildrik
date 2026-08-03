@@ -79,8 +79,6 @@ export interface PanelHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
 export function PanelHeader({ title, actions, isPinned, onPinToggle, onHelpClick, onClose, className, ...rest }: PanelHeaderProps) {
   return (
     <div
-      role="heading"
-      aria-level={2}
       className={[
         "tw:flex tw:items-center tw:gap-2 tw:h-11 tw:py-0 tw:pl-4 tw:pr-3 tw:bg-white tw:border-b tw:border-gray-200 " +
           "tw:[font-family:var(--bk-font-ui)] tw:text-[11px] tw:font-medium tw:tracking-[0.08em] tw:text-gray-600 tw:uppercase tw:flex-none",
@@ -90,7 +88,15 @@ export function PanelHeader({ title, actions, isPinned, onPinToggle, onHelpClick
         .join(" ")}
       {...rest}
     >
-      <span className="tw:flex-1">{title}</span>
+      {/* The heading is the TITLE, not the bar. `role="heading"` used to sit on
+          the container, which was harmless only while the container held
+          nothing but the title — the moment PanelFrame's subtitle moved in
+          beside it, the heading's accessible name became "SEOSearch & social
+          preview", and any action label in here would have joined it. Caught by
+          SettingsTab's pending-nav test, which asserted the heading read "SEO". */}
+      <span className="tw:flex-1" role="heading" aria-level={2}>
+        {title}
+      </span>
       <PanelHeaderActions
         label={title}
         isPinned={isPinned}

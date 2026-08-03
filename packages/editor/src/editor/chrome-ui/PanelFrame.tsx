@@ -8,9 +8,7 @@
  * @license BSD-3-Clause
  */
 import React from "react";
-import { Button } from "flowbite-react";
-
-const GHOST_BTN_CLASS = "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900";
+import { PanelHeader } from "./PanelHeader";
 
 export type PanelWidth = "narrow" | "wide" | "fullpage";
 
@@ -58,58 +56,60 @@ export interface PanelFrameHeaderProps extends React.HTMLAttributes<HTMLDivEleme
   onPinToggle?: () => void;
 }
 
+/**
+ * The drawer head. DELEGATES to PanelHeader (Figma 16:6) rather than drawing
+ * its own, which is what it used to do — and the two had drifted:
+ *
+ *   PanelHeader      11px / 500 / 0.08em tracking / UPPERCASE / gray-600   (44h)
+ *   PanelFrameHeader 13px / 600 / no tracking     / Title Case / gray-900  (auto h)
+ *
+ * Both claimed to be the drawer header. Content and Brand took the first,
+ * Insert / Layers / Pages / Media took the second, so the editor shipped two
+ * different header languages depending on which rail icon you pressed. The
+ * board is unambiguous — 16:6 is "44h, shared by all seven drawer surfaces.
+ * Title is 11/600 caps with 8% tracking — a label, not a heading."
+ *
+ * The pin/help/close cluster was duplicated verbatim between the two files as
+ * well; delegating deletes that copy along with the drift.
+ *
+ * SUBTITLE moves to the right of the title instead of onto a second line.
+ * Keeping it below would have inverted the hierarchy the moment the title
+ * became 11px — the subtitle was 12px — and would have broken the fixed 44px
+ * height the board specifies. Right-aligned secondary text is also the
+ * language the board already uses for counts (Section header 16:16 puts its
+ * count there, in mono). It truncates, and carries its full text in `title`,
+ * because "Chat with AI to edit your page" is a subtitle in this codebase and
+ * will not fit beside a label. The cap is max-w-40 (160px) — a percentage was
+ * tried first and truncated "53 blocks · 6 categories" down to "53 blocks …",
+ * because a percentage max-width resolves against a shrink-to-fit flex parent,
+ * not against the header.
+ */
 function PanelFrameHeader({
   title, subtitle, actions, onClose, onHelpClick, isPinned, onPinToggle, className, ...rest
 }: PanelFrameHeaderProps) {
   return (
-    <div
-      className={[
-        "tw:flex tw:items-start tw:gap-2 tw:py-3 tw:px-4 tw:border-b tw:border-gray-200 tw:flex-none",
-        className,
-      ]
-        .filter(Boolean)
-        .join(" ")}
+    <PanelHeader
+      title={title}
+      isPinned={isPinned}
+      onPinToggle={onPinToggle}
+      onHelpClick={onHelpClick}
+      onClose={onClose}
+      className={className}
+      actions={
+        <>
+          {subtitle ? (
+            <span
+              className="tw:max-w-40 tw:truncate tw:normal-case tw:tracking-normal tw:text-gray-500"
+              title={subtitle}
+            >
+              {subtitle}
+            </span>
+          ) : null}
+          {actions}
+        </>
+      }
       {...rest}
-    >
-      <div className="tw:flex tw:flex-col tw:gap-0.5 tw:flex-1 tw:min-w-0">
-        <span
-          className="tw:text-[13px] tw:font-semibold tw:text-gray-900 tw:[font-family:var(--bk-font-ui)]"
-          role="heading"
-          aria-level={2}
-        >
-          {title}
-        </span>
-        {subtitle ? (
-          <span className="tw:text-xs tw:text-gray-500 tw:[font-family:var(--bk-font-ui)]">{subtitle}</span>
-        ) : null}
-      </div>
-      <div className="tw:flex tw:items-center tw:gap-1 tw:flex-none">
-        {actions}
-        {onPinToggle ? (
-          <Button
-            type="button"
-            color="light"
-            size="xs"
-            className={GHOST_BTN_CLASS}
-            onClick={onPinToggle}
-            aria-pressed={Boolean(isPinned)}
-            aria-label={isPinned ? `Unpin ${title}` : `Pin ${title}`}
-          >
-            {isPinned ? "📌" : "📍"}
-          </Button>
-        ) : null}
-        {onHelpClick ? (
-          <Button type="button" color="light" size="xs" className={GHOST_BTN_CLASS} onClick={onHelpClick} aria-label="Help">
-            ?
-          </Button>
-        ) : null}
-        {onClose ? (
-          <Button type="button" color="light" size="xs" className={GHOST_BTN_CLASS} onClick={onClose} aria-label={`Close ${title}`}>
-            ✕
-          </Button>
-        ) : null}
-      </div>
-    </div>
+    />
   );
 }
 
