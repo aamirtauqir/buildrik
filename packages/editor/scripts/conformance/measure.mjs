@@ -19,6 +19,8 @@ import * as playwright from "playwright-core";
 // Browser pin + font gate are shared with e2e/style-parity.spec.ts — same
 // mechanics, different question. See e2e/lib/measure-lib.mjs.
 import { launchPinnedBrowser, fontsLoadedStatus } from "../../e2e/lib/measure-lib.mjs";
+// Recipe schema lives in lib.mjs so every consumer reads the same rules.
+import { validateRecipe } from "./lib.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SURFACES = join(HERE, "surfaces");
@@ -81,21 +83,16 @@ const refToSelector = (ref, where) => {
   throw new Error(`${where} has neither testId nor selector: ${JSON.stringify(ref)}`);
 };
 
-// A target addressed by CSS class is how this recipe rotted in the first place:
-// `.bd-topbar` and `.bd-bp-switcher` were named here and exist nowhere in src/,
-// so the run died before measuring anything. Reject it at read time with the
-// file named, rather than 120 seconds later as a selector timeout.
-for (const t of recipe.targets ?? []) {
-  if (!t.testId) {
-    console.error(
-      `[measure] target "${t.name}" in ${surfaceId}.json is addressed by CSS ` +
-      `("${t.selector}"). Targets must use testId — a class-based selector ` +
-      `breaks on the next styling change and unhooks measurement silently. ` +
-      `Add a data-testid to the element and name it here.`
-    );
-    await browser.close();
-    process.exit(3);
-  }
+// Schema is enforced in lib.mjs so measure, diff and any future consumer read
+// the same rules. A target addressed by CSS is how this recipe rotted in the
+// first place: `.bd-topbar` and `.bd-bp-switcher` were named here and exist
+// nowhere in src/, so the run died before measuring anything.
+try {
+  validateRecipe(recipe, surfaceId);
+} catch (err) {
+  console.error(`[measure] ${err.message}`);
+  await browser.close();
+  process.exit(3);
 }
 
 for (const step of recipe.steps ?? []) {
