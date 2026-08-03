@@ -261,3 +261,31 @@ disabled/readOnly affordance, workspace-rename stale sidebar.
   stack. `--bk-font-ui` was cleaned earlier today; the mono stack was missed.
   Fix in `scripts/tokens/figma-tokens.json` and regenerate — hand-editing the
   generated file fails `gate:tokens-generated`. **Effort:** S. **Priority:** P3.
+
+## Editor ↔ Figma fidelity — deferred from /qa 2026-08-03
+
+Full report: `packages/editor/.gstack/qa-reports/qa-report-editor-figma-2026-08-03.md`.
+Fixed in the same run: Publish black ring (`7683eabc`), Publish 40px→32px (`af315d82`).
+
+- [ ] **D1 — IconButton 28×28 vs the board's 32×32.** `chrome-ui/Icon.tsx:51`
+  (`tw:h-7 tw:w-7`). Figma's Icon button is 32×32 and its doc gives the reason
+  ("32×32 so it clears the 24px touch minimum"). NOT an a11y violation — 28
+  already clears WCAG 2.5.8's 24×24 — so this is fidelity, with a 13-instance /
+  10-file blast radius that visibly changes the whole chrome. No decision record
+  exists for 28. Needs a product call, not a unilateral fix.
+- [ ] **D2 — Exit button off on four properties.** Board `btn/exit` is h28 · px10
+  · 12px regular · `#111827`; renders h32 · px12 · 12px medium · `#4b5563`.
+  Geometry is unambiguous; the COLOUR is not — `GHOST_BTN_CLASS` runs grey-600
+  rest → grey-900 hover, and matching the board at rest deletes that hover
+  affordance. The board only draws a rest state so it cannot settle it.
+- [ ] **D3 — controls under the 24×24 target minimum.** `content-field-rows`
+  entries 9/14/15 measure 21.92 × 18 (WCAG 2.5.8 wants 24×24). Pre-existing;
+  they read 25.92 × 22 before only because 4px of that was the QA-001 black
+  border, which was never real spacing. Under the minimum either way.
+- [ ] **`GHOST_BTN_CLASS` duplicated verbatim in 4 files** — `Topbar.tsx:29`,
+  `Toast.tsx:22`, `PanelFrame.tsx:13`, `PanelHeader.tsx:9`. CLAUDE.md bans exactly
+  this. Refactor, so out of QA scope.
+- [ ] **Board is stale on the topbar, three ways** — save pill (T8/D7 rule 4),
+  review pill tone (T8/D7 rule 3), and the eye/comment/shield tool icons
+  ("Figma nodes pending", `Topbar.tsx:275`). The CODE is right in all three; the
+  Figma component needs updating so the next conformance run stops flagging them.
