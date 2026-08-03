@@ -287,7 +287,66 @@ const readAll = () => page.evaluate(({ targets, contrastScope, ignore }) => {
       });
     }
   }
-  return { targets: targets_, contrastFailures: pairs };
+  /**
+   * NON-TEXT CONTRAST — WCAG 1.4.11, threshold 3:1, not 4.5.
+   *
+   * The sweep above only sees elements that paint text directly, so an
+   * icon-only control is invisible to it. In this product that is most of the
+   * chrome: the rail and the topbar are almost entirely icon buttons. An icon
+   * too light against its fill passed every check we had.
+   *
+   * Scope is deliberately narrow, because 1.4.11 covers parts needed to
+   * IDENTIFY a control, not decoration. An SVG only qualifies here when it is
+   * inside an interactive element that has no visible text of its own — then
+   * the glyph IS the affordance, and if it cannot be seen the control cannot
+   * be identified. A decorative icon sitting next to a text label is skipped.
+   *
+   * Colour resolution: an SVG usually paints with `currentColor`, so the
+   * computed `color` of the icon (or its nearest styled ancestor) is the
+   * effective stroke. Explicit `stroke`/`fill` win when set to a real colour.
+   */
+  const INTERACTIVE = 'button, a[href], [role="button"], [role="tab"], [role="menuitem"], input, select, textarea';
+  const nonText = [];
+  const seenIcon = new Set();
+  for (const svg of scope.querySelectorAll("svg")) {
+    if (ignoreSel && svg.closest(ignoreSel)) continue;
+    const control = svg.closest(INTERACTIVE);
+    if (!control) continue;                       // decorative, not a control part
+    if (control.textContent.trim().length > 0) continue;  // has a text label; icon is not the only affordance
+    if (seenIcon.has(control)) continue;
+    seenIcon.add(control);
+
+    const r = svg.getBoundingClientRect();
+    if (r.width === 0 || r.height === 0) continue;
+    const cs = getComputedStyle(svg);
+    if (cs.visibility === "hidden" || +cs.opacity === 0) continue;
+
+    // stroke/fill may be "none" or currentColor — fall back to computed color.
+    const pick = (v) => (v && v !== "none" && !v.startsWith("url(") ? v : null);
+    const raw = parse(pick(cs.stroke) ?? pick(cs.fill) ?? cs.color);
+    if (!raw) continue;
+    const bg = effectiveBg(control);
+    const fg = raw.a < 1 ? blend(raw, bg) : raw;
+    const got = ratio(fg, bg);
+    const needed = 3;                              // non-text UI component
+    if (got < needed) {
+      nonText.push({
+        kind: "icon",
+        label: control.getAttribute("aria-label") || control.getAttribute("title") || "(unlabelled)",
+        selector:
+          control.tagName.toLowerCase() +
+          (control.id ? `#${control.id}` : "") +
+          (control.classList.length ? `.${[...control.classList].slice(0, 2).join(".")}` : ""),
+        color: cs.stroke !== "none" ? cs.stroke : cs.color,
+        bg: `rgb(${Math.round(bg.r)}, ${Math.round(bg.g)}, ${Math.round(bg.b)})`,
+        size: `${Math.round(r.width)}x${Math.round(r.height)}`,
+        ratio: Math.round(got * 100) / 100,
+        needed,
+      });
+    }
+  }
+
+  return { targets: targets_, contrastFailures: pairs, nonTextFailures: nonText };
 }, {
   targets: (recipe.targets ?? []).map((t) => ({ name: t.name, sel: refToSelector(t, `target ${t.name}`) })),
   contrastScope: recipe.contrastScope,
@@ -375,8 +434,10 @@ const outPath = join(OUT_DIR, `${surfaceId}.json`);
 writeFileSync(outPath, JSON.stringify(out, null, 2));
 
 const missing = out.targets.filter((t) => !t.found);
-console.log(`[measure] ${surfaceId}: ${out.targets.length} targets (${missing.length} missing), ${out.contrastFailures.length} contrast failure(s) → ${resolve(outPath)}`);
+console.log(`[measure] ${surfaceId}: ${out.targets.length} targets (${missing.length} missing), ${out.contrastFailures.length} text-contrast + ${(out.nonTextFailures ?? []).length} icon-contrast failure(s) → ${resolve(outPath)}`);
 for (const t of missing) console.log(`  MISSING target: ${t.name} (${t.selector})`);
 for (const p of out.contrastFailures)
   console.log(`  CONTRAST ${p.ratio} < ${p.needed}  ${p.selector}  "${p.text}"  ${p.color} on ${p.bg} @${p.fontSize}/${p.fontWeight}`);
-process.exit(missing.length || out.contrastFailures.length ? 1 : 0);
+for (const p of out.nonTextFailures ?? [])
+  console.log(`  ICON     ${p.ratio} < ${p.needed}  ${p.selector}  "${p.label}"  ${p.color} on ${p.bg} @${p.size}`);
+process.exit(missing.length || out.contrastFailures.length || (out.nonTextFailures ?? []).length ? 1 : 0);
