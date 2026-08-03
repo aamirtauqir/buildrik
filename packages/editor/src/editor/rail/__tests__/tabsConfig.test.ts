@@ -6,6 +6,10 @@ import {
   getTabConfig,
   getTabsByZone,
 } from "../tabsConfig";
+// ONE width for every panel (founder-approved 2026-07-24). These assertions
+// used to hardcode 280, which is how the superseded two-width rule survived
+// its own removal from DESIGN.md — the test kept the defect alive.
+import { SIDEBAR_WIDE } from "@/shared/constants/layout";
 
 describe("tabsConfig helpers", () => {
   describe("getTabMode", () => {
@@ -31,24 +35,24 @@ describe("tabsConfig helpers", () => {
   });
 
   describe("getTabWidth", () => {
-    it("returns 280 for Add tab", () => {
-      expect(getTabWidth("add")).toBe(280);
+    it("returns the canonical drawer width for Add tab", () => {
+      expect(getTabWidth("add")).toBe(SIDEBAR_WIDE);
     });
 
-    it("returns 280 for Layers tab", () => {
-      expect(getTabWidth("layers")).toBe(280);
+    it("returns the canonical drawer width for Layers tab", () => {
+      expect(getTabWidth("layers")).toBe(SIDEBAR_WIDE);
     });
 
-    it("returns 280 for Pages tab", () => {
-      expect(getTabWidth("pages")).toBe(280);
+    it("returns the canonical drawer width for Pages tab", () => {
+      expect(getTabWidth("pages")).toBe(SIDEBAR_WIDE);
     });
 
-    it("returns 280 for Components tab", () => {
-      expect(getTabWidth("components")).toBe(280);
+    it("returns the canonical drawer width for Components tab", () => {
+      expect(getTabWidth("components")).toBe(SIDEBAR_WIDE);
     });
 
-    it("returns 280 for unknown tab (default)", () => {
-      expect(getTabWidth("nonexistent" as any)).toBe(280);
+    it("falls back to the canonical drawer width for an unknown tab", () => {
+      expect(getTabWidth("nonexistent" as any)).toBe(SIDEBAR_WIDE);
     });
   });
 
@@ -110,10 +114,13 @@ describe("tabsConfig helpers", () => {
     });
 
     it("panel-mode tabs have panelWidth defined", () => {
+      // Asserts the RESOLVED width, not a declared one. Requiring every panel
+      // tab to carry its own panelWidth was the old two-width rule expressed as
+      // a test; now a tab omits it and inherits SIDEBAR_WIDE, so a declaration
+      // is the exception rather than the requirement.
       const panelTabs = GROUPED_TABS_CONFIG.filter((t) => t.mode === "panel");
       for (const tab of panelTabs) {
-        expect(tab.panelWidth).toBeDefined();
-        expect(tab.panelWidth).toBeGreaterThan(0);
+        expect(getTabWidth(tab.id)).toBe(SIDEBAR_WIDE);
       }
     });
   });

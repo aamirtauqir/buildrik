@@ -1,44 +1,59 @@
 import { describe, it, expect } from "vitest";
-import { GROUPED_TABS_CONFIG } from "../tabsConfig";
+import { GROUPED_TABS_CONFIG, getTabWidth } from "../tabsConfig";
+import { SIDEBAR_WIDE } from "@/shared/constants/layout";
 
 /**
- * Width-rule lock (gap-fill). The 2026-05-22 width rule (tabsConfig.ts,
- * GroupedTabConfig.panelWidth doc) allows exactly two drawer widths:
- *   280 → list/tree surfaces, 320 → browse/canvas-rich surfaces.
- * Existing suites assert widths for a handful of tabs (add/layers/pages/
- * components = 280, ai = 320) but never the universal invariant, and never
- * the six remaining tabs (templates/assets/design/settings/publish/history).
- * The 700px Settings outlier is the historical reason this rule exists —
- * this test is the regression guard for it.
+ * Drawer-width lock.
+ *
+ * REWRITTEN 2026-08-03. This file used to lock the two-width rule of
+ * 2026-05-22 — 280 for list/tree surfaces, 320 for browse surfaces — with a
+ * hardcoded per-tab map. That rule was superseded by the founder-approved
+ * convergence of 2026-07-24 ("ONE width for every panel", `SIDEBAR_WIDE` in
+ * shared/constants/layout.ts) and removed from DESIGN.md's §Sidebar table, but
+ * tabsConfig.ts and these assertions kept enforcing it.
+ *
+ * That mattered, because `panelWidth` is written as an INLINE style on the
+ * panel element, so it beat `--bk-size-drawer` (320, generated from Figma)
+ * every time. The Insert drawer rendered 40px narrow and clipped its own
+ * search field and the right column of its card grid. Figma board 20:6 is
+ * named "GATE A — does 320 hold?" and its two 320-wide panels answer yes: the
+ * Media grid is 16 + 136 + 16 + 136 + 16, exactly 320, which cannot fit in 280.
+ *
+ * The lock is kept rather than deleted — a width rule still needs a regression
+ * guard. It now locks the rule actually in force, and asserts the RESOLVED
+ * width rather than a declared one, so re-introducing a local override fails.
  */
 describe("tabsConfig — drawer width rule", () => {
-  it("every panel tab's width is 280 or 320 — no other value allowed", () => {
-    for (const tab of GROUPED_TABS_CONFIG.filter((t) => t.mode === "panel")) {
+  it("every panel tab resolves to the one canonical drawer width", () => {
+    const panels = GROUPED_TABS_CONFIG.filter((t) => t.mode === "panel");
+    expect(panels.length).toBeGreaterThan(0); // a vacuous loop must not pass
+    for (const tab of panels) {
       expect(
-        [280, 320],
-        `tab "${tab.id}" has panelWidth ${tab.panelWidth} — must be 280 or 320`
-      ).toContain(tab.panelWidth);
+        getTabWidth(tab.id),
+        `tab "${tab.id}" resolves to ${getTabWidth(tab.id)} — every panel is SIDEBAR_WIDE`
+      ).toBe(SIDEBAR_WIDE);
     }
   });
 
-  it("assigns 280 to list/tree surfaces and 320 to browse surfaces, per tab", () => {
-    const widths = Object.fromEntries(
-      GROUPED_TABS_CONFIG.map((t) => [t.id, t.panelWidth])
-    );
-    expect(widths).toEqual({
-      add: 280,
-      layers: 280,
-      pages: 280,
-      components: 280,
-      publish: 280,
-      history: 280,
-      ai: 320,
-      templates: 320,
-      assets: 320,
-      design: 320,
-      settings: 320, // normalized from the 700px outlier 2026-05-22 (D1)
-      review: 320, // browse/thread surface — same 320 as AI/Media/Design
-      content: 320, // P4.2 data front-door — browse/list surface, 320
-    });
+  it("no panel tab declares its own width — an exception must be deliberate", () => {
+    // An override is allowed, but it has to be a conscious act. Silently
+    // re-adding one is how the two-width rule outlived its own removal.
+    for (const tab of GROUPED_TABS_CONFIG.filter((t) => t.mode === "panel")) {
+      expect(
+        tab.panelWidth,
+        `tab "${tab.id}" declares panelWidth ${tab.panelWidth}. If that is a genuine ` +
+          `exception, say why in tabsConfig.ts and update this test.`
+      ).toBeUndefined();
+    }
+  });
+
+  it("tracks the generated token, not a local literal", () => {
+    // SIDEBAR_WIDE mirrors --bk-size-drawer, which generate.mjs emits from
+    // figma-tokens.json (size/drawer). If Figma moves the drawer, this moves.
+    expect(SIDEBAR_WIDE).toBe(320);
+  });
+
+  it("an unknown tab still resolves to the canonical width", () => {
+    expect(getTabWidth("nonexistent" as never)).toBe(SIDEBAR_WIDE);
   });
 });

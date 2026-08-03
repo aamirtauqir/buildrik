@@ -9,6 +9,8 @@
  * @license BSD-3-Clause
  */
 
+import { SIDEBAR_WIDE } from "@/shared/constants/layout";
+
 // ─── Tab Types ────────────────────────────────────────────────────────────────
 
 export type GroupedTabId =
@@ -59,16 +61,25 @@ export interface GroupedTabConfig {
   accent?: boolean;
   /** Whether this tab opens a 280px panel or replaces the canvas with a full-page view */
   mode: TabMode;
-  /** Panel width in pixels (only for mode="panel"). Defaults to 280 if omitted.
+  /** Panel width in pixels (only for mode="panel").
    *
-   *  Width rule (locked 2026-05-22):
-   *   - 280  → list/tree surfaces (Layers, Pages, Add, Components, Publish, History)
-   *   - 320  → browse / canvas-rich surfaces (AI conversation, Templates, Media, Design)
-   *   - mode="fullpage" → workflow surfaces (Settings — too page-shaped for a drawer)
+   *  Omit it. Defaults to `SIDEBAR_WIDE`, which is ONE width for every panel.
    *
-   *  New tabs MUST pick one of these widths OR document why they're an
-   *  exception. The 700px Settings outlier is the historical reason this
-   *  rule exists. */
+   *  The two-width rule that lived here ("locked 2026-05-22": 280 for list/tree
+   *  surfaces, 320 for browse surfaces) was superseded by the founder-approved
+   *  convergence on 2026-07-24 and removed from DESIGN.md's §Sidebar table, but
+   *  this file kept enforcing it — and since it is written as an INLINE style on
+   *  the panel element, it beat `--bk-size-drawer` (320) every time.
+   *
+   *  What that cost, visibly: the Insert drawer rendered 40px narrow and clipped
+   *  its own search field ("Describe or search to in") and the right column of
+   *  its card grid. Figma board 20:6 is named "GATE A — does 320 hold?" and its
+   *  two 320-wide panels answer yes — the Media grid is 16 + 136 + 16 + 136 + 16,
+   *  which is exactly 320 and cannot fit in 280.
+   *
+   *  Set this ONLY for a genuine exception, and say why. mode="fullpage" remains
+   *  the answer for page-shaped surfaces (Settings), which is what the old 700px
+   *  outlier was really asking for. */
   panelWidth?: number;
   /** Which rail zone this tab appears in. undefined = no rail button (design, publish). */
   zone?: TabZone;
@@ -90,7 +101,6 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     pattern: "card-drill-in",
     shortcut: "A",
     mode: "panel",
-    panelWidth: 280,
     zone: "creation",
   },
   {
@@ -103,7 +113,6 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     pattern: "standalone",
     shortcut: "I",
     mode: "panel",
-    panelWidth: 320,
     zone: "creation",
   },
   {
@@ -120,7 +129,6 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     pattern: "card-drill-in",
     shortcut: "T",
     mode: "panel",
-    panelWidth: 320,
     zone: "creation",
   },
   {
@@ -133,7 +141,6 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     pattern: "standalone",
     shortcut: "M",
     mode: "panel",
-    panelWidth: 320,
     zone: "creation",
   },
   // ── STRUCTURE: page organization ───────────────────────────────────────────
@@ -147,7 +154,6 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     pattern: "standalone",
     shortcut: "L",
     mode: "panel",
-    panelWidth: 280,
     zone: "structure",
   },
   {
@@ -160,7 +166,6 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     pattern: "standalone",
     shortcut: "P",
     mode: "panel",
-    panelWidth: 280,
     zone: "structure",
   },
   {
@@ -177,7 +182,6 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     pattern: "card-drill-in",
     shortcut: "⇧A",
     mode: "panel",
-    panelWidth: 280,
     // Reclassified 2026-05-22: Components is a library (browse + insert
     // reusable patterns) — same mental class as Add/Templates. Moved to
     // CREATION zone for IA symmetry. Previously labeled "Comps" (truncated)
@@ -197,7 +201,6 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     pattern: "standalone",
     shortcut: "B",
     mode: "panel",
-    panelWidth: 320,
     zone: "config",
   },
   {
@@ -214,7 +217,6 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     // 140px-snav + 1fr-pane now renders full-width via FullPageRouter; the drawer
     // path is retired. panelWidth kept as the fallback the width helper reads.
     mode: "fullpage",
-    panelWidth: 320,
     zone: "config",
   },
   {
@@ -227,7 +229,6 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     pattern: "standalone",
     shortcut: "U",
     mode: "panel",
-    panelWidth: 280,
     // Classified 2026-05-22: publish is the user's GOAL after building, not
     // a config-tier concern. Stays bottom-section visually (alongside
     // Settings + History) but joins CONFIG zone for taxonomy. If we add a
@@ -244,7 +245,6 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     pattern: "standalone",
     shortcut: "H",
     mode: "panel",
-    panelWidth: 280,
     zone: "config",
   },
   {
@@ -261,7 +261,6 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     pattern: "standalone",
     shortcut: "R",
     mode: "panel",
-    panelWidth: 320,
   },
   {
     // P4.2 data front-door. Off-rail like review (no `zone`), so it doesn't
@@ -279,7 +278,6 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     // Bare C toggles comment mode (useEditorShortcuts).
     shortcut: "D",
     mode: "panel",
-    panelWidth: 320,
   },
 ];
 
@@ -292,9 +290,11 @@ export function getTabMode(tabId: GroupedTabId): TabMode {
   return TAB_CONFIG_MAP.get(tabId)?.mode ?? "panel";
 }
 
-/** Get the panel width for a given tab (only meaningful for panel-mode tabs) */
+/** Get the panel width for a given tab (only meaningful for panel-mode tabs).
+ *  Falls back to the single canonical drawer width rather than a local literal:
+ *  SIDEBAR_WIDE tracks `--bk-size-drawer`, which is generated from Figma. */
 export function getTabWidth(tabId: GroupedTabId): number {
-  return TAB_CONFIG_MAP.get(tabId)?.panelWidth ?? 280;
+  return TAB_CONFIG_MAP.get(tabId)?.panelWidth ?? SIDEBAR_WIDE;
 }
 
 /** Get full config for a tab by id */
