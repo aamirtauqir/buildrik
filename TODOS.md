@@ -299,3 +299,44 @@ D3 target size + gate (`d8f82204`), D2 Exit button (`e1782ef9`).
   rule 4), review pill tone (T8/D7 rule 3), and the eye/comment/shield tool
   icons ("Figma nodes pending", `Topbar.tsx`). The CODE is right in all three.
   Update the Figma component so conformance runs stop re-flagging them.
+
+## Media surface — from /plan-eng-review 2026-08-03
+
+Review of `docs`-adjacent design doc `shahg-main-design-20260803-200524.md`
+(Media + Content drawers, Approach C). These three were found during the review
+and deliberately left OUT of that arc.
+
+- [ ] **Fullpage MediaTab header is hand-rolled, and 62 inline styles sit under it.**
+  `MediaTab.tsx:53` (drawer branch) correctly uses `PanelFrame.Header`, but `:287`
+  (fullpage branch) hand-rolls `<div className="med-tabs-wrap" style={{display:'flex',
+  alignItems:'center', justifyContent:'space-between', height: ROW_LG}}>`. One tab,
+  two headers. The stated goal is "flowbite via chrome-ui", so this is part of the
+  problem, not cleanup (Codex, outside voice).
+  **Measured split: 34 of the inline styles are STATIC and convert straight to `tw:`
+  classes; 19 are genuinely dynamic and must stay** — CLAUDE.md allows exactly that
+  ("NO inline style objects except dynamic computed values"). Examples:
+  `{display:'flex',alignItems:'center',gap:8}` → `tw:flex tw:items-center tw:gap-2`;
+  `{display:"none"}` → `tw:hidden`. Mixed cases split rather than convert wholesale —
+  `MediaContextMenu.tsx` is `{position:"fixed", left, top, width:MENU_WIDTH, zIndex:200}`,
+  which becomes `tw:fixed tw:w-[...] tw:z-[200]` plus `style={{left, top}}` for the part
+  actually computed from the click.
+  Top files by static count: LibraryView (8), StockSourceModal (5), ImageEditorModal (4),
+  MediaContextMenu (3), FolderTree (3), AssetGrid (3).
+  **Depends on:** the Media drawer arc landing first, so the two do not move together.
+
+- [ ] **`StockService.ts` file-header is stale and actively misleads.** Lines 4-10 say
+  "Currently a stub: returns empty results" and "To enable real stock search, swap the
+  implementations". Line 48 records the truth (`#24, 2026-06-24: the provider is wired
+  via the dashboard tRPC proxy`) and line 67 makes the real query. Delete the stale
+  paragraph. **Context worth keeping:** this comment produced a confident P1 finding in
+  the 2026-08-03 eng review that had to be retracted after reading the implementation.
+  A wrong comment cost more than no comment.
+
+- [ ] **`StockService` collapses "error" into "empty".** `searchPhotos`/`searchVideos`
+  catch every non-abort failure and `return []`, so a provider outage and a genuine
+  zero-result search are indistinguishable to callers. Figma `453:3931 Media · load-error`
+  draws them differently — "Couldn't load your media." + Try again / Browse stock, versus
+  the ordinary empty state. That screen cannot be built truthfully until the return
+  contract can express failure. **This is the one real exception to the design doc's
+  "zero new endpoints" premise** — the server is fine; the editor-side return type changes.
+  **Depends on:** decide before building the Media load-error state.
