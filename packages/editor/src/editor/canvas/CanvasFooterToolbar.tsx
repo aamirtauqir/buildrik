@@ -277,6 +277,13 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
                 onChange={onDeviceChange}
                 includeWide
                 aria-label="Device breakpoint"
+                // Conformance anchor at the CALL SITE, not inside the component.
+                // BreakpointSwitcher is a generic chrome-ui primitive; if a
+                // second one ever appears (a settings panel, say) an anchor
+                // baked into the component would match both and Playwright
+                // throws on an ambiguous locator. The composition site knows
+                // which instance this is.
+                data-testid="breakpoint-switcher"
               />
             )}
           </div>

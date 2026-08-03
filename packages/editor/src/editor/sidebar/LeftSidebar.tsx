@@ -514,6 +514,10 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
       <nav
         ref={navRef}
         className="ls-rail"
+        // Conformance anchor — see themes/fonts.css era note in Topbar.tsx.
+        // `.ls-rail` happens to be stable today, but recipes select on testids
+        // uniformly so a class rename can never silently unhook measurement.
+        data-testid="rail"
         role="tablist"
         aria-label="Editor navigation"
         aria-orientation="vertical"
@@ -559,6 +563,15 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
       <div
         className={`ls-panel${!drawerOpen ? " ls-panel--closed" : ""}`}
         style={{ width: drawerOpen ? panelWidth : 0 }}
+        // Conformance anchor. NOTE for whoever measures this: the inline width
+        // above comes from tabsConfig's `panelWidth`, which falls back to a
+        // narrower default when a tab omits it (rail/tabsConfig.ts:62) — while
+        // `--bk-size-drawer` and SIDEBAR_WIDE both carry the wider value that
+        // was founder-approved 2026-07-24 as matching Figma 32-2. Insert omits
+        // the width, so the drawer renders under the token and clips its own
+        // search field. Tracked as wave A work; the anchor is here so the
+        // harness can prove it instead of someone spotting it by eye.
+        data-testid="sidebar-panel"
         role="tabpanel"
         aria-hidden={!drawerOpen}
       >

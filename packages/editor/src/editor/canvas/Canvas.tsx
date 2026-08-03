@@ -502,6 +502,12 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
             ref={canvasRef}
             className={`buildrick-canvas${showComponentView ? " bd-canvas--component-view" : ""}`}
             data-buildrick-canvas="true"
+            // Conformance anchor, deliberately separate from the engine markers
+            // above. `data-buildrick-canvas` and `.buildrick-canvas` are queried
+            // by engine and overlay code; this one is owned by the measurement
+            // harness. Sharing a hook between the two would mean an engine
+            // refactor silently unhooks conformance.
+            data-testid="canvas"
             data-device={device}
             data-show-outlines={showOutlines ? "true" : undefined}
             data-xray-mode={showXRay ? "true" : undefined}

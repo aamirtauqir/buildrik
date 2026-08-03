@@ -104,6 +104,12 @@ export function Topbar({
   const hasTools = Boolean(tools && (tools.onPreview || tools.onToggleComments || tools.issues));
   return (
     <header
+      // Conformance anchor. The bar wears only utility classes, so any selector
+      // built from them breaks on the next drain commit — which is exactly what
+      // happened: scripts/conformance/surfaces/shell-default.json waited on
+      // `.bd-topbar`, a class that exists in no file under src/. Rendered once
+      // (StudioHeader.tsx), so the id is unambiguous.
+      data-testid="topbar"
       className={
         /* The bar measures itself so the compact tiers of plan §7 key off the
            space it actually has, not the viewport — the shell's rails eat
