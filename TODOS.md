@@ -264,7 +264,7 @@ disabled/readOnly affordance, workspace-rename stale sidebar.
 
 ## Editor ↔ Figma fidelity — deferred from /qa 2026-08-03
 
-Full report: `packages/editor/.gstack/qa-reports/qa-report-editor-figma-2026-08-03.md`.
+Full report: `docs/audits/2026-08-03-editor-figma-qa.md` (screenshots alongside it).
 Fixed in the same run: Publish black ring (`7683eabc`), Publish 40px→32px (`af315d82`).
 
 - [ ] **D1 — IconButton 28×28 vs the board's 32×32.** `chrome-ui/Icon.tsx:51`
