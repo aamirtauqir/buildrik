@@ -48,7 +48,12 @@ export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(f
       ref={ref}
       type="button"
       className={[
-        "tw:inline-flex tw:items-center tw:justify-center tw:h-7 tw:w-7 tw:border-0 tw:rounded-md",
+        // 32x32 (h-8), per the board's Icon button component (697:440), whose
+        // own note gives the reason: "32x32 so it clears the 24px touch
+        // minimum." Was h-7 (28) with no decision record anywhere — 28 does
+        // clear WCAG 2.5.8's 24x24, so this is fidelity rather than a
+        // violation, but nothing chose 28 either.
+        "tw:inline-flex tw:items-center tw:justify-center tw:h-8 tw:w-8 tw:border-0 tw:rounded-md",
         "tw:bg-transparent tw:text-gray-600 tw:cursor-pointer tw:[transition:var(--bk-transition-fast)]",
         "tw:enabled:hover:bg-gray-100 tw:enabled:hover:text-gray-900",
         "tw:aria-pressed:bg-blue-50 tw:aria-pressed:text-blue-700",
