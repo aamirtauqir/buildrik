@@ -237,6 +237,17 @@ jobs:
         working-directory: packages/editor
         run: pnpm run test:parity
 
+      # WCAG 2.5.8 target size — every interactive control at least 24x24.
+      # Locked at zero: the exemption map in the spec ships empty. This lives in
+      # a browser because jsdom does not lay out, so a vitest assertion on
+      # control size cannot fail no matter how small the control gets — the same
+      # blindness that let a 21.92x18 delete button and four 16px link actions
+      # ship. Negative-controlled: watched failing on 5 of 6 cases before the
+      # fix, and against a planted 20px control after it.
+      - name: Target size (WCAG 2.5.8)
+        working-directory: packages/editor
+        run: npx playwright test e2e/target-size.spec.ts
+
       # Spec freshness, --mode=ci so it WARNS. CI has no Figma access and cannot
       # re-extract, so blocking here would fail a build for something the build
       # cannot fix. The pre-push hook runs the identical check in --mode=prepush,

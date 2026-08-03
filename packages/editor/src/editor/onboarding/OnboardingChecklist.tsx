@@ -211,7 +211,9 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
                     <Button
                       type="button"
                       size="xs"
-                      className="tw:self-start tw:font-semibold"
+                      /* min-h-6 = 24: flowbite's xs renders this at 22px tall,
+                         under WCAG 2.5.8's 24x24 target minimum. */
+                      className="tw:self-start tw:font-semibold tw:min-h-6"
                       onClick={() => onAction(step.actionKey!)}
                     >
                       {step.actionLabel}

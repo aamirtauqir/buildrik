@@ -17,6 +17,7 @@ import {
   Button,
   Checkbox,
   EmptyState,
+  IconButton,
   ListRow,
   RecordRow,
   Row,
@@ -42,8 +43,13 @@ const SCROLL = "tw:flex-1 tw:min-h-0 tw:overflow-y-auto";
  *  `2px outset` button border survives and the control grows 4px in both
  *  axes. The parity harness caught exactly that. With the width at 0 the
  *  colour is unobservable, so no `border-transparent` here. */
+/* `tw:p-0` leaves the height entirely to the line-box, which rendered every
+   link-action ("+ Add", "+ Add field", "+ New collection") and every breadcrumb
+   at 16px tall — under WCAG 2.5.8's 24x24 target minimum. `min-h-6` is 24
+   exactly; `items-center` already centres the label, so the glyph does not
+   move, only the hit area grows. */
 const LINK_BTN =
-  "tw:inline-flex tw:items-center tw:gap-1.5 tw:bg-transparent tw:border-0 tw:p-0 " +
+  "tw:inline-flex tw:items-center tw:gap-1.5 tw:bg-transparent tw:border-0 tw:p-0 tw:min-h-6 " +
   "tw:text-[13px] tw:text-blue-700 tw:hover:text-blue-800 tw:enabled:hover:bg-transparent";
 /** The quiet row-action button, previously copy-pasted at eleven call sites. */
 const GHOST = "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900";
@@ -344,15 +350,16 @@ export function FieldsView({
             </span>
             <span className={ROW_ACTIONS}>
               {f.validation?.required && <span className={SUB}>required</span>}
-              <Button
-                color="light"
-                size="xs"
-                className={GHOST}
-                aria-label={`Delete field ${f.name}`}
+              {/* IconButton, not a text Button carrying a glyph. An icon-only
+                  action rendered as `<Button size="xs">✕</Button>` sizes itself
+                  to the glyph — this one measured 21.92x18, under WCAG 2.5.8's
+                  24x24. IconButton is 32x32 and requires the label. */}
+              <IconButton
+                label={`Delete field ${f.name}`}
                 onClick={() => setConfirmDelete(f)}
               >
                 ✕
-              </Button>
+              </IconButton>
             </span>
           </Row>
         ))}
