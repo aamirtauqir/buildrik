@@ -54,6 +54,23 @@
     "without them are SKIPPED by diff.mjs and counted in the report header, so",
     "coverage cannot shrink quietly. A shell surface legitimately draws from",
     "several component boards, which is why the join is per-target rather than",
-    "one board per surface."
+    "one board per surface.",
+    "",
+    "`states` are measured in ONE page visit: default, then each state applied,",
+    "read and reset, then default read AGAIN and compared byte-for-byte against",
+    "the first. That re-read is the whole safety argument for sharing a page \u2014",
+    "a hover left on, or focus never blurred, looks exactly like real drift."
+  ],
+  "states": [
+    {
+      "name": "hover",
+      "action": "hover",
+      "testId": "rail"
+    },
+    {
+      "name": "focus",
+      "action": "focus",
+      "testId": "topbar"
+    }
   ]
 }

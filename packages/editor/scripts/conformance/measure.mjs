@@ -139,7 +139,11 @@ if (unresolved.length) {
   process.exit(3);
 }
 
-const result = await page.evaluate(({ targets, contrastScope, ignore }) => {
+/**
+ * Read every target plus the contrast sweep, once. Called per interaction
+ * state, so this must stay free of side effects on the page.
+ */
+const readAll = () => page.evaluate(({ targets, contrastScope, ignore }) => {
   const lum = (r, g, b) => {
     const f = (c) => {
       c /= 255;
@@ -290,7 +294,73 @@ const result = await page.evaluate(({ targets, contrastScope, ignore }) => {
   ignore: recipe.ignore,
 });
 
+/**
+ * INTERACTION STATES — one page visit, not one per state.
+ *
+ * Four states across sixty surfaces is 240 page loads if each reloads; one
+ * visit each is sixty. The saving is real but it is only SAFE if the reset
+ * actually resets, so that is asserted rather than asserted-in-a-comment: the
+ * default state is read again after the whole cycle and must be byte-identical
+ * to the first read. If a hover was left on, or focus never blurred, the two
+ * differ and the run exits 3 naming the property that drifted.
+ *
+ * Without that check, sharing a page across states is a guess — and a leaked
+ * state looks exactly like real drift in the diff.
+ */
+const applyState = async (st) => {
+  const sel = refToSelector(st, `state ${st.name}`);
+  if (st.action === "hover") await page.hover(sel, { timeout: 15000 });
+  else if (st.action === "focus") await page.focus(sel, { timeout: 15000 });
+  else if (st.action === "active") await page.locator(sel).hover({ timeout: 15000 });
+  else throw new Error(`state "${st.name}" has unknown action "${st.action}"`);
+  await page.waitForTimeout(st.settleMs ?? 150);
+};
+
+/** Undo a state. Deliberately explicit — "it will reset itself" is the bug. */
+const resetState = async () => {
+  // Move the pointer off any element, and drop focus back to the body.
+  await page.mouse.move(0, 0);
+  await page.evaluate(() => (document.activeElement instanceof HTMLElement) && document.activeElement.blur());
+  await page.waitForTimeout(150);
+};
+
+const baseline = await readAll();
+const states = {};
+for (const st of recipe.states ?? []) {
+  await applyState(st);
+  states[st.name] = await readAll();
+  await resetState();
+}
+
+// The leak detector. Re-read the default state and compare target geometry and
+// computed CSS against the first read.
+let leak = null;
+if (Object.keys(states).length) {
+  const after = await readAll();
+  const before = JSON.stringify(baseline.targets);
+  if (JSON.stringify(after.targets) !== before) {
+    const diffs = [];
+    for (const [i, b] of baseline.targets.entries()) {
+      const a = after.targets[i];
+      for (const k of Object.keys(b.css ?? {})) {
+        if (b.css[k] !== a?.css?.[k]) diffs.push(`${b.name}.${k}: ${b.css[k]} -> ${a?.css?.[k]}`);
+      }
+    }
+    leak = diffs;
+  }
+}
+
 await browser.close();
+
+if (leak) {
+  console.error(
+    `[measure] surface "${surfaceId}": STATE LEAK — the default state does not read the same ` +
+    `after the interaction cycle as before it. A state was applied and not undone, so every ` +
+    `subsequent measurement is untrustworthy.`
+  );
+  for (const d of leak.slice(0, 12)) console.error(`          ${d}`);
+  process.exit(3);
+}
 
 mkdirSync(OUT_DIR, { recursive: true });
 const out = {
@@ -298,7 +368,8 @@ const out = {
   board: recipe.board ?? null,
   viewport: recipe.viewport ?? { width: 1440, height: 900 },
   measuredAt: new Date().toISOString(),
-  ...result,
+  ...baseline,
+  states,
 };
 const outPath = join(OUT_DIR, `${surfaceId}.json`);
 writeFileSync(outPath, JSON.stringify(out, null, 2));
