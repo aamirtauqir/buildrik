@@ -276,13 +276,26 @@ jobs:
           set -euo pipefail
           npx vite --port 5050 --strictPort > /tmp/vite-conformance.log 2>&1 &
           VITE_PID=$!
-          trap 'kill $VITE_PID 2>/dev/null || true' EXIT
+          # Second server, package root: the Media recipes measure the PROBE,
+          # because the states that board draws (populated library, failed
+          # upload) are not reachable by clicking the demo app. Different vite
+          # root, so it cannot be the same server as the demo above.
+          npx vite . --port 5051 --strictPort > /tmp/vite-probe.log 2>&1 &
+          PROBE_PID=$!
+          trap 'kill $VITE_PID $PROBE_PID 2>/dev/null || true' EXIT
           for i in $(seq 1 90); do
             curl -sf -o /dev/null http://localhost:5050/ && break
             sleep 1
           done
           curl -sf -o /dev/null http://localhost:5050/ || {
             echo "dev server never came up; last 40 lines:"; tail -40 /tmp/vite-conformance.log; exit 1;
+          }
+          for i in $(seq 1 90); do
+            curl -sf -o /dev/null http://localhost:5051/e2e/probe/probe.html && break
+            sleep 1
+          done
+          curl -sf -o /dev/null http://localhost:5051/e2e/probe/probe.html || {
+            echo "probe server never came up; last 40 lines:"; tail -40 /tmp/vite-probe.log; exit 1;
           }
           # --all, not a surface name: with the id hardcoded, every recipe added
           # after `shell-default` would sit in surfaces/ and never run, and CI

@@ -99,8 +99,8 @@ export function SlimLauncher(props: SlimLauncherProps) {
       <PanelFrame.Header title="Media" onClose={onClose} />
 
       {/* Search — board `144:7`: 28h field inset 16, on bg-subtle. */}
-      <div className="sl-search tw:px-4 tw:py-1" data-testid="media-search">
-        <span className="tw:relative tw:flex tw:items-center">
+      <div className="sl-search tw:flex tw:h-9 tw:items-center tw:px-4" data-testid="media-search">
+        <span className="tw:relative tw:flex tw:w-full tw:items-center">
           <Search
             size={14}
             className="sl-search__icon tw:pointer-events-none tw:absolute tw:left-2.5 tw:text-gray-500"
@@ -193,7 +193,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
         )}
       </div>
 
-      <div className="sl-upload-footer" data-testid="media-footer">
+      <div className="sl-upload-footer" data-testid="media-footer-region">
         {/* Strip first: the board puts the failure above the footer links
             (145:195 sits between the spacer and 145:192), because the thing
             that went wrong outranks the thing you might do next. */}
@@ -207,7 +207,10 @@ export function SlimLauncher(props: SlimLauncherProps) {
           disabled={props.storage.used >= props.storage.total}
         />
         {/* Board `144:46` — two accent text links, 44h row. */}
-        <div className="tw:flex tw:h-11 tw:items-center tw:gap-6 tw:px-4 tw:text-[13px]">
+        <div
+          className="tw:flex tw:h-11 tw:items-center tw:gap-6 tw:px-4 tw:text-[13px] tw:leading-5 tw:text-blue-700"
+          data-testid="media-footer"
+        >
           <Button
             type="button"
             color="light"

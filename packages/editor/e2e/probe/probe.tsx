@@ -265,6 +265,17 @@ const CASES: Record<string, () => React.ReactElement> = {
   ),
   // ── Media drawer states (T6) — the 320 drawer the board specifies ─────────
   "media-drawer-grid": () => <div data-probe="media-drawer-grid">{mediaDrawer()}</div>,
+  // One card, so a conformance target for `Card / media` resolves to exactly
+  // one element — measure.mjs refuses ambiguity, and rightly: whichever card
+  // happened to be first would be measured silently.
+  "media-drawer-single": () => (
+    <div data-probe="media-drawer-single">
+      {mediaDrawer({
+        libraryItems: [MEDIA_ITEMS[1]],
+        counts: { all: 1, img: 1, vid: 0, ico: 0, fnt: 0 },
+      })}
+    </div>
+  ),
   "media-drawer-empty": () => (
     <div data-probe="media-drawer-empty">
       {mediaDrawer({ libraryItems: [], counts: { all: 0, img: 0, vid: 0, ico: 0, fnt: 0 } })}

@@ -1,0 +1,275 @@
+{
+  "surface": "media-drawer",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "144:2",
+  "boardName": "Media · grid",
+  "figmaHash": "f284ee47e7b16b11b1db06e19d072a51d78d0f311cada75045ea27a8bf1dcd21",
+  "extractorVersion": 1,
+  "extractedAt": "2026-08-04T00:00:00.000000Z",
+  "targets": [
+    {
+      "nodeId": "144:2",
+      "name": "Media · grid",
+      "className": "bg-[var(--color\\/bg-card,white)] content-stretch cursor-pointer flex flex-col items-start relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        }
+      }
+    },
+    {
+      "nodeId": "208:271",
+      "name": "Panel header",
+      "className": "bg-[var(--color\\/bg-panel,white)] content-stretch flex gap-[8px] h-[44px] items-center pl-[16px] pr-[12px] relative shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "44px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "I208:271;16:7",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Medium'] font-medium leading-[16px] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-left tracking-[0.88px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "144:7",
+      "name": "Search",
+      "className": "h-[36px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "36px"
+        }
+      }
+    },
+    {
+      "nodeId": "144:8",
+      "name": "search box",
+      "className": "absolute bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[28px] left-[16px] overflow-clip rounded-[6px] top-[4px] w-[288px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "288px"
+        }
+      }
+    },
+    {
+      "nodeId": "144:9",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[10px] not-italic text-[13px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left top-[5px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "144:10",
+      "name": "Folder row",
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal h-[32px] not-italic overflow-clip relative shrink-0 text-left w-full whitespace-pre",
+      "props": {
+        "height": {
+          "value": "32px"
+        }
+      }
+    },
+    {
+      "nodeId": "144:13",
+      "name": "Type pills",
+      "className": "[word-break:break-word] content-stretch flex gap-[8px] items-start leading-[16px] overflow-clip px-[16px] py-[4px] relative shrink-0 text-[11px] text-left w-full whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "line-height": {
+          "value": "16px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "padding-top": {
+          "value": "4px"
+        },
+        "padding-bottom": {
+          "value": "4px"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "144:14",
+      "name": "pill/image",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] content-stretch flex gap-[4px] items-start overflow-clip px-[8px] py-[3px] relative rounded-[9999px] shrink-0",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "gap": {
+          "value": "4px"
+        },
+        "padding-left": {
+          "value": "8px"
+        },
+        "padding-right": {
+          "value": "8px"
+        },
+        "padding-top": {
+          "value": "3px"
+        },
+        "padding-bottom": {
+          "value": "3px"
+        },
+        "border-radius": {
+          "value": "9999px"
+        }
+      }
+    },
+    {
+      "nodeId": "144:26",
+      "name": "Asset grid",
+      "className": "content-stretch flex flex-col gap-[16px] items-start overflow-clip px-[16px] py-[12px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "16px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "padding-top": {
+          "value": "12px"
+        },
+        "padding-bottom": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "218:686",
+      "name": "Card / media",
+      "className": "content-stretch flex flex-col gap-[4px] h-[104px] items-start relative shrink-0 w-[136px]",
+      "props": {
+        "gap": {
+          "value": "4px"
+        },
+        "height": {
+          "value": "104px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "I218:686;17:7",
+      "name": "thumb",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[76px] relative rounded-[var(--radius\\/sm,4px)] shrink-0 w-[136px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "76px"
+        },
+        "border-radius": {
+          "token": "--radius/sm",
+          "value": "4px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "I218:686;218:6",
+      "name": "badge",
+      "className": "absolute bg-[var(--color\\/ink,#111827)] h-[14px] left-[6px] overflow-clip rounded-[4px] top-[56px] w-[40px]",
+      "props": {
+        "background-color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        },
+        "height": {
+          "value": "14px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "40px"
+        }
+      }
+    },
+    {
+      "nodeId": "144:46",
+      "name": "Footer",
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal h-[44px] leading-[20px] not-italic overflow-clip relative shrink-0 text-[13px] text-[color:var(--color\\/accent-text,#1a56db)] text-left w-full whitespace-pre",
+      "props": {
+        "height": {
+          "value": "44px"
+        },
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        }
+      }
+    }
+  ]
+}

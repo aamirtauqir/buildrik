@@ -85,6 +85,7 @@ export function PanelHeader({ title, actions, isPinned, onPinToggle, onHelpClick
       ]
         .filter(Boolean)
         .join(" ")}
+      data-testid="panel-header"
       {...rest}
     >
       {/* The heading is the TITLE, not the bar. `role="heading"` used to sit on

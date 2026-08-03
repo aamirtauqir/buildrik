@@ -53,7 +53,7 @@ export function TypePills({
 }: TypePillsProps) {
   return (
     <div
-      className="med-type-pills tw:flex tw:items-center tw:gap-2 tw:px-4 tw:py-1 tw:overflow-x-auto"
+      className="med-type-pills tw:flex tw:items-center tw:gap-2 tw:overflow-x-auto tw:px-4 tw:py-1 tw:text-[11px] tw:leading-4"
       role="tablist"
       aria-label="Filter by media type"
       data-testid="media-type-chips"

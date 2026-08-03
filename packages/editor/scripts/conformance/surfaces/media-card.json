@@ -1,0 +1,15 @@
+{
+  "surface": "media-card",
+  "board": "Card / media (Figma 17:6, instanced at 218:686)",
+  "_note": "A one-item probe case, because measure.mjs requires every target to resolve to exactly one element — with four cards on screen it would measure whichever came first and say nothing about which.",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=media-drawer-single",
+  "viewport": { "width": 320, "height": 812 },
+  "steps": [
+    { "action": "waitFor", "testId": "media-card" }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    { "name": "card", "testId": "media-card", "spec": "media-drawer", "nodeId": "218:686" },
+    { "name": "badge", "testId": "media-card-badge", "spec": "media-drawer", "nodeId": "I218:686;218:6" }
+  ]
+}

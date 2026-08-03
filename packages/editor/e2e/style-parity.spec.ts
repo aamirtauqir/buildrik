@@ -28,7 +28,7 @@ const BASELINE_DIR = join(HERE, "baselines");
 
 const CASES = ["content-collection-rows", "content-field-rows", "content-root-rows", "folder-context-menu", "onboarding-steps", "canvas-footer-toolbar", "panel-frame-header",
   // T6 — the Media drawer's data states, none of them reachable by hovering.
-  "media-drawer-grid", "media-drawer-empty", "media-drawer-no-results",
+  "media-drawer-grid", "media-drawer-single", "media-drawer-empty", "media-drawer-no-results",
   "media-drawer-upload-failed", "media-drawer-quota-full"] as const;
 
 for (const name of CASES) {
