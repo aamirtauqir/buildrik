@@ -262,30 +262,40 @@ disabled/readOnly affordance, workspace-rename stale sidebar.
   Fix in `scripts/tokens/figma-tokens.json` and regenerate — hand-editing the
   generated file fails `gate:tokens-generated`. **Effort:** S. **Priority:** P3.
 
-## Editor ↔ Figma fidelity — deferred from /qa 2026-08-03
+## Editor ↔ Figma fidelity — /qa 2026-08-03, all deferred items now CLOSED
 
-Full report: `docs/audits/2026-08-03-editor-figma-qa.md` (screenshots alongside it).
-Fixed in the same run: Publish black ring (`7683eabc`), Publish 40px→32px (`af315d82`).
+Report: `docs/audits/2026-08-03-editor-figma-qa.md` (screenshots alongside it).
 
-- [ ] **D1 — IconButton 28×28 vs the board's 32×32.** `chrome-ui/Icon.tsx:51`
-  (`tw:h-7 tw:w-7`). Figma's Icon button is 32×32 and its doc gives the reason
-  ("32×32 so it clears the 24px touch minimum"). NOT an a11y violation — 28
-  already clears WCAG 2.5.8's 24×24 — so this is fidelity, with a 13-instance /
-  10-file blast radius that visibly changes the whole chrome. No decision record
-  exists for 28. Needs a product call, not a unilateral fix.
-- [ ] **D2 — Exit button off on four properties.** Board `btn/exit` is h28 · px10
-  · 12px regular · `#111827`; renders h32 · px12 · 12px medium · `#4b5563`.
-  Geometry is unambiguous; the COLOUR is not — `GHOST_BTN_CLASS` runs grey-600
-  rest → grey-900 hover, and matching the board at rest deletes that hover
-  affordance. The board only draws a rest state so it cannot settle it.
-- [ ] **D3 — controls under the 24×24 target minimum.** `content-field-rows`
-  entries 9/14/15 measure 21.92 × 18 (WCAG 2.5.8 wants 24×24). Pre-existing;
-  they read 25.92 × 22 before only because 4px of that was the QA-001 black
-  border, which was never real spacing. Under the minimum either way.
-- [ ] **`GHOST_BTN_CLASS` duplicated verbatim in 4 files** — `Topbar.tsx:29`,
-  `Toast.tsx:22`, `PanelFrame.tsx:13`, `PanelHeader.tsx:9`. CLAUDE.md bans exactly
-  this. Refactor, so out of QA scope.
-- [ ] **Board is stale on the topbar, three ways** — save pill (T8/D7 rule 4),
-  review pill tone (T8/D7 rule 3), and the eye/comment/shield tool icons
-  ("Figma nodes pending", `Topbar.tsx:275`). The CODE is right in all three; the
-  Figma component needs updating so the next conformance run stops flagging them.
+Fixed in the QA run: Publish black ring (`7683eabc`), Publish 40px→32px
+(`af315d82`). Fixed in the follow-up: D1 IconButton 28→32 (`8b65eef8`),
+D3 target size + gate (`d8f82204`), D2 Exit button (`e1782ef9`).
+
+- [x] **D1 — IconButton 28×28 → 32×32.** Board 697:440. 13 instances / 8 files,
+  all measured at 32×32 after. Worth restating because the board's own note
+  invites the wrong conclusion: 28 ALSO cleared WCAG 2.5.8, so this was fidelity,
+  never a violation.
+- [x] **D2 — Exit button.** Now h28 · px10 · 12px regular · `#111827`, exactly the
+  board. The colour needed a decision the board could not make: matching
+  gray-900 at rest would have deleted the gray-600→gray-900 hover. Moved the
+  hover signal to a `bg-gray-100` surface instead, so both hold.
+- [x] **D3 — five controls under the 24×24 target minimum**, not the one the
+  report named. Two root causes: an icon-only action rendered as a text
+  `<Button>` with a glyph (21.92×18), and `LINK_BTN`'s `p-0` leaving height to
+  the line-box (16px). Now covered by `e2e/target-size.spec.ts`, **locked at
+  zero** — the exemption map ships empty — and wired into `editor-ci.yml`.
+
+### Still open
+
+- [ ] **`media/components/SelectionBanner.tsx:31`** renders its cancel action as
+  `<Button>✕</Button>` — the same root cause as D3's delete buttons. No probe
+  case reaches it, so it is not covered by the target-size gate and was not
+  changed blind. Convert to `IconButton` and add a probe case in the same edit.
+- [ ] **CORRECTION to the QA report.** It said `GHOST_BTN_CLASS` was "duplicated
+  verbatim in 4 files". That undercounted badly: the *string* is inlined about
+  **130 times** with **16 separate `const GHOST*` definitions**. The original
+  grep matched only the constant name, not the literal. This is not a QA-sized
+  refactor — it belongs to the open one-component-system inline drain.
+- [ ] **The Figma board is stale on the topbar, three ways** — save pill (T8/D7
+  rule 4), review pill tone (T8/D7 rule 3), and the eye/comment/shield tool
+  icons ("Figma nodes pending", `Topbar.tsx`). The CODE is right in all three.
+  Update the Figma component so conformance runs stop re-flagging them.

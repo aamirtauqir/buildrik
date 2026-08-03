@@ -117,7 +117,11 @@ correct.
 
 ---
 
-## Deferred — real gaps, your call
+## Deferred at the time — ALL THREE SUBSEQUENTLY FIXED
+
+Kept as written so the reasoning is legible, with outcomes appended. D1
+`8b65eef8` · D3 `d8f82204` · D2 `e1782ef9`. D3 turned out to be five controls,
+not one, and now has a gate locked at zero (`e2e/target-size.spec.ts`).
 
 ### D1 · IconButton is 28×28, the board says 32×32
 `Icon.tsx:51` — `tw:h-7 tw:w-7`. Figma's Icon button component is 32×32 and its
@@ -147,10 +151,12 @@ which was never real spacing. Both readings are under the minimum.
 
 ## Also noticed
 
-**`GHOST_BTN_CLASS` is duplicated verbatim in 4 files** — `Topbar.tsx:29`,
-`Toast.tsx:22`, `PanelFrame.tsx:13`, `PanelHeader.tsx:9`, identical string. The
-repo's own CLAUDE.md bans exactly this ("same concept, same value, one place").
-A refactor, not a QA fix, so left alone.
+**`GHOST_BTN_CLASS` duplication — the figure below was WRONG, corrected
+2026-08-03.** This section originally read "duplicated verbatim in 4 files".
+That grep matched only the constant NAME. The literal string is inlined about
+**130 times**, behind **16 separate `const GHOST*` definitions**. The repo's own
+CLAUDE.md bans exactly this, but at that size it is not a QA-sized refactor — it
+belongs to the open one-component-system inline drain, and is left there.
 
 **Untracked directories appeared mid-session** and are not mine:
 `packages/editor/{MISSION,NOTES,RESOURCES}.md`, `assets/`, `learning-records/`,
