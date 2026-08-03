@@ -20,7 +20,7 @@ import * as playwright from "playwright-core";
 // mechanics, different question. See e2e/lib/measure-lib.mjs.
 import { launchPinnedBrowser, fontsLoadedStatus } from "../../e2e/lib/measure-lib.mjs";
 // Recipe schema lives in lib.mjs so every consumer reads the same rules.
-import { validateRecipe } from "./lib.mjs";
+import { validateRecipe, runEvery } from "./lib.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SURFACES = join(HERE, "surfaces");
@@ -31,9 +31,10 @@ if (args.includes("--list")) {
   for (const f of readdirSync(SURFACES)) console.log(f.replace(/\.json$/, ""));
   process.exit(0);
 }
+if (args.includes("--all")) process.exit(runEvery(import.meta.filename, args));
 const surfaceId = args.find((a) => !a.startsWith("--"));
 if (!surfaceId) {
-  console.error("usage: measure.mjs <surface-id> [--url <base>] | --list");
+  console.error("usage: measure.mjs <surface-id> [--url <base>] | --all | --list");
   process.exit(2);
 }
 const urlFlag = args.indexOf("--url");

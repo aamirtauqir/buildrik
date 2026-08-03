@@ -284,8 +284,12 @@ jobs:
           curl -sf -o /dev/null http://localhost:5050/ || {
             echo "dev server never came up; last 40 lines:"; tail -40 /tmp/vite-conformance.log; exit 1;
           }
-          node scripts/conformance/measure.mjs shell-default
-          node scripts/conformance/diff.mjs shell-default
+          # --all, not a surface name: with the id hardcoded, every recipe added
+          # after `shell-default` would sit in surfaces/ and never run, and CI
+          # would stay green for screens nobody measured. Both scripts exit
+          # non-zero if ANY single surface fails (lib.mjs runEvery).
+          node scripts/conformance/measure.mjs --all
+          node scripts/conformance/diff.mjs --all
 
 
       - name: Upload report on failure

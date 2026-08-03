@@ -35,7 +35,7 @@ import { readFileSync, existsSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { compareValue, figmaTokenToBk, readRecipe, EXTRACTOR_VERSION } from "./lib.mjs";
+import { compareValue, figmaTokenToBk, readRecipe, runEvery, EXTRACTOR_VERSION } from "./lib.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SURFACES = join(HERE, "surfaces");
@@ -45,10 +45,11 @@ const RAW = join(HERE, "raw-figma");
 const BASELINE = join(HERE, ".conformance-baseline.json");
 
 const args = process.argv.slice(2);
+if (args.includes("--all")) process.exit(runEvery(import.meta.filename, args));
 const surfaceId = args.find((a) => !a.startsWith("--"));
 const updateBaseline = args.includes("--update-baseline");
 if (!surfaceId) {
-  console.error("usage: diff.mjs <surface-id> [--update-baseline]");
+  console.error("usage: diff.mjs <surface-id> [--update-baseline] | --all");
   process.exit(2);
 }
 

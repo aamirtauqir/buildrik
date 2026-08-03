@@ -11,7 +11,8 @@
  *
  * @license BSD-3-Clause
  */
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
+import { spawnSync } from "node:child_process";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -259,4 +260,56 @@ export function validateRecipe(recipe, surfaceId) {
 /** Read + validate in one call. */
 export function readRecipe(path, surfaceId) {
   return validateRecipe(JSON.parse(readFileSync(path, "utf8")), surfaceId);
+}
+
+/**
+ * Run one script over every recipe in `surfaces/`, and fail the run if ANY
+ * single surface fails (T5, plan §Failure modes — the one critical gap the eng
+ * review flagged).
+ *
+ * The naive shape — a `for` loop that awaits each surface in-process — is
+ * exactly the "gate that lies" this harness exists to prevent: one thrown
+ * recipe, one swallowed rejection, and the loop reports green for screens it
+ * never measured. So each surface runs in its own process and its exit code is
+ * kept. A crash is a failure, not a gap in the log.
+ *
+ * Sequential on purpose. Both consumers drive a browser against one dev
+ * server; running them in parallel would have surfaces competing for the same
+ * viewport and produce measurements that depend on scheduling.
+ *
+ * @param {string} scriptPath - the caller's own file; it re-invokes itself per surface.
+ * @param {string[]} args - the caller's argv tail; `--all` is dropped, the rest pass through.
+ * @returns {number} 0 when every surface passed, 1 otherwise.
+ */
+export function runEvery(scriptPath, args) {
+  const ids = readdirSync(join(HERE, "surfaces"))
+    .filter((f) => f.endsWith(".json"))
+    .map((f) => f.replace(/\.json$/, ""))
+    .sort();
+
+  if (ids.length === 0) {
+    console.error("[all] no recipes in surfaces/ — nothing was measured, which is not a pass.");
+    return 1;
+  }
+
+  const passThrough = args.filter((a) => a !== "--all");
+  const failures = [];
+  for (const id of ids) {
+    console.log(`\n[all] ── ${id} ─────────────────────────────────────────`);
+    const run = spawnSync(process.execPath, [scriptPath, id, ...passThrough], { stdio: "inherit" });
+    // `status === null` means the child was killed by a signal (OOM, timeout).
+    // That is a failure with no exit code, and must never fall through as 0.
+    const code = run.status ?? 1;
+    if (code !== 0) failures.push({ id, code });
+  }
+
+  if (failures.length) {
+    console.error(
+      `\n[all] FAIL — ${failures.length} of ${ids.length} surface(s): ` +
+        failures.map((f) => `${f.id}(exit ${f.code})`).join(", "),
+    );
+    return 1;
+  }
+  console.log(`\n[all] PASS — ${ids.length} surface(s).`);
+  return 0;
 }
