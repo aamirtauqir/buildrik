@@ -20,6 +20,11 @@
  */
 import * as React from "react";
 import { createRoot } from "react-dom/client";
+// fonts.css before default.css, and imported here rather than from default.css
+// — see the note at the top of themes/default.css. Without it this probe has no
+// webfont at all, which is how 106 baseline entries came to record
+// `font-family: "Times"`.
+import "@/themes/fonts.css";
 import "@/themes/default.css";
 
 import { CollectionView, FieldsView, RootView } from "@/editor/sidebar/tabs/content/ContentViews";

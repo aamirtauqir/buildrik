@@ -7,13 +7,18 @@
     <!--
       Canonical type stack per Figma "Buildrick — Product" foundations:
       Inter (UI) + Geist Mono (data). No system fallback names.
-      Loaded from Bunny Fonts (privacy-respecting, no Google tracking).
+
+      SELF-HOSTED since 2026-08-03 — `src/themes/fonts.css`, imported by
+      `demo/main.tsx` (and by `e2e/probe/probe.tsx` for the parity harness).
+      NOT routed through `themes/default.css`, because that file is also bundled
+      into the dashboard for the unified editor route, where layout.tsx already
+      loads these families from a CDN — see the note at the top of default.css.
+
+      The Bunny Fonts <link> that used to live here is gone: it loaded with
+      `display=swap` (fallback first, by definition) and `e2e/probe/probe.html`
+      never included it at all, so the style-parity probe measured a font that
+      was never Inter. See fonts.css for the evidence.
     -->
-    <link rel="preconnect" href="https://fonts.bunny.net" />
-    <link
-      href="https://fonts.bunny.net/css?family=inter:400,500,600|geist-mono:400,500&display=swap"
-      rel="stylesheet"
-    />
     <style>
       /*
         Pre-React body defaults — matches canonical --buildrick-* tokens from

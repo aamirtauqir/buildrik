@@ -25,7 +25,7 @@
     "border-bottom-width": "0px",
     "border-bottom-color": "rgb(0, 0, 0)",
     "border-radius": "0px",
-    "font-family": "Times",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "16px",
     "font-weight": "400",
     "line-height": "normal",
@@ -34,7 +34,9 @@
     "overflow": "visible",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "0px",
+    "overflow-x": "visible"
   },
   "onboarding-steps>0": {
     "display": "flex",
@@ -62,7 +64,7 @@
     "border-bottom-width": "1px",
     "border-bottom-color": "rgb(229, 231, 235)",
     "border-radius": "12px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "16px",
     "font-weight": "400",
     "line-height": "normal",
@@ -71,7 +73,9 @@
     "overflow": "hidden",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "0px",
+    "overflow-x": "hidden"
   },
   "onboarding-steps>1": {
     "display": "flex",
@@ -99,7 +103,7 @@
     "border-bottom-width": "0px",
     "border-bottom-color": "rgb(0, 0, 0)",
     "border-radius": "0px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "16px",
     "font-weight": "400",
     "line-height": "normal",
@@ -108,7 +112,9 @@
     "overflow": "visible",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "auto",
+    "overflow-x": "visible"
   },
   "onboarding-steps>2": {
     "display": "flex",
@@ -136,7 +142,7 @@
     "border-bottom-width": "0px",
     "border-bottom-color": "rgb(0, 0, 0)",
     "border-radius": "0px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "16px",
     "font-weight": "400",
     "line-height": "normal",
@@ -145,7 +151,9 @@
     "overflow": "visible",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "0px",
+    "overflow-x": "visible"
   },
   "onboarding-steps>3": {
     "display": "block",
@@ -173,7 +181,7 @@
     "border-bottom-width": "0px",
     "border-bottom-color": "rgb(17, 24, 39)",
     "border-radius": "0px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "13px",
     "font-weight": "600",
     "line-height": "normal",
@@ -182,7 +190,9 @@
     "overflow": "visible",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "auto",
+    "overflow-x": "visible"
   },
   "onboarding-steps>4": {
     "display": "block",
@@ -210,7 +220,7 @@
     "border-bottom-width": "0px",
     "border-bottom-color": "rgb(107, 114, 128)",
     "border-radius": "0px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "11px",
     "font-weight": "500",
     "line-height": "normal",
@@ -219,7 +229,9 @@
     "overflow": "visible",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "auto",
+    "overflow-x": "visible"
   },
   "onboarding-steps>5": {
     "display": "flex",
@@ -247,7 +259,7 @@
     "border-bottom-width": "0px",
     "border-bottom-color": "rgb(0, 0, 0)",
     "border-radius": "0px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "16px",
     "font-weight": "400",
     "line-height": "normal",
@@ -256,7 +268,9 @@
     "overflow": "visible",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "auto",
+    "overflow-x": "visible"
   },
   "onboarding-steps>6": {
     "display": "flex",
@@ -284,7 +298,7 @@
     "border-bottom-width": "0px",
     "border-bottom-color": "rgb(0, 0, 0)",
     "border-radius": "6px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "16px",
     "font-weight": "400",
     "line-height": "normal",
@@ -293,7 +307,9 @@
     "overflow": "visible",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "auto",
+    "overflow-x": "visible"
   },
   "onboarding-steps>7": {
     "display": "block",
@@ -321,7 +337,7 @@
     "border-bottom-width": "0px",
     "border-bottom-color": "rgb(107, 114, 128)",
     "border-radius": "0px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "16px",
     "font-weight": "400",
     "line-height": "normal",
@@ -330,7 +346,9 @@
     "overflow": "hidden",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "auto",
+    "overflow-x": "hidden"
   },
   "onboarding-steps>8": {
     "display": "inline",
@@ -358,7 +376,7 @@
     "border-bottom-width": "0px",
     "border-bottom-color": "rgb(107, 114, 128)",
     "border-radius": "0px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "16px",
     "font-weight": "400",
     "line-height": "normal",
@@ -367,7 +385,9 @@
     "overflow": "visible",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "0px",
+    "overflow-x": "visible"
   },
   "onboarding-steps>9": {
     "display": "flex",
@@ -395,7 +415,7 @@
     "border-bottom-width": "0px",
     "border-bottom-color": "rgb(0, 0, 0)",
     "border-radius": "6px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "16px",
     "font-weight": "400",
     "line-height": "normal",
@@ -404,7 +424,9 @@
     "overflow": "visible",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "auto",
+    "overflow-x": "visible"
   },
   "onboarding-steps>10": {
     "display": "block",
@@ -432,7 +454,7 @@
     "border-bottom-width": "0px",
     "border-bottom-color": "rgb(107, 114, 128)",
     "border-radius": "0px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "16px",
     "font-weight": "400",
     "line-height": "normal",
@@ -441,7 +463,9 @@
     "overflow": "hidden",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "auto",
+    "overflow-x": "hidden"
   },
   "onboarding-steps>11": {
     "display": "inline",
@@ -469,7 +493,7 @@
     "border-bottom-width": "0px",
     "border-bottom-color": "rgb(107, 114, 128)",
     "border-radius": "0px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "16px",
     "font-weight": "400",
     "line-height": "normal",
@@ -478,7 +502,9 @@
     "overflow": "visible",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "0px",
+    "overflow-x": "visible"
   },
   "onboarding-steps>12": {
     "display": "inline",
@@ -506,7 +532,7 @@
     "border-bottom-width": "0px",
     "border-bottom-color": "rgb(107, 114, 128)",
     "border-radius": "0px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "16px",
     "font-weight": "400",
     "line-height": "normal",
@@ -515,7 +541,9 @@
     "overflow": "visible",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "0px",
+    "overflow-x": "visible"
   },
   "onboarding-steps>13": {
     "display": "block",
@@ -543,7 +571,7 @@
     "border-bottom-width": "0px",
     "border-bottom-color": "rgb(0, 0, 0)",
     "border-radius": "0px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "16px",
     "font-weight": "400",
     "line-height": "normal",
@@ -552,7 +580,9 @@
     "overflow": "visible",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "auto",
+    "overflow-x": "visible"
   },
   "onboarding-steps>14": {
     "display": "block",
@@ -580,7 +610,7 @@
     "border-bottom-width": "0px",
     "border-bottom-color": "rgb(0, 0, 0)",
     "border-radius": "1px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "16px",
     "font-weight": "400",
     "line-height": "normal",
@@ -589,7 +619,9 @@
     "overflow": "visible",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "0px",
+    "overflow-x": "visible"
   },
   "onboarding-steps>15": {
     "display": "block",
@@ -617,7 +649,7 @@
     "border-bottom-width": "0px",
     "border-bottom-color": "rgb(0, 0, 0)",
     "border-radius": "0px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "16px",
     "font-weight": "400",
     "line-height": "normal",
@@ -626,7 +658,9 @@
     "overflow": "auto",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "auto",
+    "overflow-x": "auto"
   },
   "onboarding-steps>16": {
     "display": "list-item",
@@ -654,7 +688,7 @@
     "border-bottom-width": "0px",
     "border-bottom-color": "rgb(0, 0, 0)",
     "border-radius": "0px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "16px",
     "font-weight": "400",
     "line-height": "normal",
@@ -663,7 +697,9 @@
     "overflow": "visible",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "0px",
+    "overflow-x": "visible"
   },
   "onboarding-steps>17": {
     "display": "flex",
@@ -691,7 +727,7 @@
     "border-bottom-width": "0px",
     "border-bottom-color": "rgb(0, 0, 0)",
     "border-radius": "0px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "16px",
     "font-weight": "400",
     "line-height": "normal",
@@ -700,7 +736,9 @@
     "overflow": "visible",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "0px",
+    "overflow-x": "visible"
   },
   "onboarding-steps>18": {
     "display": "flex",
@@ -728,7 +766,7 @@
     "border-bottom-width": "1px",
     "border-bottom-color": "rgb(14, 159, 110)",
     "border-radius": "3.35544e+07px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "16px",
     "font-weight": "400",
     "line-height": "normal",
@@ -737,7 +775,9 @@
     "overflow": "visible",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "auto",
+    "overflow-x": "visible"
   },
   "onboarding-steps>19": {
     "display": "block",
@@ -765,7 +805,7 @@
     "border-bottom-width": "0px",
     "border-bottom-color": "rgb(0, 0, 0)",
     "border-radius": "0px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "16px",
     "font-weight": "400",
     "line-height": "normal",
@@ -774,7 +814,9 @@
     "overflow": "hidden",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "auto",
+    "overflow-x": "hidden"
   },
   "onboarding-steps>20": {
     "display": "inline",
@@ -802,7 +844,7 @@
     "border-bottom-width": "0px",
     "border-bottom-color": "rgb(0, 0, 0)",
     "border-radius": "0px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "16px",
     "font-weight": "400",
     "line-height": "normal",
@@ -811,7 +853,9 @@
     "overflow": "visible",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "0px",
+    "overflow-x": "visible"
   },
   "onboarding-steps>21": {
     "display": "block",
@@ -839,7 +883,7 @@
     "border-bottom-width": "0px",
     "border-bottom-color": "rgb(107, 114, 128)",
     "border-radius": "0px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "13px",
     "font-weight": "500",
     "line-height": "17.55px",
@@ -848,7 +892,9 @@
     "overflow": "visible",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "line-through"
+    "text-decoration-line": "line-through",
+    "min-width": "0px",
+    "overflow-x": "visible"
   },
   "onboarding-steps>22": {
     "display": "list-item",
@@ -876,7 +922,7 @@
     "border-bottom-width": "0px",
     "border-bottom-color": "rgb(0, 0, 0)",
     "border-radius": "0px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "16px",
     "font-weight": "400",
     "line-height": "normal",
@@ -885,7 +931,9 @@
     "overflow": "visible",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "0px",
+    "overflow-x": "visible"
   },
   "onboarding-steps>23": {
     "display": "flex",
@@ -913,7 +961,7 @@
     "border-bottom-width": "0px",
     "border-bottom-color": "rgb(0, 0, 0)",
     "border-radius": "0px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "16px",
     "font-weight": "400",
     "line-height": "normal",
@@ -922,7 +970,9 @@
     "overflow": "visible",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "0px",
+    "overflow-x": "visible"
   },
   "onboarding-steps>24": {
     "display": "flex",
@@ -950,7 +1000,7 @@
     "border-bottom-width": "1px",
     "border-bottom-color": "rgb(26, 86, 219)",
     "border-radius": "3.35544e+07px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "16px",
     "font-weight": "400",
     "line-height": "normal",
@@ -959,7 +1009,9 @@
     "overflow": "visible",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "auto",
+    "overflow-x": "visible"
   },
   "onboarding-steps>25": {
     "display": "block",
@@ -987,7 +1039,7 @@
     "border-bottom-width": "0px",
     "border-bottom-color": "rgb(17, 24, 39)",
     "border-radius": "0px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "13px",
     "font-weight": "500",
     "line-height": "17.55px",
@@ -996,7 +1048,9 @@
     "overflow": "visible",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "0px",
+    "overflow-x": "visible"
   },
   "onboarding-steps>26": {
     "display": "block",
@@ -1024,7 +1078,7 @@
     "border-bottom-width": "0px",
     "border-bottom-color": "rgb(209, 213, 219)",
     "border-radius": "0px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "16px",
     "font-weight": "400",
     "line-height": "normal",
@@ -1033,7 +1087,9 @@
     "overflow": "visible",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "auto",
+    "overflow-x": "visible"
   },
   "onboarding-steps>27": {
     "display": "inline",
@@ -1061,7 +1117,7 @@
     "border-bottom-width": "0px",
     "border-bottom-color": "rgb(209, 213, 219)",
     "border-radius": "0px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "16px",
     "font-weight": "400",
     "line-height": "normal",
@@ -1070,7 +1126,9 @@
     "overflow": "hidden",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "0px",
+    "overflow-x": "hidden"
   },
   "onboarding-steps>28": {
     "display": "inline",
@@ -1098,7 +1156,7 @@
     "border-bottom-width": "0px",
     "border-bottom-color": "rgb(209, 213, 219)",
     "border-radius": "0px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "16px",
     "font-weight": "400",
     "line-height": "normal",
@@ -1107,7 +1165,9 @@
     "overflow": "visible",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "0px",
+    "overflow-x": "visible"
   },
   "onboarding-steps>29": {
     "display": "flex",
@@ -1135,7 +1195,7 @@
     "border-bottom-width": "0px",
     "border-bottom-color": "rgb(0, 0, 0)",
     "border-radius": "0px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "16px",
     "font-weight": "400",
     "line-height": "normal",
@@ -1144,7 +1204,9 @@
     "overflow": "visible",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "0px",
+    "overflow-x": "visible"
   },
   "onboarding-steps>30": {
     "display": "block",
@@ -1172,7 +1234,7 @@
     "border-bottom-width": "0px",
     "border-bottom-color": "rgb(107, 114, 128)",
     "border-radius": "0px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "12px",
     "font-weight": "400",
     "line-height": "19.5px",
@@ -1181,7 +1243,9 @@
     "overflow": "visible",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "auto",
+    "overflow-x": "visible"
   },
   "onboarding-steps>31": {
     "display": "block",
@@ -1189,7 +1253,7 @@
     "align-items": "normal",
     "justify-content": "normal",
     "gap": "normal",
-    "width": "163.453px",
+    "width": "172.219px",
     "height": "26px",
     "min-height": "auto",
     "max-width": "none",
@@ -1209,7 +1273,7 @@
     "border-bottom-width": "2px",
     "border-bottom-color": "rgb(0, 0, 0)",
     "border-radius": "0px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "16px",
     "font-weight": "600",
     "line-height": "normal",
@@ -1218,7 +1282,9 @@
     "overflow": "visible",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "auto",
+    "overflow-x": "visible"
   },
   "onboarding-steps>32": {
     "display": "inline",
@@ -1246,7 +1312,7 @@
     "border-bottom-width": "0px",
     "border-bottom-color": "rgb(0, 0, 0)",
     "border-radius": "0px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "16px",
     "font-weight": "600",
     "line-height": "normal",
@@ -1255,7 +1321,9 @@
     "overflow": "hidden",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "0px",
+    "overflow-x": "hidden"
   },
   "onboarding-steps>33": {
     "display": "inline",
@@ -1283,7 +1351,7 @@
     "border-bottom-width": "0px",
     "border-bottom-color": "rgb(0, 0, 0)",
     "border-radius": "0px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "16px",
     "font-weight": "600",
     "line-height": "normal",
@@ -1292,7 +1360,9 @@
     "overflow": "visible",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "0px",
+    "overflow-x": "visible"
   },
   "onboarding-steps>34": {
     "display": "inline",
@@ -1320,7 +1390,7 @@
     "border-bottom-width": "0px",
     "border-bottom-color": "rgb(0, 0, 0)",
     "border-radius": "0px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "16px",
     "font-weight": "600",
     "line-height": "normal",
@@ -1329,7 +1399,9 @@
     "overflow": "visible",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "0px",
+    "overflow-x": "visible"
   },
   "onboarding-steps>35": {
     "display": "list-item",
@@ -1357,7 +1429,7 @@
     "border-bottom-width": "0px",
     "border-bottom-color": "rgb(0, 0, 0)",
     "border-radius": "0px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "16px",
     "font-weight": "400",
     "line-height": "normal",
@@ -1366,7 +1438,9 @@
     "overflow": "visible",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "0px",
+    "overflow-x": "visible"
   },
   "onboarding-steps>36": {
     "display": "flex",
@@ -1394,7 +1468,7 @@
     "border-bottom-width": "0px",
     "border-bottom-color": "rgb(0, 0, 0)",
     "border-radius": "0px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "16px",
     "font-weight": "400",
     "line-height": "normal",
@@ -1403,7 +1477,9 @@
     "overflow": "visible",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "0px",
+    "overflow-x": "visible"
   },
   "onboarding-steps>37": {
     "display": "flex",
@@ -1431,7 +1507,7 @@
     "border-bottom-width": "1px",
     "border-bottom-color": "rgb(209, 213, 219)",
     "border-radius": "3.35544e+07px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "16px",
     "font-weight": "400",
     "line-height": "normal",
@@ -1440,7 +1516,9 @@
     "overflow": "visible",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "auto",
+    "overflow-x": "visible"
   },
   "onboarding-steps>38": {
     "display": "block",
@@ -1468,7 +1546,7 @@
     "border-bottom-width": "0px",
     "border-bottom-color": "rgb(17, 24, 39)",
     "border-radius": "0px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "13px",
     "font-weight": "500",
     "line-height": "17.55px",
@@ -1477,7 +1555,9 @@
     "overflow": "visible",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "0px",
+    "overflow-x": "visible"
   },
   "onboarding-steps>39": {
     "display": "block",
@@ -1505,7 +1585,7 @@
     "border-bottom-width": "0px",
     "border-bottom-color": "rgb(209, 213, 219)",
     "border-radius": "0px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "16px",
     "font-weight": "400",
     "line-height": "normal",
@@ -1514,7 +1594,9 @@
     "overflow": "visible",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "auto",
+    "overflow-x": "visible"
   },
   "onboarding-steps>40": {
     "display": "inline",
@@ -1542,7 +1624,7 @@
     "border-bottom-width": "0px",
     "border-bottom-color": "rgb(209, 213, 219)",
     "border-radius": "0px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "16px",
     "font-weight": "400",
     "line-height": "normal",
@@ -1551,7 +1633,9 @@
     "overflow": "hidden",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "0px",
+    "overflow-x": "hidden"
   },
   "onboarding-steps>41": {
     "display": "inline",
@@ -1579,7 +1663,7 @@
     "border-bottom-width": "0px",
     "border-bottom-color": "rgb(209, 213, 219)",
     "border-radius": "0px",
-    "font-family": "Inter, \"Inter Tight\", -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+    "font-family": "Inter, \"Inter Tight\", sans-serif",
     "font-size": "16px",
     "font-weight": "400",
     "line-height": "normal",
@@ -1588,6 +1672,8 @@
     "overflow": "visible",
     "text-overflow": "clip",
     "white-space": "normal",
-    "text-decoration-line": "none"
+    "text-decoration-line": "none",
+    "min-width": "0px",
+    "overflow-x": "visible"
   }
 }

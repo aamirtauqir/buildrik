@@ -45,4 +45,16 @@
 .bd-studio textarea:not(.buildrick-canvas, .buildrick-canvas *) {
   font: inherit; color: inherit;
 }
+
+/* UI FONT ON THE SHELL ROOT (2026-08-03). Until today the only thing setting a
+   UI font was `body { font-family: ... }` inline in demo/index.html, which
+   e2e/probe/probe.html does not have. The probe therefore rendered in the
+   browser default serif and 106 committed baseline entries recorded
+   `font-family: "Times"`. Setting it on the shell root fixes the probe and is
+   strictly NARROWER than the old body rule, which already inherited into the
+   canvas. Single rule, not the `*` rule, so canvas-mounted customer content
+   keeps overriding it normally. */
+.bd-studio:not(.buildrick-canvas, .buildrick-canvas *) {
+  font-family: var(--bk-font-ui);
+}
 }

@@ -51,6 +51,25 @@ const page = await browser.newPage({ viewport: recipe.viewport ?? { width: 1440,
 // pages that poll.
 await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120000 });
 
+// Fonts before geometry. `domcontentloaded` says nothing about whether the UI
+// typeface has resolved, and every text-dependent measurement below is wrong if
+// it is taken against a fallback face. Fonts are self-hosted as of 2026-08-03
+// (themes/fonts.css) so this settles in milliseconds.
+//
+// The status is checked, not assumed: `page.evaluate(() =>
+// document.fonts.ready)` serializes to `{}`, so a future edit that breaks the
+// expression would silently no-op and every measurement after it would be taken
+// mid-load. Exit 3 — a measurement we cannot trust is MISSING, not a pass.
+const fontStatus = await page.evaluate(async () => {
+  await document.fonts.ready;
+  return document.fonts.status;
+});
+if (fontStatus !== "loaded") {
+  console.error(`[measure] fonts did not finish loading (status=${fontStatus}) — refusing to measure`);
+  await browser.close();
+  process.exit(3);
+}
+
 for (const step of recipe.steps ?? []) {
   if (step.action === "click") await page.click(step.selector);
   else if (step.action === "hover") await page.hover(step.selector);

@@ -187,3 +187,77 @@ disabled/readOnly affordance, workspace-rename stale sidebar.
 - [ ] **`Button`'s default `type` silently changed from `submit` to `button`** with the flowbite swap. Every current in-form Button carries an explicit type so nothing is broken today, but the next one added without `type="submit"` will look right and do nothing.
 - [ ] 76 `<label>` elements across the dashboard, zero `htmlFor` — clicking a label focuses nothing and screen readers cannot pair label to field. Pre-existing, not from the migration. Cheapest real fix now that every field is one primitive: give `InputField` a `label` prop that owns the association.
 - [ ] Control-height mismatches after the InputField swap: 2FA code fields (`security-tab.tsx:279,331`) and redirect From/To (`redirects-tab.tsx:142,147`) are now 42px next to 36px buttons/selects they used to align with.
+
+### Medium — found during /plan-eng-review of the conformance harness, 2026-08-03
+
+- [ ] **`gate:figma` has been red for four days and runs nowhere.** `packages/dashboard/scripts/check-figma-conformance.mjs` encodes 14 hand-written expected values from the pre-Flowbite Slate palette; the dashboard migrated to the Flowbite palette on 2026-07-30. Running it now: `exit 1`, 8 mismatches — `--color-primary` is `#1A56DB` (correct, `globals.css:91`), the gate expects `#406ED6`; same for `bg-page`, `bg-subtle`, `border-default`, `border-strong`, `text-primary`, `text-secondary`, `primary-subtle`. It is referenced only by its own `package.json` script line: not in `.github/workflows/`, not in the pre-push hook.
+
+  **Why it matters:** `gate:ds` (which the pre-push hook DOES run) passes all 7 checks and its D3 asserts the correct `#1A56DB`, so accent enforcement is genuinely covered. The problem is that `gate:figma` still exists and lies — anyone running it concludes the dashboard has drifted from Figma when it is the gate that is stale. This is the third time this gate family has gone stale on an accent flip (see memory `ds-gate-stale-hides-downstream-gates`, 07-18 and 07-30).
+
+  **Two ways out, and the choice is the work:** refresh the expected values to the Flowbite palette and wire it into the pre-push chain so it cannot rot again, OR delete it and let `gate:ds` own accent conformance. Refreshing without wiring it in just resets the clock on the same failure.
+
+  **Depends on:** nothing. Independent of the editor conformance harness — but it is the strongest evidence for why that harness derives its specs instead of hand-writing them.
+
+### Deferred from /plan-ceo-review of the conformance harness, 2026-08-03
+
+- [ ] **E1 — point the conformance harness at the dashboard.** Once
+  `scripts/conformance/lib.mjs`, `extract.mjs` and `diff.mjs` exist in the editor
+  and the editor sweep has proven them, run the same three scripts against
+  `packages/dashboard`. Nothing in them is editor-specific — they read a recipe
+  JSON and drive a browser.
+
+  **Why:** it retires `packages/dashboard/scripts/check-figma-conformance.mjs`
+  instead of refreshing it. That script hardcodes 14 expected values from the
+  pre-Flowbite Slate palette and has been failing since the 2026-07-30 accent
+  flip. Refreshing the hexes just resets the clock on a gate that has now gone
+  stale three times (see memory `ds-gate-stale-hides-downstream-gates`).
+
+  **Pros:** one conformance instrument for both packages; the dashboard gets
+  derived specs, which cannot rot the way hand-written hexes do; deletes a lying
+  gate rather than repairing it.
+
+  **Cons:** the dashboard writes UNPREFIXED Tailwind while the editor writes
+  `tw:` — the token-identity read (which parses the className) needs a
+  per-package mode. Not free.
+
+  **Not a free delete.** Codex ran `gate:figma` during the CEO review and counted
+  16 problems. Some of those are real dashboard drift, not just stale expected
+  values. Retirement needs parity criteria: the new harness must report at least
+  what the old one legitimately catches before the old one goes.
+
+  **Effort:** M (human ~1d) → with CC ~2h. **Priority:** P2.
+  **Depends on:** editor harness shipped and wave A green. Nothing else.
+
+### Deferred from Phase 0.1 font self-hosting, 2026-08-03
+
+- [ ] **Self-host the dashboard's fonts too.** `packages/dashboard/app/layout.tsx:38-42`
+  still loads Inter, Inter Tight and Geist Mono from `fonts.bunny.net` with
+  `display=swap`. That layout wraps the unified editor route, so the production
+  editor renders from the CDN while the demo/probe hosts now render from
+  vendored woff2.
+
+  **Why it matters:** the conformance harness measures the demo host. If prod
+  and the harness resolve fonts differently, the harness can go green against
+  text metrics production never produces. It also keeps a third-party runtime
+  dependency in the render path of the paid product.
+
+  **Why it was not done in Phase 0.1:** the dashboard needs a wider weight set
+  than the editor — Inter 700/800 (plus a stray `font-black`), and Inter Tight
+  400-700 for the auth craftwork surface (`globals.css:213-215`). Vendoring
+  those touches the auth surface, and `docs/plans/2026-08-03-editor-figma-conformance.md`
+  puts the dashboard package explicitly out of scope.
+
+  **Careful:** `next.config.mjs:28-32` allows `fonts.bunny.net` in
+  `style-src`/`font-src`/`connect-src`. `'self'` is already permitted so
+  self-hosted files load today; the Bunny entries become dead once the link goes
+  and should be dropped in the same commit.
+
+  **Effort:** M (human ~1d) → CC ~2h. **Priority:** P2.
+  **Depends on:** nothing.
+
+- [ ] **`--bk-font-mono` names system fallbacks that DESIGN.md bans.**
+  `tokens.generated.css:162` is `"Geist Mono", "SF Mono", Menlo, Consolas, monospace`.
+  DESIGN.md §Typography anti-slop rule 8 bans naming system fallbacks in any
+  stack. `--bk-font-ui` was cleaned earlier today; the mono stack was missed.
+  Fix in `scripts/tokens/figma-tokens.json` and regenerate — hand-editing the
+  generated file fails `gate:tokens-generated`. **Effort:** S. **Priority:** P3.

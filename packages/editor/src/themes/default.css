@@ -25,6 +25,22 @@
  * (tokens, engine selectors) win over all layers per CSS spec. */
 @layer reset, components, overrides;
 
+/* NOTE ON FONTS (2026-08-03): `themes/fonts.css` deliberately is NOT imported
+   here. This file is imported by AquibraStudio.tsx:51, which Next transpiles
+   into the dashboard bundle for the unified editor route — and
+   `packages/dashboard/app/layout.tsx:38-42` already loads the same families
+   from fonts.bunny.net with `display: swap`. Importing fonts.css here put TWO
+   @font-face sets for the same family/weight/unicode-range into the production
+   document with CONFLICTING font-display values, and which one wins is
+   declaration-order dependent, so it varies by build.
+
+   Instead each host that needs deterministic text metrics imports fonts.css
+   itself: `demo/main.tsx` (standalone editor + the conformance measurement
+   target) and `e2e/probe/probe.tsx` (style-parity). The dashboard keeps the
+   CDN until it self-hosts its own wider weight set — it needs Inter 700/800
+   and the Inter Tight 400-700 the auth surface runs on, none of which are
+   vendored here. Tracked in TODOS.md. */
+
 @import "./design-system/index.css";
 
 /* Flowbite big-bang (Task 2): tw:-prefixed Tailwind utilities + flowbite-react

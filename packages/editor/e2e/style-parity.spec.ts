@@ -57,6 +57,24 @@ for (const name of CASES) {
     expect(err, "probe reported an unknown case").toBeNull();
     await expect(page.locator("#probe-root")).toHaveAttribute("data-probe-ready", name);
 
+    // Fonts must be resolved BEFORE anything is measured. Every tracked
+    // property that depends on text metrics — width, height, line-height and
+    // any layout derived from them — is wrong if the read happens while a
+    // fallback face is still painted. Until 2026-08-03 this probe loaded no
+    // webfont at all (see themes/fonts.css), which is why 106 baseline entries
+    // recorded `font-family: "Times"`.
+    //
+    // The status is ASSERTED, not assumed: `await page.evaluate(() =>
+    // document.fonts.ready)` serializes to `{}`, so if the expression ever
+    // became undefined the await would silently no-op and the baselines would
+    // quietly go back to being captured mid-load. Returning the status turns
+    // that into a visible failure.
+    const fontStatus = await page.evaluate(async () => {
+      await document.fonts.ready;
+      return document.fonts.status;
+    });
+    expect(fontStatus, "fonts must be fully loaded before measuring").toBe("loaded");
+
     const actual = await page.evaluate((props) => {
       const out: Record<string, Record<string, string>> = {};
       // Portalled surfaces (menus, modals) leave the [data-probe] subtree for

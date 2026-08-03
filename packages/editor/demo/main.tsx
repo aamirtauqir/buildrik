@@ -9,7 +9,13 @@ import { Agentation } from "agentation";
 import { AquibraStudio } from "../src/editor/shell/AquibraStudio";
 import type { Composer } from "../src/engine/Composer";
 import { initErrorTracking } from "../src/shared/utils/errorTracking";
-// Global styles
+// Global styles.
+// fonts.css is imported HERE rather than from default.css: default.css is also
+// bundled into the dashboard for the unified editor route, where layout.tsx
+// already loads the same families from a CDN — see the note at the top of
+// themes/default.css. This host is the conformance measurement target, so it
+// needs the self-hosted faces.
+import "../src/themes/fonts.css";
 import "../src/themes/default.css";
 
 // Fire-and-forget Sentry init. No-ops when VITE_SENTRY_DSN is absent or
