@@ -201,6 +201,44 @@ const result = await page.evaluate(({ targets, contrastScope, ignore }) => {
         fontWeight: s.fontWeight,
         lineHeight: s.lineHeight,
       },
+      /**
+       * Everything a Figma spec can express, keyed by the CSS property name so
+       * diff.mjs can join without a translation table. Added 2026-08-03: the
+       * extractor emits padding, gap and border-color from the board, and
+       * without these the diff reported UNKNOWN for most of every spec — a
+       * harness that cannot see the properties it is given is not measuring.
+       *
+       * Longhand only. `getComputedStyle` reports shorthand inconsistently and
+       * a spec's `padding-left` would never match a `padding` string.
+       */
+      css: {
+        "width": `${r.width}px`,
+        "height": `${r.height}px`,
+        "min-width": s.minWidth,
+        "min-height": s.minHeight,
+        "max-width": s.maxWidth,
+        "padding-top": s.paddingTop,
+        "padding-right": s.paddingRight,
+        "padding-bottom": s.paddingBottom,
+        "padding-left": s.paddingLeft,
+        "margin-top": s.marginTop,
+        "margin-right": s.marginRight,
+        "margin-bottom": s.marginBottom,
+        "margin-left": s.marginLeft,
+        "gap": s.gap === "normal" ? "0px" : s.gap,
+        "background-color": s.backgroundColor,
+        "color": s.color,
+        "border-color": s.borderTopColor,
+        "border-top-width": s.borderTopWidth,
+        "border-bottom-width": s.borderBottomWidth,
+        "border-radius": s.borderTopLeftRadius,
+        "font-size": s.fontSize,
+        "font-weight": s.fontWeight,
+        "font-family": s.fontFamily,
+        "line-height": s.lineHeight,
+        "display": s.display,
+        "overflow": s.overflow,
+      },
     };
   };
 

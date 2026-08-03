@@ -56,12 +56,9 @@ import { createHash } from "node:crypto";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-/**
- * Bump when the parser's OUTPUT changes for unchanged input — a new property,
- * a different normalisation, a fixed bug. Specs carrying an older version are
- * STALE and must be re-extracted, even though their figmaHash still matches.
- */
-export const EXTRACTOR_VERSION = 1;
+// Version lives in lib.mjs so a consumer can read it without executing an
+// extraction — this file does its work at module top level.
+import { EXTRACTOR_VERSION } from "./lib.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const RAW_DIR = join(HERE, "raw-figma");

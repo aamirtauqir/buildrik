@@ -38,7 +38,10 @@
     "gate:chrome-ui-surface": "node scripts/check-chrome-ui-surface.mjs",
     "gate:styling-ratchet": "node scripts/check-styling-ratchet.mjs",
     "test:parity": "playwright test",
-    "test:parity:update": "UPDATE_PARITY=true playwright test"
+    "test:parity:update": "UPDATE_PARITY=true playwright test",
+    "conformance:extract": "node scripts/conformance/extract.mjs",
+    "conformance:measure": "node scripts/conformance/measure.mjs",
+    "conformance:diff": "node scripts/conformance/diff.mjs"
   },
   "dependencies": {
     "@buildrik/shared": "workspace:*",

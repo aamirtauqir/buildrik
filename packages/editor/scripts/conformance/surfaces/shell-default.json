@@ -1,26 +1,59 @@
 {
   "surface": "shell-default",
-  "board": "Editor Shell — default (Insert open, no selection) @1440",
+  "board": "Editor Shell \u2014 default (Insert open, no selection) @1440",
   "url": "http://localhost:5050/",
-  "viewport": { "width": 1440, "height": 900 },
-  "steps": [{ "action": "waitFor", "testId": "topbar" }],
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "topbar"
+    }
+  ],
   "contrastScope": "body",
-  "ignore": ["[class*=\"styles-module__\"]"],
+  "ignore": [
+    "[class*=\"styles-module__\"]"
+  ],
   "targets": [
-    { "name": "topbar", "testId": "topbar" },
-    { "name": "rail", "testId": "rail" },
-    { "name": "sidebar-panel", "testId": "sidebar-panel" },
-    { "name": "canvas", "testId": "canvas" },
-    { "name": "breakpoint-switcher", "testId": "breakpoint-switcher" }
+    {
+      "name": "topbar",
+      "testId": "topbar",
+      "spec": "topbar",
+      "nodeId": "681:26"
+    },
+    {
+      "name": "rail",
+      "testId": "rail"
+    },
+    {
+      "name": "sidebar-panel",
+      "testId": "sidebar-panel"
+    },
+    {
+      "name": "canvas",
+      "testId": "canvas"
+    },
+    {
+      "name": "breakpoint-switcher",
+      "testId": "breakpoint-switcher"
+    }
   ],
   "_note": [
     "Targets address elements by data-testid, never by CSS class. This file used",
     "to wait on `.bd-topbar` and measure `.bd-bp-switcher`, and NEITHER class",
-    "exists in any file under src/ — so the run died on its first step and had",
+    "exists in any file under src/ \u2014 so the run died on its first step and had",
     "never produced a measurement at all. They were not typos: chrome wears only",
     "tw:-prefixed utility classes, so there was no stable class to name.",
     "Anchors live in Topbar.tsx, LeftSidebar.tsx, Canvas.tsx and",
     "CanvasFooterToolbar.tsx; check-anchors.mjs fails in ~1s when a recipe names",
-    "one that no longer exists in src/."
+    "one that no longer exists in src/.",
+    "",
+    "A target carries `spec` + `nodeId` when a Figma board covers it. Targets",
+    "without them are SKIPPED by diff.mjs and counted in the report header, so",
+    "coverage cannot shrink quietly. A shell surface legitimately draws from",
+    "several component boards, which is why the join is per-target rather than",
+    "one board per surface."
   ]
 }

@@ -15,6 +15,18 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
+/**
+ * Bump when the extractor's OUTPUT changes for unchanged input — a new
+ * property, a different normalisation, a fixed bug. Specs carrying an older
+ * version are STALE and must be re-extracted even though their figmaHash still
+ * matches: the hash sees the board move, this sees the parser move.
+ *
+ * Lives here, not in extract.mjs, because extract.mjs runs its work at module
+ * top level — importing it just to read a constant would execute an extraction
+ * and call process.exit. Shared constants belong with the shared vocabulary.
+ */
+export const EXTRACTOR_VERSION = 1;
+
 const HERE = dirname(fileURLToPath(import.meta.url));
 const TOKENS_PATH = join(HERE, "..", "tokens", "figma-tokens.json");
 
