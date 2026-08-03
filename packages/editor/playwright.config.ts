@@ -32,7 +32,14 @@ export default defineConfig({
   // a wrong colour, and retrying would only hide a flaky mount.
   retries: 0,
   fullyParallel: true,
-  reporter: process.env.CI ? "list" : [["list"]],
+  // CI also emits the HTML report so a failure leaves something browsable in
+  // the uploaded artifact. Without it `playwright-report/` is never created and
+  // the workflow's upload step silently uploads nothing — the artifact would
+  // exist, be empty, and read as "no detail available" rather than "misconfigured".
+  // `open: "never"` because a CI runner has no browser to open it in.
+  reporter: process.env.CI
+    ? [["list"], ["html", { open: "never" }]]
+    : [["list"]],
   use: {
     baseURL: `http://localhost:${PORT}`,
     // Deterministic box model: parity numbers include px sizes.
