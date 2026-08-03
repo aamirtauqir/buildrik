@@ -237,6 +237,16 @@ jobs:
         working-directory: packages/editor
         run: pnpm run test:parity
 
+      # Spec freshness, --mode=ci so it WARNS. CI has no Figma access and cannot
+      # re-extract, so blocking here would fail a build for something the build
+      # cannot fix. The pre-push hook runs the identical check in --mode=prepush,
+      # where it blocks. The mode is an explicit argument in both places; it is
+      # never inferred, because one wrong default would silently turn the
+      # blocking half into a no-op with nothing looking broken.
+      - name: Conformance spec freshness (warn-only)
+        working-directory: packages/editor
+        run: node scripts/conformance/check-spec-age.mjs --mode=ci
+
       # TODO (Phase 1.3): add the Figma conformance run here once the surface
       # recipes point at selectors that exist. `measure.mjs shell-default`
       # currently dies on `.bd-topbar`, which is in no file under src/, so

@@ -39,16 +39,29 @@ echo "────────────────────────�
 # 2026-05-24 — DESIGN.md two-accent enforcement for dashboard chrome.
 EDITOR_OK=0
 DASH_OK=0
+AGE_OK=0
 pnpm run verify:ds > /tmp/buildrik-pre-push-gate.log 2>&1 || EDITOR_OK=$?
 (cd "$REPO_ROOT/packages/dashboard" && pnpm run gate:ds) >> /tmp/buildrik-pre-push-gate.log 2>&1 || DASH_OK=$?
-if [ "$EDITOR_OK" = "0" ] && [ "$DASH_OK" = "0" ]; then
+
+# Conformance spec freshness — prepush mode BLOCKS, because this machine has the
+# Figma MCP and can actually re-extract. CI runs the same check in --mode=ci,
+# where it only warns: failing a build for something the build cannot fix is how
+# people learn to route around a gate. The mode is an explicit argument, never
+# inferred from the environment.
+#
+# Honest about its limits: this is a calendar alarm, not drift detection, and a
+# hook installed per clone and bypassable with --no-verify is advisory in the
+# end. Spec freshness is a human ritual with a reminder attached.
+node scripts/conformance/check-spec-age.mjs --mode=prepush >> /tmp/buildrik-pre-push-gate.log 2>&1 || AGE_OK=$?
+
+if [ "$EDITOR_OK" = "0" ] && [ "$DASH_OK" = "0" ] && [ "$AGE_OK" = "0" ]; then
   echo " ✓ all gates passing (editor + dashboard)"
   echo "──────────────────────────────────────────────"
   exit 0
 fi
 
 # Gate failed. Show what broke and either warn-or-block.
-echo " ✗ one or more gates failing (editor=$EDITOR_OK dashboard=$DASH_OK)"
+echo " ✗ one or more gates failing (editor=$EDITOR_OK dashboard=$DASH_OK spec-age=$AGE_OK)"
 echo ""
 tail -20 /tmp/buildrik-pre-push-gate.log | sed 's/^/   /'
 echo ""
