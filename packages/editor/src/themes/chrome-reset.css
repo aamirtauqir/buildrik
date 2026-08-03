@@ -39,11 +39,26 @@
 .bd-studio *:not(.buildrick-canvas, .buildrick-canvas *)::after {
   box-sizing: border-box;
 }
+/* BORDER (fix, 2026-08-03). `border: 0 solid` is the half of preflight this
+   file forgot when it replaced it. The UA stylesheet puts `border: 2px outset
+   ButtonBorder` on form controls, so any chrome control that does not set a
+   border of its own keeps it — and the primary Publish CTA shipped with a 2px
+   BLACK RING around the blue. Measured, not inferred: a sweep of all 42
+   controls in the default shell found exactly one leak, because every other
+   control happens to carry `tw:border-0` or `tw:border-transparent`. That is
+   the tell — those are workarounds for a missing reset, not real intent.
+
+   `solid` (not `none`) matches preflight so a later `border-width` alone still
+   paints. Scoped to the four form-control tags rather than `*` because those
+   are the only elements the UA gives a border to; a `*` rule would be a much
+   larger blast radius for no extra coverage. Reset layer, so every `tw:border-*`
+   utility still wins. */
 .bd-studio button:not(.buildrick-canvas, .buildrick-canvas *),
 .bd-studio input:not(.buildrick-canvas, .buildrick-canvas *),
 .bd-studio select:not(.buildrick-canvas, .buildrick-canvas *),
 .bd-studio textarea:not(.buildrick-canvas, .buildrick-canvas *) {
   font: inherit; color: inherit;
+  border: 0 solid;
 }
 
 /* UI FONT ON THE SHELL ROOT (2026-08-03). Until today the only thing setting a
