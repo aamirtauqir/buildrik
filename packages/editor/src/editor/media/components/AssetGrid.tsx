@@ -290,7 +290,7 @@ export function AssetGrid({
                 <img
                   src={item.src}
                   alt={item.name}
-                  style={{ width: 36, height: 36, objectFit: "contain" }}
+                  className="tw:h-9 tw:w-9 tw:object-contain"
                 />
               ) : item.type === "fnt" ? (
                 <span

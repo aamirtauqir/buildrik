@@ -44,6 +44,11 @@ const CASES = [
   // T2: the shared drawer header carries pin / help / close on every one of the
   // seven drawers, so a regression here is a regression seven times over.
   "panel-frame-header",
+  // T6: every control in the Media drawer, including the ones only a failed
+  // upload or a full quota puts on screen.
+  "media-drawer-grid",
+  "media-drawer-upload-failed",
+  "media-drawer-quota-full",
 ] as const;
 
 /**

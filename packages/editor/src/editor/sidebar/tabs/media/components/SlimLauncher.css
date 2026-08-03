@@ -13,100 +13,11 @@
 /* .sl-header / .sl-title / .sl-header-actions / .sl-icon-btn rules
    deleted 2026-05-24 — replaced by TabFrame.Header which uses
    PanelHeader's canonical close button + title styling. */
-.sl-controls {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 12px 0;
-}
-/* TypePills row scrolls horizontally inside the controls so the
- * "+ Stock" button always stays visible on the right at 320px panel
- * width. Matches prototype-v3 §10 layout (pills left, Stock right). */
-.sl-controls .med-type-pills {
-  flex: 1 1 auto;
-  min-width: 0;
-  overflow-x: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-.sl-controls .med-type-pills::-webkit-scrollbar {
-  display: none;
-}
-.sl-stock-btn.bd-btn {
-  flex-shrink: 0;
-  height: 26px;
-  padding: 0 10px;
-  font-size: 12px;
-  background: var(--bk-accent);
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  min-height: 0;
-}
-.sl-stock-btn.bd-btn:hover {
-  opacity: 0.9;
-}
-.sl-search {
-  position: relative;
-  padding: 10px 12px 0;
-}
-.sl-search__icon {
-  position: absolute;
-  left: 22px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--bk-ink-muted, #64748B);
-  pointer-events: none;
-}
-.sl-search__input {
-  width: 100%;
-  height: 30px;
-  padding: 0 10px 0 32px;
-  font-size: 12px;
-  border: 1px solid var(--bk-border, var(--bk-border));
-  border-radius: 4px;
-  background: var(--bk-bg-card, #fff);
-}
-.sl-grid-wrap {
-  flex: 1;
-  overflow-y: auto;
-  min-height: 0;
-}
-.med-asset-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 6px;
-  padding: 10px 12px;
-  align-content: start;
-}
-.sl-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 24px 12px;
-  text-align: center;
-  gap: 8px;
-}
-.sl-empty__title {
-  margin: 0;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--bk-ink, var(--bk-ink));
-}
-.sl-empty__body {
-  margin: 0;
-  font-size: 11px;
-  color: var(--bk-ink-muted, #64748B);
-  line-height: 1.5;
-  max-width: 220px;
-}
-.sl-empty__cta.bd-btn {
-  margin-top: 4px;
-}
-.sl-upload-footer {
-  border-top: 1px solid var(--bk-border, var(--bk-border));
-  padding: 10px 12px;
-  background: var(--bk-bg-panel, #fff);
-  flex-shrink: 0;
-}
+/*
+ * Layout, spacing and colour for this drawer moved onto the components
+ * themselves as tw: utilities in T8 (Figma 144:2). What used to live here —
+ * .sl-controls, .sl-stock-btn, .sl-search*, .sl-grid-wrap, .sl-empty*,
+ * .med-asset-grid — described the pre-board layout (pills beside a Stock
+ * button, 3-column square grid) and outranked the utilities that replace it.
+ * The classNames remain in the JSX as measurement anchors.
+ */

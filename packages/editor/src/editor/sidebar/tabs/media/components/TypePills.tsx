@@ -1,13 +1,28 @@
 /**
- * TypePills — horizontal filter chips for media type (All / Img / Vid / Ico / Fnt).
- * Emits onTypeChange with the new filter. `counts` populate small badges.
+ * TypePills — the media-type filter chips. Figma `144:13` (pills `144:14`-`144:25`).
+ *
+ * The board changed two things about this row and both are load-bearing:
+ *
+ * 1. **Full words, not abbreviations.** It reads `image 128 · video 6 · svg 24 ·
+ *    icon 370`, where this used to render `All / Img / Vid / Ico / Fnt`. The
+ *    abbreviations existed to fit five pills beside a "+ Stock" button; the
+ *    board moved Stock to the footer, so the width they were buying is free.
+ * 2. **The count is mono.** `data/11 · mono small` — Geist Mono 500 with
+ *    `tabular-nums`. A count that reflows as it changes is the jitter the
+ *    section headers were fixed for (board 16:16), and this row updates on
+ *    every upload.
+ *
+ * `svg` is this codebase's `ico` bucket and `icon` is its `fnt` bucket: the
+ * board names the file kinds a user recognises, the data model names its own
+ * buckets. The mapping lives here, once, rather than being renamed through the
+ * state layer.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
+import { Chip } from "@/editor/chrome-ui";
 import type { MediaTypeFilter, TypeCounts } from "../data/mediaTypes";
-import { Button } from "@/editor/chrome-ui";
 
 interface TypePillsProps {
   activeType: MediaTypeFilter;
@@ -17,16 +32,17 @@ interface TypePillsProps {
   onTypeChange(type: MediaTypeFilter): void;
 }
 
-// Labels match the file's intent doc above (All / Img / Vid / Ico / Fnt).
-// Short labels let all 5 pills fit beside the "+ Stock" button at the
-// narrow Media-panel width without horizontal-scroll clipping the last
-// pill. `title` exposes the full word for hover + screen readers.
+/**
+ * `all` keeps its chip even though the board's mock does not draw one: without
+ * it a filtered drawer has no way back to everything, and the board's own
+ * `Media · filtered` state has to return somewhere.
+ */
 const PILLS: Array<{ key: MediaTypeFilter; label: string; title: string }> = [
-  { key: "all", label: "All", title: "All" },
-  { key: "img", label: "Img", title: "Images" },
-  { key: "vid", label: "Vid", title: "Video" },
-  { key: "ico", label: "Ico", title: "Icons" },
-  { key: "fnt", label: "Fnt", title: "Fonts" },
+  { key: "all", label: "all", title: "All media" },
+  { key: "img", label: "image", title: "Images" },
+  { key: "vid", label: "video", title: "Video" },
+  { key: "ico", label: "svg", title: "Icons and SVG" },
+  { key: "fnt", label: "icon", title: "Fonts and icon sets" },
 ];
 
 export function TypePills({
@@ -36,28 +52,28 @@ export function TypePills({
   onTypeChange,
 }: TypePillsProps) {
   return (
-    <div className="med-type-pills" role="tablist" aria-label="Filter by media type">
+    <div
+      className="med-type-pills tw:flex tw:items-center tw:gap-2 tw:px-4 tw:py-1 tw:overflow-x-auto"
+      role="tablist"
+      aria-label="Filter by media type"
+      data-testid="media-type-chips"
+    >
       {PILLS.map((p) => {
         const isActive = p.key === activeType;
         const count = counts[p.key];
         return (
-          <Button
+          <Chip
             key={p.key}
-            type="button"
             role="tab"
-            size="xs"
-            color="light"
-            aria-selected={isActive}
+            selected={isActive}
+            label={p.label}
+            count={discMode ? undefined : count}
             aria-label={p.title}
             title={p.title}
-            className={`med-type-pill${isActive ? " med-type-pill--active" : ""}`}
+            data-testid={`media-type-chip-${p.key}`}
+            className={isActive ? "med-type-pill med-type-pill--active" : "med-type-pill"}
             onClick={() => onTypeChange(p.key)}
-          >
-            {p.label}
-            {!discMode && count > 0 ? (
-              <span className="med-type-pill__count">{count}</span>
-            ) : null}
-          </Button>
+          />
         );
       })}
     </div>

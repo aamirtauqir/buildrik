@@ -367,6 +367,10 @@ export interface DiscoveryViewProps {
 }
 
 export interface UploadZoneProps {
+  /** Lets a caller (the drawer footer's Upload link) open this zone's file dialog. */
+  inputRef?: React.RefObject<HTMLInputElement | null>;
+  /** Drawer mode (board 144:2): no drop box at rest — see UploadZone's own note. */
+  compact?: boolean;
   storage: { used: number; total: number };
   onUpload(files: File[]): void;
   disabled?: boolean;

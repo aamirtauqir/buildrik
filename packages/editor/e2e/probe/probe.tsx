@@ -32,6 +32,72 @@ import { FolderContextMenu } from "@/editor/sidebar/tabs/media/components/Folder
 import { OnboardingChecklist } from "@/editor/onboarding/OnboardingChecklist";
 import { CanvasFooterToolbar } from "@/editor/canvas/CanvasFooterToolbar";
 import { PanelFrame } from "@/editor/chrome-ui";
+import { SlimLauncher } from "@/editor/sidebar/tabs/media/components/SlimLauncher";
+import type { LibraryItem } from "@/editor/sidebar/tabs/media/data/mediaTypes";
+import type { UploadProgress } from "@/shared/types/media";
+
+
+/**
+ * Media drawer fixtures (T6).
+ *
+ * The plan said "mount `<MediaTab>` with fixture props". `SlimLauncher` is what
+ * that actually resolves to at 320: `MediaTab` picks between three renderers,
+ * and the drawer the Figma screens describe is this one. Mounting MediaTab
+ * would drag a real `Composer` into the probe to reach the same markup — a
+ * dependency that buys nothing and can only add flake.
+ *
+ * Every state below is unreachable by hovering the live app: an empty library,
+ * a filter that matches nothing, a failed upload. Those are exactly the screens
+ * the board draws and the ones nothing has ever measured.
+ */
+const MEDIA_ITEM = (over: Partial<LibraryItem> = {}): LibraryItem => ({
+  key: "a1",
+  name: "hero.jpg",
+  type: "img",
+  src: "data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==",
+  thumb: "data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==",
+  size: 128_000,
+  createdAt: "2026-08-01T10:00:00.000Z",
+  mimeType: "image/jpeg",
+  ...over,
+});
+
+const MEDIA_ITEMS: LibraryItem[] = [
+  MEDIA_ITEM({ key: "a1", name: "hero.jpg" }),
+  MEDIA_ITEM({ key: "a2", name: "team.png", assetSource: "stock" }),
+  MEDIA_ITEM({ key: "a3", name: "promo.mp4", type: "vid", mimeType: "video/mp4", thumb: undefined }),
+  MEDIA_ITEM({ key: "a4", name: "logo.svg", type: "ico", mimeType: "image/svg+xml", thumb: undefined }),
+];
+
+const MEDIA_COUNTS = { all: 4, img: 2, vid: 1, ico: 1, fnt: 0 };
+
+function mediaDrawer(over: Partial<React.ComponentProps<typeof SlimLauncher>> = {}) {
+  return (
+    <SlimLauncher
+      composer={null as unknown as React.ComponentProps<typeof SlimLauncher>["composer"]}
+      libraryItems={MEDIA_ITEMS}
+      activeType="all"
+      counts={MEDIA_COUNTS}
+      searchQuery=""
+      storage={{ used: 42 * 1024 * 1024, total: 500 * 1024 * 1024 }}
+      uploadQueue={[]}
+      usageMap={new Map([["a1", 3]])}
+      onInsert={() => {}}
+      onTypeChange={() => {}}
+      onSearchChange={() => {}}
+      onUpload={() => {}}
+      onRetryUpload={() => {}}
+      onOpenStock={() => {}}
+      onOpenLibrary={() => {}}
+      onClose={() => {}}
+      {...over}
+    />
+  );
+}
+
+const FAILED_UPLOAD: UploadProgress[] = [
+  { fileName: "poster-4k.png", progress: 0, status: "error", error: "File too large. Max: 10MB" },
+];
 
 /** Every case renders into `.bd-studio` so chrome-scoped CSS applies. */
 const CASES: Record<string, () => React.ReactElement> = {
@@ -195,6 +261,29 @@ const CASES: Record<string, () => React.ReactElement> = {
           <div />
         </PanelFrame.Body>
       </PanelFrame>
+    </div>
+  ),
+  // ── Media drawer states (T6) — the 320 drawer the board specifies ─────────
+  "media-drawer-grid": () => <div data-probe="media-drawer-grid">{mediaDrawer()}</div>,
+  "media-drawer-empty": () => (
+    <div data-probe="media-drawer-empty">
+      {mediaDrawer({ libraryItems: [], counts: { all: 0, img: 0, vid: 0, ico: 0, fnt: 0 } })}
+    </div>
+  ),
+  // A library that HAS assets and a filter that matches none of them. Distinct
+  // from empty on purpose: the board draws two different screens, and the code
+  // has two different branches that only differ by which one it reaches.
+  "media-drawer-no-results": () => (
+    <div data-probe="media-drawer-no-results">{mediaDrawer({ searchQuery: "zzzz" })}</div>
+  ),
+  "media-drawer-upload-failed": () => (
+    <div data-probe="media-drawer-upload-failed">{mediaDrawer({ uploadQueue: FAILED_UPLOAD })}</div>
+  ),
+  // Quota pressure changes the upload zone's own copy and tint, which is a
+  // state of the footer rather than of the grid.
+  "media-drawer-quota-full": () => (
+    <div data-probe="media-drawer-quota-full">
+      {mediaDrawer({ storage: { used: 500 * 1024 * 1024, total: 500 * 1024 * 1024 } })}
     </div>
   ),
 };

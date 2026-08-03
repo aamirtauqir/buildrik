@@ -609,70 +609,12 @@
  * sort controls / grid toggle render as proper tabs.
  * ───────────────────────────────────────────────────────────────────── */
 
-/* TypePills container */
-.med-type-pills,
-.exp-panel .med-type-pills {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  padding: 2px;
-  background: var(--bk-bg-subtle, var(--bk-bg-subtle));
-  border-radius: var(--bk-radius-md);
-}
-
-/* TypePills — individual pill */
-.med-tab .med-type-pill,
-.exp-panel .med-type-pill,
-.sl-launcher .med-type-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 10px;
-  height: 24px;
-  border: none;
-  border-radius: 4px;
-  background: transparent;
-  color: var(--bk-ink-muted, var(--bk-ink-soft));
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.12s, color 0.12s;
-  flex-shrink: 0;
-  white-space: nowrap;
-}
-.med-tab .med-type-pill:hover,
-.exp-panel .med-type-pill:hover,
-.sl-launcher .med-type-pill:hover {
-  background: var(--bk-bg-app, var(--bk-bg-card));
-  color: var(--bk-ink, var(--bk-ink));
-}
-.med-tab .med-type-pill--active,
-.exp-panel .med-type-pill--active,
-.sl-launcher .med-type-pill--active,
-.med-tab .med-type-pill[aria-selected="true"],
-.exp-panel .med-type-pill[aria-selected="true"],
-.sl-launcher .med-type-pill[aria-selected="true"] {
-  background: var(--bk-bg-app, var(--bk-bg-card));
-  color: var(--bk-accent, var(--bk-accent));
-  font-weight: 600;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
-}
-
-.med-tab .med-type-pill__count,
-.exp-panel .med-type-pill__count {
-  font-size: 10px;
-  color: var(--bk-ink-muted);
-  background: var(--bk-bg-subtle);
-  padding: 0 4px;
-  border-radius: var(--bk-radius-lg);
-  min-width: 14px;
-  text-align: center;
-}
-.med-type-pill--active .med-type-pill__count,
-.med-type-pill[aria-selected="true"] .med-type-pill__count {
-  color: var(--bk-accent);
-  background: var(--bk-accent-tint);
-}
+/* TypePills CSS deleted 2026-08-04 (T8). The chips are `chrome-ui/Chip`
+   now — Figma 144:14, styled with tw: utilities on the component itself.
+   These rules outranked those utilities (`.sl-launcher .med-type-pill` is
+   0,2,0) and would have silently kept the old 12px grey tabs on screen
+   while the JSX said otherwise. The `.med-type-pill` classNames survive as
+   test/measurement anchors only. */
 
 /* Sort label + direction button */
 .med-tab .med-sort-lbl,
@@ -1668,76 +1610,12 @@
   color: var(--bk-warning, var(--bk-warning));
 }
 
-/* Asset cell — prototype-v3 §10/§12/§15 */
-.med-asset-cell {
-  position: relative;
-  aspect-ratio: 1;
-  border: 1px solid var(--bk-border, var(--bk-border));
-  border-radius: 4px;
-  overflow: hidden;
-  cursor: pointer;
-  padding: 0;
-  background: var(--bk-bg-subtle, var(--bk-bg-subtle));
-  transition: border-color 120ms ease, box-shadow 120ms ease;
-}
-.med-asset-cell:hover {
-  border-color: var(--bk-accent);
-  box-shadow: var(--bk-shadow-raised);
-}
-.med-asset-cell--selected,
-.med-asset-cell--applied {
-  border: 2px solid var(--bk-accent);
-}
-.med-asset-cell--locked {
-  cursor: not-allowed;
-}
-.med-asset-cell--locked:hover {
-  border-color: var(--bk-border, var(--bk-border));
-  box-shadow: none;
-}
-.med-asset-cell__img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-.med-asset-cell__vid-preview,
-.med-asset-cell__ico-preview,
-.med-asset-cell__fnt-preview {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  color: var(--bk-ink-muted, var(--bk-ink-soft));
-  background: var(--bk-bg-card, var(--bk-bg-card));
-}
-.med-asset-cell__fnt-preview {
-  font-size: 24px;
-  font-weight: 500;
-}
-.med-asset-cell__applied-badge {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  padding: 1px 4px;
-  background: var(--bk-accent);
-  color: var(--bk-bg-card);
-  font-size: 8px;
-  font-weight: var(--bk-weight-semibold);
-  letter-spacing: 0.04em;
-  border-radius: 2px;
-  line-height: 1.2;
-}
-.med-asset-cell__lock-overlay {
-  position: absolute;
-  inset: 0;
-  background: color-mix(in srgb, var(--bk-bg-card) 60%, transparent);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--bk-ink-muted, var(--bk-ink-soft));
-}
+/* Asset cell CSS deleted 2026-08-04 (T8). The card is Figma `Card / media`
+   17:6 now — 136x104, thumb + label + provenance badge — styled with tw:
+   utilities on AssetCell itself. The old rules forced `aspect-ratio: 1` and a
+   bordered tile, which is the square-tile look the board replaced; left in
+   place they would have won on specificity and the redesign would have been
+   invisible. */
 
 /* ─── §13 FolderBreadcrumb ─────────────────────────────────────────────── */
 .med-folder-breadcrumb {

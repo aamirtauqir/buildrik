@@ -29,8 +29,14 @@ export function UploadZone({
   disabled = false,
   uploadQueue,
   onRetryUpload,
+  inputRef: externalInputRef,
+  compact = false,
 }: UploadZoneProps) {
-  const inputRef = React.useRef<HTMLInputElement>(null);
+  // The drawer footer's "Upload" link opens THIS input (board 144:46). A second
+  // input would mean a second accept-list and a second size guard to keep in
+  // step with `isAccepted`, so the caller borrows the one that already exists.
+  const localInputRef = React.useRef<HTMLInputElement>(null);
+  const inputRef = externalInputRef ?? localInputRef;
   const [isDragOver, setIsDragOver] = React.useState(false);
   const [rejectedReason, setRejectedReason] = React.useState<string | null>(null);
   const rejectedTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -108,20 +114,37 @@ export function UploadZone({
         : "Drag files or click to browse";
 
   return (
-    <div className="med-upload-zone-wrap">
+    <div className="med-upload-zone-wrap" data-testid="media-upload-zone-wrap">
+      {/*
+        COMPACT is the drawer (board 144:2), which draws no drop box at all —
+        just the two footer links. The zone still has to exist: it owns the file
+        input, the drag target, the accept-list and the rejection copy. So in
+        compact mode it collapses to nothing at rest and only paints while a
+        drag is over it, or when it has something to say (storage full, a
+        rejected file). Hiding it outright would have deleted drag-and-drop to
+        match a static frame.
+      */}
       <div
-        className={`med-upload-zone${stateClass ? ` ${stateClass}` : ""}`}
+        className={[
+          `med-upload-zone${stateClass ? ` ${stateClass}` : ""}`,
+          compact && "tw:flex tw:items-center tw:justify-center tw:gap-2 tw:px-4 tw:text-[12px]",
+          compact && (isDragOver || rejectedReason || isFull || isNearLimit
+            ? "tw:h-9 tw:border tw:border-dashed tw:border-gray-300 tw:text-gray-600"
+            : "tw:h-0 tw:overflow-hidden tw:border-0 tw:p-0"),
+        ].filter(Boolean).join(" ")}
+        data-testid="media-upload-zone"
         onClick={() => !isFull && !disabled && !rejectedReason && inputRef.current?.click()}
         onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
         onDragLeave={() => setIsDragOver(false)}
         onDrop={handleDrop}
         role="button"
-        tabIndex={0}
+        tabIndex={compact ? -1 : 0}
+        aria-hidden={compact && !isDragOver && !rejectedReason && !isFull && !isNearLimit}
         aria-label={label}
         aria-live={rejectedReason ? "assertive" : "polite"}
         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); inputRef.current?.click(); } }}
       >
-        <Icon size={20} className="med-upload-zone-icon" />
+        <Icon size={compact ? 14 : 20} className="med-upload-zone-icon" />
         <span className="med-upload-zone__label">{label}</span>
         <TextInput
           ref={inputRef}
@@ -132,10 +155,19 @@ export function UploadZone({
           onChange={(e) => handleFiles(e.target.files)}
         />
       </div>
-      <StorageQuotaBar used={storage.used} total={storage.total} />
+      <StorageQuotaBar used={storage.used} total={storage.total} compact={compact} />
+      {/*
+        T9 — board `145:195`. A 44h row on warning-tint, filename over the
+        reason, Retry on the right. It is NOT a toast: an upload that failed is
+        still failed thirty seconds later, and the board draws it persisting
+        above the footer with the actual limit named ("file is 24 MB, limit is
+        10 MB"), because "Upload failed" alone tells the user nothing they can
+        act on. Restyled, not rebuilt — this list, its retry handler and its
+        `aria-label` predate the redesign.
+      */}
       {failedItems.length > 0 && (
         <ul
-          className="med-upload-queue-errors"
+          className="med-upload-queue-errors tw:m-0 tw:list-none tw:p-0"
           role="list"
           aria-label="Failed uploads"
           data-testid="upload-queue-errors"
@@ -143,19 +175,23 @@ export function UploadZone({
           {failedItems.map((item) => (
             <li
               key={item.fileName}
-              className="med-upload-queue-item med-upload-queue-item--error"
+              className="med-upload-queue-item med-upload-queue-item--error tw:flex tw:min-h-11 tw:items-center tw:gap-2 tw:bg-yellow-50 tw:px-4 tw:py-1.5"
+              data-testid="media-upload-error-row"
             >
-              <XCircle size={14} aria-hidden />
-              <span className="med-upload-queue-item__name">{item.fileName}</span>
-              <span className="med-upload-queue-item__reason">
-                {item.error ?? "Upload failed"}
+              <span className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
+                <span className="med-upload-queue-item__name tw:truncate tw:text-[12px] tw:leading-[18px] tw:text-gray-900">
+                  {item.fileName}
+                </span>
+                <span className="med-upload-queue-item__reason tw:truncate tw:text-[11px] tw:leading-4 tw:text-amber-800">
+                  {item.error ?? "Upload failed"}
+                </span>
               </span>
               {onRetryUpload ? (
                 <Button
                   type="button"
                   color="light"
                   size="xs"
-                  className="med-upload-queue-item__retry tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+                  className="med-upload-queue-item__retry tw:min-h-6 tw:shrink-0 tw:border-transparent tw:bg-transparent tw:px-0 tw:text-[12px] tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
                   onClick={() => onRetryUpload(item.fileName)}
                   aria-label={`Retry ${item.fileName}`}
                 >

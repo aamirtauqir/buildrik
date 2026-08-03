@@ -1,16 +1,29 @@
 /**
- * SlimLauncher — §10 default 320px experience.
+ * SlimLauncher — the Media drawer at 320. Figma `Media · grid` 144:2.
  *
- * Phase 1 Task 11 — header zone rewrite: panel header + TypePills row +
- * "+ Stock" primary button + real search input. Grid + UploadZone land
- * in Phase 1 Tasks 12-13.
+ * `MediaTab` picks between three renderers; this is the one the board's Media
+ * screens describe, which is why the redesign lands here rather than in the
+ * fullpage manager.
+ *
+ * ORDER IS THE DESIGN. Header, search, folder row, type chips, grid, spacer,
+ * footer. It used to be header, chips + "+ Stock" button, search, grid, a
+ * drop-zone footer — so the first thing under the title was a filter for
+ * assets the user had not found yet. Search leads now, and Stock moved to the
+ * footer beside Upload, where the two ways of getting media in sit together.
+ *
+ * WHAT THE FOOTER KEPT. The board draws two text links. `UploadZone` is still
+ * mounted under them because it owns the file input, the drag-and-drop target,
+ * the quota bar and the persistent failed-upload list with retry — none of
+ * which the board's mock shows and all of which are real behaviour. Deleting
+ * the component to match a static frame would have removed working surfaces;
+ * the links drive it instead.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { PanelFrame, Button, TextField } from "@/editor/chrome-ui";
-import { Search } from "lucide-react";
+import { PanelFrame, Button, IconButton, TextField } from "@/editor/chrome-ui";
+import { Search, Upload, Cloud, Folder, ChevronDown, LayoutGrid, Rows3, ArrowUpDown } from "lucide-react";
 import type { Composer } from "@/engine/Composer";
 import type { LibraryItem, MediaTypeFilter, TypeCounts, UploadProgress } from "../data/mediaTypes";
 import { TypePills } from "./TypePills";
@@ -33,6 +46,13 @@ interface SlimLauncherProps {
   onTypeChange(type: MediaTypeFilter): void;
   onSearchChange(query: string): void;
   onUpload(files: File[]): void;
+  /**
+   * Retry a failed upload. The drawer had no way to reach it: `MediaTab` wired
+   * `state.retryUpload` into the fullpage branch only, so the persistent
+   * failed-upload row the board draws with a Retry link (145:195) rendered
+   * here without one. Found by building that state as a probe case.
+   */
+  onRetryUpload?(fileName: string): void;
   onOpenStock(): void;
   onOpenLibrary?(opts?: { searchQuery?: string; folderId?: string | null }): void;
   onClose?(): void;
@@ -53,6 +73,10 @@ export function SlimLauncher(props: SlimLauncherProps) {
     onCancelSelection,
   } = props;
 
+  // The footer's Upload link drives UploadZone's file input rather than
+  // duplicating one: two inputs would mean two accept-lists to keep in step.
+  const uploadInputRef = React.useRef<HTMLInputElement>(null);
+
   // Filter items by activeType + search query
   const filtered = React.useMemo(() => {
     let result = props.libraryItems;
@@ -65,7 +89,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
   }, [props.libraryItems, activeType, searchQuery]);
 
   return (
-    <PanelFrame className="sl-launcher">
+    <PanelFrame className="sl-launcher" data-testid="media-panel">
       {selectionContext ? (
         <SelectionContextBar
           label={selectionContext.label}
@@ -73,54 +97,89 @@ export function SlimLauncher(props: SlimLauncherProps) {
         />
       ) : null}
       <PanelFrame.Header title="Media" onClose={onClose} />
-      <div className="sl-controls">
-        <TypePills
-          activeType={activeType}
-          counts={counts}
-          onTypeChange={onTypeChange}
-        />
-        <Button
-          type="button"
-          className="sl-stock-btn"
-          onClick={onOpenStock}
-        >
-          + Stock
-        </Button>
+
+      {/* Search — board `144:7`: 28h field inset 16, on bg-subtle. */}
+      <div className="sl-search tw:px-4 tw:py-1" data-testid="media-search">
+        <span className="tw:relative tw:flex tw:items-center">
+          <Search
+            size={14}
+            className="sl-search__icon tw:pointer-events-none tw:absolute tw:left-2.5 tw:text-gray-500"
+            aria-hidden="true"
+          />
+          <TextField
+            type="text"
+            className="sl-search__input tw:h-7 tw:w-full tw:rounded-md tw:border-0 tw:bg-gray-100 tw:pl-8 tw:text-[13px] tw:text-gray-900 tw:placeholder:text-gray-500"
+            placeholder="Search"
+            value={searchQuery}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => onSearchChange(e.target.value)}
+            aria-label="Search library"
+          />
+        </span>
       </div>
-      <div className="sl-search">
-        <Search size={14} className="sl-search__icon" aria-hidden="true" />
-        <TextField
-          type="text"
-          className="sl-search__input"
-          placeholder="Search library…"
-          value={searchQuery}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => onSearchChange(e.target.value)}
-          aria-label="Search library"
-        />
+
+      {/*
+        Folder row — board `144:10`. Scope on the left, view + sort on the
+        right. The controls are rendered disabled rather than omitted: the
+        board draws them, the drawer has one flat folder today, and a control
+        that is present-but-disabled says "not here yet" where a missing one
+        says nothing at all. They light up with the folder work (T12).
+      */}
+      <div className="tw:flex tw:h-8 tw:items-center tw:gap-2 tw:px-4" data-testid="media-folder-row">
+        <span className="tw:flex tw:min-w-0 tw:flex-1 tw:items-center tw:gap-1.5 tw:text-[13px] tw:text-gray-900">
+          <Folder size={14} className="tw:text-gray-500" aria-hidden="true" />
+          <span className="tw:truncate">All</span>
+          <ChevronDown size={12} className="tw:text-gray-500" aria-hidden="true" />
+        </span>
+        <span className="tw:flex tw:items-center tw:gap-1 tw:text-gray-600" data-testid="media-view-controls">
+          <IconButton label="Grid view" size="sm" pressed disabled>
+            <LayoutGrid size={14} />
+          </IconButton>
+          <IconButton label="List view" size="sm" disabled>
+            <Rows3 size={14} />
+          </IconButton>
+          <IconButton label="Sort" size="sm" disabled>
+            <ArrowUpDown size={14} />
+          </IconButton>
+        </span>
       </div>
-      <div className="sl-grid-wrap">
+
+      <TypePills
+        activeType={activeType}
+        counts={counts}
+        onTypeChange={onTypeChange}
+      />
+
+      <div className="sl-grid-wrap tw:min-h-0 tw:flex-1 tw:overflow-y-auto" data-testid="media-grid-wrap">
         {filtered.length === 0 ? (
           props.libraryItems.length === 0 ? (
-            <div className="sl-empty">
-              <p className="sl-empty__title">Your library is empty</p>
-              <p className="sl-empty__body">
+            <div className="sl-empty tw:px-4 tw:py-6" data-testid="media-empty">
+              <p className="sl-empty__title tw:text-[13px] tw:text-gray-900">Your library is empty</p>
+              <p className="sl-empty__body tw:mt-1 tw:text-[12px] tw:text-gray-600">
                 Upload your brand assets or browse free stock.
               </p>
               <Button
                 type="button"
-                className="sl-empty__cta"
+                size="xs"
+                className="sl-empty__cta tw:mt-3"
+                data-testid="media-empty-cta"
                 onClick={onOpenStock}
               >
                 Browse stock
               </Button>
             </div>
           ) : (
-            <div className="sl-empty">
-              <p className="sl-empty__body">No assets matching this filter.</p>
+            <div className="sl-empty tw:px-4 tw:py-6" data-testid="media-no-results">
+              <p className="sl-empty__body tw:text-[12px] tw:text-gray-600">No assets matching this filter.</p>
             </div>
           )
         ) : (
-          <div className="med-asset-grid" role="listbox" aria-label="Asset library">
+          /* Two 136px columns with 16px gutters: 16+136+16+136+16 = 320. */
+          <div
+            className="med-asset-grid tw:grid tw:grid-cols-2 tw:justify-items-start tw:gap-4 tw:px-4 tw:py-3"
+            role="listbox"
+            aria-label="Asset library"
+            data-testid="media-grid"
+          >
             {filtered.map((item) => (
               <AssetCell
                 key={item.key}
@@ -133,13 +192,45 @@ export function SlimLauncher(props: SlimLauncherProps) {
           </div>
         )}
       </div>
-      <div className="sl-upload-footer">
+
+      <div className="sl-upload-footer" data-testid="media-footer">
+        {/* Strip first: the board puts the failure above the footer links
+            (145:195 sits between the spacer and 145:192), because the thing
+            that went wrong outranks the thing you might do next. */}
         <UploadZone
+          compact
+          inputRef={uploadInputRef}
           storage={props.storage}
           onUpload={props.onUpload}
+          onRetryUpload={props.onRetryUpload}
           uploadQueue={props.uploadQueue}
           disabled={props.storage.used >= props.storage.total}
         />
+        {/* Board `144:46` — two accent text links, 44h row. */}
+        <div className="tw:flex tw:h-11 tw:items-center tw:gap-6 tw:px-4 tw:text-[13px]">
+          <Button
+            type="button"
+            color="light"
+            size="xs"
+            className="tw:min-h-6 tw:gap-1.5 tw:border-0 tw:bg-transparent tw:px-0 tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+            data-testid="media-upload-action"
+            onClick={() => uploadInputRef.current?.click()}
+          >
+            <Upload size={14} aria-hidden="true" />
+            Upload
+          </Button>
+          <Button
+            type="button"
+            color="light"
+            size="xs"
+            className="tw:min-h-6 tw:gap-1.5 tw:border-0 tw:bg-transparent tw:px-0 tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+            data-testid="media-stock-action"
+            onClick={onOpenStock}
+          >
+            <Cloud size={14} aria-hidden="true" />
+            Stock
+          </Button>
+        </div>
       </div>
     </PanelFrame>
   );

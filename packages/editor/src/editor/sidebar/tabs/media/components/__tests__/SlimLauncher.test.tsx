@@ -60,14 +60,19 @@ describe("SlimLauncher — §10 default 320px experience", () => {
     expect(container.querySelector(".med-type-pills")).toBeInTheDocument();
   });
 
-  it("renders '+ Stock' primary button", () => {
+  // T8: the board moved Stock out of the header and into the footer beside
+  // Upload (144:46), so the two ways of getting media in sit together. The
+  // "+ Stock" button next to the filters is gone, not renamed.
+  it("offers Stock from the footer, beside Upload", () => {
     render(<SlimLauncher {...baseProps()} />);
-    expect(screen.getByRole("button", { name: /\+ Stock/i })).toBeInTheDocument();
+    expect(screen.getByTestId("media-stock-action")).toBeInTheDocument();
+    expect(screen.getByTestId("media-upload-action")).toBeInTheDocument();
   });
 
   it("renders real search input (not ghost button)", () => {
     render(<SlimLauncher {...baseProps()} />);
-    expect(screen.getByPlaceholderText(/Search library/i)).toBeInTheDocument();
+    // Placeholder is the board's own copy (144:9) — "Search", not "Search library…".
+    expect(screen.getByLabelText(/Search library/i)).toBeInTheDocument();
   });
 
   it("renders 3-col asset grid (AssetGrid component) when libraryItems present", () => {
@@ -114,11 +119,27 @@ describe("SlimLauncher — §10 default 320px experience", () => {
     expect(cells.length).toBe(1);
   });
 
-  it("opens stock modal when '+ Stock' clicked", async () => {
+  it("opens stock modal from the footer Stock link", async () => {
     const onOpenStock = vi.fn();
     const user = userEvent.setup();
     render(<SlimLauncher {...baseProps()} onOpenStock={onOpenStock} />);
-    await user.click(screen.getByRole("button", { name: /\+ Stock/i }));
+    await user.click(screen.getByTestId("media-stock-action"));
     expect(onOpenStock).toHaveBeenCalledOnce();
+  });
+
+  // The drawer had no retry at all before T9 — MediaTab wired state.retryUpload
+  // into the fullpage branch only, so a failed upload here was a dead end.
+  it("a failed upload keeps a working Retry", async () => {
+    const onRetryUpload = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <SlimLauncher
+        {...baseProps()}
+        onRetryUpload={onRetryUpload}
+        uploadQueue={[{ fileName: "poster.png", progress: 0, status: "error", error: "File too large" }]}
+      />,
+    );
+    await user.click(screen.getByRole("button", { name: /Retry poster.png/i }));
+    expect(onRetryUpload).toHaveBeenCalledWith("poster.png");
   });
 });
