@@ -1,0 +1,12 @@
+{
+  "surface": "content-load-error",
+  "board": "Content · load-error (Figma 453:4010)",
+  "_note": "The CMS hydrate failing is a server condition; ContentTab takes an injected status so the screen can be measured at all.",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=content-load-error",
+  "viewport": { "width": 320, "height": 812 },
+  "steps": [{ "action": "waitFor", "testId": "content-load-error" }],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    { "name": "error-block", "testId": "content-load-error", "spec": "content-load-error", "nodeId": "453:4013" }
+  ]
+}

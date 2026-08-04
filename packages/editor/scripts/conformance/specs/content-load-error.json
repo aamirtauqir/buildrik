@@ -1,0 +1,33 @@
+{
+  "surface": "content-load-error",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "453:4010",
+  "boardName": "Content · load-error",
+  "figmaHash": "266440a13a5716970f3f33bb63eed5e19f865ee0eec39fd56eba27d631a56458",
+  "extractorVersion": 1,
+  "extractedAt": "2026-08-04T00:00:00.000000Z",
+  "targets": [
+    {
+      "nodeId": "453:4013",
+      "name": "Empty state",
+      "className": "[word-break:break-word] content-stretch flex flex-col font-['Inter:Regular'] font-normal gap-[6px] items-start not-italic overflow-clip pb-[32px] pt-[36px] px-[24px] relative shrink-0 text-left w-full",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "padding-bottom": {
+          "value": "32px"
+        },
+        "padding-top": {
+          "value": "36px"
+        },
+        "padding-left": {
+          "value": "24px"
+        },
+        "padding-right": {
+          "value": "24px"
+        }
+      }
+    }
+  ]
+}

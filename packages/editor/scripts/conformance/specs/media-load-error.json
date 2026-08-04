@@ -1,0 +1,41 @@
+{
+  "surface": "media-load-error",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "453:3931",
+  "boardName": "Media · load-error",
+  "figmaHash": "edaeb99dbc0b2cbce65298e451be669f3b2125331c00900b5d1ea6d0e8b3d11b",
+  "extractorVersion": 1,
+  "extractedAt": "2026-08-04T00:00:00.000000Z",
+  "targets": [
+    {
+      "nodeId": "453:3952",
+      "name": "Empty state",
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal h-[140px] leading-[20px] not-italic overflow-clip relative shrink-0 text-[13px] text-center w-full",
+      "props": {
+        "height": {
+          "value": "140px"
+        },
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "453:3953",
+      "name": null,
+      "className": "-translate-x-1/2 absolute left-[160px] text-[color:var(--color\\/error-text,#c81e1e)] top-[44px] w-[272px]",
+      "props": {
+        "color": {
+          "token": "--color/error-text",
+          "value": "#c81e1e"
+        },
+        "width": {
+          "value": "272px"
+        }
+      }
+    }
+  ]
+}
