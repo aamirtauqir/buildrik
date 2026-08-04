@@ -1,0 +1,232 @@
+<title>Lesson 04 · Kai agents, ek repo</title>
+<link rel="stylesheet" href="../assets/lesson.css" />
+
+<div class="wrap">
+
+<p class="eyebrow">Lesson 04 · One component system</p>
+<h1>Kai agents, ek repo</h1>
+<p class="lede">
+  Sawal: "editor par kai alag agents ke saath kaam kar sakta hoon?" Jawab haan —
+  aur aap ne is ka poora system <strong>May 2026 mein khud likh liya tha</strong>,
+  phir kabhi chalaya nahi. Ye lesson wo system nikaal kar, is arc ke liye theek
+  karta hai.
+</p>
+
+<h2>Pehle: aap ke paas already kya hai</h2>
+
+<pre><code>$ git worktree list
+
+/Users/shahg/Desktop/pencil/buildrik                  53970ec3 [main]
+/Users/shahg/Desktop/pencil/buildrik-inspector-hardening  [inspector-hardening]
+/Users/shahg/Desktop/pencil/buildrik-sandbox-a            [sandbox-a]
+/Users/shahg/Desktop/pencil/buildrik-sandbox-b            [sandbox-b]
+/Users/shahg/Desktop/pencil/buildrik/.claude/worktrees/ia-v2</code></pre>
+
+<p>
+  Chaar sibling trees. Saath mein teen documents jo main par pare hain:
+  ek design spec, ek setup plan, aur ek copy/paste runbook — plus
+  <code>TASKS_LANE_A.md</code> aur <code>TASKS_LANE_B.md</code>.
+</p>
+
+<div class="note">
+  <span class="note-label">Sab kuch banaya, chalaya kabhi nahi</span>
+  Dono lane files ka aakhri commit <code>2026-05-21 chore(workflow): add
+  parallel session task queues</code> hai. Us din banayi, us din ke baad ek
+  bhi edit nahi. <code>sandbox-b</code> ka <code>node_modules</code> tak
+  install nahi hua. Ye "naya system banao" wala kaam nahi hai — ye
+  "jo pehle se hai use chalao" wala kaam hai.
+</div>
+
+<h2>Asal unit agent nahi hai — file hai</h2>
+
+<p>
+  Ye poore mauzu ka markaz hai. Do agents ek hi tree mein alag-alag
+  files likh rahe hain — bilkul safe. Do agents <strong>ek hi file</strong> likh
+  rahe hain — jo baad mein likhega wo pehle wale ko mita dega, chupke se, bina
+  kisi error ke. Git ko pata bhi nahi chalega, kyunki dono ek hi working tree
+  hain, do commits nahi.
+</p>
+
+<p>Isi liye teen mechanisms hain, teen alag qeematon par:</p>
+
+<div class="tbl-scroll">
+<table>
+  <thead><tr><th>Mechanism</th><th>Kya alag hota hai</th><th>Setup</th><th>Kab</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Subagents</strong><br>(ek tree)</td>
+      <td>Sirf context. Tree, branch, node_modules, port — sab share.</td>
+      <td class="num">0</td>
+      <td>Files disjoint hon. Dev server ki zaroorat na ho.</td>
+    </tr>
+    <tr>
+      <td><strong>Worktree</strong><br><code>git worktree add</code></td>
+      <td>Poora tree + apni branch. Ek hi <code>.git</code> share.</td>
+      <td>pnpm install, alag port, <code>.env.local</code> copy</td>
+      <td>Dev server / test suite chahiye, ya shared file likhni hai.</td>
+    </tr>
+    <tr>
+      <td><strong>Alag terminal session</strong></td>
+      <td>Upar wala + apni queue file + merge cadence.</td>
+      <td>Upar wala + lane file + nightly squash</td>
+      <td>Kai din ka autonomous kaam. Aap sirf log parhein.</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h2>Aap ka arc sab se aasan case hai</h2>
+
+<p>Ratchet se seedha kaam ki list nikalti hai:</p>
+
+<pre><code>$ node scripts/check-styling-ratchet.mjs --top
+
+  18  src/editor/ecommerce/CollectionSetupModal.tsx
+  18  src/editor/shell/modals/ProjectSettingsModal.tsx
+  18  src/editor/sidebar/tabs/pages/components/SearchListingsTable.tsx
+  17  src/editor/design-system/ui/sections/ExportSection.tsx
+  17  src/editor/export/CodePreview.tsx
+  …29 files</code></pre>
+
+<p>
+  Alag folders, alag panels, aapas mein koi taluq nahi. Aur wo ek file jise
+  har conversion chhoo sakti hai — <code>chrome-ui/index.ts</code> — pichle
+  <strong>30 din mein sirf 2 commits</strong> mein badli. Yani zyada tar
+  conversions maujooda atom hi reuse karti hain, nayi export add nahi karti.
+</p>
+
+<div class="win">
+  <span class="note-label">Faisla</span>
+  Is arc ke liye <strong>worktree ki zaroorat nahi</strong>. Ek tree, kai
+  subagents, <strong>ek agent = ek file</strong>. Setup zero. Worktree tab
+  nikaalein jab do lane sach much alag <em>branches</em> par chahiye hon.
+</div>
+
+<h2>Jo cheez tootegi: baseline file</h2>
+
+<p>
+  Yahan asal khatra source files mein nahi hai. Wo hai
+  <code>scripts/.styling-baseline.json</code> — ratchet ki yaaddasht.
+</p>
+
+<pre><code>if (process.argv.includes("--update")) {
+  <strong>writeFileSync(BASELINE_PATH, …)</strong>   // poori file, dobara likhi gayi
+}</code></pre>
+
+<p>
+  <code>--update</code> poori JSON ko <strong>apne tree ke count se</strong>
+  dobara likhta hai. Ek tree mein ye theek hai. <strong>Worktrees mein ye
+  zeher hai:</strong>
+</p>
+
+<pre><code>worktree A → panel X drain kiya → --update → likha: "Y abhi bhi 18 par hai"
+worktree B → panel Y drain kiya → --update → likha: "X abhi bhi 18 par hai"
+
+merge → dono drains real hain, lekin baseline dono ko <strong>18 par lock kar raha hai</strong>
+      → ratchet PASS, 36 style ki dheel ke saath
+      → koi error nahi. Taala dheela ho gaya, khamoshi se.</code></pre>
+
+<div class="warn">
+  <span class="note-label">Qaeda</span>
+  <strong>Baseline ka sirf ek likhne wala hota hai.</strong> Agents drain
+  karte hain; <code>--update</code> aap khud, sab merge hone ke baad, ek baar
+  chalate hain. Ye qaeda naya nahi — aap ne May ke design mein
+  <code>MEMORY.md</code>, <code>package.json</code> aur prisma migrations ke
+  liye bilkul yehi likha tha: <em>"single writer prevents merge corruption on a
+  hot file"</em>. Baseline JSON usi list ki agli entry hai.
+</div>
+
+<h2>Worked example — 4 agents, abhi</h2>
+
+<p>Parent session (aap) pehle baseline record karta hai — is se agents ke paas
+"baseline check karne" ka bahana hi khatam ho jata hai:</p>
+
+<pre><code>$ node scripts/check-styling-ratchet.mjs &gt; /tmp/baseline-before.txt
+$ npx tsc --noEmit 2&gt;&amp;1 | grep -c "error TS" &gt;&gt; /tmp/baseline-before.txt</code></pre>
+
+<p>Phir har agent ko <strong>ek</strong> file, aur teen sakht qaede:</p>
+
+<pre><code>Convert src/editor/export/CodePreview.tsx to chrome-ui + `tw:` utilities.
+
+- Sirf YEHI file likhein. Koi doosri file nahi.
+- `--update` NA chalayein. `git commit` NA karein. Main karunga.
+- `git stash` NA karein. Baseline pehle se /tmp/baseline-before.txt mein hai.
+- Business logic na toote. Visual drift qabool hai.
+- Wapis: kya hataya, aur konsa chrome-ui atom laga.</code></pre>
+
+<p>Sab wapis aane ke baad, aap ek baar:</p>
+
+<pre><code>$ pnpm test &amp;&amp; pnpm run verify:ds        # 10 gates, ratchet un mein aakhri
+$ node scripts/check-styling-ratchet.mjs --update
+$ git commit -am "refactor(chrome): 4 panels drained — inline_literal 836 → …"</code></pre>
+
+<div class="note">
+  <span class="note-label">Qeemat, sach sach</span>
+  Aap ki apni memory se, 15 incidents par: parallel dispatch mein
+  <strong>~30-50% agents phir bhi <code>git stash</code> chala dete hain</strong>
+  — chahe prompt mein saaf mana kiya ho. Har incident ~10 min recovery. 4 agents
+  = ~1-2 stash incidents ka hisab rakh kar chalein. Ye rukta nahi; sirf
+  <em>sasta</em> hota hai jab baseline pehle se file mein likhi ho.
+</div>
+
+<div class="quiz" data-answer="1">
+  <p class="q">
+    Aap ne 4 panels 4 alag worktrees mein drain karwaye. Har agent ne apna kaam
+    poora kar diya. Ab?
+  </p>
+  <button>Har worktree mein --update chalayein, phir sab merge karein</button>
+  <button>Sab kuch merge karein, phir ek baar --update chalayein</button>
+  <button>Har agent apne commit mein naya baseline shamil kar de</button>
+  <button>Baseline ko gitignore karein taake koi conflict na aaye</button>
+  <p class="why">
+    Baseline poore tree ka snapshot hai, ek panel ka nahi. Har worktree ka
+    <code>--update</code> baqi teen panels ke <em>purane</em> numbers likh dega,
+    aur merge ke baad wo dheel ban jayegi — bina kisi FAIL ke. Option 4 to
+    ratchet ko hi khatam kar deta hai: baseline nahi to muqabla kis se?
+  </p>
+</div>
+
+<h2>Kab worktree sach much chahiye</h2>
+
+<div class="tbl-scroll">
+<table>
+  <thead><tr><th>Halat</th><th>Ek tree kaafi?</th></tr></thead>
+  <tbody>
+    <tr><td>Alag-alag panel files convert karna</td><td>Haan</td></tr>
+    <tr><td>Dono ko dev server chahiye (5050 / 5051)</td><td>Nahi — worktree</td></tr>
+    <tr><td>Ek lane <code>main</code> par, doosri risky branch par</td><td>Nahi — worktree</td></tr>
+    <tr><td>Baseline dekhna hai bina apna kaam kho'e</td><td>Nahi — worktree (<em>stash kabhi nahi</em>)</td></tr>
+    <tr><td>Kai din ka autonomous kaam, alag queues</td><td>Nahi — poori lane setup</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="warn">
+  <span class="note-label">Worktree ki chhupi qeemat</span>
+  <code>node_modules</code> 1.9G ka hai. pnpm store se hardlink karta hai to
+  disk kam lagti hai, par install phir bhi minute leti hai — aur is repo mein
+  pnpm 11 fresh worktree mein build scripts skip kar deta hai, yani
+  <code>prisma generate</code> haath se chalana parta hai aur linux
+  <code>sharp</code> graft karni parti hai. Isi liye default ek tree hai.
+</div>
+
+<h2>Ek line mein</h2>
+
+<p>
+  <strong>Agents baantein files ke hisab se, trees ke hisab se nahi.</strong>
+  Tree tab torein jab do agents ko alag <em>branch</em> ya alag <em>port</em>
+  chahiye ho. Aur jo bhi shakl ho — ratchet ki baseline ka likhne wala hamesha
+  ek hi rehta hai: aap.
+</p>
+
+<div class="foot">
+  <p><strong>Reference:</strong> <a href="../reference/parallel-agents.html">Parallel agents</a> — teenon mechanisms, shared-resource table, commands.</p>
+  <p><strong>Pichle lessons:</strong> <a href="0001-two-audiences.html">01 — The two audiences</a> · <a href="0002-three-libraries.html">02 — Three libraries, two graveyards</a> · <a href="0003-ratchets.html">03 — Ratchet</a></p>
+  <p><strong>Primary source:</strong> <a href="https://docs.claude.com/en/docs/claude-code/common-workflows">Claude Code — Common workflows</a>, "Run parallel sessions with Git worktrees". Iske baad apna hi <code>docs/superpowers/specs/2026-05-21-parallel-claude-sessions-design.md</code> parhein — wo is repo ke liye already tuned hai.</p>
+  <p>Khud chala kar dekhein: <code>git worktree list</code> aur <code>node scripts/check-styling-ratchet.mjs --top</code></p>
+  <p>Kuch clear na ho to poochhein.</p>
+</div>
+
+<script src="../assets/quiz.js"></script>
+
+</div>

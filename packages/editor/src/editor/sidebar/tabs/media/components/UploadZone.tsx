@@ -89,6 +89,12 @@ export function UploadZone({
   );
 
   const failedItems = (uploadQueue ?? []).filter((q) => q.status === "error");
+  // Everything still moving. "complete" is excluded on purpose: a finished
+  // upload's evidence is the card that just appeared in the grid, and a 100%
+  // bar lingering under it says the work is still happening.
+  const activeItems = (uploadQueue ?? []).filter(
+    (q) => q.status === "pending" || q.status === "uploading" || q.status === "optimizing" || q.status === "processing",
+  );
 
   // Visual state priority: rejected > full > uploading > near-limit > drag > idle.
   const stateClass = rejectedReason
@@ -156,6 +162,41 @@ export function UploadZone({
         />
       </div>
       <StorageQuotaBar used={storage.used} total={storage.total} compact={compact} />
+      {/*
+        Board `145:143` — one 44h row per upload in flight: name, mono percent,
+        and a 4px accent track. Mono because the number changes several times a
+        second and proportional digits make the row twitch while it counts.
+      */}
+      {activeItems.length > 0 && (
+        <ul className="tw:m-0 tw:list-none tw:p-0" role="list" aria-label="Uploads in progress" data-testid="media-upload-progress">
+          {activeItems.map((item) => (
+            <li key={item.fileName} className="tw:flex tw:h-11 tw:flex-col tw:justify-center tw:gap-1.5 tw:px-4">
+              <span className="tw:flex tw:items-baseline tw:gap-2">
+                <span className="tw:min-w-0 tw:flex-1 tw:truncate tw:text-[12px] tw:leading-[18px] tw:text-gray-900">
+                  {item.fileName}
+                </span>
+                <span className="tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:leading-4 tw:tabular-nums tw:text-gray-500">
+                  {Math.round(item.progress)}%
+                </span>
+              </span>
+              <span
+                className="tw:h-1 tw:w-full tw:overflow-hidden tw:rounded-sm tw:bg-gray-100"
+                role="progressbar"
+                aria-label={`Uploading ${item.fileName}`}
+                aria-valuenow={Math.round(item.progress)}
+                aria-valuemin={0}
+                aria-valuemax={100}
+              >
+                <span
+                  className="tw:block tw:h-full tw:rounded-sm tw:bg-blue-700"
+                  style={{ width: `${Math.min(100, Math.max(0, item.progress))}%` }}
+                />
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+
       {/*
         T9 — board `145:195`. A 44h row on warning-tint, filename over the
         reason, Retry on the right. It is NOT a toast: an upload that failed is

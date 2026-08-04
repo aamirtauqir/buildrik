@@ -1,0 +1,141 @@
+<title>Lesson 01 · The two audiences</title>
+<link rel="stylesheet" href="../assets/lesson.css" />
+
+<div class="wrap">
+
+<p class="eyebrow">Lesson 01 · One component system</p>
+<h1>The two audiences</h1>
+<p class="lede">
+  Aap ne kaha: purani CSS aur bekaar cheezein delete kar do, design kharab ho to
+  koi baat nahi, bas business logic na toote. Ye lesson wo <em>ek line</em>
+  sikhata hai jo tay karti hai ke delete karna safe hai ya nahi — aur wo line
+  design ke baare mein hai hi nahi.
+</p>
+
+<h2>Aap ka apna constraint hi jawab hai</h2>
+
+<p>
+  Aap ne do cheezein saath kahin: <strong>"design kharab ho to theek hai"</strong>
+  aur <strong>"business logic na kharab ho"</strong>. Ye tab tak alag alag lagti
+  hain jab tak aap ye na dekhein ke editor mein CSS <em>do</em> alag cheezein
+  style karti hai:
+</p>
+
+<div class="split">
+  <div>
+    <span class="who">Audience 1 — aap</span>
+    <h4>Editor chrome</h4>
+    <ul>
+      <li>Sidebar, rail, inspector, topbar, modals</li>
+      <li>Yahan design toot-ta hai to <em>aap</em> dekhte hain</li>
+      <li>Aap fix kar sakte hain, aaj hi</li>
+    </ul>
+  </div>
+  <div>
+    <span class="who">Audience 2 — aap ka customer</span>
+    <h4>Published site</h4>
+    <ul>
+      <li>Canvas ke andar ki HTML, exported site, Vercel par live page</li>
+      <li>Yahan toot-ta hai to <em>customer ka client</em> dekhta hai</li>
+      <li>Aap ko pata bhi nahi chalega — koi test nahi pakadta</li>
+    </ul>
+  </div>
+</div>
+
+<p>
+  Doosri wali CSS delete karna cosmetic nahi hai. Wo <strong>product output</strong>
+  hai — bilkul waisa hi jaise publish function tor dena. Aap ke apne constraint
+  ke andar aata hai.
+</p>
+
+<h2>Kaise pehchanein — ek scanner ye kabhi nahi bata sakta</h2>
+
+<p>
+  Chrome CSS ke class names aap ke <code>.tsx</code> mein likhe hote hain. Customer
+  wali CSS ke class names <strong>engine runtime par likhta hai</strong>. Isliye
+  koi bhi dead-CSS scanner <code>Canvas.css</code> ko 100% dead batayega:
+</p>
+
+<pre><code>// blocks/Components/Slider.tsx:277 — ye string customer ke page mein jati hai
+'&lt;div class="buildrick-slider" data-buildrick-type="slider"&gt;'</code></pre>
+
+<p>
+  Aaj <strong>33</strong> aise <code>buildrick-*</code> class names hain jo
+  <code>blocks/</code>, <code>templates/</code> aur <code>engine/</code> se
+  customer ki HTML mein emit hote hain. Un mein se ek ki CSS delete karein, aur
+  har wo site jo pehle publish ho chuki hai — toot jati hai.
+</p>
+
+<div class="warn">
+  <span class="note-label">Ye is session mein waqai hua</span>
+  Maine 96 CSS classes ko "unreferenced" mark kiya. <strong>Sirf 63 delete
+  huin.</strong> Baqi 33 mein se kuch template literals se bante the
+  (<code>med-fmt-btn${active ? " active" : ""}</code>), kuch node_modules likhta
+  tha, aur kuch customer HTML mein jate the. Ek plain grep ne 9 classes ko dead
+  kaha tha — <strong>7 zinda thin</strong>.
+</div>
+
+<h2>Isi liye 1,438 lines counter se bahar hain</h2>
+
+<div class="tbl-scroll">
+<table>
+  <thead><tr><th>Kya</th><th class="num">Lines</th><th>Kyun rehti hai</th></tr></thead>
+  <tbody>
+    <tr><td>canvas CSS</td><td class="num">997</td><td>Customer ki HTML style karti hai</td></tr>
+    <tr><td>site-builder design system</td><td class="num">390</td><td>Customer ka apna palette</td></tr>
+    <tr><td><code>chrome-ui</code> ki apni CSS</td><td class="num">151</td><td>Ye destination hai, target nahi</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>
+  Pehle ratchet ye sab gin raha tha. Matlab <code>css_lines</code> ka
+  <strong>farsh 1,438 tha</strong> — wo kabhi zero nahi ho sakta tha, chahe aap
+  poora chrome convert kar dete. Ek aisa gate jo hil hi nahi sakta, use log
+  <code>--update</code> se aage badha dete hain aur wo matlab khona shuru kar deta
+  hai. Ab list explicit hai, har row ke saath wajah likhi hai.
+</p>
+
+<div class="win">
+  <span class="note-label">Aaj ka win</span>
+  Kuch bhi delete karne se pehle ek command chalayein. Agar iska jawab khali
+  nahi hai, wo customer ka hai — haath mat lagayein.
+  <pre style="margin:.7rem 0 0"><code>grep -rhoE 'class="[^"]*<var>your-class</var>' src/blocks src/templates src/engine</code></pre>
+</div>
+
+<div class="quiz" data-answer="1">
+  <p class="q">
+    Ek scanner kehta hai <code>Canvas.css</code> ki saari 800 lines unreferenced
+    hain. Aap ne kaha hai design toot-na acceptable hai. Delete karein?
+  </p>
+  <button>Haan — aap ne design breakage allow kiya hai</button>
+  <button>Nahi — wo customer ki published HTML style karti hai</button>
+  <button>Haan — lekin pehle ek backup branch bana lein</button>
+  <button>Nahi — pehle poori suite chalayein aur dekhein</button>
+  <p class="why">
+    Wo chrome hai hi nahi. Uske class names engine runtime par likhta hai,
+    isliye har scanner use dead batayega. Delete karne se aap ka apna editor
+    bilkul theek dikhega aur <em>customer ki live sites</em> toot jayengi — aur
+    suite bhi green rahegi, kyunki koi test published HTML render nahi karta.
+  </p>
+</div>
+
+<h2>Aage kya</h2>
+
+<p>
+  Ye pehli line thi. Doosri line ye hai ke <strong>flowbite har cheez nahi kar
+  sakta</strong> — aur wo aap ke repo mein pehle se rendered-DOM evidence ke saath
+  likha hua hai. Lesson 02 wo padhna sikhayega, taake aap khud faisla kar sakein
+  ke kaunsa flowbite component adopt karna safe hai, docs ke waade par nahi.
+</p>
+
+<div class="foot">
+  <p><strong>Reference:</strong> <a href="../reference/two-audiences.html">The two audiences</a> — namespace tells + the exclusion list.</p>
+  <p><strong>Primary source:</strong> <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Cascade">MDN — CSS cascade</a>, specifically why a stylesheet whose selectors never appear in source can still be load-bearing at runtime.</p>
+  <p><strong>Repo evidence:</strong> <code>packages/editor/scripts/check-styling-ratchet.mjs</code> (the exclusion list) and <code>scripts/audit/dead-css-scan.mjs</code> (which prints "NOT a delete list" for exactly this reason).</p>
+  <p>Kuch bhi clear na ho to poochhein — main aap ka teacher hoon, lesson ka koi hissa dobara khol sakte hain.</p>
+</div>
+
+<script src="../assets/quiz.js"></script>
+
+</div>

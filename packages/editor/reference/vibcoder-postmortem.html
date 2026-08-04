@@ -1,0 +1,162 @@
+<title>Reference · Vibcoder — what it was, how it died</title>
+<link rel="stylesheet" href="../assets/lesson.css" />
+
+<div class="wrap">
+
+<p class="eyebrow">Reference · Buildrik editor</p>
+<h1>Vibcoder</h1>
+<p class="lede">
+  Born 26 Apr 2026. Died 28 Jul 2026. 70 primitives, 63 CSS files, 106 preview
+  files, deleted in one commit of <strong>−29,179 lines</strong>. It is the
+  model for the migration you are asking for, because it has already been done —
+  twice.
+</p>
+
+<h2>What it actually was</h2>
+
+<p>
+  Not something written from scratch. The first commit (<code>7a4328fe</code>,
+  26 Apr) says it plainly:
+</p>
+
+<pre><code>feat(editor): vibcoder React wrapper namespace
+
+Phase 0 Task 2. shared/vibcoder/ is the single import surface for
+chrome JSX consuming <strong>vendored</strong> components. Barrel ready;
+Button lands next.</code></pre>
+
+<p>
+  A <strong>vendored UI kit</strong> — copied into the repo from
+  <code>docs/reference/vibcoder/</code> — with a thin React wrapper per
+  component so chrome had one import surface. Exactly the role
+  <code>chrome-ui/</code> plays for flowbite today.
+</p>
+
+<h3>The 56 components at its peak</h3>
+
+<p style="font: 400 13px/1.9 'Geist Mono', monospace; color: var(--ink-soft)">
+A11yOverlay · ActionBar · Avatar · Badge · Breadcrumb · Button · Card · Center ·
+Checkbox · Chipbar · Cluster · ColorPicker · ColorTrigger · CommandPalette ·
+Count · Divider · EmptyState · Footer · FormField · Frame · Grid · Grip ·
+HelperText · Icon · IconButton · Input · Kbd · Label · Link · ListRow · Menu ·
+Modal · NotificationCenter · NumericStepper · OverlayMount · Popover · Progress ·
+Radio · SearchInput · SectionHead · Select · Skeleton · Slider · Spinner ·
+Stack · SurfaceHead · Switch · Switcher · Tabs · Tag · Textarea · Thumb ·
+TileMeta · Toast · ToggleRow · Toolbar · Uploader
+</p>
+
+<div class="note">
+  <span class="note-label">Look at that list again</span>
+  ListRow. Menu. Modal. EmptyState. Toolbar. Popover. Skeleton. Those are the
+  same names <code>chrome-ui/</code> ships today. The library changed; the
+  shapes a visual editor needs did not.
+</div>
+
+<h2>Three libraries, two graveyards</h2>
+
+<div class="tbl-scroll">
+<table>
+  <thead><tr><th>Library</th><th>Lived</th><th>Killed by</th><th>Gate now</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><code>editor/shared/vibcoder</code></td>
+      <td>26 Apr → 28 Jul 2026</td>
+      <td><code>8c326538</code> stage 6</td>
+      <td><code>gate:vibcoder-ratchet</code> = 0</td>
+    </tr>
+    <tr>
+      <td><code>editor/ui</code></td>
+      <td>Jul 2026 → 31 Jul 2026</td>
+      <td><code>15afb6b2</code> flowbite Task 13</td>
+      <td><code>gate:editor-ui-gone</code> = 0</td>
+    </tr>
+    <tr>
+      <td><code>editor/chrome-ui</code> + flowbite</td>
+      <td>31 Jul 2026 → now</td>
+      <td>—</td>
+      <td><code>gate:chrome-ui-surface</code> = 0 direct imports</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p>
+  <code>editor/ui</code> was built to replace vibcoder, absorbed every consumer,
+  and was itself deleted <strong>three days later</strong> once flowbite
+  absorbed it. Two full component libraries were built and buried in one
+  quarter.
+</p>
+
+<h2>How the deletion was actually done</h2>
+
+<p>
+  This is the part worth copying. The library was <strong>not</strong> deleted
+  first. Six slices moved every consumer off it, and the delete was the last
+  step, when the count was already zero:
+</p>
+
+<div class="tbl-scroll">
+<table>
+  <thead><tr><th>Slice</th><th>What moved</th></tr></thead>
+  <tbody>
+    <tr><td>1 · <code>eaa9a393</code></td><td>topbar / shell header</td></tr>
+    <tr><td>2 · <code>c5a64252</code></td><td>rail + drawer</td></tr>
+    <tr><td>3 · <code>8c0d4f4f</code></td><td>Tooltip compound + leftovers</td></tr>
+    <tr><td>4 · <code>a67f6779</code></td><td>seven dialogs onto one Modal</td></tr>
+    <tr><td>5 · <code>73a0cbd1</code></td><td>forms, compounds, mechanicals — 34 surfaces</td></tr>
+    <tr><td>6 · <code>8c326538</code></td><td><strong>delete</strong> — ratchet already read 402 → 0</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>
+  The deletion commit's own summary line: <code>ratchet 402 → 0</code>. The gate
+  counted remaining imports, and the delete happened when that number hit zero —
+  not before. That is why 29,179 lines could be removed in one commit with
+  7,803 tests green.
+</p>
+
+<div class="warn">
+  <span class="note-label">Why order matters more than courage</span>
+  Deleting first and fixing after would have produced hundreds of broken imports
+  at once, with no way to tell a real breakage from a missing shim. Draining
+  first means every commit is independently green, and the delete is boring.
+</div>
+
+<h2>What is left of it today</h2>
+
+<p>
+  Thirteen mentions in <code>src/</code>. Twelve are <strong>comments</strong> —
+  archaeology explaining where a shape came from:
+</p>
+
+<pre><code>chrome-ui/BreakpointSwitcher.tsx:2
+  * BreakpointSwitcher — segmented viewport switcher (ported from vibcoder).
+
+shared/forms/NumberField.tsx:5
+  * The vibcoder-era −/+ stepper buttons are gone (the Figma design has no…)</code></pre>
+
+<p>
+  The thirteenth is real, and it is a test cleaning up a legacy DOM id:
+  <code>document.getElementById("vibcoder-overlay-root")?.remove()</code> in
+  <code>MyTemplatesSaveTemplate.test.tsx</code>. No imports. No components. No CSS.
+</p>
+
+<div class="win">
+  <span class="note-label">The answer to "delete vibcoder"</span>
+  There is nothing to delete. It went on 28 Jul, its successor went on 31 Jul,
+  and both are locked at zero by gates that fail the build on a single import.
+  What remains is a fossil record, and fossils are useful — they tell you which
+  shapes this editor has needed three times running.
+</div>
+
+<div class="foot">
+  <p><strong>Verify any of this yourself:</strong></p>
+  <pre><code>git show --shortstat 8c326538      # the deletion
+git show -s --format=%b 7a4328fe   # the intent, three months earlier
+npm run gate:vibcoder-ratchet      # PASS — 0
+grep -rn vibcoder src --include='*.ts*'   # 13 hits, 12 comments</code></pre>
+  <p>Used by <a href="../lessons/0002-three-libraries.html">Lesson 02 — Three libraries, two graveyards</a>.</p>
+</div>
+
+</div>

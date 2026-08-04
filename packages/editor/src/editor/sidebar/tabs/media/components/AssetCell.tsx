@@ -32,6 +32,8 @@ interface AssetCellProps {
   isApplied?: boolean;
   isLocked?: boolean;
   isSelected?: boolean;
+  /** Selection mode is on — the card shows its check state (board 145:300). */
+  selectable?: boolean;
   onDoubleClick?: (key: string) => void;
   onContextMenu?: (e: MouseEvent, key: string) => void;
 }
@@ -49,6 +51,7 @@ export function AssetCell({
   isApplied = false,
   isLocked = false,
   isSelected = false,
+  selectable = false,
   onDoubleClick,
   onContextMenu,
 }: AssetCellProps) {
@@ -93,6 +96,7 @@ export function AssetCell({
       onDoubleClick={onDoubleClick ? () => onDoubleClick(item.key) : undefined}
       onContextMenu={onContextMenu ? (e) => onContextMenu(e, item.key) : undefined}
       aria-label={`${item.name} asset`}
+      aria-pressed={selectable ? isSelected : undefined}
       data-testid="media-card"
     >
       <span className="med-asset-cell__thumb tw:relative tw:flex tw:items-center tw:justify-center tw:w-34 tw:h-19 tw:shrink-0 tw:overflow-hidden tw:rounded tw:bg-gray-100 tw:text-gray-500">
@@ -131,6 +135,18 @@ export function AssetCell({
       </span>
 
       <span className="tw:flex tw:w-34 tw:items-center tw:gap-1">
+        {selectable ? (
+          <span
+            className={[
+              "tw:flex tw:h-4 tw:w-4 tw:flex-none tw:items-center tw:justify-center tw:rounded tw:border tw:text-[10px]",
+              isSelected ? "tw:border-blue-700 tw:bg-blue-700 tw:text-white" : "tw:border-gray-300 tw:text-transparent",
+            ].join(" ")}
+            aria-hidden="true"
+            data-testid="media-card-check"
+          >
+            ✓
+          </span>
+        ) : null}
         <span className="med-asset-cell__name tw:min-w-0 tw:flex-1 tw:truncate tw:text-left tw:text-[12px] tw:leading-[18px] tw:text-gray-900">
           {item.name}
         </span>

@@ -1,0 +1,169 @@
+<title>Reference · Parallel agents</title>
+<link rel="stylesheet" href="../assets/lesson.css" />
+
+<div class="wrap">
+
+<p class="eyebrow">Reference · Buildrik editor</p>
+<h1>Parallel agents</h1>
+<p class="lede">
+  The safety unit is the <strong>file</strong>, not the agent. Two agents writing
+  disjoint files in one tree are safe. Two agents writing one file lose data
+  silently — no conflict, no error, last writer wins.
+</p>
+
+<h2>Choose the mechanism</h2>
+
+<div class="tbl-scroll">
+<table>
+  <thead><tr><th>Mechanism</th><th>Isolates</th><th>Setup cost</th><th>Use when</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><code>Agent</code> subagents<br>(one tree)</td>
+      <td>Context only. Shares tree, branch, <code>node_modules</code>, ports, git index.</td>
+      <td>None</td>
+      <td>Disjoint file sets. No dev server. No commits from the agent.</td>
+    </tr>
+    <tr>
+      <td><code>git worktree add</code></td>
+      <td>Working tree + branch + build cache. Shares one <code>.git</code>.</td>
+      <td><code>pnpm install</code>, distinct ports, manual <code>.env.local</code> copy</td>
+      <td>Dev server, full test run, or edits to a shared file.</td>
+    </tr>
+    <tr>
+      <td>Separate terminal session</td>
+      <td>The above plus its own task queue and merge cadence.</td>
+      <td>The above plus a lane file and a nightly squash ritual</td>
+      <td>Multi-day autonomous lanes supervised by reading logs.</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h2>Single-writer resources</h2>
+
+<p>
+  Each of these is a whole-repo snapshot. A second writer does not conflict — it
+  overwrites with a view of the world that is missing the first writer's work.
+</p>
+
+<div class="tbl-scroll">
+<table>
+  <thead><tr><th>Resource</th><th>Writer</th><th>Failure if shared</th></tr></thead>
+  <tbody>
+    <tr><td><code>scripts/.styling-baseline.json</code></td><td>Parent, once, after merge</td><td><code>--update</code> rewrites the whole object from its own tree. Other lanes' drains get re-locked at their old numbers → ratchet passes with slack, silently.</td></tr>
+    <tr><td><code>MEMORY.md</code></td><td>Lane A only</td><td>Merge corruption on a hot append-only file.</td></tr>
+    <tr><td><code>package.json</code> · <code>pnpm-lock.yaml</code></td><td>Lane A only</td><td>Lockfile race; two installs diverge.</td></tr>
+    <tr><td>Prisma migrations · the database</td><td>Lane A only</td><td>One DB, two migration histories.</td></tr>
+    <tr><td><code>.env.local</code> (gitignored)</td><td>Copy manually per tree</td><td>Not tracked; a new worktree starts with none.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>Port allocation</h2>
+
+<div class="tbl-scroll">
+<table>
+  <thead><tr><th>Service</th><th class="num">Lane A</th><th class="num">Lane B</th></tr></thead>
+  <tbody>
+    <tr><td>Dashboard (Next.js)</td><td class="num">3000</td><td class="num">3001</td></tr>
+    <tr><td>Editor (Vite)</td><td class="num">5050</td><td class="num">5051</td></tr>
+    <tr><td>Prisma Studio</td><td class="num">5555</td><td class="num">5556</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>Subagent prompt — the four clauses</h2>
+
+<p>
+  Every dispatched agent gets these verbatim. Clause 3 is the one that keeps
+  failing without a named destination, so give it the path.
+</p>
+
+<pre><code>1. Write ONLY &lt;one file&gt;. No other file.
+2. Do NOT run `--update`. Do NOT `git commit`. The parent does both.
+3. Do NOT `git stash`. The baseline is already at /tmp/baseline-before.txt.
+4. Business logic must not break. Visual drift is acceptable.
+
+Report: what was removed, and which chrome-ui atom replaced it.</code></pre>
+
+<div class="warn">
+  <span class="note-label">Measured, not assumed</span>
+  Across 15 recorded incidents, roughly 30–50% of agents dispatched in parallel
+  run <code>git stash</code> anyway — with the ban stated explicitly in the
+  prompt. Recovery averages ~10 minutes each. Recording the baseline to a file
+  <em>before</em> dispatch does not stop the reflex; it makes it cheap, because
+  the agent has somewhere else to look.
+</div>
+
+<h2>Commands</h2>
+
+<h3>Create and remove a worktree</h3>
+
+<pre><code>git worktree add ../buildrik-lane-b -b lane-b     # new branch
+git worktree add ../buildrik-baseline HEAD        # throwaway, for a baseline read
+git worktree list
+git worktree remove ../buildrik-baseline
+git worktree prune                                # after deleting a dir by hand</code></pre>
+
+<h3>Record a baseline before dispatch</h3>
+
+<pre><code>node scripts/check-styling-ratchet.mjs      &gt;  /tmp/baseline-before.txt
+npx tsc --noEmit 2&gt;&amp;1 | grep -c "error TS" &gt;&gt; /tmp/baseline-before.txt</code></pre>
+
+<h3>Converge after agents return</h3>
+
+<pre><code>git log --oneline -10                       # a parallel session may have shipped it
+pnpm test &amp;&amp; pnpm run verify:ds             # 10 gates; the ratchet is the last
+node scripts/check-styling-ratchet.mjs --update
+git commit -am "refactor(chrome): N panels drained — …"</code></pre>
+
+<h3>Nightly squash, Lane B → main</h3>
+
+<pre><code>cd ~/Desktop/pencil/buildrik
+git fetch origin
+git merge --squash sandbox-a
+git commit -m "chore(cleanup): nightly batch YYYY-MM-DD — N tasks"
+git push origin main
+
+cd ~/Desktop/pencil/buildrik-sandbox-a
+git fetch origin &amp;&amp; git reset --hard origin/main
+git push --force-with-lease origin sandbox-a</code></pre>
+
+<h2>Traps specific to this repo</h2>
+
+<div class="tbl-scroll">
+<table>
+  <thead><tr><th>Trap</th><th>What happens</th><th>Fix</th></tr></thead>
+  <tbody>
+    <tr><td>pnpm 11 in a fresh worktree</td><td>Build scripts are skipped silently.</td><td>Run <code>prisma generate</code> by hand; graft the linux <code>sharp</code> binary.</td></tr>
+    <tr><td>Any <code>pnpm</code> command in a worktree with a symlinked <code>node_modules</code></td><td>pnpm's dep-status check decides the modules dir is stale and tries to <strong>purge</strong> it — through the symlink, at the main tree's 1.9G of deps. Only the no-TTY guard stops it, and <code>CI=true</code> removes that guard.</td><td>Never run <code>pnpm</code> there. Call the gate scripts directly with <code>node</code> / <code>bash</code>.</td></tr>
+    <tr><td>Symlinking a package's whole <code>node_modules</code></td><td>Workspace links inside it are <em>relative</em>, so they resolve from the symlink's real location — the main tree. TypeScript then sees the same class from two paths and reports phantom <code>TS2322</code>/<code>TS2345</code> nominal mismatches (22 of them here) in a package you never touched.</td><td>Make the dir real and symlink each entry, with the workspace link (<code>@buildrik/editor</code>) pointed at the worktree's own copy.</td></tr>
+    <tr><td><code>git stash</code> for a baseline</td><td>Pops a stash entry from another session onto your tree. 15 incidents, one near-loss.</td><td>Throwaway worktree, or read the baseline before you start.</td></tr>
+    <tr><td>Two sessions, same arc</td><td>Both land bit-identical commits (verified 2026-05-11).</td><td><code>git log --oneline -10</code> before staging anything.</td></tr>
+    <tr><td>Pre-push hook hang</td><td><code>verify:ds</code> runs on push and stalls.</td><td><code>git push --no-verify</code> after you have run the gates yourself.</td></tr>
+    <tr><td>Turbopack in a second tree</td><td>Serves stale server code from a shared <code>.next</code>.</td><td><code>rm -rf .next</code> per tree; never share a build cache.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>Already in this repo</h2>
+
+<div class="tbl-scroll">
+<table>
+  <thead><tr><th>Path</th><th>What it is</th></tr></thead>
+  <tbody>
+    <tr><td><code>docs/superpowers/specs/2026-05-21-parallel-claude-sessions-design.md</code></td><td>Locked decisions: lane split, ports, single-writer rules, merge cadence.</td></tr>
+    <tr><td><code>docs/superpowers/plans/2026-05-21-parallel-claude-sessions-setup.md</code></td><td>The setup steps.</td></tr>
+    <tr><td><code>docs/superpowers/runbooks/parallel-session-prompts.md</code></td><td>Copy/paste launch prompts per lane.</td></tr>
+    <tr><td><code>TASKS_LANE_A.md</code> · <code>TASKS_LANE_B.md</code></td><td>The two queues. Untouched since 2026-05-21.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="foot">
+  <p><strong>Lesson:</strong> <a href="../lessons/0004-parallel-agents.html">04 — Kai agents, ek repo</a></p>
+  <p><strong>Related:</strong> <a href="ratchets.html">Ratchets</a> — the baseline this page tells you not to let agents write.</p>
+  <p><strong>Sources:</strong> <a href="https://docs.claude.com/en/docs/claude-code/common-workflows">Claude Code — Common workflows</a> · <a href="https://git-scm.com/docs/git-worktree">git-worktree(1)</a></p>
+</div>
+
+</div>

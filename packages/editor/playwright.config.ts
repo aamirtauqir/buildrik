@@ -44,6 +44,13 @@ export default defineConfig({
     baseURL: `http://localhost:${PORT}`,
     // Deterministic box model: parity numbers include px sizes.
     viewport: { width: 1440, height: 900 },
+    // A running animation has no single computed value: the skeleton grid's
+    // pulse was captured mid-cycle and every re-capture disagreed with the
+    // last (opacity 0.844 vs 0.923). Measuring under reduced-motion is not a
+    // trick to stabilise the number — it is a real user setting the chrome is
+    // required to honour, so this asserts BOTH determinism and that every
+    // animation actually stands down when asked.
+    reducedMotion: "reduce",
     trace: "retain-on-failure",
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],

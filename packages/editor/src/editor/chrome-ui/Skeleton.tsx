@@ -47,7 +47,9 @@ export const SkeletonBlock: React.FC<SkeletonBlockProps> = ({ circle, className,
     className={[
       "bk-skeleton",
       circle && "bk-skeleton--circle",
-      "tw:animate-pulse tw:bg-gray-100",
+      // Reduced motion means the pulse stops, not that the placeholder
+      // disappears — the grey block is the information.
+      "tw:animate-pulse tw:motion-reduce:animate-none tw:bg-gray-100",
       circle ? "tw:rounded-full" : "tw:rounded",
       className,
     ]

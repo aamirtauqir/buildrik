@@ -1,0 +1,137 @@
+<title>Reference · Ratchets</title>
+<link rel="stylesheet" href="../assets/lesson.css" />
+
+<div class="wrap">
+
+<p class="eyebrow">Reference · Buildrik editor</p>
+<h1>Ratchets</h1>
+<p class="lede">
+  A ratchet is a counter that may go <strong>down or stay flat, never up</strong>.
+  It is the mechanism that made 29,179 lines deletable in one commit, and it is
+  the only reason a months-long migration does not quietly reverse.
+</p>
+
+<h2>The one-line definition</h2>
+
+<pre><code>if (now &gt; baseline) → exit 1 → build fails</code></pre>
+
+<p>
+  That is the whole idea. A wrench ratchet turns one way and locks the other.
+  A code ratchet is the same: the number you are draining can fall, and the
+  moment it rises the build stops.
+</p>
+
+<h2>The four ratchets in this repo</h2>
+
+<div class="tbl-scroll">
+<table>
+  <thead><tr><th>Gate</th><th>Counts</th><th class="num">Locked at</th></tr></thead>
+  <tbody>
+    <tr><td><code>gate:vibcoder-ratchet</code></td><td>imports of the deleted vibcoder / shared-ui paths</td><td class="num">0</td></tr>
+    <tr><td><code>gate:editor-ui-gone</code></td><td>imports of the deleted <code>editor/ui</code></td><td class="num">0</td></tr>
+    <tr><td><code>gate:chrome-ui-surface</code></td><td>direct <code>flowbite-react</code> imports outside <code>chrome-ui/</code></td><td class="num">0</td></tr>
+    <tr><td><code>gate:styling-ratchet</code></td><td>inline styles + in-scope CSS lines</td><td class="num">draining</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>
+  The first three are <strong>finished</strong> ratchets — locked at zero, so
+  they are now bans. The fourth is a <strong>live</strong> one: its number is
+  still falling, and every conversion lowers it.
+</p>
+
+<h2>Anatomy of the live one</h2>
+
+<pre><code>scripts/check-styling-ratchet.mjs   # the counter
+scripts/.styling-baseline.json      # its memory</code></pre>
+
+<pre><code>{
+  "inline_literal": 1280,
+  "inline_hoisted": 590,
+  "css_lines": 10940,
+  "css_files": {
+    "inspector/styles/inspector.css": 1038,
+    "media/LibraryManager.css": 955,
+    …
+  }
+}</code></pre>
+
+<p>Three aggregates plus a <strong>per-file map</strong>. The map exists because aggregates alone cannot see direction:</p>
+
+<pre><code>[styling-ratchet] ok   css_lines  10939 (baseline 10940, drained 1)
+[styling-ratchet] FAIL shell/chrome.css grew 45 -&gt; 50 (+5)</code></pre>
+
+<p>
+  Five lines added in one panel and six removed from another nets to −1 and the
+  total says "drained". The per-file lock catches it. Without that, a ratchet
+  measures tidiness, not architecture.
+</p>
+
+<h2>The two commands</h2>
+
+<div class="tbl-scroll">
+<table>
+  <thead><tr><th>Command</th><th>Does</th><th>When</th></tr></thead>
+  <tbody>
+    <tr><td><code>node scripts/check-styling-ratchet.mjs</code></td><td>Compares now against baseline. Exit 1 if any number rose.</td><td>Every build, via <code>verify:ds</code></td></tr>
+    <tr><td><code>… --update</code></td><td>Writes the current numbers as the new baseline.</td><td><strong>Only after a real drain</strong>, in the same commit</td></tr>
+    <tr><td><code>… --top</code></td><td>Worst remaining files, the in-scope CSS list, and what is excluded and why.</td><td>Choosing the next target</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="warn">
+  <span class="note-label">The failure mode</span>
+  <code>--update</code> is also how a ratchet dies. Run it to make a red build
+  go green and you have not drained anything — you have moved the goalposts and
+  kept the ceremony. The rule: <code>--update</code> only ever lowers a number,
+  and only in a commit that explains what was drained.
+</div>
+
+<h2>Why it made vibcoder deletable</h2>
+
+<p>
+  The vibcoder deletion commit's own summary carries one line:
+  <code>ratchet 402 → 0</code>. The gate counted remaining imports across six
+  migration slices. The delete landed when the counter said zero — not when
+  someone felt ready.
+</p>
+
+<p>
+  That is the difference between "we should clean this up" and a deletion of
+  29,179 lines with 7,803 tests green. The counter, not the intention, decided
+  the moment.
+</p>
+
+<h2>A ratchet you never watch fail is a lie</h2>
+
+<p>
+  Every ratchet here has been <strong>negative-controlled</strong>: a violation
+  is planted deliberately, and the gate is watched failing before it is trusted.
+  The styling ratchet was checked three ways:
+</p>
+
+<div class="tbl-scroll">
+<table>
+  <thead><tr><th>Planted</th><th>Result</th></tr></thead>
+  <tbody>
+    <tr><td>+1 line in <code>chrome.css</code></td><td>FAIL — both aggregate and per-file</td></tr>
+    <tr><td>+5 here, −6 there</td><td>aggregate says "drained 1"; <strong>per-file says FAIL</strong></td></tr>
+    <tr><td>brand-new panel CSS file</td><td>FAIL — new panel CSS file</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>
+  The middle one is the reason the per-file map exists at all. It was found by
+  planting the violation, not by reading the code.
+</p>
+
+<div class="foot">
+  <p><strong>Source:</strong> <code>packages/editor/scripts/check-styling-ratchet.mjs</code> — the header documents both defects that were fixed on 2026-08-02 and why.</p>
+  <p><strong>Primary source:</strong> Titus Winters et al., <a href="https://abseil.io/resources/swe-book/html/ch22.html">Software Engineering at Google</a>, ch. 22 — "Large-Scale Changes", where this is the standard tool for a migration that outlives anyone's attention span.</p>
+  <p>Used by <a href="../lessons/0003-ratchets.html">Lesson 03 — Ratchets</a>.</p>
+</div>
+
+</div>

@@ -259,6 +259,25 @@ function MediaTabWithComposer({
         loading={state.libraryLoading}
         loadError={state.libraryError}
         onRetryLoad={state.retryLibraryLoad}
+        selectionMode={state.selMode}
+        selectedKeys={state.selectedKeys}
+        onEnterSelection={(key) => {
+          if (!state.selMode) state.toggleSelMode();
+          state.toggleSelect(key);
+        }}
+        onToggleSelect={state.toggleSelect}
+        onExitSelection={state.toggleSelMode}
+        // Move needs a destination, and the drawer has no folder picker of its
+        // own yet — the fullpage manager owns that popover. Until it does, the
+        // control opens the library where the picker lives rather than
+        // pretending to work. (Board 145:349 draws "Move to…" with an ellipsis,
+        // which is the same promise: a second step follows.)
+        onBulkMove={onOpenLibrary ? () => onOpenLibrary() : undefined}
+        onBulkDelete={() =>
+          state.requestBulkDelete(
+            state.libraryItems.filter((i) => state.selectedKeys.has(i.key)),
+          )
+        }
         onOpenStock={() => setStockModalOpen(true)}
         onOpenLibrary={onOpenLibrary}
         onClose={onClose}

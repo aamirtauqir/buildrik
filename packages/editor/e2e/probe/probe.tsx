@@ -95,6 +95,10 @@ function mediaDrawer(over: Partial<React.ComponentProps<typeof SlimLauncher>> = 
   );
 }
 
+const ACTIVE_UPLOAD: UploadProgress[] = [
+  { fileName: "pasta-2.jpg", progress: 62, status: "uploading" },
+];
+
 const FAILED_UPLOAD: UploadProgress[] = [
   { fileName: "poster-4k.png", progress: 0, status: "error", error: "File too large. Max: 10MB" },
 ];
@@ -296,6 +300,21 @@ const CASES: Record<string, () => React.ReactElement> = {
   // has two different branches that only differ by which one it reaches.
   "media-drawer-no-results": () => (
     <div data-probe="media-drawer-no-results">{mediaDrawer({ searchQuery: "zzzz" })}</div>
+  ),
+  "media-drawer-bulk-select": () => (
+    <div data-probe="media-drawer-bulk-select">
+      {mediaDrawer({
+        selectionMode: true,
+        selectedKeys: new Set(["a1", "a2", "a3", "a4"]),
+        onToggleSelect: () => {},
+        onExitSelection: () => {},
+        onBulkMove: () => {},
+        onBulkDelete: () => {},
+      })}
+    </div>
+  ),
+  "media-drawer-uploading": () => (
+    <div data-probe="media-drawer-uploading">{mediaDrawer({ uploadQueue: ACTIVE_UPLOAD })}</div>
   ),
   "media-drawer-upload-failed": () => (
     <div data-probe="media-drawer-upload-failed">{mediaDrawer({ uploadQueue: FAILED_UPLOAD })}</div>

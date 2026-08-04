@@ -1,0 +1,159 @@
+<title>Lesson 02 · Three libraries, two graveyards</title>
+<link rel="stylesheet" href="../assets/lesson.css" />
+
+<div class="wrap">
+
+<p class="eyebrow">Lesson 02 · One component system</p>
+<h1>Three libraries, two graveyards</h1>
+<p class="lede">
+  Aap ne kaha "vibcoder ke components delete kar do". Wo <strong>28 July ko mar
+  chuka</strong> — 29,179 lines, ek commit mein. Uska replacement <strong>31
+  July ko</strong> mara. Ye lesson wo tareeqa sikhata hai jis se dono safely
+  mare, kyunki aap ka baqi ka plan usi tareeqe se chalega.
+</p>
+
+<h2>Vibcoder tha kya</h2>
+
+<p>
+  Khud likha hua library nahi tha. Pehla commit (<code>7a4328fe</code>, 26 April)
+  saaf kehta hai:
+</p>
+
+<pre><code>shared/vibcoder/ is the single import surface for
+chrome JSX consuming <strong>vendored</strong> components.</code></pre>
+
+<p>
+  Yani bahar se copy ki hui UI kit, aur har component par ek patla React wrapper
+  taake chrome ka <strong>ek hi import surface</strong> ho. Bilkul wahi kaam jo
+  aaj <code>chrome-ui/</code> flowbite ke liye karta hai.
+</p>
+
+<p>Peak par 56 components the. In naamon ko dekhein:</p>
+
+<pre><code>ListRow · Menu · Modal · EmptyState · Toolbar · Popover
+Skeleton · Tabs · FormField · SectionHead · Badge · Slider</code></pre>
+
+<div class="note">
+  <span class="note-label">Ye sab se aham observation hai</span>
+  Yehi naam <code>chrome-ui/</code> aaj bhi ship karta hai. Library badli, par
+  jo shapes ek visual editor ko chahiye wo nahi badle. Aap teesri baar wahi
+  cheezein bana rahe hain.
+</div>
+
+<h2>Teen libraries, do kabristan</h2>
+
+<div class="tbl-scroll">
+<table>
+  <thead><tr><th>Library</th><th>Umar</th><th>Ab gate</th></tr></thead>
+  <tbody>
+    <tr><td><code>editor/shared/vibcoder</code></td><td>26 Apr → 28 Jul</td><td><code>vibcoder-ratchet</code> = 0</td></tr>
+    <tr><td><code>editor/ui</code></td><td>Jul → <strong>31 Jul</strong></td><td><code>editor-ui-gone</code> = 0</td></tr>
+    <tr><td><code>chrome-ui</code> + flowbite</td><td>31 Jul → ab</td><td><code>chrome-ui-surface</code> = 0</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>
+  <code>editor/ui</code> vibcoder ko replace karne ke liye bana, har consumer
+  absorb kiya, aur <strong>teen din baad</strong> khud delete ho gaya jab
+  flowbite ne use absorb kar liya. Ek hi quarter mein do poori component
+  libraries bani aur dafan huin.
+</p>
+
+<h2>Ab wo hissa jo copy karne layak hai</h2>
+
+<p>
+  Library <strong>pehle delete nahi hui</strong>. Chhe slices ne har consumer
+  hataya, aur delete <em>aakhri</em> qadam tha — jab count pehle se zero tha:
+</p>
+
+<div class="tbl-scroll">
+<table>
+  <thead><tr><th>Slice</th><th>Kya move hua</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>topbar</td></tr>
+    <tr><td>2</td><td>rail + drawer</td></tr>
+    <tr><td>3</td><td>Tooltip + leftovers</td></tr>
+    <tr><td>4</td><td>saat dialogs → ek Modal</td></tr>
+    <tr><td>5</td><td>forms, compounds — 34 surfaces</td></tr>
+    <tr><td>6</td><td><strong>delete</strong></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>
+  Deletion commit ki apni line: <code>ratchet 402 → 0</code>. Gate baqi imports
+  ginta tha, aur delete tab hua jab wo number <strong>zero</strong> ho gaya. Isi
+  liye 29,179 lines ek commit mein ja sakin aur <strong>7,803 tests green</strong>
+  rahe.
+</p>
+
+<div class="warn">
+  <span class="note-label">Himmat se zyada tarteeb ahem hai</span>
+  Pehle delete karke baad mein theek karna: ek saath sainkdon toota hua import.
+  Phir aap bata hi nahi sakte ke kaunsa asli breakage hai aur kaunsa sirf
+  missing shim. Pehle drain karo to har commit apne aap green rehta hai, aur
+  delete boring ho jata hai.
+</div>
+
+<h2>Aaj vibcoder ka kya bacha hai</h2>
+
+<p>
+  <code>src/</code> mein 13 zikr. <strong>12 comments hain</strong> — batate
+  hain ke koi shape kahan se aayi:
+</p>
+
+<pre><code>chrome-ui/BreakpointSwitcher.tsx:2
+  * segmented viewport switcher (<strong>ported from vibcoder</strong>).</code></pre>
+
+<p>
+  Terahwan asli hai: ek test purani DOM id saaf karta hai —
+  <code>getElementById("vibcoder-overlay-root")?.remove()</code>. Koi import
+  nahi. Koi component nahi. Koi CSS nahi.
+</p>
+
+<div class="quiz" data-answer="2">
+  <p class="q">
+    Aap ko <code>MediaTab.css</code> (1,777 lines) hatani hai. Uske classes 24
+    files use karte hain. Sab se safe pehla qadam?
+  </p>
+  <button>CSS file delete karo, phir toote hue panels theek karo</button>
+  <button>CSS ko tw: mein convert karo, phir purani file delete karo</button>
+  <button>Consumers ko atoms par le jao, gate zero dikhaye, phir delete</button>
+  <button>Poori file ek commit mein rewrite karo taake diff saaf rahe</button>
+</div>
+<div class="quiz" data-answer="0" style="margin-top:-1rem;border-top:none;border-radius:0 0 8px 8px">
+  <p class="why show" style="margin:0">
+    Wahi tarteeb jis se vibcoder mara: <strong>drain pehle, delete aakhir mein,
+    gate ko zero dikhne do</strong>. Pehla option har commit ko red kar deta hai.
+    Doosra behtar lagta hai par CSS ko tw: mein "convert" karne ka matlab hai wo
+    24 files bhi badalni — yani wahi kaam, bas gate ke bagair jo batata ke kab
+    khatam hua. Chautha ek 1,777-line big-bang hai jise review nahi kiya ja sakta.
+  </p>
+</div>
+
+<h2>Aap ke liye is ka matlab</h2>
+
+<p>
+  Aap ne kaha "purani cheezein delete kar do, tension mat lo agar toot jayein".
+  Is repo ne wo do baar kiya hai — aur dono baar <strong>tension li</strong>, is
+  shakal mein ke delete aakhir mein aaya, ek gate ke peeche jo sabit karta tha ke
+  count zero hai. 29,179 lines bina kisi test ke red hue gayin.
+</p>
+
+<p>
+  Wahi ratchet aaj bhi chal raha hai, teen numbers par:
+  <code>inline_literal</code>, <code>inline_hoisted</code>,
+  <code>css_lines</code>. Wo aap ka <code>402 → 0</code> hai.
+</p>
+
+<div class="foot">
+  <p><strong>Reference:</strong> <a href="../reference/vibcoder-postmortem.html">Vibcoder — what it was, how it died</a> (56 components, timeline, verify-it-yourself commands).</p>
+  <p><strong>Pichla lesson:</strong> <a href="0001-two-audiences.html">01 — The two audiences</a>.</p>
+  <p><strong>Primary source:</strong> Martin Fowler, <a href="https://martinfowler.com/bliki/StranglerFigApplication.html">Strangler Fig Application</a> — the pattern both deletions used, named. New system grows around the old one; the old one is removed only once nothing calls it.</p>
+  <p>Kuch clear na ho to poochhein.</p>
+</div>
+
+<script src="../assets/quiz.js"></script>
+
+</div>

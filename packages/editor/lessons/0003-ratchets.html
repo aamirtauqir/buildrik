@@ -1,0 +1,169 @@
+<title>Lesson 03 · Ratchet</title>
+<link rel="stylesheet" href="../assets/lesson.css" />
+
+<div class="wrap">
+
+<p class="eyebrow">Lesson 03 · One component system</p>
+<h1>Ratchet</h1>
+<p class="lede">
+  Pichle lesson mein ek line thi: <code>ratchet 402 → 0</code>. Wahi wajah thi
+  ke 29,179 lines ek commit mein delete ho sakin. Ye lesson batata hai wo cheez
+  hai kya — aur aap ise abhi apne repo par chala kar dekh sakte hain.
+</p>
+
+<h2>Ek line ka matlab</h2>
+
+<pre><code>agar (ab &gt; baseline) → exit 1 → build fail</code></pre>
+
+<p>
+  Bas itna. Pana (wrench) ka ratchet ek taraf ghoomta hai, doosri taraf lock ho
+  jata hai. Code ka ratchet wahi hai: jo number aap kam kar rahe hain wo
+  <strong>gir sakta hai, barh nahi sakta</strong>. Barha, to build ruk gayi.
+</p>
+
+<div class="note">
+  <span class="note-label">Ye kyun ahem hai</span>
+  Aap ek aisi migration kar rahe hain jo hafton chalegi. Beech mein aap koi
+  feature banayenge, koi bug fix karenge — aur ek inline style wapas add kar
+  denge, bina jane. Ratchet ke bagair migration <strong>khamoshi se ulti</strong>
+  chalti rehti hai aur kisi ko pata nahi chalta.
+</div>
+
+<h2>Aap ka ratchet abhi kya kehta hai</h2>
+
+<pre><code>$ node scripts/check-styling-ratchet.mjs
+
+[styling-ratchet] ok   inline_literal  1280 (baseline 1280)
+[styling-ratchet] ok   inline_hoisted   590 (baseline 590)
+[styling-ratchet] ok   css_lines      10940 (baseline 10940)
+[styling-ratchet] PASS — one-component-system drain holding</code></pre>
+
+<p>Uski yaaddasht ek JSON file hai — <code>scripts/.styling-baseline.json</code>:</p>
+
+<pre><code>{
+  "inline_literal": 1280,
+  "inline_hoisted": 590,
+  "css_lines": 10940,
+  "css_files": { "inspector/styles/inspector.css": 1038, … }
+}</code></pre>
+
+<h2>Ab dekhein wo rokta kaise hai</h2>
+
+<p>Maine abhi ek inline style add ki — bilkul wo cheez jo aap hata rahe hain:</p>
+
+<pre><code>&lt;div className={WRAP} <strong>style={{ padding: 99 }}</strong>&gt;</code></pre>
+
+<p>Aur ratchet chalaya:</p>
+
+<pre><code>[styling-ratchet] <strong>FAIL inline_literal  1281 &gt; baseline 1280 (+1)</strong>
+[styling-ratchet] ok   inline_hoisted   590 (baseline 590)
+[styling-ratchet] ok   css_lines      10940 (baseline 10940)
+
+New inline styles or CSS lines were added to editor chrome.
+Target is a chrome-ui component styled with `tw:` utilities.
+
+<strong>EXIT CODE = 1</strong></code></pre>
+
+<p>
+  <strong>Ek</strong> inline style. Poori build ruk gayi. Ye koi warning nahi jo
+  log mein guzar jaye — <code>verify:ds</code> ka hissa hai, aur wo push se pehle
+  chalta hai.
+</p>
+
+<h2>Do commands, aur ek khatra</h2>
+
+<div class="tbl-scroll">
+<table>
+  <thead><tr><th>Command</th><th>Kaam</th></tr></thead>
+  <tbody>
+    <tr><td><code>check-styling-ratchet.mjs</code></td><td>Check kare. Barha to exit 1.</td></tr>
+    <tr><td><code>--top</code></td><td>Sab se bhaari files bataye — agla target chunne ke liye.</td></tr>
+    <tr><td><code>--update</code></td><td>Naye numbers baseline bana de.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="warn">
+  <span class="note-label">Ratchet isi tarah marta hai</span>
+  <code>--update</code> wo cheez bhi hai jo ratchet ko bekaar kar deti hai. Red
+  build ko green karne ke liye chalayenge, to aap ne kuch drain nahi kiya —
+  aap ne <strong>goalpost hila diya</strong> aur ceremony rakh li. Qaeda:
+  <code>--update</code> sirf number <em>girane</em> ke liye, aur usi commit mein
+  jo batata ho kya drain hua.
+</div>
+
+<h2>Sirf total ginna kaafi nahi</h2>
+
+<p>Ye asli output hai, is session ka:</p>
+
+<pre><code>[styling-ratchet] ok   css_lines  10939 (baseline 10940, drained 1)
+[styling-ratchet] <strong>FAIL shell/chrome.css grew 45 -&gt; 50 (+5)</strong></code></pre>
+
+<p>
+  Ek panel mein 5 lines add, doosre se 6 minus. Total <strong>−1</strong> — yani
+  aggregate kehta hai "drained". Par architecture ulti chali. Isi liye baseline
+  mein <code>css_files</code> map hai jo <strong>har file alag lock</strong>
+  karta hai.
+</p>
+
+<div class="win">
+  <span class="note-label">Aur ye kaise pata chala</span>
+  Code padh kar nahi. <strong>Violation plant karke.</strong> Gate ko fail hote
+  hue dekha gaya — teen tarah se — tab bharosa kiya gaya. Ek gate jise aap ne
+  kabhi fail hote nahi dekha, wo gate nahi, ek dua hai.
+</div>
+
+<div class="quiz" data-answer="3">
+  <p class="q">
+    Aap ne ek panel convert kiya. Ratchet kehta hai <code>FAIL inline_hoisted
+    591 &gt; baseline 590 (+1)</code>. Aap ko yaqeen hai aap ne styles hataye
+    hain. Kya karein?
+  </p>
+  <button>Baseline update karein — aap ne drain kiya hai</button>
+  <button>Gate skip karein, agle commit mein theek karein</button>
+  <button>Baseline manually 591 likh dein aur aage barhein</button>
+  <button>Us +1 ko dhoondein — ratchet aap se zyada jaanta hai</button>
+  <p class="why">
+    Bilkul yahi is session mein hua. Maine <code>style={fontStyle}</code> pass
+    kiya aur comment likha "token ki apni face — genuinely computed". Wo galat
+    tha: `{fontWeight: 800}` aur `{fontStyle: "italic"}`, har button ka static
+    literal. <strong>Ratchet +1 par fail hua aur sirf isi wajah se maine dobara
+    padha.</strong> Pehle teen options us +1 ko dafan kar dete.
+  </p>
+</div>
+
+<h2>Yehi wo cheez hai jo aap ne maangi</h2>
+
+<p>
+  Aap ne kaha "sara code clean hona chahiye". Clean kaha nahi ja sakta —
+  <strong>napa</strong> ja sakta hai. Aap ke teen number:
+</p>
+
+<div class="tbl-scroll">
+<table>
+  <thead><tr><th>Mechanism</th><th class="num">Shuru</th><th class="num">Ab</th></tr></thead>
+  <tbody>
+    <tr><td><code>inline_literal</code></td><td class="num">1573</td><td class="num">1280</td></tr>
+    <tr><td><code>inline_hoisted</code></td><td class="num">1053</td><td class="num">590</td></tr>
+    <tr><td><code>css_lines</code></td><td class="num">12,949</td><td class="num">10,940</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>
+  Jab teenon zero par pahunch jayen, aap ka "sab kuch flowbite par" <em>ho chuka</em>
+  hoga — aur aap ko kisi se poochhna nahi paregi, kyunki gate keh raha hoga.
+  Bilkul waise hi jaise vibcoder ke waqt <code>402 → 0</code> ne kaha tha.
+</p>
+
+<div class="foot">
+  <p><strong>Reference:</strong> <a href="../reference/ratchets.html">Ratchets</a> — chaaron gates, anatomy, aur negative-control table.</p>
+  <p><strong>Pichle lessons:</strong> <a href="0001-two-audiences.html">01 — The two audiences</a> · <a href="0002-three-libraries.html">02 — Three libraries, two graveyards</a></p>
+  <p><strong>Primary source:</strong> <a href="https://abseil.io/resources/swe-book/html/ch22.html">Software Engineering at Google, ch. 22 — Large-Scale Changes</a>. Ratchets are the standard tool for a migration that outlives anyone's attention span.</p>
+  <p>Khud chala kar dekhein: <code>node scripts/check-styling-ratchet.mjs --top</code></p>
+  <p>Kuch clear na ho to poochhein.</p>
+</div>
+
+<script src="../assets/quiz.js"></script>
+
+</div>

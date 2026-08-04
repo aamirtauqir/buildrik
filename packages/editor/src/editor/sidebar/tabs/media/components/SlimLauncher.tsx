@@ -51,6 +51,22 @@ interface SlimLauncherProps {
   /** Storage could not be read. Distinct from empty: the assets still exist. */
   loadError?: string | null;
   onRetryLoad?(): void;
+
+  // ── Bulk select (board `145:300`) ─────────────────────────────────────────
+  /**
+   * The board draws the SELECTED state but no way into it — there is no
+   * "Select" control anywhere on `144:2`. Right-click on a card is the entry
+   * point here: it is the gesture the fullpage manager already uses for its
+   * per-asset menu, it costs the bar no chrome the board does not have, and
+   * the way out (Done) is visible the whole time selection is on.
+   */
+  selectionMode?: boolean;
+  selectedKeys?: Set<string>;
+  onEnterSelection?(key: string): void;
+  onToggleSelect?(key: string): void;
+  onExitSelection?(): void;
+  onBulkMove?(): void;
+  onBulkDelete?(): void;
   /**
    * Retry a failed upload. The drawer had no way to reach it: `MediaTab` wired
    * `state.retryUpload` into the fullpage branch only, so the persistent
@@ -199,10 +215,13 @@ export function SlimLauncher(props: SlimLauncherProps) {
             aria-busy="true"
             aria-label="Loading media"
           >
-            {[96, 72, 110, 84, 100, 66].map((w, i) => (
+            {/* Board `777:4140`-`777:4157`: 96, 72, 110, 84, 100, 66. Utility
+                classes rather than an inline width — these are six fixed
+                values from the design, not a computed one. */}
+            {["tw:w-24", "tw:w-18", "tw:w-[110px]", "tw:w-21", "tw:w-25", "tw:w-[66px]"].map((w, i) => (
               <span key={i} className="tw:flex tw:h-26 tw:w-34 tw:flex-col tw:gap-1">
                 <SkeletonBlock className="tw:h-19 tw:w-34 tw:rounded-md" />
-                <SkeletonBlock className="tw:h-2.5" style={{ width: w }} />
+                <SkeletonBlock className={`tw:h-2.5 ${w}`} />
               </span>
             ))}
           </div>
@@ -242,14 +261,68 @@ export function SlimLauncher(props: SlimLauncherProps) {
                 item={item}
                 usageCount={props.usageMap.get(item.key) ?? 0}
                 isApplied={props.appliedAssetKey === item.key}
-                onClick={props.onInsert}
+                isSelected={props.selectedKeys?.has(item.key) ?? false}
+                selectable={props.selectionMode}
+                // While selecting, a click selects — inserting an asset the
+                // user is in the middle of choosing among would be a surprise.
+                onClick={props.selectionMode && props.onToggleSelect ? props.onToggleSelect : props.onInsert}
+                onContextMenu={
+                  props.onEnterSelection
+                    ? (e, key) => {
+                        e.preventDefault();
+                        props.onEnterSelection?.(key);
+                      }
+                    : undefined
+                }
               />
             ))}
           </div>
         )}
       </div>
 
-      <div className="sl-upload-footer" data-testid="media-footer-region">
+      {props.selectionMode ? (
+        /* Board `145:347` — 44h on ink, white 12/18. It REPLACES the footer
+           links rather than stacking above them: Upload and Stock add assets,
+           and adding while choosing among what is already there is a different
+           job. */
+        <div
+          className="tw:flex tw:h-11 tw:items-center tw:gap-6 tw:bg-gray-900 tw:px-4 tw:text-[12px] tw:leading-[18px] tw:text-white"
+          data-testid="media-bulk-bar"
+        >
+          <span data-testid="media-bulk-count">{props.selectedKeys?.size ?? 0} selected</span>
+          <Button
+            type="button"
+            color="light"
+            size="xs"
+            className="tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[12px] tw:text-white tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+            onClick={props.onBulkMove}
+            disabled={!props.selectedKeys?.size}
+          >
+            Move to…
+          </Button>
+          <Button
+            type="button"
+            color="light"
+            size="xs"
+            className="tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[12px] tw:text-white tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+            onClick={props.onBulkDelete}
+            disabled={!props.selectedKeys?.size}
+          >
+            Delete
+          </Button>
+          <Button
+            type="button"
+            color="light"
+            size="xs"
+            className="tw:ml-auto tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[12px] tw:text-white tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+            data-testid="media-bulk-done"
+            onClick={props.onExitSelection}
+          >
+            Done
+          </Button>
+        </div>
+      ) : null}
+      <div className="sl-upload-footer" data-testid="media-footer-region" hidden={props.selectionMode}>
         {/* Strip first: the board puts the failure above the footer links
             (145:195 sits between the spacer and 145:192), because the thing
             that went wrong outranks the thing you might do next. */}

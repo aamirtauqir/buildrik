@@ -1,0 +1,115 @@
+<title>Reference · The two audiences</title>
+<link rel="stylesheet" href="../assets/lesson.css" />
+
+<div class="wrap">
+
+<p class="eyebrow">Reference · Buildrik editor</p>
+<h1>The two audiences</h1>
+<p class="lede">
+  Every file in <code>packages/editor/src</code> styles one of two things: the
+  editor you use, or the website your customer publishes. Before you delete or
+  restyle anything, decide which. This is the sheet to check.
+</p>
+
+<div class="split">
+  <div>
+    <span class="who">Audience 1 — you</span>
+    <h4>Editor chrome</h4>
+    <ul>
+      <li>Sidebar, rail, inspector, topbar, footer, modals</li>
+      <li>Owned by <code>chrome-ui/</code> + flowbite + <code>tw:</code></li>
+      <li>Tokens: <code>--bk-*</code> (generated from Figma)</li>
+      <li><strong>This is the drain target.</strong> Convert it, delete its CSS.</li>
+    </ul>
+  </div>
+  <div>
+    <span class="who">Audience 2 — your customer</span>
+    <h4>Published site output</h4>
+    <ul>
+      <li>Canvas contents, exported HTML, the live site on Vercel</li>
+      <li>Owned by <code>blocks/</code>, <code>templates/</code>, <code>engine/</code></li>
+      <li>Tokens: <code>--buildrick-design-*</code> (the customer picks these)</li>
+      <li><strong>Never a drain target.</strong> Deleting it breaks live sites.</li>
+    </ul>
+  </div>
+</div>
+
+<h2>The four files that look deletable and are not</h2>
+
+<div class="tbl-scroll">
+<table>
+  <thead>
+    <tr><th>Path</th><th class="num">Lines</th><th>Why it stays</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>editor/canvas/**.css</code></td>
+      <td class="num">997</td>
+      <td>Styles the customer's HTML mounted inside the canvas. Its class names never appear in our source, so every rule reads dead to a scanner.</td>
+    </tr>
+    <tr>
+      <td><code>editor/design-system/**</code><br /><code>themes/design-system/design.css</code></td>
+      <td class="num">390</td>
+      <td>The customer's own design system — their colours, their type. Putting it on flowbite would make every published site look like the editor.</td>
+    </tr>
+    <tr>
+      <td><code>themes/legacy-components.css</code></td>
+      <td class="num">83</td>
+      <td>Residual engine selectors: canvas container, drag cursor, selection ring. Do not add rules; do not remove them either.</td>
+    </tr>
+    <tr>
+      <td><code>chrome-ui/skeleton.css</code><br /><code>chrome-ui/slider.css</code></td>
+      <td class="num">151</td>
+      <td>The destination library's own CSS. Counting it as "to drain" makes the target unreachable by definition.</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p>
+  Total excluded from <code>css_lines</code>: <strong>1,438</strong>. The ratchet
+  carries this list explicitly in
+  <code>scripts/check-styling-ratchet.mjs</code>, one reason string per row, so
+  an exception is distinguishable from a leak.
+</p>
+
+<h2>How to tell, in one command</h2>
+
+<pre><code># Does this class ever reach a customer's page?
+grep -rhoE 'class="[^"]*<var>your-class</var>' src/blocks src/templates src/engine
+
+# 33 buildrick-* class names are emitted into customer HTML today.
+# blocks/Components/Slider.tsx:277 is the clearest example:
+#   '&lt;div class="buildrick-slider" data-buildrick-type="slider"&gt;'</code></pre>
+
+<div class="warn">
+  <span class="note-label">The trap</span>
+  A dead-CSS scanner reads <code>Canvas.css</code> as 100% dead, because the
+  engine writes those class names at runtime and they are not in any
+  <code>.tsx</code>. Purging on that signal alone deletes the styling of every
+  site your customers have already published — and they will not find out from a
+  test, they will find out from their client.
+</div>
+
+<h2>Namespace tells</h2>
+
+<div class="tbl-scroll">
+<table>
+  <thead><tr><th>You see</th><th>It belongs to</th><th>Safe to change?</th></tr></thead>
+  <tbody>
+    <tr><td><code>--bk-*</code></td><td>Editor chrome</td><td>Yes — but change it in Figma and regenerate, never by hand</td></tr>
+    <tr><td><code>tw:*</code></td><td>Editor chrome</td><td>Yes — this is the destination</td></tr>
+    <tr><td><code>--buildrick-design-*</code></td><td>Customer's site</td><td>No</td></tr>
+    <tr><td><code>buildrick-*</code> (class)</td><td>Customer's site</td><td>No</td></tr>
+    <tr><td><code>data-buildrick-*</code></td><td>Engine runtime</td><td>No — behaviour, not style</td></tr>
+    <tr><td><code>--bd-*</code></td><td>Nothing. Dead namespace.</td><td>Banned by Gate 15</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="foot">
+  <p>Used by <a href="../lessons/0001-two-audiences.html">Lesson 01 — The two audiences</a>.</p>
+  <p>Verified against <code>main</code> on 2026-08-02. Re-run the counts before quoting them.</p>
+</div>
+
+</div>
