@@ -19,10 +19,16 @@
  */
 
 import * as React from "react";
-import { PanelHeader } from "@/editor/chrome-ui";
+import { Button, PanelHeader, SkeletonBlock } from "@/editor/chrome-ui";
 import { EVENTS } from "@/shared/constants";
 import type { Composer } from "@/engine";
 import type { ConditionExpression } from "@/shared/types/data";
+import {
+  getCmsHydrationStatus,
+  onCmsHydrationChange,
+  retryCmsHydration,
+  type CmsHydrationStatus,
+} from "@/services/cmsSync";
 import { useContentPanel } from "./useContentPanel";
 import {
   CollectionView,
@@ -44,10 +50,18 @@ export interface ContentTabProps {
   /** Opens the CMS collection setup (shell-owned modal) — the data-first create
    *  path, no element selection required. Absent → the create button hides. */
   onCreateCollection?: () => void;
+  /**
+   * Overrides the live CMS hydration status. The status is module state in
+   * `cmsSync` (one hydrate per session, shared by every consumer), so the only
+   * way to render the loading and error screens for measurement is to inject
+   * it. Absent in the app — the live status wins there.
+   */
+  hydrationStatus?: CmsHydrationStatus;
 }
 
 export const ContentTab: React.FC<ContentTabProps> = ({
   composer,
+  hydrationStatus,
   isPinned,
   onPinToggle,
   onHelpClick,
@@ -114,8 +128,49 @@ export const ContentTab: React.FC<ContentTabProps> = ({
 
   const collectionFor = (id: string) => panel.collections.find((c) => c.id === id) ?? null;
 
+  const [liveHydration, setLiveHydration] = React.useState<CmsHydrationStatus>(() =>
+    getCmsHydrationStatus(),
+  );
+  React.useEffect(() => onCmsHydrationChange(setLiveHydration), []);
+  const hydration = hydrationStatus ?? liveHydration;
+
+  /*
+    Board `775:4241` (loading) and `453:4010` (load-error). Until hydration
+    settles, "no collections" is not a fact about the workspace — it is the
+    absence of an answer, and `hydrateCmsFromServer` used to swallow its own
+    failure so the panel said "No collections yet" to users whose collections
+    were sitting on a server it could not reach. The error copy names that
+    explicitly, because the first thing someone thinks when a content list
+    empties is that they lost data.
+  */
   let body: React.ReactNode = null;
-  switch (view.kind) {
+  if (view.kind === "root" && hydration !== "ready" && panel.collections.length === 0) {
+    body =
+      hydration === "error" ? (
+        <div className="tw:flex tw:flex-col tw:gap-1.5 tw:px-6 tw:pb-8 tw:pt-9" data-testid="content-load-error" role="alert">
+          <p className="tw:text-[13px] tw:leading-5 tw:text-red-700">Couldn&apos;t load your collections.</p>
+          <p className="tw:text-[12px] tw:text-gray-500">
+            This is a connection problem, not a change to your data.
+          </p>
+          <Button
+            type="button"
+            color="light"
+            size="xs"
+            className="tw:min-h-6 tw:self-start tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+            data-testid="content-load-retry"
+            onClick={() => void retryCmsHydration()}
+          >
+            Try again
+          </Button>
+        </div>
+      ) : (
+        <div className="tw:flex tw:flex-col tw:gap-2 tw:px-4 tw:py-3" data-testid="content-loading" aria-busy="true" aria-label="Loading collections">
+          {["tw:w-40", "tw:w-32", "tw:w-44", "tw:w-28"].map((w, i) => (
+            <SkeletonBlock key={i} className={`tw:h-4 ${w}`} />
+          ))}
+        </div>
+      );
+  } else switch (view.kind) {
     case "root":
       body = (
         <RootView

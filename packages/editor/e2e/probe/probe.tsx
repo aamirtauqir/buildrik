@@ -33,6 +33,7 @@ import { OnboardingChecklist } from "@/editor/onboarding/OnboardingChecklist";
 import { CanvasFooterToolbar } from "@/editor/canvas/CanvasFooterToolbar";
 import { PanelFrame } from "@/editor/chrome-ui";
 import { SlimLauncher } from "@/editor/sidebar/tabs/media/components/SlimLauncher";
+import { ContentTab } from "@/editor/sidebar/tabs/content/ContentTab";
 import type { LibraryItem } from "@/editor/sidebar/tabs/media/data/mediaTypes";
 import type { UploadProgress } from "@/shared/types/media";
 
@@ -300,6 +301,17 @@ const CASES: Record<string, () => React.ReactElement> = {
   // has two different branches that only differ by which one it reaches.
   "media-drawer-no-results": () => (
     <div data-probe="media-drawer-no-results">{mediaDrawer({ searchQuery: "zzzz" })}</div>
+  ),
+  // ── Content states (T13) ─────────────────────────────────────────────────
+  "content-loading": () => (
+    <div data-probe="content-loading">
+      <ContentTab composer={null} hydrationStatus="loading" onClose={() => {}} />
+    </div>
+  ),
+  "content-load-error": () => (
+    <div data-probe="content-load-error">
+      <ContentTab composer={null} hydrationStatus="error" onClose={() => {}} />
+    </div>
   ),
   "media-drawer-folder-scoped": () => (
     <div data-probe="media-drawer-folder-scoped">

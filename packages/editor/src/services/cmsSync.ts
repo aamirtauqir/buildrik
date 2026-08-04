@@ -62,16 +62,64 @@ export function retryCmsSync(): Promise<void> {
  * Populates local storage; the engine reads it (immediately on a fresh device
  * whose store was empty, otherwise on the next load).
  */
+/**
+ * Hydration status, so the Content drawer can tell "no collections" from
+ * "could not ask". The hydrate below used to `console.warn` and return, which
+ * left the panel rendering its empty state — telling a user with a server full
+ * of collections that they had none. Board `453:4010` says the quiet part out
+ * loud: "This is a connection problem, not a change to your data."
+ */
+export type CmsHydrationStatus = "loading" | "ready" | "error";
+/**
+ * "ready" means NOTHING IS PENDING, not "hydrated successfully" — the initial
+ * value matters. Starting at "loading" made the status a promise nobody had
+ * made: any surface that never calls hydrate (a test, a probe, an editor with
+ * no site) sat in a loading state forever, and the Content panel refused to
+ * draw its own empty state. Hydration sets "loading" itself when it starts,
+ * which is the only moment the word is true.
+ */
+let hydrationStatus: CmsHydrationStatus = "ready";
+const hydrationListeners = new Set<(s: CmsHydrationStatus) => void>();
+
+export function getCmsHydrationStatus(): CmsHydrationStatus {
+  return hydrationStatus;
+}
+
+export function onCmsHydrationChange(cb: (s: CmsHydrationStatus) => void): () => void {
+  hydrationListeners.add(cb);
+  return () => hydrationListeners.delete(cb);
+}
+
+function setHydrationStatus(next: CmsHydrationStatus): void {
+  hydrationStatus = next;
+  for (const cb of hydrationListeners) cb(next);
+}
+
+/** Re-run hydration after a failure. */
+export async function retryCmsHydration(): Promise<void> {
+  setHydrationStatus("loading");
+  await hydrateCmsFromServer();
+}
+
 export async function hydrateCmsFromServer(): Promise<void> {
   const siteId = currentSiteId();
-  if (!siteId || !Storage.isStorageAvailable()) return;
+  // No site or no storage is not a failure — there is nothing to hydrate FROM,
+  // and the local collections (if any) are the whole truth.
+  if (!siteId || !Storage.isStorageAvailable()) {
+    setHydrationStatus("ready");
+    return;
+  }
+  setHydrationStatus("loading");
   try {
     const remote = (await client().cms.collections.list.query({ siteId })) as Array<{
       id: string; name: string; slug: string; description: string | null; icon: string | null;
       displayField: string | null; fields: unknown; createdAt: Date | string; updatedAt: Date | string;
       pageSlugPattern: string | null; pageSeoTitle: string | null; pageSeoDescription: string | null; pageTemplatePath: string | null;
     }>;
-    if (!remote.length) return;
+    if (!remote.length) {
+      setHydrationStatus("ready");
+      return;
+    }
     const localIds = new Set((await Storage.loadCollections()).map((c) => c.id));
     for (const rc of remote) {
       if (localIds.has(rc.id)) continue;
@@ -98,9 +146,11 @@ export async function hydrateCmsFromServer(): Promise<void> {
         });
       }
     }
+    setHydrationStatus("ready");
   } catch (err) {
     // eslint-disable-next-line no-console
     console.warn("[cms-sync] hydrate from server failed", err);
+    setHydrationStatus("error");
   }
 }
 

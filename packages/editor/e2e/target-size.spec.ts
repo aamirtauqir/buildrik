@@ -51,6 +51,7 @@ const CASES = [
   "media-drawer-quota-full",
   "media-drawer-load-error",
   "media-drawer-bulk-select",
+  "content-load-error",
 ] as const;
 
 /**
