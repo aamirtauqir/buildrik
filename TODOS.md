@@ -376,3 +376,38 @@ needs a founder decision, not an implementation.**
   the **`stock`** CSS class, so a future writer would ship the wrong badge silently.
   Either wire the AI-generated import path to stamp it, or drop the AI badge from the
   T8 scope — do not build a badge whose only possible value is unreachable.
+
+## Left-rail redesign follow-ups — from /plan-design-review 2026-08-04
+
+Deck: `~/.gstack/projects/aamirtauqir-buildrik/designs/left-rail-all-panels-20260804/wireframes.html`.
+All four are editor-code changes that implement decisions locked in that review;
+the deck is the design SSOT for each. None block the deck itself.
+
+- [ ] **Drain the dead pin props.** `isPinned`/`onPinToggle` toggle and pass through
+  LeftSidebar (`:346`, `:506`) into 10+ panel headers, and NOTHING reads them for
+  behavior — the drawer never auto-closes, so pin is a decorative control (Issue 25,
+  decision 25A: delete pin everywhere). Remove the props from the panel interfaces,
+  `LeftSidebar.tsx`, `PanelHeader.tsx`/`PanelFrame`, and the header icon row. Same
+  class of deletion as the AI model picker ("a control that never controlled anything").
+
+- [ ] **Retire `PageCommandPalette`; ⌘K is global-only.** PagesTab.tsx:113-118 opens a
+  second palette when Pages is open — one shortcut, two results (Issue 22, decision
+  22A). Pages-scoped commands (jump-to-page, new page) become a context section of the
+  GLOBAL palette when Pages is active. Search-field kbd hints change to `/`
+  (focus-search), ⌘K hint appears only for the palette itself.
+  **Depends on:** the global ⌘K palette design in the deck (Door 3) shipping first.
+
+- [ ] **Flip Components V2 canonical, delete V1.** Founder chose V2 (Issue 23, decision
+  23A): `componentsV2` flag at TabRouter.tsx:161 dies, `ComponentsPanelV2` becomes the
+  only Components surface, old `ComponentsTab` deleted. V1's state patterns (skeleton /
+  PanelErrorState / EmptyState) carry over — they are the reference implementations.
+  **Depends on:** the V2 wireframe being finalized in the deck + a V2 maturity audit
+  (states, shortcuts, ⌘K entry parity) before the flip.
+
+- [ ] **Media: persist panel width, retire the slim-launcher tree.** Expand choice
+  resets on tab switch (LeftSidebar.tsx:477-479) — the user's width is forgotten every
+  time (Issue 24, decision 24A: one panel, 320 default, width persists per user).
+  Kill the reset, persist `ui:media-panel-width` per user, and collapse the
+  slim-launcher-vs-ExpandedMediaPanel dual tree into one MediaTab.
+  **Inventory first:** audit `onOpenLibrary` consumers before deleting the branch
+  (feedback_inventory_before_deletion_wrappers).
