@@ -220,6 +220,45 @@ function MediaTabWithComposer({
     />
   );
 
+  /*
+    Mounted by EVERY branch, not just the fullpage one. The detail overlay and
+    the delete confirm used to live inside the fullpage return, so the drawer —
+    the surface the board's five drill-ins hang off — could not reach
+    asset-detail, versions or used-in at all. Same shape as the `stockModal`
+    note above: a modal that only one of three renderers mounts is a feature
+    that exists for a third of its users.
+  */
+  const sharedOverlays = (
+    <>
+      {state.confirmDelete && (
+        <ConfirmDeleteModal
+          payload={state.confirmDelete}
+          onConfirm={state.executeDelete}
+          onCancel={state.cancelDelete}
+        />
+      )}
+      {state.detailItem && (
+        <AssetDetailOverlay
+          item={state.detailItem}
+          onInsert={state.insertToCanvas}
+          onRename={state.renameItem}
+          onUpdate={state.updateItem}
+          onDelete={(key) => {
+            state.requestDelete(key);
+            state.closeDetail();
+          }}
+          onClose={state.closeDetail}
+          onEditImage={handleEditImage}
+          composer={composer}
+          libraryItems={state.libraryItems}
+          onOpenItem={state.openDetail}
+          onOptimized={handleOptimized}
+          onReplaceAcross={handleReplaceAcross}
+        />
+      )}
+    </>
+  );
+
   if (onOpenLibrary) {
     if (state.panelExpanded) {
       return (
@@ -284,10 +323,13 @@ function MediaTabWithComposer({
         onOpenStock={() => setStockModalOpen(true)}
         onOpenLibrary={onOpenLibrary}
         onClose={onClose}
+        onOpenDetail={state.openDetail}
+        onOpenIconPicker={onOpenIconPicker ? handleOpenIconPicker : undefined}
         selectionContext={state.selectionContext}
         onCancelSelection={() => state.setSelectionContext(null)}
       />
       {stockModal}
+      {sharedOverlays}
       </>
     );
   }
@@ -411,32 +453,7 @@ function MediaTabWithComposer({
           onClose={() => state.setReplaceAcrossPair(null)}
         />
       )}
-      {state.confirmDelete && (
-        <ConfirmDeleteModal
-          payload={state.confirmDelete}
-          onConfirm={state.executeDelete}
-          onCancel={state.cancelDelete}
-        />
-      )}
-      {state.detailItem && (
-        <AssetDetailOverlay
-          item={state.detailItem}
-          onInsert={state.insertToCanvas}
-          onRename={state.renameItem}
-          onUpdate={state.updateItem}
-          onDelete={(key) => {
-            state.requestDelete(key);
-            state.closeDetail();
-          }}
-          onClose={state.closeDetail}
-          onEditImage={handleEditImage}
-          composer={composer}
-          libraryItems={state.libraryItems}
-          onOpenItem={state.openDetail}
-          onOptimized={handleOptimized}
-          onReplaceAcross={handleReplaceAcross}
-        />
-      )}
+      {sharedOverlays}
       {stockModal}
     </PanelFrame>
   );

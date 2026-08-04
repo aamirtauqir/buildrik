@@ -88,6 +88,8 @@ function mediaDrawer(over: Partial<React.ComponentProps<typeof SlimLauncher>> = 
       onSearchChange={() => {}}
       onUpload={() => {}}
       onRetryUpload={() => {}}
+      onOpenDetail={() => {}}
+      onOpenIconPicker={() => {}}
       onOpenStock={() => {}}
       onOpenLibrary={() => {}}
       onClose={() => {}}

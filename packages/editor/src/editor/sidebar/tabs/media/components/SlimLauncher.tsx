@@ -23,7 +23,7 @@
 
 import * as React from "react";
 import { PanelFrame, Button, IconButton, Menu, MenuItem, Popover, SkeletonBlock, TextField } from "@/editor/chrome-ui";
-import { Search, Upload, Cloud, Folder, ChevronDown, LayoutGrid, Rows3, ArrowUpDown } from "lucide-react";
+import { Search, Upload, Cloud, Shapes, Folder, ChevronDown, LayoutGrid, Rows3, ArrowUpDown } from "lucide-react";
 import type { Composer } from "@/engine/Composer";
 import type { LibraryItem, MediaFolder, MediaTypeFilter, TypeCounts, UploadProgress } from "../data/mediaTypes";
 import { TypePills } from "./TypePills";
@@ -60,6 +60,16 @@ interface SlimLauncherProps {
    * per-asset menu, it costs the bar no chrome the board does not have, and
    * the way out (Done) is visible the whole time selection is on.
    */
+  /**
+   * Open the asset drill-in (board `146:2`, and its Versions / Used-in tabs at
+   * `146:32` / `146:68`). Double-click, because single click inserts — the
+   * primary job of this drawer is putting an asset on the canvas, and taking
+   * that over would trade a one-click flow for a two-click one.
+   */
+  onOpenDetail?(item: LibraryItem): void;
+  /** Icon picker drill-in (board `147:2`). */
+  onOpenIconPicker?(): void;
+
   // ── Folder scope (board `145:49`) ────────────────────────────────────────
   /** null = the whole library. */
   currentFolderId?: string | null;
@@ -322,6 +332,12 @@ export function SlimLauncher(props: SlimLauncherProps) {
                 // While selecting, a click selects — inserting an asset the
                 // user is in the middle of choosing among would be a surprise.
                 onClick={props.selectionMode && props.onToggleSelect ? props.onToggleSelect : props.onInsert}
+                onDoubleClick={
+                  props.onOpenDetail ? (key) => {
+                    const hit = filtered.find((i) => i.key === key);
+                    if (hit) props.onOpenDetail?.(hit);
+                  } : undefined
+                }
                 onContextMenu={
                   props.onEnterSelection
                     ? (e, key) => {
@@ -418,6 +434,19 @@ export function SlimLauncher(props: SlimLauncherProps) {
             <Cloud size={14} aria-hidden="true" />
             Stock
           </Button>
+          {props.onOpenIconPicker ? (
+            <Button
+              type="button"
+              color="light"
+              size="xs"
+              className="tw:min-h-6 tw:gap-1.5 tw:border-0 tw:bg-transparent tw:px-0 tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+              data-testid="media-icons-action"
+              onClick={props.onOpenIconPicker}
+            >
+              <Shapes size={14} aria-hidden="true" />
+              Icons
+            </Button>
+          ) : null}
         </div>
       </div>
     </PanelFrame>
