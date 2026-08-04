@@ -81,6 +81,22 @@ export const MEDIA_EXTENSIONS = {
  * Media-related event names
  */
 export const MEDIA_EVENTS = {
+  /**
+   * Emitted once `MediaManager.init()` has finished reading storage. Until it
+   * fires the library is not empty — it is unknown, and the two look identical
+   * on screen. Figma draws them as different screens (`777:4093` skeletons vs
+   * `145:359` "Your library is empty"), and nothing in the code could tell them
+   * apart before this event existed.
+   */
+  INITIALIZED: "media:initialized",
+  /**
+   * `init()` could not read storage — IndexedDB blocked in a private window,
+   * a quota refusal, a corrupt store. Before this existed the failure resolved
+   * to an empty array and the drawer said "Your library is empty", which is a
+   * lie the user cannot act on: their assets are still there. Figma draws the
+   * two differently (`453:3931` "Couldn't load your media." + Try again).
+   */
+  INIT_FAILED: "media:init-failed",
   /** Emitted when a media asset is added */
   MEDIA_ADDED: "media:added",
   /** Emitted when a media asset is updated */

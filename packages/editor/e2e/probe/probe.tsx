@@ -276,6 +276,16 @@ const CASES: Record<string, () => React.ReactElement> = {
       })}
     </div>
   ),
+  "media-drawer-loading": () => (
+    <div data-probe="media-drawer-loading">
+      {mediaDrawer({ loading: true, libraryItems: [], counts: MEDIA_COUNTS })}
+    </div>
+  ),
+  "media-drawer-load-error": () => (
+    <div data-probe="media-drawer-load-error">
+      {mediaDrawer({ loadError: "IndexedDB is unavailable in this browser", onRetryLoad: () => {}, libraryItems: [] })}
+    </div>
+  ),
   "media-drawer-empty": () => (
     <div data-probe="media-drawer-empty">
       {mediaDrawer({ libraryItems: [], counts: { all: 0, img: 0, vid: 0, ico: 0, fnt: 0 } })}

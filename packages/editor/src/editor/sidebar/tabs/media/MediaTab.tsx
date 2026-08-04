@@ -256,6 +256,9 @@ function MediaTabWithComposer({
         onSearchChange={(q) => state.setLibrarySearch(q)}
         onUpload={state.upload}
         onRetryUpload={state.retryUpload}
+        loading={state.libraryLoading}
+        loadError={state.libraryError}
+        onRetryLoad={state.retryLibraryLoad}
         onOpenStock={() => setStockModalOpen(true)}
         onOpenLibrary={onOpenLibrary}
         onClose={onClose}

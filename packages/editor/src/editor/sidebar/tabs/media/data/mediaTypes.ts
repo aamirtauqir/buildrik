@@ -99,6 +99,11 @@ export interface CtxMenuState {
 // --- Sub-hook result interfaces ---
 
 export interface LibraryStateResult {
+  /** False only once storage has been read — see useLibraryState. */
+  libraryLoading: boolean;
+  /** Non-null when storage could not be read at all. NOT the same as empty. */
+  libraryError: string | null;
+  retryLibraryLoad(): void;
   rawAssets: MediaAsset[];
   libraryItems: LibraryItem[];
   folders: MediaFolder[];
@@ -184,6 +189,11 @@ export interface DiscoveryStateResult {
 // --- Full state result (returned by useMediaState) ---
 
 export interface MediaStateResult {
+  /** False only once storage has been read — see useLibraryState. */
+  libraryLoading: boolean;
+  /** Non-null when storage could not be read at all. NOT the same as empty. */
+  libraryError: string | null;
+  retryLibraryLoad(): void;
   // Navigation
   activeType: MediaTypeFilter;
   setType(t: MediaTypeFilter): void;

@@ -32,11 +32,16 @@ import React from "react";
 import { Spinner } from "flowbite-react";
 import "./skeleton.css";
 
-interface SkeletonBlockProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface SkeletonBlockProps extends React.HTMLAttributes<HTMLDivElement> {
   circle?: boolean;
 }
 
-const SkeletonBlock: React.FC<SkeletonBlockProps> = ({ circle, className, ...rest }) => (
+/**
+ * The pulse itself. Exported because every skeleton in the editor should be
+ * the same grey and the same animation — the Media grid's loading state
+ * (board 777:4139) needs its own geometry, not its own treatment.
+ */
+export const SkeletonBlock: React.FC<SkeletonBlockProps> = ({ circle, className, ...rest }) => (
   <div
     aria-hidden="true"
     className={[

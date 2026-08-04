@@ -20,6 +20,15 @@ import {
 
 export function useLibraryState(composer: Composer): LibraryStateResult {
   const [rawAssets, setRawAssets] = useState(() => composer.media.getAssets());
+  /**
+   * "Unknown", not "empty". `MediaManager.init()` reads storage asynchronously,
+   * so an empty `getAssets()` before it resolves means nothing — and the board
+   * draws the two as different screens (`777:4093` skeletons vs `145:359` "Your
+   * library is empty"). Seeded from the manager so a tab mounted after init
+   * never flashes a skeleton it has no reason to show.
+   */
+  const [libraryLoading, setLibraryLoading] = useState(() => !composer.media.isInitialized);
+  const [libraryError, setLibraryError] = useState<string | null>(() => composer.media.initFailure);
   const [folders, setFolders] = useState(() => composer.media.getFolders());
   const [allFolders, setAllFolders] = useState(() => composer.media.getAllFolders());
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
@@ -50,6 +59,20 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
     reload();
     reloadFolders();
 
+    const onInitialized = () => {
+      reload();
+      reloadFolders();
+      setLibraryError(null);
+      setLibraryLoading(false);
+    };
+    const onInitFailed = (payload: unknown) => {
+      const message = (payload as { error?: string } | undefined)?.error;
+      setLibraryError(message ?? "Could not read local media storage");
+      setLibraryLoading(false);
+    };
+
+    composer.media.on(MEDIA_EVENTS.INITIALIZED, onInitialized);
+    composer.media.on(MEDIA_EVENTS.INIT_FAILED, onInitFailed);
     composer.media.on(MEDIA_EVENTS.MEDIA_ADDED, reload);
     composer.media.on(MEDIA_EVENTS.MEDIA_UPDATED, reload);
     composer.media.on(MEDIA_EVENTS.MEDIA_DELETED, reload);
@@ -59,6 +82,8 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
     composer.media.on(MEDIA_EVENTS.FOLDER_DELETED, reloadFolders);
 
     return () => {
+      composer.media.off(MEDIA_EVENTS.INITIALIZED, onInitialized);
+      composer.media.off(MEDIA_EVENTS.INIT_FAILED, onInitFailed);
       composer.media.off(MEDIA_EVENTS.MEDIA_ADDED, reload);
       composer.media.off(MEDIA_EVENTS.MEDIA_UPDATED, reload);
       composer.media.off(MEDIA_EVENTS.MEDIA_DELETED, reload);
@@ -223,8 +248,17 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
     [composer]
   );
 
+  const retryLibraryLoad = useCallback(() => {
+    setLibraryError(null);
+    setLibraryLoading(true);
+    void composer.media.retryInit();
+  }, [composer]);
+
   return {
     rawAssets,
+    libraryLoading,
+    libraryError,
+    retryLibraryLoad,
     libraryItems,
     folders,
     allFolders,

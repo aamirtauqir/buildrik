@@ -22,7 +22,7 @@
  */
 
 import * as React from "react";
-import { PanelFrame, Button, IconButton, TextField } from "@/editor/chrome-ui";
+import { PanelFrame, Button, IconButton, SkeletonBlock, TextField } from "@/editor/chrome-ui";
 import { Search, Upload, Cloud, Folder, ChevronDown, LayoutGrid, Rows3, ArrowUpDown } from "lucide-react";
 import type { Composer } from "@/engine/Composer";
 import type { LibraryItem, MediaTypeFilter, TypeCounts, UploadProgress } from "../data/mediaTypes";
@@ -46,6 +46,11 @@ interface SlimLauncherProps {
   onTypeChange(type: MediaTypeFilter): void;
   onSearchChange(query: string): void;
   onUpload(files: File[]): void;
+  /** Storage has not been read yet — draw the skeleton, not the empty state. */
+  loading?: boolean;
+  /** Storage could not be read. Distinct from empty: the assets still exist. */
+  loadError?: string | null;
+  onRetryLoad?(): void;
   /**
    * Retry a failed upload. The drawer had no way to reach it: `MediaTab` wired
    * `state.retryUpload` into the fullpage branch only, so the persistent
@@ -150,7 +155,58 @@ export function SlimLauncher(props: SlimLauncherProps) {
       />
 
       <div className="sl-grid-wrap tw:min-h-0 tw:flex-1 tw:overflow-y-auto" data-testid="media-grid-wrap">
-        {filtered.length === 0 ? (
+        {props.loadError ? (
+          /*
+            Board `453:3952`. "Couldn't load your media." in error-text with
+            two accent links under it. NOT the empty state: an empty library is
+            a fact about the user's account, a failed read is a fact about this
+            browser, and only one of them is worth a retry.
+          */
+          <div className="tw:px-4 tw:pt-11 tw:text-center tw:text-[13px] tw:leading-5" data-testid="media-load-error" role="alert">
+            <p className="tw:text-red-700">Couldn&apos;t load your media.</p>
+            <p className="tw:mt-2 tw:flex tw:justify-center tw:gap-10">
+              <Button
+                type="button"
+                color="light"
+                size="xs"
+                className="tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+                data-testid="media-load-retry"
+                onClick={props.onRetryLoad}
+              >
+                Try again
+              </Button>
+              <Button
+                type="button"
+                color="light"
+                size="xs"
+                className="tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+                onClick={onOpenStock}
+              >
+                Browse stock
+              </Button>
+            </p>
+          </div>
+        ) : props.loading ? (
+          /*
+            Board `777:4139`. Six cells on the real grid's geometry, so the
+            layout does not jump when the assets land. The label bars are
+            deliberately uneven — a column of identical bars reads as a
+            rendered UI that has gone wrong, not as one still arriving.
+          */
+          <div
+            className="tw:grid tw:grid-cols-2 tw:justify-items-start tw:gap-4 tw:px-4 tw:py-3"
+            data-testid="media-grid-skeleton"
+            aria-busy="true"
+            aria-label="Loading media"
+          >
+            {[96, 72, 110, 84, 100, 66].map((w, i) => (
+              <span key={i} className="tw:flex tw:h-26 tw:w-34 tw:flex-col tw:gap-1">
+                <SkeletonBlock className="tw:h-19 tw:w-34 tw:rounded-md" />
+                <SkeletonBlock className="tw:h-2.5" style={{ width: w }} />
+              </span>
+            ))}
+          </div>
+        ) : filtered.length === 0 ? (
           props.libraryItems.length === 0 ? (
             <div className="sl-empty tw:px-4 tw:py-6" data-testid="media-empty">
               <p className="sl-empty__title tw:text-[13px] tw:text-gray-900">Your library is empty</p>

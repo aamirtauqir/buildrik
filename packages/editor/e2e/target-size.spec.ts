@@ -49,6 +49,7 @@ const CASES = [
   "media-drawer-grid",
   "media-drawer-upload-failed",
   "media-drawer-quota-full",
+  "media-drawer-load-error",
 ] as const;
 
 /**

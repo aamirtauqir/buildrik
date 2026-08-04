@@ -152,6 +152,8 @@
     "SiteCard": "local",
     "SiteCardProps": "local",
     "SiteMenuIcon": "local",
+    "SkeletonBlock": "local",
+    "SkeletonBlockProps": "local",
     "SkeletonListItem": "local",
     "SkeletonListItemProps": "local",
     "Slider": "local",

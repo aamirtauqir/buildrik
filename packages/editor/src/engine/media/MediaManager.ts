@@ -144,6 +144,7 @@ export class MediaManager extends MediaEventEmitter {
    * Null = local-only mode (no dashboard URL configured / unauthenticated).
    */
   private remoteSync: RemoteAssetSync | null;
+  private initError: string | null = null;
 
   /**
    * Phase B2: asset IDs needing server retry. Populated when uploadAndCreate
@@ -619,8 +620,19 @@ export class MediaManager extends MediaEventEmitter {
   async init(): Promise<void> {
     if (this.initialized) return;
 
-    await this.storage.init();
-    await this.loadFromStorage();
+    // A read that throws must not resolve to "no assets". `loadFromStorage`
+    // returning nothing and storage being unreachable look identical to every
+    // consumer downstream, and the drawer would tell the user their library is
+    // empty while their files sit intact in a store it could not open.
+    try {
+      await this.storage.init();
+      await this.loadFromStorage();
+    } catch (err) {
+      this.initError = err instanceof Error ? err.message : "Could not read local media storage";
+      this.emit(MEDIA_EVENTS.INIT_FAILED, { error: this.initError });
+      return;
+    }
+    this.initError = null;
     // Phase B5 P2 (durability): refresh between sync failures used to lose
     // retry intent because retryQueue lived only in memory. Now we rebuild
     // it from persisted localOnly markers so retry survives reload — for
@@ -631,6 +643,28 @@ export class MediaManager extends MediaEventEmitter {
     this.rebuildRetryQueueFromState();
     this.rebuildFolderRetryQueueFromState();
     this.initialized = true;
+    this.emit(MEDIA_EVENTS.INITIALIZED, { assetCount: this.state.assets.length });
+  }
+
+  /** Has storage been read yet? False means "unknown", not "empty". */
+  get isInitialized(): boolean {
+    return this.initialized;
+  }
+
+  /** Why the last `init()` failed, or null. Non-null means the library is unknown. */
+  get initFailure(): string | null {
+    return this.initError;
+  }
+
+  /**
+   * Re-run a failed init. Retry belongs here rather than at the call site
+   * because `initialized` and `initError` are this object's state — a caller
+   * that re-invoked `init()` would hit the `if (this.initialized) return`
+   * guard on the happy path and do nothing on the sad one.
+   */
+  async retryInit(): Promise<void> {
+    this.initError = null;
+    await this.init();
   }
 
   private async loadFromStorage(): Promise<void> {
