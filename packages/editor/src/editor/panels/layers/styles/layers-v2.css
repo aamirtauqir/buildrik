@@ -590,45 +590,6 @@
 }
 
 /* ==========================================================================
-   Empty-search state (no layers match the current search query)
-   ========================================================================== */
-
-.bdc-layers-empty-search {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: var(--bk-space-24) var(--bk-space-16);
-  text-align: center;
-  gap: 6px;
-  color: var(--bk-ink-muted);
-}
-.bdc-les-icon {
-  font-size: 20px;
-  line-height: 1;
-  opacity: 0.6;
-}
-.bdc-les-title {
-  margin: 0;
-  font: 500 11.5px var(--bk-font-ui);
-  color: var(--bk-ink-soft);
-}
-.bdc-les-clear {
-  background: transparent;
-  border: 1px solid var(--bk-border);
-  border-radius: 5px;
-  padding: var(--bk-space-4) 10px;
-  font: 500 10.5px var(--bk-font-ui);
-  color: var(--bk-ink-soft);
-  cursor: pointer;
-  margin-top: var(--bk-space-4);
-}
-.bdc-les-clear:hover {
-  background: var(--bk-bg-subtle);
-  color: var(--bk-ink);
-}
-
-/* ==========================================================================
    Screen-reader only
    ========================================================================== */
 

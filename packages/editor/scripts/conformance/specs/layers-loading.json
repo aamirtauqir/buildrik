@@ -1,0 +1,244 @@
+{
+  "surface": "layers-loading",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "775:4130",
+  "boardName": "Layers · loading",
+  "figmaHash": "0aba1a678c79a001ef95bacaedb9b4f6abee2236280868cdc25b5a68dd5da718",
+  "extractorVersion": 1,
+  "extractedAt": "2026-08-04T00:00:00.000000Z",
+  "targets": [
+    {
+      "nodeId": "775:4130",
+      "name": "Layers · loading",
+      "className": "bg-[var(--color\\\\/bg-card,white)] content-stretch cursor-pointer flex flex-col items-start relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        }
+      }
+    },
+    {
+      "nodeId": "775:4131",
+      "name": "Panel header",
+      "className": "bg-[var(--color\\\\/bg-panel,white)] content-stretch flex gap-[8px] h-[44px] items-center pl-[16px] pr-[12px] relative shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "44px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "I775:4131;16:7",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Medium'] font-medium leading-[16px] min-w-px not-italic relative text-[11px] text-[color:var(--color\\\\/ink-soft,#4b5563)] text-left tracking-[0.88px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "776:4089",
+      "name": "Toolbar",
+      "className": "h-[36px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "36px"
+        }
+      }
+    },
+    {
+      "nodeId": "776:4090",
+      "name": "search box",
+      "className": "absolute bg-[var(--color\\\\/bg-subtle,#f3f4f6)] h-[28px] left-[16px] overflow-clip rounded-[6px] top-[4px] w-[206px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "206px"
+        }
+      }
+    },
+    {
+      "nodeId": "776:4091",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[10px] not-italic text-[13px] text-[color:var(--color\\\\/ink-muted,#6b7280)] text-left top-[5px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "775:4220",
+      "name": "skeleton 0",
+      "className": "h-[32px] relative shrink-0 w-[320px]",
+      "props": {
+        "height": {
+          "value": "32px"
+        },
+        "width": {
+          "value": "320px"
+        }
+      }
+    },
+    {
+      "nodeId": "775:4221",
+      "name": "sk/icon",
+      "className": "absolute bg-[#f3f4f6] left-[16px] rounded-[3px] size-[12px] top-[10px]",
+      "props": {
+        "background-color": {
+          "value": "#f3f4f6"
+        },
+        "border-radius": {
+          "value": "3px"
+        }
+      }
+    },
+    {
+      "nodeId": "775:4222",
+      "name": "sk",
+      "className": "absolute bg-[#f3f4f6] h-[10px] left-[36px] rounded-[4px] top-[11px] w-[132px]",
+      "props": {
+        "background-color": {
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "10px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "132px"
+        }
+      }
+    },
+    {
+      "nodeId": "775:4223",
+      "name": "skeleton 1",
+      "className": "h-[32px] relative shrink-0 w-[320px]",
+      "props": {
+        "height": {
+          "value": "32px"
+        },
+        "width": {
+          "value": "320px"
+        }
+      }
+    },
+    {
+      "nodeId": "775:4224",
+      "name": "sk/icon",
+      "className": "absolute bg-[#f3f4f6] left-[32px] rounded-[3px] size-[12px] top-[10px]",
+      "props": {
+        "background-color": {
+          "value": "#f3f4f6"
+        },
+        "border-radius": {
+          "value": "3px"
+        }
+      }
+    },
+    {
+      "nodeId": "775:4225",
+      "name": "sk",
+      "className": "absolute bg-[#f3f4f6] h-[10px] left-[52px] rounded-[4px] top-[11px] w-[96px]",
+      "props": {
+        "background-color": {
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "10px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "96px"
+        }
+      }
+    },
+    {
+      "nodeId": "775:4226",
+      "name": "skeleton 2",
+      "className": "h-[32px] relative shrink-0 w-[320px]",
+      "props": {
+        "height": {
+          "value": "32px"
+        },
+        "width": {
+          "value": "320px"
+        }
+      }
+    },
+    {
+      "nodeId": "775:4227",
+      "name": "sk/icon",
+      "className": "absolute bg-[#f3f4f6] left-[48px] rounded-[3px] size-[12px] top-[10px]",
+      "props": {
+        "background-color": {
+          "value": "#f3f4f6"
+        },
+        "border-radius": {
+          "value": "3px"
+        }
+      }
+    },
+    {
+      "nodeId": "775:4228",
+      "name": "sk",
+      "className": "absolute bg-[#f3f4f6] h-[10px] left-[68px] rounded-[4px] top-[11px] w-[150px]",
+      "props": {
+        "background-color": {
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "10px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    }
+  ]
+}

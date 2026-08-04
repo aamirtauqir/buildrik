@@ -1,0 +1,13 @@
+{
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "fetchedAt": "2026-08-04T00:00:00.000000Z",
+  "tool": "mcp__plugin_figma_figma__get_design_context",
+  "note": "Verbatim get_design_context output, trimmed to the structural elements this recipe targets (icon <img> wrappers and asset URL constants removed — the URLs expire in 7 days and carry no spec).",
+  "designStyles": [
+    "ui/13 · row label: Inter Regular 13/20, ls 0",
+    "ui/12 · small: Inter Regular 12/18, ls 0"
+  ],
+  "nodeId": "782:4260",
+  "boardName": "Layers · no-results",
+  "code": "export default function LayersNoResults() {\n  return (\n    <a className=\"bg-[var(--color\\\\/bg-card,white)] content-stretch cursor-pointer flex flex-col items-start relative size-full\" data-node-id=\"782:4260\" data-name=\"Layers · no-results\">\n      <div className=\"[word-break:break-word] content-stretch flex flex-col font-['Inter:Regular'] font-normal gap-[10px] items-start leading-[normal] not-italic pb-[32px] pt-[36px] px-[24px] relative shrink-0 text-[13px] text-left w-[320px]\" data-node-id=\"782:4350\" data-name=\"No results\">\n        <p className=\"relative shrink-0 text-[#6b7280] w-full\" data-node-id=\"782:4351\">Nothing matches ‘hero’.</p>\n        <p className=\"relative shrink-0 text-[#1a56db] w-full\" data-node-id=\"782:4352\">Clear search</p>\n      </div>\n      <div className=\"flex-[1_0_0] min-h-px relative w-full\" data-node-id=\"782:4274\" data-name=\"spacer\" />\n    </a>\n  );\n}"
+}

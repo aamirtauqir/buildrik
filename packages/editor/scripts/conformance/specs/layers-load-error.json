@@ -1,0 +1,80 @@
+{
+  "surface": "layers-load-error",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "781:4217",
+  "boardName": "Layers · load-error",
+  "figmaHash": "e17519ad58c535bdeb28bd9325738de4432f6fefdd69cc9179117b42d3257c73",
+  "extractorVersion": 1,
+  "extractedAt": "2026-08-04T00:00:00.000000Z",
+  "targets": [
+    {
+      "nodeId": "781:4217",
+      "name": "Layers · load-error",
+      "className": "bg-[var(--color\\\\/bg-card,white)] content-stretch cursor-pointer flex flex-col items-start relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        }
+      }
+    },
+    {
+      "nodeId": "781:4307",
+      "name": "Load error",
+      "className": "[word-break:break-word] content-stretch flex flex-col font-['Inter:Regular'] font-normal gap-[6px] items-start leading-[normal] not-italic pb-[32px] pt-[36px] px-[24px] relative shrink-0 text-left w-[320px]",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-bottom": {
+          "value": "32px"
+        },
+        "padding-top": {
+          "value": "36px"
+        },
+        "padding-left": {
+          "value": "24px"
+        },
+        "padding-right": {
+          "value": "24px"
+        },
+        "width": {
+          "value": "320px"
+        }
+      }
+    },
+    {
+      "nodeId": "781:4308",
+      "name": null,
+      "className": "relative shrink-0 text-[#c81e1e] text-[13px] w-full",
+      "props": {
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "781:4309",
+      "name": null,
+      "className": "relative shrink-0 text-[#6b7280] text-[12px] w-full",
+      "props": {
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "781:4310",
+      "name": null,
+      "className": "relative shrink-0 text-[#1a56db] text-[13px] w-full",
+      "props": {
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    }
+  ]
+}

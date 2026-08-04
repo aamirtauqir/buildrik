@@ -34,6 +34,8 @@ import { CanvasFooterToolbar } from "@/editor/canvas/CanvasFooterToolbar";
 import { PanelFrame } from "@/editor/chrome-ui";
 import { SlimLauncher } from "@/editor/sidebar/tabs/media/components/SlimLauncher";
 import { ContentTab } from "@/editor/sidebar/tabs/content/ContentTab";
+import { LayersTab } from "@/editor/sidebar/tabs/layers/LayersTab";
+import { LayersLoadError, LayersNoResults } from "@/editor/panels/layers/components/LayersStateBlocks";
 import type { LibraryItem } from "@/editor/sidebar/tabs/media/data/mediaTypes";
 import type { UploadProgress } from "@/shared/types/media";
 
@@ -313,6 +315,26 @@ const CASES: Record<string, () => React.ReactElement> = {
   "content-load-error": () => (
     <div data-probe="content-load-error">
       <ContentTab composer={null} hydrationStatus="error" onClose={() => {}} />
+    </div>
+  ),
+  // ── Layers states (boards 775:4130 / 781:4217 / 782:4260) ────────────────
+  // Loading is the REAL path (composer null = editor boot), so the case mounts
+  // the whole tab. Error/no-results need a throwing tree or a live search —
+  // neither is mountable without an engine, so those cases mount the shared
+  // block the app itself renders (LayersStateBlocks is the single home).
+  "layers-loading": () => (
+    <div data-probe="layers-loading">
+      <LayersTab composer={null} />
+    </div>
+  ),
+  "layers-load-error": () => (
+    <div data-probe="layers-load-error" style={{ width: 320, background: "#fff" }}>
+      <LayersLoadError onRetry={() => {}} />
+    </div>
+  ),
+  "layers-no-results": () => (
+    <div data-probe="layers-no-results" style={{ width: 320, background: "#fff" }}>
+      <LayersNoResults search="hero" onClear={() => {}} />
     </div>
   ),
   "media-drawer-folder-scoped": () => (

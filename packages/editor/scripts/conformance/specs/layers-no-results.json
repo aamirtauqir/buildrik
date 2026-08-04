@@ -1,0 +1,73 @@
+{
+  "surface": "layers-no-results",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "782:4260",
+  "boardName": "Layers · no-results",
+  "figmaHash": "e0d3f8b2409d72e14833641db9791deeed760a9419c079f5dc741ab55ba68544",
+  "extractorVersion": 1,
+  "extractedAt": "2026-08-04T00:00:00.000000Z",
+  "targets": [
+    {
+      "nodeId": "782:4260",
+      "name": "Layers · no-results",
+      "className": "bg-[var(--color\\\\/bg-card,white)] content-stretch cursor-pointer flex flex-col items-start relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        }
+      }
+    },
+    {
+      "nodeId": "782:4350",
+      "name": "No results",
+      "className": "[word-break:break-word] content-stretch flex flex-col font-['Inter:Regular'] font-normal gap-[10px] items-start leading-[normal] not-italic pb-[32px] pt-[36px] px-[24px] relative shrink-0 text-[13px] text-left w-[320px]",
+      "props": {
+        "gap": {
+          "value": "10px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-bottom": {
+          "value": "32px"
+        },
+        "padding-top": {
+          "value": "36px"
+        },
+        "padding-left": {
+          "value": "24px"
+        },
+        "padding-right": {
+          "value": "24px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "width": {
+          "value": "320px"
+        }
+      }
+    },
+    {
+      "nodeId": "782:4351",
+      "name": null,
+      "className": "relative shrink-0 text-[#6b7280] w-full",
+      "props": {
+        "font-size": {
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "782:4352",
+      "name": null,
+      "className": "relative shrink-0 text-[#1a56db] w-full",
+      "props": {
+        "font-size": {
+          "value": "#1a56db"
+        }
+      }
+    }
+  ]
+}

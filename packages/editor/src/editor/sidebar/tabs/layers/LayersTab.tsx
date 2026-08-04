@@ -13,7 +13,29 @@ import { useComposerSelection } from "../../../canvas/hooks/useComposerSelection
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
 import { LayersPanel } from "../../../panels/layers/index";
+import { LayersLoadError, LayersLoadingSkeleton } from "../../../panels/layers/components/LayersStateBlocks";
 import type { SelectedElementInfo } from "../../../panels/layers/types";
+
+/*
+  Boards 781:4217 / 775:4130. A tree that throws mid-render used to blank the
+  whole drawer; the board draws a scoped failure instead — "The page is fine —
+  only this list failed." Retry remounts the tree (key bump), nothing else.
+*/
+class LayersTreeBoundary extends React.Component<
+  { children: React.ReactNode },
+  { failed: boolean; attempt: number }
+> {
+  state = { failed: false, attempt: 0 };
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  render() {
+    if (this.state.failed) {
+      return <LayersLoadError onRetry={() => this.setState((s) => ({ failed: false, attempt: s.attempt + 1 }))} />;
+    }
+    return <React.Fragment key={this.state.attempt}>{this.props.children}</React.Fragment>;
+  }
+}
 
 export interface LayersTabProps {
   composer: Composer | null;
@@ -123,21 +145,21 @@ export const LayersTab: React.FC<LayersTabProps> = ({
       </label>
       <div className="bdc-pbody bdc-pbody-scroll">
         {composer ? (
-          <LayersPanel
-            composer={composer}
-            selectedElement={selectedElement}
-            onLayerHover={handleLayerHover}
-            canvasHoveredId={canvasHoveredId}
-            onAddBlockClick={onAddBlockClick}
-            search={search}
-            displaySettingsOpen={displaySettingsOpen}
-            onDisplaySettingsToggle={() => setDisplaySettingsOpen((v) => !v)}
-            onSearchChange={setSearch}
-          />
+          <LayersTreeBoundary>
+            <LayersPanel
+              composer={composer}
+              selectedElement={selectedElement}
+              onLayerHover={handleLayerHover}
+              canvasHoveredId={canvasHoveredId}
+              onAddBlockClick={onAddBlockClick}
+              search={search}
+              displaySettingsOpen={displaySettingsOpen}
+              onDisplaySettingsToggle={() => setDisplaySettingsOpen((v) => !v)}
+              onSearchChange={setSearch}
+            />
+          </LayersTreeBoundary>
         ) : (
-          <div className="bdc-layers-empty">
-            <p>Loading layers…</p>
-          </div>
+          <LayersLoadingSkeleton />
         )}
       </div>
     </PanelFrame>

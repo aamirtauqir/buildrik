@@ -16,6 +16,7 @@ import { LayerSelectionBanner } from "./components/LayerSelectionBanner";
 import { useLayerContextActions } from "./hooks/useLayerContextActions";
 import { useLayersState } from "./hooks/useLayersState";
 import { LayerTreeItem } from "./LayerTreeItem";
+import { LayersNoResults } from "./components/LayersStateBlocks";
 import type { LayersPanelProps } from "./types";
 import { Button } from "@/editor/chrome-ui";
 export type { LayersPanelProps, SelectedElementInfo } from "./types";
@@ -394,13 +395,10 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
         {state.layers.length === 0 && <LayersEmptyState onAddBlockClick={onAddBlockClick} />}
 
         {state.searchHook.isSearching && filteredLayers.length === 0 && (
-          <div className="bdc-layers-empty-search" role="status">
-            <span className="bdc-les-icon">🔍</span>
-            <p className="bdc-les-title">No layers match &quot;{state.search}&quot;</p>
-            <Button className="bdc-les-clear" onClick={() => onSearchChange ? onSearchChange("") : setSearch("")}>
-              Clear search
-            </Button>
-          </div>
+          <LayersNoResults
+            search={state.search}
+            onClear={() => (onSearchChange ? onSearchChange("") : setSearch(""))}
+          />
         )}
 
         {filteredLayers.map((layer) => (

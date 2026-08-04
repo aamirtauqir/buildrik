@@ -1,0 +1,13 @@
+{
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "fetchedAt": "2026-08-04T00:00:00.000000Z",
+  "tool": "mcp__plugin_figma_figma__get_design_context",
+  "note": "Verbatim get_design_context output, trimmed to the structural elements this recipe targets (icon <img> wrappers and asset URL constants removed — the URLs expire in 7 days and carry no spec).",
+  "designStyles": [
+    "ui/13 · row label: Inter Regular 13/20, ls 0",
+    "ui/12 · small: Inter Regular 12/18, ls 0"
+  ],
+  "nodeId": "781:4217",
+  "boardName": "Layers · load-error",
+  "code": "export default function LayersLoadError() {\n  return (\n    <a className=\"bg-[var(--color\\\\/bg-card,white)] content-stretch cursor-pointer flex flex-col items-start relative size-full\" data-node-id=\"781:4217\" data-name=\"Layers · load-error\">\n      <div className=\"[word-break:break-word] content-stretch flex flex-col font-['Inter:Regular'] font-normal gap-[6px] items-start leading-[normal] not-italic pb-[32px] pt-[36px] px-[24px] relative shrink-0 text-left w-[320px]\" data-node-id=\"781:4307\" data-name=\"Load error\">\n        <p className=\"relative shrink-0 text-[#c81e1e] text-[13px] w-full\" data-node-id=\"781:4308\">Couldn’t load the layer tree.</p>\n        <p className=\"relative shrink-0 text-[#6b7280] text-[12px] w-full\" data-node-id=\"781:4309\">The page is fine — only this list failed.</p>\n        <p className=\"relative shrink-0 text-[#1a56db] text-[13px] w-full\" data-node-id=\"781:4310\">Try again</p>\n      </div>\n      <div className=\"flex-[1_0_0] min-h-px relative w-full\" data-node-id=\"781:4231\" data-name=\"spacer\" />\n    </a>\n  );\n}"
+}
