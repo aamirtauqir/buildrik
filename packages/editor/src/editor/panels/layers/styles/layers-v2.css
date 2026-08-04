@@ -538,17 +538,40 @@
    now ride as children of TabFrame.Header; layout sourced from
    PanelHeader's HeaderActions. */
 
-/* Search field (prototype .psearch shape) */
+/* Board 142:7 Toolbar — 36h band: search box + ⊞ ⊟ ⚙ cluster. */
+.bdc-ltoolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--bk-space-4);
+  height: var(--bk-space-36);
+  padding: 0 var(--bk-space-12) 0 var(--bk-space-16);
+  flex-shrink: 0;
+}
+
+/* Search field (board 142:8 — 28h subtle box inside the toolbar) */
 .bdc-psearch {
   display: flex;
   align-items: center;
+  flex: 1;
+  min-width: 0;
   gap: 6px;
-  padding: 5px var(--bk-space-8);
-  margin: 10px 10px 0;
+  height: var(--bk-size-row-dense);
+  padding: 0 var(--bk-space-8);
   background: var(--bk-bg-subtle);
   border: 1px solid transparent;
-  border-radius: var(--bk-radius-md);
+  border-radius: 6px;
   font: 500 11px var(--bk-font-ui);
+}
+
+/* Board 142:58 Count footer — 28h, 12px muted, 16px inset. */
+.bdc-lcount {
+  flex-shrink: 0;
+  height: var(--bk-size-row-dense);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--bk-space-16);
+  font: 400 var(--bk-text-12) var(--bk-font-ui);
+  color: var(--bk-ink-muted);
 }
 .bdc-psearch svg {
   color: var(--bk-ink-muted);

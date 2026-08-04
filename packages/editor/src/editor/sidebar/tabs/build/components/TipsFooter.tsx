@@ -1,16 +1,15 @@
 /**
- * TipsFooter — PRO TIPS carousel at bottom of Add panel.
- *
- * Rewritten against the `--bd-*` alias tokens from
- * src/themes/design-system/bd-aliases.css. All colors, spacing, type come from tokens
- * (no raw hex, no class dependency). Collapsed = 1-line header; expanded =
- * header + tip card + dot pagination.
+ * TipsFooter — board 137:43 "TipsFooter": a single 40-tall strip on the accent
+ * tint, not a card. "💡 Tip n/N" + one-line tip body + ‹ › ✕. The ✕ hides
+ * tips for the session (scope lives in useBuildTab); no collapse state — the
+ * board has none, dismiss IS the collapse. Search mode unmounts it entirely
+ * (BuildTab hides panel-bottom while searching).
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { Lightbulb, ChevronLeft, ChevronRight, ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { TIPS } from "../catalog/tips";
 import { Button } from "@/editor/chrome-ui";
 
@@ -27,47 +26,38 @@ export interface TipsFooterProps {
 
 // ── Styles (token-bound) ─────────────────────────────────────────────────────
 
-const wrap: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: 6,
-  fontFamily: "var(--bk-font-ui)",
-};
-
-const header: React.CSSProperties = {
+const strip: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
-  gap: 6,
-  minHeight: 20,
-};
-
-const label: React.CSSProperties = {
-  display: "inline-flex",
-  alignItems: "center",
-  gap: 5,
+  gap: 8,
+  height: "var(--bk-space-40)",
+  padding: "0 12px 0 16px",
+  background: "var(--bk-accent-tint)",
+  color: "var(--bk-accent-text)",
   fontFamily: "var(--bk-font-ui)",
-  fontSize: "var(--bk-text-11)",
-  fontWeight: 600,
-  letterSpacing: "var(--bk-tracking-wide)",
-  textTransform: "uppercase",
-  color: "var(--bk-ink-muted)",
-  flexShrink: 0,
+  fontSize: "var(--bk-text-12)",
+  lineHeight: "18px",
 };
 
 const counter: React.CSSProperties = {
-  fontFamily: "var(--bk-font-mono)",
-  fontSize: "var(--bk-text-11)",
-  fontWeight: 500,
-  color: "var(--bk-ink-muted)",
-  marginLeft: 8,
+  fontWeight: 600,
+  flexShrink: 0,
   fontVariantNumeric: "tabular-nums",
+};
+
+const body: React.CSSProperties = {
+  flex: 1,
+  minWidth: 0,
+  whiteSpace: "nowrap",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
 };
 
 const nav: React.CSSProperties = {
   display: "inline-flex",
   alignItems: "center",
   gap: 2,
-  marginLeft: "auto",
+  flexShrink: 0,
 };
 
 const arr: React.CSSProperties = {
@@ -81,56 +71,16 @@ const arr: React.CSSProperties = {
   border: "none",
   borderRadius: 4,
   background: "transparent",
-  color: "var(--bk-ink-muted)",
+  color: "var(--bk-accent-text)",
   cursor: "pointer",
   lineHeight: 1,
-  transition: "background 120ms, color 120ms",
 };
 
-const card: React.CSSProperties = {
-  fontFamily: "var(--bk-font-ui)",
-  fontSize: "var(--bk-text-13)",
-  fontWeight: 500,
-  lineHeight: "var(--bk-leading-normal)",
-  color: "var(--bk-ink-soft)",
-  textAlign: "center",
-};
-
-const cardBold: React.CSSProperties = {
-  color: "var(--bk-ink)",
-  fontWeight: 600,
-  marginRight: 4,
-};
-
-const dots: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  gap: 4,
-  paddingTop: 2,
-};
-
-const dot = (active: boolean): React.CSSProperties => ({
-  width: 5,
-  height: 5,
-  minHeight: 5,
-  padding: 0,
-  border: "none",
-  borderRadius: "var(--bk-radius-full)",
-  background: active ? "var(--bk-accent)" : "var(--bk-border-medium)",
-  cursor: "pointer",
-  transform: active ? "scale(1.1)" : "none",
-  transition: "background 120ms, transform 120ms",
-});
-
-// Simple hover-bg via inline handlers since we're avoiding new CSS classes.
 const hoverIn = (e: React.MouseEvent<HTMLElement>) => {
-  e.currentTarget.style.background = "var(--bk-bg-subtle)";
-  e.currentTarget.style.color = "var(--bk-ink)";
+  e.currentTarget.style.background = "var(--bk-accent-subtle)";
 };
 const hoverOut = (e: React.MouseEvent<HTMLElement>) => {
   e.currentTarget.style.background = "transparent";
-  e.currentTarget.style.color = "var(--bk-ink-muted)";
 };
 
 // ── Component ────────────────────────────────────────────────────────────────
@@ -139,107 +89,43 @@ export const TipsFooter: React.FC<TipsFooterProps> = ({
   tipIdx,
   onPrev,
   onNext,
-  onDotClick,
   dismissed = false,
   onDismiss,
-  collapsed = false,
-  onToggleCollapsed,
 }) => {
   if (dismissed) return null;
   const tip = TIPS[tipIdx];
 
-  if (collapsed) {
-    return (
-      <div
-        style={{ ...header, cursor: "pointer" }}
-        onClick={onToggleCollapsed}
-        role="button"
-        tabIndex={0}
-        aria-expanded={false}
-        aria-label="Expand Pro Tips"
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            onToggleCollapsed?.();
-          }
-        }}
-      >
-        <span style={label}>
-          <Lightbulb size={12} aria-hidden color="var(--bk-accent)" />
-          Pro tips
-        </span>
-        <span style={counter}>
-          {tipIdx + 1} / {TIPS.length}
-        </span>
-        <span style={{ ...arr, marginLeft: "auto" }} aria-hidden="true">
-          <ChevronUp size={12} />
-        </span>
-      </div>
-    );
-  }
-
   return (
-    <div style={wrap}>
-      <div style={header}>
-        <span style={label}>
-          <Lightbulb size={12} aria-hidden color="var(--bk-accent)" />
-          Pro tips
-        </span>
-        <span style={counter}>
-          {tipIdx + 1} / {TIPS.length}
-        </span>
-        <div style={nav}>
-          <Button
-            type="button"
-            style={arr}
-            onClick={onPrev}
-            onMouseEnter={hoverIn}
-            onMouseLeave={hoverOut}
-            aria-label="Previous tip"
-          >
-            <ChevronLeft size={12} />
-          </Button>
-          <Button
-            type="button"
-            style={arr}
-            onClick={onNext}
-            onMouseEnter={hoverIn}
-            onMouseLeave={hoverOut}
-            aria-label="Next tip"
-          >
-            <ChevronRight size={12} />
-          </Button>
-          {onToggleCollapsed && (
-            <Button
-              type="button"
-              style={arr}
-              onClick={onToggleCollapsed}
-              onMouseEnter={hoverIn}
-              onMouseLeave={hoverOut}
-              aria-label="Collapse tips"
-              aria-expanded={true}
-            >
-              <ChevronDown size={12} />
-            </Button>
-          )}
-        </div>
-      </div>
-      <div style={card}>
-        <strong style={cardBold}>{tip.bold}</strong>
+    <div style={strip} role="note" aria-label="Tips">
+      <span aria-hidden="true">💡</span>
+      <span style={counter}>
+        Tip {tipIdx + 1}/{TIPS.length}
+      </span>
+      <span style={body} title={`${tip.bold}${tip.body}`}>
+        <strong>{tip.bold}</strong>
         {tip.body}
-      </div>
-      <div style={dots}>
-        {TIPS.map((_, i) => (
+      </span>
+      <span style={nav}>
+        <Button type="button" style={arr} onClick={onPrev} onMouseEnter={hoverIn} onMouseLeave={hoverOut} aria-label="Previous tip">
+          <ChevronLeft size={12} />
+        </Button>
+        <Button type="button" style={arr} onClick={onNext} onMouseEnter={hoverIn} onMouseLeave={hoverOut} aria-label="Next tip">
+          <ChevronRight size={12} />
+        </Button>
+        {onDismiss && (
           <Button
-            key={i}
             type="button"
-            style={dot(i === tipIdx)}
-            onClick={() => onDotClick(i)}
-            aria-label={`Tip ${i + 1}`}
-            aria-current={i === tipIdx ? "true" : undefined}
-          />
-        ))}
-      </div>
+            style={arr}
+            onClick={onDismiss}
+            onMouseEnter={hoverIn}
+            onMouseLeave={hoverOut}
+            aria-label="Hide tips for this session"
+            title="Hide tips for this session — bring them back from Help"
+          >
+            <X size={12} />
+          </Button>
+        )}
+      </span>
     </div>
   );
 };

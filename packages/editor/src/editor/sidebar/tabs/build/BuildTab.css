@@ -13,15 +13,18 @@
   min-height: 0;
 }
 
+/* Board 137:7 — 36h search band, box inset 16 each side. */
 .bld-search-wrap {
-  padding: 10px 10px 0;
+  padding: var(--bk-space-4) var(--bk-space-16) var(--bk-space-4);
   flex-shrink: 0;
 }
 
+/* Rows and group headers are full-bleed (board 137) — each carries its own
+   16px inset, so the scroller adds none. */
 .bld-scroll {
   flex: 1;
   overflow-y: auto;
-  padding: var(--bk-space-4) 10px 10px;
+  padding: 0 0 10px;
   scrollbar-width: thin;
   scrollbar-color: var(--bk-border, var(--bk-border)) transparent;
 }
@@ -32,56 +35,38 @@
 }
 
 .bld-cat-item {
-  border-bottom: 1px solid var(--bk-border, var(--bk-border));
   position: relative;
 }
 
-.bld-cat-item:last-child {
-  border-bottom: none;
-}
-
+/* Group header — board 137:11: 32h row, text chevron at 16, 11/500 caps label
+   with 0.5px tracking, mono count at the right edge. Muted throughout; the
+   open state is the ▾ glyph, not a tinted row. */
 .bld-cat-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--bk-space-8);
-  padding: 7px 10px;
-  margin: 2px 0;
-  border-radius: 5px;
+  height: var(--bk-size-row);
+  gap: var(--bk-space-4);
+  padding: 0 var(--bk-space-16);
   cursor: pointer;
   background: transparent;
   transition: background 0.12s ease, color 0.12s ease;
   user-select: none;
-  font-family: var(--bk-font-ui, "Inter Tight", system-ui, sans-serif);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-family: var(--bk-font-ui);
+  font-size: var(--bk-text-11);
+  font-weight: 500;
+  letter-spacing: 0.5px;
   text-transform: uppercase;
-  color: var(--bk-ink-muted, var(--bk-ink-muted));
+  color: var(--bk-ink-muted);
 }
 
 .bld-cat-row:hover {
   background: var(--bk-bg-subtle);
-  color: var(--bk-ink, var(--bk-ink));
-}
-
-/* Open = active. Mirrors the canonical active-state pattern used across
-   rail (.ls-btn--active), pages (.pg-row--active), layers (.is-selected),
-   and the Settings split sub-nav: accent-tint background + accent color.
-   Same three-property treatment, no deviation. */
-.bld-cat-row.open,
-.bld-cat-row.open:hover {
-  background: var(--bk-accent-tint);
-  color: var(--bk-accent-text);
-}
-
-.bld-cat-row.open .bld-cat-count {
-  color: var(--bk-accent-text);
+  color: var(--bk-ink);
 }
 
 .bld-cat-row:focus-visible {
-  outline: 2px solid var(--bk-accent, var(--bk-accent));
-  outline-offset: 2px;
+  outline: 2px solid var(--bk-accent);
+  outline-offset: -2px;
   border-radius: 4px;
 }
 
@@ -95,27 +80,19 @@
 }
 
 .bld-cat-chev {
-  width: 10px;
-  height: 10px;
+  font-size: var(--bk-text-12);
+  font-weight: 400;
+  letter-spacing: 0;
+  width: 12px;
   flex-shrink: 0;
-  color: currentColor;
-  transition: transform 0.2s ease;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.8;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.bld-cat-row.open .bld-cat-chev {
-  transform: rotate(90deg);
+  text-align: left;
 }
 
 .bld-cat-count {
-  font-family: var(--bk-font-mono, "Geist Mono", ui-monospace, monospace);
-  font-size: 9px;
+  font-family: var(--bk-font-mono);
+  font-size: var(--bk-text-11);
   font-weight: 500;
-  color: var(--bk-ink-muted, var(--bk-ink-muted));
+  color: var(--bk-ink-muted);
   letter-spacing: 0;
   text-transform: none;
 }
@@ -137,46 +114,38 @@
   background: transparent;
 }
 
-/* ───── DS drop: flat 3-col block grid ───── */
+/* ───── Board 233:1108 "List row": elements are 32h rows, not cards.
+   12px muted glyph + 13px ink label, 16px inset, hover = subtle fill. ───── */
 .bld-el-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 5px;
-  padding: 2px 0;
+  display: block;
+  padding: 0;
 }
 
 .bld-el-card {
-  aspect-ratio: 1;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: var(--bk-space-4);
-  padding: 6px var(--bk-space-4);
-  border-radius: var(--bk-radius-md);
-  background: var(--bk-bg-card, var(--bk-bg-card));
-  border: 1px solid var(--bk-border, var(--bk-border));
-  color: var(--bk-ink, var(--bk-ink));
+  height: var(--bk-size-row);
+  gap: var(--bk-space-8);
+  padding: 0 var(--bk-space-16);
+  background: transparent;
+  color: var(--bk-ink);
   cursor: grab;
-  transition: background 120ms ease, border-color 120ms ease, color 120ms ease, box-shadow 120ms ease;
+  transition: background 120ms ease;
   position: relative;
   user-select: none;
 }
 
 .bld-el-card:hover {
-  background: var(--bk-accent-subtle);
-  border-color: var(--bk-accent, var(--bk-accent));
-  color: var(--bk-accent, var(--bk-accent));
+  background: var(--bk-bg-subtle);
 }
 
 .bld-el-card:active {
   cursor: grabbing;
-  transform: scale(0.96);
 }
 
 .bld-el-card:focus-visible {
-  outline: 2px solid var(--bk-accent, var(--bk-accent));
-  outline-offset: 2px;
+  outline: 2px solid var(--bk-accent);
+  outline-offset: -2px;
 }
 
 .bld-el-card:focus:not(:focus-visible) {
@@ -192,22 +161,15 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: var(--bk-radius-md);
-  background: var(--bk-bg-subtle);
-  color: var(--bk-ink-soft);
-  transition: background 120ms ease, color 120ms ease;
-}
-
-.bld-el-card:hover .bld-el-icon {
-  background: var(--bk-accent-tint);
-  color: var(--bk-accent);
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  color: var(--bk-ink-muted);
 }
 
 .bld-el-icon svg {
-  width: 16px;
-  height: 16px;
+  width: 12px;
+  height: 12px;
   color: currentColor;
   stroke: currentColor;
   stroke-width: 1.5;
@@ -215,25 +177,18 @@
   stroke-linejoin: round;
 }
 
-/* Duotone layering: shape primitives get a 12%-fill layer under the stroke
-   so icons read with depth rather than flat outlines. `line` and `polyline`
-   are stroke-only so they're excluded. */
-.bld-el-icon svg :is(rect, circle, ellipse, polygon, path) {
-  fill: currentColor;
-  fill-opacity: 0.14;
-}
-
 .bld-el-name {
-  font-family: var(--bk-font-ui, "Inter Tight", system-ui, sans-serif);
-  font-size: 9.5px;
-  font-weight: 500;
-  color: currentColor;
-  text-align: center;
-  line-height: 1.2;
+  flex: 1;
+  min-width: 0;
+  font-family: var(--bk-font-ui);
+  font-size: var(--bk-text-13);
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--bk-ink);
+  text-align: left;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 100%;
 }
 
 .bld-el-card--disabled {
@@ -373,11 +328,10 @@
   outline-offset: 2px;
 }
 
+/* Full-bleed: the TipsFooter strip (board 137:43) IS the bottom band — it
+   carries its own tint background, so no frame padding or border here. */
 .bld-panel-bottom {
   flex-shrink: 0;
-  border-top: 1px solid var(--bk-border);
-  padding: 10px var(--bk-space-12);
-  background: var(--bk-bg-panel);
 }
 
 .bld-kbd-hint {

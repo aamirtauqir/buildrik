@@ -34,21 +34,25 @@ export interface BuildTabProps {
   onClose?: () => void;
 }
 
-export const BuildTab: React.FC<BuildTabProps> = ({ composer, onBlockClick }) => {
+export const BuildTab: React.FC<BuildTabProps> = ({ composer, onBlockClick, onHelpClick, onClose }) => {
   const tab = useBuildTab(composer, onBlockClick);
   const callout = useCallout();
   const isSearching = tab.searchQuery.trim().length > 0;
 
-  // Global "/" shortcut: focus the Build tab search bar.
+  // Search focus shortcuts: "/" (typing-context-safe) and ⌘F (board 137:10 —
+  // hijacks browser find while the Insert panel is mounted, same as Figma).
   React.useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.key !== "/") return;
+      const isCmdF = (e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "f";
+      if (e.key !== "/" && !isCmdF) return;
       const target = e.target as HTMLElement | null;
       if (!target) return;
-      const tag = target.tagName;
-      const inTypingContext =
-        tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || target.isContentEditable;
-      if (inTypingContext) return;
+      if (!isCmdF) {
+        const tag = target.tagName;
+        const inTypingContext =
+          tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || target.isContentEditable;
+        if (inTypingContext) return;
+      }
       const input = document.getElementById("bld-search-input") as HTMLInputElement | null;
       if (!input) return;
       e.preventDefault();
@@ -63,7 +67,10 @@ export const BuildTab: React.FC<BuildTabProps> = ({ composer, onBlockClick }) =>
 
   return (
     <PanelFrame className="bld-container">
-      <PanelFrame.Header title="Insert" subtitle={blocksSubtitle} />
+      {/* 10A: Insert gets the full 16:6 header — help + close come from
+          PanelHeader itself (the `onHelpClick`/`onClose` PROPS; children are
+          silently dropped by this API). */}
+      <PanelFrame.Header title="Insert" subtitle={blocksSubtitle} onHelpClick={onHelpClick} onClose={onClose} />
 
       <div className="bld-content">
         <div
@@ -79,9 +86,9 @@ export const BuildTab: React.FC<BuildTabProps> = ({ composer, onBlockClick }) =>
             id="bld-search-input"
             value={tab.searchQuery}
             onChange={tab.setSearchQuery}
-            placeholder="Describe or search to insert…  /"
+            placeholder="Search elements"
             debounceMs={150}
-            kbdHint="⌘K"
+            kbdHint="⌘F"
           />
         </div>
 

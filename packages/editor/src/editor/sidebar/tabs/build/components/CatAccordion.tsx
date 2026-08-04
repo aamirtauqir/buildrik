@@ -63,12 +63,10 @@ export const CatAccordion: React.FC<CatAccordionProps> = ({
         aria-expanded={isOpen}
         aria-controls={bodyId}
       >
+        <span className="bld-cat-chev" aria-hidden="true">{isOpen ? "▾" : "▸"}</span>
         <span className="bld-cat-name">{cat.name}</span>
         <span className="bld-cat-spacer" />
         <span className="bld-cat-count">{flatElements.length}</span>
-        <svg className="bld-cat-chev" viewBox="0 0 24 24">
-          <path d="M9 18l6-6-6-6" />
-        </svg>
       </div>
       <div id={bodyId} className={`bld-cat-body${isOpen ? " open" : ""}`}>
         <div className="bld-cat-body-inner">
