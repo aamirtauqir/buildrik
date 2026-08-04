@@ -22,10 +22,10 @@
  */
 
 import * as React from "react";
-import { PanelFrame, Button, IconButton, SkeletonBlock, TextField } from "@/editor/chrome-ui";
+import { PanelFrame, Button, IconButton, Menu, MenuItem, Popover, SkeletonBlock, TextField } from "@/editor/chrome-ui";
 import { Search, Upload, Cloud, Folder, ChevronDown, LayoutGrid, Rows3, ArrowUpDown } from "lucide-react";
 import type { Composer } from "@/engine/Composer";
-import type { LibraryItem, MediaTypeFilter, TypeCounts, UploadProgress } from "../data/mediaTypes";
+import type { LibraryItem, MediaFolder, MediaTypeFilter, TypeCounts, UploadProgress } from "../data/mediaTypes";
 import { TypePills } from "./TypePills";
 import { SelectionContextBar } from "./SelectionContextBar";
 import { AssetCell } from "./AssetCell";
@@ -60,6 +60,12 @@ interface SlimLauncherProps {
    * per-asset menu, it costs the bar no chrome the board does not have, and
    * the way out (Done) is visible the whole time selection is on.
    */
+  // ── Folder scope (board `145:49`) ────────────────────────────────────────
+  /** null = the whole library. */
+  currentFolderId?: string | null;
+  allFolders?: MediaFolder[];
+  onFolderChange?(folderId: string | null): void;
+
   selectionMode?: boolean;
   selectedKeys?: Set<string>;
   onEnterSelection?(key: string): void;
@@ -97,6 +103,12 @@ export function SlimLauncher(props: SlimLauncherProps) {
   // The footer's Upload link drives UploadZone's file input rather than
   // duplicating one: two inputs would mean two accept-lists to keep in step.
   const uploadInputRef = React.useRef<HTMLInputElement>(null);
+  const [folderMenuOpen, setFolderMenuOpen] = React.useState(false);
+  // "All" is the honest label for the whole library; a folder that has been
+  // deleted while its id is still selected falls back to it rather than
+  // rendering an empty scope name.
+  const currentFolderName =
+    (props.allFolders ?? []).find((f) => f.id === props.currentFolderId)?.name ?? "All";
 
   // Filter items by activeType + search query
   const filtered = React.useMemo(() => {
@@ -146,11 +158,55 @@ export function SlimLauncher(props: SlimLauncherProps) {
         says nothing at all. They light up with the folder work (T12).
       */}
       <div className="tw:flex tw:h-8 tw:items-center tw:gap-2 tw:px-4" data-testid="media-folder-row">
-        <span className="tw:flex tw:min-w-0 tw:flex-1 tw:items-center tw:gap-1.5 tw:text-[13px] tw:text-gray-900">
-          <Folder size={14} className="tw:text-gray-500" aria-hidden="true" />
-          <span className="tw:truncate">All</span>
-          <ChevronDown size={12} className="tw:text-gray-500" aria-hidden="true" />
-        </span>
+        <Popover
+          open={folderMenuOpen}
+          onClose={() => setFolderMenuOpen(false)}
+          placement="bottom"
+          label="Folder"
+          trigger={
+            <Button
+              type="button"
+              color="light"
+              size="xs"
+              className="tw:min-h-6 tw:max-w-full tw:gap-1.5 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:text-gray-900 tw:enabled:hover:bg-transparent"
+              aria-expanded={folderMenuOpen}
+              data-testid="media-folder-scope"
+              onClick={() => setFolderMenuOpen((v) => !v)}
+              disabled={(props.allFolders?.length ?? 0) === 0}
+            >
+              {/* flowbite's Button renders its children inside its own span,
+                  so the gap has to live on that span, not on the button. */}
+              <span className="tw:flex tw:min-w-0 tw:items-center tw:gap-1.5">
+                <Folder size={14} className="tw:text-gray-500" aria-hidden="true" />
+                <span className="tw:truncate">{currentFolderName}</span>
+                <ChevronDown size={12} className="tw:text-gray-500" aria-hidden="true" />
+              </span>
+            </Button>
+          }
+        >
+          <Menu label="Folder">
+            <MenuItem
+              onClick={() => {
+                setFolderMenuOpen(false);
+                props.onFolderChange?.(null);
+              }}
+            >
+              All
+            </MenuItem>
+            {(props.allFolders ?? []).map((f) => (
+              <MenuItem
+                key={f.id}
+                onClick={() => {
+                  setFolderMenuOpen(false);
+                  props.onFolderChange?.(f.id);
+                }}
+              >
+                {f.name}
+              </MenuItem>
+            ))}
+          </Menu>
+        </Popover>
+        <span className="tw:flex-1" />
         <span className="tw:flex tw:items-center tw:gap-1 tw:text-gray-600" data-testid="media-view-controls">
           <IconButton label="Grid view" size="sm" pressed disabled>
             <LayoutGrid size={14} />

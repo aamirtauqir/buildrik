@@ -301,6 +301,20 @@ const CASES: Record<string, () => React.ReactElement> = {
   "media-drawer-no-results": () => (
     <div data-probe="media-drawer-no-results">{mediaDrawer({ searchQuery: "zzzz" })}</div>
   ),
+  "media-drawer-folder-scoped": () => (
+    <div data-probe="media-drawer-folder-scoped">
+      {mediaDrawer({
+        currentFolderId: "f1",
+        allFolders: [
+          { id: "f1", name: "Brand", parentId: null, createdAt: "", updatedAt: "" },
+          { id: "f2", name: "Screenshots", parentId: null, createdAt: "", updatedAt: "" },
+        ],
+        onFolderChange: () => {},
+        libraryItems: [MEDIA_ITEMS[0], MEDIA_ITEMS[1]],
+        counts: { all: 2, img: 2, vid: 0, ico: 0, fnt: 0 },
+      })}
+    </div>
+  ),
   "media-drawer-bulk-select": () => (
     <div data-probe="media-drawer-bulk-select">
       {mediaDrawer({

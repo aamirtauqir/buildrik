@@ -259,6 +259,9 @@ function MediaTabWithComposer({
         loading={state.libraryLoading}
         loadError={state.libraryError}
         onRetryLoad={state.retryLibraryLoad}
+        currentFolderId={state.currentFolderId}
+        allFolders={state.allFolders}
+        onFolderChange={state.setCurrentFolderId}
         selectionMode={state.selMode}
         selectedKeys={state.selectedKeys}
         onEnterSelection={(key) => {
