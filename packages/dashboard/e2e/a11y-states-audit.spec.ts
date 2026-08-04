@@ -58,5 +58,5 @@ test("the focus ring token resolves to the design accent", async ({ page }) => {
   const accent = await page.evaluate(() =>
     getComputedStyle(document.documentElement).getPropertyValue("--color-primary").trim()
   );
-  expect(accent.toUpperCase()).toBe("#406ED6");
+  expect(accent.toUpperCase()).toBe("#1A56DB");
 });

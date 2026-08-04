@@ -10,20 +10,20 @@
 import { describe, it, expect } from "vitest";
 import { DEFAULT_ELEMENT_STYLES, getDefaultStyles } from "../defaultStyles";
 
-const RETIRED_COBALT = /#2d6dff/i;
-const ACCENT = "#406ED6";
+const RETIRED_ACCENTS = /#2d6dff|#406ed6/i;
+const ACCENT = "#1A56DB";
 
 describe("default element styles carry the current accent", () => {
-  it("paints a new button and link with the accent, not the retired cobalt", () => {
+  it("paints a new button and link with the accent, not a retired blue", () => {
     expect(DEFAULT_ELEMENT_STYLES.button?.["background-color"]).toBe(ACCENT);
     expect(DEFAULT_ELEMENT_STYLES.link?.color).toBe(ACCENT);
   });
 
-  it("has no retired cobalt anywhere in the default palette", () => {
+  it("has no retired accent anywhere in the default palette", () => {
     const offenders: string[] = [];
     for (const [type, styles] of Object.entries(DEFAULT_ELEMENT_STYLES)) {
       for (const [prop, value] of Object.entries(styles)) {
-        if (RETIRED_COBALT.test(value)) offenders.push(`${type}.${prop} = ${value}`);
+        if (RETIRED_ACCENTS.test(value)) offenders.push(`${type}.${prop} = ${value}`);
       }
     }
     expect(offenders).toEqual([]);

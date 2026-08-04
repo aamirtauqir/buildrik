@@ -10,11 +10,12 @@
 
 // Theme constants - use actual values (not CSS vars) so they display properly in Inspector
 const THEME = {
-  // Missed by the 2026-07-21 cobalt → #406ED6 migration. This is the colour
-  // every newly-created button, link, blockquote rule and form accent gets,
-  // and the Inspector's fallback swatch — so the retired brand blue was still
-  // being handed to user sites long after the accent moved.
-  primary: "#406ED6",
+  // This is the colour every newly-created button, link, blockquote rule and
+  // form accent gets, and the Inspector's fallback swatch. It must track the
+  // single product accent (DESIGN.md) — it lagged behind BOTH accent
+  // migrations (cobalt→#406ED6 2026-07-21, #406ED6→#1A56DB 2026-07-30), each
+  // time handing a retired brand blue to user sites.
+  primary: "#1A56DB",
   textPrimary: "#1a1a1a",
   textSecondary: "#333333",
   fontFamily: "Inter, sans-serif",

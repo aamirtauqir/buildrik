@@ -12,13 +12,13 @@ import type React from "react";
 
 /**
  * Buildrik Brand Accent Palette
- * References CSS variables from themes/design-system/color.css (canonical
- * cobalt accent ramp). Renamed from BRAND_PURPLE 2026-04-26 — name was
- * a pre-cobalt-era leftover; values were already pointing at cobalt vars.
+ * References the generated --bk-* accent ramp (themes/tokens.generated.css).
+ * Renamed from BRAND_PURPLE 2026-04-26 — name was a pre-cobalt-era leftover;
+ * values were already pointing at accent vars.
  */
 export const BRAND_ACCENT = {
-  // Core shades — resolve via cobalt accent ramp (color.css:33-37)
-  DEFAULT: "var(--bk-accent)", // #406ED6 — Main accent
+  // Core shades — resolve via the generated accent ramp
+  DEFAULT: "var(--bk-accent)", // #1A56DB — Main accent
   light: "var(--bk-accent-subtle)", // Faint accent background
   dark: "var(--bk-accent-pressed)", // Active/pressed states
   subtle: "var(--bk-accent-tint)", // Very light accent tint
