@@ -4,6 +4,8 @@
 
 Next.js 16 (App Router, Turbopack) | React 19 | Tailwind CSS 4 | tRPC 11 | NextAuth 5 | Prisma 5 | PostgreSQL | Nodemailer (SMTP) | Zod
 
+These runtime deps live in the **root** `package.json`, not `packages/dashboard/package.json` (which holds only package-local deps: `@buildrik/editor`, `flowbite-react`, `@emotion/react`).
+
 ## Architecture
 
 ```
@@ -56,7 +58,7 @@ whole stale section that two careful readings missed. It is an audit, not a gate
 
 ### Global Invariants
 
-- Validation schemas live only in `packages/shared/schemas/` (SSOT).
+- Shared/domain validation schemas live in `packages/shared/schemas/` (SSOT). tRPC routers may define endpoint-input `z.object`s inline (~110 exist today); anything used by 2+ consumers or crossing the transport boundary goes in shared. (This line said "only in shared" until 2026-08-04, which the routers never obeyed.)
 - One accent color: `#1A56DB` (Flowbite blue-700; was `#406ED6`, migrated 2026-07-30). Purple/violet/indigo banned (DESIGN.md).
 - Never instantiate external clients at module level — lazy-init.
 - `../../` relative imports banned; use path aliases.
@@ -73,7 +75,7 @@ No file should exist only to re-export from another file. If `router.ts` just re
 If two places do the same thing with different variable names, extract to one source. But don't extract things that merely look similar — only extract when the duplication is semantic (same intent, same rules).
 
 ### Single Source of Truth (SSOT)
-- Zod schemas live in `packages/shared/schemas/`. Don't recreate validation logic in services or routers.
+- Shared/domain Zod schemas live in `packages/shared/schemas/`. Routers may define their own endpoint-input schemas inline, but never duplicate a schema that exists in shared; services take validation from shared, never their own copies.
 - DB schema is Prisma. Don't maintain parallel type definitions.
 - Auth config lives in `server/auth.config.ts`. Don't scatter provider logic.
 - Email templates live in `packages/dashboard/emails/`. Don't inline HTML in services.
@@ -143,7 +145,7 @@ In QA mode, flag any code that doesn't match DESIGN.md — especially: purple/vi
 
 Key constraints:
 - Editor chrome uses the canonical light theme per DESIGN.md (see Color / Token Namespace Contract sections). Desktop-only. Dark-only direction was flipped 2026-04-18 in the theme unification.
-- Single accent color: `#1A56DB` (Flowbite blue-700, hover `#1E429F`; migrated 2026-07-30 from `#406ED6` across dashboard, auth, onboarding — editor already shipped it 2026-07-28; legacy indigo/violet tokens fully drained as of 2026-06-12). One blue everywhere per DESIGN.md.
+- Single accent color: `#1A56DB` (Flowbite blue-700, hover `#1E429F`; migrated 2026-07-30 from `#406ED6` across dashboard, auth, onboarding — editor **chrome** shipped it 2026-07-28, but the canvas element defaults (`defaultStyles.ts`), the DS-linter copy, the `gate:figma` expectation table and the e2e accent assert all sat on `#406ED6` until the 2026-08-04 drain; legacy indigo/violet tokens fully drained as of 2026-06-12). One blue everywhere per DESIGN.md. Note: dashboard `gate:figma` (`check-figma-conformance.mjs`) is wired into **no** verify chain — it sat red for 5 days unnoticed; run it by hand.
 - Typography: **Inter** for body/UI everywhere — editor chrome and dashboard (moved off Inter Tight 2026-07-26 with the DS replacement; auth + onboarding still run Inter Tight until their own reskin). General Sans is display, marketing site only. Geist Mono is data, with `tabular-nums`. **No system fallbacks named in any stack** — no `system-ui`, `-apple-system`, `Roboto`, `Helvetica`, `Arial`, `Segoe UI` (DESIGN.md §Typography, anti-slop rule 8). This line said "Inter Tight or Geist" until 2026-08-03.
 - 4px base spacing, compact density.
 - Minimal motion. No spring physics, no scroll choreography.
@@ -205,6 +207,7 @@ Sites deploy into **the workspace's own Vercel account** via per-workspace OAuth
 | `ENCRYPTION_KEY` | 32-byte hex (`openssl rand -hex 32`) for AES-256-GCM token-at-rest. Rotate by re-encrypting all rows. | Yes for publishing |
 | `VERCEL_PROJECT_PREFIX` | Optional prefix on generated Vercel project names. | No |
 | `VERCEL_TOKEN` | Shared Vercel API token from the retired "Buildrick hosts everything" model. Nothing in the publish path reads it now. | No — legacy |
+| `PUBLISH_ALLOW_SIMULATION` | `true` opts into the no-credentials simulation publish path: the pre-publish Vercel-connection check is skipped and the worker falls through to `runSimulation` (fake deploy, placeholder URL) — `publish.service.ts:238,514`. Dev-only local loop; deliberately an explicit opt-in, NOT keyed on `NODE_ENV` (that split dev/prod publish paths once — see the dev-fallback incidents). | **Never in production** — a truthy value makes publishes "succeed" without deploying anything |
 
 **There is no `VERCEL_OAUTH_REDIRECT_URI`.** The callback is registered with Vercel at integration-registration time, and the callback route derives its own `redirect_uri` from the request (`${url.protocol}//${url.host}/api/integrations/vercel/callback`). Setting this var does nothing.
 
@@ -215,12 +218,13 @@ number. `billing.createCheckoutSession` resolves/creates a Stripe customer and
 returns a Checkout URL; the plan is flipped to ACTIVE **only** by the verified
 `checkout.session.completed` webhook (`handleCheckoutCompleted` in
 `stripe-webhook.service.ts`), never by the session-creation call itself — see the
-security invariant documented at `billing.service.ts:158` (now `createCheckoutSession`).
+security invariant above `createCheckoutSession` (`billing.service.ts:190`), plus
+the companion self-grant invariant above `resolveStripeCustomerId` (`:159`).
 
 | Var | Purpose | Required? |
 |-----|---------|-----------|
 | `STRIPE_SECRET_KEY` | Server-side Stripe API key. Without it, `getStripe()` throws `PAYMENTS_NOT_CONFIGURED` — Checkout/Portal session creation fails cleanly (tRPC `PRECONDITION_FAILED`), it does not crash. | Yes for billing |
-| `STRIPE_WEBHOOK_SECRET` | HMAC secret for the raw-signature verification in `app/api/webhooks/stripe/route.ts` (no Stripe SDK involved in verification — see the 5-min replay-window check there). Now load-bearing: without it every webhook 500s (`route.ts:47-51`) and no plan ever reaches ACTIVE, no matter how many customers pay. | Yes for billing |
+| `STRIPE_WEBHOOK_SECRET` | HMAC secret for the raw-signature verification in `app/api/webhooks/stripe/route.ts` (no Stripe SDK involved in verification — see the 5-min replay-window check there). Now load-bearing: without it every webhook 500s (`route.ts:48-52`) and no plan ever reaches ACTIVE, no matter how many customers pay. | Yes for billing |
 | `STRIPE_PRICE_PRO_MONTHLY` / `STRIPE_PRICE_PRO_YEARLY` | Stripe Price ids for the Pro plan (created in the Stripe dashboard from `lib/constants/plan-limits.ts`'s PRO pricing — $29/mo, $23/mo billed yearly). Also used in reverse by the webhook to map an incoming Stripe price id back to `plan: "PRO"`. | Yes for billing |
 | `STRIPE_PRICE_BUSINESS_MONTHLY` / `STRIPE_PRICE_BUSINESS_YEARLY` | Same, for Business ($79/mo, $63/mo billed yearly). | Yes for billing |
 
@@ -258,8 +262,9 @@ a green suite.
 | Var | Purpose | Required? |
 |-----|---------|-----------|
 | `OPENAI_API_KEY` | AI site generation. Without it every `ai-generate-worker` job fails on "Missing credentials" and the AI onboarding path dies (the UI degrades to "AI drafting isn't configured yet"). | Yes if the AI path is offered |
-| `ANTHROPIC_API_KEY` | Claude models, where selected. | Only for Claude models |
 | `OLLAMA_BASE_URL` / `OLLAMA_MODEL` / `OLLAMA_TIMEOUT_MS` | Local model provider. | Only for local AI |
+
+(An `ANTHROPIC_API_KEY` row sat here until 2026-08-04 — nothing in the code reads it; the Claude alt-text path that did was removed. Re-add the row only with the `process.env` read.)
 
 ### Editor
 
@@ -268,6 +273,14 @@ a green suite.
 | `NEXT_PUBLIC_UNIFIED_EDITOR` | Graduates the in-Next editor at `/edit/:id`. When unset/`false`, the dashboard "Edit" link falls back to the legacy `NEXT_PUBLIC_EDITOR_URL` (`localhost:5050/?siteId=`) standalone demo, which is dev-only and doesn't load real projects. Set `true` in dev (`.env.local`) and in prod. | Yes — without it, "Edit site" points at the dead demo |
 | `EDITOR_ORIGIN` | Origin allowed to call the tRPC endpoint cross-origin. | Yes in production |
 | `NEXT_PUBLIC_EDITOR_URL` | Legacy standalone-editor URL. Only read when `NEXT_PUBLIC_UNIFIED_EDITOR` is off. | No |
+
+### Observability (Sentry)
+
+| Var | Purpose | Required? |
+|-----|---------|-----------|
+| `SENTRY_DSN` | Server + edge error reporting (`sentry.server.config.ts`, `sentry.edge.config.ts`). Init is `enabled` only when `NODE_ENV=production`. | No — server errors just go unreported |
+| `NEXT_PUBLIC_SENTRY_DSN` | Client-side error reporting (`sentry.client.config.ts` skips init when unset). **Baked at build time** like all `NEXT_PUBLIC_*`. | No |
+| `SENTRY_ORG` / `SENTRY_PROJECT` / `SENTRY_AUTH_TOKEN` | Build-time only: source-map upload + release tagging via `withSentryConfig` (`next.config.mjs`). `SENTRY_AUTH_TOKEN` is read internally by the Sentry plugin, not through our source. | No — builds work without them |
 
 ### Optional / partially built
 
@@ -279,7 +292,7 @@ a green suite.
 ### Before you deploy
 
 ```bash
-npm run env:check:prod     # pulls the LIVE cPanel env and checks it
+pnpm run env:check:prod     # pulls the LIVE cPanel env and checks it
 ```
 
 `scripts/check-prod-env.mjs` already required `GOOGLE_CLIENT_ID`, `GITHUB_CLIENT_ID`,

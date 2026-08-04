@@ -195,6 +195,17 @@ requirePresent("VERCEL_INTEGRATION_ID");
 requirePresent("VERCEL_CLIENT_ID");
 requirePresent("VERCEL_CLIENT_SECRET");
 
+// PUBLISH_ALLOW_SIMULATION=true skips the Vercel-connection pre-check and lets
+// the worker fall through to runSimulation — publishes "succeed" with a
+// placeholder URL and deploy nothing. Dev-only opt-in; in prod it silently
+// replaces the entire publish path (the same dev-fallback class that hid three
+// prod outages).
+if (!isDev && env.PUBLISH_ALLOW_SIMULATION === "true") {
+  fail("PUBLISH_ALLOW_SIMULATION", "set to `true` in production — every publish would be a fake simulation deploy");
+} else {
+  pass("PUBLISH_ALLOW_SIMULATION");
+}
+
 // Payments. Without STRIPE_SECRET_KEY, checkout/portal session creation fails
 // (cleanly — PRECONDITION_FAILED, not a crash) but billing.ts CLAUDE.md still
 // documents these as required once billing ships, and this script's whole
