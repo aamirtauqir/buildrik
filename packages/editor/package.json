@@ -42,6 +42,7 @@
     "conformance:extract": "node scripts/conformance/extract.mjs",
     "conformance:measure": "node scripts/conformance/measure.mjs",
     "conformance:diff": "node scripts/conformance/diff.mjs",
+    "conformance:serve": "bash scripts/conformance/serve.sh",
     "gate:hooks": "node scripts/conformance/check-hooks.mjs"
   },
   "dependencies": {

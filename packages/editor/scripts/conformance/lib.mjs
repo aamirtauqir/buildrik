@@ -314,6 +314,59 @@ export function runEvery(scriptPath, args) {
   return 0;
 }
 
+// ── Argument parsing ───────────────────────────────────────────────────────
+
+/**
+ * Parse `<id...> [--flags]` with a known-flag allowlist.
+ *
+ * Every script used `args.find(a => !a.startsWith("--"))`, which silently
+ * accepts any flag at all. Two consequences that were live:
+ *
+ *   `extract.mjs --help`            -> no id found -> extracted and REWROTE
+ *                                      every committed spec. Idempotent today;
+ *                                      a 287-file commit the day
+ *                                      EXTRACTOR_VERSION bumps.
+ *   `diff.mjs s --update-baselin`   -> typo ignored, prints PASS, exits 0, and
+ *                                      does not update the baseline.
+ *
+ * Unknown flags exit 64 (EX_USAGE). Deliberately NOT 2 — that is STALE in this
+ * harness's taxonomy, and three scripts were overloading it for usage errors.
+ */
+export function parseArgs(argv, { script, usage, flags = {} }) {
+  const ids = [];
+  const seen = new Map();
+  for (let i = 0; i < argv.length; i++) {
+    const a = argv[i];
+    if (!a.startsWith("--")) { ids.push(a); continue; }
+    if (!(a in flags)) {
+      const known = Object.keys(flags).join(" ");
+      console.error(
+        `[${script}] unknown flag ${a}\n` +
+        `          cause: flags are allowlisted so a typo cannot be silently ignored.\n` +
+        `          fix:   ${usage}\n` +
+        `                 known flags: ${known || "(none)"}`,
+      );
+      process.exit(64);
+    }
+    if (flags[a] === "value") {
+      const v = argv[++i];
+      if (v == null || v.startsWith("--")) {
+        console.error(`[${script}] ${a} needs a value\n          fix:   ${usage}`);
+        process.exit(64);
+      }
+      seen.set(a, v);
+    } else {
+      seen.set(a, true);
+    }
+  }
+  return {
+    ids,
+    id: ids[0],
+    has: (f) => seen.has(f),
+    get: (f) => seen.get(f) ?? null,
+  };
+}
+
 // ── Baseline: ONE file, two writers, one merge rule ────────────────────────
 
 /**

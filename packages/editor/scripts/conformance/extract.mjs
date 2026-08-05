@@ -58,7 +58,7 @@ import { fileURLToPath } from "node:url";
 
 // Version lives in lib.mjs so a consumer can read it without executing an
 // extraction — this file does its work at module top level.
-import { EXTRACTOR_VERSION, figmaTokenValue, compareValue } from "./lib.mjs";
+import { EXTRACTOR_VERSION, figmaTokenValue, compareValue, parseArgs } from "./lib.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const RAW_DIR = join(HERE, "raw-figma");
@@ -134,12 +134,31 @@ const propsFrom = (className) => {
   return props;
 };
 
-const surfaceArg = process.argv.slice(2).find((a) => !a.startsWith("--"));
-const surfaces = surfaceArg
-  ? [surfaceArg]
-  : existsSync(RAW_DIR)
+const USAGE = "usage: extract.mjs <surface-id> | --all | --list";
+const cli = parseArgs(process.argv.slice(2), {
+  script: "extract",
+  usage: USAGE,
+  flags: { "--all": "bool", "--list": "bool" },
+});
+
+const everySurface = () =>
+  existsSync(RAW_DIR)
     ? readdirSync(RAW_DIR).filter((f) => f.endsWith(".json")).map((f) => f.replace(/\.json$/, ""))
     : [];
+
+if (cli.has("--list")) {
+  for (const s of everySurface()) console.log(s);
+  process.exit(0);
+}
+
+// Bulk extraction must be asked for. Bare `extract.mjs` used to rewrite every
+// committed spec, so `--help` — an unknown flag that found no id — performed a
+// bulk write to tracked artifacts.
+if (!cli.id && !cli.has("--all")) {
+  console.error(`[extract] ${USAGE}\n          --all rewrites every committed spec; say so explicitly.`);
+  process.exit(64);
+}
+const surfaces = cli.id ? [cli.id] : everySurface();
 
 if (!surfaces.length) {
   console.error(`[extract] no raw-figma input. Expected ${RAW_DIR}/<surface>.json — an agent step writes it.`);

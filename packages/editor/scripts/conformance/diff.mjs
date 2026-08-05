@@ -37,7 +37,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   compareValue, figmaTokenToBk, figmaTokenValue, readRecipe, runEvery,
-  readBaseline, patchBaseline, EXTRACTOR_VERSION,
+  readBaseline, patchBaseline, parseArgs, EXTRACTOR_VERSION,
 } from "./lib.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -48,12 +48,19 @@ const RAW = join(HERE, "raw-figma");
 const BASELINE = join(HERE, ".conformance-baseline.json");
 
 const args = process.argv.slice(2);
-if (args.includes("--all")) process.exit(runEvery(import.meta.filename, args));
-const surfaceId = args.find((a) => !a.startsWith("--"));
-const updateBaseline = args.includes("--update-baseline");
+const USAGE = "usage: diff.mjs <surface-id> [--update-baseline] | --all";
+const cli = parseArgs(args, {
+  script: "diff",
+  usage: USAGE,
+  flags: { "--all": "bool", "--update-baseline": "bool" },
+});
+if (cli.has("--all")) process.exit(runEvery(import.meta.filename, args));
+const surfaceId = cli.id;
+const updateBaseline = cli.has("--update-baseline");
 if (!surfaceId) {
-  console.error("usage: diff.mjs <surface-id> [--update-baseline] | --all");
-  process.exit(2);
+  // 64 (EX_USAGE), not 2 — 2 means STALE in this harness's taxonomy.
+  console.error(`[diff] ${USAGE}\n       --all is what CI runs.`);
+  process.exit(64);
 }
 
 const die = (code, msg) => { console.error(`[diff] ${msg}`); process.exit(code); };

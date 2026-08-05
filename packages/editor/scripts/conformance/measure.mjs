@@ -20,26 +20,57 @@ import * as playwright from "playwright-core";
 // mechanics, different question. See e2e/lib/measure-lib.mjs.
 import { launchPinnedBrowser, fontsLoadedStatus } from "../../e2e/lib/measure-lib.mjs";
 // Recipe schema lives in lib.mjs so every consumer reads the same rules.
-import { validateRecipe, runEvery, readBaseline, patchBaseline } from "./lib.mjs";
+import { validateRecipe, runEvery, readBaseline, patchBaseline, parseArgs } from "./lib.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SURFACES = join(HERE, "surfaces");
 const OUT_DIR = join(HERE, "measured");
 
 const args = process.argv.slice(2);
-if (args.includes("--list")) {
+const USAGE = "usage: measure.mjs <surface-id> [--url <base>] [--update-baseline] | --all | --list";
+const cli = parseArgs(args, {
+  script: "measure",
+  usage: USAGE,
+  flags: { "--all": "bool", "--list": "bool", "--update-baseline": "bool", "--url": "value" },
+});
+if (cli.has("--list")) {
   for (const f of readdirSync(SURFACES)) console.log(f.replace(/\.json$/, ""));
   process.exit(0);
 }
-if (args.includes("--all")) process.exit(runEvery(import.meta.filename, args));
-const surfaceId = args.find((a) => !a.startsWith("--"));
+if (cli.has("--all")) process.exit(runEvery(import.meta.filename, args));
+const surfaceId = cli.id;
 if (!surfaceId) {
-  console.error("usage: measure.mjs <surface-id> [--url <base>] | --all | --list");
-  process.exit(2);
+  // 64 (EX_USAGE), not 2 — 2 means STALE in this harness's taxonomy.
+  console.error(`[measure] ${USAGE}`);
+  process.exit(64);
 }
-const urlFlag = args.indexOf("--url");
-const recipe = JSON.parse(readFileSync(join(SURFACES, `${surfaceId}.json`), "utf8"));
-const baseUrl = urlFlag !== -1 ? args[urlFlag + 1] : (recipe.url ?? "http://localhost:5050/");
+const recipePath = join(SURFACES, `${surfaceId}.json`);
+if (!existsSync(recipePath)) {
+  console.error(
+    `[measure] no recipe at ${recipePath}\n` +
+    `          cause: "${surfaceId}" is not a surface this harness knows.\n` +
+    `          fix:   \`node scripts/conformance/measure.mjs --list\` shows every surface id,\n` +
+    `                 or copy scripts/conformance/surfaces/layers-loading.json as a starting point.`,
+  );
+  process.exit(3);
+}
+const recipe = JSON.parse(readFileSync(recipePath, "utf8"));
+const baseUrl = cli.get("--url") ?? recipe.url ?? "http://localhost:5050/";
+
+/**
+ * The server a URL expects, named so a connection refusal is actionable.
+ *
+ * Two roots, and this is the single most common way a first run fails: `:5050`
+ * is the demo app, `:5051` is the component probe (a different vite root), and
+ * eight of the nine shipped recipes use the probe. The README documents only
+ * the first, so "I started the server" is usually "I started the wrong one".
+ */
+const serverFor = (url) => {
+  const port = (() => { try { return new URL(url).port; } catch { return ""; } })();
+  if (port === "5051") return "npx vite . --port 5051 --strictPort   # probe host";
+  if (port === "5050") return "npx vite --port 5050   # demo app";
+  return `a server on ${url}`;
+};
 
 // The `channel: "chrome"` fallback that used to live here is gone (2026-08-03).
 // Falling back meant the same commit could be measured in two different
@@ -57,7 +88,23 @@ const page = await browser.newPage({ viewport: recipe.viewport ?? { width: 1440,
 // domcontentloaded + the recipe's own waitFor steps — networkidle is flaky
 // under load (vite dev serves hundreds of modules) and never settles on
 // pages that poll.
-await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120000 });
+try {
+  await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120000 });
+} catch (err) {
+  // Uncaught, this threw a node stack trace and exited 1 — which in this
+  // harness's taxonomy means FAIL, "a measured value did not match its spec".
+  // It is the most likely error in the whole tool reported as the one code
+  // that sends a newcomer off to debug their CSS. Nothing was measured, so it
+  // is 3 (MISSING), and the fix is the server command for this recipe's URL.
+  console.error(
+    `[measure] could not open ${baseUrl}\n` +
+    `          cause: ${err.message.split("\n")[0]}\n` +
+    `          fix:   start the server this surface measures against, then re-run:\n` +
+    `                 ${serverFor(baseUrl)}`,
+  );
+  await browser.close();
+  process.exit(3);
+}
 
 // Fonts before geometry. `domcontentloaded` says nothing about whether the UI
 // typeface has resolved, and every text-dependent measurement below is wrong if
@@ -66,7 +113,14 @@ await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120000 });
 // but "loaded" — see measure-lib.mjs for why the obvious one-liner no-ops.
 const fontStatus = await fontsLoadedStatus(page);
 if (fontStatus !== "loaded") {
-  console.error(`[measure] fonts did not finish loading (status=${fontStatus}) — refusing to measure`);
+  console.error(
+    `[measure] fonts did not finish loading (status=${fontStatus}) — refusing to measure\n` +
+    `          cause: every text measurement below would be taken against a fallback face.\n` +
+    `          fix:   "unloaded" usually means the page served no @font-face — check that\n` +
+    `                 src/themes/fonts.css is imported by the host at ${baseUrl}.\n` +
+    `                 "loading" means it timed out; re-run, and if it persists check that\n` +
+    `                 src/themes/fonts/*.woff2 are being served (10 files expected).`,
+  );
   await browser.close();
   process.exit(3);
 }
