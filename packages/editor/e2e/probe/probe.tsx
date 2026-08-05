@@ -24,6 +24,20 @@ import { createRoot } from "react-dom/client";
 // — see the note at the top of themes/default.css. Without it this probe has no
 // webfont at all, which is how 106 baseline entries came to record
 // `font-family: "Times"`.
+/* flowbite-react's `tw:` prefix, BEFORE any flowbite component renders.
+   Without this the probe measured bare OS buttons, not our components:
+   flowbiteStore.ts:15 — "with prefix set but version undefined, resolveTheme's
+   prefix branch never fires and classes render unprefixed" — and unprefixed
+   classes do not exist in a `tw:`-prefixed Tailwind build, so every flowbite
+   class resolved to nothing. The proof was sitting in the committed baseline:
+   a `<Button size="xs">` recorded background-color rgb(239,239,239)
+   (UA buttonface), color black, border-radius 0px, font-size 16px.
+   Production was never affected — demo/main.tsx and the dashboard's
+   EditorClient both mount AquibraStudio, which imports it at :56 — so this
+   was a measurement bug, not a product bug. It is the worse kind: five
+   "WCAG violations" were found and fixed against numbers that came from
+   unstyled elements. */
+import "@/editor/chrome-ui/flowbiteStore";
 import "@/themes/fonts.css";
 import "@/themes/default.css";
 
