@@ -20,7 +20,7 @@ import * as playwright from "playwright-core";
 // mechanics, different question. See e2e/lib/measure-lib.mjs.
 import { launchPinnedBrowser, fontsLoadedStatus } from "../../e2e/lib/measure-lib.mjs";
 // Recipe schema lives in lib.mjs so every consumer reads the same rules.
-import { validateRecipe, runEvery } from "./lib.mjs";
+import { validateRecipe, runEvery, readBaseline, patchBaseline } from "./lib.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SURFACES = join(HERE, "surfaces");
@@ -491,8 +491,7 @@ for (const p of out.nonTextFailures ?? [])
  * A MISSING target is never baselined. That is an instrument failure, not a
  * product defect, and it exits 3 above.
  */
-const BASELINE_PATH = join(HERE, ".conformance-baseline.json");
-const bl = existsSync(BASELINE_PATH) ? JSON.parse(readFileSync(BASELINE_PATH, "utf8")) : {};
+const bl = readBaseline();
 const entry = bl[surfaceId] ?? {};
 const textBaseline = entry.contrastFailures ?? 0;
 const iconBaseline = entry.nonTextFailures ?? 0;
@@ -500,8 +499,8 @@ const textNow = out.contrastFailures.length;
 const iconNow = (out.nonTextFailures ?? []).length;
 
 if (args.includes("--update-baseline")) {
-  bl[surfaceId] = { ...entry, contrastFailures: textNow, nonTextFailures: iconNow };
-  writeFileSync(BASELINE_PATH, JSON.stringify(bl, null, 2) + "\n");
+  // Merge, never replace — diff.mjs owns skipped/compared in this same file.
+  patchBaseline(surfaceId, { contrastFailures: textNow, nonTextFailures: iconNow });
   console.log(`[measure] baseline updated: ${surfaceId} contrast=${textNow} icon=${iconNow}`);
   process.exit(0);
 }

@@ -58,7 +58,7 @@ import { fileURLToPath } from "node:url";
 
 // Version lives in lib.mjs so a consumer can read it without executing an
 // extraction — this file does its work at module top level.
-import { EXTRACTOR_VERSION } from "./lib.mjs";
+import { EXTRACTOR_VERSION, figmaTokenValue, compareValue } from "./lib.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const RAW_DIR = join(HERE, "raw-figma");
@@ -171,6 +171,43 @@ for (const surface of surfaces) {
       `[extract] ${surface}: parsed 0 targets from ${raw.code.length} chars. ` +
       `Either the board is empty or get_design_context changed its output shape — ` +
       `refusing to write a spec that would pass by default.`
+    );
+    missing++; continue;
+  }
+
+  // A board class carries BOTH the token name and a literal fallback:
+  //   bg-[var(--color\/accent,#3366f2)]
+  // When the fallback disagrees with what `figma-tokens.json` holds for that
+  // token, the BOARD is wrong — the designer edited a raw fill instead of the
+  // variable. Writing that spec teaches the harness to fail correct,
+  // token-using chrome, and the fix an implementer applies is to delete the
+  // token. That is how `#3366f2` reached 95 instances across 65 boards.
+  //
+  // Refuse the spec instead. Unresolvable tokens stay UNKNOWN, never a failure
+  // (same rule as figmaTokenToBk) — only a token we can place AND disagree
+  // with blocks extraction.
+  const drift = [];
+  for (const t of targets) {
+    for (const [prop, p] of Object.entries(t.props)) {
+      if (!p.token || p.value == null) continue;
+      const tokenValue = figmaTokenValue(p.token);
+      if (tokenValue == null) continue;
+      const c = compareValue(prop, p.value, tokenValue);
+      if (c.verdict === "FAIL") {
+        drift.push(
+          `  ${t.name ?? t.nodeId} · ${prop}: board says ${c.expected}, ` +
+          `token ${p.token} holds ${c.actual}`
+        );
+      }
+    }
+  }
+  if (drift.length) {
+    console.error(
+      `[extract] ${surface}: ${drift.length} propert(ies) contradict the token they name.\n` +
+      drift.join("\n") + "\n" +
+      `          The board drifted off its own variable. Fix the fill in Figma to\n` +
+      `          reference the variable, re-fetch the raw file, and re-run. Refusing\n` +
+      `          to write a spec that would make correct token usage fail.`
     );
     missing++; continue;
   }

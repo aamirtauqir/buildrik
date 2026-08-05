@@ -129,6 +129,37 @@ describe('extract.mjs — derive a spec from a committed Figma response', () => 
     const dir = makeRepo({});
     expect(run(dir, 'extract.mjs', ['does-not-exist']).code).toBe(3);
   });
+
+  it('refuses a board whose literal fallback contradicts the token it names', () => {
+    // The failure this prevents: a designer edits a raw fill instead of the
+    // variable, the fallback drifts off the token, and the written spec then
+    // FAILS chrome that correctly renders var(--bk-*). The fix an implementer
+    // applies is to delete the token — which is how #3366f2 reached 95 uses
+    // across 65 boards. Refuse the spec; the board is the thing that is wrong.
+    const drifted = CODE.replace(
+      /bg-\[[^\]]*\]/,
+      'bg-[var(--color\\/warning-tint,#3366f2)]',
+    );
+    const dir = makeRepo({ raw: { ...RAW, code: drifted } });
+    const r = run(dir, 'extract.mjs', ['t']);
+    expect(r.code).toBe(3);
+    expect(r.out).toMatch(/contradict the token they name/);
+    expect(r.out).toMatch(/#3366f2/);
+    expect(existsSync(join(dir, 'scripts/conformance/specs/t.json'))).toBe(false);
+  });
+
+  it('a fallback that AGREES with its token still extracts', () => {
+    // The negative-control's negative control: the check must not reject the
+    // ordinary case, or every extraction stops.
+    const ok = CODE.replace(
+      /bg-\[[^\]]*\]/,
+      'bg-[var(--color\\/warning-tint,#fdfdea)]',
+    );
+    const dir = makeRepo({ raw: { ...RAW, code: ok } });
+    const r = run(dir, 'extract.mjs', ['t']);
+    expect(r.code).toBe(0);
+    expect(existsSync(join(dir, 'scripts/conformance/specs/t.json'))).toBe(true);
+  });
 });
 
 // ── diff.mjs ───────────────────────────────────────────────────────────────
@@ -209,6 +240,23 @@ describe('diff.mjs — compare rendered against board', () => {
     const r = run(dir, 'diff.mjs', ['s']);
     expect(r.code).toBe(3);
     expect(r.out).toMatch(/every target was SKIPPED/);
+  });
+
+  it('--update-baseline MERGES: it must not delete measure.mjs\'s a11y keys', () => {
+    // One file, two writers. diff.mjs owns skipped/compared, measure.mjs owns
+    // contrastFailures/nonTextFailures. diff.mjs used to assign a fresh object,
+    // silently dropping the a11y ratchet — after which measure read baseline 0,
+    // saw the real 3, and reported a regression that never happened.
+    const dir = repoReadyForDiff({
+      baseline: { s: { skipped: 0, compared: 1, contrastFailures: 3, nonTextFailures: 2 } },
+    });
+    const r = run(dir, 'diff.mjs', ['s', '--update-baseline']);
+    expect(r.code).toBe(0);
+    const after = JSON.parse(
+      readFileSync(join(dir, 'scripts/conformance/.conformance-baseline.json'), 'utf8'),
+    );
+    expect(after.s.contrastFailures).toBe(3);
+    expect(after.s.nonTextFailures).toBe(2);
   });
 
   it('FAIL (1) when SKIPPED rises above the baseline — coverage may not shrink', () => {

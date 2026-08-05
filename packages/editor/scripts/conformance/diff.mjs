@@ -35,7 +35,10 @@ import { readFileSync, existsSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { compareValue, figmaTokenToBk, readRecipe, runEvery, EXTRACTOR_VERSION } from "./lib.mjs";
+import {
+  compareValue, figmaTokenToBk, figmaTokenValue, readRecipe, runEvery,
+  readBaseline, patchBaseline, EXTRACTOR_VERSION,
+} from "./lib.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SURFACES = join(HERE, "surfaces");
@@ -127,7 +130,18 @@ for (const target of recipe.targets) {
 
   for (const [prop, expected] of Object.entries(node.props)) {
     const actual = css[prop];
-    const value = compareValue(prop, expected.value, actual);
+    // When the board names a token we can place, THAT token's value is the
+    // expectation — not the literal fallback baked into the class. The board's
+    // fallback is a snapshot of the variable at export time and drifts the
+    // moment someone edits a raw fill; the token is the contract. Comparing the
+    // fallback made this harness fail correct `var(--bk-*)` chrome and reward
+    // deleting the token. `extract.mjs` now refuses specs where the two
+    // disagree, so this is the second line of defence for specs written before
+    // that check existed.
+    //
+    // Unplaceable token -> fall back to the literal, exactly as before.
+    const tokenValue = expected.token ? figmaTokenValue(expected.token) : null;
+    const value = compareValue(prop, tokenValue ?? expected.value, actual);
 
     // Token verdict, advisory. We cannot read which token the browser used —
     // computed style gives a resolved value — so this reports whether the
@@ -211,10 +225,11 @@ if (fails.length) {
 
 // ── SKIPPED baseline: coverage may grow, never shrink ─────────────────────
 
-const baseline = existsSync(BASELINE) ? JSON.parse(readFileSync(BASELINE, "utf8")) : {};
+const baseline = readBaseline();
 if (updateBaseline) {
-  baseline[surfaceId] = { skipped: skipped.length, compared: rows.length };
-  writeFileSync(BASELINE, JSON.stringify(baseline, null, 2) + "\n");
+  // Merge, never replace — measure.mjs owns contrastFailures/nonTextFailures
+  // in this same file and assigning a fresh object deleted them.
+  patchBaseline(surfaceId, { skipped: skipped.length, compared: rows.length });
   console.log(`\n[diff] baseline updated: ${surfaceId} skipped=${skipped.length} compared=${rows.length}`);
 } else if (baseline[surfaceId]) {
   const b = baseline[surfaceId];

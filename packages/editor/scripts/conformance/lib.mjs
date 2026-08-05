@@ -11,7 +11,7 @@
  *
  * @license BSD-3-Clause
  */
-import { readFileSync, readdirSync } from "node:fs";
+import { readFileSync, readdirSync, existsSync, writeFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -312,4 +312,38 @@ export function runEvery(scriptPath, args) {
   }
   console.log(`\n[all] PASS — ${ids.length} surface(s).`);
   return 0;
+}
+
+// ── Baseline: ONE file, two writers, one merge rule ────────────────────────
+
+/**
+ * `.conformance-baseline.json` carries two independent ratchets per surface:
+ *
+ *   skipped / compared              written by diff.mjs   (coverage)
+ *   contrastFailures / nonTextFailures  written by measure.mjs (a11y)
+ *
+ * They were written by two scripts with two different merge semantics —
+ * `measure.mjs` spread the existing entry, `diff.mjs` assigned a fresh object.
+ * So `diff --update-baseline` silently DELETED the a11y keys, and the next
+ * `measure` read `contrastFailures ?? 0`, saw the real 3, and reported
+ * "TEXT CONTRAST REGRESSION: 3 > baseline 0. A new failure was introduced" —
+ * a false statement about a cause that never happened. `diff --all
+ * --update-baseline` disarmed every contrast baseline in the repo in one
+ * command.
+ *
+ * Both writers now go through `patchBaseline`, which merges by key. A writer
+ * can only ever change the keys it owns.
+ */
+export const BASELINE_PATH = join(HERE, ".conformance-baseline.json");
+
+export function readBaseline(path = BASELINE_PATH) {
+  return existsSync(path) ? JSON.parse(readFileSync(path, "utf8")) : {};
+}
+
+/** Merge `patch` into one surface's entry, preserving every key it omits. */
+export function patchBaseline(surfaceId, patch, path = BASELINE_PATH) {
+  const all = readBaseline(path);
+  all[surfaceId] = { ...(all[surfaceId] ?? {}), ...patch };
+  writeFileSync(path, JSON.stringify(all, null, 2) + "\n");
+  return all[surfaceId];
 }
