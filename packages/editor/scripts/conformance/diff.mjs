@@ -31,7 +31,7 @@
  *
  * @license BSD-3-Clause
  */
-import { readFileSync, existsSync, writeFileSync } from "node:fs";
+import { readFileSync, existsSync, writeFileSync, mkdirSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -48,11 +48,12 @@ const RAW = join(HERE, "raw-figma");
 const BASELINE = join(HERE, ".conformance-baseline.json");
 
 const args = process.argv.slice(2);
-const USAGE = "usage: diff.mjs <surface-id> [--update-baseline] | --all";
+const USAGE =
+  "usage: diff.mjs <surface-id> [--update-baseline] [--json] [--failures-only] | --all";
 const cli = parseArgs(args, {
   script: "diff",
   usage: USAGE,
-  flags: { "--all": "bool", "--update-baseline": "bool" },
+  flags: { "--all": "bool", "--update-baseline": "bool", "--json": "bool", "--failures-only": "bool" },
 });
 if (cli.has("--all")) process.exit(runEvery(import.meta.filename, args));
 const surfaceId = cli.id;
@@ -184,15 +185,49 @@ console.log(`${rows.length} compared · ${passes.length} pass · ${fails.length}
 if (skipped.length) console.log(`skipped (no spec yet): ${skipped.join(", ")}`);
 console.log("");
 
+// `--json` writes the same data the table is built from. At 287 surfaces the
+// table runs ~5,300 lines of which ~95% are passing rows, and the consumer
+// doing triage in this repo is usually an agent — asking it to re-parse a
+// padEnd() table it just printed is a token bill and a parsing risk for
+// objects we already hold.
+if (cli.has("--json")) {
+  mkdirSync(MEASURED, { recursive: true });
+  const out = {
+    surface: surfaceId,
+    board: measured.board ?? null,
+    counts: {
+      compared: rows.length, pass: passes.length, fail: fails.length,
+      unknown: unknown.length, skipped: skipped.length,
+    },
+    skipped,
+    rows,
+  };
+  const p = join(MEASURED, `${surfaceId}.report.json`);
+  writeFileSync(p, JSON.stringify(out, null, 2) + "\n");
+  console.log(`[diff] report → ${p}`);
+}
+
+// `--failures-only` keeps the triage list to what needs acting on. PASS rows
+// are still counted in the header line above, so coverage stays visible.
+const shown = cli.has("--failures-only")
+  ? rows.filter((r) => r.verdict !== "PASS")
+  : rows;
+
+// Hoisted: the failure-grouping block below uses it too.
 const pad = (s, n) => String(s ?? "").padEnd(n);
-console.log(pad("target", 20) + pad("property", 18) + pad("figma", 14) + pad("code", 14) + pad("verdict", 9) + "token");
-console.log("-".repeat(94));
-for (const r of rows) {
-  const tok = r.figmaToken ? `${r.figmaToken} -> ${r.bkToken ?? "UNMAPPED"}` : "";
-  console.log(
-    pad(r.target, 20) + pad(r.prop, 18) + pad(r.expected, 14) + pad(r.actual, 14) +
-    pad(r.verdict, 9) + tok
-  );
+
+if (!shown.length) {
+  console.log(`(all ${rows.length} compared propert(ies) pass)`);
+} else {
+  console.log(pad("target", 20) + pad("property", 18) + pad("figma", 14) + pad("code", 14) + pad("verdict", 9) + "token");
+  console.log("-".repeat(94));
+  for (const r of shown) {
+    const tok = r.figmaToken ? `${r.figmaToken} -> ${r.bkToken ?? "UNMAPPED"}` : "";
+    console.log(
+      pad(r.target, 20) + pad(r.prop, 18) + pad(r.expected, 14) + pad(r.actual, 14) +
+      pad(r.verdict, 9) + tok
+    );
+  }
 }
 
 // Group failures by property so one board-wide change reads as one cause

@@ -242,6 +242,30 @@ describe('diff.mjs — compare rendered against board', () => {
     expect(r.out).toMatch(/every target was SKIPPED/);
   });
 
+  it('--json writes the rows the table is built from', () => {
+    // At 287 surfaces the table is ~5,300 lines, ~95% passing. The agent doing
+    // triage should read objects, not re-parse a padEnd() table.
+    const dir = repoReadyForDiff({});
+    const r = run(dir, 'diff.mjs', ['s', '--json']);
+    expect(r.code).toBe(0);
+    const report = JSON.parse(readFileSync(
+      join(dir, 'scripts/conformance/measured/s.report.json'), 'utf8',
+    ));
+    expect(report.surface).toBe('s');
+    expect(report.counts.compared).toBe(report.rows.length);
+    expect(report.counts.pass + report.counts.fail + report.counts.unknown)
+      .toBe(report.rows.length);
+  });
+
+  it('--failures-only hides PASS rows but still counts them', () => {
+    const dir = repoReadyForDiff({});
+    const r = run(dir, 'diff.mjs', ['s', '--failures-only']);
+    expect(r.code).toBe(0);
+    // Header keeps the coverage numbers; the body says nothing needs acting on.
+    expect(r.out).toMatch(/5 compared · 5 pass/);
+    expect(r.out).toMatch(/all 5 compared propert\(ies\) pass/);
+  });
+
   it('--update-baseline MERGES: it must not delete measure.mjs\'s a11y keys', () => {
     // One file, two writers. diff.mjs owns skipped/compared, measure.mjs owns
     // contrastFailures/nonTextFailures. diff.mjs used to assign a fresh object,
