@@ -411,3 +411,101 @@ the deck is the design SSOT for each. None block the deck itself.
   slim-launcher-vs-ExpandedMediaPanel dual tree into one MediaTab.
   **Inventory first:** audit `onOpenLibrary` consumers before deleting the branch
   (feedback_inventory_before_deletion_wrappers).
+
+## Probe / gate findings — adversarial review 2026-08-03
+
+Found by the adversarial pass on the 12-commit editor arc. The flowbite-prefix
+root cause is fixed in `466158dd`; these are the rest.
+
+- [ ] **Regenerate every parity baseline now that the probe styles flowbite.**
+  `466158dd` added the missing `flowbiteStore` import. Until each surface is
+  re-captured its baseline still records unstyled OS buttons (buttonface grey,
+  16px, radius 0). Expect large, correct movement — a `<Button size="xs">` goes
+  24px -> 32px, transparent -> `rgb(26,86,219)`. **Re-run the WCAG target-size
+  gate afterwards**: its five cited violations were artifacts of the unstyled
+  cascade and will not reproduce. **Depends on:** coordinating with whoever owns
+  the 17 baselines added in `387e1a3d..1f903c44` — do not clobber mid-flight.
+- [ ] **Re-justify or revert the two `min-h-6` edits.** `OnboardingChecklist.tsx:214`
+  and `LINK_BTN` in `ContentViews.tsx` were added to fix 22px/16px measurements
+  that came from unstyled buttons. flowbite `xs` is `h-8` (32), so `min-h-6` (24)
+  never applies in production. Harmless but dead. The IconButton conversion in
+  ContentViews stays — it is right on design grounds regardless.
+- [ ] **`target-size.spec.ts` passes vacuously on an empty render.** Zero controls
+  yields `[]`, `[].filter(...)` yields `[]`, and `toEqual([])` passes. Its sibling
+  `style-parity.spec.ts` already guards this with
+  `expect(Object.keys(actual).length, "probe rendered no measurable nodes").toBeGreaterThan(0)`
+  plus a `data-probe-error` read, a fonts-loaded assert, and a `pageerror` listener.
+  target-size has none of the four. React 18 commits asynchronously, so
+  `data-probe-ready` is set before a render throw surfaces — a component that
+  throws produces an empty DOM and a green gate.
+- [ ] **`"name" in BASELINE` walks the prototype chain.** `target-size.spec.ts`
+  filters with `!(c.name in BASELINE)`, so a control named `constructor`,
+  `toString`, `valueOf` or `__proto__` is silently exempt from a map documented
+  as shipping empty. Use `Object.hasOwn`. Also: the key is a global accessible
+  name (not case-scoped), it is truncated to 40 chars, it falls back to
+  `<button>` (one entry would exempt every unlabelled button), and there is no
+  staleness check so the list can only grow.
+- [ ] **The gate's selector misses most non-`<button>` interactives.** Present in
+  chrome and invisible to it: `role="tab"` x28, `role="option"` x14,
+  `role="radio"` x7, `role="treeitem"` x4, `role="switch"` x3, `role="slider"` x3,
+  `role="combobox"` x1, `<summary>` x2. Conversely `input:not([type=hidden])`
+  matches sr-only inputs — flowbite `Checkbox` is 16x16 and fails the moment one
+  enters a probe case (`ContentViews.tsx:382` has one behind the `adding` form).
+- [ ] **`.filter(c => c.w > 0 && c.h > 0)` discards the worst controls.** A control
+  collapsed to zero width by flex-shrink is unclickable; 1x18 fails the gate and
+  0x18 passes it. Gate on `display`/`visibility`/`offsetParent`, not on the
+  number being measured.
+- [ ] **Loading-state baselines are non-deterministic.** `content-loading` differs
+  run to run on `opacity` (0.989 vs 0.857) and `media-drawer-loading` on 122
+  sub-pixel widths — skeletons measured mid-animation. `37c7deac` claims a
+  harness that stops measuring animations; it is not holding for these two.
+  `canvas-footer-toolbar` also fails with zero value changes, so its key set moved.
+- [ ] **`UPDATE_PARITY` has no CI guard.** `style-parity.spec.ts:93` writes a
+  missing baseline and passes. A new probe case is blessed on first run with no
+  review, and the env var turns the whole gate into a rubber stamp. Note the
+  asymmetry: `playwright.config.ts:19` throws loudly if BrowserStack creds are
+  present, but this is unguarded. In CI it should be a hard failure.
+- [ ] **The CI target-size step is decorative.** `package.json:40` is
+  `"test:parity": "playwright test"` with no filter and `testDir: "./e2e"`, so the
+  earlier Style-parity step already runs target-size. Steps abort on first
+  failure, so the dedicated step can never be the one that fails, the suite runs
+  twice against a 20-minute budget, and it uses `npx` where the browser install
+  two steps above uses `pnpm exec`.
+- [ ] **Nothing in `chrome-reset.css` reaches portalled chrome.** `OverlayRoot.tsx:16`
+  appends `#bk-overlay-root` to `document.body`, outside `.bd-studio`. Modals,
+  drawers, menus, the command palette, toasts and tooltips get neither the new
+  `border: 0 solid` nor `box-sizing: border-box` (preflight is off). The
+  "all 42 controls in the default shell" sweep excluded every overlay by
+  construction.
+- [ ] **`chrome-reset.css` guards on the class but the engine accepts the attribute.**
+  `:not(.buildrick-canvas, .buildrick-canvas *)` keys on the class only, while
+  `engine/canvas/resize/utils.ts:27`, `indicators/BoundsCalculator.ts:44` and
+  `resize/ConstraintManager.ts:138` all query
+  `"[data-buildrick-canvas], .buildrick-canvas"`. A canvas mount setting only the
+  attribute is unguarded. Add `[data-buildrick-canvas]` to the `:not()` list and
+  to `CANVAS_GUARD` in `chrome-reset.test.ts`.
+- [ ] **The canvas inherits the editor's UI font.** `chrome-reset.css:72` sets
+  `font-family: var(--bk-font-ui)` on `.bd-studio`; `.buildrick-canvas` sets no
+  font of its own, and `font-family` inherits. A customer site with no
+  font-family declaration renders Inter in the editor canvas and browser-default
+  when published. Preview does not match output, in a WYSIWYG builder.
+- [ ] **`PanelFrame` delegation dropped `min-w-0` from the title.** The old header
+  wrapped title+subtitle in `tw:flex-1 tw:min-w-0`; `PanelHeader.tsx:88` is
+  `tw:flex-1` only. A flex item's `min-width` defaults to `auto`, so a long title
+  cannot shrink and pushes the pin/help/close cluster past the right edge of a
+  fixed 44px bar. Was 3 drawers, now all 7.
+- [ ] **`PanelHeaderActions` still renders the pattern this arc declared fixed.**
+  `PanelHeader.tsx:34-64` renders pin / help / close as
+  `<Button color="light" size="xs">📌 / ? / ✕</Button>` — an icon-only action as a
+  text Button carrying a glyph, which is exactly what `ContentViews.tsx:350` was
+  converted away from. The delegation propagated it from 3 drawers to 7.
+- [ ] **Row and NavItem accent bars are not the same bar.** `NavItem` uses
+  `before:rounded-l-lg`, `Row` uses no radius, in the commit whose message says
+  "one active language across the product". On a selected Row the bar also paints
+  over the left 3px of the `focus-visible` inset ring — the exact cost NavItem's
+  comment says it avoided.
+- [ ] **Parity baselines are keyed by positional DOM index.** `style-parity.spec.ts`
+  builds keys as `${label}>${idx}` from `querySelectorAll("*")`. Inserting one
+  element shifts every subsequent key and silently re-pairs recorded values with
+  different elements. This is why a primary CTA recorded as buttonface-grey
+  survived review.
