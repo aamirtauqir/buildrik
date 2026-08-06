@@ -8,14 +8,13 @@
  * @license BSD-3-Clause
  */
 
-import { ChevronDown, Layers, Plus } from "lucide-react";
+import { Layers, Plus } from "lucide-react";
 import * as React from "react";
 import { Button, ConfirmDialog, EmptyState, EmptyStateDesc, EmptyStateTitle, ModalBody, ModalClose, ModalContent, ModalRoot, ModalTitle, PanelFrame, SkeletonListItem, TextInput, useToast } from "@/editor/chrome-ui";
 import { PanelErrorState } from "../shared/PanelErrorState";
 import { SearchBar } from "../shared/SearchBar";
 import { ComponentDetailScreen } from "./component-library/ComponentDetailScreen";
 import { ComponentIcon } from "./component-library/ComponentIcon";
-import { ComponentRow } from "./component-library/ComponentRow";
 import { CreateComponentModal } from "./component-library/CreateComponentModal";
 import {
   containerStyles,
@@ -26,7 +25,7 @@ import {
 } from "./component-library/styles";
 import type { ComponentsTabProps } from "./component-library/types";
 import { useComponentsState } from "./component-library/useComponentsState";
-import { type ComponentFilter, FILTER_CHIPS } from "./componentsData";
+
 import "./component-library/ComponentsTab.css";
 export type { ComponentsTabProps };
 
@@ -253,15 +252,13 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
           >
             {headerAddBtn}
           </PanelFrame.Header>
-          <div style={searchContainerStyles}>
-            <SearchBar
-              value={state.internalSearchQuery}
-              onChange={state.setInternalSearchQuery}
-              placeholder="Search components..."
-            />
-          </div>
         </>
       )}
+      {/* Board 641:2546 (Components · library): no search, no filter chips —
+          one "YOUR COMPONENTS" section of 32h rows (name · "N instances" · ›)
+          and a bordered footer with the one primary button. The FROM BRAND
+          section ships when a brand-linked source exists; today's registry
+          has none, so it would always be empty chrome. */}
       <div style={{ flex: 1, overflow: "auto" }}>
         {!state.isLoaded && (
           <div style={{ padding: "12px" }}>
@@ -271,82 +268,52 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
           </div>
         )}
 
-        <div>
-          <span>Create components from canvas:</span>
-          <span>
-            Select layers → Right-click → Create component
-          </span>
-        </div>
-
-        <div>
-          {FILTER_CHIPS.map((chip) => (
-            <Button
-              key={chip.id}
-              className={`bd-chip ${state.activeFilter === chip.id ? "active" : ""}`}
-              onClick={() => state.setActiveFilter(chip.id)}
-            >
-              {chip.label}
-            </Button>
-          ))}
-        </div>
-
         <div aria-live="polite">
-          <span className="bd-sr-only">{state.filteredComponents.length} components found</span>
-          {state.filteredComponents.length === 0 ? (
-            <div>
-              <span>No components match filters</span>
-              <Button onClick={() => state.setActiveFilter("all" as ComponentFilter)}>
-                Clear filters
-              </Button>
-            </div>
-          ) : (
-            Object.entries(state.groupedComponents).map(([category, items]) => (
-              <div key={category}>
-                <Button
-                  className={`bd-accordion-header ${!state.collapsedGroups.has(category) ? "open" : ""}`}
-                  onClick={() => state.toggleGroup(category)}
-                >
-                  <span>
-                    {category}
-                    <span>{items.length}</span>
-                  </span>
-                  <ChevronDown
-                    size={14}
-                    className={`bd-accordion-chevron ${!state.collapsedGroups.has(category) ? "open" : "closed"}`}
-                  />
-                </Button>
-
-                {!state.collapsedGroups.has(category) && (
-                  <div>
-                    {items.map((component) => (
-                      <ComponentRow
-                        key={component.id}
-                        component={component}
-                        instanceCount={
-                          composer?.components?.getInstancesOfComponent?.(component.id)?.length || 0
-                        }
-                        isSelected={state.selectedId === component.id}
-                        openMenuId={state.openMenuId}
-                        isFavorite={state.isFavorite}
-                        hasVariants={state.hasVariants}
-                        onDragStart={state.handleDragStart}
-                        onViewDetail={state.handleViewDetail}
-                        onInstantiate={state.handleInstantiate}
-                        onSetOpenMenuId={state.setOpenMenuId}
-                        onRename={state.handleRename}
-                        onDuplicate={state.handleDuplicate}
-                        onSwapVariant={state.handleSwapVariant}
-                        onToggleFavorite={state.toggleFavorite}
-                        onDelete={state.handleDelete}
-                      />
-                    ))}
-                  </div>
-                )}
+          <span className="bd-sr-only">{state.components.length} components found</span>
+          <div className="tw:flex tw:items-center tw:h-7 tw:px-4 tw:text-[11px] tw:leading-4 tw:font-medium tw:tracking-[0.5px] tw:text-[var(--bk-ink-muted)]">
+            YOUR COMPONENTS
+          </div>
+          {state.components.map((component) => {
+            const n = composer?.components?.getInstancesOfComponent?.(component.id)?.length || 0;
+            return (
+              <div
+                key={component.id}
+                role="button"
+                tabIndex={0}
+                draggable
+                className="tw:flex tw:items-center tw:gap-2 tw:h-8 tw:px-4 tw:cursor-pointer tw:select-none hover:tw:bg-[var(--bk-bg-subtle)]"
+                data-testid={`comp-row-${component.id}`}
+                onClick={() => state.handleViewDetail(component)}
+                onDragStart={(e) => state.handleDragStart(e, component)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") { e.preventDefault(); state.handleViewDetail(component); }
+                }}
+              >
+                <span className="tw:flex-1 tw:min-w-0 tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
+                  {component.name}
+                </span>
+                <span className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+                  {n} instance{n === 1 ? "" : "s"}
+                </span>
+                <span className="tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]" aria-hidden="true">›</span>
               </div>
-            ))
-          )}
+            );
+          })}
         </div>
       </div>
+      {/* Board 641:2596 panel footer — the screen's ONE primary button. */}
+      {onCreateNew && (
+        <div className="tw:flex tw:border-t tw:border-[var(--bk-border)] tw:px-4 tw:py-2.5 tw:shrink-0">
+          <Button
+            size="xs"
+            className="tw:h-7 tw:rounded-8 tw:px-3 tw:text-[13px] tw:font-medium"
+            data-testid="comp-create"
+            onClick={onCreateNew}
+          >
+            + Create component
+          </Button>
+        </div>
+      )}
       {/* ── Dialogs ─────────────────────────────────────────────────────────── */}
       {showCreateModal && (
         <CreateComponentModal

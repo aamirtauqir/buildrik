@@ -33,7 +33,7 @@ export interface InsertGroup {
    */
   kind: "inline" | "navigate";
   /** For kind:"navigate" — the GroupedTabId to switch to. */
-  targetTab?: "component-library" | "templates";
+  targetTab?: "components" | "templates";
 }
 
 /** ELEMENTS — every element def, flat, exactly as the board lists them. */
@@ -46,8 +46,8 @@ export function buildInsertGroups(): InsertGroup[] {
   return [
     { id: "elements", label: "ELEMENTS", count: elementRows.length, kind: "inline" },
     { id: "blocks", label: "BLOCKS", count: blockRows.length, kind: "inline" },
-    { id: "components", label: "COMPONENTS", count: null, kind: "navigate", targetTab: "component-library" },
+    { id: "components", label: "COMPONENTS", count: null, kind: "navigate", targetTab: "components" },
     { id: "templates", label: "TEMPLATES", count: null, kind: "navigate", targetTab: "templates" },
-    { id: "mine", label: "MINE", count: null, kind: "navigate", targetTab: "component-library" },
+    { id: "mine", label: "MINE", count: null, kind: "navigate", targetTab: "components" },
   ];
 }
