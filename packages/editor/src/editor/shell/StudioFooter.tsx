@@ -1,7 +1,25 @@
 /**
- * StudioFooter — 32px status bar at bottom of editor shell.
- * Left: sync status + breadcrumb path to selected element.
- * Right: canvas dimensions, zoom -/+ control, version.
+ * StudioFooter — 32px status bar at the bottom of the editor shell.
+ *
+ * Rebuilt to Figma board 52:2 node 52:10 (2026-08-06 full-UI rebuild):
+ *   left   `Section · Hero` — the selected element's identity
+ *          `680 × 250`     — its live rendered size
+ *   right  `Desktop · 100%` — device · zoom, as text
+ *
+ * What the previous footer showed and the board does not: the
+ * "Connected · main" pill (connection truth lives in the topbar save pill —
+ * its component doc calls offline one of the five save truths), zoom −/+
+ * buttons (zoom controls live in the floating canvas toolbar, board
+ * 462:3992-3997), and the version string. Removed per the founder's
+ * precedence rule: everything visual, the board wins.
+ *
+ * "Section · Hero" and "680 × 250" on the board are SAMPLE data — the
+ * contract is the shape `{type} · {name}` + `{w} × {h}`, not those literals.
+ *
+ * `onZoomChange` / `syncConnected` remain in the interface unused: the only
+ * call site is AquibraStudio.tsx, which is mid-edit in the founder's working
+ * tree — staging it would commit their unrelated work. Trim both when that
+ * lands.
  *
  * @license BSD-3-Clause
  */
@@ -12,21 +30,21 @@ import { getEditorViewMode } from "../../shared/utils/editorViewMode";
 import type { Composer } from "../../engine";
 import type { DeviceType } from "../../shared/types";
 import { Button } from "@/editor/chrome-ui";
-const VERSION = "v2.14.0";
-const ZOOM_PRESETS = [25, 50, 75, 100, 125, 150, 200] as const;
 
-const DEVICE_DIMENSIONS: Partial<Record<DeviceType, string>> = {
-  wide: "1440 × 900",
-  desktop: "1280 × 800",
-  tablet: "768 × 1024",
-  mobile: "375 × 812",
+const DEVICE_LABEL: Partial<Record<DeviceType, string>> = {
+  wide: "Wide",
+  desktop: "Desktop",
+  tablet: "Tablet",
+  mobile: "Mobile",
 };
 
 export interface StudioFooterProps {
   composer: Composer | null;
   device: DeviceType;
   zoom: number;
+  /** Unused since the board rebuild — see the header comment. */
   onZoomChange?: (zoom: number) => void;
+  /** Unused since the board rebuild — see the header comment. */
   syncConnected?: boolean;
   selectedElement: { id: string; type: string; tagName?: string } | null;
   /** E3: opens the page-structure (layers) outline. In 4-tool mode the footer ⌗
@@ -34,59 +52,39 @@ export interface StudioFooterProps {
   onOpenStructure?: () => void;
 }
 
-const zoomBtnStyle: React.CSSProperties = {
-  width: 20,
-  height: 20,
-  padding: 0,
-  border: "none",
-  background: "transparent",
-  color: "var(--bk-ink-muted)",
-  cursor: "pointer",
-  borderRadius: 4,
-  display: "inline-flex",
-  alignItems: "center",
-  justifyContent: "center",
-  fontFamily: "var(--bk-font-ui)",
-  fontSize: 13,
-  fontWeight: 500,
-  lineHeight: 1,
-};
+/** `section` -> `Section`, matching the board's `Section · Hero` casing. */
+const cap = (s: string) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
+
+/**
+ * The selected element's rendered size, read from the canvas DOM. The engine
+ * stamps every element with `data-buildrick-id` (Canvas.tsx:423), which is the
+ * same handle the click-to-select path resolves. Re-read per render — a footer
+ * render is driven by selection/zoom changes, exactly when size may move.
+ * Returns null when the node is not in the DOM (jsdom, mid-mount).
+ */
+function elementDims(id: string | undefined): string | null {
+  if (!id || typeof document === "undefined") return null;
+  const node = document.querySelector<HTMLElement>(`[data-buildrick-id="${CSS.escape(id)}"]`);
+  if (!node) return null;
+  const w = Math.round(node.offsetWidth);
+  const h = Math.round(node.offsetHeight);
+  if (!w && !h) return null;
+  return `${w} × ${h}`;
+}
 
 export const StudioFooter: React.FC<StudioFooterProps> = ({
-  composer,
   device,
   zoom,
-  onZoomChange,
-  syncConnected = true,
   selectedElement,
   onOpenStructure,
 }) => {
   const fourToolRail = getEditorViewMode().fourToolRail;
-  const breadcrumb = selectedElement
-    ? `body › ${selectedElement.tagName ?? selectedElement.type}`
+
+  const label = selectedElement
+    ? `${cap(selectedElement.type)}${selectedElement.tagName ? ` · ${selectedElement.tagName}` : ""}`
     : "body";
-
-  const dims = DEVICE_DIMENSIONS[device] ?? "—";
-  const zoomLabel = `${Math.round(zoom)}%`;
-
-  const applyZoom = React.useCallback(
-    (z: number) => {
-      const clamped = Math.max(25, Math.min(200, z));
-      onZoomChange?.(clamped);
-      composer?.setZoom?.(clamped);
-    },
-    [composer, onZoomChange]
-  );
-
-  const onZoomOut = React.useCallback(() => {
-    const prev = [...ZOOM_PRESETS].reverse().find((p) => p < zoom);
-    applyZoom(prev ?? ZOOM_PRESETS[0]);
-  }, [zoom, applyZoom]);
-
-  const onZoomIn = React.useCallback(() => {
-    const next = ZOOM_PRESETS.find((p) => p > zoom);
-    applyZoom(next ?? ZOOM_PRESETS[ZOOM_PRESETS.length - 1]);
-  }, [zoom, applyZoom]);
+  const dims = elementDims(selectedElement?.id);
+  const deviceLabel = DEVICE_LABEL[device] ?? cap(device);
 
   return (
     <>
@@ -95,93 +93,33 @@ export const StudioFooter: React.FC<StudioFooterProps> = ({
           color="light"
           onClick={onOpenStructure}
           aria-label="Page structure"
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 4,
-            padding: "2px 6px",
-            color: "var(--bk-ink-muted)",
-            fontSize: 12,
-          }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+          className="tw:inline-flex tw:items-center tw:gap-[4px] tw:px-[6px] tw:py-[2px] tw:text-[12px] tw:text-[var(--bk-ink-muted)] tw:border-transparent tw:bg-transparent tw:hover:text-gray-900"
         >
           <ListTree size={14} />
           Structure
         </Button>
       )}
       <span
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 6,
-        }}
+        className="tw:text-[11px] tw:leading-[16px] tw:text-[var(--bk-ink-muted)] tw:whitespace-nowrap tw:overflow-hidden tw:text-ellipsis"
+        title={label}
+        data-testid="footer-selection-label"
       >
-        <span
-          aria-hidden="true"
-          style={{
-            width: 6,
-            height: 6,
-            borderRadius: "var(--bk-radius-full)",
-            background: syncConnected
-              ? "var(--bk-success)"
-              : "var(--bk-ink-muted)",
-          }}
-        />
-        {syncConnected ? "Connected · main" : "Offline"}
+        {label}
       </span>
-      <span
-        style={{
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
-          minWidth: 0,
-          flex: 1,
-        }}
-        title={breadcrumb}
-      >
-        {breadcrumb}
-      </span>
-      <span style={{ display: "inline-flex", alignItems: "center", gap: 14, flexShrink: 0 }}>
-        <span>{dims}</span>
+      {dims && (
         <span
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 2,
-            padding: "2px 4px",
-            borderRadius: 5,
-            background: "var(--bk-bg-subtle)",
-          }}
+          className="tw:text-[11px] tw:leading-[16px] tw:text-[var(--bk-ink-muted)] tw:whitespace-nowrap"
+          data-testid="footer-selection-dims"
         >
-          <Button
-            type="button"
-            style={zoomBtnStyle}
-            onClick={onZoomOut}
-            aria-label="Zoom out"
-            disabled={zoom <= ZOOM_PRESETS[0]}
-          >
-            −
-          </Button>
-          <span
-            style={{
-              minWidth: 36,
-              textAlign: "center",
-              color: "var(--bk-ink)",
-              fontVariantNumeric: "tabular-nums",
-            }}
-          >
-            {zoomLabel}
-          </span>
-          <Button
-            type="button"
-            style={zoomBtnStyle}
-            onClick={onZoomIn}
-            aria-label="Zoom in"
-            disabled={zoom >= ZOOM_PRESETS[ZOOM_PRESETS.length - 1]}
-          >
-            +
-          </Button>
+          {dims}
         </span>
-        <span>{VERSION}</span>
+      )}
+      <span className="tw:flex-1 tw:min-w-px" />
+      <span
+        className="tw:text-[11px] tw:leading-[16px] tw:text-[var(--bk-ink-muted)] tw:whitespace-nowrap"
+        data-testid="footer-device-zoom"
+      >
+        {deviceLabel} · {Math.round(zoom)}%
       </span>
     </>
   );

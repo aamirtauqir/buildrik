@@ -312,6 +312,20 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           >
             <CornerLeftUp size={12} aria-hidden="true" />
           </Button>
+          {/* Figma 920:4546 `btn/ai` — THE AI entry point. The rail omits `ai`
+              deliberately (tabsConfig RAIL_FIGMA); the 2026-08-05 Figma arc put
+              this chip on every inspector header instead, and it never shipped:
+              the conformance harness had no recipe for it, so nothing went red. */}
+          <Button
+            type="button"
+            className="tw:h-[22px] tw:px-[7px] tw:rounded-[6px] tw:bg-[var(--bk-accent-tint)] tw:text-[11px] tw:font-medium tw:text-[var(--bk-accent)] tw:whitespace-nowrap"
+            title="Ask AI about this element"
+            aria-label="Ask AI about this element"
+            data-testid="inspector-ai-chip"
+            onClick={() => composer?.emit("ui:switch-tab", { tab: "ai" })}
+          >
+            ✦ AI
+          </Button>
           <BindingPopover
             elementId={selectedElement?.id ?? null}
             composer={composer ?? null}
