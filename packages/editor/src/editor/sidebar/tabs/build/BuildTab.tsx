@@ -16,13 +16,13 @@ import { PanelFrame } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import type { BlockData } from "../../../../shared/types";
 import { SearchBar } from "../../shared/SearchBar";
-import { CATALOG, flatCatalog } from "./catalog/catalog";
 import { useBuildTab } from "./hooks/useBuildTab";
 import { useCallout } from "./hooks/useCallout";
 import { TipsFooter } from "./components/TipsFooter";
-import { CatAccordion } from "./components/CatAccordion";
+import { GroupSection } from "./components/GroupSection";
 import { SearchResults } from "./components/SearchResults";
 import { TransitionCallout } from "./components/TransitionCallout";
+import { buildInsertGroups, elementRows, blockRows, type InsertGroupId } from "./catalog/groups";
 import "./BuildTab.css";
 
 export interface BuildTabProps {
@@ -34,10 +34,31 @@ export interface BuildTabProps {
   onClose?: () => void;
 }
 
-export const BuildTab: React.FC<BuildTabProps> = ({ composer, onBlockClick, onHelpClick, onClose }) => {
+export const BuildTab: React.FC<BuildTabProps> = ({
+  composer, onBlockClick, isPinned, onPinToggle, onHelpClick, onClose,
+}) => {
   const tab = useBuildTab(composer, onBlockClick);
   const callout = useCallout();
   const isSearching = tab.searchQuery.trim().length > 0;
+
+  // Board 137:2 taxonomy: ELEMENTS open (▾), the rest closed (▸).
+  const groups = React.useMemo(buildInsertGroups, []);
+  const [openGroups, setOpenGroups] = React.useState<Set<InsertGroupId>>(
+    () => new Set<InsertGroupId>(["elements"]),
+  );
+  const toggleGroup = (g: (typeof groups)[number]) => {
+    // COMPONENTS / TEMPLATES / MINE own full tabs (create/preview flows this
+    // panel cannot host) — expanding navigates there. Real behaviour, no stub.
+    if (g.kind === "navigate" && g.targetTab) {
+      composer?.emit("ui:switch-tab", { tab: g.targetTab });
+      return;
+    }
+    setOpenGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(g.id)) next.delete(g.id); else next.add(g.id);
+      return next;
+    });
+  };
 
   // Search focus shortcuts: "/" (typing-context-safe) and ⌘F (board 137:10 —
   // hijacks browser find while the Insert panel is mounted, same as Figma).
@@ -63,14 +84,20 @@ export const BuildTab: React.FC<BuildTabProps> = ({ composer, onBlockClick, onHe
     return () => document.removeEventListener("keydown", handler);
   }, []);
 
-  const blocksSubtitle = `${flatCatalog.length} blocks · ${CATALOG.length} categories`;
-
   return (
     <PanelFrame className="bld-container">
-      {/* 10A: Insert gets the full 16:6 header — help + close come from
-          PanelHeader itself (the `onHelpClick`/`onClose` PROPS; children are
-          silently dropped by this API). */}
-      <PanelFrame.Header title="Insert" subtitle={blocksSubtitle} onHelpClick={onHelpClick} onClose={onClose} />
+      {/* Board 137:2 header: title alone (the "N blocks · N categories"
+          subtitle is not on the board), PIN before CLOSE per the 16:6
+          component doc — "closing is the last thing you do, so it goes last".
+          isPinned/onPinToggle flowed in as props for months and were dropped
+          at this destructure; PanelFrame.Header supported them all along. */}
+      <PanelFrame.Header
+        title="Insert"
+        isPinned={isPinned}
+        onPinToggle={onPinToggle}
+        onHelpClick={onHelpClick}
+        onClose={onClose}
+      />
 
       <div className="bld-content">
         <div
@@ -106,18 +133,23 @@ export const BuildTab: React.FC<BuildTabProps> = ({ composer, onBlockClick, onHe
           <div className="bld-scroll">
             {callout.visible && <TransitionCallout />}
 
-            <div className="bld-cats">
-              {CATALOG.map((cat) => (
-                <CatAccordion
-                  key={cat.id}
-                  cat={cat}
-                  isOpen={tab.openCats.has(cat.id)}
-                  onToggle={() => tab.toggleCat(cat.id)}
-                  onDragStart={tab.handleDragStart}
-                  onElClick={tab.handleElClick}
-                />
-              ))}
-            </div>
+            {/* Board 137:2: source taxonomy, not element-type categories.
+                ELEMENTS/BLOCKS render inline; the navigate groups open their
+                owning tabs. Blocks insert through the SAME onBlockClick path
+                elements use — BlockDefinition extends BlockData. */}
+            {groups.map((g) => (
+              <GroupSection
+                key={g.id}
+                group={g}
+                isOpen={openGroups.has(g.id)}
+                onToggle={() => toggleGroup(g)}
+                elements={g.id === "elements" ? elementRows : undefined}
+                blocks={g.id === "blocks" ? blockRows : undefined}
+                onDragStart={tab.handleDragStart}
+                onElClick={tab.handleElClick}
+                onBlockInsert={(b) => onBlockClick?.(b)}
+              />
+            ))}
           </div>
         )}
 

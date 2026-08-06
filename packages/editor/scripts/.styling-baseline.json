@@ -1,7 +1,7 @@
 {
   "inline_literal": 776,
   "inline_hoisted": 335,
-  "css_lines": 10382,
+  "css_lines": 10173,
   "css_files": {
     "inspector/styles/inspector.css": 1038,
     "media/ImageEditorModal.css": 326,
@@ -12,7 +12,7 @@
     "shell/header.css": 153,
     "sidebar/LeftSidebar.css": 415,
     "sidebar/tabs/ai/AITab.css": 296,
-    "sidebar/tabs/build/BuildTab.css": 379,
+    "sidebar/tabs/build/BuildTab.css": 294,
     "sidebar/tabs/component-library/ComponentsTab.css": 75,
     "sidebar/tabs/history/styles/history.css": 1237,
     "sidebar/tabs/media/MediaTab.css": 1656,

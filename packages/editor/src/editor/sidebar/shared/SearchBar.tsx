@@ -137,10 +137,15 @@ const containerStyles: React.CSSProperties = {
   gap: 8,
   margin: 0,
   padding: "0 8px",
-  height: 36,
-  background: "var(--bk-bg-card, var(--bk-bg-card))",
+  // Board 137:8 (founder re-spec 2026-08-06): 28h field on gray-50 with a
+  // border, radius 6 — the wrapper's 4/16 padding supplies the 36h band.
+  // Shared by all seven drawers; the board's Panel-header doc scopes the
+  // drawer chrome file-wide, so this is the one deliberate SearchBar edit
+  // of the frozen set, board-driven.
+  height: "var(--bk-size-row-dense)",
+  background: "var(--bk-gray-50)",
   border: "1px solid var(--bk-border)",
-  borderRadius: 4,
+  borderRadius: 6,
   color: "var(--bk-ink-soft, var(--bk-ink-muted))",
   transition: "border-color 0.15s ease, box-shadow 0.15s ease",
 };

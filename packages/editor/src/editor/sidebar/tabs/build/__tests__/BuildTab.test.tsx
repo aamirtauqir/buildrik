@@ -13,45 +13,60 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import * as React from "react";
 import { BuildTab } from "../BuildTab";
-import { CATALOG } from "../catalog/catalog";
 
 beforeEach(() => {
   localStorage.clear();
   sessionStorage.clear();
 });
 
-describe("BuildTab — header + categories", () => {
-  it("renders the panel title and the block/category count subtitle", () => {
+// The previous suite here asserted the PRE-board design — the "N blocks ·
+// N categories" subtitle, the BASIC/LAYOUT category rows, and a single-open
+// accordion. Board 137:2 carries none of them, and a test protecting removed
+// design is how "No pages yet" survived (PageList.test.tsx:55). Rewritten to
+// the board contract in the same commit as the rebuild.
+describe("BuildTab — board 137:2 taxonomy", () => {
+  it("renders the title with no count subtitle", () => {
     render(<BuildTab composer={null} onBlockClick={vi.fn()} />);
     expect(screen.getByText("Insert")).toBeTruthy();
-    expect(screen.getByText(new RegExp(`${CATALOG.length} categories`))).toBeTruthy();
+    expect(screen.queryByText(/categories/)).toBeNull();
   });
 
-  it("renders every catalog category row", () => {
+  it("renders the five source groups: ELEMENTS BLOCKS COMPONENTS TEMPLATES MINE", () => {
     render(<BuildTab composer={null} onBlockClick={vi.fn()} />);
-    for (const cat of CATALOG) {
-      expect(screen.getByText(cat.name)).toBeTruthy();
+    for (const label of ["ELEMENTS", "BLOCKS", "COMPONENTS", "TEMPLATES", "MINE"]) {
+      expect(screen.getByText(label)).toBeTruthy();
     }
   });
 
-  it("opens 'Basic' by default and mounts only its element grid", () => {
+  it("ELEMENTS is open by default (▾) with its rows mounted; BLOCKS is closed", () => {
     render(<BuildTab composer={null} onBlockClick={vi.fn()} />);
-    // Basic is the first-session default open category.
+    expect(screen.getByTestId("insert-group-elements")).toHaveAttribute("aria-expanded", "true");
+    // A known element row is mounted…
     expect(screen.getByText("Heading")).toBeTruthy();
-    // Layout is collapsed → its elements are not mounted.
-    expect(screen.queryByText("Container")).toBeNull();
+    // …and the closed BLOCKS group has no rows mounted.
+    expect(screen.getByTestId("insert-group-blocks")).toHaveAttribute("aria-expanded", "false");
+    expect(screen.queryByTestId(/^insert-block-/)).toBeNull();
   });
-});
 
-describe("BuildTab — exclusive accordion toggle", () => {
-  it("opening Layout closes Basic (single-open invariant)", () => {
+  it("groups toggle independently — opening BLOCKS keeps ELEMENTS open", () => {
     render(<BuildTab composer={null} onBlockClick={vi.fn()} />);
-    expect(screen.getByText("Heading")).toBeTruthy();
+    fireEvent.click(screen.getByTestId("insert-group-blocks"));
+    expect(screen.getByTestId("insert-group-blocks")).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByTestId("insert-group-elements")).toHaveAttribute("aria-expanded", "true");
+    // Scoped by testid: a BLOCK named "Heading" exists too once BLOCKS is open.
+    expect(screen.getByTestId("insert-el-Heading")).toBeTruthy();
+  });
 
-    fireEvent.click(screen.getByText("Layout"));
-
-    expect(screen.getByText("Container")).toBeTruthy();
-    expect(screen.queryByText("Heading")).toBeNull();
+  it("clicking a BLOCKS row inserts through the same onBlockClick path elements use", () => {
+    const onBlockClick = vi.fn();
+    render(<BuildTab composer={null} onBlockClick={onBlockClick} />);
+    fireEvent.click(screen.getByTestId("insert-group-blocks"));
+    const first = document.querySelector('[data-testid^="insert-block-"]') as HTMLElement;
+    expect(first).toBeTruthy();
+    fireEvent.click(first);
+    expect(onBlockClick).toHaveBeenCalledTimes(1);
+    expect(onBlockClick.mock.calls[0][0]).toHaveProperty("id");
+    expect(onBlockClick.mock.calls[0][0]).toHaveProperty("label");
   });
 });
 

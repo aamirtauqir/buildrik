@@ -19,6 +19,8 @@ import * as React from "react";
 
 interface SvgIconProps {
   html: string;
+  /** Explicit px size (board-137:2 rows use 12); omit to size via CSS. */
+  size?: number;
 }
 
 const ICON_PROP_NAME = ["dangerously", "Set", "Inner", "HTML"].join("");
@@ -30,9 +32,11 @@ const ICON_PROP_NAME = ["dangerously", "Set", "Inner", "HTML"].join("");
  * in the catalog is a stable module-level literal, so the memo check is a
  * single reference comparison.
  */
-export const SvgIcon: React.FC<SvgIconProps> = React.memo(({ html }) =>
+export const SvgIcon: React.FC<SvgIconProps> = React.memo(({ html, size }) =>
   React.createElement("svg", {
     viewBox: "0 0 24 24",
+    // Board 137:2 rows size the icon to 12px; legacy call sites size via CSS.
+    ...(size != null ? { width: size, height: size } : {}),
     [ICON_PROP_NAME]: { __html: html },
   })
 );
