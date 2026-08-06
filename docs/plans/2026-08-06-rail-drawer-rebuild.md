@@ -129,8 +129,16 @@ Insert state-board ledger (updated after fetches):
   by 8"). Rows implementation replaced with the grid.
 - 138:198 disabled-item ✅ — Soon tag + reason tooltip (ink bg, white 12) +
   no insert; wired to the pre-existing ElEntry.disabled flag.
-- DELTA PASSES REMAINING (code exists, board unfetched): 138:53 searching ·
-  138:106 no-results · 138:153 dragging · 138:244 tip-dismissed.
+- 138:53 searching FETCHED, contract extracted, IMPLEMENTATION PENDING:
+  flat result rows 32h — label 13 ink @16 + SOURCE-GROUP tag 11 caps muted
+  right (@230, tracking .5). NO "N results for" header, NO category grouping,
+  NO cards. Results span ALL sources (sample: Button/ELEMENTS,
+  Button group/BLOCKS, CTA button/COMPONENTS) — search must cover elements +
+  blocks (+ components/mine when async). Paste-HTML row + TipsFooter STAY
+  VISIBLE during search (current code hides panel-bottom while searching —
+  board contradicts). SearchResults.tsx needs the rebuild.
+- DELTA PASSES REMAINING (board unfetched): 138:106 no-results · 138:153
+  dragging · 138:244 tip-dismissed.
 
 ## NOT in scope
 
