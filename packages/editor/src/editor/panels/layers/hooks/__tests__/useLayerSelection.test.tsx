@@ -48,6 +48,42 @@ afterEach(() => {
   document.body.replaceChildren();
 });
 
+describe("useLayerSelection — engine event sync (multi-select regression)", () => {
+  it("reflects SELECTION_ADDED/REMOVED — what meta-click toggle actually emits", () => {
+    // Real event registry + mutable selection: the engine's addToSelection
+    // emits selection:added, NOT selection:changed. The hook must hear it.
+    const handlers = new Map<string, Set<(p?: unknown) => void>>();
+    let ids: string[] = ["a"];
+    const composer = {
+      selection: {
+        getSelectedIds: () => ids,
+        select: vi.fn(),
+        toggle: vi.fn(),
+        addToSelection: vi.fn(),
+        clear: vi.fn(),
+      },
+      elements: { getElement: (id: string) => ({ id }) },
+      on: (ev: string, fn: (p?: unknown) => void) => {
+        if (!handlers.has(ev)) handlers.set(ev, new Set());
+        handlers.get(ev)!.add(fn);
+      },
+      off: (ev: string, fn: (p?: unknown) => void) => handlers.get(ev)?.delete(fn),
+      emit: (ev: string) => handlers.get(ev)?.forEach((fn) => fn()),
+    } as unknown as Composer & { emit: (ev: string) => void };
+
+    const { result } = renderHook(() => useLayerSelection(composer, layers, new Set()));
+    expect(result.current.selectedIds).toEqual(new Set(["a"]));
+
+    ids = ["a", "b"];
+    act(() => composer.emit("selection:added"));
+    expect(result.current.selectedIds).toEqual(new Set(["a", "b"]));
+
+    ids = ["a"];
+    act(() => composer.emit("selection:removed"));
+    expect(result.current.selectedIds).toEqual(new Set(["a"]));
+  });
+});
+
 describe("useLayerSelection — plain + meta clicks", () => {
   it("selectSingle selects the resolved element", () => {
     const { composer, select } = makeComposer();

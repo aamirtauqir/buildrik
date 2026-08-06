@@ -45,11 +45,18 @@ export function useLayerSelection(
     if (!composer) return;
     const sync = () => setSelectedIds(new Set(composer.selection.getSelectedIds()));
     sync();
+    // SELECTION_ADDED/REMOVED are what addToSelection/removeFromSelection
+    // (meta-click toggle, shift-range) actually emit — without them the tree
+    // never reflected multi-select even though the engine held it.
     composer.on(EVENTS.SELECTION_CHANGED, sync);
     composer.on(EVENTS.SELECTION_CLEARED, sync);
+    composer.on(EVENTS.SELECTION_ADDED, sync);
+    composer.on(EVENTS.SELECTION_REMOVED, sync);
     return () => {
       composer.off(EVENTS.SELECTION_CHANGED, sync);
       composer.off(EVENTS.SELECTION_CLEARED, sync);
+      composer.off(EVENTS.SELECTION_ADDED, sync);
+      composer.off(EVENTS.SELECTION_REMOVED, sync);
     };
   }, [composer]);
 
