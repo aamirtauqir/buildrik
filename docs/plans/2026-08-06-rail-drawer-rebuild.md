@@ -97,12 +97,16 @@ decided, final. **Brand IA: boards win** — the 26 drawer screens replace the
 
 ## Insert `137:2` — extracted board contract (fetched 2026-08-06)
 
-Geometry (px): header **44h** · search band **36h** (box 288×28, rounded-6,
-bg-subtle, "Search elements" 13 muted + `⌘F` Geist Mono 11 right) · group
-header **32h** (▾/▸ @16, LABEL 11/500 tracking .5 @32, count Geist Mono 11
-right-aligned @284) · list row **32h** (12px icon rounded-2 + 13/400 label,
-px-16 gap-8) · flex spacer · pinned `⌥ Paste HTML…` row 32h · **TipsFooter
-40h** (accent-tint bg, accent-text 12, `💡 Tip 2/5` left, `‹ › ✕` right).
+Geometry (px), **re-fetched after founder edits (2nd fetch, same day)**:
+header **44h** (title 11/500 caps tracking .5) · search band **36h, border
+`--bk-border` + rounded-6** (box 288×28 **bg gray-50 `#f9fafb` + border
+`--bk-border`**, rounded-6, "Search elements" 13 muted + `⌘F` Geist Mono 11
+right) · group header **32h** (▾/▸ @16, LABEL 11/500 tracking .5 @32, count
+Geist Mono 11 right @284) · list row **32h, rounded-4** (12px icon rounded-2 +
+13/400 label, px-16 gap-8) · flex spacer · pinned `⌥ Paste HTML…` row 32h ·
+**TipsFooter 40h** (accent-tint bg, tip 12, controls 11 tracking .5). Board
+root: white + 1px `#f3f4f6` border. Founder's edits = outlined lighter search
+field, rounded rows, bordered band; taxonomy and heights unchanged.
 
 Panel-header component doc (16:6, applies to ALL SEVEN drawers): *"44h. Title
 is 11/600 caps 8% tracking — a label, not a heading. **Pin sits before
@@ -118,9 +122,15 @@ structure. Rebuild = regroup the catalog to the board taxonomy (`blocks/` dir
 own → MINE). Header gains PIN before close; live's "53 blocks · 6 categories"
 subtitle is NOT on the board.
 
-State boards remaining: 138:2 group-expanded · 138:53 searching · 138:106
-no-results · 138:153 dragging · 138:198 disabled-item · 138:244 tip-dismissed ·
-775:4053 loading · 781:4154 load-error.
+Insert state-board ledger (updated after fetches):
+- 137:2 default ✅ rebuilt+verified · 775:4053 loading ✅ · 781:4154 load-error ✅
+- 138:2 group-expanded ✅ — BLOCKS is a CARD GRID (`Card / media` 17:6:
+  136×104, 136×76 thumb, 2 cols 16+136+16+136+16=320 EXACT, "140 overflows
+  by 8"). Rows implementation replaced with the grid.
+- 138:198 disabled-item ✅ — Soon tag + reason tooltip (ink bg, white 12) +
+  no insert; wired to the pre-existing ElEntry.disabled flag.
+- DELTA PASSES REMAINING (code exists, board unfetched): 138:53 searching ·
+  138:106 no-results · 138:153 dragging · 138:244 tip-dismissed.
 
 ## NOT in scope
 
