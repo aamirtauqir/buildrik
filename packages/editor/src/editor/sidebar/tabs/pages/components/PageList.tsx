@@ -218,6 +218,8 @@ export const PageList: React.FC<Props> = ({
                   renamingPageId={renamingPageId}
                   nameError={nameError}
                   openContextMenuPageId={openContextMenuPageId}
+                  selectedIds={selectedIds}
+                  onToggleSelect={onToggleSelect}
                   onToggle={() => onFolderToggle(folder.id)}
                   onFolderRename={(name) => onFolderRename(folder.id, name)}
                   onFolderDelete={() => onFolderDelete(folder.id)}

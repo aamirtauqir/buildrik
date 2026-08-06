@@ -178,7 +178,7 @@
 
 /* ─── ROW VARIANTS ────────────────────────────────────────────────────── */
 .bd-pg-row.nested { padding-left: 22px; }
-.bd-pg-row.folder-row .bd-pg-row-icon { color: var(--bk-warning); }
+.bd-pg-row.folder-row .bd-pg-row-icon { color: var(--bk-ink-muted); }
 .bd-pg-row.selected .bd-pg-row-checkbox { background: var(--bk-accent); border-color: var(--bk-accent); }
 /* .bd-pg-row.expanded-folder .bd-pg-row-disclosure descendant rule
    removed 2026-05-24 — .bd-pg-row-disclosure has no JSX consumer. */
@@ -197,6 +197,18 @@
 }
 .bd-pg-row-checkbox svg { width: 10px; height: 10px; color: var(--bk-accent-on); opacity: 0; }
 .bd-pg-row.selected .bd-pg-row-checkbox svg { opacity: 1; }
+/* Folder-row checkbox states — board 140:11-12 + Checkbox 12:26 mixed rule. */
+.bd-pg-row-checkbox.on,
+.bd-pg-row-checkbox.mixed { background: var(--bk-accent); border-color: var(--bk-accent); }
+.bd-pg-row-checkbox.on svg { opacity: 1; }
+.bd-pg-row-checkbox.mixed svg { display: none; }
+.bd-pg-row-checkbox.mixed::after {
+  content: "";
+  width: 8px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--bk-accent-on);
+}
 
 .bd-pg-row-grip {
   display: none;
@@ -309,15 +321,12 @@
 .bd-pg-folder { display: block; }
 .bd-pg-folder-children { padding-left: 0; }
 .bd-pg-folder-count {
+  /* Board 140:16: bare Geist Mono 11 — no pill, no background. */
   display: inline-flex;
   align-items: center;
-  height: 16px;
-  padding: 0 6px;
-  margin-left: var(--bk-space-4);
-  border-radius: 4px;
-  background: rgba(15, 23, 42, 0.06);
+  margin-left: auto;
   color: var(--bk-ink-muted);
-  font: 500 10.5px var(--bk-font-ui);
+  font: 500 11px/16px var(--bk-font-mono);
   font-variant-numeric: tabular-nums;
 }
 .bd-pg-folder-actions {

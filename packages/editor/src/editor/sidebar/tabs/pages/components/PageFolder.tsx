@@ -26,6 +26,8 @@ interface Props {
   renamingPageId: string | null;
   nameError: string | null;
   openContextMenuPageId: string | null;
+  selectedIds: Set<string>;
+  onToggleSelect: (id: string, e: React.MouseEvent | React.KeyboardEvent) => void;
   onToggle: () => void;
   onFolderRename: (name: string) => void;
   onFolderDelete: () => void;
@@ -47,6 +49,8 @@ export const PageFolder: React.FC<Props> = ({
   renamingPageId,
   nameError,
   openContextMenuPageId,
+  selectedIds,
+  onToggleSelect,
   onToggle,
   onFolderRename,
   onFolderDelete,
@@ -92,6 +96,17 @@ export const PageFolder: React.FC<Props> = ({
     if (pageId) onDrop(pageId);
   };
 
+  const selCount = pages.filter((p) => selectedIds.has(p.id)).length;
+  const toggleAllMembers = (e: React.MouseEvent | React.KeyboardEvent) => {
+    if (selCount === pages.length) {
+      pages.forEach((p) => onToggleSelect(p.id, e));
+    } else {
+      pages.forEach((p) => {
+        if (!selectedIds.has(p.id)) onToggleSelect(p.id, e);
+      });
+    }
+  };
+
   const isExpanded = !folder.collapsed;
   const folderRowClasses = [
     "bd-pg-row",
@@ -120,6 +135,31 @@ export const PageFolder: React.FC<Props> = ({
             }
           }}
         >
+          {/* Board 140:11-12: folder row carries the same 16px checkbox as
+              page rows — mixed when only some members are selected (the
+              Checkbox 12:26 doc's parent-row rule). */}
+          <div
+            className={`bd-pg-row-checkbox${selCount === pages.length && pages.length > 0 ? " on" : selCount > 0 ? " mixed" : ""}`}
+            role="checkbox"
+            aria-checked={selCount === pages.length && pages.length > 0 ? "true" : selCount > 0 ? "mixed" : "false"}
+            aria-label={`Select all pages in ${folder.name}`}
+            tabIndex={0}
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleAllMembers(e);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === " " || e.key === "Enter") {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleAllMembers(e);
+              }
+            }}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" aria-hidden="true">
+              <path d="M5 12l5 5L20 7" />
+            </svg>
+          </div>
           <IconButton
             size="sm"
             label={isExpanded ? `Collapse ${folder.name}` : `Expand ${folder.name}`}
@@ -134,7 +174,7 @@ export const PageFolder: React.FC<Props> = ({
             </svg>
           </IconButton>
 
-          <span style={{ flexShrink: 0, color: "var(--bk-warning)", display: "grid", placeItems: "center" }} aria-hidden="true">
+          <span style={{ flexShrink: 0, color: "var(--bk-ink-muted)", display: "grid", placeItems: "center" }} aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ width: 12, height: 12 }}>
               <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" />
             </svg>
@@ -172,7 +212,7 @@ export const PageFolder: React.FC<Props> = ({
             </span>
           )}
 
-          <span style={{ display: "inline-flex", alignItems: "center", height: 16, padding: "0 6px", marginLeft: "var(--bk-space-4)", borderRadius: 4, background: "rgba(15, 23, 42, 0.06)", color: "var(--bk-ink-muted)", font: "500 10.5px var(--bk-font-ui)", fontVariantNumeric: "tabular-nums" }} aria-label={`${pages.length} pages in folder`}>
+          <span className="bd-pg-folder-count" aria-label={`${pages.length} pages in folder`}>
             {pages.length}
           </span>
 
@@ -236,7 +276,9 @@ export const PageFolder: React.FC<Props> = ({
                 isRenaming={renamingPageId === page.id}
                 nameError={renamingPageId === page.id ? nameError : null}
                 isContextMenuOpen={openContextMenuPageId === page.id}
+                isSelected={selectedIds.has(page.id)}
                 onSelect={() => onSelectPage(page.id)}
+                onToggleSelect={(e) => onToggleSelect(page.id, e)}
                 onRenameStart={() => onRenameStart(page.id)}
                 onRenameCommit={(name) => onRenameCommit(page.id, name)}
                 onRenameCancel={onRenameCancel}

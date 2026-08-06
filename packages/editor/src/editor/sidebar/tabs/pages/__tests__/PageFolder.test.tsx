@@ -21,6 +21,8 @@ const pages: PageItem[] = [
 
 const baseProps = {
   allPages: pages,
+  selectedIds: new Set<string>(),
+  onToggleSelect: vi.fn(),
   composer: null,
   renamingPageId: null,
   nameError: null,
@@ -127,5 +129,42 @@ describe("PageFolder (flat model)", () => {
     expect(container.querySelector(".pg-folder__header")).toBeNull();
     expect(container.querySelector(".pg-folder__chevron")).toBeNull();
     expect(container.querySelector(".pg-folder__pages")).toBeNull();
+  });
+
+  // Board 140:11-12 + Checkbox 12:26: folder row carries a parent checkbox —
+  // mixed when only some members are selected, and clicking selects the rest.
+  it("folder checkbox is mixed with a partial selection and selects the remainder on click", () => {
+    const onToggleSelect = vi.fn();
+    render(
+      <PageFolder
+        folder={folder}
+        pages={pages}
+        {...baseProps}
+        selectedIds={new Set([pages[0].id])}
+        onToggleSelect={onToggleSelect}
+      />,
+    );
+    const box = screen.getByRole("checkbox", { name: /select all pages in marketing/i });
+    expect(box).toHaveAttribute("aria-checked", "mixed");
+    fireEvent.click(box);
+    expect(onToggleSelect).toHaveBeenCalledTimes(1);
+    expect(onToggleSelect.mock.calls[0][0]).toBe(pages[1].id);
+  });
+
+  it("folder checkbox is checked when every member is selected and clears all on click", () => {
+    const onToggleSelect = vi.fn();
+    render(
+      <PageFolder
+        folder={folder}
+        pages={pages}
+        {...baseProps}
+        selectedIds={new Set(pages.map((p) => p.id))}
+        onToggleSelect={onToggleSelect}
+      />,
+    );
+    const box = screen.getByRole("checkbox", { name: /select all pages in marketing/i });
+    expect(box).toHaveAttribute("aria-checked", "true");
+    fireEvent.click(box);
+    expect(onToggleSelect).toHaveBeenCalledTimes(pages.length);
   });
 });

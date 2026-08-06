@@ -1,7 +1,7 @@
 {
-  "inline_literal": 770,
+  "inline_literal": 769,
   "inline_hoisted": 335,
-  "css_lines": 10025,
+  "css_lines": 10034,
   "css_files": {
     "inspector/styles/inspector.css": 1038,
     "media/ImageEditorModal.css": 326,
@@ -18,7 +18,7 @@
     "sidebar/tabs/media/MediaTab.css": 1656,
     "sidebar/tabs/media/components/ExpandedMediaPanel.css": 234,
     "sidebar/tabs/media/components/SlimLauncher.css": 24,
-    "sidebar/tabs/pages/PagesTab.css": 860,
+    "sidebar/tabs/pages/PagesTab.css": 869,
     "sidebar/tabs/settings/settings.css": 581,
     "sidebar/tabs/templates/ApplyProgressOverlay.css": 58,
     "sidebar/tabs/templates/TemplatePreviewModal.css": 221,
