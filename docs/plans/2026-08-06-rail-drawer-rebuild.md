@@ -228,6 +228,19 @@ arcs. The gate is in NO verify chain (verify:ds excludes it) so it sat red
 unnoticed — same class as the dashboard gate:figma trap. Founder call:
 re-baseline with reason or wire it into verify:ds.
 
+## Insert taxonomy — FOUNDER FINAL 2026-08-07: TEMPLATES OUT
+
+"Template ka apna poora flow hai, Insert mein adjust nahi ho raha." Insert
+= ELEMENTS · BLOCKS · COMPONENTS · MINE. Templates' surfaces: rail tab
+(gallery 641:2487), Pages new-page (S1.3b), first-run (S1.1b). MINE now
+expands INLINE (board 1069:4970) — live user components, click =
+instantiateComponent (same parent contract as the Components surface).
+COMPONENTS stays navigate: its expanded board (1069:4790) draws a curated
+UI catalog with NO live source yet — inline would duplicate MINE.
+FIGMA DEBT (founder's file): Insert boards still draw a TEMPLATES group
+row; `Insert · templates-expanded` (1069:4905) is obsolete; the 3 NEW ONES
+boards are unwired. Founder to update/delete or delegate.
+
 ## Templates + Components families — PULLED INTO SCOPE (founder, 2026-08-06)
 
 Founder hit them THROUGH Insert (the navigate groups land on the old-design

@@ -41,11 +41,14 @@ describe("BuildTab — board 137:2 taxonomy", () => {
     expect(screen.queryByText(/categories/)).toBeNull();
   });
 
-  it("renders the five source groups: ELEMENTS BLOCKS COMPONENTS TEMPLATES MINE", () => {
+  // TEMPLATES is OUT of Insert (founder, 2026-08-07) — templates own a full
+  // flow (rail tab, Pages new-page, first-run) and never lived here.
+  it("renders the four source groups: ELEMENTS BLOCKS COMPONENTS MINE — no TEMPLATES", () => {
     renderTab();
-    for (const label of ["ELEMENTS", "BLOCKS", "COMPONENTS", "TEMPLATES", "MINE"]) {
+    for (const label of ["ELEMENTS", "BLOCKS", "COMPONENTS", "MINE"]) {
       expect(screen.getByText(label)).toBeTruthy();
     }
+    expect(screen.queryByText("TEMPLATES")).toBeNull();
   });
 
   it("ELEMENTS is open by default (▾) with its rows mounted; BLOCKS is closed", () => {

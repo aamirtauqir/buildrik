@@ -25,6 +25,8 @@ import { useToast } from "@/editor/chrome-ui";
 import { SearchResults } from "./components/SearchResults";
 import { TransitionCallout } from "./components/TransitionCallout";
 import { buildInsertGroups, elementRows, blockRows, type InsertGroupId } from "./catalog/groups";
+import { EVENTS } from "../../../../shared/constants";
+import type { ComponentDefinition } from "../../../../shared/types/components";
 import "./BuildTab.css";
 
 export interface BuildTabProps {
@@ -44,11 +46,46 @@ export const BuildTab: React.FC<BuildTabProps> = ({
   const isSearching = tab.searchQuery.trim().length > 0;
 
   // Board 137:2 taxonomy: ELEMENTS open (▾), the rest closed (▸).
-  const groups = React.useMemo(buildInsertGroups, []);
   const [openGroups, setOpenGroups] = React.useState<Set<InsertGroupId>>(
     () => new Set<InsertGroupId>(["elements"]),
   );
   const { addToast } = useToast();
+
+  // MINE (board 1069:4970): the user's own components, inline. Same load +
+  // subscribe shape useComponentsState uses.
+  const [mine, setMine] = React.useState<ComponentDefinition[]>([]);
+  React.useEffect(() => {
+    if (!composer?.components) return;
+    const load = () => setMine(composer.components?.getAllComponents() ?? []);
+    load();
+    composer.on(EVENTS.COMPONENT_LIST_UPDATED, load);
+    return () => {
+      composer.off(EVENTS.COMPONENT_LIST_UPDATED, load);
+    };
+  }, [composer]);
+
+  const groups = React.useMemo(
+    () => buildInsertGroups(composer?.components ? mine.length : null),
+    [composer, mine.length],
+  );
+
+  // MINE row click — the same instantiate contract the Components surface
+  // uses: selected element is the parent, else the active page root.
+  const insertMine = React.useCallback(async (c: ComponentDefinition) => {
+    if (!composer) return;
+    let parentId = composer.selection.getSelectedIds()[0];
+    if (!parentId) parentId = composer.elements.getActivePage()?.root?.id ?? "";
+    if (!parentId) {
+      addToast({ description: "Open a page first to add this component.", tone: "warning" });
+      return;
+    }
+    try {
+      await composer.components.instantiateComponent(c.id, parentId);
+      addToast({ description: "Component added to canvas", tone: "success" });
+    } catch {
+      addToast({ description: "Couldn't add component. Try again.", tone: "error" });
+    }
+  }, [composer, addToast]);
 
   // Board 233:1123 "⌥ Paste HTML…": clipboard → the SAME BlockData insert path
   // everything else uses. useBlockInsertion sanitizes (insertBlock owns the
@@ -167,9 +204,11 @@ export const BuildTab: React.FC<BuildTabProps> = ({
                 onToggle={() => toggleGroup(g)}
                 elements={g.id === "elements" ? elementRows : undefined}
                 blocks={g.id === "blocks" ? blockRows : undefined}
+                mine={g.id === "mine" ? mine : undefined}
                 onDragStart={tab.handleDragStart}
                 onElClick={tab.handleElClick}
                 onBlockInsert={(b) => onBlockClick?.(b)}
+                onMineInsert={(c) => void insertMine(c)}
               />
             ))}
           </div>

@@ -11,6 +11,7 @@
 import * as React from "react";
 import type { FlatElEntry } from "../catalog/types";
 import type { BlockDefinition } from "../../../../../blocks/blockRegistry";
+import type { ComponentDefinition } from "../../../../../shared/types/components";
 import type { InsertGroup } from "../catalog/groups";
 import type { DragStartFn, ElClickFn } from "../hooks/useBuildTab";
 import { Button, Tooltip } from "@/editor/chrome-ui";
@@ -21,9 +22,12 @@ interface GroupSectionProps {
   onToggle: () => void;
   elements?: FlatElEntry[];
   blocks?: BlockDefinition[];
+  /** MINE (board 1069:4970): the user's own components as plain rows. */
+  mine?: ComponentDefinition[];
   onDragStart: DragStartFn;
   onElClick: ElClickFn;
   onBlockInsert?: (block: BlockDefinition) => void;
+  onMineInsert?: (component: ComponentDefinition) => void;
 }
 
 /** Board group header: 32h · ▾/▸ 12px @16 · LABEL 11/500 caps tracking .5 · count mono 11 right. */
@@ -116,7 +120,7 @@ export const Row: React.FC<{
 };
 
 export const GroupSection: React.FC<GroupSectionProps> = ({
-  group, isOpen, onToggle, elements, blocks, onDragStart, onElClick, onBlockInsert,
+  group, isOpen, onToggle, elements, blocks, mine, onDragStart, onElClick, onBlockInsert, onMineInsert,
 }) => (
   <div data-testid={`insert-section-${group.id}`}>
     <HeaderRow group={group} isOpen={isOpen} onToggle={onToggle} />
@@ -137,6 +141,17 @@ export const GroupSection: React.FC<GroupSectionProps> = ({
         320w: 16+136+16+136+16 = 320 EXACTLY ("140 was tried and overflows by
         8"). Thumb is the block's preview when it has one, empty until then —
         the board names it "thumb/site-preview (empty until first publish)". */}
+    {/* Board 1069:4970 (mine-expanded): the user's own components as plain
+        32h rows — same Row treatment as ELEMENTS. Empty registry = no rows;
+        the group header's live count already says 0. */}
+    {isOpen && group.id === "mine" && mine?.map((c) => (
+      <Row
+        key={c.id}
+        label={c.name}
+        testId={`insert-mine-${c.id}`}
+        onClick={() => onMineInsert?.(c)}
+      />
+    ))}
     {isOpen && group.id === "blocks" && (
       <div className="tw:flex tw:flex-wrap tw:gap-[16px] tw:px-[16px] tw:py-[8px]">
         {blocks?.map((b) => (
