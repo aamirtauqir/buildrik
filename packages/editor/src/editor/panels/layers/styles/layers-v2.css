@@ -237,6 +237,7 @@
   border: none;
   border-radius: 5px;
   color: var(--bk-ink-soft);
+  font: 400 13px/16px var(--bk-font-ui);
   cursor: pointer;
   padding: 0;
 }
@@ -255,7 +256,7 @@
 }
 
 .bdc-layers-banner-count {
-  font: 500 10px var(--bk-font-mono);
+  font: 500 12px/16px var(--bk-font-ui);
   color: var(--bk-ink-soft);
   flex: 1;
 }
@@ -297,7 +298,8 @@
   padding: 6px 10px;
   overflow-x: auto;
   border-bottom: 1px solid var(--bk-border);
-  font: 500 9.5px var(--bk-font-mono);
+  /* Navigation labels are Inter — Geist Mono is data-only (DESIGN.md). */
+  font: 400 11px/16px var(--bk-font-ui);
 }
 
 .bdc-layers-crumb button {
@@ -333,16 +335,17 @@
   z-index: 1000;
   background: var(--bk-bg-card);
   border: 1px solid var(--bk-border);
-  border-radius: var(--bk-radius-lg);
-  box-shadow: 0 8px 24px -6px rgba(15, 23, 42, 0.18);
+  border-radius: var(--bk-radius-md);
+  box-shadow: var(--bk-shadow-overlay);
   padding: var(--bk-space-4);
   min-width: 180px;
-  font: 500 11px var(--bk-font-ui);
+  font: 400 13px/20px var(--bk-font-ui);
 }
 
 .bdc-menu-item {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: var(--bk-space-8);
   padding: 6px 10px;
   border-radius: 5px;
@@ -376,11 +379,9 @@
 .bdc-menu-lbl { flex: 1; }
 
 .bdc-menu-kbd {
-  font: 500 9.5px var(--bk-font-mono);
-  color: var(--bk-ink-muted);
-  background: var(--bk-bg-subtle);
-  padding: 1px var(--bk-space-4);
-  border-radius: 3px;
+  /* Bare Geist Mono, no chip — the same kbd treatment the ⌘F hint uses. */
+  font: 500 11px/16px var(--bk-font-mono);
+  color: var(--bk-ink-soft);
   flex-shrink: 0;
 }
 
