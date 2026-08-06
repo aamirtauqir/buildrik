@@ -1,5 +1,6 @@
 /**
- * LayersEmptyState - Empty state for Layers panel when canvas has no elements.
+ * LayersEmptyState — board 143:355 (Layers · empty): two centered muted
+ * lines and the one accent "Open Insert" link. No icon, no button chrome.
  * @license BSD-3-Clause
  */
 
@@ -12,17 +13,23 @@ interface LayersEmptyStateProps {
 
 export const LayersEmptyState: React.FC<LayersEmptyStateProps> = ({ onAddBlockClick }) => {
   return (
-    <div className="bdc-layers-empty">
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-        <rect x="3" y="4" width="14" height="4" rx="1" />
-        <rect x="7" y="10" width="14" height="4" rx="1" />
-        <rect x="3" y="16" width="14" height="4" rx="1" />
-      </svg>
-      <h3>No layers yet</h3>
-      <p>Drop in a block to get started.</p>
+    <div
+      className="tw:flex tw:flex-col tw:items-center tw:gap-2.5 tw:px-6 tw:pt-12"
+      data-testid="layers-empty"
+    >
+      <p className="tw:m-0 tw:text-center tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
+        This page is empty. Drop something on the canvas to see it here.
+      </p>
       {onAddBlockClick && (
-        <Button className="bdc-btn bdc-primary" onClick={onAddBlockClick}>
-          Browse blocks
+        <Button
+          type="button"
+          color="light"
+          size="xs"
+          className="tw:min-h-0 tw:border-0 tw:bg-transparent tw:p-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-accent-text)] tw:shadow-none tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+          data-testid="layers-open-insert"
+          onClick={onAddBlockClick}
+        >
+          Open Insert
         </Button>
       )}
     </div>

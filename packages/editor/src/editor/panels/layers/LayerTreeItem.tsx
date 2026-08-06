@@ -94,7 +94,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
   const canDrag = !!(composer && layer.depth > 0 && !isLocked);
 
   const rowStyle: React.CSSProperties = {
-    paddingLeft: `${6 + layer.depth * 14}px`,
+    paddingLeft: `${16 + layer.depth * 14}px`,
   };
 
   const rowClassNames = [

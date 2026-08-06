@@ -16,6 +16,7 @@ import { LayerSelectionBanner } from "./components/LayerSelectionBanner";
 import { useLayerContextActions } from "./hooks/useLayerContextActions";
 import { useLayersState } from "./hooks/useLayersState";
 import { LayerTreeItem } from "./LayerTreeItem";
+import { itemMatches } from "./hooks/useLayerSearch";
 import { LayersNoResults } from "./components/LayersStateBlocks";
 import type { LayersPanelProps } from "./types";
 import { Button } from "@/editor/chrome-ui";
@@ -335,8 +336,26 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
   }, [composer, state.selectionHook]);
 
   // Filter tree by search only (no category filters in Minimal Tree design)
-  const filteredLayers = state.filterTree(state.layers);
+  const treeFiltered = state.filterTree(state.layers);
   const matchCount = state.searchHook.countMatches(state.layers, state.actionsHook.customNames);
+
+  // Board 143:2 (Layers · filtered): search results render FLAT — only the
+  // matching rows, no indentation, no chevrons, no ancestor context. The
+  // filtered tree keeps ancestors so we walk it and keep just the matches.
+  const filteredLayers = React.useMemo(() => {
+    if (!state.searchHook.isSearching) return treeFiltered;
+    const q = state.search.toLowerCase();
+    const names = state.actionsHook.customNames;
+    const flat: typeof treeFiltered = [];
+    const walk = (items: typeof treeFiltered) => {
+      for (const it of items) {
+        if (itemMatches(it, names, q)) flat.push({ ...it, children: [], depth: 0 });
+        walk(it.children as typeof treeFiltered);
+      }
+    };
+    walk(treeFiltered);
+    return flat;
+  }, [treeFiltered, state.searchHook.isSearching, state.search, state.actionsHook.customNames]);
 
   return (
     <div className="bdc-layers-panel">
@@ -366,7 +385,6 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
       {/* Drop feedback message (UX improvement - Phase 3) */}
       {dropFeedback && (
         <div className="bdc-layers-drop-alert" role="alert" aria-live="assertive">
-          <span aria-hidden>{dropFeedback.type === "error" ? "⚠️" : "ℹ️"}</span>
           {dropFeedback.message}
         </div>
       )}

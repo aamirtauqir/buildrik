@@ -281,9 +281,19 @@ icon call, and what 244:1580 draws); eye/lock are ALWAYS drawn at gray-300
 (were hover-reveal — board contradicts) in board order 👁 then 🔒; rows are
 28h px-16 gap-8; selected = accent-tint + 2px accent bar with the label
 staying ink (was accent-600 bold, not on the board).
-REMAINING Layers delta passes (boards unfetched): 143:60 dragging ·
-143:355 empty · 143:2 filtered · 143:179 hidden · 143:119 invalid-drop ·
-143:237 locked · 143:295 multi-select. Plus 1082:4739
+State passes DONE 2026-08-07 (from the founder's own board exports, all 11
+frames in hand): empty 143:355 = two centered muted lines + "Open Insert"
+accent link (icon/button/old copy gone); filtered 143:2 = FLAT match rows
+(no indent/chevron/ancestors — itemMatches exported and reused, footer
+keeps the total); dragging 143:60 = full-width edge-to-edge accent drop
+line; invalid-drop 143:119 = full-width ink band with the reason in white
+12 (was a red tinted card with a ⚠️ emoji); hidden 143:179 = muted label
+(italic dropped) + gray-300 icon/chevron + gray-200 controls; locked
+143:237 = lock-on in ink (was warning-orange — board draws it dark);
+multi-select 143:295 = footer flips to "N selected of M" at 2+; row indent
+base fixed 6→16 (board px-16); the layers search input lost its inner
+flowbite ring (container is the box). Loading/error/no-results were
+already live (08-04). Plus 1082:4739
 Layers · component-instance — a NEW founder board that is NOT in
 boards.json yet (regenerate or hand-add before the regression net can see
 it). Loading/error/no-results shipped 08-04 (LayersStateBlocks).

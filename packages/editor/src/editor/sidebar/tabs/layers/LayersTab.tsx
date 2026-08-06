@@ -52,6 +52,17 @@ export interface LayersTabProps {
   onClose?: () => void;
 }
 
+/* Board 142:8: the .bdc-psearch container is the box — the flowbite input's
+   own border/ring inside it reads as a second box. */
+const searchInputStyles: React.CSSProperties = {
+  border: "none",
+  boxShadow: "none",
+  background: "transparent",
+  fontSize: 13,
+  lineHeight: "20px",
+  fontFamily: "var(--bk-font-ui)",
+};
+
 export const LayersTab: React.FC<LayersTabProps> = ({
   composer,
   onElementSelect,
@@ -129,12 +140,16 @@ export const LayersTab: React.FC<LayersTabProps> = ({
       <div className="bdc-ltoolbar">
         {/* Board 142:8: bare box — no magnifier glyph. */}
         <label className="bdc-psearch">
+          {/* The CONTAINER (.bdc-psearch) is the box — board 142:8. The
+              flowbite input's own border/ring inside it reads as a second
+              box; inline style outranks the theme utilities. */}
           <TextInput
             type="text"
             placeholder="Search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             aria-label="Search layers"
+            style={searchInputStyles}
           />
         </label>
         <Button className="bdc-icon-btn" title="Expand all" aria-label="Expand all layers" onClick={handleExpandAll}>
@@ -176,8 +191,9 @@ export const LayersTab: React.FC<LayersTabProps> = ({
       {/* Board 142:58 Count footer — the node count lives here, not in the
           header subtitle; the header stays a bare label. */}
       <div className="bdc-lcount" aria-live="polite">
-        {stats.total} layer{stats.total === 1 ? "" : "s"}
-        {stats.selected > 0 ? ` · ${stats.selected} selected` : ""}
+        {stats.selected >= 2
+          ? `${stats.selected} selected of ${stats.total}`
+          : `${stats.total} layer${stats.total === 1 ? "" : "s"}`}
       </div>
     </PanelFrame>
   );
