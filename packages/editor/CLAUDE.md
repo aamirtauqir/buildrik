@@ -20,6 +20,39 @@ Demo app: `demo/main.tsx` on port 5050.
 - **Sentry** — error tracking
 - **Vitest** — testing
 
+## FIGMA UI REBUILD — THE LOOP (founder rules, 2026-08-06)
+
+Full-UI rebuild in progress: every editor surface rebuilt to Figma
+`g4GzQFqzNYz5sosz1QtZXC` page `1:3`. Checklist = `scripts/conformance/boards.json`
+(288 active boards / 33 families). Plan + review record:
+`docs/plans/2026-08-06-editor-figma-rebuild.md`.
+
+**Precedence (founder, final):** behaviour → the CODE contract (Zod schemas,
+service returns — proof: the 8-row pre-checks board was corrected TO the code).
+Everything VISUAL — layout, colour, type, copy on screen — → the BOARD.
+Board sample data ("Bella Cucina", "In review · 3 open", "Nothing matches
+'hero'") is never conformed to literally; the SHAPE is the contract.
+
+**The build loop, per board — Figma's official skill, not homegrown tooling:**
+1. Load `figma:figma-design-to-code`, then `get_design_context(board)` —
+   reference code + screenshot + component docs.
+2. Build from the reference, adapted to chrome-ui + `tw:` + `--bk-*` tokens.
+3. **Verify = board screenshot vs live screenshot, side by side, by eye.**
+   Live at 1440×900, element selected where the board shows selection.
+   Not matching → keep fixing. This is the acceptance, nothing else.
+4. Tests protecting the OLD design get rewritten in the same commit
+   (`PageList.test.tsx:55` asserted drifted copy for months).
+
+**The conformance harness (`scripts/conformance/`) is a REGRESSION NET ONLY.**
+Property probes are thermometers — they answer only what they are asked and
+went silent while the inspector body diverged wholesale from its board. A
+probe result is never accepted as visual verification. (Founder call,
+2026-08-06, after exactly that failure.)
+
+Traps already hit: `.layout-shell__*` classes reused inside `.bd-studio` (flex
+host) lose their grid-area sizing — set explicit heights. `AquibraStudio.tsx`
+mid-edit in the founder's tree → never stage it from an agent session.
+
 ## Path Aliases
 
 ```
