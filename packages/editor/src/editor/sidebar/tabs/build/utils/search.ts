@@ -15,12 +15,14 @@ import type { BlockDefinition } from "../../../../../blocks/blockRegistry";
 /** One flat search hit — the payload field matches `group`. */
 export type InsertSearchHit =
   | { key: string; label: string; group: "ELEMENTS"; el: FlatElEntry }
-  | { key: string; label: string; group: "BLOCKS"; block: BlockDefinition };
+  | { key: string; label: string; group: "BLOCKS"; block: BlockDefinition }
+  | { key: string; label: string; group: "COMPONENTS"; block: BlockDefinition };
 
 export function searchInsert(
   query: string,
   elements: FlatElEntry[],
-  blocks: BlockDefinition[]
+  blocks: BlockDefinition[],
+  components: BlockDefinition[] = []
 ): InsertSearchHit[] {
   const q = query.toLowerCase().trim();
   if (!q) return [];
@@ -49,5 +51,14 @@ export function searchInsert(
       block: b,
     }));
 
-  return [...elHits, ...blockHits];
+  const componentHits: InsertSearchHit[] = components
+    .filter((b) => b.label.toLowerCase().includes(q) || b.id.toLowerCase().includes(q))
+    .map((b) => ({
+      key: `component-${b.id}`,
+      label: b.label,
+      group: "COMPONENTS" as const,
+      block: b,
+    }));
+
+  return [...elHits, ...blockHits, ...componentHits];
 }

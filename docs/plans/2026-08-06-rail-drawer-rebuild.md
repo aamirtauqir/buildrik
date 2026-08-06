@@ -241,6 +241,18 @@ FIGMA DEBT (founder's file): Insert boards still draw a TEMPLATES group
 row; `Insert · templates-expanded` (1069:4905) is obsolete; the 3 NEW ONES
 boards are unwired. Founder to update/delete or delegate.
 
+## Insert — COMPONENTS inline SHIPPED 2026-08-07 (board 1069:4790)
+
+The catalog source turned out to EXIST: `src/blocks/Components/` — 13
+component blocks (Card, Slider, Testimonials, Pricing, Progress, Countdown,
+Accordion, SocialIcons, Stack, Switch, Tabs, Modal, Table). Registry now
+exports `componentBlockDefinitions`; Insert's COMPONENTS group expands
+inline with those rows (same Row + same onBlockClick insert path), BLOCKS
+carries the remaining 50, search gains the third COMPONENTS tag (board
+138:53's sample always showed it), and the navigate kind is gone — all
+four groups are inline. Components MANAGEMENT surface stays on the rail.
+Insert family: every board implemented, no navigate/inline conflict left.
+
 ## Templates + Components families — PULLED INTO SCOPE (founder, 2026-08-06)
 
 Founder hit them THROUGH Insert (the navigate groups land on the old-design

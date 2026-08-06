@@ -173,6 +173,28 @@ export const blockDefinitions: BlockDefinition[] = [
   cartButtonBlockConfig,
 ];
 
+/**
+ * The Components-folder subset — Insert's COMPONENTS group renders these
+ * inline (board 1069:4790) while BLOCKS carries the rest. Same registry,
+ * one membership list: keep it in lockstep with the "Component blocks"
+ * span of blockDefinitions above.
+ */
+export const componentBlockDefinitions: BlockDefinition[] = [
+  cardBlockConfig,
+  sliderBlockConfig,
+  testimonialsBlockConfig,
+  pricingBlockConfig,
+  progressBlockConfig,
+  countdownBlockConfig,
+  accordionBlockConfig,
+  socialIconsBlockConfig,
+  stackBlockConfig,
+  switchBlockConfig,
+  tabsBlockConfig,
+  modalBlockConfig,
+  tableBlockConfig,
+];
+
 export function getBlockDefinitions(): BlockDefinition[] {
   return blockDefinitions;
 }

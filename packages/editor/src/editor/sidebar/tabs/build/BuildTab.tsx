@@ -24,7 +24,7 @@ import { GroupSection, Row } from "./components/GroupSection";
 import { useToast } from "@/editor/chrome-ui";
 import { SearchResults } from "./components/SearchResults";
 import { TransitionCallout } from "./components/TransitionCallout";
-import { buildInsertGroups, elementRows, blockRows, type InsertGroupId } from "./catalog/groups";
+import { buildInsertGroups, elementRows, blockRows, componentRows, type InsertGroupId } from "./catalog/groups";
 import { EVENTS } from "../../../../shared/constants";
 import type { ComponentDefinition } from "../../../../shared/types/components";
 import "./BuildTab.css";
@@ -106,12 +106,6 @@ export const BuildTab: React.FC<BuildTabProps> = ({
   }, [addToast, onBlockClick]);
 
   const toggleGroup = (g: (typeof groups)[number]) => {
-    // COMPONENTS / TEMPLATES / MINE own full tabs (create/preview flows this
-    // panel cannot host) — expanding navigates there. Real behaviour, no stub.
-    if (g.kind === "navigate" && g.targetTab) {
-      composer?.emit("ui:switch-tab", { tab: g.targetTab });
-      return;
-    }
     setOpenGroups((prev) => {
       const next = new Set(prev);
       if (next.has(g.id)) next.delete(g.id); else next.add(g.id);
@@ -204,6 +198,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({
                 onToggle={() => toggleGroup(g)}
                 elements={g.id === "elements" ? elementRows : undefined}
                 blocks={g.id === "blocks" ? blockRows : undefined}
+                components={g.id === "components" ? componentRows : undefined}
                 mine={g.id === "mine" ? mine : undefined}
                 onDragStart={tab.handleDragStart}
                 onElClick={tab.handleElClick}

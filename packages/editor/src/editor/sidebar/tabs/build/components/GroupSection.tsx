@@ -22,6 +22,8 @@ interface GroupSectionProps {
   onToggle: () => void;
   elements?: FlatElEntry[];
   blocks?: BlockDefinition[];
+  /** COMPONENTS (board 1069:4790): the registry's component blocks as rows. */
+  components?: BlockDefinition[];
   /** MINE (board 1069:4970): the user's own components as plain rows. */
   mine?: ComponentDefinition[];
   onDragStart: DragStartFn;
@@ -120,7 +122,7 @@ export const Row: React.FC<{
 };
 
 export const GroupSection: React.FC<GroupSectionProps> = ({
-  group, isOpen, onToggle, elements, blocks, mine, onDragStart, onElClick, onBlockInsert, onMineInsert,
+  group, isOpen, onToggle, elements, blocks, components, mine, onDragStart, onElClick, onBlockInsert, onMineInsert,
 }) => (
   <div data-testid={`insert-section-${group.id}`}>
     <HeaderRow group={group} isOpen={isOpen} onToggle={onToggle} />
@@ -141,6 +143,17 @@ export const GroupSection: React.FC<GroupSectionProps> = ({
         320w: 16+136+16+136+16 = 320 EXACTLY ("140 was tried and overflows by
         8"). Thumb is the block's preview when it has one, empty until then —
         the board names it "thumb/site-preview (empty until first publish)". */}
+    {/* Board 1069:4790 (components-expanded): registry component blocks as
+        plain rows — same Row treatment, same onBlockClick insert path
+        (BlockDefinition extends BlockData). */}
+    {isOpen && group.id === "components" && components?.map((c) => (
+      <Row
+        key={c.id}
+        label={c.label}
+        testId={`insert-component-${c.id}`}
+        onClick={() => onBlockInsert?.(c)}
+      />
+    ))}
     {/* Board 1069:4970 (mine-expanded): the user's own components as plain
         32h rows — same Row treatment as ELEMENTS. Empty registry = no rows;
         the group header's live count already says 0. */}

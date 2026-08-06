@@ -11,6 +11,7 @@ import { CATALOG, flatCatalog } from "../catalog/catalog";
 import { TIPS } from "../catalog/tips";
 import type { FlatElEntry } from "../catalog/types";
 import { searchInsert, type InsertSearchHit } from "../utils/search";
+import { blockRows, componentRows } from "../catalog/groups";
 import { getBlockDefinitions } from "../../../../../blocks";
 
 // ─── Storage helpers ─────────────────────────────────────────────────────────
@@ -227,9 +228,10 @@ export function useBuildTab(
     [searchQuery, openCats]
   );
 
-  // Board 138:53: search is flat and cross-source — elements AND blocks.
+  // Board 138:53: search is flat and cross-source — elements, blocks AND
+  // components (the board's third tag).
   const searchResults = React.useMemo(
-    () => searchInsert(searchQuery, flatCatalog, getBlockDefinitions()),
+    () => searchInsert(searchQuery, flatCatalog, blockRows, componentRows),
     [searchQuery]
   );
 
