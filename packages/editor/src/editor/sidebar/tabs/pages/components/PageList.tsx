@@ -21,7 +21,8 @@ interface Props {
   pages: PageItem[];
   renamingPageId: string | null;
   nameError: string | null;
-  canSearch: boolean;
+  /** Opens the whole-site listings view — board 140:10's toolbar link. */
+  onOpenListings?: () => void;
   openContextMenuPageId?: string | null;
   composer: Composer | null;
   folders: FolderItem[];
@@ -53,7 +54,7 @@ export const PageList: React.FC<Props> = ({
   pages,
   renamingPageId,
   nameError,
-  canSearch,
+  onOpenListings,
   openContextMenuPageId = null,
   composer,
   folders,
@@ -98,16 +99,6 @@ export const PageList: React.FC<Props> = ({
     ? pages.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()))
     : pages;
 
-  const stats = React.useMemo(() => {
-    let drafts = 0, scheduled = 0, hidden = 0;
-    for (const p of pages) {
-      if (p.status === "draft")          drafts++;
-      else if (p.status === "scheduled") scheduled++;
-      else if (p.status === "hidden")    hidden++;
-    }
-    return { total: pages.length, drafts, scheduled, hidden };
-  }, [pages]);
-
   if (pages.length === 0) {
     return (
       <div className="bd-pg-list-shell">
@@ -137,39 +128,35 @@ export const PageList: React.FC<Props> = ({
 
   return (
     <div className="bd-pg-list-shell">
-      {canSearch && (
-        <div className="bd-pg-search-wrap">
-          <div className="bd-pg-search">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-              <circle cx="11" cy="11" r="8" />
-              <line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
-            <TextInput
-              ref={searchRef}
-              type="text"
-              placeholder="Search pages..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Escape") setSearch("");
-              }}
-              aria-label="Search pages"
-            />
-            {search && (
-              <IconButton
-                size="sm"
-                onClick={() => setSearch("")}
-                label="Clear search"
-              >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true" style={{ width: 14, height: 14 }}>
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-              </IconButton>
-            )}
-          </div>
+      {/* Board 140:7: 36h band with a bare 28h search box (no magnifier,
+          no inline clear) plus the Listings text link on the right. Always
+          visible - the old 5-page gate is gone. */}
+      <div className="bd-pg-search-wrap">
+        <div className="bd-pg-search">
+          <TextInput
+            ref={searchRef}
+            type="text"
+            placeholder="Search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") setSearch("");
+            }}
+            aria-label="Search pages"
+          />
         </div>
-      )}
+        {onOpenListings && (
+          <Button
+            color="light"
+            size="xs"
+            className="bd-pg-listings-link"
+            data-testid="pages-open-listings"
+            onClick={onOpenListings}
+          >
+            {"\u229E"} Listings
+          </Button>
+        )}
+      </div>
       {showSelectAll && (
         <div
           className="bd-pg-selectall"
@@ -285,19 +272,9 @@ export const PageList: React.FC<Props> = ({
           onClear={onClearSelection}
         />
       )}
+      {/* Board 140:38: the footer is just "+  Add page" in accent — no
+          count stats. From-template/New-folder survive on the ⋮ overflow. */}
       <div className="bd-pg-footer">
-        <div className="bd-pg-footer-stats">
-          <span><b>{stats.total}</b> page{stats.total !== 1 ? "s" : ""}</span>
-          {stats.drafts > 0 && (
-            <><span>·</span><span>{stats.drafts} draft{stats.drafts !== 1 ? "s" : ""}</span></>
-          )}
-          {stats.scheduled > 0 && (
-            <><span>·</span><span>{stats.scheduled} scheduled</span></>
-          )}
-          {stats.hidden > 0 && (
-            <><span>·</span><span>{stats.hidden} hidden</span></>
-          )}
-        </div>
         <AddPageButton onAddBlank={onAddPage} onFromTemplate={onRequestTemplates} onAddFolder={onAddFolder} />
       </div>
     </div>

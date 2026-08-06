@@ -29,12 +29,17 @@ export const AddPageButton: React.FC<AddPageButtonProps> = ({
 
   return (
     <div ref={wrapRef} style={{ display: "flex", alignItems: "center", gap: 4, position: "relative" }}>
-      <Button type="button" size="xs" onClick={onAddBlank} aria-label="Add new page">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true" style={{ width: 14, height: 14 }}>
-          <line x1="12" y1="5" x2="12" y2="19" />
-          <line x1="5" y1="12" x2="19" y2="12" />
-        </svg>
-        Add page
+      {/* Board 140:38-39: "+  Add page" is a plain accent text link — no
+          filled pill. */}
+      <Button
+        type="button"
+        color="light"
+        size="xs"
+        onClick={onAddBlank}
+        aria-label="Add new page"
+        className="tw:min-h-0 tw:border-0 tw:bg-transparent tw:p-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-accent-text)] tw:shadow-none tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+      >
+        +&nbsp;&nbsp;Add page
       </Button>
       {hasOverflow && (
         <>

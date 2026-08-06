@@ -204,6 +204,9 @@ export const PageRow = React.memo<Props>(
             </svg>
           </span>
 
+          {/* Board 140:2: plain page rows carry NO icon — only Home draws
+              the roof glyph (140:19) and external pages keep the link glyph. */}
+          {(page.isHome || page.status === "external") && (
           <span className="bd-pg-row-icon" aria-hidden="true">
             <svg
               viewBox="0 0 24 24"
@@ -221,12 +224,13 @@ export const PageRow = React.memo<Props>(
                 </>
               ) : (
                 <>
-                  <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-                  <polyline points="14 2 14 8 20 8" />
+                  <path d="M3 11l9-8 9 8" />
+                  <path d="M5 9.5V21h14V9.5" />
                 </>
               )}
             </svg>
           </span>
+          )}
 
           {isRenaming ? (
             <>
@@ -258,32 +262,10 @@ export const PageRow = React.memo<Props>(
               >
                 {page.name}
               </span>
-              {page.slug && (
-                <span className="bd-pg-row-slug">
-                  {page.slug.startsWith("/") ? page.slug : `/${page.slug}`}
-                </span>
-              )}
             </>
           )}
 
           <span style={{ flex: 1 }} aria-hidden="true" />
-
-          {page.isHome && (
-            <span className="bd-pg-home-chip" aria-label="Homepage">
-              <span className="dot" aria-hidden="true" />
-              Home
-            </span>
-          )}
-
-          {label && (
-            <span
-              className={`bd-pg-chip ${page.status ?? "live"}`}
-              aria-label={`${page.status ?? "live"} status`}
-            >
-              <span className="dot" aria-hidden="true" />
-              {label}
-            </span>
-          )}
 
           <Button
             className="bd-pg-row-overflow"

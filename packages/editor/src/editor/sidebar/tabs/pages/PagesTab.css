@@ -27,20 +27,41 @@
 
 /* ─── SEARCH ──────────────────────────────────────────────────────────── */
 .bd-pg-search {
+  /* Board 140:8: 28h box on gray-50 with a border, radius 6. */
   display: flex;
   align-items: center;
-  gap: 6px;
+  flex: 1;
+  min-width: 0;
   height: 28px;
   padding: 0 var(--bk-space-8);
-  background: var(--bk-bg-subtle);
-  border: 1px solid transparent;
-  border-radius: 4px;
-  transition: background 100ms, border-color 100ms;
+  background: var(--bk-gray-50);
+  border: 1px solid var(--bk-border);
+  border-radius: var(--bk-radius-md);
+  transition: border-color 100ms;
 }
 .bd-pg-search:focus-within {
-  background: var(--bk-bg-card);
   border-color: var(--bk-accent);
-  box-shadow: 0 0 0 3px var(--bk-accent-tint);
+}
+
+/* Board 140:7 band: search + the Listings link on one 36h row. */
+.bd-pg-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--bk-space-8);
+}
+
+.bd-pg-listings-link,
+.bd-pg-listings-back {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  font: 400 12px/18px var(--bk-font-ui);
+  color: var(--bk-ink-soft);
+  box-shadow: none;
+}
+.bd-pg-listings-back {
+  align-self: flex-start;
+  color: var(--bk-accent-text);
 }
 .bd-pg-search input {
   flex: 1;
@@ -164,16 +185,16 @@
 
 /* ─── ROW INTERNALS ───────────────────────────────────────────────────── */
 .bd-pg-row-checkbox {
-  width: 14px; height: 14px;
-  border-radius: 3px;
-  border: 1.5px solid var(--bk-border-medium);
-  display: none;
+  /* Board 140:12: 16px, radius 4, 1.5px gray-300 — on EVERY row. */
+  width: 16px; height: 16px;
+  border-radius: 4px;
+  border: 1.5px solid var(--bk-gray-300);
+  display: grid;
   place-items: center;
   flex-shrink: 0;
   background: var(--bk-bg-card);
   transition: 100ms;
 }
-.bd-pg-panel.bulk-mode .bd-pg-row-checkbox { display: grid; }
 .bd-pg-row-checkbox svg { width: 10px; height: 10px; color: var(--bk-accent-on); opacity: 0; }
 .bd-pg-row.selected .bd-pg-row-checkbox svg { opacity: 1; }
 

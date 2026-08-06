@@ -222,52 +222,25 @@ export const PagesTab: React.FC<PagesTabProps> = ({
         </PanelFrame.Body>
       ) : (
         <PanelFrame.Body noScroll>
-          {/* View segment — page tree vs whole-site search-listings (50-pages) */}
-          <div
-            role="tablist"
-            aria-label="Pages view"
-            style={{
-              display: "inline-flex",
-              margin: "8px 12px 0",
-              border: "1px solid var(--bk-border)",
-              borderRadius: 4,
-              overflow: "hidden",
-              alignSelf: "flex-start",
-            }}
-          >
-            {([["pages", "Pages"], ["listings", "Search listings"]] as const).map(([v, label], i) => {
-              const on = view === v;
-              return (
-                <Button
-                  key={v}
-                  color="light"
-                  size="xs"
-                  role="tab"
-                  aria-selected={on}
-                  onClick={() => setView(v)}
-                  style={{
-                    padding: "4px 12px",
-                    fontSize: 11,
-                    fontWeight: on ? 600 : 400,
-                    borderRadius: 0,
-                    borderRight: i === 0 ? "1px solid var(--bk-border)" : undefined,
-                    background: on ? "var(--bk-accent)" : "transparent",
-                    color: on ? "var(--bk-accent-on)" : "var(--bk-ink-muted)",
-                  }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
-                >
-                  {label}
-                </Button>
-              );
-            })}
-          </div>
           {view === "listings" ? (
-            <SearchListingsTable pages={p.pages} onEditPage={p.openSettings} />
+            <>
+              <Button
+                color="light"
+                size="xs"
+                className="bd-pg-listings-back"
+                data-testid="pages-listings-back"
+                onClick={() => setView("pages")}
+              >
+                {"\u2039"} Pages
+              </Button>
+              <SearchListingsTable pages={p.pages} onEditPage={p.openSettings} />
+            </>
           ) : (
           <PageList
             pages={p.pages}
             renamingPageId={p.renamingPageId}
             nameError={nameError}
-            canSearch={p.canSearch}
+            onOpenListings={() => setView("listings")}
             openContextMenuPageId={p.contextMenu?.pageId ?? null}
             composer={composer}
             folders={f.folders}

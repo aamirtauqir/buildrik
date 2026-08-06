@@ -63,7 +63,6 @@ export interface UsePagesReturn {
 
   // Derived
   isOnlyPage: boolean;
-  canSearch: boolean;
 
   // Error state
   loadError: string | null;
@@ -388,7 +387,6 @@ export function usePages(composer: Composer | null): UsePagesReturn {
     // Guards against deleting the final page. Semantically the "only" page is
     // exactly 1 — 0 pages is a different (empty-list) state handled by PageList.
     isOnlyPage: pages.length === 1,
-    canSearch: pages.length >= 5,
     loadError,
     retrySync,
   };

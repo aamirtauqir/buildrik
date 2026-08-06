@@ -314,6 +314,25 @@ are tokens. Board styling itself is an off-palette outlier (old grays,
 rounded card) — the BADGE is the contract, 142:2 chrome stays. Board still
 NOT in boards.json (founder's file, regenerate pending). Loading/error/no-results shipped 08-04 (LayersStateBlocks).
 
+## Pages family — tree board conformed (2026-08-07)
+
+Census first (learning applied): 10 boards.json boards + 3 S3.7
+page-settings shell screens, NO hidden founder batch. 140:2 fetched, live
+diffed. Shipped: the segmented Pages/Search-listings pill control is GONE —
+board 140:7 draws a 28h bare search box (always on; the 5-page canSearch
+gate deleted) with the "⊞ Listings" text link right (listings view keeps a
+"‹ Pages" back link); rows go board-exact — always-visible 16px checkbox
+(was bulk-mode-gated CSS), NO slug, NO status/home chips (status stays in
+the aria-label), icon only on Home (roof glyph) and external (link glyph);
+footer is the "+  Add page" accent text link (count stats gone; From-
+template/New-folder survive on the ⋮ overflow). 187/187 tests (11
+old-design chip/slug tests rewritten same-commit).
+REMAINING Pages delta passes: 141:2 folders-collapsed · 141:40 searching ·
+141:78 bulk-select · 141:124 empty · 141:165 load-error · 141:207
+listings · 774:4044 loading · 782:4212 no-results · 435:2348 PageTabBar ·
+S3.7 SEO/Social/Advanced settings. Dirty-dot (140:21, 8px orange on Home)
+NOT shipped — no per-page unsaved-state source in the model yet.
+
 ## NOT in scope
 
 - Inspector flat body (board `52:56` / `824:5095`) — next arc after this one;

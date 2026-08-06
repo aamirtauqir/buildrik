@@ -392,27 +392,18 @@ describe("usePages load error recovery", () => {
 // ── Derived values ───────────────────────────────────────────────────────────
 
 describe("usePages derived values", () => {
-  it("isOnlyPage is true with exactly 1 page, canSearch false below 5", () => {
+  // The 5-page search gate is gone — board 140:7 draws search always.
+  it("isOnlyPage is true with exactly 1 page", () => {
     const composer = createMockComposer({ pages: [pg("p1", "Home")] });
     const { result } = setup(composer);
     expect(result.current.isOnlyPage).toBe(true);
-    expect(result.current.canSearch).toBe(false);
   });
 
-  it("canSearch flips on at 5 pages; isOnlyPage false", () => {
+  it("isOnlyPage false with 5 pages", () => {
     const composer = createMockComposer({
       pages: [1, 2, 3, 4, 5].map((n) => pg(`p${n}`, `Page ${n}`)),
     });
     const { result } = setup(composer);
     expect(result.current.isOnlyPage).toBe(false);
-    expect(result.current.canSearch).toBe(true);
-  });
-
-  it("canSearch stays false at 4 pages", () => {
-    const composer = createMockComposer({
-      pages: [1, 2, 3, 4].map((n) => pg(`p${n}`, `Page ${n}`)),
-    });
-    const { result } = setup(composer);
-    expect(result.current.canSearch).toBe(false);
   });
 });

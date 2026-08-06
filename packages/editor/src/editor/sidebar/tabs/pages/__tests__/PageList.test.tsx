@@ -20,7 +20,7 @@ function makeProps(overrides: Partial<React.ComponentProps<typeof PageList>> = {
     pages,
     renamingPageId: null,
     nameError: null,
-    canSearch: false,
+    
     openContextMenuPageId: null,
     composer: null,
     folders: noFolders,
@@ -67,7 +67,7 @@ describe("PageList", () => {
 
   it("renders search-empty state when query has no matches", () => {
     const { container } = render(
-      <PageList {...makeProps({ canSearch: true })} />,
+      <PageList {...makeProps({})} />,
     );
     const search = container.querySelector(".bd-pg-search input") as HTMLInputElement;
     fireEvent.change(search, { target: { value: "zzznomatch" } });

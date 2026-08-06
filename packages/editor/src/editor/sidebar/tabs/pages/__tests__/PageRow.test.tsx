@@ -29,11 +29,26 @@ const home: PageItem = {
 };
 
 describe("PageRow", () => {
-  it("renders name, slug, and row icon", () => {
+  // Board 140:2: plain rows carry NO slug, NO status chip, NO icon —
+  // only Home (roof glyph) and external (link glyph) draw one.
+  it("renders the name; no slug on the tree row", () => {
     const { container } = render(<PageRow page={home} {...baseProps} />);
     expect(container.querySelector(".bd-pg-row-name")).toHaveTextContent("Home");
-    expect(container.querySelector(".bd-pg-row-slug")).toHaveTextContent("/");
-    expect(container.querySelector(".bd-pg-row-icon")).not.toBeNull();
+    expect(container.querySelector(".bd-pg-row-slug")).toBeNull();
+  });
+
+  it("home draws the roof glyph; a plain page draws no icon", () => {
+    const { container: h } = render(<PageRow page={home} {...baseProps} />);
+    expect(h.querySelector(".bd-pg-row-icon")).not.toBeNull();
+    const { container: p } = render(
+      <PageRow page={{ ...home, isHome: false }} {...baseProps} />,
+    );
+    expect(p.querySelector(".bd-pg-row-icon")).toBeNull();
+  });
+
+  it("every row leads with the always-visible checkbox (board 140:12)", () => {
+    const { container } = render(<PageRow page={home} {...baseProps} />);
+    expect(container.querySelector(".bd-pg-row-checkbox")).not.toBeNull();
   });
 
   it("active variant adds .bd-pg-row.active", () => {
@@ -48,31 +63,14 @@ describe("PageRow", () => {
     expect(container.querySelector(".bd-pg-row.nested")).not.toBeNull();
   });
 
-  it("home page renders .bd-pg-home-chip", () => {
-    const { container } = render(<PageRow page={home} {...baseProps} />);
-    expect(container.querySelector(".bd-pg-home-chip")).not.toBeNull();
-  });
-
-  it("renders status chip with class .bd-pg-chip.live for live status", () => {
-    const { container } = render(<PageRow page={home} {...baseProps} />);
-    expect(container.querySelector(".bd-pg-chip.live")).not.toBeNull();
-  });
-
-  it.each([
-    ["draft", "Draft"],
-    ["scheduled", "Scheduled"],
-    ["hidden", "Hidden"],
-    ["password", "Password"],
-    ["external", "External"],
-    ["error", "Error"],
-  ])("renders chip with correct label for %s", (status, label) => {
-    render(
-      <PageRow
-        page={{ ...home, status: status as PageItem["status"], isHome: false }}
-        {...baseProps}
-      />,
+  it("no home/status chips on the tree row; status still announced", () => {
+    const { container } = render(
+      <PageRow page={{ ...home, status: "draft", isHome: false }} {...baseProps} />,
     );
-    expect(screen.getByText(label)).toBeInTheDocument();
+    expect(container.querySelector(".bd-pg-home-chip")).toBeNull();
+    expect(container.querySelector(".bd-pg-chip")).toBeNull();
+    const row = container.querySelector(".bd-pg-row");
+    expect(row?.getAttribute("aria-label") ?? "").toContain("Draft");
   });
 
   it("long name shows title attribute for tooltip", () => {
@@ -84,11 +82,7 @@ describe("PageRow", () => {
     expect(nameEl).toHaveAttribute("title", longName);
   });
 
-  it("chip has aria-label matching status", () => {
-    const { container } = render(<PageRow page={home} {...baseProps} />);
-    const chip = container.querySelector(".bd-pg-chip");
-    expect(chip?.getAttribute("aria-label")).toContain("live");
-  });
+
 
   it("renders single overflow button (no per-row action strip)", () => {
     const { container } = render(<PageRow page={home} {...baseProps} />);
