@@ -52,6 +52,7 @@ import { LayersTab } from "@/editor/sidebar/tabs/layers/LayersTab";
 import { LayersLoadError, LayersNoResults } from "@/editor/panels/layers/components/LayersStateBlocks";
 import { InsertLoadingSkeleton, InsertLoadError } from "@/editor/sidebar/tabs/build/components/InsertStateBlocks";
 import { Row as InsertRow } from "@/editor/sidebar/tabs/build/components/GroupSection";
+import { PagesLoadingSkeleton } from "@/editor/sidebar/tabs/pages/components/PagesStateBlocks";
 import type { LibraryItem } from "@/editor/sidebar/tabs/media/data/mediaTypes";
 import type { UploadProgress } from "@/shared/types/media";
 
@@ -369,6 +370,13 @@ const CASES: Record<string, () => React.ReactElement> = {
   // Insert board 138:198 — disabled row ("Soon" tag + reason tooltip, no
   // insert). No production catalog entry is disabled, so the probe is the
   // only mount, same rule as the loading/error pair above.
+  // Pages board 774:4044 — pages hydrate synchronously today; the probe is
+  // the loading block's only mount, same rule as the Insert/Layers pairs.
+  "pages-loading": () => (
+    <div data-probe="pages-loading" style={{ width: 320, background: "#fff" }}>
+      <PagesLoadingSkeleton />
+    </div>
+  ),
   "insert-disabled-row": () => (
     <div data-probe="insert-disabled-row" style={{ width: 320, background: "#fff" }}>
       <InsertRow
