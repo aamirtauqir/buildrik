@@ -14,7 +14,6 @@ import type { BlockDefinition } from "../../../../../blocks/blockRegistry";
 import type { InsertGroup } from "../catalog/groups";
 import type { DragStartFn, ElClickFn } from "../hooks/useBuildTab";
 import { Button, Tooltip } from "@/editor/chrome-ui";
-import { SvgIcon } from "./SvgIcon";
 
 interface GroupSectionProps {
   group: InsertGroup;
@@ -57,7 +56,6 @@ const HeaderRow: React.FC<{ group: InsertGroup; isOpen: boolean; onToggle: () =>
  *  the board's icon-less pinned rows (⌥ Paste HTML…) in BuildTab. */
 export const Row: React.FC<{
   label: string;
-  iconHtml?: string;
   /** Board 233:1123 draws the Paste-HTML row with no icon slot at all. */
   noIcon?: boolean;
   /** Board 138:198: disabled row = "Soon" tag + reason tooltip + no insert.
@@ -68,7 +66,7 @@ export const Row: React.FC<{
   draggable?: boolean;
   onDragStart?: (e: React.DragEvent) => void;
   onClick: () => void;
-}> = ({ label, iconHtml, noIcon, disabled, disabledReason, testId, draggable, onDragStart, onClick }) => {
+}> = ({ label, noIcon, disabled, disabledReason, testId, draggable, onDragStart, onClick }) => {
   const row = (
     <div
       role="button"
@@ -88,15 +86,12 @@ export const Row: React.FC<{
         if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClick(); }
       }}
     >
-      {noIcon ? null : iconHtml ? (
-        // .bld-el-icon owns the glyph contract: 12px box, ink-muted colour, and
-        // stroke:currentColor/1.5/round for the stroke-only glyphs (bare <line>
-        // icons render fill:black/stroke:none — i.e. INVISIBLE — without it).
-        // Bypassing this class is exactly how Text/List/Divider/Spacer vanished.
-        <span className="bld-el-icon" aria-hidden="true">
-          <SvgIcon html={iconHtml} />
-        </span>
-      ) : (
+      {/* Board icon treatment (founder call, 2026-08-06): EVERY element row
+          draws the same 12px solid ink-muted rounded square — the boards'
+          List-row icon is a plain filled div, not a glyph. The per-element
+          SVG glyph system was retired with it (real glyphs return only if a
+          Figma icon library ships and regenerates like the tokens do). */}
+      {noIcon ? null : (
         <span className="tw:size-[12px] tw:rounded-[2px] tw:bg-[var(--bk-ink-muted)] tw:shrink-0" aria-hidden="true" />
       )}
       <span className="tw:flex-1 tw:min-w-0 tw:truncate tw:text-[13px] tw:leading-[20px] tw:text-[var(--bk-ink)]">
@@ -129,7 +124,6 @@ export const GroupSection: React.FC<GroupSectionProps> = ({
       <Row
         key={`${el.catId}-${el.name}`}
         label={el.name}
-        iconHtml={el.iconHtml}
         disabled={el.disabled}
         disabledReason={el.disabled ? el.description : undefined}
         testId={`insert-el-${el.name}`}

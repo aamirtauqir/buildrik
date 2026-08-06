@@ -169,8 +169,12 @@ compared — the frames, not the contracts, caught them):
 4. PIN WAS DEAD: `StudioPanels` defaulted `panelPinned = true`
    (half-controlled) so the header pin never unpinned anywhere in the app.
    Now uncontrolled-with-override like LeftSidebar.
-Known intentional deltas vs frames: real glyphs instead of the board's
-placeholder icon squares; live counts/rows instead of sample 3-row data.
+Known intentional deltas vs frames: live counts/rows instead of sample
+3-row data. Icons: founder ruled 2026-08-06 (AskUserQuestion) — EVERY element
+row draws the board's 12px solid ink-muted rounded square; the per-element
+SVG glyph system in the Insert rows is retired (glyphs return only via a
+Figma icon library regenerating like tokens). SvgIcon.tsx survives — the
+rail (TabRouter) still consumes it.
 
 ### Insert — coverage matrix (FINAL)
 

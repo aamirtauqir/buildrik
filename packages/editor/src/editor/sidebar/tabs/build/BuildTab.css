@@ -29,26 +29,6 @@
   scrollbar-color: var(--bk-border, var(--bk-border)) transparent;
 }
 
-.bld-el-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 12px;
-  height: 12px;
-  flex-shrink: 0;
-  color: var(--bk-ink-muted);
-}
-
-.bld-el-icon svg {
-  width: 12px;
-  height: 12px;
-  color: currentColor;
-  stroke: currentColor;
-  stroke-width: 1.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
 /* Full-bleed: the TipsFooter strip (board 137:43) IS the bottom band — it
    carries its own tint background, so no frame padding or border here. */
 .bld-panel-bottom {
