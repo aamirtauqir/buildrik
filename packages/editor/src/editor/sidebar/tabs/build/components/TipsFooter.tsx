@@ -37,18 +37,16 @@ const strip: React.CSSProperties = {
   lineHeight: "18px",
 };
 
+// Board text style ui/12 — Inter Regular, no bold in the strip.
 const counter: React.CSSProperties = {
-  fontWeight: 600,
+  fontWeight: 400,
   flexShrink: 0,
   fontVariantNumeric: "tabular-nums",
 };
 
-const body: React.CSSProperties = {
+const spacer: React.CSSProperties = {
   flex: 1,
   minWidth: 0,
-  whiteSpace: "nowrap",
-  overflow: "hidden",
-  textOverflow: "ellipsis",
 };
 
 const nav: React.CSSProperties = {
@@ -94,15 +92,15 @@ export const TipsFooter: React.FC<TipsFooterProps> = ({
   const tip = TIPS[tipIdx];
 
   return (
-    <div style={strip} role="note" aria-label="Tips">
+    // Board 137:43 (and every Insert state board): the strip draws ONLY
+    // "💡 Tip n/N" + ‹ › ✕ — no tip body text. The body rides on title so
+    // hover still tells you what the tip says.
+    <div style={strip} role="note" aria-label="Tips" title={`${tip.bold}${tip.body}`}>
       <span aria-hidden="true">💡</span>
       <span style={counter}>
         Tip {tipIdx + 1}/{TIPS.length}
       </span>
-      <span style={body} title={`${tip.bold}${tip.body}`}>
-        <strong>{tip.bold}</strong>
-        {tip.body}
-      </span>
+      <span style={spacer} />
       <span style={nav}>
         <Button type="button" style={arr} onClick={onPrev} onMouseEnter={hoverIn} onMouseLeave={hoverOut} aria-label="Previous tip">
           <ChevronLeft size={12} />

@@ -83,28 +83,12 @@ describe("SearchBar — debounce", () => {
   });
 });
 
-describe("SearchBar — clear button", () => {
-  it("clear is immediate (no debounce) and cancels a pending debounce", () => {
-    const onChange = vi.fn();
-    render(<SearchBar value="" onChange={onChange} />);
-
-    type("pending");
-    fireEvent.click(screen.getByRole("button", { name: /clear search/i }));
-
-    expect(onChange).toHaveBeenCalledTimes(1);
-    expect(onChange).toHaveBeenCalledWith("");
-    expect((screen.getByRole("textbox") as HTMLInputElement).value).toBe("");
-
-    // The pending "pending" timer must have been cancelled.
-    vi.advanceTimersByTime(300);
-    expect(onChange).toHaveBeenCalledTimes(1);
-  });
-
-  it("clear button only renders when the input has text", () => {
+describe("SearchBar — no inline chrome (board 137:8)", () => {
+  it("draws no ✕ clear button and no magnifier — the box is text + hint only", () => {
     render(<SearchBar value="" onChange={vi.fn()} />);
-    expect(screen.queryByRole("button", { name: /clear search/i })).toBeNull();
     type("abc");
-    expect(screen.getByRole("button", { name: /clear search/i })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /clear search/i })).toBeNull();
+    expect(document.querySelector("svg")).toBeNull();
   });
 });
 
@@ -116,11 +100,11 @@ describe("SearchBar — value sync + hint", () => {
     expect((screen.getByRole("textbox") as HTMLInputElement).value).toBe("");
   });
 
-  it("shows kbdHint only while the input is empty", () => {
+  it("keeps kbdHint visible while typing — board 138:53 shows text and ⌘F together", () => {
     render(<SearchBar value="" onChange={vi.fn()} kbdHint="/" />);
     expect(document.querySelector(".bld-kbd-hint")?.textContent).toBe("/");
     type("q");
-    expect(document.querySelector(".bld-kbd-hint")).toBeNull();
+    expect(document.querySelector(".bld-kbd-hint")?.textContent).toBe("/");
   });
 
   it("applies the accessible label to the input", () => {

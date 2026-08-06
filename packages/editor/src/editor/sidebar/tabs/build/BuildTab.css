@@ -55,15 +55,14 @@
   flex-shrink: 0;
 }
 
+/* Board 137:8: the ⌘F hint is BARE Geist Mono 11/500 in ink-soft — no chip,
+   no border, no background. */
 .bld-kbd-hint {
-  font-family: var(--bk-font-mono, "Geist Mono", ui-monospace, monospace);
-  font-size: 9.5px;
+  font-family: var(--bk-font-mono);
+  font-size: 11px;
+  line-height: 16px;
   font-weight: 500;
-  color: var(--bk-ink-muted, var(--bk-ink-muted));
-  padding: 0 var(--bk-space-4);
-  border: 1px solid var(--bk-border, var(--bk-border));
-  border-radius: 3px;
-  background: var(--bk-bg-card, var(--bk-bg-card));
+  color: var(--bk-ink-soft);
   pointer-events: none;
   flex-shrink: 0;
 }

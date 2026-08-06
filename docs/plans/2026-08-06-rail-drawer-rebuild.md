@@ -154,6 +154,24 @@ Insert state-board ledger (updated after fetches):
   e2e/probe; URL is /e2e/probe/probe.html?case=…), loading/error via probe
   earlier. One-shot capture script: `e2e/insert-eye-verify.mjs`.
 
+### Founder visual pass 2026-08-06 (board screenshots vs live, all 9 frames)
+
+Second sweep after the founder called a mismatch. Four real deltas found and
+fixed (all were in the "frozen" shared chrome, which the first pass under-
+compared — the frames, not the contracts, caught them):
+1. SearchBar drew a magnifier + inline ✕ + bordered ⌘F chip — board 137:8
+   draws NONE of those: text + bare Geist Mono 11 hint, hint stays during
+   typing (138:53). Also killed the `-apple-system` fallback stack
+   (DESIGN.md anti-slop 8) and the inner flowbite focus ring (double-box).
+2. TipsFooter rendered the tip body inline — every board draws ONLY
+   "💡 Tip n/N" + ‹ › ✕. Body now rides on title hover.
+3. `.bld-kbd-hint` was a 9.5px bordered chip — board is bare 11/500 mono.
+4. PIN WAS DEAD: `StudioPanels` defaulted `panelPinned = true`
+   (half-controlled) so the header pin never unpinned anywhere in the app.
+   Now uncontrolled-with-override like LeftSidebar.
+Known intentional deltas vs frames: real glyphs instead of the board's
+placeholder icon squares; live counts/rows instead of sample 3-row data.
+
 ### Insert — coverage matrix (FINAL)
 
 | Board | State | Where it lives | Verified |

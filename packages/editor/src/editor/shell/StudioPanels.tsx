@@ -195,7 +195,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   composerContainerRef,
   isFullPageMode = false,
   drawerWidth = 280,
-  panelPinned = true,
+  panelPinned,
   onPanelPinnedToggle,
   projectId,
   publishJob,
@@ -206,6 +206,13 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   useAltTextAutoTrigger(composer);
 
   const [canvasHoveredId, setCanvasHoveredId] = React.useState<string | null>(null);
+  // Pin is uncontrolled unless the host passes both props. The old
+  // `panelPinned = true` default made it HALF-controlled: the header's
+  // toggle flipped LeftSidebar's internal state that the locked-true prop
+  // then overrode — the pin never visually unpinned anywhere.
+  const [internalPinned, setInternalPinned] = React.useState(true);
+  const effectivePinned = panelPinned ?? internalPinned;
+  const handlePinToggle = onPanelPinnedToggle ?? (() => setInternalPinned((p) => !p));
   const [isVersionPreview, setIsVersionPreview] = React.useState(false);
 
   // Media tab dual-mode: panel (slim launcher) or fullpage (library manager)
@@ -374,7 +381,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
       <StarterGalleryMount projectId={projectId} composer={composer} />
       <LayoutShell
         drawerOpen={isLeftPanelOpen && !effectiveFullPageMode}
-        drawerPinned={panelPinned}
+        drawerPinned={effectivePinned}
         drawerWidth={drawerWidth}
         fullPageMode={effectiveFullPageMode && isLeftPanelOpen}
         inspectorOpen={!!selectedElement && !effectiveFullPageMode}
@@ -388,8 +395,8 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
             onTabChange={handleRailTabChange}
             drawerOpen={isLeftPanelOpen && !effectiveFullPageMode}
             onDrawerToggle={onLeftPanelToggle ?? (() => {})}
-            isPinned={panelPinned}
-            onPinToggle={onPanelPinnedToggle}
+            isPinned={effectivePinned}
+            onPinToggle={handlePinToggle}
             onElementSelect={handleElementSelect}
             onBlockClick={handleBlockClick}
             canvasHoveredId={canvasHoveredId}

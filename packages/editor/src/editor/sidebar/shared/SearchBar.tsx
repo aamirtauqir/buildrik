@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import { trackSidebar } from "../../../shared/utils/sidebarAnalytics";
-import { Button, TextInput } from "@/editor/chrome-ui";
+import { TextInput } from "@/editor/chrome-ui";
 
 export interface SearchBarProps {
   value: string;
@@ -73,16 +73,12 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     }, debounceMs);
   };
 
-  const handleClear = () => {
-    // Clear is immediate — no debounce on explicit user action
-    if (timerRef.current) clearTimeout(timerRef.current);
-    setInputValue("");
-    onChange("");
-  };
-
   return (
+    // Board 137:8 / 138:53: the box draws NO magnifier and NO ✕ — text plus
+    // the bare mono kbd hint, which stays visible while typing (138:53 shows
+    // "button" and ⌘F together). Clearing = Escape or the empty-state's
+    // "Clear search" link.
     <div style={containerStyles} role="search">
-      <SearchIcon />
       <TextInput
         type="text"
         id={id}
@@ -92,44 +88,12 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         style={inputStyles}
         aria-label={ariaLabel}
       />
-      {inputValue ? (
-        <Button onClick={handleClear} style={clearButtonStyles} aria-label="Clear search">
-          <ClearIcon />
-        </Button>
-      ) : kbdHint ? (
+      {kbdHint ? (
         <span className="bld-kbd-hint" aria-hidden="true">{kbdHint}</span>
       ) : null}
     </div>
   );
 };
-
-const SearchIcon = () => (
-  <svg
-    width="14"
-    height="14"
-    viewBox="0 0 14 14"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    style={{ flexShrink: 0 }}
-  >
-    <circle cx="6" cy="6" r="4" />
-    <path d="M9 9l3 3" strokeLinecap="round" />
-  </svg>
-);
-
-const ClearIcon = () => (
-  <svg
-    width="12"
-    height="12"
-    viewBox="0 0 12 12"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-  >
-    <path d="M3 3l6 6M9 3l-6 6" strokeLinecap="round" />
-  </svg>
-);
 
 const containerStyles: React.CSSProperties = {
   display: "flex",
@@ -155,22 +119,16 @@ const inputStyles: React.CSSProperties = {
   background: "transparent",
   border: "none",
   color: "var(--bk-ink)",
-  fontSize: 12,
+  // Board text style ui/13: Inter 13/20. No system fallbacks in any stack
+  // (DESIGN.md §Typography, anti-slop rule 8) — the token carries the family.
+  fontSize: 13,
   outline: "none",
-  lineHeight: "18px",
-  fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif",
-};
-
-const clearButtonStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  padding: 2,
-  background: "transparent",
-  border: "none",
-  cursor: "pointer",
-  color: "var(--bk-ink-muted, var(--bk-ink-soft))",
-  borderRadius: 4,
+  lineHeight: "20px",
+  fontFamily: "var(--bk-font-ui)",
+  // The CONTAINER is the box (board 137:8) — the flowbite input's own focus
+  // ring inside it reads as a second box. Inline style outranks the theme's
+  // ring utility.
+  boxShadow: "none",
 };
 
 export default SearchBar;
