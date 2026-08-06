@@ -228,6 +228,37 @@ arcs. The gate is in NO verify chain (verify:ds excludes it) so it sat red
 unnoticed — same class as the dashboard gate:figma trap. Founder call:
 re-baseline with reason or wire it into verify:ds.
 
+## Templates + Components families — PULLED INTO SCOPE (founder, 2026-08-06)
+
+Founder hit them THROUGH Insert (the navigate groups land on the old-design
+tabs) — "insert ke andar templates/components ka layout totally mismatch."
+Two families, 11 boards: Components (library 641:2546 · detail 641:2599 ·
+create 642:3112 [1440] · loading 778:4173 · load-error 781:4433), Templates
+(gallery 641:2487 · preview 642:2556 [1440] · applying 642:2832 [1440] ·
+loading 778:4102 · load-error 781:4372 · no-results 782:4402).
+
+### Templates · gallery contract (641:2487, fetched)
+Header 44 "Templates" + expand + ✕ · Search = FORM INPUT 10:16 (42h box,
+px-12 rounded-8, 14/20 placeholder gray-400, wrapper px-8 py-6 — NOT the
+Insert 137:8 band) · "PAGE TEMPLATES" section header 28h (16:16: caps
+11/500 track .5 muted, mono count right) → full-width cards px-16 py-8
+(thumb w-full 88h bg-subtle border rounded-6; meta: name 13/500 ink left +
+"N sections" 11 muted right) · "SECTION TEMPLATES" → 32h rows (label 13
+ink · right "Free"/"Pro" 11 muted · › 13 muted) · flex spacer · Panel
+footer border-t px-16 py-10 with SECONDARY button 28h rounded-8 bordered
+"Browse all templates". State hotspots → loading/error/no-results boards.
+
+### Components · library contract (641:2546, fetched)
+Header 44 "Components" + expand + ✕ · NO search · "YOUR COMPONENTS" 28h →
+32h rows (name 13 ink · "N instances" 11 muted · ›) · "FROM BRAND" → rows
+(name · "linked" · ›) · spacer · footer border-t with PRIMARY button
+(accent fill, white 13/500, 28h rounded-8, elevation/raised) "+ Create
+component". Hotspots loading/load-error.
+
+Order: these two drawer views land immediately after this note (founder is
+looking at them); their loading/error/detail/preview/create states follow,
+then Layers 142:2 resumes.
+
 ## NOT in scope
 
 - Inspector flat body (board `52:56` / `824:5095`) — next arc after this one;
