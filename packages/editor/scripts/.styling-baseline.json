@@ -1,12 +1,12 @@
 {
   "inline_literal": 775,
   "inline_hoisted": 335,
-  "css_lines": 9965,
+  "css_lines": 9972,
   "css_files": {
     "inspector/styles/inspector.css": 1038,
     "media/ImageEditorModal.css": 326,
     "media/LibraryManager.css": 955,
-    "panels/layers/styles/layers-v2.css": 637,
+    "panels/layers/styles/layers-v2.css": 644,
     "rail/LayoutShell.css": 425,
     "shell/chrome.css": 45,
     "shell/header.css": 153,

@@ -293,10 +293,14 @@ line; invalid-drop 143:119 = full-width ink band with the reason in white
 multi-select 143:295 = footer flips to "N selected of M" at 2+; row indent
 base fixed 6→16 (board px-16); the layers search input lost its inner
 flowbite ring (container is the box). Loading/error/no-results were
-already live (08-04). Plus 1082:4739
-Layers · component-instance — a NEW founder board that is NOT in
-boards.json yet (regenerate or hand-add before the regression net can see
-it). Loading/error/no-results shipped 08-04 (LayersStateBlocks).
+already live (08-04). 1082:4739 component-instance DONE 2026-08-07: ◇ instance badge (success
+token) between label and eye on component-linked rows via
+components.isInstance. The board's ◆ master badge is DEFERRED — no
+persisted master↔element link in the model (sourceElementId lives only on
+the created-event payload); its purple is gate-18-banned anyway, so colors
+are tokens. Board styling itself is an off-palette outlier (old grays,
+rounded card) — the BADGE is the contract, 142:2 chrome stays. Board still
+NOT in boards.json (founder's file, regenerate pending). Loading/error/no-results shipped 08-04 (LayersStateBlocks).
 
 ## NOT in scope
 

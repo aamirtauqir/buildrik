@@ -140,6 +140,13 @@
 
 /* Eye + lock — board 244:1580 draws them ALWAYS, at gray-300; hover/state
    darkens. (Was hover-reveal, which the board contradicts.) */
+.bdc-lr-comp {
+  font-size: 10px;
+  line-height: 16px;
+  color: var(--bk-success);
+  flex-shrink: 0;
+}
+
 .bdc-lr-eye,
 .bdc-lr-lock {
   color: var(--bk-gray-300);

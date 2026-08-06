@@ -93,6 +93,14 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
     (ELEMENT_TYPE_LABELS[layer.type] ?? layer.type.charAt(0).toUpperCase() + layer.type.slice(1));
   const canDrag = !!(composer && layer.depth > 0 && !isLocked);
 
+  // Board 1082:4739 (Layers · component-instance): a diamond badge sits
+  // between the label and the eye on component-linked rows. Only the
+  // INSTANCE link (◇) exists in the registry today — the board's ◆ master
+  // badge needs a persisted master↔element link the model doesn't carry
+  // yet. Board badge colors are off-palette for chrome, so the token
+  // stands in: success marks the instance.
+  const isInstance = !!composer?.components?.isInstance?.(layer.id);
+
   const rowStyle: React.CSSProperties = {
     paddingLeft: `${16 + layer.depth * 14}px`,
   };
@@ -208,6 +216,15 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
         ) : (
           <>
             <span className="bdc-lr-nm">{displayName}</span>
+            {isInstance && (
+              <span
+                className="bdc-lr-comp"
+                title="Component instance"
+                aria-label="Component instance"
+              >
+                {"\u25C7"}
+              </span>
+            )}
             {displayPrefs.showHtmlBadges && (
               <span className="bdc-lr-tag" aria-hidden>{layer.tagName}</span>
             )}
