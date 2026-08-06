@@ -1,5 +1,5 @@
 /**
- * Build Tab catalog types — ElEntry, CatEntry, FlatElEntry, SearchGroup
+ * Build Tab catalog types — ElEntry, CatEntry, FlatElEntry
  * @license BSD-3-Clause
  */
 
@@ -39,10 +39,3 @@ export type FlatElEntry = ElEntry & {
   catId: string;
   catName: string;
 };
-
-/** Grouped search result for a single category */
-export interface SearchGroup {
-  catId: string;
-  catName: string;
-  elements: FlatElEntry[];
-}

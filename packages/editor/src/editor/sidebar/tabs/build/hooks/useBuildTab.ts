@@ -9,8 +9,8 @@ import type { BlockData } from "../../../../../shared/types";
 import { STORAGE_KEYS } from "../../../../../shared/constants/storageKeys";
 import { CATALOG, flatCatalog } from "../catalog/catalog";
 import { TIPS } from "../catalog/tips";
-import type { FlatElEntry, SearchGroup } from "../catalog/types";
-import { searchElements } from "../utils/search";
+import type { FlatElEntry } from "../catalog/types";
+import { searchInsert, type InsertSearchHit } from "../utils/search";
 import { getBlockDefinitions } from "../../../../../blocks";
 
 // ─── Storage helpers ─────────────────────────────────────────────────────────
@@ -68,9 +68,8 @@ export interface UseBuildTabReturn {
   openCats: Set<string>;
   searchQuery: string;
   tipDismissed: boolean;
-  tipsCollapsed: boolean;
   favOpen: boolean;
-  searchResults: SearchGroup[];
+  searchResults: InsertSearchHit[];
   allElements: FlatElEntry[];
   composer: Composer | null;
   tipIdx: number;
@@ -84,7 +83,6 @@ export interface UseBuildTabReturn {
   favsInformed: boolean;
   markFavsInformed: () => void;
   dismissTip: () => void;
-  toggleTipsCollapsed: () => void;
   tipPrev: () => void;
   tipNext: () => void;
   tipSetAt: (i: number) => void;
@@ -122,9 +120,6 @@ export function useBuildTab(
   );
   const [favsInformed, setFavsInformed] = React.useState<boolean>(() =>
     ls.getBool(STORAGE_KEYS.BUILD_FAVS_INFORMED)
-  );
-  const [tipsCollapsed, setTipsCollapsed] = React.useState<boolean>(() =>
-    ls.getBool(STORAGE_KEYS.BUILD_TIPS_COLLAPSED)
   );
   const [favOpen, setFavOpen] = React.useState(false);
   const [tipIdx, setTipIdx] = React.useState(0);
@@ -172,14 +167,6 @@ export function useBuildTab(
   const dismissTip = React.useCallback(() => {
     setTipDismissed(true);
     ls.saveBool(STORAGE_KEYS.BUILD_TIP_DISMISSED, true);
-  }, []);
-
-  const toggleTipsCollapsed = React.useCallback(() => {
-    setTipsCollapsed((prev) => {
-      const next = !prev;
-      ls.saveBool(STORAGE_KEYS.BUILD_TIPS_COLLAPSED, next);
-      return next;
-    });
   }, []);
 
   const tipPrev = React.useCallback(() => {
@@ -240,8 +227,9 @@ export function useBuildTab(
     [searchQuery, openCats]
   );
 
+  // Board 138:53: search is flat and cross-source — elements AND blocks.
   const searchResults = React.useMemo(
-    () => searchElements(searchQuery, flatCatalog),
+    () => searchInsert(searchQuery, flatCatalog, getBlockDefinitions()),
     [searchQuery]
   );
 
@@ -262,7 +250,6 @@ export function useBuildTab(
     openCats,
     searchQuery,
     tipDismissed,
-    tipsCollapsed,
     favOpen,
     tipIdx,
     searchResults,
@@ -277,7 +264,6 @@ export function useBuildTab(
     favsInformed,
     markFavsInformed,
     dismissTip,
-    toggleTipsCollapsed,
     tipPrev,
     tipNext,
     tipSetAt,

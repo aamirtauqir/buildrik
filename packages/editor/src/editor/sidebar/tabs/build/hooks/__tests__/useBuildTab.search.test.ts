@@ -1,10 +1,10 @@
 /**
  * useBuildTab — search matching pure-logic tests.
  *
- * The existing useBuildTab tests cover tip-nav wrap + search-clear category
- * restore, but not what searchResults actually matches. This pins the four
- * match branches in utils/search.ts (name, tag, category name, description)
- * as exercised through the hook's derived searchResults.
+ * Board 138:53: search is FLAT and CROSS-SOURCE. This pins the four element
+ * match branches (name, tag, category name, description), the block branch,
+ * and hit-key uniqueness, as exercised through the hook's derived
+ * searchResults.
  *
  * @license BSD-3-Clause
  */
@@ -12,10 +12,9 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useBuildTab } from "../useBuildTab";
-import type { SearchGroup } from "../../catalog/types";
+import type { InsertSearchHit } from "../../utils/search";
 
-const names = (groups: SearchGroup[]): string[] =>
-  groups.flatMap((g) => g.elements.map((e) => e.name));
+const labels = (hits: InsertSearchHit[]): string[] => hits.map((h) => h.label);
 
 beforeEach(() => {
   localStorage.clear();
@@ -33,34 +32,41 @@ describe("useBuildTab — searchResults", () => {
   it("matches by element name (case-insensitive)", () => {
     const { result } = renderHook(() => useBuildTab(null));
     act(() => result.current.setSearchQuery("HEADING"));
-    expect(names(result.current.searchResults)).toContain("Heading");
+    expect(labels(result.current.searchResults)).toContain("Heading");
   });
 
   it("matches by tag — 'cta' hits Button via its tags, not its name/description", () => {
     const { result } = renderHook(() => useBuildTab(null));
     act(() => result.current.setSearchQuery("cta"));
-    expect(names(result.current.searchResults)).toContain("Button");
+    expect(labels(result.current.searchResults)).toContain("Button");
   });
 
-  it("matches by category name — 'forms' returns the Forms group", () => {
+  it("matches by category name — 'forms' returns that category's elements", () => {
     const { result } = renderHook(() => useBuildTab(null));
     act(() => result.current.setSearchQuery("forms"));
-    const formsGroup = result.current.searchResults.find((g) => g.catId === "forms");
-    expect(formsGroup).toBeTruthy();
-    expect(formsGroup!.elements.length).toBeGreaterThan(0);
+    const formHits = result.current.searchResults.filter(
+      (h) => h.group === "ELEMENTS" && h.el.catId === "forms"
+    );
+    expect(formHits.length).toBeGreaterThan(0);
   });
 
   it("matches by description — 'bulleted' hits List via its description text", () => {
     const { result } = renderHook(() => useBuildTab(null));
     act(() => result.current.setSearchQuery("bulleted"));
-    expect(names(result.current.searchResults)).toContain("List");
+    expect(labels(result.current.searchResults)).toContain("List");
   });
 
-  it("groups results by category, preserving catalog order", () => {
+  it("is cross-source — block registry entries appear with group BLOCKS", () => {
     const { result } = renderHook(() => useBuildTab(null));
-    act(() => result.current.setSearchQuery("e")); // broad query spanning many cats
-    const catIds = result.current.searchResults.map((g) => g.catId);
-    // No duplicate category groups.
-    expect(new Set(catIds).size).toBe(catIds.length);
+    act(() => result.current.setSearchQuery("hero"));
+    const blockHits = result.current.searchResults.filter((h) => h.group === "BLOCKS");
+    expect(blockHits.length).toBeGreaterThan(0);
+  });
+
+  it("hit keys are unique across sources", () => {
+    const { result } = renderHook(() => useBuildTab(null));
+    act(() => result.current.setSearchQuery("e")); // broad query spanning sources
+    const keys = result.current.searchResults.map((h) => h.key);
+    expect(new Set(keys).size).toBe(keys.length);
   });
 });

@@ -1,9 +1,9 @@
 /**
  * TipsFooter — board 137:43 "TipsFooter": a single 40-tall strip on the accent
  * tint, not a card. "💡 Tip n/N" + one-line tip body + ‹ › ✕. The ✕ hides
- * tips for the session (scope lives in useBuildTab); no collapse state — the
- * board has none, dismiss IS the collapse. Search mode unmounts it entirely
- * (BuildTab hides panel-bottom while searching).
+ * tips (scope lives in useBuildTab); no collapse state — board 138:244 shows
+ * dismiss removes the band entirely, nothing collapsed remains. The strip
+ * stays mounted during search (board 138:53 draws it under the results).
  *
  * @license BSD-3-Clause
  */
@@ -20,8 +20,6 @@ export interface TipsFooterProps {
   onDotClick: (i: number) => void;
   dismissed?: boolean;
   onDismiss?: () => void;
-  collapsed?: boolean;
-  onToggleCollapsed?: () => void;
 }
 
 // ── Styles (token-bound) ─────────────────────────────────────────────────────

@@ -129,7 +129,7 @@ Insert state-board ledger (updated after fetches):
   by 8"). Rows implementation replaced with the grid.
 - 138:198 disabled-item ✅ — Soon tag + reason tooltip (ink bg, white 12) +
   no insert; wired to the pre-existing ElEntry.disabled flag.
-- 138:53 searching FETCHED, contract extracted, IMPLEMENTATION PENDING:
+- 138:53 searching ✅ IMPLEMENTED:
   flat result rows 32h — label 13 ink @16 + SOURCE-GROUP tag 11 caps muted
   right (@230, tracking .5). NO "N results for" header, NO category grouping,
   NO cards. Results span ALL sources (sample: Button/ELEMENTS,
@@ -137,8 +137,19 @@ Insert state-board ledger (updated after fetches):
   blocks (+ components/mine when async). Paste-HTML row + TipsFooter STAY
   VISIBLE during search (current code hides panel-bottom while searching —
   board contradicts). SearchResults.tsx needs the rebuild.
-- DELTA PASSES REMAINING (board unfetched): 138:106 no-results · 138:153
-  dragging · 138:244 tip-dismissed.
+- 138:106 no-results ✅ — board draws NO sparkle icon: two lines only,
+  muted "Nothing matches 'X'." (curly quotes + period) + accent "Clear
+  search" link. Old icon+button state replaced; .bld-no-results CSS deleted.
+- 138:153 dragging ✅ — behaviour-note board ("Dragging to canvas — the
+  panel keeps its scroll" is an annotation, not a UI row). Contract: drag
+  mutates no panel DOM — handleDragStart only sets dataTransfer, already
+  true. Default-view geometry re-confirmed against shipped GroupSection.
+- 138:244 tip-dismissed ✅ — dismiss removes the TipsFooter band ENTIRELY
+  (no collapsed pill). Component already returned null; dead collapsed/
+  onToggleCollapsed plumbing + BUILD_TIPS_COLLAPSED key deleted.
+- ALL 9 INSERT BOARDS FETCHED AND CONFORMED. Eye-verify screenshots pending
+  for: card grid (138:2), disabled row (138:198), searching (138:53),
+  no-results (138:106).
 
 ## NOT in scope
 

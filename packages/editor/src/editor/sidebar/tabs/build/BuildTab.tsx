@@ -2,7 +2,8 @@
  * BuildTab — Add tab shell.
  *
  * Layout: PanelHeader / SearchBar / panel-scroll / panel-bottom
- * where panel-bottom is pinned (flex-shrink: 0) and hidden during search.
+ * where panel-bottom is pinned (flex-shrink: 0) — ALWAYS, including during
+ * search: board 138:53 draws Paste-HTML + TipsFooter under the results.
  *
  * Sections mode (pre-built sections catalog + lazy chunk) was removed on
  * 2026-04-23 — the UI switch had been stripped earlier and ~1300 lines
@@ -144,9 +145,10 @@ export const BuildTab: React.FC<BuildTabProps> = ({
           <div className="bld-scroll">
             <SearchResults
               query={tab.searchQuery}
-              groups={tab.searchResults}
+              hits={tab.searchResults}
               onDragStart={tab.handleDragStart}
               onElClick={tab.handleElClick}
+              onBlockInsert={(b) => onBlockClick?.(b)}
               onClearSearch={() => tab.setSearchQuery("")}
             />
           </div>
@@ -174,22 +176,19 @@ export const BuildTab: React.FC<BuildTabProps> = ({
           </div>
         )}
 
-        {!isSearching && (
-          <div className="bld-panel-bottom">
-            {/* Board 233:1123 — pinned above the tips band, no icon slot. */}
-            <Row label={"⌥  Paste HTML…"} noIcon testId="insert-paste-html" onClick={() => void pasteHtml()} />
-            <TipsFooter
-              tipIdx={tab.tipIdx}
-              onPrev={tab.tipPrev}
-              onNext={tab.tipNext}
-              onDotClick={tab.tipSetAt}
-              dismissed={tab.tipDismissed}
-              onDismiss={tab.dismissTip}
-              collapsed={tab.tipsCollapsed}
-              onToggleCollapsed={tab.toggleTipsCollapsed}
-            />
-          </div>
-        )}
+        {/* Board 138:53: the pinned bottom stays up DURING search too. */}
+        <div className="bld-panel-bottom">
+          {/* Board 233:1123 — pinned above the tips band, no icon slot. */}
+          <Row label={"⌥  Paste HTML…"} noIcon testId="insert-paste-html" onClick={() => void pasteHtml()} />
+          <TipsFooter
+            tipIdx={tab.tipIdx}
+            onPrev={tab.tipPrev}
+            onNext={tab.tipNext}
+            onDotClick={tab.tipSetAt}
+            dismissed={tab.tipDismissed}
+            onDismiss={tab.dismissTip}
+          />
+        </div>
       </div>
     </PanelFrame>
   );

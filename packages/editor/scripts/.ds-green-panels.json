@@ -85,7 +85,6 @@
     "packages/editor/src/editor/sidebar/tabs/ai/EmptyThread.tsx",
     "packages/editor/src/editor/sidebar/tabs/ai/ScopeChip.tsx",
     "packages/editor/src/editor/sidebar/tabs/build/BuildTab.tsx",
-    "packages/editor/src/editor/sidebar/tabs/build/components/ElCard.tsx",
     "packages/editor/src/editor/sidebar/tabs/build/components/SearchResults.tsx",
     "packages/editor/src/editor/sidebar/tabs/build/components/SvgIcon.tsx",
     "packages/editor/src/editor/sidebar/tabs/build/components/TipsFooter.tsx",

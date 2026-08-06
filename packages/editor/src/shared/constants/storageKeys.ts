@@ -63,8 +63,6 @@ export const STORAGE_KEYS = {
   BUILD_TIP_DISMISSED: "buildrick-build-tip-dismissed",
   /** Whether the user has been informed that favorites are browser-local only */
   BUILD_FAVS_INFORMED: "buildrick-build-favs-informed",
-  /** Whether the Pro Tips footer is collapsed */
-  BUILD_TIPS_COLLAPSED: "buildrick-build-tips-collapsed",
   /** @deprecated — Sections mode removed 2026-04-23. Cleaned on next read of BUILD_OPEN_CATS. */
   BUILD_MODE: "buildrick-build-mode",
   /** @deprecated — Quick Picks removed in v4. Cleaned on TransitionCallout dismiss. */

@@ -2,9 +2,9 @@
 /**
  * BuildTab — render/interaction tests.
  *
- * Verifies the catalog accordion renders (default-open "Basic"), the
- * exclusive-accordion toggle swaps the open category, and typing in the
- * search box swaps the accordion view for grouped SearchResults.
+ * Verifies the board-137:2 group view renders, and typing in the search box
+ * swaps it for the flat cross-source SearchResults (board 138:53) while the
+ * pinned panel-bottom stays visible.
  *
  * @license BSD-3-Clause
  */
@@ -108,7 +108,7 @@ describe("BuildTab — ⌥ Paste HTML (board 233:1123)", () => {
 });
 
 describe("BuildTab — search", () => {
-  it("swaps the accordion view for grouped SearchResults", async () => {
+  it("swaps the group view for the flat cross-source SearchResults (138:53)", async () => {
     const { container } = renderTab();
     const input = container.querySelector("#bld-search-input") as HTMLInputElement;
     expect(input).toBeTruthy();
@@ -116,9 +116,14 @@ describe("BuildTab — search", () => {
     fireEvent.change(input, { target: { value: "button" } });
 
     // SearchBar debounces (150ms) before pushing the query up to the hook.
-    await waitFor(() => expect(screen.getByText(/results? for/i)).toBeTruthy());
-    // The matching element card renders inside the results, not the accordion.
-    expect(screen.getByText("Button")).toBeTruthy();
+    await waitFor(() => expect(screen.getByTestId("insert-search-results")).toBeTruthy());
+    // Flat rows with the source tag on the right — no results header.
+    // "Button" hits BOTH sources (element + block) — that IS the contract.
+    expect(screen.getAllByText("Button").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("ELEMENTS").length).toBeGreaterThan(0);
+    expect(screen.queryByText(/results? for/i)).toBeNull();
+    // Board 138:53: the pinned bottom stays visible during search.
+    expect(screen.getByTestId("insert-paste-html")).toBeTruthy();
   });
 
   it("shows the no-results state for an unmatched query", async () => {
@@ -128,7 +133,7 @@ describe("BuildTab — search", () => {
     fireEvent.change(input, { target: { value: "zzznotablock" } });
 
     await waitFor(() =>
-      expect(screen.getByText('Nothing matches "zzznotablock"')).toBeTruthy()
+      expect(screen.getByText("Nothing matches ‘zzznotablock’.")).toBeTruthy()
     );
   });
 });

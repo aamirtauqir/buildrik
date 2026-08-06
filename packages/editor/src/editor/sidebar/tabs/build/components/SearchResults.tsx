@@ -1,69 +1,91 @@
 /**
- * SearchResults — grouped search results with zero-results state
- * Pure render component — never calls searchElements() internally
+ * SearchResults — board 138:53 (Insert · searching).
+ *
+ * ONE flat list across sources: 32h rows, label 13 ink left, source-group
+ * tag 11 caps ink-soft right (tracking .5). No results header, no category
+ * sections, no cards — the board draws search flat and cross-source.
+ * Pure render — matching lives in utils/search.ts.
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import type { SearchGroup } from "../catalog/types";
+import type { InsertSearchHit } from "../utils/search";
 import type { DragStartFn, ElClickFn } from "../hooks/useBuildTab";
-import { ElCard } from "./ElCard";
+import type { BlockDefinition } from "../../../../../blocks/blockRegistry";
 import { Button } from "@/editor/chrome-ui";
 
 interface SearchResultsProps {
   query: string;
-  groups: SearchGroup[];
+  hits: InsertSearchHit[];
   onDragStart: DragStartFn;
   onElClick: ElClickFn;
+  onBlockInsert: (block: BlockDefinition) => void;
   onClearSearch: () => void;
 }
 
 export const SearchResults: React.FC<SearchResultsProps> = ({
   query,
-  groups,
+  hits,
   onDragStart,
   onElClick,
+  onBlockInsert,
   onClearSearch,
 }) => {
-  if (!groups.length) {
+  if (!hits.length) {
+    // Board 138:106: two lines only — muted fact (curly quotes, trailing
+    // period), accent "Clear search" link. No icon, no button chrome.
     return (
-      <div className="bld-no-results" role="status" aria-live="polite">
-        {/* Sparkle icon — small square, slate-400 tint */}
-        <svg className="bld-no-results-icon" width="28" height="28" viewBox="0 0 24 24" fill="none">
-          <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2z"
-            stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
-        </svg>
-        <p className="bld-no-results-headline">Nothing matches "{query}"</p>
-        <Button className="bld-clear-search" onClick={onClearSearch}>
+      <div
+        className="tw:flex tw:flex-col tw:items-center tw:gap-[10px] tw:px-6 tw:pt-12"
+        role="status"
+        aria-live="polite"
+        data-testid="insert-no-results"
+      >
+        <p className="tw:m-0 tw:text-center tw:text-[13px] tw:leading-[20px] tw:text-[var(--bk-ink-muted)]">
+          Nothing matches &lsquo;{query}&rsquo;.
+        </p>
+        <Button
+          type="button"
+          color="light"
+          size="xs"
+          className="tw:min-h-0 tw:border-0 tw:bg-transparent tw:p-0 tw:text-[13px] tw:leading-[20px] tw:text-[var(--bk-accent-text)] tw:shadow-none tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+          data-testid="insert-clear-search"
+          onClick={onClearSearch}
+        >
           Clear search
         </Button>
       </div>
     );
   }
 
-  const totalCount = groups.reduce((sum, g) => sum + g.elements.length, 0);
+  const activate = (hit: InsertSearchHit) =>
+    hit.group === "ELEMENTS" ? onElClick(hit.el) : onBlockInsert(hit.block);
 
   return (
-    <div className="bld-search-results" role="status" aria-live="polite">
-      <div className="bld-search-total">
-        {totalCount} result{totalCount !== 1 ? "s" : ""} for &ldquo;{query}&rdquo;
-      </div>
-      {groups.map((group) => (
-        <div key={group.catId} className="bld-search-group">
-          <div className="bld-search-group-hdr">
-            <span>{group.catName}</span>
-            <span className="bld-search-group-count">{group.elements.length}</span>
-          </div>
-          <div className="bld-el-grid">
-            {group.elements.map((el) => (
-              <ElCard
-                key={`${el.catId}-${el.name}`}
-                el={el}
-                onDragStart={onDragStart}
-                onClick={onElClick}
-              />
-            ))}
-          </div>
+    <div role="status" aria-live="polite" data-testid="insert-search-results">
+      {hits.map((hit) => (
+        <div
+          key={hit.key}
+          role="button"
+          tabIndex={0}
+          draggable={hit.group === "ELEMENTS"}
+          className="tw:flex tw:items-center tw:h-[var(--bk-size-row)] tw:px-[16px] tw:gap-[8px] tw:rounded-[4px] tw:cursor-pointer tw:select-none hover:tw:bg-[var(--bk-bg-subtle)]"
+          data-testid={`insert-hit-${hit.key}`}
+          onClick={() => activate(hit)}
+          onDragStart={hit.group === "ELEMENTS" ? (e) => onDragStart(e, hit.el) : undefined}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              activate(hit);
+            }
+          }}
+        >
+          <span className="tw:flex-1 tw:min-w-0 tw:truncate tw:text-[13px] tw:leading-[20px] tw:text-[var(--bk-ink)]">
+            {hit.label}
+          </span>
+          <span className="tw:text-[11px] tw:leading-[16px] tw:tracking-[0.5px] tw:text-[var(--bk-ink-soft)]">
+            {hit.group}
+          </span>
         </div>
       ))}
     </div>

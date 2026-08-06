@@ -1,35 +1,53 @@
 /**
- * search.ts — pure search function for Build Tab element catalog
- * Groups results by category, preserving catalog order
+ * search.ts — Insert panel search (board 138:53).
+ *
+ * The board draws search as ONE flat list across every source group — label
+ * left, source tag (ELEMENTS/BLOCKS/…) right — no category grouping, no
+ * results header. Element matching keeps the four-branch contract (name,
+ * description, tags, category name); blocks match on label and id.
+ * COMPONENTS/TEMPLATES/MINE join here when their sources go async.
  * @license BSD-3-Clause
  */
 
-import type { FlatElEntry, SearchGroup } from "../catalog/types";
+import type { FlatElEntry } from "../catalog/types";
+import type { BlockDefinition } from "../../../../../blocks/blockRegistry";
 
-/**
- * Filter elements by query against name, description, tags, and category name.
- * Returns results grouped by category, preserving catalog order.
- */
-export function searchElements(query: string, catalog: FlatElEntry[]): SearchGroup[] {
+/** One flat search hit — the payload field matches `group`. */
+export type InsertSearchHit =
+  | { key: string; label: string; group: "ELEMENTS"; el: FlatElEntry }
+  | { key: string; label: string; group: "BLOCKS"; block: BlockDefinition };
+
+export function searchInsert(
+  query: string,
+  elements: FlatElEntry[],
+  blocks: BlockDefinition[]
+): InsertSearchHit[] {
   const q = query.toLowerCase().trim();
   if (!q) return [];
 
-  const matched = catalog.filter(
-    (el) =>
-      el.name.toLowerCase().includes(q) ||
-      el.description.toLowerCase().includes(q) ||
-      el.tags.some((tag) => tag.includes(q)) ||
-      el.catName.toLowerCase().includes(q)
-  );
+  const elHits: InsertSearchHit[] = elements
+    .filter(
+      (el) =>
+        el.name.toLowerCase().includes(q) ||
+        el.description.toLowerCase().includes(q) ||
+        el.tags.some((tag) => tag.includes(q)) ||
+        el.catName.toLowerCase().includes(q)
+    )
+    .map((el) => ({
+      key: `el-${el.catId}-${el.name}`,
+      label: el.name,
+      group: "ELEMENTS" as const,
+      el,
+    }));
 
-  // Group by category, preserving catalog insertion order
-  const groupMap = new Map<string, SearchGroup>();
-  for (const el of matched) {
-    if (!groupMap.has(el.catId)) {
-      groupMap.set(el.catId, { catId: el.catId, catName: el.catName, elements: [] });
-    }
-    groupMap.get(el.catId)!.elements.push(el);
-  }
+  const blockHits: InsertSearchHit[] = blocks
+    .filter((b) => b.label.toLowerCase().includes(q) || b.id.toLowerCase().includes(q))
+    .map((b) => ({
+      key: `block-${b.id}`,
+      label: b.label,
+      group: "BLOCKS" as const,
+      block: b,
+    }));
 
-  return Array.from(groupMap.values());
+  return [...elHits, ...blockHits];
 }
