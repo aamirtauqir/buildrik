@@ -17,6 +17,8 @@ interface LayerContextMenuProps {
   isLocked: boolean;
   childCount: number;
   selectedCount: number;
+  /** composer.clipboard holds an element — enables Paste. */
+  hasClipboard: boolean;
   onAction: (action: LayerAction, id: string) => void;
   onClose: () => void;
 }
@@ -26,10 +28,11 @@ export function LayerContextMenu({
   y,
   nodeId,
   nodeName,
-  isHidden,
-  isLocked,
-  childCount,
+  isHidden: _isHidden,
+  isLocked: _isLocked,
+  childCount: _childCount,
   selectedCount,
+  hasClipboard,
   onAction,
   onClose,
 }: LayerContextMenuProps) {
@@ -56,64 +59,45 @@ export function LayerContextMenu({
       role="menu"
       aria-label={`Actions for ${nodeName}`}
     >
-      <Button className="bdc-menu-item" role="menuitem" onClick={() => act("rename")}>
-        <span className="bdc-menu-lbl">Rename</span>
-        <span className="bdc-menu-kbd">F2</span>
+      {/* Board 1082:4527: Cut · Copy · Paste | Duplicate · Delete |
+          Rename · Group selection. Plain 28h rows, no kbd hints, no icons.
+          Hide/Lock live on the row's own 👁🔒; reordering is drag. Move to
+          page… and Copy link wait for real backing — a dead item is worse
+          than a missing one. */}
+      <Button className="bdc-menu-item" role="menuitem" onClick={() => act("cut")}>
+        Cut
       </Button>
+      <Button className="bdc-menu-item" role="menuitem" onClick={() => act("copy")}>
+        Copy
+      </Button>
+      <Button
+        className="bdc-menu-item"
+        role="menuitem"
+        disabled={!hasClipboard}
+        title={hasClipboard ? undefined : "Copy or cut an element first"}
+        onClick={() => act("paste")}
+      >
+        Paste
+      </Button>
+      <div className="bdc-menu-sep" />
       <Button className="bdc-menu-item" role="menuitem" onClick={() => act("duplicate")}>
-        <span className="bdc-menu-lbl">Duplicate</span>
-        <span className="bdc-menu-kbd">⌘D</span>
+        Duplicate
+      </Button>
+      <Button className="bdc-menu-item" role="menuitem" onClick={() => act("delete")}>
+        Delete
       </Button>
       <div className="bdc-menu-sep" />
+      <Button className="bdc-menu-item" role="menuitem" onClick={() => act("rename")}>
+        Rename
+      </Button>
       <Button
         className="bdc-menu-item"
         role="menuitem"
-        onClick={() => act(isHidden ? "show" : "hide")}
+        disabled={selectedCount < 2}
+        title={selectedCount < 2 ? "Select 2 or more layers first" : undefined}
+        onClick={() => act("group")}
       >
-        {isHidden ? "Show" : "Hide"}
-      </Button>
-      <Button
-        className="bdc-menu-item"
-        role="menuitem"
-        onClick={() => act(isLocked ? "unlock" : "lock")}
-      >
-        {isLocked ? "Unlock" : "Lock"}
-      </Button>
-      <div className="bdc-menu-sep" />
-      {selectedCount > 1 && (
-        <Button className="bdc-menu-item" role="menuitem" onClick={() => act("group")}>
-          <span className="bdc-menu-lbl">Group {selectedCount} layers</span>
-          <span className="bdc-menu-kbd">⌘G</span>
-        </Button>
-      )}
-      {childCount > 0 && (
-        <Button
-          className="bdc-menu-item"
-          role="menuitem"
-          onClick={() => act("selectChildren")}
-        >
-          Select children
-        </Button>
-      )}
-      <Button className="bdc-menu-item" role="menuitem" onClick={() => act("moveToTop")}>
-        <span className="bdc-menu-lbl">Move to top</span>
-        <span className="bdc-menu-kbd">⌘⇧]</span>
-      </Button>
-      <Button className="bdc-menu-item" role="menuitem" onClick={() => act("moveToBottom")}>
-        <span className="bdc-menu-lbl">Move to bottom</span>
-        <span className="bdc-menu-kbd">⌘⇧[</span>
-      </Button>
-      <div className="bdc-menu-sep" />
-      <Button
-        className="bdc-menu-item bdc-menu-danger"
-        role="menuitem"
-        onClick={() => act("delete")}
-      >
-        <span className="bdc-menu-lbl">
-          Delete
-          {childCount > 0 ? ` (+ ${childCount} child${childCount === 1 ? "" : "ren"})` : ""}
-        </span>
-        <span className="bdc-menu-kbd">⌫</span>
+        Group selection
       </Button>
     </div>
   );

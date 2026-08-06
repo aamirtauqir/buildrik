@@ -54,6 +54,7 @@ export interface UseLayersStateOptions {
 
 /** Shape returned by useLayersState — intentionally wide to cover both legacy and new API */
 export interface UseLayersStateReturn {
+  composer: Composer | null;
   // Sub-hook namespaces (new API)
   treeHook: UseLayerTreeReturn;
   actionsHook: UseLayerActionsReturn;
@@ -157,6 +158,7 @@ export function useLayersState({
   );
 
   return {
+    composer,
     // Sub-hook namespaces (new API)
     treeHook,
     actionsHook,

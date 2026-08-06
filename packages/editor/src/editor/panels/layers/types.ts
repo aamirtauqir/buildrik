@@ -78,6 +78,9 @@ export interface LayerContextMenuState {
 
 /** Actions available in the right-click context menu */
 export type LayerAction =
+  | "cut"
+  | "copy"
+  | "paste"
   | "rename"
   | "duplicate"
   | "hide"

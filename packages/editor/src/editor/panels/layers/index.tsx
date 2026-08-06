@@ -460,6 +460,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
           x={state.contextMenu.x}
           y={state.contextMenu.y}
           nodeId={state.contextMenu.nodeId}
+          hasClipboard={!!composer?.clipboard}
           nodeName={state.contextMenu.nodeName}
           isHidden={state.contextMenu.isHidden}
           isLocked={state.contextMenu.isLocked}

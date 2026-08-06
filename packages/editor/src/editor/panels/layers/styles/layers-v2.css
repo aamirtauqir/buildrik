@@ -331,24 +331,26 @@
    ========================================================================== */
 
 .bdc-menu {
+  /* Board 1082:4564: 180w card, radius 8, 4px vertical padding only —
+     items run full-bleed. */
   position: fixed;
   z-index: 1000;
   background: var(--bk-bg-card);
-  border: 1px solid var(--bk-border);
-  border-radius: var(--bk-radius-md);
+  border-radius: var(--bk-radius-lg);
   box-shadow: var(--bk-shadow-overlay);
-  padding: var(--bk-space-4);
-  min-width: 180px;
-  font: 400 13px/20px var(--bk-font-ui);
+  padding: var(--bk-space-4) 0;
+  width: 180px;
+  font: 400 13px/18px var(--bk-font-ui);
 }
 
 .bdc-menu-item {
+  /* Board item: 28h, px-12, flush edges — no inner radius. */
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: var(--bk-space-8);
-  padding: 6px 10px;
-  border-radius: 5px;
+  height: 28px;
+  padding: 0 var(--bk-space-12);
+  border-radius: 0;
   background: transparent;
   border: none;
   color: var(--bk-ink);
@@ -360,30 +362,7 @@
 .bdc-menu-item:hover { background: var(--bk-bg-subtle); }
 .bdc-menu-item:disabled { color: var(--bk-ink-muted); cursor: not-allowed; }
 
-.bdc-menu-ic {
-  width: 13px;
-  height: 13px;
-  color: var(--bk-ink-muted);
-  flex-shrink: 0;
-}
-.bdc-menu-ic svg {
-  width: 13px;
-  height: 13px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
 
-.bdc-menu-lbl { flex: 1; }
-
-.bdc-menu-kbd {
-  /* Bare Geist Mono, no chip — the same kbd treatment the ⌘F hint uses. */
-  font: 500 11px/16px var(--bk-font-mono);
-  color: var(--bk-ink-soft);
-  flex-shrink: 0;
-}
 
 .bdc-menu-sep {
   height: 1px;
@@ -391,9 +370,6 @@
   margin: var(--bk-space-4) 0;
 }
 
-.bdc-menu-item.bdc-menu-danger:hover {
-  color: var(--bk-error);
-}
 
 /* ==========================================================================
    Display settings popover
