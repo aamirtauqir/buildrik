@@ -4,8 +4,14 @@
   "nodeId": "681:26",
   "boardName": "Topbar / Publish=ready, Review=open",
   "figmaHash": "f369679d5a961d345bb2344e3911e21ce8cc79c24299ee2aa9b2720a37262743",
-  "extractorVersion": 1,
+  "extractorVersion": 2,
   "extractedAt": "2026-08-03T04:13:32.680321Z",
+  "copy": [
+    "‹ Exit",
+    "Bella Cucina",
+    "In review · 3 open",
+    "Publish"
+  ],
   "targets": [
     {
       "nodeId": "681:26",

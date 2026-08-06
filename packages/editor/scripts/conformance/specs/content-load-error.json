@@ -4,8 +4,9 @@
   "nodeId": "453:4010",
   "boardName": "Content · load-error",
   "figmaHash": "266440a13a5716970f3f33bb63eed5e19f865ee0eec39fd56eba27d631a56458",
-  "extractorVersion": 1,
+  "extractorVersion": 2,
   "extractedAt": "2026-08-04T00:00:00.000000Z",
+  "copy": [],
   "targets": [
     {
       "nodeId": "453:4013",

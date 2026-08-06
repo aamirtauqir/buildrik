@@ -4,8 +4,9 @@
   "nodeId": "145:347",
   "boardName": "Media · bulk-select",
   "figmaHash": "e8def38c165ba42d82145bc6118aee4846a8db4a3649026c2145318793598f4d",
-  "extractorVersion": 1,
+  "extractorVersion": 2,
   "extractedAt": "2026-08-04T00:00:00.000000Z",
+  "copy": [],
   "targets": [
     {
       "nodeId": "145:347",

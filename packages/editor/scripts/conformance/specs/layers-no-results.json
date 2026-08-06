@@ -4,8 +4,12 @@
   "nodeId": "782:4260",
   "boardName": "Layers · no-results",
   "figmaHash": "e0d3f8b2409d72e14833641db9791deeed760a9419c079f5dc741ab55ba68544",
-  "extractorVersion": 1,
+  "extractorVersion": 2,
   "extractedAt": "2026-08-04T00:00:00.000000Z",
+  "copy": [
+    "Nothing matches ‘hero’.",
+    "Clear search"
+  ],
   "targets": [
     {
       "nodeId": "782:4260",

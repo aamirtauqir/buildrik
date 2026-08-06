@@ -98,6 +98,39 @@ const SINGLE = {
   "leading-": ["line-height"],
 };
 
+/**
+ * Board copy, in render order.
+ *
+ * Precedence rule (founder, 2026-08-06): behaviour is the code's, everything
+ * VISUAL is the board's — and text on screen is visual. So the board's strings
+ * are the contract, not `editor-shell-wireframes.md` §5.7.
+ *
+ * Two things this cannot do, stated rather than discovered later:
+ *
+ *   1. Boards render SAMPLE values. `layers-no-results` says
+ *      "Nothing matches 'hero'." where the product templates the query. Exact
+ *      equality would false-fail every templated line, so the comparison has
+ *      to be shape-aware — see check-copy.mjs.
+ *   2. Figma uses typographic quotes (' ' " "). The code mostly uses straight
+ *      ones. Normalised on both sides before comparing; a curly-vs-straight
+ *      difference is a font-rendering artifact, not a copy decision.
+ *
+ * HTML entities survive from get_design_context (`&lsaquo;`, `&middot;`) and
+ * are decoded here so the spec holds what a user actually reads.
+ */
+const ENTITIES = {
+  "&lsaquo;": "‹", "&rsaquo;": "›", "&middot;": "·",
+  "&amp;": "&", "&lt;": "<", "&gt;": ">", "&quot;": '"', "&nbsp;": " ",
+  "&ldquo;": "“", "&rdquo;": "”", "&lsquo;": "‘", "&rsquo;": "’",
+  "&hellip;": "…", "&mdash;": "—", "&ndash;": "–",
+};
+const decode = (s) => s.replace(/&[a-z]+;/gi, (e) => ENTITIES[e] ?? e);
+
+const copyFrom = (code) =>
+  [...code.matchAll(/>([^<>{}]{2,120})</g)]
+    .map((m) => decode(m[1]).replace(/\s+/g, " ").trim())
+    .filter((t) => t.length >= 2);
+
 /** Extract every `data-node-id` element with its className. */
 const elements = (code) => {
   const out = [];
@@ -239,6 +272,7 @@ for (const surface of surfaces) {
     figmaHash: createHash("sha256").update(raw.code).digest("hex"),
     extractorVersion: EXTRACTOR_VERSION,
     extractedAt: raw.fetchedAt ?? null,
+    copy: copyFrom(raw.code),
     targets,
   };
   mkdirSync(SPEC_DIR, { recursive: true });

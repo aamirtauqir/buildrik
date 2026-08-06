@@ -4,8 +4,13 @@
   "nodeId": "781:4217",
   "boardName": "Layers · load-error",
   "figmaHash": "e17519ad58c535bdeb28bd9325738de4432f6fefdd69cc9179117b42d3257c73",
-  "extractorVersion": 1,
+  "extractorVersion": 2,
   "extractedAt": "2026-08-04T00:00:00.000000Z",
+  "copy": [
+    "Couldn’t load the layer tree.",
+    "The page is fine — only this list failed.",
+    "Try again"
+  ],
   "targets": [
     {
       "nodeId": "781:4217",

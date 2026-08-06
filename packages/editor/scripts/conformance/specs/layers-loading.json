@@ -4,8 +4,12 @@
   "nodeId": "775:4130",
   "boardName": "Layers · loading",
   "figmaHash": "0aba1a678c79a001ef95bacaedb9b4f6abee2236280868cdc25b5a68dd5da718",
-  "extractorVersion": 1,
+  "extractorVersion": 2,
   "extractedAt": "2026-08-04T00:00:00.000000Z",
+  "copy": [
+    "Layers",
+    "Search"
+  ],
   "targets": [
     {
       "nodeId": "775:4130",

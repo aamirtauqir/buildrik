@@ -4,8 +4,11 @@
   "nodeId": "453:3931",
   "boardName": "Media · load-error",
   "figmaHash": "edaeb99dbc0b2cbce65298e451be669f3b2125331c00900b5d1ea6d0e8b3d11b",
-  "extractorVersion": 1,
+  "extractorVersion": 2,
   "extractedAt": "2026-08-04T00:00:00.000000Z",
+  "copy": [
+    "Couldn’t load your media."
+  ],
   "targets": [
     {
       "nodeId": "453:3952",

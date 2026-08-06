@@ -4,8 +4,12 @@
   "nodeId": "144:2",
   "boardName": "Media · grid",
   "figmaHash": "f284ee47e7b16b11b1db06e19d072a51d78d0f311cada75045ea27a8bf1dcd21",
-  "extractorVersion": 1,
+  "extractorVersion": 2,
   "extractedAt": "2026-08-04T00:00:00.000000Z",
+  "copy": [
+    "Media",
+    "Search"
+  ],
   "targets": [
     {
       "nodeId": "144:2",

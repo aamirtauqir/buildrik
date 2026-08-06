@@ -26,7 +26,7 @@ import { fileURLToPath } from "node:url";
  * top level — importing it just to read a constant would execute an extraction
  * and call process.exit. Shared constants belong with the shared vocabulary.
  */
-export const EXTRACTOR_VERSION = 1;
+export const EXTRACTOR_VERSION = 2;
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const TOKENS_PATH = join(HERE, "..", "tokens", "figma-tokens.json");
