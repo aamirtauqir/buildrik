@@ -210,15 +210,15 @@ export const PagesTab: React.FC<PagesTabProps> = ({
       {/* Error state — takes priority over everything */}
       {p.loadError ? (
         <PanelFrame.Body>
-          <EmptyState size="compact" style={{ margin: "var(--bk-space-12)" }} role="alert" aria-live="assertive">
-            <EmptyStateTitle>{p.loadError}</EmptyStateTitle>
-            <EmptyStateDesc>Your connection dropped. Work is safe — nothing was lost.</EmptyStateDesc>
-            <EmptyStateActions>
-              <Button color="light" size="xs" onClick={p.retrySync}>
-                Try again
-              </Button>
-            </EmptyStateActions>
-          </EmptyState>
+          {/* Board 141:165: centered — red fact, muted harm scope, accent
+              retry. */}
+          <div className="bd-pg-error" role="alert" aria-live="assertive">
+            <p className="bd-pg-error-title">Couldn{"\u2019"}t load your pages.</p>
+            <p className="bd-pg-error-desc">The site is fine {"\u2014"} this panel isn{"\u2019"}t.</p>
+            <Button color="light" size="xs" className="bd-pg-error-retry" onClick={p.retrySync}>
+              Try again
+            </Button>
+          </div>
         </PanelFrame.Body>
       ) : (
         <PanelFrame.Body noScroll>

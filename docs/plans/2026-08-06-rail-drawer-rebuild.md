@@ -327,10 +327,20 @@ the aria-label), icon only on Home (roof glyph) and external (link glyph);
 footer is the "+  Add page" accent text link (count stats gone; From-
 template/New-folder survive on the ⋮ overflow). 187/187 tests (11
 old-design chip/slug tests rewritten same-commit).
-REMAINING Pages delta passes: 141:2 folders-collapsed · 141:40 searching ·
-141:78 bulk-select · 141:124 empty · 141:165 load-error · 141:207
-listings · 774:4044 loading · 782:4212 no-results · 435:2348 PageTabBar ·
-S3.7 SEO/Social/Advanced settings. Dirty-dot (140:21, 8px orange on Home)
+Delta passes DONE 2026-08-07 (all frames screenshotted first): 141:124
+empty is the ONE-PAGE state (Home row + centered "This site has one
+page." + Add link) — shipped, replacing nothing (zero-pages EmptyState
+stays for the unreachable case); 141:165 load-error centered board copy
+("Couldn't load your pages." / "The site is fine — this panel isn't." /
+Try again); 782:4212 no-results left-aligned curly-quote copy + Clear
+search; 141:40 searching = FLAT results incl. folder members (a real BUG:
+the folder filter hid them from search) with the muted "in {Folder}" tag;
+141:78 bulk = light bottom band replacing the Add-page footer at ANY
+selection (was a floating dark pill gated at 2+), plain 13 ink actions.
+STILL OPEN: 141:2 folders-collapsed (visual verify only), 774:4044
+loading skeleton (probe block pending), 141:207 listings drawer table
+restyle (PAGE/TITLE/DESC/SCORE + "Open full listings ›"), 435:2348
+PageTabBar, S3.7 SEO/Social/Advanced settings screens. Dirty-dot (140:21, 8px orange on Home)
 NOT shipped — no per-page unsaved-state source in the model yet.
 
 ## NOT in scope

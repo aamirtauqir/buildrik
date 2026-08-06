@@ -71,7 +71,9 @@ describe("PageList", () => {
     );
     const search = container.querySelector(".bd-pg-search input") as HTMLInputElement;
     fireEvent.change(search, { target: { value: "zzznomatch" } });
-    expect(screen.getByText(/No pages match/i)).toBeInTheDocument();
+    // Board 782:4212 copy — curly quotes, trailing period.
+    expect(screen.getByText(/Nothing matches/)).toBeInTheDocument();
+    expect(screen.getByText('Clear search')).toBeInTheDocument();
   });
 
   it("renders drop indicator placeholder with .bd-pg-drop-indicator", () => {

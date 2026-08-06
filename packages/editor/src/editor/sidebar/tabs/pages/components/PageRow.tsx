@@ -43,6 +43,8 @@ interface Props {
   onRenameStart: () => void;
   onContextMenu: (x: number, y: number) => void;
   onSettingsClick: () => void;
+  /** Board 141:40 search results: the owning folder, shown muted right. */
+  searchContext?: string;
 }
 
 export const PageRow = React.memo<Props>(
@@ -61,6 +63,7 @@ export const PageRow = React.memo<Props>(
     onRenameCancel,
     onRenameStart,
     onContextMenu,
+    searchContext,
   }) => {
     const [renameValue, setRenameValue] = React.useState(page.name);
     const inputRef = React.useRef<HTMLInputElement>(null);
@@ -266,6 +269,12 @@ export const PageRow = React.memo<Props>(
           )}
 
           <span style={{ flex: 1 }} aria-hidden="true" />
+
+          {searchContext && (
+            <span className="bd-pg-row-incontext" aria-label={`in ${searchContext}`}>
+              in {searchContext}
+            </span>
+          )}
 
           <Button
             className="bd-pg-row-overflow"

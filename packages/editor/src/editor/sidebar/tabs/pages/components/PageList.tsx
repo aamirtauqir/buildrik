@@ -191,14 +191,17 @@ export const PageList: React.FC<Props> = ({
       )}
       <div className="bd-pg-list" role="tree" aria-label="Pages">
         {visible.length === 0 && search ? (
-          <EmptyState size="compact">
-            <EmptyStateTitle>No pages match &ldquo;{search}&rdquo;</EmptyStateTitle>
-            <EmptyStateActions>
-              <Button color="light" size="xs" onClick={() => setSearch("")} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
-                Clear search
-              </Button>
-            </EmptyStateActions>
-          </EmptyState>
+          <div className="bd-pg-nores" role="status" aria-live="polite" data-testid="pages-no-results">
+            <p>Nothing matches {"\u2018"}{search}{"\u2019"}.</p>
+            <Button
+              color="light"
+              size="xs"
+              className="bd-pg-nores-clear"
+              onClick={() => setSearch("")}
+            >
+              Clear search
+            </Button>
+          </div>
         ) : (
           <>
             {!search && folders.map((folder) => {
@@ -231,7 +234,10 @@ export const PageList: React.FC<Props> = ({
             })}
 
             {visible
-              .filter((p) => !pageToFolder.has(p.id))
+              // Board 141:40: search results are FLAT — folder members show
+              // too, tagged "in {Folder}". Outside search, folder members
+              // render under their folder above.
+              .filter((p) => (search ? true : !pageToFolder.has(p.id)))
               .map((page) => (
                 <PageRow
                   key={page.id}
@@ -253,15 +259,37 @@ export const PageList: React.FC<Props> = ({
                   onRenameCancel={onRenameCancel}
                   onContextMenu={(x, y) => onContextMenu(page.id, x, y)}
                   onSettingsClick={() => onSettingsClick(page.id)}
+                  searchContext={
+                    search
+                      ? folders.find((f) => f.id === pageToFolder.get(page.id))?.name
+                      : undefined
+                  }
                 />
               ))}
+            {/* Board 141:124: with exactly one page the list carries the
+                one-page note + a centered Add link under the row. */}
+            {!search && pages.length === 1 && (
+              <div className="bd-pg-onepage" data-testid="pages-onepage">
+                <p>This site has one page.</p>
+                <Button
+                  color="light"
+                  size="xs"
+                  className="bd-pg-onepage-add"
+                  onClick={onAddPage}
+                >
+                  + Add page
+                </Button>
+              </div>
+            )}
           </>
         )}
 
         {/* Drop indicator placeholder — toggled via .show during dragover (CSS owns visibility) */}
         <div className="bd-pg-drop-indicator" aria-hidden="true" />
       </div>
-      {selectedIds.size >= 2 && (
+      {/* Board 141:78: the band appears with ANY checkbox selection —
+          it replaces the Add-page footer. */}
+      {selectedIds.size >= 1 && (
         <BulkToolbar
           selectedCount={selectedIds.size}
           folders={folders}
@@ -272,11 +300,13 @@ export const PageList: React.FC<Props> = ({
           onClear={onClearSelection}
         />
       )}
-      {/* Board 140:38: the footer is just "+  Add page" in accent — no
-          count stats. From-template/New-folder survive on the ⋮ overflow. */}
-      <div className="bd-pg-footer">
-        <AddPageButton onAddBlank={onAddPage} onFromTemplate={onRequestTemplates} onAddFolder={onAddFolder} />
-      </div>
+      {/* Board 140:38 footer vs board 141:78: when a bulk selection is
+          active the bottom band IS the bulk bar — otherwise "+  Add page". */}
+      {selectedIds.size === 0 && (
+        <div className="bd-pg-footer">
+          <AddPageButton onAddBlank={onAddPage} onFromTemplate={onRequestTemplates} onAddFolder={onAddFolder} />
+        </div>
+      )}
     </div>
   );
 };

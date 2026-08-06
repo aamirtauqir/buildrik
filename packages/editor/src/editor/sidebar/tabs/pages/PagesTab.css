@@ -450,38 +450,42 @@
 
 /* ─── BULK TOOLBAR (dark floating pill) ───────────────────────────────── */
 .bd-pg-bulk-toolbar {
+  /* Board 141:78: a light full-width band pinned at the bottom — it takes
+     the footer's place while a selection is active. */
   position: absolute;
-  bottom: 72px;
-  left: 10px;
-  right: 10px;
+  bottom: 0;
+  left: 0;
+  right: 0;
   display: flex;
   align-items: center;
   gap: var(--bk-space-8);
-  padding: 6px 10px;
-  background: var(--bk-ink); /* slate-700 — closest non-black per NO-BLACK rule */
-  border-radius: var(--bk-radius-lg);
-  box-shadow: 0 8px 32px rgba(15,23,42,0.18);
+  padding: 8px var(--bk-space-16);
+  background: var(--bk-gray-50);
+  border-top: 1px solid var(--bk-border);
   z-index: 10;
 }
 .bd-pg-bulk-count {
-  color: var(--bk-bg-card);
-  font: 500 12px var(--bk-font-ui);
+  color: var(--bk-ink);
+  font: 400 13px/20px var(--bk-font-ui);
+  white-space: nowrap;
 }
-.bd-pg-bulk-count b { color: var(--bk-bg-card); font-weight: 600; }
+.bd-pg-bulk-count b { color: var(--bk-ink); font-weight: 500; }
 .bd-pg-bulk-spacer { flex: 1; }
 .bd-pg-bulk-toolbar button {
+  /* Board 141:78: plain 13px ink text actions on the light band. */
   padding: var(--bk-space-4) var(--bk-space-8);
   border-radius: var(--bk-radius-md);
   background: transparent;
-  color: var(--bk-bg-card);
+  color: var(--bk-ink);
   border: 0;
-  font: 500 11.5px var(--bk-font-ui);
+  font: 400 13px/20px var(--bk-font-ui);
   cursor: pointer;
+  white-space: nowrap;
   transition: background 100ms;
 }
-.bd-pg-bulk-toolbar button:hover { background: var(--bk-alpha-on-dark-12); color: var(--bk-bg-card); }
-.bd-pg-bulk-toolbar button.danger { color: #FCA5A5; }
-.bd-pg-bulk-toolbar button.danger:hover { background: rgba(252,165,165,0.15); color: var(--bk-bg-card); }
+.bd-pg-bulk-toolbar button:hover { background: var(--bk-bg-subtle); color: var(--bk-ink); }
+.bd-pg-bulk-toolbar button.danger { color: var(--bk-error); }
+.bd-pg-bulk-toolbar button.danger:hover { background: var(--bk-bg-subtle); color: var(--bk-error); }
 .bd-pg-bulk-close {
   width: 22px; height: 22px;
   display: grid;
@@ -801,4 +805,55 @@
 .bd-pg-drawer-tab:focus-visible {
   outline: 2px solid var(--bk-accent);
   outline-offset: 2px;
+}
+
+/* Board 141:165 — centered load error. */
+.bd-pg-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--bk-space-8);
+  padding: var(--bk-space-32) var(--bk-space-24) 0;
+  text-align: center;
+}
+.bd-pg-error-title { margin: 0; font: 400 13px/20px var(--bk-font-ui); color: var(--bk-error); }
+.bd-pg-error-desc { margin: 0; font: 400 12px/18px var(--bk-font-ui); color: var(--bk-ink-muted); }
+.bd-pg-error-retry,
+.bd-pg-nores-clear,
+.bd-pg-onepage-add {
+  min-height: 0;
+  border: none;
+  background: transparent;
+  padding: 0;
+  font: 400 13px/20px var(--bk-font-ui);
+  color: var(--bk-accent-text);
+  box-shadow: none;
+}
+
+/* Board 782:4212 — no-results, left at 16. */
+.bd-pg-nores {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--bk-space-8);
+  padding: var(--bk-space-24) var(--bk-space-16) 0;
+}
+.bd-pg-nores p { margin: 0; font: 400 13px/20px var(--bk-font-ui); color: var(--bk-ink-muted); }
+
+/* Board 141:124 — the one-page note under the single row. */
+.bd-pg-onepage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--bk-space-8);
+  padding: var(--bk-space-24) var(--bk-space-24) 0;
+  text-align: center;
+}
+.bd-pg-onepage p { margin: 0; font: 400 13px/20px var(--bk-font-ui); color: var(--bk-ink-muted); }
+
+/* Board 141:40 — search result's owning folder, muted right. */
+.bd-pg-row-incontext {
+  flex-shrink: 0;
+  font: 400 11px/16px var(--bk-font-ui);
+  color: var(--bk-gray-300);
 }
