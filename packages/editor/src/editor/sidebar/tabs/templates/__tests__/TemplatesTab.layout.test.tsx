@@ -25,7 +25,7 @@ import { TemplatesTab } from "../TemplatesTab";
 describe("TemplatesTab — inline detail layout (prototype-v3 §2)", () => {
   it("applies tpl-detail-layout--split when a template card is selected", async () => {
     const user = userEvent.setup();
-    const { container } = render(<TemplatesTab composer={null} />);
+    const { container } = render(<TemplatesTab composer={null} isExpanded />);
 
     const cards = container.querySelectorAll(".tpl-card");
     expect(cards.length).toBeGreaterThan(0);
@@ -39,7 +39,7 @@ describe("TemplatesTab — inline detail layout (prototype-v3 §2)", () => {
 
   it("keeps the grid visible (not display:none) when detail is open", async () => {
     const user = userEvent.setup();
-    const { container } = render(<TemplatesTab composer={null} />);
+    const { container } = render(<TemplatesTab composer={null} isExpanded />);
 
     const cards = container.querySelectorAll(".tpl-card");
     await user.click(cards[0]);
@@ -53,7 +53,7 @@ describe("TemplatesTab — inline detail layout (prototype-v3 §2)", () => {
 
   it("swaps the 'Templates' title for a breadcrumb path when detail is open", async () => {
     const user = userEvent.setup();
-    const { container } = render(<TemplatesTab composer={null} />);
+    const { container } = render(<TemplatesTab composer={null} isExpanded />);
 
     const cards = container.querySelectorAll(".tpl-card");
     await user.click(cards[0]);

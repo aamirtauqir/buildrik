@@ -124,6 +124,8 @@ export const TabRouter: React.FC<TabRouterProps> = ({
     case "templates":
       return (
         <TemplatesTab
+          isExpanded={commonTabProps.isExpanded}
+          onExpandToggle={commonTabProps.onExpandToggle}
           composer={composer}
           onTemplateUsed={onSwitchToAdd}
           onSwitchTab={onTemplatesSwitchTab}

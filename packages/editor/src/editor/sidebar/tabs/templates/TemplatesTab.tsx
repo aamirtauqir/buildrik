@@ -22,6 +22,7 @@ import { TemplateCard } from "./components/TemplateCard";
 import { TemplateDetail } from "./components/TemplateDetail";
 import { TemplatePagination } from "./components/TemplatePagination";
 import { TemplateUsageDrawer } from "./components/TemplateUsageDrawer";
+import { DrawerGallery } from "./components/DrawerGallery";
 import { useTemplateUsageMap } from "./hooks/useTemplateUsageMap";
 import { resolveTokens } from "./utils/resolveTemplateTokens";
 import { snapshotFromComputedStyle } from "./utils/tokenSnapshot";
@@ -39,6 +40,8 @@ export interface TemplatesTabProps {
   onSwitchTab?: (tab: string) => void;
   onClose?: () => void;
   newPageMode?: boolean;
+  isExpanded?: boolean;
+  onExpandToggle?: () => void;
 }
 
 export const TemplatesTab: React.FC<TemplatesTabProps> = ({
@@ -47,6 +50,8 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   onSwitchTab,
   onClose,
   newPageMode: newPageModeProp = false,
+  isExpanded,
+  onExpandToggle,
 }) => {
   const { addToast } = useToast();
   const [showSearch, setShowSearch] = React.useState(false);
@@ -266,6 +271,9 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   }
 
   // ── Render ──
+  // Compact drawer (board 641:2487) vs the full grid: detail, new-page and
+  // the expanded 700 view keep the pre-existing layout.
+  const showFull = Boolean(detailTemplate) || newPageMode || Boolean(isExpanded);
   const tName = pendingId.current
     ? (SITE_TEMPLATES.find((t) => t.id === pendingId.current)?.name ?? "Template")
     : "Template";
@@ -298,18 +306,35 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
       ) : (
         <PanelFrame.Header
           title="Templates"
-          subtitle={`${SITE_TEMPLATES.length} templates`}
+          subtitle={showFull ? `${SITE_TEMPLATES.length} templates` : undefined}
+          isExpanded={isExpanded}
+          onExpandToggle={onExpandToggle}
           onClose={onClose}
         >
-          <Button
-            className="tpl-header-btn"
-            onClick={() => setShowSearch(!showSearch)}
-            aria-label={showSearch ? "Close search" : "Search templates"}
-          >
-            <Search size={16} />
-          </Button>
+          {showFull && (
+            <Button
+              className="tpl-header-btn"
+              onClick={() => setShowSearch(!showSearch)}
+              aria-label={showSearch ? "Close search" : "Search templates"}
+            >
+              <Search size={16} />
+            </Button>
+          )}
         </PanelFrame.Header>
       )}
+      {/* Board 641:2487: at 320 the drawer shows the compact gallery — page
+          cards + section rows + Browse-all (which expands to this full view).
+          The full grid/pills/pagination survive as the EXPANDED (700) and
+          detail/new-page layouts. */}
+      {!showFull ? (
+        <DrawerGallery
+          searchQ={sel.searchQ}
+          onSearchChange={sel.setSearchQ}
+          onOpenDetail={(id) => sel.setDetailId(id)}
+          onBrowseAll={onExpandToggle}
+        />
+      ) : (
+      <>
       {/* Search input */}
       {showSearch && (
         <div className="tpl-search-wrap">
@@ -459,6 +484,8 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
       />
 
       </>
+      </>
+      )}
       {/* Error banner */}
       {applyError && (
         <div className="tpl-error-banner">
