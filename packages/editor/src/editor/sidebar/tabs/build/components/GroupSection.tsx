@@ -75,7 +75,13 @@ const Row: React.FC<{
     }}
   >
     {iconHtml ? (
-      <SvgIcon html={iconHtml} size={12} />
+      // .bld-el-icon owns the glyph contract: 12px box, ink-muted colour, and
+      // stroke:currentColor/1.5/round for the stroke-only glyphs (bare <line>
+      // icons render fill:black/stroke:none — i.e. INVISIBLE — without it).
+      // Bypassing this class is exactly how Text/List/Divider/Spacer vanished.
+      <span className="bld-el-icon" aria-hidden="true">
+        <SvgIcon html={iconHtml} />
+      </span>
     ) : (
       <span className="tw:size-[12px] tw:rounded-[2px] tw:bg-[var(--bk-ink-muted)] tw:shrink-0" aria-hidden="true" />
     )}
