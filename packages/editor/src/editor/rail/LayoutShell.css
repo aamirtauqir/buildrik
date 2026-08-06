@@ -152,6 +152,10 @@
 /* Footer slot — 32px status bar at bottom */
 .layout-shell__footer {
   grid-area: footer;
+  /* Board 52:10: 32px band. In .bd-studio (flex host) grid-area is inert and
+     height collapsed to content once the rebuild dropped the 20px buttons. */
+  height: var(--bk-size-footer, 32px);
+  flex: none;
   display: flex;
   align-items: center;
   justify-content: space-between;
