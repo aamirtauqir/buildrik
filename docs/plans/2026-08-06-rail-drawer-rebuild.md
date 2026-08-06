@@ -95,6 +95,33 @@ decided, final. **Brand IA: boards win** — the 26 drawer screens replace the
 | 4 | CEO | PanelFrame frozen | Mechanical | P2 blast-radius | 10+ consumers incl. out-of-scope panels |
 | 5 | CEO | Recipes ride per family | Mechanical | gate-must-fail doctrine | net armed, never gates the eye |
 
+## Insert `137:2` — extracted board contract (fetched 2026-08-06)
+
+Geometry (px): header **44h** · search band **36h** (box 288×28, rounded-6,
+bg-subtle, "Search elements" 13 muted + `⌘F` Geist Mono 11 right) · group
+header **32h** (▾/▸ @16, LABEL 11/500 tracking .5 @32, count Geist Mono 11
+right-aligned @284) · list row **32h** (12px icon rounded-2 + 13/400 label,
+px-16 gap-8) · flex spacer · pinned `⌥ Paste HTML…` row 32h · **TipsFooter
+40h** (accent-tint bg, accent-text 12, `💡 Tip 2/5` left, `‹ › ✕` right).
+
+Panel-header component doc (16:6, applies to ALL SEVEN drawers): *"44h. Title
+is 11/600 caps 8% tracking — a label, not a heading. **Pin sits before
+close**: closing is the last thing you do, so it goes last."*
+
+**THE mismatch (founder was right on Insert):** board groups are
+**ELEMENTS 48 · BLOCKS 63 · COMPONENTS 27 · TEMPLATES 10 · MINE 4** —
+five groups, catalog-source taxonomy. Live BuildTab ships
+**BASIC/LAYOUT/FORMS/MEDIA/NAVIGATION/INTERACTIVE** — six element-type
+categories. Different IA, not drift. Counts are sample data; group names are
+structure. Rebuild = regroup the catalog to the board taxonomy (`blocks/` dir
+→ BLOCKS, `componentsData.ts` → COMPONENTS, `templates/` → TEMPLATES, user's
+own → MINE). Header gains PIN before close; live's "53 blocks · 6 categories"
+subtitle is NOT on the board.
+
+State boards remaining: 138:2 group-expanded · 138:53 searching · 138:106
+no-results · 138:153 dragging · 138:198 disabled-item · 138:244 tip-dismissed ·
+775:4053 loading · 781:4154 load-error.
+
 ## NOT in scope
 
 - Inspector flat body (board `52:56` / `824:5095`) — next arc after this one;
