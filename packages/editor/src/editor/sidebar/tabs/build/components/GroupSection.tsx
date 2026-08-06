@@ -53,15 +53,18 @@ const HeaderRow: React.FC<{ group: InsertGroup; isOpen: boolean; onToggle: () =>
   </Button>
 );
 
-/** Board list row: 32h · rounded-4 · 12px icon · 13/400 label. */
-const Row: React.FC<{
+/** Board list row: 32h · rounded-4 · 12px icon · 13/400 label. Exported for
+ *  the board's icon-less pinned rows (⌥ Paste HTML…) in BuildTab. */
+export const Row: React.FC<{
   label: string;
   iconHtml?: string;
+  /** Board 233:1123 draws the Paste-HTML row with no icon slot at all. */
+  noIcon?: boolean;
   testId: string;
   draggable?: boolean;
   onDragStart?: (e: React.DragEvent) => void;
   onClick: () => void;
-}> = ({ label, iconHtml, testId, draggable, onDragStart, onClick }) => (
+}> = ({ label, iconHtml, noIcon, testId, draggable, onDragStart, onClick }) => (
   <div
     role="button"
     tabIndex={0}
@@ -74,7 +77,7 @@ const Row: React.FC<{
       if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClick(); }
     }}
   >
-    {iconHtml ? (
+    {noIcon ? null : iconHtml ? (
       // .bld-el-icon owns the glyph contract: 12px box, ink-muted colour, and
       // stroke:currentColor/1.5/round for the stroke-only glyphs (bare <line>
       // icons render fill:black/stroke:none — i.e. INVISIBLE — without it).

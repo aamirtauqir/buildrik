@@ -36,7 +36,24 @@ export function PanelHeaderActions({
           pressed={Boolean(isPinned)}
           onClick={onPinToggle}
         >
-          {isPinned ? "📌" : "📍"}
+          {/* Board 16:6 draws a neutral 16px outline icon. The previous 📌/📍
+              emoji rendered as a red badge — DESIGN.md's anti-slop list bans
+              emoji as design elements, and red means destructive here and
+              nothing else. State = filled vs outline, colour inherits. */}
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill={isPinned ? "currentColor" : "none"}
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M12 17v5" />
+            <path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16h14v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1z" />
+          </svg>
         </IconButton>
       ) : null}
       {onHelpClick ? (

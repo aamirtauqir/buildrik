@@ -19,7 +19,8 @@ import { SearchBar } from "../../shared/SearchBar";
 import { useBuildTab } from "./hooks/useBuildTab";
 import { useCallout } from "./hooks/useCallout";
 import { TipsFooter } from "./components/TipsFooter";
-import { GroupSection } from "./components/GroupSection";
+import { GroupSection, Row } from "./components/GroupSection";
+import { useToast } from "@/editor/chrome-ui";
 import { SearchResults } from "./components/SearchResults";
 import { TransitionCallout } from "./components/TransitionCallout";
 import { buildInsertGroups, elementRows, blockRows, type InsertGroupId } from "./catalog/groups";
@@ -46,6 +47,26 @@ export const BuildTab: React.FC<BuildTabProps> = ({
   const [openGroups, setOpenGroups] = React.useState<Set<InsertGroupId>>(
     () => new Set<InsertGroupId>(["elements"]),
   );
+  const { addToast } = useToast();
+
+  // Board 233:1123 "⌥ Paste HTML…": clipboard → the SAME BlockData insert path
+  // everything else uses. useBlockInsertion sanitizes (insertBlock owns the
+  // XSS boundary) and gives the transaction/smart-placement/select/flash.
+  const pasteHtml = React.useCallback(async () => {
+    let text = "";
+    try {
+      text = await navigator.clipboard.readText();
+    } catch {
+      addToast({ description: "Clipboard is not readable — allow clipboard access and try again.", tone: "warning" });
+      return;
+    }
+    if (!text.trim()) {
+      addToast({ description: "Clipboard is empty — copy some HTML first.", tone: "warning" });
+      return;
+    }
+    onBlockClick?.({ id: "pasted-html", label: "Pasted HTML", content: text });
+  }, [addToast, onBlockClick]);
+
   const toggleGroup = (g: (typeof groups)[number]) => {
     // COMPONENTS / TEMPLATES / MINE own full tabs (create/preview flows this
     // panel cannot host) — expanding navigates there. Real behaviour, no stub.
@@ -155,6 +176,8 @@ export const BuildTab: React.FC<BuildTabProps> = ({
 
         {!isSearching && (
           <div className="bld-panel-bottom">
+            {/* Board 233:1123 — pinned above the tips band, no icon slot. */}
+            <Row label={"⌥  Paste HTML…"} noIcon testId="insert-paste-html" onClick={() => void pasteHtml()} />
             <TipsFooter
               tipIdx={tab.tipIdx}
               onPrev={tab.tipPrev}

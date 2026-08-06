@@ -48,7 +48,16 @@ export function useBlockInsertion(composer: Composer | null): UseBlockInsertionR
           return;
         }
 
-        const def = getBlockDefinitions().find((b) => b.id === block.id);
+        // Registry first; otherwise a BlockData that CARRIES its content is a
+        // complete insert spec on its own — board 137:2's "⌥ Paste HTML…" row
+        // sends clipboard HTML this way. insertBlock owns the XSS boundary
+        // (sanitizeHTML before insertHTMLToElement), so ad-hoc content rides
+        // the exact same transaction/smart-placement/select/flash path.
+        const registryDef = getBlockDefinitions().find((b) => b.id === block.id);
+        const def = registryDef ??
+          (typeof block.content === "string" && block.content.trim()
+            ? { ...block, elementType: "container" as const }
+            : undefined);
         if (!def) {
           addToast({ description: `Block "${block.label}" not found in registry.`, tone: "error" });
           return;

@@ -12,12 +12,22 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import * as React from "react";
-import { BuildTab } from "../BuildTab";
+import { BuildTab, type BuildTabProps } from "../BuildTab";
+import { ToastProvider } from "@/editor/chrome-ui";
 
 beforeEach(() => {
   localStorage.clear();
   sessionStorage.clear();
 });
+
+/** BuildTab uses useToast (Paste-HTML clipboard errors) — the app provides
+ *  ToastProvider at the shell; tests must too. */
+const renderTab = (props: Partial<BuildTabProps> = {}) =>
+  render(
+    <ToastProvider>
+      <BuildTab composer={null} onBlockClick={vi.fn()} {...props} />
+    </ToastProvider>,
+  );
 
 // The previous suite here asserted the PRE-board design — the "N blocks ·
 // N categories" subtitle, the BASIC/LAYOUT category rows, and a single-open
@@ -26,20 +36,20 @@ beforeEach(() => {
 // the board contract in the same commit as the rebuild.
 describe("BuildTab — board 137:2 taxonomy", () => {
   it("renders the title with no count subtitle", () => {
-    render(<BuildTab composer={null} onBlockClick={vi.fn()} />);
+    renderTab();
     expect(screen.getByText("Insert")).toBeTruthy();
     expect(screen.queryByText(/categories/)).toBeNull();
   });
 
   it("renders the five source groups: ELEMENTS BLOCKS COMPONENTS TEMPLATES MINE", () => {
-    render(<BuildTab composer={null} onBlockClick={vi.fn()} />);
+    renderTab();
     for (const label of ["ELEMENTS", "BLOCKS", "COMPONENTS", "TEMPLATES", "MINE"]) {
       expect(screen.getByText(label)).toBeTruthy();
     }
   });
 
   it("ELEMENTS is open by default (▾) with its rows mounted; BLOCKS is closed", () => {
-    render(<BuildTab composer={null} onBlockClick={vi.fn()} />);
+    renderTab();
     expect(screen.getByTestId("insert-group-elements")).toHaveAttribute("aria-expanded", "true");
     // A known element row is mounted…
     expect(screen.getByText("Heading")).toBeTruthy();
@@ -49,7 +59,7 @@ describe("BuildTab — board 137:2 taxonomy", () => {
   });
 
   it("groups toggle independently — opening BLOCKS keeps ELEMENTS open", () => {
-    render(<BuildTab composer={null} onBlockClick={vi.fn()} />);
+    renderTab();
     fireEvent.click(screen.getByTestId("insert-group-blocks"));
     expect(screen.getByTestId("insert-group-blocks")).toHaveAttribute("aria-expanded", "true");
     expect(screen.getByTestId("insert-group-elements")).toHaveAttribute("aria-expanded", "true");
@@ -59,7 +69,7 @@ describe("BuildTab — board 137:2 taxonomy", () => {
 
   it("clicking a BLOCKS row inserts through the same onBlockClick path elements use", () => {
     const onBlockClick = vi.fn();
-    render(<BuildTab composer={null} onBlockClick={onBlockClick} />);
+    renderTab({ onBlockClick });
     fireEvent.click(screen.getByTestId("insert-group-blocks"));
     const first = document.querySelector('[data-testid^="insert-block-"]') as HTMLElement;
     expect(first).toBeTruthy();
@@ -70,9 +80,36 @@ describe("BuildTab — board 137:2 taxonomy", () => {
   });
 });
 
+describe("BuildTab — ⌥ Paste HTML (board 233:1123)", () => {
+  it("reads the clipboard and sends content through onBlockClick", async () => {
+    const onBlockClick = vi.fn();
+    Object.assign(navigator, {
+      clipboard: { readText: vi.fn().mockResolvedValue("<div><p>hi</p></div>") },
+    });
+    renderTab({ onBlockClick });
+    fireEvent.click(screen.getByTestId("insert-paste-html"));
+    await waitFor(() => expect(onBlockClick).toHaveBeenCalledTimes(1));
+    expect(onBlockClick.mock.calls[0][0]).toMatchObject({
+      id: "pasted-html",
+      content: "<div><p>hi</p></div>",
+    });
+  });
+
+  it("empty clipboard → warns, never inserts", async () => {
+    const onBlockClick = vi.fn();
+    Object.assign(navigator, {
+      clipboard: { readText: vi.fn().mockResolvedValue("   ") },
+    });
+    renderTab({ onBlockClick });
+    fireEvent.click(screen.getByTestId("insert-paste-html"));
+    await waitFor(() => expect(screen.getByText(/Clipboard is empty/)).toBeTruthy());
+    expect(onBlockClick).not.toHaveBeenCalled();
+  });
+});
+
 describe("BuildTab — search", () => {
   it("swaps the accordion view for grouped SearchResults", async () => {
-    const { container } = render(<BuildTab composer={null} onBlockClick={vi.fn()} />);
+    const { container } = renderTab();
     const input = container.querySelector("#bld-search-input") as HTMLInputElement;
     expect(input).toBeTruthy();
 
@@ -85,7 +122,7 @@ describe("BuildTab — search", () => {
   });
 
   it("shows the no-results state for an unmatched query", async () => {
-    const { container } = render(<BuildTab composer={null} onBlockClick={vi.fn()} />);
+    const { container } = renderTab();
     const input = container.querySelector("#bld-search-input") as HTMLInputElement;
 
     fireEvent.change(input, { target: { value: "zzznotablock" } });
