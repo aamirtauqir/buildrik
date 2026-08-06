@@ -1,0 +1,98 @@
+{
+  "_note": [
+    "Final empty-state copy from docs/designs/2026-07-18-editor-shell-wireframes.md §5.7,",
+    "which states: \"Copy is final, not placeholder.\"",
+    "",
+    "This file exists because a geometry/colour/type diff structurally cannot see copy.",
+    "conformance/README.md already admits the sibling blindness for structure; this is the",
+    "same hole for text. String equality is cheaper than any board extraction and catches",
+    "a class of drift the whole harness would otherwise mark green.",
+    "",
+    "status: ships   = the line is present in src/ and check-copy.mjs guards it",
+    "        missing = drifted or never built. Counted against driftFloor, which may",
+    "                  only fall. Resolving one is a product decision (adopt the spec",
+    "                  line, or amend the doc) and is NOT auto-applied."
+  ],
+  "source": "docs/designs/2026-07-18-editor-shell-wireframes.md#57",
+  "generatedAt": "2026-08-06",
+  "driftFloor": 9,
+  "lines": [
+    {
+      "surface": "Insert · search, no hits",
+      "copy": "Nothing matches",
+      "status": "ships",
+      "file": "src/editor/sidebar/tabs/build/components/SearchResults.tsx",
+      "shipsInstead": null
+    },
+    {
+      "surface": "Content · no collections",
+      "copy": "Collections turn a spreadsheet into pages — one page per row, updated when the data changes.",
+      "status": "ships",
+      "file": "src/editor/sidebar/tabs/content/ContentViews.tsx",
+      "shipsInstead": null
+    },
+    {
+      "surface": "Pages · single page",
+      "copy": "This site has one page.",
+      "status": "missing",
+      "file": null,
+      "shipsInstead": "ships \"No pages yet\" + \"Add your first page to get started. Pages are the screens visitors see.\" — and note those describe the ZERO-page state; the spec line describes the ONE-page state, which has no empty state at all."
+    },
+    {
+      "surface": "Layers · empty page",
+      "copy": "This page is empty. Drop something on the canvas to see it here.",
+      "status": "missing",
+      "file": null,
+      "shipsInstead": "LayersEmptyState.tsx renders no matching string"
+    },
+    {
+      "surface": "Media · no assets",
+      "copy": "No images or files yet.",
+      "status": "missing",
+      "file": null,
+      "shipsInstead": null
+    },
+    {
+      "surface": "Brand · starter not applied",
+      "copy": "No brand set. Start from a theme or import your client's tokens.",
+      "status": "missing",
+      "file": null,
+      "shipsInstead": null
+    },
+    {
+      "surface": "Inspector · no selection",
+      "copy": "Select something on the canvas to edit it.",
+      "status": "missing",
+      "file": null,
+      "shipsInstead": null
+    },
+    {
+      "surface": "Issues panel · clean",
+      "copy": "No issues. This page is ready to publish.",
+      "status": "missing",
+      "file": null,
+      "shipsInstead": "ships \"Your site is clean — nothing to fix.\" (IssuesPanel.tsx) — same intent, different words, and it says SITE where the spec says PAGE"
+    },
+    {
+      "surface": "Comments · none",
+      "copy": "No comments yet. Turn on comment mode to leave one.",
+      "status": "missing",
+      "file": null,
+      "shipsInstead": null
+    },
+    {
+      "surface": "Versions · fresh site",
+      "copy": "No saved versions yet. Versions are created every time you publish, or whenever you name one.",
+      "status": "missing",
+      "file": null,
+      "shipsInstead": null
+    },
+    {
+      "surface": "Canvas · blank page",
+      "copy": "Start with a template, or drop your first section.",
+      "status": "missing",
+      "file": null,
+      "shipsInstead": null
+    }
+  ]
+}
