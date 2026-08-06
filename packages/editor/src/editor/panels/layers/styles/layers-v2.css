@@ -18,8 +18,9 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: var(--bk-space-4) 6px;
+  gap: var(--bk-space-8);
+  height: 28px;
+  padding: 0 var(--bk-space-16);
   border-radius: 4px;
   font: 500 11px var(--bk-font-ui);
   color: var(--bk-ink);
@@ -31,10 +32,19 @@
 
 .bdc-lr.bdc-canvas-hover { background: var(--bk-bg-subtle); }
 
+/* Board 244:1598 selected: accent tint + a 2px accent bar, label stays ink. */
 .bdc-lr.bdc-sel {
   background: var(--bk-accent-tint);
-  color: var(--bk-accent);
-  font-weight: 600;
+}
+
+.bdc-lr.bdc-sel::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--bk-accent);
 }
 
 .bdc-lr.bdc-hidden .bdc-lr-nm {
@@ -60,12 +70,12 @@
 .bdc-lr.bdc-leaf .bdc-lr-chev { visibility: hidden; }
 
 .bdc-lr-ic {
-  color: var(--bk-ink-soft);
-  display: inline-flex;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  background: var(--bk-ink-muted);
   flex-shrink: 0;
 }
-
-.bdc-lr.bdc-sel .bdc-lr-ic { color: var(--bk-accent); }
 
 .bdc-lr-ic svg {
   width: 13px;
@@ -127,14 +137,15 @@
   flex-shrink: 0;
 }
 
-/* Eye + lock (hover-reveal, warning color on lock) */
+/* Eye + lock — board 244:1580 draws them ALWAYS, at gray-300; hover/state
+   darkens. (Was hover-reveal, which the board contradicts.) */
 .bdc-lr-eye,
 .bdc-lr-lock {
-  color: var(--bk-ink-muted);
+  color: var(--bk-gray-300);
   display: inline-flex;
   padding: 2px;
-  opacity: 0;
-  transition: opacity 120ms;
+  opacity: 1;
+  transition: color 120ms;
   background: transparent;
   border: none;
   cursor: pointer;
@@ -152,13 +163,12 @@
 }
 
 .bdc-lr:hover .bdc-lr-eye,
-.bdc-lr.bdc-sel .bdc-lr-eye { opacity: 1; }
+.bdc-lr.bdc-sel .bdc-lr-eye { color: var(--bk-ink-muted); }
 
 .bdc-lr-eye.bdc-off { opacity: 0.6; }
 .bdc-lr-eye:hover { color: var(--bk-ink); }
 
-.bdc-lr:hover .bdc-lr-lock,
-.bdc-lr-lock.bdc-on { opacity: 1; }
+.bdc-lr:hover .bdc-lr-lock { color: var(--bk-ink-muted); }
 .bdc-lr-lock.bdc-on { color: var(--bk-warning); }
 
 /* Drag indicators */

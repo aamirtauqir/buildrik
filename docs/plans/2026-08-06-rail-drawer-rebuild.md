@@ -272,6 +272,22 @@ Order: these two drawer views land immediately after this note (founder is
 looking at them); their loading/error/detail/preview/create states follow,
 then Layers 142:2 resumes.
 
+## Layers family — root board conformed (2026-08-07)
+
+142:2 fetched; live diffed by eye; deltas fixed: header gained the expand
+toggle; toolbar search dropped its magnifier (board 142:8 is a bare box);
+tree-row icons became the 12px solid ink-muted square (founder's Insert
+icon call, and what 244:1580 draws); eye/lock are ALWAYS drawn at gray-300
+(were hover-reveal — board contradicts) in board order 👁 then 🔒; rows are
+28h px-16 gap-8; selected = accent-tint + 2px accent bar with the label
+staying ink (was accent-600 bold, not on the board).
+REMAINING Layers delta passes (boards unfetched): 143:60 dragging ·
+143:355 empty · 143:2 filtered · 143:179 hidden · 143:119 invalid-drop ·
+143:237 locked · 143:295 multi-select. Plus 1082:4739
+Layers · component-instance — a NEW founder board that is NOT in
+boards.json yet (regenerate or hand-add before the regression net can see
+it). Loading/error/no-results shipped 08-04 (LayersStateBlocks).
+
 ## NOT in scope
 
 - Inspector flat body (board `52:56` / `824:5095`) — next arc after this one;

@@ -59,6 +59,8 @@ export const LayersTab: React.FC<LayersTabProps> = ({
   onAddBlockClick,
   onHelpClick,
   onClose,
+  isExpanded,
+  onExpandToggle,
 }) => {
   const { selectedElement: selectedEl, selectedId } = useComposerSelection({ composer });
 
@@ -116,14 +118,17 @@ export const LayersTab: React.FC<LayersTabProps> = ({
           from PanelHeader's own props (children are silently dropped by this
           API — the old expand/cog "header buttons" never rendered at all);
           tree tools live on the toolbar row, the count in the footer. */}
-      <PanelFrame.Header title="Layers" onHelpClick={onHelpClick} onClose={onClose} />
+      <PanelFrame.Header
+        title="Layers"
+        isExpanded={isExpanded}
+        onExpandToggle={onExpandToggle}
+        onHelpClick={onHelpClick}
+        onClose={onClose}
+      />
       {/* Board 142:7 Toolbar — search box + ⊞ ⊟ ⚙ on one 36-tall band. */}
       <div className="bdc-ltoolbar">
+        {/* Board 142:8: bare box — no magnifier glyph. */}
         <label className="bdc-psearch">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-            <circle cx="11" cy="11" r="7" />
-            <path d="M21 21l-4.3-4.3" />
-          </svg>
           <TextInput
             type="text"
             placeholder="Search"

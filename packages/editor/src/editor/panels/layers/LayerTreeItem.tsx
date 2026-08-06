@@ -5,7 +5,6 @@
  */
 
 import * as React from "react";
-import { getElementIcon } from "@/editor/shared/elementIcons";
 import type { Composer } from "../../../engine";
 import { ELEMENT_TYPE_LABELS } from "../../../shared/constants/elementTypeLabels";
 import type { LayerItem, DragState, LayerDisplayPrefs } from "./types";
@@ -82,7 +81,6 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
   const isSelected = selectedIds.has(layer.id);
   const isExpanded = expandedIds.has(layer.id);
   const hasChildren = layer.children.length > 0;
-  const IconComponent = getElementIcon(layer.type);
   const isDragging = dragState.draggedId === layer.id;
   const isDropTarget = dragState.targetId === layer.id;
   const dropPosition = isDropTarget ? dragState.position : null;
@@ -188,9 +186,9 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
           </svg>
         </Button>
 
-        <span className="bdc-lr-ic" aria-hidden>
-          <IconComponent size="sm" />
-        </span>
+        {/* Board 244:1580 icon: a 12px solid ink-muted rounded square —
+            the same treatment the founder chose for Insert rows. */}
+        <span className="bdc-lr-ic" aria-hidden />
 
         {isEditing ? (
           <TextField
@@ -233,28 +231,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
           </>
         )}
 
-        <Button
-          type="button"
-          className={`bdc-lr-lock${isLocked ? " bdc-on" : ""}`}
-          title={isLocked ? "Unlock element" : "Lock element"}
-          aria-label={isLocked ? "Unlock element" : "Lock element"}
-          onClick={(e) => onToggleLock(layer.id, e)}
-        >
-          <svg viewBox="0 0 24 24">
-            {isLocked ? (
-              <>
-                <rect x="5" y="11" width="14" height="10" rx="2" />
-                <path d="M8 11V7a4 4 0 018 0v4" />
-              </>
-            ) : (
-              <>
-                <rect x="5" y="11" width="14" height="10" rx="2" />
-                <path d="M8 11V7a4 4 0 018 0" />
-              </>
-            )}
-          </svg>
-        </Button>
-
+        {/* Board 244:1580 trailing order: 👁 then 🔒 — eye first. */}
         <Button
           type="button"
           className={`bdc-lr-eye${isHidden ? " bdc-off" : ""}`}
@@ -273,6 +250,28 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
               <>
                 <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" />
                 <circle cx="12" cy="12" r="2.5" />
+              </>
+            )}
+          </svg>
+        </Button>
+
+        <Button
+          type="button"
+          className={`bdc-lr-lock${isLocked ? " bdc-on" : ""}`}
+          title={isLocked ? "Unlock element" : "Lock element"}
+          aria-label={isLocked ? "Unlock element" : "Lock element"}
+          onClick={(e) => onToggleLock(layer.id, e)}
+        >
+          <svg viewBox="0 0 24 24">
+            {isLocked ? (
+              <>
+                <rect x="5" y="11" width="14" height="10" rx="2" />
+                <path d="M8 11V7a4 4 0 018 0v4" />
+              </>
+            ) : (
+              <>
+                <rect x="5" y="11" width="14" height="10" rx="2" />
+                <path d="M8 11V7a4 4 0 018 0" />
               </>
             )}
           </svg>
