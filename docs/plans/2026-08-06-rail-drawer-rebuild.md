@@ -147,9 +147,52 @@ Insert state-board ledger (updated after fetches):
 - 138:244 tip-dismissed ✅ — dismiss removes the TipsFooter band ENTIRELY
   (no collapsed pill). Component already returned null; dead collapsed/
   onToggleCollapsed plumbing + BUILD_TIPS_COLLAPSED key deleted.
-- ALL 9 INSERT BOARDS FETCHED AND CONFORMED. Eye-verify screenshots pending
-  for: card grid (138:2), disabled row (138:198), searching (138:53),
-  no-results (138:106).
+- ALL 9 INSERT BOARDS FETCHED, CONFORMED, AND EYE-VERIFIED (2026-08-06):
+  default/searching/no-results/tip-dismissed/card-grid live at :5050,
+  disabled-row via probe case `insert-disabled-row` (:5051, run
+  `npx vite . --port 5051` from packages/editor — root is the PACKAGE, not
+  e2e/probe; URL is /e2e/probe/probe.html?case=…), loading/error via probe
+  earlier. One-shot capture script: `e2e/insert-eye-verify.mjs`.
+
+### Insert — coverage matrix (FINAL)
+
+| Board | State | Where it lives | Verified |
+|---|---|---|---|
+| 137:2 | default | BuildTab + GroupSection | eye ✅ |
+| 775:4053 | loading | InsertStateBlocks (probe-only mount) | eye ✅ |
+| 781:4154 | load-error | InsertStateBlocks (probe-only mount) | eye ✅ |
+| 138:2 | group-expanded (BLOCKS card grid) | GroupSection blocks branch | eye ✅ |
+| 138:198 | disabled item | Row disabled+reason (probe mount; no prod entry disabled) | eye ✅ |
+| 138:53 | searching | SearchResults flat cross-source | eye ✅ |
+| 138:106 | no-results | SearchResults empty branch | eye ✅ |
+| 138:153 | dragging | behaviour note — drag mutates no panel DOM (handleDragStart) | contract ✅ |
+| 138:244 | tip-dismissed | TipsFooter dismissed→null | eye ✅ |
+
+### Insert — codebase-only flows (in code, on NO board — documented, NOT deleted)
+
+1. **useBuildTab dead surface**: `favs/toggleFav/clearFavs/restoreFavs/
+   favsInformed/markFavsInformed/favOpen/setFavOpen/openCats/toggleCat/
+   allElements/insertionContext` — ZERO consumers outside the hook + its
+   tests since the rebuild (ElCard carried the star; deleted). ElementsTab/
+   ComponentsTab favorites are a DIFFERENT system (useElementsState /
+   useComponentsState). Founder call: delete the surface or design a
+   favorites board.
+2. **TransitionCallout + useCallout** — one-time v4-transition notice, still
+   renders above the groups; no board draws it.
+3. **"/" focus shortcut** — board shows only ⌘F; "/" is an extra
+   typing-context-safe alias (kept, harmless).
+4. **openCats search-restore** (setSearchQuery capture/restore) — restores
+   accordion state that no longer drives the default view (openGroups is
+   BuildTab-local now).
+5. **Media element needs-asset auto-open** (useBlockInsertion) and the
+   registry-miss container fallback — behaviour contracts, boardless by
+   nature.
+
+Gate note (pre-existing, NOT from this arc): `gate:buildrick` FAILs 78→116;
+the +38 are storage-key strings in canvas/layers/shell tests from earlier
+arcs. The gate is in NO verify chain (verify:ds excludes it) so it sat red
+unnoticed — same class as the dashboard gate:figma trap. Founder call:
+re-baseline with reason or wire it into verify:ds.
 
 ## NOT in scope
 

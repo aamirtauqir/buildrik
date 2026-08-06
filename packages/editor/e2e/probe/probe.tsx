@@ -51,6 +51,7 @@ import { ContentTab } from "@/editor/sidebar/tabs/content/ContentTab";
 import { LayersTab } from "@/editor/sidebar/tabs/layers/LayersTab";
 import { LayersLoadError, LayersNoResults } from "@/editor/panels/layers/components/LayersStateBlocks";
 import { InsertLoadingSkeleton, InsertLoadError } from "@/editor/sidebar/tabs/build/components/InsertStateBlocks";
+import { Row as InsertRow } from "@/editor/sidebar/tabs/build/components/GroupSection";
 import type { LibraryItem } from "@/editor/sidebar/tabs/media/data/mediaTypes";
 import type { UploadProgress } from "@/shared/types/media";
 
@@ -363,6 +364,20 @@ const CASES: Record<string, () => React.ReactElement> = {
   "insert-load-error": () => (
     <div data-probe="insert-load-error" style={{ width: 320, background: "#fff" }}>
       <InsertLoadError onRetry={() => {}} />
+    </div>
+  ),
+  // Insert board 138:198 — disabled row ("Soon" tag + reason tooltip, no
+  // insert). No production catalog entry is disabled, so the probe is the
+  // only mount, same rule as the loading/error pair above.
+  "insert-disabled-row": () => (
+    <div data-probe="insert-disabled-row" style={{ width: 320, background: "#fff" }}>
+      <InsertRow
+        label="Video"
+        disabled
+        disabledReason="Video blocks need a media provider connected"
+        testId="probe-insert-disabled"
+        onClick={() => {}}
+      />
     </div>
   ),
   "media-drawer-folder-scoped": () => (
