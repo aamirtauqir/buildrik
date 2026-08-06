@@ -65,7 +65,7 @@ function renderRouter(activeTab: GroupedTabId, extra: Partial<TabRouterProps> = 
     <TabRouter
       activeTab={activeTab}
       composer={null}
-      commonTabProps={{ isPinned: false, onPinToggle: noop, onHelpClick: noop, onClose: noop }}
+      commonTabProps={{ isExpanded: false, onExpandToggle: noop, onHelpClick: noop, onClose: noop }}
       onSwitchToAdd={noop}
       onCreateComponent={noop}
       {...extra}

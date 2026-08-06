@@ -17,8 +17,8 @@ import "./AITab.css";
 
 export interface AITabProps {
   composer: Composer | null;
-  isPinned: boolean;
-  onPinToggle: () => void;
+  isExpanded: boolean;
+  onExpandToggle: () => void;
   onHelpClick?: () => void;
   onClose: () => void;
 }

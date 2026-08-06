@@ -22,7 +22,10 @@ export interface PanelFrameProps extends React.HTMLAttributes<HTMLDivElement> {
    `--bk-bg-panel` (fullpage: `--bk-bg-app`) can't be a separate additive
    class layered on top of a shared default. */
 const WIDTH_CLASS: Record<PanelWidth, string> = {
-  narrow: "tw:w-80 tw:flex-none tw:bg-white",
+  // Drawer frames FILL their host: the drawer (ls-panel) owns the px width
+  // and the header's expand toggle (board 16:6) drives it 320↔700. The old
+  // fixed w-80 froze every panel at 320 no matter what the drawer did.
+  narrow: "tw:w-full tw:flex-none tw:bg-white",
   wide: "tw:w-[360px] tw:flex-none tw:bg-white",
   fullpage: "tw:flex-1 tw:bg-gray-100",
 };
@@ -52,8 +55,8 @@ export interface PanelFrameHeaderProps extends React.HTMLAttributes<HTMLDivEleme
   onClose?: () => void;
   onHelpClick?: () => void;
   /** Drawers can be pinned open; the state is announced, not just drawn. */
-  isPinned?: boolean;
-  onPinToggle?: () => void;
+  isExpanded?: boolean;
+  onExpandToggle?: () => void;
 }
 
 /**
@@ -85,13 +88,13 @@ export interface PanelFrameHeaderProps extends React.HTMLAttributes<HTMLDivEleme
  * not against the header.
  */
 function PanelFrameHeader({
-  title, subtitle, actions, onClose, onHelpClick, isPinned, onPinToggle, className, ...rest
+  title, subtitle, actions, onClose, onHelpClick, isExpanded, onExpandToggle, className, ...rest
 }: PanelFrameHeaderProps) {
   return (
     <PanelHeader
       title={title}
-      isPinned={isPinned}
-      onPinToggle={onPinToggle}
+      isExpanded={isExpanded}
+      onExpandToggle={onExpandToggle}
       onHelpClick={onHelpClick}
       onClose={onClose}
       className={className}

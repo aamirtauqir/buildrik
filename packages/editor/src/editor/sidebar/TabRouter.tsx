@@ -56,8 +56,8 @@ export interface TabRouterProps {
   activeTab: GroupedTabId;
   composer: Composer | null;
   commonTabProps: {
-    isPinned: boolean;
-    onPinToggle: () => void;
+    isExpanded: boolean;
+    onExpandToggle: () => void;
     onHelpClick?: () => void;
     onClose: () => void;
   };

@@ -5,7 +5,7 @@
  */
 
 // Shared Icons (used by headers and other components)
-export { PinIcon, HelpIcon, CloseIcon, BackArrowIcon, ChevronIcon, CheckIcon } from "./headerIcons";
+export { BackArrowIcon, ChevronIcon, CheckIcon } from "./headerIcons";
 
 // Shared Styles (used by headers and other components)
 export {

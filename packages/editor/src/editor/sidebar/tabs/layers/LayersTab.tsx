@@ -43,9 +43,9 @@ export interface LayersTabProps {
   canvasHoveredId?: string | null;
   onAddBlockClick?: () => void;
   /** Retained for call-site compat. Unused in the new-design Layers tab. */
-  isPinned?: boolean;
+  isExpanded?: boolean;
   /** Retained for call-site compat. Unused in the new-design Layers tab. */
-  onPinToggle?: () => void;
+  onExpandToggle?: () => void;
   /** Header help action (board 208:191 — the 16:6 Panel header's first slot). */
   onHelpClick?: () => void;
   /** Header close action (16:6 second slot — "closing is the last thing you do"). */

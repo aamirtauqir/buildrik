@@ -236,8 +236,8 @@ export const SettingsTab: React.FC<
   }
 > = ({
   composer,
-  isPinned: _isPinned,
-  onPinToggle: _onPinToggle,
+  isExpanded: _isPinned,
+  onExpandToggle: _onPinToggle,
   onHelpClick,
   onClose,
   userPlan,

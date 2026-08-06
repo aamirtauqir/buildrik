@@ -19,9 +19,6 @@ if (!(await page.locator(".bld-container").count())) {
   await page.waitForTimeout(600);
 }
 
-// Boards draw the UNPINNED header (outline pin, no tint) — normalize state.
-const pinBtn = page.locator('[aria-label^="Unpin"]');
-if (await pinBtn.count()) await pinBtn.click();
 // Park focus + pointer so no hover/focus tint rides into the captures.
 await page.mouse.move(720, 850);
 await page.evaluate(() => (document.activeElement instanceof HTMLElement) && document.activeElement.blur());

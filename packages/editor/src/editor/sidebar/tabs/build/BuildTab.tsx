@@ -30,14 +30,14 @@ import "./BuildTab.css";
 export interface BuildTabProps {
   composer: Composer | null;
   onBlockClick?: (data: BlockData) => void;
-  isPinned?: boolean;
-  onPinToggle?: () => void;
+  isExpanded?: boolean;
+  onExpandToggle?: () => void;
   onHelpClick?: () => void;
   onClose?: () => void;
 }
 
 export const BuildTab: React.FC<BuildTabProps> = ({
-  composer, onBlockClick, isPinned, onPinToggle, onHelpClick, onClose,
+  composer, onBlockClick, isExpanded, onExpandToggle, onHelpClick, onClose,
 }) => {
   const tab = useBuildTab(composer, onBlockClick);
   const callout = useCallout();
@@ -109,14 +109,13 @@ export const BuildTab: React.FC<BuildTabProps> = ({
   return (
     <PanelFrame className="bld-container">
       {/* Board 137:2 header: title alone (the "N blocks · N categories"
-          subtitle is not on the board), PIN before CLOSE per the 16:6
-          component doc — "closing is the last thing you do, so it goes last".
-          isPinned/onPinToggle flowed in as props for months and were dropped
-          at this destructure; PanelFrame.Header supported them all along. */}
+          subtitle is not on the board), EXPAND before CLOSE — 16:6's first
+          action is the corner-brackets expand (founder-confirmed 2026-08-06;
+          the component description's "Pin" text is stale). */}
       <PanelFrame.Header
         title="Insert"
-        isPinned={isPinned}
-        onPinToggle={onPinToggle}
+        isExpanded={isExpanded}
+        onExpandToggle={onExpandToggle}
         onHelpClick={onHelpClick}
         onClose={onClose}
       />

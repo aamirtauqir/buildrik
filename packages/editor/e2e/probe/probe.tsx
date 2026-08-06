@@ -277,8 +277,8 @@ const CASES: Record<string, () => React.ReactElement> = {
         <PanelFrame.Header
           title="Media"
           subtitle="53 blocks · 6 categories"
-          isPinned={false}
-          onPinToggle={() => {}}
+          isExpanded={false}
+          onExpandToggle={() => {}}
           onHelpClick={() => {}}
           onClose={() => {}}
         />

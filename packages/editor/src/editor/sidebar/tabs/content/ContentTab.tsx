@@ -43,8 +43,8 @@ import {
 
 export interface ContentTabProps {
   composer: Composer | null;
-  isPinned?: boolean;
-  onPinToggle?: () => void;
+  isExpanded?: boolean;
+  onExpandToggle?: () => void;
   onHelpClick?: () => void;
   onClose?: () => void;
   /** Opens the CMS collection setup (shell-owned modal) — the data-first create
@@ -62,8 +62,8 @@ export interface ContentTabProps {
 export const ContentTab: React.FC<ContentTabProps> = ({
   composer,
   hydrationStatus,
-  isPinned,
-  onPinToggle,
+  isExpanded,
+  onExpandToggle,
   onHelpClick,
   onClose,
   onCreateCollection,
@@ -282,8 +282,8 @@ export const ContentTab: React.FC<ContentTabProps> = ({
     <div className={CONTENT_BODY}>
       <PanelHeader
         title="Content"
-        isPinned={isPinned}
-        onPinToggle={onPinToggle}
+        isExpanded={isExpanded}
+        onExpandToggle={onExpandToggle}
         onHelpClick={onHelpClick}
         onClose={onClose}
       />

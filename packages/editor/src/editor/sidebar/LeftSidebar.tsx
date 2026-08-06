@@ -62,8 +62,8 @@ export interface LeftSidebarProps {
   onTabChange: (tab: GroupedTabId) => void;
   drawerOpen: boolean;
   onDrawerToggle: () => void;
-  isPinned?: boolean;
-  onPinToggle?: () => void;
+  isExpanded?: boolean;
+  onExpandToggle?: () => void;
   onElementSelect?: (elementId: string) => void;
   onBlockClick?: (block: BlockData) => void;
   canvasHoveredId?: string | null;
@@ -323,8 +323,8 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   onTabChange,
   drawerOpen,
   onDrawerToggle,
-  isPinned: controlledPinned,
-  onPinToggle: controlledPinToggle,
+  isExpanded: controlledExpanded,
+  onExpandToggle: controlledExpandToggle,
   onElementSelect,
   onBlockClick,
   canvasHoveredId,
@@ -341,10 +341,12 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   const panelContentRef = React.useRef<HTMLDivElement>(null);
   const [errorKey, setErrorKey] = React.useState(0);
 
-  // Pin state (controlled or internal fallback)
-  const [internalPinned, setInternalPinned] = React.useState(true);
-  const isPinned = controlledPinned ?? internalPinned;
-  const onPinToggle = controlledPinToggle ?? (() => setInternalPinned((p) => !p));
+  // Expand state (board 16:6 header action): 320 ↔ 700 drawer width.
+  // Collapsed by default — the boards draw the 320 drawer. Controlled or
+  // internal fallback, same shape the pin state had.
+  const [internalExpanded, setInternalExpanded] = React.useState(false);
+  const isExpanded = controlledExpanded ?? internalExpanded;
+  const onExpandToggle = controlledExpandToggle ?? (() => setInternalExpanded((p) => !p));
 
   // Settings dirty-state guard
   const [settingsDirty, setSettingsDirty] = React.useState(false);
@@ -496,15 +498,20 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   React.useEffect(() => {
     if (activeTab !== "templates") setTemplatesPanelOverride(null);
   }, [activeTab]);
+  // Header expand (board 16:6) widens ANY drawer to 700; the media/templates
+  // runtime overrides keep winning on their tabs — they carry flow-specific
+  // widths (560 detail, 700 gallery) the generic toggle must not fight.
   const panelWidth = activeTab === "assets" && mediaPanelOverride !== null
     ? mediaPanelOverride
     : activeTab === "templates" && templatesPanelOverride !== null
     ? templatesPanelOverride
+    : isExpanded
+    ? 700
     : configPanelWidth;
 
   const commonTabProps = {
-    isPinned,
-    onPinToggle: onPinToggle ?? (() => {}),
+    isExpanded,
+    onExpandToggle: onExpandToggle ?? (() => {}),
     onClose: onDrawerToggle,
   };
 

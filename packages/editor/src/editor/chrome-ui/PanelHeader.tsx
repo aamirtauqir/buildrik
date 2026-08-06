@@ -7,11 +7,11 @@ import React from "react";
 import { IconButton } from "./Icon";
 
 export interface PanelHeaderActionsProps {
-  /** Aria-label context: "Pin {label}" / "Close {label}" (e.g. the panel title). */
+  /** Aria-label context: "Expand {label}" / "Close {label}" (e.g. the panel title). */
   label: string;
-  /** Drawers can be pinned open; the state is announced, not just drawn. */
-  isPinned?: boolean;
-  onPinToggle?: () => void;
+  /** Expanded = 700-wide drawer (board 16:6 expand action); announced via aria-pressed. */
+  isExpanded?: boolean;
+  onExpandToggle?: () => void;
   onHelpClick?: () => void;
   onClose?: () => void;
   /** Extra content rendered before the pin/help/close buttons. */
@@ -25,34 +25,37 @@ export interface PanelHeaderActionsProps {
  * headers that lay out their own title area (e.g. the sidebar DrillInHeader).
  */
 export function PanelHeaderActions({
-  label, isPinned, onPinToggle, onHelpClick, onClose, children, className, style,
+  label, isExpanded, onExpandToggle, onHelpClick, onClose, children, className, style,
 }: PanelHeaderActionsProps) {
   return (
     <span className={["tw:flex tw:items-center tw:gap-1", className].filter(Boolean).join(" ")} style={style}>
       {children}
-      {onPinToggle ? (
+      {onExpandToggle ? (
         <IconButton
-          label={isPinned ? `Unpin ${label}` : `Pin ${label}`}
-          pressed={Boolean(isPinned)}
-          onClick={onPinToggle}
+          label={isExpanded ? `Collapse ${label}` : `Expand ${label}`}
+          pressed={Boolean(isExpanded)}
+          onClick={onExpandToggle}
         >
-          {/* Board 16:6 draws a neutral 16px outline icon. The previous 📌/📍
-              emoji rendered as a red badge — DESIGN.md's anti-slop list bans
-              emoji as design elements, and red means destructive here and
-              nothing else. State = filled vs outline, colour inherits. */}
+          {/* Board 16:6's first action is EXPAND — four corner brackets,
+              16 viewBox, stroke 1.33 (the frame's own SVG, founder-confirmed
+              2026-08-06; the component's "Pin sits before close" description
+              text is stale — the drawn icon wins). Toggles the 320↔700
+              drawer width. */}
           <svg
             width="16"
             height="16"
-            viewBox="0 0 24 24"
-            fill={isPinned ? "currentColor" : "none"}
+            viewBox="0 0 16 16"
+            fill="none"
             stroke="currentColor"
-            strokeWidth="1.5"
+            strokeWidth="1.33333"
             strokeLinecap="round"
             strokeLinejoin="round"
             aria-hidden="true"
           >
-            <path d="M12 17v5" />
-            <path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16h14v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1z" />
+            <path d="M6 2H3.33333C2.97971 2 2.64057 2.14048 2.39052 2.39052C2.14048 2.64057 2 2.97971 2 3.33333V6" />
+            <path d="M6 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V10" />
+            <path d="M10 2H12.6667C13.0203 2 13.3594 2.14048 13.6095 2.39052C13.8595 2.64057 14 2.97971 14 3.33333V6" />
+            <path d="M10 14H12.6667C13.0203 14 13.3594 13.8595 13.6095 13.6095C13.8595 13.3594 14 13.0203 14 12.6667V10" />
           </svg>
         </IconButton>
       ) : null}
@@ -73,14 +76,14 @@ export function PanelHeaderActions({
 export interface PanelHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
   actions?: React.ReactNode;
-  /** Drawers can be pinned open; the state is announced, not just drawn. */
-  isPinned?: boolean;
-  onPinToggle?: () => void;
+  /** Expanded = 700-wide drawer (board 16:6 expand action); announced via aria-pressed. */
+  isExpanded?: boolean;
+  onExpandToggle?: () => void;
   onHelpClick?: () => void;
   onClose?: () => void;
 }
 
-export function PanelHeader({ title, actions, isPinned, onPinToggle, onHelpClick, onClose, className, ...rest }: PanelHeaderProps) {
+export function PanelHeader({ title, actions, isExpanded, onExpandToggle, onHelpClick, onClose, className, ...rest }: PanelHeaderProps) {
   return (
     <div
       className={[
@@ -116,8 +119,8 @@ export function PanelHeader({ title, actions, isPinned, onPinToggle, onHelpClick
       </span>
       <PanelHeaderActions
         label={title}
-        isPinned={isPinned}
-        onPinToggle={onPinToggle}
+        isExpanded={isExpanded}
+        onExpandToggle={onExpandToggle}
         onHelpClick={onHelpClick}
         onClose={onClose}
       >

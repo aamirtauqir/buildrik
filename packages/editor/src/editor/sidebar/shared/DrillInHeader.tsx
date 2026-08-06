@@ -23,9 +23,9 @@ export interface DrillInHeaderProps {
   /** Fires instead of onBack when isDirty=true — use to show an unsaved-changes guard */
   onBackAttempt?: () => void;
   /** Whether the panel is pinned */
-  isPinned?: boolean;
+  isExpanded?: boolean;
   /** Callback when pin button is clicked */
-  onPinToggle?: () => void;
+  onExpandToggle?: () => void;
   /** Callback when help button is clicked */
   onHelpClick?: () => void;
   /** Callback when close button is clicked */
@@ -54,8 +54,8 @@ export const DrillInHeader: React.FC<DrillInHeaderProps> = ({
   onBack,
   isDirty,
   onBackAttempt,
-  isPinned = false,
-  onPinToggle,
+  isExpanded = false,
+  onExpandToggle,
   onHelpClick,
   onClose,
   focusTarget = "back",
@@ -172,8 +172,8 @@ export const DrillInHeader: React.FC<DrillInHeaderProps> = ({
       {/* Action buttons */}
       <PanelHeaderActions
         label="panel"
-        isPinned={isPinned}
-        onPinToggle={onPinToggle}
+        isExpanded={isExpanded}
+        onExpandToggle={onExpandToggle}
         onHelpClick={onHelpClick}
         onClose={onClose}
         style={{ marginTop: 2 }}

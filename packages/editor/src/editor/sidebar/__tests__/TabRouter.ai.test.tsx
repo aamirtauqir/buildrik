@@ -14,7 +14,7 @@ describe("TabRouter — ai case", () => {
       <TabRouter
         activeTab="ai"
         composer={null}
-        commonTabProps={{ isPinned: false, onPinToggle: noop, onHelpClick: noop, onClose: noop }}
+        commonTabProps={{ isExpanded: false, onExpandToggle: noop, onHelpClick: noop, onClose: noop }}
         onSwitchToAdd={noop}
         onCreateComponent={noop}
       />,

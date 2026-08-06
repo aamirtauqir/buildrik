@@ -75,8 +75,8 @@ const COMPOSER = "tw:border-t tw:border-gray-200 tw:px-3 tw:py-2.5 tw:flex tw:fl
 const GHOST = "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900";
 
 export interface ReviewTabProps {
-  isPinned?: boolean;
-  onPinToggle?: () => void;
+  isExpanded?: boolean;
+  onExpandToggle?: () => void;
   onHelpClick?: () => void;
   onClose?: () => void;
   /** Full re-send (re-renders the snapshot, mints a fresh token) — provided by
@@ -125,8 +125,8 @@ function groupByPage(comments: ReviewComment[]): Group[] {
 }
 
 export const ReviewTab: React.FC<ReviewTabProps> = ({
-  isPinned,
-  onPinToggle,
+  isExpanded,
+  onExpandToggle,
   onHelpClick,
   onClose,
   onResend,
@@ -269,8 +269,8 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
   const header = (
     <PanelHeader
       title="Review"
-      isPinned={isPinned}
-      onPinToggle={onPinToggle}
+      isExpanded={isExpanded}
+      onExpandToggle={onExpandToggle}
       onHelpClick={onHelpClick}
       onClose={onClose}
     />

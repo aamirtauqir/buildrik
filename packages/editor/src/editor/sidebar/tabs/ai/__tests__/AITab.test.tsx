@@ -48,12 +48,12 @@ function makeElementScopedComposer() {
 
 describe("AITab skeleton", () => {
   it("renders the empty thread message when no messages exist", () => {
-    renderWithToast(<AITab composer={null} isPinned={false} onPinToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />);
+    renderWithToast(<AITab composer={null} isExpanded={false} onExpandToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />);
     expect(screen.getByText(/Try a quick action or type a prompt to start/i)).toBeInTheDocument();
   });
 
   it("renders a composer textarea", () => {
-    renderWithToast(<AITab composer={null} isPinned={false} onPinToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />);
+    renderWithToast(<AITab composer={null} isExpanded={false} onExpandToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />);
     expect(screen.getByPlaceholderText(/Ask AI/i)).toBeInTheDocument();
   });
 });
@@ -61,12 +61,12 @@ describe("AITab skeleton", () => {
 describe("AITab — scope + composer wiring", () => {
   it("submitting a prompt locks the scope chip", () => {
     const { rerender, container } = renderWithToast(
-      <AITab composer={null} isPinned={false} onPinToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />,
+      <AITab composer={null} isExpanded={false} onExpandToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />,
     );
     const ta = container.querySelector("textarea")!;
     fireEvent.change(ta, { target: { value: "Hello" } });
     fireEvent.keyDown(ta, { key: "Enter" });
-    rerender(<AITab composer={null} isPinned={false} onPinToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />);
+    rerender(<AITab composer={null} isExpanded={false} onExpandToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />);
     expect(container.querySelector(".bd-ai-scope-lock")).toBeInTheDocument();
   });
 
@@ -78,7 +78,7 @@ describe("AITab — scope + composer wiring", () => {
     // the canvas never changed. Binding the id locally fixes it.
     const composer = makeElementScopedComposer();
     const { container } = renderWithToast(
-      <AITab composer={composer} isPinned={false} onPinToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />,
+      <AITab composer={composer} isExpanded={false} onExpandToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />,
     );
     const ta = container.querySelector("textarea")!;
     fireEvent.change(ta, { target: { value: "duplicate this" } });
@@ -117,7 +117,7 @@ describe("AITab — scope + composer wiring", () => {
       off: () => {},
     } as never;
     const { container } = renderWithToast(
-      <AITab composer={composer} isPinned={false} onPinToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />,
+      <AITab composer={composer} isExpanded={false} onExpandToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />,
     );
     const ta = container.querySelector("textarea")!;
     fireEvent.change(ta, { target: { value: "make the page modern" } });
@@ -149,7 +149,7 @@ describe("AITab — scope + composer wiring", () => {
       off: () => {},
     } as never;
     const { container } = renderWithToast(
-      <AITab composer={composer} isPinned={false} onPinToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />,
+      <AITab composer={composer} isExpanded={false} onExpandToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />,
     );
     const ta = container.querySelector("textarea")!;
     fireEvent.change(ta, { target: { value: "use the brand color" } });
@@ -166,7 +166,7 @@ describe("AITab — scope + composer wiring", () => {
     // assistant box. The error must be visible to the user.
     const composer = makeElementScopedComposer();
     const { container } = renderWithToast(
-      <AITab composer={composer} isPinned={false} onPinToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />,
+      <AITab composer={composer} isExpanded={false} onExpandToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />,
     );
     const ta = container.querySelector("textarea")!;
     fireEvent.change(ta, { target: { value: "duplicate this" } });

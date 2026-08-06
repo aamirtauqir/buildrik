@@ -66,8 +66,8 @@ const renderTab = () =>
   render(
     <HistoryTab
       composer={null}
-      isPinned={false}
-      onPinToggle={() => {}}
+      isExpanded={false}
+      onExpandToggle={() => {}}
       onHelpClick={() => {}}
       onClose={() => {}}
     />

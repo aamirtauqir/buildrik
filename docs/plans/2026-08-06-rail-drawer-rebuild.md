@@ -176,6 +176,18 @@ SVG glyph system in the Insert rows is retired (glyphs return only via a
 Figma icon library regenerating like tokens). SvgIcon.tsx survives — the
 rail (TabRouter) still consumes it.
 
+### Header action correction 2026-08-06 (founder): EXPAND, not pin
+
+16:6's first header action is the corner-brackets EXPAND icon (the frame's
+own SVG) — the component description's "Pin sits before close" text is
+STALE; the drawn icon wins. Founder chose the action: 320↔700 drawer width
+toggle (pattern media/templates already had). Shipped across all seven
+drawers: PanelHeader draws the board SVG with Expand/Collapse labels;
+LeftSidebar owns the expand state and width; PanelFrame `narrow` became
+w-full (the fixed w-80 froze every panel at 320 regardless of drawer
+width); the pin plumbing (isPinned/onPinToggle, StudioPanels state, dead
+PinIcon/HelpIcon/CloseIcon) is deleted. Verified live: 320→700→320.
+
 ### Insert — coverage matrix (FINAL)
 
 | Board | State | Where it lives | Verified |

@@ -33,8 +33,8 @@ type FilterMode = "all" | "ds" | "yours";
 
 interface ComponentsPanelV2Props {
   composer: Composer | null;
-  isPinned?: boolean;
-  onPinToggle?: () => void;
+  isExpanded?: boolean;
+  onExpandToggle?: () => void;
   onHelpClick?: () => void;
   onClose?: () => void;
   /** Caller-routed: clicking DSStatusChip jumps to Design tab. */
@@ -131,8 +131,8 @@ const FILTERS: Array<{ id: FilterMode; label: string }> = [
 
 export const ComponentsPanelV2: React.FC<ComponentsPanelV2Props> = ({
   composer,
-  isPinned,
-  onPinToggle,
+  isExpanded,
+  onExpandToggle,
   onHelpClick,
   onClose,
   onJumpToDesign,
@@ -176,8 +176,8 @@ export const ComponentsPanelV2: React.FC<ComponentsPanelV2Props> = ({
     <div style={containerStyle} data-components-panel-v2>
       <PanelHeader
         title="Components"
-        isPinned={isPinned}
-        onPinToggle={onPinToggle}
+        isExpanded={isExpanded}
+        onExpandToggle={onExpandToggle}
         onHelpClick={onHelpClick}
         onClose={onClose}
       />
@@ -238,8 +238,8 @@ export const ComponentsPanelV2: React.FC<ComponentsPanelV2Props> = ({
           <UserSavedSection
             composer={composer}
             searchQuery={search}
-            isPinned={isPinned}
-            onPinToggle={onPinToggle}
+            isExpanded={isExpanded}
+            onExpandToggle={onExpandToggle}
             onHelpClick={onHelpClick}
             onClose={onClose}
           />

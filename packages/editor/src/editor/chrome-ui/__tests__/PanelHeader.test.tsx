@@ -20,15 +20,15 @@ describe("PanelHeader", () => {
 
 describe("PanelHeaderActions", () => {
   it("renders only the buttons whose callbacks are provided, labelled by context", () => {
-    const onPinToggle = vi.fn();
+    const onExpandToggle = vi.fn();
     const onClose = vi.fn();
-    render(<PanelHeaderActions label="panel" isPinned onPinToggle={onPinToggle} onClose={onClose} />);
-    const pin = screen.getByRole("button", { name: "Unpin panel" });
+    render(<PanelHeaderActions label="panel" isExpanded onExpandToggle={onExpandToggle} onClose={onClose} />);
+    const pin = screen.getByRole("button", { name: "Collapse panel" });
     expect(pin.getAttribute("aria-pressed")).toBe("true");
     expect(screen.queryByRole("button", { name: "Help" })).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Close panel" }));
     expect(onClose).toHaveBeenCalledTimes(1);
     fireEvent.click(pin);
-    expect(onPinToggle).toHaveBeenCalledTimes(1);
+    expect(onExpandToggle).toHaveBeenCalledTimes(1);
   });
 });

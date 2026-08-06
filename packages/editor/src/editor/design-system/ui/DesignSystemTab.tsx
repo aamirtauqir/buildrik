@@ -117,16 +117,16 @@ function dirtyCount(reg: KindRegistryLike): number {
 
 interface DesignSystemTabProps {
   composer: Composer | null;
-  isPinned?: boolean;
-  onPinToggle?: () => void;
+  isExpanded?: boolean;
+  onExpandToggle?: () => void;
   onHelpClick?: () => void;
   onClose?: () => void;
 }
 
 export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
   composer,
-  isPinned,
-  onPinToggle,
+  isExpanded,
+  onExpandToggle,
   onHelpClick,
   onClose,
 }) => {
@@ -497,8 +497,8 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
     <div data-ds-preview={resolvedMode} className={PANEL}>
       <PanelHeader
         title={headerTitle}
-        isPinned={isPinned}
-        onPinToggle={onPinToggle}
+        isExpanded={isExpanded}
+        onExpandToggle={onExpandToggle}
         onHelpClick={onHelpClick}
         onClose={onClose}
       >

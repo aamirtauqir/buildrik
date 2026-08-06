@@ -14,8 +14,8 @@ export interface ComponentsTabProps {
   onCreateNew?: () => void;
   onComponentSelect?: (component: ComponentDefinition | null) => void;
   selectedComponentId?: string | null;
-  isPinned?: boolean;
-  onPinToggle?: () => void;
+  isExpanded?: boolean;
+  onExpandToggle?: () => void;
   onHelpClick?: () => void;
   onClose?: () => void;
 }

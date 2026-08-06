@@ -39,7 +39,7 @@ interface UseComponentsStateParams {
   selectedComponentId?: string | null;
   onComponentSelect?: (component: ComponentDefinition | null) => void;
   onClose?: () => void;
-  onPinToggle?: () => void;
+  onExpandToggle?: () => void;
   onHelpClick?: () => void;
 }
 
@@ -49,7 +49,7 @@ export function useComponentsState({
   selectedComponentId,
   onComponentSelect,
   onClose,
-  onPinToggle,
+  onExpandToggle,
   onHelpClick,
 }: UseComponentsStateParams) {
   // Internal search state for standalone mode
@@ -443,7 +443,7 @@ export function useComponentsState({
   // Derived state
   const canCreateComponent = canvasSelection.length > 0;
   const isAtComponentLimit = components.length >= MAX_COMPONENTS;
-  const isStandaloneMode = onClose !== undefined || onPinToggle !== undefined;
+  const isStandaloneMode = onClose !== undefined || onExpandToggle !== undefined;
 
   // No fallback: PanelHeader hides the help affordance when the handler is
   // undefined, which is what we want. The old fallback opened docs.aquibra.com —

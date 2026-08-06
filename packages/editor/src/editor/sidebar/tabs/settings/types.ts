@@ -13,8 +13,8 @@ export type PlanTier = "starter" | "pro" | "enterprise";
 
 export interface SettingsTabProps {
   composer: Composer | null;
-  isPinned?: boolean;
-  onPinToggle?: () => void;
+  isExpanded?: boolean;
+  onExpandToggle?: () => void;
   onHelpClick?: () => void;
   onClose?: () => void;
   userPlan?: PlanTier;

@@ -37,8 +37,8 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   onCreateNew,
   onComponentSelect,
   selectedComponentId,
-  isPinned,
-  onPinToggle,
+  isExpanded,
+  onExpandToggle,
   onHelpClick,
   onClose,
 }) => {
@@ -48,7 +48,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
     selectedComponentId,
     onComponentSelect,
     onClose,
-    onPinToggle,
+    onExpandToggle,
     onHelpClick,
   });
   const { addToast } = useToast();
@@ -102,8 +102,8 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         {state.isStandaloneMode && (
           <PanelFrame.Header
             title="Components"
-            isPinned={isPinned}
-            onPinToggle={onPinToggle}
+            isExpanded={isExpanded}
+            onExpandToggle={onExpandToggle}
             onHelpClick={state.handleHelpClick}
             onClose={onClose}
           >
@@ -128,8 +128,8 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         {state.isStandaloneMode && (
           <PanelFrame.Header
             title="Components"
-            isPinned={isPinned}
-            onPinToggle={onPinToggle}
+            isExpanded={isExpanded}
+            onExpandToggle={onExpandToggle}
             onHelpClick={state.handleHelpClick}
             onClose={onClose}
           >
@@ -182,8 +182,8 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
           <>
             <PanelFrame.Header
               title="Components"
-              isPinned={isPinned}
-              onPinToggle={onPinToggle}
+              isExpanded={isExpanded}
+              onExpandToggle={onExpandToggle}
               onHelpClick={state.handleHelpClick}
               onClose={onClose}
             >
@@ -246,8 +246,8 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         <>
           <PanelFrame.Header
             title="Components"
-            isPinned={isPinned}
-            onPinToggle={onPinToggle}
+            isExpanded={isExpanded}
+            onExpandToggle={onExpandToggle}
             onHelpClick={state.handleHelpClick}
             onClose={onClose}
           >

@@ -31,8 +31,8 @@ import type { IconConfig } from "@shared/types/media";
 
 interface MediaTabProps {
   composer: Composer | null;
-  isPinned?: boolean;
-  onPinToggle?: () => void;
+  isExpanded?: boolean;
+  onExpandToggle?: () => void;
   onHelpClick?: () => void;
   onClose?: () => void;
   onOpenImageEditor?: (

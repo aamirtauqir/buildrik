@@ -45,8 +45,8 @@ const ClearXSvg = () => (
 export const HistoryTab: React.FC<HistoryTabProps> = ({
   composer,
   projectId,
-  isPinned,
-  onPinToggle,
+  isExpanded,
+  onExpandToggle,
   onHelpClick,
   onClose,
 }) => {
@@ -113,8 +113,8 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
     <PanelFrame className="bd-history-container">
       <PanelFrame.Header
         title="Version History"
-        isPinned={isPinned}
-        onPinToggle={onPinToggle}
+        isExpanded={isExpanded}
+        onExpandToggle={onExpandToggle}
         onHelpClick={onHelpClick}
         onClose={onClose}
       />

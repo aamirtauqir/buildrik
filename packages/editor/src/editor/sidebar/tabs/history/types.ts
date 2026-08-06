@@ -13,9 +13,9 @@ export interface HistoryTabProps {
   /** Project ID — scopes localStorage key so view preference is per-project */
   projectId?: string | null;
   /** Panel pin state */
-  isPinned?: boolean;
+  isExpanded?: boolean;
   /** Pin toggle callback */
-  onPinToggle?: () => void;
+  onExpandToggle?: () => void;
   /** Help button callback */
   onHelpClick?: () => void;
   /** Close panel callback */

@@ -28,8 +28,8 @@ import "./PagesTab.css";
 
 export interface PagesTabProps {
   composer: Composer | null;
-  isPinned?: boolean;
-  onPinToggle?: () => void;
+  isExpanded?: boolean;
+  onExpandToggle?: () => void;
   onHelpClick?: () => void;
   onClose?: () => void;
   /** Called when user clicks "From Template" — parent should switch to Templates tab */
@@ -38,8 +38,8 @@ export interface PagesTabProps {
 
 export const PagesTab: React.FC<PagesTabProps> = ({
   composer,
-  isPinned,
-  onPinToggle,
+  isExpanded,
+  onExpandToggle,
   onHelpClick,
   onClose,
   onRequestTemplates,
@@ -190,8 +190,8 @@ export const PagesTab: React.FC<PagesTabProps> = ({
     <PanelFrame className={`bd-pg-panel${bulk.hasSelection ? " bulk-mode" : ""}`}>
       <PanelFrame.Header
         title="Pages"
-        isPinned={isPinned}
-        onPinToggle={onPinToggle}
+        isExpanded={isExpanded}
+        onExpandToggle={onExpandToggle}
         onHelpClick={onHelpClick}
         onClose={onClose}
       >
