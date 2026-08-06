@@ -337,10 +337,16 @@ search; 141:40 searching = FLAT results incl. folder members (a real BUG:
 the folder filter hid them from search) with the muted "in {Folder}" tag;
 141:78 bulk = light bottom band replacing the Add-page footer at ANY
 selection (was a floating dark pill gated at 2+), plain 13 ink actions.
-STILL OPEN: 141:2 folders-collapsed (visual verify only), 774:4044
-loading skeleton (probe block pending), 141:207 listings drawer table
-restyle (PAGE/TITLE/DESC/SCORE + "Open full listings ›"), 435:2348
-PageTabBar, S3.7 SEO/Social/Advanced settings screens. Dirty-dot (140:21, 8px orange on Home)
+141:207 listings DONE 2026-08-07: compact 4-col table (PAGE/TITLE/DESC/
+SCORE), caps header band, 32h rows, Set/Missing-in-red, deterministic mono
+score from the real SEO signals (100 − 40 no-desc − 15 fallback-title −
+25 dup-title − 20 noIndex), red under 50; "Open full listings ›" widens
+the drawer (the 700 view IS the full table). 774:4044 loading shipped with
+its probe mount. STILL OPEN: 141:2 folders-collapsed (live verify needs
+folders in the demo), 435:2348 PageTabBar delta pass (board spec in hand:
+tab bar states, rename validation trio, context menu, delete confirm,
+undo toast — code exists at PageTabBar.tsx), S3.7 SEO/Social/Advanced
+settings screens (3 × 1440). Dirty-dot (140:21, 8px orange on Home)
 NOT shipped — no per-page unsaved-state source in the model yet.
 
 ## NOT in scope

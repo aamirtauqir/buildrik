@@ -233,7 +233,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
               >
                 {"\u2039"} Pages
               </Button>
-              <SearchListingsTable pages={p.pages} onEditPage={p.openSettings} />
+              <SearchListingsTable pages={p.pages} onEditPage={p.openSettings} onOpenFull={onExpandToggle} />
             </>
           ) : (
           <PageList
