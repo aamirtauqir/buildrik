@@ -231,5 +231,26 @@ redirect · `bfa85e19` backlog · plus the copy-approval sync.
 
 ---
 
-*End. Agla qadam aap ka: §9a ka rehearsal walk abhi chala doon, ya pehle
-§9b Stripe checklist aap karna chahenge?*
+## 11. Addendum (same evening) — the Figma file got its design system
+
+After this report was first published, the founder set the lane: **design,
+in Figma.** The biggest structural gap from §8.3 was closed the same evening:
+
+- **45 paint styles created** — the Styles panel went from empty to a full
+  semantic set (`color/ink`, `color/bg-panel`, `color/accent`…), every style
+  bound to its variable, so the token stays the single source of truth.
+- **5,673 raw colours bound to tokens** in three verified passes, zero
+  errors: exact matches first (no visual change), then a deliberate
+  **drift repair** — the newest boards had been drawn with an old
+  grey-purple ramp (~1,500 paints) plus stray blues/greens/ambers; all
+  remapped onto the current design system. Three heaviest boards
+  screenshot-checked: clean.
+- **Raw colours on product boards: 6,075 → 235 (−96%).** The rest is a
+  one-off tail (biggest offender: a banned purple `#7359d9` ×6) listed for
+  the next design session. Archive/Reference material was left untouched —
+  history stays history.
+
+What this buys: any future palette change is now a variable edit, not a
+95-instance manual hunt — and the hex-drift gate (§7) keeps it that way.
+
+*End.*
