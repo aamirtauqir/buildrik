@@ -636,140 +636,71 @@
 /* ─── CONTEXT MENU ────────────────────────────────────────────────────── */
 
 /* ─── SETTINGS DRAWER (Task 9a — shell + tabs strip) ──────────────────── */
-.bd-pg-drawer {
-  position: absolute;
+/* Board S3.7 (302:1978/2004/2026): page settings is a centered 580×520
+   modal card on a dark scrim — not an in-panel slide-over. */
+.bd-pg-drawer-scrim {
+  position: fixed;
   inset: 0;
-  z-index: 10;
+  z-index: 90;
+  background: rgba(17, 24, 39, 0.6);
+}
+.bd-pg-drawer {
+  position: fixed;
+  z-index: 91;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 580px;
+  height: 520px;
   display: flex;
   flex-direction: column;
-  background: var(--bk-bg-panel);
-  border-right: 1px solid var(--bk-border);
+  background: var(--bk-bg-card);
+  border-radius: 16px;
   box-shadow: var(--bk-shadow-overlay);
   animation: bd-pg-drawer-in var(--bk-motion-base) var(--bk-ease-default);
 }
 @keyframes bd-pg-drawer-in {
-  from { transform: translateX(-12px); opacity: 0; }
-  to   { transform: translateX(0); opacity: 1; }
+  from { transform: translate(-50%, calc(-50% + 8px)); opacity: 0; }
+  to   { transform: translate(-50%, -50%); opacity: 1; }
 }
 
 .bd-pg-drawer-hdr {
+  /* Board header: 16 semibold title, 14px gap, then the text-link tab row. */
   display: flex;
-  align-items: center;
-  gap: var(--bk-space-8);
-  padding: 10px var(--bk-space-12);
-  border-bottom: 1px solid var(--bk-border);
+  flex-direction: column;
+  gap: 14px;
+  padding: var(--bk-space-24) var(--bk-space-28) 0;
   flex-shrink: 0;
 }
-.bd-pg-drawer-back {
-  width: 24px;
-  height: 24px;
-  display: grid;
-  place-items: center;
-  padding: 0;
-  border: 0;
-  border-radius: 4px;
-  background: transparent;
-  color: var(--bk-ink-muted);
-  cursor: pointer;
-  transition: background 100ms, color 100ms;
-}
-.bd-pg-drawer-back:hover {
-  background: var(--bk-bg-subtle);
-  color: var(--bk-ink);
-}
-.bd-pg-drawer-back svg { width: 14px; height: 14px; }
 
-.bd-pg-drawer-title-block {
-  flex: 1;
-  min-width: 0;
-}
 .bd-pg-drawer-title {
-  font: 600 13px var(--bk-font-ui);
-  letter-spacing: -0.1px;
+  font: 600 16px var(--bk-font-ui);
   color: var(--bk-ink);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-.bd-pg-drawer-slug {
-  margin-top: 2px;
-  font: 500 10.5px var(--bk-font-mono);
-  color: var(--bk-ink-muted);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.bd-pg-drawer-save {
-  height: 26px;
-  padding: 0 10px;
-  border: 1px solid transparent;
-  border-radius: 4px;
-  background: transparent;
-  color: var(--bk-ink-muted);
-  font: 500 11.5px var(--bk-font-ui);
-  cursor: not-allowed;
-  transition: background 100ms, color 100ms, border-color 100ms;
-  flex-shrink: 0;
-}
-.bd-pg-drawer-save--clean {
-  color: var(--bk-success);
-  background: var(--bk-success-tint);
-}
-.bd-pg-drawer-save--dirty {
-  background: var(--bk-accent);
-  border-color: var(--bk-accent);
-  color: var(--bk-accent-on);
-  cursor: pointer;
-}
-.bd-pg-drawer-save--dirty:hover { background: var(--bk-accent-hover); }
-.bd-pg-drawer-save--saving {
-  background: var(--bk-accent-subtle);
-  border-color: var(--bk-accent);
-  color: var(--bk-accent);
-  cursor: progress;
-}
-.bd-pg-drawer-save--error {
-  background: var(--bk-error-tint);
-  border-color: var(--bk-error);
-  color: var(--bk-error);
-  cursor: pointer;
 }
 
 .bd-pg-drawer-tabs {
   display: flex;
-  gap: 2px;
-  padding: var(--bk-space-4) var(--bk-space-12) 0;
-  border-bottom: 1px solid var(--bk-border);
-  background: var(--bk-bg-panel);
+  gap: var(--bk-space-20);
   flex-shrink: 0;
 }
 .bd-pg-drawer-tab {
-  position: relative;
-  padding: var(--bk-space-8) var(--bk-space-12);
+  /* Board: bare 14px text links — active is blue-500 semibold, no underline. */
+  padding: 0;
   border: 0;
   background: transparent;
-  font: 500 12px var(--bk-font-ui);
+  font: 500 14px var(--bk-font-ui);
   color: var(--bk-ink-muted);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  border-radius: 4px 4px 0 0;
   transition: color 100ms;
 }
 .bd-pg-drawer-tab:hover { color: var(--bk-ink); }
-.bd-pg-drawer-tab--active { color: var(--bk-ink); }
-.bd-pg-drawer-tab--active::after {
-  content: "";
-  position: absolute;
-  left: 8px;
-  right: 8px;
-  bottom: -1px;
-  height: 2px;
-  background: var(--bk-accent);
-  border-radius: 2px 2px 0 0;
-}
+.bd-pg-drawer-tab--active { color: var(--bk-blue-500); font-weight: 600; }
 .bd-pg-drawer-tab-chip {
   font: 500 10px var(--bk-font-mono);
   padding: 1px 6px;
@@ -781,10 +712,39 @@
 .bd-pg-drawer-body {
   flex: 1;
   overflow-y: auto;
-  padding: var(--bk-space-16) var(--bk-space-16) var(--bk-space-32);
+  padding: var(--bk-space-16) var(--bk-space-28) var(--bk-space-24);
   display: flex;
   flex-direction: column;
   gap: 14px;
+}
+/* Board field rows: 42h inputs, radius 8, 14px text (drawn instances win
+   over the Input component doc's 36h — founder precedent: drawn > description). */
+.bd-pg-drawer-body input[type="text"],
+.bd-pg-drawer-body input:not([type]) {
+  min-height: 42px;
+  border-radius: var(--bk-radius-lg);
+  font-size: 14px;
+}
+.bd-pg-drawer-body textarea { border-radius: var(--bk-radius-lg); font-size: 14px; }
+/* Save-error retry row — only rendered on saveState=error; the board draws
+   no save chrome (autosave owns persistence). */
+.bd-pg-drawer-errrow {
+  display: flex;
+  align-items: center;
+  gap: var(--bk-space-8);
+  padding: var(--bk-space-8) var(--bk-space-28) var(--bk-space-16);
+  font: 500 12px var(--bk-font-ui);
+  color: var(--bk-error);
+  flex-shrink: 0;
+}
+.bd-pg-drawer-errrow-retry {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font: 600 12px var(--bk-font-ui);
+  color: var(--bk-error);
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 /* ─── ORPHAN DRAWER TABS REMOVED 2026-05-24 ───────────────────────────────

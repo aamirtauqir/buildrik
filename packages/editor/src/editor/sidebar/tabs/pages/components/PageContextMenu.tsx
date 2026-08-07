@@ -73,7 +73,10 @@ export const PageContextMenu: React.FC<Props> = ({
   };
 
   const menu = (
-    <div ref={menuRef} style={style}>
+    // bd-pg-menu is LOAD-BEARING: usePages' outside-mousedown close guard
+    // checks closest(".bd-pg-menu") — without it every item's mousedown
+    // unmounted the menu before its click could fire.
+    <div ref={menuRef} className="bd-pg-menu" style={style}>
       <Menu label={`Options for ${page?.name ?? "page"}`} onKeyDown={handleKeyDown}>
         <MenuItem kbd="F2" onClick={() => act(() => onRename(pageId))}>
           Rename

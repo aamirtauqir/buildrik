@@ -79,65 +79,32 @@ export const PageSettingsDrawer: React.FC<Props> = ({ page, allPages, composer, 
 
   return (
     <>
+      {/* Board S3.7: centered modal card on a dark scrim — scrim click closes
+          (through the same unsaved guard as ESC). */}
+      <div className="bd-pg-drawer-scrim" onClick={handleClose} aria-hidden="true" />
       <div className="bd-pg-drawer" role="dialog" aria-modal="true" aria-label={`${page.name} settings`}>
-        {/* ── Header ─────────────────────────────────────────────── */}
+        {/* ── Header — board 302:1980: title + text-link tab row ──── */}
         <div className="bd-pg-drawer-hdr">
-          <Button
-            className="bd-pg-drawer-back"
-            onClick={handleClose}
-            aria-label="Close page settings"
-            title="Close"
-          >
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <polyline points="15 18 9 12 15 6" />
-            </svg>
-          </Button>
-
-          <div className="bd-pg-drawer-title-block">
-            <div className="bd-pg-drawer-title" title={page.name}>
-              {page.name}
-            </div>
-            {s.domain && page.slug && (
-              <div className="bd-pg-drawer-slug">
-                {s.domain}/{page.slug.replace(/^\//, "")}
-              </div>
-            )}
+          <div className="bd-pg-drawer-title" title={page.name}>
+            Page settings — {page.name}
           </div>
-
-          {/* Save button */}
-          <Button
-            className={[
-              "bd-pg-drawer-save",
-              s.saveState === "saving" ? "bd-pg-drawer-save--saving" : "",
-              s.saveState === "error" ? "bd-pg-drawer-save--error" : "",
-              s.isDirty ? "bd-pg-drawer-save--dirty" : "",
-              !s.isDirty && s.saveState === "clean" ? "bd-pg-drawer-save--clean" : "",
-            ].filter(Boolean).join(" ")}
-            onClick={() => s.isDirty && s.saveState !== "saving" && s.save()}
-            disabled={!s.isDirty || s.saveState === "saving"}
-            aria-label={s.isDirty ? "Save changes" : "No unsaved changes"}
-          >
-            {s.saveState === "saving" ? "Saving..." : s.saveState === "error" ? "Retry" : s.isDirty ? "Save" : "Saved"}
-          </Button>
-        </div>
-
-        {/* ── Tab bar ────────────────────────────────────────────── */}
-        <div className="bd-pg-drawer-tabs" role="tablist" aria-label="Settings sections">
-          {TABS.map((tab) => (
-            <Button
-              key={tab.id}
-              role="tab"
-              aria-selected={s.activeTab === tab.id}
-              aria-controls={`pg-drawer-tab-${tab.id}`}
-              className={["bd-pg-drawer-tab", s.activeTab === tab.id ? "bd-pg-drawer-tab--active" : ""].filter(Boolean).join(" ")}
-              onClick={() => handleTabClick(tab.id)}
-            >
-              {tab.label}
-              {tab.id === "seo" && s.seoScore < 80 && s.allowIndex && (
-                <span className="bd-pg-drawer-tab-chip" aria-hidden="true">{s.seoScore}</span>
-              )}
-            </Button>
-          ))}
+          <div className="bd-pg-drawer-tabs" role="tablist" aria-label="Settings sections">
+            {TABS.map((tab) => (
+              <Button
+                key={tab.id}
+                role="tab"
+                aria-selected={s.activeTab === tab.id}
+                aria-controls={`pg-drawer-tab-${tab.id}`}
+                className={["bd-pg-drawer-tab", s.activeTab === tab.id ? "bd-pg-drawer-tab--active" : ""].filter(Boolean).join(" ")}
+                onClick={() => handleTabClick(tab.id)}
+              >
+                {tab.label}
+                {tab.id === "seo" && s.seoScore < 80 && s.allowIndex && (
+                  <span className="bd-pg-drawer-tab-chip" aria-hidden="true">{s.seoScore}</span>
+                )}
+              </Button>
+            ))}
+          </div>
         </div>
 
         {/* ── Tab content ─────────────────────────────────────────── */}
@@ -158,6 +125,16 @@ export const PageSettingsDrawer: React.FC<Props> = ({ page, allPages, composer, 
             </div>
           )}
         </div>
+        {/* Autosave owns persistence (the board draws no save chrome); a save
+            FAILURE still needs a real affordance, shown only then. */}
+        {s.saveState === "error" && (
+          <div className="bd-pg-drawer-errrow" role="alert">
+            <span>Couldn&apos;t save your changes.</span>
+            <Button className="bd-pg-drawer-errrow-retry" onClick={() => s.save()}>
+              Retry
+            </Button>
+          </div>
+        )}
       </div>
       <UnsavedWarningModal
         isOpen={s.showDiscardConfirm}

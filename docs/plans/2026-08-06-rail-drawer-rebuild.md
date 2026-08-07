@@ -374,7 +374,29 @@ everything on it is removed…", "Delete page"). Live-verify traps: global
 [role=tab] matches the 6 RAIL buttons before page tabs (scope to the
 tablist), and playwright dispatchEvent("contextmenu", {clientX}) builds
 a plain Event — coords lost, NaN left/top — use a real right-click.
-STILL OPEN: S3.7 SEO/Social/Advanced settings screens (3 × 1440). Dirty-dot (140:21, 8px orange on Home)
+S3.7 page-settings DONE 2026-08-07 (302:1978 / 302:2004 / 302:2026):
+the in-panel slide-over became the boards' centered 580×520 modal card on
+a 60% ink scrim (scrim click + ESC close through the existing unsaved
+guard) — header is "Page settings — {name}" 16 semibold + bare text-link
+tabs (active --bk-blue-500 semibold 14), body px-28 with 42h rounded-8
+inputs (drawn instances beat the Input 10:16 doc's 36h — drawn-wins
+precedent). Back-chevron, slug line and Save button chrome deleted;
+autosave + ⌘S own persistence, an error-only Retry row renders on save
+failure. Tab CONTENT kept the code contract (score card, AI suggest,
+counters, slug warnings, visibility segmented control) — the boards'
+bare 4-input fixtures are shape, not a field-deletion order. Scrim
+verified by PIXEL SAMPLING (canvas 112/255 = exactly 0.6 ink over
+white) — the downscaled screenshot preview LIES about large translucent
+overlays; sample pixels before declaring a scrim missing.
+REAL BUG found by the S3.7 live walk: every Pages context-menu action
+(Rename/Duplicate/Set as Homepage/Settings/Delete) was DEAD — usePages'
+outside-mousedown guard checks closest(".bd-pg-menu") and the wrapper
+no longer carried the class, so any item mousedown unmounted the menu
+before its click fired. A test comment even called the class "only ever
+an implementation detail" — the test was the bug's cover. Class
+restored (load-bearing comment added) + 2 regression tests, incl. one
+that replays the exact guard.
+Pages family: ALL boards + states + S3.7 CLOSED. Next family: Media 144:2. Dirty-dot (140:21, 8px orange on Home)
 NOT shipped — no per-page unsaved-state source in the model yet.
 
 ## NOT in scope
