@@ -58,7 +58,10 @@ Founder chose **A — timeboxed core** over:
 
 **Named regret scenario (F7), accepted with eyes open:** six months out,
 pre-revenue still, retro reads "polished the design file while Stripe sat one
-afternoon from live." The timebox is the mitigation: **3 working days hard**,
+afternoon from live." **Timebox compressed same day on founder order: the
+3-day box runs as ONE day** — founder available 8–10h for inline gate
+approvals, removing the wait states the spread priced in. Scope unchanged.
+The box remains hard: **3 working days absolute ceiling**,
 overflow ships partial with unresolved items named. After this arc, the
 founder-gated business actions (real client `/review/<token>` walk, Stripe
 live provisioning, pilot workspace) are next in queue.

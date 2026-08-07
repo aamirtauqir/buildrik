@@ -509,3 +509,9 @@ root cause is fixed in `466158dd`; these are the rest.
   element shifts every subsequent key and silently re-pairs recorded values with
   different elements. This is why a primary CTA recorded as buttonface-grey
   survived review.
+
+## From 2026-08-07 reconciliation matrix (code-arc backlog — founder-approved defaults)
+- [ ] Settings Pro-lock: fix dead key `advanced` → `custom-code` in `packages/editor/src/editor/sidebar/tabs/settings/types.ts:61` (founder decision 2026-08-07: Pro = Custom-code + Integrations; Headers stays free; Headers·locked board archived)
+- [ ] Insert: mount `InsertStateBlocks` (loading + load-error) in BuildTab — blocks exist, only tests import them (ledger D2)
+- [ ] ReviewTab Re-send: pass `onResendReview` from LeftSidebar → TabRouter (1-line, ledger D3 — button is a visible no-op)
+- [ ] ⌘K navigation: add ai/components/publish/review/content to VALID_LEFT_TABS (ledger D4 — 5 palette commands silently no-op)
