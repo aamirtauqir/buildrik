@@ -23,6 +23,7 @@ import { UploadZone } from "./components/UploadZone";
 import { useMediaState } from "./hooks/useMediaState";
 import { SlimLauncher } from "./components/SlimLauncher";
 import { IconBrowserOverlay } from "./components/IconBrowserOverlay";
+import { StockBrowserOverlay } from "./components/StockBrowserOverlay";
 import { ExpandedMediaPanel } from "./components/ExpandedMediaPanel";
 import { SelectionContextBar } from "./components/SelectionContextBar";
 import "./MediaTab.css";
@@ -73,6 +74,7 @@ function MediaTabWithComposer({
   const { addToast } = useToast();
   const [stockModalOpen, setStockModalOpen] = React.useState(false);
   const [iconBrowserOpen, setIconBrowserOpen] = React.useState(false);
+  const [stockBrowserOpen, setStockBrowserOpen] = React.useState(false);
 
   const showToast = React.useCallback((msg: string, type: "success" | "error" | "info") => {
     addToast({ description: msg, tone: type });
@@ -315,7 +317,7 @@ function MediaTabWithComposer({
             state.libraryItems.filter((i) => state.selectedKeys.has(i.key)),
           )
         }
-        onOpenStock={() => setStockModalOpen(true)}
+        onOpenStock={() => setStockBrowserOpen(true)}
         onOpenLibrary={onOpenLibrary}
         onClose={onClose}
         onOpenDetail={state.openDetail}
@@ -323,6 +325,22 @@ function MediaTabWithComposer({
         selectionContext={state.selectionContext}
         onCancelSelection={() => state.setSelectionContext(null)}
       />
+      {stockBrowserOpen && (
+        <StockBrowserOverlay
+          onClose={() => setStockBrowserOpen(false)}
+          photos={state.stockPhotos}
+          videos={state.stockVideos}
+          loading={state.discLoading}
+          searchQuery={state.discoverySearch}
+          orientation={state.discOrientation}
+          color={state.discColor}
+          onSearch={state.discSearchAll}
+          onSetOrientation={state.setDiscOrientation}
+          onSetColor={state.setDiscColor}
+          onLoadMore={state.loadMoreDisc}
+          onSave={(type, item) => state.saveToLibrary(type, item)}
+        />
+      )}
       {iconBrowserOpen && (
         <IconBrowserOverlay
           onClose={() => setIconBrowserOpen(false)}

@@ -455,9 +455,27 @@ static flow (positioning now lives on the component); flowbite Button's
 justify-center centered the back row + hub rows (explicit
 justify-start); overlay Escape now stopPropagation()s so one keystroke
 can't also fire the drawer's own close.
-STILL OPEN (Media): bulk-select 145:300 + folder-scoped 145:49 eye
-passes, icon-picker 147:2 + stock-browser 147:55 drill-ins, S3.6
-editing/optimizing, footer Icons 3rd link (founder call pending). Dirty-dot (140:21, 8px orange on Home)
+Media pass 4 (icon-picker + stock-browser drill-ins) DONE 2026-08-07:
+icon-picker 147:2 = IconBrowserOverlay (footer Icons link now opens the
+drill-in, NOT the modal): search carries the REAL catalog count (368),
+All ▾ + "17 categories" mono, RECENT band capped at 12 (recents SHARED
+with IconPickerModal via STORAGE_KEYS.RECENT_ICONS — same literal the
+modal already wrote), 6-col 40×40 tiles; pick = insertMedia(name,
+"icon") + toast + pop. IconPickerModal stays the inspector's
+size/colour/stroke flow. stock-browser 147:55 = StockBrowserOverlay
+(drawer footer Stock now opens the drill-in; StockSourceModal stays for
+fullpage/expanded): ‹ Stock photos back, search, three 88w dropdowns on
+a horizontally-scrolling row (closed controls name the FILTER per the
+board — Orientation/Colour/Type), results reuse the 136×104 grid with
+the required 24h provider credit ("Pexels · A. Nowak" shape from
+item.source+author), infinite scroll handing to an explicit Load more
+after 3 auto-loads (caption law), "Loading 8 more…" line. Both overlays
+use the drill-in pattern from pass 3 (absolute inset, own header,
+Esc stopPropagation).
+ALL 5 Media drill-ins DONE. STILL OPEN (Media): bulk-select 145:300 +
+folder-scoped 145:49 eye passes, S3.6 editing/optimizing, footer Icons
+3rd link (founder call pending — the link is now the icon drill-in's
+only entry). Dirty-dot (140:21, 8px orange on Home)
 NOT shipped — no per-page unsaved-state source in the model yet.
 
 ## NOT in scope
