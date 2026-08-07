@@ -29,6 +29,7 @@ export function UploadZone({
   disabled = false,
   uploadQueue,
   onRetryUpload,
+  onOptimize,
   inputRef: externalInputRef,
   compact = false,
 }: UploadZoneProps) {
@@ -134,7 +135,10 @@ export function UploadZone({
         className={[
           `med-upload-zone${stateClass ? ` ${stateClass}` : ""}`,
           compact && "tw:flex tw:items-center tw:justify-center tw:gap-2 tw:px-4 tw:text-[12px]",
-          compact && (isDragOver || rejectedReason || isFull || isNearLimit
+          // Quota pressure paints in StorageQuotaBar's band (boards 145:199 /
+          // 145:250) — repeating it here doubled the message. The strip only
+          // surfaces for a drag-over or a rejection flash.
+          compact && (isDragOver || rejectedReason
             ? "tw:h-9 tw:border tw:border-dashed tw:border-gray-300 tw:text-gray-600"
             : "tw:h-0 tw:overflow-hidden tw:border-0 tw:p-0"),
         ].filter(Boolean).join(" ")}
@@ -145,7 +149,7 @@ export function UploadZone({
         onDrop={handleDrop}
         role="button"
         tabIndex={compact ? -1 : 0}
-        aria-hidden={compact && !isDragOver && !rejectedReason && !isFull && !isNearLimit}
+        aria-hidden={compact && !isDragOver && !rejectedReason}
         aria-label={label}
         aria-live={rejectedReason ? "assertive" : "polite"}
         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); inputRef.current?.click(); } }}
@@ -161,7 +165,7 @@ export function UploadZone({
           onChange={(e) => handleFiles(e.target.files)}
         />
       </div>
-      <StorageQuotaBar used={storage.used} total={storage.total} compact={compact} />
+      <StorageQuotaBar used={storage.used} total={storage.total} onOptimize={onOptimize} compact={compact} />
       {/*
         Board `145:143` — one 44h row per upload in flight: name, mono percent,
         and a 4px accent track. Mono because the number changes several times a

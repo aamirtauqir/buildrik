@@ -421,12 +421,24 @@ Media pass 1 (grid 144:2 + filtered 145:2 + empty 145:359) DONE:
   auto-expand behavior confirmed deliberate (useMediaState), multi-select
   verified in drawer AND expanded panel. Upload of .svg lands under the
   svg pill now.
-STILL OPEN (Media): uploading/upload-failed/quota-warn/quota-full/
-bulk-select/load-error/loading/no-results state passes (several already
-code-built from the 13-phase arc — need eye passes), folder-scoped
-145:49, 5 drill-ins (asset-detail/versions/used-in/icon-picker/
-stock-browser), S3.6 editing/optimizing, footer Icons 3rd link (board
-draws 2 — founder call pending; icon-picker entry mapping). Dirty-dot (140:21, 8px orange on Home)
+Media pass 2 (states) DONE 2026-08-07 — probe-verified by eye:
+loading/load-error/empty conformed already; no-results took board
+782:4353's copy ("Nothing matches '{q}'." + Clear search, left-aligned;
+pill-only zero keeps its own line — the board only defines the search
+case); load-error hides pill counts via discMode (the CAPTION is the
+contract — the board drawing's 128s are sample artifacts); quota-warn
+145:199 = warm band "842 MB of 1 GB used" (MB-precise under 1 GB) + bar
++ "Optimise images to free space ›" (wired to onOpenLibrary — the
+manager owns optimization); quota-full 145:250 = red band with the
+reason ON the number + "Nothing already on your sites is affected." +
+footer Upload DISABLED not hidden, track removed at full. The compact
+upload-zone strip no longer duplicates quota messages (drag/rejection
+only). upload-failed 145:148 verified against the existing probe.
+STILL OPEN (Media): bulk-select 145:300 + folder-scoped 145:49 eye
+passes (code board-built in the 13-phase arc), 5 drill-ins
+(asset-detail/versions/used-in/icon-picker/stock-browser), S3.6
+editing/optimizing, footer Icons 3rd link (board draws 2 — founder call
+pending; icon-picker entry mapping). Dirty-dot (140:21, 8px orange on Home)
 NOT shipped — no per-page unsaved-state source in the model yet.
 
 ## NOT in scope

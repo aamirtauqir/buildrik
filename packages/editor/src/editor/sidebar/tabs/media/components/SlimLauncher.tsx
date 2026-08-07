@@ -231,6 +231,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
       <TypePills
         selectedTypes={activeTypes}
         counts={counts}
+        discMode={Boolean(props.loadError)}
         onToggle={onToggleType}
       />
 
@@ -319,9 +320,29 @@ export function SlimLauncher(props: SlimLauncherProps) {
               </p>
             </div>
           ) : (
-            <div className="sl-empty tw:px-4 tw:py-6" data-testid="media-no-results">
-              <p className="sl-empty__body tw:text-[12px] tw:text-gray-600">No assets matching this filter.</p>
-            </div>
+            searchQuery.trim() ? (
+              <div className="tw:px-4 tw:pt-8 tw:text-left tw:text-[13px] tw:leading-5" data-testid="media-no-results" role="status">
+                <p className="tw:text-[var(--bk-ink-muted)]">
+                  Nothing matches {"\u2018"}{searchQuery.trim()}{"\u2019"}.
+                </p>
+                <Button
+                  type="button"
+                  color="light"
+                  size="xs"
+                  className="tw:mt-1.5 tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+                  data-testid="media-clear-search"
+                  onClick={() => onSearchChange("")}
+                >
+                  Clear search
+                </Button>
+              </div>
+            ) : (
+              /* Pill-only zero \u2014 no board of its own; scope and filters stay
+                 set, same rule as the search state. */
+              <div className="sl-empty tw:px-4 tw:py-6" data-testid="media-no-results">
+                <p className="sl-empty__body tw:text-[12px] tw:text-gray-600">No assets matching this filter.</p>
+              </div>
+            )
           )
         ) : (
           /* Two 136px columns with 16px gutters: 16+136+16+136+16 = 320. */
@@ -414,6 +435,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
           storage={props.storage}
           onUpload={props.onUpload}
           onRetryUpload={props.onRetryUpload}
+          onOptimize={props.onOpenLibrary ? () => props.onOpenLibrary?.() : undefined}
           uploadQueue={props.uploadQueue}
           disabled={props.storage.used >= props.storage.total}
         />
@@ -429,6 +451,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
             className="tw:min-h-6 tw:gap-1.5 tw:border-0 tw:bg-transparent tw:px-0 tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
             data-testid="media-upload-action"
             onClick={() => uploadInputRef.current?.click()}
+            disabled={props.storage.used >= props.storage.total}
           >
             <Upload size={14} aria-hidden="true" />
             Upload

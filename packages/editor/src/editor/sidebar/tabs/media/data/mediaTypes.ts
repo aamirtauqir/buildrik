@@ -397,4 +397,6 @@ export interface UploadZoneProps {
   uploadQueue?: UploadProgress[];
   /** §22 — fired when user clicks Retry on a failed queue item. */
   onRetryUpload?(fileName: string): void;
+  /** Quota-warn band's "Optimise images to free space ›" (board 145:199). */
+  onOptimize?(): void;
 }

@@ -323,6 +323,12 @@ const CASES: Record<string, () => React.ReactElement> = {
   "media-drawer-no-results": () => (
     <div data-probe="media-drawer-no-results">{mediaDrawer({ searchQuery: "zzzz" })}</div>
   ),
+  // Board 145:199 — warn band at >80% with the actionable exit.
+  "media-drawer-quota-warn": () => (
+    <div data-probe="media-drawer-quota-warn">
+      {mediaDrawer({ storage: { used: 842e6, total: 1e9 }, onOpenLibrary: () => {} })}
+    </div>
+  ),
   // ── Content states (T13) ─────────────────────────────────────────────────
   "content-loading": () => (
     <div data-probe="content-loading">

@@ -11,9 +11,13 @@
  * @license BSD-3-Clause
  */
 
+import { Button } from "@/editor/chrome-ui";
+
 interface StorageQuotaBarProps {
   used: number;
   total: number;
+  /** Board 145:199's "Optimise images to free space ›" — the actionable exit. */
+  onOptimize?: () => void;
   /**
    * Drawer mode: the board's default Media screen (144:2) shows no quota line
    * at all — it earns its space only once the number starts to matter, which is
@@ -22,12 +26,14 @@ interface StorageQuotaBarProps {
   compact?: boolean;
 }
 
-function formatGB(bytes: number): string {
+/** Board copy is MB-precise under a gigabyte: "842 MB of 1 GB used". */
+function formatSize(bytes: number): string {
+  if (bytes < 1e9) return `${Math.round(bytes / 1e6)} MB`;
   const gb = bytes / 1e9;
-  return gb >= 10 ? gb.toFixed(0) : gb.toFixed(1).replace(/\.0$/, "");
+  return `${gb >= 10 ? gb.toFixed(0) : gb.toFixed(1).replace(/\.0$/, "")} GB`;
 }
 
-export function StorageQuotaBar({ used, total, compact = false }: StorageQuotaBarProps) {
+export function StorageQuotaBar({ used, total, onOptimize, compact = false }: StorageQuotaBarProps) {
   const pct = total > 0 ? (used / total) * 100 : 0;
   const clampedPct = Math.min(100, pct);
   const isExhausted = pct >= 100;
@@ -50,21 +56,43 @@ export function StorageQuotaBar({ used, total, compact = false }: StorageQuotaBa
     <div
       className={[
         "med-quota-bar tw:flex tw:flex-col tw:gap-1 tw:px-4 tw:py-1.5",
-        isExhausted && "med-quota-bar--exhausted",
-        isNearLimit && "med-quota-bar--near-limit",
+        isExhausted && "med-quota-bar--exhausted tw:bg-red-50 tw:py-3",
+        isNearLimit && "med-quota-bar--near-limit tw:bg-yellow-50 tw:py-2",
       ]
         .filter(Boolean)
         .join(" ")}
     >
       <div
         data-testid="media-quota-bar"
-        className={`med-quota-text tw:text-[11px] tw:leading-4 tw:tabular-nums ${tone}`}
+        className={`med-quota-text tw:text-[${isExhausted ? "13px" : "11px"}] tw:leading-4 tw:tabular-nums ${tone}`}
       >
-        {formatGB(used)} GB / {formatGB(total)} GB used
+        {formatSize(used)} of {formatSize(total)} used
+        {/* Board 145:250: the reason rides the number — disabled, never hidden. */}
+        {isExhausted ? " — upload is off until you free space" : null}
       </div>
-      <div className="med-quota-track tw:h-1 tw:w-full tw:overflow-hidden tw:rounded-full tw:bg-gray-100">
-        <div className={`med-quota-fill tw:h-full ${fill}`} style={{ width: `${clampedPct}%` }} />
-      </div>
+      {!isExhausted && (
+        <div className="med-quota-track tw:h-1 tw:w-full tw:overflow-hidden tw:rounded-full tw:bg-gray-100">
+          <div className={`med-quota-fill tw:h-full ${fill}`} style={{ width: `${clampedPct}%` }} />
+        </div>
+      )}
+      {isExhausted && (
+        /* Board 145:250's reassurance line: existing files are untouched. */
+        <div className="tw:text-[12px] tw:leading-[18px] tw:text-gray-600">
+          Nothing already on your sites is affected.
+        </div>
+      )}
+      {isNearLimit && onOptimize && (
+        <Button
+          type="button"
+          color="light"
+          size="xs"
+          className="tw:min-h-5 tw:self-start tw:border-0 tw:bg-transparent tw:px-0 tw:text-[12px] tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+          data-testid="media-quota-optimize"
+          onClick={onOptimize}
+        >
+          {"Optimise images to free space \u203A"}
+        </Button>
+      )}
     </div>
   );
 }

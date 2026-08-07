@@ -9,6 +9,6 @@ describe("UploadZone — consumes StorageQuotaBar", () => {
       <UploadZone storage={{ used: 1e9, total: 5e9 }} onUpload={onUpload} uploadQueue={[]} />
     );
     expect(container.querySelector(".med-quota-bar")).toBeInTheDocument();
-    expect(container.querySelector(".med-quota-text")?.textContent).toMatch(/1 GB \/ 5 GB used/);
+    expect(container.querySelector(".med-quota-text")?.textContent).toMatch(/1 GB of 5 GB used/);
   });
 });
