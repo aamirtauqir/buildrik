@@ -41,3 +41,40 @@ describe("runtimeEnv env substitution", () => {
     expect(SRC).toMatch(/process\.env/);
   });
 });
+
+/**
+ * The same rule, for the OTHER bundler. This half was missing, and the identical
+ * bug promptly reappeared on the Next side: `readProcessEnv()` returned
+ * `process.env` wholesale and `pick()` indexed it as `proc[nextKey]`, so
+ * Next/Turbopack — which substitutes the exact text `process.env.NEXT_PUBLIC_X`
+ * — had nothing to replace. In the unified-editor browser bundle there is no
+ * `process` binding at all, so every NEXT_PUBLIC_* read as undefined and every
+ * feature flag was permanently false in the shipping path (verified in-browser
+ * 2026-08-05: `typeof process === "undefined"`).
+ *
+ * Source-text assertion again, and for the same reason: under Vitest `process`
+ * is real and populated, so the broken form passes at runtime and fails only in
+ * a browser bundle.
+ */
+describe("runtimeEnv Next substitution", () => {
+  const NEXT_KEYS = [...new Set(SRC.match(/NEXT_PUBLIC_[A-Z0-9_]+/g) ?? [])];
+
+  it("references at least one NEXT_PUBLIC_ key (guard is wired to something)", () => {
+    expect(NEXT_KEYS.length).toBeGreaterThan(0);
+  });
+
+  it.each(NEXT_KEYS)("reads %s as a literal process.env member expression", (key) => {
+    expect(SRC).toContain(`process.env.${key}`);
+  });
+
+  it("never returns process.env wholesale from the Next reader", () => {
+    // Scoped to the Next reader on purpose: readViteEnv legitimately returns
+    // process.env on the Node/Vitest path (that is how VITE_* reach the tests).
+    // The bug was the NEXT side doing it — `return process.env as EnvMap` there
+    // leaves the bundler nothing to substitute.
+    const start = SRC.indexOf("function readNextEnv");
+    expect(start).toBeGreaterThan(-1);
+    const nextReader = SRC.slice(start, SRC.indexOf("\nconst ", start));
+    expect(nextReader).not.toMatch(/return\s+process\.env\s*(?:as[^;]*)?;/);
+  });
+});

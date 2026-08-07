@@ -1,137 +1,222 @@
 // @vitest-environment jsdom
 /**
- * PublishTab — pre-publish readiness checks.
+ * PublishTab — pre-publish readiness.
  *
- * Companion to PublishTab.test.tsx (which covers SEO readiness text +
- * canonical publish wiring). This file covers the checks-computation logic:
- * the "pages" check now reads the real pages API, all 7 computed checks
- * render, plus honest coverage of the settings-driven checks that vary.
+ * REWRITTEN 2026-08-05. This file used to assert seven locally-computed checks
+ * ("SEO title set", "Meta description added", "Social share image", …) read off
+ * `composer.getProjectSettings()`. Those checks were never the product contract:
+ * the server's `runPrePublishChecks` returns a DIFFERENT six, with pass/warning/
+ * fail severity, and the local set never checked "Vercel connected" — the one
+ * condition that actually blocks a deploy. So the panel could read all-green and
+ * the publish still be hard-refused, and this test file was protecting that.
+ *
+ * These tests assert the server contract instead, and the last describe is a
+ * regression guard that the local heuristics never come back.
  *
  * @license BSD-3-Clause
  */
 
-import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import * as React from "react";
+import type { PrePublishChecksResult } from "@buildrik/shared/schemas/publish";
 import type { PublishTabProps } from "../PublishTab";
+
+const fetchPrePublishChecks = vi.fn();
+vi.mock("@/services/PublishService", () => ({
+  fetchPrePublishChecks: (siteId: string) => fetchPrePublishChecks(siteId),
+  // PublishHistory (rendered when projectId is set) reaches for these.
+  fetchPublishHistory: () => Promise.resolve([]),
+  rollbackToVersion: () => Promise.resolve(),
+}));
 
 vi.mock("@/editor/chrome-ui", async () => {
   const actual = await vi.importActual<Record<string, unknown>>("@/editor/chrome-ui");
-  return {
-    ...actual,
-    useToast: () => ({ addToast: vi.fn(), removeToast: vi.fn(), toasts: [] }),
-    ToastProvider: ({ children }: { children: React.ReactNode }) => children,
-  };
+  return { ...actual, useToast: () => ({ addToast: vi.fn(), removeToast: vi.fn(), toasts: [] }) };
 });
 
+import { ToastProvider } from "@/editor/chrome-ui";
 import { PublishTab } from "../PublishTab";
 
 type ComposerProp = PublishTabProps["composer"];
 
-/** Minimal composer exposing the surface PublishTab's checks read. */
-function composerWith(
-  seo: Record<string, unknown> = {},
-  extra: Record<string, unknown> = {}
-): ComposerProp {
+/** A composer whose settings WOULD have satisfied every old local heuristic —
+ *  so if any of them survived, the regression test below would see them. */
+function composerWith(emit = vi.fn()): ComposerProp {
   return {
-    getProjectSettings: () => ({ seo }),
+    emit,
+    getProjectSettings: () => ({
+      seo: {
+        siteName: "Bella Cucina",
+        favicon: "/favicon.ico",
+        metaTitle: "T",
+        metaDescription: "D",
+        defaultOgImage: "og.png",
+      },
+    }),
     elements: {
-      getActivePage: () => null,
-      getElement: () => null,
+      getAllPages: () => [{ id: "p1" }],
+      getActivePage: () => ({ root: { id: "r" } }),
+      getElement: () => ({ getChildCount: () => 3 }),
     },
-    ...extra,
   } as unknown as ComposerProp;
 }
 
-describe("PublishTab — pages check reflects the real page count", () => {
-  // FIXED §2-B2: the check now reads the real pages API
-  // (composer.elements.getAllPages), so an empty project reads "incomplete"
-  // instead of falsely green. The old code read a nonexistent `composer.pages`
-  // bag and fell through to `return true`.
-  it("renders 'At least 1 page' as incomplete when the project reports zero pages", () => {
-    const composer = composerWith({}, {
-      elements: { getAllPages: () => [], getActivePage: () => null, getElement: () => null },
-    });
-    render(<PublishTab composer={composer} />);
-    expect(screen.getByLabelText("At least 1 page: incomplete")).toBeTruthy();
+function result(over: Partial<PrePublishChecksResult> = {}): PrePublishChecksResult {
+  return {
+    ready: true,
+    checks: [
+      { label: "Vercel connected", status: "pass", detail: "This workspace is connected to Vercel." },
+      { label: "Pages ready", status: "pass", detail: "3 pages ready to publish." },
+      { label: "SEO configured", status: "warning", detail: "No meta title template set." },
+      { label: "Domain connected", status: "warning", detail: "No custom domain." },
+      { label: "Empty pages", status: "warning", detail: "1 page has no content blocks." },
+      { label: "Favicon", status: "warning", detail: "No favicon set." },
+    ],
+    ...over,
+  };
+}
+
+function renderTab(ui: React.ReactElement) {
+  return render(<ToastProvider>{ui}</ToastProvider>);
+}
+
+beforeEach(() => {
+  fetchPrePublishChecks.mockReset();
+});
+
+describe("PublishTab — renders the server's readiness contract", () => {
+  it("renders every row the server returned, and only those", async () => {
+    fetchPrePublishChecks.mockResolvedValue(result());
+    renderTab(<PublishTab composer={composerWith()} projectId="site_1" />);
+
+    await waitFor(() => expect(screen.getByText("Vercel connected")).toBeTruthy());
+    for (const label of ["Pages ready", "SEO configured", "Domain connected", "Empty pages", "Favicon"]) {
+      expect(screen.getByText(label)).toBeTruthy();
+    }
   });
 
-  it("renders 'At least 1 page' as complete once the project has pages", () => {
-    const composer = composerWith({}, {
-      elements: {
-        getAllPages: () => [{ id: "p1" }],
-        getActivePage: () => null,
-        getElement: () => null,
-      },
-    });
-    render(<PublishTab composer={composer} />);
-    expect(screen.getByLabelText("At least 1 page: complete")).toBeTruthy();
+  it("passes the site id straight through to the server call", async () => {
+    fetchPrePublishChecks.mockResolvedValue(result());
+    renderTab(<PublishTab composer={composerWith()} projectId="site_abc" />);
+    await waitFor(() => expect(fetchPrePublishChecks).toHaveBeenCalledWith("site_abc"));
   });
 
-  it("renders 'At least 1 page' as incomplete with no composer at all", () => {
-    render(<PublishTab composer={null} />);
-    expect(screen.getByLabelText("At least 1 page: incomplete")).toBeTruthy();
+  it("surfaces each non-passing row's server detail, not an invented hint", async () => {
+    fetchPrePublishChecks.mockResolvedValue(result());
+    renderTab(<PublishTab composer={composerWith()} projectId="site_1" />);
+    await waitFor(() => expect(screen.getByText("No custom domain.")).toBeTruthy());
+    expect(screen.getByText("1 page has no content blocks.")).toBeTruthy();
   });
 });
 
-describe("PublishTab — all 7 computed checks are rendered", () => {
-  // FIXED: the checks useMemo computes 7 booleans (hasContent, hasPageTitle,
-  // hasFavicon, hasPages, hasSeoTitle, hasMetaDesc, hasSocialImg) and the
-  // checklist now renders a row for every one — hasContent and hasSocialImg
-  // are no longer computed-then-dropped.
-  it("renders exactly 7 checklist rows", () => {
-    const { container } = render(<PublishTab composer={composerWith()} />);
-    // Every ChecklistItem carries aria-label `<label>: (in)complete`; both
-    // suffixes end in "complete". StatusBadge ends in "Published"/"Draft".
-    const rows = container.querySelectorAll('[aria-label$="complete"]');
-    expect(rows.length).toBe(7);
+describe("PublishTab — only a fail blocks the publish", () => {
+  it("keeps Publish enabled when every non-pass row is a warning", async () => {
+    fetchPrePublishChecks.mockResolvedValue(result({ ready: true }));
+    const { getByText } = renderTab(
+      <PublishTab composer={composerWith()} projectId="site_1" onVercelPublish={vi.fn()} />,
+    );
+    await waitFor(() => expect(screen.getByText("SEO configured")).toBeTruthy());
+    expect((getByText("Publish Site").closest("button") as HTMLButtonElement).disabled).toBe(false);
+    expect(screen.getByText(/4 warnings — none block/)).toBeTruthy();
   });
 
-  it("renders all 7 checklist labels, including the previously-dropped two", () => {
-    render(<PublishTab composer={composerWith()} />);
-    expect(screen.getByText("Page title set")).toBeTruthy();
-    expect(screen.getByText("Favicon uploaded")).toBeTruthy();
-    expect(screen.getByText("At least 1 page")).toBeTruthy();
-    expect(screen.getByText("SEO title set")).toBeTruthy();
-    expect(screen.getByText("Meta description added")).toBeTruthy();
-    // hasContent / hasSocialImg now each have a checklist row.
-    expect(screen.getByText("Page has content")).toBeTruthy();
-    expect(screen.getByText("Social share image")).toBeTruthy();
+  it("disables Publish when the server reports a blocking check", async () => {
+    const checks = result({ ready: false });
+    checks.checks[0] = {
+      label: "Vercel connected",
+      status: "fail",
+      detail: "Sites deploy to your own Vercel account. Connect it to publish.",
+    };
+    fetchPrePublishChecks.mockResolvedValue(checks);
+    const { getByText } = renderTab(
+      <PublishTab composer={composerWith()} projectId="site_1" onVercelPublish={vi.fn()} />,
+    );
+    await waitFor(() => expect(screen.getByText(/Blocked — Vercel connected/)).toBeTruthy());
+    expect((getByText("Publish Site").closest("button") as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it("does not fire the publish handler while blocked", async () => {
+    const checks = result({ ready: false });
+    checks.checks[1] = { label: "Pages ready", status: "fail", detail: "No pages found." };
+    fetchPrePublishChecks.mockResolvedValue(checks);
+    const onVercelPublish = vi.fn();
+    const { getByText } = renderTab(
+      <PublishTab composer={composerWith()} projectId="site_1" onVercelPublish={onVercelPublish} />,
+    );
+    await waitFor(() => expect(screen.getByText(/Blocked — Pages ready/)).toBeTruthy());
+    fireEvent.click(getByText("Publish Site"));
+    expect(onVercelPublish).not.toHaveBeenCalled();
   });
 });
 
-describe("PublishTab — settings-driven checks (honest)", () => {
-  it("Page title check reflects seo.siteName", () => {
-    const { rerender } = render(
-      <PublishTab composer={composerWith({ siteName: "My Site" })} />
-    );
-    expect(screen.getByLabelText("Page title set: complete")).toBeTruthy();
+describe("PublishTab — fix affordances match severity and ownership", () => {
+  it("sends the Vercel row to the dashboard integration, not an editor tab", async () => {
+    const checks = result({ ready: false });
+    checks.checks[0] = { label: "Vercel connected", status: "fail", detail: "Connect it to publish." };
+    fetchPrePublishChecks.mockResolvedValue(checks);
+    const emit = vi.fn();
+    renderTab(<PublishTab composer={composerWith(emit)} projectId="site_1" />);
 
-    rerender(<PublishTab composer={composerWith({ siteName: "   " })} />);
-    expect(screen.getByLabelText("Page title set: incomplete")).toBeTruthy();
+    const link = (await screen.findByText(/Connect Vercel/)) as HTMLAnchorElement;
+    expect(link.getAttribute("href")).toContain("/dashboard/settings/integrations");
+    expect(emit).not.toHaveBeenCalled();
   });
 
-  it("Favicon check reflects seo.favicon", () => {
-    const { rerender } = render(
-      <PublishTab composer={composerWith({ favicon: "/favicon.ico" })} />
-    );
-    expect(screen.getByLabelText("Favicon uploaded: complete")).toBeTruthy();
+  it("routes an in-editor warning to its owning tab", async () => {
+    fetchPrePublishChecks.mockResolvedValue(result());
+    const emit = vi.fn();
+    renderTab(<PublishTab composer={composerWith(emit)} projectId="site_1" />);
 
-    rerender(<PublishTab composer={composerWith({})} />);
-    expect(screen.getByLabelText("Favicon uploaded: incomplete")).toBeTruthy();
+    await waitFor(() => expect(screen.getByText("Empty pages")).toBeTruthy());
+    // "Empty pages" is fixed in the Pages tab.
+    const row = screen.getByLabelText(/^Empty pages: warning/);
+    fireEvent.click(row.querySelector("button") as HTMLElement);
+    expect(emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "pages" });
+  });
+});
+
+describe("PublishTab — a failed load never reads as passing (DF5)", () => {
+  it("shows Retry instead of a green checklist", async () => {
+    fetchPrePublishChecks.mockRejectedValue(new Error("network"));
+    const { container } = renderTab(<PublishTab composer={composerWith()} projectId="site_1" />);
+    await waitFor(() => expect(screen.getByText("Retry")).toBeTruthy());
+    expect(container.textContent).not.toContain("All checks pass");
+    expect(container.textContent).not.toContain("Vercel connected");
   });
 
-  it("SEO title + meta description checks reflect their settings", () => {
-    const { rerender } = render(
-      <PublishTab
-        composer={composerWith({ metaTitle: "Title", metaDescription: "Desc" })}
-      />
-    );
-    expect(screen.getByLabelText("SEO title set: complete")).toBeTruthy();
-    expect(screen.getByLabelText("Meta description added: complete")).toBeTruthy();
+  it("recovers when Retry succeeds", async () => {
+    fetchPrePublishChecks.mockRejectedValueOnce(new Error("network")).mockResolvedValue(result());
+    renderTab(<PublishTab composer={composerWith()} projectId="site_1" />);
+    fireEvent.click(await screen.findByText("Retry"));
+    await waitFor(() => expect(screen.getByText("Vercel connected")).toBeTruthy());
+  });
+});
 
-    rerender(<PublishTab composer={composerWith({})} />);
-    expect(screen.getByLabelText("SEO title set: incomplete")).toBeTruthy();
-    expect(screen.getByLabelText("Meta description added: incomplete")).toBeTruthy();
+describe("PublishTab — regression: the local heuristics stay dead", () => {
+  it("never renders a locally-computed check label, even with settings that would satisfy them", async () => {
+    fetchPrePublishChecks.mockResolvedValue(result());
+    const { container } = renderTab(<PublishTab composer={composerWith()} projectId="site_1" />);
+    await waitFor(() => expect(screen.getByText("Vercel connected")).toBeTruthy());
+
+    for (const dead of [
+      "Page title set",
+      "Favicon uploaded",
+      "At least 1 page",
+      "Page has content",
+      "SEO title set",
+      "Meta description added",
+      "Social share image",
+    ]) {
+      expect(container.textContent).not.toContain(dead);
+    }
+  });
+
+  it("does not call the server when there is no site id", async () => {
+    renderTab(<PublishTab composer={composerWith()} />);
+    await waitFor(() =>
+      expect(screen.getByText(/Open this site from the dashboard/)).toBeTruthy(),
+    );
+    expect(fetchPrePublishChecks).not.toHaveBeenCalled();
   });
 });

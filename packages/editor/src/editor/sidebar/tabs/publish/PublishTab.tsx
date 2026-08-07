@@ -9,11 +9,17 @@
  */
 
 import * as React from "react";
-import { CopyButton, PanelFrame, Button } from "@/editor/chrome-ui";
+import { CopyButton, PanelFrame, Button, Spinner } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import type { UsePublishJobResult } from "../../../shell/hooks/usePublishJob";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { PublishHistory } from "../../../shell/PublishHistory";
+import { fetchPrePublishChecks } from "../../../../services/PublishService";
+import { getSiteIdFromUrl } from "../../../../services/BuildrikSyncProvider";
+import {
+  VERCEL_CHECK_LABEL,
+  type PrePublishChecksResult,
+} from "@buildrik/shared/schemas/publish";
 // ============================================
 // Types
 // ============================================
@@ -24,9 +30,9 @@ export interface PublishTabProps {
   /** Project ID for publish operations */
   projectId?: string | null;
   /** Panel pin state */
-  isPinned?: boolean;
+  isExpanded?: boolean;
   /** Pin toggle callback */
-  onPinToggle?: () => void;
+  onExpandToggle?: () => void;
   /** Help button callback */
   onHelpClick?: () => void;
   /** Close panel callback */
@@ -71,47 +77,84 @@ const StatusBadge: React.FC<{ isPublished: boolean }> = ({ isPublished }) => (
   </span>
 );
 
-const ChecklistItem: React.FC<{
+type CheckStatus = PrePublishChecksResult["checks"][number]["status"];
+
+/**
+ * Where a non-passing check is fixed. Only `fail` rows block the publish, so a
+ * warning gets a quiet text link, never a solid button — the affordance has to
+ * match the severity or the panel implies the warning is blocking (Figma
+ * "Publish · pre-checks", founder decision 2026-08-05).
+ *
+ * Settings sub-sections are not addressable today: `ui:switch-tab` takes a tab
+ * id only (StudioPanels), so SEO / Domain / Favicon all land on Settings rather
+ * than their exact pane.
+ */
+const FIX_TARGETS: Record<string, { tab: string; label: string }> = {
+  "Pages ready": { tab: "pages", label: "Add a page" },
+  "SEO configured": { tab: "settings", label: "Fix" },
+  "Domain connected": { tab: "settings", label: "Fix" },
+  "Empty pages": { tab: "pages", label: "Fix" },
+  Favicon: { tab: "settings", label: "Fix" },
+};
+
+const STATUS_ICON: Record<CheckStatus, { dot: string; glyph: string; sr: string }> = {
+  pass: { dot: "tw:bg-[var(--bk-success)]", glyph: "✓", sr: "passed" },
+  warning: { dot: "tw:bg-[var(--bk-warning)]", glyph: "!", sr: "warning" },
+  fail: { dot: "tw:bg-[var(--bk-error)]", glyph: "✕", sr: "blocking" },
+};
+
+const CheckRow: React.FC<{
   label: string;
-  ok: boolean;
-  required?: boolean;
-  hint?: string;
-}> = ({ label, ok, required, hint }) => (
-  <div
-    className={[
-      "tw:flex tw:items-center tw:gap-2 tw:px-2 tw:py-1.5 tw:rounded-md tw:border tw:text-[13px]",
-      ok
-        ? "tw:bg-[var(--bk-success-tint)] tw:border-green-200"
-        : "tw:bg-transparent tw:border-gray-200",
-    ].join(" ")}
-    aria-label={`${label}: ${ok ? "complete" : "incomplete"}`}
-  >
-    {/* 16x16 checkbox — filled with success colour when checked */}
-    <span
-      className={[
-        "tw:size-4 tw:rounded-sm tw:flex tw:items-center tw:justify-center tw:flex-none",
-        "tw:[transition:var(--bk-transition-fast)]",
-        ok ? "tw:bg-[var(--bk-success)] tw:border-0" : "tw:bg-transparent tw:border tw:border-gray-200",
-      ].join(" ")}
-      aria-hidden="true"
+  status: CheckStatus;
+  detail: string;
+  onFix?: () => void;
+  fixLabel?: string;
+  fixHref?: string;
+}> = ({ label, status, detail, onFix, fixLabel, fixHref }) => {
+  const icon = STATUS_ICON[status];
+  return (
+    <div
+      className="tw:flex tw:items-start tw:gap-2 tw:px-2 tw:py-1.5 tw:text-[13px]"
+      aria-label={`${label}: ${icon.sr}. ${detail}`}
     >
-      {ok && (
-        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M2 5l2.5 2.5L8 2.5" />
-        </svg>
+      <span
+        className={`tw:size-4 tw:mt-0.5 tw:rounded-full tw:flex tw:items-center tw:justify-center tw:flex-none tw:text-[10px] tw:font-bold tw:text-white ${icon.dot}`}
+        aria-hidden="true"
+      >
+        {icon.glyph}
+      </span>
+      <span className="tw:flex tw:flex-col tw:flex-1 tw:min-w-0">
+        <span className="tw:text-[13px] tw:text-[var(--bk-ink-soft)]">{label}</span>
+        {status !== "pass" && (
+          <span className="tw:text-[11px] tw:text-gray-500 tw:leading-snug">{detail}</span>
+        )}
+      </span>
+      {status !== "pass" && fixHref && (
+        <a
+          href={fixHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`tw:flex-none tw:text-[11px] tw:no-underline ${status === "fail" ? "tw:font-semibold" : ""} tw:text-[var(--bk-accent)]`}
+        >
+          {fixLabel} ›
+        </a>
       )}
-    </span>
-    <span
-      className={`tw:flex-1 tw:text-[13px] ${ok ? "tw:text-gray-500 tw:line-through" : "tw:text-[var(--bk-ink-soft)] tw:no-underline"}`}
-    >
-      {label}
-    </span>
-    {required && !ok && (
-      <span className="tw:text-xs tw:font-medium tw:text-[var(--bk-error)]">Required</span>
-    )}
-    {hint && !ok && <span className="tw:text-xs tw:text-gray-500">{hint}</span>}
-  </div>
-);
+      {status !== "pass" && !fixHref && onFix && (
+        /* chrome-ui Button, not a native <button> — Gate 24 keeps native
+           elements inside chrome-ui. Stripped to a text link so a non-blocking
+           warning never wears a solid-button affordance. */
+        <Button
+          color="light"
+          size="xs"
+          onClick={onFix}
+          className={`tw:flex-none tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[11px] tw:text-[var(--bk-accent)] ${status === "fail" ? "tw:font-semibold" : ""}`}
+        >
+          {fixLabel} ›
+        </Button>
+      )}
+    </div>
+  );
+};
 
 const UrlDisplay: React.FC<{ url: string }> = ({ url }) => (
   <div className="tw:flex tw:flex-col">
@@ -138,10 +181,10 @@ const UrlDisplay: React.FC<{ url: string }> = ({ url }) => (
 // ============================================
 
 export const PublishTab: React.FC<PublishTabProps> = ({
-  composer: _composer,
+  composer,
   projectId = null,
-  isPinned,
-  onPinToggle,
+  isExpanded,
+  onExpandToggle,
   onHelpClick,
   onClose,
   publishJob,
@@ -170,71 +213,66 @@ export const PublishTab: React.FC<PublishTabProps> = ({
     await onVercelPublish();
   };
 
-  const checks = React.useMemo(() => {
-    const hasContent = (() => {
-      try {
-        const page = _composer?.elements?.getActivePage?.();
-        if (!page) return false;
-        const root = _composer?.elements?.getElement?.(page.root?.id);
-        return (root?.getChildCount?.() ?? 0) > 0;
-      } catch { return false; }
-    })();
-    // Page title: check project settings seo.siteName
-    const hasPageTitle = (() => {
-      try {
-        const settings = _composer?.getProjectSettings?.();
-        const title = settings?.seo?.siteName;
-        return typeof title === "string" && title.trim().length > 0;
-      } catch { return false; }
-    })();
-    // Favicon: check project settings seo.favicon
-    const hasFavicon = (() => {
-      try {
-        const settings = _composer?.getProjectSettings?.();
-        const favicon = settings?.seo?.favicon;
-        return typeof favicon === "string" && favicon.trim().length > 0;
-      } catch { return false; }
-    })();
-    // At least 1 page — read the real pages API (pages live under
-    // composer.elements, NOT a `composer.pages` bag). When the API is
-    // unavailable we can't verify, so this required check stays incomplete
-    // rather than falsely green.
-    const hasPages = (() => {
-      try {
-        const pages = _composer?.elements?.getAllPages?.();
-        return Array.isArray(pages) && pages.length > 0;
-      } catch { return false; }
-    })();
-    const hasSeoTitle = (() => {
-      try {
-        const settings = _composer?.getProjectSettings?.();
-        const title = settings?.seo?.metaTitle;
-        return typeof title === "string" && title.trim().length > 0;
-      } catch { return false; }
-    })();
-    const hasMetaDesc = (() => {
-      try {
-        const settings = _composer?.getProjectSettings?.();
-        const desc = settings?.seo?.metaDescription;
-        return typeof desc === "string" && desc.trim().length > 0;
-      } catch { return false; }
-    })();
-    const hasSocialImg = (() => {
-      try {
-        const settings = _composer?.getProjectSettings?.();
-        const img = settings?.seo?.defaultOgImage;
-        return typeof img === "string" && img.trim().length > 0;
-      } catch { return false; }
-    })();
-    return { hasContent, hasPageTitle, hasFavicon, hasPages, hasSeoTitle, hasMetaDesc, hasSocialImg };
-  }, [_composer]);
+  // The `projectId` prop is not threaded in unified-editor mode (AquibraStudio
+  // never sets it), so resolve the site the same way the canonical publish path
+  // does — from the URL. Without this the panel silently had no site: readiness
+  // never loaded and the publish-history section below never rendered.
+  const siteId = React.useMemo(() => projectId ?? getSiteIdFromUrl(), [projectId]);
+
+  // Readiness comes from the server (`runPrePublishChecks`), never from a local
+  // approximation. See fetchPrePublishChecks for why: the old local set was a
+  // different seven checks with no severity and no Vercel check, so the panel
+  // could read all-green while the server hard-refused the publish.
+  const [checkState, setCheckState] = React.useState<"loading" | "ready" | "error">("loading");
+  const [checks, setChecks] = React.useState<PrePublishChecksResult | null>(null);
+
+  const loadChecks = React.useCallback(async () => {
+    if (!siteId) {
+      setCheckState("ready");
+      setChecks(null);
+      return;
+    }
+    setCheckState("loading");
+    try {
+      setChecks(await fetchPrePublishChecks(siteId));
+      setCheckState("ready");
+    } catch {
+      // DF5: never fall back to a fake-passing checklist — show Retry.
+      setChecks(null);
+      setCheckState("error");
+    }
+  }, [siteId]);
+
+  React.useEffect(() => {
+    void loadChecks();
+  }, [loadChecks]);
+
+  // Re-read after a publish settles: publishing can change what the checks
+  // report (a first deploy resolves the Vercel row), and a stale checklist is
+  // the exact failure this panel is being fixed for.
+  const uiState = publishJob?.uiState;
+  React.useEffect(() => {
+    if (uiState === "published" || uiState === "failed") void loadChecks();
+  }, [uiState, loadChecks]);
+
+  const blocking = React.useMemo(
+    () => (checks?.checks ?? []).filter((c) => c.status === "fail"),
+    [checks],
+  );
+  const warnings = React.useMemo(
+    () => (checks?.checks ?? []).filter((c) => c.status === "warning"),
+    [checks],
+  );
+  // Only a `fail` blocks. When the checks could not be loaded we do NOT invent a
+  // block — the server gate is still authoritative and refuses on its own.
+  const blockedByChecks = checkState === "ready" && !!checks && !checks.ready;
 
   return (
     <PanelFrame>
       <PanelFrame.Header
         title="Publish"
-        isPinned={isPinned}
-        onPinToggle={onPinToggle}
+        isExpanded={isExpanded}
+        onExpandToggle={onExpandToggle}
         onHelpClick={onHelpClick}
         onClose={onClose}
       />
@@ -257,22 +295,68 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           </section>
         )}
 
-        {/* Pre-Publish Checklist */}
-        <section className={SECTION}>
+        {/* Pre-publish readiness — the server's contract, rendered verbatim */}
+        <section className={SECTION} aria-label="Pre-publish readiness">
           <h3 className={SECTION_TITLE}>Pre-publish checklist</h3>
-          <div className="tw:flex tw:flex-col tw:gap-2">
-            <ChecklistItem label="Page title set" ok={checks.hasPageTitle} hint="Settings → Site" />
-            <ChecklistItem label="Favicon uploaded" ok={checks.hasFavicon} hint="Settings → Site" />
-            <ChecklistItem label="At least 1 page" ok={checks.hasPages} required />
-            <ChecklistItem label="Page has content" ok={checks.hasContent} hint="Add sections" />
-            <ChecklistItem label="SEO title set" ok={checks.hasSeoTitle} hint="Pages → SEO" />
-            <ChecklistItem label="Meta description added" ok={checks.hasMetaDesc} hint="Pages → SEO" />
-            <ChecklistItem label="Social share image" ok={checks.hasSocialImg} hint="Pages → SEO" />
-          </div>
-          {projectId && (
-            <p className={`${META} tw:mt-1`}>
-              Publishing to <strong className="tw:text-gray-900">your connected Vercel project</strong>
-            </p>
+
+          {checkState === "loading" && (
+            <div className="tw:flex tw:items-center tw:gap-2 tw:px-2 tw:py-3 tw:text-xs tw:text-gray-500">
+              <Spinner size="sm" aria-label="Checking readiness" />
+              Checking readiness…
+            </div>
+          )}
+
+          {checkState === "error" && (
+            <div className="tw:flex tw:items-center tw:justify-between tw:gap-2 tw:px-2 tw:py-2 tw:text-xs tw:text-[var(--bk-ink-soft)]">
+              <span>Couldn&apos;t load the readiness checks.</span>
+              <Button color="light" size="xs" onClick={() => void loadChecks()}>
+                Retry
+              </Button>
+            </div>
+          )}
+
+          {checkState === "ready" && checks && (
+            <>
+              <div className="tw:flex tw:flex-col">
+                {checks.checks.map((c) => {
+                  const isVercel = c.label === VERCEL_CHECK_LABEL;
+                  const target = FIX_TARGETS[c.label];
+                  return (
+                    <CheckRow
+                      key={c.label}
+                      label={c.label}
+                      status={c.status}
+                      detail={c.detail}
+                      // The Vercel connection is a workspace-level integration,
+                      // so its fix lives in the dashboard, not in an editor tab.
+                      fixHref={isVercel ? `${DASHBOARD_URL}/dashboard/settings/integrations` : undefined}
+                      fixLabel={isVercel ? "Connect Vercel" : target?.label}
+                      onFix={
+                        !isVercel && target
+                          ? () => composer?.emit("ui:switch-tab", { tab: target.tab })
+                          : undefined
+                      }
+                    />
+                  );
+                })}
+              </div>
+              <p
+                className={`tw:m-0 tw:mt-1 tw:px-2 tw:text-[11px] tw:leading-snug ${
+                  blockedByChecks ? "tw:text-[var(--bk-error)]" : "tw:text-gray-500"
+                }`}
+                role={blockedByChecks ? "alert" : undefined}
+              >
+                {blockedByChecks
+                  ? `Blocked — ${blocking.map((c) => c.label).join(", ")}. Fix to publish.`
+                  : warnings.length > 0
+                    ? `${warnings.length} warning${warnings.length > 1 ? "s" : ""} — none block. Client approval is a separate gate.`
+                    : "All checks pass."}
+              </p>
+            </>
+          )}
+
+          {checkState === "ready" && !checks && (
+            <p className={META}>Open this site from the dashboard to see readiness checks.</p>
           )}
         </section>
 
@@ -294,11 +378,20 @@ export const PublishTab: React.FC<PublishTabProps> = ({
             <>
               <Button
                 onClick={handlePublish}
-                disabled={isPublishing}
+                // A blocking check means the server WILL refuse this publish
+                // (runPrePublishChecks → ready:false). Disabling here is the
+                // point of the fix: the panel must not offer a publish that
+                // cannot succeed.
+                disabled={isPublishing || blockedByChecks}
                 className="tw:w-full"
               >
                 {isPublishing ? (isPublished ? "Updating..." : "Publishing...") : isPublished ? "Update Site" : "Publish Site"}
               </Button>
+              {blockedByChecks && !isPublishing && (
+                <p className="tw:m-0 tw:text-[11px] tw:text-[var(--bk-error)] tw:leading-[1.4]">
+                  {blocking.map((c) => c.detail).join(" ")}
+                </p>
+              )}
               {isPublishing && (
                 <p className="tw:m-0 tw:text-[11px] tw:text-gray-500 tw:leading-[1.4]">
                   {isPublished ? "Update" : "Publishing"} in progress — please wait.
@@ -316,7 +409,9 @@ export const PublishTab: React.FC<PublishTabProps> = ({
             <p className="tw:mt-1 tw:mb-0 tw:text-xs tw:leading-normal tw:text-[var(--bk-ink-soft)]">
               {isPublished
                 ? "Changes made after publishing require an update to go live."
-                : "Complete the checklist above, then hit Publish to make your site public."}
+                : blockedByChecks
+                  ? "Clear the blocking check above, then hit Publish to make your site public."
+                  : "Warnings above don't block. Hit Publish to make your site public."}
             </p>
           </div>
         </section>
@@ -351,9 +446,9 @@ export const PublishTab: React.FC<PublishTabProps> = ({
         )}
 
         {/* P1: published-version history + rollback (contract §5) */}
-        {projectId && (
+        {siteId && (
           <section className={SECTION}>
-            <PublishHistory siteId={projectId} onRollbackStarted={() => publishJob?.reset?.()} />
+            <PublishHistory siteId={siteId} onRollbackStarted={() => publishJob?.reset?.()} />
           </section>
         )}
       </div>

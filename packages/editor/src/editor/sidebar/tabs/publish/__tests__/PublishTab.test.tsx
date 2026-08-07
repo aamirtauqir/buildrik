@@ -45,11 +45,16 @@ function makeJob(over: Partial<UsePublishJobResult> = {}): UsePublishJobResult {
   };
 }
 
-describe("PublishTab SEO readiness", () => {
-  it("shows SEO checks as true when settings are present", () => {
+describe("PublishTab readiness source", () => {
+  // Was "shows SEO checks as true when settings are present", asserting the
+  // locally-computed "SEO title set" / "Meta description added" rows. Those were
+  // never the server's contract (runPrePublishChecks returns a different six with
+  // severity) and are gone. Readiness coverage now lives in
+  // PublishTab.checks.test.tsx against the real endpoint shape.
+  it("asks the user to open the site from the dashboard when there is no site id", () => {
     const { container } = renderTab(<PublishTab composer={composer} />);
-    expect(container.textContent).toContain("SEO title set");
-    expect(container.textContent).toContain("Meta description added");
+    expect(container.textContent).toContain("Open this site from the dashboard");
+    expect(container.textContent).not.toContain("SEO title set");
   });
 });
 

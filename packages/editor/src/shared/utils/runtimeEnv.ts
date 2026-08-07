@@ -27,15 +27,36 @@ function readViteEnv(): EnvMap {
   }
 }
 
-function readProcessEnv(): EnvMap {
-  if (typeof process !== "undefined" && process.env) {
-    return process.env as EnvMap;
+function readNextEnv(): EnvMap {
+  // Next/Turbopack resolves NEXT_PUBLIC_* by STATIC TEXT REPLACEMENT of the
+  // exact expression `process.env.NEXT_PUBLIC_FOO`. Reading through an alias
+  // (`const p = process.env; p[key]`) leaves nothing to replace — the same trap
+  // documented above for `import.meta.env`, and this file fell into it on the
+  // Next side too. Worse: in the unified-editor browser bundle there is no
+  // `process` object at all (`typeof process === "undefined"`), so the aliased
+  // read was not merely unreplaced, it was unreachable. Every NEXT_PUBLIC_* read
+  // as undefined and every feature flag was permanently false in the shipping
+  // path, with VITE_FEATURE_PUBLISH=true set and looking correct in dev.
+  //
+  // So each key MUST appear literally, exactly once, below.
+  try {
+    return {
+      NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+      NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
+      NEXT_PUBLIC_FEATURE_PUBLISH: process.env.NEXT_PUBLIC_FEATURE_PUBLISH,
+      NEXT_PUBLIC_FEATURE_COMPONENTS_V2: process.env.NEXT_PUBLIC_FEATURE_COMPONENTS_V2,
+      NEXT_PUBLIC_FEATURE_DS_AI: process.env.NEXT_PUBLIC_FEATURE_DS_AI,
+      NEXT_PUBLIC_FEATURE_COLLAB: process.env.NEXT_PUBLIC_FEATURE_COLLAB,
+      NODE_ENV: process.env.NODE_ENV,
+    };
+  } catch {
+    // No `process` binding and no replacement performed — treat as unset.
+    return {};
   }
-  return {};
 }
 
 const vite = readViteEnv();
-const proc = readProcessEnv();
+const proc = readNextEnv();
 
 function pick(viteKey: string, nextKey: string, fallback: string): string {
   return vite[viteKey] ?? proc[nextKey] ?? fallback;

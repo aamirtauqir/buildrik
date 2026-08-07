@@ -17,6 +17,7 @@ import { EVENTS } from "../../shared/constants";
 import type { ComposerConfig, ProjectData, BlockData } from "../../shared/types";
 import { ToastProvider, UpgradeModal, useToast, StudioSkeleton, Button } from "@/editor/chrome-ui";
 import { StaleApprovalModal } from "./modals/StaleApprovalModal";
+import { PublishConfirmModal } from "./modals/PublishConfirmModal";
 import { PreviewOverlay } from "./PreviewOverlay";
 import { migrateStorageKeys, migrateAqbKeys } from "../../shared/utils/storageMigration";
 import type { CanvasRef } from "../canvas/Canvas";
@@ -331,6 +332,20 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     setExportLoading: modals.setExportLoading,
   });
 
+  // Publishing replaces the live site for every visitor, and the only gate that
+  // existed (StaleApprovalModal) fires *after* the server rejects a stale
+  // approval — so the common path shipped with no stop at all. Both publish
+  // entry points (topbar dropdown + sidebar Publish panel) are routed through
+  // one confirm here rather than each growing its own.
+  const [publishConfirmOpen, setPublishConfirmOpen] = React.useState(false);
+  const requestPublish = React.useCallback(async () => {
+    setPublishConfirmOpen(true);
+  }, []);
+  const confirmPublish = React.useCallback(async () => {
+    setPublishConfirmOpen(false);
+    await handleVercelPublish();
+  }, [handleVercelPublish]);
+
   // T5 (topbar plan D10/eng D11): the 2s outcome flash behind the topbar's
   // "✓ Published" transient. Display state only — toasts stay owned by
   // useExportHandlers, announcements by StudioHeader.
@@ -402,7 +417,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           onOpenShortcuts={modals.toggleShortcuts}
           onSave={saveProject}
           onExportHTML={handleExportHTML}
-          onVercelPublish={handleVercelPublish}
+          onVercelPublish={requestPublish}
           publishLoading={publishJob.uiState === "publishing"}
           publishedUrl={publishJob.publishedUrl}
           publishOutcome={publishOutcome}
@@ -458,7 +473,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         canvasRef={canvasRef}
         composerContainerRef={composerContainerRef}
         publishJob={publishJob}
-        onVercelPublish={handleVercelPublish}
+        onVercelPublish={requestPublish}
       />
 
       {/* P3: Issues panel — opened by the topbar issue pill */}
@@ -611,6 +626,18 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         composer={composer}
         onClose={publishJob.dismissBlock}
         onPublishAnyway={handlePublishAcknowledged}
+      />
+
+      {/* Confirm before an irreversible deploy. Runs BEFORE the publish call, so
+          the stale-approval gate above still fires afterwards if the server
+          rejects — the two are sequential, not alternatives. */}
+      <PublishConfirmModal
+        isOpen={publishConfirmOpen}
+        composer={composer}
+        isPublished={publishJob.uiState === "published" || !!publishJob.publishedUrl}
+        publishedUrl={publishJob.publishedUrl}
+        onConfirm={confirmPublish}
+        onClose={() => setPublishConfirmOpen(false)}
       />
     </div>
   );

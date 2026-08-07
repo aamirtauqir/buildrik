@@ -9,6 +9,7 @@
 
 import { createBuildrikApiClient } from "./api-client";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
+import type { PrePublishChecksResult } from "@buildrik/shared/schemas/publish";
 
 let _client: ReturnType<typeof createBuildrikApiClient> | null = null;
 function getClient() {
@@ -137,4 +138,21 @@ export async function fetchPublishHistory(siteId: string): Promise<PublishHistor
  */
 export async function rollbackToVersion(siteId: string, jobId: string): Promise<void> {
   await getClient().sites.rollback.mutate({ siteId, jobId });
+}
+
+/**
+ * The server's pre-publish readiness contract (`runPrePublishChecks`).
+ *
+ * The panel MUST render this and not a local approximation. Until 2026-08-05 the
+ * sidebar computed seven of its own heuristics off `composer.getProjectSettings()`
+ * — a different set from the server's six, with no warning-vs-fail distinction,
+ * and it never checked "Vercel connected" at all. That is the one check that
+ * actually blocks a deploy, so an all-green sidebar could be followed by a hard
+ * server refusal. Only `status: "fail"` blocks; `ready === !hasFail`.
+ *
+ * THROWS on a fetch error so the panel shows "couldn't load · Retry" rather than
+ * a fake-passing checklist (DF5) — same rule as fetchPublishHistory.
+ */
+export async function fetchPrePublishChecks(siteId: string): Promise<PrePublishChecksResult> {
+  return getClient().sites.prePublishChecks.query({ siteId });
 }
