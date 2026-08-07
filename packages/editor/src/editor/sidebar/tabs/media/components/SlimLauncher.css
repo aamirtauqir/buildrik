@@ -8,7 +8,11 @@
    flex column + height:100% + bg automatically — bespoke wrapper CSS
    removed 2026-05-24 in header-pattern migration. */
 .sl-launcher {
-  /* Empty — TabFrame owns layout; class kept for descendant rules. */
+  /* PanelFrame is flex-col but carries no height, so the grid's flex-1
+     never grew and the footer sat under the last row instead of at the
+     panel foot (boards 144:2/145:347 pin it bottom). PanelFrame is frozen
+     for the arc — the height lives here, scoped. */
+  height: 100%;
 }
 /* .sl-header / .sl-title / .sl-header-actions / .sl-icon-btn rules
    deleted 2026-05-24 — replaced by TabFrame.Header which uses

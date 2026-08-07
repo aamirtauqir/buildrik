@@ -472,10 +472,20 @@ item.source+author), infinite scroll handing to an explicit Load more
 after 3 auto-loads (caption law), "Loading 8 more…" line. Both overlays
 use the drill-in pattern from pass 3 (absolute inset, own header,
 Esc stopPropagation).
-ALL 5 Media drill-ins DONE. STILL OPEN (Media): bulk-select 145:300 +
-folder-scoped 145:49 eye passes, S3.6 editing/optimizing, footer Icons
-3rd link (founder call pending — the link is now the icon drill-in's
-only entry). Dirty-dot (140:21, 8px orange on Home)
+ALL 5 Media drill-ins DONE. bulk-select 145:300 eye-verified live
+(right-click entry → card checkboxes + ink bar "N selected · Move to… ·
+Delete · Done") — and it exposed a REAL layout bug: PanelFrame is
+flex-col with NO height, so SlimLauncher's flex-1 grid never grew and
+the footer/bulk-bar sat under the last row instead of the panel foot.
+PanelFrame is frozen (10+ consumers) — the fix is scoped:
+.sl-launcher{height:100%}. Every earlier "footer" screenshot showed the
+links floating mid-panel; nobody had eye-checked against the boards'
+BOTTOM-pinned footer. folder-scoped 145:49: dropdown mechanism verified
+in code (Popover + folder menu + All fallback); a live eye pass needs
+folders, which only the fullpage manager can create — demo-data
+limitation, noted. STILL OPEN (Media): S3.6 editing/optimizing screens,
+footer Icons 3rd link (founder call — the link is now the icon
+drill-in's only entry). Dirty-dot (140:21, 8px orange on Home)
 NOT shipped — no per-page unsaved-state source in the model yet.
 
 ## NOT in scope
