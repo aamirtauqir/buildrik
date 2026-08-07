@@ -4,9 +4,9 @@
   "page": "1:3",
   "generatedAt": "2026-08-07",
   "counts": {
-    "total": 375,
+    "total": 380,
     "active": 327,
-    "designAhead": 25,
+    "designAhead": 30,
     "outOfScope": 23,
     "activeFamilies": 33
   },
@@ -4169,6 +4169,61 @@
       "width": 0,
       "height": 0,
       "status": "out-of-scope",
+      "authority": "undecided",
+      "recipe": null
+    },
+    {
+      "nodeId": "1156:4593",
+      "name": "[design-ahead] S6.5d · scheduled-publish · invalid-date",
+      "family": "S6 flows",
+      "state": "scheduled-publish · invalid-date",
+      "width": 440,
+      "height": 548,
+      "status": "design-ahead",
+      "authority": "undecided",
+      "recipe": null
+    },
+    {
+      "nodeId": "1156:4620",
+      "name": "[design-ahead] History · Backups · empty",
+      "family": "History",
+      "state": "Backups · empty",
+      "width": 360,
+      "height": 776,
+      "status": "design-ahead",
+      "authority": "undecided",
+      "recipe": null
+    },
+    {
+      "nodeId": "1156:4665",
+      "name": "[design-ahead] History · Backups · restore-failed",
+      "family": "History",
+      "state": "Backups · restore-failed",
+      "width": 440,
+      "height": 169,
+      "status": "design-ahead",
+      "authority": "undecided",
+      "recipe": null
+    },
+    {
+      "nodeId": "1157:4593",
+      "name": "[design-ahead] Preview · performance audit · all-clear",
+      "family": "Preview",
+      "state": "performance audit · all-clear",
+      "width": 480,
+      "height": 340,
+      "status": "design-ahead",
+      "authority": "undecided",
+      "recipe": null
+    },
+    {
+      "nodeId": "1157:4649",
+      "name": "[design-ahead] S7.1 · site-health-monitor · healthy",
+      "family": "S7 flows",
+      "state": "site-health · healthy",
+      "width": 800,
+      "height": 480,
+      "status": "design-ahead",
       "authority": "undecided",
       "recipe": null
     }
