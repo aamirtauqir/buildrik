@@ -398,7 +398,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
 
         {/* Canvas Area — main editing surface */}
         <LayoutShell.Canvas>
-          <PageTabBar composer={composer} />
           <div style={styles.canvasPattern} />
           <div ref={composerContainerRef} style={styles.canvasContent}>
             <Canvas
@@ -437,6 +436,9 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
               </div>
             )}
           </div>
+          {/* Board 435:2348: the tab bar sits at the canvas FOOT — the
+              context menu opens upward from it. */}
+          <PageTabBar composer={composer} />
         </LayoutShell.Canvas>
 
         {/* Right Inspector — element properties */}

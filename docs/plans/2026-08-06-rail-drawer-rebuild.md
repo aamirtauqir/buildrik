@@ -353,10 +353,28 @@ click selects the remainder / clears all. Folder-child PageRows now
 receive isSelected/onToggleSelect (they had NO selection wiring before —
 folder members could never join a bulk selection). Live-verified via
 drag-into-folder script; mixed state covered by unit test (needs ≥2
-members). STILL OPEN: 435:2348 PageTabBar delta pass (board spec in hand:
-tab bar states, rename validation trio, context menu, delete confirm,
-undo toast — code exists at PageTabBar.tsx), S3.7 SEO/Social/Advanced
-settings screens (3 × 1440). Dirty-dot (140:21, 8px orange on Home)
+members).
+435:2348 PageTabBar DONE 2026-08-07, eye-verified against the board:
+bar MOVED to the canvas FOOT (was mounted first child of
+LayoutShell.Canvas — board title literally says "bar sits at the canvas
+foot"), + button pulled adjacent to the tabs (TABS lost flex-1), ⌂ text
+glyph replaces the 🏠 emoji (ink-soft active / ink-muted resting), dirty
+dot + valid-rename border → --bk-blue-500 per the board (not the 700
+accent), add-btn gray-400 dashed with 14px +. Context menu: emojis
+dropped, "Set as home"/"Delete" copy, 160w menu now real CSS classes in
+shell/chrome.css (.bd-ptb-menu/-item) because flowbite Button's theme
+(h-10, justify-center, font-medium) beat tw: overrides — same fix the
+Layers menu proved. Rename validation trio: popover PORTALED (the
+tablist's overflow-x-auto clips vertical overflow — it never showed at
+all at the foot) and opens ABOVE the input via measured rect;
+warning/valid border needed focus-variant classes too (flowbite's
+focus:border overrode the static border while focused — error only
+survived via aria-invalid). ConfirmDialog copy → board ("This page and
+everything on it is removed…", "Delete page"). Live-verify traps: global
+[role=tab] matches the 6 RAIL buttons before page tabs (scope to the
+tablist), and playwright dispatchEvent("contextmenu", {clientX}) builds
+a plain Event — coords lost, NaN left/top — use a real right-click.
+STILL OPEN: S3.7 SEO/Social/Advanced settings screens (3 × 1440). Dirty-dot (140:21, 8px orange on Home)
 NOT shipped — no per-page unsaved-state source in the model yet.
 
 ## NOT in scope

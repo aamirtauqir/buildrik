@@ -211,7 +211,7 @@ describe("PageTabBar", () => {
       fireEvent.click(screen.getByRole("menuitem", { name: /Delete/ }));
       expect(elements.deletePage).not.toHaveBeenCalled(); // not before confirm
       expect(screen.getByText('Delete "About"?')).toBeInTheDocument();
-      fireEvent.click(screen.getByRole("button", { name: "Delete Page" }));
+      fireEvent.click(screen.getByRole("button", { name: "Delete page" }));
       expect(elements.deletePage).toHaveBeenCalledWith("p-2");
       expect(screen.queryByRole("tab", { name: "About" })).toBeNull();
     });
@@ -228,11 +228,11 @@ describe("PageTabBar", () => {
   });
 
   // ── set-home ───────────────────────────────────────────────────────────────
-  it("'Set as Home' calls composer.elements.setHomePage", () => {
+  it("'Set as home' calls composer.elements.setHomePage", () => {
     const { composer, elements } = makeComposer(TWO_PAGES);
     renderBar(composer);
     fireEvent.contextMenu(screen.getByRole("tab", { name: "About" }));
-    fireEvent.click(screen.getByRole("menuitem", { name: /Set as Home/ }));
+    fireEvent.click(screen.getByRole("menuitem", { name: /Set as home/ }));
     expect(elements.setHomePage).toHaveBeenCalledWith("p-2");
   });
 
@@ -258,7 +258,7 @@ describe("PageTabBar", () => {
       renderBar(composer);
       fireEvent.contextMenu(screen.getByRole("tab", { name: "About" }));
       fireEvent.click(screen.getByRole("menuitem", { name: /Delete/ }));
-      fireEvent.click(screen.getByRole("button", { name: "Delete Page" }));
+      fireEvent.click(screen.getByRole("button", { name: "Delete page" }));
     }
 
     it("the delete toast exposes an Undo action that restores via history.undo", () => {

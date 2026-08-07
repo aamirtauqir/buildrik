@@ -42,3 +42,35 @@
 .bdc-btn.bdc-icon { padding: 6px; }
 .bdc-btn.bdc-primary { background: var(--bk-accent); color: var(--bk-accent-on); }
 .bdc-btn.bdc-primary:hover { background: var(--bk-accent-hover); }
+
+/* PageTabBar context menu — board 435:2403. Real CSS rules, not tw: utilities,
+   because flowbite Button's theme (h-10, justify-center, font-medium) must be
+   overridden reliably — the same pattern the Layers menu proved. */
+.bd-ptb-menu {
+  position: fixed;
+  z-index: 10000;
+  width: 160px;
+  padding: var(--bk-space-4) 0;
+  background: var(--bk-bg-card);
+  border: 1px solid var(--bk-border);
+  border-radius: var(--bk-radius-lg);
+  box-shadow: var(--bk-shadow-overlay);
+  font: 400 13px/18px var(--bk-font-ui);
+}
+.bd-ptb-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  height: auto;
+  padding: var(--bk-space-8) var(--bk-space-12);
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--bk-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.bd-ptb-menu-item:hover { background: var(--bk-bg-subtle); }
+.bd-ptb-menu-item.danger { color: var(--bk-error); }

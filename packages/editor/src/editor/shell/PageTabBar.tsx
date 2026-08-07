@@ -38,7 +38,20 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
   const [deleteConfirmPageId, setDeleteConfirmPageId] = React.useState<string | null>(null);
   const [dirtyPages, setDirtyPages] = React.useState<Set<string>>(new Set());
   const ctxMenuRef = React.useRef<HTMLDivElement>(null);
+  const renameWrapRef = React.useRef<HTMLSpanElement>(null);
+  const [renameRect, setRenameRect] = React.useState<{ left: number; top: number } | null>(null);
   const { addToast } = useToast();
+
+  // The validation popover is portaled (the tablist clips overflow), so it
+  // needs the input's viewport position — measured once per edit session.
+  React.useLayoutEffect(() => {
+    if (!editingPageId) {
+      setRenameRect(null);
+      return;
+    }
+    const r = renameWrapRef.current?.getBoundingClientRect();
+    setRenameRect(r ? { left: r.left, top: r.top } : null);
+  }, [editingPageId]);
 
   const nameValidation = React.useMemo<{
     error?: string;
@@ -239,9 +252,16 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
               }}
               className={`${TAB} ${page.id === activePageId ? TAB_ACTIVE : TAB_RESTING}`}
             >
-              {page.isHome && <span className="tw:text-xs">🏠</span>}
+              {page.isHome && (
+                <span
+                  className={`tw:text-[12px] tw:font-medium ${page.id === activePageId ? "tw:text-[var(--bk-ink-soft)]" : "tw:text-[var(--bk-ink-muted)]"}`}
+                  aria-hidden="true"
+                >
+                  {"\u2302"}
+                </span>
+              )}
               {editingPageId === page.id ? (
-                <span className="tw:relative">
+                <span className="tw:relative" ref={renameWrapRef}>
                   <TextInput
                     type="text"
                     value={editName}
@@ -262,34 +282,45 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
                     aria-invalid={!!nameValidation.error}
                     className={`${RENAME_INPUT} ${
                       nameValidation.error
-                        ? "tw:[&_input]:border-[var(--bk-error)]"
+                        ? "tw:[&_input]:border-[var(--bk-error)] tw:[&_input]:focus:border-[var(--bk-error)]"
                         : nameValidation.warning
-                          ? "tw:[&_input]:border-[var(--bk-warning)]"
-                          : "tw:[&_input]:border-blue-700"
+                          ? "tw:[&_input]:border-[var(--bk-warning)] tw:[&_input]:focus:border-[var(--bk-warning)]"
+                          : "tw:[&_input]:border-[var(--bk-blue-500)] tw:[&_input]:focus:border-[var(--bk-blue-500)]"
                     }`}
                     onClick={(e) => e.stopPropagation()}
                   />
-                  <span
-                    id="ptb-rename-feedback"
-                    role={nameValidation.error ? "alert" : undefined}
-                    className={RENAME_FEEDBACK}
-                  >
-                    {nameValidation.error && (
-                      <span className="tw:block tw:text-[var(--bk-error)]">
-                        {nameValidation.error}
+                  {/* Board 435:2385 popover — portaled because the tablist's
+                      overflow-x-auto clips vertical overflow, and it opens
+                      ABOVE the input since the bar sits at the canvas foot. */}
+                  {renameRect && (
+                    <Portal>
+                      <span
+                        id="ptb-rename-feedback"
+                        role={nameValidation.error ? "alert" : undefined}
+                        className={RENAME_FEEDBACK}
+                        style={{
+                          left: renameRect.left,
+                          bottom: window.innerHeight - renameRect.top + 2,
+                        }}
+                      >
+                        {nameValidation.error && (
+                          <span className="tw:block tw:font-medium tw:text-[var(--bk-error)]">
+                            {nameValidation.error}
+                          </span>
+                        )}
+                        {nameValidation.warning && (
+                          <span className="tw:block tw:font-medium tw:text-[var(--bk-warning)]">
+                            {nameValidation.warning}
+                          </span>
+                        )}
+                        {nameValidation.slug && (
+                          <span className="tw:block tw:text-[var(--bk-ink-muted)]">
+                            /{nameValidation.slug}
+                          </span>
+                        )}
                       </span>
-                    )}
-                    {nameValidation.warning && (
-                      <span className="tw:block tw:text-[var(--bk-warning)]">
-                        {nameValidation.warning}
-                      </span>
-                    )}
-                    {nameValidation.slug && (
-                      <span className="tw:block tw:text-gray-500">
-                        /{nameValidation.slug}
-                      </span>
-                    )}
-                  </span>
+                    </Portal>
+                  )}
                 </span>
               ) : (
                 <span className={TAB_NAME}>{page.name}</span>
@@ -315,7 +346,7 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
         <Portal>
           <div
             ref={ctxMenuRef}
-            className={CTX_MENU}
+            className="bd-ptb-menu"
             style={{ left: contextMenu.x, top: contextMenu.y }}
             role="menu"
             aria-label={`Options for ${pages.find((p) => p.id === contextMenu.pageId)?.name ?? "page"}`}
@@ -338,33 +369,33 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
             }}
           >
             <Button
-              className={MENU_ITEM}
+              className="bd-ptb-menu-item"
               role="menuitem"
               onClick={() => handleRename(contextMenu.pageId)}
             >
-              ✏️ Rename
+              Rename
             </Button>
             <Button
-              className={MENU_ITEM}
+              className="bd-ptb-menu-item"
               role="menuitem"
               onClick={() => handleDuplicate(contextMenu.pageId)}
             >
-              📋 Duplicate
+              Duplicate
             </Button>
             <Button
-              className={MENU_ITEM}
+              className="bd-ptb-menu-item"
               role="menuitem"
               onClick={() => handleSetHome(contextMenu.pageId)}
             >
-              🏠 Set as Home
+              Set as home
             </Button>
             {pages.length > 1 && (
               <Button
-                className={`${MENU_ITEM} tw:text-[var(--bk-error)]`}
+                className="bd-ptb-menu-item danger"
                 role="menuitem"
                 onClick={() => handleDeleteRequest(contextMenu.pageId)}
               >
-                🗑️ Delete
+                Delete
               </Button>
             )}
           </div>
@@ -376,8 +407,8 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
         onClose={() => setDeleteConfirmPageId(null)}
         onConfirm={confirmDelete}
         title={`Delete "${pages.find((p) => p.id === deleteConfirmPageId)?.name}"?`}
-        message="All content on this page will be permanently removed. You can undo immediately after."
-        confirmLabel="Delete Page"
+        message="This page and everything on it is removed. You can undo this from the toast that follows."
+        confirmLabel="Delete page"
         destructive
       />
     </div>
@@ -392,9 +423,9 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
  *  proud of it. Both were bg-card before, which left the active page marked
  *  only by a 500 weight and a 5%-alpha shadow — invisible in practice.
  *  Figma board B9.7 is the record. */
-const BAR = "tw:relative tw:border-b tw:border-gray-200 tw:bg-[var(--bk-bg-app)]";
-const ROW = "tw:flex tw:items-center tw:gap-1 tw:px-2 tw:py-1";
-const TABS = "tw:flex tw:flex-1 tw:items-center tw:gap-0.5 tw:overflow-x-auto";
+const BAR = "tw:relative tw:border-y tw:border-gray-200 tw:bg-[var(--bk-bg-app)]";
+const ROW = "tw:flex tw:items-center tw:gap-2 tw:px-2 tw:py-1";
+const TABS = "tw:flex tw:min-w-0 tw:items-center tw:gap-0.5 tw:overflow-x-auto";
 const TAB =
   "tw:flex tw:items-center tw:gap-1 tw:px-3 tw:py-1.5 tw:whitespace-nowrap tw:cursor-pointer " +
   "tw:rounded-t-md tw:rounded-b-none tw:text-[13px]";
@@ -404,19 +435,14 @@ const TAB_ACTIVE =
   "tw:[box-shadow:var(--bk-shadow-raised)]";
 /** inline-block is required for overflow+ellipsis to trigger on a span. */
 const TAB_NAME = "tw:inline-block tw:max-w-30 tw:overflow-hidden tw:text-ellipsis tw:align-middle";
-const DIRTY_DOT = "tw:size-1.5 tw:flex-none tw:rounded-full tw:bg-blue-700";
-const RENAME_INPUT = "tw:w-25 tw:[&_input]:px-1 tw:[&_input]:py-0.5 tw:[&_input]:text-[13px] tw:[&_input]:rounded-[3px]";
+const DIRTY_DOT = "tw:size-1.5 tw:flex-none tw:rounded-full tw:bg-[var(--bk-blue-500)]";
+const RENAME_INPUT = "tw:w-25 tw:[&_input]:px-1 tw:[&_input]:py-0.5 tw:[&_input]:text-[13px] tw:[&_input]:rounded";
 const ADD_BTN =
-  "tw:flex tw:items-center tw:justify-center tw:size-6 tw:ml-1 tw:p-0 tw:rounded tw:text-base " +
-  "tw:border tw:border-dashed tw:border-gray-200 tw:bg-transparent tw:text-gray-500 tw:hover:bg-gray-100";
+  "tw:flex tw:items-center tw:justify-center tw:size-6 tw:ml-1 tw:p-0 tw:rounded tw:text-sm tw:font-medium " +
+  "tw:border tw:border-dashed tw:border-gray-400 tw:bg-transparent tw:text-[var(--bk-ink-muted)] tw:hover:bg-gray-100";
 const RENAME_FEEDBACK =
-  "tw:absolute tw:top-full tw:left-0 tw:z-100 tw:mt-0.5 tw:px-2 tw:py-1 tw:whitespace-nowrap " +
-  "tw:rounded tw:border tw:border-gray-200 tw:bg-white tw:text-xs tw:leading-snug";
-const MENU_ITEM =
-  "tw:flex tw:w-full tw:items-center tw:gap-2 tw:px-3 tw:py-2 tw:rounded tw:border-0 " +
-  "tw:bg-transparent tw:text-left tw:text-[13px] tw:text-gray-900 tw:hover:bg-gray-100";
-const CTX_MENU =
-  "tw:fixed tw:z-[10000] tw:min-w-35 tw:p-1 tw:rounded-md tw:border tw:border-gray-200 " +
-  "tw:bg-white tw:[box-shadow:var(--bk-shadow-drag)]";
+  "tw:fixed tw:z-[10000] tw:px-2 tw:py-1 tw:whitespace-nowrap " +
+  "tw:rounded tw:border tw:border-gray-200 tw:bg-white tw:text-xs tw:leading-snug " +
+  "tw:[box-shadow:var(--bk-shadow-drag)]";
 
 export default PageTabBar;
