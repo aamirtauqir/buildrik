@@ -3646,7 +3646,7 @@
     },
     {
       "nodeId": "1138:13394",
-      "name": "Components · empty [copy-proposed]",
+      "name": "Components · empty",
       "family": "Components",
       "state": "empty",
       "width": 320,
@@ -3657,7 +3657,7 @@
     },
     {
       "nodeId": "1138:13413",
-      "name": "Templates · empty [copy-proposed]",
+      "name": "Templates · empty",
       "family": "Templates",
       "state": "empty",
       "width": 320,
