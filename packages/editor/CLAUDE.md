@@ -24,8 +24,9 @@ Demo app: `demo/main.tsx` on port 5050.
 
 Full-UI rebuild in progress: every editor surface rebuilt to Figma
 `g4GzQFqzNYz5sosz1QtZXC` page `1:3`. Checklist = `scripts/conformance/boards.json`
-(288 active boards / 33 families). Plan + review record:
-`docs/plans/2026-08-06-editor-figma-rebuild.md`.
+(300 active boards / 33 families as of 2026-08-07). The 2026-08-06 plan doc was
+removed on founder order 2026-08-07 (superseded by
+`docs/plans/2026-08-07-editor-figma-completion.md`; recovery: git history).
 
 **Precedence (founder, final):** behaviour → the CODE contract (Zod schemas,
 service returns — proof: the 8-row pre-checks board was corrected TO the code).
