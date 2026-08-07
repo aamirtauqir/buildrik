@@ -4,6 +4,8 @@ function buildMockState() {
   return {
     libraryItems: [] as LibraryItem[],
     activeType: "all" as const,
+    activeTypes: new Set<import("../../data/mediaTypes").MediaBucket>(),
+    toggleType: vi.fn(),
     counts: { all: 0, img: 0, vid: 0, ico: 0, fnt: 0 },
     storage: { used: 0, total: 5_000_000_000 },
     selectionContext: null as { elementId: string; label?: string } | null,

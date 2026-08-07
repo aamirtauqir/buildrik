@@ -20,6 +20,8 @@ export type { StockPhoto, StockVideo, DiscIcon, DiscFont };
 
 export type MediaSource = "mine" | "disc";
 export type MediaTypeFilter = "all" | "img" | "vid" | "ico" | "fnt";
+/** One selectable pill — the board's multi-select filter has no "all" member. */
+export type MediaBucket = Exclude<MediaTypeFilter, "all">;
 
 export interface MediaFolder {
   id: string;
@@ -44,6 +46,8 @@ export interface TypeCounts {
 export interface LibraryItem {
   key: string;
   name: string;
+  /** Label with the file extension restored — board 144:2 draws full filenames. */
+  displayName?: string;
   type: "img" | "vid" | "ico" | "fnt";
   src: string;
   thumb?: string;
@@ -121,12 +125,14 @@ export interface LibraryStateResult {
   gridN: 2 | 3 | 4;
   fmtFilter: string;
   activeType: MediaTypeFilter;
+  activeTypes: ReadonlySet<MediaBucket>;
   librarySearch: string;
   setLibrarySearch(q: string): void;
   setSort(by: MediaSortBy, dir: SortDirection): void;
   setGridN(n: 2 | 3 | 4): void;
   setFmtFilter(f: string): void;
   setActiveType(t: MediaTypeFilter): void;
+  toggleType(t: MediaBucket): void;
   renameItem(key: string, name: string): Promise<void>;
   renameFolder(id: string, name: string): Promise<void>;
   updateItem(key: string, updates: Partial<LibraryItem>): Promise<void>;
@@ -196,7 +202,9 @@ export interface MediaStateResult {
   retryLibraryLoad(): void;
   // Navigation
   activeType: MediaTypeFilter;
+  activeTypes: ReadonlySet<MediaBucket>;
   setType(t: MediaTypeFilter): void;
+  toggleType(t: MediaBucket): void;
   currentFolderId: string | null;
   setCurrentFolderId(id: string | null): void;
 

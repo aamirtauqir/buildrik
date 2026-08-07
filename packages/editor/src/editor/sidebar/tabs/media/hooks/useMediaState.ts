@@ -309,6 +309,7 @@ export function useMediaState(composer: Composer): MediaStateResult {
   return {
     // Navigation
     activeType: library.activeType,
+    activeTypes: library.activeTypes,
     currentFolderId: library.currentFolderId,
     setCurrentFolderId: library.setCurrentFolderId,
 
@@ -333,6 +334,7 @@ export function useMediaState(composer: Composer): MediaStateResult {
     setGridN: library.setGridN,
     setFmtFilter: library.setFmtFilter,
     setType: library.setActiveType,
+    toggleType: library.toggleType,
     toggleSelMode: selection.toggleSelMode,
     toggleSelect: selection.toggleSelect,
     selectAll: selection.selectAll,

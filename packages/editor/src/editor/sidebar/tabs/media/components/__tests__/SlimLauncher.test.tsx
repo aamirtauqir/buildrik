@@ -15,7 +15,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { SlimLauncher } from "../SlimLauncher";
 import { mockComposer } from "../../__tests__/test-utils/mockComposer";
-import type { LibraryItem, MediaTypeFilter } from "../../data/mediaTypes";
+import type { LibraryItem, MediaBucket } from "../../data/mediaTypes";
 
 const baseItem: Omit<LibraryItem, "key" | "name" | "type" | "src" | "thumb"> = {
   size: 1024,
@@ -36,14 +36,15 @@ const makeItem = (overrides: Partial<LibraryItem>): LibraryItem => ({
 const baseProps = () => ({
   composer: mockComposer(),
   libraryItems: [] as LibraryItem[],
-  activeType: "all" as const,
+  activeTypes: new Set() as ReadonlySet<import("../../data/mediaTypes").MediaBucket>,
+  onToggleType: vi.fn(),
   counts: { all: 0, img: 0, vid: 0, ico: 0, fnt: 0 },
   searchQuery: "",
   storage: { used: 0, total: 5_000_000_000 },
   uploadQueue: [],
   usageMap: new Map<string, number>(),
   onInsert: vi.fn(),
-  onTypeChange: vi.fn(),
+
   onSearchChange: vi.fn(),
   onUpload: vi.fn(),
   onOpenStock: vi.fn(),
@@ -91,32 +92,50 @@ describe("SlimLauncher — §10 default 320px experience", () => {
     expect(container.querySelector(".med-upload-zone")).toBeInTheDocument();
   });
 
-  it("renders empty state when no assets", () => {
+  it("renders the board empty state — muted line + Upload / Browse stock links", () => {
     render(<SlimLauncher {...baseProps()} />);
-    expect(screen.getByText(/Your library is empty/i)).toBeInTheDocument();
+    expect(screen.getByText("No images or files yet.")).toBeInTheDocument();
+    expect(screen.getByTestId("media-empty-upload")).toBeInTheDocument();
+    expect(screen.getByTestId("media-empty-cta")).toHaveTextContent("Browse stock");
   });
 
-  it("filters grid by type pill click", async () => {
+  // Board 145:2 caption: the pills are a MULTI-select filter — a second pill
+  // widens the result instead of replacing it, and empty selection = all.
+  it("type pills multi-select: one pill narrows, a second widens, deselect-all restores", async () => {
     function Harness() {
-      const [type, setType] = React.useState<MediaTypeFilter>("all");
+      const [types, setTypes] = React.useState<ReadonlySet<MediaBucket>>(new Set());
       const items = [
         makeItem({ key: "a", name: "a.jpg", type: "img", src: "x", thumb: "x" }),
         makeItem({ key: "b", name: "b.mp4", type: "vid", src: "y", thumb: "y" }),
+        makeItem({ key: "c", name: "c.svg", type: "ico", src: "z", thumb: "z" }),
       ];
       return (
         <SlimLauncher
           {...baseProps()}
           libraryItems={items}
-          activeType={type}
-          onTypeChange={setType}
+          activeTypes={types}
+          onToggleType={(t) =>
+            setTypes((prev) => {
+              const next = new Set(prev);
+              if (next.has(t)) next.delete(t);
+              else next.add(t);
+              return next;
+            })
+          }
         />
       );
     }
     const user = userEvent.setup();
     const { container } = render(<Harness />);
-    await user.click(screen.getByRole("tab", { name: /^Video/i }));
-    const cells = container.querySelectorAll(".med-asset-cell");
-    expect(cells.length).toBe(1);
+    const cells = () => container.querySelectorAll(".med-asset-cell").length;
+    expect(cells()).toBe(3);
+    await user.click(screen.getByRole("button", { name: /^Video/i }));
+    expect(cells()).toBe(1);
+    await user.click(screen.getByRole("button", { name: /^Images/i }));
+    expect(cells()).toBe(2);
+    await user.click(screen.getByRole("button", { name: /^Video/i }));
+    await user.click(screen.getByRole("button", { name: /^Images/i }));
+    expect(cells()).toBe(3);
   });
 
   it("opens stock modal from the footer Stock link", async () => {

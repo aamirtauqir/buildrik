@@ -283,7 +283,7 @@ function MediaTabWithComposer({
       <SlimLauncher
         composer={composer}
         libraryItems={state.libraryItems}
-        activeType={state.activeType}
+        activeTypes={state.activeTypes}
         counts={state.counts}
         searchQuery={state.librarySearch}
         storage={state.storage}
@@ -291,8 +291,9 @@ function MediaTabWithComposer({
         usageMap={state.usageMap}
         appliedAssetKey={undefined}
         onInsert={state.insertToCanvas}
-        onTypeChange={state.setType}
+        onToggleType={state.toggleType}
         onSearchChange={(q) => state.setLibrarySearch(q)}
+        onExpand={() => state.setPanelExpanded(true)}
         onUpload={state.upload}
         onRetryUpload={state.retryUpload}
         loading={state.libraryLoading}
@@ -354,10 +355,10 @@ function MediaTabWithComposer({
       {/* 1. Header bar — type pills + stock button + close */}
       <div className="med-tabs-wrap" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: ROW_LG }}>
         <TypePills
-          activeType={state.activeType}
+          selectedTypes={state.activeTypes}
           counts={state.counts}
           discMode={false}
-          onTypeChange={state.setType}
+          onToggle={state.toggleType}
         />
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

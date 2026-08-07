@@ -148,7 +148,7 @@ export function AssetCell({
           </span>
         ) : null}
         <span className="med-asset-cell__name tw:min-w-0 tw:flex-1 tw:truncate tw:text-left tw:text-[12px] tw:leading-[18px] tw:text-gray-900">
-          {item.name}
+          {item.displayName ?? item.name}
         </span>
         {usageCount > 0 ? <UsagePips count={usageCount} /> : null}
       </span>

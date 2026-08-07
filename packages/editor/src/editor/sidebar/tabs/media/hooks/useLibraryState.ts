@@ -9,7 +9,7 @@ import type { Composer } from "../../../../../engine/Composer";
 import { MEDIA_EVENTS } from "../../../../../shared/constants/media";
 import { STORAGE_KEYS } from "../../../../../shared/constants/storageKeys";
 import type { MediaSortBy, SortDirection } from "../../../../../shared/types/media";
-import type { LibraryItem, LibraryStateResult, MediaTypeFilter } from "../data/mediaTypes";
+import type { LibraryItem, LibraryStateResult, MediaBucket, MediaTypeFilter } from "../data/mediaTypes";
 import {
   countByType,
   filterByFmt,
@@ -42,9 +42,16 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
     const v = localStorage.getItem(STORAGE_KEYS.MEDIA_GRID_N);
     return v === "2" ? 2 : v === "4" ? 4 : 3;
   });
-  const [activeType, setActiveType_] = useState<MediaTypeFilter>(
-    () => (localStorage.getItem(STORAGE_KEYS.MEDIA_ACTIVE_TYPE) as MediaTypeFilter | null) ?? "all"
-  );
+  // Board 145:2 caption: "Type pills are a multi-select filter" — the Set is
+  // the SSOT; empty = everything. The old single-value key migrates once.
+  const [activeTypes, setActiveTypes_] = useState<ReadonlySet<MediaBucket>>(() => {
+    const csv = localStorage.getItem(STORAGE_KEYS.MEDIA_ACTIVE_TYPES);
+    if (csv != null) return new Set(csv.split(",").filter(Boolean) as MediaBucket[]);
+    const old = localStorage.getItem(STORAGE_KEYS.MEDIA_ACTIVE_TYPE) as MediaTypeFilter | null;
+    return old && old !== "all" ? new Set([old]) : new Set();
+  });
+  /** Single-type view for the fullpage manager's per-type sections. */
+  const activeType: MediaTypeFilter = activeTypes.size === 1 ? [...activeTypes][0] : "all";
   const [fmtFilter, setFmtFilter_] = useState("");
   const [librarySearch, setLibrarySearch_] = useState("");
 
@@ -112,7 +119,9 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
       (i) => folderByAssetId.get(i.key) === currentFolderId,
     );
 
-    const byType = filterByType(inFolder, activeType);
+    const byType = activeTypes.size
+      ? inFolder.filter((i) => activeTypes.has(i.type as MediaBucket))
+      : inFolder;
     const byFmt = filterByFmt(byType, fmtFilter);
     const bySearch = filterBySearch(byFmt, librarySearch);
     return [...bySearch].sort((a, b) => {
@@ -133,7 +142,7 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
     allLibraryItems,
     folderByAssetId,
     currentFolderId,
-    activeType,
+    activeTypes,
     fmtFilter,
     librarySearch,
     sort,
@@ -163,10 +172,25 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
 
   const setFmtFilter = useCallback((f: string) => setFmtFilter_(f), []);
 
+  const persistTypes = (s: ReadonlySet<MediaBucket>) =>
+    localStorage.setItem(STORAGE_KEYS.MEDIA_ACTIVE_TYPES, [...s].join(","));
+
   const setActiveType = useCallback((t: MediaTypeFilter) => {
-    setActiveType_(t);
+    const next: Set<MediaBucket> = t === "all" ? new Set() : new Set([t]);
+    setActiveTypes_(next);
     setFmtFilter_("");
-    localStorage.setItem(STORAGE_KEYS.MEDIA_ACTIVE_TYPE, t);
+    persistTypes(next);
+  }, []);
+
+  const toggleType = useCallback((t: MediaBucket) => {
+    setActiveTypes_((prev) => {
+      const next = new Set(prev);
+      if (next.has(t)) next.delete(t);
+      else next.add(t);
+      persistTypes(next);
+      return next;
+    });
+    setFmtFilter_("");
   }, []);
 
   const setLibrarySearch = useCallback((q: string) => setLibrarySearch_(q), []);
@@ -275,12 +299,14 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
     gridN,
     fmtFilter,
     activeType,
+    activeTypes,
     librarySearch,
     setLibrarySearch,
     setSort,
     setGridN,
     setFmtFilter,
     setActiveType,
+    toggleType,
     renameItem,
     renameFolder,
     updateItem,

@@ -102,7 +102,28 @@ describe("useLibraryState — filters", () => {
     expect(result.current.fmtFilter).toBe("png");
     act(() => result.current.setActiveType("img"));
     expect(result.current.fmtFilter).toBe("");
-    expect(localStorage.getItem(STORAGE_KEYS.MEDIA_ACTIVE_TYPE)).toBe("img");
+    expect(localStorage.getItem(STORAGE_KEYS.MEDIA_ACTIVE_TYPES)).toBe("img");
+  });
+
+  // Board 145:2 caption: multi-select filter. toggleType accumulates and
+  // persists the set; deselecting the last member restores "everything".
+  it("toggleType multi-selects, persists the csv, and empty set means all", () => {
+    const composer = makeComposer([
+      asset({ id: "i1" }),
+      asset({ id: "v1", mimeType: "video/mp4" }),
+    ]);
+    const { result } = renderHook(() => useLibraryState(composer));
+    act(() => result.current.toggleType("img"));
+    act(() => result.current.toggleType("vid"));
+    expect(result.current.activeTypes.has("img")).toBe(true);
+    expect(result.current.activeTypes.has("vid")).toBe(true);
+    expect(localStorage.getItem(STORAGE_KEYS.MEDIA_ACTIVE_TYPES)).toBe("img,vid");
+    expect(result.current.activeType).toBe("all");
+    act(() => result.current.toggleType("img"));
+    expect(result.current.activeType).toBe("vid");
+    act(() => result.current.toggleType("vid"));
+    expect(result.current.activeTypes.size).toBe(0);
+    expect(result.current.libraryItems.length).toBe(2);
   });
 
   it("filters by MIME format substring", () => {

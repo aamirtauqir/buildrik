@@ -23,9 +23,9 @@
 
 import * as React from "react";
 import { PanelFrame, Button, IconButton, Menu, MenuItem, Popover, SkeletonBlock, TextField } from "@/editor/chrome-ui";
-import { Search, Upload, Cloud, Shapes, Folder, ChevronDown, LayoutGrid, Rows3, ArrowUpDown } from "lucide-react";
+import { Upload, Cloud, Shapes, Folder, ChevronDown, LayoutGrid, Rows3, ArrowUpDown } from "lucide-react";
 import type { Composer } from "@/engine/Composer";
-import type { LibraryItem, MediaFolder, MediaTypeFilter, TypeCounts, UploadProgress } from "../data/mediaTypes";
+import type { LibraryItem, MediaBucket, MediaFolder, TypeCounts, UploadProgress } from "../data/mediaTypes";
 import { TypePills } from "./TypePills";
 import { SelectionContextBar } from "./SelectionContextBar";
 import { AssetCell } from "./AssetCell";
@@ -35,7 +35,7 @@ import "./SlimLauncher.css";
 interface SlimLauncherProps {
   composer: Composer;
   libraryItems: LibraryItem[];
-  activeType: MediaTypeFilter;
+  activeTypes: ReadonlySet<MediaBucket>;
   counts: TypeCounts;
   searchQuery: string;
   storage: { used: number; total: number };
@@ -43,8 +43,10 @@ interface SlimLauncherProps {
   usageMap: Map<string, number>;
   appliedAssetKey?: string;
   onInsert(key: string): void;
-  onTypeChange(type: MediaTypeFilter): void;
+  onToggleType(type: MediaBucket): void;
   onSearchChange(query: string): void;
+  /** Header expand brackets — 320 ↔ 700, same as every other drawer. */
+  onExpand?(): void;
   onUpload(files: File[]): void;
   /** Storage has not been read yet — draw the skeleton, not the empty state. */
   loading?: boolean;
@@ -99,10 +101,10 @@ interface SlimLauncherProps {
 
 export function SlimLauncher(props: SlimLauncherProps) {
   const {
-    activeType,
+    activeTypes,
     counts,
     searchQuery,
-    onTypeChange,
+    onToggleType,
     onSearchChange,
     onOpenStock,
     onClose,
@@ -123,13 +125,13 @@ export function SlimLauncher(props: SlimLauncherProps) {
   // Filter items by activeType + search query
   const filtered = React.useMemo(() => {
     let result = props.libraryItems;
-    if (activeType !== "all") result = result.filter((i) => i.type === activeType);
+    if (activeTypes.size) result = result.filter((i) => activeTypes.has(i.type as MediaBucket));
     if (searchQuery.trim()) {
       const q = searchQuery.trim().toLowerCase();
       result = result.filter((i) => i.name.toLowerCase().includes(q));
     }
     return result;
-  }, [props.libraryItems, activeType, searchQuery]);
+  }, [props.libraryItems, activeTypes, searchQuery]);
 
   return (
     <PanelFrame className="sl-launcher" data-testid="media-panel">
@@ -139,25 +141,19 @@ export function SlimLauncher(props: SlimLauncherProps) {
           onCancel={onCancelSelection ?? (() => {})}
         />
       ) : null}
-      <PanelFrame.Header title="Media" onClose={onClose} />
+      <PanelFrame.Header title="Media" onClose={onClose} onExpandToggle={props.onExpand} />
 
       {/* Search — board `144:7`: 28h field inset 16, on bg-subtle. */}
+      {/* Board 144:7/144:8 — bare 28h box, no magnifier, no inline clear. */}
       <div className="sl-search tw:flex tw:h-9 tw:items-center tw:px-4" data-testid="media-search">
-        <span className="tw:relative tw:flex tw:w-full tw:items-center">
-          <Search
-            size={14}
-            className="sl-search__icon tw:pointer-events-none tw:absolute tw:left-2.5 tw:text-gray-500"
-            aria-hidden="true"
-          />
-          <TextField
-            type="text"
-            className="sl-search__input tw:h-7 tw:w-full tw:rounded-md tw:border-0 tw:bg-gray-100 tw:pl-8 tw:text-[13px] tw:text-gray-900 tw:placeholder:text-gray-500"
-            placeholder="Search"
-            value={searchQuery}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => onSearchChange(e.target.value)}
-            aria-label="Search library"
-          />
-        </span>
+        <TextField
+          type="text"
+          className="sl-search__input tw:h-7 tw:w-full tw:rounded-md tw:border tw:border-gray-200 tw:bg-gray-50 tw:px-2 tw:text-[13px] tw:text-gray-900 tw:placeholder:text-gray-500"
+          placeholder="Search"
+          value={searchQuery}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => onSearchChange(e.target.value)}
+          aria-label="Search library"
+        />
       </div>
 
       {/*
@@ -217,23 +213,25 @@ export function SlimLauncher(props: SlimLauncherProps) {
           </Menu>
         </Popover>
         <span className="tw:flex-1" />
-        <span className="tw:flex tw:items-center tw:gap-1 tw:text-gray-600" data-testid="media-view-controls">
-          <IconButton label="Grid view" size="sm" pressed disabled>
-            <LayoutGrid size={14} />
+        {/* Board 144:12 draws a bare glyph cluster — no button boxes. Still
+            disabled controls, not decoration (T12 lights them up). */}
+        <span className="tw:flex tw:items-center tw:gap-2 tw:text-[var(--bk-ink-soft)]" data-testid="media-view-controls">
+          <IconButton label="Grid view" size="sm" pressed disabled className="tw:border-0 tw:bg-transparent tw:aria-pressed:bg-transparent tw:aria-pressed:text-[var(--bk-ink)]">
+            <LayoutGrid size={13} />
           </IconButton>
-          <IconButton label="List view" size="sm" disabled>
-            <Rows3 size={14} />
+          <IconButton label="List view" size="sm" disabled className="tw:border-0 tw:bg-transparent">
+            <Rows3 size={13} />
           </IconButton>
-          <IconButton label="Sort" size="sm" disabled>
-            <ArrowUpDown size={14} />
+          <IconButton label="Sort" size="sm" disabled className="tw:border-0 tw:bg-transparent">
+            <ArrowUpDown size={13} />
           </IconButton>
         </span>
       </div>
 
       <TypePills
-        activeType={activeType}
+        selectedTypes={activeTypes}
         counts={counts}
-        onTypeChange={onTypeChange}
+        onToggle={onToggleType}
       />
 
       <div className="sl-grid-wrap tw:min-h-0 tw:flex-1 tw:overflow-y-auto" data-testid="media-grid-wrap">
@@ -293,20 +291,32 @@ export function SlimLauncher(props: SlimLauncherProps) {
           </div>
         ) : filtered.length === 0 ? (
           props.libraryItems.length === 0 ? (
-            <div className="sl-empty tw:px-4 tw:py-6" data-testid="media-empty">
-              <p className="sl-empty__title tw:text-[13px] tw:text-gray-900">Your library is empty</p>
-              <p className="sl-empty__body tw:mt-1 tw:text-[12px] tw:text-gray-600">
-                Upload your brand assets or browse free stock.
+            /* Board 145:406: one muted line, then Upload / Browse stock as
+               accent text links — no filled CTA. */
+            <div className="sl-empty tw:px-4 tw:pt-11 tw:text-center tw:text-[13px] tw:leading-5" data-testid="media-empty">
+              <p className="tw:text-[var(--bk-ink-muted)]">No images or files yet.</p>
+              <p className="tw:mt-2.5 tw:flex tw:justify-center tw:gap-10">
+                <Button
+                  type="button"
+                  color="light"
+                  size="xs"
+                  className="tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+                  data-testid="media-empty-upload"
+                  onClick={() => uploadInputRef.current?.click()}
+                >
+                  Upload
+                </Button>
+                <Button
+                  type="button"
+                  color="light"
+                  size="xs"
+                  className="tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+                  data-testid="media-empty-cta"
+                  onClick={onOpenStock}
+                >
+                  Browse stock
+                </Button>
               </p>
-              <Button
-                type="button"
-                size="xs"
-                className="sl-empty__cta tw:mt-3"
-                data-testid="media-empty-cta"
-                onClick={onOpenStock}
-              >
-                Browse stock
-              </Button>
             </div>
           ) : (
             <div className="sl-empty tw:px-4 tw:py-6" data-testid="media-no-results">

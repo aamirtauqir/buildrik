@@ -96,14 +96,14 @@ function mediaDrawer(over: Partial<React.ComponentProps<typeof SlimLauncher>> = 
     <SlimLauncher
       composer={null as unknown as React.ComponentProps<typeof SlimLauncher>["composer"]}
       libraryItems={MEDIA_ITEMS}
-      activeType="all"
+      activeTypes={new Set()}
       counts={MEDIA_COUNTS}
       searchQuery=""
       storage={{ used: 42 * 1024 * 1024, total: 500 * 1024 * 1024 }}
       uploadQueue={[]}
       usageMap={new Map([["a1", 3]])}
       onInsert={() => {}}
-      onTypeChange={() => {}}
+      onToggleType={() => {}}
       onSearchChange={() => {}}
       onUpload={() => {}}
       onRetryUpload={() => {}}

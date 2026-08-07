@@ -414,10 +414,10 @@ export function ExpandedMediaPanel({
             onNavigate={setCurrentFolderId}
           />
           <TypePills
-            activeType={state.activeType}
+            selectedTypes={state.activeTypes}
             counts={state.counts}
             discMode={false}
-            onTypeChange={state.setType}
+            onToggle={state.toggleType}
           />
           {currentFolderId !== null &&
           state.libraryItems.length === 0 &&

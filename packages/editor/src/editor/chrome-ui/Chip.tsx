@@ -20,7 +20,7 @@ import React from "react";
 export interface ChipProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "type"> {
   /** Chip copy. Lowercase in the board: `image`, `video`, `svg`. */
   label: string;
-  /** Rendered mono, right of the label. Omit (or 0) to draw the label alone. */
+  /** Rendered mono, right of the label — including a real 0. Omit to draw the label alone. */
   count?: number;
   selected?: boolean;
   /** ARIA role — `tab` inside a tablist, `button` on its own. */
@@ -56,7 +56,7 @@ export const Chip = React.forwardRef<HTMLButtonElement, ChipProps>(function Chip
       {...rest}
     >
       {label}
-      {count ? (
+      {typeof count === "number" ? (
         <span
           data-testid={countTestId}
           className="tw:[font-family:var(--bk-font-mono)] tw:font-medium tw:tabular-nums tw:text-gray-600"

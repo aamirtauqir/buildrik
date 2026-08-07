@@ -396,7 +396,37 @@ before its click fired. A test comment even called the class "only ever
 an implementation detail" — the test was the bug's cover. Class
 restored (load-bearing comment added) + 2 regression tests, incl. one
 that replays the exact guard.
-Pages family: ALL boards + states + S3.7 CLOSED. Next family: Media 144:2. Dirty-dot (140:21, 8px orange on Home)
+Pages family: ALL boards + states + S3.7 CLOSED. Next family: Media 144:2.
+
+MEDIA census 2026-08-07 (page 1:3 by name): 12 panel states + 5 drill-ins
++ 2 S3.6 (editing/optimizing) + overview 75:2. Captions read as contracts.
+Media pass 1 (grid 144:2 + filtered 145:2 + empty 145:359) DONE:
+- Type pills are now the caption's MULTI-SELECT filter — activeTypes Set is
+  the SSOT in useLibraryState (csv-persisted, old single key migrates),
+  fullpage keeps a derived single activeType for its sections; the "all"
+  pill died (empty set = all). Chip now renders a real 0 (load-error is
+  the one state that hides counts, per its caption).
+- Header gained the expand brackets (320↔700 via setPanelExpanded — the
+  700 ExpandedMediaPanel already existed), search became the bare board
+  box, folder-row toggles lost their button boxes (plain glyphs, still
+  disabled until T12), empty state = board copy "No images or files yet."
+  + Upload / Browse stock accent links (filled CTA gone).
+- REAL FIXES the pass surfaced: engine "svg" assets were bucketed into
+  "img", so the svg pill's count was a permanent 0 (mediaUtils
+  assetTypeToFilter — contradicted TypePills' own mapping doc); and the
+  engine strips file extensions at upload while the board draws full
+  filenames — display-level displayName derives the ext back from MIME
+  (name stays ext-less for alt-text/rename).
+- Live-verified with real uploads: per-file 44h progress rows ✓, upload
+  auto-expand behavior confirmed deliberate (useMediaState), multi-select
+  verified in drawer AND expanded panel. Upload of .svg lands under the
+  svg pill now.
+STILL OPEN (Media): uploading/upload-failed/quota-warn/quota-full/
+bulk-select/load-error/loading/no-results state passes (several already
+code-built from the 13-phase arc — need eye passes), folder-scoped
+145:49, 5 drill-ins (asset-detail/versions/used-in/icon-picker/
+stock-browser), S3.6 editing/optimizing, footer Icons 3rd link (board
+draws 2 — founder call pending; icon-picker entry mapping). Dirty-dot (140:21, 8px orange on Home)
 NOT shipped — no per-page unsaved-state source in the model yet.
 
 ## NOT in scope

@@ -38,12 +38,14 @@ export function extStyle(mimeType: string): string {
 export function assetTypeToFilter(type: MediaAsset["type"]): LibraryItem["type"] {
   switch (type) {
     case "image":
-    case "svg":
       return "img";
-    case "video":
-      return "vid";
+    // The svg PILL is the ico bucket (TypePills' own mapping doc) — an .svg
+    // upload landing in "img" left that pill's count at a permanent 0.
+    case "svg":
     case "icon":
       return "ico";
+    case "video":
+      return "vid";
     case "font":
       return "fnt";
     default:
@@ -51,11 +53,32 @@ export function assetTypeToFilter(type: MediaAsset["type"]): LibraryItem["type"]
   }
 }
 
+/** Board 144:2 draws full filenames ("hero-dark.jpg"); the engine strips the
+ * extension at upload (MediaManager :845), so the label derives it back from
+ * the MIME type. Display only — name stays ext-less for alt-text and rename. */
+const MIME_EXT: Record<string, string> = {
+  "image/jpeg": ".jpg",
+  "image/png": ".png",
+  "image/gif": ".gif",
+  "image/webp": ".webp",
+  "image/avif": ".avif",
+  "image/svg+xml": ".svg",
+  "video/mp4": ".mp4",
+  "video/webm": ".webm",
+  "video/quicktime": ".mov",
+  "font/ttf": ".ttf",
+  "font/otf": ".otf",
+  "font/woff": ".woff",
+  "font/woff2": ".woff2",
+};
+
 /** Map MediaAsset to LibraryItem (display-ready) */
 export function toLibraryItem(asset: MediaAsset): LibraryItem {
+  const ext = MIME_EXT[asset.mimeType ?? ""] ?? "";
   return {
     key: asset.id,
     name: asset.name,
+    displayName: ext && !asset.name.toLowerCase().endsWith(ext) ? asset.name + ext : asset.name,
     type: assetTypeToFilter(asset.type),
     src: asset.src,
     thumb: asset.thumbnailSrc,

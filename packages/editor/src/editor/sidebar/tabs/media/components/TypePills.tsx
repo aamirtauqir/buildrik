@@ -22,23 +22,22 @@
 
 import * as React from "react";
 import { Chip } from "@/editor/chrome-ui";
-import type { MediaTypeFilter, TypeCounts } from "../data/mediaTypes";
+import type { MediaBucket, TypeCounts } from "../data/mediaTypes";
 
 interface TypePillsProps {
-  activeType: MediaTypeFilter;
+  /** Board 145:2 caption: "Type pills are a multi-select filter" — empty = all. */
+  selectedTypes: ReadonlySet<MediaBucket>;
   counts: TypeCounts;
   /** When true, hide count badges (discovery surfaces don't track them). */
   discMode?: boolean;
-  onTypeChange(type: MediaTypeFilter): void;
+  onToggle(type: MediaBucket): void;
 }
 
 /**
- * `all` keeps its chip even though the board's mock does not draw one: without
- * it a filtered drawer has no way back to everything, and the board's own
- * `Media · filtered` state has to return somewhere.
+ * No `all` pill: the filter is multi-select, so deselecting every pill IS
+ * "everything" — the board draws exactly these four (144:14-144:25).
  */
-const PILLS: Array<{ key: MediaTypeFilter; label: string; title: string }> = [
-  { key: "all", label: "all", title: "All media" },
+const PILLS: Array<{ key: MediaBucket; label: string; title: string }> = [
   { key: "img", label: "image", title: "Images" },
   { key: "vid", label: "video", title: "Video" },
   { key: "ico", label: "svg", title: "Icons and SVG" },
@@ -46,25 +45,25 @@ const PILLS: Array<{ key: MediaTypeFilter; label: string; title: string }> = [
 ];
 
 export function TypePills({
-  activeType,
+  selectedTypes,
   counts,
   discMode = false,
-  onTypeChange,
+  onToggle,
 }: TypePillsProps) {
   return (
     <div
       className="med-type-pills tw:flex tw:items-center tw:gap-2 tw:overflow-x-auto tw:px-4 tw:py-1 tw:text-[11px] tw:leading-4"
-      role="tablist"
+      role="group"
       aria-label="Filter by media type"
       data-testid="media-type-chips"
     >
       {PILLS.map((p) => {
-        const isActive = p.key === activeType;
+        const isActive = selectedTypes.has(p.key);
         const count = counts[p.key];
         return (
           <Chip
             key={p.key}
-            role="tab"
+            aria-pressed={isActive}
             selected={isActive}
             label={p.label}
             count={discMode ? undefined : count}
@@ -73,7 +72,7 @@ export function TypePills({
             data-testid={`media-type-chip-${p.key}`}
             countTestId={`media-type-count-${p.key}`}
             className={isActive ? "med-type-pill med-type-pill--active" : "med-type-pill"}
-            onClick={() => onTypeChange(p.key)}
+            onClick={() => onToggle(p.key)}
           />
         );
       })}
