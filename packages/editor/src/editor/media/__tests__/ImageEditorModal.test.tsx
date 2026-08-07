@@ -89,7 +89,7 @@ describe("ImageEditorModal — visibility", () => {
 
   it("renders the modal with Crop/Adjust/Resize tabs when open", () => {
     mount();
-    expect(screen.getByText("Edit Image")).toBeInTheDocument();
+    expect(screen.getByText(/Edit image/)).toBeInTheDocument();
     expect(screen.getByText("Crop")).toBeInTheDocument();
     expect(screen.getByText("Adjust")).toBeInTheDocument();
     expect(screen.getByText("Resize")).toBeInTheDocument();
@@ -99,8 +99,9 @@ describe("ImageEditorModal — visibility", () => {
 describe("ImageEditorModal — tab switching", () => {
   it("Crop is the default tab (aspect ratios visible)", () => {
     mount();
-    expect(screen.getByText("Aspect Ratio")).toBeInTheDocument();
-    expect(screen.getByText("Rotation")).toBeInTheDocument();
+    expect(screen.getByText("Free")).toBeInTheDocument();
+    expect(screen.getByText("1:1")).toBeInTheDocument();
+    expect(screen.getByText("Rotate")).toBeInTheDocument();
   });
 
   it("switching to Adjust reveals brightness/contrast/saturation + filter presets", () => {
@@ -117,7 +118,7 @@ describe("ImageEditorModal — tab switching", () => {
   it("switching to Resize reveals the W/H output inputs", () => {
     mount();
     fireEvent.click(screen.getByText("Resize"));
-    expect(screen.getByText("Output Size")).toBeInTheDocument();
+    expect(screen.getByText("Output size")).toBeInTheDocument();
     expect(screen.getByText(/Leave empty to keep original crop dimensions/)).toBeInTheDocument();
   });
 });
@@ -181,7 +182,7 @@ describe("ImageEditorModal — save", () => {
   it("awaits onSave with the edited data URL and closes on success", async () => {
     const onSave = vi.fn(() => Promise.resolve());
     const { props } = mount({ onSave });
-    fireEvent.click(screen.getByText("Save"));
+    fireEvent.click(screen.getByText("Save version"));
     await waitFor(() => expect(onSave).toHaveBeenCalledWith("data:image/webp;base64,ZWRpdGVk"));
     await waitFor(() => expect(props.onClose).toHaveBeenCalled());
   });
@@ -190,7 +191,7 @@ describe("ImageEditorModal — save", () => {
     const onSave = vi.fn(() => Promise.reject(new Error("upload boom")));
     const onError = vi.fn();
     const { props } = mount({ onSave, onError });
-    fireEvent.click(screen.getByText("Save"));
+    fireEvent.click(screen.getByText("Save version"));
     await waitFor(() => expect(onError).toHaveBeenCalled());
     expect(props.onClose).not.toHaveBeenCalled();
   });

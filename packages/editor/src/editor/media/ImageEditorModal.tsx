@@ -1,22 +1,29 @@
 /**
- * Aquibra Image Editor Modal
- * Crop, resize, rotate, flip, and adjust images.
- * Uses react-easy-crop (15KB, no reconciler conflicts) + CSS filters.
- * Non-destructive: onSave returns a data URL of the edited image.
+ * ImageEditorModal — board S3.6 · media · image-editor (1124:4527).
+ *
+ * A 720-wide card on a 60% ink scrim (cargo-sheets §4: the image editor is a
+ * MODAL, not a drill-in): title "Edit image — {name}", Crop / Adjust / Resize
+ * text-link tabs, the full-width canvas well with live mono dimensions, the
+ * active tab's controls beneath it, and a foot carrying the new-version note
+ * with Reset · Cancel · Save version. Compare (hold to see the original)
+ * rides the transform tool cluster — it is canvas behaviour, so it lives with
+ * the canvas tools rather than inventing header chrome the board doesn't draw.
+ *
+ * Uses react-easy-crop + CSS filters. Non-destructive: onSave returns a data
+ * URL of the edited image and the parent versions it.
  *
  * @module editor/media/ImageEditorModal
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { TextField, Button, TextInput } from "@/editor/chrome-ui";
+import { Button, Slider, TextInput } from "@/editor/chrome-ui";
 import Cropper from "react-easy-crop";
 import type { Area, Point } from "react-easy-crop";
 import {
-  X, RotateCcw, RotateCw, FlipHorizontal, FlipVertical,
-  Crop, SlidersHorizontal, Maximize, Download, AlertTriangle, Eye,
+  RotateCcw, RotateCw, FlipHorizontal, FlipVertical, AlertTriangle, Eye,
 } from "lucide-react";
-import "./ImageEditorModal.css";
+
 // ============================================
 // Types
 // ============================================
@@ -25,13 +32,13 @@ export interface ImageEditorModalProps {
   isOpen: boolean;
   onClose: () => void;
   imageSrc: string;
+  /** Board title is "Edit image — {name}"; falls back to the bare title. */
+  imageName?: string;
   /**
    * Audit-remediation PR1 [ModalSubmit]: accepts sync OR async handler.
    * MediaTab's real onSave is `async` (fetches the data URL, converts to
-   * Blob, uploads). Pre-fix the contract was `void`, so a thrown promise
-   * from the parent would silently bubble out of React as an unhandled
-   * rejection. Now we await it inside handleSave and surface errors via
-   * onError (or console.error in dev) without dismissing the modal.
+   * Blob, uploads). handleSave awaits it and surfaces errors via onError
+   * without dismissing the modal.
    */
   onSave: (editedSrc: string) => void | Promise<void>;
   /** Surface async rejections from onSave. Recommended: wire to toast. */
@@ -45,8 +52,7 @@ interface Adjustments {
   contrast: number;    // -100 to 100
   saturation: number;  // -100 to 100
   blur: number;        // 0 to 20
-  // Phase D: named filter preset (B&W/Sepia/Cool/Warm/Vibrant) layered on top
-  // of brightness/contrast/saturation. "none" = no preset.
+  // Named filter preset layered on top of brightness/contrast/saturation.
   preset: FilterPreset;
 }
 
@@ -95,8 +101,6 @@ function buildCssFilter(adj: Adjustments): string {
   if (adj.contrast !== 0) parts.push(`contrast(${1 + adj.contrast / 100})`);
   if (adj.saturation !== 0) parts.push(`saturate(${1 + adj.saturation / 100})`);
   if (adj.blur > 0) parts.push(`blur(${adj.blur}px)`);
-  // Phase D: append named preset (B&W/Sepia/Cool/Warm/Vibrant) AFTER user
-  // adjustments so preset stylization is the final pass.
   const presetDef = FILTER_PRESETS.find((p) => p.id === adj.preset);
   if (presetDef && presetDef.cssFilter) parts.push(presetDef.cssFilter);
   return parts.length > 0 ? parts.join(" ") : "none";
@@ -122,10 +126,7 @@ async function getCroppedImg(
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d")!;
 
-  // Apply rotation to determine canvas size
   const radians = (rotation * Math.PI) / 180;
-  const sin = Math.abs(Math.sin(radians));
-  const cos = Math.abs(Math.cos(radians));
 
   const cropW = pixelCrop.width;
   const cropH = pixelCrop.height;
@@ -136,17 +137,11 @@ async function getCroppedImg(
   canvas.width = outputW;
   canvas.height = outputH;
 
-  // Apply CSS filter as canvas filter
   ctx.filter = buildCssFilter(adjustments);
 
-  // Center and rotate
   ctx.translate(outputW / 2, outputH / 2);
   ctx.rotate(radians);
   ctx.scale(flip.h ? -1 : 1, flip.v ? -1 : 1);
-
-  // Draw the cropped region
-  const scaleX = outputW / cropW;
-  const scaleY = outputH / cropH;
 
   ctx.drawImage(
     image,
@@ -164,6 +159,28 @@ async function getCroppedImg(
 }
 
 // ============================================
+// Classes (board 1124:4527)
+// ============================================
+
+const TAB =
+  "tw:border-0 tw:bg-transparent tw:p-0 tw:text-[14px] tw:leading-5 tw:enabled:hover:bg-transparent";
+const TAB_ACTIVE = "tw:font-semibold tw:text-[var(--bk-blue-500)]";
+const TAB_RESTING = "tw:font-medium tw:text-[var(--bk-ink-muted)] tw:enabled:hover:text-gray-900";
+const CHIP =
+  "tw:min-h-6 tw:rounded-full tw:border-0 tw:px-2.5 tw:py-0.5 tw:text-[12px] tw:leading-4";
+const CHIP_ACTIVE = "tw:bg-[var(--bk-accent-subtle,#ebf5ff)] tw:font-medium tw:text-[var(--bk-accent-text,#1a56db)]";
+const CHIP_RESTING = "tw:bg-[var(--bk-bg-subtle)] tw:text-gray-900 tw:enabled:hover:bg-gray-200";
+const TOOL =
+  "tw:flex tw:h-7 tw:w-9 tw:items-center tw:justify-center tw:rounded-md tw:border tw:border-gray-200 " +
+  "tw:bg-white tw:p-0 tw:text-[var(--bk-ink-soft)] tw:enabled:hover:bg-gray-50";
+const GHOST =
+  "tw:min-h-8 tw:border-0 tw:bg-transparent tw:px-2 tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink-soft)] " +
+  "tw:enabled:hover:bg-transparent tw:enabled:hover:text-gray-900";
+const SECTION_LABEL = "tw:mb-1 tw:block tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]";
+const MONO_VAL =
+  "tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:font-medium tw:tabular-nums tw:text-[var(--bk-ink-muted)]";
+
+// ============================================
 // Component
 // ============================================
 
@@ -171,6 +188,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
   isOpen,
   onClose,
   imageSrc,
+  imageName,
   onSave,
   onError,
 }) => {
@@ -251,10 +269,8 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
         resizeW,
         resizeH,
       );
-      // Audit-remediation PR1 [ModalSubmit]: await the parent handler so
-      // its rejection surfaces here as a typed error instead of escaping
-      // as an unhandled promise. onSave may be sync (returns void) or
-      // async (returns Promise<void>); both are awaitable.
+      // Await the parent handler so its rejection surfaces here as a typed
+      // error instead of escaping as an unhandled promise.
       await onSave(dataUrl);
       onClose();
     } catch (err) {
@@ -286,14 +302,85 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
   const filterStyle = buildCssFilter(adjustments);
 
   return (
-    <div className="ie-backdrop" onClick={onClose}>
-      <div className="ie-modal" onClick={(e) => e.stopPropagation()}>
-        {/* Header */}
-        <div className="ie-header">
-          <h3 className="ie-title">Edit Image</h3>
-          <div className="ie-header-actions">
+    <div
+      className="tw:fixed tw:inset-0 tw:z-[10000] tw:flex tw:items-center tw:justify-center tw:bg-[rgba(17,24,39,0.6)]"
+      onClick={onClose}
+    >
+      <div
+        className="tw:flex tw:max-h-[90vh] tw:w-[720px] tw:max-w-[92vw] tw:flex-col tw:overflow-y-auto tw:rounded-2xl tw:bg-white tw:[box-shadow:var(--bk-shadow-overlay)]"
+        role="dialog"
+        aria-modal="true"
+        aria-label={imageName ? `Edit image — ${imageName}` : "Edit image"}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header — board: title + text-link tabs, no button chrome. */}
+        <div className="tw:shrink-0 tw:px-6 tw:pt-5">
+          <h3 className="tw:m-0 tw:text-[16px] tw:font-semibold tw:leading-6 tw:text-gray-900">
+            Edit image{imageName ? ` — ${imageName}` : ""}
+          </h3>
+          <div className="tw:mt-3 tw:flex tw:gap-5" role="tablist" aria-label="Editor sections">
+            {([
+              ["crop", "Crop"],
+              ["adjust", "Adjust"],
+              ["resize", "Resize"],
+            ] as Array<[EditorTab, string]>).map(([id, label]) => (
+              <Button
+                key={id}
+                role="tab"
+                aria-selected={tab === id}
+                className={`${TAB} ${tab === id ? TAB_ACTIVE : TAB_RESTING}`}
+                onClick={() => setTab(id)}
+              >
+                {label}
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        {/* Canvas well — board 1124: full-width, rounded-8, mono dims. */}
+        <div className="tw:relative tw:mx-6 tw:mt-3 tw:h-[280px] tw:shrink-0 tw:overflow-hidden tw:rounded-lg tw:bg-[var(--bk-bg-subtle)]">
+          {!imageError && (
+            <Cropper
+              image={imageSrc}
+              crop={crop}
+              zoom={zoom}
+              rotation={comparing ? 0 : rotation}
+              aspect={aspect}
+              onCropChange={setCrop}
+              onZoomChange={setZoom}
+              onRotationChange={setRotation}
+              onCropComplete={onCropComplete}
+              onMediaLoaded={() => setImageError(false)}
+              style={{
+                mediaStyle: {
+                  filter: comparing ? "none" : filterStyle,
+                  transform: comparing
+                    ? "none"
+                    : `scaleX(${flipH ? -1 : 1}) scaleY(${flipV ? -1 : 1})`,
+                  transformOrigin: "center center",
+                },
+              }}
+            />
+          )}
+          {imageError && (
+            <div className="tw:flex tw:h-full tw:flex-col tw:items-center tw:justify-center tw:gap-2 tw:px-8 tw:text-center tw:text-[var(--bk-ink-soft)]">
+              <AlertTriangle size={32} aria-hidden="true" />
+              <div className="tw:text-[14px] tw:font-semibold tw:text-gray-900">Image failed to load</div>
+              <div className="tw:max-w-[400px] tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]">
+                The asset&apos;s URL may be stale or inaccessible. Try reloading the page, or re-upload the image.
+              </div>
+            </div>
+          )}
+          {!imageError && croppedArea.width > 0 ? (
+            <span className={`tw:absolute tw:bottom-2 tw:left-4 ${MONO_VAL}`}>
+              {Math.round(croppedArea.width)}×{Math.round(croppedArea.height)}
+            </span>
+          ) : null}
+          {/* Compare is a CANVAS behaviour, so it overlays the well — every
+              tab gets it (a B&W preview compare is an Adjust job). */}
+          {!imageError && (
             <Button
-              className="ie-btn-ghost ie-compare-btn"
+              className={`tw:absolute tw:right-2 tw:top-2 tw:flex tw:min-h-7 tw:items-center tw:gap-1.5 tw:rounded-md tw:border tw:border-gray-200 tw:bg-white tw:px-2 tw:text-[12px] tw:font-medium ${comparing ? "tw:text-[var(--bk-accent)]" : "tw:text-[var(--bk-ink-soft)]"} tw:enabled:hover:bg-gray-50`}
               onPointerDown={() => setComparing(true)}
               onPointerUp={() => setComparing(false)}
               onPointerLeave={() => setComparing(false)}
@@ -305,249 +392,191 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
                 }
               }}
               onKeyUp={(e) => {
-                if (e.key === " " || e.key === "Enter") {
-                  setComparing(false);
-                }
+                if (e.key === " " || e.key === "Enter") setComparing(false);
               }}
               onBlur={() => setComparing(false)}
+              title="Hold to compare with original"
               aria-label="Hold to compare with original"
               aria-pressed={comparing}
-              data-comparing={comparing}
             >
-              <Eye size={14} />
+              <Eye size={13} aria-hidden="true" />
               {comparing ? "Original" : "Compare"}
             </Button>
-            <Button className="ie-btn-ghost" onClick={handleReset}>Reset</Button>
-            <Button className="ie-btn-primary" onClick={handleSave} disabled={saving}>
-              <Download size={14} />
-              {saving ? "Saving..." : "Save"}
-            </Button>
-            <Button className="ie-close" onClick={onClose}><X size={16} /></Button>
-          </div>
+          )}
         </div>
 
-        {/* Body */}
-        <div className="ie-body">
-          {/* Canvas area */}
-          <div className="ie-canvas">
-            {!imageError && (
-              <div className="ie-cropper-wrap">
-                <Cropper
-                  image={imageSrc}
-                  crop={crop}
-                  zoom={zoom}
-                  rotation={comparing ? 0 : rotation}
-                  aspect={aspect}
-                  onCropChange={setCrop}
-                  onZoomChange={setZoom}
-                  onRotationChange={setRotation}
-                  onCropComplete={onCropComplete}
-                  onMediaLoaded={() => setImageError(false)}
-                  style={{
-                    mediaStyle: {
-                      filter: comparing ? "none" : filterStyle,
-                      transform: comparing
-                        ? "none"
-                        : `scaleX(${flipH ? -1 : 1}) scaleY(${flipV ? -1 : 1})`,
-                      transformOrigin: "center center",
-                    },
-                  }}
-                />
+        {/* Controls — the active tab's, below the canvas per the board. */}
+        <div className="tw:min-h-[128px] tw:shrink-0 tw:px-6 tw:pt-4">
+          {tab === "crop" && (
+            <>
+              <div className="tw:flex tw:items-center tw:gap-2">
+                {CROP_PRESETS.map((p) => (
+                  <Button
+                    key={p.label}
+                    className={`${CHIP} ${aspect === p.value ? CHIP_ACTIVE : CHIP_RESTING}`}
+                    aria-pressed={aspect === p.value}
+                    onClick={() => setAspect(p.value)}
+                  >
+                    {p.label}
+                  </Button>
+                ))}
+                <span className="tw:flex-1" />
+                {/* Transform tools + Compare — canvas tools sit with the canvas. */}
+                <Button className={TOOL} onClick={() => setRotation((r) => r - 90)} title="Rotate left" aria-label="Rotate left">
+                  <RotateCcw size={14} />
+                </Button>
+                <Button className={TOOL} onClick={() => setRotation((r) => r + 90)} title="Rotate right" aria-label="Rotate right">
+                  <RotateCw size={14} />
+                </Button>
+                <Button
+                  className={`${TOOL} ${flipH ? "tw:border-[var(--bk-accent)] tw:text-[var(--bk-accent)]" : ""}`}
+                  onClick={() => setFlipH(!flipH)}
+                  title="Flip horizontal"
+                  aria-label="Flip horizontal"
+                  aria-pressed={flipH}
+                >
+                  <FlipHorizontal size={14} />
+                </Button>
+                <Button
+                  className={`${TOOL} ${flipV ? "tw:border-[var(--bk-accent)] tw:text-[var(--bk-accent)]" : ""}`}
+                  onClick={() => setFlipV(!flipV)}
+                  title="Flip vertical"
+                  aria-label="Flip vertical"
+                  aria-pressed={flipV}
+                >
+                  <FlipVertical size={14} />
+                </Button>
               </div>
-            )}
-            {imageError && (
-              <div className="ie-canvas-error">
-                <AlertTriangle size={40} />
-                <div style={{ fontWeight: 600, fontSize: 14 }}>Image failed to load</div>
-                <div style={{ opacity: 0.7, maxWidth: 400 }}>
-                  The asset's URL may be stale or inaccessible. Try reloading the page, or re-upload the image.
+
+              <div className="tw:mt-4 tw:grid tw:grid-cols-2 tw:gap-x-9">
+                <div>
+                  <span className={SECTION_LABEL}>Zoom</span>
+                  <div className="tw:flex tw:items-center tw:gap-2">
+                    <div className="tw:flex-1">
+                      <Slider value={zoom} onChange={setZoom} min={1} max={3} step={0.1} label="Zoom" withField={false} />
+                    </div>
+                    <span className={MONO_VAL}>{zoom.toFixed(1)}x</span>
+                  </div>
+                </div>
+                <div>
+                  <span className={SECTION_LABEL}>Rotate</span>
+                  <div className="tw:flex tw:items-center tw:gap-2">
+                    <div className="tw:flex-1">
+                      <Slider value={rotation} onChange={setRotation} min={-180} max={180} label="Rotate" withField={false} />
+                    </div>
+                    <span className={MONO_VAL}>{rotation}°</span>
+                  </div>
                 </div>
               </div>
-            )}
-          </div>
+            </>
+          )}
 
-          {/* Sidebar controls */}
-          <div className="ie-sidebar">
-            {/* Tab bar */}
-            <div className="ie-tabs">
-              <Button className={`ie-tab${tab === "crop" ? " active" : ""}`} onClick={() => setTab("crop")}>
-                <Crop size={14} /> Crop
-              </Button>
-              <Button className={`ie-tab${tab === "adjust" ? " active" : ""}`} onClick={() => setTab("adjust")}>
-                <SlidersHorizontal size={14} /> Adjust
-              </Button>
-              <Button className={`ie-tab${tab === "resize" ? " active" : ""}`} onClick={() => setTab("resize")}>
-                <Maximize size={14} /> Resize
-              </Button>
-            </div>
+          {tab === "adjust" && (
+            <>
+              <div className="tw:grid tw:grid-cols-2 tw:gap-x-9 tw:gap-y-3">
+                {([
+                  ["Brightness", "brightness", -100, 100, 1, ""],
+                  ["Contrast", "contrast", -100, 100, 1, ""],
+                  ["Saturation", "saturation", -100, 100, 1, ""],
+                  ["Blur", "blur", 0, 20, 0.5, "px"],
+                ] as Array<[string, "brightness" | "contrast" | "saturation" | "blur", number, number, number, string]>).map(
+                  ([label, key, min, max, step, unit]) => (
+                    <div key={key}>
+                      <span className={SECTION_LABEL}>{label}</span>
+                      <div className="tw:flex tw:items-center tw:gap-2">
+                        <div className="tw:flex-1">
+                          <Slider
+                            value={adjustments[key]}
+                            onChange={(v) => setAdjustments((a) => ({ ...a, [key]: v }))}
+                            min={min}
+                            max={max}
+                            step={step}
+                            label={label}
+                            withField={false}
+                          />
+                        </div>
+                        <span className={MONO_VAL}>
+                          {adjustments[key]}
+                          {unit}
+                        </span>
+                      </div>
+                    </div>
+                  ),
+                )}
+              </div>
 
-            {/* Tab content */}
-            <div className="ie-controls">
-              {tab === "crop" && (
-                <>
-                  {/* Aspect ratio presets */}
-                  <div className="ie-section-label">Aspect Ratio</div>
-                  <div className="ie-presets">
-                    {CROP_PRESETS.map((p) => (
-                      <Button
-                        key={p.label}
-                        className={`ie-preset${aspect === p.value ? " active" : ""}`}
-                        onClick={() => setAspect(p.value)}
-                      >
-                        {p.label}
-                      </Button>
-                    ))}
-                  </div>
-
-                  {/* Rotation */}
-                  <div className="ie-section-label">Rotation</div>
-                  <div className="ie-slider-row">
-                    <TextField
-                      type="range"
-                      className="ie-slider"
-                      min={-180}
-                      max={180}
-                      value={rotation}
-                      onChange={(e) => setRotation(Number(e.target.value))}
-                    />
-                    <span className="ie-slider-val">{rotation}°</span>
-                  </div>
-
-                  {/* Quick rotate + flip */}
-                  <div className="ie-section-label">Transform</div>
-                  <div className="ie-transform-btns">
-                    <Button className="ie-tool-btn" onClick={() => setRotation((r) => r - 90)} title="Rotate left">
-                      <RotateCcw size={16} />
+              {/* Filter presets — applied AFTER user adjustments. */}
+              <span className={`${SECTION_LABEL} tw:mt-4`}>Filters</span>
+              <div className="tw:flex tw:flex-wrap tw:gap-2">
+                {FILTER_PRESETS.map((preset) => {
+                  const active = adjustments.preset === preset.id;
+                  return (
+                    <Button
+                      key={preset.id}
+                      className={`${CHIP} ${active ? CHIP_ACTIVE : CHIP_RESTING}`}
+                      aria-pressed={active}
+                      onClick={() => setAdjustments((a) => ({ ...a, preset: preset.id }))}
+                    >
+                      {preset.label}
                     </Button>
-                    <Button className="ie-tool-btn" onClick={() => setRotation((r) => r + 90)} title="Rotate right">
-                      <RotateCw size={16} />
-                    </Button>
-                    <Button className={`ie-tool-btn${flipH ? " active" : ""}`} onClick={() => setFlipH(!flipH)} title="Flip horizontal">
-                      <FlipHorizontal size={16} />
-                    </Button>
-                    <Button className={`ie-tool-btn${flipV ? " active" : ""}`} onClick={() => setFlipV(!flipV)} title="Flip vertical">
-                      <FlipVertical size={16} />
-                    </Button>
-                  </div>
+                  );
+                })}
+              </div>
+            </>
+          )}
 
-                  {/* Zoom */}
-                  <div className="ie-section-label">Zoom</div>
-                  <div className="ie-slider-row">
-                    <TextField
-                      type="range"
-                      className="ie-slider"
-                      min={1}
-                      max={3}
-                      step={0.1}
-                      value={zoom}
-                      onChange={(e) => setZoom(Number(e.target.value))}
-                    />
-                    <span className="ie-slider-val">{zoom.toFixed(1)}x</span>
-                  </div>
-                </>
-              )}
+          {tab === "resize" && (
+            <>
+              <span className={SECTION_LABEL}>Output size</span>
+              <div className="tw:flex tw:items-center tw:gap-2">
+                <label className="tw:flex tw:items-center tw:gap-1.5 tw:text-[12px] tw:text-[var(--bk-ink-muted)]">
+                  <span>W</span>
+                  <TextInput
+                    type="number"
+                    className="tw:w-24 tw:[&_input]:h-8 tw:[&_input]:rounded-md tw:[&_input]:text-[13px]"
+                    placeholder={String(Math.round(croppedArea.width) || "auto")}
+                    value={resizeW ?? ""}
+                    onChange={(e) => setResizeW(e.target.value ? Number(e.target.value) : undefined)}
+                  />
+                </label>
+                <span className="tw:text-[13px] tw:text-[var(--bk-ink-muted)]">×</span>
+                <label className="tw:flex tw:items-center tw:gap-1.5 tw:text-[12px] tw:text-[var(--bk-ink-muted)]">
+                  <span>H</span>
+                  <TextInput
+                    type="number"
+                    className="tw:w-24 tw:[&_input]:h-8 tw:[&_input]:rounded-md tw:[&_input]:text-[13px]"
+                    placeholder={String(Math.round(croppedArea.height) || "auto")}
+                    value={resizeH ?? ""}
+                    onChange={(e) => setResizeH(e.target.value ? Number(e.target.value) : undefined)}
+                  />
+                </label>
+                <span className="tw:text-[12px] tw:text-[var(--bk-ink-muted)]">px</span>
+              </div>
+              <div className="tw:mt-2 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+                Leave empty to keep original crop dimensions
+              </div>
+            </>
+          )}
+        </div>
 
-              {tab === "adjust" && (
-                <>
-                  <div className="ie-section-label">Brightness</div>
-                  <div className="ie-slider-row">
-                    <TextField type="range" className="ie-slider" min={-100} max={100}
-                      value={adjustments.brightness}
-                      onChange={(e) => setAdjustments((a) => ({ ...a, brightness: Number(e.target.value) }))}
-                    />
-                    <span className="ie-slider-val">{adjustments.brightness}</span>
-                  </div>
-
-                  <div className="ie-section-label">Contrast</div>
-                  <div className="ie-slider-row">
-                    <TextField type="range" className="ie-slider" min={-100} max={100}
-                      value={adjustments.contrast}
-                      onChange={(e) => setAdjustments((a) => ({ ...a, contrast: Number(e.target.value) }))}
-                    />
-                    <span className="ie-slider-val">{adjustments.contrast}</span>
-                  </div>
-
-                  <div className="ie-section-label">Saturation</div>
-                  <div className="ie-slider-row">
-                    <TextField type="range" className="ie-slider" min={-100} max={100}
-                      value={adjustments.saturation}
-                      onChange={(e) => setAdjustments((a) => ({ ...a, saturation: Number(e.target.value) }))}
-                    />
-                    <span className="ie-slider-val">{adjustments.saturation}</span>
-                  </div>
-
-                  <div className="ie-section-label">Blur</div>
-                  <div className="ie-slider-row">
-                    <TextField type="range" className="ie-slider" min={0} max={20} step={0.5}
-                      value={adjustments.blur}
-                      onChange={(e) => setAdjustments((a) => ({ ...a, blur: Number(e.target.value) }))}
-                    />
-                    <span className="ie-slider-val">{adjustments.blur}px</span>
-                  </div>
-
-                  {/* Phase D: filter presets — applied AFTER user adjustments. */}
-                  <div className="ie-section-label" style={{ marginTop: 16 }}>Filters</div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
-                    {FILTER_PRESETS.map((preset) => {
-                      const active = adjustments.preset === preset.id;
-                      return (
-                        <Button
-                          key={preset.id}
-                          onClick={() =>
-                            setAdjustments((a) => ({ ...a, preset: preset.id }))
-                          }
-                          style={{
-                            padding: "5px 8px",
-                            fontSize: 11,
-                            background: active ? "var(--bk-accent-subtle)" : "transparent",
-                            border: `1px solid ${active ? "var(--bk-accent)" : "var(--bk-border)"}`,
-                            color: active ? "var(--bk-accent)" : "var(--bk-ink-soft)",
-                            borderRadius: 4,
-                            cursor: "pointer",
-                            fontWeight: active ? 500 : 400,
-                          }}
-                        >
-                          {preset.label}
-                        </Button>
-                      );
-                    })}
-                  </div>
-                </>
-              )}
-
-              {tab === "resize" && (
-                <>
-                  <div className="ie-section-label">Output Size</div>
-                  <div className="ie-resize-inputs">
-                    <label className="ie-resize-field">
-                      <span>W</span>
-                      <TextInput
-                        type="number"
-                        placeholder={String(croppedArea.width || "auto")}
-                        value={resizeW ?? ""}
-                        onChange={(e) => setResizeW(e.target.value ? Number(e.target.value) : undefined)}
-                      />
-                      <span>px</span>
-                    </label>
-                    <span className="ie-resize-x">×</span>
-                    <label className="ie-resize-field">
-                      <span>H</span>
-                      <TextInput
-                        type="number"
-                        placeholder={String(croppedArea.height || "auto")}
-                        value={resizeH ?? ""}
-                        onChange={(e) => setResizeH(e.target.value ? Number(e.target.value) : undefined)}
-                      />
-                      <span>px</span>
-                    </label>
-                  </div>
-                  <div style={{ fontSize: 11, color: "var(--bk-ink-disabled)", marginTop: 8 }}>
-                    Leave empty to keep original crop dimensions
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
+        {/* Foot — board: note left, actions right. Reset rides as a ghost. */}
+        <div className="tw:mt-auto tw:flex tw:shrink-0 tw:items-center tw:gap-2 tw:px-6 tw:py-5">
+          <span className="tw:min-w-0 tw:flex-1 tw:truncate tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]">
+            Edits create a new version — original preserved.
+          </span>
+          <Button className={GHOST} onClick={handleReset}>
+            Reset
+          </Button>
+          <Button className={GHOST} onClick={onClose}>
+            Cancel
+          </Button>
+          <Button
+            className="tw:min-h-8 tw:rounded tw:border-0 tw:bg-[var(--bk-accent)] tw:px-3.5 tw:text-[13px] tw:font-medium tw:text-[var(--bk-accent-on)] tw:enabled:hover:bg-[var(--bk-accent-hover)]"
+            onClick={handleSave}
+            disabled={saving}
+          >
+            {saving ? "Saving…" : "Save version"}
+          </Button>
         </div>
       </div>
     </div>

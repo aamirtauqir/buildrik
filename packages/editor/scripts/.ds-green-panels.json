@@ -59,7 +59,6 @@
     "packages/editor/src/editor/inspector/shared/controls/TextControls.tsx",
     "packages/editor/src/editor/inspector/tabs/InspectorTabContent.tsx",
     "packages/editor/src/editor/media/ImageEditorModal.tsx",
-    "packages/editor/src/editor/media/SliderControl.tsx",
     "packages/editor/src/editor/panels/KeyboardShortcutsPanel.tsx",
     "packages/editor/src/editor/panels/layers/LayerTreeItem.tsx",
     "packages/editor/src/editor/panels/layers/components/LayerBreadcrumb.tsx",

@@ -500,9 +500,21 @@ behaviour contract + DS conventions:
   (−63% in success), full-width Optimise CTA, new-version note.
 - 1124:4588 footer "⬡ Icons" third link ADDED to Media·grid 144:2 —
   founder kept the Icons entry; board and code agree now.
-NEXT (Media): implement ImageEditorModal + OptimizationPanel to these
-two new boards + the status pills the marker boards draw. Then Media
-CLOSED → Content 148:2. Dirty-dot (140:21, 8px orange on Home)
+ImageEditorModal DONE 2026-08-07 to board 1124:4527: 2-column icon-tab
+layout → single-column 720w card on 60% ink scrim — title (+ optional
+imageName; wiring needs imageEditorContext in AquibraStudio, founder
+tree, NOT touched), Crop/Adjust/Resize text-link tabs, full-width canvas
+well with live mono crop dims, aspect CHIPS (all 6 — board draws 4,
+sample shape), rotate/flip tool cluster, chrome-ui Slider everywhere
+(TextField type=range gone), foot = note + Reset/Cancel ghosts + "Save
+version" primary. Compare moved to a canvas-well overlay chip TOP-RIGHT —
+first draft put it in the crop cluster and the §17 test caught that
+Adjust lost it (a B&W compare is an Adjust job). ImageEditorModal.css
+DELETED (−325 lines) + dead SliderControl.tsx/ImageEditorStyles.ts
+removed. All behaviour kept: react-easy-crop, hold-to-compare, async
+onSave w/ onError, stay-open-on-error, Escape/backdrop close.
+NEXT (Media): OptimizationPanel to board 1124:4562 + marker-board status
+pills. Then Media CLOSED → Content 148:2. Dirty-dot (140:21, 8px orange on Home)
 NOT shipped — no per-page unsaved-state source in the model yet.
 
 ## NOT in scope
