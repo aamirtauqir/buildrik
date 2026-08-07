@@ -483,9 +483,26 @@ links floating mid-panel; nobody had eye-checked against the boards'
 BOTTOM-pinned footer. folder-scoped 145:49: dropdown mechanism verified
 in code (Popover + folder menu + All fallback); a live eye pass needs
 folders, which only the fullpage manager can create — demo-data
-limitation, noted. STILL OPEN (Media): S3.6 editing/optimizing screens,
-footer Icons 3rd link (founder call — the link is now the icon
-drill-in's only entry). Dirty-dot (140:21, 8px orange on Home)
+limitation, noted. S3.6 RESOLVED 2026-08-07 (founder: "redraw karo Figma mein pehle"):
+the old S3.6 boards were STATUS-PILL MARKERS only ("Image editor — crop
+· rotate · adjust" / "Optimizing → WebP…" over the grid) — the full
+editor/optimizer UIs had NO Figma design. Drawn now, to the CODE's
+behaviour contract + DS conventions:
+- 1124:4527 "S3.6 · media · image-editor (modal)" — 720×560 card on ink
+  scrim (cargo-sheets §4: modal, not drill-in): title, Crop/Adjust/
+  Resize text-link tabs, preview well + crop marks + mono dims, aspect
+  chips Free/1:1/4:3/16:9, flip ⇋⇵, Zoom+Rotate sliders, "Edits create
+  a new version" note, Cancel + Save version. Adjust/Resize contents
+  noted on-board (4 sliders + 6 presets; W×H fields).
+- 1124:4562 "S3.6 · media · optimise (drill-in)" — 320×812 drawer
+  conventions: ‹ back row, 160h preview + mono dims, Format chips
+  WebP/JPEG/PNG, Quality slider (85 mono), Original/Optimised size rows
+  (−63% in success), full-width Optimise CTA, new-version note.
+- 1124:4588 footer "⬡ Icons" third link ADDED to Media·grid 144:2 —
+  founder kept the Icons entry; board and code agree now.
+NEXT (Media): implement ImageEditorModal + OptimizationPanel to these
+two new boards + the status pills the marker boards draw. Then Media
+CLOSED → Content 148:2. Dirty-dot (140:21, 8px orange on Home)
 NOT shipped — no per-page unsaved-state source in the model yet.
 
 ## NOT in scope
