@@ -2,7 +2,7 @@ import { ToastProvider } from "@/editor/chrome-ui";
 /**
  * §15 AssetDetailOverlay Edit tab — alt-text input — Phase 6 Task 35.
  *
- * Asserts the Edit tab exposes an alt-text Input that initializes from
+ * Board 146:2: alt text sits on the HUB above the fold — initializes from
  * item.altText, commits via onUpdate on blur, and lets the user edit
  * even when no current alt is set.
  *
@@ -35,9 +35,6 @@ function renderOverlay(
     <ToastProvider>
       <AssetDetailOverlay
         item={item}
-        onInsert={() => {}}
-        onRename={async () => {}}
-        onDelete={() => {}}
         onClose={() => {}}
         onEditImage={() => {}}
         {...extra}
@@ -49,14 +46,12 @@ function renderOverlay(
 describe("§15 — Edit tab alt-text input", () => {
   it("Edit tab shows alt-text input initialized from item.altText", () => {
     renderOverlay(makeItem({ altText: "Hero banner" }));
-    fireEvent.click(screen.getByRole("tab", { name: /edit/i }));
     const input = screen.getByLabelText(/alt text/i) as HTMLInputElement;
     expect(input.value).toBe("Hero banner");
   });
 
   it("Edit tab shows empty alt-text input when item has no altText", () => {
     renderOverlay(makeItem());
-    fireEvent.click(screen.getByRole("tab", { name: /edit/i }));
     const input = screen.getByLabelText(/alt text/i) as HTMLInputElement;
     expect(input.value).toBe("");
   });
@@ -64,7 +59,6 @@ describe("§15 — Edit tab alt-text input", () => {
   it("onBlur commits altText via onUpdate(key, { altText })", () => {
     const onUpdate = vi.fn(async () => {});
     renderOverlay(makeItem(), { onUpdate });
-    fireEvent.click(screen.getByRole("tab", { name: /edit/i }));
     const input = screen.getByLabelText(/alt text/i) as HTMLInputElement;
     fireEvent.change(input, { target: { value: "New alt text" } });
     fireEvent.blur(input);
@@ -74,7 +68,6 @@ describe("§15 — Edit tab alt-text input", () => {
   it("Enter key commits altText via onUpdate", () => {
     const onUpdate = vi.fn(async () => {});
     renderOverlay(makeItem(), { onUpdate });
-    fireEvent.click(screen.getByRole("tab", { name: /edit/i }));
     const input = screen.getByLabelText(/alt text/i) as HTMLInputElement;
     fireEvent.change(input, { target: { value: "Logo for site" } });
     fireEvent.keyDown(input, { key: "Enter", code: "Enter" });
@@ -84,17 +77,16 @@ describe("§15 — Edit tab alt-text input", () => {
   it("does NOT call onUpdate if alt text unchanged", () => {
     const onUpdate = vi.fn(async () => {});
     renderOverlay(makeItem({ altText: "Same" }), { onUpdate });
-    fireEvent.click(screen.getByRole("tab", { name: /edit/i }));
     const input = screen.getByLabelText(/alt text/i) as HTMLInputElement;
     fireEvent.blur(input);
     expect(onUpdate).not.toHaveBeenCalled();
   });
 
-  it("Open image editor button still present and fires onEditImage", () => {
+  // Board 146:2: "Edit image ›" hub row opens the image-editor modal.
+  it("Edit image row fires onEditImage with the item", () => {
     const onEditImage = vi.fn();
     renderOverlay(makeItem(), { onEditImage });
-    fireEvent.click(screen.getByRole("tab", { name: /edit/i }));
-    fireEvent.click(screen.getByRole("button", { name: /open image editor/i }));
+    fireEvent.click(screen.getByTestId("media-detail-edit"));
     expect(onEditImage).toHaveBeenCalledTimes(1);
   });
 });

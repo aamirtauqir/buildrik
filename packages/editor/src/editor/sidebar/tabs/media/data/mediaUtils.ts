@@ -129,3 +129,45 @@ export function countByType(items: LibraryItem[]): {
     fnt: items.filter((i) => i.type === "fnt").length,
   };
 }
+
+// ── Used-in drill-in (board 146:68) ──────────────────────────────────────────
+
+export interface PageUsageHit {
+  elementId: string;
+  label: string;
+  crumb: string;
+}
+export interface PageUsage {
+  pageId: string;
+  pageName: string;
+  hits: PageUsageHit[];
+}
+
+/**
+ * Cross-page usage for one media src — board 146:68 groups hits by PAGE.
+ * Pure walk over the serialized page trees (attributes.src + inline
+ * background-image), so it needs no live element instances.
+ */
+export function collectUsageByPage(
+  pages: ReadonlyArray<import("@shared/types/project").PageData>,
+  src: string,
+): PageUsage[] {
+  if (!src) return [];
+  const out: PageUsage[] = [];
+  for (const page of pages) {
+    const hits: PageUsageHit[] = [];
+    const walk = (el: import("@shared/types/element").ElementData) => {
+      const elSrc = el.attributes?.src;
+      const bg = el.styles?.["background-image"] ?? el.styles?.backgroundImage;
+      const bgHit = bg ? bg.includes(src) : false;
+      if (elSrc === src || bgHit) {
+        const label = el.attributes?.["data-name"] ?? el.type;
+        hits.push({ elementId: el.id, label, crumb: `${page.name} › ${label}` });
+      }
+      el.children?.forEach(walk);
+    };
+    if (page.root) walk(page.root);
+    if (hits.length) out.push({ pageId: page.id, pageName: page.name, hits });
+  }
+  return out;
+}

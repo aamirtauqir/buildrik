@@ -510,18 +510,10 @@ export function ExpandedMediaPanel({
       {state.detailItem && (
         <AssetDetailOverlay
           item={state.detailItem}
-          onInsert={state.insertToCanvas}
-          onRename={state.renameItem}
           onUpdate={state.updateItem}
-          onDelete={(key) => {
-            state.requestDelete(key);
-            state.closeDetail();
-          }}
           onClose={state.closeDetail}
           onEditImage={handleEditImage}
           composer={composer}
-          libraryItems={state.libraryItems}
-          onOpenItem={state.openDetail}
           onOptimized={optimizedHandler}
           onReplaceAcross={onReplaceAcross}
         />

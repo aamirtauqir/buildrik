@@ -448,13 +448,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
       {state.detailItem && (
         <AssetDetailOverlay
           item={state.detailItem}
-          onInsert={state.insertToCanvas}
-          onRename={state.renameItem}
           onUpdate={state.updateItem}
-          onDelete={(key) => {
-            state.requestDelete(key);
-            state.closeDetail();
-          }}
           onClose={state.closeDetail}
           onEditImage={handleEditImage}
         />

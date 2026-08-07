@@ -434,11 +434,30 @@ reason ON the number + "Nothing already on your sites is affected." +
 footer Upload DISABLED not hidden, track removed at full. The compact
 upload-zone strip no longer duplicates quota messages (drag/rejection
 only). upload-failed 145:148 verified against the existing probe.
+Media pass 3 (asset drill-ins) DONE 2026-08-07: AssetDetailOverlay
+REBUILT from the 5-tab drawer to board 146:2's list-row HUB — preview
+well (160h, mono dims), alt text + ✨ Generate above the fold (wired to
+generateContent; generatedAltMeta is provenance {generatedAt, model},
+NOT text — nearly shipped an object into the input), then the five 32h
+rows. Versions view = board 146:32 (56h rows, current pinned on
+accent-tint with the 3px bar, size deltas from restore-point bytes,
+"original" on the last, INLINE 32h Restore?/Cancel/Restore band — no
+modal); Used-in view = board 146:68 (28h page-group headers + 44h rows
++ Jump → setActivePage + select; NEW collectUsageByPage util walks the
+serialized page trees CROSS-PAGE — the old tab was active-page only).
+Dropped from the surface per board: Add-to-page/Delete footer,
+Prev/Next, rename input, sibling-filename version list (grid already
+shows those as items). No author line on versions — AssetVersion
+carries none (codebase gap; board's "Ali/Sara" = sample shape).
+TRAPS: .med-detail-overlay CSS was scoped .med-tab/.exp-panel only —
+in the drawer (.sl-launcher) the drill-in rendered BELOW the grid in
+static flow (positioning now lives on the component); flowbite Button's
+justify-center centered the back row + hub rows (explicit
+justify-start); overlay Escape now stopPropagation()s so one keystroke
+can't also fire the drawer's own close.
 STILL OPEN (Media): bulk-select 145:300 + folder-scoped 145:49 eye
-passes (code board-built in the 13-phase arc), 5 drill-ins
-(asset-detail/versions/used-in/icon-picker/stock-browser), S3.6
-editing/optimizing, footer Icons 3rd link (board draws 2 — founder call
-pending; icon-picker entry mapping). Dirty-dot (140:21, 8px orange on Home)
+passes, icon-picker 147:2 + stock-browser 147:55 drill-ins, S3.6
+editing/optimizing, footer Icons 3rd link (founder call pending). Dirty-dot (140:21, 8px orange on Home)
 NOT shipped — no per-page unsaved-state source in the model yet.
 
 ## NOT in scope
