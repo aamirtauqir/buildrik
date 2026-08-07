@@ -98,6 +98,7 @@ export const STORAGE_KEYS = {
   /** Media library active type filter (all | img | vid | ico | fnt) */
   MEDIA_ACTIVE_TYPE: "med_active_type",
   MEDIA_ACTIVE_TYPES: "med_active_types",
+  RECENT_ICONS: "buildrick-recent-icons",
   /** Whether the media panel tip has been dismissed */
   MEDIA_TIP_DISMISSED: "med_tip_dismissed",
   /** Media library search query persistence */

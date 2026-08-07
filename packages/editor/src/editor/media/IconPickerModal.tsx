@@ -20,6 +20,7 @@ import {
 } from "../../shared/constants/icons";
 import { InputField } from "../../shared/forms";
 import type { IconConfig, IconLibrary } from "../../shared/types/media";
+import { STORAGE_KEYS } from "../../shared/constants/storageKeys";
 // ============================================
 // Types
 // ============================================
@@ -35,7 +36,7 @@ export interface IconPickerModalProps {
 // Constants
 // ============================================
 
-const RECENT_ICONS_KEY = "buildrick-recent-icons";
+const RECENT_ICONS_KEY = STORAGE_KEYS.RECENT_ICONS;
 const MAX_RECENT_ICONS = 12;
 
 // ============================================

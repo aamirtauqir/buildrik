@@ -22,6 +22,7 @@ import { TypePills } from "./components/TypePills";
 import { UploadZone } from "./components/UploadZone";
 import { useMediaState } from "./hooks/useMediaState";
 import { SlimLauncher } from "./components/SlimLauncher";
+import { IconBrowserOverlay } from "./components/IconBrowserOverlay";
 import { ExpandedMediaPanel } from "./components/ExpandedMediaPanel";
 import { SelectionContextBar } from "./components/SelectionContextBar";
 import "./MediaTab.css";
@@ -71,6 +72,7 @@ function MediaTabWithComposer({
   const state = useMediaState(composer);
   const { addToast } = useToast();
   const [stockModalOpen, setStockModalOpen] = React.useState(false);
+  const [iconBrowserOpen, setIconBrowserOpen] = React.useState(false);
 
   const showToast = React.useCallback((msg: string, type: "success" | "error" | "info") => {
     addToast({ description: msg, tone: type });
@@ -317,10 +319,23 @@ function MediaTabWithComposer({
         onOpenLibrary={onOpenLibrary}
         onClose={onClose}
         onOpenDetail={state.openDetail}
-        onOpenIconPicker={onOpenIconPicker ? handleOpenIconPicker : undefined}
+        onOpenIconPicker={() => setIconBrowserOpen(true)}
         selectionContext={state.selectionContext}
         onCancelSelection={() => state.setSelectionContext(null)}
       />
+      {iconBrowserOpen && (
+        <IconBrowserOverlay
+          onClose={() => setIconBrowserOpen(false)}
+          onPick={(icon) => {
+            try {
+              const result = composer.mediaOps.insertMedia(icon.name, "icon");
+              if (result) showToast(`${icon.name} icon added ✓`, "success");
+            } catch {
+              showToast("Could not add icon", "error");
+            }
+          }}
+        />
+      )}
       {stockModal}
       {sharedOverlays}
       </>
