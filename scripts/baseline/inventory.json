@@ -1,0 +1,43 @@
+{
+  "meta": {
+    "pinnedCommit": "f7b39a4c",
+    "figmaFiles": {
+      "index": "p7GAS7CBCpbOS1cZC4RQ8W",
+      "active": "Micuc1rmLcFhjxF1A08Kk2",
+      "broken": "cgTtpYQuI286gsmEQJmVEe",
+      "museum": "wQsxXDoVQ2LpPkpnaKIVtR",
+      "shared": "HS0tZANzT3F9HGL0QfuIDJ",
+      "qa": "Htnvig0uarTGtNhSYg5Pyv"
+    },
+    "viewports": {
+      "desktop": "1440x900"
+    },
+    "seedFixture": null,
+    "envManifestRef": "docs/plans/2026-08-08-figma-existing-ui-baseline.md",
+    "figmaPlan": "team::1653084145714197185",
+    "figmaAccount": "saqib@vortexwebinnovate.com",
+    "fontPreflight": {
+      "date": "2026-08-08",
+      "Inter": "PASS",
+      "GeistMono": "PASS",
+      "InterTight": "MISSING — batch 1 (auth/onboarding) blocked until installed"
+    }
+  },
+  "rows": [
+    {
+      "id": "BL-0000",
+      "kind": "cover",
+      "route": null,
+      "sourceFile": "docs/plans/2026-08-08-figma-existing-ui-baseline.md",
+      "statusClass": 1,
+      "flow": "index",
+      "figmaFileKey": "p7GAS7CBCpbOS1cZC4RQ8W",
+      "figmaPageId": "0:1",
+      "figmaNodeId": "1:2",
+      "state": "default",
+      "viewport": "n/a",
+      "pipelineState": "readback-verified",
+      "notes": "cover verified: VERTICAL, 6 children, widths 1072, no clipping"
+    }
+  ]
+}
