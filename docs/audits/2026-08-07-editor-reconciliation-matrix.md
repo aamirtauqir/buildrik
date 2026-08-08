@@ -115,6 +115,40 @@ board work. Board-side-only problem rate ≈ 26/340 ≈ 8%.
    Preview ×3, S6 ×2, S5.9) — preserved per founder prompt rule 4.
 5. Class 2/7/9 items → decision list for the founder (below), no silent fixes.
 
+## F. Surface-level sweep — 2026-08-08 (post-Media-catch, founder order: "match with my codebase")
+
+Family rows hid Media's fullpage twin, so every tab was re-walked at RENDER-SURFACE
+level (every modal/overlay/popover/drill-in in the code inventory vs boards).
+Result: **17 shipped surfaces with no board**, grouped by job priority:
+
+| # | Surface (code) | Job | Boards needed |
+|---|---|---|---|
+| G1 | `StaleApprovalModal` (publish blocked: approval stale, itemized changed pages) | Publish | 1 |
+| G2 | Topbar publish-anyway confirm (`bk-pubconfirm`, top-3 issues + N more) | Publish | 1 |
+| G3 | `ExportModal` — HTML export + code preview | Export | 1 |
+| G4 | Templates `ReplaceModal` (+ backup-current-page checkbox) | Templates | 1 |
+| G5 | Templates CreatePage confirm/success/error + `ProModal` + `UsageDrawer` | Templates | 2 (fold states) |
+| G6 | `CMSCollectionSetupModal` + `CMSRecordsModal` | Content | 2 |
+| G7 | Shell `CreateComponentModal` + `SaveAsComponentModal` (canvas right-click, binding-aware) | Components | 1 |
+| G8 | Components variant-picker + `DetachConfirmModal` | Components | 1 |
+| G9 | `PageContextMenu` (Layers has a ctx board; Pages does not) | Pages | 1 |
+| G10 | PageSettings `UnsavedWarningModal` | Pages | 1 (or fold into S3.7) |
+| G11 | Pages panel-scoped ⌘K palette | Pages | 1 |
+| G12 | Layers `LayerDisplaySettings` popover (⚙) | Layers | 1 |
+| G13 | Shell exit-guard modal — `dirty` (Stay/Leave/Save&leave) + `risky` offline variant | Exit | 1–2 |
+| G14 | `UpgradeModal` (generic plan-gate) | Billing-gate | 1 |
+| G15 | `SaveTemplateModal` | Templates | 1 |
+| G16 | Brand `ReviewModal` (staged-diff before Apply) | Brand | 1 |
+| G17 | Canvas `BlockPickerModal` (insert picker on canvas) | Insert | 1 (or mark covered-by-Insert) |
+
+Deliberately NOT drawn: StockSourceModal (covered by drawer stock-browser),
+StructurePopover/e3 surfaces (dead by mode, D8/D20), V2 components panel +
+dsAi modal (feature-flag dark), micro-popovers (BindingPopover, MixedValue,
+snapshot hover — variant-level, not screens). Conflict flagged, not drawn:
+`ProjectSettingsModal` still ships in code while board B9.6 was superseded
+2026-08-05 as "settings ship fullpage" — code and design disagree; founder
+call needed before drawing anything.
+
 **Founder decisions needed (5, can answer inline):**
 | # | Question | Default if no answer |
 |---|---|---|
