@@ -515,3 +515,15 @@ root cause is fixed in `466158dd`; these are the rest.
 - [ ] Insert: mount `InsertStateBlocks` (loading + load-error) in BuildTab — blocks exist, only tests import them (ledger D2)
 - [ ] ReviewTab Re-send: pass `onResendReview` from LeftSidebar → TabRouter (1-line, ledger D3 — button is a visible no-op)
 - [ ] ⌘K navigation: add ai/components/publish/review/content to VALID_LEFT_TABS (ledger D4 — 5 palette commands silently no-op)
+
+## From 2026-08-08 deep surface audit (code bugs, evidence in docs/audits/2026-08-08-editor-deep-surface-audit.md)
+- [ ] RichTextEditor inline toolbar: unanchored mount in pointerEvents:none root; `.bd-inline-toolbar` guard class never applied; activeStyles never passed (CanvasOverlayGroup:313, useCanvasInlineEdit:166)
+- [ ] AlignmentToolbar renders TWICE on multi-select (SelectionBoxOverlay:536 + CanvasOverlayGroup:304)
+- [ ] Locked ruler guides still deletable via double-click (GuidesOverlay:68-75)
+- [ ] Keyboard overlays contradict: cheat sheet ⌘⇧Z/⌘⇧P vs panel Ctrl+Y/Ctrl+K (panel's Ctrl+K claim wrong — reserved for shell palette)
+- [ ] Silent failures: ExportModal ZIP (devError only), CMSRecordsModal mutations (no catch), AiPromptPopover apply, BlockPickerModal insert paths
+- [ ] setSyncStatus never called — "syncing" SaveState unreachable (useStudioState:232)
+- [ ] Media copy conflict: LibraryView empty says "max 10 MB", UploadZone allows 50MB (mediaData.ts:64 vs UploadZone.ts:16)
+- [ ] Stock colour filters: drawer 10 vs fullpage 12 (incl. Purple/Magenta — DESIGN.md ban check)
+- [ ] Quick Style ctx actions write literals #ccc/#f5f5f5 — off-token (styleActions.ts)
+- [ ] SaveTemplate button: no busy label while saving (aria-busy only)
