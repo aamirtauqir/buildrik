@@ -553,7 +553,39 @@ somewhere eats a real Escape keystroke before it reaches window — the
 overlay closes correctly on a window-dispatched Escape but not on a
 physical one. Affordance is unaffected (the ‹ back row works). Needs its
 own investigate pass across the shell's key handling.
-MEDIA FAMILY CLOSED. NEXT: Content 148:2 (11 boards). Dirty-dot (140:21, 8px orange on Home)
+MEDIA FAMILY CLOSED.
+
+PAGES RE-AUDIT 2026-08-08 (founder re-ran the Pages spec). Census by NAME
+on page 1:3 found THREE boards the first Pages pass never saw — the
+founder's 1171 batch, added after that pass and absent from boards.json
+(the same trap as the 1082 Layers batch):
+- 1171:4713 Pages · context-menu → labels were Title Case with ⌘ hints;
+  board is sentence case with ellipses and no hints (Rename… /
+  Duplicate / Set as homepage / Copy link / Page settings… / Delete
+  page). Shortcuts still fire from the row.
+- 1171:4767 Pages · command-palette (⌘K) → code shipped a 560w
+  SCREEN-CENTRED modal on a scrim with file icons, status chips and a
+  shortcut footer. Board is a 296w dropdown ANCHORED IN THE PANEL under
+  the header, rows = name + home ⌂ only. Rebuilt; the scheduled-vs-Live
+  guard the palette test carried now lives at its source
+  (utils/__tests__/statusLabel.test.ts), which already had it.
+- 1171:4820 Pages · settings · unsaved-warning → code had a generic
+  "Unsaved changes" + THREE buttons. Board names the stakes ("Discard
+  unsaved SEO changes?" + which fields) and draws TWO: Keep editing
+  (accent, focused) / Discard changes (error outline). Save & Switch
+  left with the third button — the drawer autosaves 500ms after every
+  change, so the only state this modal can guard is a failed save or one
+  still inside that window.
+DIRTY DOT SHIPPED (140:21 / 1171:4729, caption: "checkbox · chevron ·
+icon · name · home ⌂ · dirty ●"). It was deferred as "no per-page
+unsaved-state source" — there WAS one, PageTabBar had it inline and
+unshared. Extracted to editor/shared/useDirtyPages.ts; both surfaces read
+it; dot is 8px --bk-warning (#C27803, read off the board, NOT the tab
+bar's blue-500).
+REAL BUG found on the way: PageSettingsDrawer routes a guarded CLOSE into
+the same modal, but Discard only called confirmTabChange() — a no-op with
+no pending tab, so discarding while closing left the drawer open. One
+modal, two exits now, with regression tests. Dirty-dot (140:21, 8px orange on Home)
 NOT shipped — no per-page unsaved-state source in the model yet.
 
 ## NOT in scope

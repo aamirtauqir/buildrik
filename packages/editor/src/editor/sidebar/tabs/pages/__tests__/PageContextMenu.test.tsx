@@ -56,7 +56,7 @@ describe("PageContextMenu", () => {
     };
     document.addEventListener("mousedown", guard);
     try {
-      const item = screen.getByText(/Page Settings/);
+      const item = screen.getByText(/Page settings/);
       fireEvent.mouseDown(item);
       fireEvent.click(item);
       expect(onSettings).toHaveBeenCalledWith("p2");
@@ -104,7 +104,7 @@ describe("PageContextMenu", () => {
     );
     // MenuItem wraps its children in a span, so the text node is not the
     // element carrying the ARIA state — walk to the menuitem itself.
-    const deleteItem = screen.getByText("Delete Page").closest('[role="menuitem"]')!;
+    const deleteItem = screen.getByText("Delete page").closest('[role="menuitem"]')!;
     expect(deleteItem.getAttribute("aria-disabled")).toBe("true");
     fireEvent.click(deleteItem);
     expect(onDelete).not.toHaveBeenCalled();
@@ -115,7 +115,7 @@ describe("PageContextMenu", () => {
     render(
       <PageContextMenu {...baseProps} pageId="p2" onDelete={onDelete} />,
     );
-    fireEvent.click(screen.getByText("Delete Page"));
+    fireEvent.click(screen.getByText("Delete page"));
     expect(onDelete).toHaveBeenCalledWith("p2");
   });
 });

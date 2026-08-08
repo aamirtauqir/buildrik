@@ -32,19 +32,21 @@ describe("PageCommandPalette", () => {
     expect(screen.queryByText("About")).toBeNull();
   });
 
-  // IRON RULE: regression test for pre-existing bug where scheduled pages
-  // rendered "Live" because the switch was missing case "scheduled".
-  // Source: PageCommandPalette.tsx:20-29 (pre-fix).
-  it("scheduled page renders 'Scheduled' label, NOT 'Live'", () => {
-    const { container } = render(
-      <PageCommandPalette pages={pages} onSelect={vi.fn()} onClose={vi.fn()} />,
-    );
-    expect(screen.getByText("Scheduled")).toBeInTheDocument();
-    // Stronger assertion: the Launch row's status text is NOT "Live"
-    const launchRow = screen.getByText("Launch").closest("[role='option']");
-    expect(launchRow).not.toBeNull();
-    expect(launchRow?.textContent).toMatch(/Scheduled/);
-    expect(launchRow?.textContent).not.toMatch(/\bLive\b/);
+  // Board 1171:4807: rows are the page name plus the home glyph. Status chips
+  // moved out — the tree two rows away already carries status, and the
+  // scheduled-vs-Live regression is guarded at its source in
+  // utils/__tests__/statusLabel.test.ts.
+  it("rows are name + home glyph only — no status chips", () => {
+    render(<PageCommandPalette pages={pages} onSelect={vi.fn()} onClose={vi.fn()} />);
+    const homeRow = screen.getByText("Home").closest("[role='option']");
+    expect(homeRow?.textContent).toContain("\u2302");
+    expect(screen.queryByText("Scheduled")).toBeNull();
+    expect(screen.queryByText("Live")).toBeNull();
+  });
+
+  it("input carries the board placeholder", () => {
+    render(<PageCommandPalette pages={pages} onSelect={vi.fn()} onClose={vi.fn()} />);
+    expect(screen.getByPlaceholderText("go to page…")).toBeInTheDocument();
   });
 
   it("Enter on highlighted result invokes onSelect with page id", () => {

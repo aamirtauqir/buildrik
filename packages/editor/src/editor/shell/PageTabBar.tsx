@@ -9,6 +9,7 @@ import type { Composer } from "../../engine";
 import { EVENTS } from "../../shared/constants";
 import type { PageData } from "../../shared/types";
 import { useClickOutside } from "@/shared/hooks";
+import { useDirtyPages } from "../shared/useDirtyPages";
 import { getDefaultPageName } from "../../shared/utils/pageUtils";
 import { normalizeSlug } from "../sidebar/tabs/pages/utils/slug";
 // ============================================================================
@@ -36,7 +37,7 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
   const [editingPageId, setEditingPageId] = React.useState<string | null>(null);
   const [editName, setEditName] = React.useState("");
   const [deleteConfirmPageId, setDeleteConfirmPageId] = React.useState<string | null>(null);
-  const [dirtyPages, setDirtyPages] = React.useState<Set<string>>(new Set());
+  const dirtyPages = useDirtyPages(composer);
   const ctxMenuRef = React.useRef<HTMLDivElement>(null);
   const renameWrapRef = React.useRef<HTMLSpanElement>(null);
   const [renameRect, setRenameRect] = React.useState<{ left: number; top: number } | null>(null);
@@ -87,31 +88,6 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
     evs.forEach((ev) => composer.on(ev as string, syncPages));
     return () => {
       evs.forEach((ev) => composer.off(ev as string, syncPages));
-    };
-  }, [composer]);
-
-  // Track dirty (unsaved) pages — mark active page dirty on element changes, clear on save
-  React.useEffect(() => {
-    if (!composer) return;
-    const markDirty = () => {
-      const active = composer.elements.getActivePage();
-      if (active) {
-        setDirtyPages((prev) => {
-          if (prev.has(active.id)) return prev;
-          const next = new Set(prev);
-          next.add(active.id);
-          return next;
-        });
-      }
-    };
-    const clearDirty = () => setDirtyPages(new Set());
-    composer.on(EVENTS.ELEMENT_UPDATED, markDirty);
-    composer.on(EVENTS.ELEMENT_DELETED, markDirty);
-    composer.on(EVENTS.PROJECT_SAVED, clearDirty);
-    return () => {
-      composer.off(EVENTS.ELEMENT_UPDATED, markDirty);
-      composer.off(EVENTS.ELEMENT_DELETED, markDirty);
-      composer.off(EVENTS.PROJECT_SAVED, clearDirty);
     };
   }, [composer]);
 

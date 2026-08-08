@@ -27,6 +27,7 @@ interface Props {
   nameError: string | null;
   openContextMenuPageId: string | null;
   selectedIds: Set<string>;
+  dirtyPages?: ReadonlySet<string>;
   onToggleSelect: (id: string, e: React.MouseEvent | React.KeyboardEvent) => void;
   onToggle: () => void;
   onFolderRename: (name: string) => void;
@@ -50,6 +51,7 @@ export const PageFolder: React.FC<Props> = ({
   nameError,
   openContextMenuPageId,
   selectedIds,
+  dirtyPages,
   onToggleSelect,
   onToggle,
   onFolderRename,
@@ -277,6 +279,7 @@ export const PageFolder: React.FC<Props> = ({
                 nameError={renamingPageId === page.id ? nameError : null}
                 isContextMenuOpen={openContextMenuPageId === page.id}
                 isSelected={selectedIds.has(page.id)}
+                isDirty={dirtyPages?.has(page.id) ?? false}
                 onSelect={() => onSelectPage(page.id)}
                 onToggleSelect={(e) => onToggleSelect(page.id, e)}
                 onRenameStart={() => onRenameStart(page.id)}

@@ -45,6 +45,8 @@ interface Props {
   onSettingsClick: () => void;
   /** Board 141:40 search results: the owning folder, shown muted right. */
   searchContext?: string;
+  /** Board 140:21 / 1171:4729 — 8px warning dot when the page has unsaved edits. */
+  isDirty?: boolean;
 }
 
 export const PageRow = React.memo<Props>(
@@ -64,6 +66,7 @@ export const PageRow = React.memo<Props>(
     onRenameStart,
     onContextMenu,
     searchContext,
+    isDirty = false,
   }) => {
     const [renameValue, setRenameValue] = React.useState(page.name);
     const inputRef = React.useRef<HTMLInputElement>(null);
@@ -137,6 +140,7 @@ export const PageRow = React.memo<Props>(
       page.name,
       label ?? "",
       page.isHome ? "Homepage," : "",
+      isDirty ? "unsaved changes," : "",
       "press Enter to select",
     ]
       .filter(Boolean)
@@ -274,6 +278,10 @@ export const PageRow = React.memo<Props>(
             <span className="bd-pg-row-incontext" aria-label={`in ${searchContext}`}>
               in {searchContext}
             </span>
+          )}
+
+          {isDirty && (
+            <span className="bd-pg-row-dirty" data-testid="page-dirty-dot" aria-hidden="true" />
           )}
 
           <Button

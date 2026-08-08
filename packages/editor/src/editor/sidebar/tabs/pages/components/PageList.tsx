@@ -28,6 +28,8 @@ interface Props {
   folders: FolderItem[];
   pageToFolder: Map<string, string>;
   selectedIds: Set<string>;
+  /** Pages with unsaved edits — board 140:21's dirty ●. */
+  dirtyPages?: ReadonlySet<string>;
   onAddPage: () => void;
   onAddFolder: () => void;
   onSelectPage: (id: string) => void;
@@ -60,6 +62,7 @@ export const PageList: React.FC<Props> = ({
   folders,
   pageToFolder,
   selectedIds,
+  dirtyPages,
   onAddPage,
   onAddFolder,
   onSelectPage,
@@ -219,6 +222,7 @@ export const PageList: React.FC<Props> = ({
                   nameError={nameError}
                   openContextMenuPageId={openContextMenuPageId}
                   selectedIds={selectedIds}
+                  dirtyPages={dirtyPages}
                   onToggleSelect={onToggleSelect}
                   onToggle={() => onFolderToggle(folder.id)}
                   onFolderRename={(name) => onFolderRename(folder.id, name)}
@@ -254,6 +258,7 @@ export const PageList: React.FC<Props> = ({
                     composer?.elements.reorderPage(draggedId, page.id)
                   }
                   isSelected={selectedIds.has(page.id)}
+                  isDirty={dirtyPages?.has(page.id) ?? false}
                   onSelect={() => onSelectPage(page.id)}
                   onToggleSelect={(e) => onToggleSelect(page.id, e)}
                   onRenameStart={() => onRenameStart(page.id)}

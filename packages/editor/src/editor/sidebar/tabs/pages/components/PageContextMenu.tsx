@@ -78,19 +78,16 @@ export const PageContextMenu: React.FC<Props> = ({
     // unmounted the menu before its click could fire.
     <div ref={menuRef} className="bd-pg-menu" style={style}>
       <Menu label={`Options for ${page?.name ?? "page"}`} onKeyDown={handleKeyDown}>
-        <MenuItem kbd="F2" onClick={() => act(() => onRename(pageId))}>
-          Rename
-        </MenuItem>
-        <MenuItem kbd="⌘D" onClick={() => act(() => onDuplicate(pageId))}>
-          Duplicate
-        </MenuItem>
+        {/* Board 1171:4753 labels — sentence case, ellipsis on the two that
+            open something. It draws no shortcut hints; the shortcuts still
+            work from the row (F2 / ⌘D / ⌘,). */}
+        <MenuItem onClick={() => act(() => onRename(pageId))}>Rename…</MenuItem>
+        <MenuItem onClick={() => act(() => onDuplicate(pageId))}>Duplicate</MenuItem>
         {!isHome && (
-          <MenuItem onClick={() => act(() => onSetHomepage(pageId))}>Set as Homepage</MenuItem>
+          <MenuItem onClick={() => act(() => onSetHomepage(pageId))}>Set as homepage</MenuItem>
         )}
-        <MenuItem onClick={() => act(() => onCopyLink(pageId))}>Copy Page Link</MenuItem>
-        <MenuItem kbd="⌘," onClick={() => act(() => onSettings(pageId))}>
-          Page Settings
-        </MenuItem>
+        <MenuItem onClick={() => act(() => onCopyLink(pageId))}>Copy link</MenuItem>
+        <MenuItem onClick={() => act(() => onSettings(pageId))}>Page settings…</MenuItem>
         <MenuSeparator />
         <MenuItem
           danger
@@ -98,7 +95,7 @@ export const PageContextMenu: React.FC<Props> = ({
           title={deleteTooltip}
           onClick={() => act(() => onDelete(pageId))}
         >
-          Delete Page
+          Delete page
         </MenuItem>
       </Menu>
     </div>

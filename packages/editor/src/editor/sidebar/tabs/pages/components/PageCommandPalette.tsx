@@ -1,21 +1,19 @@
 /**
- * PageCommandPalette — Cmd+K fuzzy-search overlay for quick page navigation.
+ * PageCommandPalette — ⌘K jump-to-page, board 1171:4807.
  *
- * Triggered from PagesTab via Cmd+K / Ctrl+K. Pressing Enter or clicking a
- * row selects that page in the composer.
- *
- * IRON RULE: status labels come from the centralized getStatusLabel util.
- * Pre-fix bug: this file had its own switch statement missing case 'scheduled',
- * causing scheduled pages to render as 'Live'. The util's exhaustive
- * Record<PageStatus, string> map prevents this class of bug at the type level.
+ * The board draws it as a 296w dropdown ANCHORED IN THE PANEL under the
+ * header, not the screen-centred 560w modal on a scrim this used to be: the
+ * palette navigates the list it is sitting on, so it stays on that surface.
+ * Rows are name + the home ⌂ glyph, active row on accent-subtle. No status
+ * chips, no file icons, no shortcut footer — the board draws none of them,
+ * and the list they duplicated is two rows away.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { Kbd, TextField } from "@/editor/chrome-ui";
+import { TextField } from "@/editor/chrome-ui";
 import type { PageItem } from "../types";
-import { getStatusLabel } from "../utils/statusLabel";
 
 interface Props {
   pages: PageItem[];
@@ -102,7 +100,7 @@ export const PageCommandPalette: React.FC<Props> = ({ pages, onSelect, onClose }
           ref={inputRef}
           type="text"
           className="bd-pg-palette-input"
-          placeholder="Search pages…"
+          placeholder="go to page…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -123,63 +121,26 @@ export const PageCommandPalette: React.FC<Props> = ({ pages, onSelect, onClose }
           {filtered.length === 0 ? (
             <div className="bd-pg-palette-empty">No pages match &ldquo;{query}&rdquo;</div>
           ) : (
-            filtered.map((page, idx) => {
-              const label = getStatusLabel(page.status ?? "live");
-              return (
-                <div
-                  key={page.id}
-                  id={`bd-pg-palette-item-${page.id}`}
-                  className={`bd-pg-palette-item${idx === activeIndex ? " active" : ""}`}
-                  role="option"
-                  aria-selected={idx === activeIndex}
-                  data-palette-index={idx}
-                  onMouseEnter={() => setActiveIndex(idx)}
-                  onClick={() => handleItemClick(page.id)}
-                >
-                  <span className="bd-pg-palette-item-icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      {page.status === "external" ? (
-                        <>
-                          <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" />
-                          <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" />
-                        </>
-                      ) : (
-                        <>
-                          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-                          <polyline points="14 2 14 8 20 8" />
-                        </>
-                      )}
-                    </svg>
+            filtered.map((page, idx) => (
+              <div
+                key={page.id}
+                id={`bd-pg-palette-item-${page.id}`}
+                className={`bd-pg-palette-item${idx === activeIndex ? " active" : ""}`}
+                role="option"
+                aria-selected={idx === activeIndex}
+                data-palette-index={idx}
+                onMouseEnter={() => setActiveIndex(idx)}
+                onClick={() => handleItemClick(page.id)}
+              >
+                <span className="bd-pg-palette-item-name">{page.name}</span>
+                {page.isHome && (
+                  <span className="bd-pg-palette-item-home" aria-label="Homepage">
+                    {"\u2302"}
                   </span>
-
-                  <span className="bd-pg-palette-item-name">{page.name}</span>
-
-                  {page.isHome && (
-                    <span className="bd-pg-home-chip" aria-label="Homepage">
-                      <span className="dot" aria-hidden="true" />
-                      Home
-                    </span>
-                  )}
-
-                  {label && (
-                    <span
-                      className={`bd-pg-chip ${page.status ?? "live"}`}
-                      aria-label={`${page.status ?? "live"} status`}
-                    >
-                      <span className="dot" aria-hidden="true" />
-                      {label}
-                    </span>
-                  )}
-                </div>
-              );
-            })
+                )}
+              </div>
+            ))
           )}
-        </div>
-
-        <div className="bd-pg-palette-footer">
-          <span><Kbd>↑↓</Kbd> navigate</span>
-          <span><Kbd>↵</Kbd> select</span>
-          <span><Kbd>esc</Kbd> close</span>
         </div>
       </div>
     </div>

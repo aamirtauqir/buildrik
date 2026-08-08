@@ -117,4 +117,20 @@ describe("PageRow", () => {
     fireEvent.click(overflow);
     expect(onContextMenu).toHaveBeenCalled();
   });
+
+  // Board 140:21 / 1171:4729 — the caption spells the row out as
+  // "checkbox · chevron · icon · name · home ⌂ · dirty ●".
+  it("renders the dirty dot only when the page has unsaved edits", () => {
+    const { rerender } = render(<PageRow {...baseProps} page={home} />);
+    expect(screen.queryByTestId("page-dirty-dot")).toBeNull();
+    rerender(<PageRow {...baseProps} page={home} isDirty />);
+    expect(screen.getByTestId("page-dirty-dot")).toBeInTheDocument();
+  });
+
+  it("announces unsaved changes in the row label", () => {
+    render(<PageRow {...baseProps} page={home} isDirty />);
+    expect(
+      screen.getByRole("treeitem", { name: /unsaved changes/i }),
+    ).toBeInTheDocument();
+  });
 });

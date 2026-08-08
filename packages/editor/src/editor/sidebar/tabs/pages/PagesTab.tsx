@@ -20,6 +20,7 @@ import { PageContextMenu } from "./components/PageContextMenu";
 import { PageList } from "./components/PageList";
 import { SearchListingsTable } from "./components/SearchListingsTable";
 import { PageSettingsDrawer } from "./page-settings/PageSettingsDrawer";
+import { useDirtyPages } from "@/editor/shared/useDirtyPages";
 import { SettingsErrorBoundary } from "./page-settings/SettingsErrorBoundary";
 import { usePages } from "./usePages";
 import { useFolders } from "./useFolders";
@@ -76,6 +77,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   const [view, setView] = React.useState<"pages" | "listings">("pages");
 
   // Settings drawer — resolve the active page from the id stored in usePages
+  const dirtyPages = useDirtyPages(composer);
   const settingsPage = p.settingsPageId
     ? p.pages.find((pg) => pg.id === p.settingsPageId) ?? null
     : null;
@@ -256,6 +258,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             onBulkDelete={handleBulkDelete}
             onClearSelection={bulk.clearSelection}
             onContextMenu={p.openContextMenu}
+            dirtyPages={dirtyPages}
             onSettingsClick={p.openSettings}
             onRenameStart={p.startRename}
             onRenameCommit={handleRenameCommit}

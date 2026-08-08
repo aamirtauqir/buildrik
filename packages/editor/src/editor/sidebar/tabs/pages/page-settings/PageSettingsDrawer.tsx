@@ -58,12 +58,6 @@ export const PageSettingsDrawer: React.FC<Props> = ({ page, allPages, composer, 
     s.setActiveTab(tab);
   };
 
-  const handleSaveAndSwitch = async () => {
-    await s.save();
-    s.confirmTabChange();
-    onClose();
-  };
-
   const handleClose = () => {
     if (s.isDirty || s.saveState === "error") {
       s.setShowDiscardConfirm(true);
@@ -72,10 +66,6 @@ export const PageSettingsDrawer: React.FC<Props> = ({ page, allPages, composer, 
     onClose();
   };
 
-  const handleDiscardAndClose = () => {
-    s.discard();
-    onClose();
-  };
 
   return (
     <>
@@ -136,16 +126,24 @@ export const PageSettingsDrawer: React.FC<Props> = ({ page, allPages, composer, 
           </div>
         )}
       </div>
+      {/* One modal, two exits: a guarded TAB switch confirms the pending tab,
+          a guarded CLOSE (no pending tab) discards and closes. Before this the
+          close path opened the modal and Discard only ever confirmed a tab
+          change, so discarding on close left the drawer open. */}
       <UnsavedWarningModal
         isOpen={s.showDiscardConfirm}
-        pendingTab={s.pendingTabChange ?? "seo"}
-        onSaveAndSwitch={handleSaveAndSwitch}
+        pendingTab={s.pendingTabChange ?? s.activeTab}
         onDiscard={() => {
           s.discard();
-          s.confirmTabChange();
+          if (s.pendingTabChange) s.confirmTabChange();
+          else {
+            s.setShowDiscardConfirm(false);
+            onClose();
+          }
         }}
         onCancel={() => {
-          s.cancelTabChange();
+          if (s.pendingTabChange) s.cancelTabChange();
+          else s.setShowDiscardConfirm(false);
         }}
       />
     </>
