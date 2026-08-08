@@ -1,0 +1,267 @@
+[
+ {
+  "id": "BL-0001",
+  "path": "/auth",
+  "fullPage": true,
+  "sentinel": {
+   "selector": "form"
+  }
+ },
+ {
+  "id": "BL-0002",
+  "path": "/auth/2fa",
+  "fullPage": true,
+  "sentinel": {
+   "text": "Enter your code"
+  }
+ },
+ {
+  "id": "BL-0003",
+  "path": "/auth/2fa/backup",
+  "fullPage": true,
+  "sentinel": {
+   "text": "Enter a backup code"
+  }
+ },
+ {
+  "id": "BL-0004",
+  "path": "/auth/access-removed",
+  "fullPage": true,
+  "sentinel": {
+   "text": "Your access was removed"
+  }
+ },
+ {
+  "id": "BL-0005",
+  "path": "/auth/account-unlocked",
+  "fullPage": true,
+  "sentinel": {
+   "text": "Your account is unlocked"
+  }
+ },
+ {
+  "id": "BL-0006",
+  "path": "/auth/callback",
+  "fullPage": true,
+  "sentinel": {
+   "text": "Completing sign in"
+  },
+  "requires": "session"
+ },
+ {
+  "id": "BL-0007",
+  "path": "/auth/change-email",
+  "fullPage": true,
+  "sentinel": {
+   "text": "Change email for"
+  },
+  "requires": "session"
+ },
+ {
+  "id": "BL-0008",
+  "path": "/auth/check-inbox",
+  "fullPage": true,
+  "sentinel": {
+   "text": "Check your inbox"
+  }
+ },
+ {
+  "id": "BL-0009",
+  "path": "/auth/device-alert",
+  "fullPage": true,
+  "sentinel": {
+   "text": "New sign-in detected"
+  }
+ },
+ {
+  "id": "BL-0010",
+  "path": "/auth/email-exists",
+  "fullPage": true,
+  "sentinel": {
+   "text": "This email is already in use"
+  }
+ },
+ {
+  "id": "BL-0011",
+  "path": "/auth/error/2fa-locked",
+  "fullPage": true,
+  "sentinel": {
+   "text": "Too many attempts"
+  }
+ },
+ {
+  "id": "BL-0012",
+  "path": "/auth/error/captcha",
+  "fullPage": true,
+  "sentinel": {
+   "text": "Verify you're human"
+  }
+ },
+ {
+  "id": "BL-0013",
+  "path": "/auth/error/expired-link",
+  "fullPage": true,
+  "sentinel": {
+   "text": "This link isn't valid"
+  }
+ },
+ {
+  "id": "BL-0014",
+  "path": "/auth/error/invite-expired",
+  "fullPage": true,
+  "sentinel": {
+   "text": "This invitation expired"
+  }
+ },
+ {
+  "id": "BL-0015",
+  "path": "/auth/error/locked",
+  "fullPage": true,
+  "sentinel": {
+   "text": "Account temporarily locked"
+  }
+ },
+ {
+  "id": "BL-0016",
+  "path": "/auth/error/rate-limited",
+  "fullPage": true,
+  "sentinel": {
+   "text": "Too many requests"
+  }
+ },
+ {
+  "id": "BL-0017",
+  "path": "/auth/error/session-expired",
+  "fullPage": true,
+  "sentinel": {
+   "text": "Your session expired"
+  }
+ },
+ {
+  "id": "BL-0018",
+  "path": "/auth/error/social-error",
+  "fullPage": true,
+  "sentinel": {
+   "text": "Couldn't connect that account"
+  }
+ },
+ {
+  "id": "BL-0019",
+  "path": "/auth/error/suspicious",
+  "fullPage": true,
+  "sentinel": {
+   "text": "New sign-in detected"
+  }
+ },
+ {
+  "id": "BL-0020",
+  "path": "/auth/forgot-password",
+  "fullPage": true,
+  "sentinel": {
+   "text": "Reset your password"
+  }
+ },
+ {
+  "id": "BL-0021",
+  "path": "/auth/invite",
+  "fullPage": true,
+  "sentinel": {
+   "text": "Loading invitation"
+  },
+  "requires": "token"
+ },
+ {
+  "id": "BL-0022",
+  "path": "/auth/join-workspace",
+  "fullPage": true,
+  "sentinel": {
+   "text": "Loading invitation"
+  },
+  "requires": "token"
+ },
+ {
+  "id": "BL-0023",
+  "path": "/auth/magic-link",
+  "fullPage": true,
+  "sentinel": {
+   "text": "Log in with a magic link"
+  }
+ },
+ {
+  "id": "BL-0024",
+  "path": "/auth/magic-link/sent",
+  "fullPage": true,
+  "sentinel": {
+   "text": "Magic link on its way"
+  }
+ },
+ {
+  "id": "BL-0025",
+  "path": "/auth/oauth-conflict",
+  "fullPage": true,
+  "sentinel": {
+   "text": "Account already exists"
+  }
+ },
+ {
+  "id": "BL-0026",
+  "path": "/auth/password-changed",
+  "fullPage": true,
+  "sentinel": {
+   "text": "Password updated"
+  }
+ },
+ {
+  "id": "BL-0027",
+  "path": "/auth/redirect",
+  "fullPage": true,
+  "sentinel": {
+   "text": "Signing you in"
+  },
+  "requires": "session"
+ },
+ {
+  "id": "BL-0028",
+  "path": "/auth/reset-password",
+  "fullPage": true,
+  "sentinel": {
+   "text": "Choose a new password"
+  },
+  "requires": "token"
+ },
+ {
+  "id": "BL-0029",
+  "path": "/auth/signup",
+  "fullPage": true,
+  "sentinel": {
+   "selector": "form"
+  }
+ },
+ {
+  "id": "BL-0030",
+  "path": "/auth/verify-email",
+  "fullPage": true,
+  "sentinel": {
+   "selector": "main"
+  },
+  "requires": "token"
+ },
+ {
+  "id": "BL-0031",
+  "path": "/auth/workspace-select",
+  "fullPage": true,
+  "sentinel": {
+   "text": "Choose a workspace"
+  },
+  "requires": "session"
+ },
+ {
+  "id": "BL-0032",
+  "path": "/auth/workspace-setup",
+  "fullPage": true,
+  "sentinel": {
+   "text": "Create your workspace"
+  },
+  "requires": "session"
+ }
+]
