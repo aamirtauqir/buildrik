@@ -50,6 +50,12 @@ interface TreeNodeProps {
   onClick: () => void;
   onToggleExpand?: () => void;
   onDelete?: () => void;
+  /** Drop target: assets dragged from the grid land in this folder. */
+  dropFolderId?: string | null;
+  isDropTarget?: boolean;
+  onAssetDragOver?: (e: React.DragEvent<HTMLElement>, id: string | null) => void;
+  onAssetDragLeave?: (id: string | null) => void;
+  onAssetDrop?: (e: React.DragEvent<HTMLElement>, id: string | null) => void;
 }
 
 export interface FolderTreeProps {
@@ -69,6 +75,13 @@ export interface FolderTreeProps {
   deleteFolder(id: string): Promise<void>;
   /** Trash placeholder — orchestrator wires this to a toast. */
   onTrashClick(): void;
+  /**
+   * Drag an asset from the grid onto a folder row to move it. Ported from
+   * ExpandedMediaPanel when that surface was retired — the fullpage manager
+   * had no drop targets at all, so a straight deletion would have taken
+   * drag-to-folder with it.
+   */
+  onMoveAssetToFolder?(assetKey: string, folderId: string | null): void;
 }
 
 // ─── TreeNode (leaf, internal) ────────────────────────────────────────────
@@ -84,10 +97,22 @@ function TreeNode({
   onClick,
   onToggleExpand,
   onDelete,
+  dropFolderId,
+  isDropTarget = false,
+  onAssetDragOver,
+  onAssetDragLeave,
+  onAssetDrop,
 }: TreeNodeProps) {
   const depthClass = depth === 1 ? " depth-1" : depth === 2 ? " depth-2" : "";
+  const droppable = onAssetDrop !== undefined;
   return (
-    <div className={`mgr-node${active ? " active" : ""}${depthClass}`} onClick={onClick}>
+    <div
+      className={`mgr-node${active ? " active" : ""}${depthClass}${isDropTarget ? " dragover" : ""}`}
+      onClick={onClick}
+      onDragOver={droppable ? (e) => onAssetDragOver?.(e, dropFolderId ?? null) : undefined}
+      onDragLeave={droppable ? () => onAssetDragLeave?.(dropFolderId ?? null) : undefined}
+      onDrop={droppable ? (e) => onAssetDrop?.(e, dropFolderId ?? null) : undefined}
+    >
       {expandable ? (
         <Button
           className="mgr-chev-btn"
@@ -141,6 +166,7 @@ export function FolderTree({
   createFolder,
   deleteFolder,
   onTrashClick,
+  onMoveAssetToFolder,
 }: FolderTreeProps) {
   const [collapsedFolders, setCollapsedFolders] = React.useState<Set<string>>(new Set());
 
@@ -154,6 +180,46 @@ export function FolderTree({
   }, []);
 
   // Recursive folder tree renderer (Bug #8 fix: expand/collapse).
+  // Drop-target state for asset→folder drags (ported with the behaviour).
+  const [dropTargetId, setDropTargetId] = React.useState<string | null>(null);
+  const readDraggedAssetKey = (e: React.DragEvent<HTMLElement>): string =>
+    e.dataTransfer.getData("application/x-buildrik-media-asset-key") ||
+    e.dataTransfer.getData("text/plain") ||
+    "";
+  const handleAssetDragOver = React.useCallback(
+    (e: React.DragEvent<HTMLElement>, id: string | null) => {
+      if (!onMoveAssetToFolder) return;
+      // preventDefault is required for the drop event to fire at all.
+      e.preventDefault();
+      e.stopPropagation();
+      e.dataTransfer.dropEffect = "move";
+      const marker = id ?? "__root__";
+      setDropTargetId((prev) => (prev === marker ? prev : marker));
+    },
+    [onMoveAssetToFolder],
+  );
+  const handleAssetDragLeave = React.useCallback((id: string | null) => {
+    const marker = id ?? "__root__";
+    setDropTargetId((prev) => (prev === marker ? null : prev));
+  }, []);
+  const handleAssetDrop = React.useCallback(
+    (e: React.DragEvent<HTMLElement>, folderId: string | null) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const assetKey = readDraggedAssetKey(e);
+      setDropTargetId(null);
+      if (assetKey) onMoveAssetToFolder?.(assetKey, folderId);
+    },
+    [onMoveAssetToFolder],
+  );
+  const dropProps = onMoveAssetToFolder
+    ? {
+        onAssetDragOver: handleAssetDragOver,
+        onAssetDragLeave: handleAssetDragLeave,
+        onAssetDrop: handleAssetDrop,
+      }
+    : {};
+
   const renderFolderTree = React.useCallback(
     (parentId: string | null, depth: number): React.ReactNode => {
       const children = folders.filter((f) => f.parentId === parentId);
@@ -181,13 +247,16 @@ export function FolderTree({
               }}
               onToggleExpand={hasChildren ? () => toggleCollapsed(folder.id) : undefined}
               onDelete={() => deleteFolder(folder.id)}
+              dropFolderId={folder.id}
+              isDropTarget={dropTargetId === folder.id}
+              {...dropProps}
             />
             {!isCollapsed && renderFolderTree(folder.id, depth + 1)}
           </React.Fragment>
         );
       });
     },
-    [folders, currentFolderId, deleteFolder, setCurrentFolderId, setSmartFolder, collapsedFolders, toggleCollapsed]
+    [folders, currentFolderId, deleteFolder, setCurrentFolderId, setSmartFolder, collapsedFolders, toggleCollapsed, dropTargetId, handleAssetDragOver, handleAssetDragLeave, handleAssetDrop, onMoveAssetToFolder]
   );
 
   return (
@@ -251,6 +320,9 @@ export function FolderTree({
             setSmartFolder(null);
             setCurrentFolderId(null);
           }}
+          dropFolderId={null}
+          isDropTarget={dropTargetId === "__root__"}
+          {...dropProps}
         />
 
         <hr className="mgr-tree-sep" />

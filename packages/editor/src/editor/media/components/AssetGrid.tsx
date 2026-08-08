@@ -306,12 +306,18 @@ export function AssetGrid({
                 <img src={item.src} alt={item.name} loading="lazy" />
               );
 
-            // Drag data for canvas drop.
+            // Two drop targets read this drag: the canvas (src/type/name) and
+            // the folder tree, which moves the asset and needs its KEY. The grid
+            // only ever published the canvas payload, so dragging a card onto a
+            // folder here did nothing — the drawer's AssetCell had the key line
+            // and this one did not.
             const onDragStart = (e: React.DragEvent) => {
               e.dataTransfer.setData("application/x-aquibra-media-src", item.src);
               e.dataTransfer.setData("application/x-aquibra-media-type", item.type);
               e.dataTransfer.setData("application/x-aquibra-media-name", item.name);
-              e.dataTransfer.effectAllowed = "copy";
+              e.dataTransfer.setData("application/x-buildrik-media-asset-key", item.key);
+              e.dataTransfer.setData("text/plain", item.key);
+              e.dataTransfer.effectAllowed = "copyMove";
             };
 
             // Bug #10 fix: Cmd/Ctrl enters multi-select; in selMode, regular click toggles.

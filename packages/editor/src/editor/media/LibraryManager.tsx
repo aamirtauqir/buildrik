@@ -315,6 +315,16 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           onTrashClick={() =>
             addToast({ description: "Trash coming soon", tone: "info" })
           }
+          onMoveAssetToFolder={(assetKey, folderId) => {
+            // Multi-select drag: if the dragged asset is part of the active
+            // selection, the whole set moves — single asset otherwise. Same
+            // rule the retired 560 panel used.
+            if (state.selMode && state.selectedKeys.has(assetKey) && state.selectedKeys.size > 1) {
+              state.bulkMoveAssets(Array.from(state.selectedKeys), folderId);
+            } else {
+              state.moveAsset(assetKey, folderId);
+            }
+          }}
         />
 
         {/* ─── MIDDLE: Asset grid ─── */}

@@ -564,8 +564,31 @@ family done:
 - 1175:4827 delete-confirm · bulk type-DELETE (>20)
 My Media pass only ever verified the 320 drawer and its five drill-ins.
 The fullpage manager and the modals had NO boards at the time, so they
-were never eye-checked — now they have boards and the delta is a
-surface rebuild, not a paint pass. FOUNDER DECISION NEEDED (below).
+were never eye-checked — now they have boards.
+FOUNDER DECISION (2026-08-08): **B — one manager.** The board draws ONE;
+the code had FOUR media surfaces (320 drawer ✅ conformed, 560
+ExpandedMediaPanel, a MediaTab fullpage branch + LibraryView that
+TabRouter can never render because it always passes onOpenLibrary, and
+the real fullpage LibraryManager). Step 1 shipped: the 560 panel is
+retired and every expand signal (header brackets, upload auto-expand)
+opens the fullpage manager.
+The scoping fear was wrong in a useful way: LibraryManager ALREADY
+carries the board's IA (3 columns, smart folders, tags, trash, quota
+status bar) — the parallel arc drew this board FROM that code, so it is
+a conformance pass, not a rebuild.
+FEATURE SAVED, NOT DELETED: drag-an-asset-onto-a-folder lived ONLY in
+the 560 panel; the fullpage FolderTree/AssetGrid had zero drop handlers.
+Ported into FolderTree first (5 regression tests), and the fullpage grid
+now publishes the asset KEY in its drag payload — it only ever published
+the canvas src/type/name, so a card dragged onto a folder there did
+nothing even before this.
+DEAD CODE FOUND: MediaTab's fullpage branch + LibraryView are
+unreachable (TabRouter always passes onOpenLibrary) — flagged, not yet
+deleted. STILL OPEN (Media): grid-toolbar + card conformance to
+1159:4593 (format strip, used×N meta, select-all), 1162:4617 empty,
+1163:4641 list-view bulk-select, 1163:13695 unused-scope context-menu,
+1163:13948 drag-over uploading, 1164:4713 picker modal, 1164:4738 +
+1174:4849 replace-across, 1175:4827 bulk type-DELETE.
 
 PAGES RE-AUDIT 2026-08-08 (founder re-ran the Pages spec). Census by NAME
 on page 1:3 found THREE boards the first Pages pass never saw — the

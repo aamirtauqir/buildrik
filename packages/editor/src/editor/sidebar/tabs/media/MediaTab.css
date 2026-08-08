@@ -618,73 +618,14 @@
 
 /* Sort label + direction button */
 .med-tab .med-sort-lbl,
-.exp-panel .med-sort-lbl {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
-  height: 24px;
-  border: 1px solid var(--bk-border, var(--bk-border));
-  border-radius: 4px;
-  background: var(--bk-bg-app, var(--bk-bg-card));
-  color: var(--bk-ink-soft, var(--bk-ink));
-  font-size: 11px;
-  font-weight: 500;
-  cursor: pointer;
-}
 .med-tab .med-sort-lbl:hover,
-.exp-panel .med-sort-lbl:hover {
-  border-color: var(--bk-border, var(--bk-border-medium));
-  color: var(--bk-ink);
-}
 .med-tab .med-sort-dir,
-.exp-panel .med-sort-dir {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  border: 1px solid var(--bk-border);
-  border-radius: 4px;
-  background: var(--bk-bg-app);
-  color: var(--bk-ink-soft);
-  font-size: 12px;
-  cursor: pointer;
-}
 .med-tab .med-sort-dir:hover,
-.exp-panel .med-sort-dir:hover {
-  border-color: var(--bk-border);
-  color: var(--bk-ink);
-}
 
 /* Grid-size toggle (2 / 3 / 4) */
 .med-tab .med-grid-tog,
-.exp-panel .med-grid-tog {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  padding: 0;
-  border: 1px solid var(--bk-border);
-  border-radius: 4px;
-  background: var(--bk-bg-app);
-  color: var(--bk-ink-soft);
-  font-size: 11px;
-  font-weight: 500;
-  cursor: pointer;
-}
 .med-tab .med-grid-tog.active,
-.exp-panel .med-grid-tog.active {
-  background: var(--bk-accent, var(--bk-accent));
-  color: var(--bk-bg-card);
-  border-color: var(--bk-accent);
-}
 .med-tab .med-grid-tog:not(.active):hover,
-.exp-panel .med-grid-tog:not(.active):hover {
-  border-color: var(--bk-border);
-  color: var(--bk-ink);
-}
 
 /* Card mini-buttons (delete / select / insert) */
 .med-tab .med-del-btn,
@@ -692,42 +633,10 @@
 .med-tab .med-chk,
 .exp-panel .med-chk,
 .med-tab .med-insert-btn,
-.exp-panel .med-insert-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--bk-bg-card);
-  color: var(--bk-ink, var(--bk-ink));
-  border: 1px solid var(--bk-border);
-  border-radius: 4px;
-  font-size: 11px;
-  padding: 0;
-  cursor: pointer;
-}
 .med-tab .med-del-btn,
-.exp-panel .med-del-btn {
-  width: 20px;
-  height: 20px;
-  color: var(--bk-ink-muted);
-}
 .med-tab .med-del-btn:hover,
-.exp-panel .med-del-btn:hover {
-  background: var(--bk-error-tint, var(--bk-error-tint));
-  color: var(--bk-error, var(--bk-error));
-  border-color: var(--bk-error, var(--bk-error));
-}
 .med-tab .med-chk,
-.exp-panel .med-chk {
-  width: 18px;
-  height: 18px;
-  color: var(--bk-ink-muted);
-}
 .med-tab .med-insert-btn,
-.exp-panel .med-insert-btn {
-  padding: 4px 8px;
-  height: 24px;
-  font-weight: 500;
-}
 
 /* ─── LibraryView toolbar + sections ─────────────────────────────────── */
 
@@ -773,25 +682,7 @@
   margin-right: 8px;
 }
 .med-tab .med-fmt-btn,
-.exp-panel .med-fmt-btn {
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 8px;
-  height: 22px;
-  border: 1px solid var(--bk-border);
-  border-radius: 10px;
-  background: var(--bk-bg-app);
-  color: var(--bk-ink-soft);
-  font-size: 10px;
-  font-weight: 500;
-  cursor: pointer;
-}
 .med-tab .med-fmt-btn.active,
-.exp-panel .med-fmt-btn.active {
-  background: var(--bk-accent-tint);
-  color: var(--bk-accent);
-  border-color: var(--bk-accent);
-}
 
 /* Sort dropdown */
 .med-sort-wrap { display: inline-flex; gap: 4px; align-items: center; }
@@ -808,22 +699,8 @@
   padding: 4px;
 }
 .med-tab .med-sort-opt,
-.exp-panel .med-sort-opt {
-  display: flex;
-  width: 100%;
-  padding: 6px 8px;
-  border: none;
-  background: transparent;
-  color: var(--bk-ink);
-  font-size: 12px;
-  cursor: pointer;
-  border-radius: 4px;
-  text-align: left;
-}
 .med-tab .med-sort-opt:hover,
-.exp-panel .med-sort-opt:hover { background: var(--bk-bg-subtle); }
 .med-tab .med-sort-opt.active,
-.exp-panel .med-sort-opt.active { color: var(--bk-accent); font-weight: 500; }
 .med-sort-chk { margin-left: auto; }
 
 /* Empty state per type */
@@ -942,15 +819,7 @@
 
 /* Insert button overlay on cards */
 .med-tab .med-insert-btn,
-.exp-panel .med-insert-btn {
-  background: var(--bk-accent, var(--bk-accent));
-  color: var(--bk-bg-card);
-  border-color: var(--bk-accent);
-}
 .med-tab .med-insert-btn:hover,
-.exp-panel .med-insert-btn:hover {
-  background: var(--bk-accent-pressed, var(--bk-accent-pressed));
-}
 
 /* ──────────────────────────────────────────────────────────────────────
    §15 AssetDetailOverlay — vSrqD spec
@@ -958,557 +827,113 @@
    library content. role="dialog" aria-modal="true".
    ────────────────────────────────────────────────────────────────────── */
 .med-tab .med-detail-overlay,
-.exp-panel .med-detail-overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 5;
-  display: flex;
-  flex-direction: column;
-  background: var(--bk-bg-panel, var(--bk-bg-card));
-  overflow: auto;
-}
 
 /* Back nav row — h=30, padding [8,10] */
 .med-tab .med-detail-nav,
-.exp-panel .med-detail-nav {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  height: 38px;
-  padding: 8px 10px;
-  border-bottom: 1px solid var(--bk-border, var(--bk-border));
-  flex-shrink: 0;
-  background: var(--bk-bg-panel, var(--bk-bg-card));
-}
 
 .med-tab .med-detail-nav .med-detail-back,
-.exp-panel .med-detail-nav .med-detail-back {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 24px;
-  padding: 0 8px;
-  background: transparent;
-  border: 1px solid transparent;
-  color: var(--bk-ink-muted, var(--bk-ink-soft));
-  font-size: 11.5px;
-  font-weight: 500;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 0.12s, color 0.12s;
-}
 .med-tab .med-detail-nav .med-detail-back:hover,
-.exp-panel .med-detail-nav .med-detail-back:hover {
-  background: var(--bk-bg-subtle, var(--bk-bg-subtle));
-  color: var(--bk-ink, var(--bk-ink));
-}
 
 .med-tab .med-detail-nav .med-strip-spacer,
-.exp-panel .med-detail-nav .med-strip-spacer {
-  flex: 1;
-}
 
 .med-tab .med-detail-nav .med-detail-navbtn,
-.exp-panel .med-detail-nav .med-detail-navbtn {
-  height: 24px;
-  padding: 0 10px;
-  background: transparent;
-  border: 1px solid var(--bk-border, var(--bk-border-medium));
-  color: var(--bk-ink, var(--bk-ink));
-  font-size: 11px;
-  font-weight: 500;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 0.12s, border-color 0.12s;
-}
 .med-tab .med-detail-nav .med-detail-navbtn:hover,
-.exp-panel .med-detail-nav .med-detail-navbtn:hover {
-  background: var(--bk-bg-subtle, var(--bk-bg-subtle));
-  border-color: var(--bk-ink-muted, var(--bk-ink-soft));
-}
 
 /* Preview — h=140 (prototype) but allow grow on wide expand */
 .med-tab .med-detail-preview,
-.exp-panel .med-detail-preview {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 140px;
-  max-height: 240px;
-  margin: 12px;
-  padding: 12px;
-  background: var(--bk-bg-card, var(--bk-bg-panel));
-  border: 1px solid var(--bk-border, var(--bk-border));
-  border-radius: 4px;
-  overflow: hidden;
-  flex-shrink: 0;
-}
 
 /* Font specimen preview */
 .med-tab .med-font-specimen,
-.exp-panel .med-font-specimen {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  text-align: center;
-  color: var(--bk-ink, var(--bk-ink));
-}
 .med-tab .med-font-specimen-lg,
-.exp-panel .med-font-specimen-lg {
-  font-size: 32px;
-  line-height: 1.1;
-  font-weight: 500;
-}
 .med-tab .med-font-specimen-sm,
-.exp-panel .med-font-specimen-sm {
-  font-size: 14px;
-  color: var(--bk-ink-muted, var(--bk-ink-soft));
-}
 
 /* Metadata section — gap 8, padding [10,12] */
 .med-tab .med-detail-meta-section,
-.exp-panel .med-detail-meta-section {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 0 12px 10px;
-  flex-shrink: 0;
-}
 
 .med-tab .med-detail-name,
-.exp-panel .med-detail-name {
-  width: 100%;
-  height: 32px;
-  padding: 0 10px;
-  background: var(--bk-bg-app, var(--bk-bg-card));
-  border: 1px solid var(--bk-border, var(--bk-border-medium));
-  border-radius: 4px;
-  color: var(--bk-ink, var(--bk-ink));
-  font-size: 13px;
-  font-weight: 500;
-  font-family: inherit;
-  transition: border-color 0.12s, box-shadow 0.12s;
-}
 .med-tab .med-detail-name:focus,
-.exp-panel .med-detail-name:focus {
-  outline: none;
-  border-color: var(--bk-accent, var(--bk-accent));
-  box-shadow: var(--bk-shadow-focus);
-}
 
 .med-tab .med-detail-meta,
-.exp-panel .med-detail-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 8px 0;
-  border-top: 1px solid var(--bk-border, var(--bk-border));
-}
 
 .med-tab .med-detail-row,
-.exp-panel .med-detail-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 12px;
-  font-size: 11.5px;
-  line-height: 1.4;
-}
 
 .med-tab .med-detail-key,
-.exp-panel .med-detail-key {
-  color: var(--bk-ink-muted, var(--bk-ink-soft));
-  font-weight: 400;
-}
 
 .med-tab .med-detail-val,
-.exp-panel .med-detail-val {
-  color: var(--bk-ink, var(--bk-ink));
-  font-weight: 500;
-  font-feature-settings: "tnum";
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 60%;
-}
 
 /* Actions — padding [4,12,12,12], gap 6 */
 .med-tab .med-detail-actions,
-.exp-panel .med-detail-actions {
-  display: flex;
-  gap: 6px;
-  padding: 4px 12px 12px;
-  flex-shrink: 0;
-  margin-top: auto;
-}
 
 .med-tab .med-detail-action-btn,
-.exp-panel .med-detail-action-btn {
-  flex: 1;
-  height: 32px;
-  padding: 0 12px;
-  border-radius: 4px;
-  border: 1px solid var(--bk-border, var(--bk-border-medium));
-  background: var(--bk-bg-app, var(--bk-bg-card));
-  color: var(--bk-ink, var(--bk-ink));
-  font-size: 12px;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  transition: background 0.12s, border-color 0.12s, opacity 0.12s;
-}
 .med-tab .med-detail-action-btn:hover:not(:disabled),
-.exp-panel .med-detail-action-btn:hover:not(:disabled) {
-  background: var(--bk-bg-subtle, var(--bk-bg-subtle));
-}
 .med-tab .med-detail-action-btn:disabled,
-.exp-panel .med-detail-action-btn:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-}
 
 .med-tab .med-detail-action-btn--primary,
-.exp-panel .med-detail-action-btn--primary {
-  background: var(--bk-accent, var(--bk-accent));
-  border-color: var(--bk-accent, var(--bk-accent));
-  color: var(--bk-bg-card);
-}
 .med-tab .med-detail-action-btn--primary:hover:not(:disabled),
-.exp-panel .med-detail-action-btn--primary:hover:not(:disabled) {
-  background: var(--bk-accent-pressed, var(--bk-accent-pressed));
-  border-color: var(--bk-accent-pressed, var(--bk-accent-pressed));
-}
 
 .med-tab .med-detail-action-btn--danger,
-.exp-panel .med-detail-action-btn--danger {
-  background: transparent;
-  border-color: var(--bk-border, var(--bk-border-medium));
-  color: var(--bk-error, var(--bk-error));
-}
 .med-tab .med-detail-action-btn--danger:hover:not(:disabled),
-.exp-panel .med-detail-action-btn--danger:hover:not(:disabled) {
-  background: rgba(220, 38, 38, 0.08);
-  border-color: var(--bk-error, var(--bk-error));
-}
 
 /* Error state (COb2m) */
 .med-tab .med-detail-error-body,
-.exp-panel .med-detail-error-body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 32px 24px;
-  text-align: center;
-  color: var(--bk-ink-muted, var(--bk-ink-soft));
-}
 .med-tab .med-detail-error-title,
-.exp-panel .med-detail-error-title {
-  margin: 4px 0 0;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--bk-ink, var(--bk-ink));
-}
 .med-tab .med-detail-error-sub,
-.exp-panel .med-detail-error-sub {
-  margin: 0;
-  font-size: 11.5px;
-  color: var(--bk-ink-muted, var(--bk-ink-soft));
-}
 .med-tab .med-detail-error-body .med-detail-retry,
-.exp-panel .med-detail-error-body .med-detail-retry {
-  margin-top: 8px;
-  height: 28px;
-  padding: 0 14px;
-  background: transparent;
-  border: 1px solid var(--bk-border, var(--bk-border-medium));
-  color: var(--bk-ink, var(--bk-ink));
-  font-size: 12px;
-  font-weight: 500;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 0.12s;
-}
 .med-tab .med-detail-error-body .med-detail-retry:hover,
-.exp-panel .med-detail-error-body .med-detail-retry:hover {
-  background: var(--bk-bg-subtle, var(--bk-bg-subtle));
-}
 
 /* ──────────────────────────────────────────────────────────────────────
    §15 Tabbed drawer — Preview / Where used / Versions / Edit / Optimize
    ────────────────────────────────────────────────────────────────────── */
 .med-tab .med-detail-tabs,
-.exp-panel .med-detail-tabs {
-  display: flex;
-  align-items: stretch;
-  gap: 2px;
-  padding: 0 12px;
-  border-bottom: 1px solid var(--bk-border, var(--bk-border));
-  flex-shrink: 0;
-  overflow-x: auto;
-  background: var(--bk-bg-panel, var(--bk-bg-card));
-}
 
 .med-tab .med-detail-tab,
-.exp-panel .med-detail-tab {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 36px;
-  padding: 0 10px;
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid transparent;
-  color: var(--bk-ink-muted, var(--bk-ink-soft));
-  font-size: 12px;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  white-space: nowrap;
-  margin-bottom: -1px;
-  transition: color 0.12s, border-color 0.12s;
-}
 .med-tab .med-detail-tab:hover,
-.exp-panel .med-detail-tab:hover {
-  color: var(--bk-ink, var(--bk-ink));
-}
 .med-tab .med-detail-tab.is-active,
-.exp-panel .med-detail-tab.is-active {
-  color: var(--bk-accent, var(--bk-accent));
-  border-bottom-color: var(--bk-accent, var(--bk-accent));
-  font-weight: 600;
-}
 
 .med-tab .med-detail-tab-count,
-.exp-panel .med-detail-tab-count {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 6px;
-  border-radius: var(--bk-radius-full);
-  background: var(--bk-bg-subtle, var(--bk-bg-subtle));
-  color: var(--bk-ink-muted, var(--bk-ink-soft));
-  font-size: 10px;
-  font-weight: 600;
-  font-feature-settings: "tnum";
-}
 .med-tab .med-detail-tab.is-active .med-detail-tab-count,
-.exp-panel .med-detail-tab.is-active .med-detail-tab-count {
-  background: var(--bk-accent-tint);
-  color: var(--bk-accent, var(--bk-accent));
-}
 
 .med-tab .med-detail-body,
-.exp-panel .med-detail-body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: auto;
-  min-height: 0;
-}
 
 /* Where used / Versions lists */
 .med-tab .med-detail-list,
-.exp-panel .med-detail-list {
-  padding: 12px;
-}
 
 .med-tab .med-detail-empty,
-.exp-panel .med-detail-empty {
-  padding: 32px 12px;
-  text-align: center;
-  font-size: 12px;
-  color: var(--bk-ink-muted, var(--bk-ink-soft));
-}
 
 .med-tab .med-detail-used-list,
 .exp-panel .med-detail-used-list,
 .med-tab .med-detail-versions-list,
-.exp-panel .med-detail-versions-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
 
 .med-tab .med-detail-used-row,
-.exp-panel .med-detail-used-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
-  border-radius: 4px;
-  background: var(--bk-bg-subtle, var(--bk-bg-subtle));
-  font-size: 12px;
-}
 .med-tab .med-detail-used-tag,
-.exp-panel .med-detail-used-tag {
-  font-weight: 500;
-  color: var(--bk-ink, var(--bk-ink));
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  font-size: 10px;
-  padding: 2px 6px;
-  background: var(--bk-bg-app, var(--bk-bg-card));
-  border: 1px solid var(--bk-border, var(--bk-border));
-  border-radius: 3px;
-}
 .med-tab .med-detail-used-id,
-.exp-panel .med-detail-used-id {
-  flex: 1;
-  font-family: var(--bk-font-mono, monospace);
-  font-size: 11px;
-  color: var(--bk-ink-muted, var(--bk-ink-soft));
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
 
 .med-tab .med-detail-version-row,
-.exp-panel .med-detail-version-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  padding: 8px 10px;
-  border-radius: 4px;
-  border: 1px solid var(--bk-border, var(--bk-border));
-  background: var(--bk-bg-app, var(--bk-bg-card));
-  color: var(--bk-ink, var(--bk-ink));
-  font-size: 12px;
-  font-family: inherit;
-  text-align: left;
-  cursor: pointer;
-  transition: background 0.12s, border-color 0.12s;
-}
 .med-tab .med-detail-version-row:hover:not(:disabled),
-.exp-panel .med-detail-version-row:hover:not(:disabled) {
-  background: var(--bk-bg-subtle, var(--bk-bg-subtle));
-  border-color: var(--bk-ink-muted, var(--bk-ink-soft));
-}
 .med-tab .med-detail-version-row.is-current,
-.exp-panel .med-detail-version-row.is-current {
-  background: var(--bk-accent-subtle);
-  border-color: var(--bk-alpha-accent-30);
-}
 .med-tab .med-detail-version-row:disabled,
-.exp-panel .med-detail-version-row:disabled {
-  cursor: default;
-}
 .med-tab .med-detail-version-name,
-.exp-panel .med-detail-version-name {
-  flex: 1;
-  font-weight: 500;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
 .med-tab .med-detail-version-meta,
-.exp-panel .med-detail-version-meta {
-  font-size: 11px;
-  color: var(--bk-ink-muted, var(--bk-ink-soft));
-}
 .med-tab .med-detail-version-badge,
-.exp-panel .med-detail-version-badge {
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding: 2px 6px;
-  border-radius: 3px;
-  background: var(--bk-accent, var(--bk-accent));
-  color: var(--bk-bg-card);
-}
 
 /* Edit pane */
 .med-tab .med-detail-edit-pane,
-.exp-panel .med-detail-edit-pane {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  padding: 32px 24px;
-  text-align: center;
-}
 .med-tab .med-detail-edit-blurb,
-.exp-panel .med-detail-edit-blurb {
-  margin: 0;
-  font-size: 12px;
-  color: var(--bk-ink-muted, var(--bk-ink-soft));
-  max-width: 360px;
-  line-height: 1.5;
-}
 .med-tab .med-detail-edit-cta,
-.exp-panel .med-detail-edit-cta {
-  height: 34px;
-  padding: 0 16px;
-  border-radius: 4px;
-  background: var(--bk-accent, var(--bk-accent));
-  color: var(--bk-bg-card);
-  border: 1px solid var(--bk-accent, var(--bk-accent));
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: inherit;
-}
 .med-tab .med-detail-edit-cta:hover:not(:disabled),
-.exp-panel .med-detail-edit-cta:hover:not(:disabled) {
-  background: var(--bk-accent-pressed, var(--bk-accent-pressed));
-}
 .med-tab .med-detail-edit-cta:disabled,
-.exp-panel .med-detail-edit-cta:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
 
 /* Optimize pane — embeds OptimizationPanel */
 .med-tab .med-detail-optim-pane,
-.exp-panel .med-detail-optim-pane {
-  flex: 1;
-  overflow: auto;
-}
 
 /* ──────────────────────────────────────────────────────────────────────
    §22 Drag-over overlay — file drop affordance for full MediaTab + ExpandedMediaPanel
    ────────────────────────────────────────────────────────────────────── */
 .med-tab .med-drag-overlay,
-.exp-panel .med-drag-overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 9;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  pointer-events: none;
-  background: var(--bk-alpha-accent-15);
-  border: 2px dashed var(--bk-accent, var(--bk-accent));
-  border-radius: 4px;
-  color: var(--bk-accent, var(--bk-accent));
-  animation: med-drag-fade-in 0.12s ease-out;
-}
 
 .med-tab .med-drag-overlay svg,
-.exp-panel .med-drag-overlay svg {
-  color: var(--bk-accent, var(--bk-accent));
-}
 
 .med-tab .med-drag-label,
-.exp-panel .med-drag-label {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--bk-accent, var(--bk-accent));
-  letter-spacing: -0.01em;
-}
 
 @keyframes med-drag-fade-in {
   from { opacity: 0; }

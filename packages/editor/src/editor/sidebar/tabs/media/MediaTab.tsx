@@ -24,7 +24,6 @@ import { useMediaState } from "./hooks/useMediaState";
 import { SlimLauncher } from "./components/SlimLauncher";
 import { IconBrowserOverlay } from "./components/IconBrowserOverlay";
 import { StockBrowserOverlay } from "./components/StockBrowserOverlay";
-import { ExpandedMediaPanel } from "./components/ExpandedMediaPanel";
 import { SelectionContextBar } from "./components/SelectionContextBar";
 import "./MediaTab.css";
 import type { LibraryItem } from "./data/mediaTypes";
@@ -87,6 +86,19 @@ function MediaTabWithComposer({
     user has left the modal.
   */
   const [statusPill, setStatusPill] = React.useState<string | null>(null);
+
+  /*
+    Board 1159:4593 draws ONE manager. The 560 "expanded" panel was a second
+    one with its own grid, folder rail and toolbar; it is gone, so every
+    expand signal (the header brackets, the upload auto-expand) opens the
+    fullpage manager instead. Drag-to-folder lived only in that panel and was
+    ported into FolderTree first — see FolderTree.drop.test.tsx.
+  */
+  React.useEffect(() => {
+    if (!state.panelExpanded || !onOpenLibrary) return;
+    state.setPanelExpanded(false);
+    onOpenLibrary();
+  }, [state.panelExpanded, state, onOpenLibrary]);
   const [stockBrowserOpen, setStockBrowserOpen] = React.useState(false);
 
   const showToast = React.useCallback((msg: string, type: "success" | "error" | "info") => {
@@ -275,24 +287,6 @@ function MediaTabWithComposer({
   );
 
   if (onOpenLibrary) {
-    if (state.panelExpanded) {
-      return (
-        <>
-        <ExpandedMediaPanel
-          composer={composer}
-          state={state}
-          onCompact={() => state.setPanelExpanded(false)}
-          onOpenLibrary={onOpenLibrary}
-          onClose={onClose}
-          onOpenImageEditor={onOpenImageEditor}
-          onReplaceAcross={handleReplaceAcross}
-          onOptimized={handleOptimized}
-          onOpenIconPicker={onOpenIconPicker}
-        />
-        {stockModal}
-        </>
-      );
-    }
     return (
       <>
       <SlimLauncher

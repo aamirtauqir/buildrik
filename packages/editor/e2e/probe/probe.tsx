@@ -42,7 +42,6 @@ import "@/themes/fonts.css";
 import "@/themes/default.css";
 
 import { CollectionView, FieldsView, RootView } from "@/editor/sidebar/tabs/content/ContentViews";
-import { FolderContextMenu } from "@/editor/sidebar/tabs/media/components/FolderContextMenu";
 import { OnboardingChecklist } from "@/editor/onboarding/OnboardingChecklist";
 import { CanvasFooterToolbar } from "@/editor/canvas/CanvasFooterToolbar";
 import { PanelFrame } from "@/editor/chrome-ui";
@@ -217,21 +216,6 @@ const CASES: Record<string, () => React.ReactElement> = {
         onBack={() => {}}
         onAddField={async () => {}}
         onDeleteField={async () => {}}
-      />
-    </div>
-  ),
-  // Renders the menu itself, not a trigger — the converted markup IS the menu,
-  // so a case that only mounted a button would measure nothing that changed.
-  "folder-context-menu": () => (
-    <div data-probe="folder-context-menu">
-      <FolderContextMenu
-        folderId="f1"
-        folderName="Screenshots"
-        x={40}
-        y={40}
-        onClose={() => {}}
-        onRename={() => {}}
-        onDelete={() => {}}
       />
     </div>
   ),
