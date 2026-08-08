@@ -1,11 +1,11 @@
 {
-  "_note": "Generated from Figma g4GzQFqzNYz5sosz1QtZXC page 1:3 (Editor), 2026-08-06.,Regeneration is an agent step (get_metadata), same reason extraction is — see README.,status: active = must have a recipe eventually. design-ahead = drawn, no backend, no code.,out-of-scope = reference/spec/archive boards, file hygiene not product.,authority: which artefact wins on conflict. undecided until someone reads both. 12 boards appended 2026-08-07 from a live page-1:3 census (Insert x4, Layers x6, S3.6 x2) — drawn after the 2026-08-06 generation. Phase-1 sync 2026-08-07: +6 drawn boards, +27 section-child product boards (dims 0 = not yet captured), +4 design-ahead, +14 reference out-of-scope; Headers·locked superseded by Custom-code·locked (founder Pro-lock decision); [dashboard-flow]/[not-implemented] markers synced.",
+  "_note": "Generated from Figma g4GzQFqzNYz5sosz1QtZXC page 1:3 (Editor), 2026-08-06.,Regeneration is an agent step (get_metadata), same reason extraction is — see README.,status: active = must have a recipe eventually. design-ahead = drawn, no backend, no code.,out-of-scope = reference/spec/archive boards, file hygiene not product.,authority: which artefact wins on conflict. undecided until someone reads both. 12 boards appended 2026-08-07 from a live page-1:3 census (Insert x4, Layers x6, S3.6 x2) — drawn after the 2026-08-06 generation. Phase-1 sync 2026-08-07: +6 drawn boards, +27 section-child product boards (dims 0 = not yet captured), +4 design-ahead, +14 reference out-of-scope; Headers·locked superseded by Custom-code·locked (founder Pro-lock decision); [dashboard-flow]/[not-implemented] markers synced. 2026-08-08: Media fullpage library surface designed — 5 fullpage boards + 2 modals (code was ahead of Figma; founder catch).",
   "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
   "page": "1:3",
-  "generatedAt": "2026-08-07",
+  "generatedAt": "2026-08-08",
   "counts": {
-    "total": 380,
-    "active": 327,
+    "total": 387,
+    "active": 334,
     "designAhead": 30,
     "outOfScope": 23,
     "activeFamilies": 33
@@ -4224,6 +4224,83 @@
       "width": 800,
       "height": 480,
       "status": "design-ahead",
+      "authority": "undecided",
+      "recipe": null
+    },
+    {
+      "nodeId": "1159:4593",
+      "name": "Media · fullpage · library",
+      "state": "fullpage · library",
+      "width": 1440,
+      "height": 900,
+      "family": "Media",
+      "status": "active",
+      "authority": "undecided",
+      "recipe": null
+    },
+    {
+      "nodeId": "1162:4617",
+      "name": "Media · fullpage · empty",
+      "state": "fullpage · empty",
+      "width": 1440,
+      "height": 900,
+      "family": "Media",
+      "status": "active",
+      "authority": "undecided",
+      "recipe": null
+    },
+    {
+      "nodeId": "1163:4641",
+      "name": "Media · fullpage · list-view · bulk-select",
+      "state": "fullpage · list-view · bulk",
+      "width": 1440,
+      "height": 900,
+      "family": "Media",
+      "status": "active",
+      "authority": "undecided",
+      "recipe": null
+    },
+    {
+      "nodeId": "1163:13695",
+      "name": "Media · fullpage · unused-scope · context-menu",
+      "state": "fullpage · unused · ctx-menu",
+      "width": 1440,
+      "height": 900,
+      "family": "Media",
+      "status": "active",
+      "authority": "undecided",
+      "recipe": null
+    },
+    {
+      "nodeId": "1163:13948",
+      "name": "Media · fullpage · drag-over · uploading",
+      "state": "fullpage · drag-over",
+      "width": 1440,
+      "height": 900,
+      "family": "Media",
+      "status": "active",
+      "authority": "undecided",
+      "recipe": null
+    },
+    {
+      "nodeId": "1164:4713",
+      "name": "Media · modal · picker (choose for element)",
+      "state": "modal · picker",
+      "width": 640,
+      "height": 520,
+      "family": "Media",
+      "status": "active",
+      "authority": "undecided",
+      "recipe": null
+    },
+    {
+      "nodeId": "1164:4738",
+      "name": "Media · modal · replace-across-site",
+      "state": "modal · replace-across",
+      "width": 520,
+      "height": 300,
+      "family": "Media",
+      "status": "active",
       "authority": "undecided",
       "recipe": null
     }
