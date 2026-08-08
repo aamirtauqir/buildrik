@@ -513,8 +513,24 @@ Adjust lost it (a B&W compare is an Adjust job). ImageEditorModal.css
 DELETED (−325 lines) + dead SliderControl.tsx/ImageEditorStyles.ts
 removed. All behaviour kept: react-easy-crop, hold-to-compare, async
 onSave w/ onError, stay-open-on-error, Escape/backdrop close.
-NEXT (Media): OptimizationPanel to board 1124:4562 + marker-board status
-pills. Then Media CLOSED → Content 148:2. Dirty-dot (140:21, 8px orange on Home)
+OptimizationPanel DONE 2026-08-07 to board 1124:4562: 160h preview well
+(optimised result once it exists, original until then — the old
+side-by-side pair was 130px each at 320w and proved nothing), Format
+chips, Quality label + mono readout + Slider, Original/Optimised size
+rows with the saving ON the optimised number, full-width Optimise CTA,
+new-version note. Drill-in no longer passes onClose — its ‹ back row is
+the exit and the board draws no second one; the fullpage manager still
+gets its Cancel. Back label now reads "· optimise".
+REAL BUG found by the live walk: originalSize was computed from base64
+arithmetic, which only works for data: URLs — every library asset is a
+blob:/http: URL, so the panel showed "Original 0 Bytes" and a fake 0%
+saving beside a real optimised number. Now falls back to fetch→blob.size.
+Savings tone made honest too: success green only when it actually saved
+(0% muted, bigger-file warning) — green-on-0% was the same class of lie.
+Code-only controls kept + flagged for a Figma row: AVIF chip (real
+probed capability) and the §18 max-dimension clamp.
+NEXT (Media): marker-board status pills (303:1997 / 303:2032). Then
+Media CLOSED → Content 148:2. Dirty-dot (140:21, 8px orange on Home)
 NOT shipped — no per-page unsaved-state source in the model yet.
 
 ## NOT in scope

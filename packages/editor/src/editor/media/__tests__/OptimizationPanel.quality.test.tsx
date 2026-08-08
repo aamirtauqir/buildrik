@@ -99,17 +99,21 @@ describe("OptimizationPanel — quality slider", () => {
 });
 
 describe("OptimizationPanel — savings + apply", () => {
-  it("shows a savings percentage after optimization completes", async () => {
+  // Board 1124:4562 puts the saving ON the optimised number ("312 KB · −63%"),
+  // not in a third stat column.
+  it("the optimised row carries the size and the saving", async () => {
     mount();
     // original = round(800 * 3 / 4) = 600B, optimized 400B → 33% savings.
-    await waitFor(() => expect(screen.getByText("33%")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByTestId("opt-result")).toHaveTextContent(/−33%/),
+    );
   });
 
   it("Apply forwards the optimized data URL to onOptimized", async () => {
     const { props } = mount();
     await waitFor(() => expect(optimizeMock).toHaveBeenCalled());
     const applyBtn = await waitFor(() => {
-      const btn = screen.getByText("Apply Optimization").closest("button") as HTMLButtonElement;
+      const btn = screen.getByText("Optimise").closest("button") as HTMLButtonElement;
       expect(btn).not.toBeDisabled();
       return btn;
     });

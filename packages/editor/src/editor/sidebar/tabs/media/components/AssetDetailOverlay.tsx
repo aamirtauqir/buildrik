@@ -237,7 +237,13 @@ export function AssetDetailOverlay({
   const versionCount = dbVersions.length > 0 ? dbVersions.length + 1 : 0;
 
   const backLabel =
-    view === "versions" ? `${display} · versions` : view === "used" ? `${display} · used in` : display;
+    view === "versions"
+      ? `${display} · versions`
+      : view === "used"
+        ? `${display} · used in`
+        : view === "optimize"
+          ? `${display} · optimise`
+          : display;
 
   return (
     <div
@@ -514,12 +520,14 @@ export function AssetDetailOverlay({
         </div>
       ) : (
         <div className="tw:min-h-0 tw:flex-1 tw:overflow-y-auto">
+          {/* No onClose: the ‹ back row is this screen's exit and board
+              1124:4562 draws no second one. */}
           <OptimizationPanel
             imageSrc={item.src}
             onOptimized={async (src) => {
               await onOptimized?.(src);
+              setView("hub");
             }}
-            onClose={() => setView("hub")}
           />
         </div>
       )}

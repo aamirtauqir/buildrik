@@ -1,19 +1,27 @@
 /**
- * Optimization Panel Component
- * Quality slider, format picker, and compression preview.
+ * OptimizationPanel — board S3.6 · media · optimise (1124:4562).
  *
- * The hex-policy exemption this file used to carry is gone with its only hex:
- * the savings figure was #a6e3a1, a Catppuccin swatch, where the meaning is
- * "this succeeded" and the token is --bk-success.
+ * Drawer anatomy: a 160h preview well with the live mono size line, a Format
+ * chip row, the Quality slider with its mono readout, Original / Optimised
+ * size rows where the saving rides the optimised number in success, a
+ * full-width Optimise CTA and the new-version note. The back row and panel
+ * header belong to the drill-in that hosts this (AssetDetailOverlay), which is
+ * why the panel starts at the preview.
+ *
+ * Two code-only controls have no board row and are kept, not deleted: AVIF
+ * (a real capability probed at mount — it joins the board's three chips) and
+ * the max-dimension clamp (§18). Both are flagged for a Figma row rather than
+ * removed to match a static frame.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { Spinner, Button, Label, Slider, TextInput } from "@/editor/chrome-ui";
+import { Spinner, Button, Slider, TextInput } from "@/editor/chrome-ui";
 import { MediaOptimizer } from "../../engine/media";
 import { formatBytes } from "@shared/utils/helpers/number";
 import type { ImageExportFormat } from "../../shared/types/media";
+
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -21,6 +29,11 @@ import type { ImageExportFormat } from "../../shared/types/media";
 export interface OptimizationPanelProps {
   imageSrc: string;
   onOptimized: (optimizedSrc: string) => void;
+  /**
+   * Renders a Cancel link beside the CTA. The drill-in omits it — its ‹ back
+   * row is the exit and the board draws no second one; the fullpage manager
+   * passes it because there the panel replaces the library view.
+   */
   onClose?: () => void;
 }
 
@@ -33,16 +46,15 @@ interface OptimizationState {
   isProcessing: boolean;
 }
 
-/* Layout classes. The quality control is chrome-ui's Slider now, so the
-   hand-rolled range-input restyle that used to live here is gone. */
-const SECTION = "tw:mb-5";
-const FIELD_LABEL = "tw:block tw:mb-2";
-const SEGMENTED = "tw:flex tw:gap-2";
-const STAT_LABEL = "tw:text-xs tw:text-gray-500 tw:uppercase tw:mb-1";
-const STAT_VALUE = "tw:text-sm tw:font-semibold tw:text-gray-900";
-const PREVIEW_BOX = "tw:flex-1 tw:bg-gray-50 tw:rounded-lg tw:p-2 tw:text-center";
-const PREVIEW_LABEL = "tw:text-xs tw:text-gray-500 tw:mt-1.5";
-const GHOST = "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900";
+// ── Board classes ───────────────────────────────────────────────────────────
+const LABEL = "tw:block tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]";
+const MONO =
+  "tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:font-medium tw:tabular-nums";
+const CHIP = "tw:min-h-6 tw:rounded-full tw:border-0 tw:px-3 tw:py-0.5 tw:text-[12px] tw:leading-4";
+const CHIP_ACTIVE =
+  "tw:bg-[var(--bk-accent-subtle,#ebf5ff)] tw:font-medium tw:text-[var(--bk-accent-text,#1a56db)]";
+const CHIP_RESTING = "tw:bg-[var(--bk-bg-subtle)] tw:text-gray-900 tw:enabled:hover:bg-gray-200";
+const ROW = "tw:flex tw:items-center tw:justify-between tw:text-[13px] tw:leading-5 tw:text-gray-900";
 
 // ============================================================================
 // COMPONENT
@@ -72,15 +84,32 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
     optimizer.checkFormatSupport().then(setFormatSupport);
   }, [optimizer]);
 
-  // Calculate original size
+  /*
+    Original size. The base64 arithmetic only works for data: URLs — every
+    asset in the library is a blob:/http: URL, so this read returned 0 and the
+    panel showed "Original 0 Bytes" with a 0% saving next to a real optimised
+    number. Found by the live walk against board 1124:4562. Falls back to
+    fetching the blob and reading its size.
+  */
   React.useEffect(() => {
-    if (imageSrc) {
-      const base64 = imageSrc.split(",")[1];
-      if (base64) {
-        const size = Math.round((base64.length * 3) / 4);
-        setState((s) => ({ ...s, originalSize: size }));
-      }
+    if (!imageSrc) return;
+    let alive = true;
+    const base64 = imageSrc.startsWith("data:") ? imageSrc.split(",")[1] : null;
+    if (base64) {
+      setState((s) => ({ ...s, originalSize: Math.round((base64.length * 3) / 4) }));
+      return;
     }
+    fetch(imageSrc)
+      .then((r) => r.blob())
+      .then((blob) => {
+        if (alive) setState((s) => ({ ...s, originalSize: blob.size }));
+      })
+      .catch(() => {
+        // Unreachable source — the optimised number still renders on its own.
+      });
+    return () => {
+      alive = false;
+    };
   }, [imageSrc]);
 
   // Optimize on settings change
@@ -132,8 +161,8 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
   const savings =
     state.originalSize > 0 ? Math.round((1 - state.optimizedSize / state.originalSize) * 100) : 0;
 
-  // Phase D: AVIF added — formatSupport.avif is already probed at mount.
-  // Disabled state shown when browser/canvas doesn't support encoding.
+  // AVIF joins the board's three chips — formatSupport.avif is probed at mount,
+  // and the chip renders disabled where the browser cannot encode it.
   const formats: Array<{ id: ImageExportFormat; label: string; supported: boolean }> = [
     { id: "webp", label: "WebP", supported: formatSupport.webp },
     { id: "avif", label: "AVIF", supported: formatSupport.avif },
@@ -142,34 +171,55 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
   ];
 
   return (
-    <div className="tw:p-4">
-      {/* Format Selection */}
-      <div className={SECTION}>
-        <Label className={FIELD_LABEL}>Output Format</Label>
-        <div className={SEGMENTED}>
-          {formats.map(({ id, label, supported }) => (
-            <Button
-              key={id}
-              size="xs"
-              color={state.format === id ? undefined : "light"}
-              aria-pressed={state.format === id}
-              className="tw:flex-1"
-              onClick={() => supported && handleFormatChange(id)}
-              disabled={!supported}
-            >
-              {label}
-              {id === "webp" && " (Recommended)"}
-            </Button>
-          ))}
-        </div>
+    <div className="tw:flex tw:flex-col">
+      {/* Board 1124: one 160h well — the optimised result once it exists, the
+          original until then. Two side-by-side thumbnails were the old shape;
+          at 320 they were 130px each and proved nothing. */}
+      <div className="tw:relative tw:h-40 tw:w-full tw:shrink-0 tw:overflow-hidden tw:bg-[var(--bk-bg-subtle)]">
+        {state.isProcessing ? (
+          <span className="tw:flex tw:h-full tw:items-center tw:justify-center">
+            <Spinner size="sm" />
+          </span>
+        ) : (
+          <img
+            src={state.optimizedSrc ?? imageSrc}
+            alt={state.optimizedSrc ? "Optimised preview" : "Original"}
+            className="tw:size-full tw:object-contain"
+          />
+        )}
+        <span className={`tw:absolute tw:bottom-2 tw:left-4 ${MONO} tw:tracking-[0.5px] tw:text-[var(--bk-ink-muted)]`}>
+          {formatBytes(state.originalSize)}
+        </span>
       </div>
-      {/* Quality Slider */}
-      <div className={SECTION}>
-        <Label className={FIELD_LABEL}>Quality</Label>
-        <div className="tw:flex tw:items-center tw:gap-3">
-          <div className="tw:flex-1">
-            {/* chrome-ui Slider, not a restyled range input. Its own readout is
-                off because this panel shows a percentage, not the raw value. */}
+
+      <div className="tw:flex tw:flex-col tw:gap-3 tw:px-4 tw:pt-3">
+        {/* Format */}
+        <div>
+          <span className={LABEL} id="opt-format-label">
+            Format
+          </span>
+          <div className="tw:mt-1.5 tw:flex tw:flex-wrap tw:gap-2" role="group" aria-labelledby="opt-format-label">
+            {formats.map(({ id, label, supported }) => (
+              <Button
+                key={id}
+                className={`${CHIP} ${state.format === id ? CHIP_ACTIVE : CHIP_RESTING}`}
+                aria-pressed={state.format === id}
+                onClick={() => supported && handleFormatChange(id)}
+                disabled={!supported}
+              >
+                {label}
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        {/* Quality — label left, mono value right, slider under (board 1124). */}
+        <div>
+          <div className="tw:flex tw:items-center tw:justify-between">
+            <span className={LABEL}>Quality</span>
+            <span className={`${MONO} tw:text-[var(--bk-ink-soft)]`}>{state.quality}%</span>
+          </div>
+          <div className="tw:mt-1.5">
             <Slider
               value={state.quality}
               onChange={(v) => setState((s) => ({ ...s, quality: v }))}
@@ -179,70 +229,76 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
               withField={false}
             />
           </div>
-          <span className="tw:min-w-10 tw:text-right tw:text-[13px] tw:[font-family:var(--bk-font-mono)] tw:text-gray-900">
-            {state.quality}%
-          </span>
         </div>
-      </div>
-      {/* §18 — Max dimension override */}
-      <div className={SECTION}>
-        <Label className={FIELD_LABEL} htmlFor="opt-max-dim">Max dimension (px)</Label>
-        <TextInput
-          id="opt-max-dim"
-          type="number"
-          min={1}
-          step={1}
-          inputMode="numeric"
-          placeholder="No limit"
-          aria-label="Max dimension in pixels"
-          value={maxDim}
-          onChange={(e) => setMaxDim(e.target.value)}
-        />
-      </div>
-      {/* Stats */}
-      <div className="tw:flex tw:justify-between tw:px-4 tw:py-3 tw:bg-gray-50 tw:rounded-lg tw:mb-4">
-        <div className="tw:text-center">
-          <div className={STAT_LABEL}>Original</div>
-          <div className={STAT_VALUE}>{formatBytes(state.originalSize)}</div>
+
+        {/* §18 max-dimension clamp — real behaviour with no board row yet. */}
+        <div>
+          <label className={LABEL} htmlFor="opt-max-dim">
+            Max dimension (px)
+          </label>
+          <TextInput
+            id="opt-max-dim"
+            type="number"
+            min={1}
+            step={1}
+            inputMode="numeric"
+            placeholder="No limit"
+            aria-label="Max dimension in pixels"
+            className="tw:mt-1.5 tw:[&_input]:h-8 tw:[&_input]:rounded-md tw:[&_input]:text-[13px]"
+            value={maxDim}
+            onChange={(e) => setMaxDim(e.target.value)}
+          />
         </div>
-        <div className="tw:text-center">
-          <div className={STAT_LABEL}>Optimized</div>
-          <div className={STAT_VALUE}>
-            {state.isProcessing ? "..." : formatBytes(state.optimizedSize)}
+
+        {/* Size rows — the saving rides the optimised number, in success. */}
+        <div className="tw:flex tw:flex-col tw:gap-1.5">
+          <div className={ROW}>
+            <span>Original</span>
+            <span className={`${MONO} tw:text-[var(--bk-ink-muted)]`}>
+              {formatBytes(state.originalSize)}
+            </span>
+          </div>
+          <div className={ROW}>
+            <span>Optimised</span>
+            {/* Success green means "this saved you something". A wash (0%) or
+                a bigger file is not a success and must not read as one. */}
+            <span
+              className={`${MONO} ${savings > 0 ? "tw:text-[var(--bk-success)]" : savings < 0 ? "tw:text-[var(--bk-warning)]" : "tw:text-[var(--bk-ink-muted)]"}`}
+              data-testid="opt-result"
+            >
+              {state.isProcessing
+                ? "…"
+                : state.originalSize > 0
+                  ? `${formatBytes(state.optimizedSize)}${savings === 0 ? "" : ` · ${savings > 0 ? "−" : "+"}${Math.abs(savings)}%`}`
+                  : formatBytes(state.optimizedSize)}
+            </span>
           </div>
         </div>
-        <div className="tw:text-center">
-          <div className={STAT_LABEL}>Savings</div>
-          <div className={`${STAT_VALUE} tw:text-[var(--bk-success)]`}>
-            {state.isProcessing ? "..." : `${savings}%`}
-          </div>
-        </div>
-      </div>
-      {/* Preview Comparison */}
-      <div className="tw:flex tw:gap-3 tw:mb-4">
-        <div className={PREVIEW_BOX}>
-          <img src={imageSrc} alt="Original" className="tw:max-w-full tw:max-h-30 tw:rounded" />
-          <div className={PREVIEW_LABEL}>Original</div>
-        </div>
-        <div className={PREVIEW_BOX}>
-          {state.isProcessing ? (
-            <Spinner size="sm" />
-          ) : state.optimizedSrc ? (
-            <img src={state.optimizedSrc} alt="Optimized" className="tw:max-w-full tw:max-h-30 tw:rounded" />
-          ) : null}
-          <div className={PREVIEW_LABEL}>Optimized</div>
-        </div>
-      </div>
-      {/* Actions */}
-      <div className="tw:flex tw:justify-end tw:gap-2 tw:mt-4">
-        {onClose && (
-          <Button color="light" onClick={onClose} className={GHOST}>
-            Cancel
-          </Button>
-        )}
-        <Button onClick={handleApply} disabled={state.isProcessing || !state.optimizedSrc}>
-          Apply Optimization
+
+        {/* CTA — full-width per the board. */}
+        <Button
+          className="tw:h-9 tw:w-full tw:rounded tw:border-0 tw:bg-[var(--bk-accent)] tw:text-[13px] tw:font-medium tw:text-[var(--bk-accent-on)] tw:enabled:hover:bg-[var(--bk-accent-hover)]"
+          onClick={handleApply}
+          disabled={state.isProcessing || !state.optimizedSrc}
+        >
+          Optimise
         </Button>
+
+        <div className="tw:flex tw:items-center tw:gap-2 tw:pb-4">
+          <span className="tw:min-w-0 tw:flex-1 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]">
+            Optimised copy saves as a new version.
+          </span>
+          {onClose && (
+            <Button
+              color="light"
+              size="xs"
+              className="tw:min-h-6 tw:shrink-0 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[12px] tw:font-medium tw:text-[var(--bk-ink-soft)] tw:enabled:hover:bg-transparent tw:enabled:hover:text-gray-900"
+              onClick={onClose}
+            >
+              Cancel
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );
