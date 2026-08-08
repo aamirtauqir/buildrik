@@ -21,6 +21,15 @@
       "Inter": "PASS",
       "GeistMono": "PASS",
       "InterTight": "MISSING — batch 1 (auth/onboarding) blocked until installed"
+    },
+    "gateKit": {
+      "plantedViolationsCaught": [
+        "DUP",
+        "WIDTH",
+        "MISSING"
+      ],
+      "date": "2026-08-08",
+      "status": "green"
     }
   },
   "rows": [
@@ -37,7 +46,8 @@
       "state": "default",
       "viewport": "n/a",
       "pipelineState": "readback-verified",
-      "notes": "cover verified: VERTICAL, 6 children, widths 1072, no clipping"
+      "notes": "cover verified: VERTICAL, 6 children, widths 1072, no clipping",
+      "expectedWidth": 1200
     }
   ]
 }

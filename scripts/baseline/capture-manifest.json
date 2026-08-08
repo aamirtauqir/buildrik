@@ -1,0 +1,23 @@
+{
+ "commit": "2229d04f",
+ "base": "http://localhost:3000",
+ "generated": "2026-08-08T13:31:22.489Z",
+ "captures": [
+  {
+   "id": "BL-SMOKE",
+   "path": "/auth",
+   "state": "default",
+   "status": 200,
+   "sha256": "d915dda46e7e01d3",
+   "scrollHeight": 900,
+   "elCount": 1
+  }
+ ],
+ "failures": [
+  {
+   "id": "BL-SMOKE-FAIL",
+   "path": "/auth/login",
+   "error": "redirected to /auth"
+  }
+ ]
+}
