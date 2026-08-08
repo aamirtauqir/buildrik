@@ -57,6 +57,27 @@ const ROW =
 const ROW_CHEVRON = "tw:text-[13px] tw:text-gray-500";
 const ROW_COUNT =
   "tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:font-medium tw:tabular-nums tw:text-gray-500";
+/**
+ * True when another modal dialog is VISIBLE above `el` — i.e. one this surface
+ * opened. Escape belongs to the topmost layer, not to us.
+ *
+ * The visibility test is the whole trick: several dialogs stay mounted while
+ * closed (the stock modal, the delete confirm), so a presence-only check
+ * reported "covered" permanently and swallowed every Escape. A closed dialog
+ * has no client rects.
+ */
+function isCoveredByModal(el: HTMLElement): boolean {
+  const dialogs = document.querySelectorAll<HTMLElement>('[role="dialog"][aria-modal="true"]');
+  for (const d of dialogs) {
+    if (d === el || d.contains(el) || el.contains(d)) continue;
+    if (d.hidden || d.getAttribute("aria-hidden") === "true") continue;
+    const cs = getComputedStyle(d);
+    if (cs.display === "none" || cs.visibility === "hidden") continue;
+    return true;
+  }
+  return false;
+}
+
 const BACK_ROW =
   "tw:flex tw:h-9 tw:w-full tw:items-center tw:justify-start tw:border-0 tw:bg-transparent tw:px-4 tw:text-left " +
   "tw:text-[13px] tw:leading-5 tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline";
@@ -71,6 +92,13 @@ export function AssetDetailOverlay({
   onReplaceAcross,
 }: AssetDetailOverlayProps) {
   const [view, setView] = useState<View>("hub");
+  // Escape reads the level from a ref: calling onClose() inside a setState
+  // updater is a side effect in the render phase, which StrictMode's double
+  // invoke discards — the drill-in simply ignored Escape.
+  const viewRef = useRef<View>("hub");
+  useEffect(() => {
+    viewRef.current = view;
+  }, [view]);
   const [altDraft, setAltDraft] = useState(item.altText ?? "");
   const [altBusy, setAltBusy] = useState(false);
   const [metaError, setMetaError] = useState(false);
@@ -159,17 +187,16 @@ export function AssetDetailOverlay({
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
+        // A modal opened FROM this drill-in (the image editor) sits above it
+        // and owns the keystroke. Without this guard one Escape closed the
+        // modal AND navigated the drawer behind it — found on the live walk.
+        if (isCoveredByModal(el)) return;
         e.preventDefault();
         // One level per press — and nobody else's Escape handler (drawer
         // close, canvas deselect) gets to also fire on the same keystroke.
         e.stopPropagation();
-        setView((v) => {
-          if (v === "hub") {
-            onClose();
-            return v;
-          }
-          return "hub";
-        });
+        if (viewRef.current === "hub") onClose();
+        else setView("hub");
         return;
       }
       if (e.key !== "Tab") return;

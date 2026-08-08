@@ -529,8 +529,31 @@ Savings tone made honest too: success green only when it actually saved
 (0% muted, bigger-file warning) — green-on-0% was the same class of lie.
 Code-only controls kept + flagged for a Figma row: AVIF chip (real
 probed capability) and the §18 max-dimension clamp.
-NEXT (Media): marker-board status pills (303:1997 / 303:2032). Then
-Media CLOSED → Content 148:2. Dirty-dot (140:21, 8px orange on Home)
+Status pills DONE 2026-08-07 (marker boards 303:1997 / 303:2032): the
+drawer names the running media job over the grid — "Image editor — crop
+· rotate · adjust" while the editor is open, "Optimising → WebP…" while
+the optimised copy is written. Both spans are owned by MediaTab (the
+handlers it already runs); the pill is status, never a control
+(pointer-events:none, role=status/aria-live). The editor pill has no
+close signal — the modal's open state lives in AquibraStudio (founder
+tree) — so it clears on save completion and on the first pointerdown
+back in the drawer (inert while the modal is up).
+TWO REAL BUGS found chasing the pill live:
+1. AssetDetailOverlay's Escape called onClose() INSIDE a setState
+   updater — a render-phase side effect that StrictMode's double invoke
+   discards, so the drill-in ignored Escape entirely. Now reads the
+   level from a ref.
+2. The modal-above guard added for it was over-broad: presence-only
+   matching counted CLOSED-but-mounted dialogs, so it swallowed every
+   Escape. Now skips hidden/display:none/aria-hidden dialogs.
+Both locked with regression tests (AssetDetailOverlay.escape.test.tsx,
+SlimLauncher.statusPill.test.tsx).
+OPEN (pre-existing, not from this pass): a capture-phase listener
+somewhere eats a real Escape keystroke before it reaches window — the
+overlay closes correctly on a window-dispatched Escape but not on a
+physical one. Affordance is unaffected (the ‹ back row works). Needs its
+own investigate pass across the shell's key handling.
+MEDIA FAMILY CLOSED. NEXT: Content 148:2 (11 boards). Dirty-dot (140:21, 8px orange on Home)
 NOT shipped — no per-page unsaved-state source in the model yet.
 
 ## NOT in scope

@@ -47,6 +47,13 @@ interface SlimLauncherProps {
   onSearchChange(query: string): void;
   /** Header expand brackets — 320 ↔ 700, same as every other drawer. */
   onExpand?(): void;
+  /**
+   * Boards 303:1997 / 303:2032 — a pill over the grid naming the media job
+   * currently running ("Image editor — …", "Optimising → WebP…").
+   */
+  statusPill?: string | null;
+  /** Any interaction with the drawer clears a pill left by a closed modal. */
+  onDismissStatusPill?(): void;
   onUpload(files: File[]): void;
   /** Storage has not been read yet — draw the skeleton, not the empty state. */
   loading?: boolean;
@@ -134,7 +141,11 @@ export function SlimLauncher(props: SlimLauncherProps) {
   }, [props.libraryItems, activeTypes, searchQuery]);
 
   return (
-    <PanelFrame className="sl-launcher" data-testid="media-panel">
+    <PanelFrame
+      className="sl-launcher"
+      data-testid="media-panel"
+      onPointerDownCapture={props.statusPill ? props.onDismissStatusPill : undefined}
+    >
       {selectionContext ? (
         <SelectionContextBar
           label={selectionContext.label}
@@ -144,6 +155,21 @@ export function SlimLauncher(props: SlimLauncherProps) {
       <PanelFrame.Header title="Media" onClose={onClose} onExpandToggle={props.onExpand} />
 
       {/* Search — board `144:7`: 28h field inset 16, on bg-subtle. */}
+      {/* Boards 303:1997 / 303:2032 — the running job names itself over the
+          grid; it is status, not a control, so it never takes a click. */}
+      {props.statusPill ? (
+        <div
+          className="tw:relative tw:h-0"
+          role="status"
+          aria-live="polite"
+          data-testid="media-status-pill"
+        >
+          <span className="tw:pointer-events-none tw:absolute tw:left-4 tw:top-1.5 tw:z-10 tw:inline-flex tw:items-center tw:rounded-full tw:bg-[var(--bk-bg-subtle)] tw:px-3 tw:py-1 tw:text-[12px] tw:leading-[18px] tw:text-gray-900 tw:[box-shadow:var(--bk-shadow-raised)]">
+            {props.statusPill}
+          </span>
+        </div>
+      ) : null}
+
       {/* Board 144:7/144:8 — bare 28h box, no magnifier, no inline clear. */}
       <div className="sl-search tw:flex tw:h-9 tw:items-center tw:px-4" data-testid="media-search">
         <TextField

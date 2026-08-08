@@ -74,6 +74,19 @@ function MediaTabWithComposer({
   const { addToast } = useToast();
   const [stockModalOpen, setStockModalOpen] = React.useState(false);
   const [iconBrowserOpen, setIconBrowserOpen] = React.useState(false);
+  /*
+    Boards 303:1997 / 303:2032 draw a status pill over the grid while a
+    long-running media job is happening: "Image editor — crop · rotate ·
+    adjust" while the editor is open, "Optimising → WebP…" while an optimised
+    copy is being written. Both spans are owned here.
+
+    The editor pill has no close signal to hang off: the modal's open state
+    lives in AquibraStudio, which this tab cannot reach. It clears on save
+    completion, and on the first pointerdown back in the drawer — while the
+    editor is open the drawer is inert, so that gesture only happens after the
+    user has left the modal.
+  */
+  const [statusPill, setStatusPill] = React.useState<string | null>(null);
   const [stockBrowserOpen, setStockBrowserOpen] = React.useState(false);
 
   const showToast = React.useCallback((msg: string, type: "success" | "error" | "info") => {
@@ -83,6 +96,7 @@ function MediaTabWithComposer({
   const handleEditImage = React.useCallback(
     (item: LibraryItem) => {
       if (!onOpenImageEditor) return;
+      setStatusPill("Image editor — crop · rotate · adjust");
       onOpenImageEditor(item.src, async (editedSrc) => {
         try {
           // Convert data URL to Blob
@@ -115,6 +129,8 @@ function MediaTabWithComposer({
         } catch (err) {
           console.error("Failed to process edited image:", err);
           showToast("Could not save edited version", "error");
+        } finally {
+          setStatusPill(null);
         }
       });
     },
@@ -127,6 +143,7 @@ function MediaTabWithComposer({
   const handleOptimized = React.useCallback(async (optimizedSrc: string) => {
     const item = state.detailItem;
     if (!item) return;
+    setStatusPill("Optimising → WebP…");
     try {
       const res = await fetch(optimizedSrc);
       const blob = await res.blob();
@@ -149,6 +166,8 @@ function MediaTabWithComposer({
     } catch (err) {
       console.error("Failed to save optimized image:", err);
       showToast("Could not save optimized image", "error");
+    } finally {
+      setStatusPill(null);
     }
   }, [state, showToast]);
 
@@ -290,6 +309,8 @@ function MediaTabWithComposer({
         onToggleType={state.toggleType}
         onSearchChange={(q) => state.setLibrarySearch(q)}
         onExpand={() => state.setPanelExpanded(true)}
+        statusPill={statusPill}
+        onDismissStatusPill={() => setStatusPill(null)}
         onUpload={state.upload}
         onRetryUpload={state.retryUpload}
         loading={state.libraryLoading}
