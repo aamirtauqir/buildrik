@@ -553,12 +553,33 @@ somewhere eats a real Escape keystroke before it reaches window — the
 overlay closes correctly on a window-dispatched Escape but not on a
 physical one. Affordance is unaffected (the ‹ back row works). Needs its
 own investigate pass across the shell's key handling.
-MEDIA FAMILY CLOSED.
+MEDIA FAMILY *NOT* CLOSED — reopened 2026-08-08. The same parallel arc
+drew 36 new boards, NINE of them Media, all after my pass declared the
+family done:
+- 1159:4593 / 1162:4617 / 1163:4641 / 1163:13695 / 1163:13948 —
+  `Media · fullpage · *` (library / empty / list-view bulk-select /
+  unused-scope context-menu / drag-over uploading)
+- 1164:4713 modal · picker (choose for element)
+- 1164:4738 + 1174:4849 modal · replace-across-site + result-states
+- 1175:4827 delete-confirm · bulk type-DELETE (>20)
+My Media pass only ever verified the 320 drawer and its five drill-ins.
+The fullpage manager and the modals had NO boards at the time, so they
+were never eye-checked — now they have boards and the delta is a
+surface rebuild, not a paint pass. FOUNDER DECISION NEEDED (below).
 
 PAGES RE-AUDIT 2026-08-08 (founder re-ran the Pages spec). Census by NAME
 on page 1:3 found THREE boards the first Pages pass never saw — the
-founder's 1171 batch, added after that pass and absent from boards.json
-(the same trap as the 1082 Layers batch):
+founder's 1171 batch. CORRECTION 2026-08-08: the commit for this pass
+said they were "absent from boards.json, like the 1082 batch". That was
+true when the Pages pass ran on 08-07 and FALSE by the time it was
+written — a parallel figma-design arc (26e25572..f7b39a4c, all 08-08)
+had already drawn them, wired them and REGENERATED boards.json hours
+earlier. boards.json is current (416 boards, generatedAt 08-08); the
+regeneration I was about to recommend is unnecessary. The real lesson is
+the memory rule I skipped: check git log before assuming state
+([[feedback_check_git_log_before_assuming_uncleaned]],
+[[feedback_parallel_agent_convergence_20260511]]).
+The three boards:
 - 1171:4713 Pages · context-menu → labels were Title Case with ⌘ hints;
   board is sentence case with ellipses and no hints (Rename… /
   Duplicate / Set as homepage / Copy link / Page settings… / Delete
