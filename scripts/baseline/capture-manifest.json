@@ -1,212 +1,32 @@
 {
- "commit": "18ab8a66",
+ "commit": "5cb0e606",
  "base": "http://localhost:3100",
- "generated": "2026-08-08T13:47:37.155Z",
+ "generated": "2026-08-08T14:05:16.288Z",
  "captures": [
   {
-   "id": "BL-0001",
-   "path": "/auth",
+   "id": "BL-0027",
+   "path": "/auth/redirect",
    "state": "default",
    "status": 200,
-   "sha256": "e3ff014f2fa23b4a",
-   "scrollHeight": 900,
-   "elCount": 1
-  },
-  {
-   "id": "BL-0002",
-   "path": "/auth/2fa",
-   "state": "default",
-   "status": 200,
-   "sha256": "7d9fb92f9716a9ad",
+   "sha256": "825fd34af51ff9b5",
    "scrollHeight": 900,
    "elCount": 0
   },
   {
-   "id": "BL-0003",
-   "path": "/auth/2fa/backup",
+   "id": "BL-0031",
+   "path": "/auth/workspace-select",
    "state": "default",
    "status": 200,
-   "sha256": "5c24f093bdb0bd74",
-   "scrollHeight": 900,
-   "elCount": 1
-  },
-  {
-   "id": "BL-0004",
-   "path": "/auth/access-removed",
-   "state": "default",
-   "status": 200,
-   "sha256": "22c136395ed8d576",
+   "sha256": "2388d311f557e61c",
    "scrollHeight": 900,
    "elCount": 0
   },
   {
-   "id": "BL-0005",
-   "path": "/auth/account-unlocked",
+   "id": "BL-0032",
+   "path": "/auth/workspace-setup",
    "state": "default",
    "status": 200,
-   "sha256": "4118bc3cd4bf7229",
-   "scrollHeight": 900,
-   "elCount": 0
-  },
-  {
-   "id": "BL-0008",
-   "path": "/auth/check-inbox",
-   "state": "default",
-   "status": 200,
-   "sha256": "56b10fdd7e25ef21",
-   "scrollHeight": 900,
-   "elCount": 0
-  },
-  {
-   "id": "BL-0009",
-   "path": "/auth/device-alert",
-   "state": "default",
-   "status": 200,
-   "sha256": "efab3159ba68a4a9",
-   "scrollHeight": 900,
-   "elCount": 0
-  },
-  {
-   "id": "BL-0010",
-   "path": "/auth/email-exists",
-   "state": "default",
-   "status": 200,
-   "sha256": "21afbd1bb5e1a933",
-   "scrollHeight": 900,
-   "elCount": 0
-  },
-  {
-   "id": "BL-0011",
-   "path": "/auth/error/2fa-locked",
-   "state": "default",
-   "status": 200,
-   "sha256": "45c86add9bea5ec3",
-   "scrollHeight": 900,
-   "elCount": 0
-  },
-  {
-   "id": "BL-0012",
-   "path": "/auth/error/captcha",
-   "state": "default",
-   "status": 200,
-   "sha256": "41aa8f57945e32f6",
-   "scrollHeight": 900,
-   "elCount": 0
-  },
-  {
-   "id": "BL-0013",
-   "path": "/auth/error/expired-link",
-   "state": "default",
-   "status": 200,
-   "sha256": "8b3257f5f7775969",
-   "scrollHeight": 900,
-   "elCount": 0
-  },
-  {
-   "id": "BL-0014",
-   "path": "/auth/error/invite-expired",
-   "state": "default",
-   "status": 200,
-   "sha256": "b3b3c79f01c27fc5",
-   "scrollHeight": 900,
-   "elCount": 0
-  },
-  {
-   "id": "BL-0015",
-   "path": "/auth/error/locked",
-   "state": "default",
-   "status": 200,
-   "sha256": "5b0d6f642cebecf1",
-   "scrollHeight": 900,
-   "elCount": 0
-  },
-  {
-   "id": "BL-0016",
-   "path": "/auth/error/rate-limited",
-   "state": "default",
-   "status": 200,
-   "sha256": "f86f53f35f2d5e38",
-   "scrollHeight": 900,
-   "elCount": 0
-  },
-  {
-   "id": "BL-0017",
-   "path": "/auth/error/session-expired",
-   "state": "default",
-   "status": 200,
-   "sha256": "a7b5fa83b94af0f8",
-   "scrollHeight": 900,
-   "elCount": 0
-  },
-  {
-   "id": "BL-0018",
-   "path": "/auth/error/social-error",
-   "state": "default",
-   "status": 200,
-   "sha256": "745c1235a476b678",
-   "scrollHeight": 900,
-   "elCount": 0
-  },
-  {
-   "id": "BL-0019",
-   "path": "/auth/error/suspicious",
-   "state": "default",
-   "status": 200,
-   "sha256": "936d20053b2beb7a",
-   "scrollHeight": 900,
-   "elCount": 0
-  },
-  {
-   "id": "BL-0020",
-   "path": "/auth/forgot-password",
-   "state": "default",
-   "status": 200,
-   "sha256": "c090f1aa08162a59",
-   "scrollHeight": 900,
-   "elCount": 1
-  },
-  {
-   "id": "BL-0023",
-   "path": "/auth/magic-link",
-   "state": "default",
-   "status": 200,
-   "sha256": "09f07b87dc6fd3ce",
-   "scrollHeight": 900,
-   "elCount": 1
-  },
-  {
-   "id": "BL-0024",
-   "path": "/auth/magic-link/sent",
-   "state": "default",
-   "status": 200,
-   "sha256": "1e6b44c83bdcfc82",
-   "scrollHeight": 900,
-   "elCount": 0
-  },
-  {
-   "id": "BL-0025",
-   "path": "/auth/oauth-conflict",
-   "state": "default",
-   "status": 200,
-   "sha256": "74949d2f09e01202",
-   "scrollHeight": 900,
-   "elCount": 0
-  },
-  {
-   "id": "BL-0026",
-   "path": "/auth/password-changed",
-   "state": "default",
-   "status": 200,
-   "sha256": "21b33cabe6896c6a",
-   "scrollHeight": 900,
-   "elCount": 0
-  },
-  {
-   "id": "BL-0029",
-   "path": "/auth/signup",
-   "state": "default",
-   "status": 200,
-   "sha256": "f0a0e6991a0c56bc",
+   "sha256": "2fb35d395cbe1180",
    "scrollHeight": 900,
    "elCount": 1
   }

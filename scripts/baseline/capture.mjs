@@ -36,8 +36,11 @@ const require = createRequire(join(HERE, "..", "..", "packages", "dashboard", "p
 const { chromium } = require("@playwright/test");
 
 const [, , screensArg, ...rest] = process.argv;
-if (!screensArg) { console.error("usage: capture.mjs <screens.json> [--base URL]"); process.exit(3); }
+if (!screensArg) { console.error("usage: capture.mjs <screens.json> [--base URL] [--tokens file] [--login-token raw]"); process.exit(3); }
 const BASE = rest.includes("--base") ? rest[rest.indexOf("--base") + 1] : "http://localhost:3000";
+// Runtime-only token material: never committed, never recorded in the manifest.
+const TOKENS = rest.includes("--tokens") ? JSON.parse(readFileSync(rest[rest.indexOf("--tokens") + 1], "utf8")) : {};
+const LOGIN_TOKEN = rest.includes("--login-token") ? rest[rest.indexOf("--login-token") + 1] : null;
 const screens = JSON.parse(readFileSync(screensArg, "utf8"));
 const OUT = join(homedir(), ".gstack", "projects", "aamirtauqir-buildrik", "baseline-shots");
 mkdirSync(OUT, { recursive: true });
@@ -63,11 +66,42 @@ await ctx.addInitScript((css) => {
 const commit = execFileSync("git", ["rev-parse", "--short", "HEAD"], { cwd: HERE }).toString().trim();
 const manifest = []; const failures = [];
 
+// Session context: log in once via the magic-link callback, keep cookies in a
+// second context. storageState never touches disk — memory only, per run.
+let sessionCtx = null;
+if (LOGIN_TOKEN) {
+  sessionCtx = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
+  await sessionCtx.addInitScript((css) => {
+    const s = document.createElement("style"); s.textContent = css;
+    document.addEventListener("DOMContentLoaded", () => document.head.appendChild(s));
+  }, ANIMATION_KILL);
+  const lp = await sessionCtx.newPage();
+  await lp.goto(`${BASE}/auth/callback?token=${LOGIN_TOKEN}`, { waitUntil: "domcontentloaded", timeout: 30000 });
+  // Post-login landing (dashboard) never reaches networkidle — wait only for
+  // the URL to leave the auth flow, then confirm a session cookie exists.
+  await lp.waitForURL((u) => !u.pathname.startsWith("/auth/"), { timeout: 30000 });
+  const cookies = await sessionCtx.cookies(BASE);
+  if (!cookies.some((c) => c.name.includes("session-token"))) throw new Error("login produced no session cookie");
+  console.log(`[capture] session established → ${new URL(lp.url()).pathname}`);
+  await lp.close();
+}
+
 for (const s of screens) {
-  const page = await ctx.newPage();
+  const useCtx = s.requires === "session" && sessionCtx ? sessionCtx : ctx;
+  const page = await useCtx.newPage();
   try {
     await page.clock.install({ time: FROZEN_TIME });
-    const resp = await page.goto(BASE + s.path, { waitUntil: "networkidle", timeout: 30000 });
+    // Stall (never resolve) rather than abort: an aborted request fires the
+    // app's onError path instantly; a stalled one holds loading/spinner states
+    // open deterministically for capture.
+    if (s.blockPatterns) for (const p of s.blockPatterns) await page.route(p, () => {});
+    let q = "";
+    if (s.tokenRef) {
+      const tok = TOKENS[s.tokenRef];
+      if (!tok) throw new Error(`tokenRef ${s.tokenRef} not provided`);
+      q = (s.query ? `?${s.query}&` : "?") + `token=${tok}`;
+    } else if (s.query) q = `?${s.query}`;
+    const resp = await page.goto(BASE + s.path + q, { waitUntil: s.waitUntil || "networkidle", timeout: 30000 });
     if (s.waitMs) await page.waitForTimeout(s.waitMs);
     // SENTINEL — the screen must prove it is itself
     if (s.sentinel?.selector) await page.waitForSelector(s.sentinel.selector, { timeout: 8000 });
