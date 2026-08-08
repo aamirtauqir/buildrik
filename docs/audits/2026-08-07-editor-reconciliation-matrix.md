@@ -119,7 +119,7 @@ board work. Board-side-only problem rate ≈ 26/340 ≈ 8%.
 
 Family rows hid Media's fullpage twin, so every tab was re-walked at RENDER-SURFACE
 level (every modal/overlay/popover/drill-in in the code inventory vs boards).
-Result: **17 shipped surfaces with no board**, grouped by job priority:
+Result: **17 shipped surfaces with no board** — **ALL DRAWN + WIRED 2026-08-08** (G1-G16 as 18 boards across commits a9858f5d + the G-sweep; G17 BlockPickerModal marked covered-by-Insert per duplication-control; ProjectSettingsModal conflict resolved by founder blanket rule "codebase ke hisaab se" = code wins, modal board drawn). Page BFS after: 404/404 reachable.
 
 | # | Surface (code) | Job | Boards needed |
 |---|---|---|---|
