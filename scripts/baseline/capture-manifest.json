@@ -1,16 +1,106 @@
 {
- "commit": "a7c3e861",
+ "commit": "67a5f23c",
  "base": "http://localhost:3100",
- "generated": "2026-08-09T06:50:47.935Z",
+ "generated": "2026-08-09T09:43:11.581Z",
  "captures": [
   {
-   "id": "BL-0091",
-   "path": "/onboarding/ai/preview",
-   "state": "default",
+   "id": "BL-0101",
+   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
+   "state": "panel-layers",
    "status": 200,
-   "sha256": "e3649b006232ba6c",
-   "scrollHeight": 904,
-   "elCount": 2
+   "sha256": "be845c3a4a3ef6dc",
+   "scrollHeight": 900,
+   "elCount": 18
+  },
+  {
+   "id": "BL-0102",
+   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
+   "state": "panel-pages",
+   "status": 200,
+   "sha256": "181b9e3e11600f66",
+   "scrollHeight": 900,
+   "elCount": 20
+  },
+  {
+   "id": "BL-0103",
+   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
+   "state": "panel-media",
+   "status": 200,
+   "sha256": "f71d9b0ac0c5c7c4",
+   "scrollHeight": 900,
+   "elCount": 45
+  },
+  {
+   "id": "BL-0104",
+   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
+   "state": "panel-content",
+   "status": 200,
+   "sha256": "d28d601a15500e8d",
+   "scrollHeight": 900,
+   "elCount": 19
+  },
+  {
+   "id": "BL-0105",
+   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
+   "state": "panel-brand",
+   "status": 200,
+   "sha256": "2be6a222459d9065",
+   "scrollHeight": 900,
+   "elCount": 18
+  },
+  {
+   "id": "BL-0106",
+   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
+   "state": "publish-open",
+   "status": 200,
+   "sha256": "63291adf5dae0312",
+   "scrollHeight": 900,
+   "elCount": 18
+  },
+  {
+   "id": "BL-0107",
+   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
+   "state": "comments-open",
+   "status": 200,
+   "sha256": "ec7d264b90de08ce",
+   "scrollHeight": 900,
+   "elCount": 19
+  },
+  {
+   "id": "BL-0108",
+   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
+   "state": "notifications-open",
+   "status": 200,
+   "sha256": "7d6589115c68525f",
+   "scrollHeight": 900,
+   "elCount": 18
+  },
+  {
+   "id": "BL-0109",
+   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
+   "state": "site-menu-open",
+   "status": 200,
+   "sha256": "78fb3122a1653b31",
+   "scrollHeight": 900,
+   "elCount": 18
+  },
+  {
+   "id": "BL-0110",
+   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
+   "state": "review-pill-open",
+   "status": 200,
+   "sha256": "6fa12819a1ebd6f5",
+   "scrollHeight": 900,
+   "elCount": 20
+  },
+  {
+   "id": "BL-0111",
+   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
+   "state": "cmdk-open",
+   "status": 200,
+   "sha256": "52362d3c4aaf843c",
+   "scrollHeight": 900,
+   "elCount": 80
   }
  ],
  "failures": []
