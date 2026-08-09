@@ -49,6 +49,12 @@
    "ok": 57,
    "blocked": 7,
    "traps": "dashboard never networkidle (domcontentloaded+waitMs); h1 absent on app-shell pages (nav sentinel); seed site rows soft-deleted (filter deletedAt null); active-workspace mismatch shows Site-not-found; sha-clustering = spinner-shell detector; wizard step guards redirect; cookie banner present on all fresh-context captures (as-built first-visit state)"
+  },
+  "captureRun4": {
+   "date": "2026-08-09",
+   "scope": "wizard-state manufacture + share/review/transfer",
+   "ok": 7,
+   "trap": "wizardDataSchema is FLAT (shared/schemas/onboarding.ts:38); prisma schema comment claims nested data:{} \u2014 comment lies, zod is truth"
   }
  },
  "rows": [
@@ -1403,8 +1409,10 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "blocked",
-   "blockReason": "wizard guard \u2014 needs completed AI draft state"
+   "pipelineState": "planned",
+   "screenshotHash": "e3649b006232ba6c",
+   "capturedFrom": "prod@f7b39a4c",
+   "notes": " captured via server wizardData manufacture (onboarding_states, FLAT schema \u2014 prisma comment shows nested data:{} which is WRONG)"
   },
   {
    "id": "BL-0092",
@@ -1444,8 +1452,10 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "blocked",
-   "blockReason": "wizard guard \u2014 needs selected template state"
+   "pipelineState": "planned",
+   "screenshotHash": "0fcf63998137a265",
+   "capturedFrom": "prod@f7b39a4c",
+   "notes": " captured via server wizardData manufacture (onboarding_states, FLAT schema \u2014 prisma comment shows nested data:{} which is WRONG)"
   },
   {
    "id": "BL-0095",
@@ -1457,8 +1467,10 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "blocked",
-   "blockReason": "wizard guard \u2014 needs selected template state"
+   "pipelineState": "planned",
+   "screenshotHash": "f32aa1ceddceae69",
+   "capturedFrom": "prod@f7b39a4c",
+   "notes": " captured via server wizardData manufacture (onboarding_states, FLAT schema \u2014 prisma comment shows nested data:{} which is WRONG)"
   },
   {
    "id": "BL-0096",
@@ -1470,8 +1482,52 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "blocked",
-   "blockReason": "wizard guard \u2014 needs completed-path state"
+   "pipelineState": "planned",
+   "screenshotHash": "9c95e518fa18b2bc",
+   "capturedFrom": "prod@f7b39a4c",
+   "notes": " captured via server wizardData manufacture (onboarding_states, FLAT schema \u2014 prisma comment shows nested data:{} which is WRONG)"
+  },
+  {
+   "id": "BL-0097",
+   "kind": "route",
+   "route": "/share/[token]",
+   "statusClass": 2,
+   "flow": "share",
+   "state": "as-rendered (unpublished site fixture)",
+   "viewport": "1440x900",
+   "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
+   "pipelineState": "planned",
+   "screenshotHash": "91c10d2eb9df4c42",
+   "capturedFrom": "prod@f7b39a4c",
+   "notes": "ShareLink fixture row; captured render whatever unpublished-site share shows"
+  },
+  {
+   "id": "BL-0098",
+   "kind": "route",
+   "route": "/review/[token]",
+   "statusClass": 2,
+   "flow": "review",
+   "state": "PENDING, snapshotPages null",
+   "viewport": "1440x900",
+   "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
+   "pipelineState": "planned",
+   "screenshotHash": "beef553fa46c28a7",
+   "capturedFrom": "prod@f7b39a4c",
+   "notes": "ReviewRequest fixture (internal-submit shape, no snapshot)"
+  },
+  {
+   "id": "BL-0099",
+   "kind": "route",
+   "route": "/transfer/accept",
+   "statusClass": 1,
+   "flow": "transfer",
+   "state": "invalid-link (no token)",
+   "viewport": "1440x900",
+   "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
+   "pipelineState": "planned",
+   "screenshotHash": "3a5b99d16940e182",
+   "capturedFrom": "prod@f7b39a4c",
+   "notes": "default no-token render; valid-token state needs transfer fixture (later)"
   }
  ]
 }

@@ -1,111 +1,17 @@
 {
- "commit": "aff6295c",
+ "commit": "a7c3e861",
  "base": "http://localhost:3100",
- "generated": "2026-08-08T16:59:17.394Z",
+ "generated": "2026-08-09T06:50:47.935Z",
  "captures": [
-  {
-   "id": "BL-0084",
-   "path": "/onboarding/path",
-   "state": "default",
-   "status": 200,
-   "sha256": "9d6fd1f6062748e0",
-   "scrollHeight": 900,
-   "elCount": 2
-  },
-  {
-   "id": "BL-0085",
-   "path": "/onboarding/workspace",
-   "state": "default",
-   "status": 200,
-   "sha256": "620a79bc461c3ceb",
-   "scrollHeight": 900,
-   "elCount": 3
-  },
-  {
-   "id": "BL-0086",
-   "path": "/onboarding/site",
-   "state": "default",
-   "status": 200,
-   "sha256": "71d60e6456f72c05",
-   "scrollHeight": 900,
-   "elCount": 3
-  },
-  {
-   "id": "BL-0087",
-   "path": "/onboarding/ai/basics",
-   "state": "default",
-   "status": 200,
-   "sha256": "8edc5701abed5b82",
-   "scrollHeight": 900,
-   "elCount": 3
-  },
-  {
-   "id": "BL-0088",
-   "path": "/onboarding/ai/brand",
-   "state": "default",
-   "status": 200,
-   "sha256": "f95c524a037c88c2",
-   "scrollHeight": 956,
-   "elCount": 3
-  },
-  {
-   "id": "BL-0089",
-   "path": "/onboarding/ai/goal",
-   "state": "default",
-   "status": 200,
-   "sha256": "75b3355c6de56622",
-   "scrollHeight": 900,
-   "elCount": 3
-  },
-  {
-   "id": "BL-0092",
-   "path": "/onboarding/blank",
-   "state": "default",
-   "status": 200,
-   "sha256": "2c81bcce8437807d",
-   "scrollHeight": 900,
-   "elCount": 3
-  },
-  {
-   "id": "BL-0093",
-   "path": "/onboarding/template",
-   "state": "default",
-   "status": 200,
-   "sha256": "ca31e0eda071fc43",
-   "scrollHeight": 928,
-   "elCount": 2
-  }
- ],
- "failures": [
-  {
-   "id": "BL-0083",
-   "path": "/onboarding",
-   "error": "redirected to /onboarding/site"
-  },
-  {
-   "id": "BL-0090",
-   "path": "/onboarding/ai/generating",
-   "error": "redirected to /onboarding/ai/basics"
-  },
   {
    "id": "BL-0091",
    "path": "/onboarding/ai/preview",
-   "error": "redirected to /onboarding/ai/basics"
-  },
-  {
-   "id": "BL-0094",
-   "path": "/onboarding/template/preview",
-   "error": "redirected to /onboarding/template"
-  },
-  {
-   "id": "BL-0095",
-   "path": "/onboarding/template/selected",
-   "error": "redirected to /onboarding/template"
-  },
-  {
-   "id": "BL-0096",
-   "path": "/onboarding/ready",
-   "error": "redirected to /onboarding/path"
+   "state": "default",
+   "status": 200,
+   "sha256": "e3649b006232ba6c",
+   "scrollHeight": 904,
+   "elCount": 2
   }
- ]
+ ],
+ "failures": []
 }
