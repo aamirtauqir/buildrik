@@ -584,8 +584,26 @@ the canvas src/type/name, so a card dragged onto a folder there did
 nothing even before this.
 DEAD CODE FOUND: MediaTab's fullpage branch + LibraryView are
 unreachable (TabRouter always passes onOpenLibrary) — flagged, not yet
-deleted. STILL OPEN (Media): grid-toolbar + card conformance to
-1159:4593 (format strip, used×N meta, select-all), 1162:4617 empty,
+deleted.
+Grid toolbar + cards DONE 2026-08-09 (board 1161:35 / 1161:52): the
+toolbar now reads count → formats → arrangement. Type pills left (the
+drawer's control living twice); the manager files by FORMAT, and the
+strip lists only formats the library actually holds — a chip with
+nothing behind it could only ever empty the grid. A type filter carried
+in from the drawer gets a clearable chip so a filtered grid always has
+its cause on screen. 2/3/4 sizes the CARD, not the column count: the
+board draws "3" active with five 144px cards in an 820 column, so it is
+a size control. Select-all moved into the toolbar (it was only reachable
+from a bulk bar you cannot see until something is already selected).
+Cards: the provenance badge (UP/STOCK/AI) is gone — where a file came
+from is the one thing the grid never has to answer — replaced by the
+kind badge (▶/◆/Aa, images carry none), and dimensions+bytes gave way to
+the board's dot + "used ×N" / "unused", which answers "can I delete
+this?". TWO PRE-EXISTING BUGS: the grid/list toggle rendered as two
+blank white pills (flowbite Button's own bg/border/min-height beat the
+bare `button` selector, hiding the icons inside), and the fullpage
+grid's drag payload never carried the asset key.
+STILL OPEN (Media): 1162:4617 empty,
 1163:4641 list-view bulk-select, 1163:13695 unused-scope context-menu,
 1163:13948 drag-over uploading, 1164:4713 picker modal, 1164:4738 +
 1174:4849 replace-across, 1175:4827 bulk type-DELETE.

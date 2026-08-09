@@ -82,6 +82,10 @@ function makeMediaState(over: Partial<MediaStateResult> = {}): MediaStateResult 
   const noopAsync = vi.fn(() => Promise.resolve());
   return {
     activeType: "all",
+    activeTypes: new Set(),
+    toggleType: vi.fn(),
+    setFmtFilter: vi.fn(),
+    setGridN: vi.fn(),
     setType: noop,
     currentFolderId: null,
     setCurrentFolderId: noop,
@@ -100,8 +104,6 @@ function makeMediaState(over: Partial<MediaStateResult> = {}): MediaStateResult 
     selMode: false,
     selectedKeys: new Set<string>(),
     setSort: noop,
-    setGridN: noop,
-    setFmtFilter: noop,
     toggleSelMode: noop,
     toggleSelect: noop,
     selectAll: noop,

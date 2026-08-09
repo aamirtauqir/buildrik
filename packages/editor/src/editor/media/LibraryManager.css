@@ -350,15 +350,27 @@
 }
 
 .mgr-view-toggle button {
-  width: 28px; height: 24px;
+  /* flowbite's Button carries its own background, border and min-height at a
+     specificity a bare element selector loses to — the two toggles rendered
+     as blank white pills with the icon invisible inside them. */
+  width: 28px;
+  height: 24px;
+  min-height: 0;
+  padding: 0;
   border-radius: 3px;
-  background: transparent;
-  border: none;
-  color: var(--bk-ink-disabled);
+  background: transparent !important;
+  border: 0 !important;
+  color: var(--bk-ink-muted);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+}
+.mgr-view-toggle button svg { width: 12px; height: 12px; }
+.mgr-view-toggle button.active {
+  background: var(--bk-bg-card) !important;
+  color: var(--bk-accent-text);
+  box-shadow: var(--bk-shadow-raised);
 }
 
 .mgr-view-toggle button.active {
@@ -370,18 +382,17 @@
 .mgr-view-toggle button svg { width: 12px; height: 12px; }
 
 .mgr-grid {
+  /* Board 1174:4876 — the 2 / 3 / 4 toggle sets the column count, so the
+     count is a variable now instead of a fixed 5 with a media-query 4. */
   flex: 1;
   padding: var(--bk-space-16) var(--bk-space-20);
   overflow-y: auto;
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(var(--mgr-card, 144px), 1fr));
+  gap: var(--bk-space-12);
   align-content: start;
 }
 
-@media (max-width: 1320px) {
-.mgr-grid { grid-template-columns: repeat(4, 1fr); }
-}
 
 .mgr-asset {
   background: var(--bk-bg-card);
@@ -416,39 +427,9 @@
   object-fit: cover;
 }
 
-.mgr-badge {
-  position: absolute;
-  top: 6px; left: 6px;
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  height: 16px;
-  padding: 0 6px;
-  border-radius: var(--bk-radius-lg);
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-}
 
-.mgr-badge.uploaded { background: var(--bk-bg-subtle); color: var(--bk-ink-soft); }
 
-.mgr-badge.stock { background: var(--bk-accent-tint); color: var(--bk-ink); }
 
-.mgr-usage {
-  position: absolute;
-  top: 6px; right: 6px;
-  height: 16px;
-  padding: 0 6px;
-  border-radius: var(--bk-radius-lg);
-  background: rgba(29,78,216,0.85);
-  color: var(--bk-bg-card);
-  font-size: 9px;
-  font-weight: 700;
-  display: inline-flex;
-  align-items: center;
-  backdrop-filter: blur(4px);
-}
 
 .mgr-asset-meta {
   padding: 6px var(--bk-space-8) var(--bk-space-8);
@@ -463,11 +444,6 @@
   white-space: nowrap;
 }
 
-.mgr-asset-sub {
-  font-size: 10px;
-  color: var(--bk-ink-disabled);
-  margin-top: 2px;
-}
 
 .mgr-sel-check {
   position: absolute;
@@ -958,3 +934,80 @@
   background: var(--bk-accent-subtle, #ebf5ff);
   box-shadow: inset 0 0 0 1px var(--bk-accent);
 }
+
+/* ─── Board 1159:4593 card + toolbar ─────────────────────────────────── */
+.mgr-kind {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  padding: 2px var(--bk-space-4);
+  border-radius: var(--bk-radius-sm);
+  background: var(--bk-bg-overlay, rgba(17, 24, 39, 0.5));
+  color: var(--bk-ink-inverse, #fff);
+  font: 500 10px var(--bk-font-ui);
+}
+.mgr-asset-use {
+  display: flex;
+  align-items: center;
+  gap: var(--bk-space-4);
+  font: 400 9px var(--bk-font-ui);
+  color: var(--bk-ink-muted);
+}
+.mgr-use-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: var(--bk-radius-full);
+  background: var(--bk-success);
+  flex-shrink: 0;
+}
+.mgr-asset-use.unused { color: var(--bk-ink-disabled); }
+.mgr-asset-use.unused .mgr-use-dot { background: var(--bk-border-medium, var(--bk-border)); }
+
+.mgr-count {
+  font: 400 11px var(--bk-font-ui);
+  color: var(--bk-ink-muted);
+  white-space: nowrap;
+}
+.mgr-fmt-strip { display: flex; gap: var(--bk-space-4); }
+.mgr-fmt {
+  padding: 2px var(--bk-space-8);
+  border: 1px solid var(--bk-border);
+  border-radius: var(--bk-radius-sm);
+  background: transparent;
+  color: var(--bk-ink-muted);
+  font: 500 9px var(--bk-font-ui);
+  cursor: pointer;
+}
+.mgr-fmt.active {
+  background: var(--bk-accent-subtle, #ebf5ff);
+  border-color: var(--bk-accent);
+  color: var(--bk-accent-text);
+}
+.mgr-gridn { display: flex; gap: 2px; }
+.mgr-gridn-btn {
+  padding: 2px var(--bk-space-8);
+  border: 0;
+  border-radius: var(--bk-radius-sm);
+  background: transparent;
+  color: var(--bk-ink-muted);
+  font: 400 10px var(--bk-font-ui);
+  cursor: pointer;
+}
+.mgr-gridn-btn.active {
+  background: var(--bk-accent-subtle, #ebf5ff);
+  color: var(--bk-accent-text);
+  font-weight: 500;
+}
+.mgr-selectall {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--bk-radius-sm);
+  background: transparent;
+  color: var(--bk-ink-muted);
+  cursor: pointer;
+}
+.mgr-selectall:hover { color: var(--bk-ink); background: var(--bk-bg-subtle); }

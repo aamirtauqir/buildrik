@@ -1,10 +1,10 @@
 {
-  "inline_literal": 756,
+  "inline_literal": 755,
   "inline_hoisted": 327,
-  "css_lines": 8875,
+  "css_lines": 8928,
   "css_files": {
     "inspector/styles/inspector.css": 1038,
-    "media/LibraryManager.css": 961,
+    "media/LibraryManager.css": 1014,
     "panels/layers/styles/layers-v2.css": 621,
     "rail/LayoutShell.css": 425,
     "shell/chrome.css": 77,

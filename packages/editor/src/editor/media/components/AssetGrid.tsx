@@ -40,12 +40,12 @@
 
 import {
   Check,
+  CheckSquare,
   ChevronDown,
   FolderOpen,
   Grid2X2,
   List,
   Search,
-  SlidersHorizontal,
   Trash2,
   Upload,
 } from "lucide-react";
@@ -58,6 +58,7 @@ import type {
 } from "../../sidebar/tabs/media/data/mediaTypes";
 import type { SmartFolder } from "./FolderTree";
 import { formatBytes } from "@shared/utils/helpers/number";
+import { formatRelativeTime } from "@shared/utils/relativeTime";
 import { Button } from "@/editor/chrome-ui";
 // ─── Toast contract (matches @/editor/chrome-ui useToast) ───────────────────────
 
@@ -122,6 +123,28 @@ export function AssetGrid({
   addToast,
 }: AssetGridProps) {
   const [viewMode, setViewMode] = React.useState<"grid" | "list">("grid");
+
+  /* Board 1174:4867 — the format strip lists the formats THIS library
+     actually holds, not a fixed JPG/PNG/SVG/MP4 row. A chip for a format
+     with nothing behind it is a filter that can only ever empty the grid. */
+  const availableFormats = React.useMemo(() => {
+    const seen = new Set<string>();
+    for (const i of state.libraryItems) {
+      const ext = (i.mimeType ?? "").split("/")[1]?.split("+")[0];
+      if (ext) seen.add(ext === "jpeg" ? "jpg" : ext);
+    }
+    return [...seen].sort();
+  }, [state.libraryItems]);
+
+  /* Board 1174:4866 — "24 files · Last added 2h ago". */
+  const lastAddedLabel = React.useMemo(() => {
+    let newest = 0;
+    for (const i of state.libraryItems) {
+      const t = new Date(i.createdAt).getTime();
+      if (Number.isFinite(t) && t > newest) newest = t;
+    }
+    return newest ? formatRelativeTime(newest) : "";
+  }, [state.libraryItems]);
   const [sortMenuOpen, setSortMenuOpen] = React.useState(false);
   const [bulkMovePickerOpen, setBulkMovePickerOpen] = React.useState(false);
 
@@ -207,27 +230,84 @@ export function AssetGrid({
         </div>
       )}
 
+      {/*
+        Board 1161:35 — the grid toolbar reads left to right: what you are
+        looking at, what formats are in it, then how it is arranged. The
+        type pills that used to lead were the drawer's control living twice;
+        the board files by FORMAT here (fmtFilter), which is the finer cut
+        the manager is for. A type filter carried in from the drawer still
+        gets a visible, clearable chip — otherwise the manager would show a
+        filtered library with no cause on screen.
+      */}
       <div className="mgr-subbar">
-        <div className="mgr-pills">
-          {TYPE_PILLS.map((pill) => (
+        <span className="mgr-count">
+          {state.counts.all} {state.counts.all === 1 ? "file" : "files"}
+          {lastAddedLabel ? ` · Last added ${lastAddedLabel}` : ""}
+        </span>
+
+        {availableFormats.length > 0 && (
+          <div className="mgr-fmt-strip" role="group" aria-label="Filter by format">
+            {availableFormats.map((fmt) => (
+              <Button
+                key={fmt}
+                className={`mgr-fmt${state.fmtFilter === fmt ? " active" : ""}`}
+                aria-pressed={state.fmtFilter === fmt}
+                onClick={() => state.setFmtFilter(state.fmtFilter === fmt ? "" : fmt)}
+              >
+                {fmt.toUpperCase()}
+              </Button>
+            ))}
+          </div>
+        )}
+
+        {state.activeTypes.size > 0 && (
+          <Button
+            className="mgr-fmt active"
+            aria-label="Clear the type filter carried in from the drawer"
+            onClick={() => state.setType("all")}
+          >
+            {[...state.activeTypes].join(" + ")} ✕
+          </Button>
+        )}
+
+        <div className="mgr-spacer" />
+
+        <div className="mgr-view-toggle">
+          <Button
+            className={viewMode === "grid" ? "active" : ""}
+            onClick={() => setViewMode("grid")}
+            title="Grid view"
+            aria-pressed={viewMode === "grid"}
+          >
+            <Grid2X2 size={12} />
+          </Button>
+          <Button
+            className={viewMode === "list" ? "active" : ""}
+            onClick={() => setViewMode("list")}
+            title="List view"
+            aria-pressed={viewMode === "list"}
+          >
+            <List size={12} />
+          </Button>
+        </div>
+
+        {/* Board's 2 / 3 / 4 — columns per row, not a view mode. */}
+        <div className="mgr-gridn" role="group" aria-label="Columns">
+          {([2, 3, 4] as const).map((n) => (
             <Button
-              key={pill.id}
-              className={`mgr-pill${state.activeType === pill.id ? " active" : ""}`}
-              onClick={() => state.setType(pill.id)}
+              key={n}
+              className={`mgr-gridn-btn${state.gridN === n ? " active" : ""}`}
+              aria-pressed={state.gridN === n}
+              onClick={() => state.setGridN(n)}
             >
-              {pill.label}
-              {state.counts[pill.id] > 0 && (
-                <span style={{ marginLeft: 4, opacity: 0.7 }}>{state.counts[pill.id]}</span>
-              )}
+              {n}
             </Button>
           ))}
         </div>
-        <div className="mgr-spacer" />
-        {/* Bug #3 fix: Sort dropdown */}
+
         <div className="mgr-sort-wrap">
           <Button className="mgr-sort" onClick={() => setSortMenuOpen((o) => !o)}>
-            <SlidersHorizontal size={12} />
-            Sort: {SORT_OPTIONS.find((o) => o.value === state.sort)?.label || "Recent"}
+            {SORT_OPTIONS.find((o) => o.value === state.sort)?.label || "Recent"}
             <ChevronDown size={12} />
           </Button>
           {sortMenuOpen && (
@@ -261,26 +341,30 @@ export function AssetGrid({
             </>
           )}
         </div>
-        <div className="mgr-view-toggle">
-          <Button
-            className={viewMode === "grid" ? "active" : ""}
-            onClick={() => setViewMode("grid")}
-            title="Grid view"
-          >
-            <Grid2X2 size={12} />
-          </Button>
-          <Button
-            className={viewMode === "list" ? "active" : ""}
-            onClick={() => setViewMode("list")}
-            title="List view"
-          >
-            <List size={12} />
-          </Button>
-        </div>
+
+        {/* Board's ☑ — select-all lives in the toolbar, not only in the
+            bulk bar you can't reach until something is already selected. */}
+        <Button
+          className="mgr-selectall"
+          aria-label={state.selMode ? "Clear selection" : "Select all assets"}
+          title={state.selMode ? "Clear selection" : "Select all"}
+          onClick={() => (state.selMode ? state.toggleSelMode() : state.selectAll())}
+        >
+          <CheckSquare size={13} />
+        </Button>
       </div>
 
       {visibleItems.length > 0 ? (
-        <div className={viewMode === "grid" ? "mgr-grid" : "mgr-list"}>
+        <div
+          className={viewMode === "grid" ? "mgr-grid" : "mgr-list"}
+          /* Board 1174:4876 draws "3" active with 144px cards, five to a row —
+             so the toggle sizes the CARD, it does not count columns. */
+          style={
+            viewMode === "grid"
+              ? ({ "--mgr-card": `${state.gridN === 2 ? 176 : state.gridN === 4 ? 118 : 144}px` } as React.CSSProperties)
+              : undefined
+          }
+        >
           {visibleItems.map((item) => {
             const isSelected = selectedAssetId === item.key;
             const thumbContent =
@@ -366,19 +450,17 @@ export function AssetGrid({
               >
                 <div className="mgr-asset-thumb">
                   {thumbContent}
-                  {/* Source badge */}
-                  <div
-                    className={`mgr-badge ${item.assetSource === "stock" ? "stock" : item.assetSource === "ai" ? "stock" : "uploaded"}`}
-                  >
-                    {item.assetSource === "stock"
-                      ? "STOCK"
-                      : item.assetSource === "ai"
-                        ? "AI"
-                        : "UP"}
-                  </div>
-                  {/* Usage chip */}
-                  {(usageMap.get(item.key) ?? 0) > 0 && (
-                    <div className="mgr-usage">{usageMap.get(item.key)}×</div>
+                  {/*
+                    Board 1161:66/80/111 — the only badge on a card says what
+                    KIND of file it is (▶ video, ◆ vector, Aa font); an image
+                    needs none. The old "UP/STOCK/AI" provenance badge sat on
+                    every card saying where it came from, which is the one
+                    thing the grid never has to answer.
+                  */}
+                  {item.type !== "img" && (
+                    <div className="mgr-kind" aria-hidden="true">
+                      {item.type === "vid" ? "▶" : item.type === "fnt" ? "Aa" : "◆"}
+                    </div>
                   )}
                   {isSelected && (
                     <div className="mgr-sel-check">
@@ -389,10 +471,18 @@ export function AssetGrid({
                   )}
                 </div>
                 <div className="mgr-asset-meta">
-                  <div className="mgr-asset-name">{item.name}</div>
-                  <div className="mgr-asset-sub">
-                    {item.width && item.height ? `${item.width}×${item.height} · ` : ""}
-                    {formatBytes(item.size)}
+                  <div className="mgr-asset-name">{item.displayName ?? item.name}</div>
+                  {/*
+                    Board 1161:55 — dot + "used ×3" / "unused". Dimensions and
+                    bytes moved to the details rail, which is where you go when
+                    you care; on the card the question is always "can I delete
+                    this?".
+                  */}
+                  <div className={`mgr-asset-use${(usageMap.get(item.key) ?? 0) > 0 ? "" : " unused"}`}>
+                    <span className="mgr-use-dot" aria-hidden="true" />
+                    {(usageMap.get(item.key) ?? 0) > 0
+                      ? `used ×${usageMap.get(item.key)}`
+                      : "unused"}
                   </div>
                 </div>
               </div>

@@ -50,15 +50,17 @@ function makeState(over: Partial<MediaStateResult> = {}): MediaStateResult {
     sort: "date",
     sortDir: "desc",
     gridN: 3,
-    fmtFilter: "all",
+    fmtFilter: "",
+    activeTypes: new Set(),
+    toggleType: vi.fn(),
+    setFmtFilter: vi.fn(),
+    setGridN: vi.fn(),
+    selectAll: vi.fn(),
+    toggleSelMode: vi.fn(),
     selMode: false,
     selectedKeys: new Set<string>(),
     setSort: vi.fn(),
-    setGridN: noop,
-    setFmtFilter: noop,
-    toggleSelMode: vi.fn(),
     toggleSelect: vi.fn(),
-    selectAll: vi.fn(),
     upload: noop,
     failedUploads: [],
     dismissFailedUploads: noop,
@@ -123,27 +125,62 @@ function mount(state: MediaStateResult, over: Partial<Parameters<typeof AssetGri
   return { ...utils, props };
 }
 
-describe("AssetGrid — type pills + counts", () => {
-  it("renders the 5 type pills and marks the active one", () => {
-    const state = makeState({
-      activeType: "img",
-      counts: { all: 4, img: 3, vid: 1, ico: 0, fnt: 0 },
-    });
-    const { container } = mount(state);
-    for (const label of ["All", "Images", "Videos", "Icons", "Fonts"]) {
-      expect(screen.getByText(label)).toBeInTheDocument();
-    }
-    const active = container.querySelector(".mgr-pill.active");
-    expect(active?.textContent).toContain("Images");
-    // Count badge only for non-zero counts
-    expect(active?.textContent).toContain("3");
+// Board 1161:35 files the manager by FORMAT, not by the drawer's type pills:
+// the count line, then a strip of the formats this library actually holds.
+describe("AssetGrid — toolbar (board 1161:35)", () => {
+  it("leads with the file count and the last-added time", () => {
+    const state = makeState({ counts: { all: 4, img: 3, vid: 1, ico: 0, fnt: 0 } });
+    mount(state);
+    expect(screen.getByText(/^4 files/)).toBeInTheDocument();
   });
 
-  it("clicking a pill calls state.setType with the pill id", () => {
-    const state = makeState();
+  it("the format strip lists only formats present in the library", () => {
+    const state = makeState({
+      libraryItems: [
+        { key: "a", name: "a", type: "img", src: "", size: 1, createdAt: new Date().toISOString(), mimeType: "image/jpeg" },
+        { key: "b", name: "b", type: "vid", src: "", size: 1, createdAt: new Date().toISOString(), mimeType: "video/mp4" },
+      ] as MediaStateResult["libraryItems"],
+    });
     mount(state);
-    fireEvent.click(screen.getByText("Videos"));
-    expect(state.setType).toHaveBeenCalledWith("vid");
+    expect(screen.getByText("JPG")).toBeInTheDocument();
+    expect(screen.getByText("MP4")).toBeInTheDocument();
+    // A chip with nothing behind it could only ever empty the grid.
+    expect(screen.queryByText("SVG")).toBeNull();
+  });
+
+  it("a format chip toggles fmtFilter on and back off", () => {
+    const state = makeState({
+      libraryItems: [
+        { key: "a", name: "a", type: "img", src: "", size: 1, createdAt: new Date().toISOString(), mimeType: "image/png" },
+      ] as MediaStateResult["libraryItems"],
+    });
+    mount(state);
+    fireEvent.click(screen.getByText("PNG"));
+    expect(state.setFmtFilter).toHaveBeenCalledWith("png");
+  });
+
+  // A type filter set in the drawer persists into the manager; without a
+  // visible chip the grid would look filtered for no reason on screen.
+  it("a drawer type filter shows as a clearable chip", () => {
+    const state = makeState({ activeTypes: new Set(["vid"]) as MediaStateResult["activeTypes"] });
+    mount(state);
+    const chip = screen.getByLabelText(/Clear the type filter/i);
+    fireEvent.click(chip);
+    expect(state.setType).toHaveBeenCalledWith("all");
+  });
+
+  it("the 2 / 3 / 4 toggle sets the column count", () => {
+    const state = makeState({ gridN: 3 });
+    mount(state);
+    fireEvent.click(screen.getByRole("button", { name: "4" }));
+    expect(state.setGridN).toHaveBeenCalledWith(4);
+  });
+
+  it("select-all lives in the toolbar, not only inside the bulk bar", () => {
+    const state = makeState({ selMode: false });
+    mount(state);
+    fireEvent.click(screen.getByLabelText("Select all assets"));
+    expect(state.selectAll).toHaveBeenCalled();
   });
 });
 
@@ -151,7 +188,7 @@ describe("AssetGrid — sort menu", () => {
   it("opens the sort menu and selecting an option calls setSort keeping direction", () => {
     const state = makeState({ sort: "date", sortDir: "desc" });
     mount(state);
-    fireEvent.click(screen.getByText(/Sort: Recent/));
+    fireEvent.click(screen.getByText("Recent"));
     fireEvent.click(screen.getByText("Name"));
     expect(state.setSort).toHaveBeenCalledWith("name", "desc");
   });
@@ -159,7 +196,7 @@ describe("AssetGrid — sort menu", () => {
   it("direction row flips asc/desc without changing the sort key", () => {
     const state = makeState({ sort: "size", sortDir: "asc" });
     mount(state);
-    fireEvent.click(screen.getByText(/Sort: Size/));
+    fireEvent.click(screen.getByText("Size"));
     fireEvent.click(screen.getByText("Ascending ↑"));
     expect(state.setSort).toHaveBeenCalledWith("size", "desc");
   });
@@ -279,16 +316,25 @@ describe("AssetGrid — bulk toolbar", () => {
 });
 
 describe("AssetGrid — badges + footer", () => {
-  it("renders the usage chip when usageMap has a count", () => {
+  it("card meta says used ×N (board 1161:55) — the usage chip on the thumb is gone", () => {
     const state = makeState({
       libraryItems: [makeItem({ key: "a" })],
       counts: { all: 1, img: 1, vid: 0, ico: 0, fnt: 0 },
     });
     mount(state, { usageMap: new Map([["a", 3]]) });
-    expect(screen.getByText("3×")).toBeInTheDocument();
+    expect(screen.getByText("used ×3")).toBeInTheDocument();
   });
 
-  it("renders source badges (STOCK / AI / UP)", () => {
+  it("an unused asset says so — the answer to \"can I delete this?\"", () => {
+    const state = makeState({
+      libraryItems: [makeItem({ key: "a" })],
+      counts: { all: 1, img: 1, vid: 0, ico: 0, fnt: 0 },
+    });
+    mount(state, { usageMap: new Map() });
+    expect(screen.getByText("unused")).toBeInTheDocument();
+  });
+
+  it("only the file KIND badges (▶ / ◆ / Aa) remain — provenance left the card", () => {
     const state = makeState({
       libraryItems: [
         makeItem({ key: "a", assetSource: "stock" }),
@@ -297,9 +343,25 @@ describe("AssetGrid — badges + footer", () => {
       ],
     });
     mount(state);
-    expect(screen.getByText("STOCK")).toBeInTheDocument();
-    expect(screen.getByText("AI")).toBeInTheDocument();
-    expect(screen.getByText("UP")).toBeInTheDocument();
+    // Where a file came from is the one thing the grid never has to answer.
+    expect(screen.queryByText("STOCK")).toBeNull();
+    expect(screen.queryByText("AI")).toBeNull();
+    expect(screen.queryByText("UP")).toBeNull();
+  });
+
+  it("non-image cards carry their kind badge", () => {
+    const state = makeState({
+      libraryItems: [
+        makeItem({ key: "v", name: "clip.mp4", type: "vid" }),
+        makeItem({ key: "s", name: "logo.svg", type: "ico" }),
+        makeItem({ key: "f", name: "Inter.woff2", type: "fnt" }),
+      ],
+    });
+    mount(state);
+    expect(screen.getByText("▶")).toBeInTheDocument();
+    expect(screen.getByText("◆")).toBeInTheDocument();
+    // The font THUMB also renders "Aa" as its specimen — scope to the badge.
+    expect(document.querySelectorAll(".mgr-kind")).toHaveLength(3);
   });
 
   it("footer shows 'Showing N of M in <smart folder>'", () => {
