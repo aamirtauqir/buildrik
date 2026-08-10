@@ -2106,9 +2106,11 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "1277bc3cd0536b44",
-   "capturedFrom": "prod@f7b39a4c"
+   "capturedFrom": "prod@f7b39a4c",
+   "figmaNodeId": "93:2",
+   "figmaPageId": "75:2"
   },
   {
    "id": "BL-0127",
@@ -2120,9 +2122,11 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "1c3ce7c882091152",
-   "capturedFrom": "prod@f7b39a4c"
+   "capturedFrom": "prod@f7b39a4c",
+   "figmaNodeId": "94:2",
+   "figmaPageId": "75:2"
   },
   {
    "id": "BL-0128",
@@ -2134,9 +2138,11 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "f8d05deda9111eed",
-   "capturedFrom": "prod@f7b39a4c"
+   "capturedFrom": "prod@f7b39a4c",
+   "figmaNodeId": "95:2",
+   "figmaPageId": "75:2"
   },
   {
    "id": "BL-0129",
@@ -2148,9 +2154,11 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "b9847cdde41d4ffc",
-   "capturedFrom": "prod@f7b39a4c"
+   "capturedFrom": "prod@f7b39a4c",
+   "figmaNodeId": "96:2",
+   "figmaPageId": "75:2"
   },
   {
    "id": "BL-0131",
