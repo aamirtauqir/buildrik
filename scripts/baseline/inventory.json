@@ -836,9 +836,11 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "8265185c9ff559c0",
-   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)"
+   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
+   "figmaNodeId": "13:2",
+   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
   },
   {
    "id": "BL-0047",
@@ -850,9 +852,11 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "e683c850d1f786a0",
-   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)"
+   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
+   "figmaNodeId": "14:2",
+   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
   },
   {
    "id": "BL-0048",
@@ -864,10 +868,12 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "39408a3d00d142a7",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
-   "notes": "slug fixture; not-found render is honest as-built"
+   "notes": "slug fixture; not-found render is honest as-built",
+   "figmaNodeId": "15:2",
+   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
   },
   {
    "id": "BL-0049",
@@ -879,9 +885,11 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "50272aa9fcc70abc",
-   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)"
+   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
+   "figmaNodeId": "16:2",
+   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
   },
   {
    "id": "BL-0050",
@@ -893,9 +901,11 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "4f7b84581f8423b6",
-   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)"
+   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
+   "figmaNodeId": "17:2",
+   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
   },
   {
    "id": "BL-0051",
@@ -923,9 +933,11 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "d9d496ac7a1e270d",
-   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)"
+   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
+   "figmaNodeId": "18:2",
+   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
   },
   {
    "id": "BL-0053",
@@ -953,9 +965,11 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "5e64674666546a02",
-   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)"
+   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
+   "figmaNodeId": "19:2",
+   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
   },
   {
    "id": "BL-0055",
@@ -983,9 +997,11 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "d1aa5304ce854685",
-   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)"
+   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
+   "figmaNodeId": "20:2",
+   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
   },
   {
    "id": "BL-0057",
@@ -997,9 +1013,11 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "9ad3c98601c8965d",
-   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)"
+   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
+   "figmaNodeId": "21:2",
+   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
   },
   {
    "id": "BL-0058",
@@ -1011,9 +1029,11 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "66c30f6442819c16",
-   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)"
+   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
+   "figmaNodeId": "22:2",
+   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
   },
   {
    "id": "BL-0059",
