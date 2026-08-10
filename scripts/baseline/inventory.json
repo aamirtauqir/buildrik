@@ -744,10 +744,12 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "8a854c6508285d8c",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
-   "notes": "route group root"
+   "notes": "route group root",
+   "figmaNodeId": "113:2",
+   "figmaPageId": "108:2"
   },
   {
    "id": "BL-0040",
