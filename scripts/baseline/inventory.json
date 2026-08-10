@@ -646,9 +646,11 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": null,
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "abfdad1e84ea85db",
-   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)"
+   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
+   "figmaNodeId": "98:2",
+   "figmaPageId": "108:2"
   },
   {
    "id": "BL-0034",
@@ -660,9 +662,11 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": null,
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "9278ea9b44213afe",
-   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)"
+   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
+   "figmaNodeId": "99:2",
+   "figmaPageId": "108:2"
   },
   {
    "id": "BL-0035",
@@ -674,9 +678,11 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": null,
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "a391143847c26275",
-   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)"
+   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
+   "figmaNodeId": "100:2",
+   "figmaPageId": "108:2"
   },
   {
    "id": "BL-0036",
@@ -688,10 +694,12 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": null,
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "ac4ec1f4c7f3f50a",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
-   "notes": "dev state-primitive gallery; preserve stale copy defect"
+   "notes": "dev state-primitive gallery; preserve stale copy defect",
+   "figmaNodeId": "101:2",
+   "figmaPageId": "108:2"
   },
   {
    "id": "BL-0037",
@@ -751,9 +759,11 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "f7b482fcff889d3a",
-   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)"
+   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
+   "figmaNodeId": "102:2",
+   "figmaPageId": "108:2"
   },
   {
    "id": "BL-0041",
@@ -765,9 +775,11 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "a24e2e001ba00ed5",
-   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)"
+   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
+   "figmaNodeId": "103:2",
+   "figmaPageId": "108:2"
   },
   {
    "id": "BL-0042",
@@ -779,9 +791,11 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "ced1c83d64c581e9",
-   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)"
+   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
+   "figmaNodeId": "104:2",
+   "figmaPageId": "108:2"
   },
   {
    "id": "BL-0043",
@@ -793,9 +807,11 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "6be1be39b71addc2",
-   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)"
+   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
+   "figmaNodeId": "105:2",
+   "figmaPageId": "108:2"
   },
   {
    "id": "BL-0044",
@@ -807,9 +823,11 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "dda6630af4619c9b",
-   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)"
+   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
+   "figmaNodeId": "106:2",
+   "figmaPageId": "108:2"
   },
   {
    "id": "BL-0045",
@@ -821,10 +839,12 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "de40676cf009514e",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
-   "notes": "agency [id] with ws id \u2014 record as-rendered"
+   "notes": "agency [id] with ws id \u2014 record as-rendered",
+   "figmaNodeId": "107:2",
+   "figmaPageId": "108:2"
   },
   {
    "id": "BL-0046",
@@ -1647,10 +1667,12 @@
    "state": "as-rendered (unpublished site fixture)",
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "91c10d2eb9df4c42",
    "capturedFrom": "prod@f7b39a4c",
-   "notes": "ShareLink fixture row; captured render whatever unpublished-site share shows"
+   "notes": "ShareLink fixture row; captured render whatever unpublished-site share shows",
+   "figmaNodeId": "109:2",
+   "figmaPageId": "108:2"
   },
   {
    "id": "BL-0098",
@@ -1661,10 +1683,12 @@
    "state": "PENDING, snapshotPages null",
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "beef553fa46c28a7",
    "capturedFrom": "prod@f7b39a4c",
-   "notes": "ReviewRequest fixture (internal-submit shape, no snapshot)"
+   "notes": "ReviewRequest fixture (internal-submit shape, no snapshot)",
+   "figmaNodeId": "110:2",
+   "figmaPageId": "108:2"
   },
   {
    "id": "BL-0099",
@@ -1675,10 +1699,12 @@
    "state": "invalid-link (no token)",
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "3a5b99d16940e182",
    "capturedFrom": "prod@f7b39a4c",
-   "notes": "default no-token render; valid-token state needs transfer fixture (later)"
+   "notes": "default no-token render; valid-token state needs transfer fixture (later)",
+   "figmaNodeId": "111:2",
+   "figmaPageId": "108:2"
   },
   {
    "id": "BL-0100",
