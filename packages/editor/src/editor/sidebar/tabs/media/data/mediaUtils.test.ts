@@ -20,9 +20,10 @@ describe("toLibraryItem — assetId threading (G11)", () => {
 describe("fmtSize", () => {
   it("formats bytes", () => expect(fmtSize(512)).toBe("512 B"));
   it("formats KB", () => expect(fmtSize(1536)).toBe("1.5 KB"));
-  it("formats MB", () => expect(fmtSize(2 * 1024 * 1024)).toBe("2.0 MB"));
+  // No padded decimals: the boards write "24 MB", never "24.0 MB".
+  it("formats MB", () => expect(fmtSize(2 * 1024 * 1024)).toBe("2 MB"));
   it("formats GB for 1073741824 bytes (1 GB quota)", () =>
-    expect(fmtSize(1_073_741_824)).toBe("1.0 GB"));
+    expect(fmtSize(1_073_741_824)).toBe("1 GB"));
   it("formats partial GB", () => expect(fmtSize(1.5 * 1024 * 1024 * 1024)).toBe("1.5 GB"));
   it("formats 0 bytes", () => expect(fmtSize(0)).toBe("0 B"));
 });

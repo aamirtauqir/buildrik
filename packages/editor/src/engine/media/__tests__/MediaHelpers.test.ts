@@ -27,7 +27,8 @@ describe("validateFile", () => {
   it("rejects files over the per-type size limit", () => {
     const r = validateFile(fileWithSize("image/png", 20 * 1024 * 1024));
     expect(r.valid).toBe(false);
-    expect(r.error).toMatch(/too large/i);
+    // Board 145:148: the message names the file size AND the limit.
+    expect(r.error).toMatch(/Upload failed — file is 20 MB, limit is 10 MB/);
   });
 
   it("accepts a supported, small file", () => {

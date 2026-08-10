@@ -46,6 +46,10 @@ import { OnboardingChecklist } from "@/editor/onboarding/OnboardingChecklist";
 import { CanvasFooterToolbar } from "@/editor/canvas/CanvasFooterToolbar";
 import { PanelFrame } from "@/editor/chrome-ui";
 import { SlimLauncher } from "@/editor/sidebar/tabs/media/components/SlimLauncher";
+import { AssetDetailOverlay } from "@/editor/sidebar/tabs/media/components/AssetDetailOverlay";
+import { IconBrowserOverlay } from "@/editor/sidebar/tabs/media/components/IconBrowserOverlay";
+import { StockBrowserOverlay } from "@/editor/sidebar/tabs/media/components/StockBrowserOverlay";
+import { ToastProvider } from "@/editor/chrome-ui";
 import { ContentTab } from "@/editor/sidebar/tabs/content/ContentTab";
 import { LayersTab } from "@/editor/sidebar/tabs/layers/LayersTab";
 import { LayersLoadError, LayersNoResults } from "@/editor/panels/layers/components/LayersStateBlocks";
@@ -121,8 +125,93 @@ const ACTIVE_UPLOAD: UploadProgress[] = [
 ];
 
 const FAILED_UPLOAD: UploadProgress[] = [
-  { fileName: "poster-4k.png", progress: 0, status: "error", error: "File too large. Max: 10MB" },
+  { fileName: "pasta-2.jpg", progress: 0, status: "error", error: "Upload failed — file is 24 MB, limit is 10 MB" },
 ];
+
+/**
+ * Drill-in fixtures (boards 146:2 / 146:68 / 147:2 / 147:55).
+ *
+ * The drill-ins are `absolute inset-0`, so each needs a positioned host at the
+ * drawer's own 320 to be measurable at all — mounting one bare stretches it to
+ * the probe root and every width reads wrong.
+ *
+ * `versions` (146:32) is deliberately absent: its rows come from IndexedDB via
+ * `reloadDbVersions`, so a probe would capture the empty list and call it a
+ * pass. That board is eye-verified in the live app instead.
+ */
+const DETAIL_ITEM: LibraryItem = MEDIA_ITEM({
+  key: "hero",
+  name: "hero-dark.jpg",
+  size: 840 * 1024,
+  width: 2400,
+  height: 1600,
+  altText: "Dark restaurant interior with…",
+});
+
+/** Pages shaped for `collectUsageByPage`: Home ×2, Menu ×1 (board 146:68). */
+const USAGE_PAGES = [
+  {
+    id: "home",
+    name: "Home",
+    root: {
+      id: "r1",
+      type: "container",
+      children: [
+        { id: "e1", type: "image", attributes: { src: DETAIL_ITEM.src, "data-name": "hero" } },
+        { id: "e2", type: "image", attributes: { src: DETAIL_ITEM.src, "data-name": "gallery" } },
+      ],
+    },
+  },
+  {
+    id: "menu",
+    name: "Menu",
+    root: {
+      id: "r2",
+      type: "container",
+      children: [
+        { id: "e3", type: "image", attributes: { src: DETAIL_ITEM.src, "data-name": "header" } },
+      ],
+    },
+  },
+];
+
+const USAGE_COMPOSER = {
+  elements: {
+    getAllPages: () => USAGE_PAGES,
+    setActivePage: () => {},
+    getElement: () => null,
+  },
+  selection: { select: () => {} },
+} as unknown as React.ComponentProps<typeof AssetDetailOverlay>["composer"];
+
+/** 320-wide positioned host — the drill-in's own stage. */
+function drillHost(children: React.ReactNode) {
+  return (
+    <ToastProvider>
+      <div className="tw:relative tw:h-[840px] tw:w-80 tw:overflow-hidden tw:bg-white">{children}</div>
+    </ToastProvider>
+  );
+}
+
+/** Clicks one testid after mount so a nested view can be probed statically. */
+function AutoOpen({ testid, children }: { testid: string; children: React.ReactNode }) {
+  React.useEffect(() => {
+    (document.querySelector(`[data-testid="${testid}"]`) as HTMLElement | null)?.click();
+  }, [testid]);
+  return <>{children}</>;
+}
+
+const STOCK_PHOTOS = Array.from({ length: 4 }, (_, i) => ({
+  id: `p${i}`,
+  url: MEDIA_ITEM().src,
+  thumb: MEDIA_ITEM().src,
+  alt: "restaurant interior",
+  author: "A. Nowak",
+  authorUrl: "https://example.test",
+  width: 1200,
+  height: 800,
+  source: "unsplash" as const,
+}));
 
 /** Every case renders into `.bd-studio` so chrome-scoped CSS applies. */
 const CASES: Record<string, () => React.ReactElement> = {
@@ -415,6 +504,68 @@ const CASES: Record<string, () => React.ReactElement> = {
   "media-drawer-quota-full": () => (
     <div data-probe="media-drawer-quota-full">
       {mediaDrawer({ storage: { used: 500 * 1024 * 1024, total: 500 * 1024 * 1024 } })}
+    </div>
+  ),
+  // Board 145:2 — a type pill ON. Distinct from no-results: the filter matches
+  // here, so what the board is asserting is the pill's active treatment and the
+  // grid under it, not an empty branch.
+  "media-drawer-filtered": () => (
+    <div data-probe="media-drawer-filtered">
+      {mediaDrawer({ activeTypes: new Set(["img" as const]) })}
+    </div>
+  ),
+  // ── Drill-ins (boards 146:2 / 146:68 / 147:2 / 147:55) ───────────────────
+  "media-detail-hub": () => (
+    <div data-probe="media-detail-hub">
+      {drillHost(
+        <AssetDetailOverlay
+          item={DETAIL_ITEM}
+          composer={USAGE_COMPOSER}
+          onClose={() => {}}
+          onEditImage={() => {}}
+          onOptimized={() => {}}
+          onReplaceAcross={() => {}}
+        />,
+      )}
+    </div>
+  ),
+  "media-detail-used-in": () => (
+    <div data-probe="media-detail-used-in">
+      {drillHost(
+        <AutoOpen testid="media-detail-used">
+          <AssetDetailOverlay
+            item={DETAIL_ITEM}
+            composer={USAGE_COMPOSER}
+            onClose={() => {}}
+            onEditImage={() => {}}
+          />
+        </AutoOpen>,
+      )}
+    </div>
+  ),
+  "media-icon-picker": () => (
+    <div data-probe="media-icon-picker">
+      {drillHost(<IconBrowserOverlay onClose={() => {}} onPick={() => {}} />)}
+    </div>
+  ),
+  "media-stock-browser": () => (
+    <div data-probe="media-stock-browser">
+      {drillHost(
+        <StockBrowserOverlay
+          onClose={() => {}}
+          photos={STOCK_PHOTOS}
+          videos={[]}
+          loading={{ img: true, vid: false }}
+          searchQuery="restaurant interior"
+          orientation="all"
+          color="all"
+          onSearch={() => {}}
+          onSetOrientation={() => {}}
+          onSetColor={() => {}}
+          onLoadMore={() => {}}
+          onSave={() => {}}
+        />,
+      )}
     </div>
   ),
 };

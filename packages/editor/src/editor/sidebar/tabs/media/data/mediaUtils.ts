@@ -9,10 +9,13 @@ import type { LibraryItem, MediaTypeFilter } from "./mediaTypes";
 
 /** Format bytes to human-readable string e.g. "1.2 MB" */
 export function fmtSize(bytes: number): string {
+  // `+` drops a trailing ".0": the boards write "840 KB" and "24 MB", never
+  // "840.0 KB", while a genuinely fractional size still keeps its digit
+  // ("1.5 MB"). toFixed alone padded every round number with a false decimal.
   if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-  return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`;
+  if (bytes < 1024 * 1024) return `${+(bytes / 1024).toFixed(1)} KB`;
+  if (bytes < 1024 * 1024 * 1024) return `${+(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  return `${+(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`;
 }
 
 /** Format seconds to "0:34" or "1:23:45" */

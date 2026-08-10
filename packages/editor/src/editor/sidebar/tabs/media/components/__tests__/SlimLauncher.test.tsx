@@ -155,7 +155,7 @@ describe("SlimLauncher — §10 default 320px experience", () => {
       <SlimLauncher
         {...baseProps()}
         onRetryUpload={onRetryUpload}
-        uploadQueue={[{ fileName: "poster.png", progress: 0, status: "error", error: "File too large" }]}
+        uploadQueue={[{ fileName: "poster.png", progress: 0, status: "error", error: "Upload failed — file is 24 MB, limit is 10 MB" }]}
       />,
     );
     await user.click(screen.getByRole("button", { name: /Retry poster.png/i }));

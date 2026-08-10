@@ -8,7 +8,7 @@
  */
 
 import * as React from "react";
-import { Upload, AlertTriangle, XCircle, RotateCcw } from "lucide-react";
+import { Upload, AlertTriangle, XCircle } from "lucide-react";
 import type { UploadZoneProps } from "../data/mediaTypes";
 import { StorageQuotaBar } from "./StorageQuotaBar";
 import { Button, TextInput } from "@/editor/chrome-ui";
@@ -240,7 +240,10 @@ export function UploadZone({
                   onClick={() => onRetryUpload(item.fileName)}
                   aria-label={`Retry ${item.fileName}`}
                 >
-                  <RotateCcw size={12} aria-hidden />
+                  {/* Board 145:148 draws "Retry" as bare accent text. The
+                      glyph that used to sit here also rendered flush against
+                      the word — flowbite puts children in one span with no
+                      gap — so it read as "↻Retry". */}
                   Retry
                 </Button>
               ) : null}

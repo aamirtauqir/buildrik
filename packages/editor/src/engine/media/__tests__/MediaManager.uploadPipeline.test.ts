@@ -146,7 +146,8 @@ describe("uploadFile — validation (size per type, allowed MIME)", () => {
     );
 
     expect(result.success).toBe(false);
-    expect(result.error).toMatch(/File too large\. Max: 1MB/);
+    // Board 145:148 names both numbers, so the assertion checks both.
+    expect(result.error).toMatch(/Upload failed — file is 2 MB, limit is 1 MB/);
   });
 
   it("rejects a video over the 100MB video limit (limit is per-type, not global)", async () => {
@@ -158,7 +159,7 @@ describe("uploadFile — validation (size per type, allowed MIME)", () => {
     );
 
     expect(result.success).toBe(false);
-    expect(result.error).toMatch(/File too large\. Max: 100MB/);
+    expect(result.error).toMatch(/Upload failed — file is 101 MB, limit is 100 MB/);
   });
 
   it("accepts an image over 1MB but under the 10MB image limit", async () => {

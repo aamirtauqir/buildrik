@@ -5,6 +5,7 @@
  */
 
 import { MEDIA_SIZE_LIMITS, getMaxFileSize, isAllowedMimeType } from "../../shared/constants/media";
+import { formatBytes } from "../../shared/utils/helpers/number";
 
 /**
  * Validate a file for upload
@@ -16,7 +17,14 @@ export function validateFile(file: File): { valid: boolean; error?: string } {
 
   const maxSize = getMaxFileSize(file.type);
   if (file.size > maxSize) {
-    return { valid: false, error: `File too large. Max: ${Math.round(maxSize / 1024 / 1024)}MB` };
+    // Board 145:148 names BOTH numbers: "Upload failed — file is 24 MB, limit
+    // is 10 MB". The old copy ("File too large. Max: 10MB") named only the
+    // limit, so the one fact the user needs to act on — how far over they are —
+    // was the fact it left out.
+    return {
+      valid: false,
+      error: `Upload failed — file is ${formatBytes(file.size, 0)}, limit is ${formatBytes(maxSize, 0)}`,
+    };
   }
 
   return { valid: true };
