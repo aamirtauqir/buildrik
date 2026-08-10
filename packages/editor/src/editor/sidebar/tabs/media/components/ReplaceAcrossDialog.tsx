@@ -85,6 +85,14 @@ export function ReplaceAcrossDialog({
     });
   }, []);
 
+  /* Board 1164:4738 leads with the blast radius across the WHOLE site, not
+     just the pages currently ticked — that number is what the sentence is
+     warning about. */
+  const totalUses = React.useMemo(
+    () => (state.phase === "preview" ? state.pages.reduce((n, p) => n + p.useCount, 0) : 0),
+    [state],
+  );
+
   const selectedTotals = React.useMemo(() => {
     if (state.phase !== "preview") return { uses: 0, pages: 0 };
     let uses = 0;
@@ -137,15 +145,15 @@ export function ReplaceAcrossDialog({
         aria-labelledby="med-rx-title"
       >
         <h2 id="med-rx-title" className="med-rx-title">
-          Replace {oldLabel ? `"${oldLabel}"` : "asset"} across canvas
+          Replace across site
         </h2>
 
         {state.phase === "preview" ? (
           <>
             <p className="med-rx-body">
-              Replace this asset with{" "}
-              {newLabel ? <strong>{newLabel}</strong> : "the new asset"} on the
-              selected pages. The change is one undo step.
+              Every place that uses {oldLabel ? <strong>{oldLabel}</strong> : "this asset"}
+              {" "}— {totalUses} in total — will switch to the image you pick. This can be
+              undone.
             </p>
             <div className="med-rx-preview">
               <div className="med-rx-preview__before">

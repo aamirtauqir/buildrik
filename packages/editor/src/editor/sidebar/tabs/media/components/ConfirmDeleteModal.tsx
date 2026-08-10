@@ -1,8 +1,13 @@
 /**
- * Media Tab — Confirm Delete Modal
- * Shows in-use warning, bulk type-DELETE gate, and file names.
+ * ConfirmDeleteModal — board 1175:4827.
+ *
+ * Styles are inline `tw:` utilities because the `.med-modal-*` CSS this file
+ * referenced was deleted on 2026-04-11 (ab72ef18) while the classNames stayed:
+ * the modal that guards deleting up to 34 files has been rendering unstyled
+ * ever since — no warning tint, no red on the destructive button. Orphan
+ * classes do not fail a build, so nothing said a word.
  * P5: on the shared Radix Modal substrate (focus trap, Esc, overlay) — the
- * hand-rolled med-modal-overlay wrapper is gone; inner med-* styling stays.
+ * hand-rolled overlay wrapper is gone — ModalRoot/ModalContent own it.
  * @license BSD-3-Clause
  */
 
@@ -30,27 +35,32 @@ export function ConfirmDeleteModal({ payload, onConfirm, onCancel }: ConfirmDele
 
   return (
     <ModalRoot open onOpenChange={(o) => { if (!o) onCancel(); }}>
-      <ModalContent srTitle="Delete files" className="med-modal">
-        <h3 className="med-modal-title" id="med-del-title">
+      <ModalContent srTitle="Delete files" className="tw:p-5">
+        <h3 className="tw:m-0 tw:text-[15px] tw:font-semibold tw:text-[var(--bk-ink)]" id="med-del-title">
           {isBulk ? `Delete ${keys.length} files?` : "Delete file?"}
         </h3>
 
         {/* File name list */}
-        <div className="med-modal-names">
+        <div className="tw:mt-3 tw:flex tw:flex-col tw:gap-1">
           {visibleNames.map((n) => (
-            <div key={n} className="med-modal-name-row">
-              <span className="med-modal-file-icon" aria-hidden="true">
-                📄
-              </span>
-              <span className="med-modal-file-name">{n}</span>
+            <div key={n} className="tw:flex tw:items-center tw:gap-2 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]">
+              <span aria-hidden="true">📄</span>
+              <span className="tw:min-w-0 tw:truncate">{n}</span>
             </div>
           ))}
-          {hiddenCount > 0 && <div className="med-modal-name-more">and {hiddenCount} more</div>}
+          {hiddenCount > 0 && (
+            <div className="tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]">
+              and {hiddenCount} more
+            </div>
+          )}
         </div>
 
         {/* In-use warning */}
         {inUseCount > 0 && (
-          <div className="med-modal-warning" role="alert">
+          <div
+            className="tw:mt-3 tw:rounded-md tw:bg-[var(--bk-warning-tint)] tw:px-2.5 tw:py-2 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-warning-text,var(--bk-warning))]"
+            role="alert"
+          >
             ⚠ {inUseCount} {inUseCount === 1 ? "file is" : "files are"} currently used on the
             canvas. Deleting will break those elements.
           </div>
@@ -58,11 +68,12 @@ export function ConfirmDeleteModal({ payload, onConfirm, onCancel }: ConfirmDele
 
         {/* Large bulk: require typing DELETE */}
         {isLargeBulk && (
-          <div className="med-modal-confirm-gate">
-            <p className="med-modal-gate-label">
+          <div className="tw:mt-4">
+            <p className="tw:mb-1.5 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]">
               Type <strong>DELETE</strong> to confirm:
             </p>
             <TextField
+              className="tw:h-8 tw:w-full tw:rounded-md tw:border tw:border-gray-200 tw:bg-[var(--bk-bg-subtle)] tw:px-2 tw:text-[13px]"
               value={confirmInput}
               onChange={(e) => setConfirmInput(e.target.value)}
               placeholder="DELETE"
@@ -73,12 +84,15 @@ export function ConfirmDeleteModal({ payload, onConfirm, onCancel }: ConfirmDele
         )}
 
         {/* Actions */}
-        <div className="med-modal-actions">
-          <Button className="med-modal-cancel" onClick={onCancel}>
+        <div className="tw:mt-4 tw:flex tw:justify-end tw:gap-2">
+          <Button
+            className="tw:min-h-8 tw:rounded-md tw:border tw:border-gray-200 tw:bg-[var(--bk-bg-card)] tw:px-3.5 tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink-soft)]"
+            onClick={onCancel}
+          >
             Cancel
           </Button>
           <Button
-            className="med-modal-confirm danger"
+            className="tw:min-h-8 tw:rounded-md tw:border-0 tw:bg-[var(--bk-error)] tw:px-3.5 tw:text-[13px] tw:font-medium tw:text-[var(--bk-accent-on)] tw:disabled:opacity-50"
             onClick={onConfirm}
             disabled={!canConfirm}
             aria-disabled={!canConfirm}
@@ -86,6 +100,18 @@ export function ConfirmDeleteModal({ payload, onConfirm, onCancel }: ConfirmDele
             Delete{keys.length > 1 ? ` ${keys.length} files` : ""}
           </Button>
         </div>
+
+        {/*
+          Board 1175:4827 puts the reason under the dead button. The Button
+          component's own doc makes this a rule, not a nicety: "every disabled
+          variant ships a tooltip naming the role needed — disabled without a
+          reason is a bug." Here the reason is the typing gate.
+        */}
+        {isLargeBulk && !canConfirm && (
+          <p className="tw:mt-2 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+            Delete stays disabled until the word matches exactly.
+          </p>
+        )}
       </ModalContent>
     </ModalRoot>
   );

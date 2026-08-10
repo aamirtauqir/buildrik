@@ -32,6 +32,13 @@ export interface MediaLibraryPanelProps {
   allowedTypes?: MediaAssetType[];
   multiple?: boolean;
   title?: string;
+  /**
+   * Board 1164:4713 subtitles the modal with the element that asked for it
+   * ("for Hero · Image"). A picker opened from a selection with no idea what
+   * it is picking for is the same modal as the library, and the user has to
+   * remember which one they are in.
+   */
+  forLabel?: string;
   composer?: Composer | null;
 }
 
@@ -45,7 +52,8 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
   onSelect,
   allowedTypes = ["image", "video", "audio", "icon", "svg"],
   multiple = false,
-  title = "Media Library",
+  title = "Choose an image",
+  forLabel,
   composer = null,
 }) => {
   const {
@@ -130,7 +138,14 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
   return (
     <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
       <ModalContent size="lg">
-        <ModalTitle>{title}</ModalTitle>
+        <ModalTitle>
+          {title}
+          {forLabel ? (
+            <span className="tw:ml-2 tw:text-[12px] tw:font-normal tw:text-[var(--bk-ink-muted)]">
+              for {forLabel}
+            </span>
+          ) : null}
+        </ModalTitle>
         <ModalClose aria-label="Close modal" onClick={onClose}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
             <path d="M18 6L6 18M6 6l12 12" />
@@ -155,7 +170,7 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
           <div className="tw:flex tw:items-center tw:gap-2">
             <div className="tw:flex-1">
               <InputField
-                placeholder="Search assets..."
+                placeholder="Search library…"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -272,7 +287,7 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
     </div>
 
     {/* Footer with selection info */}
-    {multiple && selectedIds.size > 0 && (
+    {selectedIds.size > 0 && (
       <div className="tw:flex tw:items-center tw:justify-between tw:mt-4 tw:pt-4 tw:border-t tw:border-gray-200">
         <span className="tw:text-[13px] tw:text-[var(--bk-ink-soft)]">
           {selectedIds.size} selected
@@ -280,6 +295,16 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
         <Button onClick={handleConfirmSelection}>Use Selected</Button>
       </div>
     )}
+
+    {/*
+      Board 1164:4713's footnote. It names the limits BEFORE a file is picked
+      — including that From URL is still a stub, which this tab really is
+      (it renders "coming soon"). A tab that looks live and is not is worse
+      than one that says so.
+    */}
+    <p className="tw:mt-2 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+      Upload tab accepts image/video/audio · max 10 MB each · From URL launches soon
+    </p>
 
     {/* Video Preview Modal */}
     {previewVideo && (
