@@ -216,8 +216,13 @@ export function AssetDetailOverlay({
         first.focus();
       }
     };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    // Capture on document, not bubble on window: a drill-in is the topmost
+    // layer, and window-bubble is the LAST stop on the event path — the one
+    // any of the app's other keydown listeners can preempt. Measured: with
+    // the overlay open, Escape reached document but not window, so the
+    // overlay ignored it. Capture puts it first instead of last.
+    document.addEventListener("keydown", handleKeyDown, true);
+    return () => document.removeEventListener("keydown", handleKeyDown, true);
   }, [onClose]);
 
   useEffect(() => {

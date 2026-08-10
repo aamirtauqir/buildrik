@@ -1,9 +1,16 @@
 /**
  * AssetDetailOverlay — Escape belongs to the topmost layer.
  *
- * REGRESSION: the drill-in listens for Escape on window, so while the image
- * editor modal it opened was up, one keystroke closed the modal AND navigated
- * the drawer behind it. Found on the live walk of boards 303:1997/303:2032.
+ * REGRESSION 1: while the image editor modal it opened was up, one keystroke
+ * closed the modal AND navigated the drawer behind it.
+ *
+ * REGRESSION 2: the listener sat on WINDOW BUBBLE — the last stop on the event
+ * path, and the easiest place to be preempted from. Measured live: with the
+ * overlay open, Escape reached document but never window, so the drill-in
+ * ignored it about half the time. It listens at document CAPTURE now, which is
+ * why these tests dispatch on `document`: that is where a real keystroke
+ * travels (target = the focused element inside it), while an event dispatched
+ * ON window never passes a document capture listener at all.
  *
  * @license BSD-3-Clause
  */
@@ -48,14 +55,14 @@ afterEach(() => {
 describe("AssetDetailOverlay — Escape ownership", () => {
   it("Escape closes the drill-in when nothing is above it", () => {
     const onClose = mountOverlay();
-    fireEvent.keyDown(window, { key: "Escape" });
+    fireEvent.keyDown(document, { key: "Escape" });
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
   it("Escape is ignored while a modal it opened sits above", () => {
     const onClose = mountOverlay();
     mountModalAbove();
-    fireEvent.keyDown(window, { key: "Escape" });
+    fireEvent.keyDown(document, { key: "Escape" });
     expect(onClose).not.toHaveBeenCalled();
   });
 
@@ -64,7 +71,7 @@ describe("AssetDetailOverlay — Escape ownership", () => {
     fireEvent.click(screen.getByTestId("media-detail-used"));
     expect(screen.getByText(/used in/i)).toBeInTheDocument();
     mountModalAbove();
-    fireEvent.keyDown(window, { key: "Escape" });
+    fireEvent.keyDown(document, { key: "Escape" });
     // Still on the used-in view — the modal owns the keystroke.
     expect(screen.getByText(/used in/i)).toBeInTheDocument();
   });

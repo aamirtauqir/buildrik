@@ -548,11 +548,21 @@ TWO REAL BUGS found chasing the pill live:
    Escape. Now skips hidden/display:none/aria-hidden dialogs.
 Both locked with regression tests (AssetDetailOverlay.escape.test.tsx,
 SlimLauncher.statusPill.test.tsx).
-OPEN (pre-existing, not from this pass): a capture-phase listener
-somewhere eats a real Escape keystroke before it reaches window — the
-overlay closes correctly on a window-dispatched Escape but not on a
-physical one. Affordance is unaffected (the ‹ back row works). Needs its
-own investigate pass across the shell's key handling.
+ESCAPE BUG FIXED 2026-08-10. The earlier note blamed "a capture-phase
+listener eating Escape" — WRONG, and the measurement said so: patching
+Event.prototype.stopPropagation logged ZERO calls on the Escape keydown.
+The real shape, from a 3-run probe: with the drill-in OPEN the event
+reached document but not window; with it closed it reached window fine.
+The overlays listened on WINDOW BUBBLE — the last stop on the event path
+and the easiest position to be preempted from, in an app carrying ~15
+keydown listeners across document and window. All three drill-ins
+(asset-detail, icon-browser, stock-browser) listen at document CAPTURE
+now, so the topmost layer gets the keystroke FIRST instead of last.
+Verified 3/3 deterministic live (was roughly half). The unit tests had
+to move their dispatch from `window` to `document`: an event dispatched
+ON window never passes a document capture listener, which is also why
+the old window-dispatch probe "passed" while the real keystroke did
+not — the probe was testing a path a real key never takes.
 MEDIA FAMILY *NOT* CLOSED — reopened 2026-08-08. The same parallel arc
 drew 36 new boards, NINE of them Media, all after my pass declared the
 family done:

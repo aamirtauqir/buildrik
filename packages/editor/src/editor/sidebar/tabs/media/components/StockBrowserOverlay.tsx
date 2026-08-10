@@ -156,8 +156,10 @@ export function StockBrowserOverlay({
         onClose();
       }
     };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    // Capture on document — see AssetDetailOverlay: window-bubble is the last
+    // stop on the event path and the easiest position to be preempted from.
+    document.addEventListener("keydown", onKey, true);
+    return () => document.removeEventListener("keydown", onKey, true);
   }, [onClose]);
 
   const isLoading = Boolean(loading[type]);
