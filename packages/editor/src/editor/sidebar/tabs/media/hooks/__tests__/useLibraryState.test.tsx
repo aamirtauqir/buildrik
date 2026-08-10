@@ -206,14 +206,18 @@ describe("useLibraryState — counts", () => {
     expect(result.current.counts).toMatchObject({ all: 2, img: 1, vid: 1 });
   });
 
-  it("switches to filtered counts when a search is active", () => {
+  // Boards 145:2 / 145:49 / 782:4353 all draw the LIBRARY totals in the pills,
+  // including while a search matches nothing. Switching to counts-of-the-
+  // filtered-list zeroed every pill mid-search and left the drawer with no
+  // truthful "is the library empty" signal.
+  it("keeps the library totals while a search is active", () => {
     const composer = makeComposer([
       asset({ id: "hero", name: "Hero", type: "image" }),
       asset({ id: "clip", name: "Clip", type: "video", mimeType: "video/mp4" }),
     ]);
     const { result } = renderHook(() => useLibraryState(composer));
     act(() => result.current.setLibrarySearch("hero"));
-    expect(result.current.counts).toMatchObject({ all: 1, img: 1, vid: 0 });
+    expect(result.current.counts).toMatchObject({ all: 2, img: 1, vid: 1 });
   });
 });
 

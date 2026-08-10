@@ -23,15 +23,23 @@ export function useSelectionState(
 
   const checkInUse = useCallback(
     (keys: string[]): number => {
-      if (typeof (composer.elements as { findByMediaSrc?: unknown })?.findByMediaSrc !== "function")
-        return 0;
-      const findFn = (
-        composer.elements as unknown as { findByMediaSrc: (src: string) => unknown[] }
-      ).findByMediaSrc;
+      const elements = composer.elements as unknown as {
+        findByMediaSrc?: (src: string) => unknown[];
+      };
+      if (typeof elements?.findByMediaSrc !== "function") return 0;
       return keys.filter((key) => {
         const asset = composer.media.getAsset(key);
         if (!asset) return false;
-        return findFn(asset.src).length > 0;
+        /*
+          Called ON the manager, not through a detached reference. The old code
+          lifted the method out (`const findFn = composer.elements.findByMediaSrc`)
+          and called it bare, so `this` was undefined and its first line —
+          `this.elements.values()` — threw "Cannot read properties of undefined
+          (reading 'elements')". That threw inside requestBulkDelete, so bulk
+          Delete opened no confirm modal at all, and the in-use count that warns
+          before deleting a referenced asset never ran.
+        */
+        return elements.findByMediaSrc!(asset.src).length > 0;
       }).length;
     },
     [composer]

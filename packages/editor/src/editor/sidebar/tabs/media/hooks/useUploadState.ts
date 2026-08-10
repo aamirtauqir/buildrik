@@ -67,7 +67,21 @@ export function useUploadState(
       const name = fileName ?? "File";
       const reason = error ?? "Upload failed";
       setFailedUploads((prev) => [...prev, { fileName: name, reason }]);
-      showToast(`${name} is not supported. Upload JPG, PNG, SVG, MP4, TTF, or OTF files.`, "error");
+      /*
+        Board 145:148 keeps the failure ON SCREEN above the footer, with the
+        reason and a Retry. That row renders from `uploadQueue`, and a file
+        rejected by validation never entered it — it only landed in
+        `failedUploads`, which nothing renders. So a 12 MB image was refused in
+        total silence: measured live, the drawer showed no band at all.
+      */
+      setUploadQueue((prev) => [
+        ...prev.filter((u) => u.fileName !== name),
+        { fileName: name, progress: 0, status: "error", error: reason },
+      ]);
+      // The reason is already computed — say it. This used to claim every
+      // failure was an unsupported TYPE, so an oversized JPG was told to
+      // upload a JPG.
+      showToast(`${name} — ${reason}`, "error");
     };
 
     const onAdded = () => recalcStorage();
@@ -168,6 +182,9 @@ export function useUploadState(
       const file = failedFilesRef.current.get(fileName);
       if (!file) return;
       setFailedUploads((prev) => prev.filter((f) => f.fileName !== fileName));
+      // The band renders from the queue, so the retry has to clear it there
+      // too or the old failure sits under the new attempt.
+      setUploadQueue((prev) => prev.filter((u) => u.fileName !== fileName));
       void upload([file]);
     },
     [upload]

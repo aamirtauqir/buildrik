@@ -284,7 +284,11 @@ describe("useUploadState — media event listeners", () => {
     expect(result.current.uploadQueue).toHaveLength(0);
   });
 
-  it("UPLOAD_ERROR appends to failedUploads and toasts the unsupported-type message", () => {
+  // The toast used to claim every failure was an unsupported TYPE, so an
+  // oversized JPG was told to upload a JPG. And the failure only reached
+  // `failedUploads`, which nothing renders — board 145:148 draws it as a row
+  // above the footer, and that row comes from `uploadQueue`.
+  it("UPLOAD_ERROR surfaces the real reason, in the queue and the toast", () => {
     const { composer, showToast, result } = setup();
 
     act(() => {
@@ -296,8 +300,11 @@ describe("useUploadState — media event listeners", () => {
     expect(result.current.failedUploads).toEqual([
       { fileName: "virus.exe", reason: "Unsupported type" },
     ]);
+    expect(result.current.uploadQueue).toEqual([
+      { fileName: "virus.exe", progress: 0, status: "error", error: "Unsupported type" },
+    ]);
     expect(showToast).toHaveBeenCalledWith(
-      "virus.exe is not supported. Upload JPG, PNG, SVG, MP4, TTF, or OTF files.",
+      "virus.exe — Unsupported type",
       "error"
     );
 

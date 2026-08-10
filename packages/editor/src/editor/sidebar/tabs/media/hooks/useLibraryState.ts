@@ -149,15 +149,18 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
     sortDir,
   ]);
 
-  // Counts from ALL items (for pills when no filter active)
-  const totalCounts = useMemo(() => countByType(allLibraryItems), [allLibraryItems]);
-  // Counts from filtered items (for pills when search/format filter is active)
-  const filteredCounts = useMemo(() => countByType(libraryItems), [libraryItems]);
-  // Use filtered counts when search or format filter is active
-  const counts = useMemo(
-    () => (librarySearch || fmtFilter ? filteredCounts : totalCounts),
-    [librarySearch, fmtFilter, filteredCounts, totalCounts]
-  );
+  /*
+    Pills carry the LIBRARY's totals, in every state. Boards 145:2 (a type
+    filter on), 145:49 (a folder scoped) and 782:4353 (a search matching
+    nothing) all draw the same `image 128 · video 6 · svg 24 · icon 370`.
+
+    They used to switch to counts-of-the-filtered-list whenever a search or
+    format filter was active, so searching for something absent zeroed every
+    pill — the row that tells you what you own reported that you own nothing.
+    It also left the drawer with no truthful "is the library empty" signal,
+    which is what made a fruitless search render the empty-library screen.
+  */
+  const counts = useMemo(() => countByType(allLibraryItems), [allLibraryItems]);
   const setSort = useCallback((by: MediaSortBy, dir: SortDirection) => {
     setSort_(by);
     setSortDir_(dir);

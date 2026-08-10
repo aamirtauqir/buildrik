@@ -317,7 +317,15 @@ export function SlimLauncher(props: SlimLauncherProps) {
             ))}
           </div>
         ) : filtered.length === 0 ? (
-          props.libraryItems.length === 0 ? (
+          /*
+            `libraryItems` arrives ALREADY filtered by useLibraryState, so
+            testing its length answered "did this search match anything", not
+            "does this user own anything" — and a search for a word no file
+            carries rendered "No images or files yet." over a full library.
+            `counts` is the library's own total (see useLibraryState), so it
+            is the honest signal for an empty library.
+          */
+          counts.all === 0 ? (
             /* Board 145:406: one muted line, then Upload / Browse stock as
                accent text links — no filled CTA. */
             <div className="sl-empty tw:px-4 tw:pt-11 tw:text-center tw:text-[13px] tw:leading-5" data-testid="media-empty">
