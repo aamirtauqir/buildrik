@@ -1439,9 +1439,11 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "9d6fd1f6062748e0",
-   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)"
+   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
+   "figmaNodeId": "48:2",
+   "figmaPageId": "10.03 \u2014 ACTIVE \u2014 Onboarding"
   },
   {
    "id": "BL-0085",
@@ -1453,9 +1455,11 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "620a79bc461c3ceb",
-   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)"
+   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
+   "figmaNodeId": "49:2",
+   "figmaPageId": "10.03 \u2014 ACTIVE \u2014 Onboarding"
   },
   {
    "id": "BL-0086",
@@ -1467,9 +1471,11 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "71d60e6456f72c05",
-   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)"
+   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
+   "figmaNodeId": "50:2",
+   "figmaPageId": "10.03 \u2014 ACTIVE \u2014 Onboarding"
   },
   {
    "id": "BL-0087",
@@ -1481,9 +1487,11 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "8edc5701abed5b82",
-   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)"
+   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
+   "figmaNodeId": "51:2",
+   "figmaPageId": "10.03 \u2014 ACTIVE \u2014 Onboarding"
   },
   {
    "id": "BL-0088",
@@ -1495,9 +1503,11 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "f95c524a037c88c2",
-   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)"
+   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
+   "figmaNodeId": "52:2",
+   "figmaPageId": "10.03 \u2014 ACTIVE \u2014 Onboarding"
   },
   {
    "id": "BL-0089",
@@ -1509,9 +1519,11 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "75b3355c6de56622",
-   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)"
+   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
+   "figmaNodeId": "53:2",
+   "figmaPageId": "10.03 \u2014 ACTIVE \u2014 Onboarding"
   },
   {
    "id": "BL-0090",
@@ -1536,10 +1548,12 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "e3649b006232ba6c",
    "capturedFrom": "prod@f7b39a4c",
-   "notes": " captured via server wizardData manufacture (onboarding_states, FLAT schema \u2014 prisma comment shows nested data:{} which is WRONG)"
+   "notes": " captured via server wizardData manufacture (onboarding_states, FLAT schema \u2014 prisma comment shows nested data:{} which is WRONG)",
+   "figmaNodeId": "54:2",
+   "figmaPageId": "10.03 \u2014 ACTIVE \u2014 Onboarding"
   },
   {
    "id": "BL-0092",
@@ -1551,9 +1565,11 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "2c81bcce8437807d",
-   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)"
+   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
+   "figmaNodeId": "55:2",
+   "figmaPageId": "10.03 \u2014 ACTIVE \u2014 Onboarding"
   },
   {
    "id": "BL-0093",
@@ -1565,9 +1581,11 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "ca31e0eda071fc43",
-   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)"
+   "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
+   "figmaNodeId": "56:2",
+   "figmaPageId": "10.03 \u2014 ACTIVE \u2014 Onboarding"
   },
   {
    "id": "BL-0094",
@@ -1579,10 +1597,12 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "0fcf63998137a265",
    "capturedFrom": "prod@f7b39a4c",
-   "notes": " captured via server wizardData manufacture (onboarding_states, FLAT schema \u2014 prisma comment shows nested data:{} which is WRONG)"
+   "notes": " captured via server wizardData manufacture (onboarding_states, FLAT schema \u2014 prisma comment shows nested data:{} which is WRONG)",
+   "figmaNodeId": "58:2",
+   "figmaPageId": "10.03 \u2014 ACTIVE \u2014 Onboarding"
   },
   {
    "id": "BL-0095",
@@ -1594,10 +1614,12 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "f32aa1ceddceae69",
    "capturedFrom": "prod@f7b39a4c",
-   "notes": " captured via server wizardData manufacture (onboarding_states, FLAT schema \u2014 prisma comment shows nested data:{} which is WRONG)"
+   "notes": " captured via server wizardData manufacture (onboarding_states, FLAT schema \u2014 prisma comment shows nested data:{} which is WRONG)",
+   "figmaNodeId": "59:2",
+   "figmaPageId": "10.03 \u2014 ACTIVE \u2014 Onboarding"
   },
   {
    "id": "BL-0096",
@@ -1609,10 +1631,12 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "9c95e518fa18b2bc",
    "capturedFrom": "prod@f7b39a4c",
-   "notes": " captured via server wizardData manufacture (onboarding_states, FLAT schema \u2014 prisma comment shows nested data:{} which is WRONG)"
+   "notes": " captured via server wizardData manufacture (onboarding_states, FLAT schema \u2014 prisma comment shows nested data:{} which is WRONG)",
+   "figmaNodeId": "60:2",
+   "figmaPageId": "10.03 \u2014 ACTIVE \u2014 Onboarding"
   },
   {
    "id": "BL-0097",
