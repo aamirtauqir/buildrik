@@ -1,25 +1,25 @@
 {
- "commit": "fda2998e",
+ "commit": "983b73cb",
  "base": "http://localhost:3100",
- "generated": "2026-08-10T07:53:16.331Z",
+ "generated": "2026-08-10T09:05:37.595Z",
  "captures": [
   {
-   "id": "BL-0162",
-   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "state": "media-list-view",
+   "id": "BL-0178",
+   "path": "/dashboard",
+   "state": "dunning-banner-PAST_DUE",
    "status": 200,
-   "sha256": "b72c34c66018d397",
-   "scrollHeight": 900,
-   "elCount": 47
+   "sha256": "89bf87dcbf0b334f",
+   "scrollHeight": 964,
+   "elCount": 7
   },
   {
-   "id": "BL-0163",
-   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "state": "pages-context-menu",
+   "id": "BL-0179",
+   "path": "/dashboard/settings/billing",
+   "state": "billing-PAST_DUE",
    "status": 200,
-   "sha256": "fe0bfed0fdbdbe82",
-   "scrollHeight": 900,
-   "elCount": 21
+   "sha256": "57f6eaad322f9f8b",
+   "scrollHeight": 1440,
+   "elCount": 8
   }
  ],
  "failures": []
