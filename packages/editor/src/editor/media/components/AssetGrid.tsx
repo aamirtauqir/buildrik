@@ -96,6 +96,12 @@ export interface AssetGridProps {
   usageMap: Map<string, number>;
   /** Smart folder gating the visibleItems filter (drives footer label). */
   smartFolder: SmartFolder;
+  /** Board 1163:13948 — the error row's Dismiss. */
+  onDismissUpload?: (fileName: string) => void;
+  /** Board 1163:4641's bulk Download — routed to the engine's media layer. */
+  onDownload: (assets: ReadonlyArray<{ src: string; name: string }>) => number;
+  /** Whole grid becomes the drop zone while a file drag is over the manager. */
+  isDragOver?: boolean;
   /** Breadcrumb path for the footer label. */
   breadcrumbPath: { id: string | null; name: string }[];
   /** Selected item highlight + click target. */
@@ -115,6 +121,9 @@ export function AssetGrid({
   visibleItems,
   usageMap,
   smartFolder,
+  onDismissUpload,
+  onDownload,
+  isDragOver = false,
   breadcrumbPath,
   selectedAssetId,
   onSelectAsset,
@@ -136,6 +145,14 @@ export function AssetGrid({
     return [...seen].sort();
   }, [state.libraryItems]);
 
+  /* Board 1163:13948 — every row that is still in flight or has something to
+     say. A completed upload keeps its green line briefly; its real evidence is
+     the card that just appeared. */
+  const activeUploads = React.useMemo(
+    () => (state.uploadQueue ?? []).filter((u) => u.status !== "complete" || u.progress < 100),
+    [state.uploadQueue],
+  );
+
   /* Board 1174:4866 — "24 files · Last added 2h ago". */
   const lastAddedLabel = React.useMemo(() => {
     let newest = 0;
@@ -149,15 +166,24 @@ export function AssetGrid({
   const [bulkMovePickerOpen, setBulkMovePickerOpen] = React.useState(false);
 
   return (
-    <div className="mgr-main">
+    <div className={`mgr-main${isDragOver ? " dragover" : ""}`}>
+      {isDragOver && (
+        <div className="mgr-dropzone" aria-hidden="true">
+          <span className="mgr-dropzone-title">Drop files to upload</span>
+          <span className="mgr-dropzone-sub">
+            Images, video, audio, SVG and fonts — up to {formatBytes(state.storage.total)} total
+          </span>
+        </div>
+      )}
       {/* Bulk action toolbar (multi-select mode) */}
       {state.selMode && state.selectedKeys.size > 0 && (
         <div className="mgr-bulk-bar">
           <span className="mgr-bulk-count">{state.selectedKeys.size} selected</span>
+          <div className="mgr-spacer" />
           {/* Bug #4 fix: Move → folder picker popover */}
           <div className="mgr-sort-wrap">
             <Button className="mgr-btn" onClick={() => setBulkMovePickerOpen((o) => !o)}>
-              <FolderOpen size={12} /> Move to...
+              Move to folder…
             </Button>
             {bulkMovePickerOpen && (
               <>
@@ -212,20 +238,32 @@ export function AssetGrid({
             )}
           </div>
           <Button
+            className="mgr-btn"
+            onClick={() => {
+              // Board 1163:4641 draws Download between Move and Delete. The
+              // browser pulls one file at a time, so the selection goes as
+              // individual downloads — the engine owns the disk write.
+              const items = state.libraryItems.filter((i) => state.selectedKeys.has(i.key));
+              const n = onDownload(items.map((i) => ({ src: i.src, name: i.displayName ?? i.name })));
+              addToast({
+                description: `Downloading ${n} ${n === 1 ? "file" : "files"}`,
+                tone: "info",
+              });
+            }}
+          >
+            Download
+          </Button>
+          <Button
             className="mgr-btn danger"
             onClick={() => {
               const items = state.libraryItems.filter((i) => state.selectedKeys.has(i.key));
               state.requestBulkDelete(items);
             }}
           >
-            <Trash2 size={12} /> Delete
-          </Button>
-          <div className="mgr-spacer" />
-          <Button className="mgr-btn" onClick={state.selectAll}>
-            Select all
+            Delete
           </Button>
           <Button className="mgr-btn" onClick={state.toggleSelMode}>
-            Cancel
+            ✕ Clear
           </Button>
         </div>
       )}
@@ -354,6 +392,58 @@ export function AssetGrid({
         </Button>
       </div>
 
+      {/*
+        Board 1163:13695 — a smart scope says what it is showing AND what that
+        means. "Unused" is the one worth spelling out: the whole reason to open
+        it is to delete, and the safety claim belongs next to the assets, not
+        in a tooltip on the folder row.
+      */}
+      {smartFolder === "unused" && visibleItems.length > 0 && (
+        <div className="mgr-scope-note" role="status">
+          Showing {visibleItems.length} unused{" "}
+          {visibleItems.length === 1 ? "asset" : "assets"} — safe to delete, nothing on
+          the site references them.
+        </div>
+      )}
+
+      {/* Board 1163:13948 — files still landing report themselves above the
+          grid: what failed and why, what is still working, what arrived. */}
+      {activeUploads.length > 0 && (
+        <ul className="mgr-uploads" aria-label="Uploads">
+          {activeUploads.map((u) => (
+            <li key={u.fileName} className={`mgr-upload ${u.status}`}>
+              <span className="mgr-upload-name">
+                {u.fileName}
+                {u.status === "error"
+                  ? ` → ${u.error ?? "not supported"}`
+                  : u.status === "complete"
+                    ? ""
+                    : " → uploading…"}
+              </span>
+              {u.status === "uploading" || u.status === "processing" || u.status === "optimizing" ? (
+                <span className="mgr-upload-track" aria-hidden="true">
+                  <span className="mgr-upload-fill" style={{ width: `${Math.round(u.progress)}%` }} />
+                </span>
+              ) : null}
+              {u.status === "error" && onDismissUpload ? (
+                <Button className="mgr-upload-dismiss" onClick={() => onDismissUpload(u.fileName)}>
+                  Dismiss
+                </Button>
+              ) : null}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {visibleItems.length > 0 && viewMode === "list" && (
+        <div className="mgr-list-head" aria-hidden="true">
+          <span />
+          <span>Name</span>
+          <span>Type</span>
+          <span>Size</span>
+          <span>Usage</span>
+        </div>
+      )}
       {visibleItems.length > 0 ? (
         <div
           className={viewMode === "grid" ? "mgr-grid" : "mgr-list"}
@@ -417,23 +507,45 @@ export function AssetGrid({
             };
 
             if (viewMode === "list") {
+              const checked = state.selectedKeys.has(item.key);
               return (
                 <div
                   key={item.key}
-                  className={`mgr-list-row${isSelected ? " selected" : ""}`}
+                  className={`mgr-list-row${isSelected || checked ? " selected" : ""}`}
                   onClick={onClick}
                   onDoubleClick={() => state.insertToCanvas(item.key)}
                   onContextMenu={(e) => state.openCtxMenu(e, item)}
                   draggable
                   onDragStart={onDragStart}
                 >
-                  <div className="mgr-list-thumb">{thumbContent}</div>
-                  <div className="mgr-list-name">{item.name}</div>
+                  {/* Board 1163:4641 leads every row with its checkbox — list
+                      view IS the bulk view, and dims left with it: the column
+                      that decides a bulk action is usage, not pixels. */}
+                  <span
+                    className={`mgr-list-check${checked ? " on" : ""}`}
+                    role="checkbox"
+                    aria-checked={checked}
+                    aria-label={`Select ${item.name}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (!state.selMode) state.toggleSelMode();
+                      state.toggleSelect(item.key);
+                    }}
+                  >
+                    {checked ? (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round">
+                        <path d="M5 12l5 5L20 7" />
+                      </svg>
+                    ) : null}
+                  </span>
+                  <div className="mgr-list-name">{item.displayName ?? item.name}</div>
                   <div className="mgr-list-type">{item.type.toUpperCase()}</div>
-                  <div className="mgr-list-dims">
-                    {item.width && item.height ? `${item.width}×${item.height}` : "—"}
-                  </div>
                   <div className="mgr-list-size">{formatBytes(item.size)}</div>
+                  <div className={`mgr-list-use${(usageMap.get(item.key) ?? 0) > 0 ? "" : " unused"}`}>
+                    {(usageMap.get(item.key) ?? 0) > 0
+                      ? `used ×${usageMap.get(item.key)}`
+                      : "unused"}
+                  </div>
                 </div>
               );
             }
@@ -495,17 +607,20 @@ export function AssetGrid({
             <div className="mgr-empty-ring">
               <FolderOpen size={32} />
             </div>
-            <h4>{state.librarySearch ? "No results" : "Your library is empty"}</h4>
+            {/* Board 1162:4617 — the empty library says where uploads GO,
+                because the question at zero assets is "is this the right
+                place?", not "what can I do here?". */}
+            <h4>{state.librarySearch ? "No results" : "No images or files yet."}</h4>
             <p>
               {state.librarySearch
                 ? `No assets match "${state.librarySearch}"`
-                : "Upload your brand assets, browse free stock, or import from other tools."}
+                : "Everything you upload lives here, in one library for the whole site."}
             </p>
             {!state.librarySearch && (
               <div className="mgr-empty-actions">
                 <Button className="mgr-btn-primary" onClick={onUploadClick}>
                   <Upload size={14} />
-                  Upload files
+                  Upload
                 </Button>
                 <Button className="mgr-btn" onClick={onOpenStockModal}>
                   <Search size={14} />

@@ -29,6 +29,7 @@ packages/editor/src/editor/export/ExportUtils.ts
 packages/editor/src/editor/sidebar/tabs/settings/screens/FormsScreen.tsx
 packages/editor/src/engine/components/ComponentStorage.ts
 packages/editor/src/engine/export/ExportEngine.ts
+packages/editor/src/engine/media/MediaManager.ts
 packages/editor/src/engine/export/ExportHelpers.ts
 packages/editor/src/engine/storage/VersionHistoryStorage.ts
 # ── Capture / offscreen measurement nodes — mounted briefly to rasterize or

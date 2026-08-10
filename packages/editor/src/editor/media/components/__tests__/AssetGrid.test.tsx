@@ -118,6 +118,7 @@ function mount(state: MediaStateResult, over: Partial<Parameters<typeof AssetGri
     onSelectAsset: vi.fn(),
     onUploadClick: vi.fn(),
     onOpenStockModal: vi.fn(),
+    onDownload: vi.fn(() => 0),
     addToast: vi.fn(),
     ...over,
   };
@@ -305,12 +306,17 @@ describe("AssetGrid — bulk toolbar", () => {
     expect(arg.map((i: LibraryItem) => i.key)).toEqual(["a", "b"]);
   });
 
-  it("Select all and Cancel wire to state", () => {
+  // Board 1163:4641 bar: count left, then Move to folder… · Download ·
+  // Delete · ✕ Clear. Select-all left for the toolbar, where it is reachable
+  // before anything is selected.
+  it("the bulk bar carries the board's four actions and Clear exits", () => {
     const state = bulkState();
     mount(state);
-    fireEvent.click(screen.getByText("Select all"));
-    expect(state.selectAll).toHaveBeenCalled();
-    fireEvent.click(screen.getByText("Cancel"));
+    expect(screen.getByText("Move to folder…")).toBeInTheDocument();
+    expect(screen.getByText("Download")).toBeInTheDocument();
+    expect(screen.getByText("Delete")).toBeInTheDocument();
+    expect(screen.queryByText("Select all")).toBeNull();
+    fireEvent.click(screen.getByText("✕ Clear"));
     expect(state.toggleSelMode).toHaveBeenCalled();
   });
 });

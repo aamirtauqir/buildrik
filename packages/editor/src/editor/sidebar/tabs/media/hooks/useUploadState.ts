@@ -155,6 +155,14 @@ export function useUploadState(
   );
 
   // Re-upload a previously-failed file by name (queue Retry button).
+  /**
+   * Board 1163:13948's error row carries a Dismiss. A failed upload otherwise
+   * sat in the queue forever — the auto-clear only ever fired for completes.
+   */
+  const dismissUpload = useCallback((fileName: string) => {
+    setUploadQueue((prev) => prev.filter((u) => u.fileName !== fileName));
+  }, []);
+
   const retryUpload = useCallback(
     (fileName: string) => {
       const file = failedFilesRef.current.get(fileName);
@@ -205,6 +213,7 @@ export function useUploadState(
     panelDragOver,
     upload,
     retryUpload,
+    dismissUpload,
     dismissFailedUploads,
     handlePanelDragEnter,
     handlePanelDragLeave,

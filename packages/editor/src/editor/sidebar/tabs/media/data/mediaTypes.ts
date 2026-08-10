@@ -147,6 +147,8 @@ export interface UploadStateResult {
   panelDragOver: boolean;
   upload(files: File[], opts?: { folderId?: string | null }): Promise<boolean>;
   retryUpload(fileName: string): void;
+  /** Board 1163:13948 — drop a failed upload row. */
+  dismissUpload(fileName: string): void;
   dismissFailedUploads(): void;
   handlePanelDragEnter(e: React.DragEvent): void;
   handlePanelDragLeave(e: React.DragEvent): void;
@@ -235,6 +237,8 @@ export interface MediaStateResult {
   enterSelectModeWith(key: string): void;
   upload(files: File[], opts?: { folderId?: string | null }): Promise<boolean>;
   retryUpload(fileName: string): void;
+  /** Board 1163:13948 — drop a failed upload row. */
+  dismissUpload(fileName: string): void;
   failedUploads: FailedUpload[];
   dismissFailedUploads(): void;
   requestDelete(key: string): void;

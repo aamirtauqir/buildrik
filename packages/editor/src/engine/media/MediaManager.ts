@@ -1342,6 +1342,31 @@ export class MediaManager extends MediaEventEmitter {
   // Selection & Sorting
   // ============================================
 
+  /**
+   * Save assets to the user's disk (board 1163:4641's bulk Download).
+   *
+   * Lives here rather than in the grid component for two reasons: a React
+   * component writing to `document.body` is the shape Gate 22 exists to
+   * catch, and "put these files on disk" is a media operation, not a
+   * rendering one. The anchor is attached before clicking because Safari
+   * ignores a click on a detached one.
+   */
+  downloadAssets(assets: ReadonlyArray<{ src: string; name: string }>): number {
+    let started = 0;
+    for (const asset of assets) {
+      if (!asset.src) continue;
+      const a = document.createElement("a");
+      a.href = asset.src;
+      a.download = asset.name;
+      a.rel = "noopener";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      started += 1;
+    }
+    return started;
+  }
+
   selectAssets(ids: string[]): void {
     this.state.selectedAssetIds = ids;
   }

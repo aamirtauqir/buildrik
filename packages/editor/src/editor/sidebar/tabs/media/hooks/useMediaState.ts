@@ -347,6 +347,7 @@ export function useMediaState(composer: Composer): MediaStateResult {
     libraryError: library.libraryError,
     retryLibraryLoad: library.retryLibraryLoad,
     retryUpload: upload.retryUpload,
+    dismissUpload: upload.dismissUpload,
     requestDelete: selection.requestDelete,
     requestBulkDelete: selection.requestBulkDelete,
     executeDelete: selection.executeDelete,

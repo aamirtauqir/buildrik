@@ -1011,3 +1011,118 @@
   cursor: pointer;
 }
 .mgr-selectall:hover { color: var(--bk-ink); background: var(--bk-bg-subtle); }
+
+/* ─── Board 1163:4641 list view ──────────────────────────────────────── */
+.mgr-list-head,
+.mgr-list-row {
+  display: grid;
+  grid-template-columns: 24px 1fr 64px 88px 88px;
+  align-items: center;
+  gap: var(--bk-space-12);
+  padding: 0 var(--bk-space-20);
+}
+.mgr-list-head {
+  height: 28px;
+  font: 400 11px var(--bk-font-ui);
+  color: var(--bk-ink-muted);
+  border-bottom: 1px solid var(--bk-border);
+}
+.mgr-list-check {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid var(--bk-border-medium, var(--bk-border));
+  border-radius: var(--bk-radius-sm);
+  background: var(--bk-bg-card);
+  cursor: pointer;
+}
+.mgr-list-check.on {
+  background: var(--bk-accent);
+  border-color: var(--bk-accent);
+  color: var(--bk-accent-on);
+}
+.mgr-list-check svg { width: 10px; height: 10px; }
+.mgr-list-type,
+.mgr-list-size,
+.mgr-list-use {
+  font: 400 11px var(--bk-font-ui);
+  color: var(--bk-ink-muted);
+}
+.mgr-list-use.unused { color: var(--bk-ink-disabled); }
+
+/* ─── Board 1163:13695 smart-scope note ──────────────────────────────── */
+.mgr-scope-note {
+  margin: var(--bk-space-8) var(--bk-space-20) 0;
+  padding: var(--bk-space-8) var(--bk-space-12);
+  border-radius: var(--bk-radius-md);
+  background: var(--bk-bg-subtle);
+  font: 400 11px var(--bk-font-ui);
+  color: var(--bk-ink-soft);
+}
+
+/* ─── Board 1163:13948 drop zone + upload rows ───────────────────────── */
+.mgr-main.dragover { position: relative; }
+.mgr-main.dragover::after {
+  content: "";
+  position: absolute;
+  inset: var(--bk-space-4);
+  border: 2px dashed var(--bk-accent);
+  border-radius: var(--bk-radius-lg);
+  pointer-events: none;
+  z-index: 2;
+}
+.mgr-dropzone {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--bk-space-4);
+  background: var(--bk-alpha-accent-08, rgba(26, 86, 219, 0.04));
+  pointer-events: none;
+  z-index: 3;
+}
+.mgr-dropzone-title { font: 500 14px var(--bk-font-ui); color: var(--bk-accent-text); }
+.mgr-dropzone-sub { font: 400 11px var(--bk-font-ui); color: var(--bk-ink-muted); }
+
+.mgr-uploads {
+  margin: var(--bk-space-8) var(--bk-space-20) 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--bk-space-4);
+}
+.mgr-upload {
+  display: flex;
+  align-items: center;
+  gap: var(--bk-space-8);
+  padding: var(--bk-space-8) var(--bk-space-12);
+  border-radius: var(--bk-radius-md);
+  background: var(--bk-bg-subtle);
+  font: 400 11px var(--bk-font-ui);
+  color: var(--bk-ink-soft);
+}
+.mgr-upload.error { background: var(--bk-error-tint); color: var(--bk-error-text, var(--bk-error)); }
+.mgr-upload.complete { background: var(--bk-success-tint); color: var(--bk-success-text, var(--bk-success)); }
+.mgr-upload-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mgr-upload-track {
+  width: 120px;
+  height: 4px;
+  border-radius: var(--bk-radius-full);
+  background: var(--bk-bg-active, var(--bk-border));
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.mgr-upload-fill { display: block; height: 100%; background: var(--bk-accent); }
+.mgr-upload-dismiss {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font: 500 11px var(--bk-font-ui);
+  color: var(--bk-accent-text);
+  cursor: pointer;
+  flex-shrink: 0;
+}

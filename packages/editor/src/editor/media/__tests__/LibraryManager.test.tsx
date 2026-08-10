@@ -191,10 +191,17 @@ async function mount(state: MediaStateResult, usages: Record<string, number> = {
 // ─── Tests ───────────────────────────────────────────────────────────────────
 
 describe("LibraryManager — D5 baseline", () => {
-  it("renders the empty-library hero when there are no assets", async () => {
+  // Board 1162:4617 — at zero assets the question is "is this the right
+  // place?", so the empty state says where uploads go.
+  it("renders the board empty state when there are no assets", async () => {
     await mount(makeMediaState({ libraryItems: [] }));
-    expect(screen.getByText("Your library is empty")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /upload files/i })).toBeInTheDocument();
+    expect(screen.getByText("No images or files yet.")).toBeInTheDocument();
+    expect(screen.getByText(/one library for the whole site/)).toBeInTheDocument();
+    // Two Uploads on screen now: the top bar's and the empty state's — the
+    // board draws both, so scope the assertion to the empty state.
+    const hero = document.querySelector(".mgr-empty-actions")!;
+    expect(hero.textContent).toContain("Upload");
+    expect(hero.textContent).toContain("Browse stock");
   });
 
   it("renders asset names in the grid when libraryItems is populated", async () => {

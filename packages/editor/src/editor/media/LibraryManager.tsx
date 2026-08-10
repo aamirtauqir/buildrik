@@ -64,6 +64,11 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
   const [stockModalOpen, setStockModalOpen] = React.useState(false);
   const [selectedAssetId, setSelectedAssetId] = React.useState<string | null>(null);
   const [smartFolder, setSmartFolder] = React.useState<SmartFolder>(null);
+  /* Board 1163:13948 — the whole manager is the drop target. dragenter fires
+     per child element, so a counter is the only way to know when the pointer
+     has really left rather than crossed a card boundary. */
+  const [isDragOver, setIsDragOver] = React.useState(false);
+  const dragDepth = React.useRef(0);
   const searchRef = React.useRef<HTMLInputElement>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -244,8 +249,33 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
 
   const storageUsedPct = Math.min(100, (state.storage.used / state.storage.total) * 100);
 
+  const fileDragProps = {
+    onDragEnter: (e: React.DragEvent) => {
+      if (!Array.from(e.dataTransfer.types).includes("Files")) return;
+      dragDepth.current += 1;
+      setIsDragOver(true);
+    },
+    onDragOver: (e: React.DragEvent) => {
+      if (!Array.from(e.dataTransfer.types).includes("Files")) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "copy";
+    },
+    onDragLeave: () => {
+      dragDepth.current = Math.max(0, dragDepth.current - 1);
+      if (dragDepth.current === 0) setIsDragOver(false);
+    },
+    onDrop: (e: React.DragEvent) => {
+      const files = Array.from(e.dataTransfer.files ?? []);
+      dragDepth.current = 0;
+      setIsDragOver(false);
+      if (!files.length) return;
+      e.preventDefault();
+      state.upload(files, { folderId: state.currentFolderId });
+    },
+  };
+
   return (
-    <div className="mgr">
+    <div className="mgr" {...fileDragProps}>
       {/* ═══ TOP BAR ═══ */}
       <div className="mgr-top">
         <div className="mgr-title">
@@ -333,6 +363,9 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
             ./components/AssetGrid.tsx now. Virtualization deferred —
             see comment in AssetGrid.tsx for the full reasoning. */}
         <AssetGrid
+          isDragOver={isDragOver}
+          onDownload={(assets) => composer.media.downloadAssets(assets)}
+          onDismissUpload={state.dismissUpload}
           state={state}
           visibleItems={visibleItems}
           usageMap={usageMap}
