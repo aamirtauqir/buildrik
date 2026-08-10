@@ -174,7 +174,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
       <div className="sl-search tw:flex tw:h-9 tw:items-center tw:px-4" data-testid="media-search">
         <TextField
           type="text"
-          className="sl-search__input tw:h-7 tw:w-full tw:rounded-md tw:border tw:border-gray-200 tw:bg-gray-50 tw:px-2 tw:text-[13px] tw:text-gray-900 tw:placeholder:text-gray-500"
+          className="sl-search__input tw:h-[28px] tw:w-full tw:rounded-md tw:border tw:border-gray-200 tw:bg-gray-50 tw:px-2 tw:text-[13px] tw:text-gray-900 tw:placeholder:text-gray-500"
           placeholder="Search"
           value={searchQuery}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => onSearchChange(e.target.value)}
@@ -276,7 +276,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
                 type="button"
                 color="light"
                 size="xs"
-                className="tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+                className="tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:font-normal tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
                 data-testid="media-load-retry"
                 onClick={props.onRetryLoad}
               >
@@ -286,7 +286,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
                 type="button"
                 color="light"
                 size="xs"
-                className="tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+                className="tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:font-normal tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
                 onClick={onOpenStock}
               >
                 Browse stock
@@ -327,7 +327,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
                   type="button"
                   color="light"
                   size="xs"
-                  className="tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+                  className="tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:font-normal tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
                   data-testid="media-empty-upload"
                   onClick={() => uploadInputRef.current?.click()}
                 >
@@ -337,7 +337,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
                   type="button"
                   color="light"
                   size="xs"
-                  className="tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+                  className="tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:font-normal tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
                   data-testid="media-empty-cta"
                   onClick={onOpenStock}
                 >
@@ -355,7 +355,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
                   type="button"
                   color="light"
                   size="xs"
-                  className="tw:mt-1.5 tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+                  className="tw:mt-1.5 tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:font-normal tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
                   data-testid="media-clear-search"
                   onClick={() => onSearchChange("")}
                 >
@@ -474,7 +474,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
             type="button"
             color="light"
             size="xs"
-            className="tw:min-h-6 tw:gap-1.5 tw:border-0 tw:bg-transparent tw:px-0 tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+            className="tw:min-h-6 tw:gap-1.5 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:font-normal tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
             data-testid="media-upload-action"
             onClick={() => uploadInputRef.current?.click()}
             disabled={props.storage.used >= props.storage.total}
@@ -486,7 +486,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
             type="button"
             color="light"
             size="xs"
-            className="tw:min-h-6 tw:gap-1.5 tw:border-0 tw:bg-transparent tw:px-0 tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+            className="tw:min-h-6 tw:gap-1.5 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:font-normal tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
             data-testid="media-stock-action"
             onClick={onOpenStock}
           >
@@ -498,7 +498,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
               type="button"
               color="light"
               size="xs"
-              className="tw:min-h-6 tw:gap-1.5 tw:border-0 tw:bg-transparent tw:px-0 tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+              className="tw:min-h-6 tw:gap-1.5 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:font-normal tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
               data-testid="media-icons-action"
               onClick={props.onOpenIconPicker}
             >

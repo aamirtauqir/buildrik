@@ -42,28 +42,25 @@ export function useMediaState(composer: Composer): MediaStateResult {
   // §12 — expanded panel mode (320 ↔ 560). Composer event fires on change so
   // LeftSidebar can re-read the live width without coupling to media state.
   const [panelExpanded, setPanelExpandedRaw] = useState(false);
-  // Tracks manual collapse so subsequent uploads don't fight user intent.
-  // Resets when user manually expands (explicit re-opt-in).
-  const userCollapsedRef = React.useRef(false);
   const setPanelExpanded = useCallback((v: boolean) => {
     setPanelExpandedRaw(v);
-    userCollapsedRef.current = !v;
     composer.emit("ui:media-panel-width", { width: v ? 560 : 320, expanded: v });
   }, [composer]);
 
-  // Auto-expand on upload completion when user hasn't manually collapsed.
-  // Suppressed during selection-context (§11 snap-back) — disruptive there.
-  useEffect(() => {
-    const onUploadComplete = () => {
-      if (userCollapsedRef.current) return;
-      if (selectionContext) return;
-      setPanelExpanded(true);
-    };
-    composer.media.on(MEDIA_EVENTS.UPLOAD_COMPLETE, onUploadComplete);
-    return () => {
-      composer.media.off(MEDIA_EVENTS.UPLOAD_COMPLETE, onUploadComplete);
-    };
-  }, [composer, selectionContext, setPanelExpanded]);
+  /*
+    NO auto-expand on upload. Boards 145:96 and 145:148 both draw an upload —
+    running and failed — with the drawer exactly where it was: the progress
+    row sits above the footer links and the grid stays behind it.
+
+    An `UPLOAD_COMPLETE` handler used to call `setPanelExpanded(true)` here.
+    That was survivable while expanding meant the 560 panel; after the
+    one-manager change (aff6295c) every expand signal opens the FULLPAGE
+    library, so dropping a file into the 320 drawer threw the user out of it
+    into a different screen. Measured live: after one upload the drawer was
+    still mounted but `isVisible() === false`, with the manager on top.
+
+    Expanding stays a thing the user asks for — the header brackets.
+  */
 
   // §10/§15 — per-asset usage counts (distinct pages where each asset is referenced).
   // Built from composer.elements page tree; resilient to missing engine APIs (mocks/tests).

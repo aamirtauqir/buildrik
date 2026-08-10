@@ -141,49 +141,32 @@ describe("useMediaState — §12 panelExpanded", () => {
     expect(composer.emit).toHaveBeenLastCalledWith("ui:media-panel-width", { width: 320, expanded: false });
   });
 
-  it("auto-expands on UPLOAD_COMPLETE event", () => {
+  /*
+    The three tests that used to sit here asserted the OPPOSITE contract:
+    "auto-expands on UPLOAD_COMPLETE", plus two about a collapse guard that
+    only existed to tame it. Expanding now means opening the FULLPAGE library
+    (one-manager, aff6295c), and boards 145:96 / 145:148 draw an upload with
+    the 320 drawer staying put — so an upload that navigates is the bug, and a
+    test that demanded it was protecting the bug.
+  */
+  it("an upload does NOT move the user out of the drawer (boards 145:96 / 145:148)", () => {
     const composer = makeFakeComposer();
     const { result } = renderHook(() => useMediaState(composer as never));
     expect(result.current.panelExpanded).toBe(false);
     act(() => {
       composer.media.emit(MEDIA_EVENTS.UPLOAD_COMPLETE, { fileName: "x.png" });
     });
-    expect(result.current.panelExpanded).toBe(true);
-  });
-
-  it("does NOT re-expand after user manually collapsed", () => {
-    const composer = makeFakeComposer();
-    const { result } = renderHook(() => useMediaState(composer as never));
-    // User expands then collapses
-    act(() => result.current.setPanelExpanded(true));
-    act(() => result.current.setPanelExpanded(false));
-    expect(result.current.panelExpanded).toBe(false);
-    // Now upload completes — should respect manual collapse
-    act(() => {
-      composer.media.emit(MEDIA_EVENTS.UPLOAD_COMPLETE, { fileName: "y.png" });
-    });
     expect(result.current.panelExpanded).toBe(false);
   });
 
-  it("re-expands after manual re-expand resets the collapse guard", () => {
+  it("expanding stays available as an explicit user action", () => {
     const composer = makeFakeComposer();
     const { result } = renderHook(() => useMediaState(composer as never));
-    act(() => result.current.setPanelExpanded(true));
-    act(() => result.current.setPanelExpanded(false));
-    // User manually re-expands — explicit opt-in resets guard
-    act(() => result.current.setPanelExpanded(true));
-    act(() => result.current.setPanelExpanded(false));
-    // After last collapse, guard is set again
-    act(() => {
-      composer.media.emit(MEDIA_EVENTS.UPLOAD_COMPLETE, { fileName: "z.png" });
-    });
-    expect(result.current.panelExpanded).toBe(false);
-    // But manual expand should still work
     act(() => result.current.setPanelExpanded(true));
     expect(result.current.panelExpanded).toBe(true);
   });
 
-  it("does NOT auto-expand when selection context is active (§11 snap-back mode)", () => {
+  it("an upload during a selection context also leaves the drawer alone", () => {
     const composer = makeFakeComposer();
     const { result } = renderHook(() => useMediaState(composer as never));
     act(() => result.current.setSelectionContext({ elementId: "el-1", label: "Hero image" }));
