@@ -1,70 +1,25 @@
 {
- "commit": "d7a8b56f",
+ "commit": "fda2998e",
  "base": "http://localhost:3100",
- "generated": "2026-08-10T06:54:12.629Z",
+ "generated": "2026-08-10T07:53:16.331Z",
  "captures": [
   {
-   "id": "BL-0123",
+   "id": "BL-0162",
    "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "state": "inspector-text",
+   "state": "media-list-view",
    "status": 200,
-   "sha256": "2828e17a715849f6",
+   "sha256": "b72c34c66018d397",
    "scrollHeight": 900,
-   "elCount": 82
+   "elCount": 47
   },
   {
-   "id": "BL-0124",
+   "id": "BL-0163",
    "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "state": "inspector-button",
+   "state": "pages-context-menu",
    "status": 200,
-   "sha256": "ecc180d61cfb5aa7",
+   "sha256": "fe0bfed0fdbdbe82",
    "scrollHeight": 900,
-   "elCount": 82
-  },
-  {
-   "id": "BL-0125",
-   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "state": "inspector-container",
-   "status": 200,
-   "sha256": "aa6557bf2dd28b85",
-   "scrollHeight": 900,
-   "elCount": 82
-  },
-  {
-   "id": "BL-0126",
-   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "state": "inspector-grid",
-   "status": 200,
-   "sha256": "1277bc3cd0536b44",
-   "scrollHeight": 900,
-   "elCount": 82
-  },
-  {
-   "id": "BL-0127",
-   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "state": "inspector-flex",
-   "status": 200,
-   "sha256": "1c3ce7c882091152",
-   "scrollHeight": 900,
-   "elCount": 82
-  },
-  {
-   "id": "BL-0128",
-   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "state": "inspector-input",
-   "status": 200,
-   "sha256": "f8d05deda9111eed",
-   "scrollHeight": 900,
-   "elCount": 82
-  },
-  {
-   "id": "BL-0129",
-   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "state": "inspector-heading",
-   "status": 200,
-   "sha256": "b9847cdde41d4ffc",
-   "scrollHeight": 900,
-   "elCount": 82
+   "elCount": 21
   }
  ],
  "failures": []

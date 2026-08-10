@@ -111,6 +111,7 @@ for (const s of screens) {
       throw new Error(`redirected to ${new URL(page.url()).pathname}`);
     // Post-load interactions (open a panel, press a shortcut) before capture.
     if (s.actions) for (const a of s.actions) {
+      if (a.hover) await page.hover(a.hover, { timeout: 8000 });
       if (a.click) await page.click(a.click, { timeout: 8000, force: !!a.force });
       if (a.press) await page.keyboard.press(a.press);
       if (a.waitFor) await page.waitForSelector(a.waitFor, { timeout: 8000 });
