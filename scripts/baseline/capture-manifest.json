@@ -1,25 +1,25 @@
 {
- "commit": "983b73cb",
+ "commit": "0bccdb21",
  "base": "http://localhost:3100",
- "generated": "2026-08-10T09:05:37.595Z",
+ "generated": "2026-08-10T10:30:13.370Z",
  "captures": [
   {
-   "id": "BL-0178",
-   "path": "/dashboard",
-   "state": "dunning-banner-PAST_DUE",
+   "id": "BL-0182",
+   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
+   "state": "experimental-rail-e3",
    "status": 200,
-   "sha256": "89bf87dcbf0b334f",
-   "scrollHeight": 964,
-   "elCount": 7
+   "sha256": "00d00b8354c7ec17",
+   "scrollHeight": 905,
+   "elCount": 80
   },
   {
-   "id": "BL-0179",
-   "path": "/dashboard/settings/billing",
-   "state": "billing-PAST_DUE",
+   "id": "BL-0183",
+   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
+   "state": "experimental-rail-legacy",
    "status": 200,
-   "sha256": "57f6eaad322f9f8b",
-   "scrollHeight": 1440,
-   "elCount": 8
+   "sha256": "f499e60af3e2ba27",
+   "scrollHeight": 900,
+   "elCount": 80
   }
  ],
  "failures": []
