@@ -548,11 +548,13 @@
    "state": "default",
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "requires": null,
    "screenshotHash": "1e6b44c83bdcfc82",
    "capturedFrom": "prod@f7b39a4c",
-   "scrollHeight": 900
+   "scrollHeight": 900,
+   "figmaNodeId": "204:2",
+   "figmaPageId": "183:2"
   },
   {
    "id": "BL-0025",
@@ -564,11 +566,13 @@
    "state": "default",
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "requires": null,
    "screenshotHash": "74949d2f09e01202",
    "capturedFrom": "prod@f7b39a4c",
-   "scrollHeight": 900
+   "scrollHeight": 900,
+   "figmaNodeId": "206:2",
+   "figmaPageId": "183:2"
   },
   {
    "id": "BL-0026",
@@ -580,11 +584,13 @@
    "state": "default",
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "requires": null,
    "screenshotHash": "21b33cabe6896c6a",
    "capturedFrom": "prod@f7b39a4c",
-   "scrollHeight": 900
+   "scrollHeight": 900,
+   "figmaNodeId": "207:2",
+   "figmaPageId": "183:2"
   },
   {
    "id": "BL-0027",
@@ -596,11 +602,13 @@
    "state": "default",
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "requires": "session",
    "screenshotHash": "825fd34af51ff9b5",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
-   "notes": "session + stalled /api/auth/session \u2014 'Signing you in\u2026' spinner"
+   "notes": "session + stalled /api/auth/session \u2014 'Signing you in\u2026' spinner",
+   "figmaNodeId": "208:2",
+   "figmaPageId": "183:2"
   },
   {
    "id": "BL-0028",
@@ -612,11 +620,13 @@
    "state": "default",
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "requires": "token",
    "screenshotHash": "a651ace2be8d7837",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
-   "notes": "valid password_reset token"
+   "notes": "valid password_reset token",
+   "figmaNodeId": "209:2",
+   "figmaPageId": "183:2"
   },
   {
    "id": "BL-0029",
@@ -628,11 +638,13 @@
    "state": "default",
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "requires": null,
    "screenshotHash": "f0a0e6991a0c56bc",
    "capturedFrom": "prod@f7b39a4c",
-   "scrollHeight": 900
+   "scrollHeight": 900,
+   "figmaNodeId": "210:2",
+   "figmaPageId": "183:2"
   },
   {
    "id": "BL-0030",
