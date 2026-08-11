@@ -98,7 +98,7 @@ describe("the in-use check calls its engine method ON the manager", () => {
   }
 
   it("counts an in-use asset instead of throwing", () => {
-    const { result } = renderHook(() => useSelectionState(fakeComposer(), [ITEM]));
+    const { result } = renderHook(() => useSelectionState(fakeComposer(), [ITEM], vi.fn()));
     act(() => result.current.requestBulkDelete([ITEM]));
     expect(result.current.confirmDelete).not.toBeNull();
     expect(result.current.confirmDelete?.inUseCount).toBe(1);
@@ -106,7 +106,7 @@ describe("the in-use check calls its engine method ON the manager", () => {
 
   it("still opens the confirmation when the engine lacks the method", () => {
     const composer = { elements: {}, media: { getAsset: () => ITEM } } as never;
-    const { result } = renderHook(() => useSelectionState(composer, [ITEM]));
+    const { result } = renderHook(() => useSelectionState(composer, [ITEM], vi.fn()));
     act(() => result.current.requestBulkDelete([ITEM]));
     expect(result.current.confirmDelete?.inUseCount).toBe(0);
   });
