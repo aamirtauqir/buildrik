@@ -72,7 +72,7 @@ describe("DesignSystemTab — Brand root drill-in a11y", () => {
 
   it("opens on the root list, not inside a section", () => {
     const { container, queryByRole } = renderRoot();
-    expect(rows(container)).toHaveLength(4);
+    expect(rows(container)).toHaveLength(5);
     // The tab bar it replaced must not survive anywhere in the panel.
     expect(queryByRole("tablist")).toBeNull();
     expect(queryByRole("tab")).toBeNull();
@@ -82,7 +82,7 @@ describe("DesignSystemTab — Brand root drill-in a11y", () => {
   it("labels every row from the board, with a hint", () => {
     const { container, getByText } = renderRoot();
     const labels = rows(container).map((r) => r.textContent);
-    for (const label of ["Tokens", "Presets", "Components", "Import / export"]) {
+    for (const label of ["Tokens", "Presets", "Components", "Lint", "Import / export"]) {
       expect(labels.some((l) => l?.includes(label))).toBe(true);
     }
     expect(getByText("Component style presets")).toBeTruthy();
@@ -107,12 +107,12 @@ describe("DesignSystemTab — Brand root drill-in a11y", () => {
     const { container, getByText } = renderRoot();
     fireEvent.click(rows(container).find((r) => r.textContent?.includes("Tokens"))!);
     fireEvent.click(getByText(/‹ Tokens/));
-    expect(rows(container)).toHaveLength(4);
+    expect(rows(container)).toHaveLength(5);
   });
 
   it("hides the decorative chevron from assistive tech", () => {
     const { container } = renderRoot();
     const chevrons = container.querySelectorAll('[data-section-id] [aria-hidden="true"]');
-    expect(chevrons.length).toBe(4);
+    expect(chevrons.length).toBe(5);
   });
 });

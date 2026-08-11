@@ -1,6 +1,9 @@
 /**
- * DesignSystemTab v12 — Tokens / Styles / Components / Export
- * 4-section workspace. Aggregates dirty state across all 14 token registries.
+ * DesignSystemTab — the Brand panel.
+ *
+ * A drill-in root (M5) over five destinations: Tokens · Presets · Components ·
+ * Lint · Import / export. Aggregates dirty state across all 14 token
+ * registries and all 11 preset registries.
  *
  * @license BSD-3-Clause
  */
@@ -62,23 +65,26 @@ import { TokensSection } from "./sections/TokensSection";
 import { StylesSection, useStylesSectionTotalDirty } from "./sections/StylesSection";
 import { ComponentsSection } from "./sections/ComponentsSection";
 import { ExportSection } from "./sections/ExportSection";
+import { LintSection } from "./sections/LintSection";
+import { useDSLint } from "../state/useDSLint";
 // ─── Layout ───────────────────────────────────────────────────────────────────
 
 const PANEL = "tw:relative tw:flex tw:flex-col tw:h-full tw:bg-[var(--bk-bg-subtle)]";
 const SECTION_BODY = "tw:flex-1 tw:overflow-auto tw:p-3";
-/** Header strip shared by the brand banner, the toolbar and the tablist. */
+/** Header strip shared by the brand banner, the toolbar and the crumb. */
 const STRIP = "tw:flex tw:items-center tw:flex-none tw:border-b tw:border-gray-200";
 /** Square icon button in the toolbar (themes, AI). */
 const TOOL_BTN =
   "tw:inline-flex tw:items-center tw:justify-center tw:w-7 tw:h-6 tw:p-0 tw:rounded-md " +
   "tw:border tw:border-gray-200 tw:bg-transparent tw:text-sm tw:text-gray-500 tw:hover:bg-gray-100";
-const SECTION_TAB =
-  "tw:flex tw:items-center tw:gap-[5px] tw:h-9 tw:px-3 tw:rounded-t-md tw:rounded-b-none " +
-  "tw:border-0 tw:border-b-2 tw:bg-transparent tw:text-[13px]";
+/** Back crumb inside a destination — board 153:2 draws `‹ <Section>` in accent. */
+const CRUMB =
+  "tw:flex tw:items-center tw:gap-[5px] tw:h-auto tw:px-0 tw:border-0 tw:bg-transparent " +
+  "tw:text-[13px] tw:font-normal tw:text-[var(--bk-accent)] tw:hover:underline";
 
 // ─── Section types ────────────────────────────────────────────────────────────
 
-type DesignSection = "tokens" | "styles" | "components" | "export";
+type DesignSection = "tokens" | "styles" | "components" | "lint" | "export";
 
 /**
  * Brand root — a drill-in list, not a tab bar (M5).
@@ -100,22 +106,22 @@ type DesignSection = "tokens" | "styles" | "components" | "export";
  *   · Colour mode — its board lists "tokens with NO DARK VALUE" plus a Set
  *                   action each. That query is not known to exist on the
  *                   registries. `ColorModeToggle` keeps working where it is.
- *   · Lint        — its board is a findings list with per-row Fix/Open. The
- *                   data exists (`LintIssue[]`) but is owned by `DSLintMount`;
- *                   promoting it means lifting that state, not rendering it.
  *   · Typography  — `TypeTokenList` needs the full token registry plumbing that
  *                   `TokensSection` does internally; it is not liftable as-is.
  *   · Starters    — `StarterGalleryModal` is a modal, and the board draws a
  *                   destination. Making it a row would misreport what it is.
  *
- * Row counts (the board shows them on 5 of 9 rows) are not wired yet either.
- * A row that cannot answer its own question is worse than a row that is not
- * there — which is the whole finding this change came from.
+ * Row counts: only Lint carries one, because only Lint has a real number to
+ * hand. The others need registry sizes that are not aggregated here yet, and a
+ * count that is not the truth is worse than no count — a row that cannot answer
+ * its own question is worse than a row that is not there, which is the whole
+ * finding this change came from.
  */
 const SECTIONS: Array<{ id: DesignSection; label: string; hint: string }> = [
   { id: "tokens",     label: "Tokens",          hint: "Colours, type, spacing" },
   { id: "styles",     label: "Presets",         hint: "Component style presets" },
   { id: "components", label: "Components",      hint: "What the brand ships" },
+  { id: "lint",       label: "Lint",            hint: "What breaks the brand" },
   { id: "export",     label: "Import / export", hint: "Move the brand in and out" },
 ];
 
@@ -163,6 +169,9 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
   onClose,
 }) => {
   const { addToast } = useToast();
+  /* Shared with DSLintBanner via `useDSLint` so the row count, the banner and
+     the Lint destination can never disagree. */
+  const lintIssues = useDSLint(composer);
   /* null = the Brand root list. Every destination is entered from it (M5). */
   const [activeSection, setActiveSection] = React.useState<DesignSection | null>(null);
   /* "root" is a real target (Back), so it cannot be modelled as null — null
@@ -594,7 +603,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
         />
       </div>
 
-      <DSLintMount composer={composer} />
+      <DSLintMount composer={composer} onReviewAll={() => handleSectionClick("lint")} />
 
       {/* Breadcrumb — only inside a destination. Board 152:2 draws no crumb at
           the root, and 153:2 draws `‹ <Section>` inside one. */}
@@ -604,7 +613,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
             color="light"
             data-crumb-back=""
             onClick={() => handleSectionClick("root")}
-            className={`${SECTION_TAB} tw:h-auto tw:px-0 tw:border-b-0 tw:text-[13px] tw:font-normal tw:text-[var(--bk-accent)] tw:hover:underline`}
+            className={CRUMB}
           >
             ‹ {SECTIONS.find((s) => s.id === activeSection)?.label}
           </Button>
@@ -656,8 +665,13 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
                         </span>
                         <span className="tw:text-xs tw:text-gray-500">{s.hint}</span>
                       </span>
-                      <span aria-hidden="true" className="tw:flex-none tw:text-gray-400">
-                        ›
+                      <span className="tw:flex tw:flex-none tw:items-center tw:gap-1.5">
+                        {s.id === "lint" && lintIssues.length > 0 && (
+                          <span className="tw:text-xs tw:text-gray-500">
+                            {lintIssues.length}
+                          </span>
+                        )}
+                        <span aria-hidden="true" className="tw:text-gray-400">›</span>
                       </span>
                     </Button>
                   </li>
@@ -689,6 +703,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
               onOpenAIAssist={() => setAiOpen(true)}
             />
           )}
+          {activeSection === "lint"       && <LintSection issues={lintIssues} />}
           {activeSection === "export"     && <ExportSection />}
         </div>
       )}
