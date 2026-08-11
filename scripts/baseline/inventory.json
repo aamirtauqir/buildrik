@@ -3026,11 +3026,13 @@
    "flow": "experimental",
    "state": "experimental-rail-e3 (?rail=e3, tabsConfig.ts:312-348)",
    "viewport": "1440x900",
-   "figmaFileKey": "wQsxXDoVQ2LpPkpnaKIVtR",
+   "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "00d00b8354c7ec17",
-   "capturedFrom": "prod@f7b39a4c"
+   "capturedFrom": "prod@f7b39a4c",
+   "figmaNodeId": "171:2",
+   "figmaPageId": "173:2"
   },
   {
    "id": "BL-0183",
