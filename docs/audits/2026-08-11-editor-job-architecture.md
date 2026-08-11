@@ -313,7 +313,13 @@ new element type is one entry in PROFILES, not a code change"
 (`elementProfiles.ts:12`). So an eighth profile is a data row, not a redesign —
 worth knowing before Phase 5 draws a board per profile.
 
-### J5 · Manage the brand system — 4 tabs, 28 boards, correctly state-shaped
+### J5 · Manage the brand system — **the navigation models disagree**
+
+> **Corrected 2026-08-12.** This section first read "4 tabs, 28 boards, correctly
+> state-shaped", which conflated two different claims. *Component coverage* does
+> agree — nearly every board has a code home, and the table below still holds.
+> *Navigation* does not agree at all, and I asserted the first while implying the
+> second. Board `152:2` was read afterwards and settles it. See Finding H.
 
 `DesignSystemTab.tsx:82-88` — four sections: **Tokens · Styles · Components ·
 Export**. The 28 `Brand ·` boards are states and sub-screens of those four, not
@@ -338,25 +344,79 @@ tooltip, modal, nav, table, layout). Figma drew them as **four states of one
 screen**, not eleven screens. That is the §4.1 test applied correctly by whoever
 drew it, and it is why the Brand family is 28 boards instead of ~60.
 
-Two boards did **not** resolve to a Brand code home:
-
-→ **Finding G (needs verification, not yet classified).** `Brand · classes`. The
-only CSS-classes surface in the codebase is
-`inspector/sections/CSSClassesSection.tsx`, registered in the **inspector**
-element registry (`sections/registry/element.tsx:10`) and reached per selected
-element. Either Figma plans a **site-wide** class manager under Brand (class 4,
-Figma-only extension — preserve per rule 4), or the per-element inspector surface
-has been drawn in the wrong family. **I have not opened the board.** These are
-materially different outcomes — one is a feature to build, the other is a board
-to move — so it is recorded as unresolved rather than guessed. One board read in
-Phase 5 settles it.
-
 → **`Brand · pro-locked`.** `UpgradeModal` is mounted once, globally, at
 `AquibraStudio.tsx:616`, and the file already has `Shell · Upgrade modal (403
 gate)` for it. So `pro-locked` is almost certainly Brand rendering that shared
 gate rather than a Brand-specific screen — but no Brand-specific trigger was
 located in `design-system/`, so this is stated as the likely reading, not a
 verified one.
+
+### Finding G — RESOLVED. `Brand · classes` is a site-wide class manager
+
+Board `153:2` read 2026-08-12. It draws a **drill-in** (breadcrumb `‹ Classes`)
+listing the site's CSS classes with a **usage count per class** and a `⋯` row
+menu:
+
+```
+.btn-primary   used 12×      ⋯
+.card          used  8×      ⋯
+.section       used 22×      ⋯
+.nav-link      used  6×      ⋯
+.badge         used  4×      ⋯
+```
+
+**This is not the inspector surface.** `CSSClassesSection` edits the classes *on
+the selected element*; it has no reason to know that `.section` is used 22 times
+across the site. The usage count is the discriminator, and it is decisive.
+
+→ **Class 4 · Figma-only extension. Preserve, do not implement (rule 4).** No
+site-wide class registry exists in code — `classRegistry` / `allClasses` /
+`siteClasses` / `classUsage` all return zero hits across `src/`. The adjacent
+capability *does* exist for tokens (`TokenUsageChip`, `TokenDetailView`), so the
+mechanism to count usage is already proven on a sibling concept; classes simply
+never got it.
+
+This was recorded yesterday as "feature to build, or board to move" — it is the
+former. **One board read turned an unresolved question into a scoped feature.**
+
+### Finding H — Brand's navigation model differs (class 2, structural)
+
+Board `152:2` (`Brand · root`) is **not a tab bar**. It is a **nine-row drill-in
+list**, each row with a count and a `›` chevron:
+
+| Figma `Brand · root` row | Count | Code home | Code's shape |
+|---|---|---|---|
+| Tokens | 14 | `TokensSection` | **tab** |
+| Presets | 18 | `StylesRouter` (11 categories) | inside the **Styles tab** |
+| Starters | 6 | `StarterGalleryModal` | a **modal** |
+| **Classes** | 12 | — | **absent** (Finding G) |
+| Components | 27 | `ComponentsSection` | **tab** |
+| Typography | — | `ui/type/` | inside the **Tokens tab** |
+| Colour mode | — | `ColorModeToggle` | a **toggle** |
+| Lint | 3 | `DSLintBanner` | a **banner** |
+| Import / export | — | `ExportSection` + `ImportCard` | **tab** ("Export") |
+
+Nine peer destinations in Figma; in code, four tabs plus a modal, a toggle and a
+banner. Same capabilities, different mental model: Figma treats Brand as a
+**directory you drill into**, code treats it as a **workspace you tab across**.
+
+Two independent reasons this resolves toward Figma:
+
+1. **Rule 2** — Figma is source of truth for navigation patterns and IA.
+2. **The standing drill-in decision** — the sidebar is locked to drill-in stack
+   nav. Brand's tab bar is the older pattern, surviving because nothing forced
+   the question.
+
+→ **Recommended: Brand root becomes the nine-row drill-in.** That single change
+also promotes Starters, Colour mode and Lint from incidental chrome (a modal, a
+toggle, a banner) to first-class destinations with a stable address — which is
+what their board counts already assume (`starters` ×2, `lint` ×3, `colour-mode`
+×1 cannot be reached as states of a banner).
+
+**This is the largest single IA delta found so far**, and it was invisible to
+every count-based check: the family count matched, the component coverage
+matched, and the navigation was still wrong. Same failure shape as Finding B, one
+level up.
 
 ### J2 · Add content — partially traced
 
@@ -387,8 +447,7 @@ and that is exactly what Finding B was made of.
 
 **Open decisions** — Phase 5's target file (Phase 1/2 gate, unchanged) · M2
 (`publish-history` out of Settings) · M3 (canonical `CreateComponentModal`) ·
-Finding E (`S4`) · Finding G (`Brand · classes`: feature to build, or board to
-move).
+M5 (Brand root → drill-in) · Finding E (`S4`).
 
 ### Findings ledger
 
@@ -400,4 +459,15 @@ move).
 | D | History tab set: `Changes` is a state, not a tab | 2 | recommended (M1) |
 | E | No `S4` in the spine | 9 | needs one sentence |
 | F | Inspector profiles 7/7, fallback included | 1 | **verified, nothing to do** |
-| G | `Brand · classes` has no Brand code home | ? | needs one board read |
+| G | `Brand · classes` = site-wide class manager | **4** | **resolved** — Figma-only, preserve |
+| H | Brand root: 9-row drill-in vs 4-tab bar | **2** | recommended (M5) — largest IA delta |
+
+### Merge / change decisions
+
+| # | Change | Basis | Status |
+|---|---|---|---|
+| M1 | History `Changes` tab → filter state on Saves | Finding D | recommended |
+| M2 | `publish-history` out of the Settings nav | Finding C | founder call |
+| M3 | Two `CreateComponentModal` → one canonical | Phase 1/2 §1.4 | founder call |
+| M4 | `Publish · pre-checks` + `· blocked` → one screen, two states | §4.2 | code should match |
+| M5 | **Brand root → nine-row drill-in** | Finding H + standing drill-in decision | **founder call** |
