@@ -28,7 +28,7 @@ type View = { kind: "list" } | { kind: "detail"; tokenId: string };
 export interface TokensRouterProps {
   composer: Composer | null | undefined;
   tokens: ReadonlyArray<DesignToken>;
-  onTokenChange?: (id: string, value: string) => void;
+  onTokenChange?: (id: string, value: string, darkValue?: string) => void;
   onTokenDelete?: (id: string, opts?: { replaceWith?: string }) => void;
   onTokenRename?: (id: string, newId: string) => void;
   children: (handlers: { onRowClick: (tokenId: string) => void }) => React.ReactNode;

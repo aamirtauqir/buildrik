@@ -123,6 +123,71 @@ const wrap = (
 ) => <DSModeProvider initialMode={mode}>{children}</DSModeProvider>;
 
 describe("TokenDetailView", () => {
+  /* Regression: the Dark value field accepted text and threw it away on blur.
+     `onBlur` was an empty handler whose comment said the engine-side commit was
+     "a separate follow-up (D4)" — which stopped being true once
+     useColorTokens.updateToken took a third `darkValue` argument. The comment
+     outlived the limitation, so the field kept silently discarding input. */
+  describe("dark value commit", () => {
+    const renderDark = (onValueChange: ReturnType<typeof vi.fn>, token = colorToken) =>
+      render(
+        wrap(
+          <TokenDetailView
+            token={token}
+            composer={makeMockComposer({})}
+            onBack={() => {}}
+            onValueChange={onValueChange}
+          />,
+        ),
+      );
+
+    it("commits what was typed, carrying the unchanged light value", () => {
+      const onValueChange = vi.fn();
+      const { getByLabelText } = renderDark(onValueChange);
+      const input = getByLabelText("Dark value");
+      fireEvent.change(input, { target: { value: "#89A7FF" } });
+      fireEvent.blur(input);
+      expect(onValueChange).toHaveBeenCalledWith(
+        colorToken.id,
+        colorToken.value,
+        "#89A7FF",
+      );
+    });
+
+    it("does not commit when the value is unchanged", () => {
+      const onValueChange = vi.fn();
+      const withDark = { ...colorToken, darkValue: "#89A7FF" };
+      const { getByLabelText } = renderDark(onValueChange, withDark);
+      fireEvent.blur(getByLabelText("Dark value"));
+      expect(onValueChange).not.toHaveBeenCalled();
+    });
+
+    it("trims, so trailing whitespace is not a change", () => {
+      const onValueChange = vi.fn();
+      const withDark = { ...colorToken, darkValue: "#89A7FF" };
+      const { getByLabelText } = renderDark(onValueChange, withDark);
+      const input = getByLabelText("Dark value");
+      fireEvent.change(input, { target: { value: "  #89A7FF  " } });
+      fireEvent.blur(input);
+      expect(onValueChange).not.toHaveBeenCalled();
+    });
+
+    it("commits an empty string, which is how a dark value is cleared", () => {
+      const onValueChange = vi.fn();
+      const withDark = { ...colorToken, darkValue: "#89A7FF" };
+      const { getByLabelText } = renderDark(onValueChange, withDark);
+      const input = getByLabelText("Dark value");
+      fireEvent.change(input, { target: { value: "" } });
+      fireEvent.blur(input);
+      expect(onValueChange).toHaveBeenCalledWith(colorToken.id, colorToken.value, "");
+    });
+
+    it("has no Dark value field for a non-color token", () => {
+      const { queryByLabelText } = renderDark(vi.fn(), radiusToken);
+      expect(queryByLabelText("Dark value")).toBeNull();
+    });
+  });
+
   it("renders Back arrow button", () => {
     const composer = makeMockComposer({});
     const { getByText } = render(

@@ -237,14 +237,16 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
   // T8: dispatch a token-value update to whichever registry owns the id.
   // Detail view (and any future cross-kind editor) calls onTokenChange with
   // just (id, value) — we resolve the owning registry by token kind.
-  const handleTokenChange = React.useCallback((id: string, value: string) => {
+  const handleTokenChange = React.useCallback((id: string, value: string, darkValue?: string) => {
     const tok = allTokens.find((t) => t.id === id);
     if (!tok) return;
     const k = tok.kind ?? (tok.category === "colors" ? "color"
       : tok.category === "typography" ? "type"
       : tok.category === "spacing" ? "spacing"
       : undefined);
-    if (k === "color")        { color.updateToken(id, value); return; }
+    // Only the color registry stores a dark variant — the other kinds take
+    // two args and would ignore a third anyway.
+    if (k === "color")        { color.updateToken(id, value, darkValue); return; }
     if (k === "type")         { type.updateToken(id, value); return; }
     if (k === "spacing")      { spacing.updateToken(id, value); return; }
     const r = newKindRegistry(k as TokenKind);

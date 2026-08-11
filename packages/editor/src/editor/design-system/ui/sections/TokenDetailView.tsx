@@ -48,7 +48,9 @@ export interface TokenDetailViewProps {
    */
   allTokens?: ReadonlyArray<DesignToken>;
   onBack: () => void;
-  onValueChange?: (id: string, value: string) => void;
+  /** Commit a token edit. `darkValue` carries the dark-mode variant; only the
+   *  color registry stores one, and passing it for other kinds is a no-op. */
+  onValueChange?: (id: string, value: string, darkValue?: string) => void;
   /**
    * Delete callback. Accepts an optional `{ replaceWith }` second arg routed
    * through the B1 `replacedBy` bridge (B4 follow-up). Without the second
@@ -417,11 +419,15 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
               placeholder={token.darkValue ? "" : "+ add (currently falls back)"}
               onChange={(e) => setDarkInput(e.target.value)}
               onBlur={() => {
-                // Dark value commits via the same onValueChange seam; consumers
-                // distinguish via field naming downstream when wired. For MVP
-                // we forward through onValueChange-dark equivalent if present.
-                // T8 ships only the local input — engine-side dark commit is a
-                // separate follow-up (D4).
+                /* This handler was empty, with a comment saying the engine-side
+                   dark commit was "a separate follow-up (D4)". That stopped
+                   being true when `useColorTokens.updateToken` gained its third
+                   `darkValue` argument for the import path — but the comment
+                   froze the old limitation in place, so the field kept
+                   accepting text and discarding it on blur, silently. */
+                const next = darkInput.trim();
+                if (next === (token.darkValue ?? "")) return;
+                onValueChange?.(token.id, token.value, next);
               }}
               className={MONO}
               aria-label="Dark value"
