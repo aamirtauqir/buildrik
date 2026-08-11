@@ -80,11 +80,43 @@ const SECTION_TAB =
 
 type DesignSection = "tokens" | "styles" | "components" | "export";
 
-const SECTIONS: Array<{ id: DesignSection; label: string }> = [
-  { id: "tokens",     label: "Tokens" },
-  { id: "styles",     label: "Styles" },
-  { id: "components", label: "Components" },
-  { id: "export",     label: "Export" },
+/**
+ * Brand root — a drill-in list, not a tab bar (M5).
+ *
+ * Board `Brand · root` (g4Gz… 152:2) draws nine peer destinations with a `›`
+ * chevron each. The code had four tabs plus a modal (Starters), a toggle
+ * (Colour mode) and a banner (Lint) — same capabilities, different mental
+ * model. Figma owns navigation (rule 2), and the sidebar is drill-in stack nav.
+ *
+ * This change is the NAVIGATION MODEL and the board's labels. It deliberately
+ * ships the four destinations that already exist as self-contained sections,
+ * and does NOT invent the other five. Each omission has a reason, and none of
+ * them is "ran out of time":
+ *
+ *   · Classes     — a SITE-WIDE class manager with per-class usage counts. No
+ *                   such registry exists in code (`classRegistry`/`classUsage`:
+ *                   zero hits). Figma-only; rule 4 says preserve the design,
+ *                   not implement it. (Finding G.)
+ *   · Colour mode — its board lists "tokens with NO DARK VALUE" plus a Set
+ *                   action each. That query is not known to exist on the
+ *                   registries. `ColorModeToggle` keeps working where it is.
+ *   · Lint        — its board is a findings list with per-row Fix/Open. The
+ *                   data exists (`LintIssue[]`) but is owned by `DSLintMount`;
+ *                   promoting it means lifting that state, not rendering it.
+ *   · Typography  — `TypeTokenList` needs the full token registry plumbing that
+ *                   `TokensSection` does internally; it is not liftable as-is.
+ *   · Starters    — `StarterGalleryModal` is a modal, and the board draws a
+ *                   destination. Making it a row would misreport what it is.
+ *
+ * Row counts (the board shows them on 5 of 9 rows) are not wired yet either.
+ * A row that cannot answer its own question is worse than a row that is not
+ * there — which is the whole finding this change came from.
+ */
+const SECTIONS: Array<{ id: DesignSection; label: string; hint: string }> = [
+  { id: "tokens",     label: "Tokens",          hint: "Colours, type, spacing" },
+  { id: "styles",     label: "Presets",         hint: "Component style presets" },
+  { id: "components", label: "Components",      hint: "What the brand ships" },
+  { id: "export",     label: "Import / export", hint: "Move the brand in and out" },
 ];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -131,8 +163,11 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
   onClose,
 }) => {
   const { addToast } = useToast();
-  const [activeSection, setActiveSection] = React.useState<DesignSection>("tokens");
-  const [pendingSection, setPendingSection] = React.useState<DesignSection | null>(null);
+  /* null = the Brand root list. Every destination is entered from it (M5). */
+  const [activeSection, setActiveSection] = React.useState<DesignSection | null>(null);
+  /* "root" is a real target (Back), so it cannot be modelled as null — null
+     already means "nothing pending". */
+  const [pendingSection, setPendingSection] = React.useState<DesignSection | "root" | null>(null);
   const [showSectionGuard, setShowSectionGuard] = React.useState(false);
   const [showReview, setShowReview] = React.useState(false);
   const [showAddToken, setShowAddToken] = React.useState(false);
@@ -330,45 +365,30 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
     };
   }, [composer, loadFromComposer, addToast]);
 
-  // ─ Section switching with guard ─
-  const handleSectionClick = (s: DesignSection) => {
-    if (s === activeSection) return;
+  /* Navigation with the unsaved-changes guard. "root" is Back, and it is
+     guarded like any other move — leaving a dirty section by the back button
+     loses exactly as much work as leaving it sideways did. The arrow-key
+     tablist handler that used to live here went with the tab bar: a drill-in
+     list is a list of buttons and gets Tab, not roving focus. */
+  const handleSectionClick = (s: DesignSection | "root") => {
+    const target = s === "root" ? null : s;
+    if (target === activeSection) return;
     if (isDirty) {
       setPendingSection(s);
       setShowSectionGuard(true);
     } else {
-      setActiveSection(s);
+      setActiveSection(target);
     }
-  };
-
-  // DD3 a11y baseline: WAI-ARIA tablist keyboard nav. Arrow keys cycle;
-  // Home/End jump to ends. Auto-activation on focus matches the spec
-  // pattern for tabsets where panel mounts are cheap.
-  const handleSectionKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
-    const idx = SECTIONS.findIndex((s) => s.id === activeSection);
-    if (idx < 0) return;
-    let nextIdx = idx;
-    switch (e.key) {
-      case "ArrowRight": nextIdx = (idx + 1) % SECTIONS.length; break;
-      case "ArrowLeft":  nextIdx = (idx - 1 + SECTIONS.length) % SECTIONS.length; break;
-      case "Home":       nextIdx = 0; break;
-      case "End":        nextIdx = SECTIONS.length - 1; break;
-      default: return;
-    }
-    e.preventDefault();
-    handleSectionClick(SECTIONS[nextIdx].id);
-    // Move focus to the newly-active tab so screen readers announce it.
-    const next = e.currentTarget.parentElement?.querySelector<HTMLButtonElement>(
-      `[data-section-id="${SECTIONS[nextIdx].id}"]`,
-    );
-    next?.focus();
   };
 
   const handleGuardDiscard = () => {
     allRegistries.forEach((r) => r.discardAll());
     allPresetRegistries.forEach((r) => r.discardAll());
     setShowSectionGuard(false);
-    if (pendingSection) { setActiveSection(pendingSection); setPendingSection(null); }
+    if (pendingSection) {
+      setActiveSection(pendingSection === "root" ? null : pendingSection);
+      setPendingSection(null);
+    }
   };
 
   const handleGuardKeep = () => {
@@ -379,7 +399,10 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
   const handleGuardSaveAndSwitch = () => {
     handleApply();
     setShowSectionGuard(false);
-    if (pendingSection) { setActiveSection(pendingSection); setPendingSection(null); }
+    if (pendingSection) {
+      setActiveSection(pendingSection === "root" ? null : pendingSection);
+      setPendingSection(null);
+    }
   };
 
   // ─ Apply ─
@@ -573,46 +596,20 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
 
       <DSLintMount composer={composer} />
 
-      {/* Section switcher — WAI-ARIA tablist (DD3 a11y baseline) */}
-      <div
-        role="tablist"
-        aria-label="Design workspace sections"
-        className={`${STRIP} tw:gap-0.5 tw:px-3 tw:pt-2 tw:bg-[var(--bk-bg-subtle)]`}
-      >
-        {SECTIONS.map((s) => {
-          const dirtyHere =
-            (s.id === "tokens" && tokensDirty > 0) ||
-            (s.id === "styles" && stylesDirty > 0);
-          const selected = activeSection === s.id;
-          return (
-            <Button
-              key={s.id}
-              color="light"
-              role="tab"
-              id={`design-tab-${s.id}`}
-              aria-selected={selected}
-              aria-controls={`design-tabpanel-${s.id}`}
-              tabIndex={selected ? 0 : -1}
-              data-section-id={s.id}
-              onClick={() => handleSectionClick(s.id)}
-              onKeyDown={handleSectionKeyDown}
-              className={`${SECTION_TAB} ${
-                selected
-                  ? "tw:border-b-blue-700 tw:font-medium tw:text-gray-900"
-                  : "tw:border-b-transparent tw:font-normal tw:text-gray-500 tw:hover:text-gray-900"
-              }`}
-            >
-              {s.label}
-              {dirtyHere && (
-                <span
-                  className="tw:size-[5px] tw:flex-none tw:rounded-full tw:bg-[var(--bk-warning)]"
-                  aria-label="unsaved changes"
-                />
-              )}
-            </Button>
-          );
-        })}
-      </div>
+      {/* Breadcrumb — only inside a destination. Board 152:2 draws no crumb at
+          the root, and 153:2 draws `‹ <Section>` inside one. */}
+      {activeSection && (
+        <div className={`${STRIP} tw:px-3 tw:py-2 tw:bg-[var(--bk-bg-subtle)]`}>
+          <Button
+            color="light"
+            data-crumb-back=""
+            onClick={() => handleSectionClick("root")}
+            className={`${SECTION_TAB} tw:h-auto tw:px-0 tw:border-b-0 tw:text-[13px] tw:font-normal tw:text-[var(--bk-accent)] tw:hover:underline`}
+          >
+            ‹ {SECTIONS.find((s) => s.id === activeSection)?.label}
+          </Button>
+        </div>
+      )}
 
       <div
         className="tw:flex-none tw:px-3 tw:py-[5px] tw:border-b tw:border-gray-200 tw:bg-[var(--bk-bg-subtle)] tw:text-xs tw:text-gray-500"
@@ -631,12 +628,44 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
           onRetry={() => { setError(null); loadFromComposer(); }}
         />
       ) : (
-        <div
-          role="tabpanel"
-          id={`design-tabpanel-${activeSection}`}
-          aria-labelledby={`design-tab-${activeSection}`}
-          className={SECTION_BODY}
-        >
+        <div id={`design-section-${activeSection ?? "root"}`} className={SECTION_BODY}>
+          {/* Brand root — the drill-in list (M5, board 152:2) */}
+          {activeSection === null && (
+            <ul className="tw:flex tw:flex-col tw:gap-0.5 tw:list-none tw:m-0 tw:p-0">
+              {SECTIONS.map((s) => {
+                const dirtyHere =
+                  (s.id === "tokens" && tokensDirty > 0) ||
+                  (s.id === "styles" && stylesDirty > 0);
+                return (
+                  <li key={s.id}>
+                    <Button
+                      color="light"
+                      data-section-id={s.id}
+                      onClick={() => handleSectionClick(s.id)}
+                      className="tw:flex tw:w-full tw:items-center tw:gap-2 tw:justify-between tw:h-auto tw:px-2 tw:py-2 tw:rounded-md tw:border-0 tw:bg-transparent tw:text-left tw:hover:bg-gray-100"
+                    >
+                      <span className="tw:flex tw:flex-col tw:gap-0.5 tw:min-w-0">
+                        <span className="tw:flex tw:items-center tw:gap-[5px] tw:text-[13px] tw:text-gray-900">
+                          {s.label}
+                          {dirtyHere && (
+                            <span
+                              className="tw:size-[5px] tw:flex-none tw:rounded-full tw:bg-[var(--bk-warning)]"
+                              aria-label="unsaved changes"
+                            />
+                          )}
+                        </span>
+                        <span className="tw:text-xs tw:text-gray-500">{s.hint}</span>
+                      </span>
+                      <span aria-hidden="true" className="tw:flex-none tw:text-gray-400">
+                        ›
+                      </span>
+                    </Button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+
           {isFirstLoad && activeSection === "tokens" && (
             <div className="tw:mx-2.5 tw:mt-2.5 tw:px-3 tw:py-2 tw:rounded-lg tw:border tw:border-[var(--bk-accent-tint)] tw:bg-[var(--bk-accent-tint)]">
               <span className="tw:text-xs tw:leading-relaxed tw:text-gray-900">

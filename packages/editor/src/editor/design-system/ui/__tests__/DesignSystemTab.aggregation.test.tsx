@@ -52,28 +52,35 @@ beforeEach(() => {
 });
 
 describe("DesignSystemTab — 14-kind aggregation", () => {
-  it("renders all four sections in the section switcher", () => {
+  it("renders all four destinations on the Brand root", () => {
     const composer = makeFakeComposer();
-    const { getAllByRole } = render(wrap(<DesignSystemTab composer={composer} />));
-    // DD3: section switcher uses role="tab" (WAI-ARIA tablist), not implicit
-    // role="button". ExportDropdown trigger remains a plain <button>.
-    const tabLabels = getAllByRole("tab").map((t) => t.textContent ?? "");
-    expect(tabLabels).toContain("Tokens");
-    expect(tabLabels).toContain("Styles");
-    expect(tabLabels).toContain("Components");
-    expect(tabLabels).toContain("Export");
+    const { container } = render(wrap(<DesignSystemTab composer={composer} />));
+    // M5: the section switcher is a drill-in list, so the destinations are
+    // rows carrying data-section-id — not role="tab". Labels follow the board.
+    const rows = Array.from(
+      container.querySelectorAll<HTMLButtonElement>("[data-section-id]"),
+    ).map((r) => r.textContent ?? "");
+    expect(rows).toHaveLength(4);
+    for (const label of ["Tokens", "Presets", "Components", "Import / export"]) {
+      expect(rows.some((r) => r.includes(label))).toBe(true);
+    }
   });
 
-  it("editing a radius token surfaces a dirty marker on the Tokens section", async () => {
+  it("editing a radius token surfaces the dirty signal while inside Tokens", async () => {
     const composer = makeFakeComposer();
-    const { getByLabelText, container } = render(wrap(<DesignSystemTab composer={composer} />));
+    const { getByLabelText, getByText, container } = render(
+      wrap(<DesignSystemTab composer={composer} />),
+    );
+    // M5: Brand opens on the root list, so Tokens is entered, not defaulted to.
+    fireEvent.click(container.querySelector<HTMLButtonElement>('[data-section-id="tokens"]')!);
     const radiusInput = await waitFor(
       () => getByLabelText("Small radius value") as HTMLInputElement
     );
     fireEvent.change(radiusInput, { target: { value: "10px" } });
-    // Dirty marker on Tokens tab is span[aria-label="unsaved changes"].
+    // The dirty dot sits on the root row, which is unreachable while dirty (the
+    // guard intercepts that move). Inside a section the footer is the signal.
     await waitFor(() => {
-      expect(container.querySelector('[aria-label="unsaved changes"]')).toBeTruthy();
+      expect(getByText(/previewing/)).toBeTruthy();
     });
   });
 

@@ -69,18 +69,35 @@ beforeEach(() => {
   localStorage.clear();
 });
 
+/* M5: Brand opens on the root drill-in list, so reaching the Tokens controls
+   is now an explicit navigation step rather than the default mount. */
 async function renderTab(composer: ComposerProp) {
   const utils = render(wrap(<DesignSystemTab composer={composer} />));
+  enterSection(utils, "tokens");
   const radiusInput = (await waitFor(
     () => utils.getByLabelText("Small radius value") as HTMLInputElement
   ))!;
   return { ...utils, radiusInput };
 }
 
-function sectionTab(utils: ReturnType<typeof render>, label: string): HTMLButtonElement {
-  const tab = utils.getAllByRole("tab").find((t) => t.textContent?.startsWith(label));
-  if (!tab) throw new Error(`section tab ${label} not found`);
-  return tab as HTMLButtonElement;
+/* Switching sections is two moves now: leave to the root, then enter the next
+   destination. The guard fires on the FIRST move — leaving dirty work behind is
+   exactly what it exists to catch — so the dirty tests below drive `leaveToRoot`
+   directly instead of the old one-shot tab click. */
+function leaveToRoot(utils: ReturnType<typeof render>) {
+  const crumb = utils.container.querySelector<HTMLButtonElement>("[data-crumb-back]");
+  if (crumb) fireEvent.click(crumb);
+}
+
+function enterSection(utils: ReturnType<typeof render>, id: string) {
+  const row = utils.container.querySelector<HTMLButtonElement>(`[data-section-id="${id}"]`);
+  if (!row) throw new Error(`Brand root row ${id} not found`);
+  fireEvent.click(row);
+}
+
+function switchSection(utils: ReturnType<typeof render>, id: string) {
+  leaveToRoot(utils);
+  enterSection(utils, id);
 }
 
 describe("DesignSystemTab — section switching (clean)", () => {
@@ -88,20 +105,20 @@ describe("DesignSystemTab — section switching (clean)", () => {
     const composer = makeFakeComposer();
     const utils = await renderTab(composer);
 
-    fireEvent.click(sectionTab(utils, "Styles"));
+    switchSection(utils, "styles");
 
     expect(utils.queryByText("Unsaved changes")).toBeNull();
     await waitFor(() => {
-      expect(document.getElementById("design-tabpanel-styles")).toBeTruthy();
-      expect(document.getElementById("design-tabpanel-tokens")).toBeNull();
+      expect(document.getElementById("design-section-styles")).toBeTruthy();
+      expect(document.getElementById("design-section-tokens")).toBeNull();
     });
   });
 
-  it("clicking the already-active section is a no-op", async () => {
+  it("re-entering the section just left is clean — no guard", async () => {
     const composer = makeFakeComposer();
     const utils = await renderTab(composer);
-    fireEvent.click(sectionTab(utils, "Tokens"));
-    expect(document.getElementById("design-tabpanel-tokens")).toBeTruthy();
+    switchSection(utils, "tokens");
+    expect(document.getElementById("design-section-tokens")).toBeTruthy();
     expect(utils.queryByText("Unsaved changes")).toBeNull();
   });
 });
@@ -112,12 +129,12 @@ describe("DesignSystemTab — dirty guard (TabGuardModal)", () => {
     const utils = await renderTab(composer);
 
     fireEvent.change(utils.radiusInput, { target: { value: "10px" } });
-    fireEvent.click(sectionTab(utils, "Styles"));
+    leaveToRoot(utils);
 
     expect(await utils.findByText("Unsaved changes")).toBeTruthy();
-    // Still on Tokens — the switch was intercepted.
-    expect(document.getElementById("design-tabpanel-tokens")).toBeTruthy();
-    expect(document.getElementById("design-tabpanel-styles")).toBeNull();
+    // Still on Tokens — the move was intercepted before reaching the root.
+    expect(document.getElementById("design-section-tokens")).toBeTruthy();
+    expect(document.getElementById("design-section-root")).toBeNull();
   });
 
   it("'Stay' keeps the section, the modal closes, and the edit survives", async () => {
@@ -125,13 +142,13 @@ describe("DesignSystemTab — dirty guard (TabGuardModal)", () => {
     const utils = await renderTab(composer);
 
     fireEvent.change(utils.radiusInput, { target: { value: "10px" } });
-    fireEvent.click(sectionTab(utils, "Styles"));
+    leaveToRoot(utils);
     await utils.findByText("Unsaved changes");
 
     fireEvent.click(utils.getByText("Stay"));
 
     expect(utils.queryByText("Unsaved changes")).toBeNull();
-    expect(document.getElementById("design-tabpanel-tokens")).toBeTruthy();
+    expect(document.getElementById("design-section-tokens")).toBeTruthy();
     expect((utils.getByLabelText("Small radius value") as HTMLInputElement).value).toBe("10px");
   });
 
@@ -141,18 +158,20 @@ describe("DesignSystemTab — dirty guard (TabGuardModal)", () => {
     const original = utils.radiusInput.value;
 
     fireEvent.change(utils.radiusInput, { target: { value: "10px" } });
-    fireEvent.click(sectionTab(utils, "Styles"));
+    leaveToRoot(utils);
     await utils.findByText("Unsaved changes");
 
     fireEvent.click(utils.getByText("Discard Tokens"));
 
     await waitFor(() => {
-      expect(document.getElementById("design-tabpanel-styles")).toBeTruthy();
+      expect(document.getElementById("design-section-root")).toBeTruthy();
     });
+    enterSection(utils, "styles");
+    expect(document.getElementById("design-section-styles")).toBeTruthy();
 
     // Coming back to Tokens must NOT re-trigger the guard (clean again) and
     // the input must show the pre-edit value.
-    fireEvent.click(sectionTab(utils, "Tokens"));
+    switchSection(utils, "tokens");
     expect(utils.queryByText("Unsaved changes")).toBeNull();
     await waitFor(() => {
       expect((utils.getByLabelText("Small radius value") as HTMLInputElement).value).toBe(original);
@@ -163,7 +182,7 @@ describe("DesignSystemTab — dirty guard (TabGuardModal)", () => {
   // (handleDiscard) now call discardAll on the 11 STYLE PRESET registries as
   // well as the 14 token registries, so a preset-only dirty state is reverted
   // and the Styles tab dot clears.
-  it("footer Discard reverts a dirty STYLE PRESET so the Styles tab dot clears", async () => {
+  it("footer Discard reverts a dirty STYLE PRESET so the dirty signal clears", async () => {
     const composer = makeFakeComposer();
 
     // Capture the button-preset registry (shared context) so the test can
@@ -182,10 +201,16 @@ describe("DesignSystemTab — dirty guard (TabGuardModal)", () => {
         </>,
       ),
     );
+    enterSection(utils, "tokens");
     await waitFor(() => utils.getByLabelText("Small radius value"));
 
-    const stylesTab = () =>
-      utils.getAllByRole("tab").find((t) => t.textContent?.startsWith("Styles"))!;
+    /* The per-section dirty DOT moved from the tab bar to the root row, so it
+       is only readable at the root — and you cannot walk back to the root while
+       dirty, because that is precisely the move the guard intercepts. The
+       always-visible signal inside a section is the footer ("N previewing" /
+       "All changes saved"), which is what this test reads. That is not a
+       weaker assertion: it is the one a user actually has in front of them
+       while editing. */
 
     // Dirty a PRESET (not a token) — the Styles side goes dirty.
     act(() => {
@@ -199,7 +224,7 @@ describe("DesignSystemTab — dirty guard (TabGuardModal)", () => {
     });
 
     await waitFor(() => {
-      expect(stylesTab().querySelector('[aria-label="unsaved changes"]')).toBeTruthy();
+      expect(utils.getByText(/previewing/)).toBeTruthy();
     });
     expect(buttonReg!.isDirty).toBe(true);
 
@@ -207,7 +232,7 @@ describe("DesignSystemTab — dirty guard (TabGuardModal)", () => {
     fireEvent.click(utils.getByText("Discard"));
 
     await waitFor(() => {
-      expect(stylesTab().querySelector('[aria-label="unsaved changes"]')).toBeNull();
+      expect(utils.getByText("All changes saved")).toBeTruthy();
     });
     expect(buttonReg!.isDirty).toBe(false);
   });
@@ -220,7 +245,7 @@ describe("DesignSystemTab — Apply pipeline (via guard 'Save and switch')", () 
     const utils = await renderTab(composer);
 
     fireEvent.change(utils.radiusInput, { target: { value: "10px" } });
-    fireEvent.click(sectionTab(utils, "Styles"));
+    leaveToRoot(utils);
     await utils.findByText("Unsaved changes");
 
     fireEvent.click(utils.getByText("Save and switch"));
@@ -242,9 +267,10 @@ describe("DesignSystemTab — Apply pipeline (via guard 'Save and switch')", () 
     expect(Array.isArray(arg.designPresets)).toBe(true);
     expect(arg.designPresets.length).toBeGreaterThan(0);
 
-    // Switch completed + success toast + dirty cleared.
+    // Move completed + success toast + dirty cleared. The guarded move is now
+    // "leave to the root", so that is where Save-and-switch lands.
     await waitFor(() => {
-      expect(document.getElementById("design-tabpanel-styles")).toBeTruthy();
+      expect(document.getElementById("design-section-root")).toBeTruthy();
     });
     expect(await utils.findByText("Design tokens applied successfully")).toBeTruthy();
     await waitFor(() => {
@@ -260,7 +286,7 @@ describe("DesignSystemTab — Apply pipeline (via guard 'Save and switch')", () 
     const utils = await renderTab(composer);
 
     fireEvent.change(utils.radiusInput, { target: { value: "10px" } });
-    fireEvent.click(sectionTab(utils, "Styles"));
+    leaveToRoot(utils);
     await utils.findByText("Unsaved changes");
     fireEvent.click(utils.getByText("Save and switch"));
 
@@ -286,7 +312,7 @@ describe("DesignSystemTab — §2-B1 engine undo preserves unsaved DS edits (fix
 
     fireEvent.change(utils.radiusInput, { target: { value: "10px" } });
     await waitFor(() => {
-      expect(document.querySelector('[aria-label="unsaved changes"]')).toBeTruthy();
+      expect(utils.getByText(/previewing/)).toBeTruthy();
     });
 
     // Engine-level undo (canvas action) — nothing to do with the DS tab.
@@ -298,7 +324,7 @@ describe("DesignSystemTab — §2-B1 engine undo preserves unsaved DS edits (fix
     // the canvas undo does not silently reload stored settings over them.
     await waitFor(() => {
       expect((utils.getByLabelText("Small radius value") as HTMLInputElement).value).toBe("10px");
-      expect(document.querySelector('[aria-label="unsaved changes"]')).toBeTruthy();
+      expect(utils.getByText(/previewing/)).toBeTruthy();
     });
   });
 

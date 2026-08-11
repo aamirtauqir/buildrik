@@ -60,8 +60,9 @@ describe("DesignSystemTab → StylesSection (Arc B1 drill-in integration)", () =
       wrap(<DesignSystemTab composer={composer} />),
     );
 
-    const stylesBtn = getAllByRole("tab").find((b) => b.textContent === "Styles");
-    if (!stylesBtn) throw new Error("Styles section button missing");
+    // M5: the Brand root is a drill-in list; "Styles" is labelled "Presets".
+    const stylesBtn = container.querySelector<HTMLButtonElement>('[data-section-id="styles"]');
+    if (!stylesBtn) throw new Error("Presets section row missing");
     fireEvent.click(stylesBtn);
 
     await waitFor(() => {
@@ -78,8 +79,9 @@ describe("DesignSystemTab → StylesSection (Arc B1 drill-in integration)", () =
       wrap(<DesignSystemTab composer={composer} />),
     );
 
-    const stylesBtn = getAllByRole("tab").find((b) => b.textContent === "Styles");
-    if (!stylesBtn) throw new Error("Styles section button missing");
+    // M5: the Brand root is a drill-in list; "Styles" is labelled "Presets".
+    const stylesBtn = container.querySelector<HTMLButtonElement>('[data-section-id="styles"]');
+    if (!stylesBtn) throw new Error("Presets section row missing");
     fireEvent.click(stylesBtn);
 
     const cardRow = (await waitFor(() =>

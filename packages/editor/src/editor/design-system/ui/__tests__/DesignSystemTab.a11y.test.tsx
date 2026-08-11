@@ -51,79 +51,68 @@ beforeEach(() => {
   }
 });
 
-describe("DesignSystemTab — DD3 WAI-ARIA tablist a11y", () => {
-  it("section switcher has role=tablist with descriptive label", () => {
-    const composer = makeFakeComposer();
-    const { getByRole } = render(wrap(<DesignSystemTab composer={composer} />));
-    const tablist = getByRole("tablist", { name: "Design workspace sections" });
-    expect(tablist).toBeTruthy();
+/**
+ * Brand navigation a11y — rewritten with M5.
+ *
+ * The seven tests replaced here asserted a WAI-ARIA TABLIST: four tabs, roving
+ * tabindex, ArrowLeft/Right/Home/End, and a labelled tabpanel. That contract is
+ * gone because the surface is gone — board `Brand · root` (152:2) is a drill-in
+ * list of destinations, not a tab bar. They were pinning the old design, not
+ * catching a regression, so they are rewritten in the same commit rather than
+ * deleted or skipped.
+ *
+ * A list of links needs the opposite of roving focus: every row is a plain
+ * button in the tab order, which is what these tests now hold.
+ */
+describe("DesignSystemTab — Brand root drill-in a11y", () => {
+  const renderRoot = () => render(wrap(<DesignSystemTab composer={makeFakeComposer()} />));
+
+  const rows = (c: HTMLElement) =>
+    Array.from(c.querySelectorAll<HTMLButtonElement>("[data-section-id]"));
+
+  it("opens on the root list, not inside a section", () => {
+    const { container, queryByRole } = renderRoot();
+    expect(rows(container)).toHaveLength(4);
+    // The tab bar it replaced must not survive anywhere in the panel.
+    expect(queryByRole("tablist")).toBeNull();
+    expect(queryByRole("tab")).toBeNull();
+    expect(queryByRole("tabpanel")).toBeNull();
   });
 
-  it("renders 4 tabs with aria-selected reflecting active section", () => {
-    const composer = makeFakeComposer();
-    const { getAllByRole } = render(wrap(<DesignSystemTab composer={composer} />));
-    const tabs = getAllByRole("tab");
-    expect(tabs).toHaveLength(4);
-    const labels = tabs.map((t) => t.textContent);
-    expect(labels).toContain("Tokens");
-    expect(labels).toContain("Styles");
-    expect(labels).toContain("Components");
-    expect(labels).toContain("Export");
-    // Tokens is the default active section.
-    const tokensTab = tabs.find((t) => t.textContent === "Tokens")!;
-    expect(tokensTab.getAttribute("aria-selected")).toBe("true");
-    expect(tokensTab.getAttribute("tabindex")).toBe("0");
-    // Others are not selected and roving-tabindex=-1.
-    const stylesTab = tabs.find((t) => t.textContent === "Styles")!;
-    expect(stylesTab.getAttribute("aria-selected")).toBe("false");
-    expect(stylesTab.getAttribute("tabindex")).toBe("-1");
+  it("labels every row from the board, with a hint", () => {
+    const { container, getByText } = renderRoot();
+    const labels = rows(container).map((r) => r.textContent);
+    for (const label of ["Tokens", "Presets", "Components", "Import / export"]) {
+      expect(labels.some((l) => l?.includes(label))).toBe(true);
+    }
+    expect(getByText("Component style presets")).toBeTruthy();
   });
 
-  it("ArrowRight on the active tab activates the next tab", () => {
-    const composer = makeFakeComposer();
-    const { getAllByRole } = render(wrap(<DesignSystemTab composer={composer} />));
-    const tokensTab = getAllByRole("tab").find((t) => t.textContent === "Tokens")!;
-    fireEvent.keyDown(tokensTab, { key: "ArrowRight" });
-    const stylesTab = getAllByRole("tab").find((t) => t.textContent === "Styles")!;
-    expect(stylesTab.getAttribute("aria-selected")).toBe("true");
+  it("keeps every row in the tab order — no roving tabindex", () => {
+    const { container } = renderRoot();
+    for (const row of rows(container)) {
+      expect(row.getAttribute("tabindex")).not.toBe("-1");
+      expect(row.getAttribute("aria-selected")).toBeNull();
+    }
   });
 
-  it("ArrowLeft on the first tab wraps to the last", () => {
-    const composer = makeFakeComposer();
-    const { getAllByRole } = render(wrap(<DesignSystemTab composer={composer} />));
-    const tokensTab = getAllByRole("tab").find((t) => t.textContent === "Tokens")!;
-    fireEvent.keyDown(tokensTab, { key: "ArrowLeft" });
-    const exportTab = getAllByRole("tab").find((t) => t.textContent === "Export")!;
-    expect(exportTab.getAttribute("aria-selected")).toBe("true");
+  it("drills into a destination and shows a back crumb naming it", () => {
+    const { container, getByText } = renderRoot();
+    fireEvent.click(rows(container).find((r) => r.textContent?.includes("Presets"))!);
+    expect(rows(container)).toHaveLength(0); // root list is gone
+    expect(getByText(/‹ Presets/)).toBeTruthy();
   });
 
-  it("End jumps to the last tab; Home jumps back to the first", () => {
-    const composer = makeFakeComposer();
-    const { getAllByRole } = render(wrap(<DesignSystemTab composer={composer} />));
-    const tokensTab = getAllByRole("tab").find((t) => t.textContent === "Tokens")!;
-    fireEvent.keyDown(tokensTab, { key: "End" });
-    let exportTab = getAllByRole("tab").find((t) => t.textContent === "Export")!;
-    expect(exportTab.getAttribute("aria-selected")).toBe("true");
-    fireEvent.keyDown(exportTab, { key: "Home" });
-    const tokensAgain = getAllByRole("tab").find((t) => t.textContent === "Tokens")!;
-    expect(tokensAgain.getAttribute("aria-selected")).toBe("true");
+  it("returns to the root from the back crumb", () => {
+    const { container, getByText } = renderRoot();
+    fireEvent.click(rows(container).find((r) => r.textContent?.includes("Tokens"))!);
+    fireEvent.click(getByText(/‹ Tokens/));
+    expect(rows(container)).toHaveLength(4);
   });
 
-  it("renders the active section as a labelled tabpanel", () => {
-    const composer = makeFakeComposer();
-    const { getByRole } = render(wrap(<DesignSystemTab composer={composer} />));
-    const panel = getByRole("tabpanel");
-    expect(panel.getAttribute("aria-labelledby")).toBe("design-tab-tokens");
-    expect(panel.getAttribute("id")).toBe("design-tabpanel-tokens");
-  });
-
-  it("ignores unrelated keys (no nav on Space, Tab, etc.)", () => {
-    const composer = makeFakeComposer();
-    const { getAllByRole } = render(wrap(<DesignSystemTab composer={composer} />));
-    const tokensTab = getAllByRole("tab").find((t) => t.textContent === "Tokens")!;
-    fireEvent.keyDown(tokensTab, { key: "Tab" });
-    fireEvent.keyDown(tokensTab, { key: " " });
-    fireEvent.keyDown(tokensTab, { key: "a" });
-    expect(tokensTab.getAttribute("aria-selected")).toBe("true");
+  it("hides the decorative chevron from assistive tech", () => {
+    const { container } = renderRoot();
+    const chevrons = container.querySelectorAll('[data-section-id] [aria-hidden="true"]');
+    expect(chevrons.length).toBe(4);
   });
 });

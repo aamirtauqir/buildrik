@@ -62,14 +62,16 @@ beforeEach(() => {
 describe("DesignSystemTab → ExportSection (S5 integration)", () => {
   it("clicking Export section reveals import card + export preview", async () => {
     const composer = makeFakeComposer();
-    const { getAllByRole, getByTestId, getByText, getAllByText } =
+    const { getAllByRole, getByTestId, getByText, getAllByText, container } =
       render(wrap(<DesignSystemTab composer={composer} />));
 
     // Section switcher has Tokens / Styles / Components / Export — second
     // Export label belongs to header dropdown trigger.
     // Two buttons read "Export" (header dropdown trigger + section switcher
     // tab). Section tab has no aria-haspopup; dropdown does.
-    const sectionExport = getAllByRole("tab").find((t) => t.textContent === "Export");
+    // M5: sections are drill-in rows on the Brand root, not tabs. The board
+    // calls this one "Import / export"; the id is unchanged.
+    const sectionExport = container.querySelector<HTMLButtonElement>('[data-section-id="export"]');
     if (!sectionExport) throw new Error("Export section tab missing");
     fireEvent.click(sectionExport);
 
@@ -87,7 +89,9 @@ describe("DesignSystemTab → ExportSection (S5 integration)", () => {
     const { getAllByRole, getByLabelText, getByText, container, findByText } =
       render(wrap(<DesignSystemTab composer={composer} />));
 
-    const sectionExport = getAllByRole("tab").find((t) => t.textContent === "Export");
+    // M5: sections are drill-in rows on the Brand root, not tabs. The board
+    // calls this one "Import / export"; the id is unchanged.
+    const sectionExport = container.querySelector<HTMLButtonElement>('[data-section-id="export"]');
     if (!sectionExport) throw new Error("Export section tab missing");
     fireEvent.click(sectionExport);
 
@@ -114,7 +118,10 @@ describe("DesignSystemTab → ExportSection (S5 integration)", () => {
     fireEvent.click(getByText(/Apply 1 valid only/i));
 
     await waitFor(() => {
-      expect(container.querySelector('[aria-label="unsaved changes"]')).toBeTruthy();
+      // M5: the per-section dot is a root-list affordance, and the root cannot
+      // be reached while dirty — the guard intercepts exactly that move. The
+      // footer carries the signal inside a section.
+      expect(getByText(/previewing/)).toBeTruthy();
     });
   });
 
@@ -123,7 +130,9 @@ describe("DesignSystemTab → ExportSection (S5 integration)", () => {
     const { getAllByRole, getByLabelText, getByText, container, findByText } =
       render(wrap(<DesignSystemTab composer={composer} />));
 
-    const sectionExport = getAllByRole("tab").find((t) => t.textContent === "Export");
+    // M5: sections are drill-in rows on the Brand root, not tabs. The board
+    // calls this one "Import / export"; the id is unchanged.
+    const sectionExport = container.querySelector<HTMLButtonElement>('[data-section-id="export"]');
     if (!sectionExport) throw new Error("Export section tab missing");
     fireEvent.click(sectionExport);
 
@@ -149,7 +158,10 @@ describe("DesignSystemTab → ExportSection (S5 integration)", () => {
     // dirtyCount() at DesignSystemTab.tsx:97 only counted saved !== undefined
     // → adds passed silently and the user lost visual confirmation.
     await waitFor(() => {
-      expect(container.querySelector('[aria-label="unsaved changes"]')).toBeTruthy();
+      // M5: the per-section dot is a root-list affordance, and the root cannot
+      // be reached while dirty — the guard intercepts exactly that move. The
+      // footer carries the signal inside a section.
+      expect(getByText(/previewing/)).toBeTruthy();
     });
   });
 });
