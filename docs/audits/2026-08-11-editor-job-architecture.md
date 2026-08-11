@@ -490,13 +490,45 @@ Four rows remain unbuilt: **Classes** (Figma-only, rule 4 — Finding G),
 **Colour mode**, **Typography** (`TypeTokenList` needs the token plumbing
 `TokensSection` does internally), **Starters** (a modal, not a destination).
 
-→ **Correction to my own reason for deferring Colour mode.** I wrote that its
-"tokens with no dark value" query "is not known to exist on the registries".
-It does exist — `DSLinter` has a `missing-dark` rule, and it reads
-`token.darkValue`, so both the query and the field are already there. Colour
-mode is therefore a smaller job than recorded: the list is a filter over the
-same lint the Lint row now consumes, and only the per-token **Set** write path
-is genuinely new. Deferring it was right; the reason given was wrong.
+→ **Colour mode's reason, corrected twice. The record of both stands.**
+First I wrote that its "tokens with no dark value" query does not exist. Then
+that `DSLinter`'s `missing-dark` rule *is* that query. **Neither is right.**
+`missing-dark` is **conditional** — `DSLinter.ts:141` only raises it when the
+project already holds at least one `darkValue`, so a project with none produces
+zero findings and the board's `NO DARK VALUE · 4` list would render empty at
+exactly the moment it matters most. The unconditional query is the one
+`ColorTokenList.tsx:243` already computes.
+
+The real blocker was never the query — it was the write path, and it was worse
+than missing. See Finding J.
+
+### Finding J — the Dark value field discarded what you typed (fixed, `8b3df719`)
+
+`TokenDetailView`'s dark-value input had an **empty `onBlur`**, commented
+*"T8 ships only the local input — engine-side dark commit is a separate
+follow-up (D4)"*. Type a dark value, blur, and it was gone. No error, no hint,
+no trace.
+
+That comment had stopped being true. `useColorTokens.updateToken` already
+accepted a third `darkValue` argument — with a no-op guard, and a deliberate
+decision not to push a dark-only edit onto the undo stack — added for the
+token-import path. **The engine could commit dark values the whole time; the UI
+seam was held shut by a comment describing a limitation that had already been
+lifted.**
+
+This is the fourth dead path this arc has turned up, and the first that loses
+user input rather than merely failing to navigate:
+
+| | Path | Symptom |
+|---|---|---|
+| — | `_leftPanelSubTab` | sub-tab deep links opened the right panel at the wrong screen |
+| I | `onOpenPlugins` | targets a `plugins` screen absent from the Settings NAV |
+| — | `onReviewAll` | never passed, so the banner's "Review all" never rendered |
+| **J** | `TokenDetailView` dark `onBlur` | **typed input silently discarded** |
+
+All four were TypeScript-clean. Types cannot see an empty handler, a discarded
+destructure, or a prop nobody passes — only reading the path end to end does.
+Colour mode is now unblocked.
 
 **Two consequences M5 surfaced, both real:**
 
