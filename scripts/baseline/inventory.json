@@ -224,11 +224,13 @@
    "state": "default",
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "requires": "session",
    "screenshotHash": "d0d60fed5ebf13b5",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
-   "notes": "loading state (stalled trpc) \u2014 'Completing sign in\u2026' spinner"
+   "notes": "loading state (stalled trpc) \u2014 'Completing sign in\u2026' spinner",
+   "figmaNodeId": "182:2",
+   "figmaPageId": "183:2"
   },
   {
    "id": "BL-0007",
@@ -240,11 +242,13 @@
    "state": "default",
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "requires": "session",
    "screenshotHash": "5a698e3c968b2042",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
-   "notes": "renders unauthenticated with ?email= param"
+   "notes": "renders unauthenticated with ?email= param",
+   "figmaNodeId": "184:2",
+   "figmaPageId": "183:2"
   },
   {
    "id": "BL-0008",
@@ -256,11 +260,13 @@
    "state": "default",
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "requires": null,
    "screenshotHash": "56b10fdd7e25ef21",
    "capturedFrom": "prod@f7b39a4c",
-   "scrollHeight": 900
+   "scrollHeight": 900,
+   "figmaNodeId": "185:2",
+   "figmaPageId": "183:2"
   },
   {
    "id": "BL-0009",
@@ -272,11 +278,13 @@
    "state": "default",
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "requires": null,
    "screenshotHash": "efab3159ba68a4a9",
    "capturedFrom": "prod@f7b39a4c",
-   "scrollHeight": 900
+   "scrollHeight": 900,
+   "figmaNodeId": "186:2",
+   "figmaPageId": "183:2"
   },
   {
    "id": "BL-0010",
@@ -288,11 +296,13 @@
    "state": "default",
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "requires": null,
    "screenshotHash": "21afbd1bb5e1a933",
    "capturedFrom": "prod@f7b39a4c",
-   "scrollHeight": 900
+   "scrollHeight": 900,
+   "figmaNodeId": "187:2",
+   "figmaPageId": "183:2"
   },
   {
    "id": "BL-0011",
@@ -304,11 +314,13 @@
    "state": "default",
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "requires": null,
    "screenshotHash": "45c86add9bea5ec3",
    "capturedFrom": "prod@f7b39a4c",
-   "scrollHeight": 900
+   "scrollHeight": 900,
+   "figmaNodeId": "188:2",
+   "figmaPageId": "183:2"
   },
   {
    "id": "BL-0012",
