@@ -104,7 +104,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
     <ModalRoot open onOpenChange={(next) => !next && onClose()}>
       <ModalContent size="sm">
         <div className="tw:p-5">
-          <ModalTitle className="tw:text-sm tw:font-semibold tw:text-gray-900 tw:mb-1">
+          <ModalTitle inset={false} className="tw:text-sm tw:font-semibold tw:text-gray-900 tw:mb-1">
             Review changes
           </ModalTitle>
           <div className="tw:text-xs tw:text-gray-500 tw:mb-3.5">

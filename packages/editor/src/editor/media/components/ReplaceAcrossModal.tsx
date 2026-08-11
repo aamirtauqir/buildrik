@@ -98,7 +98,7 @@ export const ReplaceAcrossModal: React.FC<ReplaceAcrossModalProps> = ({
         {/* Header */}
         <div className={`tw:flex tw:items-center tw:justify-between tw:py-4 ${SECTION_X} tw:border-b ${HAIRLINE}`}>
           <div>
-            <ModalTitle id="replace-across-title" className="tw:text-[15px] tw:font-semibold">
+            <ModalTitle inset={false} id="replace-across-title" className="tw:text-[15px] tw:font-semibold">
               Replace {oldName} across pages
             </ModalTitle>
             <ModalDescription className="tw:mt-0.5 tw:text-[11px] tw:text-gray-500">

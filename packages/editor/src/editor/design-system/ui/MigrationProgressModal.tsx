@@ -73,7 +73,7 @@ export const MigrationProgressModal: React.FC<MigrationProgressModalProps> = ({
     <ModalRoot open={open} onOpenChange={onOpenChange}>
       <ModalContent size="lg" aria-labelledby="migration-modal-title">
         <div className="tw:px-6 tw:py-5">
-          <ModalTitle id="migration-modal-title" className="tw:text-base tw:font-semibold">
+          <ModalTitle inset={false} id="migration-modal-title" className="tw:text-base tw:font-semibold">
             {state === "failed" ? "Migration failed" : "Updating your project"}
           </ModalTitle>
           {rangeLabel && (

@@ -80,10 +80,38 @@ export const ModalContent = React.forwardRef<HTMLDivElement, ModalContentProps>(
   );
 });
 
-export const ModalTitle = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(
-  function ModalTitle({ className, children, ...rest }, ref) {
+/*
+  ModalTitle carries the padding the compound form has no header wrapper for.
+
+  `Modal` (the all-in-one) puts its title inside MODAL_HEAD_CLASS, which is
+  where its pt-5/px-5/pb-3 comes from. The compound form has no such wrapper,
+  so its title had NO padding at all — measured live at x=0 while the body
+  beside it was inset 20, which read as "eate Collection". And an unpadded
+  title row is only 24px tall, so the body under it began at y=24, beneath the
+  close button floating at y=12..44 — in the CMS collection modal the close put
+  itself on top of the "Fields" step label.
+
+  pl-5 matches the body inset; pr-12 clears the 32px close at right-3. Left and
+  right are separate classes rather than `px-5 pr-12` because two classes on
+  one property resolve by stylesheet order, not by writing order.
+*/
+const MODAL_TITLE_HEAD_CLASS = "tw:pl-5 tw:pr-12 tw:pt-4 tw:pb-3";
+
+export interface ModalTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
+  /**
+   * Set false when the caller already wraps the title in its own padded
+   * header — three do (MigrationProgressModal, ReviewModal,
+   * ReplaceAcrossModal) and would otherwise be inset twice. An explicit prop
+   * rather than a `tw:pl-0` override: two classes on one property are
+   * resolved by stylesheet order, so the override would not reliably win.
+   */
+  inset?: boolean;
+}
+
+export const ModalTitle = React.forwardRef<HTMLHeadingElement, ModalTitleProps>(
+  function ModalTitle({ inset = true, className, children, ...rest }, ref) {
     return (
-      <h2 ref={ref} className={[MODAL_TITLE_CLASS, className].filter(Boolean).join(" ")} {...rest}>
+      <h2 ref={ref} className={[inset ? MODAL_TITLE_HEAD_CLASS : "", MODAL_TITLE_CLASS, className].filter(Boolean).join(" ")} {...rest}>
         {children}
       </h2>
     );
