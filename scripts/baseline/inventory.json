@@ -2398,10 +2398,12 @@
    "state": "default-props",
    "viewport": "800xauto",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "8eb880d13c2ec3a6",
    "capturedFrom": "react-email render@f7b39a4c",
-   "notes": "rendered via @react-email/render with baked default props; system-ui font stack = as-built defect vs DESIGN.md (annotate)"
+   "notes": "rendered via @react-email/render with baked default props; system-ui font stack = as-built defect vs DESIGN.md (annotate)",
+   "figmaNodeId": "156:2",
+   "figmaPageId": "152:2"
   },
   {
    "id": "BL-0144",
@@ -2413,10 +2415,12 @@
    "state": "default-props",
    "viewport": "800xauto",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "788c573eff6bd6ba",
    "capturedFrom": "react-email render@f7b39a4c",
-   "notes": "rendered via @react-email/render with baked default props; system-ui font stack = as-built defect vs DESIGN.md (annotate)"
+   "notes": "rendered via @react-email/render with baked default props; system-ui font stack = as-built defect vs DESIGN.md (annotate)",
+   "figmaNodeId": "157:2",
+   "figmaPageId": "152:2"
   },
   {
    "id": "BL-0145",
@@ -2428,10 +2432,12 @@
    "state": "default-props",
    "viewport": "800xauto",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "screenshotHash": "ed9919c6fb4a964c",
    "capturedFrom": "react-email render@f7b39a4c",
-   "notes": "rendered via @react-email/render with baked default props; system-ui font stack = as-built defect vs DESIGN.md (annotate)"
+   "notes": "rendered via @react-email/render with baked default props; system-ui font stack = as-built defect vs DESIGN.md (annotate)",
+   "figmaNodeId": "158:2",
+   "figmaPageId": "152:2"
   },
   {
    "id": "BL-0146",
