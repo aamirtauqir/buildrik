@@ -17,6 +17,8 @@ import {
   Button,
   Checkbox,
   EmptyState,
+  EmptyStateActions,
+  EmptyStateDesc,
   IconButton,
   ListRow,
   RecordRow,
@@ -105,18 +107,38 @@ export function RootView({
 }) {
   if (collections.length === 0 && sourcesCount === 0 && variablesCount === 0 && conditionsCount === 0) {
     return (
+      /*
+        Board 149:7 draws this block composed, not with the default slots:
+        the copy is 13/20 over 272, and the call to action is ACCENT TEXT.
+        EmptyState's shared body class is 12px and its `action` slot takes a
+        filled Button, so the defaults gave a 12px line under a solid blue
+        CTA. The Button doc on the same page is explicit — primary is the ONE
+        filled accent button per screen — and an empty panel inviting you in
+        is not where that one gets spent. Media's empty state (145:406) draws
+        its two calls to action the same way.
+      */
       <EmptyState
         className="tw:flex-1"
         data-testid="content-empty"
-        body="Collections turn a spreadsheet into pages — one page per row, updated when the data changes."
-        action={
-          onCreateCollection ? (
-            <Button size="xs" onClick={onCreateCollection}>
+      >
+        <EmptyStateDesc className="tw:max-w-[272px] tw:text-[13px] tw:leading-5">
+          Collections turn a spreadsheet into pages — one page per row, updated when the
+          data changes.
+        </EmptyStateDesc>
+        {onCreateCollection ? (
+          <EmptyStateActions>
+            <Button
+              color="light"
+              size="xs"
+              className="tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:font-normal tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+              data-testid="content-empty-cta"
+              onClick={onCreateCollection}
+            >
               Create a collection
             </Button>
-          ) : undefined
-        }
-      />
+          </EmptyStateActions>
+        ) : null}
+      </EmptyState>
     );
   }
   return (
