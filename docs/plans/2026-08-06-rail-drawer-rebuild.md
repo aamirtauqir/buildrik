@@ -660,6 +660,56 @@ no pending tab, so discarding while closing left the drawer open. One
 modal, two exits now, with regression tests. Dirty-dot (140:21, 8px orange on Home)
 NOT shipped — no per-page unsaved-state source in the model yet.
 
+## Status — 2026-08-12 (verified against git, not against this document)
+
+This document had drifted in two places, both caught by reading `git log`
+rather than trusting the prose — the rule this arc keeps re-learning
+([[feedback_check_git_log_before_assuming_uncleaned]]):
+
+1. **"STILL OPEN (Media)" — all eight are closed.** `53872acd` shipped
+   1162:4617 empty, 1163:4641 list-view bulk-select, 1163:13695 unused-scope
+   context-menu and 1163:13948 drag-over uploading; `fda2998e` shipped the
+   three modals (1164:4713 picker, 1164:4738 + 1174:4849 replace-across,
+   1175:4827 bulk type-DELETE). The list was written before the 08-10 pass and
+   never struck through.
+2. **The dirty dot is recorded twice, contradicting itself** — "DIRTY DOT
+   SHIPPED (140:21 / 1171:4729 …)" and, four lines later, "Dirty-dot (140:21,
+   8px orange on Home) NOT shipped — no per-page unsaved-state source in the
+   model yet." The second is the older text left standing under the newer
+   correction. It shipped (`18ab8a66`); the state source existed all along,
+   inline and unshared in `PageTabBar`, and is now `editor/shared/useDirtyPages.ts`.
+
+### Family status
+
+| Family | Boards | State |
+|---|---|---|
+| Insert `137:2` | 9 + Components inline | **CLOSED** — coverage matrix in this doc |
+| Layers `1082:*` | 12 | **CLOSED** 12/12 |
+| Pages `140:2` | 13 + 1171 batch + S3.7 | **CLOSED** |
+| Media `144:2` | 26 | **CLOSED** (twice — 08-08, then the 08-10 one-manager pass) |
+| Content `148:2` | 15 | **13/15** — see below |
+| Brand `152:2` | 28 | **not walked as a family.** Touched 08-11/12 from the job-architecture audit (`06142b1e` root drill-in, `8764ffb9` Lint destination, `8b3df719` the dark-value data-loss fix) — that was IA work off `docs/audits/2026-08-11-editor-job-architecture.md`, not this arc's per-board pass |
+
+**Counting note.** Content first read as "2/15" because I counted *commits*
+touching `tabs/content/`. That is the wrong measure: nine of its boards were
+built with the panel and carry their board ids in the source
+(`/* ── Root (148:2) + empty (149:7) ── */` and so on). Count board ids the code
+claims, then verify them; never count commits.
+
+### Content — what is left, and why it is not code
+
+- `1170:4749` records (modal) — **DONE 2026-08-12** (`2f12e5e7`). Table built
+  from the collection's leading fields + Updated; count moved into the title;
+  image fields read as present/missing. `Import JSON` deliberately NOT built —
+  no bulk import path exists on the engine, and a test asserts no import button
+  renders.
+- `303:2067` data · no-source and `303:2083` data · watching — **STATUS-PILL
+  MARKERS, not designs.** Each is the same Sources frame with a pill pasted over
+  the breadcrumb, and both frames show a *connected* source, so the "No data
+  source connected" pill contradicts the frame it sits on. This is the S3.6 gap
+  again, where the founder's call was: draw it in Figma first, then code to it.
+  **Founder call — a design pass, not a code pass.**
+
 ## NOT in scope
 
 - Inspector flat body (board `52:56` / `824:5095`) — next arc after this one;
