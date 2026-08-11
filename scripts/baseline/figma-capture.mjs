@@ -37,7 +37,8 @@ if (ACTIONS_JSON && ACTIONS_JSON !== "none") {
 const r = await page.context().request.get("https://mcp.figma.com/mcp/html-to-design/capture.js");
 await page.evaluate((s) => { const el = document.createElement("script"); el.textContent = s; document.head.appendChild(el); }, await r.text());
 await page.waitForTimeout(800);
-const result = await Promise.race([new Promise(r=>setTimeout(()=>r({timedOutLocally:true}),150000)), page.evaluate(async (cid) =>
+const result = await Promise.race([new Promise(r=>setTimeout(()=>r({timedOutLocally:true}),300000)), page.evaluate(async (cid) =>
   await window.figma.captureForDesign({ captureId: cid, endpoint: `https://mcp.figma.com/mcp/capture/${cid}/submit?bindVariables=true`, selector: "body" }), CAPTURE_ID)]);
 console.log(JSON.stringify(result));
+await page.waitForTimeout(30000);
 await b.close();
