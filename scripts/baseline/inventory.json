@@ -656,11 +656,13 @@
    "state": "default",
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "requires": "token",
    "screenshotHash": "783d2b533613456e",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
-   "notes": "loading state (stalled trpc) \u2014 'Verifying your email\u2026'"
+   "notes": "loading state (stalled trpc) \u2014 'Verifying your email\u2026'",
+   "figmaNodeId": "212:2",
+   "figmaPageId": "183:2"
   },
   {
    "id": "BL-0031",
@@ -672,11 +674,13 @@
    "state": "default",
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "requires": "session",
    "screenshotHash": "2388d311f557e61c",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
-   "notes": "session (qa fixture, 1 workspace)"
+   "notes": "session (qa fixture, 1 workspace)",
+   "figmaNodeId": "213:2",
+   "figmaPageId": "183:2"
   },
   {
    "id": "BL-0032",
@@ -688,11 +692,13 @@
    "state": "default",
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "requires": "session",
    "screenshotHash": "2fb35d395cbe1180",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
-   "notes": "session"
+   "notes": "session",
+   "figmaNodeId": "214:2",
+   "figmaPageId": "183:2"
   },
   {
    "id": "BL-0033",
@@ -773,7 +779,7 @@
    "screenshotHash": "e7685b8055fc1799",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
    "figmaNodeId": "1:2",
-   "figmaPageId": "10.02 \u2014 ACTIVE \u2014 Dashboard",
+   "figmaPageId": "0:1",
    "notes": "FIRST FRAME. generate_figma_design capture via Playwright (login + CSP-strip + inject). Read-back: 1440x900 exact, 69 text nodes, fonts Inter+Geist Mono only (no substitution). Awaiting numeric rect-gate + founder checkpoint."
   },
   {
@@ -790,7 +796,7 @@
    "screenshotHash": "03102381aaa04150",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
    "figmaNodeId": "6:2",
-   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
+   "figmaPageId": "0:1"
   },
   {
    "id": "BL-0039",
@@ -920,7 +926,7 @@
    "screenshotHash": "8265185c9ff559c0",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
    "figmaNodeId": "13:2",
-   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
+   "figmaPageId": "0:1"
   },
   {
    "id": "BL-0047",
@@ -936,7 +942,7 @@
    "screenshotHash": "e683c850d1f786a0",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
    "figmaNodeId": "14:2",
-   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
+   "figmaPageId": "0:1"
   },
   {
    "id": "BL-0048",
@@ -953,7 +959,7 @@
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
    "notes": "slug fixture; not-found render is honest as-built",
    "figmaNodeId": "15:2",
-   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
+   "figmaPageId": "0:1"
   },
   {
    "id": "BL-0049",
@@ -969,7 +975,7 @@
    "screenshotHash": "50272aa9fcc70abc",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
    "figmaNodeId": "16:2",
-   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
+   "figmaPageId": "0:1"
   },
   {
    "id": "BL-0050",
@@ -985,7 +991,7 @@
    "screenshotHash": "4f7b84581f8423b6",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
    "figmaNodeId": "17:2",
-   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
+   "figmaPageId": "0:1"
   },
   {
    "id": "BL-0051",
@@ -1001,7 +1007,7 @@
    "screenshotHash": "2bdcedbb11f3d6f1",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
    "figmaNodeId": "5:2",
-   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
+   "figmaPageId": "0:1"
   },
   {
    "id": "BL-0052",
@@ -1017,7 +1023,7 @@
    "screenshotHash": "d9d496ac7a1e270d",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
    "figmaNodeId": "18:2",
-   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
+   "figmaPageId": "0:1"
   },
   {
    "id": "BL-0053",
@@ -1033,7 +1039,7 @@
    "screenshotHash": "18e0b26aa8e14a71",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
    "figmaNodeId": "4:2",
-   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
+   "figmaPageId": "0:1"
   },
   {
    "id": "BL-0054",
@@ -1049,7 +1055,7 @@
    "screenshotHash": "5e64674666546a02",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
    "figmaNodeId": "19:2",
-   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
+   "figmaPageId": "0:1"
   },
   {
    "id": "BL-0055",
@@ -1065,7 +1071,7 @@
    "screenshotHash": "c6659a4c44586b09",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
    "figmaNodeId": "8:2",
-   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
+   "figmaPageId": "0:1"
   },
   {
    "id": "BL-0056",
@@ -1081,7 +1087,7 @@
    "screenshotHash": "d1aa5304ce854685",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
    "figmaNodeId": "20:2",
-   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
+   "figmaPageId": "0:1"
   },
   {
    "id": "BL-0057",
@@ -1097,7 +1103,7 @@
    "screenshotHash": "9ad3c98601c8965d",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
    "figmaNodeId": "21:2",
-   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
+   "figmaPageId": "0:1"
   },
   {
    "id": "BL-0058",
@@ -1113,7 +1119,7 @@
    "screenshotHash": "66c30f6442819c16",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
    "figmaNodeId": "22:2",
-   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
+   "figmaPageId": "0:1"
   },
   {
    "id": "BL-0059",
@@ -1129,7 +1135,7 @@
    "screenshotHash": "ed704e02d8cc6e9c",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
    "figmaNodeId": "9:2",
-   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
+   "figmaPageId": "0:1"
   },
   {
    "id": "BL-0060",
@@ -1145,7 +1151,7 @@
    "screenshotHash": "5fdfda1487350b0a",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
    "figmaNodeId": "25:2",
-   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
+   "figmaPageId": "0:1"
   },
   {
    "id": "BL-0061",
@@ -1161,7 +1167,7 @@
    "screenshotHash": "ff1420f8ac39e11d",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
    "figmaNodeId": "26:2",
-   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
+   "figmaPageId": "0:1"
   },
   {
    "id": "BL-0062",
@@ -1177,7 +1183,7 @@
    "screenshotHash": "140eb62ba9f4a78e",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
    "figmaNodeId": "27:2",
-   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
+   "figmaPageId": "0:1"
   },
   {
    "id": "BL-0063",
@@ -1206,7 +1212,7 @@
    "screenshotHash": "55065c76d55617cc",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
    "figmaNodeId": "28:2",
-   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
+   "figmaPageId": "0:1"
   },
   {
    "id": "BL-0065",
@@ -1222,7 +1228,7 @@
    "screenshotHash": "5428f13ec1c66c77",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
    "figmaNodeId": "29:2",
-   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
+   "figmaPageId": "0:1"
   },
   {
    "id": "BL-0066",
@@ -1238,7 +1244,7 @@
    "screenshotHash": "c764c4efad7a0347",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
    "figmaNodeId": "30:2",
-   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
+   "figmaPageId": "0:1"
   },
   {
    "id": "BL-0067",
@@ -1254,7 +1260,7 @@
    "screenshotHash": "43c5909b161204e2",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
    "figmaNodeId": "31:2",
-   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
+   "figmaPageId": "0:1"
   },
   {
    "id": "BL-0068",
@@ -1270,7 +1276,7 @@
    "screenshotHash": "c85dbcfefd55bafd",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
    "figmaNodeId": "32:2",
-   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
+   "figmaPageId": "0:1"
   },
   {
    "id": "BL-0069",
@@ -1286,7 +1292,7 @@
    "screenshotHash": "006997f4a894f175",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
    "figmaNodeId": "33:2",
-   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
+   "figmaPageId": "0:1"
   },
   {
    "id": "BL-0070",
@@ -1302,7 +1308,7 @@
    "screenshotHash": "d942361711b0698b",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
    "figmaNodeId": "34:2",
-   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
+   "figmaPageId": "0:1"
   },
   {
    "id": "BL-0071",
@@ -1318,7 +1324,7 @@
    "screenshotHash": "c6fb14083f12df89",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
    "figmaNodeId": "10:2",
-   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
+   "figmaPageId": "0:1"
   },
   {
    "id": "BL-0072",
@@ -1334,7 +1340,7 @@
    "screenshotHash": "0543f0cc0c549342",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
    "figmaNodeId": "37:2",
-   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
+   "figmaPageId": "0:1"
   },
   {
    "id": "BL-0073",
@@ -1350,7 +1356,7 @@
    "screenshotHash": "14cd4b18fe775fdc",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
    "figmaNodeId": "38:2",
-   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
+   "figmaPageId": "0:1"
   },
   {
    "id": "BL-0074",
@@ -1366,7 +1372,7 @@
    "screenshotHash": "06b4de0708e18cf1",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
    "figmaNodeId": "39:2",
-   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
+   "figmaPageId": "0:1"
   },
   {
    "id": "BL-0075",
@@ -1382,7 +1388,7 @@
    "screenshotHash": "b8c93f7b4e175e36",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
    "figmaNodeId": "40:2",
-   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
+   "figmaPageId": "0:1"
   },
   {
    "id": "BL-0076",
@@ -1398,7 +1404,7 @@
    "screenshotHash": "1a28e166dbf7e46d",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
    "figmaNodeId": "41:2",
-   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
+   "figmaPageId": "0:1"
   },
   {
    "id": "BL-0077",
@@ -1414,7 +1420,7 @@
    "screenshotHash": "b5145b3b133ee889",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
    "figmaNodeId": "42:2",
-   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
+   "figmaPageId": "0:1"
   },
   {
    "id": "BL-0078",
@@ -1430,7 +1436,7 @@
    "screenshotHash": "4ab523632f3ee920",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
    "figmaNodeId": "43:2",
-   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
+   "figmaPageId": "0:1"
   },
   {
    "id": "BL-0079",
@@ -1446,7 +1452,7 @@
    "screenshotHash": "5bd3e92bb416dabb",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
    "figmaNodeId": "44:2",
-   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
+   "figmaPageId": "0:1"
   },
   {
    "id": "BL-0080",
@@ -1462,7 +1468,7 @@
    "screenshotHash": "ed24ab49b6801a2a",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
    "figmaNodeId": "11:2",
-   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
+   "figmaPageId": "0:1"
   },
   {
    "id": "BL-0081",
@@ -1478,7 +1484,7 @@
    "screenshotHash": "e2246bc92ad7ce92",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
    "figmaNodeId": "7:2",
-   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
+   "figmaPageId": "0:1"
   },
   {
    "id": "BL-0082",
@@ -1494,7 +1500,7 @@
    "screenshotHash": "00067925c9448e7a",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
    "figmaNodeId": "45:2",
-   "figmaPageId": "0:1 (10.02 \u2014 ACTIVE \u2014 Dashboard)"
+   "figmaPageId": "0:1"
   },
   {
    "id": "BL-0083",
