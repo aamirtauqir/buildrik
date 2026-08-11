@@ -134,11 +134,13 @@
    "state": "default",
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "requires": null,
    "screenshotHash": "e3ff014f2fa23b4a",
    "capturedFrom": "prod@f7b39a4c",
-   "scrollHeight": 900
+   "scrollHeight": 900,
+   "figmaNodeId": "177:2",
+   "figmaPageId": "183:2"
   },
   {
    "id": "BL-0002",
@@ -150,11 +152,13 @@
    "state": "default",
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "requires": null,
    "screenshotHash": "7d9fb92f9716a9ad",
    "capturedFrom": "prod@f7b39a4c",
-   "scrollHeight": 900
+   "scrollHeight": 900,
+   "figmaNodeId": "178:2",
+   "figmaPageId": "183:2"
   },
   {
    "id": "BL-0003",
@@ -166,11 +170,13 @@
    "state": "default",
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "requires": null,
    "screenshotHash": "5c24f093bdb0bd74",
    "capturedFrom": "prod@f7b39a4c",
-   "scrollHeight": 900
+   "scrollHeight": 900,
+   "figmaNodeId": "179:2",
+   "figmaPageId": "183:2"
   },
   {
    "id": "BL-0004",
@@ -182,11 +188,13 @@
    "state": "default",
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "requires": null,
    "screenshotHash": "22c136395ed8d576",
    "capturedFrom": "prod@f7b39a4c",
-   "scrollHeight": 900
+   "scrollHeight": 900,
+   "figmaNodeId": "180:2",
+   "figmaPageId": "183:2"
   },
   {
    "id": "BL-0005",
@@ -198,11 +206,13 @@
    "state": "default",
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "requires": null,
    "screenshotHash": "4118bc3cd4bf7229",
    "capturedFrom": "prod@f7b39a4c",
-   "scrollHeight": 900
+   "scrollHeight": 900,
+   "figmaNodeId": "181:2",
+   "figmaPageId": "183:2"
   },
   {
    "id": "BL-0006",
