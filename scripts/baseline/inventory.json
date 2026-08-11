@@ -502,11 +502,13 @@
    "state": "default",
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "requires": "token",
    "screenshotHash": "0719a4c24516068f",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
-   "notes": "loading state \u2014 IDENTICAL render to BL-0021 (same sha, as-built source duplicate)"
+   "notes": "loading state \u2014 IDENTICAL render to BL-0021 (same sha, as-built source duplicate)",
+   "figmaNodeId": "195:2",
+   "figmaPageId": "183:2"
   },
   {
    "id": "BL-0023",
@@ -518,11 +520,13 @@
    "state": "default",
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "requires": null,
    "screenshotHash": "09f07b87dc6fd3ce",
    "capturedFrom": "prod@f7b39a4c",
-   "scrollHeight": 900
+   "scrollHeight": 900,
+   "figmaNodeId": "197:2",
+   "figmaPageId": "183:2"
   },
   {
    "id": "BL-0024",
