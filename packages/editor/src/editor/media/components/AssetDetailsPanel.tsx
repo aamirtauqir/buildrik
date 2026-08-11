@@ -111,7 +111,8 @@ export function AssetDetailsPanel({
         <div className="tw:flex tw:flex-1 tw:items-center tw:justify-center tw:p-8">
           <div className="tw:text-center tw:text-[var(--bk-ink-disabled)]">
             <FolderOpen size={32} className="tw:mb-3 tw:opacity-40" />
-            <div className="tw:text-[13px]">Select an asset to view details</div>
+            {/* Board 1163:13947 — "see", and the sentence ends. */}
+            <div className="tw:text-[13px]">Select an asset to see details.</div>
           </div>
         </div>
       </div>

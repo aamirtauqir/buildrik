@@ -64,6 +64,14 @@ export function useSelectionState(
 
   const selectAll = useCallback(() => {
     setSelectedKeys(new Set(libraryItems.map((i) => i.key)));
+    /*
+      Selecting has to ENTER selection mode, or nothing about it is visible:
+      the cards only draw their checkbox in selMode and the bulk bar only
+      mounts in selMode. Measured live in the fullpage manager — the toolbar's
+      select-all filled `selectedKeys` and then rendered exactly nothing: no
+      checks, no bulk bar, no count. Board 1163:4641 draws all three.
+    */
+    setSelMode(true);
   }, [libraryItems]);
 
   /**

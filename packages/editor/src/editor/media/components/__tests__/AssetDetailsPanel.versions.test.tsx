@@ -57,7 +57,7 @@ function mount(over: Partial<AssetDetailsPanelProps> = {}) {
 describe("AssetDetailsPanel — empty + details", () => {
   it("renders the placeholder when no asset is selected", () => {
     mount({ selectedItem: null });
-    expect(screen.getByText("Select an asset to view details")).toBeInTheDocument();
+    expect(screen.getByText("Select an asset to see details.")).toBeInTheDocument();
   });
 
   it("renders filename, type/size subline and the details KV block", () => {
