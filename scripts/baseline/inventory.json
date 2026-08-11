@@ -2569,9 +2569,10 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "planned",
+   "pipelineState": "blocked",
    "screenshotHash": "6b46f86ae3b5cf18",
-   "capturedFrom": "prod@f7b39a4c"
+   "capturedFrom": "prod@f7b39a4c",
+   "notes": " | BLOCKED: capture submit repeatedly dies (3 attempts: stale selector fixed, still no server-side arrival)"
   },
   {
    "id": "BL-0155",
@@ -2615,9 +2616,10 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "planned",
+   "pipelineState": "blocked",
    "screenshotHash": "284d60de373d686a",
-   "capturedFrom": "prod@f7b39a4c"
+   "capturedFrom": "prod@f7b39a4c",
+   "notes": " | BLOCKED: capture submit repeatedly dies (3 attempts; page renders but submit never lands)"
   },
   {
    "id": "BL-0158",
@@ -2991,9 +2993,10 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "planned",
+   "pipelineState": "blocked",
    "screenshotHash": "f778bc9687f868ec",
-   "capturedFrom": "prod@f7b39a4c"
+   "capturedFrom": "prod@f7b39a4c",
+   "notes": " | BLOCKED: capture submit repeatedly dies (3 attempts, viewer dashboard)"
   },
   {
    "id": "BL-0182",
