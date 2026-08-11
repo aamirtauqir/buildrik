@@ -2,11 +2,11 @@
  * MediaContextMenu — right-click menu for an asset in the library grid.
  * Positioned at (x, y) in viewport coords; clamps to stay on-screen.
  *
- * Layout (prototype-v3 §16): 4 groups separated by dividers.
- *   1. Primary actions: Insert · Edit image (img) · Replace across (img/vid)
- *   2. Organize:        Select · Rename · Move to ▸ (nested folder picker)
- *   3. Copy:            Copy URL · Copy alt-text (img + altText)
- *   4. Danger:          Delete
+ * Layout follows board 1163:13695 — ONE list, ONE divider before Delete:
+ *   Insert to canvas · Select · Rename… · Move to folder › (nested picker) ·
+ *   Copy URL · Edit image… ── Delete
+ * Two items are ours and have no board slot; they sit beside their kin:
+ * "Copy alt text" after Copy URL, "Replace across pages…" after Edit image.
  *
  * @license BSD-3-Clause
  */
@@ -35,7 +35,8 @@ interface MediaContextMenuProps {
   onClose(): void;
 }
 
-const MENU_WIDTH = 160;
+// Board 1163:13931 — the menu is 180 wide, one divider, 11px rows.
+const MENU_WIDTH = 180;
 const MENU_ITEM_HEIGHT = 28;
 
 /**
@@ -107,36 +108,21 @@ export function MediaContextMenu({
         aria-label="Asset actions"
         style={{ position: "fixed", left, top, width: MENU_WIDTH, zIndex: 200 }}
       >
-        {/* Group 1 — Primary actions */}
+        {/*
+          Order and copy come from board 1163:13695, which draws ONE list and
+          one divider: Insert to canvas · Select · Rename… · Move to folder › ·
+          Copy URL · Edit image… ── Delete. The two items the board has no slot
+          for are ours, not its — "Replace across pages…" and "Copy alt text"
+          sit next to their own kin (the image op, the other copy) rather than
+          being dropped, per the codebase-only rule.
+        */}
         <Button
           role="menuitem"
           className="med-ctx-item"
           onClick={act(() => onInsert(item))}
         >
-          Insert
+          Insert to canvas
         </Button>
-        {item.type === "img" ? (
-          <Button
-            role="menuitem"
-            className="med-ctx-item"
-            onClick={act(() => onEditImage(item))}
-          >
-            Edit image
-          </Button>
-        ) : null}
-        {onReplaceAcross && (item.type === "img" || item.type === "vid") ? (
-          <Button
-            role="menuitem"
-            className="med-ctx-item"
-            onClick={act(() => onReplaceAcross(item))}
-          >
-            Replace across pages…
-          </Button>
-        ) : null}
-
-        <div className="med-ctx-sep" role="separator" />
-
-        {/* Group 2 — Organize */}
         <Button
           role="menuitem"
           className="med-ctx-item"
@@ -149,7 +135,7 @@ export function MediaContextMenu({
           className="med-ctx-item"
           onClick={act(() => onRename(item))}
         >
-          Rename
+          Rename…
         </Button>
         <div
           role="menuitem"
@@ -157,7 +143,7 @@ export function MediaContextMenu({
           onMouseEnter={() => setMoveOpen(true)}
           onMouseLeave={() => setMoveOpen(false)}
         >
-          Move to ▸
+          Move to folder ›
           {moveOpen ? (
             <div className="med-ctx-submenu" role="menu">
               <Button
@@ -183,9 +169,6 @@ export function MediaContextMenu({
           ) : null}
         </div>
 
-        <div className="med-ctx-sep" role="separator" />
-
-        {/* Group 3 — Copy */}
         <Button
           role="menuitem"
           className="med-ctx-item"
@@ -208,10 +191,27 @@ export function MediaContextMenu({
             Copy alt text
           </Button>
         ) : null}
+        {item.type === "img" ? (
+          <Button
+            role="menuitem"
+            className="med-ctx-item"
+            onClick={act(() => onEditImage(item))}
+          >
+            Edit image…
+          </Button>
+        ) : null}
+        {onReplaceAcross && (item.type === "img" || item.type === "vid") ? (
+          <Button
+            role="menuitem"
+            className="med-ctx-item"
+            onClick={act(() => onReplaceAcross(item))}
+          >
+            Replace across pages…
+          </Button>
+        ) : null}
 
         <div className="med-ctx-sep" role="separator" />
 
-        {/* Group 4 — Danger */}
         <Button
           role="menuitem"
           className="med-ctx-item med-ctx-item--danger"

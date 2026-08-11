@@ -111,18 +111,34 @@ describe("FolderTree — user folders", () => {
     expect(props.setCurrentFolderId).not.toHaveBeenCalled();
   });
 
-  it("New folder prompts for a name and calls createFolder with the trimmed value", () => {
-    vi.spyOn(window, "prompt").mockReturnValue("  Assets 2026  ");
+  // These three replace two that asserted `window.prompt`. A native dialog
+  // cannot be styled, cannot explain a refusal, and freezes any automated
+  // walk of the product; the name is typed in the tree now.
+  it("New folder opens an input in the tree, not an OS dialog", () => {
+    const promptSpy = vi.spyOn(window, "prompt");
+    mount();
+    fireEvent.click(screen.getByTitle("New folder"));
+    expect(screen.getByTestId("mgr-new-folder-input")).toBeInTheDocument();
+    expect(promptSpy).not.toHaveBeenCalled();
+  });
+
+  it("Enter creates the folder with the trimmed name", () => {
     const { props } = mount();
     fireEvent.click(screen.getByTitle("New folder"));
+    const input = screen.getByTestId("mgr-new-folder-input");
+    fireEvent.change(input, { target: { value: "  Assets 2026  " } });
+    fireEvent.keyDown(input, { key: "Enter" });
     expect(props.createFolder).toHaveBeenCalledWith("Assets 2026");
   });
 
-  it("cancelling the prompt creates nothing", () => {
-    vi.spyOn(window, "prompt").mockReturnValue(null);
+  it("Escape creates nothing and closes the input", () => {
     const { props } = mount();
     fireEvent.click(screen.getByTitle("New folder"));
+    const input = screen.getByTestId("mgr-new-folder-input");
+    fireEvent.change(input, { target: { value: "Scratch" } });
+    fireEvent.keyDown(input, { key: "Escape" });
     expect(props.createFolder).not.toHaveBeenCalled();
+    expect(screen.queryByTestId("mgr-new-folder-input")).toBeNull();
   });
 
   it("shows the empty hint when there are no folders", () => {

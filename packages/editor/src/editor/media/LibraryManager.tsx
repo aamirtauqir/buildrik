@@ -18,6 +18,7 @@ import { useMediaState } from "../sidebar/tabs/media/hooks/useMediaState";
 import { StockSourceModal } from "../sidebar/tabs/media/components/StockSourceModal";
 import { ConfirmDeleteModal } from "../sidebar/tabs/media/components/ConfirmDeleteModal";
 import { MediaContextMenu } from "../sidebar/tabs/media/components/MediaContextMenu";
+import { ImportUrlModal } from "./components/ImportUrlModal";
 import { AssetDetailOverlay } from "../sidebar/tabs/media/components/AssetDetailOverlay";
 import { STORAGE_QUOTA_BYTES } from "../../shared/constants/media";
 import { useToast, Button, TextInput } from "@/editor/chrome-ui";
@@ -160,12 +161,12 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
     fileInputRef.current?.click();
   }, []);
 
-  const handleImportFromUrl = React.useCallback(async () => {
-    const url = window.prompt("Paste image or media URL:");
-    if (!url?.trim()) return;
+  const [importUrlOpen, setImportUrlOpen] = React.useState(false);
+
+  const handleImportFromUrl = React.useCallback(async (url: string) => {
     try {
       addToast({ description: "Importing...", tone: "info", duration: 2000 });
-      const res = await fetch(url.trim());
+      const res = await fetch(url);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const blob = await res.blob();
       const ext = blob.type.split("/")[1] || "bin";
@@ -304,7 +305,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
         </div>
 
         <div className="mgr-right">
-          <Button className="mgr-btn" onClick={handleImportFromUrl}>
+          <Button className="mgr-btn" onClick={() => setImportUrlOpen(true)}>
             <Download size={14} />
             Import URL
           </Button>
@@ -487,6 +488,12 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           onEditImage={handleEditImage}
         />
       )}
+      <ImportUrlModal
+        open={importUrlOpen}
+        onClose={() => setImportUrlOpen(false)}
+        onImport={handleImportFromUrl}
+      />
+
       {/* Bug #2 fix: mount AssetDetailOverlay so rename from context menu actually shows */}
       {state.detailItem && (
         <AssetDetailOverlay

@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 import * as React from "react";
 import type { LibraryItem, MediaFolder } from "../../sidebar/tabs/media/data/mediaTypes";
-import { Button } from "@/editor/chrome-ui";
+import { Button, TextField } from "@/editor/chrome-ui";
 // ─── Types ────────────────────────────────────────────────────────────────
 
 export type SmartFolder = null | "recent" | "in-use" | "unused";
@@ -182,6 +182,13 @@ export function FolderTree({
   // Recursive folder tree renderer (Bug #8 fix: expand/collapse).
   // Drop-target state for asset→folder drags (ported with the behaviour).
   const [dropTargetId, setDropTargetId] = React.useState<string | null>(null);
+  /*
+    Naming a folder happens IN the tree, where the folder will appear. It used
+    to be a native prompt() — an OS dialog dropped into a designed product:
+    unstyleable, unable to say why a name was refused, and a hard stop for
+    anything driving the page.
+  */
+  const [newFolderName, setNewFolderName] = React.useState<string | null>(null);
   const readDraggedAssetKey = (e: React.DragEvent<HTMLElement>): string =>
     e.dataTransfer.getData("application/x-buildrik-media-asset-key") ||
     e.dataTransfer.getData("text/plain") ||
@@ -266,14 +273,35 @@ export function FolderTree({
         <Button
           className="mgr-tree-add"
           title="New folder"
-          onClick={() => {
-            const name = window.prompt("Folder name:");
-            if (name?.trim()) createFolder(name.trim());
-          }}
+          onClick={() => setNewFolderName((v) => (v === null ? "" : null))}
+          aria-expanded={newFolderName !== null}
         >
           <Plus size={12} />
         </Button>
       </div>
+
+      {newFolderName !== null ? (
+        <div className="mgr-tree-newfolder tw:px-2 tw:pb-1.5" data-testid="mgr-new-folder">
+          <TextField
+            autoFocus
+            value={newFolderName}
+            placeholder="Folder name"
+            aria-label="New folder name"
+            data-testid="mgr-new-folder-input"
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewFolderName(e.target.value)}
+            onBlur={() => setNewFolderName(null)}
+            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+              if (e.key === "Enter" && newFolderName.trim()) {
+                createFolder(newFolderName.trim());
+                setNewFolderName(null);
+              } else if (e.key === "Escape") {
+                e.stopPropagation();
+                setNewFolderName(null);
+              }
+            }}
+          />
+        </div>
+      ) : null}
 
       <div className="mgr-tree">
         {/* Smart folders (Bugs #6, #7 fix: actually filter) */}

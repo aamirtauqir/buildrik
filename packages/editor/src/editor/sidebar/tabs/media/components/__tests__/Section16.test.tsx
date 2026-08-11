@@ -58,22 +58,24 @@ function renderMenu(
 }
 
 describe("§16 — MediaContextMenu groups", () => {
-  it("renders 3 separators between 4 groups", () => {
+  // Board 1163:13695 draws ONE list with ONE rule, immediately above the
+  // destructive item. The four-group layout was ours.
+  it("renders a single separator, and it sits above Delete", () => {
     const { container } = renderMenu(makeItem());
-    const separators = container.querySelectorAll(".med-ctx-sep");
-    expect(separators.length).toBe(3);
+    expect(container.querySelectorAll(".med-ctx-sep").length).toBe(1);
+    const kids = Array.from(container.querySelector(".med-ctx-menu")?.children ?? []);
+    const sep = kids.findIndex((n) => n.classList.contains("med-ctx-sep"));
+    expect(kids[sep + 1]?.textContent).toMatch(/^Delete$/);
   });
 
-  it("renders Insert in Group 1 primary actions", () => {
+  it("names the first item the way the board does", () => {
     renderMenu(makeItem());
-    expect(
-      screen.getByRole("menuitem", { name: /^insert$/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("menuitem", { name: /^insert to canvas$/i })).toBeInTheDocument();
   });
 
   it("Insert click fires onInsert(item)", () => {
     const { onInsert } = renderMenu(makeItem());
-    fireEvent.click(screen.getByRole("menuitem", { name: /^insert$/i }));
+    fireEvent.click(screen.getByRole("menuitem", { name: /^insert to canvas$/i }));
     expect(onInsert).toHaveBeenCalledTimes(1);
     expect(onInsert.mock.calls[0][0]?.key).toBe("a1");
   });
