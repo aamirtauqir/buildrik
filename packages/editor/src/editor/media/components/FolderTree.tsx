@@ -280,29 +280,6 @@ export function FolderTree({
         </Button>
       </div>
 
-      {newFolderName !== null ? (
-        <div className="mgr-tree-newfolder tw:px-2 tw:pb-1.5" data-testid="mgr-new-folder">
-          <TextField
-            autoFocus
-            value={newFolderName}
-            placeholder="Folder name"
-            aria-label="New folder name"
-            data-testid="mgr-new-folder-input"
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewFolderName(e.target.value)}
-            onBlur={() => setNewFolderName(null)}
-            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-              if (e.key === "Enter" && newFolderName.trim()) {
-                createFolder(newFolderName.trim());
-                setNewFolderName(null);
-              } else if (e.key === "Escape") {
-                e.stopPropagation();
-                setNewFolderName(null);
-              }
-            }}
-          />
-        </div>
-      ) : null}
-
       <div className="mgr-tree">
         {/* Smart folders (Bugs #6, #7 fix: actually filter) */}
         <TreeNode
@@ -358,6 +335,37 @@ export function FolderTree({
 
         {/* User folders (nested tree) */}
         {renderFolderTree(null, 0)}
+
+        {/*
+          Board 1205:4829 — the name is typed at the bottom of My folders,
+          where the folder will land, with the two keys spelled out. It
+          replaced a native prompt(), which could not say any of this.
+        */}
+        {newFolderName !== null ? (
+          <div className="mgr-tree-newfolder tw:px-2 tw:pb-1.5" data-testid="mgr-new-folder">
+            <TextField
+              autoFocus
+              value={newFolderName}
+              placeholder="Folder name"
+              aria-label="New folder name"
+              data-testid="mgr-new-folder-input"
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewFolderName(e.target.value)}
+              onBlur={() => setNewFolderName(null)}
+              onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                if (e.key === "Enter" && newFolderName.trim()) {
+                  createFolder(newFolderName.trim());
+                  setNewFolderName(null);
+                } else if (e.key === "Escape") {
+                  e.stopPropagation();
+                  setNewFolderName(null);
+                }
+              }}
+            />
+            <p className="tw:mt-1 tw:text-[10px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+              Enter to create · Esc to cancel
+            </p>
+          </div>
+        ) : null}
 
         {folders.length === 0 && (
           <div style={{ padding: "12px 8px", fontSize: 11, color: "var(--bk-ink-disabled)" }}>

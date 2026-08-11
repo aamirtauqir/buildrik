@@ -70,6 +70,11 @@ export function ImportUrlModal({ open, onClose, onImport }: ImportUrlModalProps)
         </div>
       }
     >
+      {/* Board 1205:4804 labels the field, the way the family's other
+          modals label their sections ("PAGES" on 1164:4738). */}
+      <p className="tw:mb-1 tw:text-[9px] tw:font-semibold tw:uppercase tw:tracking-[0.5px] tw:text-[var(--bk-ink-muted)]">
+        Media URL
+      </p>
       <TextField
         type="url"
         autoFocus
