@@ -41,7 +41,6 @@ import { useReducedMotion } from "@/shared/hooks/useReducedMotion";
 import type { ProjectSettings } from "@/shared/types/project";
 import { getEditorPlanTier } from "@/services/BuildrikSyncProvider";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
-import { PublishHistory } from "@/editor/shell/PublishHistory";
 import { EVENTS } from "@/shared/constants/events";
 import { currentSiteId } from "@/services/ReviewService";
 import "./settings.css";
@@ -61,7 +60,7 @@ type InTabNavId =
   | "general" | "branding" | "seo"
   | "analytics" | "localization" | "domains"
   | "custom-code" | "redirects" | "headers" | "forms" | "integrations" | "webhooks"
-  | "publish-history" | "export";
+  | "export";
 
 type NavGroupId = "site" | "distribution" | "plumbing";
 
@@ -78,8 +77,7 @@ const NAV: NavDef[] = [
   { id: "general", title: "General", subtitle: "Project metadata", group: "site", icon: SiteSettingsIcon },
   { id: "branding", title: "Branding", subtitle: "Colors, type, favicon", group: "site", icon: DesignSystemIcon },
   { id: "seo", title: "SEO", subtitle: "Search & social preview", group: "site", icon: SeoIcon },
-  // DISTRIBUTION
-  { id: "publish-history", title: "Publish history", subtitle: "Past deploys + rollback", group: "distribution", icon: IntegrationsIcon },
+  // DISTRIBUTION — "Publish history" lived here until M2; it is now History › Published
   { id: "export", title: "Export", subtitle: "Download the site as code", group: "distribution", icon: IntegrationsIcon },
   { id: "domains", title: "Domains", subtitle: "Custom domain + DNS", group: "distribution", icon: IntegrationsIcon },
   { id: "analytics", title: "Analytics", subtitle: "GA4, Plausible, PostHog, Pixel", group: "distribution", icon: IntegrationsIcon },
@@ -689,17 +687,13 @@ export const SettingsTab: React.FC<
         return <DomainsScreen projectId={projectId} onDirtyChange={handleScreenDirty} />;
       case "webhooks":
         return <WebhooksScreen onDirtyChange={handleScreenDirty} />;
-      // P5: publish history + export graduate into the full-page settings snav
-      // (authoritative IA — "Site full-page = settings + export + publish history").
-      case "publish-history":
-        return projectId ? (
-          <PublishHistory siteId={projectId} />
-        ) : (
-          <div className="bd-set-section">
-            <h3 className="bd-set-section-h">Publish history</h3>
-            <div className="bd-set-section-d">Publish the site once to start a version history.</div>
-          </div>
-        );
+      // `publish-history` used to render here. It moved to History › Published
+      // (M2 / Finding C): the same PublishHistory component answered at three
+      // addresses — the Publish panel, this screen, and the History › Published
+      // boards in Figma — and only the two code ones were undrawn. The Publish
+      // panel keeps its embedded copy on purpose; that one answers "did mine
+      // land?" at the moment of publishing, which is a different question from
+      // "what shipped, and can I go back?".
       case "export":
         return (
           <div className="bd-set-section">

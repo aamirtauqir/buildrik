@@ -1,8 +1,10 @@
 /**
  * HistoryTab — Version history sidebar panel
  *
- * Layout matches the History Tab prototype:
- *   PanelHeader → view-switcher (Changes / Saves) → search-bar → list-container
+ * Layout:
+ *   PanelHeader → view-switcher (Saves / Published) → search-bar → list-container
+ * Inside Saves, a filter row switches between named milestones and raw recent
+ * edits — the old top-level "Changes" tab (M1).
  * Time-Travel scrubber drawer renders at body level when active.
  *
  * @license BSD-3-Clause
@@ -13,19 +15,30 @@ import { PanelFrame, Button, TextField } from "@/editor/chrome-ui";
 import { useHistoryState } from "../../../../shared/hooks/useHistoryState";
 import { useAutoMilestone } from "../../../../shared/hooks/useAutoMilestone";
 import { VersionHistoryPanel } from "../../../panels/VersionHistoryPanel";
+import { PublishHistory } from "../../../shell/PublishHistory";
 import { ActivityView } from "./components/ActivityView";
 import { TimeTravelScrubber } from "./components/TimeTravelScrubber";
 import { MilestoneSuggestionBanner } from "./components/MilestoneSuggestionBanner";
-import type { HistoryView, HistoryTabProps } from "./types";
+import type { HistoryView, SavesFilter, HistoryTabProps } from "./types";
 
-const HELPER_TEXT: Record<HistoryView, string> = {
-  changes: "Your recent edits",
-  saves: "Named milestones",
+const VIEW_LABEL: Record<HistoryView, string> = {
+  saves: "Saves",
+  published: "Published",
 };
 
-const SEARCH_PLACEHOLDER: Record<HistoryView, string> = {
+const HELPER_TEXT: Record<HistoryView, string> = {
+  saves: "Named milestones",
+  published: "What's live",
+};
+
+const FILTER_LABEL: Record<SavesFilter, string> = {
+  milestones: "Milestones",
+  changes: "All changes",
+};
+
+const SEARCH_PLACEHOLDER: Record<SavesFilter, string> = {
+  milestones: "Search saves...",
   changes: "Search changes...",
-  saves: "Search saves...",
 };
 
 const SearchIconSvg = () => (
@@ -45,6 +58,7 @@ const ClearXSvg = () => (
 export const HistoryTab: React.FC<HistoryTabProps> = ({
   composer,
   projectId,
+  initialView,
   isExpanded,
   onExpandToggle,
   onHelpClick,
@@ -53,16 +67,27 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
   const storageKey = `buildrick-history-view${projectId ? `-${projectId}` : ""}`;
   const { historyStack, canUndo, clear } = useHistoryState(composer);
 
-  const [activeView, setActiveView] = React.useState<HistoryView>(() => {
-    if (typeof window === "undefined") return "changes";
+  /* Stored preference, read once. The key predates M1 and every returning user
+     has either "saves" or "changes" in it — "changes" is no longer a view, so
+     it migrates to Saves-with-the-changes-filter rather than being discarded.
+     Dropping it would silently move those users to a list they did not pick. */
+  const stored = React.useMemo<string | null>(() => {
+    if (typeof window === "undefined") return null;
     try {
-      const stored = window.localStorage.getItem(storageKey);
-      if (stored === "saves" || stored === "changes") return stored;
+      return window.localStorage.getItem(storageKey);
     } catch {
-      // Ignore storage errors
+      return null; // storage unavailable (private mode, quota) — use defaults
     }
-    return "changes";
+  }, [storageKey]);
+
+  const [activeView, setActiveView] = React.useState<HistoryView>(() => {
+    if (initialView) return initialView; // deep link wins for this mount
+    return stored === "published" ? "published" : "saves";
   });
+
+  const [savesFilter, setSavesFilter] = React.useState<SavesFilter>(() =>
+    stored === "changes" ? "changes" : "milestones",
+  );
 
   const [searchQuery, setSearchQuery] = React.useState("");
   const [showScrubber, setShowScrubber] = React.useState(false);
@@ -76,14 +101,19 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
     isAvailable: milestoneAvailable,
   } = useAutoMilestone(composer);
 
+  /* Written back in the SAME vocabulary the key already used ("saves" |
+     "changes" | "published"), so a downgrade to a build without M1 still reads
+     a value it understands instead of choking on a new enum. */
   React.useEffect(() => {
     if (typeof window === "undefined") return;
+    const persisted =
+      activeView === "published" ? "published" : savesFilter === "changes" ? "changes" : "saves";
     try {
-      window.localStorage.setItem(storageKey, activeView);
+      window.localStorage.setItem(storageKey, persisted);
     } catch {
       // Ignore storage errors
     }
-  }, [activeView, storageKey]);
+  }, [activeView, savesFilter, storageKey]);
 
   // Ctrl+Shift+T toggles Time-Travel scrubber
   React.useEffect(() => {
@@ -120,7 +150,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
       />
       {/* View switcher — prototype tabs with helper text */}
       <div className="view-switcher" role="tablist" aria-label="History view">
-        {(["changes", "saves"] as const).map((view) => (
+        {(["saves", "published"] as const).map((view) => (
           <Button
             key={view}
             type="button"
@@ -129,38 +159,56 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
             className={`view-tab${activeView === view ? " active" : ""}`}
             onClick={() => setActiveView(view)}
           >
-            {view === "changes" ? "Changes" : "Saves"}
+            {VIEW_LABEL[view]}
             <span className="tab-helper">{HELPER_TEXT[view]}</span>
           </Button>
         ))}
       </div>
-      {/* Search bar — prototype markup */}
-      <div className="search-bar">
-        <span className="search-icon" aria-hidden="true">
-          <SearchIconSvg />
-        </span>
-        <TextField
-          className="search-input"
-          type="search"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder={SEARCH_PLACEHOLDER[activeView]}
-          aria-label={SEARCH_PLACEHOLDER[activeView]}
-        />
-        {searchQuery && (
-          <Button
-            type="button"
-            className="search-clear visible"
-            onClick={() => setSearchQuery("")}
-            aria-label="Clear search"
-          >
-            <ClearXSvg />
-          </Button>
-        )}
-      </div>
-      {/* List container — switches between Changes / Saves */}
+      {/* Saves-only chrome. Published renders its own list and takes no search
+          query, so showing a dead search field over it would be a lie. */}
+      {activeView === "saves" && (
+        <>
+          <div className="saves-filter" role="group" aria-label="Saves filter">
+            {(["milestones", "changes"] as const).map((f) => (
+              <Button
+                key={f}
+                type="button"
+                aria-pressed={savesFilter === f}
+                className={`saves-filter-chip${savesFilter === f ? " active" : ""}`}
+                onClick={() => setSavesFilter(f)}
+              >
+                {FILTER_LABEL[f]}
+              </Button>
+            ))}
+          </div>
+          <div className="search-bar">
+            <span className="search-icon" aria-hidden="true">
+              <SearchIconSvg />
+            </span>
+            <TextField
+              className="search-input"
+              type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={SEARCH_PLACEHOLDER[savesFilter]}
+              aria-label={SEARCH_PLACEHOLDER[savesFilter]}
+            />
+            {searchQuery && (
+              <Button
+                type="button"
+                className="search-clear visible"
+                onClick={() => setSearchQuery("")}
+                aria-label="Clear search"
+              >
+                <ClearXSvg />
+              </Button>
+            )}
+          </div>
+        </>
+      )}
+      {/* List container — Saves (milestones | all changes) or Published */}
       <div className="list-container" role="tabpanel">
-        {activeView === "changes" && (
+        {activeView === "saves" && savesFilter === "changes" && (
           <ActivityView
             composer={composer}
             searchQuery={searchQuery}
@@ -170,7 +218,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
           />
         )}
 
-        {activeView === "saves" && (
+        {activeView === "saves" && savesFilter === "milestones" && (
           <>
             {milestoneAvailable && milestoneSuggestion && (
               <MilestoneSuggestionBanner
@@ -184,6 +232,15 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
             <VersionHistoryPanel composer={composer} searchQuery={searchQuery} />
           </>
         )}
+
+        {/* M2 — the published-version list's canonical home. Same component the
+            Publish panel embeds; rollback stays ADMIN-gated inside it. */}
+        {activeView === "published" &&
+          (projectId ? (
+            <PublishHistory siteId={projectId} />
+          ) : (
+            <div className="bd-history-empty">Publish the site once to start a version history.</div>
+          ))}
       </div>
       {/* Time-Travel scrubber drawer (overlays canvas, not sidebar) */}
       {showScrubber && (

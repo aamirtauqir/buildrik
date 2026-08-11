@@ -58,6 +58,45 @@
   margin-top: 1px;
 }
 
+/* Saves filter (M1) — the old top-level "Changes" tab, demoted to a filter over
+   the same list. Chips, not tabs, so it cannot be mistaken for a third
+   destination next to Saves / Published. */
+.saves-filter {
+  display: flex;
+  gap: var(--bk-space-4);
+  padding: var(--bk-space-8) var(--bk-space-12) 0;
+}
+
+.saves-filter-chip {
+  padding: var(--bk-space-4) var(--bk-space-8);
+  font-size: 12px;
+  font-weight: 400;
+  font-family: inherit;
+  color: var(--bk-ink-soft);
+  background: none;
+  border: 1px solid var(--bk-border);
+  border-radius: var(--bk-radius-full);
+  cursor: pointer;
+  transition: color 150ms ease-out, background-color 150ms ease-out,
+    border-color 150ms ease-out;
+}
+
+.saves-filter-chip:hover {
+  color: var(--bk-ink);
+}
+
+.saves-filter-chip.active {
+  font-weight: 500;
+  color: var(--bk-accent-on);
+  background: var(--bk-accent);
+  border-color: var(--bk-accent);
+}
+
+.saves-filter-chip:focus-visible {
+  outline: none;
+  box-shadow: var(--bk-shadow-focus);
+}
+
 .bd-history-container .search-bar {
   position: relative;
   padding: var(--bk-space-8) var(--bk-space-12);

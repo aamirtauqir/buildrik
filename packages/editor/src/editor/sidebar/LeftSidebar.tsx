@@ -59,6 +59,8 @@ const ICON_MAP: Record<string, LucideIcon> = {
 export interface LeftSidebarProps {
   composer: Composer | null;
   activeTab: GroupedTabId;
+  /** Deep-link sub-tab for `activeTab` — see `TabRouter.activeSubTab`. */
+  activeSubTab?: string;
   onTabChange: (tab: GroupedTabId) => void;
   drawerOpen: boolean;
   onDrawerToggle: () => void;
@@ -320,6 +322,7 @@ function ToolSubNav({
 export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   composer,
   activeTab,
+  activeSubTab,
   onTabChange,
   drawerOpen,
   onDrawerToggle,
@@ -583,10 +586,14 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
             key={errorKey}
             fallback={<SidebarErrorFallback onRetry={() => setErrorKey((k) => k + 1)} />}
           >
-            <div key={activeTab} className="ls-panel-animate">
+            {/* Keyed on the sub-tab too: a deep link that only changes the
+                sub-tab (⋯ → Publish history while History is already open)
+                must remount so the tab re-reads its initial screen. */}
+            <div key={`${activeTab}:${activeSubTab ?? ""}`} className="ls-panel-animate">
               <React.Suspense fallback={<PanelSkeleton />}>
                 <TabRouter
                   activeTab={activeTab}
+                  activeSubTab={activeSubTab}
                   composer={composer}
                   commonTabProps={commonTabProps}
                   onBlockClick={onBlockClick}

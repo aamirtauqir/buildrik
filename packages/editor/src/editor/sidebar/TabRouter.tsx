@@ -92,6 +92,13 @@ export interface TabRouterProps {
   /** P4.2 Content tab: opens the shell CMS collection-setup modal (data-first
    *  create, no element selection). Absent → the Content create button hides. */
   onCreateCollection?: () => void;
+  /** Deep-link sub-tab for the active panel — `openLeftPanelToTab(tab, subTab)`.
+   *
+   *  This chain existed but stopped one component short: `StudioPanels` took
+   *  `leftPanelSubTab` and destructured it to `_leftPanelSubTab`, unused, so
+   *  every sub-tab deep link opened the right panel at the wrong screen. Only
+   *  History reads it today; other tabs ignore it until they need it. */
+  activeSubTab?: string;
 }
 
 export const TabRouter: React.FC<TabRouterProps> = ({
@@ -116,6 +123,7 @@ export const TabRouter: React.FC<TabRouterProps> = ({
   onOpenIconPicker,
   onResendReview,
   onCreateCollection,
+  activeSubTab,
 }) => {
   switch (activeTab) {
     case "add":
@@ -198,7 +206,14 @@ export const TabRouter: React.FC<TabRouterProps> = ({
       );
 
     case "history":
-      return <HistoryTab composer={composer} projectId={projectId} {...commonTabProps} />;
+      return (
+        <HistoryTab
+          composer={composer}
+          projectId={projectId}
+          initialView={activeSubTab === "published" ? "published" : undefined}
+          {...commonTabProps}
+        />
+      );
 
     case "review":
       return (

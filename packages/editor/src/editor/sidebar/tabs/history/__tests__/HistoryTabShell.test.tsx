@@ -1,9 +1,15 @@
 /**
- * HistoryTab shell tests — verifies the prototype-aligned chrome:
- *   - View switcher (Changes default, Saves second)
+ * HistoryTab shell tests — verifies the chrome after M1 + M2:
+ *   - View switcher is Saves / Published (Changes is a filter, not a tab)
  *   - Helper text under each tab
- *   - Search bar with prototype markup
+ *   - Saves filter switches milestones ↔ all changes
+ *   - Search bar is Saves-only (Published takes no query)
+ *   - `initialView` deep link lands on Published
  *   - Time-Travel scrubber toggles via Ctrl+Shift+T
+ *
+ * Rewritten with the M1/M2 change rather than after it: the three assertions
+ * that broke were pinning the OLD design (Changes-by-default, "Your recent
+ * edits" helper text, ActivityView mounted at first paint), not a regression.
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
@@ -62,7 +68,13 @@ vi.mock("../../../../../shared/hooks/useAutoMilestone", () => ({
 
 import { HistoryTab } from "../HistoryTab";
 
-const renderTab = () =>
+vi.mock("../../../../shell/PublishHistory", () => ({
+  PublishHistory: ({ siteId }: { siteId: string }) => (
+    <div data-testid="published-panel">PUBLISHED:{siteId}</div>
+  ),
+}));
+
+const renderTab = (props: Partial<React.ComponentProps<typeof HistoryTab>> = {}) =>
   render(
     <HistoryTab
       composer={null}
@@ -70,8 +82,12 @@ const renderTab = () =>
       onExpandToggle={() => {}}
       onHelpClick={() => {}}
       onClose={() => {}}
+      {...props}
     />
   );
+
+/** Saves is the default view; the changes list sits behind a filter chip. */
+const showChanges = () => fireEvent.click(screen.getByRole("button", { name: "All changes" }));
 
 describe("HistoryTab shell", () => {
   beforeEach(() => {
@@ -79,25 +95,30 @@ describe("HistoryTab shell", () => {
   });
   afterEach(cleanup);
 
-  it("renders Changes view by default with both tabs visible", () => {
+  it("renders Saves by default, with Published as the only sibling tab", () => {
     renderTab();
     const tabs = screen.getAllByRole("tab");
     expect(tabs).toHaveLength(2);
-    expect(tabs[0]).toHaveTextContent(/Changes/);
-    expect(tabs[1]).toHaveTextContent(/Saves/);
+    expect(tabs[0]).toHaveTextContent(/Saves/);
+    expect(tabs[1]).toHaveTextContent(/Published/);
     expect(tabs[0].getAttribute("aria-selected")).toBe("true");
+    // Changes is a filter now — it must not be reachable as a tab.
+    expect(screen.queryByRole("tab", { name: /Changes/ })).toBeNull();
   });
 
-  it("shows the prototype helper text under each tab", () => {
+  it("shows helper text under each tab", () => {
     renderTab();
-    expect(screen.getByText("Your recent edits")).toBeInTheDocument();
     expect(screen.getByText("Named milestones")).toBeInTheDocument();
+    expect(screen.getByText("What's live")).toBeInTheDocument();
   });
 
-  it("switches to the Saves view when the Saves tab is clicked", () => {
+  it("defaults the Saves filter to milestones and switches to all changes", () => {
     renderTab();
-    fireEvent.click(screen.getByRole("tab", { name: /Saves/ }));
     expect(screen.getByTestId("saves-panel")).toBeInTheDocument();
+    expect(screen.queryByTestId("activity-view")).toBeNull();
+    showChanges();
+    expect(screen.getByTestId("activity-view")).toBeInTheDocument();
+    expect(screen.queryByTestId("saves-panel")).toBeNull();
   });
 
   it("renders prototype search-bar markup with a search-icon", () => {
@@ -107,8 +128,36 @@ describe("HistoryTab shell", () => {
     expect(container.querySelector(".search-icon")).toBeTruthy();
   });
 
+  it("hides the search bar on Published, which takes no query", () => {
+    const { container } = renderTab({ projectId: "site_1" });
+    fireEvent.click(screen.getByRole("tab", { name: /Published/ }));
+    expect(screen.getByTestId("published-panel")).toBeInTheDocument();
+    expect(container.querySelector(".search-bar")).toBeNull();
+    expect(container.querySelector(".saves-filter")).toBeNull();
+  });
+
+  it("lands on Published when deep-linked, ahead of the stored preference", () => {
+    window.localStorage.setItem("buildrick-history-view", "changes");
+    renderTab({ projectId: "site_1", initialView: "published" });
+    expect(screen.getByTestId("published-panel")).toHaveTextContent("PUBLISHED:site_1");
+  });
+
+  it("explains itself on Published with no project rather than rendering an empty list", () => {
+    renderTab({ initialView: "published" });
+    expect(screen.queryByTestId("published-panel")).toBeNull();
+    expect(screen.getByText(/Publish the site once/)).toBeInTheDocument();
+  });
+
+  it("migrates a stored 'changes' preference to Saves + the changes filter", () => {
+    window.localStorage.setItem("buildrick-history-view", "changes");
+    renderTab();
+    expect(screen.getAllByRole("tab")[0].getAttribute("aria-selected")).toBe("true");
+    expect(screen.getByTestId("activity-view")).toBeInTheDocument();
+  });
+
   it("toggles the Time-Travel scrubber when the activity view requests it", () => {
     renderTab();
+    showChanges();
     expect(screen.queryByTestId("tt-scrubber")).toBeNull();
     fireEvent.click(screen.getByTestId("tt-trigger"));
     expect(screen.getByTestId("tt-scrubber")).toBeInTheDocument();

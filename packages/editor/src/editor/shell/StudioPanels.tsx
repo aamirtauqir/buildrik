@@ -170,7 +170,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   isLeftPanelOpen,
   onLeftPanelToggle,
   leftPanelTab,
-  leftPanelSubTab: _leftPanelSubTab,
+  leftPanelSubTab,
   onLeftPanelTabChange,
   onLeftPanelSubTabChange: _onLeftPanelSubTabChange,
   blocks: _blocks,
@@ -380,6 +380,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           <LeftSidebar
             composer={composer}
             activeTab={activeTabId}
+            activeSubTab={leftPanelSubTab}
             onTabChange={handleRailTabChange}
             drawerOpen={isLeftPanelOpen && !effectiveFullPageMode}
             onDrawerToggle={onLeftPanelToggle ?? (() => {})}
