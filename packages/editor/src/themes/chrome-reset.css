@@ -61,6 +61,40 @@
   border: 0 solid;
 }
 
+/* THE OVERLAY ROOT IS NOT INSIDE THE SHELL (fix, 2026-08-11). Everything
+   portalled — every modal, popover and toast — mounts into
+   `#bk-overlay-root`, a direct child of <body> (chrome-ui/OverlayMount).
+   `.bd-studio` is not an ancestor of it, so NONE of the reset above ever
+   reached any of them, and the border fix directly above this comment cured
+   the shell while leaving every dialog untouched.
+
+   Measured, not inferred: the CMS collection modal's primary button read
+   `border: 2px outset rgb(0, 0, 0)` in a real browser — the same UA ring on
+   the same blue CTA that comment describes — and `btn.closest('.bd-studio')`
+   returned null, with the chain running button → … → div#bk-overlay-root →
+   body. Buttons that carry `tw:border-0` or `tw:border-transparent` of their
+   own hid it, which is the same tell as before.
+
+   No canvas exclusion here: the canvas mounts inside the studio, never into
+   the overlay root, so there is no customer content in this subtree to
+   protect. The guard test only constrains `.bd-studio`-rooted selectors. */
+#bk-overlay-root,
+#bk-overlay-root *,
+#bk-overlay-root *::before,
+#bk-overlay-root *::after {
+  box-sizing: border-box;
+}
+#bk-overlay-root button,
+#bk-overlay-root input,
+#bk-overlay-root select,
+#bk-overlay-root textarea {
+  font: inherit; color: inherit;
+  border: 0 solid;
+}
+#bk-overlay-root {
+  font-family: var(--bk-font-ui);
+}
+
 /* UI FONT ON THE SHELL ROOT (2026-08-03). Until today the only thing setting a
    UI font was `body { font-family: ... }` inline in demo/index.html, which
    e2e/probe/probe.html does not have. The probe therefore rendered in the

@@ -122,8 +122,10 @@ export function RootView({
         data-testid="content-empty"
       >
         <EmptyStateDesc className="tw:max-w-[272px] tw:text-[13px] tw:leading-5">
-          Collections turn a spreadsheet into pages — one page per row, updated when the
-          data changes.
+          {/* One source literal, deliberately: gate:copy greps src/ for the exact
+              string from the design doc, so wrapping it across two JSX lines
+              reads to that gate as the line having been deleted. */}
+          Collections turn a spreadsheet into pages — one page per row, updated when the data changes.
         </EmptyStateDesc>
         {onCreateCollection ? (
           <EmptyStateActions>

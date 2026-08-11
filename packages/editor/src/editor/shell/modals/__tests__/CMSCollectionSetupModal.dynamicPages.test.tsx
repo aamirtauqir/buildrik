@@ -27,7 +27,8 @@ function makeComposer(updateCollection: ReturnType<typeof vi.fn>) {
 async function gotoStep2(name = "Posts") {
   fireEvent.change(screen.getByPlaceholderText("Blog Posts"), { target: { value: name } });
   fireEvent.click(screen.getByRole("button", { name: /next: add fields/i }));
-  await screen.findByRole("button", { name: /generate a page per entry/i });
+  // Board 1173:4826 draws a switch here, not a button whose label toggles.
+  await screen.findByLabelText(/generate a page per entry/i);
 }
 
 describe("CMSCollectionSetupModal — dynamic-page config", () => {
@@ -41,7 +42,7 @@ describe("CMSCollectionSetupModal — dynamic-page config", () => {
     // Inputs hidden until the toggle is on.
     expect(screen.queryByPlaceholderText(/slug pattern/i)).toBeNull();
 
-    fireEvent.click(screen.getByRole("button", { name: /generate a page per entry/i }));
+    fireEvent.click(screen.getByLabelText(/generate a page per entry/i));
 
     const slug = await screen.findByPlaceholderText(/slug pattern/i);
     fireEvent.change(slug, { target: { value: "/blog/{slug}" } });
