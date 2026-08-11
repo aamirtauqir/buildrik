@@ -367,7 +367,9 @@ export function FolderTree({
           </div>
         ) : null}
 
-        {folders.length === 0 && (
+        {/* Not while one is being named — "No folders yet" under a folder the
+            user is in the middle of creating contradicts what they are doing. */}
+        {folders.length === 0 && newFolderName === null && (
           <div style={{ padding: "12px 8px", fontSize: 11, color: "var(--bk-ink-disabled)" }}>
             No folders yet
           </div>
