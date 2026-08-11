@@ -472,13 +472,31 @@ M5 (Brand root → drill-in) · Finding E (`S4`).
 | M4 | `Publish · pre-checks` + `· blocked` → one screen, two states | §4.2 | open — code should match |
 | M5 | Brand root → drill-in list | Finding H + standing drill-in decision | **partly shipped** `06142b1e` |
 
-**M5 shipped the navigation model and the board's labels for the four
-destinations that already exist.** Five rows are not built, each for a stated
-reason recorded in `DesignSystemTab.tsx`: Classes (Figma-only, rule 4 —
-Finding G), Colour mode (needs a "tokens with no dark value" query), Lint (data
-exists but is owned by `DSLintMount`), Typography (`TypeTokenList` needs the
-token plumbing `TokensSection` does internally), Starters (a modal, not a
-destination). Row counts are unwired.
+**M5 shipped the navigation model and the board's labels.** Five destinations
+are live — Tokens · Presets · Components · **Lint** · Import / export.
+
+**Lint shipped separately (`8764ffb9`)** and is the only row carrying a count,
+because it is the only row with a real number to hand. `useDSLint` was extracted
+so the banner, the row count and the destination read one debounced computation
+rather than three that could disagree. The board draws `Fix ›` / `Open` per row
+and **neither shipped**: `DSLinter.lint()` returns
+`{ rule, severity, tokenId, message }` with no suggested replacement, so a Fix
+button would have nothing to apply. A test asserts the section renders zero
+buttons, so a later change cannot quietly add one. It also wired
+`DSLintBanner`'s `onReviewAll` — a dead prop that `DesignSystemTab` never
+passed, meaning the banner's "Review all" button had never once rendered.
+
+Four rows remain unbuilt: **Classes** (Figma-only, rule 4 — Finding G),
+**Colour mode**, **Typography** (`TypeTokenList` needs the token plumbing
+`TokensSection` does internally), **Starters** (a modal, not a destination).
+
+→ **Correction to my own reason for deferring Colour mode.** I wrote that its
+"tokens with no dark value" query "is not known to exist on the registries".
+It does exist — `DSLinter` has a `missing-dark` rule, and it reads
+`token.darkValue`, so both the query and the field are already there. Colour
+mode is therefore a smaller job than recorded: the list is a filter over the
+same lint the Lint row now consumes, and only the per-token **Set** write path
+is genuinely new. Deferring it was right; the reason given was wrong.
 
 **Two consequences M5 surfaced, both real:**
 
