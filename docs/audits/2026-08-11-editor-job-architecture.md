@@ -285,7 +285,91 @@ schedules them off the board count.
 
 ---
 
-## 5. What is verified, and what is not
+## 5. Second pass — two more jobs traced, three more findings
+
+§2 covered the three jobs that conflict. This pass traced the two largest
+families to their code, because "the counts agree" is precisely the reasoning
+that produced Finding B.
+
+### J4 · Style an element — **7/7 exact, verified**
+
+`Inspector · profile · …` draws seven element profiles: BUTTON,
+**CONTAINER (fallback)**, FLEX, GRID, INPUT, MEDIA, TEXT.
+
+`inspector/config/elementProfiles.ts` declares exactly seven:
+`CONTAINER_PROFILE` (:50), `TEXT_PROFILE` (:70), `FLEX_PROFILE` (:88),
+`GRID_PROFILE` (:108), `MEDIA_PROFILE` (:128), `BUTTON_PROFILE` (:137),
+`INPUT_PROFILE` (:156) — and `getProfileFor` falls back to `CONTAINER_PROFILE`
+for unmapped types (:179), which is what the board's parenthetical
+"(fallback)" records.
+
+→ **Finding F (class 1, verified — not assumed).** Seven profiles, same seven
+names, same fallback semantics, the annotation carried across. This is the one
+surface in the file where a board documents an *implementation invariant* rather
+than a layout, and it is correct. Nothing to reconcile.
+
+The profile map is also the extension point the code names: "adding support for a
+new element type is one entry in PROFILES, not a code change"
+(`elementProfiles.ts:12`). So an eighth profile is a data row, not a redesign —
+worth knowing before Phase 5 draws a board per profile.
+
+### J5 · Manage the brand system — 4 tabs, 28 boards, correctly state-shaped
+
+`DesignSystemTab.tsx:82-88` — four sections: **Tokens · Styles · Components ·
+Export**. The 28 `Brand ·` boards are states and sub-screens of those four, not
+28 screens:
+
+| Code | Boards it accounts for |
+|---|---|
+| `TokensSection` / `TokensRouter` / `TokenDetailView` / `TokenReplaceModal` | `tokens`, `tokens · add`, `tokens · replace`, `token-detail` |
+| `StylesRouter` + `PRESET_CATEGORIES` (11) + `PresetBindingRow` / `PresetDetailPane` | `presets`, `· bound`, `· draft`, `· unbound` |
+| `StarterGalleryModal` / `StarterGalleryMount` | `starters`, `starters · applied` |
+| `DSLintBanner` / `DSLintMount` | `lint`, `lint · suppressed`, `lint-warnings` |
+| `ExportSection` / `ExportDropdown` / `ImportCard` | `export · error / exported / imported`, `import-export` |
+| `ComponentsSection` | `components` |
+| `ColorModeToggle` / `ColorModeIconCycle` | `colour-mode` |
+| `DraftChip` / `TabGuardModal` | `dirty` |
+| `modals/ReviewModal` | `review-changes (modal)` |
+| shell load path | `root`, `empty`, `loading`, `load-error` |
+
+**A Phase 4 win worth naming.** There are **11 preset categories** in code
+(`StylePresetRegistryContext.tsx:18-21` — button, card, form, link, badge, alert,
+tooltip, modal, nav, table, layout). Figma drew them as **four states of one
+screen**, not eleven screens. That is the §4.1 test applied correctly by whoever
+drew it, and it is why the Brand family is 28 boards instead of ~60.
+
+Two boards did **not** resolve to a Brand code home:
+
+→ **Finding G (needs verification, not yet classified).** `Brand · classes`. The
+only CSS-classes surface in the codebase is
+`inspector/sections/CSSClassesSection.tsx`, registered in the **inspector**
+element registry (`sections/registry/element.tsx:10`) and reached per selected
+element. Either Figma plans a **site-wide** class manager under Brand (class 4,
+Figma-only extension — preserve per rule 4), or the per-element inspector surface
+has been drawn in the wrong family. **I have not opened the board.** These are
+materially different outcomes — one is a feature to build, the other is a board
+to move — so it is recorded as unresolved rather than guessed. One board read in
+Phase 5 settles it.
+
+→ **`Brand · pro-locked`.** `UpgradeModal` is mounted once, globally, at
+`AquibraStudio.tsx:616`, and the file already has `Shell · Upgrade modal (403
+gate)` for it. So `pro-locked` is almost certainly Brand rendering that shared
+gate rather than a Brand-specific screen — but no Brand-specific trigger was
+located in `design-system/`, so this is stated as the likely reading, not a
+verified one.
+
+### J2 · Add content — partially traced
+
+Four panels, four families (Insert 13 · Templates 11 · Components 8 · Media 26),
+plus `S3.1`/`S3.2` for the drag-and-drop half. The one permission fact confirmed:
+**applying a template requires ADMIN** (`TemplatesTab.tsx:162`), which is a
+notably high bar for what reads as a routine authoring action, and it is not
+drawn on any Templates board. Flagged for Phase 5; the remaining J2 tracing is
+scheduled behind the M2/M3 decisions because both change where components live.
+
+---
+
+## 6. What is verified, and what is not
 
 Honest scope, so the next pass does not re-trust this one:
 
@@ -293,12 +377,27 @@ Honest scope, so the next pass does not re-trust this one:
 Settings `NAV` (14 entries, 3 groups, 2 workspace links); `HistoryView` (2 tabs);
 `PublishHistory`'s two mount points; the role model and its four gates; the
 Topbar props contract; the modal file list; `S4`'s absence; the 416-board
-clustering.
+clustering; the 7 inspector element profiles and their fallback; the 4 Brand
+sections and the 11 preset categories behind them.
 
-**Not yet traced end-to-end** — J2, J3, J4, J5, J6, J7, J13 at the depth §2 gives
-J10/J11/J12. They are consistent between the sources as far as the family counts
-go, which is why they were not prioritised, but "counts agree" is not "flow
-agrees" — that is the mistake Finding B was made of.
+**Not yet traced end-to-end** — J3, J6, J7, J13, and the authoring half of J2, at
+the depth §2 gives J10/J11/J12. Their family counts agree across the sources,
+which is why they were not prioritised — but "counts agree" is not "flow agrees",
+and that is exactly what Finding B was made of.
 
-**Open decisions** — Phase 5's target file (Phase 1/2 gate, unchanged) · M2 ·
-M3 · Finding E (`S4`).
+**Open decisions** — Phase 5's target file (Phase 1/2 gate, unchanged) · M2
+(`publish-history` out of Settings) · M3 (canonical `CreateComponentModal`) ·
+Finding E (`S4`) · Finding G (`Brand · classes`: feature to build, or board to
+move).
+
+### Findings ledger
+
+| | Finding | Class | Status |
+|---|---|---|---|
+| A | `review` entry point undocumented in `tabsConfig` | doc drift | Phase 1/2 |
+| B | ~~Settings has no Figma family~~ | — | **withdrawn** — it is `S7`, 14 boards |
+| C | `PublishHistory`: one job, three addresses | 2 | founder call (M2) |
+| D | History tab set: `Changes` is a state, not a tab | 2 | recommended (M1) |
+| E | No `S4` in the spine | 9 | needs one sentence |
+| F | Inspector profiles 7/7, fallback included | 1 | **verified, nothing to do** |
+| G | `Brand · classes` has no Brand code home | ? | needs one board read |
