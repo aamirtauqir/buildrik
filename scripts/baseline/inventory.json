@@ -412,11 +412,13 @@
    "state": "default",
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "requires": null,
    "screenshotHash": "a7b5fa83b94af0f8",
    "capturedFrom": "prod@f7b39a4c",
-   "scrollHeight": 900
+   "scrollHeight": 900,
+   "figmaNodeId": "190:2",
+   "figmaPageId": "183:2"
   },
   {
    "id": "BL-0018",
@@ -428,11 +430,13 @@
    "state": "default",
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "requires": null,
    "screenshotHash": "745c1235a476b678",
    "capturedFrom": "prod@f7b39a4c",
-   "scrollHeight": 900
+   "scrollHeight": 900,
+   "figmaNodeId": "191:2",
+   "figmaPageId": "183:2"
   },
   {
    "id": "BL-0019",
@@ -444,11 +448,13 @@
    "state": "default",
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "requires": null,
    "screenshotHash": "936d20053b2beb7a",
    "capturedFrom": "prod@f7b39a4c",
-   "scrollHeight": 900
+   "scrollHeight": 900,
+   "figmaNodeId": "192:2",
+   "figmaPageId": "183:2"
   },
   {
    "id": "BL-0020",
@@ -460,11 +466,13 @@
    "state": "default",
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "requires": null,
    "screenshotHash": "c090f1aa08162a59",
    "capturedFrom": "prod@f7b39a4c",
-   "scrollHeight": 900
+   "scrollHeight": 900,
+   "figmaNodeId": "193:2",
+   "figmaPageId": "183:2"
   },
   {
    "id": "BL-0021",
@@ -476,11 +484,13 @@
    "state": "default",
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "requires": "token",
    "screenshotHash": "0719a4c24516068f",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
-   "notes": "loading state (stalled trpc) \u2014 'Loading invitation\u2026'; loaded state redirects into signup flow"
+   "notes": "loading state (stalled trpc) \u2014 'Loading invitation\u2026'; loaded state redirects into signup flow",
+   "figmaNodeId": "194:2",
+   "figmaPageId": "183:2"
   },
   {
    "id": "BL-0022",
