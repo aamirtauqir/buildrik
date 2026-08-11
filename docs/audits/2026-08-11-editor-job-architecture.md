@@ -466,8 +466,37 @@ M5 (Brand root → drill-in) · Finding E (`S4`).
 
 | # | Change | Basis | Status |
 |---|---|---|---|
-| M1 | History `Changes` tab → filter state on Saves | Finding D | recommended |
-| M2 | `publish-history` out of the Settings nav | Finding C | founder call |
-| M3 | Two `CreateComponentModal` → one canonical | Phase 1/2 §1.4 | founder call |
-| M4 | `Publish · pre-checks` + `· blocked` → one screen, two states | §4.2 | code should match |
-| M5 | **Brand root → nine-row drill-in** | Finding H + standing drill-in decision | **founder call** |
+| M1 | History `Changes` tab → filter state on Saves | Finding D | **shipped** `a5607bfc` |
+| M2 | `publish-history` out of the Settings nav | Finding C | **shipped** `a5607bfc` |
+| M3 | Two `CreateComponentModal` → one canonical | Phase 1/2 §1.4 | open — founder call |
+| M4 | `Publish · pre-checks` + `· blocked` → one screen, two states | §4.2 | open — code should match |
+| M5 | Brand root → drill-in list | Finding H + standing drill-in decision | **partly shipped** `06142b1e` |
+
+**M5 shipped the navigation model and the board's labels for the four
+destinations that already exist.** Five rows are not built, each for a stated
+reason recorded in `DesignSystemTab.tsx`: Classes (Figma-only, rule 4 —
+Finding G), Colour mode (needs a "tokens with no dark value" query), Lint (data
+exists but is owned by `DSLintMount`), Typography (`TypeTokenList` needs the
+token plumbing `TokensSection` does internally), Starters (a modal, not a
+destination). Row counts are unwired.
+
+**Two consequences M5 surfaced, both real:**
+
+1. Switching sections is now two moves, and the unsaved-changes guard fires on
+   the first — leaving dirty work behind is the thing it exists to catch.
+2. The per-section dirty dot was permanently visible in the tab bar. On a
+   drill-in it lives on the root row, and the root is unreachable while dirty.
+   The always-visible in-section signal is the footer (`N previewing` / `All
+   changes saved`). Nothing was lost, but the signal moved, and any board that
+   assumes a persistent per-section dot needs to know that.
+
+**M2 fixed a live bug on the way.** `openLeftPanelToTab(tab, subTab)` stored the
+sub-tab, passed it to `StudioPanels` — which destructured it to
+`_leftPanelSubTab` and never used it. Every sub-tab deep link opened the right
+panel at the wrong screen, so the ⋯ menu's "Publish history" never reached
+Publish history even before this change. Now wired end to end.
+
+→ **Finding I (dead deep link, unfixed).** `onOpenPlugins` deep-links to
+`("settings", "plugins")`, and `plugins` is not one of the Settings `NAV` ids.
+Even with the plumbing repaired it resolves to nothing. Left alone because it is
+outside the approved changes.
