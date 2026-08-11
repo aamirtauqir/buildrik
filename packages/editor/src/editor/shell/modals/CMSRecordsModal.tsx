@@ -28,6 +28,47 @@ function emptyForm(fields: CMSField[]): Record<string, unknown> {
   return out;
 }
 
+/* Board 1170:4749 draws the columns off the collection's own fields, then a
+   fixed "Updated". Three fit the 688 frame; beyond that the table would
+   out-grow the modal, so the leading three are shown and the rest live in the
+   record form. The board's own sample (Title · Price · Photo) is three. */
+const MAX_FIELD_COLUMNS = 3;
+
+/** The quiet row-action treatment, previously repeated at each of the three
+ *  call sites below. */
+const GHOST_BTN = "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900";
+
+/** "today" for same-day, else "MMM D" — the board's own two shapes. */
+function updatedLabel(iso: string): string {
+  const then = new Date(iso);
+  if (Number.isNaN(then.getTime())) return "—";
+  const now = new Date();
+  const sameDay =
+    then.getFullYear() === now.getFullYear() &&
+    then.getMonth() === now.getMonth() &&
+    then.getDate() === now.getDate();
+  if (sameDay) return "today";
+  return then.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+}
+
+/** A media cell reads as presence, not as a path: the board draws a checked
+ *  "photo" when the field is filled and a warn-toned "missing" when it is not.
+ *  That is the only question a table can usefully answer about an image. */
+function MediaCell({ filled, label }: { filled: boolean; label: string }) {
+  return filled ? (
+    <span className="tw:text-gray-500">✓ {label}</span>
+  ) : (
+    <span style={{ color: "var(--bk-warning)" }}>— missing</span>
+  );
+}
+
+function cellText(item: CMSContentItem, field: CMSField): string {
+  const v = item.data[field.slug];
+  if (v == null || v === "") return "—";
+  if (typeof v === "boolean") return v ? "Yes" : "No";
+  return String(v);
+}
+
 function displayValue(item: CMSContentItem, collection: CMSCollection): string {
   const key = collection.displayField || collection.fields[0]?.slug;
   const v = key ? item.data[key] : undefined;
@@ -43,6 +84,12 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
   const [busy, setBusy] = React.useState(false);
 
   const collection = collections.find((c) => c.id === collectionId) ?? null;
+  /* Columns follow the collection's field order, which is the order the user
+     defined — not a re-sort of it. */
+  const columns = React.useMemo(
+    () => (collection?.fields ?? []).slice(0, MAX_FIELD_COLUMNS),
+    [collection],
+  );
   const publishedCount = items.filter((i) => i.status === "published").length;
   const hasDynamicPages = Boolean(collection?.pageSlugPattern);
 
@@ -182,7 +229,12 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
   return (
     <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
       <ModalContent size="lg">
-        <ModalTitle>CMS Records</ModalTitle>
+        {/* Board 1170:4749 puts the collection and its record count IN the
+            title — "Menu items — 12 records" — so the modal says what it is
+            holding before you read a single row. */}
+        <ModalTitle>
+          {collection ? `${collection.name} — ${items.length} record${items.length === 1 ? "" : "s"}` : "Records"}
+        </ModalTitle>
         <ModalClose aria-label="Close modal" onClick={onClose}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
             <path d="M18 6L6 18M6 6l12 12" />
@@ -240,56 +292,102 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                       dynamic pages won&apos;t generate until at least one record is published.
                     </div>
                   )}
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                    <span style={{ fontSize: 12, color: "var(--bk-ink-soft)" }}>
-                      {items.length} record{items.length === 1 ? "" : "s"}
-                    </span>
-                    <Button color="light" size="xs" onClick={startAdd} disabled={!collection}>
+
+                  {/* Board 1170:4749 — a table whose columns are the
+                      collection's own leading fields plus Updated. The list it
+                      replaced showed only the display field, so every other
+                      field was invisible until you opened the record. */}
+                  <table className="tw:w-full tw:text-[13px] tw:border-collapse">
+                    <thead>
+                      <tr>
+                        {columns.map((f) => (
+                          <th
+                            key={f.id}
+                            scope="col"
+                            className="tw:px-3 tw:py-2 tw:text-left tw:text-xs tw:font-normal tw:text-gray-500"
+                          >
+                            {f.name}
+                          </th>
+                        ))}
+                        <th scope="col" className="tw:px-3 tw:py-2 tw:text-left tw:text-xs tw:font-normal tw:text-gray-500">
+                          Updated
+                        </th>
+                        {/* The board draws no row actions; the code has publish,
+                            edit and delete, and rule 1 says a working capability
+                            does not get dropped because a sample frame omits it. */}
+                        <th scope="col" className="tw:px-3 tw:py-2">
+                          <span className="tw:sr-only">Actions</span>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {items.length === 0 ? (
+                        <tr>
+                          <td
+                            colSpan={columns.length + 2}
+                            className="tw:px-3 tw:py-6 tw:text-center tw:text-gray-500"
+                          >
+                            No records yet.
+                          </td>
+                        </tr>
+                      ) : (
+                        items.map((item) => (
+                          <tr key={item.id} className="tw:hover:bg-blue-50">
+                            {columns.map((f, idx) => (
+                              <td key={f.id} className="tw:px-3 tw:py-2.5 tw:text-gray-900">
+                                {f.type === "image" ? (
+                                  <MediaCell
+                                    filled={Boolean(item.data[f.slug])}
+                                    label={f.name.toLowerCase()}
+                                  />
+                                ) : idx === 0 && collection ? (
+                                  displayValue(item, collection)
+                                ) : (
+                                  cellText(item, f)
+                                )}
+                              </td>
+                            ))}
+                            <td className="tw:px-3 tw:py-2.5 tw:text-gray-500">
+                              {updatedLabel(item.updatedAt)}
+                            </td>
+                            <td className="tw:px-3 tw:py-2.5">
+                              <span className="tw:flex tw:justify-end tw:gap-1">
+                                <Button
+                                  color="light"
+                                  size="xs"
+                                  disabled={busy}
+                                  onClick={() => setStatus(item.id, item.status === "published" ? "draft" : "published")}
+                                  aria-label={item.status === "published" ? "Unpublish record" : "Publish record"}
+                                  aria-busy={busy || undefined}
+                                  className={GHOST_BTN}
+                                >
+                                  {item.status === "published" ? "Unpublish" : "Publish"}
+                                </Button>
+                                <Button color="light" size="xs" onClick={() => startEdit(item)} aria-label="Edit record" className={GHOST_BTN}>
+                                  <Pencil size={13} />
+                                </Button>
+                                <Button color="light" size="xs" disabled={busy} onClick={() => remove(item.id)} aria-label="Delete record" aria-busy={busy || undefined} className={GHOST_BTN}>
+                                  <Trash2 size={13} />
+                                </Button>
+                              </span>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+
+                  {/* Footer actions, right-aligned as the board draws them.
+                      `Import JSON` sits beside Add record on the board and is
+                      NOT built: the engine exposes createContentItem one record
+                      at a time and has no bulk or JSON import path, so the
+                      button would have nothing to call. Parsing, validating and
+                      fanning a file out over N creates is a feature, not this
+                      modal's layout. */}
+                  <div className="tw:flex tw:justify-end tw:pt-3">
+                    <Button size="xs" onClick={startAdd} disabled={!collection}>
                       <Plus size={13} /> Add record
                     </Button>
-                  </div>
-                  <div>
-                    {items.length === 0 ? (
-                      <p style={{ color: "var(--bk-ink-soft)", fontSize: 13 }}>No records yet.</p>
-                    ) : (
-                      items.map((item) => (
-                        <div
-                          key={item.id}
-                          style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid var(--bk-border)" }}
-                        >
-                          <span style={{ fontSize: 13 }}>
-                            {collection ? displayValue(item, collection) : item.id}
-                            <span
-                              style={{
-                                marginLeft: 8,
-                                fontSize: 11,
-                                fontWeight: 500,
-                                color: item.status === "published" ? "var(--bk-success)" : "var(--bk-ink-muted)",
-                              }}
-                            >
-                              {item.status}
-                            </span>
-                          </span>
-                          <span style={{ display: "flex", gap: 4 }}>
-                            <Button
-                              color="light"
-                              size="xs"
-                              disabled={busy}
-                              onClick={() => setStatus(item.id, item.status === "published" ? "draft" : "published")}
-                              aria-label={item.status === "published" ? "Unpublish record" : "Publish record"} aria-busy={busy || undefined} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
-                            >
-                              {item.status === "published" ? "Unpublish" : "Publish"}
-                            </Button>
-                            <Button color="light" size="xs" onClick={() => startEdit(item)} aria-label="Edit record" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
-                              <Pencil size={13} />
-                            </Button>
-                            <Button color="light" size="xs" disabled={busy} onClick={() => remove(item.id)} aria-label="Delete record" aria-busy={busy || undefined} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
-                              <Trash2 size={13} />
-                            </Button>
-                          </span>
-                        </div>
-                      ))
-                    )}
                   </div>
                 </>
               )}

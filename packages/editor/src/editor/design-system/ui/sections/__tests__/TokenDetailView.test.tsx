@@ -129,7 +129,8 @@ describe("TokenDetailView", () => {
      useColorTokens.updateToken took a third `darkValue` argument. The comment
      outlived the limitation, so the field kept silently discarding input. */
   describe("dark value commit", () => {
-    const renderDark = (onValueChange: ReturnType<typeof vi.fn>, token = colorToken) =>
+    type ValueChange = (id: string, value: string, darkValue?: string) => void;
+    const renderDark = (onValueChange: ValueChange, token = colorToken) =>
       render(
         wrap(
           <TokenDetailView
