@@ -92,13 +92,31 @@ Two pairs needed a closer look:
 | history | History | 23 |
 | review | Review panel | 13 |
 | content | Content | 15 |
-| **settings** | **none** | **0** |
+| settings | **`S7`** | **14** |
 | design | Brand | 28 |
 
-→ **Finding B (class 3 — code-only).** `SettingsTab` is a live, configured,
-reachable panel with **no Figma family**. The word "settings" appears in 21
-board names, but those are *Page settings* and *Project settings* — different
-jobs. The Editor's own Settings panel has never been drawn.
+→ ~~**Finding B (class 3 — code-only).** `SettingsTab` is a live, configured,
+reachable panel with **no Figma family**.~~
+
+**Finding B — WITHDRAWN 2026-08-11 (Phase 3 pass). It was wrong.**
+
+The Settings panel *is* drawn. It is family **`S7`**, 14 boards: `S7 · Settings ·
+General · Branding · SEO · Analytics · Localization · Domains · Export · Forms ·
+Headers · Integrations · Redirects · Webhooks · Custom code`, plus
+`Custom code · locked (Pro)`.
+
+The first pass searched for a family **named after the panel**, and `S7` is named
+after the **flow**. Every other panel happens to share its name with its family,
+so a name-keyed lookup worked twelve times and failed silently on the thirteenth.
+That is the failure mode this document was written to avoid — a count that reads
+as a gap because of how the question was asked.
+
+The real delta is **one screen, not thirteen**: code's `NAV`
+(`SettingsTab.tsx:76-94`) has **14** entries, `S7` has 13 sub-screens. The extra
+is `publish-history` — see **Finding C** in the Phase 3/4 document, where it turns
+out to be a placement conflict rather than a missing board.
+
+Class for Settings therefore moves **3 → 2** (present in both, inconsistent).
 
 ### 2.2 Families with no code surface
 
@@ -118,14 +136,17 @@ mistake them for orphans.
 | Class | Count so far | Items |
 |---|---|---|
 | 1 · consistent in both | 12 panels | the 12 with a family, pending per-board verification |
-| 2 · present, inconsistent | — | populated per family during Phase 5 |
-| 3 · code-only | **1 confirmed** | Settings panel (Finding B) |
-| 4 · Figma-only | — | pending the family sweep |
-| 5 · duplicated in Figma | — | pending near-duplicate detection |
+| 2 · present, inconsistent | **3** | Settings placement (Finding B, corrected); `PublishHistory` home (Finding C); History tab set (Finding D) |
+| 3 · code-only | **0** | ~~Settings panel~~ — Finding B withdrawn |
+| 4 · Figma-only | **≥3** | History · Backups (7 boards); Preview · performance audit (4); scheduled-publish (4) — all `[design-ahead]`, preserve per rule 4 |
+| 5 · duplicated in Figma | **0 true duplicates** | 25 multi-board clusters detected; all resolve to screen + states, not copies — Phase 3/4 doc §5 |
 | 6 · duplicated in code | **1 confirmed** | two `CreateComponentModal` (§1.4) |
 | 7 · incomplete / broken | — | see the Media + Content arcs, already fixed and shipped |
 | 8 · experimental | **2** | zone rail, tool rail (`?rail=`) |
-| 9 · needs clarification | **1** | which Figma file is the target (below) |
+| 9 · needs clarification | **2** | which Figma file is the target (below); the missing **S4** (Finding E) |
+
+Phases 3 and 4 continue in
+[`2026-08-11-editor-job-architecture.md`](./2026-08-11-editor-job-architecture.md).
 
 ---
 
