@@ -212,7 +212,10 @@ describe("ContentTab", () => {
     fireEvent.click(await screen.findByText("Conditions"));
     expect(await screen.findByText("when available is false")).toBeInTheDocument();
     expect(screen.getByText(/badge · Sold out/)).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Remove condition" }));
+    /* Board 151:87 puts the row actions behind a `⋯`, so removal is two
+       clicks now: open the row menu, then choose. */
+    fireEvent.click(screen.getByRole("button", { name: /Actions for/ }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Remove condition" }));
     expect(removeDataBinding).toHaveBeenCalledWith("condition");
   });
 
@@ -243,7 +246,8 @@ describe("ContentTab", () => {
     const { composer } = makeEngine({ collections: [MENU], items: [] });
     render(<ContentTab composer={composer as never} />);
     fireEvent.click(await screen.findByText("Sources"));
-    fireEvent.click(await screen.findByRole("button", { name: "+ Add a source (JSON)" }));
+    // Board 151:46 names this "+ Connect a source".
+    fireEvent.click(await screen.findByRole("button", { name: "+ Connect a source" }));
     const box = screen.getByLabelText("Source JSON");
     fireEvent.change(box, { target: { value: "{nope" } });
     fireEvent.click(screen.getByRole("button", { name: "Add source" }));

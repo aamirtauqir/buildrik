@@ -121,6 +121,15 @@ export const ContentTab: React.FC<ContentTabProps> = ({
     }
   };
 
+  /* Board 151:46 puts a `⋯` on each source row. DataManager.unregisterSource
+     has existed since the manager shipped and no UI ever called it, so a source
+     could be added and never removed. */
+  const removeSource = (id: string) => {
+    if (!composer) return;
+    composer.data.unregisterSource(id);
+    reload();
+  };
+
   const selectElement = (id: string) => {
     const el = composer?.elements.getElement(id);
     if (el && composer) composer.selection.select(el);
@@ -243,7 +252,14 @@ export const ContentTab: React.FC<ContentTabProps> = ({
       break;
     }
     case "sources":
-      body = <SourcesView sources={panel.sources} onBack={() => setView({ kind: "root" })} onImportJson={importJson} />;
+      body = (
+        <SourcesView
+          sources={panel.sources}
+          onBack={() => setView({ kind: "root" })}
+          onImportJson={importJson}
+          onRemoveSource={removeSource}
+        />
+      );
       break;
     case "variables":
       body = (

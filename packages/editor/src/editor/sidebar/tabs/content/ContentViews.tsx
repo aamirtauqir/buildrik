@@ -20,6 +20,9 @@ import {
   EmptyStateActions,
   EmptyStateDesc,
   IconButton,
+  Popover,
+  Menu,
+  MenuItem,
   ListRow,
   RecordRow,
   Row,
@@ -345,6 +348,21 @@ export function RecordView({
 
 const FIELD_TYPES = ["text", "textarea", "richtext", "number", "boolean", "image", "date", "slug", "reference"] as const;
 
+/** Board 151:2 writes the type as prose — "Rich text", not the `richtext` slug
+ *  the model stores. The slug is an identifier; a field list is read, not
+ *  parsed. */
+const FIELD_TYPE_LABEL: Record<string, string> = {
+  text: "Text",
+  textarea: "Long text",
+  richtext: "Rich text",
+  number: "Number",
+  boolean: "Boolean",
+  image: "Image",
+  date: "Date",
+  slug: "Slug",
+  reference: "Reference",
+};
+
 export function FieldsView({
   collection,
   onBack,
@@ -361,6 +379,7 @@ export function FieldsView({
   const [type, setType] = React.useState<string>("text");
   const [required, setRequired] = React.useState(false);
   const [confirmDelete, setConfirmDelete] = React.useState<CMSField | null>(null);
+  const [menuFor, setMenuFor] = React.useState<string | null>(null);
 
   return (
     <div className={CONTENT_BODY}>
@@ -370,20 +389,41 @@ export function FieldsView({
           <Row key={f.id} size="comment" data-field-row>
             <span className={ROW_STACK}>
               <span>{f.name}</span>
-              <span className={SUB}>{f.type}</span>
+              <span className={SUB}>{FIELD_TYPE_LABEL[f.type] ?? f.type}</span>
             </span>
             <span className={ROW_ACTIONS}>
               {f.validation?.required && <span className={SUB}>required</span>}
-              {/* IconButton, not a text Button carrying a glyph. An icon-only
-                  action rendered as `<Button size="xs">✕</Button>` sizes itself
-                  to the glyph — this one measured 21.92x18, under WCAG 2.5.8's
-                  24x24. IconButton is 32x32 and requires the label. */}
-              <IconButton
-                label={`Delete field ${f.name}`}
-                onClick={() => setConfirmDelete(f)}
+              {/* Board 151:2 draws `⋯`, not a bare ✕: delete is not the only
+                  thing a field row will ever offer, and a destructive glyph
+                  sitting permanently on every row invites the mis-click.
+                  IconButton (32x32) rather than a text Button carrying a glyph —
+                  that sizes to the glyph and measured 21.92x18, under WCAG
+                  2.5.8's 24x24 minimum. */}
+              <Popover
+                open={menuFor === f.id}
+                onClose={() => setMenuFor(null)}
+                placement="bottom-end"
+                label={`Actions for ${f.name}`}
+                trigger={
+                  <IconButton
+                    label={`Actions for field ${f.name}`}
+                    onClick={() => setMenuFor((p) => (p === f.id ? null : f.id))}
+                  >
+                    ⋯
+                  </IconButton>
+                }
               >
-                ✕
-              </IconButton>
+                <Menu>
+                  <MenuItem
+                    onClick={() => {
+                      setMenuFor(null);
+                      setConfirmDelete(f);
+                    }}
+                  >
+                    Delete field
+                  </MenuItem>
+                </Menu>
+              </Popover>
             </span>
           </Row>
         ))}
@@ -399,7 +439,7 @@ export function FieldsView({
             <div className={FORM_ROW}>
               <Select value={type} onChange={(e) => setType(e.target.value)} aria-label="Field type">
                 {FIELD_TYPES.map((t) => (
-                  <option key={t} value={t}>{t}</option>
+                  <option key={t} value={t}>{FIELD_TYPE_LABEL[t] ?? t}</option>
                 ))}
               </Select>
               <label className="tw:inline-flex tw:items-center tw:gap-1.5 tw:text-[13px] tw:cursor-pointer">
@@ -452,31 +492,97 @@ export function FieldsView({
 
 /* ── Sources (151:46) ────────────────────────────────────────────────────── */
 
+/** Board 151:46 draws a status LINE under the source name — a dot, then a
+ *  state and a detail ("● Connected · synced 4m ago").
+ *
+ *  Its sample is a Google Sheets connection with a sync clock, and neither
+ *  exists here: `DataSource` carries no connection state and no timestamp, and
+ *  `DataManager.watch()` watches a local data PATH for in-editor updates, not a
+ *  remote file for external ones. So the SHAPE is taken and the sample is not —
+ *  the dot reports whether the source actually resolves to data, which is the
+ *  one thing this panel can state truthfully. A green dot next to
+ *  "synced 4m ago" would be a fiction the code cannot back. */
+function sourceStatus(s: DataSource): { ok: boolean; label: string } {
+  const d = s.data;
+  if (Array.isArray(d)) return { ok: d.length > 0, label: `${s.type} · ${d.length} item${d.length === 1 ? "" : "s"}` };
+  if (d && typeof d === "object") {
+    const n = Object.keys(d as Record<string, unknown>).length;
+    return { ok: n > 0, label: `${s.type} · ${n} key${n === 1 ? "" : "s"}` };
+  }
+  if (s.type === "api") return { ok: Boolean(s.endpoint), label: s.endpoint ? `api · ${s.endpoint}` : "api · no endpoint" };
+  if (s.type === "function") return { ok: Boolean(s.getData), label: "function" };
+  return { ok: false, label: `${s.type} · empty` };
+}
+
 export function SourcesView({
   sources,
   onBack,
   onImportJson,
+  onRemoveSource,
 }: {
   sources: DataSource[];
   onBack: () => void;
   onImportJson: (json: string) => string | null;
+  /** Board 151:46 draws a `⋯` on every source row. `DataManager` has had
+   *  `unregisterSource` all along and no UI ever called it, so a source could
+   *  be added and never removed. */
+  onRemoveSource?: (id: string) => void;
 }) {
   const [adding, setAdding] = React.useState(false);
   const [json, setJson] = React.useState("");
   const [error, setError] = React.useState<string | null>(null);
+  const [menuFor, setMenuFor] = React.useState<string | null>(null);
   return (
     <div className={CONTENT_BODY}>
       <Crumb label="Sources" onClick={onBack} />
       <div className={SCROLL}>
-        {sources.map((s) => (
-          <Row key={s.id} size="comment" data-source-row>
-            <span className={ROW_STACK}>
-              <span>{s.name}</span>
-              <span className={SUB}>{s.type}</span>
-            </span>
-          </Row>
-        ))}
-        {sources.length === 0 && !adding && <div className={`${SUB} tw:p-3`}>No data sources yet.</div>}
+        {sources.map((s) => {
+          const status = sourceStatus(s);
+          return (
+            <Row key={s.id} size="comment" data-source-row>
+              <span className={ROW_STACK}>
+                <span>{s.name}</span>
+                <span className={`${SUB} tw:inline-flex tw:items-center tw:gap-1.5`}>
+                  <span
+                    aria-hidden="true"
+                    className="tw:size-[7px] tw:flex-none tw:rounded-full"
+                    style={{ background: status.ok ? "var(--bk-success)" : "var(--bk-ink-muted)" }}
+                  />
+                  {status.label}
+                </span>
+              </span>
+              {onRemoveSource && (
+                <span className={ROW_ACTIONS}>
+                  <Popover
+                    open={menuFor === s.id}
+                    onClose={() => setMenuFor(null)}
+                    placement="bottom-end"
+                    label={`Actions for ${s.name}`}
+                    trigger={
+                      <IconButton label={`Actions for ${s.name}`} onClick={() => setMenuFor((p) => (p === s.id ? null : s.id))}>
+                        ⋯
+                      </IconButton>
+                    }
+                  >
+                    <Menu>
+                      <MenuItem
+                        onClick={() => {
+                          setMenuFor(null);
+                          onRemoveSource(s.id);
+                        }}
+                      >
+                        Remove source
+                      </MenuItem>
+                    </Menu>
+                  </Popover>
+                </span>
+              )}
+            </Row>
+          );
+        })}
+        {/* Board 303:2067's pill words, which are the state's real name — the
+            panel is not missing a list, there is nothing connected yet. */}
+        {sources.length === 0 && !adding && <div className={`${SUB} tw:p-3`}>No data source connected</div>}
         {adding ? (
           <div className={INLINE_FORM}>
             <Textarea
@@ -510,7 +616,7 @@ export function SourcesView({
           </div>
         ) : (
           <Button className={`${LINK_BTN} tw:mx-3 tw:my-2`} onClick={() => setAdding(true)}>
-            + Add a source (JSON)
+            + Connect a source
           </Button>
         )}
       </div>
@@ -535,6 +641,7 @@ export function VariablesView({
   const [value, setValue] = React.useState("");
   const [editKey, setEditKey] = React.useState<string | null>(null);
   const [editValue, setEditValue] = React.useState("");
+  const [menuFor, setMenuFor] = React.useState<string | null>(null);
   const keyError = key.trim() !== "" && !isValidVariableKey(key.trim());
   const dupError = variables.some((v) => v.key === key.trim());
 
@@ -579,26 +686,32 @@ export function VariablesView({
                   Save
                 </Button>
               ) : (
-                <>
-                  <Button
-                    color="light"
-                    size="xs"
-                    className={GHOST}
-                    aria-label={`Edit ${v.key}`}
-                    onClick={() => { setEditKey(v.key); setEditValue(v.value); }}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    color="light"
-                    size="xs"
-                    className={GHOST}
-                    aria-label={`Delete ${v.key}`}
-                    onClick={() => onChange(variables.filter((x) => x.key !== v.key))}
-                  >
-                    ✕
-                  </Button>
-                </>
+                /* Board 151:62 draws one `⋯` per row, not a pair of text
+                   buttons. Two labelled actions on every row read as the row's
+                   content and crowded the value out of a 320 column. */
+                <Popover
+                  open={menuFor === v.key}
+                  onClose={() => setMenuFor(null)}
+                  placement="bottom-end"
+                  label={`Actions for ${v.key}`}
+                  trigger={
+                    <IconButton
+                      label={`Actions for ${v.key}`}
+                      onClick={() => setMenuFor((p) => (p === v.key ? null : v.key))}
+                    >
+                      ⋯
+                    </IconButton>
+                  }
+                >
+                  <Menu>
+                    <MenuItem onClick={() => { setMenuFor(null); setEditKey(v.key); setEditValue(v.value); }}>
+                      Edit value
+                    </MenuItem>
+                    <MenuItem onClick={() => { setMenuFor(null); onChange(variables.filter((x) => x.key !== v.key)); }}>
+                      Delete variable
+                    </MenuItem>
+                  </Menu>
+                </Popover>
               )}
             </span>
           </Row>
@@ -677,6 +790,7 @@ export function ConditionsView({
   const [operator, setOperator] = React.useState<ConditionOperator>("==");
   const [right, setRight] = React.useState("");
   const needsRight = !["exists", "not_exists", "empty", "not_empty"].includes(operator);
+  const [menuFor, setMenuFor] = React.useState<string | null>(null);
 
   return (
     <div className={CONTENT_BODY}>
@@ -689,18 +803,30 @@ export function ConditionsView({
               <span className={SUB}>{conditionSummary(c.binding)}</span>
             </span>
             <span className={ROW_ACTIONS}>
-              <Button color="light" size="xs" className={GHOST} onClick={() => onSelectElement(c.elementId)}>
-                Select
-              </Button>
-              <Button
-                color="light"
-                size="xs"
-                className={GHOST}
-                aria-label="Remove condition"
-                onClick={() => onRemove(c.elementId)}
+              {/* Board 151:87 draws `⋯`. */}
+              <Popover
+                open={menuFor === c.elementId}
+                onClose={() => setMenuFor(null)}
+                placement="bottom-end"
+                label={`Actions for ${c.label}`}
+                trigger={
+                  <IconButton
+                    label={`Actions for ${c.label}`}
+                    onClick={() => setMenuFor((p) => (p === c.elementId ? null : c.elementId))}
+                  >
+                    ⋯
+                  </IconButton>
+                }
               >
-                ✕
-              </Button>
+                <Menu>
+                  <MenuItem onClick={() => { setMenuFor(null); onSelectElement(c.elementId); }}>
+                    Select element
+                  </MenuItem>
+                  <MenuItem onClick={() => { setMenuFor(null); onRemove(c.elementId); }}>
+                    Remove condition
+                  </MenuItem>
+                </Menu>
+              </Popover>
             </span>
           </Row>
         ))}
