@@ -503,6 +503,110 @@ export function FieldsView({
   );
 }
 
+/* ── Dynamic pages ───────────────────────────────────────────────────────────
+ *
+ * Board 149:50 draws a `Dynamic pages ›` row in the collection footer and stops
+ * there — it names the destination without drawing it. `CollectionView` had the
+ * row behind an optional `onOpenDynamicPages`, ContentTab never passed it, and
+ * the row is conditional, so it has never once rendered. The prop was dead from
+ * the day it was added.
+ *
+ * The destination below is therefore designed, not transcribed, and it is
+ * grounded in what the field actually does: `pageSlugPattern` generates one page
+ * per record (`cms.ts:60`), so this screen is where you set it, see how many
+ * pages it will produce, and learn why nothing appears until records publish —
+ * which is the question `CMSRecordsModal` already answers in a warning banner.
+ */
+
+export function DynamicPagesView({
+  collection,
+  records,
+  onBack,
+  onSave,
+}: {
+  collection: CMSCollection;
+  records: CMSContentItem[];
+  onBack: () => void;
+  onSave: (pattern: string) => Promise<void>;
+}) {
+  const [pattern, setPattern] = React.useState(collection.pageSlugPattern ?? "");
+  const [saving, setSaving] = React.useState(false);
+  React.useEffect(() => setPattern(collection.pageSlugPattern ?? ""), [collection.pageSlugPattern]);
+
+  const trimmed = pattern.trim();
+  const dirty = trimmed !== (collection.pageSlugPattern ?? "");
+  const publishedCount = records.filter((r) => r.status === "published").length;
+
+  return (
+    <div className={CONTENT_BODY}>
+      <Crumb label={`${collection.name} · dynamic pages`} onClick={onBack} />
+      <div className={SCROLL}>
+        <div className={FIELD_LABEL}>URL pattern</div>
+        <div className={FIELD_WRAP}>
+          <TextInput
+            value={pattern}
+            placeholder="/menu/{slug}"
+            onChange={(e) => setPattern(e.target.value)}
+            aria-label="URL pattern"
+            className="tw:[font-family:var(--bk-font-mono)]"
+          />
+        </div>
+        <div className={`${SUB} tw:px-3 tw:pt-1.5 tw:leading-normal`}>
+          One page per record. Use a field slug in braces — {"{slug}"} — to build the URL.
+        </div>
+
+        {trimmed ? (
+          <div className={`${SUB} tw:px-3 tw:pt-3 tw:leading-normal`}>
+            {publishedCount === 0 ? (
+              /* The count that matters is PUBLISHED, not total: generation
+                 filters on published, so "4 records" would be a comforting
+                 number that produces nothing. */
+              <span style={{ color: "var(--bk-warning)" }}>
+                {records.length === 0
+                  ? "No records yet — nothing to generate."
+                  : `${records.length} record${records.length === 1 ? "" : "s"}, none published. Dynamic pages only generate from published records.`}
+              </span>
+            ) : (
+              `Generates ${publishedCount} page${publishedCount === 1 ? "" : "s"} from published records.`
+            )}
+          </div>
+        ) : (
+          <div className={`${SUB} tw:px-3 tw:pt-3 tw:leading-normal`}>
+            No pattern set — this collection generates no pages.
+          </div>
+        )}
+      </div>
+      {dirty && (
+        <div className={SAVEBAR} role="region" aria-label="Unsaved changes">
+          <span className="tw:text-xs tw:text-[var(--bk-warning-text)]">Unsaved changes</span>
+          <span className={SPACER} />
+          <Button
+            color="light"
+            size="xs"
+            className={GHOST}
+            onClick={() => setPattern(collection.pageSlugPattern ?? "")}
+          >
+            Discard
+          </Button>
+          <Button
+            color="light"
+            size="xs"
+            className={SAVE_LINK}
+            disabled={saving}
+            aria-busy={saving || undefined}
+            onClick={() => {
+              setSaving(true);
+              void onSave(trimmed).finally(() => setSaving(false));
+            }}
+          >
+            {saving ? "Saving…" : "Save"}
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ── Sources (151:46) ────────────────────────────────────────────────────── */
 
 /** Board 151:46 draws a status LINE under the source name — a dot, then a

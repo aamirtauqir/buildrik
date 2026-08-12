@@ -15,7 +15,7 @@ import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
 type Handler = (p: unknown) => void;
 
 function makeEngine(opts?: { collections?: CMSCollection[]; items?: CMSContentItem[] }) {
-  const collections = opts?.collections ?? [];
+  let collections = opts?.collections ?? [];
   let items = opts?.items ?? [];
   const listeners = new Map<string, Set<Handler>>();
   const sources = new Map<string, { id: string; name: string; type: string; data?: unknown }>();
@@ -26,6 +26,11 @@ function makeEngine(opts?: { collections?: CMSCollection[]; items?: CMSContentIt
     getDataBindings: () => Record<string, unknown>;
     removeDataBinding: (p: string) => void;
   }> = [];
+  const updateCollection = vi.fn((id: string, updates: Record<string, unknown>) => {
+    collections = collections.map((c) => (c.id === id ? { ...c, ...updates } : c));
+    return Promise.resolve(collections.find((c) => c.id === id) ?? null);
+  });
+
   const composer = {
     on: (ev: string, fn: Handler) => (listeners.get(ev) ?? listeners.set(ev, new Set()).get(ev)!).add(fn),
     off: (ev: string, fn: Handler) => listeners.get(ev)?.delete(fn),
@@ -93,10 +98,14 @@ function makeEngine(opts?: { collections?: CMSCollection[]; items?: CMSContentIt
         deleteContentItem: vi.fn(() => Promise.resolve(true)),
         addField: vi.fn(() => Promise.resolve(null)),
         deleteField: vi.fn(() => Promise.resolve(true)),
+        /* Mutates the array the getters read from, so a save is observable the
+           way it is in the engine — a spy that only records the call would pass
+           even if the panel never re-read the collection. */
+        updateCollection,
       },
     },
   };
-  return { composer, elements, sources };
+  return { composer, elements, sources, updateCollection };
 }
 
 const MENU = {
@@ -245,6 +254,27 @@ describe("ContentTab", () => {
     expect(composer.data.bindCondition).toHaveBeenCalledWith(
       elements[0],
       expect.objectContaining({ operator: "==", left: "site.open", right: "true" }),
+    );
+  });
+
+  /* Regression. `CollectionView` renders the Dynamic pages row only when
+     `onOpenDynamicPages` is supplied, and ContentTab never supplied it, so the
+     row board 149:50 draws had never rendered once. This fails without the
+     wiring. */
+  it("reaches Dynamic pages from a collection and saves the URL pattern", async () => {
+    const { composer, updateCollection } = makeEngine({ collections: [MENU], items: [] });
+    render(<ContentTab composer={composer as never} />);
+    fireEvent.click(await screen.findByText("Menu items"));
+
+    const row = await screen.findByText("Dynamic pages");
+    fireEvent.click(row);
+
+    const input = await screen.findByLabelText("URL pattern");
+    fireEvent.change(input, { target: { value: "/menu/{slug}" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+
+    await waitFor(() =>
+      expect(updateCollection).toHaveBeenCalledWith(MENU.id, { pageSlugPattern: "/menu/{slug}" }),
     );
   });
 

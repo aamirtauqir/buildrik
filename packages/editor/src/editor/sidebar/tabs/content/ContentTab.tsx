@@ -32,6 +32,7 @@ import {
 import { useContentPanel } from "./useContentPanel";
 import {
   CollectionView,
+  DynamicPagesView,
   ConditionsView,
   FieldsView,
   RecordView,
@@ -250,6 +251,7 @@ export const ContentTab: React.FC<ContentTabProps> = ({
           onOpenRecord={(recordId) => setView({ kind: "record", collectionId: view.id, recordId })}
           onAddRecord={() => setView({ kind: "record", collectionId: view.id, recordId: null })}
           onOpenFields={() => setView({ kind: "fields", collectionId: view.id })}
+          onOpenDynamicPages={() => setView({ kind: "dynamic-pages", collectionId: view.id })}
         />
       ) : null;
       break;
@@ -288,6 +290,27 @@ export const ContentTab: React.FC<ContentTabProps> = ({
           onBack={() => setView({ kind: "collection", id: view.collectionId })}
           onAddField={(name, type, required) => panel.addField(view.collectionId, name, type, required)}
           onDeleteField={(fieldId) => panel.deleteField(view.collectionId, fieldId)}
+        />
+      ) : null;
+      break;
+    }
+    case "dynamic-pages": {
+      const collection = collectionFor(view.collectionId);
+      body = collection ? (
+        <DynamicPagesView
+          collection={collection}
+          records={panel.records}
+          onBack={() => setView({ kind: "collection", id: view.collectionId })}
+          onSave={async (pattern) => {
+            if (!composer) return;
+            /* Empty clears the binding rather than storing "" — a collection
+               with an empty pattern is one that generates nothing, and the
+               field is optional in the model. */
+            await composer.cms.collections.updateCollection(view.collectionId, {
+              pageSlugPattern: pattern || undefined,
+            });
+            reload();
+          }}
         />
       ) : null;
       break;

@@ -25,6 +25,7 @@ export type ContentView =
   | { kind: "collection"; id: string }
   | { kind: "record"; collectionId: string; recordId: string | null }
   | { kind: "fields"; collectionId: string }
+  | { kind: "dynamic-pages"; collectionId: string }
   | { kind: "sources" }
   | { kind: "variables" }
   | { kind: "conditions" };
