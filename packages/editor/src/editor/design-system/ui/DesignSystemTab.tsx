@@ -66,6 +66,7 @@ import { StylesSection, useStylesSectionTotalDirty } from "./sections/StylesSect
 import { ComponentsSection } from "./sections/ComponentsSection";
 import { ExportSection } from "./sections/ExportSection";
 import { LintSection } from "./sections/LintSection";
+import { StartersSection } from "./sections/StartersSection";
 import { useDSLint } from "../state/useDSLint";
 // ─── Layout ───────────────────────────────────────────────────────────────────
 
@@ -84,7 +85,7 @@ const CRUMB =
 
 // ─── Section types ────────────────────────────────────────────────────────────
 
-type DesignSection = "tokens" | "styles" | "components" | "lint" | "export";
+type DesignSection = "tokens" | "styles" | "starters" | "components" | "lint" | "export";
 
 /**
  * Brand root — a drill-in list, not a tab bar (M5).
@@ -108,8 +109,6 @@ type DesignSection = "tokens" | "styles" | "components" | "lint" | "export";
  *                   registries. `ColorModeToggle` keeps working where it is.
  *   · Typography  — `TypeTokenList` needs the full token registry plumbing that
  *                   `TokensSection` does internally; it is not liftable as-is.
- *   · Starters    — `StarterGalleryModal` is a modal, and the board draws a
- *                   destination. Making it a row would misreport what it is.
  *
  * Row counts: only Lint carries one, because only Lint has a real number to
  * hand. The others need registry sizes that are not aggregated here yet, and a
@@ -120,6 +119,7 @@ type DesignSection = "tokens" | "styles" | "components" | "lint" | "export";
 const SECTIONS: Array<{ id: DesignSection; label: string; hint: string }> = [
   { id: "tokens",     label: "Tokens",          hint: "Colours, type, spacing" },
   { id: "styles",     label: "Presets",         hint: "Component style presets" },
+  { id: "starters",   label: "Starters",        hint: "Whole-brand starting points" },
   { id: "components", label: "Components",      hint: "What the brand ships" },
   { id: "lint",       label: "Lint",            hint: "What breaks the brand" },
   { id: "export",     label: "Import / export", hint: "Move the brand in and out" },
@@ -155,6 +155,8 @@ function dirtyCount(reg: KindRegistryLike): number {
 
 interface DesignSystemTabProps {
   composer: Composer | null;
+  /** Scopes the starter token blob in storage — Starters is a destination now. */
+  projectId?: string | null;
   isExpanded?: boolean;
   onExpandToggle?: () => void;
   onHelpClick?: () => void;
@@ -163,6 +165,7 @@ interface DesignSystemTabProps {
 
 export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
   composer,
+  projectId,
   isExpanded,
   onExpandToggle,
   onHelpClick,
@@ -716,6 +719,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
               onOpenAIAssist={() => setAiOpen(true)}
             />
           )}
+          {activeSection === "starters"   && <StartersSection projectId={projectId} />}
           {activeSection === "lint"       && <LintSection issues={lintIssues} />}
           {activeSection === "export"     && <ExportSection />}
         </div>

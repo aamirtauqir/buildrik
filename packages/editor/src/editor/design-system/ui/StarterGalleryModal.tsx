@@ -62,25 +62,7 @@ export const StarterGalleryModal: React.FC<StarterGalleryModalProps> = ({
           </ModalDescription>
         </div>
 
-        <div
-          role="radiogroup"
-          aria-label="Starter design systems"
-          style={{
-            padding: "24px 28px",
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: 12,
-          }}
-        >
-          {STARTER_DS_REGISTRY.map((s) => (
-            <StarterCard
-              key={s.id}
-              starter={s}
-              selected={s.id === selectedId}
-              onSelect={() => setSelectedId(s.id)}
-            />
-          ))}
-        </div>
+        <StarterGrid columns={3} selectedId={selectedId} onSelect={setSelectedId} />
 
         <ModalFooter style={{ padding: "16px 28px", borderTop: "1px solid var(--bk-border)" }}>
           <div style={{ fontSize: 11, color: "var(--bk-ink-muted)", marginRight: "auto" }}>
@@ -102,6 +84,40 @@ export const StarterGalleryModal: React.FC<StarterGalleryModalProps> = ({
     </ModalRoot>
   );
 };
+
+/** The card grid, shared by the first-run modal and the Brand > Starters
+ *  destination (board 152:137, which draws two columns in a 320 panel). */
+export function StarterGrid({
+  columns,
+  selectedId,
+  onSelect,
+}: {
+  columns: number;
+  selectedId: string;
+  onSelect: (id: string) => void;
+}) {
+  return (
+    <div
+      role="radiogroup"
+      aria-label="Starter design systems"
+      style={{
+        padding: "24px 28px",
+        display: "grid",
+        gridTemplateColumns: `repeat(${columns}, 1fr)`,
+        gap: 12,
+      }}
+    >
+      {STARTER_DS_REGISTRY.map((s) => (
+        <StarterCard
+          key={s.id}
+          starter={s}
+          selected={s.id === selectedId}
+          onSelect={() => onSelect(s.id)}
+        />
+      ))}
+    </div>
+  );
+}
 
 interface StarterCardProps {
   starter: StarterDS;

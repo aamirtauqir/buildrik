@@ -52,7 +52,7 @@ beforeEach(() => {
 });
 
 describe("DesignSystemTab — 14-kind aggregation", () => {
-  it("renders all five destinations on the Brand root", () => {
+  it("renders all six destinations on the Brand root", () => {
     const composer = makeFakeComposer();
     const { container } = render(wrap(<DesignSystemTab composer={composer} />));
     // M5: the section switcher is a drill-in list, so the destinations are
@@ -60,8 +60,8 @@ describe("DesignSystemTab — 14-kind aggregation", () => {
     const rows = Array.from(
       container.querySelectorAll<HTMLButtonElement>("[data-section-id]"),
     ).map((r) => r.textContent ?? "");
-    expect(rows).toHaveLength(5);
-    for (const label of ["Tokens", "Presets", "Components", "Lint", "Import / export"]) {
+    expect(rows).toHaveLength(6);
+    for (const label of ["Tokens", "Presets", "Starters", "Components", "Lint", "Import / export"]) {
       expect(rows.some((r) => r.includes(label))).toBe(true);
     }
   });

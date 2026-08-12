@@ -243,7 +243,7 @@ export const TabRouter: React.FC<TabRouterProps> = ({
       );
 
     case "design":
-      return <DesignSystemTab composer={composer} {...commonTabProps} />;
+      return <DesignSystemTab composer={composer} projectId={projectId} {...commonTabProps} />;
 
     default:
       return null;
