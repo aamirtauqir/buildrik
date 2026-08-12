@@ -51,9 +51,9 @@ export const ReplaceAcrossModal: React.FC<ReplaceAcrossModalProps> = ({
   open,
   onOpenChange,
   oldName,
-  oldSrc: _oldSrc,
+  oldSrc,
   newName,
-  newSrc: _newSrc,
+  newSrc,
   pages,
   onConfirm,
 }) => {
@@ -109,11 +109,11 @@ export const ReplaceAcrossModal: React.FC<ReplaceAcrossModalProps> = ({
 
         {/* Replacing / With strip */}
         <div className={`tw:flex tw:gap-4 tw:py-3 ${SECTION_X} tw:border-b ${HAIRLINE}`}>
-          <ThumbBlock label="Replacing" name={oldName} kind="old" />
+          <ThumbBlock label="Replacing" name={oldName} src={oldSrc} kind="old" />
           <div className="tw:flex tw:items-center tw:px-2">
             <ArrowRight />
           </div>
-          <ThumbBlock label="With" name={newName} kind="new" />
+          <ThumbBlock label="With" name={newName} src={newSrc} kind="new" />
         </div>
 
         {/* Per-page list */}
@@ -174,16 +174,32 @@ export const ReplaceAcrossModal: React.FC<ReplaceAcrossModalProps> = ({
 interface ThumbBlockProps {
   label: string;
   name: string;
+  /** The image itself. Board 1164:4738 draws a placeholder rectangle in this
+   *  slot; a placeholder rectangle in a wireframe means "image goes here", and
+   *  the srcs were already being handed to this modal and thrown away — the
+   *  props were destructured to `_oldSrc` / `_newSrc`. A confirm whose whole
+   *  job is "are you replacing the right picture with the right picture"
+   *  cannot answer it with two coloured boxes. */
+  src?: string;
   kind: "old" | "new";
 }
 
-function ThumbBlock({ label, name, kind }: ThumbBlockProps) {
+function ThumbBlock({ label, name, src, kind }: ThumbBlockProps) {
   const isNew = kind === "new";
+  const frame = `${HERO_THUMB} ${isNew ? `${TINT_ACCENT} tw:border-2 tw:border-blue-700` : `${TINT_WARM} tw:border ${HAIRLINE}`}`;
   return (
     <div className="tw:flex tw:flex-1 tw:items-center tw:gap-2.5">
-      <div
-        className={`${HERO_THUMB} ${isNew ? `${TINT_ACCENT} tw:border-2 tw:border-blue-700` : `${TINT_WARM} tw:border ${HAIRLINE}`}`}
-      />
+      {src ? (
+        <img
+          src={src}
+          alt=""
+          className={`${frame} tw:object-cover`}
+        />
+      ) : (
+        /* No src (a non-image asset, or one whose URL has expired) keeps the
+           board's plain frame rather than a broken-image glyph. */
+        <div className={frame} />
+      )}
       <div>
         <div
           className={`tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.04em] ${

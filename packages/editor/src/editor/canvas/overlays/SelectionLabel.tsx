@@ -17,7 +17,11 @@ export interface SelectionLabelProps {
   canvasRef: React.RefObject<HTMLDivElement | null>;
   onSelectParent: () => void;
   onOpenSettings?: () => void;
-  onAncestorClick?: (ancestorId: string) => void;
+  /* REQUIRED, not optional. The ancestor dropdown always renders its rows and
+     every row calls this — an optional handler let the only consumer omit it,
+     and the dropdown closed on click while selecting nothing. Required means
+     the compiler catches the next omission instead of a user finding it. */
+  onAncestorClick: (ancestorId: string) => void;
 }
 
 interface ElementPosition {
@@ -216,7 +220,7 @@ export const SelectionLabel: React.FC<SelectionLabelProps> = ({
             <Button
               key={ancestor.id}
               onClick={() => {
-                onAncestorClick?.(ancestor.id);
+                onAncestorClick(ancestor.id);
                 setShowDropdown(false);
               }}
               style={{

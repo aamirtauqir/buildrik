@@ -97,4 +97,21 @@ describe("ReplaceAcrossModal", () => {
     fireEvent.click(getByLabelText("Replace on About"));
     expect(getByText(/\(skipped\)/)).toBeTruthy();
   });
+
+  /* The modal took oldSrc/newSrc and destructured them to `_oldSrc`/`_newSrc`,
+     so the confirm that exists to answer "am I replacing the right picture with
+     the right picture" showed two coloured boxes. The harness passed both srcs
+     all along — nothing here asserted they reached the DOM. */
+  it("shows both images, so the swap can actually be checked", () => {
+    /* baseElement, not container: the modal portals out of the render root. */
+    const { baseElement } = renderModal();
+    const srcs = Array.from(baseElement.querySelectorAll("img")).map((i) => i.getAttribute("src"));
+    expect(srcs).toContain("old.png");
+    expect(srcs).toContain("new.png");
+  });
+
+  it("keeps the plain frame when an asset has no src, not a broken image", () => {
+    const { baseElement } = renderModal({ oldSrc: undefined, newSrc: undefined });
+    expect(baseElement.querySelectorAll("img")).toHaveLength(0);
+  });
 });
