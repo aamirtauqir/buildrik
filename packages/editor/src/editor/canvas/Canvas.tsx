@@ -7,6 +7,7 @@
 
 import * as React from "react";
 import { EVENTS } from "../../shared/constants/events";
+import { THRESHOLDS } from "../../shared/constants";
 import { useToast } from "@/editor/chrome-ui";
 import { getElementId } from "../../shared/utils/dragDrop";
 import type { CanvasProps, CanvasRef } from "./Canvas.types";
@@ -273,7 +274,12 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       if (vw <= 0 || vh <= 0) return;
       const scale = Math.min(vw / cw, vh / ch);
       const clamped = Math.max(0.1, Math.min(5, scale));
-      composer.setZoom(Math.round(clamped * 100) / 100);
+      /* PERCENT, not a fraction. `setZoom` clamps to THRESHOLDS.ZOOM_MIN/MAX,
+         which are 10 and 500, and every readout renders `{Math.round(zoom)}%`.
+         This sent `clamped * 100 / 100` — 0.85 for an 85% fit — which clamped
+         straight to 10, so Fit to screen snapped the canvas to 10% instead of
+         fitting it. */
+      composer.setZoom(Math.round(clamped * 100));
     }, [composer]);
 
     React.useEffect(() => {
@@ -284,6 +290,26 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
         composer.off(EVENTS.ZOOM_FIT, handler);
       };
     }, [composer, handleFitToScreen]);
+
+    /* ZOOM_IN / ZOOM_OUT had no listener anywhere. BOTH command palettes emit
+       them — the shell's ⌘K (CommandPalette.tsx:125,132) and the canvas's own
+       ⌘⇧P (useCanvasCommandPalette.ts:113,121) — so "Zoom in" was a command you
+       could find, read and run, and nothing moved. Steps by THRESHOLDS.ZOOM_STEP
+       on the same percent scale ZoomControls uses. */
+    React.useEffect(() => {
+      if (!composer) return;
+      const step = (delta: number) => () => {
+        composer.setZoom(composer.getState().zoom + delta);
+      };
+      const zoomIn = step(THRESHOLDS.ZOOM_STEP);
+      const zoomOut = step(-THRESHOLDS.ZOOM_STEP);
+      composer.on(EVENTS.ZOOM_IN, zoomIn);
+      composer.on(EVENTS.ZOOM_OUT, zoomOut);
+      return () => {
+        composer.off(EVENTS.ZOOM_IN, zoomIn);
+        composer.off(EVENTS.ZOOM_OUT, zoomOut);
+      };
+    }, [composer]);
 
     // Command palette + cheat sheet (delegated to hooks)
     const { isPaletteOpen, closePalette, commands } = useCanvasCommandPalette({
