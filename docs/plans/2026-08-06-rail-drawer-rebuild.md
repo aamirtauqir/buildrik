@@ -696,7 +696,51 @@ built with the panel and carry their board ids in the source
 (`/* ── Root (148:2) + empty (149:7) ── */` and so on). Count board ids the code
 claims, then verify them; never count commits.
 
-### Content — what is left, and why it is not code
+### Content — CLOSED 2026-08-12, 15/15
+
+Walked board by board. `2f12e5e7` records modal · `975c8500` sources, fields,
+variables, conditions · `c72f42f9` unsaved save bar + loading skeleton ·
+`5e0d9cf1` the watching state.
+
+| Board | Outcome |
+|---|---|
+| 148:2 root · 149:7 empty · 149:50 collection · 149:84 record · 453:4010 load-error | already conformant — verified against the frames, no change |
+| 1170:4713 collection-setup | conformed earlier (`7fcb6fb9`) |
+| 1170:4749 records modal | flat one-column list → table built from the collection's leading fields + Updated |
+| 151:46 sources | status line with a dot; `⋯` → Remove source; "+ Connect a source" |
+| 151:2 fields | type as prose ("Rich text", not `richtext`); ✕ → `⋯` |
+| 151:62 variables · 151:87 conditions | text-button pairs → `⋯` row menus |
+| 149:108 unsaved | warn-tinted save bar; Save as accent text, not a filled button |
+| 775:4241 loading | flat bars → the root's own structure with skeletons in it |
+| 303:2067 · 303:2083 | the two markers, resolved — see below |
+
+**Real bugs the walk turned up**, all pre-existing and none visible to types:
+
+- `DataManager.unregisterSource` had existed since the manager shipped and **no
+  UI ever called it** — a source could be added and never removed. The `⋯` the
+  board draws on each source row is what exposes it.
+- `ContentTab` subscribed to `CollectionManager`'s events and to **nothing on
+  `DataManager`**, a different emitter. The Sources view refreshed only because
+  `importJson` and `removeSource` called `reload()` by hand, so a source changed
+  from anywhere else left the panel stale and silent.
+- The test mock's `composer.data` carried no `on`/`off`, making it a weaker
+  DataManager than the real one — it could not have caught either.
+
+**On the two marker boards.** I first read them as annotations of a capability
+that does not exist and deferred both. That was right about the SAMPLE and wrong
+about the STATE: "Connected · synced 4m ago" is a Google Sheets integration this
+codebase has nothing to do with, but "no source connected" is simply the empty
+state (now in the board's own words), and "watching for changes" became true the
+moment the panel subscribed to DataManager. The lesson is narrower than "markers
+need a redraw": read what state the pill NAMES, separately from the frame it was
+pasted on.
+
+Still not built, and deliberately: `Import JSON` on 1170:4749 (no bulk-import
+path on the engine — a test asserts the button does not render), and the sync
+clock on 151:46 (`DataSource` carries no timestamp; `DataManager.watch()`
+watches a local data path, not a remote file).
+
+### Superseded — the earlier "what is left" note
 
 - `1170:4749` records (modal) — **DONE 2026-08-12** (`2f12e5e7`). Table built
   from the collection's leading fields + Updated; count moved into the title;
