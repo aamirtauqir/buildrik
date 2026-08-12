@@ -63,7 +63,17 @@ const FIELD_LABEL = "tw:text-xs tw:text-gray-500 tw:mx-3 tw:mt-2.5 tw:mb-1";
  *  the field keeps the TextInput/Select wrapper theme untouched. */
 const FIELD_WRAP = "tw:px-3";
 const TOGGLE_ROW = "tw:flex tw:items-center tw:justify-between tw:p-3";
-const SAVEBAR = "tw:flex tw:items-center tw:gap-2 tw:px-3 tw:py-2.5 tw:border-t tw:border-gray-200 tw:bg-gray-50";
+/* Board 149:108 tints the save bar with the warning wash, not neutral grey —
+   the bar exists to say something is unsaved, and grey says nothing. */
+const SAVEBAR =
+  "tw:flex tw:items-center tw:gap-2 tw:px-3 tw:py-2.5 tw:border-t tw:border-gray-200 " +
+  "tw:bg-[var(--bk-warning-tint)]";
+/* …and it draws Save as accent TEXT, not a filled button. The Button doc on the
+   same Figma page is explicit that the one filled accent button belongs to the
+   screen's primary action; a drawer's save bar is not where that is spent. */
+const SAVE_LINK =
+  "tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:font-normal " +
+  "tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline";
 const HINT = "tw:text-xs tw:text-gray-500 tw:leading-normal tw:px-3 tw:py-2.5 tw:border-t tw:border-gray-200";
 const MONO = "tw:[font-family:var(--bk-font-mono)] tw:text-xs tw:text-blue-700";
 const SUB = "tw:text-xs tw:text-gray-500";
@@ -329,8 +339,11 @@ export function RecordView({
             Discard
           </Button>
           <Button
+            color="light"
             size="xs"
+            className={SAVE_LINK}
             disabled={saving}
+            aria-busy={saving || undefined}
             onClick={() => {
               setSaving(true);
               void onSave(data, published).finally(() => setSaving(false));

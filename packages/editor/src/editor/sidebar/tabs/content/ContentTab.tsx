@@ -19,7 +19,7 @@
  */
 
 import * as React from "react";
-import { Button, PanelHeader, SkeletonBlock } from "@/editor/chrome-ui";
+import { Button, PanelHeader, SectionHeader, SkeletonBlock } from "@/editor/chrome-ui";
 import { EVENTS } from "@/shared/constants";
 import type { Composer } from "@/engine";
 import type { ConditionExpression } from "@/shared/types/data";
@@ -57,6 +57,18 @@ export interface ContentTabProps {
    * it. Absent in the app — the live status wins there.
    */
   hydrationStatus?: CmsHydrationStatus;
+}
+
+/** One placeholder row of the Content root: the row glyph, then the label bar.
+ *  Board 775:4241 keeps both, so the skeleton occupies the same box the real
+ *  row will. */
+function SkeletonRow({ width }: { width: string }) {
+  return (
+    <div className="tw:flex tw:items-center tw:gap-2 tw:px-3 tw:py-2.5">
+      <SkeletonBlock className="tw:size-3.5 tw:flex-none tw:rounded-sm" />
+      <SkeletonBlock className={`tw:h-3 ${width}`} />
+    </div>
+  );
 }
 
 export const ContentTab: React.FC<ContentTabProps> = ({
@@ -173,9 +185,20 @@ export const ContentTab: React.FC<ContentTabProps> = ({
           </Button>
         </div>
       ) : (
-        <div className="tw:flex tw:flex-col tw:gap-2 tw:px-4 tw:py-3" data-testid="content-loading" aria-busy="true" aria-label="Loading collections">
-          {["tw:w-40", "tw:w-32", "tw:w-44", "tw:w-28"].map((w, i) => (
-            <SkeletonBlock key={i} className={`tw:h-4 ${w}`} />
+        /* Board 775:4241 draws the ROOT'S OWN STRUCTURE with skeletons inside
+           it — the COLLECTIONS and DATA bands are already there, and each
+           placeholder row carries the row glyph as well as the label bar. The
+           flat list of four bars this replaces reflowed the whole panel the
+           moment data landed, which is the one thing a skeleton exists to
+           prevent. */
+        <div data-testid="content-loading" aria-busy="true" aria-label="Loading collections">
+          <SectionHeader tint>Collections</SectionHeader>
+          {["tw:w-40", "tw:w-24", "tw:w-44"].map((w, i) => (
+            <SkeletonRow key={`c${i}`} width={w} />
+          ))}
+          <SectionHeader tint>Data</SectionHeader>
+          {["tw:w-28", "tw:w-20", "tw:w-36"].map((w, i) => (
+            <SkeletonRow key={`d${i}`} width={w} />
           ))}
         </div>
       );
