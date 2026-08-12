@@ -378,7 +378,19 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
                 <History size={14} aria-hidden="true" /> Compare
               </Button>
             )}
-            <Button size="xs" disabled={resending} onClick={() => void doResend()} aria-busy={resending || undefined}>Re-send</Button>
+            {/* Disabled with the reason when the shell has not supplied a
+                re-send path, never silently inert. `doResend` opens with
+                `if (!onResend) return;`, so without this the button was live,
+                clickable and did nothing at all — which is how it shipped. */}
+            <Button
+              size="xs"
+              disabled={resending || !onResend}
+              title={!onResend ? "Re-send isn't available here" : undefined}
+              onClick={() => void doResend()}
+              aria-busy={resending || undefined}
+            >
+              Re-send
+            </Button>
             <Popover
               open={moreOpen}
               onClose={() => setMoreOpen(false)}

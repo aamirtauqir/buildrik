@@ -77,6 +77,8 @@ export interface LeftSidebarProps {
   onOpenLibrary?: (opts?: { searchQuery?: string; folderId?: string | null }) => void;
   /** P4.2 — opens the CMS collection-setup modal from the Content tab (data-first). */
   onCreateCollection?: () => void;
+  /** P0 review loop: full re-send, forwarded to ReviewTab. */
+  onResendReview?: () => Promise<void>;
   /** §17 — opens ImageEditorModal for asset crop/rotate/adjust in panel-mode MediaTab. */
   onOpenImageEditor?: (
     imageSrc: string,
@@ -337,6 +339,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   onVercelPublish,
   onOpenLibrary,
   onCreateCollection,
+  onResendReview,
   onOpenImageEditor,
   onOpenIconPicker,
 }) => {
@@ -613,6 +616,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
                   onOpenImageEditor={onOpenImageEditor}
                   onOpenIconPicker={onOpenIconPicker}
                   onCreateCollection={onCreateCollection}
+                  onResendReview={onResendReview}
                 />
               </React.Suspense>
             </div>

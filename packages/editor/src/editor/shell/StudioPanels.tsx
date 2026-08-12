@@ -74,6 +74,8 @@ export interface StudioPanelsProps {
     onSelect: (icon: IconConfig) => void
   ) => void;
   onOpenCreateCollection?: () => void;
+  /** P0 review loop: full re-send for the Review panel. */
+  onResendReview?: () => Promise<void>;
   onOpenImageEditor?: (
     imageSrc: string,
     onSave: (editedSrc: string) => void | Promise<void>,
@@ -188,6 +190,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   onOpenMediaLibrary,
   onOpenIconPicker,
   onOpenCreateCollection,
+  onResendReview,
   onOpenImageEditor,
   canvasRef,
   composerContainerRef,
@@ -392,6 +395,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
             onVercelPublish={onVercelPublish}
             onOpenLibrary={handleOpenLibrary}
             onCreateCollection={onOpenCreateCollection}
+            onResendReview={onResendReview}
             onOpenImageEditor={onOpenImageEditor}
             onOpenIconPicker={onOpenIconPicker}
           />

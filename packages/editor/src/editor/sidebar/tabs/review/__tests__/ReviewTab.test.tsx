@@ -138,4 +138,25 @@ describe("actions", () => {
     fireEvent.click(screen.getByRole("button", { name: /revoke link/i }));
     await waitFor(() => expect(revokeReview).toHaveBeenCalledWith("r1", "2026-07-21T09:00:00.000Z"));
   });
+
+  /* The harness supplies onResend by default, which is exactly why nothing here
+     ever caught that the SHELL did not: the test was more capable than the app.
+     ReviewTab renders Re-send unconditionally and doResend opens with
+     `if (!onResend) return;`, so a missing path made the button live, clickable
+     and silent. It is now disabled with the reason attached. */
+  it("disables Re-send when no re-send path was supplied, instead of clicking into nothing", async () => {
+    fetchCurrentRound.mockResolvedValue(ROUND);
+    fetchReviewComments.mockResolvedValue([]);
+    renderTab({ onResend: undefined });
+    const btn = await screen.findByRole("button", { name: "Re-send" });
+    expect(btn).toBeDisabled();
+    expect(btn).toHaveAttribute("title", "Re-send isn't available here");
+  });
+
+  it("enables Re-send once a path is supplied", async () => {
+    fetchCurrentRound.mockResolvedValue(ROUND);
+    fetchReviewComments.mockResolvedValue([]);
+    renderTab();
+    expect(await screen.findByRole("button", { name: "Re-send" })).toBeEnabled();
+  });
 });

@@ -35,6 +35,8 @@ import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { useEditorEventListeners } from "./hooks/useEditorEventListeners";
 import { useEditorShortcuts } from "./hooks/useEditorShortcuts";
 import { useExportHandlers } from "./hooks/useExportHandlers";
+import { exportPublishPages } from "./exportPublishPages";
+import { submitForReview } from "../../services/ReviewService";
 import { useHistoryFeedback } from "./hooks/useHistoryFeedback";
 import { usePublishOutcomeFlash } from "./hooks/usePublishOutcomeFlash";
 import { useSaveCallback } from "./hooks/useSaveCallback";
@@ -338,6 +340,29 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   // entry points (topbar dropdown + sidebar Publish panel) are routed through
   // one confirm here rather than each growing its own.
   const [publishConfirmOpen, setPublishConfirmOpen] = React.useState(false);
+  /* Review panel re-send. `TabRouter` declares `onResendReview` and forwards it
+     to `ReviewTab` as `onResend`, and NOTHING supplied it — the chain simply
+     stopped at the shell. ReviewTab renders its "Re-send" button
+     unconditionally and `doResend` opens with `if (!onResend) return;`, so the
+     button was live, clickable, and silent.
+
+     Same path the topbar's SendForReview takes (snapshot then submit), minus
+     the note/summary/email the compose form collects: a panel re-send is a
+     fresh round of what is already there, not a new message. A failed snapshot
+     still sends — the round matters more than the preview, which is the
+     tradeoff SendForReview already makes. */
+  const resendReview = React.useCallback(async () => {
+    let snapshotPages;
+    if (composer) {
+      try {
+        snapshotPages = await exportPublishPages(composer);
+      } catch (e) {
+        console.warn("[review] snapshot render failed; re-sending without preview", e);
+      }
+    }
+    await submitForReview(undefined, undefined, undefined, snapshotPages);
+  }, [composer]);
+
   const requestPublish = React.useCallback(async () => {
     setPublishConfirmOpen(true);
   }, []);
@@ -470,6 +495,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         onOpenIconPicker={modals.openIconPicker}
         onOpenImageEditor={modals.openImageEditor}
         onOpenCreateCollection={modals.openCMSCollectionSetup}
+        onResendReview={resendReview}
         canvasRef={canvasRef}
         composerContainerRef={composerContainerRef}
         publishJob={publishJob}
