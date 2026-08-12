@@ -52,11 +52,21 @@ const FORMAT_OPTIONS: Array<{
   id: UIExportFormat;
   label: string;
   desc: string;
+  /** Offered but not selectable — the reason rides in `desc`. */
+  disabled?: boolean;
 }> = [
   { id: "css",      label: "CSS Variables",        desc: ":root block + dark mode" },
   { id: "json",     label: "JSON",                 desc: "design tokens" },
   { id: "tailwind", label: "Tailwind Config",      desc: "tailwind.config.js" },
-  { id: "figma",    label: "Figma Variables JSON", desc: "figma-variables.json" },
+  /* Board 153:120 greys this row out with "Coming soon — export JSON and use
+     the Figma Variables importer", and the board is right. The emitter here was
+     a hand-rolled envelope, `{version, format:"figma-variables", variables[]}`,
+     which is NOT the schema Figma's importer reads — so the file downloaded
+     under exactly the right name and failed on import. A control that produces
+     a convincing wrong artifact is worse than one that is switched off. */
+  { id: "figma", label: "Figma Variables JSON",
+    desc: "Coming soon — export JSON and use the Figma Variables importer",
+    disabled: true },
 ];
 
 type DarkStrategy = NonNullable<BundleOptions["darkStrategy"]>;
@@ -208,7 +218,7 @@ export const ExportSection: React.FC = () => {
           FORMAT
         </div>
         <div className="tw:flex tw:flex-col tw:gap-1.5 tw:mt-1" role="radiogroup" aria-label="Export format">
-          {FORMAT_OPTIONS.map(({ id, label, desc }) => {
+          {FORMAT_OPTIONS.map(({ id, label, desc, disabled }) => {
             const selected = format === id;
             const droppedCount = id === "tailwind" ? tailwindDropped : 0;
             const chip = chipForFormat(id, droppedCount);
@@ -217,7 +227,7 @@ export const ExportSection: React.FC = () => {
                 key={id}
                 className={`${FORMAT_ROW} ${
                   selected ? "tw:border-blue-700 tw:bg-white" : "tw:border-gray-200"
-                }`}
+                } ${disabled ? "tw:opacity-60" : ""}`}
               >
                 <Radio
                   color="blue"
@@ -226,6 +236,7 @@ export const ExportSection: React.FC = () => {
                   name="export-format"
                   value={id}
                   checked={selected}
+                  disabled={disabled}
                   onChange={() => setFormat(id)}
                   aria-label={label}
                 />

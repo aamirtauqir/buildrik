@@ -164,4 +164,22 @@ describe("DesignSystemTab → ExportSection (S5 integration)", () => {
       expect(getByText(/previewing/)).toBeTruthy();
     });
   });
+
+  /* The Figma emitter was a hand-rolled envelope, not the schema Figma's
+     importer reads, so the row downloaded a convincing wrong file under exactly
+     the right name. Board 153:120 greys it with the workaround in its own copy.
+     This test is the thing that stops a future change re-enabling a stub. */
+  it("offers Figma Variables but does not let you export a file Figma cannot read", async () => {
+    const composer = makeFakeComposer();
+    const { getAllByRole, getByTestId, container } =
+      render(wrap(<DesignSystemTab composer={composer} />));
+    const { container: c } = { container };
+    fireEvent.click(c.querySelector<HTMLButtonElement>('[data-section-id="export"]')!);
+
+    const figma = await waitFor(() => getByTestId("format-row-figma") as HTMLInputElement);
+    expect(figma).toBeDisabled();
+    // The reason travels with the row, not in a tooltip nobody opens.
+    expect(figma.closest("label")?.textContent).toMatch(/Coming soon/);
+    expect(getAllByRole("radio").length).toBeGreaterThan(1);
+  });
 });
