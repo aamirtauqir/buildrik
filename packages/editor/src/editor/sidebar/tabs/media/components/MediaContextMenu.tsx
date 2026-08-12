@@ -15,6 +15,7 @@ import * as React from "react";
 import { useClickOutside } from "../../../../../shared/hooks/useClickOutside";
 import type { LibraryItem, MediaFolder } from "../data/mediaTypes";
 import { Button } from "@/editor/chrome-ui";
+import "./MediaContextMenu.css";
 
 interface MediaContextMenuProps {
   x: number;
