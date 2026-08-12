@@ -1,5 +1,5 @@
 import * as React from "react";
-import { TokenKindCard } from "./TokenKindCard";
+import { Button } from "@/editor/chrome-ui";
 import { TokensRouter } from "./TokensRouter";
 import { GenericTokenList } from "../tokens/GenericTokenList";
 import { ColorTokenList } from "../colors/ColorTokenList";
@@ -35,6 +35,11 @@ interface TokensSectionProps {
   onResetSpacingToDefaults?: () => void;
   /** T7: composer drives per-token usage counts via TokenUsageTracker. */
   composer?: Composer | null;
+  /** Which token kind is open, or null for the kind list. Controlled by
+   *  DesignSystemTab so the panel can render ONE crumb — board 152:83 draws
+   *  `‹ Tokens · color`, not two stacked crumbs. */
+  openKind?: TokenKind | null;
+  onOpenKind?: (kind: TokenKind | null) => void;
 }
 
 interface KindEntry {
@@ -64,6 +69,8 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
   onAddTokenClick,
   onResetSpacingToDefaults,
   composer,
+  openKind = null,
+  onOpenKind,
 }) => {
   const dsMode = useDSModeOptional();
   const isBeginner = dsMode?.mode !== "pro";
@@ -317,17 +324,60 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
     >
       {({ onRowClick }) => (
         <div>
-          {ordered.map((entry) => {
+          {/* Board 152:52 draws the Tokens destination as a DRILL-IN LIST of
+              kinds — "color 18 ›" — not the accordion of expandable cards this
+              replaced. That accordion came from prototype s02 (its own comment
+              in TokenKindCard says so) and the board moved past it, the same
+              way Brand's root moved from a tab bar to a drill-in. Presets was
+              already a row list, so this brings the last Brand destination onto
+              one nav model. */}
+          {openKind === null &&
+            ordered.map((entry) => {
+              const r =
+                entry.kindId === "color" ? color
+                : entry.kindId === "type" ? type
+                : entry.kindId === "spacing" ? spacing
+                : newKindRegistry(entry.kindId);
+              const count = r ? visible(r.tokens).length : 0;
+              /* Not every registry exposes pendingDiff (SpacingRegistry does
+                 not), so the dot reads the one field they all share. */
+              const dirty = r
+                ? r.tokens.some((t) => {
+                    const saved = r.savedTokens.find((s2) => s2.id === t.id);
+                    return saved === undefined || t.value !== saved.value;
+                  })
+                : false;
+              return (
+                <Button
+                  key={entry.kindId}
+                  color="light"
+                  data-kind-id={entry.kindId}
+                  data-kind-count={count}
+                  onClick={() => onOpenKind?.(entry.kindId)}
+                  className="tw:flex tw:w-full tw:items-center tw:justify-between tw:gap-2 tw:h-auto tw:px-2 tw:py-2 tw:rounded-md tw:border-0 tw:bg-transparent tw:text-left tw:hover:bg-gray-100"
+                >
+                  <span className="tw:flex tw:items-center tw:gap-[5px] tw:text-[13px] tw:text-gray-900">
+                    {entry.title.toLowerCase()}
+                    {dirty && (
+                      <span
+                        className="tw:size-[5px] tw:flex-none tw:rounded-full tw:bg-[var(--bk-warning)]"
+                        aria-label="unsaved changes"
+                      />
+                    )}
+                  </span>
+                  <span className="tw:flex tw:flex-none tw:items-center tw:gap-1.5">
+                    <span className="tw:text-xs tw:text-gray-500">{count}</span>
+                    <span aria-hidden="true" className="tw:text-gray-400">›</span>
+                  </span>
+                </Button>
+              );
+            })}
+
+          {ordered.filter((e) => e.kindId === openKind).map((entry) => {
             if (entry.kindId === "color") {
               const visibleColor = visible(color.tokens);
               return (
-                <TokenKindCard
-                  key={entry.kindId}
-                  kindId={entry.kindId}
-                  title={entry.title}
-                  count={visibleColor.length}
-                  isDirty={colorDirty}
-                >
+                <React.Fragment key={entry.kindId}>
                   <ColorTokenList
                     tokens={visibleColor}
                     pendingDiff={color.pendingDiff}
@@ -343,19 +393,13 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
                     composer={composer}
                     onRowClick={onRowClick}
                   />
-                </TokenKindCard>
+                </React.Fragment>
               );
             }
             if (entry.kindId === "type") {
               const visibleType = visible(type.tokens);
               return (
-                <TokenKindCard
-                  key={entry.kindId}
-                  kindId={entry.kindId}
-                  title={entry.title}
-                  count={visibleType.length}
-                  isDirty={typeDirty}
-                >
+                <React.Fragment key={entry.kindId}>
                   <TypeTokenList
                     tokens={visibleType}
                     responsiveMode={type.responsiveMode}
@@ -368,19 +412,13 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
                     usageByTokenId={usageMap}
                     onRowClick={onRowClick}
                   />
-                </TokenKindCard>
+                </React.Fragment>
               );
             }
             if (entry.kindId === "spacing") {
               const visibleSpacing = visible(spacing.tokens);
               return (
-                <TokenKindCard
-                  key={entry.kindId}
-                  kindId={entry.kindId}
-                  title={entry.title}
-                  count={visibleSpacing.length}
-                  isDirty={spacingDirty}
-                >
+                <React.Fragment key={entry.kindId}>
                   <SpacingTokenList
                     tokens={visibleSpacing}
                     activePreset={spacing.activePreset}
@@ -396,7 +434,7 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
                     usageByTokenId={usageMap}
                     onRowClick={onRowClick}
                   />
-                </TokenKindCard>
+                </React.Fragment>
               );
             }
             const r = newKindRegistry(entry.kindId);
@@ -404,14 +442,7 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
             const dirty = Object.keys(r.pendingDiff).length > 0;
             const visibleR = visible(r.tokens);
             return (
-              <TokenKindCard
-                key={entry.kindId}
-                kindId={entry.kindId}
-                title={entry.title}
-                count={visibleR.length}
-                isDirty={dirty}
-                defaultOpen={visibleR.length > 0}
-              >
+              <React.Fragment key={entry.kindId}>
                 <GenericTokenList
                   tokens={visibleR}
                   pendingDiff={r.pendingDiff}
@@ -422,7 +453,7 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
                   getLintIssues={getIssues}
                   onRowClick={onRowClick}
                 />
-              </TokenKindCard>
+              </React.Fragment>
             );
           })}
           {isBeginner && (

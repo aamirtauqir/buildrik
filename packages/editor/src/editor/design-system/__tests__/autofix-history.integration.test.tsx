@@ -162,7 +162,9 @@ describe("Arc D6.c · Auto-fix history-awareness", () => {
     await new Promise((r) => setTimeout(r, 20));
 
     const { container, getByText } = render(
-      wrap(composer, <TokensSection composer={composer} />),
+      wrap(composer, /* Tokens is a drill-in (board 152:52); open the colour kind so the
+         token rows this test drives are on screen. */
+      <TokensSection composer={composer} openKind="color" />),
     );
 
     // Drill into the token. Find the row by token id, then click its "open
@@ -257,7 +259,9 @@ describe("Arc D6.c · Auto-fix history-awareness", () => {
     await new Promise((r) => setTimeout(r, 20));
 
     const { container } = render(
-      wrap(composer, <TokensSection composer={composer} />),
+      wrap(composer, /* Tokens is a drill-in (board 152:52); open the colour kind so the
+         token rows this test drives are on screen. */
+      <TokensSection composer={composer} openKind="color" />),
     );
 
     const colorRow = await waitFor(() => {

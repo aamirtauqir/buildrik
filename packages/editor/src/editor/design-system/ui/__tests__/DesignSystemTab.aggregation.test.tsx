@@ -73,6 +73,8 @@ describe("DesignSystemTab — 14-kind aggregation", () => {
     );
     // M5: Brand opens on the root list, so Tokens is entered, not defaulted to.
     fireEvent.click(container.querySelector<HTMLButtonElement>('[data-section-id="tokens"]')!);
+    // Tokens is a drill-in (board 152:52) — the kind list, then the kind.
+    fireEvent.click(container.querySelector<HTMLButtonElement>('[data-kind-id="radius"]')!);
     const radiusInput = await waitFor(
       () => getByLabelText("Small radius value") as HTMLInputElement
     );

@@ -172,6 +172,10 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
   /* Shared with DSLintBanner via `useDSLint` so the row count, the banner and
      the Lint destination can never disagree. */
   const lintIssues = useDSLint(composer);
+  /* Which token KIND is open inside the Tokens destination (board 152:52 ->
+     152:83). Held here so the panel renders ONE crumb — the board draws
+     `‹ Tokens · color`, not a second crumb stacked under the first. */
+  const [tokenKind, setTokenKind] = React.useState<string | null>(null);
   /* null = the Brand root list. Every destination is entered from it (M5). */
   const [activeSection, setActiveSection] = React.useState<DesignSection | null>(null);
   /* "root" is a real target (Back), so it cannot be modelled as null — null
@@ -386,6 +390,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
       setPendingSection(s);
       setShowSectionGuard(true);
     } else {
+      setTokenKind(null);
       setActiveSection(target);
     }
   };
@@ -612,10 +617,16 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
           <Button
             color="light"
             data-crumb-back=""
-            onClick={() => handleSectionClick("root")}
+            onClick={() => {
+              /* Back walks ONE level: out of the open token kind first, then
+                 out of the destination. */
+              if (activeSection === "tokens" && tokenKind) setTokenKind(null);
+              else handleSectionClick("root");
+            }}
             className={CRUMB}
           >
             ‹ {SECTIONS.find((s) => s.id === activeSection)?.label}
+            {activeSection === "tokens" && tokenKind ? ` · ${tokenKind}` : ""}
           </Button>
         </div>
       )}
@@ -694,6 +705,8 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
               onAddTokenClick={() => setShowAddToken(true)}
               onResetSpacingToDefaults={handleResetSpacingToDefaults}
               composer={composer}
+              openKind={tokenKind as never}
+              onOpenKind={(k) => setTokenKind(k)}
             />
           )}
           {activeSection === "styles"     && <StylesSection />}

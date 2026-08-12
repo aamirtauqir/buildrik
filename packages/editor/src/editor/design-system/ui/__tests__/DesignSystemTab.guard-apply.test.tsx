@@ -71,9 +71,18 @@ beforeEach(() => {
 
 /* M5: Brand opens on the root drill-in list, so reaching the Tokens controls
    is now an explicit navigation step rather than the default mount. */
+/* Tokens is a drill-in now (board 152:52): the destination lists KINDS and the
+   radius control lives one level further in. */
+function enterKind(utils: ReturnType<typeof render>, kind: string) {
+  const row = utils.container.querySelector<HTMLButtonElement>(`[data-kind-id="${kind}"]`);
+  if (!row) throw new Error(`token kind row ${kind} not found`);
+  fireEvent.click(row);
+}
+
 async function renderTab(composer: ComposerProp) {
   const utils = render(wrap(<DesignSystemTab composer={composer} />));
   enterSection(utils, "tokens");
+  enterKind(utils, "radius");
   const radiusInput = (await waitFor(
     () => utils.getByLabelText("Small radius value") as HTMLInputElement
   ))!;
@@ -84,9 +93,18 @@ async function renderTab(composer: ComposerProp) {
    destination. The guard fires on the FIRST move — leaving dirty work behind is
    exactly what it exists to catch — so the dirty tests below drive `leaveToRoot`
    directly instead of the old one-shot tab click. */
+/* The crumb walks ONE level. From inside a token kind that is two clicks to the
+   Brand root — out of the kind, then out of Tokens — and the guard only fires
+   on the SECOND, because leaving a kind for its kind list does not leave Tokens
+   and so cannot lose the edit. Stops on whichever arrives first. */
 function leaveToRoot(utils: ReturnType<typeof render>) {
-  const crumb = utils.container.querySelector<HTMLButtonElement>("[data-crumb-back]");
-  if (crumb) fireEvent.click(crumb);
+  for (let i = 0; i < 3; i++) {
+    if (utils.container.querySelector("[data-section-id]")) return;   // at root
+    if (utils.queryByText("Unsaved changes")) return;                 // guard took it
+    const crumb = utils.container.querySelector<HTMLButtonElement>("[data-crumb-back]");
+    if (!crumb) return;
+    fireEvent.click(crumb);
+  }
 }
 
 function enterSection(utils: ReturnType<typeof render>, id: string) {
@@ -149,6 +167,9 @@ describe("DesignSystemTab — dirty guard (TabGuardModal)", () => {
 
     expect(utils.queryByText("Unsaved changes")).toBeNull();
     expect(document.getElementById("design-section-tokens")).toBeTruthy();
+    /* Stay leaves you where the guard caught you — the kind LIST, one level up
+       from radius. The edit lives in the registry, so re-entering shows it. */
+    enterKind(utils, "radius");
     expect((utils.getByLabelText("Small radius value") as HTMLInputElement).value).toBe("10px");
   });
 
@@ -172,6 +193,7 @@ describe("DesignSystemTab — dirty guard (TabGuardModal)", () => {
     // Coming back to Tokens must NOT re-trigger the guard (clean again) and
     // the input must show the pre-edit value.
     switchSection(utils, "tokens");
+    enterKind(utils, "radius");
     expect(utils.queryByText("Unsaved changes")).toBeNull();
     await waitFor(() => {
       expect((utils.getByLabelText("Small radius value") as HTMLInputElement).value).toBe(original);
@@ -202,6 +224,7 @@ describe("DesignSystemTab — dirty guard (TabGuardModal)", () => {
       ),
     );
     enterSection(utils, "tokens");
+    enterKind(utils, "radius");
     await waitFor(() => utils.getByLabelText("Small radius value"));
 
     /* The per-section dirty DOT moved from the tab bar to the root row, so it
