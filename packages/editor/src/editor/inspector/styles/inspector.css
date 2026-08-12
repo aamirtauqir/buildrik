@@ -169,6 +169,22 @@
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
+/* Collapsed-section value readout ("16px · solid", "fade-in 300ms").
+   `.bdi-sec-name` has taken `flex: 1` since it shipped and this never had a
+   rule at all, so the preview rendered at the panel's default 13px ink and sat
+   flush against the chevron. Every Section in the inspector draws it — 34 call
+   sites — which is why one missing rule was visible everywhere and traceable
+   nowhere. Muted, mono, and truncating, because it is a value not a label. */
+.bdi-sec-h .bdi-sec-preview {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: 400 10.5px var(--bk-font-mono);
+  color: var(--bk-ink-muted);
+}
+
 .bdi-sec-h .bdi-ind {
   font: 500 9.5px var(--bk-font-mono);
   color: var(--bk-ink-soft);

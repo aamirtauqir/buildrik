@@ -1060,3 +1060,33 @@
   color: var(--bk-ink-muted);
   flex-shrink: 0;
 }
+
+/* ── Drawer drag-over feedback ───────────────────────────────────────────────
+   `med-drag-overlay` and `med-drag-label` had no rules, so dragging a file over
+   the Media drawer rendered an unpositioned div with a bare icon and a line of
+   text somewhere in the panel's flow — the panel gave no sign it would accept
+   the drop. `.med-tab` is already `position: relative`, so this fills it.
+
+   No board draws the DRAWER overlay (Media's drag-over board 1163:13948 is the
+   fullpage manager), so this follows the panel's own tokens rather than
+   inventing a second visual language. */
+.med-drag-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--bk-space-8);
+  background: var(--bk-accent-tint);
+  border: 2px dashed var(--bk-accent);
+  border-radius: var(--bk-radius-lg);
+  color: var(--bk-accent);
+  pointer-events: none;
+}
+
+.med-drag-label {
+  font: 500 13px var(--bk-font-ui);
+  color: var(--bk-accent);
+}
