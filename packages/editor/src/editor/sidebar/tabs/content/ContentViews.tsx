@@ -548,6 +548,19 @@ export function SourcesView({
   return (
     <div className={CONTENT_BODY}>
       <Crumb label="Sources" onClick={onBack} />
+      {/* Board 303:2083. Shown only when there is something to watch, and only
+          because ContentTab now subscribes to DataManager's own events — the
+          panel states this because it is true, not as decoration. */}
+      {sources.length > 0 && (
+        <div className="tw:px-3 tw:pb-1" data-testid="sources-watching">
+          <span
+            className="tw:inline-flex tw:items-center tw:gap-1.5 tw:rounded-full tw:px-2 tw:py-0.5 tw:text-xs"
+            style={{ background: "var(--bk-success-tint)", color: "var(--bk-success)" }}
+          >
+            Watching for changes
+          </span>
+        </div>
+      )}
       <div className={SCROLL}>
         {sources.map((s) => {
           const status = sourceStatus(s);

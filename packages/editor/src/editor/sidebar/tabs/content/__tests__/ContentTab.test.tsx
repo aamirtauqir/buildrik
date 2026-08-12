@@ -37,6 +37,12 @@ function makeEngine(opts?: { collections?: CMSCollection[]; items?: CMSContentIt
     },
     selection: { select: vi.fn() },
     data: {
+      /* DataManager is an emitter — the panel subscribes to its
+         source:registered/updated/unregistered events so the Sources view does
+         not go stale when a source changes from elsewhere. The mock omitted
+         on/off, which made it a weaker DataManager than the real one. */
+      on: vi.fn(),
+      off: vi.fn(),
       getSource: (id: string) => sources.get(id),
       registerSource: vi.fn((s: { id: string; name: string; type: string; data?: unknown }) => {
         if (sources.has(s.id)) throw new Error(`Data source "${s.id}" already exists`);
@@ -240,6 +246,30 @@ describe("ContentTab", () => {
       elements[0],
       expect.objectContaining({ operator: "==", left: "site.open", right: "true" }),
     );
+  });
+
+  it("subscribes to DataManager's own events so the Sources view cannot go stale", async () => {
+    const { composer } = makeEngine({ collections: [MENU], items: [] });
+    render(<ContentTab composer={composer as never} />);
+    await screen.findByText("Collections");
+    const subscribed = (composer.data.on as ReturnType<typeof vi.fn>).mock.calls.map((c) => c[0]);
+    expect(subscribed).toEqual(
+      expect.arrayContaining([
+        "source:registered",
+        "source:updated",
+        "source:unregistered",
+        "sample:imported",
+      ]),
+    );
+  });
+
+  it("says it is watching only when there is a source to watch (board 303:2083)", async () => {
+    const { composer } = makeEngine({ collections: [MENU], items: [] });
+    render(<ContentTab composer={composer as never} />);
+    fireEvent.click(await screen.findByText("Sources"));
+    // Only the live `site` variables source is registered here, and the panel
+    // filters that one out — so there is nothing to watch and no claim to make.
+    expect(screen.queryByTestId("sources-watching")).toBeNull();
   });
 
   it("sources: JSON import goes through importSampleData; bad JSON shows the error", async () => {

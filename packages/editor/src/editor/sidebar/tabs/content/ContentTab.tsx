@@ -99,8 +99,26 @@ export const ContentTab: React.FC<ContentTabProps> = ({
       EVENTS.CMS_CONTENT_DELETED,
     ] as const;
     cmsEvents.forEach((ev) => cms.on(ev, onChange));
+
+    /* Sources live on DataManager, which is a DIFFERENT emitter, and nothing
+       here was subscribed to it — the Sources view only ever refreshed because
+       importJson and removeSource call reload() by hand. A source registered or
+       updated from anywhere else left this panel showing stale rows with no
+       sign anything had happened.
+
+       Subscribing is also what makes board 303:2083's "Watching for changes"
+       true rather than decorative: the panel really is watching now. */
+    const dataEvents = [
+      EVENTS.DATA_SOURCE_REGISTERED,
+      EVENTS.DATA_SOURCE_UPDATED,
+      EVENTS.DATA_SOURCE_UNREGISTERED,
+      EVENTS.DATA_SAMPLE_IMPORTED,
+    ] as const;
+    dataEvents.forEach((ev) => composer.data.on(ev, onChange));
+
     return () => {
       cmsEvents.forEach((ev) => cms.off(ev, onChange));
+      dataEvents.forEach((ev) => composer.data.off(ev, onChange));
     };
   }, [composer, reload]);
 
