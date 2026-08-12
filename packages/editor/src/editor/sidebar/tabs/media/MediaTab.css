@@ -143,6 +143,132 @@
 }
 
 /* §21 — Replace-across per-page selector */
+/* ── Replace-across dialog shell (board 1164:4738) ──────────────────────────
+   These rules did not exist. Only the PAGE LIST below was ever styled, so the
+   dialog rendered its scrim, card, title, copy, image preview and footer with
+   no rules at all — an "alertdialog" with no position and no background, which
+   means it was not a dialog on screen, just markup in the panel's flow with two
+   full-size images in it. The page rows underneath looked right, which is
+   probably how it survived: the part with rules was the part people looked at.
+
+   Orphan classNames fail no gate, no type check and no test. Second instance
+   found in the same scan as MediaContextMenu. */
+
+.med-rx-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  /* @lint-hex-policy: scrim — matches the page-settings modal scrim shipped
+     against its own board (PagesTab.css:609). There is no scrim token; using
+     the established literal keeps one dimming value in the editor rather than
+     inventing a second. */
+  background: rgba(17, 24, 39, 0.6);
+}
+
+.med-rx-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 301;
+  width: 520px;
+  max-width: calc(100vw - 48px);
+  max-height: calc(100vh - 96px);
+  overflow-y: auto;
+  padding: var(--bk-space-24);
+  background: var(--bk-bg-card);
+  border-radius: var(--bk-radius-lg);
+  box-shadow: var(--bk-shadow-overlay);
+  font: 400 13px/18px var(--bk-font-ui);
+  color: var(--bk-ink);
+}
+
+.med-rx-title {
+  margin: 0 0 var(--bk-space-8);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--bk-ink);
+}
+
+.med-rx-body {
+  margin: 0;
+  color: var(--bk-ink-soft);
+  line-height: 20px;
+}
+
+/* Before → After. The board draws two square plates with the arrow between. */
+.med-rx-preview {
+  display: flex;
+  align-items: center;
+  gap: var(--bk-space-12);
+  margin: var(--bk-space-16) 0;
+}
+.med-rx-preview__before,
+.med-rx-preview__after {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--bk-space-4);
+  font-size: 11px;
+  color: var(--bk-ink-soft);
+}
+.med-rx-preview__before img,
+.med-rx-preview__after img {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border-radius: var(--bk-radius-md);
+  border: 1px solid var(--bk-border);
+  background: var(--bk-bg-subtle);
+}
+/* The board rings the incoming asset in accent — it is the thing being chosen. */
+.med-rx-preview__after img {
+  border: 2px solid var(--bk-accent);
+}
+.med-rx-preview__arrow {
+  font-size: 16px;
+  color: var(--bk-ink-muted);
+}
+
+.med-rx-failed {
+  margin: var(--bk-space-8) 0 0;
+  color: var(--bk-error);
+}
+
+.med-rx-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--bk-space-8);
+  margin-top: var(--bk-space-16);
+}
+
+.med-rx-btn {
+  height: 32px;
+  padding: 0 var(--bk-space-12);
+  border: 1px solid var(--bk-border);
+  border-radius: var(--bk-radius-md);
+  background: var(--bk-bg-card);
+  color: var(--bk-ink);
+  font: inherit;
+  cursor: pointer;
+}
+.med-rx-btn:hover:not(:disabled) { background: var(--bk-bg-subtle); }
+.med-rx-btn:disabled { color: var(--bk-ink-muted); cursor: not-allowed; }
+.med-rx-btn:focus-visible { outline: none; box-shadow: var(--bk-shadow-focus); }
+
+.med-rx-btn--primary {
+  border-color: var(--bk-accent);
+  background: var(--bk-accent);
+  color: var(--bk-accent-on);
+  font-weight: 500;
+}
+.med-rx-btn--primary:hover:not(:disabled) { background: var(--bk-accent-hover); }
+
+/* Result phases reuse the body copy slot, tinted by outcome. */
+.med-rx-body--success { color: var(--bk-success); }
+.med-rx-body--warn { color: var(--bk-warning); }
+.med-rx-body--error { color: var(--bk-error); }
+
 .med-rx-pages {
   list-style: none;
   margin: 12px 0;
