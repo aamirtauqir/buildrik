@@ -133,13 +133,11 @@ export const BindingRow: React.FC<BindingRowProps> = ({
               onChange(tokenId);
               setOpen(false);
             }}
-            onCustomValue={() => {
-              // S2.1 v1: bindings must reference a tokenId. Custom raw values
-              // are out-of-scope until D7 DSLinter rule decides whether
-              // unbound raw values are even allowed in presets.
-              // (TokenPickerPopover still renders the Custom tab; clicking
-              // Apply there is a no-op here.)
-            }}
+            /* No onCustomValue on purpose: a preset binding must reference a
+               tokenId until D7's DSLinter rule decides whether unbound raw
+               values are allowed at all. Omitting it now HIDES the Custom tab,
+               where before it passed a no-op and the tab's Apply button did
+               nothing at all. */
           />
         </div>
       )}

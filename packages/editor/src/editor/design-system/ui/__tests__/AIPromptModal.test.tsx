@@ -178,4 +178,27 @@ describe("AIPromptModal → Accept (Gap B — onAccept receives schema)", () => 
     expect(onAccept).toHaveBeenCalledTimes(1);
     expect(onAccept).toHaveBeenCalledWith(sentinelSchema);
   });
+
+  /* The only consumer passed an empty onAccept, so Accept closed the modal and
+     dropped the schema after the user had waited for a generation — the same
+     outcome as Discard. onAccept is optional now and the button follows it. */
+  it("renders no Accept when there is nowhere for the schema to go", async () => {
+    const service = makeService({
+      generate: vi.fn(async () => JSON.stringify(validSchema)),
+    });
+    const { getByLabelText, getByText, queryByText, findByTestId } = render(
+      <AIPromptModal open service={service} onOpenChange={vi.fn()} />
+    );
+
+    fireEvent.change(getByLabelText("Component description"), {
+      target: { value: "a pricing card" },
+    });
+    fireEvent.click(getByText("Generate"));
+    await findByTestId("ai-prompt-schema-preview");
+
+    expect(queryByText("Accept")).toBeNull();
+    // Discard and Retry still stand — the generation is readable, just not takeable.
+    expect(getByText("Discard")).toBeTruthy();
+    expect(getByText("Retry")).toBeTruthy();
+  });
 });

@@ -746,10 +746,13 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
         open={aiOpen}
         onOpenChange={setAiOpen}
         service={composer?.aiAssistService ?? null}
-        onAccept={() => {
-          // Acceptance routes the generated schema into the component catalog
-          // in a follow-up arc; modal closes itself via onOpenChange(false).
-        }}
+        /* No onAccept: there is nowhere for the schema to go yet. It is a
+           preset BINDING schema ({componentTypeId, variants, bindings}), not an
+           element tree, so ComponentManager.createComponent — which needs an
+           existing elementId — is the wrong target; the real home is the style
+           preset registries, and mapping into them is a feature, not a wiring.
+           Omitting the prop hides the Accept button, where before it rendered,
+           took the click and dropped the schema. */
       />
     </div>
   );

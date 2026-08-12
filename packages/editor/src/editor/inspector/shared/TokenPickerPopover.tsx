@@ -38,7 +38,12 @@ export interface TokenPickerPopoverProps {
   currentValue: string;
   /** Called with (tokenId, cssVar) — e.g. ("color-primary", "var(--buildrick-design-color-primary)") */
   onSelect: (tokenId: string, cssVar: string) => void;
-  onCustomValue: (value: string) => void;
+  /** Apply a raw value instead of a token. OPTIONAL: omit it and the Custom
+   *  tab does not render at all. It used to be required, so a consumer that
+   *  could not honour a raw value had to pass a no-op — and `BindingRow` did,
+   *  which shipped a Custom tab whose Apply button did nothing. A tab is not a
+   *  place to park an unimplemented decision. */
+  onCustomValue?: (value: string) => void;
   /** false = list layout (spacing/type), true = 4-col swatch grid (default, color) */
   showSwatch?: boolean;
   /** Noun shown in empty-state prompt, e.g. "color", "spacing", "type" */
@@ -92,6 +97,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
   tokenLabel = "color",
 }) => {
   const [tab, setTab] = React.useState<"tokens" | "custom">("tokens");
+  const allowCustom = onCustomValue !== undefined;
   const [customInput, setCustomInput] = React.useState(
     isValidHex(currentValue) ? currentValue : "#000000"
   );
@@ -177,7 +183,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
 
   const commitCustom = () => {
     const trimmed = customInput.trim();
-    if (trimmed) onCustomValue(trimmed);
+    if (trimmed) onCustomValue?.(trimmed);
   };
 
   return (
@@ -188,7 +194,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
     >
       {/* Tab strip */}
       <div className="tw:flex tw:border-b tw:border-gray-200">
-        {(["tokens", "custom"] as const).map((t) => (
+        {(allowCustom ? (["tokens", "custom"] as const) : (["tokens"] as const)).map((t) => (
           <Button
             key={t}
             type="button"

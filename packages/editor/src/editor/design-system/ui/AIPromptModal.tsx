@@ -37,7 +37,11 @@ export interface AIPromptModalProps {
   /** AIAssistService from composer.aiAssistService — supplied by mount. */
   service: AIAssistService | null;
   /** Called when the user confirms the generated schema. */
-  onAccept: (schema: ComponentSchema) => void;
+  /** Take the generated schema. OPTIONAL: omit it and no Accept button renders.
+   *  It was required, so the only consumer passed an empty function and the
+   *  Accept button closed the modal and dropped the schema — identical to
+   *  Discard, after the user had waited for a generation. */
+  onAccept?: (schema: ComponentSchema) => void;
 }
 
 const PLACEHOLDER =
@@ -102,7 +106,7 @@ export const AIPromptModal: React.FC<AIPromptModalProps> = ({
 
   const handleAccept = React.useCallback(() => {
     if (state.kind === "success") {
-      onAccept(state.schema);
+      onAccept?.(state.schema);
       onOpenChange(false);
     }
   }, [state, onAccept, onOpenChange]);
@@ -212,9 +216,11 @@ export const AIPromptModal: React.FC<AIPromptModalProps> = ({
               <Button color="light" size="xs" type="button" onClick={handleGenerate} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
                 Retry
               </Button>
-              <Button size="xs" type="button" onClick={handleAccept}>
-                Accept
-              </Button>
+              {onAccept && (
+                <Button size="xs" type="button" onClick={handleAccept}>
+                  Accept
+                </Button>
+              )}
             </>
           )}
 
