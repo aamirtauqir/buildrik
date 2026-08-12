@@ -1273,3 +1273,13 @@
 .bd-history-container .hidden {
   display: none !important;
 }
+
+/* Published-with-no-project. I added this className in the M2 commit and never
+   wrote its rule — an orphan I introduced in the same session that was hunting
+   them. Matches the panel's other quiet copy. */
+.bd-history-empty {
+  padding: var(--bk-space-16) var(--bk-space-12);
+  font-size: 12px;
+  color: var(--bk-ink-muted);
+  text-align: center;
+}
