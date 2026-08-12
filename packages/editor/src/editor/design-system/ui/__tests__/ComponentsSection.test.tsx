@@ -39,10 +39,13 @@ describe("ComponentsSection (Arc D2) — read-only summary", () => {
     expect(first.textContent).toMatch(/\d+ variants? · \d+ instances?/);
   });
 
-  it("renders the + Add via AI-assist CTA and Open AI-assist button", () => {
+  /* Board 153:29 pins ONE call to action at the foot — "✨ Generate with AI" —
+     where this asserted a label plus a bordered button plus a paragraph. Old
+     copy, not a regression. */
+  it("pins a single Generate with AI action at the foot of the list", () => {
     const { container } = render(<ComponentsSection composer={null} />);
     expect(container.querySelector("[data-ai-assist-cta]")?.textContent).toMatch(
-      /\+ Add via AI-assist/
+      /Generate with AI/
     );
     expect(container.querySelector("[data-open-ai-assist]")).toBeTruthy();
   });

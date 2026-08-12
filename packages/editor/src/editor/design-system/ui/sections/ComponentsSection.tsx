@@ -43,7 +43,12 @@ const CONTAINER = "tw:flex tw:flex-col tw:h-full tw:min-h-0 tw:overflow-y-auto";
 const HEADER_ROW = "tw:flex tw:items-center tw:justify-between tw:px-3 tw:pt-3 tw:pb-1 tw:gap-2";
 const HEADER_TITLE = "tw:text-xs tw:font-semibold tw:text-gray-900";
 const HEADER_SUB = "tw:px-3 tw:pb-2.5 tw:text-[11px] tw:text-gray-500";
-const CARD_GRID = "tw:grid tw:[grid-template-columns:repeat(auto-fill,minmax(110px,1fr))] tw:gap-2 tw:px-3";
+/* Board 153:29 draws Components as a DRILL-IN LIST with a chevron per row, not
+   the card grid with sketch previews this replaced. Same move Tokens and the
+   Brand root already made — the whole panel is one nav model now. */
+const ROW =
+  "tw:flex tw:w-full tw:items-center tw:justify-between tw:gap-2 tw:h-auto tw:px-2 tw:py-2 " +
+  "tw:rounded-md tw:border-0 tw:bg-transparent tw:text-left tw:hover:bg-gray-100";
 const CARD = "tw:flex tw:flex-col tw:p-2 tw:border tw:border-gray-200 tw:rounded-lg tw:bg-white tw:min-h-29";
 const PREVIEW_BOX =
   "tw:flex tw:items-center tw:justify-center tw:h-11 tw:mb-1.5 tw:rounded tw:bg-gray-50 tw:text-[10px] tw:text-gray-500";
@@ -145,29 +150,34 @@ export const ComponentsSection: React.FC<ComponentsSectionProps> = ({
         Buildrick catalog v3 · last updated {CATALOG_LAST_UPDATED}
       </div>
 
-      <div className={CARD_GRID} data-catalog-grid>
+      <div data-catalog-grid>
         {CATALOG.map((component) => {
           const variantCount = component.variants.length;
           const instanceCount = getInstanceCount(composer, component.id);
           return (
-            <div key={component.id} data-catalog-card={component.id} className={CARD}>
-              <div className={PREVIEW_BOX}>
-                <CatalogPreview component={component} />
-              </div>
-              <div className={CARD_NAME}>{component.name}</div>
-              <div className={CARD_META}>
-                {variantCount} variant{variantCount === 1 ? "" : "s"} ·{" "}
-                {instanceCount} instance{instanceCount === 1 ? "" : "s"}
-              </div>
-            </div>
+            <Button
+              key={component.id}
+              color="light"
+              data-catalog-card={component.id}
+              className={ROW}
+            >
+              <span className="tw:flex tw:flex-col tw:gap-0.5 tw:min-w-0">
+                <span className={CARD_NAME}>{component.name}</span>
+                <span className={CARD_META}>
+                  {variantCount} variant{variantCount === 1 ? "" : "s"} ·{" "}
+                  {instanceCount} instance{instanceCount === 1 ? "" : "s"}
+                </span>
+              </span>
+              <span aria-hidden="true" className="tw:flex-none tw:text-gray-400">›</span>
+            </Button>
           );
         })}
       </div>
 
-      <div className={AI_ROW}>
-        <div className={AI_CTA} data-ai-assist-cta>
-          + Add via AI-assist
-        </div>
+      {/* Board 153:29 pins ONE call to action at the foot of the list —
+          "✨ Generate with AI" — where the code had a label, a bordered button
+          and a paragraph stacked in three rows. */}
+      <div className={AI_ROW} data-ai-assist-cta>
         <Button
           type="button"
           color="light"
@@ -175,13 +185,10 @@ export const ComponentsSection: React.FC<ComponentsSectionProps> = ({
           onClick={onOpenAIAssist}
           disabled={!onOpenAIAssist}
           data-open-ai-assist
-          className="tw:border-blue-700 tw:bg-transparent tw:text-blue-700"
+          className="tw:w-full tw:justify-start tw:gap-1.5 tw:border-0 tw:bg-transparent tw:text-[13px] tw:font-normal tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
         >
-          Open AI-assist
+          ✨ Generate with AI
         </Button>
-      </div>
-      <div className={AI_DESC}>
-        Describe a component — Claude drafts a schema. Preview before adopt.
       </div>
 
       <div className={SAVED_HEADER} data-saved-header>
@@ -193,25 +200,28 @@ export const ComponentsSection: React.FC<ComponentsSectionProps> = ({
           No saved components yet — save a selection from the canvas to start.
         </div>
       ) : (
-        <div className={`${CARD_GRID} tw:pb-1`} data-saved-grid>
+        /* Saved components follow the catalog onto rows — the board draws one
+           list idiom for this destination, and two shapes in one panel is the
+           thing the drill-in was meant to end. The section itself stays: the
+           board does not draw it, and rule 1 keeps a working capability. */
+        <div className="tw:pb-1" data-saved-grid>
           {savedComponents.map((component) => {
             const instanceCount = getInstanceCount(composer, component.id);
             return (
-              <div
+              <Button
                 key={component.id}
+                color="light"
                 data-saved-card={component.id}
-                className={CARD}
+                className={ROW}
               >
-                <div className={PREVIEW_BOX}>
-                  <span className="tw:text-[10px] tw:text-gray-500">
-                    {component.name.slice(0, 4)}
+                <span className="tw:flex tw:flex-col tw:gap-0.5 tw:min-w-0">
+                  <span className={CARD_NAME}>{component.name}</span>
+                  <span className={CARD_META}>
+                    1 master · {instanceCount} instance{instanceCount === 1 ? "" : "s"}
                   </span>
-                </div>
-                <div className={CARD_NAME}>{component.name}</div>
-                <div className={CARD_META}>
-                  1 master · {instanceCount} instance{instanceCount === 1 ? "" : "s"}
-                </div>
-              </div>
+                </span>
+                <span aria-hidden="true" className="tw:flex-none tw:text-gray-400">›</span>
+              </Button>
             );
           })}
         </div>
