@@ -67,6 +67,7 @@ import { ComponentsSection } from "./sections/ComponentsSection";
 import { ExportSection } from "./sections/ExportSection";
 import { LintSection } from "./sections/LintSection";
 import { StartersSection } from "./sections/StartersSection";
+import { ColourModeSection } from "./sections/ColourModeSection";
 import { useDSLint } from "../state/useDSLint";
 // ─── Layout ───────────────────────────────────────────────────────────────────
 
@@ -85,7 +86,7 @@ const CRUMB =
 
 // ─── Section types ────────────────────────────────────────────────────────────
 
-type DesignSection = "tokens" | "styles" | "starters" | "components" | "lint" | "export";
+type DesignSection = "tokens" | "styles" | "starters" | "components" | "colour-mode" | "lint" | "export";
 
 /**
  * Brand root — a drill-in list, not a tab bar (M5).
@@ -104,9 +105,6 @@ type DesignSection = "tokens" | "styles" | "starters" | "components" | "lint" | 
  *                   such registry exists in code (`classRegistry`/`classUsage`:
  *                   zero hits). Figma-only; rule 4 says preserve the design,
  *                   not implement it. (Finding G.)
- *   · Colour mode — its board lists "tokens with NO DARK VALUE" plus a Set
- *                   action each. That query is not known to exist on the
- *                   registries. `ColorModeToggle` keeps working where it is.
  *   · Typography  — `TypeTokenList` needs the full token registry plumbing that
  *                   `TokensSection` does internally; it is not liftable as-is.
  *
@@ -121,6 +119,7 @@ const SECTIONS: Array<{ id: DesignSection; label: string; hint: string }> = [
   { id: "styles",     label: "Presets",         hint: "Component style presets" },
   { id: "starters",   label: "Starters",        hint: "Whole-brand starting points" },
   { id: "components", label: "Components",      hint: "What the brand ships" },
+  { id: "colour-mode", label: "Colour mode",    hint: "Light and dark values" },
   { id: "lint",       label: "Lint",            hint: "What breaks the brand" },
   { id: "export",     label: "Import / export", hint: "Move the brand in and out" },
 ];
@@ -720,6 +719,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
             />
           )}
           {activeSection === "starters"   && <StartersSection projectId={projectId} />}
+          {activeSection === "colour-mode" && <ColourModeSection composer={composer} />}
           {activeSection === "lint"       && <LintSection issues={lintIssues} />}
           {activeSection === "export"     && <ExportSection />}
         </div>
