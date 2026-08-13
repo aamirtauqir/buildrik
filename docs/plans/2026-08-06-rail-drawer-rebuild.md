@@ -1135,6 +1135,69 @@ steady-state showed ls-panel--closed at width 0. And browse's viewport resets
 to 1280×720 on daemon restart — re-set 1440×900 at each session start (now in
 the protocol above).
 
+### Phase 0 — Inspector empty state was unreachable (2026-08-14, `7bfd50f4`)
+
+The fifth invisible-but-healthy defect, and the purest of the class: the
+no-selection empty state (rebuilt to its board this arc — two lines +
+"✦ Ask AI ›") rendered every time into a column StudioPanels had collapsed to
+1px at x=1441 of a 1440 viewport. `inspectorOpen={!!selectedElement}` meant
+the drawn board state could NEVER appear — the exact moment "Select something
+on the canvas to edit it" exists for is the moment the column vanished.
+jsdom asserted the text happily; only the live measurement (w:1, off-screen)
+caught it. Now `inspectorOpen={!effectiveFullPageMode}`; verified live:
+deselect → visible panel. 467 shell tests green.
+
+### Phase 0 — History-Saves surfaces eye-verified 2026-08-14 (3 surfaces, 1 defect)
+
+The sixth live find (`aa77bf74`) came from simply opening the panel: the
+skeleton never resolved. VERSION_LIST_UPDATED / VERSION_LOAD_FAILED fire once
+when the manager's storage read settles, seconds after startup; the panel
+mounts minutes later and had subscribed to events already gone. The hook's
+tests emit-after-mount — the one ordering real usage never produces — so they
+stayed green for the lifetime of the bug. Fix: manager exposes
+`getLoadState()` ("loading"|"ready"|"error") read synchronously at mount;
+events now only cover a read still in flight. Two pins mount after settle.
+
+All three surfaces then verified live: **skeleton** (5 rows during load, now
+resolving to the timeline), **load-error** 453:4031 (injected
+`version:load-failed` via a fiber-walked composer handle — red heading,
+"Your versions are still stored" copy, footer "Try again"; clicking it ran a
+real reload and recovered to the list), **pruned notice** (injected
+`version:pruned {removed:12, kept:40}` — amber banner above TODAY:
+"Older auto-saves were removed / Past 40…").
+
+Verification note: no `window.composer` exists — the handle came from walking
+React fibers for a `memoizedProps.composer` (found in 30 nodes). Injection is
+the sanctioned route for states only failure produces; both injected states
+exercise the REAL listeners in panel and hook, not test doubles.
+
+### Phase 0 — Canvas remainder eye-verified 2026-08-14 (4 surfaces, 1 triple defect)
+
+Command palette (⌘K: light theme, NAVIGATION-first fixed groups, footer
+hints, shortcut chips), ctx-menu → Reveal in Layers (69666c8f live: drawer
+opens, tree expands Container→Heading, row highlighted), full Inspector on
+selection (TEXT/SIZE/SPACING sections against the board), breadcrumb bar in
+context (Canvas › Container › Heading, hints right, above the toolbar).
+
+The seventh find (`cb5fbfdb`) was the inline-edit toolbar — walked, wired
+(de783749), tested, and **unusable in every way at once**: unpainted AND
+mouse-transparent (bare in the pointer-events:none overlay host, no
+positioning wrapper), the `.bd-inline-toolbar` class its own blur/click
+guards match existed nowhere in the DOM, useCanvasInlineCommands persisted
+per-command so the engine re-render killed the session on the first click,
+and with both fixed the canvas's click-refocus still blurred the editor and
+ended the edit. Plus #111827-on-#111827 text in both toolbar Selects. Fixes:
+positioned wrapper (floatingToolbar z, pointer-events:auto, the guard class,
+preventDefault/stopPropagation pair), one-writer persistence (finishEdit
+only), bg-panel Selects. Live: two commands back-to-back with the session
+surviving, click-outside persists once.
+
+The instrument that cracked it: a capture-phase event log on document
+(mousedown/focusin/focusout sequence) — the killer was
+`focusout H2 rel=DIV.""` AFTER the command applied, the canvas stealing
+focus back. No jsdom test can produce that ordering; the pin asserts the
+toolbar-mousedown guard + zero mid-session persistence instead.
+
 ## Named for the founder — needs a decision or a file I must not stage
 
 **`ConflictModal` does not match board 66:640, and fixing it needs
