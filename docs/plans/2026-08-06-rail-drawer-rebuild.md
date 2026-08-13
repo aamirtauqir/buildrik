@@ -899,6 +899,77 @@ seven more labels naming dead keys.
 event it listens for, and diff a toolbar's dispatched command literals against
 its handler's case labels. Both found defects nothing else could see.
 
+## Cross-cutting scans — 2026-08-13 (11 defects, no boards involved)
+
+The Canvas walk's finds all had one shape: two halves that both exist and
+disagree on a NAME. That is mechanically detectable, so after Canvas closed the
+walk switched from boards to scans. Three of them, run over the whole package.
+
+### Scan 1 — every `.emit(x)` name vs every `.on(x)` name
+
+Ten defects. The pattern is a near-miss: the right name and the wrong one
+living side by side.
+
+| What broke | The miss | Commit |
+|---|---|---|
+| `saveProject` announced completion at the START — the Pages/tab-bar unsaved dots cleared before `storage.save()` ran, and stayed cleared when it threw | emitted `PROJECT_SAVED {saving:true}`; `PROJECT_SAVING` existed with no emitter | `3525b1db` |
+| Smart guides and spacing indicators measured against wherever an element sat when first measured — the bounds cache was never invalidated | 8 registrations on `element:style-changed` / `element:children-changed` / `canvas:scrolled` / `viewport:resized`; the engine sends `element:style-updated`, `canvas:scroll`, `viewport:changed` | `34dc0ec9` |
+| Zoom to Fit, Zoom In, Zoom Out changed engine state and nothing else — the canvas scales off React state | listened `device:changed` / `zoom:changed`; engine emits `BREAKPOINT_CHANGED` / `VIEWPORT_ZOOM` | `4d2d6e9c` |
+| Switching pages left the Layers panel on the previous page's tree, with expansion keyed to the old page | listened for bare `page:changed`; engine sends `PROJECT_CHANGED {type:"page:activated"}` | `cb38908d` |
+| Pages › "From template" opened the gallery whose apply path REPLACES the current page — asking for a new page overwrote the open one | `newPageMode` had neither a prop caller nor an event emitter | `c8e22a83` |
+| Resolving a comment greyed the row and left its pin open on canvas | `comments:refresh` was in CommentLayer's own docblock, with no emitter | `fc1a7102` |
+| Layers never reflected marquee / Select All | `SELECTION_MULTIPLE` and `ELEMENT_SELECTED` unsubscribed; dead `SELECTION_CHANGED` subscribed | `a78ba109` |
+| The page_added milestone suggestion never fired | listened `PAGE_CREATED`; engine sends `PROJECT_CHANGED {type:"page:created"}` | `a78ba109` |
+| "Reveal in Layers" revealed nothing; a version-preview banner that could never render | `layers:reveal` vs `SHOW_IN_LAYERS`; `VERSION_PREVIEW_STARTED` vs `VERSION_PREVIEW` | `69666c8f` |
+| `UI_OPEN_BUILD_PANEL` — a second, emitter-less way to ask for a panel `UI_PANEL_OPEN` already opens | deleted | `0a23f41a` |
+
+### Scan 2 — `default:` branches that only log or no-op
+
+18 candidates, most legitimate (icon maps, routers). One real: `"active"`
+("While Pressed") sat in the Add-Interaction picker with no case in
+`setupTrigger`, so it fell to a `devLog` that is silent in production
+(`56eee5d1`).
+
+### Scan 3 — the same exported type name declared in two files
+
+68 names. Most are benign (a barrel re-declaring its own submodule) or genuine
+homonyms (`Template` is a saved project in shared/, a static HTML block in
+templates/). Two mattered:
+
+- `InteractionTrigger` — editor 15 values, engine 13. The picker could offer a
+  trigger the runtime's exhaustive switch had never heard of and the compiler
+  had nothing to compare. This is WHY scan 2's defect existed.
+- `LintIssue` — DSLinter `{rule, severity:"warning", tokenId}` vs LintState
+  `{type: 4-value union, severity:"warn"}`, sharing not one value. They never
+  had to agree because the hand-off was never built: nothing ever called
+  `setIssues`, so the Issues panel and TokenDetailView were permanently empty
+  while the DS banner showed findings (`96fc8e4d`).
+
+### The one that generalises the rest
+
+`getPresetTimeline` implemented 2 of the inspector's 39 animation presets;
+the other 37 returned a 0.2s opacity nudge (`01deb024`). Worse than the dead
+toolbar controls, because every preset does *something* — it reads as a weak
+animation, not an unimplemented one, so the fix looks like a duration tweak.
+
+The guard that now holds it is the pattern worth copying: a test that walks the
+UI's own option catalogue and asserts each entry reaches an implementation. It
+immediately found eight presets missing from the table I had just hand-written.
+
+### What kept all of this green
+
+In five of the eleven, a TEST asserted the broken half:
+
+- `useCanvasElementDrag` drove clone with `altKey`, pinning an inverted contract
+- `standaloneActions` asserted the emit of `"layers:reveal"`
+- `SnapCalculator` + `SpacingCalculator` suites consisted ENTIRELY of assertions
+  on the four dead event names — deleting them emptied both files, so neither
+  class had ever had a test of what it computes
+- `InteractionRuntime` passed `"shake"` as its example of an *unknown* preset
+
+A green suite is not evidence a feature works. It is evidence the suite agrees
+with the code, which is also what you get when both are wrong.
+
 ## NOT in scope
 
 - ~~Inspector flat body (board `52:56` / `824:5095`) — next arc after this one;
