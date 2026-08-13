@@ -830,7 +830,28 @@ should come from the business rather than from board counts.
 
 ## NOT in scope
 
-- Inspector flat body (board `52:56` / `824:5095`) — next arc after this one;
-  already the named biggest shell mismatch.
+- ~~Inspector flat body (board `52:56` / `824:5095`) — next arc after this one;
+  already the named biggest shell mismatch.~~ **STALE, corrected 2026-08-13.**
+  It is not a mismatch any more and has not been since S3.9. `ProInspector:353`
+  carries the note itself — "no tab strip — the body below is one flat scrolling
+  column ordered per element profile" — and the scope row is the board's three
+  dropdowns (`ScopeDropdown` · `BreakpointPill` · `StateDropdown`), with
+  `InspectorTabContent` called at a fixed `tabId="style"`. That is exactly what
+  the board's own name describes: "tabs exist in data, not UI". The `✦ AI` chip
+  the board draws in the header is there too (`inspector-ai-chip`).
+
+  Whoever plans the next arc should not budget for this. Verified board-by-code
+  on 2026-08-13: of the Inspector family's 21 boards, 20 map to a code surface —
+  the 7 element profiles match 7/7 including the CONTAINER fallback, plus
+  no-selection, multi-select, instance-selected, bound-to-CMS,
+  breakpoint-override, pseudo-state, reach-whole-site, ai-agent-run and the
+  token-picker popover.
+
+  The ONE that does not: `Inspector · loading` (159:102) draws the element name
+  over six skeleton rows in the real two-column rhythm. The inspector has no
+  loading moment to show it in — `ProInspector` returns the no-selection state
+  at :266 and otherwise renders synchronously off the selected element, with no
+  awaited data gating the body. Building the skeleton would mean inventing a
+  delay to justify it. Left undone deliberately.
 - Drawer drill-ins beyond the 85 boards (Media drill-in boards ARE in the 17).
 - Backend/behaviour changes; `AquibraStudio.tsx` (founder's dirty file).
