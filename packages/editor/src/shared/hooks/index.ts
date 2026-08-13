@@ -12,8 +12,6 @@ export { useRefetchOnFocus } from "./useRefetchOnFocus";
 export { useReducedMotion } from "./useReducedMotion";
 
 // Feedback hooks (depend on Composer + events)
-export { useSaveIndicator } from "./useSaveIndicator";
-export type { SaveStatus, SaveIndicatorState } from "./useSaveIndicator";
 export { useElementFlash } from "./useElementFlash";
 
 // (usePublish removed — the sidebar PublishTab now shares the canonical

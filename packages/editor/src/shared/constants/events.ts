@@ -660,7 +660,8 @@ export interface EventPayloads {
 
   // Project Events
   [EVENTS.PROJECT_CHANGED]: void;
-  [EVENTS.PROJECT_SAVED]: import("../types").ProjectData | { saving: boolean };
+  [EVENTS.PROJECT_SAVED]: import("../types").ProjectData;
+  [EVENTS.PROJECT_SAVING]: Record<string, never>;
   [EVENTS.PROJECT_LOADED]:
     | import("../types").ProjectData
     | {

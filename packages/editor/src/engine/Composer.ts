@@ -439,7 +439,11 @@ export class Composer extends EventEmitter {
    * Save current project
    */
   async saveProject(): Promise<void> {
-    this.emit(EVENTS.PROJECT_SAVED, { saving: true });
+    /* PROJECT_SAVING, not PROJECT_SAVED-with-a-flag. Listeners read the event
+       NAME: useDirtyPages clears every dirty page marker on PROJECT_SAVED, so
+       announcing the save before storage.save() ran cleared the markers up
+       front — and left them cleared when the write threw. */
+    this.emit(EVENTS.PROJECT_SAVING, {});
 
     try {
       const data = this.exportProject();

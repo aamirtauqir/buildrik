@@ -68,6 +68,17 @@ describe("useDirtyPages", () => {
     expect(result.current.size).toBe(0);
   });
 
+  /* Composer.saveProject used to announce PROJECT_SAVED before storage.save()
+     ran, so the dots cleared up front — and stayed cleared when the write
+     threw. The start of a save is PROJECT_SAVING. */
+  it("the START of a save does not clear the dots", () => {
+    const composer = makeComposer();
+    const { result } = renderHook(() => useDirtyPages(composer));
+    act(() => composer.emit(EVENTS.ELEMENT_UPDATED));
+    act(() => composer.emit(EVENTS.PROJECT_SAVING));
+    expect(result.current.size).toBe(1);
+  });
+
   it("edits with no active page are ignored, not crashed on", () => {
     const composer = makeComposer(null);
     const { result } = renderHook(() => useDirtyPages(composer));
