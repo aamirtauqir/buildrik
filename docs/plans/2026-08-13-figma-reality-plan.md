@@ -179,13 +179,16 @@ just reads.
 ## Implementation Tasks
 Synthesized from this review's findings. Run with Claude Code; checkbox as you ship.
 
-- [ ] **T1 (P1, human: ~2h / CC: ~20min)** — conformance — Fix BrowserStack
-  env-divert so local Playwright runs stay local
+- [x] **T1 (P1)** — DONE 2026-08-14 — the editor config's loud guard already
+  refused BS creds; the real work was making local runs TRUE: Playwright
+  1.61 silently drops use.reducedMotion (explicit emulateMedia + assert now),
+  and CSS @import chains raced the measurement (stylesheetsSettled gate).
+  31/31 twice, locally (`9ac6dca2`)
   - Surfaced by: Architecture Issue 1 (1A prereq); TODOS.md already names it
   - Files: packages/editor/playwright.config.ts
   - Verify: `npx playwright test` runs local chromium with BS creds present
-- [ ] **T2 (P1, human: ~1d / CC: ~half session)** — conformance — Script the 5
-  seam-scans as `scripts/conformance/seam-scan.mjs`, WARN-mode in verify:ds
+- [x] **T2 (P1)** — DONE 2026-08-13 — seam-scan.mjs in verify:ds, WARN-mode,
+  baseline + triage notes; first run found a real dead listener
   - Surfaced by: Code Quality Issue 3 (3A)
   - Verify: plant one dead listener, scan goes amber
 - [ ] **T3 (P2, human: ~3d / CC: ~1 session)** — conformance — Playwright
@@ -196,8 +199,7 @@ Synthesized from this review's findings. Run with Claude Code; checkbox as you s
   Re-census page 1:3 at every phase close before any DONE claim
   - Surfaced by: Test Issue 4 (4A) + boards-json-not-exhaustive (2× burned)
   - Verify: counts in boards.json match a fresh name-scan
-- [ ] **T5 (P3, human: ~5min / CC: ~5min)** — protocol — Ledger note: server is
-  agent-owned (this plan already edited)
+- [x] **T5 (P3)** — DONE 2026-08-13 — protocol in plan + ledger
   - Surfaced by: Architecture Issue 2 (2A)
   - Verify: next session starts without founder action
 

@@ -1198,6 +1198,25 @@ The instrument that cracked it: a capture-phase event log on document
 focus back. No jsdom test can produce that ordering; the pin asserts the
 toolbar-mousedown guard + zero mid-session persistence instead.
 
+### Phase 0 — T1 closed: the parity harness was lying three ways (`9ac6dca2`)
+
+Chasing one flaky opacity opened the whole floor. Playwright 1.61's runner
+silently drops `use.reducedMotion` (config AND test.use; the library API
+honours it) — so every suite run raced the skeleton pulse and read a
+mid-cycle opacity lottery. Vite's synchronous `<style>` injection hides an
+async `@import` chain (default.css → design-system/index.css → a11y.css);
+measuring before it lands is how "Times" and 16px/400 browser defaults got
+committed as baselines. And folder-context-menu's probe case had been deleted
+with the 560-panel in `aff6295c` while both CASES lists and its baseline kept
+the name — "unknown case" every run since.
+
+Now: explicit `emulateMedia` + a loud matchMedia assert, a recursive
+`stylesheetsSettled()` gate in both specs, dead case removed, all 19
+baselines re-accepted under working emulation (every surface eye-verified
+live this phase; onboarding-steps accepted from its diff — browser defaults →
+designed values). **31/31, twice consecutively.** T3's snapshot pins now have
+a floor that doesn't wobble.
+
 ## Named for the founder — needs a decision or a file I must not stage
 
 **`ConflictModal` does not match board 66:640, and fixing it needs
