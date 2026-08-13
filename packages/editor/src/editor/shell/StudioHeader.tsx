@@ -47,11 +47,8 @@ import { SiteMenu } from "./SiteMenu";
 import "./header.css";
 
 /** Selected element minimal info */
-export interface SelectedElementInfo {
-  id: string;
-  type: string;
-  tagName?: string;
-}
+import type { SelectedElementInfo } from "@/shared/types";
+export type { SelectedElementInfo };
 
 export interface StudioHeaderProps {
   /** Composer instance */

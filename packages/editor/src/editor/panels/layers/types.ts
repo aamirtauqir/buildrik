@@ -4,11 +4,8 @@
  */
 
 /** Selected element info passed from parent */
-export interface SelectedElementInfo {
-  id: string;
-  type: string;
-  tagName?: string;
-}
+import type { SelectedElementInfo } from "@/shared/types";
+export type { SelectedElementInfo };
 
 /** LayersPanel component props */
 export interface LayersPanelProps {

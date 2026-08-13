@@ -46,11 +46,8 @@ export interface PanelState {
 }
 
 /** Selected element info */
-export interface SelectedElementInfo {
-  id: string;
-  type: string;
-  tagName?: string;
-}
+import type { SelectedElementInfo } from "@/shared/types";
+export type { SelectedElementInfo };
 
 /** Save operation state */
 export interface SaveState {

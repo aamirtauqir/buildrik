@@ -18,11 +18,8 @@ import { computeEffectiveStyles } from "../config/cssContext";
 // TYPES
 // ============================================================================
 
-export interface SelectedElement {
-  id: string;
-  type: string;
-  tagName?: string;
-}
+import type { SelectedElementInfo as SelectedElement } from "@/shared/types";
+export type { SelectedElement };
 
 export interface StyleHandlers {
   /** Current styles for the element */

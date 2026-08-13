@@ -15,11 +15,8 @@ import type { PseudoStateId } from "../../../shared/types";
 // TYPES
 // ============================================================================
 
-export interface SelectedElement {
-  id: string;
-  type: string;
-  tagName?: string;
-}
+import type { SelectedElementInfo as SelectedElement } from "@/shared/types";
+export type { SelectedElement };
 
 export interface InspectorState {
   /** Current pseudo-state for styling (hover, focus, etc.) */

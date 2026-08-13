@@ -13,10 +13,8 @@ import type { IconConfig } from "../../../../shared/types/media";
 // TYPES
 // ============================================================================
 
-export interface SelectedElement {
-  id: string;
-  type: string;
-}
+import type { SelectedElementInfo as SelectedElement } from "@/shared/types";
+export type { SelectedElement };
 
 export interface HandleChangeParams {
   id: string;

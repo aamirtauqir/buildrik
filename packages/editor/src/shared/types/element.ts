@@ -168,3 +168,17 @@ export interface TraitOption {
   /** Option label */
   label: string;
 }
+
+/**
+ * The minimum an element is identified by outside the engine — what the
+ * inspector, the layers tree, the header and the studio state each pass
+ * around. Six separate declarations of this same three-field shape existed
+ * (three `SelectedElement`, three `SelectedElementInfo`), which is the same
+ * setup that let a picker offer an interaction trigger the runtime had never
+ * heard of: two declarations of one value set can never fail to agree.
+ */
+export interface SelectedElementInfo {
+  id: string;
+  type: string;
+  tagName?: string;
+}
