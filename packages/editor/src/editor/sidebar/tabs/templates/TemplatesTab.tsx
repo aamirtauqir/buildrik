@@ -8,6 +8,7 @@ import * as React from "react";
 import { PanelFrame, useToast, Button, TextField } from "@/editor/chrome-ui";
 import { Search, X } from "lucide-react";
 import type { Composer } from "../../../../engine";
+import { EVENTS } from "../../../../shared/constants/events";
 import { DrillInHeader } from "../../shared/DrillInHeader";
 import { type TemplateItem, SITE_CATEGORY_PILLS, SITE_TEMPLATES, TEMPLATE_TYPE_PILLS, SUB_CATEGORY_TAGS, type SiteCategory, type TemplateType, DEFAULT_TEMPLATE_VERSION } from "./templatesData";
 import { clearAppliedId, recordTemplateApplied, saveAppliedId } from "./templatesStorage";
@@ -58,20 +59,26 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   const [showCreateConfirm, setShowCreateConfirm] = React.useState(false);
   const [createResult, setCreateResult] = React.useState<"success" | "error" | null>(null);
 
-  // §6 — newPageMode can be activated externally via composer event so any
-  // future caller (Pages tab "Add page from template", rail action, etc.)
-  // can flip the templates panel into "new page" mode without prop-drilling.
+  // §6 — newPageMode is activated by the caller that navigated here. Pages ›
+  // "From template" (LeftSidebar) emits UI_TEMPLATES_NEWPAGE_ON; without it
+  // this panel shows the ordinary gallery, whose apply path REPLACES the
+  // current page instead of creating a new one.
   const [newPageModeInternal, setNewPageModeInternal] = React.useState(false);
   const newPageMode = newPageModeProp || newPageModeInternal;
   React.useEffect(() => {
     if (!composer) return;
     const enable = () => setNewPageModeInternal(true);
     const disable = () => setNewPageModeInternal(false);
-    composer.on("ui:templates-newpage-on", enable);
-    composer.on("ui:templates-newpage-off", disable);
+    composer.on(EVENTS.UI_TEMPLATES_NEWPAGE_ON, enable);
+    composer.on(EVENTS.UI_TEMPLATES_NEWPAGE_OFF, disable);
     return () => {
-      composer.off("ui:templates-newpage-on", enable);
-      composer.off("ui:templates-newpage-off", disable);
+      composer.off(EVENTS.UI_TEMPLATES_NEWPAGE_ON, enable);
+      composer.off(EVENTS.UI_TEMPLATES_NEWPAGE_OFF, disable);
+      /* TabRouter renders one tab at a time, so leaving Templates unmounts
+         this. New-page mode belongs to the visit that asked for it — without
+         this reset, opening Templates from the rail later would still promise
+         a new page. */
+      setNewPageModeInternal(false);
     };
   }, [composer]);
 
@@ -295,14 +302,15 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
           onClose={onClose}
         />
       ) : newPageMode ? (
-        <PanelFrame.Header title="Choose a template for your new page">
-          <div className="tpl-newpage-chip">New Page</div>
-          {onClose && (
-            <Button className="tpl-header-btn" onClick={onClose} aria-label="Close templates">
-              <X size={16} />
-            </Button>
-          )}
-        </PanelFrame.Header>
+        /* PanelFrame.Header renders `actions`, never children — the chip and
+           the close button sat here as children and were dropped on the floor,
+           so the new-page header (board 807:7252) shipped without its "New
+           Page" chip and, alone among the three headers, without a way out. */
+        <PanelFrame.Header
+          title="Choose a template for your new page"
+          onClose={onClose}
+          actions={<span className="tpl-newpage-chip">New Page</span>}
+        />
       ) : (
         <PanelFrame.Header
           title="Templates"

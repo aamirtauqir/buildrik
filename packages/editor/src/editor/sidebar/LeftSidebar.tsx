@@ -603,7 +603,14 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
                   onElementSelect={onElementSelect}
                   canvasHoveredId={canvasHoveredId}
                   onSwitchToAdd={() => safeTabChange("add")}
-                  onSwitchToTemplates={() => safeTabChange("templates")}
+                  onSwitchToTemplates={() => {
+                    /* Pages › "From template" means a NEW page. Without this the
+                       Templates panel opens in its ordinary gallery mode, whose
+                       apply path replaces the CURRENT page — boards 807:7252 and
+                       1169:4725 are the new-page flow this turns on. */
+                    composer?.emit(EVENTS.UI_TEMPLATES_NEWPAGE_ON, {});
+                    safeTabChange("templates");
+                  }}
                   onSwitchToDesign={() => safeTabChange("design")}
                   onCreateComponent={handleCreateComponent}
                   onReplayTour={onReplayTour}

@@ -6,7 +6,9 @@
  */
 
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, act } from "@testing-library/react";
+import type { Composer } from "@/engine";
+import { EVENTS } from "@/shared/constants/events";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
 
@@ -53,5 +55,44 @@ describe("TemplatesTab — new-design IA (S1)", () => {
     expect(screen.queryByRole("tab", { name: "SaaS" })).not.toBeInTheDocument();
     expect(screen.queryByRole("tab", { name: "Blog" })).not.toBeInTheDocument();
     expect(screen.queryByRole("tab", { name: "E-comm" })).not.toBeInTheDocument();
+  });
+});
+
+/* Board 807:4299 vs 807:7252: the same panel, two different headers. Pages ›
+   "From template" emits UI_TEMPLATES_NEWPAGE_ON so this panel promises a new
+   page; without it the gallery's apply path replaces the current one. */
+describe("TemplatesTab — new-page mode", () => {
+  function eventComposer() {
+    const handlers = new Map<string, Set<() => void>>();
+    return {
+      on: (ev: string, fn: () => void) => {
+        if (!handlers.has(ev)) handlers.set(ev, new Set());
+        handlers.get(ev)!.add(fn);
+      },
+      off: (ev: string, fn: () => void) => handlers.get(ev)?.delete(fn),
+      emit: (ev: string) => handlers.get(ev)?.forEach((fn) => fn()),
+      elements: { getActivePage: () => null },
+    } as unknown as Composer & { emit(ev: string): void };
+  }
+
+  it("switches to the new-page header when the entry point announces it", () => {
+    const composer = eventComposer();
+    render(<TemplatesTab composer={composer} isExpanded />);
+    expect(screen.queryByText("Choose a template for your new page")).toBeNull();
+
+    act(() => composer.emit(EVENTS.UI_TEMPLATES_NEWPAGE_ON));
+
+    expect(screen.getByText("Choose a template for your new page")).toBeInTheDocument();
+    expect(screen.getByText("New Page")).toBeInTheDocument();
+  });
+
+  it("drops new-page mode when the panel is left", () => {
+    const composer = eventComposer();
+    const { unmount } = render(<TemplatesTab composer={composer} isExpanded />);
+    act(() => composer.emit(EVENTS.UI_TEMPLATES_NEWPAGE_ON));
+    unmount();
+
+    render(<TemplatesTab composer={composer} isExpanded />);
+    expect(screen.queryByText("Choose a template for your new page")).toBeNull();
   });
 });
