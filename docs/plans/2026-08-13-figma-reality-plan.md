@@ -45,6 +45,11 @@ re-run `verify:ds` (Gate 24 caught this walk's own breadcrumb).
 
 ### Phase 0 — verify the debt (1–2 sessions) ← START HERE
 
+**First task (eng-review 3A): script the 5 seam-scans as
+`scripts/conformance/seam-scan.mjs`, WARN-mode in `verify:ds`.** They produced
+~25 defects and exist only as session knowledge; phases 1–2 must run inside
+the net, not before it.
+
 The 140 walked boards were walked before the server existed. Round 1 found
 defects at 3-per-4-surfaces on exactly such boards. Batch eye-verify per
 family, rebuilt/high-risk surfaces first:
@@ -88,16 +93,22 @@ Human verification decays; the net is what holds.
 
 1. Every walked board gets its `recipe` filled in `boards.json` —
    `coveredFloor` ratchets it (already wired in `check-boards.mjs`, floor 9).
-2. High-risk surfaces get a measured spec (`specs/` + `measure.mjs`) — extend
-   from 8 toward every stateful panel. Probes are thermometers, not
-   acceptance (founder rule stands) — they exist to catch REGRESSION after
-   the eye has accepted once.
+2. **(eng-review 1A) The visual pin is Playwright `toHaveScreenshot`** — a
+   baseline captured per surface at the moment the eye accepts, using the
+   existing e2e probe harness (probe.tsx MUST import flowbiteStore; portalled
+   content asserts `data-probe-ready`, never `waitFor`). Prereq: fix the
+   BrowserStack env-divert so local runs stay local. `measure.mjs` probes stay
+   only for surfaces whose dynamic content breaks pixel-diff. Rationale: all
+   three live-round defects (clipping, z-order ×2) are invisible to probes and
+   to jsdom — only pixels catch the class.
 3. The 5 scans become a script (`scripts/conformance/seam-scan.mjs`) run in
    `verify:ds` — emit-vs-listen and option-catalogue found 25 defects; they
    should never need a human to remember them.
 
 ## Standing protocol — live verify (hard-won, follow exactly)
 
+- **Server is agent-owned (2A):** probe 5050 at session start; if down, start
+  `npm run dev` in background and retry with backoff. Never block on the founder.
 - `browse` at **1440×900**, element selected where the board shows selection.
 - Popovers: `chain` + `screenshot --viewport` + JS `.click()` — full-page
   screenshots SCROLL and close popovers; Playwright clicks scroll-into-view.
@@ -117,7 +128,9 @@ Human verification decays; the net is what holds.
    `AquibraStudio.tsx` (your file).
 4. **`PAGE_CHANGED` listener** in `AquibraStudio.tsx:248` — one-line fix
    written out in the ledger; your file, your commit.
-5. **Dev server uptime** — every session needs it now; Phase 0 dies without.
+(Gate removed by eng-review 2A: the dev server is the AGENT's job — probe at
+session start, background-start `npm run dev` with health retries if down, as
+proven 2026-08-13. Noted in Standing protocol below.)
 
 ## Estimate (from measured rates, not hope)
 
@@ -135,7 +148,97 @@ just reads.
 
 ## What DONE looks like
 
-- `boards.json`: 363 active boards, each with a recipe; floor = 363.
+- **(eng-review 4A) Census-fresh at every phase close:** name-scan page 1:3,
+  fold new boards into `boards.json`, update counts. boards.json has missed
+  founder-drawn boards TWICE; a DONE claim against a stale census is void.
+- `boards.json`: every active board (count per the LATEST census) has a
+  recipe; floor = that count.
 - `verify:ds` green including seam-scan; pre-push unblocked.
 - A closing entry in the ledger naming the last family and the final count.
 - Founder gates 1–4 decided (any way — decided is the requirement).
+
+## NOT in scope (review-confirmed)
+
+- Design-ahead (30) and out-of-scope (23) boards — excluded by definition.
+- AI-worker raw-HTML canvas sanitize — already tracked in TODOS.md; adjacent
+  to, not part of, this arc.
+- ConflictModal "Review both" + PAGE_CHANGED one-liner — founder-file work,
+  gates 3–4.
+- Running the full Playwright suite in CI — TODOS.md item; 1A only needs
+  local snapshot runs.
+
+## What already exists (reused, not rebuilt)
+
+- `check-boards.mjs` coveredFloor ratchet — Phase 3 fills recipes into it.
+- `e2e/` probe harness (probe.tsx, style-parity patterns) — 1A builds
+  snapshot pins on it instead of a new system.
+- `measure.mjs` + 8 specs — kept for dynamic-content surfaces only.
+- The 5 seam-scans — written this session as one-offs; 3A scripts them,
+  no re-derivation.
+
+## Implementation Tasks
+Synthesized from this review's findings. Run with Claude Code; checkbox as you ship.
+
+- [ ] **T1 (P1, human: ~2h / CC: ~20min)** — conformance — Fix BrowserStack
+  env-divert so local Playwright runs stay local
+  - Surfaced by: Architecture Issue 1 (1A prereq); TODOS.md already names it
+  - Files: packages/editor/playwright.config.ts
+  - Verify: `npx playwright test` runs local chromium with BS creds present
+- [ ] **T2 (P1, human: ~1d / CC: ~half session)** — conformance — Script the 5
+  seam-scans as `scripts/conformance/seam-scan.mjs`, WARN-mode in verify:ds
+  - Surfaced by: Code Quality Issue 3 (3A)
+  - Verify: plant one dead listener, scan goes amber
+- [ ] **T3 (P2, human: ~3d / CC: ~1 session)** — conformance — Playwright
+  `toHaveScreenshot` baseline per eye-accepted surface
+  - Surfaced by: Architecture Issue 1 (1A) + probe/portal learnings
+  - Verify: revert breadcrumb z-fix locally → snapshot test fails
+- [ ] **T4 (P2, human: ~30min / CC: ~10min per phase)** — conformance —
+  Re-census page 1:3 at every phase close before any DONE claim
+  - Surfaced by: Test Issue 4 (4A) + boards-json-not-exhaustive (2× burned)
+  - Verify: counts in boards.json match a fresh name-scan
+- [ ] **T5 (P3, human: ~5min / CC: ~5min)** — protocol — Ledger note: server is
+  agent-owned (this plan already edited)
+  - Surfaced by: Architecture Issue 2 (2A)
+  - Verify: next session starts without founder action
+
+## Failure modes (per pipeline path)
+
+| Path | Realistic failure | Test? | Handling? | Silent? |
+|---|---|---|---|---|
+| seam-scan | new event style evades regex | plant-a-violation check (T2) | WARN-mode | flagged, not silent |
+| snapshot pin | BS divert / flake | T1 prereq; retry-once policy | baseline re-accept flow | visible red |
+| eye-verify | popover closes pre-shot | chain+viewport protocol | re-query in same chain | caught in-protocol |
+| census | founder draws boards mid-phase | T4 per-phase gate | counts diff | was silent — now gated |
+| recipes floor | recipe filled without eye-accept | floor only ratchets after verify | reviewer discipline | **residual risk — accepted** |
+
+No critical gap: every silent path now has a gate except recipe-discipline,
+accepted as process risk.
+
+## Worktree parallelization
+
+| Step | Modules touched | Depends on |
+|---|---|---|
+| T1 BS-divert | playwright.config | — |
+| T2 seam-scan.mjs | scripts/conformance | — |
+| T3 snapshot pins | e2e/ | T1 |
+| Phase 0 eye-verify | none (read-only + fixes as found) | server |
+| T4 census | scripts/conformance/boards.json | phase close |
+
+Lane A: T1 → T3 (sequential, e2e/). Lane B: T2 (independent). Lane C: Phase 0
+eye-verify (independent, defect-fix commits land anywhere). Launch A+B+C in
+parallel; T4 at each phase close. Conflict flag: T2 and T4 both touch
+scripts/conformance/ — sequence T4 after T2 lands.
+
+## GSTACK REVIEW REPORT
+
+| Review | Trigger | Why | Runs | Status | Findings |
+|--------|---------|-----|------|--------|----------|
+| CEO Review | `/plan-ceo-review` | Scope & strategy | 0 | — | — |
+| Codex Review | `/codex review` | Independent 2nd opinion | 0 | — (disabled by config) | — |
+| Eng Review | `/plan-eng-review` | Architecture & tests (required) | 1 | CLEAR (PLAN) | 4 issues, 0 critical gaps — all 4 resolved (1A, 2A, 3A, 4A) and folded into the plan |
+| Design Review | `/plan-design-review` | UI/UX gaps | 0 | — | — |
+| DX Review | `/plan-devex-review` | Developer experience gaps | 0 | — | — |
+
+**VERDICT:** ENG CLEARED — ready to implement (Phase 0).
+
+NO UNRESOLVED DECISIONS
