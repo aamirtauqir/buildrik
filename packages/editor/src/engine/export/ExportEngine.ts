@@ -98,6 +98,11 @@ export class ExportEngine {
   private cmsResolver: CMSExportResolver;
   private seoInjector: SEOInjector;
   private formspreeInjector: FormspreeInjector;
+  /**
+   * pageId → exported filename, for resolving the inspector's internal-link
+   * scheme. Built per export because it depends on the page set being written.
+   */
+  private pageHrefs = new Map<string, string>();
 
   constructor(composer: Composer, config?: Partial<ExportConfig>) {
     this.composer = composer;
@@ -217,7 +222,7 @@ export class ExportEngine {
     const attrParts: string[] = [`class="${className}"`];
 
     if (attrs.alt) attrParts.push(`alt="${escapeHTML(attrs.alt)}"`);
-    if (attrs.href) attrParts.push(`href="${escapeHTML(attrs.href)}"`);
+    if (attrs.href) attrParts.push(`href="${escapeHTML(this.resolveHref(attrs.href))}"`);
     if (attrs.src) attrParts.push(`src="${escapeHTML(attrs.src)}"`);
     if (attrs.target) attrParts.push(`target="${attrs.target}"`);
     if (attrs.id) attrParts.push(`id="${escapeHTML(attrs.id)}"`);
@@ -496,6 +501,10 @@ export class ExportEngine {
       syntax: options.cmsSyntax,
     };
 
+    this.pageHrefs = new Map(
+      pages.map((p) => [p.id, p.isHome || !p.slug ? "index.html" : `${p.slug}.html`]),
+    );
+
     // Export each page
     for (const page of pages) {
       let html = this.exportPageToHtml(page, css);
@@ -505,7 +514,7 @@ export class ExportEngine {
         html = await this.cmsResolver.resolve(html, cmsOptions);
       }
 
-      const fileName = page.isHome || !page.slug ? "index.html" : `${page.slug}.html`;
+      const fileName = this.pageHrefs.get(page.id) ?? "index.html";
 
       files.push({
         name: fileName,
@@ -541,6 +550,22 @@ export class ExportEngine {
    * @param page - Page data to convert
    * @param css - CSS content (used to determine if styles.css should be linked)
    */
+  /**
+   * The Link inspector writes an internal page link as `#page:<pageId>` and
+   * nothing else in the package has ever understood that scheme. Exported
+   * verbatim it is a fragment identifier for an id that does not exist, so
+   * every internal link on a published site did nothing — the browser stayed
+   * on the page and appended a hash. Resolved here against the filenames this
+   * same export is writing (`<slug>.html`, or index.html for home).
+   *
+   * An unresolvable id — a page deleted after the link was made — falls back
+   * to the home page rather than shipping the raw scheme.
+   */
+  private resolveHref(href: string): string {
+    if (!href.startsWith("#page:")) return href;
+    return this.pageHrefs.get(href.slice("#page:".length)) ?? "index.html";
+  }
+
   private exportPageToHtml(page: PageData, css: string): string {
     // Build body content from root element
     let bodyContent = "";
@@ -730,7 +755,11 @@ ${bodyContent}${interactionScript}
         // class/style/data-buildrick-id emitted above from their canonical
         // fields — don't double-emit if a raw attribute mirrors them.
         if (key === "class" || key === "style" || key === "data-buildrick-id") continue;
-        attrParts.push(`${key}="${escapeHTML(value)}"`);
+        // Internal page links carry the inspector's `#page:<id>` scheme — this
+        // is the writer the PUBLISH path uses, so resolving it only in the
+        // live-Element writer above would have fixed nothing that ships.
+        const out = key === "href" ? this.resolveHref(value) : value;
+        attrParts.push(`${key}="${escapeHTML(out)}"`);
       }
     }
 
