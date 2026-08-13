@@ -16,7 +16,7 @@
 
 import * as React from "react";
 import { useClickOutside } from "@/shared/hooks";
-import { BreakpointSwitcher, Button, POPOVER_BASE_CLASS, Tooltip, type Breakpoint } from "@/editor/chrome-ui";
+import { BreakpointSwitcher, Button, POPOVER_BASE_CLASS, Portal, Tooltip, type Breakpoint } from "@/editor/chrome-ui";
 import { ZOOM_PRESETS } from "./shared";
 // Undo/redo/device switching moved OFF the topbar and onto this canvas toolbar
 // (Figma contract §2: viewport + edit controls belong to the canvas, the topbar
@@ -225,6 +225,10 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
 }) => {
   const [showPresets, setShowPresets] = React.useState(false);
   const presetsRef = React.useRef<HTMLDivElement>(null);
+  /* The flyout lives in a portal, outside presetsRef's subtree — without the
+     exclude, the mousedown that picks a preset counts as "outside" and closes
+     the popover before the row's onClick can fire. */
+  const presetsPopoverRef = React.useRef<HTMLDivElement>(null);
 
   // Snap to next/prev preset instead of raw ±10 steps
   const handleZoomIn = React.useCallback(() => {
@@ -237,7 +241,10 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
     onZoomChange(prev);
   }, [zoom, onZoomChange]);
 
-  useClickOutside(presetsRef, () => setShowPresets(false), { enabled: showPresets });
+  useClickOutside(presetsRef, () => setShowPresets(false), {
+    enabled: showPresets,
+    excludeRefs: [presetsPopoverRef],
+  });
 
   const showEditGroup = Boolean(onUndo || onRedo || (device && onDeviceChange));
 
@@ -372,8 +379,29 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
         </Button>
 
         {/* Preset dropdown */}
-        {showPresets && (
-          <div className={`${POPOVER_BASE_CLASS} tw:flex tw:flex-col tw:bottom-[calc(100%+6px)] tw:left-1/2 tw:-translate-x-1/2 tw:min-w-45 tw:p-1`}>
+        {/* Portaled, same reason as PageTabBar's rename popover: this toolbar
+            is tw:overflow-x-auto, and per CSS an auto overflow-x forces
+            overflow-y to auto too — so an absolute flyout opening upward was
+            clipped to the toolbar's 40px box. It opened, opacity 1, and the
+            user saw canvas. Fixed coords come from the anchor's rect, bottom-
+            anchored so it grows upward like the board draws it. */}
+        {showPresets && presetsRef.current && (
+          <Portal>
+            <div
+              ref={presetsPopoverRef}
+              className={`${POPOVER_BASE_CLASS} tw:flex tw:flex-col tw:min-w-45 tw:p-1`}
+              style={{
+                position: "fixed",
+                left:
+                  presetsRef.current.getBoundingClientRect().left +
+                  presetsRef.current.getBoundingClientRect().width / 2,
+                bottom:
+                  window.innerHeight -
+                  presetsRef.current.getBoundingClientRect().top +
+                  6,
+                transform: "translateX(-50%)",
+              }}
+            >
             {/* Board 817:4723 opens the flyout with the actions, then the
                 preset list under a divider. */}
             {onFitToScreen && (
@@ -420,7 +448,8 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
                 {preset}%
               </Button>
             ))}
-          </div>
+            </div>
+          </Portal>
         )}
       </div>
       {/* Help Button */}
