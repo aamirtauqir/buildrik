@@ -91,7 +91,7 @@ export function useCanvasCommandPalette({
       {
         id: "select-all",
         label: "Select All",
-        category: "Selection",
+        category: "Edit",
         shortcut: "Cmd+A",
         icon: "\u2610",
         handler: () => composer.selection.selectAll(),
@@ -99,7 +99,7 @@ export function useCanvasCommandPalette({
       {
         id: "deselect",
         label: "Deselect All",
-        category: "Selection",
+        category: "Edit",
         shortcut: "Esc",
         icon: "\u2612",
         handler: () => clear(),
@@ -131,7 +131,7 @@ export function useCanvasCommandPalette({
       {
         id: "cms-records",
         label: "Manage CMS Records",
-        category: "CMS",
+        category: "Tools",
         icon: "\u{1F5C3}",
         keywords: ["cms", "content", "collection", "records", "data"],
         handler: () => composer.emit(EVENTS.CMS_MANAGE_RECORDS, {}),
@@ -139,7 +139,7 @@ export function useCanvasCommandPalette({
       {
         id: "save-template",
         label: "Save page as template",
-        category: "Templates",
+        category: "Tools",
         icon: "\u{1F4BE}",
         keywords: ["template", "save", "reuse", "my templates"],
         handler: () => composer.emit(EVENTS.TEMPLATE_SAVE_REQUESTED, {}),
@@ -147,7 +147,7 @@ export function useCanvasCommandPalette({
       {
         id: "start-collab",
         label: "Start collaboration session",
-        category: "Collaborate",
+        category: "Tools",
         icon: "\u{1F465}",
         keywords: ["collaborate", "team", "real-time", "multiplayer", "share"],
         handler: () => {
@@ -158,7 +158,7 @@ export function useCanvasCommandPalette({
       {
         id: "add-text",
         label: "Add Text",
-        category: "Add",
+        category: "Insert",
         icon: "T",
         keywords: ["paragraph", "heading"],
         handler: () => composer.emit(EVENTS.ELEMENT_QUICK_ADD, { type: "text" }),
@@ -166,7 +166,7 @@ export function useCanvasCommandPalette({
       {
         id: "add-image",
         label: "Add Image",
-        category: "Add",
+        category: "Insert",
         icon: "\ud83d\uddbc",
         keywords: ["picture", "photo"],
         handler: () => composer.emit(EVENTS.ELEMENT_QUICK_ADD, { type: "image" }),
@@ -174,7 +174,7 @@ export function useCanvasCommandPalette({
       {
         id: "add-button",
         label: "Add Button",
-        category: "Add",
+        category: "Insert",
         icon: "\u25fb",
         keywords: ["cta", "link"],
         handler: () => composer.emit(EVENTS.ELEMENT_QUICK_ADD, { type: "button" }),
@@ -182,7 +182,7 @@ export function useCanvasCommandPalette({
       {
         id: "add-container",
         label: "Add Container",
-        category: "Add",
+        category: "Insert",
         icon: "\u25a2",
         keywords: ["div", "section", "box"],
         handler: () => composer.emit(EVENTS.ELEMENT_QUICK_ADD, { type: "container" }),
@@ -190,7 +190,7 @@ export function useCanvasCommandPalette({
       {
         id: "browse-templates",
         label: "Browse Templates",
-        category: "Navigate",
+        category: "Tools",
         shortcut: "T",
         icon: "\ud83d\udcd0",
         keywords: ["template", "start", "design", "layout"],
@@ -200,7 +200,7 @@ export function useCanvasCommandPalette({
       {
         id: "open-analytics",
         label: "Open Analytics Settings",
-        category: "Navigate",
+        category: "Tools",
         icon: "\ud83d\udcca",
         keywords: ["analytics", "google", "tracking", "pixel"],
         handler: () => composer.emit(EVENTS.UI_PANEL_OPEN, { panel: "settings", screen: "analytics" }),
@@ -211,7 +211,7 @@ export function useCanvasCommandPalette({
         // straight to the SEO drawer needs PagesTab drawer-routing (follow-up).
         id: "open-seo",
         label: "Open Page Settings (SEO, slug, status)",
-        category: "Navigate",
+        category: "Tools",
         icon: "\ud83d\udd0d",
         keywords: ["seo", "meta", "title", "description", "search", "page", "settings", "slug"],
         handler: () => composer.emit(EVENTS.UI_PANEL_OPEN, { panel: "pages" }),
@@ -219,7 +219,7 @@ export function useCanvasCommandPalette({
       {
         id: "open-export",
         label: "Open Export Settings",
-        category: "Navigate",
+        category: "Tools",
         icon: "\ud83d\udce6",
         keywords: ["export", "code", "download"],
         handler: () => composer.emit(EVENTS.UI_PANEL_OPEN, { panel: "settings", screen: "export" }),
@@ -227,7 +227,7 @@ export function useCanvasCommandPalette({
       {
         id: "open-integrations",
         label: "Open Integrations",
-        category: "Navigate",
+        category: "Tools",
         icon: "\ud83d\udd17",
         keywords: ["integrations", "api", "connect", "third-party"],
         handler: () => composer.emit(EVENTS.UI_PANEL_OPEN, { panel: "settings", screen: "integrations" }),
@@ -235,7 +235,7 @@ export function useCanvasCommandPalette({
       {
         id: "toggle-layers",
         label: "Toggle Layers Panel",
-        category: "Navigate",
+        category: "View",
         icon: "\u2630",
         keywords: ["layers", "tree", "structure"],
         handler: () => composer.emit(EVENTS.UI_TOGGLE_LAYERS, {}),
@@ -243,7 +243,7 @@ export function useCanvasCommandPalette({
       {
         id: "toggle-preview",
         label: "Preview Site",
-        category: "Navigate",
+        category: "View",
         shortcut: "Cmd+P",
         icon: "\u25b6",
         keywords: ["preview", "view", "live"],
@@ -253,7 +253,7 @@ export function useCanvasCommandPalette({
       {
         id: "open-media",
         label: "Open Media Library",
-        category: "Media",
+        category: "Tools",
         icon: "\ud83d\uddbc",
         keywords: ["assets", "images", "videos", "library"],
         handler: () => composer.emit("ui:switch-tab", { tab: "assets" }),
@@ -261,7 +261,7 @@ export function useCanvasCommandPalette({
       {
         id: "replace-media",
         label: "Replace Selected Media",
-        category: "Media",
+        category: "Tools",
         icon: "\ud83d\udd04",
         requiresSelection: true,
         keywords: ["change", "swap", "image", "replace"],
@@ -277,7 +277,7 @@ export function useCanvasCommandPalette({
       {
         id: "search-stock",
         label: "Search Stock Photos",
-        category: "Media",
+        category: "Tools",
         icon: "\ud83d\udd0d",
         keywords: ["unsplash", "stock", "find", "discovery"],
         handler: () => {

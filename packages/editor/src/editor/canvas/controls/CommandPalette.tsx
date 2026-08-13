@@ -15,7 +15,7 @@
  */
 
 import * as React from "react";
-import { CANVAS_COLORS, PANEL_STYLE, Z_INDEX } from "../shared";
+import { Z_INDEX } from "../shared";
 import { Button, TextInput } from "@/editor/chrome-ui";
 // =============================================================================
 // TYPES
@@ -122,6 +122,21 @@ export function useCommandPalette(): UseCommandPaletteResult {
 // =============================================================================
 // COMPONENT
 // =============================================================================
+
+/**
+ * Board 1177:4804 fixes the group order: EDIT, VIEW, INSERT, TOOLS. Grouping
+ * by first appearance instead let the recency sort reorder the headings —
+ * running one Insert command moved the whole INSERT block to the top, so the
+ * palette never looked the same twice.
+ */
+const CATEGORY_ORDER = ["Edit", "View", "Insert", "Tools"];
+
+const orderedGroups = (grouped: Record<string, CommandAction[]>): [string, CommandAction[]][] =>
+  Object.entries(grouped).sort(([a], [b]) => {
+    const ai = CATEGORY_ORDER.indexOf(a);
+    const bi = CATEGORY_ORDER.indexOf(b);
+    return (ai === -1 ? CATEGORY_ORDER.length : ai) - (bi === -1 ? CATEGORY_ORDER.length : bi);
+  });
 
 export const CommandPalette: React.FC<CommandPaletteProps> = ({
   isOpen,
@@ -277,8 +292,11 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
       <div
         className="tw:flex tw:flex-col tw:gap-0"
         style={{
-          ...PANEL_STYLE,
           position: "fixed",
+          background: "var(--bk-bg-card)",
+          border: "1px solid var(--bk-border)",
+          borderRadius: 12,
+          boxShadow: "var(--bk-shadow-overlay)",
           top: "20%",
           left: "50%",
           transform: "translateX(-50%)",
@@ -292,7 +310,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         aria-label="Command Palette"
       >
         {/* Search Input */}
-        <div style={{ padding: 12, borderBottom: `1px solid ${CANVAS_COLORS.border}` }}>
+        <div style={{ padding: "12px 14px", borderBottom: "1px solid var(--bk-border)" }}>
           <TextInput
             ref={inputRef}
             type="text"
@@ -302,12 +320,11 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
             onKeyDown={handleKeyDown}
             style={{
               width: "100%",
-              padding: "10px 14px",
-              background: CANVAS_COLORS.bgInput,
-              border: `1px solid ${CANVAS_COLORS.border}`,
-              borderRadius: 8,
-              color: CANVAS_COLORS.textPrimary,
-              fontSize: 15,
+              padding: 0,
+              background: "transparent",
+              border: "none",
+              color: "var(--bk-ink)",
+              fontSize: 12,
               outline: "none",
             }}
           />
@@ -327,24 +344,24 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
               style={{
                 padding: 24,
                 textAlign: "center",
-                color: CANVAS_COLORS.textMuted,
-                fontSize: 13,
+                color: "var(--bk-ink-muted)",
+                fontSize: 12,
               }}
             >
               No commands found
             </div>
           ) : (
-            Object.entries(groupedCommands).map(([category, cmds]) => (
+            orderedGroups(groupedCommands).map(([category, cmds]) => (
               <div key={category} style={{ marginBottom: 12 }}>
                 {/* Category Header */}
                 <div
                   style={{
-                    padding: "6px 8px",
-                    fontSize: 12,
+                    padding: "8px 2px 3px",
+                    fontSize: 9,
                     fontWeight: 600,
-                    color: CANVAS_COLORS.textMuted,
+                    color: "var(--bk-ink-muted)",
                     textTransform: "uppercase",
-                    letterSpacing: "0.5px",
+                    letterSpacing: "0.54px",
                   }}
                 >
                   {category}
@@ -368,17 +385,20 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                         alignItems: "center",
                         justifyContent: "space-between",
                         width: "100%",
-                        padding: "10px 12px",
+                        padding: "7px 2px",
                         background:
-                          isSelected && !isDisabled ? CANVAS_COLORS.bgHover : "transparent",
+                          isSelected && !isDisabled ? "var(--bk-accent-tint)" : "transparent",
                         border: "none",
-                        borderRadius: 6,
-                        color: CANVAS_COLORS.textPrimary,
-                        fontSize: 13,
+                        borderRadius: 4,
+                        color:
+                          isSelected && !isDisabled
+                            ? "var(--bk-accent-text)"
+                            : "var(--bk-ink-soft)",
+                        fontSize: 11,
                         cursor: isDisabled ? "default" : "pointer",
                         textAlign: "left",
                         transition: "background 0.1s",
-                        opacity: isDisabled ? 0.4 : 1,
+                        opacity: isDisabled ? 0.45 : 1,
                       }}
                       onMouseEnter={() => !isDisabled && setSelectedIndex(globalIndex)}
                     >
@@ -388,10 +408,11 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                         {isRecent && !isDisabled && (
                           <span
                             style={{
-                              fontSize: 12,
-                              color: CANVAS_COLORS.textMuted,
-                              background: "rgba(255,255,255,0.06)",
-                              padding: "2px 6px",
+                              fontSize: 8,
+                              fontWeight: 500,
+                              color: "var(--bk-ink-muted)",
+                              background: "var(--bk-bg-subtle)",
+                              padding: "1px 5px",
                               borderRadius: 4,
                             }}
                           >
@@ -402,9 +423,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                           <span
                             data-testid="selection-hint"
                             style={{
-                              fontSize: 12,
-                              color: CANVAS_COLORS.textMuted,
-                              fontStyle: "italic",
+                              fontSize: 9,
+                              color: "var(--bk-gray-400)",
                             }}
                           >
                             (Select an element first)
@@ -423,17 +443,23 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         {/* Footer Hint */}
         <div
           style={{
-            padding: "8px 12px",
-            borderTop: `1px solid ${CANVAS_COLORS.border}`,
+            padding: "8px 14px",
+            borderTop: "1px solid var(--bk-border)",
             display: "flex",
-            justifyContent: "space-between",
-            fontSize: 12,
-            color: CANVAS_COLORS.textMuted,
+            alignItems: "center",
+            gap: 12,
+            fontSize: 9,
+            color: "var(--bk-ink-muted)",
           }}
         >
           <span>↑↓ Navigate</span>
           <span>↵ Select</span>
           <span>Esc Close</span>
+          {/* Board 1177:4853 carries the count and the disambiguation from the
+              shell's own ⌘K palette — two palettes, two key chords. */}
+          <span style={{ marginLeft: "auto", color: "var(--bk-gray-400)" }}>
+            {commands.length} commands · distinct from shell ⌘K
+          </span>
         </div>
       </div>
     </>
@@ -457,12 +483,9 @@ const ShortcutBadge: React.FC<{ shortcut: string }> = ({ shortcut }) => {
   return (
     <span
       style={{
-        fontSize: 12,
-        color: CANVAS_COLORS.textMuted,
+        fontSize: 9,
+        color: "var(--bk-gray-400)",
         fontFamily: "var(--bk-font-ui)",
-        background: "rgba(255,255,255,0.06)",
-        padding: "3px 8px",
-        borderRadius: 4,
       }}
     >
       {display}

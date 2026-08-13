@@ -302,4 +302,13 @@ describe("useCanvasCommandPalette — commands", () => {
     findCommand(result, "start-collab").handler();
     expect(composer.collab.manager.startSession).not.toHaveBeenCalled();
   });
+
+  /* Board 1177:4804 groups the palette into exactly four sections. Nine
+     categories had accumulated (Add, CMS, Collaborate, Media, Navigate,
+     Selection, Templates …), one of them holding a single command. */
+  it("files every command under one of the board's four groups", () => {
+    const { result } = renderPalette(makeComposer());
+    const groups = new Set(result.current.commands.map((c) => c.category));
+    expect([...groups].sort()).toEqual(["Edit", "Insert", "Tools", "View"]);
+  });
 });
