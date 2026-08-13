@@ -775,7 +775,7 @@ five different shapes. The boards draw one drill-in stack. It is one now.
 | starters (+applied) | modal → destination; `useApplyStarter` shared so both paths write identically |
 | colour-mode | toggle → destination; unblocked by the dark-value write fix earlier the same day |
 | lint (+suppressed/warnings) | banner → destination |
-| import-export (+error/exported/imported) | Figma stub disabled — see below |
+| import-export (+error/exported/imported) | Figma stub disabled + rebuilt to the board's row-per-format with Copy/Download each (`23d44fdf`) |
 | pro-locked | it is the root in BASIC mode; the note is the only thing marking it |
 | tokens·add · tokens·replace · dirty · empty · loading · load-error · review-changes | verified against existing surfaces, no change |
 
@@ -797,17 +797,27 @@ gap):
   code's typography is type TOKENS; font handling is split across Media upload,
   the engine `FontManager` and the inspector `FontPicker`, with no Brand home.
 
-**Still open, and both are founder calls rather than conversions:**
+**Import/export is done** (`23d44fdf`). Every live format row carries its own
+Copy and Download; the greyed Figma row carries neither, which is the board
+refusing to offer a file it cannot make. The single download button under the
+preview is gone — two ways to download the same thing is one more than the board
+draws. The PREVIEW PANE stays: the board omits it, and reading the output before
+taking it is real capability, so rule 1 wins over rule 2 where they disagree
+about something that works.
 
-- `token-detail` (152:83) draws three footer actions — `Used in 34 places ›`,
-  `Rename safely ›`, `Fix contrast ›` — at the KIND level, where the code has
-  the equivalents per TOKEN. All three carry a chevron, implying destinations
-  the file does not draw anywhere. Adding rows that go nowhere is the thing this
-  session spent its time removing.
-- Import/export layout: the board is a row per format with Copy and Download on
-  each and dark strategy as a dropdown; the code is a radio group, one preview
-  pane and one download button. A restructure, and the preview pane is real
-  capability the board happens not to draw.
+**One thing still open, and it is a founder call rather than a conversion.**
+`token-detail` (152:83) draws three footer actions — `Used in 34 places ›`,
+`Rename safely ›`, `Fix contrast ›` — at the KIND level, where the code has the
+equivalents per TOKEN (`usageByTokenId`, `handleTokenRename`, ColorTokenList's
+contrast fixes). All three carry a chevron, implying destinations the file does
+not draw anywhere.
+
+Of the three, only `Fix contrast` maps cleanly onto something that exists —
+flipping ColorTokenList to its `issues` filter — and it is in-place, not a
+drill-in. `Rename safely` has no target at kind level at all. Shipping one of
+three, or shipping three rows that go nowhere, are both worse than saying so:
+this is the S3.6 situation, where the answer was to draw the destination in
+Figma first and then code to it.
 
 ### Arc status
 
