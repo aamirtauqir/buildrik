@@ -107,3 +107,56 @@ describe("sanitizeElementTreeContent — ingest boundary", () => {
     expect(tree.content).toContain("<i>world</i>");
   });
 });
+
+/* importProject is how project JSON from storage, the dashboard, a template or
+   an AI draft enters the element tree, and this is the only thing that runs on
+   it. It sanitized `content` and left `attributes` untouched on the grounds
+   that the serializer handled them — true of one of the editor's three HTML
+   writers; ExportEngine's two emitted whatever was there, so `onerror` in a
+   stored project reached a published page. */
+describe("sanitizeElementTreeContent — attributes", () => {
+  const tree = (): ElementData =>
+    ({
+      id: "root",
+      type: "container",
+      tagName: "div",
+      attributes: { onclick: "steal()", title: "fine" },
+      children: [
+        {
+          id: "a1",
+          type: "link",
+          tagName: "a",
+          attributes: {
+            onerror: "alert(1)",
+            href: "javascript:alert(1)",
+            rel: "noopener",
+            "data-x": "1",
+          },
+          children: [],
+        },
+      ],
+    }) as unknown as ElementData;
+
+  it("drops event handlers at every depth", () => {
+    const t = tree();
+    sanitizeElementTreeContent(t);
+
+    expect(t.attributes).not.toHaveProperty("onclick");
+    expect(t.children?.[0].attributes).not.toHaveProperty("onerror");
+  });
+
+  it("drops a javascript: href", () => {
+    const t = tree();
+    sanitizeElementTreeContent(t);
+
+    expect(t.children?.[0].attributes).not.toHaveProperty("href");
+  });
+
+  it("keeps everything legitimate", () => {
+    const t = tree();
+    sanitizeElementTreeContent(t);
+
+    expect(t.attributes).toMatchObject({ title: "fine" });
+    expect(t.children?.[0].attributes).toMatchObject({ rel: "noopener", "data-x": "1" });
+  });
+});

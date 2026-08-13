@@ -143,12 +143,27 @@ export function sanitizeHTML(html: string, options: SanitizeOptions = {}): strin
  * through importProject without otherwise passing the HTML sanitizer, and
  * `content` is later emitted raw into the canvas. Run it once per load.
  *
- * Attribute safety is handled separately by the serializer (buildAttributeString);
- * this covers the one field that is emitted unescaped.
+ * Attributes are dropped here too. This used to say attribute safety was
+ * "handled separately by the serializer (buildAttributeString)" — true of that
+ * serializer, but the editor has three HTML writers and ExportEngine's two had
+ * no such guard until 2026-08-13, so `onerror` in imported project JSON went
+ * straight onto a published page. All three now filter on the way out; this
+ * keeps it from being stored and re-saved in the first place, and means a
+ * fourth writer cannot reintroduce the hole by forgetting.
+ *
+ * Only unsafe attributes go — the same `isSafeAttrValue` test the serializers
+ * use, so nothing legitimate is lost.
  */
 export function sanitizeElementTreeContent(data: ElementData): void {
   if (typeof data.content === "string" && data.content.length > 0) {
     data.content = sanitizeHTML(data.content);
+  }
+  if (data.attributes) {
+    for (const [name, value] of Object.entries(data.attributes)) {
+      if (!isSafeAttrValue(name, value, data.tagName ?? "")) {
+        delete data.attributes[name];
+      }
+    }
   }
   data.children?.forEach((child) => sanitizeElementTreeContent(child));
 }
