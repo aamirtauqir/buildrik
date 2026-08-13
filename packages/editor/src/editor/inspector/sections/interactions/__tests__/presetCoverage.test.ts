@@ -12,6 +12,7 @@
 
 import { describe, it, expect } from "vitest";
 import { PRESET_TIMELINES } from "@/engine/interactions/InteractionRuntime";
+import { ANIMATION_KEYFRAMES } from "@/shared/constants/animationKeyframes";
 import { ANIMATION_PRESET_GROUPS, TRIGGER_GROUPS } from "../types";
 import type { InteractionTrigger } from "@/engine/interactions/types";
 
@@ -43,4 +44,13 @@ describe("inspector option catalogues vs the runtime", () => {
       expect(known).toContain(trigger as InteractionTrigger);
     },
   );
+
+  /* A preset reaches the page two ways: the GSAP timeline (interactions
+     runtime) and a CSS @keyframes (element animations + the inspector's own
+     Preview button, which sets `animation: bd-anim-<name>`). 20 of the 39 had
+     a timeline but no keyframe, so Preview showed nothing for them — on the
+     canvas and on the published site alike. */
+  it.each(OFFERED_PRESETS)("preset %s has a keyframe", (preset) => {
+    expect(ANIMATION_KEYFRAMES[`bd-anim-${preset}`]).toBeDefined();
+  });
 });

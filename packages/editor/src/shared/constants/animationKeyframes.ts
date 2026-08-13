@@ -45,6 +45,31 @@ export const ANIMATION_KEYFRAMES: Record<string, string> = {
   "bd-anim-fadeOutDown": "@keyframes bd-anim-fadeOutDown{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(30px)}}",
   "bd-anim-zoomOut": "@keyframes bd-anim-zoomOut{from{opacity:1;transform:scale(1)}to{opacity:0;transform:scale(0.5)}}",
   "bd-anim-slideOutUp": "@keyframes bd-anim-slideOutUp{from{transform:translateY(0)}to{transform:translateY(-100%)}}",
+  /* The inspector offers 39 presets; 20 of them had no keyframe here, so the
+     Preview button and any element animation set to one of these names
+     resolved against an undefined @keyframes and did nothing — on the canvas
+     AND on the published site. Bodies mirror the GSAP timelines in
+     InteractionRuntime's PRESET_TIMELINES so the two paths agree. */
+  "bd-anim-slideUp": "@keyframes bd-anim-slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}",
+  "bd-anim-slideDown": "@keyframes bd-anim-slideDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}",
+  "bd-anim-slideLeft": "@keyframes bd-anim-slideLeft{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}",
+  "bd-anim-slideRight": "@keyframes bd-anim-slideRight{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}",
+  "bd-anim-scaleIn": "@keyframes bd-anim-scaleIn{from{opacity:0;transform:scale(0.8)}to{opacity:1;transform:scale(1)}}",
+  "bd-anim-scaleOut": "@keyframes bd-anim-scaleOut{from{opacity:1;transform:scale(1)}to{opacity:0;transform:scale(0.8)}}",
+  "bd-anim-scaleUp": "@keyframes bd-anim-scaleUp{from{transform:scale(1)}to{transform:scale(1.1)}}",
+  "bd-anim-scaleDown": "@keyframes bd-anim-scaleDown{from{transform:scale(1)}to{transform:scale(0.9)}}",
+  "bd-anim-rotate": "@keyframes bd-anim-rotate{from{transform:rotate(0)}to{transform:rotate(360deg)}}",
+  "bd-anim-rotateOut": "@keyframes bd-anim-rotateOut{from{opacity:1;transform:rotate(0)}to{opacity:0;transform:rotate(180deg)}}",
+  "bd-anim-flip": "@keyframes bd-anim-flip{from{transform:perspective(400px) rotateY(0)}to{transform:perspective(400px) rotateY(360deg)}}",
+  "bd-anim-flipX": "@keyframes bd-anim-flipX{from{opacity:0;transform:perspective(400px) rotateX(-90deg)}to{opacity:1;transform:perspective(400px) rotateX(0)}}",
+  "bd-anim-flipY": "@keyframes bd-anim-flipY{from{opacity:0;transform:perspective(400px) rotateY(-90deg)}to{opacity:1;transform:perspective(400px) rotateY(0)}}",
+  "bd-anim-rollIn": "@keyframes bd-anim-rollIn{from{opacity:0;transform:translateX(-60px) rotate(-120deg)}to{opacity:1;transform:translateX(0) rotate(0)}}",
+  "bd-anim-rollOut": "@keyframes bd-anim-rollOut{from{opacity:1;transform:translateX(0) rotate(0)}to{opacity:0;transform:translateX(60px) rotate(120deg)}}",
+  "bd-anim-hinge": "@keyframes bd-anim-hinge{0%{opacity:1;transform:rotate(0);transform-origin:top left}100%{opacity:0;transform:rotate(80deg);transform-origin:top left}}",
+  "bd-anim-tada": "@keyframes bd-anim-tada{0%{transform:scale(1)}30%{transform:scale(1.15)}100%{transform:scale(1)}}",
+  "bd-anim-jello": "@keyframes bd-anim-jello{0%{transform:skewX(0)}30%{transform:skewX(-10deg)}100%{transform:skewX(0)}}",
+  "bd-anim-blur": "@keyframes bd-anim-blur{from{opacity:0;filter:blur(8px)}to{opacity:1;filter:blur(0)}}",
+  "bd-anim-glow": "@keyframes bd-anim-glow{0%{filter:drop-shadow(0 0 0 rgba(26,86,219,0))}40%{filter:drop-shadow(0 0 12px rgba(26,86,219,0.6))}100%{filter:drop-shadow(0 0 0 rgba(26,86,219,0))}}",
 };
 
 /**
