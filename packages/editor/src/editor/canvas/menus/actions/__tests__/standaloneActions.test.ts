@@ -72,10 +72,13 @@ describe("standaloneActions", () => {
     });
   });
 
-  it("reveal-in-layers selects the element and emits layers:reveal", () => {
+  /* This asserted "layers:reveal", which nothing in the app listens for — the
+     shell listens for SHOW_IN_LAYERS. The test passed for as long as the menu
+     item did nothing. */
+  it("reveal-in-layers selects the element and asks the shell to open Layers", () => {
     action("reveal-in-layers").handler!(ctx);
     expect(composer.selection.select).toHaveBeenCalledWith(element);
-    expect(composer.emit).toHaveBeenCalledWith("layers:reveal", element);
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.SHOW_IN_LAYERS, {});
   });
 
   describe("select-parent", () => {

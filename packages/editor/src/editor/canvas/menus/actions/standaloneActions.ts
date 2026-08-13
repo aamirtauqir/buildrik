@@ -39,7 +39,11 @@ export const standaloneActions: ContextAction[] = [
     group: "standalone",
     handler: ({ composer, element }) => {
       composer.selection.select(element as never);
-      composer.emit?.("layers:reveal", element);
+      // SHOW_IN_LAYERS is the event the shell actually listens for: it switches
+      // the left panel to Layers, opens the drawer, then asks the tree to
+      // scroll. Selecting alone only highlights a row that may not be on
+      // screen — or in a panel that is not even open.
+      composer.emit(EVENTS.SHOW_IN_LAYERS, {});
     },
   },
   {

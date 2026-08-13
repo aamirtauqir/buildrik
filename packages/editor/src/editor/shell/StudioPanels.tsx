@@ -16,7 +16,7 @@ import type { GroupedTabId } from "../rail/tabsConfig";
 import { getTabMode } from "../rail/tabsConfig";
 import type { BlockData, DeviceType } from "../../shared/types";
 import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/media";
-import { useToast, Button } from "@/editor/chrome-ui";
+import { useToast } from "@/editor/chrome-ui";
 import { Canvas, type CanvasRef } from "../canvas/Canvas";
 import type { CanvasOverlayState } from "../canvas/CanvasFooterToolbar";
 import { ProInspector } from "../inspector/ProInspector";
@@ -97,37 +97,6 @@ export interface StudioPanelsProps {
 // STYLES
 // ============================================================================
 
-const previewBannerStyle: React.CSSProperties = {
-  position: "absolute",
-  top: 12,
-  left: "50%",
-  transform: "translateX(-50%)",
-  display: "flex",
-  alignItems: "center",
-  gap: 6,
-  padding: "6px 14px",
-  background: "rgba(0,0,0,0.82)",
-  border: "1px solid rgba(255,255,255,0.12)",
-  borderRadius: 8,
-  color: "var(--bk-accent-on)",
-  fontSize: 13,
-  zIndex: 50,
-  pointerEvents: "auto",
-  backdropFilter: "blur(6px)",
-  userSelect: "none",
-};
-
-const previewExitBtnStyle: React.CSSProperties = {
-  marginLeft: 8,
-  padding: "2px 10px",
-  border: "1px solid rgba(255,255,255,0.2)",
-  borderRadius: 5,
-  background: "transparent",
-  color: "inherit",
-  fontSize: 12,
-  cursor: "pointer",
-};
-
 const styles = {
   container: {
     flex: 1,
@@ -205,7 +174,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   useAltTextAutoTrigger(composer);
 
   const [canvasHoveredId, setCanvasHoveredId] = React.useState<string | null>(null);
-  const [isVersionPreview, setIsVersionPreview] = React.useState(false);
 
   // Media tab dual-mode: panel (slim launcher) or fullpage (library manager)
   const [mediaFullPage, setMediaFullPage] = React.useState(false);
@@ -273,19 +241,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
     composer.on("canvas:hover", handleCanvasHover);
     return () => {
       composer.off("canvas:hover", handleCanvasHover);
-    };
-  }, [composer]);
-
-  // Version preview mode — dims canvas and shows "Preview" banner while hovering a version row
-  React.useEffect(() => {
-    if (!composer) return;
-    const handlePreviewStarted = () => setIsVersionPreview(true);
-    const handlePreviewCleared = () => setIsVersionPreview(false);
-    composer.on(EVENTS.VERSION_PREVIEW_STARTED, handlePreviewStarted);
-    composer.on(EVENTS.VERSION_PREVIEW_CLEARED, handlePreviewCleared);
-    return () => {
-      composer.off(EVENTS.VERSION_PREVIEW_STARTED, handlePreviewStarted);
-      composer.off(EVENTS.VERSION_PREVIEW_CLEARED, handlePreviewCleared);
     };
   }, [composer]);
 
@@ -426,20 +381,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
               canUndo={canUndo}
               canRedo={canRedo}
             />
-            {isVersionPreview && (
-              <div style={previewBannerStyle}>
-                <span style={{ fontWeight: 500 }}>Preview</span>
-                <span style={{ color: "rgba(255,255,255,0.45)", fontSize: 12 }}>
-                  — not saved
-                </span>
-                <Button
-                  style={previewExitBtnStyle}
-                  onClick={() => composer?.versions?.clearPreview()}
-                >
-                  Exit
-                </Button>
-              </div>
-            )}
           </div>
           {/* Board 435:2348: the tab bar sits at the canvas FOOT — the
               context menu opens upward from it. */}
