@@ -55,6 +55,13 @@
   flex-shrink: 0;
 }
 
+/* The running text the target sits inside. Parent sets size and weight; this
+   only needed the muted colour, and without it the label and the target read at
+   the same emphasis — which defeats the point of highlighting the target. */
+.bd-ai-scope-text {
+  color: var(--bk-ink-soft);
+}
+
 .bd-ai-scope-target {
   color: var(--bk-ink);
   font-weight: 600;
