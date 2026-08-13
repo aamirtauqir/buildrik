@@ -754,6 +754,70 @@ watches a local data path, not a remote file).
   again, where the founder's call was: draw it in Figma first, then code to it.
   **Founder call — a design pass, not a code pass.**
 
+### Brand — CLOSED 2026-08-13, and the arc with it
+
+Last family. `06142b1e` root drill-in · `8764ffb9` Lint · `fb6e6d1c` Tokens ·
+`bfbfae47` Components · `dd1e62ef` Figma export · `b80cde29` Starters ·
+`c7a2a0fc` Colour mode · `42c7b24e` Basic-mode note.
+
+**The finding that ran through the whole family: the code was built to a
+PROTOTYPE and the boards had moved past it.** Two files said so themselves —
+`TokenKindCard`'s comment named "prototype `COLOR · 12 TOKENS [-]` shape" and
+`ExportSection`'s named "Arc D3 (prototype s05)". Brand's root was a tab bar,
+Tokens an accordion of cards, Components a card grid, Presets already rows,
+Starters a modal, Colour mode a toggle, Lint a banner: seven capabilities in
+five different shapes. The boards draw one drill-in stack. It is one now.
+
+| Board | Outcome |
+|---|---|
+| root · tokens · components | tab bar → rows · accordion → rows · card grid → rows |
+| presets (+bound/draft/unbound) | already rows — verified, unchanged |
+| starters (+applied) | modal → destination; `useApplyStarter` shared so both paths write identically |
+| colour-mode | toggle → destination; unblocked by the dark-value write fix earlier the same day |
+| lint (+suppressed/warnings) | banner → destination |
+| import-export (+error/exported/imported) | Figma stub disabled — see below |
+| pro-locked | it is the root in BASIC mode; the note is the only thing marking it |
+| tokens·add · tokens·replace · dirty · empty · loading · load-error · review-changes | verified against existing surfaces, no change |
+
+**The correctness bug**: the Figma export emitted a hand-rolled envelope under
+the name `figma-variables.json`. That is not the schema Figma's importer reads —
+no collections, no modes — so the file downloaded looking right and failed on
+import. Its own comment said "Stub … Real emitter pending" and the row shipped
+selectable anyway. Board 153:120 greys it with the workaround in its own copy,
+and the board was right.
+
+**Two rows deliberately NOT built** (rule 4 — preserve the design, document the
+gap):
+
+- `Classes` — a site-wide class manager with per-class usage counts. No such
+  registry exists (`classRegistry` / `classUsage`: zero hits). The usage count is
+  what proves it is not the inspector's per-element CSS-classes surface.
+- `Typography` — its board is a FONT manager: active fonts, role pills
+  (Display/Body/Mono), weights, a `.woff2` drop zone, a licence attestation. The
+  code's typography is type TOKENS; font handling is split across Media upload,
+  the engine `FontManager` and the inspector `FontPicker`, with no Brand home.
+
+**Still open, and both are founder calls rather than conversions:**
+
+- `token-detail` (152:83) draws three footer actions — `Used in 34 places ›`,
+  `Rename safely ›`, `Fix contrast ›` — at the KIND level, where the code has
+  the equivalents per TOKEN. All three carry a chevron, implying destinations
+  the file does not draw anywhere. Adding rows that go nowhere is the thing this
+  session spent its time removing.
+- Import/export layout: the board is a row per format with Copy and Download on
+  each and dark strategy as a dropdown; the code is a radio group, one preview
+  pane and one download button. A restructure, and the preview pane is real
+  capability the board happens not to draw.
+
+### Arc status
+
+All six families closed: Insert · Layers · Pages · Media · Content · Brand.
+113 of the file's 416 boards. The remaining 303 sit in 35 families that have
+never had a family walk — off-rail panels (History, Settings, Publish, Review,
+Templates, AI, Components), cross-cutting surfaces (Inspector, Shell, Canvas,
+CmdK) and the journey flows (S1, S3, S5, S6). That is a new arc, and its order
+should come from the business rather than from board counts.
+
 ## NOT in scope
 
 - Inspector flat body (board `52:56` / `824:5095`) — next arc after this one;
