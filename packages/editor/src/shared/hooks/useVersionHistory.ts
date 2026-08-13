@@ -64,11 +64,20 @@ export function useVersionHistory(composer: Composer | null): UseVersionHistoryR
        async). Clearing isLoading here made the panel render its empty state —
        "Version history appears here as you save changes" — to users who had
        forty saved versions, until VERSION_LIST_UPDATED arrived and it popped
-       to a list. Seed the rows, but stay loading until the manager says it has
-       finished; when storage is unavailable the manager never starts, and
+       to a list. Seed the rows, but the manager's events fire ONCE, when the
+       read settles — a panel opened minutes later has missed them, and
+       waiting on them alone left the skeleton up forever. Ask the manager
+       where the read stands instead; the events only cover a load still in
+       flight. When storage is unavailable the manager never starts, and
        isAvailable is false, which the panel branches on first. */
     setVersions(composer.versions.getVersions());
-    if (!composer.versions.isAvailable()) setIsLoading(false);
+    const loadState = composer.versions.getLoadState();
+    if (!composer.versions.isAvailable() || loadState === "ready") {
+      setIsLoading(false);
+    } else if (loadState === "error") {
+      setIsLoading(false);
+      setLoadError(true);
+    }
 
     // Listen for version changes
     composer.on(EVENTS.VERSION_LIST_UPDATED, loadVersions);

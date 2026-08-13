@@ -55,6 +55,11 @@ export class VersionTimelineManager {
   private versions: NamedVersion[] = [];
   private projectId: string = "default";
   private isLoading: boolean = false;
+  /* Read synchronously by useVersionHistory at mount. VERSION_LIST_UPDATED /
+     VERSION_LOAD_FAILED fire once when the storage read settles — a panel
+     that mounts later has missed them, and an event-only contract left it
+     showing the loading skeleton forever. */
+  private loadState: "loading" | "ready" | "error" = "loading";
   private autoCheckpointHandlers: Map<string, () => void> = new Map();
   /** Current user ID for team attribution — set from session when available */
   private currentUserId: string | null = null;
@@ -86,8 +91,10 @@ export class VersionTimelineManager {
    */
   private async loadVersionsFromStorage(): Promise<void> {
     this.isLoading = true;
+    this.loadState = "loading";
     try {
       this.versions = await loadVersions(this.projectId);
+      this.loadState = "ready";
       this.composer.emit(EVENTS.VERSION_LIST_UPDATED, { versions: this.versions });
     } catch {
       /* loadVersions rejects on any IndexedDB failure and this had no catch —
@@ -96,10 +103,17 @@ export class VersionTimelineManager {
          they are only unreadable. Board 453:4031 says the opposite in as many
          words: "Your versions are still stored. Only this list failed to
          load." */
+      this.loadState = "error";
       this.composer.emit(EVENTS.VERSION_LOAD_FAILED, {});
     } finally {
       this.isLoading = false;
     }
+  }
+
+  /** Where the one-shot storage read stands, for subscribers that mount
+      after its events have already fired. */
+  getLoadState(): "loading" | "ready" | "error" {
+    return this.loadState;
   }
 
   /** Re-run the storage read behind board 453:4031's "Try again". */

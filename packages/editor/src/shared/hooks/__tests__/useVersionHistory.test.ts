@@ -31,6 +31,7 @@ function createMockComposer(versions: NamedVersion[] = []) {
     listenerCount: (event: string) => listeners.get(event)?.size ?? 0,
     versions: {
       isAvailable: vi.fn(() => true),
+      getLoadState: vi.fn((): "loading" | "ready" | "error" => "loading"),
       getVersions: vi.fn(() => versions),
       createVersion: vi.fn().mockResolvedValue(undefined),
       restoreVersion: vi.fn().mockResolvedValue(undefined),
@@ -73,6 +74,29 @@ describe("useVersionHistory", () => {
 
     expect(result.current.isLoading).toBe(false);
     expect(result.current.versions).toEqual([v("v2", "Redesign")]);
+  });
+
+  /* The manager's load events fire once, when its storage read settles. A
+     panel opened minutes later has missed them — waiting on events alone
+     kept the skeleton up forever (found live, 2026-08-14: 46-minute-old
+     project, History panel skeleton'd indefinitely). The hook must ask the
+     manager where the read stands at mount. */
+  it("mounting after the read finished is not loading — the events are gone", () => {
+    const composer = createMockComposer([v("v1", "Launch")]);
+    composer.versions.getLoadState.mockReturnValue("ready");
+    const { result } = renderHook(() => useVersionHistory(asComposer(composer)));
+
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.versions).toEqual([v("v1", "Launch")]);
+  });
+
+  it("mounting after a failed read shows the error, not the skeleton", () => {
+    const composer = createMockComposer([]);
+    composer.versions.getLoadState.mockReturnValue("error");
+    const { result } = renderHook(() => useVersionHistory(asComposer(composer)));
+
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.loadError).toBe(true);
   });
 
   it("does not sit loading forever when versions are unavailable", () => {
