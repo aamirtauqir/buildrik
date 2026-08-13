@@ -30,11 +30,6 @@ export class SnapCalculator {
   constructor(composer: Composer, boundsCalculator: BoundsCalculator) {
     this.composer = composer;
     this.boundsCalculator = boundsCalculator;
-
-    this.composer.on("element:style-changed", () => this.boundsCalculator.invalidateCache());
-    this.composer.on("element:children-changed", () => this.boundsCalculator.invalidateCache());
-    this.composer.on("canvas:scrolled", () => this.boundsCalculator.invalidateCache());
-    this.composer.on("viewport:resized", () => this.boundsCalculator.invalidateCache());
   }
 
   /**

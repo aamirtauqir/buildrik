@@ -7,6 +7,7 @@
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { BoundsCalculator } from "../BoundsCalculator";
+import { EVENTS } from "../../../../shared/constants/events";
 
 function createFakeElement(id: string) {
   return {
@@ -16,7 +17,14 @@ function createFakeElement(id: string) {
 }
 
 function createFakeComposer(activePageId?: string) {
+  const handlers = new Map<string, Set<() => void>>();
   return {
+    on: vi.fn((ev: string, fn: () => void) => {
+      if (!handlers.has(ev)) handlers.set(ev, new Set());
+      handlers.get(ev)!.add(fn);
+    }),
+    off: vi.fn(),
+    _emit: (ev: string) => handlers.get(ev)?.forEach((fn) => fn()),
     elements: {
       getElement: vi.fn((id: string) => createFakeElement(id)),
       getActivePage: vi.fn(() =>
@@ -104,5 +112,33 @@ describe("BoundsCalculator", () => {
       expect(v2).toBe(v1 + 1);
       expect(second).not.toBe(first);
     });
+  });
+});
+
+/* SnapCalculator and SpacingCalculator each carried their own copy of this
+   wiring, on four event names nothing emits, and each had a full test suite
+   asserting those names. Eight registrations, zero invalidations — the guides
+   measured against wherever an element sat the first time it was measured.
+   The behaviour lives here now, on events the engine actually sends. */
+describe("BoundsCalculator — cache invalidation", () => {
+  const DROPS = [
+    EVENTS.ELEMENT_UPDATED,
+    EVENTS.ELEMENT_STYLE_UPDATED,
+    EVENTS.ELEMENT_DELETED,
+    EVENTS.VIEWPORT_ZOOM,
+  ];
+
+  it.each(DROPS)("drops cached bounds on %s", (event) => {
+    const composer = createFakeComposer("page-1") as unknown as {
+      _emit(ev: string): void;
+    } & import("../../../Composer").Composer;
+    const calc = new BoundsCalculator(composer);
+    setupDom("el-1");
+
+    const first = calc.getElementBounds(createFakeElement("el-1"));
+    expect(calc.getElementBounds(createFakeElement("el-1"))).toBe(first);
+
+    composer._emit(event);
+    expect(calc.getElementBounds(createFakeElement("el-1"))).not.toBe(first);
   });
 });

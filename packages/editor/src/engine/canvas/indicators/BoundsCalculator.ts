@@ -6,6 +6,7 @@
  * @license BSD-3-Clause
  */
 
+import { EVENTS } from "../../../shared/constants/events";
 import type { ElementBounds } from "../../../shared/types/canvas";
 import { parseNumericValue } from "../../../shared/utils/helpers";
 import type { Composer } from "../../Composer";
@@ -21,6 +22,24 @@ export class BoundsCalculator {
 
   constructor(composer: Composer) {
     this.composer = composer;
+
+    /* The cache is read before the DOM on every lookup, so it has to be
+       dropped whenever geometry moves. SnapCalculator and SpacingCalculator
+       each carried their own copy of this wiring, on four event names nothing
+       emits — "element:style-changed" (the event is element:style-updated),
+       "element:children-changed", "canvas:scrolled" (canvas:scroll) and
+       "viewport:resized" (viewport:changed). Eight registrations, zero
+       invalidations: smart guides and spacing indicators measured against
+       wherever each element sat the first time it was ever measured.
+
+       Wired here because this class owns the cache. Scroll is deliberately
+       absent: bounds are stored relative to the canvas container, so scrolling
+       moves both rects together and the difference is unchanged. */
+    const drop = () => this.invalidateCache();
+    composer.on(EVENTS.ELEMENT_UPDATED, drop);
+    composer.on(EVENTS.ELEMENT_STYLE_UPDATED, drop);
+    composer.on(EVENTS.ELEMENT_DELETED, drop);
+    composer.on(EVENTS.VIEWPORT_ZOOM, drop);
   }
 
   /**
