@@ -403,7 +403,9 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                       onMouseEnter={() => !isDisabled && setSelectedIndex(globalIndex)}
                     >
                       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        {cmd.icon && <span style={{ fontSize: 16, opacity: 0.8 }}>{cmd.icon}</span>}
+                        {/* Board 1177:4804 draws rows as plain text — no icon
+                            column. Live check showed ours carrying emoji
+                            glyphs the board does not have. */}
                         <span>{cmd.label}</span>
                         {isRecent && !isDisabled && (
                           <span

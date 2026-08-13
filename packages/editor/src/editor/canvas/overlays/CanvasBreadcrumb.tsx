@@ -5,6 +5,7 @@
  */
 
 import * as React from "react";
+import { Z_LAYERS } from "@/shared/constants/canvas";
 import { Button } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
 
@@ -46,8 +47,12 @@ function getElementName(type: string, tagName?: string): string {
   return typeMap[normalized] || tagName || type;
 }
 
+/* bottom-14, not bottom-0: the floating footer toolbar overlaps the canvas
+   wrapper's last 40px, and live check showed it covering the bar's lower 16px
+   — the scrim survived as a 12px tinted sliver nobody would read as a
+   breadcrumb. */
 const BAR =
-  "tw:absolute tw:bottom-0 tw:left-0 tw:right-0 tw:z-30 tw:flex tw:items-center tw:gap-2 " +
+  "tw:absolute tw:bottom-14 tw:left-0 tw:right-0 tw:flex tw:items-center tw:gap-2 " +
   "tw:px-3 tw:py-1.5 tw:bg-[rgba(17,24,39,0.5)] tw:backdrop-blur-sm";
 
 /* Flowbite's Button theme sets h-10 / justify-center / font-medium and beats
@@ -114,7 +119,12 @@ export const CanvasBreadcrumb: React.FC<CanvasBreadcrumbProps> = ({
   }
 
   return (
-    <div className={BAR}>
+    // z from the registry, not a tw: utility — the Emotion version this
+    // replaced sat at Z_LAYERS.floatingToolbar (3001), and the rebuild's
+    // tw:z-30 painted the whole bar UNDER the canvas. checkVisibility said
+    // true, the rect was right, elementFromPoint returned the canvas: only
+    // the live screenshot showed an empty strip.
+    <div className={BAR} style={{ zIndex: Z_LAYERS.floatingToolbar }}>
       <div className="tw:flex tw:items-center tw:gap-2 tw:overflow-hidden">
         {segments.map((segment, index) => (
           <React.Fragment key={segment.id}>
