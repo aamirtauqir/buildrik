@@ -260,7 +260,35 @@ describe("ExportEngine.generateHTML — config knobs", () => {
     expect(html).toContain(">Default</h2>");
   });
 
-  it("renders self-closing tags with escaped allow-listed attributes and drops unknown attrs", () => {
+  /* This asserted `data-custom` was DROPPED, which pinned a five-name whitelist
+     — alt, href, src, target, id — in the writer behind the HTML and ZIP
+     exports. The multi-page writer that publish uses has always emitted every
+     attribute, so the two disagreed and the download was the lossy one.
+     Attributes are vetted by the sanitizer at import (DEFAULT_ALLOWED_ATTRS,
+     no on* handlers), so there is nothing here for a whitelist to add. */
+  /* Publish (renderPageElement) has always emitted every attribute; this
+     writer emitted five. Same project, two exports, different HTML. */
+  it("keeps rel / title / data- / aria- on a link, like the publish writer does", () => {
+    const attrs = {
+      href: "https://example.com",
+      rel: "noopener noreferrer",
+      title: "Read more",
+      target: "_blank",
+      "data-analytics": "cta",
+      "aria-label": "Read more about pricing",
+    };
+    const root: LiveNode = {
+      id: "root",
+      children: [{ id: "a1", type: "link", tagName: "a", attributes: attrs, content: "Go" }],
+    };
+    const html = new ExportEngine(makeComposer({ root })).generateHTML();
+
+    for (const [k, v] of Object.entries(attrs)) {
+      expect(html, `${k} missing from the single-page export`).toContain(`${k}="${v}"`);
+    }
+  });
+
+  it("renders self-closing tags with every attribute, escaped", () => {
     const root: LiveNode = {
       id: "root",
       children: [
@@ -280,7 +308,7 @@ describe("ExportEngine.generateHTML — config knobs", () => {
     expect(html).toMatch(/<img [^>]*\/>/);
     expect(html).toContain('src="https://x.test/a.png?w=1&amp;h=2"');
     expect(html).toContain('alt="A &quot;photo&quot;"');
-    expect(html).not.toContain("data-custom");
+    expect(html).toContain('data-custom="dropped"');
   });
 
   it("injects the project's global custom CSS in a trailing <style> block", () => {

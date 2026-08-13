@@ -221,14 +221,17 @@ export class ExportEngine {
     // Build attributes
     const attrParts: string[] = [`class="${className}"`];
 
-    if (attrs.alt) attrParts.push(`alt="${escapeHTML(attrs.alt)}"`);
-    if (attrs.href) attrParts.push(`href="${escapeHTML(this.resolveHref(attrs.href))}"`);
-    if (attrs.src) attrParts.push(`src="${escapeHTML(attrs.src)}"`);
-    if (attrs.target) attrParts.push(`target="${attrs.target}"`);
-    if (attrs.id) attrParts.push(`id="${escapeHTML(attrs.id)}"`);
-    // Configured interactions — emitted so the published runtime can wire them.
-    if (attrs[INTERACTION_ATTR]) {
-      attrParts.push(`${INTERACTION_ATTR}="${escapeHTML(attrs[INTERACTION_ATTR])}"`);
+    /* Emit every attribute the element carries, the way the multi-page writer
+       below already does. This was a five-name whitelist — alt, href, src,
+       target, id — so the HTML and ZIP exports silently dropped everything
+       else the Element Properties inspector writes: rel, title, poster, value,
+       placeholder, name, required, download, and every aria- / data- attribute an
+       element had. class and style come from their canonical fields above and
+       below, so a raw attribute mirroring them would double-emit. */
+    for (const [key, value] of Object.entries(attrs)) {
+      if (key === "class" || key === "style") continue;
+      const out = key === "href" ? this.resolveHref(value) : value;
+      attrParts.push(`${key}="${escapeHTML(out)}"`);
     }
 
     // Build inline styles if configured
