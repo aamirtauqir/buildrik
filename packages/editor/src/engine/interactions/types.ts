@@ -14,6 +14,13 @@
 export type InteractionTrigger =
   | "hover"
   | "click"
+  /* "While Pressed" in the inspector's Add-Interaction panel. This type and
+     the editor's own InteractionTrigger (inspector/sections/interactions/
+     types.ts) are separate declarations of the same value set, so the panel
+     could offer a trigger the runtime had never heard of and nothing caught
+     it — the switch fell through to a devLog. The two lists agree again here;
+     they still need collapsing to one home. */
+  | "active"
   | "focus"
   | "blur"
   | "page-load"

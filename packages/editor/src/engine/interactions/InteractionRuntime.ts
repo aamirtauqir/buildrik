@@ -184,6 +184,19 @@ export class InteractionRuntime {
       case "blur":
         this.addListener(element, "blur", () => this.playAnimation(id, interaction));
         break;
+      /* "While Pressed" sits in the Add-Interaction panel's Element Triggers
+         group (types.ts TRIGGER_GROUPS.element) and had no case here, so it
+         fell into the default below — which only devLogs, and devLog is a
+         no-op in production. Picking it, configuring an animation and pressing
+         the element did nothing, silently. Mirrors `hover`: play on press, and
+         reverse on release when the animation is reversible. */
+      case "active":
+        this.addListener(element, "mousedown", () => this.playAnimation(id, interaction));
+        if (animation.reverse) {
+          this.addListener(element, "mouseup", () => this.reverseAnimation(id, interaction));
+          this.addListener(element, "mouseleave", () => this.reverseAnimation(id, interaction));
+        }
+        break;
       case "page-load":
         // Queue for processing after all elements are attached
         this.pageLoadQueue.push({ element, id, interaction });

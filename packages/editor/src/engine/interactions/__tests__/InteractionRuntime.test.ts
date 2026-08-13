@@ -604,4 +604,32 @@ describe("InteractionRuntime", () => {
       "BUG: window listener leak on stop() — page-scroll/page-leave/while-scrolling handlers are added to `window` but tracked (and removed) on the *element*, so stop() leaves them firing on window forever",
     );
   });
+
+  /* Every trigger the inspector's Add-Interaction panel offers must reach a
+     case here. "active" ("While Pressed") did not, and the default branch only
+     devLogs — silent in production, so the interaction simply never played. */
+  describe("element triggers", () => {
+    it("plays on press for the While Pressed trigger", () => {
+      const el = makeElement("el-active", [makeInteraction("active")]);
+      runtime.start();
+
+      el.dispatchEvent(new MouseEvent("mousedown"));
+
+      expect(callsFor("el-active")).toHaveLength(1);
+    });
+
+    /* Release is wired to reverseAnimation, which is still a devLog
+       placeholder (InteractionRuntime:317) — `reverse` is inert for every
+       trigger that offers it, not just this one. What release must NOT do is
+       play the animation forward a second time. */
+    it("does not re-play forward on release", () => {
+      const el = makeElement("el-active-rev", [makeInteraction("active", { reverse: true })]);
+      runtime.start();
+
+      el.dispatchEvent(new MouseEvent("mousedown"));
+      el.dispatchEvent(new MouseEvent("mouseup"));
+
+      expect(callsFor("el-active-rev")).toHaveLength(1);
+    });
+  });
 });
