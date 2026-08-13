@@ -68,6 +68,14 @@ const buttonGroupStyles: React.CSSProperties = {
   borderRadius: "var(--bk-radius-lg)",
 };
 
+/** Count left, AI entry right — matches the single-selection header. */
+const headerRowStyles: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  gap: "var(--bk-space-8)",
+};
+
 const countBadgeStyles: React.CSSProperties = {
   display: "inline-flex",
   alignItems: "center",
@@ -149,8 +157,25 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
 
   return (
     <div style={toolbarStyles}>
-      {/* Selection count badge */}
-      <div style={countBadgeStyles}>{selectedIds.length} elements selected</div>
+      {/* Board 159:123 heads this panel the way the single-selection header is
+          headed — the count on the left, the `✦ AI` entry on the right. It
+          reads "3 selected", not "3 elements selected": the panel is already
+          the element inspector, so the noun is doing no work. */}
+      <div style={headerRowStyles}>
+        <span style={countBadgeStyles}>{selectedIds.length} selected</span>
+        {composer && (
+          <Button
+            type="button"
+            className="tw:h-[22px] tw:px-[7px] tw:rounded-[6px] tw:bg-[var(--bk-accent-tint)] tw:text-[11px] tw:font-medium tw:text-[var(--bk-accent)] tw:whitespace-nowrap"
+            title="Ask AI about this selection"
+            aria-label="Ask AI about this selection"
+            data-testid="multiselect-ai-chip"
+            onClick={() => composer.emit("ui:switch-tab", { tab: "ai" })}
+          >
+            ✦ AI
+          </Button>
+        )}
+      </div>
 
       {/* Horizontal Alignment */}
       <div style={sectionStyles}>

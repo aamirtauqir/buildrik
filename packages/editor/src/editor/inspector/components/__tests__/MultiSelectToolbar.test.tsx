@@ -23,9 +23,21 @@ function renderToolbar(
 afterEach(() => vi.restoreAllMocks());
 
 describe("MultiSelectToolbar — gating", () => {
+  /* Board 159:123 reads "2 selected". The panel is already the element
+     inspector, so the noun was doing no work. */
   it("shows the selection count", () => {
     renderToolbar(["a", "b"]);
-    expect(screen.getByText("2 elements selected")).toBeInTheDocument();
+    expect(screen.getByText("2 selected")).toBeInTheDocument();
+  });
+
+  it("carries the same AI entry the single-selection header does", () => {
+    renderToolbar(["a", "b"]);
+    expect(screen.getByTestId("multiselect-ai-chip")).toBeInTheDocument();
+  });
+
+  it("renders no AI entry without a composer to route it", () => {
+    renderToolbar(["a", "b"], null);
+    expect(screen.queryByTestId("multiselect-ai-chip")).toBeNull();
   });
 
   it("disables alignment when no composer is present", () => {
