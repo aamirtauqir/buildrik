@@ -1040,6 +1040,34 @@ In five of the eleven, a TEST asserted the broken half:
 A green suite is not evidence a feature works. It is evidence the suite agrees
 with the code, which is also what you get when both are wrong.
 
+### Scan 5 — drifted string-literal unions (ran clean; do not re-run)
+
+The duplicate-TYPE scan only sees named exports. Widening SaveState exposed two
+copies it could never have found — one spelled inline in `useComposerInit`'s
+props, one in `StudioHeader`'s — so the follow-up was to look for the shape
+directly: every union of 3+ string literals, named or inline, compared
+pairwise.
+
+39 sets are declared identically in 2+ files, and 39 more pairs overlap without
+matching. Triaged, **none is a live defect**:
+
+- Most near-misses are legitimate subsets — a component accepting four Toast
+  tones where Toast offers six, a switcher offering three breakpoints where the
+  state type has five.
+- The one domain concept that genuinely drifts is media types: `lottie` exists
+  in `ElementManager.insertMedia` and has a block, but not in shared's
+  `MediaAssetType`; `font` is in some lists and not others. That is a real
+  boundary — the library ingests images/video/fonts, the canvas can hold a
+  Lottie element from a URL — not a mismatch to merge.
+
+Recorded so the next person does not spend the afternoon on it. The scan worth
+keeping from this pass is the negative result: identical-today unions are risk,
+not defect, and chasing all 39 into one home would be the speculative
+refactoring CLAUDE.md warns about.
+
+What DID find real defects, every time, is narrower: a UI catalogue compared
+against the implementations that must serve it.
+
 ## Named for the founder — needs a decision or a file I must not stage
 
 **`ConflictModal` does not match board 66:640, and fixing it needs
