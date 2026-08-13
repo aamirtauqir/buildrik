@@ -101,7 +101,7 @@ describe("CanvasFooterToolbar — zoom controls (preset snapping)", () => {
   it("zoom in snaps UP to the next preset above the current value", () => {
     const { onZoomChange } = renderToolbar({ zoom: 100 });
     fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
-    expect(onZoomChange).toHaveBeenCalledWith(125); // next preset above 100
+    expect(onZoomChange).toHaveBeenCalledWith(150); // next preset above 100
   });
 
   it("zoom out snaps DOWN to the next preset below the current value", () => {
@@ -113,7 +113,7 @@ describe("CanvasFooterToolbar — zoom controls (preset snapping)", () => {
   it("snaps an off-preset value UP to the nearest preset above it", () => {
     const { onZoomChange } = renderToolbar({ zoom: 110 });
     fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
-    expect(onZoomChange).toHaveBeenCalledWith(125);
+    expect(onZoomChange).toHaveBeenCalledWith(150);
   });
 
   it("snaps an off-preset value DOWN to the nearest preset below it", () => {
@@ -164,19 +164,25 @@ describe("CanvasFooterToolbar — preset dropdown", () => {
     expect(screen.queryByRole("button", { name: "25%" })).toBeNull();
   });
 
-  it("renders a Fit to screen entry inside the dropdown when onFitToScreen is wired", () => {
+  it("reaches 400%, the top of the range the board documents", () => {
+    const { onZoomChange } = renderToolbar({ zoom: 200 });
+    fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
+    expect(onZoomChange).toHaveBeenCalledWith(400);
+  });
+
+  it("renders a Zoom to fit entry inside the dropdown when onFitToScreen is wired", () => {
     const onFitToScreen = vi.fn();
     renderToolbar({ zoom: 100, onFitToScreen });
     fireEvent.click(screen.getByRole("button", { name: "Zoom presets" }));
-    const fit = screen.getByRole("button", { name: "Fit to screen" });
+    const fit = screen.getByRole("button", { name: /Zoom to fit/ });
     fireEvent.click(fit);
     expect(onFitToScreen).toHaveBeenCalledTimes(1);
   });
 
-  it("omits the Fit to screen entry when onFitToScreen is not provided", () => {
+  it("omits the Zoom to fit entry when onFitToScreen is not provided", () => {
     renderToolbar({ zoom: 100 });
     fireEvent.click(screen.getByRole("button", { name: "Zoom presets" }));
-    expect(screen.queryByRole("button", { name: "Fit to screen" })).toBeNull();
+    expect(screen.queryByRole("button", { name: /Zoom to fit/ })).toBeNull();
   });
 });
 

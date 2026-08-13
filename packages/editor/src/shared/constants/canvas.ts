@@ -378,7 +378,12 @@ export const DEVICE_PRESETS = [
 // ZOOM PRESETS
 // ============================================
 
-export const ZOOM_PRESETS = [10, 25, 50, 75, 100, 125, 150, 200, 300] as const;
+/* Board 817:4723 states the range as 10%–400% and gives 400% its own state
+   card ("Max zoom · sub-pixel work"). The list stopped at 300, so the top of
+   the documented range could not be reached from the UI at all — the engine
+   clamp (THRESHOLDS.ZOOM_MAX) was never the limit, this array was. 10 stays
+   as the floor: it is the min-zoom state and the disabled bound for Zoom out. */
+export const ZOOM_PRESETS = [10, 25, 50, 75, 100, 150, 200, 400] as const;
 
 export const ZOOM_LIMITS = {
   min: 10,

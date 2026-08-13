@@ -4,8 +4,6 @@
  * @license BSD-3-Clause
  */
 
-export { ZoomControl } from "./ZoomControl";
-export type { ZoomControlProps } from "./ZoomControl";
 
 export { DeviceSelector } from "./DeviceSelector";
 export type { DeviceSelectorProps, Device } from "./DeviceSelector";

@@ -20,8 +20,6 @@ export { CanvasFooterToolbar } from "./CanvasFooterToolbar";
 export type { CanvasFooterToolbarProps, CanvasOverlayState } from "./CanvasFooterToolbar";
 
 // Zoom controls (standalone widget)
-export { ZoomControls } from "./ZoomControls";
-export type { ZoomControlsProps } from "./ZoomControls";
 
 // Empty canvas CTA
 export { CanvasEmptyCTA } from "./CanvasEmptyCTA";

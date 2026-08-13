@@ -155,6 +155,10 @@ const ZOOM_PCT =
   "tw:bg-transparent tw:text-[11px] tw:font-semibold tw:text-gray-900";
 const PRESET_ITEM =
   "tw:w-full tw:px-3 tw:py-[5px] tw:rounded tw:border-0 tw:text-xs tw:font-medium tw:text-right";
+const PRESET_ROW =
+  "tw:w-full tw:px-3 tw:py-[5px] tw:rounded tw:border-0 tw:text-xs tw:font-medium " +
+  "tw:flex tw:items-center tw:justify-between tw:gap-4";
+const PRESET_KEY = "tw:text-[10px] tw:text-[var(--bk-gray-400)]";
 const PRESET_DIVIDER = "tw:h-px tw:my-1 tw:bg-gray-200";
 
 // ============================================
@@ -369,7 +373,35 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
 
         {/* Preset dropdown */}
         {showPresets && (
-          <div className={`${POPOVER_BASE_CLASS} tw:flex tw:flex-col tw:bottom-[calc(100%+6px)] tw:left-1/2 tw:-translate-x-1/2 tw:min-w-25 tw:p-1`}>
+          <div className={`${POPOVER_BASE_CLASS} tw:flex tw:flex-col tw:bottom-[calc(100%+6px)] tw:left-1/2 tw:-translate-x-1/2 tw:min-w-45 tw:p-1`}>
+            {/* Board 817:4723 opens the flyout with the actions, then the
+                preset list under a divider. */}
+            {onFitToScreen && (
+              <Button
+                type="button"
+                color="light"
+                onClick={() => {
+                  onFitToScreen();
+                  setShowPresets(false);
+                }}
+                className={`${PRESET_ROW} tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:bg-gray-100`}
+              >
+                <span>Zoom to fit</span>
+                <span className={PRESET_KEY}>⌘0</span>
+              </Button>
+            )}
+            <Button
+              type="button"
+              color="light"
+              onClick={() => {
+                onZoomChange(100);
+                setShowPresets(false);
+              }}
+              className={`${PRESET_ROW} tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:bg-gray-100`}
+            >
+              <span>Zoom to 100%</span>
+            </Button>
+            <div className={PRESET_DIVIDER} />
             {ZOOM_PRESETS.map((preset) => (
               <Button
                 key={preset}
@@ -388,22 +420,6 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
                 {preset}%
               </Button>
             ))}
-            {onFitToScreen && (
-              <>
-                <div className={PRESET_DIVIDER} />
-                <Button
-                  type="button"
-                  color="light"
-                  onClick={() => {
-                    onFitToScreen();
-                    setShowPresets(false);
-                  }}
-                  className={`${PRESET_ITEM} tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:bg-gray-100`}
-                >
-                  Fit to screen
-                </Button>
-              </>
-            )}
           </div>
         )}
       </div>
