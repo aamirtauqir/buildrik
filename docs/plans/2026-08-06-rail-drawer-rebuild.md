@@ -865,6 +865,40 @@ Building the skeleton would mean inventing a delay to justify it.
 without noticing that a title, two CTAs and a keyboard tip had been deleted. The
 surface every user sees whenever they deselect had no coverage at all.
 
+## Canvas family — WALKED 2026-08-13 (7/7 boards)
+
+Not part of the rail-drawer 6, but walked in the same pass because the drawer
+work kept landing next to it. Every board had a code home; none of the finds
+were missing surfaces. All seven were the same shape — **two halves that both
+exist, both look implemented, and disagree with each other** — which no test,
+type or gate can see.
+
+| Board | Find | Commit |
+|---|---|---|
+| inline-edit toolbar (18 controls) | 11 of 18 controls fell into a `default:` that only called `devLog`. Lists, all four alignments, indent/outdent, size and both colours rendered, took the click, did nothing. | `de783749` |
+| ctx-menu submenus | "Reveal in Layers" emitted `"layers:reveal"`; the shell listens for `SHOW_IN_LAYERS`. Four names existed for one job. The working chain had no production emitter — its own test kept it alive. | `69666c8f` |
+| (same pass) | StudioPanels listened for `VERSION_PREVIEW_STARTED/_CLEARED`; the engine emits `VERSION_PREVIEW/_CLEAR`. Banner could never render. Deleted — board `163:113` puts this bar in the Versions panel, where `TimeTravelScrubber` already implements it. | `69666c8f` |
+| hover levels | ⊕ clone badge on Ctrl, clone drag on Alt. Ctrl promised a duplicate and moved; Alt showed the hierarchy overlay and silently duplicated. Tests drove it with `altKey`, so the inverted contract stayed green. | `9e508da7` |
+| breadcrumb bar | Bar advertised "Alt+↑ Parent"; Alt+↑ *reorders among siblings*. Parent/child are ← and →. Context menu's "Select Parent" told the same lie. Rebuilt to the board (4 Emotion styled + 95-line `getTypeIcon` gone). | `5a3674e3` |
+| command palette | Still rendering the dark-only palette dropped on 2026-04-18. Nine categories against the board's four, grouped by first appearance in a recency-sorted list — running one Insert command floated INSERT to the top. | `7765ace0` |
+| zoom levels | Board documents 10%–400% with a 400% state card; presets stopped at 300, so the top of the range was unreachable by any route. Two dead zoom components sat beside the live one reading the same array. | `aaf0b1e9` |
+| toolbar states | "Toggles persist per-user per-project" — they were plain useState and reset every reload. `useOverlayState.ts` was a second complete copy of the state, imported by nothing. | `f429fcbb` |
+
+**Deliberate board deviations, all one rule** — a shortcut label names the key
+that is bound. Boards draw Alt+↑ as Parent (twice) and ⌘1 as Zoom to fit; the
+code binds ← and ⌘0. Same call as the 8-row pre-checks board. The alternative
+was moving documented shortcuts so labels could stay as drawn.
+
+**Named, not built:** Zoom to selection (⌘2 on `817:4723`) needs viewport
+scrolling this canvas has no path for. Comments as the footer's 7th toggle —
+comment mode lives in the top bar; moving it is IA, not a fix. The seven
+toggle shortcuts on `817:4649` are bound to nothing; printing them would add
+seven more labels naming dead keys.
+
+**The scan worth keeping:** diff every event the package emits against every
+event it listens for, and diff a toolbar's dispatched command literals against
+its handler's case labels. Both found defects nothing else could see.
+
 ## NOT in scope
 
 - ~~Inspector flat body (board `52:56` / `824:5095`) — next arc after this one;
