@@ -1217,6 +1217,17 @@ live this phase; onboarding-steps accepted from its diff — browser defaults �
 designed values). **31/31, twice consecutively.** T3's snapshot pins now have
 a floor that doesn't wobble.
 
+### Phase 0 — T3 tranche 1: pixel pins on the 19 probe surfaces (`59d2c357`)
+
+`visual-pins.spec.ts`: toHaveScreenshot per eye-accepted probe surface, same
+three gates as parity + animations:"disabled". The negative test failed
+twice before it worked, each failure its own lesson: `tw:bg-gray-300` never
+compiled (the JIT class-list trap biting the TEST — mutate with inline
+styles, not novel utilities), and Playwright's default threshold 0.2 calls a
+40%-dimmed near-white "the same pixel" (pinned at 0.02; the mutation now
+fails with 66k differing pixels). 19/19 twice. Tranche 2 = live-app surfaces
+(breadcrumb, inline toolbar, shell states) — needs app-state setup per case.
+
 ## Named for the founder — needs a decision or a file I must not stage
 
 **`ConflictModal` does not match board 66:640, and fixing it needs
