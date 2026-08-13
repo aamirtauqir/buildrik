@@ -913,6 +913,12 @@ export class VersionTimelineManager {
     const pruned = await pruneVersions(this.projectId, this.config.maxVersions);
     if (pruned > 0) {
       this.versions = this.versions.slice(0, this.config.maxVersions);
+      /* Pruning was silent: a user's older auto-saves vanished with nothing
+         said. Board 163:269 draws the notice — announce it so the panel can. */
+      this.composer.emit(EVENTS.VERSION_PRUNED, {
+        removed: pruned,
+        kept: this.config.maxVersions,
+      });
     }
   }
 

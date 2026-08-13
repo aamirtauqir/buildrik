@@ -446,6 +446,28 @@
   color: var(--bk-ink-muted);
 }
 
+/* Board 163:269 — the pruned notice. Amber wash, not an error: nothing failed,
+   the oldest auto-saves aged out. Named versions and the approved one survive,
+   which is the half the copy exists to say. */
+.saves-pruned-notice {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--bk-space-8) var(--bk-space-12);
+  background: var(--bk-warning-tint);
+  border-bottom: 1px solid var(--bk-border);
+  color: var(--bk-warning-text);
+  font-size: 12px;
+}
+
+.saves-pruned-notice strong {
+  font-weight: 600;
+}
+
+.saves-pruned-notice span {
+  color: var(--bk-ink-muted);
+}
+
 .saves-view {
   height: 100%;
   display: flex;

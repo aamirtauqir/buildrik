@@ -101,6 +101,11 @@ function makeVersion(overrides: Partial<NamedVersion> = {}): NamedVersion {
 
 function makeComposer(): Composer {
   return {
+    /* The panel subscribes to VERSION_PRUNED. A composer without an event
+       registry is not a composer — the stub was thinner than the real thing,
+       which is only visible the first time the component subscribes. */
+    on: () => {},
+    off: () => {},
     versions: {
       captureVisualSnapshot: () => "data:image/jpeg;base64,fake",
     },
@@ -109,7 +114,7 @@ function makeComposer(): Composer {
 
 /** Composer with no versions manager — currentVisualSnapshot stays null. */
 function makeSnapshotlessComposer(): Composer {
-  return {} as unknown as Composer;
+  return { on: () => {}, off: () => {} } as unknown as Composer;
 }
 
 async function loadPanel() {

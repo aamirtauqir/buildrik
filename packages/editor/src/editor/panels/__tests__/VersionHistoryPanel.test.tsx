@@ -117,6 +117,11 @@ function makeVersion(overrides: Partial<NamedVersion> = {}): NamedVersion {
 function makeComposer(): Composer {
   // Minimal stub — only versions.captureVisualSnapshot() is touched.
   return {
+    /* The panel subscribes to VERSION_PRUNED. A composer without an event
+       registry is not a composer — the stub was thinner than the real thing,
+       which is only visible the first time the component subscribes. */
+    on: () => {},
+    off: () => {},
     versions: {
       captureVisualSnapshot: () => "data:image/jpeg;base64,fake",
     },

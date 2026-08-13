@@ -10,6 +10,7 @@
  */
 
 import * as React from "react";
+import { EVENTS } from "@/shared/constants/events";
 import { useVersionHistory } from "../../shared/hooks/useVersionHistory";
 import type { CompareResult } from "../../shared/types/versions";
 import type { Composer } from "../../engine";
@@ -79,6 +80,20 @@ export function VersionHistoryPanel({
   // AI summary state — hook owns the rate-limit + cooldown tick + handler.
   const { aiSummaryStates, handleGetAiSummary, getCooldownSeconds } =
     useAISummary({ versions, compareResults, updateAiSummary });
+
+  /* Board 163:269 — pruning used to happen with nothing said, so a user's
+     older auto-saves simply stopped being there. The engine now announces it
+     (VERSION_PRUNED); this is the notice. Dismissible, and it clears itself on
+     the next prune-free session because it is session state, not stored. */
+  const [pruned, setPruned] = React.useState<{ removed: number; kept: number } | null>(null);
+  React.useEffect(() => {
+    if (!composer) return;
+    const onPruned = (p: { removed: number; kept: number }) => setPruned(p);
+    composer.on(EVENTS.VERSION_PRUNED, onPruned);
+    return () => {
+      composer.off(EVENTS.VERSION_PRUNED, onPruned);
+    };
+  }, [composer]);
 
   // Capture current canvas visual snapshot on mount
   React.useEffect(() => {
@@ -210,6 +225,15 @@ export function VersionHistoryPanel({
 
   return (
     <div className="saves-view">
+      {pruned && (
+        <div className="saves-pruned-notice" role="status">
+          <strong>Older auto-saves were removed</strong>
+          <span>
+            Past {pruned.kept}. Named versions and the approved one were kept.
+          </span>
+        </div>
+      )}
+
       {/* Version List — virtualization + row rendering owned by VersionList.
           See ./version-history/VersionList.tsx (D3 Stage 1). */}
       <VersionList

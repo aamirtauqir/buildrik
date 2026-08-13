@@ -130,6 +130,9 @@ export const EVENTS = {
   // ============================================
   VERSION_CREATED: "version:created",
   VERSION_RESTORED: "version:restored",
+  /** Auto-saves were dropped to stay under maxVersions. Board 163:269 draws
+      the notice this makes possible; pruning used to be silent. */
+  VERSION_PRUNED: "version:pruned",
   VERSION_DELETED: "version:deleted",
   VERSION_EXPORTED: "version:exported",
   VERSION_IMPORTED: "version:imported",
@@ -713,6 +716,7 @@ export interface EventPayloads {
   // Version History Events (AQUI-031)
   [EVENTS.VERSION_CREATED]: import("../types/versions").VersionCreatedPayload;
   [EVENTS.VERSION_RESTORED]: import("../types/versions").VersionRestoredPayload;
+  [EVENTS.VERSION_PRUNED]: { removed: number; kept: number };
   [EVENTS.VERSION_DELETED]: import("../types/versions").VersionDeletedPayload;
   [EVENTS.VERSION_EXPORTED]: import("../types/versions").VersionExportPayload;
   [EVENTS.VERSION_IMPORTED]: import("../types/versions").VersionExportPayload;
