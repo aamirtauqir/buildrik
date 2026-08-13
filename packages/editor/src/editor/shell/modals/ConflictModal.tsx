@@ -47,7 +47,7 @@ export function ConflictModal({ open, onReload, onSaveBackup, onOverwrite, onClo
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        style={{ width: "100%", maxWidth: 440, background: /* @lint-hex-policy: ConflictModal self-themed state colors (documented component-theme exception) */ "#fff", borderRadius: 12, boxShadow: "0 10px 40px rgba(0,0,0,0.25)", padding: 24, fontFamily: "Inter, system-ui, sans-serif" }}
+        style={{ width: "100%", maxWidth: 440, background: /* @lint-hex-policy: ConflictModal self-themed state colors (documented component-theme exception) */ "#fff", borderRadius: 12, boxShadow: "0 10px 40px rgba(0,0,0,0.25)", padding: 24, fontFamily: "var(--bk-font-ui)" }}
       >
         <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: /* @lint-hex-policy: ConflictModal self-themed state colors (documented component-theme exception) */ "#111" }}>This site changed somewhere else</h2>
         <p style={{ marginTop: 8, marginBottom: 0, fontSize: 14, lineHeight: 1.5, color: /* @lint-hex-policy: ConflictModal self-themed state colors (documented component-theme exception) */ "#555" }}>

@@ -1040,6 +1040,46 @@ In five of the eleven, a TEST asserted the broken half:
 A green suite is not evidence a feature works. It is evidence the suite agrees
 with the code, which is also what you get when both are wrong.
 
+## Named for the founder — needs a decision or a file I must not stage
+
+**`ConflictModal` does not match board 66:640, and fixing it needs
+`AquibraStudio.tsx`.** The board draws "Someone else saved first" / "Sara saved
+a change to this page 40 seconds ago. Keeping yours will overwrite hers." with
+two buttons: **Review both** and **Keep mine**. The shipped modal says "This
+site changed somewhere else" and offers four: Reload latest, Save a backup,
+Overwrite… → Yes, overwrite.
+
+The detection works — `useSaveCallback` returns a `"conflict"` outcome
+(`:98`) — so this is a real state a user reaches, drawn one way and built
+another. "Keep mine" maps to the existing `onOverwrite`; **"Review both" maps
+to nothing that exists** and would need a compare surface (board 807:6965
+`S1.2d · Conflict · Review both`) plus a new prop, which means editing
+`AquibraStudio.tsx` — the founder's file, which CLAUDE.md says never to stage
+from an agent session. Left alone deliberately rather than half-conformed: new
+copy over the old four-button action set would be worse than either.
+
+Fixed in-file, because it is a violation either way: the modal's inline
+`fontFamily: "Inter, system-ui, sans-serif"` — DESIGN.md §Typography bans
+naming system fallbacks in any stack — is now `var(--bk-font-ui)`.
+
+Also on the same surface: `SaveStatus`'s `SaveState` union carries a
+`"conflict"` value that `StudioHeader:452`'s derivation cannot produce (it maps
+offline / saving / error / dirty / saved and nothing else). So the topbar chip
+has a conflict state that never appears, while the modal for the same condition
+appears with the wrong copy.
+
+**Open product call (unchanged):** `#page:<id>` in a saved template. Templates
+capture `exportHTML()`, so a page saved as a template carries an internal link
+to a page id that will not exist wherever it is applied. Strip it, resolve to a
+slug, or ask on apply — a decision, not a wiring fix.
+
+**Open founder call:** the styling ratchet. It was already failing at this
+session's starting commit (css_lines 9252 vs a 9043 baseline, five files over,
+incl. a MediaContextMenu.css added 2026-08-12 that never got a bump), so the
+pre-push hook has been refusing pushes since before this work. This session
+adds 145 on top. Not re-baselined here — a ratchet quietly raised stops being
+one.
+
 ## NOT in scope
 
 - ~~Inspector flat body (board `52:56` / `824:5095`) — next arc after this one;
