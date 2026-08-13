@@ -81,7 +81,7 @@ describe("DesignSystemTab → ExportSection (S5 integration)", () => {
     // ImportCard heading visible.
     expect(getAllByText(/Import tokens/i).length).toBeGreaterThan(0);
     // Format radios present.
-    expect(getByText(/CSS Variables/i)).toBeTruthy();
+    expect(getByText(/Custom properties/i)).toBeTruthy(); // board 153:120 copy
   });
 
   it("import flow stages a new color token + propagates dirty marker to Tokens section tab", async () => {

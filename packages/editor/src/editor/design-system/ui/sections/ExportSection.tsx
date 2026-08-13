@@ -56,9 +56,11 @@ const FORMAT_OPTIONS: Array<{
   /** Offered but not selectable — the reason rides in `desc`. */
   disabled?: boolean;
 }> = [
-  { id: "css",      label: "CSS Variables",        desc: ":root block + dark mode" },
-  { id: "json",     label: "JSON",                 desc: "design tokens" },
-  { id: "tailwind", label: "Tailwind Config",      desc: "tailwind.config.js" },
+  /* Copy per board 153:120 — short bold titles, the desc line carries the
+     format detail. */
+  { id: "css",      label: "CSS",      desc: "Custom properties" },
+  { id: "json",     label: "JSON",     desc: "Design tokens format" },
+  { id: "tailwind", label: "Tailwind", desc: "theme.extend config" },
   /* Board 153:120 greys this row out with "Coming soon — export JSON and use
      the Figma Variables importer", and the board is right. The emitter here was
      a hand-rolled envelope, `{version, format:"figma-variables", variables[]}`,
@@ -228,9 +230,18 @@ export const ExportSection: React.FC = () => {
                   onChange={() => setFormat(id)}
                   aria-label={label}
                 />
-                <span>
-                  {label}
-                  <span className="tw:ml-1 tw:text-gray-500">· {desc}</span>
+                {/* Board 153:120 draws every row as TWO lines — bold title,
+                    muted description under it — with the actions to the right.
+                    The single-line version could not exist at this width: the
+                    actions squeezed the label to ~70px (word-per-line wrap),
+                    and flex-1 alone collapsed it to 0 because the row had no
+                    free space left. Found live 2026-08-13. */}
+                <span className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
+                  <span className="tw:truncate" title={label}>{label}</span>
+                  <span className="tw:truncate tw:text-[11px] tw:text-gray-500" title={desc}>
+                    {desc}
+                    {id === "tailwind" && droppedCount > 0 ? ` · ${droppedCount} dropped` : ""}
+                  </span>
                 </span>
                 {/* Board 153:120 puts Copy and Download on every LIVE row —
                     the greyed Figma line carries no actions at all, which is
@@ -256,12 +267,6 @@ export const ExportSection: React.FC = () => {
                   </Button>
                 </span>
                 )}
-                <span
-                  data-testid={`format-chip-${id}`}
-                  className={`${CHIP} ${chip.className}`}
-                >
-                  {chip.label}
-                </span>
               </label>
             );
           })}

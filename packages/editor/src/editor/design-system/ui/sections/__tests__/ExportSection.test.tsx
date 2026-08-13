@@ -39,20 +39,19 @@ beforeEach(() => {
 describe("ExportSection", () => {
   it("renders 4 format radio options", () => {
     const { getByLabelText } = render(wrap(<ExportSection />));
-    expect(getByLabelText("CSS Variables")).toBeTruthy();
+    expect(getByLabelText("CSS")).toBeTruthy();
     expect(getByLabelText("JSON")).toBeTruthy();
-    expect(getByLabelText("Tailwind Config")).toBeTruthy();
+    expect(getByLabelText("Tailwind")).toBeTruthy();
     expect(getByLabelText("Figma Variables JSON")).toBeTruthy();
   });
 
-  it("each format row renders a status chip", () => {
-    const { getByTestId } = render(wrap(<ExportSection />));
-    expect(getByTestId("format-chip-css").textContent).toBe("lossless");
-    expect(getByTestId("format-chip-json").textContent).toBe("lossless");
-    expect(getByTestId("format-chip-figma").textContent).toBe("lossless");
-    // Tailwind chip is either "N dropped" or the fallback "dark variants dropped"
-    const twChip = getByTestId("format-chip-tailwind").textContent ?? "";
-    expect(/dropped/.test(twChip)).toBe(true);
+  /* Board 153:120 draws no chips on rows — title + muted desc, actions right.
+     The chip assertion pinned a decoration the board does not have; lossy
+     info (N dropped) now rides the Tailwind desc line. */
+  it("puts the description on its own muted line, chipless", () => {
+    const { queryByTestId, getByText } = render(wrap(<ExportSection />));
+    expect(queryByTestId("format-chip-css")).toBeNull();
+    expect(getByText("Custom properties")).toBeTruthy();
   });
 
   it("stats line shows kinds · tokens · alias edges · dark variants", () => {
@@ -66,7 +65,7 @@ describe("ExportSection", () => {
 
   it("Tailwind warning callout visible when Tailwind selected", () => {
     const { getByLabelText, getByTestId } = render(wrap(<ExportSection />));
-    fireEvent.click(getByLabelText("Tailwind Config"));
+    fireEvent.click(getByLabelText("Tailwind"));
     expect(getByTestId("tailwind-warning")).toBeTruthy();
     expect(getByTestId("tailwind-warning").textContent).toMatch(/Tailwind warning/i);
   });
@@ -96,7 +95,7 @@ describe("ExportSection", () => {
 
   it("switching to Tailwind re-renders preview as JS module", () => {
     const { getByLabelText, getByTestId } = render(wrap(<ExportSection />));
-    fireEvent.click(getByLabelText("Tailwind Config"));
+    fireEvent.click(getByLabelText("Tailwind"));
     const preview = getByTestId("export-preview");
     expect(preview.textContent).toContain("module.exports");
   });
