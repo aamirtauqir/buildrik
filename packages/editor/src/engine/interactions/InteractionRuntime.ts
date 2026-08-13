@@ -298,9 +298,22 @@ export class InteractionRuntime {
     const targetId = this.resolveTarget(id, animation.target);
     if (!targetId) return;
 
-    // Map our preset to GSAP timeline steps
-    // In a full implementation, we'd have a PresetManager
-    const timeline = this.getPresetTimeline(animation.preset);
+    /* The inspector persists the editor's AnimationConfig shape — `type`,
+       `iterations` — while this runtime was written against the engine's
+       InteractionAnimationConfig — `preset`, `loop`. Two shapes for one
+       object, so `animation.preset` was undefined for every interaction the
+       inspector has ever created: every preset fell to the default nudge, and
+       the Duration / Delay / Easing controls reached nothing at all. Both
+       names are read here so already-saved projects keep working. */
+    const legacy = animation as unknown as {
+      type?: string;
+      iterations?: number;
+    };
+    const timeline = applyAnimationConfig(
+      this.getPresetTimeline(animation.preset ?? legacy.type ?? ""),
+      animation,
+    );
+    const loop = animation.loop ?? legacy.iterations ?? 1;
 
     gsapEngine
       .createAnimation({
@@ -308,8 +321,8 @@ export class InteractionRuntime {
         target: targetId,
         trigger: "click", // generic trigger for GSAP internal
         timeline,
-        loop: (animation.loop ?? 1) === -1,
-        repeatCount: (animation.loop ?? 1) > 0 ? (animation.loop ?? 1) - 1 : 0,
+        loop: loop === -1,
+        repeatCount: loop > 0 ? loop - 1 : 0,
       })
       ?.timeline.play();
   }
@@ -383,6 +396,50 @@ export class InteractionRuntime {
 // InteractionManager instantiates its own InteractionRuntime per Composer
 // instance, so a module-level singleton was just an unused allocation
 // at module load. Re-add if a real cross-Composer use case appears.
+
+/** GSAP ease names for the two easing vocabularies the editor writes. */
+const EASE_MAP: Record<string, string> = {
+  linear: "none",
+  ease: "power2.inOut",
+  "ease-in": "power2.in",
+  "ease-out": "power2.out",
+  "ease-in-out": "power2.inOut",
+  easeIn: "power2.in",
+  easeOut: "power2.out",
+  easeInOut: "power2.inOut",
+  easeInQuad: "power1.in",
+  easeOutQuad: "power1.out",
+  easeInCubic: "power3.in",
+  easeOutCubic: "power3.out",
+  easeInQuart: "power4.in",
+  easeOutQuart: "power4.out",
+};
+
+/**
+ * Fold the user's duration / delay / easing onto a preset's timeline. The
+ * preset defines the SHAPE (which properties move, in what order, with what
+ * relative weight); the config defines how long and how it feels. Durations
+ * are scaled so a two-step preset keeps its internal ratio.
+ */
+function applyAnimationConfig(
+  steps: TimelineStep[],
+  animation: { duration?: number; delay?: number; easing?: string },
+): TimelineStep[] {
+  if (steps.length === 0) return steps;
+
+  const total = steps.reduce((sum, s) => sum + s.duration, 0);
+  const wanted = typeof animation.duration === "number" ? animation.duration / 1000 : null;
+  const scale = wanted && total > 0 ? wanted / total : 1;
+  const ease = animation.easing ? EASE_MAP[animation.easing] : undefined;
+  const delay = typeof animation.delay === "number" ? animation.delay / 1000 : 0;
+
+  return steps.map((s, i) => ({
+    ...s,
+    duration: s.duration * scale,
+    ease: ease ?? s.ease,
+    delay: i === 0 ? s.delay + delay : s.delay,
+  }));
+}
 
 // =============================================================================
 // PRESET TIMELINES

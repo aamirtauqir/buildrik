@@ -1,17 +1,19 @@
 /**
- * Animation keyframe definitions for EXPORT output.
+ * Animation keyframe definitions — the ONE definition, for both the canvas
+ * and exported sites.
  *
- * The editor canvas gets these keyframes from
- * `themes/components/atoms/animation-utils.css` (chrome runtime). Exported /
- * published sites are a standalone artifact that never loads that chrome CSS,
- * so element animations (`animation: bd-anim-<name> …`, written by
- * ElementOperations.setAnimation) referenced undefined keyframes and silently
- * no-op'd on the live site. ExportEngine emits the keyframes used by the
- * exported tree from this map.
+ * This header used to say the canvas got them from
+ * `themes/components/atoms/animation-utils.css` and that this map was a copy
+ * to keep mirrored. That file was deleted with the vibcoder CSS bundle on
+ * 2026-07-28, so the canvas had no `bd-anim-*` keyframes at all: an element
+ * animation set through the inspector (`animation: bd-anim-<name> …`, written
+ * by ElementOperations.setAnimation) referenced an undefined name and did
+ * nothing until the site was published, and the interactions Preview button —
+ * which sets the same property — never previewed anything.
  *
- * SSOT note: this is the engine-importable copy (engine/ may import shared/,
- * not themes/). It must stay in sync with animation-utils.css — both define
- * the same `bd-anim-*` keyframes. Keep edits mirrored.
+ * Canvas.tsx now injects `keyframesStyleSheet()` alongside the user's global
+ * CSS, and ExportEngine emits `collectUsedKeyframes()` for the published
+ * artifact. Same map, so the two cannot drift.
  *
  * @license BSD-3-Clause
  */
@@ -58,4 +60,14 @@ export function collectUsedKeyframes(css: string): string {
     if (re.test(css)) used.push(block);
   }
   return used.join("\n");
+}
+
+/**
+ * Every keyframe block, for the canvas. Export uses `collectUsedKeyframes` to
+ * ship only what a page references; the canvas cannot know in advance which
+ * animation a user is about to preview, so it takes the lot — ~4KB of static
+ * text, injected once.
+ */
+export function keyframesStyleSheet(): string {
+  return Object.values(ANIMATION_KEYFRAMES).join("");
 }

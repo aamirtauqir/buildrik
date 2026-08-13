@@ -534,8 +534,12 @@ describe("InteractionRuntime", () => {
       runtime.start();
       el.dispatchEvent(new MouseEvent("click"));
 
+      /* DEFAULT_ANIMATION_CONFIG asks for 300ms / easeOut, and the runtime now
+         honours it — the preset supplies the SHAPE, the config the timing.
+         This used to assert the preset's own 0.5s, i.e. that duration and
+         easing were ignored. */
       expect(firstConfigFor("el-fade").timeline).toEqual([
-        { property: "opacity", from: 0, to: 1, duration: 0.5, delay: 0, ease: "power2.out" },
+        { property: "opacity", from: 0, to: 1, duration: 0.3, delay: 0, ease: "power2.out" },
       ]);
     });
 
@@ -562,7 +566,7 @@ describe("InteractionRuntime", () => {
       el.dispatchEvent(new MouseEvent("click"));
 
       expect(firstConfigFor("el-other").timeline).toEqual([
-        { property: "opacity", from: 0.5, to: 1, duration: 0.2, delay: 0, ease: "linear" },
+        { property: "opacity", from: 0.5, to: 1, duration: 0.3, delay: 0, ease: "power2.out" },
       ]);
     });
 
@@ -643,6 +647,79 @@ describe("InteractionRuntime", () => {
       el.dispatchEvent(new MouseEvent("mouseup"));
 
       expect(callsFor("el-active-rev")).toHaveLength(1);
+    });
+  });
+
+  /* The inspector persists the editor's AnimationConfig — `type`, `iterations`
+     — and this runtime was written against the engine's `preset`, `loop`. Two
+     shapes for one object: `animation.preset` was undefined for every
+     interaction the inspector has ever created, so every preset fell to the
+     default nudge and the Duration/Delay/Easing controls reached nothing. */
+  describe("the inspector's animation shape", () => {
+    const firstConfigFor = (targetId: string) => callsFor(targetId)[0][0];
+
+    it("reads a preset stored under the editor's `type` key", () => {
+      const el = makeElement("el-legacy", [
+        makeInteraction("click", { preset: undefined as unknown as AnimationPreset }),
+      ]);
+      el.setAttribute(
+        "data-buildrick-interactions",
+        JSON.stringify([
+          {
+            id: "i1",
+            trigger: "click",
+            enabled: true,
+            animation: { type: "shake", duration: 400, delay: 0, easing: "ease-in-out" },
+          },
+        ]),
+      );
+      runtime.start();
+      el.dispatchEvent(new MouseEvent("click"));
+
+      const timeline = firstConfigFor("el-legacy").timeline;
+      expect(timeline[0]).toMatchObject({ property: "x" });
+      expect(timeline.reduce((n, s) => n + s.duration, 0)).toBeCloseTo(0.4);
+      expect(timeline[0].ease).toBe("power2.inOut");
+    });
+
+    it("reads the loop count from the editor's `iterations` key", () => {
+      const el = makeElement("el-iter", null);
+      el.setAttribute(
+        "data-buildrick-interactions",
+        JSON.stringify([
+          {
+            id: "i2",
+            trigger: "click",
+            enabled: true,
+            animation: { type: "fadeIn", duration: 300, delay: 0, easing: "ease", iterations: 3 },
+          },
+        ]),
+      );
+      runtime.start();
+      el.dispatchEvent(new MouseEvent("click"));
+
+      expect(firstConfigFor("el-iter")).toMatchObject({ loop: false, repeatCount: 2 });
+    });
+
+    it("puts the configured delay on the first step only", () => {
+      const el = makeElement("el-delay", null);
+      el.setAttribute(
+        "data-buildrick-interactions",
+        JSON.stringify([
+          {
+            id: "i3",
+            trigger: "click",
+            enabled: true,
+            animation: { type: "fadeInUp", duration: 500, delay: 250, easing: "linear" },
+          },
+        ]),
+      );
+      runtime.start();
+      el.dispatchEvent(new MouseEvent("click"));
+
+      const timeline = firstConfigFor("el-delay").timeline;
+      expect(timeline[0].delay).toBeCloseTo(0.25);
+      expect(timeline[1].delay).toBe(0);
     });
   });
 });

@@ -48,6 +48,7 @@ import {
   useSectionReorder,
 } from "./hooks";
 import type { DropError, DropSuccess } from "./hooks/useCanvasDragDrop";
+import { keyframesStyleSheet } from "@/shared/constants/animationKeyframes";
 import { useGlobalCustomCss } from "./hooks/useGlobalCustomCss";
 import { ElementContextMenu } from "./menus";
 import { CanvasOverlayGroup } from "./overlays";
@@ -520,6 +521,12 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
             ...(pickMode ? { cursor: "crosshair" } : {}),
           }}
         >
+          {/* Element animations resolve against these. The canvas had none
+              after animation-utils.css was deleted with the vibcoder bundle,
+              so every `animation: bd-anim-*` set through the inspector did
+              nothing until publish. */}
+          <style>{keyframesStyleSheet()}</style>
+
           {/* User's global custom CSS — applied live on the canvas. */}
           {globalCustomCss ? <style>{globalCustomCss}</style> : null}
 
