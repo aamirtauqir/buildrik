@@ -1068,6 +1068,30 @@ refactoring CLAUDE.md warns about.
 What DID find real defects, every time, is narrower: a UI catalogue compared
 against the implementations that must serve it.
 
+### Live eye-verification — round 1, 2026-08-13 (server finally up)
+
+Four Canvas surfaces checked board-vs-live at 1440×900, per the founder's
+acceptance rule. **Three defects found that NO offline instrument could see** —
+on surfaces where tsc, vitest, gates and even DOM queries all said healthy:
+
+| Surface | Live finding | Fix |
+|---|---|---|
+| Zoom flyout (817:4723) | Opened **fully invisible** — the footer toolbar's `tw:overflow-x-auto` forces overflow-y to auto, clipping the upward flyout to the toolbar's 40px box. DOM said open, opacity 1; elementFromPoint returned the canvas. Predates this arc. | Portal + fixed coords from anchor rect — PageTabBar's own precedent, Gate 22's sanctioned route. Click-through verified: pick 400% → footer reads 400% (`7ebbabeb`) |
+| Breadcrumb (1175:4849) | **My rebuild's own regression**: Emotion version sat at Z_LAYERS.floatingToolbar (3001); the rebuild wrote `tw:z-30`, painting the whole bar UNDER the canvas. checkVisibility() true. Plus bottom-0 put its lower 16px under the floating toolbar. | z from the registry (inline style, per the registry's contract) + bottom-14 (`27e74fec`) |
+| Command palette (1177:4804) | Structure/light theme/groups/footer count all match. One visual delta: rows carried emoji icons the board does not draw. | Icon column removed (`27e74fec`) |
+| Footer toggles (817:4649) | Persistence verified end-to-end live: toggle Grid → localStorage overlays key → reload → button renders active (Grid✓). | none needed — `f429fcbb` holds |
+
+**The lesson, in one line: the DOM lies about visibility.** Open + opacity:1 +
+checkVisibility:true + correct rect can still be invisible (clipped by an
+ancestor's computed overflow, or painted under a sibling stacking context).
+Only a pixel screenshot catches this class, which is exactly why the founder's
+acceptance rule is a screenshot.
+
+Verification tooling note for the next walk: popovers here close between browse
+commands — full-page screenshots scroll (closing scroll-away popovers), so use
+`chain` + `--viewport`, JS clicks (no scroll-into-view), and re-query popover
+presence in the same chain step before trusting a shot.
+
 ## Named for the founder — needs a decision or a file I must not stage
 
 **`ConflictModal` does not match board 66:640, and fixing it needs
