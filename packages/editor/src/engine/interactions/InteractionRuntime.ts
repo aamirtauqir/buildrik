@@ -364,47 +364,109 @@ export class InteractionRuntime {
   }
 
   /**
-   * Mock preset to timeline conversion
+   * Preset name → timeline. The inspector offers 31 presets
+   * (ANIMATION_PRESET_GROUPS); this switch implemented two, fadeIn and
+   * slideUp, and everything else fell to a default that returns a 0.2s
+   * opacity 0.5→1 nudge. So Bounce, Zoom In, Shake, Flip and the rest all
+   * produced the same faint flicker — which reads as a weak animation rather
+   * than an unimplemented one, and is why it survived: nothing looked broken.
+   *
+   * These are data, not behaviour: `from`/`to` on properties GSAPEngine's
+   * PROPERTY_MAP already understands. Steps with delay 0 run together.
    */
   private getPresetTimeline(preset: string): TimelineStep[] {
-    const defaultDuration = 0.5;
-    switch (preset) {
-      case "fadeIn":
-        return [
-          {
-            property: "opacity",
-            from: 0,
-            to: 1,
-            duration: defaultDuration,
-            delay: 0,
-            ease: "power2.out",
-          },
-        ];
-      case "slideUp":
-        return [
-          {
-            property: "y",
-            from: 20,
-            to: 0,
-            duration: defaultDuration,
-            delay: 0,
-            ease: "power2.out",
-          },
-          {
-            property: "opacity",
-            from: 0,
-            to: 1,
-            duration: defaultDuration,
-            delay: 0,
-            ease: "linear",
-          },
-        ];
-      default:
-        return [{ property: "opacity", from: 0.5, to: 1, duration: 0.2, delay: 0, ease: "linear" }];
-    }
+    return PRESET_TIMELINES[preset] ?? DEFAULT_TIMELINE;
   }
+
 }
 // Singleton `interactionRuntime` removed 2026-05-24 — zero consumers.
 // InteractionManager instantiates its own InteractionRuntime per Composer
 // instance, so a module-level singleton was just an unused allocation
 // at module load. Re-add if a real cross-Composer use case appears.
+
+// =============================================================================
+// PRESET TIMELINES
+// =============================================================================
+
+const D = 0.5;
+const OUT = "power2.out";
+const IN_OUT = "power2.inOut";
+
+const step = (
+  property: string,
+  from: number | string,
+  to: number | string,
+  duration = D,
+  ease = OUT,
+  delay = 0,
+): TimelineStep => ({ property, from, to, duration, delay, ease });
+
+/** Fade paired with a directional offset — the fadeIn / slideIn family. */
+const enterFrom = (property: string, from: number): TimelineStep[] => [
+  step(property, from, 0),
+  step("opacity", 0, 1),
+];
+
+const DEFAULT_TIMELINE: TimelineStep[] = [step("opacity", 0.5, 1, 0.2, "linear")];
+
+export const PRESET_TIMELINES: Record<string, TimelineStep[]> = {
+  // Fade
+  fadeIn: [step("opacity", 0, 1)],
+  fadeOut: [step("opacity", 1, 0)],
+  fadeInUp: enterFrom("y", 20),
+  fadeInDown: enterFrom("y", -20),
+  fadeInLeft: enterFrom("x", -20),
+  fadeInRight: enterFrom("x", 20),
+
+  // Slide — movement without the fade
+  slideUp: [step("y", 20, 0), step("opacity", 0, 1)],
+  slideDown: [step("y", -20, 0), step("opacity", 0, 1)],
+  slideLeft: [step("x", 20, 0), step("opacity", 0, 1)],
+  slideRight: [step("x", -20, 0), step("opacity", 0, 1)],
+  slideInUp: enterFrom("y", 40),
+  slideInDown: enterFrom("y", -40),
+
+  // Scale / zoom
+  scaleIn: [step("scale", 0.8, 1), step("opacity", 0, 1)],
+  scaleOut: [step("scale", 1, 0.8), step("opacity", 1, 0)],
+  scaleUp: [step("scale", 1, 1.1, 0.3, IN_OUT)],
+  scaleDown: [step("scale", 1, 0.9, 0.3, IN_OUT)],
+  zoomIn: [step("scale", 0.3, 1), step("opacity", 0, 1)],
+  zoomOut: [step("scale", 1, 0.3), step("opacity", 1, 0)],
+
+  // Rotation
+  rotate: [step("rotation", 0, 360, 0.8, IN_OUT)],
+  rotateIn: [step("rotation", -180, 0), step("opacity", 0, 1)],
+  rotateOut: [step("rotation", 0, 180), step("opacity", 1, 0)],
+  flip: [step("rotationY", 0, 360, 0.8, IN_OUT)],
+  flipX: [step("rotationX", -90, 0, D, IN_OUT), step("opacity", 0, 1)],
+  flipY: [step("rotationY", -90, 0, D, IN_OUT), step("opacity", 0, 1)],
+
+  /* Attention seekers return to where they started, so each is a there-and-
+     back pair: an explicit delay on the second step sequences it after the
+     first instead of running with it. */
+  pulse: [step("scale", 1, 1.08, 0.25, IN_OUT), step("scale", 1.08, 1, 0.25, IN_OUT, 0.001)],
+  heartBeat: [step("scale", 1, 1.2, 0.18, OUT), step("scale", 1.2, 1, 0.32, IN_OUT, 0.001)],
+  flash: [step("opacity", 1, 0, 0.15, "linear"), step("opacity", 0, 1, 0.15, "linear", 0.001)],
+  shake: [step("x", 0, -8, 0.08, "linear"), step("x", -8, 8, 0.08, "linear", 0.001)],
+  wobble: [step("rotation", 0, -8, 0.15, IN_OUT), step("rotation", -8, 8, 0.15, IN_OUT, 0.001)],
+  jello: [step("skewX", 0, -10, 0.15, IN_OUT), step("skewX", -10, 0, 0.35, IN_OUT, 0.001)],
+  bounce: [step("y", 0, -20, 0.25, "power2.out"), step("y", -20, 0, 0.35, "bounce.out", 0.001)],
+  rubberBand: [step("scaleX", 1, 1.25, 0.2, IN_OUT), step("scaleX", 1.25, 1, 0.4, "elastic.out", 0.001)],
+  swing: [step("rotation", 0, 12, 0.2, IN_OUT), step("rotation", 12, 0, 0.4, "elastic.out", 0.001)],
+  tada: [step("scale", 1, 1.15, 0.2, OUT), step("scale", 1.15, 1, 0.4, "elastic.out", 0.001)],
+
+  // Exits
+  hinge: [step("rotation", 0, 80, 0.8, "power2.in"), step("opacity", 1, 0, 0.8, "linear")],
+  rollIn: [step("rotation", -120, 0), step("x", -60, 0), step("opacity", 0, 1)],
+  rollOut: [step("rotation", 0, 120), step("x", 0, 60), step("opacity", 1, 0)],
+
+  /* blur and glow animate CSS filters, which GSAPEngine's PROPERTY_MAP does
+     not carry — passed through by name, which is what the map's fallback is
+     for. `filter` interpolates in GSAP with the CSSPlugin. */
+  blur: [step("filter", "blur(8px)", "blur(0px)", D, OUT), step("opacity", 0, 1)],
+  glow: [
+    step("filter", "drop-shadow(0 0 0 rgba(26,86,219,0))", "drop-shadow(0 0 12px rgba(26,86,219,0.6))", 0.3, IN_OUT),
+    step("filter", "drop-shadow(0 0 12px rgba(26,86,219,0.6))", "drop-shadow(0 0 0 rgba(26,86,219,0))", 0.4, IN_OUT, 0.001),
+  ],
+};

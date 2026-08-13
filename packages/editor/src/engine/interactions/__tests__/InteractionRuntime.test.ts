@@ -21,6 +21,7 @@ import {
   type Interaction,
   type InteractionAnimationConfig,
   type InteractionTrigger,
+  type AnimationPreset,
 } from "../types";
 import { gsapEngine } from "../../animations/GSAPEngine";
 import { devError, devLog } from "../../../shared/utils/devLogger";
@@ -551,14 +552,26 @@ describe("InteractionRuntime", () => {
       expect(timeline[1]).toMatchObject({ property: "opacity", from: 0, to: 1 });
     });
 
-    it("unknown presets fall back to the default pulse-ish step", () => {
-      const el = makeElement("el-other", [makeInteraction("click", { preset: "shake" })]);
+    /* This used to pass "shake" as its example of an unknown preset — shake is
+       one of the 31 the inspector offers, and asserting it produced the
+       fallback nudge is how "every preset but two does nothing" stayed
+       green. */
+    it("falls back only for a preset name nothing offers", () => {
+      const el = makeElement("el-other", [makeInteraction("click", { preset: "not-a-preset" as AnimationPreset })]);
       runtime.start();
       el.dispatchEvent(new MouseEvent("click"));
 
       expect(firstConfigFor("el-other").timeline).toEqual([
         { property: "opacity", from: 0.5, to: 1, duration: 0.2, delay: 0, ease: "linear" },
       ]);
+    });
+
+    it("gives shake a timeline of its own", () => {
+      const el = makeElement("el-shake", [makeInteraction("click", { preset: "shake" })]);
+      runtime.start();
+      el.dispatchEvent(new MouseEvent("click"));
+
+      expect(firstConfigFor("el-shake").timeline[0]).toMatchObject({ property: "x" });
     });
 
     it("loop: -1 maps to infinite loop with no repeatCount", () => {

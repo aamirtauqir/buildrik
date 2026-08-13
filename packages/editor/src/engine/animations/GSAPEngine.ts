@@ -121,24 +121,33 @@ export class GSAPEngine {
       timeline.timeScale(100);
     }
 
+    /* Seed EVERY step's starting value before the timeline runs, not just the
+       first. A compound preset — fade in while sliding up — needs both opacity
+       and y set before either tween starts; seeding only step 0 left the
+       second property tweening from whatever the element happened to have. */
+    config.timeline.forEach((step) => {
+      const gsapProp = GSAPEngine.PROPERTY_MAP[step.property] || step.property;
+      gsap.set(target, { [gsapProp]: step.from });
+    });
+
     // Add each step to the timeline
     config.timeline.forEach((step, index) => {
       const props: gsap.TweenVars = {
         duration: prefersReducedMotion ? 0 : step.duration,
         ease: prefersReducedMotion ? "none" : step.ease,
-        delay: step.delay,
       };
+      if (step.delay) props.delay = step.delay;
 
       // Set the target property
       const gsapProp = GSAPEngine.PROPERTY_MAP[step.property] || step.property;
       props[gsapProp] = step.to;
 
-      // If this is the first step, set initial state
-      if (index === 0) {
-        gsap.set(target, { [gsapProp]: step.from });
-      }
-
-      timeline.to(target, props);
+      /* delay 0 on a follow-on step means "with the previous one". Appending
+         serially is what made a two-property preset play as two separate
+         half-second animations instead of one. An explicit delay still
+         sequences, which is what a stagger wants. */
+      if (index > 0 && !step.delay) timeline.to(target, props, "<");
+      else timeline.to(target, props);
     });
 
     const instance: AnimationInstance = {
