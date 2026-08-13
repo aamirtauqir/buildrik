@@ -828,6 +828,43 @@ Templates, AI, Components), cross-cutting surfaces (Inspector, Shell, Canvas,
 CmdK) and the journey flows (S1, S3, S5, S6). That is a new arc, and its order
 should come from the business rather than from board counts.
 
+## Inspector — walked 2026-08-13, the next arc's first family
+
+Walked board-by-code rather than by surface presence, because "a component with
+that name exists" is the reasoning that made Content read 13/15 when seven of
+its boards still needed work.
+
+| Board | Outcome |
+|---|---|
+| `52:56` flat scroll body | conformant since S3.9 — the plan's "biggest shell mismatch" line was stale, see NOT in scope |
+| 7 × `profile · *` | 7/7 exact, CONTAINER fallback included |
+| `159:99` no-selection | **rebuilt** (`60d0d60c`) — six blocks of chrome down to the board's two lines |
+| `1175:4841` empty · template-applied | conformant, down to the 30-minute window |
+| `159:123` multi-select | header **done** (`2a409c57`); shared-property editing is a feature gap, below |
+| `159:102` loading | the code has no loading moment to show it in — deliberate, see below |
+| reach-all-like-this · reach-whole-site · instance-selected · bound-to-CMS · breakpoint-override · pseudo-state · ai-agent-run · token-picker | mapped to live code |
+
+**The family's real gap is multi-select property editing.** Board 159:123 draws
+align and distribute AND the shared properties across the selection —
+Background, Text colour, Radius, Padding, Font size — with `Mixed` wherever the
+values differ, under "Editing a Mixed field applies it to all three". The code
+ships align and distribute only.
+
+That is a capability, not a layout. It needs shared-vs-mixed computed across the
+selection and a write that fans out to every selected element, and the engine
+has no batch style write at all (`updateMany` / `batchUpdate`: zero hits). A
+loop over `styles.update` would also have to land as ONE undo step, which is its
+own decision. Named here rather than built inside a walk.
+
+**`Inspector · loading` is drawn for a state the code cannot enter.**
+`ProInspector` returns the no-selection branch at :266 and otherwise renders
+synchronously off the selected element — no awaited data gates the body.
+Building the skeleton would mean inventing a delay to justify it.
+
+**Worth noting from the no-selection rewrite**: 510 inspector tests passed
+without noticing that a title, two CTAs and a keyboard tip had been deleted. The
+surface every user sees whenever they deselect had no coverage at all.
+
 ## NOT in scope
 
 - ~~Inspector flat body (board `52:56` / `824:5095`) — next arc after this one;
