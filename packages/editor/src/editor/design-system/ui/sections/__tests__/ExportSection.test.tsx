@@ -77,8 +77,7 @@ describe("ExportSection", () => {
     expect(queryByTestId("tailwind-warning")).toBeNull();
     fireEvent.click(getByLabelText("JSON"));
     expect(queryByTestId("tailwind-warning")).toBeNull();
-    fireEvent.click(getByLabelText("Figma Variables JSON"));
-    expect(queryByTestId("tailwind-warning")).toBeNull();
+    // Figma is disabled now; selecting JSON above is the real assertion here.
   });
 
   it("preview pane shows :root block by default (CSS format)", () => {
@@ -102,14 +101,6 @@ describe("ExportSection", () => {
     expect(preview.textContent).toContain("module.exports");
   });
 
-  it("switching to Figma Variables JSON shows envelope object", () => {
-    const { getByLabelText, getByTestId } = render(wrap(<ExportSection />));
-    fireEvent.click(getByLabelText("Figma Variables JSON"));
-    const preview = getByTestId("export-preview");
-    expect(preview.textContent).toContain("\"format\": \"figma-variables\"");
-    expect(preview.textContent).toContain("\"variables\"");
-  });
-
   it("CSS format includes dark mode block via CSSBundler", () => {
     // Default tokens shipped via migration0002 carry darkValue on 9 colors.
     const { getByTestId } = render(wrap(<ExportSection />));
@@ -126,13 +117,23 @@ describe("ExportSection", () => {
     expect(preview.textContent).not.toContain("@media (prefers-color-scheme: dark)");
   });
 
-  it("download button label reflects active format", () => {
-    const { getByLabelText, getByRole } = render(wrap(<ExportSection />));
-    expect(getByRole("button", { name: /Download design-tokens\.css/i })).toBeTruthy();
-    fireEvent.click(getByLabelText("JSON"));
-    expect(getByRole("button", { name: /Download tokens-studio\.json/i })).toBeTruthy();
-    fireEvent.click(getByLabelText("Figma Variables JSON"));
-    expect(getByRole("button", { name: /Download figma-variables\.json/i })).toBeTruthy();
+  /* Board 153:120 gives every LIVE row its own Copy and Download and leaves the
+     greyed Figma line with neither — the board refusing to hand over a file it
+     cannot make. This replaces an assertion on a single button whose LABEL
+     changed with the selection; that button is gone. */
+  it("gives every live format its own Download, and Figma none", () => {
+    const { container } = render(wrap(<ExportSection />));
+    for (const id of ["css", "json", "tailwind"]) {
+      expect(container.querySelector(`[data-download-format="${id}"]`)).toBeTruthy();
+    }
+    expect(container.querySelector('[data-download-format="figma"]')).toBeNull();
+  });
+
+  it("does not let Figma Variables be selected at all", () => {
+    const { getByLabelText, getByTestId } = render(wrap(<ExportSection />));
+    expect(getByLabelText("Figma Variables JSON")).toBeDisabled();
+    // Preview stays on the default CSS output rather than the stub envelope.
+    expect(getByTestId("export-preview").textContent).toContain(":root");
   });
 
   it("download button triggers exportUtils.downloadFile-style anchor click", () => {
@@ -146,8 +147,10 @@ describe("ExportSection", () => {
       return el;
     });
 
-    const { getByRole } = render(wrap(<ExportSection />));
-    fireEvent.click(getByRole("button", { name: /Download/i }));
+    /* Every format row carries its own Download now (board 153:120), so the
+       old bare name match is ambiguous — target one row. */
+    const { container } = render(wrap(<ExportSection />));
+    fireEvent.click(container.querySelector<HTMLButtonElement>('[data-download-format="css"]')!);
     expect(clickSpy).toHaveBeenCalled();
     createSpy.mockRestore();
   });

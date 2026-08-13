@@ -15,6 +15,7 @@ import { CATEGORY_ICONS } from "./elements/constants";
 import { ElementCard, AnimatedAccordionContent, ChevronIcon } from "./elements/ElementCard";
 import type { ElementsTabProps } from "./elements/types";
 import { useElementsState } from "./elements/useElementsState";
+import "./ElementsTab.css";
 export type { ElementsTabProps };
 
 export const ElementsTab: React.FC<ElementsTabProps> = ({

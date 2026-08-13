@@ -22,6 +22,7 @@ import {
   useBreakpointRegistry, useGridRegistry, useSizingRegistry,
   useIconRegistry, useImageryRegistry,
 } from "../../state/TokenRegistryContext";
+import { CopyButton } from "@/editor/chrome-ui";
 import { CSSBundler } from "../../../../engine/designSystem/bundler";
 import { buildExport, downloadFile, type ExportFormat } from "../../utils/exportUtils";
 import type { DesignToken } from "../../types";
@@ -123,15 +124,6 @@ function downloadForFormat(
   downloadFile(content, filename);
 }
 
-function downloadLabelFor(format: UIExportFormat): string {
-  switch (format) {
-    case "css":      return "Download design-tokens.css";
-    case "json":     return "Download tokens-studio.json";
-    case "tailwind": return "Download tailwind.config.js";
-    case "figma":    return "Download figma-variables.json";
-  }
-}
-
 interface ChipSpec {
   label: string;
   /** Tone classes rather than three hand-mixed rgba() strings — the two tones
@@ -203,10 +195,6 @@ export const ExportSection: React.FC = () => {
     [allTokens, format, darkStrategy],
   );
 
-  const handleDownload = () => {
-    downloadForFormat(allTokens, format, preview);
-  };
-
   const statsLine =
     `${TOKEN_KINDS_COUNT} kinds · ${stats.tokensCount} tokens · ` +
     `${stats.aliasEdges} alias edges · ${stats.darkVariants} dark variants`;
@@ -244,6 +232,30 @@ export const ExportSection: React.FC = () => {
                   {label}
                   <span className="tw:ml-1 tw:text-gray-500">· {desc}</span>
                 </span>
+                {/* Board 153:120 puts Copy and Download on every LIVE row —
+                    the greyed Figma line carries no actions at all, which is
+                    the board refusing to offer a file it cannot make. */}
+                {!disabled && (
+                <span className="tw:ml-auto tw:flex tw:flex-none tw:items-center tw:gap-2">
+                  <CopyButton
+                    content={buildPreview(allTokens, id, darkStrategy)}
+                    label="Copy"
+                  />
+                  <Button
+                    color="light"
+                    size="xs"
+                    type="button"
+                    data-download-format={id}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      downloadForFormat(allTokens, id, buildPreview(allTokens, id, darkStrategy));
+                    }}
+                    className="tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:font-normal tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+                  >
+                    Download
+                  </Button>
+                </span>
+                )}
                 <span
                   data-testid={`format-chip-${id}`}
                   className={`${CHIP} ${chip.className}`}
@@ -302,9 +314,11 @@ export const ExportSection: React.FC = () => {
         <pre data-testid="export-preview" className={PREVIEW}>
           {preview}
         </pre>
-        <Button onClick={handleDownload} className="tw:w-full tw:mt-2">
-          {downloadLabelFor(format)}
-        </Button>
+        {/* The single download button that used to sit here is gone: every
+            format row carries its own now (board 153:120), and two ways to
+            download the same thing is one more than the board draws. The
+            preview pane stays — the board omits it, and reading the output
+            before taking it is real capability, not decoration. */}
       </div>
 
       <ImportCard />
