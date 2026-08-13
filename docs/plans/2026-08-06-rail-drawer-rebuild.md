@@ -987,6 +987,45 @@ internal link *should* become in a portable template — strip it, keep it as a
 slug, prompt on apply. That is a product decision, not a wiring fix, so it is
 named rather than guessed at.
 
+### The animation chain — one feature, four implementations, three of them wrong
+
+Pulling on scan 4's second thread (39 presets offered, 2 implemented) ran the
+whole length of the feature. Each fix revealed that the next layer down had the
+same gap, and each was invisible from the layer above.
+
+| Layer | What it is | Was | Commit |
+|---|---|---|---|
+| `PRESET_TIMELINES` | GSAP timelines, editor canvas | 2 of 39; the rest returned a 0.2s opacity nudge | `01deb024` |
+| the seam | inspector writes `AnimationConfig` (`type`, `iterations`), runtime reads `preset`, `loop` | `animation.preset` undefined for every interaction ever created — so the timelines above were unreachable, and Duration/Delay/Easing reached nothing | `32e8ddc1` |
+| `ANIMATION_KEYFRAMES` | CSS `@keyframes`, canvas + export | 25 of 39; and the canvas injected NONE of them (animation-utils.css was deleted 2026-07-28), so element animations worked only after publish and the Preview button previewed nothing | `32e8ddc1`, `598c9436` |
+| `INTERACTION_PRESET_KEYFRAMES` | WAAPI runtime inside every published page — **the only one a live site runs** | 17 of 39; 22 presets animated in the editor and did nothing on the customer's site | `00a5067a` |
+
+`AnimationPreset` was 23 values short of its own picker, so writing a preset
+needed a cast — which is why none of this ever failed to compile. Widening it
+is what surfaced the published-runtime table.
+
+**What actually holds it now:** `presetCoverage.test.ts` walks the inspector's
+own `ANIMATION_PRESET_GROUPS` and asserts each entry reaches a timeline, a
+keyframe, and a published-page keyframe. It found 8 presets missing from a
+table I had hand-written minutes earlier, then 20 missing keyframes, then 22
+missing from the export runtime. A list you type into a test is a list that
+agrees with you.
+
+### Export — two writers, and what only one of them shipped
+
+| Find | Commit |
+|---|---|
+| `#page:<id>` internal links shipped raw: **every internal link on every published site was dead** | `41138e12` |
+| The HTML/ZIP download kept five attributes (alt, href, src, target, id) and dropped rel, title, poster, placeholder, name, required, and every data-/aria- | `5103524f` |
+| The same download dropped the user's own CSS classes, so class-based custom CSS matched nothing | `5103524f` |
+| Both writers emitted attributes unfiltered — `onerror` in imported project JSON reached a published page. Pre-existing on the publish path | `0d8dd01c` |
+| `sanitizeElementTreeContent` never looked at `attributes`, on a stated assumption that "the serializer" handled it — true of one of three writers | `d8948d25` |
+
+The security review that caught the attribute change was right, and the hole it
+pointed at was older and wider than the change. Worth keeping: the fix is one
+shared `isSafeAttrValue` across all three writers plus the ingest boundary, not
+a fourth allowlist.
+
 ### What kept all of this green
 
 In five of the eleven, a TEST asserted the broken half:
