@@ -1,9 +1,9 @@
 /**
  * DesignSystemTab — the Brand panel.
  *
- * A drill-in root (M5) over five destinations: Tokens · Presets · Components ·
- * Lint · Import / export. Aggregates dirty state across all 14 token
- * registries and all 11 preset registries.
+ * A drill-in root (M5) over seven destinations: Tokens · Presets · Starters ·
+ * Components · Colour mode · Lint · Import / export. Aggregates dirty state
+ * across all 14 token registries and all 11 preset registries.
  *
  * @license BSD-3-Clause
  */
@@ -55,6 +55,7 @@ import { DesignTabFooter } from "./DesignTabFooter";
 import { DraftChip } from "./DraftChip";
 import { DSLintMount } from "./DSLintMount";
 import { DSModeToggle } from "./DSModeToggle";
+import { useDSModeOptional } from "../state/DSModeContext";
 import { ColorModeToggle } from "./ColorModeToggle";
 import { ExportDropdown } from "./ExportDropdown";
 import { AIPromptModal } from "./AIPromptModal";
@@ -96,17 +97,22 @@ type DesignSection = "tokens" | "styles" | "starters" | "components" | "colour-m
  * (Colour mode) and a banner (Lint) — same capabilities, different mental
  * model. Figma owns navigation (rule 2), and the sidebar is drill-in stack nav.
  *
- * This change is the NAVIGATION MODEL and the board's labels. It deliberately
- * ships the four destinations that already exist as self-contained sections,
- * and does NOT invent the other five. Each omission has a reason, and none of
- * them is "ran out of time":
+ * Seven of the board's nine rows ship. Starters and Colour mode joined later in
+ * the same arc — Starters once the board settled that it is a destination and
+ * not a modal, Colour mode once the dark-value write path was repaired (it had
+ * an empty onBlur that discarded what you typed, so the screen had nothing to
+ * write through). Two rows remain out, and neither reason is "ran out of time":
  *
  *   · Classes     — a SITE-WIDE class manager with per-class usage counts. No
  *                   such registry exists in code (`classRegistry`/`classUsage`:
  *                   zero hits). Figma-only; rule 4 says preserve the design,
  *                   not implement it. (Finding G.)
- *   · Typography  — `TypeTokenList` needs the full token registry plumbing that
- *                   `TokensSection` does internally; it is not liftable as-is.
+ *   · Typography  — its board is a FONT manager: active fonts with role pills,
+ *                   weights, a .woff2 drop zone and a licence attestation. The
+ *                   code's typography is type TOKENS, and font handling is
+ *                   scattered across Media upload, the engine FontManager and
+ *                   the inspector FontPicker with no Brand home. A feature, not
+ *                   a conversion.
  *
  * Row counts: only Lint carries one, because only Lint has a real number to
  * hand. The others need registry sizes that are not aggregated here yet, and a
@@ -171,6 +177,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
   onClose,
 }) => {
   const { addToast } = useToast();
+  const isBeginner = useDSModeOptional()?.mode !== "pro";
   /* Shared with DSLintBanner via `useDSLint` so the row count, the banner and
      the Lint destination can never disagree. */
   const lintIssues = useDSLint(composer);
@@ -690,6 +697,15 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
                   </li>
                 );
               })}
+              {/* Board 154:132 is the root in Basic mode, and the only thing
+                  that distinguishes it is this line. Without it the mode simply
+                  shows less with no reason given, which reads as missing
+                  features rather than a setting the user can change. */}
+              {isBeginner && (
+                <li className="tw:mt-3 tw:px-2 tw:text-xs tw:leading-normal tw:text-gray-500" data-basic-mode-note>
+                  Basic mode hides what you cannot edit yet. Switch to Pro to unlock.
+                </li>
+              )}
             </ul>
           )}
 
