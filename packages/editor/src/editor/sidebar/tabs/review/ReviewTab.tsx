@@ -182,14 +182,21 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
     void load();
   }, [load]);
 
+  /* Every mutation in this panel — reply, resolve, reopen, delete — lands
+     here. The canvas draws the same comments as pins and refetches them on
+     "comments:refresh", which the CommentLayer docblock lists as "anyone →
+     refetch pins" and which nothing has ever emitted: resolving a comment
+     greyed the row here and left the pin on the canvas open. Not in `load`,
+     which is also the handler for the layer's own "comments:reattached". */
   const reload = React.useCallback(async () => {
     try {
       setComments(await fetchReviewComments());
       setRound(await fetchCurrentRound());
+      composer?.emit("comments:refresh", {});
     } catch {
       /* keep the current view; the next explicit load surfaces errors */
     }
-  }, []);
+  }, [composer]);
 
   const activePage = round && comments[0]?.pageId ? comments[0].pageId : undefined;
 

@@ -116,6 +116,20 @@ describe("actions", () => {
     await waitFor(() => expect(resolveReviewComment).toHaveBeenCalledWith("c1", "RESOLVED"));
   });
 
+  /* The canvas draws these same comments as pins and refetches on
+     "comments:refresh". Nothing emitted it, so resolving greyed the row here
+     and left the pin on the canvas open. */
+  it("tells the canvas to refetch its pins after a resolve", async () => {
+    const composer = { on: vi.fn(), off: vi.fn(), emit: vi.fn() };
+    renderTab({ composer });
+    await screen.findByText("hero photo is too dark");
+    const row = screen.getByText("hero photo is too dark").closest("[data-comment-row]") as HTMLElement;
+    fireEvent.click(within(row).getByRole("button", { name: /resolve/i }));
+    await waitFor(() =>
+      expect(composer.emit).toHaveBeenCalledWith("comments:refresh", {}),
+    );
+  });
+
   it("re-send is the primary action and calls onResend", async () => {
     const onResend = vi.fn(() => Promise.resolve());
     renderTab({ onResend });
