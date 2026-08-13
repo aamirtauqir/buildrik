@@ -30,3 +30,11 @@ export declare function launchPinnedBrowser(
  * instead of silently measuring mid-load. "loaded" is the good value.
  */
 export declare function fontsLoadedStatus(page: Page): Promise<string>;
+
+/**
+ * Resolve once every stylesheet — including nested CSS `@import`s — has
+ * loaded. Vite injects imported CSS synchronously, but `@import` chains
+ * inside it fetch async; measuring before they land reads a page without
+ * the full cascade (reduced-motion rules, or any chrome CSS at all).
+ */
+export declare function stylesheetsSettled(page: Page): Promise<void>;

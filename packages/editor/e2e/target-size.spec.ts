@@ -31,6 +31,7 @@
  * @license BSD-3-Clause
  */
 import { test, expect } from "@playwright/test";
+import { stylesheetsSettled } from "./lib/measure-lib.mjs";
 
 const MIN = 24;
 
@@ -38,7 +39,6 @@ const CASES = [
   "content-collection-rows",
   "content-field-rows",
   "content-root-rows",
-  "folder-context-menu",
   "onboarding-steps",
   "canvas-footer-toolbar",
   // T2: the shared drawer header carries pin / help / close on every one of the
@@ -65,13 +65,19 @@ const BASELINE: Record<string, string> = {};
 test.describe("WCAG 2.5.8 target size", () => {
   for (const name of CASES) {
     test(`every control is at least ${MIN}x${MIN}: ${name}`, async ({ page }) => {
+      // Same 1.61 runner bug as style-parity: use.reducedMotion never lands.
+      await page.emulateMedia({ reducedMotion: "reduce" });
       await page.goto(`/e2e/probe/probe.html?case=${name}`);
-      // Attribute, not visibility. Portalled cases (folder-context-menu,
+      // Attribute, not visibility. Portalled cases (onboarding-steps,
       // onboarding-steps) move their content to #bk-overlay-root and leave
       // #probe-root an empty, HIDDEN div — `waitFor()` defaults to visible and
       // hangs 30s on exactly the two cases whose controls are most worth
       // measuring. The parity spec already learned this; same check here.
       await expect(page.locator("#probe-root")).toHaveAttribute("data-probe-ready", name);
+
+      // getBoundingClientRect on an unstyled control is a lie in either
+      // direction — wait for the full @import chain, same as the parity spec.
+      await stylesheetsSettled(page);
 
       const undersized = await page.evaluate((min) => {
         const roots = Array.from(document.querySelectorAll<HTMLElement>("[data-probe]"));

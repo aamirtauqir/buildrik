@@ -120,3 +120,35 @@ export async function fontsLoadedStatus(page) {
     return document.fonts.status;
   });
 }
+
+/**
+ * Wait until every stylesheet — including nested CSS `@import`s — is loaded.
+ *
+ * Vite injects imported CSS as <style> tags synchronously with module eval,
+ * but `@import` chains INSIDE that CSS (default.css → design-system/index.css
+ * → a11y.css) are separate async fetches. A measurement taken before they
+ * land reads a page without a11y's reduced-motion rules — the skeleton pulse
+ * runs and every opacity is a mid-cycle lottery — or without the cascade at
+ * all, which is how 106 baseline entries once recorded browser defaults
+ * (16px/400/"Times"). A CSSImportRule whose .styleSheet is still null is a
+ * fetch in flight; recurse because @imports nest.
+ */
+export async function stylesheetsSettled(page) {
+  await page.waitForFunction(() => {
+    const loaded = (ss) => {
+      let rules;
+      try {
+        rules = ss.cssRules;
+      } catch {
+        return false; // cross-origin or still parsing — not settled
+      }
+      for (const r of rules) {
+        if (r instanceof CSSImportRule) {
+          if (!r.styleSheet || !loaded(r.styleSheet)) return false;
+        }
+      }
+      return true;
+    };
+    return Array.from(document.styleSheets).every(loaded);
+  });
+}

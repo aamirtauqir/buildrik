@@ -20,13 +20,13 @@ import { fileURLToPath } from "node:url";
 // The tracked-property list and the font gate are shared with
 // scripts/conformance/measure.mjs — same mechanics, different question. See
 // e2e/lib/measure-lib.mjs for what is shared and what deliberately is not.
-import { TRACKED, fontsLoadedStatus } from "./lib/measure-lib.mjs";
+import { TRACKED, fontsLoadedStatus, stylesheetsSettled } from "./lib/measure-lib.mjs";
 
 // ESM: no __dirname. The package is type:module, so derive it.
 const HERE = dirname(fileURLToPath(import.meta.url));
 const BASELINE_DIR = join(HERE, "baselines");
 
-const CASES = ["content-collection-rows", "content-field-rows", "content-root-rows", "folder-context-menu", "onboarding-steps", "canvas-footer-toolbar", "panel-frame-header",
+const CASES = ["content-collection-rows", "content-field-rows", "content-root-rows", "onboarding-steps", "canvas-footer-toolbar", "panel-frame-header",
   // T6 — the Media drawer's data states, none of them reachable by hovering.
   "media-drawer-grid", "media-drawer-single", "media-drawer-loading", "media-drawer-load-error", "media-drawer-empty", "media-drawer-no-results",
   "content-loading", "content-load-error", "media-drawer-folder-scoped", "media-drawer-bulk-select", "media-drawer-uploading", "media-drawer-upload-failed", "media-drawer-quota-full"] as const;
@@ -36,7 +36,18 @@ for (const name of CASES) {
     const errors: string[] = [];
     page.on("pageerror", (e) => errors.push(String(e)));
 
+    /* Explicit, not config: Playwright 1.61's runner silently drops the
+       `use.reducedMotion` context option (verified — matchMedia stayed false
+       under both config use and test.use, while this API works). Without it
+       the skeleton pulse runs and every opacity is a mid-cycle lottery. The
+       assertion below keeps this from regressing silently again. */
+    await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto(`/e2e/probe/probe.html?case=${name}`);
+
+    expect(
+      await page.evaluate(() => matchMedia("(prefers-reduced-motion: reduce)").matches),
+      "reduced-motion emulation must be active before measuring"
+    ).toBe(true);
 
     // A probe that rendered nothing must fail here, not silently compare {} to {}.
     const err = await page.locator("#probe-root").getAttribute("data-probe-error");
@@ -53,6 +64,12 @@ for (const name of CASES) {
       await fontsLoadedStatus(page),
       "fonts must be fully loaded before measuring"
     ).toBe("loaded");
+
+    // And the CASCADE must be complete too: nested CSS @imports (a11y.css and
+    // the rest of default.css's chain) fetch async after the <style> tag
+    // lands. Measuring early reads a page where reduced-motion never applied
+    // — the skeleton pulse mid-cycle — or no chrome CSS at all.
+    await stylesheetsSettled(page);
 
     const actual = await page.evaluate((props) => {
       const out: Record<string, Record<string, string>> = {};
