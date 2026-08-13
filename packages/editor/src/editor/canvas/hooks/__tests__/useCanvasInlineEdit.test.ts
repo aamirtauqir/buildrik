@@ -180,4 +180,43 @@ describe("useCanvasInlineEdit — non-left-click guard (EC-06)", () => {
     const persisted = setContent.mock.calls[0][0] as string;
     expect(persisted).not.toMatch(/onerror/i);
   });
+
+  /* Found live 2026-08-14: clicking any of the toolbar's eighteen controls
+     ended the edit session. Two contracts pin the fix. The guard: mousedown
+     inside .bd-inline-toolbar must not finish the edit — the class is
+     matched by name, and the wrapper that carries it lives in
+     CanvasOverlayGroup. One writer: nothing persists mid-session
+     (useCanvasInlineCommands used to setContent per command, which made the
+     engine re-render the element and killed the contentEditable session);
+     finishEdit persists once, at session end. */
+  it("mousedown inside .bd-inline-toolbar neither ends the session nor persists", () => {
+    const composer = makeMockComposer();
+    const setContent = vi.fn();
+    (composer.elements.getElement as ReturnType<typeof vi.fn>).mockReturnValue({ setContent });
+
+    const toolbar = document.createElement("div");
+    toolbar.className = "bd-inline-toolbar";
+    const boldBtn = document.createElement("button");
+    toolbar.appendChild(boldBtn);
+    document.body.appendChild(toolbar);
+
+    const { result } = renderHook(() => useCanvasInlineEdit({ composer, canvasRef }));
+
+    act(() => {
+      result.current.handleDoubleClick({
+        target: editableEl,
+        stopPropagation: vi.fn(),
+      } as unknown as React.MouseEvent);
+    });
+    expect(result.current.isEditing).toBe(true);
+
+    act(() => {
+      boldBtn.dispatchEvent(new MouseEvent("mousedown", { bubbles: true, cancelable: true, button: 0 }));
+    });
+
+    expect(result.current.isEditing).toBe(true);
+    expect(setContent).not.toHaveBeenCalled();
+
+    document.body.removeChild(toolbar);
+  });
 });

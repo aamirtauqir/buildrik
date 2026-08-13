@@ -127,7 +127,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
         onChange={(e) => onCommand("formatBlock", e.target.value)}
         style={{
           padding: "4px 8px",
-          background: "var(--bk-gray-900)",
+          background: "var(--bk-bg-panel)",
           border: "1px solid var(--bk-border)",
           borderRadius: 4,
           color: "var(--bk-ink)",
@@ -147,7 +147,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
         onChange={(e) => onCommand("fontSize", e.target.value)}
         style={{
           padding: "4px 8px",
-          background: "var(--bk-gray-900)",
+          background: "var(--bk-bg-panel)",
           border: "1px solid var(--bk-border)",
           borderRadius: 4,
           color: "var(--bk-ink)",
@@ -269,7 +269,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
             style={{
               width: "100%",
               padding: "8px 12px",
-              background: "var(--bk-gray-900)",
+              background: "var(--bk-bg-panel)",
               border: "1px solid var(--bk-border)",
               borderRadius: 6,
               color: "var(--bk-ink)",

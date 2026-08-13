@@ -188,7 +188,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
 
     // Inline editing commands (delegated to useCanvasInlineCommands)
     const { handleInlineCommand } = useCanvasInlineCommands({
-      composer,
       canvasRef,
       editingId: editing.id,
     });

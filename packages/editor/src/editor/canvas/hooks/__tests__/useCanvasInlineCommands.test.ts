@@ -1,7 +1,6 @@
 import { renderHook, act } from "@testing-library/react";
 import * as React from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import type { Composer } from "../../../../engine/Composer";
 import { useCanvasInlineCommands } from "../useCanvasInlineCommands";
 
 describe("useCanvasInlineCommands — createLink scheme validation (T4)", () => {
@@ -32,16 +31,9 @@ describe("useCanvasInlineCommands — createLink scheme validation (T4)", () => 
     sel?.addRange(range);
   }
 
-  function makeComposer(setContent: ReturnType<typeof vi.fn>): Composer {
-    return {
-      elements: { getElement: vi.fn().mockReturnValue({ setContent }) },
-    } as unknown as Composer;
-  }
-
   it("does not create a javascript: link", () => {
-    const setContent = vi.fn();
     const { result } = renderHook(() =>
-      useCanvasInlineCommands({ composer: makeComposer(setContent), canvasRef, editingId: "el-1" })
+      useCanvasInlineCommands({ canvasRef, editingId: "el-1" })
     );
 
     selectAll(editableEl);
@@ -54,9 +46,8 @@ describe("useCanvasInlineCommands — createLink scheme validation (T4)", () => 
   });
 
   it("creates a link for a safe https: url", () => {
-    const setContent = vi.fn();
     const { result } = renderHook(() =>
-      useCanvasInlineCommands({ composer: makeComposer(setContent), canvasRef, editingId: "el-1" })
+      useCanvasInlineCommands({ canvasRef, editingId: "el-1" })
     );
 
     selectAll(editableEl);
@@ -90,7 +81,7 @@ describe("useCanvasInlineCommands — createLink scheme validation (T4)", () => 
     const exec = vi.fn().mockReturnValue(true);
     (document as unknown as { execCommand: unknown }).execCommand = exec;
     const { result } = renderHook(() =>
-      useCanvasInlineCommands({ composer: makeComposer(vi.fn()), canvasRef, editingId: "el-1" })
+      useCanvasInlineCommands({ canvasRef, editingId: "el-1" })
     );
 
     for (const command of DISPATCHED) {
@@ -105,7 +96,7 @@ describe("useCanvasInlineCommands — createLink scheme validation (T4)", () => 
     const exec = vi.fn().mockReturnValue(true);
     (document as unknown as { execCommand: unknown }).execCommand = exec;
     const { result } = renderHook(() =>
-      useCanvasInlineCommands({ composer: makeComposer(vi.fn()), canvasRef, editingId: "el-1" })
+      useCanvasInlineCommands({ canvasRef, editingId: "el-1" })
     );
 
     selectAll(editableEl);

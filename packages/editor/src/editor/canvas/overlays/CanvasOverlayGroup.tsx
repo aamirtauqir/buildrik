@@ -313,9 +313,35 @@ export function CanvasOverlayGroup({
         </div>
       )}
 
-      {/* Inline Text Editor */}
+      {/* Inline Text Editor — board 1176:4824 floats the 18-control toolbar
+          above the element being edited. The overlay host is
+          pointer-events:none by design; without re-enabling here every
+          control is mouse-transparent and clicks fall through to the canvas.
+          The bd-inline-toolbar class is load-bearing: useCanvasInlineEdit's
+          blur/click guards match on it to keep a toolbar click from ending
+          the edit session. */}
       {editing.id && (
-        <RichTextEditor onCommand={onInlineCommand} />
+        <div
+          className="bd-inline-toolbar"
+          style={{
+            position: "absolute",
+            left: editing.rect ? Math.max(8, editing.rect.left) : 8,
+            top: editing.rect ? Math.max(8, editing.rect.top - 52) : 8,
+            zIndex: Z_LAYERS.floatingToolbar,
+            pointerEvents: "auto",
+          }}
+          /* The standard rich-text toolbar pair. preventDefault on mousedown
+             keeps focus — and the user's text selection — in the editing
+             element while the button is pressed. stopPropagation on click
+             keeps the click from bubbling into the canvas, whose handlers
+             refocus the canvas wrapper; that focus steal blurred the editor
+             with a relatedTarget outside this toolbar and ended the session
+             after every command. */
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <RichTextEditor onCommand={onInlineCommand} />
+        </div>
       )}
 
       {/* Drag & drop feedback (slot indicators, breadcrumb) */}

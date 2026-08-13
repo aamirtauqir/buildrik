@@ -10,12 +10,10 @@
  */
 
 import * as React from "react";
-import type { Composer } from "../../../engine";
 import { devLog } from "../../../shared/utils/devLogger";
-import { isSafeUrl, sanitizeHTML } from "../../../shared/utils/html";
+import { isSafeUrl } from "../../../shared/utils/html";
 
 interface UseCanvasInlineCommandsParams {
-  composer: Composer | null;
   canvasRef: React.RefObject<HTMLDivElement | null>;
   editingId: string | null;
 }
@@ -26,7 +24,6 @@ interface UseCanvasInlineCommandsParams {
  * createLink, unlink, and formatBlock.
  */
 export function useCanvasInlineCommands({
-  composer,
   canvasRef,
   editingId,
 }: UseCanvasInlineCommandsParams) {
@@ -167,14 +164,15 @@ export function useCanvasInlineCommands({
           devLog("Canvas", `Unsupported inline command: ${command}`);
       }
 
-      // Notify composer of content change — sanitize the edited markup before
-      // it is persisted and re-rendered onto the canvas.
-      if (composer && editingId) {
-        const newContent = sanitizeHTML(editingEl.innerHTML);
-        composer.elements.getElement(editingId)?.setContent(newContent);
-      }
+      /* No setContent here. Persisting mid-session made the engine re-render
+         the element, which destroyed the contentEditable session on the FIRST
+         toolbar click — format applied, editing over, in a toolbar of
+         eighteen controls. The live DOM already holds every edit;
+         useCanvasInlineEdit's finishEdit(true) sanitizes and persists the
+         final markup once, when the session actually ends (Enter, Escape,
+         click-outside). One writer, one transaction, one undo step. */
     },
-    [editingId, composer, canvasRef]
+    [editingId, canvasRef]
   );
 
   return { handleInlineCommand };
