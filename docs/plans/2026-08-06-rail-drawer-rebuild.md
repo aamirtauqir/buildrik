@@ -1092,6 +1092,29 @@ commands — full-page screenshots scroll (closing scroll-away popovers), so use
 `chain` + `--viewport`, JS clicks (no scroll-into-view), and re-query popover
 presence in the same chain step before trusting a shot.
 
+### Phase 0 — Brand family eye-verified 2026-08-13/14 (all 9 destinations)
+
+Root, Tokens, Tokens·color, Lint, Starters, Components, Colour mode,
+Import/export, Presets, TokenDetailView — board-vs-live at 1440×900. Four
+defects found, four fixed, each invisible to every offline instrument:
+
+| Surface | Find | Commit |
+|---|---|---|
+| Lint destination | said "Nothing to fix" while the colour list's chip said "Issues (1)" — a third, local lint implementation. Contrast is now a lint rule in the shared hook; verified live: banner 4 · destination 4 · chip subset | `5f120333` |
+| Starter cards | locked to 40px by flowbite's Button theme — gradient squashed to 17px, description clipped mid-line. The CLAUDE.md pill trap, on a card | `5c6d16c2` |
+| Export rows | one-line row impossible at 245px — label wrapped word-per-line; flex-1 collapsed it to 0. Rebuilt to board 153:120's two-line rows, board copy, chips dropped | `c7aecd38` |
+| TokenDetailView | dark-value commit (8b3df719) verified live end-to-end: type → blur → stored → missing-dark count recomputed 17→16 (the projectHasAnyDark conditional waking, correctly) | verified |
+
+Kept against the board, recorded: export keeps its selection radio + preview
+pane (working feature the board does not draw — dropping it is a product
+call). Stripe Blue's violet gradient is customer-palette data, outside
+Gate 18. The "Surface fails contrast" row is the findSurfaceToken heuristic
+missing id "color-surface" — signal-or-noise is a founder call.
+
+Also landed this batch: seam-scan.mjs (T2) wired into verify:ds, whose first
+run found three more dead listeners — one real (useElementDragDomSync's
+updateRootId never re-ran after mount; drag root stale on every page switch).
+
 ## Named for the founder — needs a decision or a file I must not stage
 
 **`ConflictModal` does not match board 66:640, and fixing it needs
