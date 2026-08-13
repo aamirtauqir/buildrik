@@ -27,6 +27,22 @@ export interface PanelState {
   leftPanelSubTabs?: Record<string, string>; // Stores sub-tab per primary tab
   rightPanelTab?: string;
   isLeftPanelOpen?: boolean;
+  /**
+   * Board 817:4649 states the canvas toggles persist. They were plain
+   * useState, so every reload put Grid, Rulers, Badges, X-Ray and Spacing back
+   * to off — a user who works with rulers on turned them on again every
+   * session. Stored as a partial: a key absent from an older payload falls
+   * back to its default rather than reading as `false`.
+   */
+  overlays?: Partial<Pick<
+    OverlayState,
+    | "showXRay"
+    | "showSpacingIndicators"
+    | "showBadges"
+    | "showGuides"
+    | "showGrid"
+    | "showRulers"
+  >>;
 }
 
 /** Selected element info */
@@ -219,12 +235,14 @@ export function useStudioState(): UseStudioStateReturn {
 
   // Overlay states
   const [showComponentView, setShowComponentView] = React.useState(false);
-  const [showXRay, setShowXRay] = React.useState(false);
-  const [showSpacingIndicators, setShowSpacingIndicators] = React.useState(false);
-  const [showBadges, setShowBadges] = React.useState(false);
-  const [showGuides, setShowGuides] = React.useState(true);
-  const [showGrid, setShowGrid] = React.useState(false);
-  const [showRulers, setShowRulers] = React.useState(false);
+  const [showXRay, setShowXRay] = React.useState(savedState?.overlays?.showXRay ?? false);
+  const [showSpacingIndicators, setShowSpacingIndicators] = React.useState(
+    savedState?.overlays?.showSpacingIndicators ?? false
+  );
+  const [showBadges, setShowBadges] = React.useState(savedState?.overlays?.showBadges ?? false);
+  const [showGuides, setShowGuides] = React.useState(savedState?.overlays?.showGuides ?? true);
+  const [showGrid, setShowGrid] = React.useState(savedState?.overlays?.showGrid ?? false);
+  const [showRulers, setShowRulers] = React.useState(savedState?.overlays?.showRulers ?? false);
   const [devMode, setDevMode] = React.useState(false);
   const [showSuggestions, setShowSuggestions] = React.useState(true);
 
@@ -252,8 +270,26 @@ export function useStudioState(): UseStudioStateReturn {
       leftPanelTab,
       leftPanelSubTabs,
       rightPanelTab,
+      overlays: {
+        showXRay,
+        showSpacingIndicators,
+        showBadges,
+        showGuides,
+        showGrid,
+        showRulers,
+      },
     });
-  }, [leftPanelTab, leftPanelSubTabs, rightPanelTab]);
+  }, [
+    leftPanelTab,
+    leftPanelSubTabs,
+    rightPanelTab,
+    showXRay,
+    showSpacingIndicators,
+    showBadges,
+    showGuides,
+    showGrid,
+    showRulers,
+  ]);
 
   // Wrapped setters that update state and trigger persistence
   const setLeftPanelTab = React.useCallback((tab: string) => {

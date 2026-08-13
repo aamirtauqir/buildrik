@@ -80,11 +80,34 @@ describe("useStudioState", () => {
         result.current.setLeftPanelSubTabs({ pages: "list" });
         result.current.setRightPanelTab("styles");
       });
-      expect(readPersisted()).toEqual({
+      expect(readPersisted()).toMatchObject({
         leftPanelTab: "pages",
         leftPanelSubTabs: { pages: "list" },
         rightPanelTab: "styles",
       });
+    });
+
+    /* Board 817:4649: "Toggles persist per-user per-project." They did not —
+       every reload reset the canvas to guides-on and everything else off. */
+    it("persists the canvas overlay toggles and restores them on mount", () => {
+      const { result, unmount } = renderHook(() => useStudioState());
+      act(() => result.current.toggleOverlay("showRulers"));
+      act(() => result.current.toggleOverlay("showGuides"));
+      expect(readPersisted()?.overlays).toMatchObject({ showRulers: true, showGuides: false });
+      unmount();
+
+      const remount = renderHook(() => useStudioState());
+      expect(remount.result.current.overlays.showRulers).toBe(true);
+      expect(remount.result.current.overlays.showGuides).toBe(false);
+    });
+
+    /* A payload written before overlays existed must not read as all-false —
+       showGuides defaults on. */
+    it("falls back to defaults for a stored payload with no overlays key", () => {
+      localStorage.setItem(PANEL_STATE_KEY, JSON.stringify({ leftPanelTab: "pages" }));
+      const { result } = renderHook(() => useStudioState());
+      expect(result.current.overlays.showGuides).toBe(true);
+      expect(result.current.overlays.showGrid).toBe(false);
     });
 
     it("restores persisted tabs on mount", () => {
