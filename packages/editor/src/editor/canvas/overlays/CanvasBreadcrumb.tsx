@@ -47,10 +47,10 @@ function getElementName(type: string, tagName?: string): string {
   return typeMap[normalized] || tagName || type;
 }
 
-/* bottom-14, not bottom-0: the floating footer toolbar overlaps the canvas
-   wrapper's last 40px, and live check showed it covering the bar's lower 16px
-   — the scrim survived as a 12px tinted sliver nobody would read as a
-   breadcrumb. */
+/* bottom-14, not bottom-0: the floating footer toolbar overlaps the last
+   forty pixels of the canvas wrapper, and live check showed it covering the
+   bar's lower 16px — the scrim survived as a 12px tinted sliver nobody would
+   read as a breadcrumb. */
 const BAR =
   "tw:absolute tw:bottom-14 tw:left-0 tw:right-0 tw:flex tw:items-center tw:gap-2 " +
   "tw:px-3 tw:py-1.5 tw:bg-[rgba(17,24,39,0.5)] tw:backdrop-blur-sm";
