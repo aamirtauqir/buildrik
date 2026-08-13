@@ -13,6 +13,7 @@ import { ProductCollectionService } from "../../../engine/cms";
 import type { Element } from "../../../engine/elements/Element";
 import { THRESHOLDS } from "../../../shared/constants/config";
 import { EVENTS } from "../../../shared/constants/events";
+import type { SaveState } from "./useStudioState";
 import { attachAdoptionRevertListener } from "../../../services/ai/adoptionTracker";
 import type { ComposerConfig, ProjectData, DeviceType, ElementType } from "../../../shared/types";
 import type { DesignToken } from "@/editor/design-system";
@@ -49,13 +50,10 @@ export interface UseComposerInitParams {
   setShowExporter: React.Dispatch<React.SetStateAction<boolean>>;
   setShowComponentView: React.Dispatch<React.SetStateAction<boolean>>;
   setIsDirty: (dirty: boolean) => void;
-  setSaveState: React.Dispatch<
-    React.SetStateAction<{
-      status: "idle" | "saving" | "error";
-      error?: string;
-      lastSavedAt?: number;
-    }>
-  >;
+  /* Was this shape spelled out inline — a fourth copy of SaveState, and an
+     anonymous one, so no duplicate-name scan could see it. Widening the union
+     in useStudioState broke here and nowhere else, which is how it surfaced. */
+  setSaveState: React.Dispatch<React.SetStateAction<SaveState>>;
   openCollectionSetup?: (onConfirm: (includeSampleData: boolean) => Promise<void>) => void;
   /** S1.5: surface a dashboard load failure as a persistent banner instead of
    *  a transient toast. `auth` = session expired, `network` = generic failure.

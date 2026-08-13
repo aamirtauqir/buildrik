@@ -51,7 +51,10 @@ export type { SelectedElementInfo };
 
 /** Save operation state */
 export interface SaveState {
-  status: "idle" | "saving" | "error";
+  /* "conflict" — someone else saved first. Distinct from "error": the save
+     did not fail, it was refused because the server copy moved on, and the
+     topbar's own chip has always had a conflict state waiting for it. */
+  status: "idle" | "saving" | "error" | "conflict";
   error?: string;
   lastSavedAt?: number;
 }

@@ -94,7 +94,12 @@ export function useSaveCallback({
         // also show a generic "save failed" toast or a Retry that would re-save
         // over the newer copy — just clear the saving spinner.
         if (err instanceof SaveConflictError) {
-          setSaveState((prev) => ({ ...prev, status: "idle" }));
+          /* Was "idle", which the topbar reads as Saved (or Unsaved) — the
+             indicator claimed the edit had landed when it had been refused.
+             "conflict" is its own status precisely so the chip can say so
+             without the scary Save-failed + Retry that would re-save over the
+             newer copy. */
+          setSaveState((prev) => ({ ...prev, status: "conflict" }));
           return "conflict";
         }
         const errorMessage = err?.message || "Unknown error";

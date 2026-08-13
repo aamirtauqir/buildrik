@@ -20,6 +20,7 @@
  */
 
 import * as React from "react";
+import type { SaveState as StudioSaveState } from "./hooks/useStudioState";
 import { Topbar, ModalRoot, ModalContent, ModalTitle, ModalDescription, ModalFooter, isModalOpen, plural, Button, type PublishState, type ReviewPill, type ReviewTone, type SaveState, type ToastInput } from "@/editor/chrome-ui";
 import type { SaveOutcome } from "./hooks/useSaveCallback";
 import type { Composer } from "../../engine";
@@ -54,7 +55,10 @@ export interface StudioHeaderProps {
   /** Composer instance */
   composer: Composer | null;
   /** Save status indicator */
-  saveStatus: "idle" | "saving" | "error";
+  /* Derived from useStudioState rather than re-spelled — this was the fifth
+     copy of that union, and each copy is a place the set can silently fall
+     behind. */
+  saveStatus: StudioSaveState["status"];
   /** Has unsaved changes */
   isDirty: boolean;
   /** Network offline — edits are queued locally (60-save-states). */
@@ -449,15 +453,20 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
       );
   }, [composer, currentUser, addToast]);
 
+  /* SaveStatus has carried a "conflict" state — label, amber pill, dot — that
+     this derivation could not produce, so board 66:640's condition showed the
+     chip as Saved. */
   const save: SaveState = offline
     ? "offline"
     : saveStatus === "saving"
       ? "saving"
-      : saveStatus === "error"
-        ? "error"
-        : isDirty
-          ? "unsaved"
-          : "saved";
+      : saveStatus === "conflict"
+        ? "conflict"
+        : saveStatus === "error"
+          ? "error"
+          : isDirty
+            ? "unsaved"
+            : "saved";
 
   const errorCount = issues.filter((i) => i.type === "error").length;
   const warnCount = issues.filter((i) => i.type === "warning").length;
