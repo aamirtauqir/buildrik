@@ -10,7 +10,7 @@
  * dangerouslySetInnerHTML (which happens on selection changes).
  *
  * Features:
- * - Alt+Drag: Clone/duplicate element instead of moving
+ * - Ctrl/Cmd+Drag: Clone/duplicate element instead of moving
  * - Smart guides during drag (snap lines)
  * - Touch support with long-press to initiate
  * - Multi-element drag for selected elements
@@ -33,7 +33,7 @@ import { useElementDragDomSync } from "./useElementDragDomSync";
 
 /** Drag modifiers state */
 interface DragModifiers {
-  alt: boolean; // Clone mode
+  alt: boolean;
   shift: boolean; // Constrain axis
   ctrl: boolean; // Snap to grid
 }
@@ -213,8 +213,11 @@ export function useCanvasElementDrag({
       dragStartPosRef.current = { x: e.clientX, y: e.clientY };
       axisConstraintRef.current = "none";
 
-      // Alt+Drag: Clone mode - duplicate the element and drag the clone
-      if (modifiersRef.current.alt) {
+      // Ctrl/Cmd+Drag: clone mode — duplicate the element and drag the clone.
+      // The modifier is Ctrl/Cmd, not Alt, because that is what the hover
+      // overlay's ⊕ badge already announces (useCursorIntelligence reads
+      // ctrlKey || metaKey). Alt is the hierarchy-inspect modifier.
+      if (modifiersRef.current.ctrl) {
         isCloneModeRef.current = true;
 
         composer.beginTransaction("clone-element");

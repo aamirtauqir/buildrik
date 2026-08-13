@@ -238,14 +238,14 @@ describe("useCanvasElementDrag", () => {
     });
   });
 
-  describe("dragstart — Alt+drag clone mode", () => {
+  describe("dragstart — Ctrl/Cmd+drag clone mode", () => {
     it("duplicates the element in a clone-element transaction and drags the clone", () => {
       const clone = { getId: () => "el-1-copy", getType: () => "text", getParent: () => null };
       composer.elements.duplicateElement.mockReturnValue(clone);
       mountHook();
 
       const dt = makeDataTransfer();
-      child.dispatchEvent(dragEvent("dragstart", dt, { altKey: true }));
+      child.dispatchEvent(dragEvent("dragstart", dt, { ctrlKey: true }));
 
       expect(composer.beginTransaction).toHaveBeenCalledWith("clone-element");
       expect(composer.elements.duplicateElement).toHaveBeenCalledWith("el-1");
@@ -266,13 +266,27 @@ describe("useCanvasElementDrag", () => {
       mountHook();
 
       const dt = makeDataTransfer();
-      child.dispatchEvent(dragEvent("dragstart", dt, { altKey: true }));
+      child.dispatchEvent(dragEvent("dragstart", dt, { ctrlKey: true }));
 
       expect(composer.rollbackTransaction).toHaveBeenCalled();
       expect(JSON.parse(dt.getData("element"))).toEqual({ elementId: "el-1" });
       expect(dt.effectAllowed).toBe("move");
       expect(child.classList.contains("bd-clone-mode")).toBe(false);
     });
+  });
+
+  /* Alt is the hierarchy-inspect modifier — the hover overlay draws the
+     ancestor chain under it and shows no ⊕ badge. Alt+drag used to duplicate
+     anyway, silently, while the badge sat on Ctrl. */
+  it("Alt+drag moves the original — Alt is not the clone modifier", () => {
+    mountHook();
+
+    const dt = makeDataTransfer();
+    child.dispatchEvent(dragEvent("dragstart", dt, { altKey: true }));
+
+    expect(composer.elements.duplicateElement).not.toHaveBeenCalled();
+    expect(JSON.parse(dt.getData("element"))).toEqual({ elementId: "el-1" });
+    expect(dt.effectAllowed).toBe("move");
   });
 
   describe("dragstart — multi-select payload", () => {
