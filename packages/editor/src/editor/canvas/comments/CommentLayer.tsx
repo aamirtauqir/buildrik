@@ -155,7 +155,6 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
     composer.on("comments:refresh", onRefresh);
     composer.on("comments:orphans-request", onOrphansRequest);
     composer.on("comments:reattach-start", onReattachStart);
-    composer.on(EVENTS.PAGE_CHANGED, bump);
     composer.on(EVENTS.PROJECT_CHANGED, bump);
     composer.on(EVENTS.ELEMENT_DELETED, bump);
     return () => {
@@ -163,7 +162,6 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
       composer.off("comments:refresh", onRefresh);
       composer.off("comments:orphans-request", onOrphansRequest);
     composer.off("comments:reattach-start", onReattachStart);
-      composer.off(EVENTS.PAGE_CHANGED, bump);
       composer.off(EVENTS.PROJECT_CHANGED, bump);
       composer.off(EVENTS.ELEMENT_DELETED, bump);
     };

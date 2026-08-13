@@ -203,12 +203,14 @@ export function useElementDragDomSync({
 
     updateRootId();
 
-    composer.on(EVENTS.PAGE_CHANGED, updateRootId);
-    composer.on(EVENTS.PAGE_CREATED, updateRootId);
+    /* Was PAGE_CHANGED + PAGE_CREATED — bare names the engine never emits
+       (PageManager announces page ops as PROJECT_CHANGED with a type payload),
+       so updateRootId ran once on mount and the drag target root went stale on
+       every page switch. Found by seam-scan on its first run. */
+    composer.on(EVENTS.PROJECT_CHANGED, updateRootId);
 
     return () => {
-      composer.off(EVENTS.PAGE_CHANGED, updateRootId);
-      composer.off(EVENTS.PAGE_CREATED, updateRootId);
+      composer.off(EVENTS.PROJECT_CHANGED, updateRootId);
     };
   }, [composer, rootIdRef]);
 

@@ -89,13 +89,15 @@ describe("useTemplateUsageMap", () => {
     expect(result.current.has("t1")).toBe(false);
   });
 
-  it("invalidates on PAGE_CREATED + PROJECT_CHANGED", () => {
+  /* Asserted a subscription to PAGE_CREATED — a name the engine never emits;
+     PROJECT_CHANGED carries "page:created". Fifth test this walk found
+     pinning a dead listener. */
+  it("invalidates on template events + PROJECT_CHANGED", () => {
     const composer = makeFakeComposer([]);
     renderHook(() => useTemplateUsageMap(composer as any));
     const subscribed = composer.on.mock.calls.map((c) => c[0]);
     expect(subscribed).toContain(EVENTS.TEMPLATE_APPLIED);
     expect(subscribed).toContain(EVENTS.TEMPLATE_REMOVED);
-    expect(subscribed).toContain(EVENTS.PAGE_CREATED);
     expect(subscribed).toContain(EVENTS.PROJECT_CHANGED);
   });
 
@@ -106,7 +108,6 @@ describe("useTemplateUsageMap", () => {
     const offCalls = composer.off.mock.calls.map((c) => c[0]);
     expect(offCalls).toContain(EVENTS.TEMPLATE_APPLIED);
     expect(offCalls).toContain(EVENTS.TEMPLATE_REMOVED);
-    expect(offCalls).toContain(EVENTS.PAGE_CREATED);
     expect(offCalls).toContain(EVENTS.PROJECT_CHANGED);
   });
 });

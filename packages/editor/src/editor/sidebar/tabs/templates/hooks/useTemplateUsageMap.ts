@@ -6,8 +6,9 @@
  * invalidation. Rebuilds on:
  *   - TEMPLATE_APPLIED   — recordAppliedTemplate fired
  *   - TEMPLATE_REMOVED   — removeAppliedTemplate fired
- *   - PAGE_CREATED       — page appeared
- *   - PROJECT_CHANGED    — page:deleted, page:updated, project reload
+ *   - PROJECT_CHANGED    — page create/delete/activate + project reload
+ *     (PAGE_CREATED was listed here too; the engine never emits the bare
+ *     name — PROJECT_CHANGED already carries "page:created")
  *
  * @license BSD-3-Clause
  */
@@ -45,13 +46,11 @@ export function useTemplateUsageMap(composer: Composer | null): TemplateUsageMap
     rebuild();
     composer.on(EVENTS.TEMPLATE_APPLIED, rebuild);
     composer.on(EVENTS.TEMPLATE_REMOVED, rebuild);
-    composer.on(EVENTS.PAGE_CREATED, rebuild);
     composer.on(EVENTS.PROJECT_CHANGED, rebuild);
     return () => {
       composer.off(EVENTS.TEMPLATE_APPLIED, rebuild);
       composer.off(EVENTS.TEMPLATE_REMOVED, rebuild);
-      composer.off(EVENTS.PAGE_CREATED, rebuild);
-      composer.off(EVENTS.PROJECT_CHANGED, rebuild);
+        composer.off(EVENTS.PROJECT_CHANGED, rebuild);
     };
   }, [composer]);
 
