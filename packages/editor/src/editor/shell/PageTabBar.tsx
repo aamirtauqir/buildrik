@@ -78,16 +78,13 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
     };
 
     syncPages();
-    const evs = [
-      EVENTS.PROJECT_CHANGED,
-      "page:created",
-      "page:deleted",
-      "page:changed",
-      "page:updated",
-    ] as const;
-    evs.forEach((ev) => composer.on(ev as string, syncPages));
+    /* PROJECT_CHANGED is the whole list: PageManager announces create, delete
+       and activate through it with a `type` discriminator (:91, :270, :225).
+       The four bare "page:*" names that sat beside it are emitted by nothing —
+       this bar worked only because the one real name was also here. */
+    composer.on(EVENTS.PROJECT_CHANGED, syncPages);
     return () => {
-      evs.forEach((ev) => composer.off(ev as string, syncPages));
+      composer.off(EVENTS.PROJECT_CHANGED, syncPages);
     };
   }, [composer]);
 

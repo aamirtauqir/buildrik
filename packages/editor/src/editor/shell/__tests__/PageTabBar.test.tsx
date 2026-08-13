@@ -7,6 +7,7 @@
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, cleanup, act } from "@testing-library/react";
+import { EVENTS } from "@/shared/constants/events";
 import { PageTabBar } from "../PageTabBar";
 import { ToastProvider } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
@@ -28,26 +29,26 @@ function makeComposer(initialPages: PageData[]) {
   let pages = [...initialPages];
   let activeId: string | null = pages[0]?.id ?? null;
   const handlers = new Map<string, Set<EventHandler>>();
-  const emit = (ev: string) => handlers.get(ev)?.forEach((fn) => fn());
+  const emit = (ev: string, _payload?: unknown) => handlers.get(ev)?.forEach((fn) => fn());
 
   const elements = {
     getAllPages: vi.fn(() => pages),
     getActivePage: vi.fn(() => pages.find((p) => p.id === activeId) ?? null),
     setActivePage: vi.fn((id: string) => {
       activeId = id;
-      emit("page:changed");
+      emit(EVENTS.PROJECT_CHANGED, { type: "page:changed" });
     }),
     createPage: vi.fn((name: string) => {
       pages = [...pages, makePage({ id: `p-${pages.length + 1}-new`, name })];
-      emit("page:created");
+      emit(EVENTS.PROJECT_CHANGED, { type: "page:created" });
     }),
     updatePage: vi.fn((id: string, patch: Partial<PageData>) => {
       pages = pages.map((p) => (p.id === id ? { ...p, ...patch } : p));
-      emit("page:updated");
+      emit(EVENTS.PROJECT_CHANGED, { type: "page:updated" });
     }),
     deletePage: vi.fn((id: string) => {
       pages = pages.filter((p) => p.id !== id);
-      emit("page:deleted");
+      emit(EVENTS.PROJECT_CHANGED, { type: "page:deleted" });
     }),
     setHomePage: vi.fn(),
   };
