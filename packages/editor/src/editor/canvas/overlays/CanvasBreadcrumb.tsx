@@ -5,6 +5,7 @@
  */
 
 import * as React from "react";
+import { Button } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
 
 export interface CanvasBreadcrumbProps {
@@ -49,7 +50,12 @@ const BAR =
   "tw:absolute tw:bottom-0 tw:left-0 tw:right-0 tw:z-30 tw:flex tw:items-center tw:gap-2 " +
   "tw:px-3 tw:py-1.5 tw:bg-[rgba(17,24,39,0.5)] tw:backdrop-blur-sm";
 
-const SEG_BASE = "tw:shrink-0 tw:rounded tw:px-1.5 tw:py-[3px] tw:text-[10px] tw:whitespace-nowrap";
+/* Flowbite's Button theme sets h-10 / justify-center / font-medium and beats
+   plain tw: utilities, so the board's 10px pill has to restate geometry,
+   padding and border here rather than rely on defaults. */
+const SEG_BASE =
+  "tw:shrink-0 tw:h-auto tw:rounded tw:px-1.5 tw:py-[3px] tw:text-[10px] tw:leading-none " +
+  "tw:whitespace-nowrap tw:border-0 tw:font-normal tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 const SEG =
   SEG_BASE + " tw:bg-white tw:text-[color:var(--bk-ink-muted)] tw:cursor-pointer " +
   "disabled:tw:cursor-default";
@@ -113,8 +119,9 @@ export const CanvasBreadcrumb: React.FC<CanvasBreadcrumbProps> = ({
         {segments.map((segment, index) => (
           <React.Fragment key={segment.id}>
             {index > 0 && <span className={SEP}>&rsaquo;</span>}
-            <button
+            <Button
               type="button"
+              color="light"
               className={segment.isCurrent ? SEG_CURRENT : SEG}
               onClick={() => {
                 if (segment.id !== "canvas-root" && !segment.isCurrent) {
@@ -124,7 +131,7 @@ export const CanvasBreadcrumb: React.FC<CanvasBreadcrumbProps> = ({
               disabled={segment.id === "canvas-root"}
             >
               {segment.name}
-            </button>
+            </Button>
           </React.Fragment>
         ))}
       </div>
