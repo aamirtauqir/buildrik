@@ -99,14 +99,29 @@ describe("useAutoMilestone — triggers", () => {
     });
   });
 
-  it("PAGE_CREATED requests a suggestion (trigger page_added)", async () => {
-    stubSuggestFetch();
+  /* The engine has no bare PAGE_CREATED — a new page arrives as
+     PROJECT_CHANGED { type: "page:created" }, so this trigger never fired. */
+  it("a created page requests a suggestion (trigger page_added)", async () => {
+    stubSuggestFetch("Added pricing page");
     const composer = createMockComposer();
     const { result } = renderHook(() => useAutoMilestone(asComposer(composer)));
 
-    await act(async () => composer.emit(EVENTS.PAGE_CREATED, { pageId: "p1" }));
+    await act(async () => composer.emit(EVENTS.PROJECT_CHANGED, { type: "page:created" }));
+
     await waitFor(() => expect(result.current.suggestion?.trigger).toBe("page_added"));
   });
+
+  it("ignores PROJECT_CHANGED for anything that is not a page create", async () => {
+    const fetchMock = stubSuggestFetch();
+    const composer = createMockComposer();
+    const { result } = renderHook(() => useAutoMilestone(asComposer(composer)));
+
+    await act(async () => composer.emit(EVENTS.PROJECT_CHANGED, { type: "page:activated" }));
+
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(result.current.suggestion).toBeNull();
+  });
+
 
   it("enforces the 30s cooldown between suggestions", async () => {
     const fetchMock = stubSuggestFetch();

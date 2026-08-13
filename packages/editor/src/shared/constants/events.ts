@@ -477,9 +477,9 @@ export const EVENTS = {
   /** Trigger scroll to selected element in Layers panel */
   LAYERS_SCROLL_TO_SELECTION: "layers:scroll-to-selection",
   /** Open the Build/Add panel in the left sidebar */
-  /** Templates panel enters/leaves "choose a template for a NEW page" mode. */
+  /** Templates panel enters "choose a template for a NEW page" mode. Leaving
+      the panel unmounts it, which is the only way out — no OFF event. */
   UI_TEMPLATES_NEWPAGE_ON: "ui:templates-newpage-on",
-  UI_TEMPLATES_NEWPAGE_OFF: "ui:templates-newpage-off",
   /** Open the Design/Global Styles panel in the left sidebar */
   UI_OPEN_DESIGN_PANEL: "ui:open-design-panel",
   /** Open the StarterGalleryModal — re-trigger for users to browse

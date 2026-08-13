@@ -68,12 +68,9 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   React.useEffect(() => {
     if (!composer) return;
     const enable = () => setNewPageModeInternal(true);
-    const disable = () => setNewPageModeInternal(false);
     composer.on(EVENTS.UI_TEMPLATES_NEWPAGE_ON, enable);
-    composer.on(EVENTS.UI_TEMPLATES_NEWPAGE_OFF, disable);
     return () => {
       composer.off(EVENTS.UI_TEMPLATES_NEWPAGE_ON, enable);
-      composer.off(EVENTS.UI_TEMPLATES_NEWPAGE_OFF, disable);
       /* TabRouter renders one tab at a time, so leaving Templates unmounts
          this. New-page mode belongs to the visit that asked for it — without
          this reset, opening Templates from the rail later would still promise

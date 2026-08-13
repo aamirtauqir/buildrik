@@ -387,7 +387,11 @@ export const ZOOM_PRESETS = [10, 25, 50, 75, 100, 150, 200, 400] as const;
 
 export const ZOOM_LIMITS = {
   min: 10,
-  max: 300,
+  /* 400, per board 817:4723's stated range and its "Max zoom" state card. The
+     preset list moved first and this did not, which the SSOT test in
+     __tests__/canvas.test.ts caught — it asserts the two agree in both
+     directions. */
+  max: 400,
   step: 10,
 } as const;
 

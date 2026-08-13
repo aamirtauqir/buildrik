@@ -238,18 +238,24 @@ export function useAutoMilestone(
       await requestSuggestion("element_deleted");
     };
 
-    const handlePageCreated = async () => {
+    /* The engine has no bare "page:created" — PageManager announces every page
+       create/delete/activate as PROJECT_CHANGED with a `type` discriminator
+       (:91, :270, :225). Listening for EVENTS.PAGE_CREATED meant the
+       page_added milestone suggestion never fired for anyone. Filtered on the
+       type so this stays as narrow as it was meant to be. */
+    const handleProjectChanged = async (p?: { type?: string }) => {
+      if (p?.type !== "page:created") return;
       await requestSuggestion("page_added");
     };
 
     composer.on(EVENTS.HISTORY_RECORDED, handleRecorded);
     composer.on(EVENTS.ELEMENT_DELETED, handleElementDeleted);
-    composer.on(EVENTS.PAGE_CREATED, handlePageCreated);
+    composer.on(EVENTS.PROJECT_CHANGED, handleProjectChanged);
 
     return () => {
       composer.off(EVENTS.HISTORY_RECORDED, handleRecorded);
       composer.off(EVENTS.ELEMENT_DELETED, handleElementDeleted);
-      composer.off(EVENTS.PAGE_CREATED, handlePageCreated);
+      composer.off(EVENTS.PROJECT_CHANGED, handleProjectChanged);
     };
   }, [composer, requestSuggestion]);
 

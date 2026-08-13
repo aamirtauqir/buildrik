@@ -81,6 +81,17 @@ describe("useLayerSelection — engine event sync (multi-select regression)", ()
     ids = ["a"];
     act(() => composer.emit("selection:removed"));
     expect(result.current.selectedIds).toEqual(new Set(["a"]));
+
+    /* Marquee / Select All go through selectMultiple → SELECTION_MULTIPLE, and
+       a plain click replaces the selection via ELEMENT_SELECTED. Neither was
+       subscribed; the dead "selection:changed" was. */
+    ids = ["a", "b", "c"];
+    act(() => composer.emit("element:selected"));
+    expect(result.current.selectedIds).toEqual(new Set(["a", "b", "c"]));
+
+    ids = ["c"];
+    act(() => composer.emit("selection:multiple"));
+    expect(result.current.selectedIds).toEqual(new Set(["c"]));
   });
 });
 

@@ -48,15 +48,20 @@ export function useLayerSelection(
     // SELECTION_ADDED/REMOVED are what addToSelection/removeFromSelection
     // (meta-click toggle, shift-range) actually emit — without them the tree
     // never reflected multi-select even though the engine held it.
-    composer.on(EVENTS.SELECTION_CHANGED, sync);
-    composer.on(EVENTS.SELECTION_CLEARED, sync);
-    composer.on(EVENTS.SELECTION_ADDED, sync);
-    composer.on(EVENTS.SELECTION_REMOVED, sync);
+    // SELECTION_MULTIPLE and ELEMENT_SELECTED are the other two ways the set
+    // changes (marquee / Select All, and a plain single click that replaces
+    // the whole selection); neither was here. SELECTION_CHANGED was, and the
+    // engine has never emitted it.
+    const EVENTS_IN = [
+      EVENTS.ELEMENT_SELECTED,
+      EVENTS.SELECTION_MULTIPLE,
+      EVENTS.SELECTION_CLEARED,
+      EVENTS.SELECTION_ADDED,
+      EVENTS.SELECTION_REMOVED,
+    ] as const;
+    EVENTS_IN.forEach((e) => composer.on(e, sync));
     return () => {
-      composer.off(EVENTS.SELECTION_CHANGED, sync);
-      composer.off(EVENTS.SELECTION_CLEARED, sync);
-      composer.off(EVENTS.SELECTION_ADDED, sync);
-      composer.off(EVENTS.SELECTION_REMOVED, sync);
+      EVENTS_IN.forEach((e) => composer.off(e, sync));
     };
   }, [composer]);
 
