@@ -23,6 +23,12 @@ import * as React from "react";
 import type { DesignToken, TokenDiff } from "../../types";
 import { calcWcagLevel, calcContrastRatio } from "../../utils/colorUtils";
 import { suggestContrastFix } from "../../utils/contrastFix";
+import {
+  contrastFails,
+  findSurfaceToken,
+  resolveSurface,
+  shownValue,
+} from "../../utils/contrastLint";
 import { TokenRow } from "../sections/TokenRow";
 import type { LintIssue } from "../../../../engine/designSystem/LintState";
 import type { Composer } from "../../../../engine/Composer";
@@ -100,33 +106,11 @@ const GROUP_META: Record<string, { label: string; subtext: string }> = {
  */
 const FALLBACK_BG = "#FFFFFF";
 
-function findSurfaceToken(tokens: readonly DesignToken[]): DesignToken | undefined {
-  return (
-    tokens.find((t) => t.id === "color-background") ??
-    tokens.find((t) => t.group === "surface" && /background/i.test(t.name))
-  );
-}
-
-function resolveSurface(bg: DesignToken | undefined, mode: "light" | "dark"): string {
-  if (!bg) return FALLBACK_BG;
-  return (mode === "dark" ? bg.darkValue : bg.value) || bg.value || FALLBACK_BG;
-}
-
-/** In dark mode a token is shown as its dark value, so that is the value that
- *  has to survive the dark surface. Comparing the light value against a dark
- *  page measures a pairing the customer never sees. */
-const shownValue = (t: DesignToken, mode: "light" | "dark") =>
-  (mode === "dark" ? t.darkValue : t.value) || t.value;
-
-/** The page colour itself is not "text on the page". Comparing it to itself is
- *  always 1:1, so without this every palette would report its own background as
- *  a failure — noise the old hardcoded surface hid by accident. */
-const contrastFails = (
-  t: DesignToken,
-  surfaceBg: string,
-  mode: "light" | "dark",
-  surfaceId?: string,
-) => t.id !== surfaceId && calcWcagLevel(shownValue(t, mode), surfaceBg) === "fail";
+/* findSurfaceToken / resolveSurface / shownValue / contrastFails moved to
+   ../../utils/contrastLint — useDSLint merges the same computation into the
+   shared lint result, so this chip and the Lint destination can never
+   disagree again (they did, live, 2026-08-13: "Issues (1)" here vs "Nothing
+   to fix" there). */
 
 /* Classes. The only genuinely computed values left in this file are a token's
    own colour on its swatch and a suggested fix's colour — both the user's data.

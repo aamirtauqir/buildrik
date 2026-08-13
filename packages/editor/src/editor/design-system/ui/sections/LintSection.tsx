@@ -25,6 +25,7 @@ export interface LintSectionProps {
 
 /** Human labels, kept in step with `DSLintBanner`'s RULE_LABEL. */
 const RULE_LABEL: Record<LintRuleId, string> = {
+  contrast: "Fails WCAG AA on the page background",
   "banned-hue": "Banned hue — purple, violet or indigo",
   "pure-black": "Pure black",
   "empty-value": "Empty value",

@@ -12,6 +12,7 @@ import * as React from "react";
 import type { Composer } from "../../../engine";
 import type { LintIssue } from "../../../engine/designSystem/linter";
 import type { LintIssue as StoredLintIssue } from "../../../engine/designSystem/LintState";
+import { buildContrastIssues } from "../utils/contrastLint";
 import {
   useColorRegistry,
   useSpacingRegistry,
@@ -40,7 +41,14 @@ export function useDSLint(composer: Composer | null | undefined): readonly LintI
   React.useEffect(() => {
     if (!composer) return;
     const timer = window.setTimeout(() => {
-      const found = composer.dsLinter.lint(allTokens);
+      /* Contrast is computed here, not in DSLinter — it needs the resolved
+         mode. Merged so the Lint destination, the banner and the colour
+         list's chip can never tell three different stories again. */
+      const mode = composer.colorMode?.resolved?.() ?? "light";
+      const found = [
+        ...composer.dsLinter.lint(allTokens),
+        ...buildContrastIssues(colorState?.tokens ?? [], mode),
+      ];
       setIssues(found);
 
       /* Publish into the engine store the rest of the editor reads. This hook

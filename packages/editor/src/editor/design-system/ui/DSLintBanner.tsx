@@ -30,6 +30,7 @@ export interface DSLintBannerProps {
 }
 
 const RULE_LABEL: Record<LintRuleId, string> = {
+  contrast: "WCAG contrast failure",
   "banned-hue": "banned hue (purple/violet/indigo)",
   "pure-black": "pure-black value",
   "empty-value": "empty token value",

@@ -57,19 +57,29 @@ describe("DSLintMount", () => {
       vi.advanceTimersByTime(500);
     });
 
-    expect(queryByText("1 DS error · 1 warning")).toBeTruthy();
+    /* 2 mocked findings + the default registry's four contrast findings, now
+       merged into the shared result (the live 2026-08-13 find: the colour
+       list said "Issues (1)" while the Lint destination said "Nothing to
+       fix"). The registry lints the FULL palette; the colour list's chip
+       counts only its Beginner-visible subset — superset, never contradiction. */
+    expect(queryByText("1 DS error · 5 warnings")).toBeTruthy();
   });
 
-  it("renders nothing when lint returns an empty list", () => {
+  /* Renamed from "renders nothing when lint returns an empty list": with
+     contrast merged, an empty DSLinter result no longer means a clean brand —
+     the default palette carries one WCAG failure and the banner must say so.
+     Suppressing it was the bug. */
+  it("surfaces contrast findings even when DSLinter returns nothing", () => {
     const composer = makeComposer([]);
-    const { container } = render(wrap(<DSLintMount composer={composer as any} />));
+    const { queryByText } = render(wrap(<DSLintMount composer={composer as any} />));
 
     act(() => {
       vi.advanceTimersByTime(500);
     });
 
-    expect(container.firstChild).toBeNull();
+    expect(queryByText("4 DS warnings")).toBeTruthy();
   });
+
 
   it("hides the banner after the dismiss button is clicked", () => {
     const issues: LintIssue[] = [

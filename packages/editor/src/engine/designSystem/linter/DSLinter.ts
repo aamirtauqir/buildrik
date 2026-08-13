@@ -10,6 +10,11 @@ export interface LintIssue {
 }
 
 export type LintRuleId =
+  /* Computed editor-side (utils/contrastLint.ts, merged in useDSLint) — needs
+     the resolved colour mode and surface token, which the pure token-list
+     linter does not have. In the union so every consumer speaks one
+     vocabulary. */
+  | "contrast"
   | "banned-hue"
   | "pure-black"
   | "empty-value"
