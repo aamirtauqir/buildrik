@@ -4,8 +4,7 @@
    celebration state. */
 
 import * as React from "react";
-import { MousePointerClick } from "lucide-react";
-import { Kbd, Button } from "@/editor/chrome-ui";
+import { Button } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
 import { EVENTS } from "../../../shared/constants/events";
 
@@ -70,58 +69,31 @@ export const InspectorEmptyState: React.FC<InspectorEmptyStateProps> = ({
     );
   }
 
+  /* Board 159:99 draws this state as TWO LINES: a muted sentence and one accent
+     link to the AI. What it replaces was an icon circle, an h3, a description,
+     a two-button CTA stack (Open Build Panel / Browse Templates) and a keyboard
+     tip — six blocks of chrome for "nothing is selected".
+
+     Neither CTA loses its destination: Insert is a rail button and Templates
+     opens from ⌘K and the Pages panel, so the capability is untouched. What
+     changes is that an empty panel stops advertising them. And the one action
+     the board does keep is the AI entry, which is the same one the inspector
+     header carries as `✦ AI` — one answer to "I do not know what to do next",
+     not three. */
   return (
     <div role="status" aria-live="polite" aria-label="No element selected" className={CONTAINER}>
-      {/* Icon */}
-      <div className={ICON_CIRCLE} aria-hidden="true">
-        <MousePointerClick size={16} strokeWidth={1.5} className="tw:opacity-50" />
-      </div>
-      {/* Title */}
-      <h3 className={TITLE}>Nothing Selected</h3>
-      {/* Description */}
-      <p className={DESCRIPTION}>
-        Click an element on the canvas or use the Layers panel to select and edit properties.
-      </p>
-      {/* CTA Buttons */}
-      <div className={CTA_STACK}>
-        {composer && (
-          <>
-            <Button
-              onClick={() => composer.emit(EVENTS.UI_OPEN_BUILD_PANEL, {})}
-              className={PRIMARY_BTN}
-              aria-label="Open Build panel to add elements"
-            >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M12 5v14M5 12h14" />
-              </svg>
-              Open Build Panel
-            </Button>
-            <Button
-              onClick={() => composer.emit(EVENTS.UI_BROWSE_TEMPLATES, {})}
-              className={SECONDARY_BTN}
-              aria-label="Browse available templates"
-            >
-              Browse Templates
-            </Button>
-          </>
-        )}
-      </div>
-      {/* Keyboard Tips */}
-      <div className={TIP}>
-        <span className="tw:opacity-70">Tip:</span> Press <Kbd>A</Kbd> to open Build
-        panel{" · "}
-        <Kbd>Esc</Kbd> to deselect
-      </div>
+      <p className={DESCRIPTION}>Select something on the canvas to edit it.</p>
+      {composer && (
+        <Button
+          color="light"
+          size="xs"
+          data-testid="inspector-empty-ask-ai"
+          onClick={() => composer.emit("ui:switch-tab", { tab: "ai" })}
+          className="tw:mt-1 tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:font-normal tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+        >
+          ✦ Ask AI ›
+        </Button>
+      )}
     </div>
   );
 };
@@ -133,18 +105,8 @@ export const InspectorEmptyState: React.FC<InspectorEmptyStateProps> = ({
 const CONTAINER =
   "tw:flex tw:flex-col tw:items-center tw:justify-center tw:h-full tw:mt-10 tw:p-6 " +
   "tw:text-center tw:text-[var(--bk-ink-soft)]";
-const ICON_CIRCLE =
-  "tw:flex tw:items-center tw:justify-center tw:size-12 tw:mb-4 tw:rounded-full " +
-  "tw:border tw:border-[var(--bk-bg-subtle)] tw:bg-[var(--bk-bg-subtle)]";
 const TITLE = "tw:mb-2 tw:text-sm tw:font-semibold tw:text-gray-900";
 const DESCRIPTION = "tw:m-0 tw:max-w-55 tw:text-[13px] tw:leading-normal tw:text-gray-500";
-const CTA_STACK = "tw:flex tw:flex-col tw:gap-2 tw:mt-5 tw:w-full tw:max-w-50";
-const PRIMARY_BTN =
-  "tw:flex tw:items-center tw:justify-center tw:gap-1.5 tw:w-full tw:px-4 tw:py-2 tw:rounded-md " +
-  "tw:border-0 tw:bg-blue-700 tw:text-white tw:text-xs tw:font-semibold tw:hover:bg-blue-800";
-const SECONDARY_BTN =
-  "tw:px-3 tw:py-1.5 tw:rounded tw:border-0 tw:bg-transparent tw:text-xs tw:font-medium " +
-  "tw:text-[var(--bk-ink-soft)] tw:underline tw:underline-offset-2 tw:hover:text-gray-900";
 const TIP = "tw:mt-5 tw:px-3 tw:py-2 tw:rounded-md tw:bg-blue-50 tw:text-[11px] tw:text-[var(--bk-ink-soft)]";
 /** Success banner after a template applies — success tokens, not a hand-mixed green. */
 const APPLIED_BANNER =
