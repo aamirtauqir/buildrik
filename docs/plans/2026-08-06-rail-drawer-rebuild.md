@@ -1115,6 +1115,26 @@ Also landed this batch: seam-scan.mjs (T2) wired into verify:ds, whose first
 run found three more dead listeners — one real (useElementDragDomSync's
 updateRootId never re-ran after mount; drag root stale on every page switch).
 
+### Phase 0 — Media family eye-verified 2026-08-14 (7 surfaces, 0 new defects)
+
+Drawer empty-state, drawer grid (2 uploaded assets, webp transcode), bulk bar
+("1 selected · Move to… · Delete · Done"), stock-photos idle, fullpage Asset
+Library (board 1159:4593 — folders rail, toolbar, grid, detail panel, footer),
+MediaContextMenu (the 08-12 no-stylesheet fix, fully styled: 7 items + red
+Delete), ImageEditorModal (board 1124:4527 — tabs, crop grid, ratio pills,
+sliders, version footer).
+
+Zero new defects — every prior Media-arc fix holding live. Two states remain
+unverifiable without failure injection (upload-failed 145:148, load-error
+453:3931) and one needs a saved version (versions drill-in 146:32); listed,
+not skipped silently.
+
+Verification notes: the "ghost drawer behind fullpage" I chased was a
+screenshot-timing artifact — chain screenshots can land before React commits;
+steady-state showed ls-panel--closed at width 0. And browse's viewport resets
+to 1280×720 on daemon restart — re-set 1440×900 at each session start (now in
+the protocol above).
+
 ## Named for the founder — needs a decision or a file I must not stage
 
 **`ConflictModal` does not match board 66:640, and fixing it needs
