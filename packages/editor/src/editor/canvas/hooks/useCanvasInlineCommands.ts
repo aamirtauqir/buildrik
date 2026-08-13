@@ -126,6 +126,43 @@ export function useCanvasInlineCommands({
           }
           break;
         }
+        /* Everything the toolbar can emit that is not hand-built above:
+           lists, the four alignments, indent/outdent, size and the two colours.
+           ELEVEN of the toolbar's eighteen controls used to fall past this
+           switch into the log below — they rendered, took the click, and did
+           nothing, silently, because devLog is a no-op outside development.
+
+           These are hand-built as tag surgery only where the markup matters
+           (bold/italic/underline/strike, above, so the canvas gets <strong> and
+           <em> rather than execCommand's <b>/<i>). For list, block-alignment
+           and indent structure there is no equivalent worth writing by hand:
+           contenteditable already implements them, and the result is sanitized
+           on the very next lines before it reaches the element tree. */
+        case "insertUnorderedList":
+        case "insertOrderedList":
+        case "justifyLeft":
+        case "justifyCenter":
+        case "justifyRight":
+        case "justifyFull":
+        case "outdent":
+        case "indent":
+        case "fontSize": {
+          document.execCommand(command, false, value);
+          break;
+        }
+
+        case "foreColor":
+        case "hiliteColor": {
+          /* Colours need CSS-mode on, or Chrome emits <font color> for
+             foreColor and ignores hiliteColor entirely. styleWithCSS is
+             per-document state, so it is set immediately before use rather
+             than once at mount. */
+          document.execCommand("styleWithCSS", false, "true");
+          document.execCommand(command, false, value);
+          document.execCommand("styleWithCSS", false, "false");
+          break;
+        }
+
         default:
           devLog("Canvas", `Unsupported inline command: ${command}`);
       }

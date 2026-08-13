@@ -68,4 +68,53 @@ describe("useCanvasInlineCommands — createLink scheme validation (T4)", () => 
     expect(anchor).not.toBeNull();
     expect(anchor?.getAttribute("href")).toBe("https://example.com");
   });
+
+  /* ELEVEN of the inline toolbar's eighteen controls used to fall past the
+     switch into a devLog — they rendered, took the click, and did nothing,
+     silently, because devLog is a no-op outside development. jsdom does not
+     implement execCommand, so these assert the DISPATCH rather than the
+     resulting markup: that is the boundary that was broken. */
+  const DISPATCHED = [
+    "insertUnorderedList",
+    "insertOrderedList",
+    "justifyLeft",
+    "justifyCenter",
+    "justifyRight",
+    "justifyFull",
+    "outdent",
+    "indent",
+    "fontSize",
+  ] as const;
+
+  it("reaches the document for every command the toolbar can emit", () => {
+    const exec = vi.fn().mockReturnValue(true);
+    (document as unknown as { execCommand: unknown }).execCommand = exec;
+    const { result } = renderHook(() =>
+      useCanvasInlineCommands({ composer: makeComposer(vi.fn()), canvasRef, editingId: "el-1" })
+    );
+
+    for (const command of DISPATCHED) {
+      exec.mockClear();
+      selectAll(editableEl);
+      act(() => result.current.handleInlineCommand(command, "3"));
+      expect(exec, `${command} never reached the document`).toHaveBeenCalledWith(command, false, "3");
+    }
+  });
+
+  it("turns CSS mode on for colours, or Chrome ignores the highlight entirely", () => {
+    const exec = vi.fn().mockReturnValue(true);
+    (document as unknown as { execCommand: unknown }).execCommand = exec;
+    const { result } = renderHook(() =>
+      useCanvasInlineCommands({ composer: makeComposer(vi.fn()), canvasRef, editingId: "el-1" })
+    );
+
+    selectAll(editableEl);
+    act(() => result.current.handleInlineCommand("hiliteColor", "#ff0"));
+
+    const calls = exec.mock.calls.map((c) => c[0]);
+    expect(calls[0]).toBe("styleWithCSS");
+    expect(calls).toContain("hiliteColor");
+    // and put it back, because styleWithCSS is per-document state
+    expect(calls[calls.length - 1]).toBe("styleWithCSS");
+  });
 });
