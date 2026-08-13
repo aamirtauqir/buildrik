@@ -11,6 +11,7 @@
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, beforeEach } from "vitest";
 import type { Composer } from "../../../../../engine";
+import { EVENTS } from "@/shared/constants/events";
 import { useLayerTree } from "../useLayerTree";
 
 interface EngineEl {
@@ -45,15 +46,28 @@ const elementMap = new Map<string, EngineEl>([
   ["b", b],
 ]);
 
-function makeComposer(): Composer {
+/** A second page whose root holds only `b`, for the page-switch test. */
+const root2 = el("root-2", [b]);
+elementMap.set("root-2", root2);
+
+function makeComposer(): Composer & { _emit(ev: string): void; _setPage(id: string): void } {
+  const handlers = new Map<string, Set<() => void>>();
+  let page = { id: "page-1", root: { id: "root" } };
   return {
     elements: {
-      getActivePage: () => ({ id: "page-1", root: { id: "root" } }),
+      getActivePage: () => page,
       getElement: (id: string) => elementMap.get(id) ?? null,
     },
-    on: () => {},
-    off: () => {},
-  } as unknown as Composer;
+    on: (ev: string, fn: () => void) => {
+      if (!handlers.has(ev)) handlers.set(ev, new Set());
+      handlers.get(ev)!.add(fn);
+    },
+    off: (ev: string, fn: () => void) => handlers.get(ev)?.delete(fn),
+    _emit: (ev: string) => handlers.get(ev)?.forEach((fn) => fn()),
+    _setPage: (id: string) => {
+      page = { id, root: { id: id === "page-2" ? "root-2" : "root" } };
+    },
+  } as unknown as Composer & { _emit(ev: string): void; _setPage(id: string): void };
 }
 
 beforeEach(() => {
@@ -132,5 +146,24 @@ describe("useLayerTree — expansion controls", () => {
     const { result } = mount();
     // Only root expanded initially → a1 is under a (collapsed) so hidden
     expect(result.current.getVisibleLayerIds()).not.toContain("a1");
+  });
+});
+
+/* Switching the active page emits PROJECT_CHANGED { type: "page:activated" }.
+   This hook listened for a bare "page:changed" the engine never sends, so the
+   panel kept showing the previous page's tree until some unrelated element
+   event happened to fire. */
+describe("useLayerTree — page switch", () => {
+  it("rebuilds the tree when the active page changes", () => {
+    const composer = makeComposer();
+    const { result } = renderHook(() => useLayerTree(composer));
+    expect(result.current.layers[0].id).toBe("root");
+
+    act(() => {
+      composer._setPage("page-2");
+      composer._emit(EVENTS.PROJECT_CHANGED);
+    });
+
+    expect(result.current.layers[0].id).toBe("root-2");
   });
 });

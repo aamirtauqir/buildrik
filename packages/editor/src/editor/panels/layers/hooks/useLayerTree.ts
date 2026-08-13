@@ -13,6 +13,7 @@
 import * as React from "react";
 import type { Composer } from "../../../../engine";
 import type { Element } from "../../../../engine/elements/Element";
+import { EVENTS } from "../../../../shared/constants/events";
 import type { LayerItem } from "../types";
 import { loadSetFromStorage, saveSetToStorage } from "./layersPersistence";
 
@@ -98,13 +99,17 @@ export function useLayerTree(
       }
     };
     handlePageChange();
-    composer.on("page:changed", handlePageChange);
-    composer.on("project:loaded", handlePageChange);
-    composer.on("project:imported", handlePageChange);
+    /* The engine has no bare "page:changed" / "project:imported" — switching
+       the active page emits PROJECT_CHANGED with type "page:activated"
+       (PageManager:225), and importProject re-emits PROJECT_LOADED. Listening
+       for the bare names meant this never ran again after mount, so switching
+       pages left the tree — and the expanded-node state keyed to the old page
+       — exactly as it was. */
+    composer.on(EVENTS.PROJECT_CHANGED, handlePageChange);
+    composer.on(EVENTS.PROJECT_LOADED, handlePageChange);
     return () => {
-      composer.off("page:changed", handlePageChange);
-      composer.off("project:loaded", handlePageChange);
-      composer.off("project:imported", handlePageChange);
+      composer.off(EVENTS.PROJECT_CHANGED, handlePageChange);
+      composer.off(EVENTS.PROJECT_LOADED, handlePageChange);
     };
   }, [composer, currentPageId, hydrateExpandedFromStorage]);
 
@@ -112,17 +117,16 @@ export function useLayerTree(
   React.useEffect(() => {
     if (!composer) return;
     buildLayersFromEngine();
+    /* PROJECT_CHANGED carries every page create/delete/activate as a typed
+       payload; the four bare page/import names it replaces were never emitted. */
     const events = [
-      "project:imported",
-      "project:loaded",
-      "page:created",
-      "page:deleted",
-      "page:changed",
-      "element:created",
-      "element:deleted",
-      "element:moved",
-      "element:duplicated",
-      "element:updated",
+      EVENTS.PROJECT_CHANGED,
+      EVENTS.PROJECT_LOADED,
+      EVENTS.ELEMENT_CREATED,
+      EVENTS.ELEMENT_DELETED,
+      EVENTS.ELEMENT_MOVED,
+      EVENTS.ELEMENT_DUPLICATED,
+      EVENTS.ELEMENT_UPDATED,
     ] as const;
     const handler = () => buildLayersFromEngine();
     events.forEach((e) => composer.on(e, handler));
