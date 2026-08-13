@@ -101,7 +101,7 @@ const KeyboardHint: React.FC<KeyboardHintProps> = ({ shortcut }) => {
       style={{
         fontSize: 12,
         color: CANVAS_COLORS.textMuted,
-        fontFamily: "system-ui, -apple-system, sans-serif",
+        fontFamily: "var(--bk-font-ui)",
         letterSpacing: 0.5,
       }}
     >

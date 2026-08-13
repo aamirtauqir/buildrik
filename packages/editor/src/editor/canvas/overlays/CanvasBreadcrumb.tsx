@@ -6,12 +6,6 @@
 
 import * as React from "react";
 import type { Composer } from "../../../engine";
-import {
-  BreadcrumbContainer,
-  BreadcrumbSegment,
-  BreadcrumbSeparator,
-  BreadcrumbHint,
-} from "../styled";
 
 export interface CanvasBreadcrumbProps {
   composer: Composer;
@@ -51,104 +45,19 @@ function getElementName(type: string, tagName?: string): string {
   return typeMap[normalized] || tagName || type;
 }
 
-/** Get type icon */
-function getTypeIcon(type: string): React.ReactNode {
-  const t = type.toLowerCase();
+const BAR =
+  "tw:absolute tw:bottom-0 tw:left-0 tw:right-0 tw:z-30 tw:flex tw:items-center tw:gap-2 " +
+  "tw:px-3 tw:py-1.5 tw:bg-[rgba(17,24,39,0.5)] tw:backdrop-blur-sm";
 
-  if (["container", "div", "section"].includes(t)) {
-    return (
-      <svg
-        width="12"
-        height="12"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-      >
-        <rect x="3" y="3" width="18" height="18" rx="2" />
-      </svg>
-    );
-  }
-  if (["row", "column"].includes(t)) {
-    return (
-      <svg
-        width="12"
-        height="12"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-      >
-        <rect x="3" y="3" width="7" height="18" rx="1" />
-        <rect x="14" y="3" width="7" height="18" rx="1" />
-      </svg>
-    );
-  }
-  if (["heading", "h1", "h2", "h3", "h4", "h5", "h6"].includes(t)) {
-    return <span style={{ fontWeight: 700, fontSize: 12 }}>H</span>;
-  }
-  if (["paragraph", "p", "text"].includes(t)) {
-    return <span style={{ fontWeight: 500, fontSize: 12 }}>T</span>;
-  }
-  if (["image", "img"].includes(t)) {
-    return (
-      <svg
-        width="12"
-        height="12"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-      >
-        <rect x="3" y="3" width="18" height="18" rx="2" />
-        <circle cx="8.5" cy="8.5" r="1.5" />
-        <path d="M21 15l-5-5L5 21" />
-      </svg>
-    );
-  }
-  if (["button"].includes(t)) {
-    return (
-      <svg
-        width="12"
-        height="12"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-      >
-        <rect x="3" y="8" width="18" height="8" rx="2" />
-      </svg>
-    );
-  }
-  if (["link", "a"].includes(t)) {
-    return (
-      <svg
-        width="12"
-        height="12"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-      >
-        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-      </svg>
-    );
-  }
-
-  return (
-    <svg
-      width="12"
-      height="12"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-    >
-      <rect x="3" y="3" width="18" height="18" rx="2" />
-    </svg>
-  );
-}
+const SEG_BASE = "tw:shrink-0 tw:rounded tw:px-1.5 tw:py-[3px] tw:text-[10px] tw:whitespace-nowrap";
+const SEG =
+  SEG_BASE + " tw:bg-white tw:text-[color:var(--bk-ink-muted)] tw:cursor-pointer " +
+  "disabled:tw:cursor-default";
+const SEG_CURRENT =
+  SEG_BASE + " tw:bg-[color:var(--bk-accent)] tw:text-[color:var(--bk-accent-on)] tw:font-medium";
+const SEP = "tw:shrink-0 tw:text-[10px] tw:text-[color:var(--bk-ink-muted)]";
+const HINTS =
+  "tw:ml-auto tw:flex tw:shrink-0 tw:gap-3 tw:text-[9px] tw:text-[color:var(--bk-gray-400)]";
 
 export const CanvasBreadcrumb: React.FC<CanvasBreadcrumbProps> = ({
   composer,
@@ -199,48 +108,33 @@ export const CanvasBreadcrumb: React.FC<CanvasBreadcrumbProps> = ({
   }
 
   return (
-    <BreadcrumbContainer>
-      <div style={{ display: "flex", alignItems: "center", gap: 2, overflow: "hidden" }}>
+    <div className={BAR}>
+      <div className="tw:flex tw:items-center tw:gap-2 tw:overflow-hidden">
         {segments.map((segment, index) => (
           <React.Fragment key={segment.id}>
-            {index > 0 && (
-              <BreadcrumbSeparator>
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path d="M9 18l6-6-6-6" />
-                </svg>
-              </BreadcrumbSeparator>
-            )}
-            <BreadcrumbSegment
+            {index > 0 && <span className={SEP}>&rsaquo;</span>}
+            <button
+              type="button"
+              className={segment.isCurrent ? SEG_CURRENT : SEG}
               onClick={() => {
                 if (segment.id !== "canvas-root" && !segment.isCurrent) {
                   onSelectElement(segment.id);
                 }
               }}
               disabled={segment.id === "canvas-root"}
-              isCurrent={segment.isCurrent}
-              isRoot={segment.id === "canvas-root"}
             >
-              <span style={{ opacity: 0.7, display: "flex", alignItems: "center" }}>
-                {getTypeIcon(segment.type)}
-              </span>
-              <span>{segment.name}</span>
-            </BreadcrumbSegment>
+              {segment.name}
+            </button>
           </React.Fragment>
         ))}
       </div>
 
-      <BreadcrumbHint>
-        <span>Alt+↑ Parent</span>
-        <span>Alt+↓ Child</span>
-      </BreadcrumbHint>
-    </BreadcrumbContainer>
+      {/* The keys named here are the ones useCanvasKeyboard actually binds. */}
+      <div className={HINTS}>
+        <span>&larr; Parent</span>
+        <span>&rarr; Child</span>
+      </div>
+    </div>
   );
 };
 

@@ -459,7 +459,7 @@ const ShortcutBadge: React.FC<{ shortcut: string }> = ({ shortcut }) => {
       style={{
         fontSize: 12,
         color: CANVAS_COLORS.textMuted,
-        fontFamily: "system-ui, -apple-system, sans-serif",
+        fontFamily: "var(--bk-font-ui)",
         background: "rgba(255,255,255,0.06)",
         padding: "3px 8px",
         borderRadius: 4,

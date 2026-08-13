@@ -51,7 +51,7 @@ export const standaloneActions: ContextAction[] = [
     label: "Select Parent",
     icon: "arrow-up",
     group: "standalone",
-    shortcut: "Alt+Up",
+    shortcut: "Left",
     isVisible: ({ element }) => Boolean(element.getParent()),
     handler: ({ composer, element }) => {
       const parent = element.getParent();

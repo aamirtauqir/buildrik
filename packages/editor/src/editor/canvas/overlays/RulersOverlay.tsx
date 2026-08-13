@@ -64,7 +64,7 @@ const HorizontalRuler: React.FC<{
 
     // Ticks
     ctx.fillStyle = COLORS.tick;
-    ctx.font = "10px -apple-system, sans-serif";
+    ctx.font = "10px Inter, sans-serif";
     ctx.textAlign = "center";
 
     const step = MINOR_TICK * scale;
@@ -154,7 +154,7 @@ const VerticalRuler: React.FC<{
 
     // Ticks
     ctx.fillStyle = COLORS.tick;
-    ctx.font = "10px -apple-system, sans-serif";
+    ctx.font = "10px Inter, sans-serif";
     ctx.textAlign = "right";
 
     const step = MINOR_TICK * scale;
