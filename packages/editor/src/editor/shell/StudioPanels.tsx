@@ -324,7 +324,10 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
         drawerOpen={isLeftPanelOpen && !effectiveFullPageMode}
         drawerWidth={drawerWidth}
         fullPageMode={effectiveFullPageMode && isLeftPanelOpen}
-        inspectorOpen={!!selectedElement && !effectiveFullPageMode}
+        // Open whenever not fullpage — the no-selection state is a DRAWN
+        // board (2 lines + ✦ Ask AI); gating on selectedElement collapsed the
+        // column to 1px, so that state rendered off-viewport, unseeable.
+        inspectorOpen={!effectiveFullPageMode}
         style={styles.container}
       >
         {/* Left Sidebar — merged rail + panel */}
