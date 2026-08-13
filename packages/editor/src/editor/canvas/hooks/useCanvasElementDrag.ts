@@ -27,19 +27,19 @@ import * as React from "react";
 import type { Composer } from "../../../engine";
 import type { ElementType, GrapesElement } from "../../../shared/types";
 import { setMultiDragData } from "../../../shared/utils/dragDrop";
+import {
+  DRAG_THROTTLE_MS,
+  type AxisConstraint,
+  type DragModifiers,
+} from "./elementDragTypes";
 import { useTouchDrag, useKeyboardMove } from "./drag";
 import { useElementDragAutoScroll } from "./useElementDragAutoScroll";
 import { useElementDragDomSync } from "./useElementDragDomSync";
 
-/** Drag modifiers state */
-interface DragModifiers {
-  alt: boolean;
-  shift: boolean; // Constrain axis
-  ctrl: boolean; // Snap to grid
-}
-
-/** Axis constraint for shift+drag */
-type AxisConstraint = "none" | "horizontal" | "vertical";
+/* DragModifiers, AxisConstraint and DRAG_THROTTLE_MS were declared here AND in
+   elementDragTypes.ts — the sibling whose whole job is to hold them — with
+   this file importing none of them. Identical today; nothing would have said
+   so on the day they stopped being. */
 
 export interface UseCanvasElementDragOptions {
   composer: Composer | null;
@@ -119,7 +119,6 @@ export function useCanvasElementDrag({
 
   // Throttle for drag calculations
   const lastDragCalcRef = React.useRef<number>(0);
-  const DRAG_THROTTLE_MS = 50;
 
   // Track modifier keys globally (keydown/keyup events)
   React.useEffect(() => {

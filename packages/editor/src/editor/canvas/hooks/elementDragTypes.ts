@@ -10,9 +10,10 @@ import type { SnapLine } from "./useCanvasSnapping";
 
 /** Drag modifiers state */
 export interface DragModifiers {
-  alt: boolean; // Clone mode
+  /** Ctrl/Cmd is clone mode — see useCanvasElementDrag's dragstart. */
+  alt: boolean;
   shift: boolean; // Constrain axis
-  ctrl: boolean; // Snap to grid
+  ctrl: boolean; // Clone mode + snap to grid
 }
 
 /** Axis constraint for shift+drag */
