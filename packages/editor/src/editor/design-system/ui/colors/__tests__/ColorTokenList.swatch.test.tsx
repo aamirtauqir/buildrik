@@ -122,7 +122,7 @@ describe("ColorTokenList — row stack (T4)", () => {
     ];
     const getLintIssues = (id: string) =>
       id === "color-text"
-        ? [{ type: "contrast" as const, severity: "warn" as const, message: "low contrast", autoFixHint: "darken-22" }]
+        ? [{ type: "banned-hue" as const, severity: "warning" as const, message: "low contrast", autoFixHint: "darken-22" }]
         : [];
     const { container } = render(
       <ColorTokenList tokens={tokens} {...baseProps} getLintIssues={getLintIssues} />,

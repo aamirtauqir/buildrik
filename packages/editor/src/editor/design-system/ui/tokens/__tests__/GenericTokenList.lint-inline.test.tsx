@@ -68,8 +68,8 @@ describe("GenericTokenList — inline lint row state (T7)", () => {
 
   it("row with lint sets data-lint-warn, amber bg, description, and [lint] tag", () => {
     const issue: LintIssue = {
-      type: "contrast",
-      severity: "warn",
+      type: "banned-hue",
+      severity: "warning",
       message: "△ test issue",
     };
     const getLintIssues = (id: string): readonly LintIssue[] =>
@@ -103,8 +103,8 @@ describe("GenericTokenList — inline lint row state (T7)", () => {
 
   it("with 3 tokens and only 1 having lint, only 1 row carries data-lint-warn", () => {
     const issue: LintIssue = {
-      type: "contrast",
-      severity: "warn",
+      type: "banned-hue",
+      severity: "warning",
       message: "△ only md row is warn",
     };
     const getLintIssues = (id: string): readonly LintIssue[] =>

@@ -11,6 +11,7 @@
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import type { LintIssue } from "../../../engine/designSystem/linter";
+import type { LintIssue as StoredLintIssue } from "../../../engine/designSystem/LintState";
 import {
   useColorRegistry,
   useSpacingRegistry,
@@ -39,7 +40,24 @@ export function useDSLint(composer: Composer | null | undefined): readonly LintI
   React.useEffect(() => {
     if (!composer) return;
     const timer = window.setTimeout(() => {
-      setIssues(composer.dsLinter.lint(allTokens));
+      const found = composer.dsLinter.lint(allTokens);
+      setIssues(found);
+
+      /* Publish into the engine store the rest of the editor reads. This hook
+         is the only place the linter runs, and nothing wrote to lintState at
+         all — so the Issues panel (AquibraStudio's bridge) and the per-token
+         lint row in TokenDetailView both showed nothing no matter how much the
+         linter had found. Grouped by token, replaced wholesale so a token that
+         has been fixed stops reporting. */
+      const byToken = new Map<string, StoredLintIssue[]>();
+      for (const issue of found) {
+        const list = byToken.get(issue.tokenId);
+        if (list) list.push({ type: issue.rule, severity: issue.severity, message: issue.message });
+        else byToken.set(issue.tokenId, [
+          { type: issue.rule, severity: issue.severity, message: issue.message },
+        ]);
+      }
+      composer.designSystem?.lintState?.setAllIssues(byToken);
     }, DEBOUNCE_MS);
     return () => window.clearTimeout(timer);
   }, [composer, allTokens]);

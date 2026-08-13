@@ -127,8 +127,8 @@ describe("Arc D6.c · Auto-fix history-awareness", () => {
 
     // Seed a lint issue against the token so TokenDetailView shows Auto-fix.
     const issue: LintIssue = {
-      type: "contrast",
-      severity: "warn",
+      type: "banned-hue",
+      severity: "warning",
       message: "Contrast 2.8:1 vs surface — WCAG AA needs 4.5",
       autoFixHint: "darken-22",
     };

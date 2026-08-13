@@ -295,8 +295,8 @@ describe("TokenDetailView", () => {
 
   it("Lint fail (1 issue) → amber message + Auto-fix + Ignore", () => {
     const issue: LintIssue = {
-      type: "contrast",
-      severity: "warn",
+      type: "banned-hue",
+      severity: "warning",
       message: "2.8:1 vs surface · WCAG AA needs 4.5",
       autoFixHint: "darken-22",
     };
@@ -320,8 +320,8 @@ describe("TokenDetailView", () => {
 
   it("Auto-fix click → onValueChange called with computed fix + lint suppress", () => {
     const issue: LintIssue = {
-      type: "contrast",
-      severity: "warn",
+      type: "banned-hue",
+      severity: "warning",
       message: "fail",
       autoFixHint: "darken-22",
     };

@@ -22,8 +22,8 @@ const baseToken: DesignToken = {
 };
 
 const contrastIssue: LintIssue = {
-  type: "contrast",
-  severity: "warn",
+  type: "banned-hue",
+  severity: "warning",
   message: "2.8:1 vs surface · WCAG AA needs 4.5",
   autoFixHint: "darken-22",
 };

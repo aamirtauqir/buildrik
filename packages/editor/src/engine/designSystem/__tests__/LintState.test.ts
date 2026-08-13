@@ -14,8 +14,8 @@ describe("LintState", () => {
 
   it("stores and reads issues", () => {
     const issue: LintIssue = {
-      type: "contrast",
-      severity: "warn",
+      type: "banned-hue",
+      severity: "warning",
       message: "2.8:1 vs surface",
       autoFixHint: "darken-22",
     };
@@ -36,7 +36,7 @@ describe("LintState", () => {
   });
 
   it("returns visible issues (excludes suppressed)", () => {
-    const issue: LintIssue = { type: "contrast", severity: "warn", message: "x" };
+    const issue: LintIssue = { type: "banned-hue", severity: "warning", message: "x" };
     state.setIssues("color.accent.yellow", [issue]);
     expect(state.getVisibleIssues("color.accent.yellow")).toHaveLength(1);
     state.suppress("color.accent.yellow");
@@ -46,7 +46,7 @@ describe("LintState", () => {
   it("emits 'lint:changed' on setIssues / suppress / unsuppress", () => {
     const handler = vi.fn();
     state.on("lint:changed", handler);
-    const issue: LintIssue = { type: "contrast", severity: "warn", message: "x" };
+    const issue: LintIssue = { type: "banned-hue", severity: "warning", message: "x" };
     state.setIssues("color.a", [issue]);
     state.suppress("color.a");
     state.unsuppress("color.a");

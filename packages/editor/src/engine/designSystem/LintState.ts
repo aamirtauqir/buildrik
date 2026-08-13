@@ -4,8 +4,10 @@
  * Tracks per-token lint issues plus per-token suppression flags. Suppressions
  * persist to localStorage so an "Ignore" decision sticks across reloads.
  *
- * Issues are populated externally (by DSLinter, downstream of this arc). For
- * now this is a passive store. Token list rows read via `getVisibleIssues`
+ * Issues arrive from DSLinter via `useDSLint`, which is the one place the
+ * linter runs. This store was passive and empty for the whole of that arc:
+ * nothing called `setIssues`, so the Issues panel and the token detail view
+ * both showed nothing no matter what the linter had found. Token list rows read via `getVisibleIssues`
  * to render inline row lint state (amber bg + borderLeft + description +
  * [lint] tag). Auto-fix + Ignore actions live in the T8 detail view.
  *
@@ -14,11 +16,21 @@
  */
 
 import { EventEmitter } from "../EventEmitter";
+import type { LintRuleId, LintSeverity } from "./linter";
 
+/**
+ * One finding, in the linter's own vocabulary. This used to be a second,
+ * independent shape — `type` was a four-value union ("contrast" |
+ * "spacing-collision" | "unused" | "alias-cycle") that shared not one value
+ * with the seven rule ids DSLinter actually produces, and `severity` was
+ * "warn" against the linter's "warning". Two shapes for one concept, on either
+ * side of a hand-off that was never built, so nothing ever failed to compile.
+ */
 export interface LintIssue {
-  type: "contrast" | "spacing-collision" | "unused" | "alias-cycle";
-  severity: "warn" | "error";
+  type: LintRuleId;
+  severity: LintSeverity;
   message: string;
+  /** Absent until a rule learns to describe its own fix. */
   autoFixHint?: string;
 }
 
@@ -37,6 +49,19 @@ export class LintState extends EventEmitter {
   constructor() {
     super();
     this.loadSuppressions();
+  }
+
+  /**
+   * Replace the whole map in one shot and emit once. The per-token setter
+   * cannot express "this token no longer has issues" for tokens the caller
+   * did not mention, which is most of them after a re-lint.
+   */
+  setAllIssues(byToken: ReadonlyMap<string, readonly LintIssue[]>): void {
+    this.issues.clear();
+    for (const [tokenId, issues] of byToken) {
+      if (issues.length > 0) this.issues.set(tokenId, [...issues]);
+    }
+    this.emit("lint:changed");
   }
 
   setIssues(tokenId: string, issues: readonly LintIssue[]): void {
