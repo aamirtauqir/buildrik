@@ -12,6 +12,7 @@ import { createComposer, Composer } from "../../../engine";
 import { ProductCollectionService } from "../../../engine/cms";
 import type { Element } from "../../../engine/elements/Element";
 import { THRESHOLDS } from "../../../shared/constants/config";
+import { EVENTS } from "../../../shared/constants/events";
 import { attachAdoptionRevertListener } from "../../../services/ai/adoptionTracker";
 import type { ComposerConfig, ProjectData, DeviceType, ElementType } from "../../../shared/types";
 import type { DesignToken } from "@/editor/design-system";
@@ -325,8 +326,14 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
     instance.on("ui:toggle:exporter", toggleExporterHandler);
     instance.on("ui:toggle:ai", toggleAIHandler);
     instance.on("ui:toggle:component-view", toggleComponentViewHandler);
-    instance.on("device:changed", deviceChangedHandler);
-    instance.on("zoom:changed", zoomChangedHandler);
+    /* The engine names these BREAKPOINT_CHANGED and VIEWPORT_ZOOM (Viewport.ts
+       :70,:87). Listening for "device:changed" / "zoom:changed" meant nothing
+       the engine did to zoom ever reached React — and the canvas transform is
+       `zoom / 100` off THIS state, not off composer. Zoom to Fit, Zoom In and
+       Zoom Out from both command palettes set engine zoom and stopped there:
+       no scale change, no change in the footer readout. */
+    instance.on(EVENTS.BREAKPOINT_CHANGED, deviceChangedHandler);
+    instance.on(EVENTS.VIEWPORT_ZOOM, zoomChangedHandler);
 
     setComposer(instance);
     onEditorRef.current?.(instance);
@@ -344,8 +351,8 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
       instance.off("ui:toggle:exporter", toggleExporterHandler);
       instance.off("ui:toggle:ai", toggleAIHandler);
       instance.off("ui:toggle:component-view", toggleComponentViewHandler);
-      instance.off("device:changed", deviceChangedHandler);
-      instance.off("zoom:changed", zoomChangedHandler);
+      instance.off(EVENTS.BREAKPOINT_CHANGED, deviceChangedHandler);
+      instance.off(EVENTS.VIEWPORT_ZOOM, zoomChangedHandler);
       instance.destroy();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

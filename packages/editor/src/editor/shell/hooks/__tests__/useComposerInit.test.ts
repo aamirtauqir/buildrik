@@ -1,5 +1,6 @@
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { EVENTS } from "@/shared/constants/events";
 import { THRESHOLDS } from "../../../../shared/constants/config";
 import { useComposerInit } from "../useComposerInit";
 
@@ -239,6 +240,62 @@ describe("useComposerInit — autosave debounce SSOT", () => {
 
     // Despite 5 events, saveProject should have been called exactly once
     expect(mockComposer.saveProject).toHaveBeenCalledTimes(1);
+  });
+});
+
+/* The canvas transform is `zoom / 100` off React state, not off composer, so
+   an engine zoom that never reaches React is an engine zoom nothing renders.
+   These listened for "device:changed" / "zoom:changed"; Viewport emits
+   BREAKPOINT_CHANGED and VIEWPORT_ZOOM. */
+describe("useComposerInit — engine viewport changes reach React", () => {
+  beforeEach(() => {
+    Object.keys(eventHandlers).forEach((k) => {
+      delete eventHandlers[k];
+    });
+    vi.clearAllMocks();
+    mockComposer.on.mockImplementation((event: string, handler: EventHandler) => {
+      if (!eventHandlers[event]) eventHandlers[event] = [];
+      eventHandlers[event].push(handler);
+    });
+    mockComposer.off.mockImplementation(() => {});
+    mockComposer.emit.mockImplementation((event: string, ...args: unknown[]) => {
+      (eventHandlers[event] ?? []).forEach((h) => h(...args));
+    });
+    mockComposer.loadProject.mockReturnValue(Promise.resolve(null));
+    mockComposer.elements.getAllPages.mockReturnValue([{ id: "page-1" }]);
+    mockComposer.history.canUndo.mockReturnValue(false);
+    mockComposer.history.canRedo.mockReturnValue(false);
+  });
+
+  function mount(setDevice: () => void, setZoom: () => void) {
+    renderHook(() =>
+      useComposerInit({
+        containerRef: makeContainerRef(),
+        addToast: vi.fn(),
+        setCanUndo: vi.fn(),
+        setCanRedo: vi.fn(),
+        setDevice,
+        setZoom,
+        setShowExporter: vi.fn(),
+        setShowComponentView: vi.fn(),
+        setIsDirty: vi.fn(),
+        setSaveState: vi.fn(),
+      })
+    );
+  }
+
+  it("pushes VIEWPORT_ZOOM into React zoom state", () => {
+    const setZoom = vi.fn();
+    mount(vi.fn(), setZoom);
+    act(() => mockComposer.emit(EVENTS.VIEWPORT_ZOOM, 250));
+    expect(setZoom).toHaveBeenCalledWith(250);
+  });
+
+  it("pushes BREAKPOINT_CHANGED into React device state", () => {
+    const setDevice = vi.fn();
+    mount(setDevice, vi.fn());
+    act(() => mockComposer.emit(EVENTS.BREAKPOINT_CHANGED, "mobile"));
+    expect(setDevice).toHaveBeenCalledWith("mobile");
   });
 });
 

@@ -450,7 +450,6 @@ export const EVENTS = {
   // ============================================
   // Device/Zoom Events
   // ============================================
-  ZOOM_CHANGED: "zoom:changed",
   ZOOM_IN: "zoom:in",
   ZOOM_OUT: "zoom:out",
   ZOOM_FIT: "zoom:fit",
