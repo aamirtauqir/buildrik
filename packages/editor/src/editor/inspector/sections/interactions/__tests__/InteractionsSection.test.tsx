@@ -7,12 +7,12 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { InteractionsSection } from "../index";
 import type { Interaction } from "../types";
-import { DEFAULT_ANIMATION } from "../../../../../shared/types/animations";
+import { DEFAULT_ANIMATION_CONFIG } from "../../../../../engine/interactions/types";
 
 const makeInteraction = (trigger: Interaction["trigger"] = "click"): Interaction => ({
   id: `test-${trigger}`,
   trigger,
-  animation: { ...DEFAULT_ANIMATION },
+  animation: { ...DEFAULT_ANIMATION_CONFIG },
   enabled: true,
 });
 

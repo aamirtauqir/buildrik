@@ -13,6 +13,7 @@
 import { describe, it, expect } from "vitest";
 import { PRESET_TIMELINES } from "@/engine/interactions/InteractionRuntime";
 import { ANIMATION_KEYFRAMES } from "@/shared/constants/animationKeyframes";
+import { INTERACTION_PRESET_KEYFRAMES } from "@/engine/export/interactionRuntime";
 import { ANIMATION_PRESET_GROUPS, TRIGGER_GROUPS } from "../types";
 import type { InteractionTrigger } from "@/engine/interactions/types";
 
@@ -52,5 +53,15 @@ describe("inspector option catalogues vs the runtime", () => {
      canvas and on the published site alike. */
   it.each(OFFERED_PRESETS)("preset %s has a keyframe", (preset) => {
     expect(ANIMATION_KEYFRAMES[`bd-anim-${preset}`]).toBeDefined();
+  });
+
+  /* Third implementation, and the only one a PUBLISHED page runs: the
+     dependency-free WAAPI runtime shipped in the export boot script. It had 17
+     of the 39, so 22 presets animated in the editor and did nothing on the
+     live site. */
+  it.each(OFFERED_PRESETS)("preset %s animates on a published page", (preset) => {
+    expect(
+      INTERACTION_PRESET_KEYFRAMES[preset as keyof typeof INTERACTION_PRESET_KEYFRAMES],
+    ).toBeDefined();
   });
 });

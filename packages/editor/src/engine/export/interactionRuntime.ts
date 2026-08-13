@@ -65,6 +65,74 @@ export const INTERACTION_PRESET_KEYFRAMES: Record<
     { boxShadow: "0 0 20px rgba(45,109,255,0.6)", offset: 0.5 },
     { boxShadow: "0 0 0 rgba(45,109,255,0)" },
   ],
+  /* Added 2026-08-13. The picker offers 39 presets; this table had 17, and it
+     is the only one a PUBLISHED page uses — everything missing simply did not
+     animate on the live site. Bodies mirror the canvas GSAP timelines and the
+     bd-anim-* keyframes so all three describe the same motion. */
+  fadeInUp: [{ opacity: 0, transform: "translateY(20px)" }, { opacity: 1, transform: "translateY(0)" }],
+  fadeInDown: [{ opacity: 0, transform: "translateY(-20px)" }, { opacity: 1, transform: "translateY(0)" }],
+  fadeInLeft: [{ opacity: 0, transform: "translateX(-20px)" }, { opacity: 1, transform: "translateX(0)" }],
+  fadeInRight: [{ opacity: 0, transform: "translateX(20px)" }, { opacity: 1, transform: "translateX(0)" }],
+  slideInUp: [{ opacity: 0, transform: "translateY(40px)" }, { opacity: 1, transform: "translateY(0)" }],
+  slideInDown: [{ opacity: 0, transform: "translateY(-40px)" }, { opacity: 1, transform: "translateY(0)" }],
+  scaleUp: [{ transform: "scale(1)" }, { transform: "scale(1.1)" }],
+  scaleDown: [{ transform: "scale(1)" }, { transform: "scale(0.9)" }],
+  zoomIn: [{ opacity: 0, transform: "scale(0.3)" }, { opacity: 1, transform: "scale(1)" }],
+  zoomOut: [{ opacity: 1, transform: "scale(1)" }, { opacity: 0, transform: "scale(0.3)" }],
+  rotate: [{ transform: "rotate(0)" }, { transform: "rotate(360deg)" }],
+  flip: [
+    { transform: "perspective(400px) rotateY(0)" },
+    { transform: "perspective(400px) rotateY(360deg)" },
+  ],
+  rollIn: [
+    { opacity: 0, transform: "translateX(-60px) rotate(-120deg)" },
+    { opacity: 1, transform: "translateX(0) rotate(0)" },
+  ],
+  rollOut: [
+    { opacity: 1, transform: "translateX(0) rotate(0)" },
+    { opacity: 0, transform: "translateX(60px) rotate(120deg)" },
+  ],
+  hinge: [
+    { opacity: 1, transform: "rotate(0)", transformOrigin: "top left" },
+    { opacity: 0, transform: "rotate(80deg)", transformOrigin: "top left" },
+  ],
+  bounce: [
+    { transform: "translateY(0)" },
+    { transform: "translateY(-20px)", offset: 0.4 },
+    { transform: "translateY(0)" },
+  ],
+  flash: [{ opacity: 1 }, { opacity: 0, offset: 0.5 }, { opacity: 1 }],
+  heartBeat: [
+    { transform: "scale(1)" },
+    { transform: "scale(1.2)", offset: 0.35 },
+    { transform: "scale(1)" },
+  ],
+  tada: [
+    { transform: "scale(1)" },
+    { transform: "scale(1.15)", offset: 0.3 },
+    { transform: "scale(1)" },
+  ],
+  rubberBand: [
+    { transform: "scaleX(1)" },
+    { transform: "scaleX(1.25)", offset: 0.3 },
+    { transform: "scaleX(1)" },
+  ],
+  swing: [
+    { transform: "rotate(0)" },
+    { transform: "rotate(12deg)", offset: 0.3 },
+    { transform: "rotate(0)" },
+  ],
+  wobble: [
+    { transform: "rotate(0)" },
+    { transform: "rotate(-8deg)", offset: 0.3 },
+    { transform: "rotate(8deg)", offset: 0.6 },
+    { transform: "rotate(0)" },
+  ],
+  jello: [
+    { transform: "skewX(0)" },
+    { transform: "skewX(-10deg)", offset: 0.3 },
+    { transform: "skewX(0)" },
+  ],
 };
 
 /** Easing name → CSS timing function. Mirrors the named easings the inspector

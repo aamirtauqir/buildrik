@@ -81,7 +81,7 @@ export const InteractionItem: React.FC<InteractionItemProps> = ({
       <div onClick={onToggleEdit} style={styles.header(isEditing)}>
         <span style={styles.icon}>{triggerInfo.icon}</span>
         <span style={styles.label}>{triggerInfo.label}</span>
-        <span style={styles.type}>{interaction.animation.type}</span>
+        <span style={styles.type}>{interaction.animation.preset}</span>
         <span style={styles.arrow(isEditing)}>&#9654;</span>
       </div>
 

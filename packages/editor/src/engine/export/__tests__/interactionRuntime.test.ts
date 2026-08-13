@@ -10,26 +10,26 @@ import {
   buildInteractionRuntimeScript,
 } from "../interactionRuntime";
 
-// Mirror of AnimationPreset (minus "custom", which is data-driven at runtime)
-// and EasingFunction. If a preset/easing is added to the inspector, these
-// arrays force the runtime map to keep up.
-const PRESETS = [
-  "fadeIn", "fadeOut", "slideUp", "slideDown", "slideLeft", "slideRight",
-  "scaleIn", "scaleOut", "rotateIn", "rotateOut", "bounceIn", "bounceOut",
-  "flipX", "flipY", "pulse", "shake", "blur", "glow",
-] as const;
+/* This used to carry a hand-typed mirror of AnimationPreset and assert the map
+   had exactly that many keys — so it went red when the union GREW and, worse,
+   would have stayed green if the union grew and the map did not, as long as
+   someone updated the array. Completeness is already enforced at compile time:
+   INTERACTION_PRESET_KEYFRAMES is typed Record<Exclude<AnimationPreset,
+   "custom">, …>, which is what caught the 22 missing presets. What a runtime
+   test can add is that each entry is usable. */
 const EASINGS = [
   "linear", "easeIn", "easeOut", "easeInOut", "easeInQuad", "easeOutQuad",
   "easeInCubic", "easeOutCubic", "easeInQuart", "easeOutQuart", "spring", "bounce",
 ] as const;
 
 describe("interaction runtime preset map (SSOT)", () => {
-  it("covers every non-custom AnimationPreset", () => {
-    for (const p of PRESETS) {
-      expect(INTERACTION_PRESET_KEYFRAMES[p], `missing keyframes for ${p}`).toBeDefined();
-      expect(INTERACTION_PRESET_KEYFRAMES[p].length).toBeGreaterThanOrEqual(2);
+  it("gives every preset at least two usable keyframes", () => {
+    for (const [preset, frames] of Object.entries(INTERACTION_PRESET_KEYFRAMES)) {
+      expect(frames.length, `${preset} needs at least two frames`).toBeGreaterThanOrEqual(2);
+      for (const frame of frames) {
+        expect(Object.keys(frame).length, `${preset} has an empty frame`).toBeGreaterThan(0);
+      }
     }
-    expect(Object.keys(INTERACTION_PRESET_KEYFRAMES)).toHaveLength(PRESETS.length);
   });
 
   it("maps every EasingFunction to a CSS timing function", () => {

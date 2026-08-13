@@ -4,7 +4,7 @@
  */
 
 import { GSAPEngine } from "../../../../engine/animations";
-import type { AnimationConfig } from "../../../../shared/types/animations";
+import type { InteractionAnimationConfig } from "../../../../engine/interactions/types";
 
 // ============================================================================
 // TYPES
@@ -30,10 +30,19 @@ export type InteractionTrigger =
   | "mouse-move"
   | "mouse-out";
 
+/**
+ * This borrowed shared/types/animations' AnimationConfig — the shape for CSS
+ * keyframe animations on an element (`type`, `direction`, `iterations`,
+ * `fillMode`). Interactions are driven by the GSAP runtime, which reads
+ * `preset`, `loop`, `target` and `reverse`, so the two never lined up: the
+ * runtime looked for `animation.preset` and the inspector wrote
+ * `animation.type`. AnimationConfig is still the right shape for element
+ * animations and keeps that job; this one is the runtime's.
+ */
 export interface Interaction {
   id: string;
   trigger: InteractionTrigger;
-  animation: AnimationConfig;
+  animation: InteractionAnimationConfig;
   enabled: boolean;
 }
 

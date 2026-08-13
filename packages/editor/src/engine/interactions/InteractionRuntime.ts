@@ -430,7 +430,9 @@ function applyAnimationConfig(
   const total = steps.reduce((sum, s) => sum + s.duration, 0);
   const wanted = typeof animation.duration === "number" ? animation.duration / 1000 : null;
   const scale = wanted && total > 0 ? wanted / total : 1;
-  const ease = animation.easing ? EASE_MAP[animation.easing] : undefined;
+  /* A named easing maps; anything else is already a GSAP ease string from the
+     picker and passes straight through. */
+  const ease = animation.easing ? (EASE_MAP[animation.easing] ?? animation.easing) : undefined;
   const delay = typeof animation.delay === "number" ? animation.delay / 1000 : 0;
 
   return steps.map((s, i) => ({

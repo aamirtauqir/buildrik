@@ -5,10 +5,11 @@
  */
 
 import * as React from "react";
-import { DEFAULT_ANIMATION } from "../../../../shared/types/animations";
+import {  } from "../../../../shared/types/animations";
 import { Section } from "../../shared/controls";
 import { AddInteractionPanel } from "./AddInteractionPanel";
 import { InteractionItem } from "./InteractionItem";
+import { DEFAULT_ANIMATION_CONFIG } from "../../../../engine/interactions/types";
 import { type Interaction, type InteractionTrigger, type InteractionsSectionProps } from "./types";
 import { Button } from "@/editor/chrome-ui";
 // Re-export types for external use
@@ -57,10 +58,7 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
     const newInteraction: Interaction = {
       id: `interaction-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       trigger,
-      animation: {
-        ...DEFAULT_ANIMATION,
-        trigger: trigger === "hover" ? "hover" : trigger === "click" ? "click" : "scroll",
-      },
+      animation: { ...DEFAULT_ANIMATION_CONFIG },
       enabled: true,
     };
 

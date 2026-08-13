@@ -6,6 +6,7 @@
 
 import * as React from "react";
 import { SelectField } from "../../../../shared/forms";
+import type { AnimationPreset } from "../../../../engine/interactions/types";
 import { type Interaction, ANIMATION_PRESETS, EASING_OPTIONS } from "./types";
 import { Button, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
@@ -96,7 +97,7 @@ export const InteractionEditor: React.FC<InteractionEditorProps> = ({
 
   const handleAnimationTypeChange = (value: string) => {
     onUpdate(interaction.id, {
-      animation: { ...interaction.animation, type: value },
+      animation: { ...interaction.animation, preset: value as AnimationPreset },
     });
   };
 
@@ -110,7 +111,7 @@ export const InteractionEditor: React.FC<InteractionEditorProps> = ({
     <div style={styles.container}>
       <SelectField
         label="Animation"
-        value={interaction.animation.type}
+        value={interaction.animation.preset}
         onChange={handleAnimationTypeChange}
         options={ANIMATION_PRESETS}
       />

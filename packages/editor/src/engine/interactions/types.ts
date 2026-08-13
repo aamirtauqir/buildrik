@@ -34,26 +34,56 @@ export type InteractionTrigger =
   | "mouse-out";
 
 /** Animation preset names */
+/**
+ * Animation preset names. This union and the inspector's
+ * ANIMATION_PRESET_GROUPS are the same catalogue; 23 of the picker's entries
+ * were absent here, so writing one required a cast and the compiler could not
+ * see the mismatch — the same setup that let "active" reach a runtime that had
+ * never heard of it. presetCoverage.test.ts holds the two together.
+ */
 export type AnimationPreset =
-  | "fadeIn"
-  | "fadeOut"
-  | "slideUp"
-  | "slideDown"
-  | "slideLeft"
-  | "slideRight"
-  | "scaleIn"
-  | "scaleOut"
-  | "rotateIn"
-  | "rotateOut"
+  | "blur"
+  | "bounce"
   | "bounceIn"
   | "bounceOut"
+  | "custom"
+  | "fadeIn"
+  | "fadeInDown"
+  | "fadeInLeft"
+  | "fadeInRight"
+  | "fadeInUp"
+  | "fadeOut"
+  | "flash"
+  | "flip"
   | "flipX"
   | "flipY"
-  | "pulse"
-  | "shake"
-  | "blur"
   | "glow"
-  | "custom";
+  | "heartBeat"
+  | "hinge"
+  | "jello"
+  | "pulse"
+  | "rollIn"
+  | "rollOut"
+  | "rotate"
+  | "rotateIn"
+  | "rotateOut"
+  | "rubberBand"
+  | "scaleDown"
+  | "scaleIn"
+  | "scaleOut"
+  | "scaleUp"
+  | "shake"
+  | "slideDown"
+  | "slideInDown"
+  | "slideInUp"
+  | "slideLeft"
+  | "slideRight"
+  | "slideUp"
+  | "swing"
+  | "tada"
+  | "wobble"
+  | "zoomIn"
+  | "zoomOut";
 
 /** Easing function names */
 export type EasingFunction =
@@ -82,8 +112,10 @@ export interface InteractionAnimationConfig {
   duration: number;
   /** Delay before animation starts (ms) */
   delay: number;
-  /** Easing function */
-  easing: EasingFunction;
+  /** Easing. The inspector writes raw GSAP ease strings (EASING_OPTIONS maps
+   *  GSAPEngine.EASINGS, whose VALUES are "power2.out" and friends); projects
+   *  saved earlier carry the EasingFunction names. The runtime accepts both. */
+  easing: EasingFunction | string;
   /** Custom CSS properties for "custom" preset */
   customProperties?: Record<string, string | number>;
   /** Target element (self, parent, sibling, or selector) */
