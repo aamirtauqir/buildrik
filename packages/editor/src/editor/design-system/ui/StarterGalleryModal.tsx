@@ -137,7 +137,12 @@ function StarterCard({ starter, selected, onSelect }: StarterCardProps) {
       role="radio"
       aria-checked={selected}
       onClick={onSelect}
-      className={`tw:rounded-lg tw:overflow-hidden tw:flex tw:flex-col tw:bg-white tw:p-0 ${
+      /* tw:h-auto and friends restate what flowbite's Button theme sets
+         (h-10, justify-center, items-center, font-medium) — without them the
+         card locked to 40px: the 80px gradient squashed to 17px and the
+         description clipped mid-line with its ellipsis below the fold. Found
+         live 2026-08-13; the CLAUDE.md menu/pill trap, on a card. */
+      className={`tw:h-auto tw:items-stretch tw:justify-start tw:text-left tw:font-normal tw:rounded-lg tw:overflow-hidden tw:flex tw:flex-col tw:bg-white tw:p-0 ${
         selected
           ? "tw:border-2 tw:border-blue-700 tw:[box-shadow:0_0_0_2px_var(--bk-accent-subtle)]"
           : "tw:border tw:border-gray-200 tw:shadow-none"
