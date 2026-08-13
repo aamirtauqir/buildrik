@@ -956,6 +956,37 @@ The guard that now holds it is the pattern worth copying: a test that walks the
 UI's own option catalogue and asserts each entry reaches an implementation. It
 immediately found eight presets missing from the table I had just hand-written.
 
+### Scan 4 — UI option catalogues vs their implementations
+
+Generalised from two earlier finds (18 toolbar controls / 7 handled;
+5 triggers / 4 handled). Scanned every `const X = [...]` with four or more
+`{value}` entries. Most are plain CSS pickers where the browser is the
+implementation. Two were not:
+
+- 39 animation presets offered, 2 implemented (`01deb024`, above).
+- **`LINK_TYPE_OPTIONS` — the one that reaches customers.** The Link inspector
+  writes an internal page link as `href="#page:<pageId>"`. Grep the package:
+  one producer, no consumer. ExportEngine copied href through verbatim, so
+  every published site shipped `href="#page:cm2x9k…"` — a fragment for an id
+  that does not exist. **Every internal link a customer built did nothing on
+  their live site** (`41138e12`).
+
+  Nothing is visible from inside the editor: the inspector round-trips its own
+  scheme correctly, so the feature looks complete from every surface a
+  developer would check. It is only wrong in the artefact that ships.
+
+  The fix had to go in TWICE — ExportEngine has two attribute writers, and the
+  multi-page one (`renderPageElement`) is the path publish uses. Fixing the
+  live-Element writer alone would have left every site as broken while the
+  tests passed.
+
+**Still open, deliberately:** `handleSaveTemplate` captures `exportHTML()`, so
+saving a page as a template stores `#page:<id>` pointing at a page id that will
+not exist wherever the template is applied. Resolving it means deciding what an
+internal link *should* become in a portable template — strip it, keep it as a
+slug, prompt on apply. That is a product decision, not a wiring fix, so it is
+named rather than guessed at.
+
 ### What kept all of this green
 
 In five of the eleven, a TEST asserted the broken half:
