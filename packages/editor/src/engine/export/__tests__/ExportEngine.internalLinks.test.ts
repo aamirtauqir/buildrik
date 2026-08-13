@@ -99,3 +99,51 @@ describe("ExportEngine — internal page links", () => {
     expect(html).toContain('href="#section"');
   });
 });
+
+/* Attributes reach the element tree from two places. HTML import runs through
+   sanitizeHTML, but `Composer.importProject` only sanitizes each node's
+   `content` (sanitizeElementTreeContent) — it never looks at `attributes`. So
+   project JSON from storage, the dashboard or an AI draft can carry an event
+   handler straight into the tree, and both export writers used to emit
+   whatever was there. buildAttributeString (the third writer) had guarded this
+   since it was written; these two had not. */
+describe("ExportEngine — hostile attributes never reach the artifact", () => {
+  const hostile = {
+    onerror: "alert(1)",
+    onclick: "steal()",
+    href: "javascript:alert(1)",
+    title: "safe",
+  };
+
+  function pageWith(attrs: Record<string, string>) {
+    return [
+      {
+        id: "p1",
+        name: "Home",
+        slug: "home",
+        isHome: true,
+        root: {
+          id: "r1",
+          type: "container",
+          tagName: "div",
+          children: [{ id: "a1", type: "link", tagName: "a", content: "Go", children: [], attributes: attrs }],
+        },
+      },
+    ];
+  }
+
+  it("drops event handlers and javascript: urls from the publish writer", async () => {
+    const out = await exportFiles(pageWith(hostile));
+    const html = out.get("index.html") ?? "";
+
+    expect(html).not.toContain("onerror");
+    expect(html).not.toContain("onclick");
+    expect(html).not.toContain("javascript:");
+    expect(html).toContain('title="safe"');
+  });
+
+  it("keeps the ordinary attributes beside them", async () => {
+    const out = await exportFiles(pageWith({ ...hostile, rel: "noopener" }));
+    expect(out.get("index.html")).toContain('rel="noopener"');
+  });
+});

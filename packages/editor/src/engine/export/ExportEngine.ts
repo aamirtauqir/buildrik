@@ -214,7 +214,11 @@ export class ExportEngine {
     // Prefer the element's explicit tagName (e.g. an h1/h3 heading the user
     // chose) so the export matches the canvas; fall back to the type→tag map.
     const tag = element.getData?.().tagName || getTagForType(type);
-    const className = `${config.cssPrefix}${id}`;
+    /* The user's own classes belong here too. The multi-page writer has always
+       joined them (:753); this one emitted only the generated per-element
+       class, so a download dropped every class the Classes panel adds and the
+       CSS written against those class names had nothing to match. */
+    const className = [`${config.cssPrefix}${id}`, ...(element.getClasses?.() ?? [])].join(" ");
     const indentStr = config.minify ? "" : "  ".repeat(indent);
     const newline = config.minify ? "" : "\n";
 
@@ -231,6 +235,7 @@ export class ExportEngine {
     for (const [key, value] of Object.entries(attrs)) {
       if (key === "class" || key === "style") continue;
       const out = key === "href" ? this.resolveHref(value) : value;
+      if (!isSafeAttrValue(key, out, tag)) continue;
       attrParts.push(`${key}="${escapeHTML(out)}"`);
     }
 
@@ -762,6 +767,7 @@ ${bodyContent}${interactionScript}
         // is the writer the PUBLISH path uses, so resolving it only in the
         // live-Element writer above would have fixed nothing that ships.
         const out = key === "href" ? this.resolveHref(value) : value;
+        if (!isSafeAttrValue(key, out, tag)) continue;
         attrParts.push(`${key}="${escapeHTML(out)}"`);
       }
     }
