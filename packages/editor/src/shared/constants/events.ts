@@ -477,7 +477,6 @@ export const EVENTS = {
   /** Trigger scroll to selected element in Layers panel */
   LAYERS_SCROLL_TO_SELECTION: "layers:scroll-to-selection",
   /** Open the Build/Add panel in the left sidebar */
-  UI_OPEN_BUILD_PANEL: "ui:open-build-panel",
   /** Templates panel enters/leaves "choose a template for a NEW page" mode. */
   UI_TEMPLATES_NEWPAGE_ON: "ui:templates-newpage-on",
   UI_TEMPLATES_NEWPAGE_OFF: "ui:templates-newpage-off",
