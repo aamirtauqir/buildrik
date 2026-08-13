@@ -49,8 +49,16 @@ export function useVersionHistory(composer: Composer | null): UseVersionHistoryR
       setIsLoading(false);
     };
 
-    // Initial load
-    loadVersions();
+    /* The seed read is synchronous and returns [] while the manager is still
+       awaiting storage (VersionTimelineManager.loadVersionsFromStorage is
+       async). Clearing isLoading here made the panel render its empty state —
+       "Version history appears here as you save changes" — to users who had
+       forty saved versions, until VERSION_LIST_UPDATED arrived and it popped
+       to a list. Seed the rows, but stay loading until the manager says it has
+       finished; when storage is unavailable the manager never starts, and
+       isAvailable is false, which the panel branches on first. */
+    setVersions(composer.versions.getVersions());
+    if (!composer.versions.isAvailable()) setIsLoading(false);
 
     // Listen for version changes
     composer.on(EVENTS.VERSION_LIST_UPDATED, loadVersions);

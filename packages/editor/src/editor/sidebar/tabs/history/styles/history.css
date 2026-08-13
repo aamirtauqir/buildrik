@@ -446,6 +446,45 @@
   color: var(--bk-ink-muted);
 }
 
+/* Board 1138:4573 — the Saves loading state. Staggered indents so it reads as
+   a tree settling, not a list of identical bars. */
+.saves-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bk-space-8);
+  padding: var(--bk-space-12);
+}
+
+.saves-skeleton__row {
+  display: flex;
+  align-items: center;
+  gap: var(--bk-space-8);
+}
+
+.saves-skeleton__row--1 {
+  padding-left: var(--bk-space-12);
+}
+
+.saves-skeleton__row--2 {
+  padding-left: var(--bk-space-24);
+}
+
+.saves-skeleton__dot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: var(--bk-radius-sm);
+  background: var(--bk-bg-subtle);
+}
+
+.saves-skeleton__bar {
+  height: 10px;
+  flex: 1;
+  max-width: 180px;
+  border-radius: var(--bk-radius-sm);
+  background: var(--bk-bg-subtle);
+}
+
 /* Board 163:269 — the pruned notice. Amber wash, not an error: nothing failed,
    the oldest auto-saves aged out. Named versions and the approved one survive,
    which is the half the copy exists to say. */

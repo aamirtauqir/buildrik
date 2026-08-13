@@ -70,7 +70,8 @@ const mocks = vi.hoisted(() => {
   const state: {
     versions: NamedVersion[];
     isAvailable: boolean;
-  } = { versions: [], isAvailable: true };
+    isLoading: boolean;
+  } = { versions: [], isAvailable: true, isLoading: false };
   return {
     state,
     createVersion: vi.fn(),
@@ -86,7 +87,7 @@ vi.mock("../../../shared/hooks/useVersionHistory", () => ({
   useVersionHistory: () => ({
     versions: mocks.state.versions,
     isAvailable: mocks.state.isAvailable,
-    isLoading: false,
+    isLoading: mocks.state.isLoading,
     createVersion: mocks.createVersion,
     restoreVersion: mocks.restoreVersion,
     deleteVersion: mocks.deleteVersion,
@@ -305,5 +306,34 @@ describe("VersionHistoryPanel — search filter", () => {
 
     expect(screen.queryByLabelText(/Version "Hero update"/)).toBeNull();
     expect(screen.getByLabelText(/Version "Footer redesign"/)).toBeTruthy();
+  });
+});
+
+/* Board 1138:4573. VersionTimelineManager loads from storage with an await, so
+   the panel's first render has versions: []. It rendered the EMPTY state for
+   that window — "Version history appears here as you save changes" — to users
+   who had plenty saved, then popped to a list. */
+describe("VersionHistoryPanel — loading", () => {
+  it("shows skeleton rows, not the empty state, while storage resolves", async () => {
+    mocks.state.versions = [];
+    mocks.state.isAvailable = true;
+    mocks.state.isLoading = true;
+    const Panel = await loadPanel();
+
+    render(<Panel composer={makeComposer()} />);
+
+    expect(screen.getByLabelText("Loading versions")).toBeInTheDocument();
+    expect(screen.queryByText(/appears here as you save changes/)).toBeNull();
+  });
+
+  it("hands over to the real list once loading finishes", async () => {
+    mocks.state.versions = [];
+    mocks.state.isAvailable = true;
+    mocks.state.isLoading = false;
+    const Panel = await loadPanel();
+
+    render(<Panel composer={makeComposer()} />);
+
+    expect(screen.queryByLabelText("Loading versions")).toBeNull();
   });
 });

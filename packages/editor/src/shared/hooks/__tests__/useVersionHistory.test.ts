@@ -51,12 +51,35 @@ describe("useVersionHistory", () => {
     expect(result.current.isLoading).toBe(false);
   });
 
-  it("loads versions on mount and reports availability", () => {
+  it("seeds versions on mount and reports availability", () => {
     const composer = createMockComposer([v("v1", "Launch")]);
     const { result } = renderHook(() => useVersionHistory(asComposer(composer)));
 
     expect(result.current.versions).toEqual([v("v1", "Launch")]);
     expect(result.current.isAvailable).toBe(true);
+  });
+
+  /* The manager reads storage with an await; the synchronous seed returns []
+     until that resolves. Clearing isLoading on the seed is what made the panel
+     render its empty state to users who had versions. */
+  it("stays loading until the manager reports its storage read finished", () => {
+    const composer = createMockComposer([]);
+    const { result } = renderHook(() => useVersionHistory(asComposer(composer)));
+
+    expect(result.current.isLoading).toBe(true);
+
+    composer.versions.getVersions.mockReturnValue([v("v2", "Redesign")]);
+    act(() => composer.emit(EVENTS.VERSION_LIST_UPDATED));
+
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.versions).toEqual([v("v2", "Redesign")]);
+  });
+
+  it("does not sit loading forever when versions are unavailable", () => {
+    const composer = createMockComposer([]);
+    composer.versions.isAvailable.mockReturnValue(false);
+    const { result } = renderHook(() => useVersionHistory(asComposer(composer)));
+
     expect(result.current.isLoading).toBe(false);
   });
 

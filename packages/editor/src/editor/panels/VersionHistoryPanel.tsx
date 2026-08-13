@@ -47,6 +47,7 @@ export function VersionHistoryPanel({
   const {
     versions,
     isAvailable,
+    isLoading,
     createVersion,
     restoreVersion,
     deleteVersion,
@@ -205,6 +206,24 @@ export function VersionHistoryPanel({
   const restoreConfirmVersion = restoreConfirmId
     ? filteredVersions.find((v) => v.id === restoreConfirmId) ?? null
     : null;
+
+  /* Board 1138:4573 — skeleton rows while storage resolves. Without this the
+     empty state below answers a question the panel cannot yet answer: it said
+     "no versions" during the await, to users who had plenty. */
+  if (isLoading) {
+    return (
+      <div className="saves-view">
+        <div className="saves-skeleton" aria-busy="true" aria-label="Loading versions">
+          {[0, 1, 2, 3, 4].map((i) => (
+            <div key={i} className={`saves-skeleton__row saves-skeleton__row--${i % 3}`}>
+              <span className="saves-skeleton__dot" />
+              <span className="saves-skeleton__bar" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   if (!isAvailable) {
     return (
