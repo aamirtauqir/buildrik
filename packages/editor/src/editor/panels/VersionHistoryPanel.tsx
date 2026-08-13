@@ -48,6 +48,8 @@ export function VersionHistoryPanel({
     versions,
     isAvailable,
     isLoading,
+    loadError,
+    retryLoad,
     createVersion,
     restoreVersion,
     deleteVersion,
@@ -206,6 +208,26 @@ export function VersionHistoryPanel({
   const restoreConfirmVersion = restoreConfirmId
     ? filteredVersions.find((v) => v.id === restoreConfirmId) ?? null
     : null;
+
+  /* Board 453:4031. The list failed to read; the versions themselves are
+     intact, and saying so is the whole point of this copy — the empty state
+     would have told the user they were gone. */
+  if (loadError) {
+    return (
+      <div className="saves-view">
+        <div className="saves-load-error" role="alert">
+          <strong>Couldn&apos;t load version history.</strong>
+          <span>Your versions are still stored. Only this list failed to load.</span>
+        </div>
+        <div className="saves-load-error__foot">
+          <span>Retry, or reopen Versions in a moment.</span>
+          <Button color="light" size="xs" onClick={retryLoad}>
+            Try again
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   /* Board 1138:4573 — skeleton rows while storage resolves. Without this the
      empty state below answers a question the panel cannot yet answer: it said

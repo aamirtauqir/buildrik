@@ -144,4 +144,29 @@ describe("useVersionHistory", () => {
     unmount();
     expect(composer.listenerCount(EVENTS.VERSION_LIST_UPDATED)).toBe(0);
   });
+
+  /* Board 453:4031. The storage read rejects on any IndexedDB failure; before
+     the manager caught it, that was an unhandled rejection and the panel fell
+     through to "no versions yet". */
+  it("reports a load failure instead of sitting on the skeleton", () => {
+    const composer = createMockComposer([]);
+    const { result } = renderHook(() => useVersionHistory(asComposer(composer)));
+    expect(result.current.isLoading).toBe(true);
+
+    act(() => composer.emit(EVENTS.VERSION_LOAD_FAILED));
+
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.loadError).toBe(true);
+  });
+
+  it("clears the error when a later read succeeds", () => {
+    const composer = createMockComposer([]);
+    const { result } = renderHook(() => useVersionHistory(asComposer(composer)));
+    act(() => composer.emit(EVENTS.VERSION_LOAD_FAILED));
+    expect(result.current.loadError).toBe(true);
+
+    act(() => composer.emit(EVENTS.VERSION_LIST_UPDATED));
+
+    expect(result.current.loadError).toBe(false);
+  });
 });

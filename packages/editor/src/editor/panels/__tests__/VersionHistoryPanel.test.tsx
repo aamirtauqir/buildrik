@@ -71,13 +71,15 @@ const mocks = vi.hoisted(() => {
     versions: NamedVersion[];
     isAvailable: boolean;
     isLoading: boolean;
-  } = { versions: [], isAvailable: true, isLoading: false };
+    loadError: boolean;
+  } = { versions: [], isAvailable: true, isLoading: false, loadError: false };
   return {
     state,
     createVersion: vi.fn(),
     restoreVersion: vi.fn(),
     deleteVersion: vi.fn(),
     compareVersions: vi.fn(),
+    retryLoad: vi.fn(),
     updateAiSummary: vi.fn(),
     getVersion: vi.fn(),
   };
@@ -88,6 +90,8 @@ vi.mock("../../../shared/hooks/useVersionHistory", () => ({
     versions: mocks.state.versions,
     isAvailable: mocks.state.isAvailable,
     isLoading: mocks.state.isLoading,
+    loadError: mocks.state.loadError,
+    retryLoad: mocks.retryLoad,
     createVersion: mocks.createVersion,
     restoreVersion: mocks.restoreVersion,
     deleteVersion: mocks.deleteVersion,
@@ -335,5 +339,35 @@ describe("VersionHistoryPanel — loading", () => {
     render(<Panel composer={makeComposer()} />);
 
     expect(screen.queryByLabelText("Loading versions")).toBeNull();
+  });
+});
+
+/* Board 453:4031. loadVersions rejects on any IndexedDB failure and the manager
+   had no catch — so the read failed silently and the panel showed its EMPTY
+   state, telling the user their versions were gone when they were only
+   unreadable. The board's copy says the opposite in as many words. */
+describe("VersionHistoryPanel — load error", () => {
+  it("says the versions are still stored, not that there are none", async () => {
+    mocks.state.versions = [];
+    mocks.state.isAvailable = true;
+    mocks.state.isLoading = false;
+    mocks.state.loadError = true;
+    const Panel = await loadPanel();
+
+    render(<Panel composer={makeComposer()} />);
+
+    expect(screen.getByRole("alert")).toBeInTheDocument();
+    expect(screen.getByText(/still stored/)).toBeInTheDocument();
+    expect(screen.queryByText(/appears here as you save changes/)).toBeNull();
+  });
+
+  it("offers a retry that re-runs the read", async () => {
+    mocks.state.loadError = true;
+    const Panel = await loadPanel();
+
+    render(<Panel composer={makeComposer()} />);
+    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
+
+    expect(mocks.retryLoad).toHaveBeenCalledTimes(1);
   });
 });

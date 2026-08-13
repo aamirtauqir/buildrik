@@ -86,10 +86,25 @@ export class VersionTimelineManager {
    */
   private async loadVersionsFromStorage(): Promise<void> {
     this.isLoading = true;
-    this.versions = await loadVersions(this.projectId);
-    this.isLoading = false;
+    try {
+      this.versions = await loadVersions(this.projectId);
+      this.composer.emit(EVENTS.VERSION_LIST_UPDATED, { versions: this.versions });
+    } catch {
+      /* loadVersions rejects on any IndexedDB failure and this had no catch —
+         an unhandled rejection, `isLoading` stuck true, and the panel showing
+         its EMPTY state, which tells the user their versions are gone when
+         they are only unreadable. Board 453:4031 says the opposite in as many
+         words: "Your versions are still stored. Only this list failed to
+         load." */
+      this.composer.emit(EVENTS.VERSION_LOAD_FAILED, {});
+    } finally {
+      this.isLoading = false;
+    }
+  }
 
-    this.composer.emit(EVENTS.VERSION_LIST_UPDATED, { versions: this.versions });
+  /** Re-run the storage read behind board 453:4031's "Try again". */
+  async reloadVersions(): Promise<void> {
+    await this.loadVersionsFromStorage();
   }
 
   /**

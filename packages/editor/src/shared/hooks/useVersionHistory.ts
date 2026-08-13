@@ -17,6 +17,9 @@ export interface UseVersionHistoryReturn {
   isAvailable: boolean;
   /** Loading state */
   isLoading: boolean;
+  /** The list could not be read. The versions are still stored. */
+  loadError: boolean;
+  retryLoad: () => void;
   /** Create a new version */
   createVersion: (name: string, description?: string) => Promise<void>;
   /** Restore a version by id */
@@ -34,6 +37,7 @@ export interface UseVersionHistoryReturn {
 export function useVersionHistory(composer: Composer | null): UseVersionHistoryReturn {
   const [versions, setVersions] = React.useState<NamedVersion[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [loadError, setLoadError] = React.useState(false);
 
   const isAvailable = composer?.versions?.isAvailable() ?? false;
 
@@ -47,6 +51,12 @@ export function useVersionHistory(composer: Composer | null): UseVersionHistoryR
     const loadVersions = () => {
       setVersions(composer.versions.getVersions());
       setIsLoading(false);
+      setLoadError(false);
+    };
+
+    const onLoadFailed = () => {
+      setIsLoading(false);
+      setLoadError(true);
     };
 
     /* The seed read is synchronous and returns [] while the manager is still
@@ -62,9 +72,11 @@ export function useVersionHistory(composer: Composer | null): UseVersionHistoryR
 
     // Listen for version changes
     composer.on(EVENTS.VERSION_LIST_UPDATED, loadVersions);
+    composer.on(EVENTS.VERSION_LOAD_FAILED, onLoadFailed);
 
     return () => {
       composer.off(EVENTS.VERSION_LIST_UPDATED, loadVersions);
+      composer.off(EVENTS.VERSION_LOAD_FAILED, onLoadFailed);
     };
   }, [composer]);
 
@@ -115,10 +127,19 @@ export function useVersionHistory(composer: Composer | null): UseVersionHistoryR
     [composer]
   );
 
+  const retryLoad = React.useCallback(() => {
+    if (!composer?.versions?.reloadVersions) return;
+    setLoadError(false);
+    setIsLoading(true);
+    void composer.versions.reloadVersions();
+  }, [composer]);
+
   return {
     versions,
     isAvailable,
     isLoading,
+    loadError,
+    retryLoad,
     createVersion,
     restoreVersion,
     deleteVersion,
