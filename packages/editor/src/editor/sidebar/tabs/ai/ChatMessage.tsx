@@ -8,8 +8,6 @@ export interface ChatMessageProps {
   onAccept: (msgId: string) => void;
   onReject: (msgId: string) => void;
   onRegenerate: (msgId: string) => void;
-  onPreviewEnter: (edit: DiffEdit) => void;
-  onPreviewLeave: (edit: DiffEdit) => void;
 }
 
 export const ChatMessage: React.FC<ChatMessageProps> = ({

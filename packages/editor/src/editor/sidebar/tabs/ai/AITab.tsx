@@ -196,8 +196,6 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose }) 
             onAccept={onAccept}
             onReject={onReject}
             onRegenerate={onRegenerate}
-            onPreviewEnter={() => {}}
-            onPreviewLeave={() => {}}
           />
         </>
       ) : (

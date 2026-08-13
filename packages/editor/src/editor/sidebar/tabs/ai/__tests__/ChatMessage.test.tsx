@@ -32,8 +32,6 @@ describe("ChatMessage edit rendering", () => {
         onAccept={onAccept}
         onReject={noop}
         onRegenerate={noop}
-        onPreviewEnter={noop}
-        onPreviewLeave={noop}
       />,
     );
     expect(screen.getByText("color")).toBeTruthy();
@@ -56,8 +54,6 @@ describe("ChatMessage edit rendering", () => {
         onAccept={noop}
         onReject={noop}
         onRegenerate={noop}
-        onPreviewEnter={noop}
-        onPreviewLeave={noop}
       />,
     );
     expect(screen.getByText(/Applied/)).toBeTruthy();
@@ -71,8 +67,6 @@ describe("ChatMessage edit rendering", () => {
         onAccept={noop}
         onReject={noop}
         onRegenerate={noop}
-        onPreviewEnter={noop}
-        onPreviewLeave={noop}
       />,
     );
     expect(screen.getByText(/Regenerate/)).toBeTruthy();

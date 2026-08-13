@@ -8,8 +8,6 @@ export interface ChatThreadProps {
   onAccept: (msgId: string) => void;
   onReject: (msgId: string) => void;
   onRegenerate: (msgId: string) => void;
-  onPreviewEnter: (edit: DiffEdit) => void;
-  onPreviewLeave: (edit: DiffEdit) => void;
 }
 
 export const ChatThread: React.FC<ChatThreadProps> = ({ messages, ...handlers }) => {

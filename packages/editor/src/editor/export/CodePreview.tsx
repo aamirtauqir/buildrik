@@ -38,7 +38,6 @@ export interface CodePreviewProps {
   cssCode: string;
   defaultTab?: CodeTab;
   showLineNumbers?: boolean;
-  onCopy?: (content: string, type: "html" | "css") => void;
 }
 
 // ============================================================================
@@ -230,7 +229,6 @@ export const CodePreview: React.FC<CodePreviewProps> = ({
   cssCode,
   defaultTab = "html",
   showLineNumbers = true,
-  onCopy: _onCopy,
 }) => {
   const [activeTab, setActiveTab] = React.useState<CodeTab>(defaultTab);
 

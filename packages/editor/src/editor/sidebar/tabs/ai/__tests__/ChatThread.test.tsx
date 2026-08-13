@@ -17,7 +17,7 @@ function msg(over: Partial<ChatMessage> = {}): ChatMessage {
 
 describe("ChatThread", () => {
   it("renders empty state when no messages", () => {
-    render(<ChatThread messages={[]} onAccept={vi.fn()} onReject={vi.fn()} onRegenerate={vi.fn()} onPreviewEnter={vi.fn()} onPreviewLeave={vi.fn()} />);
+    render(<ChatThread messages={[]} onAccept={vi.fn()} onReject={vi.fn()} onRegenerate={vi.fn()} />);
     expect(screen.getByText(/Try a quick action/i)).toBeInTheDocument();
   });
 
@@ -25,7 +25,7 @@ describe("ChatThread", () => {
     render(
       <ChatThread
         messages={[msg({ id: "u", role: "user", text: "hello" }), msg({ id: "a", role: "assistant", text: "hi" })]}
-        onAccept={vi.fn()} onReject={vi.fn()} onRegenerate={vi.fn()} onPreviewEnter={vi.fn()} onPreviewLeave={vi.fn()}
+        onAccept={vi.fn()} onReject={vi.fn()} onRegenerate={vi.fn()}
       />,
     );
     expect(screen.getByText("You")).toBeInTheDocument();
@@ -36,7 +36,7 @@ describe("ChatThread", () => {
     render(
       <ChatThread
         messages={[msg({ id: "a", role: "assistant", text: "thinking", streaming: true })]}
-        onAccept={vi.fn()} onReject={vi.fn()} onRegenerate={vi.fn()} onPreviewEnter={vi.fn()} onPreviewLeave={vi.fn()}
+        onAccept={vi.fn()} onReject={vi.fn()} onRegenerate={vi.fn()}
       />,
     );
     expect(document.querySelector(".bd-ai-msg-streaming")).toBeInTheDocument();
@@ -46,7 +46,7 @@ describe("ChatThread", () => {
     render(
       <ChatThread
         messages={[msg({ id: "a", role: "assistant", text: "partial", stopped: true })]}
-        onAccept={vi.fn()} onReject={vi.fn()} onRegenerate={vi.fn()} onPreviewEnter={vi.fn()} onPreviewLeave={vi.fn()}
+        onAccept={vi.fn()} onReject={vi.fn()} onRegenerate={vi.fn()}
       />,
     );
     expect(screen.getByText(/\(stopped\)/i)).toBeInTheDocument();
@@ -56,7 +56,7 @@ describe("ChatThread", () => {
     render(
       <ChatThread
         messages={[msg({ id: "u", role: "user", text: "hi" }), msg({ id: "a", role: "assistant", text: "hi back" })]}
-        onAccept={vi.fn()} onReject={vi.fn()} onRegenerate={vi.fn()} onPreviewEnter={vi.fn()} onPreviewLeave={vi.fn()}
+        onAccept={vi.fn()} onReject={vi.fn()} onRegenerate={vi.fn()}
       />,
     );
     const links = screen.getAllByRole("button", { name: /regenerate/i });

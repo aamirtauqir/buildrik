@@ -13,9 +13,6 @@ interface LayerContextMenuProps {
   y: number;
   nodeId: string;
   nodeName: string;
-  isHidden: boolean;
-  isLocked: boolean;
-  childCount: number;
   selectedCount: number;
   /** composer.clipboard holds an element — enables Paste. */
   hasClipboard: boolean;
@@ -28,9 +25,6 @@ export function LayerContextMenu({
   y,
   nodeId,
   nodeName,
-  isHidden: _isHidden,
-  isLocked: _isLocked,
-  childCount: _childCount,
   selectedCount,
   hasClipboard,
   onAction,
