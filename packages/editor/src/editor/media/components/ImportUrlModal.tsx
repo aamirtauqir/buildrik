@@ -16,22 +16,13 @@
 
 import * as React from "react";
 import { Button, Modal, TextField } from "@/editor/chrome-ui";
+import { isFetchableUrl } from "../fetchUrlAsFile";
 
 interface ImportUrlModalProps {
   open: boolean;
   onClose(): void;
   /** Receives a trimmed, http(s) URL. Fetching and error toasts stay upstream. */
   onImport(url: string): void;
-}
-
-/** http/https only — a data: or blob: URL is already local, and file:// cannot be read. */
-function isFetchableUrl(raw: string): boolean {
-  try {
-    const u = new URL(raw.trim());
-    return u.protocol === "http:" || u.protocol === "https:";
-  } catch {
-    return false;
-  }
 }
 
 export function ImportUrlModal({ open, onClose, onImport }: ImportUrlModalProps) {

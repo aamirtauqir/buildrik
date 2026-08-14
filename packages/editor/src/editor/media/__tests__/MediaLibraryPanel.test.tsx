@@ -10,7 +10,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import * as React from "react";
 import type { MediaAsset } from "../../../shared/types/media";
@@ -95,13 +95,59 @@ describe("MediaLibraryPanel — tabs", () => {
   });
 });
 
-describe("MediaLibraryPanel — From URL (KNOWN stub, pinned)", () => {
-  it("shows the coming-soon placeholder instead of an import form", () => {
+/* This block used to pin the placeholder: "shows the coming-soon placeholder
+   instead of an import form … the feature is inert". It was inert only HERE —
+   the fullpage manager had been importing URLs the whole time. A test that
+   pins a lie keeps the lie. Board 1205:4804 draws the import; these assert it. */
+describe("MediaLibraryPanel — From URL", () => {
+  it("offers the field and keeps Import disabled until the URL is fetchable", () => {
     mount();
     fireEvent.click(screen.getByText("From URL"));
-    expect(screen.getByText(/Import from URL — coming soon/)).toBeInTheDocument();
-    // No text input is offered — the feature is inert.
-    expect(screen.queryByPlaceholderText(/url/i)).not.toBeInTheDocument();
+
+    const field = screen.getByPlaceholderText("https://example.com/photo.jpg");
+    const go = screen.getByTestId("panel-import-url-go");
+    expect(go).toBeDisabled();
+
+    fireEvent.change(field, { target: { value: "not a url" } });
+    expect(go).toBeDisabled();
+
+    fireEvent.change(field, { target: { value: "https://cdn.example.com/a.png" } });
+    expect(go).toBeEnabled();
+  });
+
+  it("imports through the same uploadFile as the Upload tab, then shows the library", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({ ok: true, blob: async () => new Blob(["x"], { type: "image/png" }) }),
+    );
+    mount();
+    fireEvent.click(screen.getByText("From URL"));
+    fireEvent.change(screen.getByPlaceholderText("https://example.com/photo.jpg"), {
+      target: { value: "https://cdn.example.com/hero.png" },
+    });
+    fireEvent.click(screen.getByTestId("panel-import-url-go"));
+
+    await waitFor(() => expect(managerMock.uploadFile).toHaveBeenCalledTimes(1));
+    expect((managerMock.uploadFile.mock.calls[0][0] as File).name).toBe("hero.png");
+    // An import the user cannot see did not happen.
+    await waitFor(() => expect(screen.getByPlaceholderText("Search library…")).toBeInTheDocument());
+    vi.unstubAllGlobals();
+  });
+
+  it("says why a failed import failed, on the field, and stays on the tab", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false, status: 404, blob: async () => new Blob([]) }));
+    mount();
+    fireEvent.click(screen.getByText("From URL"));
+    fireEvent.change(screen.getByPlaceholderText("https://example.com/photo.jpg"), {
+      target: { value: "https://cdn.example.com/missing.png" },
+    });
+    fireEvent.click(screen.getByTestId("panel-import-url-go"));
+
+    await waitFor(() =>
+      expect(screen.getByText("Could not import from that URL.")).toBeInTheDocument(),
+    );
+    expect(managerMock.uploadFile).not.toHaveBeenCalled();
+    vi.unstubAllGlobals();
   });
 });
 

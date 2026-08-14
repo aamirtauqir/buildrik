@@ -13,6 +13,7 @@ import type { MediaAsset, MediaAssetType, MediaViewMode } from "../../shared/typ
 import { Button, ConfirmDialog, ModalBody, ModalClose, ModalContent, ModalRoot, ModalTitle, Spinner, Tabs } from "@/editor/chrome-ui";
 import { useMediaManager } from "../shell/hooks";
 import { AssetCard } from "./AssetCard";
+import { fetchUrlAsFile, isFetchableUrl } from "./fetchUrlAsFile";
 import { OptimizationPanel } from "./OptimizationPanel";
 import { VideoPreview } from "./VideoPreview";
 
@@ -71,6 +72,9 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
   const [previewVideo, setPreviewVideo] = React.useState<MediaAsset | null>(null);
   const [uploading, setUploading] = React.useState(false);
   const [pendingDeleteId, setPendingDeleteId] = React.useState<string | null>(null);
+  const [importUrl, setImportUrl] = React.useState("");
+  const [importing, setImporting] = React.useState(false);
+  const [importError, setImportError] = React.useState<string | null>(null);
 
   // Get filtered assets based on search and type
   const assets = React.useMemo(() => {
@@ -89,6 +93,26 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
       setActiveTab("library");
     } finally {
       setUploading(false);
+    }
+  };
+
+  /* Lands the fetched file through the same uploadFile the Upload tab uses,
+     then shows it — an import the user cannot see did not happen. The error
+     stays on the field rather than a toast: this panel is a modal, and a
+     toast behind it is the wrong place to say why THIS field failed. */
+  const handleImportUrl = async () => {
+    const url = importUrl.trim();
+    if (!isFetchableUrl(url) || importing) return;
+    setImporting(true);
+    setImportError(null);
+    try {
+      await uploadFile(await fetchUrlAsFile(url));
+      setImportUrl("");
+      setActiveTab("library");
+    } catch {
+      setImportError("Could not import from that URL.");
+    } finally {
+      setImporting(false);
     }
   };
 
@@ -234,14 +258,35 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
         </div>
       )}
 
+      {/* Board 1205:4804. This tab told the user the feature was "launching
+          soon" while the fullpage manager had been importing URLs for weeks —
+          same product, two answers. Same field, same validation, same import
+          path (fetchUrlAsFile), inline because this panel is already a modal
+          and cannot open a second one on top of itself. */}
       {activeTab === "url" && (
-        <div className="tw:px-6 tw:py-10 tw:text-center">
-          <div className="tw:mb-4 tw:text-4xl">🔗</div>
-          <div className="tw:mb-2 tw:font-semibold">Import from URL — coming soon</div>
-          <div className="tw:text-[13px] tw:leading-normal tw:text-gray-500">
-            Paste an image or video URL to import it directly.
-            <br />
-            This feature is launching soon.
+        <div className={PAD}>
+          <InputField
+            label="Media URL"
+            type="url"
+            placeholder="https://example.com/photo.jpg"
+            value={importUrl}
+            onChange={(e) => {
+              setImportUrl(e.target.value);
+              setImportError(null);
+            }}
+            error={importError ?? undefined}
+            hint="Paste a link to an image or video and it lands in this library."
+            disabled={importing}
+          />
+          <div className="tw:mt-3 tw:flex tw:justify-end">
+            <Button
+              type="button"
+              onClick={handleImportUrl}
+              disabled={!isFetchableUrl(importUrl) || importing}
+              data-testid="panel-import-url-go"
+            >
+              {importing ? "Importing…" : "Import"}
+            </Button>
           </div>
         </div>
       )}
@@ -297,13 +342,14 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
     )}
 
     {/*
-      Board 1164:4713's footnote. It names the limits BEFORE a file is picked
-      — including that From URL is still a stub, which this tab really is
-      (it renders "coming soon"). A tab that looks live and is not is worse
-      than one that says so.
+      Board 1164:4713's footnote — the limits, named BEFORE a file is picked.
+      It used to end "· From URL launches soon", written when that tab really
+      was a stub. The tab imports now (board 1205:4804), so the sentence
+      would be the third place in this product telling the user a shipped
+      feature has not shipped.
     */}
     <p className="tw:mt-2 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
-      Upload tab accepts image/video/audio · max 10 MB each · From URL launches soon
+      Upload tab accepts image/video/audio · max 10 MB each
     </p>
 
     {/* Video Preview Modal */}

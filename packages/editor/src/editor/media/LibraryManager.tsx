@@ -19,6 +19,7 @@ import { StockSourceModal } from "../sidebar/tabs/media/components/StockSourceMo
 import { ConfirmDeleteModal } from "../sidebar/tabs/media/components/ConfirmDeleteModal";
 import { MediaContextMenu } from "../sidebar/tabs/media/components/MediaContextMenu";
 import { ImportUrlModal } from "./components/ImportUrlModal";
+import { fetchUrlAsFile } from "./fetchUrlAsFile";
 import { AssetDetailOverlay } from "../sidebar/tabs/media/components/AssetDetailOverlay";
 import { STORAGE_QUOTA_BYTES } from "../../shared/constants/media";
 import { useToast, Button, TextInput } from "@/editor/chrome-ui";
@@ -166,14 +167,9 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
   const handleImportFromUrl = React.useCallback(async (url: string) => {
     try {
       addToast({ description: "Importing...", tone: "info", duration: 2000 });
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const blob = await res.blob();
-      const ext = blob.type.split("/")[1] || "bin";
-      const name = url.split("/").pop()?.split("?")[0] || `imported.${ext}`;
-      const file = new File([blob], name, { type: blob.type });
+      const file = await fetchUrlAsFile(url);
       state.upload([file]);
-      addToast({ description: `${name} imported`, tone: "success" });
+      addToast({ description: `${file.name} imported`, tone: "success" });
     } catch {
       addToast({ description: "Could not import from that URL", tone: "error" });
     }
