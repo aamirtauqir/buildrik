@@ -1323,6 +1323,37 @@ not exist yet**, and `Import JSON` exists nowhere. That is Content-family
 work in Phase 1, not a Phase 0 fix — building a fullpage surface mid-sweep
 would be scope invented, not scope found.
 
+## Phase 1 — family 1: History · Published (2026-08-14)
+
+Phase 0 closed; this is the first Phase-1 family. Published-tab empty state
+verified live ("Publish the site once to start a version history" — the demo
+has no projectId, which is the honest path to that board).
+
+`04b2ee0c` — **the eleventh find, and the first from Phase 1**: the panel
+treated `rollbackToVersion` resolving as the rollback being DONE. It only
+starts a publish job, so all three drawn outcomes had no code home —
+`184:37` "Rolling back…" (determinate bar), `184:45` "Rolled back" (green,
+naming the new live version and that the replaced one survives), `453:4064`
+"Rollback failed" (naming that the live site did NOT change). The panel
+answered all three with one line of grey text.
+
+The job feed already existed (`usePublishJob`, polled by the Publish panel)
+and reached History nowhere: TabRouter held `publishJob` and passed it only
+to Publish. One `rollbackJob` prop now drives all three boards from that
+single source.
+
+Two of my own mistakes, both caught by the pins and worth the record:
+clearing the in-flight marker when the START call resolved made the progress
+modal unreachable; clearing it "only when no feed exists" failed the same way
+because `onRollbackStarted` is what starts the polling — the feed arrives a
+tick AFTER. The marker is consumed by the job's first terminal state, nothing
+else.
+
+Also settled by reading the service: `getPublishHistory` returns only
+`status: "COMPLETED"` jobs, so "failed" and "redeploying" can never be ROWS
+in that list. The boards agree — they draw modals, not rows. Behaviour →
+code contract; visual → board; both honoured.
+
 ## Named for the founder — needs a decision or a file I must not stage
 
 **`ConflictModal` does not match board 66:640, and fixing it needs
