@@ -21,6 +21,8 @@
 import * as React from "react";
 import { Button, ModalContent, ModalRoot, Spinner } from "@/editor/chrome-ui";
 import type { PrePublishChecksResult } from "@buildrik/shared/schemas/publish";
+import type { Composer } from "@/engine";
+import { PublishConfirmFacts } from "./PublishConfirmFacts";
 
 type Step = "review" | "confirm";
 
@@ -34,16 +36,16 @@ export interface PublishWizardProps {
   onRetryChecks(): void;
   /** Rendered on a check row when the editor can take the user to the fix. */
   renderFix?(label: string): React.ReactNode;
-  /** Confirm step facts, all read from state the panel already holds. */
-  target: string;
-  pageCount: number;
-  approval: { label: string; tone: "ok" | "warn" | "muted" };
+  /** Confirm-step context. The facts themselves come from
+      PublishConfirmFacts, which reads the exporter and the review round. */
+  composer: Composer | null;
+  publishedUrl: string | null;
+  isPublished: boolean;
   rollbackTo: number | null;
 }
 
 const STEP_PILL = "tw:rounded-full tw:px-2.5 tw:py-1 tw:text-[12px] tw:leading-4";
 const ROW = "tw:flex tw:items-center tw:gap-3 tw:h-9 tw:px-6";
-const DEF_ROW = "tw:flex tw:items-baseline tw:justify-between tw:gap-4 tw:px-6 tw:py-2";
 const BAND =
   "tw:mx-6 tw:my-3 tw:rounded-md tw:bg-[var(--bk-warning-tint)] tw:px-3 tw:py-2.5 tw:text-[13px] tw:text-[var(--bk-warning-text)]";
 
@@ -71,9 +73,9 @@ export const PublishWizard: React.FC<PublishWizardProps> = ({
   checks,
   onRetryChecks,
   renderFix,
-  target,
-  pageCount,
-  approval,
+  composer,
+  publishedUrl,
+  isPublished,
   rollbackTo,
 }) => {
   const [step, setStep] = React.useState<Step>("review");
@@ -181,37 +183,19 @@ export const PublishWizard: React.FC<PublishWizardProps> = ({
             Confirm publish
           </h2>
 
-          <div className={DEF_ROW}>
-            <span className="tw:text-[13px] tw:text-[var(--bk-ink-muted)]">Target</span>
-            <span className="tw:text-[14px] tw:text-[var(--bk-ink)]">{target}</span>
-          </div>
-          <div className={DEF_ROW}>
-            <span className="tw:text-[13px] tw:text-[var(--bk-ink-muted)]">Pages</span>
-            <span className="tw:text-[14px] tw:text-[var(--bk-ink)]">
-              {pageCount} {pageCount === 1 ? "page" : "pages"}
-            </span>
-          </div>
-          <div className={DEF_ROW}>
-            <span className="tw:text-[13px] tw:text-[var(--bk-ink-muted)]">Client approval</span>
-            <span
-              className={`tw:text-[14px] ${
-                approval.tone === "ok"
-                  ? "tw:text-[var(--bk-success-text)]"
-                  : approval.tone === "warn"
-                    ? "tw:text-[var(--bk-warning-text)]"
-                    : "tw:text-[var(--bk-ink-muted)]"
-              }`}
-            >
-              {approval.label}
-            </span>
-          </div>
-          <div className={DEF_ROW}>
-            <span className="tw:text-[13px] tw:text-[var(--bk-ink-muted)]">Rollback</span>
-            <span className="tw:text-[14px] tw:text-[var(--bk-ink)]">
-              {rollbackTo !== null
-                ? `v${rollbackTo} stays restorable in publish history`
-                : "Nothing to roll back to yet — this is the first publish"}
-            </span>
+          {/* The four rows are PublishConfirmFacts — the shell's
+              PublishConfirmModal renders the same component, so the two ways
+              into this board cannot drift apart. It reads the real review
+              round; this step used to guess the approval line from the publish
+              job's block reason. */}
+          <div className="tw:px-6">
+            <PublishConfirmFacts
+              active={open && step === "confirm"}
+              composer={composer}
+              publishedUrl={publishedUrl}
+              isPublished={isPublished}
+              rollbackTo={rollbackTo}
+            />
           </div>
 
           {/* Board 914:4507. The consequence, stated before the irreversible

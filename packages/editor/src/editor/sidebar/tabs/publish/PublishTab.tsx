@@ -699,17 +699,9 @@ export const PublishTab: React.FC<PublishTabProps> = ({
             </Button>
           );
         }}
-        target={snapshot.production.value ? `Production · ${snapshot.production.value}` : "Production"}
-        pageCount={snapshot.pageCount}
-        /* The approval gate is the server's, surfaced through the publish
-           job's block reason — the panel never decides it locally. */
-        approval={
-          publishJob?.blockedReason === "needs-approval"
-            ? { label: "Not approved yet", tone: "warn" }
-            : publishJob?.blockedReason === "stale-approval"
-              ? { label: "Approved, then changed", tone: "warn" }
-              : { label: "Not required", tone: "muted" }
-        }
+        composer={composer}
+        publishedUrl={publishedUrl}
+        isPublished={isPublished}
         rollbackTo={snapshot.lastDeploy?.version ?? null}
       />
     </PanelFrame>

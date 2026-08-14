@@ -89,7 +89,9 @@ describe("PublishConfirmModal — it states the real consequence", () => {
     await waitFor(() =>
       expect(screen.getByText(/replaces the live site immediately/)).toBeTruthy(),
     );
-    expect(screen.getByText("bellacucina.com")).toBeTruthy();
+    /* Board 914:4507 names the environment with the domain: "Production ·
+       bellacucina.com", not the bare host. */
+    expect(screen.getByText("Production · bellacucina.com")).toBeTruthy();
     expect(screen.getByText("Update now")).toBeTruthy();
   });
 
