@@ -34,6 +34,8 @@ const mockComposer = {
   saveProject: vi.fn(() => Promise.resolve()),
   loadProject: vi.fn(() => Promise.resolve(null)),
   importProject: vi.fn(),
+  setProjectLoading: vi.fn(),
+  isProjectLoading: vi.fn(() => false),
   exportProject: vi.fn(() => ({ pages: [] })),
   elements: {
     getAllPages: vi.fn(() => [{ id: "page-1" }]),
@@ -247,6 +249,33 @@ describe("useComposerInit — siteId load flow (happy path)", () => {
       expect.objectContaining({ title: "Load failed", tone: "warning" }),
     );
     expect(mockComposer.importProject).toHaveBeenCalledWith({ pages: ["local"] });
+  });
+
+  /* Board 65:412. The flag is what the canvas and footer read; a load that
+     fails must clear it, or the editor sits behind placeholders forever. */
+  it("raises the load flag for the fetch window and clears it — even when the fetch fails", async () => {
+    vi.mocked(getSiteIdFromUrl).mockReturnValue("site-9");
+    vi.mocked(loadProject).mockRejectedValue(new Error("boom 500"));
+
+    renderHook(() => useComposerInit(makeParams()));
+    await act(async () => {
+      mockComposer.emit("composer:ready");
+      await flushMicrotasks();
+    });
+
+    expect(mockComposer.setProjectLoading.mock.calls.map(([v]) => v)).toEqual([true, false]);
+  });
+
+  it("never raises the load flag without a siteId — there is no fetch to wait for", async () => {
+    vi.mocked(getSiteIdFromUrl).mockReturnValue(null);
+
+    renderHook(() => useComposerInit(makeParams()));
+    await act(async () => {
+      mockComposer.emit("composer:ready");
+      await flushMicrotasks();
+    });
+
+    expect(mockComposer.setProjectLoading).not.toHaveBeenCalled();
   });
 });
 

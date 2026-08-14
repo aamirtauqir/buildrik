@@ -82,6 +82,8 @@ export class Composer extends EventEmitter {
   private collaborationHandlers: Set<(...args: any[]) => void> = new Set();
   private selectionHandlers: Set<(...args: any[]) => void> = new Set();
   private initPromise: Promise<void> | null = null;
+  /** See isProjectLoading(). */
+  private projectLoading = false;
 
   private transactionDepth = 0;
   private transactionDirty = false;
@@ -710,6 +712,30 @@ ${html}
    */
   isReady(): boolean {
     return this.state.ready;
+  }
+
+  /**
+   * Is a project still arriving from the dashboard?
+   *
+   * The shell creates the composer and mounts the whole editor SYNCHRONOUSLY,
+   * then fetches the site's pages. For the length of that fetch the canvas is
+   * empty — and an empty canvas draws "Start building · Browse templates",
+   * which tells someone with a twelve-page site that they have nothing. Board
+   * 65:412 (Shell state 12 · Loading) draws the other thing: the shell, with
+   * the canvas showing placeholders and the status bar saying so.
+   *
+   * A getter as well as an event because the consumers mount AFTER the fetch
+   * starts — a subscriber-only signal is a signal they were never there for.
+   */
+  isProjectLoading(): boolean {
+    return this.projectLoading;
+  }
+
+  /** Set by whoever owns the fetch (the shell); the engine does no I/O. */
+  setProjectLoading(loading: boolean): void {
+    if (this.projectLoading === loading) return;
+    this.projectLoading = loading;
+    this.emit(EVENTS.PROJECT_LOAD_STATE, { loading });
   }
 
   /**

@@ -261,6 +261,9 @@ export interface ComposerStub {
   on: ReturnType<typeof vi.fn>;
   off: ReturnType<typeof vi.fn>;
   emit: ReturnType<typeof vi.fn>;
+  /** Canvas reads it to choose between the empty-state CTA and the loading
+      placeholders (board 65:412). A composer without it is not a composer. */
+  isProjectLoading: ReturnType<typeof vi.fn>;
   clipboard: unknown;
   styleClipboard: Record<string, string> | undefined;
 }
@@ -313,6 +316,7 @@ export function makeComposer(overrides: DeepPartial<ComposerStub> = {}): Compose
     on: vi.fn(),
     off: vi.fn(),
     emit: vi.fn(),
+    isProjectLoading: vi.fn(() => false),
     clipboard: null,
     styleClipboard: undefined,
   };

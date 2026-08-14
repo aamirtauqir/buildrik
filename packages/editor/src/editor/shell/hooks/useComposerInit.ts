@@ -149,6 +149,13 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
         void instance.versions?.setProjectId?.(siteId);
         void instance.components?.setProjectId?.(siteId);
 
+        /* The shell is already fully mounted at this point — the canvas is up
+           and empty, which is the state that draws "Start building · Browse
+           templates" over someone's existing site until this fetch lands.
+           Board 65:412 gives that window its own treatment; the flag is what
+           the canvas and footer read to draw it. Cleared in .finally() so a
+           failed load leaves a usable editor, never a permanent skeleton. */
+        instance.setProjectLoading(true);
         loadProject(siteId)
           .then(async (data) => {
             // A.1 integration: run DS schema migrations on the loaded payload
@@ -236,7 +243,8 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               });
             }
             loadFromLocalStorage(instance, projectConfig);
-          });
+          })
+          .finally(() => instance.setProjectLoading(false));
         return;
       }
 

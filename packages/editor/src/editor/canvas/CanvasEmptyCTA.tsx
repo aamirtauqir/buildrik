@@ -1,6 +1,20 @@
 /**
- * Canvas Empty State CTA
- * Shown when the canvas has no content.
+ * CanvasEmptyCTA — board 65:2 (Shell state 1 · First run).
+ *
+ * One sentence and two buttons side by side. What the board does not carry and
+ * this component used to: a plus glyph, a second paragraph explaining where the
+ * sidebar is, and a stacked underlined "Start Blank" text link. The board makes
+ * the two routes equal-weight siblings — template or blank — rather than a
+ * primary action with an afterthought under it.
+ *
+ * The buttons are chrome-ui Buttons now. The old ones were `<Button>` with the
+ * DS overridden back out in CSS (own background, own radius, own weight), which
+ * is the same as not using it.
+ *
+ * Board 65:2 also draws a first-run coach mark over the rail ("Everything you
+ * build lives behind these six." · Got it). That is not built here: it has its
+ * own boards in the S1 flow family (S1.1 · coach-dismissed, S1.1b, S1.1c),
+ * which own its copy, its dismissal and what each button opens.
  *
  * @license BSD-3-Clause
  */
@@ -19,32 +33,15 @@ export function CanvasEmptyCTA({
 }: CanvasEmptyCTAProps): React.ReactElement {
   return (
     <div className="bd-canvas-empty-cta" role="status" aria-label="Canvas is empty">
-      {/* Plus icon */}
-      <svg
-        className="bd-canvas-empty-cta__icon"
-        width="48"
-        height="48"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <line x1="12" y1="5" x2="12" y2="19" />
-        <line x1="5" y1="12" x2="19" y2="12" />
-      </svg>
-      <h3 className="bd-canvas-empty-cta__title">Start building</h3>
-      <p className="bd-canvas-empty-cta__desc">
-        Click + in the sidebar to add elements, or drag a template onto the canvas.
+      <p className="bd-canvas-empty-cta__title">
+        Start with a template, or drop your first section.
       </p>
-      <Button className="bd-canvas-empty-cta__browse" onClick={onBrowseTemplates}>
-        Browse templates
-      </Button>
-      <Button className="bd-canvas-empty-cta__blank" onClick={onStartBlank}>
-        Start Blank
-      </Button>
+      <div className="bd-canvas-empty-cta__actions">
+        <Button onClick={onBrowseTemplates}>Browse templates</Button>
+        <Button color="light" onClick={onStartBlank}>
+          Start blank
+        </Button>
+      </div>
     </div>
   );
 }

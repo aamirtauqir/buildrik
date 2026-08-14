@@ -30,6 +30,7 @@ import { getEditorViewMode } from "../../shared/utils/editorViewMode";
 import type { Composer } from "../../engine";
 import type { DeviceType } from "../../shared/types";
 import { Button } from "@/editor/chrome-ui";
+import { useProjectLoading } from "./hooks/useProjectLoading";
 
 const DEVICE_LABEL: Partial<Record<DeviceType, string>> = {
   wide: "Wide",
@@ -73,16 +74,28 @@ function elementDims(id: string | undefined): string | null {
 }
 
 export const StudioFooter: React.FC<StudioFooterProps> = ({
+  composer,
   device,
   zoom,
   selectedElement,
   onOpenStructure,
 }) => {
   const fourToolRail = getEditorViewMode().fourToolRail;
+  /* Board 65:412 puts "Loading…" in this slot while the site is arriving.
+     Without it the footer says "body" — the same thing it says about a
+     finished, genuinely empty page. */
+  const projectLoading = useProjectLoading(composer);
 
-  const label = selectedElement
-    ? `${cap(selectedElement.type)}${selectedElement.tagName ? ` · ${selectedElement.tagName}` : ""}`
-    : "body";
+  /* "Nothing selected" per board 65:2, which is the only board that draws
+     this slot with an empty selection — 52:10, the footer's own board, draws
+     a selected element. The previous "body" contradicted the inspector
+     standing beside it ("Select something on the canvas to edit it") by
+     naming an element nobody had chosen. */
+  const label = projectLoading
+    ? "Loading…"
+    : selectedElement
+      ? `${cap(selectedElement.type)}${selectedElement.tagName ? ` · ${selectedElement.tagName}` : ""}`
+      : "Nothing selected";
   const dims = elementDims(selectedElement?.id);
   const deviceLabel = DEVICE_LABEL[device] ?? cap(device);
 

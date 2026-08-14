@@ -507,6 +507,13 @@ export const EVENTS = {
   // Additional Project Events
   // ============================================
   PROJECT_SAVING: "project:saving",
+  /* Whether a project is in flight FROM THE DASHBOARD — the window between
+     the shell mounting and the site's own pages arriving. Distinct from
+     PROJECT_LOADED, which announces an import that already happened and says
+     nothing on failure. The payload carries the boolean deliberately: one
+     event that reports both edges cannot be misread by a listener keying on
+     the name alone, which is how PROJECT_SAVING was got wrong. */
+  PROJECT_LOAD_STATE: "project:load-state",
 
   // ============================================
   // OT Engine Events
@@ -675,6 +682,7 @@ export interface EventPayloads {
   [EVENTS.PROJECT_CHANGED]: void;
   [EVENTS.PROJECT_SAVED]: import("../types").ProjectData;
   [EVENTS.PROJECT_SAVING]: Record<string, never>;
+  [EVENTS.PROJECT_LOAD_STATE]: { loading: boolean };
   [EVENTS.PROJECT_LOADED]:
     | import("../types").ProjectData
     | {

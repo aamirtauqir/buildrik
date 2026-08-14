@@ -8,14 +8,15 @@
  * tier file under themes/components/{atoms,molecules,organisms,layouts}/.
  */
 
-/* keep: canonical engine container, emitted by Canvas.tsx */
+/* keep: canonical engine container, emitted by Canvas.tsx.
+   The 20px gradient grid that used to be painted here was unconditional — it
+   ignored the canvas toolbar's own Grid toggle, which drives a separate
+   overlay (CanvasOverlayGroup). Turning Grid off left a grid on screen, and
+   no shell board draws one. The toggle is now the only thing that draws a
+   grid. */
 .buildrick-canvas {
   flex: 1;
   background: var(--bk-bg-app);
-  background-image:
-    linear-gradient(var(--bk-alpha-ink-06) 1px, transparent 1px),
-    linear-gradient(90deg, var(--bk-alpha-ink-06) 1px, transparent 1px);
-  background-size: 20px 20px;
   display: flex;
   align-items: center;
   justify-content: center;

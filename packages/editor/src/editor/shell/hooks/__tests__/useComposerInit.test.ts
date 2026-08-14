@@ -29,6 +29,10 @@ const mockComposer = {
   saveProject: vi.fn(() => Promise.resolve()),
   loadProject: vi.fn(() => Promise.resolve(null)),
   importProject: vi.fn(),
+  /* The hook announces the dashboard fetch through the composer so the canvas
+     and footer can draw board 65:412's loading state. */
+  setProjectLoading: vi.fn(),
+  isProjectLoading: vi.fn(() => false),
   exportProject: vi.fn(() => ({})),
   elements: {
     getAllPages: vi.fn(() => [{ id: "page-1" }]),

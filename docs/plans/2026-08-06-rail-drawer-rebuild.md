@@ -1507,6 +1507,90 @@ the canvas, but 435:2348 — the dedicated board, which names PageTabBar.tsx in
 its own title — annotates "bar sits at the canvas foot". The dedicated board
 wins; the code was already right.
 
+**Board 66:441 "Shell state 10 · Offline" draws no offline treatment at all** —
+fetched at full width, its topbar is the default one, "Saved 2m ago" and "In
+review · 3 open", identical to every other shell board. The board is a
+placeholder; the code is ahead of it. Driven offline deterministically
+(`live-shot --offline`, which sets the context offline AND dispatches the
+browser's own `offline` event rather than waiting for a poll to fail), the live
+editor shows an amber "Offline — saved locally" pill, an "Offline — changes
+queued" banner, and refuses to publish with "Can't publish while offline". No
+change made: conforming code to an empty board would delete working behaviour.
+
+**The fourteenth find** — board 65:412 "Shell state 12 · Loading" is a real
+board, and the state it draws did not exist. The shell mounts SYNCHRONOUSLY and
+then fetches the site: `setComposer(instance)` runs, the whole editor appears,
+and `loadProject(siteId)` resolves later. For the whole of that window the
+canvas is empty — and an empty canvas draws **"Start building · Browse
+templates · Start Blank"**. Someone opening their twelve-page site on a slow
+connection was told they had nothing, and invited to start over on top of it.
+The footer said `body` — the same word it says about a finished, genuinely
+empty page. Nothing distinguished "loading" from "empty".
+
+Fixed to the board: the canvas shows stacked placeholders (`CanvasLoadingSkeleton`,
+one short bar then three tall, the board's shape) and the status bar says
+"Loading…". The signal travels on the composer — `setProjectLoading()` /
+`isProjectLoading()` + `PROJECT_LOAD_STATE` — because the two consumers mount
+AFTER the fetch starts, so a subscribe-only signal is one they were never there
+for; and because the alternative was prop-drilling through `AquibraStudio.tsx`,
+which I must not stage. Cleared in `.finally()`, so a load that fails leaves a
+usable editor rather than a permanent skeleton (asserted both ways).
+
+Two things the board's own drawing did not survive contact with:
+- the placeholders were invisible at first. `SkeletonBlock`'s shared grey is
+  gray-100 and its pulse takes it to 50% opacity — tuned for panel rows, and
+  measured live at `rgb(243,244,246)` @ 0.50 over the white canvas page, which
+  is nothing. One step darker (gray-200) survives the trough. This is the
+  invisible-but-healthy class again: correct geometry, correct DOM, four bars
+  present, and a screenshot showing an empty canvas.
+- the board dims the whole chrome (rail, inspector, drawer) during load. Not
+  done, and named below for the founder: every other conformed family draws
+  its chrome at full strength, so a global dim contradicts ~30 boards unless
+  they each grow a loading variant.
+
+**The fifteenth find** — board 65:2 "Shell state 1 · First run" draws an empty
+canvas as one sentence and two routes: "Start with a template, or drop your
+first section." · **Browse templates** · **Start blank**. `CanvasEmptyCTA`
+existed and rendered none of that copy — but more to the point, **it was
+unreachable**. Its condition was `!content`, and `content` is the canvas HTML
+string; every page owns a root container, so the string is never empty once a
+page exists. The CTA rendered for one frame at boot and never again. What a
+user actually saw on a brand-new site was the engine's generic empty-container
+affordance leaking onto the page root: a 60px dashed box reading "Drop blocks
+here or use Quick Add above ↑".
+
+Three changes, all live-verified at 1440×900 against the board:
+- emptiness now means the active page's root has **no children**, read from
+  the engine and keyed on the canvas sync string (so it recomputes exactly
+  when the child count can have moved).
+- the `:empty` container affordance excludes `.buildrick-page-root`. Empty
+  containers the user placed still get their dashed hint; an empty *page* gets
+  the board's sentence.
+- the CTA is the board's: no plus glyph, no second paragraph, no stacked
+  underlined link. Two chrome-ui Buttons side by side — the old pair were DS
+  Buttons with the DS overridden back out in CSS.
+
+The footer went with it: **"Nothing selected"** replaces "body". 65:2 is the
+only board that draws that slot with an empty selection (52:10, the footer's
+own board, draws a selected element), and "body" contradicted the inspector
+standing next to it. Its test asserted "body" and was rewritten in the same
+commit.
+
+**The sixteenth find, from the same screenshot** — the canvas painted a 20px
+grid **unconditionally**, in `.buildrick-canvas`'s own background-image. The
+canvas toolbar has a Grid toggle that drives a separate overlay, so turning
+Grid **off** left a grid on screen: the control could not do the thing it
+said. No shell board draws a grid. The baked gradient is gone; the toggle is
+now the only thing that draws one — verified both ways (off → clean canvas;
+on → the blue overlay grid, button active).
+
+Carried, not skipped: 65:2's dark first-run coach mark ("Everything you build
+lives behind these six." · Got it, anchored to the rail) is not built. It has
+its own boards in the S1 flow family — S1.1 · coach-dismissed, S1.1b (→
+Templates drawer), S1.1c (→ Insert drawer) — which own its copy, its dismissal
+and what each route opens. Building it here would mean building S1.1 blind to
+those three.
+
 ## Named for the founder — needs a decision or a file I must not stage
 
 **The save chip: board pill vs D7 rule 4.** Board 199:2 (and every shell board)
@@ -1518,6 +1602,16 @@ mean 'your work is not where you think it is'." That is a recorded decision
 from the topbar arc, and it contradicts the board deliberately. Live also reads
 "Saved · just now" where the board has no separator. Both are one call: keep
 D7 rule 4 (and note it on the boards), or conform to the pill.
+
+
+**Does the whole chrome dim while a site loads? (board `65:412`)** The loading
+board greys the rail, the drawer and the inspector, leaving only the canvas
+placeholders at full strength. The canvas and status-bar halves are built (see
+the fourteenth find); the dim is not. Reason to decide rather than just do it:
+every other family's boards draw full-strength chrome, so a global loading dim
+either contradicts them or means each grows a loading variant of its own. The
+load is usually a second or two. Your call: dim, or leave the chrome live and
+let the canvas carry the state.
 
 
 **Time-travel: panel banner or canvas drawer? (board `163:113`)** The board

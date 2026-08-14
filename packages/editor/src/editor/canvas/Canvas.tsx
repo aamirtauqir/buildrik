@@ -13,6 +13,8 @@ import { getElementId } from "../../shared/utils/dragDrop";
 import type { CanvasProps, CanvasRef } from "./Canvas.types";
 import { DEVICE_SIZES } from "./Canvas.types";
 import { CanvasEmptyCTA } from "./CanvasEmptyCTA";
+import { CanvasLoadingSkeleton } from "./CanvasLoadingSkeleton";
+import { useProjectLoading } from "../shell/hooks/useProjectLoading";
 import { CanvasFooterToolbar } from "./CanvasFooterToolbar";
 import { DeviceFramePreview, DeviceFrameToggle } from "./DeviceFramePreview";
 import {
@@ -397,7 +399,25 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     React.useEffect(() => {
       if (content) setEmptyDismissed(false);
     }, [content]);
-    const isCanvasEmpty = !content && !emptyDismissed;
+
+    /* An empty canvas means one of two things and they are opposites: this
+       project has nothing in it, or this project has not arrived yet. Board
+       65:412 draws the second one. Offering "Start building · Browse
+       templates" during a load invites the user to build over the site that
+       is seconds from landing. */
+    const projectLoading = useProjectLoading(composer);
+    /* "Empty" is a page with nothing ON it, not an empty HTML string. Every
+       page owns a root container, so `content` is never falsy once one
+       exists — which meant this CTA rendered for a single frame at boot and
+       then never again. Board 65:2 is a state no user could reach. Keyed on
+       `content` because that string changes on every canvas sync, which is
+       exactly when the child count can have moved. */
+    const pageIsEmpty = React.useMemo(() => {
+      const root = composer?.elements?.getActivePage?.()?.root;
+      return !!root && (root.children?.length ?? 0) === 0;
+    }, [composer, content]);
+    const isCanvasEmpty = pageIsEmpty && !emptyDismissed && !projectLoading;
+    const showLoadingCanvas = pageIsEmpty && projectLoading;
 
     // Toolbar action callbacks (delegated to useCanvasToolbarActions)
     const {
@@ -549,6 +569,8 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
             style={contentStyles}
             dangerouslySetInnerHTML={canvasInnerHtml}
           />
+
+          {showLoadingCanvas && <CanvasLoadingSkeleton />}
 
           {isCanvasEmpty && (
             <CanvasEmptyCTA

@@ -19,7 +19,14 @@ import type { Composer } from "../../../engine";
 
 function makeProps(over: Partial<StudioFooterProps> = {}): StudioFooterProps {
   return {
-    composer: { setZoom: vi.fn() } as unknown as Composer,
+    /* A composer double without an event surface is an incomplete double —
+       the footer subscribes to the project-load state (board 65:412). */
+    composer: {
+      setZoom: vi.fn(),
+      isProjectLoading: () => false,
+      on: vi.fn(),
+      off: vi.fn(),
+    } as unknown as Composer,
     device: "desktop",
     zoom: 100,
     selectedElement: null,
@@ -35,9 +42,12 @@ afterEach(() => {
 
 describe("StudioFooter (board 52:10)", () => {
   // ── left: selection identity ─────────────────────────────────────────────
-  it("no selection → 'body'", () => {
+  // Board 65:2 draws this slot with nothing selected and it reads "Nothing
+  // selected". The old expectation was "body" — an element name for a
+  // selection that does not exist.
+  it("no selection → 'Nothing selected'", () => {
     render(<StudioFooter {...makeProps()} />);
-    expect(screen.getByTestId("footer-selection-label")).toHaveTextContent("body");
+    expect(screen.getByTestId("footer-selection-label")).toHaveTextContent("Nothing selected");
   });
 
   it("selection → '{Type} · {tagName}', shaped like the board's 'Section · Hero'", () => {
@@ -102,6 +112,27 @@ describe("StudioFooter (board 52:10)", () => {
   it("fractional zoom rounds like the board's clean '100%'", () => {
     render(<StudioFooter {...makeProps({ zoom: 99.6 })} />);
     expect(screen.getByTestId("footer-device-zoom")).toHaveTextContent("Desktop · 100%");
+  });
+
+  // ── board 65:412 · Loading ───────────────────────────────────────────────
+  it("says 'Loading…' while the site is still arriving, not 'body'", () => {
+    render(
+      <StudioFooter
+        {...makeProps({
+          composer: {
+            setZoom: vi.fn(),
+            isProjectLoading: () => true,
+            on: vi.fn(),
+            off: vi.fn(),
+          } as unknown as Composer,
+        })}
+      />,
+    );
+    const label = screen.getByTestId("footer-selection-label");
+    expect(label).toHaveTextContent("Loading…");
+    // "Nothing selected" is what a finished load with no selection reports —
+    // the two states must not print the same string.
+    expect(label).not.toHaveTextContent("Nothing selected");
   });
 
   // ── what the board does NOT carry must not render ────────────────────────

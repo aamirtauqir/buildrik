@@ -138,7 +138,11 @@
   font-family: var(--bk-font-ui);
 }
 
-[data-buildrick-type="container"]:empty,
+/* The page root is excluded: an empty PAGE is board 65:2's job — one
+   sentence and two routes into the product — not a 60px dashed box telling
+   someone to drop blocks into a canvas they have not started. Empty
+   containers the user placed themselves still get the affordance. */
+[data-buildrick-type="container"]:not(.buildrick-page-root):empty,
 [data-buildrick-type="columns"]:empty {
   min-height: 60px;
   background: var(--bk-bg-subtle);
@@ -149,7 +153,7 @@
   justify-content: center;
 }
 
-[data-buildrick-type="container"]:empty::after,
+[data-buildrick-type="container"]:not(.buildrick-page-root):empty::after,
 [data-buildrick-type="columns"]:empty::after {
   content: "Drop blocks here or use Quick Add above ↑";
   color: var(--bk-ink-muted);
@@ -331,6 +335,34 @@
   min-height: 480px;
 }
 
+/* Board 65:412 — placeholders down the page column while the site loads.
+   Top-aligned, not centred like the empty-state CTA: these stand in for the
+   sections that are about to land, so they start where the first one will. */
+.bd-canvas-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--bk-space-16);
+  z-index: 5;
+  padding: var(--bk-space-24);
+}
+
+.bd-canvas-loading__bar {
+  width: 100%;
+  flex: none;
+}
+
+/* The shared skeleton grey (gray-100) is tuned for panel rows on white; the
+   pulse takes it to 50% opacity, and at the trough it vanished completely
+   against the canvas page. Measured live: rgb(243,244,246) at 0.50 over
+   white. One step darker survives the trough and still reads as a
+   placeholder. Two classes, so it beats the utility by specificity rather
+   than by whatever order Tailwind happened to emit. */
+.bd-canvas-loading .bk-skeleton {
+  background-color: var(--bk-gray-200);
+}
+
 .bd-canvas-empty-cta {
   position: absolute;
   inset: 0;
@@ -345,61 +377,20 @@
   animation: bd-fade-in 0.4s ease-out;
 }
 
-.bd-canvas-empty-cta__icon {
-  color: var(--bk-ink-muted);
-  margin-bottom: var(--bk-space-16);
-  opacity: 0.6;
-}
-
+/* Board 65:2: one sentence, then the two routes side by side. The button
+   rules that used to live here re-implemented the DS button on top of the DS
+   button — the chrome-ui pair carries its own appearance. */
 .bd-canvas-empty-cta__title {
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--bk-ink);
-  margin: 0 0 var(--bk-space-8);
+  margin: 0 0 var(--bk-space-16);
 }
 
-.bd-canvas-empty-cta__desc {
-  font-size: 14px;
-  color: var(--bk-ink-muted);
-  margin: 0 0 var(--bk-space-24);
-  max-width: 320px;
-  line-height: 1.5;
-}
-
-.bd-canvas-empty-cta__browse {
-  display: inline-flex;
+.bd-canvas-empty-cta__actions {
+  display: flex;
   align-items: center;
-  gap: 6px;
-  padding: var(--bk-space-12) var(--bk-space-20);
-  background: var(--bk-accent);
-  color: var(--bk-bg-card);
-  border: none;
-  border-radius: var(--bk-radius-lg);
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.15s;
-}
-
-.bd-canvas-empty-cta__browse:hover {
-  opacity: 0.9;
-}
-
-.bd-canvas-empty-cta__blank {
-  margin-top: var(--bk-space-12);
-  padding: 6px var(--bk-space-16);
-  background: transparent;
-  color: var(--bk-ink-muted);
-  border: none;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-.bd-canvas-empty-cta__blank:hover {
-  color: var(--bk-ink-soft);
+  gap: var(--bk-space-12);
 }
 
 @keyframes bd-fade-in {
