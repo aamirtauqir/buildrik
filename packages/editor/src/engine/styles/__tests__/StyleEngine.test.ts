@@ -12,14 +12,32 @@ import { getBreakpointQuery } from "@shared/constants/breakpoints";
 import type { BreakpointId } from "@shared/types/breakpoints";
 import type { Element } from "@/engine/elements/Element";
 
-function makeComposer() {
+function makeComposer(device: string = "desktop") {
+  const listeners = new Map<string, Set<(p?: unknown) => void>>();
   return {
-    emit: vi.fn(),
+    emit: vi.fn((event: string, payload?: unknown) => {
+      listeners.get(event)?.forEach((cb) => cb(payload));
+    }),
+    on: vi.fn((event: string, cb: (p?: unknown) => void) => {
+      if (!listeners.has(event)) listeners.set(event, new Set());
+      listeners.get(event)!.add(cb);
+    }),
+    off: vi.fn((event: string, cb: (p?: unknown) => void) => {
+      listeners.get(event)?.delete(cb);
+    }),
     markDirty: vi.fn(),
     elements: {
       getElement: vi.fn(),
     },
-  } as unknown as ConstructorParameters<typeof StyleEngine>[0];
+    viewport: {
+      getDevice: vi.fn(() => device),
+      setDeviceForTest(d: string) {
+        device = d;
+      },
+    },
+  } as unknown as ConstructorParameters<typeof StyleEngine>[0] & {
+    viewport: { getDevice: () => string; setDeviceForTest: (d: string) => void };
+  };
 }
 
 describe("StyleEngine RAF batching", () => {
@@ -223,8 +241,11 @@ function makeComposerHarness() {
   return {
     composer: {
       emit,
+      on: vi.fn(),
+      off: vi.fn(),
       markDirty,
       elements: { getElement },
+      viewport: { getDevice: vi.fn(() => "desktop") },
     } as unknown as ConstructorParameters<typeof StyleEngine>[0],
     emit,
     markDirty,
@@ -1027,5 +1048,84 @@ describe("StyleEngine.inheritStyles", () => {
 
     expect(engine.getStyles("to-el")).toBeUndefined();
     expect(emitsOf(harness.emit, EVENTS.STYLE_INHERITED)).toHaveLength(0);
+  });
+});
+
+/* The editor's device preview is a narrowed canvas in a full-width page —
+   `@media (max-width: …)` never matches in the editor, so a tablet override
+   was stored, exported, and invisible on the canvas claiming to show Tablet
+   (found live 2026-08-14: engine held tablet font-size 28px, canvas rendered
+   the default). flush() re-emits the active breakpoint's rules without their
+   media queries, after the base rules; exports must never see that block. */
+describe("StyleEngine editor device preview", () => {
+  let engine: StyleEngine;
+  let composer: ReturnType<typeof makeComposer>;
+
+  beforeEach(() => {
+    composer = makeComposer("desktop");
+    engine = new StyleEngine(composer);
+    const el = { getData: () => ({}), setBreakpointStyles: vi.fn() } as unknown as Element;
+    (composer.elements.getElement as ReturnType<typeof vi.fn>).mockReturnValue(el);
+  });
+
+  afterEach(() => {
+    engine.destroy();
+  });
+
+  const sheet = () => document.getElementById("aquibra-styles")!.textContent!;
+
+  it("desktop: breakpoint rules stay behind their media queries only", () => {
+    engine.setBreakpointStyle("el-1", "tablet", { "font-size": "28px" });
+    engine.flush();
+
+    const bare = sheet().split("@media")[0];
+    expect(bare).not.toContain("font-size: 28px");
+    expect(sheet()).toContain("@media (max-width: 1023px)");
+  });
+
+  it("tablet: the override is re-emitted un-media'd so the canvas shows it", () => {
+    engine.setBreakpointStyle("el-1", "tablet", { "font-size": "28px" });
+    (composer as unknown as { viewport: { setDeviceForTest: (d: string) => void } }).viewport.setDeviceForTest("tablet");
+    composer.emit(EVENTS.BREAKPOINT_CHANGED, "tablet");
+    engine.flush();
+
+    expect(sheet()).toContain("editor device preview (tablet)");
+    const preview = sheet().split("editor device preview")[1];
+    expect(preview).toContain("font-size: 28px");
+  });
+
+  it("mobile: desktop-first cascade — tablet rules first, then mobile", () => {
+    engine.setBreakpointStyle("el-1", "tablet", { "font-size": "28px" });
+    engine.setBreakpointStyle("el-1", "mobile", { "font-size": "20px" });
+    (composer as unknown as { viewport: { setDeviceForTest: (d: string) => void } }).viewport.setDeviceForTest("mobile");
+    composer.emit(EVENTS.BREAKPOINT_CHANGED, "mobile");
+    engine.flush();
+
+    const preview = sheet().split("editor device preview")[1];
+    expect(preview.indexOf("28px")).toBeGreaterThan(-1);
+    expect(preview.indexOf("20px")).toBeGreaterThan(preview.indexOf("28px"));
+  });
+
+  it("switching back to desktop removes the preview block", () => {
+    engine.setBreakpointStyle("el-1", "tablet", { "font-size": "28px" });
+    const v = (composer as unknown as { viewport: { setDeviceForTest: (d: string) => void } }).viewport;
+    v.setDeviceForTest("tablet");
+    composer.emit(EVENTS.BREAKPOINT_CHANGED, "tablet");
+    engine.flush();
+    expect(sheet()).toContain("editor device preview");
+
+    v.setDeviceForTest("desktop");
+    composer.emit(EVENTS.BREAKPOINT_CHANGED, "desktop");
+    engine.flush();
+    expect(sheet()).not.toContain("editor device preview");
+  });
+
+  it("exported CSS never contains the preview block", () => {
+    engine.setBreakpointStyle("el-1", "tablet", { "font-size": "28px" });
+    (composer as unknown as { viewport: { setDeviceForTest: (d: string) => void } }).viewport.setDeviceForTest("tablet");
+    composer.emit(EVENTS.BREAKPOINT_CHANGED, "tablet");
+
+    expect(engine.toCSS()).not.toContain("editor device preview");
+    expect(engine.generateCSS()).not.toContain("editor device preview");
   });
 });

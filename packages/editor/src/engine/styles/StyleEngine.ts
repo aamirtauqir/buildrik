@@ -33,7 +33,14 @@ export class StyleEngine {
   constructor(composer: Composer) {
     this.composer = composer;
     this.createStyleElement();
+    // The live stylesheet's device-preview block (see flush) depends on the
+    // active device, so a device switch must re-render the sheet.
+    this.composer.on(EVENTS.BREAKPOINT_CHANGED, this.onBreakpointChanged);
   }
+
+  private onBreakpointChanged = (): void => {
+    this.updateStylesheet();
+  };
 
   /**
    * Composite key for rule index lookup
@@ -624,8 +631,37 @@ export class StyleEngine {
    */
   flush(): void {
     if (!this.pendingUpdate || !this.styleElement) return;
-    this.styleElement.textContent = this.toCSS();
+    this.styleElement.textContent = this.toCSS() + this.editorDevicePreviewCSS();
     this.pendingUpdate = false;
+  }
+
+  /**
+   * The editor's device preview is a NARROWED CANVAS in a full-width page, so
+   * `@media (max-width: …)` rules never match inside the editor no matter
+   * which device is active — a tablet font-size override was stored,
+   * exported, and invisible on the canvas that claimed to be showing Tablet.
+   * When a narrow device is active, re-emit that breakpoint's rules without
+   * their media query, appended AFTER the base rules so they win by source
+   * order — the same desktop-first cascade the exported CSS gets from real
+   * media queries (mobile preview applies tablet rules first, then mobile).
+   * Editor-only: exports go through toCSS/generateCSS, which never append
+   * this block.
+   */
+  private editorDevicePreviewCSS(): string {
+    const device = this.composer.viewport?.getDevice();
+    if (device !== "tablet" && device !== "mobile") return "";
+
+    const cascade: BreakpointId[] = device === "tablet" ? ["tablet"] : ["tablet", "mobile"];
+    const out: string[] = [];
+    for (const bp of cascade) {
+      const query = getBreakpointQuery(bp);
+      if (!query) continue;
+      this.styles.forEach((style) => {
+        if (style.mediaQuery === query) out.push(this.generateStyleRule(style));
+      });
+    }
+    if (out.length === 0) return "";
+    return `\n\n/* editor device preview (${device}) — breakpoint rules re-emitted without media queries */\n${out.join("\n")}`;
   }
 
   // ============================================
@@ -727,6 +763,7 @@ export class StyleEngine {
    * Destroy the style engine
    */
   destroy(): void {
+    this.composer.off(EVENTS.BREAKPOINT_CHANGED, this.onBreakpointChanged);
     if (this.rafId !== null) {
       cancelAnimationFrame(this.rafId);
       this.rafId = null;
