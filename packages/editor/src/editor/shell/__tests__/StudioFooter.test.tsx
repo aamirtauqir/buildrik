@@ -112,6 +112,47 @@ describe("StudioFooter (board 52:10)", () => {
     expect(screen.getByTestId("footer-selection-label")).toHaveTextContent(/^Section$/);
   });
 
+  // ── board 66:4 · Multi-select ────────────────────────────────────────────
+  it("a multi-selection is counted, not named after one of its members", () => {
+    const composer = {
+      setZoom: vi.fn(),
+      isProjectLoading: () => false,
+      elements: { getActivePage: () => ({ id: "page-1" }) },
+      selection: { getSelectedIds: () => ["a", "b", "c"] },
+      on: vi.fn(),
+      off: vi.fn(),
+    } as unknown as Composer;
+
+    render(
+      <StudioFooter
+        {...makeProps({
+          composer,
+          // The shell passes ONE element even when three are selected.
+          selectedElement: { id: "a", type: "section", tagName: "div" },
+        })}
+      />,
+    );
+    expect(screen.getByTestId("footer-selection-label")).toHaveTextContent("3 elements selected");
+  });
+
+  it("a single selection is still named, not counted", () => {
+    const composer = {
+      setZoom: vi.fn(),
+      isProjectLoading: () => false,
+      elements: { getActivePage: () => ({ id: "page-1" }) },
+      selection: { getSelectedIds: () => ["a"] },
+      on: vi.fn(),
+      off: vi.fn(),
+    } as unknown as Composer;
+
+    render(
+      <StudioFooter
+        {...makeProps({ composer, selectedElement: { id: "a", type: "section" } })}
+      />,
+    );
+    expect(screen.getByTestId("footer-selection-label")).toHaveTextContent(/^Section$/);
+  });
+
   // ── left: live dims from the canvas DOM ──────────────────────────────────
   it("dims render from the [data-buildrick-id] node when it is in the DOM", () => {
     const node = document.createElement("div");

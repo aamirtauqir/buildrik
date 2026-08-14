@@ -114,6 +114,33 @@ export const StudioFooter: React.FC<StudioFooterProps> = ({
     return loadMapFromStorage(pageId).get(selectedElement.id) ?? null;
   }, [selectedElement, pageId, renamed]);
 
+  /* Board 66:4 (Multi-select): "3 elements selected". The prop carries ONE
+     element — the shell's primary — so a three-element selection printed the
+     name of one of the three, with nothing anywhere in the status bar to say
+     the other two would move with it. The count comes from the engine, which
+     is the only thing that knows. */
+  const [selectionCount, setSelectionCount] = React.useState(0);
+  React.useEffect(() => {
+    if (!composer) return;
+    const sync = () => setSelectionCount(composer.selection?.getSelectedIds?.().length ?? 0);
+    sync();
+    /* SELECTION_ADDED / _REMOVED are the ones multi-select actually fires —
+       addToSelection emits neither SELECTION_CHANGED nor ELEMENT_SELECTED
+       (SelectionManager:70), so a subscription to the obvious two names sees
+       nothing while three elements are selected. */
+    const EVENTS_WATCHED = [
+      EVENTS.SELECTION_CHANGED,
+      EVENTS.SELECTION_ADDED,
+      EVENTS.SELECTION_REMOVED,
+      EVENTS.ELEMENT_SELECTED,
+      EVENTS.SELECTION_CLEARED,
+    ] as const;
+    for (const evt of EVENTS_WATCHED) composer.on(evt, sync);
+    return () => {
+      for (const evt of EVENTS_WATCHED) composer.off(evt, sync);
+    };
+  }, [composer]);
+
   /* "Nothing selected" per board 65:2, which is the only board that draws
      this slot with an empty selection — 52:10, the footer's own board, draws
      a selected element. The previous "body" contradicted the inspector
@@ -121,9 +148,11 @@ export const StudioFooter: React.FC<StudioFooterProps> = ({
      naming an element nobody had chosen. */
   const label = projectLoading
     ? "Loading…"
-    : selectedElement
-      ? `${cap(selectedElement.type)}${customName ? ` · ${customName}` : ""}`
-      : "Nothing selected";
+    : selectionCount > 1
+      ? `${selectionCount} elements selected`
+      : selectedElement
+        ? `${cap(selectedElement.type)}${customName ? ` · ${customName}` : ""}`
+        : "Nothing selected";
   const dims = elementDims(selectedElement?.id);
   const deviceLabel = DEVICE_LABEL[device] ?? cap(device);
 

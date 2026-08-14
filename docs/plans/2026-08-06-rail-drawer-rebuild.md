@@ -1611,6 +1611,28 @@ shortcuts button fully into view), and the visible result is board 199:205's
 own drawer-open drawing: ↶ ↷ · W D T M · Snap Guides · Spacing · Grid · Rulers
 · Badges · X-Ray.
 
+**The nineteenth find** — board 66:4 (Multi-select) puts **"3 elements
+selected"** in the status bar. The footer takes ONE element from the shell —
+the primary — so a three-element selection printed the name of one of the
+three, and nothing anywhere in the status bar said the other two would move
+with it. It now counts from the engine.
+
+The subscription is the part worth writing down: `addToSelection` emits
+**`SELECTION_ADDED`** and nothing else (`SelectionManager:70`) — not
+`SELECTION_CHANGED`, not `ELEMENT_SELECTED`. A listener on the two obvious
+names sees nothing at all while three elements are selected. Both existing
+consumers (`useComposerSelection`, `useLayerSelection`) already knew this and
+subscribe to ADDED/REMOVED; the first version of this fix did not, and the
+live walk said "Heading" with two elements selected. Watched all five names,
+it reads "2 elements selected" as the shift-clicks land.
+
+Observed for the Canvas walk, not fixed here: the first shift-click of that
+walk hit the floating selection toolbar, not the paragraph under it. The
+toolbar renders below the selection when there is no room above (element at
+the top of the page), and there it covers the next element down — so
+shift-clicking two stacked elements fails on the first try. Canvas family
+(1176:4824 owns that toolbar).
+
 A method note, because it nearly produced a false find: driving the selection
 with `element.click()` showed an element selected in the inspector and footer
 with **no selection ring, no label and no toolbar on canvas**. That would have
@@ -1629,6 +1651,17 @@ no-selection, 159:123 multi-select, 160:2 instance) and Canvas (7: 1175:4849
 breadcrumb bar, 1176:4824 inline-edit toolbar, 1176:4925 hover levels). The
 shell board shows them in situ; their own boards own them, and rebuilding from
 the in-situ drawing would pre-empt four boards with one.
+
+**Board 65:211 (Preview) — walked, three deltas handed to the Preview family
+(7 boards), which owns that surface.** Live preview does the main thing right:
+all chrome drops away, the topbar stays, and a Done button sits at the bottom.
+What differs: (1) the board presents the site as a centred page sheet on the
+app background; live renders it edge-to-edge from x=0, (2) the board's Done is
+a dark navy pill ~110×33 at 14px; live's is a 54×32 accent-blue pill at 12px,
+(3) the AI launcher FAB stays on screen over the preview, and the board draws
+nothing but Done. None of the three are shell composition — they are what the
+Preview family's own boards specify — so they are written down here rather than
+guessed at from an in-situ drawing.
 
 Carried, not skipped: 65:2's dark first-run coach mark ("Everything you build
 lives behind these six." · Got it, anchored to the rail) is not built. It has
