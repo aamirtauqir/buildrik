@@ -34,6 +34,8 @@ type ComposerProp = PublishTabProps["composer"];
 function composerWith(entries: Array<{ id: string; label: string; timestamp: number }> = []): ComposerProp {
   return {
     emit: vi.fn(),
+    on: vi.fn(),
+    off: vi.fn(),
     history: { getHistoryStack: () => entries },
     elements: { getAllPages: () => [{ id: "p1" }, { id: "p2" }, { id: "p3" }] },
   } as unknown as ComposerProp;

@@ -32,6 +32,12 @@ function renderTab(ui: React.ReactElement) {
 }
 
 const composer = {
+  /* The panel reads the undo stack and subscribes to the engine's history
+     events to keep "since last deploy" honest — a double without on/off is an
+     incomplete composer, not a reason to guard the hook. */
+  on: vi.fn(),
+  off: vi.fn(),
+  history: { getHistoryStack: () => [] },
   getProjectSettings: () => ({ seo: { metaTitle: "T", metaDescription: "D", ogImage: "img.png" } }),
   pages: { getAll: () => [{ id: "p1" }] },
   elements: { getElement: () => ({ getChildCount: () => 1 }), getActivePage: () => ({ root: { id: "r" } }) },

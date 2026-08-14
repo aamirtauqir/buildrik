@@ -16,6 +16,7 @@
 
 import * as React from "react";
 import type { Composer } from "../../../../engine";
+import { EVENTS } from "../../../../shared/constants/events";
 import { fetchPublishHistory } from "../../../../services/PublishService";
 import type { PublishHistoryRow } from "../../../../services/PublishService";
 
@@ -122,6 +123,27 @@ export function usePublishSnapshot(
     };
   }, [siteId, reloadKey, retry]);
 
+  /* The undo stack is mutable state this hook reads but does not own, so a
+     memo keyed on [composer, lastDeployAt] never recomputed: the panel's
+     "SINCE LAST DEPLOY" count froze at whatever it was when the panel opened,
+     and the section's whole claim is "what would go out if you published
+     NOW". Subscribe to the engine's own history events and re-read. */
+  const [stackVersion, setStackVersion] = React.useState(0);
+  React.useEffect(() => {
+    if (!composer) return;
+    const bump = () => setStackVersion((n) => n + 1);
+    composer.on(EVENTS.HISTORY_RECORDED, bump);
+    composer.on(EVENTS.HISTORY_UNDO, bump);
+    composer.on(EVENTS.HISTORY_REDO, bump);
+    composer.on(EVENTS.HISTORY_CLEARED, bump);
+    return () => {
+      composer.off(EVENTS.HISTORY_RECORDED, bump);
+      composer.off(EVENTS.HISTORY_UNDO, bump);
+      composer.off(EVENTS.HISTORY_REDO, bump);
+      composer.off(EVENTS.HISTORY_CLEARED, bump);
+    };
+  }, [composer]);
+
   const latest = rows?.[0] ?? null;
   const lastDeployAt = latest?.completedAt ? new Date(latest.completedAt).getTime() : null;
 
@@ -138,7 +160,7 @@ export function usePublishSnapshot(
         when: relativeShort(e.timestamp),
         author: (e as { author?: string }).author,
       }));
-  }, [composer, lastDeployAt]);
+  }, [composer, lastDeployAt, stackVersion]);
 
   const pageCount = composer?.elements?.getAllPages?.().length ?? 0;
 

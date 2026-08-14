@@ -61,23 +61,6 @@ export interface PublishTabProps {
 // Sub-components
 // ============================================
 
-const StatusBadge: React.FC<{ isPublished: boolean }> = ({ isPublished }) => (
-  <span
-    aria-label={`Publication status: ${isPublished ? "Published" : "Draft"}`}
-    className={[
-      "tw:inline-flex tw:items-center tw:gap-1.5 tw:px-2.5 tw:py-1 tw:rounded-full",
-      "tw:text-xs tw:font-semibold tw:tracking-[0.02em]",
-      isPublished
-        ? "tw:bg-[var(--bk-success-tint)] tw:text-[var(--bk-success)]"
-        : "tw:bg-[var(--bk-warning-tint)] tw:text-[var(--bk-warning)]",
-    ].join(" ")}
-  >
-    <span
-      className={`tw:size-1.5 tw:rounded-full ${isPublished ? "tw:bg-[var(--bk-success)]" : "tw:bg-[var(--bk-warning)]"}`}
-    />
-    {isPublished ? "Published" : "Draft"}
-  </span>
-);
 
 type CheckStatus = PrePublishChecksResult["checks"][number]["status"];
 
@@ -105,58 +88,6 @@ const STATUS_ICON: Record<CheckStatus, { dot: string; glyph: string; sr: string 
   fail: { dot: "tw:bg-[var(--bk-error)]", glyph: "✕", sr: "blocking" },
 };
 
-const CheckRow: React.FC<{
-  label: string;
-  status: CheckStatus;
-  detail: string;
-  onFix?: () => void;
-  fixLabel?: string;
-  fixHref?: string;
-}> = ({ label, status, detail, onFix, fixLabel, fixHref }) => {
-  const icon = STATUS_ICON[status];
-  return (
-    <div
-      className="tw:flex tw:items-start tw:gap-2 tw:px-2 tw:py-1.5 tw:text-[13px]"
-      aria-label={`${label}: ${icon.sr}. ${detail}`}
-    >
-      <span
-        className={`tw:size-4 tw:mt-0.5 tw:rounded-full tw:flex tw:items-center tw:justify-center tw:flex-none tw:text-[10px] tw:font-bold tw:text-white ${icon.dot}`}
-        aria-hidden="true"
-      >
-        {icon.glyph}
-      </span>
-      <span className="tw:flex tw:flex-col tw:flex-1 tw:min-w-0">
-        <span className="tw:text-[13px] tw:text-[var(--bk-ink-soft)]">{label}</span>
-        {status !== "pass" && (
-          <span className="tw:text-[11px] tw:text-gray-500 tw:leading-snug">{detail}</span>
-        )}
-      </span>
-      {status !== "pass" && fixHref && (
-        <a
-          href={fixHref}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={`tw:flex-none tw:text-[11px] tw:no-underline ${status === "fail" ? "tw:font-semibold" : ""} tw:text-[var(--bk-accent)]`}
-        >
-          {fixLabel} ›
-        </a>
-      )}
-      {status !== "pass" && !fixHref && onFix && (
-        /* chrome-ui Button, not a native <button> — Gate 24 keeps native
-           elements inside chrome-ui. Stripped to a text link so a non-blocking
-           warning never wears a solid-button affordance. */
-        <Button
-          color="light"
-          size="xs"
-          onClick={onFix}
-          className={`tw:flex-none tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[11px] tw:text-[var(--bk-accent)] ${status === "fail" ? "tw:font-semibold" : ""}`}
-        >
-          {fixLabel} ›
-        </Button>
-      )}
-    </div>
-  );
-};
 
 /** The board's row rhythm: label left, value right, one line. */
 const ROW = "tw:flex tw:items-center tw:justify-between tw:gap-3 tw:py-[3px]";

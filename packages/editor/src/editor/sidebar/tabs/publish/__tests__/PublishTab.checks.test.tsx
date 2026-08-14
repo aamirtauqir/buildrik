@@ -50,6 +50,9 @@ type ComposerProp = PublishTabProps["composer"];
 function composerWith(emit = vi.fn()): ComposerProp {
   return {
     emit,
+    on: vi.fn(),
+    off: vi.fn(),
+    history: { getHistoryStack: () => [] },
     getProjectSettings: () => ({
       seo: {
         siteName: "Bella Cucina",
