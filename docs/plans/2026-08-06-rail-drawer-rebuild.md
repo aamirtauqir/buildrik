@@ -1291,6 +1291,38 @@ styles, not novel utilities), and Playwright's default threshold 0.2 calls a
 fails with 66k differing pixels). 19/19 twice. Tranche 2 = live-app surfaces
 (breadcrumb, inline toolbar, shell states) — needs app-state setup per case.
 
+### Phase 0 — risk-class sweep, Insert · Layers · Pages · Content (2026-08-14)
+
+The plan names the class to hunt: overlays, popovers, drawers — clipping and
+z-order. 12 risk-class boards across the four families; walked live.
+
+**Healthy, and worth recording why:** Layers · context-menu escapes its
+`overflow:auto` scroll parent because it is `position: fixed` — forced the
+condition by shrinking the scroll body to 220px, menu bottom overshot the
+clip by 128px and still painted all seven items. Insert's four expanded
+groups render correctly; every row's icon is the same 12px ink-muted square,
+which is the **founder call of 2026-08-06** recorded in GroupSection.tsx (the
+per-element glyph system was retired with it) — the comment is what stopped
+me filing it. Content · collection-setup: 2-step wizard, required-name gate,
+"Next: Add Fields" disabled until valid, Create lands the collection.
+
+**The tenth find** (`75553f06`): Pages · context-menu had NO SURFACE —
+transparent background, no shadow, no radius, the page list legible straight
+through six menu items. chrome-ui's `Menu` is padding and roving focus only;
+the surface comes from the `Popover` that wraps it, and this menu is
+positioned from a right-click so it wraps a bare div instead. All 8 other
+Menu callers were checked — every one is inside a Popover. Fixed with the
+exported `POPOVER_BASE_CLASS` + `tw:!fixed`; pinned and negative-tested.
+
+**Named gap, not a defect:** board `1170:4749` (Content · records) draws a
+688px TABLE — Title/Price/Photo/Updated columns, sample rows, `Import JSON`
++ `+ Add record`. The code's drawer is a 320px drill-in list ("1 record",
+row + chevron), which is right for the drawer and matches the founder's
+standing drill-in rule. The table is a **fullpage Content surface that does
+not exist yet**, and `Import JSON` exists nowhere. That is Content-family
+work in Phase 1, not a Phase 0 fix — building a fullpage surface mid-sweep
+would be scope invented, not scope found.
+
 ## Named for the founder — needs a decision or a file I must not stage
 
 **`ConflictModal` does not match board 66:640, and fixing it needs

@@ -78,6 +78,7 @@ Order by user impact, using each family's boards as the checklist:
 | 6 | AI | 11 | apply contract pinned; states idle→done |
 | 7 | CmdK | 7 | second palette — apply the same board diff as canvas palette |
 | 8 | Compare · Components · Issues · Notifications · Modal · Shell · Exit · Onboarding · Orphans · small | ~40 | small families, batch 2–3 per session |
+| 9 | Content (carried from Phase 0) | 15 | Phase 0 found the drawer correct but board `1170:4749` drawing a 688px fullpage records TABLE (Title/Price/Photo/Updated + `Import JSON`) that has no code home. Fullpage surface + JSON import are the work |
 
 ### Phase 2 — the S-flows (2–3 sessions)
 
