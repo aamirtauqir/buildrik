@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent, cleanup, act } from "@testing-library/react";
+import { render, screen, fireEvent, cleanup, act, waitFor } from "@testing-library/react";
 import { EVENTS } from "@/shared/constants/events";
 import { PageTabBar } from "../PageTabBar";
 import { ToastProvider } from "@/editor/chrome-ui";
@@ -27,6 +27,13 @@ function makePage(over: Partial<PageData>): PageData {
 
 function makeComposer(initialPages: PageData[]) {
   let pages = [...initialPages];
+  /* Lets a test load pages AFTER mount — the real sequence, and the one that
+     hid the whole bar. */
+  const loadPages = (next: PageData[]) => {
+    pages = [...next];
+    activeId = pages[0]?.id ?? null;
+    emit(EVENTS.PROJECT_LOADED, {});
+  };
   let activeId: string | null = pages[0]?.id ?? null;
   const handlers = new Map<string, Set<EventHandler>>();
   const emit = (ev: string, _payload?: unknown) => handlers.get(ev)?.forEach((fn) => fn());
@@ -63,7 +70,7 @@ function makeComposer(initialPages: PageData[]) {
     history: { undo: vi.fn() },
     elements,
   };
-  return { composer: composer as unknown as Composer, elements, history: composer.history };
+  return { composer: composer as unknown as Composer, elements, history: composer.history, loadPages };
 }
 
 const TWO_PAGES = [
@@ -288,5 +295,30 @@ describe("PageTabBar", () => {
       expect(screen.queryByRole("button", { name: "Undo" })).toBeNull();
       expect(history.undo).not.toHaveBeenCalled();
     });
+  });
+});
+
+/* The bar mounts against an empty project and the pages arrive after: the
+   project load emits PROJECT_LOADED, which this component did not listen for,
+   so a plain page load produced NO tab bar at all — it appeared only once some
+   unrelated edit happened to fire PROJECT_CHANGED. Board 435:2348 draws the
+   bar at the canvas foot on every load. */
+describe("PageTabBar — pages that arrive after mount", () => {
+  it("renders once the project finishes loading", async () => {
+    const { composer, loadPages } = makeComposer([]);
+    renderBar(composer);
+
+    // Nothing to show yet — this is the state the bar was stuck in.
+    expect(screen.queryByRole("tab")).toBeNull();
+
+    act(() => {
+      loadPages([
+        makePage({ id: "p-1", name: "Home", isHome: true }),
+        makePage({ id: "p-2", name: "About" }),
+      ]);
+    });
+
+    await waitFor(() => expect(screen.getByText("Home")).toBeInTheDocument());
+    expect(screen.getByText("About")).toBeInTheDocument();
   });
 });

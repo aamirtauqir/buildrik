@@ -81,10 +81,20 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
     /* PROJECT_CHANGED is the whole list: PageManager announces create, delete
        and activate through it with a `type` discriminator (:91, :270, :225).
        The four bare "page:*" names that sat beside it are emitted by nothing —
-       this bar worked only because the one real name was also here. */
+       this bar worked only because the one real name was also here.
+
+       PROJECT_LOADED is the other half, and its absence hid the entire bar.
+       The pages arrive asynchronously: this component mounts against an empty
+       project (`pages.length === 0` → renders null), the project then loads and
+       emits PROJECT_LOADED — which nothing here listened for. So after a plain
+       page load there was no tab bar at all, and it appeared only once some
+       unrelated edit happened to fire PROJECT_CHANGED. Found live 2026-08-14
+       against board 435:2348. */
     composer.on(EVENTS.PROJECT_CHANGED, syncPages);
+    composer.on(EVENTS.PROJECT_LOADED, syncPages);
     return () => {
       composer.off(EVENTS.PROJECT_CHANGED, syncPages);
+      composer.off(EVENTS.PROJECT_LOADED, syncPages);
     };
   }, [composer]);
 
