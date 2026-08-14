@@ -181,6 +181,19 @@ export function CompareView({
             `${summary.pagesDeleted} page${summary.pagesDeleted === 1 ? "" : "s"} removed`}
         </p>
       )}
+      {/* Board 168:82 states the rule in its own annotation: "No panes render —
+          an empty diff view reads as broken." Two ways to land here and they
+          are different facts, so they get different sentences: the panel skips
+          the diff entirely when the clicked version IS the newest (nothing to
+          compare it against), and a computed diff can come back empty. Before
+          this, both rendered a toggle over blank space. */}
+      {mode === "semantic" && changes.length === 0 && (
+        <p className="compare-empty">
+          {compareResult === null
+            ? "This is the newest version — there is nothing later to compare it against."
+            : `Nothing changed since “${version.name}”.`}
+        </p>
+      )}
       {/* Semantic mode — change list */}
       {mode === "semantic" && changes.length > 0 && (
         <div className="diff-change-list">

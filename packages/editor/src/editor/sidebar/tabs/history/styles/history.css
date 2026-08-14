@@ -864,6 +864,16 @@
   color: var(--bk-ink);
 }
 
+/* Board 168:82: an empty diff view reads as broken, so the empty case says
+   which kind of empty it is instead of rendering nothing. */
+.compare-empty {
+  margin: var(--bk-space-8) 0 0;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--bk-ink-muted);
+  text-align: center;
+}
+
 .compare-view {
   padding: var(--bk-space-12);
   margin: var(--bk-space-8) var(--bk-space-8) 0;
