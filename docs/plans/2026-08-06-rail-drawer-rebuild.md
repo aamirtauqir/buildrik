@@ -1236,10 +1236,19 @@ never matched. StyleEngine.flush() now appends the active breakpoint's
 rules un-media'd (editor-only; exports pinned clean). Live: Tablet 28px
 paints, Desktop reverts.
 
+Same batch, continued: **all 7 profiles now verified live** — INPUT
+(typography+border first, "form aesthetics" per the profile comment), MEDIA
+(SIZE-first, no TEXT), FLEX (QUICK→LAYOUT→FLEXBOX→SIZE→SPACING… = exactly
+FLEX_PROFILE), GRID (same with CSS GRID). One self-caught verification
+trap: the Flex/Grid drawer tiles build a parent with three container
+children, and `els.pop()` selects the LAST child — the first "flex profile"
+reading was actually the CONTAINER fallback on Flex Item 3. Select by
+`[data-buildrick-type="flex"]`, not by DOM order. 13/20 inspector states
+done.
+
 Remaining inspector states (need setups): loading, instance-selected,
 bound-to-CMS, pseudo-state, reach-all-like-this, reach-whole-site,
-ai-agent-run, empty·template-applied, token-picker popover, and the
-INPUT/MEDIA/FLEX/GRID profiles.
+ai-agent-run, empty·template-applied, token-picker popover.
 
 ### Phase 0 — T3 tranche 1: pixel pins on the 19 probe surfaces (`59d2c357`)
 
