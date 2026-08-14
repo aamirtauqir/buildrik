@@ -1217,6 +1217,30 @@ live this phase; onboarding-steps accepted from its diff — browser defaults �
 designed values). **31/31, twice consecutively.** T3's snapshot pins now have
 a floor that doesn't wobble.
 
+### Phase 0 — Inspector states walked live 2026-08-14 (9 of 20; 1 engine defect)
+
+Verified live: no-selection (fixed 7bfd50f4), single-selection,
+profile·TEXT (12 sections, heading), profile·CONTAINER (fallback order,
+SIZE-first, no TEXT), profile·BUTTON (TEXT→COLORS→STROKE→CORNER→SPACING→
+SIZE→LAYOUT + LINK SETTINGS + INTERACTIONS promoted — exactly
+BUTTON_PROFILE), multi-select ("2 selected", ALIGN H/V, DISTRIBUTE,
+BATCH EDIT (2)), breakpoint chip (Desktop·1200+ → Tablet·≤1023 live),
+SIZE/LAYOUT split (W/H owned by LAYOUT's ConstraintControl — deliberate,
+verified both halves).
+
+The eighth find (`83a5d3c4`) came from the breakpoint-override board:
+**every responsive edit was invisible in the editor** — stored in
+breakpointStyles, emitted under @media, and the page is 1440px wide; the
+device preview narrows the canvas, not the viewport, so the media query
+never matched. StyleEngine.flush() now appends the active breakpoint's
+rules un-media'd (editor-only; exports pinned clean). Live: Tablet 28px
+paints, Desktop reverts.
+
+Remaining inspector states (need setups): loading, instance-selected,
+bound-to-CMS, pseudo-state, reach-all-like-this, reach-whole-site,
+ai-agent-run, empty·template-applied, token-picker popover, and the
+INPUT/MEDIA/FLEX/GRID profiles.
+
 ### Phase 0 — T3 tranche 1: pixel pins on the 19 probe surfaces (`59d2c357`)
 
 `visual-pins.spec.ts`: toHaveScreenshot per eye-accepted probe surface, same
