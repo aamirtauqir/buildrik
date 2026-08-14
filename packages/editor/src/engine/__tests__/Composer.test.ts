@@ -228,4 +228,21 @@ describe("Composer.importProject — the editor always has a page to insert into
 
     expect(composer.elements.getActivePage()).toBeTruthy();
   });
+
+  /* The page-repair runs inside importProject, and importProject is also how
+     undo/redo restore a snapshot (HistoryManager.restoreSnapshot). A repair
+     that recorded itself would push an entry onto the stack DURING an undo —
+     the classic way an undo stack eats itself. restoreSnapshot sets
+     isRecording=false around the import; this pins that the repair stays
+     inside that window. */
+  it("repairing a page-less snapshot during undo does not grow the history stack", () => {
+    const composer = new Composer({} as any);
+    composer.elements.createPage("Home");
+    const before = composer.history.getHistoryStack().length;
+
+    (composer as any).history.restoreSnapshot({ version: "1.0.0", pages: [] });
+
+    expect(composer.elements.getActivePage()).toBeTruthy();
+    expect(composer.history.getHistoryStack().length).toBe(before);
+  });
 });

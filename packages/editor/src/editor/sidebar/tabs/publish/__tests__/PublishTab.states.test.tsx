@@ -219,3 +219,33 @@ describe("PublishTab — board 781:4489, the deploy service is unreachable", () 
     await waitFor(() => expect(screen.getByText("v2 · live")).toBeTruthy());
   });
 });
+
+/* The panel has three whole-body states that can be true at once. Their order
+   is a product decision, not an accident of JSX nesting: with no publish path,
+   connecting is the only next step, so it outranks a history read that failed;
+   and a failed read outranks sections it cannot speak for. */
+describe("PublishTab — which whole-body state wins", () => {
+  it("no publish path beats an unreachable deploy service", async () => {
+    fetchPublishHistory.mockRejectedValue(new Error("network"));
+    const { container } = renderTab(<PublishTab composer={composerWith()} projectId="site_1" />);
+
+    await waitFor(() => expect(container.textContent).toContain("Connect Vercel to publish."));
+    expect(container.textContent).not.toContain("Couldn't reach the deploy service.");
+  });
+
+  it("an unreachable service beats the sections it cannot speak for", async () => {
+    fetchPublishHistory.mockRejectedValue(new Error("network"));
+    renderTab(
+      <PublishTab
+        composer={composerWith([{ id: "e1", label: "Edit", timestamp: Date.now() }])}
+        projectId="site_1"
+        onVercelPublish={vi.fn()}
+        publishJob={job({ uiState: "failed", error: "boom" })}
+      />,
+    );
+
+    await waitFor(() => expect(screen.getByText("Couldn't reach the deploy service.")).toBeTruthy());
+    expect(screen.queryByText("Publish failed.")).toBeNull();
+    expect(screen.queryByText("Since last deploy")).toBeNull();
+  });
+});

@@ -251,3 +251,30 @@ describe("PublishTab — regression: the local heuristics stay dead", () => {
     expect(fetchPrePublishChecks).not.toHaveBeenCalled();
   });
 });
+
+/* The row this replaced announced severity in words ("SEO configured:
+   warning. No meta title template."). The wizard's row carries severity in a
+   coloured disc, which is nothing at all to a screen reader — so the severity
+   is in the accessible name, and the disc carries an sr-only word. */
+describe("PublishWizard rows — severity is readable, not just visible", () => {
+  it("names the severity and the reason in the accessible name", async () => {
+    fetchPrePublishChecks.mockResolvedValue(result());
+    renderTab(<PublishTab composer={composerWith()} projectId="site_1" onVercelPublish={vi.fn()} />);
+    await openWizard();
+
+    await waitFor(() => expect(screen.getByLabelText(/^Vercel connected: passing/)).toBeTruthy());
+    expect(screen.getByLabelText(/^SEO configured: warning\. No meta title template set\./)).toBeTruthy();
+  });
+
+  it("says blocking, not just red, when a check fails", async () => {
+    const checks = result({ ready: false });
+    checks.checks[0] = { label: "Vercel connected", status: "fail", detail: "Connect it to publish." };
+    fetchPrePublishChecks.mockResolvedValue(checks);
+    renderTab(<PublishTab composer={composerWith()} projectId="site_1" onVercelPublish={vi.fn()} />);
+    await openWizard();
+
+    await waitFor(() =>
+      expect(screen.getByLabelText(/^Vercel connected: blocking\. Connect it to publish\./)).toBeTruthy(),
+    );
+  });
+});

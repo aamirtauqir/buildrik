@@ -49,10 +49,19 @@ const ROW = "tw:flex tw:items-center tw:gap-3 tw:h-9 tw:px-6";
 const BAND =
   "tw:mx-6 tw:my-3 tw:rounded-md tw:bg-[var(--bk-warning-tint)] tw:px-3 tw:py-2.5 tw:text-[13px] tw:text-[var(--bk-warning-text)]";
 
-/** Board 833:4518: 20px disc, green tick for pass, amber bang otherwise. */
+/** Board 833:4518: 20px disc, green tick for pass, amber bang otherwise.
+ *  The disc is the ONLY thing carrying severity visually, so it carries it in
+ *  text too — the row this replaced announced "SEO configured: warning. No
+ *  meta title template", and colour alone would have dropped that for anyone
+ *  not reading pixels. */
+const SR_STATUS: Record<"pass" | "warning" | "fail", string> = {
+  pass: "passing",
+  warning: "warning",
+  fail: "blocking",
+};
+
 const CheckIcon: React.FC<{ status: "pass" | "warning" | "fail" }> = ({ status }) => (
   <span
-    aria-hidden="true"
     className={`tw:flex tw:size-5 tw:flex-none tw:items-center tw:justify-center tw:rounded-full tw:text-[11px] tw:font-semibold tw:text-white ${
       status === "pass"
         ? "tw:bg-[var(--bk-success)]"
@@ -61,7 +70,8 @@ const CheckIcon: React.FC<{ status: "pass" | "warning" | "fail" }> = ({ status }
           : "tw:bg-[var(--bk-warning)]"
     }`}
   >
-    {status === "pass" ? "✓" : "!"}
+    <span aria-hidden="true">{status === "pass" ? "✓" : "!"}</span>
+    <span className="tw:sr-only">{SR_STATUS[status]}</span>
   </span>
 );
 
@@ -146,7 +156,11 @@ export const PublishWizard: React.FC<PublishWizardProps> = ({
 
           {checkState === "ready" &&
             rows.map((c) => (
-              <div key={c.label} className={ROW}>
+              <div
+                key={c.label}
+                className={ROW}
+                aria-label={`${c.label}: ${SR_STATUS[c.status]}.${c.status === "pass" ? "" : ` ${c.detail}`}`}
+              >
                 <CheckIcon status={c.status} />
                 <span className="tw:flex-1 tw:text-[14px] tw:text-[var(--bk-ink)]">{c.label}</span>
                 {c.status !== "pass" && (
