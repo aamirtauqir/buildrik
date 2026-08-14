@@ -175,15 +175,12 @@ export const TimeTravelScrubber: React.FC<TimeTravelScrubberProps> = ({
     parent.appendChild(layer);
     previewLayerRef.current = layer;
 
-    // Small next-frame opacity bump so reduced-motion path still shows instantly.
-    const reveal = () => {
-      layer.style.opacity = "0.4";
-    };
-    if (reducedMotion) {
-      reveal();
-    } else {
-      requestAnimationFrame(reveal);
-    }
+    /* Opacity is driven by the paint effect below, not fixed here: the layer
+       shows a frame of the PAST, and a past frame at 40% over the live canvas
+       is two states superimposed — unreadable as either. With nothing to show
+       it stays fully transparent rather than washing a label across whatever
+       the canvas is displaying (live: "Select a point to preview" printed on
+       top of the canvas empty state, both at 40%). */
 
     return () => {
       // Cleanup: remove DOM node and any pending scrub timers.
@@ -217,16 +214,13 @@ export const TimeTravelScrubber: React.FC<TimeTravelScrubberProps> = ({
       img.style.objectFit = "contain";
       img.style.display = "block";
       layer.appendChild(img);
+      layer.style.opacity = "1";
     } else {
-      const label = document.createElement("div");
-      label.textContent = currentEntry
-        ? `Time-traveling: ${currentEntry.label}`
-        : "Select a point to preview";
-      label.style.fontSize = "14px";
-      label.style.color = "var(--bk-ink-soft)";
-      label.style.fontFamily = "inherit";
-      label.style.padding = "16px";
-      layer.appendChild(label);
+      /* No frame to show — the drawer below already names the state ("No
+         history entries to scrub through", and the entry label while
+         scrubbing). Printing a second label here put it over the canvas's own
+         text at 40% opacity, two sentences in the same place. */
+      layer.style.opacity = "0";
     }
   }, [previewSrc, currentEntry]);
 
