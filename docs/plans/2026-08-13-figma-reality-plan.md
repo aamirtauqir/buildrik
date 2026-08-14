@@ -191,14 +191,15 @@ Synthesized from this review's findings. Run with Claude Code; checkbox as you s
   baseline + triage notes; first run found a real dead listener
   - Surfaced by: Code Quality Issue 3 (3A)
   - Verify: plant one dead listener, scan goes amber
-- [ ] **T3 (P2, human: ~3d / CC: ~1 session)** — conformance — Playwright
-  `toHaveScreenshot` baseline per eye-accepted surface
-  - Surfaced by: Architecture Issue 1 (1A) + probe/portal learnings
-  - Verify: revert breadcrumb z-fix locally → snapshot test fails
-- [ ] **T4 (P2, human: ~30min / CC: ~10min per phase)** — conformance —
-  Re-census page 1:3 at every phase close before any DONE claim
-  - Surfaced by: Test Issue 4 (4A) + boards-json-not-exhaustive (2× burned)
-  - Verify: counts in boards.json match a fresh name-scan
+- [~] **T3 (P2)** — tranche 1 DONE 2026-08-14 (`59d2c357`) — visual-pins.spec.ts,
+  19 probe surfaces, threshold 0.02, negative-tested twice. Tranche 2
+  (live-app surfaces: breadcrumb, inline toolbar, shell states) needs
+  per-case app-state setup — carried into Phase 1
+- [x] **T4 (P2)** — Phase 0 close re-census DONE 2026-08-14 (`a1c7900f`):
+  421 boards / 366 active / 34 families. Section CHILDREN must be scanned —
+  depth-1-only made 51 catalogued boards look deleted. Found 3 new Media
+  boards, one of which was a shipped-but-denied feature (`ff07eaae`).
+  Repeat at every phase close.
 - [x] **T5 (P3)** — DONE 2026-08-13 — protocol in plan + ledger
   - Surfaced by: Architecture Issue 2 (2A)
   - Verify: next session starts without founder action

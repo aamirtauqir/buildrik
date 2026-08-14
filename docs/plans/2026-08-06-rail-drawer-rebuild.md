@@ -1259,6 +1259,27 @@ instance-selected (Templates/Components family), bound-to-CMS +
 reach-all-like-this + reach-whole-site (Content family), ai-agent-run (AI
 family), empty·template-applied (Templates).
 
+### Phase 0 close — T4 re-census (`a1c7900f`) and what it found (`ff07eaae`)
+
+Fresh page-1:3 scan vs boards.json. **Depth-1 frames alone undercount** —
+five SECTIONS hold product boards as children, and scanning only the top
+level made 51 catalogued boards look deleted. Real drift: 3 new Media boards
+(import-url, its invalid state, inline new-folder), 2 uncatalogued
+[superseded] frames, 9 titles that gained explanatory suffixes. Now 421
+boards / 366 active / 34 families.
+
+The ninth find fell straight out of it: `Media · modal · import-url` was
+**already built** — and the picker modal beside it said "Import from URL —
+coming soon … This feature is launching soon", with the footer repeating
+"· From URL launches soon" a third time. A test pinned the placeholder as
+"KNOWN stub, pinned … the feature is inert"; it was inert only there. Fixed
+by sharing one writer (`fetchUrlAsFile` + `isFetchableUrl`), rewriting the
+test, and deleting the footer clause. All three new boards then verified
+live: picker From URL imports a real picsum URL (10.2 KB, 240×160, lands in
+Library), the manager's modal rejects `ftp://nope` with the drawn red reason
+and a disabled Import, and inline new-folder ("Enter to create · Esc to
+cancel") creates the folder.
+
 ### Phase 0 — T3 tranche 1: pixel pins on the 19 probe surfaces (`59d2c357`)
 
 `visual-pins.spec.ts`: toHaveScreenshot per eye-accepted probe surface, same
