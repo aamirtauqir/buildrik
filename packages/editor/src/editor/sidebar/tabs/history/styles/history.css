@@ -540,6 +540,28 @@
   color: var(--bk-ink-muted);
 }
 
+/* Board 163:220 — the restore in flight. Accent wash, not amber: nothing is
+   wrong, something is happening. The second line is the promise the engine
+   keeps (VersionTimelineManager saves the open work before importing). */
+.saves-restoring-notice {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--bk-space-8) var(--bk-space-12);
+  background: var(--bk-accent-tint);
+  border-bottom: 1px solid var(--bk-border);
+  color: var(--bk-accent-text);
+  font-size: 12px;
+}
+
+.saves-restoring-notice strong {
+  font-weight: 600;
+}
+
+.saves-restoring-notice span {
+  color: var(--bk-ink-muted);
+}
+
 .saves-view {
   height: 100%;
   display: flex;

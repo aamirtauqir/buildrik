@@ -240,6 +240,30 @@ export class VersionTimelineManager {
 
     const previousVersionId = this.versions[0]?.id;
 
+    /* Save the current work FIRST. `importProject` clears every element and
+       style before it loads the snapshot, so without this a restore is
+       unrecoverable data loss: the work on screen exists in no version, and
+       nothing listens for VERSION_RESTORED to put it back. Board 163:220
+       states the promise on screen — "Saving your current work as v4 first" —
+       which made it a contract, not a nicety. A failed save aborts the
+       restore; losing the work is the outcome this exists to prevent. */
+    let savedAs: string | null = null;
+    try {
+      const safety = await this.createVersion(
+        `Before restoring "${version.name}"`,
+        "Automatic — the work that was open when a restore was requested.",
+      );
+      savedAs = safety.name;
+    } catch {
+      this.composer.emit(EVENTS.VERSION_LOAD_FAILED, {});
+      return false;
+    }
+
+    this.composer.emit(EVENTS.VERSION_RESTORING, {
+      targetName: version.name,
+      savedAs,
+    });
+
     // Import the snapshot
     this.composer.importProject(deepClone(version.snapshot));
 

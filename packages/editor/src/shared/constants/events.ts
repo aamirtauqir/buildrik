@@ -129,6 +129,9 @@ export const EVENTS = {
   // Version History Events (AQUI-031)
   // ============================================
   VERSION_CREATED: "version:created",
+  /** A restore has begun: the current work is being saved first (board
+      163:220 draws that promise as a banner, so it has to be true). */
+  VERSION_RESTORING: "version:restoring",
   VERSION_RESTORED: "version:restored",
   /** Auto-saves were dropped to stay under maxVersions. Board 163:269 draws
       the notice this makes possible; pruning used to be silent. */
@@ -718,6 +721,7 @@ export interface EventPayloads {
 
   // Version History Events (AQUI-031)
   [EVENTS.VERSION_CREATED]: import("../types/versions").VersionCreatedPayload;
+  [EVENTS.VERSION_RESTORING]: { targetName: string; savedAs: string | null };
   [EVENTS.VERSION_RESTORED]: import("../types/versions").VersionRestoredPayload;
   [EVENTS.VERSION_LOAD_FAILED]: Record<string, never>;
   [EVENTS.VERSION_PRUNED]: { removed: number; kept: number };

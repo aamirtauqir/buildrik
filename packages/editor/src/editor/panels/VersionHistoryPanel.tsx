@@ -89,12 +89,22 @@ export function VersionHistoryPanel({
      (VERSION_PRUNED); this is the notice. Dismissible, and it clears itself on
      the next prune-free session because it is session state, not stored. */
   const [pruned, setPruned] = React.useState<{ removed: number; kept: number } | null>(null);
+  /* Board 163:220 draws the restore in flight, and its second line is the
+     reassurance the engine now actually keeps: the work that was open is
+     saved as its own version before anything is replaced. */
+  const [restoring, setRestoring] = React.useState<{ targetName: string; savedAs: string | null } | null>(null);
   React.useEffect(() => {
     if (!composer) return;
     const onPruned = (p: { removed: number; kept: number }) => setPruned(p);
+    const onRestoring = (p: { targetName: string; savedAs: string | null }) => setRestoring(p);
+    const onRestored = () => setRestoring(null);
     composer.on(EVENTS.VERSION_PRUNED, onPruned);
+    composer.on(EVENTS.VERSION_RESTORING, onRestoring);
+    composer.on(EVENTS.VERSION_RESTORED, onRestored);
     return () => {
       composer.off(EVENTS.VERSION_PRUNED, onPruned);
+      composer.off(EVENTS.VERSION_RESTORING, onRestoring);
+      composer.off(EVENTS.VERSION_RESTORED, onRestored);
     };
   }, [composer]);
 
@@ -266,6 +276,14 @@ export function VersionHistoryPanel({
 
   return (
     <div className="saves-view">
+      {/* Board 163:220 — the restore banner, above the list. */}
+      {restoring && (
+        <div className="saves-restoring-notice" role="status">
+          <strong>Restoring {restoring.targetName}…</strong>
+          {restoring.savedAs && <span>Saving your current work as “{restoring.savedAs}” first.</span>}
+        </div>
+      )}
+
       {pruned && (
         <div className="saves-pruned-notice" role="status">
           <strong>Older auto-saves were removed</strong>
