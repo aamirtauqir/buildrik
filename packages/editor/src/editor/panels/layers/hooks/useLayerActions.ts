@@ -13,6 +13,7 @@
 
 import * as React from "react";
 import type { Composer } from "../../../../engine";
+import { EVENTS } from "../../../../shared/constants/events";
 import type { LayerItem } from "../types";
 import {
   loadSetFromStorage,
@@ -178,20 +179,26 @@ export function useLayerActions(
 
   const saveEditedName = React.useCallback(() => {
     if (editingId) {
+      const trimmed = editingName.trim();
       setCustomNames((prev) => {
         const next = new Map(prev);
-        if (editingName.trim()) {
-          next.set(editingId, editingName.trim());
+        if (trimmed) {
+          next.set(editingId, trimmed);
         } else {
           // Empty input → remove custom name, revert to type label
           next.delete(editingId);
         }
         return next;
       });
+      /* The status bar names the selected element too (board 65:2 / 52:10),
+         and these names live only in this panel's store — without an
+         announcement it would keep showing the old one until something else
+         happened to re-render it. */
+      composer?.emit(EVENTS.ELEMENT_RENAMED, { id: editingId, name: trimmed || null });
     }
     setEditingId(null);
     setEditingName("");
-  }, [editingId, editingName]);
+  }, [editingId, editingName, composer]);
 
   const cancelEditing = React.useCallback(() => {
     setEditingId(null);

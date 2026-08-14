@@ -1584,6 +1584,39 @@ said. No shell board draws a grid. The baked gradient is gone; the toggle is
 now the only thing that draws one — verified both ways (off → clean canvas;
 on → the blue overlay grid, button active).
 
+**The seventeenth find** — board 199:205 (Element selected) and 52:10 both
+print the selection as `{Type} · {name}`: "Section · Hero". The footer printed
+`{Type} · {tagName}`, so a section named Hero read **"Container · div"** — the
+HTML tag, which the user never chose and cannot act on, in the one slot that
+exists to say WHICH element they are holding. Names live in the layers panel's
+per-page store; the footer now reads that same store, so the tree and the
+status bar cannot disagree, and shows the type alone when there is no name
+(what the tree does). A rename had no way to reach anything outside the panel,
+so `ELEMENT_RENAMED` now announces it and the footer takes the event's name
+over the store — the panel persists in an effect, so reading storage in the
+same tick returns the name the user just replaced. Walked live: insert →
+select → Layers → double-click → "Masthead" → Enter, and the status bar reads
+"Container · Masthead" before the panel closes.
+
+A method note, because it nearly produced a false find: driving the selection
+with `element.click()` showed an element selected in the inspector and footer
+with **no selection ring, no label and no toolbar on canvas**. That would have
+been a headline defect. It was the harness: canvas selection runs off
+pointerdown, which a synthetic click event never fires — the inspector was
+showing the selection the INSERT had made, not my click. `live-shot --click
+x,y` now drives a real mouse; with it, the box, handles, label pill and
+breadcrumb all appear.
+
+Deferred by ownership, not skipped: 199:205 also draws the inspector's
+expanded sections (LAYOUT · SPACING · TYPOGRAPHY · BACKGROUND · BORDER ·
+EFFECTS with live values) and the dark selection action bar. Live ships a
+collapsed accordion inspector and a light unified toolbar. Both have dedicated
+families still to walk — Inspector (22 boards: 159:2 single-selection, 159:99
+no-selection, 159:123 multi-select, 160:2 instance) and Canvas (7: 1175:4849
+breadcrumb bar, 1176:4824 inline-edit toolbar, 1176:4925 hover levels). The
+shell board shows them in situ; their own boards own them, and rebuilding from
+the in-situ drawing would pre-empt four boards with one.
+
 Carried, not skipped: 65:2's dark first-run coach mark ("Everything you build
 lives behind these six." · Got it, anchored to the rail) is not built. It has
 its own boards in the S1 flow family — S1.1 · coach-dismissed, S1.1b (→

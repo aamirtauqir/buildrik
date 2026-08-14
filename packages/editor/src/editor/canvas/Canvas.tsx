@@ -413,8 +413,13 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
        `content` because that string changes on every canvas sync, which is
        exactly when the child count can have moved. */
     const pageIsEmpty = React.useMemo(() => {
-      const root = composer?.elements?.getActivePage?.()?.root;
-      return !!root && (root.children?.length ?? 0) === 0;
+      /* getActivePage() hands back PageData — a stored snapshot whose
+         `root.children` is NOT maintained as elements are added (it read
+         empty with a section on the page). The live tree is the Element
+         instances, so resolve the root id through the manager. */
+      const rootId = composer?.elements?.getActivePage?.()?.root?.id;
+      const rootEl = rootId ? composer?.elements?.getElement?.(rootId) : null;
+      return !!rootEl && rootEl.getChildren().length === 0;
     }, [composer, content]);
     const isCanvasEmpty = pageIsEmpty && !emptyDismissed && !projectLoading;
     const showLoadingCanvas = pageIsEmpty && projectLoading;

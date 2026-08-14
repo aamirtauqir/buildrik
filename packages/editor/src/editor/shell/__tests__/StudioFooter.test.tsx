@@ -13,7 +13,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { render, screen, fireEvent, cleanup } from "@testing-library/react";
+import { render, screen, fireEvent, cleanup, act } from "@testing-library/react";
 import { StudioFooter, type StudioFooterProps } from "../StudioFooter";
 import type { Composer } from "../../../engine";
 
@@ -24,6 +24,8 @@ function makeProps(over: Partial<StudioFooterProps> = {}): StudioFooterProps {
     composer: {
       setZoom: vi.fn(),
       isProjectLoading: () => false,
+      /* The footer reads the active page id to look up layer names. */
+      elements: { getActivePage: () => ({ id: "page-1" }) },
       on: vi.fn(),
       off: vi.fn(),
     } as unknown as Composer,
@@ -36,6 +38,7 @@ function makeProps(over: Partial<StudioFooterProps> = {}): StudioFooterProps {
 
 afterEach(() => {
   cleanup();
+  localStorage.clear();
   for (const n of document.querySelectorAll("[data-buildrick-id]")) n.remove();
   window.history.replaceState({}, "", "/");
 });
@@ -50,20 +53,63 @@ describe("StudioFooter (board 52:10)", () => {
     expect(screen.getByTestId("footer-selection-label")).toHaveTextContent("Nothing selected");
   });
 
-  it("selection → '{Type} · {tagName}', shaped like the board's 'Section · Hero'", () => {
+  /* The board's "Section · Hero" is `{Type} · {name}`, and the name is the
+     one the user typed in the layers panel — not the HTML tag. Asserting the
+     tag here is what let "Container · div" ship. */
+  it("selection with a layer name → '{Type} · {name}', the board's 'Section · Hero'", () => {
+    localStorage.setItem("buildrick-layers-page-1-names", JSON.stringify({ "el-1": "Hero" }));
     render(
       <StudioFooter
-        {...makeProps({ selectedElement: { id: "el-1", type: "section", tagName: "hero" } })}
+        {...makeProps({ selectedElement: { id: "el-1", type: "section", tagName: "div" } })}
       />,
     );
-    expect(screen.getByTestId("footer-selection-label")).toHaveTextContent("Section · hero");
+    expect(screen.getByTestId("footer-selection-label")).toHaveTextContent("Section · Hero");
   });
 
-  it("selection without a tagName renders the type alone — no dangling separator", () => {
+  it("an unnamed selection renders the type alone — never the tag name", () => {
     render(
-      <StudioFooter {...makeProps({ selectedElement: { id: "el-1", type: "container" } })} />,
+      <StudioFooter
+        {...makeProps({ selectedElement: { id: "el-1", type: "container", tagName: "div" } })}
+      />,
     );
-    expect(screen.getByTestId("footer-selection-label")).toHaveTextContent(/^Container$/);
+    const label = screen.getByTestId("footer-selection-label");
+    expect(label).toHaveTextContent(/^Container$/);
+    expect(label).not.toHaveTextContent("div");
+  });
+
+  it("a rename lands immediately — the panel persists in an effect, so the event wins", () => {
+    localStorage.setItem("buildrick-layers-page-1-names", JSON.stringify({ "el-1": "Hero" }));
+    const handlers: Record<string, ((p: unknown) => void)[]> = {};
+    const composer = {
+      setZoom: vi.fn(),
+      isProjectLoading: () => false,
+      elements: { getActivePage: () => ({ id: "page-1" }) },
+      on: (e: string, fn: (p: unknown) => void) => {
+        (handlers[e] ??= []).push(fn);
+      },
+      off: vi.fn(),
+    } as unknown as Composer;
+
+    render(
+      <StudioFooter
+        {...makeProps({
+          composer,
+          selectedElement: { id: "el-1", type: "section", tagName: "div" },
+        })}
+      />,
+    );
+    expect(screen.getByTestId("footer-selection-label")).toHaveTextContent("Section · Hero");
+
+    act(() => {
+      handlers["element:renamed"]?.forEach((fn) => fn({ id: "el-1", name: "Masthead" }));
+    });
+    expect(screen.getByTestId("footer-selection-label")).toHaveTextContent("Section · Masthead");
+
+    // Cleared name → back to the type label, no dangling separator.
+    act(() => {
+      handlers["element:renamed"]?.forEach((fn) => fn({ id: "el-1", name: null }));
+    });
+    expect(screen.getByTestId("footer-selection-label")).toHaveTextContent(/^Section$/);
   });
 
   // ── left: live dims from the canvas DOM ──────────────────────────────────
@@ -115,7 +161,7 @@ describe("StudioFooter (board 52:10)", () => {
   });
 
   // ── board 65:412 · Loading ───────────────────────────────────────────────
-  it("says 'Loading…' while the site is still arriving, not 'body'", () => {
+  it("says 'Loading…' while the site is still arriving", () => {
     render(
       <StudioFooter
         {...makeProps({

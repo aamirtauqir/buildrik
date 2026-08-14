@@ -31,6 +31,8 @@ import type { Composer } from "../../engine";
 import type { DeviceType } from "../../shared/types";
 import { Button } from "@/editor/chrome-ui";
 import { useProjectLoading } from "./hooks/useProjectLoading";
+import { loadMapFromStorage } from "../panels/layers/hooks/layersPersistence";
+import { EVENTS } from "../../shared/constants/events";
 
 const DEVICE_LABEL: Partial<Record<DeviceType, string>> = {
   wide: "Wide",
@@ -86,6 +88,32 @@ export const StudioFooter: React.FC<StudioFooterProps> = ({
      finished, genuinely empty page. */
   const projectLoading = useProjectLoading(composer);
 
+  /* Boards 52:10 and 65:2 both print `{Type} · {name}` — "Section · Hero".
+     This printed `{Type} · {tagName}`, so a named section read "Container ·
+     div": the tag, which the user never chose and cannot act on, in the slot
+     meant to say WHICH element they are holding. Names live in the layers
+     panel's per-page store, which is where the layer tree reads them from
+     too, so the two surfaces cannot disagree. */
+  const pageId = composer?.elements?.getActivePage?.()?.id;
+  const [renamed, setRenamed] = React.useState<{ id: string; name: string | null } | null>(null);
+  React.useEffect(() => {
+    if (!composer) return;
+    const onRenamed = (p: { id: string; name: string | null }) => setRenamed(p);
+    composer.on(EVENTS.ELEMENT_RENAMED, onRenamed);
+    return () => {
+      composer.off(EVENTS.ELEMENT_RENAMED, onRenamed);
+    };
+  }, [composer]);
+
+  const customName = React.useMemo(() => {
+    if (!selectedElement || !pageId) return null;
+    /* A rename that just happened wins over the store: the panel persists in
+       an effect, so reading storage in the same tick would return the name
+       the user just replaced. */
+    if (renamed && renamed.id === selectedElement.id) return renamed.name;
+    return loadMapFromStorage(pageId).get(selectedElement.id) ?? null;
+  }, [selectedElement, pageId, renamed]);
+
   /* "Nothing selected" per board 65:2, which is the only board that draws
      this slot with an empty selection — 52:10, the footer's own board, draws
      a selected element. The previous "body" contradicted the inspector
@@ -94,7 +122,7 @@ export const StudioFooter: React.FC<StudioFooterProps> = ({
   const label = projectLoading
     ? "Loading…"
     : selectedElement
-      ? `${cap(selectedElement.type)}${selectedElement.tagName ? ` · ${selectedElement.tagName}` : ""}`
+      ? `${cap(selectedElement.type)}${customName ? ` · ${customName}` : ""}`
       : "Nothing selected";
   const dims = elementDims(selectedElement?.id);
   const deviceLabel = DEVICE_LABEL[device] ?? cap(device);

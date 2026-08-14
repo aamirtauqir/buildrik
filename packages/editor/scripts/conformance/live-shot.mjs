@@ -109,6 +109,17 @@ if (evalSrc) {
   await page.waitForTimeout(1200);
 }
 
+/* A real gesture, not `element.click()`. Canvas selection is driven by
+   pointerdown/mousedown; a synthetic click event reaches neither, so a
+   JS-clicked element can look unselected on canvas while the inspector shows
+   it selected — a tool artifact that reads exactly like a product bug. */
+const clickAt = arg("click");
+if (clickAt) {
+  const [cx, cy] = String(clickAt).split(",").map(Number);
+  await page.mouse.click(cx, cy);
+  await page.waitForTimeout(Number(arg("click-settle", 1200)));
+}
+
 if (out) {
   const opts = { path: out };
   if (clip) {
