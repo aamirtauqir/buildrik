@@ -12,7 +12,7 @@
 
 import * as React from "react";
 import type { PageItem } from "../types";
-import { Menu, MenuItem, MenuSeparator, Portal } from "@/editor/chrome-ui";
+import { Menu, MenuItem, MenuSeparator, POPOVER_BASE_CLASS, Portal } from "@/editor/chrome-ui";
 
 interface Props {
   pageId: string;
@@ -73,10 +73,17 @@ export const PageContextMenu: React.FC<Props> = ({
   };
 
   const menu = (
-    // bd-pg-menu is LOAD-BEARING: usePages' outside-mousedown close guard
-    // checks closest(".bd-pg-menu") — without it every item's mousedown
-    // unmounted the menu before its click could fire.
-    <div ref={menuRef} className="bd-pg-menu" style={style}>
+    /* bd-pg-menu is LOAD-BEARING: usePages' outside-mousedown close guard
+       checks closest(".bd-pg-menu") — without it every item's mousedown
+       unmounted the menu before its click could fire. It carries no styling
+       of its own, which is why this box needs POPOVER_BASE_CLASS: chrome-ui's
+       Menu is padding and roving focus only, and every other caller gets the
+       surface from the Popover wrapping it. Without it this menu painted
+       transparent — six items floating over the page list, its rows legible
+       straight through them.
+       `tw:!fixed` because the shared class is `absolute` and the position is
+       computed from the click, not from an anchor. */
+    <div ref={menuRef} className={`bd-pg-menu ${POPOVER_BASE_CLASS} tw:!fixed`} style={style}>
       <Menu label={`Options for ${page?.name ?? "page"}`} onKeyDown={handleKeyDown}>
         {/* Board 1171:4753 labels — sentence case, ellipsis on the two that
             open something. It draws no shortcut hints; the shortcuts still

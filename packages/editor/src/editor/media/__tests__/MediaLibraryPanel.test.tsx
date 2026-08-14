@@ -128,7 +128,8 @@ describe("MediaLibraryPanel — From URL", () => {
     fireEvent.click(screen.getByTestId("panel-import-url-go"));
 
     await waitFor(() => expect(managerMock.uploadFile).toHaveBeenCalledTimes(1));
-    expect((managerMock.uploadFile.mock.calls[0][0] as File).name).toBe("hero.png");
+    const uploaded = (managerMock.uploadFile.mock.calls as unknown as File[][])[0][0];
+    expect(uploaded.name).toBe("hero.png");
     // An import the user cannot see did not happen.
     await waitFor(() => expect(screen.getByPlaceholderText("Search library…")).toBeInTheDocument());
     vi.unstubAllGlobals();

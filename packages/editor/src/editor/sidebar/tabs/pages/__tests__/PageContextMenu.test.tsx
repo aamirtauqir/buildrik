@@ -118,4 +118,25 @@ describe("PageContextMenu", () => {
     fireEvent.click(screen.getByText("Delete page"));
     expect(onDelete).toHaveBeenCalledWith("p2");
   });
+
+  /* Found live 2026-08-14: this menu painted TRANSPARENT — six items floating
+     over the page list with its rows legible straight through them. chrome-ui's
+     Menu is padding and roving focus only; every other caller gets the surface
+     from the Popover that wraps it, and this one is positioned from a click, so
+     it wraps a bare div instead. jsdom cannot see the missing pixels, so the
+     pin is on the class contract: the box carries the shared popover surface,
+     and `fixed` survives the shared class's `absolute`. */
+  it("wears the shared popover surface, positioned fixed from the click", () => {
+    render(<PageContextMenu pageId="p2" {...baseProps} />);
+    // Portalled to the overlay root — never inside RTL's container.
+    const box = document.querySelector(".bd-pg-menu") as HTMLElement;
+
+    expect(box).toBeTruthy();
+    expect(box.className).toContain("tw:bg-white");
+    expect(box.className).toContain("tw:[box-shadow:var(--bk-shadow-overlay)]");
+    expect(box.className).toContain("tw:rounded-lg");
+    // The surface class ships `absolute`; the menu must stay click-positioned.
+    expect(box.className).toContain("tw:!fixed");
+    expect(box.style.position).toBe("fixed");
+  });
 });
