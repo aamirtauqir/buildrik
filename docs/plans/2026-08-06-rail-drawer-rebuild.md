@@ -1429,6 +1429,58 @@ redeploying ✓, restored ✓, restore-confirm ✓, roll-back confirm ✓.
 the engine half exists (`exportVersions`/`importVersions`, which is why
 VERSION_EXPORTED/IMPORTED have no listeners), the UI half is drawn only.
 
+## Phase 1 — family 2: Publish (2026-08-14, 12 boards)
+
+The panel and its board were different products. Board 641:2652 opens on what
+a publish would DO — ENVIRONMENT (Production/Preview with domains), SINCE LAST
+DEPLOY (a change count, a page count, the changes themselves), LAST DEPLOY
+(v14 · live) — above a pinned "Publish to production". What shipped was a
+Status chip, an inline checklist, an encryption banner, a rocket card
+restating the panel to itself, and a button floating in the scroll body.
+
+Every field the board wanted already existed unread: deploy history, the undo
+stack (filtered to changes AFTER the last deploy — that is the section's whole
+claim), the page list, the published URL. `usePublishSnapshot` reads them.
+
+**States, all board-led:** publishing (784:4250) leads with the run and drops
+the "what would go out" sections; live (784:4326) states the result, links the
+site, compares against the version it replaced, greys the CTA; failed
+(784:4403) says what broke AND that nothing was deployed; loading (778:4238)
+keeps the labels and bars the values; unreachable (781:4489) was actively
+lying — a caught history error rendered as "This site has never been
+published", so the panel asserted "no deploys" when the truth was "we cannot
+tell"; not-connected (784:4480) is one sentence and one action.
+
+**The flow became a gate.** Boards 833:4518 → 914:4507: checklist, then a
+statement of consequence, then the irreversible button. Two steps, not the
+three drawn — board 912:4520 ("Options") carries its own annotation:
+"design-ahead · no backend yet — publishInputSchema carries siteId · pages ·
+acknowledgeStale only… all three controls below are unbacked." Building it
+would have shipped three dead controls.
+
+One interaction changed deliberately: the panel CTA used to disable on a
+blocking check, which locked the user out of the only screen that says why.
+The CTA now always opens the gate; the wizard's Continue is the dead control,
+as drawn.
+
+**A duplicate caught mid-build.** My wizard's Confirm step was a second
+implementation of 914:4507 — the shell's PublishConfirmModal already had it,
+with the real review round and the exporter's page count, while mine guessed
+approval from the job's block reason. Extracted `PublishConfirmFacts`; both
+doors render it. Extracting it also dropped `disabled={pageCount === 0}` by
+accident — a real protection, caught by its own test, restored through an
+`onPageCount` report.
+
+**The two "publish anyway" modals** (1168:4713 stale-approval, 1168:4732
+issues-confirm) had the right data and the wrong presentation. The issues
+modal put every row in ONE amber box with only text colour differing, so an
+error read as a warning — the single distinction it exists to make. Now one
+severity-tinted pill per row.
+
+Not live-verifiable in the standalone demo: pre-checks · blocked and
+issues-confirm need a server that reports a blocking check and a project that
+produces error-level issues. Both are pinned by tests.
+
 ## Named for the founder — needs a decision or a file I must not stage
 
 **Time-travel: panel banner or canvas drawer? (board `163:113`)** The board

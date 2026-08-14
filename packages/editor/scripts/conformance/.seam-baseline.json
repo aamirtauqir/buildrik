@@ -1,8 +1,8 @@
 {
   "listeners-without-emitter": 4,
-  "emit-literal-drift": 130,
+  "emit-literal-drift": 131,
   "duplicate-type-names": 65,
   "discarded-props": 12,
   "silent-defaults": 2,
-  "_triage": "Baseline residuals, triaged 2026-08-13. listeners-without-emitter 4 = PAGE_CHANGED (AquibraStudio \u2014 founder file, fix written in ledger) + RESIZE_START/MOVE/END (scan FP: useCanvasResize listens on ResizeHandler's own emitter, which emits via the emitResizeEvent wrapper \u2014 a variable, not a literal). emit-literal-drift 130 = colon-events outside the EVENTS registry but PAIRED (emitter+listener on the same literal, e.g. inspector:pick-*, comments:*) \u2014 working, just unregistered. duplicate-type-names 65 = triaged in the 08-13 walk; divergent ones fixed, rest benign homonyms/subsets. discarded-props 12 = triaged; the deliberate ones (aria-disabled no-op onClick, ColorPicker live-preview onChange) documented in ledger. silent-defaults 2 = legitimate log-only defaults."
+  "_triage": "Baseline residuals, triaged 2026-08-13. listeners-without-emitter 4 = PAGE_CHANGED (AquibraStudio \u2014 founder file, fix written in ledger) + RESIZE_START/MOVE/END (scan FP: useCanvasResize listens on ResizeHandler's own emitter, which emits via the emitResizeEvent wrapper \u2014 a variable, not a literal). emit-literal-drift 130 = colon-events outside the EVENTS registry but PAIRED (emitter+listener on the same literal, e.g. inspector:pick-*, comments:*) \u2014 working, just unregistered. duplicate-type-names 65 = triaged in the 08-13 walk; divergent ones fixed, rest benign homonyms/subsets. discarded-props 12 = triaged; the deliberate ones (aria-disabled no-op onClick, ColorPicker live-preview onChange) documented in ledger. silent-defaults 2 = legitimate log-only defaults. | 2026-08-14: 130\u2192131. The publish wizard adds one more composer.emit(\"ui:switch-tab\", \u2026). That name is NOT in EVENTS and never was \u2014 22 call sites use the literal, so this is one established seam repeated, not a new one. The real fix is a SWITCH_TAB constant plus a 22-site sweep, which belongs to its own commit."
 }
