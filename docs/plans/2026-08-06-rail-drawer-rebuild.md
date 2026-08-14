@@ -1481,7 +1481,44 @@ Not live-verifiable in the standalone demo: pre-checks · blocked and
 issues-confirm need a server that reports a blocking check and a project that
 produces error-level issues. Both are pinned by tests.
 
+## Phase 1 — family 3: Shell states, started 2026-08-14
+
+**The thirteenth find** (`cb60cc29`): board 435:2348 draws the page tab bar at
+the canvas foot on every load — the live editor had **no tab bar at all after
+a reload**. It mounts against an empty project (renders null at zero pages),
+the project then loads and emits PROJECT_LOADED, and the bar listened for
+PROJECT_CHANGED only. It appeared as soon as any unrelated edit fired that
+event, which is why it looked present all session: I had been inserting
+elements. Measured before the fix: engine 1 page, bar 0 nodes; emitting
+project:changed by hand made it appear. Every existing test seeded pages
+before render — which is exactly how a bar that never appears passes 18 tests.
+
+Board 435:2348 then walked end to end, and everything else on it holds:
+context menu opens ABOVE the bar (Rename · Duplicate · Set as home · Delete in
+red — Delete correctly absent with a single page), the delete confirm carries
+the board's sentence verbatim ("This page and everything on it is removed. You
+can undo this from the toast that follows"), the toast's Undo genuinely
+restores the page ("Home | +" → "Home | About | +"), and the rename validation
+copy matches word for word: "Page name is required" and "Short name — consider
+3+ characters".
+
+Settled by the same board: shell board 199:409 draws page tabs at the TOP of
+the canvas, but 435:2348 — the dedicated board, which names PageTabBar.tsx in
+its own title — annotates "bar sits at the canvas foot". The dedicated board
+wins; the code was already right.
+
 ## Named for the founder — needs a decision or a file I must not stage
+
+**The save chip: board pill vs D7 rule 4.** Board 199:2 (and every shell board)
+draws "Saved 2m ago" as a GREEN TINTED PILL. The code renders it as plain muted
+text with a coloured dot, and says why in a comment: "T8/D7 rule 4 — text-first:
+saved · saving · unsaved are plain muted text on no surface… Only offline,
+error (and conflict) earn a tinted pill, because they are the only ones that
+mean 'your work is not where you think it is'." That is a recorded decision
+from the topbar arc, and it contradicts the board deliberately. Live also reads
+"Saved · just now" where the board has no separator. Both are one call: keep
+D7 rule 4 (and note it on the boards), or conform to the pill.
+
 
 **Time-travel: panel banner or canvas drawer? (board `163:113`)** The board
 draws the preview state as a banner INSIDE the Versions panel — "Previewing
