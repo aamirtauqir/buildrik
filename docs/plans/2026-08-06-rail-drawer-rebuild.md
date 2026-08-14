@@ -1354,6 +1354,27 @@ Also settled by reading the service: `getPublishHistory` returns only
 in that list. The boards agree — they draw modals, not rows. Behaviour →
 code contract; visual → board; both honoured.
 
+`1abf52dd` — **the twelfth find, and the worst**: `restoreVersion` called
+`importProject` directly, and `importProject` CLEARS every element and style
+before loading the snapshot. Restoring a version destroyed whatever was open,
+saved or not. No version held it; undo does not cover it; `VERSION_RESTORED`
+carries `previousVersionId` but **nothing in the product listens to that
+event**, so nobody could offer the work back. Board 163:220 states the
+promise on screen — "Restoring v3… / Saving your current work as v4 first" —
+and the code simply never did it.
+
+Now: a safety version is created FIRST (named "Before restoring \"X\""), and a
+failed safety save ABORTS the restore rather than proceeding best-effort —
+losing the work is precisely what this prevents. New `VERSION_RESTORING`
+event drives the board's banner. Pins assert the ORDER as a sequence (save →
+import), not two independent facts, plus the abort path. Verified live: the
+safety version appears in the list carrying the work.
+
+Saves states also walked live this batch: restore-confirm (dialog names the
+version), restore runs and lands, restoring banner (injected — a local
+IndexedDB restore completes in the same tick, so the state is real but
+flashes).
+
 ## Named for the founder — needs a decision or a file I must not stage
 
 **`ConflictModal` does not match board 66:640, and fixing it needs
