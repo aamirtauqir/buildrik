@@ -101,17 +101,21 @@ describe("PublishTab — canonical publish wiring (B1)", () => {
     const { container, getByText } = renderTab(
       <PublishTab composer={composer} publishJob={makeJob({ uiState: "published", publishedUrl: "https://x.vercel.app" })} onVercelPublish={vi.fn()} />
     );
-    expect(getByText("Update production")).toBeTruthy();
+    expect(getByText("Publish to production")).toBeTruthy();
     expect(container.textContent).toContain("x.vercel.app");
   });
 
-  // codex review P2: a FAILED republish of an already-live site must NOT read
-  // as Draft — live-state is durable (publishedUrl), not the transient job state.
-  it("stays 'published' (Update) after a failed republish while a deployment is still live", () => {
-    const { getByText, queryByText } = renderTab(
+  /* codex review P2: a FAILED republish of an already-live site must NOT read
+     as Draft — live-state is durable (publishedUrl), not the transient job
+     state. The assertion moved from the CTA label to the live URL: the boards
+     use ONE label in every state (641:2652, 784:4326), so the button no longer
+     carries this distinction. What must survive a failed republish is the fact
+     that a deployment is still serving. */
+  it("a failed republish leaves the live deployment on screen", () => {
+    const { container } = renderTab(
       <PublishTab composer={composer} publishJob={makeJob({ uiState: "failed", publishedUrl: "https://x.vercel.app", error: "deploy failed" })} onVercelPublish={vi.fn()} />
     );
-    expect(getByText("Update production")).toBeTruthy();
-    expect(queryByText("Publish to production")).toBeNull();
+    expect(container.textContent).toContain("x.vercel.app");
+    expect(container.textContent).toContain("deploy failed");
   });
 });

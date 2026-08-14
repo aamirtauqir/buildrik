@@ -35,14 +35,16 @@ export interface PublishSnapshot {
   changes: PublishChange[];
   changeCount: number;
   pageCount: number;
-  lastDeploy: { version: number; when: string; isLive: boolean } | null;
+  /** `rawAt` is the timestamp itself — board 784:4326 prints it relatively
+      ("just now"), board 641:2652 absolutely ("2 Jul, 14:22"). */
+  lastDeploy: { version: number; when: string; rawAt: string | Date | null; isLive: boolean } | null;
   loading: boolean;
 }
 
 /** "2m" / "41m" / "3h" / "2 Jul" — the board's own scale. */
-export function relativeShort(ts: number | string | null | undefined): string {
+export function relativeShort(ts: number | string | Date | null | undefined): string {
   if (ts === null || ts === undefined) return "";
-  const then = typeof ts === "number" ? ts : Date.parse(ts);
+  const then = ts instanceof Date ? ts.getTime() : typeof ts === "number" ? ts : Date.parse(ts);
   if (Number.isNaN(then)) return "";
   const secs = Math.max(0, Math.floor((Date.now() - then) / 1000));
   if (secs < 60) return "just now";
@@ -78,6 +80,8 @@ export function usePublishSnapshot(
   composer: Composer | null,
   siteId: string | null,
   publishedUrl: string | null,
+  /** Bump to re-read history — a finished publish changes every field here. */
+  reloadKey: unknown = null,
 ): PublishSnapshot {
   const [rows, setRows] = React.useState<PublishHistoryRow[] | null>(null);
   const [loading, setLoading] = React.useState(true);
@@ -99,7 +103,7 @@ export function usePublishSnapshot(
     return () => {
       alive = false;
     };
-  }, [siteId]);
+  }, [siteId, reloadKey]);
 
   const latest = rows?.[0] ?? null;
   const lastDeployAt = latest?.completedAt ? new Date(latest.completedAt).getTime() : null;
@@ -131,7 +135,7 @@ export function usePublishSnapshot(
     changeCount: changes.length,
     pageCount,
     lastDeploy: latest
-      ? { version: latest.version, when: deployStamp(latest.completedAt), isLive: true }
+      ? { version: latest.version, when: deployStamp(latest.completedAt), rawAt: latest.completedAt, isLive: true }
       : null,
     loading,
   };

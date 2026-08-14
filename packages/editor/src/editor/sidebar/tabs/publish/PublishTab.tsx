@@ -15,7 +15,7 @@ import type { UsePublishJobResult } from "../../../shell/hooks/usePublishJob";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { PublishHistory } from "../../../shell/PublishHistory";
 import { fetchPrePublishChecks } from "../../../../services/PublishService";
-import { usePublishSnapshot } from "./usePublishSnapshot";
+import { relativeShort, usePublishSnapshot } from "./usePublishSnapshot";
 import { PublishWizard } from "./PublishWizard";
 import { getSiteIdFromUrl } from "../../../../services/BuildrikSyncProvider";
 import {
@@ -254,10 +254,13 @@ export const PublishTab: React.FC<PublishTabProps> = ({
 
   // Board 641:2652's three sections, every field read from what the editor
   // already owns (deploy history, undo stack, page list).
-  const snapshot = usePublishSnapshot(composer, siteId, publishedUrl);
+  const snapshot = usePublishSnapshot(composer, siteId, publishedUrl, publishJob?.uiState);
   /* Board 833:4518 / 914:4507: publishing runs through a stepped modal, so the
      panel's CTA opens the gate rather than firing the deploy. */
   const [wizardOpen, setWizardOpen] = React.useState(false);
+  /* Board 784:4326 is the just-published panel: the result leads and the
+     "what would go out" sections are empty by definition. */
+  const justPublished = publishJob?.uiState === "published" && snapshot.changeCount === 0;
 
   /* Board 784:4250 prints how long the run has been going. The job reports
      progress, not a start time, so the panel stamps the transition into
@@ -355,6 +358,42 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           </section>
         ) : (
         <>
+        {/* Board 784:4326 — the moment after a publish: what went out, where
+            to see it, and what changed against the version it replaced. */}
+        {justPublished && (
+          <section className={SECTION} aria-label="Publish result">
+            <h2 className="tw:m-0 tw:text-[15px] tw:font-semibold tw:text-[var(--bk-success-text)]">
+              Published to production.
+            </h2>
+            <p className={META}>
+              {snapshot.lastDeploy ? `v${snapshot.lastDeploy.version} · live · ` : ""}
+              {snapshot.lastDeploy ? relativeShort(snapshot.lastDeploy.rawAt) : "just now"}
+            </p>
+            <div className="tw:mt-1 tw:flex tw:items-center tw:gap-4">
+              {publishedUrl && (
+                <a
+                  href={publishedUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="tw:text-[13px] tw:text-[var(--bk-accent)] tw:no-underline"
+                >
+                  View live site
+                </a>
+              )}
+              {snapshot.lastDeploy && snapshot.lastDeploy.version > 1 && (
+                <Button
+                  color="light"
+                  size="xs"
+                  onClick={() => composer?.emit("ui:switch-tab", { tab: "history" })}
+                  className="tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[13px] tw:text-[var(--bk-accent)]"
+                >
+                  Compare v{snapshot.lastDeploy.version - 1} → v{snapshot.lastDeploy.version}
+                </Button>
+              )}
+            </div>
+          </section>
+        )}
+
         {/* Board 784:4250 — while a publish runs, the panel leads with the run
             itself and drops the "what would go out" sections: they describe a
             publish the user has already started. ENVIRONMENT stays, because
@@ -392,7 +431,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
         {/* Board 641:2652 — what would go out if you published now. The count
             pair is the header; the rows are the changes themselves. Absent
             during a run (board 784:4250 drops it). */}
-        {!isPublishing && (
+        {!isPublishing && !justPublished && (
         <section className={SECTION} aria-label="Since last deploy">
           <div className={ROW}>
             <h3 className={SECTION_TITLE}>Since last deploy</h3>
@@ -423,7 +462,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
 
         {/* Board 641:2652 — what is live right now, and therefore what a
             rollback would return to. */}
-        {!isPublishing && (
+        {!isPublishing && !justPublished && (
         <section className={SECTION} aria-label="Last deploy">
           <h3 className={SECTION_TITLE}>Last deploy</h3>
           {snapshot.lastDeploy ? (
@@ -525,10 +564,16 @@ export const PublishTab: React.FC<PublishTabProps> = ({
                    user out of the one screen that says WHY they are blocked.
                    The wizard's "Continue to Confirm" is the dead control now,
                    which is what the board draws. */
-                disabled={isPublishing}
+                /* Board 784:4326 greys the CTA right after a deploy: with no
+                   pending change there is nothing to publish. */
+                disabled={isPublishing || justPublished}
                 className="tw:w-full"
               >
-                {isPublishing ? (isPublished ? "Updating…" : "Publishing…") : isPublished ? "Update production" : "Publish to production"}
+                {/* One label, in every state. Board 641:2652 and 784:4326 both name the
+                    destination and neither draws an "Update" variant — the
+                    publish/update distinction is one the boards deliberately do not
+                    make, and the disabled state already says "nothing to send". */}
+                {isPublishing ? "Publishing…" : "Publish to production"}
               </Button>
               {blockedByChecks && !isPublishing && (
                 <p className="tw:m-0 tw:text-[11px] tw:text-[var(--bk-error)] tw:leading-[1.4]">
