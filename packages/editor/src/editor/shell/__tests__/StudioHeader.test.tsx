@@ -334,7 +334,7 @@ describe("StudioHeader", () => {
       expect(screen.getByText("error two")).toBeTruthy();
       expect(screen.getByText("warn one")).toBeTruthy();
       expect(screen.queryByText("warn three")).toBeNull();
-      fireEvent.click(screen.getByRole("button", { name: "+2 more" }));
+      fireEvent.click(screen.getByRole("button", { name: "+2 more warnings" }));
       expect(onOpenIssues).toHaveBeenCalled();
       expect(screen.queryByRole("dialog")).toBeNull();
     });
@@ -357,10 +357,11 @@ describe("StudioHeader", () => {
       expect(screen.queryByText(/review round is open/)).toBeNull();
     });
 
-    it("'Review issues first' is the safe door — panel opens, nothing publishes", () => {
+    /* Board 1168:4732 names the door by what it does: "Fix issues first". */
+    it("'Fix issues first' is the safe door — panel opens, nothing publishes", () => {
       const { onVercelPublish, onOpenIssues } = setup([err("1", "x")]);
       fireEvent.click(screen.getByRole("button", { name: "Publish anyway" }));
-      fireEvent.click(screen.getByRole("button", { name: "Review issues first" }));
+      fireEvent.click(screen.getByRole("button", { name: "Fix issues first" }));
       expect(onOpenIssues).toHaveBeenCalled();
       expect(onVercelPublish).not.toHaveBeenCalled();
     });

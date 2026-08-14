@@ -129,17 +129,26 @@
   align-items: flex-start;
   gap: var(--bk-space-4);
   margin: 0 var(--bk-space-24) var(--bk-space-8);
-  padding: var(--bk-space-8) var(--bk-space-12);
-  border-radius: var(--bk-radius-md);
-  background: var(--bk-warning-tint);
+  padding: 0;
 }
+/* Board 1168:4732: one tinted pill PER row, severity-coloured. The list used
+   to be a single amber box with coloured text inside, so an error read as a
+   warning — the one distinction this modal exists to make. */
 .bk-pubconfirm__row {
   margin: 0;
+  padding: var(--bk-space-8) var(--bk-space-12);
+  border-radius: var(--bk-radius-md);
   font-size: var(--bk-text-12);
   line-height: var(--bk-leading-normal);
 }
-.bk-pubconfirm__row--error { color: var(--bk-error-text); }
-.bk-pubconfirm__row--warning { color: var(--bk-warning-text); }
+.bk-pubconfirm__row--error {
+  color: var(--bk-error-text);
+  background: var(--bk-error-tint);
+}
+.bk-pubconfirm__row--warning {
+  color: var(--bk-warning-text);
+  background: var(--bk-warning-tint);
+}
 
 /* ── F1 exit dialog ─────────────────────────────────────────────────────── */
 .bk-exit-dialog__error {

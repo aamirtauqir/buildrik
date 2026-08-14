@@ -69,19 +69,24 @@ afterEach(() => cleanup());
 describe("StaleApprovalModal", () => {
   it("names the reviewer and itemizes the changed pages (edited + added, not unchanged)", async () => {
     mount();
-    expect(await screen.findByText(/Publish work Sara hasn’t seen\?/)).toBeInTheDocument();
+    expect(await screen.findByText(/The approval is older than your latest edits/)).toBeInTheDocument();
     await waitFor(() => expect(screen.getByText("Home")).toBeInTheDocument());
     expect(screen.getByText("edited")).toBeInTheDocument();
     expect(screen.getByText("added")).toBeInTheDocument();
     expect(screen.queryByText(/menu/i)).toBeNull();
-    expect(screen.getByText(/2 things changed after that/)).toBeInTheDocument();
+    /* Board 1168:4713 phrases it as a consequence, not a count in isolation:
+       "since then, N things changed. Publishing now would go live with work
+       the client hasn't seen." */
+    expect(screen.getByText(/since then, 2 things changed/)).toBeInTheDocument();
+    expect(screen.getByText(/would go live with work the client/)).toBeInTheDocument();
+    expect(screen.getByText("Changed since approval")).toBeInTheDocument();
   });
 
   it("re-sends a fresh round to the same client and closes", async () => {
     const onClose = vi.fn();
     mount({ onClose });
     await screen.findByText(/2 things changed/);
-    fireEvent.click(screen.getByRole("button", { name: "Re-send for approval" }));
+    fireEvent.click(screen.getByRole("button", { name: "Request fresh review" }));
     await waitFor(() => expect(submitForReview).toHaveBeenCalledTimes(1));
     const [, changeSummary, email] = submitForReview.mock.calls[0];
     expect(changeSummary).toBe("Re-send after 2 changes");

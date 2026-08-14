@@ -131,52 +131,48 @@ export const StaleApprovalModal: React.FC<StaleApprovalModalProps> = ({
   return (
     <ModalRoot open={isOpen} onOpenChange={(o) => !o && onClose()}>
       <ModalContent size="lg" srTitle="Publish un-approved changes?">
-        <ModalTitle>Publish work {name} hasn&rsquo;t seen?</ModalTitle>
-        <p style={{ fontSize: 13, color: "var(--bk-ink-muted)", margin: "8px 0 12px" }}>
+        {/* Board 1168:4713. The title states the FACT (the approval is stale),
+            not a question about the client — the question is the buttons. */}
+        <ModalTitle>The approval is older than your latest edits</ModalTitle>
+        <p className="tw:my-2 tw:mb-3 tw:text-[13px] tw:leading-normal tw:text-[var(--bk-ink-muted)]">
           {round?.reviewerName ?? "Your client"} approved round {round?.roundNumber ?? "—"}
-          {approvedOn(round)}.{" "}
+          {approvedOn(round)}
           {changed == null
-            ? "Comparing with the approved version…"
+            ? " — comparing with the approved version…"
             : changed.length === 0
-              ? "The changes since couldn't be itemized — publishing still ships them."
-              : `${changed.length} thing${changed.length === 1 ? "" : "s"} changed after that:`}
+              ? " — the changes since couldn't be itemized."
+              : ` — since then, ${changed.length} ${changed.length === 1 ? "thing" : "things"} changed.`}
+          {" "}
+          Publishing now would go live with work the client hasn&rsquo;t seen.
         </p>
         {changed != null && changed.length > 0 && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 12 }}>
-            {changed.slice(0, 6).map((c) => (
-              <div
-                key={`${c.kind}-${c.path}`}
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  background: "var(--bk-warning-tint)",
-                  border: "1px solid var(--bk-warning-text)",
-                  borderRadius: "var(--bk-radius-sm)",
-                  padding: "8px 10px",
-                  fontSize: 12,
-                }}
-              >
-                <span style={{ color: "var(--bk-ink)", fontWeight: 500, textTransform: "capitalize" }}>
-                  {pageLabel(c.path)}
-                </span>
-                <span style={{ color: "var(--bk-warning-text)" }}>{c.kind}</span>
-              </div>
-            ))}
-            {changed.length > 6 && (
-              <div style={{ fontSize: 11, color: "var(--bk-ink-muted)" }}>
-                and {changed.length - 6} more
-              </div>
-            )}
-          </div>
+          <>
+            <p className="tw:m-0 tw:mb-1.5 tw:text-[11px] tw:font-medium tw:uppercase tw:tracking-[0.04em] tw:text-[var(--bk-ink-muted)]">
+              Changed since approval
+            </p>
+            <div className="tw:mb-3 tw:flex tw:flex-col tw:gap-1.5">
+              {changed.slice(0, 6).map((c) => (
+                <div
+                  key={`${c.kind}-${c.path}`}
+                  className="tw:flex tw:items-center tw:gap-2 tw:rounded-[var(--bk-radius-sm)] tw:bg-[var(--bk-warning-tint)] tw:px-2.5 tw:py-2 tw:text-[12px]"
+                >
+                  <span className="tw:font-medium tw:capitalize tw:text-[var(--bk-warning-text)]">
+                    {pageLabel(c.path)}
+                  </span>
+                  <span className="tw:text-[var(--bk-ink-muted)]">{c.kind}</span>
+                </div>
+              ))}
+              {changed.length > 6 && (
+                <div className="tw:text-[11px] tw:text-[var(--bk-ink-muted)]">
+                  and {changed.length - 6} more
+                </div>
+              )}
+            </div>
+          </>
         )}
-        <p style={{ fontSize: 12, color: "var(--bk-ink-muted)", margin: "0 0 4px" }}>
-          {name === "your client" ? "The" : `${name}’s`} approval still stands — publishing
-          now just ships these on top of it.
-        </p>
         <ModalFooter>
           <Button color="light" size="xs" disabled={resending} onClick={() => void handleResend()}>
-            {resending ? "Re-sending…" : "Re-send for approval"}
+            {resending ? "Requesting…" : "Request fresh review"}
           </Button>
           <Button
             size="xs"

@@ -670,9 +670,26 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
             <ModalTitle id="bk-pubconfirm-title">
               Publish with {plural(errorCount, "error")}?
             </ModalTitle>
+            {/* Board 1168:4732 states the consequence, not the options — the
+                options are the two buttons. */}
+            <ModalDescription>
+              These will ship to every visitor exactly as they are now.
+              {reviewStatus.state !== "none"
+                ? ` A review round is open — ${reviewStatus.reviewerName ?? "your reviewer"} will see the published site.`
+                : ""}
+            </ModalDescription>
             <div className="bk-pubconfirm__list">
               {confirmRows.map((i) => (
+                /* Each row carries its OWN severity tint. They used to share
+                   one amber box with only the text colour differing, which
+                   dressed an error as a warning — the single distinction the
+                   modal exists to make. */
                 <p key={i.id} className={`bk-pubconfirm__row bk-pubconfirm__row--${i.type}`}>
+                  <span aria-hidden="true">{i.type === "error" ? "●" : "▲"}</span>{" "}
+                  {/* `location` is the human "where" the Issue shape already
+                      carries ("Brand › color.accent"); `pageId` is an id and
+                      would print as one. */}
+                  {i.location ? `${i.location} · ` : ""}
                   {i.message || `A ${i.type} will go live exactly as it looks now.`}
                 </p>
               ))}
@@ -685,16 +702,10 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
                     onOpenIssues?.();
                   }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
                 >
-                  +{confirmMore} more
+                  +{plural(confirmMore, "more warning")}
                 </Button>
               ) : null}
             </div>
-            <ModalDescription>
-              You can review the issues first, or publish and fix later.
-              {reviewStatus.state !== "none"
-                ? ` A review round is open — ${reviewStatus.reviewerName ?? "your reviewer"} will see the published site.`
-                : ""}
-            </ModalDescription>
             <ModalFooter>
               <Button
                 color="light"
@@ -704,7 +715,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
                   onOpenIssues?.();
                 }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
               >
-                Review issues first
+                Fix issues first
               </Button>
               <Button
                 onClick={() => {
