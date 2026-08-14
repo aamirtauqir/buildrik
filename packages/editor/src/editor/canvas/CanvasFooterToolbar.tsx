@@ -138,9 +138,18 @@ const EDIT_BTN =
 
 /** The floating bar itself. maxWidth/minWidth/overflow keep it inside the
  *  canvas column when the inspector opens — without them it ran ~276px under
- *  the inspector at 1440 and hid controls behind another panel. */
+ *  the inspector at 1440 and hid controls behind another panel.
+ *
+ *  `justify-start`, NOT `justify-center`: a centred flex row that overflows
+ *  spills equally off BOTH ends, and the spill off the start cannot be
+ *  scrolled back to — scrollLeft has no negative side. Measured at 1440 with a
+ *  drawer open: bar 758px, content 855px, and undo, redo and the Wide device
+ *  button sat at x=300..367 against a bar starting at x=380. They rendered,
+ *  they were focusable, and no pointer could ever reach them. Anchored at the
+ *  start, the overflow goes to the end, where the scroll can follow it — which
+ *  is also how board 199:205 draws the bar with a drawer open. */
 const BAR =
-  "tw:flex tw:items-center tw:justify-center tw:gap-3 tw:h-10 tw:px-4 tw:py-2 tw:rounded-lg " +
+  "tw:flex tw:items-center tw:justify-start tw:gap-3 tw:h-10 tw:px-4 tw:py-2 tw:rounded-lg " +
   "tw:border tw:border-gray-200 tw:bg-white tw:[box-shadow:var(--bk-shadow-drag)] " +
   "tw:whitespace-nowrap tw:max-w-full tw:min-w-0 tw:overflow-x-auto";
 const GROUP = "tw:flex tw:items-center tw:gap-1";

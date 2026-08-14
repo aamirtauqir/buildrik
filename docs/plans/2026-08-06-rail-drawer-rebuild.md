@@ -1598,6 +1598,19 @@ same tick returns the name the user just replaced. Walked live: insert →
 select → Layers → double-click → "Masthead" → Enter, and the status bar reads
 "Container · Masthead" before the panel closes.
 
+**The eighteenth find** — board 199:409 (Drawer closed) draws the canvas
+toolbar with undo · redo · **W** D T M at its left end. Live had them too, and
+they could not be reached. The bar is `overflow-x: auto` but was also
+`justify-center`, and a centred flex row that overflows spills off BOTH ends —
+`scrollLeft` has no negative side, so whatever sits left of the container is
+gone. Measured at 1440 with a drawer open: bar 758px, content 855px, undo at
+x=300 and W at x=367 against a bar starting at x=380. Rendered, focusable,
+unreachable by any pointer. Anchored at the start, the overflow moves to the
+end where the scroll can follow it (verified: `scrollLeft` 193 brings the ⌘
+shortcuts button fully into view), and the visible result is board 199:205's
+own drawer-open drawing: ↶ ↷ · W D T M · Snap Guides · Spacing · Grid · Rulers
+· Badges · X-Ray.
+
 A method note, because it nearly produced a false find: driving the selection
 with `element.click()` showed an element selected in the inspector and footer
 with **no selection ring, no label and no toolbar on canvas**. That would have

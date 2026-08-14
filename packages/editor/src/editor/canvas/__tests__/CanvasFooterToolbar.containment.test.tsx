@@ -77,6 +77,16 @@ describe("canvas toolbar containment", () => {
     for (const cls of CONTAINMENT) expect(bar.classList.contains(cls)).toBe(true);
   });
 
+  /* Overflow that cannot be scrolled to is the same as deleted. A centred
+     flex row spills off both ends and scrollLeft has no negative side, so at
+     1440 with a drawer open, undo, redo and the Wide device button sat left
+     of the bar's own left edge with no way to reach them. */
+  it("anchors its controls at the start, so overflow lands where the scroll can reach it", () => {
+    const bar = pill();
+    expect(bar.classList.contains("tw:justify-start")).toBe(true);
+    expect(bar.classList.contains("tw:justify-center")).toBe(false);
+  });
+
   it("is opaque — a floating bar cannot show canvas content through itself", () => {
     const bar = pill();
     const fill = [...bar.classList].filter((c) => /^tw:bg-/.test(c));
