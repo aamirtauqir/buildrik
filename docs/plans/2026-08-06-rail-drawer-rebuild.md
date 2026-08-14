@@ -1246,9 +1246,18 @@ reading was actually the CONTAINER fallback on Flex Item 3. Select by
 `[data-buildrick-type="flex"]`, not by DOM order. 13/20 inspector states
 done.
 
-Remaining inspector states (need setups): loading, instance-selected,
-bound-to-CMS, pseudo-state, reach-all-like-this, reach-whole-site,
-ai-agent-run, empty·template-applied, token-picker popover.
+And two more, live: **token-picker popover** (line-height's "Link to type
+token" → TOKENS/CUSTOM tabs, search, token rows with value chips — Inter
+Tight in the values is site-builder DS, the customer's domain, not chrome)
+and **pseudo-state** (the third chip: Base → :hover/:focus/:active/:disabled
+dropdown; picking :hover re-labels the chip live). An accidental side-proof
+along the way: Escape deselects, and the empty state appeared exactly as the
+7bfd50f4 fix promises. **15/20 inspector states verified.**
+
+Remaining 5 need infrastructure their own families will build: loading,
+instance-selected (Templates/Components family), bound-to-CMS +
+reach-all-like-this + reach-whole-site (Content family), ai-agent-run (AI
+family), empty·template-applied (Templates).
 
 ### Phase 0 — T3 tranche 1: pixel pins on the 19 probe surfaces (`59d2c357`)
 
