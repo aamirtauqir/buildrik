@@ -16,6 +16,7 @@ import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { PublishHistory } from "../../../shell/PublishHistory";
 import { fetchPrePublishChecks } from "../../../../services/PublishService";
 import { usePublishSnapshot } from "./usePublishSnapshot";
+import { PublishWizard } from "./PublishWizard";
 import { getSiteIdFromUrl } from "../../../../services/BuildrikSyncProvider";
 import {
   VERCEL_CHECK_LABEL,
@@ -254,6 +255,9 @@ export const PublishTab: React.FC<PublishTabProps> = ({
   // Board 641:2652's three sections, every field read from what the editor
   // already owns (deploy history, undo stack, page list).
   const snapshot = usePublishSnapshot(composer, siteId, publishedUrl);
+  /* Board 833:4518 / 914:4507: publishing runs through a stepped modal, so the
+     panel's CTA opens the gate rather than firing the deploy. */
+  const [wizardOpen, setWizardOpen] = React.useState(false);
 
   /* Board 784:4250 prints how long the run has been going. The job reports
      progress, not a start time, so the panel stamps the transition into
@@ -337,6 +341,20 @@ export const PublishTab: React.FC<PublishTabProps> = ({
         onClose={onClose}
       />
       <div className={CONTENT}>
+        {/* Board 784:4480 — with no publish path there is nothing to say about
+            environments, changes or deploys: the panel states the one fact
+            that matters and offers the one action that changes it. */}
+        {!canPublish ? (
+          <section className={SECTION}>
+            <h2 className="tw:m-0 tw:text-[15px] tw:font-semibold tw:text-[var(--bk-ink)]">
+              Connect Vercel to publish.
+            </h2>
+            <p className="tw:m-0 tw:mt-1 tw:text-[13px] tw:leading-normal tw:text-[var(--bk-ink-muted)]">
+              Buildrick deploys into your own Vercel account — we host nothing.
+            </p>
+          </section>
+        ) : (
+        <>
         {/* Board 784:4250 — while a publish runs, the panel leads with the run
             itself and drops the "what would go out" sections: they describe a
             publish the user has already started. ENVIRONMENT stays, because
@@ -430,70 +448,9 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           </section>
         )}
 
-        {/* Pre-publish readiness — the server's contract, rendered verbatim */}
-        <section className={SECTION} aria-label="Pre-publish readiness">
-          <h3 className={SECTION_TITLE}>Pre-publish checklist</h3>
-
-          {checkState === "loading" && (
-            <div className="tw:flex tw:items-center tw:gap-2 tw:px-2 tw:py-3 tw:text-xs tw:text-gray-500">
-              <Spinner size="sm" aria-label="Checking readiness" />
-              Checking readiness…
-            </div>
-          )}
-
-          {checkState === "error" && (
-            <div className="tw:flex tw:items-center tw:justify-between tw:gap-2 tw:px-2 tw:py-2 tw:text-xs tw:text-[var(--bk-ink-soft)]">
-              <span>Couldn&apos;t load the readiness checks.</span>
-              <Button color="light" size="xs" onClick={() => void loadChecks()}>
-                Retry
-              </Button>
-            </div>
-          )}
-
-          {checkState === "ready" && checks && (
-            <>
-              <div className="tw:flex tw:flex-col">
-                {checks.checks.map((c) => {
-                  const isVercel = c.label === VERCEL_CHECK_LABEL;
-                  const target = FIX_TARGETS[c.label];
-                  return (
-                    <CheckRow
-                      key={c.label}
-                      label={c.label}
-                      status={c.status}
-                      detail={c.detail}
-                      // The Vercel connection is a workspace-level integration,
-                      // so its fix lives in the dashboard, not in an editor tab.
-                      fixHref={isVercel ? `${DASHBOARD_URL}/dashboard/settings/integrations` : undefined}
-                      fixLabel={isVercel ? "Connect Vercel" : target?.label}
-                      onFix={
-                        !isVercel && target
-                          ? () => composer?.emit("ui:switch-tab", { tab: target.tab })
-                          : undefined
-                      }
-                    />
-                  );
-                })}
-              </div>
-              <p
-                className={`tw:m-0 tw:mt-1 tw:px-2 tw:text-[11px] tw:leading-snug ${
-                  blockedByChecks ? "tw:text-[var(--bk-error)]" : "tw:text-gray-500"
-                }`}
-                role={blockedByChecks ? "alert" : undefined}
-              >
-                {blockedByChecks
-                  ? `Blocked — ${blocking.map((c) => c.label).join(", ")}. Fix to publish.`
-                  : warnings.length > 0
-                    ? `${warnings.length} warning${warnings.length > 1 ? "s" : ""} — none block. Client approval is a separate gate.`
-                    : "All checks pass."}
-              </p>
-            </>
-          )}
-
-          {checkState === "ready" && !checks && (
-            <p className={META}>Open this site from the dashboard to see readiness checks.</p>
-          )}
-        </section>
+        {/* The pre-publish checklist moved to the wizard's first step
+            (board 833:4518). It gated a publish, so it belongs in the flow
+            that publishes, not in a panel the user may only be reading. */}
 
         {/* The encryption reassurance banner and the "Ready to go live?" card
             are not on board 641:2652 and were pure decoration around the CTA —
@@ -538,6 +495,8 @@ export const PublishTab: React.FC<PublishTabProps> = ({
             <PublishHistory siteId={siteId} onRollbackStarted={() => publishJob?.reset?.()} />
           </section>
         )}
+        </>
+        )}
       </div>
 
       {/* Board 641:2652 pins the CTA to the bottom of the panel, full width,
@@ -548,18 +507,25 @@ export const PublishTab: React.FC<PublishTabProps> = ({
       <div className="tw:flex tw:flex-col tw:gap-2 tw:border-t tw:border-[var(--bk-border)] tw:px-4 tw:py-3">
         <div className="tw:flex tw:flex-col tw:gap-2">
           {!canPublish ? (
-            <div className="tw:p-3 tw:bg-[var(--bk-warning-tint)] tw:border tw:border-yellow-200 tw:rounded-lg tw:text-xs tw:text-[var(--bk-ink-soft)] tw:leading-normal">
-              Publishing not configured. Contact your administrator to link this project.
-            </div>
+            /* Board 784:4480 puts the CTA here too — the panel body above
+               carries the sentence, this is the action. */
+            <Button
+              onClick={() => window.open(`${DASHBOARD_URL}/dashboard/settings/integrations`, "_blank", "noopener")}
+              className="tw:w-full"
+            >
+              Connect Vercel
+            </Button>
           ) : (
             <>
               <Button
-                onClick={handlePublish}
-                // A blocking check means the server WILL refuse this publish
-                // (runPrePublishChecks → ready:false). Disabling here is the
-                // point of the fix: the panel must not offer a publish that
-                // cannot succeed.
-                disabled={isPublishing || blockedByChecks}
+                onClick={() => setWizardOpen(true)}
+                /* The gate moved into the wizard (board 833:4518), so this
+                   button opens it rather than publishing. Disabling it on a
+                   blocking check — which is what it used to do — locked the
+                   user out of the one screen that says WHY they are blocked.
+                   The wizard's "Continue to Confirm" is the dead control now,
+                   which is what the board draws. */
+                disabled={isPublishing}
                 className="tw:w-full"
               >
                 {isPublishing ? (isPublished ? "Updating…" : "Publishing…") : isPublished ? "Update production" : "Publish to production"}
@@ -589,6 +555,57 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           Terms of service
         </a>
       </div>
+
+      <PublishWizard
+        open={wizardOpen}
+        onClose={() => setWizardOpen(false)}
+        onPublish={() => void handlePublish()}
+        checkState={checkState}
+        checks={checks}
+        onRetryChecks={() => void loadChecks()}
+        renderFix={(label) => {
+          const isVercel = label === VERCEL_CHECK_LABEL;
+          const target = FIX_TARGETS[label];
+          if (isVercel) {
+            return (
+              <a
+                href={`${DASHBOARD_URL}/dashboard/settings/integrations`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="tw:flex-none tw:text-[13px] tw:text-[var(--bk-accent)] tw:no-underline"
+              >
+                Connect Vercel ›
+              </a>
+            );
+          }
+          if (!target) return null;
+          return (
+            <Button
+              color="light"
+              size="xs"
+              onClick={() => {
+                setWizardOpen(false);
+                composer?.emit("ui:switch-tab", { tab: target.tab });
+              }}
+              className="tw:flex-none tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[13px] tw:text-[var(--bk-accent)]"
+            >
+              Fix ›
+            </Button>
+          );
+        }}
+        target={snapshot.production.value ? `Production · ${snapshot.production.value}` : "Production"}
+        pageCount={snapshot.pageCount}
+        /* The approval gate is the server's, surfaced through the publish
+           job's block reason — the panel never decides it locally. */
+        approval={
+          publishJob?.blockedReason === "needs-approval"
+            ? { label: "Not approved yet", tone: "warn" }
+            : publishJob?.blockedReason === "stale-approval"
+              ? { label: "Approved, then changed", tone: "warn" }
+              : { label: "Not required", tone: "muted" }
+        }
+        rollbackTo={snapshot.lastDeploy?.version ?? null}
+      />
     </PanelFrame>
   );
 };

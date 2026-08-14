@@ -51,9 +51,17 @@ describe("PublishTab readiness source", () => {
   // never the server's contract (runPrePublishChecks returns a different six with
   // severity) and are gone. Readiness coverage now lives in
   // PublishTab.checks.test.tsx against the real endpoint shape.
+  /* Moved with the checklist: "open this site from the dashboard" is what the
+     wizard's step 1 says when there is no site to run checks against. The panel
+     itself, with a publish path wired, shows the board's three sections. */
   it("asks the user to open the site from the dashboard when there is no site id", () => {
-    const { container } = renderTab(<PublishTab composer={composer} />);
-    expect(container.textContent).toContain("Open this site from the dashboard");
+    const { container, getByText } = renderTab(
+      <PublishTab composer={composer} onVercelPublish={vi.fn()} />,
+    );
+    fireEvent.click(getByText("Publish to production"));
+    expect(container.textContent + document.body.textContent).toContain(
+      "Open this site from the dashboard",
+    );
     expect(container.textContent).not.toContain("SEO title set");
   });
 });
@@ -64,7 +72,8 @@ describe("PublishTab readiness source", () => {
 describe("PublishTab — canonical publish wiring (B1)", () => {
   it("shows 'not configured' when no canonical handler is wired (flag off / inert)", () => {
     const { container } = renderTab(<PublishTab composer={composer} publishJob={makeJob()} />);
-    expect(container.textContent).toContain("Publishing not configured");
+    // Board 784:4480: with no publish path the panel is that one sentence.
+    expect(container.textContent).toContain("Connect Vercel to publish.");
   });
 
   it("enables Publish and fires the canonical handler when wired", () => {
@@ -72,8 +81,11 @@ describe("PublishTab — canonical publish wiring (B1)", () => {
     const { getByText } = renderTab(
       <PublishTab composer={composer} publishJob={makeJob()} onVercelPublish={onVercelPublish} />
     );
-    const btn = getByText("Publish to production");
-    fireEvent.click(btn);
+    /* The CTA opens the gate; the deploy fires from the wizard's last step.
+       Board 833:4518 → 914:4507: nothing publishes without passing Confirm. */
+    fireEvent.click(getByText("Publish to production"));
+    fireEvent.click(getByText("Continue to Confirm →"));
+    fireEvent.click(getByText("Publish now"));
     expect(onVercelPublish).toHaveBeenCalledTimes(1);
   });
 
