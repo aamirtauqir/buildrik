@@ -58,6 +58,9 @@ describe("PublishTab readiness source", () => {
   });
 });
 
+/* CTA copy follows board 641:2652: the button names the destination
+   ("Publish to production"), not the verb ("Publish Site"), and lives pinned
+   at the panel's bottom rather than inside the scroll body. */
 describe("PublishTab — canonical publish wiring (B1)", () => {
   it("shows 'not configured' when no canonical handler is wired (flag off / inert)", () => {
     const { container } = renderTab(<PublishTab composer={composer} publishJob={makeJob()} />);
@@ -69,7 +72,7 @@ describe("PublishTab — canonical publish wiring (B1)", () => {
     const { getByText } = renderTab(
       <PublishTab composer={composer} publishJob={makeJob()} onVercelPublish={onVercelPublish} />
     );
-    const btn = getByText("Publish Site");
+    const btn = getByText("Publish to production");
     fireEvent.click(btn);
     expect(onVercelPublish).toHaveBeenCalledTimes(1);
   });
@@ -78,7 +81,7 @@ describe("PublishTab — canonical publish wiring (B1)", () => {
     const { container } = renderTab(
       <PublishTab composer={composer} publishJob={makeJob({ uiState: "publishing", progress: 40 })} onVercelPublish={vi.fn()} />
     );
-    expect(container.textContent).toContain("Publishing...");
+    expect(container.textContent).toContain("Publishing…");
     expect(container.textContent).toContain("40%");
   });
 
@@ -86,7 +89,7 @@ describe("PublishTab — canonical publish wiring (B1)", () => {
     const { container, getByText } = renderTab(
       <PublishTab composer={composer} publishJob={makeJob({ uiState: "published", publishedUrl: "https://x.vercel.app" })} onVercelPublish={vi.fn()} />
     );
-    expect(getByText("Update Site")).toBeTruthy();
+    expect(getByText("Update production")).toBeTruthy();
     expect(container.textContent).toContain("x.vercel.app");
   });
 
@@ -96,7 +99,7 @@ describe("PublishTab — canonical publish wiring (B1)", () => {
     const { getByText, queryByText } = renderTab(
       <PublishTab composer={composer} publishJob={makeJob({ uiState: "failed", publishedUrl: "https://x.vercel.app", error: "deploy failed" })} onVercelPublish={vi.fn()} />
     );
-    expect(getByText("Update Site")).toBeTruthy();
-    expect(queryByText("Publish Site")).toBeNull();
+    expect(getByText("Update production")).toBeTruthy();
+    expect(queryByText("Publish to production")).toBeNull();
   });
 });

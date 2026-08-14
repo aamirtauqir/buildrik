@@ -117,7 +117,7 @@ describe("PublishTab — only a fail blocks the publish", () => {
       <PublishTab composer={composerWith()} projectId="site_1" onVercelPublish={vi.fn()} />,
     );
     await waitFor(() => expect(screen.getByText("SEO configured")).toBeTruthy());
-    expect((getByText("Publish Site").closest("button") as HTMLButtonElement).disabled).toBe(false);
+    expect((getByText("Publish to production").closest("button") as HTMLButtonElement).disabled).toBe(false);
     expect(screen.getByText(/4 warnings — none block/)).toBeTruthy();
   });
 
@@ -133,7 +133,7 @@ describe("PublishTab — only a fail blocks the publish", () => {
       <PublishTab composer={composerWith()} projectId="site_1" onVercelPublish={vi.fn()} />,
     );
     await waitFor(() => expect(screen.getByText(/Blocked — Vercel connected/)).toBeTruthy());
-    expect((getByText("Publish Site").closest("button") as HTMLButtonElement).disabled).toBe(true);
+    expect((getByText("Publish to production").closest("button") as HTMLButtonElement).disabled).toBe(true);
   });
 
   it("does not fire the publish handler while blocked", async () => {
@@ -145,7 +145,7 @@ describe("PublishTab — only a fail blocks the publish", () => {
       <PublishTab composer={composerWith()} projectId="site_1" onVercelPublish={onVercelPublish} />,
     );
     await waitFor(() => expect(screen.getByText(/Blocked — Pages ready/)).toBeTruthy());
-    fireEvent.click(getByText("Publish Site"));
+    fireEvent.click(getByText("Publish to production"));
     expect(onVercelPublish).not.toHaveBeenCalled();
   });
 });

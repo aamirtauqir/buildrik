@@ -9,12 +9,13 @@
  */
 
 import * as React from "react";
-import { CopyButton, PanelFrame, Button, Spinner } from "@/editor/chrome-ui";
+import { CopyButton, PanelFrame, Button, Progress, Spinner } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import type { UsePublishJobResult } from "../../../shell/hooks/usePublishJob";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { PublishHistory } from "../../../shell/PublishHistory";
 import { fetchPrePublishChecks } from "../../../../services/PublishService";
+import { usePublishSnapshot } from "./usePublishSnapshot";
 import { getSiteIdFromUrl } from "../../../../services/BuildrikSyncProvider";
 import {
   VERCEL_CHECK_LABEL,
@@ -156,6 +157,37 @@ const CheckRow: React.FC<{
   );
 };
 
+/** The board's row rhythm: label left, value right, one line. */
+const ROW = "tw:flex tw:items-center tw:justify-between tw:gap-3 tw:py-[3px]";
+
+/** Board 641:2652's environment row — value on the right, chevron when the
+    value is somewhere you can actually go. */
+const EnvRow: React.FC<{ label: string; value: string | null; href?: string | null; empty: string }> = ({
+  label,
+  value,
+  href,
+  empty,
+}) => (
+  <div className={ROW}>
+    <span className="tw:text-[13px] tw:text-[var(--bk-ink)]">{label}</span>
+    {value && href ? (
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="tw:min-w-0 tw:truncate tw:text-[12px] tw:text-[var(--bk-accent)] tw:no-underline"
+        title={value}
+      >
+        {value} ›
+      </a>
+    ) : (
+      <span className={`${META} tw:min-w-0 tw:truncate`} title={value ?? empty}>
+        {value ?? empty}
+      </span>
+    )}
+  </div>
+);
+
 const UrlDisplay: React.FC<{ url: string }> = ({ url }) => (
   <div className="tw:flex tw:flex-col">
     <label className={LABEL}>Published URL</label>
@@ -219,6 +251,31 @@ export const PublishTab: React.FC<PublishTabProps> = ({
   // never loaded and the publish-history section below never rendered.
   const siteId = React.useMemo(() => projectId ?? getSiteIdFromUrl(), [projectId]);
 
+  // Board 641:2652's three sections, every field read from what the editor
+  // already owns (deploy history, undo stack, page list).
+  const snapshot = usePublishSnapshot(composer, siteId, publishedUrl);
+
+  /* Board 784:4250 prints how long the run has been going. The job reports
+     progress, not a start time, so the panel stamps the transition into
+     "publishing" itself and ticks while it lasts. */
+  const [startedAt, setStartedAt] = React.useState<number | null>(null);
+  const [nowTick, setNowTick] = React.useState(0);
+  React.useEffect(() => {
+    if (publishJob?.uiState === "publishing") {
+      setStartedAt((prev) => prev ?? Date.now());
+      const t = window.setInterval(() => setNowTick((n) => n + 1), 1000);
+      return () => window.clearInterval(t);
+    }
+    setStartedAt(null);
+    return undefined;
+  }, [publishJob?.uiState]);
+  const startedAgo = React.useMemo(() => {
+    void nowTick;
+    if (!startedAt) return "";
+    const secs = Math.max(0, Math.floor((Date.now() - startedAt) / 1000));
+    return secs < 60 ? `${secs}s` : `${Math.floor(secs / 60)}m`;
+  }, [startedAt, nowTick]);
+
   // Readiness comes from the server (`runPrePublishChecks`), never from a local
   // approximation. See fetchPrePublishChecks for why: the old local set was a
   // different seven checks with no severity and no Vercel check, so the panel
@@ -268,7 +325,10 @@ export const PublishTab: React.FC<PublishTabProps> = ({
   const blockedByChecks = checkState === "ready" && !!checks && !checks.ready;
 
   return (
-    <PanelFrame>
+    /* h-full so the pinned CTA below actually reaches the bottom of the
+       drawer: PanelFrame is flex-col but sizes to content, which left the
+       button floating mid-panel with white space under it. */
+    <PanelFrame className="tw:h-full">
       <PanelFrame.Header
         title="Publish"
         isExpanded={isExpanded}
@@ -277,16 +337,91 @@ export const PublishTab: React.FC<PublishTabProps> = ({
         onClose={onClose}
       />
       <div className={CONTENT}>
-        {/* Status Section */}
-        <section className={SECTION}>
-          <div className="tw:flex tw:items-center tw:justify-between">
-            <h3 className={SECTION_TITLE}>Status</h3>
-            <StatusBadge isPublished={isPublished} />
+        {/* Board 784:4250 — while a publish runs, the panel leads with the run
+            itself and drops the "what would go out" sections: they describe a
+            publish the user has already started. ENVIRONMENT stays, because
+            where it is going is still the question being answered. The board's
+            meta line reads "Building · step 2 of 4 · started 14s ago"; the job
+            exposes a percentage and a start, not named steps, so the shape is
+            kept and only what exists is printed. */}
+        {isPublishing && (
+          <section className={SECTION} aria-label="Publish progress">
+            <h3 className="tw:m-0 tw:text-[13px] tw:font-semibold tw:text-[var(--bk-ink)]">
+              Publishing to production…
+            </h3>
+            <p className={META}>
+              {publishJob && publishJob.progress > 0 ? `${publishJob.progress}%` : "Starting"}
+              {startedAgo ? ` · started ${startedAgo} ago` : ""}
+            </p>
+            <Progress progress={publishJob?.progress ?? 0} size="sm" />
+          </section>
+        )}
+
+        {/* Board 641:2652 opens on WHERE it goes, not on a status chip.
+            Production carries the live domain; Preview stays listed because an
+            environment list that hides it says the site has none. */}
+        <section className={SECTION} aria-label="Environment">
+          <h3 className={SECTION_TITLE}>Environment</h3>
+          <EnvRow
+            label={snapshot.production.label}
+            value={snapshot.production.value}
+            href={publishedUrl}
+            empty="Not published yet"
+          />
+          <EnvRow label={snapshot.preview.label} value={snapshot.preview.value} empty="None" />
+        </section>
+
+        {/* Board 641:2652 — what would go out if you published now. The count
+            pair is the header; the rows are the changes themselves. Absent
+            during a run (board 784:4250 drops it). */}
+        {!isPublishing && (
+        <section className={SECTION} aria-label="Since last deploy">
+          <div className={ROW}>
+            <h3 className={SECTION_TITLE}>Since last deploy</h3>
           </div>
-          {isPublishing && publishJob && publishJob.progress > 0 && (
-            <p className={META}>Publishing… {publishJob.progress}%</p>
+          <div className={ROW}>
+            <span className="tw:text-[13px] tw:text-[var(--bk-ink)]">
+              {snapshot.changeCount} {snapshot.changeCount === 1 ? "change" : "changes"}
+            </span>
+            <span className={META}>
+              {snapshot.pageCount} {snapshot.pageCount === 1 ? "page" : "pages"}
+            </span>
+          </div>
+          {snapshot.changes.slice(0, 6).map((c) => (
+            <div key={c.id} className={ROW}>
+              <span className="tw:min-w-0 tw:flex-1 tw:truncate tw:text-[13px] tw:text-[var(--bk-ink)]">
+                {c.label}
+              </span>
+              <span className={`${META} tw:flex-none`}>
+                {c.author ? `${c.author} · ${c.when}` : c.when}
+              </span>
+            </div>
+          ))}
+          {snapshot.changeCount === 0 && (
+            <p className={META}>Nothing has changed since the last deploy.</p>
           )}
         </section>
+        )}
+
+        {/* Board 641:2652 — what is live right now, and therefore what a
+            rollback would return to. */}
+        {!isPublishing && (
+        <section className={SECTION} aria-label="Last deploy">
+          <h3 className={SECTION_TITLE}>Last deploy</h3>
+          {snapshot.lastDeploy ? (
+            <div className={ROW}>
+              <span className="tw:text-[13px] tw:text-[var(--bk-ink)]">
+                v{snapshot.lastDeploy.version} · live
+              </span>
+              <span className={META}>{snapshot.lastDeploy.when}</span>
+            </div>
+          ) : (
+            <p className={META}>
+              {snapshot.loading ? "Reading deploy history…" : "This site has never been published."}
+            </p>
+          )}
+        </section>
+        )}
 
         {/* Published URL */}
         {isPublished && publishedUrl && (
@@ -360,62 +495,14 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           )}
         </section>
 
-        {/* Trust signal */}
-        <div className="tw:flex tw:items-center tw:gap-1.5 tw:px-2.5 tw:py-[7px] tw:bg-[var(--bk-success-tint)] tw:rounded-lg tw:border tw:border-green-200 tw:text-xs tw:text-gray-500 tw:leading-snug">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" className="tw:flex-none tw:text-[var(--bk-success)]">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-          </svg>
-          <span>Your site data is encrypted and stored securely.</span>
-        </div>
+        {/* The encryption reassurance banner and the "Ready to go live?" card
+            are not on board 641:2652 and were pure decoration around the CTA —
+            removed. The legal line below stays: a compliance disclosure is not
+            a visual call. */}
 
-        {/* Actions */}
-        <section className={SECTION}>
-          {!canPublish ? (
-            <div className="tw:p-3 tw:bg-[var(--bk-warning-tint)] tw:border tw:border-yellow-200 tw:rounded-lg tw:text-xs tw:text-[var(--bk-ink-soft)] tw:leading-normal">
-              Publishing not configured. Contact your administrator to link this project.
-            </div>
-          ) : (
-            <>
-              <Button
-                onClick={handlePublish}
-                // A blocking check means the server WILL refuse this publish
-                // (runPrePublishChecks → ready:false). Disabling here is the
-                // point of the fix: the panel must not offer a publish that
-                // cannot succeed.
-                disabled={isPublishing || blockedByChecks}
-                className="tw:w-full"
-              >
-                {isPublishing ? (isPublished ? "Updating..." : "Publishing...") : isPublished ? "Update Site" : "Publish Site"}
-              </Button>
-              {blockedByChecks && !isPublishing && (
-                <p className="tw:m-0 tw:text-[11px] tw:text-[var(--bk-error)] tw:leading-[1.4]">
-                  {blocking.map((c) => c.detail).join(" ")}
-                </p>
-              )}
-              {isPublishing && (
-                <p className="tw:m-0 tw:text-[11px] tw:text-gray-500 tw:leading-[1.4]">
-                  {isPublished ? "Update" : "Publishing"} in progress — please wait.
-                </p>
-              )}
-            </>
-          )}
-        </section>
-
-        {/* Info Section */}
-        <section className="tw:flex tw:gap-3 tw:p-3 tw:bg-[var(--bk-accent-tint)] tw:rounded-lg tw:border tw:border-[var(--bk-accent-subtle)]">
-          <RocketIcon />
-          <div>
-            <p className={SECTION_TITLE}>{isPublished ? "Your site is live" : "Ready to go live?"}</p>
-            <p className="tw:mt-1 tw:mb-0 tw:text-xs tw:leading-normal tw:text-[var(--bk-ink-soft)]">
-              {isPublished
-                ? "Changes made after publishing require an update to go live."
-                : blockedByChecks
-                  ? "Clear the blocking check above, then hit Publish to make your site public."
-                  : "Warnings above don't block. Hit Publish to make your site public."}
-            </p>
-          </div>
-        </section>
-
+        {/* The rocket card is not on board 641:2652. Its only load-bearing
+            sentence — why a blocked publish is blocked — already prints under
+            the CTA, so the card was restating the panel back to itself. */}
         {/* Error display */}
         {error && (
           <div
@@ -452,8 +539,47 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           </section>
         )}
       </div>
+
+      {/* Board 641:2652 pins the CTA to the bottom of the panel, full width,
+          and names the destination rather than the verb: "Publish to
+          production", not "Publish Site". Inside the scroll body it drifted
+          below the fold as the change list grew — exactly when it is most
+          needed. */}
+      <div className="tw:flex tw:flex-col tw:gap-2 tw:border-t tw:border-[var(--bk-border)] tw:px-4 tw:py-3">
+        <div className="tw:flex tw:flex-col tw:gap-2">
+          {!canPublish ? (
+            <div className="tw:p-3 tw:bg-[var(--bk-warning-tint)] tw:border tw:border-yellow-200 tw:rounded-lg tw:text-xs tw:text-[var(--bk-ink-soft)] tw:leading-normal">
+              Publishing not configured. Contact your administrator to link this project.
+            </div>
+          ) : (
+            <>
+              <Button
+                onClick={handlePublish}
+                // A blocking check means the server WILL refuse this publish
+                // (runPrePublishChecks → ready:false). Disabling here is the
+                // point of the fix: the panel must not offer a publish that
+                // cannot succeed.
+                disabled={isPublishing || blockedByChecks}
+                className="tw:w-full"
+              >
+                {isPublishing ? (isPublished ? "Updating…" : "Publishing…") : isPublished ? "Update production" : "Publish to production"}
+              </Button>
+              {blockedByChecks && !isPublishing && (
+                <p className="tw:m-0 tw:text-[11px] tw:text-[var(--bk-error)] tw:leading-[1.4]">
+                  {blocking.map((c) => c.detail).join(" ")}
+                </p>
+              )}
+              {isPublishing && (
+                <p className="tw:m-0 tw:text-[11px] tw:text-gray-500 tw:leading-[1.4]">
+                  {isPublished ? "Update" : "Publishing"} in progress — please wait.
+                </p>
+              )}
+            </>
+          )}
+        </div>
+      </div>
       {/* Privacy & Terms footer */}
-      <div className="tw:px-4 tw:py-2.5 tw:border-t tw:border-gray-200 tw:text-xs tw:leading-normal tw:text-gray-500 tw:text-center">
+      <div className="tw:px-4 tw:py-2.5 tw:text-xs tw:leading-normal tw:text-gray-500 tw:text-center">
         By publishing, your site is deployed to your connected Vercel account.{" "}
         <a href={`${DASHBOARD_URL}/privacy`} target="_blank" rel="noopener noreferrer" className="tw:text-blue-700 tw:no-underline">
           Privacy policy
@@ -471,31 +597,20 @@ export const PublishTab: React.FC<PublishTabProps> = ({
 // Icons
 // ============================================
 
-const RocketIcon: React.FC = () => (
-  <svg
-    width="20"
-    height="20"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="var(--bk-accent)"
-    strokeWidth="1.5"
-    className="tw:flex-none tw:mt-0.5"
-    aria-hidden="true"
-  >
-    <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
-    <path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
-    <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
-    <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
-  </svg>
-);
 
 // ============================================
 // Classes
 // ============================================
 
-const CONTENT = "tw:flex-1 tw:overflow-y-auto tw:p-4 tw:flex tw:flex-col tw:gap-4";
-const SECTION = "tw:flex tw:flex-col tw:gap-2 tw:p-3 tw:bg-gray-50 tw:rounded-lg tw:border tw:border-gray-200";
-const SECTION_TITLE = "tw:m-0 tw:text-[13px] tw:font-semibold tw:text-gray-900";
+const CONTENT = "tw:flex-1 tw:overflow-y-auto tw:px-4 tw:py-3 tw:flex tw:flex-col tw:gap-4";
+/* Board 641:2652 sets these sections on the panel surface itself — no cards.
+   A card per section turned three related facts into three separate objects
+   and cost 24px of chrome each, which is why the board's four sections fit
+   above the fold and the card version did not. */
+const SECTION = "tw:flex tw:flex-col tw:gap-0";
+/* The board's section label: 11px, uppercase, tracked, ink-muted. */
+const SECTION_TITLE =
+  "tw:m-0 tw:mb-1 tw:text-[11px] tw:font-medium tw:uppercase tw:tracking-[0.04em] tw:text-[var(--bk-ink-muted)]";
 const META = "tw:m-0 tw:text-xs tw:text-gray-500";
 const LABEL = "tw:text-xs tw:font-medium tw:text-[var(--bk-ink-soft)] tw:mb-1";
 
