@@ -1375,7 +1375,72 @@ version), restore runs and lands, restoring banner (injected — a local
 IndexedDB restore completes in the same tick, so the state is real but
 flashes).
 
+## History family — /investigate sweep, 2026-08-14 (16 boards, nothing left unexamined)
+
+Founder asked for the family to be swept until nothing remained. Four more
+defects, one of them the worst kind.
+
+**`9f3ed776` — a page-less snapshot left the editor with nowhere to insert.**
+Restoring a version whose snapshot carried no pages left ZERO pages and no
+active page. Every insert path reads `getActivePage()` first
+(`useBlockInsertion:41` returns on `!page`), so the Insert drawer rendered its
+53 rows and did nothing. Live at the moment of the bug:
+`{pageCount: 0, activePage: null}`. Not synthetic — auto-checkpoints fire on
+`project:loaded`, so versions captured before pages existed sit in real users'
+lists. Root cause is `importProject`, not restore: the invariant "a loaded
+project has a page, one of them active" is held by importPage, createPage and
+RecoveryManager — the last on an inactivity timer, minutes late. Fixed where
+it breaks. Three pins.
+
+**`e2a55487` — Compare rendered a toggle over blank space.** Board 168:82's
+own annotation states the rule: "No panes render — an empty diff view reads
+as broken." Two ways in, now two sentences: the newest row skips the
+comparison entirely (`latest.id !== versionId`), and a real comparison can
+come back empty. The diff path itself is healthy — verified against a real
+change (save → delete element → compare older row → "1 page removed" + −
+rows).
+
+**`47df571a` — the time-travel preview washed a label across the canvas.**
+Layer opened at opacity 0.4 with a placeholder, printing "Select a point to
+preview" on top of the canvas empty state, both half-visible. Opacity now
+follows content: opaque for a real frame, invisible with nothing to show.
+
+**Dead surface deleted** (same commit as the first): `VERSION_LOAD_ERROR` (a
+second name for VERSION_LOAD_FAILED, zero uses — the ctx-menu shape again)
+and the four `VERSION_PREVIEW*` events plus `clearPreview()`, a hover-preview
+design their own doc comments described and nothing ever built.
+
+**Board-by-board:** Saves ✓, changes ✓, empty ✓ (code + sibling live),
+loading ✓, load-error ✓, pruned ✓, restore-confirm ✓, restoring ✓,
+time-travel ✓ live *with the open question below*; Published tab ✓, failed ✓,
+redeploying ✓, restored ✓, restore-confirm ✓, roll-back confirm ✓.
+
+**Two items honestly not closed:**
+1. `433:2348` milestone-suggestion banner needs `POST
+   /api/trpc/ai.milestoneSuggest` — the dashboard. Standalone demo 404s and
+   the hook swallows it by design (best-effort). Verifiable only in the
+   unified editor.
+2. `163:113` draws time-travel as an IN-PANEL banner ("Previewing v3 · Exit ·
+   Restore this version · Nothing is written until Restore"). The code ships a
+   bottom canvas drawer with a slider plus a full-viewport overlay. Both are
+   real; they are different shapes. Founder call — see below.
+
+**Backups (6 boards) are design-ahead and correctly out of active scope** —
+the engine half exists (`exportVersions`/`importVersions`, which is why
+VERSION_EXPORTED/IMPORTED have no listeners), the UI half is drawn only.
+
 ## Named for the founder — needs a decision or a file I must not stage
+
+**Time-travel: panel banner or canvas drawer? (board `163:113`)** The board
+draws the preview state as a banner INSIDE the Versions panel — "Previewing
+v3", Exit, "Restore this version", and the line "Nothing is written until
+Restore." The code ships something else entirely: a bottom drawer over the
+canvas with a scrub slider, plus a full-viewport overlay and a preview image
+layer. Neither is broken. The drawer does more (scrubbing through every undo
+entry); the board's banner is calmer and keeps the surface in one place. This
+is a product decision about what time-travel IS, not a defect, so it is not
+mine to make. Everything else in History is closed.
+
 
 **`ConflictModal` does not match board 66:640, and fixing it needs
 `AquibraStudio.tsx`.** The board draws "Someone else saved first" / "Sara saved
