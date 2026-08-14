@@ -39,6 +39,10 @@ export interface PublishSnapshot {
       ("just now"), board 641:2652 absolutely ("2 Jul, 14:22"). */
   lastDeploy: { version: number; when: string; rawAt: string | Date | null; isLive: boolean } | null;
   loading: boolean;
+  /** The history read failed. Board 781:4489 — never the same as "no deploys
+      yet", which is what a silent catch made it look like. */
+  error: boolean;
+  reload(): void;
 }
 
 /** "2m" / "41m" / "3h" / "2 Jul" — the board's own scale. */
@@ -85,25 +89,38 @@ export function usePublishSnapshot(
 ): PublishSnapshot {
   const [rows, setRows] = React.useState<PublishHistoryRow[] | null>(null);
   const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState(false);
+  const [retry, setRetry] = React.useState(0);
 
   React.useEffect(() => {
     let alive = true;
     if (!siteId) {
       setRows(null);
       setLoading(false);
+      setError(false);
       return;
     }
     setLoading(true);
+    setError(false);
     fetchPublishHistory(siteId)
-      .then((r) => alive && setRows(r))
-      /* A history that will not load must not read as "never deployed" — the
-         section simply does not claim a last deploy. */
-      .catch(() => alive && setRows(null))
+      .then((r) => {
+        if (!alive) return;
+        setRows(r);
+        setError(false);
+      })
+      /* A history that will not load must not read as "never deployed": the
+         panel says it could not reach the service (board 781:4489), because
+         "no deploys yet" and "we cannot tell" are different facts. */
+      .catch(() => {
+        if (!alive) return;
+        setRows(null);
+        setError(true);
+      })
       .finally(() => alive && setLoading(false));
     return () => {
       alive = false;
     };
-  }, [siteId, reloadKey]);
+  }, [siteId, reloadKey, retry]);
 
   const latest = rows?.[0] ?? null;
   const lastDeployAt = latest?.completedAt ? new Date(latest.completedAt).getTime() : null;
@@ -138,5 +155,7 @@ export function usePublishSnapshot(
       ? { version: latest.version, when: deployStamp(latest.completedAt), rawAt: latest.completedAt, isLive: true }
       : null,
     loading,
+    error,
+    reload: () => setRetry((n) => n + 1),
   };
 }

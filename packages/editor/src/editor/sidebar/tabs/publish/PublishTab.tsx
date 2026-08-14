@@ -9,7 +9,7 @@
  */
 
 import * as React from "react";
-import { CopyButton, PanelFrame, Button, Progress, Spinner } from "@/editor/chrome-ui";
+import { CopyButton, PanelFrame, Button, Progress, SkeletonBlock, Spinner } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import type { UsePublishJobResult } from "../../../shell/hooks/usePublishJob";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
@@ -189,6 +189,20 @@ const EnvRow: React.FC<{ label: string; value: string | null; href?: string | nu
   </div>
 );
 
+/** Board 778:4238: the labels stay, the values become bars. Widths are
+    deliberately uneven — a column of identical bars reads as a rendered UI
+    that has gone wrong rather than one still arriving. */
+const SkeletonRows: React.FC<{ widths: string[] }> = ({ widths }) => (
+  <div className="tw:flex tw:flex-col tw:gap-2 tw:py-1" aria-hidden="true">
+    {widths.map((w, i) => (
+      <div key={i} className="tw:flex tw:items-center tw:gap-2">
+        <SkeletonBlock className="tw:size-3 tw:rounded-[2px]" />
+        <SkeletonBlock className={`tw:h-3 ${w}`} />
+      </div>
+    ))}
+  </div>
+);
+
 const UrlDisplay: React.FC<{ url: string }> = ({ url }) => (
   <div className="tw:flex tw:flex-col">
     <label className={LABEL}>Published URL</label>
@@ -261,6 +275,10 @@ export const PublishTab: React.FC<PublishTabProps> = ({
   /* Board 784:4326 is the just-published panel: the result leads and the
      "what would go out" sections are empty by definition. */
   const justPublished = publishJob?.uiState === "published" && snapshot.changeCount === 0;
+  /* Board 784:4403. "View log" is drawn beside Try again; this editor has no
+     log destination — the job reports a message, not a build log — so the row
+     carries the retry only rather than a link to nowhere. */
+  const hasFailed = publishJob?.uiState === "failed" && !!error;
 
   /* Board 784:4250 prints how long the run has been going. The job reports
      progress, not a start time, so the panel stamps the transition into
@@ -358,6 +376,57 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           </section>
         ) : (
         <>
+        {/* Board 781:4489 — the deploy service is unreachable, so the panel
+            can claim nothing about environments or deploys. Both halves of the
+            reassurance: nothing went out, and the work is not lost. */}
+        {snapshot.error ? (
+          <section className={SECTION} aria-label="Deploy service unreachable">
+            <h2 className="tw:m-0 tw:text-[15px] tw:font-semibold tw:text-[var(--bk-error-text)]">
+              Couldn&apos;t reach the deploy service.
+            </h2>
+            <p className={META}>Nothing was published. Your work is saved.</p>
+            <div className="tw:mt-1">
+              <Button
+                color="light"
+                size="xs"
+                onClick={() => snapshot.reload()}
+                className="tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[13px] tw:text-[var(--bk-accent)]"
+              >
+                Try again
+              </Button>
+            </div>
+          </section>
+        ) : (
+        <>
+
+        {/* Board 784:4403 — a failed publish leads with the failure AND with
+            the fact that nothing changed, which is the half a user needs
+            first. Same shape as the rollback-failed modal. */}
+        {hasFailed && (
+          <section className={SECTION} aria-label="Publish failure">
+            <h2 className="tw:m-0 tw:text-[15px] tw:font-semibold tw:text-[var(--bk-error-text)]">
+              Publish failed.
+            </h2>
+            <p className={META}>
+              {error}
+              {error && !/nothing was deployed/i.test(error) ? " Nothing was deployed." : ""}
+            </p>
+            <div className="tw:mt-1">
+              <Button
+                color="light"
+                size="xs"
+                onClick={() => {
+                  publishJob?.reset?.();
+                  setWizardOpen(true);
+                }}
+                className="tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[13px] tw:text-[var(--bk-accent)]"
+              >
+                Try again
+              </Button>
+            </div>
+          </section>
+        )}
+
         {/* Board 784:4326 — the moment after a publish: what went out, where
             to see it, and what changed against the version it replaced. */}
         {justPublished && (
@@ -419,23 +488,33 @@ export const PublishTab: React.FC<PublishTabProps> = ({
             environment list that hides it says the site has none. */}
         <section className={SECTION} aria-label="Environment">
           <h3 className={SECTION_TITLE}>Environment</h3>
-          <EnvRow
-            label={snapshot.production.label}
-            value={snapshot.production.value}
-            href={publishedUrl}
-            empty="Not published yet"
-          />
-          <EnvRow label={snapshot.preview.label} value={snapshot.preview.value} empty="None" />
+          {snapshot.loading ? (
+            <SkeletonRows widths={["tw:w-32", "tw:w-24"]} />
+          ) : (
+            <>
+              <EnvRow
+                label={snapshot.production.label}
+                value={snapshot.production.value}
+                href={publishedUrl}
+                empty="Not published yet"
+              />
+              <EnvRow label={snapshot.preview.label} value={snapshot.preview.value} empty="None" />
+            </>
+          )}
         </section>
 
         {/* Board 641:2652 — what would go out if you published now. The count
             pair is the header; the rows are the changes themselves. Absent
             during a run (board 784:4250 drops it). */}
-        {!isPublishing && !justPublished && (
+        {!isPublishing && !justPublished && !hasFailed && (
         <section className={SECTION} aria-label="Since last deploy">
           <div className={ROW}>
             <h3 className={SECTION_TITLE}>Since last deploy</h3>
           </div>
+          {snapshot.loading ? (
+            <SkeletonRows widths={["tw:w-36", "tw:w-28", "tw:w-20", "tw:w-32"]} />
+          ) : (
+          <>
           <div className={ROW}>
             <span className="tw:text-[13px] tw:text-[var(--bk-ink)]">
               {snapshot.changeCount} {snapshot.changeCount === 1 ? "change" : "changes"}
@@ -457,15 +536,19 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           {snapshot.changeCount === 0 && (
             <p className={META}>Nothing has changed since the last deploy.</p>
           )}
+          </>
+          )}
         </section>
         )}
 
         {/* Board 641:2652 — what is live right now, and therefore what a
             rollback would return to. */}
-        {!isPublishing && !justPublished && (
+        {!isPublishing && !justPublished && !hasFailed && (
         <section className={SECTION} aria-label="Last deploy">
           <h3 className={SECTION_TITLE}>Last deploy</h3>
-          {snapshot.lastDeploy ? (
+          {snapshot.loading ? (
+            <SkeletonRows widths={["tw:w-24"]} />
+          ) : snapshot.lastDeploy ? (
             <div className={ROW}>
               <span className="tw:text-[13px] tw:text-[var(--bk-ink)]">
                 v{snapshot.lastDeploy.version} · live
@@ -473,9 +556,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
               <span className={META}>{snapshot.lastDeploy.when}</span>
             </div>
           ) : (
-            <p className={META}>
-              {snapshot.loading ? "Reading deploy history…" : "This site has never been published."}
-            </p>
+            <p className={META}>This site has never been published.</p>
           )}
         </section>
         )}
@@ -499,40 +580,20 @@ export const PublishTab: React.FC<PublishTabProps> = ({
         {/* The rocket card is not on board 641:2652. Its only load-bearing
             sentence — why a blocked publish is blocked — already prints under
             the CTA, so the card was restating the panel back to itself. */}
-        {/* Error display */}
-        {error && (
-          <div
-            className="tw:flex tw:items-center tw:justify-between tw:gap-2 tw:px-3 tw:py-2 tw:bg-[var(--bk-error-tint)] tw:rounded-lg tw:border tw:border-red-200 tw:text-[var(--bk-error)] tw:text-xs"
-            role="alert"
-          >
-            <span>{error}</span>
-            <Button
-              color="light"
-              size="xs"
-              onClick={() => publishJob?.reset?.()}
-              aria-label="Dismiss error"
-              className="tw:border-transparent tw:bg-transparent tw:text-current tw:flex-none tw:p-0 tw:size-5"
-            >
-              <svg
-                width="12"
-                height="12"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                aria-hidden="true"
-              >
-                <path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" />
-              </svg>
-            </Button>
-          </div>
-        )}
+        {/* The error chip with a dismiss X is gone: board 784:4403 makes the
+            failure a first-class state at the top of the panel, not a toast
+            hiding under the checklist. */}
 
-        {/* P1: published-version history + rollback (contract §5) */}
+        {/* P1: published-version history + rollback (contract §5). Inside the
+            reachable branch: with the deploy service down, board 781:4489 is
+            the whole panel — a second "couldn't load" list under the first
+            message says the same failure twice. */}
         {siteId && (
           <section className={SECTION}>
             <PublishHistory siteId={siteId} onRollbackStarted={() => publishJob?.reset?.()} />
           </section>
+        )}
+        </>
         )}
         </>
         )}
@@ -566,7 +627,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
                    which is what the board draws. */
                 /* Board 784:4326 greys the CTA right after a deploy: with no
                    pending change there is nothing to publish. */
-                disabled={isPublishing || justPublished}
+                disabled={isPublishing || justPublished || snapshot.error}
                 className="tw:w-full"
               >
                 {/* One label, in every state. Board 641:2652 and 784:4326 both name the

@@ -10,7 +10,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import * as React from "react";
 import type { PublishTabProps } from "../PublishTab";
 
@@ -139,5 +139,81 @@ describe("PublishTab — board 784:4480, no publish path", () => {
     // The board draws no environment/changes/deploy sections here.
     expect(container.textContent).not.toContain("SINCE LAST DEPLOY");
     expect(screen.queryByText("Publish to production")).toBeNull();
+  });
+});
+
+describe("PublishTab — board 784:4403, failed", () => {
+  it("says what failed AND that nothing was deployed", async () => {
+    renderTab(
+      <PublishTab
+        composer={composerWith([{ id: "e1", label: "Edit", timestamp: Date.now() }])}
+        projectId="site_1"
+        onVercelPublish={vi.fn()}
+        publishJob={job({ uiState: "failed", error: "Build error on Menu — 3 unresolved links." })}
+      />,
+    );
+
+    await waitFor(() => expect(screen.getByText("Publish failed.")).toBeTruthy());
+    /* The reassurance is the half a user needs first, and the panel adds it
+       when the server message does not carry it. */
+    expect(screen.getByText(/Nothing was deployed\./)).toBeTruthy();
+    expect(screen.getByText("Try again")).toBeTruthy();
+    // Same as publishing/live: the "what would go out" sections step aside.
+    expect(screen.queryByText("Since last deploy")).toBeNull();
+    // The CTA stays live — a failed publish is retryable.
+    expect(
+      (screen.getByText("Publish to production").closest("button") as HTMLButtonElement).disabled,
+    ).toBe(false);
+  });
+
+  it("does not double the reassurance when the server already said it", async () => {
+    renderTab(
+      <PublishTab
+        composer={composerWith()}
+        projectId="site_1"
+        onVercelPublish={vi.fn()}
+        publishJob={job({ uiState: "failed", error: "Timed out. Nothing was deployed." })}
+      />,
+    );
+    await waitFor(() => expect(screen.getByText("Publish failed.")).toBeTruthy());
+    expect(screen.getByText("Timed out. Nothing was deployed.")).toBeTruthy();
+  });
+});
+
+describe("PublishTab — board 781:4489, the deploy service is unreachable", () => {
+  it("says so, and says nothing about environments it cannot read", async () => {
+    fetchPublishHistory.mockRejectedValue(new Error("network"));
+    renderTab(<PublishTab composer={composerWith()} projectId="site_1" onVercelPublish={vi.fn()} />);
+
+    await waitFor(() => expect(screen.getByText("Couldn't reach the deploy service.")).toBeTruthy());
+    /* Both halves: nothing went out, and the work is not lost. */
+    expect(screen.getByText("Nothing was published. Your work is saved.")).toBeTruthy();
+    expect(screen.getByText("Try again")).toBeTruthy();
+    // "no deploys yet" and "we cannot tell" are different facts.
+    expect(screen.queryByText("This site has never been published.")).toBeNull();
+    expect(screen.queryByText("Since last deploy")).toBeNull();
+    expect(
+      (screen.getByText("Publish to production").closest("button") as HTMLButtonElement).disabled,
+    ).toBe(true);
+  });
+
+  it("Try again re-reads the history and recovers", async () => {
+    /* A flag, not mockRejectedValueOnce: TWO components read this history (the
+       panel's snapshot and PublishHistory), so a "once" mock is spent by the
+       second reader before the test can use it. */
+    let failing = true;
+    fetchPublishHistory.mockImplementation(() =>
+      failing
+        ? Promise.reject(new Error("network"))
+        : Promise.resolve([
+            { id: "j1", version: 2, completedAt: new Date(), deploymentId: "d", rollbackable: true, rolledBackFrom: null },
+          ]),
+    );
+    renderTab(<PublishTab composer={composerWith()} projectId="site_1" onVercelPublish={vi.fn()} />);
+
+    await waitFor(() => expect(screen.getByText("Couldn't reach the deploy service.")).toBeTruthy());
+    failing = false;
+    fireEvent.click(screen.getByText("Try again"));
+    await waitFor(() => expect(screen.getByText("v2 · live")).toBeTruthy());
   });
 });
