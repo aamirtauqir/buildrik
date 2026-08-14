@@ -1,14 +1,14 @@
 {
-  "_note": "Generated from Figma g4GzQFqzNYz5sosz1QtZXC page 1:3 (Editor), 2026-08-06.,Regeneration is an agent step (get_metadata), same reason extraction is — see README.,status: active = must have a recipe eventually. design-ahead = drawn, no backend, no code.,out-of-scope = reference/spec/archive boards, file hygiene not product.,authority: which artefact wins on conflict. undecided until someone reads both. 12 boards appended 2026-08-07 from a live page-1:3 census (Insert x4, Layers x6, S3.6 x2) — drawn after the 2026-08-06 generation. Phase-1 sync 2026-08-07: +6 drawn boards, +27 section-child product boards (dims 0 = not yet captured), +4 design-ahead, +14 reference out-of-scope; Headers·locked superseded by Custom-code·locked (founder Pro-lock decision); [dashboard-flow]/[not-implemented] markers synced. 2026-08-08: Media fullpage library surface designed — 5 fullpage boards + 2 modals (code was ahead of Figma; founder catch). 2026-08-08 G-sweep complete: 16 more surface boards (Templates/CMS/Components/Pages/Layers/Shell modals+menus); G17 BlockPicker marked covered-by-Insert. Deep-audit remediation: 6 boards corrected to code evidence + 11 gap boards (G-verdict A+B closed).",
+  "_note": "Generated from Figma g4GzQFqzNYz5sosz1QtZXC page 1:3 (Editor), 2026-08-06.,Regeneration is an agent step (get_metadata), same reason extraction is — see README.,status: active = must have a recipe eventually. design-ahead = drawn, no backend, no code.,out-of-scope = reference/spec/archive boards, file hygiene not product.,authority: which artefact wins on conflict. undecided until someone reads both. 12 boards appended 2026-08-07 from a live page-1:3 census (Insert x4, Layers x6, S3.6 x2) — drawn after the 2026-08-06 generation. Phase-1 sync 2026-08-07: +6 drawn boards, +27 section-child product boards (dims 0 = not yet captured), +4 design-ahead, +14 reference out-of-scope; Headers·locked superseded by Custom-code·locked (founder Pro-lock decision); [dashboard-flow]/[not-implemented] markers synced. 2026-08-08: Media fullpage library surface designed — 5 fullpage boards + 2 modals (code was ahead of Figma; founder catch). 2026-08-08 G-sweep complete: 16 more surface boards (Templates/CMS/Components/Pages/Layers/Shell modals+menus); G17 BlockPicker marked covered-by-Insert. Deep-audit remediation: 6 boards corrected to code evidence + 11 gap boards (G-verdict A+B closed). 2026-08-14 T4 re-census (phase-0 close): +3 Media boards drawn after 2026-08-08 (import-url x2, new-folder inline), +2 [superseded] frames catalogued out-of-scope, 9 rows renamed to current Figma titles (suffix drift only, same boards).",
   "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
   "page": "1:3",
-  "generatedAt": "2026-08-08",
+  "generatedAt": "2026-08-14",
   "counts": {
-    "total": 416,
-    "active": 363,
+    "total": 421,
+    "active": 366,
     "designAhead": 30,
-    "outOfScope": 23,
-    "activeFamilies": 33
+    "outOfScope": 25,
+    "activeFamilies": 34
   },
   "activeFamilies": [
     "AI",
@@ -3965,7 +3965,7 @@
     },
     {
       "nodeId": "807:6965",
-      "name": "S1.2d - Conflict - Review both",
+      "name": "S1.2d - Conflict - Review both (Compare opens with conflict context)",
       "family": "S1 flows",
       "state": "Conflict · review-both",
       "width": 0,
@@ -4031,7 +4031,7 @@
     },
     {
       "nodeId": "57:2",
-      "name": "Empty states — all 11",
+      "name": "Empty states — all 11 · copy is final, not placeholder",
       "family": "Reference",
       "state": "Empty states — all 11",
       "width": 0,
@@ -4053,7 +4053,7 @@
     },
     {
       "nodeId": "59:2",
-      "name": "Permissions — DESIGNER",
+      "name": "Permissions — what a DESIGNER cannot do",
       "family": "Reference",
       "state": "Permissions — DESIGNER",
       "width": 0,
@@ -4064,7 +4064,7 @@
     },
     {
       "nodeId": "70:2",
-      "name": "Modal instances — the six missing",
+      "name": "Modal instances — the six that were missing",
       "family": "Reference",
       "state": "Modal instances — the six missing",
       "width": 0,
@@ -4086,7 +4086,7 @@
     },
     {
       "nodeId": "74:2",
-      "name": "Brand sub-screens + chrome modals",
+      "name": "Brand sub-screens + remaining chrome modals",
       "family": "Reference",
       "state": "Brand sub-screens + chrome modals",
       "width": 0,
@@ -4097,7 +4097,7 @@
     },
     {
       "nodeId": "96:6",
-      "name": "Device frames + zoom",
+      "name": "Device frames + zoom — §5.5",
       "family": "Reference",
       "state": "Device frames + zoom",
       "width": 0,
@@ -4108,7 +4108,7 @@
     },
     {
       "nodeId": "396:3777",
-      "name": "Permissions — VIEWER",
+      "name": "Permissions — what a VIEWER cannot do",
       "family": "Reference",
       "state": "Permissions — VIEWER",
       "width": 0,
@@ -4152,7 +4152,7 @@
     },
     {
       "nodeId": "962:4474",
-      "name": "SPEC · Panel slots",
+      "name": "SPEC · Panel slots — 320 drawer vs 360 overlay",
       "family": "Reference",
       "state": "SPEC · Panel slots",
       "width": 0,
@@ -4163,7 +4163,7 @@
     },
     {
       "nodeId": "821:4520",
-      "name": "UX Architecture Analysis",
+      "name": "UX Architecture Analysis · 12-Point Audit",
       "family": "Reference",
       "state": "UX Architecture Analysis",
       "width": 0,
@@ -4620,6 +4620,61 @@
       "width": 0,
       "height": 0,
       "status": "active",
+      "authority": "undecided",
+      "recipe": null
+    },
+    {
+      "nodeId": "1205:4829",
+      "name": "Media · fullpage · folders · new-folder (inline)",
+      "family": "Media",
+      "state": "new-folder inline",
+      "width": 240,
+      "height": 330,
+      "status": "active",
+      "authority": "undecided",
+      "recipe": null
+    },
+    {
+      "nodeId": "1205:4804",
+      "name": "Media · modal · import-url",
+      "family": "Media",
+      "state": "import-url",
+      "width": 520,
+      "height": 177,
+      "status": "active",
+      "authority": "undecided",
+      "recipe": null
+    },
+    {
+      "nodeId": "1205:4816",
+      "name": "Media · modal · import-url · invalid",
+      "family": "Media",
+      "state": "import-url invalid",
+      "width": 520,
+      "height": 202,
+      "status": "active",
+      "authority": "undecided",
+      "recipe": null
+    },
+    {
+      "nodeId": "434:2348",
+      "name": "[superseded 2026-08-05] B9.6 · Project settings modal — settings ship fullpage (tabsConfig mode:fullpage)",
+      "family": "Modal",
+      "state": "superseded",
+      "width": 1540,
+      "height": 399,
+      "status": "out-of-scope",
+      "authority": "undecided",
+      "recipe": null
+    },
+    {
+      "nodeId": "71:2",
+      "name": "[superseded 2026-08-05] Inspector — the six missing profiles (all now built)",
+      "family": "Inspector",
+      "state": "superseded",
+      "width": 1986,
+      "height": 796,
+      "status": "out-of-scope",
       "authority": "undecided",
       "recipe": null
     }
