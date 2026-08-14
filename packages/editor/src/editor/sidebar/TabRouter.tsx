@@ -211,6 +211,13 @@ export const TabRouter: React.FC<TabRouterProps> = ({
           composer={composer}
           projectId={projectId}
           initialView={activeSubTab === "published" ? "published" : undefined}
+          /* Boards 184:37 / 184:45 / 453:4064 read the same job the Publish
+             panel polls — one source, two surfaces. */
+          rollbackJob={
+            publishJob && (publishJob.uiState === "publishing" || publishJob.uiState === "published" || publishJob.uiState === "failed")
+              ? { state: publishJob.uiState, progress: publishJob.progress }
+              : null
+          }
           {...commonTabProps}
         />
       );

@@ -59,6 +59,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
   composer,
   projectId,
   initialView,
+  rollbackJob = null,
   isExpanded,
   onExpandToggle,
   onHelpClick,
@@ -237,7 +238,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
             Publish panel embeds; rollback stays ADMIN-gated inside it. */}
         {activeView === "published" &&
           (projectId ? (
-            <PublishHistory siteId={projectId} />
+            <PublishHistory siteId={projectId} rollbackJob={rollbackJob} />
           ) : (
             <div className="bd-history-empty">Publish the site once to start a version history.</div>
           ))}

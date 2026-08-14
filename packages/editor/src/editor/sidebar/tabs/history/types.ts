@@ -36,6 +36,9 @@ export interface HistoryTabProps {
    *  Wins over the stored preference for one mount, so the ⋯ menu's "Publish
    *  history" lands on Published instead of wherever the user last was. */
   initialView?: HistoryView;
+  /** The shell's publish job, forwarded to the Published view so boards
+   *  184:37 / 184:45 / 453:4064 can run off one state. Null = no feed. */
+  rollbackJob?: { state: "publishing" | "published" | "failed"; progress: number } | null;
   /** Panel pin state */
   isExpanded?: boolean;
   /** Pin toggle callback */
