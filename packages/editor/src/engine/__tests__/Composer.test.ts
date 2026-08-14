@@ -159,3 +159,73 @@ describe("Composer listener hygiene", () => {
     expect((composer as any).viewport.getDevice()).toBe("tablet");
   });
 });
+
+/* A loaded project always has a page, and one of them is active. importPage
+   adopts the first when there is no active one, createPage sets it, and
+   RecoveryManager repairs it — on an INACTIVITY timer, minutes later.
+   importProject was the one entry point that could leave the invariant broken:
+   a snapshot with no pages cleared the editor and set nothing back.
+
+   That is reachable in the real product, not a synthetic case: auto-checkpoints
+   fire on project:loaded, so a version captured before pages existed sits in
+   the user's version list. Restoring one left zero pages, no active page, and
+   every insert path dying at `if (!page)` — the sidebar looked fine and did
+   nothing (found live 2026-08-14). */
+describe("Composer.importProject — the editor always has a page to insert into", () => {
+  /* `new Composer()` builds a MediaOptimizer, which throws without a 2d
+     context. The first describe stubs it in its own beforeAll; that scope does
+     not reach here, so this block installs the same stub. */
+  let restoreGetContext: (() => void) | null = null;
+  beforeAll(() => {
+    const original = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (this: HTMLCanvasElement, contextId: string) {
+      if (contextId === "2d") {
+        return {
+          fillStyle: "", strokeStyle: "", lineWidth: 1, canvas: this,
+          getImageData: () => ({ data: new Uint8ClampedArray(4) }),
+          putImageData: () => {}, drawImage: () => {}, fillRect: () => {},
+          clearRect: () => {}, save: () => {}, restore: () => {},
+          beginPath: () => {}, closePath: () => {}, stroke: () => {}, fill: () => {},
+          translate: () => {}, scale: () => {}, rotate: () => {},
+          measureText: () => ({ width: 0 }), fillText: () => {},
+        } as unknown as CanvasRenderingContext2D;
+      }
+      return (original as never as (id: string) => never).call(this, contextId);
+    } as typeof HTMLCanvasElement.prototype.getContext;
+    restoreGetContext = () => { HTMLCanvasElement.prototype.getContext = original; };
+  });
+  afterAll(() => restoreGetContext?.());
+
+  it("adopts the first imported page as active", () => {
+    const composer = new Composer({} as any);
+    const page = composer.elements.createPage("Home");
+    const exported = composer.exportProject();
+    (composer.elements as any).setActivePage?.(page.id);
+
+    composer.importProject(exported);
+
+    expect(composer.elements.getAllPages().length).toBeGreaterThan(0);
+    expect(composer.elements.getActivePage()).toBeTruthy();
+  });
+
+  it("a page-less snapshot leaves a usable editor, not a dead one", () => {
+    const composer = new Composer({} as any);
+    composer.elements.createPage("Home");
+
+    composer.importProject({ version: "1.0.0", pages: [], styles: [], assets: [] } as any);
+
+    // The invariant, stated the way the insert path reads it.
+    expect(composer.elements.getAllPages().length).toBe(1);
+    const active = composer.elements.getActivePage();
+    expect(active).toBeTruthy();
+    expect(composer.elements.getElement(active!.root.id)).toBeTruthy();
+  });
+
+  it("holds when the snapshot omits `pages` entirely", () => {
+    const composer = new Composer({} as any);
+
+    composer.importProject({ version: "1.0.0" } as any);
+
+    expect(composer.elements.getActivePage()).toBeTruthy();
+  });
+});

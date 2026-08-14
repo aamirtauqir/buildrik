@@ -143,15 +143,18 @@ export const EVENTS = {
   VERSION_EXPORTED: "version:exported",
   VERSION_IMPORTED: "version:imported",
   VERSION_LIST_UPDATED: "version:list:updated",
-  VERSION_LOAD_ERROR: "version:load:error",
-  /** Emitted by VersionRow on mouseenter after 300ms — consumed by VersionTimelineManager */
-  VERSION_PREVIEW: "version:preview",
-  /** Emitted by VersionRow on mouseleave — consumed by VersionTimelineManager */
-  VERSION_PREVIEW_CLEAR: "version:preview-clear",
-  /** Emitted by VersionTimelineManager once preview snapshot is applied to canvas */
-  VERSION_PREVIEW_STARTED: "version:preview:started",
-  /** Emitted by VersionTimelineManager once original state is restored after preview */
-  VERSION_PREVIEW_CLEARED: "version:preview:cleared",
+  /* Removed 2026-08-14, all five dead on arrival:
+       VERSION_LOAD_ERROR   — a second name for VERSION_LOAD_FAILED (6 uses);
+                              this one had none, the ctx-menu "four names for
+                              one job" shape again.
+       VERSION_PREVIEW, _CLEAR, _STARTED, _CLEARED — a hover-preview design
+                              their own doc comments described ("emitted by
+                              VersionRow on mouseenter after 300ms") and
+                              nothing ever implemented. VersionRow emitted
+                              none of them; the manager consumed none. Board
+                              163:113's preview is TimeTravelScrubber, which
+                              paints its own image layer and never touches
+                              these. Git has them if the hover design returns. */
 
   // ============================================
   // Component Events (AQUI-027)
@@ -729,11 +732,6 @@ export interface EventPayloads {
   [EVENTS.VERSION_EXPORTED]: import("../types/versions").VersionExportPayload;
   [EVENTS.VERSION_IMPORTED]: import("../types/versions").VersionExportPayload;
   [EVENTS.VERSION_LIST_UPDATED]: { versions: import("../types/versions").NamedVersion[] };
-  [EVENTS.VERSION_LOAD_ERROR]: { error: string };
-  [EVENTS.VERSION_PREVIEW]: { versionId: string; snapshot: import("../types").ProjectData };
-  [EVENTS.VERSION_PREVIEW_CLEAR]: Record<string, never>;
-  [EVENTS.VERSION_PREVIEW_STARTED]: { versionId: string };
-  [EVENTS.VERSION_PREVIEW_CLEARED]: void;
 
   // Component Events (AQUI-027)
   [EVENTS.COMPONENT_CREATED]: import("../types/components").ComponentCreatedPayload;

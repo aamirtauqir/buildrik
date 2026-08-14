@@ -494,6 +494,25 @@ export class Composer extends EventEmitter {
       this.projectMetadata = { ...this.projectMetadata, ...data.metadata };
     }
 
+    /* A loaded project always has a page, and one of them is active — every
+       insert path reads it (`useBlockInsertion`: `if (!page) return`), and
+       importPage/createPage/RecoveryManager all maintain it. This was the one
+       entry point that could leave it broken: a snapshot carrying no pages
+       cleared the editor above and set nothing back, so the sidebar rendered
+       normally and every insert died silently.
+
+       Reachable in the product, not just in theory: auto-checkpoints fire on
+       `project:loaded`, so a version captured before pages existed sits in the
+       user's own version list — restoring it bricked the editor until they
+       found "Start Blank". Repaired here, at the moment the invariant breaks,
+       rather than minutes later on RecoveryManager's inactivity timer. */
+    const pages = this.elements.getAllPages();
+    if (pages.length === 0) {
+      this.elements.createPage("Home");
+    } else if (!this.elements.getActivePage()) {
+      this.elements.setActivePage(pages[0].id);
+    }
+
     this.state.dirty = false;
     this.emit(EVENTS.PROJECT_LOADED, data);
   }

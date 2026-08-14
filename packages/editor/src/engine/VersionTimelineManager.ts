@@ -985,13 +985,6 @@ export class VersionTimelineManager {
     this.autoCheckpointHandlers.clear();
   }
 
-  /**
-   * Clear any active preview state
-   */
-  clearPreview(): void {
-    this.composer.emit(EVENTS.VERSION_PREVIEW_CLEAR, {});
-  }
-
   // ============================================
   // Lifecycle
   // ============================================
