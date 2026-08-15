@@ -74,11 +74,8 @@ describe("FontControls — engine writes", () => {
     expect(onChange).toHaveBeenCalledWith("text-decoration", "underline");
   });
 
-  it("clicking Italic writes font-style", () => {
-    const { onChange } = renderFont();
-    fireEvent.click(screen.getByRole("button", { name: "Italic" }));
-    expect(onChange).toHaveBeenCalledWith("font-style", "italic");
-  });
+  /* Font style sits behind More settings now (board 807:8342 draws no Style
+     row) — TypographyControls.test.tsx covers it. */
 });
 
 describe("FontControls — type token chain buttons (CP5)", () => {

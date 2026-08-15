@@ -43,8 +43,10 @@ describe("BorderSection — basic controls", () => {
     expect(onChange).toHaveBeenCalledWith("border-color", "#333333");
   });
 
+  /* A preview is a collapsed-state summary — the open header carries only its
+     name and chevron (boards 807:8342 / 807:8567). */
   it("renders a preview pill combining width + style", () => {
-    renderBorder({ styles: { "border-width": "2px", "border-style": "solid" } });
+    renderBorder({ styles: { "border-width": "2px", "border-style": "solid" }, isOpen: false });
     expect(screen.getByText("2px solid")).toBeInTheDocument();
   });
 });

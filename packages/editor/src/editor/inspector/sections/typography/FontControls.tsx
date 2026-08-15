@@ -16,7 +16,7 @@ import { Link2, Link2Off } from "lucide-react";
 import * as React from "react";
 import { useTypeRegistry } from "../../../design-system/state/TokenRegistryContext";
 import { TokenPickerPopover } from "../../shared/TokenPickerPopover";
-import { SelectRow, ButtonGroup, InputWithUnit, MixedValueIndicator } from "../../shared/controls";
+import { SelectRow, ButtonGroup, ColorInput, InputWithUnit, MixedValueIndicator } from "../../shared/controls";
 import { CHAIN_BOUND, CHAIN_ROW, CHAIN_SLOT, CHAIN_TRIGGER } from "../../shared/controls/controlClasses";
 import { getCssVariable } from "@/shared/utils/getCssVariable";
 // Font weight options
@@ -129,23 +129,50 @@ interface FontControlsProps {
 export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mixedKeys }) => {
   return (
     <>
-      {/* Font Size — CP5: chain button for type token binding */}
-      <div className={CHAIN_ROW}>
-        <MixedValueIndicator prop="font-size" mixedKeys={mixedKeys} />
-        <div className="tw:flex-1">
-          <InputWithUnit
-            label="Size"
-            value={styles["font-size"] || "16px"}
-            onChange={(v) => onChange("font-size", v)}
-            units={["px", "em", "rem", "%", "vw"]}
-          />
-        </div>
-        <div className={CHAIN_SLOT}>
-          <TypeChainButton
-            property="font-size"
-            value={styles["font-size"] || ""}
-            onChange={(v) => onChange("font-size", v)}
-          />
+      {/* Board 807:8342 pairs the two type numbers on one row — "Size 14 | 1.5"
+          — because line height is read against the size it belongs to, never
+          on its own. Both keep their type-token chain. */}
+      <div className="bdi-row-ctrl" role="group" aria-label="Size and line height">
+        <label className="bdi-lb">Size</label>
+        <div className="bdi-pair">
+          <div className={CHAIN_ROW}>
+            <MixedValueIndicator prop="font-size" mixedKeys={mixedKeys} />
+            <div className="tw:flex-1">
+              <InputWithUnit
+                label=""
+                value={styles["font-size"] || "16px"}
+                onChange={(v) => onChange("font-size", v)}
+                units={["px", "em", "rem", "%", "vw"]}
+              />
+            </div>
+            <div className={CHAIN_SLOT}>
+              <TypeChainButton
+                property="font-size"
+                value={styles["font-size"] || ""}
+                onChange={(v) => onChange("font-size", v)}
+              />
+            </div>
+          </div>
+          <span className="bdi-pair-sep" aria-hidden="true" />
+          <div className={CHAIN_ROW}>
+            <MixedValueIndicator prop="line-height" mixedKeys={mixedKeys} />
+            <div className="tw:flex-1">
+              <InputWithUnit
+                label=""
+                value={styles["line-height"] || ""}
+                onChange={(v) => onChange("line-height", v)}
+                units={["px", "em", "%", "normal"]}
+                placeholder="1.5"
+              />
+            </div>
+            <div className={CHAIN_SLOT}>
+              <TypeChainButton
+                property="line-height"
+                value={styles["line-height"] || ""}
+                onChange={(v) => onChange("line-height", v)}
+              />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -160,34 +187,42 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mi
         />
       </div>
 
-      {/* Line Height — CP5: chain button for type token binding */}
-      <div className={CHAIN_ROW}>
-        <MixedValueIndicator prop="line-height" mixedKeys={mixedKeys} />
-        <div className="tw:flex-1">
-          <InputWithUnit
-            label="Line height"
-            value={styles["line-height"] || ""}
-            onChange={(v) => onChange("line-height", v)}
-            units={["px", "em", "%", "normal"]}
-          />
-        </div>
-        <div className={CHAIN_SLOT}>
-          <TypeChainButton
-            property="line-height"
-            value={styles["line-height"] || ""}
-            onChange={(v) => onChange("line-height", v)}
-          />
-        </div>
+      {/* Text Align — on the board's face, not behind More settings: it is one
+          of the three things anyone changes on a piece of text. */}
+      <div className="tw:relative">
+        <MixedValueIndicator prop="text-align" mixedKeys={mixedKeys} />
+        <ButtonGroup
+          label="Align"
+          value={styles["text-align"] || ""}
+          onChange={(v) => onChange("text-align", v)}
+          options={[
+            { value: "left", label: "Left", icon: "\u2B05" },
+            { value: "center", label: "Center", icon: "\u2B0C" },
+            { value: "right", label: "Right", icon: "\u27A1" },
+            { value: "justify", label: "Justify", icon: "\u2630" },
+          ]}
+        />
       </div>
 
-      {/* Letter Spacing */}
+      {/* Colour */}
       <div className="tw:relative">
-        <MixedValueIndicator prop="letter-spacing" mixedKeys={mixedKeys} />
-        <InputWithUnit
-          label="Letter spacing"
-          value={styles["letter-spacing"] || ""}
-          onChange={(v) => onChange("letter-spacing", v)}
-          units={["px", "em", "normal"]}
+        <MixedValueIndicator prop="color" mixedKeys={mixedKeys} />
+        <ColorInput label="Color" value={styles.color || ""} onChange={(v) => onChange("color", v)} />
+      </div>
+
+      {/* Text Transform */}
+      <div className="tw:relative">
+        <MixedValueIndicator prop="text-transform" mixedKeys={mixedKeys} />
+        <ButtonGroup
+          label="Transform"
+          value={styles["text-transform"] || ""}
+          onChange={(v) => onChange("text-transform", v)}
+          options={[
+            { value: "none", label: "None", icon: "Aa" },
+            { value: "uppercase", label: "Upper", icon: "AA" },
+            { value: "lowercase", label: "Lower", icon: "aa" },
+            { value: "capitalize", label: "Cap", icon: "Aa" },
+          ]}
         />
       </div>
 
@@ -207,16 +242,26 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mi
         />
       </div>
 
-      {/* Font Style */}
-      <ButtonGroup
-        label="Style"
-        value={styles["font-style"] || ""}
-        onChange={(v) => onChange("font-style", v)}
-        options={[
-          { value: "normal", label: "Normal", icon: "N" },
-          { value: "italic", label: "Italic", icon: "I" },
-        ]}
-      />
+      {/* Letter / Word — the board's two spacing numbers, in its words. */}
+      <div className="tw:relative">
+        <MixedValueIndicator prop="letter-spacing" mixedKeys={mixedKeys} />
+        <InputWithUnit
+          label="Letter"
+          value={styles["letter-spacing"] || ""}
+          onChange={(v) => onChange("letter-spacing", v)}
+          units={["px", "em", "normal"]}
+        />
+      </div>
+      <div className="tw:relative">
+        <MixedValueIndicator prop="word-spacing" mixedKeys={mixedKeys} />
+        <InputWithUnit
+          label="Word"
+          value={styles["word-spacing"] || ""}
+          onChange={(v) => onChange("word-spacing", v)}
+          units={["px", "em", "normal"]}
+        />
+      </div>
+
     </>
   );
 };

@@ -32,7 +32,9 @@ describe("Section — preview prop", () => {
     expect(screen.getByTestId("preview-swatch")).toBeInTheDocument();
   });
 
-  it("shows preview when expanded (always visible indicator)", () => {
+  /* Boards 807:8342 / 807:8567 — an expanded header carries its name and its
+     chevron, nothing else. The rows below say what the summary was for. */
+  it("drops the preview once the section is open", () => {
     const preview = <span data-testid="preview-swatch" />;
     render(
       <Section title="Background" preview={preview}>
@@ -40,7 +42,7 @@ describe("Section — preview prop", () => {
       </Section>
     );
     fireEvent.click(screen.getByRole("button"));
-    expect(screen.getByTestId("preview-swatch")).toBeInTheDocument();
+    expect(screen.queryByTestId("preview-swatch")).not.toBeInTheDocument();
   });
 
   it("shows no preview when none provided", () => {

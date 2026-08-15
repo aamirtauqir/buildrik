@@ -94,27 +94,21 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange }) => {
   }, [value]);
 
   return (
-    <div style={{ marginBottom: 12 }}>
-      <label
-        style={{
-          fontSize: 12,
-          color: "var(--bk-ink-muted)",
-          fontWeight: 500,
-          display: "block",
-          marginBottom: 6,
-        }}
-      >
-        Font Family
-      </label>
+    /* Board 807:8342 reads "Family  [Inter Tight]" — one row, label left, the
+       same 88px column every other row uses. It used to stack a "Font Family"
+       caption above a full-bleed button, the only row in the section that did. */
+    <div className="bdi-row-ctrl" style={{ marginBottom: 12, position: "relative" }}>
+      <label className="bdi-lb">Family</label>
       {/* Current Font Display / Toggle Button */}
       <Button
         onClick={() => setShowFontPicker(!showFontPicker)}
         aria-haspopup="listbox"
         aria-expanded={showFontPicker}
         aria-controls="font-picker-listbox"
+        aria-label="Font family"
         style={{
           width: "100%",
-          padding: "10px 12px",
+          padding: "4px 8px",
           background: "var(--bk-bg-card)",
           border: `1px solid ${"var(--bk-border-medium)"}`,
           borderRadius: 6,

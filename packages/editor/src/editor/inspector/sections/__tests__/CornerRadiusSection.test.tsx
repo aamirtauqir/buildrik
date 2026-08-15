@@ -8,10 +8,10 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { CornerRadiusSection } from "../CornerRadiusSection";
 
-function renderRadius(styles: Record<string, string> = {}) {
+function renderRadius(styles: Record<string, string> = {}, isOpen = true) {
   const onChange = vi.fn();
   const utils = render(
-    <CornerRadiusSection styles={styles} onChange={onChange} isOpen={true} />
+    <CornerRadiusSection styles={styles} onChange={onChange} isOpen={isOpen} />
   );
   return { onChange, ...utils };
 }
@@ -31,7 +31,7 @@ describe("CornerRadiusSection — value rendering", () => {
   });
 
   it("shows the shorthand as the collapsed preview pill", () => {
-    renderRadius({ "border-radius": "6px" });
+    renderRadius({ "border-radius": "6px" }, false);
     expect(screen.getByText("6px")).toBeInTheDocument();
   });
 });

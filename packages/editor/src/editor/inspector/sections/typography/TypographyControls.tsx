@@ -1,13 +1,17 @@
 /**
- * TextControls - Text alignment, transform, and spacing controls
- * Part of Typography section refactoring
+ * TypographyControls — what "More settings" holds for text.
+ *
+ * Colour, Align, Transform and Word spacing used to live here; board 807:8342
+ * draws all four on the section's face, so they moved up into FontControls.
+ * What is left is what the board keeps out of the way — five rows, which is
+ * what the More settings badge has always claimed.
  *
  * @module editor/inspector/sections/typography/TypographyControls
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { SelectRow, ButtonGroup, ColorInput, MixedValueIndicator, InputWithUnit } from "../../shared/controls";
+import { SelectRow, ButtonGroup, MixedValueIndicator, InputWithUnit } from "../../shared/controls";
 
 interface TextControlsProps {
   styles: Record<string, string>;
@@ -19,40 +23,16 @@ interface TextControlsProps {
 export const TypographyControls: React.FC<TextControlsProps> = ({ styles, onChange, mixedKeys }) => {
   return (
     <>
-      {/* Text Color */}
-      <div style={{ position: "relative" }}>
-        <MixedValueIndicator prop="color" mixedKeys={mixedKeys} />
-        <ColorInput label="Color" value={styles.color || ""} onChange={(v) => onChange("color", v)} />
-      </div>
-
-      {/* Text Align */}
-      <div style={{ position: "relative" }}>
-        <MixedValueIndicator prop="text-align" mixedKeys={mixedKeys} />
+      {/* Font Style */}
+      <div className="tw:relative">
+        <MixedValueIndicator prop="font-style" mixedKeys={mixedKeys} />
         <ButtonGroup
-          label="Align"
-          value={styles["text-align"] || ""}
-          onChange={(v) => onChange("text-align", v)}
+          label="Style"
+          value={styles["font-style"] || ""}
+          onChange={(v) => onChange("font-style", v)}
           options={[
-            { value: "left", label: "Left", icon: "\u2B05" },
-            { value: "center", label: "Center", icon: "\u2B0C" },
-            { value: "right", label: "Right", icon: "\u27A1" },
-            { value: "justify", label: "Justify", icon: "\u2630" },
-          ]}
-        />
-      </div>
-
-      {/* Text Transform */}
-      <div style={{ position: "relative" }}>
-        <MixedValueIndicator prop="text-transform" mixedKeys={mixedKeys} />
-        <ButtonGroup
-          label="Transform"
-          value={styles["text-transform"] || ""}
-          onChange={(v) => onChange("text-transform", v)}
-          options={[
-            { value: "none", label: "None", icon: "Aa" },
-            { value: "uppercase", label: "Upper", icon: "AA" },
-            { value: "lowercase", label: "Lower", icon: "aa" },
-            { value: "capitalize", label: "Cap", icon: "Aa" },
+            { value: "normal", label: "Normal", icon: "N" },
+            { value: "italic", label: "Italic", icon: "I" },
           ]}
         />
       </div>
@@ -82,13 +62,6 @@ export const TypographyControls: React.FC<TextControlsProps> = ({ styles, onChan
           { value: "keep-all", label: "Keep All" },
           { value: "break-word", label: "Break Word" },
         ]}
-      />
-
-      {/* Word Spacing */}
-      <InputWithUnit
-        label="Word Spacing"
-        value={styles["word-spacing"] || ""}
-        onChange={(v) => onChange("word-spacing", v)}
       />
 
       {/* Text Indent */}

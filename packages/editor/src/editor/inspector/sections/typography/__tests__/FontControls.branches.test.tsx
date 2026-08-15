@@ -1,7 +1,7 @@
 /**
  * FontControls — remaining branches not covered by FontControls.test.tsx:
- * line-height / letter-spacing writes, weight change, extra decoration options,
- * font-style Normal, and unlinking a bound line-height type token.
+ * the paired line-height field, Letter / Word spacing, weight change, extra
+ * decoration options, and unlinking a bound line-height type token.
  *
  * @license BSD-3-Clause
  */
@@ -22,16 +22,40 @@ function editRow(labelText: string, value: string) {
 }
 
 describe("FontControls — remaining unit rows", () => {
-  it("editing line-height writes line-height (default px unit)", () => {
+  /* Board 807:8342 pairs it with Size, so it has no label of its own — the
+     second field in the row is line height. */
+  it("editing the paired second field writes line-height", () => {
     const { onChange } = renderFont();
-    editRow("Line height", "1.5");
+    const pair = screen.getByRole("group", { name: "Size and line height" });
+    const inputs = pair.querySelectorAll("input");
+    fireEvent.change(inputs[inputs.length - 1] as HTMLInputElement, { target: { value: "1.5" } });
     expect(onChange).toHaveBeenCalledWith("line-height", "1.5px");
   });
 
   it("editing letter-spacing writes letter-spacing", () => {
     const { onChange } = renderFont();
-    editRow("Letter spacing", "2");
+    editRow("Letter", "2");
     expect(onChange).toHaveBeenCalledWith("letter-spacing", "2px");
+  });
+
+  it("editing word-spacing writes word-spacing", () => {
+    const { onChange } = renderFont();
+    editRow("Word", "3");
+    expect(onChange).toHaveBeenCalledWith("word-spacing", "3px");
+  });
+
+  /* Promoted out of More settings by the board — colour, align and transform
+     are on the section's face now. */
+  it("colour, align and transform write from the section face", () => {
+    const { onChange } = renderFont();
+    fireEvent.change(screen.getByRole("textbox", { name: "Color value" }), {
+      target: { value: "ff0000" },
+    });
+    expect(onChange).toHaveBeenCalledWith("color", "#ff0000");
+    fireEvent.click(screen.getByRole("button", { name: "Center" }));
+    expect(onChange).toHaveBeenCalledWith("text-align", "center");
+    fireEvent.click(screen.getByRole("button", { name: "Upper" }));
+    expect(onChange).toHaveBeenCalledWith("text-transform", "uppercase");
   });
 });
 
@@ -53,11 +77,6 @@ describe("FontControls — weight + decoration + style branches", () => {
     expect(onChange).toHaveBeenCalledWith("text-decoration", "overline");
   });
 
-  it("clicking Normal writes font-style normal", () => {
-    const { onChange } = renderFont();
-    fireEvent.click(screen.getByRole("button", { name: "Normal" }));
-    expect(onChange).toHaveBeenCalledWith("font-style", "normal");
-  });
 });
 
 describe("FontControls — type token chain (line-height bound)", () => {

@@ -87,7 +87,10 @@ export const Section: React.FC<SectionProps> = ({
         aria-label={`${title} section, ${isOpen ? "expanded" : "collapsed"}`}
       >
         <span className="bdi-sec-name">{title}</span>
-        {preview && <span className="bdi-sec-preview">{preview}</span>}
+        {/* A summary of what is inside is worth a line only while it is shut.
+            Open, the rows say it better, and the boards' expanded headers
+            (807:8342, 807:8567) carry nothing but their chevron. */}
+        {!isOpen && preview && <span className="bdi-sec-preview">{preview}</span>}
         {action && (
           <span
             onClick={(e) => e.stopPropagation()}

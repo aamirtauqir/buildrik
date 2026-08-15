@@ -36,12 +36,12 @@ describe("SizeSection — current values render", () => {
   });
 
   it("renders a collapsed preview 'W × H' when either dimension is set", () => {
-    renderSize({ styles: { width: "100px", height: "50px" } });
+    renderSize({ styles: { width: "100px", height: "50px" }, isOpen: false });
     expect(screen.getByText("100px × 50px")).toBeInTheDocument();
   });
 
   it("preview falls back to 'auto' for the unset dimension", () => {
-    renderSize({ styles: { width: "100px" } });
+    renderSize({ styles: { width: "100px" }, isOpen: false });
     expect(screen.getByText("100px × auto")).toBeInTheDocument();
   });
 });

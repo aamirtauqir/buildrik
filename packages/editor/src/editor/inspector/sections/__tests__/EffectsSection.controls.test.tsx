@@ -10,10 +10,10 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { EffectsSection } from "../EffectsSection";
 
-function renderEffects(styles: Record<string, string> = {}) {
+function renderEffects(styles: Record<string, string> = {}, isOpen = true) {
   const onChange = vi.fn();
   const utils = render(
-    <EffectsSection styles={styles} onChange={onChange} isOpen={true} />
+    <EffectsSection styles={styles} onChange={onChange} isOpen={isOpen} />
   );
   return { onChange, ...utils };
 }
@@ -95,12 +95,12 @@ describe("EffectsSection — transition + cursor selects", () => {
 
 describe("EffectsSection — collapsed preview", () => {
   it("summarizes shadow count and reduced opacity", () => {
-    renderEffects({ "box-shadow": "0 4px 6px rgba(0,0,0,0.1)", opacity: "0.5" });
+    renderEffects({ "box-shadow": "0 4px 6px rgba(0,0,0,0.1)", opacity: "0.5" }, false);
     expect(screen.getByText("1 shadow · 50%")).toBeInTheDocument();
   });
 
   it("renders no preview when no effects are applied", () => {
-    const { container } = renderEffects();
+    const { container } = renderEffects({}, false);
     expect(container.querySelector(".bdi-sec-preview")).toBeNull();
   });
 });

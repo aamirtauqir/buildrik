@@ -21,12 +21,12 @@ function renderLayout(props: Partial<Props> = {}) {
 
 describe("LayoutSection — collapsed preview", () => {
   it("combines display and a non-static position", () => {
-    renderLayout({ styles: { display: "flex", position: "absolute" } });
+    renderLayout({ isOpen: false, styles: { display: "flex", position: "absolute" } });
     expect(screen.getByText("flex · absolute")).toBeInTheDocument();
   });
 
   it("omits a static position from the preview", () => {
-    renderLayout({ styles: { display: "block", position: "static" } });
+    renderLayout({ isOpen: false, styles: { display: "block", position: "static" } });
     expect(screen.getByText("block")).toBeInTheDocument();
     expect(screen.queryByText(/static/)).not.toBeInTheDocument();
   });

@@ -95,6 +95,7 @@ describe("GridSection — item writes", () => {
 describe("GridSection — collapsed preview", () => {
   it("counts explicit tracks as 'cols × rows'", () => {
     renderGrid({
+      isOpen: false,
       styles: {
         "grid-template-columns": "1fr 1fr 1fr",
         "grid-template-rows": "auto auto",
@@ -105,6 +106,7 @@ describe("GridSection — collapsed preview", () => {
 
   it("labels auto-fit templates as 'auto'", () => {
     renderGrid({
+      isOpen: false,
       styles: { "grid-template-columns": "repeat(auto-fit, minmax(200px, 1fr))" },
     });
     expect(screen.getByText(/auto\s*×\s*—/)).toBeInTheDocument();

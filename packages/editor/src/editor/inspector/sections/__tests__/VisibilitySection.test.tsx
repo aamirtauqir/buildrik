@@ -8,10 +8,10 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { VisibilitySection } from "../VisibilitySection";
 
-function renderVisibility(styles: Record<string, string> = {}) {
+function renderVisibility(styles: Record<string, string> = {}, isOpen = true) {
   const onChange = vi.fn();
   const utils = render(
-    <VisibilitySection styles={styles} onChange={onChange} isOpen={true} />
+    <VisibilitySection styles={styles} onChange={onChange} isOpen={isOpen} />
   );
   return { onChange, ...utils };
 }
@@ -35,7 +35,7 @@ describe("VisibilitySection — rendering", () => {
   });
 
   it("shows a 'hidden on N' preview when any breakpoint is hidden", () => {
-    renderVisibility({ "--hide-mobile": "true", "--hide-tablet": "true" });
+    renderVisibility({ "--hide-mobile": "true", "--hide-tablet": "true" }, false);
     expect(screen.getByText("hidden on 2")).toBeInTheDocument();
   });
 

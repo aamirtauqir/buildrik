@@ -59,7 +59,7 @@ describe("SpacingSection — current values render", () => {
   });
 
   it("shows an 'm <value>' preview when all margin sides match", () => {
-    renderSpacing({ styles: { margin: "16px" } });
+    renderSpacing({ styles: { margin: "16px" }, isOpen: false });
     expect(screen.getByText("m 16px")).toBeInTheDocument();
   });
 });

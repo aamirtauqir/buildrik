@@ -68,7 +68,7 @@ describe("FlexboxSection — container controls", () => {
   });
 
   it("renders a 'row · center' preview from direction + justify", () => {
-    renderFlex({ styles: { display: "flex", "justify-content": "center" } });
+    renderFlex({ isOpen: false, styles: { display: "flex", "justify-content": "center" } });
     expect(screen.getByText("row · center")).toBeInTheDocument();
   });
 

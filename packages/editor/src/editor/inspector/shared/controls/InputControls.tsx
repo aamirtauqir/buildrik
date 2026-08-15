@@ -204,12 +204,21 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   const isKeywordUnit = unit === "auto" || unit === "none" || unit === "inherit";
 
   return (
-    <div className={`bdi-row-ctrl${disabled ? " disabled" : ""}`} title={disabledReason}>
-      <label className="bdi-lb">
-        {label}
-        {isOverridden && <OverrideDot />}
-        {helperText && <HelperIcon text={helperText} />}
-      </label>
+    /* An unlabelled field takes the whole row: the 88px label column is for a
+       label, and leaving it standing squeezed paired fields (Size | line
+       height, W | H) down to about 39px — enough to read "inhe". */
+    <div
+      className={`bdi-row-ctrl${disabled ? " disabled" : ""}`}
+      style={label ? undefined : { gridTemplateColumns: "1fr" }}
+      title={disabledReason}
+    >
+      {label ? (
+        <label className="bdi-lb">
+          {label}
+          {isOverridden && <OverrideDot />}
+          {helperText && <HelperIcon text={helperText} />}
+        </label>
+      ) : null}
       <div className="bdi-row-content">
         <div
           className={`bdi-fld${isInvalid ? " invalid" : ""}`}

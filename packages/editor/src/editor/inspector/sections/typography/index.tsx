@@ -94,7 +94,7 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
       tier={tier}
       id="inspector-section-typography"
     >
-      {/* Font Family Picker - AQUI-032 */}
+      {/* Family — board 807:8342's first row. */}
       <div style={{ position: "relative" }}>
         <MixedValueIndicator prop="font-family" mixedKeys={mixedKeys} />
         <FontPicker value={styles["font-family"] || ""} onChange={handleFontChange} />
