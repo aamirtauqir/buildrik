@@ -2250,6 +2250,28 @@ nobody had read the descriptions against the behaviour.
 Matched without changes: hover levels (1176:4925 — all four, verified live),
 the breadcrumb's shape and the palette's groups, disabled rows and footer.
 
+## BLOCKER for the founder's own file — the Issues panel is a 60px sliver
+
+Open the topbar's issue pill and the panel renders 360px wide at the right,
+**underneath the inspector**: all you see is a 60px strip of its header. Not a
+z-index typo — `.layout-shell__inspector` carries `transform: translateX(...)`
+for its open/close slide, and a transform creates a stacking context, so the
+aside's `z-index: 80` beats the panel's inline `zIndex: 45`.
+
+The fix is one line in `AquibraStudio.tsx:514` — the panel wrapper's
+`zIndex: 45` needs to be above the shell's panels (80). CLAUDE.md says never to
+stage that file from an agent session, so it is left for the founder:
+
+```
+-            zIndex: 45,
++            zIndex: 120,   // above .layout-shell__inspector's transform-made
++                           // stacking context (z-index: 80)
+```
+
+Everything else in the Issues family (164:2 · 164:22 · 164:35) is conformed and
+verified against the boards; the panel simply cannot be seen until that line
+changes.
+
 ## Content family — walked, 2026-08-15
 
 Fifteen boards. The panel's own screens were close; the walk's finds were one
