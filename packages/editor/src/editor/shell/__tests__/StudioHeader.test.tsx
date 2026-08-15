@@ -706,7 +706,7 @@ describe("F1 dirty-exit guard", () => {
     render(<StudioHeader {...makeProps({ isDirty: true })} />);
     fireEvent.click(exitBtn());
     expect(assign).not.toHaveBeenCalled();
-    expect(screen.getByText("Leave the editor?")).toBeTruthy();
+    expect(screen.getByText("Leave with unsaved changes?")).toBeTruthy();
     expect(screen.getByRole("button", { name: "Save & leave" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Leave anyway" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Stay" })).toBeTruthy();
@@ -729,7 +729,7 @@ describe("F1 dirty-exit guard", () => {
     fireEvent.click(exitBtn());
     fireEvent.click(screen.getByRole("button", { name: "Save & leave" }));
     await waitFor(() =>
-      expect(screen.getByText(/unsaved edits will be lost/)).toBeTruthy(),
+      expect(screen.getByText(/leaving loses this work/)).toBeTruthy(),
     );
     expect(assign).not.toHaveBeenCalled();
     // risky dialog never offers a fake save
@@ -749,7 +749,7 @@ describe("F1 dirty-exit guard", () => {
   it("offline + dirty: Exit goes straight to the risky dialog (5A — never fake-save)", () => {
     render(<StudioHeader {...makeProps({ isDirty: true, isOffline: true })} />);
     fireEvent.click(exitBtn());
-    expect(screen.getByText(/unsaved edits will be lost/)).toBeTruthy();
+    expect(screen.getByText(/leaving loses this work/)).toBeTruthy();
     expect(screen.queryByRole("button", { name: "Save & leave" })).toBeNull();
   });
 
@@ -991,7 +991,7 @@ describe("F9 a11y", () => {
   it("⌘K is a no-op while a modal dialog owns the keyboard", () => {
     render(<StudioHeader {...makeProps({ isDirty: true })} />);
     fireEvent.click(screen.getByRole("button", { name: "‹ Exit" }));
-    expect(screen.getByText("Leave the editor?")).toBeTruthy();
+    expect(screen.getByText("Leave with unsaved changes?")).toBeTruthy();
     fireEvent.keyDown(document, { key: "k", metaKey: true });
     expect(screen.queryByTestId("command-palette")).toBeNull();
   });

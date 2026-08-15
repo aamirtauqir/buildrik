@@ -735,11 +735,20 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
       {exitDialog ? (
         <ModalRoot open onOpenChange={(o) => !o && setExitDialog(null)}>
           <ModalContent size="question" aria-labelledby="bk-exit-title">
-            <ModalTitle id="bk-exit-title">Leave the editor?</ModalTitle>
+            {/* Board 1172:4804 draws these as two different dialogs, and the
+                difference is which door is the safe one. With a save
+                available, leaving is the risk. Offline, STAYING is the
+                answer — so Stay is the primary there and the other button
+                names what it costs. */}
+            <ModalTitle id="bk-exit-title">
+              {exitDialog.kind === "risky"
+                ? "You're offline with unsaved changes"
+                : "Leave with unsaved changes?"}
+            </ModalTitle>
             <ModalDescription>
               {exitDialog.kind === "risky"
-                ? "You're offline — unsaved edits will be lost if you leave."
-                : "You have unsaved changes."}
+                ? "Saving isn't possible right now — leaving loses this work. Reconnect first, or stay until the connection returns."
+                : "Your last edits aren't saved yet."}
             </ModalDescription>
             {exitDialog.error ? (
               <p className="bk-exit-dialog__error" role="alert">
@@ -747,17 +756,34 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
               </p>
             ) : null}
             <ModalFooter>
-              <Button color="light" onClick={() => setExitDialog(null)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
-                Stay
-              </Button>
-              <Button color="red" onClick={leaveAnyway}>
-                Leave anyway
-              </Button>
-              {exitDialog.kind === "dirty" ? (
-                <Button disabled={leaving} onClick={() => void saveAndLeave()} aria-busy={leaving || undefined}>
-                  Save &amp; leave
-                </Button>
-              ) : null}
+              {exitDialog.kind === "risky" ? (
+                <>
+                  <Button onClick={() => setExitDialog(null)}>Stay</Button>
+                  <Button
+                    color="light"
+                    onClick={leaveAnyway}
+                    className="tw:border-[var(--bk-error)] tw:bg-transparent tw:text-[var(--bk-error)]"
+                  >
+                    Leave and lose changes
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button color="light" onClick={() => setExitDialog(null)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+                    Stay
+                  </Button>
+                  <Button
+                    color="light"
+                    onClick={leaveAnyway}
+                    className="tw:border-[var(--bk-error)] tw:bg-transparent tw:text-[var(--bk-error)]"
+                  >
+                    Leave anyway
+                  </Button>
+                  <Button disabled={leaving} onClick={() => void saveAndLeave()} aria-busy={leaving || undefined}>
+                    Save &amp; leave
+                  </Button>
+                </>
+              )}
             </ModalFooter>
           </ModalContent>
         </ModalRoot>
