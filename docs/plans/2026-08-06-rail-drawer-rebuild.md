@@ -1904,6 +1904,57 @@ the catalog is bundled; save-as-template left unbuilt for want of a route. Two
 of the finds were the serious kind — a published site in Times New Roman, and
 "Add as new page" destroying the page you were on.
 
+## Phase 1 — family 6: AI, started 2026-08-15
+
+**The panel was in the wrong column.** All eleven AI boards draw it in the
+INSPECTOR, opening with "‹ Inspector", the scope band and the prompt directly
+under the title. Live opened AI as a LEFT sidebar tab with a Chat/Agent toggle
+no board has and the composer at the bottom, chat-style. Routing `ui:switch-tab
+{tab:"ai"}` to the inspector column moved every entry at once — the ✦ AI chip,
+the multi-select toolbar, the no-selection state, and `AquibraStudio`'s own
+`onShowAI`, which matters because that file cannot be staged from here.
+
+**Four states did not exist, and two of them mattered.**
+- **No API key (171:136).** The server has said so precisely since it shipped
+  (`assertProviderConfigured` → PRECONDITION_FAILED, before any quota is
+  reserved) and the panel flattened it into one grey line under a composer
+  that still looked ready. It now says what is wrong, that nothing will run,
+  and where to fix it — including the board's own sentence about why the state
+  exists: *"This is the real message — not a silent fallback that pretends to
+  work."*
+- **Out of credit (171:105).** Same shape, and the line that matters most is
+  "Nothing was changed." The server's own numbers are quoted rather than
+  re-worded — the board's "resets on 1 Aug" is sample data.
+- **A stopped run reported itself as finished.** `stop()` sets phase `"done"`,
+  the same phase a completed run ends in, so the panel said "Done · N of M"
+  either way. The runner now carries `stoppedByUser` and board 171:36's state
+  says what happened.
+- **A failed step printed its error and nothing else.** Board 171:2 names the
+  step, says what survived it ("Nothing after step 2 ran"), and offers Undo all
+  and Retry. Both are real: Retry re-runs the same brief (the panel remembers
+  it, the runner does not), and Undo all issues exactly as many undos as there
+  were applied steps.
+
+**Three of the boards' sentences are deliberately not used**, because they are
+not true of this code, and each is a claim a user would rely on:
+- 171:67's *"Apply lands as ONE undo step — ⌘Z takes back all three."* Each
+  approved step applies in its own transaction, so a three-step run leaves
+  three undo entries. A test asserts that wording never returns. The idle
+  state's version of the promise IS kept, because a chat edit is a single
+  apply.
+- 171:36's *"Undo all removes it in one step."* Same reason.
+- 170:97's footnote ends *"…the line between an assistant and something that
+  edits a client's site unattended"* — which the **auto-apply checkbox
+  contradicts outright**. The first half is kept; the contradiction is named
+  below.
+
+Also fixed on the way past: the command palette's "Ask AI instead" offer
+emitted `UI_PANEL_OPEN {panel:"ai"}`, and that handler allow-lists real LEFT
+tabs, which "ai" is not — the offer had been a silent no-op since it shipped.
+
+The run states need a live model to reach, so they are pinned by test rather
+than walked; idle, scope and not-configured were walked live at 1440×900.
+
 ## Named for the founder — needs a decision or a file I must not stage
 
 **The save chip: board pill vs D7 rule 4.** Board 199:2 (and every shell board)
@@ -1931,6 +1982,23 @@ group does not exist; Insert shows ELEMENTS · BLOCKS · COMPONENTS · MINE. Boa
 it either. Options: an Insert TEMPLATES group (which the code already expects),
 a seventh rail slot, or a second action beside "+ Add page". One decision
 unlocks both.
+
+
+**Auto-apply contradicts the promise board 170:97 prints under it.** The
+step-gate footnote reads "The run waits rather than guessing. This is the line
+between an assistant and something that edits a client's site unattended." The
+panel also carries an "Auto-apply steps (skip per-step approval)" checkbox,
+which is exactly the unattended editing that sentence draws a line against. One
+of the two has to go: keep the checkbox and drop the claim, or keep the claim
+and drop the checkbox. The first half of the footnote ("The run waits rather
+than guessing") ships either way, because it is true of the default.
+
+**The AI panel keeps a chat thread; the boards draw a single shot.** Every AI
+board shows one prompt and one result — a plan, or a diff card — with no
+history of previous turns. Live keeps a multi-turn thread with You/Assistant
+bubbles, which is a capability the boards neither draw nor forbid. Kept, on the
+same reasoning as the review composer, and named here so it is a decision
+rather than an oversight.
 
 
 **Published sites name Inter and never load it.** Every element this product
