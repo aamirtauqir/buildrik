@@ -40,8 +40,22 @@ export function sanitizeHTMLForPreview(html: string): string {
         }
       });
     });
+    /* Keep the page's own stylesheet. The rebuilt head used to carry nothing
+       but a charset, so every <style> the export wrote was dropped and the
+       "Quick preview" — the one surface whose whole job is "this is what a
+       visitor sees" — showed the page without its CSS. The same token filter
+       the style ATTRIBUTES get is applied to the sheet, and script-bearing
+       elements were already removed above. */
+    const styles = [...doc.head.querySelectorAll("style"), ...doc.body.querySelectorAll("style")]
+      .map((el) => el.textContent ?? "")
+      .filter((css) => {
+        const flat = css.replace(/\s+/g, "").toLowerCase();
+        return !FORBIDDEN_STYLE_TOKENS.some((t) => flat.includes(t));
+      })
+      .map((css) => `<style>${css}</style>`)
+      .join("");
     const body = doc.body.textContent !== null ? doc.body.outerHTML : "<body></body>";
-    return `<!DOCTYPE html><html><head><meta charset="utf-8"></head>${body}</html>`;
+    return `<!DOCTYPE html><html><head><meta charset="utf-8">${styles}</head>${body}</html>`;
   } catch {
     return "<!DOCTYPE html><html><body>Preview unavailable</body></html>";
   }

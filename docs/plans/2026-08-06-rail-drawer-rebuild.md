@@ -1671,16 +1671,41 @@ an AI run panel (back · "AI" · "Still working on: Hero" · a step list with
 done/running dots); live reaches AI through the inspector header's ✦ AI chip.
 The AI family owns that panel — 11 boards.
 
-**Board 65:211 (Preview) — walked, three deltas handed to the Preview family
-(7 boards), which owns that surface.** Live preview does the main thing right:
-all chrome drops away, the topbar stays, and a Done button sits at the bottom.
-What differs: (1) the board presents the site as a centred page sheet on the
-app background; live renders it edge-to-edge from x=0, (2) the board's Done is
-a dark navy pill ~110×33 at 14px; live's is a 54×32 accent-blue pill at 12px,
-(3) the AI launcher FAB stays on screen over the preview, and the board draws
-nothing but Done. None of the three are shell composition — they are what the
-Preview family's own boards specify — so they are written down here rather than
-guessed at from an in-situ drawing.
+**Board 65:211 (Preview) — walked, and fixed.** Live preview did the main thing
+right: all chrome drops away, the topbar stays, a Done button sits at the
+bottom. Two real deltas, both now closed: the board presents the site as a
+centred page **sheet** on the app ground (live rendered it edge-to-edge from
+x=0 — a preview of a page, drawn without the page), and its Done is a dark
+pill, wider and taller than the accent-blue chip that shipped — it is the only
+control on screen, so it should read as the way out rather than as one more
+blue button.
+
+A third "delta" was a **tool artifact and is withdrawn**: the dark circular
+button bottom-right of every screenshot is not ours. It carries
+`data-feedback-toolbar="true" data-agentation-toolbar="true"` — a feedback
+toolbar injected into the page by the harness. The "0 / 7 done" pill beside it
+IS ours (the onboarding checklist). Twice now in this arc a screenshot has
+argued for a defect that belonged to the tooling; the check is one DOM query.
+
+**The twenty-second find, from looking at that same preview twice: Quick
+preview never showed the page's CSS.** `sanitizeHTMLForPreview` keeps the body
+and rebuilds a head containing one charset meta — so every `<style>` the export
+wrote was thrown away. The surface whose entire claim is "this is what a
+visitor sees" showed the page without its stylesheet, while the published page
+shipped it. Inline styles survived, which is why a template previewed
+convincingly (templates carry their styling inline) and an editor-built page
+did not. The sheet is kept now, through the same token filter the style
+ATTRIBUTES already pass.
+
+Underneath it was a second: **`Composer.exportHTML()` builds its own
+document** — `<style>${css}</style>` and nothing else — so the quick export and
+the published export disagreed about the base rules. It now carries the same
+`RESET_CSS` a published page gets, which is what makes the preview's typography
+match the site's after the Times New Roman fix.
+
+The Preview *family*'s own seven boards need nothing: every one is tagged
+`[not-implemented]` (accessibility checker, interaction test, share link) or
+`[design-ahead]` (the four performance-audit frames).
 
 Carried, not skipped: 65:2's dark first-run coach mark ("Everything you build
 lives behind these six." · Got it, anchored to the rail) is not built. It has

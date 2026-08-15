@@ -51,21 +51,47 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({ html, onDone }) 
         flexDirection: "column",
       }}
     >
-      <iframe
-        title="Site preview"
-        sandbox=""
-        srcDoc={html}
-        style={{ flex: 1, width: "100%", border: "none", background: "#fff" }}
-      />
+      {/* Board 65:211 presents the site as a PAGE on the app ground, not
+          edge-to-edge chrome-less browser fill: the preview is of a page, and
+          a page has edges. */}
+      <div
+        style={{
+          flex: 1,
+          minHeight: 0,
+          display: "flex",
+          justifyContent: "center",
+          padding: "var(--bk-space-24) var(--bk-space-24) var(--bk-space-40)",
+        }}
+      >
+        <iframe
+          title="Site preview"
+          sandbox=""
+          srcDoc={html}
+          style={{
+            width: "100%",
+            maxWidth: 1100,
+            height: "100%",
+            border: "none",
+            borderRadius: "var(--bk-radius-lg)",
+            boxShadow: "var(--bk-shadow-overlay)",
+            background: "#fff",
+          }}
+        />
+      </div>
+      {/* Board 65:211's Done is a dark pill, wider and taller than the
+          accent-blue chip that shipped — it is the only control on screen, so
+          it reads as the way out rather than as one more blue button. */}
       <Button
-        size="xs"
         onClick={onDone}
         style={{
           position: "absolute",
-          bottom: 16,
+          bottom: 20,
           left: "50%",
           transform: "translateX(-50%)",
+          minWidth: 110,
           borderRadius: "var(--bk-radius-full)",
+          background: "var(--bk-ink)",
+          borderColor: "var(--bk-ink)",
           boxShadow: "var(--bk-shadow-overlay)",
         }}
       >

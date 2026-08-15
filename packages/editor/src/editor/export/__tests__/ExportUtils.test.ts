@@ -183,4 +183,23 @@ describe("downloadFile", () => {
 
     expect(revokeObjectURL).toHaveBeenCalledWith("blob:mock-url");
   });
+
+  /* The preview's whole claim is "this is what a visitor sees". The rebuilt
+     head carried nothing but a charset, so the page's own stylesheet was
+     dropped and the preview showed unstyled HTML — while the published page
+     shipped the CSS. */
+  it("keeps the page's stylesheet", () => {
+    const out = sanitizeHTMLForPreview(
+      "<!DOCTYPE html><html><head><style>body{font-family:Inter, sans-serif}</style></head><body><h1>Hi</h1></body></html>",
+    );
+    expect(out).toContain("font-family:Inter, sans-serif");
+    expect(out).toContain("<h1>Hi</h1>");
+  });
+
+  it("still refuses a sheet carrying the tokens it refuses in a style attribute", () => {
+    const out = sanitizeHTMLForPreview(
+      "<!DOCTYPE html><html><head><style>body{background:url(http://x/y.png)}</style></head><body>x</body></html>",
+    );
+    expect(out).not.toContain("url(");
+  });
 });

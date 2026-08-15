@@ -32,6 +32,7 @@ import { TraitDataBinding } from "./data/TraitDataBinding";
 import { DragManager } from "./drag/DragManager";
 import { ElementManager } from "./elements/ElementManager";
 import { EventEmitter } from "./EventEmitter";
+import { RESET_CSS } from "./export/ExportHelpers";
 import { FontManager } from "./fonts/FontManager";
 import { FormHandler } from "./forms/FormHandler";
 import { HistoryManager } from "./HistoryManager";
@@ -543,6 +544,16 @@ export class Composer extends EventEmitter {
   /**
    * Export to HTML
    */
+  /**
+   * The quick single-document export — what the in-shell preview renders and
+   * what "copy HTML" hands over.
+   *
+   * It carries the SAME base rules as a published export. It used to build its
+   * own document with only the element CSS, so the preview showed the browser's
+   * default typography while the published page showed the product's: the one
+   * surface whose whole job is "this is what visitors will see" disagreed with
+   * what visitors would see.
+   */
   exportHTML(options?: ExportOptions): ExportResult {
     const html = this.elements.toHTML(options);
     const css = this.styles.toCSS(options);
@@ -556,7 +567,7 @@ export class Composer extends EventEmitter {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Buildrick Export</title>
-  <style>${css}</style>
+  <style>${RESET_CSS}${css}</style>
 </head>
 <body>
 ${html}
