@@ -6,13 +6,13 @@ import { fireEvent } from "@testing-library/react";
 const lastSubscribe: {
   input?: { scope?: { kind?: string; elements?: unknown[] }; intent?: string };
   onData?: (chunk: unknown) => void;
-  onError?: (err: { message?: string }) => void;
+  onError?: (err: { message?: string; data?: { code?: string } | null }) => void;
 } = {};
 vi.mock("@/services/ai/subscriptionClient", () => ({
   getAiSubscriptionClient: () => ({
     ai: {
       streamPrompt: {
-        subscribe: vi.fn((input: unknown, cbs: { onData?: (c: unknown) => void; onError?: (e: { message?: string }) => void }) => {
+        subscribe: vi.fn((input: unknown, cbs: { onData?: (c: unknown) => void; onError?: (e: { message?: string; data?: { code?: string } | null }) => void }) => {
           lastSubscribe.input = input as typeof lastSubscribe.input;
           lastSubscribe.onData = cbs.onData;
           lastSubscribe.onError = cbs.onError;
@@ -177,5 +177,46 @@ describe("AITab — scope + composer wiring", () => {
     });
 
     expect(screen.getByText(/Daily limit reached/i)).toBeInTheDocument();
+  });
+
+  /* Board 171:136 — a workspace with no API key gets its own state, with the
+     way to fix it. Before, the server's PRECONDITION_FAILED message printed as
+     grey text under a composer that still looked ready to run. */
+  it("says AI is not configured, and offers workspace settings, instead of one more error line", () => {
+    const composer = makeElementScopedComposer();
+    const { container } = renderWithToast(
+      <AITab composer={composer} isExpanded={false} onExpandToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />,
+    );
+    const ta = container.querySelector("textarea")!;
+    fireEvent.change(ta, { target: { value: "make the hero warmer" } });
+    fireEvent.keyDown(ta, { key: "Enter" });
+
+    act(() => {
+      lastSubscribe.onError?.({
+        message: "AI provider not configured",
+        data: { code: "PRECONDITION_FAILED" },
+      });
+    });
+
+    expect(screen.getByText(/AI drafting isn.t configured yet\./)).toBeInTheDocument();
+    expect(screen.getByText(/not a silent fallback that pretends to work/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Open workspace settings" })).toBeInTheDocument();
+  });
+
+  it("keeps an ordinary failure as a message, not as the not-configured state", () => {
+    const composer = makeElementScopedComposer();
+    const { container } = renderWithToast(
+      <AITab composer={composer} isExpanded={false} onExpandToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />,
+    );
+    const ta = container.querySelector("textarea")!;
+    fireEvent.change(ta, { target: { value: "make the hero warmer" } });
+    fireEvent.keyDown(ta, { key: "Enter" });
+
+    act(() => {
+      lastSubscribe.onError?.({ message: "Stream failed", data: { code: "INTERNAL_SERVER_ERROR" } });
+    });
+
+    expect(screen.queryByText(/isn.t configured yet/)).not.toBeInTheDocument();
+    expect(screen.getByText("Stream failed")).toBeInTheDocument();
   });
 });

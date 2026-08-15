@@ -36,6 +36,11 @@ interface UseStreamPromptResult {
   streaming: boolean;
   stopped: boolean;
   error: string | null;
+  /** Board 171:136 draws "not configured" as its own state, not as an error
+   *  line — the server already distinguishes it (PRECONDITION_FAILED from
+   *  assertProviderConfigured), and the panel used to flatten every failure
+   *  into one grey sentence. */
+  errorKind: "not-configured" | "quota" | "other" | null;
   start: (args: StartArgs) => void;
   stop: () => void;
   reset: () => void;
@@ -57,6 +62,9 @@ export function useStreamPrompt(): UseStreamPromptResult {
   const [streaming, setStreaming] = React.useState(false);
   const [stopped, setStopped] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [errorKind, setErrorKind] = React.useState<
+    "not-configured" | "quota" | "other" | null
+  >(null);
   const subRef = React.useRef<{ unsubscribe: () => void } | null>(null);
 
   const stop = React.useCallback(() => {
@@ -74,6 +82,7 @@ export function useStreamPrompt(): UseStreamPromptResult {
     setStreaming(false);
     setStopped(false);
     setError(null);
+    setErrorKind(null);
   }, []);
 
   const start = React.useCallback((args: StartArgs) => {
@@ -81,6 +90,7 @@ export function useStreamPrompt(): UseStreamPromptResult {
     setEdit(null);
     setStopped(false);
     setError(null);
+    setErrorKind(null);
     setStreaming(true);
 
     const client = getAiSubscriptionClient();
@@ -102,7 +112,17 @@ export function useStreamPrompt(): UseStreamPromptResult {
             subRef.current = null;
           }
         },
-        onError: (err: { message?: string }) => {
+        /* tRPC types `data` as Maybe<…> (it can be null), so the parameter is
+           typed the way the client actually hands it over. */
+        onError: (err: { message?: string; data?: { code?: string } | null }) => {
+          const code = err.data?.code;
+          setErrorKind(
+            code === "PRECONDITION_FAILED"
+              ? "not-configured"
+              : code === "TOO_MANY_REQUESTS"
+                ? "quota"
+                : "other",
+          );
           setError(err.message ?? "Stream failed");
           setStreaming(false);
           subRef.current = null;
@@ -115,5 +135,5 @@ export function useStreamPrompt(): UseStreamPromptResult {
     return () => { subRef.current?.unsubscribe(); };
   }, []);
 
-  return { text, edit, streaming, stopped, error, start, stop, reset };
+  return { text, edit, streaming, stopped, error, errorKind, start, stop, reset };
 }

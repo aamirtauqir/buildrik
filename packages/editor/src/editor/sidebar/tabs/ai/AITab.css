@@ -300,3 +300,36 @@
   color: var(--bk-ink-muted);
   cursor: pointer;
 }
+
+/* Board 171:136 (AI · not-configured): the panel says why nothing will run,
+   in the panel, instead of printing the server's error under a live-looking
+   composer. */
+.bd-ai-notconfigured {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bk-space-8);
+  padding: var(--bk-space-16);
+  background: var(--bk-bg-subtle);
+}
+
+.bd-ai-notconfigured__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--bk-ink);
+}
+
+.bd-ai-notconfigured__body {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--bk-ink-muted);
+}
+
+.bd-ai-notconfigured__link {
+  align-self: flex-start;
+  padding: 0;
+  border-color: transparent;
+  background: transparent;
+  color: var(--bk-accent);
+}

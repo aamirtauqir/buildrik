@@ -11,6 +11,7 @@ import { gatherTokens, gatherMediaAssets } from "./hooks/aiScopeContext";
 import { useAgentRunner } from "./hooks/useAgentRunner";
 import { useAiActionGate } from "./hooks/useAiActionGate";
 import { applyAiEdit } from "./applySetStyle";
+import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { trackAiEditApplied } from "@/services/ai/adoptionTracker";
 import { DEFAULT_MODEL, type AIModel, type ChatMessage, type DiffEdit } from "./types";
 import "./AITab.css";
@@ -188,7 +189,27 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose }) 
           Agent
         </Button>
       </div>
-      {mode === "chat" ? (
+      {/* Board 171:136 — a missing API key is a state, not an error line. The
+          server already says so (PRECONDITION_FAILED from
+          assertProviderConfigured); the panel used to print that message as
+          grey text under the prompt and leave the composer inviting more. */}
+      {stream.errorKind === "not-configured" ? (
+        <div className="bd-ai-notconfigured">
+          <p className="bd-ai-notconfigured__title">AI drafting isn&rsquo;t configured yet.</p>
+          <p className="bd-ai-notconfigured__body">
+            No API key is set for this workspace, so nothing here will run. This is the real
+            message — not a silent fallback that pretends to work.
+          </p>
+          <Button
+            color="light"
+            size="xs"
+            className="bd-ai-notconfigured__link"
+            onClick={() => window.open(`${DASHBOARD_URL}/dashboard/settings`, "_blank")}
+          >
+            Open workspace settings
+          </Button>
+        </div>
+      ) : mode === "chat" ? (
         <>
           <ScopeChip scope={scope} status={status} />
           <ChatThread
