@@ -216,7 +216,10 @@ describe("CommandPalette", () => {
       const askAI = screen.getByRole("button", { name: /Ask AI instead/ });
       expect(askAI).toBeInTheDocument();
       fireEvent.click(askAI);
-      expect(composer!.emit).toHaveBeenCalledWith(EVENTS.UI_PANEL_OPEN, { panel: "ai" });
+      /* Was UI_PANEL_OPEN {panel:"ai"} — allow-listed to real LEFT tabs, which
+         "ai" is not, so the offer had been a no-op since it shipped. AI opens
+         over the inspector (boards 170:*), which ui:switch-tab routes. */
+      expect(composer!.emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "ai" });
       expect(onClose).toHaveBeenCalledTimes(1);
     });
 
@@ -224,7 +227,10 @@ describe("CommandPalette", () => {
       const { composer } = renderPalette();
       fireEvent.change(searchInput(), { target: { value: "zzzznope" } });
       fireEvent.keyDown(searchInput(), { key: "Enter" });
-      expect(composer!.emit).toHaveBeenCalledWith(EVENTS.UI_PANEL_OPEN, { panel: "ai" });
+      /* Was UI_PANEL_OPEN {panel:"ai"} — allow-listed to real LEFT tabs, which
+         "ai" is not, so the offer had been a no-op since it shipped. AI opens
+         over the inspector (boards 170:*), which ui:switch-tab routes. */
+      expect(composer!.emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "ai" });
     });
   });
 
@@ -294,7 +300,7 @@ describe("CommandPalette", () => {
       fireEvent.change(searchInput(), { target: { value: "qqp" } });
       expect(screen.getByText(/Nothing matches/)).toBeInTheDocument();
       fireEvent.click(screen.getByRole("button", { name: /Ask AI instead/ }));
-      expect(composer.emit).toHaveBeenCalledWith(expect.anything(), { panel: "ai" });
+      expect(composer.emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "ai" });
     });
 
     it("natural-language query → AI hand-off with the diff explainer", () => {

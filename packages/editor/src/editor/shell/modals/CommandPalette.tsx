@@ -259,7 +259,10 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
   // ai-offer: a query that matches nothing → offer the AI panel instead of a
   // dead end (contracts §2, no-results never a nothing-state).
   const askAI = React.useCallback(() => {
-    composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "ai" });
+    /* UI_PANEL_OPEN is allow-listed to real LEFT tabs and "ai" is not one —
+       this offer has been a no-op since it shipped. AI opens over the
+       inspector (boards 170:*), which is what ui:switch-tab now routes. */
+    composer?.emit("ui:switch-tab", { tab: "ai" });
     onClose();
   }, [composer, onClose]);
 

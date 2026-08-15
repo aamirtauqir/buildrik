@@ -18,7 +18,7 @@ function msg(over: Partial<ChatMessage> = {}): ChatMessage {
 describe("ChatThread", () => {
   it("renders empty state when no messages", () => {
     render(<ChatThread messages={[]} onAccept={vi.fn()} onReject={vi.fn()} onRegenerate={vi.fn()} />);
-    expect(screen.getByText(/Try a quick action/i)).toBeInTheDocument();
+    expect(screen.getByText("TRY")).toBeInTheDocument();
   });
 
   it("renders user and assistant messages with role labels", () => {

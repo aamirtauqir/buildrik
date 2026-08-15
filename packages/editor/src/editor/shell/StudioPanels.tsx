@@ -20,6 +20,7 @@ import { useToast } from "@/editor/chrome-ui";
 import { Canvas, type CanvasRef } from "../canvas/Canvas";
 import type { CanvasOverlayState } from "../canvas/CanvasFooterToolbar";
 import { ProInspector } from "../inspector/ProInspector";
+import { AITab } from "../sidebar/tabs/ai/AITab";
 import { LayoutShell } from "../rail/LayoutShell";
 import { LeftSidebar } from "../sidebar/LeftSidebar";
 import { FullPageView } from "../sidebar/FullPageView";
@@ -174,6 +175,8 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   useAltTextAutoTrigger(composer);
 
   const [canvasHoveredId, setCanvasHoveredId] = React.useState<string | null>(null);
+  /** AI drills in over the inspector (boards 170:* · 66:225). */
+  const [aiInInspector, setAiInInspector] = React.useState(false);
 
   // Media tab dual-mode: panel (slim launcher) or fullpage (library manager)
   const [mediaFullPage, setMediaFullPage] = React.useState(false);
@@ -217,6 +220,15 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   React.useEffect(() => {
     if (!composer) return;
     const handler = (data: { tab: string }) => {
+      /* Boards 170:2 and 66:225 put AI in the INSPECTOR column with a
+         "‹ Inspector" way back — not in the left sidebar. Every existing
+         entry point (the inspector's ✦ AI chip, the multi-select toolbar, the
+         no-selection state, the shell's own onShowAI) emits this same event,
+         so routing it here moves them all at once. */
+      if (data.tab === "ai") {
+        setAiInInspector(true);
+        return;
+      }
       onLeftPanelTabChange?.(data.tab);
       if (!isLeftPanelOpen) onLeftPanelToggle?.();
     };
@@ -384,8 +396,18 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           <PageTabBar composer={composer} />
         </LayoutShell.Canvas>
 
-        {/* Right Inspector — element properties */}
+        {/* Right Inspector — element properties, or the AI drill-in that
+            replaces them (boards 170:*). */}
         <LayoutShell.Inspector>
+          {aiInInspector ? (
+            <AITab
+              composer={composer}
+              isExpanded={false}
+              onExpandToggle={() => {}}
+              onClose={() => setAiInInspector(false)}
+              onBack={() => setAiInInspector(false)}
+            />
+          ) : (
           <ProInspector
             composer={composer}
             selectedElement={selectedElement}
@@ -396,6 +418,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
             onOpenIconPicker={onOpenIconPicker}
             onOpenCreateCollection={onOpenCreateCollection}
           />
+          )}
         </LayoutShell.Inspector>
 
         {/* FullPage View — Templates, Settings, History, Design (replaces canvas area) */}

@@ -3,6 +3,13 @@ import { render, screen } from "@testing-library/react";
 import { ScopeChip } from "../ScopeChip";
 
 describe("ScopeChip", () => {
+  /* Board 170:2 words it "Scope: Hero section" — the word the boards use for
+     what a run is allowed to touch. */
+  it("leads with the word Scope, then the target", () => {
+    render(<ScopeChip scope={{ kind: "element", label: "Hero", id: "el-1" }} status="idle" />);
+    expect(screen.getByText(/^Scope:/)).toBeInTheDocument();
+  });
+
   it("renders the element label for element scope", () => {
     render(<ScopeChip scope={{ kind: "element", id: "el-1", label: "Hero" }} status="idle" />);
     expect(screen.getByText("Hero")).toBeInTheDocument();

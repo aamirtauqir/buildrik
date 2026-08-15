@@ -49,7 +49,16 @@ function makeElementScopedComposer() {
 describe("AITab skeleton", () => {
   it("renders the empty thread message when no messages exist", () => {
     renderWithToast(<AITab composer={null} isExpanded={false} onExpandToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />);
-    expect(screen.getByText(/Try a quick action or type a prompt to start/i)).toBeInTheDocument();
+    /* Board 170:2's idle state: three prompts worth trying, the promise that
+       governs every run, and the way into a longer job. The old copy invited
+       "quick actions" this panel does not have. */
+    expect(screen.getByRole("button", { name: "Make the hero warmer" })).toBeInTheDocument();
+    expect(
+      screen.getByText(/AI proposes a diff and never writes directly/),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /Draft a new section from a brief/ }),
+    ).toBeInTheDocument();
   });
 
   it("renders a composer textarea", () => {

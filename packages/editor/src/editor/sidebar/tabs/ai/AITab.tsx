@@ -22,9 +22,12 @@ export interface AITabProps {
   onExpandToggle: () => void;
   onHelpClick?: () => void;
   onClose: () => void;
+  /** Rendered in the inspector column (boards 170:2 · 66:225), where the way
+   *  out is back to the inspector rather than a panel close. */
+  onBack?: () => void;
 }
 
-export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose }) => {
+export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, onBack }) => {
   const { scope, status, lock, unlock } = useAIScope(composer);
   const stream = useStreamPrompt();
   // Not state: the server owns model choice (`resolveModelForUser` gates it by
@@ -32,11 +35,20 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose }) 
   // set this offered four models, three of which the server could never call —
   // a control that never controlled anything. Removed.
   const model: AIModel = DEFAULT_MODEL;
+  /* No mode toggle on any board: the idle state's DRAFT row is the way into
+     a longer job (board 170:2), and the run's own end returns you. */
   const [mode, setMode] = React.useState<"chat" | "agent">("chat");
   const [messages, setMessages] = React.useState<ChatMessage[]>([]);
   const streamingMsgIdRef = React.useRef<string | null>(null);
   const actionGate = useAiActionGate(composer);
   const agent = useAgentRunner(composer, model, actionGate.propose);
+
+  /* With the mode toggle gone, a finished or stopped run has to hand the panel
+     back by itself — otherwise the plan's last frame would be the only thing
+     left on screen with no way to ask anything else. */
+  React.useEffect(() => {
+    if (mode === "agent" && agent.phase === "idle") setMode("chat");
+  }, [mode, agent.phase]);
 
   const submit = React.useCallback((text: string) => {
     const serverScope = toServerScope(scope);
@@ -161,34 +173,40 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose }) 
 
   return (
     <PanelFrame className="bd-ai-tab">
-      <PanelFrame.Header
-        title="AI"
-        subtitle="Chat with AI to edit your page"
-        onHelpClick={onHelpClick}
-        onClose={onClose}
+      {/* Every AI board opens with "‹ Inspector" and a plain "AI" title — the
+          panel lives in the inspector column, not beside it. The old header
+          carried a subtitle ("Chat with AI to edit your page") no board has. */}
+      {onBack ? (
+        <div className="bd-ai-drillin">
+          <Button
+            color="light"
+            size="xs"
+            className="bd-ai-drillin__back"
+            onClick={onBack}
+            aria-label="Back to Inspector"
+          >
+            ‹ Inspector
+          </Button>
+          <div className="bd-ai-drillin__title">AI</div>
+        </div>
+      ) : (
+        <PanelFrame.Header
+          title="AI"
+          onHelpClick={onHelpClick}
+          onClose={onClose}
+        />
+      )}
+      {/* Every AI board puts the scope band and the prompt directly under the
+          title, with whatever the run is doing below them — the composer used
+          to sit at the bottom, chat-style, under states that had replaced the
+          thread entirely. */}
+      <ScopeChip scope={scope} status={status} />
+      <PromptComposer
+        onSubmit={mode === "agent" ? agent.start : submit}
+        onStop={mode === "agent" ? agent.stop : stream.stop}
+        streaming={mode === "agent" ? agent.phase === "planning" || agent.phase === "running" : stream.streaming}
       />
-      <div className="bd-ai-mode" role="tablist" aria-label="AI mode">
-        <Button
-          type="button"
-          color="light"
-          role="tab"
-          aria-selected={mode === "chat"}
-          className={`bd-ai-mode-btn${mode === "chat" ? " bd-ai-mode-active" : ""}`}
-          onClick={() => setMode("chat")}
-        >
-          Chat
-        </Button>
-        <Button
-          type="button"
-          color="light"
-          role="tab"
-          aria-selected={mode === "agent"}
-          className={`bd-ai-mode-btn${mode === "agent" ? " bd-ai-mode-active" : ""}`}
-          onClick={() => setMode("agent")}
-        >
-          Agent
-        </Button>
-      </div>
+
       {/* Boards 171:136 and 171:105 — "no key" and "no credit" are states,
           not error lines. The server already tells them apart
           (PRECONDITION_FAILED vs TOO_MANY_REQUESTS); the panel used to print
@@ -228,12 +246,13 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose }) 
         </div>
       ) : mode === "chat" ? (
         <>
-          <ScopeChip scope={scope} status={status} />
           <ChatThread
             messages={messages}
             onAccept={onAccept}
             onReject={onReject}
             onRegenerate={onRegenerate}
+            onTry={submit}
+            onDraft={() => setMode("agent")}
           />
         </>
       ) : (
@@ -249,11 +268,6 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose }) 
           onStop={agent.stop}
         />
       )}
-      <PromptComposer
-        onSubmit={mode === "agent" ? agent.start : submit}
-        onStop={mode === "agent" ? agent.stop : stream.stop}
-        streaming={mode === "agent" ? agent.phase === "planning" || agent.phase === "running" : stream.streaming}
-      />
       <ConfirmDialog
         open={actionGate.state.open}
         title={actionGate.state.title}

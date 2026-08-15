@@ -24,7 +24,7 @@ export const Composer: React.FC<ComposerProps> = ({
     <div className="bd-ai-composer">
       <Textarea
         className="bd-ai-composer-input"
-        placeholder="Ask AI…"
+        placeholder="Ask AI to change something…"
         aria-label="Prompt"
         value={text}
         onChange={(e) => setText(e.target.value)}

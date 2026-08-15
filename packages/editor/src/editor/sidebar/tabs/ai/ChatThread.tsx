@@ -8,9 +8,13 @@ export interface ChatThreadProps {
   onAccept: (msgId: string) => void;
   onReject: (msgId: string) => void;
   onRegenerate: (msgId: string) => void;
+  /** Board 170:2's idle state runs one of its three suggestions… */
+  onTry?: (prompt: string) => void;
+  /** …or hands over to the longer job. */
+  onDraft?: () => void;
 }
 
-export const ChatThread: React.FC<ChatThreadProps> = ({ messages, ...handlers }) => {
+export const ChatThread: React.FC<ChatThreadProps> = ({ messages, onTry, onDraft, ...handlers }) => {
   const ref = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
@@ -21,7 +25,7 @@ export const ChatThread: React.FC<ChatThreadProps> = ({ messages, ...handlers })
   if (messages.length === 0) {
     return (
       <div className="bd-ai-thread" ref={ref}>
-        <EmptyThread />
+        <EmptyThread onTry={onTry} onDraft={onDraft} />
       </div>
     );
   }

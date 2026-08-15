@@ -12,12 +12,14 @@ function describeScope(scope: AIScope): string {
   return "Whole page";
 }
 
+/* Every AI board opens the panel with a tinted band reading "Scope: <what>"
+   — what the run is allowed to touch, in the run's own words. The old chip
+   said "Scoped to <x>" with a status dot. */
 export const ScopeChip: React.FC<ScopeChipProps> = ({ scope, status }) => {
   return (
     <div className="bd-ai-scope" role="status" aria-live="polite">
-      <span className="bd-ai-scope-dot" aria-hidden="true" />
       <span className="bd-ai-scope-text">
-        Scoped to <span className="bd-ai-scope-target">{describeScope(scope)}</span>
+        Scope: <span className="bd-ai-scope-target">{describeScope(scope)}</span>
       </span>
       {status === "locked" && (
         <span className="bd-ai-scope-lock" aria-label="Scope locked during prompt">

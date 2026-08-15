@@ -35,37 +35,27 @@
   resize: none;
 }
 
+/* Board 170:2: a full-width tinted band under the title, not an inset chip. */
 .bd-ai-scope {
-  margin: var(--bk-space-8) var(--bk-space-8) 0;
-  padding: var(--bk-space-4) var(--bk-space-8);
-  background: var(--bk-bg-subtle);
-  border-radius: var(--bk-radius-sm);
+  padding: var(--bk-space-8) var(--bk-space-16);
+  background: var(--bk-accent-tint);
   display: flex;
   align-items: center;
   gap: var(--bk-space-4);
-  font: 500 var(--bk-text-11) var(--bk-font-ui);
-  color: var(--bk-ink-soft);
-}
-
-.bd-ai-scope-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: var(--bk-radius-full);
-  background: var(--bk-accent);
-  flex-shrink: 0;
+  font: 400 var(--bk-text-12) var(--bk-font-ui);
+  color: var(--bk-accent);
 }
 
 /* The running text the target sits inside. Parent sets size and weight; this
    only needed the muted colour, and without it the label and the target read at
    the same emphasis — which defeats the point of highlighting the target. */
 .bd-ai-scope-text {
-  color: var(--bk-ink-soft);
+  color: var(--bk-accent);
 }
 
 .bd-ai-scope-target {
-  color: var(--bk-ink);
-  font-weight: 600;
-  font-family: var(--bk-font-mono);
+  color: var(--bk-accent);
+  font-weight: 500;
 }
 
 .bd-ai-scope-lock {
@@ -345,4 +335,72 @@
   font-size: 14px;
   font-weight: 500;
   color: var(--bk-error);
+}
+
+/* Boards 170:2 / 66:225 — the panel is a drill-in from the inspector: a back
+   link naming where it returns to, then the title on its own row. */
+.bd-ai-drillin {
+  display: flex;
+  flex-direction: column;
+}
+
+.bd-ai-drillin__back {
+  align-self: flex-start;
+  padding: var(--bk-space-12) var(--bk-space-16);
+  border-color: transparent;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--bk-ink);
+}
+
+.bd-ai-drillin__title {
+  padding: 0 var(--bk-space-16) var(--bk-space-12);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--bk-ink);
+  border-bottom: 1px solid var(--bk-border);
+}
+
+/* Board 170:2 (AI · idle) — TRY prompts, the promise, then the way into a
+   longer job. */
+.bd-ai-idle {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: var(--bk-space-8);
+}
+
+.bd-ai-idle__band {
+  padding: var(--bk-space-12) var(--bk-space-16) var(--bk-space-4);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  color: var(--bk-ink-muted);
+}
+
+.bd-ai-idle__try {
+  justify-content: flex-start;
+  padding: var(--bk-space-4) var(--bk-space-16);
+  border-color: transparent;
+  background: transparent;
+  font-size: 13px;
+  color: var(--bk-accent);
+}
+
+.bd-ai-idle__note {
+  margin: var(--bk-space-12) var(--bk-space-16) 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--bk-ink-muted);
+}
+
+.bd-ai-idle__draft {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 var(--bk-space-16);
+  padding: var(--bk-space-8) var(--bk-space-12);
+  border: 1px solid var(--bk-border);
+  background: var(--bk-bg-card);
+  font-size: 13px;
+  color: var(--bk-ink);
 }
