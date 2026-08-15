@@ -274,6 +274,28 @@ a green suite.
 | `EDITOR_ORIGIN` | Origin allowed to call the tRPC endpoint cross-origin. | Yes in production |
 | `NEXT_PUBLIC_EDITOR_URL` | Legacy standalone-editor URL. Only read when `NEXT_PUBLIC_UNIFIED_EDITOR` is off. | No |
 
+#### Editor feature flags — the `VITE_` / `NEXT_PUBLIC_` pair trap
+
+Every editor feature flag is read twice (`packages/editor/src/shared/utils/runtimeEnv.ts:85-101`):
+`VITE_FEATURE_X ?? NEXT_PUBLIC_FEATURE_X`. **Only the `NEXT_PUBLIC_` half reaches
+production.** The shipping editor is the one bundled into Next
+(`NEXT_PUBLIC_UNIFIED_EDITOR`), where `import.meta.env.VITE_*` does not exist — so
+a flag set only as `VITE_FEATURE_X` is ON in the port-5050 standalone demo and OFF
+for every real user. `.env.local` already carries a comment about exactly this for
+Publish; the other three flags never got the same treatment, and none of these rows
+existed in this table until 2026-08-16.
+
+| Var | Purpose | Required? |
+|-----|---------|-----------|
+| `NEXT_PUBLIC_FEATURE_PUBLISH` | Publish dropdown + publish flow in the shipping editor. Must be set alongside `VITE_FEATURE_PUBLISH`, which only serves the standalone demo. | Yes once publishing is live |
+| `NEXT_PUBLIC_FEATURE_COMPONENTS_V2` | Which Components panel ships. **Set nowhere today** — `.env.local` sets only `VITE_FEATURE_COMPONENTS_V2=true`, so the standalone demo shows `ComponentsPanelV2` and production shows the legacy `ComponentsTab`. Two different screens, and neither matches board 641:2546. Founder call open. | No — but read the note |
+| `NEXT_PUBLIC_FEATURE_DS_AI` | AI entry points in the Brand / design-system panel. | No |
+| `NEXT_PUBLIC_FEATURE_COLLAB` | Real-time collaboration. **Leave off** — collab is demo-only (last-write-wins, 6 known OT bugs). | No — never in production |
+
+`scripts/check-prod-env.mjs` checks none of these. A flag that is silently false in
+production looks exactly like a feature that was never built — the same shape as the
+`GOOGLE_CLIENT_ID` incident above.
+
 ### Observability (Sentry)
 
 | Var | Purpose | Required? |
