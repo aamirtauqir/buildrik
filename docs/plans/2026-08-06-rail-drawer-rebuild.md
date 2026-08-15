@@ -2145,5 +2145,86 @@ one.
   at :266 and otherwise renders synchronously off the selected element, with no
   awaited data gating the body. Building the skeleton would mean inventing a
   delay to justify it. Left undone deliberately.
+
+  **Both paragraphs above are superseded by the 2026-08-15 walk below.** They
+  were written from code-to-board mapping — every board has a surface, so every
+  board was called matched. Opening the two side by side found the family's
+  labels, its section order, four missing states and three sections drawn at
+  three to five times the board's height. A surface existing is not the surface
+  matching, which is the same lesson the conformance harness taught in August.
+
+## Inspector family — walked board vs live, 2026-08-15
+
+Twenty active boards, walked at 1440x900 against the running editor with a
+template applied and a real selection. What the walk found, in the order it
+found it:
+
+**One rule explains every profile board.** 807:8342 (text) says "2 of 12
+sections apply", 807:8412 (flex) says "4 of 13" — and in both, the sections
+drawn open are exactly the ones carrying a value on that element. Live opened
+"the first two in profile order" instead, which on a text element meant SIZE:
+a heading, a "More settings 5" link, and nothing between them, because Layout
+and Size both claimed width/height and the registry asked the profile which
+one to silence. Size owns the dimension now, everywhere, and draws it as the
+boards do (Fixed / Fill / Hug).
+
+That rule also settles the two board generations: 32:2 and 159:2 (six sections,
+all open) and the 807:* set (two open, ten collapsed) are the same panel in
+front of two different elements.
+
+**The profiles are one ordered list now.** The Style / Element / Effects tab
+strip left the UI at S3.9; its three orders outlived it and were concatenated
+at render time into an order no board draws. Each profile is its board's order,
+top to bottom, including the collapsed tail.
+
+**Four states did not exist at all**, and each hid something a user needs:
+
+- *Breakpoint override* (160:208). A tablet-only value's only sign was a 5px
+  dot on the breakpoint pill — no property name, no base value, no way back.
+  Building the strip found why it would have looked broken anyway: the dot was
+  derived from the inspector's optimistic `styles` state, which changes 300ms
+  before the engine does, so it recomputed while the engine still knew nothing
+  and then never again.
+- *Bound to CMS* (160:105). A bound element looked exactly like a loose one;
+  the field it followed lived inside the link icon's popover. `BINDING_CREATED`
+  and `BINDING_REMOVED` were constants nothing emitted, so nothing could have
+  shown it.
+- *Pseudo-state* (160:313). Picking `:hover` changes which layer every write
+  lands on. The dropdown's own label was the only sign.
+- *Loading* (159:102). Now reachable, because the shell has a loading window
+  since the 65:412 work: with no selection and no project yet the panel offered
+  "Select something on the canvas to edit it." over a canvas with nothing on
+  it — the same lie the canvas itself told before its skeleton landed.
+
+**Three sections were three to five times their board height.** Layout was a
+3x2 grid of 42px display cards plus five position tiles; Spacing led with a
+150px four-side box; Typography hid Align, Colour and Transform — the three
+things anyone changes about text — behind More settings. All three now lead
+with the board's rows, with the fuller editors one layer down. Nothing was
+deleted: Position, the per-side box and row/column gap moved into their
+sections' own More settings.
+
+**Reset to master** (160:2) was drawn, and did not exist in the panel or the
+engine. An instance's own edits could be made and never taken back short of
+detaching it. `resetInstance` is the opposite of sync and reuses it.
+
+### Founder calls out of this walk
+
+1. **Reach "all like this" — mode or action?** Board 160:412 draws it as a
+   state the panel sits in ("Editing all 12 buttons", amber rule down the
+   column). The engine applies it once: peers take this element's styles, and
+   the next edit is back to one element. The panel now says what happened
+   rather than claiming a mode. Making it a real mode is a behaviour change
+   with its own undo story — your call.
+2. **Text loses Layout and Corner radius.** Board 807:8342 lists twelve
+   sections for text and neither is among them. Followed the board. A heading
+   that needs `position: absolute` now needs a wrapper.
+3. **Align / Transform / Decoration stay icon groups.** The boards draw them as
+   value fields ("left", "none"). The icon groups are one click where a field
+   is two and they show the options; kept, and named here rather than settled
+   quietly.
+4. **Text is bound to `menu.name`** — the board's Unbind is wired to
+   `unbindAll`, which drops every binding on the element, not just the one
+   named. Fine while an element carries one binding; say so if that changes.
 - Drawer drill-ins beyond the 85 boards (Media drill-in boards ARE in the 17).
 - Backend/behaviour changes; `AquibraStudio.tsx` (founder's dirty file).
