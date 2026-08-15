@@ -67,10 +67,12 @@ export const BreakpointPill: React.FC<BreakpointPillProps> = ({
         }}
       >
         {BP_ICONS[current]}
-        <span>
-          {meta.name}
-          {meta.maxWidth !== undefined ? ` · ≤${meta.maxWidth}` : " · 1200+"}
-        </span>
+        {/* The NAME only, as boards 807:8342 and 160:412 draw it. The width
+            range used to ride along here — "Desktop · 1200+" — and at 136px it
+            was half the strip's usable width on a 300px panel, enough to push
+            the three pills into wrapping. The range still shows on every row
+            of the dropdown this opens, where there is room for it. */}
+        <span>{meta.name}</span>
         {hasOverride && (
           <span
             aria-hidden="true"

@@ -2,6 +2,13 @@
  * useStyleHandlers Hook
  * Manages style change handlers with breakpoint and pseudo-state awareness
  *
+ * `reachPeerIds` is board 160:412's "All like this" mode, applied at the one
+ * place every single-element inspector edit already passes through. The mode
+ * used to be a one-shot in ScopeDropdown that copied this element's WHOLE
+ * style map onto its peers; here only the property being edited moves, to the
+ * same breakpoint and pseudo-state, inside the same transaction — so one ⌘Z
+ * takes the whole fan-out back.
+ *
  * @license BSD-3-Clause
  */
 
@@ -43,7 +50,9 @@ export function useStyleHandlers(
   selectedElement: SelectedElement | null,
   composer: Composer | null | undefined,
   currentBreakpoint: BreakpointId,
-  currentPseudoState: PseudoStateId
+  currentPseudoState: PseudoStateId,
+  /** Same-type peers each edit also lands on. Empty unless "All like this". */
+  reachPeerIds: string[] = []
 ): StyleHandlers {
   const [styles, setStyles] = useState<Record<string, string>>({});
   const [overriddenProperties, setOverriddenProperties] = useState<Set<string>>(new Set());
@@ -108,8 +117,6 @@ export function useStyleHandlers(
       const el = composer?.elements.getElement(selectedElement.id);
       if (!el) return;
 
-      const selector = `[data-buildrick-id="${selectedElement.id}"]`;
-
       // 1. Immediate local state update — live preview without waiting for debounce
       setStyles((prev) => {
         if (value === "" || value == null) {
@@ -133,51 +140,54 @@ export function useStyleHandlers(
       // Stores the flush closure in pendingFlushRef so the cleanup effect can
       // commit it when element/breakpoint/pseudo changes before the timer fires.
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
-      const flush = () => {
+      const writeOne = (id: string) => {
         // Re-read element inside the flush — avoids stale closure if element was replaced.
-        const el = composer?.elements.getElement(selectedElement.id);
+        const el = composer?.elements.getElement(id);
         if (!el) return;
-        composer?.beginTransaction?.("style-change");
-        try {
-          if (currentPseudoState !== "normal" && composer?.styles) {
-            const mq = currentBreakpoint === "desktop" ? undefined : getBreakpointQuery(currentBreakpoint) ?? undefined;
-            const pseudoSelector = `${selector}:${currentPseudoState}`;
-            if (value === "" || value == null) {
-              const existingRule = composer.styles.getRule(pseudoSelector, mq);
-              if (existingRule) {
-                const props = { ...existingRule.properties };
-                delete props[property];
-                composer.styles.setRule(selector, props, {
-                  pseudo: `:${currentPseudoState}`,
-                  mediaQuery: mq,
-                });
-              }
-            } else {
-              composer.styles.setRule(
-                selector,
-                { [property]: value },
-                { pseudo: `:${currentPseudoState}`, mediaQuery: mq }
-              );
-            }
-          } else if (value === "" || value == null) {
-            if (currentBreakpoint === "desktop") {
-              el.removeStyle?.(property);
-            } else if (composer?.styles) {
-              composer.styles.removeBreakpointStyleProperty(
-                selectedElement.id,
-                currentBreakpoint,
-                property
-              );
-            }
-          } else {
-            if (currentBreakpoint === "desktop") {
-              el.setStyle?.(property, value);
-            } else if (composer?.styles) {
-              composer.styles.setBreakpointStyle(selectedElement.id, currentBreakpoint, {
-                [property]: value,
+        const sel = `[data-buildrick-id="${id}"]`;
+        if (currentPseudoState !== "normal" && composer?.styles) {
+          const mq = currentBreakpoint === "desktop" ? undefined : getBreakpointQuery(currentBreakpoint) ?? undefined;
+          const pseudoSelector = `${sel}:${currentPseudoState}`;
+          if (value === "" || value == null) {
+            const existingRule = composer.styles.getRule(pseudoSelector, mq);
+            if (existingRule) {
+              const props = { ...existingRule.properties };
+              delete props[property];
+              composer.styles.setRule(sel, props, {
+                pseudo: `:${currentPseudoState}`,
+                mediaQuery: mq,
               });
             }
+          } else {
+            composer.styles.setRule(
+              sel,
+              { [property]: value },
+              { pseudo: `:${currentPseudoState}`, mediaQuery: mq }
+            );
           }
+        } else if (value === "" || value == null) {
+          if (currentBreakpoint === "desktop") {
+            el.removeStyle?.(property);
+          } else if (composer?.styles) {
+            composer.styles.removeBreakpointStyleProperty(id, currentBreakpoint, property);
+          }
+        } else {
+          if (currentBreakpoint === "desktop") {
+            el.setStyle?.(property, value);
+          } else if (composer?.styles) {
+            composer.styles.setBreakpointStyle(id, currentBreakpoint, { [property]: value });
+          }
+        }
+      };
+
+      const flush = () => {
+        if (!composer?.elements.getElement(selectedElement.id)) return;
+        /* One transaction around the selected element AND its reach, so a
+           fan-out to twelve buttons is one undo step rather than twelve. */
+        composer?.beginTransaction?.("style-change");
+        try {
+          writeOne(selectedElement.id);
+          for (const peerId of reachPeerIds) writeOne(peerId);
         } finally {
           composer?.endTransaction?.();
         }
@@ -188,7 +198,7 @@ export function useStyleHandlers(
         pendingFlushRef.current = null;
       }, 300);
     },
-    [selectedElement, composer, currentBreakpoint, currentPseudoState]
+    [selectedElement, composer, currentBreakpoint, currentPseudoState, reachPeerIds]
   );
 
   // Batch style change handler

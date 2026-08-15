@@ -7,8 +7,8 @@
  * silently widens beyond the selected item:
  *
  *   - This item      — the default (what the inspector controls already do)
- *   - All like this  — propagate this element's styles to every same-type peer,
- *                      behind a blast-radius confirm
+ *   - All like this  — a MODE: every edit you make from here also lands on
+ *                      every same-type peer, until you leave it
  *   - Whole site     — site-wide colors & fonts live in the Styles tab
  *
  * Compact `This ▾` pill matching Figma node 32-2 (design-system Foundations):
@@ -16,9 +16,12 @@
  * The three-card `ReachScopeStrip` it replaced ate ~150px of vertical space and
  * diverged hard from the design; this is one pill that opens the same choices.
  *
- * "All like this" uses existing per-element engine APIs (getAllElements +
- * setStyle) inside one transaction, so it composes with history/undo and needs
- * no class/token engine change.
+ * "All like this" was a one-shot until 2026-08-16: picking it copied THIS
+ * element's whole style map onto every peer and closed. That is a much larger
+ * thing than the label promises — a peer with its own padding, colour and size
+ * lost all three — and it is not what board 160:412 draws, which is a banner
+ * that stays up while you work. It is the mode now; the fan-out happens in
+ * useStyleHandlers, per edit, so only the properties you actually touch move.
  *
  * @license BSD-3-Clause
  */
@@ -34,18 +37,20 @@ interface ScopeDropdownProps {
   /** Board 189:2 — selecting Whole site switches the inspector into the
    *  site-wide banner state (site styles live in the Brand panel). */
   onWholeSite?: () => void;
-  /** Board 160:412 — the panel says what a reach beyond "this" just did. */
-  onAppliedToPeers?: (count: number) => void;
+  /** Whether the "All like this" mode is on. Owned by the inspector, which
+   *  also owns the banner and the style handlers the mode changes. */
+  reachAll?: boolean;
+  onReachAllChange?: (on: boolean) => void;
 }
 
 export function ScopeDropdown({
   composer,
   selectedElement,
   onWholeSite,
-  onAppliedToPeers,
+  reachAll = false,
+  onReachAllChange,
 }: ScopeDropdownProps) {
   const [open, setOpen] = React.useState(false);
-  const [confirming, setConfirming] = React.useState(false);
   const ref = React.useRef<HTMLDivElement>(null);
 
   // Count same-type peers (excludes the selected element). Recomputed per render
@@ -67,33 +72,11 @@ export function ScopeDropdown({
   React.useEffect(() => {
     if (!open) return;
     const onDown = (e: PointerEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-        setConfirming(false);
-      }
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     };
     document.addEventListener("pointerdown", onDown);
     return () => document.removeEventListener("pointerdown", onDown);
   }, [open]);
-
-  const propagate = () => {
-    const src = composer?.elements?.getElement?.(selectedElement.id);
-    if (!src || peers.length === 0) { setConfirming(false); return; }
-    const styles = src.getStyles?.() ?? {};
-    composer?.beginTransaction?.("reach-all-like-this");
-    try {
-      for (const peer of peers) {
-        for (const [prop, value] of Object.entries(styles)) {
-          peer.setStyle?.(prop, value as string);
-        }
-      }
-    } finally {
-      composer?.endTransaction?.();
-    }
-    setConfirming(false);
-    setOpen(false);
-    onAppliedToPeers?.(peers.length);
-  };
 
   const optionRow: React.CSSProperties = {
     display: "flex",
@@ -116,14 +99,18 @@ export function ScopeDropdown({
     <div ref={ref} style={{ position: "relative", display: "inline-block" }}>
       <Button
         type="button"
-        className="bdi-bpr-pill"
+        className="bdi-bpr-pill bdi-bpr-pill--reach"
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="menu"
         aria-expanded={open}
-        aria-label="Edit reach: this item"
+        aria-label={reachAll ? "Edit reach: all like this" : "Edit reach: this item"}
         style={{ border: "none", cursor: "pointer" }}
       >
-        <span>This</span>
+        {/* The pill names the reach it is IN. Board 160:412 draws it reading
+            "This" beside a banner that says twelve buttons are being edited —
+            the two cannot both be right, and a control that misreports its own
+            state is the worse half to keep. */}
+        <span>{reachAll ? "All like this" : "This"}</span>
         <ChevronDown size={10} aria-hidden="true" style={{ opacity: 0.7 }} />
       </Button>
       {open && (
@@ -144,21 +131,34 @@ export function ScopeDropdown({
         >
           <Button
             color="light"
-            style={{ ...optionRow, background: "var(--bk-accent-tint)" }}
-            title="Just this element" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+            style={reachAll ? optionRow : { ...optionRow, background: "var(--bk-accent-tint)" }}
+            title="Just this element"
+            onClick={() => {
+              onReachAllChange?.(false);
+              setOpen(false);
+            }}
+            className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           >
-            <span style={{ ...optTop, color: "var(--bk-accent)" }}>This item</span>
+            <span style={reachAll ? optTop : { ...optTop, color: "var(--bk-accent)" }}>This item</span>
             <span style={optSub}>just here — the default</span>
           </Button>
           <Button
             color="light"
-            style={optionRow}
+            style={reachAll ? { ...optionRow, background: "var(--bk-accent-tint)" } : optionRow}
             disabled={peers.length === 0}
-            onClick={() => setConfirming(true)}
-            title={peers.length === 0 ? `No other ${typeLabel}s on this page` : `Apply to ${othersLabel}`} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+            onClick={() => {
+              onReachAllChange?.(true);
+              setOpen(false);
+            }}
+            title={peers.length === 0 ? `No other ${typeLabel}s on this page` : `Every edit also goes to ${othersLabel}`}
+            className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           >
-            <span style={optTop}>All like this</span>
-            <span style={optSub}>{peers.length} {peers.length === 1 ? "instance" : "instances"}</span>
+            <span style={reachAll ? { ...optTop, color: "var(--bk-accent)" } : optTop}>All like this</span>
+            <span style={optSub}>
+              {peers.length === 0
+                ? `no other ${typeLabel}s here`
+                : `edits also go to ${othersLabel}`}
+            </span>
           </Button>
           <Button
             color="light"
@@ -167,23 +167,12 @@ export function ScopeDropdown({
             onClick={() => {
               setOpen(false);
               onWholeSite?.();
-            }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+            }}
+            className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           >
             <span style={optTop}>Whole site</span>
             <span style={optSub}>colors & fonts — Styles tab</span>
           </Button>
-
-          {confirming && (
-            <div style={{ margin: 4, padding: 8, borderRadius: 4, background: "var(--bk-bg-subtle)", border: "1px solid var(--bk-border)" }}>
-              <p style={{ margin: "0 0 6px", fontSize: 11, color: "var(--bk-ink)" }}>
-                Apply this element&apos;s styles to the <strong>{othersLabel}</strong> on this page?
-              </p>
-              <div style={{ display: "flex", gap: 6 }}>
-                <Button size="xs" onClick={propagate}>Apply to {peers.length}</Button>
-                <Button color="light" size="xs" onClick={() => setConfirming(false)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">Cancel</Button>
-              </div>
-            </div>
-          )}
         </div>
       )}
     </div>

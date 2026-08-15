@@ -95,15 +95,38 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   // Board 189:2 — "Whole site" scope shows the site-wide banner instead of
   // per-element controls (site styles live in the Brand panel).
   const [wholeSite, setWholeSite] = React.useState(false);
-  // Board 160:412 draws a reach beyond this element as a state the panel is
-  // in. The engine applies it as one action instead — peers get this
-  // element's styles once, then everything is back to editing one thing — so
-  // the line says what happened rather than claiming a mode that is not there.
-  const [peersApplied, setPeersApplied] = React.useState<number | null>(null);
+  /* Board 160:412 draws a reach beyond this element as a STATE the panel is
+     in — a banner reading "Editing all 12 buttons — All like this" that stays
+     up while you work. It used to be a one-shot: picking "All like this"
+     copied every style off this element onto its peers and closed, which is a
+     different and much larger thing than the banner describes. A peer that had
+     its own padding, its own colour, its own size lost all three to an action
+     whose only warning was a count.
+
+     Now it is the mode the board draws: the edits you make from here go to the
+     peers as you make them, and nothing else about them is touched. */
+  const [reachAll, setReachAll] = React.useState(false);
   React.useEffect(() => {
     setWholeSite(false); // scope resets with the selection
-    setPeersApplied(null);
+    setReachAll(false);
   }, [selectedElement?.id]);
+
+  /* The peers the mode reaches, recomputed off the live element set. Same
+     filter ScopeDropdown counts with — one definition, so the banner's number
+     and the elements actually written can never disagree. */
+  const reachPeerIds = React.useMemo(() => {
+    if (!reachAll || !selectedElement?.id) return [];
+    try {
+      return (composer?.elements?.getAllElements?.() ?? [])
+        .filter(
+          (e) => e.getType?.() === selectedElement.type && e.getId?.() !== selectedElement.id
+        )
+        .map((e) => e.getId?.())
+        .filter((id): id is string => Boolean(id));
+    } catch {
+      return [];
+    }
+  }, [reachAll, composer, selectedElement?.id, selectedElement?.type]);
 
   // Board 160:512 — while the AI agent runs, the inspector hands over to a
   // status card; selection is kept and restored on return.
@@ -126,7 +149,13 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     handleStyleChange,
     handleBatchStyleChange,
     overriddenProperties,
-  } = useStyleHandlers(selectedElement, composer, currentBreakpoint, currentPseudoState);
+  } = useStyleHandlers(
+    selectedElement,
+    composer,
+    currentBreakpoint,
+    currentPseudoState,
+    reachPeerIds
+  );
 
   // Breakpoint override indicator — same reading the strip below the scope row
   // shows, from the same subscription, so the dot and the list can never
@@ -390,8 +419,9 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
         <ScopeDropdown
           composer={composer}
           selectedElement={{ id: selectedElement.id, type: selectedElement.type }}
+          reachAll={reachAll}
+          onReachAllChange={setReachAll}
           onWholeSite={() => setWholeSite(true)}
-          onAppliedToPeers={setPeersApplied}
         />
         <BreakpointPill
           current={currentBreakpoint}
@@ -410,14 +440,20 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           selectedElementId={selectedElement?.id}
         />
       </div>
-      {peersApplied !== null && (
+      {/* Board 160:412's banner: "Editing all 12 buttons — All like this", one
+          line, no exit control of its own. It counts the peers PLUS this
+          element, because that is what "all" means to the person reading it,
+          and it stays up for as long as the mode is on. The way out is the
+          same pill that turned it on — which now reads "All like this", so the
+          banner and the control agree about where you are. */}
+      {reachAll && (
         <p
           className="tw:m-0 tw:border-l-2 tw:border-[var(--bk-warning)] tw:bg-[var(--bk-warning-tint)] tw:px-3 tw:py-1.5 tw:text-[12px] tw:text-[var(--bk-warning-text)]"
           role="status"
-          data-testid="peers-applied"
+          data-testid="reach-all-banner"
         >
-          Applied to {peersApplied} other {selectedElement.type}
-          {peersApplied === 1 ? "" : "s"} — ⌘Z takes it back.
+          Editing all {reachPeerIds.length + 1} {selectedElement.type}
+          {reachPeerIds.length === 0 ? "" : "s"} — All like this
         </p>
       )}
       {/* Board 160:105 — a bound element says what it follows, above the
