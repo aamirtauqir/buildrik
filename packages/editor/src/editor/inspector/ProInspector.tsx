@@ -13,7 +13,7 @@ import { BindingPopover } from "./components/BindingPopover";
 import { BreakpointPill } from "./components/BreakpointPill";
 import { ScopeDropdown } from "./components/ScopeDropdown";
 import { DetachInstanceButton } from "@/editor/components-catalog/ui/DetachInstanceButton";
-import { StateDropdown } from "./components/StateDropdown";
+import { StateDropdown, pseudoStateLabel } from "./components/StateDropdown";
 import { USE_DEV_MODE } from "./renderer/featureFlags";
 import type { Composer } from "../../engine";
 import { isValidBreakpoint } from "../../shared/constants/breakpoints";
@@ -385,6 +385,21 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           selectedElementId={selectedElement?.id}
         />
       </div>
+      {/* Board 160:2 — an instance says so above its styles, not in a
+          collapsed section under Animation. */}
+      <VariantSection composer={composer ?? null} elementId={selectedElement.id ?? null} />
+      {/* Board 160:313 — a picked state is a different layer, and every write
+          from here lands on it rather than on Base. The dropdown alone said
+          which state was picked, not that the panel below it had changed
+          meaning. */}
+      {currentPseudoState !== "normal" && (
+        <p
+          className="tw:m-0 tw:bg-[var(--bk-accent-tint)] tw:px-3 tw:py-1.5 tw:text-[12px] tw:text-[var(--bk-accent)]"
+          data-testid="pseudo-state-banner"
+        >
+          Editing {pseudoStateLabel(currentPseudoState)} — not Base
+        </p>
+      )}
       {/* Board 160:208 — what this breakpoint changes, and the way back. */}
       <BreakpointOverrides
         composer={composer}
@@ -447,14 +462,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
               devMode={devMode}
               density={inspectorDensity}
             />
-            {selectedElement && (
-              <VariantSection
-                composer={composer ?? null}
-                elementId={selectedElement.id ?? null}
-                isOpen={expandedSections.has(`${selectedElement.type}:variants`)}
-                onToggle={() => toggleSection(selectedElement.type, "variants")}
-              />
-            )}
+
           </InspectorErrorBoundary>
         </div>
       </div>

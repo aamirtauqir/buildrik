@@ -290,6 +290,29 @@ export async function syncInstance(
 }
 
 /**
+ * Reset an instance to its master — board 160:2's "Reset to master".
+ *
+ * Drops what was changed on THIS instance and rebuilds it from the component,
+ * which is the opposite of sync: sync keeps the instance's own edits and takes
+ * the master's structure, this takes both from the master.
+ *
+ * `syncedVersion` is forced back so the rebuild runs even when the instance is
+ * already on the master's current version — the common case, since resetting
+ * is about local edits, not about being out of date.
+ */
+export async function resetInstance(
+  composer: Composer,
+  maps: InstanceMaps,
+  elementId: string
+): Promise<boolean> {
+  const instance = maps.instances.get(elementId);
+  if (!instance || instance.isDetached) return false;
+
+  maps.instances.set(elementId, { ...instance, overrides: [], syncedVersion: -1 });
+  return syncInstance(composer, maps, elementId);
+}
+
+/**
  * Sync all instances of a component.
  */
 export async function syncAllInstances(

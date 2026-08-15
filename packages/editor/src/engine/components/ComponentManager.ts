@@ -29,6 +29,7 @@ import {
   recordInstanceOverride,
   getInstancesOfComponent,
   detachInstance,
+  resetInstance,
   detachAllInstances,
   syncInstance,
   syncAllInstances,
@@ -415,6 +416,11 @@ export class ComponentManager {
 
   async detachInstance(elementId: string): Promise<boolean> {
     return detachInstance(this.composer, this.maps, elementId);
+  }
+
+  /** Board 160:2 — throw away this instance's own edits and take the master. */
+  async resetInstance(elementId: string): Promise<boolean> {
+    return resetInstance(this.composer, this.maps, elementId);
   }
 
   async syncInstance(elementId: string): Promise<boolean> {

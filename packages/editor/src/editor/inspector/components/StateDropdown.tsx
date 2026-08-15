@@ -26,6 +26,11 @@ const PSEUDO_LABELS: Record<PseudoStateId, string> = {
 
 const ALL_STATES: readonly PseudoStateId[] = ["normal", "hover", "focus", "active", "disabled"];
 
+/** Board 160:313's line: what a write lands on while a state is picked. */
+export function pseudoStateLabel(state: PseudoStateId): string {
+  return PSEUDO_LABELS[state];
+}
+
 export interface StateDropdownProps {
   current: PseudoStateId;
   onChange: (s: PseudoStateId) => void;

@@ -32,6 +32,7 @@ import {
   detachInstance,
   detachAllInstances,
   syncInstance,
+  resetInstance,
   syncAllInstances,
   updateInstanceVariant,
 } from "../ComponentInstances";
@@ -349,6 +350,38 @@ describe("variant swap — updateInstanceVariant + getVariantStylesForElement", 
     expect(getOverridesForElement(c, maps.components, maps.instances, instanceId)).toEqual({
       background: "tomato",
     });
+  });
+});
+
+describe("resetInstance — board 160:2's Reset to master", () => {
+  it("drops the instance's own edits and rebuilds it from the master", async () => {
+    const { manager, maps, instanceId, c } = await seed();
+    const utils = new ComponentInstanceUtils(c);
+    const title = manager.getElement(instanceId)!.getChildren()[0];
+    recordInstanceOverride(c, maps, utils, title.getId(), "style", "color", "hotpink");
+    expect(maps.instances.get(instanceId)!.overrides.length).toBeGreaterThan(0);
+
+    expect(await resetInstance(c, maps, instanceId)).toBe(true);
+
+    // The element is re-cloned, so find the surviving instance by its record.
+    const [, record] = [...maps.instances.entries()].find(
+      ([, inst]) => inst.componentId === maps.components.keys().next().value
+    )!;
+    expect(record.overrides).toEqual([]);
+  });
+
+  it("runs even when the instance is already on the master's current version", async () => {
+    const { manager, maps, instanceId, c } = await seed();
+    const before = manager.getElement(instanceId)!;
+    expect(await resetInstance(c, maps, instanceId)).toBe(true);
+    // sync alone would have early-returned with the same live object.
+    expect(manager.getElement(instanceId)).not.toBe(before);
+  });
+
+  it("refuses a detached instance — it has no master to go back to", async () => {
+    const { maps, instanceId, c } = await seed();
+    maps.instances.get(instanceId)!.isDetached = true;
+    expect(await resetInstance(c, maps, instanceId)).toBe(false);
   });
 });
 

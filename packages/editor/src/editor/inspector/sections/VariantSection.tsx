@@ -1,15 +1,22 @@
 /**
- * VariantSection - Component variant picker for instances
- * Shows when selected element is a component instance with variants
+ * VariantSection — board 160:2 (Inspector · instance-selected).
+ *
+ * The band that says this thing came from a component: which variant it is on,
+ * and the way back to the master. The board puts it ABOVE the style sections,
+ * tinted, because it changes what everything below means — an instance's edits
+ * are local until it is detached.
+ *
+ * It used to render as an ordinary collapsible "Variants" section at the very
+ * bottom of the column, under Animation and CSS classes, with chips instead of
+ * the board's selects and no way at all to undo an instance's own edits.
+ *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { Package } from "lucide-react";
 import type { Composer } from "../../../engine";
 import type { ComponentDefinition } from "../../../shared/types/components";
-import { Section } from "../shared/controls";
-import { Button } from "@/editor/chrome-ui";
+import { Button, Select } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -19,89 +26,17 @@ interface VariantSectionProps {
   composer: Composer | null;
   /** Selected element ID */
   elementId: string | null;
-  /** Controlled open state for auto-expand functionality */
-  isOpen?: boolean;
-  /** Called when section header is toggled — wires into useInspectorSections */
-  onToggle?: () => void;
 }
 
 // ============================================================================
 // STYLES
 // ============================================================================
 
-const styles = {
-  container: {
-    display: "flex",
-    flexDirection: "column" as const,
-    gap: 12,
-  },
-  propertyRow: {
-    display: "flex",
-    flexDirection: "column" as const,
-    gap: 6,
-  },
-  propertyLabel: {
-    fontSize: 12,
-    fontWeight: 500,
-    color: "var(--bk-ink-soft)",
-    textTransform: "uppercase" as const,
-    letterSpacing: "0.5px",
-  },
-  valueChips: {
-    display: "flex",
-    flexWrap: "wrap" as const,
-    gap: 6,
-  },
-  chip: (isSelected: boolean): React.CSSProperties => ({
-    padding: "6px 12px",
-    borderRadius: 6,
-    border: isSelected ? "1px solid var(--bk-accent)" : "1px solid var(--bk-border)",
-    background: isSelected ? "var(--bk-accent-subtle)" : "var(--bk-bg-subtle)",
-    color: isSelected ? "var(--bk-accent)" : "var(--bk-ink-soft)",
-    fontSize: 12,
-    fontWeight: isSelected ? 600 : 400,
-    cursor: "pointer",
-    transition: "all 0.15s ease",
-  }),
-  noVariants: {
-    padding: 12,
-    background: "var(--bk-bg-subtle)",
-    borderRadius: 8,
-    fontSize: 12,
-    color: "var(--bk-ink-muted)",
-    textAlign: "center" as const,
-  },
-  componentName: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    padding: "8px 12px",
-    background: "var(--bk-accent-subtle)",
-    borderRadius: 8,
-    marginBottom: 8,
-  },
-  componentIcon: {
-    fontSize: 16,
-  },
-  componentLabel: {
-    fontSize: 12,
-    fontWeight: 600,
-    color: "var(--bk-ink)",
-  },
-  hint: {
-    fontSize: 12,
-    color: "var(--bk-ink-muted)",
-    padding: "8px 0 0",
-    borderTop: "1px solid var(--bk-border)",
-    marginTop: 8,
-  },
-};
-
 // ============================================================================
 // COMPONENT
 // ============================================================================
 
-export const VariantSection: React.FC<VariantSectionProps> = ({ composer, elementId, isOpen, onToggle }) => {
+export const VariantSection: React.FC<VariantSectionProps> = ({ composer, elementId }) => {
   // State for component info
   const [componentInfo, setComponentInfo] = React.useState<{
     component: ComponentDefinition | null;
@@ -164,54 +99,49 @@ export const VariantSection: React.FC<VariantSectionProps> = ({ composer, elemen
     return null;
   }
 
-  // Get current values for each property
-  const getCurrentValue = (propertyName: string): string => {
+  const currentValue = (propertyName: string): string => {
     if (!componentInfo.currentVariant || variants.length === 0) {
       const prop = variantProperties.find((p) => p.name === propertyName);
       return prop?.defaultValue || "";
     }
-
     const currentVar = variants.find((v) => v.id === componentInfo.currentVariant);
     return currentVar?.propertyValues[propertyName] || "";
   };
 
   return (
-    <Section title="Variants" icon="Layers" isOpen={isOpen} onToggle={onToggle} id="inspector-section-variants">
-      <div style={styles.container}>
-        {/* Component name badge */}
-        <div style={styles.componentName}>
-          <Package size={16} aria-hidden style={styles.componentIcon} />
-          <span style={styles.componentLabel}>{componentInfo.component.name}</span>
-        </div>
-
-        {/* Variant property controls */}
-        {variantProperties.map((prop) => (
-          <div key={prop.name} style={styles.propertyRow}>
-            <span style={styles.propertyLabel}>{prop.name}</span>
-            <div style={styles.valueChips}>
-              {prop.values.map((value) => {
-                const isSelected = getCurrentValue(prop.name) === value;
-                return (
-                  <Button
-                    key={value}
-                    style={styles.chip(isSelected)}
-                    onClick={() => handleVariantChange(prop.name, value)}
-                    title={`Set ${prop.name} to ${value}`}
-                    aria-pressed={isSelected}
-                  >
-                    {value}
-                  </Button>
-                );
-              })}
-            </div>
-          </div>
-        ))}
-
-        <div style={styles.hint}>
-          Switch between component variants. Changes apply to this instance only.
-        </div>
+    <div className="tw:bg-[var(--bk-accent-tint)] tw:px-3 tw:py-2" data-testid="variant-band">
+      <div className="tw:mb-1 tw:text-[11px] tw:font-medium tw:tracking-wide tw:text-[var(--bk-accent)]">
+        VARIANT
       </div>
-    </Section>
+      {variantProperties.map((prop) => (
+        <div key={prop.name} className="bdi-row-ctrl">
+          <label className="bdi-lb">{prop.name}</label>
+          <Select
+            value={currentValue(prop.name)}
+            onChange={(e) => handleVariantChange(prop.name, e.target.value)}
+            aria-label={`${prop.name} variant`}
+          >
+            {prop.values.map((value) => (
+              <option key={value} value={value}>
+                {value}
+              </option>
+            ))}
+          </Select>
+        </div>
+      ))}
+      <Button
+        color="light"
+        size="xs"
+        className="tw:mt-1 tw:border-transparent tw:bg-transparent tw:px-0 tw:text-[12px] tw:text-[var(--bk-accent)]"
+        onClick={() => {
+          if (componentInfo.instanceId) {
+            void composer?.components?.resetInstance?.(componentInfo.instanceId);
+          }
+        }}
+      >
+        Reset to master
+      </Button>
+    </div>
   );
 };
 
