@@ -102,11 +102,17 @@ export const InspectorEmptyState: React.FC<InspectorEmptyStateProps> = ({
 // CLASSES
 // ============================================================================
 
+/* Board 159:99 sets this line where the first row of a real inspector would
+   be — near the top, not floating in the middle of an 812px column. Centring
+   it made the panel read as a placeholder screen rather than a panel waiting
+   for a selection. */
 const CONTAINER =
-  "tw:flex tw:flex-col tw:items-center tw:justify-center tw:h-full tw:mt-10 tw:p-6 " +
+  "tw:flex tw:flex-col tw:items-center tw:px-4 tw:pt-12 tw:pb-6 " +
   "tw:text-center tw:text-[var(--bk-ink-soft)]";
 const TITLE = "tw:mb-2 tw:text-sm tw:font-semibold tw:text-gray-900";
-const DESCRIPTION = "tw:m-0 tw:max-w-55 tw:text-[13px] tw:leading-normal tw:text-gray-500";
+/* No max-width: the board's sentence sits on one line inside the panel's
+   own padding; capping it at 220px broke it across two. */
+const DESCRIPTION = "tw:m-0 tw:text-[13px] tw:leading-normal tw:text-gray-500";
 const TIP = "tw:mt-5 tw:px-3 tw:py-2 tw:rounded-md tw:bg-blue-50 tw:text-[11px] tw:text-[var(--bk-ink-soft)]";
 /** Success banner after a template applies — success tokens, not a hand-mixed green. */
 const APPLIED_BANNER =

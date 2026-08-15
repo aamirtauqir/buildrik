@@ -93,12 +93,17 @@ describe("MultiSelectToolbar — handler wiring", () => {
 });
 
 describe("MultiSelectToolbar — batch panel Mixed labelling", () => {
-  it("labels a field 'Mixed' when a property differs across the selection", () => {
+  /* Board 159:123 — the row keeps its own name and the empty field says
+     "Mixed", with one sentence under the fields saying what editing it does. */
+  it("says 'Mixed' inside the field when a property differs across the selection", () => {
     const e1 = makeMockElement({ id: "e1", styles: { "background-color": "#ff0000" } });
     const e2 = makeMockElement({ id: "e2", styles: { "background-color": "#0000ff" } });
     const composer = makeMockComposer({ elements: [e1, e2] });
     renderToolbar(["e1", "e2"], composer);
-    expect(screen.getByText("Background · Mixed")).toBeInTheDocument();
-    expect(screen.getByText(/differ across selection/)).toBeInTheDocument();
+    expect(screen.getByText("Background")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Mixed")).toBeInTheDocument();
+    expect(
+      screen.getByText("Editing a Mixed field applies it to all 2.")
+    ).toBeInTheDocument();
   });
 });

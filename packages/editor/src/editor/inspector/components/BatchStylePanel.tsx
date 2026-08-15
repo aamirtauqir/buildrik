@@ -79,25 +79,24 @@ export const BatchStylePanel: React.FC<BatchStylePanelProps> = ({
 
   if (selectedIds.length < 2) return null;
 
-  // When a property disagrees across the selection, hand the input a blank
-  // value + a "Mixed" label so users can see they're about to overwrite. The
-  // label appears as a small pill next to the control's label.
-  const fieldProps = (prop: string, fallbackLabel: string) => ({
-    label: mixed.has(prop) ? `${fallbackLabel} · Mixed` : fallbackLabel,
+  // Board 159:123 says "Mixed" inside the empty field, not appended to its
+  // label: the row still reads "Radius", and the field says it has nothing to
+  // show because the selection disagrees.
+  const fieldProps = (prop: string, label: string) => ({
+    label,
     value: mixed.has(prop) ? "" : elementStyles[prop] || "",
+    placeholder: mixed.has(prop) ? "Mixed" : undefined,
   });
 
   return (
     <div style={styles.container}>
-      <span style={styles.label}>Batch Edit ({selectedIds.length})</span>
-
       <ColorInput
         {...fieldProps("background-color", "Background")}
         onChange={(v) => handleStyleChange("background-color", v)}
       />
 
       <ColorInput
-        {...fieldProps("color", "Text")}
+        {...fieldProps("color", "Text color")}
         onChange={(v) => handleStyleChange("color", v)}
       />
 
@@ -121,7 +120,7 @@ export const BatchStylePanel: React.FC<BatchStylePanelProps> = ({
 
       <p style={styles.hint}>
         {mixed.size > 0
-          ? `${mixed.size} propert${mixed.size === 1 ? "y" : "ies"} differ across selection. Editing a "Mixed" field overwrites all ${selectedIds.length}.`
+          ? `Editing a Mixed field applies it to all ${selectedIds.length}.`
           : `Edits apply to all ${selectedIds.length} elements in one action.`}
       </p>
     </div>

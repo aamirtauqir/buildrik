@@ -120,8 +120,13 @@ if (clickAt) {
      the next, because the click after an insert lands on a tree the engine
      has not mounted yet otherwise. */
   for (const point of String(clickAt).split(";")) {
-    const [cx, cy] = point.split(",").map(Number);
+    /* `x,y+Shift` holds a modifier for that one gesture — multi-select is
+       shift-click, and a plain click can never reach it. */
+    const [coords, mod] = point.split("+");
+    const [cx, cy] = coords.split(",").map(Number);
+    if (mod) await page.keyboard.down(mod);
     await page.mouse.click(cx, cy);
+    if (mod) await page.keyboard.up(mod);
     await page.waitForTimeout(Number(arg("click-settle", 1200)));
   }
 }

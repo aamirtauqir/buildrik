@@ -50,9 +50,18 @@ export interface ColorInputProps {
   onChange: (value: string) => void;
   /** Optional composer ref — when present, clicking a binding chip opens the Design panel. */
   composer?: Composer | null;
+  /** Shown in the empty hex field — the batch panel passes "Mixed" when the
+   *  selection disagrees (board 159:123). */
+  placeholder?: string;
 }
 
-export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange, composer }) => {
+export const ColorInput: React.FC<ColorInputProps> = ({
+  label,
+  value,
+  onChange,
+  composer,
+  placeholder,
+}) => {
   const [hidden, setHidden] = React.useState(false);
   const [isOpen, setIsOpen] = React.useState(false);
 
@@ -173,22 +182,29 @@ export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange, 
                       else if (v === "transparent" || v === "inherit" || v === "currentColor") onChange(v);
                     }}
                     onClick={(e) => e.stopPropagation()}
-                    placeholder={isKeyword ? value : "000000"}
+                    placeholder={placeholder ?? (isKeyword ? value : "000000")}
                     aria-label={`${label} value`}
                   />
-                  <span className="bdi-pct">{getPercent(!hidden)}</span>
-                  <Button
-                    type="button"
-                    className="bdi-eye"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setHidden((v) => !v);
-                    }}
-                    aria-label={hidden ? "Show color" : "Hide color"}
-                    title={hidden ? "Show color" : "Hide color"}
-                  >
-                    {hidden ? <EyeOff size={10} aria-hidden="true" /> : <Eye size={10} aria-hidden="true" />}
-                  </Button>
+                  {/* An opacity reading and a hide toggle for a colour that is
+                      not set say nothing, and they cost the field the width it
+                      needs — "Mixed" arrived as "Mi…" in the batch panel. */}
+                  {value ? (
+                    <>
+                      <span className="bdi-pct">{getPercent(!hidden)}</span>
+                      <Button
+                        type="button"
+                        className="bdi-eye"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setHidden((v) => !v);
+                        }}
+                        aria-label={hidden ? "Show color" : "Hide color"}
+                        title={hidden ? "Show color" : "Hide color"}
+                      >
+                        {hidden ? <EyeOff size={10} aria-hidden="true" /> : <Eye size={10} aria-hidden="true" />}
+                      </Button>
+                    </>
+                  ) : null}
                 </>
               )}
             </div>

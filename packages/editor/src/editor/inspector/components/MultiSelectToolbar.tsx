@@ -76,17 +76,15 @@ const headerRowStyles: React.CSSProperties = {
   gap: "var(--bk-space-8)",
 };
 
+/* Board 159:123 writes the count the way the single-selection header writes
+   the element's name — plain dark text, not an accent pill. The pill read as a
+   status badge for something that is simply the panel's title. */
 const countBadgeStyles: React.CSSProperties = {
   display: "inline-flex",
   alignItems: "center",
-  justifyContent: "center",
-  background: "var(--bk-accent-subtle)",
-  color: "var(--bk-accent)",
-  fontSize: "var(--bk-text-12)",
+  color: "var(--bk-ink)",
+  fontSize: "var(--bk-text-14)",
   fontWeight: 600,
-  padding: "var(--bk-space-8)",
-  borderRadius: "var(--bk-radius-lg)",
-  marginBottom: "var(--bk-space-8)",
 };
 
 // ============================================================================
@@ -177,9 +175,12 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
         )}
       </div>
 
-      {/* Horizontal Alignment */}
+      {/* Board 159:123 bands them once: ALIGN carries all six, DISTRIBUTE
+          carries its two on the right. Live split ALIGN in two ("Align
+          Horizontal" / "Align Vertical"), which read as two decisions where
+          the board has one. */}
       <div style={sectionStyles}>
-        <span style={sectionLabelStyles}>Align Horizontal</span>
+        <span style={sectionLabelStyles}>Align</span>
         <div style={buttonGroupStyles}>
           <Tooltip content={getAlignTooltip("Align Left")} placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
             <Button
@@ -208,13 +209,6 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
               disabled={isDisabled} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
             ><AlignRight size={16} /></Button>
           </Tooltip>
-        </div>
-      </div>
-
-      {/* Vertical Alignment */}
-      <div style={sectionStyles}>
-        <span style={sectionLabelStyles}>Align Vertical</span>
-        <div style={buttonGroupStyles}>
           <Tooltip content={getAlignTooltip("Align Top")} placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
             <Button
               color="light"
@@ -248,7 +242,7 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
       {/* Distribution */}
       <div style={sectionStyles}>
         <span style={sectionLabelStyles}>Distribute</span>
-        <div style={buttonGroupStyles}>
+        <div style={{ ...buttonGroupStyles, alignSelf: "flex-end" }}>
           <Tooltip content={getDistributeTooltip("Horizontally")} placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
             <Button
               color="light"
