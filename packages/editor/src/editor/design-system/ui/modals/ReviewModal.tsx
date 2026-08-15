@@ -23,6 +23,10 @@ export interface ReviewModalProps {
   spacingSavedTokens: DesignToken[];
   onConfirm: () => void;
   onClose: () => void;
+  /** Board 1172:4840's third door — throw the staged edits away. */
+  onDiscardAll?: () => void;
+  /** How many places on the site are bound to the tokens being changed. */
+  usageCount?: number;
 }
 
 /* Four `rgba(255,255,255,0.0x)` values in here were dark-theme leftovers —
@@ -70,6 +74,8 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
   spacingSavedTokens,
   onConfirm,
   onClose,
+  onDiscardAll,
+  usageCount,
 }) => {
   const cancelRef = React.useRef<HTMLButtonElement>(null);
   React.useEffect(() => {
@@ -104,12 +110,14 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
     <ModalRoot open onOpenChange={(next) => !next && onClose()}>
       <ModalContent size="sm">
         <div className="tw:p-5">
+          {/* Board 1172:4840 counts in the title and says what applying
+              reaches: "Applying updates every element bound to these tokens —
+              63 places." A count in the title is the difference between
+              "review changes" and knowing whether this is a typo fix or a
+              rebrand. */}
           <ModalTitle inset={false} className="tw:text-sm tw:font-semibold tw:text-gray-900 tw:mb-1">
-            Review changes
+            Review {totalChanges} staged {totalChanges === 1 ? "change" : "changes"}
           </ModalTitle>
-          <div className="tw:text-xs tw:text-gray-500 tw:mb-3.5">
-            {totalChanges} {totalChanges === 1 ? "change" : "changes"} will be saved to your site.
-          </div>
 
           {/* Colour changes — the only section whose row is not name/was/now */}
           {changedEntries.length > 0 && (
@@ -147,7 +155,24 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
           <ValueDiffSection title="Typography Changes" rows={typeRows} />
           <ValueDiffSection title="Spacing Changes" rows={spacingRows} />
 
+          <p className="tw:mt-3 tw:mb-0 tw:text-xs tw:text-gray-500">
+            Applying updates every element bound to these tokens
+            {usageCount != null && usageCount > 0
+              ? ` — ${usageCount} place${usageCount === 1 ? "" : "s"}.`
+              : "."}
+          </p>
+
           <div className="tw:flex tw:gap-2 tw:justify-end tw:mt-4">
+            {onDiscardAll && (
+              <Button
+                color="light"
+                size="xs"
+                onClick={onDiscardAll}
+                className="tw:mr-auto tw:border-[var(--bk-error)] tw:bg-transparent tw:text-[var(--bk-error)]"
+              >
+                Discard all
+              </Button>
+            )}
             <Button
               ref={cancelRef}
               color="light"
@@ -155,10 +180,10 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
               onClick={onClose}
               className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
             >
-              Cancel
+              Keep editing
             </Button>
             <Button size="xs" onClick={onConfirm}>
-              Save to site
+              Apply {totalChanges} {totalChanges === 1 ? "change" : "changes"}
             </Button>
           </div>
         </div>

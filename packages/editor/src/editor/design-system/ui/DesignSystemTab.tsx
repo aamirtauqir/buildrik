@@ -750,6 +750,18 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
           spacingSavedTokens={spacing.savedTokens}
           onConfirm={handleApply}
           onClose={() => setShowReview(false)}
+          /* Board 1172:4840's third door. The same discard the footer runs,
+             with its undo toast — reachable from the review, which is where
+             someone decides they do not want these edits after all. */
+          onDiscardAll={() => {
+            setShowReview(false);
+            handleDiscard();
+          }}
+          usageCount={(() => {
+            let n = 0;
+            for (const set of usageMap.values()) n += set.size;
+            return n;
+          })()}
         />
       )}
       {showAddToken && (
