@@ -254,23 +254,14 @@
   grid-area: fullpage;
 }
 
-/* ============================================
-   Stacking
-   ============================================
-   The shell's slots sit INSIDE the token z-scale
-   (--bk-z-canvas 0 · chrome 10 · drawer 20 · topbar 30 · popover 40 ·
-   overlay 50 · modal 60 · cmdk 70), which they did not until 2026-08-16:
-   they ran 80 / 90 / 100 / 200, above every layer the tokens define. Since
-   `.layout-shell__inspector` and `__drawer` also carry a transform for their
-   slide, each is its own stacking context, so a topbar popover at z-index 40
-   painted UNDERNEATH them: the notifications dropdown and the Issues panel
-   both rendered as a ~60px sliver at the edge of the inspector, and neither
-   could be read or used. Relative order inside the shell is unchanged —
-   topbar/footer over rail over drawer/inspector over canvas.
-
-   Canvas overlays keep their own (much larger) numbers: they live inside
-   `.layout-shell__canvas`, which clips them with overflow:hidden, so they
-   cannot reach the topbar whatever the number says. */
+/* Stacking — the shell's slots sit INSIDE the token z-scale (canvas 0 ·
+   chrome 10 · drawer 20 · topbar 30 · popover 40 · overlay 50 · modal 60 ·
+   cmdk 70). They ran 80/90/100/200 until 2026-08-16, above every layer the
+   tokens define, and because the inspector and drawer carry a transform for
+   their slide (each its own stacking context) a topbar popover at 40 painted
+   UNDERNEATH them — the notifications dropdown and the Issues panel both
+   rendered as a 60px sliver. Canvas overlays keep their own larger numbers:
+   overflow:hidden on the canvas clips them, so they cannot reach the topbar. */
 
 /* ============================================
    Drawer Panel
