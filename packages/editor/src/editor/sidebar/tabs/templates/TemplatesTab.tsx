@@ -263,7 +263,15 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
       setApplyStepIndex(1);
       await paint();
       if (wasNewPageMode) {
-        composer.elements.createPage(t.name);
+        /* Switch to the page we just made BEFORE importing. `createPage`
+           adopts the new page only when there is no active one
+           (PageManager:87), so on any real site the import below landed on
+           the page the user was looking at: asking for the template as a NEW
+           page replaced the page they were on, and left the new one empty.
+           Walked live — Page 1 held "SaaS Landing", "Add as new page" with
+           Portfolio, and Page 1 came back as Portfolio. */
+        const created = composer.elements.createPage(t.name);
+        composer.elements.setActivePage?.(created.id);
       }
       if (resetStyles) composer.styles.clear();
       setApplyCancellable(false);

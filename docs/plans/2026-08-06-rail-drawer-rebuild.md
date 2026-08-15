@@ -1820,6 +1820,22 @@ outright), and the backup box stays unchecked by default — the board draws it
 ticked, but a default is behaviour, and the code's answer is that version
 history already holds the previous state.
 
+**The twenty-first find, and it destroyed work: "Add as new page" replaced the
+page you were on.** `createPage` adopts the page it creates only when there is
+no active one (`PageManager:87`), and the apply then calls
+`importHTMLToActivePage`. On any site that already has a page — which is every
+site — the new page was created empty and the template was imported over the
+page the user was looking at. Asking for a template as a NEW page destroyed the
+current one.
+
+Walked live, both ways. Before: Page 1 held "SaaS Landing", "Add as new page"
+with Portfolio, and Page 1 came back as Portfolio. After: the tab bar reads
+`Page 1` · `Portfolio` with Portfolio selected, the template is on the new
+page, and switching back to Page 1 shows "Acme SaaS · Ship faster with…"
+exactly as it was. The regression test asserts the ORDER —
+`createPage → setActivePage → import` — and was watched to fail against the old
+code before being kept.
+
 **Reachability, found while trying to walk the replace confirm: once a page has
 content, nothing on screen opens Templates.** The canvas CTA is an empty-state
 only, the Pages drawer's "Browse templates" likewise, the Insert drawer's
