@@ -333,3 +333,16 @@
   background: transparent;
   color: var(--bk-accent);
 }
+
+/* Board 171:105 (AI · error-quota) — same block, amber ground, red heading:
+   the run stopped and nothing changed. */
+.bd-ai-quota {
+  background: var(--bk-warning-tint);
+}
+
+.bd-ai-quota__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--bk-error);
+}

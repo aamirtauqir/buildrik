@@ -219,4 +219,28 @@ describe("AITab — scope + composer wiring", () => {
     expect(screen.queryByText(/isn.t configured yet/)).not.toBeInTheDocument();
     expect(screen.getByText("Stream failed")).toBeInTheDocument();
   });
+
+  /* Board 171:105 — running out of credit is its own state too, and the one
+     line that matters is that nothing changed. */
+  it("says the run stopped on credit and that nothing changed, with a way to fix it", () => {
+    const composer = makeElementScopedComposer();
+    const { container } = renderWithToast(
+      <AITab composer={composer} isExpanded={false} onExpandToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />,
+    );
+    const ta = container.querySelector("textarea")!;
+    fireEvent.change(ta, { target: { value: "make the hero warmer" } });
+    fireEvent.keyDown(ta, { key: "Enter" });
+
+    act(() => {
+      lastSubscribe.onError?.({
+        message: "Daily limit reached (10). Resets at 2026-08-16T00:00:00.000Z.",
+        data: { code: "TOO_MANY_REQUESTS" },
+      });
+    });
+
+    expect(screen.getByText("AI is out of credit.")).toBeInTheDocument();
+    // The server's own numbers, not a re-worded guess at them.
+    expect(screen.getByText(/Nothing was changed\. Daily limit reached \(10\)/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "See plans" })).toBeInTheDocument();
+  });
 });

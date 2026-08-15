@@ -189,10 +189,10 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose }) 
           Agent
         </Button>
       </div>
-      {/* Board 171:136 — a missing API key is a state, not an error line. The
-          server already says so (PRECONDITION_FAILED from
-          assertProviderConfigured); the panel used to print that message as
-          grey text under the prompt and leave the composer inviting more. */}
+      {/* Boards 171:136 and 171:105 — "no key" and "no credit" are states,
+          not error lines. The server already tells them apart
+          (PRECONDITION_FAILED vs TOO_MANY_REQUESTS); the panel used to print
+          either as grey text under a composer that still looked ready. */}
       {stream.errorKind === "not-configured" ? (
         <div className="bd-ai-notconfigured">
           <p className="bd-ai-notconfigured__title">AI drafting isn&rsquo;t configured yet.</p>
@@ -207,6 +207,23 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose }) 
             onClick={() => window.open(`${DASHBOARD_URL}/dashboard/settings`, "_blank")}
           >
             Open workspace settings
+          </Button>
+        </div>
+      ) : stream.errorKind === "quota" ? (
+        <div className="bd-ai-notconfigured bd-ai-quota">
+          <p className="bd-ai-quota__title">AI is out of credit.</p>
+          <p className="bd-ai-notconfigured__body">
+            {/* The server's own sentence carries the real limit and reset time
+                — the board's "1 Aug" is sample data. */}
+            Nothing was changed. {stream.error}
+          </p>
+          <Button
+            color="light"
+            size="xs"
+            className="bd-ai-notconfigured__link"
+            onClick={() => window.open(`${DASHBOARD_URL}/dashboard/settings/billing`, "_blank")}
+          >
+            See plans
           </Button>
         </div>
       ) : mode === "chat" ? (
