@@ -1,21 +1,18 @@
 // @vitest-environment jsdom
 /**
- * CanvasFooterToolbar — overlay toggles, preset-snapping zoom controls, the
- * preset dropdown and the help button. (The undo/redo/device edit group is
- * covered separately in CanvasFooterToolbar.editgroup.test.tsx.)
+ * CanvasFooterToolbar — overlay toggles and the help button. (The undo/redo/
+ * device edit group is covered separately in
+ * CanvasFooterToolbar.editgroup.test.tsx.)
  *
- * KNOWN real behavior pinned here (the reason a naive "clamp-to-max" test was
- * wrong): zoom in/out SNAP to the neighbouring ZOOM_PRESETS entry rather than
- * clamping arbitrary values, and the +/- buttons are DISABLED at the preset
- * bounds — so a click at the bound is a genuine no-op (0 onZoomChange calls),
- * not a clamp.
+ * The zoom controls that used to be pinned here now live in StudioFooter —
+ * board 817:4723 puts them in the footer's bottom-right corner — so their
+ * tests moved to StudioFooter.zoom.test.tsx with them.
  *
  * @license BSD-3-Clause
  */
 import * as React from "react";
 import { describe, it, expect, vi, beforeAll } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { ZOOM_PRESETS } from "../shared";
 import { CanvasFooterToolbar } from "../CanvasFooterToolbar";
 
 const ALL_OFF = {
@@ -26,9 +23,6 @@ const ALL_OFF = {
   badges: false,
   xray: false,
 };
-
-const MIN = ZOOM_PRESETS[0]; // 10
-const MAX = ZOOM_PRESETS[ZOOM_PRESETS.length - 1]; // 300
 
 function renderToolbar(props: Partial<React.ComponentProps<typeof CanvasFooterToolbar>> = {}) {
   const onOverlayChange = vi.fn();
@@ -90,99 +84,29 @@ describe("CanvasFooterToolbar — overlay toggles", () => {
     fireEvent.click(screen.getByRole("button", { name: "X-Ray" }));
     expect(onOverlayChange).toHaveBeenCalledWith("xray", false);
   });
-});
 
-describe("CanvasFooterToolbar — zoom controls (preset snapping)", () => {
-  it("shows the current zoom rounded to a whole percent", () => {
-    renderToolbar({ zoom: 133.4 });
-    expect(screen.getByRole("button", { name: "Zoom presets" }).textContent).toBe("133%");
-  });
-
-  it("zoom in snaps UP to the next preset above the current value", () => {
-    const { onZoomChange } = renderToolbar({ zoom: 100 });
-    fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
-    expect(onZoomChange).toHaveBeenCalledWith(150); // next preset above 100
-  });
-
-  it("zoom out snaps DOWN to the next preset below the current value", () => {
-    const { onZoomChange } = renderToolbar({ zoom: 100 });
-    fireEvent.click(screen.getByRole("button", { name: "Zoom out" }));
-    expect(onZoomChange).toHaveBeenCalledWith(75); // next preset below 100
-  });
-
-  it("snaps an off-preset value UP to the nearest preset above it", () => {
-    const { onZoomChange } = renderToolbar({ zoom: 110 });
-    fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
-    expect(onZoomChange).toHaveBeenCalledWith(150);
-  });
-
-  it("snaps an off-preset value DOWN to the nearest preset below it", () => {
-    const { onZoomChange } = renderToolbar({ zoom: 110 });
-    fireEvent.click(screen.getByRole("button", { name: "Zoom out" }));
-    expect(onZoomChange).toHaveBeenCalledWith(100);
-  });
-
-  it("disables zoom-in at the maximum preset and clicking it is a no-op (KNOWN: no clamp)", () => {
-    const { onZoomChange } = renderToolbar({ zoom: MAX });
-    const zoomIn = screen.getByRole("button", { name: "Zoom in" }) as HTMLButtonElement;
-    expect(zoomIn.disabled).toBe(true);
-    fireEvent.click(zoomIn);
-    expect(onZoomChange).not.toHaveBeenCalled();
-  });
-
-  it("disables zoom-out at the minimum preset and clicking it is a no-op", () => {
-    const { onZoomChange } = renderToolbar({ zoom: MIN });
-    const zoomOut = screen.getByRole("button", { name: "Zoom out" }) as HTMLButtonElement;
-    expect(zoomOut.disabled).toBe(true);
-    fireEvent.click(zoomOut);
-    expect(onZoomChange).not.toHaveBeenCalled();
-  });
-
-  it("keeps zoom-in enabled above a preset boundary but below max (e.g. 350 is not a real state, 250 is)", () => {
-    renderToolbar({ zoom: 250 });
-    const zoomIn = screen.getByRole("button", { name: "Zoom in" }) as HTMLButtonElement;
-    // 250 < 300 → still enabled; snaps up to 300
-    expect(zoomIn.disabled).toBe(false);
-  });
-});
-
-describe("CanvasFooterToolbar — preset dropdown", () => {
-  it("opens the preset dropdown listing every ZOOM_PRESETS entry when the % is clicked", () => {
-    renderToolbar({ zoom: 100 });
-    fireEvent.click(screen.getByRole("button", { name: "Zoom presets" }));
-    for (const preset of ZOOM_PRESETS) {
-      expect(screen.getByRole("button", { name: `${preset}%` })).toBeTruthy();
+  /* Board 199:205 draws these as words. They were icon-only for a while
+     because the bar overflowed under the inspector; the label IS the control
+     now, so a regression back to glyphs shows up here rather than in a
+     screenshot nobody re-takes. */
+  it("prints each toggle's name in the bar, not just in its tooltip", () => {
+    renderToolbar();
+    for (const name of ["Snap Guides", "Spacing", "Grid", "Rulers", "Badges", "X-Ray"]) {
+      expect(screen.getByRole("button", { name }).textContent).toBe(name);
     }
   });
 
-  it("selecting a preset fires onZoomChange with that exact value and closes the dropdown", () => {
-    const { onZoomChange } = renderToolbar({ zoom: 100 });
-    fireEvent.click(screen.getByRole("button", { name: "Zoom presets" }));
-    fireEvent.click(screen.getByRole("button", { name: "50%" }));
-    expect(onZoomChange).toHaveBeenCalledWith(50);
-    // dropdown closed → the 25% option is gone
-    expect(screen.queryByRole("button", { name: "25%" })).toBeNull();
-  });
+  /* Board 817:4649 prints ⌘R against Rulers. The chord was the one on that
+     board never bound — it is the browser's reload. Only the PLAIN chord is
+     taken; ⌘⇧R must still reach the browser. */
+  it("⌘R toggles rulers, and ⌘⇧R is left to the browser", () => {
+    const { onOverlayChange } = renderToolbar();
+    fireEvent.keyDown(window, { key: "r", metaKey: true });
+    expect(onOverlayChange).toHaveBeenCalledWith("rulers", true);
 
-  it("reaches 400%, the top of the range the board documents", () => {
-    const { onZoomChange } = renderToolbar({ zoom: 200 });
-    fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
-    expect(onZoomChange).toHaveBeenCalledWith(400);
-  });
-
-  it("renders a Zoom to fit entry inside the dropdown when onFitToScreen is wired", () => {
-    const onFitToScreen = vi.fn();
-    renderToolbar({ zoom: 100, onFitToScreen });
-    fireEvent.click(screen.getByRole("button", { name: "Zoom presets" }));
-    const fit = screen.getByRole("button", { name: /Zoom to fit/ });
-    fireEvent.click(fit);
-    expect(onFitToScreen).toHaveBeenCalledTimes(1);
-  });
-
-  it("omits the Zoom to fit entry when onFitToScreen is not provided", () => {
-    renderToolbar({ zoom: 100 });
-    fireEvent.click(screen.getByRole("button", { name: "Zoom presets" }));
-    expect(screen.queryByRole("button", { name: /Zoom to fit/ })).toBeNull();
+    onOverlayChange.mockClear();
+    fireEvent.keyDown(window, { key: "r", metaKey: true, shiftKey: true });
+    expect(onOverlayChange).not.toHaveBeenCalled();
   });
 });
 

@@ -15,8 +15,7 @@
  */
 
 import * as React from "react";
-import { useClickOutside } from "@/shared/hooks";
-import { BreakpointSwitcher, Button, isModalOpen, POPOVER_BASE_CLASS, Portal, Tooltip, type Breakpoint } from "@/editor/chrome-ui";
+import { BreakpointSwitcher, Button, isModalOpen, Tooltip, type Breakpoint } from "@/editor/chrome-ui";
 import { ZOOM_PRESETS } from "./shared";
 // Undo/redo/device switching moved OFF the topbar and onto this canvas toolbar
 // (Figma contract §2: viewport + edit controls belong to the canvas, the topbar
@@ -71,44 +70,9 @@ export interface CanvasFooterToolbarProps {
 // Icons (inline SVG for self-containment)
 // ============================================
 
-const GuidesIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M16 3v18M8 3v18M3 8h18M3 16h18" strokeLinecap="round" />
-  </svg>
-);
-
-const SpacingIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M21 6H3M21 18H3M6 21V3M18 21V3" strokeLinecap="round" />
-  </svg>
-);
-
-const GridIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <rect x="3" y="3" width="18" height="18" rx="2" />
-    <path d="M3 9h18M3 15h18M9 3v18M15 3v18" />
-  </svg>
-);
-
-const RulersIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M3 3h4v18H3zM3 3h18v4H3z" strokeLinejoin="round" />
-    <path d="M3 8h2M3 12h2M3 16h2M8 3v2M12 3v2M16 3v2" strokeLinecap="round" />
-  </svg>
-);
-
-const BadgesIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M3 7h2M3 12h2M3 17h2M9 7h12M9 12h8M9 17h10" strokeLinecap="round" />
-  </svg>
-);
-
-const XRayIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <circle cx="12" cy="12" r="3" />
-    <path d="M2 12h7M15 12h7M12 2v7M12 15v7" strokeLinecap="round" />
-  </svg>
-);
+/* The six overlay glyphs that used to sit in this block are gone with the
+   icon-only toggles — board 199:205 labels them in words. Recover from git
+   history if a future surface needs them. */
 
 const HelpIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -156,28 +120,12 @@ const BAR =
   "tw:whitespace-nowrap tw:max-w-full tw:min-w-0 tw:overflow-x-auto";
 const GROUP = "tw:flex tw:items-center tw:gap-1";
 const DIVIDER = "tw:w-px tw:h-5 tw:mx-1 tw:bg-gray-200";
-const ZOOM_GROUP = "tw:flex tw:items-center tw:gap-0.5 tw:p-0.5 tw:rounded tw:bg-[var(--bk-bg-subtle)]";
-const ZOOM_BTN =
-  "tw:flex tw:items-center tw:justify-center tw:size-6 tw:p-0 tw:rounded tw:border-0 " +
-  "tw:bg-transparent tw:text-sm tw:font-medium tw:text-[var(--bk-ink-soft)] " +
-  "tw:hover:bg-gray-100 tw:hover:text-gray-900";
-const ZOOM_PCT =
-  "tw:flex tw:items-center tw:justify-center tw:min-w-12 tw:h-6 tw:p-0 tw:border-0 " +
-  "tw:bg-transparent tw:text-[11px] tw:font-semibold tw:text-gray-900";
-const PRESET_ITEM =
-  "tw:w-full tw:px-3 tw:py-[5px] tw:rounded tw:border-0 tw:text-xs tw:font-medium tw:text-right";
-const PRESET_ROW =
-  "tw:w-full tw:px-3 tw:py-[5px] tw:rounded tw:border-0 tw:text-xs tw:font-medium " +
-  "tw:flex tw:items-center tw:justify-between tw:gap-4";
-const PRESET_KEY = "tw:text-[10px] tw:text-[var(--bk-gray-400)]";
-const PRESET_DIVIDER = "tw:h-px tw:my-1 tw:bg-gray-200";
 
 // ============================================
 // Overlay Button Component
 // ============================================
 
 interface OverlayButtonProps {
-  icon: React.ReactNode;
   label: string;
   shortcut?: string;
   active: boolean;
@@ -185,7 +133,6 @@ interface OverlayButtonProps {
 }
 
 const OverlayButton: React.FC<OverlayButtonProps> = ({
-  icon,
   label,
   shortcut,
   active,
@@ -197,26 +144,25 @@ const OverlayButton: React.FC<OverlayButtonProps> = ({
     arrow={false}
     className="tw:max-w-[280px] tw:whitespace-normal"
   >
+    {/* Board 199:205 draws these as WORDS, not icons: "Snap Guides · Spacing ·
+        Grid · Rulers · Badges · X-Ray", the active one in a grey pill with the
+        text gone semibold — no border, no tick. They were icon-only because the
+        bar also carried the zoom group and overflowed under the inspector; board
+        817:4723 puts zoom in the footer's bottom-right corner instead, and with
+        it gone the words fit the canvas column's 760px with room to spare. */}
     <Button
       type="button"
       color="light"
-      className={`tw:inline-flex tw:items-center tw:gap-1 tw:h-7 tw:px-2 tw:py-1 tw:rounded tw:border tw:text-[11px] tw:font-medium ${
+      className={`tw:inline-flex tw:items-center tw:h-7 tw:px-2.5 tw:py-1 tw:rounded tw:border tw:border-transparent tw:text-[11px] tw:whitespace-nowrap ${
         active
-          ? "tw:border-blue-700 tw:bg-[var(--bk-bg-subtle)] tw:text-gray-900"
-          : "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:bg-gray-100"
+          ? "tw:bg-[var(--bk-bg-subtle)] tw:text-gray-900 tw:font-semibold"
+          : "tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:font-medium tw:hover:bg-gray-100"
       }`}
       onClick={onClick}
       aria-pressed={active}
       aria-label={label}
     >
-      {/* Icon only. The bar carries undo/redo, a device switcher, seven
-          toggles and the zoom group inside the canvas column's 760px, and
-          with labels it ran to ~840px — the overflow slid UNDER the inspector,
-          where the zoom control could not be clicked at all (elementFromPoint
-          returned the inspector aside). The name and its chord live in the
-          tooltip, which is where the board's own annotation puts them. */}
-      <span className={active ? "tw:flex" : "tw:flex tw:opacity-70"}>{icon}</span>
-      {active && <span className="tw:ml-0.5 tw:text-blue-700">✓</span>}
+      {label}
     </Button>
   </Tooltip>
 );
@@ -245,9 +191,10 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
      handler lives here rather than in the shell's shortcut hook because this
      component already owns the toggles' state and callback.
 
-     ⌘R (Rulers) is deliberately NOT bound: it is the browser's reload, and
-     taking it means a user who wants to reload gets rulers instead. Named in
-     the ledger for the founder rather than settled here. */
+     ⌘R (Rulers) is one of them, and it is the browser's reload. Taken anyway,
+     because a chord printed on a control and not honoured is the worse of the
+     two failures — and only the PLAIN chord is taken, so ⌘⇧R (hard reload) and
+     F5 both still reload the editor. */
   React.useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (isModalOpen()) return;
@@ -295,6 +242,7 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
       if (key === ";" || key === ":") overlay = e.shiftKey ? "spacing" : "guides";
       else if (key === "'" || key === '"') overlay = "grid";
       else if (key === "b" && !e.shiftKey) overlay = "badges";
+      else if (key === "r" && !e.shiftKey) overlay = "rulers";
       else if (key === "x" && e.shiftKey) overlay = "xray";
       if (!overlay) return;
 
@@ -304,29 +252,6 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [overlays, onOverlayChange, onZoomChange, onFitToScreen, onZoomToSelection, zoom]);
-
-  const [showPresets, setShowPresets] = React.useState(false);
-  const presetsRef = React.useRef<HTMLDivElement>(null);
-  /* The flyout lives in a portal, outside presetsRef's subtree — without the
-     exclude, the mousedown that picks a preset counts as "outside" and closes
-     the popover before the row's onClick can fire. */
-  const presetsPopoverRef = React.useRef<HTMLDivElement>(null);
-
-  // Snap to next/prev preset instead of raw ±10 steps
-  const handleZoomIn = React.useCallback(() => {
-    const next = ZOOM_PRESETS.find((p) => p > zoom) ?? ZOOM_PRESETS[ZOOM_PRESETS.length - 1];
-    onZoomChange(next);
-  }, [zoom, onZoomChange]);
-
-  const handleZoomOut = React.useCallback(() => {
-    const prev = [...ZOOM_PRESETS].reverse().find((p) => p < zoom) ?? ZOOM_PRESETS[0];
-    onZoomChange(prev);
-  }, [zoom, onZoomChange]);
-
-  useClickOutside(presetsRef, () => setShowPresets(false), {
-    enabled: showPresets,
-    excludeRefs: [presetsPopoverRef],
-  });
 
   const showEditGroup = Boolean(onUndo || onRedo || (device && onDeviceChange));
 
@@ -386,173 +311,41 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
       {/* Overlay Toggles */}
       <div className={GROUP}>
         <OverlayButton
-          icon={<GuidesIcon />}
           label="Snap Guides"
           shortcut="⌘;"
           active={overlays.guides}
           onClick={() => onOverlayChange("guides", !overlays.guides)}
         />
         <OverlayButton
-          icon={<SpacingIcon />}
           label="Spacing"
           shortcut="⌘⇧;"
           active={overlays.spacing}
           onClick={() => onOverlayChange("spacing", !overlays.spacing)}
         />
         <OverlayButton
-          icon={<GridIcon />}
           label="Grid"
           shortcut="⌘'"
           active={overlays.grid}
           onClick={() => onOverlayChange("grid", !overlays.grid)}
         />
         <OverlayButton
-          icon={<RulersIcon />}
           label="Rulers"
+          shortcut="⌘R"
           active={overlays.rulers}
           onClick={() => onOverlayChange("rulers", !overlays.rulers)}
         />
         <OverlayButton
-          icon={<BadgesIcon />}
           label="Badges"
           shortcut="⌘B"
           active={overlays.badges}
           onClick={() => onOverlayChange("badges", !overlays.badges)}
         />
         <OverlayButton
-          icon={<XRayIcon />}
           label="X-Ray"
           shortcut="⌘⇧X"
           active={overlays.xray}
           onClick={() => onOverlayChange("xray", !overlays.xray)}
         />
-      </div>
-      {/* Divider */}
-      <div className={DIVIDER} />
-      {/* Zoom Controls */}
-      <div className={`${ZOOM_GROUP} tw:relative`} ref={presetsRef}>
-        <Button
-          type="button"
-          color="light"
-          className={ZOOM_BTN}
-          onClick={handleZoomOut}
-          aria-label="Zoom out"
-          disabled={zoom <= ZOOM_PRESETS[0]}
-        >
-          −
-        </Button>
-
-        {/* % display — click to open preset dropdown */}
-        <Button
-          type="button"
-          color="light"
-          className={ZOOM_PCT}
-          onClick={() => setShowPresets((v) => !v)}
-          aria-label="Zoom presets"
-          title="Click for zoom presets"
-        >
-          {Math.round(zoom)}%
-        </Button>
-
-        <Button
-          type="button"
-          color="light"
-          className={ZOOM_BTN}
-          onClick={handleZoomIn}
-          aria-label="Zoom in"
-          disabled={zoom >= ZOOM_PRESETS[ZOOM_PRESETS.length - 1]}
-        >
-          +
-        </Button>
-
-        {/* Preset dropdown */}
-        {/* Portaled, same reason as PageTabBar's rename popover: this toolbar
-            is tw:overflow-x-auto, and per CSS an auto overflow-x forces
-            overflow-y to auto too — so an absolute flyout opening upward was
-            clipped to the toolbar's 40px box. It opened, opacity 1, and the
-            user saw canvas. Fixed coords come from the anchor's rect, bottom-
-            anchored so it grows upward like the board draws it. */}
-        {showPresets && presetsRef.current && (
-          <Portal>
-            <div
-              ref={presetsPopoverRef}
-              className={`${POPOVER_BASE_CLASS} tw:flex tw:flex-col tw:min-w-45 tw:p-1`}
-              style={{
-                position: "fixed",
-                left:
-                  presetsRef.current.getBoundingClientRect().left +
-                  presetsRef.current.getBoundingClientRect().width / 2,
-                bottom:
-                  window.innerHeight -
-                  presetsRef.current.getBoundingClientRect().top +
-                  6,
-                transform: "translateX(-50%)",
-              }}
-            >
-            {/* Board 817:4723 opens the flyout with the actions, then the
-                preset list under a divider. */}
-            {onFitToScreen && (
-              <Button
-                type="button"
-                color="light"
-                onClick={() => {
-                  onFitToScreen();
-                  setShowPresets(false);
-                }}
-                className={`${PRESET_ROW} tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:bg-gray-100`}
-              >
-                <span>Zoom to fit</span>
-                <span className={PRESET_KEY}>⌘1</span>
-              </Button>
-            )}
-            {onZoomToSelection && (
-              <Button
-                type="button"
-                color="light"
-                onClick={() => {
-                  onZoomToSelection();
-                  setShowPresets(false);
-                }}
-                className={`${PRESET_ROW} tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:bg-gray-100`}
-              >
-                <span>Zoom to selection</span>
-                <span className={PRESET_KEY}>⌘2</span>
-              </Button>
-            )}
-            <Button
-              type="button"
-              color="light"
-              onClick={() => {
-                onZoomChange(100);
-                setShowPresets(false);
-              }}
-              className={`${PRESET_ROW} tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:bg-gray-100`}
-            >
-              <span>Zoom to 100%</span>
-              <span className={PRESET_KEY}>⌘0</span>
-            </Button>
-            <div className={PRESET_DIVIDER} />
-            {ZOOM_PRESETS.map((preset) => (
-              <Button
-                key={preset}
-                type="button"
-                color="light"
-                onClick={() => {
-                  onZoomChange(preset);
-                  setShowPresets(false);
-                }}
-                className={`${PRESET_ITEM} ${
-                  Math.round(zoom) === preset
-                    ? "tw:bg-[var(--bk-bg-subtle)] tw:text-gray-900"
-                    : "tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:bg-gray-100"
-                }`}
-              >
-                {preset}%
-              </Button>
-            ))}
-            </div>
-          </Portal>
-        )}
       </div>
       {/* Help Button */}
       {onHelpClick && (

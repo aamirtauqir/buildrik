@@ -318,6 +318,15 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       };
     }, [composer, handleFitToScreen]);
 
+    React.useEffect(() => {
+      if (!composer) return;
+      const handler = () => handleZoomToSelection();
+      composer.on(EVENTS.ZOOM_SELECTION, handler);
+      return () => {
+        composer.off(EVENTS.ZOOM_SELECTION, handler);
+      };
+    }, [composer, handleZoomToSelection]);
+
     /* ZOOM_IN / ZOOM_OUT had no listener anywhere. BOTH command palettes emit
        them — the shell's ⌘K (CommandPalette.tsx:125,132) and the canvas's own
        ⌘⇧P (useCanvasCommandPalette.ts:113,121) — so "Zoom in" was a command you

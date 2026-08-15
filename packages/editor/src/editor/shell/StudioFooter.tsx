@@ -8,18 +8,27 @@
  *
  * What the previous footer showed and the board does not: the
  * "Connected · main" pill (connection truth lives in the topbar save pill —
- * its component doc calls offline one of the five save truths), zoom −/+
- * buttons (zoom controls live in the floating canvas toolbar, board
- * 462:3992-3997), and the version string. Removed per the founder's
- * precedence rule: everything visual, the board wins.
+ * its component doc calls offline one of the five save truths) and the version
+ * string. Removed per the founder's precedence rule: everything visual, the
+ * board wins.
+ *
+ * The `Desktop · 100%` readout is the ZOOM CONTROL, not a label. Board
+ * 817:4723 says it in words — "Bottom-right corner of footer. Click percentage
+ * to open flyout. Range: 10%–400%." The −/+/presets group used to live in the
+ * floating canvas toolbar instead, where it cost ~105px of a 760px bar and
+ * forced every overlay toggle down to an icon; board 199:205 draws those
+ * toggles as words, so the zoom group was the thing in the wrong place.
+ *
+ * Fit and zoom-to-selection have to measure the canvas, which only Canvas.tsx
+ * can do, so those two rows emit `ZOOM_FIT` / `ZOOM_SELECTION` on the composer
+ * rather than reaching for a prop chain that would have to cross the shell.
  *
  * "Section · Hero" and "680 × 250" on the board are SAMPLE data — the
  * contract is the shape `{type} · {name}` + `{w} × {h}`, not those literals.
  *
- * `onZoomChange` / `syncConnected` remain in the interface unused: the only
- * call site is AquibraStudio.tsx, which is mid-edit in the founder's working
- * tree — staging it would commit their unrelated work. Trim both when that
- * lands.
+ * `syncConnected` remains in the interface unused: the only call site is
+ * AquibraStudio.tsx, which is mid-edit in the founder's working tree — staging
+ * it would commit their unrelated work. Trim it when that lands.
  *
  * @license BSD-3-Clause
  */
@@ -29,10 +38,12 @@ import { ListTree } from "lucide-react";
 import { getEditorViewMode } from "../../shared/utils/editorViewMode";
 import type { Composer } from "../../engine";
 import type { DeviceType } from "../../shared/types";
-import { Button } from "@/editor/chrome-ui";
+import { Button, POPOVER_BASE_CLASS } from "@/editor/chrome-ui";
+import { useClickOutside } from "@/shared/hooks";
 import { useProjectLoading } from "./hooks/useProjectLoading";
 import { loadMapFromStorage } from "../panels/layers/hooks/layersPersistence";
 import { EVENTS } from "../../shared/constants/events";
+import { ZOOM_PRESETS } from "../../shared/constants/canvas";
 
 const DEVICE_LABEL: Partial<Record<DeviceType, string>> = {
   wide: "Wide",
@@ -45,7 +56,7 @@ export interface StudioFooterProps {
   composer: Composer | null;
   device: DeviceType;
   zoom: number;
-  /** Unused since the board rebuild — see the header comment. */
+  /** Board 817:4723 — the percentage readout opens the zoom flyout. */
   onZoomChange?: (zoom: number) => void;
   /** Unused since the board rebuild — see the header comment. */
   syncConnected?: boolean;
@@ -75,10 +86,21 @@ function elementDims(id: string | undefined): string | null {
   return `${w} × ${h}`;
 }
 
+/** One flyout row: name on the left, its chord greyed on the right.
+ *  `nowrap` is load-bearing — at the popover's default 180px "Zoom to
+ *  selection" broke across two lines and the flyout stopped looking like the
+ *  board's single-line list. */
+const ZOOM_ROW =
+  "tw:flex tw:w-full tw:h-7 tw:min-h-0 tw:items-center tw:justify-between tw:gap-6 tw:rounded tw:border-0 " +
+  "tw:px-3 tw:py-0 tw:text-xs tw:font-medium tw:leading-5 tw:whitespace-nowrap tw:bg-transparent " +
+  "tw:text-[var(--bk-ink-soft)] tw:hover:bg-gray-100";
+const ZOOM_KEY = "tw:text-[10px] tw:text-[var(--bk-gray-400)]";
+
 export const StudioFooter: React.FC<StudioFooterProps> = ({
   composer,
   device,
   zoom,
+  onZoomChange,
   selectedElement,
   onOpenStructure,
 }) => {
@@ -156,6 +178,22 @@ export const StudioFooter: React.FC<StudioFooterProps> = ({
   const dims = elementDims(selectedElement?.id);
   const deviceLabel = DEVICE_LABEL[device] ?? cap(device);
 
+  /* Zoom flyout. Bottom-anchored so it grows UPWARD out of the 32px bar —
+     it sits at the very bottom edge of the shell, and a downward menu would
+     open off-screen. */
+  const [zoomOpen, setZoomOpen] = React.useState(false);
+  const zoomRef = React.useRef<HTMLDivElement>(null);
+  useClickOutside(zoomRef, () => setZoomOpen(false), { enabled: zoomOpen });
+
+  const pick = (z: number) => () => {
+    onZoomChange?.(z);
+    setZoomOpen(false);
+  };
+  const emitZoom = (event: string) => () => {
+    composer?.emit(event, {});
+    setZoomOpen(false);
+  };
+
   return (
     <>
       {fourToolRail && onOpenStructure && (
@@ -185,12 +223,64 @@ export const StudioFooter: React.FC<StudioFooterProps> = ({
         </span>
       )}
       <span className="tw:flex-1 tw:min-w-px" />
-      <span
-        className="tw:text-[11px] tw:leading-[16px] tw:text-[var(--bk-ink-muted)] tw:whitespace-nowrap"
-        data-testid="footer-device-zoom"
-      >
-        {deviceLabel} · {Math.round(zoom)}%
-      </span>
+      <div className="tw:relative" ref={zoomRef}>
+        <Button
+          color="light"
+          onClick={() => setZoomOpen((v) => !v)}
+          aria-haspopup="menu"
+          aria-expanded={zoomOpen}
+          aria-label={`Zoom: ${Math.round(zoom)} percent`}
+          className="tw:border-transparent tw:bg-transparent tw:px-[6px] tw:py-[2px] tw:text-[11px] tw:leading-[16px] tw:text-[var(--bk-ink-muted)] tw:whitespace-nowrap tw:hover:text-gray-900"
+          data-testid="footer-device-zoom"
+        >
+          {deviceLabel} · {Math.round(zoom)}%
+        </Button>
+        {zoomOpen && (
+          <div
+            role="menu"
+            aria-label="Zoom"
+            data-testid="footer-zoom-flyout"
+            className={`${POPOVER_BASE_CLASS} tw:absolute tw:bottom-full tw:right-0 tw:mb-1 tw:min-w-[196px] tw:p-1`}
+          >
+            <Button color="light" className={ZOOM_ROW} onClick={emitZoom(EVENTS.ZOOM_FIT)}>
+              <span>Zoom to fit</span>
+              <span className={ZOOM_KEY}>⌘1</span>
+            </Button>
+            <Button color="light" className={ZOOM_ROW} onClick={emitZoom(EVENTS.ZOOM_SELECTION)}>
+              <span>Zoom to selection</span>
+              <span className={ZOOM_KEY}>⌘2</span>
+            </Button>
+            <Button color="light" className={ZOOM_ROW} onClick={pick(100)}>
+              <span>Zoom to 100%</span>
+              <span className={ZOOM_KEY}>⌘0</span>
+            </Button>
+            <div className="tw:my-1 tw:h-px tw:bg-gray-200" />
+            {ZOOM_PRESETS.map((preset) => (
+              <Button
+                key={preset}
+                color="light"
+                onClick={pick(preset)}
+                className={`${ZOOM_ROW} tw:justify-end ${
+                  Math.round(zoom) === preset
+                    ? "tw:bg-[var(--bk-bg-subtle)] tw:text-gray-900"
+                    : ""
+                }`}
+              >
+                {preset}%
+              </Button>
+            ))}
+            <div className="tw:my-1 tw:h-px tw:bg-gray-200" />
+            <Button color="light" className={ZOOM_ROW} onClick={emitZoom(EVENTS.ZOOM_IN)}>
+              <span>Zoom in</span>
+              <span className={ZOOM_KEY}>⌘+</span>
+            </Button>
+            <Button color="light" className={ZOOM_ROW} onClick={emitZoom(EVENTS.ZOOM_OUT)}>
+              <span>Zoom out</span>
+              <span className={ZOOM_KEY}>⌘−</span>
+            </Button>
+          </div>
+        )}
+      </div>
     </>
   );
 };

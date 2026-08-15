@@ -246,13 +246,18 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
 /* The only value here that is genuinely computed is the progress bar's width.
    Everything else was a static object, including the three-state step circle
    and label, which are now class ternaries. */
+/* z on the token scale, not a raw 1200. At 1200 this floated over EVERY
+   popover in the editor: the footer's zoom flyout opened underneath the pill,
+   which covered its "Zoom in" row. A dismissible progress helper does not
+   outrank an open menu — drawer height puts it above the canvas and below
+   popovers (40), overlays (50) and modals (60). */
 const PANEL =
   "tw:fixed tw:right-6 tw:bottom-20 tw:w-80 tw:max-h-[540px] tw:bg-white tw:border tw:border-gray-200 " +
-  "tw:rounded-xl tw:[box-shadow:var(--bk-shadow-overlay)] tw:z-[1200] tw:overflow-hidden tw:flex " +
+  "tw:rounded-xl tw:[box-shadow:var(--bk-shadow-overlay)] tw:[z-index:var(--bk-z-drawer)] tw:overflow-hidden tw:flex " +
   "tw:flex-col tw:[font-family:var(--bk-font-ui)]";
 const PILL =
   "tw:fixed tw:right-6 tw:bottom-20 tw:flex tw:items-center tw:gap-2 tw:px-3.5 tw:py-2 tw:bg-white " +
-  "tw:border tw:border-gray-200 tw:rounded-full tw:[box-shadow:var(--bk-shadow-overlay)] tw:z-[1200] " +
+  "tw:border tw:border-gray-200 tw:rounded-full tw:[box-shadow:var(--bk-shadow-overlay)] tw:[z-index:var(--bk-z-drawer)] " +
   "tw:cursor-pointer tw:[font-family:var(--bk-font-ui)] tw:select-none";
 const PILL_DOT = "tw:size-2 tw:rounded-full tw:flex-none";
 const PILL_TEXT = "tw:text-xs tw:font-semibold tw:text-gray-900 tw:whitespace-nowrap";

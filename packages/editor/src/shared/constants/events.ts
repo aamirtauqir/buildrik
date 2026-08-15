@@ -465,6 +465,11 @@ export const EVENTS = {
   ZOOM_IN: "zoom:in",
   ZOOM_OUT: "zoom:out",
   ZOOM_FIT: "zoom:fit",
+  /** Board 817:4723 row 2. Only the canvas can measure the selected element,
+   *  and the flyout that offers this now lives in the footer, so the two talk
+   *  through the composer rather than through a prop chain that would have to
+   *  cross the shell. */
+  ZOOM_SELECTION: "zoom:selection",
 
   // ============================================
   // Additional Resize Events
