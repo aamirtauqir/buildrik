@@ -1847,6 +1847,26 @@ not a synthetic event — so this is a discoverability hole rather than a dead
 end, and the fix is a founder call: an Insert group, a rail slot, or leaving
 it to the shortcut.
 
+**Board 1169:4725's whole flow has no way in.** The three create-page modals
+(confirm · success · error) run on `newPageMode`, which is turned on by exactly
+one thing: Pages › **"From template"** — and that button renders only in the
+Pages EMPTY state (`PageList.tsx:116`), which a user cannot reach, because a
+project always has at least one page and the last one cannot be deleted. So
+the flow is correct code nobody can run. Conformed to the board anyway and
+pinned by test rather than left to drift: the question now names the template
+("Create a page from 'Bistro Menu'?"), the answer names the page ("A new page
+'Menu 2' will be added after your current pages."), success says "'Menu 2' is
+ready — you're on it now" (true only since the previous fix) with the board's
+**Open page settings** · **Done**, and the failure leads with the reassurance
+that their pages are unchanged. "Open page settings" is wired for real —
+`UI_PAGES_OPEN_SETTINGS` lets something outside PagesTab open a page's settings
+drawer, which was local state until now.
+
+Where that flow starts is a founder call, and it is the same call as the
+Templates-reachability one above: board 140:2 (Pages · tree) shows only
+"+ Add page" in its footer, so the boards do not place a template route there
+either.
+
 Two boards are not reachable at all today: **778:4102 (loading)** and
 **781:4372 (load-error)**. The drawer reads a bundled constant, so there is no
 fetch to be slow or to fail. They become real the day the catalog is served —
@@ -1868,6 +1888,22 @@ mean 'your work is not where you think it is'." That is a recorded decision
 from the topbar arc, and it contradicts the board deliberately. Live also reads
 "Saved · just now" where the board has no separator. Both are one call: keep
 D7 rule 4 (and note it on the boards), or conform to the pill.
+
+
+**Where does a user open Templates, and where does "new page from template"
+start?** Two holes with one answer. Today the Templates panel opens from the
+canvas empty-state CTA or the **T** shortcut and nowhere else — with content on
+the page, none of the six drawers offers it and the rail has no slot.
+Separately, the new-page-from-template flow (board 1169:4725, three modals,
+all built and conformed) runs on a mode that only Pages › "From template" turns
+on, and that button lives in the Pages EMPTY state, which cannot be reached
+because the last page cannot be deleted. `DrawerGallery`'s own docblock says
+the drawer is "the 320 drawer view Insert's TEMPLATES group lands on" — that
+group does not exist; Insert shows ELEMENTS · BLOCKS · COMPONENTS · MINE. Board
+140:2 puts only "+ Add page" in the Pages footer, so the boards do not answer
+it either. Options: an Insert TEMPLATES group (which the code already expects),
+a seventh rail slot, or a second action beside "+ Add page". One decision
+unlocks both.
 
 
 **Published sites name Inter and never load it.** Every element this product

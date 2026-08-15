@@ -183,20 +183,25 @@ export const ProModal: React.FC<ProModalProps> = ({ templateName, onCancel, onUp
 
 export interface CreatePageConfirmModalProps {
   templateName: string;
+  /** The name the new page will get — the board states it before you agree. */
+  newPageName: string;
   onCancel: () => void;
   onConfirm: () => void;
 }
 
 export const CreatePageConfirmModal: React.FC<CreatePageConfirmModalProps> = ({
   templateName,
+  newPageName,
   onCancel,
   onConfirm,
 }) => (
+  /* Board 1169:4725 — the question names the template, the answer names the
+     page and where it lands. "Create page?" over "Using: X" named neither. */
   <Modal
     open
     onClose={onCancel}
     dismissOnScrimClick
-    title="Create page?"
+    title={`Create a page from ‘${templateName}’?`}
     footer={
       <>
         <Button color="light" onClick={onCancel}>
@@ -206,13 +211,9 @@ export const CreatePageConfirmModal: React.FC<CreatePageConfirmModalProps> = ({
       </>
     }
   >
-    <div className="tw:flex tw:items-center tw:gap-2">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <rect x="3" y="3" width="18" height="18" rx="2" />
-        <path d="M3 9h18M9 21V9" />
-      </svg>
-      <span>Using: {templateName}</span>
-    </div>
+    <p className="tw:m-0">
+      A new page ‘{newPageName}’ will be added after your current pages.
+    </p>
   </Modal>
 );
 
@@ -221,36 +222,37 @@ export const CreatePageConfirmModal: React.FC<CreatePageConfirmModalProps> = ({
 // ============================================================================
 
 export interface CreatePageSuccessModalProps {
+  /** The page that now exists, and that the editor is already showing. */
+  pageName: string;
   onClose: () => void;
-  onGoToPage: () => void;
+  onOpenPageSettings: () => void;
 }
 
 export const CreatePageSuccessModal: React.FC<CreatePageSuccessModalProps> = ({
+  pageName,
   onClose,
-  onGoToPage,
+  onOpenPageSettings,
 }) => (
+  /* Board 1169:4725: "Page created" with a green tick, "‘Menu 2’ is ready —
+     you're on it now", and the two things left to do. "Go to page" was the
+     old copy from when the apply did NOT switch pages. */
   <Modal
     open
     onClose={onClose}
     dismissOnScrimClick
-    title="Page created!"
+    title="Page created"
     footer={
       <>
-        <Button color="light" onClick={onClose}>
-          Close
+        <Button color="light" onClick={onOpenPageSettings}>
+          Open page settings
         </Button>
-        <Button onClick={onGoToPage}>Go to page</Button>
+        <Button onClick={onClose}>Done</Button>
       </>
     }
   >
-    <div className={`${HERO} tw:size-12 tw:mb-3 tw:bg-[var(--bk-success-tint)]`} aria-hidden="true">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--bk-success)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="10" />
-        <path d="M9 12l2 2 4-4" />
-      </svg>
-    </div>
-    <p className="tw:text-center">
-      Your new page has been created from the template and is ready to edit.
+    <p className="tw:m-0 tw:flex tw:items-center tw:gap-2">
+      <span className="tw:text-[var(--bk-success)]" aria-hidden="true">✓</span>
+      ‘{pageName}’ is ready — you&rsquo;re on it now.
     </p>
   </Modal>
 );
@@ -260,19 +262,24 @@ export const CreatePageSuccessModal: React.FC<CreatePageSuccessModalProps> = ({
 // ============================================================================
 
 export interface CreatePageErrorModalProps {
+  /** What actually went wrong, when the apply path knows. */
+  reason?: string;
   onCancel: () => void;
   onRetry: () => void;
 }
 
 export const CreatePageErrorModal: React.FC<CreatePageErrorModalProps> = ({
+  reason,
   onCancel,
   onRetry,
 }) => (
+  /* Board 1169:4725 — the failure in red, then the reassurance that matters
+     most: nothing of theirs changed. */
   <Modal
     open
     onClose={onCancel}
     dismissOnScrimClick
-    title="Couldn't create page"
+    title="Couldn't create the page"
     footer={
       <>
         <Button color="light" onClick={onCancel}>
@@ -282,14 +289,8 @@ export const CreatePageErrorModal: React.FC<CreatePageErrorModalProps> = ({
       </>
     }
   >
-    <div className={`${HERO} tw:size-12 tw:mb-3 tw:bg-[var(--bk-error-tint)]`} aria-hidden="true">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--bk-error)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="10" />
-        <path d="M12 8v4M12 16h.01" />
-      </svg>
-    </div>
-    <p className="tw:p-3 tw:rounded-md tw:bg-[var(--bk-error-tint)] tw:text-gray-500">
-      Something went wrong creating your page. Your existing pages were not affected.
+    <p className="tw:m-0">
+      {reason ?? "The template failed to load."} Your pages are unchanged.
     </p>
   </Modal>
 );

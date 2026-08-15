@@ -361,6 +361,18 @@ export function usePages(composer: Composer | null): UsePagesReturn {
     setRenamingPageId(null);
   }, []);
 
+  /* Page settings is local state here, so anything outside this panel that
+     wants to open it — the Templates success modal, board 1169:4725 — has to
+     ask through the composer. */
+  React.useEffect(() => {
+    if (!composer) return;
+    const onOpen = (p: { pageId: string }) => openSettings(p.pageId);
+    composer.on(EVENTS.UI_PAGES_OPEN_SETTINGS, onOpen);
+    return () => {
+      composer.off(EVENTS.UI_PAGES_OPEN_SETTINGS, onOpen);
+    };
+  }, [composer, openSettings]);
+
   const closeSettings = React.useCallback(() => {
     setSettingsPageId(null);
   }, []);

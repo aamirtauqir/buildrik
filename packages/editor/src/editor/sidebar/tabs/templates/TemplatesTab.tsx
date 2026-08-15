@@ -636,6 +636,8 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
       {showCreateConfirm && (
         <CreatePageConfirmModal
           templateName={tName}
+          /* The new page takes the template's name — createPage(t.name). */
+          newPageName={tName}
           onCancel={() => { setShowCreateConfirm(false); addAsNewPageRef.current = false; }}
           onConfirm={() => {
             // P2 fix (codex A6): startApply only — success/error result is set
@@ -647,12 +649,24 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
       )}
       {createResult === "success" && (
         <CreatePageSuccessModal
+          pageName={tName}
           onClose={() => { setCreateResult(null); onTemplateUsed?.(); }}
-          onGoToPage={() => { setCreateResult(null); onSwitchTab?.("pages"); onTemplateUsed?.(); }}
+          onOpenPageSettings={() => {
+            setCreateResult(null);
+            onSwitchTab?.("pages");
+            /* Page settings is local state inside PagesTab, so the ask goes
+               through the composer (UI_PAGES_OPEN_SETTINGS). Without this the
+               button opened the Pages list and left the user to find the
+               page they had just made. */
+            const active = composer?.elements.getActivePage?.();
+            if (active) composer?.emit(EVENTS.UI_PAGES_OPEN_SETTINGS, { pageId: active.id });
+            onTemplateUsed?.();
+          }}
         />
       )}
       {createResult === "error" && (
         <CreatePageErrorModal
+          reason={applyError ?? undefined}
           onCancel={() => setCreateResult(null)}
           onRetry={() => { setCreateResult(null); startApply(); }}
         />

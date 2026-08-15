@@ -492,6 +492,10 @@ export const EVENTS = {
   /** Templates panel enters "choose a template for a NEW page" mode. Leaving
       the panel unmounts it, which is the only way out — no OFF event. */
   UI_TEMPLATES_NEWPAGE_ON: "ui:templates-newpage-on",
+  /* Open a page's settings from outside the Pages panel — the Templates
+     success modal offers it (board 1169:4725) and page settings is otherwise
+     local state inside PagesTab. */
+  UI_PAGES_OPEN_SETTINGS: "ui:pages-open-settings",
   /** Open the Design/Global Styles panel in the left sidebar */
   UI_OPEN_DESIGN_PANEL: "ui:open-design-panel",
   /** Open the StarterGalleryModal — re-trigger for users to browse
