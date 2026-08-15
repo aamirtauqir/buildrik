@@ -150,6 +150,14 @@ export const ApprovedCompareView: React.FC<ApprovedCompareViewProps> = ({
           </Button>
         ))}
         <ToolbarSpacer />
+        {/* Board 168:2 keeps the count in the header, in every mode — the
+            change total and how many of them are on the page you are looking
+            at. Live printed it only in List, so Side-by-side and Overlay left
+            you comparing without knowing how much there was to find. */}
+        <span className={LIST_DETAIL} data-compare-count>
+          {result.changes.length} change{result.changes.length === 1 ? "" : "s"}
+          {result.changes.length > 0 ? ` · ${changesForPage.length} of ${result.changes.length}` : ""}
+        </span>
         {paths.length > 1 && (
           <Select
             value={path}
