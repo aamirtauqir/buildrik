@@ -2271,6 +2271,41 @@ clips them, so they cannot reach the topbar whatever the number says.
 Verified live: the notifications dropdown and the Issues panel both render in
 full. This needed no change to `AquibraStudio.tsx`.
 
+## Issues · Notifications · Modal — walked 2026-08-16
+
+- **Issues** (164:2 · 164:22 · 164:35): the clean state centred an icon and a
+  sentence in an 844px column, so a healthy site read as a broken panel; the
+  board gives it two lines under the header, in green. The filter spent a
+  segmented row of three buttons plus a counts row on what the board says in
+  one line ("All · 3", "Errors only · 1"), and never said what a filter was
+  hiding.
+- **Notifications** (165:2 and its five states): a flat list with "type · 2h
+  ago" on a second line under each row. The board bands by day and puts the
+  age at the right. The unread dot was one colour for every kind of event.
+  Reached with `panel-fixture.mjs --panel notifications` (the Review fixture,
+  generalised — these states need dashboard data).
+- **Modal** (183:2 · 183:16 · 183:43): destructive primaries are red and
+  NAMED. One of four confirms did that; the others said "Delete" under titles
+  like "Delete Component". And a filled form died to a stray scrim click —
+  board 183:16 says the frame pulses instead, "losing a filled form to a stray
+  click is the cheapest possible way to lose trust". `dirty` is on the shared
+  Modal API now, with the CMS wizard as its first consumer.
+
+### Founder call — the Components panel ships two different screens
+
+`VITE_FEATURE_COMPONENTS_V2` decides which Components panel the rail opens.
+OFF (the code's default) gives `ComponentsTab`, which IS board 641:2546: YOUR
+COMPONENTS rows with instance counts and one "+ Create component" at the foot.
+ON — which is what `.env.local` sets, so it is what a developer sees — gives
+`ComponentsPanelV2`, built to "Spec §6.3 / Arc D5 prototype-s06": a DS status
+chip, All|DS|Yours pills, a search field and a two-column grid of catalogue
+cards. No board in this file draws that panel.
+
+So the family cannot be called conformed either way until you say which one
+ships. If V2 is the future, boards 641:2546 / 641:2599 / 642:3112 are stale
+and need redrawing; if it is not, the flag and the panel are dead weight and
+should go. Nothing was changed in either panel pending that.
+
 ## Content family — walked, 2026-08-15
 
 Fifteen boards. The panel's own screens were close; the walk's finds were one
