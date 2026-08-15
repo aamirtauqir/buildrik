@@ -169,17 +169,20 @@ describe("DesignSystemTab → ExportSection (S5 integration)", () => {
      importer reads, so the row downloaded a convincing wrong file under exactly
      the right name. Board 153:120 greys it with the workaround in its own copy.
      This test is the thing that stops a future change re-enabling a stub. */
-  it("offers Figma Variables but does not let you export a file Figma cannot read", async () => {
+  /* Board 153:120 names Figma and greys it, with no Copy and no Download —
+     the board refusing to hand over a file it cannot make. The row carries no
+     radio any more (nothing selects a format), so the promise is the missing
+     actions and the reason printed on the row itself. */
+  it("names Figma Variables but offers no way to take it", async () => {
     const composer = makeFakeComposer();
-    const { getAllByRole, getByTestId, container } =
-      render(wrap(<DesignSystemTab composer={composer} />));
-    const { container: c } = { container };
-    fireEvent.click(c.querySelector<HTMLButtonElement>('[data-section-id="export"]')!);
+    const { container } = render(wrap(<DesignSystemTab composer={composer} />));
+    fireEvent.click(container.querySelector<HTMLButtonElement>('[data-section-id="export"]')!);
 
-    const figma = await waitFor(() => getByTestId("format-row-figma") as HTMLInputElement);
-    expect(figma).toBeDisabled();
-    // The reason travels with the row, not in a tooltip nobody opens.
-    expect(figma.closest("label")?.textContent).toMatch(/Coming soon/);
-    expect(getAllByRole("radio").length).toBeGreaterThan(1);
+    await waitFor(() => expect(container.textContent).toMatch(/Figma Variables JSON/));
+    expect(container.textContent).toMatch(/Coming soon/);
+    expect(container.querySelector('[data-download-format="figma"]')).toBeNull();
+    for (const id of ["css", "json", "tailwind"]) {
+      expect(container.querySelector(`[data-download-format="${id}"]`)).toBeTruthy();
+    }
   });
 });

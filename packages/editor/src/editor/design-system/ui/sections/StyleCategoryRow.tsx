@@ -1,7 +1,8 @@
 /**
  * StyleCategoryRow (Arc B1 T2) — single row in the Styles sub-tab left column.
  *
- * Shows `<Category> · N variants` with cobalt active state (left border +
+ * Shows the category at the left and its variant count at the right (board
+ * 152:112), with cobalt active state (left border +
  * accent fg). Disabled when category has zero presets. Click → host router
  * setView({ category, variant: firstVariant }).
  *
@@ -72,9 +73,13 @@ export const StyleCategoryRow: React.FC<StyleCategoryRowProps> = ({
         fontWeight: isActive ? 600 : 500,
       }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
     >
-      <span>
-        {CATEGORY_LABELS[category]} · {variantCount}{" "}
-        {variantCount === 1 ? "variant" : "variants"}
+      {/* Board 152:112 splits the row: name at the left margin, count muted
+          at the right, like every other list in this panel. It used to read
+          "Button · 3 variants" as one run of text, so the counts did not line
+          up and the eye could not scan them. */}
+      <span>{CATEGORY_LABELS[category]}</span>
+      <span className="tw:text-xs tw:font-normal tw:text-gray-500">
+        {variantCount} {variantCount === 1 ? "variant" : "variants"}
       </span>
     </Button>
   );

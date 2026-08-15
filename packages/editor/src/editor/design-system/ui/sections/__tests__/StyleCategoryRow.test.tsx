@@ -13,7 +13,10 @@ describe("StyleCategoryRow", () => {
         onClick={() => {}}
       />,
     );
-    expect(getByText("Button · 3 variants")).toBeTruthy();
+    /* Board 152:112 puts the name at the left and the count at the right,
+       so they are two nodes now rather than one run of text. */
+    expect(getByText("Button")).toBeTruthy();
+    expect(getByText("3 variants")).toBeTruthy();
   });
 
   it("renders singular 'variant' when variantCount === 1", () => {
@@ -25,7 +28,8 @@ describe("StyleCategoryRow", () => {
         onClick={() => {}}
       />,
     );
-    expect(getByText("Form input · 1 variant")).toBeTruthy();
+    expect(getByText("Form input")).toBeTruthy();
+    expect(getByText("1 variant")).toBeTruthy();
   });
 
   it("active state exposes data-active='true' and accent fg", () => {

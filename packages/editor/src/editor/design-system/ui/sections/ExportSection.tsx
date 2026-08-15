@@ -28,7 +28,7 @@ import { buildExport, downloadFile, type ExportFormat } from "../../utils/export
 import type { DesignToken } from "../../types";
 import type { BundleOptions } from "../../../../engine/designSystem/bundler/CSSBundler";
 import { ImportCard } from "./ImportCard";
-import { Button, Radio } from "@/editor/chrome-ui";
+import { Button, Radio, Select } from "@/editor/chrome-ui";
 // Local format type widens exportUtils ExportFormat with a stub "figma" entry
 // so the s05 prototype's 4-row selector renders without touching the shared
 // exporter contract. Figma JSON download emits a minimal envelope until a
@@ -73,10 +73,13 @@ const FORMAT_OPTIONS: Array<{
 ];
 
 type DarkStrategy = NonNullable<BundleOptions["darkStrategy"]>;
-const DARK_OPTIONS: Array<{ id: DarkStrategy; label: string }> = [
-  { id: "media",     label: "media — @media prefers-color-scheme (default)" },
-  { id: "data-attr", label: "data-attr — :root[data-theme='dark']" },
-  { id: "off",       label: "off — light only" },
+/* Board 153:120 prints the value as "media-query" — three words, not the
+   sentence the radio rows carried. The sentence is the row's title, so the
+   detail survives on hover without the select overflowing a 320px panel. */
+const DARK_OPTIONS: Array<{ id: DarkStrategy; label: string; detail: string }> = [
+  { id: "media",     label: "media-query", detail: "@media (prefers-color-scheme: dark)" },
+  { id: "data-attr", label: "data-attr",   detail: ":root[data-theme='dark']" },
+  { id: "off",       label: "off",         detail: "light only — no dark block" },
 ];
 
 const bundler = new CSSBundler();
@@ -203,33 +206,43 @@ export const ExportSection: React.FC = () => {
 
   return (
     <div className="tw:flex tw:flex-col tw:gap-3 tw:p-3">
+      {/* Board 153:120 leads with the one decision that changes every export —
+          how dark values are written — as a single row with its value at the
+          right. It used to be three radio rows buried under the CSS format,
+          which is where nobody chooses it before copying JSON. */}
+      <div className="tw:flex tw:items-center tw:gap-2">
+        <span className="tw:flex-1 tw:text-[13px] tw:text-gray-900">Dark strategy</span>
+        <Select
+          className="tw:flex-none"
+          value={darkStrategy}
+          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setDarkStrategy(e.target.value as DarkStrategy)}
+          aria-label="Dark mode strategy"
+        >
+          {DARK_OPTIONS.map(({ id, label, detail }) => (
+            <option key={id} value={id} title={detail}>
+              {label}
+            </option>
+          ))}
+        </Select>
+      </div>
+
       <div className={CARD}>
         <div className="tw:text-[11px] tw:font-semibold tw:tracking-[0.06em] tw:text-gray-500">
-          FORMAT
+          EXPORT
         </div>
         <div className="tw:flex tw:flex-col tw:gap-1.5 tw:mt-1" role="radiogroup" aria-label="Export format">
           {FORMAT_OPTIONS.map(({ id, label, desc, disabled }) => {
-            const selected = format === id;
             const droppedCount = id === "tailwind" ? tailwindDropped : 0;
             const chip = chipForFormat(id, droppedCount);
             return (
-              <label
+              <div
                 key={id}
-                className={`${FORMAT_ROW} ${
-                  selected ? "tw:border-blue-700 tw:bg-white" : "tw:border-gray-200"
-                } ${disabled ? "tw:opacity-60" : ""}`}
+                className={`${FORMAT_ROW} tw:border-gray-200 ${disabled ? "tw:opacity-60" : ""}`}
               >
-                <Radio
-                  color="blue"
-                  className="tw:bg-white"
-                  data-testid={`format-row-${id}`}
-                  name="export-format"
-                  value={id}
-                  checked={selected}
-                  disabled={disabled}
-                  onChange={() => setFormat(id)}
-                  aria-label={label}
-                />
+                {/* No radio: board 153:120 gives each format its own Copy
+                    and Download, so there is nothing to "select" — and the
+                    control was eating the width that truncated every label to
+                    "Custom …". `format` survives as the preview's subject. */}
                 {/* Board 153:120 draws every row as TWO lines — bold title,
                     muted description under it — with the actions to the right.
                     The single-line version could not exist at this width: the
@@ -267,7 +280,7 @@ export const ExportSection: React.FC = () => {
                   </Button>
                 </span>
                 )}
-              </label>
+              </div>
             );
           })}
         </div>
@@ -287,35 +300,27 @@ export const ExportSection: React.FC = () => {
           </div>
         )}
 
-        {format === "css" && (
-          <div className="tw:mt-3">
-            <div className={`${CAPTION} tw:mb-1.5`}>Dark mode strategy</div>
-            <div
-              className="tw:flex tw:flex-wrap tw:gap-4 tw:text-xs tw:text-gray-900"
-              role="radiogroup"
-              aria-label="Dark mode strategy"
-            >
-              {DARK_OPTIONS.map(({ id, label }) => (
-                <label key={id} className={RADIO_LABEL}>
-                  <Radio
-                    color="blue"
-                    className="tw:bg-white"
-                    name="dark-strategy"
-                    value={id}
-                    checked={darkStrategy === id}
-                    onChange={() => setDarkStrategy(id)}
-                    aria-label={label}
-                  />
-                  <span>{label}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
 
       <div className={CARD}>
-        <div className="tw:mb-2 tw:text-[13px] tw:font-medium tw:text-gray-900">Preview</div>
+        {/* The preview is not on the board — it is kept because reading the
+            output before taking it is real capability. It needs a subject of
+            its own now that the format rows carry no selection. */}
+        <div className="tw:mb-2 tw:flex tw:items-center tw:gap-2">
+          <span className="tw:flex-1 tw:text-[13px] tw:font-medium tw:text-gray-900">Preview</span>
+          <Select
+            className="tw:flex-none"
+            value={format}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormat(e.target.value as UIExportFormat)}
+            aria-label="Preview format"
+          >
+            {FORMAT_OPTIONS.filter((f) => !f.disabled).map(({ id, label }) => (
+              <option key={id} value={id}>
+                {label}
+              </option>
+            ))}
+          </Select>
+        </div>
         <pre data-testid="export-preview" className={PREVIEW}>
           {preview}
         </pre>

@@ -64,6 +64,7 @@ import { StylesSection, useStylesSectionTotalDirty } from "./sections/StylesSect
 import { ComponentsSection } from "./sections/ComponentsSection";
 import { ExportSection } from "./sections/ExportSection";
 import { LintSection } from "./sections/LintSection";
+import { filterTokensByMode } from "../utils/semanticKind";
 import { ClassesSection } from "./sections/ClassesSection";
 import { StartersSection } from "./sections/StartersSection";
 import { ColourModeSection } from "./sections/ColourModeSection";
@@ -271,7 +272,15 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
      themselves render, so they are the truth. Starters and Components stay
      bare until their own registries can answer. */
   const sectionCounts = React.useMemo<Partial<Record<DesignSection, number>>>(() => {
-    const tokens = allRegistries.reduce((n, r) => n + (r.tokens?.length ?? 0), 0);
+    /* The same filter the Tokens screen applies to its own rows. Beginner
+       mode lists semantic tokens only, so counting every registry entry here
+       put "Tokens 55" on the root above a screen that showed 4 — the row and
+       its destination disagreeing about the same number. */
+    const mode = isBeginner ? "beginner" : "pro";
+    const tokens = allRegistries.reduce(
+      (n, r) => n + filterTokensByMode(r.tokens ?? [], mode).length,
+      0,
+    );
     const presets = allPresetRegistries.reduce((n, r) => n + (r.presets?.length ?? 0), 0);
     const classNames = new Set<string>();
     for (const el of composer?.elements?.getAllElements?.() ?? []) {
@@ -282,7 +291,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
     }
     return { tokens, styles: presets, classes: classNames.size };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allRegistries, allPresetRegistries, composer, usageVersion]);
+  }, [allRegistries, allPresetRegistries, composer, usageVersion, isBeginner]);
 
   const tokensDirty = allRegistries.reduce((n, r) => n + dirtyCount(r), 0);
   const stylesDirty = useStylesSectionTotalDirty();

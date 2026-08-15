@@ -37,12 +37,19 @@ beforeEach(() => {
 });
 
 describe("ExportSection", () => {
-  it("renders 4 format radio options", () => {
-    const { getByLabelText } = render(wrap(<ExportSection />));
-    expect(getByLabelText("CSS")).toBeTruthy();
-    expect(getByLabelText("JSON")).toBeTruthy();
-    expect(getByLabelText("Tailwind")).toBeTruthy();
-    expect(getByLabelText("Figma Variables JSON")).toBeTruthy();
+  /* Board 153:120 lists four formats under EXPORT — three live, Figma greyed
+     — as plain rows. The radios that used to lead each row are gone with the
+     selection they expressed. */
+  it("lists every format the board draws", () => {
+    const { container } = render(wrap(<ExportSection />));
+    /* Scoped to the EXPORT card: the preview's own format select repeats
+       three of these names in its options. */
+    const rows = Array.from(container.querySelectorAll("[data-testid^='format-row-'], .tw\\:border-gray-200"));
+    const text = container.textContent ?? "";
+    for (const label of ["CSS", "JSON", "Tailwind", "Figma Variables JSON"]) {
+      expect(text.includes(label), label).toBe(true);
+    }
+    expect(rows.length).toBeGreaterThan(0);
   });
 
   /* Board 153:120 draws no chips on rows — title + muted desc, actions right.
@@ -63,18 +70,24 @@ describe("ExportSection", () => {
     expect(stats).toMatch(/\d+ dark variants/);
   });
 
-  it("Tailwind warning callout visible when Tailwind selected", () => {
+  /* The format rows carry no selection any more (board 153:120 gives each its
+     own Copy and Download), so the thing that has a format is the preview. */
+  function chooseFormat(getByLabelText: (t: RegExp | string) => HTMLElement, value: string) {
+    fireEvent.change(getByLabelText(/preview format/i), { target: { value } });
+  }
+
+  it("Tailwind warning callout visible when Tailwind is previewed", () => {
     const { getByLabelText, getByTestId } = render(wrap(<ExportSection />));
-    fireEvent.click(getByLabelText("Tailwind"));
+    chooseFormat(getByLabelText, "tailwind");
     expect(getByTestId("tailwind-warning")).toBeTruthy();
     expect(getByTestId("tailwind-warning").textContent).toMatch(/Tailwind warning/i);
   });
 
-  it("Tailwind warning hidden when non-Tailwind format selected", () => {
+  it("Tailwind warning hidden for any other format", () => {
     const { getByLabelText, queryByTestId } = render(wrap(<ExportSection />));
     // Default is CSS — no warning.
     expect(queryByTestId("tailwind-warning")).toBeNull();
-    fireEvent.click(getByLabelText("JSON"));
+    chooseFormat(getByLabelText, "json");
     expect(queryByTestId("tailwind-warning")).toBeNull();
     // Figma is disabled now; selecting JSON above is the real assertion here.
   });
@@ -88,14 +101,14 @@ describe("ExportSection", () => {
 
   it("switching to JSON re-renders preview as JSON array", () => {
     const { getByLabelText, getByTestId } = render(wrap(<ExportSection />));
-    fireEvent.click(getByLabelText("JSON"));
+    chooseFormat(getByLabelText, "json");
     const preview = getByTestId("export-preview");
     expect(preview.textContent?.trim().startsWith("[")).toBe(true);
   });
 
   it("switching to Tailwind re-renders preview as JS module", () => {
     const { getByLabelText, getByTestId } = render(wrap(<ExportSection />));
-    fireEvent.click(getByLabelText("Tailwind"));
+    chooseFormat(getByLabelText, "tailwind");
     const preview = getByTestId("export-preview");
     expect(preview.textContent).toContain("module.exports");
   });
@@ -107,10 +120,13 @@ describe("ExportSection", () => {
     expect(preview.textContent).toContain("@media (prefers-color-scheme: dark)");
   });
 
-  it("dark strategy radio swaps @media for :root[data-theme]", () => {
+  /* Board 153:120 leads with one "Dark strategy" row and its value at the
+     right, not three radios buried under the CSS format — where a JSON
+     exporter would never see the choice they are exporting under. */
+  it("dark strategy swaps @media for :root[data-theme]", () => {
     const { getByLabelText, getByTestId } = render(wrap(<ExportSection />));
-    const dataAttr = getByLabelText(/data-attr/i) as HTMLInputElement;
-    fireEvent.click(dataAttr);
+    const select = getByLabelText(/dark mode strategy/i) as HTMLSelectElement;
+    fireEvent.change(select, { target: { value: "data-attr" } });
     const preview = getByTestId("export-preview");
     expect(preview.textContent).toContain(':root[data-theme="dark"]');
     expect(preview.textContent).not.toContain("@media (prefers-color-scheme: dark)");
@@ -128,10 +144,13 @@ describe("ExportSection", () => {
     expect(container.querySelector('[data-download-format="figma"]')).toBeNull();
   });
 
-  it("does not let Figma Variables be selected at all", () => {
-    const { getByLabelText, getByTestId } = render(wrap(<ExportSection />));
-    expect(getByLabelText("Figma Variables JSON")).toBeDisabled();
-    // Preview stays on the default CSS output rather than the stub envelope.
+  it("offers no way to preview or take the Figma stub", () => {
+    const { container, getByLabelText, getByTestId } = render(wrap(<ExportSection />));
+    const options = Array.from(
+      (getByLabelText(/preview format/i) as HTMLSelectElement).options,
+    ).map((o) => o.value);
+    expect(options).not.toContain("figma");
+    expect(container.querySelector('[data-download-format="figma"]')).toBeNull();
     expect(getByTestId("export-preview").textContent).toContain(":root");
   });
 
