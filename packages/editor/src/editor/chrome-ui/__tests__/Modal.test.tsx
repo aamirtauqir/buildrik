@@ -23,6 +23,37 @@ describe("Modal", () => {
     expect(screen.getByText("Delete 3 pages")).toBeTruthy();
   });
 
+  /* The trap re-ran on every render because it depended on the escape
+     handler's identity, and every setup ends by focusing the first focusable
+     — the close button. One keystroke in any modal field moved focus to the
+     ✕: the CMS collection wizard took "R" of "Recipes" and sent "ecipes" to
+     the close button. Reproduced live before this test existed. */
+  it("keeps focus in a field while its state changes on every keystroke", () => {
+    function Host() {
+      const [value, setValue] = React.useState("");
+      /* Inline handler on purpose: this is what every caller passes, and its
+         fresh identity per render is what broke the trap. */
+      return (
+        <Modal open onClose={() => {}} title="Name it">
+          <input
+            aria-label="Collection name"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+          />
+        </Modal>
+      );
+    }
+    render(<Host />);
+    const input = screen.getByLabelText("Collection name") as HTMLInputElement;
+    input.focus();
+    fireEvent.change(input, { target: { value: "R" } });
+    expect(document.activeElement).toBe(input);
+    fireEvent.change(input, { target: { value: "Re" } });
+    fireEvent.change(input, { target: { value: "Rec" } });
+    expect(input.value).toBe("Rec");
+    expect(document.activeElement).toBe(input);
+  });
+
   it("renders nothing when closed", () => {
     render(<Modal open={false} onClose={() => {}} title="Hidden" />);
     expect(screen.queryByRole("dialog")).toBeNull();

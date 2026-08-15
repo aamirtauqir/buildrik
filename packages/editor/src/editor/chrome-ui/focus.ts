@@ -16,6 +16,23 @@ const FOCUSABLE =
 export function useFocusTrap(active: boolean, onEscape?: () => void) {
   const ref = React.useRef<HTMLDivElement | null>(null);
 
+  /**
+   * The escape handler is read through a ref so the trap does not depend on
+   * its identity.
+   *
+   * Every caller of `OverlayMount` passes a fresh closure — `ModalRoot`'s
+   * `close` is rebuilt whenever its `onOpenChange` prop changes, and most
+   * surfaces pass that inline. With `onEscape` in the dependency list the
+   * whole effect tore down and set up again on EVERY render, and setup ends
+   * with `focusables()[0].focus()`. That meant one keystroke in any modal
+   * field moved focus to the modal's close button: the CMS collection wizard
+   * accepted "R" of "Recipes" and sent the rest to the ✕. Reproduced live.
+   */
+  const escapeRef = React.useRef(onEscape);
+  React.useEffect(() => {
+    escapeRef.current = onEscape;
+  }, [onEscape]);
+
   React.useEffect(() => {
     if (!active) return;
     const container = ref.current;
@@ -37,7 +54,7 @@ export function useFocusTrap(active: boolean, onEscape?: () => void) {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         e.stopPropagation();
-        onEscape?.();
+        escapeRef.current?.();
         return;
       }
       if (e.key !== "Tab") return;
@@ -59,7 +76,7 @@ export function useFocusTrap(active: boolean, onEscape?: () => void) {
       document.removeEventListener("keydown", onKeyDown, true);
       previous?.focus?.();
     };
-  }, [active, onEscape]);
+  }, [active]);
 
   return ref;
 }

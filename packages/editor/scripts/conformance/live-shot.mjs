@@ -153,6 +153,29 @@ if (hoverAt) {
   await page.waitForTimeout(Number(arg("hover-settle", 900)));
 }
 
+/* Type into whatever the last gesture focused. Flows that gate their next
+   step on a filled field (create-collection, rename, search) cannot be walked
+   without it. */
+const typeText = arg("type");
+if (typeText) {
+  await page.keyboard.type(String(typeText), { delay: 30 });
+  await page.waitForTimeout(Number(arg("type-settle", 600)));
+}
+
+/* Click a control by its visible text — coordinates move between runs when a
+   modal grows a step, and a missed click reads exactly like a dead button.
+   Still a real mouse click at the element's own centre, not element.click(). */
+const clickText = arg("clicktext");
+if (clickText) {
+  for (const label of String(clickText).split(";")) {
+    const target = page.getByRole("button", { name: label, exact: false }).first();
+    const box = await target.boundingBox();
+    if (!box) throw new Error(`--clicktext: no button matching "${label}"`);
+    await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+    await page.waitForTimeout(Number(arg("click-settle", 1200)));
+  }
+}
+
 /* A real key press — some panels are only reachable by their shortcut, and a
    dispatched KeyboardEvent does not prove a user could get there. */
 const pressKey = arg("press");
