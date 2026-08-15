@@ -67,10 +67,15 @@ const BAND = "tw:px-3 tw:py-2.5 tw:border-b tw:border-gray-200";
 /** The quiet button look, previously copy-pasted onto six separate Buttons. */
 const GHOST = "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900";
 
+/* Board 164:2 / 164:22 head the list with ONE line — "All · 3", "Errors only
+   · 1" — where the label names what you are looking at and the number counts
+   it. The three-button segmented row this replaces spent a whole row saying
+   what the one line says, and still needed a second line under it to repeat
+   the counts. Clicking cycles; the title says where it goes next. */
 const FILTERS: { key: Filter; label: string }[] = [
   { key: "all", label: "All" },
-  { key: "error", label: "Errors" },
-  { key: "warning", label: "Warnings" },
+  { key: "error", label: "Errors only" },
+  { key: "warning", label: "Warnings only" },
 ];
 
 export const IssuesPanel: React.FC<IssuesPanelProps> = ({
@@ -108,9 +113,10 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
       setFixing(null);
     }
   };
-  const errorCount = scoped.filter((i) => i.type === "error").length;
-  const warnCount = scoped.filter((i) => i.type === "warning").length;
   const visible = filter === "all" ? scoped : scoped.filter((i) => i.type === filter);
+  const filterIndex = FILTERS.findIndex((f) => f.key === filter);
+  const currentFilter = FILTERS[filterIndex];
+  const nextFilter = FILTERS[(filterIndex + 1) % FILTERS.length];
 
   /** Selected reads as the primary action, unselected as a quiet one. */
   const segment = (selected: boolean) => ({
@@ -123,12 +129,16 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
       <PanelHeader title="Issues" onClose={onClose} />
 
       {issues.length === 0 ? (
-        <EmptyState
-          className="tw:flex-1"
-          icon={<CheckCircle2 size={24} aria-hidden="true" />}
-          title="No issues"
-          body="Your site is clean — nothing to fix."
-        />
+        /* Board 164:35: two lines under the header — the verdict in green, and
+           what it means for publishing under it. No icon, and not floating in
+           the middle of an 844px panel, where the panel read as empty rather
+           than as clean. */
+        <div className="tw:px-3 tw:pt-6 tw:text-center" role="status">
+          <p className="tw:m-0 tw:text-[13px] tw:text-[var(--bk-success-text)]">No issues.</p>
+          <p className="tw:m-0 tw:mt-1 tw:text-xs tw:text-gray-500">
+            This page is ready to publish.
+          </p>
+        </div>
       ) : (
         <>
           {anyPageBound && (
@@ -141,15 +151,17 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
               </Button>
             </Toolbar>
           )}
-          <Toolbar>
-            {FILTERS.map((f) => (
-              <Button key={f.key} size="xs" onClick={() => setFilter(f.key)} {...segment(filter === f.key)}>
-                {f.label}
-              </Button>
-            ))}
-          </Toolbar>
           <div className={SUMMARY}>
-            {errorCount} error{errorCount === 1 ? "" : "s"} · {warnCount} warning{warnCount === 1 ? "" : "s"}
+            <Button
+              color="light"
+              size="xs"
+              className="tw:min-h-5 tw:border-0 tw:bg-transparent tw:px-0 tw:text-xs tw:font-normal tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+              title={`Showing ${currentFilter.label.toLowerCase()} — click for ${nextFilter.label.toLowerCase()}`}
+              onClick={() => setFilter(nextFilter.key)}
+            >
+              {currentFilter.label}
+            </Button>
+            <span className="tw:ml-1 tw:text-gray-500">· {visible.length}</span>
           </div>
 
           {fixing && (
@@ -195,6 +207,14 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
             </div>
           )}
           <div className={SCROLL}>
+            {filter !== "all" && scoped.length > visible.length && (
+              /* Board 164:22 says what the filter is keeping from you, in the
+                 same breath as the filter itself. */
+              <p className="tw:m-0 tw:mb-2 tw:text-xs tw:text-gray-500">
+                Filtered to one severity. {scoped.length - visible.length}{" "}
+                {scoped.length - visible.length === 1 ? "issue is" : "issues are"} hidden.
+              </p>
+            )}
             {visible.length === 0 ? (
               <EmptyState
                 className="tw:flex-1"

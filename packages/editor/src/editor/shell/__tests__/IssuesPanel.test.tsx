@@ -21,24 +21,28 @@ function renderPanel(props = {}) {
 afterEach(cleanup);
 
 describe("IssuesPanel", () => {
-  it("lists all issues with an error/warning breakdown", () => {
+  /* Boards 164:2 / 164:22 head the list with one line: what you are looking
+     at, and how many. The error/warning split it replaces needed its own row
+     plus a segmented filter above it to say the same thing. */
+  it("lists every issue under an 'All · N' head", () => {
     renderPanel();
     expect(screen.getByText(/Broken link/)).toBeInTheDocument();
     expect(screen.getByText(/missing alt/)).toBeInTheDocument();
-    expect(screen.getByText(/1 error/i)).toBeInTheDocument();
-    expect(screen.getByText(/2 warnings/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "All" })).toBeInTheDocument();
+    expect(screen.getByText("· 3")).toBeInTheDocument();
   });
 
-  it("filters to errors only", () => {
+  it("cycles to errors only, and says what it is hiding", () => {
     renderPanel();
-    fireEvent.click(screen.getByRole("button", { name: /^errors/i }));
+    fireEvent.click(screen.getByRole("button", { name: "All" }));
     expect(screen.getByText(/Broken link/)).toBeInTheDocument();
     expect(screen.queryByText(/missing alt/)).not.toBeInTheDocument();
+    expect(screen.getByText(/2 issues are hidden/)).toBeInTheDocument();
   });
 
   it("shows a filtered-empty state when a filter matches nothing", () => {
     renderPanel({ issues: ISSUES.filter((i) => i.type === "warning") });
-    fireEvent.click(screen.getByRole("button", { name: /^errors/i }));
+    fireEvent.click(screen.getByRole("button", { name: "All" }));
     expect(screen.getByText(/no errors/i)).toBeInTheDocument();
   });
 
@@ -73,15 +77,15 @@ describe("IssuesPanel", () => {
       expect(screen.getByText(/Broken link on Home/)).toBeInTheDocument();
       expect(screen.getByText(/Off-token color everywhere/)).toBeInTheDocument();
       expect(screen.queryByText(/Missing alt on About/)).not.toBeInTheDocument();
-      // summary counts follow the scope
-      expect(screen.getByText(/1 error · 1 warning/)).toBeInTheDocument();
+      // the head's count follows the scope
+      expect(screen.getByText("· 2")).toBeInTheDocument();
     });
 
     it("All pages shows everything", () => {
       renderPanel({ issues: PAGED, activePageId: "home" });
       fireEvent.click(screen.getByRole("button", { name: /all pages/i }));
       expect(screen.getByText(/Missing alt on About/)).toBeInTheDocument();
-      expect(screen.getByText(/1 error · 2 warnings/)).toBeInTheDocument();
+      expect(screen.getByText("· 3")).toBeInTheDocument();
     });
   });
 });
