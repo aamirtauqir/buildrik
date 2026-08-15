@@ -447,3 +447,26 @@
   font-size: 13px;
   color: var(--bk-ink);
 }
+
+/* Board 170:29 — "Thinking…" is a band, not an empty bubble. */
+.bd-ai-msg-thinking {
+  margin: 0;
+  padding: var(--bk-space-8) var(--bk-space-16);
+  background: var(--bk-accent-tint);
+  font-size: 13px;
+  color: var(--bk-accent);
+}
+
+/* Board 171:67's result card. */
+.bd-ai-msg-edit-head {
+  margin: 0 0 var(--bk-space-4);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--bk-success-text);
+}
+
+.bd-ai-msg-edit-foot {
+  margin: var(--bk-space-4) 0 0;
+  font-size: 12px;
+  color: var(--bk-ink-muted);
+}
