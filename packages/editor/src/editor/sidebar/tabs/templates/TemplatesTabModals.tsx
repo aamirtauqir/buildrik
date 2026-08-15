@@ -78,38 +78,45 @@ export const ReplaceModal: React.FC<ReplaceModalProps> = ({
   onCancel,
   onApply,
 }) => (
+  /* Board 1169:4713 names the template in the question and the page in the
+     answer — "Replace this page with 'Bistro Landing'?" / "Everything on Home
+     will be replaced". The old title named neither, so the one irreversible
+     word in the dialog ("Replace") had nothing attached to it. */
   <Modal
     open
     onClose={onCancel}
     dismissOnScrimClick
-    title="Replace current page content?"
-    subtitle={`${currentPageName ? `${currentPageName} page` : "Current page"} has ${currentPageCount} element${
-      currentPageCount === 1 ? "" : "s"
-    } that will be replaced.`}
+    title={`Replace this page with ‘${template.name}’?`}
     footer={
       <>
         <Button color="light" onClick={onCancel}>
           Cancel
         </Button>
-        <Button onClick={onApply}>Replace content</Button>
+        <Button onClick={onApply}>Replace page</Button>
       </>
     }
   >
     <div className="tw:mb-3">
-      Applying <b className="tw:text-gray-900">{template.name}</b> will replace all elements on the current
-      page. You can:
+      Everything on {currentPageName || "this page"} will be replaced by the template
+      {currentPageCount > 0
+        ? ` (${currentPageCount} element${currentPageCount === 1 ? "" : "s"})`
+        : ""}
+      . Your brand tokens are applied automatically.
     </div>
     <Option
       checked={backupCurrentPage}
       onChange={onBackupChange}
-      title={<>Backup current page as &ldquo;{currentPageName || "Current"} (backup)&rdquo;</>}
-      hint="Preserves your work in a new page."
+      title="Save the current page as a backup version first"
+      hint={`Keeps your work as “${currentPageName || "Current"} (backup)”.`}
     />
+    {/* Not on the board, kept because it does something the board's sentence
+        does not cover: brand tokens resolve automatically either way, while
+        this clears the project's global styles outright. */}
     <Option
       checked={resetGlobalStyles}
       onChange={onResetChange}
       title="Reset global styles to template defaults"
-      hint="Override your brand colors with template colors."
+      hint="Overrides your brand colours with the template's."
     />
   </Modal>
 );

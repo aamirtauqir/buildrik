@@ -120,6 +120,14 @@ if (clickAt) {
   await page.waitForTimeout(Number(arg("click-settle", 1200)));
 }
 
+/* A real key press — some panels are only reachable by their shortcut, and a
+   dispatched KeyboardEvent does not prove a user could get there. */
+const pressKey = arg("press");
+if (pressKey) {
+  await page.keyboard.press(String(pressKey));
+  await page.waitForTimeout(Number(arg("press-settle", 1200)));
+}
+
 if (out) {
   const opts = { path: out };
   if (clip) {

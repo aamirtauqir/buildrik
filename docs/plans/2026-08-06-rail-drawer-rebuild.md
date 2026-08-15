@@ -1806,6 +1806,37 @@ Smaller, from the same walk:
   templates are coming — start blank for now.") is built, though today's
   bundled catalog cannot reach it.
 
+**The replace confirm named neither side of the trade.** Board 1169:4713 asks
+"Replace this page with 'Bistro Landing'?" and answers "Everything on Home will
+be replaced by the template. Your brand tokens are applied automatically." The
+shipped dialog was titled "Replace current page content?" — no template, no
+page — so the one irreversible word in it had nothing attached. Conformed,
+with the live element count kept ("34 elements") because it is true and it is
+the size of what is being lost. The backup checkbox now carries the board's
+sentence. Two deliberate differences: the board's second control does not
+exist (its "Reset global styles" checkbox stays, because brand tokens resolve
+automatically either way while that one clears the project's global styles
+outright), and the backup box stays unchecked by default — the board draws it
+ticked, but a default is behaviour, and the code's answer is that version
+history already holds the previous state.
+
+**Reachability, found while trying to walk the replace confirm: once a page has
+content, nothing on screen opens Templates.** The canvas CTA is an empty-state
+only, the Pages drawer's "Browse templates" likewise, the Insert drawer's
+groups are ELEMENTS · BLOCKS · COMPONENTS · MINE (the TEMPLATES group
+`DrawerGallery`'s own docblock names does not exist), and the rail's six tools
+do not include it. Swept all six drawers with a template applied: none mentions
+templates. The **T** shortcut still opens it — verified with a real key press,
+not a synthetic event — so this is a discoverability hole rather than a dead
+end, and the fix is a founder call: an Insert group, a rail slot, or leaving
+it to the shortcut.
+
+Two boards are not reachable at all today: **778:4102 (loading)** and
+**781:4372 (load-error)**. The drawer reads a bundled constant, so there is no
+fetch to be slow or to fail. They become real the day the catalog is served —
+`userTemplates.list` already hydrates "My Templates" that way, and that is
+where those two states will land.
+
 Founder item from this walk: **the catalog has no section templates.** Board
 641:2487 draws three (Hero · image left, Menu grid · 3-up, Testimonials ·
 slider) and the panel has a group ready for them. That is content, not code.
