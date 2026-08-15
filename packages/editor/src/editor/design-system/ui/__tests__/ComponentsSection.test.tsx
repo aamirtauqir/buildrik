@@ -22,21 +22,14 @@ beforeEach(() => {
 });
 
 describe("ComponentsSection (Arc D2) — read-only summary", () => {
-  it("renders the catalog header with shipped component count", () => {
-    const { getByText } = render(<ComponentsSection composer={null} />);
-    expect(
-      getByText(`Catalog · ${CATALOG.length} polished components shipped`)
-    ).toBeTruthy();
-  });
-
-  it("renders a catalog card per CATALOG entry with variant + instance text", () => {
+  it("renders a catalog row per CATALOG entry, count at the right", () => {
     const { container } = render(<ComponentsSection composer={null} />);
     const cards = container.querySelectorAll("[data-catalog-card]");
     expect(cards.length).toBe(CATALOG.length);
     // First card should expose name + "N variants · M instances" text.
     const first = cards[0];
     expect(first.textContent).toMatch(CATALOG[0].name);
-    expect(first.textContent).toMatch(/\d+ variants? · \d+ instances?/);
+    expect(first.textContent).toMatch(/\d+ variants?/);
   });
 
   /* Board 153:29 pins ONE call to action at the foot — "✨ Generate with AI" —
@@ -81,24 +74,4 @@ describe("ComponentsSection (Arc D2) — read-only summary", () => {
     expect(footer?.textContent).toMatch(/Read-only by design/);
   });
 
-  it("Open Components panel button emits ui:switch-tab on composer", () => {
-    const emit = vi.fn();
-    const composer = { emit } as unknown as Parameters<typeof ComponentsSection>[0]["composer"];
-    const { container } = render(<ComponentsSection composer={composer} />);
-    const btn = container.querySelector(
-      "[data-open-components-panel]"
-    ) as HTMLButtonElement;
-    fireEvent.click(btn);
-    expect(emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "components" });
-  });
-
-  it("Open Components panel button is a safe no-op when composer is null", () => {
-    const { container } = render(<ComponentsSection composer={null} />);
-    const btn = container.querySelector(
-      "[data-open-components-panel]"
-    ) as HTMLButtonElement;
-    // Smoke — must not throw.
-    fireEvent.click(btn);
-    expect(btn).toBeTruthy();
-  });
 });

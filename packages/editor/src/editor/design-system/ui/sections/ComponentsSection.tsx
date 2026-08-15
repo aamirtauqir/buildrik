@@ -24,7 +24,6 @@ import { CATALOG } from "../../../components-catalog/catalog";
 import type { ComponentType } from "../../../components-catalog/types";
 import type { ComponentDefinition } from "../../../../shared/types/components";
 import { Button } from "@/editor/chrome-ui";
-const CATALOG_LAST_UPDATED = "2026-04-12";
 
 export interface ComponentsSectionProps {
   composer: Composer | null;
@@ -40,9 +39,6 @@ export interface ComponentsSectionProps {
    resolves, so the second argument was dead weight carrying a second source of
    truth for the same colour. */
 const CONTAINER = "tw:flex tw:flex-col tw:h-full tw:min-h-0 tw:overflow-y-auto";
-const HEADER_ROW = "tw:flex tw:items-center tw:justify-between tw:px-3 tw:pt-3 tw:pb-1 tw:gap-2";
-const HEADER_TITLE = "tw:text-xs tw:font-semibold tw:text-gray-900";
-const HEADER_SUB = "tw:px-3 tw:pb-2.5 tw:text-[11px] tw:text-gray-500";
 /* Board 153:29 draws Components as a DRILL-IN LIST with a chevron per row, not
    the card grid with sketch previews this replaced. Same move Tokens and the
    Brand root already made — the whole panel is one nav model now. */
@@ -118,11 +114,6 @@ function getInstanceCount(composer: Composer | null, componentId: string): numbe
 // the button was a silent no-op in production. Reusing the composer channel
 // avoids adding a parallel listener path.
 
-function dispatchOpenComponentsPanel(composer: ComponentsSectionProps["composer"]): void {
-  if (!composer || typeof composer.emit !== "function") return;
-  composer.emit("ui:switch-tab", { tab: "components" });
-}
-
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export const ComponentsSection: React.FC<ComponentsSectionProps> = ({
@@ -133,22 +124,12 @@ export const ComponentsSection: React.FC<ComponentsSectionProps> = ({
 
   return (
     <div className={CONTAINER} data-components-catalog data-mode="summary">
-      <div className={HEADER_ROW}>
-        <div className={HEADER_TITLE}>
-          Catalog · {CATALOG.length} polished components shipped
-        </div>
-        <Button
-          type="button"
-          size="xs"
-          onClick={() => dispatchOpenComponentsPanel(composer)}
-          data-open-components-panel
-        >
-          Open Components
-        </Button>
-      </div>
-      <div className={HEADER_SUB}>
-        Buildrick catalog v3 · last updated {CATALOG_LAST_UPDATED}
-      </div>
+      {/* Board 153:29 is a list and one CTA at its foot. The catalogue's own
+          headline ("27 polished components shipped", a version and a date) and
+          an "Open Components" button that jumps to the rail's panel were a
+          second header on a screen the user reached by tapping a row called
+          Components — the count now rides the Brand root's row, where every
+          other destination's count is. */}
 
       <div data-catalog-grid>
         {CATALOG.map((component) => {
@@ -161,14 +142,16 @@ export const ComponentsSection: React.FC<ComponentsSectionProps> = ({
               data-catalog-card={component.id}
               className={ROW}
             >
-              <span className="tw:flex tw:flex-col tw:gap-0.5 tw:min-w-0">
-                <span className={CARD_NAME}>{component.name}</span>
+              {/* One line per row, count at the right — the Brand panel's own
+                  list grammar (152:2, 152:112, 153:2). */}
+              <span className={CARD_NAME}>{component.name}</span>
+              <span className="tw:ml-auto tw:flex tw:flex-none tw:items-center tw:gap-1.5">
                 <span className={CARD_META}>
-                  {variantCount} variant{variantCount === 1 ? "" : "s"} ·{" "}
-                  {instanceCount} instance{instanceCount === 1 ? "" : "s"}
+                  {variantCount} variant{variantCount === 1 ? "" : "s"}
+                  {instanceCount > 0 ? ` · ${instanceCount} in use` : ""}
                 </span>
+                <span aria-hidden="true" className="tw:text-gray-400">›</span>
               </span>
-              <span aria-hidden="true" className="tw:flex-none tw:text-gray-400">›</span>
             </Button>
           );
         })}
