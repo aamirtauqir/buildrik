@@ -12,6 +12,15 @@ import { useAgentRunner } from "./hooks/useAgentRunner";
 import { useAiActionGate } from "./hooks/useAiActionGate";
 import { applyAiEdit } from "./applySetStyle";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
+
+/* Boards 171:136 / 171:105 — a state block: what is wrong, why, and the way
+   out. Utilities rather than a stylesheet: this panel's CSS file is on the
+   styling ratchet, and new chrome belongs inline (DS SSOT §3). */
+const STATE_BLOCK = "tw:flex tw:flex-col tw:gap-2 tw:bg-[var(--bk-bg-subtle)] tw:p-4";
+const STATE_TITLE = "tw:m-0 tw:text-[14px] tw:font-medium tw:text-[var(--bk-ink)]";
+const STATE_BODY = "tw:m-0 tw:text-[12px] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
+const STATE_LINK =
+  "tw:self-start tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[var(--bk-accent)]";
 import { trackAiEditApplied } from "@/services/ai/adoptionTracker";
 import { DEFAULT_MODEL, type AIModel, type ChatMessage, type DiffEdit } from "./types";
 import "./AITab.css";
@@ -180,17 +189,19 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
           panel lives in the inspector column, not beside it. The old header
           carried a subtitle ("Chat with AI to edit your page") no board has. */}
       {onBack ? (
-        <div className="bd-ai-drillin">
+        <div className="tw:flex tw:flex-col">
           <Button
             color="light"
             size="xs"
-            className="bd-ai-drillin__back"
+            className="tw:self-start tw:border-transparent tw:bg-transparent tw:px-4 tw:py-3 tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink)]"
             onClick={onBack}
             aria-label="Back to Inspector"
           >
             ‹ Inspector
           </Button>
-          <div className="bd-ai-drillin__title">AI</div>
+          <div className="tw:border-b tw:border-[var(--bk-border)] tw:px-4 tw:pb-3 tw:text-[14px] tw:font-medium tw:text-[var(--bk-ink)]">
+            AI
+          </div>
         </div>
       ) : (
         <PanelFrame.Header
@@ -222,25 +233,25 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
           (PRECONDITION_FAILED vs TOO_MANY_REQUESTS); the panel used to print
           either as grey text under a composer that still looked ready. */}
       {stream.errorKind === "not-configured" ? (
-        <div className="bd-ai-notconfigured">
-          <p className="bd-ai-notconfigured__title">AI drafting isn&rsquo;t configured yet.</p>
-          <p className="bd-ai-notconfigured__body">
+        <div className={STATE_BLOCK}>
+          <p className={STATE_TITLE}>AI drafting isn&rsquo;t configured yet.</p>
+          <p className={STATE_BODY}>
             No API key is set for this workspace, so nothing here will run. This is the real
             message — not a silent fallback that pretends to work.
           </p>
           <Button
             color="light"
             size="xs"
-            className="bd-ai-notconfigured__link"
+            className={STATE_LINK}
             onClick={() => window.open(`${DASHBOARD_URL}/dashboard/settings`, "_blank")}
           >
             Open workspace settings
           </Button>
         </div>
       ) : stream.errorKind === "quota" ? (
-        <div className="bd-ai-notconfigured bd-ai-quota">
-          <p className="bd-ai-quota__title">AI is out of credit.</p>
-          <p className="bd-ai-notconfigured__body">
+        <div className={`${STATE_BLOCK} tw:bg-[var(--bk-warning-tint)]`}>
+          <p className={`${STATE_TITLE} tw:text-[var(--bk-error)]`}>AI is out of credit.</p>
+          <p className={STATE_BODY}>
             {/* The server's own sentence carries the real limit and reset time
                 — the board's "1 Aug" is sample data. */}
             Nothing was changed. {stream.error}
@@ -248,7 +259,7 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
           <Button
             color="light"
             size="xs"
-            className="bd-ai-notconfigured__link"
+            className={STATE_LINK}
             onClick={() => window.open(`${DASHBOARD_URL}/dashboard/settings/billing`, "_blank")}
           >
             See plans

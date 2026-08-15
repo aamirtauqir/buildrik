@@ -21,7 +21,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
         {/* Board 170:29 — before any text arrives the panel says "Thinking…"
             in a band of its own, rather than showing an empty bubble with a
             role label above it. */}
-        {streaming && !text ? <p className="bd-ai-msg-thinking">Thinking…</p> : null}
+        {streaming && !text ? <p className="tw:m-0 tw:bg-[var(--bk-accent-tint)] tw:px-4 tw:py-2 tw:text-[13px] tw:text-[var(--bk-accent)]">Thinking…</p> : null}
         {text ? <p>{text}</p> : null}
         {error ? <p className="bd-ai-msg-error" role="alert">{error}</p> : null}
         {stopped && <span className="bd-ai-msg-stopped">(stopped)</span>}
@@ -31,7 +31,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
           {/* Board 171:67's result card: how many changes, then what they are.
               The undo promise is true HERE — a chat edit applies inside one
               transaction (applySetStyle), unlike a multi-step agent run. */}
-          <p className="bd-ai-msg-edit-head">
+          <p className="tw:mt-0 tw:mb-1 tw:text-[13px] tw:font-medium tw:text-[var(--bk-success-text)]">
             {edit.rows.length || 1} change{(edit.rows.length || 1) === 1 ? "" : "s"} proposed
           </p>
           <DiffRows edit={edit} />
@@ -55,7 +55,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
             </span>
           )}
           {edit.state === "pending" ? (
-            <p className="bd-ai-msg-edit-foot">Apply lands as one undo step.</p>
+            <p className="tw:mt-1 tw:mb-0 tw:text-[12px] tw:text-[var(--bk-ink-muted)]">Apply lands as one undo step.</p>
           ) : null}
         </div>
       )}

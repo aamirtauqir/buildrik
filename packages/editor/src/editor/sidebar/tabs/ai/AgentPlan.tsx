@@ -3,6 +3,16 @@ import { DiffRows } from "./DiffRows";
 import type { RunStep, RunPhase } from "./hooks/useAgentRunner";
 import { Button, Checkbox } from "@/editor/chrome-ui";
 
+/* Utilities, not a stylesheet: this panel's CSS file is on the styling
+   ratchet and new chrome belongs inline (DS SSOT §3). */
+const BAND =
+  "tw:bg-[var(--bk-bg-subtle)] tw:px-4 tw:py-2 tw:text-[11px] tw:font-medium tw:uppercase tw:tracking-wide tw:text-[var(--bk-ink-muted)]";
+const STEP_ROW = "tw:flex tw:items-baseline tw:gap-2 tw:px-4 tw:py-1 tw:text-[13px] tw:text-[var(--bk-ink)]";
+const PANEL = "tw:flex tw:flex-col tw:gap-2 tw:px-4 tw:py-3";
+const PANEL_TITLE = "tw:m-0 tw:text-[13px] tw:font-medium";
+const PANEL_BODY = "tw:m-0 tw:text-[12px] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
+const PANEL_ACTIONS = "tw:flex tw:justify-between tw:gap-2";
+
 /**
  * The agent run — boards 170:41 (planning), 170:70 (running), 170:97
  * (step-gate), 171:67 (done), 171:36 (stopped), 171:2 (step-failed).
@@ -133,22 +143,22 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
 
   return (
     <div className="bd-ai-agent">
-      <div className="bd-ai-agent-band">{bandLabel(phase, steps, currentIndex, stoppedByUser)}</div>
+      <div className={BAND}>{bandLabel(phase, steps, currentIndex, stoppedByUser)}</div>
 
       <ol className="bd-ai-agent-steps">
         {steps.map((s, i) => (
           <li
             key={`${i}-${s.plan.title}`}
-            className={`bd-ai-agent-step bd-ai-agent-step-${s.status}`}
+            className={STEP_ROW}
             data-step-status={s.status}
           >
-            <span className="bd-ai-agent-step-glyph" style={{ color: STEP_COLOR[s.status] }} aria-hidden="true">
+            <span className="tw:w-3 tw:flex-none tw:text-center" style={{ color: STEP_COLOR[s.status] }} aria-hidden="true">
               {STEP_GLYPH[s.status]}
             </span>
-            <span className="bd-ai-agent-step-index">{i + 1}</span>
-            <span className="bd-ai-agent-step-title">{s.plan.title}</span>
+            <span className="tw:min-w-2.5 tw:text-[var(--bk-ink-muted)]">{i + 1}</span>
+            <span className="tw:flex-1">{s.plan.title}</span>
             {STEP_WORD[s.status] ? (
-              <span className="bd-ai-agent-step-status">{STEP_WORD[s.status]}</span>
+              <span className="tw:text-[11px] tw:text-[var(--bk-ink-muted)]">{STEP_WORD[s.status]}</span>
             ) : null}
           </li>
         ))}
@@ -158,7 +168,7 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
         <Button
           type="button"
           color="light"
-          className="bd-ai-agent-stop"
+          className="tw:mx-4 tw:mb-3 tw:self-start"
           aria-label="Stop run"
           onClick={onStop}
         >
@@ -168,15 +178,15 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
 
       {/* Board 170:97 — the run stops and says what it is about to do. */}
       {gateStep ? (
-        <div className="bd-ai-agent-gate" role="alertdialog" aria-label="Step needs approval">
-          <p className="bd-ai-agent-gate__title">
+        <div className={`${PANEL} tw:bg-[var(--bk-warning-tint)]`} role="alertdialog" aria-label="Step needs approval">
+          <p className={`${PANEL_TITLE} tw:text-[var(--bk-warning-text)]`}>
             Step {currentIndex + 1}: {gateStep.plan.title}
           </p>
-          <p className="bd-ai-agent-gate__body">
+          <p className={PANEL_BODY}>
             {gateStep.plan.instruction} Approve it, or skip it and keep the rest.
           </p>
           {gateStep.edit ? <DiffRows edit={{ ...gateStep.edit, state: "pending" }} /> : null}
-          <div className="bd-ai-agent-gate__actions">
+          <div className={PANEL_ACTIONS}>
             <Button type="button" color="light" aria-label="Skip step" onClick={onSkip}>
               Skip
             </Button>
@@ -184,7 +194,7 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
               Approve
             </Button>
           </div>
-          <p className="bd-ai-agent-foot">The run waits rather than guessing.</p>
+          <p className={PANEL_BODY}>The run waits rather than guessing.</p>
         </div>
       ) : null}
 
@@ -192,12 +202,12 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
           on. "Nothing after step N ran" is the fact that makes the state safe
           to sit in. */}
       {error ? (
-        <div className="bd-ai-agent-failed" role="alert">
-          <p className="bd-ai-agent-failed__title">
+        <div className={`${PANEL} tw:bg-[var(--bk-warning-tint)]`} role="alert">
+          <p className={`${PANEL_TITLE} tw:text-[var(--bk-error)]`}>
             {failedIndex >= 0 ? `Step ${failedIndex + 1} failed — ${error}` : error}
           </p>
           {failedIndex >= 0 ? (
-            <p className="bd-ai-agent-gate__body">
+            <p className={PANEL_BODY}>
               {appliedCount > 0
                 ? `${appliedCount} step${appliedCount === 1 ? "" : "s"} kept.`
                 : "Nothing was applied."}{" "}
@@ -205,7 +215,7 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
             </p>
           ) : null}
           {(onUndoAll || onRetry) && (
-            <div className="bd-ai-agent-gate__actions">
+            <div className={PANEL_ACTIONS}>
               {onUndoAll ? (
                 <Button type="button" color="light" onClick={onUndoAll} disabled={appliedCount === 0}>
                   Undo all
@@ -224,29 +234,29 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
       {/* Board 171:36 — stopping is not finishing. What already ran is kept,
           and taking it back is offered here rather than left to ⌘Z. */}
       {phase === "done" && !error && stoppedByUser ? (
-        <div className="bd-ai-agent-stopped">
-          <p className="bd-ai-agent-stopped__head">
+        <div className={`${PANEL} tw:bg-[var(--bk-bg-subtle)]`}>
+          <p className="tw:m-0 tw:text-[13px] tw:text-[var(--bk-ink)]">
             Stopped after step {appliedCount + skippedCount}.
           </p>
-          <p className="bd-ai-agent-foot">
+          <p className={PANEL_BODY}>
             What already ran is kept.
             {appliedCount > 0
               ? ` Undo all takes back the ${appliedCount} step${appliedCount === 1 ? "" : "s"} that applied.`
               : ""}
           </p>
           {onUndoAll && appliedCount > 0 ? (
-            <Button type="button" color="light" className="bd-ai-agent-stopped__undo" onClick={onUndoAll}>
+            <Button type="button" color="light" className="tw:self-start tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[var(--bk-accent)]" onClick={onUndoAll}>
               Undo all
             </Button>
           ) : null}
         </div>
       ) : phase === "done" && !error ? (
-        <div className="bd-ai-agent-result">
-          <p className="bd-ai-agent-result__head">
+        <div className={`${PANEL} tw:mx-4 tw:my-2 tw:rounded tw:bg-[var(--bk-success-tint)]`}>
+          <p className={`${PANEL_TITLE} tw:text-[var(--bk-success-text)]`}>
             {appliedCount} change{appliedCount === 1 ? "" : "s"} applied
             {skippedCount > 0 ? `, ${skippedCount} skipped` : ""}.
           </p>
-          <p className="bd-ai-agent-foot">
+          <p className={PANEL_BODY}>
             {appliedCount > 1
               ? `Each step is its own undo step — ⌘Z takes back the last of the ${appliedCount}.`
               : "⌘Z takes it back."}

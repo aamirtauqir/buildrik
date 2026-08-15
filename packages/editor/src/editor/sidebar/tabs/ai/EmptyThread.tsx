@@ -13,6 +13,10 @@
 import * as React from "react";
 import { Button } from "@/editor/chrome-ui";
 
+/** The section band every board in this family uses. */
+const BAND =
+  "tw:px-4 tw:pt-3 tw:pb-1 tw:text-[11px] tw:font-medium tw:tracking-wide tw:text-[var(--bk-ink-muted)]";
+
 /** Board 170:2's three. Sample copy, kept because it is also good copy: each
  *  names a real, scoped edit rather than a capability. */
 const TRY_PROMPTS = [
@@ -29,14 +33,14 @@ export interface EmptyThreadProps {
 }
 
 export const EmptyThread: React.FC<EmptyThreadProps> = ({ onTry, onDraft }) => (
-  <div className="bd-ai-idle">
-    <div className="bd-ai-idle__band">TRY</div>
+  <div className="tw:flex tw:flex-col tw:pb-2">
+    <div className={BAND}>TRY</div>
     {TRY_PROMPTS.map((p) => (
       <Button
         key={p}
         color="light"
         size="xs"
-        className="bd-ai-idle__try"
+        className="tw:justify-start tw:border-transparent tw:bg-transparent tw:px-4 tw:py-1 tw:text-[13px] tw:text-[var(--bk-accent)]"
         onClick={() => onTry?.(p)}
         disabled={!onTry}
       >
@@ -44,14 +48,14 @@ export const EmptyThread: React.FC<EmptyThreadProps> = ({ onTry, onDraft }) => (
       </Button>
     ))}
 
-    <p className="bd-ai-idle__note">
+    <p className="tw:mx-4 tw:mt-3 tw:mb-0 tw:text-[12px] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
       AI proposes a diff and never writes directly. Apply lands as one undo step.
     </p>
 
-    <div className="bd-ai-idle__band">DRAFT</div>
+    <div className={BAND}>DRAFT</div>
     <Button
       color="light"
-      className="bd-ai-idle__draft"
+      className="tw:mx-4 tw:flex tw:justify-between tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:px-3 tw:py-2 tw:text-[13px] tw:text-[var(--bk-ink)]"
       onClick={() => onDraft?.()}
       disabled={!onDraft}
     >
