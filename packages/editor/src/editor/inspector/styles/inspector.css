@@ -105,25 +105,21 @@
   align-items: center;
   gap: 6px;
   padding: 6px 10px;
-  /* #F3F4F6, the grey the boards draw this strip on. It was --bk-bg-panel,
-     which is #FFFFFF — the same white as the pill that is supposed to stand
-     out of it, so the active pill had no shape at all. */
+  /* Boards 807:8342 + 160:412: grey strip, reach pill white, the other two bare
+     dark text. Was --bk-bg-panel (#FFFFFF) under three accent-tinted 10px pills
+     — same white as the pill meant to stand out of it, so nothing did.
+     height/min-height: these are flowbite Buttons and their own min-height is
+     40px, so padding alone could not reach the boards' 28px strip.
+     nowrap: at 12px in a 300px panel the three pills wrapped to two lines. */
   background: var(--bk-bg-subtle);
   border-bottom: 1px solid var(--bk-border);
   font: 500 10px var(--bk-font-ui);
   color: var(--bk-ink-muted);
 }
-/* Boards 807:8342 and 160:412 draw this strip the same way: the reach pill in
-   a white box, the breakpoint and state pills as bare dark text. All three
-   were accent-tinted blue at 10px, which read as three equally-active
-   controls — and made the strip the loudest thing in a panel whose job is to
-   show the element's values. */
 .bdi-bpr .bdi-bpr-pill {
   display: inline-flex;
   align-items: center;
   gap: 3px;
-  /* Height pinned: these are flowbite Buttons, whose own min-height is 40px —
-     the boards draw a 28px strip and the padding alone could not win. */
   height: 26px;
   min-height: 0;
   padding: 0 8px;
@@ -133,14 +129,9 @@
   color: var(--bk-ink);
   border: none;
   cursor: pointer;
-  /* Three dropdowns in a 300px panel: without this "All like this" and
-     "Desktop · 1200+" each broke over two lines and the strip doubled in
-     height. The row scrolls instead. */
   white-space: nowrap;
 }
-.bdi-bpr .bdi-bpr-pill--reach {
-  background: var(--bk-bg-card);
-}
+.bdi-bpr .bdi-bpr-pill--reach { background: var(--bk-bg-card); }
 
 /* ── Body ─────────────────────────────────────────────── */
 .bdi-body {
