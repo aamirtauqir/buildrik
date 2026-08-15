@@ -123,7 +123,7 @@ export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
   };
 
   return (
-    <Section title="Classes" icon="Tag" defaultOpen isOpen={isOpen} onToggle={onToggle} tier={tier} id="inspector-section-css-classes">
+    <Section title="CSS classes" icon="Tag" defaultOpen isOpen={isOpen} onToggle={onToggle} tier={tier} id="inspector-section-css-classes">
       <div className="bdi-chips" style={{ position: "relative" }}>
         {classes.map((cls, i) => (
           <span key={cls} className={`bdi-chip${i === 0 ? " pri" : ""}`}>

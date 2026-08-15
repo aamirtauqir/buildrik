@@ -115,9 +115,15 @@ if (evalSrc) {
    it selected — a tool artifact that reads exactly like a product bug. */
 const clickAt = arg("click");
 if (clickAt) {
-  const [cx, cy] = String(clickAt).split(",").map(Number);
-  await page.mouse.click(cx, cy);
-  await page.waitForTimeout(Number(arg("click-settle", 1200)));
+  /* `x,y` for one gesture, `x,y;x,y` when a surface is only reachable by a
+     sequence — insert a section, then select it. Each point settles before
+     the next, because the click after an insert lands on a tree the engine
+     has not mounted yet otherwise. */
+  for (const point of String(clickAt).split(";")) {
+    const [cx, cy] = point.split(",").map(Number);
+    await page.mouse.click(cx, cy);
+    await page.waitForTimeout(Number(arg("click-settle", 1200)));
+  }
 }
 
 /* A real key press — some panels are only reachable by their shortcut, and a

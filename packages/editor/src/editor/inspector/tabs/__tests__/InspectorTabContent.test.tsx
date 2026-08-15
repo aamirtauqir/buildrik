@@ -131,7 +131,7 @@ function renderTab(opts: {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe("InspectorTabContent — per-element-type reshaping", () => {
-  it("text element's style tab shows Text before Size", () => {
+  it("text element shows Typography before Size", () => {
     renderTab({
       tabId: "style",
       elementType: "text",
@@ -148,9 +148,9 @@ describe("InspectorTabContent — per-element-type reshaping", () => {
         } as unknown as CssContext["inspectorContext"],
       },
     });
-    const text = screen.getByRole("button", { name: /Text section/i });
+    const text = screen.getByRole("button", { name: /Typography section/i });
     const size = screen.getByRole("button", { name: /Size section/i });
-    // Text (typography) appears before Size in DOM order.
+    // Typography appears before Size in DOM order — board 807:8342.
     expect(
       text.compareDocumentPosition(size) & Node.DOCUMENT_POSITION_FOLLOWING
     ).toBeTruthy();
@@ -223,24 +223,24 @@ describe("InspectorTabContent — per-element-type reshaping", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("container's effects tab shows Effects + Animation + Visibility", () => {
+  it("container shows Effects + Animation + Visibility", () => {
     renderTab({ tabId: "effects", elementType: "container" });
     expect(screen.getByRole("button", { name: /Effects section/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Animation section/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Visibility section/i })).toBeInTheDocument();
   });
 
-  it("button element's element tab shows Link Settings (linkable)", () => {
+  it("button shows Link (linkable)", () => {
     renderTab({ tabId: "element", elementType: "button" });
     expect(
-      screen.getByRole("button", { name: /Link Settings section/i })
+      screen.getByRole("button", { name: /Link section/i })
     ).toBeInTheDocument();
   });
 
-  it("container element's element tab does NOT show Link Settings (not linkable)", () => {
+  it("container does NOT show Link (not linkable)", () => {
     renderTab({ tabId: "element", elementType: "container" });
     expect(
-      screen.queryByRole("button", { name: /Link Settings section/i })
+      screen.queryByRole("button", { name: /Link section/i })
     ).not.toBeInTheDocument();
   });
 
@@ -271,11 +271,11 @@ describe("InspectorTabContent — per-element-type reshaping", () => {
     expect(screen.getByRole("button", { name: /All CSS section/i })).toBeInTheDocument();
   });
 
-  it("css-classes is universal — appears for every element type's element tab", () => {
+  it("css-classes is universal — every element type has it", () => {
     for (const type of ["container", "text", "image", "button", "input"]) {
       const { unmount } = renderTab({ tabId: "element", elementType: type });
       expect(
-        screen.getByRole("button", { name: /^Classes section/i }),
+        screen.getByRole("button", { name: /^CSS classes section/i }),
         `css-classes missing for ${type}`
       ).toBeInTheDocument();
       unmount();
@@ -286,8 +286,7 @@ describe("InspectorTabContent — per-element-type reshaping", () => {
     expect(() => {
       renderTab({ tabId: "style", elementType: "nonexistent-widget-xyz" });
     }).not.toThrow();
-    // Container profile starts with quick-actions; it's a non-collapsible row
-    // with a "Block" preset button, so that button is a good existence check.
-    expect(screen.getByRole("button", { name: /Set layout to Block/i })).toBeInTheDocument();
+    // Container profile leads with Layout (board 32:2).
+    expect(screen.getByRole("button", { name: /Layout section/i })).toBeInTheDocument();
   });
 });

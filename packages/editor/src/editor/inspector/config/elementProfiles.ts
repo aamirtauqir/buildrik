@@ -1,18 +1,20 @@
 /**
- * Element Profiles — per-element-type section ordering for the contextual
- * inspector. Each profile declares which sections appear in each of the
- * three tabs (Style / Element / Effects), in what order. Section visibility
- * is enforced by the registry's `shouldRender` predicates, so profiles stay
- * declarative and don't need to know about flex-item / grid-item / text-like
- * context. First section in each tab's order is the visual "primary" tier.
+ * Element Profiles — per-element-type section order for the inspector.
  *
- * Element type strings below come from the canonical `ElementType` union in
- * `shared/types/element.ts` — verified 2026-04-12 during office-hours.
- * Container fallback catches any type not explicitly listed. Adding support
- * for a new element type is one entry in PROFILES, not a code change.
+ * ONE ordered list per element type, because the panel is one scroll: the
+ * Style / Element / Effects tab strip was removed from the UI and the three
+ * separate orders it needed outlived it, concatenated at render time into an
+ * order no board ever drew. The orders below are read off the profile boards
+ * — 807:8342 (text), 807:8567 (button), 807:8412 (flex), 807:8475 (grid),
+ * 807:8521 (media), 807:8614 (input), 32:2 (container fallback) — top to
+ * bottom, including the collapsed tail.
  *
- * Design reference:
- *   ~/.gstack/projects/aamirtauqir-buildrik/shahg-main-design-20260412-033637.md
+ * Section visibility is enforced by the registry's `shouldRender` predicates,
+ * so a profile may list more than an element shows (flex sits in the
+ * container profile but only renders once the container is a flex box).
+ *
+ * Element type strings come from the canonical `ElementType` union in
+ * `shared/types/element.ts`. Container fallback catches any type not listed.
  *
  * @license BSD-3-Clause
  */
@@ -24,149 +26,166 @@ import type { SectionId } from "../sections/registry";
 // ============================================================================
 
 /**
- * An element profile describes which sections a given element type sees in
- * each of the three inspector tabs and in what order. Sections are filtered
- * by their registry-level `shouldRender` predicates before rendering, so a
- * profile can list more sections than are actually visible for a given
- * element (e.g. flex is in the container profile but only renders when the
- * element is actually a flex container or item).
+ * A profile is the order its element's sections appear in, top to bottom.
+ * Which of them open on first sight is not encoded here — that is whichever
+ * sections carry a value on the element (see `useInspectorSections`), which is
+ * what every profile board's footer counts.
  */
 export interface ElementProfile {
-  /** Ordered section ids for the Style tab. First entry is visually primary. */
-  style: { order: SectionId[] };
-  /** Ordered section ids for the Element tab. */
-  element: { order: SectionId[] };
-  /** Ordered section ids for the Effects tab. */
-  effects: { order: SectionId[] };
+  /** Ordered section ids, board order. */
+  order: SectionId[];
 }
 
 // ============================================================================
 // PROFILES
 // ============================================================================
 
-/** Generic container fallback — used for plain divs, sections, and any
- *  element type not explicitly registered below. Starts with the quick-actions
- *  row so users can switch display modes in one click. */
+/** Generic container fallback — plain divs, sections, and any type not
+ *  registered below. Board 32:2: layout, spacing, typography, background,
+ *  border, effects. `flex` / `grid` ride along for containers the user has
+ *  turned into one; both hide until then. */
 const CONTAINER_PROFILE: ElementProfile = {
-  style: {
-    order: [
-      "quick-actions",
-      "size",
-      "spacing",
-      "flex",
-      "typography",
-      "background",
-      "border",
-      "corner-radius",
-      "layout",
-      "grid",
-    ],
-  },
-  element: { order: ["css-classes", "element-properties", "all-css"] },
-  effects: { order: ["effects", "animation", "visibility", "interactions"] },
+  order: [
+    "layout",
+    "flex",
+    "grid",
+    "size",
+    "spacing",
+    "typography",
+    "background",
+    "border",
+    "corner-radius",
+    "effects",
+    "interactions",
+    "animation",
+    "visibility",
+    "element-properties",
+    "css-classes",
+    "all-css",
+  ],
 };
 
-/** Text-like elements — Typography is the first thing users want. */
+/** Text-like elements — board 807:8342. Typography leads; the board draws no
+ *  Layout or Corner radius row for text. */
 const TEXT_PROFILE: ElementProfile = {
-  style: {
-    order: [
-      "typography",
-      "size",
-      "spacing",
-      "layout",
-      "background",
-      "border",
-      "corner-radius",
-    ],
-  },
-  element: { order: ["css-classes", "all-css"] },
-  effects: { order: ["effects", "animation", "visibility", "interactions"] },
+  order: [
+    "typography",
+    "spacing",
+    "size",
+    "background",
+    "border",
+    "effects",
+    "link",
+    "interactions",
+    "animation",
+    "visibility",
+    "element-properties",
+    "css-classes",
+    "all-css",
+  ],
 };
 
-/** Explicit flex container — prioritizes Layout and Flex over everything
- *  else. Keeps quick-actions at the top so users can switch away from flex. */
+/** Explicit flex container — board 807:8412. Layout, then Flexbox. */
 const FLEX_PROFILE: ElementProfile = {
-  style: {
-    order: [
-      "quick-actions",
-      "layout",
-      "flex",
-      "size",
-      "spacing",
-      "background",
-      "border",
-      "corner-radius",
-      "typography",
-    ],
-  },
-  element: { order: ["css-classes", "all-css"] },
-  effects: { order: ["effects", "animation", "visibility", "interactions"] },
+  order: [
+    "layout",
+    "flex",
+    "size",
+    "spacing",
+    "background",
+    "border",
+    "corner-radius",
+    "effects",
+    "interactions",
+    "animation",
+    "visibility",
+    "element-properties",
+    "css-classes",
+    "all-css",
+  ],
 };
 
-/** Explicit grid container — same idea as flex but grid leads. Columns is
- *  semantically a grid under the hood, so it reuses this profile. */
+/** Explicit grid container — board 807:8475. Columns is a grid underneath, so
+ *  it reuses this profile. */
 const GRID_PROFILE: ElementProfile = {
-  style: {
-    order: [
-      "quick-actions",
-      "layout",
-      "grid",
-      "size",
-      "spacing",
-      "background",
-      "border",
-      "corner-radius",
-      "typography",
-    ],
-  },
-  element: { order: ["css-classes", "all-css"] },
-  effects: { order: ["effects", "animation", "visibility", "interactions"] },
+  order: [
+    "layout",
+    "grid",
+    "size",
+    "spacing",
+    "background",
+    "border",
+    "corner-radius",
+    "effects",
+    "interactions",
+    "animation",
+    "visibility",
+    "element-properties",
+    "css-classes",
+    "all-css",
+  ],
 };
 
-/** Image / video / icon / lottie / svg / audio / embeds — Size (with
- *  object-fit) and Element Properties (src, alt, etc.) matter first. */
+/** Image / video / icon / lottie / svg / audio / embeds — board 807:8521.
+ *  Size leads; media carries a link. */
 const MEDIA_PROFILE: ElementProfile = {
-  style: { order: ["size", "layout", "spacing", "border", "corner-radius", "background"] },
-  element: { order: ["element-properties", "css-classes", "all-css"] },
-  effects: { order: ["effects", "animation", "visibility", "interactions"] },
+  order: [
+    "size",
+    "spacing",
+    "background",
+    "border",
+    "corner-radius",
+    "effects",
+    "link",
+    "interactions",
+    "animation",
+    "visibility",
+    "element-properties",
+    "css-classes",
+    "all-css",
+  ],
 };
 
-/** Button / link / CTA — Typography, Background, Border are the big wins;
- *  link settings live in the Element tab; interactions get promoted in
- *  Effects because buttons are the most common interaction target. */
+/** Button / link / CTA — board 807:8567. Typography and Background lead;
+ *  Link sits low, after Animation. */
 const BUTTON_PROFILE: ElementProfile = {
-  style: {
-    order: [
-      "typography",
-      "background",
-      "border",
-      "corner-radius",
-      "spacing",
-      "size",
-      "layout",
-    ],
-  },
-  element: { order: ["link", "element-properties", "css-classes", "all-css"] },
-  effects: { order: ["interactions", "effects", "animation", "visibility"] },
+  order: [
+    "typography",
+    "background",
+    "border",
+    "corner-radius",
+    "spacing",
+    "size",
+    "effects",
+    "interactions",
+    "animation",
+    "link",
+    "visibility",
+    "element-properties",
+    "css-classes",
+    "all-css",
+  ],
 };
 
-/** Input / textarea / select / form — Typography + Border come first for
- *  form aesthetics; element-properties (name, placeholder, validation)
- *  dominates the Element tab. */
+/** Input / textarea / select — board 807:8614. Typography then Border, and
+ *  Element properties (name, placeholder, validation) is promoted above the
+ *  behaviour sections. */
 const INPUT_PROFILE: ElementProfile = {
-  style: {
-    order: [
-      "typography",
-      "border",
-      "corner-radius",
-      "size",
-      "spacing",
-      "background",
-      "layout",
-    ],
-  },
-  element: { order: ["element-properties", "css-classes", "all-css"] },
-  effects: { order: ["effects", "animation", "interactions", "visibility"] },
+  order: [
+    "typography",
+    "border",
+    "spacing",
+    "size",
+    "background",
+    "corner-radius",
+    "effects",
+    "element-properties",
+    "interactions",
+    "animation",
+    "visibility",
+    "css-classes",
+    "all-css",
+  ],
 };
 
 // ============================================================================

@@ -24,7 +24,7 @@ describe("elementProfiles — warn-once fallback", () => {
     const second = getProfileFor(type);
 
     // Same fallback profile both times…
-    expect(first.style.order).toEqual(second.style.order);
+    expect(first.order).toEqual(second.order);
     // …but the warning only fires on first sighting.
     const relevant = warn.mock.calls.filter((c) =>
       String(c[0]).includes(type)
@@ -37,7 +37,7 @@ describe("elementProfiles — warn-once fallback", () => {
     vi.spyOn(console, "warn").mockImplementation(() => {});
     const unknown = getProfileFor("totally-unknown-widget-beta");
     const container = getProfileFor("container");
-    expect(unknown.style.order).toEqual(container.style.order);
+    expect(unknown.order).toEqual(container.order);
   });
 
   it("does NOT warn for a known type", () => {

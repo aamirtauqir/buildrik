@@ -60,7 +60,7 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
   ) : undefined;
 
   return (
-    <Section title="Stroke" icon="Square" preview={borderPreview} isOpen={isOpen} onToggle={onToggle} tier={tier} id="inspector-section-border">
+    <Section title="Border" icon="Square" preview={borderPreview} isOpen={isOpen} onToggle={onToggle} tier={tier} id="inspector-section-border">
       {/* Border Width */}
       <div style={{ position: "relative" }}>
         <MixedValueIndicator prop="border-width" mixedKeys={mixedKeys} />

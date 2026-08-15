@@ -94,25 +94,24 @@ function renderDensity(density: "full" | "fewer") {
 }
 
 describe("InspectorTabContent — density gating", () => {
-  // container effects tab order: effects, animation, visibility, interactions
-  // (4 sections, none shouldRender-gated).
-  it("full density renders all four effects sections", () => {
+  // Container profile, board 32:2 order: layout, size, spacing lead; the
+  // behaviour sections (effects, animation, visibility) sit further down.
+  it("full density renders the whole column, top to bottom", () => {
     renderDensity("full");
+    expect(screen.getByRole("button", { name: /Layout section/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Spacing section/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Effects section/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Animation section/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Visibility section/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Interactions section/i })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Show all controls/i })).not.toBeInTheDocument();
   });
 
-  it("fewer density trims to the first three and hides the fourth", () => {
+  it("fewer density keeps the first three sections and drops the rest", () => {
     renderDensity("fewer");
-    expect(screen.getByRole("button", { name: /Effects section/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Animation section/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Visibility section/i })).toBeInTheDocument();
-    // 4th section (Interactions) is dropped in "fewer".
+    expect(screen.getByRole("button", { name: /Layout section/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Size section/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Spacing section/i })).toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: /Interactions section/i })
+      screen.queryByRole("button", { name: /Effects section/i })
     ).not.toBeInTheDocument();
   });
 

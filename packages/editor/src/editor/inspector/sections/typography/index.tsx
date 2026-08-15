@@ -86,7 +86,7 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
 
   return (
     <Section
-      title="Text"
+      title="Typography"
       icon="Type"
       isOpen={isOpen}
       onToggle={onToggle}

@@ -1,11 +1,21 @@
 /**
- * Constraint Control - Fixed / Fill / Hug size controls
+ * Constraint Control — Fixed / Fill / Hug, the value every profile board shows
+ * against Width and Height ("Fill", "Hug").
+ *
+ * It used to sit inside the Layout section, which meant Layout and Size both
+ * owned width/height and the inspector had to ask the profile which one to
+ * silence — that switch left a TEXT element's Size section rendering nothing
+ * but a "More settings" link. Size owns the dimension now, everywhere.
+ *
+ * `fixedInput` lets the owner supply its own numeric field (Size passes the
+ * unit input with its design-token chain) instead of the plain text box.
+ *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { CONTROL_INPUT_WRAP } from "../../shared/controls/controlClasses";
-import { CLUSTER_CAPTION, constraintBtnClass } from "./classes";
+import { CONTROL_INPUT_WRAP } from "../shared/controls/controlClasses";
+import { CLUSTER_CAPTION, constraintBtnClass } from "./layout/classes";
 import { Button, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
@@ -17,13 +27,20 @@ export interface ConstraintControlProps {
   label: string;
   value: string;
   onChange: (value: string) => void;
+  /** Numeric field shown in Fixed mode. Defaults to a plain text box. */
+  fixedInput?: React.ReactNode;
 }
 
 // ============================================================================
 // COMPONENT
 // ============================================================================
 
-export const ConstraintControl: React.FC<ConstraintControlProps> = ({ label, value, onChange }) => {
+export const ConstraintControl: React.FC<ConstraintControlProps> = ({
+  label,
+  value,
+  onChange,
+  fixedInput,
+}) => {
   // Determine current constraint type based on CSS value
   const getConstraintType = (): ConstraintType => {
     if (value === "100%" || value === "-webkit-fill-available") return "fill";
@@ -126,14 +143,18 @@ export const ConstraintControl: React.FC<ConstraintControlProps> = ({ label, val
       {/* Fixed value input - only show when in fixed mode */}
       {currentType === "fixed" && (
         <div className="tw:flex tw:items-center tw:gap-1 tw:mt-1.5">
-          <span className="tw:w-8 tw:text-xs tw:text-gray-500">{isWidth ? "W" : "H"}</span>
-          <TextInput
-            type="text"
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            placeholder={isWidth ? "200px" : "auto"}
-            className={CONTROL_INPUT_WRAP}
-          />
+          {fixedInput ?? (
+            <>
+              <span className="tw:w-8 tw:text-xs tw:text-gray-500">{isWidth ? "W" : "H"}</span>
+              <TextInput
+                type="text"
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                placeholder={isWidth ? "200px" : "auto"}
+                className={CONTROL_INPUT_WRAP}
+              />
+            </>
+          )}
         </div>
       )}
     </div>

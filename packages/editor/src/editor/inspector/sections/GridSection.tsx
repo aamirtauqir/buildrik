@@ -130,7 +130,7 @@ export const GridSection: React.FC<GridSectionProps> = ({
 
   return (
     <Section
-      title="CSS Grid"
+      title="Grid"
       icon="Grid3X3"
       defaultOpen
       isOpen={isOpen}

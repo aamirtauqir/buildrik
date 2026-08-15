@@ -20,10 +20,19 @@ function renderSize(props: Partial<React.ComponentProps<typeof SizeSection>> = {
 describe("SizeSection — current values render", () => {
   it("shows width/height numeric parts in the W/H inputs", () => {
     renderSize({ styles: { width: "100px", height: "50px" } });
-    const pair = screen.getByRole("group", { name: "Width and height" });
-    const inputs = within(pair).getAllByRole("textbox");
-    expect(inputs[0]).toHaveValue("100");
-    expect(inputs[1]).toHaveValue("50");
+    const w = within(screen.getByRole("group", { name: "Width" })).getAllByRole("textbox");
+    const h = within(screen.getByRole("group", { name: "Height" })).getAllByRole("textbox");
+    expect(w[0]).toHaveValue("100");
+    expect(h[0]).toHaveValue("50");
+  });
+
+  /* Board 807:8412 prints "Fill" and "Hug" against Width and Height — the
+     constraint is the row, and the numeric field only belongs to Fixed. */
+  it("a filled width reads as Fill, with no number to edit", () => {
+    renderSize({ styles: { width: "100%" } });
+    const row = within(screen.getByRole("group", { name: "Width" }));
+    expect(row.getByRole("button", { name: /Fill/ })).toBeInTheDocument();
+    expect(row.queryAllByRole("textbox")).toHaveLength(0);
   });
 
   it("renders a collapsed preview 'W × H' when either dimension is set", () => {
@@ -40,18 +49,23 @@ describe("SizeSection — current values render", () => {
 describe("SizeSection — engine writes", () => {
   it("editing the W input writes width with the current unit", () => {
     const { onChange } = renderSize({ styles: { width: "100px" } });
-    const pair = screen.getByRole("group", { name: "Width and height" });
-    const [wInput] = within(pair).getAllByRole("textbox");
+    const [wInput] = within(screen.getByRole("group", { name: "Width" })).getAllByRole("textbox");
     fireEvent.change(wInput, { target: { value: "200" } });
     expect(onChange).toHaveBeenCalledWith("width", "200px");
   });
 
   it("editing the H input writes height", () => {
     const { onChange } = renderSize({ styles: { height: "40px" } });
-    const pair = screen.getByRole("group", { name: "Width and height" });
-    const inputs = within(pair).getAllByRole("textbox");
-    fireEvent.change(inputs[1], { target: { value: "80" } });
+    const [hInput] = within(screen.getByRole("group", { name: "Height" })).getAllByRole("textbox");
+    fireEvent.change(hInput, { target: { value: "80" } });
     expect(onChange).toHaveBeenCalledWith("height", "80px");
+  });
+
+  it("Fill writes the full-width value", () => {
+    const { onChange } = renderSize({ styles: { width: "100px" } });
+    const row = within(screen.getByRole("group", { name: "Width" }));
+    fireEvent.click(row.getByRole("button", { name: /Fill/ }));
+    expect(onChange).toHaveBeenCalledWith("width", "100%");
   });
 
   it("object-fit select writes object-fit", () => {
@@ -67,25 +81,23 @@ describe("SizeSection — engine writes", () => {
 });
 
 describe("SizeSection — propertyStates gates", () => {
-  it("hides the W/H pair when width+height are hidden", () => {
+  it("hides the W/H rows when width+height are hidden", () => {
     renderSize({
       propertyStates: {
         width: { hidden: true },
         height: { hidden: true },
       },
     });
-    expect(
-      screen.queryByRole("group", { name: "Width and height" })
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole("group", { name: "Width" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("group", { name: "Height" })).not.toBeInTheDocument();
   });
 
   it("disables the W input and suppresses its token chain button when width is disabled", () => {
     renderSize({
-      styles: { width: "100px" },
+      styles: { width: "100px", height: "40px" },
       propertyStates: { width: { disabled: true, reason: "Inline elements ignore width/height" } },
     });
-    const pair = screen.getByRole("group", { name: "Width and height" });
-    const [wInput] = within(pair).getAllByRole("textbox");
+    const [wInput] = within(screen.getByRole("group", { name: "Width" })).getAllByRole("textbox");
     expect(wInput).toBeDisabled();
     expect(
       screen.queryByRole("button", { name: "Link width to spacing token" })

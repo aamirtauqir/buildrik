@@ -401,12 +401,7 @@
   flex-shrink: 0;
 }
 
-/* ── Quick action card ──────────────────────────────── */
-.bdi-quick {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--bk-space-4);
-}
+/* ── Preset tile (PresetGrids) ───────────────────────── */
 .bdi-qa {
   display: flex;
   flex-direction: column;

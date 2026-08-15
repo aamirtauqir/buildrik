@@ -15,15 +15,16 @@
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import { ALL_PROFILE_ELEMENT_TYPES, getProfileFor } from "../config/elementProfiles";
-import { ALL_REGISTRY_SECTION_IDS, type SectionId } from "../sections/registry";
+import {
+  ALL_REGISTRY_SECTION_IDS,
+  sectionApplies,
+  type SectionId,
+} from "../sections/registry";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Two open sections by default — three was visually overwhelming in a 320px
-// panel. Users that want more can Expand All; users that want less can collapse.
-const MAX_DEFAULT_EXPANDED = 2;
 
 /** Legacy localStorage key (pre-Phase-6 flat section set). */
 const LEGACY_PREFS_KEY = "buildrick-inspector-sections";
@@ -88,6 +89,9 @@ function migrateLegacyState(): void {
 export interface UseInspectorSectionsOptions {
   selectedElement: { id: string; type: string } | null;
   composer?: Composer | null;
+  /** The selected element's own declared styles — decides which sections open
+   *  on first sight (see `getDefaultExpandedKeysForType`). */
+  styles?: Record<string, string>;
 }
 
 export interface UseInspectorSectionsResult {
@@ -110,6 +114,7 @@ export interface UseInspectorSectionsResult {
 export function useInspectorSections({
   selectedElement,
   composer,
+  styles,
 }: UseInspectorSectionsOptions): UseInspectorSectionsResult {
   // Run the legacy migration on first hook mount. Uses useEffect (not useMemo)
   // because it writes to localStorage — a side effect that shouldn't run
@@ -143,23 +148,27 @@ export function useInspectorSections({
     }
   }, []);
 
-  // ── Smart defaults by element type ───────────────────────────────────────
-  // Uses the element's profile as the source of truth: the first
-  // MAX_DEFAULT_EXPANDED sections from the style tab's order are opened by
-  // default. Component instances get "variants" elevated to the front.
+  // ── Smart defaults: open what applies ────────────────────────────────────
+  // The sections that open are the ones carrying a value on this element —
+  // the rule every profile board's footer counts ("4 of 13 sections apply" on
+  // the flex board, where Layout / Flexbox / Size / Spacing are exactly the
+  // four drawn open). It replaced "the first two in profile order", which
+  // opened Size on a text element and showed an empty body.
+  //
+  // Nothing set yet (a freshly dropped element) still opens the first section,
+  // so the panel never greets anyone fully shut.
   const getDefaultExpandedKeysForType = React.useCallback(
     (elementType: string): string[] => {
-      const profile = getProfileFor(elementType);
-      const priority = profile.style.order.slice(0, MAX_DEFAULT_EXPANDED);
+      const { order } = getProfileFor(elementType);
+      const applying = styles ? order.filter((id) => sectionApplies(id, styles)) : [];
+      const open = applying.length > 0 ? applying : order.slice(0, 1);
       // Note: VariantSection for component instances is rendered directly
       // by ProInspector outside the registry pipeline (autoExpandSection
       // === "variants" drives its open state), so we don't need to seed a
       // variants key here.
-      return priority.map((sectionId) => `${elementType}:${sectionId}`);
+      return open.map((sectionId) => `${elementType}:${sectionId}`);
     },
-    // selectedElement.id and composer are intentionally omitted — defaults
-    // are computed per element TYPE, not per instance.
-    []
+    [styles]
   );
 
   // ── State ─────────────────────────────────────────────────────────────────
@@ -198,18 +207,12 @@ export function useInspectorSections({
   // ── Controls ──────────────────────────────────────────────────────────────
 
   /** Build the `${type}:${id}` keys for every section in the currently
-   *  selected element's profile across all 3 tabs. Used by expandAll /
-   *  collapseAll to scope their action to the active element type only. */
+   *  selected element's profile. Used by expandAll / collapseAll to scope
+   *  their action to the active element type only. */
   const keysForCurrentElement = React.useCallback((): string[] => {
     const type = selectedElement?.type;
     if (!type) return [];
-    const profile = getProfileFor(type);
-    const ids = new Set<string>([
-      ...profile.style.order,
-      ...profile.element.order,
-      ...profile.effects.order,
-    ]);
-    return Array.from(ids).map((id) => `${type}:${id}`);
+    return getProfileFor(type).order.map((id) => `${type}:${id}`);
   }, [selectedElement?.type]);
 
   const collapseAll = React.useCallback(() => {

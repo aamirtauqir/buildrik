@@ -9,7 +9,7 @@
  *
  * Registry structure:
  *   - `_shared.tsx`      — types, defineSection, adaptBaseStyleProps
- *   - `layout.tsx`       — quick-actions, layout, size, spacing, flex, grid
+ *   - `layout.tsx`       — layout, size, spacing, flex, grid
  *   - `typography.tsx`   — typography
  *   - `visual.tsx`       — background, border, corner-radius
  *   - `element.tsx`      — link, element-properties, css-classes, all-css
@@ -86,6 +86,30 @@ export const ALL_REGISTRY_SECTION_IDS = Object.keys(SECTION_REGISTRY) as Section
  */
 export const SECTION_REGISTRY_LIST: (AnySectionEntry & { id: SectionId })[] =
   ALL_REGISTRY_SECTION_IDS.map((id) => SECTION_REGISTRY[id] as AnySectionEntry & { id: SectionId });
+
+/**
+ * Does this section say anything about THIS element — i.e. does the element
+ * declare a value for any property the section owns?
+ *
+ * This is the rule every profile board's footer counts ("2 of 12 sections
+ * apply", "4 of 13" on the flex board, where the four opened are exactly
+ * Layout / Flexbox / Size / Spacing). It is also what decides which sections
+ * open on first sight, so the panel opens on the element's own styling rather
+ * than on a fixed count of whatever happens to sit at the top of the profile.
+ *
+ * Sections that own no CSS (element properties, classes, link) never apply by
+ * this rule — the boards draw them collapsed, which is the same answer.
+ */
+export function sectionApplies(
+  id: SectionId,
+  styles: Record<string, string>
+): boolean {
+  const keys = SECTION_REGISTRY[id]?.styleKeys ?? [];
+  return keys.some((k) => {
+    const v = styles[k];
+    return v !== undefined && v !== "";
+  });
+}
 
 /**
  * Build the advanced-prop map that `useAdvancedSettings` takes as input.

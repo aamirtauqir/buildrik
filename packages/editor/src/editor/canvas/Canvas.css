@@ -155,7 +155,10 @@
 
 [data-buildrick-type="container"]:not(.buildrick-page-root):empty::after,
 [data-buildrick-type="columns"]:empty::after {
-  content: "Drop blocks here or use Quick Add above ↑";
+  /* Names a route that exists. The "Quick Add above ↑" this used to point at
+     was a floating bar that no screen ever mounted — deleted with this edit;
+     the real second route is the selection toolbar's + (Add child element). */
+  content: "Drop a block here, or select this box and use +";
   color: var(--bk-ink-muted);
   font-size: var(--bk-text-13);
   font-weight: 500;

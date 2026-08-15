@@ -138,6 +138,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   const { expandedSections, toggleSection } = useInspectorSections({
     selectedElement,
     composer,
+    styles: styles_state,
   });
 
   // E3 per-user density (acceptance #4) — from the shared editor view-mode SSOT.
@@ -411,7 +412,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
         <div className="bdi-body">
           <InspectorErrorBoundary>
             <InspectorTabContent
-              flat
               tabId="style"
               composer={composer}
               selectedElement={selectedElement}

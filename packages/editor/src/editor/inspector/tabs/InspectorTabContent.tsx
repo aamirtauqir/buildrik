@@ -38,6 +38,7 @@ import { getProfileFor } from "../config/elementProfiles";
 import type { UseAdvancedSettingsReturn } from "../hooks/useAdvancedSettings";
 import {
   SECTION_REGISTRY,
+  sectionApplies,
   type SectionContext,
   type SectionId,
   type ShouldRenderContext,
@@ -77,12 +78,6 @@ export interface InspectorTabContentProps {
    *  inspector to its primary + secondary sections, hiding tertiary (advanced)
    *  ones; "full" shows everything. Row heights are unaffected (density learning). */
   density?: "full" | "fewer";
-  /** S3.9 flat inspector: render EVERY section from all three tab groups
-   *  (style → element → effects) in one scrolling column, dropping the
-   *  Look/Layout/Effects tab strip. When set, `tabId` is ignored for section
-   *  selection (it's still forwarded to sections that read it, none do today).
-   *  Ordered per the element profile, per S3.9. */
-  flat?: boolean;
 }
 
 // ============================================================================
@@ -106,22 +101,10 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
     onOpenIconPicker,
     devMode,
     density = "full",
-    flat = false,
   } = props;
 
-  const profile = getProfileFor(selectedElement.type);
-  // S3.9: flat mode concatenates all three tab groups into one column, ordered
-  // per the profile (style → element → effects), deduped so a section listed in
-  // two groups renders once. Tabbed mode renders just the active tab's order.
-  // Memoized so the flat concat doesn't hand `visibleIds` a fresh array every
-  // render (which would defeat its filter memo).
-  const orderedIds = React.useMemo<SectionId[]>(
-    () =>
-      flat
-        ? [...new Set([...profile.style.order, ...profile.element.order, ...profile.effects.order])]
-        : profile[tabId].order,
-    [flat, profile, tabId]
-  );
+  // One scroll, one order — the profile's, read off its board.
+  const orderedIds: SectionId[] = getProfileFor(selectedElement.type).order;
 
   // Stable per-section toggle factories. Without `useCallback`, each render
   // produces new closures, which defeats downstream React.memo on section
@@ -227,6 +210,16 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
         };
         return <React.Fragment key={id}>{entry.render(ctx)}</React.Fragment>;
       })}
+
+      {/* Every profile board closes with this line — "2 of 12 sections apply",
+          "4 of 13" on the flex board. It says why most of the column is shut:
+          the sections below carry nothing for this element yet. */}
+      {renderIds.length > 0 && (
+        <p className="tw:m-0 tw:px-4 tw:py-3 tw:text-[12px] tw:text-[var(--bk-ink-muted)]">
+          {renderIds.filter((id) => sectionApplies(id, styles)).length} of{" "}
+          {renderIds.length} sections apply
+        </p>
+      )}
 
       {/* E3 density: when "fewer" hides advanced sections, say so and offer a
           reversible way back to full controls — density is a preference, never

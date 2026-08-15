@@ -54,7 +54,6 @@ export type TabId = "style" | "element" | "effects";
  */
 export type SectionId =
   // Style tab
-  | "quick-actions"
   | "layout"
   | "size"
   | "spacing"

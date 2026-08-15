@@ -7,7 +7,6 @@
 import * as React from "react";
 import { Section, MoreSettingsToggle, type SectionTier } from "../../shared/controls";
 import { SECTION_PREVIEW, SECTION_SUBTITLE } from "../../shared/controls/controlClasses";
-import { ConstraintControl } from "./ConstraintControl";
 import { DisplayControls } from "./DisplayControls";
 import { OverflowControls, VisibilityFloatControls } from "./OverflowVisibilityControls";
 import { PositionControls } from "./PositionControls";
@@ -83,19 +82,6 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
 
       {/* Display (essential) */}
       <DisplayControls display={styles.display || ""} onChange={onChange} mixedKeys={mixedKeys} />
-
-      {/* Size Constraints (essential) */}
-      <div className={SECTION_SUBTITLE}>Size Constraints</div>
-      <ConstraintControl
-        label="Width"
-        value={styles.width || "auto"}
-        onChange={(val) => onChange("width", val)}
-      />
-      <ConstraintControl
-        label="Height"
-        value={styles.height || "auto"}
-        onChange={(val) => onChange("height", val)}
-      />
 
       {/* Position - essential (position type + anchor) */}
       <div className={SECTION_SUBTITLE}>Position</div>

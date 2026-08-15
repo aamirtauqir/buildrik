@@ -9,6 +9,7 @@ import { Popover, Button, Select } from "@/editor/chrome-ui";
 import { Link2, Link2Off } from "lucide-react";
 import * as React from "react";
 import { useSpacingRegistry } from "@/editor/design-system/state/TokenRegistryContext";
+import { ConstraintControl } from "./ConstraintControl";
 import { TokenPickerPopover } from "../shared/TokenPickerPopover";
 import { Section, InputWithUnit, MoreSettingsToggle, type SectionTier, MixedValueIndicator } from "../shared/controls";
 import {
@@ -129,8 +130,6 @@ export interface SizeSectionProps {
   onAdvancedToggle?: () => void;
   mixedKeys?: ReadonlySet<string>;
   isMultiSelect?: boolean;
-  /** Hide width/height rows (LayoutSection handles them via ConstraintControl) */
-  showDimensions?: boolean;
 }
 
 export const SizeSection: React.FC<SizeSectionProps> = ({
@@ -143,7 +142,6 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
   advancedExpanded = false,
   onAdvancedToggle,
   mixedKeys,
-  showDimensions = true,
 }) => {
   const hidden = (prop: string) => propertyStates[prop]?.hidden;
   const disabled = (prop: string) => propertyStates[prop]?.disabled;
@@ -167,47 +165,70 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
       tier={tier}
       id="inspector-section-size"
     >
-      {/* W | link | H pair */}
-      {showDimensions && !hidden("width") && !hidden("height") && (
-        <div className="bdi-pair" role="group" aria-label="Width and height">
-          <div className={CHAIN_ROW}>
-            <MixedValueIndicator prop="width" mixedKeys={mixedKeys} />
-            <div className="tw:flex-1">
-              <InputWithUnit
-                label=""
-                value={styles.width || ""}
-                onChange={(v) => onChange("width", v)}
-                disabled={disabled("width")}
-                disabledReason={reason("width")}
-                isOverridden={propertyStates["width"]?.isOverridden}
-                fieldIcon={<span className={FIELD_GLYPH}>W</span>}
-              />
-            </div>
-            {!disabled("width") && (
-              <div className={CHAIN_SLOT}>
-                <ChainButton property="width" value={styles.width || ""} onChange={(v) => onChange("width", v)} />
-              </div>
-            )}
+      {/* Board: Width / Height as Fixed · Fill · Hug, the value the profile
+          boards print ("Fill", "Hug"). Fixed mode keeps the unit input and its
+          design-token chain. */}
+      {!hidden("width") && (
+        <div className={CHAIN_ROW} role="group" aria-label="Width">
+          <MixedValueIndicator prop="width" mixedKeys={mixedKeys} />
+          <div className="tw:flex-1">
+            <ConstraintControl
+              label="Width"
+              value={styles.width || "auto"}
+              onChange={(v) => onChange("width", v)}
+              fixedInput={
+                <>
+                  <div className="tw:flex-1">
+                    <InputWithUnit
+                      label=""
+                      value={styles.width || ""}
+                      onChange={(v) => onChange("width", v)}
+                      disabled={disabled("width")}
+                      disabledReason={reason("width")}
+                      isOverridden={propertyStates["width"]?.isOverridden}
+                      fieldIcon={<span className={FIELD_GLYPH}>W</span>}
+                    />
+                  </div>
+                  {!disabled("width") && (
+                    <div className={CHAIN_SLOT}>
+                      <ChainButton property="width" value={styles.width || ""} onChange={(v) => onChange("width", v)} />
+                    </div>
+                  )}
+                </>
+              }
+            />
           </div>
-          <span className="bdi-pair-sep" aria-hidden="true" />
-          <div className={CHAIN_ROW}>
-            <MixedValueIndicator prop="height" mixedKeys={mixedKeys} />
-            <div className="tw:flex-1">
-              <InputWithUnit
-                label=""
-                value={styles.height || ""}
-                onChange={(v) => onChange("height", v)}
-                disabled={disabled("height")}
-                disabledReason={reason("height")}
-                isOverridden={propertyStates["height"]?.isOverridden}
-                fieldIcon={<span className={FIELD_GLYPH}>H</span>}
-              />
-            </div>
-            {!disabled("height") && (
-              <div className={CHAIN_SLOT}>
-                <ChainButton property="height" value={styles.height || ""} onChange={(v) => onChange("height", v)} />
-              </div>
-            )}
+        </div>
+      )}
+      {!hidden("height") && (
+        <div className={CHAIN_ROW} role="group" aria-label="Height">
+          <MixedValueIndicator prop="height" mixedKeys={mixedKeys} />
+          <div className="tw:flex-1">
+            <ConstraintControl
+              label="Height"
+              value={styles.height || "auto"}
+              onChange={(v) => onChange("height", v)}
+              fixedInput={
+                <>
+                  <div className="tw:flex-1">
+                    <InputWithUnit
+                      label=""
+                      value={styles.height || ""}
+                      onChange={(v) => onChange("height", v)}
+                      disabled={disabled("height")}
+                      disabledReason={reason("height")}
+                      isOverridden={propertyStates["height"]?.isOverridden}
+                      fieldIcon={<span className={FIELD_GLYPH}>H</span>}
+                    />
+                  </div>
+                  {!disabled("height") && (
+                    <div className={CHAIN_SLOT}>
+                      <ChainButton property="height" value={styles.height || ""} onChange={(v) => onChange("height", v)} />
+                    </div>
+                  )}
+                </>
+              }
+            />
           </div>
         </div>
       )}

@@ -237,7 +237,7 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
   ];
 
   return (
-    <Section title="Link Settings" icon="Link2" defaultOpen isOpen={isOpen} onToggle={onToggle} tier={tier} id="inspector-section-link">
+    <Section title="Link" icon="Link2" defaultOpen isOpen={isOpen} onToggle={onToggle} tier={tier} id="inspector-section-link">
       <SelectRow
         label="Link Type"
         value={linkType}

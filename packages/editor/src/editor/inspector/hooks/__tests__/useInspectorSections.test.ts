@@ -17,22 +17,28 @@ function readStored(): string[] {
   return JSON.parse(localStorage.getItem(PREFS_KEY) ?? "[]");
 }
 
-function mount(type = "container") {
+function mount(type = "container", styles: Record<string, string> = {}) {
   return renderHook(() =>
-    useInspectorSections({ selectedElement: { id: "e1", type }, composer: null })
+    useInspectorSections({ selectedElement: { id: "e1", type }, composer: null, styles })
   );
 }
 
 beforeEach(() => localStorage.clear());
 
 describe("useInspectorSections — default seeding", () => {
-  it("seeds the first two style-tab sections for the selected type", () => {
-    const expected = getProfileFor("container")
-      .style.order.slice(0, 2)
-      .map((id) => `container:${id}`);
+  /* The profile boards open exactly the sections that carry a value and count
+     them in the footer ("4 of 13 sections apply"). */
+  it("opens the sections the element actually styles", () => {
+    const { result } = mount("container", { padding: "24px", "background-color": "#fff" });
+    expect([...result.current.expandedSections].sort()).toEqual(
+      ["container:background", "container:spacing"].sort()
+    );
+  });
+
+  it("an element with nothing set still opens its first section", () => {
+    const expected = `container:${getProfileFor("container").order[0]}`;
     const { result } = mount("container");
-    expect([...result.current.expandedSections].sort()).toEqual([...expected].sort());
-    expect(result.current.expandedCount).toBe(expected.length);
+    expect([...result.current.expandedSections]).toEqual([expected]);
   });
 });
 
@@ -53,10 +59,9 @@ describe("useInspectorSections — expandAll / collapseAll", () => {
   it("expandAll opens every section in the current element's profile and persists", () => {
     const { result } = mount("container");
     act(() => result.current.expandAll());
-    const profile = getProfileFor("container");
-    const anyEffectsSection = profile.effects.order[0];
-    expect(result.current.expandedSections.has(`container:${anyEffectsSection}`)).toBe(true);
-    expect(readStored()).toContain(`container:${anyEffectsSection}`);
+    const lastSection = getProfileFor("container").order.at(-1) as string;
+    expect(result.current.expandedSections.has(`container:${lastSection}`)).toBe(true);
+    expect(readStored()).toContain(`container:${lastSection}`);
   });
 
   it("collapseAll clears every current-type key and persists the empty scope", () => {

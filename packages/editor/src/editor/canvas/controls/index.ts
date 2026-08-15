@@ -11,7 +11,6 @@ export type { DeviceSelectorProps, Device } from "./DeviceSelector";
 export { UndoRedoControls } from "./UndoRedoControls";
 export type { UndoRedoControlsProps } from "./UndoRedoControls";
 
-export { QuickAddBar } from "./QuickAddBar";
 
 export { UnifiedSelectionToolbar } from "./UnifiedSelectionToolbar";
 export type { UnifiedSelectionToolbarProps } from "./UnifiedSelectionToolbar";
