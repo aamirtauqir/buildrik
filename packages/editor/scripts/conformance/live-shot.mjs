@@ -168,9 +168,15 @@ if (typeText) {
 const clickText = arg("clicktext");
 if (clickText) {
   for (const label of String(clickText).split(";")) {
-    const target = page.getByRole("button", { name: label, exact: false }).first();
-    const box = await target.boundingBox();
-    if (!box) throw new Error(`--clicktext: no button matching "${label}"`);
+    /* Rows in the panels are divs with onClick as often as they are buttons,
+       so fall back to plain text rather than making the caller know which. */
+    let target = page.getByRole("button", { name: label, exact: false }).first();
+    let box = await target.boundingBox().catch(() => null);
+    if (!box) {
+      target = page.getByText(label, { exact: false }).first();
+      box = await target.boundingBox().catch(() => null);
+    }
+    if (!box) throw new Error(`--clicktext: nothing matching "${label}"`);
     await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
     await page.waitForTimeout(Number(arg("click-settle", 1200)));
   }

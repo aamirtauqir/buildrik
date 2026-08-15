@@ -74,7 +74,8 @@ const SAVEBAR =
 const SAVE_LINK =
   "tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:font-normal " +
   "tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline";
-const HINT = "tw:text-xs tw:text-gray-500 tw:leading-normal tw:px-3 tw:py-2.5 tw:border-t tw:border-gray-200";
+/** A note that belongs to the row above it, not to the panel's foot. */
+const INLINE_HINT = "tw:text-xs tw:text-gray-500 tw:leading-normal tw:px-3 tw:pb-3";
 const MONO = "tw:[font-family:var(--bk-font-mono)] tw:text-xs tw:text-blue-700";
 const SUB = "tw:text-xs tw:text-gray-500";
 const INLINE_FORM = "tw:flex tw:flex-col tw:gap-2 tw:p-3 tw:border-b tw:border-gray-200";
@@ -87,7 +88,10 @@ const ERROR_TEXT = "tw:text-xs tw:text-[var(--bk-error)]";
 
 function Crumb({ label, onClick }: { label: string; onClick: () => void }) {
   return (
-    <Button className={`${LINK_BTN} tw:mx-3 tw:mt-2.5 tw:mb-0.5`} onClick={onClick} aria-label={`Back to ${label}`}>
+    /* self-start / justify-start: flowbite's Button centres its content and
+       stretches to the column's width, so the board's left-aligned back link
+       sat in the middle of the panel (149:50, 149:84). */
+    <Button className={`${LINK_BTN} tw:mx-3 tw:mt-2.5 tw:mb-0.5 tw:self-start tw:justify-start`} onClick={onClick} aria-label={`Back to ${label}`}>
       ‹ {label}
     </Button>
   );
@@ -745,12 +749,19 @@ export function SourcesView({
             </div>
           </div>
         ) : (
-          <Button className={`${LINK_BTN} tw:mx-3 tw:my-2`} onClick={() => setAdding(true)}>
-            + Connect a source
-          </Button>
+          <>
+            <Button className={`${LINK_BTN} tw:mx-3 tw:my-2`} onClick={() => setAdding(true)}>
+              + Connect a source
+            </Button>
+            {/* Board 151:46 prints this under the link, in flow. Pinned to the
+                panel's foot with a rule above it, it read as a footer note on
+                a different subject — 600px below the thing it explains. */}
+            <div className={INLINE_HINT}>
+              A source feeds a collection. Edits sync one way — from the source in.
+            </div>
+          </>
         )}
       </div>
-      <div className={HINT}>A source feeds a collection. Edits sync one way — from the source in.</div>
     </div>
   );
 }
@@ -962,7 +973,9 @@ export function ConditionsView({
         ))}
         {conditions.length === 0 && !pickedElementId && (
           <div className={`${SUB} tw:p-3`}>
-            No conditions yet. A condition shows or hides an element based on data.
+            No conditions yet. A condition shows or hides an element based on data —
+            &ldquo;+ New condition&rdquo; starts by picking the element on the canvas it
+            controls.
           </div>
         )}
         {pickedElementId ? (
@@ -1020,9 +1033,7 @@ export function ConditionsView({
           </Button>
         )}
       </div>
-      {!pickedElementId && (
-        <div className={HINT}>"+ New condition" starts by picking the element on the canvas it controls.</div>
-      )}
+
     </div>
   );
 }
