@@ -790,6 +790,17 @@ export function VariablesView({
     <div className={CONTENT_BODY}>
       <Crumb label="Variables" onClick={onBack} />
       <div className={SCROLL}>
+        {/* Every other screen in this panel says what an empty list means —
+            "No data source connected", "No records yet". Variables said
+            nothing at all, so an empty Variables screen was one blue link on
+            white with no clue what a variable is for. */}
+        {variables.length === 0 && !adding && (
+          <div className={`${SUB} tw:p-3`}>
+            No variables yet. A variable is a value you write once and reuse —
+            <span className={MONO}>{" {{site.name}} "}</span>
+            in any text on any page.
+          </div>
+        )}
         {variables.map((v) => (
           <Row key={v.key} size="comment" data-variable-row>
             <span className={ROW_STACK}>
