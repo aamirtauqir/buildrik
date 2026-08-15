@@ -39,7 +39,11 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
-  }
+  
+  /* The dirty-modal pulse (board 183:16) is motion, not information —
+     the click still does not close the form. */
+  .bk-overlay-pulse { animation: none; }
+}
 
   /* Force-show overlay/feedback elements at full opacity. Universal rule above
    * kills transition-duration but element may be stuck at opacity:0 (animation

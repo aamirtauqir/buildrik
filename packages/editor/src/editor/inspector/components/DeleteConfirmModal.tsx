@@ -22,7 +22,10 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
 }) => (
   <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
     <ModalContent size="lg">
-      <ModalTitle>Delete Element</ModalTitle>
+      {/* Board 183:2: a destructive confirm NAMES what it will destroy, in
+          the title and on the button — "Delete 3 pages", never "Confirm" and
+          never a bare "Delete Element" that could be any of them. */}
+      <ModalTitle>Delete {elementLabel}?</ModalTitle>
       <ModalClose aria-label="Close modal">
         <svg
           width="20"
@@ -47,7 +50,10 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
         lineHeight: 1.5,
       }}
     >
-      Delete <strong>{elementLabel}</strong>? You can undo this with{" "}
+      {/* The board's sample says "This cannot be undone", which is not true
+          of this editor — a delete is one undo step. The code contract wins on
+          behaviour, so the sentence says what actually happens. */}
+      <strong>{elementLabel}</strong> is removed from the page. You can undo it with{" "}
       <Kbd style={{ fontFamily: "var(--bk-font-mono)", fontSize: "0.9em" }}>Ctrl+Z</Kbd>.
     </p>
     <div style={{ display: "flex", gap: "var(--bk-space-12)", justifyContent: "flex-end" }}>
@@ -77,7 +83,7 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
           fontWeight: 600,
         }}
       >
-        Delete
+        Delete {elementLabel}
       </Button>
     </div>
   </div>

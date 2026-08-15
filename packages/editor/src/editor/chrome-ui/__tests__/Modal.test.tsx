@@ -54,6 +54,27 @@ describe("Modal", () => {
     expect(document.activeElement).toBe(input);
   });
 
+  /* Board 183:16 — "losing a filled form to a stray click is the cheapest
+     possible way to lose trust". A dirty modal answers the scrim with a pulse
+     and stays where it is. */
+  it("a dirty modal survives a scrim click; a clean one still closes", () => {
+    const onClose = vi.fn();
+    const { rerender, container } = render(
+      <Modal open onClose={onClose} title="Page settings" dirty />,
+    );
+    const scrim = container.ownerDocument.querySelector<HTMLElement>(
+      '[role="dialog"]',
+    )!.parentElement!;
+    fireEvent.mouseDown(scrim);
+    expect(onClose).not.toHaveBeenCalled();
+
+    rerender(<Modal open onClose={onClose} title="Page settings" />);
+    fireEvent.mouseDown(
+      container.ownerDocument.querySelector<HTMLElement>('[role="dialog"]')!.parentElement!,
+    );
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
   it("renders nothing when closed", () => {
     render(<Modal open={false} onClose={() => {}} title="Hidden" />);
     expect(screen.queryByRole("dialog")).toBeNull();

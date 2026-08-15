@@ -43,16 +43,18 @@ export interface ModalRootProps {
   onClose?: () => void;
   children: React.ReactNode;
   dismissOnScrimClick?: boolean;
+  /** Board 183:16 — a form with unsaved input pulses instead of closing. */
+  dirty?: boolean;
 }
 
 /** Compound root: owns the portal, scrim and focus trap. */
-export function ModalRoot({ open, onOpenChange, onClose, children, dismissOnScrimClick }: ModalRootProps) {
+export function ModalRoot({ open, onOpenChange, onClose, children, dismissOnScrimClick, dirty }: ModalRootProps) {
   const close = React.useCallback(() => {
     onClose?.();
     onOpenChange?.(false);
   }, [onClose, onOpenChange]);
   return (
-    <OverlayMount open={open} onClose={close} dismissOnScrimClick={dismissOnScrimClick}>
+    <OverlayMount open={open} onClose={close} dismissOnScrimClick={dismissOnScrimClick} dirty={dirty}>
       <ModalCloseContext.Provider value={close}>{children}</ModalCloseContext.Provider>
     </OverlayMount>
   );

@@ -54,6 +54,19 @@
   transition: all 0.2s ease;
 }
 
+/* Board 183:16: a dirty form answers a scrim click by pulsing once, not by
+   closing. Named for the overlay so it cannot collide with a canvas or panel
+   animation (the DS SSOT gate locks duplicate keyframe names). */
+@keyframes bk-overlay-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.015); }
+}
+
+.bk-overlay-pulse {
+  display: flex;
+  animation: bk-overlay-pulse 320ms var(--bk-ease-default, ease-out);
+}
+
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
   25% { transform: translateX(-4px); }

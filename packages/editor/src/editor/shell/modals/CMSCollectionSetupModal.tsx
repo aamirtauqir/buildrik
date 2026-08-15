@@ -252,7 +252,18 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
   );
 
   return (
-    <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
+    /* Board 183:16 — a filled wizard does not close on a stray scrim click.
+       Anything typed counts: a name, a description, or a field renamed off
+       the default. */
+    <ModalRoot
+      open={isOpen}
+      onOpenChange={(next) => !next && onClose()}
+      dirty={
+        name.trim() !== "" ||
+        description.trim() !== "" ||
+        fields.some((f) => f.name !== "title")
+      }
+    >
       <ModalContent size="form">
         {/* Board 1170:4713's own title is the step, not the wizard. */}
         <ModalTitle>{step === 2 && name.trim() ? `Fields for ${name.trim()}` : "Create Collection"}</ModalTitle>

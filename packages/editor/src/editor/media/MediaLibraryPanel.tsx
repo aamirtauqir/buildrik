@@ -370,9 +370,12 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
       open={pendingDeleteId != null}
       onClose={() => setPendingDeleteId(null)}
       onConfirm={() => void confirmDeleteAsset()}
-      title="Delete file?"
-      message={`"${filteredAssets.find((a) => a.id === pendingDeleteId)?.name ?? "This file"}" will be permanently deleted. This cannot be undone.`}
-      confirmLabel="Delete"
+      /* Board 183:2: a destructive confirm names what it destroys, in the
+         title and on the button. "Delete" alone could be any of the three
+         destructive dialogs in this editor. */
+      title={`Delete "${filteredAssets.find((a) => a.id === pendingDeleteId)?.name ?? "this file"}"?`}
+      message="The file is removed from the library and from every page using it. This cannot be undone."
+      confirmLabel="Delete file"
       destructive
     />
         </ModalBody>

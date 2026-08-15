@@ -41,14 +41,16 @@ export interface ModalProps {
   children?: React.ReactNode;
   footer?: React.ReactNode;
   dismissOnScrimClick?: boolean;
+  /** Board 183:16 — a form with unsaved input pulses instead of closing. */
+  dirty?: boolean;
 }
 
 export function Modal({
-  open, onClose, title, subtitle, kind = "question", children, footer, dismissOnScrimClick,
+  open, onClose, title, subtitle, kind = "question", children, footer, dismissOnScrimClick, dirty,
 }: ModalProps) {
   const titleId = React.useId();
   return (
-    <OverlayMount open={open} onClose={onClose} labelledBy={titleId} dismissOnScrimClick={dismissOnScrimClick}>
+    <OverlayMount open={open} onClose={onClose} labelledBy={titleId} dismissOnScrimClick={dismissOnScrimClick} dirty={dirty}>
       <div className={[MODAL_FRAME_BASE_CLASS, KIND_WIDTH_CLASS[kind]].join(" ")}>
         <div className={MODAL_HEAD_CLASS}>
           <span className={MODAL_TITLE_CLASS} id={titleId}>
