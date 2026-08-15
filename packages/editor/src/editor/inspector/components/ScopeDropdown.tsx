@@ -34,9 +34,16 @@ interface ScopeDropdownProps {
   /** Board 189:2 — selecting Whole site switches the inspector into the
    *  site-wide banner state (site styles live in the Brand panel). */
   onWholeSite?: () => void;
+  /** Board 160:412 — the panel says what a reach beyond "this" just did. */
+  onAppliedToPeers?: (count: number) => void;
 }
 
-export function ScopeDropdown({ composer, selectedElement, onWholeSite }: ScopeDropdownProps) {
+export function ScopeDropdown({
+  composer,
+  selectedElement,
+  onWholeSite,
+  onAppliedToPeers,
+}: ScopeDropdownProps) {
   const [open, setOpen] = React.useState(false);
   const [confirming, setConfirming] = React.useState(false);
   const ref = React.useRef<HTMLDivElement>(null);
@@ -85,6 +92,7 @@ export function ScopeDropdown({ composer, selectedElement, onWholeSite }: ScopeD
     }
     setConfirming(false);
     setOpen(false);
+    onAppliedToPeers?.(peers.length);
   };
 
   const optionRow: React.CSSProperties = {

@@ -36,8 +36,10 @@ function makeElement(): MockElement {
 
 function makeHarness() {
   const elements = new Map<string, MockElement>();
+  const emit = vi.fn();
   const composer = {
     elements: { getElement: (id: string) => elements.get(id) },
+    emit,
   } as unknown as Composer & { data: DataManager };
   const data = new DataManager(composer);
   (composer as { data: DataManager }).data = data;
@@ -47,7 +49,7 @@ function makeHarness() {
     type: "object",
     data: { accent: "#2D6DFF", link: "https://a.example", title: "Hello" },
   });
-  return { composer, data, elements };
+  return { composer, data, elements, emit };
 }
 
 function variableBinding(path: string, fallback?: string): VariableBinding {

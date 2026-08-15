@@ -6,9 +6,10 @@
  * @license BSD-3-Clause
  */
 
-import { Crosshair, CornerLeftUp } from "lucide-react";
+import { Crosshair, CornerLeftUp, Link } from "lucide-react";
 import * as React from "react";
 import { getElementIcon } from "@/editor/shared/elementIcons";
+import { BindingBanner, useElementBinding } from "./components/BindingBanner";
 import { BindingPopover } from "./components/BindingPopover";
 import { BreakpointPill } from "./components/BreakpointPill";
 import { ScopeDropdown } from "./components/ScopeDropdown";
@@ -94,8 +95,14 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   // Board 189:2 — "Whole site" scope shows the site-wide banner instead of
   // per-element controls (site styles live in the Brand panel).
   const [wholeSite, setWholeSite] = React.useState(false);
+  // Board 160:412 draws a reach beyond this element as a state the panel is
+  // in. The engine applies it as one action instead — peers get this
+  // element's styles once, then everything is back to editing one thing — so
+  // the line says what happened rather than claiming a mode that is not there.
+  const [peersApplied, setPeersApplied] = React.useState<number | null>(null);
   React.useEffect(() => {
     setWholeSite(false); // scope resets with the selection
+    setPeersApplied(null);
   }, [selectedElement?.id]);
 
   // Board 160:512 — while the AI agent runs, the inspector hands over to a
@@ -170,6 +177,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
 
   const { selectedIds, isMultiSelect } = useComposerSelection({ composer: composer ?? null });
   const projectLoading = useProjectLoading(composer ?? null);
+  const boundLabel = useElementBinding(composer, selectedElement?.id ?? "");
 
   const [contextState, setContextState] = React.useState(() =>
     deriveCssContext(selectedElement, composer, devMode, styles_state, currentBreakpoint, currentPseudoState)
@@ -345,6 +353,18 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
             composer={composer ?? null}
             onOpenCreateCollection={onOpenCreateCollection}
           />
+          {/* Board 160:105 — the header carries the fact, not just the way in.
+              A bound element used to be indistinguishable from a loose one
+              until someone opened the link popover. */}
+          {boundLabel && (
+            <span
+              className="tw:inline-flex tw:items-center tw:gap-1 tw:rounded-[6px] tw:border tw:border-[var(--bk-accent)] tw:px-[6px] tw:py-[2px] tw:text-[11px] tw:text-[var(--bk-accent)]"
+              title={`Bound to ${boundLabel}`}
+              data-testid="inspector-bound-chip"
+            >
+              <Link size={10} aria-hidden="true" /> Bound
+            </span>
+          )}
           {onDelete && (
             <InspectorElementMenu
               composer={composer}
@@ -367,7 +387,12 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           state), three compact dropdowns on one line. S3.9: no tab strip — the
           body below is one flat scrolling column ordered per element profile. */}
       <div className="bdi-bpr">
-        <ScopeDropdown composer={composer} selectedElement={{ id: selectedElement.id, type: selectedElement.type }} onWholeSite={() => setWholeSite(true)} />
+        <ScopeDropdown
+          composer={composer}
+          selectedElement={{ id: selectedElement.id, type: selectedElement.type }}
+          onWholeSite={() => setWholeSite(true)}
+          onAppliedToPeers={setPeersApplied}
+        />
         <BreakpointPill
           current={currentBreakpoint}
           onChange={onBreakpointChange}
@@ -385,6 +410,23 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           selectedElementId={selectedElement?.id}
         />
       </div>
+      {peersApplied !== null && (
+        <p
+          className="tw:m-0 tw:border-l-2 tw:border-[var(--bk-warning)] tw:bg-[var(--bk-warning-tint)] tw:px-3 tw:py-1.5 tw:text-[12px] tw:text-[var(--bk-warning-text)]"
+          role="status"
+          data-testid="peers-applied"
+        >
+          Applied to {peersApplied} other {selectedElement.type}
+          {peersApplied === 1 ? "" : "s"} — ⌘Z takes it back.
+        </p>
+      )}
+      {/* Board 160:105 — a bound element says what it follows, above the
+          controls that no longer decide anything. */}
+      <BindingBanner
+        composer={composer}
+        elementId={selectedElement.id}
+        elementLabel={elementLabel}
+      />
       {/* Board 160:2 — an instance says so above its styles, not in a
           collapsed section under Animation. */}
       <VariantSection composer={composer ?? null} elementId={selectedElement.id ?? null} />

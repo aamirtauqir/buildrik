@@ -38,6 +38,7 @@
  * @license BSD-3-Clause
  */
 
+import { EVENTS } from "../../shared/constants/events";
 import type { DataBinding } from "../../shared/types/data";
 import type { Composer } from "../Composer";
 
@@ -92,6 +93,11 @@ export abstract class BaseBindingManager<T extends BindingWithData> {
     }
 
     this.bindings.set(elementId, elementBindings);
+    /* Binding an element changes what every text control in the inspector
+       means — it stops being a field you can type into. Surfaces that say so
+       need telling; before this, `BINDING_CREATED` and `BINDING_REMOVED` were
+       constants nothing ever emitted. */
+    this.composer.emit(EVENTS.BINDING_CREATED, { elementId, binding });
     void this.applyBinding(elementId, binding);
   }
 
@@ -109,6 +115,7 @@ export abstract class BaseBindingManager<T extends BindingWithData> {
     } else {
       this.bindings.set(elementId, filtered);
     }
+    this.composer.emit(EVENTS.BINDING_REMOVED, { elementId, key });
   }
 
   /**
@@ -116,6 +123,7 @@ export abstract class BaseBindingManager<T extends BindingWithData> {
    */
   unbindAll(elementId: string): void {
     this.bindings.delete(elementId);
+    this.composer.emit(EVENTS.BINDING_REMOVED, { elementId });
   }
 
   /**
