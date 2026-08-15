@@ -49,6 +49,8 @@ export interface CanvasFooterToolbarProps {
   onHelpClick?: () => void;
   /** Fit canvas to visible viewport */
   onFitToScreen?: () => void;
+  /** Board 817:4723 — fit the SELECTED element, not the page. */
+  onZoomToSelection?: () => void;
 
   // ── Edit + viewport controls (moved off the topbar) ──────────────────────
   /** Current device/breakpoint. When provided, the device switcher renders. */
@@ -207,8 +209,13 @@ const OverlayButton: React.FC<OverlayButtonProps> = ({
       aria-pressed={active}
       aria-label={label}
     >
+      {/* Icon only. The bar carries undo/redo, a device switcher, seven
+          toggles and the zoom group inside the canvas column's 760px, and
+          with labels it ran to ~840px — the overflow slid UNDER the inspector,
+          where the zoom control could not be clicked at all (elementFromPoint
+          returned the inspector aside). The name and its chord live in the
+          tooltip, which is where the board's own annotation puts them. */}
       <span className={active ? "tw:flex" : "tw:flex tw:opacity-70"}>{icon}</span>
-      <span>{label}</span>
       {active && <span className="tw:ml-0.5 tw:text-blue-700">✓</span>}
     </Button>
   </Tooltip>
@@ -225,6 +232,7 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
   onZoomChange,
   onHelpClick,
   onFitToScreen,
+  onZoomToSelection,
   device,
   onDeviceChange,
   canUndo,
@@ -254,6 +262,35 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
       if (!(e.metaKey || e.ctrlKey)) return;
 
       const key = e.key.toLowerCase();
+
+      /* Board 817:4723's own rows: fit, selection, 100%, in, out. Printed on
+         the flyout and bound nowhere until now. */
+      if (key === "1" && onFitToScreen) {
+        e.preventDefault();
+        onFitToScreen();
+        return;
+      }
+      if (key === "2" && onZoomToSelection) {
+        e.preventDefault();
+        onZoomToSelection();
+        return;
+      }
+      if (key === "0") {
+        e.preventDefault();
+        onZoomChange(100);
+        return;
+      }
+      if (key === "=" || key === "+") {
+        e.preventDefault();
+        onZoomChange(ZOOM_PRESETS.find((p) => p > zoom) ?? ZOOM_PRESETS[ZOOM_PRESETS.length - 1]);
+        return;
+      }
+      if (key === "-" || key === "_") {
+        e.preventDefault();
+        onZoomChange([...ZOOM_PRESETS].reverse().find((p) => p < zoom) ?? ZOOM_PRESETS[0]);
+        return;
+      }
+
       let overlay: keyof CanvasOverlayState | null = null;
       if (key === ";" || key === ":") overlay = e.shiftKey ? "spacing" : "guides";
       else if (key === "'" || key === '"') overlay = "grid";
@@ -266,7 +303,7 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [overlays, onOverlayChange]);
+  }, [overlays, onOverlayChange, onZoomChange, onFitToScreen, onZoomToSelection, zoom]);
 
   const [showPresets, setShowPresets] = React.useState(false);
   const presetsRef = React.useRef<HTMLDivElement>(null);
@@ -465,7 +502,21 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
                 className={`${PRESET_ROW} tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:bg-gray-100`}
               >
                 <span>Zoom to fit</span>
-                <span className={PRESET_KEY}>⌘0</span>
+                <span className={PRESET_KEY}>⌘1</span>
+              </Button>
+            )}
+            {onZoomToSelection && (
+              <Button
+                type="button"
+                color="light"
+                onClick={() => {
+                  onZoomToSelection();
+                  setShowPresets(false);
+                }}
+                className={`${PRESET_ROW} tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:bg-gray-100`}
+              >
+                <span>Zoom to selection</span>
+                <span className={PRESET_KEY}>⌘2</span>
               </Button>
             )}
             <Button
@@ -478,6 +529,7 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
               className={`${PRESET_ROW} tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:bg-gray-100`}
             >
               <span>Zoom to 100%</span>
+              <span className={PRESET_KEY}>⌘0</span>
             </Button>
             <div className={PRESET_DIVIDER} />
             {ZOOM_PRESETS.map((preset) => (

@@ -284,6 +284,31 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       composer.setZoom(Math.round(clamped * 100));
     }, [composer]);
 
+    /* Board 817:4723's second flyout row. Fit answers "show me the page";
+       this answers "show me the thing I am working on", which on a long page
+       is the question people actually have. Measured off the selected
+       element's own box, since that is the only thing that knows its size. */
+    const handleZoomToSelection = React.useCallback(() => {
+      const viewport = wrapperRef.current;
+      const id = composer?.selection?.getSelected?.()?.getId?.();
+      if (!viewport || !id || !composer) return;
+      const el = canvasRef.current?.querySelector(`[data-buildrick-id="${id}"]`);
+      if (!(el instanceof HTMLElement)) return;
+      const currentScale = (zoom || 100) / 100;
+      /* offsetWidth is post-transform-free; getBoundingClientRect is not, so
+         divide out the zoom already applied or the second press halves it. */
+      const rect = el.getBoundingClientRect();
+      const w = rect.width / currentScale;
+      const h = rect.height / currentScale;
+      if (!w || !h) return;
+      const vw = viewport.clientWidth - 64;
+      const vh = viewport.clientHeight - 64;
+      if (vw <= 0 || vh <= 0) return;
+      const scale = Math.min(vw / w, vh / h);
+      composer.setZoom(Math.round(Math.max(0.1, Math.min(4, scale)) * 100));
+      el.scrollIntoView({ block: "center", inline: "center" });
+    }, [composer, zoom]);
+
     React.useEffect(() => {
       if (!composer) return;
       const handler = () => handleFitToScreen();
@@ -662,6 +687,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
               onOverlayChange={onOverlayChange}
               onZoomChange={onZoomChange}
               onFitToScreen={handleFitToScreen}
+              onZoomToSelection={handleZoomToSelection}
               onHelpClick={openCheatSheet}
               device={device === "watch" ? "mobile" : device}
               onDeviceChange={onDeviceChange}
