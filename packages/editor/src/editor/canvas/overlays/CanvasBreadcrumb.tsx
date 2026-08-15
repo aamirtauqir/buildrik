@@ -7,6 +7,7 @@
 import * as React from "react";
 import { Z_LAYERS } from "@/shared/constants/canvas";
 import { Button } from "@/editor/chrome-ui";
+import { loadMapFromStorage } from "../../panels/layers/hooks/layersPersistence";
 import type { Composer } from "../../../engine";
 
 export interface CanvasBreadcrumbProps {
@@ -84,6 +85,14 @@ export const CanvasBreadcrumb: React.FC<CanvasBreadcrumbProps> = ({
       return;
     }
 
+    /* Board 1175:4849 labels a named element "Section · Hero" — the type says
+       what it is, the name says which one. Without the name every container
+       in a page of containers reads the same, which is exactly when a
+       breadcrumb is worth having. Names come from the Layers panel's store,
+       the same source the status bar reads. */
+    const pageId = composer.elements?.getActivePage?.()?.id ?? "";
+    const names = pageId ? loadMapFromStorage(pageId) : new Map<string, string>();
+
     const path: BreadcrumbSegmentData[] = [];
 
     // Build ancestor chain
@@ -93,9 +102,11 @@ export const CanvasBreadcrumb: React.FC<CanvasBreadcrumbProps> = ({
       const type =
         currentElement.getType?.() || currentElement.getTagName?.()?.toLowerCase() || "element";
       const currentId = currentElement.getId?.() || "";
+      const typeName = getElementName(type, currentElement.getTagName?.()?.toLowerCase());
+      const custom = names.get(currentId);
       path.unshift({
         id: currentId,
-        name: getElementName(type, currentElement.getTagName?.()?.toLowerCase()),
+        name: custom ? `${typeName} · ${custom}` : typeName,
         type,
         isCurrent: currentId === selectedId,
       });

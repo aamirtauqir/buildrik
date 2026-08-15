@@ -123,6 +123,19 @@ if (clickAt) {
   }
 }
 
+/* A pointer move with no click — hover states (the canvas's four hover levels,
+   badges, tooltips) are only reachable this way, and a click would select the
+   element instead, which is a different picture. `x,y+Alt` holds a modifier
+   down for the move, which is how the hierarchy and box-model levels work. */
+const hoverAt = arg("hover");
+if (hoverAt) {
+  const [coords, mod] = String(hoverAt).split("+");
+  const [hx, hy] = coords.split(",").map(Number);
+  if (mod) await page.keyboard.down(mod);
+  await page.mouse.move(hx, hy);
+  await page.waitForTimeout(Number(arg("hover-settle", 900)));
+}
+
 /* A real key press — some panels are only reachable by their shortcut, and a
    dispatched KeyboardEvent does not prove a user could get there. */
 const pressKey = arg("press");
