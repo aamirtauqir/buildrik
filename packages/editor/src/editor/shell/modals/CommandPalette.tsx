@@ -17,6 +17,10 @@ import { Button, TextInput } from "@/editor/chrome-ui";
 // TYPES
 // =============================================================================
 
+/** How many commands the opening list offers before the rest fall under their
+ *  own bands — board 166:2 shows a short "Suggested" head, not the catalogue. */
+const SUGGESTED_COUNT = 5;
+
 interface PaletteCommand {
   id: string;
   label: string;
@@ -100,6 +104,12 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
       label: "Delete element",
       group: "Edit",
       shortcut: "Del",
+      /* Board 166:58: "A command you cannot run is still worth seeing — hiding
+         it means the shortcut someone memorised silently vanishes." With
+         nothing selected this used to close the palette and do nothing at
+         all; now it says why it cannot run, like Undo already did. */
+      disabled: (composer.selection?.getSelectedIds?.() ?? []).length === 0,
+      disabledReason: "nothing selected",
       handler: () => {
         const ids = composer.selection?.getSelectedIds?.();
         if (ids && ids.length > 0) composer.elements.removeElement(ids[0]);
@@ -279,15 +289,27 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
     item?.scrollIntoView({ block: "nearest" });
   }, [selectedIndex]);
 
-  // Group display commands (recents first when present)
+  /* Boards 166:2 and 166:27 group by what a row DOES, not by which part of the
+     editor owns it: RECENT · SUGGESTED before you type, ACTIONS · GO TO once
+     you do. The internal groups (Navigation · Edit · View · History ·
+     Commands) are the palette's own taxonomy and mean nothing to the person
+     reading the list. */
+  const bandFor = React.useCallback((cmd: PaletteCommand, index: number): string => {
+    if (cmd.group === "Recent") return "Recent";
+    if (!query.trim()) return index < SUGGESTED_COUNT ? "Suggested" : cmd.group === "Navigation" ? "Go to" : "Actions";
+    return cmd.group === "Navigation" ? "Go to" : "Actions";
+  }, [query]);
+
   const grouped = React.useMemo(() => {
     const groups: Record<string, PaletteCommand[]> = {};
+    let nonRecent = 0;
     for (const cmd of displayCommands) {
-      if (!groups[cmd.group]) groups[cmd.group] = [];
-      groups[cmd.group].push(cmd);
+      const band = bandFor(cmd, cmd.group === "Recent" ? -1 : nonRecent++);
+      if (!groups[band]) groups[band] = [];
+      groups[band].push(cmd);
     }
     return groups;
-  }, [displayCommands]);
+  }, [displayCommands, bandFor]);
 
   const handleKeyDown = React.useCallback(
     (e: React.KeyboardEvent) => {
@@ -355,7 +377,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
           <TextInput
             ref={inputRef}
             type="text"
-            placeholder="Search commands..."
+            /* Board 166:2's own words — the palette does both. */
+            placeholder="Type a command or search…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}

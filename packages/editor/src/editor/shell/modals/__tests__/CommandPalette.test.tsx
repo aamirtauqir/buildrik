@@ -30,7 +30,7 @@ function renderPalette(composer: ReturnType<typeof makeComposer> | null = makeCo
 const commandButtons = () =>
   Array.from(document.querySelectorAll<HTMLButtonElement>("[data-idx]"));
 
-const searchInput = () => screen.getByPlaceholderText("Search commands...");
+const searchInput = () => screen.getByPlaceholderText("Type a command or search…");
 
 describe("CommandPalette", () => {
   beforeEach(() => {
@@ -57,12 +57,16 @@ describe("CommandPalette", () => {
     // tab with a shortcut — the `review` tab (P0) added one, so nav is 13).
     // Total with a composer: 24. If a command registry ever lands, this pin
     // should break and be replaced.
-    it("with a composer: exactly 24 commands in 4 hardcoded groups", () => {
+    /* Boards 166:2 / 166:27 band by what a row DOES — Recent · Suggested
+       before you type, Actions · Go to after — not by which internal group
+       owns it. The `group:` strings are still the filter's material; they are
+       no longer what the reader sees. */
+    it("with a composer: exactly 24 commands, banded the way the boards band them", () => {
       renderPalette();
       expect(commandButtons()).toHaveLength(24);
-      // Group section headers (hardcoded `group:` strings, not registry data).
-      for (const group of ["Navigation", "Edit", "View", "History"]) {
-        expect(screen.getByText(group)).toBeInTheDocument();
+      expect(screen.getByText("Suggested")).toBeInTheDocument();
+      for (const internal of ["Navigation", "Edit", "View", "History"]) {
+        expect(screen.queryByText(internal)).toBeNull();
       }
       // Representative hardcoded entries (id → label):
       // nav-add → "Open Insert panel", edit-undo → "Undo",
@@ -83,10 +87,9 @@ describe("CommandPalette", () => {
     it("without a composer: only the 13 navigation commands", () => {
       renderPalette(null);
       expect(commandButtons()).toHaveLength(13);
-      expect(screen.getByText("Navigation")).toBeInTheDocument();
-      expect(screen.queryByText("Edit")).toBeNull();
-      expect(screen.queryByText("View")).toBeNull();
-      expect(screen.queryByText("History")).toBeNull();
+      // All navigation, so past the suggested head every band is "Go to".
+      expect(screen.getByText("Go to")).toBeInTheDocument();
+      expect(screen.queryByText("Actions")).toBeNull();
     });
   });
 
@@ -254,7 +257,10 @@ describe("CommandPalette", () => {
       const composer = composerWithRegistry();
       render(<CommandPalette onClose={vi.fn()} composer={composer as unknown as Composer} />);
       expect(screen.getByText("Export HTML")).toBeInTheDocument();
-      expect(screen.getByText("Commands")).toBeInTheDocument(); // the registry group
+      /* A registry command is something you DO, so it bands under Actions —
+         "Commands" was the internal group name, which the boards do not use. */
+      expect(screen.getByText("Actions")).toBeInTheDocument();
+      expect(screen.queryByText("Commands")).toBeNull();
     });
 
     it("runs a registry command through the CommandCenter", () => {
@@ -323,6 +329,33 @@ describe("CommandPalette", () => {
       expect(row).toHaveAttribute("aria-disabled", "true");
       fireEvent.click(row);
       expect(composer.history.undo).not.toHaveBeenCalled();
+    });
+  });
+
+  /* Board 166:58 — a command you cannot run is still worth seeing, with the
+     reason beside it. "Delete element" used to look live with nothing
+     selected, close the palette, and do nothing. */
+  describe("disabled commands (board 166:58)", () => {
+    it("shows Delete element with its reason when nothing is selected", () => {
+      const composer = { ...makeComposer(), selection: { getSelectedIds: vi.fn(() => []) } };
+      render(<CommandPalette onClose={vi.fn()} composer={composer as unknown as Composer} />);
+      const row = screen.getByText("Delete element").closest("button")!;
+      /* aria-disabled, not `disabled`: the row stays reachable so the reason
+         can be read, and runCommand refuses it (board 166:58 — visible, not
+         runnable). */
+      expect(row).toHaveAttribute("aria-disabled", "true");
+      expect(row).toHaveTextContent("nothing selected");
+
+      fireEvent.click(row);
+      expect(composer.elements.removeElement).not.toHaveBeenCalled();
+    });
+
+    it("enables it once something is selected", () => {
+      // The shared composer double already has one element selected.
+      renderPalette();
+      expect(
+        screen.getByText("Delete element").closest("button"),
+      ).not.toHaveAttribute("aria-disabled");
     });
   });
 });
