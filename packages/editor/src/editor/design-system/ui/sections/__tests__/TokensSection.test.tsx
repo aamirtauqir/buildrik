@@ -82,7 +82,7 @@ describe("TokensSection — mode-driven token filter (carried over)", () => {
     expect(ids).toContain("color-surface");
     expect(ids).toContain("color-text-primary");
     expect(ids).toContain("color-feedback-error");
-    expect(ids).not.toContain("color-blue-500");
+    expect(ids).not.toContain("color-brand-500");
     expect(ids).not.toContain("color-primary");
     expect(ids).not.toContain("color-error");
   });
@@ -91,7 +91,7 @@ describe("TokensSection — mode-driven token filter (carried over)", () => {
     const { container } = render(wrap(<TokensSection openKind="color" />, "pro"));
     const ids = tokenIds(container);
     expect(ids).toContain("color-action");
-    expect(ids).toContain("color-blue-500");
+    expect(ids).toContain("color-brand-500");
     expect(ids).toContain("color-primary");
   });
 

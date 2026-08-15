@@ -23,7 +23,15 @@ const css = fs.readFileSync(
 const cssValues = {};
 for (const line of css.split("\n")) {
   const match = line.match(/^\s*(--buildrick-design-[a-z0-9-]+)\s*:\s*([^;]+);/);
-  if (match) cssValues[match[1]] = match[2].trim();
+  if (!match) continue;
+  // A retention alias — `--old: var(--new)` — has no DEFAULT_TOKENS entry by
+  // construction: the token it names was renamed, and the line exists so that
+  // elements saved before the rename still resolve. Comparing it against JS
+  // would report "(missing in JS)" forever, which is how a real drift check
+  // gets switched off. Skipped, not baselined. (First case: schema v5's
+  // color-blue-500 → color-brand-500, 2026-08-16.)
+  if (/^var\(/.test(match[2].trim())) continue;
+  cssValues[match[1]] = match[2].trim();
 }
 
 // Parse constants.ts DEFAULT_TOKENS. Each DesignToken object contains cssVar + value.

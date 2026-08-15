@@ -899,7 +899,7 @@ const COMMAND_PROMPT_SPECS: Array<{ id: EditCommand["commandId"] } & CommandProm
     id: "set-token",
     agentCallable: true,
     rule: () =>
-      `- set-token: {"commandId":"set-token","args":{"tokenId":"<id>","value":"<value>"}} — when asked to change a design/theme token (a brand color, a spacing step, a font). No elementId. "tokenId" MUST be one of the ids in the "Design tokens" list below — never invent one. "value" matches that token's type: a color (e.g. "#2D6DFF", "rgb(45,109,255)"), a length (e.g. "16px", "1.5rem"), a number, or a font family — plain values only, never url(), expression(), or markup. Prefer set-token over set-style when the request is about the theme/brand globally rather than one element.`,
+      `- set-token: {"commandId":"set-token","args":{"tokenId":"<id>","value":"<value>"}} — when asked to change a design/theme token (a brand color, a spacing step, a font). No elementId. "tokenId" MUST be one of the ids in the "Design tokens" list below — never invent one. "value" matches that token's type: a color (e.g. "#1A56DB", "rgb(26,86,219)"), a length (e.g. "16px", "1.5rem"), a number, or a font family — plain values only, never url(), expression(), or markup. Prefer set-token over set-style when the request is about the theme/brand globally rather than one element.`,
   },
 ];
 

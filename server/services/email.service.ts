@@ -93,9 +93,9 @@ export async function sendOAuthOnlyLoginEmail(to: string, providers: string[], t
   const html = `<div style="font-family:system-ui,sans-serif;max-width:480px;margin:0 auto;padding:24px">
     <h2 style="color:#0F172A;margin:0 0 8px">Your account uses ${providerText}</h2>
     <p style="color:#334155">You asked to reset your password, but this account was created with ${providerText} and doesn't have one yet. Sign in with the button on the login page and you're in.</p>
-    <p><a href="${BASE_URL}/auth" style="display:inline-block;background:#2D6DFF;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:600">Go to login</a></p>
+    <p><a href="${BASE_URL}/auth" style="display:inline-block;background:#1A56DB;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:600">Go to login</a></p>
     <p style="color:#334155;margin-top:20px">Prefer signing in with a password? You can set one:</p>
-    <p><a href="${setPasswordUrl}" style="color:#2D6DFF;font-weight:600">Set a password</a> <span style="color:#94A3B8">(link expires in 1 hour)</span></p>
+    <p><a href="${setPasswordUrl}" style="color:#1A56DB;font-weight:600">Set a password</a> <span style="color:#94A3B8">(link expires in 1 hour)</span></p>
     <p style="color:#64748B;font-size:13px;margin-top:16px">If you didn't request this, you can ignore this email — nothing changes.</p>
   </div>`;
   await sendEmail(to, "Signing in to Buildrick", html);
@@ -111,7 +111,7 @@ export async function sendNewDeviceAlertEmail(to: string) {
     <h2 style="color:#0F172A;margin:0 0 8px">New sign-in to your Buildrick account</h2>
     <p style="color:#334155">We noticed a sign-in from a device or location we don't recognize. If this was you, no action is needed.</p>
     <p style="color:#334155">If this wasn't you, secure your account now:</p>
-    <p><a href="${BASE_URL}/auth/forgot-password" style="display:inline-block;background:#2D6DFF;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:600">Secure my account</a></p>
+    <p><a href="${BASE_URL}/auth/forgot-password" style="display:inline-block;background:#1A56DB;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:600">Secure my account</a></p>
     <p style="color:#64748B;font-size:13px;margin-top:16px">Review this alert at ${BASE_URL}/auth/device-alert</p>
   </div>`;
   await sendEmail(to, "New sign-in to your Buildrick account", html);

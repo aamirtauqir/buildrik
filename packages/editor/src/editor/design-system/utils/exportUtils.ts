@@ -29,14 +29,16 @@ interface AliasEntry {
 }
 
 const ALIAS_RETENTION: AliasEntry[] = [
-  // DS V1 is baseline — no renames yet.
-  // Example future entry:
-  // {
-  //   oldName: "--buildrick-design-color-primary",
-  //   newName: "--buildrick-design-color-brand-primary",
-  //   deprecatedIn: 2,
-  //   removeIn: 4,
-  // },
+  // Schema v5 (2026-08-16) renamed the brand primitive. A site published
+  // before the rename has `var(--buildrick-design-color-blue-500)` baked into
+  // its CSS; without this line the next export drops the variable it reads and
+  // every element using it falls back to the browser's initial value.
+  {
+    oldName: "--buildrick-design-color-blue-500",
+    newName: "--buildrick-design-color-brand-500",
+    deprecatedIn: 5,
+    removeIn: 7,
+  },
 ];
 
 /**

@@ -22,7 +22,7 @@ export const DEFAULT_TOKENS: DesignToken[] = [
   {
     id: "color-primary",
     name: "Primary",
-    value: "#3B82F6",
+    value: "#1A56DB",
     category: "colors",
     cssVar: "--buildrick-design-color-primary",
     type: "color",
@@ -113,11 +113,16 @@ export const DEFAULT_TOKENS: DesignToken[] = [
   // surfaces only the 4 semantics; Pro reveals primitives. Mirrors v4
   // migration in migrations/index.ts — keep both in sync.
   {
-    id: "color-blue-500",
-    name: "Blue 500",
-    value: "#2D6DFF",
+    /* Was `color-blue-500` / "Blue 500" / #2D6DFF until 2026-08-16. The name
+       was false — #2D6DFF is blue-500 in no ramp (#3B82F6 is) — and the value
+       disagreed with `color-primary` in this same seed, so a new site shipped
+       two different brand blues at once. Renamed and set to the product
+       accent; schema v5 carries the rename for existing token sets. */
+    id: "color-brand-500",
+    name: "Brand 500",
+    value: "#1A56DB",
     category: "colors",
-    cssVar: "--buildrick-design-color-blue-500",
+    cssVar: "--buildrick-design-color-brand-500",
     type: "color",
     group: "primitive",
   },
@@ -151,13 +156,13 @@ export const DEFAULT_TOKENS: DesignToken[] = [
   {
     id: "color-action",
     name: "Action",
-    value: "#2D6DFF",
+    value: "#1A56DB",
     category: "colors",
     cssVar: "--buildrick-design-color-action",
     type: "color",
     group: "semantic",
     semanticKind: "action",
-    aliasOf: "color-blue-500",
+    aliasOf: "color-brand-500",
   },
   {
     id: "color-surface",

@@ -3,8 +3,8 @@ import { migrateDesignTokens, CURRENT_SCHEMA_VERSION } from "../index";
 import type { DesignToken } from "../../types";
 
 describe("migrateDesignTokens", () => {
-  it("CURRENT_SCHEMA_VERSION is 4 after B5-wire seed (semantic color aliases added 2026-05-17, on top of B1 v3)", () => {
-    expect(CURRENT_SCHEMA_VERSION).toBe(4);
+  it("CURRENT_SCHEMA_VERSION is 5 after the brand-blue rename (2026-08-16, on top of the B5-wire v4 seed)", () => {
+    expect(CURRENT_SCHEMA_VERSION).toBe(5);
   });
 
   it("v3 → v4 injects 4 primitive + 4 semantic color tokens into stored projects when absent", () => {
@@ -22,7 +22,7 @@ describe("migrateDesignTokens", () => {
     // Existing token preserved.
     expect(after.find((t) => t.id === "color-primary")).toBeDefined();
     // 4 new primitives added.
-    for (const id of ["color-blue-500", "color-slate-50", "color-slate-700", "color-red-500"]) {
+    for (const id of ["color-brand-500", "color-slate-50", "color-slate-700", "color-red-500"]) {
       const t = after.find((x) => x.id === id);
       expect(t, `missing primitive ${id}`).toBeDefined();
       expect(t?.semanticKind).toBeUndefined();
@@ -30,7 +30,7 @@ describe("migrateDesignTokens", () => {
     }
     // 4 new semantics added, each with aliasOf + semanticKind set.
     const semantics: Array<[string, string, string]> = [
-      ["color-action", "color-blue-500", "action"],
+      ["color-action", "color-brand-500", "action"],
       ["color-surface", "color-slate-50", "surface"],
       ["color-text-primary", "color-slate-700", "text"],
       ["color-feedback-error", "color-red-500", "feedback"],

@@ -33,17 +33,31 @@ import type { DesignToken } from "../types";
  *                   entries are never clobbered. Unblocks Beginner-mode
  *                   filtering (B5 lock) — without this seed, fresh installs
  *                   see an empty Tokens tab.
+ *
+ * v5 (2026-08-16) — brand-blue reconciliation. Renames `color-blue-500` to
+ *                   `color-brand-500` (its old name was false: #2D6DFF is
+ *                   blue-500 in no ramp) and repoints anything aliased to it.
+ *                   VALUES ARE NOT TOUCHED — an existing site keeps whatever
+ *                   colour it is already published with; only the id, name and
+ *                   cssVar move, and `generateCompatibilityShim` keeps the old
+ *                   CSS variable resolving for two versions. Fresh seeds get
+ *                   #1A56DB from V4_SEEDS above, which is id-gated, so this
+ *                   migration and that seed can never both fire on one token.
  */
-export const CURRENT_SCHEMA_VERSION = 4;
+export const CURRENT_SCHEMA_VERSION = 5;
+
+/** The v5 rename, named once so the migration and its tests cannot drift. */
+const OLD_BRAND_PRIMITIVE_ID = "color-blue-500";
+const BRAND_PRIMITIVE_ID = "color-brand-500";
 
 const V4_SEEDS: DesignToken[] = [
   // Primitives (Pro-only).
   {
-    id: "color-blue-500",
-    name: "Blue 500",
-    value: "#2D6DFF",
+    id: "color-brand-500",
+    name: "Brand 500",
+    value: "#1A56DB",
     category: "colors",
-    cssVar: "--buildrick-design-color-blue-500",
+    cssVar: "--buildrick-design-color-brand-500",
     type: "color",
     group: "primitive",
   },
@@ -79,13 +93,13 @@ const V4_SEEDS: DesignToken[] = [
   {
     id: "color-action",
     name: "Action",
-    value: "#2D6DFF",
+    value: "#1A56DB",
     category: "colors",
     cssVar: "--buildrick-design-color-action",
     type: "color",
     group: "semantic",
     semanticKind: "action",
-    aliasOf: "color-blue-500",
+    aliasOf: "color-brand-500",
   },
   {
     id: "color-surface",
@@ -144,6 +158,30 @@ const MIGRATIONS: Record<number, (tokens: DesignToken[]) => DesignToken[]> = {
     const existingIds = new Set(tokens.map((t) => t.id));
     const additions = V4_SEEDS.filter((t) => !existingIds.has(t.id));
     return additions.length === 0 ? tokens : [...tokens, ...additions];
+  },
+  // v4 → v5: rename color-blue-500 → color-brand-500 in place, and repoint
+  // every alias that pointed at it. In place rather than the replacedBy bridge
+  // because a bridge leaves BOTH ids in the list and the Tokens screen would
+  // show the user two primitives where they have one. The old CSS variable
+  // keeps resolving on published sites via ALIAS_RETENTION in exportUtils.
+  //
+  // `value` is deliberately carried across untouched: a site already published
+  // with #2D6DFF stays that colour until its owner changes it. Only new seeds
+  // get #1A56DB.
+  5: (tokens) => {
+    if (!tokens.some((t) => t.id === OLD_BRAND_PRIMITIVE_ID || t.aliasOf === OLD_BRAND_PRIMITIVE_ID)) {
+      return tokens;
+    }
+    return tokens.map((t) => {
+      const next = { ...t };
+      if (next.id === OLD_BRAND_PRIMITIVE_ID) {
+        next.id = BRAND_PRIMITIVE_ID;
+        next.name = "Brand 500";
+        next.cssVar = "--buildrick-design-color-brand-500";
+      }
+      if (next.aliasOf === OLD_BRAND_PRIMITIVE_ID) next.aliasOf = BRAND_PRIMITIVE_ID;
+      return next;
+    });
   },
 };
 

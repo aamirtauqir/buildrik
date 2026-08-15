@@ -126,7 +126,9 @@ interface StarterCardProps {
 }
 
 function StarterCard({ starter, selected, onSelect }: StarterCardProps) {
-  const primary = starter.tokens.find((t) => t.id === "color-primary")?.value ?? "#2D6DFF";
+  // Fallback swatch for a starter with no color-primary. Was the retired
+  // cobalt; the seed's own brand blue is the only honest stand-in.
+  const primary = starter.tokens.find((t) => t.id === "color-primary")?.value ?? "#1A56DB";
   const background = starter.tokens.find((t) => t.id === "color-background")?.value ?? "#fff";
   const text = starter.tokens.find((t) => t.id === "color-text")?.value ?? "#0f172a";
 

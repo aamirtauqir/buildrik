@@ -10,7 +10,7 @@
 
 :root {
   /* COLORS (9 — user-editable) */
-  --buildrick-design-color-primary: #3B82F6;
+  --buildrick-design-color-primary: #1A56DB;
   --buildrick-design-color-secondary: #64748B;
   --buildrick-design-color-accent: #22C55E;
   --buildrick-design-color-background: #F8FAFC;
@@ -23,14 +23,24 @@
   /* COLORS — v4 migration (4 primitives + 4 semantic aliases, added via
    * projectMigrations/0002. Synced to CSS 2026-05-18 to satisfy baseline
    * parity check against DEFAULT_TOKENS in constants.ts). */
-  --buildrick-design-color-blue-500: #2D6DFF;
+  --buildrick-design-color-brand-500: #1A56DB;
   --buildrick-design-color-slate-50: #F8FAFC;
   --buildrick-design-color-slate-700: #334155;
   --buildrick-design-color-red-500: #EF4444;
-  --buildrick-design-color-action: #2D6DFF;
+  --buildrick-design-color-action: #1A56DB;
   --buildrick-design-color-surface: #F8FAFC;
   --buildrick-design-color-text-primary: #334155;
   --buildrick-design-color-feedback-error: #EF4444;
+
+  /* Schema v5 (2026-08-16) renamed the brand primitive and settled the seed on
+   * one blue: primary, the primitive and action were #3B82F6 / #2D6DFF /
+   * #2D6DFF, so a new site shipped two brand blues and the primitive's name
+   * ("Blue 500") described neither. The old variable stays declared as an
+   * alias — an element saved before the rename still asks for it by name, and
+   * without this line it would fall back to the browser's initial value.
+   * Matches ALIAS_RETENTION in design-system/utils/exportUtils.ts; drop both
+   * together at schema v7. */
+  --buildrick-design-color-blue-500: var(--buildrick-design-color-brand-500);
 
   /* TYPOGRAPHY (11 — user-editable) */
   --buildrick-design-font-heading: "Inter Tight";
