@@ -4,9 +4,27 @@ import type { RunStep, RunPhase } from "./hooks/useAgentRunner";
 import { Button, Checkbox } from "@/editor/chrome-ui";
 
 /**
- * P4 agent run surface: the ordered plan with per-step status, and on the step
- * awaiting approval, the proposed diff + Approve / Skip / Stop controls. Reuses
- * DiffRows (the same diff surface as single-element edits).
+ * The agent run — boards 170:41 (planning), 170:70 (running), 170:97
+ * (step-gate), 171:67 (done), 171:36 (stopped), 171:2 (step-failed).
+ *
+ * Board shape: a band that names the run's state and position ("RUNNING · 2 OF
+ * 3", "PAUSED AT STEP 3", "DONE · 3 OF 3"), the steps as numbered rows whose
+ * glyph carries their status, Stop under them, and — when the run pauses — an
+ * amber panel saying what is about to happen with Skip and Approve.
+ *
+ * Two places where the boards' words are not used, because they are not true
+ * of this code:
+ *  - Board 171:67 ends with "Apply lands as ONE undo step — ⌘Z takes back all
+ *    three." Each approved step applies in its own transaction
+ *    (`applySetStyle` opens one per edit), so a three-step run is three undo
+ *    entries. The line here says that instead. The idle state's version of the
+ *    promise IS true, because a chat edit is a single apply.
+ *  - Board 170:97's footnote ends "…the line between an assistant and
+ *    something that edits a client's site unattended", which the auto-apply
+ *    checkbox below contradicts. The first half is kept, and the contradiction
+ *    is named in the ledger for the founder rather than settled here.
+ *
+ * @license BSD-3-Clause
  */
 export interface AgentPlanProps {
   phase: RunPhase;
@@ -20,15 +38,43 @@ export interface AgentPlanProps {
   onStop: () => void;
 }
 
-const STATUS_LABEL: Record<RunStep["status"], string> = {
-  pending: "·",
-  running: "…",
-  awaiting: "review",
-  applied: "✓ applied",
+/** Board glyphs: done, in flight, waiting. Never colour alone — every row also
+ *  carries its number and, when it is not simply pending, a word. */
+const STEP_GLYPH: Record<RunStep["status"], string> = {
+  pending: "○",
+  running: "●",
+  awaiting: "●",
+  applied: "✓",
+  skipped: "–",
+  nochange: "–",
+  failed: "✕",
+};
+
+const STEP_WORD: Partial<Record<RunStep["status"], string>> = {
   skipped: "skipped",
   nochange: "no change",
   failed: "failed",
 };
+
+const STEP_COLOR: Record<RunStep["status"], string> = {
+  pending: "var(--bk-ink-disabled)",
+  running: "var(--bk-accent)",
+  awaiting: "var(--bk-accent)",
+  applied: "var(--bk-success)",
+  skipped: "var(--bk-ink-muted)",
+  nochange: "var(--bk-ink-muted)",
+  failed: "var(--bk-error)",
+};
+
+function bandLabel(phase: RunPhase, steps: RunStep[], currentIndex: number): string {
+  const total = steps.length;
+  const doneCount = steps.filter((s) => s.status === "applied").length;
+  if (phase === "planning") return "Planning";
+  if (steps[currentIndex]?.status === "awaiting") return `Paused at step ${currentIndex + 1}`;
+  if (phase === "running") return `Running · ${Math.min(currentIndex + 1, total)} of ${total}`;
+  if (phase === "done") return `Done · ${doneCount} of ${total}`;
+  return "";
+}
 
 export const AgentPlan: React.FC<AgentPlanProps> = ({
   phase,
@@ -52,6 +98,7 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
       <span>Auto-apply steps (skip per-step approval)</span>
     </label>
   );
+
   if (phase === "idle") {
     return (
       <div className="bd-ai-agent-empty">
@@ -61,61 +108,89 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
       </div>
     );
   }
-  if (phase === "planning") {
-    return <div className="bd-ai-agent-planning">Planning the steps…</div>;
-  }
+
+  const gateStep = steps[currentIndex]?.status === "awaiting" ? steps[currentIndex] : null;
+  const appliedCount = steps.filter((s) => s.status === "applied").length;
+  const skippedCount = steps.filter((s) => s.status === "skipped").length;
+
   return (
     <div className="bd-ai-agent">
-      {phase === "running" && (
-        <div className="bd-ai-agent-bar">
-          <span className="bd-ai-agent-progress">
-            Step {Math.min(currentIndex + 1, steps.length)} of {steps.length}
-          </span>
-          <Button type="button" color="light" aria-label="Stop run" onClick={onStop} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
-            Stop
-          </Button>
-        </div>
-      )}
+      <div className="bd-ai-agent-band">{bandLabel(phase, steps, currentIndex)}</div>
+
       <ol className="bd-ai-agent-steps">
         {steps.map((s, i) => (
           <li
             key={`${i}-${s.plan.title}`}
-            className={`bd-ai-agent-step bd-ai-agent-step-${s.status}${i === currentIndex ? " bd-ai-agent-step-current" : ""}`}
+            className={`bd-ai-agent-step bd-ai-agent-step-${s.status}`}
+            data-step-status={s.status}
           >
-            <div className="bd-ai-agent-step-head">
-              <span className="bd-ai-agent-step-title">{s.plan.title}</span>
-              <span className="bd-ai-agent-step-status">{STATUS_LABEL[s.status]}</span>
-            </div>
-            {s.status === "awaiting" && s.edit ? (
-              <div className="bd-ai-agent-step-review">
-                <DiffRows edit={{ ...s.edit, state: "pending" }} />
-                <div className="bd-ai-agent-step-actions">
-                  <Button type="button" color="light" aria-label="Skip step" onClick={onSkip} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
-                    Skip
-                  </Button>
-                  <Button type="button" aria-label="Apply step" onClick={onApprove}>
-                    Apply
-                  </Button>
-                </div>
-              </div>
+            <span className="bd-ai-agent-step-glyph" style={{ color: STEP_COLOR[s.status] }} aria-hidden="true">
+              {STEP_GLYPH[s.status]}
+            </span>
+            <span className="bd-ai-agent-step-index">{i + 1}</span>
+            <span className="bd-ai-agent-step-title">{s.plan.title}</span>
+            {STEP_WORD[s.status] ? (
+              <span className="bd-ai-agent-step-status">{STEP_WORD[s.status]}</span>
             ) : null}
           </li>
         ))}
       </ol>
+
+      {(phase === "running" || phase === "planning") && (
+        <Button
+          type="button"
+          color="light"
+          className="bd-ai-agent-stop"
+          aria-label="Stop run"
+          onClick={onStop}
+        >
+          Stop
+        </Button>
+      )}
+
+      {/* Board 170:97 — the run stops and says what it is about to do. */}
+      {gateStep ? (
+        <div className="bd-ai-agent-gate" role="alertdialog" aria-label="Step needs approval">
+          <p className="bd-ai-agent-gate__title">
+            Step {currentIndex + 1}: {gateStep.plan.title}
+          </p>
+          <p className="bd-ai-agent-gate__body">
+            {gateStep.plan.instruction} Approve it, or skip it and keep the rest.
+          </p>
+          {gateStep.edit ? <DiffRows edit={{ ...gateStep.edit, state: "pending" }} /> : null}
+          <div className="bd-ai-agent-gate__actions">
+            <Button type="button" color="light" aria-label="Skip step" onClick={onSkip}>
+              Skip
+            </Button>
+            <Button type="button" aria-label="Apply step" onClick={onApprove}>
+              Approve
+            </Button>
+          </div>
+          <p className="bd-ai-agent-foot">The run waits rather than guessing.</p>
+        </div>
+      ) : null}
+
       {error ? (
         <p className="bd-ai-agent-error" role="alert">
           {error}
         </p>
       ) : null}
+
       {phase === "done" && !error ? (
-        <p className="bd-ai-agent-done">
-          Run complete — {steps.filter((s) => s.status === "applied").length} applied
-          {steps.some((s) => s.status === "skipped")
-            ? `, ${steps.filter((s) => s.status === "skipped").length} skipped`
-            : ""}
-          .
-        </p>
+        <div className="bd-ai-agent-result">
+          <p className="bd-ai-agent-result__head">
+            {appliedCount} change{appliedCount === 1 ? "" : "s"} applied
+            {skippedCount > 0 ? `, ${skippedCount} skipped` : ""}.
+          </p>
+          <p className="bd-ai-agent-foot">
+            {appliedCount > 1
+              ? `Each step is its own undo step — ⌘Z takes back the last of the ${appliedCount}.`
+              : "⌘Z takes it back."}
+          </p>
+        </div>
       ) : null}
+
+      {phase !== "done" ? autoApplyToggle : null}
     </div>
   );
 };

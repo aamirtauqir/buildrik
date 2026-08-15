@@ -215,77 +215,120 @@
   background: var(--bk-accent);
   border-color: var(--bk-accent);
 }
+/* Boards 170:41 · 170:70 · 170:97 · 171:67 — the run reads as a band naming
+   where it is, numbered step rows, and (when it pauses) an amber panel. The
+   steps used to be bordered cards with a text status on the right. */
 .bd-ai-agent,
 .bd-ai-agent-empty,
 .bd-ai-agent-planning {
   flex: 1;
   overflow-y: auto;
-  padding: var(--bk-space-12);
   font: var(--bk-text-12) var(--bk-font-ui);
   color: var(--bk-ink-soft);
 }
-.bd-ai-agent-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--bk-space-8);
+.bd-ai-agent-empty,
+.bd-ai-agent-planning {
+  padding: var(--bk-space-12) var(--bk-space-16);
 }
-.bd-ai-agent-progress {
-  font: 500 var(--bk-text-11) var(--bk-font-mono);
+.bd-ai-agent-band {
+  padding: var(--bk-space-8) var(--bk-space-16);
+  background: var(--bk-bg-subtle);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
   color: var(--bk-ink-muted);
 }
 .bd-ai-agent-steps {
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: var(--bk-space-8) 0;
+  display: flex;
+  flex-direction: column;
+}
+.bd-ai-agent-step {
+  display: flex;
+  align-items: baseline;
+  gap: var(--bk-space-8);
+  padding: var(--bk-space-4) var(--bk-space-16);
+  font-size: 13px;
+  color: var(--bk-ink);
+}
+.bd-ai-agent-step-glyph {
+  width: 12px;
+  flex: none;
+  text-align: center;
+}
+.bd-ai-agent-step-index {
+  min-width: 10px;
+  color: var(--bk-ink-muted);
+}
+.bd-ai-agent-step-title {
+  flex: 1;
+}
+.bd-ai-agent-step-status {
+  font-size: 11px;
+  color: var(--bk-ink-muted);
+}
+.bd-ai-agent-stop {
+  margin: var(--bk-space-4) var(--bk-space-16) var(--bk-space-12);
+  align-self: flex-start;
+}
+.bd-ai-agent-gate {
   display: flex;
   flex-direction: column;
   gap: var(--bk-space-8);
+  padding: var(--bk-space-12) var(--bk-space-16);
+  background: var(--bk-warning-tint);
 }
-.bd-ai-agent-step {
-  padding: var(--bk-space-8);
-  border: 1px solid var(--bk-border);
-  border-radius: var(--bk-radius-sm);
-  background: var(--bk-bg-card);
+.bd-ai-agent-gate__title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--bk-warning-text);
 }
-.bd-ai-agent-step-current {
-  border-color: var(--bk-accent);
+.bd-ai-agent-gate__body {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--bk-ink-muted);
 }
-.bd-ai-agent-step-head {
+.bd-ai-agent-gate__actions {
   display: flex;
-  align-items: center;
   justify-content: space-between;
   gap: var(--bk-space-8);
 }
-.bd-ai-agent-step-title {
-  color: var(--bk-ink);
-}
-.bd-ai-agent-step-status {
-  font: 500 var(--bk-text-11) var(--bk-font-mono);
+.bd-ai-agent-foot {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
   color: var(--bk-ink-muted);
 }
-.bd-ai-agent-step-applied .bd-ai-agent-step-status { color: var(--bk-accent); }
-.bd-ai-agent-step-failed .bd-ai-agent-step-status { color: var(--bk-error); }
-.bd-ai-agent-step-review {
-  margin-top: var(--bk-space-8);
+.bd-ai-agent-error {
+  padding: var(--bk-space-8) var(--bk-space-16);
+  color: var(--bk-error);
 }
-.bd-ai-agent-step-actions {
+.bd-ai-agent-result {
   display: flex;
-  justify-content: flex-end;
-  gap: var(--bk-space-8);
-  margin-top: var(--bk-space-8);
+  flex-direction: column;
+  gap: var(--bk-space-4);
+  margin: var(--bk-space-8) var(--bk-space-16);
+  padding: var(--bk-space-12);
+  background: var(--bk-success-tint);
+  border-radius: var(--bk-radius-sm);
 }
-.bd-ai-agent-error { color: var(--bk-error); }
-.bd-ai-agent-done {
-  margin-top: var(--bk-space-8);
-  color: var(--bk-ink-muted);
+.bd-ai-agent-result__head {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--bk-success-text);
 }
 
 .bd-ai-agent-autoapply {
   display: flex;
   align-items: center;
   gap: var(--bk-space-4);
-  margin-bottom: var(--bk-space-8);
+  padding: var(--bk-space-8) var(--bk-space-16);
   font: 500 var(--bk-text-11) var(--bk-font-ui);
   color: var(--bk-ink-muted);
   cursor: pointer;
