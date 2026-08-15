@@ -1,68 +1,88 @@
 /**
- * CommentRow — Figma 17:40 (Author: internal | client).
+ * CommentRow — Review panel boards 156:2, 157:2, 157:109.
  *
- * Client comments carry a tint because who said it changes what you do about
- * it. The author is also written out, so the distinction survives greyscale and
- * colour-blindness.
+ * The comment IS the row: it is quoted at full size, and everything about it
+ * — who said it, which page, how long ago — sits under it in one muted line.
+ * The previous row led with an avatar and the author's name and put the
+ * comment second, so a panel of client feedback read as a list of people.
+ *
+ * A status dot carries open vs resolved. It is never the only carrier: the
+ * meta line names the author and their kind in words, so the row survives
+ * greyscale and colour-blindness.
  *
  * @license BSD-3-Clause
  */
 import React from "react";
 import { Row, type RowProps, ROW_META_CLASS } from "./Row";
-import { Avatar } from "flowbite-react";
-import { avatarInitials, AVATAR_TONE_THEME } from "./avatarTone";
 
 export interface CommentRowProps extends Omit<RowProps, "children" | "size"> {
   author: string;
   authorKind?: "internal" | "client";
   body: string;
+  /** The tail of the board's meta line — "Home · 2d". */
   meta?: string;
   resolved?: boolean;
-  /** Per-comment controls (Resolve, Reattach). They sit under the body rather
-   *  than beside the meta so a long thread keeps one action column. */
+  /** Board 157:2: `was on: "Book a table" — element deleted`. */
+  detachedNote?: string;
+  /** Per-comment controls (Resolve, Reattach), under the meta line. */
   actions?: React.ReactNode;
 }
 
+const DOT = "tw:mt-1.5 tw:size-2 tw:flex-none tw:rounded-full";
+
 export function CommentRow({
-  author, authorKind = "internal", body, meta, resolved, actions, className, style, ...rest
+  author,
+  authorKind = "internal",
+  body,
+  meta,
+  resolved,
+  detachedNote,
+  actions,
+  className,
+  style,
+  ...rest
 }: CommentRowProps) {
   return (
     <Row
       size="comment"
       interactive
-      /* gap/border-bottom/background all override a Row BASE utility of the
-       * same specificity (tw:gap-2, tw:border-0, tw:bg-transparent) — see
-       * VersionRow's comment on why `style` (already part of Row's untouched
-       * HTMLAttributes contract) is the only deterministic override channel
-       * for that, unlike the old CSS's guaranteed source-order win. */
+      /* Row's BASE utilities (tw:gap-2, tw:border-0, tw:items-center) are the
+       * same specificity as any className override, so the geometry that has
+       * to win goes through `style` — the VersionRow precedent. */
       style={{
-        gap: "var(--bk-space-12)",
+        gap: "var(--bk-space-8)",
+        alignItems: "flex-start",
         borderBottom: "1px solid var(--bk-border)",
-        ...(authorKind === "client" ? { background: "var(--bk-warning-tint)" } : {}),
         ...style,
       }}
       className={className}
       {...rest}
     >
-      <Avatar
-        rounded
-        size="xs"
-        alt=""
-        placeholderInitials={avatarInitials(author)}
-        theme={AVATAR_TONE_THEME.neutral}
-        role="img"
-        aria-label={author}
-        title={author}
+      <span
+        aria-hidden="true"
+        className={DOT}
+        style={{ background: resolved ? "var(--bk-success)" : "var(--bk-warning)" }}
       />
       <span className="tw:flex-1 tw:flex tw:flex-col tw:gap-1 tw:min-w-0">
-        <span className="tw:font-medium tw:text-xs">
-          {author}
-          {authorKind === "client" ? " · Client" : ""}
+        <span className="tw:text-[14px] tw:leading-5 tw:text-[var(--bk-ink)]">
+          {"“"}
+          {body}
+          {"”"}
         </span>
-        <span className="tw:text-gray-600">{body}</span>
-        {actions ? <span className="tw:flex tw:items-center tw:gap-2 tw:pt-1">{actions}</span> : null}
+        {detachedNote ? (
+          <span className="tw:text-[12px] tw:leading-4 tw:text-[var(--bk-warning-text)]">
+            {detachedNote}
+          </span>
+        ) : null}
+        <span className={ROW_META_CLASS}>
+          {author} · {authorKind === "client" ? "client" : "you"}
+          {meta ? ` · ${meta}` : ""}
+          {resolved ? " · resolved" : ""}
+        </span>
+        {actions ? (
+          <span className="tw:flex tw:items-center tw:gap-2 tw:pt-1">{actions}</span>
+        ) : null}
       </span>
-      {meta ? <span className={ROW_META_CLASS}>{resolved ? `${meta} · Resolved` : meta}</span> : null}
     </Row>
   );
 }

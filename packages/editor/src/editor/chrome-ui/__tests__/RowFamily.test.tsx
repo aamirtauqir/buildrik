@@ -127,8 +127,23 @@ describe("IntegrationRow", () => {
 });
 
 describe("CommentRow", () => {
-  it("names the client rather than relying on the tint", () => {
+  /* The status dot is never the only carrier: boards 156:2 / 157:109 put the
+     author, their kind and the age in one meta line under the comment. The
+     casing follows the boards ("Sara · client · Home · 2d"). */
+  it("names the client in words, not by a dot or a tint", () => {
+    render(
+      <CommentRow author="Hina Raza" authorKind="client" body="Move the hero up" meta="Home · 2d" />,
+    );
+    expect(screen.getByText(/Hina Raza · client · Home · 2d/)).toBeTruthy();
+  });
+
+  it("quotes the comment — it is the row's headline, not its footnote", () => {
     render(<CommentRow author="Hina Raza" authorKind="client" body="Move the hero up" />);
-    expect(screen.getByText(/Hina Raza · Client/)).toBeTruthy();
+    expect(screen.getByText(/“Move the hero up”/)).toBeTruthy();
+  });
+
+  it("says 'resolved' in the meta line as well as colouring the dot", () => {
+    render(<CommentRow author="Ali" body="footer link dead" resolved meta="Home · 3d" />);
+    expect(screen.getByText(/· resolved$/)).toBeTruthy();
   });
 });

@@ -1652,6 +1652,25 @@ breadcrumb bar, 1176:4824 inline-edit toolbar, 1176:4925 hover levels). The
 shell board shows them in situ; their own boards own them, and rebuilding from
 the in-situ drawing would pre-empt four boards with one.
 
+**Board 200:213 (Review active) draws a surface that does not exist.** Under
+the topbar, full width, tinted: **3 open · Next › · Compare** on the left,
+**Re-send** on the right — so anyone editing a site that is out for review sees
+the state and can move through it without opening a panel. In the code all four
+affordances live INSIDE the review panel (`ReviewTab`), and there is no shell
+bar at all. Not built here: it is the Review panel family's own surface (13
+boards, next in the Phase 1 order), and it cannot be walked live from the
+standalone demo — an open review round comes from the dashboard. First item of
+that walk.
+
+**Boards 200:2 (Comment mode) and 66:225 (AI agent run) — walked, nothing
+broken at shell level.** Comment mode works end to end live: the topbar toggle
+lights, a canvas click drops a pin and opens the composer ("Leave a comment…",
+Cancel · Post). The board's numbered pins (1 · 2 · 3) are existing comments,
+which the Review/comments boards own. 66:225 replaces the inspector column with
+an AI run panel (back · "AI" · "Still working on: Hero" · a step list with
+done/running dots); live reaches AI through the inspector header's ✦ AI chip.
+The AI family owns that panel — 11 boards.
+
 **Board 65:211 (Preview) — walked, three deltas handed to the Preview family
 (7 boards), which owns that surface.** Live preview does the main thing right:
 all chrome drops away, the topbar stays, and a Done button sits at the bottom.
@@ -1669,6 +1688,75 @@ its own boards in the S1 flow family — S1.1 · coach-dismissed, S1.1b (→
 Templates drawer), S1.1c (→ Insert drawer) — which own its copy, its dismissal
 and what each route opens. Building it here would mean building S1.1 blind to
 those three.
+
+**Shell states — walked out.** 11 of 13 boards walked live at 1440×900: First
+run, Returning, Element selected, Multi-select, Comment mode, Preview, Review
+active, AI agent run, Offline, Loading, Drawer closed. Six defects fixed
+(thirteenth through nineteenth finds). Two remain untouched for stated reasons:
+66:640 (Saving → conflict) needs `AquibraStudio.tsx`, which is the founder's
+working tree, and Shell state 13 (Presence) is marked design-ahead on the board
+itself. Four deltas were handed to the families that own those surfaces rather
+than guessed at from an in-situ drawing — Inspector (22), Canvas (7), Preview
+(7), Review panel (13).
+
+## Phase 1 — family 4: Review panel, started 2026-08-15
+
+**How it is walked at all.** The panel's states only exist when the dashboard
+has a live review round, so nine of the thirteen boards were unreachable from
+the standalone editor. `scripts/conformance/review-fixture.mjs` answers the
+editor's own tRPC calls with a fixture round and lets everything else behave
+normally — `--case open · empty · all-resolved · revoked · older-round ·
+review-closed · load-error · loading`. Two traps are baked into it: the
+responses need CORS headers (the dashboard is another origin, and a fulfilled
+response without them is blocked, which reads exactly like the load failure you
+are hunting), and the client runs superjson, so every payload is `{json: …}`.
+
+A third trap produced a false find worth recording: answering the procedures I
+had not fixtured with `null` crashed the whole editor on
+`reviewStatus.state`. That is not a defect — `reviews.status` has four early
+returns and every one of them is an object, so the server cannot produce it.
+The fixture now answers every procedure in the shape the server would.
+
+**The panel was rebuilt to the boards.** What it showed before: a status badge,
+an open-count chip, a Re-send button and an overflow menu in one row, a "Show
+resolved" toggle, avatar-led rows with the comment as a subtitle, and page
+groups labelled with the raw page id. None of that is on any board, and the
+last one is a defect on any real site — a group header reads
+"PAGE-CMFX3K9Q0001" the moment page ids are generated rather than typed.
+
+The frame every board shares now: progress bar with **resolved of total**, the
+sent line ("Sent 2d ago · Sara"), the thread, then a fixed foot — the round
+line, Compare, and ONE primary button whose label is the state ("Re-send for
+review" · "Sending round 3…" · "Send a new link" · "Try again"). Bodies per
+board: quoted comments grouped under page NAMES (resolved through the engine),
+a collapsed RESOLVED count, the detached band, "…has not commented yet.",
+"Everything is resolved." with the next round named, and the revoked notice.
+Both confirms became inline panels, as drawn: revoke at the top (in red, with
+the round's revision so a re-send that landed first cannot be revoked by a
+stale click), re-send at the foot — where it **replaces** the primary button,
+because two live re-send affordances at once is how a client's link gets
+invalidated by the wrong click.
+
+Walked live at 1440×900: open, empty, all-resolved, revoked, load-error,
+loading, revoke-confirm, re-send-confirm.
+
+Three deviations, deliberate and stated in the file:
+- **No ‹ › round pager.** The board draws one; nothing can serve it.
+  `comments.list` is site-scoped and `reviews.list` is workspace-admin-scoped,
+  so no endpoint returns an older round's comments. Arrows that cannot move
+  are the dead-control defect this arc keeps deleting.
+- **"Compare with approved", not "Compare with v3".** Nothing in the panel
+  knows a version number; the board's "v3" is sample data.
+- **The reply composer stays**, though no board draws one. `postReply` is live
+  and internal replies are a shipped capability — the same reasoning that kept
+  the offline treatment when board 66:441 turned out to be a placeholder.
+
+Left for the founder: **board 158:213 (review-closed) documents an absence** —
+when a round closes, the panel and its rail icon are supposed to disappear,
+leaving a toast ("Review closed — Sara approved v3"). Building that means the
+shell removing a tab on review status, and the Review tab's rail presence is
+already gated on the open `agency_layer` decision (1.3). It is one decision,
+not two implementations.
 
 ## Named for the founder — needs a decision or a file I must not stage
 

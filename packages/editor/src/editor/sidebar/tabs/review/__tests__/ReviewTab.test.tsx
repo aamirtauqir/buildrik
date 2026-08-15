@@ -1,8 +1,16 @@
 /**
- * ReviewTab (P0) — the editor-side review panel. Verifies the load states
- * (loading → list, never-sent, error+retry that is NOT fake-empty, empty),
- * the thread labels (client vs internal), and the actions: reply, resolve,
- * re-send (primary), and revoke (behind an overflow + confirm, race-safe).
+ * ReviewTab — the panel's own 13 boards.
+ *
+ * Rewritten with the rebuild. The previous suite asserted a "Show resolved"
+ * toggle, an overflow menu holding Revoke, and a bare "Re-send" button: that
+ * was the pre-board panel, and a test protecting removed design is how
+ * "No pages yet" survived for months (PageList.test.tsx:55).
+ *
+ * What it protects now: the frame every board shares (progress "N of M", the
+ * sent line, the round line, Compare, one primary button whose label is the
+ * state), the bodies that differ per board, and the behaviours the boards
+ * imply — the re-send confirm REPLACING the primary, the revoke confirm being
+ * inline and race-safe, resolve reaching the canvas.
  */
 import * as React from "react";
 import { render, screen, fireEvent, waitFor, cleanup, within } from "@testing-library/react";
@@ -20,6 +28,7 @@ vi.mock("../../../../../services/ReviewService", () => ({
   postReply: (...a: unknown[]) => postReply(...a),
   resolveReviewComment: (...a: unknown[]) => resolveReviewComment(...a),
   revokeReview: (...a: unknown[]) => revokeReview(...a),
+  fetchApprovedSnapshot: vi.fn(),
 }));
 
 import { ReviewTab } from "../ReviewTab";
@@ -31,21 +40,20 @@ const ROUND = {
   reviewerName: "Sara Khan",
   revoked: false,
   resolvedAt: null,
-  createdAt: "2026-07-20T10:00:00Z",
+  createdAt: new Date(Date.now() - 2 * 86_400_000).toISOString(),
   revision: "2026-07-21T09:00:00.000Z",
   roundNumber: 2,
-  totalRounds: 2,
+  totalRounds: 3,
   openCommentCount: 1,
 };
 const COMMENTS = [
-  { id: "c1", body: "hero photo is too dark", pageId: "home", x: 0.5, y: 0.2, status: "OPEN", authorKind: "client", authorName: "Sara Khan", createdAt: "2026-07-20T11:00:00Z" },
-  { id: "c2", body: "on it, swapping the image", pageId: "home", x: null, y: null, status: "OPEN", authorKind: "internal", authorName: null, createdAt: "2026-07-20T12:00:00Z" },
+  { id: "c1", body: "hero photo is too dark", pageId: "page-home", x: 0.5, y: 0.2, targetSelector: null, status: "OPEN", authorKind: "client", authorName: "Sara Khan", createdAt: new Date(Date.now() - 2 * 86_400_000).toISOString() },
+  { id: "c2", body: "on it, swapping the image", pageId: "page-home", x: null, y: null, targetSelector: null, status: "OPEN", authorKind: "internal", authorName: null, createdAt: new Date(Date.now() - 86_400_000).toISOString() },
+  { id: "c3", body: "menu prices wrong", pageId: "page-menu", x: null, y: null, targetSelector: null, status: "RESOLVED", authorKind: "client", authorName: "Sara Khan", createdAt: new Date(Date.now() - 3 * 86_400_000).toISOString() },
 ];
 
 function renderTab(props = {}) {
-  return render(
-    <ReviewTab onResend={vi.fn(() => Promise.resolve())} {...props} />,
-  );
+  return render(<ReviewTab onResend={vi.fn(() => Promise.resolve())} {...props} />);
 }
 
 beforeEach(() => {
@@ -58,16 +66,45 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 
-describe("load states", () => {
-  it("loads the round + thread, labelling client vs internal", async () => {
+describe("the frame every board shares", () => {
+  it("counts resolved of total, and says who it went to and when", async () => {
     renderTab();
-    expect(await screen.findByText("hero photo is too dark")).toBeInTheDocument();
-    expect(screen.getByText("on it, swapping the image")).toBeInTheDocument();
-    // client comment names the client; internal one reads as "You"
-    expect(screen.getByText(/Sara Khan/)).toBeInTheDocument();
-    expect(screen.getByText(/You/)).toBeInTheDocument();
-    // round header
-    expect(screen.getByText(/Round 2 of 2/)).toBeInTheDocument();
+    expect(await screen.findByText("1 of 3")).toBeInTheDocument();
+    expect(screen.getByText("Sent 2d ago · Sara Khan")).toBeInTheDocument();
+    expect(screen.getByText("Round 2 of 3")).toBeInTheDocument();
+  });
+
+  /* The round line is deliberately arrow-less: no endpoint returns an older
+     round's comments, and a chevron that cannot move is a dead control. */
+  it("has no round pager", async () => {
+    renderTab();
+    await screen.findByText("Round 2 of 3");
+    expect(screen.queryByRole("button", { name: /previous round|next round/i })).not.toBeInTheDocument();
+  });
+});
+
+describe("load states", () => {
+  it("quotes each comment and groups it under its page", async () => {
+    renderTab();
+    expect(await screen.findByText(/hero photo is too dark/)).toBeInTheDocument();
+    expect(screen.getByText(/on it, swapping the image/)).toBeInTheDocument();
+    // Board 156:2 marks where the open thread starts.
+    expect(screen.getByText(/^Open · /)).toBeInTheDocument();
+  });
+
+  /* Board 156:2 labels the group with the page's NAME. Without a composer
+     there is nothing to resolve the id against, so the id is the fallback —
+     but with one, an id must never reach the screen. */
+  it("labels a group with the page name, not the page id", async () => {
+    const composer = {
+      on: vi.fn(),
+      off: vi.fn(),
+      emit: vi.fn(),
+      elements: { getAllPages: () => [{ id: "page-home", name: "Home" }] },
+    };
+    renderTab({ composer });
+    expect(await screen.findByText("Open · Home")).toBeInTheDocument();
+    expect(screen.queryByText(/page-home/)).not.toBeInTheDocument();
   });
 
   it("shows a never-sent state when there is no round", async () => {
@@ -77,41 +114,68 @@ describe("load states", () => {
     expect(await screen.findByText(/hasn't been sent for review/i)).toBeInTheDocument();
   });
 
-  it("shows error+retry (NOT fake-empty) when the load fails, and retries", async () => {
+  /* Board 453:3974 — the failure is stated in red and the reassurance under
+     it; it is NEVER the empty state (DF5, fake-empty). */
+  it("shows the load failure and a Try again, not an empty thread", async () => {
     fetchCurrentRound.mockRejectedValueOnce(new Error("network"));
     fetchReviewComments.mockRejectedValueOnce(new Error("network"));
     renderTab();
-    expect(await screen.findByText(/couldn't load/i)).toBeInTheDocument();
-    // it must NOT render the empty "no feedback" copy on a failed load
-    expect(screen.queryByText(/no feedback yet/i)).not.toBeInTheDocument();
+    expect(await screen.findByText("Couldn't load this review round.")).toBeInTheDocument();
+    expect(screen.getByText(/Your work is safe/)).toBeInTheDocument();
+    expect(screen.queryByText(/has not commented yet/i)).not.toBeInTheDocument();
+
     fetchCurrentRound.mockResolvedValue(ROUND);
     fetchReviewComments.mockResolvedValue(COMMENTS);
-    fireEvent.click(screen.getByRole("button", { name: /retry/i }));
-    expect(await screen.findByText("hero photo is too dark")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /try again/i }));
+    expect(await screen.findByText(/hero photo is too dark/)).toBeInTheDocument();
   });
 
-  it("shows an empty state when the round exists but has no comments", async () => {
+  it("board 157:221 — sent, nothing back yet", async () => {
     fetchReviewComments.mockResolvedValue([]);
     renderTab();
-    expect(await screen.findByText(/no feedback yet/i)).toBeInTheDocument();
+    expect(await screen.findByText("Sara Khan has not commented yet.")).toBeInTheDocument();
+    expect(screen.getByText("You will be notified.")).toBeInTheDocument();
+  });
+
+  it("board 157:58 — everything resolved names the next round", async () => {
+    fetchReviewComments.mockResolvedValue([{ ...COMMENTS[2] }]);
+    renderTab();
+    expect(await screen.findByText("Everything is resolved.")).toBeInTheDocument();
+    expect(screen.getByText("1 of 1 — ready to send round 3.")).toBeInTheDocument();
+  });
+
+  it("board 158:162 — a revoked link keeps the comments and offers a new link", async () => {
+    fetchCurrentRound.mockResolvedValue({ ...ROUND, revoked: true });
+    renderTab();
+    expect(await screen.findByText("This review link was revoked.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Send a new link" })).toBeInTheDocument();
+    // Revoking twice is not a thing.
+    expect(screen.queryByRole("button", { name: "Revoke link" })).not.toBeInTheDocument();
+  });
+
+  it("resolved comments are collapsed behind a count until asked for", async () => {
+    renderTab();
+    await screen.findByText(/hero photo is too dark/);
+    expect(screen.queryByText(/menu prices wrong/)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /resolved/i }));
+    expect(await screen.findByText(/menu prices wrong/)).toBeInTheDocument();
   });
 });
 
 describe("actions", () => {
   it("posts an internal reply then reloads the thread", async () => {
     renderTab();
-    await screen.findByText("hero photo is too dark");
+    await screen.findByText(/hero photo is too dark/);
     fireEvent.change(screen.getByPlaceholderText(/reply/i), { target: { value: "fixed the contrast" } });
     fireEvent.click(screen.getByRole("button", { name: /^send$/i }));
-    await waitFor(() => expect(postReply).toHaveBeenCalledWith("fixed the contrast", "home"));
-    // reloaded (comments fetched again after the reply)
+    await waitFor(() => expect(postReply).toHaveBeenCalledWith("fixed the contrast", "page-home"));
     await waitFor(() => expect(fetchReviewComments.mock.calls.length).toBeGreaterThan(1));
   });
 
   it("resolves a comment", async () => {
     renderTab();
-    await screen.findByText("hero photo is too dark");
-    const row = screen.getByText("hero photo is too dark").closest("[data-comment-row]") as HTMLElement;
+    await screen.findByText(/hero photo is too dark/);
+    const row = screen.getByText(/hero photo is too dark/).closest("[data-comment-row]") as HTMLElement;
     fireEvent.click(within(row).getByRole("button", { name: /resolve/i }));
     await waitFor(() => expect(resolveReviewComment).toHaveBeenCalledWith("c1", "RESOLVED"));
   });
@@ -122,55 +186,81 @@ describe("actions", () => {
   it("tells the canvas to refetch its pins after a resolve", async () => {
     const composer = { on: vi.fn(), off: vi.fn(), emit: vi.fn() };
     renderTab({ composer });
-    await screen.findByText("hero photo is too dark");
-    const row = screen.getByText("hero photo is too dark").closest("[data-comment-row]") as HTMLElement;
+    await screen.findByText(/hero photo is too dark/);
+    const row = screen.getByText(/hero photo is too dark/).closest("[data-comment-row]") as HTMLElement;
     fireEvent.click(within(row).getByRole("button", { name: /resolve/i }));
-    await waitFor(() =>
-      expect(composer.emit).toHaveBeenCalledWith("comments:refresh", {}),
-    );
+    await waitFor(() => expect(composer.emit).toHaveBeenCalledWith("comments:refresh", {}));
   });
 
-  it("re-send is the primary action and calls onResend", async () => {
+  /* Board 158:2. Two live re-send affordances at once is how a client's link
+     gets invalidated by the wrong click, so the confirm REPLACES the button. */
+  it("re-sending with open comments asks first, and the confirm replaces the primary", async () => {
     const onResend = vi.fn(() => Promise.resolve());
     renderTab({ onResend });
-    await screen.findByText("hero photo is too dark");
-    fireEvent.click(screen.getByRole("button", { name: /re-send/i }));
+    await screen.findByText(/hero photo is too dark/);
+    fireEvent.click(screen.getByRole("button", { name: "Re-send for review" }));
+
+    expect(screen.getByText(/2 comments are still open\. Re-send anyway\?/)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Re-send for review" })).not.toBeInTheDocument();
+    expect(onResend).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: "Re-send" }));
     await waitFor(() => expect(onResend).toHaveBeenCalled());
   });
 
-  it("revoke is behind an overflow and a confirm, and passes the revision", async () => {
+  /* Board 158:57 — while it is in flight the button says which round is being
+     sent, and cannot be pressed again. */
+  it("names the round it is sending while the re-send is in flight", async () => {
+    fetchReviewComments.mockResolvedValue([COMMENTS[2]]);
+    let release!: () => void;
+    const onResend = vi.fn(() => new Promise<void>((r) => (release = r)));
+    renderTab({ onResend });
+    await screen.findByText("Everything is resolved.");
+    fireEvent.click(screen.getByRole("button", { name: "Re-send for review" }));
+
+    const btn = await screen.findByRole("button", { name: "Sending round 3…" });
+    expect(btn).toBeDisabled();
+    release();
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Re-send for review" })).toBeEnabled(),
+    );
+  });
+
+  it("a clean round re-sends without a confirm", async () => {
+    fetchReviewComments.mockResolvedValue([COMMENTS[2]]);
+    const onResend = vi.fn(() => Promise.resolve());
+    renderTab({ onResend });
+    await screen.findByText("Everything is resolved.");
+    fireEvent.click(screen.getByRole("button", { name: "Re-send for review" }));
+    await waitFor(() => expect(onResend).toHaveBeenCalled());
+  });
+
+  /* Board 158:105 — the revoke confirm is an inline panel at the top of the
+     panel, not a modal, and it carries the revision so a re-send that landed
+     first cannot be revoked by a stale click. */
+  it("revoke asks inline and passes the revision", async () => {
     renderTab();
-    await screen.findByText("hero photo is too dark");
-    // revoke is NOT directly visible — it lives behind the More overflow.
-    // It is a chrome-ui MenuItem, so its role is "menuitem", not "button":
-    // querying for a button here would pass vacuously whether or not the item
-    // rendered.
-    expect(screen.queryByRole("menuitem", { name: /^revoke/i })).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: /more|options/i }));
-    fireEvent.click(screen.getByRole("menuitem", { name: /^revoke/i }));
-    // confirm dialog
-    fireEvent.click(screen.getByRole("button", { name: /revoke link/i }));
+    await screen.findByText(/hero photo is too dark/);
+    expect(screen.queryByText("Revoke this review link?")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Revoke link" }));
+    expect(screen.getByText("Revoke this review link?")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Revoke" }));
     await waitFor(() => expect(revokeReview).toHaveBeenCalledWith("r1", "2026-07-21T09:00:00.000Z"));
   });
 
-  /* The harness supplies onResend by default, which is exactly why nothing here
-     ever caught that the SHELL did not: the test was more capable than the app.
-     ReviewTab renders Re-send unconditionally and doResend opens with
-     `if (!onResend) return;`, so a missing path made the button live, clickable
-     and silent. It is now disabled with the reason attached. */
-  it("disables Re-send when no re-send path was supplied, instead of clicking into nothing", async () => {
-    fetchCurrentRound.mockResolvedValue(ROUND);
+  /* The harness supplies onResend by default, which is exactly why nothing
+     here ever caught that the SHELL did not. */
+  it("disables the primary when no re-send path was supplied", async () => {
     fetchReviewComments.mockResolvedValue([]);
     renderTab({ onResend: undefined });
-    const btn = await screen.findByRole("button", { name: "Re-send" });
+    const btn = await screen.findByRole("button", { name: "Re-send for review" });
     expect(btn).toBeDisabled();
     expect(btn).toHaveAttribute("title", "Re-send isn't available here");
   });
 
-  it("enables Re-send once a path is supplied", async () => {
-    fetchCurrentRound.mockResolvedValue(ROUND);
+  it("enables the primary once a path is supplied", async () => {
     fetchReviewComments.mockResolvedValue([]);
     renderTab();
-    expect(await screen.findByRole("button", { name: "Re-send" })).toBeEnabled();
+    expect(await screen.findByRole("button", { name: "Re-send for review" })).toBeEnabled();
   });
 });
