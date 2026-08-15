@@ -158,8 +158,11 @@ function StarterCard({ starter, selected, onSelect }: StarterCardProps) {
           fontSize: 12,
           fontWeight: 600,
         }}
+        aria-hidden="true"
       >
-        {starter.name}
+        {/* Board 152:137 names a starter once, under its swatch. The name sat
+            in the swatch AND under it, so every card said it twice — and the
+            copy inside a gradient was the least readable of the two. */}
       </div>
       <div style={{ padding: 10 }}>
         <div style={{ fontSize: 13, fontWeight: 600, color: "var(--bk-ink)" }}>
