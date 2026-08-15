@@ -1,12 +1,19 @@
 /**
- * Display Controls - Display mode selection with visual previews
+ * Display Controls — board 32:2's Display row.
+ *
+ * One labelled row of glyph buttons, the same 88px label column every other
+ * row uses. It used to be a 3x2 grid of 42px labelled cards under a "Display
+ * Mode" caption with its own help tooltip — about 250px of panel for a
+ * property that is one row on every board that draws it, and it pushed
+ * Spacing and Typography below the fold on a 900px screen.
+ *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { HelpTooltip, Button } from "@/editor/chrome-ui";
+import { Button } from "@/editor/chrome-ui";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
-import { CLUSTER_CAPTION, TIP_BOX, cardBtnClass } from "./classes";
+import { cardBtnClass } from "./classes";
 import { DisplayPreview } from "./previews";
 // ============================================================================
 // TYPES
@@ -40,38 +47,27 @@ export const DisplayControls: React.FC<DisplayControlsProps> = ({ display, onCha
   const isFlex = display === "flex" || display === "inline-flex";
 
   return (
-    <>
-      {/* Section label with help tooltip */}
-      <div className={`${CLUSTER_CAPTION} tw:mb-2`}>
+    <div className="bdi-row-ctrl">
+      <label className="bdi-lb">
         {mixedKeys?.has("display") && <MixedValueBadge compact />}
-        Display Mode
-        <HelpTooltip
-          content="Controls how this element flows in the layout. Block takes full width, Flex enables flexible alignment, Grid creates 2D layouts."
-          position="right"
-        />
-      </div>
-      {/* Display mode buttons */}
-      <div className="tw:grid tw:grid-cols-3 tw:gap-1 tw:mb-3">
+        Display
+      </label>
+      <div className="tw:grid tw:grid-cols-6 tw:gap-[2px]" role="group" aria-label="Display">
         {DISPLAY_OPTIONS.map((option) => (
           <Button
             key={option.value}
             size="xs"
-            className={`${cardBtnClass(display === option.value)} tw:min-h-[42px]`}
+            className={`${cardBtnClass(display === option.value)} tw:min-h-6 tw:min-w-0 tw:px-0 tw:py-1`}
             onClick={() => onChange("display", option.value)}
-            title={option.tooltip}
+            title={`${option.label} — ${option.tooltip}`}
+            aria-label={option.label}
+            aria-pressed={display === option.value}
           >
             <DisplayPreview type={option.value} />
-            <span>{option.label}</span>
           </Button>
         ))}
       </div>
-      {/* Tip for Flex/Grid */}
-      {(isFlex || isGrid) && (
-        <div className={TIP_BOX}>
-          {isFlex ? "See Flexbox section for flex controls" : "See Grid controls below"}
-        </div>
-      )}
-    </>
+    </div>
   );
 };
 

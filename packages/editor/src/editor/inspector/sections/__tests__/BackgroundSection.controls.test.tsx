@@ -47,14 +47,14 @@ describe("BackgroundSection — bg type segmentation", () => {
 describe("BackgroundSection — color writes", () => {
   it("typing a hex into the color input writes background-color", () => {
     const { onChange } = renderBg();
-    const hexInput = screen.getByRole("textbox", { name: "Color value" });
+    const hexInput = screen.getByRole("textbox", { name: "Fill value" });
     fireEvent.change(hexInput, { target: { value: "ff0000" } });
     expect(onChange).toHaveBeenCalledWith("background-color", "#ff0000");
   });
 
   it("shows the current background-color hex (without #) in the input", () => {
     renderBg({ styles: { "background-color": "#00ff00" } });
-    expect(screen.getByRole("textbox", { name: "Color value" })).toHaveValue("00ff00");
+    expect(screen.getByRole("textbox", { name: "Fill value" })).toHaveValue("00ff00");
   });
 });
 

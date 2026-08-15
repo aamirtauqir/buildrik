@@ -33,8 +33,9 @@ describe("LayoutSection — collapsed preview", () => {
 });
 
 describe("LayoutSection — advanced disclosure", () => {
-  it("hides Overflow / Visibility groups until advancedExpanded", () => {
+  it("hides Position / Overflow / Visibility groups until advancedExpanded", () => {
     renderLayout({ onAdvancedToggle: vi.fn() });
+    expect(screen.queryByText("Position")).not.toBeInTheDocument();
     expect(screen.queryByText("Overflow")).not.toBeInTheDocument();
     expect(screen.queryByText("Visibility & Float")).not.toBeInTheDocument();
   });
@@ -48,7 +49,7 @@ describe("LayoutSection — advanced disclosure", () => {
   it("renders the toggle only when onAdvancedToggle is supplied and fires it", () => {
     const onAdvancedToggle = vi.fn();
     renderLayout({ onAdvancedToggle });
-    const toggle = screen.getByRole("button", { name: "Overflow & Visibility" });
+    const toggle = screen.getByRole("button", { name: "Position, overflow & visibility" });
     fireEvent.click(toggle);
     expect(onAdvancedToggle).toHaveBeenCalled();
   });
@@ -56,7 +57,7 @@ describe("LayoutSection — advanced disclosure", () => {
   it("omits the toggle entirely when onAdvancedToggle is absent", () => {
     renderLayout();
     expect(
-      screen.queryByRole("button", { name: "Overflow & Visibility" })
+      screen.queryByRole("button", { name: "Position, overflow & visibility" })
     ).not.toBeInTheDocument();
   });
 });

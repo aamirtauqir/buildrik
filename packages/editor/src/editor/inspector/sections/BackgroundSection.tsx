@@ -9,11 +9,6 @@ import { Section, ColorInput, SelectRow, InputRow, MoreSettingsToggle, type Sect
 import { Button, TextInput } from "@/editor/chrome-ui";
 
 const FIELD_LABEL = "tw:text-xs tw:font-medium tw:text-gray-500";
-/** Gradient preset tile — the fill IS the preview, so it is a real gradient. */
-const GRADIENT_SWATCH =
-  "tw:flex-1 tw:px-3 tw:py-5 tw:rounded-md tw:border tw:border-[var(--bk-border-medium)] " +
-  "tw:text-xs tw:text-white";
-
 export interface BackgroundSectionProps {
   styles: Record<string, string>;
   onChange: (property: string, value: string) => void;
@@ -119,7 +114,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
         <div className="tw:relative">
           <MixedValueIndicator prop="background-color" mixedKeys={mixedKeys} />
           <ColorInput
-            label="Color"
+            label="Fill"
             value={styles["background-color"] || ""}
             onChange={(v) => onChange("background-color", v)}
           />
@@ -128,28 +123,45 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
       {/* Gradient Background */}
       {bgType === "gradient" && (
         <>
-          <div className="tw:mb-3">
-            <label className={`${FIELD_LABEL} tw:block tw:mb-2`}>
-              Gradient Type
-            </label>
-            <div className="tw:flex tw:gap-1">
+          {/* One labelled row, like every other row in the panel. It used to
+              be a caption over two 44px gradient tiles — the only pair of
+              picture-buttons in a column of fields. */}
+          <div className="bdi-row-ctrl">
+            <label className="bdi-lb">Type</label>
+            <div className="bdi-seg">
               <Button
-                onClick={() => {
-                  const color1 = "var(--bk-accent)";
-                  const color2 = "var(--bk-success)";
-                  onChange("background", `linear-gradient(90deg, ${color1}, ${color2})`);
-                }}
-                className={`${GRADIENT_SWATCH} tw:bg-linear-to-r tw:from-[var(--bk-accent)] tw:to-[var(--bk-success)]`}
+                type="button"
+                aria-pressed={(gradientUI?.gradientType || "linear") === "linear"}
+                className={(gradientUI?.gradientType || "linear") === "linear" ? "on" : ""}
+                onClick={() =>
+                  onChange(
+                    "background",
+                    composeGradient({
+                      type: "linear",
+                      angle: gradientUI?.angle ?? 90,
+                      color1: gradientUI?.color1 || "var(--bk-accent)",
+                      color2: gradientUI?.color2 || "var(--bk-success)",
+                    })
+                  )
+                }
               >
                 Linear
               </Button>
               <Button
-                onClick={() => {
-                  const color1 = "var(--bk-accent)";
-                  const color2 = "var(--bk-success)";
-                  onChange("background", `radial-gradient(circle, ${color1}, ${color2})`);
-                }}
-                className={`${GRADIENT_SWATCH} tw:bg-radial tw:from-[var(--bk-accent)] tw:to-[var(--bk-success)]`}
+                type="button"
+                aria-pressed={gradientUI?.gradientType === "radial"}
+                className={gradientUI?.gradientType === "radial" ? "on" : ""}
+                onClick={() =>
+                  onChange(
+                    "background",
+                    composeGradient({
+                      type: "radial",
+                      angle: gradientUI?.angle ?? 90,
+                      color1: gradientUI?.color1 || "var(--bk-accent)",
+                      color2: gradientUI?.color2 || "var(--bk-success)",
+                    })
+                  )
+                }
               >
                 Radial
               </Button>

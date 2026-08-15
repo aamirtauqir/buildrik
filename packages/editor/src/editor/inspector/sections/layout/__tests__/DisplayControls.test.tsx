@@ -1,5 +1,6 @@
 /**
- * DisplayControls — display-mode buttons + the Flex/Grid hint box + Mixed badge.
+ * DisplayControls — board 32:2's one-row Display picker: six glyph buttons in
+ * the control column, the active one pressed, a Mixed badge on the label.
  *
  * @license BSD-3-Clause
  */
@@ -23,25 +24,20 @@ describe("DisplayControls", () => {
     expect(onChange).toHaveBeenCalledWith("display", "grid");
   });
 
-  it("shows the flex hint when display is flex", () => {
+  /* The hint box ("See Flexbox section for flex controls") went with the card
+     grid — board 32:2 draws one row and the Flexbox section sits right below
+     it, saying the same thing by being there. */
+  it("marks the active mode pressed and leaves the rest alone", () => {
     renderDisplay("flex");
-    expect(screen.getByText("See Flexbox section for flex controls")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Flex" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "Block" })).toHaveAttribute("aria-pressed", "false");
   });
 
-  it("shows the grid hint when display is grid", () => {
-    renderDisplay("grid");
-    expect(screen.getByText("See Grid controls below")).toBeInTheDocument();
-  });
-
-  it("treats inline-flex as flex for the hint", () => {
-    renderDisplay("inline-flex");
-    expect(screen.getByText("See Flexbox section for flex controls")).toBeInTheDocument();
-  });
-
-  it("shows no hint box for a block element", () => {
+  it("keeps every mode reachable in one row", () => {
     renderDisplay("block");
-    expect(screen.queryByText(/See Flexbox/)).not.toBeInTheDocument();
-    expect(screen.queryByText(/See Grid/)).not.toBeInTheDocument();
+    for (const name of ["Block", "Flex", "Grid", "I-Block", "Inline", "None"]) {
+      expect(screen.getByRole("button", { name })).toBeInTheDocument();
+    }
   });
 
   it("renders a Mixed badge when display differs across selection", () => {

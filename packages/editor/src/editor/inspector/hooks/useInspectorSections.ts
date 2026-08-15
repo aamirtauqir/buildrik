@@ -155,18 +155,18 @@ export function useInspectorSections({
   // four drawn open). It replaced "the first two in profile order", which
   // opened Size on a text element and showed an empty body.
   //
-  // Nothing set yet (a freshly dropped element) still opens the first section,
-  // so the panel never greets anyone fully shut.
+  // An element with nothing set opens nothing, and the footer says "0 of 12
+  // sections apply" — which is the truth, and is what the boards draw for an
+  // element whose sections all sit collapsed.
   const getDefaultExpandedKeysForType = React.useCallback(
     (elementType: string): string[] => {
       const { order } = getProfileFor(elementType);
       const applying = styles ? order.filter((id) => sectionApplies(id, styles)) : [];
-      const open = applying.length > 0 ? applying : order.slice(0, 1);
       // Note: VariantSection for component instances is rendered directly
       // by ProInspector outside the registry pipeline (autoExpandSection
       // === "variants" drives its open state), so we don't need to seed a
       // variants key here.
-      return open.map((sectionId) => `${elementType}:${sectionId}`);
+      return applying.map((sectionId) => `${elementType}:${sectionId}`);
     },
     [styles]
   );
@@ -192,12 +192,21 @@ export function useInspectorSections({
 
     // If the user already has any keys for this type in storage (from
     // migration or a prior session), don't overwrite them.
+    // Seeding runs on the first sight of a TYPE, and the element's styles are
+    // not always there yet on that render — the inspector computes them one
+    // pass behind the selection. Seeding an empty answer used to stick: the
+    // type was marked seeded with one section open, and the real styles that
+    // arrived a moment later never reopened anything. An empty answer now
+    // seeds nothing, so the next render with real styles still can.
+    const keys = getDefaultExpandedKeysForType(type);
+    if (keys.length === 0) return;
+
     setExpandedSections((prev) => {
       const hasAnyForType = Array.from(prev).some((k) => k.startsWith(`${type}:`));
       if (hasAnyForType) return prev;
 
       const next = new Set(prev);
-      for (const key of getDefaultExpandedKeysForType(type)) {
+      for (const key of keys) {
         next.add(key);
       }
       return next;

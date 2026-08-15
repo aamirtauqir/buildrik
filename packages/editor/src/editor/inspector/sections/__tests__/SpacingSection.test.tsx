@@ -14,9 +14,15 @@
  * @license BSD-3-Clause
  */
 
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, within } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { SpacingSection } from "../SpacingSection";
+
+/** The four-side box lives behind More settings now (board 32:2 leads with
+ *  Padding / Gap / Margin rows), so box tests open it. */
+function renderBox(props: Partial<React.ComponentProps<typeof SpacingSection>> = {}) {
+  return renderSpacing({ advancedExpanded: true, ...props });
+}
 
 function renderSpacing(props: Partial<React.ComponentProps<typeof SpacingSection>> = {}) {
   const onChange = vi.fn();
@@ -41,9 +47,36 @@ const paddingInput = (container: HTMLElement, side: "t" | "r" | "b" | "l") =>
 const marginToggle = () => screen.getByRole("button", { name: "Margin" });
 const paddingToggle = () => screen.getByRole("button", { name: "Padding" });
 
+describe("SpacingSection — the board's rows", () => {
+  /* Board 32:2: "Padding [24] [16]" — vertical then horizontal, one row. */
+  it("padding's two fields write both sides of their axis", () => {
+    const { onBatchChange } = renderSpacing({ styles: { padding: "24px 16px" } });
+    const [vertical, horizontal] = within(
+      screen.getByRole("group", { name: "Padding" })
+    ).getAllByRole("textbox");
+    expect(vertical).toHaveValue("24");
+    expect(horizontal).toHaveValue("16");
+
+    fireEvent.change(vertical, { target: { value: "32" } });
+    expect(onBatchChange).toHaveBeenCalledWith({
+      "padding-top": "32px",
+      "padding-bottom": "32px",
+    });
+  });
+
+  it("gap is its own row", () => {
+    const { onChange } = renderSpacing({ styles: { gap: "16px" } });
+    const row = screen.getByText("Gap").closest(".bdi-row-ctrl") as HTMLElement;
+    const input = row.querySelector("input") as HTMLInputElement;
+    expect(input).toHaveValue("16");
+    fireEvent.change(input, { target: { value: "24" } });
+    expect(onChange).toHaveBeenCalledWith("gap", "24px");
+  });
+});
+
 describe("SpacingSection — current values render", () => {
   it("shows longhand margin/padding values in the box-model inputs", () => {
-    const { container } = renderSpacing({
+    const { container } = renderBox({
       styles: { "margin-top": "10px", "padding-left": "4px" },
     });
     expect(marginInput(container, "t")).toHaveValue("10");
@@ -51,7 +84,7 @@ describe("SpacingSection — current values render", () => {
   });
 
   it("falls back to shorthand parsing when longhands are absent", () => {
-    const { container } = renderSpacing({ styles: { margin: "10px 20px" } });
+    const { container } = renderBox({ styles: { margin: "10px 20px" } });
     expect(marginInput(container, "t")).toHaveValue("10");
     expect(marginInput(container, "r")).toHaveValue("20");
     expect(marginInput(container, "b")).toHaveValue("10");
@@ -66,13 +99,13 @@ describe("SpacingSection — current values render", () => {
 
 describe("SpacingSection — link toggles (accessible name = visible text)", () => {
   it("margin/padding toggles start unpressed", () => {
-    renderSpacing();
+    renderBox();
     expect(marginToggle()).toHaveAttribute("aria-pressed", "false");
     expect(paddingToggle()).toHaveAttribute("aria-pressed", "false");
   });
 
   it("clicking the Margin toggle flips it to pressed", () => {
-    renderSpacing();
+    renderBox();
     fireEvent.click(marginToggle());
     expect(marginToggle()).toHaveAttribute("aria-pressed", "true");
   });
@@ -80,14 +113,14 @@ describe("SpacingSection — link toggles (accessible name = visible text)", () 
 
 describe("SpacingSection — unlinked writes", () => {
   it("editing margin-top writes only margin-top", () => {
-    const { container, onChange, onBatchChange } = renderSpacing();
+    const { container, onChange, onBatchChange } = renderBox();
     fireEvent.change(marginInput(container, "t"), { target: { value: "24" } });
     expect(onChange).toHaveBeenCalledWith("margin-top", "24px");
     expect(onBatchChange).not.toHaveBeenCalled();
   });
 
   it("editing padding-right writes only padding-right", () => {
-    const { container, onChange } = renderSpacing();
+    const { container, onChange } = renderBox();
     fireEvent.change(paddingInput(container, "r"), { target: { value: "8" } });
     expect(onChange).toHaveBeenCalledWith("padding-right", "8px");
   });
@@ -95,7 +128,7 @@ describe("SpacingSection — unlinked writes", () => {
 
 describe("SpacingSection — linked writes", () => {
   it("with margin linked, one edit batch-writes all four margin sides", () => {
-    const { container, onChange, onBatchChange } = renderSpacing();
+    const { container, onChange, onBatchChange } = renderBox();
     fireEvent.click(marginToggle());
     fireEvent.change(marginInput(container, "t"), { target: { value: "12" } });
     expect(onBatchChange).toHaveBeenCalledWith({
@@ -108,7 +141,7 @@ describe("SpacingSection — linked writes", () => {
   });
 
   it("with padding linked, one edit batch-writes all four padding sides", () => {
-    const { container, onBatchChange } = renderSpacing();
+    const { container, onBatchChange } = renderBox();
     fireEvent.click(paddingToggle());
     fireEvent.change(paddingInput(container, "b"), { target: { value: "6" } });
     expect(onBatchChange).toHaveBeenCalledWith({
@@ -121,25 +154,26 @@ describe("SpacingSection — linked writes", () => {
 });
 
 describe("SpacingSection — advanced gap disclosure", () => {
-  it("hides row/column gap until advancedExpanded; toggle shows count 2", () => {
+  it("hides the per-side box and row/column gap until advancedExpanded", () => {
     const onAdvancedToggle = vi.fn();
     renderSpacing({ onAdvancedToggle });
     expect(screen.queryByText("Row gap")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Margin" })).not.toBeInTheDocument();
     const toggle = screen.getByRole("button", { name: "More settings" });
-    expect(toggle).toHaveTextContent("2");
+    expect(toggle).toHaveTextContent("4");
     fireEvent.click(toggle);
     expect(onAdvancedToggle).toHaveBeenCalledTimes(1);
   });
 
   it("writes row-gap when the advanced Row gap input is edited", () => {
-    const { onChange, container } = renderSpacing({
+    const { onChange } = renderSpacing({
       advancedExpanded: true,
       onAdvancedToggle: vi.fn(),
       styles: { "row-gap": "4px" },
     });
     expect(screen.getByText("Row gap")).toBeInTheDocument();
-    // Row gap is the first InputWithUnit (.bdi-fld) textbox outside the box model.
-    const rowGapInput = container.querySelector(".bdi-fld input") as HTMLInputElement;
+    const rowGapRow = screen.getByText("Row gap").closest(".bdi-row-ctrl") as HTMLElement;
+    const rowGapInput = rowGapRow.querySelector("input") as HTMLInputElement;
     expect(rowGapInput).toHaveValue("4");
     fireEvent.change(rowGapInput, { target: { value: "10" } });
     expect(onChange).toHaveBeenCalledWith("row-gap", "10px");

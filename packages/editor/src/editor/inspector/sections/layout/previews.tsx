@@ -23,14 +23,14 @@ export const DisplayPreview: React.FC<{ type: string }> = ({ type }) => {
   switch (type) {
     case "block":
       return (
-        <div className="tw:flex tw:flex-col tw:gap-0.5 tw:w-7">
+        <div className="tw:flex tw:flex-col tw:gap-0.5 tw:w-4">
           <div className={`${BOX} tw:h-[5px]`} />
           <div className={`${BOX} tw:h-[5px]`} />
         </div>
       );
     case "flex":
       return (
-        <div className="tw:flex tw:gap-0.5 tw:w-7">
+        <div className="tw:flex tw:gap-0.5 tw:w-4">
           <div className={`${BOX} tw:flex-1 tw:h-2.5`} />
           <div className={`${BOX} tw:flex-1 tw:h-2.5`} />
           <div className={`${BOX} tw:flex-1 tw:h-2.5`} />
@@ -38,7 +38,7 @@ export const DisplayPreview: React.FC<{ type: string }> = ({ type }) => {
       );
     case "grid":
       return (
-        <div className="tw:grid tw:grid-cols-2 tw:gap-0.5 tw:w-7">
+        <div className="tw:grid tw:grid-cols-2 tw:gap-0.5 tw:w-4">
           <div className={`${BOX} tw:h-[5px]`} />
           <div className={`${BOX} tw:h-[5px]`} />
           <div className={`${BOX} tw:h-[5px]`} />
@@ -47,14 +47,14 @@ export const DisplayPreview: React.FC<{ type: string }> = ({ type }) => {
       );
     case "inline-block":
       return (
-        <div className="tw:flex tw:gap-0.5 tw:items-center tw:w-7">
+        <div className="tw:flex tw:gap-0.5 tw:items-center tw:w-4">
           <div className={`${BOX} tw:w-2.5 tw:h-2`} />
           <div className={`${BOX} tw:w-3.5 tw:h-2`} />
         </div>
       );
     case "inline":
       return (
-        <div className="tw:flex tw:gap-px tw:items-center tw:w-7">
+        <div className="tw:flex tw:gap-px tw:items-center tw:w-4">
           <div className={`${GRAY} tw:w-1.5 tw:h-1`} />
           <div className={`${BOX} tw:w-2.5 tw:h-1.5`} />
           <div className={`${GRAY} tw:w-1.5 tw:h-1`} />

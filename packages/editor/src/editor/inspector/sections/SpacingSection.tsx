@@ -1,5 +1,6 @@
 /**
- * Spacing Section - Margin & Padding with visual box model
+ * Spacing Section — board 32:2's Padding / Gap / Margin rows, with the
+ * four-side box model behind More settings
  */
 
 import * as React from "react";
@@ -138,63 +139,119 @@ export const SpacingSection: React.FC<SpacingSectionProps> = ({
       tier={tier}
       id="inspector-section-spacing"
     >
-      {/* Link-all-sides toggles. When linked, editing one side applies to all
-          four (margin or padding). */}
-      <div style={{ display: "flex", gap: 4, marginBottom: 6 }}>
-        <Button
-          color="light"
-          size="xs"
-          onClick={() => setMarginLinked((v) => !v)}
-          aria-pressed={marginLinked}
-          title={marginLinked ? "Unlink margin sides" : "Link margin sides"}
-          className={marginLinked ? undefined : "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"}
-        >
-          {marginLinked ? <Link size={12} /> : <Link2Off size={12} />}
-          <span style={{ marginLeft: 4 }}>Margin</span>
-        </Button>
-        <Button
-          color="light"
-          size="xs"
-          onClick={() => setPaddingLinked((v) => !v)}
-          aria-pressed={paddingLinked}
-          title={paddingLinked ? "Unlink padding sides" : "Link padding sides"}
-          className={paddingLinked ? undefined : "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"}
-        >
-          {paddingLinked ? <Link size={12} /> : <Link2Off size={12} />}
-          <span style={{ marginLeft: 4 }}>Padding</span>
-        </Button>
+      {/* Board 32:2 / 807:8342 — Padding as one row of two numbers (vertical,
+          horizontal), Gap under it, Margin as the shorthand it usually is
+          ("0 auto"). The four-side box that used to lead this section is a
+          good editor and a 150px one; it holds the per-side case, which is
+          the rarer one, and moved behind More settings with it. */}
+      <div className="bdi-row-ctrl" role="group" aria-label="Padding">
+        <label className="bdi-lb">Padding</label>
+        <div className="bdi-pair">
+          <div className="tw:relative">
+            <MixedValueIndicator prop="padding" mixedKeys={mixedKeys} />
+            <InputWithUnit
+              label=""
+              value={paddingValues.top || ""}
+              onChange={(v) => onBatchChange({ "padding-top": v, "padding-bottom": v })}
+              placeholder="0"
+            />
+          </div>
+          <span className="bdi-pair-sep" aria-hidden="true" />
+          <InputWithUnit
+            label=""
+            value={paddingValues.left || ""}
+            onChange={(v) => onBatchChange({ "padding-left": v, "padding-right": v })}
+            placeholder="0"
+          />
+        </div>
       </div>
 
-      {/* Webflow-style nested spacing box (margin outside, padding inside) */}
-      <div style={{ position: "relative" }}>
-        {(marginMixed || paddingMixed) && (
-          <span style={{ position: "absolute", right: 0, top: 0, zIndex: 1 }}>
-            <MixedValueBadge compact />
-          </span>
-        )}
-        <SpacingBox
-          margin={marginValues}
-          padding={paddingValues}
-          onMarginChange={handleMarginChange}
-          onPaddingChange={handlePaddingChange}
-          disabledMargin={{
-            top: disabledMargin("top")?.disabled,
-            right: disabledMargin("right")?.disabled,
-            bottom: disabledMargin("bottom")?.disabled,
-            left: disabledMargin("left")?.disabled,
-          }}
-          disabledPadding={{
-            top: disabledPadding("top")?.disabled,
-            right: disabledPadding("right")?.disabled,
-            bottom: disabledPadding("bottom")?.disabled,
-            left: disabledPadding("left")?.disabled,
-          }}
-        />
+      <InputWithUnit
+        label="Gap"
+        value={styles.gap || ""}
+        onChange={(v) => onChange("gap", v)}
+        placeholder="0"
+      />
+
+      <div className="bdi-row-ctrl" role="group" aria-label="Margin">
+        <label className="bdi-lb">Margin</label>
+        <div className="bdi-pair">
+          <div className="tw:relative">
+            <MixedValueIndicator prop="margin" mixedKeys={mixedKeys} />
+            <InputWithUnit
+              label=""
+              value={marginValues.top || ""}
+              onChange={(v) => onBatchChange({ "margin-top": v, "margin-bottom": v })}
+              placeholder="0"
+            />
+          </div>
+          <span className="bdi-pair-sep" aria-hidden="true" />
+          <InputWithUnit
+            label=""
+            value={marginValues.left || ""}
+            onChange={(v) => onBatchChange({ "margin-left": v, "margin-right": v })}
+            units={["px", "%", "rem", "auto"]}
+            placeholder="0"
+          />
+        </div>
       </div>
 
-      {/* ─── Advanced: row-gap, column-gap (behind More settings) ─── */}
+      {/* ─── Advanced: per-side box, row-gap, column-gap ─── */}
       {advancedExpanded && (
         <>
+          {/* Link-all-sides toggles. When linked, editing one side applies to
+              all four (margin or padding). */}
+          <div style={{ display: "flex", gap: 4, margin: "6px 0" }}>
+            <Button
+              color="light"
+              size="xs"
+              onClick={() => setMarginLinked((v) => !v)}
+              aria-pressed={marginLinked}
+              title={marginLinked ? "Unlink margin sides" : "Link margin sides"}
+              className={marginLinked ? undefined : "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"}
+            >
+              {marginLinked ? <Link size={12} /> : <Link2Off size={12} />}
+              <span style={{ marginLeft: 4 }}>Margin</span>
+            </Button>
+            <Button
+              color="light"
+              size="xs"
+              onClick={() => setPaddingLinked((v) => !v)}
+              aria-pressed={paddingLinked}
+              title={paddingLinked ? "Unlink padding sides" : "Link padding sides"}
+              className={paddingLinked ? undefined : "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"}
+            >
+              {paddingLinked ? <Link size={12} /> : <Link2Off size={12} />}
+              <span style={{ marginLeft: 4 }}>Padding</span>
+            </Button>
+          </div>
+
+          <div style={{ position: "relative" }}>
+            {(marginMixed || paddingMixed) && (
+              <span style={{ position: "absolute", right: 0, top: 0, zIndex: 1 }}>
+                <MixedValueBadge compact />
+              </span>
+            )}
+            <SpacingBox
+              margin={marginValues}
+              padding={paddingValues}
+              onMarginChange={handleMarginChange}
+              onPaddingChange={handlePaddingChange}
+              disabledMargin={{
+                top: disabledMargin("top")?.disabled,
+                right: disabledMargin("right")?.disabled,
+                bottom: disabledMargin("bottom")?.disabled,
+                left: disabledMargin("left")?.disabled,
+              }}
+              disabledPadding={{
+                top: disabledPadding("top")?.disabled,
+                right: disabledPadding("right")?.disabled,
+                bottom: disabledPadding("bottom")?.disabled,
+                left: disabledPadding("left")?.disabled,
+              }}
+            />
+          </div>
+
           <div style={{ position: "relative" }}>
             <MixedValueIndicator prop="gap" mixedKeys={mixedKeys} />
             <InputWithUnit
@@ -216,7 +273,7 @@ export const SpacingSection: React.FC<SpacingSectionProps> = ({
         <MoreSettingsToggle
           isOpen={advancedExpanded}
           onToggle={() => onAdvancedToggle()}
-          advancedCount={2}
+          advancedCount={4}
         />
       )}
     </Section>

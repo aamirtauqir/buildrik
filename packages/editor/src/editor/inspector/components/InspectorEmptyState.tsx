@@ -118,6 +118,8 @@ const TIP = "tw:mt-5 tw:px-3 tw:py-2 tw:rounded-md tw:bg-blue-50 tw:text-[11px] 
 const APPLIED_BANNER =
   "tw:w-full tw:max-w-55 tw:px-4 tw:py-3 tw:rounded-lg tw:text-center " +
   "tw:border tw:border-[var(--bk-success)] tw:bg-[var(--bk-success-tint)]";
+/* Board 1175:4841 draws this as the primary action it is — solid accent, not
+   a pale tint of it. */
 const APPLIED_ACTION =
-  "tw:block tw:w-full tw:px-2.5 tw:py-1.5 tw:rounded-md tw:text-[11px] tw:text-center " +
-  "tw:border tw:border-[var(--bk-alpha-accent-15)] tw:bg-[var(--bk-accent-subtle)] tw:text-blue-700";
+  "tw:block tw:px-3 tw:py-2 tw:rounded-md tw:text-[12px] tw:font-medium tw:text-center " +
+  "tw:border-transparent tw:bg-[var(--bk-accent)] tw:text-white";

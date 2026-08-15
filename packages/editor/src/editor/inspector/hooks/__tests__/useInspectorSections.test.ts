@@ -35,10 +35,24 @@ describe("useInspectorSections — default seeding", () => {
     );
   });
 
-  it("an element with nothing set still opens its first section", () => {
-    const expected = `container:${getProfileFor("container").order[0]}`;
-    const { result } = mount("container");
-    expect([...result.current.expandedSections]).toEqual([expected]);
+  /* Nothing set means nothing applies, and the footer says "0 of N sections
+     apply". Opening a section anyway used to stick: the type was marked
+     seeded on the render before its styles arrived, so the real ones never
+     opened anything. */
+  it("an element with nothing set opens nothing, and can still seed later", () => {
+    const { result, rerender } = renderHook(
+      ({ styles }: { styles: Record<string, string> }) =>
+        useInspectorSections({
+          selectedElement: { id: "e1", type: "container" },
+          composer: null,
+          styles,
+        }),
+      { initialProps: { styles: {} as Record<string, string> } }
+    );
+    expect([...result.current.expandedSections]).toEqual([]);
+
+    rerender({ styles: { padding: "24px" } });
+    expect([...result.current.expandedSections]).toEqual(["container:spacing"]);
   });
 });
 

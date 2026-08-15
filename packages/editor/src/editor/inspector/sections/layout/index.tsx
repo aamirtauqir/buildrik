@@ -83,16 +83,18 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
       {/* Display (essential) */}
       <DisplayControls display={styles.display || ""} onChange={onChange} mixedKeys={mixedKeys} />
 
-      {/* Position - essential (position type + anchor) */}
-      <div className={SECTION_SUBTITLE}>Position</div>
-      <PositionControls styles={styles} onChange={onChange} propertyStates={propertyStates} mixedKeys={mixedKeys} />
-
       {/* ═══════════════════════════════════════════════════════════════════
           ADVANCED - Behind "More settings" toggle
           ═══════════════════════════════════════════════════════════════════ */}
 
       {advancedExpanded && (
         <>
+          {/* Position — five tiles for a property most elements never leave
+              `static`, so it sits with the rest of the advanced block rather
+              than above Spacing. Board 32:2 draws no Position row. */}
+          <div className={SECTION_SUBTITLE}>Position</div>
+          <PositionControls styles={styles} onChange={onChange} propertyStates={propertyStates} mixedKeys={mixedKeys} />
+
           {/* Overflow (advanced) */}
           <div className={SECTION_SUBTITLE}>Overflow</div>
           <OverflowControls styles={styles} onChange={onChange} mixedKeys={mixedKeys} />
@@ -108,7 +110,7 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
         <MoreSettingsToggle
           isOpen={advancedExpanded}
           onToggle={() => onAdvancedToggle()}
-          collapsedLabel="Overflow & Visibility"
+          collapsedLabel="Position, overflow & visibility"
         />
       )}
     </Section>

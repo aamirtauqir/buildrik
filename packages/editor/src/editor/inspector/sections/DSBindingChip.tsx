@@ -129,7 +129,11 @@ export const DSBindingChip: React.FC<DSBindingChipProps> = ({
       }}
     >
       {style.prefix}
-      {label}
+      {/* An off-DS chip repeats the value the field two centimetres to its
+          left already shows, and it is the widest thing in the row. The mark
+          alone carries it; the value stays in the accessible name. Board 32:2
+          draws this slot as one small square button. */}
+      {state === "off-ds" ? null : label}
     </Tag>
   );
 
