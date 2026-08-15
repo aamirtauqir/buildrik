@@ -60,6 +60,12 @@ const aliasChipStyle: React.CSSProperties = {
   color: "var(--bk-accent)",
 };
 
+const valueLineStyle: React.CSSProperties = {
+  fontFamily: "var(--bk-font-mono)",
+  fontSize: 11,
+  color: "var(--bk-ink-muted)",
+};
+
 const nameStyle: React.CSSProperties = {
   fontSize: 12.5,
   fontWeight: 500,
@@ -139,6 +145,10 @@ export const TokenRow: React.FC<TokenRowProps> = ({
         }}
       >
         <span style={nameStyle}>{token.name}</span>
+        {/* Board 152:83 prints the token's value under its name — the first
+            thing anyone opening a token list wants, and the one fact the row
+            did not carry. In Pro the id line sits under it. */}
+        <span style={valueLineStyle}>{token.value}</span>
         {isPro && (
           <span style={idLineStyle}>
             <span>{token.id}</span>

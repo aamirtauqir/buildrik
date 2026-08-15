@@ -2346,6 +2346,26 @@ serious bug and two pieces of copy in the wrong place.
   format, and format radios that selected nothing (every row has its own Copy
   and Download). Board 153:120: one "Dark strategy" row, value at the right.
 
+### Founder call — a new site still starts on the OLD product blue
+
+Board 152:83 draws the colour list with its values, and the first row reads
+`primary  #1A56DB`. Live seeds `color-blue-500` and `color-action` with
+`#2D6DFF` — the cobalt the product left on 2026-07-30 — in
+`design-system/constants.ts` (DEFAULT_TOKENS) and
+`design-system/migrations/index.ts` (V4_SEEDS). Every new project's Brand
+panel therefore opens on the old accent.
+
+Not changed here on purpose: these are SITE-BUILDER tokens, the customer's
+output, and CLAUDE.md's DS table says that domain is never restyled in bulk.
+Two separate decisions to make:
+
+1. **The seeds** — should a fresh site start on `#1A56DB`? (Existing projects
+   keep whatever they have; the migration is idempotent.)
+2. **The "Cobalt Default" starter** — `starters/cobalt-default.ts` is also
+   `#2D6DFF`, but that one is a NAMED theme. Renaming or recolouring it is a
+   different call from fixing the seed, and doing only the seed leaves the
+   starter and the default disagreeing.
+
 ### Founder calls out of the Brand walk
 
 1. **Typography (153:57) does not exist.** The board draws active fonts with
