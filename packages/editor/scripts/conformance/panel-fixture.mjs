@@ -1,18 +1,25 @@
 /**
- * review-fixture — serve the Review panel a review round so it can be walked.
+ * panel-fixture — serve a dashboard-backed panel its data so it can be walked.
  *
- * The panel's states (open · resolved · revoked · older round · load error)
- * only exist when the dashboard has an open review round for the site. The
- * standalone editor talks to the dashboard over tRPC, so the honest way to
- * reach those states without a database is to answer those two calls with a
- * fixture and let every other part of the app behave normally.
+ * Several panels only have states when the dashboard has data for the site:
+ * Review (open · resolved · revoked · older round) and Notifications (unread ·
+ * all-read · empty · jump-target-deleted) among them. The standalone editor
+ * talks to the dashboard over tRPC, so the honest way to reach those states
+ * without a database is to answer those calls with a fixture and let every
+ * other part of the app behave normally.
  *
  * Usage:
- *   node scripts/conformance/review-fixture.mjs --out shot.png [--case open]
- *        [--eval "<js>"] [--key "R"] [--wait 5000]
+ *   node scripts/conformance/panel-fixture.mjs --out shot.png [--case open]
+ *        [--panel review|notifications] [--eval "<js>"] [--key "R"] [--wait 5000]
  *
- * Cases mirror the board names: open · empty · all-resolved · revoked ·
- * older-round · load-error · loading.
+ * Review cases: open · empty · all-resolved · revoked · older-round ·
+ * load-error · loading.
+ * Notification cases: unread · all-read · empty · jump-gone (plus the shared
+ * load-error · loading).
+ *
+ * (Was review-fixture.mjs until 2026-08-16; the Notifications walk needed the
+ * same tRPC plumbing, and two copies of a CORS + superjson envelope is one too
+ * many.)
  *
  * @license BSD-3-Clause
  */
@@ -25,6 +32,7 @@ const arg = (n, d = null) => {
 };
 
 const CASE = String(arg("case", "open"));
+const PANEL = String(arg("panel", "review"));
 const out = arg("out");
 const settle = Number(arg("wait", 5000));
 const key = arg("key", "r");
@@ -93,13 +101,49 @@ const CASES = {
   loading: { hang: true },
 };
 
-const fixture = CASES[CASE];
+/* A notifications case needs no review round — the panel under test decides
+   which map the case name is looked up in. */
+const fixture =
+  PANEL === "notifications"
+    ? CASES[CASE] ?? { round: null, comments: [] }
+    : CASES[CASE];
 if (!fixture) {
   console.error(`unknown case "${CASE}" — have: ${Object.keys(CASES).join(", ")}`);
   process.exit(1);
 }
 
 /** One answer per procedure the shell calls on boot. */
+/* Board 165:2's sample — two today, one yesterday, an approval, a comment and
+   a failed publish. SHAPE is the contract, not the words. */
+const notification = (id, type, actorName, message, hoursAgo, read, actionUrl) => ({
+  id,
+  type,
+  actorName,
+  message,
+  actionUrl,
+  read,
+  createdAt: new Date(Date.now() - hoursAgo * 3_600_000).toISOString(),
+});
+
+const NOTIFICATION_CASES = {
+  unread: [
+    notification("n1", "review.approved", "Sara", "approved Bella Cucina", 2, false, "/x"),
+    notification("n2", "comment.added", "Sara", "left 3 comments", 4, false, "/x"),
+    notification("n3", "publish.failed", null, "Publish failed — Osteria", 26, true, "/x"),
+  ],
+  "all-read": [
+    notification("n1", "review.approved", "Sara", "approved Bella Cucina", 2, true, "/x"),
+    notification("n3", "publish.failed", null, "Publish failed — Osteria", 26, true, "/x"),
+  ],
+  empty: [],
+  "jump-gone": [
+    notification("n1", "review.approved", "Sara", "approved a page that has since been deleted", 3, false, null),
+  ],
+};
+
+const notifications =
+  PANEL === "notifications" ? NOTIFICATION_CASES[CASE] ?? NOTIFICATION_CASES.unread : [];
+
 function fixtureFor(proc) {
   const name = proc.split("?")[0];
   if (name.startsWith("reviews.currentRound")) return fixture.round;
@@ -122,7 +166,9 @@ function fixtureFor(proc) {
     };
   }
   if (name.startsWith("sites.myRole")) return "OWNER";
-  if (name.endsWith("unreadCount")) return 0;
+  if (name.endsWith("unreadCount")) return notifications.filter((n) => !n.read).length;
+  if (name.startsWith("notifications.recent")) return notifications;
+  if (name.startsWith("notifications.markAllRead")) return { ok: true };
   /* Anything that reads like a collection answers with one — `media.listFolders`
      returned `{}` at first and MediaManager died on `for (const f of folders)`. */
   if (/list/i.test(name)) return [];
@@ -185,7 +231,15 @@ await page.waitForTimeout(2500);
 
 /* The Review tab has no rail button (agency_layer-gated) — its shortcut is the
    way in, same as a user with the flag off would reach it. */
-await page.keyboard.press(String(key));
+if (PANEL === "notifications") {
+  /* The bell is a topbar button — clicked like a user, not dispatched. */
+  const bell = page.getByRole("button", { name: /notification/i }).first();
+  const box = await bell.boundingBox();
+  if (!box) throw new Error("panel-fixture: no notifications bell in the topbar");
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+} else {
+  await page.keyboard.press(String(key));
+}
 await page.waitForTimeout(settle);
 
 let evalResult;

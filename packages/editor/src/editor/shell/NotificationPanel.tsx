@@ -34,6 +34,32 @@ function relTime(iso: string | Date): string {
   });
 }
 
+/** Board 165:2 bands the list by day — TODAY, YESTERDAY, then the date. A
+ *  flat list made "2h" and "1d" sit in the same column with nothing saying
+ *  where one day ended. */
+function dayBand(iso: string | Date): string {
+  const then = new Date(iso);
+  if (Number.isNaN(then.getTime())) return "EARLIER";
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+  const days = Math.floor((startOfToday.getTime() - then.getTime()) / 86_400_000);
+  if (days < 0) return "TODAY";
+  if (days === 0) return "YESTERDAY";
+  return then
+    .toLocaleDateString(undefined, { day: "numeric", month: "short" })
+    .toUpperCase();
+}
+
+/** The dot carries the kind, the way the board colours it: a publish failure
+ *  is not the same event as an approval. */
+function dotState(type: string): "live" | "review" | "changes" | "failed" {
+  const t = type.toLowerCase();
+  if (t.includes("fail") || t.includes("error")) return "failed";
+  if (t.includes("approve") || t.includes("publish")) return "live";
+  if (t.includes("change") || t.includes("request")) return "changes";
+  return "review";
+}
+
 /** Unread badge count, refreshable after a read lands. */
 export function useUnreadCount(): { count: number; refresh: () => void } {
   const [count, setCount] = React.useState(0);
@@ -162,20 +188,31 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose, o
       ) : null}
 
       {state === "ready" &&
-        ordered.map((n) => {
+        ordered.map((n, index) => {
+          const band = dayBand(n.createdAt);
+          const showBand = index === 0 || dayBand(ordered[index - 1].createdAt) !== band;
           // A notification whose target was deleted has nothing to jump to.
           // It stays as information rather than becoming a dead button.
           const jumpable = n.actionUrl != null;
           return (
+            <React.Fragment key={n.id}>
+            {showBand && (
+              <div className="tw:bg-[var(--bk-bg-subtle)] tw:px-3 tw:py-1 tw:text-[11px] tw:font-medium tw:tracking-wide tw:text-gray-500">
+                {band}
+              </div>
+            )}
             <Row
-              key={n.id}
               size="comment"
               interactive={jumpable}
               className={n.read ? "bk-notif-row" : "bk-notif-row bk-notif-row--unread"}
               data-jump-gone={jumpable ? undefined : "true"}
               onClick={jumpable ? () => void openRow(n) : undefined}
             >
-              {n.read ? <span className="bk-notif-row__spacer" /> : <StatusDot state="review" label="unread" />}
+              {n.read ? (
+                <span className="bk-notif-row__spacer" />
+              ) : (
+                <StatusDot state={dotState(n.type)} label="unread" />
+              )}
               <span className="bk-notif-row__body">
                 <span className="bk-notif-row__text">
                   {n.actorName ? `${n.actorName} ` : ""}
@@ -186,11 +223,12 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose, o
                     The target is gone — the note is kept, but there&rsquo;s nothing to jump to.
                   </span>
                 )}
-                <span className={ROW_META_CLASS}>
-                  {n.type} · {relTime(n.createdAt)}
-                </span>
               </span>
+              {/* Board 165:2 puts the age at the right of its own row, not on
+                  a second line under the text with the type repeated. */}
+              <span className={ROW_META_CLASS}>{relTime(n.createdAt)}</span>
             </Row>
+            </React.Fragment>
           );
         })}
     </div>
