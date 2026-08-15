@@ -1,9 +1,10 @@
 /**
- * C1 — AI assist entry point in DesignSystemTab header.
+ * C1 — AI assist entry point.
  *
- * Asserts the discoverable `data-ai-entry` button is rendered next to
- * ColorModeToggle, and clicking it opens AIPromptModal wired to
- * composer.aiAssistService.
+ * The entry used to be a ✨ button in the panel's header strip; board 152:2
+ * draws the Brand root as a list and nothing else, so it now lives where the
+ * thing it generates lives — the Components screen's "✨ Generate with AI".
+ * Same modal, same service, one route instead of two.
  *
  * @license BSD-3-Clause
  */
@@ -83,14 +84,23 @@ beforeEach(() => {
 });
 
 describe("DesignSystemTab AI assist entry (C1)", () => {
-  test("renders a discoverable [data-ai-entry] button in the header", () => {
+  /** Walks the same two clicks a user does: Brand root → Components. */
+  function openComponents(container: HTMLElement) {
+    const row = container.querySelector<HTMLButtonElement>('[data-section-id="components"]')!;
+    act(() => {
+      fireEvent.click(row);
+    });
+    return container.querySelector<HTMLButtonElement>("[data-open-ai-assist]")!;
+  }
+
+  test("the Components screen offers the AI entry", () => {
     const composer = makeFakeComposer();
     const { container } = render(
       wrap(<DesignSystemTab composer={composer as never} />),
     );
-    const btn = container.querySelector("[data-ai-entry]");
+    const btn = openComponents(container);
     expect(btn).toBeTruthy();
-    expect(btn!.getAttribute("aria-label")).toBe("Open AI assist");
+    expect(btn.textContent).toContain("Generate with AI");
   });
 
   test("clicking the button opens AIPromptModal (dialog appears)", () => {
@@ -101,7 +111,7 @@ describe("DesignSystemTab AI assist entry (C1)", () => {
     // Modal not yet rendered.
     expect(queryByText("Generate component with AI")).toBeNull();
 
-    const btn = container.querySelector<HTMLButtonElement>("[data-ai-entry]")!;
+    const btn = openComponents(container);
     act(() => {
       fireEvent.click(btn);
     });
@@ -115,7 +125,7 @@ describe("DesignSystemTab AI assist entry (C1)", () => {
     const { container, getByLabelText, getByText } = render(
       wrap(<DesignSystemTab composer={composer as never} />),
     );
-    const btn = container.querySelector<HTMLButtonElement>("[data-ai-entry]")!;
+    const btn = openComponents(container);
     act(() => {
       fireEvent.click(btn);
     });

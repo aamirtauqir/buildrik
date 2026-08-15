@@ -72,20 +72,22 @@ describe("DesignSystemTab — Brand root drill-in a11y", () => {
 
   it("opens on the root list, not inside a section", () => {
     const { container, queryByRole } = renderRoot();
-    expect(rows(container)).toHaveLength(7);
+    expect(rows(container)).toHaveLength(8);
     // The tab bar it replaced must not survive anywhere in the panel.
     expect(queryByRole("tablist")).toBeNull();
     expect(queryByRole("tab")).toBeNull();
     expect(queryByRole("tabpanel")).toBeNull();
   });
 
-  it("labels every row from the board, with a hint", () => {
-    const { container, getByText } = renderRoot();
+  /* Board 152:2 lists the destinations by name and puts a count on the right
+     — no description line under each. "Classes" is one of them, and had no
+     row at all until 2026-08-15. */
+  it("labels every row from the board", () => {
+    const { container } = renderRoot();
     const labels = rows(container).map((r) => r.textContent);
-    for (const label of ["Tokens", "Presets", "Starters", "Components", "Colour mode", "Lint", "Import / export"]) {
+    for (const label of ["Tokens", "Presets", "Starters", "Classes", "Components", "Colour mode", "Lint", "Import / export"]) {
       expect(labels.some((l) => l?.includes(label))).toBe(true);
     }
-    expect(getByText("Component style presets")).toBeTruthy();
   });
 
   it("keeps every row in the tab order — no roving tabindex", () => {
@@ -107,12 +109,12 @@ describe("DesignSystemTab — Brand root drill-in a11y", () => {
     const { container, getByText } = renderRoot();
     fireEvent.click(rows(container).find((r) => r.textContent?.includes("Tokens"))!);
     fireEvent.click(getByText(/‹ Tokens/));
-    expect(rows(container)).toHaveLength(7);
+    expect(rows(container)).toHaveLength(8);
   });
 
   it("hides the decorative chevron from assistive tech", () => {
     const { container } = renderRoot();
     const chevrons = container.querySelectorAll('[data-section-id] [aria-hidden="true"]');
-    expect(chevrons.length).toBe(7);
+    expect(chevrons.length).toBe(8);
   });
 });

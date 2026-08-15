@@ -103,7 +103,12 @@ describe("DesignSystemTab — panel mode", () => {
     }
   });
 
-  it("renders header with both DSModeToggle and ColorModeToggle (Task 6)", () => {
+  /* Board 152:2 draws the root as a list. The colour-mode pills moved to the
+     Colour mode screen (153:92), which is where that board puts them and
+     where ColourModeSection already rendered a second copy of them. The
+     Basic/Pro toggle stays: it changes what the whole panel offers and has no
+     other route. */
+  it("keeps the mode toggle on the root and leaves colour mode to its screen", () => {
     const composer = makeFakeComposer();
     const { getByRole } = render(
       wrap(
@@ -115,8 +120,5 @@ describe("DesignSystemTab — panel mode", () => {
     // DSModeToggle renders a role="radiogroup" with aria-label "Design system
     // display mode" — matches getByRole("radiogroup", { name: /mode/i }).
     expect(getByRole("radiogroup", { name: /mode/i })).toBeTruthy();
-    // ColorModeToggle renders a role="tablist" with aria-label "Color mode"
-    // (2-pill [Light][Dark] seg per spec D1).
-    expect(getByRole("tablist", { name: /color mode/i })).toBeTruthy();
   });
 });

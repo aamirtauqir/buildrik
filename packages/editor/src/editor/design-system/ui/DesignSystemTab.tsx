@@ -53,11 +53,8 @@ import {
 import type { ExportFormat } from "../utils/exportUtils";
 import { DesignTabFooter } from "./DesignTabFooter";
 import { DraftChip } from "./DraftChip";
-import { DSLintMount } from "./DSLintMount";
 import { DSModeToggle } from "./DSModeToggle";
 import { useDSModeOptional } from "../state/DSModeContext";
-import { ColorModeToggle } from "./ColorModeToggle";
-import { ExportDropdown } from "./ExportDropdown";
 import { AIPromptModal } from "./AIPromptModal";
 import { AddTokenModal } from "./modals/AddTokenModal";
 import { ReviewModal } from "./modals/ReviewModal";
@@ -67,6 +64,7 @@ import { StylesSection, useStylesSectionTotalDirty } from "./sections/StylesSect
 import { ComponentsSection } from "./sections/ComponentsSection";
 import { ExportSection } from "./sections/ExportSection";
 import { LintSection } from "./sections/LintSection";
+import { ClassesSection } from "./sections/ClassesSection";
 import { StartersSection } from "./sections/StartersSection";
 import { ColourModeSection } from "./sections/ColourModeSection";
 import { useDSLint } from "../state/useDSLint";
@@ -87,7 +85,7 @@ const CRUMB =
 
 // ─── Section types ────────────────────────────────────────────────────────────
 
-type DesignSection = "tokens" | "styles" | "starters" | "components" | "colour-mode" | "lint" | "export";
+type DesignSection = "tokens" | "styles" | "starters" | "classes" | "components" | "colour-mode" | "lint" | "export";
 
 /**
  * Brand root — a drill-in list, not a tab bar (M5).
@@ -124,6 +122,7 @@ const SECTIONS: Array<{ id: DesignSection; label: string; hint: string }> = [
   { id: "tokens",     label: "Tokens",          hint: "Colours, type, spacing" },
   { id: "styles",     label: "Presets",         hint: "Component style presets" },
   { id: "starters",   label: "Starters",        hint: "Whole-brand starting points" },
+  { id: "classes",    label: "Classes",         hint: "Names shared across elements" },
   { id: "components", label: "Components",      hint: "What the brand ships" },
   { id: "colour-mode", label: "Colour mode",    hint: "Light and dark values" },
   { id: "lint",       label: "Lint",            hint: "What breaks the brand" },
@@ -224,12 +223,6 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
 
   const [usageVersion, setUsageVersion] = React.useState(0);
   const usageMap = useTokenUsageMap(composer, usageVersion);
-  const totalUsageCount = React.useMemo(() => {
-    let n = 0;
-    for (const set of usageMap.values()) n += set.size;
-    return n;
-  }, [usageMap]);
-
   const color      = useColorRegistry();
   const type       = useTypeRegistry();
   const spacing    = useSpacingRegistry();
@@ -270,6 +263,26 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
     color, type, spacing, radius, shadow, motion, border,
     opacity, zindex, breakpoint, grid, sizing, icon, imagery,
   ];
+
+  /* Board 152:2 puts a count on every row that has one — "Tokens 14",
+     "Presets 18", "Classes 12". The docblock above this file says a count
+     that is not the truth is worse than none, which is why Lint carried the
+     only one; these three are counted from the same sources the screens
+     themselves render, so they are the truth. Starters and Components stay
+     bare until their own registries can answer. */
+  const sectionCounts = React.useMemo<Partial<Record<DesignSection, number>>>(() => {
+    const tokens = allRegistries.reduce((n, r) => n + (r.tokens?.length ?? 0), 0);
+    const presets = allPresetRegistries.reduce((n, r) => n + (r.presets?.length ?? 0), 0);
+    const classNames = new Set<string>();
+    for (const el of composer?.elements?.getAllElements?.() ?? []) {
+      for (const cls of el.getClasses?.() ?? []) {
+        const name = String(cls).trim();
+        if (name) classNames.add(name);
+      }
+    }
+    return { tokens, styles: presets, classes: classNames.size };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allRegistries, allPresetRegistries, composer, usageVersion]);
 
   const tokensDirty = allRegistries.reduce((n, r) => n + dirtyCount(r), 0);
   const stylesDirty = useStylesSectionTotalDirty();
@@ -504,13 +517,6 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
     });
   };
 
-  const handleExport = (format: ExportFormat) => {
-    const allTokens: DesignToken[] = allRegistries.flatMap((r) => r.tokens);
-    const { content, filename } = buildExport(allTokens, format);
-    downloadFile(content, filename);
-    addToast({ description: `Exported ${filename}`, tone: "success" });
-  };
-
   // C3 fix: factory-reset spacing (stages defaults for Review/Apply, not discardAll).
   const handleResetSpacingToDefaults = () => {
     spacing.stageDefaults(DEFAULT_TOKENS);
@@ -553,6 +559,13 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
         </div>
       </PanelHeader>
 
+      {/* Board note: every one of this family's destination boards — 152:52
+          tokens, 153:2 classes, 154:2 lint — starts at its own back link. The
+          three strips below (shared-theme, toolbar, lint card) used to render
+          on every screen, spending about 300px of an 812px panel before the
+          screen's own content began. They belong to the root. */}
+      {activeSection === null && (
+        <>
       {/* Redesign P4 (ds2): two homes for styling. Everyday styling = these tokens
           (the 3-reach editor). The brand source = the workspace shared theme, which
           lives dashboard-side and client sites sync from or override. Surface that
@@ -577,47 +590,22 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
         </Button>
       </div>
 
-      {/* Toolbar row — modes + AI + Export. Moved out of PanelHeader actions
-          so the 320px DS panel doesn't overflow (title was wrapping under
-          the action cluster). */}
+      {/* Board 152:2 draws the root as a list and nothing else. What used to
+          sit above it has a destination of its own on the boards: Light/Dark
+          is the Colour mode screen's own control (153:92), Export belongs to
+          Import / export (153:120), the starter gallery is the Starters row,
+          and the lint card repeated the Lint row's count. Only the mode
+          toggle stays, because Basic/Pro changes what the rest of the panel
+          offers and has no other route. */}
       <div
         className={`${STRIP} tw:flex-wrap tw:gap-1.5 tw:px-3 tw:py-1.5 tw:bg-[var(--bk-bg-subtle)]`}
       >
         <DSModeToggle />
-        {composer && composer.colorMode ? <ColorModeToggle composer={composer} /> : null}
         <span className="tw:flex-1" />
-        {/* Browse themes — re-opens StarterGalleryModal after the 2026-05-22
-            D3 onboarding fix hid the auto-open. StarterGalleryMount in
-            StudioPanels subscribes to EVENTS.UI_OPEN_STARTERS. */}
-        <Button
-          type="button"
-          color="light"
-          onClick={() => composer?.emit(EVENTS.UI_OPEN_STARTERS, {})}
-          aria-label="Browse starter themes"
-          title="Browse starter themes"
-          className={TOOL_BTN}
-        >
-          {"🎨"}
-        </Button>
-        <Button
-          type="button"
-          color="light"
-          data-ai-entry
-          onClick={() => setAiOpen(true)}
-          aria-label="Open AI assist"
-          title="AI assist · component schema generate"
-          className={TOOL_BTN}
-        >
-          {"✨"}
-        </Button>
-        <ExportDropdown
-          onExport={handleExport}
-          isDirty={isDirty}
-          onSaveFirst={() => setShowReview(true)}
-        />
       </div>
 
-      <DSLintMount composer={composer} onReviewAll={() => handleSectionClick("lint")} />
+        </>
+      )}
 
       {/* Breadcrumb — only inside a destination. Board 152:2 draws no crumb at
           the root, and 153:2 draws `‹ <Section>` inside one. */}
@@ -639,17 +627,6 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
           </Button>
         </div>
       )}
-
-      <div
-        className="tw:flex-none tw:px-3 tw:py-[5px] tw:border-b tw:border-gray-200 tw:bg-[var(--bk-bg-subtle)] tw:text-xs tw:text-gray-500"
-      >
-        Changes here apply to every page on your site
-        {totalUsageCount > 0 && (
-          <span className="tw:ml-1.5">
-            · {totalUsageCount} token binding{totalUsageCount === 1 ? "" : "s"} in use
-          </span>
-        )}
-      </div>
 
       {error ? (
         <PanelErrorState
@@ -673,24 +650,21 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
                       onClick={() => handleSectionClick(s.id)}
                       className="tw:flex tw:w-full tw:items-center tw:gap-2 tw:justify-between tw:h-auto tw:px-2 tw:py-2 tw:rounded-md tw:border-0 tw:bg-transparent tw:text-left tw:hover:bg-gray-100"
                     >
-                      <span className="tw:flex tw:flex-col tw:gap-0.5 tw:min-w-0">
-                        <span className="tw:flex tw:items-center tw:gap-[5px] tw:text-[13px] tw:text-gray-900">
-                          {s.label}
-                          {dirtyHere && (
-                            <span
-                              className="tw:size-[5px] tw:flex-none tw:rounded-full tw:bg-[var(--bk-warning)]"
-                              aria-label="unsaved changes"
-                            />
-                          )}
-                        </span>
-                        <span className="tw:text-xs tw:text-gray-500">{s.hint}</span>
+                      <span className="tw:flex tw:items-center tw:gap-[5px] tw:min-w-0 tw:text-[13px] tw:text-gray-900">
+                        {s.label}
+                        {dirtyHere && (
+                          <span
+                            className="tw:size-[5px] tw:flex-none tw:rounded-full tw:bg-[var(--bk-warning)]"
+                            aria-label="unsaved changes"
+                          />
+                        )}
                       </span>
                       <span className="tw:flex tw:flex-none tw:items-center tw:gap-1.5">
-                        {s.id === "lint" && lintIssues.length > 0 && (
+                        {(s.id === "lint" ? lintIssues.length : sectionCounts[s.id]) ? (
                           <span className="tw:text-xs tw:text-gray-500">
-                            {lintIssues.length}
+                            {s.id === "lint" ? lintIssues.length : sectionCounts[s.id]}
                           </span>
-                        )}
+                        ) : null}
                         <span aria-hidden="true" className="tw:text-gray-400">›</span>
                       </span>
                     </Button>
@@ -735,6 +709,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
             />
           )}
           {activeSection === "starters"   && <StartersSection projectId={projectId} />}
+          {activeSection === "classes"    && <ClassesSection composer={composer} />}
           {activeSection === "colour-mode" && <ColourModeSection composer={composer} />}
           {activeSection === "lint"       && <LintSection issues={lintIssues} />}
           {activeSection === "export"     && <ExportSection />}
