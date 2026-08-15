@@ -22,9 +22,12 @@ import type { DeviceType, PseudoStateId } from "../../shared/types";
 import type { BreakpointId } from "../../shared/types/breakpoints";
 import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/media";
 import { useComposerSelection } from "../canvas/hooks/useComposerSelection";
+import { useProjectLoading } from "../shell/hooks/useProjectLoading";
 import { DeleteConfirmModal } from "./components/DeleteConfirmModal";
 import { InspectorElementMenu } from "./components/InspectorElementMenu";
 import { InspectorEmptyState } from "./components/InspectorEmptyState";
+import { InspectorLoading } from "./components/InspectorLoading";
+import { BreakpointOverrides, useBreakpointOverrides } from "./components/BreakpointOverrides";
 import { InspectorErrorBoundary } from "./components/InspectorErrorBoundary";
 import { MultiSelectToolbar } from "./components/MultiSelectToolbar";
 import { useInspectorState, useStyleHandlers, useInspectorSections } from "./hooks";
@@ -118,13 +121,15 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     overriddenProperties,
   } = useStyleHandlers(selectedElement, composer, currentBreakpoint, currentPseudoState);
 
-  // Breakpoint override indicator
-  const breakpointHasOverride = React.useMemo<boolean>(() => {
-    if (!selectedElement?.id || !composer?.styles || currentBreakpoint === "desktop") return false;
-    const bpStyles = composer.styles.getBreakpointStyle(selectedElement.id, currentBreakpoint);
-    return Object.keys(bpStyles).length > 0;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedElement?.id, composer, currentBreakpoint, styles_state]);
+  // Breakpoint override indicator — same reading the strip below the scope row
+  // shows, from the same subscription, so the dot and the list can never
+  // disagree about whether this breakpoint changes anything.
+  const breakpointOverrides = useBreakpointOverrides(
+    composer,
+    selectedElement?.id,
+    currentBreakpoint
+  );
+  const breakpointHasOverride = breakpointOverrides.length > 0;
 
   // Pseudo-states with overrides — breakpoint-qualified so mobile/tablet
   // pseudo rules light up the indicator pills at the active zoom level.
@@ -164,6 +169,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   usePickModeReset(composer, setPickActive);
 
   const { selectedIds, isMultiSelect } = useComposerSelection({ composer: composer ?? null });
+  const projectLoading = useProjectLoading(composer ?? null);
 
   const [contextState, setContextState] = React.useState(() =>
     deriveCssContext(selectedElement, composer, devMode, styles_state, currentBreakpoint, currentPseudoState)
@@ -262,6 +268,13 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
         />
       </div>
     );
+  }
+
+  /* Board 159:102 — while the site is still arriving there is nothing to
+     select, and "Select something on the canvas to edit it." over an empty
+     canvas reads as "your site is empty". */
+  if (projectLoading && !selectedElement) {
+    return <InspectorLoading />;
   }
 
   if (!selectedElement) {
@@ -372,6 +385,12 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           selectedElementId={selectedElement?.id}
         />
       </div>
+      {/* Board 160:208 — what this breakpoint changes, and the way back. */}
+      <BreakpointOverrides
+        composer={composer}
+        elementId={selectedElement.id}
+        breakpoint={currentBreakpoint}
+      />
       {/* AI agent takeover (board 160:512) — the run replaces the controls;
           the selection is kept and restored when the run ends. */}
       {agentRun.running ? (

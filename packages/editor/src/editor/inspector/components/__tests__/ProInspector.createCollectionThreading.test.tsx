@@ -60,6 +60,7 @@ function makeMinimalComposer() {
     on: vi.fn(),
     off: vi.fn(),
     emit: vi.fn(),
+    isProjectLoading: () => false,
     elements: {
       getElement: () => ({
         getStyles: () => ({}),

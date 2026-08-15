@@ -18,7 +18,7 @@
  *
  * Usage:
  *   node scripts/conformance/live-shot.mjs --out shot.png [--clip x,y,w,h]
- *        [--eval "<js run before the shot>"] [--wait 6000] [--full] [--offline]
+ *        [--eval "<js run after the gestures>"] [--wait 6000] [--full] [--offline]
  *        [--ready <selector>]
  *
  * `--ready` replaces the default canvas wait. Boot states (the skeleton) are
@@ -34,7 +34,9 @@
  *
  * `--eval` is an EXPRESSION evaluated in the page (Playwright's string form),
  * so write `(() => { ...; return x })()`, not a bare `return`. Its value is
- * printed as JSON, so one run can both act and report.
+ * printed as JSON, so one run can both act and report. It runs AFTER --click
+ * and --press: it used to run before them, so every reading described the page
+ * at load and looked like the gestures had done nothing.
  *
  * @license BSD-3-Clause
  */
@@ -99,16 +101,6 @@ if (goOffline) {
 await page.waitForSelector(".buildrick-canvas", { state: "attached", timeout: 30_000 });
 await page.waitForTimeout(settle);
 
-let evalResult;
-if (evalSrc) {
-  /* Playwright evaluates a string expression directly — no `new Function`
-     built by concatenation. The source is this script's own argv on a
-     developer machine, never network input, and it still goes through the
-     page's normal evaluation path. */
-  evalResult = await page.evaluate(String(evalSrc));
-  await page.waitForTimeout(1200);
-}
-
 /* A real gesture, not `element.click()`. Canvas selection is driven by
    pointerdown/mousedown; a synthetic click event reaches neither, so a
    JS-clicked element can look unselected on canvas while the inspector shows
@@ -137,6 +129,16 @@ const pressKey = arg("press");
 if (pressKey) {
   await page.keyboard.press(String(pressKey));
   await page.waitForTimeout(Number(arg("press-settle", 1200)));
+}
+
+let evalResult;
+if (evalSrc) {
+  /* Playwright evaluates a string expression directly — no `new Function`
+     built by concatenation. The source is this script's own argv on a
+     developer machine, never network input, and it still goes through the
+     page's normal evaluation path. */
+  evalResult = await page.evaluate(String(evalSrc));
+  await page.waitForTimeout(1200);
 }
 
 if (out) {

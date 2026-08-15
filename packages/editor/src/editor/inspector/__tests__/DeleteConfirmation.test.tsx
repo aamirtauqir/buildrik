@@ -19,6 +19,7 @@ const makeComposer = () => ({
   on: vi.fn(),
   off: vi.fn(),
   emit: vi.fn(),
+  isProjectLoading: () => false,
 });
 
 const selectedElement = { id: "abc12345678", type: "container", tag: "div" };

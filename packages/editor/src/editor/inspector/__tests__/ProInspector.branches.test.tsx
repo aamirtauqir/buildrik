@@ -1,5 +1,6 @@
 /**
  * ProInspector — top-level branch selection:
+ *   - no selection, project still loading → InspectorLoading (board 159:102)
  *   - no selection → InspectorEmptyState
  *   - 2+ selected  → MultiSelectToolbar (single-element inspector body skipped)
  *   - 1 selected   → full inspector body (flat tab content, no tab strip)
@@ -44,11 +45,15 @@ function makeElement(id: string) {
   };
 }
 
-function makeComposer(allSelected: ReturnType<typeof makeElement>[]) {
+function makeComposer(
+  allSelected: ReturnType<typeof makeElement>[],
+  loading = false
+) {
   return {
     on: vi.fn(),
     off: vi.fn(),
     emit: vi.fn(),
+    isProjectLoading: () => loading,
     elements: { getElement: (id: string) => makeElement(id) },
     selection: {
       select: vi.fn(),
@@ -72,6 +77,14 @@ describe("ProInspector — branch selection", () => {
     expect(screen.getByTestId("empty-state")).toBeInTheDocument();
     expect(screen.queryByTestId("multi-toolbar")).not.toBeInTheDocument();
     expect(screen.queryByTestId("tab-content")).not.toBeInTheDocument();
+  });
+
+  /* Board 159:102 — "Select something on the canvas to edit it." is a lie
+     while the canvas is still filling itself in. */
+  it("renders the loading skeleton, not the empty state, while the project loads", () => {
+    render(<ProInspector selectedElement={null} composer={makeComposer([], true)} />);
+    expect(screen.getByTestId("inspector-loading")).toBeInTheDocument();
+    expect(screen.queryByTestId("empty-state")).not.toBeInTheDocument();
   });
 
   it("renders the multi-select toolbar when 2+ elements are selected", () => {

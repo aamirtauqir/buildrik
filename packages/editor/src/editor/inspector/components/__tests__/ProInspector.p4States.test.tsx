@@ -38,6 +38,7 @@ function makeComposer() {
     }),
     off: vi.fn((ev: string, fn: Handler) => listeners.get(ev)?.delete(fn)),
     emit: vi.fn((ev: string, p?: unknown) => listeners.get(ev)?.forEach((fn) => fn(p))),
+    isProjectLoading: () => false,
     elements: {
       getElement: () => ({
         getStyles: () => ({}),

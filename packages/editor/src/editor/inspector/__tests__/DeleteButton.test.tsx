@@ -15,6 +15,7 @@ const makeComposer = () => ({
   on: vi.fn(),
   off: vi.fn(),
   emit: vi.fn(),
+  isProjectLoading: () => false,
 });
 
 const el = { id: "abc12345678", type: "container" };
