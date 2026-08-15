@@ -18,12 +18,27 @@ import {
   downloadHTML,
   downloadCSS,
 } from "../ExportHelpers";
+import { THEME } from "../../../shared/constants/defaultStyles";
 
 describe("RESET_CSS", () => {
   it("ships the core reset rules", () => {
     expect(RESET_CSS).toContain("box-sizing:border-box");
     expect(RESET_CSS).toContain("*{margin:0;padding:0}");
     expect(RESET_CSS).toContain("img,picture,video,canvas,svg{display:block;max-width:100%}");
+  });
+
+  /* Elements parsed out of a template's raw HTML carry no font of their own,
+     and the export links no stylesheet that would give them one — so without a
+     base rule a site designed in Inter went live in Times New Roman. It looked
+     right on the canvas only because the editor's own chrome font was
+     cascading into it. The family is the one every created element already
+     carries, so the page and its elements cannot disagree. */
+  it("gives the published page the same base font every created element carries", () => {
+    expect(RESET_CSS).toContain(`font-family:${THEME.fontFamily}`);
+    // …and the last resort is a sans, not the browser's serif default. (Note
+    // the boundary: "sans-serif" ends in "serif" — the first version of this
+    // assertion failed on its own stack.)
+    expect(THEME.fontFamily).toMatch(/(^|,\s*)sans-serif$/);
   });
 });
 

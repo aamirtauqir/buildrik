@@ -24,12 +24,30 @@ vi.mock("@/editor/chrome-ui", async () => {
 import { TemplatesTab } from "../TemplatesTab";
 
 describe("TemplatesTab — new-design IA (S1)", () => {
+  /* A band with nothing under it claims a group exists and is empty. Every
+     entry in today's catalog is a page template, so "SECTION TEMPLATES" was a
+     header over blank panel — and this test used to require it. Boards
+     782:4402 and 1138:13413 draw no bands when nothing is listed. */
   it("drawer default (board 641:2487): compact gallery, no pills, Browse-all footer", () => {
     render(<TemplatesTab composer={null} />);
     expect(screen.getByTestId("tpl-drawer-gallery")).toBeInTheDocument();
     expect(screen.getByText("PAGE TEMPLATES")).toBeInTheDocument();
-    expect(screen.getByText("SECTION TEMPLATES")).toBeInTheDocument();
     expect(screen.queryByRole("tab", { name: "All" })).not.toBeInTheDocument();
+  });
+
+  it("shows a group band only when that group has something in it", () => {
+    render(<TemplatesTab composer={null} />);
+    const bands = ["PAGE TEMPLATES", "SECTION TEMPLATES"] as const;
+    for (const band of bands) {
+      const header = screen.queryByText(band);
+      if (!header) continue;
+      // A rendered band must be followed by at least one row of its own kind.
+      const prefix = band === "PAGE TEMPLATES" ? "tpl-card-" : "tpl-row-";
+      expect(
+        document.querySelectorAll(`[data-testid^="${prefix}"]`).length,
+        `${band} rendered with nothing under it`,
+      ).toBeGreaterThan(0);
+    }
   });
 
   it("expanded view keeps top-level pills: All, Site Pages, Sections, My Templates", () => {

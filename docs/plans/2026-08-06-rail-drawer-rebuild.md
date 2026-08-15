@@ -1758,6 +1758,58 @@ shell removing a tab on review status, and the Review tab's rail presence is
 already gated on the open `agency_layer` decision (1.3). It is one decision,
 not two implementations.
 
+## Phase 1 — family 5: Templates, started 2026-08-15
+
+**The twentieth find, and the largest so far: a site built from a template
+published in Times New Roman.** Applying a template parses its raw HTML into
+elements, and those elements carry only the styles the markup declares — no
+`font-family`, because none of the ten templates sets one. The export's base
+CSS set no font either, and links no stylesheet that would. On the canvas it
+looked right, because the EDITOR's own chrome font cascades into the canvas;
+the published page had nothing, so it fell back to the browser's serif
+default. Measured live: after applying "SaaS Landing", the hero `<h1>` carries
+`font-size: 52px; font-weight: 800; color: rgb(255,255,255); …` — and no
+family — while its computed style on the canvas reads
+`Inter, "Inter Tight", sans-serif`, all of it borrowed from the chrome.
+
+The export's reset now carries the same family every element this product
+creates already carries (`defaultStyles`'s `THEME.fontFamily`), so the page and
+its elements cannot disagree. Named below for the founder: that family is
+`Inter, sans-serif` and **the export ships no webfont**, so a visitor sees
+their system sans, not Inter. Fixing that is a decision (bundle the file? link
+Google Fonts on customer sites?), not a patch.
+
+**The board's flow was not the shipped flow.** Board 642:2556 says a card in
+the drawer opens a preview: name, what it is made of, a look at it, what
+applying replaces, Cancel · Apply template. Clicking a card actually widened
+the panel to 700 and swapped in the expanded gallery's detail pane — a
+different surface, three apply buttons, and no statement of consequence
+anywhere. `TemplateApplyModal` now answers a card click, and applying runs the
+same gate as every other entry (premium check, then the replace confirm when
+the page has content). Its preview is the template's own markup in a scaled
+sandboxed iframe: the board's grey block is a drawing OF a preview, and a
+gradient swatch would be a drawing of one too.
+
+Smaller, from the same walk:
+- **"6 sections", not "4 pages."** The card's right-hand fact is what lands on
+  the canvas. There were two section counters in the tree; the counting one
+  (which counts `section|nav|header|footer|main|article`, what a person counts)
+  now lives in `templatesData` and both surfaces read it.
+- **No-results got its way out.** Board 782:4402 pairs "Nothing matches
+  'pricing'." with a **Clear search** link. Live had the sentence, centred, and
+  left the user to work out that emptying the box was their move.
+- **Empty group bands are gone.** "SECTION TEMPLATES" rendered over blank
+  panel on every single load — because **every one of the ten catalog entries
+  is a page template and there are no section templates at all**. The old IA
+  test required that empty header; it now requires the opposite.
+- Board 1138:13413's empty-catalog state ("No templates yet." · "Starter
+  templates are coming — start blank for now.") is built, though today's
+  bundled catalog cannot reach it.
+
+Founder item from this walk: **the catalog has no section templates.** Board
+641:2487 draws three (Hero · image left, Menu grid · 3-up, Testimonials ·
+slider) and the panel has a group ready for them. That is content, not code.
+
 ## Named for the founder — needs a decision or a file I must not stage
 
 **The save chip: board pill vs D7 rule 4.** Board 199:2 (and every shell board)
@@ -1769,6 +1821,19 @@ mean 'your work is not where you think it is'." That is a recorded decision
 from the topbar arc, and it contradicts the board deliberately. Live also reads
 "Saved · just now" where the board has no separator. Both are one call: keep
 D7 rule 4 (and note it on the boards), or conform to the pill.
+
+
+**Published sites name Inter and never load it.** Every element this product
+creates carries `font-family: Inter, sans-serif`, and the export now gives the
+page body the same — but nothing in the exported document loads the Inter
+webfont, so a visitor's browser falls to its system sans. The designer sees
+Inter (the editor loads it for its own chrome); the client sees something
+else. Three ways out, and it is a product call, not a patch: bundle the font
+files with the export (the asset bundler already rewrites `@font-face` URLs it
+finds), link Google Fonts on customer sites (an external request on every
+visitor's page load, with the privacy question that carries), or accept the
+system sans and stop naming Inter. Until then the export is honest about
+falling back but not about Inter.
 
 
 **Does the whole chrome dim while a site loads? (board `65:412`)** The loading

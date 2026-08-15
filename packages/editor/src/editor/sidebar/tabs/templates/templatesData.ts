@@ -54,6 +54,21 @@ export interface TemplateItem {
 /** P9: shared default until per-template versioning rolls out. */
 export const DEFAULT_TEMPLATE_VERSION = "1.0.0";
 
+/**
+ * How many sections a template puts on the page — the number boards 641:2487
+ * and 642:2556 print beside its name ("6 sections").
+ *
+ * Read from the template's own markup so it cannot drift from it, and counting
+ * the landmark elements a person would count, not just `<section>`: a template
+ * whose parts are a nav, a header and a footer has three sections to anyone
+ * looking at it. Lives here rather than in a view because two surfaces print
+ * it and they must not disagree.
+ */
+export function getSectionCount(html: string): number {
+  const matches = html.match(/<(section|nav|header|footer|main|article)/gi);
+  return matches ? matches.length : 1;
+}
+
 // ============================================================================
 // HELPER FUNCTIONS
 // ============================================================================

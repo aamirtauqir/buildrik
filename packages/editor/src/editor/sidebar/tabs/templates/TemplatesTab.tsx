@@ -24,6 +24,7 @@ import { TemplateDetail } from "./components/TemplateDetail";
 import { TemplatePagination } from "./components/TemplatePagination";
 import { TemplateUsageDrawer } from "./components/TemplateUsageDrawer";
 import { DrawerGallery } from "./components/DrawerGallery";
+import { TemplateApplyModal } from "./components/TemplateApplyModal";
 import { useTemplateUsageMap } from "./hooks/useTemplateUsageMap";
 import { resolveTokens } from "./utils/resolveTemplateTokens";
 import { snapshotFromComputedStyle } from "./utils/tokenSnapshot";
@@ -157,6 +158,9 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
     },
     [composer]
   );
+
+  /** The drawer's preview modal (board 642:2556). */
+  const [applyPreviewId, setApplyPreviewId] = React.useState<string | null>(null);
 
   // Track whether apply is "add as new page" mode
   const addAsNewPageRef = React.useRef(false);
@@ -331,11 +335,15 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
           cards + section rows + Browse-all (which expands to this full view).
           The full grid/pills/pagination survive as the EXPANDED (700) and
           detail/new-page layouts. */}
+      {/* Board 642:2556: a card in the drawer opens the preview modal. It used
+          to set detailId, which widened the panel to 700 and swapped in the
+          expanded gallery's detail pane — a different surface, with three
+          apply buttons and no statement of what applying replaces. */}
       {!showFull ? (
         <DrawerGallery
           searchQ={sel.searchQ}
           onSearchChange={sel.setSearchQ}
-          onOpenDetail={(id) => sel.setDetailId(id)}
+          onOpenTemplate={setApplyPreviewId}
           onBrowseAll={onExpandToggle}
         />
       ) : (
@@ -578,6 +586,19 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
       {showProgress && (
         <ApplyProgressOverlay templateName={tName} onComplete={handleProgressComplete} />
       )}
+      {/* Board 642:2556 — what a drawer card opens. Applying goes through the
+          same gate as every other entry point (premium check, then the replace
+          confirm when the page already has content). */}
+      <TemplateApplyModal
+        open={!!applyPreviewId}
+        template={SITE_TEMPLATES.find((t) => t.id === applyPreviewId) ?? null}
+        pageName={activePageInfo?.name}
+        onClose={() => setApplyPreviewId(null)}
+        onApply={(t) => {
+          setApplyPreviewId(null);
+          handleApplyToCurrent(t.id);
+        }}
+      />
       {sel.previewId && (() => {
         const previewTemplate = SITE_TEMPLATES.find((t) => t.id === sel.previewId);
         if (!previewTemplate) return null;

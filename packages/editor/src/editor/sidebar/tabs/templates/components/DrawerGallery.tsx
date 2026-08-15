@@ -13,12 +13,13 @@
 
 import * as React from "react";
 import { Button, TextInput } from "@/editor/chrome-ui";
-import { SITE_TEMPLATES, type TemplateItem } from "../templatesData";
+import { SITE_TEMPLATES, getSectionCount, type TemplateItem } from "../templatesData";
 
 interface DrawerGalleryProps {
   searchQ: string;
   onSearchChange: (q: string) => void;
-  onOpenDetail: (id: string) => void;
+  /** A card opens the board-642:2556 preview, not the expanded detail pane. */
+  onOpenTemplate: (id: string) => void;
   onBrowseAll?: () => void;
 }
 
@@ -28,8 +29,15 @@ const SECTION_HEADER =
 const matches = (t: TemplateItem, q: string) =>
   !q || t.name.toLowerCase().includes(q) || (t.description ?? "").toLowerCase().includes(q);
 
+/** Board 641:2487 prints "6 sections" beside a page template — how much lands
+ *  on the canvas, not how many pages the entry has. */
+const sectionLabel = (t: TemplateItem): string => {
+  const n = getSectionCount(t.html);
+  return `${n} section${n === 1 ? "" : "s"}`;
+};
+
 export const DrawerGallery: React.FC<DrawerGalleryProps> = ({
-  searchQ, onSearchChange, onOpenDetail, onBrowseAll,
+  searchQ, onSearchChange, onOpenTemplate, onBrowseAll,
 }) => {
   const q = searchQ.trim().toLowerCase();
   // `type` holds element-ish tags ("hero", …) for most entries — the real
@@ -53,7 +61,11 @@ export const DrawerGallery: React.FC<DrawerGalleryProps> = ({
       </div>
 
       <div className="tw:flex-1 tw:min-h-0 tw:overflow-y-auto">
-        <div className={SECTION_HEADER}>PAGE TEMPLATES</div>
+        {/* Boards 782:4402 / 1138:13413 draw NO section bands when nothing is
+            listed. Rendering "PAGE TEMPLATES" over an empty stretch of panel
+            says the group exists and is empty, which is a different (and
+            false) statement from "nothing matched". */}
+        {pages.length > 0 && <div className={SECTION_HEADER}>PAGE TEMPLATES</div>}
         {pages.map((t) => (
           <div
             key={t.id}
@@ -61,9 +73,9 @@ export const DrawerGallery: React.FC<DrawerGalleryProps> = ({
             tabIndex={0}
             className="tw:flex tw:flex-col tw:gap-1.5 tw:px-4 tw:py-2 tw:cursor-pointer tw:select-none hover:tw:bg-[var(--bk-bg-subtle)]"
             data-testid={`tpl-card-${t.id}`}
-            onClick={() => onOpenDetail(t.id)}
+            onClick={() => onOpenTemplate(t.id)}
             onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpenDetail(t.id); }
+              if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpenTemplate(t.id); }
             }}
           >
             {/* Board thumb: full-width 88h, bg-subtle + border, rounded-6 —
@@ -77,16 +89,14 @@ export const DrawerGallery: React.FC<DrawerGalleryProps> = ({
               <span className="tw:flex-1 tw:min-w-0 tw:truncate tw:text-[13px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]">
                 {t.name}
               </span>
-              {t.pageCount != null && (
-                <span className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
-                  {t.pageCount} page{t.pageCount === 1 ? "" : "s"}
-                </span>
-              )}
+              <span className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+                {sectionLabel(t)}
+              </span>
             </div>
           </div>
         ))}
 
-        <div className={SECTION_HEADER}>SECTION TEMPLATES</div>
+        {sections.length > 0 && <div className={SECTION_HEADER}>SECTION TEMPLATES</div>}
         {sections.map((t) => (
           <div
             key={t.id}
@@ -94,9 +104,9 @@ export const DrawerGallery: React.FC<DrawerGalleryProps> = ({
             tabIndex={0}
             className="tw:flex tw:items-center tw:gap-2 tw:h-8 tw:px-4 tw:cursor-pointer tw:select-none hover:tw:bg-[var(--bk-bg-subtle)]"
             data-testid={`tpl-row-${t.id}`}
-            onClick={() => onOpenDetail(t.id)}
+            onClick={() => onOpenTemplate(t.id)}
             onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpenDetail(t.id); }
+              if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpenTemplate(t.id); }
             }}
           >
             <span className="tw:flex-1 tw:min-w-0 tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
@@ -109,10 +119,38 @@ export const DrawerGallery: React.FC<DrawerGalleryProps> = ({
           </div>
         ))}
 
+        {/* Board 782:4402: left-aligned under the search, with the way out.
+            The message alone left the user to work out that clearing the box
+            was their move. */}
         {q && pages.length === 0 && sections.length === 0 && (
-          <p className="tw:m-0 tw:px-4 tw:pt-6 tw:text-center tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
-            Nothing matches &lsquo;{searchQ.trim()}&rsquo;.
-          </p>
+          <div className="tw:flex tw:flex-col tw:gap-1.5 tw:px-4 tw:pt-5">
+            <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
+              Nothing matches &lsquo;{searchQ.trim()}&rsquo;.
+            </p>
+            <Button
+              type="button"
+              color="light"
+              size="xs"
+              data-testid="tpl-clear-search"
+              className="tw:self-start tw:border-transparent tw:bg-transparent tw:px-0 tw:text-[13px] tw:text-[var(--bk-accent)] tw:hover:bg-transparent tw:hover:underline"
+              onClick={() => onSearchChange("")}
+            >
+              Clear search
+            </Button>
+          </div>
+        )}
+
+        {/* Board 1138:13413 — the catalog itself is empty. Distinct from a
+            search that found nothing, and it says what to do instead. */}
+        {!q && pages.length === 0 && sections.length === 0 && (
+          <div className="tw:flex tw:flex-col tw:gap-1.5 tw:px-4 tw:pt-5">
+            <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
+              No templates yet.
+            </p>
+            <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-accent)]">
+              Starter templates are coming — start blank for now.
+            </p>
+          </div>
         )}
       </div>
 

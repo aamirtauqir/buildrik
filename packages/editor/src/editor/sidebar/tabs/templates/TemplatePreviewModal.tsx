@@ -11,7 +11,7 @@
  */
 
 import * as React from "react";
-import type { TemplateItem } from "./templatesData";
+import { getSectionCount, type TemplateItem } from "./templatesData";
 import "./TemplatePreviewModal.css";
 import { Button, Portal } from "@/editor/chrome-ui";
 // ============================================================================
@@ -87,11 +87,6 @@ const VIEWPORT_CONFIGS: ViewportConfig[] = [
   { id: "tablet", label: "Tablet", shortLabel: "T", frameWidth: 700 },
   { id: "mobile", label: "Mobile", shortLabel: "M", frameWidth: 375 },
 ];
-
-function getSectionCount(html: string): number {
-  const matches = html.match(/<(section|nav|header|footer|main|article)/gi);
-  return matches ? matches.length : 1;
-}
 
 // ============================================================================
 // COMPONENT

@@ -4,6 +4,8 @@
  * @license BSD-3-Clause
  */
 
+import { THEME } from "../../shared/constants/defaultStyles";
+
 // ============================================================================
 // RESET CSS
 // ============================================================================
@@ -12,7 +14,7 @@ export const RESET_CSS = `
 *,*::before,*::after{box-sizing:border-box}
 *{margin:0;padding:0}
 html{-webkit-text-size-adjust:100%}
-body{line-height:1.5;-webkit-font-smoothing:antialiased}
+body{line-height:1.5;-webkit-font-smoothing:antialiased;font-family:${THEME.fontFamily}}
 img,picture,video,canvas,svg{display:block;max-width:100%}
 input,button,textarea,select{font:inherit}
 p,h1,h2,h3,h4,h5,h6{overflow-wrap:break-word}

@@ -9,7 +9,7 @@
  */
 
 // Theme constants - use actual values (not CSS vars) so they display properly in Inspector
-const THEME = {
+export const THEME = {
   // This is the colour every newly-created button, link, blockquote rule and
   // form accent gets, and the Inspector's fallback swatch. It must track the
   // single product accent (DESIGN.md) — it lagged behind BOTH accent
@@ -18,6 +18,12 @@ const THEME = {
   primary: "#1A56DB",
   textPrimary: "#1a1a1a",
   textSecondary: "#333333",
+  // Every element this product creates carries this. The EXPORT's base rule
+  // uses it too (ExportHelpers RESET_CSS): elements parsed out of a template's
+  // raw HTML carry no font of their own, and without a base the published page
+  // fell back to the browser default — a site designed in Inter went live in
+  // Times New Roman. On the canvas it looked right, because the editor's own
+  // chrome font was cascading into it.
   fontFamily: "Inter, sans-serif",
 };
 
