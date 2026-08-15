@@ -1897,6 +1897,13 @@ Founder item from this walk: **the catalog has no section templates.** Board
 641:2487 draws three (Hero · image left, Menu grid · 3-up, Testimonials ·
 slider) and the panel has a group ready for them. That is content, not code.
 
+**Templates — walked out.** All 11 boards accounted for: gallery, no-results,
+empty, preview, applying, replace-confirm, create-page (three states),
+usage-drawer conformed; loading and load-error recorded as unreachable while
+the catalog is bundled; save-as-template left unbuilt for want of a route. Two
+of the finds were the serious kind — a published site in Times New Roman, and
+"Add as new page" destroying the page you were on.
+
 ## Named for the founder — needs a decision or a file I must not stage
 
 **The save chip: board pill vs D7 rule 4.** Board 199:2 (and every shell board)
