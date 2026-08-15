@@ -111,8 +111,11 @@ export const insertSubmenu: ContextAction[] = [
     icon: "minimize-2",
     group: "Insert",
     shortcut: "Cmd+Shift+U",
-    isVisible: (ctx) => ctx.element.canBeUnwrapped(),
-    isEnabled: (ctx) => (ctx.element.getChildren?.()?.length ?? 0) > 0,
+    /* Board 1176:4866 draws this row greyed rather than absent. Hiding it made
+       the menu change shape between elements, and left no way to learn the
+       command exists — which is what a disabled row with its chord is for. */
+    isEnabled: (ctx) =>
+      ctx.element.canBeUnwrapped() && (ctx.element.getChildren?.()?.length ?? 0) > 0,
     handler: ({ element }) => {
       element.unwrap();
     },

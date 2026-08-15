@@ -51,7 +51,10 @@ export const standaloneActions: ContextAction[] = [
     label: "Select Parent",
     icon: "arrow-up",
     group: "standalone",
-    shortcut: "Left",
+    /* The key this binds is Left (useCanvasKeyboard), which the breadcrumb
+       prints as "← Parent". Board 1176:4866 shows a glyph in this column, and
+       the word "Left" read as a direction rather than a key. */
+    shortcut: "←",
     isVisible: ({ element }) => Boolean(element.getParent()),
     handler: ({ composer, element }) => {
       const parent = element.getParent();

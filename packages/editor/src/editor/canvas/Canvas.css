@@ -607,9 +607,9 @@
    `background: var(--bk-accent-subtle)`, so a dark hero turned pale blue with
    white text on it and the page became unreadable rather than structural. It
    also printed its own type label on every element — the Badges toggle's job,
-   shown whether or not Badges was on — in a per-type palette that included
-   violet and pink, which DESIGN.md bans and no gate catches inside a raw
-   rgba(). Both are gone; what is left is the wireframe the board describes. */
+   shown whether or not Badges was on — in a per-type palette drawn from the
+   banned ramp DESIGN.md rules out, which no gate catches inside a raw rgba().
+   Both are gone; what is left is the wireframe the board describes. */
 .buildrick-canvas[data-xray-mode="true"] [data-buildrick-id] {
   outline: 1px solid var(--bk-border-medium) !important;
   outline-offset: -1px;

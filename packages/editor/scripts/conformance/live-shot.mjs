@@ -123,6 +123,23 @@ if (clickAt) {
   }
 }
 
+/* A real right-click — the canvas context menu is only reachable this way. */
+const rightAt = arg("rightclick");
+if (rightAt) {
+  const [rx, ry] = String(rightAt).split(",").map(Number);
+  await page.mouse.click(rx, ry, { button: "right" });
+  await page.waitForTimeout(Number(arg("click-settle", 1200)));
+}
+
+/* A real double-click — inline text editing is only reachable this way, and
+   two separate single clicks are not the same gesture to the DOM. */
+const dblAt = arg("dblclick");
+if (dblAt) {
+  const [dx, dy] = String(dblAt).split(",").map(Number);
+  await page.mouse.click(dx, dy, { clickCount: 2 });
+  await page.waitForTimeout(Number(arg("click-settle", 1200)));
+}
+
 /* A pointer move with no click — hover states (the canvas's four hover levels,
    badges, tooltips) are only reachable this way, and a click would select the
    element instead, which is a different picture. `x,y+Alt` holds a modifier

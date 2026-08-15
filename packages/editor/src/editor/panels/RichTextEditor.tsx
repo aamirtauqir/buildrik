@@ -114,9 +114,9 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
 
   return (
     <div
-      className="tw:flex tw:flex-wrap tw:items-center tw:gap-1"
+      className="tw:flex tw:items-center tw:gap-0.5"
       style={{
-        padding: 8,
+        padding: 4,
         background: "var(--bk-bg-panel)",
         borderRadius: 8,
         border: "1px solid var(--bk-border)",
@@ -126,7 +126,8 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
       <Select
         onChange={(e) => onCommand("formatBlock", e.target.value)}
         style={{
-          padding: "4px 8px",
+          padding: "2px 6px",
+          minWidth: 84,
           background: "var(--bk-bg-panel)",
           border: "1px solid var(--bk-border)",
           borderRadius: 4,
@@ -146,7 +147,8 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
       <Select
         onChange={(e) => onCommand("fontSize", e.target.value)}
         style={{
-          padding: "4px 8px",
+          padding: "2px 6px",
+          minWidth: 84,
           background: "var(--bk-bg-panel)",
           border: "1px solid var(--bk-border)",
           borderRadius: 4,
@@ -301,16 +303,19 @@ const Divider = () => (
   <div
     style={{
       width: 1,
-      height: 20,
+      height: 18,
       background: "var(--bk-border)",
-      margin: "0 4px",
+      margin: "0 2px",
     }}
   />
 );
 
 const toolbarButtonStyle: React.CSSProperties = {
-  width: 28,
-  height: 28,
+  /* Board 1176:4824 is one 633px row. At 28px a button plus 8px of padding
+     and 4px dividers, the bar wrapped onto a second row over the text it was
+     editing — and the second row covered the line being typed. */
+  width: 24,
+  height: 24,
   display: "flex",
   alignItems: "center",
   justifyContent: "center",

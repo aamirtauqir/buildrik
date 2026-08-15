@@ -89,20 +89,26 @@ export const CANVAS_TEXT = {
 // ============================================
 
 export const CANVAS_COLORS = {
-  // Background
-  bgPanel: "#1e1e2e",
-  bgPanelSecondary: "#181825",
+  /* Background / text / borders were the 2026-04 dark theme's, kept after the
+     theme unification flipped the editor to light: `#1e1e2e` panels with
+     `#cdd6f4` text. Every floating thing on the canvas that reads these — the
+     element context menu and its submenus, smart suggestions, the canvas
+     dropdowns and inputs — was a black panel in a white editor, and board
+     1176:4866 draws the same menu white. Repointed at the light tokens here,
+     which is one edit for twenty-six call sites. */
+  bgPanel: "var(--bk-bg-card)",
+  bgPanelSecondary: "var(--bk-bg-subtle)",
   bgInput: "var(--bk-bg-card)",
   bgHover: BRAND_ACCENT.alpha15,
 
   // Text
-  textPrimary: "#cdd6f4",
+  textPrimary: "var(--bk-ink)",
   textSecondary: "var(--bk-ink-soft)",
-  textMuted: "#6c7086",
+  textMuted: "var(--bk-ink-muted)",
 
   // Borders
-  border: "rgba(255,255,255,0.1)",
-  borderLight: "rgba(255,255,255,0.06)",
+  border: "var(--bk-border)",
+  borderLight: "var(--bk-border)",
   borderInput: "var(--bk-border)",
 
   // Accent — cobalt accent ramp via BRAND_ACCENT
