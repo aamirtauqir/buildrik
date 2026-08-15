@@ -11,7 +11,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { ModalContent, ModalDescription, ModalRoot, ModalTitle, Button } from "@/editor/chrome-ui";
+import { ModalContent, ModalRoot, ModalTitle, Button } from "@/editor/chrome-ui";
 import type { TemplateUsageEntry } from "../utils/templateUsage";
 type Tab = "preview" | "used" | "versions";
 
@@ -73,12 +73,12 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
     <ModalRoot open={open} onOpenChange={onOpenChange}>
       <ModalContent size="lg" aria-labelledby={`tpl-usage-title-${templateId}`}>
         <div className={HEAD}>
+          {/* Board 1169:4764 asks the question in the title — "Where 'Bistro
+              Menu' is used" — instead of naming the template and explaining
+              underneath. */}
           <ModalTitle id={`tpl-usage-title-${templateId}`} className="tw:text-base tw:font-semibold">
-            {templateName}
+            Where &lsquo;{templateName}&rsquo; is used
           </ModalTitle>
-          <ModalDescription className="tw:text-xs tw:text-gray-500 tw:mt-0.5">
-            Where this template is in use across pages
-          </ModalDescription>
         </div>
 
         <div
@@ -181,6 +181,14 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
             />
           )}
         </div>
+
+        {/* Board 1169:4764's footnote, and the fact behind this whole drawer:
+            applying a template COPIES it, so editing the template later
+            changes nothing that already exists. Without it, a list of pages
+            reads like a set of live links. */}
+        <p className="tw:m-0 tw:px-6 tw:pb-3 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+          Changes to the template never touch pages already created from it.
+        </p>
 
         <div
           className={FOOTER}

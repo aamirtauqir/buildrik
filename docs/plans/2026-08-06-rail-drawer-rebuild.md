@@ -1873,6 +1873,26 @@ fetch to be slow or to fail. They become real the day the catalog is served —
 `userTemplates.list` already hydrates "My Templates" that way, and that is
 where those two states will land.
 
+**The usage drawer said what it listed, not what it meant.** Board 1169:4764
+asks its question in the title — "Where 'Bistro Menu' is used" — and closes
+with the fact the whole drawer exists to convey: *"Changes to the template
+never touch pages already created from it."* Applying a template COPIES it, so
+a list of pages without that line reads like a set of live links. Both are in
+now. Its three tabs stay: the board draws one purpose, but Preview and Versions
+each do real work (the Versions panel compares each page's applied version
+against the current one), and deleting working capability to match a drawing is
+the move this arc keeps refusing.
+
+**Board 1169:4753 (save-as-template) is not built, and deliberately so.** The
+engine has `TemplateManager.saveAsTemplate` and a hook that calls it; no UI
+does. The board draws the modal — name field, "Tokens are snapshotted —
+applying it later re-maps them to that site's brand", Cancel · Save template —
+but nothing says where it is launched from, and the Pages context menu board
+(1171:4713) lists Rename… · Duplicate · Set as homepage · Copy link · Page
+settings… · Delete page, with no "Save as template" among them. Building the
+modal without a route would add a fourth unreachable flow to this family.
+Named for the founder with the other two entry-point questions.
+
 Founder item from this walk: **the catalog has no section templates.** Board
 641:2487 draws three (Hero · image left, Menu grid · 3-up, Testimonials ·
 slider) and the panel has a group ready for them. That is content, not code.
