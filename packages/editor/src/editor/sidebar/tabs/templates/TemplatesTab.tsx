@@ -29,7 +29,7 @@ import { useTemplateUsageMap } from "./hooks/useTemplateUsageMap";
 import { resolveTokens } from "./utils/resolveTemplateTokens";
 import { snapshotFromComputedStyle } from "./utils/tokenSnapshot";
 import { DEFAULT_TOKENS } from "../../../design-system/constants";
-import { ApplyProgressOverlay } from "./ApplyProgressOverlay";
+import { ApplyProgressOverlay, type ApplyStep } from "./ApplyProgressOverlay";
 import "./TemplatesTab.css";
 
 // Re-export for external consumers
@@ -201,8 +201,31 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
     }
   }
 
-  function handleProgressComplete() {
-    setShowProgress(false);
+  /* The stages the apply actually runs, in the order it runs them. The
+     overlay used to tick these off on timers while the whole apply happened
+     afterwards in one blocking call — so every step read "done" before any of
+     it had been done. */
+  const APPLY_STEPS: ReadonlyArray<{ id: string; label: string }> = [
+    { id: "tokens", label: "Resolving brand tokens" },
+    { id: "import", label: "Importing template HTML" },
+    { id: "render", label: "Rendering on canvas" },
+    { id: "save", label: "Saving applied state" },
+  ];
+  const [applyStepIndex, setApplyStepIndex] = React.useState(0);
+  const applyCancelledRef = React.useRef(false);
+  const applyRunningRef = React.useRef(false);
+  /** Cancel is only honest before the import has landed. */
+  const [applyCancellable, setApplyCancellable] = React.useState(true);
+
+  const applySteps: ApplyStep[] = APPLY_STEPS.map((s, i) => ({
+    ...s,
+    state: i < applyStepIndex ? "done" : i === applyStepIndex ? "active" : "queued",
+  }));
+
+  /** Let React paint the step that just changed before the next one runs. */
+  const paint = () => new Promise<void>((r) => requestAnimationFrame(() => r()));
+
+  async function runApply() {
     const id = pendingId.current;
     if (!id) return;
     const t = SITE_TEMPLATES.find((x) => x.id === id);
@@ -211,28 +234,45 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
     // success/error modal routing below.
     const wasNewPageMode = addAsNewPageRef.current;
     if (!composer) {
+      setShowProgress(false);
       setApplyError("Editor not ready — please reload and try again");
       if (wasNewPageMode) setCreateResult("error");
       return;
     }
     if (!t.html) {
+      setShowProgress(false);
       setApplyError("Template has no content");
       if (wasNewPageMode) setCreateResult("error");
       return;
     }
 
     try {
-      if (wasNewPageMode) {
-        composer.elements.createPage(t.name);
-      }
-      if (resetStyles) composer.styles.clear();
+      // 1 — tokens
+      setApplyStepIndex(0);
+      await paint();
       // P3 phase 2: resolve `{{token.kind.name}}` placeholders against the
       // current Design System (read from :root computed style) before
       // sanitize+import. Templates without placeholders pass through
       // unchanged — regex misses leave content verbatim.
       const snapshot = snapshotFromComputedStyle(document.documentElement, DEFAULT_TOKENS);
       const resolvedHtml = resolveTokens(t.html, snapshot);
+      if (applyCancelledRef.current) { setShowProgress(false); return; }
+
+      // 2 — import. Past this point the page has changed, so Cancel stops
+      // being offered rather than promising an undo it cannot do.
+      setApplyStepIndex(1);
+      await paint();
+      if (wasNewPageMode) {
+        composer.elements.createPage(t.name);
+      }
+      if (resetStyles) composer.styles.clear();
+      setApplyCancellable(false);
       composer.elements.importHTMLToActivePage(resolvedHtml);
+
+      // 3 — the canvas re-render the import triggers
+      setApplyStepIndex(2);
+      await paint();
+      await paint();
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Failed to apply";
       setCanRetry(true);
@@ -246,8 +286,13 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
       // renders (it was previously never reachable; success was fired prematurely
       // from onConfirm, so error-state was dead).
       if (wasNewPageMode) setCreateResult("error");
+      setShowProgress(false);
       return;
     }
+
+    // 4 — bookkeeping
+    setApplyStepIndex(3);
+    await paint();
 
     // P2 fix (codex A6): success modal now fires AFTER actual page creation +
     // HTML import, not on confirm-click. Renders only in newPage flow.
@@ -276,7 +321,28 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
       }
       onTemplateUsed?.();
     });
+    setApplyStepIndex(APPLY_STEPS.length);
+    await paint();
+    setShowProgress(false);
   }
+
+  /* One run per showProgress window, whichever entry point opened it —
+     card preview, expanded gallery, or the create-page confirm. */
+  React.useEffect(() => {
+    if (!showProgress) {
+      applyRunningRef.current = false;
+      return;
+    }
+    if (applyRunningRef.current) return;
+    applyRunningRef.current = true;
+    applyCancelledRef.current = false;
+    setApplyCancellable(true);
+    setApplyStepIndex(0);
+    void runApply();
+    // runApply is redefined every render; the ref guard is what makes this
+    // fire once per window, so the dep list is deliberately just the flag.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showProgress]);
 
   // ── Render ──
   // Compact drawer (board 641:2487) vs the full grid: detail, new-page and
@@ -584,7 +650,18 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
         />
       )}
       {showProgress && (
-        <ApplyProgressOverlay templateName={tName} onComplete={handleProgressComplete} />
+        <ApplyProgressOverlay
+          templateName={tName}
+          steps={applySteps}
+          onCancel={
+            applyCancellable
+              ? () => {
+                  applyCancelledRef.current = true;
+                  setShowProgress(false);
+                }
+              : undefined
+          }
+        />
       )}
       {/* Board 642:2556 — what a drawer card opens. Applying goes through the
           same gate as every other entry point (premium check, then the replace

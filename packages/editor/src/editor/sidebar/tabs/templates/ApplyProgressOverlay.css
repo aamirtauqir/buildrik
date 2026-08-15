@@ -1,57 +1,51 @@
+/* Board 642:2832 (Templates · applying): a light card over a scrim, not a
+   dark full-screen takeover. The old treatment was near-black with white text
+   — legible over the dark sample template it was designed against and nowhere
+   near the rest of the editor's chrome, which is the canonical light theme. */
+
 .tmpl-progress {
   position: fixed;
   inset: 0;
-  background: rgba(4, 4, 12, 0.92);
-  backdrop-filter: blur(4px);
+  /* The scrim every other overlay uses (OverlayMount). */
+  background: var(--bk-alpha-ink-40);
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: var(--bk-space-24);
-  gap: 14px;
   z-index: 1050;
 }
 
 .tmpl-progress__inner {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 14px;
+  align-items: stretch;
+  gap: var(--bk-space-8);
   width: 100%;
+  max-width: 440px;
+  padding: var(--bk-space-20) var(--bk-space-24) var(--bk-space-16);
+  background: var(--bk-bg-card);
+  border: 1px solid var(--bk-border);
+  border-radius: var(--bk-radius-lg);
+  box-shadow: var(--bk-shadow-overlay);
 }
 
 .tmpl-progress__title {
-  font-size: 13px;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.9);
-  text-align: center;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--bk-ink);
   letter-spacing: -0.01em;
 }
 
-.tmpl-progress__spinner {
-  display: block;
-  width: 8px;
-  height: 8px;
-  border: 1.5px solid var(--bk-accent-tint);
-  border-top-color: var(--bk-accent);
-  border-radius: var(--bk-radius-full);
-  animation: tmpl-spin 0.6s linear infinite;
-}
-
-@keyframes tmpl-spin {
-  to { transform: rotate(360deg); }
-}
-
 .tmpl-progress__cancel {
+  align-self: flex-end;
   margin-top: var(--bk-space-12);
   font-size: 12px;
-  color: rgba(255,255,255,0.3);
+  color: var(--bk-ink-muted);
   background: none;
   border: none;
   cursor: pointer;
   font-family: inherit;
-  text-decoration: underline;
-  transition: color 0.12s;
 }
 
-.tmpl-progress__cancel:hover { color: rgba(255,255,255,0.55); }
+.tmpl-progress__cancel:hover { color: var(--bk-ink); }

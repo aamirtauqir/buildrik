@@ -1,9 +1,14 @@
 /**
- * ApplyProgressOverlay — shows 4-step progress while template apply runs.
+ * ApplyProgressOverlay — Templates board 642:2832 (Templates · applying).
  *
- * P2 fix (codex A8): was a single spinner; now sequenced status flow
- * matching v3 prototype § 8: Importing → Resolving tokens → Rendering → Saving.
- * Each step ≈300ms. onComplete fires after final step.
+ * A light card over the scrim: what is being applied, the one instruction that
+ * matters while it runs, a determinate bar, and the steps with their state.
+ *
+ * It is DRIVEN, not self-driving. It used to tick its four steps off on 300ms
+ * timers and then run the entire apply in one go at the end — so "Importing
+ * template HTML ✓" appeared before anything had been imported, and the bar
+ * reached 100% while the work had not started. The caller now advances it as
+ * each stage actually completes.
  *
  * @license BSD-3-Clause
  */
@@ -12,115 +17,88 @@ import * as React from "react";
 import "./ApplyProgressOverlay.css";
 import { Button, Portal } from "@/editor/chrome-ui";
 
-export interface ApplyProgressOverlayProps {
-  templateName: string;
-  onComplete: () => void;
-  onCancel?: () => void;
-  onError?: (err: Error) => void;
-}
+export type ApplyStepState = "done" | "active" | "queued";
 
-interface Step {
+export interface ApplyStep {
   id: string;
   label: string;
+  state: ApplyStepState;
 }
 
-const STEPS: Step[] = [
-  { id: "import", label: "Importing template HTML" },
-  { id: "tokens", label: "Resolving brand tokens" },
-  { id: "render", label: "Rendering on canvas" },
-  { id: "save", label: "Saving applied state" },
-];
+export interface ApplyProgressOverlayProps {
+  templateName: string;
+  steps: ApplyStep[];
+  /** Offered only while the work can still be called off — see TemplatesTab. */
+  onCancel?: () => void;
+}
 
-const STEP_DURATION = 300; // ms per step
-const FINAL_HOLD = 200; // ms hold on completed state before onComplete
+const STEP_COLOR: Record<ApplyStepState, string> = {
+  done: "var(--bk-success)",
+  active: "var(--bk-accent)",
+  queued: "var(--bk-ink-disabled)",
+};
+
+const STEP_GLYPH: Record<ApplyStepState, string> = {
+  done: "✓",
+  active: "→",
+  queued: "○",
+};
 
 export const ApplyProgressOverlay: React.FC<ApplyProgressOverlayProps> = ({
   templateName,
-  onComplete,
+  steps,
   onCancel,
-  onError,
 }) => {
-  const [stepIndex, setStepIndex] = React.useState(0);
-  const onCompleteRef = React.useRef(onComplete);
-  React.useLayoutEffect(() => { onCompleteRef.current = onComplete; });
+  const done = steps.filter((s) => s.state === "done").length;
+  const pct = steps.length === 0 ? 0 : Math.round((done / steps.length) * 100);
 
-  React.useEffect(() => {
-    const timers: ReturnType<typeof setTimeout>[] = [];
-    // Advance through each step.
-    for (let i = 1; i <= STEPS.length; i++) {
-      timers.push(
-        setTimeout(() => setStepIndex(i), STEP_DURATION * i)
-      );
-    }
-    // Fire complete after all steps + final hold.
-    timers.push(
-      setTimeout(
-        () => onCompleteRef.current(),
-        STEP_DURATION * STEPS.length + FINAL_HOLD
-      )
-    );
-    return () => timers.forEach((t) => clearTimeout(t));
-  }, []);
-
-  React.useEffect(() => {
-    if (!onError) return;
-    const timer = setTimeout(() => onError(new Error("Apply timed out")), 15000);
-    return () => clearTimeout(timer);
-  }, [onError]);
-
-  return <Portal>
-    <div className="tmpl-progress" role="status" aria-label="Applying template" aria-live="polite">
-      <div className="tmpl-progress__inner">
-        <span className="tmpl-progress__spinner" style={{ width: 32, height: 32, borderWidth: 3 }} />
-        <h3 className="tmpl-progress__title">Applying {templateName}…</h3>
-        <ol
-          style={{
-            listStyle: "none",
-            padding: 0,
-            margin: "12px 0 0",
-            display: "flex",
-            flexDirection: "column",
-            gap: 4,
-            fontSize: 12,
-            color: "var(--bk-ink-muted)",
-            textAlign: "left",
-            minWidth: 220,
-          }}
-        >
-          {STEPS.map((s, i) => {
-            const done = i < stepIndex;
-            const active = i === stepIndex;
-            return (
+  return (
+    <Portal>
+      <div className="tmpl-progress" role="status" aria-label="Applying template" aria-live="polite">
+        <div className="tmpl-progress__inner">
+          <h3 className="tmpl-progress__title">Applying {templateName}…</h3>
+          <p className="tw:m-0 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+            Do not close the editor
+          </p>
+          <span
+            className="tw:mt-3 tw:block tw:h-1.5 tw:w-full tw:overflow-hidden tw:rounded-full tw:bg-[var(--bk-bg-subtle)]"
+            role="progressbar"
+            aria-valuenow={done}
+            aria-valuemin={0}
+            aria-valuemax={steps.length}
+          >
+            <span
+              className="tw:block tw:h-full tw:rounded-full tw:bg-[var(--bk-accent)]"
+              style={{ width: `${pct}%` }}
+            />
+          </span>
+          <ol className="tw:m-0 tw:mt-3 tw:flex tw:list-none tw:flex-col tw:gap-1 tw:p-0 tw:text-left tw:text-[12px]">
+            {steps.map((s) => (
               <li
                 key={s.id}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                  color: done
-                    ? "var(--bk-success)"
-                    : active
-                      ? "var(--bk-accent)"
-                      : "var(--bk-ink-disabled)",
-                  fontWeight: active ? 500 : 400,
-                }}
+                className="tw:flex tw:items-center tw:gap-2"
+                data-step-state={s.state}
+                /* The one genuinely varying value stays inline — VersionRow
+                   precedent; three utility classes that differ only by colour
+                   would say less. */
+                style={{ color: STEP_COLOR[s.state], fontWeight: s.state === "active" ? 500 : 400 }}
               >
-                <span style={{ width: 14, display: "inline-flex", justifyContent: "center" }}>
-                  {done ? "✓" : active ? "→" : "○"}
+                <span className="tw:inline-flex tw:w-3.5 tw:justify-center" aria-hidden="true">
+                  {STEP_GLYPH[s.state]}
                 </span>
                 {s.label}
               </li>
-            );
-          })}
-        </ol>
-        {onCancel && (
-          <Button className="tmpl-progress__cancel" onClick={onCancel}>
-            Cancel
-          </Button>
-        )}
+            ))}
+          </ol>
+          {onCancel && (
+            <Button className="tmpl-progress__cancel" onClick={onCancel}>
+              Cancel
+            </Button>
+          )}
+        </div>
       </div>
-    </div>
-    </Portal>;
+    </Portal>
+  );
 };
 
 export default ApplyProgressOverlay;
