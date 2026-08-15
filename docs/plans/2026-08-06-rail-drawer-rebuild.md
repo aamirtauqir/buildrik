@@ -2397,3 +2397,86 @@ Two separate decisions to make:
    named. Fine while an element carries one binding; say so if that changes.
 - Drawer drill-ins beyond the 85 boards (Media drill-in boards ARE in the 17).
 - Backend/behaviour changes; `AquibraStudio.tsx` (founder's dirty file).
+
+---
+
+## 2026-08-16 — the six open founder calls, investigated
+
+The six items parked as "founder calls" at the 08-15 checkpoint were walked
+against their boards. Four had a board answer and are fixed. Two are genuine
+product decisions and are still open. One of my own earlier claims was wrong
+and is corrected below.
+
+### Fixed — the board settled it
+
+**Zoom was in the wrong bar, and that is why the toggles lost their names.**
+Board 817:4723 says it in prose: *"Bottom-right corner of footer. Click
+percentage to open flyout. Range: 10%–400%."* The −/100%/+ group and its preset
+popover were in the floating canvas toolbar instead, costing ~105px of a 760px
+column — which is exactly why every overlay toggle had been cut to a bare icon
+with its name hidden in a tooltip. Board 199:205 draws those toggles as WORDS.
+Moved zoom to `StudioFooter`, where `Desktop · 100%` stops being a label and
+becomes the control. Fit and zoom-to-selection emit `ZOOM_FIT` /
+`ZOOM_SELECTION` on the composer, because only the canvas can measure. Live at
+1440: 758px of a 760px bar, labels back, no overflow. (`6f2df60f`)
+
+**⌘R now toggles Rulers.** It was the one chord on board 817:4649 never bound,
+because it is the browser's reload. Taken anyway — a chord printed on a control
+and not honoured is the worse failure — and only the PLAIN chord, so ⌘⇧R and F5
+both still reload the editor.
+
+**The onboarding checklist outranked every popover.** A raw `z-index: 1200`
+against a token scale that tops out at 70. The zoom flyout opened underneath the
+"0 / 7 done" pill, which covered its "Zoom in" row. Now on `--bk-z-drawer`.
+
+**"All like this" was not a mode, and what it actually did was worse than the
+label.** Board 160:412 draws a banner that stays up while you work. The code
+opened a confirm and then copied the selected element's ENTIRE style map onto
+every same-type peer — a peer with its own padding, colour and size lost all
+three, warned only by a count. It is the mode now; the fan-out lives in
+`useStyleHandlers`, so only the property you edit moves, to the same breakpoint
+and pseudo-state, in one transaction. The pill reads the reach it is IN.
+(`3635b9e4`)
+
+**The pill strip was wrong in three ways two boards agree on** (807:8342 and
+160:412): all three pills accent-tinted blue at 10px instead of reach-white +
+two bare; the strip painted `--bk-bg-panel` = `#FFFFFF`, the same white as the
+pill meant to stand out of it; and the breakpoint pill carried its width range
+inline ("Desktop · 1200+", 136px of 297) which forced the row to wrap. Range
+still shows on every row of the dropdown it opens.
+
+**The editor's feature flags are set on the half that never ships.** Every flag
+reads `VITE_FEATURE_X ?? NEXT_PUBLIC_FEATURE_X`, and only the `NEXT_PUBLIC_`
+half reaches production — the shipping editor is bundled into Next, where
+`import.meta.env.VITE_*` does not exist. `.env.local` sets
+`VITE_FEATURE_COMPONENTS_V2=true` and nothing else, so **the port-5050 demo
+shows `ComponentsPanelV2` and every real user gets the legacy `ComponentsTab`.**
+The same file already carries this warning for Publish. Four rows added to the
+deploy checklist; `check-prod-env.mjs` still checks none of them. (`293125b8`)
+
+### Correction to the 08-15 ledger
+
+"New sites still seed `#2D6DFF`" named the wrong token. A new site's brand comes
+from `DEFAULT_TOKENS` (starters are user-picked, never auto-applied), and its
+`color-primary` is **`#3B82F6`**. `#2D6DFF` ships twice in that same seed:
+`color-blue-500` — a primitive literally named "Blue 500" holding a value that
+is not blue-500 in any ramp — and `color-action`, aliased to it, which is what
+every CTA resolves to. So a new site ships **two different brand blues at
+once**, and beginner mode (semantics only) shows one while Pro shows both.
+
+### Still open — genuine product calls
+
+1. **Which Components panel ships?** Neither matches board 641:2546, which
+   wants `YOUR COMPONENTS` (name · N instances · ›) + `FROM BRAND` (name ·
+   linked · ›) + a primary `+ Create component`. V2 has filter pills, a search
+   field, an AI chip and a dashed "Save current selection"; legacy is one
+   section. The engine already has `getInstancesOfComponent`, so the counts are
+   buildable. Recommend: conform V2's body to the board, ship it in both paths,
+   drop the flag.
+2. **Typography (153:57).** Active fonts with role pills and weights, "+ Add a
+   font", a `.woff2` drop zone, and an "I have a licence for this font"
+   checkbox. The list half is buildable today from the type tokens; the upload
+   and licence half needs storage. Recommend: build the list now, park upload.
+3. **The two brand blues.** Which value is a new customer's `color-action` —
+   `#3B82F6`, `#2D6DFF`, or the product's own `#1A56DB`? Customer output, so
+   not mine to pick. The contradiction is a bug whichever way it goes.
