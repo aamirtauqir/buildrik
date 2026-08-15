@@ -475,12 +475,19 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 const ShortcutBadge: React.FC<{ shortcut: string }> = ({ shortcut }) => {
   const isMac = typeof navigator !== "undefined" && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
 
-  const display = shortcut
-    .replace(/Cmd/g, isMac ? "⌘" : "Ctrl")
-    .replace(/Alt/g, isMac ? "⌥" : "Alt")
-    .replace(/Shift/g, isMac ? "⇧" : "Shift")
-    .replace(/Del/g, isMac ? "⌫" : "Del")
-    .replace(/\+/g, " ");
+  /* "+" is both the separator and a key. Replacing every one of them with a
+     space turned "Cmd++" (zoom in) into a lone "⌘" — the palette printed a
+     modifier with no key for it. Pull the trailing key out first. */
+  const literalKey = /\+\+$/.test(shortcut) ? "+" : /\+-$/.test(shortcut) ? "−" : null;
+  const body = literalKey ? shortcut.slice(0, -1) : shortcut;
+
+  const display =
+    body
+      .replace(/Cmd/g, isMac ? "⌘" : "Ctrl")
+      .replace(/Alt/g, isMac ? "⌥" : "Alt")
+      .replace(/Shift/g, isMac ? "⇧" : "Shift")
+      .replace(/Del/g, isMac ? "⌫" : "Del")
+      .replace(/\+/g, " ") + (literalKey ?? "");
 
   return (
     <span

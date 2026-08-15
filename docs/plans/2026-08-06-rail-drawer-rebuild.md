@@ -2208,6 +2208,48 @@ sections' own More settings.
 engine. An instance's own edits could be made and never taken back short of
 detaching it. `resetInstance` is the opposite of sync and reuses it.
 
+## Canvas family — walked board vs live, 2026-08-15
+
+Seven boards. Two of them are spec cards rather than screens (the toolbar's
+seven toggles, the zoom flyout's states), which is where the divergence hid:
+nobody had read the descriptions against the behaviour.
+
+- **X-Ray did the opposite of its board.** 817:4649: "All fills become
+  transparent, strokes become grey." Live painted every element
+  `background: var(--bk-accent-subtle) !important`, so the mode meant to strip
+  a page back to structure turned a dark hero pale blue with white text still
+  on it. It also drew its own type label on every element — the Badges
+  toggle's job — from a palette DESIGN.md bans, which Gate 18 cannot see
+  because it reads class names and these were raw `rgba()`.
+- **Badges labelled everything at once.** The board says "shown on hover",
+  blue chip. Forty elements wore forty dark chips.
+- **None of the seven chords existed.** The board prints one against every
+  toggle; the bar's tooltips were the only place they lived. ⌘; ⌘⇧; ⌘' ⌘B
+  ⌘⇧X are bound and verified live. ⌘R for Rulers is the browser's reload —
+  left unbound, founder's call.
+- **The zoom control could not be clicked.** The footer bar is 760px of canvas
+  column and had grown to ~840; the overflow sat under the inspector, and
+  `elementFromPoint` at the zoom button's centre returned the inspector aside.
+  Toggles are icons now (name + chord in the tooltip) and everything fits.
+  The board draws this bar 1440px wide across the whole window — moving it
+  there is a shell change (AquibraStudio), so it is a founder call.
+- **The zoom flyout was missing half its board.** No "Zoom to selection", and
+  the chords it printed were bound to nothing — Fit was labelled ⌘0 while
+  binding nothing at all. ⌘1 / ⌘2 / ⌘0 / ⌘+ / ⌘− all work now.
+- **The context menu was still the April dark theme** — a near-black panel in
+  a light editor, from `CANVAS_COLORS.bgPanel: #1e1e2e` that twenty-six call
+  sites read. Board 1176:4866 draws it white. "Unwrap Element" was hidden when
+  it did not apply rather than greyed, so the menu changed shape between
+  elements and the command was unlearnable.
+- **The inline text toolbar wrapped onto a second row** over the line being
+  edited (board 1176:4824 is one row).
+- **"Cmd++" printed as "⌘"** in the canvas palette: the formatter replaced
+  every "+" with a space, separator and key alike, so zoom-in showed a
+  modifier with no key.
+
+Matched without changes: hover levels (1176:4925 — all four, verified live),
+the breadcrumb's shape and the palette's groups, disabled rows and footer.
+
 ### Founder calls out of this walk
 
 1. **Reach "all like this" — mode or action?** Board 160:412 draws it as a
