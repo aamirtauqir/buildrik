@@ -16,7 +16,7 @@
 
 import * as React from "react";
 import { useClickOutside } from "@/shared/hooks";
-import { BreakpointSwitcher, Button, POPOVER_BASE_CLASS, Portal, Tooltip, type Breakpoint } from "@/editor/chrome-ui";
+import { BreakpointSwitcher, Button, isModalOpen, POPOVER_BASE_CLASS, Portal, Tooltip, type Breakpoint } from "@/editor/chrome-ui";
 import { ZOOM_PRESETS } from "./shared";
 // Undo/redo/device switching moved OFF the topbar and onto this canvas toolbar
 // (Figma contract §2: viewport + edit controls belong to the canvas, the topbar
@@ -232,6 +232,42 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
   onUndo,
   onRedo,
 }) => {
+  /* Board 817:4649 prints a chord against every toggle, and none of them was
+     bound — the hints on this bar were the only place they existed. The
+     handler lives here rather than in the shell's shortcut hook because this
+     component already owns the toggles' state and callback.
+
+     ⌘R (Rulers) is deliberately NOT bound: it is the browser's reload, and
+     taking it means a user who wants to reload gets rulers instead. Named in
+     the ledger for the founder rather than settled here. */
+  React.useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (isModalOpen()) return;
+      const target = e.target instanceof HTMLElement ? e.target : null;
+      if (
+        target &&
+        (target.isContentEditable ||
+          ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName))
+      ) {
+        return;
+      }
+      if (!(e.metaKey || e.ctrlKey)) return;
+
+      const key = e.key.toLowerCase();
+      let overlay: keyof CanvasOverlayState | null = null;
+      if (key === ";" || key === ":") overlay = e.shiftKey ? "spacing" : "guides";
+      else if (key === "'" || key === '"') overlay = "grid";
+      else if (key === "b" && !e.shiftKey) overlay = "badges";
+      else if (key === "x" && e.shiftKey) overlay = "xray";
+      if (!overlay) return;
+
+      e.preventDefault();
+      onOverlayChange(overlay, !overlays[overlay]);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [overlays, onOverlayChange]);
+
   const [showPresets, setShowPresets] = React.useState(false);
   const presetsRef = React.useRef<HTMLDivElement>(null);
   /* The flyout lives in a portal, outside presetsRef's subtree — without the
@@ -315,18 +351,21 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
         <OverlayButton
           icon={<GuidesIcon />}
           label="Snap Guides"
+          shortcut="⌘;"
           active={overlays.guides}
           onClick={() => onOverlayChange("guides", !overlays.guides)}
         />
         <OverlayButton
           icon={<SpacingIcon />}
           label="Spacing"
+          shortcut="⌘⇧;"
           active={overlays.spacing}
           onClick={() => onOverlayChange("spacing", !overlays.spacing)}
         />
         <OverlayButton
           icon={<GridIcon />}
           label="Grid"
+          shortcut="⌘'"
           active={overlays.grid}
           onClick={() => onOverlayChange("grid", !overlays.grid)}
         />
@@ -339,12 +378,14 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
         <OverlayButton
           icon={<BadgesIcon />}
           label="Badges"
+          shortcut="⌘B"
           active={overlays.badges}
           onClick={() => onOverlayChange("badges", !overlays.badges)}
         />
         <OverlayButton
           icon={<XRayIcon />}
           label="X-Ray"
+          shortcut="⌘⇧X"
           active={overlays.xray}
           onClick={() => onOverlayChange("xray", !overlays.xray)}
         />

@@ -600,117 +600,65 @@
   animation: settleElement 0.3s ease-out;
 }
 
+/* X-Ray — board 817:4649: "Wireframe mode. All fills become transparent,
+   strokes become grey, images show placeholder. Reveals layout structure."
+
+   It used to do the opposite of the first clause: every element got
+   `background: var(--bk-accent-subtle)`, so a dark hero turned pale blue with
+   white text on it and the page became unreadable rather than structural. It
+   also printed its own type label on every element — the Badges toggle's job,
+   shown whether or not Badges was on — in a per-type palette that included
+   violet and pink, which DESIGN.md bans and no gate catches inside a raw
+   rgba(). Both are gone; what is left is the wireframe the board describes. */
 .buildrick-canvas[data-xray-mode="true"] [data-buildrick-id] {
-  outline: 1px dashed var(--bk-accent) !important;
+  outline: 1px solid var(--bk-border-medium) !important;
   outline-offset: -1px;
-  background: var(--bk-accent-subtle) !important;
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  /* Text has to survive its background disappearing: a white headline on a
+     dark hero became white on white the moment the fill went. */
+  color: var(--bk-ink-soft) !important;
+  -webkit-text-fill-color: var(--bk-ink-soft) !important;
   position: relative;
 }
 
-.buildrick-canvas[data-xray-mode="true"] [data-buildrick-id]::before {
-  content: attr(data-buildrick-type);
-  position: absolute;
-  top: 0;
-  left: 0;
-  font-size: var(--bk-text-11);
-  font-family: monospace;
-  background: rgba(30, 30, 46, 0.9);
-  color: var(--bk-accent);
-  padding: 1px var(--bk-space-4);
-  border-radius: 2px;
-  pointer-events: none;
-  z-index: 2000; /* Z_LAYERS.dropFeedback - unified registry */
-  text-transform: lowercase;
-  white-space: nowrap;
+/* Images stand in as a placeholder box rather than competing with the
+   structure they sit inside. */
+.buildrick-canvas[data-xray-mode="true"] img,
+.buildrick-canvas[data-xray-mode="true"] [data-buildrick-type="image"] img,
+.buildrick-canvas[data-xray-mode="true"] video {
+  opacity: 0.15 !important;
+  filter: grayscale(1);
 }
 
-.buildrick-canvas[data-xray-mode="true"] [data-buildrick-type="container"]::before {
-  background: rgba(180, 190, 254, 0.9);
-  color: var(--bk-ink);
-}
-
-.buildrick-canvas[data-xray-mode="true"] [data-buildrick-type="columns"]::before,
-.buildrick-canvas[data-xray-mode="true"] .row::before {
-  background: rgba(203, 166, 247, 0.9);
-  color: var(--bk-ink);
-}
-
-.buildrick-canvas[data-xray-mode="true"] .col::before {
-  background: rgba(245, 194, 231, 0.9);
-  color: var(--bk-ink);
-}
-
-.buildrick-canvas[data-xray-mode="true"] [data-buildrick-type="text"]::before,
-.buildrick-canvas[data-xray-mode="true"] [data-buildrick-type="heading"]::before {
-  background: rgba(148, 226, 213, 0.9);
-  color: var(--bk-ink);
-}
-
-.buildrick-canvas[data-xray-mode="true"] [data-buildrick-type="button"]::before {
-  background: rgba(166, 227, 161, 0.9);
-  color: var(--bk-ink);
-}
-
-.buildrick-canvas[data-xray-mode="true"] [data-buildrick-type="image"]::before {
-  background: rgba(250, 179, 135, 0.9);
-  color: var(--bk-ink);
-}
-
-.buildrick-canvas[data-xray-mode="true"] [data-buildrick-id][data-selected="true"]::before {
-  display: none;
-}
-
-.buildrick-canvas[data-xray-mode="true"] [data-buildrick-id] [data-buildrick-id] {
-  outline-color: rgba(180, 190, 254, 0.4) !important;
-}
-
-.buildrick-canvas[data-xray-mode="true"] [data-buildrick-id] [data-buildrick-id] [data-buildrick-id] {
-  outline-color: rgba(203, 166, 247, 0.4) !important;
-}
-
+/* Badges — board 817:4649: "Element type badges shown on hover. Blue chip
+   labels: 'Section','Flex','Text','Image'." They used to sit on every element
+   at once, in a dark chip with muted text (plus one orange one for images),
+   so a page with forty elements wore forty labels and the design underneath
+   was hard to read. On hover, one at a time, in the accent. */
 .buildrick-canvas[data-badges="true"] [data-buildrick-id] {
   position: relative;
 }
 
-.buildrick-canvas[data-badges="true"] [data-buildrick-id]::after {
+.buildrick-canvas[data-badges="true"] [data-buildrick-id]:hover::after {
   content: attr(data-buildrick-type);
   position: absolute;
   bottom: 2px;
   right: 2px;
-  font-size: 12px;
-  font-family: monospace;
+  font-size: var(--bk-text-11);
+  font-family: var(--bk-font-ui);
   font-weight: 600;
-  background: rgba(30, 30, 46, 0.85);
-  color: var(--bk-ink-muted);
+  background: var(--bk-accent);
+  color: var(--bk-accent-on);
   padding: 1px var(--bk-space-4);
   border-radius: 2px;
   pointer-events: none;
   z-index: 1500;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
+  text-transform: capitalize;
+  letter-spacing: 0.2px;
   white-space: nowrap;
   line-height: 1.5;
-}
-
-.buildrick-canvas[data-badges="true"] [data-buildrick-type="container"]::after {
-  color: var(--bk-ink-muted);
-}
-
-.buildrick-canvas[data-badges="true"] [data-buildrick-type="text"]::after,
-.buildrick-canvas[data-badges="true"] [data-buildrick-type="heading"]::after {
-  color: var(--bk-ink-muted);
-}
-
-.buildrick-canvas[data-badges="true"] [data-buildrick-type="button"]::after {
-  color: var(--bk-ink-muted);
-}
-
-.buildrick-canvas[data-badges="true"] [data-buildrick-type="image"]::after {
-  color: #f97316;
-}
-
-.buildrick-canvas[data-xray-mode="true"][data-badges="true"] [data-buildrick-id]::after {
-  display: none;
 }
 
 [data-buildrick-id][contenteditable="true"] {
