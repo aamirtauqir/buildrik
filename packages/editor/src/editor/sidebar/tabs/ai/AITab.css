@@ -487,3 +487,26 @@
   font-weight: 500;
   color: var(--bk-error);
 }
+
+/* Board 171:36 (AI · stopped) — grey, because nothing went wrong. */
+.bd-ai-agent-stopped {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bk-space-4);
+  padding: var(--bk-space-12) var(--bk-space-16);
+  background: var(--bk-bg-subtle);
+}
+
+.bd-ai-agent-stopped__head {
+  margin: 0;
+  font-size: 13px;
+  color: var(--bk-ink);
+}
+
+.bd-ai-agent-stopped__undo {
+  align-self: flex-start;
+  padding: 0;
+  border-color: transparent;
+  background: transparent;
+  color: var(--bk-accent);
+}

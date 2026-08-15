@@ -276,6 +276,7 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
           onApprove={agent.approve}
           onSkip={agent.skip}
           onStop={agent.stop}
+          stoppedByUser={agent.stoppedByUser}
           onRetry={lastAgentPrompt.current ? () => agent.start(lastAgentPrompt.current) : undefined}
           /* Each applied step is its own transaction, so taking the run back
              is exactly that many undos — and nothing has happened since the

@@ -51,6 +51,9 @@ interface UseAgentRunnerResult {
   steps: RunStep[];
   currentIndex: number;
   error: string | null;
+  /** Board 171:36 — a run the user stopped is not a run that finished, and
+   *  `phase` alone could not tell them apart (stop() sets "done"). */
+  stoppedByUser: boolean;
   autoApply: boolean;
   setAutoApply: (on: boolean) => void;
   start: (prompt: string) => void;
@@ -72,6 +75,7 @@ export function useAgentRunner(
   const [steps, setSteps] = React.useState<RunStep[]>([]);
   const [currentIndex, setCurrentIndex] = React.useState(-1);
   const [error, setError] = React.useState<string | null>(null);
+  const [stoppedByUser, setStoppedByUser] = React.useState(false);
   const [autoApply, setAutoApplyState] = React.useState(false);
 
   const stepsRef = React.useRef<RunStep[]>([]);
@@ -198,6 +202,7 @@ export function useAgentRunner(
     async (prompt: string) => {
       if (!composer) return;
       cancelledRef.current = false;
+      setStoppedByUser(false);
       runStartRef.current = Date.now();
       reportedRef.current = false;
       setError(null);
@@ -255,6 +260,7 @@ export function useAgentRunner(
 
   const stop = React.useCallback(() => {
     cancelledRef.current = true;
+    setStoppedByUser(true);
     setPhase("done"); composer?.emit("ai:agent-run", { running: false, summary: "" });
     setCurrentIndex(-1);
     reportRun();
@@ -262,6 +268,7 @@ export function useAgentRunner(
 
   const reset = React.useCallback(() => {
     cancelledRef.current = true;
+    setStoppedByUser(false);
     setPhase("idle"); composer?.emit("ai:agent-run", { running: false, summary: "" });
     setSteps([]);
     stepsRef.current = [];
@@ -269,5 +276,5 @@ export function useAgentRunner(
     setError(null);
   }, []);
 
-  return { phase, steps, currentIndex, error, autoApply, setAutoApply, start, approve, skip, stop, reset };
+  return { phase, steps, currentIndex, error, stoppedByUser, autoApply, setAutoApply, start, approve, skip, stop, reset };
 }

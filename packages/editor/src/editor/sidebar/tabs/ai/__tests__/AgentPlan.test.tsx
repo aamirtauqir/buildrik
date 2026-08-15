@@ -140,4 +140,27 @@ describe("agent run", () => {
     expect(screen.getByText(/Nothing was applied\. Nothing after step 1 ran\./)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Undo all" })).toBeDisabled();
   });
+
+  /* Board 171:36 — stopping is not finishing, and stop() sets the same phase
+     as a completed run, so the panel needs telling. */
+  it("a run the user stopped says so, and offers to take back what applied", () => {
+    const onUndoAll = vi.fn();
+    renderPlan({
+      phase: "done",
+      currentIndex: -1,
+      stoppedByUser: true,
+      steps: [
+        step("Rewrite the headline", "applied"),
+        step("Warm the tint", "pending"),
+        step("Swap the hero photo", "pending"),
+      ],
+      onUndoAll,
+    });
+
+    expect(screen.getByText("Stopped by you")).toBeInTheDocument();
+    expect(screen.getByText("Stopped after step 1.")).toBeInTheDocument();
+    expect(screen.getByText(/Undo all takes back the 1 step that applied/)).toBeInTheDocument();
+    // Not the finished-run wording.
+    expect(screen.queryByText(/changes applied/)).not.toBeInTheDocument();
+  });
 });

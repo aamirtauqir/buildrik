@@ -36,6 +36,8 @@ export interface AgentPlanProps {
   onApprove: () => void;
   onSkip: () => void;
   onStop: () => void;
+  /** Board 171:36 — a run the user stopped, told apart from one that finished. */
+  stoppedByUser?: boolean;
   /** Board 171:2 — re-run the same brief after a step failed. */
   onRetry?: () => void;
   /** Board 171:2 — take back the steps that did land. */
@@ -70,11 +72,17 @@ const STEP_COLOR: Record<RunStep["status"], string> = {
   failed: "var(--bk-error)",
 };
 
-function bandLabel(phase: RunPhase, steps: RunStep[], currentIndex: number): string {
+function bandLabel(
+  phase: RunPhase,
+  steps: RunStep[],
+  currentIndex: number,
+  stoppedByUser?: boolean,
+): string {
   const total = steps.length;
   const doneCount = steps.filter((s) => s.status === "applied").length;
   const failedAt = steps.findIndex((s) => s.status === "failed");
   if (failedAt >= 0) return `Stopped at step ${failedAt + 1}`;
+  if (stoppedByUser) return "Stopped by you";
   if (phase === "planning") return "Planning";
   if (steps[currentIndex]?.status === "awaiting") return `Paused at step ${currentIndex + 1}`;
   if (phase === "running") return `Running · ${Math.min(currentIndex + 1, total)} of ${total}`;
@@ -92,6 +100,7 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
   onApprove,
   onSkip,
   onStop,
+  stoppedByUser,
   onRetry,
   onUndoAll,
 }) => {
@@ -124,7 +133,7 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
 
   return (
     <div className="bd-ai-agent">
-      <div className="bd-ai-agent-band">{bandLabel(phase, steps, currentIndex)}</div>
+      <div className="bd-ai-agent-band">{bandLabel(phase, steps, currentIndex, stoppedByUser)}</div>
 
       <ol className="bd-ai-agent-steps">
         {steps.map((s, i) => (
@@ -212,7 +221,26 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
         </div>
       ) : null}
 
-      {phase === "done" && !error ? (
+      {/* Board 171:36 — stopping is not finishing. What already ran is kept,
+          and taking it back is offered here rather than left to ⌘Z. */}
+      {phase === "done" && !error && stoppedByUser ? (
+        <div className="bd-ai-agent-stopped">
+          <p className="bd-ai-agent-stopped__head">
+            Stopped after step {appliedCount + skippedCount}.
+          </p>
+          <p className="bd-ai-agent-foot">
+            What already ran is kept.
+            {appliedCount > 0
+              ? ` Undo all takes back the ${appliedCount} step${appliedCount === 1 ? "" : "s"} that applied.`
+              : ""}
+          </p>
+          {onUndoAll && appliedCount > 0 ? (
+            <Button type="button" color="light" className="bd-ai-agent-stopped__undo" onClick={onUndoAll}>
+              Undo all
+            </Button>
+          ) : null}
+        </div>
+      ) : phase === "done" && !error ? (
         <div className="bd-ai-agent-result">
           <p className="bd-ai-agent-result__head">
             {appliedCount} change{appliedCount === 1 ? "" : "s"} applied
