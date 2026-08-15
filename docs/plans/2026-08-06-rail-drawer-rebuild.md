@@ -2250,6 +2250,57 @@ nobody had read the descriptions against the behaviour.
 Matched without changes: hover levels (1176:4925 — all four, verified live),
 the breadcrumb's shape and the palette's groups, disabled rows and footer.
 
+## Content family — walked, 2026-08-15
+
+Fifteen boards. The panel's own screens were close; the walk's finds were one
+serious bug and two pieces of copy in the wrong place.
+
+- **Every modal in the editor took one keystroke.** Typing "Recipes" into the
+  create-collection wizard produced "R", and the rest went to the modal's ✕.
+  The focus trap listed the escape handler in its dependencies, every overlay
+  passes a fresh closure, and each setup ends by focusing the first focusable
+  element. Any state change inside a modal — a keystroke — moved focus out of
+  the field. Not one wizard: every modal with a text input, editor-wide.
+- The collection back link (149:50) sat centred: flowbite's Button centres its
+  content and stretches, so "‹ Recipes" floated mid-panel.
+- The Sources explainer (151:46) was pinned to the panel's foot behind a rule,
+  600px below the row it explains. Conditions had a pinned note of its own
+  that no board draws.
+- Variables' empty screen said nothing at all — one blue link on white, while
+  every sibling screen names its empty state.
+
+## Brand family — walked, 2026-08-15 (root + 6 destinations)
+
+- **Three strips rode every screen.** A shared-theme block, a five-control
+  toolbar, a lint card and a "changes apply everywhere" line: ~300px of an
+  812px panel spent before any screen's own content, on a panel of lists.
+  Board 152:2 draws the root as a list and nothing else, and each destination
+  board starts at its own back link. Every control moved to the destination
+  its board puts it in — Light/Dark to Colour mode (where a second copy was
+  already rendering), Export to Import / export, the gallery to Starters, ✨
+  to Components beside what it generates.
+- **Classes (153:2) had no row and no screen.** Classes could be typed onto
+  elements one at a time in the inspector and never seen again. Building it
+  found that `composer.styles.getGlobalClasses()` — which the inspector's
+  suggestion list calls — is not implemented on the engine at all, so that
+  list has always come back empty. The new screen counts off the element tree.
+- The root's counts and the Tokens screen's counts disagreed (55 vs 4) because
+  only one applied Beginner mode's semantic filter.
+- Import / export led with three radio rows for dark strategy under the CSS
+  format, and format radios that selected nothing (every row has its own Copy
+  and Download). Board 153:120: one "Dark strategy" row, value at the right.
+
+### Founder calls out of the Brand walk
+
+1. **Typography (153:57) does not exist.** The board draws active fonts with
+   weights, "+ Add a font", a .woff2 drop zone and a licence checkbox. That is
+   a font-management feature, not chrome — no row was invented for it.
+2. **"Brand & shared theme" survives.** Board 152:2 has no such block, but it
+   is the only route to the workspace shared theme. Kept and flagged.
+3. **Tokens lists all 14 kinds, the board 6.** The board's project has six
+   populated; ours shows the empty ones too, because that is where a first
+   token of a kind gets added.
+
 ### Founder calls out of this walk
 
 1. **Reach "all like this" — mode or action?** Board 160:412 draws it as a
