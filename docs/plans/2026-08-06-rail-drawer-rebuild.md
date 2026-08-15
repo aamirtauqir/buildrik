@@ -1955,6 +1955,28 @@ tabs, which "ai" is not — the offer had been a silent no-op since it shipped.
 The run states need a live model to reach, so they are pinned by test rather
 than walked; idle, scope and not-configured were walked live at 1440×900.
 
+## Phase 1 — family 7: CmdK, 2026-08-15
+
+Seven boards, walked live. The palette's bones were right — the modal, the
+band styling, no-results, the Recent group (S3.14, verified live: run a
+command, reopen, it is at the top). Two things were not.
+
+**It grouped by who owns a command, not by what it does.** Boards 166:2 and
+166:27 band the list the way a reader thinks — **Recent · Suggested** before
+you type, **Actions · Go to** once you do. Live showed its internal taxonomy:
+Navigation · Edit · View · History · Commands. The `group:` strings are still
+what the filter matches on; they are no longer what the reader sees. The
+placeholder is the board's too ("Type a command or search…").
+
+**Board 166:58's rule reached one more command.** *"A command you cannot run is
+still worth seeing — hiding it means the shortcut someone memorised silently
+vanishes."* Undo and Redo already carried their reasons; "Delete element"
+looked live with nothing selected, closed the palette, and did nothing. It now
+says "nothing selected" and refuses the click.
+
+And the ai-offer at the bottom of no-results finally works — see the AI family
+entry; it had been emitting an event its handler ignores.
+
 ## Named for the founder — needs a decision or a file I must not stage
 
 **The save chip: board pill vs D7 rule 4.** Board 199:2 (and every shell board)
