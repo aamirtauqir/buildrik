@@ -36,6 +36,10 @@ export interface AgentPlanProps {
   onApprove: () => void;
   onSkip: () => void;
   onStop: () => void;
+  /** Board 171:2 — re-run the same brief after a step failed. */
+  onRetry?: () => void;
+  /** Board 171:2 — take back the steps that did land. */
+  onUndoAll?: () => void;
 }
 
 /** Board glyphs: done, in flight, waiting. Never colour alone — every row also
@@ -69,6 +73,8 @@ const STEP_COLOR: Record<RunStep["status"], string> = {
 function bandLabel(phase: RunPhase, steps: RunStep[], currentIndex: number): string {
   const total = steps.length;
   const doneCount = steps.filter((s) => s.status === "applied").length;
+  const failedAt = steps.findIndex((s) => s.status === "failed");
+  if (failedAt >= 0) return `Stopped at step ${failedAt + 1}`;
   if (phase === "planning") return "Planning";
   if (steps[currentIndex]?.status === "awaiting") return `Paused at step ${currentIndex + 1}`;
   if (phase === "running") return `Running · ${Math.min(currentIndex + 1, total)} of ${total}`;
@@ -86,6 +92,8 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
   onApprove,
   onSkip,
   onStop,
+  onRetry,
+  onUndoAll,
 }) => {
   const autoApplyToggle = (
     <label className="bd-ai-agent-autoapply">
@@ -110,6 +118,7 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
   }
 
   const gateStep = steps[currentIndex]?.status === "awaiting" ? steps[currentIndex] : null;
+  const failedIndex = steps.findIndex((s) => s.status === "failed");
   const appliedCount = steps.filter((s) => s.status === "applied").length;
   const skippedCount = steps.filter((s) => s.status === "skipped").length;
 
@@ -170,10 +179,37 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
         </div>
       ) : null}
 
+      {/* Board 171:2 — which step failed, what survived it, and the two ways
+          on. "Nothing after step N ran" is the fact that makes the state safe
+          to sit in. */}
       {error ? (
-        <p className="bd-ai-agent-error" role="alert">
-          {error}
-        </p>
+        <div className="bd-ai-agent-failed" role="alert">
+          <p className="bd-ai-agent-failed__title">
+            {failedIndex >= 0 ? `Step ${failedIndex + 1} failed — ${error}` : error}
+          </p>
+          {failedIndex >= 0 ? (
+            <p className="bd-ai-agent-gate__body">
+              {appliedCount > 0
+                ? `${appliedCount} step${appliedCount === 1 ? "" : "s"} kept.`
+                : "Nothing was applied."}{" "}
+              Nothing after step {failedIndex + 1} ran.
+            </p>
+          ) : null}
+          {(onUndoAll || onRetry) && (
+            <div className="bd-ai-agent-gate__actions">
+              {onUndoAll ? (
+                <Button type="button" color="light" onClick={onUndoAll} disabled={appliedCount === 0}>
+                  Undo all
+                </Button>
+              ) : <span />}
+              {onRetry ? (
+                <Button type="button" onClick={onRetry}>
+                  Retry
+                </Button>
+              ) : null}
+            </div>
+          )}
+        </div>
       ) : null}
 
       {phase === "done" && !error ? (

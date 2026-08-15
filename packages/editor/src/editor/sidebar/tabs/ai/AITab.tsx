@@ -42,6 +42,9 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
   const streamingMsgIdRef = React.useRef<string | null>(null);
   const actionGate = useAiActionGate(composer);
   const agent = useAgentRunner(composer, model, actionGate.propose);
+  /* Board 171:2's Retry re-runs the same brief, so the panel has to remember
+     it — the runner does not keep the prompt. */
+  const lastAgentPrompt = React.useRef("");
 
   /* With the mode toggle gone, a finished or stopped run has to hand the panel
      back by itself — otherwise the plan's last frame would be the only thing
@@ -202,7 +205,14 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
           thread entirely. */}
       <ScopeChip scope={scope} status={status} />
       <PromptComposer
-        onSubmit={mode === "agent" ? agent.start : submit}
+        onSubmit={
+          mode === "agent"
+            ? (text: string) => {
+                lastAgentPrompt.current = text;
+                agent.start(text);
+              }
+            : submit
+        }
         onStop={mode === "agent" ? agent.stop : stream.stop}
         streaming={mode === "agent" ? agent.phase === "planning" || agent.phase === "running" : stream.streaming}
       />
@@ -266,6 +276,18 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
           onApprove={agent.approve}
           onSkip={agent.skip}
           onStop={agent.stop}
+          onRetry={lastAgentPrompt.current ? () => agent.start(lastAgentPrompt.current) : undefined}
+          /* Each applied step is its own transaction, so taking the run back
+             is exactly that many undos — and nothing has happened since the
+             failure to undo by mistake. */
+          onUndoAll={
+            composer
+              ? () => {
+                  const applied = agent.steps.filter((s) => s.status === "applied").length;
+                  for (let i = 0; i < applied; i++) composer.history.undo();
+                }
+              : undefined
+          }
         />
       )}
       <ConfirmDialog

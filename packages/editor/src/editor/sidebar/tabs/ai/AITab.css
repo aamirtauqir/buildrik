@@ -470,3 +470,20 @@
   font-size: 12px;
   color: var(--bk-ink-muted);
 }
+
+/* Board 171:2 (AI · step-failed) — the failure, what survived it, and the two
+   ways on. */
+.bd-ai-agent-failed {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bk-space-8);
+  padding: var(--bk-space-12) var(--bk-space-16);
+  background: var(--bk-warning-tint);
+}
+
+.bd-ai-agent-failed__title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--bk-error);
+}

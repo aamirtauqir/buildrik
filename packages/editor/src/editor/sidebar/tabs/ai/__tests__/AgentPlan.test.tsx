@@ -102,4 +102,42 @@ describe("agent run", () => {
     expect(screen.getByText("1 change applied.")).toBeInTheDocument();
     expect(screen.getByText("⌘Z takes it back.")).toBeInTheDocument();
   });
+
+  /* Board 171:2 — a failed step says which one, what survived, and offers the
+     two ways on. The old panel printed the error and nothing else. */
+  it("names the failed step, what was kept, and offers Undo all + Retry", () => {
+    const onRetry = vi.fn();
+    const onUndoAll = vi.fn();
+    renderPlan({
+      phase: "running",
+      currentIndex: 1,
+      error: "the token is locked",
+      steps: [
+        step("Rewrite the headline", "applied"),
+        step("Warm the background tint", "failed"),
+        step("Swap the hero photo", "pending"),
+      ],
+      onRetry,
+      onUndoAll,
+    });
+
+    expect(screen.getByText("Stopped at step 2")).toBeInTheDocument();
+    expect(screen.getByText("Step 2 failed — the token is locked")).toBeInTheDocument();
+    expect(screen.getByText(/1 step kept\. Nothing after step 2 ran\./)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Undo all" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Retry" })).toBeInTheDocument();
+  });
+
+  it("cannot offer to undo a run that applied nothing", () => {
+    renderPlan({
+      phase: "running",
+      currentIndex: 0,
+      error: "the token is locked",
+      steps: [step("Rewrite the headline", "failed"), step("Warm the tint", "pending")],
+      onRetry: vi.fn(),
+      onUndoAll: vi.fn(),
+    });
+    expect(screen.getByText(/Nothing was applied\. Nothing after step 1 ran\./)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Undo all" })).toBeDisabled();
+  });
 });
