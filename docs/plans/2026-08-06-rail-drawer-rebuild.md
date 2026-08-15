@@ -2250,27 +2250,26 @@ nobody had read the descriptions against the behaviour.
 Matched without changes: hover levels (1176:4925 — all four, verified live),
 the breadcrumb's shape and the palette's groups, disabled rows and footer.
 
-## BLOCKER for the founder's own file — the Issues panel is a 60px sliver
+## The topbar's popovers were painted under the panels — fixed 2026-08-16
 
-Open the topbar's issue pill and the panel renders 360px wide at the right,
-**underneath the inspector**: all you see is a 60px strip of its header. Not a
-z-index typo — `.layout-shell__inspector` carries `transform: translateX(...)`
-for its open/close slide, and a transform creates a stacking context, so the
-aside's `z-index: 80` beats the panel's inline `zIndex: 45`.
+Open the notifications bell, or the topbar's issue pill, and the panel drew
+~60px of itself at the edge of the inspector and no more. Neither could be
+read or used. Same for anything else the header opens.
 
-The fix is one line in `AquibraStudio.tsx:514` — the panel wrapper's
-`zIndex: 45` needs to be above the shell's panels (80). CLAUDE.md says never to
-stage that file from an agent session, so it is left for the founder:
+The shell's slots were numbered outside the design system's own z-scale —
+`--bk-z-canvas 0 · chrome 10 · drawer 20 · topbar 30 · popover 40 · overlay 50
+· modal 60 · cmdk 70`, while `LayoutShell.css` ran 80 / 90 / 100 / 200. And
+because `.layout-shell__inspector` and `__drawer` carry a transform for their
+slide, each is its own stacking context, so a popover at the token scale's 40
+could never rise above a panel at 80.
 
-```
--            zIndex: 45,
-+            zIndex: 120,   // above .layout-shell__inspector's transform-made
-+                           // stacking context (z-index: 80)
-```
+The shell's slots sit inside the scale now, with their relative order
+unchanged (topbar/footer over rail over drawer/inspector over canvas). Canvas
+overlays keep their own much larger numbers — `overflow: hidden` on the canvas
+clips them, so they cannot reach the topbar whatever the number says.
 
-Everything else in the Issues family (164:2 · 164:22 · 164:35) is conformed and
-verified against the boards; the panel simply cannot be seen until that line
-changes.
+Verified live: the notifications dropdown and the Issues panel both render in
+full. This needed no change to `AquibraStudio.tsx`.
 
 ## Content family — walked, 2026-08-15
 

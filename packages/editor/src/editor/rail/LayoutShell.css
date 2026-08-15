@@ -124,7 +124,7 @@
   left: var(--layout-rail-width, 60px);
   bottom: 0;
   width: var(--layout-drawer-width, 280px);
-  z-index: 200;
+  z-index: calc(var(--bk-z-drawer) + 6);
   box-shadow: var(--bk-shadow-overlay);
   border-right: none;
   border-radius: 0 var(--bk-radius-lg) var(--bk-radius-lg) 0;
@@ -146,7 +146,7 @@
   padding: 0;
   background: var(--bk-bg-card);
   border-bottom: 1px solid var(--bk-border);
-  z-index: 100;
+  z-index: var(--bk-z-topbar);
 }
 
 /* Footer slot — 32px status bar at bottom */
@@ -165,7 +165,7 @@
   border-top: 1px solid var(--bk-border);
   font: 500 var(--bk-text-11) / var(--bk-space-16) var(--bk-font-ui);
   color: var(--bk-ink-muted);
-  z-index: 100;
+  z-index: var(--bk-z-topbar);
 }
 
 /* ============================================
@@ -180,7 +180,7 @@
   gap: 4px;
   background: var(--bk-bg-app);
   border-right: 1px solid var(--bk-border);
-  z-index: 90;
+  z-index: calc(var(--bk-z-drawer) + 5);
   overflow-y: auto;
   overflow-x: clip;
 }
@@ -199,7 +199,7 @@
   display: flex;
   flex-direction: row;
   overflow: hidden;
-  z-index: 90;
+  z-index: calc(var(--bk-z-drawer) + 5);
 }
 
 /* When using merged sidebar, rail+drawer collapse into auto sidebar column.
@@ -255,6 +255,24 @@
 }
 
 /* ============================================
+   Stacking
+   ============================================
+   The shell's slots sit INSIDE the token z-scale
+   (--bk-z-canvas 0 · chrome 10 · drawer 20 · topbar 30 · popover 40 ·
+   overlay 50 · modal 60 · cmdk 70), which they did not until 2026-08-16:
+   they ran 80 / 90 / 100 / 200, above every layer the tokens define. Since
+   `.layout-shell__inspector` and `__drawer` also carry a transform for their
+   slide, each is its own stacking context, so a topbar popover at z-index 40
+   painted UNDERNEATH them: the notifications dropdown and the Issues panel
+   both rendered as a ~60px sliver at the edge of the inspector, and neither
+   could be read or used. Relative order inside the shell is unchanged —
+   topbar/footer over rail over drawer/inspector over canvas.
+
+   Canvas overlays keep their own (much larger) numbers: they live inside
+   `.layout-shell__canvas`, which clips them with overflow:hidden, so they
+   cannot reach the topbar whatever the number says. */
+
+/* ============================================
    Drawer Panel
    ============================================ */
 .layout-shell__drawer {
@@ -264,7 +282,7 @@
   background: var(--bk-bg-panel);
   border-right: 1px solid var(--bk-border);
   overflow: hidden;
-  z-index: 80;
+  z-index: var(--bk-z-drawer);
 
   transform: translateX(-100%);
   opacity: 0;
@@ -303,7 +321,7 @@
   );
   background-size: 20px 20px;
   pointer-events: none;
-  z-index: 0;
+  z-index: var(--bk-z-canvas);
 }
 
 /* ============================================
@@ -316,7 +334,7 @@
   background: var(--bk-bg-panel);
   border-left: 1px solid var(--bk-border);
   overflow: hidden;
-  z-index: 80;
+  z-index: var(--bk-z-drawer);
 
   transform: translateX(100%);
   opacity: 0;
@@ -401,7 +419,7 @@
     width: var(--layout-inspector-width, 280px);
     border-radius: var(--bk-radius-lg);
     box-shadow: var(--bk-shadow-overlay);
-    z-index: 200;
+    z-index: calc(var(--bk-z-drawer) + 6);
   }
 }
 
