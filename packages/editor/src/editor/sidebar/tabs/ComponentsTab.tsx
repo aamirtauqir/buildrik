@@ -8,17 +8,15 @@
  * @license BSD-3-Clause
  */
 
-import { Layers, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import * as React from "react";
 import { Button, ConfirmDialog, EmptyState, EmptyStateDesc, EmptyStateTitle, ModalBody, ModalClose, ModalContent, ModalRoot, ModalTitle, PanelFrame, SkeletonListItem, TextInput, useToast } from "@/editor/chrome-ui";
 import { PanelErrorState } from "../shared/PanelErrorState";
-import { SearchBar } from "../shared/SearchBar";
 import { ComponentDetailScreen } from "./component-library/ComponentDetailScreen";
 import { ComponentIcon } from "./component-library/ComponentIcon";
 import { CreateComponentModal } from "./component-library/CreateComponentModal";
 import {
   containerStyles,
-  searchContainerStyles,
   dialogInputStyles,
   dialogCancelBtnStyles,
   dialogPrimaryBtnStyles,
@@ -188,45 +186,48 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             >
               {headerAddBtn}
             </PanelFrame.Header>
-            <div style={searchContainerStyles}>
-              <SearchBar
-                value={state.internalSearchQuery}
-                onChange={state.setInternalSearchQuery}
-                placeholder="Search components..."
-              />
-            </div>
           </>
         )}
-        <div>
-          {state.canCreateComponent && (
-            <div>
-              <div>
-                <Layers size={14} />
-                <span>
-                  Selected: {state.canvasSelection.length} layer
-                  {state.canvasSelection.length !== 1 ? "s" : ""}
-                </span>
-              </div>
-              <Button
-               
-                onClick={onCreateNew}
-                title="Create a reusable component from selection"
-              >
-                <Plus size={14} /> Create Component
-              </Button>
-            </div>
+        {/* Board 1138:13394. Left-aligned copy at the top of the panel, not a
+            centred card with a glyph — and the same bordered footer the list
+            view has, so the primary action does not move when the first
+            component appears.
+
+            Gone with the rebuild: a search field over zero components, a
+            "Selected: N layers" block that duplicated the footer button, and a
+            "Learn more" link whose onClick was `e.preventDefault()` and
+            nothing else. It had no destination to go to. */}
+        <div className="tw:flex tw:flex-1 tw:flex-col tw:gap-1 tw:px-4 tw:py-3">
+          <EmptyStateTitle className="tw:m-0 tw:text-[13px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]">
+            No components yet.
+          </EmptyStateTitle>
+          <EmptyStateDesc className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]">
+            Select an element on the canvas and save it as a component to reuse
+            it everywhere.
+          </EmptyStateDesc>
+          {onCreateNew && (
+            <Button
+              color="light"
+              onClick={onCreateNew}
+              data-testid="comp-empty-create-link"
+              className="tw:self-start tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-accent)] tw:hover:underline"
+            >
+              Create component
+            </Button>
           )}
-          <EmptyState className="comp-empty">
-            <span className="comp-empty__icon" aria-hidden="true">◇</span>
-            <EmptyStateTitle className="comp-empty__title">No components yet</EmptyStateTitle>
-            <EmptyStateDesc className="comp-empty__body">
-              Select elements on the canvas and save them as reusable components.
-            </EmptyStateDesc>
-            <a href="#" onClick={(e) => e.preventDefault()}>
-              Learn more
-            </a>
-          </EmptyState>
         </div>
+        {onCreateNew && (
+          <div className="tw:flex tw:border-t tw:border-[var(--bk-border)] tw:px-4 tw:py-2.5 tw:shrink-0">
+            <Button
+              size="xs"
+              className="tw:h-7 tw:rounded-8 tw:px-3 tw:text-[13px] tw:font-medium"
+              data-testid="comp-create"
+              onClick={onCreateNew}
+            >
+              + Create component
+            </Button>
+          </div>
+        )}
         {showCreateModal && (
           <CreateComponentModal
             onClose={() => setShowCreateModal(false)}

@@ -12,7 +12,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 // VITE_FEATURE_PUBLISH are ON — which would flip the "default off" assertions.
 // Clear every feature key (both context prefixes) so the baseline is hermetic
 // regardless of which config/cwd runs the file.
-const FEATURE_KEYS = ["PUBLISH", "COMPONENTS_V2", "DS_AI", "COLLAB"].flatMap((n) => [
+const FEATURE_KEYS = ["PUBLISH", "DS_AI", "COLLAB"].flatMap((n) => [
   `VITE_FEATURE_${n}`,
   `NEXT_PUBLIC_FEATURE_${n}`,
 ]);
@@ -31,7 +31,6 @@ describe("FEATURES / isFeatureEnabled", () => {
     const { FEATURES, isFeatureEnabled } = await import("../featureFlags");
     expect(FEATURES).toEqual({
       publish: false,
-      componentsV2: false,
       dsAi: false,
       collab: false,
     });
@@ -46,7 +45,7 @@ describe("FEATURES / isFeatureEnabled", () => {
 
     expect(FEATURES.publish).toBe(true);
     expect(FEATURES.collab).toBe(true);
-    expect(FEATURES.componentsV2).toBe(false);
+    expect(FEATURES.dsAi).toBe(false);
     expect(isFeatureEnabled("publish")).toBe(true);
     expect(isFeatureEnabled("dsAi")).toBe(false);
   });

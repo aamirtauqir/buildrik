@@ -13,9 +13,6 @@ export const containerStyles: React.CSSProperties = {
   background: "var(--bk-bg-subtle)",
 };
 
-export const searchContainerStyles: React.CSSProperties = {
-  padding: "6px 10px",
-};
 
 export const dialogInputStyles: React.CSSProperties = {
   padding: "8px 12px",

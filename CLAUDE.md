@@ -288,7 +288,7 @@ existed in this table until 2026-08-16.
 | Var | Purpose | Required? |
 |-----|---------|-----------|
 | `NEXT_PUBLIC_FEATURE_PUBLISH` | Publish dropdown + publish flow in the shipping editor. Must be set alongside `VITE_FEATURE_PUBLISH`, which only serves the standalone demo. | Yes once publishing is live |
-| `NEXT_PUBLIC_FEATURE_COMPONENTS_V2` | Which Components panel ships. **Set nowhere today** — `.env.local` sets only `VITE_FEATURE_COMPONENTS_V2=true`, so the standalone demo shows `ComponentsPanelV2` and production shows the legacy `ComponentsTab`. Two different screens, and neither matches board 641:2546. Founder call open. | No — but read the note |
+| ~~`NEXT_PUBLIC_FEATURE_COMPONENTS_V2`~~ | **Deleted 2026-08-16.** It selected between two Components panels, and because only the `NEXT_PUBLIC_` half ships, it only ever meant "the port-5050 demo shows `ComponentsPanelV2`, every real user sees `ComponentsTab`". `ComponentsTab` is the one built to board 641:2546, so `ComponentsPanelV2` and the flag are gone. | — |
 | `NEXT_PUBLIC_FEATURE_DS_AI` | AI entry points in the Brand / design-system panel. | No |
 | `NEXT_PUBLIC_FEATURE_COLLAB` | Real-time collaboration. **Leave off** — collab is demo-only (last-write-wins, 6 known OT bugs). | No — never in production |
 

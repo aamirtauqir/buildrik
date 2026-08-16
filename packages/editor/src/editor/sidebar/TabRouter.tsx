@@ -36,9 +36,6 @@ const TemplatesTab = React.lazy(() =>
   import("./tabs/templates/TemplatesTab").then((m) => ({ default: m.TemplatesTab }))
 );
 const ComponentsTab = React.lazy(() => import("./tabs/ComponentsTab"));
-const ComponentsPanelV2 = React.lazy(() =>
-  import("@/editor/components-catalog/ui/ComponentsPanelV2").then((m) => ({ default: m.ComponentsPanelV2 })),
-);
 const MediaTab = React.lazy(() =>
   import("./tabs/media/MediaTab").then((m) => ({ default: m.MediaTab }))
 );
@@ -165,18 +162,12 @@ export const TabRouter: React.FC<TabRouterProps> = ({
       );
 
     case "components":
-      // S6: dual-section panel (Catalog + UserSaved + DSStatusChip) gated
-      // behind VITE_FEATURE_COMPONENTS_V2. Default OFF — legacy single-section
-      // ComponentsTab keeps shipping until the new path passes browser smoke.
-      if (isFeatureEnabled("componentsV2")) {
-        return (
-          <ComponentsPanelV2
-            composer={composer}
-            onJumpToDesign={onSwitchToDesign}
-            {...commonTabProps}
-          />
-        );
-      }
+      /* One panel, both paths. There were two: ComponentsPanelV2 behind
+         VITE_FEATURE_COMPONENTS_V2, and this one when the flag was off. Only
+         the NEXT_PUBLIC_ half of a flag reaches production, and nothing ever
+         set it — so the port-5050 demo rendered V2 while every real user got
+         this, and only this one was ever built to board 641:2546. V2 and the
+         flag are deleted. */
       return (
         <ComponentsTab composer={composer} onCreateNew={onCreateComponent} {...commonTabProps} />
       );

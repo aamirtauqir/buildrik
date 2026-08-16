@@ -19,7 +19,7 @@ async function loadRuntimeEnv() {
 const READ_KEYS = [
   "VITE_DASHBOARD_URL", "NEXT_PUBLIC_APP_URL",
   "VITE_SENTRY_DSN", "NEXT_PUBLIC_SENTRY_DSN",
-  ...["PUBLISH", "COMPONENTS_V2", "DS_AI", "COLLAB"].flatMap((n) => [
+  ...["PUBLISH", "DS_AI", "COLLAB"].flatMap((n) => [
     `VITE_FEATURE_${n}`, `NEXT_PUBLIC_FEATURE_${n}`,
   ]),
 ];
@@ -70,7 +70,6 @@ describe("feature flags — exact 'true' string gating", () => {
   it("default to false when unset", async () => {
     const env = await loadRuntimeEnv();
     expect(env.FEATURE_PUBLISH).toBe(false);
-    expect(env.FEATURE_COMPONENTS_V2).toBe(false);
     expect(env.FEATURE_DS_AI).toBe(false);
     expect(env.FEATURE_COLLAB).toBe(false);
   });
@@ -83,11 +82,11 @@ describe("feature flags — exact 'true' string gating", () => {
 
   it("reject 'TRUE', '1', 'yes' — no boolean coercion", async () => {
     vi.stubEnv("VITE_FEATURE_PUBLISH", "TRUE");
-    vi.stubEnv("VITE_FEATURE_COMPONENTS_V2", "1");
+    vi.stubEnv("VITE_FEATURE_COLLAB", "1");
     vi.stubEnv("VITE_FEATURE_DS_AI", "yes");
     const env = await loadRuntimeEnv();
     expect(env.FEATURE_PUBLISH).toBe(false);
-    expect(env.FEATURE_COMPONENTS_V2).toBe(false);
+    expect(env.FEATURE_COLLAB).toBe(false);
     expect(env.FEATURE_DS_AI).toBe(false);
   });
 

@@ -44,7 +44,6 @@ function readNextEnv(): EnvMap {
       NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
       NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
       NEXT_PUBLIC_FEATURE_PUBLISH: process.env.NEXT_PUBLIC_FEATURE_PUBLISH,
-      NEXT_PUBLIC_FEATURE_COMPONENTS_V2: process.env.NEXT_PUBLIC_FEATURE_COMPONENTS_V2,
       NEXT_PUBLIC_FEATURE_DS_AI: process.env.NEXT_PUBLIC_FEATURE_DS_AI,
       NEXT_PUBLIC_FEATURE_COLLAB: process.env.NEXT_PUBLIC_FEATURE_COLLAB,
       NODE_ENV: process.env.NODE_ENV,
@@ -84,9 +83,6 @@ export const SENTRY_DSN: string | undefined = pickOptional(
 
 export const FEATURE_PUBLISH: boolean =
   (vite.VITE_FEATURE_PUBLISH ?? proc.NEXT_PUBLIC_FEATURE_PUBLISH) === "true";
-
-export const FEATURE_COMPONENTS_V2: boolean =
-  (vite.VITE_FEATURE_COMPONENTS_V2 ?? proc.NEXT_PUBLIC_FEATURE_COMPONENTS_V2) === "true";
 
 export const FEATURE_DS_AI: boolean =
   (vite.VITE_FEATURE_DS_AI ?? proc.NEXT_PUBLIC_FEATURE_DS_AI) === "true";

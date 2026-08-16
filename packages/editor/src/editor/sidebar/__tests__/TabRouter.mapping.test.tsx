@@ -1,7 +1,7 @@
 /**
  * TabRouter.mapping.test.tsx — lazy tab-id → component mapping.
  * The "ai" case is covered by TabRouter.ai.test.tsx; this file covers the
- * remaining panel tabs, the componentsV2/publish feature-flag gating, and
+ * remaining panel tabs, the publish feature-flag gating, and
  * the unknown-tab null fallback.
  */
 
@@ -118,18 +118,17 @@ describe("TabRouter — templates switch-tab wiring", () => {
   });
 });
 
-describe("TabRouter — components tab flag gating", () => {
-  it("renders the legacy ComponentsTab when componentsV2 is OFF", async () => {
+describe("TabRouter — components tab", () => {
+  /* There is one Components panel now. Two shipped for months behind
+     VITE_FEATURE_COMPONENTS_V2 — and because only the NEXT_PUBLIC_ half of a
+     flag reaches production, and nothing ever set it, the flag ONLY ever
+     selected between "what the port-5050 demo shows" and "what every real user
+     sees". No flag can reach this case again. */
+  it("renders ComponentsTab, whatever the flags say", async () => {
+    flags.enabled.add("componentsV2");
     renderRouter("components");
     expect(await screen.findByTestId("tab-components-legacy")).toBeInTheDocument();
     expect(screen.queryByTestId("tab-components-v2")).toBeNull();
-  });
-
-  it("renders ComponentsPanelV2 when componentsV2 is ON", async () => {
-    flags.enabled.add("componentsV2");
-    renderRouter("components");
-    expect(await screen.findByTestId("tab-components-v2")).toBeInTheDocument();
-    expect(screen.queryByTestId("tab-components-legacy")).toBeNull();
   });
 });
 
