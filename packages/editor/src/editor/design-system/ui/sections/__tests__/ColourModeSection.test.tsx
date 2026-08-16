@@ -84,3 +84,29 @@ describe("ColourModeSection", () => {
     expect(container.querySelectorAll("[data-no-dark-row]").length).toBe(before - 1);
   });
 });
+
+describe("ColourModeSection — the row names the token unambiguously", () => {
+  /*
+    Board 153:92 draws these rows as mono IDs. The row rendered `t.name`
+    instead, and the live list holds both `Text` and `Text Primary` — so the
+    row could not say which token you were about to give a dark value to, on
+    the one screen whose entire job is to set that value in place.
+  */
+  it("labels each row with the token id, not its display name", () => {
+    const { container } = render(wrap(<ColourModeSection />));
+    const rows = [...container.querySelectorAll("[data-no-dark-row]")];
+    expect(rows.length).toBeGreaterThan(0);
+    for (const row of rows) {
+      const id = row.getAttribute("data-no-dark-row")!;
+      const label = row.querySelector("span")?.textContent?.trim();
+      expect(label).toBe(id);
+    }
+  });
+
+  it("keeps the human name reachable, so the id is not the only thing said", () => {
+    const { container } = render(wrap(<ColourModeSection />));
+    const first = container.querySelector("[data-no-dark-row] span");
+    expect(first?.getAttribute("title")).toBeTruthy();
+    expect(first?.getAttribute("title")).not.toBe(first?.textContent?.trim());
+  });
+});

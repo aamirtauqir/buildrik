@@ -78,8 +78,25 @@ export const ColourModeSection: React.FC<ColourModeSectionProps> = ({ composer }
               data-no-dark-row={t.id}
               className="tw:flex tw:items-center tw:gap-2 tw:px-3 tw:py-2"
             >
-              <span className="tw:flex-1 tw:min-w-0 tw:truncate tw:text-[13px] tw:[font-family:var(--bk-font-mono)] tw:text-gray-900">
-                {t.name}
+              {/*
+                The id, not the display name. Board 153:92 draws these rows as
+                mono ids (`brand/accent-soft`, `surface/raised`) and the mono
+                was already here — only the value was wrong. It matters on this
+                screen more than on any other: the live list holds both `Text`
+                and `Text Primary`, so a name cannot say which token you are
+                about to give a dark value to, and this row's whole job is to
+                let you set one without leaving to check.
+
+                The board's own ids are sample data in a different convention;
+                ours are `color-text` / `color-primary`, which serve the same
+                purpose. The name stays in the accessible label so a screen
+                reader still reads something human.
+              */}
+              <span
+                className="tw:flex-1 tw:min-w-0 tw:truncate tw:text-[13px] tw:[font-family:var(--bk-font-mono)] tw:text-gray-900"
+                title={t.name}
+              >
+                {t.id}
               </span>
               {editing === t.id ? (
                 <TextInput
