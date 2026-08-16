@@ -15,8 +15,50 @@ import { CATEGORY_ICONS } from "./elements/constants";
 import { ElementCard, AnimatedAccordionContent, ChevronIcon } from "./elements/ElementCard";
 import type { ElementsTabProps } from "./elements/types";
 import { useElementsState } from "./elements/useElementsState";
-import "./ElementsTab.css";
 export type { ElementsTabProps };
+
+/*
+  `tw:` utilities, not a companion stylesheet.
+
+  These classes shipped as ElementsTab.css carrying the same claim as the media
+  context menu — that real CSS was required because flowbite's Button theme
+  "beats `tw:` overrides". chrome-ui/__tests__/className-precedence.test.tsx
+  asserts the opposite and is the contract: a caller's utilities survive the
+  merge AND evict flowbite's conflicting ones, because twMerge runs on our own
+  `tw` prefix.
+
+  The bug the stylesheet fixed was real — these classNames had no rules
+  anywhere, so pills rendered as full-height centred flowbite buttons and the
+  chevron never rotated. Keeping the fix, dropping the file.
+*/
+const PILL_BASE =
+  "tw:inline-flex tw:items-center tw:gap-[var(--bk-space-4)] tw:h-[24px] " +
+  "tw:px-[var(--bk-space-8)] tw:rounded-full tw:text-[12px] tw:font-normal " +
+  "tw:[font-family:var(--bk-font-ui)] tw:cursor-pointer";
+
+const PILL =
+  `${PILL_BASE} tw:border tw:border-[var(--bk-border)] tw:bg-transparent ` +
+  "tw:text-[var(--bk-ink-soft)] tw:enabled:hover:text-[var(--bk-ink)] " +
+  "tw:focus-visible:outline-none tw:focus-visible:shadow-[var(--bk-shadow-focus)]";
+
+const PILL_ACTIVE =
+  "tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent)] " +
+  "tw:text-[var(--bk-accent-on)] tw:font-medium";
+
+/* The dismissible "Drag onto canvas" hint — a pill, but advisory, so it carries
+   the warning wash rather than the accent. */
+const PILL_TIP =
+  `${PILL_BASE} tw:border tw:border-transparent ` +
+  "tw:bg-[var(--bk-warning-tint)] tw:text-[var(--bk-warning-text)]";
+
+/* Category accordion header. Full-bleed row, label left, chevron right. */
+const ACCORDION_HEADER =
+  "tw:flex tw:items-center tw:justify-between tw:w-full tw:h-[28px] " +
+  "tw:px-[var(--bk-space-8)] tw:border-0 tw:rounded-none tw:bg-transparent " +
+  "tw:text-[var(--bk-ink)] tw:text-[12px] tw:font-medium " +
+  "tw:[font-family:var(--bk-font-ui)] tw:text-left tw:cursor-pointer " +
+  "tw:hover:bg-[var(--bk-bg-subtle)] tw:focus-visible:outline-none " +
+  "tw:focus-visible:shadow-[var(--bk-shadow-focus)]";
 
 export const ElementsTab: React.FC<ElementsTabProps> = ({
   searchQuery,
@@ -50,7 +92,7 @@ export const ElementsTab: React.FC<ElementsTabProps> = ({
       {/* Quick Access Pills */}
       <div>
         <Button
-          className={`bd-pill ${showRecentsOverlay ? "active" : ""}`}
+          className={`${PILL} ${showRecentsOverlay ? PILL_ACTIVE : ""}`}
           onClick={() => {
             setShowRecentsOverlay(!showRecentsOverlay);
             setShowFavoritesOverlay(false);
@@ -62,7 +104,7 @@ export const ElementsTab: React.FC<ElementsTabProps> = ({
         </Button>
 
         <Button
-          className={`bd-pill ${showFavoritesOverlay ? "active" : ""}`}
+          className={`${PILL} ${showFavoritesOverlay ? PILL_ACTIVE : ""}`}
           onClick={() => {
             setShowFavoritesOverlay(!showFavoritesOverlay);
             setShowRecentsOverlay(false);
@@ -74,7 +116,7 @@ export const ElementsTab: React.FC<ElementsTabProps> = ({
         </Button>
 
         {showTip && (
-          <Button className="bd-pill-tip" onClick={dismissTip}>
+          <Button className={PILL_TIP} onClick={dismissTip}>
             <Lightbulb size={14} />
             Drag onto canvas
             <X size={12} />
@@ -151,7 +193,7 @@ export const ElementsTab: React.FC<ElementsTabProps> = ({
             return (
               <div key={cat}>
                 <Button
-                  className={`bd-accordion-header ${isOpen ? "open" : ""}`}
+                  className={ACCORDION_HEADER}
                   onClick={() => toggleCategory(cat)}
                   aria-expanded={isOpen}
                 >

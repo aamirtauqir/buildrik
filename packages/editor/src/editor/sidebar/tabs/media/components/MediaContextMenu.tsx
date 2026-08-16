@@ -15,7 +15,6 @@ import * as React from "react";
 import { useClickOutside } from "../../../../../shared/hooks/useClickOutside";
 import type { LibraryItem, MediaFolder } from "../data/mediaTypes";
 import { Button } from "@/editor/chrome-ui";
-import "./MediaContextMenu.css";
 
 interface MediaContextMenuProps {
   x: number;
@@ -38,6 +37,47 @@ interface MediaContextMenuProps {
 
 // Board 1163:13931 — the menu is 180 wide, one divider, 11px rows.
 const MENU_WIDTH = 180;
+
+/*
+  Board 1163:13695, as `tw:` utilities rather than a companion stylesheet.
+
+  This shipped as MediaContextMenu.css with a note claiming real CSS was needed
+  because "flowbite's Button theme (h-10, justify-center, font-medium) beats
+  `tw:` overrides". That is not true here, and the repo proves it: the contract
+  test at chrome-ui/__tests__/className-precedence.test.tsx asserts a caller's
+  `tw:h-[22px] tw:px-1` on a flowbite Button both survives AND removes
+  flowbite's conflicting `px-5`/`text-sm` — twMerge runs on our own `tw` prefix,
+  so the caller wins by design. The cited precedent (.bdc-menu-item in the
+  Layers menu) is older code, not evidence.
+
+  `font: inherit` does not survive the move, so the item spells its own type out:
+  flowbite Button ships text-sm/font-medium and something has to displace them.
+*/
+const ITEM_BASE =
+  "tw:flex tw:items-center tw:justify-start tw:w-full tw:h-[28px] " +
+  "tw:px-[var(--bk-space-12)] tw:border-0 tw:rounded-none tw:bg-transparent " +
+  "tw:text-left tw:cursor-pointer tw:text-[13px] tw:leading-[18px] " +
+  "tw:font-normal tw:[font-family:var(--bk-font-ui)] tw:text-[var(--bk-ink)]";
+
+/* Button rows: real <button>, so :enabled / :disabled are live. */
+const ITEM =
+  `${ITEM_BASE} tw:enabled:hover:bg-[var(--bk-bg-subtle)] ` +
+  "tw:disabled:text-[var(--bk-ink-muted)] tw:disabled:cursor-not-allowed " +
+  "tw:focus-visible:outline-none tw:focus-visible:shadow-[var(--bk-shadow-focus)]";
+
+/* The board draws Delete in error ink, under its own divider. */
+const ITEM_DANGER =
+  `${ITEM} tw:text-[var(--bk-error)] tw:enabled:hover:bg-[var(--bk-error-tint)]`;
+
+/* "Move to folder ›" is a <div role="menuitem">, where :enabled never matches —
+   it takes a plain hover. `relative` because the submenu is nested INSIDE this
+   row, so this row is the positioning context it flies out from. */
+const ITEM_SUBMENU =
+  `${ITEM_BASE} tw:justify-between tw:relative tw:hover:bg-[var(--bk-bg-subtle)]`;
+
+const MENU_SURFACE =
+  "tw:bg-[var(--bk-bg-card)] tw:rounded-[var(--bk-radius-lg)] " +
+  "tw:shadow-[var(--bk-shadow-overlay)] tw:py-[var(--bk-space-4)]";
 const MENU_ITEM_HEIGHT = 28;
 
 /**
@@ -101,10 +141,10 @@ export function MediaContextMenu({
 
   return (
     <>
-      <div className="med-ctx-backdrop" onClick={onClose} aria-hidden="true" />
+      <div className="tw:fixed tw:inset-0 tw:z-[199]" onClick={onClose} aria-hidden="true" />
       <div
         ref={menuRef}
-        className="med-ctx-menu"
+        className={`${MENU_SURFACE} tw:text-[13px] tw:leading-[18px] tw:font-normal tw:[font-family:var(--bk-font-ui)] tw:text-[var(--bk-ink)]`}
         role="menu"
         aria-label="Asset actions"
         style={{ position: "fixed", left, top, width: MENU_WIDTH, zIndex: 200 }}
@@ -119,37 +159,37 @@ export function MediaContextMenu({
         */}
         <Button
           role="menuitem"
-          className="med-ctx-item"
+          className={ITEM}
           onClick={act(() => onInsert(item))}
         >
           Insert to canvas
         </Button>
         <Button
           role="menuitem"
-          className="med-ctx-item"
+          className={ITEM}
           onClick={act(() => onSelect(item))}
         >
           Select
         </Button>
         <Button
           role="menuitem"
-          className="med-ctx-item"
+          className={ITEM}
           onClick={act(() => onRename(item))}
         >
           Rename…
         </Button>
         <div
           role="menuitem"
-          className="med-ctx-item med-ctx-item--submenu"
+          className={ITEM_SUBMENU}
           onMouseEnter={() => setMoveOpen(true)}
           onMouseLeave={() => setMoveOpen(false)}
         >
           Move to folder ›
           {moveOpen ? (
-            <div className="med-ctx-submenu" role="menu">
+            <div className={`${MENU_SURFACE} tw:absolute tw:left-full tw:top-0 tw:min-w-[160px] tw:z-[1]`} role="menu">
               <Button
                 role="menuitem"
-                className="med-ctx-item"
+                className={ITEM}
                 onClick={act(() => onMove(item, null))}
                 style={{ paddingLeft: 8 }}
               >
@@ -159,7 +199,7 @@ export function MediaContextMenu({
                 <Button
                   key={folder.id}
                   role="menuitem"
-                  className="med-ctx-item"
+                  className={ITEM}
                   onClick={act(() => onMove(item, folder.id))}
                   style={{ paddingLeft: 8 + (depth + 1) * 12 }}
                 >
@@ -172,7 +212,7 @@ export function MediaContextMenu({
 
         <Button
           role="menuitem"
-          className="med-ctx-item"
+          className={ITEM}
           onClick={act(() => onCopyUrl(item))}
         >
           Copy URL
@@ -180,7 +220,7 @@ export function MediaContextMenu({
         {item.type === "img" && item.altText ? (
           <Button
             role="menuitem"
-            className="med-ctx-item"
+            className={ITEM}
             onClick={act(() => {
               try {
                 navigator.clipboard.writeText(item.altText ?? "");
@@ -195,7 +235,7 @@ export function MediaContextMenu({
         {item.type === "img" ? (
           <Button
             role="menuitem"
-            className="med-ctx-item"
+            className={ITEM}
             onClick={act(() => onEditImage(item))}
           >
             Edit image…
@@ -204,18 +244,18 @@ export function MediaContextMenu({
         {onReplaceAcross && (item.type === "img" || item.type === "vid") ? (
           <Button
             role="menuitem"
-            className="med-ctx-item"
+            className={ITEM}
             onClick={act(() => onReplaceAcross(item))}
           >
             Replace across pages…
           </Button>
         ) : null}
 
-        <div className="med-ctx-sep" role="separator" />
+        <div className="tw:h-px tw:my-[var(--bk-space-4)] tw:bg-[var(--bk-border)]" role="separator" />
 
         <Button
           role="menuitem"
-          className="med-ctx-item med-ctx-item--danger"
+          className={ITEM_DANGER}
           onClick={act(() => onDelete(item))}
         >
           Delete

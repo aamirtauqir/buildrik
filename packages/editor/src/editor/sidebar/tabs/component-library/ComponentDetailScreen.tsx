@@ -319,6 +319,26 @@ interface VariantPickerProps {
   onChange: (value: string) => void;
 }
 
+/*
+  Variant chips. These had no rule at all, so they rendered as full flowbite
+  Buttons — h-10, centred, medium weight — in a row that wants chips, and
+  `.active` marked nothing. Fixed as `tw:` utilities rather than a CSS rule:
+  chrome-ui/__tests__/className-precedence.test.tsx is the contract that a
+  caller's utilities both survive the merge and evict flowbite's conflicting
+  ones. Shape matches ElementsTab's filter pills at 22px instead of 24px.
+*/
+const VARIANT_PILL =
+  "tw:inline-flex tw:items-center tw:h-[22px] tw:px-[var(--bk-space-8)] " +
+  "tw:rounded-full tw:border tw:border-[var(--bk-border)] tw:bg-transparent " +
+  "tw:text-[var(--bk-ink-soft)] tw:text-[12px] tw:font-normal " +
+  "tw:[font-family:var(--bk-font-ui)] tw:cursor-pointer " +
+  "tw:enabled:hover:text-[var(--bk-ink)] tw:focus-visible:outline-none " +
+  "tw:focus-visible:shadow-[var(--bk-shadow-focus)]";
+
+const VARIANT_PILL_ACTIVE =
+  "tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent)] " +
+  "tw:text-[var(--bk-accent-on)] tw:font-medium";
+
 const VariantPicker: React.FC<VariantPickerProps> = ({ property, selectedValue, onChange }) => {
   return (
     <div>
@@ -327,7 +347,7 @@ const VariantPicker: React.FC<VariantPickerProps> = ({ property, selectedValue, 
         {property.values.map((value) => (
           <Button
             key={value}
-            className={`bd-variant-pill ${selectedValue === value ? "active" : ""}`}
+            className={`${VARIANT_PILL} ${selectedValue === value ? VARIANT_PILL_ACTIVE : ""}`}
             onClick={() => onChange(value)}
           >
             {value}

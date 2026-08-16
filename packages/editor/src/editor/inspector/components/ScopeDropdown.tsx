@@ -99,7 +99,7 @@ export function ScopeDropdown({
     <div ref={ref} style={{ position: "relative", display: "inline-block" }}>
       <Button
         type="button"
-        className="bdi-bpr-pill bdi-bpr-pill--reach"
+        className="bdi-bpr-pill tw:bg-[var(--bk-bg-card)]"
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="menu"
         aria-expanded={open}

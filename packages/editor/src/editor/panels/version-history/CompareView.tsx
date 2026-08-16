@@ -188,7 +188,7 @@ export function CompareView({
           compare it against), and a computed diff can come back empty. Before
           this, both rendered a toggle over blank space. */}
       {mode === "semantic" && changes.length === 0 && (
-        <p className="compare-empty">
+        <p className="tw:mt-[var(--bk-space-8)] tw:mb-0 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)] tw:text-center">
           {compareResult === null
             ? "This is the newest version — there is nothing later to compare it against."
             : `Nothing changed since “${version.name}”.`}

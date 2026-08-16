@@ -74,24 +74,6 @@
 .bd-pg-search input::placeholder { color: var(--bk-ink-muted); }
 .bd-pg-search svg { width: 12px; height: 12px; color: var(--bk-ink-muted); flex-shrink: 0; }
 .bd-pg-search-wrap { padding: 0 var(--bk-space-12) var(--bk-space-8); }
-.bd-pg-search-clear {
-  display: inline-grid;
-  place-items: center;
-  width: 18px;
-  height: 18px;
-  padding: 0;
-  border: 0;
-  border-radius: 4px;
-  background: transparent;
-  color: var(--bk-ink-muted);
-  cursor: pointer;
-  font: 600 12px var(--bk-font-ui);
-  line-height: 1;
-}
-.bd-pg-search-clear:hover {
-  background: rgba(15, 23, 42, 0.08);
-  color: var(--bk-ink);
-}
 .bd-pg-selectall {
   display: flex;
   align-items: center;
@@ -119,14 +101,6 @@
   border-color: var(--bk-accent);
   color: var(--bk-accent-on);
 }
-.bd-pg-footer-stats {
-  display: flex;
-  gap: 6px;
-  font: 500 10.5px var(--bk-font-ui);
-  color: var(--bk-ink-muted);
-  font-variant-numeric: tabular-nums;
-}
-.bd-pg-footer-stats b { color: var(--bk-ink); font-weight: 600; }
 /* .bd-pg-add-ghost (+ :hover) removed 2026-05-24 — JSX consumer deleted
    in earlier Pages refactor; CSS left orphan. */
 
@@ -420,46 +394,9 @@
   outline: 1px dashed var(--bk-accent);
   outline-offset: -2px;
 }
-
-/* ─── EMPTY STATES ────────────────────────────────────────────────────── */
-.bd-pg-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: var(--bk-space-40) var(--bk-space-16);
-  text-align: center;
-  gap: 6px;
-}
-.bd-pg-empty-title {
-  font: 500 13px var(--bk-font-ui);
-  color: var(--bk-ink-muted);
-}
-.bd-pg-empty-body {
-  font: 400 12px var(--bk-font-ui);
-  color: var(--bk-ink-muted);
-  opacity: 0.8;
-}
-.bd-pg-empty-action { margin-top: var(--bk-space-8); }
-
-/* ─── LOADING SKELETON ────────────────────────────────────────────────── */
-.bd-pg-skeleton-row {
-  height: var(--pg-row-h);
-  margin: 2px 0;
-  border-radius: 4px;
-  background: linear-gradient(
-    90deg,
-    var(--bk-bg-subtle) 0%,
-    rgba(15,23,42,0.06) 50%,
-    var(--bk-bg-subtle) 100%
-  );
-  background-size: 200% 100%;
-  animation: bd-pg-skeleton-shimmer 1.4s ease-in-out infinite;
-}
-@keyframes bd-pg-skeleton-shimmer {
+@keyframes bd-pg-skeleton-shimmer{
   0%   { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
+  100% { background-position: -200% 0; }}
 
 /* ─── FOOTER ──────────────────────────────────────────────────────────── */
 .bd-pg-footer {
@@ -470,18 +407,6 @@
   flex-direction: column;
   gap: 6px;
   background: linear-gradient(to top, var(--bk-bg-panel) 80%, transparent);
-}
-/* .bd-pg-add + .bd-pg-add-wrap/-overflow/-popover/-option families
-   removed 2026-05-24 — JSX consumer deleted in earlier Pages refactor;
-   CSS left orphan. Footer "+ Page" button now renders via vibcoder
-   Button + Popover, not these bespoke classes. */
-.bd-pg-stats {
-  font-family: var(--bk-font-mono);
-  font-size: 10.5px;
-  font-weight: 500;
-  font-variant-numeric: tabular-nums;
-  color: var(--bk-ink-muted);
-  text-align: center;
 }
 
 /* ─── BULK TOOLBAR (dark floating pill) ───────────────────────────────── */
@@ -650,10 +575,9 @@
   box-shadow: var(--bk-shadow-overlay);
   animation: bd-pg-drawer-in var(--bk-motion-base) var(--bk-ease-default);
 }
-@keyframes bd-pg-drawer-in {
+@keyframes bd-pg-drawer-in{
   from { transform: translate(-50%, calc(-50% + 8px)); opacity: 0; }
-  to   { transform: translate(-50%, -50%); opacity: 1; }
-}
+  to   { transform: translate(-50%, -50%); opacity: 1; }}
 
 .bd-pg-drawer-hdr {
   /* Board header: 16 semibold title, 14px gap, then the text-link tab row. */

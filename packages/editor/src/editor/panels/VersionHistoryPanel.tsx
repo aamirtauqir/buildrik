@@ -37,6 +37,46 @@ import { Button, TextField, useToast } from "@/editor/chrome-ui";
 // Main Component
 // ============================================
 
+
+/*
+  Saves states as `tw:` utilities. These shipped as rules in history.css; the
+  panel-CSS lane is the thing the styling ratchet exists to drain, and the
+  chrome-ui contract test (className-precedence) is why a caller's utilities
+  are enough even on flowbite-themed children. The descendant selectors
+  (`.saves-load-error strong`) become classes on the children they targeted.
+*/
+const LOAD_ERROR =
+  "tw:flex tw:flex-col tw:items-center tw:gap-[var(--bk-space-4)] " +
+  "tw:px-[var(--bk-space-16)] tw:py-[var(--bk-space-24)] tw:text-center";
+const LOAD_ERROR_TITLE = "tw:text-[var(--bk-error)] tw:text-[13px] tw:font-normal";
+const LOAD_ERROR_SUB = "tw:text-[var(--bk-ink-muted)] tw:text-[12px]";
+const LOAD_ERROR_FOOT =
+  "tw:flex tw:flex-col tw:gap-[var(--bk-space-8)] tw:mt-auto " +
+  "tw:p-[var(--bk-space-12)] tw:border-t tw:border-[var(--bk-border)] " +
+  "tw:text-[var(--bk-ink-muted)] tw:text-[12px]";
+
+/* Board 1138:4573 — the Saves loading state. Staggered indents so it reads as a
+   tree settling, not a list of identical bars. */
+const SKELETON = "tw:flex tw:flex-col tw:gap-[var(--bk-space-8)] tw:p-[var(--bk-space-12)]";
+const SKELETON_ROW = "tw:flex tw:items-center tw:gap-[var(--bk-space-8)]";
+const SKELETON_INDENT = ["", "tw:pl-[var(--bk-space-12)]", "tw:pl-[var(--bk-space-24)]"];
+const SKELETON_DOT =
+  "tw:flex-none tw:w-[10px] tw:h-[10px] tw:rounded-[var(--bk-radius-sm)] tw:bg-[var(--bk-bg-subtle)]";
+const SKELETON_BAR =
+  "tw:h-[10px] tw:flex-1 tw:max-w-[180px] tw:rounded-[var(--bk-radius-sm)] tw:bg-[var(--bk-bg-subtle)]";
+
+/* Board 163:269 pruned / 163:220 restoring. Amber says nothing failed — the
+   oldest auto-saves aged out; accent says something is happening, not wrong. */
+const NOTICE_BASE =
+  "tw:flex tw:flex-col tw:gap-[2px] tw:px-[var(--bk-space-12)] " +
+  "tw:py-[var(--bk-space-8)] tw:border-b tw:border-[var(--bk-border)] tw:text-[12px]";
+const NOTICE_PRUNED =
+  `${NOTICE_BASE} tw:bg-[var(--bk-warning-tint)] tw:text-[var(--bk-warning-text)]`;
+const NOTICE_RESTORING =
+  `${NOTICE_BASE} tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-accent-text)]`;
+const NOTICE_STRONG = "tw:font-semibold";
+const NOTICE_SUB = "tw:text-[var(--bk-ink-muted)]";
+
 export function VersionHistoryPanel({
   composer,
   searchQuery = "",
@@ -225,11 +265,11 @@ export function VersionHistoryPanel({
   if (loadError) {
     return (
       <div className="saves-view">
-        <div className="saves-load-error" role="alert">
-          <strong>Couldn&apos;t load version history.</strong>
-          <span>Your versions are still stored. Only this list failed to load.</span>
+        <div className={LOAD_ERROR} role="alert">
+          <strong className={LOAD_ERROR_TITLE}>Couldn&apos;t load version history.</strong>
+          <span className={LOAD_ERROR_SUB}>Your versions are still stored. Only this list failed to load.</span>
         </div>
-        <div className="saves-load-error__foot">
+        <div className={LOAD_ERROR_FOOT}>
           <span>Retry, or reopen Versions in a moment.</span>
           <Button color="light" size="xs" onClick={retryLoad}>
             Try again
@@ -245,11 +285,11 @@ export function VersionHistoryPanel({
   if (isLoading) {
     return (
       <div className="saves-view">
-        <div className="saves-skeleton" aria-busy="true" aria-label="Loading versions">
+        <div className={SKELETON} aria-busy="true" aria-label="Loading versions">
           {[0, 1, 2, 3, 4].map((i) => (
-            <div key={i} className={`saves-skeleton__row saves-skeleton__row--${i % 3}`}>
-              <span className="saves-skeleton__dot" />
-              <span className="saves-skeleton__bar" />
+            <div key={i} className={`${SKELETON_ROW} ${SKELETON_INDENT[i % 3]}`}>
+              <span className={SKELETON_DOT} />
+              <span className={SKELETON_BAR} />
             </div>
           ))}
         </div>
@@ -278,16 +318,16 @@ export function VersionHistoryPanel({
     <div className="saves-view">
       {/* Board 163:220 — the restore banner, above the list. */}
       {restoring && (
-        <div className="saves-restoring-notice" role="status">
-          <strong>Restoring {restoring.targetName}…</strong>
-          {restoring.savedAs && <span>Saving your current work as “{restoring.savedAs}” first.</span>}
+        <div className={NOTICE_RESTORING} role="status">
+          <strong className={NOTICE_STRONG}>Restoring {restoring.targetName}…</strong>
+          {restoring.savedAs && <span className={NOTICE_SUB}>Saving your current work as “{restoring.savedAs}” first.</span>}
         </div>
       )}
 
       {pruned && (
-        <div className="saves-pruned-notice" role="status">
-          <strong>Older auto-saves were removed</strong>
-          <span>
+        <div className={NOTICE_PRUNED} role="status">
+          <strong className={NOTICE_STRONG}>Older auto-saves were removed</strong>
+          <span className={NOTICE_SUB}>
             Past {pruned.kept}. Named versions and the approved one were kept.
           </span>
         </div>

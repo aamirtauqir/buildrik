@@ -40,36 +40,3 @@
   font-weight: 500;
   flex-shrink: 0;
 }
-
-/* Variant picker pills in ComponentDetailScreen. No rule existed, so these
-   chrome-ui Buttons rendered as full flowbite buttons — h-10, centred, medium —
-   in a row that wants chips, and `.active` marked nothing at all. Same shape and
-   same fix as ElementsTab's `bd-pill`. */
-.bd-variant-pill {
-  display: inline-flex;
-  align-items: center;
-  height: 22px;
-  padding: 0 var(--bk-space-8);
-  border: 1px solid var(--bk-border);
-  border-radius: var(--bk-radius-full);
-  background: transparent;
-  color: var(--bk-ink-soft);
-  font: 400 12px var(--bk-font-ui);
-  cursor: pointer;
-}
-
-.bd-variant-pill:hover:not(:disabled) {
-  color: var(--bk-ink);
-}
-
-.bd-variant-pill.active {
-  border-color: var(--bk-accent);
-  background: var(--bk-accent);
-  color: var(--bk-accent-on);
-  font-weight: 500;
-}
-
-.bd-variant-pill:focus-visible {
-  outline: none;
-  box-shadow: var(--bk-shadow-focus);
-}

@@ -58,45 +58,6 @@
   margin-top: 1px;
 }
 
-/* Saves filter (M1) — the old top-level "Changes" tab, demoted to a filter over
-   the same list. Chips, not tabs, so it cannot be mistaken for a third
-   destination next to Saves / Published. */
-.saves-filter {
-  display: flex;
-  gap: var(--bk-space-4);
-  padding: var(--bk-space-8) var(--bk-space-12) 0;
-}
-
-.saves-filter-chip {
-  padding: var(--bk-space-4) var(--bk-space-8);
-  font-size: 12px;
-  font-weight: 400;
-  font-family: inherit;
-  color: var(--bk-ink-soft);
-  background: none;
-  border: 1px solid var(--bk-border);
-  border-radius: var(--bk-radius-full);
-  cursor: pointer;
-  transition: color 150ms ease-out, background-color 150ms ease-out,
-    border-color 150ms ease-out;
-}
-
-.saves-filter-chip:hover {
-  color: var(--bk-ink);
-}
-
-.saves-filter-chip.active {
-  font-weight: 500;
-  color: var(--bk-accent-on);
-  background: var(--bk-accent);
-  border-color: var(--bk-accent);
-}
-
-.saves-filter-chip:focus-visible {
-  outline: none;
-  box-shadow: var(--bk-shadow-focus);
-}
-
 .bd-history-container .search-bar {
   position: relative;
   padding: var(--bk-space-8) var(--bk-space-12);
@@ -448,120 +409,6 @@
 
 /* Board 453:4031 — the list failed to read. Red title because it IS a failure,
    muted body because the data is fine; the footer carries the retry. */
-.saves-load-error {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--bk-space-4);
-  padding: var(--bk-space-24) var(--bk-space-16);
-  text-align: center;
-}
-
-.saves-load-error strong {
-  color: var(--bk-error);
-  font-size: 13px;
-  font-weight: 400;
-}
-
-.saves-load-error span {
-  color: var(--bk-ink-muted);
-  font-size: 12px;
-}
-
-.saves-load-error__foot {
-  display: flex;
-  flex-direction: column;
-  gap: var(--bk-space-8);
-  margin-top: auto;
-  padding: var(--bk-space-12);
-  border-top: 1px solid var(--bk-border);
-  color: var(--bk-ink-muted);
-  font-size: 12px;
-}
-
-/* Board 1138:4573 — the Saves loading state. Staggered indents so it reads as
-   a tree settling, not a list of identical bars. */
-.saves-skeleton {
-  display: flex;
-  flex-direction: column;
-  gap: var(--bk-space-8);
-  padding: var(--bk-space-12);
-}
-
-.saves-skeleton__row {
-  display: flex;
-  align-items: center;
-  gap: var(--bk-space-8);
-}
-
-.saves-skeleton__row--1 {
-  padding-left: var(--bk-space-12);
-}
-
-.saves-skeleton__row--2 {
-  padding-left: var(--bk-space-24);
-}
-
-.saves-skeleton__dot {
-  flex: none;
-  width: 10px;
-  height: 10px;
-  border-radius: var(--bk-radius-sm);
-  background: var(--bk-bg-subtle);
-}
-
-.saves-skeleton__bar {
-  height: 10px;
-  flex: 1;
-  max-width: 180px;
-  border-radius: var(--bk-radius-sm);
-  background: var(--bk-bg-subtle);
-}
-
-/* Board 163:269 — the pruned notice. Amber wash, not an error: nothing failed,
-   the oldest auto-saves aged out. Named versions and the approved one survive,
-   which is the half the copy exists to say. */
-.saves-pruned-notice {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: var(--bk-space-8) var(--bk-space-12);
-  background: var(--bk-warning-tint);
-  border-bottom: 1px solid var(--bk-border);
-  color: var(--bk-warning-text);
-  font-size: 12px;
-}
-
-.saves-pruned-notice strong {
-  font-weight: 600;
-}
-
-.saves-pruned-notice span {
-  color: var(--bk-ink-muted);
-}
-
-/* Board 163:220 — the restore in flight. Accent wash, not amber: nothing is
-   wrong, something is happening. The second line is the promise the engine
-   keeps (VersionTimelineManager saves the open work before importing). */
-.saves-restoring-notice {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: var(--bk-space-8) var(--bk-space-12);
-  background: var(--bk-accent-tint);
-  border-bottom: 1px solid var(--bk-border);
-  color: var(--bk-accent-text);
-  font-size: 12px;
-}
-
-.saves-restoring-notice strong {
-  font-weight: 600;
-}
-
-.saves-restoring-notice span {
-  color: var(--bk-ink-muted);
-}
-
 .saves-view {
   height: 100%;
   display: flex;
@@ -764,7 +611,7 @@
   display: flex;
 }
 
-@keyframes slideUp {
+@keyframes slideUp{
   from {
     opacity: 0;
     transform: translateY(8px);
@@ -772,8 +619,7 @@
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
+  }}
 
 .form-row {
   display: flex;
@@ -866,14 +712,6 @@
 
 /* Board 168:82: an empty diff view reads as broken, so the empty case says
    which kind of empty it is instead of rendering nothing. */
-.compare-empty {
-  margin: var(--bk-space-8) 0 0;
-  font-size: 12px;
-  line-height: 16px;
-  color: var(--bk-ink-muted);
-  text-align: center;
-}
-
 .compare-view {
   padding: var(--bk-space-12);
   margin: var(--bk-space-8) var(--bk-space-8) 0;
@@ -1052,14 +890,13 @@
   box-shadow: var(--bk-shadow-overlay);
 }
 
-@keyframes bd-history-fade-in {
+@keyframes bd-history-fade-in{
   from {
     opacity: 0;
   }
   to {
     opacity: 1;
-  }
-}
+  }}
 
 .restore-confirm,
 .delete-confirm {
@@ -1072,13 +909,6 @@
   border: 1px solid rgba(239, 68, 68, 0.3);
   border-radius: var(--bk-radius-sm);
   animation: bd-history-fade-in 150ms ease-out;
-}
-
-.restore-confirm-text,
-.delete-confirm-text {
-  font-size: 12px;
-  color: var(--bk-ink);
-  flex: 1;
 }
 
 .tt-overlay {
@@ -1242,7 +1072,7 @@
   border-color: rgba(239, 68, 68, 0.3);
 }
 
-@keyframes toastIn {
+@keyframes toastIn{
   from {
     opacity: 0;
     transform: translateX(16px);
@@ -1250,8 +1080,7 @@
   to {
     opacity: 1;
     transform: translateX(0);
-  }
-}
+  }}
 
 .keyboard-hints {
   display: flex;
@@ -1336,14 +1165,13 @@
   border-radius: 4px;
 }
 
-@keyframes shimmer {
+@keyframes shimmer{
   0% {
     background-position: 200% 0;
   }
   100% {
     background-position: -200% 0;
-  }
-}
+  }}
 
 .milestone-banner {
   font-family: inherit;
@@ -1403,9 +1231,3 @@
 /* Published-with-no-project. I added this className in the M2 commit and never
    wrote its rule — an orphan I introduced in the same session that was hunting
    them. Matches the panel's other quiet copy. */
-.bd-history-empty {
-  padding: var(--bk-space-16) var(--bk-space-12);
-  font-size: 12px;
-  color: var(--bk-ink-muted);
-  text-align: center;
-}

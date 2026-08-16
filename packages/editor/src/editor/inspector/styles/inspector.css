@@ -131,8 +131,6 @@
   cursor: pointer;
   white-space: nowrap;
 }
-.bdi-bpr .bdi-bpr-pill--reach { background: var(--bk-bg-card); }
-
 /* ── Body ─────────────────────────────────────────────── */
 .bdi-body {
   padding: 0;
@@ -186,13 +184,6 @@
    sites — which is why one missing rule was visible everywhere and traceable
    nowhere. Muted, mono, and truncating, because it is a value not a label. */
 .bdi-sec-h .bdi-sec-preview {
-  flex: 0 1 auto;
-  min-width: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  font: 400 10.5px var(--bk-font-mono);
-  color: var(--bk-ink-muted);
 }
 
 .bdi-sec-h .bdi-ind {
@@ -1042,17 +1033,4 @@ textarea.bdi-text {
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
-}
-
-/* DSBindingChip focus indicator (DD3 a11y baseline).
- * Inline styles in the React component drop `all: "unset"`, so the global
- * `*:focus-visible` rule in a11y.css would already fire — but the chip is
- * dense (height 20, radius 10), so the default 2px outline + 2px offset
- * collides with adjacent rows. Override with a tighter ring that matches
- * the chip's pill geometry. */
-.bd-ds-binding-chip:focus-visible,
-.bd-ds-binding-chip__bind-hint:focus-visible {
-  outline: 2px solid var(--bk-accent, var(--bk-accent));
-  outline-offset: 1px;
-  border-radius: 10px;
 }

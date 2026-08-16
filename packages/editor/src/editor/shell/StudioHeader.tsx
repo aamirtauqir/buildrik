@@ -684,7 +684,14 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
                    one amber box with only the text colour differing, which
                    dressed an error as a warning — the single distinction the
                    modal exists to make. */
-                <p key={i.id} className={`bk-pubconfirm__row bk-pubconfirm__row--${i.type}`}>
+                <p
+                  key={i.id}
+                  className={`tw:m-0 tw:px-[var(--bk-space-12)] tw:py-[var(--bk-space-8)] tw:rounded-[var(--bk-radius-md)] tw:text-[length:var(--bk-text-12)] tw:leading-[var(--bk-leading-normal)] ${
+                    i.type === "error"
+                      ? "tw:text-[var(--bk-error-text)] tw:bg-[var(--bk-error-tint)]"
+                      : "tw:text-[var(--bk-warning-text)] tw:bg-[var(--bk-warning-tint)]"
+                  }`}
+                >
                   <span aria-hidden="true">{i.type === "error" ? "●" : "▲"}</span>{" "}
                   {/* `location` is the human "where" the Issue shape already
                       carries ("Brand › color.accent"); `pageId` is an id and

@@ -107,7 +107,11 @@ export const ChevronIcon: React.FC<{ expanded: boolean }> = ({ expanded }) => (
   <ChevronDown
     size={14}
     strokeWidth={2}
-    className={`bd-accordion-chevron ${expanded ? "open" : "closed"}`}
+    /* The chevron carries the open/closed state. Without a rule it pointed
+       down forever, so the only signal a category was open was its content. */
+    className={`tw:flex-none tw:text-[var(--bk-ink-muted)] tw:[transition:transform_150ms_ease-out] ${
+      expanded ? "tw:rotate-0" : "tw:-rotate-90"
+    }`}
   />
 );
 

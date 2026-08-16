@@ -57,6 +57,26 @@ function buildPageRows(composer: Composer, oldSrc: string): PageRow[] {
   return rows;
 }
 
+/*
+  Dialog buttons as `tw:` utilities. The rest of this dialog keeps its CSS
+  rules — the scrim carries an @lint-hex-policy literal that belongs in a
+  stylesheet — but a chrome-ui Button's geometry is exactly what the caller
+  className is for, per chrome-ui/__tests__/className-precedence.test.tsx.
+*/
+const RX_BTN =
+  "tw:h-[32px] tw:px-[var(--bk-space-12)] tw:border " +
+  "tw:border-[var(--bk-border)] tw:rounded-[var(--bk-radius-md)] " +
+  "tw:bg-[var(--bk-bg-card)] tw:text-[var(--bk-ink)] tw:text-[13px] " +
+  "tw:leading-[18px] tw:font-normal tw:[font-family:var(--bk-font-ui)] " +
+  "tw:cursor-pointer tw:enabled:hover:bg-[var(--bk-bg-subtle)] " +
+  "tw:disabled:text-[var(--bk-ink-muted)] tw:disabled:cursor-not-allowed " +
+  "tw:focus-visible:outline-none tw:focus-visible:shadow-[var(--bk-shadow-focus)]";
+
+const RX_BTN_PRIMARY =
+  "tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent)] " +
+  "tw:text-[var(--bk-accent-on)] tw:font-medium " +
+  "tw:enabled:hover:bg-[var(--bk-accent-hover)]";
+
 export function ReplaceAcrossDialog({
   composer,
   oldSrc,
@@ -200,12 +220,12 @@ export function ReplaceAcrossDialog({
               </ul>
             )}
             <footer className="med-rx-footer">
-              <Button type="button" className="med-rx-btn" onClick={onClose}>
+              <Button type="button" className={RX_BTN} onClick={onClose}>
                 Cancel
               </Button>
               <Button
                 type="button"
-                className="med-rx-btn med-rx-btn--primary"
+                className={`${RX_BTN} ${RX_BTN_PRIMARY}`}
                 onClick={handleCommit}
                 disabled={selectedTotals.uses === 0}
               >
@@ -255,7 +275,7 @@ function ResultView({
         <footer className="med-rx-footer">
           <Button
             type="button"
-            className="med-rx-btn med-rx-btn--primary"
+            className={`${RX_BTN} ${RX_BTN_PRIMARY}`}
             onClick={onClose}
           >
             Done
@@ -283,7 +303,7 @@ function ResultView({
           </ul>
         </details>
         <footer className="med-rx-footer">
-          <Button type="button" className="med-rx-btn" onClick={onClose}>
+          <Button type="button" className={RX_BTN} onClick={onClose}>
             Close
           </Button>
         </footer>
@@ -308,12 +328,12 @@ function ResultView({
         </ul>
       </details>
       <footer className="med-rx-footer">
-        <Button type="button" className="med-rx-btn" onClick={onClose}>
+        <Button type="button" className={RX_BTN} onClick={onClose}>
           Close
         </Button>
         <Button
           type="button"
-          className="med-rx-btn med-rx-btn--primary"
+          className={`${RX_BTN} ${RX_BTN_PRIMARY}`}
           onClick={onRetryFailed}
         >
           Retry failed

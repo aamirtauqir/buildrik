@@ -57,14 +57,25 @@ function renderMenu(
   return { container, ...h };
 }
 
+/*
+  Queries run off the accessible tree — role="menu" / "separator" / "menuitem" —
+  not off `.med-ctx-*` classNames. Those classNames were deleted when the menu
+  moved to `tw:` utilities, and these five tests failed because they were using
+  styling hooks to ask a structural question. The a11y roles are what the menu
+  actually promises, and they survive a restyle.
+*/
+const menuKids = (container: HTMLElement) =>
+  Array.from(container.querySelector('[role="menu"]')?.children ?? []);
+const isSeparator = (el: Element) => el.getAttribute("role") === "separator";
+
 describe("§16 — MediaContextMenu groups", () => {
   // Board 1163:13695 draws ONE list with ONE rule, immediately above the
   // destructive item. The four-group layout was ours.
   it("renders a single separator, and it sits above Delete", () => {
     const { container } = renderMenu(makeItem());
-    expect(container.querySelectorAll(".med-ctx-sep").length).toBe(1);
-    const kids = Array.from(container.querySelector(".med-ctx-menu")?.children ?? []);
-    const sep = kids.findIndex((n) => n.classList.contains("med-ctx-sep"));
+    const kids = menuKids(container);
+    expect(kids.filter(isSeparator)).toHaveLength(1);
+    const sep = kids.findIndex(isSeparator);
     expect(kids[sep + 1]?.textContent).toMatch(/^Delete$/);
   });
 
@@ -82,12 +93,8 @@ describe("§16 — MediaContextMenu groups", () => {
 
   it("Group 1 contains Insert, Edit image (img), and items appear before first separator", () => {
     const { container } = renderMenu(makeItem());
-    const allChildren = Array.from(
-      container.querySelector(".med-ctx-menu")?.children ?? [],
-    );
-    const firstSep = allChildren.findIndex((el) =>
-      el.classList.contains("med-ctx-sep"),
-    );
+    const allChildren = menuKids(container);
+    const firstSep = allChildren.findIndex(isSeparator);
     const group1Text = allChildren
       .slice(0, firstSep)
       .map((el) => el.textContent?.trim() ?? "")
@@ -99,11 +106,9 @@ describe("§16 — MediaContextMenu groups", () => {
 
   it("Group 4 (danger) contains Delete only, after last separator", () => {
     const { container } = renderMenu(makeItem());
-    const allChildren = Array.from(
-      container.querySelector(".med-ctx-menu")?.children ?? [],
-    );
+    const allChildren = menuKids(container);
     const seps = allChildren
-      .map((el, idx) => (el.classList.contains("med-ctx-sep") ? idx : -1))
+      .map((el, idx) => (isSeparator(el) ? idx : -1))
       .filter((idx) => idx !== -1);
     const lastSep = seps[seps.length - 1];
     const dangerGroup = allChildren
@@ -128,7 +133,7 @@ describe("§16 — Move submenu uses allFolders with depth indentation", () => {
 
   it("renders folders from allFolders prop, not folders", () => {
     const { container } = renderMenu(makeItem(), [], { allFolders: NESTED });
-    const submenuTrigger = container.querySelector(".med-ctx-item--submenu");
+    const submenuTrigger = screen.getByRole("menuitem", { name: /move to folder/i });
     expect(submenuTrigger).toBeInTheDocument();
     fireEvent.mouseEnter(submenuTrigger as HTMLElement);
     expect(screen.getByRole("menuitem", { name: /brand/i })).toBeInTheDocument();
@@ -140,8 +145,8 @@ describe("§16 — Move submenu uses allFolders with depth indentation", () => {
 
   it("indents nested folders by parentId depth", () => {
     const { container } = renderMenu(makeItem(), [], { allFolders: NESTED });
-    const submenuTrigger = container.querySelector(".med-ctx-item--submenu");
-    fireEvent.mouseEnter(submenuTrigger as HTMLElement);
+    const submenuTrigger = screen.getByRole("menuitem", { name: /move to folder/i });
+    fireEvent.mouseEnter(submenuTrigger);
     const brandBtn = screen.getByRole("menuitem", {
       name: /brand/i,
     }) as HTMLElement;

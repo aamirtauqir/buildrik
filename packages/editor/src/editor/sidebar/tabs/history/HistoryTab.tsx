@@ -55,6 +55,27 @@ const ClearXSvg = () => (
   </svg>
 );
 
+/*
+  Saves filter (M1) — the old top-level "Changes" tab, demoted to a filter over
+  the same list. Chips, not tabs, so it cannot read as a third destination next
+  to Saves / Published. `tw:` rather than a rule in history.css: the panel-CSS
+  lane is what the styling ratchet drains, and a caller's utilities win over
+  flowbite's Button theme (chrome-ui/__tests__/className-precedence.test.tsx).
+*/
+const FILTER_ROW = "tw:flex tw:gap-[var(--bk-space-4)] tw:pt-[var(--bk-space-8)] tw:px-[var(--bk-space-12)]";
+const FILTER_CHIP =
+  "tw:px-[var(--bk-space-8)] tw:py-[var(--bk-space-4)] tw:text-[12px] " +
+  "tw:font-normal tw:[font-family:inherit] tw:text-[var(--bk-ink-soft)] " +
+  "tw:bg-transparent tw:border tw:border-[var(--bk-border)] tw:rounded-full " +
+  "tw:cursor-pointer tw:[transition:color_150ms_ease-out,background-color_150ms_ease-out,border-color_150ms_ease-out] " +
+  "tw:hover:text-[var(--bk-ink)] tw:focus-visible:outline-none " +
+  "tw:focus-visible:shadow-[var(--bk-shadow-focus)]";
+const FILTER_CHIP_ACTIVE =
+  "tw:font-medium tw:text-[var(--bk-accent-on)] tw:bg-[var(--bk-accent)] tw:border-[var(--bk-accent)]";
+const HISTORY_EMPTY =
+  "tw:px-[var(--bk-space-12)] tw:py-[var(--bk-space-16)] tw:text-[12px] " +
+  "tw:text-[var(--bk-ink-muted)] tw:text-center";
+
 export const HistoryTab: React.FC<HistoryTabProps> = ({
   composer,
   projectId,
@@ -169,13 +190,13 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
           query, so showing a dead search field over it would be a lie. */}
       {activeView === "saves" && (
         <>
-          <div className="saves-filter" role="group" aria-label="Saves filter">
+          <div className={FILTER_ROW} role="group" aria-label="Saves filter">
             {(["milestones", "changes"] as const).map((f) => (
               <Button
                 key={f}
                 type="button"
                 aria-pressed={savesFilter === f}
-                className={`saves-filter-chip${savesFilter === f ? " active" : ""}`}
+                className={`${FILTER_CHIP}${savesFilter === f ? ` ${FILTER_CHIP_ACTIVE}` : ""}`}
                 onClick={() => setSavesFilter(f)}
               >
                 {FILTER_LABEL[f]}
@@ -240,7 +261,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
           (projectId ? (
             <PublishHistory siteId={projectId} rollbackJob={rollbackJob} />
           ) : (
-            <div className="bd-history-empty">Publish the site once to start a version history.</div>
+            <div className={HISTORY_EMPTY}>Publish the site once to start a version history.</div>
           ))}
       </div>
       {/* Time-Travel scrubber drawer (overlays canvas, not sidebar) */}

@@ -18,10 +18,7 @@
  * @license BSD-3-Clause
  */
 
-/* ============================================
-   Layout CSS Custom Properties (IA Redesign 2026)
-   These can be overridden by default.css tokens
-   ============================================ */
+/* Layout CSS Custom Properties (IA Redesign 2026) These can be overridden by default.css tokens */
 :root {
   /* Widened to Figma 32-2 committed size tokens (2026-07-24, founder-approved).
      These now source from the design-system size tokens — one place to change. */
@@ -29,18 +26,13 @@
   --layout-drawer-width: var(--bk-size-drawer);
   --layout-inspector-width: var(--bk-size-inspector);
   --layout-topbar-height: var(--bk-size-topbar);
-  /* --bk-size-footer, not --bk-size-row. Both are 32px today so nothing moves,
-     but this is the grid track that reserves the footer, and the footer element
-     itself already sizes off --bk-size-footer (line ~157). Bound to the row
-     token, a density change to rows would slide the track out from under it. */
+  /* footer, not row: the track and the element it reserves must read one token (cbd15eeb) */
   --layout-footer-height: var(--bk-size-footer);
   --layout-gap: var(--bk-space-12);
   --layout-touch-min: var(--bk-size-header, 44px);
 }
 
-/* ============================================
-   Main Grid Container
-   ============================================ */
+/* Main Grid Container */
 .layout-shell {
   position: relative; /* Containing block for overlay (unpinned) drawer */
   display: grid;
@@ -100,11 +92,7 @@
     var(--layout-inspector-width, 300px);
 }
 
-/* ============================================
-   Drawer Overlay (Unpinned) Mode
-   Drawer floats over canvas — grid column collapses to 0.
-   Canvas stays full width.
-   ============================================ */
+/* Drawer Overlay (Unpinned) Mode Drawer floats over canvas — grid column collapses to 0. Canvas stays full width. */
 .layout-shell--drawer-open.layout-shell--drawer-overlay {
   grid-template-columns:
     var(--layout-rail-width, 60px)
@@ -139,9 +127,7 @@
   top: 0;
 }
 
-/* ============================================
-   TopBar
-   ============================================ */
+/* TopBar */
 .layout-shell__topbar {
   grid-area: topbar;
   display: flex;
@@ -172,9 +158,7 @@
   z-index: var(--bk-z-topbar);
 }
 
-/* ============================================
-   Left Rail
-   ============================================ */
+/* Left Rail */
 .layout-shell__rail {
   grid-area: rail;
   display: flex;
@@ -195,9 +179,7 @@
   background: transparent;
 }
 
-/* ============================================
-   Sidebar (merged rail + panel)
-   ============================================ */
+/* Sidebar (merged rail + panel) */
 .layout-shell__sidebar {
   grid-area: rail;
   display: flex;
@@ -258,18 +240,10 @@
   grid-area: fullpage;
 }
 
-/* Stacking — the shell's slots sit INSIDE the token z-scale (canvas 0 ·
-   chrome 10 · drawer 20 · topbar 30 · popover 40 · overlay 50 · modal 60 ·
-   cmdk 70). They ran 80/90/100/200 until 2026-08-16, above every layer the
-   tokens define, and because the inspector and drawer carry a transform for
-   their slide (each its own stacking context) a topbar popover at 40 painted
-   UNDERNEATH them — the notifications dropdown and the Issues panel both
-   rendered as a 60px sliver. Canvas overlays keep their own larger numbers:
-   overflow:hidden on the canvas clips them, so they cannot reach the topbar. */
-
-/* ============================================
-   Drawer Panel
-   ============================================ */
+/* Stacking: shell slots sit INSIDE the token z-scale (canvas 0 → cmdk 70). They
+   ran 80/90/100/200 and outranked every token layer, so topbar popovers painted
+   under the transformed drawer/inspector. Full account in 9de598df. */
+/* Drawer Panel */
 .layout-shell__drawer {
   grid-area: drawer;
   display: flex;
@@ -291,9 +265,7 @@
   opacity: 1;
 }
 
-/* ============================================
-   Canvas Area
-   ============================================ */
+/* Canvas Area */
 .layout-shell__canvas {
   grid-area: canvas;
   display: flex;
@@ -319,9 +291,7 @@
   z-index: var(--bk-z-canvas);
 }
 
-/* ============================================
-   Right Inspector
-   ============================================ */
+/* Right Inspector */
 .layout-shell__inspector {
   grid-area: inspector;
   display: flex;
@@ -343,11 +313,7 @@
   opacity: 1;
 }
 
-/* ============================================
-   FullPage Mode (Templates, Settings, History)
-   Canvas + Inspector hidden, FullPage slot fills remaining space.
-   Grid keeps 4-column structure, collapses drawer/canvas/inspector to 0px.
-   ============================================ */
+/* FullPage Mode (Templates, Settings, History) Canvas + Inspector hidden, FullPage slot fills remaining space. Grid keeps 4-column structure, collapses drawer/canvas/inspector to 0px. */
 .layout-shell--fullpage {
   grid-template-columns:
     var(--layout-rail-width, 60px)
@@ -384,10 +350,7 @@
   pointer-events: none;
 }
 
-/* ============================================
-   Responsive Behavior (1024px - 1366px)
-   Per COMPONENT_SPECS.md responsive rules
-   ============================================ */
+/* Responsive Behavior (1024px - 1366px) Per COMPONENT_SPECS.md responsive rules */
 @media (max-width: 1366px) {
   /* Inspector overlays canvas instead of taking grid space */
   .layout-shell--inspector-open {
@@ -425,9 +388,7 @@
   }
 }
 
-/* ============================================
-   Accessibility
-   ============================================ */
+/* Accessibility */
 .layout-shell__rail:focus-visible,
 .layout-shell__drawer:focus-visible,
 .layout-shell__canvas:focus-visible,
