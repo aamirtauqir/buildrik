@@ -152,7 +152,7 @@ export function AssetDetailOverlay({
   const usage = useMemo(() => {
     if (!composer || !item.src) return [];
     try {
-      return collectUsageByPage(composer.elements.getAllPages(), item.src);
+      return collectUsageByPage(composer, item.src);
     } catch {
       return [];
     }

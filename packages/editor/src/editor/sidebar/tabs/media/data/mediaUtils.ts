@@ -148,29 +148,44 @@ export interface PageUsage {
 
 /**
  * Cross-page usage for one media src — board 146:68 groups hits by PAGE.
- * Pure walk over the serialized page trees (attributes.src + inline
- * background-image), so it needs no live element instances.
+ *
+ * Reads the LIVE element hierarchy through the command layer, not the
+ * serialized page trees. It used to walk `getAllPages()`, whose docstring
+ * promised it "needs no live element instances" — and that was the bug.
+ * `getAllPages()` returns `Array.from(ctx.pages.values())`, the STORED
+ * PageData, while `exportPages()` reconstructs each root from the live
+ * Elements and says in its own comment that those are "the single source of
+ * truth for element data". Insert an asset twice and this reported zero.
+ *
+ * That number is load-bearing: the used-in screen prints "Deleting this file
+ * won't change anything on your site." next to it. A stale zero turns that
+ * sentence into a false all-clear over an asset sitting on live elements.
  */
 export function collectUsageByPage(
-  pages: ReadonlyArray<import("@shared/types/project").PageData>,
+  composer: {
+    mediaOps: { getUsagesByPage(src: string): Map<string, unknown[]> };
+    elements: { getAllPages(): ReadonlyArray<{ id: string; name?: string }> };
+  },
   src: string,
 ): PageUsage[] {
   if (!src) return [];
+  const byPage = composer.mediaOps.getUsagesByPage(src);
+  if (byPage.size === 0) return [];
+
+  const nameById = new Map(composer.elements.getAllPages().map((p) => [p.id, p.name ?? p.id]));
   const out: PageUsage[] = [];
-  for (const page of pages) {
-    const hits: PageUsageHit[] = [];
-    const walk = (el: import("@shared/types/element").ElementData) => {
-      const elSrc = el.attributes?.src;
-      const bg = el.styles?.["background-image"] ?? el.styles?.backgroundImage;
-      const bgHit = bg ? bg.includes(src) : false;
-      if (elSrc === src || bgHit) {
-        const label = el.attributes?.["data-name"] ?? el.type;
-        hits.push({ elementId: el.id, label, crumb: `${page.name} › ${label}` });
-      }
-      el.children?.forEach(walk);
-    };
-    if (page.root) walk(page.root);
-    if (hits.length) out.push({ pageId: page.id, pageName: page.name, hits });
+  for (const [pageId, elements] of byPage) {
+    const pageName = nameById.get(pageId) ?? pageId;
+    const hits: PageUsageHit[] = elements.map((raw) => {
+      const el = raw as {
+        getId(): string;
+        getType(): string;
+        getAttribute(name: string): string | undefined;
+      };
+      const label = el.getAttribute("data-name") ?? el.getType();
+      return { elementId: el.getId(), label, crumb: `${pageName} \u203a ${label}` };
+    });
+    if (hits.length) out.push({ pageId, pageName, hits });
   }
   return out;
 }

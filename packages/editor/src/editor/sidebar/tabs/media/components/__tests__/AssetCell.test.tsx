@@ -2,8 +2,8 @@
  * AssetCell — prototype-v3 §10 3-col grid cell.
  * Phase 0 Task 5 TDD spec.
  */
-import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, it, expect, vi, afterEach } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AssetCell } from "../AssetCell";
 import type { LibraryItem } from "../../data/mediaTypes";
@@ -103,5 +103,57 @@ describe("AssetCell", () => {
     render(<AssetCell item={imgItem} onClick={onClick} isLocked />);
     await user.click(screen.getByRole("button"));
     expect(onClick).not.toHaveBeenCalled();
+  });
+});
+
+/*
+  A double-click fires click, click, dblclick. Both handlers were bound bare, so
+  opening an asset's details inserted TWO copies of it on the page first.
+  Measured live on a blank project before the fix: 0 user inserts read as
+  "Used in 2 places", 1 as 3, 2 as 4 — a constant +2 from the double-click that
+  opened the panel to read the number.
+
+  fireEvent, not userEvent: the sequence has to be exact (click, click,
+  dblclick) and userEvent's own timing machinery deadlocks against the fake
+  timers this needs.
+*/
+describe("AssetCell — click vs double-click", () => {
+  const cell = () => screen.getByRole("button", { name: /hero\.jpg asset/i });
+
+  afterEach(() => { vi.useRealTimers(); });
+
+  it("a double-click opens the detail and inserts nothing", () => {
+    vi.useFakeTimers();
+    const onClick = vi.fn();
+    const onDoubleClick = vi.fn();
+    render(<AssetCell item={imgItem} onClick={onClick} onDoubleClick={onDoubleClick} />);
+
+    const el = cell();
+    fireEvent.click(el);
+    fireEvent.click(el);
+    fireEvent.doubleClick(el);
+    vi.advanceTimersByTime(600);
+
+    expect(onDoubleClick).toHaveBeenCalledTimes(1);
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it("a single click still inserts, once the double-click window passes", () => {
+    vi.useFakeTimers();
+    const onClick = vi.fn();
+    render(<AssetCell item={imgItem} onClick={onClick} onDoubleClick={vi.fn()} />);
+
+    fireEvent.click(cell());
+    expect(onClick).not.toHaveBeenCalled();   // still inside the window
+    vi.advanceTimersByTime(600);
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it("without a double-click handler the click is immediate", () => {
+    // Selection mode has no double-click; its clicks must not be delayed.
+    const onClick = vi.fn();
+    render(<AssetCell item={imgItem} onClick={onClick} />);
+    fireEvent.click(cell());
+    expect(onClick).toHaveBeenCalledTimes(1);
   });
 });

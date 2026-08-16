@@ -19,6 +19,7 @@
  *
  * @license BSD-3-Clause
  */
+import * as React from "react";
 import { Play, FileType, Lock } from "lucide-react";
 import type { DragEvent, MouseEvent } from "react";
 import type { LibraryItem } from "../data/mediaTypes";
@@ -64,6 +65,37 @@ export function AssetCell({
   //     as an element. Reads `application/x-aquibra-media-src/-type/-name`.
   // The cell previously set ONLY the folder-move key, so dragging a library
   // asset onto the canvas did nothing. Carry both payloads.
+  /*
+    Click inserts; double-click opens the detail. Both were bound bare, and a
+    double-click fires click, click, dblclick — so opening an asset's details
+    dropped TWO copies of it on the page first. Measured on a blank project:
+    0 user inserts read as "Used in 2 places", 1 as 3, 2 as 4 — a constant +2
+    from the dblclick that opened the panel to read the number.
+
+    So the click waits out the double-click window and cancels if a second one
+    lands. Only when `onDoubleClick` is wired: selection mode has no
+    double-click and its clicks should stay instant.
+  */
+  const clickTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  React.useEffect(
+    () => () => { if (clickTimer.current) clearTimeout(clickTimer.current); },
+    [],
+  );
+
+  const handleClick = () => {
+    if (!onDoubleClick) { onClick(item.key); return; }
+    if (clickTimer.current) clearTimeout(clickTimer.current);
+    clickTimer.current = setTimeout(() => {
+      clickTimer.current = null;
+      onClick(item.key);
+    }, 250);
+  };
+
+  const handleDoubleClick = () => {
+    if (clickTimer.current) { clearTimeout(clickTimer.current); clickTimer.current = null; }
+    onDoubleClick?.(item.key);
+  };
+
   const handleDragStart = (e: DragEvent<HTMLButtonElement>) => {
     e.dataTransfer.setData("application/x-buildrik-media-asset-key", item.key);
     e.dataTransfer.setData("application/x-aquibra-media-src", item.src);
@@ -92,8 +124,8 @@ export function AssetCell({
       disabled={isLocked}
       draggable={!isLocked}
       onDragStart={isLocked ? undefined : handleDragStart}
-      onClick={() => onClick(item.key)}
-      onDoubleClick={onDoubleClick ? () => onDoubleClick(item.key) : undefined}
+      onClick={handleClick}
+      onDoubleClick={onDoubleClick ? handleDoubleClick : undefined}
       onContextMenu={onContextMenu ? (e) => onContextMenu(e, item.key) : undefined}
       aria-label={`${item.name} asset`}
       aria-pressed={selectable ? isSelected : undefined}
