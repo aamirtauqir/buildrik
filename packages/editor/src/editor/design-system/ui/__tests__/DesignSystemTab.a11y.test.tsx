@@ -72,7 +72,7 @@ describe("DesignSystemTab — Brand root drill-in a11y", () => {
 
   it("opens on the root list, not inside a section", () => {
     const { container, queryByRole } = renderRoot();
-    expect(rows(container)).toHaveLength(8);
+    expect(rows(container)).toHaveLength(9);
     // The tab bar it replaced must not survive anywhere in the panel.
     expect(queryByRole("tablist")).toBeNull();
     expect(queryByRole("tab")).toBeNull();
@@ -109,12 +109,12 @@ describe("DesignSystemTab — Brand root drill-in a11y", () => {
     const { container, getByText } = renderRoot();
     fireEvent.click(rows(container).find((r) => r.textContent?.includes("Tokens"))!);
     fireEvent.click(getByText(/‹ Tokens/));
-    expect(rows(container)).toHaveLength(8);
+    expect(rows(container)).toHaveLength(9);
   });
 
   it("hides the decorative chevron from assistive tech", () => {
     const { container } = renderRoot();
     const chevrons = container.querySelectorAll('[data-section-id] [aria-hidden="true"]');
-    expect(chevrons.length).toBe(8);
+    expect(chevrons.length).toBe(9);
   });
 });

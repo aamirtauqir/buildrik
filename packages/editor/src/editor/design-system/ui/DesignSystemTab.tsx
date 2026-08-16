@@ -66,6 +66,7 @@ import { ExportSection } from "./sections/ExportSection";
 import { LintSection } from "./sections/LintSection";
 import { filterTokensByMode } from "../utils/semanticKind";
 import { ClassesSection } from "./sections/ClassesSection";
+import { TypographySection } from "./sections/TypographySection";
 import { StartersSection } from "./sections/StartersSection";
 import { ColourModeSection } from "./sections/ColourModeSection";
 import { useDSLint } from "../state/useDSLint";
@@ -86,7 +87,7 @@ const CRUMB =
 
 // ─── Section types ────────────────────────────────────────────────────────────
 
-type DesignSection = "tokens" | "styles" | "starters" | "classes" | "components" | "colour-mode" | "lint" | "export";
+type DesignSection = "tokens" | "typography" | "styles" | "starters" | "classes" | "components" | "colour-mode" | "lint" | "export";
 
 /**
  * Brand root — a drill-in list, not a tab bar (M5).
@@ -121,6 +122,7 @@ type DesignSection = "tokens" | "styles" | "starters" | "classes" | "components"
  */
 const SECTIONS: Array<{ id: DesignSection; label: string; hint: string }> = [
   { id: "tokens",     label: "Tokens",          hint: "Colours, type, spacing" },
+  { id: "typography", label: "Typography",      hint: "The fonts this site uses" },
   { id: "styles",     label: "Presets",         hint: "Component style presets" },
   { id: "starters",   label: "Starters",        hint: "Whole-brand starting points" },
   { id: "classes",    label: "Classes",         hint: "Names shared across elements" },
@@ -719,6 +721,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
           )}
           {activeSection === "starters"   && <StartersSection projectId={projectId} />}
           {activeSection === "classes"    && <ClassesSection composer={composer} />}
+          {activeSection === "typography" && <TypographySection composer={composer} />}
           {activeSection === "colour-mode" && <ColourModeSection composer={composer} />}
           {activeSection === "lint"       && <LintSection issues={lintIssues} />}
           {activeSection === "export"     && <ExportSection />}
