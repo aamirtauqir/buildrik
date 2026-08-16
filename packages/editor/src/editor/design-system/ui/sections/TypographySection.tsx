@@ -54,14 +54,45 @@ function familyOf(value: string): string {
  * An element that names no weight still renders one, so a family that is used
  * at all is used in at least one weight.
  */
-function weightsInUse(composer: Composer | null | undefined, family: string): number {
+/**
+ * Which font slot an element falls under when it names no family of its own.
+ *
+ * Almost no element does name one. `ElementManager` writes `font-family` only
+ * when a user applies a font to a selection (`:405`); everything else inherits
+ * from the site's own CSS, which binds these three tokens by their `cssVar`
+ * (`--buildrick-design-font-heading` and friends). That is what a three-slot
+ * font model means: headings take the display face, code takes the mono face,
+ * and the rest take the body face.
+ */
+function slotForType(type: string): string {
+  const t = type.toLowerCase();
+  if (t === "heading" || /^h[1-6]$/.test(t)) return "font-heading";
+  if (t === "code" || t === "pre") return "font-mono";
+  return "font-body";
+}
+
+function weightsInUse(
+  composer: Composer | null | undefined,
+  family: string,
+  slotId: string,
+): number {
   const all = composer?.elements?.getAllElements?.() ?? [];
   const weights = new Set<string>();
   let used = false;
   for (const el of all) {
     const styles = el.getStyles?.() ?? {};
     const declared = familyOf(String(styles["font-family"] ?? ""));
-    if (!declared || declared.toLowerCase() !== family.toLowerCase()) continue;
+    /*
+      Two ways an element uses this face, and the row was only counting the
+      rarer one. Matching solely on a DECLARED family meant a normally-built
+      page — where nothing declares one — reported "not used yet" for every
+      slot forever: a row whose stated job is to answer "in how many weights"
+      that could not answer it at all.
+    */
+    const usesThisFace = declared
+      ? declared.toLowerCase() === family.toLowerCase()
+      : slotForType(String(el.getType?.() ?? "")) === slotId;
+    if (!usesThisFace) continue;
     used = true;
     const w = String(styles["font-weight"] ?? "").trim();
     if (w) weights.add(w);
@@ -77,7 +108,7 @@ export const TypographySection: React.FC<TypographySectionProps> = ({ composer, 
     return FONT_SLOTS.map(({ id, role }) => {
       const token = source.find((t) => t.id === id);
       const family = familyOf(String(token?.value ?? ""));
-      return { id, role, family, weights: weightsInUse(composer, family) };
+      return { id, role, family, weights: weightsInUse(composer, family, id) };
     }).filter((row) => row.family.length > 0);
   }, [composer, source]);
 

@@ -31,6 +31,18 @@ function makeComposer(elements: Array<Record<string, string>>) {
   } as never;
 }
 
+/** Elements that declare no family — the normal case — carry a TYPE instead. */
+function makeTypedComposer(elements: Array<{ type: string; styles?: Record<string, string> }>) {
+  return {
+    on: vi.fn(),
+    off: vi.fn(),
+    elements: {
+      getAllElements: () =>
+        elements.map((e) => ({ getStyles: () => e.styles ?? {}, getType: () => e.type })),
+    },
+  } as never;
+}
+
 afterEach(cleanup);
 
 describe("Brand · Typography", () => {
@@ -88,5 +100,59 @@ describe("Brand · Typography", () => {
     render(<TypographySection composer={makeComposer([])} tokens={[]} />);
     expect(screen.getByText(/No fonts set/)).toBeInTheDocument();
     expect(screen.queryByTestId("brand-typography")).toBeNull();
+  });
+});
+
+describe("Brand · Typography — a page that declares no font still uses one", () => {
+  /*
+    `ElementManager` writes `font-family` only when a user applies a font to a
+    selection; everything else inherits from the site's CSS, which binds these
+    three tokens by their cssVar. Counting only DECLARED families meant a
+    normally-built page reported "not used yet" on every row, forever — the row
+    exists to answer "in how many weights" and could not answer it at all.
+  */
+  it("counts a heading against the display face", () => {
+    const composer = makeTypedComposer([{ type: "heading" }]);
+    render(<TypographySection composer={composer} tokens={TOKENS} />);
+    const rows = screen.getAllByText(/weight|not used yet/);
+    expect(rows[0].textContent).toMatch(/1 weight in use/); // Display
+    expect(rows[2].textContent).toMatch(/not used yet/);    // Mono
+  });
+
+  it("counts everything that is not a heading or code against body", () => {
+    const composer = makeTypedComposer([{ type: "text" }, { type: "button" }]);
+    render(<TypographySection composer={composer} tokens={TOKENS} />);
+    const rows = screen.getAllByText(/weight|not used yet/);
+    expect(rows[0].textContent).toMatch(/not used yet/);    // Display
+    expect(rows[1].textContent).toMatch(/1 weight in use/); // Body
+  });
+
+  it("counts code against the mono face", () => {
+    const composer = makeTypedComposer([{ type: "code" }]);
+    render(<TypographySection composer={composer} tokens={TOKENS} />);
+    const rows = screen.getAllByText(/weight|not used yet/);
+    expect(rows[2].textContent).toMatch(/1 weight in use/); // Mono
+  });
+
+  it("counts distinct declared weights, not elements", () => {
+    const composer = makeTypedComposer([
+      { type: "text", styles: { "font-weight": "400" } },
+      { type: "text", styles: { "font-weight": "400" } },
+      { type: "text", styles: { "font-weight": "700" } },
+    ]);
+    render(<TypographySection composer={composer} tokens={TOKENS} />);
+    const rows = screen.getAllByText(/weight|not used yet/);
+    expect(rows[1].textContent).toMatch(/2 weights in use/);
+  });
+
+  it("an explicit family still wins over the element's role", () => {
+    // A body-role element told to render in the mono family counts as mono.
+    const composer = makeTypedComposer([
+      { type: "text", styles: { "font-family": "Geist Mono" } },
+    ]);
+    render(<TypographySection composer={composer} tokens={TOKENS} />);
+    const rows = screen.getAllByText(/weight|not used yet/);
+    expect(rows[2].textContent).toMatch(/1 weight in use/); // Mono
+    expect(rows[1].textContent).toMatch(/not used yet/);    // Body
   });
 });
