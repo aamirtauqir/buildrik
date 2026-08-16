@@ -924,3 +924,83 @@ matches what can actually arrive. Its four tests went with it — and they are t
 third instance this week of a suite passing over unreachable code because **the
 test supplied the input that no call site passes** (`previewState` in
 `TemplateDetail`, `variant="coming-soon"` here).
+
+---
+
+## 11. The drain, and the five blind spots it walked into
+
+§10 turned the dead-export check on and grandfathered 118 violations. This is
+what happened when the grandfathered pile was actually worked. **542 → 11.**
+
+The headline is not the number. It is that **four of the five reductions came
+from fixing the scanner, not from deleting code** — and that the first thing
+checked, before deleting anything, was whether the list was true.
+
+### Spot-check before you delete
+
+`PagesTab` and `LibraryManager` were on the list. Both are live. TabRouter does
+`React.lazy(() => import("./tabs/pages/PagesTab"))`, FullPageRouter does
+`import("../media/LibraryManager").then((m) => ({ default: m.LibraryManager }))`,
+and the check walked only static `ImportDeclaration` nodes. Deleting from the
+report as written would have removed the Pages panel and the media library.
+
+### The five blind spots, in the order they surfaced
+
+| # | Blind spot | Cost |
+|---|---|---|
+| 1 | Type-only exports counted as dead code | 407 false (fixed in §10) |
+| 2 | Dynamic `import()` invisible | 7 false, incl. Pages + Media |
+| 3 | `e2e/probe` and `demo` not treated as consumers | 1 false — `PagesLoadingSkeleton`, built to board 774:4044 and mounted only by the probe until Pages goes async |
+| 4 | Namespace imports (`import * as X`) invisible | 19 false, incl. all 11 CMS storage functions |
+| 5 | Delegation to a module-private receiver called a pass-through | 14 false |
+
+**Blind spot 4 was invisible until real cruft was removed.** Deleting the unused
+`export * as CollectionStorage` alias in `engine/cms/index.ts` — a genuine
+middle-man, since `CollectionManager` and `cmsSync` both import the module
+directly — immediately reported eleven CMS storage functions the app calls
+constantly. The alias had been masking the gap. Removing cruft made the report
+worse before it made it better, which is worth expecting rather than panicking
+about.
+
+### What was genuinely drained
+
+- **24 declarations deleted** — seven speculative `openai.ts` helpers (only
+  `generateContent` has a caller), the unused storage/storageMigration
+  wrappers, `autoScroll`'s pair, and orphan constants.
+- **36 symbols un-exported** — used inside their own file, so only the `export`
+  keyword was dead. `applySetStyle.ts` is the clearest: all ten flagged names
+  are called by `applyAiEdit` a few lines down, and `applyAiEdit` is the only
+  thing any consumer imports. Deleting them would have been wrong.
+- **4 files deleted** — `useSidebarState.ts` (LeftSidebar keeps its own state),
+  `UserSavedSection.tsx` (half of `ComponentsPanelV2`, deleted with the
+  `COMPONENTS_V2` flag and left behind), `SvgIcon.tsx` (the catalog carries zero
+  `html:` keys today), `settings/styles/index.ts` (inline-style objects
+  superseded by `tw:`). Plus the stale `ComponentsPanelV2` mock in
+  `TabRouter.mapping.test.tsx`, mocking a module that no longer exists.
+- **3 dead aliases in barrels** — `parseHTMLToNodes`, `PresenceAvatars`,
+  `export * as CollectionStorage`.
+
+### What was deliberately kept, and now says so
+
+- **`ExportDropdown`** — the one remaining product dead export. The Brand
+  import/export flow is boarded at 153:120, 306:2232, 306:2265, 306:2298 and
+  none of its other four pieces exist. Built ahead, not left behind; the file
+  now carries that note, the way `PagesStateBlocks` already did. **The
+  difference between the two states is only ever whether someone wrote it
+  down.**
+- **`isInteractiveType` / `isLandmarkType` / `canHaveChildren`** — still flagged,
+  honestly: their Sets are exported, so a caller could use them directly. The
+  founder kept them on 2026-05-08 because the names document intent at the call
+  site. That reasoning now sits next to the code, not only in CLAUDE.md's
+  cleanup history.
+- **The eight `layout.ts` constants** — resolved by blind-spot-4's fix, not by
+  deletion. Their consumer is the contract test that asserts each against
+  DESIGN.md via `import * as layout`. ESLint `no-magic-layout-literals` also
+  points offenders at that file, so they are un-migrated targets.
+
+### Where it landed
+
+`antiPatterns` **542 → 11**: eight dead exports (seven in test helpers, one the
+annotated `ExportDropdown`) and the three settled predicates. The negative test
+still fails on a planted dead `const`, and now correctly passes a planted dead
+`interface` and a namespace-imported symbol. `verify:ds` green; 8189 tests pass.
