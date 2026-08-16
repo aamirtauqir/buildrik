@@ -685,3 +685,66 @@ Colour mode · Typography · Starters. `Classes` stays unbuilt (Figma-only, rule
 Order by readiness: **Starters** (a modal, smallest) → **Colour mode** (query
 already exists at `ColorTokenList.tsx:243`; write path fixed in Finding J) →
 **Typography** (needs the token plumbing `TokensSection` keeps internal).
+
+---
+
+## 9. Investigation — is the dropped-prop bug a species or a specimen?
+
+Asked after fixing it: ComponentsTab passed its header "+" to
+`PanelFrame.Header` as children, and that component takes its action slot as an
+`actions` prop and never renders children. The button had never rendered, in any
+mode. Three shapes could hide the same failure, so all three were swept.
+
+### Shape 1 — a slot-prop component handed children
+
+Ten chrome-ui components declare a named slot (`actions`, `footer`, `trailing`,
+`leading`). Three of them never render `children` at all: `CommentRow`,
+`FormatRow`, `VersionRow`. **Every call site of all three is self-closing**, so
+nothing is being dropped. `PanelFrame.Header` has eighteen call sites and
+seventeen are self-closing; ComponentsTab's four were the only ones.
+
+→ **One instance, now fixed. Not a species.**
+
+### Shape 2 — an optional callback nothing ever passes
+
+172 optional `on*` props are declared across the editor; **24 are passed by no
+call site**. Some are legitimately a public surface (`AquibraStudio`'s `onReady`
+and `onEditor` are for embedders; `CountdownTimer.onComplete` is a block prop).
+
+Of the rest, the question that matters is whether the component still draws a
+control. Checked one by one, they split cleanly and **none is a visible button
+that does nothing**:
+
+| Prop | Component | Behaviour when absent |
+|---|---|---|
+| `onBindRequest` | `DSBindingChip` | hint hidden — `showBindHint` requires it |
+| `onJumpToDesign` | `DSStatusChip` | chip renders inert — `clickable = !!prop` |
+| `onSecondary` | `StickyFooter` | button not rendered |
+| `onPreviewRetry` | `TemplateDetail` | gates its own render |
+| `onOpenSettings` | `SelectionLabel` | gates its own render |
+| `onAdvancedToggle` | `BackgroundSection` | gates its own render |
+
+Those last three are the interesting ones, and they are the *opposite* fault
+from the one just fixed: the control never appears rather than appearing dead.
+They are designed affordances that were never wired — a Background "advanced"
+toggle, a canvas selection label that would open settings, and a template
+preview retry. Worth a decision each; none is breakage.
+
+### Shape 3 — a guard naming an API that does not exist
+
+The fixed bug guarded on `composer.elements["getComponents"]`, a method that
+exists nowhere. Swept for the same pattern: **it was the only string-indexed
+`typeof … === "function"` guard in the repo.** Of the thirteen method names
+guarded the ordinary way, four are absent from the engine — `build`,
+`elementFromPoint`, `elementsFromPoint`, `scrollIntoView` — and all four are DOM
+APIs being feature-detected, which is correct.
+
+→ **One instance, now fixed.**
+
+### Conclusion
+
+The ComponentsTab defect was a specimen, not a species. Saying so matters: the
+easy write-up would have implied the codebase is riddled with dropped props, and
+the sweep says it is not. What the sweep did surface is a smaller, different
+list — three affordances that exist in code and cannot be reached — which is a
+product decision each, not a bug hunt.
