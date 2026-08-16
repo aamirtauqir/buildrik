@@ -1062,3 +1062,83 @@ the board's three lines, four built-in templates still list underneath, and
 "Try again" re-fires the fetch (1 request → 2). **Not verified live:** the block
 clearing on a *successful* retry — that needs a real dashboard response, so a
 unit test covers it instead.
+
+---
+
+## 13. Media boards walked live — six of twenty-nine
+
+Board 146:32 (`Media · drill-in · versions`) had sat in the arc as "needs live
+eye-verification" for weeks. It is the most expensive board in the family to
+reach, and that is why: it needs a dashboard session, a **server-backed** asset,
+and seeded restore points. The chain that finally worked:
+
+1. dashboard `npm run dev` at :3000 against local Postgres
+2. a magic-link token minted for a real workspace member (`generateToken`,
+   identifier = USER ID) → `/auth/callback?token=…`
+3. `storageState` saved once and reused, because `verifyMagicLink` is
+   rate-limited to 5 per 15 minutes and I burned mine — the counter lives in
+   `rate_limit_buckets`, keyed `::1:auth.verifyMagicLink`
+4. the editor at `:5050/?siteId=…`, which reaches the dashboard through Vite's
+   proxy so the cookie flows
+5. three `media_asset_versions` rows seeded for the one asset that has a
+   `serverId` — a local upload never gets one, and `AssetDetailOverlay` returns
+   an empty list without it
+
+### What matched
+
+| board | verdict |
+|---|---|
+| 146:32 versions | matched **after a fix** (below) |
+| 1163:13695 fullpage context menu | matched — order, 180px, 8px radius, red Delete |
+| 1159:4593 fullpage library | matched — folders rail, Import URL / Upload / Add from stock, 2·3·4 column control, `used ×8`, quota footer |
+| 144:2 grid | matched — header, search, `All ▾` + view/sort icons, four type pills, 2-col tiles, Upload/Stock/Icons footer |
+| 782:4353 no-results | matched — "Nothing matches '…'." |
+| 145:359 empty | matched — "No images or files yet." / Upload / Browse stock |
+
+**The context menu is the load-bearing one.** It is the component whose
+stylesheet was deleted this morning on the grounds that its "flowbite beats
+`tw:`" claim was false. Seeing it render at 180px with an 8px radius and a red
+Delete, in the running app, is what closes that loop — the CSS drain that
+unblocked the push is verified on the exact surface that claimed it couldn't
+work.
+
+### The fix 146:32 needed
+
+`formatRelativeTime(ts)` was called with no options, so `fallback` defaulted to
+`"date"` and every version older than 24h printed `8/15/2026`. The board draws
+`2d ago`, in a 320 panel whose row already carries a size delta and a `⋯`.
+
+Fixed with a new `daysShort` fallback. The first attempt instead made the
+existing `days` branch respect `format` — which broke three tests, correctly:
+`format` also governs minutes and hours, and StudioHeader / NotificationPanel /
+SaveStatus want short minutes with long days. They were depending on both halves
+of the inconsistency.
+
+After: `now · current` / `2d ago · +12 KB` / `5d ago · −4 KB` /
+`12d ago · original`, which is the board's row set exactly. The restore band
+matches too — "Restore?" / Cancel / Restore, 32px, bg-subtle, inline under its
+row per board 146:64.
+
+**A false bug I nearly filed:** the rows first read 1d/4d/11d, one short of the
+board. That was my seed writing local wall-clock into a `timestamp without time
+zone` column the app fills with UTC through Prisma — a +05:00 shift. Re-seeded
+with `now() at time zone 'utc'` and the labels landed exactly. Seeded data is
+part of the harness, and the harness is guilty until proven otherwise.
+
+### Two deltas left open on 146:32
+
+- **Per-version author.** The board prints a name under each timestamp ("Ali",
+  "Sara"). `media_asset_versions` has no author column and `listAssetVersions`
+  returns the raw rows, so there is no data behind it. Needs a schema decision.
+- **Expand affordance in the drill-in header.** The board keeps `⛶` beside `✕`
+  on every drill-in screen; the live drill-in shows only `✕`. Not fixed on
+  purpose: `onOpenLibrary` takes `{ searchQuery, folderId }` and no asset, so
+  `⛶` from a versions view would drop the user at the library root having lost
+  their place — worse than its absence. Wiring it needs an asset-focus
+  parameter first.
+
+### Not verified
+
+**Twenty-three of the twenty-nine Media boards were not walked.** Also not
+observed: the `STOCK` / `AI` provenance badges, which exist in
+`AssetCell.tsx:43-44` but had no asset with that provenance to render on.
