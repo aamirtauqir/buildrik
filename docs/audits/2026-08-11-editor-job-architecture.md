@@ -1004,3 +1004,61 @@ about.
 annotated `ExportDropdown`) and the three settled predicates. The negative test
 still fails on a planted dead `const`, and now correctly passes a planted dead
 `interface` and a namespace-imported symbol. `verify:ds` green; 8189 tests pass.
+
+---
+
+## 12. The Templates load-error, and a claim I had to withdraw
+
+§9 recorded the boarded `Templates · loading` (778:4102) and
+`Templates · load-error` (781:4372) as **unbuildable** — "they need a
+server-backed catalog before they can mean anything."
+
+**That was wrong, and the mistake is worth more than the fix.**
+
+I checked `SITE_TEMPLATES`, saw a static module array that cannot fail,
+concluded there is no async load, and stopped. One file away,
+`services/templateSync.ts` exports `hydrateUserTemplatesFromServer()` — a real
+tRPC fetch of the workspace's saved templates that `AquibraStudio` has been
+firing on every editor open since 2026-06-24. The catalog is half static and
+half server-backed, and I generalised from the half I looked at.
+
+### The defect underneath
+
+The hydrate caught, `console.warn`'d and returned. A workspace whose saved
+templates failed to load looked exactly like one that has none. The *mirror*
+direction of this same wire (editor → server) had this fixed in E7 — the file's
+own comment says so: "A failed mirror used to be console.warn'd and then dropped
+forever… Now it queues + notifies + retries." The *hydrate* direction kept the
+bug the mirror was fixed for.
+
+It now reports `idle | loading | error | ready` through a subscribe channel,
+using the same shape as the `SyncRetryQueue` already in that file.
+
+### Where the board was followed, and where it was not
+
+The block's look is the board's: red line, muted line, blue "Try again".
+
+Its **placement is not**. The board draws the error replacing the gallery; this
+renders it *above* the list. Per the founder's precedence rule — visual to the
+board, behaviour to the code contract — a full-panel error would hide twelve
+built-in templates that are a static array and cannot have failed, which makes
+the board's own copy, **"You can keep building from Insert."**, a false
+statement about the panel printing it. The copy is only true because the list
+survives; obeying the layout literally would have falsified the words.
+
+### Why the loading board is still not built
+
+Not effort. Board 778:4102 draws a skeleton replacing the gallery, and the
+gallery is never empty while loading — the built-ins are synchronous. **A
+skeleton over content that already exists is the same lie as the full-panel
+error.** Its one honest home is the *My Templates* filter when the local list is
+empty AND the hydrate is in flight; that is where it belongs if someone wants
+it, and it is a different surface from the board's frame.
+
+### Verified
+
+Live at 1440×900 with only the `userTemplates` request failing: the block shows
+the board's three lines, four built-in templates still list underneath, and
+"Try again" re-fires the fetch (1 request → 2). **Not verified live:** the block
+clearing on a *successful* retry — that needs a real dashboard response, so a
+unit test covers it instead.
