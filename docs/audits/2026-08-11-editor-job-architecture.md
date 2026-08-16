@@ -550,3 +550,64 @@ Publish history even before this change. Now wired end to end.
 `("settings", "plugins")`, and `plugins` is not one of the Settings `NAV` ids.
 Even with the plumbing repaired it resolves to nothing. Left alone because it is
 outside the approved changes.
+
+---
+
+## 7. B1 — J3 · Arrange elements and layers, traced live
+
+Executed against `g4Gz` as the confirmed target, per
+`docs/plans/2026-08-11-editor-figma-phase5-plan.md`.
+
+### 7.1 What the panel actually offers
+
+`role="tree"` / `role="treeitem"`, with a header carrying **Expand all layers ·
+Collapse all layers · Layer display settings** and a per-row **Hide element ·
+Lock element**. Footer counts layers.
+
+| Board | State | Live |
+|---|---|---|
+| 142:2 | tree | ✅ 3 treeitems after two inserts |
+| 143:179 | hidden | ✅ per-row Hide |
+| 143:237 | locked | ✅ per-row Lock |
+| 1082:4527 | context-menu | ✅ Rename · Duplicate · Delete |
+| 1171:4829 | display-settings | ✅ ⚙ opens |
+| 1082:4640 | expanded | ✅ expand-all / collapse-all present |
+
+Six of the eighteen Layers boards walked, no page errors. **Not yet walked:**
+dragging, invalid-drop, multi-select, filtered, no-results, empty, loading,
+load-error, renaming, component-instance, scroll-overflow, list-view. Counting
+them as covered would be the Finding-B mistake again, so they are listed as
+outstanding.
+
+Expand-all and collapse-all both reported 3 treeitems — the fixture was a
+container with two flat children, so there was nothing nested to collapse. The
+control exists; its behaviour is **unverified**.
+
+### 7.2 Finding K — a closed panel still takes clicks (minor, real)
+
+The sidebar panel when closed measures **1px wide, `opacity: 0`,
+`aria-hidden="true"` — and keeps `pointer-events: auto`.** An element that is
+invisible and hidden from assistive tech should not be hit-testable. The blast
+radius is one pixel at x=60, which is why nothing has noticed, but the rule it
+breaks is not a small one.
+
+### 7.3 Four harness traps, recorded so the next pass does not re-pay them
+
+This trace produced three false "the product is broken" readings before it
+produced one true finding. Each is a property of driving THIS app:
+
+1. **Clicking a rail button that is already active CLOSES the drawer.** Insert
+   is the default tab, so "open Insert, then click a row" opens nothing and
+   closes everything. Assert `!className.includes("--closed")` before acting.
+2. **The rail tooltip (`Insert · A`) intercepts clicks** on rows beneath it.
+3. **`click({ force: true })` makes trap 2 worse, not better** — it skips the
+   actionability check and dispatches at the coordinates anyway, so the click
+   lands on the tooltip. A forced click is not a workaround for an interceptor;
+   it is a way to click the wrong thing silently.
+4. **`[data-element-id]` does not exist.** Canvas elements carry
+   **`data-buildrick-id`**. A wrong selector reads as "nothing was inserted".
+
+With all four cleared, click-to-insert was confirmed working: Heading 1→2,
+Button 2→3, with `Inserted: Button` / `Button selected` toasts. The prop chain
+behind it is intact — `StudioPanels:355 → LeftSidebar:602 → TabRouter:127 →
+BuildTab:44 → useBuildTab`.
