@@ -499,7 +499,19 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         canvasRef={canvasRef}
         composerContainerRef={composerContainerRef}
         publishJob={publishJob}
-        onVercelPublish={requestPublish}
+        /*
+          The PANEL gets the deploy itself, not `requestPublish`.
+
+          `requestPublish` opens PublishConfirmModal, which is the TOPBAR's
+          gate — the topbar publishes in one click, so it needs one. The
+          panel's CTA already opens PublishWizard, whose second step IS board
+          914:4507: the same four facts, the same warning band, the same
+          "Publish now". Handing the panel `requestPublish` chained them, so
+          walking the boarded flow ended with the confirm shown twice in a
+          row, the second time titled "Update the live site?" and reached from
+          a button already labelled "Publish now". Two gates, one board.
+        */
+        onVercelPublish={handleVercelPublish}
       />
 
       {/* P3: Issues panel — opened by the topbar issue pill */}

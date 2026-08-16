@@ -206,6 +206,25 @@ export function usePublishJob(): UsePublishJobResult {
     };
   }, []);
 
+  /*
+    A publish that dies BEFORE a job id comes back — the server refusing the
+    request, a dispatch that never reached the worker — is still a failed
+    publish. `publish()` catches it into `error` and returns, leaving `jobId`
+    null, and this used to fall straight through to `hydratedUrl ? "published"
+    : "idle"`. Both readers of the failure gate on `uiState === "failed"`
+    (PublishTab's board 784:4403 branch, and the outcome toast in
+    useExportHandlers), so the whole thing was silent: walked live on
+    2026-08-17, the wizard closed, the row in publish_build_jobs said
+    WORKER_DISPATCH_FAILED, and the panel showed no failure of any kind.
+
+    The same defect was already fixed one level up for the approval-gate case
+    by routing it to `blockedReason` — see the comment in `publish()`, which
+    describes this exact shape ("landed in `error` while uiState stayed idle").
+    That fix only covered the block; a plain error still lied.
+
+    `error` is only otherwise set from a poll or a cancel, and both of those
+    have a `jobId`, so this branch is reached only by a pre-job failure.
+  */
   const uiState: PublishUiState = jobId
     ? status?.status === "COMPLETED"
       ? "published"
@@ -214,9 +233,11 @@ export function usePublishJob(): UsePublishJobResult {
         : status?.status === "CANCELLED"
           ? "cancelled"
           : "publishing"
-    : hydratedUrl
-      ? "published"
-      : "idle";
+    : error
+      ? "failed"
+      : hydratedUrl
+        ? "published"
+        : "idle";
 
   return {
     uiState,

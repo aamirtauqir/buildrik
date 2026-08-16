@@ -242,7 +242,13 @@ describe("usePublishJob", () => {
   });
 
   describe("error paths", () => {
-    it("sets error and stays idle when publishSite rejects", async () => {
+    /* This asserted `uiState === "idle"`, which is what the bug looked like
+       from inside the hook: a publish that dies before a job id exists set
+       `error` and reported idle, and BOTH readers of a failure gate on
+       `uiState === "failed"` — PublishTab's board 784:4403 branch and the
+       outcome toast. The user got no toast, no panel state, nothing. The test
+       named the wrong thing as correct. */
+    it("reports failed — not idle — when publishSite rejects before a job exists", async () => {
       mockPublishSite.mockRejectedValueOnce(new Error("Publish quota exceeded"));
 
       const { result } = renderHook(() => usePublishJob());
@@ -251,9 +257,25 @@ describe("usePublishJob", () => {
       });
 
       expect(result.current.error).toBe("Publish quota exceeded");
-      expect(result.current.uiState).toBe("idle");
+      expect(result.current.uiState).toBe("failed");
       expect(result.current.jobId).toBeNull();
       expect(mockFetchStatus).not.toHaveBeenCalled();
+    });
+
+    it("goes back to idle once the failure is reset", async () => {
+      mockPublishSite.mockRejectedValueOnce(new Error("Publish quota exceeded"));
+
+      const { result } = renderHook(() => usePublishJob());
+      await act(async () => {
+        await result.current.publish("site-1", PAGES);
+      });
+      expect(result.current.uiState).toBe("failed");
+
+      // The panel's "Try again" resets before reopening the wizard; a sticky
+      // failed state would keep board 784:4403 on screen behind it.
+      act(() => result.current.reset());
+      expect(result.current.uiState).toBe("idle");
+      expect(result.current.error).toBeNull();
     });
 
     it("falls back to 'Publish failed' for non-Error rejections", async () => {
