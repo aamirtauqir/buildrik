@@ -327,6 +327,36 @@ missing for months. The guard existed; nobody ever pointed it at the server. Run
 - **Production:** the **cPanel Node.js app** environment, not Vercel. Read/write it with `cloudlinux-selector` (or the cPanel UI); the stored config is `~/.cl.selector/node-selector.json`. `cloudlinux-selector set --env-vars` **replaces the entire map** — merge with the existing keys first or you will delete `DATABASE_URL` and take the site down.
 - **`NEXT_PUBLIC_*` are baked into the bundle at build time.** Setting one in the server's runtime env has no effect on the client — it must be present when `next build` runs. `.env.production.local` exists for exactly this.
 
+## Work against a stated goal — always
+
+Every work item starts with a **done-condition written out before the work**, and
+is not called done until that condition has been checked. The founder enforces
+this with `/goal`, whose Stop hook refuses to let the turn end until the
+condition holds. Assume it is set even when it is not.
+
+A done-condition is a thing that can be *observed*, not a thing that can be
+claimed:
+
+- "Starters verified" → the row opens, the destination matches its board, a
+  starter applies, and the tokens change — **checked in the running app**.
+- not "Starters implemented" → that is a claim about code, and code has passed
+  three separate suites in this repo while the feature was broken.
+
+Rules that come out of that, learned the expensive way:
+
+1. **Live app is the verifier.** Not a probe render, not the JSX, not a unit
+   suite. All three have gone green over a broken feature here.
+2. **Measure, don't eyeball.** At 2× a screenshot an 8px error is invisible; a
+   `getComputedStyle` read is not.
+3. **A null result is your harness until proven otherwise.** Four separate
+   "the product is broken" readings in one trace were all the harness
+   (an already-open tab that the rail click closed, a tooltip eating the click,
+   `force: true` clicking that tooltip, and a `data-element-id` that does not
+   exist).
+4. **State what was NOT verified.** Six of eighteen boards walked is six, not
+   eighteen. Counting the rest as covered is how `Settings has no Figma family`
+   got written about a family that existed.
+
 ## Skill routing
 
 When the user's request matches an available skill, ALWAYS invoke it using the Skill
