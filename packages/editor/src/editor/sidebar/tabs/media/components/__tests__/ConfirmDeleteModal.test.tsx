@@ -39,6 +39,20 @@ describe("ConfirmDeleteModal", () => {
     expect(screen.queryByLabelText("Type DELETE to confirm")).not.toBeInTheDocument();
   });
 
+  /*
+    The case both existing tests stepped over: `payload()` is isBulk false and
+    `bulk(21)` is plural either way, so nothing covered one asset reached
+    THROUGH selection mode. Live, that printed "Delete 1 files?" directly above
+    a warning reading "1 file is currently used on the canvas" — the modal
+    contradicting itself inside one dialog. `isBulk` means "came from selection
+    mode", not "more than one".
+  */
+  it("says 'Delete 1 file?' for a single asset selected in bulk mode", () => {
+    render(<ConfirmDeleteModal payload={bulk(1)} onConfirm={vi.fn()} onCancel={vi.fn()} />);
+    expect(screen.getByText("Delete 1 file?")).toBeInTheDocument();
+    expect(screen.queryByText("Delete 1 files?")).not.toBeInTheDocument();
+  });
+
   it("shows the type-DELETE gate only past the large-bulk threshold", () => {
     const { unmount } = render(
       <ConfirmDeleteModal payload={bulk(20)} onConfirm={vi.fn()} onCancel={vi.fn()} />
