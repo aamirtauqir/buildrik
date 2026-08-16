@@ -138,27 +138,34 @@ describe("TemplateDetail — usage pill", () => {
   });
 });
 
-describe("TemplateDetail — preview states", () => {
-  it("renders a spinner while loading", () => {
-    const { container } = renderDetail({ previewState: "loading" });
-    expect(container.querySelector(".tpl-apply-spinner")).toBeTruthy();
+/*
+  This block used to assert a spinner, a "Preview unavailable" panel and a
+  working Retry button. All three passed for months and none could ever render:
+  the states were driven by a `previewState` prop that no call site passes, and
+  the test supplied it itself. A test that invents the input it is testing
+  proves the component compiles, not that the product has the state.
+
+  What the preview actually is: `template.gradient`, a CSS gradient off a static
+  module array. Synchronous — it cannot load and it cannot fail.
+*/
+describe("TemplateDetail — preview", () => {
+  it("paints the template's own gradient, not a placeholder", () => {
+    const { container } = renderDetail({
+      template: { ...freeTpl, gradient: "linear-gradient(90deg, #fff, #000)" },
+    });
+    const preview = container.querySelector(".tpl-detail-preview") as HTMLElement;
+    expect(preview).toBeTruthy();
+    expect(preview.style.background).toContain("linear-gradient");
   });
 
-  it("renders the error state with a working Retry button", () => {
-    const onPreviewRetry = vi.fn();
-    renderDetail({ previewState: "error", onPreviewRetry });
-    expect(screen.getByText("Preview unavailable")).toBeTruthy();
-    fireEvent.click(screen.getByText("Retry"));
-    expect(onPreviewRetry).toHaveBeenCalledTimes(1);
+  it("falls back to the subtle surface token when a template has no gradient", () => {
+    const { container } = renderDetail();  // fixture carries no gradient
+    const preview = container.querySelector(".tpl-detail-preview") as HTMLElement;
+    expect(preview.style.background).toBe("var(--bk-bg-subtle)");
   });
 
-  it("does not show the error state when ready", () => {
-    renderDetail({ previewState: "ready" });
-    expect(screen.queryByText("Preview unavailable")).toBeNull();
-  });
-
-  it("shows the APPLIED HERE badge only when applied to the current page and ready", () => {
-    const { rerender } = renderDetail({ appliedToCurrentPage: true, previewState: "ready" });
+  it("shows the APPLIED HERE badge only when applied to the current page", () => {
+    const { rerender } = renderDetail({ appliedToCurrentPage: true });
     expect(screen.getByText("APPLIED HERE")).toBeTruthy();
     rerender(
       <TemplateDetail

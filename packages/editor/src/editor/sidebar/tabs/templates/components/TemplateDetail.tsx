@@ -22,8 +22,6 @@ interface TemplateDetailProps {
   onApplyToCurrent: (id: string) => void;
   onAddAsNewPage: (id: string) => void;
   onPreview: (id: string) => void;
-  previewState?: "loading" | "error" | "ready";
-  onPreviewRetry?: () => void;
   /** S9: count of pages this template is applied to (drives "Used in" link). */
   usageCount?: number;
   /** S9: open the Used in / Versions drawer. */
@@ -42,8 +40,6 @@ export const TemplateDetail: React.FC<TemplateDetailProps> = ({
   onApplyToCurrent,
   onAddAsNewPage,
   onPreview,
-  previewState = "ready",
-  onPreviewRetry,
   usageCount,
   onShowUsage,
   currentPageName,
@@ -57,39 +53,19 @@ export const TemplateDetail: React.FC<TemplateDetailProps> = ({
 
   return (
     <div className="tpl-detail">
-      {/* Preview block */}
+      {/* Preview block. A template's preview is `template.gradient` — a CSS
+          gradient rendered synchronously from a static module array. It has no
+          fetch, so it cannot be loading and cannot fail; the loading/error/retry
+          states that used to live here were unreachable in every render. The
+          gallery-list loading + load-error states the boards DO specify
+          (778:4102, 781:4372) are a different surface and still unbuilt — they
+          need a server-backed catalog before they can mean anything. */}
       <div
         className="tpl-detail-preview"
-        style={{
-          background:
-            previewState === "ready"
-              ? (template.gradient ?? "var(--bk-bg-subtle, var(--bk-bg-subtle))")
-              : "var(--bk-bg-subtle, var(--bk-bg-subtle))",
-        }}
+        style={{ background: template.gradient ?? "var(--bk-bg-subtle)" }}
       >
-        {appliedToCurrentPage && previewState === "ready" && (
+        {appliedToCurrentPage && (
           <span className="tpl-detail-applied-badge">APPLIED HERE</span>
-        )}
-        {previewState === "loading" && (
-          <div className="tpl-detail-preview-state">
-            <div className="tpl-apply-spinner" />
-          </div>
-        )}
-        {previewState === "error" && (
-          <div className="tpl-detail-preview-state">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--bk-ink-soft, var(--bk-ink-muted))" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10" />
-              <path d="M12 8v4M12 16h.01" />
-            </svg>
-            <p style={{ fontSize: 11, color: "var(--bk-ink-muted)", margin: "6px 0 0", textAlign: "center" }}>
-              Preview unavailable
-            </p>
-            {onPreviewRetry && (
-              <Button className="tpl-detail-preview-retry" onClick={onPreviewRetry}>
-                Retry
-              </Button>
-            )}
-          </div>
         )}
       </div>
 
