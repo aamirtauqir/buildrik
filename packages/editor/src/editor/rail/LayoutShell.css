@@ -29,7 +29,11 @@
   --layout-drawer-width: var(--bk-size-drawer);
   --layout-inspector-width: var(--bk-size-inspector);
   --layout-topbar-height: var(--bk-size-topbar);
-  --layout-footer-height: var(--bk-size-row);
+  /* --bk-size-footer, not --bk-size-row. Both are 32px today so nothing moves,
+     but this is the grid track that reserves the footer, and the footer element
+     itself already sizes off --bk-size-footer (line ~157). Bound to the row
+     token, a density change to rows would slide the track out from under it. */
+  --layout-footer-height: var(--bk-size-footer);
   --layout-gap: var(--bk-space-12);
   --layout-touch-min: var(--bk-size-header, 44px);
 }
@@ -41,14 +45,14 @@
   position: relative; /* Containing block for overlay (unpinned) drawer */
   display: grid;
   grid-template-columns:
-    var(--layout-rail-width, 56px)
+    var(--layout-rail-width, 60px)
     0px
     1fr
     0px;
   grid-template-rows:
     var(--layout-topbar-height, 56px)
     1fr
-    var(--layout-footer-height, 40px);
+    var(--layout-footer-height, 32px);
   grid-template-areas:
     "topbar topbar topbar topbar"
     "rail drawer canvas inspector"
@@ -63,7 +67,7 @@
 
 /* No topbar slot provided — collapse the empty topbar row */
 .layout-shell--no-topbar {
-  grid-template-rows: 1fr var(--layout-footer-height, 40px);
+  grid-template-rows: 1fr var(--layout-footer-height, 32px);
   grid-template-areas:
     "rail drawer canvas inspector"
     "footer footer footer footer";
@@ -73,7 +77,7 @@
 .layout-shell--drawer-open {
   grid-template-columns:
     var(--layout-rail-width, 60px)
-    var(--layout-drawer-width, 280px)
+    var(--layout-drawer-width, 320px)
     1fr
     0px;
 }
@@ -84,16 +88,16 @@
     var(--layout-rail-width, 60px)
     0px
     1fr
-    var(--layout-inspector-width, 280px);
+    var(--layout-inspector-width, 300px);
 }
 
 /* Both drawer and inspector open */
 .layout-shell--drawer-open.layout-shell--inspector-open {
   grid-template-columns:
     var(--layout-rail-width, 60px)
-    var(--layout-drawer-width, 280px)
+    var(--layout-drawer-width, 320px)
     1fr
-    var(--layout-inspector-width, 280px);
+    var(--layout-inspector-width, 300px);
 }
 
 /* ============================================
@@ -114,7 +118,7 @@
     var(--layout-rail-width, 60px)
     0px
     1fr
-    var(--layout-inspector-width, 280px);
+    var(--layout-inspector-width, 300px);
 }
 
 /* Drawer panel in overlay mode — absolutely positioned over canvas */
@@ -123,7 +127,7 @@
   top: var(--layout-topbar-height, 56px);
   left: var(--layout-rail-width, 60px);
   bottom: 0;
-  width: var(--layout-drawer-width, 280px);
+  width: var(--layout-drawer-width, 320px);
   z-index: calc(var(--bk-z-drawer) + 6);
   box-shadow: var(--bk-shadow-overlay);
   border-right: none;
@@ -219,7 +223,7 @@
 .layout-shell--has-sidebar.layout-shell--no-topbar {
   grid-template-rows:
     1fr
-    var(--layout-footer-height, 40px);
+    var(--layout-footer-height, 32px);
   grid-template-areas:
     "rail rail canvas inspector"
     "footer footer footer footer";
@@ -230,7 +234,7 @@
     auto
     0px
     1fr
-    var(--layout-inspector-width, 280px);
+    var(--layout-inspector-width, 300px);
 }
 
 /* Fullpage mode with sidebar — sidebar shrinks to rail-only, fullpage fills rest.
@@ -397,7 +401,7 @@
   .layout-shell--drawer-open.layout-shell--inspector-open {
     grid-template-columns:
       var(--layout-rail-width, 60px)
-      var(--layout-drawer-width, 280px)
+      var(--layout-drawer-width, 320px)
       1fr
       0px;
   }
@@ -407,7 +411,7 @@
     top: var(--layout-topbar-height, 56px);
     right: var(--layout-gap, 12px);
     bottom: var(--layout-gap, 12px);
-    width: var(--layout-inspector-width, 280px);
+    width: var(--layout-inspector-width, 300px);
     border-radius: var(--bk-radius-lg);
     box-shadow: var(--bk-shadow-overlay);
     z-index: calc(var(--bk-z-drawer) + 6);
