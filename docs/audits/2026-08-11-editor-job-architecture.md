@@ -1137,8 +1137,30 @@ part of the harness, and the harness is guilty until proven otherwise.
   their place — worse than its absence. Wiring it needs an asset-focus
   parameter first.
 
+### A second pass — eleven of twenty-nine
+
+| board | verdict |
+|---|---|
+| 1205:4804 import-url | matched — "Import from URL", MEDIA URL label, Cancel / Import |
+| 1205:4816 import-url invalid | matched — red border, "That is not a web address. It needs to start with http:// or https://.", **Import disabled** |
+| 1163:4641 fullpage list-view · bulk-select | matched — bulk bar "1 selected · Move to folder... · Download · Delete · ✕ Clear"; columns Name / Type / Size / Usage; row IMG · 1.21 KB · used ×8 |
+| 145:2 filtered / type pills | matched via the grid walk |
+| 145:359 empty | matched |
+
+Both import-url boards are also same-day work (`ImportUrlModal.tsx`), so this is
+the second surface built this morning and confirmed in the running app rather
+than only in tests.
+
 ### Not verified
 
-**Twenty-three of the twenty-nine Media boards were not walked.** Also not
-observed: the `STOCK` / `AI` provenance badges, which exist in
-`AssetCell.tsx:43-44` but had no asset with that provenance to render on.
+**Eighteen of the twenty-nine Media boards were not walked**, among them the
+upload/quota family (145:96 uploading, 145:148 upload-failed, 145:199 quota-warn,
+145:250 quota-full), the drill-ins for icon-picker (147:2), stock-browser
+(147:55) and used-in (146:68), the modal picker (1164:4713), replace-across
+(1164:4738) and its result states (1174:4849), load-error (453:3931), loading
+(777:4093) and drag-over uploading (1163:13948).
+
+Also not observed: the `STOCK` / `AI` provenance badges, which exist in
+`AssetCell.tsx:43-44` but had no asset with that provenance to render on; and
+the `>20` type-DELETE variant of 1175:4827, which needs more than twenty assets
+in the library to trigger.
