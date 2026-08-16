@@ -86,7 +86,7 @@ const wrap = (Glyph: LucideIcon): React.FC<ElementIconProps> => {
 };
 
 // Prebuilt so getElementIcon returns stable component identities across renders.
-export const elementIcons: Record<string, React.FC<ElementIconProps>> = Object.fromEntries(
+const elementIcons: Record<string, React.FC<ElementIconProps>> = Object.fromEntries(
   Object.entries(glyphs).map(([type, Glyph]) => [type, wrap(Glyph)]),
 );
 

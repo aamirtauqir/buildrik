@@ -16,7 +16,7 @@ import type React from "react";
  * Renamed from BRAND_PURPLE 2026-04-26 — name was a pre-cobalt-era leftover;
  * values were already pointing at accent vars.
  */
-export const BRAND_ACCENT = {
+const BRAND_ACCENT = {
   // Core shades — resolve via the generated accent ramp
   DEFAULT: "var(--bk-accent)", // #1A56DB — Main accent
   light: "var(--bk-accent-subtle)", // Faint accent background
@@ -150,7 +150,7 @@ export const CANVAS_COLORS = {
 // ANIMATION TOKENS
 // ============================================
 
-export const ANIMATION = {
+const ANIMATION = {
   // Durations
   duration: {
     instant: "50ms",

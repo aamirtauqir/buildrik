@@ -9,7 +9,7 @@
  */
 
 /** Board order 1→7. Selectors resolve against the live shell. */
-export const REGION_SELECTORS: readonly string[] = [
+const REGION_SELECTORS: readonly string[] = [
   '[role="banner"]', // 1 topbar
   ".ls-rail", // 2 rail
   ".ls-panel:not(.ls-panel--closed)", // 3 drawer (drops out when closed)
@@ -37,7 +37,7 @@ const FOCUSABLE =
   'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
 /** Focus a region: its first focusable child, or the region itself. */
-export function focusRegion(region: HTMLElement): void {
+function focusRegion(region: HTMLElement): void {
   const target = region.querySelector<HTMLElement>(FOCUSABLE);
   if (target) {
     target.focus();
@@ -48,7 +48,7 @@ export function focusRegion(region: HTMLElement): void {
 }
 
 /** The region that currently contains focus, or null. */
-export function activeRegionIndex(regions: HTMLElement[]): number {
+function activeRegionIndex(regions: HTMLElement[]): number {
   const active = document.activeElement;
   if (!(active instanceof HTMLElement)) return -1;
   return regions.findIndex((r) => r === active || r.contains(active));

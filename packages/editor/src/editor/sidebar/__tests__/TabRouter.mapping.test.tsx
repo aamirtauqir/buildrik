@@ -34,9 +34,6 @@ vi.mock("../tabs/templates/TemplatesTab", () => ({
 vi.mock("../tabs/ComponentsTab", () => ({
   default: () => <div data-testid="tab-components-legacy" />,
 }));
-vi.mock("@/editor/components-catalog/ui/ComponentsPanelV2", () => ({
-  ComponentsPanelV2: () => <div data-testid="tab-components-v2" />,
-}));
 vi.mock("../tabs/media/MediaTab", () => ({
   MediaTab: () => <div data-testid="tab-assets" />,
 }));

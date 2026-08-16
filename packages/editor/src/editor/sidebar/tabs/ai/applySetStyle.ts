@@ -138,7 +138,7 @@ export function applySetStyle(composer: Composer, args: SetStyleArgs): void {
  * Text is plain only (no angle brackets) — element content is rendered into the
  * canvas innerHTML, so markup must never reach it.
  */
-export const setTextArgsSchema = z.object({
+const setTextArgsSchema = z.object({
   elementId: z.string().min(1),
   text: z
     .string()
@@ -174,7 +174,7 @@ const CONTAINER_TYPES = new Set([
   "container", "section", "columns", "grid", "flex", "list",
 ]);
 
-export const addElementArgsSchema = z.object({
+const addElementArgsSchema = z.object({
   elementId: z.string().min(1),
   elementType: z.enum(ADD_ELEMENT_TYPES),
   text: z
@@ -227,7 +227,7 @@ export function applyAddElement(composer: Composer, args: AddElementArgs): void 
  * elements) in one command. The container is placed relative to the selected
  * element; each child is created and appended into the container.
  */
-export const addSectionArgsSchema = z.object({
+const addSectionArgsSchema = z.object({
   elementId: z.string().min(1),
   sectionType: z.enum(["section", "container", "columns", "grid", "flex"]),
   children: z
@@ -266,7 +266,7 @@ export function applyAddSection(composer: Composer, args: AddSectionArgs): void 
 }
 
 /** Shared args for commands that only reference an element by id. */
-export const elementRefArgsSchema = z.object({ elementId: z.string().min(1) });
+const elementRefArgsSchema = z.object({ elementId: z.string().min(1) });
 export type ElementRefArgs = z.infer<typeof elementRefArgsSchema>;
 
 export function applyDeleteElement(composer: Composer, args: ElementRefArgs): void {
@@ -284,7 +284,7 @@ export function applyDuplicateElement(
   }
 }
 
-export const moveElementArgsSchema = z.object({
+const moveElementArgsSchema = z.object({
   elementId: z.string().min(1),
   direction: z.enum(["up", "down"]),
 });
@@ -415,7 +415,7 @@ export function applySetStyleVariant(composer: Composer, args: SetStyleVariantAr
  * validate user-saved ids that live in browser IndexedDB), and the cloned
  * subtree is node-capped so one command cannot inject an unbounded tree.
  */
-export const insertComponentArgsSchema = z.object({
+const insertComponentArgsSchema = z.object({
   elementId: z.string().min(1),
   componentId: z.string().min(1).max(100),
 });
@@ -432,7 +432,7 @@ function countNodes(tree: { children?: unknown[] } | undefined): number {
   );
 }
 
-export async function applyInsertComponent(
+async function applyInsertComponent(
   composer: Composer,
   args: InsertComponentArgs,
 ): Promise<void> {
@@ -478,7 +478,7 @@ export const saveAsComponentArgsSchema = z.object({
 });
 export type SaveAsComponentArgs = z.infer<typeof saveAsComponentArgsSchema>;
 
-export async function applySaveAsComponent(
+async function applySaveAsComponent(
   composer: Composer,
   args: SaveAsComponentArgs,
 ): Promise<void> {
@@ -520,7 +520,7 @@ export const setPageSettingArgsSchema = z
   );
 export type SetPageSettingArgs = z.infer<typeof setPageSettingArgsSchema>;
 
-export function applySetPageSetting(composer: Composer, args: SetPageSettingArgs): void {
+function applySetPageSetting(composer: Composer, args: SetPageSettingArgs): void {
   const page = composer.elements.getActivePage?.();
   if (!page) throw new Error("set-page-setting: no active page");
   if (args.setting === "slug") {
@@ -550,7 +550,7 @@ export const setTokenArgsSchema = z.object({
 });
 export type SetTokenArgs = z.infer<typeof setTokenArgsSchema>;
 
-export function applySetToken(composer: Composer, args: SetTokenArgs): void {
+function applySetToken(composer: Composer, args: SetTokenArgs): void {
   composer.designSystem.setDesignToken(args.tokenId, args.value);
 }
 

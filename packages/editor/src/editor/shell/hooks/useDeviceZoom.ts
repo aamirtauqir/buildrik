@@ -19,7 +19,7 @@ export interface UseDeviceZoomReturn {
 /**
  * Manages device type (desktop/tablet/mobile) and canvas zoom level
  */
-export function useDeviceZoom(): UseDeviceZoomReturn {
+function useDeviceZoom(): UseDeviceZoomReturn {
   const [device, setDevice] = React.useState<DeviceType>("desktop");
   const [zoom, setZoom] = React.useState(100);
 

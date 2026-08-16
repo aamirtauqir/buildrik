@@ -492,7 +492,7 @@ export const flatCatalog: FlatElEntry[] = CATALOG.flatMap((cat) =>
  * every render (6 categories × 53 elements = 318 comparisons per render was
  * the hot path).
  */
-export const flatCatalogByCatId: Record<string, FlatElEntry[]> = flatCatalog.reduce(
+const flatCatalogByCatId: Record<string, FlatElEntry[]> = flatCatalog.reduce(
   (acc, el) => {
     (acc[el.catId] ??= []).push(el);
     return acc;

@@ -1,5 +1,15 @@
 /**
- * ExportDropdown — format picker for token export
+ * ExportDropdown — format picker for token export.
+ *
+ * UNWIRED, deliberately kept. Nothing imports it, and the dead-export gate will
+ * keep listing it until it is either mounted or removed. It is not cruft: the
+ * Brand import/export flow is boarded at 153:120 (import-export), 306:2232
+ * (exported), 306:2265 (imported) and 306:2298 (error), and none of the other
+ * four pieces exist yet. Deleting the one built part would mean rebuilding it
+ * when the flow lands. Same call as PagesStateBlocks, which carries the same
+ * kind of note — the difference between "built ahead" and "left behind" is
+ * whether anyone wrote down which it was.
+ *
  * @license BSD-3-Clause
  */
 

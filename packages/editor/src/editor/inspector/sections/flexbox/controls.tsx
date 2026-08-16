@@ -118,7 +118,7 @@ export interface GapSliderProps {
   disabled?: boolean;
 }
 
-export const GapSlider: React.FC<GapSliderProps> = ({ value, onChange, disabled }) => {
+const GapSlider: React.FC<GapSliderProps> = ({ value, onChange, disabled }) => {
   // Parse numeric value from CSS (e.g., "16px" -> 16)
   const numericValue = parseInt(value) || 0;
   const maxGap = 64;

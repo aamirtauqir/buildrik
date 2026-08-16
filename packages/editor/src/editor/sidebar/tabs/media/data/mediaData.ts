@@ -14,7 +14,7 @@ export interface TypePillDef {
   lucideIcon: string; // Lucide icon component name
 }
 
-export const TYPE_PILLS: TypePillDef[] = [
+const TYPE_PILLS: TypePillDef[] = [
   { type: "all", label: "All", lucideIcon: "LayoutGrid" },
   { type: "img", label: "Images", lucideIcon: "Image" },
   { type: "vid", label: "Videos", lucideIcon: "Video" },
@@ -43,7 +43,7 @@ export interface GridOptionDef {
   label: string;
 }
 
-export const GRID_OPTIONS: GridOptionDef[] = [
+const GRID_OPTIONS: GridOptionDef[] = [
   { n: 2, label: "2 columns" },
   { n: 3, label: "3 columns" },
   { n: 4, label: "4 columns" },

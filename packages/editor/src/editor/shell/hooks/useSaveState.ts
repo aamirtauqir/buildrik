@@ -28,7 +28,7 @@ export interface UseSaveStateReturn {
 /**
  * Manages document save status, dirty flag, and undo/redo availability
  */
-export function useSaveState(): UseSaveStateReturn {
+function useSaveState(): UseSaveStateReturn {
   const [saveState, setSaveState] = React.useState<SaveState>({
     status: "idle",
     lastSavedAt: undefined,

@@ -50,7 +50,7 @@ function buildMap(composer: Composer): Map<string, number> {
   return counts;
 }
 
-export function useUsageMap(composer: Composer | null): UsageMap {
+function useUsageMap(composer: Composer | null): UsageMap {
   const [tick, setTick] = useState(0);
   const mapRef = useRef<Map<string, number>>(new Map());
 

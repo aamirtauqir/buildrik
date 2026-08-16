@@ -19,7 +19,7 @@ import {
 
 const SEEN_KEY_PREFIX = "buildrik:starter-gallery-seen-";
 
-export function starterSeenKey(projectId: string | null | undefined): string {
+function starterSeenKey(projectId: string | null | undefined): string {
   return `${SEEN_KEY_PREFIX}${projectId ?? "default"}`;
 }
 
@@ -27,7 +27,7 @@ export function starterTokenStorageKey(projectId: string | null | undefined): st
   return `buildrick-design-tokens-${projectId ?? "default"}-v1`;
 }
 
-export function markStarterSeen(projectId: string | null | undefined): void {
+function markStarterSeen(projectId: string | null | undefined): void {
   try {
     localStorage.setItem(starterSeenKey(projectId), "1");
   } catch {

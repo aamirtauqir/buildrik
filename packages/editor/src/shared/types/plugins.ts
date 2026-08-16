@@ -136,7 +136,7 @@ export type PluginEvent =
 /**
  * Plugin error types
  */
-export class PluginError extends Error {
+class PluginError extends Error {
   constructor(
     public pluginId: string,
     message: string,

@@ -25,7 +25,7 @@ export interface AIError extends Error {
   suggestion?: string;
 }
 
-export const ERROR_SUGGESTIONS: Record<AIErrorCode, string> = {
+const ERROR_SUGGESTIONS: Record<AIErrorCode, string> = {
   API_ERROR: "Check your request parameters and try again",
   TIMEOUT: "The request took too long. Try with a shorter prompt",
   NETWORK_ERROR: "Check your internet connection and try again",

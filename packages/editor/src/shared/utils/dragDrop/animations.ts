@@ -97,7 +97,7 @@ export function pulseElement(element: HTMLElement, color: string = "#4caf50"): P
  * Flash animation on successful drop (haptic feedback visual)
  * Shows a green ripple effect emanating from the element
  */
-export function flashOnDrop(element: HTMLElement, color: string = "#a6e3a1"): Promise<void> {
+function flashOnDrop(element: HTMLElement, color: string = "#a6e3a1"): Promise<void> {
   return new Promise((resolve) => {
     // Check for reduced motion preference
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -136,7 +136,7 @@ export function flashOnDrop(element: HTMLElement, color: string = "#a6e3a1"): Pr
  * Settle animation when element lands in new position
  * Subtle scale bounce effect
  */
-export function settleElement(element: HTMLElement): Promise<void> {
+function settleElement(element: HTMLElement): Promise<void> {
   return new Promise((resolve) => {
     // Check for reduced motion preference
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;

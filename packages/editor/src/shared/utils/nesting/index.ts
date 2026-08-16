@@ -203,7 +203,7 @@ import {
 /**
  * Combined nestingRules namespace for backwards compatibility
  */
-export const nestingRules = {
+const nestingRules = {
   canNestElement,
   canNestElementStrict,
   canHaveChildren,

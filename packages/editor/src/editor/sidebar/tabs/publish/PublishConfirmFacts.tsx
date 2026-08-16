@@ -23,7 +23,7 @@ const KEY = "tw:flex-none tw:text-[var(--bk-ink-muted)]";
 const VAL = "tw:text-right tw:font-medium tw:text-[var(--bk-ink)]";
 
 /** Board 914:4507 prints "Approved 2 Jul"; the real line names who, too. */
-export function approvalLine(round: CurrentRound | null, loading: boolean): string {
+function approvalLine(round: CurrentRound | null, loading: boolean): string {
   if (loading) return "Checking review status…";
   if (!round || round.revoked) return "Not sent for review.";
   if (round.status?.toLowerCase() === "approved") {

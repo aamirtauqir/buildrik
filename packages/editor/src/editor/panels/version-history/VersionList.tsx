@@ -56,7 +56,7 @@ const OVERSCAN = 5;
 
 // ─── Date helpers ─────────────────────────────────────────────────────
 
-export function getDateGroup(timestamp: number): string {
+function getDateGroup(timestamp: number): string {
   const now = new Date();
   const date = new Date(timestamp);
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());

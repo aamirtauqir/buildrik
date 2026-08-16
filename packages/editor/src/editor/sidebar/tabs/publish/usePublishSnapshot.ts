@@ -61,7 +61,7 @@ export function relativeShort(ts: number | string | Date | null | undefined): st
 }
 
 /** Board: "2 Jul, 14:22". */
-export function deployStamp(ts: Date | string | null): string {
+function deployStamp(ts: Date | string | null): string {
   if (!ts) return "";
   const d = ts instanceof Date ? ts : new Date(ts);
   if (Number.isNaN(d.getTime())) return "";

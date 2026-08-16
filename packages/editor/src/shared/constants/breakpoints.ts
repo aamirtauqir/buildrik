@@ -97,7 +97,7 @@ export function getBreakpointForWidth(width: number): BreakpointId {
  * Device preview dimensions for canvas display
  * These are fixed dimensions for simulating device viewports
  */
-export const DEVICE_BREAKPOINTS = {
+const DEVICE_BREAKPOINTS = {
   desktop: {
     width: "100%",
     height: "100%",

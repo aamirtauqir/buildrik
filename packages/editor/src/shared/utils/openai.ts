@@ -132,7 +132,7 @@ export async function generateContentVariations(
 /**
  * Generate layout HTML using AI
  */
-export async function generateLayout(
+async function generateLayout(
   prompt: string,
   style?: LayoutStyle,
   options?: AIRequestOptions
@@ -159,7 +159,7 @@ export async function generateImagePrompt(
 /**
  * Generate code snippet using AI
  */
-export async function generateCode(
+async function generateCode(
   prompt: string,
   language: ProgrammingLanguage | string,
   _style?: CodeStyle,
@@ -178,7 +178,7 @@ export async function generateCode(
 /**
  * Improve/refine existing content
  */
-export async function improveContent(
+async function improveContent(
   content: string,
   instruction: string,
   options?: AIRequestOptions

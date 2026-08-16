@@ -38,7 +38,7 @@ export function extStyle(mimeType: string): string {
 }
 
 /** Map MediaAsset.type to LibraryItem short code */
-export function assetTypeToFilter(type: MediaAsset["type"]): LibraryItem["type"] {
+function assetTypeToFilter(type: MediaAsset["type"]): LibraryItem["type"] {
   switch (type) {
     case "image":
       return "img";
