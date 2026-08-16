@@ -283,6 +283,26 @@ export function scanAntiPatterns(root) {
     if (f.endsWith('.d.ts')) continue;
     project.addSourceFileAtPathIfExists(f);
   }
+
+  /*
+    Consumers that live outside src/. They are loaded for REACHABILITY only —
+    the violation loop below still reports on src/ files, so nothing here can
+    become a dead-export finding of its own.
+
+    e2e/probe is the load-bearing one. Panels boarded with a loading state whose
+    data source is still synchronous (Pages 774:4044, Insert, Layers) are built
+    to their board and mounted by the probe until the source goes async;
+    check-anchors greps the probe's testids. Ignoring it reported those
+    components as dead code, which is the opposite of what they are.
+  */
+  for (const dir of ['e2e/probe', 'demo']) {
+    let extra = [];
+    try { extra = walk(resolve(root, dir), ['.ts', '.tsx']); } catch { continue; }
+    for (const f of extra) {
+      if (f.endsWith('.d.ts')) continue;
+      project.addSourceFileAtPathIfExists(f);
+    }
+  }
   const importNames = new Set();
   for (const sf of project.getSourceFiles()) {
     for (const imp of sf.getImportDeclarations()) {

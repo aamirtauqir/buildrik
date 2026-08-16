@@ -738,13 +738,6 @@
         "suggestion": "Delete unused export; rely on git history if needed later."
       },
       {
-        "path": "src/editor/sidebar/tabs/pages/components/PagesStateBlocks.tsx",
-        "line": 28,
-        "severity": "minor",
-        "message": "Dead export \"PagesLoadingSkeleton\" — not imported anywhere",
-        "suggestion": "Delete unused export; rely on git history if needed later."
-      },
-      {
         "path": "src/editor/sidebar/tabs/settings/styles/index.ts",
         "line": 14,
         "severity": "minor",
