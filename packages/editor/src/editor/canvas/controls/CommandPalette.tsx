@@ -65,59 +65,15 @@ export interface CommandPaletteProps {
 const STORAGE_KEY = "buildrick-recent-commands";
 const MAX_RECENT = 5;
 
-// =============================================================================
-// HOOK: useCommandPalette
-// =============================================================================
-
-export interface UseCommandPaletteResult {
-  isOpen: boolean;
-  open: () => void;
-  close: () => void;
-  toggle: () => void;
-}
-
-/**
- * Hook to manage command palette state with Cmd+Shift+P shortcut
- * (Cmd+K is reserved for AI Copilot, Cmd+P is browser print)
- */
-export function useCommandPalette(): UseCommandPaletteResult {
-  const [isOpen, setIsOpen] = React.useState(false);
-
-  React.useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't trigger if typing in input
-      if (
-        document.activeElement?.tagName === "INPUT" ||
-        document.activeElement?.tagName === "TEXTAREA" ||
-        (document.activeElement as HTMLElement)?.isContentEditable
-      ) {
-        return;
-      }
-
-      // Cmd+Shift+P or Ctrl+Shift+P opens palette (like VS Code)
-      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === "p") {
-        e.preventDefault();
-        setIsOpen((prev) => !prev);
-      }
-
-      // Escape closes palette
-      if (e.key === "Escape" && isOpen) {
-        e.preventDefault();
-        setIsOpen(false);
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen]);
-
-  return {
-    isOpen,
-    open: () => setIsOpen(true),
-    close: () => setIsOpen(false),
-    toggle: () => setIsOpen((prev) => !prev),
-  };
-}
+/*
+  `useCommandPalette` lived here — open/close/toggle state plus its own ⌘⇧P and
+  Escape listeners. Nothing imported it, not even the barrel: Canvas.tsx drives
+  this palette through `useCanvasCommandPalette`, which registers the identical
+  shortcut. Two listeners for one key, one of them unreachable. Its docstring
+  also still claimed "Cmd+K is reserved for AI Copilot", which stopped being
+  true when the shell palette took ⌘K. Deleted 2026-08-16 — the first thing the
+  newly-wired dead-export gate surfaced that was pure duplication.
+*/
 
 // =============================================================================
 // COMPONENT

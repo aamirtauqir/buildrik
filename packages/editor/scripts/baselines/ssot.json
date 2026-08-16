@@ -500,13 +500,6 @@
         "suggestion": "Delete unused export; rely on git history if needed later."
       },
       {
-        "path": "src/editor/canvas/controls/CommandPalette.tsx",
-        "line": 83,
-        "severity": "minor",
-        "message": "Dead export \"useCommandPalette\" — not imported anywhere",
-        "suggestion": "Delete unused export; rely on git history if needed later."
-      },
-      {
         "path": "src/editor/components-catalog/ui/UserSavedSection.tsx",
         "line": 41,
         "severity": "minor",
