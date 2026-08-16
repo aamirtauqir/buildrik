@@ -1,5 +1,10 @@
 /**
- * LockedScreen tests — pro / enterprise / coming-soon variants + CTA wiring.
+ * LockedScreen tests — pro / enterprise variants + CTA wiring.
+ *
+ * The coming-soon block that sat here asserted a waitlist CTA firing onWaitlist,
+ * and passed while the variant was unreachable: SettingsTab is the only
+ * construction site and SCREEN_PLAN_REQUIREMENTS types it "pro" | "enterprise".
+ * The test supplied the variant it was testing.
  *
  * @license BSD-3-Clause
  */
@@ -52,31 +57,3 @@ describe("LockedScreen — pro / enterprise variants", () => {
   });
 });
 
-describe("LockedScreen — coming-soon variant", () => {
-  it("renders the default 'Coming Soon' title and no upgrade CTA", () => {
-    render(<LockedScreen variant="coming-soon" />);
-    expect(screen.getByText("Coming Soon")).toBeInTheDocument();
-    expect(screen.queryByRole("button")).toBeNull();
-  });
-
-  it("uses a custom title + message", () => {
-    render(<LockedScreen variant="coming-soon" title="Almost there" message="Ships next week" />);
-    expect(screen.getByText("Almost there")).toBeInTheDocument();
-    expect(screen.getByText("Ships next week")).toBeInTheDocument();
-  });
-
-  it("renders a waitlist CTA that fires onWaitlist", () => {
-    const onWaitlist = vi.fn();
-    render(
-      <LockedScreen variant="coming-soon" waitlistLabel="Get notified →" onWaitlist={onWaitlist} />
-    );
-    const cta = screen.getByRole("button", { name: /get notified/i });
-    fireEvent.click(cta);
-    expect(onWaitlist).toHaveBeenCalledTimes(1);
-  });
-
-  it("omits the waitlist CTA when no label is passed", () => {
-    render(<LockedScreen variant="coming-soon" onWaitlist={vi.fn()} />);
-    expect(screen.queryByRole("button")).toBeNull();
-  });
-});

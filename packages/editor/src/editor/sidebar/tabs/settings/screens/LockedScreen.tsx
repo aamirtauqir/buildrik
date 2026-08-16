@@ -1,5 +1,5 @@
 /**
- * Locked screen — plan-gate or coming-soon gate
+ * Locked screen — plan gate (Pro / Enterprise)
  * @license BSD-3-Clause
  */
 
@@ -14,43 +14,30 @@ import {
   LockedBtn,
 } from "../shared";
 
-export type LockedVariant = "pro" | "enterprise" | "coming-soon";
+/*
+  "coming-soon" lived here with a waitlist CTA and no consumer. The only
+  construction site is SettingsTab:601, `variant={requiredPlan}`, and
+  SCREEN_PLAN_REQUIREMENTS is typed Record<string, "pro" | "enterprise"> — so
+  the branch was unreachable by type, not by accident. Worse, it rendered
+  <LockedBtn onClick={onWaitlist}> with no guard on the handler, unlike the
+  pro/enterprise path which falls back to the dashboard billing URL. A dead
+  branch hiding a live defect. The union now matches what can actually arrive.
+*/
+export type LockedVariant = "pro" | "enterprise";
 
 interface LockedScreenProps {
   variant: LockedVariant;
-  /** Override the title text */
-  title?: string;
   /** Body description */
   message?: string;
-  /** CTA label for coming-soon variant (e.g. "Get notified →") */
-  waitlistLabel?: string;
-  /** Called when waitlist CTA is clicked — coming-soon only */
-  onWaitlist?: () => void;
   /** Called when upgrade CTA is clicked — pro/enterprise only */
   onUpgrade?: () => void;
 }
 
 export const LockedScreen: React.FC<LockedScreenProps> = ({
   variant,
-  title,
   message,
-  waitlistLabel,
-  onWaitlist,
   onUpgrade,
 }) => {
-  if (variant === "coming-soon") {
-    return (
-      <LockedContainer>
-        <div style={{ fontSize: 32, marginBottom: 12 }}>🔜</div>
-        <LockedTitle>{title ?? "Coming Soon"}</LockedTitle>
-        {message && <LockedDesc>{message}</LockedDesc>}
-        {waitlistLabel && (
-          <LockedBtn onClick={onWaitlist}>{waitlistLabel}</LockedBtn>
-        )}
-      </LockedContainer>
-    );
-  }
-
   const handleUpgrade = () => {
     if (onUpgrade) {
       onUpgrade();
