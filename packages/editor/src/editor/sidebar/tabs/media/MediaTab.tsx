@@ -283,6 +283,25 @@ function MediaTabWithComposer({
           onReplaceAcross={handleReplaceAcross}
         />
       )}
+      {/*
+        Moved here from the fullpage return, which is the exact failure the
+        block comment above describes — and this modal was the one left out of
+        the fix. `handleReplaceAcross` hangs off AssetDetailOverlay's "Replace
+        across site" row, the overlay is shared, so the drawer could open the
+        file picker, upload the replacement and set replaceAcrossPair with
+        nothing mounted to render it. The work happened and the dialog never
+        came.
+      */}
+      {state.replaceAcrossPair && (
+        <ReplaceAcrossDialog
+          composer={composer}
+          oldSrc={state.replaceAcrossPair.oldSrc}
+          newSrc={state.replaceAcrossPair.newSrc}
+          oldLabel={state.replaceAcrossPair.oldLabel}
+          newLabel={state.replaceAcrossPair.newLabel}
+          onClose={() => state.setReplaceAcrossPair(null)}
+        />
+      )}
     </>
   );
 
@@ -482,16 +501,6 @@ function MediaTabWithComposer({
           onClose={state.closeCtxMenu}
           onEditImage={handleEditImage}
           onReplaceAcross={handleReplaceAcross}
-        />
-      )}
-      {state.replaceAcrossPair && (
-        <ReplaceAcrossDialog
-          composer={composer}
-          oldSrc={state.replaceAcrossPair.oldSrc}
-          newSrc={state.replaceAcrossPair.newSrc}
-          oldLabel={state.replaceAcrossPair.oldLabel}
-          newLabel={state.replaceAcrossPair.newLabel}
-          onClose={() => state.setReplaceAcrossPair(null)}
         />
       )}
       {sharedOverlays}
