@@ -14,7 +14,7 @@ import { Button, ConfirmDialog, EmptyState, EmptyStateDesc, EmptyStateTitle, Mod
 import { PanelErrorState } from "../shared/PanelErrorState";
 import { ComponentDetailScreen } from "./component-library/ComponentDetailScreen";
 import { ComponentIcon } from "./component-library/ComponentIcon";
-import { CreateComponentModal } from "./component-library/CreateComponentModal";
+import { SaveAsComponentModal } from "./component-library/SaveAsComponentModal";
 import {
   containerStyles,
   dialogInputStyles,
@@ -51,6 +51,28 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   const { addToast } = useToast();
   const [renameInput, setRenameInput] = React.useState("");
   const [showCreateModal, setShowCreateModal] = React.useState(false);
+
+  /*
+    The same context the canvas right-click flow builds
+    (canvas/menus/actions/standaloneActions.ts:25). Without it this modal
+    renders no bindings card and forces `prefillBindings: false` — so the
+    identical action, reached from the panel instead of the canvas, silently
+    dropped the DS binding pre-fill and never said why.
+  */
+  const selectionContext = React.useMemo(() => {
+    const selectionIds = composer?.selection?.getSelectedIds?.() ?? [];
+    if (selectionIds.length === 0) return undefined;
+    const resolver = composer?.designSystem?.tokenBindingResolver;
+    if (!resolver?.resolveForElements) return undefined;
+    return {
+      selectionIds,
+      extractedBindings: resolver.resolveForElements(
+        selectionIds,
+        composer?.elements?.getAllElements?.() ?? [],
+      ),
+    };
+    // Re-read when the modal opens: the selection is what it is at that moment.
+  }, [composer, showCreateModal]);
 
   const handleCreateComponent = React.useCallback(
     (payload: { name: string; group: string | null; prefillBindings: boolean }) => {
@@ -229,9 +251,10 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
           </div>
         )}
         {showCreateModal && (
-          <CreateComponentModal
+          <SaveAsComponentModal
             onClose={() => setShowCreateModal(false)}
             onSubmit={handleCreateComponent}
+            selectionContext={selectionContext}
           />
         )}
       </PanelFrame>
@@ -317,9 +340,10 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
       )}
       {/* ── Dialogs ─────────────────────────────────────────────────────────── */}
       {showCreateModal && (
-        <CreateComponentModal
+        <SaveAsComponentModal
           onClose={() => setShowCreateModal(false)}
           onSubmit={handleCreateComponent}
+          selectionContext={selectionContext}
         />
       )}
       <ConfirmDialog

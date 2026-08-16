@@ -17,7 +17,7 @@ import { useToast } from "@/editor/chrome-ui";
 import { CMSCollectionSetupModal } from "./modals/CMSCollectionSetupModal";
 import { CMSRecordsModal } from "./modals/CMSRecordsModal";
 import { CreateComponentModal } from "./modals/CreateComponentModal";
-import { CreateComponentModal as SaveAsComponentModal } from "../sidebar/tabs/component-library/CreateComponentModal";
+import { SaveAsComponentModal } from "../sidebar/tabs/component-library/SaveAsComponentModal";
 import { ProjectSettingsModal } from "./modals/ProjectSettingsModal";
 
 // ============================================================================

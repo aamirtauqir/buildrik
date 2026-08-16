@@ -30,15 +30,15 @@ export interface SelectionContext {
   extractedBindings: Map<string, string>;
 }
 
-export interface CreateComponentSubmitPayload {
+export interface SaveAsComponentSubmitPayload {
   name: string;
   group: string | null;
   prefillBindings: boolean;
 }
 
-export interface CreateComponentModalProps {
+export interface SaveAsComponentModalProps {
   onClose: () => void;
-  onSubmit: (payload: CreateComponentSubmitPayload) => void;
+  onSubmit: (payload: SaveAsComponentSubmitPayload) => void;
   selectionContext?: SelectionContext;
 }
 
@@ -71,7 +71,7 @@ const bindingsHintStyle: React.CSSProperties = {
   paddingLeft: 22,
 };
 
-export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
+export const SaveAsComponentModal: React.FC<SaveAsComponentModalProps> = ({
   onClose,
   onSubmit,
   selectionContext,

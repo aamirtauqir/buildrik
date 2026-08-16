@@ -49,8 +49,8 @@ vi.mock("../modals/CreateComponentModal", () => ({
     isOpen ? <div data-testid="modal-create-component" /> : null,
 }));
 // Save-as-Component (component-library variant) has no isOpen prop either.
-vi.mock("../../sidebar/tabs/component-library/CreateComponentModal", () => ({
-  CreateComponentModal: () => <div data-testid="modal-save-as-component" />,
+vi.mock("../../sidebar/tabs/component-library/SaveAsComponentModal", () => ({
+  SaveAsComponentModal: () => <div data-testid="modal-save-as-component" />,
 }));
 vi.mock("../modals/ProjectSettingsModal", () => ({
   ProjectSettingsModal: ({ isOpen }: { isOpen: boolean }) =>

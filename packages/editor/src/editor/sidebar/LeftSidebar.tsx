@@ -449,11 +449,20 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   // Component creation handler
   const handleCreateComponent = React.useCallback(() => {
     if (!composer) return;
-    const hasComponentsApi =
-      typeof (composer?.elements as unknown as Record<string, unknown> | undefined)?.[
-        "getComponents"
-      ] === "function";
-    if (!hasComponentsApi) return;
+    /*
+      The guard used to ask `composer.elements` for a `getComponents` method.
+      No such method exists anywhere — the components API lives on
+      `composer.components` (`ComponentManager.isAvailable()` at :483), which is
+      what every other caller checks, ComponentsTab included at its own :118.
+
+      So the guard was always false and this handler always returned on its
+      second line. It is what the Components panel's empty state calls from BOTH
+      of its actions — the inline "Create component" link and the footer
+      "+ Create component" button — so the only two things that panel offers a
+      new user did nothing at all. Measured live: zero dialogs, no toast, no
+      console error. Silence is what a wrong-manager typeof check buys.
+    */
+    if (!composer.components?.isAvailable?.()) return;
     const selectedIds = composer.selection.getSelectedIds();
     const elementId = selectedIds[0];
     if (elementId) {

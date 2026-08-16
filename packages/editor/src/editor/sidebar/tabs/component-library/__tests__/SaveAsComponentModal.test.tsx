@@ -1,5 +1,5 @@
 /**
- * CreateComponentModal tests — Task 11
+ * SaveAsComponentModal tests — Task 11
  * Covers: binding-aware fields (selectionContext), backwards-compat "+" flow,
  * group select, payload shape, plural hint, name validation.
  */
@@ -7,12 +7,12 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, fireEvent } from "@testing-library/react";
 import * as React from "react";
-import { CreateComponentModal } from "../CreateComponentModal";
+import { SaveAsComponentModal } from "../SaveAsComponentModal";
 
-describe("CreateComponentModal", () => {
+describe("SaveAsComponentModal", () => {
   it("hides binding fields when selectionContext absent", () => {
     const { queryByLabelText } = render(
-      <CreateComponentModal onClose={() => {}} onSubmit={() => {}} />
+      <SaveAsComponentModal onClose={() => {}} onSubmit={() => {}} />
     );
     expect(queryByLabelText(/pre-fill bindings/i)).toBeNull();
   });
@@ -23,7 +23,7 @@ describe("CreateComponentModal", () => {
       extractedBindings: new Map([["el-1:color", "color.brand.primary"]]),
     };
     const { getByLabelText, getByText } = render(
-      <CreateComponentModal onClose={() => {}} onSubmit={() => {}} selectionContext={ctx} />
+      <SaveAsComponentModal onClose={() => {}} onSubmit={() => {}} selectionContext={ctx} />
     );
     expect(getByLabelText(/pre-fill bindings/i)).toBeTruthy();
     expect(getByText(/1 style will bind/i)).toBeTruthy();
@@ -38,7 +38,7 @@ describe("CreateComponentModal", () => {
       ]),
     };
     const { getByText } = render(
-      <CreateComponentModal onClose={() => {}} onSubmit={() => {}} selectionContext={ctx} />
+      <SaveAsComponentModal onClose={() => {}} onSubmit={() => {}} selectionContext={ctx} />
     );
     expect(getByText(/2 styles will bind/i)).toBeTruthy();
   });
@@ -50,7 +50,7 @@ describe("CreateComponentModal", () => {
       extractedBindings: new Map([["el-1:color", "color.brand.primary"]]),
     };
     const { getByLabelText, getByText } = render(
-      <CreateComponentModal onClose={() => {}} onSubmit={onSubmit} selectionContext={ctx} />
+      <SaveAsComponentModal onClose={() => {}} onSubmit={onSubmit} selectionContext={ctx} />
     );
     fireEvent.change(getByLabelText("Name"), { target: { value: "Pricing card" } });
     fireEvent.click(getByText(/save component/i));
@@ -65,7 +65,7 @@ describe("CreateComponentModal", () => {
   it("prefillBindings is false when no selectionContext (legacy + button flow)", () => {
     const onSubmit = vi.fn();
     const { getByLabelText, getByText } = render(
-      <CreateComponentModal onClose={() => {}} onSubmit={onSubmit} />
+      <SaveAsComponentModal onClose={() => {}} onSubmit={onSubmit} />
     );
     fireEvent.change(getByLabelText("Name"), { target: { value: "Custom block" } });
     fireEvent.click(getByText(/save component/i));
@@ -80,7 +80,7 @@ describe("CreateComponentModal", () => {
   it("includes group in submitted payload (null by default)", () => {
     const onSubmit = vi.fn();
     const { getByLabelText, getByText } = render(
-      <CreateComponentModal onClose={() => {}} onSubmit={onSubmit} />
+      <SaveAsComponentModal onClose={() => {}} onSubmit={onSubmit} />
     );
     fireEvent.change(getByLabelText("Name"), { target: { value: "Hero block" } });
     fireEvent.click(getByText(/save component/i));
@@ -95,7 +95,7 @@ describe("CreateComponentModal", () => {
   it("does NOT submit when name is empty/whitespace", () => {
     const onSubmit = vi.fn();
     const { getByText } = render(
-      <CreateComponentModal onClose={() => {}} onSubmit={onSubmit} />
+      <SaveAsComponentModal onClose={() => {}} onSubmit={onSubmit} />
     );
     fireEvent.click(getByText(/save component/i));
     expect(onSubmit).not.toHaveBeenCalled();
