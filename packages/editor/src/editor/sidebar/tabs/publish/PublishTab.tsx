@@ -280,6 +280,28 @@ export const PublishTab: React.FC<PublishTabProps> = ({
   // block — the server gate is still authoritative and refuses on its own.
   const blockedByChecks = checkState === "ready" && !!checks && !checks.ready;
 
+  /*
+    Board 784:4480 is "there is no publish path" — and there are two ways to
+    have none. `canPublish` only ever knew about one of them: it is
+    `!!onVercelPublish`, and TabRouter hands that over gated on the publish
+    FEATURE FLAG, so the boarded state fired for a build with publishing
+    switched off and never for the case it is actually named after.
+
+    A workspace with the flag on and no Vercel connection got the full panel —
+    environments, change list, deploy history — under a live-looking "Publish
+    to production" button, with the real fact demoted to red 11px under it.
+    The server already says so plainly: `runPrePublishChecks` fails the
+    `Vercel connected` row. Read that, and the board's own state shows.
+
+    Guarded on `checkState === "ready"` so the panel does not flash "Connect
+    Vercel" while the checks are still in flight — board 778:4238 owns that
+    moment.
+  */
+  const vercelMissing =
+    checkState === "ready" &&
+    blocking.some((c) => c.label === VERCEL_CHECK_LABEL);
+  const noPublishPath = !canPublish || vercelMissing;
+
   return (
     /* h-full so the pinned CTA below actually reaches the bottom of the
        drawer: PanelFrame is flex-col but sizes to content, which left the
@@ -296,7 +318,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
         {/* Board 784:4480 — with no publish path there is nothing to say about
             environments, changes or deploys: the panel states the one fact
             that matters and offers the one action that changes it. */}
-        {!canPublish ? (
+        {noPublishPath ? (
           <section className={SECTION}>
             <h2 className="tw:m-0 tw:text-[15px] tw:font-semibold tw:text-[var(--bk-ink)]">
               Connect Vercel to publish.
@@ -562,7 +584,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           needed. */}
       <div className="tw:flex tw:flex-col tw:gap-2 tw:border-t tw:border-[var(--bk-border)] tw:px-4 tw:py-3">
         <div className="tw:flex tw:flex-col tw:gap-2">
-          {!canPublish ? (
+          {noPublishPath ? (
             /* Board 784:4480 puts the CTA here too — the panel body above
                carries the sentence, this is the action. */
             <Button
@@ -626,20 +648,14 @@ export const PublishTab: React.FC<PublishTabProps> = ({
         checks={checks}
         onRetryChecks={() => void loadChecks()}
         renderFix={(label) => {
-          const isVercel = label === VERCEL_CHECK_LABEL;
+          /* There used to be a `Connect Vercel ›` link here for the Vercel
+             row. The wizard only renders a fix on a non-pass row, and the
+             Vercel row is pass-or-fail — so that link needed a FAILING Vercel
+             check, which is now exactly the condition that replaces this
+             whole panel with board 784:4480 and its full-width Connect
+             Vercel CTA. The wizard is unreachable in that state, so the link
+             was dead. Connecting is the panel's action, not a checklist row's. */
           const target = FIX_TARGETS[label];
-          if (isVercel) {
-            return (
-              <a
-                href={`${DASHBOARD_URL}/dashboard/settings/integrations`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="tw:flex-none tw:text-[13px] tw:text-[var(--bk-accent)] tw:no-underline"
-              >
-                Connect Vercel ›
-              </a>
-            );
-          }
           if (!target) return null;
           return (
             <Button
