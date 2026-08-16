@@ -783,3 +783,144 @@ the sweep says it is not. What the sweep surfaced instead is a different
 list: affordances that exist in code and cannot be reached. Two are now deleted;
 the `coming-soon` LockedScreen variant is the remaining one, and it carries an
 ungated handler that will misfire the day someone constructs that variant.
+
+---
+
+## 10. Why none of this was ever caught — the gate never ran the check
+
+Every finding in §9 was found by hand. That is the actual bug. This section is
+the root-cause investigation into why a repo with sixteen CI gates let a header
+button that never rendered, a canvas gear with no consumer, and a template retry
+for an impossible failure all ship and sit.
+
+### The check exists and works
+
+`scripts/audit/ssot-scan.mjs` has had a dead-export check since the 2026-05-08
+DS SSOT arc. It is category **6** of eight (`scanAntiPatterns`, `SCANS[5]`).
+
+### The gate asks for four of the eight
+
+`scripts/check-ds-ssot.mjs:19` invoked the scanner as:
+
+```js
+execFileSync('node', [SCANNER, '--json', '--category=1,2,3,4'], …)
+```
+
+Categories 5, 6, 7 and 8 had never run in CI. Not WARN-mode. Not baselined.
+**Not run.**
+
+### Proof, not inference
+
+Planted `export const PROBE_NOBODY_IMPORTS_THIS = 42` in `editor/shell/`:
+
+| | before |
+|---|---|
+| scanner, category 6 | reports it (2 hits) |
+| `gate:ds-ssot` | `[ok] DS SSOT gate green` |
+| `npx tsc --noEmit` | silent |
+
+The check saw it. The gate did not ask. This is the exact failure shape recorded
+in `feedback_gate_negative_test_or_it_lies` — a gate nobody watched fail.
+
+### Why it was left out: the check was too noisy to enforce
+
+Running category 6 on the tree returned **542** violations, of which 509 were
+dead exports in product code. Classified by declaration kind:
+
+| kind | count |
+|---|---|
+| `export type` / `export interface` | **407** |
+| `export const` / `function` / `class` | 84 |
+| unclassified | 18 |
+
+Four out of five were **type-only exports** — `export interface SpacingSectionProps`
+sitting beside `export const SpacingSection: React.FC<SpacingSectionProps>`.
+That is idiomatic TypeScript: a component's props type is part of its contract
+whether or not another file imports it today, and the check's own advice
+("delete unused export") is wrong for it. Burying 84 real dead values under 407
+false ones is a good explanation for why this category sat outside the gate for
+three months instead of being drained.
+
+### The fix
+
+1. **Sharpened the check** — type-only declarations and `*.generated.*` files are
+   no longer reported, and violations now carry real line numbers instead of a
+   hardcoded `line: 1`. **542 → 118.**
+2. **Wired the gate** to `--category=1,2,3,4,5,6,7,8`.
+3. **Seeded the baseline** at the current 118 + 12 legacyResiduals. This is an
+   explicit grandfather, stated here because the category has never run: the
+   floor stops new dead exports, it does not claim the old ones are fine.
+4. **Negative test, both directions** — a planted dead `const`/`function` now
+   fails the gate with correct line numbers; a planted dead `interface` does not.
+
+### What the newly-visible list points at
+
+93 dead runtime exports remain in product code. Three are not cruft — they are
+symptoms with a live defect behind them, and deleting them would have been the
+symptom fix the Iron Law warns about:
+
+- **`shared/constants/layout.ts`** — 8 of its 10 constants (`RAIL_W`,
+  `INSPECTOR_W`, `TOPBAR_H`, `HEADER_H`, `TOOLBAR_H`, `FOOTER_H`, `ROW_SM`,
+  `ROW_MD`) have no importer, while the file's own docstring says every chrome
+  dimension "must come from here". They are not deletable: ESLint
+  `buildrik/no-magic-layout-literals` (`eslint.config.mjs:181`, warn) points
+  offenders *at* this file. They are un-migrated targets, not dead code — and
+  chasing them surfaced two real bugs in the CSS that actually ships those
+  numbers (below).
+- **`editor/sidebar/useSidebarState.ts`** — the whole hook is unused, which is
+  consistent with its three never-passed callbacks in §9.
+- **`editor/canvas/controls/CommandPalette.tsx` → `useCommandPalette`** — unused,
+  while the boards specify `Canvas · command palette (⌘⇧P)` (1177:4804). Worth a
+  look before anyone deletes it.
+
+### Two live defects found behind the layout constants
+
+`editor/rail/LayoutShell.css` is where the chrome dimensions actually ship.
+
+**1. The footer grid track was bound to the row token.**
+
+```css
+--layout-footer-height: var(--bk-size-row);   /* was */
+--layout-footer-height: var(--bk-size-footer); /* now */
+```
+
+`--bk-size-footer` exists (32px) and the footer element already sizes off it.
+Both tokens are 32px today so nothing moves, but the grid track that reserves
+the footer and the element inside it were reading different tokens — a row
+density change would have slid one out from under the other.
+
+**2. Twenty-five fallback literals contradicted the tokens they back up.**
+
+| variable | token | fallback said |
+|---|---|---|
+| `--layout-drawer-width` | 320px | 280px |
+| `--layout-inspector-width` | 300px | 280px |
+| `--layout-rail-width` | 60px | 56px *and* 60px |
+| `--layout-footer-height` | 32px | **40px** |
+
+These fire only if the token fails to load, so nothing renders wrong today —
+which is precisely the problem. They encode the pre-2026-07-24 layout, so a
+token-load failure would have degraded silently to the old dimensions instead of
+breaking visibly, and the footer fallback shipped the one value DESIGN.md calls
+out by name: "never 40" is load-bearing. Same shape as
+`feedback_dev_configured_never_to_fail`. All four now match their tokens.
+
+Live-verified after the change: rail 60, drawer 320, inspector 300, topbar 56,
+footer 32; rail element 60px wide, footer element 32px tall. Unchanged, as
+expected — the fallbacks never fired.
+
+### `LockedScreen`'s coming-soon variant — a dead branch hiding a live defect
+
+`variant="coming-soon"` rendered `<LockedBtn onClick={onWaitlist}>` with **no
+guard on the handler** — the one genuinely ungated dead control in the sweep.
+It never fired only because nothing constructs the variant: the sole call site is
+`SettingsTab:601` (`variant={requiredPlan}`) and `SCREEN_PLAN_REQUIREMENTS` is
+typed `Record<string, "pro" | "enterprise">`. Unreachable by type, not by luck.
+Contrast the pro/enterprise path in the same file, which handles an absent
+`onUpgrade` by opening the dashboard billing URL.
+
+Removed, and `LockedVariant` narrowed to `"pro" | "enterprise"` so the type now
+matches what can actually arrive. Its four tests went with it — and they are the
+third instance this week of a suite passing over unreachable code because **the
+test supplied the input that no call site passes** (`previewState` in
+`TemplateDetail`, `variant="coming-soon"` here).
