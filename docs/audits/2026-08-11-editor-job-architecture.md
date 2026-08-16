@@ -707,28 +707,62 @@ seventeen are self-closing; ComponentsTab's four were the only ones.
 
 ### Shape 2 — an optional callback nothing ever passes
 
-172 optional `on*` props are declared across the editor; **24 are passed by no
-call site**. Some are legitimately a public surface (`AquibraStudio`'s `onReady`
-and `onEditor` are for embedders; `CountdownTimer.onComplete` is a block prop).
+**Corrected 2026-08-16.** The first pass of this sweep matched only the JSX
+attribute form (`onX={`) and reported 24. That missed every prop passed as an
+object property — which is how the inspector's section registry passes them
+(`registry/visual.tsx`: `onAdvancedToggle: ctx.onAdvancedToggle`). Re-run
+counting both forms: **194 optional `on*` props declared, 30 passed by nobody.**
 
-Of the rest, the question that matters is whether the component still draws a
-control. Checked one by one, they split cleanly and **none is a visible button
-that does nothing**:
+`onAdvancedToggle` was in the wrong list. It is fully wired, and verified live:
+selecting a Container and clicking the advanced disclosure ("Position, overflow
+& visibility") takes the inspector from 52 to 76 controls, the control relabels
+to "Less", clicking that returns to 52, and the open state survives
+deselect/reselect. Nothing to fix.
+
+Of the 30 that survive, most are library-shaped optional hooks in type files and
+canvas hooks — `onChunk`, `onProgress`, `onMiss`, `onResize`, `onDropTargetChange`
+— not UI. The ones that reach a rendered control, and what each does when the
+prop is absent:
 
 | Prop | Component | Behaviour when absent |
 |---|---|---|
 | `onBindRequest` | `DSBindingChip` | hint hidden — `showBindHint` requires it |
 | `onJumpToDesign` | `DSStatusChip` | chip renders inert — `clickable = !!prop` |
 | `onSecondary` | `StickyFooter` | button not rendered |
-| `onPreviewRetry` | `TemplateDetail` | gates its own render |
-| `onOpenSettings` | `SelectionLabel` | gates its own render |
-| `onAdvancedToggle` | `BackgroundSection` | gates its own render |
+| `onCMSChange` | `ExportOptions` | block gated on `hasCMSBindings && onCMSChange` |
+| `onDetached` | `DetachInstanceButton` | detach still runs; only the notify is skipped |
+| `onSuggestionUsed` | `SmartSuggestions` | suggestion still applies; analytics notify skipped |
+| `onThumbnailExtracted` | `VideoPreview` | extraction skipped by the same guard |
+| `onWaitlist` | `LockedScreen` | **not gated** — but its whole branch is dead (below) |
+| `onOpenSettings` | `SelectionLabel` | gear not rendered — **removed** |
+| `onPreviewRetry` | `TemplateDetail` | retry not rendered — **removed** |
 
-Those last three are the interesting ones, and they are the *opposite* fault
-from the one just fixed: the control never appears rather than appearing dead.
-They are designed affordances that were never wired — a Background "advanced"
-toggle, a canvas selection label that would open settings, and a template
-preview retry. Worth a decision each; none is breakage.
+`onWaitlist` is the one that looked like a live dead button: `LockedScreen:48`
+renders `<LockedBtn onClick={onWaitlist}>` with no guard on the handler. It is
+saved only by an accident — the button is gated on `waitlistLabel`, and the
+entire `coming-soon` variant that supplies it is never constructed.
+`SettingsTab:601` passes `variant={requiredPlan}`, and `"coming-soon"` appears
+nowhere in the repo as a value, only in the type union. So the branch, its
+emoji, its title and its button are all unreachable. Note the contrast inside
+the same file: the pro/enterprise path handles an absent `onUpgrade` by opening
+the dashboard billing URL. One path has a fallback, the other has a bug that
+cannot fire yet.
+
+**The two removed** were removed rather than wired because there was nothing to
+wire them to. `SelectionLabel` renders only while resizing or multi-selecting;
+there is no collapsible inspector to open and no programmatic inspector-tab
+switch, so its "Element settings" gear had no target and a gear appearing
+mid-drag is not the fix. `TemplateDetail`'s preview is `template.gradient` — a
+CSS gradient off a static module array, synchronous, so it cannot load and
+cannot fail; a Retry button there is error handling for a scenario that cannot
+happen.
+
+**A real gap this surfaced:** the boards specify `Templates · loading`
+(778:4102, skeleton cards) and `Templates · load-error` (781:4372, "Couldn't
+load templates." / "You can keep building from Insert." / "Try again"). Both are
+gallery-**list** states, not detail-preview states, and `SITE_TEMPLATES` is a
+static module array that cannot fail. They need a server-backed catalog before
+they can mean anything. Recorded, not faked.
 
 ### Shape 3 — a guard naming an API that does not exist
 
@@ -745,6 +779,7 @@ APIs being feature-detected, which is correct.
 
 The ComponentsTab defect was a specimen, not a species. Saying so matters: the
 easy write-up would have implied the codebase is riddled with dropped props, and
-the sweep says it is not. What the sweep did surface is a smaller, different
-list — three affordances that exist in code and cannot be reached — which is a
-product decision each, not a bug hunt.
+the sweep says it is not. What the sweep surfaced instead is a different
+list: affordances that exist in code and cannot be reached. Two are now deleted;
+the `coming-soon` LockedScreen variant is the remaining one, and it carries an
+ungated handler that will misfire the day someone constructs that variant.
