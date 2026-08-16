@@ -14,7 +14,6 @@ import { Button, ConfirmDialog, EmptyState, EmptyStateDesc, EmptyStateTitle, Mod
 import { PanelErrorState } from "../shared/PanelErrorState";
 import { ComponentDetailScreen } from "./component-library/ComponentDetailScreen";
 import { ComponentIcon } from "./component-library/ComponentIcon";
-import { SaveAsComponentModal } from "./component-library/SaveAsComponentModal";
 import {
   containerStyles,
   dialogInputStyles,
@@ -50,43 +49,6 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   });
   const { addToast } = useToast();
   const [renameInput, setRenameInput] = React.useState("");
-  const [showCreateModal, setShowCreateModal] = React.useState(false);
-
-  /*
-    The same context the canvas right-click flow builds
-    (canvas/menus/actions/standaloneActions.ts:25). Without it this modal
-    renders no bindings card and forces `prefillBindings: false` — so the
-    identical action, reached from the panel instead of the canvas, silently
-    dropped the DS binding pre-fill and never said why.
-  */
-  const selectionContext = React.useMemo(() => {
-    const selectionIds = composer?.selection?.getSelectedIds?.() ?? [];
-    if (selectionIds.length === 0) return undefined;
-    const resolver = composer?.designSystem?.tokenBindingResolver;
-    if (!resolver?.resolveForElements) return undefined;
-    return {
-      selectionIds,
-      extractedBindings: resolver.resolveForElements(
-        selectionIds,
-        composer?.elements?.getAllElements?.() ?? [],
-      ),
-    };
-    // Re-read when the modal opens: the selection is what it is at that moment.
-  }, [composer, showCreateModal]);
-
-  const handleCreateComponent = React.useCallback(
-    (payload: { name: string; group: string | null; prefillBindings: boolean }) => {
-      const selectedIds = composer?.selection?.getSelectedIds?.() ?? [];
-      const elementId = selectedIds[0];
-      if (elementId) {
-        void composer?.components?.createComponent?.(payload.name, elementId, {
-          category: payload.group ?? undefined,
-          prefillFromDs: payload.prefillBindings,
-        });
-      }
-    },
-    [composer]
-  );
 
   React.useEffect(() => {
     if (state.renameTarget) setRenameInput(state.renameTarget.currentName);
@@ -105,7 +67,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   const headerAddBtn = (
     <Button
      
-      onClick={() => setShowCreateModal(true)}
+      onClick={() => onCreateNew?.()}
       title="Create a new component"
       aria-label="Create component"
     >
@@ -125,9 +87,8 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             onExpandToggle={onExpandToggle}
             onHelpClick={state.handleHelpClick}
             onClose={onClose}
-          >
-            {headerAddBtn}
-          </PanelFrame.Header>
+            actions={headerAddBtn}
+          />
         )}
         <EmptyState icon={<ComponentIcon />}>
           <EmptyStateTitle>Components not available</EmptyStateTitle>
@@ -151,9 +112,8 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             onExpandToggle={onExpandToggle}
             onHelpClick={state.handleHelpClick}
             onClose={onClose}
-          >
-            {headerAddBtn}
-          </PanelFrame.Header>
+            actions={headerAddBtn}
+          />
         )}
         <PanelErrorState message={state.error} onRetry={() => state.setError(null)} />
       </PanelFrame>
@@ -205,9 +165,8 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
               onExpandToggle={onExpandToggle}
               onHelpClick={state.handleHelpClick}
               onClose={onClose}
-            >
-              {headerAddBtn}
-            </PanelFrame.Header>
+              actions={headerAddBtn}
+            />
           </>
         )}
         {/* Board 1138:13394. Left-aligned copy at the top of the panel, not a
@@ -250,13 +209,6 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             </Button>
           </div>
         )}
-        {showCreateModal && (
-          <SaveAsComponentModal
-            onClose={() => setShowCreateModal(false)}
-            onSubmit={handleCreateComponent}
-            selectionContext={selectionContext}
-          />
-        )}
       </PanelFrame>
     );
   }
@@ -273,9 +225,8 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             onExpandToggle={onExpandToggle}
             onHelpClick={state.handleHelpClick}
             onClose={onClose}
-          >
-            {headerAddBtn}
-          </PanelFrame.Header>
+            actions={headerAddBtn}
+          />
         </>
       )}
       {/* Board 641:2546 (Components · library): no search, no filter chips —
@@ -339,13 +290,6 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         </div>
       )}
       {/* ── Dialogs ─────────────────────────────────────────────────────────── */}
-      {showCreateModal && (
-        <SaveAsComponentModal
-          onClose={() => setShowCreateModal(false)}
-          onSubmit={handleCreateComponent}
-          selectionContext={selectionContext}
-        />
-      )}
       <ConfirmDialog
         open={!!state.confirmDelete}
         onClose={() => state.setConfirmDelete(null)}

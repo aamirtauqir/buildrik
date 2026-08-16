@@ -48,10 +48,6 @@ vi.mock("../modals/CreateComponentModal", () => ({
   CreateComponentModal: ({ isOpen }: { isOpen: boolean }) =>
     isOpen ? <div data-testid="modal-create-component" /> : null,
 }));
-// Save-as-Component (component-library variant) has no isOpen prop either.
-vi.mock("../../sidebar/tabs/component-library/SaveAsComponentModal", () => ({
-  SaveAsComponentModal: () => <div data-testid="modal-save-as-component" />,
-}));
 vi.mock("../modals/ProjectSettingsModal", () => ({
   ProjectSettingsModal: ({ isOpen }: { isOpen: boolean }) =>
     isOpen ? <div data-testid="modal-project-settings" /> : null,
@@ -126,7 +122,6 @@ const ALL_MARKERS = [
   "modal-icon-picker",
   "modal-collection-setup",
   "modal-create-component",
-  "modal-save-as-component",
   "modal-project-settings",
   "modal-cms-setup",
   "modal-cms-records",
@@ -188,16 +183,19 @@ describe("StudioModals — mounting contract", () => {
     expect(screen.getByTestId("modal-icon-picker")).toBeInTheDocument();
   });
 
-  it("save-as-component needs flag AND context AND composer", () => {
+  /*
+    Save-as-component is no longer its own dialog. It is the second trigger of
+    the create-component dialog, so the assertion moved with it: the flag alone
+    opens nothing, because without the extracted context there is no element to
+    build from.
+  */
+  it("save-as-component opens the create dialog, and only with its context", () => {
     const ctx = { selectionIds: ["el-1"] as readonly string[], extractedBindings: new Map<string, string>() };
     renderModals({ showSaveAsComponent: true });
-    expect(screen.queryByTestId("modal-save-as-component")).toBeNull();
-    cleanup();
-    renderModals({ showSaveAsComponent: true, saveAsComponentContext: ctx, composer: null });
-    expect(screen.queryByTestId("modal-save-as-component")).toBeNull();
+    expect(screen.queryByTestId("modal-create-component")).toBeNull();
     cleanup();
     renderModals({ showSaveAsComponent: true, saveAsComponentContext: ctx });
-    expect(screen.getByTestId("modal-save-as-component")).toBeInTheDocument();
+    expect(screen.getByTestId("modal-create-component")).toBeInTheDocument();
   });
 
   it("multiple flags can be open at once (modals are independent)", () => {

@@ -199,3 +199,46 @@ describe("CreateComponentModal — reset on close", () => {
     expect((nameInput() as HTMLInputElement).value).toBe("");
   });
 });
+
+describe("CreateComponentModal — the prefill hint names the number when it knows it", () => {
+  /*
+    This contract came from the deleted component-library modal, which existed
+    almost entirely to say how many styles would bind. That was one sentence,
+    not a second dialog, so it moved onto the checkbox that was already here
+    rather than the file being deleted with its behaviour.
+  */
+  const ctx = (n: number) => ({
+    selectionIds: ["el-1"] as readonly string[],
+    extractedBindings: new Map(Array.from({ length: n }, (_, i) => [`el-1:p${i}`, `t${i}`])),
+  });
+
+  it("says nothing about a count when the caller extracted no bindings", () => {
+    renderModal();
+    expect(screen.getByTestId("create-component-prefill-hint").textContent).toMatch(
+      /Lift matching values/,
+    );
+  });
+
+  it("names the count when the caller has one", () => {
+    renderModal({ selectionContext: ctx(3) });
+    expect(screen.getByTestId("create-component-prefill-hint").textContent).toMatch(
+      /3 styles will bind to your DS tokens/,
+    );
+  });
+
+  it("says style, singular, for one", () => {
+    renderModal({ selectionContext: ctx(1) });
+    expect(screen.getByTestId("create-component-prefill-hint").textContent).toMatch(
+      /^1 style will bind/,
+    );
+  });
+
+  // A selection whose styles bind to nothing is still a selection: the honest
+  // answer is zero, not the generic promise.
+  it("says zero rather than falling back to the generic line", () => {
+    renderModal({ selectionContext: ctx(0) });
+    expect(screen.getByTestId("create-component-prefill-hint").textContent).toMatch(
+      /0 styles will bind/,
+    );
+  });
+});

@@ -17,7 +17,6 @@ import { useToast } from "@/editor/chrome-ui";
 import { CMSCollectionSetupModal } from "./modals/CMSCollectionSetupModal";
 import { CMSRecordsModal } from "./modals/CMSRecordsModal";
 import { CreateComponentModal } from "./modals/CreateComponentModal";
-import { SaveAsComponentModal } from "../sidebar/tabs/component-library/SaveAsComponentModal";
 import { ProjectSettingsModal } from "./modals/ProjectSettingsModal";
 
 // ============================================================================
@@ -223,39 +222,39 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
         onSkip={onCloseCollectionSetup}
       />
 
-      {/* Create Component Modal — sidebar header + LeftSidebar "+" flow.
-          Carries variants/description/tags UX. Single-elementId payload. */}
-      <CreateComponentModal
-        isOpen={showCreateComponent}
-        onClose={onCloseCreateComponent}
-        composer={composer}
-        elementId={createComponentContext?.elementId || null}
-      />
+      {/*
+        ONE create-component dialog, two triggers.
 
-      {/* Save as Component Modal (T12) — canvas right-click flow.
-          Uses the T11-extended component-library modal that renders the
-          "Pre-fill bindings from DS" hint based on selectionContext. */}
-      {showSaveAsComponent && saveAsComponentContext && composer && (
-        <SaveAsComponentModal
-          onClose={onCloseSaveAsComponent}
-          onSubmit={(payload) => {
-            // Component schema is keyed by a single masterTree → pass the
-            // first selected id as the source element. Multi-select grouping
-            // is a separate feature surface; for now the first id is the
-            // canonical "master" the binding-aware modal extracted from.
-            const elementId = saveAsComponentContext.selectionIds[0];
-            if (!elementId) return;
-            void composer.components.createComponent(payload.name, elementId, {
-              category: payload.group ?? undefined,
-              prefillFromDs: payload.prefillBindings,
-            });
-          }}
-          selectionContext={{
-            selectionIds: saveAsComponentContext.selectionIds,
-            extractedBindings: saveAsComponentContext.extractedBindings,
-          }}
-        />
-      )}
+        There used to be two: this one for the sidebar "+" (description,
+        category, tags, variant sets) and a second, thinner one for the canvas
+        right-click T12 flow, whose only advantage was naming how many styles
+        would bind. So the same job showed two different forms depending on
+        where you started it, and neither was a superset of the other.
+
+        The count was the thing worth keeping, and it is a sentence, not a
+        screen — it now rides the checkbox that was already here. `elementId`
+        comes from whichever trigger fired; the component schema is keyed to a
+        single masterTree, so a multi-selection contributes its first id, the
+        one the resolver extracted from.
+      */}
+      <CreateComponentModal
+        isOpen={showCreateComponent || (showSaveAsComponent && !!saveAsComponentContext)}
+        onClose={showSaveAsComponent ? onCloseSaveAsComponent : onCloseCreateComponent}
+        composer={composer}
+        elementId={
+          createComponentContext?.elementId ??
+          saveAsComponentContext?.selectionIds[0] ??
+          null
+        }
+        selectionContext={
+          saveAsComponentContext
+            ? {
+                selectionIds: saveAsComponentContext.selectionIds,
+                extractedBindings: saveAsComponentContext.extractedBindings,
+              }
+            : undefined
+        }
+      />
 
       {/* Project Settings Modal */}
       <ProjectSettingsModal

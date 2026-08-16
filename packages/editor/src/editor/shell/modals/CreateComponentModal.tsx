@@ -13,6 +13,16 @@ export interface CreateComponentModalProps {
   onClose: () => void;
   composer: Composer | null;
   elementId: string | null;
+  /**
+   * Token bindings already extracted from the selection, when the caller has
+   * them (`tokenBindingResolver.resolveForElements`). Only the hint changes:
+   * the same checkbox can either promise "matching values" or name the number
+   * it found, and the number is the honest version.
+   */
+  selectionContext?: {
+    selectionIds: readonly string[];
+    extractedBindings: Map<string, string>;
+  };
 }
 
 // GAP-FIX: Default variant property presets
@@ -27,6 +37,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
   onClose,
   composer,
   elementId,
+  selectionContext,
 }) => {
   const [name, setName] = React.useState("");
   const [description, setDescription] = React.useState("");
@@ -41,6 +52,8 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
 
   // Spec §6.3 / D7: "Pre-fill from DS styles" toggle, default ON.
   const [prefillFromDs, setPrefillFromDs] = React.useState(true);
+  /* null = the caller did not extract bindings, so say nothing about a count. */
+  const bindingCount = selectionContext ? selectionContext.extractedBindings.size : null;
 
   // Reset form when modal closes
   React.useEffect(() => {
@@ -227,8 +240,12 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
           />
           <span>Pre-fill from DS styles</span>
         </label>
-        <small className={HINT}>
-          Lift matching values into token / preset bindings on save. Recommended.
+        <small className={HINT} data-testid="create-component-prefill-hint">
+          {bindingCount === null
+            ? "Lift matching values into token / preset bindings on save. Recommended."
+            : bindingCount === 1
+              ? "1 style will bind to your DS tokens. Editing tokens later updates this component too."
+              : `${bindingCount} styles will bind to your DS tokens. Editing tokens later updates this component too.`}
         </small>
       </div>
     </div>
