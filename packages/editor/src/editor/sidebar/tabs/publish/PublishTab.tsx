@@ -216,6 +216,16 @@ export const PublishTab: React.FC<PublishTabProps> = ({
   const failedSteps = hasFailed && publishJob?.steps?.length ? publishJob.steps : null;
   const [logOpen, setLogOpen] = React.useState(false);
 
+  /* Board 784:4250's "step 2 of 4". The worker marks exactly one step
+     `running`; before it does, or once the list is exhausted, there is no
+     honest step number and the line falls back to the percentage. */
+  const runningStep = React.useMemo(() => {
+    const steps = publishJob?.steps;
+    if (!isPublishing || !steps?.length) return null;
+    const i = steps.findIndex((s) => s.status === "running");
+    return i < 0 ? null : { name: steps[i].name, index: i + 1, total: steps.length };
+  }, [isPublishing, publishJob?.steps]);
+
   /* Board 784:4250 prints how long the run has been going. The job reports
      progress, not a start time, so the panel stamps the transition into
      "publishing" itself and ticks while it lasts. */
@@ -472,17 +482,27 @@ export const PublishTab: React.FC<PublishTabProps> = ({
         {/* Board 784:4250 — while a publish runs, the panel leads with the run
             itself and drops the "what would go out" sections: they describe a
             publish the user has already started. ENVIRONMENT stays, because
-            where it is going is still the question being answered. The board's
-            meta line reads "Building · step 2 of 4 · started 14s ago"; the job
-            exposes a percentage and a start, not named steps, so the shape is
-            kept and only what exists is printed. */}
+            where it is going is still the question being answered.
+
+            The board's meta line reads "Building · step 2 of 4 · started 14s
+            ago". This note used to say the job "exposes a percentage and a
+            start, not named steps" — true until `steps` was carried through
+            PublishService for board 784:4403's log. It names the running step
+            rather than the board's generic "Building", because the worker
+            knows which one it is and "Optimizing images" answers "what is it
+            doing" where a phase word does not. Falls back to the percentage
+            when a job carries no steps. */}
         {isPublishing && (
           <section className={SECTION} aria-label="Publish progress">
             <h3 className="tw:m-0 tw:text-[13px] tw:font-semibold tw:text-[var(--bk-ink)]">
               Publishing to production…
             </h3>
             <p className={META}>
-              {publishJob && publishJob.progress > 0 ? `${publishJob.progress}%` : "Starting"}
+              {runningStep
+                ? `${runningStep.name} · step ${runningStep.index} of ${runningStep.total}`
+                : publishJob && publishJob.progress > 0
+                  ? `${publishJob.progress}%`
+                  : "Starting"}
               {startedAgo ? ` · started ${startedAgo} ago` : ""}
             </p>
             <Progress progress={publishJob?.progress ?? 0} size="sm" />

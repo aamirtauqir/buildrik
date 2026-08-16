@@ -74,6 +74,52 @@ const renderFailed = (steps: UsePublishJobResult["steps"]) =>
     />,
   );
 
+describe("PublishTab — board 784:4250 progress line", () => {
+  const publishing = (steps: UsePublishJobResult["steps"]): UsePublishJobResult => ({
+    ...failedJob(steps),
+    uiState: "publishing",
+    error: null,
+    progress: 50,
+  });
+
+  // STEPS is the terminal shape (one failed, the rest never run); a job still
+  // in flight has exactly one `running`.
+  const IN_FLIGHT = [
+    { name: "Generating pages", status: "done" },
+    { name: "Optimizing images", status: "running" },
+    { name: "Deploying to CDN", status: "pending" },
+  ];
+
+  it("names the running step and its position, per the board", async () => {
+    render(
+      <PublishTab composer={composer} projectId="site_1" onVercelPublish={vi.fn()} publishJob={publishing(IN_FLIGHT)} />,
+    );
+    await waitFor(() => expect(screen.getByText("Publishing to production…")).toBeTruthy());
+    const meta = screen.getByLabelText("Publish progress").querySelector("p");
+    expect(meta?.textContent).toMatch(/Optimizing images · step 2 of 3/);
+    // The percentage was what stood in for the step before the worker's step
+    // list reached the client; it must not print alongside it.
+    expect(screen.queryByText(/50%/)).toBeNull();
+  });
+
+  it("falls back to the percentage when no step is running yet", async () => {
+    const pending = STEPS.map((s) => ({ ...s, status: "pending" }));
+    render(
+      <PublishTab composer={composer} projectId="site_1" onVercelPublish={vi.fn()} publishJob={publishing(pending)} />,
+    );
+    await waitFor(() => expect(screen.getByText("Publishing to production…")).toBeTruthy());
+    expect(screen.getByText(/50%/)).toBeTruthy();
+  });
+
+  it("falls back when the job carries no steps at all", async () => {
+    render(
+      <PublishTab composer={composer} projectId="site_1" onVercelPublish={vi.fn()} publishJob={publishing(null)} />,
+    );
+    await waitFor(() => expect(screen.getByText("Publishing to production…")).toBeTruthy());
+    expect(screen.getByText(/50%/)).toBeTruthy();
+  });
+});
+
 describe("PublishTab — board 784:4403 build log", () => {
   it("offers the log next to Try again when the job carries steps", async () => {
     renderFailed(STEPS);
