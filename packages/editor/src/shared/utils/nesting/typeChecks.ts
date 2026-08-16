@@ -17,6 +17,22 @@ import {
 import { ELEMENT_RULES } from "./rules";
 import { ElementCategory, LandmarkRole } from "./types";
 
+/*
+  The three predicates below (isInteractiveType, isLandmarkType,
+  canHaveChildren) each delegate to an imported Set and are reported by the
+  SSOT scanner's pass-through check. Kept deliberately — the founder's call on
+  2026-05-08, recorded in CLAUDE.md's cleanup history: the names document
+  intent at the call site in a way `INTERACTIVE_ELEMENTS.has(t)` does not.
+
+  They are the only three the check still flags. The other fourteen it used to
+  report were delegations to module-PRIVATE receivers (the per-domain
+  SyncRetryQueue instances, TAB_CONFIG_MAP, TOKEN_VAR_PATTERN), which is
+  encapsulation rather than a redundant hop; the scanner now tells the two
+  apart. These three stay flagged honestly, because their Sets ARE exported
+  and a caller could reach them — that is the trade being made, not an
+  oversight.
+*/
+
 /**
  * Check if element type is interactive (button, link)
  */

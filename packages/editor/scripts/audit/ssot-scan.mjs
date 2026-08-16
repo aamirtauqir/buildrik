@@ -408,6 +408,32 @@ export function scanAntiPatterns(root) {
       const stmtText = stmt.getText().trim();
       const m = stmtText.match(/^return\s+([\w.]+)\(([^)]*)\);?$/);
       if (!m) continue;
+
+      /*
+        A delegation to a MODULE-PRIVATE receiver is encapsulation, not a
+        middle-man, and the rule this check enforces is about redundant hops:
+        `getElements() { return composer.elements.getAll(); }` is dead weight
+        precisely because the caller already has `composer`.
+
+        `retryCmsSync() { return queue.retry(); }` is the opposite — `queue` is
+        a module-private `new SyncRetryQueue()`, one instance per sync domain,
+        and these three functions are its only door. Deleting them would force
+        the queue to be exported, which is worse. All twelve sync wrappers and
+        the five predicate helpers (isInteractiveType, canHaveChildren,
+        getTabConfig, …) had this shape; the founder already kept the
+        predicates on 2026-05-08 for the same reason, one call site at a time.
+
+        So: skip when the receiver is declared in this file and not exported.
+      */
+      const receiver = m[1].split(".")[0];
+      if (receiver !== m[1]) {
+        const decl =
+          sf.getVariableDeclaration(receiver) ??
+          sf.getFunction(receiver) ??
+          sf.getClass(receiver);
+        const isExported = decl?.isExported?.() ?? decl?.hasExportKeyword?.() ?? false;
+        if (decl && !isExported) continue;
+      }
       const callArgs = m[2].split(',').map((s) => s.trim()).filter(Boolean);
       const params = fn.getParameters().map((p) => p.getName());
       if (callArgs.length !== params.length) continue;

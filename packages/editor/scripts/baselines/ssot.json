@@ -31,97 +31,6 @@
     "category": "antiPatterns",
     "violations": [
       {
-        "path": "src/services/cmsSync.ts",
-        "line": 40,
-        "severity": "minor",
-        "message": "Pass-through wrapper \"onCmsSyncError\" — body is single return queue.onError(...sameArgs)",
-        "suggestion": "Inline at call sites; delete wrapper."
-      },
-      {
-        "path": "src/services/cmsSync.ts",
-        "line": 45,
-        "severity": "minor",
-        "message": "Pass-through wrapper \"getCmsSyncPendingCount\" — body is single return queue.pendingCount(...sameArgs)",
-        "suggestion": "Inline at call sites; delete wrapper."
-      },
-      {
-        "path": "src/services/cmsSync.ts",
-        "line": 54,
-        "severity": "minor",
-        "message": "Pass-through wrapper \"retryCmsSync\" — body is single return queue.retry(...sameArgs)",
-        "suggestion": "Inline at call sites; delete wrapper."
-      },
-      {
-        "path": "src/services/componentSync.ts",
-        "line": 31,
-        "severity": "minor",
-        "message": "Pass-through wrapper \"onComponentSyncError\" — body is single return queue.onError(...sameArgs)",
-        "suggestion": "Inline at call sites; delete wrapper."
-      },
-      {
-        "path": "src/services/componentSync.ts",
-        "line": 36,
-        "severity": "minor",
-        "message": "Pass-through wrapper \"getComponentSyncPendingCount\" — body is single return queue.pendingCount(...sameArgs)",
-        "suggestion": "Inline at call sites; delete wrapper."
-      },
-      {
-        "path": "src/services/componentSync.ts",
-        "line": 41,
-        "severity": "minor",
-        "message": "Pass-through wrapper \"retryComponentSync\" — body is single return queue.retry(...sameArgs)",
-        "suggestion": "Inline at call sites; delete wrapper."
-      },
-      {
-        "path": "src/services/templateSync.ts",
-        "line": 29,
-        "severity": "minor",
-        "message": "Pass-through wrapper \"onTemplateSyncError\" — body is single return queue.onError(...sameArgs)",
-        "suggestion": "Inline at call sites; delete wrapper."
-      },
-      {
-        "path": "src/services/templateSync.ts",
-        "line": 34,
-        "severity": "minor",
-        "message": "Pass-through wrapper \"getTemplateSyncPendingCount\" — body is single return queue.pendingCount(...sameArgs)",
-        "suggestion": "Inline at call sites; delete wrapper."
-      },
-      {
-        "path": "src/services/templateSync.ts",
-        "line": 39,
-        "severity": "minor",
-        "message": "Pass-through wrapper \"retryTemplateSync\" — body is single return queue.retry(...sameArgs)",
-        "suggestion": "Inline at call sites; delete wrapper."
-      },
-      {
-        "path": "src/services/versionSync.ts",
-        "line": 33,
-        "severity": "minor",
-        "message": "Pass-through wrapper \"onVersionSyncError\" — body is single return queue.onError(...sameArgs)",
-        "suggestion": "Inline at call sites; delete wrapper."
-      },
-      {
-        "path": "src/services/versionSync.ts",
-        "line": 38,
-        "severity": "minor",
-        "message": "Pass-through wrapper \"getVersionSyncPendingCount\" — body is single return queue.pendingCount(...sameArgs)",
-        "suggestion": "Inline at call sites; delete wrapper."
-      },
-      {
-        "path": "src/services/versionSync.ts",
-        "line": 43,
-        "severity": "minor",
-        "message": "Pass-through wrapper \"retryVersionSync\" — body is single return queue.retry(...sameArgs)",
-        "suggestion": "Inline at call sites; delete wrapper."
-      },
-      {
-        "path": "src/editor/rail/tabsConfig.ts",
-        "line": 301,
-        "severity": "minor",
-        "message": "Pass-through wrapper \"getTabConfig\" — body is single return TAB_CONFIG_MAP.get(...sameArgs)",
-        "suggestion": "Inline at call sites; delete wrapper."
-      },
-      {
         "path": "src/editor/canvas/__tests__/testHarness.ts",
         "line": 61,
         "severity": "minor",
@@ -164,29 +73,22 @@
         "suggestion": "Delete unused export; rely on git history if needed later."
       },
       {
-        "path": "src/editor/inspector/shared/tokenBindingDetection.ts",
-        "line": 21,
-        "severity": "minor",
-        "message": "Pass-through wrapper \"isTokenVar\" — body is single return TOKEN_VAR_PATTERN.test(...sameArgs)",
-        "suggestion": "Inline at call sites; delete wrapper."
-      },
-      {
         "path": "src/shared/utils/nesting/typeChecks.ts",
-        "line": 23,
+        "line": 39,
         "severity": "minor",
         "message": "Pass-through wrapper \"isInteractiveType\" — body is single return INTERACTIVE_ELEMENTS.has(...sameArgs)",
         "suggestion": "Inline at call sites; delete wrapper."
       },
       {
         "path": "src/shared/utils/nesting/typeChecks.ts",
-        "line": 62,
+        "line": 78,
         "severity": "minor",
         "message": "Pass-through wrapper \"isLandmarkType\" — body is single return LANDMARK_ELEMENTS.has(...sameArgs)",
         "suggestion": "Inline at call sites; delete wrapper."
       },
       {
         "path": "src/shared/utils/nesting/typeChecks.ts",
-        "line": 141,
+        "line": 157,
         "severity": "minor",
         "message": "Pass-through wrapper \"canHaveChildren\" — body is single return CAN_HAVE_CHILDREN_SET.has(...sameArgs)",
         "suggestion": "Inline at call sites; delete wrapper."
