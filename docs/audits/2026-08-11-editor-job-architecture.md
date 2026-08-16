@@ -1189,7 +1189,39 @@ part of the harness, and the harness is guilty until proven otherwise.
   retry queue with a `localOnly` flag, and `LibraryManager.tsx:430` surfaces
   **"This device only"** in the library footer.
 
-### Not verified — seven, each with a reason
+### The last seven — all reached
+
+| board | how |
+|---|---|
+| 777:4093 loading | six skeleton tiles, caught by delaying the media IndexedDB open |
+| 145:96 uploading | "mid.png → uploading… 75%" with a 2.4 MB file |
+| 145:148 upload-failed | a 14 MB PNG against the 10 MB image cap: "Upload failed — file is 14 MB, limit is 10 MB" + Retry |
+| 1163:13948 drag-over | "Drop files to upload", via CDP `Input.dispatchDragEvent` (the items need a `data` field) |
+| 1164:4713 modal picker | the `+` in the inspector's BACKGROUND header, `aria-label="Add background image"` — "Choose an image", Library / Upload / From URL / Optimize |
+| 1164:4738 replace-across | **could not render at all** — see below |
+| 1174:4849 replace results | "Replaced 6 uses ✓" / Done, after the fix |
+
+**29 of 29 walked.**
+
+#### The fourth bug: replace-across did the work and never showed the dialog
+
+`ReplaceAcrossDialog` sat inside MediaTab's fullpage return, below
+`if (onOpenLibrary) return (...)` — the branch the shipping drawer takes. Its
+trigger does not: "Replace across site" hangs off `AssetDetailOverlay`, which is
+in `sharedOverlays`. From the drawer you could open the OS file chooser, pick a
+replacement, watch it upload, have `replaceAcrossPair` set — and see nothing.
+
+The `sharedOverlays` block six lines above exists to prevent exactly this, and
+says so: *"a modal that only one of three renderers mounts is a feature that
+exists for a third of its users."* `ConfirmDeleteModal` and `AssetDetailOverlay`
+were moved there when that was written. This one was left behind — and it is the
+only modal whose trigger lives inside a component that had already been moved.
+
+Third instance of the same shape today, after ComponentsTab's header button
+passed as children to a slot-prop component and the sync services' delegation
+false positives: **state set in one branch, consumer in the other.**
+
+#### Earlier draft of this section — superseded
 
 | board | why not |
 |---|---|
