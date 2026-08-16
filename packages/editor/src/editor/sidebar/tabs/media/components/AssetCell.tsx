@@ -9,13 +9,18 @@
  * old look came from.
  *
  * PROVENANCE BADGE. `STOCK` / `AI` sit on the thumb, ink on white, 40x14 at
- * (6, 56). They render from `assetSource`, which lives only in the browser —
- * `MediaAsset` has no such column and `updateAsset` mirrors just `folderId`, so
- * an asset loaded from the server carries no badge. That is a known gap with a
- * founder decision behind it (TODOS.md: badges are fixture-conformed until the
- * field is persisted), and `"ai"` currently has no writer at all. Both are
- * rendered here anyway because the day the field is persisted, this is the code
- * that has to already be right.
+ * (6, 56). They render from `assetSource`. This note used to say the badge
+ * only failed for server-loaded assets, because `MediaAsset` has no such
+ * column — which was true and was not the bug. `toLibraryItem` simply never
+ * copied the field, so the badge was unreachable for every asset in every
+ * session, including one saved from Stock a second earlier. Fixed in the
+ * mapper 2026-08-17 after a live save produced a badgeless tile.
+ *
+ * Two gaps survive that fix, both real: the field is browser-only, so a
+ * reload that rehydrates from the server drops it; and `"ai"` still has NO
+ * writer anywhere in the repo — nothing ever sets it. `AI` is rendered here
+ * because the day something generates an asset, this is the code that has to
+ * already be right.
  *
  * @license BSD-3-Clause
  */

@@ -94,6 +94,14 @@ export function toLibraryItem(asset: MediaAsset): LibraryItem {
     createdAt: asset.createdAt,
     mimeType: asset.mimeType,
     assetId: asset.serverId,
+    // The provenance badge (`STOCK` / `AI`, board `I218:686;218:6`) reads
+    // `LibraryItem.assetSource`, and this mapper never carried it across — so
+    // `AssetCell`'s badge was unreachable for EVERY asset, not just
+    // server-loaded ones. Both writers work: `MediaManager` stamps
+    // `"uploaded"` on upload and `useDiscoveryState` stamps `"stock"` right
+    // after a stock save. Verified live 2026-08-17 — a saved stock photo
+    // landed in the library with no badge at all.
+    assetSource: asset.assetSource,
   };
 }
 
