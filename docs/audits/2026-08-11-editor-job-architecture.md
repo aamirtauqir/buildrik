@@ -445,7 +445,7 @@ the depth §2 gives J10/J11/J12. Their family counts agree across the sources,
 which is why they were not prioritised — but "counts agree" is not "flow agrees",
 and that is exactly what Finding B was made of.
 
-**Open decisions** — Phase 5's target file (Phase 1/2 gate, unchanged) · M2
+**Open decisions** — ~~Phase 5's target file~~ **CLOSED 2026-08-11: `g4Gz`** · M2
 (`publish-history` out of Settings) · M3 (canonical `CreateComponentModal`) ·
 M5 (Brand root → drill-in) · Finding E (`S4`).
 

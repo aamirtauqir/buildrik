@@ -1,6 +1,7 @@
 # Editor ⇄ Figma reconciliation — Phase 1/2
 
-Started 2026-08-11. Target Figma file **not yet decided** — see "Open gate" at
+Started 2026-08-11. **Target Figma file: `g4GzQFqzNYz5sosz1QtZXC` — founder call,
+2026-08-11.** The gate below is closed; Phase 5 may create frames.
 the end. Everything in this document is source-agnostic: it is an inventory of
 the codebase and of `g4GzQFqzNYz5sosz1QtZXC`, and holds whichever file the
 design lands in.
@@ -150,7 +151,7 @@ Phases 3 and 4 continue in
 
 ---
 
-## Open gate — blocks Phase 5 only
+## Gate — CLOSED 2026-08-11
 
 Two live instructions point at different files:
 
@@ -160,7 +161,9 @@ Two live instructions point at different files:
 - **2026-08-11, this brief:** reconcile **into** `g4Gz…`, preserving its
   Figma-only extensions.
 
-Both running unreconciled produces exactly the duplication this brief forbids.
+**Resolved: `g4Gz` is the target.** Asked directly; answered "old wali g4Gz". The
+baseline lane keeps its own file, so the two lanes now write to different files
+by design rather than by accident.
 Phases 1–4 (inventory, matrix, job architecture, screen inventory) are
 file-agnostic and continue regardless. Phase 5 — creating frames — does not
 start until the target file is named.
