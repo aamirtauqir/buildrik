@@ -518,6 +518,12 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   // blocked reasons above win); the SERVER approval gate can still reject the
   // attempt afterwards — its acknowledge flow owns that path, not this modal.
   const [pubConfirm, setPubConfirm] = React.useState(false);
+  // `onVercelPublish` is a plain useCallback in AquibraStudio, so it is never
+  // undefined and the two fallbacks below are unreachable in the shipping
+  // editor. That is fine for `handleExport`, but it silently made the Publish
+  // PANEL (board 641:2652) undiscoverable — this was its only wire. The panel
+  // now has its own door in SiteMenu; the chain stays as a degraded path for a
+  // build with publishing switched off.
   const publishNow = onVercelPublish ?? onOpenPublish ?? handleExport;
   const handlePublishClick = React.useCallback(() => {
     if (errorCount > 0) {
@@ -631,6 +637,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
           <SiteMenu
             onOpenSiteSettings={onOpenProjectSettings}
             onOpenHistory={onOpenHistory}
+            onOpenPublish={onOpenPublish}
             onOpenPublishHistory={onOpenPublishHistory}
             onExportCode={onExportHTML}
             onOpenTemplates={onOpenTemplates}

@@ -34,6 +34,25 @@ export interface SiteMenuProps {
   // ── Site ──────────────────────────────────────────────────────────────────
   onOpenSiteSettings?: () => void;
   onOpenHistory?: () => void;
+  /**
+   * Opens the Publish panel — board 641:2652, a 320-wide drawer surface with
+   * the environment rows, the since-last-deploy change list, the last deploy
+   * and the pre-publish wizard behind its CTA.
+   *
+   * It had no door. `StudioHeader` took an `onOpenPublish` prop and spent it
+   * on `publishNow = onVercelPublish ?? onOpenPublish ?? handleExport`, where
+   * `onVercelPublish` is a plain `useCallback` in `AquibraStudio` and is
+   * therefore never undefined — so the panel opener could only ever fire in a
+   * build with publishing turned off. Nothing else in the editor switched to
+   * the publish tab: not the rail (publish has no rail zone by design), not
+   * the command palette, not `ui:switch-tab`. The whole panel was unreachable.
+   *
+   * The topbar keeps its fast path to `PublishConfirmModal` — that is
+   * deliberate, and it shares `PublishConfirmFacts` with the wizard's confirm
+   * step so the two cannot drift. This is the panel's own door, next to the
+   * publish history it belongs with.
+   */
+  onOpenPublish?: () => void;
   onOpenPublishHistory?: () => void;
   onExportCode?: () => void;
   // ── Build ─────────────────────────────────────────────────────────────────
@@ -84,6 +103,7 @@ const SETTINGS_KBD = IS_MAC ? "⌃," : "Ctrl ,";
 export const SiteMenu: React.FC<SiteMenuProps> = ({
   onOpenSiteSettings,
   onOpenHistory,
+  onOpenPublish,
   onOpenPublishHistory,
   onExportCode,
   onOpenTemplates,
@@ -104,7 +124,9 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
     fn?.();
   };
 
-  const hasSite = Boolean(onOpenSiteSettings || onOpenHistory || onOpenPublishHistory || onExportCode);
+  const hasSite = Boolean(
+    onOpenSiteSettings || onOpenHistory || onOpenPublish || onOpenPublishHistory || onExportCode,
+  );
   const hasBuild = Boolean(onOpenTemplates || onOpenComponents || onOpenDesignSystem || onOpenPlugins);
   const hasShare = Boolean(onToggleClientView || publishedUrl);
 
@@ -134,6 +156,7 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
                 Version history
               </MenuItem>
             ) : null}
+            {onOpenPublish ? <MenuItem onClick={run(onOpenPublish)}>Publish panel</MenuItem> : null}
             {onOpenPublishHistory ? (
               <MenuItem onClick={run(onOpenPublishHistory)}>Publish history</MenuItem>
             ) : null}
