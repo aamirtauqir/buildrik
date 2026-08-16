@@ -1,0 +1,20 @@
+Three code snippets were eaten by zsh when this message was passed via
+`git commit -m` — the shell expanded the `*` inside backticked code before git
+saw it. The affected sentences, restored:
+
+  "…and the `export * as CollectionStorage` namespace alias that
+   CollectionManager and cmsSync bypass by importing the module directly."
+
+  "…exposed the sixth blind spot: `import * as Storage from
+   "./CollectionStorage"` was invisible to the check, and the alias had been
+   masking it."
+
+  "…whose consumer is the contract test that asserts them against DESIGN.md
+   via `import * as layout`."
+
+Not amended, because the commit was already pushed and rewriting published
+history is not worth a cosmetic fix. The full account is in
+docs/audits/2026-08-11-editor-job-architecture.md §11, which was written
+correctly.
+
+Lesson: use `git commit -F <file>` for any message containing code.
