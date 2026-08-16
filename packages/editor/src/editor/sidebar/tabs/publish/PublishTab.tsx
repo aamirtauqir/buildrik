@@ -286,26 +286,21 @@ export const PublishTab: React.FC<PublishTabProps> = ({
   const blockedByChecks = checkState === "ready" && !!checks && !checks.ready;
 
   /*
-    Board 784:4480 is "there is no publish path" — and there are two ways to
-    have none. `canPublish` only ever knew about one of them: it is
-    `!!onVercelPublish`, and TabRouter hands that over gated on the publish
-    FEATURE FLAG, so the boarded state fired for a build with publishing
-    switched off and never for the case it is actually named after.
+    Board 784:4480 ("Connect Vercel to publish.") is the panel with no publish
+    path at all — `onVercelPublish` absent, i.e. publishing not wired.
 
-    A workspace with the flag on and no Vercel connection got the full panel —
-    environments, change list, deploy history — under a live-looking "Publish
-    to production" button, with the real fact demoted to red 11px under it.
-    The server already says so plainly: `runPrePublishChecks` fails the
-    `Vercel connected` row. Read that, and the board's own state shows.
-
-    Guarded on `checkState === "ready"` so the panel does not flash "Connect
-    Vercel" while the checks are still in flight — board 778:4238 owns that
-    moment.
+    It is NOT the panel for "connected account missing". That case has its own
+    board, 893:4518, which draws the WIZARD with the Vercel row failed, a
+    `Connect` link on the row and a `Connect Vercel` footer CTA — so the
+    checklist is what explains the block, reached by pressing the panel's
+    normal CTA. A previous pass here routed a failing Vercel check to 784:4480
+    instead, which read fine in isolation and made 893:4518 unreachable.
+    Two boards, two states; the board decides which.
   */
-  const vercelMissing =
-    checkState === "ready" &&
-    blocking.some((c) => c.label === VERCEL_CHECK_LABEL);
-  const noPublishPath = !canPublish || vercelMissing;
+  const noPublishPath = !canPublish;
+  /** Board 893:4518 — the blocker is the connection itself, which the wizard
+      answers with Connect rather than Fix. */
+  const blockedOnVercel = blocking.some((c) => c.label === VERCEL_CHECK_LABEL);
 
   /* Board 784:4403's failure block, hoisted to a const because it renders in
      TWO branches: the normal panel, and the no-publish-path panel when the
@@ -400,28 +395,14 @@ export const PublishTab: React.FC<PublishTabProps> = ({
             environments, changes or deploys: the panel states the one fact
             that matters and offers the one action that changes it. */}
         {noPublishPath ? (
-          <>
-            {/*
-              A publish that fails BECAUSE the token was revoked ends here:
-              the server rejects it, deactivates the connection, and the very
-              next checks read comes back with the Vercel row failing. Showing
-              only "Connect Vercel to publish." would drop the fact the user
-              is actually waiting on — that the publish they just started
-              failed and nothing went out. Both are true, so the panel says
-              both: the failure from board 784:4403 above the connect prompt,
-              and 784:4480's CTA below, because connecting is the only action
-              that helps from here.
-            */}
-            {hasFailed && failureSection}
-            <section className={SECTION}>
-              <h2 className="tw:m-0 tw:text-[15px] tw:font-semibold tw:text-[var(--bk-ink)]">
-                Connect Vercel to publish.
-              </h2>
-              <p className="tw:m-0 tw:mt-1 tw:text-[13px] tw:leading-normal tw:text-[var(--bk-ink-muted)]">
-                Buildrick deploys into your own Vercel account — we host nothing.
-              </p>
-            </section>
-          </>
+          <section className={SECTION}>
+            <h2 className="tw:m-0 tw:text-[15px] tw:font-semibold tw:text-[var(--bk-ink)]">
+              Connect Vercel to publish.
+            </h2>
+            <p className="tw:m-0 tw:mt-1 tw:text-[13px] tw:leading-normal tw:text-[var(--bk-ink-muted)]">
+              Buildrick deploys into your own Vercel account — we host nothing.
+            </p>
+          </section>
         ) : (
         <>
         {/* Board 781:4489 — the deploy service is unreachable, so the panel
@@ -719,14 +700,26 @@ export const PublishTab: React.FC<PublishTabProps> = ({
         checkState={checkState}
         checks={checks}
         onRetryChecks={() => void loadChecks()}
+        blockedOnVercel={blockedOnVercel}
+        onConnectVercel={() =>
+          window.open(`${DASHBOARD_URL}/dashboard/settings/integrations`, "_blank", "noopener")
+        }
         renderFix={(label) => {
-          /* There used to be a `Connect Vercel ›` link here for the Vercel
-             row. The wizard only renders a fix on a non-pass row, and the
-             Vercel row is pass-or-fail — so that link needed a FAILING Vercel
-             check, which is now exactly the condition that replaces this
-             whole panel with board 784:4480 and its full-width Connect
-             Vercel CTA. The wizard is unreachable in that state, so the link
-             was dead. Connecting is the panel's action, not a checklist row's. */
+          /* Board 893:4518 puts `Connect` on the Vercel row, not `Fix` — the
+             fix is not in this editor, so it opens the dashboard's
+             integrations page rather than switching tabs. */
+          if (label === VERCEL_CHECK_LABEL) {
+            return (
+              <a
+                href={`${DASHBOARD_URL}/dashboard/settings/integrations`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="tw:flex-none tw:text-[13px] tw:text-[var(--bk-accent)] tw:no-underline"
+              >
+                Connect
+              </a>
+            );
+          }
           const target = FIX_TARGETS[label];
           if (!target) return null;
           return (

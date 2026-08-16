@@ -36,6 +36,10 @@ export interface PublishWizardProps {
   onRetryChecks(): void;
   /** Rendered on a check row when the editor can take the user to the fix. */
   renderFix?(label: string): React.ReactNode;
+  /** The Vercel connection is the blocker — board 893:4518. */
+  blockedOnVercel?: boolean;
+  /** Opens the dashboard's integrations page. */
+  onConnectVercel?(): void;
   /** Confirm-step context. The facts themselves come from
       PublishConfirmFacts, which reads the exporter and the review round. */
   composer: Composer | null;
@@ -70,7 +74,14 @@ const CheckIcon: React.FC<{ status: "pass" | "warning" | "fail" }> = ({ status }
           : "tw:bg-[var(--bk-warning)]"
     }`}
   >
-    <span aria-hidden="true">{status === "pass" ? "✓" : "!"}</span>
+    {/* Board 893:4518 is the only board with a failing row, and it draws ✕ —
+        `!` was going out for both non-pass severities, so the one row that
+        stops the publish looked exactly like the four that do not. The disc
+        COLOUR on that board is #C27803, the same amber as the warning rows
+        (measured, not eyeballed); this keeps `--bk-error` for fail because
+        recolouring a blocking state to the warning tone is a semantic change,
+        not a visual one — flagged for the founder rather than done quietly. */}
+    <span aria-hidden="true">{status === "pass" ? "✓" : status === "fail" ? "✕" : "!"}</span>
     <span className="tw:sr-only">{SR_STATUS[status]}</span>
   </span>
 );
@@ -83,6 +94,8 @@ export const PublishWizard: React.FC<PublishWizardProps> = ({
   checks,
   onRetryChecks,
   renderFix,
+  blockedOnVercel = false,
+  onConnectVercel,
   composer,
   publishedUrl,
   isPublished,
@@ -174,11 +187,18 @@ export const PublishWizard: React.FC<PublishWizardProps> = ({
 
           {checkState === "ready" && rows.length > 0 && (
             <p className={BAND} role={blocked ? "alert" : undefined}>
-              {blocked
-                ? `⚠ ${blocking.length} blocking — ${blocking.map((c) => c.label).join(", ")}. Fix to publish.`
-                : warnings.length > 0
-                  ? `⚠ ${warnings.length} warning${warnings.length === 1 ? "" : "s"} — none block. Client approval is a separate gate.`
-                  : "All checks pass."}
+              {/* Board 893:4518 words the connection block as its own
+                  sentence — "✕ Blocked — connect Vercel to publish." — not as
+                  one entry in a list of things to fix, because it is not
+                  fixed in this editor and it is the only one that stops the
+                  publish outright. */}
+              {blockedOnVercel
+                ? "✕ Blocked — connect Vercel to publish."
+                : blocked
+                  ? `⚠ ${blocking.length} blocking — ${blocking.map((c) => c.label).join(", ")}. Fix to publish.`
+                  : warnings.length > 0
+                    ? `⚠ ${warnings.length} warning${warnings.length === 1 ? "" : "s"} — none block. Client approval is a separate gate.`
+                    : "All checks pass."}
             </p>
           )}
 
@@ -186,9 +206,17 @@ export const PublishWizard: React.FC<PublishWizardProps> = ({
             <Button color="light" onClick={onClose} className="tw:border-transparent tw:bg-transparent">
               Cancel
             </Button>
-            <Button onClick={() => setStep("confirm")} disabled={blocked}>
-              Continue to Confirm →
-            </Button>
+            {/* Board 893:4518 swaps the primary for `Connect Vercel`. A
+                disabled "Continue to Confirm →" would be a dead control whose
+                only escape is Cancel — the board gives the one action that
+                unblocks the publish instead. */}
+            {blockedOnVercel ? (
+              <Button onClick={onConnectVercel}>Connect Vercel</Button>
+            ) : (
+              <Button onClick={() => setStep("confirm")} disabled={blocked}>
+                Continue to Confirm →
+              </Button>
+            )}
           </div>
         </>
       ) : (

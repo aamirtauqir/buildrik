@@ -179,45 +179,50 @@ describe("PublishTab — only a fail blocks the publish", () => {
 });
 
 describe("PublishTab — fix affordances match severity and ownership", () => {
-  /* This asserted a `Connect Vercel ›` link on the wizard's Vercel row. That
-     row can only carry a fix when it FAILS, and a failing Vercel check is now
-     the whole-panel state on board 784:4480 — so the link was unreachable and
-     is gone. What replaced it is the board's own action, tested here: no
-     publish path, no checklist, one sentence and one CTA. */
-  it("replaces the panel with board 784:4480 when Vercel is not connected", async () => {
+  /* Board 893:4518 — the connection is the blocker, and the checklist is what
+     explains it. An earlier pass routed this to board 784:4480 (the panel's
+     "Connect Vercel to publish." state) instead, which reads fine on its own
+     and quietly made 893:4518 unreachable. 784:4480 is the panel with no
+     publish path wired at all; this is a wired publish blocked on a missing
+     account. Two boards, two states. */
+  it("sends the Vercel row to the dashboard integration, not an editor tab", async () => {
     const checks = result({ ready: false });
-    checks.checks[0] = {
-      label: "Vercel connected",
-      status: "fail",
-      detail: "Sites deploy to your own Vercel account. Connect it to publish.",
-    };
+    checks.checks[0] = { label: "Vercel connected", status: "fail", detail: "Connect it to publish." };
     fetchPrePublishChecks.mockResolvedValue(checks);
     const emit = vi.fn();
     renderTab(<PublishTab composer={composerWith(emit)} projectId="site_1" onVercelPublish={vi.fn()} />);
+    await openWizard();
 
-    await waitFor(() => expect(screen.getByText("Connect Vercel to publish.")).toBeTruthy());
-    expect(
-      screen.getByText("Buildrick deploys into your own Vercel account — we host nothing."),
-    ).toBeTruthy();
-    // The panel claims nothing it cannot know: no environments, no change
-    // list, no deploy history under a live-looking publish button.
-    expect(screen.queryByText("Environment")).toBeNull();
-    expect(screen.queryByText("Since last deploy")).toBeNull();
-    expect(screen.queryByText("Publish to production")).toBeNull();
+    const link = (await screen.findByText("Connect")) as HTMLAnchorElement;
+    expect(link.getAttribute("href")).toContain("/dashboard/settings/integrations");
     expect(emit).not.toHaveBeenCalled();
   });
 
-  it("keeps the full panel when Vercel passes and something else blocks", async () => {
-    // The guard is the Vercel row specifically, not "anything failed" — a
-    // blocked publish with a working connection still has environments and a
-    // deploy history worth reading.
+  it("board 893:4518 — the band names the block and the primary offers Connect", async () => {
+    const checks = result({ ready: false });
+    checks.checks[0] = { label: "Vercel connected", status: "fail", detail: "Connect it to publish." };
+    fetchPrePublishChecks.mockResolvedValue(checks);
+    renderTab(<PublishTab composer={composerWith()} projectId="site_1" onVercelPublish={vi.fn()} />);
+    await openWizard();
+
+    await waitFor(() =>
+      expect(screen.getByText("✕ Blocked — connect Vercel to publish.")).toBeTruthy(),
+    );
+    // A disabled "Continue to Confirm →" would be a dead control whose only
+    // escape is Cancel; the board replaces it with the action that unblocks.
+    expect(screen.getByRole("button", { name: "Connect Vercel" })).toBeTruthy();
+    expect(screen.queryByText("Continue to Confirm →")).toBeNull();
+  });
+
+  it("keeps the generic blocked band when the blocker is fixable in the editor", async () => {
     const checks = result({ ready: false });
     checks.checks[1] = { label: "Pages ready", status: "fail", detail: "No pages found." };
     fetchPrePublishChecks.mockResolvedValue(checks);
     renderTab(<PublishTab composer={composerWith()} projectId="site_1" onVercelPublish={vi.fn()} />);
+    await openWizard();
 
-    await waitFor(() => expect(screen.getByText("Publish to production")).toBeTruthy());
-    expect(screen.queryByText("Connect Vercel to publish.")).toBeNull();
+    await waitFor(() => expect(screen.getByText(/blocking — Pages ready/)).toBeTruthy());
+    expect(screen.queryByRole("button", { name: "Connect Vercel" })).toBeNull();
   });
 
   it("routes an in-editor warning to its owning tab", async () => {
