@@ -1137,7 +1137,75 @@ part of the harness, and the harness is guilty until proven otherwise.
   their place — worse than its absence. Wiring it needs an asset-focus
   parameter first.
 
-### A second pass — eleven of twenty-nine
+### The full walk — 22 of 29
+
+| # | board | verdict |
+|---|---|---|
+| 1 | 144:2 grid | match |
+| 2 | 145:2 filtered | match |
+| 3 | 145:49 folder-scoped | match — "No assets matching this filter." |
+| 4 | 145:199 quota-warn | match — "Almost full (86%)", "Optimise images to free space ›" |
+| 5 | 145:250 quota-full | match — "Storage full … upload is off until you free space" |
+| 6 | 145:300 drawer bulk-select | match — "1 selected · Move to… · Delete · Done" |
+| 7 | 145:359 empty | match |
+| 8 | 146:2 asset-detail | match — Alt text + ✨ Generate, five rows incl. "Versions 4 ›" |
+| 9 | 146:32 versions | match **after a fix** |
+| 10 | 146:68 used-in | match — "Not used on any page" / "Deleting this file won't change anything on your site." |
+| 11 | 147:2 icon-picker | match — "‹ Icons", "17 categories" |
+| 12 | 147:55 stock-browser | match — Orientation / Colour / Type, "Search to browse free photos." |
+| 13 | 453:3931 load-error | match — "Couldn't load your media." / "Try again" |
+| 14 | 782:4353 no-results | match — "Nothing matches '…'." |
+| 15 | 1159:4593 fullpage library | match |
+| 16 | 1162:4617 fullpage empty | match |
+| 17 | 1163:4641 list-view · bulk | match — Name / Type / Size / Usage |
+| 18 | 1163:13695 fullpage context-menu | match — 180px, 8px radius, red Delete |
+| 19 | 1175:4827 delete-confirm | **bug found** (below) |
+| 20 | 1205:4804 import-url | match |
+| 21 | 1205:4816 import-url invalid | match — red border, disabled Import |
+| 22 | 1205:4829 new-folder inline | match — "Enter to create · Esc to cancel" |
+
+### Three bugs the walk found, all fixed
+
+1. **Versions printed a date where the board draws "2d ago."**
+   `formatRelativeTime` was called with no options, so anything past 24h fell to
+   `toLocaleDateString()`. New `daysShort` fallback.
+2. **"Delete 1 files?"** — the delete confirm's title branched on `isBulk`
+   ("came from selection mode") instead of the count, and printed the plural
+   directly above a warning reading "1 file is currently used on the canvas."
+   Both existing tests stepped over it: one covers isBulk false, the other
+   covers bulk(21), which is plural either way.
+3. **One quota, two allowances.** The drawer read "4.3 GB of 5 GB used" while
+   the fullpage footer read "4 GB / 4.66 GB" — a decimal formatter beside a
+   1024-based one. Plans are sold in decimal GB, so the decimal one is now
+   exported as `formatQuotaSize` and both surfaces use it.
+
+### Two false bugs avoided
+
+- Versions first read **1d / 4d / 11d**, one short of the board. That was my
+  seed writing local wall-clock into a `timestamp without time zone` column the
+  app fills with UTC — a +05:00 shift, not a defect.
+- Uploading with the blob token absent reports "uploaded ✓" while the server
+  400s, which looked like a silent failure. It is not: `MediaManager` keeps a
+  retry queue with a `localOnly` flag, and `LibraryManager.tsx:430` surfaces
+  **"This device only"** in the library footer.
+
+### Not verified — seven, each with a reason
+
+| board | why not |
+|---|---|
+| 777:4093 loading | transient; the panel hydrates faster than a screenshot can catch |
+| 145:96 uploading | the in-flight progress state never renders long enough — the local IndexedDB write completes immediately |
+| 145:148 upload-failed | the local write **succeeds** even when the server 400s, so the failed state does not render |
+| 1163:13948 drag-over uploading | a synthetic `DragEvent` does not trigger the drop highlight; needs a real OS-level drag |
+| 1164:4713 modal picker | the picker trigger was not located from the inspector's Background section |
+| 1164:4738 replace-across | needs a successful blob upload of the replacement — `BLOB_READ_WRITE_TOKEN` is absent from `.env.local`, so `/api/asset-upload` returns 400 |
+| 1174:4849 replace-across results | same blocker as above |
+
+The last three are one environment fix away: setting `BLOB_READ_WRITE_TOKEN`
+locally would make uploads real, which unlocks replace-across, its result
+states, and a genuine uploading/upload-failed pair.
+
+### A second pass — the first eleven
 
 | board | verdict |
 |---|---|
