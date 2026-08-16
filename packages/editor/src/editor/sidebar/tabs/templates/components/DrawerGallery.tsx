@@ -14,6 +14,11 @@
 import * as React from "react";
 import { Button, TextInput } from "@/editor/chrome-ui";
 import { SITE_TEMPLATES, getSectionCount, type TemplateItem } from "../templatesData";
+import {
+  getTemplateHydrateState,
+  onTemplateHydrateChange,
+  hydrateUserTemplatesFromServer,
+} from "@/services/templateSync";
 
 interface DrawerGalleryProps {
   searchQ: string;
@@ -36,9 +41,53 @@ const sectionLabel = (t: TemplateItem): string => {
   return `${n} section${n === 1 ? "" : "s"}`;
 };
 
+/*
+  Board 781:4372, the load-error block: red line, muted line, blue Try again.
+
+  It renders ABOVE the list rather than in place of it, which is where the
+  board's own copy points. "You can keep building from Insert." is only true
+  because the built-in catalog is a static module array that cannot fail — so
+  what failed is the server pull of the user's saved templates, and hiding the
+  twelve built-ins behind a full-panel error would state something false. Per
+  the founder's precedence rule the block's LOOK comes from the board and WHEN
+  it shows comes from the code contract.
+*/
+const TemplateLoadError: React.FC<{ onRetry: () => void }> = ({ onRetry }) => (
+  <div
+    className="tw:flex tw:flex-col tw:gap-0.5 tw:px-4 tw:py-3"
+    role="alert"
+    data-testid="tpl-load-error"
+  >
+    <span className="tw:text-[13px] tw:leading-5 tw:text-[var(--bk-error)]">
+      Couldn&apos;t load templates.
+    </span>
+    <span className="tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
+      You can keep building from Insert.
+    </span>
+    <Button
+      type="button"
+      color="light"
+      size="xs"
+      className="tw:mt-0.5 tw:h-5 tw:w-fit tw:border-0 tw:bg-transparent tw:p-0 tw:text-[13px] tw:leading-5 tw:font-normal tw:text-[var(--bk-accent)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+      data-testid="tpl-load-retry"
+      onClick={onRetry}
+    >
+      Try again
+    </Button>
+  </div>
+);
+
 export const DrawerGallery: React.FC<DrawerGalleryProps> = ({
   searchQ, onSearchChange, onOpenTemplate, onBrowseAll,
 }) => {
+  /* The hydrate runs once from AquibraStudio on open; this only reads its
+     outcome, so a panel opened after the fetch settled still sees the failure
+     instead of a silent empty My-Templates. */
+  const hydrateState = React.useSyncExternalStore(
+    onTemplateHydrateChange,
+    getTemplateHydrateState,
+    () => "idle" as const,
+  );
   const q = searchQ.trim().toLowerCase();
   // `type` holds element-ish tags ("hero", …) for most entries — the real
   // page/section split in this catalog is pageCount: multi-page templates
@@ -61,6 +110,9 @@ export const DrawerGallery: React.FC<DrawerGalleryProps> = ({
       </div>
 
       <div className="tw:flex-1 tw:min-h-0 tw:overflow-y-auto">
+        {hydrateState === "error" && (
+          <TemplateLoadError onRetry={() => void hydrateUserTemplatesFromServer()} />
+        )}
         {/* Boards 782:4402 / 1138:13413 draw NO section bands when nothing is
             listed. Rendering "PAGE TEMPLATES" over an empty stretch of panel
             says the group exists and is empty, which is a different (and
