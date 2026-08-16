@@ -28,8 +28,22 @@ describe("IconBrowserOverlay (board 147:2)", () => {
     const onPick = vi.fn();
     const onClose = vi.fn();
     render(<IconBrowserOverlay onClose={onClose} onPick={onPick} />);
-    const tile = screen.getAllByRole("button", { name: /^Insert .* icon$/ })[0];
-    fireEvent.click(tile);
+    /*
+      Attribute selector, not getAllByRole("button", { name: … }).
+
+      The overlay renders the whole catalog — 371 buttons — and a `name`
+      matcher makes Testing Library compute the accessible name for every
+      candidate. Measured here: 1792ms for the role query against 2.0ms for
+      this one, returning the identical node. On an idle machine that is
+      merely slow; under a full-suite run the workers contend for CPU and it
+      crossed the 15s test timeout, which read as flakiness and is not — it is
+      deterministic slowness sitting just under the threshold.
+
+      The assertion is unchanged: the tile's contract IS its aria-label.
+    */
+    const tile = document.querySelector<HTMLElement>('button[aria-label^="Insert "]');
+    expect(tile).not.toBeNull();
+    fireEvent.click(tile!);
     expect(onPick).toHaveBeenCalledTimes(1);
     expect(onClose).toHaveBeenCalledTimes(1);
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEYS.RECENT_ICONS) ?? "[]");
