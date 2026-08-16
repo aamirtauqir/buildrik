@@ -249,3 +249,45 @@ describe("PublishTab — which whole-body state wins", () => {
     expect(screen.queryByText("Since last deploy")).toBeNull();
   });
 });
+
+/*
+  SINCE LAST DEPLOY's empty state wore one sentence for two different facts.
+  With no deploy to measure from, "Nothing has changed since the last deploy."
+  is false, and it reads as an all-clear two lines above LAST DEPLOY saying
+  "This site has never been published." — the panel contradicting itself on the
+  path where a user decides whether to publish at all. Seen live on a site with
+  no deploys and an untouched undo stack, which is every unpublished site the
+  moment it opens.
+*/
+describe("PublishTab — the zero-changes sentence tells the truth", () => {
+  it("says the site is going live for the first time when nothing was ever deployed", async () => {
+    fetchPublishHistory.mockResolvedValue([]);
+    renderTab(<PublishTab composer={composerWith([])} projectId="site_1" onVercelPublish={vi.fn()} />);
+
+    await waitFor(() =>
+      expect(screen.getByText("Publishing will put the whole site live for the first time.")).toBeInTheDocument(),
+    );
+    expect(screen.queryByText("Nothing has changed since the last deploy.")).toBeNull();
+    // The two sections must agree.
+    expect(screen.getByText("This site has never been published.")).toBeInTheDocument();
+  });
+
+  it("keeps the original sentence once a deploy exists", async () => {
+    fetchPublishHistory.mockResolvedValue([
+      {
+        id: "j1",
+        version: 4,
+        completedAt: new Date("2026-08-14T10:00:00Z"),
+        deploymentId: "d",
+        rollbackable: true,
+        rolledBackFrom: null,
+      },
+    ]);
+    renderTab(<PublishTab composer={composerWith([])} projectId="site_1" onVercelPublish={vi.fn()} />);
+
+    await waitFor(() =>
+      expect(screen.getByText("Nothing has changed since the last deploy.")).toBeInTheDocument(),
+    );
+    expect(screen.queryByText("Publishing will put the whole site live for the first time.")).toBeNull();
+  });
+});

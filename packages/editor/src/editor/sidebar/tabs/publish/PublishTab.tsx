@@ -465,7 +465,23 @@ export const PublishTab: React.FC<PublishTabProps> = ({
             </div>
           ))}
           {snapshot.changeCount === 0 && (
-            <p className={META}>Nothing has changed since the last deploy.</p>
+            /*
+              Two different facts wore one sentence. With no deploy to measure
+              from, "Nothing has changed since the last deploy." is false — and
+              it reads as an all-clear two lines above LAST DEPLOY saying "This
+              site has never been published." The panel contradicted itself and
+              the reassuring half was the wrong one, on the path where a user
+              decides whether to publish at all.
+
+              `lastDeploy` is already null in that case, so the discriminator
+              needs no new state. The never-published line states what the
+              section claims to state — what would go out if you published now.
+            */
+            <p className={META}>
+              {snapshot.lastDeploy
+                ? "Nothing has changed since the last deploy."
+                : "Publishing will put the whole site live for the first time."}
+            </p>
           )}
           </>
           )}
@@ -518,8 +534,17 @@ export const PublishTab: React.FC<PublishTabProps> = ({
         {/* P1: published-version history + rollback (contract §5). Inside the
             reachable branch: with the deploy service down, board 781:4489 is
             the whole panel — a second "couldn't load" list under the first
-            message says the same failure twice. */}
-        {siteId && (
+            message says the same failure twice.
+
+            The same argument the line above makes for the error state applies
+            to loading, and it was only half-applied: while the three sections
+            overhead are showing skeletons, this rendered a Spinner captioned
+            "Loading versions…" beneath them — two idioms for one wait, and the
+            spinner is the one this panel deliberately rejected (see
+            SkeletonRows: "a column of identical bars reads as a rendered UI
+            that has gone wrong rather than one still arriving"). Board
+            778:4238 draws skeletons above and empty space here. */}
+        {siteId && !snapshot.loading && (
           <section className={SECTION}>
             <PublishHistory siteId={siteId} onRollbackStarted={() => publishJob?.reset?.()} />
           </section>
