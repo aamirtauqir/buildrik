@@ -10,12 +10,22 @@
  */
 
 export type RelativeTimeFormat = "short" | "long";
-export type RelativeTimeFallback = "date" | "time" | "days";
+export type RelativeTimeFallback = "date" | "time" | "days" | "daysShort";
 
 export interface RelativeTimeOptions {
   /** "Nm ago" (default) vs "N min ago" / "N hours ago". */
   format?: RelativeTimeFormat;
-  /** What to show once timestamp is older than 24h. */
+  /**
+   * What to show once the timestamp is older than 24h. "days" is the long
+   * form ("2 days ago"); "daysShort" is "2d ago".
+   *
+   * They are separate values rather than `format` because `format` also
+   * governs the minute and hour branches, and the three existing "days"
+   * callers (StudioHeader, NotificationPanel, SaveStatus) want short minutes
+   * AND long days — "Saved · 2m ago" under an hour, "Saved · 2 days ago" over
+   * a day. Routing this through `format` flipped their minutes too and broke
+   * three tests that were right.
+   */
   fallback?: RelativeTimeFallback;
   /** Show "Ns ago" for sub-minute diffs. Default: collapse to justNowLabel. */
   showSeconds?: boolean;
@@ -57,6 +67,11 @@ export function formatRelativeTime(
         hour: "2-digit",
         minute: "2-digit",
       });
+    case "daysShort":
+      // Media's versions board (146:32) draws "2d ago" in a 320 panel whose
+      // row already carries a size delta and a ⋯. Before this existed the
+      // rows fell through to `date` and printed "8/15/2026".
+      return `${days}d ago`;
     case "days":
       return `${days} day${days === 1 ? "" : "s"} ago`;
     case "date":

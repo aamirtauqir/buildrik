@@ -452,7 +452,7 @@ export function AssetDetailOverlay({
                 <div className="tw:flex tw:h-14 tw:w-full tw:items-start hover:tw:bg-[var(--bk-bg-subtle)]" role="listitem">
                   <span className="tw:mt-4 tw:ml-5 tw:size-2 tw:shrink-0 tw:rounded-full tw:bg-gray-300" aria-hidden="true" />
                   <span className="tw:ml-3 tw:mt-2.5 tw:min-w-0 tw:flex-1 tw:text-[13px] tw:leading-5 tw:text-gray-900">
-                    {formatRelativeTime(ts)}
+                    {formatRelativeTime(ts, { fallback: "daysShort" })}
                   </span>
                   <span className="tw:mt-2.5 tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:font-medium tw:tracking-[0.5px] tw:text-gray-500">
                     {meta}
@@ -462,7 +462,7 @@ export function AssetDetailOverlay({
                     color="light"
                     size="xs"
                     className="tw:mx-3 tw:mt-1.5 tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-1 tw:text-[13px] tw:text-gray-500 tw:enabled:hover:bg-transparent tw:enabled:hover:text-gray-900"
-                    aria-label={`Restore options for version from ${formatRelativeTime(ts)}`}
+                    aria-label={`Restore options for version from ${formatRelativeTime(ts, { fallback: "daysShort" })}`}
                     disabled={restoringId !== null}
                     onClick={() => setPendingRestore(pendingRestore === v.id ? null : v.id)}
                   >
