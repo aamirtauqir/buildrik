@@ -343,18 +343,37 @@ export function scanAntiPatterns(root) {
         });
       }
     }
-    for (const decl of sf.getExportedDeclarations()) {
-      const [name] = decl;
+    // Generated files are rewritten wholesale by their generator; an unused
+    // export there is the generator's business, and hand-editing them is a
+    // build failure (gate:tokens-generated).
+    if (filePath.includes('.generated.')) continue;
+
+    for (const [name, decls] of sf.getExportedDeclarations()) {
       if (!name || name === 'default') continue;
-      if (!reachableNames.has(name)) {
-        violations.push({
-          path: filePath,
-          line: 1,
-          severity: 'minor',
-          message: `Dead export "${name}" — not imported anywhere`,
-          suggestion: 'Delete unused export; rely on git history if needed later.',
-        });
-      }
+      if (reachableNames.has(name)) continue;
+
+      /*
+        Types are NOT reported. `export interface FooProps` sitting next to
+        `export const Foo: React.FC<FooProps>` is idiomatic TypeScript — the
+        props type is a component's public contract whether or not another
+        file imports it today, and this check's own advice ("delete unused
+        export") is wrong for it. 407 of the 509 hits were exactly that shape,
+        and burying 84 real dead values under 407 false ones is why this
+        category sat outside the gate for months instead of being drained.
+      */
+      const isTypeOnly = decls.every((d) => {
+        const k = d.getKindName();
+        return k === 'InterfaceDeclaration' || k === 'TypeAliasDeclaration';
+      });
+      if (isTypeOnly) continue;
+
+      violations.push({
+        path: filePath,
+        line: decls[0]?.getStartLineNumber() ?? 1,
+        severity: 'minor',
+        message: `Dead export "${name}" — not imported anywhere`,
+        suggestion: 'Delete unused export; rely on git history if needed later.',
+      });
     }
   }
   return { category: 'antiPatterns', violations };

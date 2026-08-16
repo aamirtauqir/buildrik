@@ -22,5 +22,933 @@
         "suggestion": "Consolidate to single tier CSS file or document layered override."
       }
     ]
+  },
+  {
+    "category": "homeContractViolations",
+    "violations": []
+  },
+  {
+    "category": "antiPatterns",
+    "violations": [
+      {
+        "path": "src/services/cmsSync.ts",
+        "line": 40,
+        "severity": "minor",
+        "message": "Pass-through wrapper \"onCmsSyncError\" — body is single return queue.onError(...sameArgs)",
+        "suggestion": "Inline at call sites; delete wrapper."
+      },
+      {
+        "path": "src/services/cmsSync.ts",
+        "line": 45,
+        "severity": "minor",
+        "message": "Pass-through wrapper \"getCmsSyncPendingCount\" — body is single return queue.pendingCount(...sameArgs)",
+        "suggestion": "Inline at call sites; delete wrapper."
+      },
+      {
+        "path": "src/services/cmsSync.ts",
+        "line": 54,
+        "severity": "minor",
+        "message": "Pass-through wrapper \"retryCmsSync\" — body is single return queue.retry(...sameArgs)",
+        "suggestion": "Inline at call sites; delete wrapper."
+      },
+      {
+        "path": "src/services/componentSync.ts",
+        "line": 31,
+        "severity": "minor",
+        "message": "Pass-through wrapper \"onComponentSyncError\" — body is single return queue.onError(...sameArgs)",
+        "suggestion": "Inline at call sites; delete wrapper."
+      },
+      {
+        "path": "src/services/componentSync.ts",
+        "line": 36,
+        "severity": "minor",
+        "message": "Pass-through wrapper \"getComponentSyncPendingCount\" — body is single return queue.pendingCount(...sameArgs)",
+        "suggestion": "Inline at call sites; delete wrapper."
+      },
+      {
+        "path": "src/services/componentSync.ts",
+        "line": 41,
+        "severity": "minor",
+        "message": "Pass-through wrapper \"retryComponentSync\" — body is single return queue.retry(...sameArgs)",
+        "suggestion": "Inline at call sites; delete wrapper."
+      },
+      {
+        "path": "src/services/RoleService.ts",
+        "line": 44,
+        "severity": "minor",
+        "message": "Dead export \"__resetRoleCache\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/services/templateSync.ts",
+        "line": 29,
+        "severity": "minor",
+        "message": "Pass-through wrapper \"onTemplateSyncError\" — body is single return queue.onError(...sameArgs)",
+        "suggestion": "Inline at call sites; delete wrapper."
+      },
+      {
+        "path": "src/services/templateSync.ts",
+        "line": 34,
+        "severity": "minor",
+        "message": "Pass-through wrapper \"getTemplateSyncPendingCount\" — body is single return queue.pendingCount(...sameArgs)",
+        "suggestion": "Inline at call sites; delete wrapper."
+      },
+      {
+        "path": "src/services/templateSync.ts",
+        "line": 39,
+        "severity": "minor",
+        "message": "Pass-through wrapper \"retryTemplateSync\" — body is single return queue.retry(...sameArgs)",
+        "suggestion": "Inline at call sites; delete wrapper."
+      },
+      {
+        "path": "src/services/versionSync.ts",
+        "line": 33,
+        "severity": "minor",
+        "message": "Pass-through wrapper \"onVersionSyncError\" — body is single return queue.onError(...sameArgs)",
+        "suggestion": "Inline at call sites; delete wrapper."
+      },
+      {
+        "path": "src/services/versionSync.ts",
+        "line": 38,
+        "severity": "minor",
+        "message": "Pass-through wrapper \"getVersionSyncPendingCount\" — body is single return queue.pendingCount(...sameArgs)",
+        "suggestion": "Inline at call sites; delete wrapper."
+      },
+      {
+        "path": "src/services/versionSync.ts",
+        "line": 43,
+        "severity": "minor",
+        "message": "Pass-through wrapper \"retryVersionSync\" — body is single return queue.retry(...sameArgs)",
+        "suggestion": "Inline at call sites; delete wrapper."
+      },
+      {
+        "path": "src/editor/collaboration/index.ts",
+        "line": 59,
+        "severity": "minor",
+        "message": "Dead export \"PresenceAvatars\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/design-system/constants.ts",
+        "line": 8,
+        "severity": "minor",
+        "message": "Dead export \"TOKEN_CATEGORIES\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/design-system/types.ts",
+        "line": 43,
+        "severity": "minor",
+        "message": "Dead export \"CATEGORY_CHIPS\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/media/LibraryManager.tsx",
+        "line": 63,
+        "severity": "minor",
+        "message": "Dead export \"LibraryManager\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/rail/tabsConfig.ts",
+        "line": 301,
+        "severity": "minor",
+        "message": "Pass-through wrapper \"getTabConfig\" — body is single return TAB_CONFIG_MAP.get(...sameArgs)",
+        "suggestion": "Inline at call sites; delete wrapper."
+      },
+      {
+        "path": "src/editor/shared/elementIcons.tsx",
+        "line": 89,
+        "severity": "minor",
+        "message": "Dead export \"elementIcons\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/shell/regionCycle.ts",
+        "line": 40,
+        "severity": "minor",
+        "message": "Dead export \"focusRegion\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/shell/regionCycle.ts",
+        "line": 51,
+        "severity": "minor",
+        "message": "Dead export \"activeRegionIndex\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/shell/regionCycle.ts",
+        "line": 12,
+        "severity": "minor",
+        "message": "Dead export \"REGION_SELECTORS\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/sidebar/useSidebarState.ts",
+        "line": 52,
+        "severity": "minor",
+        "message": "Dead export \"useSidebarState\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/engine/cms/index.ts",
+        "line": 7,
+        "severity": "minor",
+        "message": "Dead export \"CollectionStorage\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/engine/components/ComponentStorage.ts",
+        "line": 185,
+        "severity": "minor",
+        "message": "Dead export \"deleteAllComponents\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/services/ai/AIErrors.ts",
+        "line": 28,
+        "severity": "minor",
+        "message": "Dead export \"ERROR_SUGGESTIONS\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/constants/breakpoints.ts",
+        "line": 100,
+        "severity": "minor",
+        "message": "Dead export \"DEVICE_BREAKPOINTS\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/constants/canvas.ts",
+        "line": 19,
+        "severity": "minor",
+        "message": "Dead export \"BRAND_ACCENT\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/constants/canvas.ts",
+        "line": 61,
+        "severity": "minor",
+        "message": "Dead export \"CANVAS_SURFACE\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/constants/canvas.ts",
+        "line": 79,
+        "severity": "minor",
+        "message": "Dead export \"CANVAS_TEXT\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/constants/canvas.ts",
+        "line": 153,
+        "severity": "minor",
+        "message": "Dead export \"ANIMATION\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/constants/layout.ts",
+        "line": 21,
+        "severity": "minor",
+        "message": "Dead export \"RAIL_W\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/constants/layout.ts",
+        "line": 35,
+        "severity": "minor",
+        "message": "Dead export \"INSPECTOR_W\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/constants/layout.ts",
+        "line": 47,
+        "severity": "minor",
+        "message": "Dead export \"TOPBAR_H\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/constants/layout.ts",
+        "line": 50,
+        "severity": "minor",
+        "message": "Dead export \"HEADER_H\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/constants/layout.ts",
+        "line": 53,
+        "severity": "minor",
+        "message": "Dead export \"TOOLBAR_H\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/constants/layout.ts",
+        "line": 57,
+        "severity": "minor",
+        "message": "Dead export \"FOOTER_H\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/constants/layout.ts",
+        "line": 64,
+        "severity": "minor",
+        "message": "Dead export \"ROW_SM\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/constants/layout.ts",
+        "line": 67,
+        "severity": "minor",
+        "message": "Dead export \"ROW_MD\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/constants/media.ts",
+        "line": 148,
+        "severity": "minor",
+        "message": "Dead export \"SUPPORTED_FORMATS_LABEL\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/constants/storage.ts",
+        "line": 13,
+        "severity": "minor",
+        "message": "Dead export \"getStorageItem\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/constants/storage.ts",
+        "line": 25,
+        "severity": "minor",
+        "message": "Dead export \"setStorageItem\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/constants/storage.ts",
+        "line": 36,
+        "severity": "minor",
+        "message": "Dead export \"removeStorageItem\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/schemas/project.ts",
+        "line": 3,
+        "severity": "minor",
+        "message": "Dead export \"ElementDataSchema\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/schemas/project.ts",
+        "line": 21,
+        "severity": "minor",
+        "message": "Dead export \"PageDataSchema\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/types/plugins.ts",
+        "line": 139,
+        "severity": "minor",
+        "message": "Dead export \"PluginError\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/utils/errorTracking.ts",
+        "line": 32,
+        "severity": "minor",
+        "message": "Dead export \"initErrorTracking\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/utils/errorTracking.ts",
+        "line": 73,
+        "severity": "minor",
+        "message": "Dead export \"setUser\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/utils/index.ts",
+        "line": 36,
+        "severity": "minor",
+        "message": "Dead export \"parseHTMLToNodes\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/utils/openai.ts",
+        "line": 118,
+        "severity": "minor",
+        "message": "Dead export \"generateContentVariations\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/utils/openai.ts",
+        "line": 135,
+        "severity": "minor",
+        "message": "Dead export \"generateLayout\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/utils/openai.ts",
+        "line": 150,
+        "severity": "minor",
+        "message": "Dead export \"generateImagePrompt\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/utils/openai.ts",
+        "line": 162,
+        "severity": "minor",
+        "message": "Dead export \"generateCode\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/utils/openai.ts",
+        "line": 181,
+        "severity": "minor",
+        "message": "Dead export \"improveContent\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/utils/openai.ts",
+        "line": 199,
+        "severity": "minor",
+        "message": "Dead export \"translateContent\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/utils/openai.ts",
+        "line": 217,
+        "severity": "minor",
+        "message": "Dead export \"summarizeContent\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/utils/openai.ts",
+        "line": 237,
+        "severity": "minor",
+        "message": "Dead export \"generateSEO\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/utils/openai.ts",
+        "line": 259,
+        "severity": "minor",
+        "message": "Dead export \"streamContent\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/utils/openai.ts",
+        "line": 292,
+        "severity": "minor",
+        "message": "Dead export \"batchRequests\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/utils/sidebarAnalytics.ts",
+        "line": 26,
+        "severity": "minor",
+        "message": "Dead export \"setSidebarAnalyticsProvider\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/utils/storageMigration.ts",
+        "line": 199,
+        "severity": "minor",
+        "message": "Dead export \"getNewKeyName\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/utils/storageMigration.ts",
+        "line": 206,
+        "severity": "minor",
+        "message": "Dead export \"isLegacyKey\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/canvas/__tests__/testHarness.ts",
+        "line": 61,
+        "severity": "minor",
+        "message": "Dead export \"stubRect\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/canvas/__tests__/testHarness.ts",
+        "line": 87,
+        "severity": "minor",
+        "message": "Dead export \"makeCanvas\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/canvas/__tests__/testHarness.ts",
+        "line": 96,
+        "severity": "minor",
+        "message": "Dead export \"makeCanvasRef\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/canvas/__tests__/testHarness.ts",
+        "line": 103,
+        "severity": "minor",
+        "message": "Dead export \"makeDomElement\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/canvas/__tests__/testHarness.ts",
+        "line": 27,
+        "severity": "minor",
+        "message": "Dead export \"TestDataTransfer\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/canvas/controls/CommandPalette.tsx",
+        "line": 83,
+        "severity": "minor",
+        "message": "Dead export \"useCommandPalette\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/components-catalog/ui/UserSavedSection.tsx",
+        "line": 41,
+        "severity": "minor",
+        "message": "Dead export \"UserSavedSection\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/design-system/state/useApplyStarter.ts",
+        "line": 22,
+        "severity": "minor",
+        "message": "Dead export \"starterSeenKey\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/design-system/state/useApplyStarter.ts",
+        "line": 30,
+        "severity": "minor",
+        "message": "Dead export \"markStarterSeen\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/design-system/ui/ExportDropdown.tsx",
+        "line": 16,
+        "severity": "minor",
+        "message": "Dead export \"ExportDropdown\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/inspector/shared/tokenBindingDetection.ts",
+        "line": 21,
+        "severity": "minor",
+        "message": "Pass-through wrapper \"isTokenVar\" — body is single return TOKEN_VAR_PATTERN.test(...sameArgs)",
+        "suggestion": "Inline at call sites; delete wrapper."
+      },
+      {
+        "path": "src/editor/panels/layers/types.ts",
+        "line": 94,
+        "severity": "minor",
+        "message": "Dead export \"DEFAULT_DISPLAY_PREFS\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/panels/version-history/VersionList.tsx",
+        "line": 59,
+        "severity": "minor",
+        "message": "Dead export \"getDateGroup\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/shell/hooks/useDeviceZoom.ts",
+        "line": 22,
+        "severity": "minor",
+        "message": "Dead export \"useDeviceZoom\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/shell/hooks/useSaveState.ts",
+        "line": 31,
+        "severity": "minor",
+        "message": "Dead export \"useSaveState\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/sidebar/tabs/componentsData.ts",
+        "line": 22,
+        "severity": "minor",
+        "message": "Dead export \"FILTER_CHIPS\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/engine/cms/__tests__/inMemoryCollectionStorage.ts",
+        "line": 15,
+        "severity": "minor",
+        "message": "Dead export \"createInMemoryCollectionStorage\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/utils/dragDrop/animations.ts",
+        "line": 100,
+        "severity": "minor",
+        "message": "Dead export \"flashOnDrop\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/utils/dragDrop/animations.ts",
+        "line": 139,
+        "severity": "minor",
+        "message": "Dead export \"settleElement\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/utils/dragDrop/autoScroll.ts",
+        "line": 128,
+        "severity": "minor",
+        "message": "Dead export \"stopAllAutoScrolls\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/utils/dragDrop/autoScroll.ts",
+        "line": 140,
+        "severity": "minor",
+        "message": "Dead export \"updateAutoScroll\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/utils/nesting/index.ts",
+        "line": 206,
+        "severity": "minor",
+        "message": "Dead export \"nestingRules\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/shared/utils/nesting/typeChecks.ts",
+        "line": 23,
+        "severity": "minor",
+        "message": "Pass-through wrapper \"isInteractiveType\" — body is single return INTERACTIVE_ELEMENTS.has(...sameArgs)",
+        "suggestion": "Inline at call sites; delete wrapper."
+      },
+      {
+        "path": "src/shared/utils/nesting/typeChecks.ts",
+        "line": 62,
+        "severity": "minor",
+        "message": "Pass-through wrapper \"isLandmarkType\" — body is single return LANDMARK_ELEMENTS.has(...sameArgs)",
+        "suggestion": "Inline at call sites; delete wrapper."
+      },
+      {
+        "path": "src/shared/utils/nesting/typeChecks.ts",
+        "line": 141,
+        "severity": "minor",
+        "message": "Pass-through wrapper \"canHaveChildren\" — body is single return CAN_HAVE_CHILDREN_SET.has(...sameArgs)",
+        "suggestion": "Inline at call sites; delete wrapper."
+      },
+      {
+        "path": "src/editor/inspector/sections/flexbox/controls.tsx",
+        "line": 121,
+        "severity": "minor",
+        "message": "Dead export \"GapSlider\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/inspector/sections/layout/classes.ts",
+        "line": 37,
+        "severity": "minor",
+        "message": "Dead export \"TIP_BOX\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/sidebar/tabs/ai/applySetStyle.ts",
+        "line": 435,
+        "severity": "minor",
+        "message": "Dead export \"applyInsertComponent\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/sidebar/tabs/ai/applySetStyle.ts",
+        "line": 481,
+        "severity": "minor",
+        "message": "Dead export \"applySaveAsComponent\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/sidebar/tabs/ai/applySetStyle.ts",
+        "line": 523,
+        "severity": "minor",
+        "message": "Dead export \"applySetPageSetting\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/sidebar/tabs/ai/applySetStyle.ts",
+        "line": 553,
+        "severity": "minor",
+        "message": "Dead export \"applySetToken\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/sidebar/tabs/ai/applySetStyle.ts",
+        "line": 141,
+        "severity": "minor",
+        "message": "Dead export \"setTextArgsSchema\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/sidebar/tabs/ai/applySetStyle.ts",
+        "line": 177,
+        "severity": "minor",
+        "message": "Dead export \"addElementArgsSchema\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/sidebar/tabs/ai/applySetStyle.ts",
+        "line": 230,
+        "severity": "minor",
+        "message": "Dead export \"addSectionArgsSchema\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/sidebar/tabs/ai/applySetStyle.ts",
+        "line": 269,
+        "severity": "minor",
+        "message": "Dead export \"elementRefArgsSchema\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/sidebar/tabs/ai/applySetStyle.ts",
+        "line": 287,
+        "severity": "minor",
+        "message": "Dead export \"moveElementArgsSchema\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/sidebar/tabs/ai/applySetStyle.ts",
+        "line": 418,
+        "severity": "minor",
+        "message": "Dead export \"insertComponentArgsSchema\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/sidebar/tabs/pages/PagesTab.tsx",
+        "line": 40,
+        "severity": "minor",
+        "message": "Dead export \"PagesTab\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/sidebar/tabs/publish/PublishConfirmFacts.tsx",
+        "line": 26,
+        "severity": "minor",
+        "message": "Dead export \"approvalLine\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/sidebar/tabs/publish/usePublishSnapshot.ts",
+        "line": 64,
+        "severity": "minor",
+        "message": "Dead export \"deployStamp\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/sidebar/tabs/build/catalog/catalog.ts",
+        "line": 495,
+        "severity": "minor",
+        "message": "Dead export \"flatCatalogByCatId\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/sidebar/tabs/build/components/SvgIcon.tsx",
+        "line": 35,
+        "severity": "minor",
+        "message": "Dead export \"SvgIcon\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/sidebar/tabs/media/data/mediaData.ts",
+        "line": 17,
+        "severity": "minor",
+        "message": "Dead export \"TYPE_PILLS\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/sidebar/tabs/media/data/mediaData.ts",
+        "line": 46,
+        "severity": "minor",
+        "message": "Dead export \"GRID_OPTIONS\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/sidebar/tabs/media/data/mediaData.ts",
+        "line": 54,
+        "severity": "minor",
+        "message": "Dead export \"MEDIA_TIP_TEXT\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/sidebar/tabs/media/data/mediaData.ts",
+        "line": 89,
+        "severity": "minor",
+        "message": "Dead export \"DISC_SECTION_LABELS\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/sidebar/tabs/media/data/mediaUtils.ts",
+        "line": 41,
+        "severity": "minor",
+        "message": "Dead export \"assetTypeToFilter\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/sidebar/tabs/media/hooks/useUsageMap.ts",
+        "line": 53,
+        "severity": "minor",
+        "message": "Dead export \"useUsageMap\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/sidebar/tabs/pages/components/PagesStateBlocks.tsx",
+        "line": 28,
+        "severity": "minor",
+        "message": "Dead export \"PagesLoadingSkeleton\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/sidebar/tabs/settings/styles/index.ts",
+        "line": 14,
+        "severity": "minor",
+        "message": "Dead export \"screenStyles\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/sidebar/tabs/settings/styles/index.ts",
+        "line": 22,
+        "severity": "minor",
+        "message": "Dead export \"exportOptionsStyles\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/sidebar/tabs/settings/styles/index.ts",
+        "line": 29,
+        "severity": "minor",
+        "message": "Dead export \"exportOptionStyles\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/sidebar/tabs/settings/styles/index.ts",
+        "line": 46,
+        "severity": "minor",
+        "message": "Dead export \"activeExportOptionStyles\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/sidebar/tabs/settings/styles/index.ts",
+        "line": 53,
+        "severity": "minor",
+        "message": "Dead export \"noteStyles\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/sidebar/tabs/media/__tests__/test-utils/mockMediaState.ts",
+        "line": 35,
+        "severity": "minor",
+        "message": "Dead export \"mockMediaState\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
+        "path": "src/editor/sidebar/tabs/media/__tests__/test-utils/renderMediaTab.tsx",
+        "line": 12,
+        "severity": "minor",
+        "message": "Dead export \"renderMediaTab\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      }
+    ]
+  },
+  {
+    "category": "legacyResiduals",
+    "violations": [
+      {
+        "path": "src/themes/legacy-components.css",
+        "line": 17,
+        "severity": "minor",
+        "message": ".buildrick-canvas at line 17 — needs annotation",
+        "suggestion": "Add /* keep: <reason> */ annotation or relocate to tier CSS."
+      },
+      {
+        "path": "src/themes/legacy-components.css",
+        "line": 27,
+        "severity": "minor",
+        "message": ".buildrick-viewport-frame at line 27 — needs annotation",
+        "suggestion": "Add /* keep: <reason> */ annotation or relocate to tier CSS."
+      },
+      {
+        "path": "src/themes/legacy-components.css",
+        "line": 30,
+        "severity": "minor",
+        "message": ".tbOfflineTooltip at line 30 — needs annotation",
+        "suggestion": "Add /* keep: <reason> */ annotation or relocate to tier CSS."
+      },
+      {
+        "path": "src/themes/legacy-components.css",
+        "line": 46,
+        "severity": "minor",
+        "message": "input[type=\"range\"]::-webkit-slider-thumb, input[type=\"range\"]::-moz-range-thumb at line 46 — needs annotation",
+        "suggestion": "Add /* keep: <reason> */ annotation or relocate to tier CSS."
+      },
+      {
+        "path": "src/themes/legacy-components.css",
+        "line": 55,
+        "severity": "minor",
+        "message": "input[type=\"color\"] at line 55 — needs annotation",
+        "suggestion": "Add /* keep: <reason> */ annotation or relocate to tier CSS."
+      },
+      {
+        "path": "src/themes/legacy-components.css",
+        "line": 57,
+        "severity": "minor",
+        "message": "input[type=\"color\"]::-webkit-color-swatch-wrapper at line 57 — needs annotation",
+        "suggestion": "Add /* keep: <reason> */ annotation or relocate to tier CSS."
+      },
+      {
+        "path": "src/themes/legacy-components.css",
+        "line": 59,
+        "severity": "minor",
+        "message": "input[type=\"color\"]::-webkit-color-swatch at line 59 — needs annotation",
+        "suggestion": "Add /* keep: <reason> */ annotation or relocate to tier CSS."
+      },
+      {
+        "path": "src/themes/legacy-components.css",
+        "line": 62,
+        "severity": "minor",
+        "message": ".bd-dragging, .bd-dragging * at line 62 — needs annotation",
+        "suggestion": "Add /* keep: <reason> */ annotation or relocate to tier CSS."
+      },
+      {
+        "path": "src/themes/legacy-components.css",
+        "line": 64,
+        "severity": "minor",
+        "message": ".bd-dragging at line 64 — needs annotation",
+        "suggestion": "Add /* keep: <reason> */ annotation or relocate to tier CSS."
+      },
+      {
+        "path": "src/themes/legacy-components.css",
+        "line": 67,
+        "severity": "minor",
+        "message": "[data-buildrick-id][data-selected=\"true\"] at line 67 — needs annotation",
+        "suggestion": "Add /* keep: <reason> */ annotation or relocate to tier CSS."
+      },
+      {
+        "path": "src/themes/legacy-components.css",
+        "line": 72,
+        "severity": "minor",
+        "message": "[data-buildrick-id]:hover:not([data-selected=\"true\"]) at line 72 — needs annotation",
+        "suggestion": "Add /* keep: <reason> */ annotation or relocate to tier CSS."
+      },
+      {
+        "path": "src/themes/legacy-components.css",
+        "line": 78,
+        "severity": "minor",
+        "message": "input:disabled, select:disabled, textarea:disabled at line 78 — needs annotation",
+        "suggestion": "Add /* keep: <reason> */ annotation or relocate to tier CSS."
+      }
+    ]
+  },
+  {
+    "category": "docDrift",
+    "violations": []
   }
 ]

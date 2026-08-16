@@ -13,9 +13,21 @@ const ERROR_MODE_CATEGORIES = new Set([
   'tokenAliasSSOT',
 ]);
 
+/*
+  All eight categories, not `--category=1,2,3,4`.
+
+  Categories 5-8 (homeContractViolations, antiPatterns, legacyResiduals,
+  docDrift) had never run in CI. The one that matters is 6 — the dead-export
+  check. It works: planting `export const PROBE = 42` that nobody imports made
+  the scanner report it and this gate still printed "[ok] DS SSOT gate green",
+  because the gate never asked for category 6. Every unreachable affordance
+  found by hand in the 2026-08-16 sweep — a header button that never rendered,
+  a canvas gear with no consumer, a template retry for a failure that cannot
+  happen — sat in a category CI did not run.
+*/
 let scannerOut;
 try {
-  scannerOut = execFileSync('node', [SCANNER, '--json', '--category=1,2,3,4'], {
+  scannerOut = execFileSync('node', [SCANNER, '--json', '--category=1,2,3,4,5,6,7,8'], {
     cwd: ROOT, encoding: 'utf8',
   });
 } catch (e) {

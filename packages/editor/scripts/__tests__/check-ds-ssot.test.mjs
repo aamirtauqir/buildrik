@@ -90,12 +90,46 @@ describe('check-ds-ssot gate', () => {
     expect(result).toContain('[ok]');
   });
 
-  it('preserves baseline JSON shape on rewrite', () => {
+  /*
+    Names every category instead of counting them. The gate ran
+    `--category=1,2,3,4` for months, so categories 5-8 — including the
+    dead-export check — never executed in CI, and the old form of this test
+    (`toHaveLength(4)`) asserted that broken state was correct. Listing the
+    categories means a future narrowing of the `--category=` argument fails
+    here by name rather than passing quietly.
+  */
+  it('scans and baselines all eight categories, by name', () => {
     const dir = makeRepo({ baseline: EMPTY_BASELINE, files: {} });
     execFileSync('node', ['scripts/check-ds-ssot.mjs'], { cwd: dir });
     const baseline = JSON.parse(readFileSync(join(dir, 'scripts/baselines/ssot.json'), 'utf8'));
-    expect(baseline).toHaveLength(4);
+    expect(baseline.map((c) => c.category)).toEqual([
+      'componentDuplicates',
+      'keyframeDuplicates',
+      'tokenAliasSSOT',
+      'selectorDuplicates',
+      'homeContractViolations',
+      'antiPatterns',
+      'legacyResiduals',
+      'docDrift',
+    ]);
     expect(baseline.every((c) => 'category' in c && 'violations' in c)).toBe(true);
+  });
+
+  it('fails on a dead runtime export but not on a dead type export', () => {
+    const withValue = makeRepo({
+      baseline: EMPTY_BASELINE,
+      files: { 'src/probe.ts': 'export const NOBODY_IMPORTS_THIS = 42;' },
+    });
+    expect(() => execFileSync('node', ['scripts/check-ds-ssot.mjs'], { cwd: withValue })).toThrow();
+
+    // A props interface exported beside its component is idiomatic TypeScript,
+    // not dead code — 407 of 509 hits were that shape, which is why this
+    // category was never enforceable until it stopped reporting them.
+    const withType = makeRepo({
+      baseline: EMPTY_BASELINE,
+      files: { 'src/probe.ts': 'export interface NobodyImportsThisProps { a: string }' },
+    });
+    expect(() => execFileSync('node', ['scripts/check-ds-ssot.mjs'], { cwd: withType })).not.toThrow();
   });
 
   it('ERROR mode: locks cleared category at zero, fails any new violation', () => {
