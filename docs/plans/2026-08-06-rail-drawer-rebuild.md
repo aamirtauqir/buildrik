@@ -2480,3 +2480,41 @@ once**, and beginner mode (semantics only) shows one while Pro shows both.
 3. **The two brand blues.** Which value is a new customer's `color-action` —
    `#3B82F6`, `#2D6DFF`, or the product's own `#1A56DB`? Customer output, so
    not mine to pick. The contradiction is a bug whichever way it goes.
+
+### 2026-08-16 (later) — the three founder calls answered and shipped
+
+**D1 · Components — one panel.** The premise of the question was half wrong.
+`ComponentsTab`, the panel every real user already gets, had *already* been
+built to board 641:2546 (rows of name · "N instances" · ›, bordered footer, one
+primary button). `ComponentsPanelV2` — filter pills, search, "+ AI" chip,
+dashed "Save current selection" — is the one that matches no board, and it only
+ever rendered on port 5050. So V2 and the flag are deleted rather than
+promoted. `CatalogSection` / `CatalogCard` / `UserSavedSection` / `DSStatusChip`
+stay: the Brand panel's own Components screen composes them. The empty state
+*was* still unconformed and is now board 1138:13394 — and it had a "Learn more"
+link whose entire onClick was `e.preventDefault()`. Its four orphaned
+`.comp-empty` rules went with it (ComponentsTab.css 108 → 76). (`7e68ee57`)
+
+**D2 · Typography — the ninth destination.** Board 153:57's screen did not
+exist. Ships as the ACTIVE FONTS list; the `.woff2` drop zone and licence
+checkbox are parked, because a drop zone that accepts a file it cannot store is
+worse than none. The weight count is measured off the element tree — nothing in
+the token model records it, and this panel's own root already follows "a count
+that is not the truth is worse than no count". (`a4fdf11f`)
+
+**D3 · One brand blue.** `#1A56DB` everywhere: `color-primary`,
+`color-brand-500` (renamed from the false `color-blue-500`) and `color-action`.
+Schema v5 is the first customer of the rename framework built in v3 and never
+used — it renames in place, repoints aliases, and **does not touch values**, so
+a site published on `#2D6DFF` stays that colour until its owner changes it. The
+export shim's `ALIAS_RETENTION` gets its first entry so pre-rename published CSS
+keeps resolving; `design.css` declares the same alias for the live canvas;
+`verify-design-baselines.mjs` learned to skip `--old: var(--new)` lines, and was
+negative-tested with a planted drift. Swept the same defect outside the editor:
+**three transactional emails had been sending the retired blue since the
+2026-07-30 accent migration**, and the AI service's set-token prompt was
+teaching the model the old hex. (`426dbe36`)
+
+Suite after all of it: 782 files / 8184 tests. `verify:ds` green except the
+styling ratchet, which was already red on entry and is now smaller
+(inline_literal −30, inline_hoisted −31, ComponentsTab.css −32 lines).
