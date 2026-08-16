@@ -390,6 +390,7 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
                     usageByTokenId={usageMap}
                     getLintIssues={getIssues}
                     isPro={isPro}
+                    hiddenByModeCount={color.tokens.length - visibleColor.length}
                     composer={composer}
                     onRowClick={onRowClick}
                   />

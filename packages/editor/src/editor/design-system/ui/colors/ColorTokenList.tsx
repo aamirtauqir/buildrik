@@ -51,6 +51,12 @@ export interface ColorTokenListProps {
   onRowClick?: (tokenId: string) => void;
   /** T5: Pro mode exposes token IDs (mono) + alias arrow chip per s02/s10. */
   isPro?: boolean;
+  /**
+   * How many colour tokens Beginner mode is hiding right now. Without it this
+   * list cannot tell an empty SEARCH from an empty MODE, and it blamed the
+   * wrong one — see the empty-state branch below.
+   */
+  hiddenByModeCount?: number;
   /** T6: composer drives resolvedMode for aggregate dark-missing chip. */
   composer?: Composer | null;
 }
@@ -189,6 +195,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
   getLintIssues,
   onRowClick,
   isPro,
+  hiddenByModeCount = 0,
   composer,
 }) => {
   const [searchQuery, setSearchQuery] = React.useState("");
@@ -383,12 +390,36 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
         </div>
       )}
 
-      {/* Empty search state */}
+      {/*
+        Two different empties, and this used to report both as the first one.
+
+        Apply a starter in Beginner mode and every colour it brings is a
+        primitive — no `semanticKind`, so `filterTokensByMode` hides all of
+        them. The screen then read `No colors match ""`: it blamed a search
+        the user had not typed, one click after telling them "Applying a
+        starter overwrites your tokens." Nothing was lost — the tokens were
+        there in Pro the whole time — but the screen said otherwise at exactly
+        the moment the user was braced to lose something.
+      */}
       {isEmpty && !isIssuesEmpty && (
-        <div className="tw:py-6 tw:text-center">
-          <div className="tw:text-xs tw:text-gray-500">
-            No colors match "{searchQuery}"
-          </div>
+        <div className="tw:py-6 tw:text-center" data-testid="color-empty">
+          {searchQuery.trim() ? (
+            <div className="tw:text-xs tw:text-gray-500">
+              No colors match "{searchQuery}"
+            </div>
+          ) : hiddenByModeCount > 0 ? (
+            <>
+              <div className="tw:text-xs tw:text-gray-500" data-testid="color-empty-mode">
+                Beginner mode is hiding {hiddenByModeCount}{" "}
+                {hiddenByModeCount === 1 ? "colour" : "colours"}.
+              </div>
+              <div className="tw:mt-1 tw:text-[11px] tw:text-gray-500">
+                They are primitives. Switch to Pro to see them.
+              </div>
+            </>
+          ) : (
+            <div className="tw:text-xs tw:text-gray-500">No colours yet.</div>
+          )}
         </div>
       )}
 
