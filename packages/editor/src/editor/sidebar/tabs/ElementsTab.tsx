@@ -53,7 +53,7 @@ const PILL_TIP =
 
 /* Category accordion header. Full-bleed row, label left, chevron right. */
 const ACCORDION_HEADER =
-  "tw:flex tw:items-center tw:justify-between tw:w-full tw:h-[28px] " +
+  "tw:flex tw:items-center tw:justify-between tw:w-full tw:h-[var(--bk-size-row-dense)] " +
   "tw:px-[var(--bk-space-8)] tw:border-0 tw:rounded-none tw:bg-transparent " +
   "tw:text-[var(--bk-ink)] tw:text-[12px] tw:font-medium " +
   "tw:[font-family:var(--bk-font-ui)] tw:text-left tw:cursor-pointer " +

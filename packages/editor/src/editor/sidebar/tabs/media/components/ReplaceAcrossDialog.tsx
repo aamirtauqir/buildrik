@@ -64,7 +64,7 @@ function buildPageRows(composer: Composer, oldSrc: string): PageRow[] {
   className is for, per chrome-ui/__tests__/className-precedence.test.tsx.
 */
 const RX_BTN =
-  "tw:h-[32px] tw:px-[var(--bk-space-12)] tw:border " +
+  "tw:h-[var(--bk-size-row)] tw:px-[var(--bk-space-12)] tw:border " +
   "tw:border-[var(--bk-border)] tw:rounded-[var(--bk-radius-md)] " +
   "tw:bg-[var(--bk-bg-card)] tw:text-[var(--bk-ink)] tw:text-[13px] " +
   "tw:leading-[18px] tw:font-normal tw:[font-family:var(--bk-font-ui)] " +

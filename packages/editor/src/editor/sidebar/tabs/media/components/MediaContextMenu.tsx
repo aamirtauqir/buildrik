@@ -54,7 +54,7 @@ const MENU_WIDTH = 180;
   flowbite Button ships text-sm/font-medium and something has to displace them.
 */
 const ITEM_BASE =
-  "tw:flex tw:items-center tw:justify-start tw:w-full tw:h-[28px] " +
+  "tw:flex tw:items-center tw:justify-start tw:w-full tw:h-[var(--bk-size-row-dense)] " +
   "tw:px-[var(--bk-space-12)] tw:border-0 tw:rounded-none tw:bg-transparent " +
   "tw:text-left tw:cursor-pointer tw:text-[13px] tw:leading-[18px] " +
   "tw:font-normal tw:[font-family:var(--bk-font-ui)] tw:text-[var(--bk-ink)]";
