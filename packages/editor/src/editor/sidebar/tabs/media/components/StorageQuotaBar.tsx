@@ -26,8 +26,17 @@ interface StorageQuotaBarProps {
   compact?: boolean;
 }
 
-/** Board copy is MB-precise under a gigabyte: "842 MB of 1 GB used". */
-function formatSize(bytes: number): string {
+/**
+ * Board copy is MB-precise under a gigabyte: "842 MB of 1 GB used".
+ *
+ * DECIMAL, not binary, and exported so there is one quota formatter rather
+ * than two. Plans are sold in decimal GB — a 5 GB plan is 5,000,000,000 bytes —
+ * so `formatBytes` (1024-based, from shared/utils/helpers/number) renders the
+ * same allowance as "4.66 GB". The fullpage library footer used it, so the
+ * drawer said "of 5 GB" and the library said "/ 4.66 GB" for one quota, which
+ * reads as the allowance shrinking when you expand the panel.
+ */
+export function formatQuotaSize(bytes: number): string {
   if (bytes < 1e9) return `${Math.round(bytes / 1e6)} MB`;
   const gb = bytes / 1e9;
   return `${gb >= 10 ? gb.toFixed(0) : gb.toFixed(1).replace(/\.0$/, "")} GB`;
@@ -66,7 +75,7 @@ export function StorageQuotaBar({ used, total, onOptimize, compact = false }: St
         data-testid="media-quota-bar"
         className={`med-quota-text tw:text-[${isExhausted ? "13px" : "11px"}] tw:leading-4 tw:tabular-nums ${tone}`}
       >
-        {formatSize(used)} of {formatSize(total)} used
+        {formatQuotaSize(used)} of {formatQuotaSize(total)} used
         {/* Board 145:250: the reason rides the number — disabled, never hidden. */}
         {isExhausted ? " — upload is off until you free space" : null}
       </div>
