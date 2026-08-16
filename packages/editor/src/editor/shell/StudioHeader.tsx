@@ -675,7 +675,10 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         <ModalRoot open onOpenChange={(o) => !o && setPubConfirm(false)}>
           <ModalContent size="question" aria-labelledby="bk-pubconfirm-title">
             <ModalTitle id="bk-pubconfirm-title">
-              Publish with {plural(errorCount, "error")}?
+              {/* Board 1168:4732 says "open errors", not "errors" — the word
+                  is doing work: these are errors the user has already been
+                  shown and left, not ones this dialog is reporting. */}
+              Publish with {errorCount} open {errorCount === 1 ? "error" : "errors"}?
             </ModalTitle>
             {/* Board 1168:4732 states the consequence, not the options — the
                 options are the two buttons. */}

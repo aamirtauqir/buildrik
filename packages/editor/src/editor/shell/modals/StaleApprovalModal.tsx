@@ -135,8 +135,15 @@ export const StaleApprovalModal: React.FC<StaleApprovalModalProps> = ({
             not a question about the client — the question is the buttons. */}
         <ModalTitle>The approval is older than your latest edits</ModalTitle>
         <p className="tw:my-2 tw:mb-3 tw:text-[13px] tw:leading-normal tw:text-[var(--bk-ink-muted)]">
-          {round?.reviewerName ?? "Your client"} approved round {round?.roundNumber ?? "—"}
-          {approvedOn(round)}
+          {/* The round is fetched separately from the block that opens this
+              modal, so it can be absent — and the fallback used to render the
+              placeholder into the prose: "Your client approved round — — the
+              changes since couldn't be itemized." A dash is a table's way of
+              saying "no value"; in a sentence it reads as a typo. Without a
+              round, state the fact the server just asserted and stop. */}
+          {round
+            ? `${round.reviewerName ?? "Your client"} approved round ${round.roundNumber}${approvedOn(round)}`
+            : "This site was approved earlier"}
           {changed == null
             ? " — comparing with the approved version…"
             : changed.length === 0

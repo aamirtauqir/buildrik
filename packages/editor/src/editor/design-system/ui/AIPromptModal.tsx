@@ -123,10 +123,10 @@ export const AIPromptModal: React.FC<AIPromptModalProps> = ({
     <ModalRoot open={open} onOpenChange={onOpenChange}>
       <ModalContent size="lg" aria-labelledby="ai-prompt-title">
         <div style={{ padding: "24px 28px", borderBottom: "1px solid var(--bk-border)" }}>
-          <ModalTitle id="ai-prompt-title" style={{ fontSize: 18, fontWeight: 600, letterSpacing: "-0.01em" }}>
+          <ModalTitle inset={false} id="ai-prompt-title" style={{ fontSize: 18, fontWeight: 600, letterSpacing: "-0.01em" }}>
             Generate component with AI
           </ModalTitle>
-          <ModalDescription style={{ fontSize: 13, color: "var(--bk-ink-muted)", marginTop: 4 }}>
+          <ModalDescription inset={false} style={{ fontSize: 13, color: "var(--bk-ink-muted)", marginTop: 4 }}>
             Describe what you want. The AI returns a structured schema bound to your design system.
           </ModalDescription>
         </div>

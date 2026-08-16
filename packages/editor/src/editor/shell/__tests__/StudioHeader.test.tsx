@@ -310,7 +310,9 @@ describe("StudioHeader", () => {
       fireEvent.click(screen.getByRole("button", { name: "Publish anyway" }));
       expect(onVercelPublish).not.toHaveBeenCalled();
       expect(screen.getByRole("dialog")).toBeTruthy();
-      expect(screen.getByText("Publish with 1 error?")).toBeTruthy();
+      // Board 1168:4732 words it "open errors" — the errors were already
+      // surfaced on the chip and left; this dialog is not reporting them anew.
+      expect(screen.getByText("Publish with 1 open error?")).toBeTruthy();
       expect(screen.getByText("Broken link — Home / CTA")).toBeTruthy();
     });
 

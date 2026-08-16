@@ -120,10 +120,39 @@ export const ModalTitle = React.forwardRef<HTMLHeadingElement, ModalTitleProps>(
   },
 );
 
-export const ModalDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
-  function ModalDescription({ className, children, ...rest }, ref) {
+/*
+  The same gap ModalTitle above was fixed for, in its sibling.
+
+  `MODAL_SUBTITLE_CLASS` is `text-xs text-gray-500` and nothing else. The
+  all-in-one `Modal` is fine — it renders that class inside MODAL_HEAD_CLASS,
+  which brings the px-5. The compound part has no wrapper, so its subtitle sat
+  at the modal's left edge while the padded title above it and the body below
+  it were both inset 20px. Measured on board 1168:4732 at 1440x900: the title
+  starts at x=520 and "These will ship to every visitor exactly as they are
+  now." starts at x=502.
+
+  Same escape hatch as ModalTitle, for the same reason: two classes on one
+  property resolve by stylesheet order, so a `tw:px-0` override could not be
+  relied on. No pr-12 here — unlike the title, the description sits below the
+  close button and does not need to clear it.
+*/
+const MODAL_DESC_INSET_CLASS = "tw:px-5";
+
+export interface ModalDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {
+  /** Set false when the caller already wraps it in its own padded header. */
+  inset?: boolean;
+}
+
+export const ModalDescription = React.forwardRef<HTMLParagraphElement, ModalDescriptionProps>(
+  function ModalDescription({ inset = true, className, children, ...rest }, ref) {
     return (
-      <p ref={ref} className={[MODAL_SUBTITLE_CLASS, className].filter(Boolean).join(" ")} {...rest}>
+      <p
+        ref={ref}
+        className={[inset ? MODAL_DESC_INSET_CLASS : "", MODAL_SUBTITLE_CLASS, className]
+          .filter(Boolean)
+          .join(" ")}
+        {...rest}
+      >
         {children}
       </p>
     );

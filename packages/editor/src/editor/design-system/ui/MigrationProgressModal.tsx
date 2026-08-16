@@ -77,7 +77,7 @@ export const MigrationProgressModal: React.FC<MigrationProgressModalProps> = ({
             {state === "failed" ? "Migration failed" : "Updating your project"}
           </ModalTitle>
           {rangeLabel && (
-            <ModalDescription className="tw:mt-1 tw:text-[11px] tw:text-gray-500">
+            <ModalDescription inset={false} className="tw:mt-1 tw:text-[11px] tw:text-gray-500">
               {rangeLabel}
             </ModalDescription>
           )}
