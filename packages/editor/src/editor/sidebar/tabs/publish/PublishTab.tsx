@@ -210,6 +210,11 @@ export const PublishTab: React.FC<PublishTabProps> = ({
      log destination — the job reports a message, not a build log — so the row
      carries the retry only rather than a link to nowhere. */
   const hasFailed = publishJob?.uiState === "failed" && !!error;
+  /* The build log behind board 784:4403's "View log". A pre-job failure never
+     reaches the worker, so there are no steps and the link stays away rather
+     than opening an empty list. */
+  const failedSteps = hasFailed && publishJob?.steps?.length ? publishJob.steps : null;
+  const [logOpen, setLogOpen] = React.useState(false);
 
   /* Board 784:4250 prints how long the run has been going. The job reports
      progress, not a start time, so the panel stamps the transition into
@@ -302,6 +307,82 @@ export const PublishTab: React.FC<PublishTabProps> = ({
     blocking.some((c) => c.label === VERCEL_CHECK_LABEL);
   const noPublishPath = !canPublish || vercelMissing;
 
+  /* Board 784:4403's failure block, hoisted to a const because it renders in
+     TWO branches: the normal panel, and the no-publish-path panel when the
+     publish failed by revoking the connection. One implementation, so the two
+     cannot say different things about the same failure. */
+  const failureSection = (
+          <section className={SECTION} aria-label="Publish failure">
+            <h2 className="tw:m-0 tw:text-[15px] tw:font-semibold tw:text-[var(--bk-error-text)]">
+              Publish failed.
+            </h2>
+            <p className={META}>
+              {error}
+              {error && !/nothing was deployed/i.test(error) ? " Nothing was deployed." : ""}
+            </p>
+            <div className="tw:mt-1 tw:flex tw:items-center tw:gap-4">
+              <Button
+                color="light"
+                size="xs"
+                onClick={() => {
+                  publishJob?.reset?.();
+                  setWizardOpen(true);
+                }}
+                className="tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[13px] tw:text-[var(--bk-accent)]"
+              >
+                Try again
+              </Button>
+              {/* Board 784:4403 draws "View log" beside "Try again". It was
+                  never built because nothing carried a log to the editor —
+                  but `getPublishStatus` has always selected the `steps`
+                  column and returned it; PublishService simply dropped it in
+                  the mapping. (Not the `log` column: that holds the raw page
+                  HTML and is deliberately never sent to a client.) So the
+                  link is disclosure, not decoration — it names the step that
+                  failed and the ones that never ran. */}
+              {failedSteps && (
+                <Button
+                  color="light"
+                  size="xs"
+                  onClick={() => setLogOpen((v) => !v)}
+                  aria-expanded={logOpen}
+                  className="tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[13px] tw:text-[var(--bk-accent)]"
+                >
+                  {logOpen ? "Hide log" : "View log"}
+                </Button>
+              )}
+            </div>
+            {failedSteps && logOpen && (
+              <ul className="tw:m-0 tw:mt-2 tw:list-none tw:p-0" aria-label="Build log">
+                {failedSteps.map((s) => (
+                  <li
+                    key={s.name}
+                    className="tw:flex tw:items-center tw:gap-2 tw:py-0.5 tw:text-[12px] tw:leading-[18px]"
+                  >
+                    {/* The glyph carries the outcome visually and the sr-only
+                        word carries it to a screen reader — the same rule the
+                        wizard's check rows follow. */}
+                    <span
+                      aria-hidden="true"
+                      className={
+                        s.status === "failed"
+                          ? "tw:text-[var(--bk-error)]"
+                          : s.status === "done"
+                            ? "tw:text-[var(--bk-success-text)]"
+                            : "tw:text-[var(--bk-ink-muted)]"
+                      }
+                    >
+                      {s.status === "failed" ? "✕" : s.status === "done" ? "✓" : "·"}
+                    </span>
+                    <span className="tw:text-[var(--bk-ink)]">{s.name}</span>
+                    <span className={META}>{STEP_WORD[s.status] ?? s.status}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+  );
+
   return (
     /* h-full so the pinned CTA below actually reaches the bottom of the
        drawer: PanelFrame is flex-col but sizes to content, which left the
@@ -319,14 +400,28 @@ export const PublishTab: React.FC<PublishTabProps> = ({
             environments, changes or deploys: the panel states the one fact
             that matters and offers the one action that changes it. */}
         {noPublishPath ? (
-          <section className={SECTION}>
-            <h2 className="tw:m-0 tw:text-[15px] tw:font-semibold tw:text-[var(--bk-ink)]">
-              Connect Vercel to publish.
-            </h2>
-            <p className="tw:m-0 tw:mt-1 tw:text-[13px] tw:leading-normal tw:text-[var(--bk-ink-muted)]">
-              Buildrick deploys into your own Vercel account — we host nothing.
-            </p>
-          </section>
+          <>
+            {/*
+              A publish that fails BECAUSE the token was revoked ends here:
+              the server rejects it, deactivates the connection, and the very
+              next checks read comes back with the Vercel row failing. Showing
+              only "Connect Vercel to publish." would drop the fact the user
+              is actually waiting on — that the publish they just started
+              failed and nothing went out. Both are true, so the panel says
+              both: the failure from board 784:4403 above the connect prompt,
+              and 784:4480's CTA below, because connecting is the only action
+              that helps from here.
+            */}
+            {hasFailed && failureSection}
+            <section className={SECTION}>
+              <h2 className="tw:m-0 tw:text-[15px] tw:font-semibold tw:text-[var(--bk-ink)]">
+                Connect Vercel to publish.
+              </h2>
+              <p className="tw:m-0 tw:mt-1 tw:text-[13px] tw:leading-normal tw:text-[var(--bk-ink-muted)]">
+                Buildrick deploys into your own Vercel account — we host nothing.
+              </p>
+            </section>
+          </>
         ) : (
         <>
         {/* Board 781:4489 — the deploy service is unreachable, so the panel
@@ -355,30 +450,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
         {/* Board 784:4403 — a failed publish leads with the failure AND with
             the fact that nothing changed, which is the half a user needs
             first. Same shape as the rollback-failed modal. */}
-        {hasFailed && (
-          <section className={SECTION} aria-label="Publish failure">
-            <h2 className="tw:m-0 tw:text-[15px] tw:font-semibold tw:text-[var(--bk-error-text)]">
-              Publish failed.
-            </h2>
-            <p className={META}>
-              {error}
-              {error && !/nothing was deployed/i.test(error) ? " Nothing was deployed." : ""}
-            </p>
-            <div className="tw:mt-1">
-              <Button
-                color="light"
-                size="xs"
-                onClick={() => {
-                  publishJob?.reset?.();
-                  setWizardOpen(true);
-                }}
-                className="tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[13px] tw:text-[var(--bk-accent)]"
-              >
-                Try again
-              </Button>
-            </div>
-          </section>
-        )}
+        {hasFailed && failureSection}
 
         {/* Board 784:4326 — the moment after a publish: what went out, where
             to see it, and what changed against the version it replaced. */}
@@ -699,6 +771,16 @@ const SECTION = "tw:flex tw:flex-col tw:gap-0";
 const SECTION_TITLE =
   "tw:m-0 tw:mb-1 tw:text-[11px] tw:font-medium tw:uppercase tw:tracking-[0.04em] tw:text-[var(--bk-ink-muted)]";
 const META = "tw:m-0 tw:text-xs tw:text-gray-500";
+
+/** The worker's own step statuses, said in words. `pending` is the one that
+    matters and the one a raw dump would bury: it means the step never ran,
+    which is how a reader tells "this broke" from "this was skipped". */
+const STEP_WORD: Record<string, string> = {
+  pending: "not run",
+  running: "in progress",
+  done: "done",
+  failed: "failed",
+};
 const LABEL = "tw:text-xs tw:font-medium tw:text-[var(--bk-ink-soft)] tw:mb-1";
 
 export default PublishTab;

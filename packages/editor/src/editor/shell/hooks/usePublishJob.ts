@@ -16,6 +16,7 @@ import {
   fetchSitePublishState,
   type PublishPagePayload,
   type PublishStatus,
+  type PublishStep,
 } from "@/services/PublishService";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 
@@ -55,6 +56,8 @@ export interface UsePublishJobResult {
   progress: number;
   publishedUrl: string | null;
   error: string | null;
+  /** The failed job's per-step build log — board 784:4403's "View log". */
+  steps: PublishStep[] | null;
   /** Set when the approval gate blocked the publish; drives the acknowledge UX. */
   blockedReason: PublishBlockReason;
   publish: (
@@ -245,6 +248,7 @@ export function usePublishJob(): UsePublishJobResult {
     progress: status?.progress ?? 0,
     publishedUrl: status?.publishedUrl ?? hydratedUrl,
     error,
+    steps: status?.steps ?? null,
     blockedReason,
     publish,
     cancel,

@@ -24,6 +24,12 @@ export interface PublishPagePayload {
   html: string;
 }
 
+/** One row of the build log — board 784:4403's "View log". */
+export interface PublishStep {
+  name: string;
+  status: "pending" | "running" | "done" | "failed" | string;
+}
+
 export interface PublishStatus {
   jobId: string;
   status: "QUEUED" | "BUILDING" | "DEPLOYING" | "COMPLETED" | "FAILED" | "CANCELLED" | string;
@@ -31,6 +37,16 @@ export interface PublishStatus {
   publishedUrl?: string | null;
   error?: string | null;
   deploymentId?: string | null;
+  /**
+   * The per-step build log. `getPublishStatus` has always selected `steps`
+   * and returned it; this mapping dropped it on the floor, which is why board
+   * 784:4403's "View log" link had nothing behind it and was never built.
+   *
+   * Not to be confused with the `log` column, which holds the raw page HTML
+   * payload and is deliberately never sent to a client (see the explicit
+   * select in publish.service.ts).
+   */
+  steps?: PublishStep[];
 }
 
 /**
@@ -66,6 +82,7 @@ export async function fetchPublishStatus(jobId: string): Promise<PublishStatus> 
     deploymentId: string | null;
     error: string | null;
     siteId: string;
+    steps: unknown;
   };
 
   // Resolve publishedUrl by reading the site after job completes.
@@ -84,7 +101,21 @@ export async function fetchPublishStatus(jobId: string): Promise<PublishStatus> 
     publishedUrl,
     error: job.error,
     deploymentId: job.deploymentId,
+    steps: parseSteps(job.steps),
   };
+}
+
+/** `steps` is a jsonb column, so it arrives as `unknown` and is narrowed here
+    rather than cast — a malformed row must render no log, not crash the panel
+    that is already telling the user their publish failed. */
+function parseSteps(raw: unknown): PublishStep[] | undefined {
+  if (!Array.isArray(raw)) return undefined;
+  const steps = raw.flatMap((s) =>
+    s && typeof s === "object" && typeof (s as PublishStep).name === "string"
+      ? [{ name: (s as PublishStep).name, status: String((s as PublishStep).status ?? "pending") }]
+      : [],
+  );
+  return steps.length ? steps : undefined;
 }
 
 /**
