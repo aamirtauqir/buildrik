@@ -50,10 +50,6 @@ const GRID_OPTIONS: GridOptionDef[] = [
 ];
 
 // --- Tips ---
-
-export const MEDIA_TIP_TEXT =
-  "Click any file to insert it on the canvas, or drag it directly from the panel.";
-
 // --- Empty state messages ---
 
 export interface EmptyMsg {
@@ -85,14 +81,6 @@ export const EMPTY_MSGS: Record<MediaTypeFilter, EmptyMsg> = {
 };
 
 // --- Discovery section labels ---
-
-export const DISC_SECTION_LABELS: Record<"img" | "vid" | "ico" | "fnt", string> = {
-  img: "Stock Photos",
-  vid: "Stock Videos",
-  ico: "Icon Library",
-  fnt: "Google Fonts",
-};
-
 // --- Format filter options per type ---
 
 export const FORMAT_OPTIONS: Record<"img" | "vid" | "ico" | "fnt", string[]> = {

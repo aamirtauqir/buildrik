@@ -32,11 +32,5 @@ export const OFFSET_ANCHOR =
 /** Fixed / Fill / Hug segmented control — same card shape, one step denser. */
 export const constraintBtnClass = (active: boolean): string =>
   `${cardBtnClass(active)} tw:py-1.5 tw:rounded tw:text-[10px]`;
-
-/** Hint under the display-mode cards, pointing at the Flexbox/Grid section. */
-export const TIP_BOX =
-  "tw:mt-0.5 tw:px-2 tw:py-[5px] tw:rounded tw:bg-[var(--bk-accent-tint)] tw:text-[10.5px] " +
-  "tw:font-medium tw:text-blue-700 tw:[font-family:var(--bk-font-ui)]";
-
 /** Small caption above a control cluster ("Position", "Position Offset"). */
 export const CLUSTER_CAPTION = "tw:flex tw:items-center tw:mb-1.5 tw:text-xs tw:text-gray-500";

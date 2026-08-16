@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const ElementDataSchema: z.ZodType<any> = z.lazy(() =>
+const ElementDataSchema: z.ZodType<any> = z.lazy(() =>
   z.object({
     id: z.string(),
     type: z.string(),
@@ -18,7 +18,7 @@ export const ElementDataSchema: z.ZodType<any> = z.lazy(() =>
   })
 );
 
-export const PageDataSchema = z.object({
+const PageDataSchema = z.object({
   id: z.string(),
   name: z.string(),
   slug: z.string(),

@@ -4,13 +4,6 @@
  */
 
 import type { DesignToken, StylePreset } from "./types";
-
-export const TOKEN_CATEGORIES = {
-  COLORS: "colors",
-  TYPOGRAPHY: "typography",
-  SPACING: "spacing",
-} as const;
-
 /**
  * V3 theme unification: cssVar fields below will be renamed from --buildrick-design-* to
  * --buildrick-design-* in P3 via codemod op 1b. Consumer hooks write whatever

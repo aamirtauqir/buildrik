@@ -4,7 +4,6 @@
  */
 
 export { CollectionManager } from "./CollectionManager";
-export * as CollectionStorage from "./CollectionStorage";
 export { CMSBindingManager } from "./CMSBindingManager";
 export type { CMSElementBinding, CMSCollectionBinding } from "./CMSBindingManager";
 export { RepeaterRenderer } from "./RepeaterRenderer";

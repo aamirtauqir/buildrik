@@ -89,10 +89,3 @@ export type LayerAction =
   | "selectChildren"
   | "moveToTop"
   | "moveToBottom";
-
-/** Default display preferences — HTML badges OFF by default */
-export const DEFAULT_DISPLAY_PREFS: LayerDisplayPrefs = {
-  showHtmlBadges: false,
-  showElementIds: false,
-  treeDensity: "comfortable",
-};

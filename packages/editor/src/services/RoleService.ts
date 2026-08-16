@@ -40,7 +40,3 @@ export function roleAtLeast(role: WorkspaceRole | null, min: WorkspaceRole): boo
   if (role == null) return null; // unknown — let the server decide
   return RANK[role] >= RANK[min];
 }
-
-export function __resetRoleCache(): void {
-  cached = null;
-}

@@ -121,28 +121,3 @@ export function stopAutoScroll(scrollId: number | null): void {
     activeScrolls.delete(scrollId);
   }
 }
-
-/**
- * Stop all active auto-scroll animations
- */
-export function stopAllAutoScrolls(): void {
-  activeScrolls.forEach((state, id) => {
-    state.isActive = false;
-    cancelAnimationFrame(state.animationId);
-    activeScrolls.delete(id);
-  });
-}
-
-/**
- * Update auto-scroll speed based on new cursor position
- * Call this during drag to dynamically adjust scroll speed
- */
-export function updateAutoScroll(
-  scrollId: number | null,
-  point: Point,
-  config: AutoScrollConfig
-): number | null {
-  // Stop existing scroll and start new one with updated speed
-  stopAutoScroll(scrollId);
-  return startAutoScroll(point, config);
-}

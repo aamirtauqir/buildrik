@@ -53,37 +53,6 @@ export const SELECTION_COLORS = {
   multiSelectOutline: "var(--bk-alpha-accent-30)",
   multiSelectFill: "var(--bk-accent-tint)",
 } as const;
-
-/**
- * Canvas Surface Colors
- * Background colors for canvas and content areas
- */
-export const CANVAS_SURFACE = {
-  // Canvas wrapper (outer area)
-  wrapper: "var(--bk-bg-panel)",
-  wrapperGradient: "linear-gradient(180deg, #FAFAFB 0%, var(--bk-bg-subtle) 100%)",
-
-  // Canvas content (white editing area)
-  content: "var(--bk-bg-card)",
-  contentBorder: "#E4E4E7",
-
-  // Grid/pattern overlay
-  gridDot: "var(--bk-border)",
-  gridLine: "var(--bk-accent-subtle)", // Blue grid lines
-} as const;
-
-/**
- * Text colors for canvas content
- * Designed for light backgrounds (WCAG AA compliant)
- */
-export const CANVAS_TEXT = {
-  heading: "#18181B", // Near black for headings
-  body: "#27272A", // Dark gray for body text
-  secondary: "#52525B", // Medium gray for secondary
-  muted: "#71717A", // Light gray for muted text
-  placeholder: "#A1A1AA", // Placeholder text
-} as const;
-
 // ============================================
 // COLORS (Legacy - for backward compatibility)
 // ============================================

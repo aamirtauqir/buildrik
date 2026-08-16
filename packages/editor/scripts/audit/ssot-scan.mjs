@@ -309,6 +309,25 @@ export function scanAntiPatterns(root) {
       for (const named of imp.getNamedImports()) importNames.add(named.getName());
       const def = imp.getDefaultImport();
       if (def) importNames.add(def.getText());
+
+      /*
+        `import * as Storage from "./CollectionStorage"` — the whole module is
+        reachable through the namespace, and which members get used is decided
+        at each `Storage.foo()` call site rather than at the import.
+
+        This was invisible until the `export * as CollectionStorage` alias in
+        engine/cms/index.ts was deleted as an unused middle-man: eleven CMS
+        storage functions that CollectionManager and cmsSync call every day
+        immediately appeared as dead exports. The alias had been masking the
+        gap, so removing real cruft made the report worse. Mark them reachable
+        from the namespace import itself.
+      */
+      if (imp.getNamespaceImport()) {
+        const target = imp.getModuleSpecifierSourceFile();
+        if (target) {
+          for (const [name] of target.getExportedDeclarations()) importNames.add(name);
+        }
+      }
     }
   }
 

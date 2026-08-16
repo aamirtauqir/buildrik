@@ -192,19 +192,4 @@ export function migrateAqbKeys(): void {
   }
 }
 
-/**
- * Get the new key name for a legacy key
- * Useful for checking if a key should be migrated
- */
-export function getNewKeyName(oldKey: string): string | undefined {
-  return MIGRATION_MAP[oldKey];
-}
-
-/**
- * Check if a key uses the old prefix
- */
-export function isLegacyKey(key: string): boolean {
-  return key.startsWith("aquibra-") || key.startsWith("aquibra_");
-}
-
 export default migrateStorageKeys;

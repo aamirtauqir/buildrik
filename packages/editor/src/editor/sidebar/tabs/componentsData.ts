@@ -18,13 +18,4 @@ export interface FilterChip {
 // ============================================
 // Constants
 // ============================================
-
-export const FILTER_CHIPS: FilterChip[] = [
-  { id: "all", label: "All" },
-  { id: "ui", label: "UI" },
-  { id: "sections", label: "Sections" },
-  { id: "saved", label: "Saved" },
-  { id: "favorites", label: "Favorites" },
-];
-
 export const FAVORITES_STORAGE_KEY = "buildrick-component-favorites";

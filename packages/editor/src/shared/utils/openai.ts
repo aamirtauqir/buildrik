@@ -113,23 +113,6 @@ export async function generateContent(
 }
 
 /**
- * Generate multiple content variations
- */
-export async function generateContentVariations(
-  prompt: string,
-  contentType: ContentType | string,
-  tone: ToneType | string,
-  count: number = 3,
-  options?: AIRequestOptions
-): Promise<string[]> {
-  const promises = Array.from({ length: count }, () =>
-    generateContent(prompt, contentType, tone, { ...options, skipCache: true })
-  );
-
-  return Promise.all(promises);
-}
-
-/**
  * Generate layout HTML using AI
  */
 async function generateLayout(
@@ -142,18 +125,6 @@ async function generateLayout(
     options
   );
   return response.data.html;
-}
-
-/**
- * Generate or fetch an image based on description
- */
-export async function generateImagePrompt(
-  description: string,
-  _imageOptions?: { size?: ImageSize; style?: ImageStyle },
-  _options?: AIRequestOptions
-): Promise<string> {
-  // Image generation not yet supported via tRPC; return fallback
-  return `${FALLBACK_IMAGE_BASE}${Date.now()}`;
 }
 
 /**
@@ -193,88 +164,6 @@ async function improveContent(
   return response.data.content;
 }
 
-/**
- * Translate content to another language
- */
-export async function translateContent(
-  content: string,
-  targetLanguage: string,
-  options?: AIRequestOptions
-): Promise<string> {
-  const response = await aiTrpcClient.generateContent(
-    {
-      prompt: `Translate the following content to ${targetLanguage}:\n\n${content}`,
-      type: "content",
-    },
-    options
-  );
-  return response.data.content;
-}
-
-/**
- * Summarize content
- */
-export async function summarizeContent(
-  content: string,
-  maxLength?: number,
-  options?: AIRequestOptions
-): Promise<string> {
-  const lengthHint = maxLength ? ` in approximately ${maxLength} characters` : "";
-  const response = await aiTrpcClient.generateContent(
-    {
-      prompt: `Summarize the following content${lengthHint}:\n\n${content}`,
-      type: "content",
-      options: { length: "short" },
-    },
-    options
-  );
-  return response.data.content;
-}
-
-/**
- * Generate SEO metadata
- */
-export async function generateSEO(
-  pageContent: string,
-  options?: AIRequestOptions
-): Promise<{ title: string; description: string; keywords: string[] }> {
-  const response = await aiTrpcClient.generateContent(
-    {
-      prompt: `Generate SEO metadata (title, description, keywords) as JSON for:\n\n${pageContent}`,
-      type: "content",
-    },
-    options
-  );
-  try {
-    return JSON.parse(response.data.content);
-  } catch {
-    return { title: "", description: "", keywords: [] };
-  }
-}
-
-/**
- * Stream content generation (for real-time updates)
- * Note: Streaming not yet supported via tRPC mutations; falls back to non-streaming.
- */
-export async function streamContent(
-  prompt: string,
-  contentType: ContentType | string,
-  tone: ToneType | string,
-  callbacks: StreamCallbacks
-): Promise<void> {
-  try {
-    const content = await generateContent(prompt, contentType, tone);
-    callbacks.onChunk?.(content);
-    callbacks.onComplete?.(content);
-  } catch (err) {
-    const error =
-      err instanceof Error && (err as AIError).code
-        ? (err as AIError)
-        : createAIError(err instanceof Error ? err.message : "Stream error", "UNKNOWN_ERROR");
-    callbacks.onError?.(error);
-  }
-}
-
 export interface BatchRequest {
   type: "content" | "layout" | "code" | "improve";
   params: Record<string, unknown>;
@@ -284,51 +173,6 @@ export interface BatchResult<T = string> {
   success: boolean;
   data?: T;
   error?: AIError;
-}
-
-/**
- * Execute multiple AI requests in batch
- */
-export async function batchRequests(
-  requests: BatchRequest[],
-  options?: AIRequestOptions
-): Promise<BatchResult[]> {
-  const promises = requests.map(async (req) => {
-    try {
-      let content: string;
-      if (req.type === "layout") {
-        content = await generateLayout(req.params.prompt as string, undefined, options);
-      } else if (req.type === "code") {
-        content = await generateCode(
-          req.params.prompt as string,
-          req.params.language as string,
-          undefined,
-          options
-        );
-      } else if (req.type === "improve") {
-        content = await improveContent(
-          req.params.content as string,
-          req.params.instruction as string,
-          options
-        );
-      } else {
-        content = await generateContent(
-          req.params.prompt as string,
-          (req.params.contentType as string) || "content",
-          (req.params.tone as string) || "professional",
-          options
-        );
-      }
-      return { success: true, data: content };
-    } catch (err) {
-      return {
-        success: false,
-        error: err as AIError,
-      };
-    }
-  });
-
-  return Promise.all(promises);
 }
 
 export const PROMPT_TEMPLATES = {

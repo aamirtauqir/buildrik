@@ -143,10 +143,6 @@ export type MediaEventName = (typeof MEDIA_EVENTS)[keyof typeof MEDIA_EVENTS];
 
 /** Total storage quota per user — single source of truth */
 export const STORAGE_QUOTA_BYTES = 1_073_741_824; // 1 GB
-
-/** Canonical list of supported upload formats for display — single source of truth */
-export const SUPPORTED_FORMATS_LABEL = "JPG · PNG · SVG · GIF · MP4 · WebM · TTF · OTF";
-
 // ============================================
 // Default Values
 // ============================================

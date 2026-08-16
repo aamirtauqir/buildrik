@@ -128,7 +128,6 @@ export {
   wrapInTag,
   createComment,
   // Parsing
-  parseHTML as parseHTMLToNodes,
   parseHTMLToElementData,
   parseStyleString,
   // DOM utilities
