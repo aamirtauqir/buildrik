@@ -611,3 +611,77 @@ With all four cleared, click-to-insert was confirmed working: Heading 1→2,
 Button 2→3, with `Inserted: Button` / `Button selected` toasts. The prop chain
 behind it is intact — `StudioPanels:355 → LeftSidebar:602 → TabRouter:127 →
 BuildTab:44 → useBuildTab`.
+
+---
+
+## 8. B6 answers — and two of my own findings corrected
+
+Founder answered the batch on 2026-08-11. Recorded with what the investigation
+found, because two of the four questions were built on my own bad premise.
+
+### M4 — one screen, two states. **Answered: one screen.**
+`Publish · pre-checks` and `Publish · blocked` are one moment — the check ran and
+the answer was no. Two frames would give one moment two addresses, which is the
+mistake Finding C already documents for `PublishHistory`.
+
+### Finding E — **WITHDRAWN. `S4` exists.** Same failure as Finding B.
+Ten frames on page `1:3`:
+
+`S4.1 · Tokens — add / replace` · `S4.2 · Presets — bound / unbound / draft` ·
+`S4.3 · Starters — applied` · `S4.4 · DS lint — suppressed` ·
+`S4.5 · Import/export — exported / imported / error`
+
+**S4 is the Brand / design-system flow** — the same five destinations M5 shipped
+as Brand's drill-in. It read as missing because the audit searched the `family`
+field, and S-numbers are *flow* names, not family names. Settings hid under `S7`
+for the identical reason. Two findings, one root cause: **a name-keyed lookup
+against the wrong field, twice.**
+
+→ **Finding L (real, and the reason the question was worth asking).** The file
+carries **two S4 numbering schemes**. The frames above are Brand. But four
+caption frames under the same number describe Preview:
+
+`caption/S4.1 - share-preview-link` · `caption/S4.2 - preview-interaction-test` ·
+`caption/S4.4 - accessibility-checker` · `caption/S4.5 - performance-lighthouse`
+
+One of the two is mis-numbered. **Recommendation: S4 stays Brand** — ten frames
+against four captions, and it matches the shipped drill-in. The four Preview
+captions should renumber into the Preview family. Founder to confirm.
+
+### M3 — canonical `CreateComponentModal`. **Answered: my call.** Recommendation:
+
+They are not two copies. They are two architectures, and the cleaner one is the
+weaker one:
+
+| | `component-library/` (180) | `shell/modals/` (260) |
+|---|---|---|
+| shape | presentational — props in, payload out, no engine | connected — takes `composer` + `elementId` |
+| fields | name · group | name · **description · category · tags** |
+| variants | — | **variant sets** (`VARIANT_PRESETS`) |
+| validation | disables submit on empty name | toasts on empty name and invalid state |
+| prefill | `selectionContext.extractedBindings` — the **T12** flow, shows a binding count | `prefillFromDs` boolean |
+
+**Canonical = `shell/modals/` (260).** It is a superset on product capability, and
+the brief forbids simplifying away working functionality — dropping variant sets,
+description, category and tags to keep the tidier file would do exactly that.
+
+**But it is not a clean superset.** The 180-line one owns the T12 per-selection
+binding pre-fill (`tokenBindingResolver.resolveForElements()` → a
+`"elementId:prop" → tokenId` map, with the count shown to the user). The 260-line
+one's `prefillFromDs` is a different feature — prefill from the design system, no
+per-selection extraction, no count.
+
+So consolidation is three steps, in order, and **not** a delete-and-repoint:
+1. port `selectionContext` + its binding count into the 260-line modal;
+2. repoint `ComponentsTab` at it (it passes a selection, so the `elementId` prop
+   needs to accept the same shape A's caller supplies);
+3. delete the 180-line file.
+
+Step 1 before step 2, or the T12 flow ships broken. Not started — this is the
+recommendation, not the change.
+
+### Brand's three unbuilt rows — **Answered: build all three.**
+Colour mode · Typography · Starters. `Classes` stays unbuilt (Figma-only, rule 4).
+Order by readiness: **Starters** (a modal, smallest) → **Colour mode** (query
+already exists at `ColorTokenList.tsx:243`; write path fixed in Finding J) →
+**Typography** (needs the token plumbing `TokensSection` keeps internal).
