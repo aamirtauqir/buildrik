@@ -136,20 +136,6 @@
         "suggestion": "Delete unused export; rely on git history if needed later."
       },
       {
-        "path": "src/editor/design-system/types.ts",
-        "line": 43,
-        "severity": "minor",
-        "message": "Dead export \"CATEGORY_CHIPS\" — not imported anywhere",
-        "suggestion": "Delete unused export; rely on git history if needed later."
-      },
-      {
-        "path": "src/editor/media/LibraryManager.tsx",
-        "line": 63,
-        "severity": "minor",
-        "message": "Dead export \"LibraryManager\" — not imported anywhere",
-        "suggestion": "Delete unused export; rely on git history if needed later."
-      },
-      {
         "path": "src/editor/rail/tabsConfig.ts",
         "line": 301,
         "severity": "minor",
@@ -196,13 +182,6 @@
         "line": 7,
         "severity": "minor",
         "message": "Dead export \"CollectionStorage\" — not imported anywhere",
-        "suggestion": "Delete unused export; rely on git history if needed later."
-      },
-      {
-        "path": "src/engine/components/ComponentStorage.ts",
-        "line": 185,
-        "severity": "minor",
-        "message": "Dead export \"deleteAllComponents\" — not imported anywhere",
         "suggestion": "Delete unused export; rely on git history if needed later."
       },
       {
@@ -353,20 +332,6 @@
         "suggestion": "Delete unused export; rely on git history if needed later."
       },
       {
-        "path": "src/shared/utils/errorTracking.ts",
-        "line": 32,
-        "severity": "minor",
-        "message": "Dead export \"initErrorTracking\" — not imported anywhere",
-        "suggestion": "Delete unused export; rely on git history if needed later."
-      },
-      {
-        "path": "src/shared/utils/errorTracking.ts",
-        "line": 73,
-        "severity": "minor",
-        "message": "Dead export \"setUser\" — not imported anywhere",
-        "suggestion": "Delete unused export; rely on git history if needed later."
-      },
-      {
         "path": "src/shared/utils/index.ts",
         "line": 36,
         "severity": "minor",
@@ -441,13 +406,6 @@
         "line": 292,
         "severity": "minor",
         "message": "Dead export \"batchRequests\" — not imported anywhere",
-        "suggestion": "Delete unused export; rely on git history if needed later."
-      },
-      {
-        "path": "src/shared/utils/sidebarAnalytics.ts",
-        "line": 26,
-        "severity": "minor",
-        "message": "Dead export \"setSidebarAnalyticsProvider\" — not imported anywhere",
         "suggestion": "Delete unused export; rely on git history if needed later."
       },
       {
@@ -567,13 +525,6 @@
         "line": 22,
         "severity": "minor",
         "message": "Dead export \"FILTER_CHIPS\" — not imported anywhere",
-        "suggestion": "Delete unused export; rely on git history if needed later."
-      },
-      {
-        "path": "src/engine/cms/__tests__/inMemoryCollectionStorage.ts",
-        "line": 15,
-        "severity": "minor",
-        "message": "Dead export \"createInMemoryCollectionStorage\" — not imported anywhere",
         "suggestion": "Delete unused export; rely on git history if needed later."
       },
       {
@@ -714,13 +665,6 @@
         "line": 418,
         "severity": "minor",
         "message": "Dead export \"insertComponentArgsSchema\" — not imported anywhere",
-        "suggestion": "Delete unused export; rely on git history if needed later."
-      },
-      {
-        "path": "src/editor/sidebar/tabs/pages/PagesTab.tsx",
-        "line": 40,
-        "severity": "minor",
-        "message": "Dead export \"PagesTab\" — not imported anywhere",
         "suggestion": "Delete unused export; rely on git history if needed later."
       },
       {

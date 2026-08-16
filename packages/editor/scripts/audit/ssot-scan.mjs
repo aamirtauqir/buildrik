@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
-import { resolve, join, basename, relative } from 'node:path';
+import { resolve, join, basename, relative, dirname } from 'node:path';
 import { createRequire } from 'node:module';
 
 const requireCjs = createRequire(import.meta.url);
@@ -289,6 +289,46 @@ export function scanAntiPatterns(root) {
       for (const named of imp.getNamedImports()) importNames.add(named.getName());
       const def = imp.getDefaultImport();
       if (def) importNames.add(def.getText());
+    }
+  }
+
+  /*
+    Dynamic imports, which getImportDeclarations() does not see.
+
+    Every code-split panel in this editor arrives this way — TabRouter does
+    `React.lazy(() => import("./tabs/pages/PagesTab"))`, FullPageRouter does
+    `import("../media/LibraryManager").then((m) => ({ default: m.LibraryManager }))`.
+    Counting only static imports reported `PagesTab` and `LibraryManager` as
+    dead exports. Deleting on that report would have removed the Pages panel and
+    the media library. Same failure as reading only one syntactic form of a prop
+    hand-off: the reachable set is bigger than the syntax you grepped for.
+
+    Conservative on purpose — a module reached by `import()` has ALL its exports
+    marked reachable. Which member the consumer plucks off the namespace varies
+    (`.then(m => m.X)`, `React.lazy` default, `await import()` destructuring),
+    and over-marking loses a few true positives while under-marking deletes
+    live code.
+  */
+  const dynamicallyImported = new Set();
+  for (const sf of project.getSourceFiles()) {
+    sf.forEachDescendant((node) => {
+      if (node.getKindName() !== "CallExpression") return;
+      const expr = node.getExpression?.();
+      if (!expr || expr.getKindName() !== "ImportKeyword") return;
+      const target = node.getArguments?.()[0];
+      if (!target) return;
+      const spec = target.getText().replace(/^['"`]|['"`]$/g, "");
+      dynamicallyImported.add({ from: sf, spec });
+    });
+  }
+  for (const { from, spec } of dynamicallyImported) {
+    if (!spec.startsWith(".")) continue;                 // aliases resolve below
+    const base = resolve(dirname(from.getFilePath()), spec);
+    for (const ext of [".ts", ".tsx", "/index.ts", "/index.tsx"]) {
+      const target = project.getSourceFile(base + ext);
+      if (!target) continue;
+      for (const [name] of target.getExportedDeclarations()) importNames.add(name);
+      break;
     }
   }
   // In addition to import-name collection, walk export declarations.
