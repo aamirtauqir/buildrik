@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { Button, Checkbox, ModalBody, ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, TextInput, useToast } from "@/editor/chrome-ui";
+import { Button, Checkbox, ModalBody, ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Tabs, TextInput, useToast } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
 import { devError } from "../../../shared/utils/devLogger";
 
@@ -19,11 +19,11 @@ type TabId = "general" | "canvas" | "seo";
 
 // Capitalising the id gave "Seo". SEO is an initialism everywhere else in the
 // product (Settings › SEO), so the label is explicit (Figma board B9.6).
-const TAB_LABELS: Record<TabId, string> = {
-  general: "General",
-  canvas: "Canvas",
-  seo: "SEO",
-};
+const TABS: { id: TabId; label: string }[] = [
+  { id: "general", label: "General" },
+  { id: "canvas", label: "Canvas" },
+  { id: "seo", label: "SEO" },
+];
 
 export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
   isOpen,
@@ -98,37 +98,34 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
         </ModalClose>
         <ModalBody>
     <div className="tw:flex tw:flex-col tw:min-h-75">
-      {/* Tabs */}
-      <div className="tw:flex tw:gap-5 tw:mb-5 tw:border-b tw:border-gray-200">
-        {(["general", "canvas", "seo"] as const).map((tab) => (
-          <Button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`${TAB_BTN} ${
-              activeTab === tab
-                ? "tw:border-b-blue-700 tw:text-gray-900"
-                : "tw:border-b-transparent tw:text-gray-500 tw:hover:text-gray-900"
-            }`}
-          >
-            {TAB_LABELS[tab]}
-          </Button>
-        ))}
-      </div>
+      {/* The tab row was three `Button`s in a flex div — no `role="tablist"`,
+          no `role="tab"`, no arrow keys, so a screen reader read it as three
+          unrelated buttons and could not say which was current. `Tabs` is the
+          primitive that owns that contract (and the board's tinted pill). */}
+      <Tabs
+        label="Project settings sections"
+        tabs={TABS}
+        value={activeTab}
+        onChange={(id) => setActiveTab(id as TabId)}
+        className="tw:mb-5 tw:px-0"
+      />
 
       {/* Tab Content */}
       <div className="tw:flex-1">
         {activeTab === "general" && (
           <div className="tw:flex tw:flex-col tw:gap-3">
-            <label className={FIELD_LABEL}>Project name</label>
+            <label className={FIELD_LABEL} htmlFor="ps-name">Project name</label>
             <TextInput
+              id="ps-name"
               type="text"
               value={projectName}
               onChange={(e) => setProjectName(e.target.value)}
               placeholder="My Awesome Project"
             />
 
-            <label className={FIELD_LABEL}>Author / description</label>
+            <label className={FIELD_LABEL} htmlFor="ps-author">Author / description</label>
             <TextInput
+              id="ps-author"
               type="text"
               value={projectDescription}
               onChange={(e) => setProjectDescription(e.target.value)}
@@ -139,9 +136,10 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
 
         {activeTab === "canvas" && (
           <div className="tw:flex tw:flex-col tw:gap-3">
-            <label className={FIELD_LABEL}>Grid size (px)</label>
+            <label className={FIELD_LABEL} htmlFor="ps-grid">Grid size (px)</label>
             <div className="tw:flex tw:items-center tw:gap-2">
               <TextInput
+                id="ps-grid"
                 type="number"
                 value={gridSize}
                 onChange={(e) => setGridSize(Number(e.target.value))}
@@ -170,8 +168,9 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
 
         {activeTab === "seo" && (
           <div className="tw:flex tw:flex-col tw:gap-3">
-            <label className={FIELD_LABEL}>Site name (SEO default)</label>
+            <label className={FIELD_LABEL} htmlFor="ps-seo-name">Site name (SEO default)</label>
             <TextInput
+              id="ps-seo-name"
               type="text"
               value={siteTitle}
               onChange={(e) => setSiteTitle(e.target.value)}
@@ -190,9 +189,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
           <Button color="light" onClick={onClose} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
             Cancel
           </Button>
-          <Button onClick={handleSave}>
-            Save changes
-          </Button>
+          <Button onClick={handleSave}>Save</Button>
         </ModalFooter>
       </ModalContent>
     </ModalRoot>
@@ -203,10 +200,12 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
 // CLASSES
 // ============================================================================
 
-const TAB_BTN =
-  "tw:px-0 tw:py-2 tw:rounded-none tw:border-0 tw:border-b-2 tw:bg-transparent " +
-  "tw:text-[13px] tw:font-semibold";
-const FIELD_LABEL = "tw:mb-1 tw:text-xs tw:font-semibold tw:text-[var(--bk-ink-soft)]";
+// The board sets field labels in the DS's micro-label type — 11px, medium,
+// .08em caps, gray-500 — the same style `SectionHeader` carries. They were
+// 12px semibold sentence-case in `--bk-ink-soft`, which read as a second
+// heading rank instead of a label.
+const FIELD_LABEL =
+  "tw:mb-1 tw:text-[11px] tw:font-medium tw:tracking-[0.08em] tw:uppercase tw:text-gray-500";
 const HINT = "tw:mt-1 tw:text-xs tw:text-gray-500";
 
 export default ProjectSettingsModal;
