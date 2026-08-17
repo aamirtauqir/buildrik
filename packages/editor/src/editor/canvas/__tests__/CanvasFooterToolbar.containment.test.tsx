@@ -13,6 +13,12 @@
  *    opens) but the controls kept their intrinsic ~1076px, so the right-hand
  *    group ran 276px UNDER the inspector panel and could not be clicked.
  *
+ * The first fix for (2) was `overflow-x: auto`, which stopped the spill and
+ * started a quieter failure: at 1280 — the width board 202:2 draws — the
+ * column gives the bar ~600px against 717px of controls, so X-Ray and the
+ * shortcuts button scrolled out of view with no scrollbar and nothing to say
+ * they existed. It wraps now, so narrow widths cost a row and hide nothing.
+ *
  * jsdom does no layout, AND it computes nothing from a `tw:` class, so the
  * contract now lives in the class list rather than in `element.style`. That is
  * a weaker check than the inline-style one it replaces — it proves the classes
@@ -46,7 +52,7 @@ beforeAll(() => {
   }
 });
 
-const CONTAINMENT = ["tw:max-w-full", "tw:min-w-0", "tw:overflow-x-auto"];
+const CONTAINMENT = ["tw:max-w-full", "tw:min-w-0", "tw:flex-wrap"];
 
 function pill(): HTMLElement {
   render();
@@ -75,6 +81,20 @@ describe("canvas toolbar containment", () => {
     // min-width:0 is what lets a flex row refuse to shrink; without it the
     // controls kept their intrinsic width and ran under the inspector.
     for (const cls of CONTAINMENT) expect(bar.classList.contains(cls)).toBe(true);
+  });
+
+  /* Scrolling a bar with no scrollbar deletes the controls past the fold as
+     surely as `display:none`. Measured at 1280: X-Ray's centre point resolved
+     to `.layout-shell__inspector`, not the button. */
+  it("never hides a control behind an overflow the user cannot see", () => {
+    const bar = pill();
+    expect([...bar.classList].some((c) => /^tw:overflow-x?-(auto|hidden|scroll)$/.test(c))).toBe(false);
+  });
+
+  it("keeps one row when the controls fit — the height boards draw is 40px", () => {
+    const bar = pill();
+    expect(bar.classList.contains("tw:min-h-10")).toBe(true);
+    expect(bar.classList.contains("tw:h-10")).toBe(false);
   });
 
   /* Overflow that cannot be scrolled to is the same as deleted. A centred

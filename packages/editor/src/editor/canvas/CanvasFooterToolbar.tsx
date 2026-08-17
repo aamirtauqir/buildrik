@@ -102,22 +102,32 @@ const EDIT_BTN =
   "tw:border tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] " +
   "tw:hover:bg-gray-100 tw:hover:text-gray-900";
 
-/** The floating bar itself. maxWidth/minWidth/overflow keep it inside the
- *  canvas column when the inspector opens — without them it ran ~276px under
- *  the inspector at 1440 and hid controls behind another panel.
+/**
+ * The floating bar. `max-w-full` + `min-w-0` keep it inside the canvas column
+ * when the inspector opens — without them it ran ~276px under the inspector at
+ * 1440 and hid controls behind another panel.
  *
- *  `justify-start`, NOT `justify-center`: a centred flex row that overflows
- *  spills equally off BOTH ends, and the spill off the start cannot be
- *  scrolled back to — scrollLeft has no negative side. Measured at 1440 with a
- *  drawer open: bar 758px, content 855px, and undo, redo and the Wide device
- *  button sat at x=300..367 against a bar starting at x=380. They rendered,
- *  they were focusable, and no pointer could ever reach them. Anchored at the
- *  start, the overflow goes to the end, where the scroll can follow it — which
- *  is also how board 199:205 draws the bar with a drawer open. */
+ * `justify-start`, NOT `justify-center`: a centred flex row that overflows
+ * spills equally off BOTH ends, and the spill off the start cannot be scrolled
+ * back to — scrollLeft has no negative side. Measured at 1440 with a drawer
+ * open: bar 758px, content 855px, and undo, redo and the Wide device button sat
+ * at x=300..367 against a bar starting at x=380. They rendered, they were
+ * focusable, and no pointer could ever reach them. Board 199:205 draws it
+ * anchored at the start too.
+ *
+ * It WRAPS rather than scrolls. It was `h-10 overflow-x-auto`, and its content
+ * is 717px wide: at 1280 — the width board 202:2 draws — the canvas column
+ * gives it about 600, so X-Ray and the keyboard-shortcuts button scrolled out
+ * of sight with no scrollbar, no fade, nothing to say they were there.
+ * Measured live at 1280: `elementFromPoint` over X-Ray returned
+ * `.layout-shell__inspector`. Wrapping costs a row of canvas at narrow widths
+ * and hides nothing; at 1440 the content still fits one 40px row, so nothing
+ * moves.
+ */
 const BAR =
-  "tw:flex tw:items-center tw:justify-start tw:gap-3 tw:h-10 tw:px-4 tw:py-2 tw:rounded-lg " +
+  "tw:flex tw:flex-wrap tw:items-center tw:justify-start tw:gap-x-3 tw:gap-y-1 tw:min-h-10 tw:px-4 tw:py-1 tw:rounded-lg " +
   "tw:border tw:border-gray-200 tw:bg-white tw:[box-shadow:var(--bk-shadow-drag)] " +
-  "tw:whitespace-nowrap tw:max-w-full tw:min-w-0 tw:overflow-x-auto";
+  "tw:whitespace-nowrap tw:max-w-full tw:min-w-0";
 const GROUP = "tw:flex tw:items-center tw:gap-1";
 const DIVIDER = "tw:w-px tw:h-5 tw:mx-1 tw:bg-gray-200";
 
