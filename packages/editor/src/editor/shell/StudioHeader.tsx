@@ -639,7 +639,16 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
             onOpenHistory={onOpenHistory}
             onOpenPublish={onOpenPublish}
             onOpenPublishHistory={onOpenPublishHistory}
-            onExportCode={onExportHTML}
+            /* Board 1172:4825 is a MODAL — format chips, a preview, a code
+               view, options — and it had no door. `handleExport` opens it, but
+               `handleExport` is third in `onVercelPublish ?? onOpenPublish ??
+               handleExport`, and the first is never undefined, so it was as
+               unreachable as the Publish panel was. Meanwhile this row fired
+               `onExportHTML`, which downloads a zip on the spot: the one
+               screen for CHOOSING a format was skipped by the only control
+               that mentions exporting. The row opens the modal; the immediate
+               zip is what the modal's own ZIP button does. */
+            onExportCode={handleExport}
             onOpenTemplates={onOpenTemplates}
             onOpenComponents={onOpenComponents}
             onOpenShortcuts={onOpenShortcuts}

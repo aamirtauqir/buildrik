@@ -10,7 +10,7 @@ import { ExportEngine } from "../../engine/export";
 import { ReactExporter } from "../../engine/export/ReactExporter";
 import type { ExportConfig, ExportResult, PreviewDevice } from "../../shared/types/export";
 import { DEFAULT_EXPORT_CONFIG, PREVIEW_DEVICES } from "../../shared/types/export";
-import { Button, ModalBody, ModalClose, ModalContent, ModalRoot, ModalTitle, Spinner, Tabs } from "@/editor/chrome-ui";
+import { Button, ModalBody, ModalClose, ModalContent, ModalDescription, ModalRoot, ModalTitle, Spinner, Tabs, plural } from "@/editor/chrome-ui";
 import { devError } from "../../shared/utils/devLogger";
 import { CodePreview } from "./CodePreview";
 import { FormatGrid, OptionsPanel } from "./ExportOptions";
@@ -137,6 +137,34 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
     }
   };
 
+  /*
+    Board 1172:4825 titles this "Export site as HTML" and puts a sentence
+    under it saying what you actually get: "A .zip with every page, styles
+    inlined, media included — host it anywhere." The modal said "Export" and
+    nothing else, so the one screen whose whole job is choosing an output
+    format described none of them.
+
+    Per format, because the board's own sentence is about the ZIP and would
+    be false over a single HTML file — the shape is the contract, the sample
+    is not.
+  */
+  const formatNoun: Record<string, string> = {
+    html: "HTML",
+    zip: "ZIP",
+    json: "JSON",
+    react: "React",
+    vue: "Vue",
+    nextjs: "Next.js",
+  };
+  const formatBlurb: Record<string, string> = {
+    zip: "A .zip with every page, styles inlined, media included — host it anywhere.",
+    html: "One HTML file with styles inlined — open it anywhere.",
+    json: "The document tree as JSON, for tooling of your own.",
+    react: "Component source you can drop into an existing React project.",
+    vue: "A single-file component you can drop into an existing Vue project.",
+    nextjs: "A page component you can drop into an existing Next.js project.",
+  };
+
   const exportLabel =
     config.format === "zip"
       ? "Export as ZIP"
@@ -147,13 +175,16 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
   return (
     <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
       <ModalContent size="lg">
-        <ModalTitle>Export</ModalTitle>
+        <ModalTitle>Export site as {formatNoun[config.format] ?? config.format.toUpperCase()}</ModalTitle>
         <ModalClose aria-label="Close modal" onClick={onClose}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
             <path d="M18 6L6 18M6 6l12 12" />
           </svg>
         </ModalClose>
         <ModalBody>
+        {formatBlurb[config.format] && (
+          <ModalDescription>{formatBlurb[config.format]}</ModalDescription>
+        )}
         {/* Format grid — always visible at top */}
         <div style={{ marginBottom: 20 }}>
           <FormatGrid
@@ -216,7 +247,8 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
               marginBottom: 4,
             }}
           >
-            {result.stats.elementCount} elements · {formatBytes(result.stats.htmlSize)} HTML
+            {/* `plural` because a one-element export read "1 elements". */}
+            {plural(result.stats.elementCount, "element")} · {formatBytes(result.stats.htmlSize)} HTML
             {result.stats.cssSize > 0 && ` · ${formatBytes(result.stats.cssSize)} CSS`}
           </div>
         )}
