@@ -1,5 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Pencil, ExternalLink, Send, Share2, MoreHorizontal, LayoutTemplate } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
@@ -30,6 +31,15 @@ export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
   const reviewEnabled = !!features.data?.agency_layer;
   const [reviewOpen, setReviewOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  /* Board 642:3401 puts "Share preview link" in the EDITOR's site menu, and
+     the flow it names lives here. The editor hands off with ?share=1 — the
+     same shape as its "Invite teammates" item, which opens the dashboard page
+     where that job is done — so the user lands on the modal rather than on a
+     page with a button to find. */
+  const search = useSearchParams();
+  useEffect(() => {
+    if (search?.get("share") === "1") setShareOpen(true);
+  }, [search]);
   const [applyTemplateOpen, setApplyTemplateOpen] = useState(false);
   const [confirmUnpublish, setConfirmUnpublish] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);

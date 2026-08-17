@@ -168,7 +168,7 @@ export function OverviewTab({
       </div>
 
       {/* Health Score Expandable Panel */}
-      <SectionCard padding="none">
+      <SectionCard id="site-health" padding="none">
         <button
           onClick={() => setHealthExpanded(!healthExpanded)}
           className="flex w-full items-center justify-between p-5"
@@ -290,7 +290,7 @@ export function OverviewTab({
       )}
 
       {/* Recent Activity */}
-      <SectionCard title="Recent Activity">
+      <SectionCard id="activity-log" title="Recent Activity">
         {activity.length === 0 ? (
           <p className="text-body" style={{ color: "var(--color-text-muted)" }}>No activity yet. Start editing to see updates here.</p>
         ) : (

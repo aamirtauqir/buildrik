@@ -649,6 +649,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
             onOpenPlugins={onOpenPlugins}
             publishedUrl={publishedUrl}
             onCopyLiveUrl={copyLiveUrl}
+            siteId={getSiteIdFromUrl()}
             clientView={viewMode.clientView}
             onToggleClientView={toggleClientView}
           />

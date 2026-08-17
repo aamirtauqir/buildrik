@@ -56,3 +56,76 @@ describe("SiteMenu — the Publish panel's door", () => {
     expect(screen.getByRole("menuitem", { name: "Publish panel" })).toBeInTheDocument();
   });
 });
+
+/*
+  Board 642:3401 lists "Share preview link" in the site menu. The flow exists —
+  the dashboard's ShareDraftModal, on `siteDetail.sharing.create`, which mints a
+  private link to the current DRAFT — and the editor had no way to reach it. A
+  live URL is a different thing: it only exists after a publish, and it is
+  public.
+*/
+describe("SiteMenu — board 642:3401's share preview link", () => {
+  it("hands off to the dashboard's share flow for this site", () => {
+    const open = vi.fn();
+    vi.stubGlobal("open", open);
+    render(<SiteMenu siteId="site_42" />);
+    openMenu();
+
+    fireEvent.click(screen.getByRole("menuitem", { name: "Share preview link" }));
+    expect(open).toHaveBeenCalledWith(
+      expect.stringContaining("/dashboard/sites/site_42?share=1"),
+      "_blank",
+      "noopener,noreferrer",
+    );
+    vi.unstubAllGlobals();
+  });
+
+  it("is absent without a site — there is nothing to share", () => {
+    render(<SiteMenu onOpenHistory={vi.fn()} />);
+    openMenu();
+    expect(screen.queryByRole("menuitem", { name: "Share preview link" })).not.toBeInTheDocument();
+  });
+
+  it("does not stand in for the live URL, which is a different thing", () => {
+    // Live URL is public and only exists after a publish; the preview link is
+    // private and works before one.
+    render(<SiteMenu siteId="site_42" />);
+    openMenu();
+    expect(screen.queryByRole("menuitem", { name: "Copy live URL" })).not.toBeInTheDocument();
+  });
+});
+
+/*
+  Board 642:3401's second group: Site health · Activity log · Share preview
+  link. All three are real surfaces the editor had no door to — the first two
+  are the Health Score panel and Recent Activity on the site's dashboard
+  overview, which is why they deep-link to their own section rather than to
+  the page.
+*/
+describe("SiteMenu — board 642:3401's dashboard hand-offs", () => {
+  const clickItem = (name: string) => {
+    const open = vi.fn();
+    vi.stubGlobal("open", open);
+    render(<SiteMenu siteId="site_42" />);
+    openMenu();
+    fireEvent.click(screen.getByRole("menuitem", { name }));
+    const url = open.mock.calls[0]?.[0] as string;
+    vi.unstubAllGlobals();
+    return url;
+  };
+
+  it("Site health lands on the health panel, not just the page", () => {
+    expect(clickItem("Site health")).toContain("/dashboard/sites/site_42#site-health");
+  });
+
+  it("Activity log lands on the activity section", () => {
+    expect(clickItem("Activity log")).toContain("/dashboard/sites/site_42#activity-log");
+  });
+
+  it("neither appears without a site", () => {
+    render(<SiteMenu onOpenHistory={vi.fn()} />);
+    openMenu();
+    expect(screen.queryByRole("menuitem", { name: "Site health" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("menuitem", { name: "Activity log" })).not.toBeInTheDocument();
+  });
+});

@@ -11,6 +11,7 @@ export function SectionCard({
   children,
   padding = "md",
   className,
+  id,
 }: {
   title?: string;
   description?: string;
@@ -18,10 +19,15 @@ export function SectionCard({
   children: ReactNode;
   padding?: "md" | "none";
   className?: string;
+  /** Anchor target. The editor's site menu deep-links to sections by id —
+      board 642:3401 lists "Site health" and "Activity log" as their own
+      destinations, and each has to land somewhere it can name. */
+  id?: string;
 }) {
   const hasHeader = Boolean(title || actions);
   return (
     <section
+      id={id}
       className={cn("overflow-hidden rounded-lg border shadow-card", className)}
       style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
     >

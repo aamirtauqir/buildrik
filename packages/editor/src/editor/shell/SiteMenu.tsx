@@ -70,6 +70,13 @@ export interface SiteMenuProps {
   /** Copying can fail (no clipboard on insecure origins), so the container
    *  owns it — this menu has no way to tell the user it didn't work. */
   onCopyLiveUrl?: () => void;
+  /**
+   * The site this menu belongs to, for the dashboard hand-offs that need one.
+   * Board 642:3401's "Share preview link" is the case: the flow exists — the
+   * dashboard's ShareDraftModal, on `siteDetail.sharing.create` — and the
+   * editor had no way to reach it.
+   */
+  siteId?: string | null;
   // ── Workspace ─────────────────────────────────────────────────────────────
   /** Collaboration is flag-gated; when it is on, the session has to be startable. */
   onStartCollaboration?: () => void;
@@ -114,6 +121,7 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
   onToggleClientView,
   publishedUrl,
   onCopyLiveUrl,
+  siteId,
   onStartCollaboration,
   onAskAI,
   onOpenShortcuts,
@@ -128,7 +136,7 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
     onOpenSiteSettings || onOpenHistory || onOpenPublish || onOpenPublishHistory || onExportCode,
   );
   const hasBuild = Boolean(onOpenTemplates || onOpenComponents || onOpenDesignSystem || onOpenPlugins);
-  const hasShare = Boolean(onToggleClientView || publishedUrl);
+  const hasShare = Boolean(onToggleClientView || publishedUrl || siteId);
 
   return (
     <Popover
@@ -164,6 +172,22 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
           </MenuGroup>
         )}
 
+        {/* Board 642:3401's second group. Both are real dashboard surfaces —
+            the Health Score panel and Recent Activity on the site's overview —
+            that the editor simply had no door to. They deep-link to their own
+            section rather than to the page, so each lands where its label
+            says it will. */}
+        {siteId && (
+          <MenuGroup>
+            <MenuItem onClick={run(() => openDashboard(`/dashboard/sites/${siteId}#site-health`))}>
+              Site health
+            </MenuItem>
+            <MenuItem onClick={run(() => openDashboard(`/dashboard/sites/${siteId}#activity-log`))}>
+              Activity log
+            </MenuItem>
+          </MenuGroup>
+        )}
+
         {hasBuild && (
           <MenuGroup>
             <MenuLabel>Build</MenuLabel>
@@ -196,6 +220,17 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
               </MenuItem>
             ) : null}
             {publishedUrl && onCopyLiveUrl ? <MenuItem onClick={run(onCopyLiveUrl)}>Copy live URL</MenuItem> : null}
+            {/* Board 642:3401. A private link to the current DRAFT — a
+                different thing from the live URL above it, and the one a
+                client is sent before anything is published. The flow is the
+                dashboard's ShareDraftModal; this hands off to it directly,
+                the way "Invite teammates" below hands off to team settings,
+                rather than landing the user on a page to hunt for a button. */}
+            {siteId ? (
+              <MenuItem onClick={run(() => openDashboard(`/dashboard/sites/${siteId}?share=1`))}>
+                Share preview link
+              </MenuItem>
+            ) : null}
           </MenuGroup>
         )}
 
