@@ -264,3 +264,44 @@ describe("actions", () => {
     expect(await screen.findByRole("button", { name: "Re-send for review" })).toBeEnabled();
   });
 });
+
+
+describe("ReviewTab — board 157:2 fills the DETACHED band", () => {
+  /* The band is the one row in the list whose comment lost its anchor. The
+     board fills it — measured off the frame at #FCFCEA on #723B13, against
+     #F3F4F6 for the OPEN and RESOLVED bands beside it. It shipped grey with
+     amber words only, which reads as the same band as its neighbours. */
+  function makeComposer(orphanIds: string[]) {
+    const handlers: Record<string, ((p: unknown) => void)[]> = {};
+    return {
+      on: (evt: string, fn: (p: unknown) => void) => {
+        (handlers[evt] ||= []).push(fn);
+      },
+      off: () => {},
+      emit: (evt: string) => {
+        if (evt === "comments:orphans-request") {
+          for (const fn of handlers["comments:orphans"] || []) fn({ ids: orphanIds });
+        }
+      },
+    };
+  }
+
+  it("gives the band the warning tint, not the neutral one", async () => {
+    const composer = makeComposer(["c1"]);
+    renderTab({ composer });
+
+    const band = await screen.findByText("Detached");
+    const row = band.closest("div[style]") as HTMLElement;
+    expect(row.style.background).toContain("--bk-warning-tint");
+    expect(row.style.color).toContain("--bk-warning-text");
+  });
+
+  it("leaves the other bands neutral", async () => {
+    const composer = makeComposer([]);
+    renderTab({ composer });
+
+    const open = await screen.findByText(/^Open · /i);
+    const band = open.closest("div") as HTMLElement;
+    expect(band.style.background).toBe("");
+  });
+});
