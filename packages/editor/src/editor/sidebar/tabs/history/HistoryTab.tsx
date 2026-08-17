@@ -21,6 +21,7 @@ import { TimeTravelScrubber } from "./components/TimeTravelScrubber";
 import { MilestoneSuggestionBanner } from "./components/MilestoneSuggestionBanner";
 import type { HistoryView, SavesFilter, HistoryTabProps } from "./types";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
+import { SavesApproval, SavesPruneNote } from "./components/SavesChrome";
 
 const VIEW_LABEL: Record<HistoryView, string> = {
   saves: "Saves",
@@ -244,6 +245,13 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
       )}
       {/* List container — Saves (milestones | all changes) or Published */}
       <div className="list-container" role="tabpanel">
+        {/* Boards 162:2 / 163:2 / 163:64 all draw the approval band above the
+            list and the retention rule below it — the milestones filter, the
+            changes filter, and the empty state alike. They sit here rather
+            than inside either list for that reason: 163:64 has no list at all
+            and still carries the note. */}
+        {activeView === "saves" && <SavesApproval composer={composer} />}
+
         {activeView === "saves" && savesFilter === "changes" && (
           <ActivityView
             composer={composer}
@@ -268,6 +276,8 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
             <VersionHistoryPanel composer={composer} searchQuery={searchQuery} />
           </>
         )}
+
+        {activeView === "saves" && <SavesPruneNote composer={composer} />}
 
         {/* M2 — the published-version list's canonical home. Same component the
             Publish panel embeds; rollback stays ADMIN-gated inside it. */}
