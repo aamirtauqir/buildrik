@@ -14,6 +14,9 @@ import { STORAGE_KEYS } from "../../../shared/constants/config";
 import type { BlockData } from "../../../shared/types";
 import { canNestElement } from "../../../shared/utils/nesting";
 import { mirrorUserTemplate } from "../../../services/templateSync";
+import { inverseResolveTokens } from "../../sidebar/tabs/templates/utils/inverseResolveTokens";
+import { snapshotFromComputedStyle } from "../../sidebar/tabs/templates/utils/tokenSnapshot";
+import { DEFAULT_TOKENS } from "../../design-system/constants";
 
 export interface UseStudioHandlersParams {
   composer: Composer | null;
@@ -50,11 +53,26 @@ export function useStudioHandlers(params: UseStudioHandlersParams): UseStudioHan
     (data: { name: string; category: string; description: string }) => {
       if (!composer) return;
       const exported = composer.exportHTML();
+      /**
+       * Save the page with token PLACEHOLDERS, not the literal values this
+       * project happens to use — board 1169:4753's own promise, "Tokens are
+       * snapshotted — applying it later re-maps them to that site's brand."
+       *
+       * The apply half of that round trip has always been wired
+       * (`TemplatesTab` runs `resolveTokens` against a live snapshot before
+       * importing). The save half was not: `inverseResolveTokens` was written,
+       * tested and imported by nothing, so a saved template carried this
+       * site's hexes and applying it into another site painted that site in
+       * these colours. Same snapshot source as the apply path, so the two
+       * directions cannot drift.
+       */
+      const snapshot = snapshotFromComputedStyle(document.documentElement, DEFAULT_TOKENS);
+      const portableHtml = inverseResolveTokens(exported.combined || "", snapshot);
       const newTemplate = {
         id: `user-${Date.now()}`,
         ...data,
         thumbnail: "",
-        html: exported.combined || "",
+        html: portableHtml,
         css: "",
       };
       try {

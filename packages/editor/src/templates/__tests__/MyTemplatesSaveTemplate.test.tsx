@@ -121,9 +121,21 @@ describe("SaveTemplate", () => {
     return { onClose, onSave };
   }
 
+  it("prints the board's token note — true only because the save path snapshots them", () => {
+    renderSave();
+    expect(document.body.textContent).toMatch(
+      /Tokens are snapshotted — applying it later re-maps them to that site.s brand\./,
+    );
+  });
+
+  it("offers no Category control — nothing ever read the choice", () => {
+    renderSave();
+    expect(screen.queryByLabelText(/Category/i)).toBeNull();
+  });
+
   it("disables Save until a name is entered", () => {
     renderSave();
-    const save = screen.getByRole("button", { name: "Save Template" });
+    const save = screen.getByRole("button", { name: "Save template" });
     expect(save).toBeDisabled();
     fireEvent.change(screen.getByPlaceholderText("My Template"), {
       target: { value: "Landing v2" },
@@ -131,6 +143,10 @@ describe("SaveTemplate", () => {
     expect(save).not.toBeDisabled();
   });
 
+  /* Category is no longer a control — board 1169:4753 draws one field, and the
+     value was never read back (`getUserTemplates` hardcodes
+     `category: "my-templates"`). The payload still carries the default so the
+     stored row shape is unchanged for anyone reading old entries. */
   it("saves name + default category + description, then closes and resets", async () => {
     const { onSave, onClose } = renderSave();
     fireEvent.change(screen.getByPlaceholderText("My Template"), {
@@ -139,7 +155,7 @@ describe("SaveTemplate", () => {
     fireEvent.change(screen.getByPlaceholderText("Describe your template..."), {
       target: { value: "Hero + pricing" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Save Template" }));
+    fireEvent.click(screen.getByRole("button", { name: "Save template" }));
 
     await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
     expect(onSave).toHaveBeenCalledWith({

@@ -4,7 +4,7 @@
  */
 
 import * as React from "react";
-import { InputField, TextareaField, SelectField } from "../shared/forms";
+import { InputField, TextareaField } from "../shared/forms";
 import { Button, ModalBody, ModalClose, ModalContent, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
 
 export interface SaveTemplateProps {
@@ -21,7 +21,10 @@ export const SaveTemplate: React.FC<SaveTemplateProps> = ({
   // html prop available for future preview feature
 }) => {
   const [name, setName] = React.useState("");
-  const [category, setCategory] = React.useState("Custom");
+  /* The saved row still carries a category so the stored shape does not change
+     under anyone reading old entries; nothing chooses it any more, and nothing
+     ever read it back. */
+  const category = "Custom";
   const [description, setDescription] = React.useState("");
   const [saving, setSaving] = React.useState(false);
 
@@ -42,7 +45,7 @@ export const SaveTemplate: React.FC<SaveTemplateProps> = ({
   return (
     <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
       <ModalContent size="lg">
-        <ModalTitle>Save as Template</ModalTitle>
+        <ModalTitle>Save page as template</ModalTitle>
         <ModalClose aria-label="Close modal" onClick={onClose}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
             <path d="M18 6L6 18M6 6l12 12" />
@@ -58,20 +61,13 @@ export const SaveTemplate: React.FC<SaveTemplateProps> = ({
         autoFocus
       />
 
-      <SelectField
-        label="Category"
-        value={category}
-        onChange={setCategory}
-        options={[
-          { value: "Custom", label: "Custom" },
-          { value: "Landing Pages", label: "Landing Pages" },
-          { value: "Portfolio", label: "Portfolio" },
-          { value: "Business", label: "Business" },
-          { value: "E-Commerce", label: "E-Commerce" },
-          { value: "Blog", label: "Blog" },
-        ]}
-      />
-
+      {/* The Category select that stood here is gone. Board 1169:4753 draws one
+          field, and the value was never read back: `getUserTemplates` parses
+          the stored row as { id, name, description, html } and hardcodes
+          `category: "my-templates"` on every one. The user chose from six
+          options and the reader ignored all six. Description stays — the board
+          does not draw it, but unlike category it IS read: the drawer gallery
+          searches on it and TemplateDetail prints it. */}
       <TextareaField
         label="Description (optional)"
         value={description}
@@ -79,6 +75,16 @@ export const SaveTemplate: React.FC<SaveTemplateProps> = ({
         placeholder="Describe your template..."
         rows={3}
       />
+
+      {/* Board 1169:4753's hint. It is printed now because it became TRUE in
+          this commit: `handleSaveTemplate` runs `inverseResolveTokens` over the
+          exported HTML, so the saved template carries `{{token.…}}`
+          placeholders and the apply path re-resolves them against whichever
+          site it lands in. Before that the sentence would have been a promise
+          the code did not keep. */}
+      <p className="tw:m-0 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+        Tokens are snapshotted — applying it later re-maps them to that site&rsquo;s brand.
+      </p>
     </div>
     <div
       style={{
@@ -92,7 +98,7 @@ export const SaveTemplate: React.FC<SaveTemplateProps> = ({
         Cancel
       </Button>
       <Button onClick={handleSave} disabled={!name.trim() || saving} aria-busy={saving || undefined}>
-        Save Template
+        Save template
       </Button>
     </div>
         </ModalBody>

@@ -160,6 +160,32 @@ describe("useStudioHandlers", () => {
   });
 
   // handleSaveTemplate -------------------------------------------------------------
+  describe("handleSaveTemplate — the saved page is portable", () => {
+    /* Board 1169:4753 promises "Tokens are snapshotted — applying it later
+       re-maps them to that site's brand". The APPLY half was always wired
+       (TemplatesTab resolves placeholders against a live snapshot); the SAVE
+       half was not — `inverseResolveTokens` was written, tested and imported
+       by nothing, so a saved template carried this project's literal hexes and
+       applying it elsewhere painted that site in these colours. */
+    it("stores placeholders, not this project's literal token values", () => {
+      const accent = "#1a56db";
+      document.documentElement.style.setProperty("--buildrick-design-color-primary", accent);
+      const { hook, composer } = mount();
+      composer.exportHTML = vi.fn(() => ({
+        combined: `<section style="color:${accent}">hi</section>`,
+      })) as never;
+
+      act(() =>
+        hook.result.current.handleSaveTemplate({ name: "Portable", category: "Custom", description: "" }),
+      );
+
+      const stored = JSON.parse(localStorage.getItem(STORAGE_KEYS.MY_TEMPLATES) || "[]");
+      expect(stored[0].html).not.toContain(accent);
+      expect(stored[0].html).toMatch(/\{\{token\./);
+      document.documentElement.style.removeProperty("--buildrick-design-color-primary");
+    });
+  });
+
   describe("handleSaveTemplate", () => {
     const data = { name: "My hero", category: "heroes", description: "d" };
 
