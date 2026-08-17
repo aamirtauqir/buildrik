@@ -1,3 +1,25 @@
+/* LAYER ORDER (fix, 2026-08-17). `@layer` statements are allowed before
+   `@import` and this one has to be: whichever stylesheet loads first fixes the
+   order of every layer it names, and a layer nobody has named yet is appended
+   AFTER all of them.
+
+   The embedded editor ships its own `reset` layer (packages/editor's
+   chrome-reset.css — `font: inherit` on button/input/select/textarea, which is
+   preflight's normalisation). In the editor's own Vite build that layer is
+   declared first, so `tw:text-*` utilities beat it, which is the whole point of
+   putting it in a layer. In THIS build the dashboard's CSS loads first, this
+   import fixes the order as theme/base/components/utilities, and the editor's
+   `reset` arrives afterwards as a brand-new layer — landing ON TOP of the
+   utilities and silently defeating them.
+
+   Measured in a real browser at /edit/<siteId>: a <button> and a <div>
+   carrying the identical class string computed 16px/400 and 11px/500. On
+   port 5050 both computed 11px/500. Every chrome button in the SHIPPING
+   editor was ignoring its own text size, weight and colour utilities.
+
+   Naming `reset` here, before the import, puts it first for everyone. */
+@layer reset;
+
 @import 'tailwindcss';
 
 @theme inline {
