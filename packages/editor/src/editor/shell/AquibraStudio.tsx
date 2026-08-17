@@ -29,6 +29,7 @@ import { useCmsSync } from "./hooks/useCmsSync";
 import { useVersionSync } from "./hooks/useVersionSync";
 import { useComponentSync } from "./hooks/useComponentSync";
 import { hydrateUserTemplatesFromServer } from "@/services/templateSync";
+import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { useComposerInit } from "./hooks/useComposerInit";
 import { RecoveryBanner } from "./RecoveryBanner";
 import { LoadErrorBanner, type LoadErrorKind } from "./LoadErrorBanner";
@@ -708,6 +709,10 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
       <PublishConfirmModal
         isOpen={publishConfirmOpen}
         composer={composer}
+        /* So the confirm can ask `runPrePublishChecks` whether this workspace
+           can deploy at all — the panel path has always asked; this one
+           published first and found out afterwards. */
+        siteId={getSiteIdFromUrl()}
         isPublished={publishJob.uiState === "published" || !!publishJob.publishedUrl}
         publishedUrl={publishJob.publishedUrl}
         onConfirm={confirmPublish}

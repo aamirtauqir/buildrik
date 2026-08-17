@@ -26,6 +26,9 @@ export interface PublishConfirmModalProps {
   isPublished: boolean;
   /** The live URL, when there is one. */
   publishedUrl?: string | null;
+  /** The site being published — passed through so the facts can ask the server
+      whether this workspace can deploy at all. */
+  siteId?: string | null;
   /** Proceed with the canonical publish. */
   onConfirm: () => void | Promise<void>;
   onClose: () => void;
@@ -37,10 +40,15 @@ export const PublishConfirmModal: React.FC<PublishConfirmModalProps> = ({
   composer,
   isPublished,
   publishedUrl,
+  siteId,
   onConfirm,
   onClose,
 }) => {
   const [submitting, setSubmitting] = React.useState(false);
+  /* A blocking pre-publish check means the server will refuse this deploy.
+     The panel path has always shown that up front; this one used to publish
+     anyway and let the job die after it had queued. */
+  const [blocked, setBlocked] = React.useState<string | null>(null);
   /* The exporter's count, reported by the facts component: a publish with
      nothing in it must not be offered. */
   const [pageCount, setPageCount] = React.useState<number | null>(null);
@@ -60,6 +68,8 @@ export const PublishConfirmModal: React.FC<PublishConfirmModalProps> = ({
             publishedUrl={publishedUrl}
             isPublished={isPublished}
             onPageCount={setPageCount}
+            siteId={siteId}
+            onBlocked={setBlocked}
           />
         </div>
 
@@ -69,13 +79,19 @@ export const PublishConfirmModal: React.FC<PublishConfirmModalProps> = ({
           </p>
         )}
 
+        {blocked && (
+          <p className="tw:mt-[10px] tw:mb-0 tw:rounded-[var(--bk-radius-sm)] tw:px-[11px] tw:py-[9px] tw:text-[12px] tw:text-[var(--bk-error)] tw:bg-[var(--bk-error-tint)]" role="alert">
+            {blocked}
+          </p>
+        )}
+
         <ModalFooter>
           <Button color="light" size="xs" disabled={submitting} onClick={onClose}>
             Cancel
           </Button>
           <Button
             size="xs"
-            disabled={submitting || pageCount === 0}
+            disabled={submitting || pageCount === 0 || blocked !== null}
             onClick={() => {
               setSubmitting(true);
               void Promise.resolve(onConfirm()).finally(() => setSubmitting(false));

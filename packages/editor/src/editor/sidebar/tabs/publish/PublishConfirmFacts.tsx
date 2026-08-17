@@ -16,6 +16,8 @@
 import * as React from "react";
 import type { Composer } from "@/engine";
 import { fetchCurrentRound, type CurrentRound } from "@/services/ReviewService";
+import { fetchPrePublishChecks } from "@/services/PublishService";
+import { VERCEL_CHECK_LABEL } from "@buildrik/shared/schemas/publish";
 import { exportPublishPages } from "@/editor/shell/exportPublishPages";
 
 const ROW = "tw:flex tw:justify-between tw:items-baseline tw:gap-[16px] tw:py-[7px] tw:text-[12px]";
@@ -51,6 +53,12 @@ export interface PublishConfirmFactsProps {
   /** Reports the exporter's page count so a caller can refuse a zero-page
       publish — the count is read here, and the guard belongs to the button. */
   onPageCount?(count: number | null): void;
+  /** The site whose readiness to check. Without it the Target row can only
+      assert a connection it has not looked for. */
+  siteId?: string | null;
+  /** The blocking check's detail, or null when nothing blocks — same contract
+      as onPageCount: read here, enforced by the button. */
+  onBlocked?(reason: string | null): void;
 }
 
 export const PublishConfirmFacts: React.FC<PublishConfirmFactsProps> = ({
@@ -60,10 +68,18 @@ export const PublishConfirmFacts: React.FC<PublishConfirmFactsProps> = ({
   isPublished,
   rollbackTo = null,
   onPageCount,
+  siteId,
+  onBlocked,
 }) => {
   const [pageCount, setPageCount] = React.useState<number | null>(null);
   const [round, setRound] = React.useState<CurrentRound | null>(null);
   const [loadingRound, setLoadingRound] = React.useState(true);
+  /* `runPrePublishChecks` is the only thing that knows whether this workspace
+     can deploy at all. The topbar path never asked it: the row asserted "your
+     connected Vercel project", the button published, the job queued, and the
+     deploy died at the last step on VERCEL_NOT_CONNECTED — which is the exact
+     failure that check exists to prevent (publish.service.ts:36). */
+  const [blocker, setBlocker] = React.useState<{ label: string; detail: string } | null>(null);
 
   React.useEffect(() => {
     if (!active) return;
@@ -73,11 +89,17 @@ export const PublishConfirmFacts: React.FC<PublishConfirmFactsProps> = ({
     void (async () => {
       /* The page count is the EXPORT's count, not the page list's: what ships
          is what the exporter produces. */
-      const [pages, r] = await Promise.all([
+      const [pages, r, checks] = await Promise.all([
         composer ? exportPublishPages(composer).catch(() => null) : Promise.resolve(null),
         fetchCurrentRound().catch(() => null),
+        siteId ? fetchPrePublishChecks(siteId).catch(() => null) : Promise.resolve(null),
       ]);
       if (cancelled) return;
+      /* A checks call that fails is not a pass: it leaves the row saying what
+         it said before and the button alone, rather than inventing a verdict. */
+      const failed = checks?.checks.find((c) => c.status === "fail") ?? null;
+      setBlocker(failed ? { label: failed.label, detail: failed.detail } : null);
+      onBlocked?.(failed ? failed.detail : null);
       const count = pages ? pages.length : null;
       setPageCount(count);
       onPageCount?.(count);
@@ -87,11 +109,16 @@ export const PublishConfirmFacts: React.FC<PublishConfirmFactsProps> = ({
     return () => {
       cancelled = true;
     };
-  }, [active, composer, onPageCount]);
+  }, [active, composer, onPageCount, siteId, onBlocked]);
 
   const target = publishedUrl
     ? `Production · ${publishedUrl.replace(/^https?:\/\//, "")}`
-    : "your connected Vercel project";
+    : blocker?.label === VERCEL_CHECK_LABEL
+      /* The row states the fact; the sentence that explains it belongs to the
+         band under the rows, which has the width for it. Both carrying the
+         same sentence printed it twice and ran it to the modal's edge. */
+      ? "No Vercel connection"
+      : "your connected Vercel project";
 
   return (
     <div>
