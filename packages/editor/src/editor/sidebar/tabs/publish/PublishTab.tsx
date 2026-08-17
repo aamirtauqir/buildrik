@@ -9,11 +9,10 @@
  */
 
 import * as React from "react";
-import { CopyButton, PanelFrame, Button, Progress, SkeletonBlock, Spinner } from "@/editor/chrome-ui";
+import { PanelFrame, Button, Progress, SkeletonBlock, Spinner } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import type { UsePublishJobResult } from "../../../shell/hooks/usePublishJob";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
-import { PublishHistory } from "../../../shell/PublishHistory";
 import { fetchPrePublishChecks } from "../../../../services/PublishService";
 import { relativeShort, usePublishSnapshot } from "./usePublishSnapshot";
 import { PublishWizard } from "./PublishWizard";
@@ -62,7 +61,6 @@ export interface PublishTabProps {
 // ============================================
 
 
-type CheckStatus = PrePublishChecksResult["checks"][number]["status"];
 
 /**
  * Where a non-passing check is fixed. Only `fail` rows block the publish, so a
@@ -82,11 +80,6 @@ const FIX_TARGETS: Record<string, { tab: string; label: string }> = {
   Favicon: { tab: "settings", label: "Fix" },
 };
 
-const STATUS_ICON: Record<CheckStatus, { dot: string; glyph: string; sr: string }> = {
-  pass: { dot: "tw:bg-[var(--bk-success)]", glyph: "✓", sr: "passed" },
-  warning: { dot: "tw:bg-[var(--bk-warning)]", glyph: "!", sr: "warning" },
-  fail: { dot: "tw:bg-[var(--bk-error)]", glyph: "✕", sr: "blocking" },
-};
 
 
 /** The board's row rhythm: label left, value right, one line. */
@@ -134,25 +127,6 @@ const SkeletonRows: React.FC<{ widths: string[] }> = ({ widths }) => (
   </div>
 );
 
-const UrlDisplay: React.FC<{ url: string }> = ({ url }) => (
-  <div className="tw:flex tw:flex-col">
-    <label className={LABEL}>Published URL</label>
-    <div className="tw:flex tw:items-center tw:gap-1.5 tw:px-2 tw:py-1.5 tw:bg-gray-50 tw:rounded tw:border tw:border-gray-200">
-      <a
-        href={url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="tw:flex-1 tw:text-xs tw:text-blue-700 tw:no-underline tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap"
-        title={url}
-      >
-        {url.replace(/^https?:\/\//, "")}
-      </a>
-      {/* chrome-ui's CopyButton owns the clipboard write, the copied-state
-          checkmark and the toast. This file had its own copy of all three. */}
-      <CopyButton content={url} label="" aria-label="Copy published URL" />
-    </div>
-  </div>
-);
 
 // ============================================
 // Main Component
@@ -603,12 +577,10 @@ export const PublishTab: React.FC<PublishTabProps> = ({
         </section>
         )}
 
-        {/* Published URL */}
-        {isPublished && publishedUrl && (
-          <section className={SECTION}>
-            <UrlDisplay url={publishedUrl} />
-          </section>
-        )}
+        {/* The "Published URL" copy-card is gone. Board 641:2652 and board
+            784:4326 both end their content after LAST DEPLOY and draw empty
+            space; neither carries it, and ENVIRONMENT › Production already
+            names the live domain and links to it. Founder call 2026-08-17. */}
 
         {/* The pre-publish checklist moved to the wizard's first step
             (board 833:4518). It gated a publish, so it belongs in the flow
@@ -626,24 +598,16 @@ export const PublishTab: React.FC<PublishTabProps> = ({
             failure a first-class state at the top of the panel, not a toast
             hiding under the checklist. */}
 
-        {/* P1: published-version history + rollback (contract §5). Inside the
-            reachable branch: with the deploy service down, board 781:4489 is
-            the whole panel — a second "couldn't load" list under the first
-            message says the same failure twice.
+        {/* The published-version list and its rollback buttons are gone from
+            this panel. Boards 641:2652 and 784:4326 both end after LAST DEPLOY
+            and draw empty space below it, and the list has a board of its own —
+            History · Published (949:4474) — which SiteMenu's "Publish history"
+            already opens. Rendering it here made the panel a second, unboarded
+            copy of that destination. Founder call 2026-08-17.
 
-            The same argument the line above makes for the error state applies
-            to loading, and it was only half-applied: while the three sections
-            overhead are showing skeletons, this rendered a Spinner captioned
-            "Loading versions…" beneath them — two idioms for one wait, and the
-            spinner is the one this panel deliberately rejected (see
-            SkeletonRows: "a column of identical bars reads as a rendered UI
-            that has gone wrong rather than one still arriving"). Board
-            778:4238 draws skeletons above and empty space here. */}
-        {siteId && !snapshot.loading && (
-          <section className={SECTION}>
-            <PublishHistory siteId={siteId} onRollbackStarted={() => publishJob?.reset?.()} />
-          </section>
-        )}
+            LAST DEPLOY above still answers "what is live" (v3 · live · date),
+            which is what this panel is for; "show me every version and roll
+            one back" is the other surface's question. */}
         </>
         )}
         </>
@@ -794,6 +758,5 @@ const STEP_WORD: Record<string, string> = {
   done: "done",
   failed: "failed",
 };
-const LABEL = "tw:text-xs tw:font-medium tw:text-[var(--bk-ink-soft)] tw:mb-1";
 
 export default PublishTab;

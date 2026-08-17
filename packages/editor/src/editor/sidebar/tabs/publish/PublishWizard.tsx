@@ -67,11 +67,13 @@ const SR_STATUS: Record<"pass" | "warning" | "fail", string> = {
 const CheckIcon: React.FC<{ status: "pass" | "warning" | "fail" }> = ({ status }) => (
   <span
     className={`tw:flex tw:size-5 tw:flex-none tw:items-center tw:justify-center tw:rounded-full tw:text-[11px] tw:font-semibold tw:text-white ${
-      status === "pass"
-        ? "tw:bg-[var(--bk-success)]"
-        : status === "fail"
-          ? "tw:bg-[var(--bk-error)]"
-          : "tw:bg-[var(--bk-warning)]"
+      /* Board 893:4518 paints the FAILING row's disc the same amber as the
+         warning rows — measured off the board at #C27803, not eyeballed — and
+         distinguishes severity by the glyph alone. This was `--bk-error`;
+         founder call 2026-08-17 was to follow the board. Severity still
+         reaches a screen reader through SR_STATUS, so colour is not the only
+         carrier. */
+      status === "pass" ? "tw:bg-[var(--bk-success)]" : "tw:bg-[var(--bk-warning)]"
     }`}
   >
     {/* Board 893:4518 is the only board with a failing row, and it draws ✕ —
