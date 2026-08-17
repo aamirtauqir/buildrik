@@ -147,6 +147,14 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose, o
     }
   };
 
+  /** The full grouped list, reached the same way a row's own jump is. */
+  const seeAll = () => {
+    const url = "/dashboard/notifications";
+    if (onNavigate) onNavigate(url);
+    else window.location.href = `${DASHBOARD_URL}${url}`;
+    onClose();
+  };
+
   // Unread first, then newest — the reason you opened the panel is at the top.
   const ordered = [...rows].sort((a, b) => {
     if (a.read !== b.read) return a.read ? 1 : -1;
@@ -231,6 +239,24 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose, o
             </React.Fragment>
           );
         })}
+
+      {/* The panel is the five most recent (`getRecentNotifications` takes 5)
+          while the bell counts every unread one — 25 against 5 on the site
+          this was walked on. Without a route to the full list, twenty of them
+          were counted in the badge and reachable from nowhere in the editor.
+          `/dashboard/notifications` already renders them grouped. */}
+      {state === "ready" && ordered.length > 0 ? (
+        <div className="tw:border-t tw:border-[var(--bk-border)] tw:px-3 tw:py-2">
+          <Button
+            color="light"
+            size="xs"
+            className="tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[var(--bk-accent)]"
+            onClick={seeAll}
+          >
+            See all notifications
+          </Button>
+        </div>
+      ) : null}
     </div>
   );
 };
