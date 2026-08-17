@@ -65,6 +65,13 @@ const ClearXSvg = () => (
   lane is what the styling ratchet drains, and a caller's utilities win over
   flowbite's Button theme (chrome-ui/__tests__/className-precedence.test.tsx).
 */
+/* Board 163:113's preview band — accent tint, actions inline with the title. */
+const PREVIEW_BAND =
+  "tw:rounded-md tw:bg-[var(--bk-accent-tint)] tw:px-3 tw:py-2.5 tw:flex tw:flex-col tw:gap-1 tw:mb-2";
+const PREVIEW_ROW = "tw:flex tw:items-center tw:justify-between tw:gap-3";
+const PREVIEW_TITLE = "tw:text-[13px] tw:font-semibold tw:text-[var(--bk-accent)] tw:truncate";
+const PREVIEW_SUB = "tw:text-[11px] tw:text-[var(--bk-ink-soft)]";
+
 const FILTER_ROW = "tw:flex tw:gap-[var(--bk-space-4)] tw:pt-[var(--bk-space-8)] tw:px-[var(--bk-space-12)]";
 const FILTER_CHIP =
   "tw:px-[var(--bk-space-8)] tw:py-[var(--bk-space-4)] tw:text-[12px] " +
@@ -189,6 +196,12 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
     setShowScrubber(false);
   }, []);
 
+  /* Board 163:113 — while time-travel is on, the PANEL says so too. Without
+     it the Saves list looked entirely normal while the canvas showed a past
+     state, and the sentence that makes scrubbing safe to explore — nothing is
+     written until you restore — appeared nowhere at all. */
+  const [preview, setPreview] = React.useState<{ id: string; label: string } | null>(null);
+
   return (
     <PanelFrame className="bd-history-container">
       <PanelFrame.Header
@@ -263,6 +276,23 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
             changes filter, and the empty state alike. They sit here rather
             than inside either list for that reason: 163:64 has no list at all
             and still carries the note. */}
+        {showScrubber && preview && (
+          <div className={PREVIEW_BAND} role="status">
+            <div className={PREVIEW_ROW}>
+              <span className={PREVIEW_TITLE}>Previewing {preview.label}</span>
+              <div className="tw:flex tw:items-center tw:gap-2">
+                <Button color="light" size="xs" onClick={handleScrubberExit}>
+                  Exit
+                </Button>
+                <Button size="xs" onClick={() => handleScrubberRestore(preview.id)}>
+                  Restore this version
+                </Button>
+              </div>
+            </div>
+            <span className={PREVIEW_SUB}>Nothing is written until Restore.</span>
+          </div>
+        )}
+
         {activeView === "saves" && savesSettled && <SavesApproval composer={composer} />}
 
         {activeView === "saves" && savesFilter === "changes" && (
@@ -315,6 +345,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
           historyStack={historyStack}
           onRestore={handleScrubberRestore}
           onExit={handleScrubberExit}
+          onPreviewChange={setPreview}
         />
       )}
     </PanelFrame>

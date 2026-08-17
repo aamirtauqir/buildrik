@@ -29,6 +29,13 @@ interface TimeTravelScrubberProps {
   historyStack: HistoryDisplayEntry[];
   onRestore: (entryId: string) => void;
   onExit: () => void;
+  /**
+   * Reports which entry the canvas is currently previewing, so the PANEL can
+   * say so too — board 163:113 draws a band there while time-travel is on,
+   * and without this the Saves list looks entirely normal while the canvas
+   * shows a past state.
+   */
+  onPreviewChange?: (entry: { id: string; label: string } | null) => void;
 }
 
 // Max one preview update every ~33ms (≈30fps) per spec §2.7
@@ -59,6 +66,7 @@ export const TimeTravelScrubber: React.FC<TimeTravelScrubberProps> = ({
   historyStack,
   onRestore,
   onExit,
+  onPreviewChange,
 }) => {
   const reducedMotion = useReducedMotion();
 
@@ -72,6 +80,13 @@ export const TimeTravelScrubber: React.FC<TimeTravelScrubberProps> = ({
   const [previewSrc, setPreviewSrc] = React.useState<string | null>(null);
 
   const currentEntry = historyStack[currentIndex];
+
+  /* Keep the panel's band in step with what the canvas is showing. Cleared on
+     unmount so the band cannot outlive the scrubber. */
+  React.useEffect(() => {
+    onPreviewChange?.(currentEntry ? { id: currentEntry.id, label: currentEntry.label } : null);
+  }, [currentEntry, onPreviewChange]);
+  React.useEffect(() => () => onPreviewChange?.(null), [onPreviewChange]);
 
   // Cache cached versions once — .getVersions() is sync and returns a copy.
   const versionsRef = React.useRef<NamedVersion[]>([]);

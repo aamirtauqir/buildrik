@@ -32,7 +32,21 @@ vi.mock("../components/ActivityView", () => ({
 }));
 
 vi.mock("../components/TimeTravelScrubber", () => ({
-  TimeTravelScrubber: () => <div data-testid="tt-scrubber">SCRUBBER</div>,
+  TimeTravelScrubber: ({
+    onPreviewChange,
+  }: {
+    onPreviewChange?: (e: { id: string; label: string } | null) => void;
+  }) => (
+    <div data-testid="tt-scrubber">
+      SCRUBBER
+      <button
+        data-testid="tt-preview"
+        onClick={() => onPreviewChange?.({ id: "e1", label: "Auto-save" })}
+      >
+        preview
+      </button>
+    </div>
+  ),
 }));
 
 vi.mock("../components/MilestoneSuggestionBanner", () => ({
@@ -302,5 +316,45 @@ describe("HistoryTab — the Saves chrome waits for the list", () => {
   it("frames the Published view with neither — it is not the Saves list", () => {
     renderTab({ composer: withCap, initialView: "published" });
     expect(note()).toBeNull();
+  });
+});
+
+/*
+  Board 163:113 — while time-travel is on, the PANEL says so too.
+
+  The scrubber is a canvas overlay, so the Saves list looked entirely normal
+  while the canvas showed a past state, and the sentence that makes scrubbing
+  safe to explore — nothing is written until you restore — appeared nowhere at
+  all.
+*/
+describe("HistoryTab — board 163:113 preview band", () => {
+  beforeEach(() => window.localStorage.clear());
+
+  const openScrubber = () => {
+    fireEvent.click(screen.getByRole("button", { name: "All changes" }));
+    fireEvent.click(screen.getByTestId("tt-trigger"));
+  };
+
+  it("says nothing until the scrubber reports what it is previewing", () => {
+    renderTab();
+    openScrubber();
+    expect(screen.queryByText(/^Previewing /)).toBeNull();
+  });
+
+  it("names the previewed entry and states that nothing is written", () => {
+    renderTab();
+    openScrubber();
+    fireEvent.click(screen.getByTestId("tt-preview"));
+
+    expect(screen.getByText("Previewing Auto-save")).toBeInTheDocument();
+    expect(screen.getByText("Nothing is written until Restore.")).toBeInTheDocument();
+  });
+
+  it("Exit leaves time-travel without restoring", () => {
+    renderTab();
+    openScrubber();
+    fireEvent.click(screen.getByTestId("tt-preview"));
+    fireEvent.click(screen.getByRole("button", { name: "Exit" }));
+    expect(screen.queryByTestId("tt-scrubber")).toBeNull();
   });
 });
