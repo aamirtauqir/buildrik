@@ -107,3 +107,35 @@ describe("MultiSelectToolbar — batch panel Mixed labelling", () => {
     ).toBeInTheDocument();
   });
 });
+
+
+describe("MultiSelectToolbar — board 159:123 bands ALIGN, and only ALIGN", () => {
+  /* The board draws a full-width tinted strip holding the ALIGN label AND its
+     six buttons, with DISTRIBUTE plain on the panel below. The tint used to
+     sit on the button GROUP in both sections instead: ALIGN's band spanned the
+     full width at a 4% contrast step and read as nothing, while DISTRIBUTE got
+     a grey pill the board does not draw. Measured off the frame — the band is
+     #F3F4F6 (`--bk-bg-subtle`) from the ALIGN label down through its buttons,
+     and white from DISTRIBUTE onward. */
+  const sectionOf = (label: string) => {
+    const heading = screen.getByText(label);
+    return heading.parentElement as HTMLElement;
+  };
+
+  it("tints the ALIGN section", () => {
+    renderToolbar(["a", "b", "c"]);
+    expect(sectionOf("Align").style.background).toContain("--bk-bg-subtle");
+  });
+
+  it("leaves DISTRIBUTE on the plain panel", () => {
+    renderToolbar(["a", "b", "c"]);
+    expect(sectionOf("Distribute").style.background).toBe("");
+  });
+
+  it("gives the banded buttons an edge — transparent on a tint has none", () => {
+    renderToolbar(["a", "b", "c"]);
+    const align = screen.getByRole("button", { name: "Align elements to left" });
+    expect(align.className).toContain("tw:bg-white");
+    expect(align.className).not.toContain("tw:bg-transparent");
+  });
+});

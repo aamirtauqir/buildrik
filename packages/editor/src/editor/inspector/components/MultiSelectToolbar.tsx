@@ -52,6 +52,21 @@ const sectionStyles: React.CSSProperties = {
   gap: "var(--bk-space-8)",
 };
 
+/* Board 159:123 bands ALIGN and only ALIGN: a full-width tinted strip that
+   holds the label AND the six buttons, with DISTRIBUTE sitting plain on the
+   panel below it. The tint was on the button GROUP instead, in both sections —
+   which made ALIGN's band invisible (it spanned the full width at a 4%
+   contrast step) and gave DISTRIBUTE a grey pill the board does not draw. */
+/* Inside the band the buttons are white boxes; outside it, on the plain
+   panel, DISTRIBUTE's two are the tinted ones. The board inverts them that
+   way, and transparent buttons on a tinted band had no edge at all. */
+const bandedSectionStyles: React.CSSProperties = {
+  ...sectionStyles,
+  background: "var(--bk-bg-subtle)",
+  padding: "var(--bk-space-8) var(--bk-space-12)",
+  borderRadius: "var(--bk-radius-lg)",
+};
+
 const sectionLabelStyles: React.CSSProperties = {
   fontSize: "var(--bk-text-11)",
   fontWeight: 600,
@@ -63,9 +78,6 @@ const sectionLabelStyles: React.CSSProperties = {
 const buttonGroupStyles: React.CSSProperties = {
   display: "flex",
   gap: "var(--bk-space-4)",
-  background: "var(--bk-bg-subtle)",
-  padding: "var(--bk-space-4)",
-  borderRadius: "var(--bk-radius-lg)",
 };
 
 /** Count left, AI entry right — matches the single-selection header. */
@@ -179,7 +191,7 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
           carries its two on the right. Live split ALIGN in two ("Align
           Horizontal" / "Align Vertical"), which read as two decisions where
           the board has one. */}
-      <div style={sectionStyles}>
+      <div style={bandedSectionStyles}>
         <span style={sectionLabelStyles}>Align</span>
         <div style={buttonGroupStyles}>
           <Tooltip content={getAlignTooltip("Align Left")} placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
@@ -188,7 +200,7 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
               size="xs"
               aria-label="Align elements to left"
               onClick={handleAlignLeft}
-              disabled={isDisabled} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+              disabled={isDisabled} className="tw:border tw:border-gray-200 tw:bg-white tw:text-gray-600 tw:hover:text-gray-900"
             ><AlignLeft size={16} /></Button>
           </Tooltip>
           <Tooltip content={getAlignTooltip("Align Center")} placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
@@ -197,7 +209,7 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
               size="xs"
               aria-label="Align elements to center horizontally"
               onClick={handleAlignCenterH}
-              disabled={isDisabled} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+              disabled={isDisabled} className="tw:border tw:border-gray-200 tw:bg-white tw:text-gray-600 tw:hover:text-gray-900"
             ><AlignCenter size={16} /></Button>
           </Tooltip>
           <Tooltip content={getAlignTooltip("Align Right")} placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
@@ -206,7 +218,7 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
               size="xs"
               aria-label="Align elements to right"
               onClick={handleAlignRight}
-              disabled={isDisabled} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+              disabled={isDisabled} className="tw:border tw:border-gray-200 tw:bg-white tw:text-gray-600 tw:hover:text-gray-900"
             ><AlignRight size={16} /></Button>
           </Tooltip>
           <Tooltip content={getAlignTooltip("Align Top")} placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
@@ -215,7 +227,7 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
               size="xs"
               aria-label="Align elements to top"
               onClick={handleAlignTop}
-              disabled={isDisabled} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+              disabled={isDisabled} className="tw:border tw:border-gray-200 tw:bg-white tw:text-gray-600 tw:hover:text-gray-900"
             ><AlignStartVertical size={16} /></Button>
           </Tooltip>
           <Tooltip content={getAlignTooltip("Align Middle")} placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
@@ -224,7 +236,7 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
               size="xs"
               aria-label="Align elements to middle vertically"
               onClick={handleAlignMiddle}
-              disabled={isDisabled} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+              disabled={isDisabled} className="tw:border tw:border-gray-200 tw:bg-white tw:text-gray-600 tw:hover:text-gray-900"
             ><AlignCenterVertical size={16} /></Button>
           </Tooltip>
           <Tooltip content={getAlignTooltip("Align Bottom")} placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
@@ -233,7 +245,7 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
               size="xs"
               aria-label="Align elements to bottom"
               onClick={handleAlignBottom}
-              disabled={isDisabled} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+              disabled={isDisabled} className="tw:border tw:border-gray-200 tw:bg-white tw:text-gray-600 tw:hover:text-gray-900"
             ><AlignEndVertical size={16} /></Button>
           </Tooltip>
         </div>
@@ -249,7 +261,7 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
               size="xs"
               aria-label="Distribute elements horizontally with equal spacing"
               onClick={handleDistributeH}
-              disabled={distributeDisabled} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+              disabled={distributeDisabled} className="tw:border-transparent tw:bg-[var(--bk-bg-subtle)] tw:text-gray-600 tw:hover:text-gray-900"
             >
               <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                 <rect x="4" y="5" width="4" height="14" rx="1" />
@@ -264,7 +276,7 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
               size="xs"
               aria-label="Distribute elements vertically with equal spacing"
               onClick={handleDistributeV}
-              disabled={distributeDisabled} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+              disabled={distributeDisabled} className="tw:border-transparent tw:bg-[var(--bk-bg-subtle)] tw:text-gray-600 tw:hover:text-gray-900"
             >
               <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                 <rect x="5" y="4" width="14" height="4" rx="1" />

@@ -81,7 +81,11 @@ export const BatchStylePanel: React.FC<BatchStylePanelProps> = ({
 
   // Board 159:123 says "Mixed" inside the empty field, not appended to its
   // label: the row still reads "Radius", and the field says it has nothing to
-  // show because the selection disagrees.
+  // show because the selection disagrees. It spells that row "Text
+  // colour", but board 807:8342 (Inspector · profile · TEXT) spells the same
+  // control "Color" and so does every other colour row in this panel
+  // (Border, Background, Font). The boards disagree with each other on
+  // spelling; the inspector is consistent, so it stays "Text color".
   const fieldProps = (prop: string, label: string) => ({
     label,
     value: mixed.has(prop) ? "" : elementStyles[prop] || "",
