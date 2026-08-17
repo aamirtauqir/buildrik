@@ -66,6 +66,22 @@ export function useStreamPrompt(): UseStreamPromptResult {
     "not-configured" | "quota" | "other" | null
   >(null);
   const subRef = React.useRef<{ unsubscribe: () => void } | null>(null);
+  /**
+   * Reconnect budget for one prompt.
+   *
+   * tRPC's SSE client treats INTERNAL_SERVER_ERROR as RETRYABLE
+   * (`retryableRpcCodes` in @trpc/server) and silently reconnects instead of
+   * calling `onError`. Every provider failure reaches us as that code — the
+   * generator rethrows whatever OpenAI/Ollama threw — so a provider outage
+   * left this panel on "Thinking…" forever while the browser reopened the
+   * stream every ~440ms. Measured against a real dev server: one EventSource,
+   * five opens, five errors, zero data, sixteen seconds, no error on screen.
+   *
+   * A genuine network blip deserves a retry; a provider that is down does not
+   * deserve an unbounded loop. Two attempts, then the error is surfaced.
+   */
+  const RECONNECT_BUDGET = 2;
+  const retriesRef = React.useRef(0);
 
   const stop = React.useCallback(() => {
     if (subRef.current) {
@@ -92,6 +108,7 @@ export function useStreamPrompt(): UseStreamPromptResult {
     setError(null);
     setErrorKind(null);
     setStreaming(true);
+    retriesRef.current = 0;
 
     const client = getAiSubscriptionClient();
     subRef.current = client.ai.streamPrompt.subscribe(
@@ -126,6 +143,19 @@ export function useStreamPrompt(): UseStreamPromptResult {
           setError(err.message ?? "Stream failed");
           setStreaming(false);
           subRef.current = null;
+        },
+        /* The link reports a retryable failure as a move BACK to "connecting"
+           with the error attached — it never reaches `onError`. This is the
+           only place a provider outage is visible to us. */
+        onConnectionStateChange: (state: { state: string; error?: { message?: string } | null }) => {
+          if (state.state !== "connecting" || !state.error) return;
+          retriesRef.current += 1;
+          if (retriesRef.current < RECONNECT_BUDGET) return;
+          subRef.current?.unsubscribe();
+          subRef.current = null;
+          setErrorKind("other");
+          setError(state.error.message ?? "The AI service didn't respond.");
+          setStreaming(false);
         },
       },
     );

@@ -169,10 +169,16 @@ describe("AITab — scope + composer wiring", () => {
     expect(scope.assets).toHaveLength(1);
   });
 
-  it("surfaces a stream error in the assistant message instead of a silent empty reply", () => {
+  it("surfaces a stream error where the user can see it, with the server's own detail", () => {
     // Regression: onError set hook state but AITab never rendered it, so a
     // quota-exhausted (TOO_MANY_REQUESTS) or provider failure showed as a blank
     // assistant box. The error must be visible to the user.
+    //
+    // It moved out of the assistant bubble and into a state block on
+    // 2026-08-18: a provider failure had been printing its raw code where the
+    // reply goes ("UNAUTHORIZED"), after an unbounded SSE reconnect loop left
+    // the panel on "Thinking…". The server's sentence is still printed inside
+    // that block, which is what this test protects.
     const composer = makeElementScopedComposer();
     const { container } = renderWithToast(
       <AITab composer={composer} isExpanded={false} onExpandToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />,
@@ -226,6 +232,8 @@ describe("AITab — scope + composer wiring", () => {
     });
 
     expect(screen.queryByText(/isn.t configured yet/)).not.toBeInTheDocument();
+    // Our headline plus the server's own line — not the not-configured state.
+    expect(screen.getByText(/didn.t respond/)).toBeInTheDocument();
     expect(screen.getByText("Stream failed")).toBeInTheDocument();
   });
 

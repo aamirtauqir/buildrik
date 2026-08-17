@@ -51,7 +51,14 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
             </div>
           ) : (
             <span className="bd-ai-msg-edit-state">
-              {edit.state === "applied" ? "✓ Applied" : "Discarded"}
+              {/* Three outcomes, not two. "invalid" is Apply on a batch that
+                  reached the canvas with nothing this editor could map — it
+                  used to read "✓ Applied" over an unchanged page. */}
+              {edit.state === "applied"
+                ? "✓ Applied"
+                : edit.state === "invalid"
+                  ? "Nothing to apply — no change this editor can make"
+                  : "Discarded"}
             </span>
           )}
           {edit.state === "pending" ? (

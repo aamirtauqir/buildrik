@@ -62,7 +62,11 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
     if (mode === "agent" && agent.phase === "idle") setMode("chat");
   }, [mode, agent.phase]);
 
+  /** The last prompt, so the provider-failure state can offer a real retry. */
+  const lastPromptRef = React.useRef<string | null>(null);
+
   const submit = React.useCallback((text: string) => {
+    lastPromptRef.current = text;
     const serverScope = toServerScope(scope);
     if (!serverScope) {
       // Multi-select (or no scope): surface a message instead of a silent no-op.
@@ -152,21 +156,30 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
 
   const onAccept = React.useCallback(async (msgId: string) => {
     const msg = messages.find((m) => m.id === msgId);
+    let outcome: "applied" | "invalid" = "invalid";
     if (msg?.edit && composer) {
       // Apply the command batch in one transaction (one undo step). A bad
       // element id throws but the transaction still closes (endTransaction in
       // finally) and the partial edit is recorded as one undoable entry.
       // applyAiEdit is async (some commands, e.g. insert-component, are async);
       // await so the "applied" state flips only after the mutation lands.
+      /* `applied` is the number of commands that actually reached the canvas,
+         and it has always been returned — it was just thrown away, so the
+         message flipped to "✓ Applied" whether or not anything changed. The
+         model regularly answers with a command set this editor cannot map
+         (the server labels that batch "No applicable change" and still ships
+         `commands: []`), and clicking Apply on one of those reported success
+         over an untouched canvas. The catch is not success either. */
       try {
-        const { proposals } = await applyAiEdit(composer, msg.edit);
+        const { applied, proposals } = await applyAiEdit(composer, msg.edit);
         trackAiEditApplied({ applyOps: msg.edit.applyOps, surface: "chat", model });
         // A privileged action (e.g. publish) was proposed — route it to the
         // explicit confirm gate instead of applying it to the canvas.
         if (proposals.length > 0) void actionGate.propose(proposals[0].actionId);
+        outcome = applied > 0 || proposals.length > 0 ? "applied" : "invalid";
       } catch { /* partial recorded */ }
     }
-    setMessages((prev) => prev.map((m) => m.id === msgId && m.edit ? { ...m, edit: { ...m.edit, state: "applied" } } : m));
+    setMessages((prev) => prev.map((m) => m.id === msgId && m.edit ? { ...m, edit: { ...m.edit, state: outcome } } : m));
     unlock();
   }, [messages, composer, unlock, model, actionGate]);
 
@@ -263,6 +276,37 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
             onClick={() => window.open(`${DASHBOARD_URL}/dashboard/settings/billing`, "_blank")}
           >
             See plans
+          </Button>
+        </div>
+      ) : stream.errorKind === "other" && stream.error ? (
+        /* The third state the boards do not draw, because it is the one the
+           server was never supposed to reach: the provider itself failed. It
+           used to arrive as a raw code printed where the assistant's reply
+           goes ("UNAUTHORIZED", "Connection error."), after the panel had sat
+           on "Thinking…" through an unbounded reconnect loop. */
+        <div className={`${STATE_BLOCK} tw:bg-[var(--bk-error-tint)]`}>
+          <p className={`${STATE_TITLE} tw:text-[var(--bk-error)]`}>The AI service didn&rsquo;t respond.</p>
+          <p className={STATE_BODY}>
+            Nothing was changed. This is usually the model provider, not your site — try again in a
+            moment.
+          </p>
+          {/* The server's own line, kept: an "other" error is the bucket for
+              everything the two boarded states do not name, and some of those
+              carry the only useful detail there is ("Daily limit reached (10).
+              Resets at …"). Printing it under our sentence keeps the detail
+              without letting a raw code stand in for the assistant's reply. */}
+          <p className={STATE_BODY}>{stream.error}</p>
+          <Button
+            color="light"
+            size="xs"
+            className={STATE_LINK}
+            onClick={() => {
+              const again = lastPromptRef.current;
+              stream.reset();
+              if (again) submit(again);
+            }}
+          >
+            Try again
           </Button>
         </div>
       ) : mode === "chat" ? (
