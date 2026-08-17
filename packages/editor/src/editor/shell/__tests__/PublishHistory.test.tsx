@@ -45,7 +45,10 @@ beforeEach(() => {
   fetchSitePublishState
     .mockReset()
     .mockResolvedValue({ isPublished: true, publishedUrl: "https://bellacucina.vercel.app" });
-  rollbackToVersion.mockReset().mockResolvedValue(undefined);
+  /* The service returns the id of the job the server created — that is what
+     the shell polls. It used to return void, which is how the outcome boards
+     ended up reading a stale "published" instead of a real job. */
+  rollbackToVersion.mockReset().mockResolvedValue({ jobId: "rb-job-1" });
 });
 afterEach(() => {
   cleanup();
@@ -312,5 +315,53 @@ describe("board 184:24 — the rollback confirm names the versions", () => {
     await openConfirm();
     expect(await screen.findByRole("button", { name: "Roll back to v2" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /roll back now/i })).toBeNull();
+  });
+});
+
+/*
+  The rollback confirm announced success before the server had done anything.
+
+  `rollbackJob` was derived from `publishJob.uiState`, which is "published"
+  for any already-live site with no job in flight — true from mount. So the
+  moment a rollback was confirmed, the effect below saw state "published" and
+  wrote the 184:45 modal: "Rolled back — v5 is live." Observed live on
+  2026-08-17 at T+0s, with no new row in publish_build_jobs at all.
+
+  The fix is upstream (the panel hands the server's job id to the shell, and
+  TabRouter gates `rollbackJob` on a job existing), but the panel must not
+  trust a terminal state it was handed before it started either.
+*/
+describe("rollback outcome follows the JOB, not the site's standing state", () => {
+  const start = async () => {
+    expect(await screen.findByText(/Version 2/i)).toBeInTheDocument();
+    fireEvent.click(screen.getAllByRole("button", { name: /^Roll back$/ })[0]);
+    fireEvent.click(await screen.findByRole("button", { name: /^Roll back to v2$/ }));
+  };
+
+  it("does not report success from a 'published' state that predates the rollback", async () => {
+    // What the shell handed the panel before the fix: already-published, no
+    // job. A success modal here is a lie about a request still in flight.
+    render(<PublishHistory siteId="s1" rollbackJob={null} />);
+    await start();
+
+    await waitFor(() => expect(rollbackToVersion).toHaveBeenCalled());
+    expect(screen.queryByText(/Rolled back/i)).toBeNull();
+  });
+
+  it("hands the server's job id up so the shell can poll it", async () => {
+    const onRollbackStarted = vi.fn();
+    render(<PublishHistory siteId="s1" onRollbackStarted={onRollbackStarted} rollbackJob={null} />);
+    await start();
+
+    await waitFor(() => expect(onRollbackStarted).toHaveBeenCalledWith("rb-job-1"));
+  });
+
+  it("reports success once that job actually completes", async () => {
+    const { rerender } = render(<PublishHistory siteId="s1" rollbackJob={null} />);
+    await start();
+    await waitFor(() => expect(rollbackToVersion).toHaveBeenCalled());
+
+    rerender(<PublishHistory siteId="s1" rollbackJob={{ state: "published", progress: 100 }} />);
+    expect(await screen.findByText(/Rolled back/i)).toBeInTheDocument();
   });
 });

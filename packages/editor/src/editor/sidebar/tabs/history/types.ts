@@ -39,6 +39,8 @@ export interface HistoryTabProps {
   /** The shell's publish job, forwarded to the Published view so boards
    *  184:37 / 184:45 / 453:4064 can run off one state. Null = no feed. */
   rollbackJob?: { state: "publishing" | "published" | "failed"; progress: number } | null;
+  /** The server-created rollback job, handed up so the shell polls it. */
+  onRollbackStarted?: (jobId: string) => void;
   /** Panel pin state */
   isExpanded?: boolean;
   /** Pin toggle callback */

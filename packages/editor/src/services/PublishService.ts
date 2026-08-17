@@ -166,9 +166,19 @@ export async function fetchPublishHistory(siteId: string): Promise<PublishHistor
 /**
  * Roll back to a prior version — re-publishes it as a NEW job. Throws on
  * failure (NOT_ROLLBACKABLE / already-publishing) so the UI can show the reason.
+ *
+ * The server creates the job and returns it; the id is what lets the editor
+ * watch the thing it just started.
+ *
+ * This used to return void. Without the id the panel had nothing to poll, so
+ * boards 184:37 / 184:45 / 453:4064 were driven off `publishJob.uiState`
+ * instead — which is "published" for any already-live site with no job in
+ * flight. The confirm therefore reported "Rolled back — v5 is live" the
+ * instant it was clicked, on a rollback that never reached the server.
  */
-export async function rollbackToVersion(siteId: string, jobId: string): Promise<void> {
-  await getClient().sites.rollback.mutate({ siteId, jobId });
+export async function rollbackToVersion(siteId: string, jobId: string): Promise<{ jobId: string }> {
+  const result = (await getClient().sites.rollback.mutate({ siteId, jobId })) as { id: string };
+  return { jobId: result.id };
 }
 
 /**

@@ -28,8 +28,18 @@ import {
 
 export interface PublishHistoryProps {
   siteId: string;
-  /** Called after a rollback starts, so the shell can poll the new publish job. */
-  onRollbackStarted?: () => void;  /**
+  /**
+   * Called with the id of the job the server created, so the shell can poll
+   * the rollback the user just started.
+   *
+   * It used to take no argument, and nothing downstream had a job to watch —
+   * so the three rollback boards were driven off `uiState`, which is
+   * "published" for any already-live site with nothing in flight. The confirm
+   * announced "Rolled back — v5 is live" the instant it was clicked, on a
+   * rollback that had not reached the server. Observed live 2026-08-17: the
+   * success modal at T+0s, and no new row in publish_build_jobs.
+   */
+  onRollbackStarted?: (jobId: string) => void;  /**
    * The shell's publish job, as far as this panel needs it. Three boards run
    * off one state: 184:37 "Rolling back…" (a bar while it publishes), 184:45
    * "Rolled back" (the green confirmation naming the new live version), and
@@ -159,9 +169,12 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
     if (!target) return;
     try {
       setRollingBack({ target: target.version, live: rows[0]?.version });
-      await rollbackToVersion(siteId, target.id);
+      const { jobId } = await rollbackToVersion(siteId, target.id);
       setNotice(`Rolling back to version ${target.version} — publishing a new version…`);
-      onRollbackStarted?.();
+      /* Hand the shell the job the server just created. Until this carried an
+         id there was nothing to poll, and the outcome boards read a stale
+         "published" that predated the click. */
+      onRollbackStarted?.(jobId);
       await load();
       /* rollbackToVersion resolving means the job STARTED, not finished.
          Clearing the in-flight marker here made the progress modal

@@ -66,6 +66,18 @@ export interface UsePublishJobResult {
     opts?: { acknowledgeStale?: boolean },
   ) => Promise<void>;
   cancel: () => Promise<void>;
+  /**
+   * Adopt a publish job this hook did not start — a rollback, which the
+   * server creates through `sites.rollback`.
+   *
+   * Without it the rollback panel had no job to watch and drove boards
+   * 184:37 / 184:45 / 453:4064 off `uiState` alone. `uiState` is "published"
+   * for any already-live site with nothing in flight, so the rollback confirm
+   * announced success the moment it was clicked — including when the request
+   * never reached the server. Adopting resets the status to QUEUED and starts
+   * polling, so the panel watches a real job from a real starting point.
+   */
+  track: (jobId: string) => void;
   reset: () => void;
   /** Dismiss an approval block without publishing (Cancel / after a toast). */
   dismissBlock: () => void;
@@ -158,6 +170,14 @@ export function usePublishJob(): UsePublishJobResult {
     },
     [jobId, startPolling],
   );
+
+  const track = React.useCallback((id: string) => {
+    setError(null);
+    setBlockedReason(null);
+    setJobId(id);
+    setStatus({ jobId: id, status: "QUEUED", progress: 0 });
+    startPolling(id);
+  }, [startPolling]);
 
   const dismissBlock = React.useCallback(() => setBlockedReason(null), []);
 
@@ -252,6 +272,7 @@ export function usePublishJob(): UsePublishJobResult {
     blockedReason,
     publish,
     cancel,
+    track,
     reset,
     dismissBlock,
   };

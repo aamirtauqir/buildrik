@@ -82,6 +82,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
   projectId,
   initialView,
   rollbackJob = null,
+  onRollbackStarted,
   isExpanded,
   onExpandToggle,
   onHelpClick,
@@ -272,7 +273,11 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
             Publish panel embeds; rollback stays ADMIN-gated inside it. */}
         {activeView === "published" &&
           (siteId ? (
-            <PublishHistory siteId={siteId} rollbackJob={rollbackJob} />
+            <PublishHistory
+              siteId={siteId}
+              rollbackJob={rollbackJob}
+              onRollbackStarted={onRollbackStarted}
+            />
           ) : (
             /* No SITE, which is a different fact from no versions —
                PublishHistory owns the latter and says so in its own words.

@@ -48,7 +48,7 @@ function makeJob(over: Partial<UsePublishJobResult> = {}): UsePublishJobResult {
     uiState: "idle", jobId: null, progress: 0, publishedUrl: null, error: null,
     steps: null,
     blockedReason: null,
-    publish: vi.fn(), cancel: vi.fn(), reset: vi.fn(), dismissBlock: vi.fn(), ...over,
+    publish: vi.fn(), cancel: vi.fn(), track: vi.fn(), reset: vi.fn(), dismissBlock: vi.fn(), ...over,
   };
 }
 

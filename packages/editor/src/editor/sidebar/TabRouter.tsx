@@ -205,10 +205,20 @@ export const TabRouter: React.FC<TabRouterProps> = ({
           /* Boards 184:37 / 184:45 / 453:4064 read the same job the Publish
              panel polls — one source, two surfaces. */
           rollbackJob={
-            publishJob && (publishJob.uiState === "publishing" || publishJob.uiState === "published" || publishJob.uiState === "failed")
+            /* Gated on there BEING a job. `uiState` alone is "published" for
+               any already-live site with nothing in flight, so the panel used
+               to read a success that predated the rollback and announce it at
+               T+0s. A job id means the server actually started one. */
+            publishJob?.jobId &&
+            (publishJob.uiState === "publishing" ||
+              publishJob.uiState === "published" ||
+              publishJob.uiState === "failed")
               ? { state: publishJob.uiState, progress: publishJob.progress }
               : null
           }
+          /* The rollback creates its own publish job; adopt it so the boards
+             above watch the real thing. */
+          onRollbackStarted={(jobId) => publishJob?.track(jobId)}
           {...commonTabProps}
         />
       );
