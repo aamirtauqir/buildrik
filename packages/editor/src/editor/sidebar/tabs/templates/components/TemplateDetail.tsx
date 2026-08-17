@@ -57,9 +57,14 @@ export const TemplateDetail: React.FC<TemplateDetailProps> = ({
           gradient rendered synchronously from a static module array. It has no
           fetch, so it cannot be loading and cannot fail; the loading/error/retry
           states that used to live here were unreachable in every render. The
-          gallery-list loading + load-error states the boards DO specify
-          (778:4102, 781:4372) are a different surface and still unbuilt — they
-          need a server-backed catalog before they can mean anything. */}
+          gallery-list loading + load-error states the boards DO specify are a
+          different surface: 781:4372's load-error IS built, in DrawerGallery,
+          because the user's saved templates ARE pulled from the server and that
+          pull can fail. 778:4102's full skeleton is not, and cannot be while
+          the built-in catalog is a static module array — the cards are already
+          on screen when the pull starts, so a skeleton over them would be a
+          lie about what is loading. (This comment claimed both were unbuilt
+          until 2026-08-17, after DrawerGallery shipped the error half.) */}
       <div
         className="tpl-detail-preview"
         style={{ background: template.gradient ?? "var(--bk-bg-subtle)" }}
