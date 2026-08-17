@@ -164,17 +164,14 @@ export function useEditorEventListeners({
     };
   }, [composer, setLeftPanelTab, setIsLeftPanelOpen]);
 
-  // 3d) UI_TOGGLE_PREVIEW → flip composer preview mode.
-  React.useEffect(() => {
-    if (!composer) return;
-    const handle = () => {
-      composer.setPreviewMode(!composer.isPreviewMode());
-    };
-    composer.on(EVENTS.UI_TOGGLE_PREVIEW, handle);
-    return () => {
-      composer.off(EVENTS.UI_TOGGLE_PREVIEW, handle);
-    };
-  }, [composer]);
+  /* 3d) UI_TOGGLE_PREVIEW used to flip `composer.setPreviewMode` here, which
+     starts the canvas interaction runtime, emits PREVIEW_MODE_CHANGED (no
+     listener anywhere) and leaves the chrome exactly as it was — so ⌘K
+     "Preview", the canvas palette's Preview and the onboarding step that asks
+     for one all reported success and showed nothing. Board 65:211 says preview
+     is the overlay, and `AquibraStudio` owns that state, so it handles the
+     event now. The engine method is left alone: it drives InteractionManager's
+     runtime, which the sandboxed-iframe overlay does not replace. */
 
   // 3e) ELEMENT_QUICK_ADD → create + insert an element via the engine API.
   // Emitters: SmartSuggestions empty-container actions + canvas command palette.

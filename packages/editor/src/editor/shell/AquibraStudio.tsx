@@ -19,6 +19,7 @@ import { ToastProvider, UpgradeModal, useToast, StudioSkeleton, Button } from "@
 import { StaleApprovalModal } from "./modals/StaleApprovalModal";
 import { PublishConfirmModal } from "./modals/PublishConfirmModal";
 import { PreviewOverlay } from "./PreviewOverlay";
+import { sanitizeHTMLForPreview } from "../export/ExportUtils";
 import { migrateStorageKeys, migrateAqbKeys } from "../../shared/utils/storageMigration";
 import type { CanvasRef } from "../canvas/Canvas";
 import { useComposerSelection } from "../canvas/hooks/useComposerSelection";
@@ -154,6 +155,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   // In-shell preview (shell state 7) — sanitized page HTML below the topbar.
   const [previewHtml, setPreviewHtml] = React.useState<string | null>(null);
 
+
   // Initialize composer with hooks
   const composer = useComposerInit({
     options,
@@ -173,6 +175,31 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     openCollectionSetup: modals.openCollectionSetup,
     onLoadError: setLoadError,
   });
+
+  /**
+   * "Preview" from anywhere opens board 65:211, not just the topbar eye.
+   *
+   * `UI_TOGGLE_PREVIEW` has three emitters — the ⌘K palette, the canvas
+   * palette, and an onboarding step — and all three used to land on
+   * `composer.setPreviewMode`, which starts the interaction runtime, emits
+   * `PREVIEW_MODE_CHANGED` (nothing listens) and changes not one pixel of
+   * chrome. The command reported success and the screen stayed put. They open
+   * the overlay now, and toggle it closed if it is already up.
+   */
+  React.useEffect(() => {
+    if (!composer) return;
+    const handle = () => {
+      setPreviewHtml((current) => {
+        if (current != null) return null;
+        const raw = composer.exportHTML().combined || "<!DOCTYPE html><html><body>No content</body></html>";
+        return sanitizeHTMLForPreview(raw);
+      });
+    };
+    composer.on(EVENTS.UI_TOGGLE_PREVIEW, handle);
+    return () => {
+      composer.off(EVENTS.UI_TOGGLE_PREVIEW, handle);
+    };
+  }, [composer]);
 
   // 4 composer-driven side-effects (wizard hide, COMPONENT_CREATE_REQUESTED,
   // SHOW_IN_LAYERS, overlay-defaults init) extracted into useEditorEventListeners
