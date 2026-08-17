@@ -19,6 +19,7 @@ import { ToastProvider, UpgradeModal, useToast, StudioSkeleton, Button } from "@
 import { StaleApprovalModal } from "./modals/StaleApprovalModal";
 import { PublishConfirmModal } from "./modals/PublishConfirmModal";
 import { PreviewOverlay } from "./PreviewOverlay";
+import { ReviewBar } from "./ReviewBar";
 import { sanitizeHTMLForPreview } from "../export/ExportUtils";
 import { migrateStorageKeys, migrateAqbKeys } from "../../shared/utils/storageMigration";
 import type { CanvasRef } from "../canvas/Canvas";
@@ -476,6 +477,14 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           addToast={addToast}
         />
       </header>
+      {/* Board 200:213 gives an open round its own row under the topbar: the
+          count, a way through the comments, Compare and Re-send. It renders
+          nothing when no round is in flight. */}
+      <ReviewBar
+        composer={composer}
+        onCompare={() => state.openLeftPanelToTab("review", "compare")}
+        onResend={resendReview}
+      />
       <StudioPanels
         composer={composer}
         selectedElement={selectedElement}

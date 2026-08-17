@@ -71,6 +71,9 @@ export interface ReviewTabProps {
   /** Composer for the orphan-comment events (Detached group + reattach) and
    *  for page names — the boards label groups "OPEN · HOME", not by page id. */
   composer?: import("@/engine").Composer | null;
+  /** Open Compare on mount — board 200:213's ReviewBar links straight to it,
+   *  the way the history tab deep-links to its Published view. */
+  initialCompare?: boolean;
 }
 
 type LoadState = "loading" | "ready" | "error";
@@ -128,6 +131,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
   onResend,
   onExportCurrentPages,
   composer,
+  initialCompare,
 }) => {
   const [state, setState] = React.useState<LoadState>("loading");
   const [round, setRound] = React.useState<CurrentRound | null>(null);
@@ -277,6 +281,16 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
       setCompareState("error");
     }
   }, [onExportCurrentPages]);
+
+  /* Board 200:213's bar links here directly. Fires once — reopening Compare
+     after the user closes it would trap them in it while the deep-link prop
+     is still true. */
+  const compareRequested = React.useRef(false);
+  React.useEffect(() => {
+    if (!initialCompare || compareRequested.current || !onExportCurrentPages) return;
+    compareRequested.current = true;
+    void openCompare();
+  }, [initialCompare, onExportCurrentPages, openCompare]);
 
   const header = (
     <PanelHeader
