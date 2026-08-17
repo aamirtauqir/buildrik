@@ -27,6 +27,7 @@ import { FullPageView } from "../sidebar/FullPageView";
 import { TokenRegistryProvider, DSModeProvider, StylePresetRegistryProvider } from "@/editor/design-system";
 import { MigrationProgressMount } from "@/editor/design-system/ui/MigrationProgressMount";
 import { StarterGalleryMount } from "@/editor/design-system/ui/StarterGalleryMount";
+import { DSLintRunner } from "@/editor/design-system/ui/DSLintRunner";
 import { useBlockInsertion } from "./hooks/useBlockInsertion";
 import { useAltTextAutoTrigger } from "./hooks/useAltTextAutoTrigger";
 import { PageTabBar } from "./PageTabBar";
@@ -330,6 +331,10 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
     <DSModeProvider>
     <TokenRegistryProvider projectId={projectId} composer={composer ?? undefined}>
     <StylePresetRegistryProvider projectId={projectId}>
+      {/* Headless. The linter only ran from inside the Brand panel, so the
+          topbar Issues chip — which gates the publish-anyway confirm — read
+          "No issues" until the user happened to open Brand. */}
+      <DSLintRunner composer={composer} />
       <MigrationProgressMount composer={composer} />
       <StarterGalleryMount projectId={projectId} composer={composer} />
       <LayoutShell
