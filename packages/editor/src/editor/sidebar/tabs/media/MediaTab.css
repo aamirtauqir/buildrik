@@ -449,13 +449,6 @@
   overflow: hidden;
 }
 
-.med-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  min-height: 0;
-}
 
 .med-no-project {
   padding: var(--bk-space-48) var(--bk-space-24);

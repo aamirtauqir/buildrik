@@ -7,7 +7,6 @@ import { render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { MediaTab } from "../MediaTab";
 import { UploadZone } from "../components/UploadZone";
-import { SelectionBanner, UploadProgressBanner } from "../components/SelectionBanner";
 
 // ─── MediaTab null composer ────────────────────────────────────────────────────
 
@@ -86,76 +85,8 @@ describe("UploadZone", () => {
   });
 });
 
-// ─── SelectionBanner ──────────────────────────────────────────────────────────
 
-describe("SelectionBanner", () => {
-  it("shows selected count", () => {
-    render(<SelectionBanner count={3} onExit={vi.fn()} onDelete={vi.fn()} />);
-    expect(screen.getByText("3 selected")).toBeTruthy();
-  });
-
-  it("shows '0 selected' when count is 0", () => {
-    render(<SelectionBanner count={0} onExit={vi.fn()} onDelete={vi.fn()} />);
-    expect(screen.getByText("0 selected")).toBeTruthy();
-  });
-
-  it("calls onDelete via Delete key when count > 0", async () => {
-    const onDelete = vi.fn();
-    render(<SelectionBanner count={2} onExit={vi.fn()} onDelete={onDelete} />);
-    await userEvent.keyboard("{Delete}");
-    expect(onDelete).toHaveBeenCalledTimes(1);
-  });
-
-  it("calls onExit on Escape key", async () => {
-    const onExit = vi.fn();
-    render(<SelectionBanner count={1} onExit={onExit} onDelete={vi.fn()} />);
-    await userEvent.keyboard("{Escape}");
-    expect(onExit).toHaveBeenCalledTimes(1);
-  });
-
-  it("shows Move and Download action buttons", () => {
-    render(<SelectionBanner count={2} onExit={vi.fn()} onDelete={vi.fn()} />);
-    expect(screen.getByText("Move")).toBeTruthy();
-    expect(screen.getByText("Download")).toBeTruthy();
-  });
-});
-
-// ─── UploadProgressBanner ─────────────────────────────────────────────────────
-
-describe("UploadProgressBanner", () => {
-  it("renders file name", () => {
-    render(
-      <UploadProgressBanner
-        fileName="photo.jpg"
-        progress={42}
-        onCancel={vi.fn()}
-      />
-    );
-    expect(screen.getByText("photo.jpg")).toBeTruthy();
-  });
-
-  it("sets progress bar width from progress prop", () => {
-    const { container } = render(
-      <UploadProgressBanner
-        fileName="video.mp4"
-        progress={75}
-        onCancel={vi.fn()}
-      />
-    );
-    const bar = container.querySelector(".med-progress__bar") as HTMLElement;
-    expect(bar.style.width).toBe("75%");
-  });
-
-  it("calls onCancel when cancel button clicked", async () => {
-    const onCancel = vi.fn();
-    render(
-      <UploadProgressBanner
-        fileName="doc.pdf"
-        progress={10}
-        onCancel={onCancel}
-      />
-    );
-    await userEvent.click(screen.getByLabelText("Cancel upload"));
-    expect(onCancel).toHaveBeenCalledTimes(1);
-  });
-});
+/* The SelectionBanner and UploadProgressBanner blocks that stood here are
+   gone with the components. Both lived in the media tab's unreachable
+   fullpage branch — nothing rendered either one, and the file's own import
+   was their last consumer. */

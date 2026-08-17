@@ -13,7 +13,6 @@ import { ROW_LG } from "@shared/constants/layout";
 import { SearchBar } from "../../shared/SearchBar";
 import { AssetDetailOverlay } from "./components/AssetDetailOverlay";
 import { ConfirmDeleteModal } from "./components/ConfirmDeleteModal";
-import { LibraryView } from "./components/LibraryView";
 import { MediaContextMenu } from "./components/MediaContextMenu";
 import { StockSourceModal } from "./components/StockSourceModal";
 import { ReplaceAcrossDialog } from "./components/ReplaceAcrossDialog";
@@ -305,9 +304,16 @@ function MediaTabWithComposer({
     </>
   );
 
-  if (onOpenLibrary) {
-    return (
-      <>
+  /* The fullpage-manager branch that used to follow this return is gone, and
+     with it `LibraryView` (687 lines), `MultiSelectBanner` and
+     `SelectionBanner`. It was guarded by `if (onOpenLibrary)`, and the shell
+     supplies that prop from a plain `useCallback` (`StudioPanels:306`), so it
+     is never undefined — the branch below it could not be reached in any build.
+     Same shape as the publish opener that spent itself on
+     `onVercelPublish ?? onOpenPublish`. The live manager is `editor/media/
+     LibraryManager`, which the Media family walk verified against its boards. */
+  return (
+    <>
       <SlimLauncher
         composer={composer}
         libraryItems={state.libraryItems}
@@ -392,119 +398,4 @@ function MediaTabWithComposer({
       {sharedOverlays}
       </>
     );
-  }
-
-  // ─── Fullpage mode: render full manager content ──────────────────
-
-  return (
-    <PanelFrame
-      className="med-tab"
-      onDragEnter={state.handlePanelDragEnter}
-      onDragLeave={state.handlePanelDragLeave}
-      onDragOver={state.handlePanelDragOver}
-      onDrop={state.handlePanelDrop}
-    >
-      {/* 0. Selection Mode Header (Snap-back context) */}
-      {state.selectionContext && (
-        <SelectionContextBar
-          label={state.selectionContext.label}
-          onCancel={() => state.setSelectionContext(null)}
-        />
-      )}
-      {/* 1. Header bar — type pills + stock button + close */}
-      <div className="med-tabs-wrap" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: ROW_LG }}>
-        <TypePills
-          selectedTypes={state.activeTypes}
-          counts={state.counts}
-          discMode={false}
-          onToggle={state.toggleType}
-        />
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Button className="med-stock-btn" onClick={() => setStockModalOpen(true)}>
-            <Plus size={14} />
-            Add from Stock
-          </Button>
-          <div style={{ width: 1, height: 24, background: 'var(--bk-border)' }} />
-          <Button onClick={onClose} style={{
-            background: 'none', border: 'none', color: 'var(--bk-ink-muted)',
-            cursor: 'pointer', padding: 4, display: 'flex'
-          }}>
-            <Upload size={18} style={{ transform: 'rotate(180deg)' }} />
-          </Button>
-        </div>
-      </div>
-      {/* 2. Unified Library */}
-      <div className="med-content">
-        <LibraryView
-          items={state.libraryItems}
-          uploadQueue={state.uploadQueue}
-          activeType={state.activeType}
-          counts={state.counts}
-          sort={state.sort}
-          sortDir={state.sortDir}
-          gridN={state.gridN}
-          fmtFilter={state.fmtFilter}
-          selMode={state.selMode}
-          selectedKeys={state.selectedKeys}
-          searchQuery={state.librarySearch}
-          allFolders={state.allFolders}
-          onSort={state.setSort}
-          onGridN={state.setGridN}
-          onFmt={state.setFmtFilter}
-          onSelToggle={state.toggleSelMode}
-          onSelect={state.toggleSelect}
-          onShiftSelect={state.shiftSelect}
-          onSelectAll={state.selectAll}
-          onRequestBulkDelete={state.requestBulkDelete}
-          onRequestDelete={state.requestDelete}
-          onInsert={state.insertToCanvas}
-          onCtxMenu={state.openCtxMenu}
-          onDetail={state.openDetail}
-          onMoveSelected={(folderId) => {
-            state.bulkMoveAssets(Array.from(state.selectedKeys), folderId);
-            state.toggleSelMode();
-          }}
-        />
-      </div>
-      {/* 5. Upload Zone (Library only) */}
-      {(
-        <UploadZone
-          storage={state.storage}
-          onUpload={state.upload}
-          onRetryUpload={state.retryUpload}
-          uploadQueue={state.uploadQueue}
-          disabled={state.storage.used >= state.storage.total}
-        />
-      )}
-      {/* Drag Feedback Overlay */}
-      {state.panelDragOver && (
-        <div className="med-drag-overlay">
-          <Upload size={24} />
-          <div className="med-drag-label">Drop to upload to Library</div>
-        </div>
-      )}
-      {/* Action Modals */}
-      {state.ctxMenu && (
-        <MediaContextMenu
-          x={state.ctxMenu.x}
-          y={state.ctxMenu.y}
-          item={state.ctxMenu.item}
-          folders={state.folders}
-          allFolders={state.allFolders}
-          onInsert={(item) => state.insertToCanvas(item.key)}
-          onSelect={(item) => state.enterSelectModeWith(item.key)}
-          onRename={state.openDetail}
-          onMove={(item, fid) => state.moveAsset(item.key, fid)}
-          onDelete={(item) => state.requestDelete(item.key)}
-          onCopyUrl={state.copyUrl}
-          onClose={state.closeCtxMenu}
-          onEditImage={handleEditImage}
-          onReplaceAcross={handleReplaceAcross}
-        />
-      )}
-      {sharedOverlays}
-      {stockModal}
-    </PanelFrame>
-  );
 }

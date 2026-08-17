@@ -1,6 +1,10 @@
 /**
  * Media Tab Static Data
- * TYPE_PILLS, SORT_OPTIONS, GRID_OPTIONS, MEDIA_TIPS, EMPTY_MSGS, labels
+ * TYPE_PILLS, GRID_OPTIONS, MEDIA_TIPS, labels.
+ *
+ * SORT_OPTIONS, EMPTY_MSGS and FORMAT_OPTIONS lived here for `LibraryView`,
+ * the media tab's unreachable fullpage branch; they went with it. The live
+ * manager (`editor/media/`) declares its own sort list locally.
  * @license BSD-3-Clause
  */
 
@@ -24,17 +28,6 @@ const TYPE_PILLS: TypePillDef[] = [
 
 // --- Sort options ---
 
-export interface SortOptionDef {
-  by: MediaSortBy;
-  label: string;
-}
-
-export const SORT_OPTIONS: SortOptionDef[] = [
-  { by: "date", label: "Date added" },
-  { by: "name", label: "Name" },
-  { by: "size", label: "File size" },
-  { by: "type", label: "Type" },
-];
 
 // --- Grid column options ---
 
@@ -52,40 +45,7 @@ const GRID_OPTIONS: GridOptionDef[] = [
 // --- Tips ---
 // --- Empty state messages ---
 
-export interface EmptyMsg {
-  title: string;
-  sub: string;
-}
-
-export const EMPTY_MSGS: Record<MediaTypeFilter, EmptyMsg> = {
-  all: {
-    title: "Your media library is empty",
-    sub: "Drag files here or click Upload. Supports PNG, JPG, SVG, MP4, WebM, TTF, OTF \u2014 max 10 MB each.",
-  },
-  img: {
-    title: "No images",
-    sub: "Drag or upload JPG, PNG, WebP, GIF, or SVG \u2014 max 10 MB.",
-  },
-  vid: {
-    title: "No videos",
-    sub: "Drag or upload MP4 or WebM \u2014 max 10 MB.",
-  },
-  ico: {
-    title: "No icons",
-    sub: "Drag or upload SVG files to use as icons.",
-  },
-  fnt: {
-    title: "No fonts",
-    sub: "Drag or upload TTF, OTF, WOFF, or WOFF2 font files.",
-  },
-};
 
 // --- Discovery section labels ---
 // --- Format filter options per type ---
 
-export const FORMAT_OPTIONS: Record<"img" | "vid" | "ico" | "fnt", string[]> = {
-  img: ["jpeg", "png", "webp", "gif", "svg"],
-  vid: ["mp4", "webm"],
-  ico: ["svg"],
-  fnt: ["ttf", "otf", "woff", "woff2"],
-};

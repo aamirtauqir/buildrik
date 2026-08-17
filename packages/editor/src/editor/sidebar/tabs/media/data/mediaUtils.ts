@@ -18,25 +18,6 @@ export function fmtSize(bytes: number): string {
   return `${+(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`;
 }
 
-/** Format seconds to "0:34" or "1:23:45" */
-export function fmtDur(seconds: number): string {
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = Math.floor(seconds % 60);
-  const mm = String(m).padStart(h > 0 ? 2 : 1, "0");
-  const ss = String(s).padStart(2, "0");
-  return h > 0 ? `${h}:${mm}:${ss}` : `${mm}:${ss}`;
-}
-
-/** Map file extension to CSS accent class name */
-export function extStyle(mimeType: string): string {
-  if (mimeType.startsWith("image/")) return "ext--img";
-  if (mimeType.startsWith("video/")) return "ext--vid";
-  if (mimeType.startsWith("audio/")) return "ext--aud";
-  if (mimeType.includes("font")) return "ext--fnt";
-  return "ext--doc";
-}
-
 /** Map MediaAsset.type to LibraryItem short code */
 function assetTypeToFilter(type: MediaAsset["type"]): LibraryItem["type"] {
   switch (type) {
