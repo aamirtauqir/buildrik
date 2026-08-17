@@ -271,6 +271,11 @@ export function RecordView({
 
   const dirty =
     JSON.stringify(data) !== JSON.stringify(initial) || published !== (record?.status === "published");
+  /* The save bar already says "Unsaved changes" and offers Discard — the crumb
+     used to do the same thing without saying so, and typed values went with
+     it. Same ConfirmDialog this file already uses to guard a field delete. */
+  const [confirmLeave, setConfirmLeave] = React.useState(false);
+  const leave = () => (dirty ? setConfirmLeave(true) : onBack());
   const display = collection.displayField ?? collection.fields[0]?.slug;
   const title =
     (record && typeof record.data[display ?? ""] === "string" && (record.data[display ?? ""] as string)) ||
@@ -280,7 +285,7 @@ export function RecordView({
 
   return (
     <div className={CONTENT_BODY}>
-      <Crumb label={title} onClick={onBack} />
+      <Crumb label={title} onClick={leave} />
       <div className={SCROLL}>
         {collection.fields.map((f) => (
           <div key={f.id}>
@@ -330,6 +335,15 @@ export function RecordView({
           </Button>
         )}
       </div>
+      <ConfirmDialog
+        open={confirmLeave}
+        onClose={() => setConfirmLeave(false)}
+        onConfirm={() => { setConfirmLeave(false); onBack(); }}
+        title="Discard changes?"
+        message="This record has unsaved changes. Going back throws them away."
+        confirmLabel="Discard"
+        tone="destructive"
+      />
       {(dirty || !record) && (
         <div className={SAVEBAR} role="region" aria-label="Unsaved changes">
           <span className="tw:text-xs tw:text-[var(--bk-warning-text)]">Unsaved changes</span>
@@ -539,11 +553,13 @@ export function DynamicPagesView({
 
   const trimmed = pattern.trim();
   const dirty = trimmed !== (collection.pageSlugPattern ?? "");
+  const [confirmLeave, setConfirmLeave] = React.useState(false);
+  const leave = () => (dirty ? setConfirmLeave(true) : onBack());
   const publishedCount = records.filter((r) => r.status === "published").length;
 
   return (
     <div className={CONTENT_BODY}>
-      <Crumb label={`${collection.name} · dynamic pages`} onClick={onBack} />
+      <Crumb label={`${collection.name} · dynamic pages`} onClick={leave} />
       <div className={SCROLL}>
         <div className={FIELD_LABEL}>URL pattern</div>
         <div className={FIELD_WRAP}>
@@ -580,6 +596,15 @@ export function DynamicPagesView({
           </div>
         )}
       </div>
+      <ConfirmDialog
+        open={confirmLeave}
+        onClose={() => setConfirmLeave(false)}
+        onConfirm={() => { setConfirmLeave(false); onBack(); }}
+        title="Discard changes?"
+        message="The page pattern has unsaved changes. Going back throws them away."
+        confirmLabel="Discard"
+        tone="destructive"
+      />
       {dirty && (
         <div className={SAVEBAR} role="region" aria-label="Unsaved changes">
           <span className="tw:text-xs tw:text-[var(--bk-warning-text)]">Unsaved changes</span>

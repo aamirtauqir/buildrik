@@ -317,4 +317,33 @@ describe("ContentTab", () => {
     await waitFor(() => expect(composer.data.importSampleData).toHaveBeenCalled());
     expect(await screen.findByText("products")).toBeInTheDocument();
   });
+
+  /* Walked live 2026-08-18: typing into a new record and clicking the crumb
+     returned to the collection and threw the value away without a word. The
+     view already knows it is dirty — it renders "Unsaved changes · Discard ·
+     Save" — so the crumb was the one exit that discarded silently. */
+  it("asks before the crumb throws away an edited record", async () => {
+    const { composer } = makeEngine({ collections: [MENU], items: [ITEM] });
+    render(<ContentTab composer={composer as never} />);
+    fireEvent.click(await screen.findByText("Menu items"));
+    fireEvent.click(await screen.findByText("Margherita"));
+    fireEvent.change(await screen.findByLabelText("Name"), { target: { value: "Margherita Extra" } });
+    expect(screen.getByText("Unsaved changes")).toBeInTheDocument();
+
+    // The crumb names the SAVED record, not the field being typed into.
+    fireEvent.click(screen.getByRole("button", { name: "Back to Margherita" }));
+    expect(await screen.findByText("Discard changes?")).toBeInTheDocument();
+    // Still in the record until the question is answered.
+    expect(screen.getByText("Unsaved changes")).toBeInTheDocument();
+  });
+
+  it("leaves a clean record without asking", async () => {
+    const { composer } = makeEngine({ collections: [MENU], items: [ITEM] });
+    render(<ContentTab composer={composer as never} />);
+    fireEvent.click(await screen.findByText("Menu items"));
+    fireEvent.click(await screen.findByText("Margherita"));
+    fireEvent.click(screen.getByRole("button", { name: "Back to Margherita" }));
+    expect(await screen.findByText("1 record")).toBeInTheDocument();
+    expect(screen.queryByText("Discard changes?")).not.toBeInTheDocument();
+  });
 });
