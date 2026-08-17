@@ -10,9 +10,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const fetchPublishHistory = vi.fn();
 const rollbackToVersion = vi.fn();
+/* Board 949:4474's banner names the live domain, which the history rows do
+   not carry — the panel reads it separately. */
+const fetchSitePublishState = vi.fn();
 
 vi.mock("../../../services/PublishService", () => ({
   fetchPublishHistory: (...a: unknown[]) => fetchPublishHistory(...a),
+  fetchSitePublishState: (...a: unknown[]) => fetchSitePublishState(...a),
   rollbackToVersion: (...a: unknown[]) => rollbackToVersion(...a),
 }));
 
@@ -38,6 +42,9 @@ function renderIt(props = {}) {
 
 beforeEach(() => {
   fetchPublishHistory.mockReset().mockResolvedValue(ROWS);
+  fetchSitePublishState
+    .mockReset()
+    .mockResolvedValue({ isPublished: true, publishedUrl: "https://bellacucina.vercel.app" });
   rollbackToVersion.mockReset().mockResolvedValue(undefined);
 });
 afterEach(() => {
@@ -73,7 +80,9 @@ describe("load states", () => {
   it("lists versions with a live badge on the latest and a ↩ marker on a rollback", async () => {
     renderIt();
     expect(await screen.findByText(/Version 3/i)).toBeInTheDocument();
-    expect(screen.getByText(/live/i)).toBeInTheDocument(); // latest is the live one
+    // /live/i now matches the banner AND the row chip — board 949:4474 says
+    // both. Assert the row's chip specifically.
+    expect(screen.getByText("Live")).toBeInTheDocument(); // latest is the live one
     expect(screen.getByText(/from v1/i)).toBeInTheDocument(); // v2 was a rollback
   });
 
@@ -225,5 +234,40 @@ describe("rollback", () => {
 
     expect(await screen.findByText(/Rollback failed/i)).toBeInTheDocument();
     expect(screen.getByText(/did not finish/i)).toBeInTheDocument();
+  });
+});
+
+/*
+  Board 949:4474 opens on WHAT IS LIVE and closes on the rule that makes
+  rollback safe to try. The panel opened on a "Published versions" header — a
+  third label for a destination the tab strip and sub-tab already name — and
+  closed on nothing.
+*/
+describe("board 949:4474 — the banner and the closing rule", () => {
+  it("leads with the live version, not a list header", async () => {
+    renderIt();
+    expect(await screen.findByText(/LIVE · v3/)).toBeInTheDocument();
+    expect(screen.queryByText("Published versions")).not.toBeInTheDocument();
+  });
+
+  it("names the live domain when the site reports one", async () => {
+    renderIt();
+    expect(await screen.findByText(/bellacucina\.vercel\.app · published/)).toBeInTheDocument();
+  });
+
+  it("keeps the banner when the domain cannot be read", async () => {
+    // The domain is a second, best-effort read. Losing it costs one clause,
+    // never the whole list — that is board 781:4489's job, not this one's.
+    fetchSitePublishState.mockRejectedValueOnce(new Error("offline"));
+    renderIt();
+    expect(await screen.findByText(/LIVE · v3/)).toBeInTheDocument();
+    expect(screen.getByText(/Version 3/i)).toBeInTheDocument();
+  });
+
+  it("states the rollback rule under the list", async () => {
+    renderIt();
+    expect(
+      await screen.findByText("Every publish is restorable. Rolling back redeploys that version."),
+    ).toBeInTheDocument();
   });
 });

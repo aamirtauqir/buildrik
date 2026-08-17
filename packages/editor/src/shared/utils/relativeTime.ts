@@ -10,7 +10,7 @@
  */
 
 export type RelativeTimeFormat = "short" | "long";
-export type RelativeTimeFallback = "date" | "time" | "days" | "daysShort";
+export type RelativeTimeFallback = "date" | "time" | "days" | "daysShort" | "weeks";
 
 export interface RelativeTimeOptions {
   /** "Nm ago" (default) vs "N min ago" / "N hours ago". */
@@ -74,6 +74,13 @@ export function formatRelativeTime(
       return `${days}d ago`;
     case "days":
       return `${days} day${days === 1 ? "" : "s"} ago`;
+    case "weeks":
+      // Board 949:4474's publish list runs "2h ago · 2d ago · 1w ago · 2w
+      // ago" — a scale that has to keep reading as elapsed time well past a
+      // week, because publish history is where you go to find the version
+      // from before the thing that broke. `daysShort` would print "14d ago"
+      // there, and `date` an absolute date that answers a different question.
+      return days < 7 ? `${days}d ago` : `${Math.floor(days / 7)}w ago`;
     case "date":
     default:
       return new Date(timestamp).toLocaleDateString();

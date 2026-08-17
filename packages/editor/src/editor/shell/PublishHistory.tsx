@@ -16,9 +16,12 @@ import * as React from "react";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
 import { ConfirmDialog, EmptyState, Modal, Progress, Spinner, Button, VersionRow } from "@/editor/chrome-ui";
 import { useEditorRole } from "./hooks/useEditorRole";
+import { formatRelativeTime } from "@/shared/utils/relativeTime";
+import { domainOf } from "@/editor/sidebar/tabs/publish/usePublishSnapshot";
 import { roleAtLeast } from "@/services/RoleService";
 import {
   fetchPublishHistory,
+  fetchSitePublishState,
   rollbackToVersion,
   type PublishHistoryRow,
 } from "../../services/PublishService";
@@ -40,19 +43,32 @@ export interface PublishHistoryProps {
 
 type LoadState = "loading" | "ready" | "error";
 
+/* Board 949:4474 runs "2h ago · 2d ago · 1w ago · 2w ago". This was a local
+   day-granularity function that collapsed everything under 24h to "today" —
+   so a publish two hours old and one twenty-three hours old read the same,
+   in the one list whose whole job is telling versions apart in time. It was
+   also a fourth inline copy of a helper whose own docstring says it replaced
+   the other three. */
 function relTime(iso: string | Date | null): string {
   if (!iso) return "";
   const then = new Date(iso).getTime();
   if (Number.isNaN(then)) return "";
-  const d = Math.max(0, Math.round((Date.now() - then) / 86400000));
-  if (d === 0) return "today";
-  return `${d}d ago`;
+  return formatRelativeTime(then, { fallback: "weeks", justNowLabel: "just now" });
 }
 
 /* The version line is chrome-ui's VersionRow — Figma 240:6, whose own header
    names "Publish history" as a surface it was drawn for. */
 const WRAP = "tw:flex tw:flex-col tw:gap-2 tw:p-3 tw:min-w-80";
-const HEAD = "tw:text-[13px] tw:font-semibold tw:text-gray-900";
+/* Board 949:4474's live banner — green tint block above the list. */
+const LIVE_BANNER =
+  "tw:rounded-md tw:bg-[var(--bk-success-tint)] tw:px-3 tw:py-2.5 tw:flex tw:flex-col tw:gap-1";
+const LIVE_TITLE =
+  "tw:flex tw:items-center tw:gap-2 tw:text-[13px] tw:font-semibold tw:text-[var(--bk-success-text)]";
+const LIVE_DOT = "tw:size-2 tw:rounded-full tw:bg-[var(--bk-success)]";
+const LIVE_META = "tw:text-xs tw:text-[var(--bk-ink-soft)]";
+/* Board 949:4474 closes the list with the rule that makes rollback safe to
+   try. It sits under the rows, not in a tooltip on each one. */
+const FOOTER_NOTE = "tw:mt-2 tw:text-xs tw:text-[var(--bk-ink-muted)]";
 const NOTICE = "tw:text-xs tw:text-gray-500";
 
 
@@ -75,6 +91,12 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
   /** Board 184:45 — set when the shell reports the rollback job finished. */
   const [rolledBack, setRolledBack] = React.useState<{ target: number; newLive: number; previous?: number } | null>(null);
 
+  /* Board 949:4474's banner names the live DOMAIN, which the history rows do
+     not carry. Best-effort and separate from `state`: a domain we cannot read
+     costs the banner one clause, and must not turn the whole list into the
+     load-error board. */
+  const [liveDomain, setLiveDomain] = React.useState<string | null>(null);
+
   const load = React.useCallback(async () => {
     setState("loading");
     try {
@@ -82,6 +104,11 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
       setState("ready");
     } catch {
       setState("error");
+    }
+    try {
+      setLiveDomain(domainOf((await fetchSitePublishState(siteId)).publishedUrl));
+    } catch {
+      setLiveDomain(null);
     }
   }, [siteId]);
 
@@ -170,7 +197,25 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
 
   return (
     <div className={WRAP}>
-      <div className={HEAD}>Published versions</div>
+      {/* Board 949:4474 opens on WHAT IS LIVE, not on a list header. The
+          board's banner also names the publisher ("by Ali"); no column on
+          publish_build_jobs carries one, so that clause is absent rather than
+          invented — the SHAPE is the contract, the sample is not.
+
+          The "Published versions" header this replaced was a third label for
+          a destination the tab strip and the sub-tab already name. */}
+      {rows[0] && (
+        <div className={LIVE_BANNER}>
+          <div className={LIVE_TITLE}>
+            <span className={LIVE_DOT} aria-hidden="true" />
+            LIVE · v{rows[0].version}
+          </div>
+          <div className={LIVE_META}>
+            {liveDomain ? `${liveDomain} · ` : ""}
+            published {relTime(rows[0].completedAt)}
+          </div>
+        </div>
+      )}
       {notice && <div className={NOTICE}>{notice}</div>}
       {rows.map((r, i) => {
         const isLive = i === 0;
@@ -213,6 +258,14 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
           />
         );
       })}
+
+      {/* Board 949:4474 states the rule that makes rollback safe to try, once,
+          under the list — rather than leaving the user to infer it from a
+          button labelled "Roll back". Both halves matter: nothing is lost,
+          AND rolling back is itself a deploy. */}
+      <p className={FOOTER_NOTE}>
+        Every publish is restorable. Rolling back redeploys that version.
+      </p>
 
       {/* Board 184:37 — "Rolling back…", a determinate bar, and the caption
           naming both versions. Rendered only while the shell reports a job in

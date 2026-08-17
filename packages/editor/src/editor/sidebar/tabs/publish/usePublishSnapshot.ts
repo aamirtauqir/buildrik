@@ -71,8 +71,10 @@ function deployStamp(ts: Date | string | null): string {
   )}`;
 }
 
-/** Domain only — the board prints "bellacucina.com", never the scheme. */
-function domainOf(url: string | null): string | null {
+/** Domain only — the board prints "bellacucina.com", never the scheme.
+    Exported because board 949:4474's LIVE banner prints the same thing and
+    a second copy of this would be the duplication the DS contract bans. */
+export function domainOf(url: string | null): string | null {
   if (!url) return null;
   try {
     return new URL(url).host;
