@@ -32,6 +32,7 @@ import { SnapshotPreview } from "../../../editor/sidebar/tabs/history/components
 // @ts-expect-error — no declaration file for react-window@1.8.x
 import { FixedSizeList as FixedSizeListUntyped } from "react-window";
 import { Button } from "@/editor/chrome-ui";
+import { versionDisplayName } from "@/shared/utils/versionLabel";
 
 interface ListChildComponentProps {
   index: number;
@@ -153,14 +154,16 @@ export function VersionRow({
       <div
         ref={rowRef}
         className={`version-row${isDeleteConfirm ? " delete-confirm" : ""}`}
-        aria-label={`Version "${version.name}" from ${relative}`}
+        aria-label={`Version "${versionDisplayName(version.name)}" from ${relative}`}
         role="listitem"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
         <div className="version-row-main">
           <div>
-            <div className="version-name">{version.name}</div>
+            {/* Board 162:2 — "Auto-save", not the engine event id the name
+                is stored as. See versionDisplayName. */}
+            <div className="version-name">{versionDisplayName(version.name)}</div>
             <div className="version-meta">
               <span className="version-time">{formatTime(version.createdAt)}</span>
               <span>{relative}</span>

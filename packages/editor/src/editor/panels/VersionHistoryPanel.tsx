@@ -25,6 +25,7 @@ import {
 import { CompareView } from "./version-history/CompareView";
 import { useAISummary } from "./version-history/useAISummary";
 import { Button, TextField, useToast } from "@/editor/chrome-ui";
+import { versionDisplayName } from "@/shared/utils/versionLabel";
 
 // CompareView + toggle-pill style constants moved to
 // ./version-history/CompareView.tsx (D3 Stage 2, audit-remediation 2026-05-08).
@@ -340,7 +341,7 @@ export function VersionHistoryPanel({
       {restoreConfirmVersion && (
         <div className={RESTORE_CONFIRM} role="alertdialog" aria-label="Confirm restore">
           <strong className={RESTORE_CONFIRM_TITLE}>
-            Restore “{restoreConfirmVersion.name}”?
+            Restore “{versionDisplayName(restoreConfirmVersion.name)}”?
           </strong>
           <span className={RESTORE_CONFIRM_SUB}>
             Your current work is saved first — nothing is lost.
@@ -452,17 +453,19 @@ export function VersionHistoryPanel({
             </div>
           </div>
         ) : (
+          /* Board 162:2 writes this as a labelled link at the foot of the
+             panel — "+ Save a version". It was a floating "+" circle with the
+             label only in a tooltip, so the one action that creates a NAMED
+             version (the kind the prune rule promises never to remove)
+             announced itself as an unlabelled dot. */
           <Button
             type="button"
+            color="light"
+            size="xs"
             onClick={() => setShowSaveForm(true)}
-            className="fab"
-            aria-label="Save version"
-            title="Save Version"
+            className="tw:border-transparent tw:bg-transparent tw:px-1 tw:text-[13px] tw:text-[var(--bk-accent)]"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <line x1="12" y1="5" x2="12" y2="19" />
-              <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
+            + Save a version
           </Button>
         )}
       </div>

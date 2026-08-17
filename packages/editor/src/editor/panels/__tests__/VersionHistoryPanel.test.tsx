@@ -284,7 +284,7 @@ describe("VersionHistoryPanel — save flow", () => {
     render(<Panel composer={makeComposer()} />);
 
     // FAB / save button has aria-label "Save version".
-    fireEvent.click(screen.getByLabelText("Save version"));
+    fireEvent.click(screen.getByRole("button", { name: "+ Save a version" }));
 
     // Form input appears — placeholder copy is "e.g. Homepage redesign".
     const input = await screen.findByPlaceholderText(/homepage redesign/i);

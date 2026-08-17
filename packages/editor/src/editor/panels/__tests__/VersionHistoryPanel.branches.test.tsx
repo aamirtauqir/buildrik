@@ -158,7 +158,7 @@ describe("VersionHistoryPanel — save form branches", () => {
     const Panel = await loadPanel();
     render(<Panel composer={makeComposer()} />);
 
-    fireEvent.click(screen.getByLabelText("Save version"));
+    fireEvent.click(screen.getByRole("button", { name: "+ Save a version" }));
     const input = await screen.findByPlaceholderText(/homepage redesign/i);
     fireEvent.change(input, { target: { value: "Draft name" } });
     fireEvent.keyDown(input, { key: "Escape" });
@@ -167,7 +167,7 @@ describe("VersionHistoryPanel — save form branches", () => {
     expect(mocks.createVersion).not.toHaveBeenCalled();
 
     // Reopen — the previously typed name must be gone.
-    fireEvent.click(screen.getByLabelText("Save version"));
+    fireEvent.click(screen.getByRole("button", { name: "+ Save a version" }));
     const reopened = await screen.findByPlaceholderText(/homepage redesign/i);
     expect((reopened as HTMLInputElement).value).toBe("");
   });
@@ -176,7 +176,7 @@ describe("VersionHistoryPanel — save form branches", () => {
     const Panel = await loadPanel();
     render(<Panel composer={makeComposer()} />);
 
-    fireEvent.click(screen.getByLabelText("Save version"));
+    fireEvent.click(screen.getByRole("button", { name: "+ Save a version" }));
     await screen.findByPlaceholderText(/homepage redesign/i);
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
 
@@ -188,7 +188,7 @@ describe("VersionHistoryPanel — save form branches", () => {
     const Panel = await loadPanel();
     render(<Panel composer={makeComposer()} />);
 
-    fireEvent.click(screen.getByLabelText("Save version"));
+    fireEvent.click(screen.getByRole("button", { name: "+ Save a version" }));
     const input = await screen.findByPlaceholderText(/homepage redesign/i);
     fireEvent.change(input, { target: { value: "   " } });
 
@@ -206,7 +206,7 @@ describe("VersionHistoryPanel — save form branches", () => {
     const Panel = await loadPanel();
     render(<Panel composer={makeComposer()} />);
 
-    fireEvent.click(screen.getByLabelText("Save version"));
+    fireEvent.click(screen.getByRole("button", { name: "+ Save a version" }));
     const input = await screen.findByPlaceholderText(/homepage redesign/i);
     fireEvent.change(input, { target: { value: "Doomed" } });
     fireEvent.keyDown(input, { key: "Enter" });
@@ -221,7 +221,7 @@ describe("VersionHistoryPanel — save form branches", () => {
     const Panel = await loadPanel();
     render(<Panel composer={makeComposer()} />);
 
-    fireEvent.click(screen.getByLabelText("Save version"));
+    fireEvent.click(screen.getByRole("button", { name: "+ Save a version" }));
     const input = await screen.findByPlaceholderText(/homepage redesign/i);
     fireEvent.change(input, { target: { value: "Milestone 2" } });
     fireEvent.click(screen.getByRole("button", { name: "Save Version" }));
