@@ -142,10 +142,14 @@ describe("HistoryTab shell", () => {
     expect(screen.getByTestId("published-panel")).toHaveTextContent("PUBLISHED:site_1");
   });
 
-  it("explains itself on Published with no project rather than rendering an empty list", () => {
+  /* Was: expects "Publish the site once to start a version history." That
+     line pinned a lie — it fired whenever the SITE could not be resolved, not
+     when nothing had been published, and in unified-editor mode that was
+     always. See the reachability block at the bottom of this file. */
+  it("explains itself on Published with no site rather than rendering an empty list", () => {
     renderTab({ initialView: "published" });
     expect(screen.queryByTestId("published-panel")).toBeNull();
-    expect(screen.getByText(/Publish the site once/)).toBeInTheDocument();
+    expect(screen.getByText(/Open this site from the dashboard/)).toBeInTheDocument();
   });
 
   it("migrates a stored 'changes' preference to Saves + the changes filter", () => {
@@ -170,5 +174,49 @@ describe("HistoryTab shell", () => {
     expect(screen.getByTestId("tt-scrubber")).toBeInTheDocument();
     fireEvent.keyDown(document, { key: "T", ctrlKey: true, shiftKey: true });
     expect(screen.queryByTestId("tt-scrubber")).toBeNull();
+  });
+});
+
+/*
+  The Published view resolved its site from the `projectId` prop alone, and
+  AquibraStudio never sets it in unified-editor mode. So every real user got
+  the fallback — "Publish the site once to start a version history." — at a
+  site with four published versions behind it, and board 949:4474 plus its
+  five state boards were unreachable in the shipping editor.
+
+  PublishTab hit exactly this and fixed it for itself, leaving a comment
+  saying so; the sibling kept the null prop. Walked live 2026-08-17.
+*/
+describe("HistoryTab — the Published view finds its site", () => {
+  const openPublished = () => fireEvent.click(screen.getByRole("tab", { name: /Published/ }));
+
+  afterEach(() => {
+    window.history.replaceState({}, "", "/");
+  });
+
+  it("falls back to the siteId in the URL when projectId is absent", () => {
+    window.history.replaceState({}, "", "/?siteId=site_from_url");
+    renderTab({ projectId: null });
+    openPublished();
+
+    expect(screen.getByTestId("published-panel").textContent).toBe("PUBLISHED:site_from_url");
+  });
+
+  it("prefers an explicit projectId over the URL", () => {
+    window.history.replaceState({}, "", "/?siteId=site_from_url");
+    renderTab({ projectId: "site_from_prop" });
+    openPublished();
+
+    expect(screen.getByTestId("published-panel").textContent).toBe("PUBLISHED:site_from_prop");
+  });
+
+  it("says there is no SITE, not that nothing was ever published", () => {
+    // The two are different facts. PublishHistory owns "no versions yet" and
+    // says it in its own words; this line only fires with no site at all.
+    renderTab({ projectId: null });
+    openPublished();
+
+    expect(screen.queryByTestId("published-panel")).toBeNull();
+    expect(screen.getByText("Open this site from the dashboard to see its publish history.")).toBeTruthy();
   });
 });

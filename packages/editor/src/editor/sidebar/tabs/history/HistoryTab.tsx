@@ -20,6 +20,7 @@ import { ActivityView } from "./components/ActivityView";
 import { TimeTravelScrubber } from "./components/TimeTravelScrubber";
 import { MilestoneSuggestionBanner } from "./components/MilestoneSuggestionBanner";
 import type { HistoryView, SavesFilter, HistoryTabProps } from "./types";
+import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 
 const VIEW_LABEL: Record<HistoryView, string> = {
   saves: "Saves",
@@ -86,7 +87,19 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
   onHelpClick,
   onClose,
 }) => {
-  const storageKey = `buildrick-history-view${projectId ? `-${projectId}` : ""}`;
+  /*
+    `projectId` is not threaded in unified-editor mode — AquibraStudio never
+    sets it — so the Published view's `projectId ? … : …` fell to its fallback
+    for every real user and printed "Publish the site once to start a version
+    history." at a site with four published versions behind it. Board 949:4474
+    and its five state boards were unreachable in the shipping editor.
+
+    PublishTab hit this and fixed it for itself, with a comment saying so;
+    its sibling kept the same null prop. Resolve the site the way the
+    canonical publish path does — from the URL.
+  */
+  const siteId = React.useMemo(() => projectId ?? getSiteIdFromUrl(), [projectId]);
+  const storageKey = `buildrick-history-view${siteId ? `-${siteId}` : ""}`;
   const { historyStack, canUndo, clear } = useHistoryState(composer);
 
   /* Stored preference, read once. The key predates M1 and every returning user
@@ -258,10 +271,13 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
         {/* M2 — the published-version list's canonical home. Same component the
             Publish panel embeds; rollback stays ADMIN-gated inside it. */}
         {activeView === "published" &&
-          (projectId ? (
-            <PublishHistory siteId={projectId} rollbackJob={rollbackJob} />
+          (siteId ? (
+            <PublishHistory siteId={siteId} rollbackJob={rollbackJob} />
           ) : (
-            <div className={HISTORY_EMPTY}>Publish the site once to start a version history.</div>
+            /* No SITE, which is a different fact from no versions —
+               PublishHistory owns the latter and says so in its own words.
+               This fires only when the editor was opened without one. */
+            <div className={HISTORY_EMPTY}>Open this site from the dashboard to see its publish history.</div>
           ))}
       </div>
       {/* Time-Travel scrubber drawer (overlays canvas, not sidebar) */}
