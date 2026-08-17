@@ -52,6 +52,19 @@ function generateVersionId(): string {
 export class VersionTimelineManager {
   private composer: Composer;
   private config: VersionHistoryConfig;
+
+  /**
+   * How many versions are kept before the oldest auto-saves are pruned.
+   *
+   * Board 162:2 states the rule under the list ("50 versions kept. Auto-saves
+   * prune oldest first; named ones never prune."), and a panel that hardcoded
+   * the number would go on saying 50 the day the config changed. The prune
+   * event already reports `kept`, but only when a prune has just happened —
+   * the note has to be true before that, too.
+   */
+  get maxVersions(): number {
+    return this.config.maxVersions;
+  }
   private versions: NamedVersion[] = [];
   private projectId: string = "default";
   private isLoading: boolean = false;

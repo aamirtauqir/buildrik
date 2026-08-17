@@ -25,6 +25,7 @@ import {
 import { CompareView } from "./version-history/CompareView";
 import { useAISummary } from "./version-history/useAISummary";
 import { Button, TextField, useToast } from "@/editor/chrome-ui";
+import { fetchReviewStatus, type ReviewStatus } from "@/services/ReviewService";
 
 // CompareView + toggle-pill style constants moved to
 // ./version-history/CompareView.tsx (D3 Stage 2, audit-remediation 2026-05-08).
@@ -70,6 +71,27 @@ const SKELETON_BAR =
 const NOTICE_BASE =
   "tw:flex tw:flex-col tw:gap-[2px] tw:px-[var(--bk-space-12)] " +
   "tw:py-[var(--bk-space-8)] tw:border-b tw:border-[var(--bk-border)] tw:text-[12px]";
+/* Board 162:2's approval band, "now" row and prune note. */
+const APPROVAL_BAND =
+  "tw:rounded-md tw:bg-[var(--bk-success-tint)] tw:px-3 tw:py-2.5 tw:flex tw:flex-col tw:gap-0.5 tw:mb-2";
+const APPROVAL_TITLE =
+  "tw:flex tw:items-center tw:gap-1.5 tw:text-[12px] tw:font-semibold tw:tracking-[0.04em] tw:text-[var(--bk-success-text)]";
+const APPROVAL_META = "tw:text-[11px] tw:text-[var(--bk-ink-soft)]";
+const NOW_ROW =
+  "tw:flex tw:items-center tw:gap-2 tw:px-1 tw:pb-2 tw:text-[13px] tw:text-[var(--bk-ink)]";
+const NOW_DOT = "tw:size-2 tw:rounded-full tw:bg-[var(--bk-accent)]";
+const PRUNE_NOTE = "tw:m-0 tw:mt-2 tw:px-1 tw:text-[11px] tw:text-[var(--bk-ink-muted)]";
+
+/** Board 162:2 stamps the approval "18 Jul, 15:42". */
+function approvalStamp(at: string | Date): string {
+  const d = at instanceof Date ? at : new Date(at);
+  if (Number.isNaN(d.getTime())) return "";
+  return `${d.toLocaleDateString(undefined, { day: "numeric", month: "short" })}, ${d.toLocaleTimeString(
+    undefined,
+    { hour: "2-digit", minute: "2-digit", hour12: false },
+  )}`;
+}
+
 const NOTICE_PRUNED =
   `${NOTICE_BASE} tw:bg-[var(--bk-warning-tint)] tw:text-[var(--bk-warning-text)]`;
 const NOTICE_RESTORING =
@@ -129,6 +151,39 @@ export function VersionHistoryPanel({
      (VERSION_PRUNED); this is the notice. Dismissible, and it clears itself on
      the next prune-free session because it is session state, not stored. */
   const [pruned, setPruned] = React.useState<{ removed: number; kept: number } | null>(null);
+
+  /* Board 162:2 opens on the approval, not on the list: "APPROVED · v3 /
+     Sara Khan · 18 Jul, 15:42" over a green band. The panel had nothing about
+     the review at all, which is the fact the Saves list exists to be measured
+     against — every row under it is a change made after that sign-off.
+
+     The board's "· v3" has no source: `reviews.status` carries state,
+     reviewer and time, not a version number. Absent rather than invented. */
+  const [review, setReview] = React.useState<ReviewStatus | null>(null);
+  React.useEffect(() => {
+    let alive = true;
+    void fetchReviewStatus().then((r) => alive && setReview(r));
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  /* Board 162:2's "Now — 12 changes since v3". Counted the same way the
+     publish panel counts "since last deploy": the engine's own history stack,
+     filtered to entries newer than the moment being measured from. */
+  /* Both approved states carry the band. `approved-edited-since` is what the
+     server returns the moment anyone touches the site after sign-off — which
+     is precisely the situation board 162:2 draws: an APPROVED band with
+     "Now — 12 changes since v3" under it. Gating on the pristine `approved`
+     alone meant the band vanished on the first edit, i.e. exactly when the
+     list it heads becomes worth reading. */
+  const isApproved = review?.state === "approved" || review?.state === "approved-edited-since";
+  const approvedAt = isApproved && review?.at ? new Date(review.at).getTime() : null;
+  const changesSinceApproval = React.useMemo(() => {
+    if (approvedAt === null) return 0;
+    const stack = composer?.history?.getHistoryStack?.() ?? [];
+    return stack.filter((e) => e.timestamp > approvedAt).length;
+  }, [composer, approvedAt, versions.length]);
   /* Board 163:220 draws the restore in flight, and its second line is the
      reassurance the engine now actually keeps: the work that was open is
      saved as its own version before anything is replaced. */
@@ -333,6 +388,34 @@ export function VersionHistoryPanel({
         </div>
       )}
 
+      {/* Board 162:2's approval band and the "now" row beneath it. The band
+          is what the whole list is measured against: every save under it was
+          made after the client signed off. Absent when there is no approved
+          round — the board draws the approved case, and inventing a band for
+          "never reviewed" would say something the server never said. */}
+      {isApproved && review && (
+        <div className={APPROVAL_BAND} role="status">
+          <div className={APPROVAL_TITLE}>
+            <span aria-hidden="true">⚑</span> APPROVED
+          </div>
+          {(review.reviewerName || review.at) && (
+            <div className={APPROVAL_META}>
+              {[review.reviewerName, review.at ? approvalStamp(review.at) : null]
+                .filter(Boolean)
+                .join(" · ")}
+            </div>
+          )}
+        </div>
+      )}
+      {approvedAt !== null && (
+        <div className={NOW_ROW}>
+          <span className={NOW_DOT} aria-hidden="true" />
+          <span>
+            Now — {changesSinceApproval} change{changesSinceApproval === 1 ? "" : "s"} since approval
+          </span>
+        </div>
+      )}
+
       {/* Version List — virtualization + row rendering owned by VersionList.
           See ./version-history/VersionList.tsx (D3 Stage 1). */}
       <VersionList
@@ -346,6 +429,17 @@ export function VersionHistoryPanel({
         onDeleteCancel={handleDeleteCancel}
         onCompare={handleCompare}
       />
+
+      {/* Board 162:2 closes on the prune rule. It is the answer to the
+          question the list provokes — "will these disappear?" — and the number
+          is read from the manager rather than written into the copy, so it
+          cannot go on saying 50 the day the config changes. */}
+      {typeof composer?.versions?.maxVersions === "number" && (
+        <p className={PRUNE_NOTE}>
+          {composer.versions.maxVersions} versions kept. Auto-saves prune oldest first; named ones
+          never prune.
+        </p>
+      )}
       {/* Inline restore confirmation — rendered outside the virtualized list.
           Appears as a pinned section below the list for the pending version. */}
       {restoreConfirmVersion && (
