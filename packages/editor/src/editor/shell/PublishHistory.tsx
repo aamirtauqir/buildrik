@@ -344,9 +344,14 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
                no payload to re-publish. */
             const selectable = !isLive && r.rollbackable;
             return (
-              <button
+              /* chrome-ui's Button, not a bare <button> — Gate 24 is zero
+                 tolerance, and it caught this one. `role="radio"` rides on it
+                 because the picker is a single-choice list, not four
+                 independent actions. */
+              <Button
                 key={r.id}
                 type="button"
+                color="light"
                 role="radio"
                 aria-checked={picking?.id === r.id}
                 disabled={!selectable}
@@ -362,7 +367,7 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
                   <span className={PICK_META}>published {relTime(r.completedAt)}</span>
                 </span>
                 {isLive && <span className={PICK_LIVE}>live</span>}
-              </button>
+              </Button>
             );
           })}
         </div>
