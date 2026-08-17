@@ -101,34 +101,64 @@ const STALE_QUEUED_AFTER_MS = 5 * 60 * 1000;
 // publish for the site forever.
 const STALE_BUILDING_AFTER_MS = 15 * 60 * 1000;
 
-// Retry the worker dispatch a few times. The route is long-running by design
-// (maxDuration=300 — entire build runs inside POST), so we can't await the
-// full response. Race the fetch against a short window: if the call hasn't
-// settled in that window the connection is up and the worker is processing
-// (success). If it throws or returns non-2xx inside the window, dispatch
-// failed — retry.
-async function dispatchWorker(baseUrl: string, jobId: string): Promise<boolean> {
+/**
+ * Hand the job to the worker route. The route is long-running by design
+ * (maxDuration=300 — the entire build runs inside the POST), so we cannot
+ * await the full response: race the fetch against a short window, and treat
+ * "still open after 2s" as the worker having taken the job.
+ *
+ * A RESPONSE — of any status — means the dispatch itself worked. That
+ * distinction was missing, and it cost the real error every time the worker
+ * threw:
+ *
+ *   attempt 1 → 500 (the worker ran, claimed the job, and failed)
+ *   attempt 2 → 400 ("not in QUEUED state" — attempt 1 already claimed it)
+ *   attempt 3 → 400
+ *   → caller marks the job WORKER_DISPATCH_FAILED, OVERWRITING whatever the
+ *     worker had recorded about why it actually failed.
+ *
+ * So every worker-side failure surfaced to the user as a dispatch problem,
+ * and the retries could not possibly succeed — the first attempt takes the
+ * job out of QUEUED, so 2 and 3 are guaranteed 400s. Retrying is only
+ * meaningful when nothing answered at all.
+ *
+ * Returns whether the worker was reached. `claimed` says the job is no longer
+ * ours to fail: the worker answered and owns its outcome.
+ */
+async function dispatchWorker(
+  baseUrl: string,
+  jobId: string,
+): Promise<{ reached: boolean; claimed: boolean }> {
   const retryDelaysMs = [200, 500];
   for (let attempt = 0; attempt <= retryDelaysMs.length; attempt++) {
     const settled = fetch(`${baseUrl}/api/workers/publish/${jobId}`, {
       method: "POST",
       headers: { "x-worker-secret": process.env.CRON_SECRET ?? "" },
     }).then(
-      (res) => (res.ok ? "ok" : "http-error") as "ok" | "http-error",
-      () => "network-error" as const,
+      (res) => ({ kind: "answered" as const, status: res.status }),
+      () => ({ kind: "network-error" as const, status: 0 }),
     );
 
     const result = await Promise.race([
       settled,
-      new Promise<"in-flight">((r) => setTimeout(() => r("in-flight"), 2000)),
+      new Promise<{ kind: "in-flight"; status: number }>((r) =>
+        setTimeout(() => r({ kind: "in-flight", status: 0 }), 2000),
+      ),
     ]);
 
-    if (result === "in-flight" || result === "ok") return true;
+    // Still open: the worker is building. Nothing to retry.
+    if (result.kind === "in-flight") return { reached: true, claimed: true };
+    // Answered — including 4xx/5xx. The worker owns the job from here; a
+    // retry can only find it out of QUEUED.
+    if (result.kind === "answered") {
+      return { reached: true, claimed: result.status !== 401 && result.status !== 404 };
+    }
+    // Nothing answered. This is the only case a retry can help.
     if (attempt < retryDelaysMs.length) {
       await new Promise((r) => setTimeout(r, retryDelaysMs[attempt]));
     }
   }
-  return false;
+  return { reached: false, claimed: false };
 }
 
 export async function startPublish(
@@ -287,8 +317,16 @@ export async function startPublish(
   ).catch(() => {});
 
   const baseUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
-  const dispatched = await dispatchWorker(baseUrl, job.id);
-  if (!dispatched) {
+  const dispatch = await dispatchWorker(baseUrl, job.id);
+  /*
+    Only claim the job back when the worker was never reached. If it answered
+    — even with a 500 — it has already written its own status and error, and
+    overwriting that with WORKER_DISPATCH_FAILED destroys the one record of
+    what actually went wrong. That is what used to happen on every worker-side
+    failure, which is why local publishes all reported a dispatch problem they
+    did not have.
+  */
+  if (!dispatch.reached || !dispatch.claimed) {
     // Roll the job into FAILED so a future publish can claim a new one
     // immediately (without waiting for the 5-min stale cutoff). Restore
     // site.status — keep PUBLISHED if a prior deploy is still live.

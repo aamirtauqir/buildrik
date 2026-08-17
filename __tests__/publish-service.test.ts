@@ -203,6 +203,70 @@ describe("Publish Service", () => {
       );
     });
 
+    /*
+      The worker answering — with ANY status — means the dispatch worked. This
+      was read as "dispatch failed" for every non-2xx, and the consequences
+      compounded:
+
+        attempt 1 → 500 (the worker ran, claimed the job, and failed)
+        attempt 2 → 400 ("not in QUEUED state", because attempt 1 claimed it)
+        attempt 3 → 400
+        → the job was overwritten with WORKER_DISPATCH_FAILED, destroying the
+          error the worker had just recorded.
+
+      Every worker-side failure therefore reached the user as a dispatch
+      problem. Measured on 2026-08-17: a rollback reported WORKER_DISPATCH_FAILED
+      whose real cause was "No page content to deploy".
+    */
+    const queueOneJob = () => {
+      vi.mocked(prisma.publishBuildJob.findFirst).mockResolvedValue(null);
+      vi.mocked(prisma.publishBuildJob.create).mockResolvedValue({
+        id: "job1", siteId: "s1", workspaceId: "ws1", status: "QUEUED", progress: 0,
+      } as any);
+      vi.mocked(prisma.site.update).mockResolvedValue({ id: "s1" } as any);
+    };
+
+    it("leaves the job alone when the worker answers with an error", async () => {
+      vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false, status: 500 }));
+      queueOneJob();
+
+      const job = await startPublish("s1", "ws1", "user1");
+
+      expect(job.id).toBe("job1");
+      // The worker owns the outcome from here — overwriting it is what erased
+      // the real error.
+      expect(prisma.publishBuildJob.update).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ error: "WORKER_DISPATCH_FAILED" }),
+        }),
+      );
+    });
+
+    it("does not retry once the worker has answered", async () => {
+      // Retrying can only find the job out of QUEUED — three POSTs where one
+      // was meaningful, and two guaranteed 400s in the log.
+      const f = vi.fn().mockResolvedValue({ ok: false, status: 500 });
+      vi.stubGlobal("fetch", f);
+      queueOneJob();
+
+      await startPublish("s1", "ws1", "user1");
+
+      expect(f).toHaveBeenCalledTimes(1);
+    });
+
+    it("still fails the job when nothing answers at all", async () => {
+      // A genuine dispatch failure: the retries are for exactly this.
+      const f = vi.fn().mockRejectedValue(new Error("ECONNREFUSED"));
+      vi.stubGlobal("fetch", f);
+      queueOneJob();
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({
+        deletedAt: null, workspaceId: "ws1", publishedUrl: null, name: "S",
+      } as never);
+
+      await expect(startPublish("s1", "ws1", "user1")).rejects.toThrow("WORKER_DISPATCH_FAILED");
+      expect(f).toHaveBeenCalledTimes(3);
+    });
+
     it("throws when already publishing", async () => {
       vi.mocked(prisma.publishBuildJob.findFirst).mockResolvedValue({
         id: "existing",
