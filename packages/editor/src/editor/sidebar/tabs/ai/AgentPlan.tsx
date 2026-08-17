@@ -12,6 +12,8 @@ const PANEL = "tw:flex tw:flex-col tw:gap-2 tw:px-4 tw:py-3";
 const PANEL_TITLE = "tw:m-0 tw:text-[13px] tw:font-medium";
 const PANEL_BODY = "tw:m-0 tw:text-[12px] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
 const PANEL_ACTIONS = "tw:flex tw:justify-between tw:gap-2";
+/** Bare accent text, the same shape the chat states use for their one link. */
+const DISMISS_LINK = "tw:self-start tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[var(--bk-accent)]";
 
 /**
  * The agent run — boards 170:41 (planning), 170:70 (running), 170:97
@@ -52,6 +54,10 @@ export interface AgentPlanProps {
   onRetry?: () => void;
   /** Board 171:2 — take back the steps that did land. */
   onUndoAll?: () => void;
+  /** Clear a finished or stopped run and hand the panel back to chat.
+      Without it the plan's last frame is the only thing left on screen and
+      nothing else can be asked. */
+  onDismiss?: () => void;
 }
 
 /** Board glyphs: done, in flight, waiting. Never colour alone — every row also
@@ -113,6 +119,7 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
   stoppedByUser,
   onRetry,
   onUndoAll,
+  onDismiss,
 }) => {
   const autoApplyToggle = (
     <label className="bd-ai-agent-autoapply">
@@ -245,8 +252,13 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
               : ""}
           </p>
           {onUndoAll && appliedCount > 0 ? (
-            <Button type="button" color="light" className="tw:self-start tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[var(--bk-accent)]" onClick={onUndoAll}>
+            <Button type="button" color="light" className={DISMISS_LINK} onClick={onUndoAll}>
               Undo all
+            </Button>
+          ) : null}
+          {onDismiss ? (
+            <Button type="button" color="light" className={DISMISS_LINK} onClick={onDismiss}>
+              Ask something else
             </Button>
           ) : null}
         </div>
@@ -261,6 +273,11 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
               ? `Each step is its own undo step — ⌘Z takes back the last of the ${appliedCount}.`
               : "⌘Z takes it back."}
           </p>
+          {onDismiss ? (
+            <Button type="button" color="light" className={DISMISS_LINK} onClick={onDismiss}>
+              Ask something else
+            </Button>
+          ) : null}
         </div>
       ) : null}
 

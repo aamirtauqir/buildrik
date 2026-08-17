@@ -57,9 +57,19 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
 
   /* With the mode toggle gone, a finished or stopped run has to hand the panel
      back by itself — otherwise the plan's last frame would be the only thing
-     left on screen with no way to ask anything else. */
+     left on screen with no way to ask anything else.
+
+     It has to key off the TRANSITION back to idle, not off idle itself: a run
+     that hasn't started yet is idle too, so `phase === "idle"` alone bounced
+     the panel out of agent mode the instant the DRAFT row put it there, and
+     the whole agent surface — plan, step gate, failed step, stopped, done —
+     was unreachable. The only thing that returns the runner to idle is
+     reset(), which is what dismissing a finished run calls. */
+  const prevPhase = React.useRef(agent.phase);
   React.useEffect(() => {
-    if (mode === "agent" && agent.phase === "idle") setMode("chat");
+    const was = prevPhase.current;
+    prevPhase.current = agent.phase;
+    if (mode === "agent" && was !== "idle" && agent.phase === "idle") setMode("chat");
   }, [mode, agent.phase]);
 
   /** The last prompt, so the provider-failure state can offer a real retry. */
@@ -332,6 +342,7 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
           onSkip={agent.skip}
           onStop={agent.stop}
           stoppedByUser={agent.stoppedByUser}
+          onDismiss={agent.reset}
           onRetry={lastAgentPrompt.current ? () => agent.start(lastAgentPrompt.current) : undefined}
           /* Each applied step is its own transaction, so taking the run back
              is exactly that many undos — and nothing has happened since the
