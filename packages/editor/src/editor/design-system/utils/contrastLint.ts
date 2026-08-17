@@ -44,13 +44,23 @@ export function resolveSurface(bg: DesignToken | undefined, mode: "light" | "dar
 export const shownValue = (t: DesignToken, mode: "light" | "dark") =>
   (mode === "dark" ? t.darkValue : t.value) || t.value;
 
-/** The page colour itself is not "text on the page" — never compare it to itself. */
+/** The page colour itself is not "text on the page" — never compare it to
+ *  itself. By VALUE, not just by id: the default palette ships #F8FAFC three
+ *  times (`color-background`, `color-slate-50`, `color-surface`), so an
+ *  id-only check flagged the page colour twice at ratio 1.00 and a fresh site
+ *  opened on four warnings, two of them impossible to act on — passing
+ *  contrast against the page is not a thing Slate 50 can do and stay Slate 50. */
 export const contrastFails = (
   t: DesignToken,
   surfaceBg: string,
   mode: "light" | "dark",
   surfaceId?: string,
-) => t.id !== surfaceId && calcWcagLevel(shownValue(t, mode), surfaceBg) === "fail";
+) => {
+  if (t.id === surfaceId) return false;
+  const shown = shownValue(t, mode);
+  if (shown && shown.toUpperCase() === surfaceBg.toUpperCase()) return false;
+  return calcWcagLevel(shown, surfaceBg) === "fail";
+};
 
 /** The rule, in the linter's vocabulary — what useDSLint merges in. */
 export function buildContrastIssues(

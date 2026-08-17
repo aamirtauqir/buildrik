@@ -95,12 +95,15 @@ describe("ColorTokenList — contrast is checked against the customer's surface"
   });
 
   it("falls back to white, never to near-black, when the palette has no background token", () => {
-    // #FFFFFF with nothing to sit on must still read as failing. Under the old
-    // fallback it scored 19.80 (aaa).
+    // Near-white on white: 1.17, a failure. On the old near-black fallback the
+    // same token scored ~15 and the finding vanished — which is the thing this
+    // guards. (It used to use #FFFFFF itself; a token whose value IS the page
+    // colour is no longer a contrast finding, so the fixture moved one shade
+    // off white and still separates the two fallbacks.)
     const noSurface: DesignToken[] = [
-      { id: "color-white", name: "White", value: "#FFFFFF",
+      { id: "color-paper", name: "Paper", value: "#F2F2F2",
         category: "colors", type: "color", kind: "color", group: "brand" } as DesignToken,
     ];
-    expect(flaggedTokens({}, noSurface)).toEqual(["White"]);
+    expect(flaggedTokens({}, noSurface)).toEqual(["Paper"]);
   });
 });
