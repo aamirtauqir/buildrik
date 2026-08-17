@@ -241,10 +241,10 @@ describe("VersionHistoryPanel — restore branches", () => {
     render(<Panel composer={makeComposer()} />);
 
     fireEvent.click(screen.getByLabelText('Restore "Save A"'));
-    await screen.findByText(/Restore to "Save A"\?/);
+    await screen.findByText(/Restore “Save A”\?/);
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
 
-    expect(screen.queryByText(/Restore to "Save A"\?/)).toBeNull();
+    expect(screen.queryByText(/Restore “Save A”\?/)).toBeNull();
     expect(mocks.restoreVersion).not.toHaveBeenCalled();
   });
 
@@ -255,7 +255,7 @@ describe("VersionHistoryPanel — restore branches", () => {
     render(<Panel composer={makeComposer()} />);
 
     fireEvent.click(screen.getByLabelText('Restore "Save A"'));
-    await screen.findByText(/Restore to "Save A"\?/);
+    await screen.findByText(/Restore “Save A”\?/);
     fireEvent.click(screen.getAllByRole("button", { name: /^Restore$/ })[0]);
 
     expect(await screen.findByText("Restore failed")).toBeTruthy();
@@ -268,7 +268,7 @@ describe("VersionHistoryPanel — restore branches", () => {
     render(<Panel composer={makeComposer()} />);
 
     fireEvent.click(screen.getByLabelText('Restore "Save A"'));
-    await screen.findByText(/Restore to "Save A"\?/);
+    await screen.findByText(/Restore “Save A”\?/);
     fireEvent.click(screen.getAllByRole("button", { name: /^Restore$/ })[0]);
 
     expect(await screen.findByText(/^Restored to /)).toBeTruthy();
@@ -445,5 +445,51 @@ describe("VersionHistoryPanel — compare branches", () => {
     const semanticTab = screen.getByRole("tab", { name: "Semantic" });
     expect((visualTab as HTMLButtonElement).disabled).toBe(true);
     expect(semanticTab.getAttribute("aria-selected")).toBe("true");
+  });
+});
+
+/*
+  Board 163:167 — the restore confirm.
+
+  It rendered below the list, "as a pinned section", so on fifty auto-saves
+  the confirmation for a click at the top appeared somewhere the user had to
+  go looking for. And it said only "Restore to X?" — leaving out the sentence
+  that makes the action safe to take: restoring does not discard the current
+  work, it saves it first.
+*/
+describe("VersionHistoryPanel — board 163:167 restore confirm", () => {
+  it("says the current work survives", async () => {
+    mocks.state.versions = [makeVersion({ id: "v1", name: "Save A" })];
+    const Panel = await loadPanel();
+    render(<Panel composer={makeComposer()} />);
+
+    fireEvent.click(screen.getAllByRole("button", { name: /restore/i })[0]);
+    expect(await screen.findByText(/Restore “Save A”\?/)).toBeInTheDocument();
+    expect(
+      screen.getByText("Your current work is saved first — nothing is lost."),
+    ).toBeInTheDocument();
+  });
+
+  it("sits above the list, not under it", async () => {
+    mocks.state.versions = [makeVersion({ id: "v1", name: "Save A" })];
+    const Panel = await loadPanel();
+    const { container } = render(<Panel composer={makeComposer()} />);
+
+    fireEvent.click(screen.getAllByRole("button", { name: /restore/i })[0]);
+    const confirm = await screen.findByRole("alertdialog");
+    const list = container.querySelector(".version-list, [class*=version-list]") ?? container.lastElementChild;
+    expect(confirm.compareDocumentPosition(list!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it("puts Cancel before Restore, per the board", async () => {
+    // The safe door reads first.
+    mocks.state.versions = [makeVersion({ id: "v1", name: "Save A" })];
+    const Panel = await loadPanel();
+    render(<Panel composer={makeComposer()} />);
+
+    fireEvent.click(screen.getAllByRole("button", { name: /restore/i })[0]);
+    const dialog = await screen.findByRole("alertdialog");
+    const labels = [...dialog.querySelectorAll("button")].map((b) => b.textContent?.trim());
+    expect(labels).toEqual(["Cancel", "Restore"]);
   });
 });

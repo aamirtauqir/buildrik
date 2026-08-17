@@ -70,6 +70,13 @@ const SKELETON_BAR =
 const NOTICE_BASE =
   "tw:flex tw:flex-col tw:gap-[2px] tw:px-[var(--bk-space-12)] " +
   "tw:py-[var(--bk-space-8)] tw:border-b tw:border-[var(--bk-border)] tw:text-[12px]";
+/* Board 163:167's confirm band — accent tint, its own actions row. */
+const RESTORE_CONFIRM =
+  "tw:rounded-md tw:bg-[var(--bk-accent-tint)] tw:px-3 tw:py-2.5 tw:flex tw:flex-col tw:gap-1 tw:mb-2";
+const RESTORE_CONFIRM_TITLE = "tw:text-[13px] tw:font-semibold tw:text-[var(--bk-accent)]";
+const RESTORE_CONFIRM_SUB = "tw:text-[11px] tw:text-[var(--bk-ink-soft)]";
+const RESTORE_CONFIRM_ACTIONS = "tw:mt-1 tw:flex tw:items-center tw:justify-between tw:gap-2";
+
 const NOTICE_PRUNED =
   `${NOTICE_BASE} tw:bg-[var(--bk-warning-tint)] tw:text-[var(--bk-warning-text)]`;
 const NOTICE_RESTORING =
@@ -318,6 +325,39 @@ export function VersionHistoryPanel({
 
   return (
     <div className="saves-view">
+      {/* Board 163:167 — the restore confirm, at the TOP of the panel.
+          It used to render below the list, "as a pinned section", which on a
+          list of fifty auto-saves put the confirmation for a click at the top
+          somewhere the user had to go looking for.
+
+          The board also carries the sentence this was missing entirely:
+          restoring does not discard the current work, it saves it first. That
+          is the whole reason the action is safe to take, and the confirm said
+          only "Restore to X?". The board writes "saved as v4 first" — the
+          engine does save first (VERSION_RESTORING reports `savedAs`), but
+          not until the restore is under way, so the name is absent and the
+          fact stated. */}
+      {restoreConfirmVersion && (
+        <div className={RESTORE_CONFIRM} role="alertdialog" aria-label="Confirm restore">
+          <strong className={RESTORE_CONFIRM_TITLE}>
+            Restore “{restoreConfirmVersion.name}”?
+          </strong>
+          <span className={RESTORE_CONFIRM_SUB}>
+            Your current work is saved first — nothing is lost.
+          </span>
+          <div className={RESTORE_CONFIRM_ACTIONS}>
+            {/* Cancel first, per the board: the safe door is the one nearer
+                the reading order's start. */}
+            <Button color="light" size="xs" onClick={handleRestoreCancel}>
+              Cancel
+            </Button>
+            <Button size="xs" onClick={() => handleRestoreConfirm(restoreConfirmVersion.id)}>
+              Restore
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Board 163:220 — the restore banner, above the list. */}
       {restoring && (
         <div className={NOTICE_RESTORING} role="status">
@@ -351,22 +391,6 @@ export function VersionHistoryPanel({
 
       {/* Inline restore confirmation — rendered outside the virtualized list.
           Appears as a pinned section below the list for the pending version. */}
-      {restoreConfirmVersion && (
-        <div className="restore-confirm">
-          <span className="restore-confirm-text">
-            Restore to "{restoreConfirmVersion.name}"?
-          </span>
-          <Button
-            onClick={() => handleRestoreConfirm(restoreConfirmVersion.id)}
-            className="action-btn primary"
-          >
-            Restore
-          </Button>
-          <Button onClick={handleRestoreCancel} className="action-btn">
-            Cancel
-          </Button>
-        </div>
-      )}
       {/* Expanded CompareView — rendered outside the virtualized list so it
           can grow freely. Shown as an inline detail section anchored below. */}
       {expandedVersion && (

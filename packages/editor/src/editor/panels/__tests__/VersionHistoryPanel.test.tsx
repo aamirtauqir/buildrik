@@ -223,7 +223,7 @@ describe("VersionHistoryPanel — restore flow", () => {
     fireEvent.click(restoreBtn);
 
     // Confirmation appears outside the row (pinned section).
-    const confirmRestore = await screen.findByText(/Restore to "Save A"\?/);
+    const confirmRestore = await screen.findByText(/Restore “Save A”\?/);
     expect(confirmRestore).toBeTruthy();
 
     // Click "Restore" in the confirmation strip — there are now two
