@@ -189,6 +189,7 @@
     "TreeRowProps": "local",
     "UpgradeModal": "local",
     "UpgradeModalProps": "local",
+    "openUpgrade": "local",
     "useFocusTrap": "local",
     "useToast": "local",
     "UseToastReturn": "local",

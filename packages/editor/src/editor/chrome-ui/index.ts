@@ -73,7 +73,7 @@ export {
 } from "./EmptyState";
 export { MediaCard, type MediaCardProps } from "./MediaCard";
 export { SiteCard, type SiteCardProps } from "./SiteCard";
-export { UpgradeModal, type UpgradeModalProps } from "./UpgradeModal";
+export { UpgradeModal, openUpgrade, type UpgradeModalProps } from "./UpgradeModal";
 export {
   PanelHeader,
   PanelHeaderActions,

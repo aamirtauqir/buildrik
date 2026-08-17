@@ -125,58 +125,6 @@ export const ReplaceModal: React.FC<ReplaceModalProps> = ({
 // Pro Intercept Modal
 // ============================================================================
 
-export interface ProModalProps {
-  templateName: string;
-  onCancel: () => void;
-  onUpgrade: () => void;
-}
-
-const PRO_FEATURES: readonly string[] = [
-  "80+ premium templates",
-  "Custom domain",
-  "Stock library access",
-  "AI alt-text generation",
-  "Priority support",
-];
-
-export const ProModal: React.FC<ProModalProps> = ({ templateName, onCancel, onUpgrade }) => (
-  <Modal
-    open
-    onClose={onCancel}
-    dismissOnScrimClick
-    title={`“${templateName}” is a Pro template`}
-    subtitle="Unlock 80+ premium templates with conversion-tested layouts."
-    footer={
-      <>
-        <Button color="light" className="tw:flex-1" onClick={onCancel}>
-          Maybe later
-        </Button>
-        <Button className="tw:flex-1" onClick={onUpgrade}>
-          Upgrade to Pro
-        </Button>
-      </>
-    }
-  >
-    <div
-      /* @lint-hex-policy: warm illustrative gradient for the Pro upsell hero */
-      className={`${HERO} tw:size-14 tw:mt-1 tw:mb-4 tw:[background-image:linear-gradient(135deg,#fff7ed,#fed7aa)]`}
-      aria-hidden="true"
-    >
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--bk-warning)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 2l3 7h7l-5.5 5L18 22l-6-4-6 4 1.5-8L2 9h7z" />
-      </svg>
-    </div>
-    <div className="tw:p-4 tw:rounded-md tw:bg-[var(--bk-bg-subtle)]">
-      <div className="tw:mb-2 tw:text-xs tw:font-semibold tw:text-gray-900">Pro includes</div>
-      <div className="tw:flex tw:flex-col tw:gap-1 tw:text-xs">
-        {PRO_FEATURES.map((feat) => (
-          <div key={feat}>✓ {feat}</div>
-        ))}
-      </div>
-    </div>
-  </Modal>
-);
-
 // ============================================================================
 // Create Page Confirm Modal (fiLNZ)
 // ============================================================================

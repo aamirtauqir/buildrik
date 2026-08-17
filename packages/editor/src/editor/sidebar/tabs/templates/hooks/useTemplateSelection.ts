@@ -22,8 +22,6 @@ export interface UseTemplateSelectionReturn {
   setDetailId: React.Dispatch<React.SetStateAction<string | null>>;
   showReplace: boolean;
   setShowReplace: React.Dispatch<React.SetStateAction<boolean>>;
-  showUpgrade: boolean;
-  setShowUpgrade: React.Dispatch<React.SetStateAction<boolean>>;
   searchQ: string;
   setSearchQ: React.Dispatch<React.SetStateAction<string>>;
   activeFilter: SiteCategory;
@@ -49,7 +47,6 @@ export function useTemplateSelection(showProgress: boolean): UseTemplateSelectio
   const [previewId, setPreviewId] = React.useState<string | null>(null);
   const [detailId, setDetailId] = React.useState<string | null>(null);
   const [showReplace, setShowReplace] = React.useState(false);
-  const [showUpgrade, setShowUpgrade] = React.useState(false);
   const [searchQ, setSearchQ] = React.useState("");
   const [activeFilter, setActiveFilter] = React.useState<SiteCategory>("all");
   const [templateType, setTemplateType] = React.useState<TemplateType | null>(null);
@@ -101,7 +98,6 @@ export function useTemplateSelection(showProgress: boolean): UseTemplateSelectio
       if (e.key === "Escape") {
         if (showProgress) return; // overlay handles its own Cancel
         if (previewId) { setPreviewId(null); return; }
-        if (showUpgrade) { setShowUpgrade(false); return; }
         if (showReplace) { setShowReplace(false); return; }
         if (detailId) { setDetailId(null); return; }
         return;
@@ -110,7 +106,7 @@ export function useTemplateSelection(showProgress: boolean): UseTemplateSelectio
       if (previewId) return;
 
       if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
-        if (showReplace || showUpgrade || showProgress) return;
+        if (showReplace || showProgress) return;
         e.preventDefault();
         const idx = detailId ? filteredTemplates.findIndex((t) => t.id === detailId) : -1;
         const next = e.key === "ArrowRight" ? filteredTemplates[idx + 1] : filteredTemplates[idx - 1];
@@ -119,7 +115,7 @@ export function useTemplateSelection(showProgress: boolean): UseTemplateSelectio
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [previewId, showUpgrade, showReplace, detailId, filteredTemplates, showProgress]);
+  }, [previewId, showReplace, detailId, filteredTemplates, showProgress]);
 
   const clearAll = React.useCallback(() => {
     setSearchQ("");
@@ -137,8 +133,6 @@ export function useTemplateSelection(showProgress: boolean): UseTemplateSelectio
     setDetailId,
     showReplace,
     setShowReplace,
-    showUpgrade,
-    setShowUpgrade,
     searchQ,
     setSearchQ,
     activeFilter,

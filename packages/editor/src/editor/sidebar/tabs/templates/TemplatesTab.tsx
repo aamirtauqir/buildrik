@@ -5,14 +5,14 @@
  */
 
 import * as React from "react";
-import { PanelFrame, useToast, Button, TextField } from "@/editor/chrome-ui";
+import { PanelFrame, useToast, Button, TextField, openUpgrade } from "@/editor/chrome-ui";
 import { Search, X } from "lucide-react";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
 import { DrillInHeader } from "../../shared/DrillInHeader";
 import { type TemplateItem, SITE_CATEGORY_PILLS, SITE_TEMPLATES, TEMPLATE_TYPE_PILLS, SUB_CATEGORY_TAGS, type SiteCategory, type TemplateType, DEFAULT_TEMPLATE_VERSION } from "./templatesData";
 import { clearAppliedId, recordTemplateApplied, saveAppliedId } from "./templatesStorage";
-import { ReplaceModal, ProModal, CreatePageConfirmModal, CreatePageSuccessModal, CreatePageErrorModal } from "./TemplatesTabModals";
+import { ReplaceModal, CreatePageConfirmModal, CreatePageSuccessModal, CreatePageErrorModal } from "./TemplatesTabModals";
 import { TemplatePreviewModal } from "./TemplatePreviewModal";
 import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
 import { roleAtLeast } from "@/services/RoleService";
@@ -179,7 +179,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
     if (denyApply()) return;
     const t = SITE_TEMPLATES.find((x) => x.id === id);
     if (!t) return;
-    if (t.status === "premium") { sel.setShowUpgrade(true); return; }
+    if (t.status === "premium") { openUpgrade({ feature: t.name }); return; }
     addAsNewPageRef.current = false;
     pendingId.current = id;
     sel.setDetailId(null);
@@ -190,7 +190,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
     if (denyApply()) return;
     const t = SITE_TEMPLATES.find((x) => x.id === id);
     if (!t) return;
-    if (t.status === "premium") { sel.setShowUpgrade(true); return; }
+    if (t.status === "premium") { openUpgrade({ feature: t.name }); return; }
     addAsNewPageRef.current = true;
     pendingId.current = id;
     sel.setDetailId(null);
@@ -622,17 +622,6 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
         />
         );
       })()}
-      {sel.showUpgrade && (
-        <ProModal
-          templateName={SITE_TEMPLATES.find((t) => t.id === pendingId.current)?.name ?? "Pro Template"}
-          onCancel={() => sel.setShowUpgrade(false)}
-          onUpgrade={() => {
-            sel.setShowUpgrade(false);
-            // Billing lives at /dashboard/settings/billing (IA v2 route merge).
-            window.open("/dashboard/settings/billing", "_blank");
-          }}
-        />
-      )}
       {showCreateConfirm && (
         <CreatePageConfirmModal
           templateName={tName}
