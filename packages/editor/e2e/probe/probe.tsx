@@ -49,7 +49,7 @@ import { SlimLauncher } from "@/editor/sidebar/tabs/media/components/SlimLaunche
 import { AssetDetailOverlay } from "@/editor/sidebar/tabs/media/components/AssetDetailOverlay";
 import { IconBrowserOverlay } from "@/editor/sidebar/tabs/media/components/IconBrowserOverlay";
 import { StockBrowserOverlay } from "@/editor/sidebar/tabs/media/components/StockBrowserOverlay";
-import { ToastProvider } from "@/editor/chrome-ui";
+import { ToastProvider, useToast } from "@/editor/chrome-ui";
 import { ContentTab } from "@/editor/sidebar/tabs/content/ContentTab";
 import { LayersTab } from "@/editor/sidebar/tabs/layers/LayersTab";
 import { LayersLoadError, LayersNoResults } from "@/editor/panels/layers/components/LayersStateBlocks";
@@ -184,6 +184,23 @@ const USAGE_COMPOSER = {
   selection: { select: () => {} },
 } as unknown as React.ComponentProps<typeof AssetDetailOverlay>["composer"];
 
+
+/** Fires one toast per tone, sticky, so the catalog can be measured at rest. */
+function ToastCatalogFirer() {
+  const { addToast } = useToast();
+  React.useEffect(() => {
+    const rows = [
+      { tone: "success" as const, title: "Saved", description: "Project saved successfully" },
+      { tone: "info" as const, title: "Offline — changes queued", description: "Your edits are saved on this device and will sync when you're back." },
+      { tone: "error" as const, title: "Save failed", description: "Network error — check your internet connection and try again.", action: { label: "Retry", onClick: () => {} } },
+      { tone: "warning" as const, title: "Approval needed", description: "This site needs an approved review before it can be published." },
+      { tone: "neutral" as const, title: "Undo", description: "Deleted 'Button'", action: { label: "Redo", onClick: () => {} } },
+    ];
+    for (const r of rows) addToast({ ...r, duration: Infinity });
+  }, [addToast]);
+  return <div data-probe="toast-catalog" />;
+}
+
 /** 320-wide positioned host — the drill-in's own stage. */
 function drillHost(children: React.ReactNode) {
   return (
@@ -274,6 +291,15 @@ const CASES: Record<string, () => React.ReactElement> = {
   // min-width:0, overflow-x:auto) and its opaque fill used to be inline styles
   // asserted in jsdom; both are classes now, so only a real browser can say
   // whether the bar still refuses to spill under the inspector.
+  /* Board 1177:4859, the toast catalog: five tones, each one a tinted card
+     with a title in its own colour. The tones are only reachable through the
+     module-level store, so this fires them on mount and lets them portal to
+     the overlay root, which the parity spec already measures. */
+  "toast-catalog": () => (
+    <ToastProvider>
+      <ToastCatalogFirer />
+    </ToastProvider>
+  ),
   "canvas-footer-toolbar": () => (
     <div data-probe="canvas-footer-toolbar">
       <CanvasFooterToolbar

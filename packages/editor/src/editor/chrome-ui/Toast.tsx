@@ -23,16 +23,31 @@ const GHOST_BTN_CLASS = "tw:border-transparent tw:bg-transparent tw:text-gray-60
 
 export type ToastTone = "info" | "success" | "warning" | "error" | "neutral";
 
-/* Each tone supplies its own left-border color — same-property values can't
-   be additive (Row/PanelFrame precedent). Base CSS had no `.bk-toast--neutral`
-   rule, meaning "neutral" fell through to the shorthand's own default
-   (--bk-ink-muted, i.e. gray-500) — reproduced explicitly here. */
-const TONE_BORDER_CLASS: Record<ToastTone, string> = {
-  neutral: "tw:border-l-gray-500",
-  info: "tw:border-l-blue-700",
-  success: "tw:border-l-green-500",
-  warning: "tw:border-l-yellow-500",
-  error: "tw:border-l-red-600",
+/**
+ * The tone fills the card and colours the title — board 1177:4859, the toast
+ * catalog. It was a 3px left border on a white card, which reads as the same
+ * toast five times with a coloured tick mark; the board tints the whole
+ * surface, and every value it draws is already a token pair: measured off the
+ * frame, #DEF7EC/#057A55, #EBF5FF/#1A56DB, #FDE8E8/#C81E1E, #FDFDEA/#723B13
+ * and #F3F4F6 for the neutral one, in that order.
+ *
+ * Same-property values can't be additive (Row/PanelFrame precedent), so each
+ * tone carries its own complete pair rather than layering on a base.
+ */
+const TONE_CLASS: Record<ToastTone, string> = {
+  neutral: "tw:bg-gray-100",
+  info: "tw:bg-[var(--bk-accent-tint)]",
+  success: "tw:bg-[var(--bk-success-tint)]",
+  warning: "tw:bg-[var(--bk-warning-tint)]",
+  error: "tw:bg-[var(--bk-error-tint)]",
+};
+
+const TONE_TITLE_CLASS: Record<ToastTone, string> = {
+  neutral: "tw:text-gray-600",
+  info: "tw:text-[var(--bk-accent-text)]",
+  success: "tw:text-[var(--bk-success-text)]",
+  warning: "tw:text-[var(--bk-warning-text)]",
+  error: "tw:text-[var(--bk-error-text)]",
 };
 
 export interface ToastActionPayload {
@@ -80,8 +95,20 @@ const store = (() => {
       toasts = toasts.filter((t) => t.id !== id);
       emit();
     },
+    /**
+     * A new listener is handed the current queue immediately.
+     *
+     * Without that, a toast fired from a CHILD's mount effect was dropped:
+     * children's effects always run before their parent's, so the add landed
+     * while the provider had not subscribed yet, and the provider's own state
+     * was seeded at render time — before the add. Nothing displayed it and
+     * nothing ever would, until some later, unrelated toast triggered an emit.
+     * Anything that reports on load — "Offline — changes queued", a sync
+     * failure noticed during hydration — is exactly that shape.
+     */
     subscribe(l: Listener) {
       listeners.add(l);
+      l([...toasts]);
       return () => {
         listeners.delete(l);
       };
@@ -154,13 +181,13 @@ function ToastItem({ toast, onDismiss }: { toast: QueuedToast; onDismiss: (id: s
   return (
     <div
       className={[
-        "tw:pointer-events-auto tw:flex tw:items-start tw:gap-2 tw:p-3 tw:rounded-lg tw:border tw:border-gray-200 tw:border-l-[3px] " +
-          "tw:bg-white tw:[box-shadow:var(--bk-shadow-overlay)] tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:text-gray-900",
-        TONE_BORDER_CLASS[tone],
+        "tw:pointer-events-auto tw:flex tw:items-start tw:gap-2 tw:p-3 tw:rounded-lg " +
+          "tw:[box-shadow:var(--bk-shadow-overlay)] tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:text-gray-900",
+        TONE_CLASS[tone],
       ].join(" ")}
     >
       <div className="tw:flex-1 tw:flex tw:flex-col tw:gap-0.5 tw:min-w-0">
-        {title ? <span className="tw:font-medium">{title}</span> : null}
+        {title ? <span className={`tw:font-medium ${TONE_TITLE_CLASS[tone]}`}>{title}</span> : null}
         <span className="tw:text-gray-600 tw:text-xs">{description}</span>
       </div>
       {action ? (

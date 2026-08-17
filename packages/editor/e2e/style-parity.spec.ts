@@ -26,7 +26,7 @@ import { TRACKED, fontsLoadedStatus, stylesheetsSettled } from "./lib/measure-li
 const HERE = dirname(fileURLToPath(import.meta.url));
 const BASELINE_DIR = join(HERE, "baselines");
 
-const CASES = ["content-collection-rows", "content-field-rows", "content-root-rows", "onboarding-steps", "canvas-footer-toolbar", "panel-frame-header",
+const CASES = ["content-collection-rows", "content-field-rows", "content-root-rows", "onboarding-steps", "canvas-footer-toolbar", "toast-catalog", "panel-frame-header",
   // T6 — the Media drawer's data states, none of them reachable by hovering.
   "media-drawer-grid", "media-drawer-single", "media-drawer-loading", "media-drawer-load-error", "media-drawer-empty", "media-drawer-no-results",
   "content-loading", "content-load-error", "media-drawer-folder-scoped", "media-drawer-bulk-select", "media-drawer-uploading", "media-drawer-upload-failed", "media-drawer-quota-full"] as const;
