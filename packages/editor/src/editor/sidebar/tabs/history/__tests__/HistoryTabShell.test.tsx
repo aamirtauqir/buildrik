@@ -55,6 +55,28 @@ vi.mock("../../../../../shared/hooks/useHistoryState", () => ({
   }),
 }));
 
+/* The tab reads this only to know whether the Saves list has settled —
+   boards 1138:4573 (skeletons) and 453:4031 (load-error) draw neither the
+   approval band nor the prune note. */
+const savesState = vi.hoisted(() => ({ isLoading: false, loadError: false }));
+/* Relative, matching this file's other hook mocks — an alias path here
+   resolves to a second module identity and the mock silently does not apply. */
+vi.mock("../../../../../shared/hooks/useVersionHistory", () => ({
+  useVersionHistory: () => ({
+    versions: [],
+    isAvailable: true,
+    isLoading: savesState.isLoading,
+    loadError: savesState.loadError,
+    retryLoad: vi.fn(),
+    createVersion: vi.fn(),
+    restoreVersion: vi.fn(),
+    deleteVersion: vi.fn(),
+    getVersion: vi.fn(),
+    compareVersions: vi.fn(),
+    updateAiSummary: vi.fn(),
+  }),
+}));
+
 vi.mock("../../../../../shared/hooks/useAutoMilestone", () => ({
   useAutoMilestone: () => ({
     suggestion: null,
@@ -218,5 +240,67 @@ describe("HistoryTab — the Published view finds its site", () => {
 
     expect(screen.queryByTestId("published-panel")).toBeNull();
     expect(screen.getByText("Open this site from the dashboard to see its publish history.")).toBeTruthy();
+  });
+});
+
+/*
+  Boards 1138:4573 and 453:4031 draw the Saves screen with NOTHING around the
+  list: the skeleton screen is only skeletons, and the error screen ends on
+  "Retry, or reopen Versions in a moment." rather than a second footer under
+  it. The chrome waits for the list to be in a state it can sit around.
+*/
+describe("HistoryTab — the Saves chrome waits for the list", () => {
+  beforeEach(() => {
+    /* The view preference is persisted, and an earlier test in this file
+       stores one — without this the tab opens on Published and every
+       assertion below is about a screen that has no Saves chrome by design. */
+    window.localStorage.clear();
+  });
+
+  afterEach(() => {
+    savesState.isLoading = false;
+    savesState.loadError = false;
+  });
+
+  /* The real SavesChrome, not a stub: the prune note is the piece that
+     renders off a composer alone, so it probes the gate without needing a
+     review round. */
+  /* A composer complete enough for the REAL useVersionHistory to run against,
+     so this test does not depend on the hook mock applying — a thinner double
+     throws inside the hook and the failure reads as "note missing". */
+  const withCap = {
+    on: () => {},
+    off: () => {},
+    versions: {
+      maxVersions: 50,
+      isAvailable: () => true,
+      getVersions: () => [],
+      getLoadState: () => "ready",
+    },
+  } as never;
+  const note = () => screen.queryByText(/versions kept\. Auto-saves prune oldest first/);
+
+  it("frames the list once it has settled", () => {
+    renderTab({ composer: withCap });
+    expect(note()).toBeInTheDocument();
+  });
+
+  it("stays away while the list is still loading", () => {
+    savesState.isLoading = true;
+    renderTab({ composer: withCap });
+    expect(note()).toBeNull();
+  });
+
+  it("stays away when the list failed to load", () => {
+    // The error screen already carries its own footer; a prune note under it
+    // would be the second thing at the bottom of one board.
+    savesState.loadError = true;
+    renderTab({ composer: withCap });
+    expect(note()).toBeNull();
+  });
+
+  it("frames the Published view with neither — it is not the Saves list", () => {
+    renderTab({ composer: withCap, initialView: "published" });
+    expect(note()).toBeNull();
   });
 });

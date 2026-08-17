@@ -22,6 +22,7 @@ import { MilestoneSuggestionBanner } from "./components/MilestoneSuggestionBanne
 import type { HistoryView, SavesFilter, HistoryTabProps } from "./types";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { SavesApproval, SavesPruneNote } from "./components/SavesChrome";
+import { useVersionHistory } from "@/shared/hooks/useVersionHistory";
 
 const VIEW_LABEL: Record<HistoryView, string> = {
   saves: "Saves",
@@ -101,6 +102,18 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
     canonical publish path does — from the URL.
   */
   const siteId = React.useMemo(() => projectId ?? getSiteIdFromUrl(), [projectId]);
+
+  /* Boards 1138:4573 (loading) and 453:4031 (load-error) draw NEITHER the
+     approval band nor the prune note: the skeleton screen is only skeletons,
+     and the error screen ends on "Retry, or reopen Versions in a moment."
+     rather than a second footer under it. So the chrome waits for the list to
+     be in a state it can sit around.
+
+     A second call of `useVersionHistory` — it is a read-only subscriber to
+     VersionTimelineManager, not a fetch, so the list and the chrome can both
+     ask where the read stands without racing each other. */
+  const { isLoading: savesLoading, loadError: savesLoadError } = useVersionHistory(composer);
+  const savesSettled = !savesLoading && !savesLoadError;
   const storageKey = `buildrick-history-view${siteId ? `-${siteId}` : ""}`;
   const { historyStack, canUndo, clear } = useHistoryState(composer);
 
@@ -250,7 +263,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
             changes filter, and the empty state alike. They sit here rather
             than inside either list for that reason: 163:64 has no list at all
             and still carries the note. */}
-        {activeView === "saves" && <SavesApproval composer={composer} />}
+        {activeView === "saves" && savesSettled && <SavesApproval composer={composer} />}
 
         {activeView === "saves" && savesFilter === "changes" && (
           <ActivityView
@@ -277,7 +290,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
           </>
         )}
 
-        {activeView === "saves" && <SavesPruneNote composer={composer} />}
+        {activeView === "saves" && savesSettled && <SavesPruneNote composer={composer} />}
 
         {/* M2 — the published-version list's canonical home. Same component the
             Publish panel embeds; rollback stays ADMIN-gated inside it. */}
