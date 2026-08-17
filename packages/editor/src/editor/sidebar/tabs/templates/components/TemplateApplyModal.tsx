@@ -85,10 +85,18 @@ export const TemplateApplyModal: React.FC<TemplateApplyModalProps> = ({
         </div>
 
         {/* Board 642:2556 — the consequence, stated before the button that
-            causes it, with the way back named. */}
+            causes it, with the way back named.
+
+            The page's name goes in an "of X" clause, not in front of the word
+            "page". Interpolating it there reads correctly only when the page is
+            named like a noun ("the current Home page content") and breaks on
+            the default name every new site has: "the current Page 1 page
+            content". */}
         <p className="tw:m-0 tw:px-6 tw:pt-4 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
-          Applying replaces the current {pageName ? `${pageName} ` : ""}page content. Your version
-          history keeps the previous state.
+          {pageName
+            ? `Applying replaces the content of ${pageName}.`
+            : "Applying replaces the current page content."}{" "}
+          Your version history keeps the previous state.
         </p>
 
         <div className="tw:mt-4 tw:flex tw:items-center tw:justify-end tw:gap-3 tw:border-t tw:border-[var(--bk-border)] tw:px-6 tw:py-3">
