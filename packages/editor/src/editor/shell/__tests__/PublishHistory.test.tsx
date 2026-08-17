@@ -125,8 +125,8 @@ describe("rollback", () => {
     const row = screen.getByText(/Version 2/i).closest("[data-version-row]") as HTMLElement;
     fireEvent.click(within(row).getByRole("button", { name: /roll back/i }));
     // confirm dialog names the version + reassures the draft is untouched
-    expect(screen.getByText(/roll back to version 2/i)).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: /roll back now/i }));
+    expect(screen.getByText(/roll back to v2\?/i)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /^Roll back to v\d+$/ }));
     await waitFor(() => expect(rollbackToVersion).toHaveBeenCalledWith("s1", "j2"));
   });
 
@@ -140,7 +140,7 @@ describe("rollback", () => {
     await screen.findByText(/Version 2/i);
     const row = screen.getByText(/Version 2/i).closest("[data-version-row]") as HTMLElement;
     fireEvent.click(within(row).getByRole("button", { name: /roll back/i }));
-    fireEvent.click(screen.getByRole("button", { name: /roll back now/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^Roll back to v\d+$/ }));
 
     await screen.findByText(/Rollback failed/i);
     expect(screen.getByText(/v2 could not be re-published/i)).toBeInTheDocument();
@@ -155,7 +155,7 @@ describe("rollback", () => {
     await screen.findByText(/Version 2/i);
     const row = screen.getByText(/Version 2/i).closest("[data-version-row]") as HTMLElement;
     fireEvent.click(within(row).getByRole("button", { name: /roll back/i }));
-    fireEvent.click(screen.getByRole("button", { name: /roll back now/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^Roll back to v\d+$/ }));
     await screen.findByText(/snapshot is no longer stored/i);
 
     cleanup();
@@ -164,7 +164,7 @@ describe("rollback", () => {
     await screen.findByText(/Version 2/i);
     const row2 = screen.getByText(/Version 2/i).closest("[data-version-row]") as HTMLElement;
     fireEvent.click(within(row2).getByRole("button", { name: /roll back/i }));
-    fireEvent.click(screen.getByRole("button", { name: /roll back now/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^Roll back to v\d+$/ }));
     await screen.findByText(/publish is already running/i);
   });
 
@@ -174,13 +174,13 @@ describe("rollback", () => {
     await screen.findByText(/Version 2/i);
     const row = screen.getByText(/Version 2/i).closest("[data-version-row]") as HTMLElement;
     fireEvent.click(within(row).getByRole("button", { name: /roll back/i }));
-    fireEvent.click(screen.getByRole("button", { name: /roll back now/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^Roll back to v\d+$/ }));
     await screen.findByText(/Rollback failed/i);
 
     rollbackToVersion.mockClear();
     fireEvent.click(screen.getByRole("button", { name: /try again/i }));
 
-    expect(screen.getByText(/roll back to version 2/i)).toBeInTheDocument();
+    expect(screen.getByText(/roll back to v2\?/i)).toBeInTheDocument();
     expect(rollbackToVersion).not.toHaveBeenCalled();
   });
 
@@ -195,7 +195,7 @@ describe("rollback", () => {
     await screen.findByText(/Version 2/i);
     const row = screen.getByText(/Version 2/i).closest("[data-version-row]") as HTMLElement;
     fireEvent.click(within(row).getByRole("button", { name: /roll back/i }));
-    fireEvent.click(screen.getByRole("button", { name: /roll back now/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^Roll back to v\d+$/ }));
     await waitFor(() => expect(rollbackToVersion).toHaveBeenCalled());
 
     rerender(<PublishHistory siteId="s1" rollbackJob={{ state: "publishing", progress: 40 }} />);
@@ -210,7 +210,7 @@ describe("rollback", () => {
     await screen.findByText(/Version 2/i);
     const row = screen.getByText(/Version 2/i).closest("[data-version-row]") as HTMLElement;
     fireEvent.click(within(row).getByRole("button", { name: /roll back/i }));
-    fireEvent.click(screen.getByRole("button", { name: /roll back now/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^Roll back to v\d+$/ }));
     await waitFor(() => expect(rollbackToVersion).toHaveBeenCalled());
 
     rerender(<PublishHistory siteId="s1" rollbackJob={{ state: "published", progress: 100 }} />);
@@ -227,7 +227,7 @@ describe("rollback", () => {
     await screen.findByText(/Version 2/i);
     const row = screen.getByText(/Version 2/i).closest("[data-version-row]") as HTMLElement;
     fireEvent.click(within(row).getByRole("button", { name: /roll back/i }));
-    fireEvent.click(screen.getByRole("button", { name: /roll back now/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^Roll back to v\d+$/ }));
     await waitFor(() => expect(rollbackToVersion).toHaveBeenCalled());
 
     rerender(<PublishHistory siteId="s1" rollbackJob={{ state: "failed", progress: 60 }} />);
@@ -269,5 +269,48 @@ describe("board 949:4474 — the banner and the closing rule", () => {
     expect(
       await screen.findByText("Every publish is restorable. Rolling back redeploys that version."),
     ).toBeInTheDocument();
+  });
+});
+
+/*
+  Board 184:24 names a version number in every sentence, and that is the whole
+  point of it. The copy it replaced — "This re-publishes that version as a new
+  one … your current draft is untouched" — was vague exactly where the user is
+  anxious: which version replaces which, and what happens to the one that is
+  live right now. It also said "draft", which is not what a rollback touches.
+*/
+describe("board 184:24 — the rollback confirm names the versions", () => {
+  const openConfirm = async () => {
+    renderIt();
+    expect(await screen.findByText(/Version 2/i)).toBeInTheDocument();
+    fireEvent.click(screen.getAllByRole("button", { name: /^Roll back$/ })[0]);
+  };
+
+  it("titles itself with the target version", async () => {
+    await openConfirm();
+    expect(await screen.findByText("Roll back to v2?")).toBeInTheDocument();
+  });
+
+  it("names target, replacement and the version staying in history", async () => {
+    await openConfirm();
+    // ROWS is v3 live, so rolling back to v2 re-publishes it as v4.
+    expect(
+      await screen.findByText(/This publishes v2 again as v4\. Your current v3 stays in history/),
+    ).toBeInTheDocument();
+  });
+
+  it("carries the board's info block about the list only growing", async () => {
+    await openConfirm();
+    // Not a repeat of the sentence above it: that one is about the live
+    // version, this one is about the LIST — which is what makes a rollback
+    // safe to try at all.
+    expect(await screen.findByText("The publish list only ever grows.")).toBeInTheDocument();
+    expect(screen.getByText("v4 will name v2 as its source.")).toBeInTheDocument();
+  });
+
+  it("names the target on the confirm button too", async () => {
+    await openConfirm();
+    expect(await screen.findByRole("button", { name: "Roll back to v2" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /roll back now/i })).toBeNull();
   });
 });

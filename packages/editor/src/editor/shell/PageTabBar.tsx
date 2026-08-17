@@ -392,7 +392,7 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
         title={`Delete "${pages.find((p) => p.id === deleteConfirmPageId)?.name}"?`}
         message="This page and everything on it is removed. You can undo this from the toast that follows."
         confirmLabel="Delete page"
-        destructive
+        tone="destructive"
       />
     </div>
   );

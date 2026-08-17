@@ -293,7 +293,7 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
             : `Are you sure you want to delete "${component.name}"?`
         }
         confirmLabel="Delete"
-        destructive
+        tone="destructive"
       />
       {/* Detach confirmation modal (Task 13) */}
       {pendingDetach && (

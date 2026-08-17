@@ -21,12 +21,28 @@ export interface ConfirmDialogProps {
   /** Name the action: "Delete 3 pages", not "Confirm". */
   confirmLabel: string;
   cancelLabel?: string;
-  destructive?: boolean;
+  /**
+   * What kind of consequence the confirm carries.
+   *
+   * `destructive` is red — the thing is gone. `warning` is
+   * `--bk-warning` (#C27803) — consequential and reversible, which is a real
+   * and separate category here: board 184:24's rollback confirm spends its
+   * whole body saying "nothing is deleted or rewritten" and then draws an
+   * amber button, because re-publishing an older version over a live site is
+   * a decision, not a deletion. Measured off that board, not eyeballed.
+   *
+   * Both keep the scrim click from dismissing: an accidental click outside
+   * should not silently drop a dialog the user was asked to decide.
+   *
+   * Replaces the `destructive` boolean — one prop for one concern rather
+   * than a boolean per tone.
+   */
+  tone?: "default" | "warning" | "destructive";
   busy?: boolean;
 }
 
 export function ConfirmDialog({
-  open, onClose, onConfirm, title, message, confirmLabel, cancelLabel = "Cancel", destructive, busy,
+  open, onClose, onConfirm, title, message, confirmLabel, cancelLabel = "Cancel", tone = "default", busy,
 }: ConfirmDialogProps) {
   return (
     <Modal
@@ -34,7 +50,7 @@ export function ConfirmDialog({
       onClose={onClose}
       title={title}
       kind="question"
-      dismissOnScrimClick={!destructive}
+      dismissOnScrimClick={tone === "default"}
       footer={
         <>
           <Button
@@ -46,7 +62,12 @@ export function ConfirmDialog({
             {cancelLabel}
           </Button>
           <Button
-            color={destructive ? "red" : undefined}
+            color={tone === "destructive" ? "red" : undefined}
+            className={
+              tone === "warning"
+                ? "tw:bg-[var(--bk-warning)] tw:hover:bg-[var(--bk-warning)] tw:text-white tw:border-transparent"
+                : undefined
+            }
             size="xs"
             disabled={busy}
             aria-busy={busy || undefined}

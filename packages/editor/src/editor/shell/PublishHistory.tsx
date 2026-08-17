@@ -69,6 +69,14 @@ const LIVE_META = "tw:text-xs tw:text-[var(--bk-ink-soft)]";
 /* Board 949:4474 closes the list with the rule that makes rollback safe to
    try. It sits under the rows, not in a tooltip on each one. */
 const FOOTER_NOTE = "tw:mt-2 tw:text-xs tw:text-[var(--bk-ink-muted)]";
+/* Board 184:24's info block — the accent-tinted box under the sentence. */
+const INFO_BOX = "tw:mt-3 tw:rounded-md tw:bg-[var(--bk-accent-tint)] tw:px-3 tw:py-2.5";
+const INFO_TITLE = "tw:m-0 tw:text-[13px] tw:text-[var(--bk-accent)]";
+const INFO_META = "tw:m-0 tw:mt-0.5 tw:text-[11px] tw:text-[var(--bk-ink-soft)]";
+/* Boards 184:45 / 453:4064 both open on a 32px status disc, centred. */
+const STATUS_DISC_WRAP = "tw:flex tw:justify-center tw:mb-2";
+const STATUS_DISC =
+  "tw:flex tw:size-8 tw:items-center tw:justify-center tw:rounded-full tw:text-white";
 const NOTICE = "tw:text-xs tw:text-gray-500";
 
 
@@ -96,6 +104,12 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
      costs the banner one clause, and must not turn the whole list into the
      load-error board. */
   const [liveDomain, setLiveDomain] = React.useState<string | null>(null);
+
+  /* Board 184:24 names three versions: the target, the one live now, and the
+     number the re-publish will take. The first comes from the row; these two
+     come from the list, where index 0 is live by construction. */
+  const liveVersion = rows[0]?.version;
+  const nextVersion = liveVersion !== undefined ? liveVersion + 1 : "…";
 
   const load = React.useCallback(async () => {
     setState("loading");
@@ -297,6 +311,14 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
           </div>
         }
       >
+        {/* Board 184:45 leads with a green check disc. The outcome of a
+            rollback is the one thing a user scans for before reading a word,
+            and the modal had no such mark at all. */}
+        <div className={STATUS_DISC_WRAP}>
+          <span className={`${STATUS_DISC} tw:bg-[var(--bk-success)]`} aria-hidden="true">
+            <CheckCircle2 size={16} />
+          </span>
+        </div>
         <p className="tw:text-center">
           v{rolledBack?.newLive} is live — a re-publish of v{rolledBack?.target}.
         </p>
@@ -322,24 +344,67 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
         title="Rollback failed"
         message={
           <>
-            <p className="tw:font-medium tw:text-[var(--bk-error-text)]">
+            {/* Board 453:4064's red warning disc — the counterpart of the
+                green one on 184:45, and read the same way: outcome first. */}
+            <div className={STATUS_DISC_WRAP}>
+              <span className={`${STATUS_DISC} tw:bg-[var(--bk-error)]`} aria-hidden="true">
+                <AlertCircle size={16} />
+              </span>
+            </div>
+            <p className="tw:font-medium tw:text-[var(--bk-error-text)] tw:text-center">
               v{failed?.target} could not be re-published. Your live site is unchanged
               {failed?.live !== undefined ? ` — still v${failed.live}` : ""}.
             </p>
-            <p className="tw:mt-2">{failed?.reason}</p>
+            <p className="tw:mt-2 tw:text-center">{failed?.reason}</p>
           </>
         }
         confirmLabel="Try again"
         cancelLabel="Close"
       />
 
+      {/* Board 184:24. Every sentence names a VERSION NUMBER, and that is the
+          point of the board: "This re-publishes that version as a new one …
+          your current draft is untouched" was the old copy, and it is vague
+          exactly where the user is anxious — which version replaces which,
+          and what happens to the one that is live right now. It also said
+          "draft", which is not what a rollback touches.
+
+          The panel knows all three numbers: the target, the live one, and the
+          number the re-publish will take. */}
       <ConfirmDialog
         open={confirm !== null}
         onClose={() => setConfirm(null)}
         onConfirm={() => void doRollback()}
-        title={confirm ? `Roll back to version ${confirm.version}?` : "Roll back?"}
-        message="This re-publishes that version as a new one — it doesn't delete anything and your current draft is untouched. The live site changes to the older version."
-        confirmLabel="Roll back now"
+        title={confirm ? `Roll back to v${confirm.version}?` : "Roll back?"}
+        message={
+          <>
+            <p className="tw:m-0">
+              This publishes v{confirm?.version} again as v{nextVersion}.
+              {liveVersion !== undefined
+                ? ` Your current v${liveVersion} stays in history`
+                : " Your current version stays in history"}{" "}
+              — nothing is deleted or rewritten.
+            </p>
+            {/* The board's info block. It is not a repeat of the sentence
+                above: that one says what happens to the live version, this
+                one says what happens to the LIST — it only ever grows, and
+                the new entry carries its source. That is the fact that makes
+                a rollback safe to try. */}
+            <div className={INFO_BOX}>
+              <p className={INFO_TITLE}>The publish list only ever grows.</p>
+              <p className={INFO_META}>
+                v{nextVersion} will name v{confirm?.version} as its source.
+              </p>
+            </div>
+          </>
+        }
+        /* Board 184:24's button is #C27803 — `--bk-warning`, measured off the
+           board. Not red: the modal spends its whole body saying nothing is
+           deleted or rewritten, and then a red button would contradict it.
+           Re-publishing an older version over a live site is a decision, not
+           a deletion. */
+        tone="warning"
+        confirmLabel={confirm ? `Roll back to v${confirm.version}` : "Roll back"}
         cancelLabel="Cancel"
       />
     </div>

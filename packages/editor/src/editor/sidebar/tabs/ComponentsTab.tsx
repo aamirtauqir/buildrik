@@ -304,7 +304,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         title={`Delete "${state.confirmDelete?.name}"?`}
         message="Instances already placed keep their content; they stop following this component. This cannot be undone."
         confirmLabel="Delete component"
-        destructive
+        tone="destructive"
       />
       <ModalRoot open={!!state.renameTarget} onOpenChange={(next) => !next && state.setRenameTarget(null)}>
         <ModalContent size="lg">

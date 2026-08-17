@@ -376,7 +376,7 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
       title={`Delete "${filteredAssets.find((a) => a.id === pendingDeleteId)?.name ?? "this file"}"?`}
       message="The file is removed from the library and from every page using it. This cannot be undone."
       confirmLabel="Delete file"
-      destructive
+      tone="destructive"
     />
         </ModalBody>
       </ModalContent>

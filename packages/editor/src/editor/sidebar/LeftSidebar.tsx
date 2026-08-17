@@ -647,7 +647,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
         title="Unsaved Changes"
         message="You have unsaved changes in Settings. Switching tabs will discard them."
         confirmLabel="Discard & Switch"
-        destructive
+        tone="destructive"
       />
     </div>
   );

@@ -501,7 +501,7 @@ export function FieldsView({
         title="Delete field?"
         message={`"${confirmDelete?.name}" and its values on every record will be removed.`}
         confirmLabel="Delete field"
-        destructive
+        tone="destructive"
       />
     </div>
   );

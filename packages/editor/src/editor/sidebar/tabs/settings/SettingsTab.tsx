@@ -917,7 +917,7 @@ export const SettingsTab: React.FC<
         message="You have unsaved changes. Switching will discard them."
         confirmLabel="Discard"
         cancelLabel="Keep editing"
-        destructive
+        tone="destructive"
       />
     </PanelFrame>
   );

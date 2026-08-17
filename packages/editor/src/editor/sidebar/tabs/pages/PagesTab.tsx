@@ -300,7 +300,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
         title={`Delete "${deleteTarget?.name}"?`}
         message="All content on this page will be permanently removed. You can undo immediately after."
         confirmLabel="Delete Page"
-        destructive
+        tone="destructive"
       />
       {/* ⌘K command palette */}
       {paletteOpen && (
