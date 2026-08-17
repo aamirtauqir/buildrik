@@ -186,14 +186,25 @@
   color: var(--bk-accent-text);
 }
 
-/* Left accent bar — 2px inset (not full height). Offsets match
-   _shared.css prototype spec (left -6, top/bottom 8). */
+/* Left accent bar — 3px, flush to the rail edge, the full height of the
+   item. Measured off board 199:2 at 1440x900: the bar runs y 114..157 and the
+   tinted pill runs y 114..157 too, so they are the same 44px, and the bar sits
+   at x 0..2.
+
+   It was 2px, inset 6px from the edge and 8px in from each end, "to match
+   _shared.css prototype spec" — an older artefact than the board. At that size
+   the marker for WHICH panel is open was a short tick floating beside the
+   pill rather than the edge-to-edge rule the board draws. */
 .ls-btn-bar {
   position: absolute;
-  left: -6px;
-  top: 8px;
-  bottom: 8px;
-  width: 2px;
+  /* Flush to the RAIL's edge, not the button's. The button is centred in the
+     rail, so the bar backs out by exactly that inset — written from the two
+     tokens that create it rather than as -8px, so it stays right if either
+     the rail or the button size changes. */
+  left: calc(-1 * (var(--layout-rail-width, 60px) - var(--bk-size-header)) / 2);
+  top: 0;
+  bottom: 0;
+  width: 3px;
   height: auto;
   border-radius: 0 2px 2px 0;
   background: var(--bk-accent);
