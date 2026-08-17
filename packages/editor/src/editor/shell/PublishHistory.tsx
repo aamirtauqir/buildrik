@@ -87,6 +87,13 @@ const INFO_META = "tw:m-0 tw:mt-0.5 tw:text-[11px] tw:text-[var(--bk-ink-soft)]"
 const STATUS_DISC_WRAP = "tw:flex tw:justify-center tw:mb-2";
 const STATUS_DISC =
   "tw:flex tw:size-8 tw:items-center tw:justify-center tw:rounded-full tw:text-white";
+/* Board 184:2's picker rows — a bordered, selectable band per version. */
+const PICK_ROW =
+  "tw:flex tw:w-full tw:items-center tw:justify-between tw:gap-3 tw:rounded-md tw:border tw:border-[var(--bk-border)] tw:bg-white tw:px-3 tw:py-2 tw:text-left tw:disabled:opacity-50";
+const PICK_ROW_ON = "tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-tint)]";
+const PICK_TITLE = "tw:text-[13px] tw:text-[var(--bk-ink)]";
+const PICK_META = "tw:text-[11px] tw:text-[var(--bk-ink-soft)]";
+const PICK_LIVE = "tw:text-[11px] tw:font-medium tw:text-[var(--bk-success-text)]";
 const NOTICE = "tw:text-xs tw:text-gray-500";
 
 
@@ -98,6 +105,19 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
   const [rows, setRows] = React.useState<PublishHistoryRow[]>([]);
   const [confirm, setConfirm] = React.useState<PublishHistoryRow | null>(null);
   const [notice, setNotice] = React.useState<string | null>(null);
+  /* Board 184:2 — the version picker. `picking` doubles as its open flag's
+     seed, so a separate boolean tracks the modal itself: the user can clear
+     the selection without the modal closing under them. */
+  const [pickerOpen, setPickerOpen] = React.useState(false);
+  const [picking, setPickingRaw] = React.useState<PublishHistoryRow | null>(null);
+  const setPicking = React.useCallback((r: PublishHistoryRow | null) => {
+    setPickingRaw(r);
+    setPickerOpen(true);
+  }, []);
+  const closePicker = React.useCallback(() => {
+    setPickerOpen(false);
+    setPickingRaw(null);
+  }, []);
   /* Board 453:4064 answers a failed rollback with a MODAL, not a line of grey
      text under the header — and its copy carries the one fact the user needs
      first: the live site did not change. `failed` holds the version that was
@@ -263,25 +283,10 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
             current={isLive}
             currentLabel="Live"
             meta={fromVersion !== undefined ? `↩ from v${fromVersion} · ${relTime(r.completedAt)}` : relTime(r.completedAt)}
-            actions={
-              !isLive ? (
-                <Button
-                  color="light"
-                  size="xs"
-                  disabled={!r.rollbackable || !canRollback}
-                  title={
-                    !canRollback
-                      ? "Ask an admin to roll back"
-                      : r.rollbackable
-                        ? undefined
-                        : "This version's snapshot is no longer stored"
-                  }
-                  onClick={() => setConfirm(r)}
-                >
-                  Roll back
-                </Button>
-              ) : undefined
-            }
+            /* Board 949:4474's rows carry no Roll back button — rollback
+               starts from the button under the list, which opens the picker
+               (board 184:2). A per-row button plus that one would be two
+               doors onto the same confirm. */
           />
         );
       })}
@@ -293,6 +298,75 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
       <p className={FOOTER_NOTE}>
         Every publish is restorable. Rolling back redeploys that version.
       </p>
+
+      {/* Board 949:4474 closes on this, full width, under the note. It is the
+          one entry into rollback, and it opens the picker rather than acting —
+          the board spends a whole screen (184:2) on choosing the version. */}
+      <Button
+        color="light"
+        className="tw:mt-1 tw:w-full tw:justify-start"
+        disabled={!canRollback || rows.length < 2}
+        title={
+          !canRollback
+            ? "Ask an admin to roll back"
+            : rows.length < 2
+              ? "There is only one published version"
+              : undefined
+        }
+        onClick={() => setPicking(rows.find((r) => r.rollbackable && r.version !== liveVersion) ?? null)}
+      >
+        Roll back to a published version…
+      </Button>
+
+      {/* Board 184:2 — pick the version, THEN confirm it. */}
+      <Modal
+        open={pickerOpen}
+        onClose={closePicker}
+        kind="form"
+        title="Roll back to a published version"
+        footer={
+          <div className="tw:flex tw:justify-end tw:gap-2">
+            <Button color="light" onClick={closePicker}>
+              Cancel
+            </Button>
+            <Button disabled={!picking} onClick={() => { setConfirm(picking); closePicker(); }}>
+              Continue
+            </Button>
+          </div>
+        }
+      >
+        <div className="tw:flex tw:flex-col tw:gap-1" role="radiogroup" aria-label="Published versions">
+          {rows.map((r) => {
+            const isLive = r.version === liveVersion;
+            /* The live version is listed — the board shows it with its `live`
+               chip — but cannot be chosen: rolling back to what is already
+               serving is a deploy that changes nothing. A pruned version has
+               no payload to re-publish. */
+            const selectable = !isLive && r.rollbackable;
+            return (
+              <button
+                key={r.id}
+                type="button"
+                role="radio"
+                aria-checked={picking?.id === r.id}
+                disabled={!selectable}
+                onClick={() => setPicking(r)}
+                title={isLive ? "This version is already live" : r.rollbackable ? undefined : "This version's snapshot is no longer stored"}
+                className={`${PICK_ROW} ${picking?.id === r.id ? PICK_ROW_ON : ""}`}
+              >
+                <span className="tw:flex tw:flex-col tw:items-start">
+                  <span className={PICK_TITLE}>
+                    v{r.version}
+                    {isLive ? " · current" : ""}
+                  </span>
+                  <span className={PICK_META}>published {relTime(r.completedAt)}</span>
+                </span>
+                {isLive && <span className={PICK_LIVE}>live</span>}
+              </button>
+            );
+          })}
+        </div>
+      </Modal>
 
       {/* Board 184:37 — "Rolling back…", a determinate bar, and the caption
           naming both versions. Rendered only while the shell reports a job in

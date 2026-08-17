@@ -55,6 +55,19 @@ afterEach(() => {
   roleState.role = null;
 });
 
+
+/*
+  Board 949:4474 has no per-row Roll back button; rollback starts from the
+  button under the list, which opens the picker (board 184:2). Every test that
+  used to click a row now walks that flow — the change is the boards', not a
+  regression.
+*/
+async function pickVersion(version: number) {
+  fireEvent.click(await screen.findByRole("button", { name: /Roll back to a published version/ }));
+  fireEvent.click(await screen.findByRole("radio", { name: new RegExp(`^v${version}(?![0-9])`) }));
+  fireEvent.click(screen.getByRole("button", { name: "Continue" }));
+}
+
 // P6 permissions boards: rollback is admin-scoped — non-admins see the button
 // disabled with "Ask an admin to roll back", never hidden.
 describe("P6 rollback role gating", () => {
@@ -62,20 +75,16 @@ describe("P6 rollback role gating", () => {
     roleState.role = "EDITOR";
     renderIt();
     expect(await screen.findByText(/Version 3/i)).toBeInTheDocument();
-    const buttons = screen.getAllByRole("button", { name: /roll back/i });
-    buttons.forEach((b) => {
-      expect(b).toBeDisabled();
-      expect(b).toHaveAttribute("title", "Ask an admin to roll back");
-    });
+    const entry = screen.getByRole("button", { name: /Roll back to a published version/ });
+    expect(entry).toBeDisabled();
+    expect(entry).toHaveAttribute("title", "Ask an admin to roll back");
   });
 
   it("ADMIN keeps rollback enabled on rollbackable versions", async () => {
     roleState.role = "ADMIN";
     renderIt();
     expect(await screen.findByText(/Version 3/i)).toBeInTheDocument();
-    const rows = screen.getAllByRole("button", { name: /roll back/i });
-    // v2 is rollbackable (enabled); v1's snapshot is gone (still disabled).
-    expect(rows.some((b) => !(b as HTMLButtonElement).disabled)).toBe(true);
+    expect(screen.getByRole("button", { name: /Roll back to a published version/ })).toBeEnabled();
   });
 });
 
@@ -107,26 +116,23 @@ describe("load states", () => {
 });
 
 describe("rollback", () => {
-  it("the live (latest) version has no rollback action", async () => {
+  it("the live version is listed but cannot be chosen", async () => {
+    // Board 184:2 shows it with its `live` chip — rolling back to what is
+    // already serving is a deploy that changes nothing.
     renderIt();
-    await screen.findByText(/Version 3/i);
-    const liveRow = screen.getByText(/Version 3/i).closest("[data-version-row]") as HTMLElement;
-    expect(within(liveRow).queryByRole("button", { name: /roll back/i })).not.toBeInTheDocument();
+    fireEvent.click(await screen.findByRole("button", { name: /Roll back to a published version/ }));
+    expect(await screen.findByRole("radio", { name: /^v3(?![0-9])/ })).toBeDisabled();
   });
 
-  it("a non-rollbackable older version is disabled with a reason", async () => {
+  it("a version whose snapshot is gone cannot be chosen either", async () => {
     renderIt();
-    await screen.findByText(/Version 1/i);
-    const row = screen.getByText(/Version 1/i).closest("[data-version-row]") as HTMLElement;
-    const btn = within(row).getByRole("button", { name: /roll back/i });
-    expect(btn).toBeDisabled();
+    fireEvent.click(await screen.findByRole("button", { name: /Roll back to a published version/ }));
+    expect(await screen.findByRole("radio", { name: /^v1(?![0-9])/ })).toBeDisabled();
   });
 
   it("rolling back an older version confirms then re-publishes it", async () => {
     renderIt();
-    await screen.findByText(/Version 2/i);
-    const row = screen.getByText(/Version 2/i).closest("[data-version-row]") as HTMLElement;
-    fireEvent.click(within(row).getByRole("button", { name: /roll back/i }));
+    await pickVersion(2);
     // confirm dialog names the version + reassures the draft is untouched
     expect(screen.getByText(/roll back to v2\?/i)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /^Roll back to v\d+$/ }));
@@ -140,9 +146,7 @@ describe("rollback", () => {
   it("a failed rollback opens the board's modal, naming the live version as unchanged", async () => {
     rollbackToVersion.mockRejectedValueOnce(new Error("boom"));
     renderIt();
-    await screen.findByText(/Version 2/i);
-    const row = screen.getByText(/Version 2/i).closest("[data-version-row]") as HTMLElement;
-    fireEvent.click(within(row).getByRole("button", { name: /roll back/i }));
+    await pickVersion(2);
     fireEvent.click(screen.getByRole("button", { name: /^Roll back to v\d+$/ }));
 
     await screen.findByText(/Rollback failed/i);
@@ -155,18 +159,14 @@ describe("rollback", () => {
   it("names the reason when the snapshot is gone, and when a publish is already running", async () => {
     rollbackToVersion.mockRejectedValueOnce(new Error("PRECONDITION_FAILED"));
     renderIt();
-    await screen.findByText(/Version 2/i);
-    const row = screen.getByText(/Version 2/i).closest("[data-version-row]") as HTMLElement;
-    fireEvent.click(within(row).getByRole("button", { name: /roll back/i }));
+    await pickVersion(2);
     fireEvent.click(screen.getByRole("button", { name: /^Roll back to v\d+$/ }));
     await screen.findByText(/snapshot is no longer stored/i);
 
     cleanup();
     rollbackToVersion.mockRejectedValueOnce(new Error("CONFLICT: publish in progress"));
     renderIt();
-    await screen.findByText(/Version 2/i);
-    const row2 = screen.getByText(/Version 2/i).closest("[data-version-row]") as HTMLElement;
-    fireEvent.click(within(row2).getByRole("button", { name: /roll back/i }));
+    await pickVersion(2);
     fireEvent.click(screen.getByRole("button", { name: /^Roll back to v\d+$/ }));
     await screen.findByText(/publish is already running/i);
   });
@@ -174,9 +174,7 @@ describe("rollback", () => {
   it("Try again reopens the confirm for the same version, not a blind retry", async () => {
     rollbackToVersion.mockRejectedValueOnce(new Error("boom"));
     renderIt();
-    await screen.findByText(/Version 2/i);
-    const row = screen.getByText(/Version 2/i).closest("[data-version-row]") as HTMLElement;
-    fireEvent.click(within(row).getByRole("button", { name: /roll back/i }));
+    await pickVersion(2);
     fireEvent.click(screen.getByRole("button", { name: /^Roll back to v\d+$/ }));
     await screen.findByText(/Rollback failed/i);
 
@@ -195,9 +193,7 @@ describe("rollback", () => {
     const { rerender } = render(
       <PublishHistory siteId="s1" rollbackJob={null} />,
     );
-    await screen.findByText(/Version 2/i);
-    const row = screen.getByText(/Version 2/i).closest("[data-version-row]") as HTMLElement;
-    fireEvent.click(within(row).getByRole("button", { name: /roll back/i }));
+    await pickVersion(2);
     fireEvent.click(screen.getByRole("button", { name: /^Roll back to v\d+$/ }));
     await waitFor(() => expect(rollbackToVersion).toHaveBeenCalled());
 
@@ -210,9 +206,7 @@ describe("rollback", () => {
     const { rerender } = render(
       <PublishHistory siteId="s1" rollbackJob={{ state: "publishing", progress: 10 }} />,
     );
-    await screen.findByText(/Version 2/i);
-    const row = screen.getByText(/Version 2/i).closest("[data-version-row]") as HTMLElement;
-    fireEvent.click(within(row).getByRole("button", { name: /roll back/i }));
+    await pickVersion(2);
     fireEvent.click(screen.getByRole("button", { name: /^Roll back to v\d+$/ }));
     await waitFor(() => expect(rollbackToVersion).toHaveBeenCalled());
 
@@ -227,9 +221,7 @@ describe("rollback", () => {
     const { rerender } = render(
       <PublishHistory siteId="s1" rollbackJob={{ state: "publishing", progress: 10 }} />,
     );
-    await screen.findByText(/Version 2/i);
-    const row = screen.getByText(/Version 2/i).closest("[data-version-row]") as HTMLElement;
-    fireEvent.click(within(row).getByRole("button", { name: /roll back/i }));
+    await pickVersion(2);
     fireEvent.click(screen.getByRole("button", { name: /^Roll back to v\d+$/ }));
     await waitFor(() => expect(rollbackToVersion).toHaveBeenCalled());
 
@@ -286,7 +278,7 @@ describe("board 184:24 — the rollback confirm names the versions", () => {
   const openConfirm = async () => {
     renderIt();
     expect(await screen.findByText(/Version 2/i)).toBeInTheDocument();
-    fireEvent.click(screen.getAllByRole("button", { name: /^Roll back$/ })[0]);
+    await pickVersion(2);
   };
 
   it("titles itself with the target version", async () => {
@@ -334,7 +326,7 @@ describe("board 184:24 — the rollback confirm names the versions", () => {
 describe("rollback outcome follows the JOB, not the site's standing state", () => {
   const start = async () => {
     expect(await screen.findByText(/Version 2/i)).toBeInTheDocument();
-    fireEvent.click(screen.getAllByRole("button", { name: /^Roll back$/ })[0]);
+    await pickVersion(2);
     fireEvent.click(await screen.findByRole("button", { name: /^Roll back to v2$/ }));
   };
 
@@ -363,5 +355,56 @@ describe("rollback outcome follows the JOB, not the site's standing state", () =
 
     rerender(<PublishHistory siteId="s1" rollbackJob={{ state: "published", progress: 100 }} />);
     expect(await screen.findByText(/Rolled back/i)).toBeInTheDocument();
+  });
+});
+
+/*
+  Board 184:2 — "Roll back to a published version". The board spends a whole
+  screen on CHOOSING the version, and 949:4474 gives it one full-width entry
+  under the list. The panel had neither: it put a Roll back button on every
+  row, which is not what either board draws.
+*/
+describe("board 184:2 — the version picker", () => {
+  const open = async () =>
+    fireEvent.click(await screen.findByRole("button", { name: /Roll back to a published version/ }));
+
+  it("is the only way in — rows carry no rollback button", async () => {
+    renderIt();
+    await screen.findByText(/Version 2/i);
+    const row = screen.getByText(/Version 2/i).closest("[data-version-row]") as HTMLElement;
+    expect(within(row).queryByRole("button", { name: /roll back/i })).not.toBeInTheDocument();
+  });
+
+  it("lists every version, live one included", async () => {
+    renderIt();
+    await open();
+    expect(screen.getAllByRole("radio")).toHaveLength(3);
+  });
+
+  it("Continue stays dead until a version is chosen", async () => {
+    // The board draws v5 pre-selected; with nothing choosable there is
+    // nothing to continue to, and a live Continue would be a dead control.
+    fetchPublishHistory.mockResolvedValue([ROWS[0]]);
+    renderIt();
+    await screen.findByText(/Version 3/i);
+    expect(
+      screen.getByRole("button", { name: /Roll back to a published version/ }),
+    ).toBeDisabled();
+  });
+
+  it("Continue hands the chosen version to the confirm", async () => {
+    renderIt();
+    await open();
+    fireEvent.click(await screen.findByRole("radio", { name: /^v2(?![0-9])/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Continue" }));
+    expect(await screen.findByText("Roll back to v2?")).toBeInTheDocument();
+  });
+
+  it("Cancel leaves without confirming anything", async () => {
+    renderIt();
+    await open();
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(screen.queryByText(/^Roll back to v/)).toBeNull();
+    expect(rollbackToVersion).not.toHaveBeenCalled();
   });
 });
