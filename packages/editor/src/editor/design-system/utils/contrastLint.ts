@@ -45,11 +45,12 @@ export const shownValue = (t: DesignToken, mode: "light" | "dark") =>
   (mode === "dark" ? t.darkValue : t.value) || t.value;
 
 /** The page colour itself is not "text on the page" — never compare it to
- *  itself. By VALUE, not just by id: the default palette ships #F8FAFC three
- *  times (`color-background`, `color-slate-50`, `color-surface`), so an
- *  id-only check flagged the page colour twice at ratio 1.00 and a fresh site
- *  opened on four warnings, two of them impossible to act on — passing
- *  contrast against the page is not a thing Slate 50 can do and stay Slate 50. */
+ *  itself. By VALUE, not just by id: the default palette ships that same
+ *  colour under three ids (`color-background`, `color-slate-50`,
+ *  `color-surface`), so an id-only check flagged the page colour twice at
+ *  ratio 1.00 and a fresh site opened on four warnings, two of them
+ *  impossible to act on — passing contrast against the page is not a thing
+ *  Slate 50 can do and stay Slate 50. */
 export const contrastFails = (
   t: DesignToken,
   surfaceBg: string,
