@@ -263,7 +263,9 @@
     "BL-0108",
     "BL-0109",
     "BL-0111",
+    "BL-0112",
     "BL-0113",
+    "BL-0115",
     "BL-0116",
     "BL-0118",
     "BL-0122",
@@ -279,10 +281,12 @@
     "BL-0170",
     "BL-0173",
     "BL-0174",
+    "BL-0175",
     "BL-0176"
    ],
    "redrawCost": "BL-0105, the first: 1 clean recapture (the rail tooltip was covering a row in the first reference), 1 computed-style measuring probe, 5 use_figma calls (structure / rows / footer / icons / icon size), 3 screenshots to check. The subtree is 260 nodes; building it as data-driven auto-layout rather than node by node is what kept it to five calls.",
-   "redrawRemaining": 3
+   "redrawRemaining": 0,
+   "redrawVerification": "25 of 25 drawn; 24 verified by pixel comparison against the reference render (92.5-97.4%). BL-0112 is written but unverifiable — the Settings surface never paints. Comparison trap: a frame screenshot is NOT symmetrically padded (x is +12 per side, y about +1 at the top), so a centre-crop comparison reads ~10px low and understates agreement — crop the figma image at the target's own measured edge instead. BL-0115 and BL-0175 were the only modals in the set."
   }
  },
  "rows": [
@@ -2214,7 +2218,8 @@
    "screenshotHash": "ce6239e73c619284",
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "80:2",
-   "figmaPageId": "75:2"
+   "figmaPageId": "75:2",
+   "notes": "REDRAWN 2026-08-19 (drift 24.16%). Dialog rebuilt from the measured live DOM: the frame held NO modal node at all, so a scrim plus a 720x720 dialog were created at the measured position. Frame 80:2 is a VERTICAL auto-layout, which stacked both new children below the screen until they were pinned with layoutPositioning=ABSOLUTE — check that before trusting a first screenshot. Two things measure-region could not give: (1) the live preview panel is a rendered site inside the modal, which the DOM walk does not descend into — it is drawn as its real chrome (#1a1a2e bezel, radius 8) plus the white page and the 18 block rects extracted from the reference pixels, the same policy the canvas gets, so the sample site is shape-not-content; (2) the five format cards measured 12px lower than the reference render shows them — the payload and the reference are two different live sessions — and the drawn frame follows the REFERENCE, since that is what verification compares against. 94.16% pixel agreement."
   },
   {
    "id": "BL-0116",
@@ -3189,7 +3194,8 @@
    "screenshotHash": "b61eef4a2525acc2",
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "133:2",
-   "figmaPageId": "75:2"
+   "figmaPageId": "75:2",
+   "notes": "REDRAWN 2026-08-19 (drift 20.60%). The frame's existing overlay container 133:739 was emptied and rebuilt as scrim + 560x488 dialog from the measured live DOM: title, the 1 Name & Type / 2 Fields stepper, the explanatory line, Collection name with its required asterisk, Content type, Description, and the footer with Cancel and a disabled Next: Add Fields. The select's chevron is drawn by the native control, so it is absent from the DOM walk and was added by hand at the measured pixel position. 94.45% pixel agreement."
   },
   {
    "id": "BL-0176",
