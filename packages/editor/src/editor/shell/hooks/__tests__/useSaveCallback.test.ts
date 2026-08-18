@@ -208,3 +208,86 @@ describe("useSaveCallback", () => {
     expect(opts.saveProject).toHaveBeenCalledTimes(2);
   });
 });
+
+/**
+ * Board S1.5b · session-expired with work in the editor.
+ *
+ * The load path has told this case apart for a while — it offers "Sign in".
+ * The save path did not: an expired session fell through to the generic
+ * "Save failed · Could not save project." with a Retry that re-sent the same
+ * unauthenticated request, so the one thing the user needed to know (you are
+ * signed out) was the one thing the toast never said.
+ */
+describe("useSaveCallback — an expired session is not a retryable save failure", () => {
+  const AUTH_ERRORS = ["UNAUTHORIZED", "401 Unauthorized", "Session expired", "FORBIDDEN"];
+
+  it.each(AUTH_ERRORS)("%s raises Sign in, not Retry", async (raw) => {
+    const opts = makeOpts();
+    opts.saveProject.mockRejectedValueOnce(new Error(raw));
+    const { result } = renderHook(() =>
+      useSaveCallback({
+        composer: opts.composer,
+        addToast: opts.addToast,
+        setSaveState: opts.setSaveState,
+        setIsDirty: opts.setIsDirty,
+      }),
+    );
+    await act(async () => {
+      await result.current();
+      await flushMicrotasks();
+    });
+    const toast = opts.addToast.mock.calls.at(-1)?.[0] as {
+      title: string;
+      tone: string;
+      action?: { label: string };
+    };
+    expect(toast.title).toBe("Session expired");
+    expect(toast.action?.label).toBe("Sign in");
+    expect(toast.tone).toBe("warning");
+  });
+
+  it("does not promise the work is safe on this device", async () => {
+    const opts = makeOpts();
+    opts.saveProject.mockRejectedValueOnce(new Error("UNAUTHORIZED"));
+    const { result } = renderHook(() =>
+      useSaveCallback({
+        composer: opts.composer,
+        addToast: opts.addToast,
+        setSaveState: opts.setSaveState,
+        setIsDirty: opts.setIsDirty,
+      }),
+    );
+    await act(async () => {
+      await result.current();
+      await flushMicrotasks();
+    });
+    const { description } = opts.addToast.mock.calls.at(-1)?.[0] as { description: string };
+    // With a siteId the save goes straight to the server and never runs the
+    // engine's localStorage write, so "saved on this device" would be a lie.
+    expect(description).not.toMatch(/on this device|saved locally|will sync/i);
+    expect(description).toMatch(/sign in/i);
+  });
+
+  it("a plain failure still gets Retry", async () => {
+    const opts = makeOpts();
+    opts.saveProject.mockRejectedValueOnce(new Error("boom"));
+    const { result } = renderHook(() =>
+      useSaveCallback({
+        composer: opts.composer,
+        addToast: opts.addToast,
+        setSaveState: opts.setSaveState,
+        setIsDirty: opts.setIsDirty,
+      }),
+    );
+    await act(async () => {
+      await result.current();
+      await flushMicrotasks();
+    });
+    const toast = opts.addToast.mock.calls.at(-1)?.[0] as {
+      title: string;
+      action?: { label: string };
+    };
+    expect(toast.title).toBe("Save failed");
+    expect(toast.action?.label).toBe("Retry");
+  });
+});

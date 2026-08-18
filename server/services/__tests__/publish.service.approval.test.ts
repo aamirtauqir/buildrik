@@ -5,7 +5,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
  *
  * The pure policy is unit-tested in publish-approval.test.ts. This proves the
  * wiring: startPublish reads workspace.editsRequireApproval + the actor's role +
- * the latest review, and THROWS "APPROVAL_REQUIRED" before queueing a job when an
+ * the latest review, and THROWS an APPROVAL_* error — one per gate state, board
+ * S5.4 — before queueing a job when an
  * Editor tries to publish an unapproved site. Security control → verified by
  * execution, not just typecheck.
  */
@@ -58,33 +59,33 @@ describe("startPublish · approval gate enforcement", () => {
     vi.stubEnv("NODE_ENV", "development"); // skip the Vercel-connection check
   });
 
-  it("Editor + gate ON + no approved review → throws APPROVAL_REQUIRED (no job queued)", async () => {
+  it("Editor + gate ON + never sent for review → throws APPROVAL_NONE (no job queued)", async () => {
     baseHappyMocks();
     workspaceFindUnique.mockResolvedValue({ editsRequireApproval: true });
     memberFindUnique.mockResolvedValue({ role: "EDITOR" });
 
-    await expect(startPublish("site-1", "ws-1", "user-editor")).rejects.toThrow("APPROVAL_REQUIRED");
+    await expect(startPublish("site-1", "ws-1", "user-editor")).rejects.toThrow("APPROVAL_NONE");
     expect(jobCreate).not.toHaveBeenCalled(); // gate fires before queueing
   });
 
   // §13-C1: the actual bug. sites.publish already requires ADMIN+, so this is the
   // realistic actor. An Admin was previously exempt → the gate blocked nobody.
-  it("Admin + gate ON + no approved review → throws APPROVAL_REQUIRED (no job queued) (§13-C1)", async () => {
+  it("Admin + gate ON + never sent for review → throws APPROVAL_NONE (no job queued) (§13-C1)", async () => {
     baseHappyMocks();
     workspaceFindUnique.mockResolvedValue({ editsRequireApproval: true });
     memberFindUnique.mockResolvedValue({ role: "ADMIN" });
 
-    await expect(startPublish("site-1", "ws-1", "user-admin")).rejects.toThrow("APPROVAL_REQUIRED");
+    await expect(startPublish("site-1", "ws-1", "user-admin")).rejects.toThrow("APPROVAL_NONE");
     expect(jobCreate).not.toHaveBeenCalled();
   });
 
-  it("Admin + gate ON + latest review CHANGES_REQUESTED → throws APPROVAL_REQUIRED (no job queued)", async () => {
+  it("Admin + gate ON + latest review CHANGES_REQUESTED → throws APPROVAL_CHANGES, not the same error as no review", async () => {
     baseHappyMocks();
     workspaceFindUnique.mockResolvedValue({ editsRequireApproval: true });
     memberFindUnique.mockResolvedValue({ role: "ADMIN" });
     reviewFindFirst.mockResolvedValue({ status: "CHANGES_REQUESTED" });
 
-    await expect(startPublish("site-1", "ws-1", "user-admin")).rejects.toThrow("APPROVAL_REQUIRED");
+    await expect(startPublish("site-1", "ws-1", "user-admin")).rejects.toThrow("APPROVAL_CHANGES");
     expect(jobCreate).not.toHaveBeenCalled();
   });
 
@@ -100,7 +101,7 @@ describe("startPublish · approval gate enforcement", () => {
     try {
       await startPublish("site-1", "ws-1", "user-admin");
     } catch (e) {
-      if (e instanceof Error && e.message === "APPROVAL_REQUIRED") approvalError = true;
+      if (e instanceof Error && e.message.startsWith("APPROVAL_")) approvalError = true;
     }
     expect(approvalError).toBe(false);
   });
@@ -117,7 +118,7 @@ describe("startPublish · approval gate enforcement", () => {
     try {
       await startPublish("site-1", "ws-1", "user-owner");
     } catch (e) {
-      if (e instanceof Error && e.message === "APPROVAL_REQUIRED") approvalError = true;
+      if (e instanceof Error && e.message.startsWith("APPROVAL_")) approvalError = true;
     }
     expect(approvalError).toBe(false);
   });
@@ -134,7 +135,7 @@ describe("startPublish · approval gate enforcement", () => {
     try {
       await startPublish("site-1", "ws-1", "user-editor");
     } catch (e) {
-      if (e instanceof Error && e.message === "APPROVAL_REQUIRED") approvalError = true;
+      if (e instanceof Error && e.message.startsWith("APPROVAL_")) approvalError = true;
     }
     expect(approvalError).toBe(false);
   });
@@ -150,7 +151,7 @@ describe("startPublish · approval gate enforcement", () => {
     try {
       await startPublish("site-1", "ws-1", "user-editor");
     } catch (e) {
-      if (e instanceof Error && e.message === "APPROVAL_REQUIRED") approvalError = true;
+      if (e instanceof Error && e.message.startsWith("APPROVAL_")) approvalError = true;
     }
     expect(approvalError).toBe(false);
   });

@@ -249,9 +249,13 @@ export async function startPublish(
         siteLastEditedAt: site.lastEditedAt,
         acknowledgeStale,
       });
-      // Distinct errors: "not-approved" needs a review; "stale" was approved but
-      // the site changed since, so the publisher must re-send or acknowledge.
-      if (block === "not-approved") throw new Error("APPROVAL_REQUIRED");
+      // Distinct errors, one per gate state the board draws (S5.4): nobody
+      // asked yet / asked and waiting / changes came back / approved but the
+      // site changed since. Each one has a different next move, so each gets
+      // its own error rather than a shared "needs approval".
+      if (block === "no-review-sent") throw new Error("APPROVAL_NONE");
+      if (block === "review-pending") throw new Error("APPROVAL_PENDING");
+      if (block === "changes-requested") throw new Error("APPROVAL_CHANGES");
       if (block === "stale-unacknowledged") throw new Error("APPROVAL_STALE");
     }
   }

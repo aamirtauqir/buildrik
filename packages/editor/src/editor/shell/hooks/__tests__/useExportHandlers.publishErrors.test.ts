@@ -218,3 +218,49 @@ describe("useExportHandlers — publish failure error mapping", () => {
     expect(opts.addToast.mock.calls.length).toBeGreaterThan(before);
   });
 });
+
+/**
+ * Board S5.4 · the three approval gates that have no over-ride path.
+ *
+ * These used to be one `needs-approval` toast reading "send it for review from
+ * the top bar" — advice that is only right for the first of the three. Someone
+ * whose reviewer had already replied asking for changes was told to go send a
+ * review they had already sent.
+ */
+describe("useExportHandlers — approval gate toasts (board S5.4)", () => {
+  const CASES: Array<[string, string]> = [
+    ["no-review", "Approval needed"],
+    ["review-pending", "Waiting on review"],
+    ["changes-requested", "Changes requested"],
+  ];
+
+  it.each(CASES)("%s raises the %s toast and clears the block", async (reason, title) => {
+    const opts = makeOpts();
+    const dismissBlock = vi.fn();
+    resetPublishState();
+    setPublishState({ blockedReason: reason, dismissBlock });
+    renderHook(() => useExportHandlers(opts as unknown as UseExportHandlersOptions));
+    await act(async () => {
+      await flushMicrotasks();
+    });
+    const call = (opts.addToast.mock.calls[0]?.[0] ?? {}) as ToastCall;
+    expect(call.title).toBe(title);
+    expect(call.tone).toBe("warning");
+    expect(dismissBlock).toHaveBeenCalled();
+  });
+
+  it("gives each gate its own next action, not one shared sentence", async () => {
+    const seen = new Set<string>();
+    for (const [reason] of CASES) {
+      const opts = makeOpts();
+      resetPublishState();
+      setPublishState({ blockedReason: reason, dismissBlock: vi.fn() });
+      renderHook(() => useExportHandlers(opts as unknown as UseExportHandlersOptions));
+      await act(async () => {
+        await flushMicrotasks();
+      });
+      seen.add(String((opts.addToast.mock.calls[0]?.[0] as { description: string }).description));
+    }
+    expect(seen.size).toBe(3);
+  });
+});

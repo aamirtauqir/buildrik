@@ -22,6 +22,7 @@ import { ToastInput } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
 import type { SaveState } from "./useStudioState";
 import { getSiteIdFromUrl, saveProject, SaveConflictError } from "@/services/BuildrikSyncProvider";
+import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 
 export interface UseSaveCallbackOptions {
   composer: Composer | null;
@@ -118,6 +119,32 @@ export function useSaveCallback({
             tone: "info",
           });
           return "queued-offline";
+        }
+        /* Board S1.5b — an expired session is not a failed save to retry. The
+           LOAD path already tells this case apart and offers Sign in
+           (useComposerInit); the SAVE path did not, so a signed-out user got
+           "Could not save project." with a Retry that could never succeed, and
+           no hint that the reason was their session. The copy deliberately does
+           NOT claim the work is safe on this device: with a siteId, save goes
+           straight to the server (`saveProject`) and never runs the engine's
+           localStorage write, so that promise is not ours to make here. */
+        const isAuth = /unauthorized|forbidden|401|403|session expired|not signed in/i.test(
+          errorMessage,
+        );
+        if (isAuth) {
+          setSaveState((prev) => ({ ...prev, status: "error", error: errorMessage }));
+          addToast({
+            title: "Session expired",
+            description: "Sign in again to save your changes. Keep this tab open.",
+            tone: "warning",
+            action: {
+              label: "Sign in",
+              onClick: () => {
+                window.open(`${DASHBOARD_URL}/auth`, "_blank", "noopener");
+              },
+            },
+          });
+          return "error";
         }
         const userMessage = explainSaveError(errorMessage);
         setSaveState((prev) => ({ ...prev, status: "error", error: errorMessage }));

@@ -303,9 +303,10 @@ export const sitesRouter = router({
     .mutation(async ({ ctx, input }) => {
       // The gate is the approval, not the role (contracts §2, decided 2026-07-19):
       // a DESIGNER (EDITOR site-role) may publish. The real control is the
-      // approval gate in startPublish, which throws APPROVAL_REQUIRED for a
+      // approval gate in startPublish, which throws an APPROVAL_* error for a
       // member in an approval-required workspace without an APPROVED review
-      // (OWNER exempt). Requiring ADMIN here contradicted the design, which
+      // (OWNER exempt) — one error per gate state, so the message can say what
+      // to do next. Requiring ADMIN here contradicted the design, which
       // draws Publish as Allowed for a designer.
       try {
         await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "EDITOR");
@@ -339,10 +340,29 @@ export const sitesRouter = router({
         // m-approval gate (publish.service startPublish): a member in an
         // approval-required workspace without an APPROVED review gets a clear
         // reason, not a 500.
-        if (e instanceof Error && e.message === "APPROVAL_REQUIRED")
+        // One message per gate state (board S5.4). The editor keys off these
+        // PHRASES (`classifyPublishBlock` in usePublishJob.ts) because all four
+        // arrive as PRECONDITION_FAILED and the message is the only
+        // discriminator — reword one here and you must reword it there in the
+        // same commit, or the gate degrades into a red "publish failed" toast.
+        // The old single sentence —
+        // "this site needs an approved review" — was true in all three cases
+        // and useful in none: it never said whether to send a review, wait for
+        // one, or go read the comments that already came back.
+        if (e instanceof Error && e.message === "APPROVAL_NONE")
           throw new TRPCError({
             code: "PRECONDITION_FAILED",
-            message: "This site needs an approved review before it can be published.",
+            message: "This site has not been sent for review yet. Send it for review to publish.",
+          });
+        if (e instanceof Error && e.message === "APPROVAL_PENDING")
+          throw new TRPCError({
+            code: "PRECONDITION_FAILED",
+            message: "This site is waiting on its review. You can publish once it is approved.",
+          });
+        if (e instanceof Error && e.message === "APPROVAL_CHANGES")
+          throw new TRPCError({
+            code: "PRECONDITION_FAILED",
+            message: "The reviewer asked for changes. Resolve the open comments and re-send for review.",
           });
         // Stale approval (contracts §1.5): approved, but the site changed since.
         // The client signed off on an earlier version — re-send for review, or

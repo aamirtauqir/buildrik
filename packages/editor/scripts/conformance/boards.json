@@ -2134,7 +2134,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "walked:2026-08-18",
       "recipe": null
     },
     {
@@ -2167,7 +2167,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -2178,7 +2178,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -2189,7 +2189,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "founder:no-templates-in-insert",
       "recipe": null
     },
     {
@@ -2200,7 +2200,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -2211,7 +2211,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -2222,7 +2222,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -2233,7 +2233,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -2244,7 +2244,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -2255,7 +2255,7 @@
       "width": 1440,
       "height": 360,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -2266,7 +2266,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "open:new-version-detect",
       "recipe": null
     },
     {
@@ -2277,7 +2277,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -2288,7 +2288,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -2299,7 +2299,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -2310,7 +2310,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -2321,7 +2321,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -2332,7 +2332,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -2343,7 +2343,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -2354,7 +2354,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -2365,7 +2365,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -2376,7 +2376,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -2387,7 +2387,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -2398,7 +2398,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -2409,7 +2409,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "board:813:4870",
       "recipe": null
     },
     {
@@ -2420,7 +2420,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -2717,7 +2717,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -2728,7 +2728,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -2739,7 +2739,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -2750,7 +2750,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -2761,7 +2761,7 @@
       "width": 360,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -2772,7 +2772,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -2783,7 +2783,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -2794,7 +2794,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -2805,7 +2805,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -2816,7 +2816,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -2827,7 +2827,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -2838,7 +2838,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -2849,7 +2849,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -2860,7 +2860,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -2871,7 +2871,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -2882,7 +2882,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -2893,7 +2893,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "board:307:2203",
       "recipe": null
     },
     {
@@ -2904,7 +2904,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "board:307:2213",
       "recipe": null
     },
     {
@@ -2915,7 +2915,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "board:307:2193",
       "recipe": null
     },
     {
@@ -2926,7 +2926,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "scope:dashboard",
       "recipe": null
     },
     {
@@ -2937,7 +2937,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -2948,7 +2948,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -2959,7 +2959,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -2992,7 +2992,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -3960,7 +3960,7 @@
       "width": 0,
       "height": 0,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -3971,7 +3971,7 @@
       "width": 0,
       "height": 0,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {

@@ -31,6 +31,24 @@ import { usePublishJob, type UsePublishJobResult } from "./usePublishJob";
 import { exportPublishPages } from "../exportPublishPages";
 import { captureAndUploadThumbnail } from "../captureThumbnail";
 
+/** Copy for each approval gate that has no over-ride path (board S5.4). */
+const APPROVAL_GATE_TOASTS: Record<string, { title: string; description: string }> = {
+  "no-review": {
+    title: "Approval needed",
+    description:
+      "This site hasn't been sent for review yet. Send it for review from the top bar.",
+  },
+  "review-pending": {
+    title: "Waiting on review",
+    description: "This site is with its reviewer. You can publish once it's approved.",
+  },
+  "changes-requested": {
+    title: "Changes requested",
+    description:
+      "The reviewer asked for changes. Resolve the open comments, then re-send for review.",
+  },
+};
+
 export interface UseExportHandlersOptions {
   composer: Composer | null;
   addToast: (input: ToastInput) => string;
@@ -131,19 +149,17 @@ export function useExportHandlers({
     runPublishRef.current = runPublish;
   }, [runPublish]);
 
-  // needs-approval has no acknowledge path — there is no review to over-ride —
-  // so surface it as an informational toast, not a dialog. Clear the block after
-  // so it doesn't re-fire. (stale-approval is handled by the dialog in the shell.)
+  // The three no-acknowledge gates (board S5.4) have no path to over-ride —
+  // there is no approval yet — so each is an informational toast, not a dialog.
+  // They differ only in what the user should do next, which is the entire
+  // reason the board draws them apart: one sentence covering all three told
+  // someone already waiting on a reviewer to go send a review.
+  // (stale-approval is handled by the dialog in the shell.)
   const dismissBlock = publishJob.dismissBlock;
   React.useEffect(() => {
-    if (publishJob.blockedReason === "needs-approval") {
-      addToast({
-        title: "Approval needed",
-        description:
-          "This site needs an approved review before it can be published. Send it for review from the top bar.",
-        tone: "warning",
-        duration: 6000,
-      });
+    const copy = publishJob.blockedReason ? APPROVAL_GATE_TOASTS[publishJob.blockedReason] : undefined;
+    if (copy) {
+      addToast({ ...copy, tone: "warning", duration: 6000 });
       dismissBlock();
     }
   }, [publishJob.blockedReason, dismissBlock, addToast]);

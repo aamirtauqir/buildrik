@@ -64,19 +64,36 @@ export function isApprovalStale(input: ApprovalGateInput): boolean {
 }
 
 /** Why a publish is blocked by the approval gate, or null when it is allowed. */
-export type PublishApprovalBlock = "not-approved" | "stale-unacknowledged" | null;
+export type PublishApprovalBlock =
+  | "no-review-sent"
+  | "review-pending"
+  | "changes-requested"
+  | "stale-unacknowledged"
+  | null;
 
 /**
  * The reason this publish is blocked, or null if it may proceed.
  *   - gate off / actor is OWNER      → allowed
- *   - latest review not APPROVED     → "not-approved"
+ *   - no review ever sent            → "no-review-sent"
+ *   - review sent, awaiting reply    → "review-pending"
+ *   - reviewer asked for changes     → "changes-requested"
  *   - approved but edited-since, not acknowledged → "stale-unacknowledged"
  *   - approved and current (or acknowledged stale) → allowed
  */
 export function publishApprovalBlock(input: ApprovalGateInput): PublishApprovalBlock {
   if (!input.editsRequireApproval) return null;
   if (APPROVAL_EXEMPT_ROLES.has(input.role)) return null;
-  if (input.latestReviewStatus !== "APPROVED") return "not-approved";
+  // Board S5.4 draws the gate as three screens, not one, because the next move
+  // differs in each: nobody has been asked yet / someone was asked and has not
+  // replied / the reviewer replied asking for changes. This function already
+  // held the status that tells them apart and threw it away, so all three
+  // reached the publisher as one sentence — "needs an approved review" — which
+  // is only actionable in the first case.
+  if (input.latestReviewStatus !== "APPROVED") {
+    if (input.latestReviewStatus === null) return "no-review-sent";
+    if (input.latestReviewStatus === "CHANGES_REQUESTED") return "changes-requested";
+    return "review-pending";
+  }
   if (isApprovalStale(input) && !input.acknowledgeStale) return "stale-unacknowledged";
   return null;
 }

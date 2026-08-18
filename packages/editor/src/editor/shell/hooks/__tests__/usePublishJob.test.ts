@@ -472,15 +472,29 @@ describe("usePublishJob", () => {
       expect(result.current.uiState).toBe("idle");
     });
 
-    it("classifies a needs-approval rejection into blockedReason", async () => {
-      mockPublishSite.mockRejectedValueOnce(
-        new Error("This site needs an approved review before it can be published."),
-      );
+    /**
+     * Board S5.4 draws the approval gate as three screens. They used to arrive
+     * as one `needs-approval` carrying one sentence, so a user whose reviewer
+     * had already asked for changes was told to send the site for review.
+     * The server now sends a distinct message per state and this is where they
+     * are told apart — the messages are the discriminator (all three come back
+     * as tRPC PRECONDITION_FAILED), so a reworded server message must be
+     * reflected here or the gate silently degrades to a red error toast.
+     */
+    it.each([
+      ["This site has not been sent for review yet. Send it for review to publish.", "no-review"],
+      ["This site is waiting on its review. You can publish once it is approved.", "review-pending"],
+      [
+        "The reviewer asked for changes. Resolve the open comments and re-send for review.",
+        "changes-requested",
+      ],
+    ])("classifies %s", async (message, reason) => {
+      mockPublishSite.mockRejectedValueOnce(new Error(message));
       const { result } = renderHook(() => usePublishJob());
       await act(async () => {
         await result.current.publish("site-1", PAGES);
       });
-      expect(result.current.blockedReason).toBe("needs-approval");
+      expect(result.current.blockedReason).toBe(reason);
       expect(result.current.error).toBeNull();
     });
 

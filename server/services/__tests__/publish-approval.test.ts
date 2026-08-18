@@ -122,9 +122,35 @@ describe("isApprovalStale / publishApprovalBlock — edited-since-approval", () 
     })).toBeNull();
   });
 
-  it("block: no review → 'not-approved' (distinct from stale)", () => {
+  /**
+   * Board S5.4 draws the publish gate as three screens, not one. All three used
+   * to collapse into "not-approved", and the publisher was told "this site needs
+   * an approved review" whether they had sent one or not — the same sentence for
+   * "ask someone", "wait for them", and "go read their comments".
+   */
+  it("block: never sent → 'no-review-sent'", () => {
     expect(publishApprovalBlock({
       editsRequireApproval: true, role: "EDITOR", latestReviewStatus: null,
-    })).toBe("not-approved");
+    })).toBe("no-review-sent");
+  });
+
+  it("block: sent and waiting → 'review-pending'", () => {
+    expect(publishApprovalBlock({
+      editsRequireApproval: true, role: "EDITOR", latestReviewStatus: "PENDING",
+    })).toBe("review-pending");
+  });
+
+  it("block: reviewer replied → 'changes-requested'", () => {
+    expect(publishApprovalBlock({
+      editsRequireApproval: true, role: "EDITOR", latestReviewStatus: "CHANGES_REQUESTED",
+    })).toBe("changes-requested");
+  });
+
+  it("still tells the three apart from a stale approval", () => {
+    const blocks = [null, "PENDING", "CHANGES_REQUESTED"].map((st) =>
+      publishApprovalBlock({ editsRequireApproval: true, role: "EDITOR", latestReviewStatus: st }),
+    );
+    expect(new Set(blocks).size).toBe(3);
+    expect(blocks).not.toContain("stale-unacknowledged");
   });
 });

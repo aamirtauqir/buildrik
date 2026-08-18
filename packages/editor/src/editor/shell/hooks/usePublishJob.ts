@@ -34,19 +34,34 @@ export type PublishUiState =
  * Why the approval gate stopped a publish before a job was even created
  * (contracts §1.5 / §2). Kept separate from `error` because these are not
  * failures to surface as a red toast — they need a decision from the user:
- * `stale-approval` offers an acknowledge-and-ship path, `needs-approval` does
- * not (there is no review to over-ride).
+ * `stale-approval` offers an acknowledge-and-ship path; the other three do not
+ * (there is no approval to over-ride yet). Board S5.4 draws them as three
+ * separate gates because the next move differs — send one, wait for one, or go
+ * resolve the comments that came back. They arrived here as a single
+ * `needs-approval` and were all told to "send it for review", which is wrong
+ * advice for the two where a review is already open.
  */
-export type PublishBlockReason = "stale-approval" | "needs-approval" | null;
+export type PublishBlockReason =
+  | "stale-approval"
+  | "no-review"
+  | "review-pending"
+  | "changes-requested"
+  | null;
 
 /**
- * Classify the server's approval-gate rejection from its message. Both come
+ * Classify the server's approval-gate rejection from its message. All four come
  * back as tRPC PRECONDITION_FAILED (`server/trpc/routers/sites.ts`), so the
  * message is the only discriminator. Anything else is a real error.
+ *
+ * These phrases are a contract with that router: reword a message there and it
+ * stops matching here, the block silently becomes a red "publish failed"
+ * toast, and nothing goes red in CI to tell you.
  */
 function classifyPublishBlock(msg: string): PublishBlockReason {
   if (/acknowledge|changed after it was approved/i.test(msg)) return "stale-approval";
-  if (/needs an approved review/i.test(msg)) return "needs-approval";
+  if (/not been sent for review/i.test(msg)) return "no-review";
+  if (/waiting on its review/i.test(msg)) return "review-pending";
+  if (/asked for changes/i.test(msg)) return "changes-requested";
   return null;
 }
 
