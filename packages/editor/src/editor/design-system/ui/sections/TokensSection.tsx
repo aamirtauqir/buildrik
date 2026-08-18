@@ -48,11 +48,15 @@ interface KindEntry {
   isFoundation: boolean; // true = often empty in a fresh project; muted in beginner mode
 }
 
+/* The first six are board 152:52's rows, in its order and under its names —
+   it says "typography", not "type", and puts spacing and radius above it. The
+   eight below are token kinds the board predates; they are destinations of
+   their own and stay. */
 const KIND_ORDER: KindEntry[] = [
   { kindId: "color",      title: "Color",      isFoundation: false },
-  { kindId: "type",       title: "Type",       isFoundation: false },
   { kindId: "spacing",    title: "Spacing",    isFoundation: false },
   { kindId: "radius",     title: "Radius",     isFoundation: false },
+  { kindId: "type",       title: "Typography", isFoundation: false },
   { kindId: "shadow",     title: "Shadow",     isFoundation: false },
   { kindId: "motion",     title: "Motion",     isFoundation: false },
   { kindId: "border",     title: "Border",     isFoundation: true  },
