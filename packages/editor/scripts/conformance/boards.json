@@ -176,7 +176,7 @@
       "width": 1120,
       "height": 701,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -187,7 +187,7 @@
       "width": 1040,
       "height": 470,
       "status": "active",
-      "authority": "undecided",
+      "authority": "open:migration-ui-unbuilt",
       "recipe": null
     },
     {
@@ -1639,7 +1639,7 @@
       "width": 1440,
       "height": 852,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -1650,7 +1650,7 @@
       "width": 1440,
       "height": 852,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -1672,7 +1672,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -1683,7 +1683,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -4598,7 +4598,7 @@
       "width": 0,
       "height": 0,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
