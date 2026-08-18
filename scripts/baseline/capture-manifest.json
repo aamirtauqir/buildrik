@@ -1,26 +1,18 @@
 {
- "commit": "0bccdb21",
- "base": "http://localhost:3100",
- "generated": "2026-08-10T10:30:13.370Z",
- "captures": [
+ "commit": "1c1ec587",
+ "base": "http://localhost:3000",
+ "generated": "2026-08-18T14:51:48.745Z",
+ "captures": [],
+ "failures": [
   {
-   "id": "BL-0182",
-   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "state": "experimental-rail-e3",
-   "status": 200,
-   "sha256": "00d00b8354c7ec17",
-   "scrollHeight": 905,
-   "elCount": 80
+   "id": "BL-0063",
+   "path": "/dashboard/settings/integrations/vercel-team-picker",
+   "error": "locator.waitFor: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText('Pick a Vercel team').first() to be visible\u001b[22m\n"
   },
   {
-   "id": "BL-0183",
-   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "state": "experimental-rail-legacy",
-   "status": 200,
-   "sha256": "f499e60af3e2ba27",
-   "scrollHeight": 900,
-   "elCount": 80
+   "id": "BL-0090",
+   "path": "/onboarding/ai/generating",
+   "error": "locator.waitFor: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText('Creating your site draft').first() to be visible\u001b[22m\n"
   }
- ],
- "failures": []
+ ]
 }

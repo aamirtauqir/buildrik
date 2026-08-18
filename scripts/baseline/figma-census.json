@@ -1,19 +1,1442 @@
 {
-  "generated": "2026-08-08T-clean",
-  "files": {
-    "p7GAS7CBCpbOS1cZC4RQ8W": [
-      {
-        "nodeId": "1:2",
-        "name": "BL-0000 / cover",
-        "page": "00 — Cover & Scope",
-        "width": 1200,
-        "height": 503
-      }
-    ],
-    "Micuc1rmLcFhjxF1A08Kk2": [],
-    "cgTtpYQuI286gsmEQJmVEe": [],
-    "wQsxXDoVQ2LpPkpnaKIVtR": [],
-    "HS0tZANzT3F9HGL0QfuIDJ": [],
-    "Htnvig0uarTGtNhSYg5Pyv": []
-  }
+ "generated": "2026-08-18T14:54:38.520Z",
+ "files": {
+  "p7GAS7CBCpbOS1cZC4RQ8W": [
+   {
+    "nodeId": "1:2",
+    "name": "BL-0000 / cover",
+    "page": "0:1",
+    "width": 1200,
+    "height": 503
+   }
+  ],
+  "Micuc1rmLcFhjxF1A08Kk2": [
+   {
+    "nodeId": "177:2",
+    "name": "BL-0001 / auth / default / 1440",
+    "page": "183:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "178:2",
+    "name": "BL-0002 / auth-2fa / default / 1440",
+    "page": "183:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "179:2",
+    "name": "BL-0003 / auth-2fa-backup / default / 1440",
+    "page": "183:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "180:2",
+    "name": "BL-0004 / auth-access-removed / default / 1440",
+    "page": "183:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "181:2",
+    "name": "BL-0005 / auth-account-unlocked / default / 1440",
+    "page": "183:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "182:2",
+    "name": "BL-0006 / auth-callback / completing-sign-in / 1440",
+    "page": "183:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "184:2",
+    "name": "BL-0007 / auth-change-email / default / 1440",
+    "page": "183:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "185:2",
+    "name": "BL-0008 / auth-check-inbox / default / 1440",
+    "page": "183:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "186:2",
+    "name": "BL-0009 / auth-device-alert / default / 1440",
+    "page": "183:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "187:2",
+    "name": "BL-0010 / auth-email-exists / default / 1440",
+    "page": "183:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "188:2",
+    "name": "BL-0011 / auth-error-2fa-locked / default / 1440",
+    "page": "183:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "190:2",
+    "name": "BL-0017 / auth-error-session-expired / default / 1440",
+    "page": "183:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "191:2",
+    "name": "BL-0018 / auth-error-social-error / default / 1440",
+    "page": "183:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "192:2",
+    "name": "BL-0019 / auth-error-suspicious / default / 1440",
+    "page": "183:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "193:2",
+    "name": "BL-0020 / auth-forgot-password / default / 1440",
+    "page": "183:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "194:2",
+    "name": "BL-0021 / auth-invite / default / 1440",
+    "page": "183:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "195:2",
+    "name": "BL-0022 / auth-join-workspace / default / 1440",
+    "page": "183:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "197:2",
+    "name": "BL-0023 / auth-magic-link / default / 1440",
+    "page": "183:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "199:2",
+    "name": "BL-0012 / auth-error-captcha / default / 1440",
+    "page": "183:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "200:2",
+    "name": "BL-0013 / auth-error-expired-link / default / 1440",
+    "page": "183:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "201:2",
+    "name": "BL-0014 / auth-error-invite-expired / default / 1440",
+    "page": "183:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "202:2",
+    "name": "BL-0015 / auth-error-locked / default / 1440",
+    "page": "183:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "203:2",
+    "name": "BL-0016 / auth-error-rate-limited / default / 1440",
+    "page": "183:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "204:2",
+    "name": "BL-0024 / auth-magic-link-sent / default / 1440",
+    "page": "183:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "206:2",
+    "name": "BL-0025 / auth-oauth-conflict / default / 1440",
+    "page": "183:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "207:2",
+    "name": "BL-0026 / auth-password-changed / default / 1440",
+    "page": "183:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "208:2",
+    "name": "BL-0027 / auth-redirect / signing-you-in / 1440",
+    "page": "183:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "209:2",
+    "name": "BL-0028 / auth-reset-password / default / 1440",
+    "page": "183:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "210:2",
+    "name": "BL-0029 / auth-signup / default / 1440",
+    "page": "183:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "212:2",
+    "name": "BL-0030 / auth-verify-email / default / 1440",
+    "page": "183:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "213:2",
+    "name": "BL-0031 / auth-workspace-select / default / 1440",
+    "page": "183:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "214:2",
+    "name": "BL-0032 / auth-workspace-setup / default / 1440",
+    "page": "183:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "98:2",
+    "name": "BL-0033 / privacy / default / 1440",
+    "page": "108:2",
+    "width": 1440,
+    "height": 1075
+   },
+   {
+    "nodeId": "99:2",
+    "name": "BL-0034 / terms / default / 1440",
+    "page": "108:2",
+    "width": 1440,
+    "height": 977
+   },
+   {
+    "nodeId": "100:2",
+    "name": "BL-0035 / maintenance / default / 1440",
+    "page": "108:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "101:2",
+    "name": "BL-0036 / dev-states / default / 1440",
+    "page": "108:2",
+    "width": 1440,
+    "height": 1623
+   },
+   {
+    "nodeId": "102:2",
+    "name": "BL-0040 / dashboard-agency-handover / default / 1440",
+    "page": "108:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "103:2",
+    "name": "BL-0041 / dashboard-agency-library / default / 1440",
+    "page": "108:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "104:2",
+    "name": "BL-0042 / dashboard-agency-partner / default / 1440",
+    "page": "108:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "105:2",
+    "name": "BL-0043 / dashboard-agency-reviews / default / 1440",
+    "page": "108:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "106:2",
+    "name": "BL-0044 / dashboard-agency-theme / default / 1440",
+    "page": "108:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "107:2",
+    "name": "BL-0045 / dashboard-agency-workspace / default / 1440",
+    "page": "108:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "109:2",
+    "name": "BL-0097 / share-token / as-rendered / 1440",
+    "page": "108:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "110:2",
+    "name": "BL-0098 / review-token / PENDING / 1440",
+    "page": "108:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "111:2",
+    "name": "BL-0099 / transfer-accept / invalid-link / 1440",
+    "page": "108:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "113:2",
+    "name": "BL-0039 / dashboard-agency / default / 1440",
+    "page": "108:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "1:2",
+    "name": "BL-0037 / dashboard / default / 1440",
+    "page": "0:1",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "4:2",
+    "name": "BL-0053 / dashboard/projects / default / 1440",
+    "page": "0:1",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "5:2",
+    "name": "BL-0051 / dashboard/media / default / 1440",
+    "page": "0:1",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "6:2",
+    "name": "BL-0038 / dashboard/activity / default / 1440",
+    "page": "0:1",
+    "width": 1440,
+    "height": 1015
+   },
+   {
+    "nodeId": "7:2",
+    "name": "BL-0081 / dashboard/templates / default / 1440",
+    "page": "0:1",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "8:2",
+    "name": "BL-0055 / dashboard/settings / default / 1440",
+    "page": "0:1",
+    "width": 1440,
+    "height": 1167
+   },
+   {
+    "nodeId": "9:2",
+    "name": "BL-0059 / dashboard/settings/billing / default / 1440",
+    "page": "0:1",
+    "width": 1440,
+    "height": 1088
+   },
+   {
+    "nodeId": "10:2",
+    "name": "BL-0071 / dashboard/sites/[id] / default / 1440",
+    "page": "0:1",
+    "width": 1440,
+    "height": 1091
+   },
+   {
+    "nodeId": "11:2",
+    "name": "BL-0080 / dashboard/sites/new / default / 1440",
+    "page": "0:1",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "13:2",
+    "name": "BL-0046 / dashboard/getting-started / default / 1440",
+    "page": "0:1",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "14:2",
+    "name": "BL-0047 / dashboard/help / default / 1440",
+    "page": "0:1",
+    "width": 1440,
+    "height": 1244
+   },
+   {
+    "nodeId": "15:2",
+    "name": "BL-0048 / dashboard/help/[slug] / default / 1440",
+    "page": "0:1",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "16:2",
+    "name": "BL-0049 / dashboard/learn / default / 1440",
+    "page": "0:1",
+    "width": 1440,
+    "height": 909
+   },
+   {
+    "nodeId": "17:2",
+    "name": "BL-0050 / dashboard/marketplace / default / 1440",
+    "page": "0:1",
+    "width": 1440,
+    "height": 1299
+   },
+   {
+    "nodeId": "18:2",
+    "name": "BL-0052 / dashboard/notifications / default / 1440",
+    "page": "0:1",
+    "width": 1440,
+    "height": 978
+   },
+   {
+    "nodeId": "19:2",
+    "name": "BL-0054 / dashboard/resources / default / 1440",
+    "page": "0:1",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "20:2",
+    "name": "BL-0056 / dashboard/settings/account / default / 1440",
+    "page": "0:1",
+    "width": 1440,
+    "height": 1277
+   },
+   {
+    "nodeId": "21:2",
+    "name": "BL-0057 / dashboard/settings/ai / default / 1440",
+    "page": "0:1",
+    "width": 1440,
+    "height": 1028
+   },
+   {
+    "nodeId": "22:2",
+    "name": "BL-0058 / dashboard/settings/api-tokens / default / 1440",
+    "page": "0:1",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "25:2",
+    "name": "BL-0060 / dashboard/settings/danger / default / 1440",
+    "page": "0:1",
+    "width": 1440,
+    "height": 1426
+   },
+   {
+    "nodeId": "26:2",
+    "name": "BL-0061 / dashboard/settings/domains / default / 1440",
+    "page": "0:1",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "27:2",
+    "name": "BL-0062 / dashboard/settings/integrations / default / 1440",
+    "page": "0:1",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "28:2",
+    "name": "BL-0064 / dashboard/settings/notifications / default / 1440",
+    "page": "0:1",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "29:2",
+    "name": "BL-0065 / dashboard/settings/plans / default / 1440",
+    "page": "0:1",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "30:2",
+    "name": "BL-0066 / dashboard/settings/profile / default / 1440",
+    "page": "0:1",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "31:2",
+    "name": "BL-0067 / dashboard/settings/security / default / 1440",
+    "page": "0:1",
+    "width": 1440,
+    "height": 1481
+   },
+   {
+    "nodeId": "32:2",
+    "name": "BL-0068 / dashboard/settings/team / default / 1440",
+    "page": "0:1",
+    "width": 1440,
+    "height": 1380
+   },
+   {
+    "nodeId": "33:2",
+    "name": "BL-0069 / dashboard/settings/usage / default / 1440",
+    "page": "0:1",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "34:2",
+    "name": "BL-0070 / dashboard/settings/workspace / default / 1440",
+    "page": "0:1",
+    "width": 1440,
+    "height": 1637
+   },
+   {
+    "nodeId": "37:2",
+    "name": "BL-0072 / dashboard/sites/[id]/access / default / 1440",
+    "page": "0:1",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "38:2",
+    "name": "BL-0073 / dashboard/sites/[id]/analytics / default / 1440",
+    "page": "0:1",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "39:2",
+    "name": "BL-0074 / dashboard/sites/[id]/domains / default / 1440",
+    "page": "0:1",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "40:2",
+    "name": "BL-0075 / dashboard/sites/[id]/feedback / default / 1440",
+    "page": "0:1",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "41:2",
+    "name": "BL-0076 / dashboard/sites/[id]/publish / default / 1440",
+    "page": "0:1",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "42:2",
+    "name": "BL-0077 / dashboard/sites/[id]/redirects / default / 1440",
+    "page": "0:1",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "43:2",
+    "name": "BL-0078 / dashboard/sites/[id]/seo / default / 1440",
+    "page": "0:1",
+    "width": 1440,
+    "height": 1292
+   },
+   {
+    "nodeId": "44:2",
+    "name": "BL-0079 / dashboard/sites/[id]/settings / default / 1440",
+    "page": "0:1",
+    "width": 1440,
+    "height": 1794
+   },
+   {
+    "nodeId": "45:2",
+    "name": "BL-0082 / dashboard/templates/[id] / default / 1440",
+    "page": "0:1",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "48:2",
+    "name": "BL-0084 / onboarding/path / default / 1440",
+    "page": "175:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "49:2",
+    "name": "BL-0085 / onboarding/workspace / default / 1440",
+    "page": "175:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "50:2",
+    "name": "BL-0086 / onboarding/site / default / 1440",
+    "page": "175:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "51:2",
+    "name": "BL-0087 / onboarding/ai/basics / default / 1440",
+    "page": "175:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "52:2",
+    "name": "BL-0088 / onboarding/ai/brand / default / 1440",
+    "page": "175:2",
+    "width": 1440,
+    "height": 956
+   },
+   {
+    "nodeId": "53:2",
+    "name": "BL-0089 / onboarding/ai/goal / default / 1440",
+    "page": "175:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "54:2",
+    "name": "BL-0091 / onboarding/ai/preview / default / 1440",
+    "page": "175:2",
+    "width": 1440,
+    "height": 904
+   },
+   {
+    "nodeId": "55:2",
+    "name": "BL-0092 / onboarding/blank / default / 1440",
+    "page": "175:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "56:2",
+    "name": "BL-0093 / onboarding/template / default / 1440",
+    "page": "175:2",
+    "width": 1440,
+    "height": 928
+   },
+   {
+    "nodeId": "58:2",
+    "name": "BL-0094 / onboarding/template/preview / default / 1440",
+    "page": "175:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "59:2",
+    "name": "BL-0095 / onboarding/template/selected / default / 1440",
+    "page": "175:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "60:2",
+    "name": "BL-0096 / onboarding/ready / default / 1440",
+    "page": "175:2",
+    "width": 1440,
+    "height": 930
+   },
+   {
+    "nodeId": "62:2",
+    "name": "BL-0100 / edit/:id / shell-default / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "64:2",
+    "name": "BL-0101 / edit/:id / panel-layers / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "66:2",
+    "name": "BL-0102 / edit/:id / panel-pages / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "68:2",
+    "name": "BL-0103 / edit/:id / panel-media / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "69:2",
+    "name": "BL-0104 / edit/:id / panel-content / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "70:2",
+    "name": "BL-0105 / edit/:id / panel-brand / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "71:2",
+    "name": "BL-0106 / edit/:id / publish-open / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "65:2",
+    "name": "BL-0107 / edit/:id / comments-open / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "67:2",
+    "name": "BL-0108 / edit/:id / notifications-open / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "73:2",
+    "name": "BL-0109 / edit/:id / site-menu-open / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "74:2",
+    "name": "BL-0110 / edit/:id / review-pill-open / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "72:2",
+    "name": "BL-0111 / edit/:id / cmdk-open / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "77:2",
+    "name": "BL-0112 / edit/:id / sitemenu-site-settings / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "78:2",
+    "name": "BL-0113 / edit/:id / sitemenu-version-history / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "79:2",
+    "name": "BL-0114 / edit/:id / sitemenu-publish-history / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "80:2",
+    "name": "BL-0115 / edit/:id / sitemenu-export-code / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "81:2",
+    "name": "BL-0116 / edit/:id / sitemenu-templates / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "82:2",
+    "name": "BL-0117 / edit/:id / sitemenu-components / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "83:2",
+    "name": "BL-0118 / edit/:id / sitemenu-design-system / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "84:2",
+    "name": "BL-0119 / edit/:id / sitemenu-plugins / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "85:2",
+    "name": "BL-0120 / edit/:id / sitemenu-invite-teammates / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "86:2",
+    "name": "BL-0121 / edit/:id / sitemenu-keyboard-shortcuts / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "87:2",
+    "name": "BL-0122 / edit/:id / sitemenu-open / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "88:2",
+    "name": "BL-0123 / edit/:id / inspector-text / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "90:2",
+    "name": "BL-0124 / edit/:id / inspector-button / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "91:2",
+    "name": "BL-0125 / edit/:id / inspector-container / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "93:2",
+    "name": "BL-0126 / edit/:id / inspector-grid / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "94:2",
+    "name": "BL-0127 / edit/:id / inspector-flex / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "95:2",
+    "name": "BL-0128 / edit/:id / inspector-input / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "96:2",
+    "name": "BL-0129 / edit/:id / inspector-heading / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "118:2",
+    "name": "BL-0159 / edit/:id / media-stock-browser / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "119:2",
+    "name": "BL-0160 / edit/:id / media-icon-picker / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "120:2",
+    "name": "BL-0161 / edit/:id / media-fullpage-library / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "121:2",
+    "name": "BL-0162 / edit/:id / media-list-view / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "122:2",
+    "name": "BL-0163 / edit/:id / pages-context-menu / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "123:2",
+    "name": "BL-0164 / edit/:id / pages-add-page / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "124:2",
+    "name": "BL-0165 / edit/:id / pages-listings-view / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "126:2",
+    "name": "BL-0166 / edit/:id / pages-more-add-options / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "127:2",
+    "name": "BL-0167 / edit/:id / pages-fullpage / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "128:2",
+    "name": "BL-0168 / edit/:id / layers-context-menu / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "129:2",
+    "name": "BL-0169 / edit/:id / brand-pro-mode / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "130:2",
+    "name": "BL-0170 / edit/:id / brand-dark-preview / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "131:2",
+    "name": "BL-0173 / edit/:id / brand-styles-tab / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "132:2",
+    "name": "BL-0174 / edit/:id / brand-components-tab / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "133:2",
+    "name": "BL-0175 / edit/:id / content-create-collection / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "134:2",
+    "name": "BL-0176 / edit/:id / publish-confirm / 1440",
+    "page": "75:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "142:2",
+    "name": "BL-0131 / email / account-deletion / 700",
+    "page": "152:2",
+    "width": 700,
+    "height": 900
+   },
+   {
+    "nodeId": "144:2",
+    "name": "BL-0132 / email / ai-complete / 700",
+    "page": "152:2",
+    "width": 700,
+    "height": 900
+   },
+   {
+    "nodeId": "145:2",
+    "name": "BL-0133 / email / ai-failed / 700",
+    "page": "152:2",
+    "width": 700,
+    "height": 900
+   },
+   {
+    "nodeId": "146:2",
+    "name": "BL-0134 / email / auto-downgrade / 700",
+    "page": "152:2",
+    "width": 700,
+    "height": 900
+   },
+   {
+    "nodeId": "147:2",
+    "name": "BL-0135 / email / dunning-reminder / 700",
+    "page": "152:2",
+    "width": 700,
+    "height": 900
+   },
+   {
+    "nodeId": "148:2",
+    "name": "BL-0136 / email / email-changed / 700",
+    "page": "152:2",
+    "width": 700,
+    "height": 900
+   },
+   {
+    "nodeId": "149:2",
+    "name": "BL-0137 / email / export-ready / 700",
+    "page": "152:2",
+    "width": 700,
+    "height": 900
+   },
+   {
+    "nodeId": "150:2",
+    "name": "BL-0138 / email / form-submission / 700",
+    "page": "152:2",
+    "width": 700,
+    "height": 900
+   },
+   {
+    "nodeId": "151:2",
+    "name": "BL-0139 / email / magic-link / 700",
+    "page": "152:2",
+    "width": 700,
+    "height": 900
+   },
+   {
+    "nodeId": "153:2",
+    "name": "BL-0140 / email / payment-failed / 700",
+    "page": "152:2",
+    "width": 700,
+    "height": 900
+   },
+   {
+    "nodeId": "156:2",
+    "name": "BL-0143 / email / review-invite / 700",
+    "page": "152:2",
+    "width": 700,
+    "height": 900
+   },
+   {
+    "nodeId": "157:2",
+    "name": "BL-0144 / email / review-requested / 700",
+    "page": "152:2",
+    "width": 700,
+    "height": 900
+   },
+   {
+    "nodeId": "158:2",
+    "name": "BL-0145 / email / review-resolved / 700",
+    "page": "152:2",
+    "width": 700,
+    "height": 900
+   },
+   {
+    "nodeId": "161:2",
+    "name": "BL-0141 / email / plan-limit-warning / 700",
+    "page": "152:2",
+    "width": 700,
+    "height": 900
+   },
+   {
+    "nodeId": "162:2",
+    "name": "BL-0142 / email / reset-password / 700",
+    "page": "152:2",
+    "width": 700,
+    "height": 900
+   },
+   {
+    "nodeId": "163:2",
+    "name": "BL-0146 / email / site-transferred / 700",
+    "page": "152:2",
+    "width": 700,
+    "height": 900
+   },
+   {
+    "nodeId": "164:2",
+    "name": "BL-0147 / email / ssl-expiring / 700",
+    "page": "152:2",
+    "width": 700,
+    "height": 900
+   },
+   {
+    "nodeId": "165:2",
+    "name": "BL-0148 / email / team-invite / 700",
+    "page": "152:2",
+    "width": 700,
+    "height": 900
+   },
+   {
+    "nodeId": "166:2",
+    "name": "BL-0149 / email / ticket-received / 700",
+    "page": "152:2",
+    "width": 700,
+    "height": 900
+   },
+   {
+    "nodeId": "167:2",
+    "name": "BL-0150 / email / verify-email / 700",
+    "page": "152:2",
+    "width": 700,
+    "height": 900
+   },
+   {
+    "nodeId": "168:2",
+    "name": "BL-0151 / email / ws-transfer-in / 700",
+    "page": "152:2",
+    "width": 700,
+    "height": 900
+   },
+   {
+    "nodeId": "169:2",
+    "name": "BL-0152 / email / ws-transfer-invite / 700",
+    "page": "152:2",
+    "width": 700,
+    "height": 900
+   },
+   {
+    "nodeId": "170:2",
+    "name": "BL-0153 / email / ws-transfer-out / 700",
+    "page": "152:2",
+    "width": 700,
+    "height": 900
+   },
+   {
+    "nodeId": "115:2",
+    "name": "BL-0155 / settings-api-tokens / new-token-modal / 1440",
+    "page": "125:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "116:2",
+    "name": "BL-0156 / settings-danger / delete-workspace-confirm / 1440",
+    "page": "125:2",
+    "width": 1440,
+    "height": 1466
+   },
+   {
+    "nodeId": "117:2",
+    "name": "BL-0158 / dashboard-media / new-folder-modal / 1440",
+    "page": "125:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "140:2",
+    "name": "BL-0177 / templates-detail / template-use-flow / 1440",
+    "page": "125:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "136:2",
+    "name": "BL-0178 / dashboard / dunning-banner-PAST_DUE / 1440",
+    "page": "138:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "137:2",
+    "name": "BL-0179 / settings-billing / billing-PAST_DUE / 1440",
+    "page": "138:2",
+    "width": 1440,
+    "height": 1440
+   },
+   {
+    "nodeId": "139:2",
+    "name": "BL-0180 / settings-team / team-as-VIEWER / 1440",
+    "page": "138:2",
+    "width": 1440,
+    "height": 900
+   },
+   {
+    "nodeId": "171:2",
+    "name": "BL-0182 / edit/:id?rail=e3 / experimental-rail-e3 / 1440",
+    "page": "173:2",
+    "width": 1440,
+    "height": 905
+   },
+   {
+    "nodeId": "174:2",
+    "name": "BL-0183 / edit/:id?rail=legacy / experimental-rail-legacy / 1440",
+    "page": "173:2",
+    "width": 1440,
+    "height": 900
+   }
+  ],
+  "cgTtpYQuI286gsmEQJmVEe": [],
+  "wQsxXDoVQ2LpPkpnaKIVtR": [
+   {
+    "nodeId": "1:3",
+    "name": "BL-0184 / MUSEUM / D1 / T3",
+    "page": "1:2",
+    "width": 800,
+    "height": 145
+   },
+   {
+    "nodeId": "1:7",
+    "name": "BL-0185 / MUSEUM / D2 / T3",
+    "page": "1:2",
+    "width": 800,
+    "height": 145
+   },
+   {
+    "nodeId": "1:11",
+    "name": "BL-0186 / MUSEUM / D3 / T3",
+    "page": "1:2",
+    "width": 800,
+    "height": 145
+   },
+   {
+    "nodeId": "1:15",
+    "name": "BL-0187 / MUSEUM / D4 / T3",
+    "page": "1:2",
+    "width": 800,
+    "height": 145
+   },
+   {
+    "nodeId": "1:19",
+    "name": "BL-0188 / MUSEUM / D5 / T3",
+    "page": "1:2",
+    "width": 800,
+    "height": 145
+   },
+   {
+    "nodeId": "1:23",
+    "name": "BL-0189 / MUSEUM / D6 / T3",
+    "page": "1:2",
+    "width": 800,
+    "height": 145
+   },
+   {
+    "nodeId": "1:27",
+    "name": "BL-0190 / MUSEUM / D7 / T3",
+    "page": "1:2",
+    "width": 800,
+    "height": 145
+   },
+   {
+    "nodeId": "1:31",
+    "name": "BL-0191 / MUSEUM / D8 / T3",
+    "page": "1:2",
+    "width": 800,
+    "height": 145
+   },
+   {
+    "nodeId": "1:35",
+    "name": "BL-0192 / MUSEUM / D9 / T3",
+    "page": "1:2",
+    "width": 800,
+    "height": 145
+   },
+   {
+    "nodeId": "1:39",
+    "name": "BL-0193 / MUSEUM / D10 / T3",
+    "page": "1:2",
+    "width": 800,
+    "height": 145
+   },
+   {
+    "nodeId": "1:43",
+    "name": "BL-0194 / MUSEUM / D11 / T3",
+    "page": "1:2",
+    "width": 800,
+    "height": 145
+   },
+   {
+    "nodeId": "1:47",
+    "name": "BL-0195 / MUSEUM / D12 / T3",
+    "page": "1:2",
+    "width": 800,
+    "height": 145
+   },
+   {
+    "nodeId": "1:51",
+    "name": "BL-0196 / MUSEUM / D13 / T3",
+    "page": "1:2",
+    "width": 800,
+    "height": 145
+   },
+   {
+    "nodeId": "1:55",
+    "name": "BL-0197 / MUSEUM / D14 / T3",
+    "page": "1:2",
+    "width": 800,
+    "height": 145
+   },
+   {
+    "nodeId": "2:2",
+    "name": "BL-0198 / MUSEUM / D15 / T3",
+    "page": "1:2",
+    "width": 800,
+    "height": 145
+   },
+   {
+    "nodeId": "2:6",
+    "name": "BL-0199 / MUSEUM / D16 / T3",
+    "page": "1:2",
+    "width": 800,
+    "height": 167
+   },
+   {
+    "nodeId": "2:10",
+    "name": "BL-0200 / MUSEUM / D17 / T3",
+    "page": "1:2",
+    "width": 800,
+    "height": 145
+   },
+   {
+    "nodeId": "2:14",
+    "name": "BL-0201 / MUSEUM / D18 / T3",
+    "page": "1:2",
+    "width": 800,
+    "height": 145
+   },
+   {
+    "nodeId": "2:18",
+    "name": "BL-0202 / MUSEUM / D19 / T3",
+    "page": "1:2",
+    "width": 800,
+    "height": 167
+   },
+   {
+    "nodeId": "2:22",
+    "name": "BL-0203 / MUSEUM / D22 / T3",
+    "page": "1:2",
+    "width": 800,
+    "height": 145
+   },
+   {
+    "nodeId": "2:26",
+    "name": "BL-0204 / MUSEUM / D23 / T3",
+    "page": "1:2",
+    "width": 800,
+    "height": 145
+   },
+   {
+    "nodeId": "2:30",
+    "name": "BL-0205 / MUSEUM / D24 / T3",
+    "page": "1:2",
+    "width": 800,
+    "height": 145
+   },
+   {
+    "nodeId": "2:34",
+    "name": "BL-0206 / MUSEUM / D25 / T3",
+    "page": "1:2",
+    "width": 800,
+    "height": 145
+   },
+   {
+    "nodeId": "2:38",
+    "name": "BL-0207 / MUSEUM / D26 / T3",
+    "page": "1:2",
+    "width": 800,
+    "height": 145
+   },
+   {
+    "nodeId": "2:42",
+    "name": "BL-0208 / MUSEUM / D27 / T3",
+    "page": "1:2",
+    "width": 800,
+    "height": 145
+   },
+   {
+    "nodeId": "2:46",
+    "name": "BL-0209 / MUSEUM / D28 / T3",
+    "page": "1:2",
+    "width": 800,
+    "height": 145
+   },
+   {
+    "nodeId": "2:50",
+    "name": "BL-0210 / MUSEUM / D29 / T3",
+    "page": "1:2",
+    "width": 800,
+    "height": 145
+   },
+   {
+    "nodeId": "2:54",
+    "name": "BL-0211 / MUSEUM / D30 / T3",
+    "page": "1:2",
+    "width": 800,
+    "height": 145
+   },
+   {
+    "nodeId": "2:58",
+    "name": "BL-0212 / UNCLASSIFIED / standalone dashboard HTML / T3",
+    "page": "1:2",
+    "width": 800,
+    "height": 145
+   }
+  ],
+  "HS0tZANzT3F9HGL0QfuIDJ": [],
+  "Htnvig0uarTGtNhSYg5Pyv": []
+ }
 }

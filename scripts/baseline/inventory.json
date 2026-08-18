@@ -20,7 +20,7 @@
    "date": "2026-08-08",
    "Inter": "PASS",
    "GeistMono": "PASS",
-   "InterTight": "MISSING \u2014 batch 1 (auth/onboarding) blocked until installed"
+   "InterTight": "MISSING — batch 1 (auth/onboarding) blocked until installed"
   },
   "gateKit": {
    "plantedViolationsCaught": [
@@ -54,38 +54,38 @@
    "date": "2026-08-09",
    "scope": "wizard-state manufacture + share/review/transfer",
    "ok": 7,
-   "trap": "wizardDataSchema is FLAT (shared/schemas/onboarding.ts:38); prisma schema comment claims nested data:{} \u2014 comment lies, zod is truth"
+   "trap": "wizardDataSchema is FLAT (shared/schemas/onboarding.ts:38); prisma schema comment claims nested data:{} — comment lies, zod is truth"
   },
   "captureRun5": {
    "date": "2026-08-09",
    "scope": "editor shell + 5 rail panels + 6 topbar surfaces + cmdk",
    "ok": 12,
-   "traps": "rail-drawer rail buttons carry NO testids (tab-* testids are stale source refs) \u2014 drive by :has-text/aria-label; Insert drawer open by default in shell; History/Templates/Components/AI/Settings NOT on rail (post-rebuild IA \u2014 find their entry points in states sweep); cmdk opened via body-click then Meta+k"
+   "traps": "rail-drawer rail buttons carry NO testids (tab-* testids are stale source refs) — drive by :has-text/aria-label; Insert drawer open by default in shell; History/Templates/Components/AI/Settings NOT on rail (post-rebuild IA — find their entry points in states sweep); cmdk opened via body-click then Meta+k"
   },
   "captureRun6": {
    "date": "2026-08-10",
    "scope": "site-menu 11 surfaces + 7 inspector profiles",
    "ok": 18,
-   "traps": "rail panel-state persists per-user server-side (Insert NOT default-open after other runs); flowbite tooltip (z-20) intercepts rail clicks \u2014 force:true insufficient, use keyboard shortcuts (Insert=A) then drawer clicks; insert auto-selects new element (footer shows 'Heading \u00b7 h2') so inspector renders without canvas click; inserts MUTATE fixture site (accepted, e2e data)"
+   "traps": "rail panel-state persists per-user server-side (Insert NOT default-open after other runs); flowbite tooltip (z-20) intercepts rail clicks — force:true insufficient, use keyboard shortcuts (Insert=A) then drawer clicks; insert auto-selects new element (footer shows 'Heading · h2') so inspector renders without canvas click; inserts MUTATE fixture site (accepted, e2e data)"
   },
   "captureRun7": {
    "date": "2026-08-10",
    "scope": "23 email templates (batch 5)",
    "ok": 23,
-   "method": "tsx import \u2192 @react-email/render \u2192 file:// screenshot @800px; default props baked in templates"
+   "method": "tsx import → @react-email/render → file:// screenshot @800px; default props baked in templates"
   },
   "captureRun8": {
    "date": "2026-08-10",
    "scope": "batch-4 set A: 5 dashboard modals + 10 editor drill-ins/menus",
    "ok": 15,
-   "traps": "rail click on ACTIVE family TOGGLES drawer closed \u2014 normalize with Insert(A) first; hover-only controls (List view toggle, row More-options) need hover action before click"
+   "traps": "rail click on ACTIVE family TOGGLES drawer closed — normalize with Insert(A) first; hover-only controls (List view toggle, row More-options) need hover action before click"
   },
   "captureRun9": {
    "date": "2026-08-10",
    "scope": "batch-4 set B: brand/content/publish/template + PAST_DUE + VIEWER variants",
    "ok": 11,
    "blocked": 2,
-   "traps": "Subscription fixture needs 5 stripe fields (schema strict); FIRST pastdue run captured FREE state mislabeled \u2014 pipe ate set -e, shas exposed it (502b17 unchanged = no variant rendered); always sha-compare variant captures against base state"
+   "traps": "Subscription fixture needs 5 stripe fields (schema strict); FIRST pastdue run captured FREE state mislabeled — pipe ate set -e, shas exposed it (502b17 unchanged = no variant rendered); always sha-compare variant captures against base state"
   },
   "captureRun10": {
    "date": "2026-08-10",
@@ -97,14 +97,14 @@
    "method": "route-file scan + email-file scan + ledger-doc scan (independent of capture manifests)",
    "routes": "102/102 covered, 0 missing",
    "emails": "23=23",
-   "deadLedger": "doc 30 = inv 28 museum + 2 live-captured experimental (D20\u2192BL-0182, D21\u2192BL-0183)",
+   "deadLedger": "doc 30 = inv 28 museum + 2 live-captured experimental (D20→BL-0182, D21→BL-0183)",
    "verdict": "NO UNEXPLAINED OMISSION on capture side"
   },
   "framePipeline": {
    "started": "2026-08-10",
-   "method": "generate_figma_design capture (login+CSP-strip Playwright driver figma-capture.mjs) \u2192 rename BL-id \u2192 read-back \u2192 screenshot compare",
-   "checkpointSwap": "fidelity checkpoint moved from auth to dashboard (Inter-only) \u2014 auth frames deferred until Inter Tight installed (13 checks missing); documented tactical adaptation",
-   "firstFrame": "BL-0037 \u2192 Micuc1rmLcFhjxF1A08Kk2#1:2"
+   "method": "generate_figma_design capture (login+CSP-strip Playwright driver figma-capture.mjs) → rename BL-id → read-back → screenshot compare",
+   "checkpointSwap": "fidelity checkpoint moved from auth to dashboard (Inter-only) — auth frames deferred until Inter Tight installed (13 checks missing); documented tactical adaptation",
+   "firstFrame": "BL-0037 → Micuc1rmLcFhjxF1A08Kk2#1:2"
   }
  },
  "rows": [
@@ -228,7 +228,7 @@
    "requires": "session",
    "screenshotHash": "d0d60fed5ebf13b5",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
-   "notes": "loading state (stalled trpc) \u2014 'Completing sign in\u2026' spinner",
+   "notes": "loading state (stalled trpc) — 'Completing sign in…' spinner",
    "figmaNodeId": "182:2",
    "figmaPageId": "183:2"
   },
@@ -498,7 +498,7 @@
    "requires": "token",
    "screenshotHash": "0719a4c24516068f",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
-   "notes": "loading state (stalled trpc) \u2014 'Loading invitation\u2026'; loaded state redirects into signup flow",
+   "notes": "loading state (stalled trpc) — 'Loading invitation…'; loaded state redirects into signup flow",
    "figmaNodeId": "194:2",
    "figmaPageId": "183:2"
   },
@@ -516,7 +516,7 @@
    "requires": "token",
    "screenshotHash": "0719a4c24516068f",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
-   "notes": "loading state \u2014 IDENTICAL render to BL-0021 (same sha, as-built source duplicate)",
+   "notes": "loading state — IDENTICAL render to BL-0021 (same sha, as-built source duplicate)",
    "figmaNodeId": "195:2",
    "figmaPageId": "183:2"
   },
@@ -606,7 +606,7 @@
    "requires": "session",
    "screenshotHash": "825fd34af51ff9b5",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
-   "notes": "session + stalled /api/auth/session \u2014 'Signing you in\u2026' spinner",
+   "notes": "session + stalled /api/auth/session — 'Signing you in…' spinner",
    "figmaNodeId": "208:2",
    "figmaPageId": "183:2"
   },
@@ -660,7 +660,7 @@
    "requires": "token",
    "screenshotHash": "783d2b533613456e",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
-   "notes": "loading state (stalled trpc) \u2014 'Verifying your email\u2026'",
+   "notes": "loading state (stalled trpc) — 'Verifying your email…'",
    "figmaNodeId": "212:2",
    "figmaPageId": "183:2"
   },
@@ -908,7 +908,7 @@
    "pipelineState": "readback-verified",
    "screenshotHash": "de40676cf009514e",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
-   "notes": "agency [id] with ws id \u2014 record as-rendered",
+   "notes": "agency [id] with ws id — record as-rendered",
    "figmaNodeId": "107:2",
    "figmaPageId": "108:2"
   },
@@ -1196,7 +1196,8 @@
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
    "pipelineState": "blocked",
-   "blockReason": "redirects to /settings/integrations without a Vercel connection (as-built conditional)"
+   "blockReason": "redirects to /settings/integrations without a Vercel connection (as-built conditional)",
+   "notes": "BLOCKED (reason established 2026-08-18): /dashboard/settings/integrations/vercel-team-picker redirects to /dashboard/settings/integrations when there is no pending Vercel OAuth team selection. The route exists (app/.../vercel-team-picker/page.tsx, sentinel 'Pick a Vercel team'); it needs a seeded mid-OAuth state, not a session."
   },
   {
    "id": "BL-0064",
@@ -1513,7 +1514,8 @@
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
    "pipelineState": "blocked",
-   "blockReason": "router page \u2014 redirects to current wizard step (nav behavior, no stable frame)"
+   "blockReason": "router page — redirects to current wizard step (nav behavior, no stable frame)",
+   "notes": "NOT A SCREEN (established 2026-08-18): /onboarding is an entry frame — it renders a bare Spinner and router.replace()s to the saved wizard route (observed: /onboarding/workspace). Capturable only with allowRedirect + a spinner sentinel, which would put a transient redirect frame into the baseline. Recommend reclassifying rather than capturing."
   },
   {
    "id": "BL-0084",
@@ -1622,7 +1624,8 @@
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
    "pipelineState": "blocked",
-   "blockReason": "wizard guard \u2014 needs in-progress AI generation state"
+   "blockReason": "wizard guard — needs in-progress AI generation state",
+   "notes": "BLOCKED (reason established 2026-08-18): /onboarding/ai/generating redirects to /onboarding/ai/basics without an active AI draft job. Sentinel is 'Creating your site draft'; the harness supports blockPatterns to stall the job request and hold this loading state open — needs a wizard seeded to the AI path first."
   },
   {
    "id": "BL-0091",
@@ -1637,7 +1640,7 @@
    "pipelineState": "readback-verified",
    "screenshotHash": "e3649b006232ba6c",
    "capturedFrom": "prod@f7b39a4c",
-   "notes": " captured via server wizardData manufacture (onboarding_states, FLAT schema \u2014 prisma comment shows nested data:{} which is WRONG)",
+   "notes": " captured via server wizardData manufacture (onboarding_states, FLAT schema — prisma comment shows nested data:{} which is WRONG)",
    "figmaNodeId": "54:2",
    "figmaPageId": "175:2"
   },
@@ -1686,7 +1689,7 @@
    "pipelineState": "readback-verified",
    "screenshotHash": "0fcf63998137a265",
    "capturedFrom": "prod@f7b39a4c",
-   "notes": " captured via server wizardData manufacture (onboarding_states, FLAT schema \u2014 prisma comment shows nested data:{} which is WRONG)",
+   "notes": " captured via server wizardData manufacture (onboarding_states, FLAT schema — prisma comment shows nested data:{} which is WRONG)",
    "figmaNodeId": "58:2",
    "figmaPageId": "175:2"
   },
@@ -1703,7 +1706,7 @@
    "pipelineState": "readback-verified",
    "screenshotHash": "f32aa1ceddceae69",
    "capturedFrom": "prod@f7b39a4c",
-   "notes": " captured via server wizardData manufacture (onboarding_states, FLAT schema \u2014 prisma comment shows nested data:{} which is WRONG)",
+   "notes": " captured via server wizardData manufacture (onboarding_states, FLAT schema — prisma comment shows nested data:{} which is WRONG)",
    "figmaNodeId": "59:2",
    "figmaPageId": "175:2"
   },
@@ -1720,7 +1723,7 @@
    "pipelineState": "readback-verified",
    "screenshotHash": "9c95e518fa18b2bc",
    "capturedFrom": "prod@f7b39a4c",
-   "notes": " captured via server wizardData manufacture (onboarding_states, FLAT schema \u2014 prisma comment shows nested data:{} which is WRONG)",
+   "notes": " captured via server wizardData manufacture (onboarding_states, FLAT schema — prisma comment shows nested data:{} which is WRONG)",
    "figmaNodeId": "60:2",
    "figmaPageId": "175:2"
   },
@@ -2923,8 +2926,9 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "blocked",
-   "blockReason": "control not reachable via drive recipe (probe lists it; 3 recipe attempts) \u2014 manual capture or deeper recipe needed"
+   "pipelineState": "planned",
+   "blockReason": "control not reachable via drive recipe (probe lists it; 3 recipe attempts) — manual capture or deeper recipe needed",
+   "notes": "UNBLOCKED 2026-08-18: captured (baseline-shots/BL-0171/default.png, 1440x905). The earlier failure was the capture spec, not the app — without \"requires\":\"session\" the harness uses the anonymous context, /edit redirects to /auth, and because the sentinel check runs BEFORE the redirect check the error reads as a .bd-studio timeout. Recipe: requires=session, waitUntil=domcontentloaded, waitMs=9000, sentinel .bd-studio, actions: click button:has-text('Brand') -> click text=Starters -> waitFor text='Applying a starter overwrites your tokens.'. Frame not yet written."
   },
   {
    "id": "BL-0172",
@@ -2937,7 +2941,8 @@
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
    "pipelineState": "blocked",
-   "blockReason": "same as BL-0171"
+   "blockReason": "same as BL-0171",
+   "notes": "BLOCKED (reason established 2026-08-18): NEXT_PUBLIC_FEATURE_DS_AI is unset, so the Brand panel's AI entry points do not render at all — there is no state to capture. Setting only VITE_FEATURE_DS_AI does NOT help: the shipping editor is the Next-bundled one, where import.meta.env.VITE_* does not exist. Set the NEXT_PUBLIC_ half, restart, then capture."
   },
   {
    "id": "BL-0173",
@@ -3125,7 +3130,7 @@
    "viewport": "n/a",
    "figmaFileKey": "wQsxXDoVQ2LpPkpnaKIVtR",
    "pipelineState": "readback-verified",
-   "notes": "non-visual artifact \u2014 inventory entry + annotation only, no frame",
+   "notes": "non-visual artifact — inventory entry + annotation only, no frame",
    "figmaNodeId": "1:3",
    "figmaPageId": "1:2"
   },
@@ -3170,7 +3175,7 @@
    "viewport": "n/a",
    "figmaFileKey": "wQsxXDoVQ2LpPkpnaKIVtR",
    "pipelineState": "readback-verified",
-   "notes": "non-visual artifact \u2014 inventory entry + annotation only, no frame",
+   "notes": "non-visual artifact — inventory entry + annotation only, no frame",
    "figmaNodeId": "1:15",
    "figmaPageId": "1:2"
   },
@@ -3185,7 +3190,7 @@
    "viewport": "n/a",
    "figmaFileKey": "wQsxXDoVQ2LpPkpnaKIVtR",
    "pipelineState": "readback-verified",
-   "notes": "non-visual artifact \u2014 inventory entry + annotation only, no frame",
+   "notes": "non-visual artifact — inventory entry + annotation only, no frame",
    "figmaNodeId": "1:19",
    "figmaPageId": "1:2"
   },
@@ -3215,7 +3220,7 @@
    "viewport": "n/a",
    "figmaFileKey": "wQsxXDoVQ2LpPkpnaKIVtR",
    "pipelineState": "readback-verified",
-   "notes": "non-visual artifact \u2014 inventory entry + annotation only, no frame",
+   "notes": "non-visual artifact — inventory entry + annotation only, no frame",
    "figmaNodeId": "1:27",
    "figmaPageId": "1:2"
   },
@@ -3260,7 +3265,7 @@
    "viewport": "n/a",
    "figmaFileKey": "wQsxXDoVQ2LpPkpnaKIVtR",
    "pipelineState": "readback-verified",
-   "notes": "non-visual artifact \u2014 inventory entry + annotation only, no frame",
+   "notes": "non-visual artifact — inventory entry + annotation only, no frame",
    "figmaNodeId": "1:39",
    "figmaPageId": "1:2"
   },
@@ -3275,7 +3280,7 @@
    "viewport": "n/a",
    "figmaFileKey": "wQsxXDoVQ2LpPkpnaKIVtR",
    "pipelineState": "readback-verified",
-   "notes": "non-visual artifact \u2014 inventory entry + annotation only, no frame",
+   "notes": "non-visual artifact — inventory entry + annotation only, no frame",
    "figmaNodeId": "1:43",
    "figmaPageId": "1:2"
   },
@@ -3305,7 +3310,7 @@
    "viewport": "n/a",
    "figmaFileKey": "wQsxXDoVQ2LpPkpnaKIVtR",
    "pipelineState": "readback-verified",
-   "notes": "non-visual artifact \u2014 inventory entry + annotation only, no frame",
+   "notes": "non-visual artifact — inventory entry + annotation only, no frame",
    "figmaNodeId": "1:51",
    "figmaPageId": "1:2"
   },
@@ -3320,7 +3325,7 @@
    "viewport": "n/a",
    "figmaFileKey": "wQsxXDoVQ2LpPkpnaKIVtR",
    "pipelineState": "readback-verified",
-   "notes": "non-visual artifact \u2014 inventory entry + annotation only, no frame",
+   "notes": "non-visual artifact — inventory entry + annotation only, no frame",
    "figmaNodeId": "1:55",
    "figmaPageId": "1:2"
   },
@@ -3425,7 +3430,7 @@
    "viewport": "n/a",
    "figmaFileKey": "wQsxXDoVQ2LpPkpnaKIVtR",
    "pipelineState": "readback-verified",
-   "notes": "non-visual artifact \u2014 inventory entry + annotation only, no frame",
+   "notes": "non-visual artifact — inventory entry + annotation only, no frame",
    "figmaNodeId": "2:26",
    "figmaPageId": "1:2"
   },
@@ -3440,7 +3445,7 @@
    "viewport": "n/a",
    "figmaFileKey": "wQsxXDoVQ2LpPkpnaKIVtR",
    "pipelineState": "readback-verified",
-   "notes": "non-visual artifact \u2014 inventory entry + annotation only, no frame",
+   "notes": "non-visual artifact — inventory entry + annotation only, no frame",
    "figmaNodeId": "2:30",
    "figmaPageId": "1:2"
   },
@@ -3455,7 +3460,7 @@
    "viewport": "n/a",
    "figmaFileKey": "wQsxXDoVQ2LpPkpnaKIVtR",
    "pipelineState": "readback-verified",
-   "notes": "non-visual artifact \u2014 inventory entry + annotation only, no frame",
+   "notes": "non-visual artifact — inventory entry + annotation only, no frame",
    "figmaNodeId": "2:34",
    "figmaPageId": "1:2"
   },
@@ -3470,7 +3475,7 @@
    "viewport": "n/a",
    "figmaFileKey": "wQsxXDoVQ2LpPkpnaKIVtR",
    "pipelineState": "readback-verified",
-   "notes": "non-visual artifact \u2014 inventory entry + annotation only, no frame",
+   "notes": "non-visual artifact — inventory entry + annotation only, no frame",
    "figmaNodeId": "2:38",
    "figmaPageId": "1:2"
   },
@@ -3485,7 +3490,7 @@
    "viewport": "n/a",
    "figmaFileKey": "wQsxXDoVQ2LpPkpnaKIVtR",
    "pipelineState": "readback-verified",
-   "notes": "non-visual artifact \u2014 inventory entry + annotation only, no frame",
+   "notes": "non-visual artifact — inventory entry + annotation only, no frame",
    "figmaNodeId": "2:42",
    "figmaPageId": "1:2"
   },
@@ -3541,7 +3546,7 @@
    "sourceFile": "packages/dashboard/newdeisgn/Buildrik Dashboard (standalone) (1).html (UNTRACKED)",
    "statusClass": 13,
    "flow": "unclassified",
-   "state": "standalone dashboard HTML \u2014 untracked working-tree file",
+   "state": "standalone dashboard HTML — untracked working-tree file",
    "viewport": "n/a",
    "figmaFileKey": "wQsxXDoVQ2LpPkpnaKIVtR",
    "pipelineState": "readback-verified",
