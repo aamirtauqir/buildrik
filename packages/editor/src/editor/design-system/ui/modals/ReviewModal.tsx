@@ -145,6 +145,14 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
                       </svg>
                       <div className={SWATCH} style={{ background: diff.currentValue }} />
                       <span className={NAME}>{token?.name ?? diff.tokenId}</span>
+                      {/* Board 1172:4840 prints the transition as text —
+                          "#1A56DB → #1E429F" — beside the row. Two swatches
+                          say a colour changed; they cannot say to WHAT, and
+                          this is the last screen before every element bound to
+                          the token moves. */}
+                      <span className={WAS}>{diff.previousValue}</span>
+                      <span className="tw:text-xs tw:text-gray-500">→</span>
+                      <span className={NOW}>{diff.currentValue}</span>
                     </div>
                   );
                 })}
