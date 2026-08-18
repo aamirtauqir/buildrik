@@ -119,6 +119,7 @@
    "commitsTouching": {
     "shell": 53,
     "brand": 44,
+    "media": 37,
     "canvas": 30,
     "inspector": 23,
     "publish": 17,
@@ -126,8 +127,7 @@
     "chrome-ui": 10,
     "layers": 8,
     "pages": 7,
-    "media": 0,
-    "insert": 0
+    "insert": 3
    },
    "note": "Commit counts are a WHERE-TO-LOOK signal, not a verdict — a commit can touch a surface without moving a pixel. The one row measured properly (BL-0169 brand-pro-mode, recaptured on the seed fixture) differs by 45.67% of pixels. media and insert are the only surfaces untouched since the pin.",
    "measuredRows": {
@@ -164,7 +164,14 @@
     "BL-0116 sitemenu-templates": "8.01% REDRAW (borderline)",
     "BL-0118 sitemenu-design-system": "15.72% REDRAW",
     "BL-0122 sitemenu-open": "11.87% REDRAW",
-    "BL-0115 sitemenu-export-code": "22.02% REDRAW"
+    "BL-0115 sitemenu-export-code": "22.02% REDRAW",
+    "BL-0159 media-stock-browser": "2.38% keep",
+    "BL-0160 media-icon-picker": "2.81% keep",
+    "BL-0161 media-fullpage-library": "40.73% REDRAW",
+    "BL-0164 pages-add-page": "3.27% keep",
+    "BL-0165 pages-listings-view": "1.08% keep",
+    "BL-0166 pages-more-add-options": "4.03% keep",
+    "BL-0167 pages-fullpage": "28.99% REDRAW"
    },
    "shellBandNote": "FOUNDER CALL 2026-08-18: redraw a frame only when its PANEL moved; the shell band in every editor frame stays as drawn and is known-stale — it predates ReviewBar (869cebb2, 2026-08-17). Componentising the shell was considered and declined for now: the frames hold zero components (433 raw frames each), so there is nothing to swap without building it first.",
    "unmeasured": {
@@ -177,7 +184,8 @@
     "BL-0112/0113/0117/0121": "site-settings, version-history, components and keyboard-shortcuts are no longer labels in the site menu — their routes changed since the pin and each needs its door found again before it can be captured."
    },
    "specsMustAssertTheState": "A capture spec whose actions do not END in a waitFor on something the state proves will happily screenshot the state it failed to open, and the diff then reports a plausible number. Caught here: comments-open and review-pill-open both read exactly 10.86%, which is the shell region and nothing else — adding waitFor on [role=menu],[role=dialog],[role=listbox] turned both into honest FAILs while the other four still passed.",
-   "capturesLeakThroughLocalStorage": "capture.mjs runs every screen in ONE browser context, and the editor remembers its open panel in localStorage. So screen N's destination is still open when screen N+1 loads: an 'Export code' capture came back showing Version History because the previous row had opened it. Normalise at the top of each spec's actions (click a known rail tab first) or the batch quietly measures the wrong screens — the first sitemenu run produced three PAIRS of identical percentages and two byte-identical PNGs."
+   "capturesLeakThroughLocalStorage": "capture.mjs runs every screen in ONE browser context, and the editor remembers its open panel in localStorage. So screen N's destination is still open when screen N+1 loads: an 'Export code' capture came back showing Version History because the previous row had opened it. Normalise at the top of each spec's actions (click a known rail tab first) or the batch quietly measures the wrong screens — the first sitemenu run produced three PAIRS of identical percentages and two byte-identical PNGs.",
+   "correction": "An earlier version of this table said media 0 and insert 0, and a commit message repeated that they were 'the only surfaces untouched since the pin'. Both were wrong. The media count was taken with two paths in one unquoted shell variable and came back 0 instead of 37; the insert count was 0 because the path it named does not exist (the tab is sidebar/tabs/elements + ElementsTab.tsx, not sidebar/tabs/insert). No editor surface is untouched since the pin. This is exactly why the founder's per-row pixel measure is the authority and the counts are only a where-to-look hint: BL-0103, the media panel ROOT, measures 2.13%% and is identical by eye, while BL-0161, the media FULL-PAGE library on the same 37-commit surface, measures 40.73%% and was rebuilt outright — 'Media library EXPANDED' with Stock/Compact became 'Asset Library MANAGE' with a folders sidebar and Import URL. One commit count cannot tell those two apart. The pixels can."
   },
   "driftRegions": {
    "_note": "Whole-frame comparison does not work: the alignment search picks dy=0 because the topbar never moved and the canvas content dominates, so the ReviewBar offset below it is never cancelled. Each state family needs the band its state actually lives in. Rail is 0-60, drawer 60-380, canvas 380-1140, inspector 1140-1440; the shell above starts at 56.",
@@ -210,9 +218,16 @@
     "BL-0115",
     "BL-0116",
     "BL-0118",
-    "BL-0122"
+    "BL-0122",
+    "BL-0159",
+    "BL-0160",
+    "BL-0161",
+    "BL-0164",
+    "BL-0165",
+    "BL-0166",
+    "BL-0167"
    ],
-   "remaining": 26,
+   "remaining": 19,
    "note": "Each remaining row needs its capture spec rebuilt by hand — the originals were never committed (only screens-auth.json was). Reaching a state is the slow part: BL-0159's stock browser took three attempts because the entry moved into the panel footer as 'Browse stock' and even that lands on a source picker. Log in as the seed fixture's owner (qa@buildrik.local), not your own user, or /edit redirects and the failure reads as a sentinel timeout."
   }
  },

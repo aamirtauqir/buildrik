@@ -1,53 +1,82 @@
 {
- "commit": "c721e3a9",
+ "commit": "158b31c6",
  "base": "http://localhost:3000",
- "generated": "2026-08-18T17:06:18.954Z",
+ "generated": "2026-08-18T17:12:25.180Z",
  "captures": [
   {
-   "id": "BL-0122",
+   "id": "BL-0161",
    "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "state": "sitemenu-open__drift",
+   "state": "media-fullpage-library__drift",
    "status": 200,
-   "sha256": "8df6b37baf282568",
+   "sha256": "01e1571f2396aeae",
    "scrollHeight": 905,
-   "elCount": 82
+   "elCount": 47
   },
   {
-   "id": "BL-0114",
+   "id": "BL-0160",
    "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "state": "sitemenu-publish-history__drift",
+   "state": "media-icon-picker__drift",
    "status": 200,
-   "sha256": "09ccf0fe82dfa2b0",
+   "sha256": "164943e5e48c6b6f",
    "scrollHeight": 905,
-   "elCount": 20
+   "elCount": 50
   },
   {
-   "id": "BL-0115",
+   "id": "BL-0159",
    "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "state": "sitemenu-export-code__drift",
+   "state": "media-stock-browser__drift",
    "status": 200,
-   "sha256": "70e03e5b334a7684",
+   "sha256": "9370fbbbf5a2baa0",
    "scrollHeight": 905,
-   "elCount": 83
+   "elCount": 53
   },
   {
-   "id": "BL-0116",
+   "id": "BL-0167",
    "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "state": "sitemenu-templates__drift",
+   "state": "pages-fullpage__drift",
    "status": 200,
-   "sha256": "9aaa9658e2476c6a",
+   "sha256": "293af973348b4f79",
    "scrollHeight": 905,
-   "elCount": 32
+   "elCount": 21
   },
   {
-   "id": "BL-0118",
+   "id": "BL-0165",
    "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "state": "sitemenu-design-system__drift",
+   "state": "pages-listings-view__drift",
    "status": 200,
-   "sha256": "c9c89ffc966612af",
+   "sha256": "9c541f913ed06b89",
    "scrollHeight": 905,
-   "elCount": 20
+   "elCount": 26
+  },
+  {
+   "id": "BL-0166",
+   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
+   "state": "pages-more-add-options__drift",
+   "status": 200,
+   "sha256": "bbc7b3c5238e4c6e",
+   "scrollHeight": 905,
+   "elCount": 21
+  },
+  {
+   "id": "BL-0164",
+   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
+   "state": "pages-add-page__drift",
+   "status": 200,
+   "sha256": "3e3c0429f92b7a01",
+   "scrollHeight": 905,
+   "elCount": 21
   }
  ],
- "failures": []
+ "failures": [
+  {
+   "id": "BL-0162",
+   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
+   "error": "page.click: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[aria-label=\\'List view\\']')\u001b[22m\n\u001b[2m    - locator resolved to <button disabled type=\"button\" title=\"List view\" aria-label=\"List view\" class=\"tw:inline-flex tw:items-center tw:justify-center tw:h-8 tw:w-8 tw:border-0 tw:rounded-md tw:bg-transparent tw:text-gray-600 tw:cursor-pointer tw:[transition:var(--bk-transition-fast)] tw:enabled:hover:bg-gray-100 tw:enabled:hover:text-gray-900 tw:aria-pressed:bg-blue-50 tw:aria-pressed:text-blue-700 tw:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)] tw:disabled:opacity-50 tw:disabled:cursor-not-allowed tw:…>…</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    15 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not enabled\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
+  },
+  {
+   "id": "BL-0163",
+   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
+   "error": "page.click: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[aria-label=\\'More options for Home\\']')\u001b[22m\n\u001b[2m    - locator resolved to <button type=\"button\" aria-haspopup=\"menu\" aria-expanded=\"false\" aria-label=\"More options for Home\" class=\"tw:relative tw:flex tw:items-center tw:justify-center tw:rounded-lg tw:text-center tw:font-medium tw:focus:outline-none tw:focus:ring-4 tw:h-10 tw:px-5 tw:text-sm tw:bg-primary-700 tw:text-white tw:hover:bg-primary-800 tw:focus:ring-primary-300 tw:dark:bg-primary-600 tw:dark:hover:bg-primary-700 tw:dark:focus:ring-primary-800 bd-pg-row-overflow\">…</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    15 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
+  }
+ ]
 }
