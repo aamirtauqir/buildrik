@@ -44,7 +44,7 @@ const payload = kept.slice(0, MAX).map((n, i) => {
   const py = p >= 0 ? kept[p].y : 0;
   return [p, r1(n.x - px), r1(n.y - py), r1(n.w), r1(n.h), n.text, n.fs, n.fw,
           n.col, n.bg, n.border ? n.border.w.map(r1) : null, n.border ? n.border.c : null,
-          n.radius, n.op, n.svg || null];
+          n.radius, n.op, n.svg || null, n.ff, n.tt, n.ls];
 });
 
 console.log(JSON.stringify(payload));

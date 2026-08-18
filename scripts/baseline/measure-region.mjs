@@ -69,8 +69,17 @@ for (const s of specs) {
         if (r.right < rx || r.left > rx + rw || r.bottom < ry || r.top > ry + rh) return;
         const cs = getComputedStyle(el);
         if (cs.visibility === "hidden" || cs.display === "none" || +cs.opacity === 0) return;
-        const own = [...el.childNodes].filter((n) => n.nodeType === 3 && n.textContent.trim())
-          .map((n) => n.textContent.trim()).join(" ");
+        /* Join the raw text nodes, do not trim each one first. JSX writes
+           `{n} variant{n > 1 ? "s" : ""}` as two adjacent text nodes, and
+           trimming then joining with a space produced "3 variant s". */
+        const parts = [...el.childNodes].filter((n) => n.nodeType === 3);
+        let own = parts.map((n) => n.textContent).join("").replace(/\s+/g, " ").trim();
+        /* An empty field still shows its placeholder, which is an attribute and
+           not a text node — the Insert drawer's "Search elements" was missing
+           from the rebuild until this. */
+        if (!own && (el.tagName === "INPUT" || el.tagName === "TEXTAREA") && el.placeholder) {
+          own = el.placeholder;
+        }
         const bg = hex(cs.backgroundColor);
         /* Read each side's colour, not just the top one. A row with only a
            left border inherits `currentColor` on the other three, and reading
@@ -88,7 +97,17 @@ for (const s of specs) {
            the rail, all of which merely touch the band's edge. */
         const inside = r.left >= rx - 1 && r.top >= ry - 1 &&
                        r.right <= rx + rw + 1 && r.bottom <= ry + rh + 1;
-        if (inside && (own || bg || bw.some(Boolean) || svgEl)) {
+        /* Skip what a scroll container has clipped away. The DOM holds every
+           row of a scrolled list; the reference render shows only the visible
+           ones, and copying the rest stacks hidden rows under the footer. */
+        let clipped = false;
+        for (let a = el.parentElement; a && !clipped; a = a.parentElement) {
+          const acs = getComputedStyle(a);
+          if (!/auto|scroll|hidden/.test(acs.overflowY + acs.overflowX)) continue;
+          const ar = a.getBoundingClientRect();
+          if (r.top >= ar.bottom - 1 || r.bottom <= ar.top + 1) clipped = true;
+        }
+        if (!clipped && inside && (own || bg || bw.some(Boolean) || svgEl)) {
           out.push({
             d: depth, tag: el.tagName.toLowerCase(),
             x: +(r.x - rx).toFixed(1), y: +(r.y - ry).toFixed(1),
@@ -96,6 +115,13 @@ for (const s of specs) {
             text: own || null,
             fs: own ? parseFloat(cs.fontSize) : null,
             fw: own ? +cs.fontWeight : null,
+            /* Family and transform, or the rebuild silently retypes the app.
+               The editor sets Geist Mono for data (token names) and uppercases
+               some labels in CSS — read as DOM text, "NO DARK VALUE" arrives
+               as "No dark value". */
+            ff: own ? cs.fontFamily.split(",")[0].replace(/["']/g, "").trim() : null,
+            tt: own && cs.textTransform !== "none" ? cs.textTransform : null,
+            ls: own && cs.letterSpacing !== "normal" ? parseFloat(cs.letterSpacing) : null,
             lh: own ? cs.lineHeight : null,
             col: own ? hex(cs.color) : null,
             align: own ? cs.textAlign : null,

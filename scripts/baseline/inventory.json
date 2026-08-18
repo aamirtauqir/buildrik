@@ -143,7 +143,7 @@
    "panelRegionMethod": "drift-diff.mjs --region 60,56,320,844 confines the comparison to the left drawer and searches +-64px of vertical alignment. It settles on dy=48px by itself — the ReviewBar's own height — which is the shell offset cancelled. Calibrated: media 2.13% (zero commits since the pin, panel confirmed identical by eye), layers 4.23% (the eye/lock icons were recoloured), brand 15.70% (tabs became a drill-in list). Read >~8% as 'the panel moved'.",
    "panelDrift": {
     "_threshold": ">~8% = the panel moved; below = keep the frame (calibrated on media 2.13%, zero commits since the pin, confirmed identical by eye)",
-    "BL-0100 shell-default": "10.51% REDRAW",
+    "BL-0100 shell-default": "10.51% REDRAWN (96.85% agreement)",
     "BL-0101 panel-layers": "4.23% keep",
     "BL-0102 panel-pages": "1.71% keep",
     "BL-0103 panel-media": "2.13% keep",
@@ -172,9 +172,9 @@
     "BL-0165 pages-listings-view": "1.08% keep",
     "BL-0166 pages-more-add-options": "4.03% keep",
     "BL-0167 pages-fullpage": "28.99% REDRAW",
-    "BL-0170 brand-dark-preview": "15.38% REDRAW",
+    "BL-0170 brand-dark-preview": "15.38% REDRAWN (95.83% agreement)",
     "BL-0173 brand-styles-tab": "12.43% REDRAWN (97.35% agreement)",
-    "BL-0174 brand-components-tab": "15.86% REDRAW",
+    "BL-0174 brand-components-tab": "15.86% REDRAWN (96.20% agreement)",
     "BL-0175 content-create-collection": "26.14% REDRAW (modal region 400,120,640,660)",
     "BL-0112 sitemenu-site-settings": "9.42% REDRAW",
     "BL-0113 sitemenu-version-history": "10.45% REDRAW",
@@ -255,9 +255,13 @@
    "remainingRows": "BL-0107, BL-0110, BL-0121 (doors not found) · BL-0119 (broken door), BL-0120 (opens a new tab), BL-0172 (feature flag off), BL-0123 (no such element in the fixture), BL-0171 (captured fresh, no prior shot to diff) · BL-0162, BL-0163, BL-0168 (controls refuse the click from a spec)",
    "redrawn": [
     "BL-0105",
-    "BL-0173"
+    "BL-0100",
+    "BL-0170",
+    "BL-0173",
+    "BL-0174"
    ],
-   "redrawCost": "BL-0105, the first: 1 clean recapture (the rail tooltip was covering a row in the first reference), 1 computed-style measuring probe, 5 use_figma calls (structure / rows / footer / icons / icon size), 3 screenshots to check. The subtree is 260 nodes; building it as data-driven auto-layout rather than node by node is what kept it to five calls."
+   "redrawCost": "BL-0105, the first: 1 clean recapture (the rail tooltip was covering a row in the first reference), 1 computed-style measuring probe, 5 use_figma calls (structure / rows / footer / icons / icon size), 3 screenshots to check. The subtree is 260 nodes; building it as data-driven auto-layout rather than node by node is what kept it to five calls.",
+   "redrawRemaining": 20
   }
  },
  "rows": [
@@ -1942,7 +1946,8 @@
    "screenshotHash": "dcaff6eb45f92ba8",
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "62:2",
-   "figmaPageId": "75:2"
+   "figmaPageId": "75:2",
+   "notes": "REDRAWN 2026-08-19 (drift 10.51%). Drawer subtree rebuilt from the measured live DOM through measure-region.mjs → pack-measure.mjs → a use_figma interpreter; 96.85% pixel agreement against the reference render. Shell band left as drawn per the founder call. Note: search placeholder restored and the element list clipped where the app clips it."
   },
   {
    "id": "BL-0101",
@@ -3068,7 +3073,8 @@
    "screenshotHash": "da4e287ce998449d",
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "130:2",
-   "figmaPageId": "75:2"
+   "figmaPageId": "75:2",
+   "notes": "REDRAWN 2026-08-19 (drift 15.38%). Drawer subtree rebuilt from the measured live DOM through measure-region.mjs → pack-measure.mjs → a use_figma interpreter; 95.83% pixel agreement against the reference render. Shell band left as drawn per the founder call. Note: token names in Geist Mono, and the CSS-uppercased summary label."
   },
   {
    "id": "BL-0171",
@@ -3113,7 +3119,7 @@
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "131:2",
    "figmaPageId": "75:2",
-   "notes": "REDRAWN 2026-08-18 (drift 12.43%). Drawer subtree 131:124 rebuilt from the measured live DOM via measure-region.mjs → pack-measure.mjs → a use_figma interpreter. 97.35% pixel agreement. The row this frame is named after is labelled **Presets** in the app now, not Styles."
+   "notes": "REDRAWN 2026-08-19 (drift 12.43%). Drawer subtree rebuilt from the measured live DOM through measure-region.mjs → pack-measure.mjs → a use_figma interpreter; 97.35% pixel agreement against the reference render. Shell band left as drawn per the founder call. Note: the row this frame is named after is labelled Presets in the app now."
   },
   {
    "id": "BL-0174",
@@ -3129,7 +3135,8 @@
    "screenshotHash": "e63ba326489b7e23",
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "132:2",
-   "figmaPageId": "75:2"
+   "figmaPageId": "75:2",
+   "notes": "REDRAWN 2026-08-19 (drift 15.86%). Drawer subtree rebuilt from the measured live DOM through measure-region.mjs → pack-measure.mjs → a use_figma interpreter; 96.20% pixel agreement against the reference render. Shell band left as drawn per the founder call. Note: eighteen component rows with variant counts."
   },
   {
    "id": "BL-0175",
