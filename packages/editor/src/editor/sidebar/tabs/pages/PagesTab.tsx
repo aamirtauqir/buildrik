@@ -63,6 +63,10 @@ export const PagesTab: React.FC<PagesTabProps> = ({
 
   // Delete confirmation state — UI concern lives here, not in usePages
   const [deleteTargetId, setDeleteTargetId] = React.useState<string | null>(null);
+  /* Board 183:2 confirms a BULK delete by name before it happens — "Delete 3
+     pages?" over the list of them. The single-page path has always asked;
+     selecting three and pressing Delete removed all three on the spot. */
+  const [bulkDeleteIds, setBulkDeleteIds] = React.useState<string[] | null>(null);
   const deleteTarget = p.pages.find((pg) => pg.id === deleteTargetId);
 
   // Name conflict error state (Screen GoEJk)
@@ -143,7 +147,9 @@ export const PagesTab: React.FC<PagesTabProps> = ({
     bulk.clearSelection();
   }, [bulk.selectedIds, p.duplicatePage, bulk.clearSelection]);
 
-  const handleBulkDelete = React.useCallback(() => {
+  /** Resolve what a bulk delete would actually remove, applying the same
+   *  guards as the per-page path: never the home page, never the last one. */
+  const resolveBulkDeletable = React.useCallback((): string[] => {
     const selected = [...bulk.selectedIds];
     // The home page is never bulk-deletable (matches the per-page guard).
     let deletable = selected.filter((id) => {
@@ -163,11 +169,21 @@ export const PagesTab: React.FC<PagesTabProps> = ({
       // explanatory toast instead of nothing happening.
       if (selected.length > 0) p.deletePage(selected[0]);
       bulk.clearSelection();
-      return;
+      return [];
     }
-    deletable.forEach((id) => p.deletePage(id));
-    bulk.clearSelection();
+    return deletable;
   }, [bulk.selectedIds, p.pages, p.deletePage, orderedPageIds, bulk.clearSelection]);
+
+  const handleBulkDelete = React.useCallback(() => {
+    const deletable = resolveBulkDeletable();
+    if (deletable.length > 0) setBulkDeleteIds(deletable);
+  }, [resolveBulkDeletable]);
+
+  const confirmBulkDelete = React.useCallback(() => {
+    (bulkDeleteIds ?? []).forEach((id) => p.deletePage(id));
+    setBulkDeleteIds(null);
+    bulk.clearSelection();
+  }, [bulkDeleteIds, p.deletePage, bulk.clearSelection]);
 
   const handleBulkMoveToFolder = React.useCallback(
     (folderId: string) => {
@@ -302,6 +318,19 @@ export const PagesTab: React.FC<PagesTabProps> = ({
         confirmLabel="Delete Page"
         tone="destructive"
       />
+      {/* Board 183:2 — the bulk confirm names what goes. */}
+      <ConfirmDialog
+        open={!!bulkDeleteIds}
+        onClose={() => setBulkDeleteIds(null)}
+        onConfirm={confirmBulkDelete}
+        title={`Delete ${bulkDeleteIds?.length ?? 0} page${(bulkDeleteIds?.length ?? 0) === 1 ? "" : "s"}?`}
+        message={`${(bulkDeleteIds ?? [])
+          .map((id) => `“${p.pages.find((pg) => pg.id === id)?.name ?? id}”`)
+          .join(", ")} will be removed from this site. This cannot be undone.`}
+        confirmLabel="Delete pages"
+        tone="destructive"
+      />
+
       {/* ⌘K command palette */}
       {paletteOpen && (
         <PageCommandPalette

@@ -572,7 +572,7 @@
       "width": 1080,
       "height": 776,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -583,7 +583,7 @@
       "width": 1080,
       "height": 776,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -605,7 +605,7 @@
       "width": 1080,
       "height": 776,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -616,7 +616,7 @@
       "width": 1080,
       "height": 776,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -627,7 +627,7 @@
       "width": 1080,
       "height": 776,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -649,7 +649,7 @@
       "width": 1080,
       "height": 776,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -660,7 +660,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -671,7 +671,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -693,7 +693,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -704,7 +704,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -1584,7 +1584,7 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -1595,7 +1595,7 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "undecided",
+      "authority": "board:165-71",
       "recipe": null
     },
     {
@@ -1606,7 +1606,7 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -1617,7 +1617,7 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -3883,7 +3883,7 @@
       "width": 0,
       "height": 0,
       "status": "active",
-      "authority": "undecided",
+      "authority": "blocked:sync-delete",
       "recipe": null
     },
     {
@@ -3894,7 +3894,7 @@
       "width": 0,
       "height": 0,
       "status": "active",
-      "authority": "undecided",
+      "authority": "blocked:sync-delete",
       "recipe": null
     },
     {
@@ -3905,7 +3905,7 @@
       "width": 0,
       "height": 0,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -4400,7 +4400,7 @@
       "width": 480,
       "height": 0,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -4411,7 +4411,7 @@
       "width": 0,
       "height": 0,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
