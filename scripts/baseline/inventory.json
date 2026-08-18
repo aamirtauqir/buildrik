@@ -203,7 +203,8 @@
    "offRailDoorsAreByDesign": "Settings, Version History, Components, Publish and History have no rail icon: the rail is six items by board 52:2, and LeftSidebar says off-rail panels open from ⌘K, shortcuts and the topbar (guarded by tabsConfig.figma.test.ts). Checked before calling anything stranded — pressing S really does open Settings. So the inventory rows named 'sitemenu-site-settings' and 'sitemenu-version-history' are still capturable, just not from the site menu: S, H, ⇧A, U reach them.",
    "knownResiduals": "Two things a DOM measure cannot reach, both small and both recorded rather than faked: unit suffixes in the inspector ('px' after a number) are CSS ::after content and have no node to read; and Figma renders Inter a shade wider than Chrome, so a line of wrapped copy can break one word earlier or later. Text alignment WAS missing for the first inspector frame (labels are right-aligned in the app, left in BL-0129) and is captured from BL-0124 on.",
    "correctionSiteMenu": "An earlier note here said site-settings, version-history, components and keyboard-shortcuts were 'no longer labels in the site menu'. They are all there — the claim came from a regex over SiteMenu.tsx that only matched a subset of the markup. Measuring the open menu listed nineteen items across five groups, including all four.",
-   "overlayMeasureNotes": "Overlays needed three fixes before they measured at all. The walk stopped descending at a zero-size box, and a portal root has no size — every popover came back as two nodes. It also stopped descending when a node fell outside the region, but an absolutely-positioned child escapes its parent: the site menu hangs off the 32x32 topbar button, nowhere near the region the menu occupies. And a region-only walk picked up the page BEHIND the overlay, so specs now name a `root` selector and the walk starts there."
+   "overlayMeasureNotes": "Overlays needed three fixes before they measured at all. The walk stopped descending at a zero-size box, and a portal root has no size — every popover came back as two nodes. It also stopped descending when a node fell outside the region, but an absolutely-positioned child escapes its parent: the site menu hangs off the 32x32 topbar button, nowhere near the region the menu occupies. And a region-only walk picked up the page BEHIND the overlay, so specs now name a `root` selector and the walk starts there.",
+   "measureRespectsAncestorOpacity": "Opacity does not inherit as a computed value, so a child of a faded ancestor still reports opacity 1. Until the walk checked ancestors, a CLOSED panel measured as a full screen of content — 50 nodes with real geometry for a surface at opacity 0. The walk climbs now."
   },
   "driftRegions": {
    "_note": "Whole-frame comparison does not work: the alignment search picks dy=0 because the topbar never moved and the canvas content dominates, so the ReviewBar offset below it is never cancelled. Each state family needs the band its state actually lives in. Rail is 0-60, drawer 60-380, canvas 380-1140, inspector 1140-1440; the shell above starts at 56.",
@@ -272,14 +273,16 @@
     "BL-0127",
     "BL-0128",
     "BL-0129",
+    "BL-0161",
     "BL-0167",
+    "BL-0169",
     "BL-0170",
     "BL-0173",
     "BL-0174",
     "BL-0176"
    ],
    "redrawCost": "BL-0105, the first: 1 clean recapture (the rail tooltip was covering a row in the first reference), 1 computed-style measuring probe, 5 use_figma calls (structure / rows / footer / icons / icon size), 3 screenshots to check. The subtree is 260 nodes; building it as data-driven auto-layout rather than node by node is what kept it to five calls.",
-   "redrawRemaining": 5
+   "redrawRemaining": 3
   }
  },
  "rows": [
@@ -2157,11 +2160,12 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "readback-verified",
+   "pipelineState": "written",
    "screenshotHash": "fe0abc498e23fc90",
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "77:2",
-   "figmaPageId": "75:2"
+   "figmaPageId": "75:2",
+   "notes": "REBUILT 2026-08-19 but NOT VERIFIED, and the reason is a product defect. The Settings full-page surface never paints: its content mounts (text=DISTRIBUTION is in the DOM and waitable) while the panel ancestor stays `.ls-panel--closed` at opacity 0 and width 1. Confirmed in a plain browser with no animation kill and no frozen clock, through BOTH doors — the site menu's 'Site settings' and the S shortcut — and through 'Plugins'. So the old reference render, which shows an empty page under a 'Settings' header, was RIGHT, and the 9.42% drift measured against it was measuring one blank against another. An earlier probe in this session reported the nav as rendering; it was reading innerText, which a zero-opacity subtree still returns. The rebuild follows the measured DOM and is the structure the surface would show — it cannot be accepted by eye until the panel opens."
   },
   {
    "id": "BL-0113",
@@ -2960,7 +2964,8 @@
    "screenshotHash": "26eb8b3078ed2bbc",
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "120:2",
-   "figmaPageId": "75:2"
+   "figmaPageId": "75:2",
+   "notes": "REDRAWN 2026-08-19 (drift 40.73%). The old frame drew this as a 560px drawer beside the canvas and inspector — 'Media library EXPANDED'. Today it is a full-width takeover, so the sidebar ancestors were widened to 1379 and the canvas and inspector it covers were removed. Rebuilt from the measured live DOM: folders rail, toolbar with Import URL / Upload / Add from stock, empty state, details rail, storage footer. 93.30% pixel agreement."
   },
   {
    "id": "BL-0162",

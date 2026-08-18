@@ -89,6 +89,14 @@ for (const s of specs) {
         const sized = r.width >= 1 && r.height >= 1;
         const cs = getComputedStyle(el);
         if (cs.visibility === "hidden" || cs.display === "none" || +cs.opacity === 0) return;
+        /* Opacity does not inherit as a computed value, so a child of a faded
+           ancestor still reports 1. Without walking up, a CLOSED panel
+           (.ls-panel--closed sits at opacity 0) measures as a full screen of
+           content that is not on screen at all. */
+        for (let a = el.parentElement; a; a = a.parentElement) {
+          const acs = getComputedStyle(a);
+          if (+acs.opacity === 0 || acs.visibility === "hidden") return;
+        }
         /* Join the raw text nodes, do not trim each one first. JSX writes
            `{n} variant{n > 1 ? "s" : ""}` as two adjacent text nodes, and
            trimming then joining with a space produced "3 variant s". */

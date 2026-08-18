@@ -1,16 +1,16 @@
 {
- "commit": "a036f343",
+ "commit": "622e329e",
  "base": "http://localhost:3000",
- "generated": "2026-08-18T18:31:00.920Z",
+ "generated": "2026-08-18T21:27:45.525Z",
  "captures": [
   {
-   "id": "BL-0105",
+   "id": "BL-0112",
    "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "state": "panel-brand__clean",
+   "state": "sitemenu-site-settings__drift3",
    "status": 200,
-   "sha256": "643b5ce2af8a3086",
+   "sha256": "7e6055a03a263fce",
    "scrollHeight": 905,
-   "elCount": 20
+   "elCount": 22
   }
  ],
  "failures": []
