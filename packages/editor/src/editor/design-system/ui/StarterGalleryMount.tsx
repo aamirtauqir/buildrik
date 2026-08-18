@@ -2,25 +2,18 @@
  * Mount component for StarterGalleryModal — first-run trigger.
  *
  * On project mount, decides whether to show the starter gallery based on
- * a per-project localStorage seen-flag. On apply, writes the starter's
- * tokens into the project's design-token storage AND calls resetFromSaved
- * on each registry so the :root applier paints immediately. On skip,
+ * a per-project localStorage seen-flag. On apply, defers to `useApplyStarter`
+ * — the shared hook that stages the starter's tokens as a pending change, so
+ * the panel's Review & Apply is what commits them to the project. On skip,
  * just sets the flag.
  *
  * Wires to:
- *   - STARTER_DS_REGISTRY (D6) — starter list
- *   - useColorRegistry / useSpacingRegistry / useTypeRegistry — live preview
+ *   - useApplyStarter — the one apply path, shared with the Brand destination
  *
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { CURRENT_SCHEMA_VERSION } from "../migrations";
-import { STARTER_DS_REGISTRY } from "../starters";
-import {
-  useColorRegistry,
-  useSpacingRegistry,
-  useTypeRegistry,
-} from "../state/TokenRegistryContext";
+import { useApplyStarter } from "../state/useApplyStarter";
 import { StarterGalleryModal } from "./StarterGalleryModal";
 import type { Composer } from "../../../engine/Composer";
 import { EVENTS } from "../../../shared/constants/events";
@@ -29,10 +22,6 @@ const SEEN_KEY_PREFIX = "buildrik:starter-gallery-seen-";
 
 function seenKey(projectId: string | null | undefined): string {
   return `${SEEN_KEY_PREFIX}${projectId ?? "default"}`;
-}
-
-function tokenStorageKey(projectId: string | null | undefined): string {
-  return `buildrick-design-tokens-${projectId ?? "default"}-v1`;
 }
 
 function markSeen(projectId: string | null | undefined): void {
@@ -53,10 +42,6 @@ export interface StarterGalleryMountProps {
 }
 
 export const StarterGalleryMount: React.FC<StarterGalleryMountProps> = ({ projectId, composer }) => {
-  const colorRegistry = useColorRegistry();
-  const spacingRegistry = useSpacingRegistry();
-  const typeRegistry = useTypeRegistry();
-
   // 2026-05-22 design plan review D3: starter gallery does NOT auto-open on
   // first project load. The theme picker stays available but discoverable
   // rather than blocking — the user opens it via the Design tab's "Browse
@@ -77,33 +62,11 @@ export const StarterGalleryMount: React.FC<StarterGalleryMountProps> = ({ projec
     };
   }, [composer]);
 
-  const handleApply = React.useCallback(
-    (starterId: string) => {
-      const starter = STARTER_DS_REGISTRY.find((s) => s.id === starterId);
-      if (!starter) return;
-
-      // Persist the full versioned blob ourselves — calling persistAll()
-      // here would capture stale registry state because resetFromSaved
-      // setState calls are batched and haven't committed yet.
-      try {
-        const versioned = {
-          schemaVersion: CURRENT_SCHEMA_VERSION,
-          tokens: starter.tokens,
-        };
-        localStorage.setItem(tokenStorageKey(projectId), JSON.stringify(versioned));
-      } catch {
-        // private browsing → tokens still live-applied via resetFromSaved
-      }
-
-      // Live preview: registries internally filter by kind.
-      colorRegistry.resetFromSaved(starter.tokens);
-      spacingRegistry.resetFromSaved(starter.tokens);
-      typeRegistry.resetFromSaved(starter.tokens);
-
-      markSeen(projectId);
-    },
-    [projectId, colorRegistry, spacingRegistry, typeRegistry]
-  );
+  /* The shared hook, not a second copy of it. `useApplyStarter` was extracted
+     from this component precisely so the two starter doors could not drift —
+     and then this copy stayed behind and drifted anyway (it kept the
+     resetFromSaved + localStorage version after the hook moved to staging). */
+  const handleApply = useApplyStarter(projectId);
 
   const handleSkip = React.useCallback(() => {
     markSeen(projectId);

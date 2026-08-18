@@ -38,6 +38,8 @@ export interface ColorTokensActions {
   discardAll: () => void;
   /** Replace savedTokens with new array (called after Composer load) */
   resetFromSaved: (newTokens: DesignToken[]) => void;
+  /** Load a token set as a PENDING change — what applying a starter does. */
+  stageTokens: (newTokens: DesignToken[]) => void;
   /** Filter tokens by search query */
   filterTokens: (query: string) => DesignToken[];
   /** Add a new token to the list */
@@ -227,6 +229,15 @@ export function useColorTokens(
     setRedoStack({});
   }, []);
 
+  /* Same load, but savedTokens is left alone so the change is PENDING and the
+     panel offers Review & Apply. CSS vars are re-applied by the provider's
+     effect on this tokens change, as with every other edit here. */
+  const stageTokens = useCallback((newTokens: DesignToken[]) => {
+    setTokens(newTokens.filter((t) => t.category === "colors"));
+    setUndoStack({});
+    setRedoStack({});
+  }, []);
+
   const addToken = useCallback((token: DesignToken) => {
     setTokens((prev) => [...prev, token]);
     setUndoStack((s) => ({ ...s, [token.id]: [] }));
@@ -298,6 +309,7 @@ export function useColorTokens(
     markSaved,
     discardAll,
     resetFromSaved,
+    stageTokens,
     filterTokens,
     addToken,
     deleteToken,

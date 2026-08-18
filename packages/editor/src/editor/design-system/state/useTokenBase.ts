@@ -19,6 +19,8 @@ export interface TokenBaseActions {
   markSaved: () => void;
   discardAll: () => void;
   resetFromSaved: (newTokens: DesignToken[]) => void;
+  /** Load a token set as a pending change (savedTokens untouched). */
+  stageTokens: (newTokens: DesignToken[]) => void;
   undoToken: (id: string) => void;
   redoToken: (id: string) => void;
   canUndo: (id: string) => boolean;
@@ -124,6 +126,27 @@ export function useTokenBase(
     setRedoStack({});
   }, [savedTokens]);
 
+  /**
+   * Load a whole token set as an UNSAVED change: `tokens` moves, `savedTokens`
+   * does not, so `pendingDiff` shows every difference and the panel's footer
+   * offers Review & Apply.
+   *
+   * This is what applying a starter needs. `resetFromSaved` sets both halves,
+   * which made the panel read "All changes saved" over tokens the project had
+   * never been told about — the starter reached localStorage and the live CSS
+   * vars and stopped there, so the site published its old palette.
+   */
+  const stageTokens = useCallback(
+    (newTokens: DesignToken[]) => {
+      const next = newTokens.filter((t) => t.category === category);
+      setTokens(next);
+      setUndoStack({});
+      setRedoStack({});
+      next.forEach((t) => document.documentElement.style.setProperty(t.cssVar, t.value));
+    },
+    [category]
+  );
+
   const resetFromSaved = useCallback(
     (newTokens: DesignToken[]) => {
       const next = newTokens.filter((t) => t.category === category);
@@ -148,6 +171,7 @@ export function useTokenBase(
     markSaved,
     discardAll,
     resetFromSaved,
+    stageTokens,
     setTokens,
     setUndoStack,
     setRedoStack,

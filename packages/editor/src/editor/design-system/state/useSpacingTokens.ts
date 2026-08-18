@@ -49,6 +49,8 @@ export interface SpacingTokensActions {
   markSaved: () => void;
   discardAll: () => void;
   resetFromSaved: (newTokens: DesignToken[]) => void;
+  /** Load a token set as a PENDING change — what applying a starter does. */
+  stageTokens: (newTokens: DesignToken[]) => void;
   stageDefaults: (defaultTokens: DesignToken[]) => void;
   undoToken: (id: string) => void;
   canUndo: (id: string) => boolean;
@@ -131,6 +133,7 @@ export function useSpacingTokens(
     markSaved,
     discardAll,
     resetFromSaved: base.resetFromSaved,
+    stageTokens: base.stageTokens,
     stageDefaults,
   };
 }

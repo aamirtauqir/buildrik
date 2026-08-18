@@ -22,6 +22,8 @@ export interface TypeTokensActions {
   markSaved: () => void;
   discardAll: () => void;
   resetFromSaved: (newTokens: DesignToken[]) => void;
+  /** Load a token set as a PENDING change — what applying a starter does. */
+  stageTokens: (newTokens: DesignToken[]) => void;
   setResponsiveMode: (mode: ResponsiveMode) => void;
   undoToken: (id: string) => void;
   canUndo: (id: string) => boolean;
@@ -46,6 +48,7 @@ export function useTypeTokens(initialTokens: DesignToken[]): TypeTokensState & T
     markSaved: base.markSaved,
     discardAll: base.discardAll,
     resetFromSaved: base.resetFromSaved,
+    stageTokens: base.stageTokens,
     setResponsiveMode,
   };
 }

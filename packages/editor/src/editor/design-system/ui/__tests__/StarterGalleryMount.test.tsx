@@ -63,7 +63,12 @@ describe("StarterGalleryMount", () => {
     expect(queryByText("Pick a starter design system")).toBeTruthy();
   });
 
-  it("on Apply: persists tokens, marks seen, closes modal", () => {
+  /* This asserted the token blob landing in localStorage, which is what the
+     first-run modal used to do INSTEAD of telling the project. Both starter
+     doors now stage through `useApplyStarter`, and the panel's Review & Apply
+     is what persists (setProjectSettings + persistAll). The blob is written
+     there, not here. */
+  it("on Apply: stages the starter, marks seen, closes modal", () => {
     const composer = makeFakeComposer();
     const { queryByText, getByText } = render(
       wrap(<StarterGalleryMount projectId={projectId} composer={composer as never} />)
@@ -74,13 +79,7 @@ describe("StarterGalleryMount", () => {
 
     expect(queryByText("Pick a starter design system")).toBeNull();
     expect(localStorage.getItem(seenKey)).toBe("1");
-
-    const raw = localStorage.getItem(tokensKey);
-    expect(raw).not.toBeNull();
-    const parsed = JSON.parse(raw!);
-    expect(parsed.schemaVersion).toBe(CURRENT_SCHEMA_VERSION);
-    expect(Array.isArray(parsed.tokens)).toBe(true);
-    expect(parsed.tokens.length).toBe(STARTER_DS_REGISTRY[0].tokens.length);
+    expect(localStorage.getItem(tokensKey), "the apply path owns the write").toBeNull();
   });
 
   it("on Skip: marks seen, closes modal, does not write tokens", () => {

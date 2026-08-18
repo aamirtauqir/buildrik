@@ -308,6 +308,7 @@ const FALLBACK_COLOR: ColorRegistry = {
   markSaved: noop,
   discardAll: noop,
   resetFromSaved: noop,
+  stageTokens: noop,
   filterTokens: (q: string) =>
     colorDefaults.filter((t) => t.name.toLowerCase().includes(q.toLowerCase())),
   addToken: noop,
@@ -329,6 +330,7 @@ const FALLBACK_SPACING: SpacingRegistry = {
   markSaved: noop,
   discardAll: noop,
   resetFromSaved: noop,
+  stageTokens: noop,
   applyPreset: noop,
   stageDefaults: noop,
 } as SpacingRegistry;
@@ -346,6 +348,7 @@ const FALLBACK_TYPE: TypeRegistry = {
   markSaved: noop,
   discardAll: noop,
   resetFromSaved: noop,
+  stageTokens: noop,
   setResponsiveMode: noop,
 } as TypeRegistry;
 
