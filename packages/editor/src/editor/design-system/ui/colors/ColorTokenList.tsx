@@ -57,6 +57,14 @@ export interface ColorTokenListProps {
    * wrong one — see the empty-state branch below.
    */
   hiddenByModeCount?: number;
+  /**
+   * The FULL colour palette, for resolving the page colour only. `tokens` is
+   * the mode-filtered view, and Beginner hides everything that is not
+   * semantic — including `color-background`. Resolving the surface from that
+   * view fell back to white, and the page colour was then reported as a
+   * contrast failure against a page it IS. Rendering still uses `tokens`.
+   */
+  allTokens?: readonly DesignToken[];
   /** T6: composer drives resolvedMode for aggregate dark-missing chip. */
   composer?: Composer | null;
 }
@@ -196,6 +204,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
   onRowClick,
   isPro,
   hiddenByModeCount = 0,
+  allTokens,
   composer,
 }) => {
   const [searchQuery, setSearchQuery] = React.useState("");
@@ -219,7 +228,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
 
   /** The customer's page colour, not the editor's. Recomputed when their
    *  background token or colour mode changes. */
-  const surfaceToken = React.useMemo(() => findSurfaceToken(tokens), [tokens]);
+  const surfaceToken = React.useMemo(() => findSurfaceToken(allTokens ?? tokens), [allTokens, tokens]);
   const surfaceBg = React.useMemo(
     () => resolveSurface(surfaceToken, resolvedMode),
     [surfaceToken, resolvedMode],

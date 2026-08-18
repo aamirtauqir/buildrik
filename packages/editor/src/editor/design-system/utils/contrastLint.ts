@@ -30,6 +30,12 @@ const FALLBACK_BG = "#FFFFFF";
 export function findSurfaceToken(tokens: readonly DesignToken[]): DesignToken | undefined {
   return (
     tokens.find((t) => t.id === "color-background") ??
+    /* `color-surface` is the SEMANTIC name for the same colour, and in
+       Beginner mode it is the only one of the two on screen. Missing it sent
+       the whole computation to the white fallback, where the page colour
+       itself scored 1.05 and got reported as a contrast failure — with an
+       auto-fix that would have repainted the page grey. */
+    tokens.find((t) => t.id === "color-surface") ??
     tokens.find((t) => t.group === "surface" && /background/i.test(t.name))
   );
 }

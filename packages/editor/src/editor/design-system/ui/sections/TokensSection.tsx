@@ -380,6 +380,10 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
                 <React.Fragment key={entry.kindId}>
                   <ColorTokenList
                     tokens={visibleColor}
+                    /* Surface resolution must see the whole palette: Beginner
+                       filters `color-background` out of the view, and the
+                       contrast rule then measured everything against white. */
+                    allTokens={color.tokens}
                     pendingDiff={color.pendingDiff}
                     onColorChange={color.updateToken}
                     onUndo={color.undoToken}

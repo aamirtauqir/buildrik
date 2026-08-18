@@ -45,3 +45,31 @@ describe("contrast lint — a surface colour is not a foreground colour", () => 
     expect(contrastFails(lower, bg, "light", surface?.id)).toBe(false);
   });
 });
+
+/**
+ * Beginner mode renders the semantic tokens only. Measured live 2026-08-18:
+ * the colour list's chip read "Issues (1)" and the one issue was **Surface**
+ * — the page colour — at "1.0:1 → 4.5:1", with a Fix that would have set the
+ * page background to #767677. `color-background` is not in the Beginner view,
+ * so the surface resolved to the white fallback and the real page colour
+ * failed against it at 1.05.
+ */
+describe("contrast lint — the page colour is findable under its semantic name", () => {
+  const semanticOnly = colors.filter((t) => t.group === "semantic");
+
+  it("finds the surface when only the semantic tokens are in view", () => {
+    const surface = findSurfaceToken(semanticOnly);
+    expect(surface?.id).toBe("color-surface");
+    expect(resolveSurface(surface, "light")).toBe(
+      colors.find((t) => t.id === "color-background")?.value,
+    );
+  });
+
+  it("does not report the page colour as failing against itself", () => {
+    expect(buildContrastIssues(semanticOnly, "light").map((i) => i.tokenId)).not.toContain("color-surface");
+  });
+
+  it("still prefers color-background when both are present", () => {
+    expect(findSurfaceToken(colors)?.id).toBe("color-background");
+  });
+});
