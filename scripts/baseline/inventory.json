@@ -12,7 +12,13 @@
   "viewports": {
    "desktop": "1440x900"
   },
-  "seedFixture": null,
+  "seedFixture": {
+   "siteId": "cmrsur1fp000unh3rvmmiq25t",
+   "siteName": "E2E Blank Full d013128c",
+   "ownerUserId": "cmpa9ohx10000wrjux4ecumzo",
+   "ownerEmail": "qa@buildrik.local",
+   "note": "The site the editor reference renders were actually captured against, recovered 2026-08-18 by reading the site name off BL-0159's PNG. It was never recorded, so nothing could be recaptured comparably: a recapture against any other site differs by whatever its canvas holds, which on a 1440x900 editor frame is most of the picture. It is an e2e leftover from 2026-07-20, not a deliberate fixture — treat it as load-bearing until a real seed exists, and do not let the e2e cleanup delete it."
+  },
   "envManifestRef": "docs/plans/2026-08-08-figma-existing-ui-baseline.md",
   "figmaPlan": "team::1653084145714197185",
   "figmaAccount": "saqib@vortexwebinnovate.com",
@@ -105,6 +111,25 @@
    "method": "generate_figma_design capture (login+CSP-strip Playwright driver figma-capture.mjs) → rename BL-id → read-back → screenshot compare",
    "checkpointSwap": "fidelity checkpoint moved from auth to dashboard (Inter-only) — auth frames deferred until Inter Tight installed (13 checks missing); documented tactical adaptation",
    "firstFrame": "BL-0037 → Micuc1rmLcFhjxF1A08Kk2#1:2"
+  },
+  "surfaceDriftSincePin": {
+   "measuredAt": "2026-08-18",
+   "pin": "f7b39a4c",
+   "head": "4762e9e0",
+   "commitsTouching": {
+    "shell": 53,
+    "brand": 44,
+    "canvas": 30,
+    "inspector": 23,
+    "publish": 17,
+    "content": 10,
+    "chrome-ui": 10,
+    "layers": 8,
+    "pages": 7,
+    "media": 0,
+    "insert": 0
+   },
+   "note": "Commit counts are a WHERE-TO-LOOK signal, not a verdict — a commit can touch a surface without moving a pixel. The one row measured properly (BL-0169 brand-pro-mode, recaptured on the seed fixture) differs by 45.67% of pixels. media and insert are the only surfaces untouched since the pin."
   }
  },
  "rows": [

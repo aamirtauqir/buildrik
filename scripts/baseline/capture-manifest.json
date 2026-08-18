@@ -1,18 +1,13 @@
 {
- "commit": "1c1ec587",
+ "commit": "4762e9e0",
  "base": "http://localhost:3000",
- "generated": "2026-08-18T14:51:48.745Z",
+ "generated": "2026-08-18T15:16:30.529Z",
  "captures": [],
  "failures": [
   {
-   "id": "BL-0063",
-   "path": "/dashboard/settings/integrations/vercel-team-picker",
-   "error": "locator.waitFor: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText('Pick a Vercel team').first() to be visible\u001b[22m\n"
-  },
-  {
-   "id": "BL-0090",
-   "path": "/onboarding/ai/generating",
-   "error": "locator.waitFor: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText('Creating your site draft').first() to be visible\u001b[22m\n"
+   "id": "BL-0159",
+   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
+   "error": "page.waitForSelector: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('text=Search free stock') to be visible\u001b[22m\n"
   }
  ]
 }
