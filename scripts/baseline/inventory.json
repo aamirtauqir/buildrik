@@ -154,7 +154,7 @@
     "BL-0109 site-menu-open": "9.41% REDRAW",
     "BL-0111 cmdk-open": "9.18% REDRAW",
     "BL-0124 inspector-button": "14.99% REDRAW",
-    "BL-0125 inspector-container": "13.58% REDRAW",
+    "BL-0125 inspector-container": "13.58% REDRAWN (94.87% agreement)",
     "BL-0126 inspector-grid": "17.07% REDRAW",
     "BL-0127 inspector-flex": "24.85% REDRAW",
     "BL-0128 inspector-input": "14.40% REDRAW",
@@ -259,6 +259,7 @@
     "BL-0105",
     "BL-0116",
     "BL-0118",
+    "BL-0125",
     "BL-0129",
     "BL-0170",
     "BL-0173",
@@ -266,7 +267,7 @@
     "BL-0176"
    ],
    "redrawCost": "BL-0105, the first: 1 clean recapture (the rail tooltip was covering a row in the first reference), 1 computed-style measuring probe, 5 use_figma calls (structure / rows / footer / icons / icon size), 3 screenshots to check. The subtree is 260 nodes; building it as data-driven auto-layout rather than node by node is what kept it to five calls.",
-   "redrawRemaining": 16
+   "redrawRemaining": 15
   }
  },
  "rows": [
@@ -2355,7 +2356,8 @@
    "screenshotHash": "aa6557bf2dd28b85",
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "91:2",
-   "figmaPageId": "75:2"
+   "figmaPageId": "75:2",
+   "notes": "REDRAWN 2026-08-19 (drift 13.58%). Inspector column rebuilt from the measured live DOM; 94.87% pixel agreement. Text alignment is carried through from this frame on. Two residuals: the Desktop scope chip wraps because Figma's Inter is wider than Chrome's at a fixed 47.5px, and the collapsed-section chevrons point down rather than right because the measure ran with the sections remembered open — measure-region.mjs clears localStorage from now on."
   },
   {
    "id": "BL-0126",

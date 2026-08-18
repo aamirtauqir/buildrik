@@ -46,6 +46,13 @@ for (const s of specs) {
   try {
     await page.goto(`${BASE}/edit/${SITE}`, { waitUntil: "domcontentloaded", timeout: 60000 });
     await page.waitForSelector(".bd-studio", { timeout: 30000 });
+    /* The editor remembers which panel and which inspector sections were open.
+       Without clearing it, one screen's state leaks into the next and a measure
+       taken today disagrees with a reference captured yesterday — collapsed
+       sections came back expanded, chevrons pointing the wrong way. */
+    await page.evaluate(() => localStorage.clear());
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await page.waitForSelector(".bd-studio", { timeout: 30000 });
     await page.waitForTimeout(3000);
     for (const a of s.actions || []) {
       if (a.hover) await page.hover(a.hover, { timeout: 8000 });
