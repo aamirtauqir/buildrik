@@ -2,7 +2,10 @@
 # Buildrik editor — pre-push WARN-only DS gate hook.
 #
 # Runs `pnpm run verify:ds` on every `git push` and prints the result.
-# Currently WARN-only — does NOT block the push, regardless of exit code.
+# BLOCKING since 2026-05-18 (see BLOCK_ON_FAIL below). This header claimed
+# WARN-only for two and a half months after that flip, which is the likely
+# reason pushes "hang": the hook is running the full gate suite (~2 min), not
+# stalling. Bypass with `git push --no-verify`, and say so when you do.
 #
 # Rationale: CI was last green 2026-04-16 with months of accumulated drift
 # (Gate 17 ghost aliases + unverified Gates 18–25). A blocking hook today
@@ -39,9 +42,15 @@ echo "────────────────────────�
 # 2026-05-24 — DESIGN.md two-accent enforcement for dashboard chrome.
 EDITOR_OK=0
 DASH_OK=0
+FIGMA_OK=0
 AGE_OK=0
 pnpm run verify:ds > /tmp/buildrik-pre-push-gate.log 2>&1 || EDITOR_OK=$?
 (cd "$REPO_ROOT/packages/dashboard" && pnpm run gate:ds) >> /tmp/buildrik-pre-push-gate.log 2>&1 || DASH_OK=$?
+# gate:figma was wired into NO chain at all — not this hook, not CI — and sat
+# red for five days before anyone looked. A gate nobody runs is a comment.
+# Added 2026-08-19; watched to fail first (change --color-primary in
+# app/globals.css and it reports FAIL, exit 1).
+(cd "$REPO_ROOT/packages/dashboard" && pnpm run gate:figma) >> /tmp/buildrik-pre-push-gate.log 2>&1 || FIGMA_OK=$?
 
 # Conformance spec freshness — prepush mode BLOCKS, because this machine has the
 # Figma MCP and can actually re-extract. CI runs the same check in --mode=ci,
@@ -54,14 +63,14 @@ pnpm run verify:ds > /tmp/buildrik-pre-push-gate.log 2>&1 || EDITOR_OK=$?
 # end. Spec freshness is a human ritual with a reminder attached.
 node scripts/conformance/check-spec-age.mjs --mode=prepush >> /tmp/buildrik-pre-push-gate.log 2>&1 || AGE_OK=$?
 
-if [ "$EDITOR_OK" = "0" ] && [ "$DASH_OK" = "0" ] && [ "$AGE_OK" = "0" ]; then
+if [ "$EDITOR_OK" = "0" ] && [ "$DASH_OK" = "0" ] && [ "$FIGMA_OK" = "0" ] && [ "$AGE_OK" = "0" ]; then
   echo " ✓ all gates passing (editor + dashboard)"
   echo "──────────────────────────────────────────────"
   exit 0
 fi
 
 # Gate failed. Show what broke and either warn-or-block.
-echo " ✗ one or more gates failing (editor=$EDITOR_OK dashboard=$DASH_OK spec-age=$AGE_OK)"
+echo " ✗ one or more gates failing (editor=$EDITOR_OK dashboard=$DASH_OK figma=$FIGMA_OK spec-age=$AGE_OK)"
 echo ""
 tail -20 /tmp/buildrik-pre-push-gate.log | sed 's/^/   /'
 echo ""
