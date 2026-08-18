@@ -173,7 +173,7 @@
     "BL-0166 pages-more-add-options": "4.03% keep",
     "BL-0167 pages-fullpage": "28.99% REDRAW",
     "BL-0170 brand-dark-preview": "15.38% REDRAW",
-    "BL-0173 brand-styles-tab": "12.43% REDRAW",
+    "BL-0173 brand-styles-tab": "12.43% REDRAWN (97.35% agreement)",
     "BL-0174 brand-components-tab": "15.86% REDRAW",
     "BL-0175 content-create-collection": "26.14% REDRAW (modal region 400,120,640,660)",
     "BL-0112 sitemenu-site-settings": "9.42% REDRAW",
@@ -254,7 +254,8 @@
    "note": "Each remaining row needs its capture spec rebuilt by hand — the originals were never committed (only screens-auth.json was). Reaching a state is the slow part: BL-0159's stock browser took three attempts because the entry moved into the panel footer as 'Browse stock' and even that lands on a source picker. Log in as the seed fixture's owner (qa@buildrik.local), not your own user, or /edit redirects and the failure reads as a sentinel timeout.",
    "remainingRows": "BL-0107, BL-0110, BL-0121 (doors not found) · BL-0119 (broken door), BL-0120 (opens a new tab), BL-0172 (feature flag off), BL-0123 (no such element in the fixture), BL-0171 (captured fresh, no prior shot to diff) · BL-0162, BL-0163, BL-0168 (controls refuse the click from a spec)",
    "redrawn": [
-    "BL-0105"
+    "BL-0105",
+    "BL-0173"
    ],
    "redrawCost": "BL-0105, the first: 1 clean recapture (the rail tooltip was covering a row in the first reference), 1 computed-style measuring probe, 5 use_figma calls (structure / rows / footer / icons / icon size), 3 screenshots to check. The subtree is 260 nodes; building it as data-driven auto-layout rather than node by node is what kept it to five calls."
   }
@@ -3111,7 +3112,8 @@
    "screenshotHash": "b95a33856d766833",
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "131:2",
-   "figmaPageId": "75:2"
+   "figmaPageId": "75:2",
+   "notes": "REDRAWN 2026-08-18 (drift 12.43%). Drawer subtree 131:124 rebuilt from the measured live DOM via measure-region.mjs → pack-measure.mjs → a use_figma interpreter. 97.35% pixel agreement. The row this frame is named after is labelled **Presets** in the app now, not Styles."
   },
   {
    "id": "BL-0174",
