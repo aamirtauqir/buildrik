@@ -129,7 +129,17 @@
     "media": 0,
     "insert": 0
    },
-   "note": "Commit counts are a WHERE-TO-LOOK signal, not a verdict — a commit can touch a surface without moving a pixel. The one row measured properly (BL-0169 brand-pro-mode, recaptured on the seed fixture) differs by 45.67% of pixels. media and insert are the only surfaces untouched since the pin."
+   "note": "Commit counts are a WHERE-TO-LOOK signal, not a verdict — a commit can touch a surface without moving a pixel. The one row measured properly (BL-0169 brand-pro-mode, recaptured on the seed fixture) differs by 45.67% of pixels. media and insert are the only surfaces untouched since the pin.",
+   "measuredRows": {
+    "BL-0103 panel-media": "12.61%",
+    "BL-0100 shell-default": "13.02%",
+    "BL-0101 panel-layers": "12.95%",
+    "BL-0102 panel-pages": "13.78%",
+    "BL-0104 panel-content": "12.92%",
+    "BL-0105 panel-brand": "14.56%",
+    "BL-0169 brand-pro-mode": "45.67%"
+   },
+   "floorExplained": "Six panel roots landed in a 12.6-14.6% band, media included, and media has zero commits since the pin. Read side by side, the Media panel body is unchanged — the band is the SHELL every editor frame contains. ReviewBar (869cebb2, 2026-08-17, board 200:213) added a whole row under the topbar whenever a round is open, and the seed fixture has one; the inspector is present in the new renders and absent in the old. Vertical re-alignment does not cancel it (best offset is 0), because a new row is not a translation. CONSEQUENCE for the per-row path: the panel-level signal is real and usable — 45.67% on Brand vs a flat floor on Media is exactly the discrimination it was built for — but every editor frame's chrome is stale regardless of its panel, so 'redraw only what moved' still touches the shell band of all 48. Founder call: redraw all 48, or redraw the shell band once if the frames are componentised enough to swap it."
   }
  },
  "rows": [

@@ -52,12 +52,34 @@ const sizeNote = a.width === b.width && a.height === b.height
 const at = (img, x, y, c) => img.buf[(y * img.width + x) * 4 + c];
 let differing = 0;
 const TOL = 12; // per-channel tolerance: font hinting and subpixel noise, not layout
-for (let y = 0; y < H; y++) {
-  for (let x = 0; x < W; x++) {
-    if (Math.abs(at(a, x, y, 0) - at(b, x, y, 0)) > TOL ||
-        Math.abs(at(a, x, y, 1) - at(b, x, y, 1)) > TOL ||
-        Math.abs(at(a, x, y, 2) - at(b, x, y, 2)) > TOL) differing++;
+
+/* One chrome change that moves everything down by a few pixels makes EVERY row
+   read ~13% different, including surfaces with zero commits since the pin —
+   measured: six panel roots landed in a 12.6-14.6% band that said nothing.
+   A pure translation is not drift in the panel, so score the best vertical
+   alignment in a small window and report that; the offset is printed, because
+   a non-zero one is itself a finding about the shell. */
+const OFFSETS = [0, -1, 1, -2, 2, -3, 3, -4, 4, -5, 5, -6, 6];
+const scoreAt = (dy) => {
+  let n = 0;
+  const y0 = Math.max(0, -dy);
+  const y1 = Math.min(H, H - dy);
+  for (let y = y0; y < y1; y++) {
+    for (let x = 0; x < W; x++) {
+      if (Math.abs(at(a, x, y, 0) - at(b, x, y + dy, 0)) > TOL ||
+          Math.abs(at(a, x, y, 1) - at(b, x, y + dy, 1)) > TOL ||
+          Math.abs(at(a, x, y, 2) - at(b, x, y + dy, 2)) > TOL) n++;
+    }
   }
+  return { n, rows: y1 - y0 };
+};
+let best = null, bestDy = 0;
+for (const dy of OFFSETS) {
+  const r = scoreAt(dy);
+  const share = r.n / (r.rows * W);
+  if (best === null || share < best) { best = share; bestDy = dy; }
 }
+differing = Math.round(best * W * H);
 const total = W * H;
-console.log(`${id} ${state}: ${((differing / total) * 100).toFixed(2)}% differ (${differing}/${total})${sizeNote}`);
+const shift = bestDy === 0 ? "" : ` · best at dy=${bestDy}px (shell shifted)`;
+console.log(`${id} ${state}: ${(best * 100).toFixed(2)}% differ${shift}${sizeNote}`);

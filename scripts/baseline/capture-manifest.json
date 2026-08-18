@@ -1,13 +1,62 @@
 {
- "commit": "4762e9e0",
+ "commit": "e9706088",
  "base": "http://localhost:3000",
- "generated": "2026-08-18T15:16:30.529Z",
- "captures": [],
- "failures": [
+ "generated": "2026-08-18T15:20:53.880Z",
+ "captures": [
   {
-   "id": "BL-0159",
+   "id": "BL-0100",
    "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "error": "page.waitForSelector: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('text=Search free stock') to be visible\u001b[22m\n"
+   "state": "shell-default__drift",
+   "status": 200,
+   "sha256": "9d79e1197bea8d6f",
+   "scrollHeight": 905,
+   "elCount": 82
+  },
+  {
+   "id": "BL-0101",
+   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
+   "state": "panel-layers__drift",
+   "status": 200,
+   "sha256": "13546adf886b12ed",
+   "scrollHeight": 905,
+   "elCount": 20
+  },
+  {
+   "id": "BL-0102",
+   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
+   "state": "panel-pages__drift",
+   "status": 200,
+   "sha256": "d6f7d553acf1835c",
+   "scrollHeight": 905,
+   "elCount": 21
+  },
+  {
+   "id": "BL-0103",
+   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
+   "state": "panel-media__drift",
+   "status": 200,
+   "sha256": "63f759a1a3a4b35d",
+   "scrollHeight": 905,
+   "elCount": 47
+  },
+  {
+   "id": "BL-0104",
+   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
+   "state": "panel-content__drift",
+   "status": 200,
+   "sha256": "a5e020705d912cf9",
+   "scrollHeight": 905,
+   "elCount": 22
+  },
+  {
+   "id": "BL-0105",
+   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
+   "state": "panel-brand__drift",
+   "status": 200,
+   "sha256": "3e5b116228fe20ce",
+   "scrollHeight": 905,
+   "elCount": 20
   }
- ]
+ ],
+ "failures": []
 }
