@@ -1353,7 +1353,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "board:782-4260",
       "recipe": null
     },
     {
@@ -1364,7 +1364,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "board:142-2",
       "recipe": null
     },
     {
@@ -3531,7 +3531,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "open:menu-awaiting-backing",
       "recipe": null
     },
     {
@@ -3542,7 +3542,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "board:1082-4589",
       "recipe": null
     },
     {

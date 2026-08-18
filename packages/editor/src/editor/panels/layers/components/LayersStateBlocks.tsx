@@ -70,7 +70,7 @@ export const LayersLoadError: React.FC<{ onRetry: () => void }> = ({ onRetry }) 
 );
 
 /*
-  Board `782:4350`. Quotes the query back ("Nothing matches 'hero'.") so the
+  Board `782:4260`. Quotes the query back ("Nothing matches 'hero'.") so the
   user sees WHAT failed to match, and offers the one recovery that always
   works. Distinct from LayersEmptyState on purpose: an empty page is a fact
   about the document, a filtered-out tree is a fact about the search box.

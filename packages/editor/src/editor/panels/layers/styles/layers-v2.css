@@ -51,7 +51,7 @@
 .bdc-lr.bdc-hidden .bdc-lr-ic { background: var(--bk-gray-300); }
 .bdc-lr.bdc-hidden .bdc-lr-chev { color: var(--bk-gray-300); }
 .bdc-lr.bdc-hidden .bdc-lr-eye,
-.bdc-lr.bdc-hidden .bdc-lr-lock { color: var(--bk-gray-200); }
+.bdc-lr.bdc-hidden .bdc-lr-lock { color: var(--bk-ink-muted); }
 
 .bdc-lr-chev {
   width: 12px;
@@ -147,9 +147,9 @@
   flex-shrink: 0;
 }
 
-.bdc-lr-eye,
+.bdc-lr-eye, /* 142:2: legible at rest. gray-300 was 1.47:1; 1.4.11 wants 3. */
 .bdc-lr-lock {
-  color: var(--bk-gray-300);
+  color: var(--bk-ink-muted);
   display: inline-flex;
   padding: 2px;
   opacity: 1;
@@ -171,12 +171,12 @@
 }
 
 .bdc-lr:hover .bdc-lr-eye,
-.bdc-lr.bdc-sel .bdc-lr-eye { color: var(--bk-ink-muted); }
+.bdc-lr.bdc-sel .bdc-lr-eye { color: var(--bk-ink); }
 
 .bdc-lr-eye.bdc-off { opacity: 0.6; }
 .bdc-lr-eye:hover { color: var(--bk-ink); }
 
-.bdc-lr:hover .bdc-lr-lock { color: var(--bk-ink-muted); }
+.bdc-lr:hover .bdc-lr-lock { color: var(--bk-ink); }
 .bdc-lr-lock.bdc-on { color: var(--bk-ink); }
 
 /* Drag indicators */
