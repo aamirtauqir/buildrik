@@ -54,7 +54,14 @@ export function useLayerActions(
   const [customNames, setCustomNames] = React.useState<Map<string, string>>(new Map());
   const [editingId, setEditingId] = React.useState<string | null>(null);
   const [editingName, setEditingName] = React.useState("");
-  const isHydrated = React.useRef(false);
+  /* The page whose stored state has actually been loaded. Persistence is
+     keyed off THIS, not off a "have we committed once" flag: the old ref was
+     flipped to true by an effect on the first commit — before
+     `hydrateFromStorage` had run for the page — so the persist effects wrote
+     the initial empty Sets straight over the stored ids. Hiding a layer and
+     reloading brought it back, because the reload wiped the record before
+     reading it. */
+  const hydratedPage = React.useRef<string | null>(null);
   const editInputRef = React.useRef<HTMLInputElement>(null);
   const pendingVisibilityRef = React.useRef<{ id: string; hidden: boolean } | null>(null);
   const pendingLockRef = React.useRef<{ id: string; locked: boolean } | null>(null);
@@ -67,8 +74,9 @@ export function useLayerActions(
         clearTimeout(hydrateTimeoutRef.current);
         hydrateTimeoutRef.current = null;
       }
-      // Set flag BEFORE state setters so persistence effects see it during the commit
-      isHydrated.current = false;
+      // Claim the page BEFORE the setters, so the persist effects that run on
+      // this commit are writing hydrated state rather than the empty initial.
+      hydratedPage.current = pageId;
       const storedHidden = loadSetFromStorage(pageId, "hidden");
       const storedLocked = loadSetFromStorage(pageId, "locked");
       const storedNames = loadMapFromStorage(pageId);
@@ -85,7 +93,6 @@ export function useLayerActions(
         applyStoredStatesToDOM(storedHidden, storedLocked);
         hydrateTimeoutRef.current = null;
       }, 100);
-      // NOTE: isHydrated.current is reset to true in the useEffect below, AFTER commit
     },
     [composer]
   );
@@ -99,28 +106,21 @@ export function useLayerActions(
     };
   }, []);
 
-  // Re-enable persistence after the hydration state commits to DOM
-  React.useEffect(() => {
-    if (!isHydrated.current) {
-      isHydrated.current = true;
-    }
-  }, [hiddenIds, lockedIds, customNames]);
-
   // Persist hidden state
   React.useEffect(() => {
-    if (!currentPageId || !isHydrated.current) return;
+    if (!currentPageId || hydratedPage.current !== currentPageId) return;
     saveSetToStorage(currentPageId, "hidden", hiddenIds);
   }, [hiddenIds, currentPageId]);
 
   // Persist locked state
   React.useEffect(() => {
-    if (!currentPageId || !isHydrated.current) return;
+    if (!currentPageId || hydratedPage.current !== currentPageId) return;
     saveSetToStorage(currentPageId, "locked", lockedIds);
   }, [lockedIds, currentPageId]);
 
   // Persist custom names
   React.useEffect(() => {
-    if (!currentPageId || !isHydrated.current) return;
+    if (!currentPageId || hydratedPage.current !== currentPageId) return;
     saveMapToStorage(currentPageId, customNames);
   }, [customNames, currentPageId]);
 
