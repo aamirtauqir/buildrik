@@ -81,6 +81,14 @@ for (const s of specs) {
           own = el.placeholder;
         }
         const bg = hex(cs.backgroundColor);
+        /* Thumbnails and hero strips are painted with CSS gradients, which the
+           colour-only read saw as empty boxes. Capture simple linear-gradients
+           so they can be rebuilt as real Figma gradient fills. */
+        const gi = cs.backgroundImage;
+        const grad = gi && gi.startsWith("linear-gradient")
+          ? { raw: gi.slice(0, 300), stops: (gi.match(/rgba?\([^)]+\)/g) || []).map(hex).filter(Boolean),
+              angle: (gi.match(/^linear-gradient\(\s*([\d.]+)deg/) || [])[1] || null }
+          : null;
         /* Read each side's colour, not just the top one. A row with only a
            left border inherits `currentColor` on the other three, and reading
            borderTopColor for all of them painted a black bar down every row
@@ -125,7 +133,7 @@ for (const s of specs) {
             lh: own ? cs.lineHeight : null,
             col: own ? hex(cs.color) : null,
             align: own ? cs.textAlign : null,
-            bg,
+            bg, grad,
             border: bw.some(Boolean) ? { w: bw, c: bcs.find((c, i) => bw[i] && c) } : null,
             svg: svgEl ? svgEl.outerHTML.slice(0, 4000) : null,
             radius: cs.borderRadius === "0px" ? null : parseFloat(cs.borderRadius),

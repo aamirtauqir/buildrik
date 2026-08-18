@@ -161,7 +161,7 @@
     "BL-0129 inspector-heading": "11.90% REDRAW",
     "BL-0169 brand-pro-mode": "15.43% REDRAW",
     "BL-0114 sitemenu-publish-history": "3.12% keep",
-    "BL-0116 sitemenu-templates": "8.01% REDRAW (borderline)",
+    "BL-0116 sitemenu-templates": "8.01% REDRAWN (92.46% agreement)",
     "BL-0118 sitemenu-design-system": "15.72% REDRAW",
     "BL-0122 sitemenu-open": "11.87% REDRAW",
     "BL-0115 sitemenu-export-code": "22.02% REDRAW",
@@ -179,7 +179,7 @@
     "BL-0112 sitemenu-site-settings": "9.42% REDRAW",
     "BL-0113 sitemenu-version-history": "10.45% REDRAW",
     "BL-0117 sitemenu-components": "5.79% keep",
-    "BL-0176 publish-confirm": "15.57% REDRAW"
+    "BL-0176 publish-confirm": "15.57% REDRAWN (94.49% agreement)"
    },
    "shellBandNote": "FOUNDER CALL 2026-08-18: redraw a frame only when its PANEL moved; the shell band in every editor frame stays as drawn and is known-stale — it predates ReviewBar (869cebb2, 2026-08-17). Componentising the shell was considered and declined for now: the frames hold zero components (433 raw frames each), so there is nothing to swap without building it first.",
    "unmeasured": {
@@ -254,14 +254,16 @@
    "note": "Each remaining row needs its capture spec rebuilt by hand — the originals were never committed (only screens-auth.json was). Reaching a state is the slow part: BL-0159's stock browser took three attempts because the entry moved into the panel footer as 'Browse stock' and even that lands on a source picker. Log in as the seed fixture's owner (qa@buildrik.local), not your own user, or /edit redirects and the failure reads as a sentinel timeout.",
    "remainingRows": "BL-0107, BL-0110, BL-0121 (doors not found) · BL-0119 (broken door), BL-0120 (opens a new tab), BL-0172 (feature flag off), BL-0123 (no such element in the fixture), BL-0171 (captured fresh, no prior shot to diff) · BL-0162, BL-0163, BL-0168 (controls refuse the click from a spec)",
    "redrawn": [
-    "BL-0105",
     "BL-0100",
+    "BL-0105",
+    "BL-0116",
     "BL-0170",
     "BL-0173",
-    "BL-0174"
+    "BL-0174",
+    "BL-0176"
    ],
    "redrawCost": "BL-0105, the first: 1 clean recapture (the rail tooltip was covering a row in the first reference), 1 computed-style measuring probe, 5 use_figma calls (structure / rows / footer / icons / icon size), 3 screenshots to check. The subtree is 260 nodes; building it as data-driven auto-layout rather than node by node is what kept it to five calls.",
-   "redrawRemaining": 20
+   "redrawRemaining": 18
   }
  },
  "rows": [
@@ -2204,7 +2206,8 @@
    "screenshotHash": "06cd84d28cb80ebc",
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "81:2",
-   "figmaPageId": "75:2"
+   "figmaPageId": "75:2",
+   "notes": "REDRAWN 2026-08-19 (drift 8.01%). Drawer subtree rebuilt from the measured live DOM; 92.46% pixel agreement. Shell band left as drawn. Note: template thumbnails carry their real CSS gradients as Figma gradient fills."
   },
   {
    "id": "BL-0117",
@@ -3168,7 +3171,8 @@
    "screenshotHash": "7dc962ca6e6c838e",
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "134:2",
-   "figmaPageId": "75:2"
+   "figmaPageId": "75:2",
+   "notes": "REDRAWN 2026-08-19 (drift 15.57%). Drawer subtree rebuilt from the measured live DOM; 94.49% pixel agreement. Shell band left as drawn. Note: the change counters differ because the fixture had an edit when the reference was taken and none when it was measured — sample data, not shape."
   },
   {
    "id": "BL-0177",

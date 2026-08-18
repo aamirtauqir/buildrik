@@ -24,7 +24,7 @@ const { nodes, region } = JSON.parse(readFileSync(src, "utf8"));
 /* Drop nodes that paint nothing a reader would notice: fully transparent boxes
    with no text and no border slipped through the DOM filter when a parent set
    only a radius. */
-const kept = nodes.filter((n) => n.text || n.bg || n.border || n.svg);
+const kept = nodes.filter((n) => n.text || n.bg || n.border || n.svg || n.grad);
 
 /* Parent = the nearest earlier node that fully contains this one. The DOM order
    is a pre-order walk, so scanning backwards finds it in one pass. */
@@ -44,7 +44,7 @@ const payload = kept.slice(0, MAX).map((n, i) => {
   const py = p >= 0 ? kept[p].y : 0;
   return [p, r1(n.x - px), r1(n.y - py), r1(n.w), r1(n.h), n.text, n.fs, n.fw,
           n.col, n.bg, n.border ? n.border.w.map(r1) : null, n.border ? n.border.c : null,
-          n.radius, n.op, n.svg || null, n.ff, n.tt, n.ls];
+          n.radius, n.op, n.svg || null, n.ff, n.tt, n.grad ? n.grad.stops : null];
 });
 
 console.log(JSON.stringify(payload));
