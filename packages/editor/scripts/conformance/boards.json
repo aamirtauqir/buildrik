@@ -242,7 +242,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "open:status-pill-convention",
       "recipe": null
     },
     {
@@ -253,7 +253,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "open:status-pill-convention",
       "recipe": null
     },
     {
@@ -264,7 +264,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "open:status-pill-convention",
       "recipe": null
     },
     {
@@ -330,7 +330,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "blocked:sync-load",
       "recipe": null
     },
     {
@@ -352,7 +352,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "open:status-pill-convention",
       "recipe": null
     },
     {
@@ -363,7 +363,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "open:status-pill-convention",
       "recipe": null
     },
     {
@@ -374,7 +374,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "open:status-pill-convention",
       "recipe": null
     },
     {
@@ -451,7 +451,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "open:status-pill-convention",
       "recipe": null
     },
     {
@@ -462,7 +462,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "open:status-pill-convention",
       "recipe": null
     },
     {
@@ -3641,7 +3641,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "open:empty-vs-defaults",
       "recipe": null
     },
     {
