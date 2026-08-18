@@ -159,16 +159,25 @@
     "BL-0127 inspector-flex": "24.85% REDRAW",
     "BL-0128 inspector-input": "14.40% REDRAW",
     "BL-0129 inspector-heading": "11.90% REDRAW",
-    "BL-0169 brand-pro-mode": "15.43% REDRAW"
+    "BL-0169 brand-pro-mode": "15.43% REDRAW",
+    "BL-0114 sitemenu-publish-history": "3.12% keep",
+    "BL-0116 sitemenu-templates": "8.01% REDRAW (borderline)",
+    "BL-0118 sitemenu-design-system": "15.72% REDRAW",
+    "BL-0122 sitemenu-open": "11.87% REDRAW",
+    "BL-0115 sitemenu-export-code": "22.02% REDRAW"
    },
    "shellBandNote": "FOUNDER CALL 2026-08-18: redraw a frame only when its PANEL moved; the shell band in every editor frame stays as drawn and is known-stale — it predates ReviewBar (869cebb2, 2026-08-17). Componentising the shell was considered and declined for now: the frames hold zero components (433 raw frames each), so there is nothing to swap without building it first.",
    "unmeasured": {
     "BL-0107 comments-open": "click on button[aria-label=Comments] opens no [role=menu|dialog|listbox] — spec unknown",
     "BL-0110 review-pill-open": "same; the review pill's popover is not one of those roles",
     "BL-0123 inspector-text": "the seed fixture has no element of data-buildrick-type=text",
-    "_rest": "31 rows still unmeasured — see driftSweepProgress"
+    "_rest": "31 rows still unmeasured — see driftSweepProgress",
+    "BL-0119 sitemenu-plugins": "the door is broken — AquibraStudio:464 deep-links to a settings screen id of 'plugins' that does not exist, so it opens Settings at its root. The state cannot be captured until the id becomes 'integrations'.",
+    "BL-0120 sitemenu-invite-teammates": "not an editor state — the item opens /dashboard/settings/team in a NEW TAB (openDashboard uses window.open '_blank'), so nothing in the editor changes.",
+    "BL-0112/0113/0117/0121": "site-settings, version-history, components and keyboard-shortcuts are no longer labels in the site menu — their routes changed since the pin and each needs its door found again before it can be captured."
    },
-   "specsMustAssertTheState": "A capture spec whose actions do not END in a waitFor on something the state proves will happily screenshot the state it failed to open, and the diff then reports a plausible number. Caught here: comments-open and review-pill-open both read exactly 10.86%, which is the shell region and nothing else — adding waitFor on [role=menu],[role=dialog],[role=listbox] turned both into honest FAILs while the other four still passed."
+   "specsMustAssertTheState": "A capture spec whose actions do not END in a waitFor on something the state proves will happily screenshot the state it failed to open, and the diff then reports a plausible number. Caught here: comments-open and review-pill-open both read exactly 10.86%, which is the shell region and nothing else — adding waitFor on [role=menu],[role=dialog],[role=listbox] turned both into honest FAILs while the other four still passed.",
+   "capturesLeakThroughLocalStorage": "capture.mjs runs every screen in ONE browser context, and the editor remembers its open panel in localStorage. So screen N's destination is still open when screen N+1 loads: an 'Export code' capture came back showing Version History because the previous row had opened it. Normalise at the top of each spec's actions (click a known rail tab first) or the batch quietly measures the wrong screens — the first sitemenu run produced three PAIRS of identical percentages and two byte-identical PNGs."
   },
   "driftRegions": {
    "_note": "Whole-frame comparison does not work: the alignment search picks dy=0 because the topbar never moved and the canvas content dominates, so the ReviewBar offset below it is never cancelled. Each state family needs the band its state actually lives in. Rail is 0-60, drawer 60-380, canvas 380-1140, inspector 1140-1440; the shell above starts at 56.",
@@ -196,9 +205,14 @@
     "BL-0127",
     "BL-0128",
     "BL-0129",
-    "BL-0169"
+    "BL-0169",
+    "BL-0114",
+    "BL-0115",
+    "BL-0116",
+    "BL-0118",
+    "BL-0122"
    ],
-   "remaining": 31,
+   "remaining": 26,
    "note": "Each remaining row needs its capture spec rebuilt by hand — the originals were never committed (only screens-auth.json was). Reaching a state is the slow part: BL-0159's stock browser took three attempts because the entry moved into the panel footer as 'Browse stock' and even that lands on a source picker. Log in as the seed fixture's owner (qa@buildrik.local), not your own user, or /edit redirects and the failure reads as a sentinel timeout."
   }
  },

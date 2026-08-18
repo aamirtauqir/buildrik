@@ -1,55 +1,53 @@
 {
- "commit": "360ee0c9",
+ "commit": "c721e3a9",
  "base": "http://localhost:3000",
- "generated": "2026-08-18T16:03:06.660Z",
+ "generated": "2026-08-18T17:06:18.954Z",
  "captures": [
   {
-   "id": "BL-0106",
+   "id": "BL-0122",
    "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "state": "publish-open__drift",
+   "state": "sitemenu-open__drift",
    "status": 200,
-   "sha256": "9bda3bf3b0ab049f",
+   "sha256": "8df6b37baf282568",
    "scrollHeight": 905,
    "elCount": 82
   },
   {
-   "id": "BL-0108",
+   "id": "BL-0114",
    "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "state": "notifications-open__drift",
+   "state": "sitemenu-publish-history__drift",
    "status": 200,
-   "sha256": "4ec7f1d890468351",
+   "sha256": "09ccf0fe82dfa2b0",
    "scrollHeight": 905,
-   "elCount": 82
+   "elCount": 20
   },
   {
-   "id": "BL-0109",
+   "id": "BL-0115",
    "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "state": "site-menu-open__drift",
+   "state": "sitemenu-export-code__drift",
    "status": 200,
-   "sha256": "ca28a14c42b47cfd",
+   "sha256": "70e03e5b334a7684",
    "scrollHeight": 905,
-   "elCount": 82
+   "elCount": 83
   },
   {
-   "id": "BL-0111",
+   "id": "BL-0116",
    "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "state": "cmdk-open__drift",
+   "state": "sitemenu-templates__drift",
    "status": 200,
-   "sha256": "06d3c3d2d5e3f664",
+   "sha256": "9aaa9658e2476c6a",
    "scrollHeight": 905,
-   "elCount": 82
+   "elCount": 32
+  },
+  {
+   "id": "BL-0118",
+   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
+   "state": "sitemenu-design-system__drift",
+   "status": 200,
+   "sha256": "c9c89ffc966612af",
+   "scrollHeight": 905,
+   "elCount": 20
   }
  ],
- "failures": [
-  {
-   "id": "BL-0107",
-   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "error": "page.waitForSelector: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[role=menu],[role=dialog],[role=listbox]') to be visible\u001b[22m\n"
-  },
-  {
-   "id": "BL-0110",
-   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "error": "page.waitForSelector: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[role=menu],[role=dialog],[role=listbox]') to be visible\u001b[22m\n"
-  }
- ]
+ "failures": []
 }
