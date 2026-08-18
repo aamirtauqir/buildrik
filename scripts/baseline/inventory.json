@@ -153,11 +153,11 @@
     "BL-0108 notifications-open": "28.52% REDRAW",
     "BL-0109 site-menu-open": "9.41% REDRAW",
     "BL-0111 cmdk-open": "9.18% REDRAW",
-    "BL-0124 inspector-button": "14.99% REDRAW",
+    "BL-0124 inspector-button": "14.99% REDRAWN (94.86% agreement)",
     "BL-0125 inspector-container": "13.58% REDRAWN (94.87% agreement)",
-    "BL-0126 inspector-grid": "17.07% REDRAW",
-    "BL-0127 inspector-flex": "24.85% REDRAW",
-    "BL-0128 inspector-input": "14.40% REDRAW",
+    "BL-0126 inspector-grid": "17.07% REDRAWN (95.27% agreement)",
+    "BL-0127 inspector-flex": "24.85% REDRAWN (95.15% agreement)",
+    "BL-0128 inspector-input": "14.40% REDRAWN (95.19% agreement)",
     "BL-0129 inspector-heading": "11.90% REDRAWN (94.21% agreement)",
     "BL-0169 brand-pro-mode": "15.43% REDRAW",
     "BL-0114 sitemenu-publish-history": "3.12% keep",
@@ -259,7 +259,11 @@
     "BL-0105",
     "BL-0116",
     "BL-0118",
+    "BL-0124",
     "BL-0125",
+    "BL-0126",
+    "BL-0127",
+    "BL-0128",
     "BL-0129",
     "BL-0170",
     "BL-0173",
@@ -267,7 +271,7 @@
     "BL-0176"
    ],
    "redrawCost": "BL-0105, the first: 1 clean recapture (the rail tooltip was covering a row in the first reference), 1 computed-style measuring probe, 5 use_figma calls (structure / rows / footer / icons / icon size), 3 screenshots to check. The subtree is 260 nodes; building it as data-driven auto-layout rather than node by node is what kept it to five calls.",
-   "redrawRemaining": 15
+   "redrawRemaining": 11
   }
  },
  "rows": [
@@ -2340,7 +2344,8 @@
    "screenshotHash": "ecc180d61cfb5aa7",
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "90:2",
-   "figmaPageId": "75:2"
+   "figmaPageId": "75:2",
+   "notes": "REDRAWN 2026-08-19 (drift 14.99%). Inspector column rebuilt from the measured live DOM; 94.86% pixel agreement. Control VALUES differ from the reference (different element selected when each was taken) — sample data, not shape. Note: Typography with the size-unit toggle and align picker, Background color/gradient/image tabs, Border."
   },
   {
    "id": "BL-0125",
@@ -2373,7 +2378,8 @@
    "screenshotHash": "1277bc3cd0536b44",
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "93:2",
-   "figmaPageId": "75:2"
+   "figmaPageId": "75:2",
+   "notes": "REDRAWN 2026-08-19 (drift 17.07%). Inspector column rebuilt from the measured live DOM; 95.27% pixel agreement. Control VALUES differ from the reference (different element selected when each was taken) — sample data, not shape. Note: the Corner radius inputs carry real 'px' text nodes here, unlike the Typography ones."
   },
   {
    "id": "BL-0127",
@@ -2389,7 +2395,8 @@
    "screenshotHash": "1c3ce7c882091152",
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "94:2",
-   "figmaPageId": "75:2"
+   "figmaPageId": "75:2",
+   "notes": "REDRAWN 2026-08-19 (drift 24.85%). Inspector column rebuilt from the measured live DOM; 95.15% pixel agreement. Control VALUES differ from the reference (different element selected when each was taken) — sample data, not shape. Note: the Flexbox section with Enable Flex and the Flex Item self controls."
   },
   {
    "id": "BL-0128",
@@ -2405,7 +2412,8 @@
    "screenshotHash": "f8d05deda9111eed",
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "95:2",
-   "figmaPageId": "75:2"
+   "figmaPageId": "75:2",
+   "notes": "REDRAWN 2026-08-19 (drift 14.40%). Inspector column rebuilt from the measured live DOM; 95.19% pixel agreement. Control VALUES differ from the reference (different element selected when each was taken) — sample data, not shape. Note: Typography, Border with width/style/colour, Spacing."
   },
   {
    "id": "BL-0129",
