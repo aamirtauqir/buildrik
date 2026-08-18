@@ -715,7 +715,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -726,7 +726,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -737,7 +737,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -748,7 +748,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -759,7 +759,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -770,7 +770,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -781,7 +781,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -792,7 +792,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -803,7 +803,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -814,7 +814,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "board:149-108",
       "recipe": null
     },
     {
@@ -825,7 +825,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -3916,7 +3916,7 @@
       "width": 0,
       "height": 0,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -3927,7 +3927,7 @@
       "width": 0,
       "height": 0,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -4378,7 +4378,7 @@
       "width": 500,
       "height": 0,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -4389,7 +4389,7 @@
       "width": 640,
       "height": 0,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
