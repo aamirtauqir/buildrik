@@ -115,12 +115,25 @@ export function useHistoryFeedback(
       });
     };
 
+    /* Board 814:7027's sixth variant. ⌘Z with an empty stack did nothing and
+       said nothing — indistinguishable from an undo that failed. Grey, no
+       reverse action: there is nothing to reverse. */
+    const handleNoop = (data: { direction: "undo" | "redo" }) => {
+      addToast({
+        description: data.direction === "undo" ? "Nothing to undo" : "Nothing to redo",
+        tone: "neutral",
+        duration: 2000,
+      });
+    };
+
     composer.on(EVENTS.HISTORY_UNDO, handleUndo);
     composer.on(EVENTS.HISTORY_REDO, handleRedo);
+    composer.on(EVENTS.HISTORY_NOOP, handleNoop);
 
     return () => {
       composer.off(EVENTS.HISTORY_UNDO, handleUndo);
       composer.off(EVENTS.HISTORY_REDO, handleRedo);
+      composer.off(EVENTS.HISTORY_NOOP, handleNoop);
     };
   }, [composer, addToast]);
 }

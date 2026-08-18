@@ -119,6 +119,10 @@ export const EVENTS = {
   HISTORY_PUSH: "history:push",
   HISTORY_UNDO: "history:undo",
   HISTORY_REDO: "history:redo",
+  /* Board 814:7027's sixth variant — "Nothing to undo", grey, no action.
+     ⌘Z on an empty stack returned false and said nothing, so an undo that
+     had nothing left looked exactly like an undo that was broken. */
+  HISTORY_NOOP: "history:noop",
   HISTORY_CHANGED: "history:changed",
   HISTORY_CLEARED: "history:cleared",
   HISTORY_RECORDED: "history:recorded",
@@ -742,6 +746,7 @@ export interface EventPayloads {
   [EVENTS.HISTORY_REDO]: {
     entry: { timestamp: number; snapshot: import("../types").ProjectData; label?: string };
   };
+  [EVENTS.HISTORY_NOOP]: { direction: "undo" | "redo" };
   [EVENTS.HISTORY_RECORDED]: { label?: string };
   [EVENTS.HISTORY_CLEARED]: void;
 

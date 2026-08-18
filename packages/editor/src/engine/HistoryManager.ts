@@ -449,7 +449,10 @@ export class HistoryManager {
     // pops the PREVIOUS step and reverts both — losing the pending edit
     // entirely (it never reaches the redo stack). SSOT for all undo callers.
     this.flushPending();
-    if (!this.canUndo()) return false;
+    if (!this.canUndo()) {
+      this.composer.emit(EVENTS.HISTORY_NOOP, { direction: "undo" });
+      return false;
+    }
 
     const current = this.undoStack.pop()!;
 
@@ -538,7 +541,10 @@ export class HistoryManager {
     // redo stack reflects reality. flushPending() clears the redo stack when
     // it records, which correctly invalidates a stale redo after a new edit.
     this.flushPending();
-    if (!this.canRedo()) return false;
+    if (!this.canRedo()) {
+      this.composer.emit(EVENTS.HISTORY_NOOP, { direction: "redo" });
+      return false;
+    }
 
     const entry = this.redoStack.pop()!;
     const currentState = this.getCurrentState();
