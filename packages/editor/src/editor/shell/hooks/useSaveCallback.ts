@@ -112,13 +112,34 @@ export function useSaveCallback({
           (typeof navigator !== "undefined" && !navigator.onLine) ||
           /network|fetch|offline|failed to fetch|connection/i.test(errorMessage);
         if (isNetwork) {
-          setSaveState((prev) => ({ ...prev, status: "idle" }));
-          addToast({
-            title: "Offline — changes queued",
-            description: "Your edits are saved on this device and will sync when you're back.",
-            tone: "info",
-          });
-          return "queued-offline";
+          /* This copy used to promise, for every project, that the edit was
+             "saved on this device and will sync when you're back". For a
+             dashboard-backed site BOTH halves were false, and it was checked
+             the only way that settles it — edit made, saveProject blocked at
+             the network, tab reloaded, edit gone. With a siteId the save is a
+             bare RPC (`saveProject`), so nothing this path writes is read back
+             on load; and the reconnect queue in `syncRetryQueue` carries CMS,
+             components, templates and versions, never the project. Only the
+             siteId-less branch runs `composer.saveProject()`, which is the one
+             that reaches localStorage — so only it may make the promise. */
+          setSaveState((prev) =>
+            siteId ? { ...prev, status: "error", error: errorMessage } : { ...prev, status: "idle" },
+          );
+          addToast(
+            siteId
+              ? {
+                  title: "Offline — not saved",
+                  description:
+                    "Your changes are still open in this tab. Keep it open and save again once you're back online.",
+                  tone: "warning",
+                }
+              : {
+                  title: "Offline — saved on this device",
+                  description: "Your edits are in this browser and will go up when you're back.",
+                  tone: "info",
+                },
+          );
+          return siteId ? "error" : "queued-offline";
         }
         /* Board S1.5b — an expired session is not a failed save to retry. The
            LOAD path already tells this case apart and offers Sign in

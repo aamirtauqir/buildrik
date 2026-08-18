@@ -9,6 +9,15 @@ import { renderHook, act } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useSaveCallback, type UseSaveCallbackOptions } from "../useSaveCallback";
 
+/* The siteId branch calls the SERVICE's saveProject, not the composer's, so
+   the two have to be controllable apart. getSiteIdFromUrl stays real — the
+   tests drive it by setting window.location, which is what the hook reads. */
+const svc = vi.hoisted(() => ({ saveProject: vi.fn().mockResolvedValue(undefined) }));
+vi.mock("@/services/BuildrikSyncProvider", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/services/BuildrikSyncProvider")>();
+  return { ...actual, saveProject: svc.saveProject };
+});
+
 function makeOpts() {
   const saveProject = vi.fn().mockResolvedValue(undefined);
   const addToast = vi.fn().mockReturnValue("toast-id");
@@ -16,6 +25,7 @@ function makeOpts() {
   const setIsDirty = vi.fn();
   const composer = {
     saveProject,
+    exportProject: vi.fn(() => ({ pages: [] })),
   } as unknown as UseSaveCallbackOptions["composer"];
   return { composer, addToast, setSaveState, setIsDirty, saveProject };
 }
@@ -33,6 +43,7 @@ describe("useSaveCallback", () => {
 
   afterEach(() => {
     vi.clearAllMocks();
+    svc.saveProject.mockResolvedValue(undefined);
   });
 
   it("no-ops when composer is null", async () => {
@@ -91,9 +102,9 @@ describe("useSaveCallback", () => {
     );
   });
 
-  it("on a network/offline error, queues calmly — no 'Save failed'", async () => {
-    // 60-save-states: a connection failure is not a lost save. The edit stays
-    // local and syncs on reconnect, so the user sees a calm 'queued' nudge.
+  it("on a network error with NO siteId, says the edit is on this device", async () => {
+    /* Only this branch runs `composer.saveProject()`, which is the one that
+       writes localStorage — so only here may the copy promise the device. */
     opts.saveProject.mockRejectedValueOnce(new Error("fetch failed: network"));
     const { result } = renderHook(() =>
       useSaveCallback({
@@ -111,13 +122,49 @@ describe("useSaveCallback", () => {
     expect(opts.addToast).toHaveBeenCalledWith(
       expect.objectContaining({
         tone: "info",
-        title: "Offline — changes queued",
+        title: "Offline — saved on this device",
       }),
     );
     // never the scary failed toast for a network error
     expect(opts.addToast).not.toHaveBeenCalledWith(
       expect.objectContaining({ title: "Save failed" }),
     );
+  });
+
+  it("on a network error WITH a siteId, promises nothing about the device", async () => {
+    /* The regression this locks: the copy used to say "saved on this device
+       and will sync when you're back" for every project. With a siteId the
+       save is a bare RPC — nothing local is written on this path and nothing
+       replays it on reconnect (syncRetryQueue carries CMS, components,
+       templates and versions, not the project). Checked live: edit made, save
+       blocked at the network, tab reloaded, edit gone. */
+    const url = new URL("http://localhost:3000/edit/site_abc");
+    const original = window.location;
+    Object.defineProperty(window, "location", { value: url, writable: true });
+    try {
+      svc.saveProject.mockRejectedValueOnce(new Error("fetch failed: network"));
+      const { result } = renderHook(() =>
+        useSaveCallback({
+          composer: opts.composer,
+          addToast: opts.addToast,
+          setSaveState: opts.setSaveState,
+          setIsDirty: opts.setIsDirty,
+        }),
+      );
+      let outcome: string | undefined;
+      await act(async () => {
+        outcome = await result.current();
+      });
+      expect(outcome).toBe("error");
+      expect(opts.addToast).toHaveBeenCalledWith(
+        expect.objectContaining({ tone: "warning", title: "Offline — not saved" }),
+      );
+      expect(opts.addToast).not.toHaveBeenCalledWith(
+        expect.objectContaining({ title: expect.stringContaining("on this device") }),
+      );
+    } finally {
+      Object.defineProperty(window, "location", { value: original, writable: true });
+    }
   });
 
   it.each([

@@ -141,7 +141,11 @@ const REVIEW_PILL: Record<ReviewStatus["state"], Omit<ReviewPill, "onClick"> | n
 const SAVE_ANNOUNCEMENTS: Partial<Record<SaveState, { assertive: boolean; msg: string }>> = {
   error: { assertive: true, msg: "Save failed" },
   conflict: { assertive: true, msg: "Sync conflict — reload" },
-  offline: { assertive: false, msg: "Offline — changes queued" },
+  /* Not "changes queued": for a dashboard-backed site nothing queues them.
+     `saveProject` is a bare RPC and the reconnect queue in syncRetryQueue
+     carries CMS, components, templates and versions — never the project.
+     Proven by blocking the save and reloading: the edit was gone. */
+  offline: { assertive: false, msg: "Offline — changes not saved" },
 };
 
 /** "· 2d ago" suffix on the approved pill (S5.6 board 131:2). */
