@@ -61,8 +61,13 @@ for (const s of specs) {
       if (a.waitFor) await page.waitForSelector(a.waitFor, { timeout: 8000 });
       if (a.waitMs) await page.waitForTimeout(a.waitMs);
     }
-    const data = await page.evaluate((region) => {
+    const data = await page.evaluate(({ region, rootSel }) => {
       const [rx, ry, rw, rh] = region;
+      /* An overlay sits on top of the page, so a region-only walk also picks up
+         whatever is behind it — canvas text, the inspector's empty state. When
+         the screen IS an overlay, name it and the walk starts there. */
+      const rootEl = rootSel ? document.querySelector(rootSel) : document.body;
+      if (!rootEl) return [];
       const hex = (v) => {
         const m = v.match(/[\d.]+/g);
         if (!m) return null;
@@ -72,8 +77,16 @@ for (const s of specs) {
       const out = [];
       const walk = (el, depth) => {
         const r = el.getBoundingClientRect();
-        if (r.width < 1 || r.height < 1) return;
-        if (r.right < rx || r.left > rx + rw || r.bottom < ry || r.top > ry + rh) return;
+        /* Do NOT stop descending at a zero-size box. A portal root has no size
+           of its own, and returning here meant every popover and modal in the
+           editor measured as two nodes — the walk never reached their
+           contents. Skip painting it; keep walking. */
+        /* Never stop descending on geometry. An absolutely-positioned child
+           escapes its parent's box: the site menu hangs off the 32x32 button
+           wrapper in the topbar, entirely outside the region the menu itself
+           occupies, so aborting there measured the whole popover as two nodes.
+           Walk everything; decide what to EMIT per node. */
+        const sized = r.width >= 1 && r.height >= 1;
         const cs = getComputedStyle(el);
         if (cs.visibility === "hidden" || cs.display === "none" || +cs.opacity === 0) return;
         /* Join the raw text nodes, do not trim each one first. JSX writes
@@ -120,9 +133,13 @@ for (const s of specs) {
           const acs = getComputedStyle(a);
           if (!/auto|scroll|hidden/.test(acs.overflowY + acs.overflowX)) continue;
           const ar = a.getBoundingClientRect();
+          /* A portal root is a zero-height box with overflow set; everything
+             inside it looked "clipped" and whole popovers measured as two
+             nodes. Only a container that actually occupies space can clip. */
+          if (ar.height < 2 || ar.width < 2) continue;
           if (r.top >= ar.bottom - 1 || r.bottom <= ar.top + 1) clipped = true;
         }
-        if (!clipped && inside && (own || bg || bw.some(Boolean) || svgEl)) {
+        if (sized && !clipped && inside && (own || bg || bw.some(Boolean) || svgEl)) {
           out.push({
             d: depth, tag: el.tagName.toLowerCase(),
             x: +(r.x - rx).toFixed(1), y: +(r.y - ry).toFixed(1),
@@ -151,9 +168,9 @@ for (const s of specs) {
         }
         if (depth < 30) [...el.children].forEach((c) => walk(c, depth + 1));
       };
-      walk(document.body, 0);
+      walk(rootEl, 0);
       return out;
-    }, s.region);
+    }, { region: s.region, rootSel: s.root || null });
     writeFileSync(join(OUT, `${s.id}.json`), JSON.stringify({ id: s.id, region: s.region, nodes: data }, null, 1));
     console.log(`[measure] OK   ${s.id} — ${data.length} painted nodes`);
     results.push({ id: s.id, count: data.length });

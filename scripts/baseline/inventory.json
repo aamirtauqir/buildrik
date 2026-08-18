@@ -150,9 +150,9 @@
     "BL-0104 panel-content": "4.52% keep",
     "BL-0105 panel-brand": "15.70% REDRAWN 2026-08-18 (94.95% agreement)",
     "BL-0106 publish-open": "6.53% keep",
-    "BL-0108 notifications-open": "28.52% REDRAW",
-    "BL-0109 site-menu-open": "9.41% REDRAW",
-    "BL-0111 cmdk-open": "9.18% REDRAW",
+    "BL-0108 notifications-open": "28.52% REDRAWN (75.67% agreement)",
+    "BL-0109 site-menu-open": "9.41% REDRAWN (89.22% agreement)",
+    "BL-0111 cmdk-open": "9.18% REDRAWN (94.64% agreement)",
     "BL-0124 inspector-button": "14.99% REDRAWN (94.86% agreement)",
     "BL-0125 inspector-container": "13.58% REDRAWN (94.87% agreement)",
     "BL-0126 inspector-grid": "17.07% REDRAWN (95.27% agreement)",
@@ -163,7 +163,7 @@
     "BL-0114 sitemenu-publish-history": "3.12% keep",
     "BL-0116 sitemenu-templates": "8.01% REDRAWN (92.46% agreement)",
     "BL-0118 sitemenu-design-system": "15.72% REDRAWN (95.44% agreement)",
-    "BL-0122 sitemenu-open": "11.87% REDRAW",
+    "BL-0122 sitemenu-open": "11.87% REDRAWN (89.22% agreement)",
     "BL-0115 sitemenu-export-code": "22.02% REDRAW",
     "BL-0159 media-stock-browser": "2.38% keep",
     "BL-0160 media-icon-picker": "2.81% keep",
@@ -201,7 +201,9 @@
    "doorsThatMoved": "Brand's rows were renamed since the pin and the old row names are dead ends for a capture spec: BL-0173 'brand-styles-tab' is now the row labelled **Presets** (id still `styles`), and BL-0170 'brand-dark-preview' is now **Colour mode**. Four site-menu rows lost their labels entirely — site-settings, version-history, components, keyboard-shortcuts. A row that cannot be captured is not necessarily a broken product; usually its door was renamed.",
    "regionMustMatchTheState": "BL-0175 measured 92.30%% against the drawer region and 26.14%% against the modal region. Both numbers are real: the old shot dims the drawer behind an open modal and the new one does not, so the drawer region was measuring a backdrop. Measure a modal row in the modal.",
    "offRailDoorsAreByDesign": "Settings, Version History, Components, Publish and History have no rail icon: the rail is six items by board 52:2, and LeftSidebar says off-rail panels open from ⌘K, shortcuts and the topbar (guarded by tabsConfig.figma.test.ts). Checked before calling anything stranded — pressing S really does open Settings. So the inventory rows named 'sitemenu-site-settings' and 'sitemenu-version-history' are still capturable, just not from the site menu: S, H, ⇧A, U reach them.",
-   "knownResiduals": "Two things a DOM measure cannot reach, both small and both recorded rather than faked: unit suffixes in the inspector ('px' after a number) are CSS ::after content and have no node to read; and Figma renders Inter a shade wider than Chrome, so a line of wrapped copy can break one word earlier or later. Text alignment WAS missing for the first inspector frame (labels are right-aligned in the app, left in BL-0129) and is captured from BL-0124 on."
+   "knownResiduals": "Two things a DOM measure cannot reach, both small and both recorded rather than faked: unit suffixes in the inspector ('px' after a number) are CSS ::after content and have no node to read; and Figma renders Inter a shade wider than Chrome, so a line of wrapped copy can break one word earlier or later. Text alignment WAS missing for the first inspector frame (labels are right-aligned in the app, left in BL-0129) and is captured from BL-0124 on.",
+   "correctionSiteMenu": "An earlier note here said site-settings, version-history, components and keyboard-shortcuts were 'no longer labels in the site menu'. They are all there — the claim came from a regex over SiteMenu.tsx that only matched a subset of the markup. Measuring the open menu listed nineteen items across five groups, including all four.",
+   "overlayMeasureNotes": "Overlays needed three fixes before they measured at all. The walk stopped descending at a zero-size box, and a portal root has no size — every popover came back as two nodes. It also stopped descending when a node fell outside the region, but an absolutely-positioned child escapes its parent: the site menu hangs off the 32x32 topbar button, nowhere near the region the menu occupies. And a region-only walk picked up the page BEHIND the overlay, so specs now name a `root` selector and the walk starts there."
   },
   "driftRegions": {
    "_note": "Whole-frame comparison does not work: the alignment search picks dy=0 because the topbar never moved and the canvas content dominates, so the ReviewBar offset below it is never cancelled. Each state family needs the band its state actually lives in. Rail is 0-60, drawer 60-380, canvas 380-1140, inspector 1140-1440; the shell above starts at 56.",
@@ -257,8 +259,12 @@
    "redrawn": [
     "BL-0100",
     "BL-0105",
+    "BL-0108",
+    "BL-0109",
+    "BL-0111",
     "BL-0116",
     "BL-0118",
+    "BL-0122",
     "BL-0124",
     "BL-0125",
     "BL-0126",
@@ -271,7 +277,7 @@
     "BL-0176"
    ],
    "redrawCost": "BL-0105, the first: 1 clean recapture (the rail tooltip was covering a row in the first reference), 1 computed-style measuring probe, 5 use_figma calls (structure / rows / footer / icons / icon size), 3 screenshots to check. The subtree is 260 nodes; building it as data-driven auto-layout rather than node by node is what kept it to five calls.",
-   "redrawRemaining": 11
+   "redrawRemaining": 7
   }
  },
  "rows": [
@@ -2086,7 +2092,8 @@
    "screenshotHash": "7d6589115c68525f",
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "67:2",
-   "figmaPageId": "75:2"
+   "figmaPageId": "75:2",
+   "notes": "REDRAWN 2026-08-19 (drift 28.52%). Overlay rebuilt from the measured live DOM; 75.67% pixel agreement. Note: date groups, rows with status dots, relative times, See all footer; the times and group labels differ because days passed between the reference and the measure."
   },
   {
    "id": "BL-0109",
@@ -2102,7 +2109,8 @@
    "screenshotHash": "78fb3122a1653b31",
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "73:2",
-   "figmaPageId": "75:2"
+   "figmaPageId": "75:2",
+   "notes": "REDRAWN 2026-08-19 (drift 9.41%). Overlay rebuilt from the measured live DOM; 89.22% pixel agreement. Note: the full site menu, including the Site settings / Version history / Components / Keyboard shortcuts items an earlier grep had wrongly reported as gone."
   },
   {
    "id": "BL-0110",
@@ -2134,7 +2142,8 @@
    "screenshotHash": "52362d3c4aaf843c",
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "72:2",
-   "figmaPageId": "75:2"
+   "figmaPageId": "75:2",
+   "notes": "REDRAWN 2026-08-19 (drift 9.18%). Overlay rebuilt from the measured live DOM; 94.64% pixel agreement. Note: search row, Suggested and Go to groups with shortcut chips, and the navigate/run/close hint bar."
   },
   {
    "id": "BL-0112",
@@ -2312,7 +2321,8 @@
    "screenshotHash": "d09cec43633e77db",
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "87:2",
-   "figmaPageId": "75:2"
+   "figmaPageId": "75:2",
+   "notes": "REDRAWN 2026-08-19 (drift 11.87%). Overlay rebuilt from the measured live DOM; 89.22% pixel agreement. Note: same popover as BL-0109."
   },
   {
    "id": "BL-0123",
