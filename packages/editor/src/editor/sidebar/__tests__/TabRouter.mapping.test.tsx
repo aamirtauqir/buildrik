@@ -45,9 +45,6 @@ vi.mock("../tabs/publish/PublishTab", () => ({
 vi.mock("../tabs/history/HistoryTab", () => ({
   default: () => <div data-testid="tab-history" />,
 }));
-vi.mock("../tabs/settings/SettingsTab", () => ({
-  default: () => <div data-testid="tab-settings" />,
-}));
 vi.mock("../tabs/ai/AITab", () => ({
   AITab: () => <div data-testid="tab-ai" />,
 }));
@@ -83,7 +80,6 @@ describe("TabRouter — tab id → panel component mapping", () => {
     ["assets", "tab-assets"],
     ["publish", "tab-publish"],
     ["history", "tab-history"],
-    ["settings", "tab-settings"],
     ["design", "tab-design"],
   ];
 
@@ -94,6 +90,16 @@ describe("TabRouter — tab id → panel component mapping", () => {
 
   it("renders nothing for an unknown tab id", () => {
     const { container } = renderRouter("not-a-tab" as unknown as GroupedTabId);
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  /* Settings is a FULLPAGE tab (tabsConfig `mode: "fullpage"`), so the drawer
+     must not route it. The router used to, which meant a second SettingsTab
+     mounted invisibly behind the real one on every visit — and because the
+     drawer's copy was the one wired to the unsaved-changes flag, the guard
+     against leaving Settings mid-edit never fired. FullPageRouter owns it. */
+  it("renders nothing for settings — that surface belongs to FullPageRouter", () => {
+    const { container } = renderRouter("settings");
     expect(container).toBeEmptyDOMElement();
   });
 });

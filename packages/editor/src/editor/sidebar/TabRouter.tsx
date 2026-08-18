@@ -43,7 +43,6 @@ const PublishTab = React.lazy(() => import("./tabs/publish/PublishTab"));
 const HistoryTab = React.lazy(() => import("./tabs/history/HistoryTab"));
 const ReviewTab = React.lazy(() => import("./tabs/review/ReviewTab"));
 const ContentTab = React.lazy(() => import("./tabs/content/ContentTab"));
-const SettingsTab = React.lazy(() => import("./tabs/settings/SettingsTab"));
 const AITab = React.lazy(() =>
   import("./tabs/ai/AITab").then((m) => ({ default: m.AITab })),
 );
@@ -63,13 +62,10 @@ export interface TabRouterProps {
   canvasHoveredId?: string | null;
   onSwitchToAdd: () => void;
   onSwitchToTemplates?: () => void;
-  onSwitchToDesign?: () => void;
   onCreateComponent: () => void;
-  onReplayTour?: () => void;
   projectId?: string | null;
   publishJob?: UsePublishJobResult;
   onVercelPublish?: () => Promise<void>;
-  onSettingsDirtyChange?: (dirty: boolean) => void;
   onTemplatesSwitchTab?: (tab: string) => void;
   /** Switches the assets tab from slim launcher to fullpage library manager. */
   onOpenLibrary?: (opts?: { searchQuery?: string; folderId?: string | null }) => void;
@@ -107,14 +103,11 @@ export const TabRouter: React.FC<TabRouterProps> = ({
   canvasHoveredId,
   onSwitchToAdd,
   onSwitchToTemplates,
-  onSwitchToDesign,
   onCreateComponent,
   projectId,
   publishJob,
   onVercelPublish,
-  onSettingsDirtyChange,
   onTemplatesSwitchTab,
-  onReplayTour,
   onOpenLibrary,
   onOpenImageEditor,
   onOpenIconPicker,
@@ -239,18 +232,6 @@ export const TabRouter: React.FC<TabRouterProps> = ({
     case "content":
       return (
         <ContentTab composer={composer} onCreateCollection={onCreateCollection} {...commonTabProps} />
-      );
-
-    case "settings":
-      return (
-        <SettingsTab
-          composer={composer}
-          projectId={projectId}
-          onReplayTour={onReplayTour}
-          onDirtyChange={onSettingsDirtyChange}
-          onOpenDesignTab={onSwitchToDesign}
-          {...commonTabProps}
-        />
       );
 
     case "design":

@@ -182,6 +182,11 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   // Media tab dual-mode: panel (slim launcher) or fullpage (library manager)
   const [mediaFullPage, setMediaFullPage] = React.useState(false);
 
+  /* Settings' unsaved-edit flag lives here because two children need it:
+     FullPageView mounts the SettingsTab that raises it, and LeftSidebar's
+     rail draws the dirty dot and guards the tab switch against it. */
+  const [settingsDirty, setSettingsDirty] = React.useState(false);
+
   // Derive fullpage mode from tab if not explicitly passed
   const activeTabId = (leftPanelTab as GroupedTabId) || "add";
   const effectiveFullPageMode =
@@ -359,6 +364,8 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
             onElementSelect={handleElementSelect}
             onBlockClick={handleBlockClick}
             canvasHoveredId={canvasHoveredId}
+            settingsDirty={settingsDirty}
+            onSettingsDirtyChange={setSettingsDirty}
             projectId={projectId}
             publishJob={publishJob}
             onVercelPublish={onVercelPublish}
@@ -435,6 +442,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
             onSwitchToAdd={() => onLeftPanelTabChange?.("add")}
             onSwitchToDesign={() => onLeftPanelTabChange?.("design")}
             onReplayTour={undefined}
+            onSettingsDirtyChange={setSettingsDirty}
             projectId={projectId}
             onOpenImageEditor={onOpenImageEditor}
             onOpenIconPicker={onOpenIconPicker}

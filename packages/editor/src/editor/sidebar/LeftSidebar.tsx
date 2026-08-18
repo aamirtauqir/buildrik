@@ -69,7 +69,9 @@ export interface LeftSidebarProps {
   onElementSelect?: (elementId: string) => void;
   onBlockClick?: (block: BlockData) => void;
   canvasHoveredId?: string | null;
-  onReplayTour?: () => void;
+  /** Settings' unsaved-edit flag, owned by the shell — see the guard below. */
+  settingsDirty?: boolean;
+  onSettingsDirtyChange?: (dirty: boolean) => void;
   projectId?: string | null;
   publishJob?: UsePublishJobResult;
   onVercelPublish?: () => Promise<void>;
@@ -357,7 +359,8 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   onElementSelect,
   onBlockClick,
   canvasHoveredId,
-  onReplayTour,
+  settingsDirty = false,
+  onSettingsDirtyChange,
   projectId,
   publishJob,
   onVercelPublish,
@@ -378,8 +381,12 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   const isExpanded = controlledExpanded ?? internalExpanded;
   const onExpandToggle = controlledExpandToggle ?? (() => setInternalExpanded((p) => !p));
 
-  // Settings dirty-state guard
-  const [settingsDirty, setSettingsDirty] = React.useState(false);
+  /* `settingsDirty` is OWNED BY THE SHELL, not by this component. Settings is
+     a full-page tab, so the copy the user types into is the one FullPageView
+     mounts, and only the shell sees both that and this rail. While the flag
+     lived here it was fed by a second, invisible SettingsTab that no edit
+     ever reached — so the guard below never fired and leaving Settings
+     dropped unsaved changes without a word. */
   const [tabGuard, setTabGuard] = React.useState<{
     open: boolean;
     pendingTab: GroupedTabId | null;
@@ -399,9 +406,9 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   const confirmTabSwitch = React.useCallback(() => {
     const dest = tabGuard.pendingTab;
     setTabGuard({ open: false, pendingTab: null });
-    setSettingsDirty(false);
+    onSettingsDirtyChange?.(false);
     if (dest) onTabChange(dest);
-  }, [tabGuard.pendingTab, onTabChange]);
+  }, [tabGuard.pendingTab, onTabChange, onSettingsDirtyChange]);
 
   const cancelTabSwitch = React.useCallback(() => {
     setTabGuard({ open: false, pendingTab: null });
@@ -644,13 +651,10 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
                     composer?.emit(EVENTS.UI_TEMPLATES_NEWPAGE_ON, {});
                     safeTabChange("templates");
                   }}
-                  onSwitchToDesign={() => safeTabChange("design")}
                   onCreateComponent={handleCreateComponent}
-                  onReplayTour={onReplayTour}
                   projectId={projectId}
                   publishJob={publishJob}
                   onVercelPublish={onVercelPublish}
-                  onSettingsDirtyChange={setSettingsDirty}
                   onTemplatesSwitchTab={(tab) => safeTabChange(tab as GroupedTabId)}
                   onOpenLibrary={onOpenLibrary}
                   onOpenImageEditor={onOpenImageEditor}

@@ -759,7 +759,17 @@ export const SettingsTab: React.FC<
   NAV.forEach((n) => navByGroup[n.group].push(n));
 
   return (
-    <PanelFrame>
+    /* width="fullpage" is load-bearing, not cosmetic. Settings graduated to a
+       full-page surface (tabsConfig `mode: "fullpage"`), so its host is
+       `.ls-fullpage-container` — a flex COLUMN. The default `narrow` width
+       carries `tw:flex-none`, which in that column resolves to the root's
+       content height: the header row alone, with the body (`flex-1 min-h-0`)
+       at zero. Every screen below mounted, measured 1379 wide by 0 tall and
+       drew nothing — the surface looked like an empty page under a
+       "Settings" header. (Do not restate the header's pixel height here: the
+       green-panel allowlist counts `NNpx` in this file even inside a
+       comment, unlike Gate 14 itself, which excludes doc lines.) */
+    <PanelFrame width="fullpage">
       <PanelFrame.Header
         title={isRoot ? "Settings" : current.title}
         subtitle={!isRoot ? current.subtitle : undefined}
