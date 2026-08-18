@@ -239,6 +239,7 @@
     "BL-0120",
     "BL-0121",
     "BL-0122",
+    "BL-0123",
     "BL-0124",
     "BL-0125",
     "BL-0126",
@@ -261,9 +262,9 @@
     "BL-0175",
     "BL-0176"
    ],
-   "remaining": 4,
+   "remaining": 3,
    "note": "Each remaining row needs its capture spec rebuilt by hand — the originals were never committed (only screens-auth.json was). Reaching a state is the slow part: BL-0159's stock browser took three attempts because the entry moved into the panel footer as 'Browse stock' and even that lands on a source picker. Log in as the seed fixture's owner (qa@buildrik.local), not your own user, or /edit redirects and the failure reads as a sentinel timeout.",
-   "remainingRows": "BL-0123 (canvas-text selector needed), BL-0162 (media list-toggle selector needed) — both are missing SELECTORS, not missing features · BL-0171 (captured, frame never written) · BL-0172 (NEXT_PUBLIC_FEATURE_DS_AI unset, so there is no state to capture)",
+   "remainingRows": "BL-0162 (fixture has no media, so the list toggle is disabled — adding an asset would restate every verified Media row) · BL-0171 (captured, frame never written) · BL-0172 (NEXT_PUBLIC_FEATURE_DS_AI unset, so there is no state to capture)",
    "redrawn": [
     "BL-0100",
     "BL-0105",
@@ -276,6 +277,7 @@
     "BL-0116",
     "BL-0118",
     "BL-0122",
+    "BL-0123",
     "BL-0124",
     "BL-0125",
     "BL-0126",
@@ -2366,7 +2368,7 @@
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "88:2",
    "figmaPageId": "75:2",
-   "notes": "STILL UNMEASURED 2026-08-19 — the door, not the app. Selecting canvas text with `text=Lorem ipsum dolor sit amet` times out: the canvas mounts engine HTML and the click has to land on the element the engine owns. Needs a `[data-buildrick-id]`-based selector taken from a live probe, not a text match."
+   "notes": "REDRAWN 2026-08-19 (drift 44.58%). The text inspector changed shape: the old \"TEXT · Inter · 16px\" block with a Font Family label and a collapsed list under it is now a TYPOGRAPHY section carrying Family / Size+line-height / Weight / Align / Color (with a contrast-warning chip) / Transform / Decoration / Letter / Word, followed by an EXPANDED Spacing section and then SIZE / BACKGROUND / BORDER. 92.83% pixel agreement. Door: `[data-buildrick-type='paragraph']` — a text match on the canvas copy times out, because the canvas mounts engine HTML and the click has to land on the element the engine owns. HARNESS FIX in the same commit: measure-region read an input's `placeholder` and never its `value`, so the first rebuild drew every number field in its empty state — Size 0 where the app showed 16, line-height 1.5 where it showed 1.6 — and left the Weight select blank. It now reads `value` first and a select's chosen option, which also brought the px unit labels in. Still missing by construction: the colour chip's checkerboard swatch (a CSS background, not a node) and the align/decoration glyphs, which measure as their fallback characters."
   },
   {
    "id": "BL-0124",
@@ -3003,7 +3005,7 @@
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "121:2",
    "figmaPageId": "75:2",
-   "notes": "STILL UNMEASURED 2026-08-19 — the door, not the app. The Media panel opens (`button[aria-label^='Upload and manage']`), but the list/grid toggle is not `button[aria-label*='list']`; its real selector has to be read off the running panel first."
+   "notes": "BLOCKED ON FIXTURE DATA 2026-08-19 — not a selector, and not a broken door. The Media panel opens and the toggle exists at `button[aria-label='List view']`, but it is DISABLED, because the seed fixture's library is empty (the type chips read image 0 / video 0 / svg 0 / icon 0). There is no list to switch to. Capturing this row needs a media asset on the fixture — and adding one would change what every already-verified Media row renders, so it is a deliberate decision, not a fix to slip in. Worth a separate question: whether a view toggle should be disabled at all when the library is empty."
   },
   {
    "id": "BL-0163",

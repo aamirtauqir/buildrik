@@ -118,8 +118,18 @@ for (const s of specs) {
         /* An empty field still shows its placeholder, which is an attribute and
            not a text node — the Insert drawer's "Search elements" was missing
            from the rebuild until this. */
-        if (!own && (el.tagName === "INPUT" || el.tagName === "TEXTAREA") && el.placeholder) {
-          own = el.placeholder;
+        if (!own && (el.tagName === "INPUT" || el.tagName === "TEXTAREA")) {
+          /* VALUE first, placeholder second. Reading the placeholder alone
+             redrew the inspector's number fields as their empty state — Size
+             "0" where the app showed 16, line-height "1.5" where it showed
+             1.6 — because a filled input's text is a property, not a text
+             node, and the walk only sees text nodes. */
+          own = el.value || el.placeholder || "";
+        }
+        /* Same shape for a select: the chosen option's label is not a child
+           of the <select> in the render tree. */
+        if (!own && el.tagName === "SELECT" && el.selectedOptions && el.selectedOptions[0]) {
+          own = el.selectedOptions[0].textContent.replace(/\s+/g, " ").trim();
         }
         const bg = hex(cs.backgroundColor);
         /* Thumbnails and hero strips are painted with CSS gradients, which the
