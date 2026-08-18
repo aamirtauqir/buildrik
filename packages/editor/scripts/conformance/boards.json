@@ -1067,7 +1067,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -1078,7 +1078,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -1089,7 +1089,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:state-exists",
       "recipe": null
     },
     {
@@ -1100,7 +1100,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -1111,7 +1111,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -1122,7 +1122,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -1133,7 +1133,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -1144,7 +1144,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -1155,7 +1155,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -3487,7 +3487,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "board:1069-4529",
       "recipe": null
     },
     {
@@ -3498,7 +3498,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "founder:no-templates-in-insert",
       "recipe": null
     },
     {
@@ -3509,7 +3509,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -3520,7 +3520,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
