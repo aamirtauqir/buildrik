@@ -13,7 +13,14 @@
  * of a percent on screens that have not actually changed, which is exactly why
  * this prints a number instead of a verdict.
  *
- * Usage: node drift-diff.mjs <BL-id> <state>   (after capturing <state>__drift)
+ * Usage: node drift-diff.mjs <BL-id> <state> [--region x,y,w,h]
+ *   (after capturing <state>__drift)
+ *
+ * --region confines the comparison to one band of the frame. The editor's left
+ * drawer is `--region 60,56,320,844`: everything the panel rows are actually
+ * about, with the topbar, canvas and inspector left out. Without it every
+ * editor row reads ~13% because they all contain the same shell, and the shell
+ * gained a ReviewBar row on 2026-08-17 (board 200:213).
  */
 import { createRequire } from "node:module";
 import { existsSync } from "node:fs";
@@ -26,7 +33,10 @@ const require = createRequire(join(HERE, "..", "..", "packages", "dashboard", "p
 const sharp = require("sharp");
 const SHOTS = join(homedir(), ".gstack", "projects", "aamirtauqir-buildrik", "baseline-shots");
 
-const [id, state] = process.argv.slice(2);
+const argv = process.argv.slice(2);
+const [id, state] = argv;
+const regionArg = argv.includes("--region") ? argv[argv.indexOf("--region") + 1] : null;
+const region = regionArg ? regionArg.split(",").map(Number) : null;
 if (!id || !state) { console.error("usage: drift-diff.mjs <BL-id> <state>"); process.exit(3); }
 const before = join(SHOTS, id, `${state}.png`);
 const after = join(SHOTS, id, `${state}__drift.png`);
@@ -59,27 +69,33 @@ const TOL = 12; // per-channel tolerance: font hinting and subpixel noise, not l
    A pure translation is not drift in the panel, so score the best vertical
    alignment in a small window and report that; the offset is printed, because
    a non-zero one is itself a finding about the shell. */
-const OFFSETS = [0, -1, 1, -2, 2, -3, 3, -4, 4, -5, 5, -6, 6];
+/* Wide enough to swallow a whole inserted row: ReviewBar is ~48px, so a panel
+   that did not change still sits 48px lower than it used to. Searching only a
+   few px would score that as total change. */
+const OFFSETS = [];
+for (let i = 0; i <= 64; i++) { OFFSETS.push(i); if (i) OFFSETS.push(-i); }
+const [rx, ry, rw, rh] = region ?? [0, 0, W, H];
+const X0 = Math.max(0, rx), X1 = Math.min(W, rx + rw);
 const scoreAt = (dy) => {
   let n = 0;
-  const y0 = Math.max(0, -dy);
-  const y1 = Math.min(H, H - dy);
+  const y0 = Math.max(ry, -dy);
+  const y1 = Math.min(Math.min(H, ry + rh), H - dy);
   for (let y = y0; y < y1; y++) {
-    for (let x = 0; x < W; x++) {
+    for (let x = X0; x < X1; x++) {
       if (Math.abs(at(a, x, y, 0) - at(b, x, y + dy, 0)) > TOL ||
           Math.abs(at(a, x, y, 1) - at(b, x, y + dy, 1)) > TOL ||
           Math.abs(at(a, x, y, 2) - at(b, x, y + dy, 2)) > TOL) n++;
     }
   }
-  return { n, rows: y1 - y0 };
+  return { n, rows: Math.max(0, y1 - y0) };
 };
 let best = null, bestDy = 0;
 for (const dy of OFFSETS) {
   const r = scoreAt(dy);
-  const share = r.n / (r.rows * W);
+  if (r.rows <= 0) continue;
+  const share = r.n / (r.rows * (X1 - X0));
   if (best === null || share < best) { best = share; bestDy = dy; }
 }
-differing = Math.round(best * W * H);
-const total = W * H;
-const shift = bestDy === 0 ? "" : ` · best at dy=${bestDy}px (shell shifted)`;
-console.log(`${id} ${state}: ${(best * 100).toFixed(2)}% differ${shift}${sizeNote}`);
+const shift = bestDy === 0 ? "" : ` · aligned at dy=${bestDy}px`;
+const where = region ? ` · region ${regionArg}` : "";
+console.log(`${id} ${state}: ${(best * 100).toFixed(2)}% differ${shift}${where}${sizeNote}`);

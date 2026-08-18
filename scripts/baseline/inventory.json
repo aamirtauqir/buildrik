@@ -139,7 +139,16 @@
     "BL-0105 panel-brand": "14.56%",
     "BL-0169 brand-pro-mode": "45.67%"
    },
-   "floorExplained": "Six panel roots landed in a 12.6-14.6% band, media included, and media has zero commits since the pin. Read side by side, the Media panel body is unchanged — the band is the SHELL every editor frame contains. ReviewBar (869cebb2, 2026-08-17, board 200:213) added a whole row under the topbar whenever a round is open, and the seed fixture has one; the inspector is present in the new renders and absent in the old. Vertical re-alignment does not cancel it (best offset is 0), because a new row is not a translation. CONSEQUENCE for the per-row path: the panel-level signal is real and usable — 45.67% on Brand vs a flat floor on Media is exactly the discrimination it was built for — but every editor frame's chrome is stale regardless of its panel, so 'redraw only what moved' still touches the shell band of all 48. Founder call: redraw all 48, or redraw the shell band once if the frames are componentised enough to swap it."
+   "floorExplained": "Six panel roots landed in a 12.6-14.6% band, media included, and media has zero commits since the pin. Read side by side, the Media panel body is unchanged — the band is the SHELL every editor frame contains. ReviewBar (869cebb2, 2026-08-17, board 200:213) added a whole row under the topbar whenever a round is open, and the seed fixture has one; the inspector is present in the new renders and absent in the old. Vertical re-alignment does not cancel it (best offset is 0), because a new row is not a translation. CONSEQUENCE for the per-row path: the panel-level signal is real and usable — 45.67% on Brand vs a flat floor on Media is exactly the discrimination it was built for — but every editor frame's chrome is stale regardless of its panel, so 'redraw only what moved' still touches the shell band of all 48. Founder call: redraw all 48, or redraw the shell band once if the frames are componentised enough to swap it.",
+   "panelRegionMethod": "drift-diff.mjs --region 60,56,320,844 confines the comparison to the left drawer and searches +-64px of vertical alignment. It settles on dy=48px by itself — the ReviewBar's own height — which is the shell offset cancelled. Calibrated: media 2.13% (zero commits since the pin, panel confirmed identical by eye), layers 4.23% (the eye/lock icons were recoloured), brand 15.70% (tabs became a drill-in list). Read >~8% as 'the panel moved'.",
+   "panelDrift": {
+    "BL-0100 shell-default": "n/a (whole-frame row)",
+    "BL-0101 panel-layers": "4.23%",
+    "BL-0103 panel-media": "2.13%",
+    "BL-0105 panel-brand": "15.70%",
+    "BL-0169 brand-pro-mode": "15.43%"
+   },
+   "shellBandNote": "FOUNDER CALL 2026-08-18: redraw a frame only when its PANEL moved; the shell band in every editor frame stays as drawn and is known-stale — it predates ReviewBar (869cebb2, 2026-08-17). Componentising the shell was considered and declined for now: the frames hold zero components (433 raw frames each), so there is nothing to swap without building it first."
   }
  },
  "rows": [
