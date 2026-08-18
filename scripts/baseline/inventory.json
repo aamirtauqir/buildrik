@@ -171,13 +171,13 @@
     "BL-0164 pages-add-page": "3.27% keep",
     "BL-0165 pages-listings-view": "1.08% keep",
     "BL-0166 pages-more-add-options": "4.03% keep",
-    "BL-0167 pages-fullpage": "28.99% REDRAW",
+    "BL-0167 pages-fullpage": "28.99% REDRAWN (94.38% agreement)",
     "BL-0170 brand-dark-preview": "15.38% REDRAWN (95.83% agreement)",
     "BL-0173 brand-styles-tab": "12.43% REDRAWN (97.35% agreement)",
     "BL-0174 brand-components-tab": "15.86% REDRAWN (96.20% agreement)",
     "BL-0175 content-create-collection": "26.14% REDRAW (modal region 400,120,640,660)",
     "BL-0112 sitemenu-site-settings": "9.42% REDRAW",
-    "BL-0113 sitemenu-version-history": "10.45% REDRAW",
+    "BL-0113 sitemenu-version-history": "10.45% REDRAWN (87.68% agreement)",
     "BL-0117 sitemenu-components": "5.79% keep",
     "BL-0176 publish-confirm": "15.57% REDRAWN (94.49% agreement)"
    },
@@ -262,6 +262,7 @@
     "BL-0108",
     "BL-0109",
     "BL-0111",
+    "BL-0113",
     "BL-0116",
     "BL-0118",
     "BL-0122",
@@ -271,13 +272,14 @@
     "BL-0127",
     "BL-0128",
     "BL-0129",
+    "BL-0167",
     "BL-0170",
     "BL-0173",
     "BL-0174",
     "BL-0176"
    ],
    "redrawCost": "BL-0105, the first: 1 clean recapture (the rail tooltip was covering a row in the first reference), 1 computed-style measuring probe, 5 use_figma calls (structure / rows / footer / icons / icon size), 3 screenshots to check. The subtree is 260 nodes; building it as data-driven auto-layout rather than node by node is what kept it to five calls.",
-   "redrawRemaining": 7
+   "redrawRemaining": 5
   }
  },
  "rows": [
@@ -2175,7 +2177,8 @@
    "screenshotHash": "91dd9e61a29a5a80",
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "78:2",
-   "figmaPageId": "75:2"
+   "figmaPageId": "75:2",
+   "notes": "REDRAWN 2026-08-19 (drift 10.45%). Rebuilt from the measured live DOM; 87.68% pixel agreement. Timestamps and row counts differ from the reference — sample data. Note: tabs, the Milestones/All changes pills, search, and the TODAY group of auto-saves."
   },
   {
    "id": "BL-0114",
@@ -3053,7 +3056,8 @@
    "screenshotHash": "2a2c2724a8c7757a",
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "127:2",
-   "figmaPageId": "75:2"
+   "figmaPageId": "75:2",
+   "notes": "REDRAWN 2026-08-19 (drift 28.99%). Rebuilt from the measured live DOM; 94.38% pixel agreement. Timestamps and row counts differ from the reference — sample data. Note: the full-page Pages surface — search, Listings toggle, page rows with checkboxes, Add page."
   },
   {
    "id": "BL-0168",
