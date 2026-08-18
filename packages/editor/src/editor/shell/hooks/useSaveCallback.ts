@@ -149,6 +149,22 @@ export function useSaveCallback({
            NOT claim the work is safe on this device: with a siteId, save goes
            straight to the server (`saveProject`) and never runs the engine's
            localStorage write, so that promise is not ours to make here. */
+        /* The save was refused before it left the browser, because this
+           site's project never loaded — saving now would replace the stored
+           pages with whatever the fallback put on screen. Reload is the fix,
+           and it is the ONLY thing to offer: a Retry would repeat the
+           overwrite. */
+        if (errorMessage.includes("PROJECT_NOT_LOADED")) {
+          setSaveState((prev) => ({ ...prev, status: "error", error: errorMessage }));
+          addToast({
+            title: "Not saved — this site never loaded",
+            description:
+              "Saving now would overwrite the stored pages with what's on screen. Reload to get the real site first.",
+            tone: "warning",
+            action: { label: "Reload", onClick: () => window.location.reload() },
+          });
+          return "error";
+        }
         const isAuth = /unauthorized|forbidden|401|403|session expired|not signed in/i.test(
           errorMessage,
         );

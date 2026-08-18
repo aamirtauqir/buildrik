@@ -46,6 +46,29 @@ function getClient() {
 // successful save; the caller may force it (to the server's value) to overwrite.
 let _baselineLastEditedAt: string | null = null;
 
+/* Site ids whose project actually came back from the server this session.
+   A save is only safe for a site in this set: `saveProjectData` treats a
+   full snapshot as authoritative and DELETES pages the payload omits, so
+   saving a project the editor never loaded replaces the real site with
+   whatever the fallback put on screen. Verified on a scratch site — one
+   blocked load plus one inserted element turned a 2-page site into a single
+   "Page 1". `initBuildrikSync`'s empty-project guard does not cover this: the
+   fallback project has a child, so it counts as content. */
+const _loadedSites = new Set<string>();
+
+/** A save refused because the site's project never loaded — not a failure to
+ *  reach the server, and deliberately worded so the network-error branch in
+ *  useSaveCallback does not claim it. */
+export class ProjectNotLoadedError extends Error {
+  constructor(public readonly siteId: string) {
+    super(
+      `PROJECT_NOT_LOADED: refusing to save site ${siteId} — its project never loaded this session, ` +
+        "so this save would replace the stored pages with what the fallback put on screen.",
+    );
+    this.name = "ProjectNotLoadedError";
+  }
+}
+
 /** Thrown by saveProject when the server rejects a behind-copy. Carries the
  *  server's current lastEditedAt so the UI can offer "Reload latest". */
 export class SaveConflictError extends Error {
@@ -231,6 +254,9 @@ export async function loadProject(siteId: string): Promise<ProjectData> {
     // 61-conflict: record the load-time version as the save baseline.
     const loadedLastEditedAt = (site as { lastEditedAt?: string | Date | null }).lastEditedAt;
     _baselineLastEditedAt = loadedLastEditedAt ? new Date(loadedLastEditedAt).toISOString() : null;
+    // Same moment, same fact: this site's project is now known-good in memory,
+    // which is the only condition under which saving over it is safe.
+    _loadedSites.add(siteId);
 
     return {
       version: "1.0",
@@ -289,6 +315,7 @@ export async function saveProject(
   siteId: string,
   projectData: ProjectData
 ): Promise<{ success: boolean; savedAt: Date }> {
+  if (!_loadedSites.has(siteId)) throw new ProjectNotLoadedError(siteId);
   const client = getClient();
   const siteColumnPatch = extractSiteColumnPatch(projectData);
   const hasSiteColumnChanges = Object.keys(siteColumnPatch).length > 0;

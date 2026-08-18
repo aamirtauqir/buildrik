@@ -394,10 +394,20 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               error: message,
             }));
             if (siteId) {
+              /* A save refused because the project never loaded is not a
+                 failed request — it is the guard that stops autosave from
+                 overwriting the real site with the fallback. Say so, and
+                 offer the only action that helps. */
+              const notLoaded = message.includes("PROJECT_NOT_LOADED");
               addToast({
-                title: "Save failed",
-                description: "Could not save to dashboard. Changes are unsaved.",
-                tone: "error",
+                title: notLoaded ? "Not saved — this site never loaded" : "Save failed",
+                description: notLoaded
+                  ? "Autosave is held back so it can't overwrite the stored pages. Reload to get the real site."
+                  : "Could not save to dashboard. Changes are unsaved.",
+                tone: notLoaded ? "warning" : "error",
+                ...(notLoaded
+                  ? { action: { label: "Reload", onClick: () => window.location.reload() } }
+                  : {}),
               });
             }
           });

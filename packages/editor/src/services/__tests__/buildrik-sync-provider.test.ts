@@ -49,8 +49,18 @@ import {
   initBuildrikSync,
   setBaselineLastEditedAt,
   SaveConflictError,
+  ProjectNotLoadedError,
   SAVE_CONFLICT_EVENT,
 } from "../BuildrikSyncProvider";
+
+/* saveProject refuses a site whose project never loaded — the guard that stops
+   a failed load from overwriting the stored pages with the fallback. Save
+   tests have to satisfy the same precondition the editor does. */
+async function loadedSite(id: string) {
+  mocks.sitesGetQuery.mockResolvedValue({ id, name: "T" });
+  mocks.pagesListQuery.mockResolvedValue([]);
+  await loadProject(id);
+}
 
 beforeEach(() => {
   mocks.sitesGetQuery.mockReset();
@@ -123,7 +133,22 @@ describe("loadProject", () => {
 });
 
 describe("saveProject", () => {
+  it("refuses a site whose project never loaded, before any request goes out", async () => {
+    /* The wipe this prevents, reproduced on a scratch site: block the load
+       once, insert one element, and the 2-page site came back as a single
+       "Page 1" — `saveProjectData` treats a full snapshot as authoritative and
+       deletes the pages the payload omits. `projectHasContent` cannot catch it;
+       the fallback project has a child, so it counts as content. */
+    await expect(
+      saveProject("never-loaded", {
+        version: "1.0" as const, pages: [], styles: [], assets: [], metadata: { name: "X" },
+      }),
+    ).rejects.toBeInstanceOf(ProjectNotLoadedError);
+    expect(mocks.saveProjectMutate).not.toHaveBeenCalled();
+  });
+
   it("calls sites.saveProject.mutate with siteId and projectData", async () => {
+    await loadedSite("site-1");
     const projectData = {
       version: "1.0" as const,
       pages: [],
@@ -291,7 +316,8 @@ describe("save-conflict parsing (61-conflict)", () => {
     metadata: { name: "X" },
   };
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    await loadedSite("s1");
     setBaselineLastEditedAt(null);
     mocks.siteDetailSettingsUpdateMutate.mockClear();
   });
@@ -372,7 +398,8 @@ describe("save-conflict parsing (61-conflict)", () => {
 });
 
 describe("saveProject dual-save routing (P0.2b)", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
+    await loadedSite("s1");
     setBaselineLastEditedAt(null);
     mocks.saveProjectMutate.mockResolvedValue({ success: true, savedAt: new Date() });
     mocks.siteDetailSettingsUpdateMutate.mockClear().mockResolvedValue({ success: true });
