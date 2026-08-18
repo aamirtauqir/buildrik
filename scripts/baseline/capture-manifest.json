@@ -1,17 +1,82 @@
 {
- "commit": "622e329e",
+ "commit": "3d26eb74",
  "base": "http://localhost:3000",
- "generated": "2026-08-18T21:27:45.525Z",
+ "generated": "2026-08-18T22:49:56.291Z",
  "captures": [
   {
-   "id": "BL-0112",
+   "id": "BL-0107",
    "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "state": "sitemenu-site-settings__drift3",
+   "state": "comments-open__drift",
    "status": 200,
-   "sha256": "7e6055a03a263fce",
+   "sha256": "fa3391b57138fe5d",
    "scrollHeight": 905,
-   "elCount": 22
+   "elCount": 83
+  },
+  {
+   "id": "BL-0110",
+   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
+   "state": "review-pill-open__drift",
+   "status": 200,
+   "sha256": "a16bd065432b9523",
+   "scrollHeight": 905,
+   "elCount": 20
+  },
+  {
+   "id": "BL-0119",
+   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
+   "state": "sitemenu-plugins__drift",
+   "status": 200,
+   "sha256": "6212cce8a0e395ae",
+   "scrollHeight": 905,
+   "elCount": 21
+  },
+  {
+   "id": "BL-0120",
+   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
+   "state": "sitemenu-invite-teammates__drift",
+   "status": 200,
+   "sha256": "bbea68da1684b777",
+   "scrollHeight": 905,
+   "elCount": 21
+  },
+  {
+   "id": "BL-0121",
+   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
+   "state": "sitemenu-keyboard-shortcuts__drift",
+   "status": 200,
+   "sha256": "5e11f3d081d121ec",
+   "scrollHeight": 905,
+   "elCount": 21
+  },
+  {
+   "id": "BL-0163",
+   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
+   "state": "pages-context-menu__drift",
+   "status": 200,
+   "sha256": "73bb40792db239ef",
+   "scrollHeight": 905,
+   "elCount": 21
+  },
+  {
+   "id": "BL-0168",
+   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
+   "state": "layers-context-menu__drift",
+   "status": 200,
+   "sha256": "634db3f264eb07a2",
+   "scrollHeight": 905,
+   "elCount": 20
   }
  ],
- "failures": []
+ "failures": [
+  {
+   "id": "BL-0123",
+   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
+   "error": "page.click: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('text=Lorem ipsum dolor sit amet')\u001b[22m\n\u001b[2m    - locator resolved to 2 elements. Proceeding with the first one: <p draggable=\"true\" data-buildrick-type=\"paragraph\" data-buildrick-id=\"el-mskbnhnj-skyr6i171g\">Lorem ipsum dolor sit amet, consectetur adipiscin…</p>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    15 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
+  },
+  {
+   "id": "BL-0162",
+   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
+   "error": "page.click: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.ls-panel button[aria-label*=\\'list\\' i]')\u001b[22m\n\u001b[2m    - locator resolved to <button disabled type=\"button\" title=\"List view\" aria-label=\"List view\" class=\"tw:inline-flex tw:items-center tw:justify-center tw:h-8 tw:w-8 tw:border-0 tw:rounded-md tw:bg-transparent tw:text-gray-600 tw:cursor-pointer tw:[transition:var(--bk-transition-fast)] tw:enabled:hover:bg-gray-100 tw:enabled:hover:text-gray-900 tw:aria-pressed:bg-blue-50 tw:aria-pressed:text-blue-700 tw:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)] tw:disabled:opacity-50 tw:disabled:cursor-not-allowed tw:…>…</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    15 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not enabled\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
+  }
+ ]
 }

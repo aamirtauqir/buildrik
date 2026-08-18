@@ -223,40 +223,47 @@
     "BL-0104",
     "BL-0105",
     "BL-0106",
+    "BL-0107",
     "BL-0108",
     "BL-0109",
+    "BL-0110",
     "BL-0111",
+    "BL-0112",
+    "BL-0113",
+    "BL-0114",
+    "BL-0115",
+    "BL-0116",
+    "BL-0117",
+    "BL-0118",
+    "BL-0119",
+    "BL-0120",
+    "BL-0121",
+    "BL-0122",
     "BL-0124",
     "BL-0125",
     "BL-0126",
     "BL-0127",
     "BL-0128",
     "BL-0129",
-    "BL-0169",
-    "BL-0114",
-    "BL-0115",
-    "BL-0116",
-    "BL-0118",
-    "BL-0122",
     "BL-0159",
     "BL-0160",
     "BL-0161",
+    "BL-0163",
     "BL-0164",
     "BL-0165",
     "BL-0166",
     "BL-0167",
+    "BL-0168",
+    "BL-0169",
     "BL-0170",
     "BL-0173",
     "BL-0174",
     "BL-0175",
-    "BL-0112",
-    "BL-0113",
-    "BL-0117",
     "BL-0176"
    ],
-   "remaining": 11,
+   "remaining": 4,
    "note": "Each remaining row needs its capture spec rebuilt by hand — the originals were never committed (only screens-auth.json was). Reaching a state is the slow part: BL-0159's stock browser took three attempts because the entry moved into the panel footer as 'Browse stock' and even that lands on a source picker. Log in as the seed fixture's owner (qa@buildrik.local), not your own user, or /edit redirects and the failure reads as a sentinel timeout.",
-   "remainingRows": "BL-0107, BL-0110, BL-0121 (doors not found) · BL-0119 (broken door), BL-0120 (opens a new tab), BL-0172 (feature flag off), BL-0123 (no such element in the fixture), BL-0171 (captured fresh, no prior shot to diff) · BL-0162, BL-0163, BL-0168 (controls refuse the click from a spec)",
+   "remainingRows": "BL-0123 (canvas-text selector needed), BL-0162 (media list-toggle selector needed) — both are missing SELECTORS, not missing features · BL-0171 (captured, frame never written) · BL-0172 (NEXT_PUBLIC_FEATURE_DS_AI unset, so there is no state to capture)",
    "redrawn": [
     "BL-0100",
     "BL-0105",
@@ -276,7 +283,9 @@
     "BL-0128",
     "BL-0129",
     "BL-0161",
+    "BL-0163",
     "BL-0167",
+    "BL-0168",
     "BL-0169",
     "BL-0170",
     "BL-0173",
@@ -286,7 +295,8 @@
    ],
    "redrawCost": "BL-0105, the first: 1 clean recapture (the rail tooltip was covering a row in the first reference), 1 computed-style measuring probe, 5 use_figma calls (structure / rows / footer / icons / icon size), 3 screenshots to check. The subtree is 260 nodes; building it as data-driven auto-layout rather than node by node is what kept it to five calls.",
    "redrawRemaining": 0,
-   "redrawVerification": "25 of 25 drawn and 25 verified against a reference render (92.5-97.8%). BL-0112 was the last: it could not be verified while the Settings surface was broken, so the surface was FIXED first and a fresh reference captured. Comparison trap: a frame screenshot is NOT symmetrically padded (x is +12 per side, y about +1 at the top), so a centre-crop comparison reads ~10px low and understates agreement — crop the figma image at the target's own measured edge instead. Interpreter trap: a measured child of a plain TEXT node is positioned relative to that text, but a text node cannot hold children, so the rebuild attaches it to the text's PARENT and must add the text's own origin — BL-0112's \"opens dashboard\" hint landed 626px too high without it."
+   "redrawVerification": "25 of 25 drawn and 25 verified against a reference render (92.5-97.8%). BL-0112 was the last: it could not be verified while the Settings surface was broken, so the surface was FIXED first and a fresh reference captured. Comparison trap: a frame screenshot is NOT symmetrically padded (x is +12 per side, y about +1 at the top), so a centre-crop comparison reads ~10px low and understates agreement — crop the figma image at the target's own measured edge instead. Interpreter trap: a measured child of a plain TEXT node is positioned relative to that text, but a text node cannot hold children, so the rebuild attaches it to the text's PARENT and must add the text's own origin — BL-0112's \"opens dashboard\" hint landed 626px too high without it.",
+   "harness": "Two fixes on 2026-08-19 unblocked five rows that had been written off as unreachable. (1) capture.mjs and measure-region.mjs now accept a `rightClick` action — context menus need the right button, and three rows sat as \"controls refuse the click from a spec\" for want of it. (2) Both scripts seed the `buildrik_consent` cookie on every context instead of clicking \"Essential Only\" per screen: the banner covers the editor's status bar and eats clicks, and a per-screen click FAILS THE WHOLE RUN on the second screen, because the contexts are reused and there is no banner left to click."
   }
  },
  "rows": [
@@ -2085,7 +2095,8 @@
    "screenshotHash": "ec7d264b90de08ce",
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "65:2",
-   "figmaPageId": "75:2"
+   "figmaPageId": "75:2",
+   "notes": "DRIFT MEASURED 2026-08-19: 16.54% against the pinned render, on a ~13% shell floor. No redraw — the extra sits in the shell (ReviewBar row, no cookie banner), not in the comments panel. Door: `button[aria-label='Comments']`; the row was never unreachable, the spec was missing."
   },
   {
    "id": "BL-0108",
@@ -2135,7 +2146,8 @@
    "screenshotHash": "6fa12819a1ebd6f5",
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "74:2",
-   "figmaPageId": "75:2"
+   "figmaPageId": "75:2",
+   "notes": "DRIFT MEASURED 2026-08-19: 14.74%, at the shell floor. No redraw. Door: the review pill itself, `button:has-text('Opened · no reply')`."
   },
   {
    "id": "BL-0111",
@@ -2285,7 +2297,8 @@
    "screenshotHash": "61fe1318b9642c12",
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "84:2",
-   "figmaPageId": "75:2"
+   "figmaPageId": "75:2",
+   "notes": "DRIFT MEASURED 2026-08-19: 11.45%, below the shell floor. No redraw. The door works — site menu → Plugins — but it still lands on the Settings ROOT, because AquibraStudio.tsx asks for a screen id (\"plugins\") the Settings panel does not have; the real one is \"integrations\". That is the state captured, and it is today's behaviour, not a capture failure."
   },
   {
    "id": "BL-0120",
@@ -2301,7 +2314,8 @@
    "screenshotHash": "1fd31e192308adbe",
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "85:2",
-   "figmaPageId": "75:2"
+   "figmaPageId": "75:2",
+   "notes": "DRIFT MEASURED 2026-08-19: 12.63%, at the shell floor. No redraw. Captured with the site menu open and the item hovered — clicking it opens the dashboard in a NEW tab, so a click would have left this tab unchanged and proved nothing."
   },
   {
    "id": "BL-0121",
@@ -2317,7 +2331,8 @@
    "screenshotHash": "7194bedeb365c37e",
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "86:2",
-   "figmaPageId": "75:2"
+   "figmaPageId": "75:2",
+   "notes": "DRIFT MEASURED 2026-08-19: 12.64%, at the shell floor. No redraw. Door: site menu → Keyboard shortcuts."
   },
   {
    "id": "BL-0122",
@@ -2350,7 +2365,8 @@
    "screenshotHash": "2828e17a715849f6",
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "88:2",
-   "figmaPageId": "75:2"
+   "figmaPageId": "75:2",
+   "notes": "STILL UNMEASURED 2026-08-19 — the door, not the app. Selecting canvas text with `text=Lorem ipsum dolor sit amet` times out: the canvas mounts engine HTML and the click has to land on the element the engine owns. Needs a `[data-buildrick-id]`-based selector taken from a live probe, not a text match."
   },
   {
    "id": "BL-0124",
@@ -2986,7 +3002,8 @@
    "screenshotHash": "b72c34c66018d397",
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "121:2",
-   "figmaPageId": "75:2"
+   "figmaPageId": "75:2",
+   "notes": "STILL UNMEASURED 2026-08-19 — the door, not the app. The Media panel opens (`button[aria-label^='Upload and manage']`), but the list/grid toggle is not `button[aria-label*='list']`; its real selector has to be read off the running panel first."
   },
   {
    "id": "BL-0163",
@@ -3002,7 +3019,8 @@
    "screenshotHash": "fe0bfed0fdbdbe82",
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "122:2",
-   "figmaPageId": "75:2"
+   "figmaPageId": "75:2",
+   "notes": "REDRAWN 2026-08-19 (drift 45.42%). The row menu really moved: it gained a white card with a 1px #e5e7eb border and radius 8, the labels changed (\"Copy Page Link\" → \"Copy link\", \"Page Settings\" → \"Page settings…\", \"Rename\" → \"Rename…\"), and the F2 / ⌘D / ⌘, shortcut hints the old node drew are GONE from the live menu — worth a design decision, since the site menu still shows its own hints. 95.59% pixel agreement. Reached with the new `rightClick` action; \"controls refuse the click from a spec\" was the harness having only a left button."
   },
   {
    "id": "BL-0164",
@@ -3083,7 +3101,8 @@
    "screenshotHash": "297e25267c100d31",
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "128:2",
-   "figmaPageId": "75:2"
+   "figmaPageId": "75:2",
+   "notes": "REDRAWN 2026-08-19 (drift 31.43%). The frame held NO menu node at all, so the layer row menu was created: Cut / Copy / Paste (disabled) · Duplicate / Delete · Rename / Group selection (disabled), on a white card, radius 8. 91.86% pixel agreement. Trap worth keeping: each measured row box spans the full card and its padding lives in CSS, not in a child node, so the labels rebuild flush against the card edge — they need the inset added back (+12x, and +5y to centre in the 28px row)."
   },
   {
    "id": "BL-0169",

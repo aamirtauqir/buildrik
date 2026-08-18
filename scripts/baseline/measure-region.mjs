@@ -35,6 +35,15 @@ mkdirSync(OUT, { recursive: true });
 
 const browser = await chromium.launch();
 const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
+/* Same reason as capture.mjs: the cookie banner sits over the editor's status
+   bar on /edit and eats clicks aimed at it. Consent up front, once. */
+await ctx.addCookies([{
+  name: "buildrik_consent",
+  value: encodeURIComponent(JSON.stringify({ essential: true, analytics: false })),
+  url: BASE,
+  expires: Math.floor(Date.now() / 1000) + 365 * 24 * 60 * 60,
+  sameSite: "Lax",
+}]);
 const lp = await ctx.newPage();
 await lp.goto(`${BASE}/auth/callback?token=${TOKEN}`, { waitUntil: "domcontentloaded", timeout: 60000 });
 await lp.waitForURL((u) => !u.pathname.startsWith("/auth/"), { timeout: 60000 });
@@ -56,6 +65,10 @@ for (const s of specs) {
     await page.waitForTimeout(3000);
     for (const a of s.actions || []) {
       if (a.hover) await page.hover(a.hover, { timeout: 8000 });
+      /* Context menus are reached by the right button, and three baseline
+         rows (pages / layers row menus, media list view) sat unmeasured as
+         "controls refuse the click from a spec" for want of it. */
+      if (a.rightClick) await page.click(a.rightClick, { button: "right", timeout: 8000 });
       if (a.click) await page.click(a.click, { timeout: 8000 });
       if (a.press) await page.keyboard.press(a.press);
       if (a.waitFor) await page.waitForSelector(a.waitFor, { timeout: 8000 });

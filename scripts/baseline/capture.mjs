@@ -57,7 +57,19 @@ const PII = [
 const browser = await chromium.launch();
 const exe = chromium.executablePath();
 if (!existsSync(exe)) { console.error(`[capture] ABORT: chromium executable not local: ${exe}`); process.exit(1); }
+/* The cookie banner is `fixed bottom-0 … z-[9998]` on every route including
+   /edit, where it covers the editor's status bar and eats clicks aimed at it.
+   Consenting up front removes it from every capture deterministically — a
+   per-screen "click Essential Only" action cannot, because the contexts are
+   reused and the second screen finds no banner to click and fails the run. */
+const CONSENT_COOKIE = {
+  name: "buildrik_consent",
+  value: encodeURIComponent(JSON.stringify({ essential: true, analytics: false })),
+  expires: Math.floor(Date.now() / 1000) + 365 * 24 * 60 * 60,
+  sameSite: "Lax",
+};
 const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
+await ctx.addCookies([{ ...CONSENT_COOKIE, url: BASE }]);
 await ctx.addInitScript((css) => {
   const s = document.createElement("style"); s.textContent = css;
   document.addEventListener("DOMContentLoaded", () => document.head.appendChild(s));
@@ -71,6 +83,7 @@ const manifest = []; const failures = [];
 let sessionCtx = null;
 if (LOGIN_TOKEN) {
   sessionCtx = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
+  await sessionCtx.addCookies([{ ...CONSENT_COOKIE, url: BASE }]);
   await sessionCtx.addInitScript((css) => {
     const s = document.createElement("style"); s.textContent = css;
     document.addEventListener("DOMContentLoaded", () => document.head.appendChild(s));
@@ -112,6 +125,10 @@ for (const s of screens) {
     // Post-load interactions (open a panel, press a shortcut) before capture.
     if (s.actions) for (const a of s.actions) {
       if (a.hover) await page.hover(a.hover, { timeout: 8000 });
+      /* Context menus are reached by the right button, and three baseline
+         rows (pages / layers row menus, media list view) sat unmeasured as
+         "controls refuse the click from a spec" for want of it. */
+      if (a.rightClick) await page.click(a.rightClick, { button: "right", timeout: 8000 });
       if (a.click) await page.click(a.click, { timeout: 8000, force: !!a.force });
       if (a.press) await page.keyboard.press(a.press);
       if (a.waitFor) await page.waitForSelector(a.waitFor, { timeout: 8000 });
