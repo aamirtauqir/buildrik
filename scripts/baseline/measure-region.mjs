@@ -131,7 +131,9 @@ for (const s of specs) {
             tt: own && cs.textTransform !== "none" ? cs.textTransform : null,
             ls: own && cs.letterSpacing !== "normal" ? parseFloat(cs.letterSpacing) : null,
             lh: own ? cs.lineHeight : null,
-            col: own ? hex(cs.color) : null,
+            /* An <svg> paints with `currentColor`, so its colour lives on the
+               element, not on any text. Without this every icon rebuilt black. */
+            col: own || svgEl ? hex(cs.color) : null,
             align: own ? cs.textAlign : null,
             bg, grad,
             border: bw.some(Boolean) ? { w: bw, c: bcs.find((c, i) => bw[i] && c) } : null,

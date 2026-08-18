@@ -24,7 +24,11 @@ const { nodes, region } = JSON.parse(readFileSync(src, "utf8"));
 /* Drop nodes that paint nothing a reader would notice: fully transparent boxes
    with no text and no border slipped through the DOM filter when a parent set
    only a radius. */
-const kept = nodes.filter((n) => n.text || n.bg || n.border || n.svg || n.grad);
+/* Screen-reader-only text is a 1x1 clipped box. It is not on screen, and
+   copying it into the baseline paints an invisible label over the chrome —
+   the same trap that had a live walk reading aria-live text as visible UI. */
+const kept = nodes.filter((n) =>
+  (n.text || n.bg || n.border || n.svg || n.grad) && !(n.text && n.w <= 2 && n.h <= 2));
 
 /* Parent = the nearest earlier node that fully contains this one. The DOM order
    is a pre-order walk, so scanning backwards finds it in one pass. */
@@ -44,8 +48,20 @@ const payload = kept.slice(0, MAX).map((n, i) => {
   const py = p >= 0 ? kept[p].y : 0;
   return [p, r1(n.x - px), r1(n.y - py), r1(n.w), r1(n.h), n.text, n.fs, n.fw,
           n.col, n.bg, n.border ? n.border.w.map(r1) : null, n.border ? n.border.c : null,
-          n.radius, n.op, n.svg || null, n.ff, n.tt, n.grad ? n.grad.stops : null];
+          n.radius, n.op, n.svg || null, n.ff, n.tt, n.grad ? n.grad.stops : null,
+          n.align && n.align !== "start" && n.align !== "left" ? n.align : null];
 });
 
-console.log(JSON.stringify(payload));
-console.error(`[pack] ${id}: ${nodes.length} measured → ${kept.length} painted → ${payload.length} emitted · region ${region.join(",")}`);
+/* The same icon repeats across a panel — chevrons, carets, the collapse
+   caret on every section. Emit the markup once and reference it by index so
+   the payload stays small enough to hand to one use_figma call. */
+const svgTable = [];
+for (const row of payload) {
+  const svg = row[14];
+  if (!svg) continue;
+  let i = svgTable.indexOf(svg);
+  if (i < 0) { i = svgTable.length; svgTable.push(svg); }
+  row[14] = i;
+}
+console.log(JSON.stringify({ svgs: svgTable, nodes: payload }));
+console.error(`[pack] ${id}: ${nodes.length} measured → ${kept.length} painted → ${payload.length} emitted · ${svgTable.length} distinct icon(s) · region ${region.join(",")}`);
