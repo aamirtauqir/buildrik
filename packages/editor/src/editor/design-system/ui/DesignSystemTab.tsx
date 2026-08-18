@@ -63,6 +63,8 @@ import { TokensSection } from "./sections/TokensSection";
 import { StylesSection, useStylesSectionTotalDirty } from "./sections/StylesSection";
 import { ComponentsSection } from "./sections/ComponentsSection";
 import { ExportSection } from "./sections/ExportSection";
+import { STARTER_DS_REGISTRY } from "../starters";
+import { CATALOG } from "../../components-catalog/catalog";
 import { LintSection } from "./sections/LintSection";
 import { filterTokensByMode } from "../utils/semanticKind";
 import { ClassesSection } from "./sections/ClassesSection";
@@ -97,36 +99,32 @@ type DesignSection = "tokens" | "typography" | "styles" | "starters" | "classes"
  * (Colour mode) and a banner (Lint) — same capabilities, different mental
  * model. Figma owns navigation (rule 2), and the sidebar is drill-in stack nav.
  *
- * Seven of the board's nine rows ship. Starters and Colour mode joined later in
+ * All nine of the board's rows ship. Starters and Colour mode joined later in
  * the same arc — Starters once the board settled that it is a destination and
  * not a modal, Colour mode once the dark-value write path was repaired (it had
  * an empty onBlur that discarded what you typed, so the screen had nothing to
- * write through). Two rows remain out, and neither reason is "ran out of time":
+ * write through). Classes and Typography followed: Classes reads the classes
+ * elements actually carry, and Typography lists the site's active fonts. (This
+ * paragraph said "two rows remain out" long after both had shipped.)
  *
- *   · Classes     — a SITE-WIDE class manager with per-class usage counts. No
- *                   such registry exists in code (`classRegistry`/`classUsage`:
- *                   zero hits). Figma-only; rule 4 says preserve the design,
- *                   not implement it. (Finding G.)
- *   · Typography  — its board is a FONT manager: active fonts with role pills,
- *                   weights, a .woff2 drop zone and a licence attestation. The
- *                   code's typography is type TOKENS, and font handling is
- *                   scattered across Media upload, the engine FontManager and
- *                   the inspector FontPicker with no Brand home. A feature, not
- *                   a conversion.
- *
- * Row counts: only Lint carries one, because only Lint has a real number to
- * hand. The others need registry sizes that are not aggregated here yet, and a
- * count that is not the truth is worse than no count — a row that cannot answer
- * its own question is worse than a row that is not there, which is the whole
- * finding this change came from.
+ * Row counts follow the board, which draws one on Tokens, Presets, Starters,
+ * Classes, Components and Lint — and not on Typography, Colour mode or
+ * Import / export. Its numbers are the real registries: Starters 6 is
+ * `STARTER_DS_REGISTRY.length` and Components 27 is `CATALOG.length`. A count
+ * still has to be the truth; the rule that a row which cannot answer its own
+ * question is worse than no row stands — it just no longer excuses a row whose
+ * number is one property away.
  */
+/* Board 152:2's order, top to bottom. Typography used to sit second here and
+   sits sixth on the board — the list is the whole screen, so its order is the
+   layout. */
 const SECTIONS: Array<{ id: DesignSection; label: string; hint: string }> = [
   { id: "tokens",     label: "Tokens",          hint: "Colours, type, spacing" },
-  { id: "typography", label: "Typography",      hint: "The fonts this site uses" },
   { id: "styles",     label: "Presets",         hint: "Component style presets" },
   { id: "starters",   label: "Starters",        hint: "Whole-brand starting points" },
   { id: "classes",    label: "Classes",         hint: "Names shared across elements" },
   { id: "components", label: "Components",      hint: "What the brand ships" },
+  { id: "typography", label: "Typography",      hint: "The fonts this site uses" },
   { id: "colour-mode", label: "Colour mode",    hint: "Light and dark values" },
   { id: "lint",       label: "Lint",            hint: "What breaks the brand" },
   { id: "export",     label: "Import / export", hint: "Move the brand in and out" },
@@ -291,7 +289,17 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
         if (name) classNames.add(name);
       }
     }
-    return { tokens, styles: presets, classes: classNames.size };
+    /* Board 152:2 draws a count on Starters and Components too, and its
+       numbers are not sample data: 6 is `STARTER_DS_REGISTRY.length` and 27 is
+       `CATALOG.length` to the digit. Both rows shipped countless — the only
+       two rows on the board that carry a number and did not here. */
+    return {
+      tokens,
+      styles: presets,
+      classes: classNames.size,
+      starters: STARTER_DS_REGISTRY.length,
+      components: CATALOG.length,
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allRegistries, allPresetRegistries, composer, usageVersion, isBeginner]);
 
