@@ -151,6 +151,7 @@ export const SpacingSection: React.FC<SpacingSectionProps> = ({
             <MixedValueIndicator prop="padding" mixedKeys={mixedKeys} />
             <InputWithUnit
               label=""
+              ariaLabel="Padding top and bottom"
               value={paddingValues.top || ""}
               onChange={(v) => onBatchChange({ "padding-top": v, "padding-bottom": v })}
               placeholder="0"
@@ -159,6 +160,7 @@ export const SpacingSection: React.FC<SpacingSectionProps> = ({
           <span className="bdi-pair-sep" aria-hidden="true" />
           <InputWithUnit
             label=""
+            ariaLabel="Padding left and right"
             value={paddingValues.left || ""}
             onChange={(v) => onBatchChange({ "padding-left": v, "padding-right": v })}
             placeholder="0"
@@ -180,6 +182,7 @@ export const SpacingSection: React.FC<SpacingSectionProps> = ({
             <MixedValueIndicator prop="margin" mixedKeys={mixedKeys} />
             <InputWithUnit
               label=""
+              ariaLabel="Margin top and bottom"
               value={marginValues.top || ""}
               onChange={(v) => onBatchChange({ "margin-top": v, "margin-bottom": v })}
               placeholder="0"
@@ -188,6 +191,7 @@ export const SpacingSection: React.FC<SpacingSectionProps> = ({
           <span className="bdi-pair-sep" aria-hidden="true" />
           <InputWithUnit
             label=""
+            ariaLabel="Margin left and right"
             value={marginValues.left || ""}
             onChange={(v) => onBatchChange({ "margin-left": v, "margin-right": v })}
             units={["px", "%", "rem", "auto"]}

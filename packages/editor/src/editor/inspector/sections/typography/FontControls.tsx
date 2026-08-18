@@ -140,6 +140,7 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mi
             <div className="tw:flex-1">
               <InputWithUnit
                 label=""
+                ariaLabel="Font size"
                 value={styles["font-size"] || "16px"}
                 onChange={(v) => onChange("font-size", v)}
                 units={["px", "em", "rem", "%", "vw"]}
@@ -159,6 +160,7 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mi
             <div className="tw:flex-1">
               <InputWithUnit
                 label=""
+                ariaLabel="Line height"
                 value={styles["line-height"] || ""}
                 onChange={(v) => onChange("line-height", v)}
                 units={["px", "em", "%", "normal"]}

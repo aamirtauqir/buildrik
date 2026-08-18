@@ -181,6 +181,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
                   <div className="tw:flex-1">
                     <InputWithUnit
                       label=""
+                      ariaLabel="Width"
                       value={styles.width || ""}
                       onChange={(v) => onChange("width", v)}
                       disabled={disabled("width")}
@@ -213,6 +214,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
                   <div className="tw:flex-1">
                     <InputWithUnit
                       label=""
+                      ariaLabel="Height"
                       value={styles.height || ""}
                       onChange={(v) => onChange("height", v)}
                       disabled={disabled("height")}
@@ -243,6 +245,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
                   <MixedValueIndicator prop="min-width" mixedKeys={mixedKeys} />
                   <InputWithUnit
                     label=""
+                    ariaLabel="Min width"
                     value={styles["min-width"] || ""}
                     onChange={(v) => onChange("min-width", v)}
                     disabled={disabled("min-width")}
@@ -258,6 +261,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
                   <MixedValueIndicator prop="max-width" mixedKeys={mixedKeys} />
                   <InputWithUnit
                     label=""
+                    ariaLabel="Max width"
                     value={styles["max-width"] || ""}
                     onChange={(v) => onChange("max-width", v)}
                     disabled={disabled("max-width")}
@@ -278,6 +282,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
                   <MixedValueIndicator prop="min-height" mixedKeys={mixedKeys} />
                   <InputWithUnit
                     label=""
+                    ariaLabel="Min height"
                     value={styles["min-height"] || ""}
                     onChange={(v) => onChange("min-height", v)}
                     disabled={disabled("min-height")}
@@ -293,6 +298,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
                   <MixedValueIndicator prop="max-height" mixedKeys={mixedKeys} />
                   <InputWithUnit
                     label=""
+                    ariaLabel="Max height"
                     value={styles["max-height"] || ""}
                     onChange={(v) => onChange("max-height", v)}
                     disabled={disabled("max-height")}

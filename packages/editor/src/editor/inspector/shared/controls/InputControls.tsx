@@ -101,6 +101,16 @@ export interface InputWithUnitProps {
    *  (Figma-style). When omitted the field renders without an inline icon
    *  and uses the outer row label only. */
   fieldIcon?: React.ReactNode;
+  /**
+   * Accessible name for rows drawn WITHOUT a visible label — the paired
+   * fields (Size | line-height, W | H). The row's `<label>` is a bare
+   * element with no `htmlFor` and it does not wrap the input, so it names
+   * nothing; when there is no visible label there is nothing to fall back to
+   * either. Measured live: nine inputs in the inspector column had no
+   * accessible name at all, while the unit `Select` and the reset `Button`
+   * beside them were both named.
+   */
+  ariaLabel?: string;
 }
 
 function isValidCSSNumber(val: string): boolean {
@@ -122,6 +132,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   isOverridden,
   helperText,
   fieldIcon,
+  ariaLabel,
 }) => {
   const [isRowHovered, setIsRowHovered] = React.useState(false);
 
@@ -234,6 +245,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
             onBlur={handleInputBlur}
             onKeyDown={handleInputKeyDown}
             placeholder={placeholder}
+            aria-label={ariaLabel || label || placeholder}
             // `.bdi-fld input.auto` (inspector.css) is a real, unlayered CSS
             // rule keyed off a class on the actual <input> — flowbite's
             // TextInput only ever puts `className` on the OUTER wrapper div
