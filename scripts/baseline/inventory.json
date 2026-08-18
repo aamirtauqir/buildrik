@@ -262,9 +262,9 @@
     "BL-0175",
     "BL-0176"
    ],
-   "remaining": 3,
+   "remaining": 2,
    "note": "Each remaining row needs its capture spec rebuilt by hand — the originals were never committed (only screens-auth.json was). Reaching a state is the slow part: BL-0159's stock browser took three attempts because the entry moved into the panel footer as 'Browse stock' and even that lands on a source picker. Log in as the seed fixture's owner (qa@buildrik.local), not your own user, or /edit redirects and the failure reads as a sentinel timeout.",
-   "remainingRows": "BL-0162 (fixture has no media, so the list toggle is disabled — adding an asset would restate every verified Media row) · BL-0171 (captured, frame never written) · BL-0172 (NEXT_PUBLIC_FEATURE_DS_AI unset, so there is no state to capture)",
+   "remainingRows": "BL-0162 (fixture has no media, so the list toggle is disabled — adding an asset would restate every verified Media row) · BL-0172 (NEXT_PUBLIC_FEATURE_DS_AI unset, so there is no state to capture)",
    "redrawn": [
     "BL-0100",
     "BL-0105",
@@ -298,7 +298,8 @@
    "redrawCost": "BL-0105, the first: 1 clean recapture (the rail tooltip was covering a row in the first reference), 1 computed-style measuring probe, 5 use_figma calls (structure / rows / footer / icons / icon size), 3 screenshots to check. The subtree is 260 nodes; building it as data-driven auto-layout rather than node by node is what kept it to five calls.",
    "redrawRemaining": 0,
    "redrawVerification": "25 of 25 drawn and 25 verified against a reference render (92.5-97.8%). BL-0112 was the last: it could not be verified while the Settings surface was broken, so the surface was FIXED first and a fresh reference captured. Comparison trap: a frame screenshot is NOT symmetrically padded (x is +12 per side, y about +1 at the top), so a centre-crop comparison reads ~10px low and understates agreement — crop the figma image at the target's own measured edge instead. Interpreter trap: a measured child of a plain TEXT node is positioned relative to that text, but a text node cannot hold children, so the rebuild attaches it to the text's PARENT and must add the text's own origin — BL-0112's \"opens dashboard\" hint landed 626px too high without it.",
-   "harness": "Two fixes on 2026-08-19 unblocked five rows that had been written off as unreachable. (1) capture.mjs and measure-region.mjs now accept a `rightClick` action — context menus need the right button, and three rows sat as \"controls refuse the click from a spec\" for want of it. (2) Both scripts seed the `buildrik_consent` cookie on every context instead of clicking \"Essential Only\" per screen: the banner covers the editor's status bar and eats clicks, and a per-screen click FAILS THE WHOLE RUN on the second screen, because the contexts are reused and there is no banner left to click."
+   "harness": "Two fixes on 2026-08-19 unblocked five rows that had been written off as unreachable. (1) capture.mjs and measure-region.mjs now accept a `rightClick` action — context menus need the right button, and three rows sat as \"controls refuse the click from a spec\" for want of it. (2) Both scripts seed the `buildrik_consent` cookie on every context instead of clicking \"Essential Only\" per screen: the banner covers the editor's status bar and eats clicks, and a per-screen click FAILS THE WHOLE RUN on the second screen, because the contexts are reused and there is no banner left to click.",
+   "referenceCorpus": "Not every pinned reference is the seed fixture. BL-0171's shows \"Demo AI Site\" in the topbar, and comparing a seed-fixture render against it reads ~81% for no reason but the canvas content. Read the site name off a reference PNG before believing its drift number."
   }
  },
  "rows": [
@@ -3149,9 +3150,11 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "planned",
+   "pipelineState": "readback-verified",
    "blockReason": "control not reachable via drive recipe (probe lists it; 3 recipe attempts) — manual capture or deeper recipe needed",
-   "notes": "UNBLOCKED 2026-08-18: captured (baseline-shots/BL-0171/default.png, 1440x905). The earlier failure was the capture spec, not the app — without \"requires\":\"session\" the harness uses the anonymous context, /edit redirects to /auth, and because the sentinel check runs BEFORE the redirect check the error reads as a .bd-studio timeout. Recipe: requires=session, waitUntil=domcontentloaded, waitMs=9000, sentinel .bd-studio, actions: click button:has-text('Brand') -> click text=Starters -> waitFor text='Applying a starter overwrites your tokens.'. Frame not yet written."
+   "notes": "FRAME WRITTEN 2026-08-19 — the row had a capture and no frame. Drawn as a whole 1440x900 screen from the measured live DOM (121 nodes, 18 icons), so its shell is TODAY's, not the pinned one. 92.46% against a reference recaptured on the seed fixture. IMPORTANT about the pinned reference: `default.png` was captured against a DIFFERENT SITE — the topbar reads \"Demo AI Site\", not \"E2E Blank Full d013128c\" — so its canvas is another project's content and comparing against it read 81%. The corpus is NOT uniformly on the seed fixture; check the site name in a reference before trusting a drift number. The fresh one is `brand-starter-themes__seed.png`; the pinned shot is untouched. HARNESS FIX in the same commit: measure-region computed a node's CSS gradient and then left `grad` out of the emit test, so a node painted ONLY by a gradient was never written out — the six starter thumbnails rebuilt as empty cards. They are real Figma gradient fills now. Still missing by construction: the canvas's \"Drop a block here…\" hint, which is a pseudo-element and invisible to a DOM walk.",
+   "figmaNodeId": "271:2",
+   "figmaPageId": "75:2"
   },
   {
    "id": "BL-0172",

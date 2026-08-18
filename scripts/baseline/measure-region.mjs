@@ -170,7 +170,12 @@ for (const s of specs) {
           if (ar.height < 2 || ar.width < 2) continue;
           if (r.top >= ar.bottom - 1 || r.bottom <= ar.top + 1) clipped = true;
         }
-        if (sized && !clipped && inside && (own || bg || bw.some(Boolean) || svgEl)) {
+        /* `grad` belongs in this test. It was computed and then not asked
+           about, so a node painted ONLY by a CSS gradient — transparent
+           background-color, no border, no text — was never emitted. That is
+           exactly what the Brand starter thumbnails are, and they rebuilt as
+           six empty cards. */
+        if (sized && !clipped && inside && (own || bg || grad || bw.some(Boolean) || svgEl)) {
           out.push({
             d: depth, tag: el.tagName.toLowerCase(),
             x: +(r.x - rx).toFixed(1), y: +(r.y - ry).toFixed(1),
