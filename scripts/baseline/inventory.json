@@ -286,7 +286,7 @@
    ],
    "redrawCost": "BL-0105, the first: 1 clean recapture (the rail tooltip was covering a row in the first reference), 1 computed-style measuring probe, 5 use_figma calls (structure / rows / footer / icons / icon size), 3 screenshots to check. The subtree is 260 nodes; building it as data-driven auto-layout rather than node by node is what kept it to five calls.",
    "redrawRemaining": 0,
-   "redrawVerification": "25 of 25 drawn; 24 verified by pixel comparison against the reference render (92.5-97.4%). BL-0112 is written but unverifiable — the Settings surface never paints. Comparison trap: a frame screenshot is NOT symmetrically padded (x is +12 per side, y about +1 at the top), so a centre-crop comparison reads ~10px low and understates agreement — crop the figma image at the target's own measured edge instead. BL-0115 and BL-0175 were the only modals in the set."
+   "redrawVerification": "25 of 25 drawn and 25 verified against a reference render (92.5-97.8%). BL-0112 was the last: it could not be verified while the Settings surface was broken, so the surface was FIXED first and a fresh reference captured. Comparison trap: a frame screenshot is NOT symmetrically padded (x is +12 per side, y about +1 at the top), so a centre-crop comparison reads ~10px low and understates agreement — crop the figma image at the target's own measured edge instead. Interpreter trap: a measured child of a plain TEXT node is positioned relative to that text, but a text node cannot hold children, so the rebuild attaches it to the text's PARENT and must add the text's own origin — BL-0112's \"opens dashboard\" hint landed 626px too high without it."
   }
  },
  "rows": [
@@ -2164,12 +2164,12 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "written",
+   "pipelineState": "readback-verified",
    "screenshotHash": "fe0abc498e23fc90",
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "77:2",
    "figmaPageId": "75:2",
-   "notes": "REBUILT 2026-08-19 but NOT VERIFIED, and the reason is a product defect. The Settings full-page surface never paints: its content mounts (text=DISTRIBUTION is in the DOM and waitable) while the panel ancestor stays `.ls-panel--closed` at opacity 0 and width 1. Confirmed in a plain browser with no animation kill and no frozen clock, through BOTH doors — the site menu's 'Site settings' and the S shortcut — and through 'Plugins'. So the old reference render, which shows an empty page under a 'Settings' header, was RIGHT, and the 9.42% drift measured against it was measuring one blank against another. An earlier probe in this session reported the nav as rendering; it was reading innerText, which a zero-opacity subtree still returns. The rebuild follows the measured DOM and is the structure the surface would show — it cannot be accepted by eye until the panel opens."
+   "notes": "REDRAWN 2026-08-19 and now VERIFIED — 97.76% pixel agreement, the highest in the redraw set. The earlier note on this row said the Settings surface never paints and called that a product defect. It WAS one, and it is fixed: PanelFrame's default `narrow` width carries `tw:flex-none`, and Settings' host `.ls-fullpage-container` is a flex column, so the root resolved to its header height and every screen under it measured 1379 wide by 0 tall. `width=\"fullpage\"` (the variant PanelFrame already shipped for this host) fixes it; a second, hidden SettingsTab that the retired drawer route still mounted was removed with it. So the reference render this row was pinned to — an empty page under a Settings header — was a picture of the bug, not of the design. A fresh reference was captured after the fix as `sitemenu-site-settings__fixed.png`; the pinned one is kept untouched. What is drawn: the whole content band (rail + full-page surface, 1440x764), replacing the old 380px drawer node 77:55, placed at frame y=104 so its bottom meets the status bar. The 48px gap above it is the ReviewBar row this frame's shell predates — the known-stale shell band, declared, not drawn."
   },
   {
    "id": "BL-0113",
