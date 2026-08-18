@@ -198,7 +198,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "open:no-row-menu",
       "recipe": null
     },
     {
@@ -209,7 +209,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "open:mode-toggle-treatment",
       "recipe": null
     },
     {
@@ -220,7 +220,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "open:component-row-count",
       "recipe": null
     },
     {
@@ -275,7 +275,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "open:export-row-chrome",
       "recipe": null
     },
     {
@@ -341,7 +341,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "open:preset-categories",
       "recipe": null
     },
     {
@@ -473,7 +473,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "open:font-upload-unbuilt",
       "recipe": null
     },
     {

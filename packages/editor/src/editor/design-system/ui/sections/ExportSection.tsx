@@ -251,7 +251,11 @@ export const ExportSection: React.FC = () => {
                     free space left. Found live 2026-08-13. */}
                 <span className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
                   <span className="tw:truncate" title={label}>{label}</span>
-                  <span className="tw:truncate tw:text-[11px] tw:text-gray-500" title={desc}>
+                  {/* Wraps rather than truncates: board 153:120 shows the whole
+                      description under the title, and at this width `truncate`
+                      was rendering "Custom prope…" — a subtitle that stops
+                      before it says anything is worse than a second line. */}
+                  <span className="tw:text-[11px] tw:leading-snug tw:text-gray-500" title={desc}>
                     {desc}
                     {id === "tailwind" && droppedCount > 0 ? ` · ${droppedCount} dropped` : ""}
                   </span>
