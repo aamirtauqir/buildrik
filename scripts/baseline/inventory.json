@@ -149,6 +149,27 @@
     "BL-0169 brand-pro-mode": "15.43%"
    },
    "shellBandNote": "FOUNDER CALL 2026-08-18: redraw a frame only when its PANEL moved; the shell band in every editor frame stays as drawn and is known-stale — it predates ReviewBar (869cebb2, 2026-08-17). Componentising the shell was considered and declined for now: the frames hold zero components (433 raw frames each), so there is nothing to swap without building it first."
+  },
+  "driftRegions": {
+   "_note": "Whole-frame comparison does not work: the alignment search picks dy=0 because the topbar never moved and the canvas content dominates, so the ReviewBar offset below it is never cancelled. Each state family needs the band its state actually lives in. Rail is 0-60, drawer 60-380, canvas 380-1140, inspector 1140-1440; the shell above starts at 56.",
+   "left-drawer": "60,56,320,844",
+   "inspector": "1140,56,300,844",
+   "topbar-popover": "900,56,540,520",
+   "centre-modal": "400,120,640,660",
+   "canvas": "380,56,760,844"
+  },
+  "driftSweepProgress": {
+   "measured": [
+    "BL-0100",
+    "BL-0101",
+    "BL-0102",
+    "BL-0103",
+    "BL-0104",
+    "BL-0105",
+    "BL-0169"
+   ],
+   "remaining": 41,
+   "note": "Each remaining row needs its capture spec rebuilt by hand — the originals were never committed (only screens-auth.json was). Reaching a state is the slow part: BL-0159's stock browser took three attempts because the entry moved into the panel footer as 'Browse stock' and even that lands on a source picker. Log in as the seed fixture's owner (qa@buildrik.local), not your own user, or /edit redirects and the failure reads as a sentinel timeout."
   }
  },
  "rows": [
