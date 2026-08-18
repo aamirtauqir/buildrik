@@ -51,11 +51,15 @@ function makeVersion(overrides: Partial<NamedVersion> = {}): NamedVersion {
 async function seedVersions(
   count: number,
   projectId = "proj-a",
-  idPrefix = "v"
+  idPrefix = "v",
+  /* Pruning only ever evicts auto-checkpoints (board 162:2 — "named ones
+     never prune"), so a prune test seeded with named versions is a test of
+     nothing. */
+  isAutoCheckpoint = true
 ): Promise<NamedVersion[]> {
   const versions: NamedVersion[] = [];
   for (let i = 0; i < count; i++) {
-    const v = makeVersion({ id: `${idPrefix}-${i}`, createdAt: 1_000 + i * 100, projectId });
+    const v = makeVersion({ id: `${idPrefix}-${i}`, createdAt: 1_000 + i * 100, projectId, isAutoCheckpoint });
     await saveVersion(v);
     versions.push(v);
   }
@@ -235,9 +239,30 @@ describe("VersionHistoryStorage", () => {
       expect(remaining[0].id).toBe("v-54");
     });
 
+    it("never prunes a named version, even when it sits in the overflow", async () => {
+      await seedVersions(4, "p1", "a");                       // a-0 oldest … a-3
+      await saveVersion(makeVersion({ id: "m-1", projectId: "p1", createdAt: 1_050, isAutoCheckpoint: false }));
+
+      const deleted = await pruneVersions("p1", 3);
+
+      // Two too many; both evicted are auto-checkpoints and the milestone stays.
+      expect(deleted).toBe(2);
+      const remaining = (await loadVersions("p1")).map((v) => v.id);
+      expect(remaining).toContain("m-1");
+      expect(remaining).not.toContain("a-0");
+      expect(remaining).not.toContain("a-1");
+    });
+
+    it("keeps every named version even past the cap", async () => {
+      await seedVersions(5, "p2", "m", false);
+
+      expect(await pruneVersions("p2", 2)).toBe(0);
+      expect(await loadVersions("p2")).toHaveLength(5);
+    });
+
     it("prunes only within the given project", async () => {
       await seedVersions(4, "proj-a");
-      await saveVersion(makeVersion({ id: "b-1", projectId: "proj-b", createdAt: 1 }));
+      await saveVersion(makeVersion({ id: "b-1", projectId: "proj-b", createdAt: 1, isAutoCheckpoint: true }));
 
       await pruneVersions("proj-a", 2);
 

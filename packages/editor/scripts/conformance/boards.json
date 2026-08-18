@@ -913,7 +913,7 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "undecided",
+      "authority": "board:162-2-prune-rule",
       "recipe": null
     },
     {
@@ -957,7 +957,7 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "undecided",
+      "authority": "board:163-269",
       "recipe": null
     },
     {

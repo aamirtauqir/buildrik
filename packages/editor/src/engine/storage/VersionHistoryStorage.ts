@@ -207,8 +207,18 @@ export async function deleteAllVersions(projectId: string = "default"): Promise<
 // ============================================
 
 /**
- * Prune old versions to stay under the limit
- * Keeps the N most recent versions
+ * Prune old versions to stay under the limit.
+ *
+ * **Auto-checkpoints only.** Board 162:2 states the rule under the list —
+ * "50 versions kept. Auto-saves prune oldest first; named ones never prune" —
+ * and `VersionTimelineManager` quotes it back in its own docs. Both prunes
+ * (this one and the server's `pruneSiteVersions`) took `slice(maxVersions)`
+ * over EVERY version, so a milestone somebody named and relied on was deleted
+ * as soon as fifty newer rows existed. Naming a version is the one promise
+ * this feature makes.
+ *
+ * Named versions are kept even when that leaves the total above the cap —
+ * "never prune" is not "prune later".
  */
 export async function pruneVersions(
   projectId: string = "default",
@@ -220,8 +230,16 @@ export async function pruneVersions(
     return 0;
   }
 
-  // Versions are sorted newest first
-  const toDelete = versions.slice(maxVersions);
+  // Newest first. Evict auto-checkpoints from the oldest end, only as many as
+  // the overflow needs, and never a named one.
+  const excess = versions.length - maxVersions;
+  const toDelete = versions
+    .filter((v) => v.isAutoCheckpoint)
+    .slice(-excess);
+
+  if (toDelete.length === 0) {
+    return 0;
+  }
   const db = await openDatabase();
 
   return new Promise((resolve, reject) => {

@@ -56,14 +56,30 @@ export async function deleteSiteVersion(siteId: string, versionId: string): Prom
   return { ok: true };
 }
 
-/** Keep the newest MAX_VERSIONS_PER_SITE rows; drop the oldest overflow. */
+/**
+ * Keep the newest MAX_VERSIONS_PER_SITE rows by evicting AUTO-SAVES only.
+ *
+ * Board 162:2 prints the rule under the list: "50 versions kept. Auto-saves
+ * prune oldest first; named ones never prune." This deleted the oldest rows
+ * whatever they were, so a milestone a user named — the one thing this feature
+ * promises to keep — was dropped as soon as fifty newer rows existed. The
+ * editor's own `pruneVersions` had the identical bug; both are fixed together.
+ *
+ * A site whose named versions alone exceed the cap keeps them all: "never
+ * prune" is not "prune later".
+ */
 async function pruneSiteVersions(siteId: string): Promise<void> {
   const all = await prisma.siteVersion.findMany({
     where: { siteId },
     orderBy: { createdAt: "desc" },
-    select: { id: true },
+    select: { id: true, isAuto: true },
   });
   if (all.length <= MAX_VERSIONS_PER_SITE) return;
-  const overflow = all.slice(MAX_VERSIONS_PER_SITE).map((r) => r.id);
+  const excess = all.length - MAX_VERSIONS_PER_SITE;
+  const overflow = all
+    .filter((r) => r.isAuto)
+    .slice(-excess)
+    .map((r) => r.id);
+  if (overflow.length === 0) return;
   await prisma.siteVersion.deleteMany({ where: { id: { in: overflow } } });
 }

@@ -978,7 +978,10 @@ export class VersionTimelineManager {
   private async pruneIfNeeded(): Promise<void> {
     const pruned = await pruneVersions(this.projectId, this.config.maxVersions);
     if (pruned > 0) {
-      this.versions = this.versions.slice(0, this.config.maxVersions);
+      /* Mirror what storage actually removed. `slice(0, maxVersions)` dropped
+         the same named milestones the prune now protects — the in-memory list
+         has to follow the same rule, not a count. */
+      this.versions = await loadVersions(this.projectId);
       /* Pruning was silent: a user's older auto-saves vanished with nothing
          said. Board 163:269 draws the notice — announce it so the panel can. */
       this.composer.emit(EVENTS.VERSION_PRUNED, {

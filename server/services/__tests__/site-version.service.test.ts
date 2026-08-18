@@ -44,12 +44,35 @@ describe("site-version.service", () => {
     expect(deleteMany).not.toHaveBeenCalled();
   });
 
-  it("prunes the oldest rows beyond the 50 cap after create", async () => {
+  it("prunes the oldest AUTO-SAVES beyond the 50 cap after create", async () => {
     upsert.mockResolvedValueOnce({ versionId: "v" });
-    const rows = Array.from({ length: 52 }, (_, i) => ({ id: `id-${i}` })); // newest-first
+    const rows = Array.from({ length: 52 }, (_, i) => ({ id: `id-${i}`, isAuto: true })); // newest-first
     findMany.mockResolvedValueOnce(rows);
     await createSiteVersion({ siteId: "s1", versionId: "v", name: "n", isAuto: true, payload: {} });
     expect(deleteMany).toHaveBeenCalledWith({ where: { id: { in: ["id-50", "id-51"] } } });
+  });
+
+  /* Board 162:2 states the rule under the list: "Auto-saves prune oldest
+     first; named ones never prune." The prune took the oldest rows whatever
+     they were, so a milestone somebody named was deleted as soon as fifty
+     newer rows existed. */
+  it("never prunes a named version sitting in the overflow", async () => {
+    upsert.mockResolvedValueOnce({ versionId: "v" });
+    const rows = Array.from({ length: 52 }, (_, i) => ({
+      id: `id-${i}`,
+      // The two oldest rows are a named milestone and an auto-save.
+      isAuto: i !== 50,
+    }));
+    findMany.mockResolvedValueOnce(rows);
+    await createSiteVersion({ siteId: "s1", versionId: "v", name: "n", isAuto: true, payload: {} });
+    expect(deleteMany).toHaveBeenCalledWith({ where: { id: { in: ["id-49", "id-51"] } } });
+  });
+
+  it("deletes nothing when the overflow is entirely named", async () => {
+    upsert.mockResolvedValueOnce({ versionId: "v" });
+    findMany.mockResolvedValueOnce(Array.from({ length: 52 }, (_, i) => ({ id: `id-${i}`, isAuto: false })));
+    await createSiteVersion({ siteId: "s1", versionId: "v", name: "n", isAuto: false, payload: {} });
+    expect(deleteMany).not.toHaveBeenCalled();
   });
 
   it("listSiteVersions selects metadata only (never the snapshot payload)", async () => {
