@@ -293,6 +293,14 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
        numbers are not sample data: 6 is `STARTER_DS_REGISTRY.length` and 27 is
        `CATALOG.length` to the digit. Both rows shipped countless — the only
        two rows on the board that carry a number and did not here. */
+    /* Board 154:132 is this same list in Basic mode, and it carries no count
+       on Classes or Components — the two rows whose contents Basic cannot
+       edit. Its own footer says why: "Basic mode hides what you cannot edit
+       yet." A number for something you cannot touch is the noise that note is
+       about. Board 152:2 (Pro) shows both. */
+    if (isBeginner) {
+      return { tokens, styles: presets, starters: STARTER_DS_REGISTRY.length };
+    }
     return {
       tokens,
       styles: presets,

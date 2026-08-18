@@ -231,7 +231,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "open:footer-copy",
       "recipe": null
     },
     {
@@ -385,7 +385,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "board:154-132",
       "recipe": null
     },
     {
