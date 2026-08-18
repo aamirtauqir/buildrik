@@ -175,12 +175,16 @@
     "BL-0170 brand-dark-preview": "15.38% REDRAW",
     "BL-0173 brand-styles-tab": "12.43% REDRAW",
     "BL-0174 brand-components-tab": "15.86% REDRAW",
-    "BL-0175 content-create-collection": "26.14% REDRAW (modal region 400,120,640,660)"
+    "BL-0175 content-create-collection": "26.14% REDRAW (modal region 400,120,640,660)",
+    "BL-0112 sitemenu-site-settings": "9.42% REDRAW",
+    "BL-0113 sitemenu-version-history": "10.45% REDRAW",
+    "BL-0117 sitemenu-components": "5.79% keep",
+    "BL-0176 publish-confirm": "15.57% REDRAW"
    },
    "shellBandNote": "FOUNDER CALL 2026-08-18: redraw a frame only when its PANEL moved; the shell band in every editor frame stays as drawn and is known-stale — it predates ReviewBar (869cebb2, 2026-08-17). Componentising the shell was considered and declined for now: the frames hold zero components (433 raw frames each), so there is nothing to swap without building it first.",
    "unmeasured": {
-    "BL-0107 comments-open": "click on button[aria-label=Comments] opens no [role=menu|dialog|listbox] — spec unknown",
-    "BL-0110 review-pill-open": "same; the review pill's popover is not one of those roles",
+    "BL-0107 comments-open": "the Comments button opens no [role=menu|dialog] and no 'Comments' text within 8s — door unknown",
+    "BL-0110 review-pill-open": "clicking the review pill changes nothing the capture can assert; a run without an assertion returns the same sha as an untouched frame, so any number from it is the shell",
     "BL-0123 inspector-text": "the seed fixture has no element of data-buildrick-type=text",
     "_rest": "31 rows still unmeasured — see driftSweepProgress",
     "BL-0119 sitemenu-plugins": "the door is broken — AquibraStudio:464 deep-links to a settings screen id of 'plugins' that does not exist, so it opens Settings at its root. The state cannot be captured until the id becomes 'integrations'.",
@@ -188,13 +192,15 @@
     "BL-0112/0113/0117/0121": "site-settings, version-history, components and keyboard-shortcuts are no longer labels in the site menu — their routes changed since the pin and each needs its door found again before it can be captured.",
     "BL-0162 media-list-view": "[aria-label='List view'] is in the panel toolbar when probed directly, but the click never lands from a capture spec — needs its own investigation",
     "BL-0163 pages-context-menu": "same shape: [aria-label='More options for Home'] not clickable from a spec",
-    "BL-0168 layers-context-menu": "the LAYERS RAIL BUTTON itself refuses the click (aria-label 'View and reorder page structure'); nothing in the panel was ever reached"
+    "BL-0168 layers-context-menu": "the LAYERS RAIL BUTTON itself refuses the click (aria-label 'View and reorder page structure'); nothing in the panel was ever reached",
+    "BL-0121 sitemenu-keyboard-shortcuts": "'?' does not open the shortcuts overlay; the real binding was not found"
    },
    "specsMustAssertTheState": "A capture spec whose actions do not END in a waitFor on something the state proves will happily screenshot the state it failed to open, and the diff then reports a plausible number. Caught here: comments-open and review-pill-open both read exactly 10.86%, which is the shell region and nothing else — adding waitFor on [role=menu],[role=dialog],[role=listbox] turned both into honest FAILs while the other four still passed.",
    "capturesLeakThroughLocalStorage": "capture.mjs runs every screen in ONE browser context, and the editor remembers its open panel in localStorage. So screen N's destination is still open when screen N+1 loads: an 'Export code' capture came back showing Version History because the previous row had opened it. Normalise at the top of each spec's actions (click a known rail tab first) or the batch quietly measures the wrong screens — the first sitemenu run produced three PAIRS of identical percentages and two byte-identical PNGs.",
    "correction": "An earlier version of this table said media 0 and insert 0, and a commit message repeated that they were 'the only surfaces untouched since the pin'. Both were wrong. The media count was taken with two paths in one unquoted shell variable and came back 0 instead of 37; the insert count was 0 because the path it named does not exist (the tab is sidebar/tabs/elements + ElementsTab.tsx, not sidebar/tabs/insert). No editor surface is untouched since the pin. This is exactly why the founder's per-row pixel measure is the authority and the counts are only a where-to-look hint: BL-0103, the media panel ROOT, measures 2.13%% and is identical by eye, while BL-0161, the media FULL-PAGE library on the same 37-commit surface, measures 40.73%% and was rebuilt outright — 'Media library EXPANDED' with Stock/Compact became 'Asset Library MANAGE' with a folders sidebar and Import URL. One commit count cannot tell those two apart. The pixels can.",
    "doorsThatMoved": "Brand's rows were renamed since the pin and the old row names are dead ends for a capture spec: BL-0173 'brand-styles-tab' is now the row labelled **Presets** (id still `styles`), and BL-0170 'brand-dark-preview' is now **Colour mode**. Four site-menu rows lost their labels entirely — site-settings, version-history, components, keyboard-shortcuts. A row that cannot be captured is not necessarily a broken product; usually its door was renamed.",
-   "regionMustMatchTheState": "BL-0175 measured 92.30%% against the drawer region and 26.14%% against the modal region. Both numbers are real: the old shot dims the drawer behind an open modal and the new one does not, so the drawer region was measuring a backdrop. Measure a modal row in the modal."
+   "regionMustMatchTheState": "BL-0175 measured 92.30%% against the drawer region and 26.14%% against the modal region. Both numbers are real: the old shot dims the drawer behind an open modal and the new one does not, so the drawer region was measuring a backdrop. Measure a modal row in the modal.",
+   "offRailDoorsAreByDesign": "Settings, Version History, Components, Publish and History have no rail icon: the rail is six items by board 52:2, and LeftSidebar says off-rail panels open from ⌘K, shortcuts and the topbar (guarded by tabsConfig.figma.test.ts). Checked before calling anything stranded — pressing S really does open Settings. So the inventory rows named 'sitemenu-site-settings' and 'sitemenu-version-history' are still capturable, just not from the site menu: S, H, ⇧A, U reach them."
   },
   "driftRegions": {
    "_note": "Whole-frame comparison does not work: the alignment search picks dy=0 because the topbar never moved and the canvas content dominates, so the ReviewBar offset below it is never cancelled. Each state family needs the band its state actually lives in. Rail is 0-60, drawer 60-380, canvas 380-1140, inspector 1140-1440; the shell above starts at 56.",
@@ -238,10 +244,15 @@
     "BL-0170",
     "BL-0173",
     "BL-0174",
-    "BL-0175"
+    "BL-0175",
+    "BL-0112",
+    "BL-0113",
+    "BL-0117",
+    "BL-0176"
    ],
-   "remaining": 15,
-   "note": "Each remaining row needs its capture spec rebuilt by hand — the originals were never committed (only screens-auth.json was). Reaching a state is the slow part: BL-0159's stock browser took three attempts because the entry moved into the panel footer as 'Browse stock' and even that lands on a source picker. Log in as the seed fixture's owner (qa@buildrik.local), not your own user, or /edit redirects and the failure reads as a sentinel timeout."
+   "remaining": 11,
+   "note": "Each remaining row needs its capture spec rebuilt by hand — the originals were never committed (only screens-auth.json was). Reaching a state is the slow part: BL-0159's stock browser took three attempts because the entry moved into the panel footer as 'Browse stock' and even that lands on a source picker. Log in as the seed fixture's owner (qa@buildrik.local), not your own user, or /edit redirects and the failure reads as a sentinel timeout.",
+   "remainingRows": "BL-0107, BL-0110, BL-0121 (doors not found) · BL-0119 (broken door), BL-0120 (opens a new tab), BL-0172 (feature flag off), BL-0123 (no such element in the fixture), BL-0171 (captured fresh, no prior shot to diff) · BL-0162, BL-0163, BL-0168 (controls refuse the click from a spec)"
   }
  },
  "rows": [

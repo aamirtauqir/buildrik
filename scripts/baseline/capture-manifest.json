@@ -1,42 +1,28 @@
 {
- "commit": "b4809ef6",
+ "commit": "96b00949",
  "base": "http://localhost:3000",
- "generated": "2026-08-18T17:25:47.485Z",
+ "generated": "2026-08-18T17:33:41.316Z",
  "captures": [
   {
-   "id": "BL-0170",
+   "id": "BL-0110",
    "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "state": "brand-dark-preview__drift",
+   "state": "review-pill-open__drift",
    "status": 200,
-   "sha256": "c0e6b10b48f5de8e",
-   "scrollHeight": 905,
-   "elCount": 20
-  },
-  {
-   "id": "BL-0173",
-   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "state": "brand-styles-tab__drift",
-   "status": 200,
-   "sha256": "dcb0efcb2656a114",
+   "sha256": "13e022aa142a3745",
    "scrollHeight": 905,
    "elCount": 20
   }
  ],
  "failures": [
   {
-   "id": "BL-0162",
+   "id": "BL-0121",
    "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "error": "page.click: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[aria-label=\\'List view\\']')\u001b[22m\n\u001b[2m    - locator resolved to <button disabled type=\"button\" title=\"List view\" aria-label=\"List view\" class=\"tw:inline-flex tw:items-center tw:justify-center tw:h-8 tw:w-8 tw:border-0 tw:rounded-md tw:bg-transparent tw:text-gray-600 tw:cursor-pointer tw:[transition:var(--bk-transition-fast)] tw:enabled:hover:bg-gray-100 tw:enabled:hover:text-gray-900 tw:aria-pressed:bg-blue-50 tw:aria-pressed:text-blue-700 tw:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)] tw:disabled:opacity-50 tw:disabled:cursor-not-allowed tw:…>…</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    15 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not enabled\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
+   "error": "page.waitForSelector: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('text=Search shortcuts') to be visible\u001b[22m\n"
   },
   {
-   "id": "BL-0163",
+   "id": "BL-0107",
    "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "error": "page.click: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[aria-label=\\'More options for Home\\']')\u001b[22m\n\u001b[2m    - locator resolved to <button type=\"button\" aria-haspopup=\"menu\" aria-expanded=\"false\" aria-label=\"More options for Home\" class=\"tw:relative tw:flex tw:items-center tw:justify-center tw:rounded-lg tw:text-center tw:font-medium tw:focus:outline-none tw:focus:ring-4 tw:h-10 tw:px-5 tw:text-sm tw:bg-primary-700 tw:text-white tw:hover:bg-primary-800 tw:focus:ring-primary-300 tw:dark:bg-primary-600 tw:dark:hover:bg-primary-700 tw:dark:focus:ring-primary-800 bd-pg-row-overflow\">…</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    15 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
-  },
-  {
-   "id": "BL-0168",
-   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "error": "page.click: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[aria-label=\\'View and reorder page structure\\']')\u001b[22m\n\u001b[2m    - locator resolved to <button role=\"tab\" type=\"button\" data-tab=\"layers\" aria-selected=\"false\" aria-label=\"View and reorder page structure\" class=\"tw:relative tw:flex tw:items-center tw:justify-center tw:rounded-lg tw:text-center tw:font-medium tw:focus:outline-none tw:focus:ring-4 tw:h-10 tw:px-5 tw:text-sm tw:border tw:border-gray-300 tw:bg-white tw:text-gray-900 tw:hover:bg-gray-100 tw:focus:ring-gray-100 tw:dark:border-gray-600 tw:dark:bg-gray-800 tw:dark:text-white tw:dark:hover:border-gray-600 tw:dark:hover:bg-gray-7…>…</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <div class=\"tw:relative tw:z-20\">Insert · A</div> from <div id=\"_r_2_\" tabindex=\"-1\" role=\"tooltip\" data-floating-ui-focusable=\"\" data-testid=\"flowbite-tooltip\" class=\"tw:absolute tw:z-10 tw:inline-block tw:rounded-lg tw:px-3 tw:py-2 tw:text-sm tw:font-medium tw:shadow-xs tw:transition-opacity duration-300 tw:bg-gray-900 tw:text-white tw:dark:bg-gray-700 tw:max-w-[280px] tw:whitespace-normal\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <div class=\"tw:relative tw:z-20\">Insert · A</div> from <div id=\"_r_2_\" tabindex=\"-1\" role=\"tooltip\" data-floating-ui-focusable=\"\" data-testid=\"flowbite-tooltip\" class=\"tw:absolute tw:z-10 tw:inline-block tw:rounded-lg tw:px-3 tw:py-2 tw:text-sm tw:font-medium tw:shadow-xs tw:transition-opacity duration-300 tw:bg-gray-900 tw:text-white tw:dark:bg-gray-700 tw:max-w-[280px] tw:whitespace-normal\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    15 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - <div class=\"tw:relative tw:z-20\">Insert · A</div> from <div id=\"_r_2_\" tabindex=\"-1\" role=\"tooltip\" data-floating-ui-focusable=\"\" data-testid=\"flowbite-tooltip\" class=\"tw:absolute tw:z-10 tw:inline-block tw:rounded-lg tw:px-3 tw:py-2 tw:text-sm tw:font-medium tw:shadow-xs tw:transition-opacity duration-300 tw:bg-gray-900 tw:text-white tw:dark:bg-gray-700 tw:max-w-[280px] tw:whitespace-normal\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
+   "error": "page.waitForSelector: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('text=Comments') to be visible\u001b[22m\n"
   }
  ]
 }
