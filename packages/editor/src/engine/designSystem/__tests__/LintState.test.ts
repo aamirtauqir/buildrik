@@ -53,3 +53,30 @@ describe("LintState", () => {
     expect(handler).toHaveBeenCalledTimes(3);
   });
 });
+
+/* Board 306:2217 draws a "Warnings suppressed" pill on the Brand root, and
+   nothing could answer it — suppression was reachable and then invisible. */
+describe("LintState — how many tokens are hiding their warnings", () => {
+  /* Suppressions persist to localStorage and the constructor reads them back,
+     so a fresh instance is only fresh if the store is. */
+  beforeEach(() => localStorage.clear());
+
+  it("counts nothing when nothing is suppressed", () => {
+    expect(new LintState().suppressedCount()).toBe(0);
+  });
+
+  it("counts each suppressed token once", () => {
+    const s = new LintState();
+    s.suppress("color-accent");
+    s.suppress("color-accent");
+    s.suppress("color-success");
+    expect(s.suppressedCount()).toBe(2);
+  });
+
+  it("drops back as they are unsuppressed", () => {
+    const s = new LintState();
+    s.suppress("color-accent");
+    s.unsuppress("color-accent");
+    expect(s.suppressedCount()).toBe(0);
+  });
+});

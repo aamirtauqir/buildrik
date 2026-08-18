@@ -9,6 +9,12 @@ import * as React from "react";
 import { EmptyState, Button } from "@/editor/chrome-ui";
 
 export interface PanelErrorStateProps {
+  /**
+   * The headline. Every panel's load-error board writes its own — Brand's
+   * 781:4311 says "Couldn't load your brand system." — because "Something
+   * went wrong" names nothing the reader can act on or reason about.
+   */
+  title?: string;
   /** Error message to display */
   message?: string;
   /** Retry callback — shows "Try again" button when provided */
@@ -16,13 +22,14 @@ export interface PanelErrorStateProps {
 }
 
 export const PanelErrorState: React.FC<PanelErrorStateProps> = ({
+  title = "Something went wrong",
   message = "Something went wrong",
   onRetry,
 }) => (
   <div style={wrapperStyles} role="alert" aria-live="polite">
     <EmptyState
       size="sm"
-      title="Something went wrong"
+      title={title}
       body={message}
       action={
         onRetry ? (

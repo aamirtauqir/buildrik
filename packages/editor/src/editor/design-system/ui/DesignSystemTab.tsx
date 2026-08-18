@@ -181,6 +181,10 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
   /* Shared with DSLintBanner via `useDSLint` so the row count, the banner and
      the Lint destination can never disagree. */
   const lintIssues = useDSLint(composer);
+  /* Board 306:2217 puts a "Warnings suppressed" pill on the root. Read here
+     rather than stored: `useDSLint` re-renders this component whenever
+     `lint:changed` fires, which is every suppress and unsuppress. */
+  const suppressedCount = composer?.designSystem?.lintState?.suppressedCount?.() ?? 0;
   /* Which token KIND is open inside the Tokens destination (board 152:52 ->
      152:83). Held here so the panel renders ONE crumb — the board draws
      `‹ Tokens · color`, not a second crumb stacked under the first. */
@@ -656,13 +660,27 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
       )}
 
       {error ? (
+        /* Board 781:4311's copy: what failed, and — the half that matters —
+           that nothing was lost. The raw exception text said neither. */
         <PanelErrorState
-          message={error}
+          title="Couldn't load your brand system."
+          message="Your tokens are safe — only this list failed to load."
           onRetry={() => { setError(null); loadFromComposer(); }}
         />
       ) : (
         <div id={`design-section-${activeSection ?? "root"}`} className={SECTION_BODY}>
           {/* Brand root — the drill-in list (M5, board 152:2) */}
+          {activeSection === null && suppressedCount > 0 ? (
+            <div className="tw:px-3 tw:pb-2">
+              <span
+                role="status"
+                className="tw:inline-flex tw:items-center tw:rounded-full tw:border tw:border-[var(--bk-warning-text)] tw:bg-[var(--bk-warning-tint)] tw:px-2.5 tw:py-0.5 tw:text-xs tw:text-[var(--bk-warning-text)]"
+              >
+                Warnings suppressed
+              </span>
+            </div>
+          ) : null}
+
           {activeSection === null && (
             <ul className="tw:flex tw:flex-col tw:gap-0.5 tw:list-none tw:m-0 tw:p-0">
               {SECTIONS.map((s) => {

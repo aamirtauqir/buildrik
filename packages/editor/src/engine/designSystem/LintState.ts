@@ -111,6 +111,19 @@ export class LintState extends EventEmitter {
     return this.suppressed.has(tokenId);
   }
 
+  /**
+   * How many tokens are currently hiding their warnings.
+   *
+   * Board 306:2217 draws a "Warnings suppressed" pill on the Brand root, and
+   * nothing could answer it: suppression was reachable (TokenDetailView) and
+   * invisible afterwards — the Lint count simply went down. A count that drops
+   * for two different reasons, with no way to tell them apart, is worse than
+   * either.
+   */
+  suppressedCount(): number {
+    return this.suppressed.size;
+  }
+
   private persist(): void {
     if (typeof window === "undefined") return;
     try {
