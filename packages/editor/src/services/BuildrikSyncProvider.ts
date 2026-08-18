@@ -102,19 +102,6 @@ const DEFAULT_ROOT: ElementData = {
 };
 
 /**
- * A project "has content" if any page's root element contains children. Used to
- * gate auto-save (see initBuildrikSync): an empty project-tree is what a failed
- * or raced `loadProject` produces, and persisting it would overwrite the
- * server's real content.
- */
-function projectHasContent(data: ProjectData): boolean {
-  return (data.pages ?? []).some((p) => {
-    const root = p.root as ElementData | undefined;
-    return Array.isArray(root?.children) && root.children.length > 0;
-  });
-}
-
-/**
  * P0.2b SSOT: shape of Site columns that mirror editor projectSettings fields.
  * `siteDetail.settings.get` returns these alongside name/slug/etc.
  */
@@ -451,73 +438,14 @@ export function getBuildrikStorageHandlers(siteId: string) {
   };
 }
 
-/**
- * Initialize Buildrik sync on a Composer instance.
- * Loads the project and sets up auto-save on PROJECT_CHANGED events.
- */
-export async function initBuildrikSync(
-  composer: {
-    importProject: (data: ProjectData) => void;
-    exportProject: () => ProjectData;
-    on: (event: string, cb: () => void) => void;
-    emit: (event: string) => void;
-  },
-  siteId: string,
-  onSaveError?: (error: Error) => void
-): Promise<void> {
-  const data = await loadProject(siteId);
-  composer.importProject(data);
-
-  // Data-loss guard: track whether real content has EVER been observed this
-  // session. A failed/raced load returns an empty project; importing it and
-  // then letting auto-save run would clobber the server's real content (the
-  // 2026-06-04 fixture-wipe incident). We refuse to persist an empty
-  // project-tree until content has been observed — either the load brought it,
-  // or the user added some. An empty page has nothing to lose; a user who
-  // deletes every block after a content-bearing load still saves normally
-  // because observedContent is already true by then.
-  let observedContent = projectHasContent(data);
-
-  let saveTimeout: ReturnType<typeof setTimeout> | null = null;
-  let isSaving = false;
-  let pendingChanges = false;
-  composer.on("project:changed", () => {
-    if (saveTimeout) clearTimeout(saveTimeout);
-    if (isSaving) {
-      pendingChanges = true;
-      return;
-    }
-    saveTimeout = setTimeout(() => {
-      const projectData = composer.exportProject();
-      if (projectHasContent(projectData)) {
-        observedContent = true;
-      } else if (!observedContent) {
-        console.warn(
-          "[BuildrikSync] skipped empty auto-save: no content observed this " +
-            "session (likely a failed or raced load — refusing to overwrite " +
-            "server content)",
-        );
-        return;
-      }
-      isSaving = true;
-      saveProject(siteId, projectData)
-        .catch((err: unknown) => {
-          const error = err instanceof Error ? err : new Error("Save failed");
-          console.error("[BuildrikSync] save failed, retrying once:", error.message);
-          return saveProject(siteId, projectData);
-        })
-        .catch((retryErr: unknown) => {
-          const retryError = retryErr instanceof Error ? retryErr : new Error("Save retry failed");
-          console.error("[BuildrikSync] retry failed:", retryError.message);
-          onSaveError?.(retryError);
-        })
-        .finally(() => {
-          isSaving = false;
-          if (pendingChanges) {
-            pendingChanges = false;
-            composer.emit("project:changed");
-          }
-        });
-    }, 5000);
-  });
-}
+/* `initBuildrikSync` lived here until 2026-08-19: a second autosave loop —
+   load, import, debounce on project:changed, save, retry once — that nothing
+   ever called. The shipping path is `useComposerInit` (load + autosave) and
+   `useSaveCallback` (manual). It also carried the only copy of the
+   2026-06-04 fixture-wipe guard, which refused a save when no CONTENT had
+   been observed. That guard did not fit the failure it was written for: a
+   failed load leaves a fallback project on screen, and the fallback has a
+   child, so it counts as content and the wipe went through anyway (proved on
+   a scratch site — 2 pages became one). The protection now lives at the write
+   boundary as `_loadedSites` + `ProjectNotLoadedError`, where every caller
+   gets it. Do not re-add a loop here; wire the shell instead. */

@@ -201,7 +201,7 @@ only via project blocks JSON.
 | Named versions (create/restore/delete/compare/export) | `VersionTimelineManager.ts:createVersion`/`restoreVersion`/`compareVersions` → `VersionHistoryStorage.ts` (IndexedDB) | WORKING (browser-LOCAL) |
 | Server version persistence | — (only `MediaAssetVersion`, `TemplateVersion` exist) | NO-BACKEND (server) |
 | Project save → server | `BuildrikSyncProvider.ts:saveProject` → `sites.service.ts:saveProjectData` | WORKING (dual-save pages + Site columns, sanitized) |
-| Save-conflict detection / autosave | `BuildrikSyncProvider.ts:SaveConflictError`/`initBuildrikSync` (5s debounce, empty-project guard) | WORKING |
+| Save-conflict detection / autosave | `BuildrikSyncProvider.ts:SaveConflictError` + the debounced effect in `useComposerInit` (autosave) and `useSaveCallback` (manual). Saves are refused for a site whose project never loaded — `_loadedSites`/`ProjectNotLoadedError`, without which one failed load plus one edit deleted a site's pages (2026-08-19). This row named `initBuildrikSync` and its empty-project guard until then; that function had no caller and was deleted. | WORKING |
 
 ## 14. Collaboration
 

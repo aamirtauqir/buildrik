@@ -46,7 +46,6 @@ import {
   getSiteIdFromUrl,
   getBuildrikStorageHandlers,
   getEditorPlanTier,
-  initBuildrikSync,
   setBaselineLastEditedAt,
   SaveConflictError,
   ProjectNotLoadedError,
@@ -69,6 +68,16 @@ beforeEach(() => {
 });
 
 describe("loadProject", () => {
+  /* Moved here 2026-08-19 when BuildrikSyncProvider.test.ts was deleted with
+     `initBuildrikSync`, the orphaned second autosave loop it existed to
+     cover. One module, one test file. */
+  it("wraps a tRPC failure in a domain error naming the site", async () => {
+    mocks.sitesGetQuery.mockRejectedValue(new Error("network"));
+    await expect(loadProject("s1")).rejects.toThrow(
+      "BuildrikSyncProvider.loadProject failed for site s1",
+    );
+  });
+
   it("assembles ProjectData from sites.get + pages.list responses", async () => {
     mocks.sitesGetQuery.mockResolvedValue({ id: "site-1", name: "My Site" });
     mocks.pagesListQuery.mockResolvedValue([
@@ -214,28 +223,6 @@ describe("getBuildrikStorageHandlers", () => {
     const handlers = getBuildrikStorageHandlers("s1");
     const data = await handlers.load();
     expect(data?.metadata?.name).toBe("Test");
-  });
-});
-
-describe("initBuildrikSync", () => {
-  it("loads project into composer and sets up auto-save listener", async () => {
-    mocks.sitesGetQuery.mockResolvedValue({ id: "s1", name: "Sync Test" });
-    mocks.pagesListQuery.mockResolvedValue([
-      { id: "p1", name: "Home", slug: "/", isHomePage: true, blocks: null, position: 1 },
-    ]);
-
-    const mockComposer = {
-      importProject: vi.fn(),
-      exportProject: vi.fn().mockReturnValue({ version: "1.0", pages: [], styles: [], assets: [] }),
-      on: vi.fn(),
-      emit: vi.fn(),
-    };
-
-    await initBuildrikSync(mockComposer, "s1");
-
-    expect(mockComposer.importProject).toHaveBeenCalledTimes(1);
-    expect(mockComposer.importProject.mock.calls[0][0].metadata?.name).toBe("Sync Test");
-    expect(mockComposer.on).toHaveBeenCalledWith("project:changed", expect.any(Function));
   });
 });
 
