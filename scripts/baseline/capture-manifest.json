@@ -1,62 +1,55 @@
 {
- "commit": "e9706088",
+ "commit": "360ee0c9",
  "base": "http://localhost:3000",
- "generated": "2026-08-18T15:20:53.880Z",
+ "generated": "2026-08-18T16:03:06.660Z",
  "captures": [
   {
-   "id": "BL-0100",
+   "id": "BL-0106",
    "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "state": "shell-default__drift",
+   "state": "publish-open__drift",
    "status": 200,
-   "sha256": "9d79e1197bea8d6f",
+   "sha256": "9bda3bf3b0ab049f",
    "scrollHeight": 905,
    "elCount": 82
   },
   {
-   "id": "BL-0101",
+   "id": "BL-0108",
    "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "state": "panel-layers__drift",
+   "state": "notifications-open__drift",
    "status": 200,
-   "sha256": "13546adf886b12ed",
+   "sha256": "4ec7f1d890468351",
    "scrollHeight": 905,
-   "elCount": 20
+   "elCount": 82
   },
   {
-   "id": "BL-0102",
+   "id": "BL-0109",
    "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "state": "panel-pages__drift",
+   "state": "site-menu-open__drift",
    "status": 200,
-   "sha256": "d6f7d553acf1835c",
+   "sha256": "ca28a14c42b47cfd",
    "scrollHeight": 905,
-   "elCount": 21
+   "elCount": 82
   },
   {
-   "id": "BL-0103",
+   "id": "BL-0111",
    "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "state": "panel-media__drift",
+   "state": "cmdk-open__drift",
    "status": 200,
-   "sha256": "63f759a1a3a4b35d",
+   "sha256": "06d3c3d2d5e3f664",
    "scrollHeight": 905,
-   "elCount": 47
-  },
-  {
-   "id": "BL-0104",
-   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "state": "panel-content__drift",
-   "status": 200,
-   "sha256": "a5e020705d912cf9",
-   "scrollHeight": 905,
-   "elCount": 22
-  },
-  {
-   "id": "BL-0105",
-   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "state": "panel-brand__drift",
-   "status": 200,
-   "sha256": "3e5b116228fe20ce",
-   "scrollHeight": 905,
-   "elCount": 20
+   "elCount": 82
   }
  ],
- "failures": []
+ "failures": [
+  {
+   "id": "BL-0107",
+   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
+   "error": "page.waitForSelector: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[role=menu],[role=dialog],[role=listbox]') to be visible\u001b[22m\n"
+  },
+  {
+   "id": "BL-0110",
+   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
+   "error": "page.waitForSelector: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[role=menu],[role=dialog],[role=listbox]') to be visible\u001b[22m\n"
+  }
+ ]
 }

@@ -142,13 +142,33 @@
    "floorExplained": "Six panel roots landed in a 12.6-14.6% band, media included, and media has zero commits since the pin. Read side by side, the Media panel body is unchanged — the band is the SHELL every editor frame contains. ReviewBar (869cebb2, 2026-08-17, board 200:213) added a whole row under the topbar whenever a round is open, and the seed fixture has one; the inspector is present in the new renders and absent in the old. Vertical re-alignment does not cancel it (best offset is 0), because a new row is not a translation. CONSEQUENCE for the per-row path: the panel-level signal is real and usable — 45.67% on Brand vs a flat floor on Media is exactly the discrimination it was built for — but every editor frame's chrome is stale regardless of its panel, so 'redraw only what moved' still touches the shell band of all 48. Founder call: redraw all 48, or redraw the shell band once if the frames are componentised enough to swap it.",
    "panelRegionMethod": "drift-diff.mjs --region 60,56,320,844 confines the comparison to the left drawer and searches +-64px of vertical alignment. It settles on dy=48px by itself — the ReviewBar's own height — which is the shell offset cancelled. Calibrated: media 2.13% (zero commits since the pin, panel confirmed identical by eye), layers 4.23% (the eye/lock icons were recoloured), brand 15.70% (tabs became a drill-in list). Read >~8% as 'the panel moved'.",
    "panelDrift": {
-    "BL-0100 shell-default": "n/a (whole-frame row)",
-    "BL-0101 panel-layers": "4.23%",
-    "BL-0103 panel-media": "2.13%",
-    "BL-0105 panel-brand": "15.70%",
-    "BL-0169 brand-pro-mode": "15.43%"
+    "_threshold": ">~8% = the panel moved; below = keep the frame (calibrated on media 2.13%, zero commits since the pin, confirmed identical by eye)",
+    "BL-0100 shell-default": "10.51% REDRAW",
+    "BL-0101 panel-layers": "4.23% keep",
+    "BL-0102 panel-pages": "1.71% keep",
+    "BL-0103 panel-media": "2.13% keep",
+    "BL-0104 panel-content": "4.52% keep",
+    "BL-0105 panel-brand": "15.70% REDRAW",
+    "BL-0106 publish-open": "6.53% keep",
+    "BL-0108 notifications-open": "28.52% REDRAW",
+    "BL-0109 site-menu-open": "9.41% REDRAW",
+    "BL-0111 cmdk-open": "9.18% REDRAW",
+    "BL-0124 inspector-button": "14.99% REDRAW",
+    "BL-0125 inspector-container": "13.58% REDRAW",
+    "BL-0126 inspector-grid": "17.07% REDRAW",
+    "BL-0127 inspector-flex": "24.85% REDRAW",
+    "BL-0128 inspector-input": "14.40% REDRAW",
+    "BL-0129 inspector-heading": "11.90% REDRAW",
+    "BL-0169 brand-pro-mode": "15.43% REDRAW"
    },
-   "shellBandNote": "FOUNDER CALL 2026-08-18: redraw a frame only when its PANEL moved; the shell band in every editor frame stays as drawn and is known-stale — it predates ReviewBar (869cebb2, 2026-08-17). Componentising the shell was considered and declined for now: the frames hold zero components (433 raw frames each), so there is nothing to swap without building it first."
+   "shellBandNote": "FOUNDER CALL 2026-08-18: redraw a frame only when its PANEL moved; the shell band in every editor frame stays as drawn and is known-stale — it predates ReviewBar (869cebb2, 2026-08-17). Componentising the shell was considered and declined for now: the frames hold zero components (433 raw frames each), so there is nothing to swap without building it first.",
+   "unmeasured": {
+    "BL-0107 comments-open": "click on button[aria-label=Comments] opens no [role=menu|dialog|listbox] — spec unknown",
+    "BL-0110 review-pill-open": "same; the review pill's popover is not one of those roles",
+    "BL-0123 inspector-text": "the seed fixture has no element of data-buildrick-type=text",
+    "_rest": "31 rows still unmeasured — see driftSweepProgress"
+   },
+   "specsMustAssertTheState": "A capture spec whose actions do not END in a waitFor on something the state proves will happily screenshot the state it failed to open, and the diff then reports a plausible number. Caught here: comments-open and review-pill-open both read exactly 10.86%, which is the shell region and nothing else — adding waitFor on [role=menu],[role=dialog],[role=listbox] turned both into honest FAILs while the other four still passed."
   },
   "driftRegions": {
    "_note": "Whole-frame comparison does not work: the alignment search picks dy=0 because the topbar never moved and the canvas content dominates, so the ReviewBar offset below it is never cancelled. Each state family needs the band its state actually lives in. Rail is 0-60, drawer 60-380, canvas 380-1140, inspector 1140-1440; the shell above starts at 56.",
@@ -166,9 +186,19 @@
     "BL-0103",
     "BL-0104",
     "BL-0105",
+    "BL-0106",
+    "BL-0108",
+    "BL-0109",
+    "BL-0111",
+    "BL-0124",
+    "BL-0125",
+    "BL-0126",
+    "BL-0127",
+    "BL-0128",
+    "BL-0129",
     "BL-0169"
    ],
-   "remaining": 41,
+   "remaining": 31,
    "note": "Each remaining row needs its capture spec rebuilt by hand — the originals were never committed (only screens-auth.json was). Reaching a state is the slow part: BL-0159's stock browser took three attempts because the entry moved into the panel footer as 'Browse stock' and even that lands on a source picker. Log in as the seed fixture's owner (qa@buildrik.local), not your own user, or /edit redirects and the failure reads as a sentinel timeout."
   }
  },
