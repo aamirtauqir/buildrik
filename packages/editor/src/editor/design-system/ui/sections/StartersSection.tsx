@@ -1,40 +1,62 @@
 /**
- * StartersSection — Brand › Starters, board 152:137.
- *
- * Starters were reachable only through a modal: a 🎨 button in the Brand
- * toolbar emitting UI_OPEN_STARTERS. The board draws them as a destination with
- * its own crumb, which is why M5 left the row out at the time — a row that
- * opened a modal would have misreported what it was. This is that row's
- * destination.
+ * StartersSection — Brand › Starters, boards 152:137 and 306:2186.
  *
  * The board leads with what you LOSE — "Applying a starter overwrites your
- * tokens." — where the modal's footer leads with reassurance ("restyles tokens
- * but keeps your elements"). Both are true; the board's order is the honest one
- * for an action that replaces work you may have done by hand.
+ * tokens." — above the grid, because that is the fact you need before the
+ * click, not after it.
  *
- * Two columns, not the modal's three: this renders in a 320 panel.
+ * There is no Apply button on either board: the CARD is the control, and
+ * 306:2186 answers it with a "Starter applied" pill. The section used to
+ * select on click and commit from a separate "Apply <name>" button below the
+ * grid — a second step the design does not draw, and a label that stopped
+ * being true once applying became staging.
  *
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button } from "@/editor/chrome-ui";
+import { StarterGrid } from "../StarterGalleryModal";
 import { STARTER_DS_REGISTRY } from "../../starters";
 import { useApplyStarter } from "../../state/useApplyStarter";
-import { StarterGrid } from "../StarterGalleryModal";
 
 export interface StartersSectionProps {
   projectId?: string | null;
 }
 
 export const StartersSection: React.FC<StartersSectionProps> = ({ projectId }) => {
-  const [selectedId, setSelectedId] = React.useState<string>(
-    STARTER_DS_REGISTRY[0]?.id ?? "",
-  );
+  const [selectedId, setSelectedId] = React.useState<string>("");
+  const [applied, setApplied] = React.useState<string | null>(null);
   const applyStarter = useApplyStarter(projectId);
-  const selected = STARTER_DS_REGISTRY.find((s) => s.id === selectedId);
+
+  /* The pill is the board's answer to the click. It clears itself so a second
+     starter reads as its own event rather than a badge that has always been
+     there. */
+  React.useEffect(() => {
+    if (!applied) return;
+    const t = setTimeout(() => setApplied(null), 4000);
+    return () => clearTimeout(t);
+  }, [applied]);
+
+  const choose = (id: string) => {
+    const starter = STARTER_DS_REGISTRY.find((s) => s.id === id);
+    if (!starter) return;
+    setSelectedId(id);
+    applyStarter(id);
+    setApplied(starter.name);
+  };
 
   return (
     <div className="tw:flex tw:flex-col">
+      {applied ? (
+        <div className="tw:px-3 tw:pt-2">
+          <span
+            role="status"
+            className="tw:inline-flex tw:items-center tw:rounded-full tw:border tw:border-[var(--bk-success)] tw:px-2.5 tw:py-0.5 tw:text-xs tw:text-[var(--bk-success-text)] tw:bg-[var(--bk-success-tint)]"
+          >
+            Starter applied
+          </span>
+        </div>
+      ) : null}
+
       <div
         role="note"
         className="tw:px-3 tw:py-2 tw:text-xs tw:leading-normal"
@@ -43,19 +65,7 @@ export const StartersSection: React.FC<StartersSectionProps> = ({ projectId }) =
         Applying a starter overwrites your tokens.
       </div>
 
-      <StarterGrid columns={2} selectedId={selectedId} onSelect={setSelectedId} />
-
-      <div className="tw:flex tw:justify-end tw:px-3 tw:pb-3">
-        <Button
-          size="xs"
-          type="button"
-          disabled={!selected}
-          data-apply-starter
-          onClick={() => selectedId && applyStarter(selectedId)}
-        >
-          Apply {selected?.name ?? ""}
-        </Button>
-      </div>
+      <StarterGrid columns={2} selectedId={selectedId} onSelect={choose} showDescription={false} />
     </div>
   );
 };

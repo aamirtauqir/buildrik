@@ -56,9 +56,11 @@ describe("StartersSection", () => {
      applying Stripe Blue the site's `projectSettings.designTokens` still
      held the defaults. A starter now STAGES, and the panel's own Review &
      Apply — the one path that calls setProjectSettings — commits it. */
+  /* The card is the control — boards 152:137 and 306:2186 draw no Apply
+     button, and the pill is how the click is answered. */
   it("stages the starter rather than declaring it saved", () => {
     const { container } = render(wrap(<StartersSection projectId="p1" />));
-    fireEvent.click(container.querySelector<HTMLButtonElement>("[data-apply-starter]")!);
+    fireEvent.click(container.querySelectorAll<HTMLButtonElement>('[role="radio"]')[0]);
     expect(seen.registry?.isDirty, "a starter the panel calls saved can never be applied").toBe(true);
   });
 
@@ -66,13 +68,29 @@ describe("StartersSection", () => {
     const { container } = render(wrap(<StartersSection projectId="p1" />));
     const starter = STARTER_DS_REGISTRY[0];
     const wanted = starter.tokens.find((t) => t.category === "colors" && t.id === "color-primary");
-    fireEvent.click(container.querySelector<HTMLButtonElement>("[data-apply-starter]")!);
+    fireEvent.click(container.querySelectorAll<HTMLButtonElement>('[role="radio"]')[0]);
     expect(seen.registry?.tokens.find((t) => t.id === "color-primary")?.value).toBe(wanted?.value);
   });
 
   it("does not write the token blob itself — persistAll on Apply owns that", () => {
     const { container } = render(wrap(<StartersSection projectId="p1" />));
-    fireEvent.click(container.querySelector<HTMLButtonElement>("[data-apply-starter]")!);
+    fireEvent.click(container.querySelectorAll<HTMLButtonElement>('[role="radio"]')[0]);
     expect(localStorage.getItem(starterTokenStorageKey("p1"))).toBeNull();
+  });
+});
+
+/* Board 306:2186 — the click is answered by a pill, not by a second button. */
+describe("StartersSection — the board's affordances", () => {
+  it("has no Apply button below the grid", () => {
+    const { container, queryByText } = render(wrap(<StartersSection projectId="p1" />));
+    expect(container.querySelector("[data-apply-starter]")).toBeNull();
+    expect(queryByText(/^Apply /)).toBeNull();
+  });
+
+  it("says Starter applied after a card is chosen", () => {
+    const { container, queryByText, getByText } = render(wrap(<StartersSection projectId="p1" />));
+    expect(queryByText("Starter applied")).toBeNull();
+    fireEvent.click(container.querySelectorAll<HTMLButtonElement>('[role="radio"]')[1]);
+    expect(getByText("Starter applied")).toBeInTheDocument();
   });
 });

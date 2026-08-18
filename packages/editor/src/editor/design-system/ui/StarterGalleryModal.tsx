@@ -91,10 +91,15 @@ export function StarterGrid({
   columns,
   selectedId,
   onSelect,
+  showDescription = true,
 }: {
   columns: number;
   selectedId: string;
   onSelect: (id: string) => void;
+  /** Board 152:137 draws a card as swatch + NAME. The destination passes
+   *  false; the first-run modal, which has room and a different board, keeps
+   *  the line. Truncated to "Clean blue bra…" it was neither. */
+  showDescription?: boolean;
 }) {
   return (
     <div
@@ -113,6 +118,7 @@ export function StarterGrid({
           starter={s}
           selected={s.id === selectedId}
           onSelect={() => onSelect(s.id)}
+          showDescription={showDescription}
         />
       ))}
     </div>
@@ -123,9 +129,10 @@ interface StarterCardProps {
   starter: StarterDS;
   selected: boolean;
   onSelect: () => void;
+  showDescription?: boolean;
 }
 
-function StarterCard({ starter, selected, onSelect }: StarterCardProps) {
+function StarterCard({ starter, selected, onSelect, showDescription = true }: StarterCardProps) {
   // Fallback swatch for a starter with no color-primary. Was the retired
   // cobalt; the seed's own brand blue is the only honest stand-in.
   const primary = starter.tokens.find((t) => t.id === "color-primary")?.value ?? "#1A56DB";
@@ -170,18 +177,20 @@ function StarterCard({ starter, selected, onSelect }: StarterCardProps) {
         <div style={{ fontSize: 13, fontWeight: 600, color: "var(--bk-ink)" }}>
           {starter.name}
         </div>
-        <div
-          style={{
-            fontSize: 11,
-            color: "var(--bk-ink-muted)",
-            marginTop: 2,
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {starter.description}
-        </div>
+        {showDescription ? (
+          <div
+            style={{
+              fontSize: 11,
+              color: "var(--bk-ink-muted)",
+              marginTop: 2,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {starter.description}
+          </div>
+        ) : null}
       </div>
     </Button>
   );
