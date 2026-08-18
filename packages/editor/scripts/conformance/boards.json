@@ -286,7 +286,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "undecided",
+      "authority": "blocked:no-autofix-producer",
       "recipe": null
     },
     {

@@ -6,13 +6,23 @@
  * auto-fix is offered.
  *
  * **The board draws a `Fix ›` link on two rows and `Open` on the third. Neither
- * ships here, and that is deliberate.** `DSLinter.lint()` returns
- * `{ rule, severity, tokenId, message }` — there is no suggested replacement in
- * the result, so there is nothing for a Fix button to apply. Drawing one would
- * make the panel claim a capability the engine does not have, which is the
- * exact failure this whole arc was written to find. The closing note states the
- * rule the board itself states, and says plainly that the auto-fix is not built
- * yet rather than implying it is one click away.
+ * ships here, and that is deliberate.** A `LintIssue` carries an optional
+ * `autoFixHint`, and re-checked 2026-08-18: **no rule anywhere sets one.** The
+ * engine's `applyAutoFix` and the Issues panel's Fix button both exist and both
+ * hang off that field, so neither can fire either — a capability with no
+ * producer rather than no capability. Drawing a Fix link here would claim what
+ * nothing can deliver.
+ *
+ * The closing note therefore does NOT copy the board's sentence ("Auto-fix only
+ * appears where a nearest token exists"), which implies a Fix that sometimes
+ * appears. Recorded as `authority: "blocked:no-autofix-producer"` on 154:2.
+ *
+ * Wiring it is a real design question, not a gap to plug: the hint grammar the
+ * engine understands is `darken-22` / `lighten-22`, one fixed L-shift, which is
+ * not guaranteed to reach AA — while `suggestContrastFix` (used by the colour
+ * list, which prints the current ratio, the target, and the hex that meets it)
+ * binary-searches to the target. A Fix button on
+ * the crude hint would be a fix that sometimes does not fix.
  *
  * @license BSD-3-Clause
  */
