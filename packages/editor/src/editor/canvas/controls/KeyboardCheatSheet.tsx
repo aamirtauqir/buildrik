@@ -9,7 +9,7 @@
  */
 
 import * as React from "react";
-import { Kbd, ModalContent, ModalRoot, Button } from "@/editor/chrome-ui";
+import { Kbd, ModalContent, ModalRoot, Button, TextInput } from "@/editor/chrome-ui";
 import { tokens } from "../shared/tokens";
 
 export interface KeyboardCheatSheetProps {
@@ -155,6 +155,26 @@ const ShortcutRow: React.FC<{ keys: string[]; description: string }> = ({ keys, 
  * Main Keyboard Cheat Sheet component
  */
 export const KeyboardCheatSheet: React.FC<KeyboardCheatSheetProps> = ({ isOpen, onClose }) => {
+  /* Board 815:4518 opens with a search field. Six groups of chords is more
+     than anyone scans for one of them. Matches the description OR the keys,
+     so "cmd" and "duplicate" both find ⌘D. */
+  const [query, setQuery] = React.useState("");
+  const groups = React.useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return SHORTCUT_GROUPS;
+    return SHORTCUT_GROUPS
+      .map((g) => ({
+        ...g,
+        shortcuts: g.shortcuts.filter(
+          (sc) =>
+            sc.description.toLowerCase().includes(q) ||
+            sc.keys.join(" ").toLowerCase().includes(q) ||
+            g.title.toLowerCase().includes(q),
+        ),
+      }))
+      .filter((g) => g.shortcuts.length > 0);
+  }, [query]);
+
   // Escape, focus trap and the overlay come from the shared Radix Modal
   // substrate (P5). '?' also closes — the toggle key mirrors open/close.
   React.useEffect(() => {
@@ -236,6 +256,17 @@ export const KeyboardCheatSheet: React.FC<KeyboardCheatSheetProps> = ({ isOpen, 
           </Button>
         </div>
 
+        {/* Board 815:4518 — the search sits above the groups. */}
+        <div style={{ padding: "12px 20px 0" }}>
+          <TextInput
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search shortcuts…"
+            aria-label="Search shortcuts"
+          />
+        </div>
+
         {/* Content - Scrollable grid of shortcut groups */}
         <div
           style={{
@@ -251,7 +282,7 @@ export const KeyboardCheatSheet: React.FC<KeyboardCheatSheetProps> = ({ isOpen, 
               gap: 24,
             }}
           >
-            {SHORTCUT_GROUPS.map((group) => (
+            {groups.map((group) => (
               <div
                 key={group.title}
                 style={{
@@ -285,6 +316,11 @@ export const KeyboardCheatSheet: React.FC<KeyboardCheatSheetProps> = ({ isOpen, 
               </div>
             ))}
           </div>
+          {groups.length === 0 && (
+            <p style={{ margin: 0, fontSize: tokens.typography.fontSm, color: tokens.colors.textTertiary }}>
+              Nothing matches “{query}”.
+            </p>
+          )}
         </div>
 
         {/* Footer */}
