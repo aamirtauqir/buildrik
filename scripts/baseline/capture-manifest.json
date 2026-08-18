@@ -1,28 +1,17 @@
 {
- "commit": "96b00949",
+ "commit": "a036f343",
  "base": "http://localhost:3000",
- "generated": "2026-08-18T17:33:41.316Z",
+ "generated": "2026-08-18T18:31:00.920Z",
  "captures": [
   {
-   "id": "BL-0110",
+   "id": "BL-0105",
    "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "state": "review-pill-open__drift",
+   "state": "panel-brand__clean",
    "status": 200,
-   "sha256": "13e022aa142a3745",
+   "sha256": "643b5ce2af8a3086",
    "scrollHeight": 905,
    "elCount": 20
   }
  ],
- "failures": [
-  {
-   "id": "BL-0121",
-   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "error": "page.waitForSelector: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('text=Search shortcuts') to be visible\u001b[22m\n"
-  },
-  {
-   "id": "BL-0107",
-   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "error": "page.waitForSelector: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('text=Comments') to be visible\u001b[22m\n"
-  }
- ]
+ "failures": []
 }

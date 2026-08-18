@@ -148,7 +148,7 @@
     "BL-0102 panel-pages": "1.71% keep",
     "BL-0103 panel-media": "2.13% keep",
     "BL-0104 panel-content": "4.52% keep",
-    "BL-0105 panel-brand": "15.70% REDRAW",
+    "BL-0105 panel-brand": "15.70% REDRAWN 2026-08-18 (94.95% agreement)",
     "BL-0106 publish-open": "6.53% keep",
     "BL-0108 notifications-open": "28.52% REDRAW",
     "BL-0109 site-menu-open": "9.41% REDRAW",
@@ -252,7 +252,11 @@
    ],
    "remaining": 11,
    "note": "Each remaining row needs its capture spec rebuilt by hand — the originals were never committed (only screens-auth.json was). Reaching a state is the slow part: BL-0159's stock browser took three attempts because the entry moved into the panel footer as 'Browse stock' and even that lands on a source picker. Log in as the seed fixture's owner (qa@buildrik.local), not your own user, or /edit redirects and the failure reads as a sentinel timeout.",
-   "remainingRows": "BL-0107, BL-0110, BL-0121 (doors not found) · BL-0119 (broken door), BL-0120 (opens a new tab), BL-0172 (feature flag off), BL-0123 (no such element in the fixture), BL-0171 (captured fresh, no prior shot to diff) · BL-0162, BL-0163, BL-0168 (controls refuse the click from a spec)"
+   "remainingRows": "BL-0107, BL-0110, BL-0121 (doors not found) · BL-0119 (broken door), BL-0120 (opens a new tab), BL-0172 (feature flag off), BL-0123 (no such element in the fixture), BL-0171 (captured fresh, no prior shot to diff) · BL-0162, BL-0163, BL-0168 (controls refuse the click from a spec)",
+   "redrawn": [
+    "BL-0105"
+   ],
+   "redrawCost": "BL-0105, the first: 1 clean recapture (the rail tooltip was covering a row in the first reference), 1 computed-style measuring probe, 5 use_figma calls (structure / rows / footer / icons / icon size), 3 screenshots to check. The subtree is 260 nodes; building it as data-driven auto-layout rather than node by node is what kept it to five calls."
   }
  },
  "rows": [
@@ -2017,7 +2021,8 @@
    "screenshotHash": "2be6a222459d9065",
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "70:2",
-   "figmaPageId": "75:2"
+   "figmaPageId": "75:2",
+   "notes": "REDRAWN 2026-08-18 from live code (drift was 15.70%). The Tab Panel subtree 70:128 was emptied and rebuilt: header + shared-theme block + Beginner/Pro toggle + the nine drill-in rows + Basic-mode footnote + save bar, all from measured geometry (getComputedStyle on the running editor, not eyeballed off the PNG). Header icons are real vectors, not images. Read back against the live render: 94.95% pixel agreement over the content, 93.45% including the save bar. The residual is (a) the save bar sits at the frame's 780px bottom while the live drawer is 732px tall — that is the known-stale shell band, left alone per the founder call; (b) the chevron glyph renders lighter in Figma than in Chrome; (c) the footnote wraps one word later. Shell, canvas and inspector untouched."
   },
   {
    "id": "BL-0106",
