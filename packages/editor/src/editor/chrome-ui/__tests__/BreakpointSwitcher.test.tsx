@@ -30,9 +30,9 @@ describe("BreakpointSwitcher", () => {
   it("marks only the active breakpoint aria-pressed and reports clicks", () => {
     const onChange = vi.fn();
     render(<BreakpointSwitcher value="tablet" onChange={onChange} />);
-    expect(screen.getByRole("button", { name: "Tablet" }).getAttribute("aria-pressed")).toBe("true");
-    expect(screen.getByRole("button", { name: "Desktop" }).getAttribute("aria-pressed")).toBe("false");
-    fireEvent.click(screen.getByRole("button", { name: "Mobile" }));
+    expect(screen.getByRole("button", { name: /^Tablet/ }).getAttribute("aria-pressed")).toBe("true");
+    expect(screen.getByRole("button", { name: /^Desktop/ }).getAttribute("aria-pressed")).toBe("false");
+    fireEvent.click(screen.getByRole("button", { name: /^Mobile/ }));
     expect(onChange).toHaveBeenCalledWith("mobile");
   });
 
@@ -43,5 +43,38 @@ describe("BreakpointSwitcher", () => {
       .getAllByRole("button")
       .map((b) => b.textContent);
     expect(texts).toEqual(["Desktop", "Tablet", "Mobile"]);
+  });
+});
+
+/**
+ * Board 807:8069 draws the breakpoints with the width range each one governs.
+ * The glyph-only switcher shipped four bare letters — nothing in the editor
+ * said what "T" meant in pixels, in any tooltip or label.
+ *
+ * The numbers are read from BREAKPOINTS, the media queries the exporter
+ * writes, NOT from the board (which draws a five-tier 992/480 scale). Those
+ * are behaviour, and behaviour follows the CODE contract; only the fact that
+ * a range is SHOWN comes from the board.
+ */
+describe("BreakpointSwitcher — each cell names the range it governs", () => {
+  it("carries the media-query range in the accessible name", () => {
+    render(<BreakpointSwitcher value="desktop" onChange={() => {}} />);
+    expect(screen.getByRole("button", { name: "Desktop (\u22651024px)" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Tablet (768\u20131023px)" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Mobile (\u2264767px)" })).toBeTruthy();
+  });
+
+  it("says wide is a preview width, because its edits land on Desktop", () => {
+    render(<BreakpointSwitcher value="wide" onChange={() => {}} includeWide />);
+    expect(screen.getByRole("button", { name: /^Wide/ }).getAttribute("aria-label")).toBe(
+      "Wide (preview width, uses Desktop styles)",
+    );
+  });
+
+  it("repeats the range in a title so a pointer user sees it too", () => {
+    render(<BreakpointSwitcher value="desktop" onChange={() => {}} />);
+    expect(screen.getByRole("button", { name: /^Tablet/ }).getAttribute("title")).toBe(
+      "Tablet \u00b7 768\u20131023px",
+    );
   });
 });

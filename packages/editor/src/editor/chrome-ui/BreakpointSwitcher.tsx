@@ -13,6 +13,7 @@
  * @license BSD-3-Clause
  */
 import React from "react";
+import { BREAKPOINTS, isValidBreakpoint } from "@/shared/constants/breakpoints";
 
 export type Breakpoint = "wide" | "desktop" | "tablet" | "mobile";
 
@@ -41,6 +42,20 @@ const CORE_BREAKPOINTS: ReadonlyArray<BreakpointEntry> = [
 ];
 
 const WIDE_BREAKPOINT: BreakpointEntry = { id: "wide", glyph: "W", label: "Wide" };
+
+/* Board 807:8069 draws each breakpoint with the width range it governs, and
+   the glyph-only switcher never said what "T" meant in pixels. The ranges
+   come from BREAKPOINTS (the media queries the exporter actually writes) —
+   NOT from the board's own 992/480 numbers, which would change generated CSS.
+   "wide" has no breakpoint config: it is a preview width whose style edits
+   fall back to desktop (ProInspector), so it says exactly that. */
+function widthHint(id: Breakpoint): string {
+  if (!isValidBreakpoint(id)) return "preview width, uses Desktop styles";
+  const { minWidth, maxWidth } = BREAKPOINTS[id];
+  if (maxWidth === undefined) return `\u2265${minWidth}px`;
+  if (minWidth === 0) return `\u2264${maxWidth}px`;
+  return `${minWidth}\u2013${maxWidth}px`;
+}
 
 const WELL_CLASS =
   "tw:inline-flex tw:p-0.5 tw:gap-0.5 tw:bg-gray-100 tw:rounded-lg tw:border tw:border-gray-200";
@@ -79,7 +94,8 @@ export const BreakpointSwitcher = React.forwardRef<HTMLDivElement, BreakpointSwi
             type="button"
             className={`${BTN_BASE_CLASS} ${labelled ? "tw:w-auto tw:px-3" : "tw:w-8"}`}
             aria-pressed={value === bp.id}
-            aria-label={bp.label}
+            aria-label={`${bp.label} (${widthHint(bp.id)})`}
+            title={`${bp.label} \u00b7 ${widthHint(bp.id)}`}
             onClick={() => onChange(bp.id)}
           >
             {labelled ? bp.label : (glyphs?.[bp.id] ?? bp.glyph)}
