@@ -80,7 +80,9 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
         { command: "justifyLeft", icon: "⬅", label: "Align Left" },
         { command: "justifyCenter", icon: "⬌", label: "Align Center" },
         { command: "justifyRight", icon: "➡", label: "Align Right" },
-        { command: "justifyFull", icon: "⬌", label: "Justify" },
+        /* Justify drew the SAME "⬌" as Align Center, so the two controls were
+           indistinguishable on screen — the label only reached a tooltip. */
+        { command: "justifyFull", icon: "☰", label: "Justify" },
       ],
     },
     {
@@ -182,6 +184,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
               >
                 <Button
                   color="light"
+                  /* The button's content is a single glyph — "B", "•", "⬌" —
+                     so without a name a screen reader announces the glyph.
+                     A Tooltip is a description, not a label. */
+                  aria-label={item.label}
                   onClick={() => onCommand(item.command)}
                   style={{
                     ...toolbarButtonStyle,
@@ -255,6 +261,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
               color: activeStyles.link ? "var(--bk-bg-card)" : "var(--bk-ink-soft)",
             }}
             title="Insert Link"
+            aria-label="Insert link"
             aria-expanded={linkOpen}
             onClick={() => setLinkOpen((v) => !v)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
           >
@@ -291,7 +298,13 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
       </Popover>
       {/* Clear Formatting */}
       <Tooltip content="Clear Formatting" placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
-        <Button color="light" onClick={() => onCommand("removeFormat")} style={toolbarButtonStyle} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+        <Button
+          color="light"
+          aria-label="Clear formatting"
+          onClick={() => onCommand("removeFormat")}
+          style={toolbarButtonStyle}
+          className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+        >
           ✕
         </Button>
       </Tooltip>

@@ -66,20 +66,36 @@ describe("RichTextEditor — format buttons", () => {
     expect(onCommand).toHaveBeenLastCalledWith("insertOrderedList");
   });
 
-  it("dispatches align commands (center + justify share the ⬌ glyph)", () => {
+  /* This used to PIN the ambiguity: Align Center and Justify both drew "⬌",
+     so the test reached them by DOM order and the user could only tell them
+     apart by hovering for a tooltip. Both halves are fixed — Justify has its
+     own glyph, and every toolbar button carries its label as an accessible
+     name, so the buttons are reachable by name instead of by position. */
+  it("dispatches align commands, each button reachable by its own name", () => {
     const onCommand = renderEditor();
-    fireEvent.click(screen.getByText("⬅"));
-    expect(onCommand).toHaveBeenLastCalledWith("justifyLeft");
-    fireEvent.click(screen.getByText("➡"));
-    expect(onCommand).toHaveBeenLastCalledWith("justifyRight");
-    // PIN: Align Center and Justify both render "⬌" — DOM order is
-    // [justifyCenter, justifyFull] per the toolbarGroups config.
-    const ambiguous = screen.getAllByText("⬌");
-    expect(ambiguous).toHaveLength(2);
-    fireEvent.click(ambiguous[0]);
-    expect(onCommand).toHaveBeenLastCalledWith("justifyCenter");
-    fireEvent.click(ambiguous[1]);
-    expect(onCommand).toHaveBeenLastCalledWith("justifyFull");
+    for (const [name, command] of [
+      ["Align Left", "justifyLeft"],
+      ["Align Center", "justifyCenter"],
+      ["Align Right", "justifyRight"],
+      ["Justify", "justifyFull"],
+    ] as const) {
+      fireEvent.click(screen.getByRole("button", { name }));
+      expect(onCommand).toHaveBeenLastCalledWith(command);
+    }
+  });
+
+  it("draws Align Center and Justify with different glyphs", () => {
+    renderEditor();
+    const glyph = (name: string) =>
+      screen.getByRole("button", { name }).textContent?.trim();
+    expect(glyph("Align Center")).not.toBe(glyph("Justify"));
+  });
+
+  it("names every format button for a screen reader", () => {
+    renderEditor();
+    for (const name of ["Bold", "Italic", "Underline", "Bullet List", "Clear formatting", "Insert link"]) {
+      expect(screen.getByRole("button", { name }), name).toBeTruthy();
+    }
   });
 
   it("dispatches indent/outdent", () => {
