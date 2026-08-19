@@ -108,7 +108,12 @@ describe("ExportEngine.export — format branches", () => {
 
     expect(result.success).toBe(true);
     expect(result.html).toContain("<!DOCTYPE html>");
-    expect(result.html).toContain("<title>Buildrick Export</title>"); // default page-title fallback
+    // Was `<title>Buildrick Export</title>` — the export config's default
+    // literal, which is OUR brand name on the customer's page. The head now
+    // comes from SEOInjector, so an untitled page falls back to the page's own
+    // name (here: none → "Untitled"), never to ours.
+    expect(result.html).toContain("<title>Untitled</title>");
+    expect(result.html).not.toContain("Buildrick Export");
     expect(result.html).toContain("<style>");
     expect(result.html).toContain(".buildrick-root");
     expect(result.css).toContain("box-sizing:border-box"); // reset css included by default
@@ -238,7 +243,7 @@ describe("ExportEngine.generateHTML — config knobs", () => {
 
     const html = engine.generateHTML({ cssStyle: "external" });
     expect(html).not.toContain("\n");
-    expect(html).toContain("<title>Buildrick Export</title>");
+    expect(html).toContain("<title>Untitled</title>");
 
     const css = engine.generateCSS();
     expect(css).toContain(".buildrick-root{background-color:red;}");

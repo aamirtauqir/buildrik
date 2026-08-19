@@ -421,35 +421,33 @@ export class ExportEngine {
       head += `${indent}<meta name="viewport" content="width=device-width, initial-scale=1.0">${nl}`;
     }
 
-    if (config.pageTitle) {
-      head += `${indent}<title>${escapeHTML(config.pageTitle)}</title>${nl}`;
-    }
 
-    if (config.metaDescription) {
-      head += `${indent}<meta name="description" content="${escapeHTML(config.metaDescription)}">${nl}`;
-    }
 
-    // The page's own SEO. This document carried a title and — only if the
-    // Options tab had one typed into it — a description, and nothing else:
-    // the description, Open Graph and Twitter tags a user fills in under Page
-    // settings reached the ZIP (which runs the multi-page pipeline) and were
-    // dropped from the single HTML file, from the same modal, one format over.
-    // A description typed in Options still wins over the page's.
+    // The page's SEO, from the SAME emitter the published page uses. This
+    // path used to assemble its own head: a title, and a description only if
+    // one had been typed into the export modal's Options tab — no Open Graph,
+    // no Twitter card, no canonical, no JSON-LD, no robots directive, no
+    // custom head code. Each of those was found and patched in one at a time
+    // today; calling `inject` is what stops the next one.
     const seoPage = this.composer.elements.getActivePage?.();
     if (seoPage) {
       const siteSEO = this.composer.getProjectSettings?.()?.seo;
-      for (const tag of this.seoInjector.getMetaTags(seoPage, siteSEO)) {
-        if (tag.name === "description" && config.metaDescription) continue;
-        const key = tag.name ? `name="${tag.name}"` : `property="${tag.property}"`;
-        head += `${indent}<meta ${key} content="${escapeHTML(tag.content)}">${nl}`;
-      }
-
-      // The page's own head code. Published pages get it; this file did not,
-      // so the "runs on every page load" promise held for one export format
-      // and not the other. Sanitised by the same allowlist the publish path
-      // uses — inline scripts and event handlers do not survive it.
-      const customHead = sanitizeHeadCode(seoPage.settings?.head);
-      if (customHead) head += `${indent}${customHead}${nl}`;
+      /* The engine's DEFAULT pageTitle is the literal "Buildrick Export". Passed
+         through as an override it would beat the page's own title on every
+         export that did not set one — the same brand-name-on-your-page bug
+         fixed in the modal earlier today, one layer down. Only a title the
+         caller actually chose is an override; an explicit empty string keeps
+         its documented meaning of "no title tag". */
+      const chosenTitle =
+        config.pageTitle === DEFAULT_EXPORT_CONFIG.pageTitle ? undefined : config.pageTitle;
+      const seoTags = this.seoInjector.inject(seoPage, siteSEO, {
+        title: chosenTitle === "" ? null : chosenTitle,
+        description: config.metaDescription,
+      });
+      // `inject` joins its tags with a newline and two spaces of its own, which
+      // a minified document must not carry.
+      const seoBlock = config.minify ? seoTags.replace(/\n\s*/g, "") : seoTags;
+      if (seoBlock) head += `${indent}${seoBlock}${nl}`;
     }
 
     // The families the page names have to be fetched, or the visitor gets the

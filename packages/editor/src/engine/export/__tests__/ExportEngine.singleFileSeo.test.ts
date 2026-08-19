@@ -89,3 +89,41 @@ describe("the page's indexing choice survives the single file", () => {
     expect(files.find((f) => f.name === "index.html")?.content).toContain('content="noindex"');
   });
 });
+
+describe("the single file uses the same SEO emitter as the published page", () => {
+  it("carries the canonical URL a user set", () => {
+    const html = new ExportEngine(composerWithSeo({ canonicalUrl: "https://real.example/x" })).generateHTML();
+    expect(html).toContain('<link rel="canonical" href="https://real.example/x">');
+  });
+
+  it("carries structured data", () => {
+    const html = new ExportEngine(
+      composerWithSeo({ structuredData: { "@type": "Organization", name: "Acme" } })
+    ).generateHTML();
+    expect(html).toContain('application/ld+json');
+    expect(html).toContain("Acme");
+  });
+
+  it("does not put our brand name on the customer's page", () => {
+    // DEFAULT_EXPORT_CONFIG.pageTitle is the literal "Buildrick Export". Passed
+    // through as an override it beat the page's own title on every export that
+    // did not set one.
+    const html = new ExportEngine(composerWithSeo({ metaTitle: "Their Title" })).generateHTML();
+    expect(html).toContain("<title>Their Title</title>");
+    expect(html).not.toContain("Buildrick Export");
+  });
+
+  it("still lets an explicitly empty title omit the tag, as the config documents", () => {
+    const html = new ExportEngine(composerWithSeo({ metaTitle: "Their Title" }), {
+      pageTitle: "",
+    }).generateHTML();
+    expect(html).not.toContain("<title>");
+  });
+
+  it("still lets a chosen title win", () => {
+    const html = new ExportEngine(composerWithSeo({ metaTitle: "Their Title" }), {
+      pageTitle: "Chosen",
+    }).generateHTML();
+    expect(html).toContain("<title>Chosen</title>");
+  });
+});

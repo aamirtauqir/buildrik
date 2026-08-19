@@ -64,13 +64,28 @@ export class SEOInjector {
   /**
    * Generate all SEO meta tags for a page
    */
-  inject(page: PageData, siteSEO?: SiteSEO): string {
+  inject(
+    page: PageData,
+    siteSEO?: SiteSEO,
+    /* The export modal's Options tab carries its own title and description
+       fields. They used to be the ONLY thing the single-file export could say
+       about SEO, because that path assembled its own head instead of calling
+       this — which is how it shipped without canonical, without JSON-LD and
+       without the page's robots directive. It calls this now; the two fields
+       stay honoured as overrides. */
+    overrides?: { title?: string | null; description?: string }
+  ): string {
     const pageSEO = page.settings?.seo;
     const pageSettings = page.settings;
 
     // Resolve values with fallbacks
-    const title = resolvePageTitle(page, pageSEO, pageSettings);
-    const description = this.getDescription(pageSEO, pageSettings);
+    // `null` means "the caller asked for no title at all" — the export config
+    // documents an empty pageTitle as omitting the tag. `undefined` means the
+    // caller has nothing to say, so the page's own title stands.
+    const omitTitle = overrides?.title === null;
+    const title = overrides?.title?.trim() || resolvePageTitle(page, pageSEO, pageSettings);
+    const description =
+      overrides?.description?.trim() || this.getDescription(pageSEO, pageSettings);
     const ogImage = pageSEO?.ogImage || siteSEO?.defaultOgImage || "";
     const ogTitle = pageSEO?.ogTitle || title;
     const ogDescription = pageSEO?.ogDescription || description;
@@ -81,7 +96,7 @@ export class SEOInjector {
     const tags: string[] = [];
 
     // Basic meta tags
-    tags.push(`<title>${this.escape(title)}</title>`);
+    if (!omitTitle) tags.push(`<title>${this.escape(title)}</title>`);
 
     if (description) {
       tags.push(`<meta name="description" content="${this.escape(description)}">`);
