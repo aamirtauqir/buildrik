@@ -97,28 +97,36 @@ describe("useCanvasKeyboard — command shortcuts", () => {
     expect(clear).toHaveBeenCalledTimes(1);
   });
 
-  it("Ctrl+D duplicates the selected element and selects the clone", () => {
+  /* ⌘D, ⌘C, ⌘V and ⌘X used to be implemented HERE as well as in the command
+     registry, which owns them window-wide and runs capture-phase — so both
+     fired. Measured live: one ⌘D produced two copies, one ⌘V pasted twice.
+     These now assert the hook stays out of it; the commands' own tests cover
+     the behaviour, and `useClipboardToasts` covers the feedback. */
+  it("leaves ⌘D to the command registry", () => {
     const { composer } = makeComposer();
-    const { hook, select, addToast } = mount(composer);
+    const { hook } = mount(composer);
     act(() => hook.result.current.handleKeyDown(key("d", { ctrlKey: true })));
-    expect(composer.elements.duplicateElement).toHaveBeenCalledWith("el-1");
-    expect(select).toHaveBeenCalledWith(expect.objectContaining({ getId: expect.any(Function) }));
-    expect(addToast).toHaveBeenCalledWith(expect.objectContaining({ tone: "success" }));
+    expect(composer.elements.duplicateElement).not.toHaveBeenCalled();
+  });
+
+  it("stands down entirely for an event the registry already handled", () => {
+    const { composer } = makeComposer({ element: { getStyles: () => ({ color: "red" }) } });
+    const { hook } = mount(composer);
+    const handled = key("c", { ctrlKey: true, altKey: true });
+    Object.defineProperty(handled, "defaultPrevented", { value: true });
+    act(() => hook.result.current.handleKeyDown(handled));
+    expect((composer as unknown as { styleClipboard: unknown }).styleClipboard).toBeUndefined();
   });
 });
 
 describe("useCanvasKeyboard — copy / cut", () => {
-  it("Ctrl+C copies the element JSON to the clipboard", () => {
+  it("leaves ⌘C to the command registry", () => {
     const { composer } = makeComposer();
-    const { hook, addToast } = mount(composer);
+    const { hook } = mount(composer);
     act(() => hook.result.current.handleKeyDown(key("c", { ctrlKey: true })));
-    expect((composer as unknown as { clipboard: unknown }).clipboard).toEqual({
-      id: "el-1",
-      type: "text",
-    });
-    expect(addToast).toHaveBeenCalledWith(
-      expect.objectContaining({ description: expect.stringContaining("copied to clipboard") })
-    );
+    // The fixture seeds `clipboard: null`; the point is that the hook did not
+    // write the element into it.
+    expect((composer as unknown as { clipboard: unknown }).clipboard).toBeFalsy();
   });
 
   it("Ctrl+Alt+C copies styles into styleClipboard", () => {
@@ -142,35 +150,24 @@ describe("useCanvasKeyboard — copy / cut", () => {
     );
   });
 
-  it("Ctrl+X copies then removes the element (cut)", () => {
+  it("leaves ⌘X to the command registry", () => {
     const { composer } = makeComposer();
-    const { hook, clear, syncFromComposer } = mount(composer);
+    const { hook } = mount(composer);
     act(() => hook.result.current.handleKeyDown(key("x", { ctrlKey: true })));
-    expect((composer as unknown as { clipboard: unknown }).clipboard).toEqual({
-      id: "el-1",
-      type: "text",
-    });
-    expect(composer.elements.removeElement).toHaveBeenCalledWith("el-1");
-    // Null parent → no next focus → clear()
-    expect(clear).toHaveBeenCalled();
-    expect(syncFromComposer).toHaveBeenCalled();
+    expect(composer.elements.removeElement).not.toHaveBeenCalled();
   });
 });
 
 describe("useCanvasKeyboard — paste", () => {
-  it("Ctrl+V pastes the clipboard element under the current parent", () => {
+  it("leaves ⌘V to the command registry", () => {
     const parent = { getId: () => "parent-1" };
     const { composer } = makeComposer({
       clipboard: { id: "copied" },
       element: { getParent: () => parent },
     });
-    const { hook, select, addToast } = mount(composer);
+    const { hook } = mount(composer);
     act(() => hook.result.current.handleKeyDown(key("v", { ctrlKey: true })));
-    expect(composer.elements.pasteElement).toHaveBeenCalledWith({ id: "copied" }, parent);
-    expect(select).toHaveBeenCalledWith(expect.objectContaining({ getId: expect.any(Function) }));
-    expect(addToast).toHaveBeenCalledWith(
-      expect.objectContaining({ description: "Element pasted" })
-    );
+    expect(composer.elements.pasteElement).not.toHaveBeenCalled();
   });
 
   it("Ctrl+Alt+V applies each style from styleClipboard to the element", () => {

@@ -273,10 +273,25 @@ describe("shortcut guard (shouldHandleShortcut)", () => {
     expect(composer.selection.getSelected).not.toHaveBeenCalled();
   });
 
-  it("still runs arrow shortcuts on the canvas, where nothing else claims them", () => {
+  /* This asserted that a bare ArrowDown outside a widget runs a command,
+     "where nothing else claims them". Something else did: `useCanvasKeyboard`
+     implements all four arrow contracts the cheat sheet documents — bare
+     selects a sibling, ⇧ moves 10px, ⌘ moves 1px, ⌥ reorders — and this
+     listener is capture-phase on window, so both ran. Measured live: ⇧-arrow
+     moved 20px and a bare arrow nudged 1px instead of moving the selection.
+     The commands kept their entries for the palette and gave up the keys. */
+  it("no longer claims the arrow keys the canvas owns", () => {
     const { composer } = makeCenter();
 
     document.body.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
+
+    expect(composer.selection.getSelected).not.toHaveBeenCalled();
+  });
+
+  it("still runs a bare shortcut it does own, outside a widget", () => {
+    const { composer } = makeCenter();
+
+    document.body.dispatchEvent(new KeyboardEvent("keydown", { key: "Delete", bubbles: true }));
 
     expect(composer.selection.getSelected).toHaveBeenCalled();
   });

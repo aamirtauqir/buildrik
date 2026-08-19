@@ -69,6 +69,14 @@ export function useCanvasKeyboard({
       if (!composer || editingId) return;
       if ((e.target as HTMLElement)?.closest("input, textarea, [contenteditable]")) return;
 
+      /* The command registry listens capture-phase on window and calls
+         preventDefault() on anything it owns, which means it has already RUN by
+         the time this handler sees the event. Both firing is how ⌘D produced
+         two copies and ⌘V pasted twice — measured live: one heading became
+         three. Anything the registry claimed is done; this handler covers what
+         it does not own (the ⌥ variants, arrows, Home/End). */
+      if (e.defaultPrevented) return;
+
       // Ctrl+A: Select All elements
       if ((e.key === "a" || e.key === "A") && (e.ctrlKey || e.metaKey)) {
         e.preventDefault();
@@ -311,26 +319,13 @@ export function useCanvasKeyboard({
           }
           break;
 
-        case "d":
-        case "D":
-          if ((e.ctrlKey || e.metaKey) && !isRoot) {
-            e.preventDefault();
-            devLogger.keyboard("duplicate", { elementId: selectedId });
-            const cloned = composer.elements.duplicateElement(selectedId);
-            if (cloned) {
-              select(cloned);
-              if (addToast) {
-                const elementType = element.getType?.() || "element";
-                const elementName = getElementNameFromType(elementType);
-                addToast({
-                  description: `${elementName} duplicated`,
-                  tone: "success",
-                  duration: 2000,
-                });
-              }
-            }
-          }
-          break;
+        /* ⌘D, ⌘C, ⌘V and ⌘X belong to the command registry, which owns them
+           window-wide with its own carve-outs for text entry and modals — see
+           CommandCenter.shouldHandleShortcut. This hook used to implement them
+           a second time; the toasts they carried now come from
+           `useClipboardToasts`, which listens to the events those commands
+           emit, so they fire wherever the shortcut is pressed rather than only
+           over the canvas. The ⌥ variants below have no command and stay. */
 
         case "c":
         case "C":
@@ -352,19 +347,6 @@ export function useCanvasKeyboard({
               addToast({
                 description: "No styles to copy",
                 tone: "warning",
-                duration: 2000,
-              });
-            }
-          } else if ((e.ctrlKey || e.metaKey) && !e.altKey) {
-            // Cmd/Ctrl+C: Copy element
-            e.preventDefault();
-            const elementType = element.getType?.() || "element";
-            const elementName = getElementNameFromType(elementType);
-            composer.clipboard = element.toJSON?.() || null;
-            if (addToast) {
-              addToast({
-                description: `${elementName} copied to clipboard`,
-                tone: "info",
                 duration: 2000,
               });
             }
@@ -404,77 +386,9 @@ export function useCanvasKeyboard({
                 composer.endTransaction();
               }
             }
-          } else if ((e.ctrlKey || e.metaKey) && !e.altKey && composer.clipboard) {
-            // Cmd/Ctrl+V: Paste element
-            e.preventDefault();
-            const parentEl = element.getParent?.();
-            if (parentEl) {
-              composer.beginTransaction("paste-element");
-              try {
-                const pastedElement = composer.elements.pasteElement?.(
-                  composer.clipboard,
-                  parentEl
-                );
-                if (pastedElement) {
-                  select(pastedElement);
-                  syncFromComposer();
-                  if (addToast) {
-                    addToast({
-                      description: "Element pasted",
-                      tone: "success",
-                      duration: 2000,
-                    });
-                  }
-                }
-              } finally {
-                composer.endTransaction();
-              }
-            }
           }
           break;
 
-        case "x":
-        case "X":
-          // Cmd/Ctrl+X: Cut element (copy + delete)
-          if ((e.ctrlKey || e.metaKey) && !isRoot) {
-            e.preventDefault();
-            const elementType = element.getType?.() || "element";
-            const elementName = getElementNameFromType(elementType);
-
-            composer.clipboard = element.toJSON?.() || null;
-
-            const { next: nextEl, prev: prevEl, parent: parentEl } = getNavigationTargets(element);
-            const nextFocus = nextEl || prevEl || parentEl;
-
-            composer.beginTransaction("cut-element");
-            try {
-              composer.elements.removeElement(selectedId);
-              if (nextFocus) {
-                select(nextFocus);
-              } else {
-                clear();
-              }
-              syncFromComposer();
-
-              if (addToast) {
-                addToast({
-                  description: `${elementName} cut to clipboard`,
-                  tone: "info",
-                  duration: 3000,
-                  action: {
-                    label: "Undo",
-                    onClick: () => {
-                      composer.history.undo();
-                      syncFromComposer();
-                    },
-                  },
-                });
-              }
-            } finally {
-              composer.endTransaction();
-            }
-          }
-          break;
       }
     },
     [

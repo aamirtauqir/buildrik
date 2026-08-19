@@ -151,52 +151,51 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
     // ============================================
     // Arrow Key Nudging
     // ============================================
+    /* The arrow keys are the CANVAS's, per the cheat sheet: bare arrows select
+       (previous sibling / next sibling / parent / first child), ⇧ moves 10px,
+       ⌘ moves 1px, ⌥ reorders. `useCanvasKeyboard` implements all four. These
+       commands kept their own bare-arrow and ⇧-arrow bindings, and this
+       listener is capture-phase on window, so both ran: ⇧-arrow moved 20px,
+       and a bare arrow nudged the element 1px instead of moving the selection
+       — measured live. The commands stay for the palette; the keys do not. */
     {
       id: "nudge-up",
       label: "Nudge Up",
-      shortcut: "arrowup",
       run: (c) => nudgeSelected(c, 0, -nudgeAmount),
     },
     {
       id: "nudge-down",
       label: "Nudge Down",
-      shortcut: "arrowdown",
       run: (c) => nudgeSelected(c, 0, nudgeAmount),
     },
     {
       id: "nudge-left",
       label: "Nudge Left",
-      shortcut: "arrowleft",
       run: (c) => nudgeSelected(c, -nudgeAmount, 0),
     },
     {
       id: "nudge-right",
       label: "Nudge Right",
-      shortcut: "arrowright",
       run: (c) => nudgeSelected(c, nudgeAmount, 0),
     },
     {
       id: "nudge-up-large",
       label: "Nudge Up (10px)",
-      shortcut: "shift+arrowup",
       run: (c) => nudgeSelected(c, 0, -nudgeAmountLarge),
     },
     {
       id: "nudge-down-large",
       label: "Nudge Down (10px)",
-      shortcut: "shift+arrowdown",
       run: (c) => nudgeSelected(c, 0, nudgeAmountLarge),
     },
     {
       id: "nudge-left-large",
       label: "Nudge Left (10px)",
-      shortcut: "shift+arrowleft",
       run: (c) => nudgeSelected(c, -nudgeAmountLarge, 0),
     },
     {
       id: "nudge-right-large",
       label: "Nudge Right (10px)",
-      shortcut: "shift+arrowright",
       run: (c) => nudgeSelected(c, nudgeAmountLarge, 0),
     },
 

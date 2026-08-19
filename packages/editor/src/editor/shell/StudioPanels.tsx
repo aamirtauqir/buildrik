@@ -30,6 +30,7 @@ import { StarterGalleryMount } from "@/editor/design-system/ui/StarterGalleryMou
 import { DSLintRunner } from "@/editor/design-system/ui/DSLintRunner";
 import { ProjectTokensApplier } from "@/editor/design-system/ui/ProjectTokensApplier";
 import { useBlockInsertion } from "./hooks/useBlockInsertion";
+import { useClipboardToasts } from "./hooks/useClipboardToasts";
 import { useAltTextAutoTrigger } from "./hooks/useAltTextAutoTrigger";
 import { PageTabBar } from "./PageTabBar";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
@@ -182,6 +183,11 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   const projectId = React.useMemo(() => getSiteIdFromUrl(), []);
 
   const { addToast } = useToast();
+
+  // Copy / cut / paste / duplicate feedback. The canvas keyboard hook used to
+  // carry these next to its own second implementation of those shortcuts; the
+  // implementations are gone and the feedback follows the commands' events.
+  useClipboardToasts(composer, addToast);
   const { handleBlockClick } = useBlockInsertion(composer);
   useAltTextAutoTrigger(composer);
 
