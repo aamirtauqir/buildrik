@@ -11,7 +11,10 @@
  */
 import { describe, it, expect, beforeAll } from "vitest";
 import { Composer } from "../../Composer";
-import { ExportEngine } from "../ExportEngine";
+import { ExportEngine, isPageLive } from "../ExportEngine";
+import { readFileSync } from "node:fs";
+import { resolve, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import { exportPublishPages } from "../../../editor/shell/exportPublishPages";
 
 beforeAll(() => {
@@ -66,5 +69,32 @@ describe("a page the user hid is not published", () => {
     const files = await names(siteWith("hidden", "hidden"));
     expect(files).toContain("index.html");
     expect(files).not.toContain("secret.html");
+  });
+});
+
+describe("isPageLive is the one rule both the deploy and its count use", () => {
+  const page = (visibility?: string) =>
+    ({ id: "p", name: "P", settings: visibility ? { visibility } : undefined }) as never;
+
+  it("treats a page that says nothing as live", () => {
+    expect(isPageLive(page())).toBe(true);
+    expect(isPageLive(page("live"))).toBe(true);
+  });
+
+  it("treats hidden and password as not live", () => {
+    expect(isPageLive(page("hidden"))).toBe(false);
+    expect(isPageLive(page("password"))).toBe(false);
+  });
+
+  it("is what the Publish panel counts with", () => {
+    // The panel read `getAllPages().length` and said "2 pages" for a site with
+    // one live page and one hidden, while the deploy carried one.
+    const src = readFileSync(
+      resolve(dirname(fileURLToPath(import.meta.url)),
+        "../../../editor/sidebar/tabs/publish/usePublishSnapshot.ts"),
+      "utf8"
+    );
+    expect(src).toContain("isPageLive");
+    expect(src).not.toMatch(/pageCount = composer\?\.elements\?\.getAllPages\?\.\(\)\.length/);
   });
 });

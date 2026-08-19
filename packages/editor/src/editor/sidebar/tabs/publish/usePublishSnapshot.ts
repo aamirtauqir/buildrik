@@ -19,6 +19,7 @@ import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
 import { fetchPublishHistory } from "../../../../services/PublishService";
 import type { PublishHistoryRow } from "../../../../services/PublishService";
+import { isPageLive } from "@/engine/export";
 
 export interface PublishChange {
   id: string;
@@ -164,7 +165,11 @@ export function usePublishSnapshot(
       }));
   }, [composer, lastDeployAt, stackVersion]);
 
-  const pageCount = composer?.elements?.getAllPages?.().length ?? 0;
+  /* What SHIPS, not what exists. The confirm modal already counts the export's
+     pages ("what ships is what the exporter produces"); this counted the page
+     list, so a site with one live page and one hidden read "2 pages" while the
+     deploy carried one. */
+  const pageCount = (composer?.elements?.getAllPages?.() ?? []).filter(isPageLive).length;
 
   return {
     production: { label: "Production", value: domainOf(publishedUrl) },

@@ -105,6 +105,22 @@ function multiPageFileType(name: string): MultiPageExportFile["type"] {
  * the property straight into the stylesheet and nothing else, so an element
  * hidden on mobile was fully visible on mobile in the exported file.
  */
+/**
+ * Whether a page is deployed at all.
+ *
+ * Page settings → Advanced offers Live / Hidden / Password. Both non-live
+ * states are left out of a deploy — static hosting cannot ask for a password,
+ * and publishing a page the owner believes is protected is the worse mistake.
+ *
+ * Exported because the Publish panel counts pages too, and a count that does
+ * not match what ships is the same lie one layer up: it read "2 pages" for a
+ * site with one live page and one hidden.
+ */
+export function isPageLive(page: PageData): boolean {
+  const v = page.settings?.visibility;
+  return v === undefined || v === "live";
+}
+
 const HIDE_MEDIA_QUERIES: Record<string, string> = {
   "--hide-mobile": "(max-width:767px)",
   "--hide-tablet": "(min-width:768px) and (max-width:1023px)",
@@ -611,11 +627,7 @@ export class ExportEngine {
        believes is protected is the worse of the two mistakes. The screen says
        so, in the same words the Redirects and Headers screens use for their
        own not-yet-enforced settings. */
-    const isLive = (p: PageData) => {
-      const v = p.settings?.visibility;
-      return v === undefined || v === "live";
-    };
-    const livePages = allPages.filter(isLive);
+    const livePages = allPages.filter(isPageLive);
     // …unless that leaves nothing to deploy. A site with no index.html is a
     // broken deploy, which helps nobody.
     const pages = livePages.length > 0 ? livePages : allPages.filter((p) => p.isHome).slice(0, 1);

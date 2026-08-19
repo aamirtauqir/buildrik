@@ -4,7 +4,7 @@
  * @license BSD-3-Clause
  */
 
-export { ExportEngine } from "./ExportEngine";
+export { ExportEngine, isPageLive } from "./ExportEngine";
 export { ReactExporter } from "./ReactExporter";
 export { AssetBundler } from "./AssetBundler";
 export { SitemapGenerator } from "./SitemapGenerator";
