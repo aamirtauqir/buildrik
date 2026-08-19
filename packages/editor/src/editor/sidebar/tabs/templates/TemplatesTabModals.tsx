@@ -96,12 +96,23 @@ export const ReplaceModal: React.FC<ReplaceModalProps> = ({
       </>
     }
   >
+    {/* The sentence below used to read "Your brand tokens are applied
+        automatically." They are not: `templatesData.ts` contains no `var()`
+        reference to a single design token, and over a hundred hardcoded hex
+        values — several in colour families DESIGN.md bans outright, which is
+        why they are not quoted here: Gate 18 rejects both the hex and the
+        words for them, even inside a comment. Someone who set a brand colour
+        and applied a template got the template's palette, with no warning.
+        Making
+        the sentence true means rewriting the ten built-in templates onto
+        tokens — a change to what they look like, which is a founder call. */}
     <div className="tw:mb-3">
       Everything on {currentPageName || "this page"} will be replaced by the template
       {currentPageCount > 0
         ? ` (${currentPageCount} element${currentPageCount === 1 ? "" : "s"})`
         : ""}
-      . Your brand tokens are applied automatically.
+      . The template brings its own colours and type — your brand tokens are not
+      applied to it.
     </div>
     <Option
       checked={backupCurrentPage}
@@ -110,8 +121,10 @@ export const ReplaceModal: React.FC<ReplaceModalProps> = ({
       hint={`Keeps your work as “${currentPageName || "Current"} (backup)”.`}
     />
     {/* Not on the board, kept because it does something the board's sentence
-        does not cover: brand tokens resolve automatically either way, while
-        this clears the project's global styles outright. */}
+        does not cover: it clears the project's global styles outright.
+        The sentence above used to claim brand tokens resolve automatically
+        either way — they do not; the ten built-in templates hardcode over a
+        hundred hex values and reference no design token. */}
     <Option
       checked={resetGlobalStyles}
       onChange={onResetChange}
