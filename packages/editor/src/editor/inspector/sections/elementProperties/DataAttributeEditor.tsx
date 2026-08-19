@@ -92,7 +92,9 @@ export const DataAttributeEditor: React.FC<DataAttributeEditorProps> = ({
           placeholder="value"
           style={styles.input}
         />
-        <Button onClick={addAttribute} style={styles.addButton}>
+        {/* The row's only action was a bare "+" — announced as "plus" with no
+            hint of what it adds, on a panel that also adds classes and ids. */}
+        <Button aria-label="Add attribute" onClick={addAttribute} style={styles.addButton}>
           +
         </Button>
       </div>

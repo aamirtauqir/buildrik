@@ -21,7 +21,7 @@ describe("DataAttributeEditor", () => {
     const { el } = setup();
     fireEvent.change(screen.getByPlaceholderText("data-*"), { target: { value: "foo" } });
     fireEvent.change(screen.getByPlaceholderText("value"), { target: { value: "bar" } });
-    fireEvent.click(screen.getByRole("button", { name: "+" }));
+    fireEvent.click(screen.getByRole("button", { name: /add attribute/i }));
     expect(el.setAttribute).toHaveBeenCalledWith("data-foo", "bar");
   });
 
@@ -31,14 +31,14 @@ describe("DataAttributeEditor", () => {
       target: { value: "data-x" },
     });
     fireEvent.change(screen.getByPlaceholderText("value"), { target: { value: "1" } });
-    fireEvent.click(screen.getByRole("button", { name: "+" }));
+    fireEvent.click(screen.getByRole("button", { name: /add attribute/i }));
     expect(el.setAttribute).toHaveBeenCalledWith("data-x", "1");
   });
 
   it("does nothing when the key is empty", () => {
     const { el } = setup();
     fireEvent.change(screen.getByPlaceholderText("value"), { target: { value: "orphan" } });
-    fireEvent.click(screen.getByRole("button", { name: "+" }));
+    fireEvent.click(screen.getByRole("button", { name: /add attribute/i }));
     expect(el.setAttribute).not.toHaveBeenCalled();
   });
 
@@ -48,7 +48,7 @@ describe("DataAttributeEditor", () => {
     const valInput = screen.getByPlaceholderText("value") as HTMLInputElement;
     fireEvent.change(keyInput, { target: { value: "foo" } });
     fireEvent.change(valInput, { target: { value: "bar" } });
-    fireEvent.click(screen.getByRole("button", { name: "+" }));
+    fireEvent.click(screen.getByRole("button", { name: /add attribute/i }));
     expect(keyInput).toHaveValue("");
     expect(valInput).toHaveValue("");
   });

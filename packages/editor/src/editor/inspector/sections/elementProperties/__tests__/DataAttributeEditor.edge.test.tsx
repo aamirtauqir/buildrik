@@ -20,7 +20,7 @@ function setup() {
 function add(key: string, value: string) {
   fireEvent.change(screen.getByPlaceholderText("data-*"), { target: { value: key } });
   fireEvent.change(screen.getByPlaceholderText("value"), { target: { value } });
-  fireEvent.click(screen.getByRole("button", { name: "+" }));
+  fireEvent.click(screen.getByRole("button", { name: /add attribute/i }));
 }
 
 describe("DataAttributeEditor — edge cases", () => {
