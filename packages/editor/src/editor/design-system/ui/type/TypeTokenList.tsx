@@ -28,6 +28,9 @@ export interface TypeTokenListProps {
 
 // ─── Icon buttons ─────────────────────────────────────────────────────────────
 
+/** Preview-only shrink for the mobile specimen rows. */
+const MOBILE_SPECIMEN_SCALE = 0.85;
+
 const DesktopIcon: React.FC = () => (
   <svg
     width="14"
@@ -364,7 +367,9 @@ const TypePreviewBand: React.FC<TypePreviewBandProps> = ({
     const token = sizeTokens.find((t) => t.id === id);
     if (!token) return "16px";
     if (responsiveMode === "mobile") {
-      return `${Math.round(parseFloat(token.value) * 0.85)}px`;
+      // Specimen-only: 85% of the token, to show how the scale reads narrow.
+      // No rule anywhere applies this to a real page.
+      return `${Math.round(parseFloat(token.value) * MOBILE_SPECIMEN_SCALE)}px`;
     }
     return token.value;
   };
@@ -447,13 +452,19 @@ export const TypeTokenList: React.FC<TypeTokenListProps> = ({
       <div
         className="tw:text-xs tw:text-gray-500 tw:mb-1.5 tw:leading-normal"
       >
-        Type scale per device — changes here only affect the selected breakpoint.
+        One type scale for the whole site. The toggle below previews how it
+        reads on a narrow screen; it does not set separate mobile sizes.
       </div>
 
       {/* Responsive toggle */}
       <div
         className="tw:flex tw:gap-1 tw:mb-2"
-        title="Preview only — font sizes scale automatically for mobile. You cannot set separate mobile values here."
+        /* Was "font sizes scale automatically for mobile", which nothing does:
+           the 0.85 below is applied to the specimen text in this panel and
+           nowhere else — not in the engine, not in the exported CSS. Per-screen
+           sizes come from selecting an element and setting its size at that
+           breakpoint, which is a different control and does work. */
+        title="Preview only. The site does not resize type by itself — for a different size on phones, select the element and set it at the Mobile breakpoint."
       >
         <Button
           size="xs"
