@@ -208,9 +208,14 @@ export function useElementDragDomSync({
        so updateRootId ran once on mount and the drag target root went stale on
        every page switch. Found by seam-scan on its first run. */
     composer.on(EVENTS.PROJECT_CHANGED, updateRootId);
+    // …and on a project load, which emits PROJECT_LOADED alone. The cached
+    // root id is what drag targets resolve against; a stale one after a
+    // version restore aims drops at an element that is no longer on the page.
+    composer.on(EVENTS.PROJECT_LOADED, updateRootId);
 
     return () => {
       composer.off(EVENTS.PROJECT_CHANGED, updateRootId);
+      composer.off(EVENTS.PROJECT_LOADED, updateRootId);
     };
   }, [composer, rootIdRef]);
 

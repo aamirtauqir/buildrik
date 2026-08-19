@@ -88,8 +88,12 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
 
     loadPages();
     composer.on(EVENTS.PROJECT_CHANGED, loadPages);
+    // A project load replaces every page; PROJECT_LOADED is the only event it
+    // emits, so the link dropdown kept offering the previous project's pages.
+    composer.on(EVENTS.PROJECT_LOADED, loadPages);
     return () => {
       composer.off(EVENTS.PROJECT_CHANGED, loadPages);
+      composer.off(EVENTS.PROJECT_LOADED, loadPages);
     };
   }, [composer]);
 

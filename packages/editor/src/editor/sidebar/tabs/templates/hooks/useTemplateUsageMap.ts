@@ -47,10 +47,14 @@ export function useTemplateUsageMap(composer: Composer | null): TemplateUsageMap
     composer.on(EVENTS.TEMPLATE_APPLIED, rebuild);
     composer.on(EVENTS.TEMPLATE_REMOVED, rebuild);
     composer.on(EVENTS.PROJECT_CHANGED, rebuild);
+    // `importProject` emits PROJECT_LOADED and nothing else, so a version
+    // restore or a fresh load left the usage counts describing the old project.
+    composer.on(EVENTS.PROJECT_LOADED, rebuild);
     return () => {
       composer.off(EVENTS.TEMPLATE_APPLIED, rebuild);
       composer.off(EVENTS.TEMPLATE_REMOVED, rebuild);
         composer.off(EVENTS.PROJECT_CHANGED, rebuild);
+        composer.off(EVENTS.PROJECT_LOADED, rebuild);
     };
   }, [composer]);
 

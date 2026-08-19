@@ -156,6 +156,12 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
     composer.on("comments:orphans-request", onOrphansRequest);
     composer.on("comments:reattach-start", onReattachStart);
     composer.on(EVENTS.PROJECT_CHANGED, bump);
+    /* …and PROJECT_LOADED, which is the ONLY event `importProject` emits.
+       Undo/redo past a load, a version restore and the initial project load
+       all arrive that way, and a pin is positioned from its element's rect —
+       so without this the pins kept pointing at where the elements used to
+       be. Same gap the Pages panel had. */
+    composer.on(EVENTS.PROJECT_LOADED, bump);
     composer.on(EVENTS.ELEMENT_DELETED, bump);
     return () => {
       composer.off("ui:comment-mode", onMode);
@@ -163,6 +169,7 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
       composer.off("comments:orphans-request", onOrphansRequest);
     composer.off("comments:reattach-start", onReattachStart);
       composer.off(EVENTS.PROJECT_CHANGED, bump);
+      composer.off(EVENTS.PROJECT_LOADED, bump);
       composer.off(EVENTS.ELEMENT_DELETED, bump);
     };
   }, [composer, refresh]);
