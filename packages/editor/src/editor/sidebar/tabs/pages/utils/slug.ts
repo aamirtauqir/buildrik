@@ -9,7 +9,17 @@ import { slugify } from "@shared/utils/helpers/string";
  * the flat shared slugify would otherwise strip.
  */
 export function normalizeSlug(raw: string): string {
-  return raw.split("/").map(slugify).join("/");
+  // Empty segments are dropped, which is what a LEADING slash produces: a
+  // person typing a path types "/about", and this returned "/about" — a slug
+  // saved with a slash on the front, which the exporter then turned into a file
+  // named "/about.html" and a publish path with a leading slash. Verified in
+  // the running app and in the database: "/contact-us" saved with no complaint,
+  // and the SEO preview already strips the slash for display.
+  return raw
+    .split("/")
+    .map(slugify)
+    .filter(Boolean)
+    .join("/");
 }
 
 export function validateSlug(slug: string): string | null {
