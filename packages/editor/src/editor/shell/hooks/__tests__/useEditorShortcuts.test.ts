@@ -269,4 +269,37 @@ describe("useEditorShortcuts", () => {
     expect(saveProject).not.toHaveBeenCalled();
     expect(composer.history.undo).not.toHaveBeenCalled();
   });
+
+  /* ⌘P was printed as "Preview" in the ⌘K palette AND in the keyboard
+     shortcuts panel, and bound nowhere — so it reached the browser and opened
+     the PRINT dialog over the editor. Measured live before the fix: no
+     preview event, no preview surface. */
+  describe("Cmd+P — preview", () => {
+    it("asks the shell to toggle preview", () => {
+      mount();
+      dispatchKey({ key: "p", metaKey: true });
+      expect(composer.emit).toHaveBeenCalledWith("ui:toggle:preview", {});
+    });
+
+    it("takes the chord away from the browser's print dialog", () => {
+      mount();
+      const event = dispatchKey({ key: "p", metaKey: true });
+      expect(event.defaultPrevented).toBe(true);
+    });
+
+    it("leaves ⌘⇧P alone — that is the command palette", () => {
+      mount();
+      dispatchKey({ key: "p", metaKey: true, shiftKey: true });
+      expect(composer.emit).not.toHaveBeenCalledWith("ui:toggle:preview", {});
+    });
+
+    it("does not fire while typing", () => {
+      mount();
+      const input = document.createElement("input");
+      document.body.appendChild(input);
+      dispatchKey({ key: "p", metaKey: true, target: input });
+      expect(composer.emit).not.toHaveBeenCalledWith("ui:toggle:preview", {});
+      input.remove();
+    });
+  });
 });

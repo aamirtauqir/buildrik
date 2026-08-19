@@ -38,6 +38,7 @@ import * as React from "react";
 import { isModalOpen } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
 import { cycleRegion } from "../regionCycle";
+import { EVENTS } from "../../../shared/constants/events";
 
 // Modals subset the shortcut handler reads. Match the public surface of
 // useStudioModals; passing the full modals object keeps mocking simple.
@@ -125,6 +126,17 @@ export function useEditorShortcuts({
       if ((e.ctrlKey || e.metaKey) && e.key === "s") {
         e.preventDefault();
         saveProject();
+      }
+
+      /* ⌘P — Preview. Printed in two places (the ⌘K palette's Preview row and
+         the keyboard-shortcuts panel) and bound nowhere, so the chord fell
+         through to the browser and opened its PRINT dialog over the editor.
+         Measured before binding it: pressing it produced no preview event and
+         no preview surface. preventDefault is the load-bearing half. */
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === "p") {
+        e.preventDefault();
+        composer?.emit(EVENTS.UI_TOGGLE_PREVIEW, {});
+        return;
       }
 
       if (!composer) return;
