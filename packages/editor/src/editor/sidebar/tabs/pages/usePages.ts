@@ -122,9 +122,22 @@ export function usePages(composer: Composer | null): UsePagesReturn {
     const handler = (payload?: { type?: string }) => {
       if (!payload?.type || payload.type.startsWith("page:")) sync();
     };
+    /* PROJECT_LOADED is the other half, and its absence made undo look broken.
+       Undo, redo and version-restore all go through `importProject`, which
+       emits PROJECT_LOADED and never PROJECT_CHANGED — so deleting a page and
+       pressing Cmd+Z restored it in the engine while this list went on saying
+       "This site has one page". Closing and reopening the panel showed both
+       pages, which is how it was caught. The delete dialog promises "You can
+       undo immediately after", so the stale list reads as the undo failing.
+       PageTabBar and useLayerTree already listen to both for the same reason.
+       `syncOnLoad` ignores the payload: an import has no page:* type to
+       filter on, and every import can change the whole list. */
+    const syncOnLoad = () => sync();
     composer.on(EVENTS.PROJECT_CHANGED, handler);
+    composer.on(EVENTS.PROJECT_LOADED, syncOnLoad);
     return () => {
       composer.off(EVENTS.PROJECT_CHANGED, handler);
+      composer.off(EVENTS.PROJECT_LOADED, syncOnLoad);
     };
   }, [composer, retryKey]);
 

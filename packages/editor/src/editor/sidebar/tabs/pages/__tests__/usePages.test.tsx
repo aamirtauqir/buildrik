@@ -136,6 +136,35 @@ describe("usePages PROJECT_CHANGED handler", () => {
   });
 });
 
+/* Undo, redo and version-restore all go through `importProject`, which emits
+   PROJECT_LOADED and never PROJECT_CHANGED. This list listened only for the
+   latter, so deleting a page and pressing Cmd+Z restored it in the engine
+   while the panel went on saying "This site has one page" — and the delete
+   dialog promises "You can undo immediately after", so it read as the undo
+   failing. Closing and reopening the panel showed both pages, which is how it
+   was caught. */
+describe("usePages PROJECT_LOADED handler — undo / redo / version-restore", () => {
+  it("re-syncs when the project is re-imported", () => {
+    const composer = createMockComposer({ pages: [pg("p1", "Home")] });
+    const { result } = setup(composer);
+    expect(result.current.pages).toHaveLength(1);
+
+    // What an undo of a page delete looks like from here: the page is back in
+    // the engine, announced only as PROJECT_LOADED.
+    composer._pages.push({ id: "p2", name: "Doomed", slug: "doomed" });
+    act(() => composer._emit(EVENTS.PROJECT_LOADED, { importing: true }));
+    expect(result.current.pages).toHaveLength(2);
+  });
+
+  it("re-syncs even though an import carries no page:* type to filter on", () => {
+    const composer = createMockComposer({ pages: [pg("p1", "Home")] });
+    const { result } = setup(composer);
+    composer._pages.push({ id: "p2", name: "About", slug: "about" });
+    act(() => composer._emit(EVENTS.PROJECT_LOADED));
+    expect(result.current.pages).toHaveLength(2);
+  });
+});
+
 // ── addPage ──────────────────────────────────────────────────────────────────
 
 describe("usePages addPage", () => {
