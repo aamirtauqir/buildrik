@@ -53,9 +53,20 @@ describe("migrateLegacyPanelState", () => {
     expect(result.leftPanelTab).toBe("layers");
   });
 
-  it("maps phantom 'content' to 'add'", () => {
-    const result = migrateLegacyPanelState({ leftPanelTab: "content" });
-    expect(result.leftPanelTab).toBe("add");
+  /* "content" was a phantom id from the 3-tab era and was mapped away to
+     "add". It is a real tab again — TabRouter renders it, the registry gives
+     it shortcut D — so mapping it away meant reopening the editor with the
+     Content panel open landed you in Insert. Same story for "ai". */
+  it("keeps 'content', which is a real tab again", () => {
+    expect(migrateLegacyPanelState({ leftPanelTab: "content" }).leftPanelTab).toBe("content");
+  });
+
+  it("keeps 'ai', which stopped being folded into Add", () => {
+    expect(migrateLegacyPanelState({ leftPanelTab: "ai" }).leftPanelTab).toBe("ai");
+  });
+
+  it("keeps 'review', which the old valid-tab list never named", () => {
+    expect(migrateLegacyPanelState({ leftPanelTab: "review" }).leftPanelTab).toBe("review");
   });
 
   it("maps unknown tab ID to 'add'", () => {
