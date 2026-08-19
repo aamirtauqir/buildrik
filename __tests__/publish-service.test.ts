@@ -109,15 +109,23 @@ describe("Publish Service", () => {
       expect(pageCheck?.status).toBe("fail");
     });
 
+    /* The page count comes from the ROWS now, not from `page.count`: the check
+       reports LIVE pages only, and visibility lives in each row's `settings`
+       JSON. A fixture that stubs the count and returns no rows describes a
+       site with zero pages, which is what this test was accidentally asserting
+       was ready to publish. */
     it("passes when site has pages and warns about SEO", async () => {
-      vi.mocked(prisma.page.count).mockResolvedValue(3);
       vi.mocked(prisma.site.findUnique).mockResolvedValue({
         id: "s1",
         metaTitleTemplate: null,
         touchIcon: null,
       } as any);
       vi.mocked(prisma.domain.findFirst).mockResolvedValue(null);
-      vi.mocked(prisma.page.findMany).mockResolvedValue([]);
+      vi.mocked(prisma.page.findMany).mockResolvedValue([
+        { id: "p1", name: "Home", blocks: [{}], settings: null },
+        { id: "p2", name: "About", blocks: [{}], settings: { visibility: "live" } },
+        { id: "p3", name: "Work", blocks: [{}], settings: {} },
+      ] as any);
 
       const result = await runPrePublishChecks("s1");
       expect(result.ready).toBe(true);
