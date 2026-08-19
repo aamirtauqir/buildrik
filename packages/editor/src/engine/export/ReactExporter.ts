@@ -88,7 +88,17 @@ export class ReactExporter {
    */
   export(): ExportResult {
     try {
-      const pages = this.composer.elements.getAllPages?.() ?? [];
+      /* exportPages(), not getAllPages(). `PageData.root` in the page map is a
+         snapshot that holds the root's ID, not its live children — the editor
+         keeps the working tree in the element registry. ExportEngine knows
+         this and re-resolves (`getElement(page.root.id)`); this exporter
+         walked the snapshot and emitted `<div></div>` for a page with 24
+         elements, while the HTML export of the same page was 9 KB of content.
+         `exportPages()` is the existing serializer that resolves the live root
+         and falls back to the snapshot per page — the same data the save path
+         sends to the server. */
+      const pages =
+        this.composer.elements.exportPages?.() ?? this.composer.elements.getAllPages?.() ?? [];
       if (pages.length === 0) {
         return { success: false, error: "No pages to export" };
       }
@@ -372,8 +382,16 @@ export class ReactExporter {
    */
   private generateClassName(element: ElementData): string {
     const type = element.type || "el";
-    // Sanitize id to valid CSS class name characters
-    const id = (element.id || "").replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 8);
+    /* The WHOLE sanitized id, not a prefix. Editor ids look like
+       `el-mskbnhmi-rnwj0h1yrd` — a shared timestamp part and then the random
+       one — so slicing to 8 characters gave every element created in the same
+       millisecond the same class. `cssClasses.set(name, entry)` then
+       OVERWROTE the earlier element's styles: three grid items with different
+       styles came out sharing one rule. Seen in a real export — six
+       references to `container_el-mskbn` against 14 defined classes.
+       The name is longer and nobody reads a generated CSS module; being
+       unique is the requirement. */
+    const id = (element.id || "").replace(/[^a-zA-Z0-9_-]/g, "");
     return `${type}${id ? "_" + id : ""}`;
   }
 }

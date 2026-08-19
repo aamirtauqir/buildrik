@@ -11,9 +11,16 @@ import type { Composer } from "../../Composer";
 import type { ElementData, PageData } from "../../../shared/types";
 
 function makeTestComposer(pages: PageData[]): Composer {
+  /* Both readers, because they do not return the same thing in the running
+     editor and this exporter used the wrong one. `getAllPages()` hands back
+     the page map, whose `root` is a snapshot holding the root's ID;
+     `exportPages()` re-resolves the live element and serialises it. Every
+     test here hand-built a populated `root`, so the two were identical and
+     the bug was invisible — see the regression at the bottom of the file. */
   return {
     elements: {
       getAllPages: () => pages,
+      exportPages: () => pages,
     },
   } as unknown as Composer;
 }
@@ -429,5 +436,84 @@ describe("ReactExporter — zip bundle, scaffold, naming fallbacks (extension)",
     expect(names.filter((n) => n.startsWith("components/Home") && n.endsWith(".tsx"))).toHaveLength(
       3
     );
+  });
+});
+
+/* The failure this file could not see. In the app, `PageData.root` in the page
+   map carries the root's identity and not its children — the working tree
+   lives in the element registry, and `exportPages()` is what resolves it.
+   ReactExporter read the map directly and emitted `<div></div>` for a page
+   whose HTML export was 9 KB of content. Verified by exporting both formats
+   from the same session, on the same page, before the fix. */
+describe("ReactExporter — reads the resolved tree, not the page-map snapshot", () => {
+  it("exports the children exportPages() resolves, not the hollow root getAllPages() holds", () => {
+    const hollow: PageData[] = [
+      { id: "page-1", name: "Home", root: makeElement({ id: "root-1", type: "container" }) },
+    ];
+    const resolved: PageData[] = [
+      {
+        id: "page-1",
+        name: "Home",
+        root: makeElement({
+          id: "root-1",
+          type: "container",
+          children: [makeElement({ id: "h-1", type: "heading", tagName: "h1", content: "Real heading" })],
+        }),
+      },
+    ];
+    const composer = {
+      elements: { getAllPages: () => hollow, exportPages: () => resolved },
+    } as unknown as Composer;
+
+    const result = new ReactExporter(composer).export();
+    expect(result.success).toBe(true);
+    const home = result.files!.find((f) => f.name === "components/Home.tsx")!;
+    expect(home.content).toContain("Real heading");
+    expect(home.content).not.toMatch(/return \(\s*<div><\/div>\s*\)/);
+  });
+
+  it("gives two elements created in the same millisecond different class names", () => {
+    /* The editor mints ids as `el-<base36 time>-<random>`, so siblings share a
+       long prefix. Truncating the id to 8 characters collapsed them onto one
+       class and the second element's styles overwrote the first's. */
+    const pages: PageData[] = [
+      {
+        id: "page-1",
+        name: "Home",
+        root: makeElement({
+          id: "root-1",
+          type: "container",
+          children: [
+            makeElement({ id: "el-mskbnhmi-rnwj0h1yrd", type: "container", styles: { color: "red" } }),
+            makeElement({ id: "el-mskbnhmi-17chzkj1ysi", type: "container", styles: { color: "blue" } }),
+          ],
+        }),
+      },
+    ];
+    const composer = { elements: { exportPages: () => pages } } as unknown as Composer;
+    const result = new ReactExporter(composer).export();
+    const css = result.files!.find((f) => f.name === "components/Home.module.css")!.content;
+    expect(css).toContain("color: red");
+    expect(css).toContain("color: blue");
+    const classNames = [...css.matchAll(/^\.([a-zA-Z0-9_-]+)\s*\{/gm)].map((m) => m[1]);
+    expect(new Set(classNames).size).toBe(classNames.length);
+  });
+
+  it("still exports when only getAllPages exists, so an older composer is not broken", () => {
+    const populated: PageData[] = [
+      {
+        id: "page-1",
+        name: "Home",
+        root: makeElement({
+          id: "root-1",
+          type: "container",
+          children: [makeElement({ id: "p-1", type: "paragraph", tagName: "p", content: "Fallback body" })],
+        }),
+      },
+    ];
+    const composer = { elements: { getAllPages: () => populated } } as unknown as Composer;
+    const result = new ReactExporter(composer).export();
+    expect(result.success).toBe(true);
+    expect(result.files!.find((f) => f.name === "components/Home.tsx")!.content).toContain("Fallback body");
   });
 });
