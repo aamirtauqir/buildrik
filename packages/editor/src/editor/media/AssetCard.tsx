@@ -158,7 +158,13 @@ export const AssetCard: React.FC<AssetCardProps> = ({
           {asset.width && asset.height && ` • ${asset.width}×${asset.height}`}
         </div>
       </div>
+      {/* The destructive control on every asset card was a bare "✕" glyph with
+          no accessible name, so a screen reader announced the delete button on
+          each tile as the multiplication sign. The name has to carry WHICH
+          file, because the grid repeats this button once per asset. */}
       <Button
+        aria-label={`Delete ${asset.name}`}
+        title={`Delete ${asset.name}`}
         onClick={(e) => onDelete(asset.id, e)}
         className={`${OVERLAY_BTN} tw:top-1 tw:right-1 tw:flex tw:items-center tw:justify-center tw:size-6 tw:p-0 tw:rounded-full tw:bg-black/60`}
       >

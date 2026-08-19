@@ -374,7 +374,15 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
          title and on the button. "Delete" alone could be any of the three
          destructive dialogs in this editor. */
       title={`Delete "${filteredAssets.find((a) => a.id === pendingDeleteId)?.name ?? "this file"}"?`}
-      message="The file is removed from the library and from every page using it. This cannot be undone."
+      /* This said the file is removed "from every page using it", which no
+         code does: deleteAsset touches the library, the local store and the
+         server row, and nothing subscribed to MEDIA_DELETED walks the page
+         tree. Measured in the running editor — after deleting the asset the
+         library no longer holds it and the page's <img> still carries the
+         same src, in engine state and in the DOM. On a published site that
+         URL then 404s, so the honest warning is the one a user needs BEFORE
+         confirming: the pages keep the link and the image breaks. */
+      message="The file is removed from the library. Pages that already use it keep the link, so the image breaks there. This cannot be undone."
       confirmLabel="Delete file"
       tone="destructive"
     />
