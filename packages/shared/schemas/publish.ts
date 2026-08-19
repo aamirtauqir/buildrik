@@ -75,6 +75,31 @@ export const publishResultSchema = z.object({
  */
 export const VERCEL_CHECK_LABEL = "Vercel connected";
 
+/**
+ * The four states the approval gate can block a publish in, and the sentence
+ * the user is shown for each. Same reason as VERCEL_CHECK_LABEL above: the
+ * server throws these and the EDITOR reads them back to decide which recovery
+ * UI to draw, so they cross the transport boundary and cannot live on one side.
+ *
+ * They lived only in `server/trpc/routers/sites.ts`, with the editor matching
+ * them by regex in `usePublishJob.ts:classifyPublishBlock`. Nothing tied the
+ * two together: editing a sentence in the router would have left every test
+ * green while the editor silently fell through to "no reason" and drew the
+ * generic failure instead of the acknowledge / send-for-review path.
+ */
+export const PUBLISH_APPROVAL_MESSAGES = {
+  "no-review-sent":
+    "This site has not been sent for review yet. Send it for review to publish.",
+  "review-pending":
+    "This site is waiting on its review. You can publish once it is approved.",
+  "changes-requested":
+    "The reviewer asked for changes. Resolve the open comments and re-send for review.",
+  "stale-unacknowledged":
+    "This site changed after it was approved. Re-send it for review, or acknowledge to publish the un-approved changes.",
+} as const;
+
+export type PublishApprovalBlockId = keyof typeof PUBLISH_APPROVAL_MESSAGES;
+
 export const prePublishChecksResultSchema = z.object({
   ready: z.boolean(),
   checks: z.array(z.object({

@@ -44,7 +44,7 @@ import {
   getProjectDataSchema,
   editorSaveProjectSchema,
 } from "@buildrik/shared/schemas/sites";
-import { prePublishCheckSchema, publishInputSchema, publishHistoryInput, rollbackInput } from "@buildrik/shared/schemas/publish";
+import { prePublishCheckSchema, publishInputSchema, publishHistoryInput, rollbackInput, PUBLISH_APPROVAL_MESSAGES } from "@buildrik/shared/schemas/publish";
 import { recordForSite } from "@/server/services/activity-log.service";
 import { resolveWorkspaceId as getWorkspaceId } from "@/server/trpc/workspace-ctx";
 
@@ -349,29 +349,23 @@ export const sitesRouter = router({
         // "this site needs an approved review" — was true in all three cases
         // and useful in none: it never said whether to send a review, wait for
         // one, or go read the comments that already came back.
-        if (e instanceof Error && e.message === "APPROVAL_NONE")
+        // The sentences live in @buildrik/shared, not here: the EDITOR reads
+        // them back to pick its recovery UI (usePublishJob's
+        // classifyPublishBlock), so they cross the transport boundary. Editing
+        // one here used to leave every test green while the editor fell
+        // through to the generic failure. Stale approval is contracts §1.5 —
+        // approved, but the site changed since; re-send, or publish again with
+        // acknowledgeStale to ship it deliberately.
+        const APPROVAL_ERROR_MESSAGE: Record<string, string> = {
+          APPROVAL_NONE: PUBLISH_APPROVAL_MESSAGES["no-review-sent"],
+          APPROVAL_PENDING: PUBLISH_APPROVAL_MESSAGES["review-pending"],
+          APPROVAL_CHANGES: PUBLISH_APPROVAL_MESSAGES["changes-requested"],
+          APPROVAL_STALE: PUBLISH_APPROVAL_MESSAGES["stale-unacknowledged"],
+        };
+        if (e instanceof Error && APPROVAL_ERROR_MESSAGE[e.message])
           throw new TRPCError({
             code: "PRECONDITION_FAILED",
-            message: "This site has not been sent for review yet. Send it for review to publish.",
-          });
-        if (e instanceof Error && e.message === "APPROVAL_PENDING")
-          throw new TRPCError({
-            code: "PRECONDITION_FAILED",
-            message: "This site is waiting on its review. You can publish once it is approved.",
-          });
-        if (e instanceof Error && e.message === "APPROVAL_CHANGES")
-          throw new TRPCError({
-            code: "PRECONDITION_FAILED",
-            message: "The reviewer asked for changes. Resolve the open comments and re-send for review.",
-          });
-        // Stale approval (contracts §1.5): approved, but the site changed since.
-        // The client signed off on an earlier version — re-send for review, or
-        // publish again with acknowledgeStale to ship it deliberately.
-        if (e instanceof Error && e.message === "APPROVAL_STALE")
-          throw new TRPCError({
-            code: "PRECONDITION_FAILED",
-            message:
-              "This site changed after it was approved. Re-send it for review, or acknowledge to publish the un-approved changes.",
+            message: APPROVAL_ERROR_MESSAGE[e.message],
           });
         throw e;
       }

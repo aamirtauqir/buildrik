@@ -19,6 +19,7 @@ import {
   type PublishStep,
 } from "@/services/PublishService";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
+import { PUBLISH_APPROVAL_MESSAGES } from "@buildrik/shared/schemas/publish";
 
 const POLL_INTERVAL_MS = 2000;
 const TERMINAL = new Set(["COMPLETED", "FAILED", "CANCELLED"]);
@@ -57,11 +58,23 @@ export type PublishBlockReason =
  * stops matching here, the block silently becomes a red "publish failed"
  * toast, and nothing goes red in CI to tell you.
  */
+/* Matched against the SHARED sentences, not against phrases guessed from them.
+   The router throws these and this hook reads them back to choose the recovery
+   UI, so they are one contract with two readers — `PUBLISH_APPROVAL_MESSAGES`
+   in @buildrik/shared is where it lives. The regexes this replaced would have
+   survived any rewording on the server: every test green, and the editor
+   quietly drawing the generic failure instead of Acknowledge or Send for
+   review. `includes` rather than `===` because the message arrives inside a
+   tRPC error whose text may carry a prefix. */
+const BLOCK_BY_MESSAGE: Array<[string, PublishBlockReason]> = [
+  [PUBLISH_APPROVAL_MESSAGES["stale-unacknowledged"], "stale-approval"],
+  [PUBLISH_APPROVAL_MESSAGES["no-review-sent"], "no-review"],
+  [PUBLISH_APPROVAL_MESSAGES["review-pending"], "review-pending"],
+  [PUBLISH_APPROVAL_MESSAGES["changes-requested"], "changes-requested"],
+];
+
 function classifyPublishBlock(msg: string): PublishBlockReason {
-  if (/acknowledge|changed after it was approved/i.test(msg)) return "stale-approval";
-  if (/not been sent for review/i.test(msg)) return "no-review";
-  if (/waiting on its review/i.test(msg)) return "review-pending";
-  if (/asked for changes/i.test(msg)) return "changes-requested";
+  for (const [sentence, reason] of BLOCK_BY_MESSAGE) if (msg.includes(sentence)) return reason;
   return null;
 }
 

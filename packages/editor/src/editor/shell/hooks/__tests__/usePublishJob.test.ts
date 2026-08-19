@@ -17,6 +17,7 @@ import {
 } from "@/services/PublishService";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { usePublishJob } from "../usePublishJob";
+import { PUBLISH_APPROVAL_MESSAGES } from "@buildrik/shared/schemas/publish";
 
 vi.mock("@/services/PublishService", () => ({
   publishSite: vi.fn(),
@@ -519,7 +520,11 @@ describe("usePublishJob", () => {
 
     it("dismissBlock clears the block without publishing", async () => {
       mockPublishSite.mockRejectedValueOnce(
-        new Error("This site changed after it was approved. …acknowledge…"),
+        /* The REAL sentence, not a paraphrase. This read
+           "This site changed after it was approved. …acknowledge…" and passed
+           only because the classifier matched on the word "acknowledge" — a
+           string the server never sends. */
+        new Error(PUBLISH_APPROVAL_MESSAGES["stale-unacknowledged"]),
       );
       const { result } = renderHook(() => usePublishJob());
       await act(async () => {
@@ -531,5 +536,50 @@ describe("usePublishJob", () => {
       });
       expect(result.current.blockedReason).toBeNull();
     });
+  });
+});
+
+/* The gate spans two packages: the server throws one of four sentences and this
+   hook reads it back to choose the recovery UI. Before they were shared, each
+   side kept its own copy — the router's in `sites.ts`, the editor's as regexes
+   — and nothing failed if one was reworded. This drives the hook the way the
+   app does, so it locks the pairing itself: a sentence can only change in
+   @buildrik/shared, where both sides read it. */
+describe("approval-gate messages are one contract, not two copies", () => {
+  const EXPECTED: Record<string, string> = {
+    "no-review-sent": "no-review",
+    "review-pending": "review-pending",
+    "changes-requested": "changes-requested",
+    "stale-unacknowledged": "stale-approval",
+  };
+
+  it.each(Object.entries(PUBLISH_APPROVAL_MESSAGES))(
+    "%s -> its own recovery reason",
+    async (key, sentence) => {
+      mockPublishSite.mockRejectedValueOnce(new Error(sentence));
+      const { result } = renderHook(() => usePublishJob());
+      await act(async () => { await result.current.publish("site-1", PAGES); });
+      expect(result.current.blockedReason).toBe(EXPECTED[key]);
+    },
+  );
+
+  it("gives the four blocks four DIFFERENT reasons", () => {
+    expect(new Set(Object.values(EXPECTED)).size).toBe(4);
+  });
+
+  it("still matches when the sentence arrives wrapped by tRPC", async () => {
+    mockPublishSite.mockRejectedValueOnce(
+      new Error(`PRECONDITION_FAILED: ${PUBLISH_APPROVAL_MESSAGES["no-review-sent"]}`),
+    );
+    const { result } = renderHook(() => usePublishJob());
+    await act(async () => { await result.current.publish("site-1", PAGES); });
+    expect(result.current.blockedReason).toBe("no-review");
+  });
+
+  it("leaves the reason null for a failure that is not the approval gate", async () => {
+    mockPublishSite.mockRejectedValueOnce(new Error("Vercel rejected the deployment."));
+    const { result } = renderHook(() => usePublishJob());
+    await act(async () => { await result.current.publish("site-1", PAGES); });
+    expect(result.current.blockedReason).toBeNull();
   });
 });
