@@ -556,6 +556,18 @@ export function DynamicPagesView({
   const [confirmLeave, setConfirmLeave] = React.useState(false);
   const leave = () => (dirty ? setConfirmLeave(true) : onBack());
   const publishedCount = records.filter((r) => r.status === "published").length;
+  /* Two more conditions decide whether a page actually appears, and neither is
+     the record count. Both were checked against the service, not guessed:
+     - `applyPattern` (cms.service.ts:121) substitutes "" for a {key} that names
+       no field, so "/{slug}" on a collection whose only field is `title`
+       resolves every record to "/" — they collide instead of generating.
+     - `appendDynamicPagesToPublish` (:234) selects collections where
+       `pageTemplatePath` is NOT NULL. Nothing in this panel sets it, so a
+       collection created here contributes ZERO pages at publish while this
+       screen said "Generates 1 page". */
+  const patternKeys = [...trimmed.matchAll(/\{([a-zA-Z0-9_-]+)\}/g)].map((m) => m[1]);
+  const unknownKeys = patternKeys.filter((k) => !collection.fields.some((f) => f.slug === k));
+  const hasTemplate = Boolean(collection.pageTemplatePath);
 
   return (
     <div className={CONTENT_BODY}>
@@ -593,6 +605,18 @@ export function DynamicPagesView({
         ) : (
           <div className={`${SUB} tw:px-3 tw:pt-3 tw:leading-normal`}>
             No pattern set — this collection generates no pages.
+          </div>
+        )}
+        {trimmed && unknownKeys.length > 0 && (
+          <div className={`${SUB} tw:px-3 tw:pt-2 tw:leading-normal`} style={{ color: "var(--bk-warning)" }}>
+            {unknownKeys.length === 1
+              ? `This collection has no field called "${unknownKeys[0]}", so every record resolves to the same URL.`
+              : `This collection has no fields called ${unknownKeys.map((k) => `"${k}"`).join(", ")}, so every record resolves to the same URL.`}
+          </div>
+        )}
+        {trimmed && !hasTemplate && (
+          <div className={`${SUB} tw:px-3 tw:pt-2 tw:leading-normal`} style={{ color: "var(--bk-warning)" }}>
+            No template page is bound, so publishing emits none of these yet.
           </div>
         )}
       </div>

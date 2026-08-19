@@ -278,6 +278,49 @@ describe("ContentTab", () => {
     );
   });
 
+  /* Two conditions decide whether a dynamic page is ever emitted, and the
+     record count is neither. Both were read off the service, then confirmed by
+     running it against a real collection:
+
+       resolveDynamicPages(...)        -> [{ slug: "/" }]      (pattern names no field)
+       appendDynamicPagesToPublish(...) -> ["index.html"]      (no template bound)
+
+     while this screen said "Generates 1 page from published records". */
+  it("warns when the URL pattern names a field the collection does not have", async () => {
+    const { composer } = makeEngine({ collections: [MENU], items: [ITEM] });
+    render(<ContentTab composer={composer as never} />);
+    fireEvent.click(await screen.findByText("Menu items"));
+    fireEvent.click(await screen.findByText("Dynamic pages"));
+    const input = await screen.findByLabelText("URL pattern");
+    fireEvent.change(input, { target: { value: "/{slug}" } });
+    expect(
+      await screen.findByText(/no field called "slug", so every record resolves to the same URL/i),
+    ).toBeTruthy();
+    // a pattern built from a real field says nothing of the sort
+    fireEvent.change(input, { target: { value: "/menu/{name}" } });
+    await waitFor(() => expect(screen.queryByText(/no field called/i)).toBeNull());
+  });
+
+  it("says publishing emits nothing while no template page is bound", async () => {
+    const { composer } = makeEngine({ collections: [MENU], items: [ITEM] });
+    render(<ContentTab composer={composer as never} />);
+    fireEvent.click(await screen.findByText("Menu items"));
+    fireEvent.click(await screen.findByText("Dynamic pages"));
+    fireEvent.change(await screen.findByLabelText("URL pattern"), { target: { value: "/menu/{name}" } });
+    expect(await screen.findByText(/no template page is bound/i)).toBeTruthy();
+  });
+
+  it("drops the template warning once the collection carries a template path", async () => {
+    const bound = { ...MENU, pageTemplatePath: "menu/_template/index.html" } as unknown as CMSCollection;
+    const { composer } = makeEngine({ collections: [bound], items: [ITEM] });
+    render(<ContentTab composer={composer as never} />);
+    fireEvent.click(await screen.findByText("Menu items"));
+    fireEvent.click(await screen.findByText("Dynamic pages"));
+    fireEvent.change(await screen.findByLabelText("URL pattern"), { target: { value: "/menu/{name}" } });
+    await waitFor(() => expect(screen.queryByText(/no template page is bound/i)).toBeNull());
+    expect(screen.getByText(/Generates 1 page from published records/i)).toBeTruthy();
+  });
+
   it("subscribes to DataManager's own events so the Sources view cannot go stale", async () => {
     const { composer } = makeEngine({ collections: [MENU], items: [] });
     render(<ContentTab composer={composer as never} />);
