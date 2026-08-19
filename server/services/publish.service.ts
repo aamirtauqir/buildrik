@@ -16,8 +16,18 @@ import {
 } from "@/lib/vercel";
 
 export async function runPrePublishChecks(siteId: string): Promise<PrePublishChecksResult> {
-  const [pageCount, site, domain, emptyPages] = await Promise.all([
-    prisma.page.count({ where: { siteId } }),
+  const [allPages, site, domain] = await Promise.all([
+    /* Every page WITH its visibility, because these checks describe the
+       deploy and the deploy leaves non-live pages out (ExportEngine.
+       isPageLive). Counting all of them told a site with one live page and
+       one hidden that "2 pages" were ready, and warned about the hidden one
+       having no content — a warning about something that does not ship.
+       Filtered here rather than in SQL: `settings` is a JSON column and a
+       null-safe path filter is more fragile than reading a handful of rows. */
+    prisma.page.findMany({
+      where: { siteId },
+      select: { id: true, name: true, blocks: true, settings: true },
+    }),
     prisma.site.findUnique({
       where: { id: siteId },
       select: { metaTitleTemplate: true, touchIcon: true, deletedAt: true, workspaceId: true },
@@ -25,11 +35,17 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
     prisma.domain.findFirst({
       where: { siteId, status: "VERIFIED" },
     }),
-    prisma.page.findMany({
-      where: { siteId, blocks: { equals: [] } },
-      select: { id: true, name: true },
-    }),
   ]);
+
+  const isLive = (p: { settings: unknown }) => {
+    const v = (p.settings as { visibility?: string } | null)?.visibility;
+    return v === undefined || v === "live";
+  };
+  const livePages = allPages.filter(isLive);
+  const pageCount = livePages.length;
+  const emptyPages = livePages.filter(
+    (p) => Array.isArray(p.blocks) && p.blocks.length === 0
+  );
 
   const checks: PrePublishChecksResult["checks"] = [];
 
