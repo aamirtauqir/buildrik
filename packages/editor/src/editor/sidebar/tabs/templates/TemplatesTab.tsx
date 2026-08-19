@@ -614,7 +614,22 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
             if (backupCurrentPage && composer) {
               const active = composer.elements.getActivePage();
               if (active) {
-                composer.elements.duplicatePage(active.id);
+                const backup = composer.elements.duplicatePage(active.id);
+                /* Name it what the checkbox PROMISED. `duplicatePage` names its
+                   output "<name> Copy", which is also exactly what the Pages
+                   menu's Duplicate produces — so the backup was
+                   indistinguishable from an ordinary duplicate, while the hint
+                   above it said `Keeps your work as "Home (backup)"`. The
+                   suffix is numbered on collision so a second backup does not
+                   overwrite the first in the reader's eye. */
+                if (backup) {
+                  const taken = new Set(
+                    composer.elements.getAllPages().map((p) => p.name),
+                  );
+                  let name = `${active.name} (backup)`;
+                  for (let n = 2; taken.has(name); n++) name = `${active.name} (backup ${n})`;
+                  composer.elements.updatePage(backup.id, { name });
+                }
               }
             }
             startApply();
