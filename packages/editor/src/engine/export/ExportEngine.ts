@@ -95,6 +95,27 @@ function multiPageFileType(name: string): MultiPageExportFile["type"] {
 // EXPORT ENGINE CLASS
 // ============================================================================
 
+/**
+ * Per-breakpoint hide, as the media queries that actually hide something.
+ *
+ * The inspector's Visibility toggles write `--hide-<bp>: true` into an
+ * element's styles. That is an inert custom property in a browser — the
+ * publish path turns it into a media query, and the single-file export wrote
+ * the property straight into the stylesheet and nothing else, so an element
+ * hidden on mobile was fully visible on mobile in the exported file.
+ */
+const HIDE_MEDIA_QUERIES: Record<string, string> = {
+  "--hide-mobile": "(max-width:767px)",
+  "--hide-tablet": "(min-width:768px) and (max-width:1023px)",
+  "--hide-desktop": "(min-width:1024px)",
+};
+
+function hideRulesFor(selector: string, styles: Record<string, string>): string[] {
+  return Object.entries(HIDE_MEDIA_QUERIES)
+    .filter(([key]) => styles[key] === "true")
+    .map(([, query]) => `@media ${query}{${selector}{display:none!important}}`);
+}
+
 export class ExportEngine {
   private composer: Composer;
   private config: ExportConfig;
@@ -305,6 +326,11 @@ export class ExportEngine {
     if (Object.keys(styles).length > 0) {
       const styleStr = stylesToCSS(styles, config.minify);
       css += config.minify ? `${className}{${styleStr}}` : `${className} {\n${styleStr}}\n\n`;
+      // …and the breakpoint hides those styles carry, the same way the publish
+      // path emits them. Without this the file kept `--hide-mobile: true` — an
+      // inert custom property — and showed the element on every screen.
+      const hides = hideRulesFor(className, styles);
+      if (hides.length) css += hides.join(config.minify ? "" : "\n") + (config.minify ? "" : "\n\n");
     }
 
     for (const child of children) {
@@ -336,11 +362,7 @@ export class ExportEngine {
    */
   private buildPublishBaseCss(pages: PageData[], minify: boolean): string {
     const prefix = this.config.cssPrefix;
-    const HIDE_QUERIES: Record<string, string> = {
-      "--hide-mobile": "(max-width:767px)",
-      "--hide-tablet": "(min-width:768px) and (max-width:1023px)",
-      "--hide-desktop": "(min-width:1024px)",
-    };
+    const HIDE_QUERIES = HIDE_MEDIA_QUERIES;
     const baseRules: string[] = [];
     const hideRules: string[] = [];
 
@@ -355,11 +377,7 @@ export class ExportEngine {
           const styleStr = stylesToCSS(styles, minify);
           baseRules.push(minify ? `${sel}{${styleStr}}` : `${sel} {\n${styleStr}}\n`);
         }
-        for (const [key, query] of Object.entries(HIDE_QUERIES)) {
-          if (styles[key] === "true") {
-            hideRules.push(`@media ${query}{${sel}{display:none!important}}`);
-          }
-        }
+        hideRules.push(...hideRulesFor(sel, styles));
       }
       el.children?.forEach(walk);
     };
