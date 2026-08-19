@@ -485,8 +485,16 @@ export class ExportEngine {
     const headScripts = sanitizeHeadCode(customCode?.headScripts);
     if (headScripts) head += `${indent}${headScripts}${nl}`;
 
-    // Inject analytics scripts before closing head tag
-    const analyticsScripts = generateAnalyticsScripts(config.analytics);
+    // Inject analytics scripts before closing head tag.
+    //
+    // `config.analytics` is EXPORT config, and nothing has ever filled it in —
+    // the modal does not set it and the default config omits it, so this call
+    // received undefined every time. The user's tracking IDs live in project
+    // settings, written by Settings → Analytics, whose own note says they are
+    // "written into the site when you publish". They were written nowhere.
+    const analyticsConfig =
+      config.analytics ?? this.composer.getProjectSettings?.()?.analytics;
+    const analyticsScripts = generateAnalyticsScripts(analyticsConfig);
     if (analyticsScripts) {
       head += analyticsScripts + nl;
     }
@@ -746,6 +754,14 @@ export class ExportEngine {
     // wrapInDocument. Sanitised by the same allowlist as the per-page field.
     const siteHeadScripts = sanitizeHeadCode(siteCustomCode?.headScripts);
     if (siteHeadScripts) headParts.push(`  ${siteHeadScripts}`);
+
+    // …and the site's analytics, which the published page never carried: the
+    // single-file path read an export-config field nobody fills in, and this
+    // path did not look at all.
+    const publishedAnalytics = generateAnalyticsScripts(
+      this.composer.getProjectSettings?.()?.analytics
+    );
+    if (publishedAnalytics) headParts.push(publishedAnalytics);
 
     // Inject the interaction runtime only when this page uses interactions.
     const interactionScript = bodyContent.includes(INTERACTION_ATTR)
