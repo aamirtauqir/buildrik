@@ -174,7 +174,11 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
     nextjs: "Next.js",
   };
   const formatBlurb: Record<string, string> = {
-    zip: "A .zip with every page, styles inlined, media included — host it anywhere.",
+    /* The board's sentence says "styles inlined", which is true of the single
+       HTML file and not of the ZIP: that archive ships one styles.css that
+       every page links, plus an assets/ folder. The shape is the contract,
+       the sample is not — and a user who unzips this finds the stylesheet. */
+    zip: "A .zip with every page, one stylesheet and your media — host it anywhere.",
     html: "One HTML file with styles inlined — open it anywhere.",
     json: "The document tree as JSON, for tooling of your own.",
     react: "Component source you can drop into an existing React project.",
