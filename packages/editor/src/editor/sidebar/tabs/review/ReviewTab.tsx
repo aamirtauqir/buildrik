@@ -407,7 +407,14 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
           className="tw:flex-1"
           icon={<CheckCircle2 size={24} aria-hidden="true" />}
           title="No review yet"
-          body="This site hasn't been sent for review yet. Use “Send for review” in the top bar to invite a client."
+          /* Said "Use “Send for review” in the top bar", which is only true
+             inside client view — `StudioHeader` renders that control under
+             `viewMode.clientView` and nowhere else. Walked it: in normal mode
+             the top bar carries Exit, Quick preview, Comments, issues,
+             Notifications, Publish and Site menu; after Site menu → Open
+             client view, "Send for review" appears. The instruction now names
+             the door it needs. */
+          body="Open client view from the Site menu, then use “Send for review” there to invite a client."
         />
       </div>
     );

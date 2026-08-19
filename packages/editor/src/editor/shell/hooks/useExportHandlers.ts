@@ -35,8 +35,10 @@ import { captureAndUploadThumbnail } from "../captureThumbnail";
 const APPROVAL_GATE_TOASTS: Record<string, { title: string; description: string }> = {
   "no-review": {
     title: "Approval needed",
+    /* "from the top bar" — the Send-for-review control lives in client view
+       only (StudioHeader renders it under viewMode.clientView). */
     description:
-      "This site hasn't been sent for review yet. Send it for review from the top bar.",
+      "This site hasn't been sent for review yet. Open client view from the Site menu and send it from there.",
   },
   "review-pending": {
     title: "Waiting on review",

@@ -111,7 +111,12 @@ describe("load states", () => {
     fetchCurrentRound.mockResolvedValue(null);
     fetchReviewComments.mockResolvedValue([]);
     renderTab();
-    expect(await screen.findByText(/hasn't been sent for review/i)).toBeInTheDocument();
+    expect(await screen.findByText(/No review yet/i)).toBeInTheDocument();
+    /* The instruction has to name the door: "Send for review" is rendered
+       only inside client view (StudioHeader gates it on viewMode.clientView),
+       so "in the top bar" sent the user looking for a control that is not
+       there in normal editing. */
+    expect(await screen.findByText(/Open client view from the Site menu/i)).toBeInTheDocument();
   });
 
   /* Board 453:3974 — the failure is stated in red and the reassurance under
