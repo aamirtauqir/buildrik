@@ -597,10 +597,30 @@ export class ExportEngine {
     // returns the stale ctx.pages snapshot, which misses click-to-add children
     // because element mutations only touch Element instances, not page.root JSON.
     // Without this, deployed sites publish empty <div></div> bodies.
-    const pages =
+    const allPages =
       this.composer.elements.exportPages?.() ??
       this.composer.elements.getAllPages?.() ??
       [];
+
+    /* A page marked Hidden — or password-protected — was published exactly
+       like a live one. Page settings → Advanced offers "Live / Hidden /
+       Password" and tells the user to "Share this password with visitors who
+       need access"; nothing outside that panel ever read the field, so the
+       promise was never kept. One page in the database is already marked
+       hidden.
+       Static hosting cannot ask for a password, so both non-live states fail
+       CLOSED here: the page is not written. Publishing a page the user
+       believes is protected is the worse of the two mistakes. The screen says
+       so, in the same words the Redirects and Headers screens use for their
+       own not-yet-enforced settings. */
+    const isLive = (p: PageData) => {
+      const v = p.settings?.visibility;
+      return v === undefined || v === "live";
+    };
+    const livePages = allPages.filter(isLive);
+    // …unless that leaves nothing to deploy. A site with no index.html is a
+    // broken deploy, which helps nobody.
+    const pages = livePages.length > 0 ? livePages : allPages.filter((p) => p.isHome).slice(0, 1);
     const files: MultiPageExportFile[] = [];
 
     // CSS = class-based base styles FIRST, then StyleEngine breakpoint overrides.

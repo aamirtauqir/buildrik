@@ -46,6 +46,14 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
             </Button>
           ))}
         </div>
+        {s.visibility !== "live" && (
+          <HelperText className={BK_HELPER_CLASS}>
+            Not published. Hidden pages are left out of the deploy, and static
+            hosting cannot ask for a password — so a password page is left out
+            too, rather than going live unprotected. Until the published-site
+            middleware ships, this is the only way the setting can be kept.
+          </HelperText>
+        )}
         <HelperText className={BK_HELPER_CLASS}>
           {s.visibility === "live" && "Page is publicly accessible."}
           {s.visibility === "hidden" && "Page is not linked in menus but reachable via direct URL."}
