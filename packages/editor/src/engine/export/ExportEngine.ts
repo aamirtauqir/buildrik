@@ -21,6 +21,7 @@ import { generateAnalyticsScripts } from "./AnalyticsInjector";
 import { AssetBundler } from "./AssetBundler";
 import {
   RESET_CSS,
+  siteFontCSS,
   getTagForType,
   escapeHTML,
   stylesToString,
@@ -172,6 +173,18 @@ export class ExportEngine {
     if (cfg.includeResetCSS) {
       css += cfg.minify ? RESET_CSS.replace(/\s+/g, " ") : RESET_CSS;
     }
+
+    // The site's fonts, after the reset so they win over its one hardcoded
+    // family. Read from the project's own tokens — the Brand panel's three
+    // font slots reached the canvas and stopped there.
+    const tokens = this.composer.getProjectSettings?.()?.designTokens ?? [];
+    const fontValue = (id: string) => tokens.find((t) => t.id === id)?.value;
+    css += siteFontCSS({
+      heading: fontValue("font-heading"),
+      body: fontValue("font-body"),
+      mono: fontValue("font-mono"),
+      text: fontValue("color-text"),
+    });
 
     const page = this.composer.elements.getActivePage?.();
     if (!page) return css;

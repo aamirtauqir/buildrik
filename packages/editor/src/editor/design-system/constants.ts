@@ -194,7 +194,7 @@ export const DEFAULT_TOKENS: DesignToken[] = [
   {
     id: "font-heading",
     name: "Heading Font",
-    value: "Inter Tight",
+    value: "Inter",
     category: "typography",
     cssVar: "--buildrick-design-font-heading",
     type: "font-family",
@@ -202,7 +202,7 @@ export const DEFAULT_TOKENS: DesignToken[] = [
   {
     id: "font-body",
     name: "Body Font",
-    value: "Inter Tight",
+    value: "Inter",
     category: "typography",
     cssVar: "--buildrick-design-font-body",
     type: "font-family",

@@ -10,6 +10,39 @@ import { THEME } from "../../shared/constants/defaultStyles";
 // RESET CSS
 // ============================================================================
 
+/**
+ * The site's own font rules, from its three font tokens.
+ *
+ * RESET_CSS names one hardcoded family for every site ever exported. The Brand
+ * panel offers a display / body / mono slot per site and the export ignored all
+ * three, so a site whose heading font was changed published in the default one —
+ * silently, the same way animation keyframes used to be dropped from exports.
+ *
+ * The body text colour rides along for the same reason: the canvas painted it
+ * from a token and the export named none, so unstyled text was slate in the
+ * editor and browser-default black on the published page.
+ *
+ * Only emitted for slots the site actually carries; a missing token leaves the
+ * reset's family in place rather than naming an empty family.
+ */
+export function siteFontCSS(fonts: {
+  heading?: string;
+  body?: string;
+  mono?: string;
+  text?: string;
+}): string {
+  const family = (v?: string) => (v ?? "").trim().replace(/;/g, "");
+  const rules: string[] = [];
+  const body: string[] = [];
+  if (family(fonts.body)) body.push(`font-family:${family(fonts.body)},sans-serif`);
+  if (family(fonts.text)) body.push(`color:${family(fonts.text)}`);
+  if (body.length) rules.push(`body{${body.join(";")}}`);
+  if (family(fonts.heading))
+    rules.push(`h1,h2,h3,h4,h5,h6{font-family:${family(fonts.heading)},sans-serif}`);
+  if (family(fonts.mono)) rules.push(`code,pre,kbd,samp{font-family:${family(fonts.mono)},monospace}`);
+  return rules.length ? `\n${rules.join("\n")}\n` : "";
+}
+
 export const RESET_CSS = `
 *,*::before,*::after{box-sizing:border-box}
 *{margin:0;padding:0}

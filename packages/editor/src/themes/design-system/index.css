@@ -29,3 +29,8 @@
  * Do not fold this into the generated file. */
 @import "./design.css";
 
+/* The same tokens, ON the customer's page — the canvas was drawing it in the
+ * editor's chrome font, ink and 13px UI type size, which is why the Brand
+ * panel's font slots moved a variable and changed nothing on screen. */
+@import "./site-content.css";
+

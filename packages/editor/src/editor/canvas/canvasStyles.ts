@@ -58,11 +58,20 @@ export function getCanvasStyles(
   };
 }
 
+/**
+ * The div that receives customer HTML (`Canvas.tsx:608`,
+ * `dangerouslySetInnerHTML`). It used to carry two CHROME tokens inline —
+ * `--bk-font-ui` and `--bk-ink` — and inline beats every stylesheet, so the
+ * editor's own UI font and ink were what every customer site rendered in, and
+ * the Brand panel's font slots could not reach past them.
+ *
+ * The site's own defaults now come from `themes/design-system/site-content.css`,
+ * which is where site-builder DS belongs. Nothing about the customer's type
+ * belongs in this file.
+ */
 export const contentStyles: React.CSSProperties = {
   minHeight: "100%",
   padding: 20,
-  fontFamily: "var(--bk-font-ui)",
-  color: "var(--bk-ink)",
   lineHeight: 1.6,
   position: "relative",
 };

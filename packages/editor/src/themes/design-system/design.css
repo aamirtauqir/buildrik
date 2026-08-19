@@ -43,8 +43,8 @@
   --buildrick-design-color-blue-500: var(--buildrick-design-color-brand-500);
 
   /* TYPOGRAPHY (11 — user-editable) */
-  --buildrick-design-font-heading: "Inter Tight";
-  --buildrick-design-font-body: "Inter Tight";
+  --buildrick-design-font-heading: "Inter";
+  --buildrick-design-font-body: "Inter";
   --buildrick-design-font-mono: "Geist Mono";
   --buildrick-design-font-size-xs: 12px;
   --buildrick-design-font-size-sm: 14px;

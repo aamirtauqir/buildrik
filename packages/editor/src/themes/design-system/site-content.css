@@ -1,0 +1,54 @@
+/**
+ * themes/design-system/site-content.css
+ * Buildrik DS — the CUSTOMER PAGE's own defaults, on the canvas.
+ *
+ * The canvas mounts customer HTML inside the editor, and the editor's chrome
+ * was styling it: `--bk-font-ui` and `--bk-ink` written inline onto the mount
+ * div (`canvasStyles.contentStyles`), and `--bk-font-ui` + the 13px UI type
+ * size on the page root and every container (`Canvas.css`). Being on the
+ * element itself, those beat anything the site could say.
+ *
+ * Two things followed, both measured in the running editor: the Brand panel's
+ * three font slots did nothing — `--buildrick-design-font-heading` moved to
+ * Georgia and the heading stayed in the UI font — and a site was drawn at a
+ * 13px base while the published page, which carries none of this, renders at
+ * the browser's 16px. The editor showed a smaller site than it shipped.
+ *
+ * These rules live HERE, not in `editor/canvas/`, because they are site-builder
+ * DS and not chrome: `ds-grep-gates.sh` Gate 3 bans `--buildrick-design-*`
+ * consumers under `src/editor` for exactly the reason that keeps these two
+ * domains apart. Chrome may not dress in the customer's tokens; the customer's
+ * page may not be dressed in chrome's.
+ *
+ * The same values are what `ExportHelpers.siteFontCSS` publishes, so the canvas
+ * and the live site answer to one source.
+ *
+ * @license BSD-3-Clause
+ */
+
+.buildrick-canvas {
+  font-family: var(--buildrick-design-font-body), sans-serif;
+  color: var(--buildrick-design-color-text);
+}
+
+/* The page root and the containers a site is built out of. */
+.buildrick-page-root,
+[data-buildrick-type="container"] {
+  font-family: var(--buildrick-design-font-body), sans-serif;
+  font-size: var(--buildrick-design-font-size-base);
+  line-height: 1.5;
+  color: var(--buildrick-design-color-text);
+}
+
+/* Headings mount as DIVs carrying data-buildrick-type, so the tag selectors
+   are for parsed or imported HTML and the attribute selectors for what the
+   editor itself creates. Both name the same slot. */
+.buildrick-canvas :is(h1, h2, h3, h4, h5, h6),
+.buildrick-canvas [data-buildrick-type="heading"] {
+  font-family: var(--buildrick-design-font-heading), sans-serif;
+}
+
+.buildrick-canvas :is(code, pre, kbd, samp),
+.buildrick-canvas [data-buildrick-type="code"] {
+  font-family: var(--buildrick-design-font-mono), monospace;
+}

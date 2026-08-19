@@ -34,13 +34,6 @@
   color: inherit;
 }
 
-.buildrick-page-root,
-[data-buildrick-type="container"] {
-  font-family: var(--bk-font-ui);
-  font-size: var(--bk-text-13);
-  line-height: var(--bk-leading-normal);
-  color: var(--bk-ink);
-}
 
 .buildrick-canvas[data-show-outlines="true"] [data-buildrick-id] {
   outline: 1px dashed var(--bk-alpha-accent-30);
