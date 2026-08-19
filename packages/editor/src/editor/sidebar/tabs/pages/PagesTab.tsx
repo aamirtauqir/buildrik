@@ -314,7 +314,11 @@ export const PagesTab: React.FC<PagesTabProps> = ({
           setDeleteTargetId(null);
         }}
         title={`Delete "${deleteTarget?.name}"?`}
-        message="All content on this page will be permanently removed. You can undo immediately after."
+        /* "permanently removed … you can undo" contradicted itself in one
+           sentence, and this door raises no toast (only the page-tab bar
+           does), so "immediately after" pointed at a control that is not
+           there. Undo is the keyboard one — walked live. */
+        message="This page and everything on it is removed. Undo (⌘Z) brings it back."
         confirmLabel="Delete Page"
         tone="destructive"
       />
@@ -324,9 +328,15 @@ export const PagesTab: React.FC<PagesTabProps> = ({
         onClose={() => setBulkDeleteIds(null)}
         onConfirm={confirmBulkDelete}
         title={`Delete ${bulkDeleteIds?.length ?? 0} page${(bulkDeleteIds?.length ?? 0) === 1 ? "" : "s"}?`}
+        /* Said "This cannot be undone." Bulk delete is the SAME deletePage
+           call in a loop, and the loop lands in one history entry: selected
+           two pages in the running editor, deleted them, and a single ⌘Z
+           brought both back. Telling a user an action is irreversible when it
+           is not is the expensive direction to be wrong in — they stop
+           looking for the way back. */
         message={`${(bulkDeleteIds ?? [])
           .map((id) => `“${p.pages.find((pg) => pg.id === id)?.name ?? id}”`)
-          .join(", ")} will be removed from this site. This cannot be undone.`}
+          .join(", ")} are removed from this site. One undo (⌘Z) brings them all back.`}
         confirmLabel="Delete pages"
         tone="destructive"
       />
