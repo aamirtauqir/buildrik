@@ -640,7 +640,15 @@ export class ExportEngine {
     const responsiveCss =
       this.composer.styles?.generateResponsiveCSS?.({ minify: options.minify }) ??
       this.generateCSS({ ...this.config, minify: options.minify });
-    let css = [baseCss, responsiveCss].filter(Boolean).join(options.minify ? "" : "\n\n");
+    /* The site's own font rules. `generateCSS` emits these for the single file;
+       this path emitted the LINKS that fetch the families and no rule that
+       uses them, so a published page requested Verdana and rendered in
+       whatever the reset named. Found by the whole-page test, which exists to
+       catch exactly this — it was the ninth thing a publish dropped in one
+       day. */
+    const siteCss = siteFontCSS(siteFontsFromTokens(this.composer.getProjectSettings?.()?.designTokens));
+
+    let css = [baseCss, responsiveCss, siteCss].filter(Boolean).join(options.minify ? "" : "\n\n");
 
     /* …and the @keyframes those styles reference. `generateCSS` has emitted
        them since the single-file export was found shipping `animation:
