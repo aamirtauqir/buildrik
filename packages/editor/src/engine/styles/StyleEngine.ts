@@ -521,10 +521,11 @@ export class StyleEngine {
   /**
    * Generate a single style rule
    */
-  private generateStyleRule(style: StyleData, scope?: string): string {
+  private generateStyleRule(style: StyleData, scope?: string, important = false): string {
     const selector = scope ? `${scope} ${style.selector}` : style.selector;
+    const bang = important ? " !important" : "";
     const props = Object.entries(style.properties ?? {})
-      .map(([key, value]) => `  ${camelToKebab(key)}: ${value};`)
+      .map(([key, value]) => `  ${camelToKebab(key)}: ${value}${bang};`)
       .join("\n");
 
     return `${selector} {\n${props}\n}`;
@@ -657,7 +658,14 @@ export class StyleEngine {
       const query = getBreakpointQuery(bp);
       if (!query) continue;
       this.styles.forEach((style) => {
-        if (style.mediaQuery === query) out.push(this.generateStyleRule(style));
+        // !important, because the canvas renders an element's BASE styles
+        // inline and inline beats any stylesheet. The publish path solved the
+        // same collision by emitting base styles as class rules instead
+        // ("Inline base styles … shadowed breakpoint overrides"); the canvas
+        // still inlines them, so this block — which exists to make the
+        // override visible — lost to them. Measured: a heading set to 22px on
+        // Mobile, this rule present in the sheet, and the canvas drawing 48px.
+        if (style.mediaQuery === query) out.push(this.generateStyleRule(style, undefined, true));
       });
     }
     if (out.length === 0) return "";

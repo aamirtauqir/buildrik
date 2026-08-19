@@ -1094,6 +1094,33 @@ describe("StyleEngine editor device preview", () => {
     expect(preview).toContain("font-size: 28px");
   });
 
+  /* …and the re-emitted rules have to BEAT the base ones. The canvas renders
+     an element's base styles inline, and inline beats any stylesheet, so the
+     block above was in the sheet and the canvas still drew the desktop value —
+     measured live 2026-08-19: heading set to 22px on Mobile, the rule present,
+     the canvas at 48px. The publish path avoids the collision by emitting base
+     styles as class rules; the canvas does not, so these carry !important. */
+  it("tablet: the re-emitted rule outranks the inline base style", () => {
+    engine.setBreakpointStyle("el-1", "tablet", { "font-size": "28px" });
+    (composer as unknown as { viewport: { setDeviceForTest: (d: string) => void } }).viewport.setDeviceForTest("tablet");
+    composer.emit(EVENTS.BREAKPOINT_CHANGED, "tablet");
+    engine.flush();
+
+    const preview = sheet().split("editor device preview")[1];
+    expect(preview).toContain("font-size: 28px !important");
+  });
+
+  it("the exported CSS keeps its media queries and stays !important-free", () => {
+    engine.setBreakpointStyle("el-1", "tablet", { "font-size": "28px" });
+    (composer as unknown as { viewport: { setDeviceForTest: (d: string) => void } }).viewport.setDeviceForTest("tablet");
+    composer.emit(EVENTS.BREAKPOINT_CHANGED, "tablet");
+
+    const exported = engine.generateResponsiveCSS();
+    expect(exported).toContain("@media (max-width: 1023px)");
+    expect(exported).not.toContain("!important");
+    expect(exported).not.toContain("editor device preview");
+  });
+
   it("mobile: desktop-first cascade — tablet rules first, then mobile", () => {
     engine.setBreakpointStyle("el-1", "tablet", { "font-size": "28px" });
     engine.setBreakpointStyle("el-1", "mobile", { "font-size": "20px" });

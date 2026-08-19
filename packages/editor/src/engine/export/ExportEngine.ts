@@ -33,6 +33,7 @@ import {
 } from "./ExportHelpers";
 import { FormspreeInjector } from "./FormspreeInjector";
 import { SEOInjector } from "./SEOInjector";
+import { sanitizeHeadCode } from "./sanitizeHeadCode";
 import { SitemapGenerator } from "./SitemapGenerator";
 import { ReactExporter } from "./ReactExporter";
 import { generateStripeScripts } from "./StripeInjector";
@@ -221,6 +222,15 @@ export class ExportEngine {
 
     const styles = this.extractStyles(rootElement, cfg);
     css += styles;
+
+    // The breakpoint overrides. `extractStyles` walks base styles only, so a
+    // site styled for phones exported with its desktop rules and nothing else —
+    // the mobile layout simply was not in the file. The publish path has always
+    // appended these, and the order is the same for the same reason: base and
+    // breakpoint rules share specificity, so the @media has to come later to
+    // win at its viewport.
+    const responsive = this.composer.styles?.generateResponsiveCSS?.({ minify: cfg.minify }) ?? "";
+    if (responsive) css += (cfg.minify ? "" : "\n") + responsive;
 
     // Emit @keyframes for any bd-anim-* animation referenced in the styles.
     // Element animations write `animation: bd-anim-<name> …` but the exported
@@ -428,6 +438,13 @@ export class ExportEngine {
         const key = tag.name ? `name="${tag.name}"` : `property="${tag.property}"`;
         head += `${indent}<meta ${key} content="${escapeHTML(tag.content)}">${nl}`;
       }
+
+      // The page's own head code. Published pages get it; this file did not,
+      // so the "runs on every page load" promise held for one export format
+      // and not the other. Sanitised by the same allowlist the publish path
+      // uses — inline scripts and event handlers do not survive it.
+      const customHead = sanitizeHeadCode(seoPage.settings?.head);
+      if (customHead) head += `${indent}${customHead}${nl}`;
     }
 
     // The families the page names have to be fetched, or the visitor gets the
