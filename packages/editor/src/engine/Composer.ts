@@ -33,6 +33,8 @@ import { DragManager } from "./drag/DragManager";
 import { ElementManager } from "./elements/ElementManager";
 import { EventEmitter } from "./EventEmitter";
 import { RESET_CSS, siteFontCSS, googleFontsHeadLinks, siteFontsFromTokens } from "./export/ExportHelpers";
+import { resolvePageTitle } from "./export/SEOInjector";
+import { escapeHTML } from "../shared/utils/html/encoding";
 import { FontManager } from "./fonts/FontManager";
 import { FormHandler } from "./forms/FormHandler";
 import { HistoryManager } from "./HistoryManager";
@@ -572,6 +574,18 @@ export class Composer extends EventEmitter {
       [fonts.heading, fonts.body, fonts.mono].filter((f): f is string => Boolean(f))
     );
 
+    // The THIRD head this codebase assembles, after the single-file export and
+    // the publish pipeline — and the one behind Quick preview, the preview
+    // modal, the client view and the "copy page HTML" command. Both of the
+    // others were taught to resolve the page's own title today; this one still
+    // stamped the literal "Buildrick Export" on every page, so the preview tab
+    // and any HTML the user copied out carried our brand name as their title.
+    // One precedence, all three paths.
+    const titlePage = this.elements.getActivePage?.();
+    const title = titlePage
+      ? resolvePageTitle(titlePage, titlePage.settings?.seo, titlePage.settings)
+      : "Untitled";
+
     return {
       html,
       css,
@@ -580,7 +594,7 @@ export class Composer extends EventEmitter {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Buildrick Export</title>
+  <title>${escapeHTML(title)}</title>
 ${fontLinks ? `${fontLinks}\n` : ""}  <style>${RESET_CSS}${css}${siteCss}</style>
 </head>
 <body>
