@@ -172,6 +172,11 @@ export class ExportEngine {
    */
   generateHTML(config?: Partial<ExportConfig>): string {
     const cfg = { ...this.config, ...config };
+    // Internal links resolve against the names every export path writes, so
+    // the map has to exist here too — not only in the multi-page pipeline.
+    this.buildPageHrefs(
+      this.composer.elements.exportPages?.() ?? this.composer.elements.getAllPages?.() ?? []
+    );
     const page = this.composer.elements.getActivePage?.();
     if (!page) return this.wrapInDocument("", cfg);
 
@@ -592,17 +597,7 @@ export class ExportEngine {
       syntax: options.cmsSyntax,
     };
 
-    // A slug is a path, and "/about" is what a person types for one —
-    // `normalizeSlug` keeps that leading slash and `validateSlug` allows it, so
-    // the file came out named "/about.html": a malformed entry in the ZIP and a
-    // leading-slash `path` in the publish payload. Strip it here rather than
-    // rewriting anyone's stored slug.
-    this.pageHrefs = new Map(
-      pages.map((p) => {
-        const slug = (p.slug ?? "").replace(/^\/+/, "");
-        return [p.id, p.isHome || !slug ? "index.html" : `${slug}.html`];
-      }),
-    );
+    this.buildPageHrefs(pages);
 
     // Export each page
     for (const page of pages) {
@@ -660,6 +655,30 @@ export class ExportEngine {
    * An unresolvable id — a page deleted after the link was made — falls back
    * to the home page rather than shipping the raw scheme.
    */
+  /**
+   * The filename each page will be written as, keyed by page id.
+   *
+   * A slug is a path, and "/about" is what a person types for one —
+   * `normalizeSlug` keeps that leading slash and `validateSlug` allows it, so
+   * the file came out named "/about.html": a malformed entry in the ZIP and a
+   * leading-slash `path` in the publish payload. Stripped here rather than by
+   * rewriting anyone's stored slug.
+   *
+   * Built for the single-file export too. It never built one, so `resolveHref`
+   * fell through to its "page deleted" fallback for EVERY link: a link to the
+   * About page came out as `href="index.html"` — pointing the visitor back at
+   * the page they were already on, which reads as broken navigation rather
+   * than a missing file.
+   */
+  private buildPageHrefs(pages: PageData[]): void {
+    this.pageHrefs = new Map(
+      pages.map((p) => {
+        const slug = (p.slug ?? "").replace(/^\/+/, "");
+        return [p.id, p.isHome || !slug ? "index.html" : `${slug}.html`];
+      }),
+    );
+  }
+
   private resolveHref(href: string): string {
     if (!href.startsWith("#page:")) return href;
     return this.pageHrefs.get(href.slice("#page:".length)) ?? "index.html";
