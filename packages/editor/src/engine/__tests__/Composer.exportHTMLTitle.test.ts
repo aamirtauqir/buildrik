@@ -16,13 +16,12 @@ import { describe, it, expect } from "vitest";
 import { Composer } from "../Composer";
 
 function composerWithPage(page: unknown): Composer {
-  const c = Object.create(Composer.prototype) as Composer & Record<string, unknown>;
-  c.elements = {
-    toHTML: () => "<div>hi</div>",
-    getActivePage: () => page,
-  } as never;
-  c.styles = { toCSS: () => "" } as never;
-  c.getProjectSettings = () => ({}) as never;
+  const c = Object.create(Composer.prototype) as Composer;
+  Object.assign(c, {
+    elements: { toHTML: () => "<div>hi</div>", getActivePage: () => page },
+    styles: { toCSS: () => "" },
+    getProjectSettings: () => ({}),
+  });
   return c;
 }
 
