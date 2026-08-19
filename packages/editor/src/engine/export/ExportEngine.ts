@@ -628,7 +628,15 @@ export class ExportEngine {
     const responsiveCss =
       this.composer.styles?.generateResponsiveCSS?.({ minify: options.minify }) ??
       this.generateCSS({ ...this.config, minify: options.minify });
-    const css = [baseCss, responsiveCss].filter(Boolean).join(options.minify ? "" : "\n\n");
+    let css = [baseCss, responsiveCss].filter(Boolean).join(options.minify ? "" : "\n\n");
+
+    /* …and the @keyframes those styles reference. `generateCSS` has emitted
+       them since the single-file export was found shipping `animation:
+       bd-anim-fadeIn` with no keyframe behind it; this path never did, so the
+       animation worked in a downloaded file and silently no-opped on the
+       PUBLISHED site — the direction that actually reaches visitors. */
+    const publishKeyframes = collectUsedKeyframes(css);
+    if (publishKeyframes) css += (options.minify ? "" : "\n") + publishKeyframes;
 
     // CMS export options
     const cmsOptions: CMSExportOptions = {
