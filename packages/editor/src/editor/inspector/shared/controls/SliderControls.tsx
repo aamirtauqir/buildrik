@@ -38,34 +38,42 @@ export const SliderInput: React.FC<SliderInputProps> = ({
   max = 100,
   step = 1,
   unit = "",
-}) => (
-  <div className="bdi-row-ctrl">
-    <label className="bdi-lb">{label}</label>
-    <div className="bdi-row-content">
-      <TextInput
-        type="range"
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
-        min={min}
-        max={max}
-        step={step}
-        style={sliderStyle}
-      />
-      <span
-        style={{
-          font: "500 11px var(--bk-font-ui)",
-          color: "var(--bk-ink-muted)",
-          minWidth: 32,
-          textAlign: "right",
-          fontVariantNumeric: "tabular-nums",
-        }}
-      >
-        {value}
-        {unit}
-      </span>
+}) => {
+  /* The row printed its label and never tied it to the control, so every
+     slider in the inspector announced itself as an unnamed "slider" — 8 of
+     them, measured in the running editor. `htmlFor` also makes the visible
+     label a click target, which a bare <label> never was. */
+  const id = React.useId();
+  return (
+    <div className="bdi-row-ctrl">
+      <label className="bdi-lb" htmlFor={id}>{label}</label>
+      <div className="bdi-row-content">
+        <TextInput
+          id={id}
+          type="range"
+          value={value}
+          onChange={(e) => onChange(Number(e.target.value))}
+          min={min}
+          max={max}
+          step={step}
+          style={sliderStyle}
+        />
+        <span
+          style={{
+            font: "500 11px var(--bk-font-ui)",
+            color: "var(--bk-ink-muted)",
+            minWidth: 32,
+            textAlign: "right",
+            fontVariantNumeric: "tabular-nums",
+          }}
+        >
+          {value}
+          {unit}
+        </span>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 // ============================================================================
 // RANGE SLIDER
@@ -91,31 +99,39 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
   max = 100,
   step = 1,
   unit = "",
-}) => (
-  <div className="bdi-row-ctrl">
-    <label className="bdi-lb">{label}</label>
-    <div className="bdi-row-content">
-      <TextInput
-        type="range"
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
-        style={sliderStyle}
-      />
-      <span
-        style={{
-          font: "500 11px var(--bk-font-ui)",
-          color: "var(--bk-ink-muted)",
-          minWidth: 32,
-          textAlign: "right",
-          fontVariantNumeric: "tabular-nums",
-        }}
-      >
-        {value}
-        {unit}
-      </span>
+}) => {
+  /* The row printed its label and never tied it to the control, so every
+     slider in the inspector announced itself as an unnamed "slider" — 8 of
+     them, measured in the running editor. `htmlFor` also makes the visible
+     label a click target, which a bare <label> never was. */
+  const id = React.useId();
+  return (
+    <div className="bdi-row-ctrl">
+      <label className="bdi-lb" htmlFor={id}>{label}</label>
+      <div className="bdi-row-content">
+        <TextInput
+          id={id}
+          type="range"
+          value={value}
+          onChange={(e) => onChange(Number(e.target.value))}
+          min={min}
+          max={max}
+          step={step}
+          style={sliderStyle}
+        />
+        <span
+          style={{
+            font: "500 11px var(--bk-font-ui)",
+            color: "var(--bk-ink-muted)",
+            minWidth: 32,
+            textAlign: "right",
+            fontVariantNumeric: "tabular-nums",
+          }}
+        >
+          {value}
+          {unit}
+        </span>
+      </div>
     </div>
-  </div>
-);
+  );
+};

@@ -25,20 +25,27 @@ export const TextInputRow: React.FC<TextInputRowProps> = ({
   value,
   onChange,
   placeholder = "0px",
-}) => (
-  <div className="bdi-row-ctrl">
-    <label className="bdi-lb">{label}</label>
-    <div className="bdi-row-content">
-      <TextField
-        type="text"
-        className="bdi-text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-      />
+}) => {
+  /* Same gap as the sliders: a printed label that was never tied to the
+     field, so the only accessible name these rows had was their placeholder —
+     the custom box-shadow row announced itself as "0 4px 6px rgba(0,0,0,0.1)". */
+  const id = React.useId();
+  return (
+    <div className="bdi-row-ctrl">
+      <label className="bdi-lb" htmlFor={id}>{label}</label>
+      <div className="bdi-row-content">
+        <TextField
+          id={id}
+          type="text"
+          className="bdi-text"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+        />
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 // ============================================================================
 // INLINE INPUT (same as TextInputRow — kept for API parity)
@@ -57,20 +64,27 @@ export const InlineInput: React.FC<InlineInputProps> = ({
   value,
   onChange,
   placeholder = "auto",
-}) => (
-  <div className="bdi-row-ctrl">
-    <label className="bdi-lb">{label}</label>
-    <div className="bdi-row-content">
-      <TextField
-        type="text"
-        className="bdi-text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-      />
+}) => {
+  /* Same gap as the sliders: a printed label that was never tied to the
+     field, so the only accessible name these rows had was their placeholder —
+     the custom box-shadow row announced itself as "0 4px 6px rgba(0,0,0,0.1)". */
+  const id = React.useId();
+  return (
+    <div className="bdi-row-ctrl">
+      <label className="bdi-lb" htmlFor={id}>{label}</label>
+      <div className="bdi-row-content">
+        <TextField
+          id={id}
+          type="text"
+          className="bdi-text"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+        />
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 // ============================================================================
 // SECTION LABEL (inline block label)

@@ -219,8 +219,12 @@ export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange
         />
 
         {/* Custom Shadow */}
+        {/* The presets above carry their own names; this field had none, so
+            its only accessible name was the placeholder — it announced itself
+            as "0 4px 6px rgba(0,0,0,0.1)". */}
         <InputField
           type="text"
+          aria-label="Custom box shadow"
           value={styles["box-shadow"] || ""}
           onChange={(e) => onChange("box-shadow", e.target.value)}
           placeholder="0 4px 6px rgba(0,0,0,0.1)"
@@ -246,9 +250,10 @@ export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange
           }}
         />
 
-        {/* Custom Inner Shadow */}
+        {/* Custom Inner Shadow — named for the same reason as the outer one. */}
         <InputField
           type="text"
+          aria-label="Custom inner shadow"
           value={extractInnerShadow(styles["box-shadow"])}
           onChange={(e) => {
             const current = styles["box-shadow"] || "";

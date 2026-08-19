@@ -339,34 +339,41 @@ export const SelectRow: React.FC<SelectRowProps> = ({
   isOverridden,
   helperText,
   placeholder = "Default",
-}) => (
-  <div className="bdi-row-ctrl">
-    <label className="bdi-lb">
-      {label}
-      {isOverridden && <OverrideDot />}
-      {helperText && <HelperIcon text={helperText} />}
-    </label>
-    <div className="bdi-row-content">
-      <div className="bdi-ddn">
-        <Select
-          className="bdi-v"
-          theme={BK_SELECT_BARE_VALUE_THEME}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-        >
-          <option value="">{placeholder}</option>
-          {options.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </Select>
-        <span className="bdi-c" aria-hidden="true">
-          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M6 9l6 6 6-6" />
-          </svg>
-        </span>
+}) => {
+  /* The label sat beside the <select> with nothing tying them together, so
+     six selects in the inspector announced no name at all — a screen reader
+     read the option list and never what it was choosing. */
+  const id = React.useId();
+  return (
+    <div className="bdi-row-ctrl">
+      <label className="bdi-lb" htmlFor={id}>
+        {label}
+        {isOverridden && <OverrideDot />}
+        {helperText && <HelperIcon text={helperText} />}
+      </label>
+      <div className="bdi-row-content">
+        <div className="bdi-ddn">
+          <Select
+            id={id}
+            className="bdi-v"
+            theme={BK_SELECT_BARE_VALUE_THEME}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+          >
+            <option value="">{placeholder}</option>
+            {options.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </Select>
+          <span className="bdi-c" aria-hidden="true">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </span>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
