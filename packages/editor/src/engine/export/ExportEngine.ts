@@ -396,6 +396,22 @@ export class ExportEngine {
       head += `${indent}<meta name="description" content="${escapeHTML(config.metaDescription)}">${nl}`;
     }
 
+    // The page's own SEO. This document carried a title and — only if the
+    // Options tab had one typed into it — a description, and nothing else:
+    // the description, Open Graph and Twitter tags a user fills in under Page
+    // settings reached the ZIP (which runs the multi-page pipeline) and were
+    // dropped from the single HTML file, from the same modal, one format over.
+    // A description typed in Options still wins over the page's.
+    const seoPage = this.composer.elements.getActivePage?.();
+    if (seoPage) {
+      const siteSEO = this.composer.getProjectSettings?.()?.seo;
+      for (const tag of this.seoInjector.getMetaTags(seoPage, siteSEO)) {
+        if (tag.name === "description" && config.metaDescription) continue;
+        const key = tag.name ? `name="${tag.name}"` : `property="${tag.property}"`;
+        head += `${indent}<meta ${key} content="${escapeHTML(tag.content)}">${nl}`;
+      }
+    }
+
     // The families the page names have to be fetched, or the visitor gets the
     // generic fallback while the editor showed the real face.
     const fontLinks = googleFontsHeadLinks(css ?? "", this.siteFontFamilies());
