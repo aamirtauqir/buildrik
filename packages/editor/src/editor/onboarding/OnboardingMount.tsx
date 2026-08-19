@@ -99,7 +99,13 @@ export const OnboardingMount: React.FC<OnboardingMountProps> = ({ composer }) =>
           composer.emit(EVENTS.UI_TOGGLE_PREVIEW, {});
           break;
         case "trigger-publish":
-          composer.emit(EVENTS.UI_PANEL_OPEN, { panel: "settings" });
+          /* Opened Settings, which has no publish anything — General,
+             Branding, SEO, Export, Domains, Analytics, Localization, Custom
+             code, Redirects, Headers, Forms, Integrations, Webhooks. The
+             Publish panel is a real left tab (Site menu opens it by that
+             name); it was unreachable through this event only because the
+             listener's allowlist had drifted. */
+          composer.emit(EVENTS.UI_PANEL_OPEN, { panel: "publish" });
           break;
         default:
           break;

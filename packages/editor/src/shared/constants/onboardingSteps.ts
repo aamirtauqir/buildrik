@@ -84,8 +84,13 @@ export const DEFAULT_ONBOARDING_STEPS: OnboardingStep[] = [
   {
     id: "publish",
     label: "Publish your site",
+    /* Was "Hit Publish to make your site live. Your site gets a free URL
+       instantly." Sites deploy into the WORKSPACE'S OWN Vercel account —
+       `runPrePublishChecks` hard-fails with "Sites deploy to your own Vercel
+       account. Connect it to publish." — so the first publish cannot happen
+       until that connection exists, and no URL is handed out by us. */
     description:
-      "Hit Publish to make your site live. Your site gets a free URL instantly.",
+      "Connect your Vercel account once, then Publish deploys the site there and gives you its URL.",
     actionLabel: "Publish now",
     actionKey: "trigger-publish",
     completed: false,

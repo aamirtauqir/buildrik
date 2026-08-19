@@ -24,6 +24,7 @@
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import { EVENTS } from "../../../shared/constants/events";
+import { GROUPED_TABS_CONFIG } from "../../rail/tabsConfig";
 import type { UseStudioModalsReturn } from "./useStudioModals";
 
 // Subset of useStudioState setters we touch — keeps the dep list tight.
@@ -130,11 +131,19 @@ export function useEditorEventListeners({
   // Allowlist on panel id — SmartSuggestions historically emitted inspector
   // subpanel ids (layout/style/typography/size) here, which opened a blank
   // drawer because none are real left tabs. Unknown ids no-op.
+  /* Was a hand-written list, and it had drifted: `publish`, `review`,
+     `content`, `components` and `ai` are all real left tabs TabRouter renders
+     and AquibraStudio opens by name — and every one of them was dropped here.
+     The ⌘K palette builds a "Open <X> panel" command for each tab that has a
+     shortcut and emits UI_PANEL_OPEN with its id, so four of those commands
+     (Publish ⌘K·U, Review R, Content D, AI I) did nothing at all when chosen.
+     tabsConfig's own comment claims Content is "reachable via ⌘K", which it
+     was not. One source: the tab registry decides what is a tab.
+
+     It also listed `home`, `build` and `media`, which are not tabs and are
+     emitted by nothing. */
   const VALID_LEFT_TABS = React.useMemo(
-    () => new Set([
-      "home", "add", "design", "templates", "pages", "build",
-      "media", "assets", "settings", "history", "layers",
-    ]),
+    () => new Set<string>(GROUPED_TABS_CONFIG.map((t) => t.id)),
     [],
   );
   const { openLeftPanelToTab } = state;
