@@ -127,3 +127,48 @@ describe("the published page carries everything the user set", () => {
     expect(names).not.toContain("secret.html");
   });
 });
+
+
+/**
+ * The same page, downloaded instead of published. Six of the nine gaps found
+ * today were in this direction — the single file lagging what publish had —
+ * and one was the reverse. Asking both for the same list is what keeps them
+ * from drifting apart again.
+ */
+describe("the downloaded file carries the same things", () => {
+  let html = "";
+  let css = "";
+
+  beforeAll(() => {
+    const engine = new ExportEngine(fullSite());
+    html = engine.generateHTML();
+    css = engine.generateCSS();
+  });
+
+  it("the page's own title and SEO", () => {
+    expect(html).toContain("<title>Their Title</title>");
+    expect(html).toContain('content="Their description."');
+    expect(html).toContain('name="robots" content="noindex"');
+  });
+
+  it("both kinds of custom code, and the analytics", () => {
+    expect(html).toContain("from-page-head");
+    expect(html).toContain("plausible.io/js/script.js");
+    expect(html).toContain("G-FULLSITE");
+  });
+
+  it("the fonts and the request that fetches them", () => {
+    expect(css).toMatch(/body\{[^}]*font-family:Verdana,sans-serif/);
+    expect(html).toContain("family=Poppins");
+  });
+
+  it("the hide, the breakpoint styles and the keyframes", () => {
+    expect(css).toContain("display:none!important");
+    expect(css).toMatch(/@media[^{]*\{[^}]*font-size/);
+    expect(css).toContain("@keyframes bd-anim-fadeIn");
+  });
+
+  it("an internal link that names the other page", () => {
+    expect(html).toContain('href="about.html"');
+  });
+});
