@@ -51,7 +51,7 @@ import {
   generateColorCssVar,
 } from "../utils/exportUtils";
 import type { ExportFormat } from "../utils/exportUtils";
-import { DesignTabFooter } from "./DesignTabFooter";
+import { APPLY_CHANGES_LABEL, DesignTabFooter } from "./DesignTabFooter";
 import { DraftChip } from "./DraftChip";
 import { DSModeToggle } from "./DSModeToggle";
 import { useDSModeOptional } from "../state/DSModeContext";
@@ -732,7 +732,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
             <div className="tw:mx-2.5 tw:mt-2.5 tw:px-3 tw:py-2 tw:rounded-lg tw:border tw:border-[var(--bk-accent-tint)] tw:bg-[var(--bk-accent-tint)]">
               <span className="tw:text-xs tw:leading-relaxed tw:text-gray-900">
                 These are your site's default design tokens. Customize them and click{" "}
-                <strong>Review &amp; Apply</strong> to go live.
+                <strong>{APPLY_CHANGES_LABEL}</strong> to go live.
               </span>
             </div>
           )}

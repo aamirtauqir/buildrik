@@ -6,6 +6,14 @@
 import * as React from "react";
 import { Button } from "@/editor/chrome-ui";
 
+/* The footer's primary action, named once. The first-load hint in
+   DesignSystemTab used to tell people to click "Review & Apply" — the name
+   this button had before it was renamed — so the instruction pointed at a
+   control that does not exist. (The prop is still `onReview`, and four
+   comments around the design-system state still say "Review & Apply", which
+   is how the rename is visible in the source.) */
+export const APPLY_CHANGES_LABEL = "Apply Changes";
+
 export interface FooterProps {
   isDirty: boolean;
   dirtyCount: number;
@@ -48,7 +56,7 @@ export const DesignTabFooter: React.FC<FooterProps> = ({
       onClick={onReview}
       disabled={!isDirty}
     >
-      Apply Changes
+      {APPLY_CHANGES_LABEL}
     </Button>
   </div>
 );
