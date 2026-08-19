@@ -38,6 +38,7 @@ interface ComposerHarness {
   };
   created: Array<{ type: string; options: Record<string, unknown> | undefined }>;
   addCalls: Array<{ el: unknown; parentId: string; dropIndex?: number }>;
+  emit: ReturnType<typeof vi.fn>;
 }
 
 function makeComposer(
@@ -69,7 +70,17 @@ function makeComposer(
     }),
   };
 
-  return { composer: { elements } as unknown as Composer, elements, created, addCalls };
+  /* insertBlock announces every successful insert (ELEMENT_INSERTED) — the
+     four insert doors all come through it and two of its three branches used
+     to emit nothing. A harness without `emit` is not a Composer. */
+  const emit = vi.fn();
+  return {
+    composer: { elements, emit } as unknown as Composer,
+    elements,
+    created,
+    addCalls,
+    emit,
+  };
 }
 
 // Synthetic block definitions — full control over each branch.
@@ -271,4 +282,55 @@ describe("blockDefinitions — registry integrity", () => {
   it.todo(
     "AUDIT (known): register contactFormBlockConfig in blockDefinitions or delete the orphan export"
   );
+});
+
+/* The four insert doors — Insert-panel click, canvas drop, block picker and
+   the studio handler — all call insertBlock, and only the elementType branch
+   announced anything (createElement's own ELEMENT_CREATED). The `build` and
+   HTML branches, which is what most catalog rows use, emitted nothing: an
+   element appeared on the canvas and no event said so. Measured in the running
+   editor first — clicking "Heading" in the Insert panel produced
+   transaction:begin, element:selected, transaction:end, project:changed,
+   history:recorded, and no creation event of any kind. */
+describe("insertBlock — announces the insert", () => {
+  it("emits element:inserted with the new id for the HTML branch", () => {
+    const h = makeComposer({ insertReturn: [{ getId: () => "el-html" }] });
+    const id = insertBlock(h.composer, htmlBlock, "parent-1");
+    expect(id).toBe("el-html");
+    expect(h.emit).toHaveBeenCalledWith("element:inserted", {
+      elementId: "el-html",
+      blockId: "x-html",
+    });
+  });
+
+  it("emits for the build branch, which announced nothing at all before", () => {
+    const h = makeComposer();
+    const built: BlockDefinition = {
+      id: "x-built",
+      label: "X Built",
+      elementType: "container",
+      build: () => "el-built",
+    };
+    expect(insertBlock(h.composer, built, "parent-1")).toBe("el-built");
+    expect(h.emit).toHaveBeenCalledWith("element:inserted", {
+      elementId: "el-built",
+      blockId: "x-built",
+    });
+  });
+
+  it("emits for the elementType branch too", () => {
+    const h = makeComposer();
+    insertBlock(h.composer, plainBlock, "parent-1");
+    expect(h.emit).toHaveBeenCalledWith("element:inserted", {
+      elementId: "el-1",
+      blockId: "x-plain",
+    });
+  });
+
+  it("says nothing when the insert never happened", () => {
+    const h = makeComposer({ parentExists: false });
+    expect(insertBlock(h.composer, plainBlock, "missing")).toBeUndefined();
+    expect(h.emit).not.toHaveBeenCalled();
+  });
+
 });

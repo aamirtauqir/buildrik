@@ -35,6 +35,53 @@ export const OnboardingMount: React.FC<OnboardingMountProps> = ({ composer }) =>
     };
   }, [composer]);
 
+  /* The checklist only ever completed a step when the user pressed that
+     step's own CTA — and two of the seven steps ("Edit text", "Style an
+     element") have no CTA at all, so they could never be ticked and the
+     counter could never reach 7 of 7. The achievement prompt's "You're all
+     set!" branch was unreachable for the same reason. These three steps now
+     complete when the user DOES the thing, which is what a checklist claims
+     to track; the rest keep their CTA, which works.
+
+     Suppressed during a project load: importing a site creates elements and
+     styles by the hundred, and crediting the user for the loader's work is
+     the same lie in the other direction. */
+  const STEP_SIGNALS: ReadonlyArray<{ id: string; event: string }> = React.useMemo(
+    () => [
+      { id: "add-element", event: EVENTS.ELEMENT_INSERTED },
+      { id: "edit-text", event: EVENTS.ELEMENT_EDIT_INLINE },
+      { id: "change-style", event: EVENTS.STYLE_CHANGED },
+    ],
+    []
+  );
+
+  const loadingRef = React.useRef(false);
+  const completeRef = React.useRef(o.completeStep);
+  completeRef.current = o.completeStep;
+
+  React.useEffect(() => {
+    if (!composer) return;
+    // `importProject` emits PROJECT_LOADED twice: `{ importing: true }` before
+    // it clears state, and the plain project data once the tree is back.
+    const onLoad = (payload: unknown) => {
+      loadingRef.current = Boolean((payload as { importing?: boolean } | undefined)?.importing);
+    };
+    composer.on(EVENTS.PROJECT_LOADED, onLoad);
+
+    const offs = STEP_SIGNALS.map(({ id, event }) => {
+      const handler = () => {
+        if (!loadingRef.current) completeRef.current(id);
+      };
+      composer.on(event, handler);
+      return () => composer.off(event, handler);
+    });
+
+    return () => {
+      composer.off(EVENTS.PROJECT_LOADED, onLoad);
+      offs.forEach((off) => off());
+    };
+  }, [composer, STEP_SIGNALS]);
+
   const handleAction = React.useCallback(
     (actionKey: string) => {
       if (!composer) return;

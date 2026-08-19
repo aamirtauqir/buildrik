@@ -7,6 +7,7 @@ import type { Composer } from "../engine";
 import type { ElementType } from "../shared/types";
 import { sanitizeHTML } from "../shared/utils/html";
 import { canNestElement } from "../shared/utils/nesting";
+import { EVENTS } from "../shared/constants";
 import {
   containerBlockConfig,
   textBlockConfig,
@@ -225,6 +226,7 @@ export function insertBlock(
   parentId: string,
   dropIndex?: number
 ): string | undefined {
+  let inserted: string | undefined;
   try {
     // Validate parent element exists
     const parent = composer.elements.getElement(parentId);
@@ -238,36 +240,52 @@ export function insertBlock(
       return undefined;
     }
 
-    // If block has a build function, use it (returns element ID for auto-selection)
-    if (block.build) {
-      const builtElementId = block.build(composer, parentId, dropIndex);
-      return builtElementId;
-    }
-
-    // If content is HTML, sanitize and insert it
-    if (typeof block.content === "string" && HTML_CONTENT_PATTERN.test(block.content)) {
-      // Defense-in-depth: sanitize HTML to remove dangerous attributes (onclick, etc.)
-      const safeContent = sanitizeHTML(block.content);
-      const insertedElements = composer.elements.insertHTMLToElement(
-        parentId,
-        safeContent,
-        dropIndex
-      );
-      // Return first inserted element's ID if available
-      if (Array.isArray(insertedElements) && insertedElements.length > 0) {
-        return insertedElements[0]?.getId?.() ?? undefined;
-      }
-      return undefined;
-    }
-
-    // Default: create element from type and add to parent
-    const element = composer.elements.createElement(block.elementType, {
-      content: typeof block.content === "string" ? block.content : undefined,
-    });
-
-    composer.elements.addElement(element, parentId, dropIndex);
-    return element.getId();
+    /* One exit, because all four insert doors — the Insert panel click, a
+       drag onto the canvas, the block picker and the studio handler — come
+       through here, and only ONE of the three branches below announced
+       anything: `createElement` emits ELEMENT_CREATED, while the `build` and
+       HTML branches (which is what most catalog rows use) emitted nothing at
+       all. Anything downstream that wants to know an element was inserted had
+       no event to listen for. */
+    inserted = insertOne(composer, block, parentId, dropIndex);
   } catch {
     return undefined;
   }
+
+  /* Announced outside the try, where "the element is in the tree" is already
+     decided — the catch above is for a failed insert, not for the telling. */
+  if (inserted) {
+    composer.emit(EVENTS.ELEMENT_INSERTED, { elementId: inserted, blockId: block.id });
+  }
+  return inserted;
+}
+
+/** The three shapes a block can take. Split out so `insertBlock` has one exit. */
+function insertOne(
+  composer: Composer,
+  block: BlockDefinition,
+  parentId: string,
+  dropIndex?: number
+): string | undefined {
+  // A build function owns its own construction and returns the new id.
+  if (block.build) return block.build(composer, parentId, dropIndex) ?? undefined;
+
+  // HTML content: sanitized at this boundary before it reaches the tree.
+  if (typeof block.content === "string" && HTML_CONTENT_PATTERN.test(block.content)) {
+    const inserted = composer.elements.insertHTMLToElement(
+      parentId,
+      sanitizeHTML(block.content),
+      dropIndex
+    );
+    return Array.isArray(inserted) && inserted.length > 0
+      ? (inserted[0]?.getId?.() ?? undefined)
+      : undefined;
+  }
+
+  // Default: create from the element type and add it to the parent.
+  const element = composer.elements.createElement(block.elementType, {
+    content: typeof block.content === "string" ? block.content : undefined,
+  });
+  composer.elements.addElement(element, parentId, dropIndex);
+  return element.getId();
 }

@@ -9,6 +9,7 @@ import * as React from "react";
 import type { Composer } from "../../../engine";
 import { getElementId } from "../../../shared/utils/dragDrop";
 import { sanitizeHTML } from "../../../shared/utils/html";
+import { EVENTS } from "../../../shared/constants";
 
 export interface EditingState {
   id: string | null;
@@ -146,6 +147,11 @@ export function useCanvasInlineEdit({
             } finally {
               composer.endTransaction();
             }
+            /* The one signal that says "the user edited text on the canvas".
+               EVENTS.ELEMENT_EDIT_INLINE existed as a constant with no
+               emitter, so the onboarding step that asks for exactly this
+               action had nothing to listen to. */
+            composer.emit(EVENTS.ELEMENT_EDIT_INLINE, { elementId: editing.id });
             composer.saveProject?.().catch(() => {
               // Autosave failure handled silently
             });

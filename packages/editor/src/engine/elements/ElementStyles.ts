@@ -138,6 +138,18 @@ export class ElementStyles {
       value
     );
 
+    /* An element's own style changing IS a style change. Only StyleEngine —
+       the CSS-RULE side — emitted this event, so everything the inspector
+       writes (which goes through here, not through a rule) was invisible to
+       anything listening for it: the breakpoint-override readout and the
+       token-usage count both refreshed on rule edits and not on the edits
+       users actually make. */
+    this.getComposer().emit(EVENTS.STYLE_CHANGED, {
+      elementId: this.getElementId(),
+      property,
+      value,
+    });
+
     this.getComposer().emit(EVENTS.ELEMENT_UPDATED, this);
     this.getComposer().markDirty();
   }
@@ -146,6 +158,10 @@ export class ElementStyles {
     const data = this.getData();
     if (data.styles) {
       delete data.styles[property];
+      this.getComposer().emit(EVENTS.STYLE_CHANGED, {
+        elementId: this.getElementId(),
+        property,
+      });
       this.getComposer().emit(EVENTS.ELEMENT_UPDATED, this);
       this.getComposer().markDirty();
     }
@@ -163,6 +179,7 @@ export class ElementStyles {
 
   setStyles(styles: Record<string, string>): void {
     this.getData().styles = { ...styles };
+    this.getComposer().emit(EVENTS.STYLE_CHANGED, { elementId: this.getElementId(), styles });
     this.getComposer().emit(EVENTS.ELEMENT_UPDATED, this);
     this.getComposer().markDirty();
   }
