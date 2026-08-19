@@ -231,9 +231,12 @@ export const SettingsTab: React.FC<
      * "Open Palette →" button can navigate cross-tab.
      */
     onOpenDesignTab?: () => void;
+    /** Deep-link screen id from `openLeftPanelToTab("settings", <id>)`. */
+    initialScreen?: string;
   }
 > = ({
   composer,
+  initialScreen,
   isExpanded: _isPinned,
   onExpandToggle: _onPinToggle,
   onHelpClick,
@@ -258,6 +261,8 @@ export const SettingsTab: React.FC<
     screens: SETTINGS_SCREENS,
     defaultScreen: "general",
   });
+
+
 
   const [screenIsDirty, setScreenIsDirty] = React.useState(false);
   const [dirtyCount, setDirtyCount] = React.useState(0);
@@ -440,6 +445,25 @@ export const SettingsTab: React.FC<
   //
   // Codex P0 #2: blur active element so focus does not stay inside the
   // section as it becomes aria-hidden=true.
+  /* Deep links arrive by the name the DOOR uses, which is not always the name
+     the screen has. The site menu says "Plugins"; the screen is "integrations"
+     — the marketplace/OAuth surface it means. Without the alias the panel
+     renders its root, which reads as a broken menu item rather than a mismatch.
+
+     It routes through `navigate`, not `navigateTo`: this panel keeps its own
+     `isRoot` flag, so setting the screen alone leaves the snav root on top and
+     the deep link still looks dead — which is exactly what the first attempt
+     at this fix did. `navigate` is the same push a row click makes: dirty
+     guard, blur, animation and all. */
+  React.useEffect(() => {
+    if (!initialScreen) return;
+    const target = initialScreen === "plugins" ? "integrations" : initialScreen;
+    /* An id matching no screen is left alone rather than guessed at. */
+    const hit = NAV.find((n) => n.id === target);
+    if (hit) navigate(hit.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialScreen]);
+
   const navigateToRoot = React.useCallback(() => {
     if (transitioning) return;
     // Codex P0 #1: dirty re-check at navigate-time, not just at click-time.

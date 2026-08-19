@@ -16,6 +16,8 @@ import { FullPageRouter } from "./FullPageRouter";
 
 export interface FullPageViewProps {
   activeTab: GroupedTabId;
+  /** Deep-link screen inside the active fullpage tab — `openLeftPanelToTab(tab, subTab)`. */
+  activeSubTab?: string;
   composer: Composer | null;
   onClose: () => void;
   onSwitchToAdd?: () => void;
@@ -36,6 +38,7 @@ export interface FullPageViewProps {
 
 export const FullPageView: React.FC<FullPageViewProps> = ({
   activeTab,
+  activeSubTab,
   composer,
   onClose,
   onSwitchToAdd,
@@ -66,6 +69,7 @@ export const FullPageView: React.FC<FullPageViewProps> = ({
         <React.Suspense fallback={<PanelSkeleton />}>
           <FullPageRouter
             activeTab={activeTab}
+            activeSubTab={activeSubTab}
             composer={composer}
             commonTabProps={commonTabProps}
             onSwitchToAdd={onSwitchToAdd}

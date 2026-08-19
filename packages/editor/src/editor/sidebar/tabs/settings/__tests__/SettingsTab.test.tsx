@@ -164,6 +164,50 @@ describe("SettingsTab v2 — root view", () => {
   });
 });
 
+// ─── Deep links ───────────────────────────────────────────────────────────────
+
+/* The site menu's "Plugins" landed on the Settings ROOT and read as a dead
+   door. Two separate reasons, both fixed together:
+     - the deep-link sub-tab reached the drawer and never the fullpage surface,
+       and Settings is a fullpage tab;
+     - the door's name ("plugins") is not the screen's id ("integrations").
+   And a third that only the running app showed: setting the screen is not
+   enough, because this panel keeps its own `isRoot` flag — the first fix moved
+   `currentScreen` and the root list stayed on top, so the door still looked
+   dead. These assert the drilled-in state, not just the id. */
+describe("SettingsTab — deep link", () => {
+  it("opens Integrations when the door asks for 'plugins'", async () => {
+    const { container } = render(
+      <SettingsTab composer={makeComposer() as never} userPlan="enterprise" initialScreen="plugins" />,
+    );
+    /* Assert the HEADER, which is what a person reads — the section node
+       mounts a tick before the panel finishes flipping out of its root. */
+    await waitFor(() =>
+      expect(document.querySelector('[role="heading"][aria-level="2"]')?.textContent).toBe("Integrations"),
+    );
+    expect(container.querySelector(".bd-set-screen--section")).not.toBeNull();
+  });
+
+  it("opens a screen asked for by its own id", async () => {
+    const { container } = render(
+      <SettingsTab composer={makeComposer() as never} userPlan="enterprise" initialScreen="seo" />,
+    );
+    await waitFor(() =>
+      expect(document.querySelector('[role="heading"][aria-level="2"]')?.textContent).toBe("SEO"),
+    );
+    expect(container.querySelector(".bd-set-screen--section")).not.toBeNull();
+  });
+
+  it("stays at the root for an id that names no screen, rather than guessing", async () => {
+    const { container } = render(
+      <SettingsTab composer={makeComposer() as never} initialScreen="not-a-screen" />,
+    );
+    await new Promise((r) => setTimeout(r, 50));
+    expect(container.querySelector(".bd-set-screen--section")).toBeNull();
+    expect(document.querySelector('[role="heading"][aria-level="2"]')?.textContent).toBe("Settings");
+  });
+});
+
 // ─── Group 2 — Push / pop / focus ─────────────────────────────────────────────
 
 describe("SettingsTab v2 — push/pop + focus", () => {

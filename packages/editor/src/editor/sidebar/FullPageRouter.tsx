@@ -33,6 +33,8 @@ export interface FullPageCommonProps {
 
 export interface FullPageRouterProps {
   activeTab: GroupedTabId;
+  /** Deep-link screen inside the active fullpage tab. */
+  activeSubTab?: string;
   composer: Composer | null;
   commonTabProps: FullPageCommonProps;
   onSwitchToAdd?: () => void;
@@ -45,6 +47,7 @@ export interface FullPageRouterProps {
 
 export const FullPageRouter: React.FC<FullPageRouterProps> = ({
   activeTab,
+  activeSubTab,
   composer,
   commonTabProps,
   onSwitchToAdd,
@@ -82,6 +85,7 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
     case "settings":
       return (
         <SettingsTab
+          initialScreen={activeSubTab}
           composer={composer}
           projectId={projectId}
           onReplayTour={onReplayTour}
