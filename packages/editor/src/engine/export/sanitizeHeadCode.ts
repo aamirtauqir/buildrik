@@ -28,50 +28,11 @@
  */
 
 import createDOMPurify, { type DOMPurify } from "dompurify";
+import { ALLOWED_HEAD_TAGS, ALLOWED_HEAD_ATTRS } from "../../shared/constants/headCode";
 
-/**
- * Allowlisted tags for the custom <head> surface. Anything outside this list
- * is stripped. Policy leans restrictive: users explicitly opt into less-safe
- * tags in a future UI toggle; default posture is safe.
- */
-const ALLOWED_HEAD_TAGS = [
-  "meta",
-  "link",
-  "script",
-  "noscript",
-  "style",
-  "base",
-  "title",
-];
-
-/**
- * Attributes allowed on the tags above. Any attribute not on this list is
- * stripped. Note the absence of `onload`, `onerror`, `javascript:`-style URIs.
- */
-const ALLOWED_HEAD_ATTRS = [
-  "name",
-  "content",
-  "property",
-  "charset",
-  "http-equiv",
-  "rel",
-  "href",
-  "hreflang",
-  "type",
-  "media",
-  "sizes",
-  "src",
-  "integrity",
-  "crossorigin",
-  "referrerpolicy",
-  "async",
-  "defer",
-  "nomodule",
-  "as",
-  "target",
-  "id",
-  "lang",
-];
+/* The allowlist itself lives in shared/constants/headCode.ts — the settings
+   validator reports against the SAME list, so the field can no longer bless
+   markup this sanitizer removes. */
 
 // Lazy singleton — only instantiate when sanitization is actually invoked.
 let _purify: DOMPurify | null = null;
@@ -140,8 +101,8 @@ export function sanitizeHeadCode(raw: string | undefined | null): string {
     // extract the sanitized <head> innerHTML.
     const wrapped = `<!DOCTYPE html><html><head>${raw}</head><body></body></html>`;
     const sanitizedDoc = purify.sanitize(wrapped, {
-      ALLOWED_TAGS: ALLOWED_HEAD_TAGS,
-      ALLOWED_ATTR: ALLOWED_HEAD_ATTRS,
+      ALLOWED_TAGS: [...ALLOWED_HEAD_TAGS],
+      ALLOWED_ATTR: [...ALLOWED_HEAD_ATTRS],
       // ADD_ATTR force-includes attributes DOMPurify's default profile strips
       // from head tags even when they're in ALLOWED_ATTR. `property` on <meta>
       // is the canonical example (required for Open Graph tags).

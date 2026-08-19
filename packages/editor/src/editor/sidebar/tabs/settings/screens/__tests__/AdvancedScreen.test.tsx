@@ -56,7 +56,10 @@ describe("AdvancedScreen — rendering + prefill", () => {
         },
       },
     });
-    expect(screen.getByText(/Custom code runs on all pages/)).toBeTruthy();
+    /* The banner used to read "Custom code runs on all pages", next to a
+       placeholder inviting `<script>…</script>` — the one shape the export
+       sanitizer strips. It now names which half runs. */
+    expect(screen.getByText(/inline JavaScript is removed/i)).toBeTruthy();
     expect(headBox().value).toBe('<meta charset="utf-8">');
     expect(bodyBox().value).toBe("<script>x()</script>");
     expect(cssBox().value).toBe(".a { color: red; }");
@@ -76,11 +79,17 @@ describe("AdvancedScreen — debounced HTML validation (head scripts)", () => {
 
   it("re-typing before the debounce window elapses resets the timer (only latest value validates)", () => {
     setup();
-    fireEvent.change(headBox(), { target: { value: "<div>" } });
+    /* Allowlisted tag, because an unbalanced-then-balanced <div> now also
+       carries the "removed when published" warning and would never reach the
+       success line this test is about. */
+    fireEvent.change(headBox(), { target: { value: "<noscript>" } });
     advance(300);
-    fireEvent.change(headBox(), { target: { value: "<div></div>" } });
+    fireEvent.change(headBox(), { target: { value: "<noscript></noscript>" } });
     advance(499);
-    expect(screen.queryByRole("status")).toBeNull();
+    /* Scoped to the head feedback: the fixture prefills Body Scripts, which
+       now has a validator of its own, so a bare role=status query would find
+       that one and say nothing about the debounce under test. */
+    expect(document.getElementById("head-validation-feedback")).toBeNull();
     advance(1);
     // Latest (balanced) value validated — no stale error from the first value.
     expect(screen.queryByText(/Unclosed tag/)).toBeNull();
@@ -144,12 +153,37 @@ describe("AdvancedScreen — debounced CSS validation", () => {
   });
 });
 
-describe("AdvancedScreen — body scripts have no validator", () => {
-  it("typing into Body Scripts never produces validation feedback", () => {
+describe("AdvancedScreen — body scripts validate on the same rules", () => {
+  /* Body scripts go through the SAME export sanitizer as head scripts
+     (ExportEngine calls sanitizeHeadCode on both) and this field used to show
+     no feedback at all, so an inline script here was dropped even more quietly
+     than in the field above. */
+  it("reports an unclosed tag typed into Body Scripts", () => {
     setup();
     fireEvent.change(bodyBox(), { target: { value: "<div>" } });
-    advance(1000);
-    expect(screen.queryByRole("status")).toBeNull();
+    expect(document.getElementById("body-validation-feedback")).toBeNull();
+    advance(500);
+    expect(document.getElementById("body-validation-feedback")?.textContent).toMatch(
+      /Unclosed tag/
+    );
+  });
+
+  it("warns that an inline script will not reach the published page", () => {
+    setup();
+    fireEvent.change(bodyBox(), { target: { value: "<script>track()</script>" } });
+    advance(500);
+    expect(document.getElementById("body-validation-feedback")?.textContent).toMatch(
+      /Inline <script> is removed when the site is published/
+    );
+  });
+
+  it("clearing the field clears its feedback without waiting for the debounce", () => {
+    setup();
+    fireEvent.change(bodyBox(), { target: { value: "<div>" } });
+    advance(500);
+    expect(document.getElementById("body-validation-feedback")).not.toBeNull();
+    fireEvent.change(bodyBox(), { target: { value: "" } });
+    expect(document.getElementById("body-validation-feedback")).toBeNull();
   });
 });
 

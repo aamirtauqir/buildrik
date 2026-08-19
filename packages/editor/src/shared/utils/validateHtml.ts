@@ -4,6 +4,8 @@
  * @license BSD-3-Clause
  */
 
+import { ALLOWED_HEAD_TAGS } from "../constants/headCode";
+
 export interface HtmlValidationResult {
   valid: boolean;
   warnings: string[];
@@ -63,6 +65,28 @@ export function validateHtml(code: string): HtmlValidationResult {
 
   if (stack.length > 0) {
     errors.push(`Unclosed tag${stack.length > 1 ? "s" : ""}: <${stack.join(">, <")}>`);
+  }
+
+  /* The export sanitizer's allowlist, reported here instead of at publish
+     time. This validator used to answer "✓ HTML looks good" for an inline
+     <script> — the one form that is guaranteed NOT to reach the published
+     page — and for any tag outside the allowlist, all of which are dropped
+     silently. Same list, one source: shared/constants/headCode. */
+  const inlineScript = /<script(?![^>]*\bsrc\s*=)[^>]*>/i.test(code);
+  if (inlineScript) {
+    warnings.push(
+      "Inline <script> is removed when the site is published — load the code from a file with <script src=\"…\"> instead"
+    );
+  }
+
+  const used = [...code.matchAll(/<([a-zA-Z][a-zA-Z0-9]*)\b/g)].map((m) => m[1].toLowerCase());
+  const dropped = [...new Set(used)].filter(
+    (t) => !ALLOWED_HEAD_TAGS.includes(t) && !FORBIDDEN_TAGS.has(t)
+  );
+  if (dropped.length) {
+    warnings.push(
+      `Removed when published: <${dropped.join(">, <")}> — only <${ALLOWED_HEAD_TAGS.join(">, <")}> survive`
+    );
   }
 
   // Warn about inline event handlers (XSS risk)

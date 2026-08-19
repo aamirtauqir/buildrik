@@ -18,6 +18,29 @@ const DEFAULT_CUSTOM_CODE: CustomCodeConfig = {
   globalCss: "",
 };
 
+/**
+ * The errors/warnings/success block under a code field. Head and body render
+ * the identical markup — it was written twice the moment the body field got a
+ * validator, which is the duplication rule and the styling ratchet in one.
+ */
+const HtmlFeedback: React.FC<{ id: string; result: HtmlValidationResult | null }> = ({
+  id,
+  result,
+}) =>
+  result ? (
+    <div id={id} role="status" aria-live="polite" style={validationContainerStyles}>
+      {result.errors.map((err, i) => (
+        <div key={`e${i}`} style={validationErrorStyles}>✗ {err}</div>
+      ))}
+      {result.warnings.map((warn, i) => (
+        <div key={`w${i}`} style={validationWarningStyles}>⚠ {warn}</div>
+      ))}
+      {result.valid && result.warnings.length === 0 && (
+        <div style={validationSuccessStyles}>✓ HTML looks good</div>
+      )}
+    </div>
+  ) : null;
+
 export const AdvancedScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange, registerFlushHandler }) => {
   const { value: savedCode } = useSettingsScreen(
     composer,
@@ -29,6 +52,11 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange,
   const [bodyCode, setBodyCode] = React.useState(savedCode.bodyScripts);
   const [cssCode, setCssCode] = React.useState(savedCode.globalCss);
   const [headValidation, setHeadValidation] = React.useState<HtmlValidationResult | null>(null);
+  /* Body scripts run through the SAME export sanitizer as head scripts
+     (ExportEngine calls sanitizeHeadCode on both), and this field showed no
+     feedback at all — so an inline script here was dropped even more quietly
+     than in the field above. */
+  const [bodyValidation, setBodyValidation] = React.useState<HtmlValidationResult | null>(null);
   const [cssValidation, setCssValidation] = React.useState<CssValidationResult | null>(null);
   const [isDirty, setIsDirty] = React.useState(false);
 
@@ -38,11 +66,20 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange,
       setHeadValidation(null);
       return;
     }
-    const timer = setTimeout(() => {
-      setHeadValidation(validateHtml(headCode));
-    }, 500);
+    const timer = setTimeout(() => setHeadValidation(validateHtml(headCode)), 500);
     return () => clearTimeout(timer);
   }, [headCode]);
+
+  // Debounced validation for body code — its own effect, so it reacts to the
+  // body field rather than to whatever was last typed in the head field.
+  React.useEffect(() => {
+    if (!bodyCode.trim()) {
+      setBodyValidation(null);
+      return;
+    }
+    const timer = setTimeout(() => setBodyValidation(validateHtml(bodyCode)), 500);
+    return () => clearTimeout(timer);
+  }, [bodyCode]);
 
   // Debounced validation for CSS
   React.useEffect(() => {
@@ -90,7 +127,17 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange,
 
   return (
     <Screen>
-      <div style={warningBannerStyles}>⚠️ Custom code runs on all pages. Test thoroughly.</div>
+      {/* Said "Custom code runs on all pages. Test thoroughly." while the
+          placeholder below invited `<script>…</script>` and the validator
+          answered "✓ HTML looks good" — and then the export sanitizer dropped
+          every inline script without a word. Walked live: typed an inline
+          script and an external one, saved, and only the external one is in
+          the exported head. The banner now says which half runs. */}
+      <div style={warningBannerStyles}>
+        ⚠️ Custom code runs on every page. Scripts must load from a file —
+        <code> &lt;script src=&quot;…&quot;&gt;</code> — inline JavaScript is removed when the
+        site is published.
+      </div>
 
       <Section title="Head Scripts">
         <Textarea
@@ -102,21 +149,11 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange,
           }}
           aria-label="Head Scripts"
           aria-describedby={headValidation ? "head-validation-feedback" : undefined}
-          placeholder={"<script>...</script>\n<link>...</link>"} style={{ minHeight: 120, fontFamily: "monospace", fontSize: 12 }}
+          /* The old placeholder was `<script>...</script>`, i.e. the exact
+             form the exporter strips. */
+          placeholder={'<script src="https://…/analytics.js"></script>\n<link rel="preconnect" href="https://…">'} style={{ minHeight: 120, fontFamily: "monospace", fontSize: 12 }}
         />
-        {headValidation && (
-          <div id="head-validation-feedback" role="status" aria-live="polite" style={validationContainerStyles}>
-            {headValidation.errors.map((err, i) => (
-              <div key={`e${i}`} style={validationErrorStyles}>✗ {err}</div>
-            ))}
-            {headValidation.warnings.map((warn, i) => (
-              <div key={`w${i}`} style={validationWarningStyles}>⚠ {warn}</div>
-            ))}
-            {headValidation.valid && headValidation.warnings.length === 0 && (
-              <div style={validationSuccessStyles}>✓ HTML looks good</div>
-            )}
-          </div>
-        )}
+        <HtmlFeedback id="head-validation-feedback" result={headValidation} />
       </Section>
 
       <Section title="Body Scripts (End)">
@@ -128,8 +165,10 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange,
             setIsDirty(true);
           }}
           aria-label="Body Scripts"
-          placeholder={"<script>...</script>"} style={{ minHeight: 120, fontFamily: "monospace", fontSize: 12 }}
+          aria-describedby={bodyValidation ? "body-validation-feedback" : undefined}
+          placeholder={'<script src="https://…/widget.js"></script>'} style={{ minHeight: 120, fontFamily: "monospace", fontSize: 12 }}
         />
+        <HtmlFeedback id="body-validation-feedback" result={bodyValidation} />
       </Section>
 
       <Section title="Global CSS">
