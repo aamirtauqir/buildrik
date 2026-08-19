@@ -49,7 +49,14 @@ const SHORTCUT_GROUPS: ShortcutGroup[] = [
       { key: "Ctrl+P", desc: "Preview" },
       { key: "Ctrl+K", desc: "Command palette" },
       { key: "?", desc: "Keyboard shortcuts" },
-      { key: "Ctrl+0", desc: "Fit to view" },
+      /* ⌘0 was printed as "Fit to view". Measured at 1440x900: ⌘0 sets 100%,
+         ⌘1 is the one that fits (100% → 98% on a page wider than the frame)
+         and ⌘2 zooms to the selection — the three rows the zoom flyout itself
+         binds (CanvasFooterToolbar). The fit chord was advertised under the
+         wrong key and the other two were not advertised at all. */
+      { key: "Ctrl+0", desc: "Zoom to 100%" },
+      { key: "Ctrl+1", desc: "Fit to view" },
+      { key: "Ctrl+2", desc: "Zoom to selection" },
       { key: "Ctrl++", desc: "Zoom in" },
       { key: "Ctrl+-", desc: "Zoom out" },
     ],
