@@ -38,16 +38,22 @@ describe("settings sections", () => {
     }
   });
 
-  it("sends its two off-section cards to the agency routes, which are route-grouped", () => {
-    // Reviews and Partner are agency pages the directory links out to. They live
-    // under a (tabs) route group, so their URL path is not their file path — a
-    // literal path check would wrongly report them missing. e2e/link-integrity
-    // resolves these over real HTTP, which is what actually proves they serve.
-    const offSection = SETTINGS_SECTIONS.map((s) => s.href).filter((h) => !SETTINGS_OWN_HREFS.includes(h));
-    expect(offSection).toEqual(["/dashboard/agency/reviews", "/dashboard/agency/partner"]);
-    for (const href of offSection) {
-      const grouped = href.replace("/dashboard/agency/", "/dashboard/agency/(tabs)/");
-      expect(existsSync(pageFileFor(grouped)), `${href} → missing grouped page`).toBe(true);
+  /* This asserted the directory carried two cards OUT to the agency area
+     (Reviews, Partner). It no longer does — settings-sections.ts lists only
+     settings-owned hrefs — so the assertion has been failing since those cards
+     were dropped. The agency pages still exist and keep their own (tabs) nav
+     under /dashboard/agency, which is the door they are reached by now.
+
+     The contract worth pinning is the one that survives an IA move: every
+     section points inside settings, and every one of them resolves to a page. */
+  it("keeps every card inside settings, with no link out to another area", () => {
+    const offSection = SETTINGS_SECTIONS.map((s) => s.href).filter(
+      (h) => !SETTINGS_OWN_HREFS.includes(h),
+    );
+    expect(offSection).toEqual([]);
+    for (const href of SETTINGS_SECTIONS.map((s) => s.href)) {
+      expect(href.startsWith("/dashboard/settings"), `${href} leaves settings`).toBe(true);
+      expect(existsSync(pageFileFor(href)), `${href} → missing page`).toBe(true);
     }
   });
 

@@ -1,26 +1,47 @@
 import { describe, it, expect } from "vitest";
 
-describe("Template Components", () => {
-  it("exports TEMPLATE_CATEGORIES with 6 categories + ALL", async () => {
-    const mod = await import("@/components/templates/template-gallery");
-    expect(mod.TEMPLATE_CATEGORIES).toHaveLength(7);
-    expect(mod.TEMPLATE_CATEGORIES[0].value).toBe("ALL");
+/* `components/templates/template-gallery`, `template-card` and
+   `template-preview` were deleted in be81c8ac ("one canonical template
+   surface — sites/new links to the browser"). This file kept importing them,
+   so the whole test file has failed to resolve ever since — a red suite that
+   says nothing about the code that replaced them.
+
+   The surviving contract is the filter model behind the templates browser:
+   category / difficulty / sort option lists, and the URL parser that pins
+   each value to its allowed set. */
+describe("Template filter model", () => {
+  const load = () => import("@/app/dashboard/templates/filters");
+
+  it("offers six categories plus ALL", async () => {
+    const { TEMPLATE_CATEGORY_OPTIONS } = await load();
+    expect(TEMPLATE_CATEGORY_OPTIONS).toHaveLength(7);
+    expect(TEMPLATE_CATEGORY_OPTIONS[0].value).toBe("ALL");
   });
 
-  it("exports TEMPLATE_SORT_OPTIONS with 3 options", async () => {
-    const mod = await import("@/components/templates/template-gallery");
-    expect(mod.TEMPLATE_SORT_OPTIONS).toHaveLength(3);
+  it("offers three sort options", async () => {
+    const { TEMPLATE_SORT_OPTIONS } = await load();
+    expect(TEMPLATE_SORT_OPTIONS).toHaveLength(3);
+    expect(TEMPLATE_SORT_OPTIONS.map((o) => o.value)).toEqual([
+      "popular",
+      "newest",
+      "alphabetical",
+    ]);
   });
 
-  it("exports TemplateCard component", async () => {
-    const mod = await import("@/components/templates/template-card");
-    expect(mod.TemplateCard).toBeDefined();
+  it("offers ALL plus three difficulty levels", async () => {
+    const { TEMPLATE_DIFFICULTY_OPTIONS } = await load();
+    expect(TEMPLATE_DIFFICULTY_OPTIONS).toHaveLength(4);
+    expect(TEMPLATE_DIFFICULTY_OPTIONS[0].value).toBe("ALL");
   });
 
-  it("exports TemplatePreview component", async () => {
-    const mod = await import("@/components/templates/template-preview");
-    expect(mod.TemplatePreview).toBeDefined();
-    expect(mod.DEVICE_OPTIONS).toHaveLength(3);
+  it("falls back to the defaults when the URL carries a value that is not offered", async () => {
+    const { templateFiltersFromParams, DEFAULT_TEMPLATE_FILTERS } = await load();
+    const parsed = templateFiltersFromParams(
+      new URLSearchParams({ category: "NOPE", sort: "nope", difficulty: "nope" })
+    );
+    expect(parsed.category).toBe(DEFAULT_TEMPLATE_FILTERS.category);
+    expect(parsed.sort).toBe(DEFAULT_TEMPLATE_FILTERS.sort);
+    expect(parsed.difficulty).toBe(DEFAULT_TEMPLATE_FILTERS.difficulty);
   });
 });
 
