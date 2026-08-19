@@ -288,7 +288,17 @@ export class PageManager {
     const source = this.ctx.pages.get(sourceId);
     if (!source) return null;
 
-    const clonedRoot = this.ctx.cloneElementData(source.root);
+    /* Resolve the LIVE root before cloning. `pages.get(id).root` carries the
+       root's identity, not its children — the working tree lives in the
+       element registry, which is why `exportPages()` below re-resolves through
+       `ctx.elements.get(page.root.id)` and serialises that. Cloning the
+       snapshot duplicated a page as an EMPTY one: a 2-block Pricing page
+       duplicated to "Pricing Copy" with zero children, which is the same
+       feature-theater this method's own comment says it exists to fix. It only
+       looked right for the page that happened to be open, because that is the
+       page whose elements are registered. */
+    const liveRoot = this.ctx.elements.get(source.root.id);
+    const clonedRoot = this.ctx.cloneElementData(liveRoot ? liveRoot.toJSON() : source.root);
     const name = uniqueCopyName(source.name, this.existingNames());
     const slug = uniqueCopySlug(source.slug ?? slugify(source.name), this.existingSlugs());
     const now = new Date().toISOString();

@@ -185,6 +185,67 @@ describe("PageManager.updatePage", () => {
   });
 });
 
+/* The feature theater came back, and this harness could not see it. The page
+   map's `root` carries the root's IDENTITY; the working tree lives in the
+   element registry — which is why `exportPages()` re-resolves through
+   `ctx.elements.get(page.root.id).toJSON()`. `duplicatePage` cloned the
+   snapshot, so duplicating a page that was not the open one produced an EMPTY
+   copy. Reproduced in the app: a 2-block Pricing page duplicated to "Pricing
+   Copy" with zero children.
+
+   Every existing test here passes because the harness's `buildElementTree`
+   registers a stub whose `toJSON()` returns the very object it was built from
+   — snapshot and registry are the same object, so they cannot disagree. This
+   one makes them disagree, the way the running editor does. */
+describe("PageManager.duplicatePage — clones the registered tree, not the page-map snapshot", () => {
+  it("copies the children the element registry holds when the snapshot is hollow", () => {
+    const { pm, ctx } = makeHarness();
+    const hollowRoot = { id: "r-pricing", type: "container", children: [] } as unknown as ElementData;
+    ctx.pages.set("p-pricing", {
+      id: "p-pricing",
+      name: "Pricing",
+      slug: "/pricing",
+      isHome: false,
+      root: hollowRoot,
+    } as never);
+    // The registry knows what is actually on that page.
+    (ctx.elements as unknown as Map<string, unknown>).set("r-pricing", {
+      getId: () => "r-pricing",
+      getDescendants: () => [],
+      toJSON: () => ({
+        id: "r-pricing",
+        type: "container",
+        children: [
+          { id: "h-1", type: "heading", content: "PRICING PAGE", children: [] },
+          { id: "p-1", type: "paragraph", content: "from $9", children: [] },
+        ],
+      }),
+    });
+
+    const copy = pm.duplicatePage("p-pricing");
+    expect(copy).not.toBeNull();
+    expect(copy!.root.children).toHaveLength(2);
+    expect(copy!.root.children!.map((c) => c.content)).toEqual(["PRICING PAGE", "from $9"]);
+    // fresh ids, not the source's
+    expect(copy!.root.id).not.toBe("r-pricing");
+    expect(copy!.root.children!.map((c) => c.id)).not.toContain("h-1");
+  });
+
+  it("falls back to the snapshot when the registry has nothing for that root", () => {
+    const { pm, ctx } = makeHarness();
+    ctx.pages.set("p-orphan", {
+      id: "p-orphan",
+      name: "Orphan",
+      slug: "/orphan",
+      isHome: false,
+      root: { id: "r-orphan", type: "container", children: [{ id: "x", type: "heading", content: "FROM SNAPSHOT", children: [] }] },
+    } as never);
+    const copy = pm.duplicatePage("p-orphan");
+    expect(copy!.root.children).toHaveLength(1);
+    expect(copy!.root.children![0].content).toBe("FROM SNAPSHOT");
+  });
+});
+
 describe("PageManager.duplicatePage (A1 — fixes feature-theater bug)", () => {
   it("returns null if source page does not exist", () => {
     const { pm } = makeHarness();
