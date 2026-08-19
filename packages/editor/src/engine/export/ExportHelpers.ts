@@ -5,6 +5,7 @@
  */
 
 import { THEME } from "../../shared/constants/defaultStyles";
+import { GOOGLE_FONT_CATALOGUE } from "../../shared/constants/googleFonts";
 
 // ============================================================================
 // RESET CSS
@@ -41,6 +42,51 @@ export function siteFontCSS(fonts: {
     rules.push(`h1,h2,h3,h4,h5,h6{font-family:${family(fonts.heading)},sans-serif}`);
   if (family(fonts.mono)) rules.push(`code,pre,kbd,samp{font-family:${family(fonts.mono)},monospace}`);
   return rules.length ? `\n${rules.join("\n")}\n` : "";
+}
+
+/**
+ * The stylesheet link the published page needs for the Google families it uses.
+ *
+ * The font picker loads a family into the EDITOR (`GoogleFontsService` injects
+ * a <link>) and the export named the family and loaded nothing, so a site set
+ * in Poppins shipped in the visitor's generic sans. Verified on a generated
+ * document: `font-family: 'Poppins', sans-serif` in the CSS, no font request
+ * anywhere in the head.
+ *
+ * Only families in the catalogue the picker offers are named here — a local or
+ * uploaded family must not be sent to Google as a lookup, and a family Google
+ * does not have would 400 the request.
+ */
+export function googleFontsHeadLinks(
+  css: string,
+  extraFamilies: readonly string[] = []
+): string {
+  const used = new Set<string>();
+  for (const decl of css.matchAll(/font-family\s*:\s*([^;}]+)/g)) {
+    const first = decl[1].split(",")[0].trim().replace(/^["']|["']$/g, "");
+    if (first) used.add(first.toLowerCase());
+  }
+  for (const f of extraFamilies) {
+    const first = String(f ?? "").split(",")[0].trim().replace(/^["']|["']$/g, "");
+    if (first) used.add(first.toLowerCase());
+  }
+
+  const wanted = GOOGLE_FONT_CATALOGUE.filter((f) => used.has(f.family.toLowerCase()));
+  if (!wanted.length) return "";
+
+  const families = wanted
+    .map((f) => {
+      const weights = [...new Set(f.variants.filter((v) => /^\d+$/.test(v)))].sort();
+      const name = f.family.replace(/ /g, "+");
+      return weights.length ? `family=${name}:wght@${weights.join(";")}` : `family=${name}`;
+    })
+    .join("&");
+
+  return (
+    '<link rel="preconnect" href="https://fonts.googleapis.com">\n' +
+    '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n' +
+    `<link rel="stylesheet" href="https://fonts.googleapis.com/css2?${families}&display=swap">`
+  );
 }
 
 export const RESET_CSS = `

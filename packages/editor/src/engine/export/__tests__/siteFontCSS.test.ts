@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { siteFontCSS, RESET_CSS } from "../ExportHelpers";
+import { siteFontCSS, googleFontsHeadLinks, RESET_CSS } from "../ExportHelpers";
 
 /**
  * The export named one hardcoded family for every site ever published, so a
@@ -33,5 +33,27 @@ describe("siteFontCSS", () => {
 
   it("cannot break out of the rule it is written into", () => {
     expect(siteFontCSS({ body: "Verdana;}body{display:none" })).not.toContain("display:none}");
+  });
+});
+
+describe("googleFontsHeadLinks", () => {
+  it("finds families in the CSS the page ships", () => {
+    const out = googleFontsHeadLinks(".a{font-family:'Poppins', sans-serif}");
+    expect(out).toContain("family=Poppins:wght@400;500;600;700");
+    expect(out).toContain('href="https://fonts.gstatic.com" crossorigin');
+  });
+
+  it("takes the site's own token families too", () => {
+    expect(googleFontsHeadLinks("", ["Lora, serif"])).toContain("family=Lora");
+  });
+
+  it("asks Google about nothing it does not have", () => {
+    expect(googleFontsHeadLinks(".a{font-family:'Helvetica Neue'}")).toBe("");
+    expect(googleFontsHeadLinks(".a{font-family:-apple-system, sans-serif}")).toBe("");
+  });
+
+  it("names one family once, however many rules use it", () => {
+    const out = googleFontsHeadLinks(".a{font-family:Poppins}.b{font-family:'Poppins',sans-serif}");
+    expect(out.match(/family=Poppins/g)).toHaveLength(1);
   });
 });

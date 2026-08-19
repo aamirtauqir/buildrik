@@ -22,6 +22,7 @@ import { AssetBundler } from "./AssetBundler";
 import {
   RESET_CSS,
   siteFontCSS,
+  googleFontsHeadLinks,
   getTagForType,
   escapeHTML,
   stylesToString,
@@ -156,11 +157,22 @@ export class ExportEngine {
 
     const bodyContent = this.elementToHTML(rootElement, cfg);
 
-    if (cfg.cssStyle === "embedded") {
-      return this.wrapInDocument(bodyContent, cfg, this.generateCSS(cfg));
-    }
+    // The CSS is generated either way: an external stylesheet still decides
+    // which font families the page needs fetched, and passing it only in the
+    // embedded case left the ZIP export naming families it never loaded.
+    return this.wrapInDocument(bodyContent, cfg, this.generateCSS(cfg));
+  }
 
-    return this.wrapInDocument(bodyContent, cfg);
+  /**
+   * The three font families the SITE names in its own tokens. They reach the
+   * page through `siteFontCSS`, so they need fetching just like a family an
+   * element names directly.
+   */
+  private siteFontFamilies(): string[] {
+    const tokens = this.composer.getProjectSettings?.()?.designTokens ?? [];
+    return ["font-heading", "font-body", "font-mono"]
+      .map((id) => tokens.find((t) => t.id === id)?.value)
+      .filter((v): v is string => Boolean(v));
   }
 
   /**
@@ -365,7 +377,10 @@ export class ExportEngine {
   /**
    * Wrap content in full HTML document
    */
-  private wrapInDocument(content: string, config: ExportConfig, embeddedCSS?: string): string {
+  private wrapInDocument(content: string, config: ExportConfig, css?: string): string {
+    // Embedded only when the caller asked for it; the CSS is always read for
+    // the font links below.
+    const embeddedCSS = config.cssStyle === "embedded" ? css : undefined;
     const nl = config.minify ? "" : "\n";
     const indent = config.minify ? "" : "  ";
 
@@ -385,6 +400,16 @@ export class ExportEngine {
 
     if (config.metaDescription) {
       head += `${indent}<meta name="description" content="${escapeHTML(config.metaDescription)}">${nl}`;
+    }
+
+    // The families the page names have to be fetched, or the visitor gets the
+    // generic fallback while the editor showed the real face.
+    const fontLinks = googleFontsHeadLinks(css ?? "", this.siteFontFamilies());
+    if (fontLinks) {
+      head += fontLinks
+        .split("\n")
+        .map((l) => `${indent}${l}`)
+        .join(nl) + nl;
     }
 
     if (embeddedCSS) {
@@ -602,6 +627,13 @@ export class ExportEngine {
       '  <meta charset="UTF-8">',
       '  <meta name="viewport" content="width=device-width, initial-scale=1.0">',
     ];
+
+    // Same reason as generateHTML: a named family that is never fetched is the
+    // visitor's default sans, not the site's font.
+    const pageFontLinks = googleFontsHeadLinks(css, this.siteFontFamilies());
+    if (pageFontLinks) {
+      headParts.push(...pageFontLinks.split("\n").map((l) => `  ${l}`));
+    }
 
     // Inject SEO meta tags (title, description, OG, Twitter cards, etc.)
     const seoTags = this.seoInjector.inject(page, siteSEO);

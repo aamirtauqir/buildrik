@@ -164,14 +164,18 @@ describe("ExportEngine.export — format branches", () => {
 // ============================================================================
 
 describe("ExportEngine.generateHTML — css placement", () => {
-  it("inline: styles land in a style attribute, with no <style> block and no <link>", () => {
+  it("inline: styles land in a style attribute, with no <style> block and no stylesheet of ours", () => {
     const engine = new ExportEngine(makeComposer({ root: simpleRoot }), { cssStyle: "inline" });
 
     const html = engine.generateHTML();
 
     expect(html).toContain('style="background-color:red"');
     expect(html).not.toContain("<style>");
-    expect(html).not.toContain("<link rel=");
+    // This asserted "no <link rel=" at all, which also forbade the font
+    // stylesheet the page needs — a page that names Poppins and fetches
+    // nothing renders the visitor's generic sans. The assertion is about
+    // where OUR css goes, so it names our stylesheet.
+    expect(html).not.toContain('href="styles.css"');
   });
 
   it("embedded: styles land in a head <style> block, not on the elements", () => {
@@ -182,7 +186,7 @@ describe("ExportEngine.generateHTML — css placement", () => {
     expect(html).toContain("<style>");
     expect(html).toContain(".buildrick-root");
     expect(html).not.toContain('style="');
-    expect(html).not.toContain("<link rel=");
+    expect(html).not.toContain('href="styles.css"');
   });
 
   it("external: head links styles.css and emits neither inline styles nor a <style> block", () => {

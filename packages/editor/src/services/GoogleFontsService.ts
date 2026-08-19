@@ -9,6 +9,8 @@
  * @license BSD-3-Clause
  */
 
+import { GOOGLE_FONT_CATALOGUE } from "@shared/constants/googleFonts";
+
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -42,37 +44,6 @@ export interface FontLoadOptions {
   subsets?: string[];
 }
 
-// ============================================================================
-// POPULAR FONTS (Fallback when API is unavailable)
-// ============================================================================
-
-const POPULAR_FONTS: GoogleFont[] = [
-  { family: "Inter", variants: ["400", "500", "600", "700"], category: "sans-serif" },
-  { family: "Roboto", variants: ["400", "500", "700"], category: "sans-serif" },
-  { family: "Open Sans", variants: ["400", "600", "700"], category: "sans-serif" },
-  { family: "Lato", variants: ["400", "700"], category: "sans-serif" },
-  { family: "Montserrat", variants: ["400", "500", "600", "700"], category: "sans-serif" },
-  { family: "Poppins", variants: ["400", "500", "600", "700"], category: "sans-serif" },
-  { family: "Source Sans Pro", variants: ["400", "600", "700"], category: "sans-serif" },
-  { family: "Nunito", variants: ["400", "600", "700"], category: "sans-serif" },
-  { family: "Raleway", variants: ["400", "500", "600", "700"], category: "sans-serif" },
-  { family: "Ubuntu", variants: ["400", "500", "700"], category: "sans-serif" },
-  { family: "Playfair Display", variants: ["400", "500", "600", "700"], category: "serif" },
-  { family: "Merriweather", variants: ["400", "700"], category: "serif" },
-  { family: "Lora", variants: ["400", "500", "600", "700"], category: "serif" },
-  { family: "PT Serif", variants: ["400", "700"], category: "serif" },
-  { family: "Crimson Pro", variants: ["400", "500", "600", "700"], category: "serif" },
-  { family: "Fira Code", variants: ["400", "500", "600", "700"], category: "monospace" },
-  { family: "JetBrains Mono", variants: ["400", "500", "600", "700"], category: "monospace" },
-  { family: "Source Code Pro", variants: ["400", "500", "600", "700"], category: "monospace" },
-  { family: "Roboto Mono", variants: ["400", "500", "700"], category: "monospace" },
-  { family: "Dancing Script", variants: ["400", "500", "600", "700"], category: "handwriting" },
-  { family: "Pacifico", variants: ["400"], category: "handwriting" },
-  { family: "Caveat", variants: ["400", "500", "600", "700"], category: "handwriting" },
-  { family: "Oswald", variants: ["400", "500", "600", "700"], category: "display" },
-  { family: "Bebas Neue", variants: ["400"], category: "display" },
-  { family: "Anton", variants: ["400"], category: "display" },
-];
 
 // ============================================================================
 // SERVICE CLASS
@@ -84,7 +55,7 @@ const POPULAR_FONTS: GoogleFont[] = [
  */
 export class GoogleFontsService {
   private static instance: GoogleFontsService;
-  private fonts: GoogleFont[] = POPULAR_FONTS;
+  private fonts: GoogleFont[] = GOOGLE_FONT_CATALOGUE;
   private loadedFonts: Set<string> = new Set();
   private linkElements: Map<string, HTMLLinkElement> = new Map();
 
