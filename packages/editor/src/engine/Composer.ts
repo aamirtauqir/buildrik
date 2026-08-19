@@ -32,7 +32,7 @@ import { TraitDataBinding } from "./data/TraitDataBinding";
 import { DragManager } from "./drag/DragManager";
 import { ElementManager } from "./elements/ElementManager";
 import { EventEmitter } from "./EventEmitter";
-import { RESET_CSS } from "./export/ExportHelpers";
+import { RESET_CSS, siteFontCSS, googleFontsHeadLinks, siteFontsFromTokens } from "./export/ExportHelpers";
 import { FontManager } from "./fonts/FontManager";
 import { FormHandler } from "./forms/FormHandler";
 import { HistoryManager } from "./HistoryManager";
@@ -558,6 +558,20 @@ export class Composer extends EventEmitter {
     const html = this.elements.toHTML(options);
     const css = this.styles.toCSS(options);
 
+    // The site's own fonts. The comment above is about this exact gap and it
+    // reopened: the export learned to emit the three font slots and to fetch
+    // the families that need fetching, and this document — the one the preview
+    // renders — kept building a head with neither.
+    const fonts = siteFontsFromTokens(this.getProjectSettings?.()?.designTokens);
+    const siteCss = siteFontCSS(fonts);
+    // The HTML too, not just the CSS: this document carries element styles
+    // INLINE (`elements.toHTML`), so a heading set in Lora names its family in
+    // a style attribute and nowhere in the stylesheet.
+    const fontLinks = googleFontsHeadLinks(
+      `${css}${siteCss}${html}`,
+      [fonts.heading, fonts.body, fonts.mono].filter((f): f is string => Boolean(f))
+    );
+
     return {
       html,
       css,
@@ -567,7 +581,7 @@ export class Composer extends EventEmitter {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Buildrick Export</title>
-  <style>${RESET_CSS}${css}</style>
+${fontLinks ? `${fontLinks}\n` : ""}  <style>${RESET_CSS}${css}${siteCss}</style>
 </head>
 <body>
 ${html}

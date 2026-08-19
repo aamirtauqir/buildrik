@@ -12,6 +12,24 @@ const FORBIDDEN_PROTOCOLS = ["javascript:", "data:", "vbscript:"];
 const FORBIDDEN_STYLE_TOKENS = ["expression", "url("];
 
 /**
+ * The one stylesheet host the preview may keep.
+ *
+ * Every <link> was stripped, which is right for arbitrary external CSS and
+ * wrong for the site's own fonts: the exported page fetches its families from
+ * Google, and the preview showed the same document with the fetch removed —
+ * so a site set in Lora previewed in whatever serif the viewer happened to
+ * have. Same host the editor itself loads fonts from when you pick one.
+ */
+const ALLOWED_STYLESHEET_HOSTS = ["https://fonts.googleapis.com/"];
+
+function isAllowedStylesheet(el: Element): boolean {
+  const rel = (el.getAttribute("rel") || "").toLowerCase();
+  if (!rel.split(/\s+/).includes("stylesheet")) return false;
+  const href = el.getAttribute("href") || "";
+  return ALLOWED_STYLESHEET_HOSTS.some((h) => href.startsWith(h));
+}
+
+/**
  * Sanitize HTML for safe preview rendering — removes dangerous elements/attributes
  */
 export function sanitizeHTMLForPreview(html: string): string {
@@ -19,7 +37,10 @@ export function sanitizeHTMLForPreview(html: string): string {
     const doc = new DOMParser().parseFromString(html, "text/html");
     doc
       .querySelectorAll("script,iframe,object,embed,link,meta[http-equiv],base,form")
-      .forEach((n) => n.remove());
+      .forEach((n) => {
+        if (n.tagName === "LINK" && isAllowedStylesheet(n)) return;
+        n.remove();
+      });
 
     doc.querySelectorAll("*").forEach((el) => {
       [...el.attributes].forEach((attr) => {
@@ -54,8 +75,23 @@ export function sanitizeHTMLForPreview(html: string): string {
       })
       .map((css) => `<style>${css}</style>`)
       .join("");
+    /* And the font stylesheet, for the same reason and by the same shape: the
+       head is REBUILT here, so anything not collected is gone whatever the
+       filter above allows. The export names the site's families and fetches
+       them; without this the preview named them and fetched nothing, so a site
+       set in Lora previewed in whatever serif the viewer's machine had. */
+    const fontLinks = [
+      ...doc.head.querySelectorAll("link"),
+      ...doc.body.querySelectorAll("link"),
+    ]
+      .filter(isAllowedStylesheet)
+      .map((el) => {
+        const href = (el.getAttribute("href") ?? "").replace(/["<>]/g, "");
+        return `<link rel="stylesheet" href="${href}">`;
+      })
+      .join("");
     const body = doc.body.textContent !== null ? doc.body.outerHTML : "<body></body>";
-    return `<!DOCTYPE html><html><head><meta charset="utf-8">${styles}</head>${body}</html>`;
+    return `<!DOCTYPE html><html><head><meta charset="utf-8">${fontLinks}${styles}</head>${body}</html>`;
   } catch {
     return "<!DOCTYPE html><html><body>Preview unavailable</body></html>";
   }

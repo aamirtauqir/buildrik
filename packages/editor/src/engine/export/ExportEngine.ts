@@ -23,6 +23,7 @@ import {
   RESET_CSS,
   siteFontCSS,
   googleFontsHeadLinks,
+  siteFontsFromTokens,
   getTagForType,
   escapeHTML,
   stylesToString,
@@ -169,10 +170,10 @@ export class ExportEngine {
    * element names directly.
    */
   private siteFontFamilies(): string[] {
-    const tokens = this.composer.getProjectSettings?.()?.designTokens ?? [];
-    return ["font-heading", "font-body", "font-mono"]
-      .map((id) => tokens.find((t) => t.id === id)?.value)
-      .filter((v): v is string => Boolean(v));
+    const { heading, body, mono } = siteFontsFromTokens(
+      this.composer.getProjectSettings?.()?.designTokens
+    );
+    return [heading, body, mono].filter((v): v is string => Boolean(v));
   }
 
   /**
@@ -189,14 +190,7 @@ export class ExportEngine {
     // The site's fonts, after the reset so they win over its one hardcoded
     // family. Read from the project's own tokens — the Brand panel's three
     // font slots reached the canvas and stopped there.
-    const tokens = this.composer.getProjectSettings?.()?.designTokens ?? [];
-    const fontValue = (id: string) => tokens.find((t) => t.id === id)?.value;
-    css += siteFontCSS({
-      heading: fontValue("font-heading"),
-      body: fontValue("font-body"),
-      mono: fontValue("font-mono"),
-      text: fontValue("color-text"),
-    });
+    css += siteFontCSS(siteFontsFromTokens(this.composer.getProjectSettings?.()?.designTokens));
 
     const page = this.composer.elements.getActivePage?.();
     if (!page) return css;

@@ -12,6 +12,27 @@ import { GOOGLE_FONT_CATALOGUE } from "../../shared/constants/googleFonts";
 // ============================================================================
 
 /**
+ * The site's three font slots and its text colour, read off its design tokens.
+ *
+ * Three places need this — the export's CSS, the export's font links, and the
+ * in-shell preview, which builds its own document. The preview is why this is
+ * shared rather than inlined: it had its own head assembly with neither, so a
+ * site set in Lora previewed in whatever serif the viewer's machine had while
+ * the published page fetched the real face.
+ */
+export function siteFontsFromTokens(
+  tokens: ReadonlyArray<{ id?: string; value?: string }> = []
+): { heading?: string; body?: string; mono?: string; text?: string } {
+  const value = (id: string) => tokens.find((t) => t.id === id)?.value;
+  return {
+    heading: value("font-heading"),
+    body: value("font-body"),
+    mono: value("font-mono"),
+    text: value("color-text"),
+  };
+}
+
+/**
  * The site's own font rules, from its three font tokens.
  *
  * RESET_CSS names one hardcoded family for every site ever exported. The Brand
