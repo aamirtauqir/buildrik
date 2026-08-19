@@ -7,6 +7,7 @@
 import * as React from "react";
 import type { Composer } from "../../engine/Composer";
 import { ExportEngine } from "../../engine/export";
+import { resolvePageTitle } from "../../engine/export/SEOInjector";
 import { ReactExporter } from "../../engine/export/ReactExporter";
 import type { ExportConfig, ExportResult, PreviewDevice } from "../../shared/types/export";
 import { DEFAULT_EXPORT_CONFIG, PREVIEW_DEVICES } from "../../shared/types/export";
@@ -37,9 +38,24 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
   const [activeTab, setActiveTab] = React.useState<ExportTab>("preview");
   const [previewDevice, setPreviewDevice] = React.useState<PreviewDevice>("desktop");
   const [config, setConfig] = React.useState<ExportConfig>(DEFAULT_EXPORT_CONFIG);
+  // Whether the user has typed their own title. Until they do, the export takes
+  // the site's — the default was the literal string "Buildrick Export", so a
+  // customer's downloaded page was titled with OUR name.
+  const titleTouchedRef = React.useRef(false);
   const [result, setResult] = React.useState<ExportResult | null>(null);
   const [loading, setLoading] = React.useState(false);
   const [zipLoading, setZipLoading] = React.useState(false);
+
+  // The site's own title, resolved the way the multi-page exporter resolves it
+  // (page SEO → page settings → page name). Runs on open, so a title the user
+  // typed during this session survives a config change.
+  React.useEffect(() => {
+    if (!isOpen || !composer || titleTouchedRef.current) return;
+    const page = composer.elements?.getActivePage?.();
+    if (!page) return;
+    const title = resolvePageTitle(page, page.settings?.seo, page.settings);
+    setConfig((prev) => (prev.pageTitle === title ? prev : { ...prev, pageTitle: title }));
+  }, [isOpen, composer]);
 
   // Generate export when modal opens or config changes
   React.useEffect(() => {
@@ -65,6 +81,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
   }, [isOpen, composer, config]);
 
   const handleConfigChange = (updates: Partial<ExportConfig>) => {
+    if (updates.pageTitle !== undefined) titleTouchedRef.current = true;
     setConfig((prev) => ({ ...prev, ...updates }));
   };
 

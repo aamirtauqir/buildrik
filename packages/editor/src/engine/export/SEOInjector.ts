@@ -23,6 +23,21 @@ export interface SEOInjectorOptions {
 // SEO INJECTOR
 // ============================================================================
 
+/**
+ * The title a page ships with, in the order the exporter has always resolved
+ * it. Exported because the single-file export path had no access to it: the
+ * download modal seeded `pageTitle` from a constant, so every customer's
+ * exported HTML was titled "Buildrick Export" until they noticed the field and
+ * typed over it. One precedence, both paths.
+ */
+export function resolvePageTitle(
+  page: PageData,
+  pageSEO?: PageSEO,
+  pageSettings?: { title?: string }
+): string {
+  return pageSEO?.metaTitle || pageSettings?.title || page.name || "Untitled";
+}
+
 export class SEOInjector {
   private options: SEOInjectorOptions;
 
@@ -38,7 +53,7 @@ export class SEOInjector {
     const pageSettings = page.settings;
 
     // Resolve values with fallbacks
-    const title = this.getTitle(page, pageSEO, pageSettings);
+    const title = resolvePageTitle(page, pageSEO, pageSettings);
     const description = this.getDescription(pageSEO, pageSettings);
     const ogImage = pageSEO?.ogImage || siteSEO?.defaultOgImage || "";
     const ogTitle = pageSEO?.ogTitle || title;
@@ -141,7 +156,7 @@ export class SEOInjector {
     const pageSEO = page.settings?.seo;
     const pageSettings = page.settings;
 
-    const title = this.getTitle(page, pageSEO, pageSettings);
+    const title = resolvePageTitle(page, pageSEO, pageSettings);
     const description = this.getDescription(pageSEO, pageSettings);
     const ogImage = pageSEO?.ogImage || siteSEO?.defaultOgImage;
 
@@ -183,9 +198,6 @@ export class SEOInjector {
   // PRIVATE HELPERS
   // --------------------------------------------------------------------------
 
-  private getTitle(page: PageData, pageSEO?: PageSEO, pageSettings?: { title?: string }): string {
-    return pageSEO?.metaTitle || pageSettings?.title || page.name || "Untitled";
-  }
 
   private getDescription(pageSEO?: PageSEO, pageSettings?: { description?: string }): string {
     return pageSEO?.metaDescription || pageSettings?.description || "";
