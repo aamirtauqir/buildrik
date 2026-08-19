@@ -3,7 +3,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, createEvent } from "@testing-library/react";
 import { PageRow } from "../components/PageRow";
 import type { PageItem } from "../types";
 
@@ -134,3 +134,40 @@ describe("PageRow", () => {
     ).toBeInTheDocument();
   });
 });
+
+/* A space typed into the rename field was swallowed and toggled the row's
+   selection instead, so "Renamed Page" saved as "RenamedPage". Two handlers
+   were responsible: the input's own, and the ROW's — the input sits inside the
+   row, so its keystrokes bubble. The row already guarded Enter and F2 with
+   `!isRenaming`; the Space branch, added later, did not. Measured in the app:
+   typing "A B C" left "ABC", with defaultPrevented flipping between the
+   capture and bubble phases while the target was the input. */
+describe("PageRow — a space belongs to the page name, not to selection", () => {
+  function renameProps(extra: Record<string, unknown> = {}) {
+    return { ...baseProps, isRenaming: true, ...extra };
+  }
+
+  it("does not preventDefault a space typed into the rename field", () => {
+    const onToggleSelect = vi.fn();
+    const { container } = render(
+      <PageRow page={home} {...renameProps({ onToggleSelect })} />,
+    );
+    const input = container.querySelector("input") as HTMLInputElement;
+    expect(input).not.toBeNull();
+    const ev = createEvent.keyDown(input, { key: " ", bubbles: true });
+    fireEvent(input, ev);
+    expect(ev.defaultPrevented).toBe(false);
+    expect(onToggleSelect).not.toHaveBeenCalled();
+  });
+
+  it("still toggles selection on space when the row is NOT renaming", () => {
+    const onToggleSelect = vi.fn();
+    const { container } = render(
+      <PageRow page={home} {...baseProps} onToggleSelect={onToggleSelect} />,
+    );
+    const row = container.querySelector(".bd-pg-row") as HTMLElement;
+    fireEvent.keyDown(row, { key: " " });
+    expect(onToggleSelect).toHaveBeenCalledTimes(1);
+  });
+});
+

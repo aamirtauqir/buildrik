@@ -99,10 +99,13 @@ export const PageRow = React.memo<Props>(
         e.preventDefault();
         committedRef.current = true;
         onRenameCancel();
-      } else if (e.key === " " && onToggleSelect) {
-        e.preventDefault();
-        onToggleSelect(e);
       }
+      /* No Space branch here. This handler is on the RENAME INPUT, where a
+         space is a character in a page name — it used to preventDefault and
+         toggle the row's selection instead, so "Renamed Page" was saved as
+         "RenamedPage" and the row silently got selected. The search box in the
+         same panel took spaces fine, which is what made it look like a
+         keyboard problem rather than this. */
     };
 
     const handleDragStart = (e: React.DragEvent) => {
@@ -183,7 +186,11 @@ export const PageRow = React.memo<Props>(
           onKeyDown={(e) => {
             if (e.key === "Enter" && !isRenaming) onSelect();
             if (e.key === "F2" && !isRenaming) onRenameStart();
-            if (e.key === " " && onToggleSelect) {
+            /* `!isRenaming` for the same reason as its two neighbours: the
+               rename input sits INSIDE this row, so its keystrokes bubble
+               here. Without the guard, every space typed into a page name was
+               eaten and toggled selection instead. */
+            if (e.key === " " && onToggleSelect && !isRenaming) {
               e.preventDefault();
               onToggleSelect(e);
             }

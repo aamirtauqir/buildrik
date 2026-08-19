@@ -131,7 +131,12 @@ export const PageFolder: React.FC<Props> = ({
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
+            /* Not while renaming: the folder's rename input sits inside this
+               row, so its keystrokes bubble here. Without the guard a space
+               typed into a folder name was swallowed (and the folder toggled),
+               and Enter collapsed the folder on the way to committing. Same
+               fault as PageRow's, one component over. */
+            if ((e.key === "Enter" || e.key === " ") && !isRenamingFolder) {
               e.preventDefault();
               onToggle();
             }
