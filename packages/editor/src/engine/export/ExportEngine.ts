@@ -470,10 +470,20 @@ export class ExportEngine {
 
     // User's global custom CSS (Settings → Advanced). Emitted last so it can
     // override generated element styles. Previously stored but injected nowhere.
-    const globalCss = this.composer.getProjectSettings?.()?.customCode?.globalCss;
+    const customCode = this.composer.getProjectSettings?.()?.customCode;
+    const globalCss = customCode?.globalCss;
     if (globalCss && globalCss.trim()) {
       head += `${indent}<style>${nl}${globalCss}${nl}${indent}</style>${nl}`;
     }
+
+    // …and the head scripts from the same screen, which said "Custom code runs
+    // on all pages" and ran on none: the field saves (verified live), and
+    // nothing read it — not this export, not the publish worker, which selects
+    // the site's icons and SEO and never its head code. Same sanitiser the
+    // per-page head field uses, so inline <script> does not survive; an
+    // external `<script src>` does.
+    const headScripts = sanitizeHeadCode(customCode?.headScripts);
+    if (headScripts) head += `${indent}${headScripts}${nl}`;
 
     // Inject analytics scripts before closing head tag
     const analyticsScripts = generateAnalyticsScripts(config.analytics);
@@ -493,7 +503,10 @@ export class ExportEngine {
       ? buildInteractionRuntimeScript() + nl
       : "";
 
-    return `<!DOCTYPE html>${nl}<html lang="en">${nl}<head>${nl}${head}</head>${nl}<body>${nl}${content}${interactionScript}</body>${nl}</html>`;
+    const bodyScripts = sanitizeHeadCode(customCode?.bodyScripts);
+    const bodyTail = bodyScripts ? `${nl}${indent}${bodyScripts}` : "";
+
+    return `<!DOCTYPE html>${nl}<html lang="en">${nl}<head>${nl}${head}</head>${nl}<body>${nl}${content}${interactionScript}${bodyTail}</body>${nl}</html>`;
   }
 
   /**
@@ -723,10 +736,16 @@ export class ExportEngine {
 
     // User's global custom CSS (Settings → Advanced), emitted after the
     // stylesheet link so it can override generated styles.
-    const globalCss = this.composer.getProjectSettings?.()?.customCode?.globalCss;
+    const siteCustomCode = this.composer.getProjectSettings?.()?.customCode;
+    const globalCss = siteCustomCode?.globalCss;
     if (globalCss && globalCss.trim()) {
       headParts.push(`  <style>\n${globalCss}\n  </style>`);
     }
+
+    // The site's head scripts, on every published page — see the note in
+    // wrapInDocument. Sanitised by the same allowlist as the per-page field.
+    const siteHeadScripts = sanitizeHeadCode(siteCustomCode?.headScripts);
+    if (siteHeadScripts) headParts.push(`  ${siteHeadScripts}`);
 
     // Inject the interaction runtime only when this page uses interactions.
     const interactionScript = bodyContent.includes(INTERACTION_ATTR)
@@ -739,7 +758,7 @@ export class ExportEngine {
 ${headParts.join("\n")}
 </head>
 <body>
-${bodyContent}${interactionScript}
+${bodyContent}${interactionScript}${sanitizeHeadCode(siteCustomCode?.bodyScripts) ? `\n  ${sanitizeHeadCode(siteCustomCode?.bodyScripts)}` : ""}
 </body>
 </html>`;
 
