@@ -31,6 +31,7 @@ import { DSLintRunner } from "@/editor/design-system/ui/DSLintRunner";
 import { useBlockInsertion } from "./hooks/useBlockInsertion";
 import { useAltTextAutoTrigger } from "./hooks/useAltTextAutoTrigger";
 import { PageTabBar } from "./PageTabBar";
+import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -88,7 +89,6 @@ export interface StudioPanelsProps {
   isFullPageMode?: boolean;
   /** Drawer width in pixels for the active tab (derived from useStudioState) */
   drawerWidth?: number;
-  projectId?: string | null;
   /** Canonical publish state machine (shared with the Topbar) + its fire
    *  handler, forwarded to the sidebar PublishTab so both drive ONE flow. */
   publishJob?: UsePublishJobResult;
@@ -167,10 +167,19 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   composerContainerRef,
   isFullPageMode = false,
   drawerWidth = 280,
-  projectId,
   publishJob,
   onVercelPublish,
 }) => {
+  /* The site whose brand/tokens/publish state these panels edit.
+     This was a prop, and `AquibraStudio` never passed it — so every consumer
+     below ran on `undefined`, and `TokenRegistryProvider` fell through to its
+     `"default"` storage key. One key for every site on the origin: apply a
+     brand colour on one site and the next site you open loads it, on a
+     surface whose whole job is per-site identity. The id is not something
+     the shell has to hand down — it is in the URL, which is where the sync
+     provider and PublishTab already read it from. */
+  const projectId = React.useMemo(() => getSiteIdFromUrl(), []);
+
   const { addToast } = useToast();
   const { handleBlockClick } = useBlockInsertion(composer);
   useAltTextAutoTrigger(composer);
