@@ -844,10 +844,18 @@ export function VariablesView({
             nothing at all, so an empty Variables screen was one blue link on
             white with no clue what a variable is for. */}
         {variables.length === 0 && !adding && (
+          /* This said a variable is reusable "in any text on any page", naming
+             the {{site.*}} form. Nothing substitutes it: typed into a heading
+             it renders literally on the canvas AND comes out literally in the
+             exported HTML (walked live — the export carried the raw braces and
+             no value). The store is localStorage keyed by project, so the
+             publish worker cannot see it either, and the inspector's binding
+             popover offers collections only. Until variables move into the
+             project and something reads them, the screen says what is true. */
           <div className={`${SUB} tw:p-3`}>
-            No variables yet. A variable is a value you write once and reuse —
-            <span className={MONO}>{" {{site.name}} "}</span>
-            in any text on any page.
+            No variables yet. A variable is a value you write once and reuse in
+            this panel — <span className={MONO}>{" {{site.name}} "}</span> is
+            saved in this browser, and pages do not read it yet.
           </div>
         )}
         {variables.map((v) => (
