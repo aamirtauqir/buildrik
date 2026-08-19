@@ -201,6 +201,18 @@ export class VersionTimelineManager {
 
     const snapshot = await this.captureSnapshotAsync();
 
+    /* An auto-checkpoint with NO PAGES is not a restore point, it is a trap.
+       `project:loaded` fires twice on open — once before the project is
+       imported and once after — so every load wrote a PAIR of auto-saves
+       milliseconds apart: one empty, one real. The Saves list shows them
+       identically ("Auto-save · 16m ago · Auto"), so picking the wrong one is
+       a coin flip, and restoring the empty one empties the site. Observed:
+       a 2-element page restored to 0.
+       Named versions are never dropped — if someone deliberately saves a blank
+       project, that is a decision. A loaded editor always has at least one
+       page, so this cannot suppress a legitimate auto-save. */
+    if (!snapshot.pages?.length) return null;
+
     const version: NamedVersion = {
       id: generateVersionId(),
       name: label,

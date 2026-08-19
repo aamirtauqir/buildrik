@@ -1,5 +1,22 @@
 import { describe, it, expect, vi } from "vitest";
 
+/* IndexedDB does not exist in jsdom, so the real storage module throws the
+   moment a version is written. Stubbed so these tests can exercise the
+   MANAGER's decisions — what it stores and what it refuses — which is the
+   subject here. */
+vi.mock("../storage/VersionHistoryStorage", () => ({
+  saveVersion: vi.fn().mockResolvedValue(undefined),
+  loadVersions: vi.fn().mockResolvedValue([]),
+  loadVersion: vi.fn().mockResolvedValue(null),
+  deleteVersion: vi.fn().mockResolvedValue(undefined),
+  deleteAllVersions: vi.fn().mockResolvedValue(undefined),
+  pruneVersions: vi.fn().mockResolvedValue(undefined),
+  exportVersions: vi.fn().mockResolvedValue({ versions: [] }),
+  importVersions: vi.fn().mockResolvedValue(undefined),
+  downloadVersionsFile: vi.fn(),
+  isStorageAvailable: () => true,
+}));
+
 describe("VersionTimelineManager compareVersions performance", () => {
   it("flattens snapshots into Maps for O(n) comparison", async () => {
     const manager = new (await import("../VersionTimelineManager")).VersionTimelineManager({} as any);
@@ -76,3 +93,46 @@ describe("VersionTimelineManager.restoreVersion — the open work survives", () 
     expect(composer.importProject).not.toHaveBeenCalled();
   });
 });
+
+/* `project:loaded` fires twice on open — once before the project is imported
+   and once after — so every load wrote a PAIR of auto-saves milliseconds
+   apart: one with zero pages, one real. The Saves list draws them identically
+   ("Auto-save · 16m ago · Auto"), so choosing between them is a coin flip, and
+   restoring the empty one empties the site. Reproduced on a scratch site: a
+   2-element page restored to 0 children. */
+describe("VersionTimelineManager.autoCheckpoint — an empty snapshot is not a restore point", () => {
+  async function makeManager(project: unknown) {
+    const composer = {
+      on: () => {},
+      off: () => {},
+      emit: () => {},
+      importProject: vi.fn(),
+      exportProject: () => project,
+      elements: { getPages: () => [], getElement: () => null },
+      styles: { exportStyles: () => [] },
+    };
+    const { VersionTimelineManager } = await import("../VersionTimelineManager");
+    return new VersionTimelineManager(composer as never);
+  }
+
+  it("does not store an auto-checkpoint whose snapshot has no pages", async () => {
+    const m = await makeManager({ pages: [], styles: [], assets: [] });
+    const created = await m.autoCheckpoint("Auto: project:loaded");
+    expect(created).toBeNull();
+    expect(m.getVersions()).toHaveLength(0);
+  });
+
+  it("stores one whose snapshot has a page, even when that page is empty", async () => {
+    /* A brand-new site is legitimately one page with no children — that IS a
+       restore point, and refusing it would drop real history. */
+    const m = await makeManager({
+      pages: [{ id: "p1", name: "Home", root: { id: "root", type: "container", children: [] } }],
+      styles: [],
+      assets: [],
+    });
+    const created = await m.autoCheckpoint("Auto: project:loaded");
+    expect(created).not.toBeNull();
+    expect(m.getVersions()).toHaveLength(1);
+  });
+});
+
