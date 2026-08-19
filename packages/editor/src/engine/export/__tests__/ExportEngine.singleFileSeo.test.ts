@@ -66,3 +66,26 @@ describe("the single HTML file carries the page's SEO", () => {
     expect(html).not.toContain('name="description"');
   });
 });
+
+describe("the page's indexing choice survives the single file", () => {
+  it("writes noindex when the user turned indexing off", () => {
+    const html = new ExportEngine(composerWithSeo({ noIndex: true })).generateHTML();
+    expect(html).toContain('<meta name="robots" content="noindex">');
+  });
+
+  it("writes both directives when both toggles are off", () => {
+    const html = new ExportEngine(composerWithSeo({ noIndex: true, noFollow: true })).generateHTML();
+    expect(html).toContain('content="noindex, nofollow"');
+  });
+
+  it("says nothing for a page that allows both", () => {
+    const html = new ExportEngine(composerWithSeo({ metaDescription: "x" })).generateHTML();
+    expect(html).not.toContain('name="robots"');
+  });
+
+  it("agrees with the published page", async () => {
+    const { files } = await new ExportEngine(composerWithSeo({ noIndex: true }))
+      .exportAllPages({ format: "html" });
+    expect(files.find((f) => f.name === "index.html")?.content).toContain('content="noindex"');
+  });
+});

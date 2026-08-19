@@ -38,6 +38,22 @@ export function resolvePageTitle(
   return pageSEO?.metaTitle || pageSettings?.title || page.name || "Untitled";
 }
 
+/**
+ * The robots directives a page asks for, from its "Allow indexing" and "Follow
+ * links" toggles.
+ *
+ * `inject()` has always emitted them and `getMetaTags` did not — and the
+ * single-file export builds its head from `getMetaTags`, so a page the user
+ * excluded from search shipped indexable in the downloaded file while the
+ * published page carried the noindex. One list, both callers.
+ */
+function robotsDirectives(pageSEO?: PageSEO): string {
+  const directives: string[] = [];
+  if (pageSEO?.noIndex) directives.push("noindex");
+  if (pageSEO?.noFollow) directives.push("nofollow");
+  return directives.join(", ");
+}
+
 export class SEOInjector {
   private options: SEOInjectorOptions;
 
@@ -121,12 +137,9 @@ export class SEOInjector {
     }
 
     // Robots directives
-    const robotsDirectives: string[] = [];
-    if (pageSEO?.noIndex) robotsDirectives.push("noindex");
-    if (pageSEO?.noFollow) robotsDirectives.push("nofollow");
-
-    if (robotsDirectives.length > 0) {
-      tags.push(`<meta name="robots" content="${robotsDirectives.join(", ")}">`);
+    const robots = robotsDirectives(pageSEO);
+    if (robots) {
+      tags.push(`<meta name="robots" content="${robots}">`);
     }
 
     // Structured data (JSON-LD).
@@ -190,6 +203,12 @@ export class SEOInjector {
     if (siteSEO?.twitterHandle) {
       tags.push({ name: "twitter:site", content: siteSEO.twitterHandle });
     }
+
+    // The page's own indexing choice. `inject()` has always emitted this; this
+    // list did not, and the single-file export builds its head from here — so a
+    // page excluded from search shipped indexable in the downloaded file.
+    const robots = robotsDirectives(pageSEO);
+    if (robots) tags.push({ name: "robots", content: robots });
 
     return tags;
   }
