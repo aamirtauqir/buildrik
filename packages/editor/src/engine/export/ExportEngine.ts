@@ -547,8 +547,16 @@ export class ExportEngine {
       syntax: options.cmsSyntax,
     };
 
+    // A slug is a path, and "/about" is what a person types for one —
+    // `normalizeSlug` keeps that leading slash and `validateSlug` allows it, so
+    // the file came out named "/about.html": a malformed entry in the ZIP and a
+    // leading-slash `path` in the publish payload. Strip it here rather than
+    // rewriting anyone's stored slug.
     this.pageHrefs = new Map(
-      pages.map((p) => [p.id, p.isHome || !p.slug ? "index.html" : `${p.slug}.html`]),
+      pages.map((p) => {
+        const slug = (p.slug ?? "").replace(/^\/+/, "");
+        return [p.id, p.isHome || !slug ? "index.html" : `${slug}.html`];
+      }),
     );
 
     // Export each page
@@ -873,31 +881,35 @@ ${bodyContent}${interactionScript}
     const zip = new JSZip();
     const bundler = new AssetBundler();
 
-    // Generate HTML and CSS
-    let html = this.generateHTML({ ...cfg, cssStyle: "external" });
-    let css = this.generateCSS(cfg);
+    // EVERY page, not just the open one. This built its archive from
+    // `generateHTML`, which is the ACTIVE page — so "Export code → ZIP" on a
+    // twelve-page site handed back one index.html and silently dropped the
+    // other eleven, while Publish (which runs `exportAllPages`) shipped them
+    // all. Verified on a two-page site: the ZIP held index.html + styles.css,
+    // and the React export beside it held both pages.
+    const { files } = await this.exportAllPages({ format: "html", minify: cfg.minify });
 
-    // Extract and bundle image assets
-    const imageUrls = bundler.extractImageUrls(html);
+    const htmlFiles = files.filter((f) => f.type === "html");
+    let css = files.find((f) => f.name === "styles.css")?.content ?? "";
+
+    // Assets referenced by ANY page, deduped — one image used on three pages
+    // should be bundled once.
+    const imageUrls = [...new Set(htmlFiles.flatMap((f) => bundler.extractImageUrls(f.content)))];
     const { assets: imageAssets } = await bundler.bundleAssets(imageUrls);
-
-    // Extract and bundle font assets from CSS
     const fontUrls = bundler.extractFontUrls(css);
     const { assets: fontAssets } = await bundler.bundleAssets(fontUrls);
-
     const allAssets = [...imageAssets, ...fontAssets];
 
-    // Rewrite URLs to use local paths
-    html = bundler.rewriteUrls(html, allAssets);
     css = bundler.rewriteFontUrls(css, fontAssets);
 
-    // Add HTML file
-    zip.file("index.html", html);
-
-    // Add CSS file
-    if (css) {
-      zip.file("styles.css", css);
+    for (const file of files) {
+      if (file.name === "styles.css") continue;
+      zip.file(
+        file.name,
+        file.type === "html" ? bundler.rewriteUrls(file.content, allAssets) : file.content
+      );
     }
+    if (css) zip.file("styles.css", css);
 
     // Add assets to ZIP
     if (allAssets.length > 0) {

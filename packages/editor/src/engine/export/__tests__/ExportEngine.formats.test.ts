@@ -59,13 +59,26 @@ interface ComposerOptions {
   settings?: Record<string, unknown>;
 }
 
+/** The one-page project a `makeComposer({ root })` fixture stands for. */
+function singlePage(root: LiveNode) {
+  return { id: "page-1", name: "Home", slug: "", isHome: true, root } as never;
+}
+
 function makeComposer({ root, pages, settings }: ComposerOptions = {}): Composer {
   return {
     elements: {
       getActivePage: () => (root ? { root: { id: root.id } } : undefined),
       getElement: (id: string) => (root && id === root.id ? live(root) : undefined),
-      getAllPages: () => pages ?? [],
-      exportPages: pages ? () => pages : undefined,
+      // A real composer's active page is always IN its page list. Returning []
+      // here modelled a project that cannot exist, and `generateZip` — which
+      // now exports every page, the way Publish always has — read it as a site
+      // with no pages and produced an empty archive.
+      // A real composer's active page is always IN its page list, and its root
+      // carries the tree. Returning [] here modelled a project that cannot
+      // exist, and `generateZip` — which now exports every page, the way
+      // Publish always has — read it as a site with no pages.
+      getAllPages: () => pages ?? (root ? [singlePage(root)] : []),
+      exportPages: () => pages ?? (root ? [singlePage(root)] : []),
     },
     styles: { generateResponsiveCSS: vi.fn().mockReturnValue("") },
     getProjectSettings: () => settings,
@@ -540,12 +553,17 @@ describe("ExportEngine.generateZip", () => {
 
     expect(fetchMock).toHaveBeenCalledWith("https://cdn.example.com/pic.png", { mode: "cors" });
     expect(zip.file("index.html")).toBeTruthy();
-    expect(zip.file("styles.css")).toBeTruthy();
     expect(zip.file("assets/asset-1.png")).toBeTruthy();
 
     const html = await zip.file("index.html")!.async("string");
     expect(html).toContain('src="assets/asset-1.png"');
     expect(html).not.toContain("cdn.example.com");
+    // The archive is now built by the same pipeline Publish uses, and this page
+    // is a bare image with no styles — so there is no stylesheet, and nothing
+    // links one. The pair is what matters: a styles.css link with no file is a
+    // 404 on the customer's site.
+    expect(zip.file("styles.css")).toBeNull();
+    expect(html).not.toContain('href="styles.css"');
   });
 
   it("produces just index.html + styles.css when there are no assets", async () => {
