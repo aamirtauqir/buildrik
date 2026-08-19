@@ -43,7 +43,8 @@ import {
 import type { StylePreset } from "../types";
 import { useTokenUsageMap } from "../state/useTokenUsageMap";
 import type { DesignToken } from "../types";
-import { CURRENT_SCHEMA_VERSION, migrateDesignTokens } from "../migrations";
+import { CURRENT_SCHEMA_VERSION } from "../migrations";
+import { mergeProjectTokens } from "../state/projectTokens";
 import {
   buildExport,
   downloadFile,
@@ -341,14 +342,12 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
         // DesignTokenRecord is structurally compatible with DesignToken at runtime
         // (id/name/value/cssVar/category/type/group are shared); cast to silence
         // a pre-existing TS narrowing gap in the migration signature.
-        let incoming = settings.designTokens as unknown as DesignToken[];
-        if (storedVersion < CURRENT_SCHEMA_VERSION) {
-          incoming = migrateDesignTokens(incoming, storedVersion, CURRENT_SCHEMA_VERSION);
-        }
-        const merged = DEFAULT_TOKENS.map((def) => {
-          const saved = incoming.find((t) => (t.id ? t.id === def.id : t.name === def.name));
-          return saved ? { ...def, value: saved.value } : def;
-        });
+        // The merge itself lives in state/projectTokens so ProjectTokensApplier —
+        // which runs this at project load, not at panel mount — shares it.
+        const merged = mergeProjectTokens(
+          settings.designTokens as unknown as DesignToken[],
+          storedVersion
+        );
         // C1 fix: single fan-out resets all 14 kinds atomically. Internally:
         // color/type/spacing get resetFromSaved(merged), the 11 new kinds get
         // hydrateFromExternal(merged) (filters by kind, replaces tokens+saved).

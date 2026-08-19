@@ -28,6 +28,7 @@ import { TokenRegistryProvider, DSModeProvider, StylePresetRegistryProvider } fr
 import { MigrationProgressMount } from "@/editor/design-system/ui/MigrationProgressMount";
 import { StarterGalleryMount } from "@/editor/design-system/ui/StarterGalleryMount";
 import { DSLintRunner } from "@/editor/design-system/ui/DSLintRunner";
+import { ProjectTokensApplier } from "@/editor/design-system/ui/ProjectTokensApplier";
 import { useBlockInsertion } from "./hooks/useBlockInsertion";
 import { useAltTextAutoTrigger } from "./hooks/useAltTextAutoTrigger";
 import { PageTabBar } from "./PageTabBar";
@@ -350,6 +351,10 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           "No issues" until the user happened to open Brand. */}
       <DSLintRunner composer={composer} />
       <MigrationProgressMount composer={composer} />
+      {/* Headless, for the same reason the linter above is: a site's own
+          tokens reached the page only when the Brand panel mounted, so a
+          machine without the localStorage cache drew the DEFAULT brand. */}
+      <ProjectTokensApplier composer={composer} />
       <StarterGalleryMount projectId={projectId} composer={composer} />
       <LayoutShell
         drawerOpen={isLeftPanelOpen && !effectiveFullPageMode}

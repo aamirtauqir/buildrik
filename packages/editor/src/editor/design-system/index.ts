@@ -4,6 +4,7 @@
  */
 
 export { DesignSystemTab } from "./ui/DesignSystemTab";
+export { ProjectTokensApplier } from "./ui/ProjectTokensApplier";
 export type { DesignToken, ThemeMode } from "./types";
 export type { ExportFormat } from "./utils/exportUtils";
 export {
