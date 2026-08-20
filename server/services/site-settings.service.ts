@@ -88,6 +88,32 @@ export async function getSiteSettings(siteId: string) {
 
   if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
 
+  /* What the editor actually writes. The SEO tab says "SEO content is edited in
+     the editor. This is a live preview", but it read the SITE columns —
+     `sites.metaTitle` / `metaDescription` — which no screen in the product
+     writes: 0 of 52 rows in this database have one. The editor's SEO panel
+     writes the PAGE's own settings JSON (`pages.settings.seo`), so the preview
+     was permanently "Not set" no matter what anyone typed. Read the home page's
+     SEO here and let the tab prefer it. */
+  const homePage = await prisma.page.findFirst({
+    where: { siteId },
+    orderBy: [{ isHomePage: "desc" }, { position: "asc" }],
+    select: { name: true, seoTitle: true, seoDescription: true, settings: true },
+  });
+  const pageSeoJson =
+    homePage && typeof homePage.settings === "object" && homePage.settings !== null
+      ? ((homePage.settings as { seo?: Record<string, unknown> }).seo ?? {})
+      : {};
+  const str = (v: unknown) => (typeof v === "string" && v.trim() ? v : null);
+  const pageSeo = homePage
+    ? {
+        pageName: homePage.name,
+        metaTitle: str(pageSeoJson.metaTitle) ?? homePage.seoTitle ?? null,
+        metaDescription: str(pageSeoJson.metaDescription) ?? homePage.seoDescription ?? null,
+        ogImage: str(pageSeoJson.ogImage),
+      }
+    : null;
+
   // P0.3: redact publishedPassword. Client gets a boolean indicator,
   // never the hash. Editor's "password is set" UI works on the boolean.
   const { workspace, publishedPassword, ...rest } = site;
@@ -96,6 +122,7 @@ export async function getSiteSettings(siteId: string) {
     publishedPassword: null, // typed as String? on schema; null = not set or redacted
     hasPublishedPassword: !!publishedPassword,
     plan: workspace.plan,
+    pageSeo,
   };
 }
 

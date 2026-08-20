@@ -24,6 +24,13 @@ interface SeoTabProps {
     metaDescription?: string;
     metaTitleTemplate?: string | null;
     ogImage?: string | null;
+    /** The home page's own SEO, which is what the editor edits. */
+    pageSeo?: {
+      pageName: string;
+      metaTitle: string | null;
+      metaDescription: string | null;
+      ogImage: string | null;
+    } | null;
     [key: string]: unknown;
   };
 }
@@ -35,9 +42,14 @@ const SERP_PLACEHOLDER_HOST = "yoursite.com";
 
 export function SeoTab({ site }: SeoTabProps) {
   const unified = useUnifiedEditorFlag();
-  const metaTitle = site.metaTitle ?? "";
-  const metaDesc = site.metaDescription ?? "";
-  const ogImage = site.ogImage ?? null;
+  /* Prefer what the editor writes. `site.metaTitle` / `metaDescription` are
+     site columns no screen writes — the editor's SEO panel writes the PAGE's
+     settings, which arrive here as `pageSeo`. Site-level values remain the
+     fallback for anything set through the API. */
+  const pageSeo = site.pageSeo ?? null;
+  const metaTitle = pageSeo?.metaTitle ?? site.metaTitle ?? "";
+  const metaDesc = pageSeo?.metaDescription ?? site.metaDescription ?? "";
+  const ogImage = pageSeo?.ogImage ?? site.ogImage ?? null;
   const editorHref = site.id ? getEditorHref(site.id, unified) : "/dashboard/projects";
 
   return (
@@ -67,7 +79,7 @@ export function SeoTab({ site }: SeoTabProps) {
         </div>
       </SectionCard>
 
-      <SectionCard title="Current Meta Tags">
+      <SectionCard title={pageSeo ? `Current Meta Tags — ${pageSeo.pageName}` : "Current Meta Tags"}>
         <dl className="space-y-3 text-body">
           <Row label="Meta title" value={metaTitle} empty="Not set" />
           <Row label="Meta description" value={metaDesc} empty="Not set" />
