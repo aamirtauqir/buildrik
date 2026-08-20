@@ -29,6 +29,11 @@ export const MenuItem: React.FC<MenuItemProps> = ({
 
   return (
     <Button
+      /* The menu points `aria-activedescendant` at the focused action's id, so
+         the id has to exist on the item — it did not, and axe read the
+         reference as invalid (critical): the menu announced a focused item
+         that, to an AT, was not there. */
+      id={action.id}
       onClick={onClick}
       disabled={!enabled && !hasSubmenu}
       style={{
