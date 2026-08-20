@@ -282,6 +282,10 @@ export function RecordView({
      used to do the same thing without saying so, and typed values went with
      it. Same ConfirmDialog this file already uses to guard a field delete. */
   const [confirmLeave, setConfirmLeave] = React.useState(false);
+  /* Deleting one FIELD asks first; deleting the whole record did not, and CMS
+     records are not in the undo stack — measured: the row was gone at once and
+     ⌘Z did not bring it back. */
+  const [confirmDelete, setConfirmDelete] = React.useState(false);
   const leave = () => (dirty ? setConfirmLeave(true) : onBack());
   const display = collection.displayField ?? collection.fields[0]?.slug;
   const title =
@@ -346,12 +350,24 @@ export function RecordView({
         {record && onDelete && (
           <Button
             className={`${LINK_BTN} tw:mx-3 tw:my-2 tw:text-[var(--bk-error)] tw:hover:text-[var(--bk-error)]`}
-            onClick={onDelete}
+            onClick={() => setConfirmDelete(true)}
           >
             Delete record
           </Button>
         )}
       </div>
+      <ConfirmDialog
+        open={confirmDelete}
+        onClose={() => setConfirmDelete(false)}
+        onConfirm={() => {
+          setConfirmDelete(false);
+          onDelete?.();
+        }}
+        title="Delete record?"
+        message={`"${title}" will be removed. This one can't be undone.`}
+        confirmLabel="Delete record"
+        tone="destructive"
+      />
       <ConfirmDialog
         open={confirmLeave}
         onClose={() => setConfirmLeave(false)}
@@ -577,6 +593,10 @@ export function DynamicPagesView({
   const trimmed = pattern.trim();
   const dirty = trimmed !== (collection.pageSlugPattern ?? "");
   const [confirmLeave, setConfirmLeave] = React.useState(false);
+  /* Deleting one FIELD asks first; deleting the whole record did not, and CMS
+     records are not in the undo stack — measured: the row was gone at once and
+     ⌘Z did not bring it back. */
+  const [confirmDelete, setConfirmDelete] = React.useState(false);
   const leave = () => (dirty ? setConfirmLeave(true) : onBack());
   const publishedCount = records.filter((r) => r.status === "published").length;
   /* Two more conditions decide whether a page actually appears, and neither is

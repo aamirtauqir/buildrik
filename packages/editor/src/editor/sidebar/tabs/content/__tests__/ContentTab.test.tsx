@@ -8,7 +8,7 @@
  */
 import * as React from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent, cleanup, waitFor, act } from "@testing-library/react";
+import { render, screen, fireEvent, cleanup, waitFor, act, within } from "@testing-library/react";
 import { ContentTab } from "../ContentTab";
 import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
 import { CMSValidationError } from "@/engine/cms/CollectionManager";
@@ -170,6 +170,37 @@ describe("ContentTab", () => {
         }),
       ),
     );
+  });
+
+  /* Deleting one FIELD asked first; deleting the whole record did not — and CMS
+     records are not in the undo stack. Measured live: the row vanished on the
+     click and ⌘Z did not bring it back. */
+  it("asks before deleting a record, and only deletes on confirm", async () => {
+    const { composer } = makeEngine({ collections: [MENU], items: [ITEM] });
+    render(<ContentTab composer={composer as never} />);
+    fireEvent.click(await screen.findByText("Menu items"));
+    fireEvent.click(await screen.findByText("Margherita"));
+    fireEvent.click(screen.getByRole("button", { name: /delete record/i }));
+
+    expect(await screen.findByText(/Delete record\?/)).toBeInTheDocument();
+    expect(composer.cms.collections.deleteContentItem).not.toHaveBeenCalled();
+
+    const dialog = screen.getByRole("dialog");
+    fireEvent.click(within(dialog).getByRole("button", { name: /delete record/i }));
+    await waitFor(() =>
+      expect(composer.cms.collections.deleteContentItem).toHaveBeenCalledWith("it-1"),
+    );
+  });
+
+  it("cancelling keeps the record", async () => {
+    const { composer } = makeEngine({ collections: [MENU], items: [ITEM] });
+    render(<ContentTab composer={composer as never} />);
+    fireEvent.click(await screen.findByText("Menu items"));
+    fireEvent.click(await screen.findByText("Margherita"));
+    fireEvent.click(screen.getByRole("button", { name: /delete record/i }));
+    fireEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: /cancel/i }));
+
+    expect(composer.cms.collections.deleteContentItem).not.toHaveBeenCalled();
   });
 
   /* Publishing runs the collection's rules now (CollectionManager throws
