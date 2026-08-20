@@ -21,7 +21,12 @@ import * as React from "react";
 import { ToastInput } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
 import type { SaveState } from "./useStudioState";
-import { getSiteIdFromUrl, saveProject, SaveConflictError } from "@/services/BuildrikSyncProvider";
+import {
+  getSiteIdFromUrl,
+  saveProject,
+  SaveConflictError,
+  SETTINGS_MIRROR_ERROR_EVENT,
+} from "@/services/BuildrikSyncProvider";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 
 export interface UseSaveCallbackOptions {
@@ -66,6 +71,23 @@ export function useSaveCallback({
   setSaveState,
   setIsDirty,
 }: UseSaveCallbackOptions): SaveProjectFn {
+  /* The pages and the site-column mirror ride in one batch. A refused mirror
+     used to reject the whole save, so "Save failed — retry" appeared over
+     pages that were already on the server. The page save now answers for
+     itself; this says the smaller true thing about the other half. */
+  React.useEffect(() => {
+    const onMirrorError = (e: Event) => {
+      const message = (e as CustomEvent<{ message: string }>).detail?.message ?? "";
+      addToast({
+        title: "Saved — site settings didn't",
+        description: `Your pages are on the server. The site-level settings were refused: ${message}`,
+        tone: "warning",
+      });
+    };
+    window.addEventListener(SETTINGS_MIRROR_ERROR_EVENT, onMirrorError);
+    return () => window.removeEventListener(SETTINGS_MIRROR_ERROR_EVENT, onMirrorError);
+  }, [addToast]);
+
   const save = React.useCallback((): Promise<SaveOutcome> => {
     if (!composer) return Promise.resolve("error");
     setSaveState((prev) => ({ ...prev, status: "saving", error: undefined }));

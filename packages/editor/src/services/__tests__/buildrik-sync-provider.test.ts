@@ -44,6 +44,7 @@ import {
   saveProject,
   loadServerMedia,
   getSiteIdFromUrl,
+  SETTINGS_MIRROR_ERROR_EVENT,
   getEditorPlanTier,
   setBaselineLastEditedAt,
   SaveConflictError,
@@ -425,6 +426,38 @@ describe("saveProject dual-save routing (P0.2b)", () => {
       metaTitleTemplate: "{page_title}",
       touchIcon: null,
     });
+  });
+
+  /* The two mutations ride in one batch, and Promise.all let either one speak
+     for both: a refused settings mirror rejected the save, so "Save failed —
+     retry" appeared over pages that were already on the server. Walked live
+     with the settings entry rewritten to a 400 — the chip reads "Saved" and a
+     second toast names what didn't. */
+  it("still resolves when the settings mirror is refused, and says so", async () => {
+    const heard: string[] = [];
+    const onMirror = (e: Event) =>
+      heard.push((e as CustomEvent<{ message: string }>).detail.message);
+    window.addEventListener(SETTINGS_MIRROR_ERROR_EVENT, onMirror);
+    mocks.siteDetailSettingsUpdateMutate.mockRejectedValueOnce(new Error("ogImage: Invalid url"));
+
+    const result = await saveProject("s1", {
+      version: "1.0",
+      pages: [],
+      styles: [],
+      assets: [],
+      settings: { seo: { metaTitle: "Still saved" } },
+    } as any);
+
+    expect(result.success).toBe(true);
+    expect(heard).toEqual(["ogImage: Invalid url"]);
+    window.removeEventListener(SETTINGS_MIRROR_ERROR_EVENT, onMirror);
+  });
+
+  it("a failed PROJECT save still rejects — that one is the save", async () => {
+    mocks.saveProjectMutate.mockRejectedValueOnce(new Error("boom"));
+    await expect(
+      saveProject("s1", { version: "1.0", pages: [], styles: [], assets: [] } as any)
+    ).rejects.toThrow("boom");
   });
 
   it("skips the settings call entirely when no mirrored fields are present", async () => {

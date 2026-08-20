@@ -95,6 +95,22 @@ function emitSaveConflict(serverLastEditedAt: string): void {
   }
 }
 
+/**
+ * The pages saved and the site-column mirror beside them did not.
+ *
+ * These two ride in one batch, and `Promise.all` made either one failing read
+ * as "Save failed — retry" for both. It happened for real: `ogImage: ""` is
+ * not a URL, so every site without an OG image saved its pages under a red
+ * banner. The page save is the one the status chip is about; a refused mirror
+ * is its own, smaller sentence.
+ */
+export const SETTINGS_MIRROR_ERROR_EVENT = "buildrik:settings-mirror-error";
+function emitSettingsMirrorError(message: string): void {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent(SETTINGS_MIRROR_ERROR_EVENT, { detail: { message } }));
+  }
+}
+
 const DEFAULT_ROOT: ElementData = {
   id: "root",
   type: "container",
@@ -320,23 +336,24 @@ export async function saveProject(
   const siteColumnPatch = extractSiteColumnPatch(projectData);
   const hasSiteColumnChanges = Object.keys(siteColumnPatch).length > 0;
 
-  const calls: Array<Promise<unknown>> = [
-    client.sites.saveProject.mutate({
-      siteId,
-      projectData,
-      // 61-conflict: opt into behind-copy detection.
-      expectedLastEditedAt: _baselineLastEditedAt,
-    }),
-  ];
-  if (hasSiteColumnChanges) {
-    calls.push(
-      client.siteDetail.settings.update.mutate({ id: siteId, ...siteColumnPatch })
-    );
-  }
+  // Both mutations start in the same tick so the httpBatchLink still batches
+  // them; they are AWAITED separately so one cannot speak for the other.
+  const primaryCall = client.sites.saveProject.mutate({
+    siteId,
+    projectData,
+    // 61-conflict: opt into behind-copy detection.
+    expectedLastEditedAt: _baselineLastEditedAt,
+  });
+  const settingsCall = hasSiteColumnChanges
+    ? client.siteDetail.settings.update
+        .mutate({ id: siteId, ...siteColumnPatch })
+        .then(() => null)
+        .catch((e: unknown) => (e instanceof Error ? e.message : String(e)))
+    : null;
 
   let primaryResult: unknown;
   try {
-    [primaryResult] = await Promise.all(calls);
+    primaryResult = await primaryCall;
   } catch (err) {
     // Translate the server's CONFLICT into a typed error the shell can catch to
     // show the conflict dialog (rather than a generic save-failed toast).
@@ -349,6 +366,9 @@ export async function saveProject(
     }
     throw err;
   }
+
+  const mirrorError = settingsCall ? await settingsCall : null;
+  if (mirrorError) emitSettingsMirrorError(mirrorError);
 
   const result = primaryResult as { success: boolean; savedAt: Date };
   // Advance the baseline so the editor's own next save isn't seen as a conflict.
