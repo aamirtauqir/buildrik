@@ -20,6 +20,7 @@ import {
   mirrorComponentDelete,
   hydrateComponentsFromServer,
   onComponentSyncError,
+  retryComponentSync,
 } from "../../../services/componentSync";
 import { currentSiteId } from "../../../services/ReviewService";
 
@@ -58,10 +59,20 @@ export function useComponentSync(
           toastShown = true;
           addToast({
             title: "A component didn't sync to the cloud",
+            /* Same correction as the version toast: editing another component
+               mirrors THAT one and leaves this one queued (`SyncRetryQueue.run`
+               replays a single op), and `retryComponentSync` had no caller. */
             description:
-              "It's saved on this device but not yet shared across your sites. It'll retry when you next edit a component or reconnect.",
+              "It's saved on this device but not yet shared across your sites. Retry now, or leave it — a reconnect replays the queue.",
             tone: "error",
             duration: Infinity,
+            action: {
+              label: "Retry now",
+              onClick: () => {
+                toastShown = false;
+                void retryComponentSync();
+              },
+            },
           });
         })
       : undefined;

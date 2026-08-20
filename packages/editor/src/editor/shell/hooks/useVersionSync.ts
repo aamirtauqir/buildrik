@@ -19,6 +19,7 @@ import {
   mirrorVersionDelete,
   hydrateVersionsFromServer,
   onVersionSyncError,
+  retryVersionSync,
 } from "../../../services/versionSync";
 import { currentSiteId } from "../../../services/ReviewService";
 
@@ -55,10 +56,23 @@ export function useVersionSync(
           toastShown = true;
           addToast({
             title: "A saved version didn't sync to the cloud",
+            /* "It'll retry when you save the next version" was not true:
+               `SyncRetryQueue.run` replays only the op it is given, so a later
+               save mirrors itself and leaves the failed one queued until a
+               reconnect. `retryVersionSync` existed and nothing in the UI
+               called it — the user was told to wait for something that would
+               not happen. */
             description:
-              "It's saved on this device but not yet on the server. It'll retry when you save the next version or reconnect.",
+              "It's saved on this device but not yet on the server. Retry now, or leave it — a reconnect replays the queue.",
             tone: "error",
             duration: Infinity,
+            action: {
+              label: "Retry now",
+              onClick: () => {
+                toastShown = false;
+                void retryVersionSync();
+              },
+            },
           });
         })
       : undefined;
