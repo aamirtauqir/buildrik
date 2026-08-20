@@ -42,10 +42,9 @@ export function resolvePageTitle(
  * The robots directives a page asks for, from its "Allow indexing" and "Follow
  * links" toggles.
  *
- * `inject()` has always emitted them and `getMetaTags` did not — and the
- * single-file export builds its head from `getMetaTags`, so a page the user
- * excluded from search shipped indexable in the downloaded file while the
- * published page carried the noindex. One list, both callers.
+ * Kept as its own function because both export paths run through `inject()`
+ * and a page excluded from search must ship excluded from BOTH — the single
+ * file and the published site.
  */
 function robotsDirectives(pageSEO?: PageSEO): string {
   const directives: string[] = [];
@@ -190,60 +189,6 @@ export class SEOInjector {
     if (customHead) tags.push(customHead);
 
     return tags.join("\n  ");
-  }
-
-  /**
-   * Generate meta tags as an array (for programmatic use)
-   */
-  getMetaTags(
-    page: PageData,
-    siteSEO?: SiteSEO
-  ): Array<{ name?: string; property?: string; content: string }> {
-    const pageSEO = page.settings?.seo;
-    const pageSettings = page.settings;
-
-    const title = resolvePageTitle(page, pageSEO, pageSettings);
-    const description = this.getDescription(pageSEO, pageSettings);
-    const ogImage = pageSEO?.ogImage || siteSEO?.defaultOgImage;
-
-    const tags: Array<{ name?: string; property?: string; content: string }> = [];
-
-    if (description) {
-      tags.push({ name: "description", content: description });
-    }
-
-    tags.push({ property: "og:title", content: title });
-
-    if (description) {
-      tags.push({ property: "og:description", content: description });
-    }
-
-    if (ogImage) {
-      tags.push({ property: "og:image", content: ogImage });
-    }
-
-    tags.push({ name: "twitter:card", content: "summary_large_image" });
-    tags.push({ name: "twitter:title", content: title });
-
-    if (description) {
-      tags.push({ name: "twitter:description", content: description });
-    }
-
-    if (ogImage) {
-      tags.push({ name: "twitter:image", content: ogImage });
-    }
-
-    if (siteSEO?.twitterHandle) {
-      tags.push({ name: "twitter:site", content: siteSEO.twitterHandle });
-    }
-
-    // The page's own indexing choice. `inject()` has always emitted this; this
-    // list did not, and the single-file export builds its head from here — so a
-    // page excluded from search shipped indexable in the downloaded file.
-    const robots = robotsDirectives(pageSEO);
-    if (robots) tags.push({ name: "robots", content: robots });
-
-    return tags;
   }
 
   // --------------------------------------------------------------------------

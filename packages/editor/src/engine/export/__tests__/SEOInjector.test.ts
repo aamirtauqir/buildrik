@@ -268,32 +268,3 @@ describe("SEOInjector.inject — custom head code (sanitizeHeadCode path)", () =
   });
 });
 
-describe("SEOInjector.getMetaTags", () => {
-  it("returns the programmatic tag array with og/twitter entries", () => {
-    const tags = new SEOInjector().getMetaTags(
-      makePage({
-        settings: {
-          seo: { metaTitle: "T", metaDescription: "D", ogImage: "https://cdn.x/i.png" },
-        },
-      }),
-      { twitterHandle: "@acme" }
-    );
-
-    expect(tags).toContainEqual({ name: "description", content: "D" });
-    expect(tags).toContainEqual({ property: "og:title", content: "T" });
-    expect(tags).toContainEqual({ property: "og:description", content: "D" });
-    expect(tags).toContainEqual({ property: "og:image", content: "https://cdn.x/i.png" });
-    expect(tags).toContainEqual({ name: "twitter:card", content: "summary_large_image" });
-    expect(tags).toContainEqual({ name: "twitter:title", content: "T" });
-    expect(tags).toContainEqual({ name: "twitter:image", content: "https://cdn.x/i.png" });
-    expect(tags).toContainEqual({ name: "twitter:site", content: "@acme" });
-  });
-
-  it("omits description/image/twitter:site entries when unset", () => {
-    const tags = new SEOInjector().getMetaTags(makePage({ name: "Bare" }));
-    expect(tags.some((t) => t.name === "description")).toBe(false);
-    expect(tags.some((t) => t.property === "og:image")).toBe(false);
-    expect(tags.some((t) => t.name === "twitter:site")).toBe(false);
-    expect(tags).toContainEqual({ property: "og:title", content: "Bare" });
-  });
-});
