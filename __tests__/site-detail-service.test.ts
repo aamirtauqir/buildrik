@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     site: { findUnique: vi.fn(), update: vi.fn(), findFirst: vi.fn() },
-    page: { count: vi.fn() },
+    page: { count: vi.fn(), findMany: vi.fn() },
     siteAnalytics: { aggregate: vi.fn(), findMany: vi.fn() },
     activityLog: { findMany: vi.fn() },
     workspaceMember: { count: vi.fn() },
@@ -33,8 +33,15 @@ describe("Site Detail Service", () => {
       } as any);
       vi.mocked(prisma.page.count)
         .mockResolvedValueOnce(5)   // totalPages
-        .mockResolvedValueOnce(3)   // pagesWithSeo
         .mockResolvedValueOnce(4);  // pagesWithContent
+      /* SEO health reads the rows now, not a count: the editor writes a page's
+         SEO into its `settings` JSON, so counting the seoTitle/seoDescription
+         COLUMNS scored 0% for every editor-built site. */
+      vi.mocked(prisma.page.findMany).mockResolvedValue([
+        { seoTitle: null, seoDescription: null, settings: { seo: { metaTitle: "T", metaDescription: "D" } } },
+        { seoTitle: "T", seoDescription: "D", settings: null },
+        { seoTitle: null, seoDescription: null, settings: null },
+      ] as any);
       vi.mocked(prisma.siteAnalytics.aggregate)
         .mockResolvedValueOnce({ _sum: { visitors: 300 } } as any)   // current month
         .mockResolvedValueOnce({ _sum: { visitors: 200 } } as any);  // previous month
@@ -51,6 +58,8 @@ describe("Site Detail Service", () => {
       expect(result.stats.teamMembers).toBe(3);
       expect(result.stats.formSubmissions).toBe(15);
       expect(result.stats.unreadSubmissions).toBe(4);
+      // 2 of 5 pages carry both a title and a description.
+      expect(result.stats.healthBreakdown.seo).toBe(40);
     });
   });
 
