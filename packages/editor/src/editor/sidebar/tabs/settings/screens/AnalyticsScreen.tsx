@@ -21,6 +21,9 @@ import type { ScreenProps } from "../types";
 // GA4 measurement ID: exactly G- followed by 10 alphanumeric characters (EC-05)
 const GA_ID_REGEX = /^G-[A-Z0-9]{10}$/i;
 
+/* The four inline `borderColor` styles that used to sit beside these
+   `aria-invalid` props are gone: the settings Input theme paints the invalid
+   border itself now, so the flag is the whole contract. */
 export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange, registerFlushHandler }) => {
   const [gaId, setGaId] = React.useState("");
   const [gaEnabled, setGaEnabled] = React.useState(false);
@@ -122,7 +125,6 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange
               setHasChanges(true);
             }}
             placeholder="G-XXXXXXXXXX"
-            style={{ borderColor: gaError ? "var(--bk-error)" : undefined }}
             aria-describedby={gaError ? "ga-error" : undefined}
             aria-invalid={!!gaError}
           />
@@ -167,7 +169,6 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange
               setHasChanges(true);
             }}
             placeholder="1234567890123456"
-            style={{ borderColor: pixelError ? "var(--bk-error)" : undefined }}
             aria-describedby={pixelError ? "pixel-error" : undefined}
             aria-invalid={!!pixelError}
           />
@@ -210,7 +211,6 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange
               setHasChanges(true);
             }}
             placeholder="abcdefghij"
-            style={{ borderColor: clarityError ? "var(--bk-error)" : undefined }}
             aria-invalid={!!clarityError}
           />
           {clarityError && (
@@ -252,7 +252,6 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange
               setHasChanges(true);
             }}
             placeholder="GTM-XXXXXXX"
-            style={{ borderColor: gtmError ? "var(--bk-error)" : undefined }}
             aria-invalid={!!gtmError}
           />
           {gtmError && (
