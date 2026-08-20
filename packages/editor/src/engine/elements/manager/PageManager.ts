@@ -226,6 +226,12 @@ export class PageManager {
         type: "page:activated",
         page: this.ctx.pages.get(id),
       });
+      /* PAGE_CHANGED was declared, listened for, and emitted by nowhere: the
+         shell reads the active page id on it, so the Issues panel's "This
+         page" scope kept filtering by whichever page the editor opened on. A
+         type on PROJECT_CHANGED is not a subscription — anyone who wants page
+         switches has to filter every project change to find them. */
+      this.ctx.composer.emit(EVENTS.PAGE_CHANGED, { pageId: id });
     }
   }
 

@@ -463,3 +463,31 @@ describe("PageManager.removeAppliedTemplate (S9 — emits TEMPLATE_REMOVED)", ()
     expect(removedEmits).toHaveLength(0);
   });
 });
+
+/* PAGE_CHANGED was declared in EVENTS, listened for in the shell (the Issues
+   panel's "This page" scope reads the active page id on it), and emitted by
+   nowhere — the seam scanner's "listeners without emitter". Measured live
+   before the fix: switching pages fired project:changed once and page:changed
+   zero times. */
+describe("PageManager.setActivePage", () => {
+  it("announces the switch as a page event, not only as a project change", () => {
+    const { pm, composer } = makeHarness();
+    const page = pm.createPage("Second", "second");
+    composer.emit.mockClear();
+
+    pm.setActivePage(page.id);
+
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.PAGE_CHANGED, { pageId: page.id });
+    expect(composer.emit).toHaveBeenCalledWith(
+      EVENTS.PROJECT_CHANGED,
+      expect.objectContaining({ type: "page:activated" }),
+    );
+  });
+
+  it("stays silent for an id that is not a page", () => {
+    const { pm, composer } = makeHarness();
+    composer.emit.mockClear();
+    pm.setActivePage("no-such-page");
+    expect(composer.emit).not.toHaveBeenCalled();
+  });
+});
