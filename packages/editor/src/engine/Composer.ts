@@ -588,7 +588,12 @@ export class Composer extends EventEmitter {
     // One precedence, all three paths.
     const titlePage = this.elements.getActivePage?.();
     const title = titlePage
-      ? resolvePageTitle(titlePage, titlePage.settings?.seo, titlePage.settings)
+      ? resolvePageTitle(
+          titlePage,
+          titlePage.settings?.seo,
+          titlePage.settings,
+          this.getProjectSettings?.()?.seo
+        )
       : "Untitled";
 
     /* The interaction runtime, on the same rule the export uses: ship it only

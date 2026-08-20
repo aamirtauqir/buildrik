@@ -33,9 +33,30 @@ export interface SEOInjectorOptions {
 export function resolvePageTitle(
   page: PageData,
   pageSEO?: PageSEO,
-  pageSettings?: { title?: string }
+  pageSettings?: { title?: string },
+  siteSEO?: SiteSEO
 ): string {
-  return pageSEO?.metaTitle || pageSettings?.title || page.name || "Untitled";
+  const own = pageSEO?.metaTitle || pageSettings?.title || page.name || "Untitled";
+  return applyTitleTemplate(own, siteSEO);
+}
+
+/**
+ * Wrap a page's own title in the site's title template.
+ *
+ * The template is stored (`sites.metaTitleTemplate`), shown on the dashboard's
+ * SEO tab, and graded by the pre-publish "SEO configured" check — and until
+ * now it was applied by nothing, so a site that set "Acme — {page_title}"
+ * published pages titled just "Home". A template with no `{page_title}` in it
+ * would replace every page title with the same string, which is never what the
+ * field is for, so it is ignored.
+ */
+function applyTitleTemplate(title: string, siteSEO?: SiteSEO): string {
+  const template = siteSEO?.metaTitleTemplate?.trim();
+  if (!template || !template.includes("{page_title}")) return title;
+  return template
+    .replace(/\{page_title\}/g, title)
+    .replace(/\{site_name\}/g, siteSEO?.siteName ?? "")
+    .trim();
 }
 
 /**
@@ -82,7 +103,10 @@ export class SEOInjector {
     // documents an empty pageTitle as omitting the tag. `undefined` means the
     // caller has nothing to say, so the page's own title stands.
     const omitTitle = overrides?.title === null;
-    const title = overrides?.title?.trim() || resolvePageTitle(page, pageSEO, pageSettings);
+    /* An override is the export modal's own Title field — a literal the user
+       typed for this one file, so the site template does not rewrite it. */
+    const title =
+      overrides?.title?.trim() || resolvePageTitle(page, pageSEO, pageSettings, siteSEO);
     const description =
       overrides?.description?.trim() || this.getDescription(pageSEO, pageSettings);
     const ogImage = pageSEO?.ogImage || siteSEO?.defaultOgImage || "";

@@ -53,7 +53,16 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
     if (!isOpen || !composer || titleTouchedRef.current) return;
     const page = composer.elements?.getActivePage?.();
     if (!page) return;
-    const title = resolvePageTitle(page, page.settings?.seo, page.settings);
+    /* Seed with the site's title template applied, because that is what the
+       published page and the preview both ship — the field showing a bare
+       "Home" while publish shipped "Home | Acme" would be the same head-drift
+       that put "Buildrick Export" on customers' files. */
+    const title = resolvePageTitle(
+      page,
+      page.settings?.seo,
+      page.settings,
+      composer.getProjectSettings?.()?.seo
+    );
     setConfig((prev) => (prev.pageTitle === title ? prev : { ...prev, pageTitle: title }));
   }, [isOpen, composer]);
 

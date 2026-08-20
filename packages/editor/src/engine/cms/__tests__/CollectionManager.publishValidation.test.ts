@@ -33,7 +33,6 @@ async function seed() {
   await manager.initialize();
   const collection = await manager.createCollection("Products", "products");
   await manager.addField(collection.id, {
-    id: "f-name",
     name: "Name",
     slug: "name",
     type: "text",
@@ -41,7 +40,6 @@ async function seed() {
     validation: { required: true, minLength: 3 },
   });
   await manager.addField(collection.id, {
-    id: "f-price",
     name: "Price",
     slug: "price",
     type: "number",

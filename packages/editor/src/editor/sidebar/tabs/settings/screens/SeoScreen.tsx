@@ -13,6 +13,7 @@ import type { ScreenProps } from "../types";
 const DEFAULT_SEO = {
   twitterHandle: "",
   defaultOgImage: "",
+  metaTitleTemplate: "",
 };
 
 export const SeoScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange, registerFlushHandler }) => {
@@ -21,12 +22,16 @@ export const SeoScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange, regi
     (s) => ({
       twitterHandle: s.seo?.twitterHandle ?? "",
       defaultOgImage: s.seo?.defaultOgImage ?? "",
+      metaTitleTemplate: s.seo?.metaTitleTemplate ?? "",
     }),
     DEFAULT_SEO
   );
 
   const [twitterHandle, setTwitterHandle] = React.useState(seo.twitterHandle);
   const [defaultOgImage, setDefaultOgImage] = React.useState(seo.defaultOgImage);
+  /* The template column has existed (and been graded by the pre-publish "SEO
+     configured" check) with no field anywhere that could set it. */
+  const [titleTemplate, setTitleTemplate] = React.useState(seo.metaTitleTemplate);
 
   React.useEffect(() => {
     onDirtyChange?.(isDirty);
@@ -36,11 +41,12 @@ export const SeoScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange, regi
   React.useEffect(() => {
     setTwitterHandle(seo.twitterHandle);
     setDefaultOgImage(seo.defaultOgImage);
-  }, [seo.twitterHandle, seo.defaultOgImage]);
+    setTitleTemplate(seo.metaTitleTemplate);
+  }, [seo.twitterHandle, seo.defaultOgImage, seo.metaTitleTemplate]);
 
   // Flush local buffer → composer once on Save click (see SettingsTab).
-  const stateRef = React.useRef({ twitterHandle, defaultOgImage });
-  stateRef.current = { twitterHandle, defaultOgImage };
+  const stateRef = React.useRef({ twitterHandle, defaultOgImage, titleTemplate });
+  stateRef.current = { twitterHandle, defaultOgImage, titleTemplate };
   React.useEffect(() => {
     if (!composer || !registerFlushHandler) return;
     registerFlushHandler(() => {
@@ -51,6 +57,7 @@ export const SeoScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange, regi
           ...current.seo,
           twitterHandle: stateRef.current.twitterHandle,
           defaultOgImage: stateRef.current.defaultOgImage,
+          metaTitleTemplate: stateRef.current.titleTemplate,
         },
       });
     });
@@ -60,6 +67,27 @@ export const SeoScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange, regi
   return (
     <Screen>
       <Section title="Site SEO">
+        <Field
+          label="Title template"
+          htmlFor="seo-title-template"
+          hint={
+            titleTemplate.trim() && !titleTemplate.includes("{page_title}")
+              ? "Add {page_title} — without it every page would ship the same title, so the template is ignored."
+              : "Wraps every page title. {page_title} and {site_name} are replaced."
+          }
+        >
+          <Input
+            id="seo-title-template"
+            type="text"
+            value={titleTemplate}
+            onChange={(e) => {
+              setTitleTemplate(e.target.value);
+              markDirty();
+            }}
+            placeholder="{page_title} | {site_name}"
+          />
+        </Field>
+
         <Field label="Twitter Handle" htmlFor="seo-twitter" hint="e.g. @buildrik">
           <Input
             id="seo-twitter"
