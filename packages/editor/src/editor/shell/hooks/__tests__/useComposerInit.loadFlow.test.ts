@@ -21,6 +21,7 @@
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from "vitest";
 import { THRESHOLDS } from "../../../../shared/constants/config";
+import { EVENTS } from "@/shared/constants/events";
 import { useComposerInit, type UseComposerInitParams } from "../useComposerInit";
 
 type EventHandler = (...args: unknown[]) => void;
@@ -470,21 +471,26 @@ describe("useComposerInit — autosave conflict handling", () => {
 // ---------------------------------------------------------------------------
 
 describe("useComposerInit — ecommerce CollectionSetupModal trigger", () => {
+  /* These emitted `element:created` with an element typed "product-card".
+     Neither half was ever true in the app: all three product blocks are
+     HTML-content blocks, so they insert through `insertHTMLToElement`, which
+     emits nothing and types each element from its TAG — a Product Card insert
+     produced a `container`. ELEMENT_INSERTED carries the block id, which is
+     the identity the prompt actually wants. */
   beforeEach(() => {
     localStorage.clear();
     resetMockComposer();
   });
 
-  function makeEcommerceElement(type: string) {
-    return { getType: () => type };
-  }
+  const insert = (blockId: string) =>
+    mockComposer.emit(EVENTS.ELEMENT_INSERTED, { elementId: "el-1", blockId });
 
-  it("opens collection setup when a product block is created and no Products collection exists", async () => {
+  it("opens collection setup when a product block is inserted and no Products collection exists", async () => {
     const openCollectionSetup = vi.fn();
     renderHook(() => useComposerInit(makeParams({ openCollectionSetup })));
 
     await act(async () => {
-      mockComposer.emit("element:created", makeEcommerceElement("product-card"));
+      insert("product-card");
       await flushMicrotasks();
     });
 
@@ -492,29 +498,29 @@ describe("useComposerInit — ecommerce CollectionSetupModal trigger", () => {
     expect(openCollectionSetup).toHaveBeenCalledTimes(1);
   });
 
-  it("prompts only ONCE per session even for repeated product-block creation", async () => {
+  it("prompts only ONCE per session even for repeated product blocks", async () => {
     const openCollectionSetup = vi.fn();
     renderHook(() => useComposerInit(makeParams({ openCollectionSetup })));
 
     await act(async () => {
-      mockComposer.emit("element:created", makeEcommerceElement("product-card"));
+      insert("product-card");
       await flushMicrotasks();
-      mockComposer.emit("element:created", makeEcommerceElement("product-grid"));
+      insert("product-grid");
       await flushMicrotasks();
-      mockComposer.emit("element:created", makeEcommerceElement("product-detail"));
+      insert("product-detail");
       await flushMicrotasks();
     });
 
     expect(openCollectionSetup).toHaveBeenCalledTimes(1);
   });
 
-  it("ignores non-ecommerce element types entirely", async () => {
+  it("ignores every other block entirely", async () => {
     const openCollectionSetup = vi.fn();
     renderHook(() => useComposerInit(makeParams({ openCollectionSetup })));
 
     await act(async () => {
-      mockComposer.emit("element:created", makeEcommerceElement("text"));
-      mockComposer.emit("element:created", makeEcommerceElement("hero"));
+      insert("text");
+      insert("hero");
       await flushMicrotasks();
     });
 
@@ -528,25 +534,23 @@ describe("useComposerInit — ecommerce CollectionSetupModal trigger", () => {
     renderHook(() => useComposerInit(makeParams({ openCollectionSetup })));
 
     await act(async () => {
-      mockComposer.emit("element:created", makeEcommerceElement("product-card"));
+      insert("product-card");
       await flushMicrotasks();
     });
 
     expect(openCollectionSetup).not.toHaveBeenCalled();
   });
 
-  it("handles the { element } wrapper payload shape too", async () => {
+  it("ignores an insert that carries no block id", async () => {
     const openCollectionSetup = vi.fn();
     renderHook(() => useComposerInit(makeParams({ openCollectionSetup })));
 
     await act(async () => {
-      mockComposer.emit("element:created", {
-        element: makeEcommerceElement("product-grid"),
-      });
+      mockComposer.emit(EVENTS.ELEMENT_INSERTED, { elementId: "el-1" });
       await flushMicrotasks();
     });
 
-    expect(openCollectionSetup).toHaveBeenCalledTimes(1);
+    expect(openCollectionSetup).not.toHaveBeenCalled();
   });
 
   it("the confirm callback creates the Products collection and toasts", async () => {
@@ -555,7 +559,7 @@ describe("useComposerInit — ecommerce CollectionSetupModal trigger", () => {
     renderHook(() => useComposerInit(params));
 
     await act(async () => {
-      mockComposer.emit("element:created", makeEcommerceElement("product-card"));
+      insert("product-card");
       await flushMicrotasks();
     });
 
@@ -579,7 +583,7 @@ describe("useComposerInit — ecommerce CollectionSetupModal trigger", () => {
   it("never registers the listener when openCollectionSetup is not provided", async () => {
     renderHook(() => useComposerInit(makeParams()));
     await act(async () => {
-      mockComposer.emit("element:created", makeEcommerceElement("product-card"));
+      insert("product-card");
       await flushMicrotasks();
     });
     expect(hasProductsCollectionMock).not.toHaveBeenCalled();

@@ -28,8 +28,12 @@ export function useCmsSync(
     if (!composer) return;
     const cm = composer.cms.collections;
 
-    // Pull any server-side collections into local storage (cross-device).
-    void hydrateCmsFromServer();
+    /* Pull any server-side collections into local storage (cross-device), then
+       make the manager re-read it: the hydrate writes to IndexedDB behind the
+       manager's back, and the manager loads that store exactly once. Without
+       the refresh, a device opening this site for the first time saw an empty
+       CMS all session while the rows sat in its own IndexedDB. */
+    void hydrateCmsFromServer().then(() => cm.refreshFromStorage());
 
     // #5/#6 (2026-06-24): CMS server-sync failures used to be logged + dropped
     // silently — the user thought their content was saved everywhere. Surface a

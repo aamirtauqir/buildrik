@@ -44,6 +44,26 @@ export class CollectionManager extends EventEmitter {
     return this.initialized;
   }
 
+  /**
+   * Re-read the store after something outside this manager wrote to it.
+   *
+   * `initialize()` reads IndexedDB once and latches. The server hydration
+   * (`cmsSync.hydrateCmsFromServer`) writes collections and entries straight
+   * into that store — so on a device that has never opened this site, the
+   * site's collections landed in IndexedDB and this manager stayed empty for
+   * the whole session: the Content panel showed none, the binding popover had
+   * nothing to bind to, and `hasProductsCollection()` answered false, which
+   * offers to create a SECOND Products collection and mirrors the duplicate
+   * back to the server.
+   */
+  async refreshFromStorage(): Promise<void> {
+    const collections = await Storage.loadCollections();
+    this.collections = new Map(collections.map((c) => [c.id, c]));
+    this.contentCache.clear();
+    this.initialized = true;
+    this.emit(EVENTS.CMS_STORE_REFRESHED, this.getAllCollections());
+  }
+
   // ============================================
   // Collection Operations
   // ============================================

@@ -98,6 +98,8 @@ export const ContentTab: React.FC<ContentTabProps> = ({
       EVENTS.CMS_CONTENT_CREATED,
       EVENTS.CMS_CONTENT_UPDATED,
       EVENTS.CMS_CONTENT_DELETED,
+      /* The server hydration lands after this panel's first read. */
+      EVENTS.CMS_STORE_REFRESHED,
     ] as const;
     cmsEvents.forEach((ev) => cms.on(ev, onChange));
 

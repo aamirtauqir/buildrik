@@ -222,6 +222,10 @@ export const EVENTS = {
   CMS_CONTENT_DELETED: "content:deleted",
   CMS_CONTENT_PUBLISHED: "content:published",
   CMS_CONTENT_UNPUBLISHED: "content:unpublished",
+  /** The collection store was re-read after an outside write (server hydration).
+   *  Distinct from `collection:created` so the sync mirror does not push the
+   *  rows it just pulled back to the server. */
+  CMS_STORE_REFRESHED: "collections:refreshed",
 
   // ============================================
   // Collaboration Events
