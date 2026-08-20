@@ -18,9 +18,18 @@ import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { Field, Input, Screen, Section } from "../shared";
 import type { ScreenProps } from "../types";
 import { Button, Checkbox } from "@/editor/chrome-ui";
+/* `site.publish` is dispatched by the publish worker on every completed job.
+   `form.submit` is dispatched by form-submission.service — which only runs
+   when something POSTs /api/public/forms/[siteId]/[formBlockId], and no
+   published page does: the exported <form> carries no action. The Forms inbox
+   now says that out loud, and so does this row, so a user does not wire a
+   webhook and sit waiting for a delivery that cannot arrive. */
 const EVENTS = [
   { id: "site.publish", label: "site.publish — fires after every successful publish" },
-  { id: "form.submit", label: "form.submit — fires on every form submission" },
+  {
+    id: "form.submit",
+    label: "form.submit — ready, but nothing sends it yet (form capture is unbuilt)",
+  },
 ] as const;
 
 type EventId = (typeof EVENTS)[number]["id"];
