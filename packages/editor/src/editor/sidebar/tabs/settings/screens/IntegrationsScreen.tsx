@@ -18,9 +18,13 @@ const categories = [...new Set(INTEGRATION_CATALOG.map((i) => i.category))];
 
 export const IntegrationsScreen: React.FC<ScreenProps> = () => (
   <Screen>
+    {/* The old intro made a publish the precondition for using any of these,
+        which is a prerequisite that does not exist: nothing on this screen
+        connects anything, before or after a deploy. Every row is a link to
+        the provider's own setup, which is what `status="soon"` says. */}
     <p className="tw:text-xs tw:text-gray-500 tw:px-3 tw:pt-2 tw:leading-[1.4]">
-      Connect third-party services to extend your site. Integrations require publishing your site
-      first.
+      Third-party services you can wire up yourself for now — each row opens the provider&rsquo;s
+      own setup. Connecting them from here is coming.
     </p>
     {categories.map((cat) => (
       <Section key={cat} title={cat}>
