@@ -29,7 +29,7 @@
   ],
   "source": "specs/*.json copy[] (board, contract) · docs/designs/2026-07-18-editor-shell-wireframes.md#57 (advisory)",
   "generatedAt": "2026-08-06",
-  "driftFloor": 4,
+  "driftFloor": 3,
   "lines": [
     {
       "surface": "Insert · search, no hits",
@@ -82,10 +82,10 @@
     },
     {
       "surface": "Issues panel · clean",
-      "copy": "No issues. This page is ready to publish.",
-      "status": "missing",
-      "file": null,
-      "shipsInstead": "ships \"Your site is clean — nothing to fix.\" (IssuesPanel.tsx) — same intent, different words, and it says SITE where the spec says PAGE"
+      "copy": "This page is ready to publish.",
+      "status": "ships",
+      "file": "src/editor/shell/IssuesPanel.tsx",
+      "note": "Board 164:35 draws the verdict and its consequence as TWO lines, and the panel ships them that way: a green \"No issues.\" with \"This page is ready to publish.\" under it. Recorded as the second line because the checker greps one literal; the pair together is the §5.7 sentence. The old shipsInstead note (\"Your site is clean — nothing to fix.\") described copy that is no longer there."
     },
     {
       "surface": "Comments · none",
