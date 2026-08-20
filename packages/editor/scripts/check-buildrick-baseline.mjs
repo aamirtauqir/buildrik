@@ -17,6 +17,24 @@ const EDITOR_ROOT = resolve(ROOT, 'src', 'editor');
 // any preceding `-` (catches `--buildrick`, `data-buildrick`) or alpha char (identifier-internal).
 const CLASS_RE = /(?<![-a-zA-Z])buildrick-[a-z][a-z0-9-]*\b/g;
 
+/* The docblock says "className refs", and the regex counted every occurrence
+   anywhere — which is mostly localStorage KEYS (`buildrick-panel-state`,
+   `buildrick-layers-…`, `buildrick-site-variables…`). Those are user data:
+   the 2026-05-07 arc decided they stay, and every feature that persists
+   something adds another, so the count grew from 78 to 121 while nothing about
+   chrome styling changed, and the gate — which is in no verify chain — has
+   been failing unread. Counting the thing it names is what makes it wirable.
+
+   A line qualifies when the ref is used AS A CLASS: a className/classList
+   write, a class selector, or a `.buildrick-…` string. */
+const CLASS_CONTEXT_RE = /className|classList|classNames|querySelector|closest\(|matches\(|\.buildrick-/;
+
+/* Engine contract, not chrome styling: the canvas root and the page root carry
+   these class names by construction (Canvas.tsx mounts `.buildrick-canvas`, and
+   the export/preview markup names the page root). Draining them would mean
+   renaming the engine's own hooks, which is a different decision. */
+const ENGINE_CLASSES = new Set(['buildrick-canvas', 'buildrick-page-root']);
+
 function* walk(dir) {
   for (const entry of readdirSync(dir)) {
     const full = resolve(dir, entry);
@@ -28,7 +46,14 @@ function* walk(dir) {
 
 function countMatches(file) {
   const src = readFileSync(file, 'utf8');
-  return [...src.matchAll(CLASS_RE)].length;
+  let n = 0;
+  for (const line of src.split('\n')) {
+    if (!CLASS_CONTEXT_RE.test(line)) continue;
+    for (const m of line.matchAll(CLASS_RE)) {
+      if (!ENGINE_CLASSES.has(m[0])) n += 1;
+    }
+  }
+  return n;
 }
 
 function panelOf(file) {

@@ -1,18 +1,18 @@
 {
-  "count": 78,
+  "count": 23,
   "mode": "WARN",
   "perPanel": {
     "animation": 0,
-    "canvas": 17,
+    "canvas": 0,
     "collaboration": 0,
-    "design-system": 37,
+    "design-system": 23,
     "export": 0,
-    "inspector": 6,
-    "media": 1,
+    "inspector": 0,
+    "media": 0,
     "onboarding": 0,
-    "panels": 5,
+    "panels": 0,
     "rail": 0,
-    "shell": 2,
-    "sidebar": 10
+    "shell": 0,
+    "sidebar": 0
   }
 }
