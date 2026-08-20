@@ -48,7 +48,11 @@ const SHORTCUT_GROUPS: ShortcutGroup[] = [
     shortcuts: [
       { key: "Ctrl+P", desc: "Preview" },
       { key: "Ctrl+K", desc: "Command palette" },
-      { key: "?", desc: "Keyboard shortcuts" },
+      /* Two help screens, two chords — and this row used to print only "?",
+         which opens the canvas cheat sheet, not this panel. Measured: "?" →
+         "⌨️ Keyboard Shortcuts · SELECTION", ⌘/ → this panel. */
+      { key: "Ctrl+/", desc: "This shortcuts panel" },
+      { key: "?", desc: "Canvas gestures & selection" },
       /* ⌘0 was printed as "Fit to view". Measured at 1440x900: ⌘0 sets 100%,
          ⌘1 is the one that fits (100% → 98% on a page wider than the frame)
          and ⌘2 zooms to the selection — the three rows the zoom flyout itself

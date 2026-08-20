@@ -106,6 +106,12 @@ const HISTORY_KBD = IS_MAC ? "⌃H" : "Ctrl H";
  * chord is the one that reaches us, and the hint says so.
  */
 const SETTINGS_KBD = IS_MAC ? "⌃," : "Ctrl ,";
+/* This row printed "?", which opens the CANVAS cheat sheet (board 815:4518) —
+   a different screen from the one this row opens. Measured in the editor: "?"
+   drew "⌨️ Keyboard Shortcuts · SELECTION · Select element", while this row and
+   ⌘/ drew "Keyboard Shortcuts · PANELS · Open Insert panel". Print the chord
+   that opens THIS one. */
+const SHORTCUTS_KBD = IS_MAC ? "⌘/" : "Ctrl /";
 
 export const SiteMenu: React.FC<SiteMenuProps> = ({
   onOpenSiteSettings,
@@ -246,7 +252,7 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
 
         {onOpenShortcuts ? (
           <MenuGroup>
-            <MenuItem kbd="?" onClick={run(onOpenShortcuts)}>
+            <MenuItem kbd={SHORTCUTS_KBD} onClick={run(onOpenShortcuts)}>
               Keyboard shortcuts
             </MenuItem>
           </MenuGroup>

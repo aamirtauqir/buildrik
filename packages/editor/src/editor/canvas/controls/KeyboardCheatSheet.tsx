@@ -81,9 +81,17 @@ const SHORTCUT_GROUPS: ShortcutGroup[] = [
     shortcuts: [
       { keys: ["⌘", "+"], description: "Zoom in" },
       { keys: ["⌘", "-"], description: "Zoom out" },
-      { keys: ["⌘", "0"], description: "Zoom to fit" },
-      { keys: ["⌘", "⇧", "P"], description: "Command palette" },
+      /* ⌘0 is 100%, ⌘1 fits and ⌘2 zooms to the selection — the three the zoom
+         flyout itself binds, measured at 1440x900. This listed ⌘0 as "Zoom to
+         fit" and never mentioned the other two. */
+      { keys: ["⌘", "0"], description: "Zoom to 100%" },
+      { keys: ["⌘", "1"], description: "Zoom to fit" },
+      { keys: ["⌘", "2"], description: "Zoom to selection" },
+      /* Two palettes, two chords: ⌘K opens the shell's, ⌘⇧P this canvas one. */
+      { keys: ["⌘", "⇧", "P"], description: "Canvas command palette" },
+      { keys: ["⌘", "K"], description: "Command palette" },
       { keys: ["?"], description: "Show this cheat sheet" },
+      { keys: ["⌘", "/"], description: "App shortcuts panel" },
     ],
   },
   {
