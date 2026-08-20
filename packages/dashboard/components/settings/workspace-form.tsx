@@ -343,10 +343,12 @@ export function WorkspaceForm({
             </div>
             <button
               type="button"
+              role="switch"
+              aria-checked={editsRequireApproval}
+              aria-label="Edits need approval before publishing"
               onClick={() => setEditsRequireApproval(!editsRequireApproval)}
               className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors shrink-0"
               style={{ backgroundColor: editsRequireApproval ? "var(--color-primary)" : "var(--color-border-default)" }}
-              aria-pressed={editsRequireApproval}
             >
               <span
                 className="inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform"
@@ -399,6 +401,9 @@ export function WorkspaceForm({
             </div>
             <button
               type="button"
+              role="switch"
+              aria-checked={requirePw}
+              aria-label="Require password on shared links"
               onClick={() => setRequirePw(!requirePw)}
               className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
               style={{ backgroundColor: requirePw ? "var(--color-primary)" : "var(--color-border-default)" }}
@@ -421,6 +426,9 @@ export function WorkspaceForm({
             </div>
             <button
               type="button"
+              role="switch"
+              aria-checked={allowEditors}
+              aria-label="Allow editors to share"
               onClick={() => setAllowEditors(!allowEditors)}
               className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
               style={{ backgroundColor: allowEditors ? "var(--color-primary)" : "var(--color-border-default)" }}
@@ -443,6 +451,9 @@ export function WorkspaceForm({
             </div>
             <button
               type="button"
+              role="switch"
+              aria-checked={notify}
+              aria-label="Activity summary emails"
               onClick={() => setNotify(!notify)}
               className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
               style={{ backgroundColor: notify ? "var(--color-primary)" : "var(--color-border-default)" }}

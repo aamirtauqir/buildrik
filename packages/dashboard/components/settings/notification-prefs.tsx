@@ -136,15 +136,21 @@ export function NotificationPrefs() {
               </div>
 
               <div className="flex justify-center">
+                {/* role=switch + aria-checked: on and off differ only by the
+                    pill's colour, so without the state a screen reader hears
+                    "Toggle in-app for Site Updates, button" whether the
+                    notifications are on or off. */}
                 <button
                   type="button"
+                  role="switch"
+                  aria-checked={pref.inApp}
                   disabled={isSecurity}
                   onClick={() => update(pref.category, { inApp: !pref.inApp })}
                   className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{
                     backgroundColor: pref.inApp ? "var(--color-primary)" : "var(--color-border-default)",
                   }}
-                  aria-label={`Toggle in-app for ${pref.category}`}
+                  aria-label={`In-app notifications for ${pref.category}`}
                 >
                   <span
                     className="inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform"

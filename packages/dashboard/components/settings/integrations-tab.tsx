@@ -70,16 +70,25 @@ function IconPlaceholder({ name }: { name: string }) {
   return <span className="text-xl">{labels[name] ?? "\uD83D\uDD0C"}</span>;
 }
 
+/* A switch, not an unnamed button: this rendered with no role, no state and no
+   name at all, so assistive tech announced "button" and nothing else — the
+   integration's name and whether it was on were both carried purely by
+   neighbouring markup and the pill's colour. */
 function Toggle({
   checked,
   onChange,
+  label,
 }: {
   checked: boolean;
   onChange: (v: boolean) => void;
+  label: string;
 }) {
   return (
     <button
       type="button"
+      role="switch"
+      aria-checked={checked}
+      aria-label={label}
       onClick={() => onChange(!checked)}
       className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
       style={{ backgroundColor: checked ? "var(--color-primary)" : "var(--color-border-default)" }}
@@ -118,6 +127,7 @@ function GoogleAnalyticsConfig({
           Apply to all sites
         </p>
         <Toggle
+          label="Apply to all sites"
           checked={values["applyToAll"] === "true"}
           onChange={(v) => onChange("applyToAll", String(v))}
         />
@@ -127,6 +137,7 @@ function GoogleAnalyticsConfig({
           Anonymize IP
         </p>
         <Toggle
+          label="Anonymize IP"
           checked={values["anonymizeIp"] === "true"}
           onChange={(v) => onChange("anonymizeIp", String(v))}
         />
@@ -287,6 +298,7 @@ function SlackConfig({
           </p>
         </div>
         <Toggle
+          label="Quiet hours"
           checked={values["quietHours"] === "true"}
           onChange={(v) => onChange("quietHours", String(v))}
         />
