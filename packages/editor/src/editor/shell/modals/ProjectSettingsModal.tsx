@@ -168,7 +168,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
 
         {activeTab === "seo" && (
           <div className="tw:flex tw:flex-col tw:gap-3">
-            <label className={FIELD_LABEL} htmlFor="ps-seo-name">Site name (SEO default)</label>
+            <label className={FIELD_LABEL} htmlFor="ps-seo-name">Site name (social sharing)</label>
             <TextInput
               id="ps-seo-name"
               type="text"
@@ -176,9 +176,16 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
               onChange={(e) => setSiteTitle(e.target.value)}
               placeholder="The formal name of your website"
             />
+            {/* Said this was "the default title for your site if not overridden
+                on individual pages". It never is: a page's title resolves as
+                meta title → page settings title → page name (SEOInjector's
+                resolvePageTitle), and every page has a name, so the fallback
+                this promised cannot be reached. Read off a real export: the
+                site name was set to "Bella Cucina" and the document came back
+                <title>Home</title> with og:site_name="Bella Cucina". */}
             <small className={HINT}>
-              This will be used as the default title for your site if not overridden on individual
-              pages.
+              The name of the site itself, sent as <code>og:site_name</code>{" "}
+              when a page is shared. Page titles come from each page&apos;s own SEO settings.
             </small>
           </div>
         )}

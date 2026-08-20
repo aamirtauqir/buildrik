@@ -70,12 +70,28 @@ describe("Project settings — fields carry their own names", () => {
     expect((screen.getByLabelText("Author / description") as HTMLInputElement).value).toBe("Ayesha");
   });
 
-  it("names the SEO field", () => {
+  it("names the SEO field for what it feeds", () => {
     open();
     fireEvent.click(screen.getByRole("tab", { name: "SEO" }));
-    expect((screen.getByLabelText("Site name (SEO default)") as HTMLInputElement).value).toBe(
+    expect((screen.getByLabelText("Site name (social sharing)") as HTMLInputElement).value).toBe(
       "Bella Cucina",
     );
+  });
+
+  /* The hint used to call this "the default title for your site if not
+     overridden on individual pages". A page title resolves as meta title →
+     page settings title → page name, and every page has a name, so that
+     fallback is unreachable — read off a real export, the site name was
+     "Bella Cucina" and the document came back <title>Home</title> with
+     og:site_name="Bella Cucina". */
+  it("does not claim the site name becomes a page title", () => {
+    open();
+    fireEvent.click(screen.getByRole("tab", { name: "SEO" }));
+    /* getByText lands on the inner <code>; the sentence lives on its <small>. */
+    const hint = screen.getByText(/og:site_name/).closest("small")?.textContent ?? "";
+    expect(hint).toMatch(/shared/i);
+    expect(hint).toMatch(/Page titles come from/i);
+    expect(document.body.textContent).not.toMatch(/default title for your site/i);
   });
 });
 
