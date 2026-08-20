@@ -329,12 +329,11 @@ export async function startPublish(
     data: { status: "PUBLISHING", lastPublishedBy: userId },
   });
 
-  notifyWorkspaceOwner(
-    workspaceId,
-    "SITE_PUBLISHED",
-    `Site "${site?.name ?? "Untitled"}" publish started`,
-    `/dashboard/sites/${siteId}`,
-  ).catch(() => {});
+  /* No "publish started" notification. The person who pressed Publish is
+     watching the editor's own progress, and this was the ONLY notification the
+     publish path ever sent — so the bell filled with starts and never said
+     whether any of them worked. The worker now notifies the OUTCOME, success
+     or failure (`SITE_PUBLISHED` / `SITE_PUBLISH_FAILED`). */
 
   const baseUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
   const dispatch = await dispatchWorker(baseUrl, job.id);

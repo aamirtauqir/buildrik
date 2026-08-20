@@ -6,6 +6,7 @@ import { slugifyProjectName, type VercelFile } from "@lib/vercel";
 import { MARKETING_URL } from "@lib/constants/contact";
 import type { PublishPage } from "@buildrik/shared/schemas/publish";
 import { record as recordActivity } from "@server/services/activity-log.service";
+import { notifyWorkspaceOwner } from "@server/services/notification.trigger";
 import { runVercelDeploy } from "@server/services/publish.service";
 import { decryptPublishedPassword } from "@server/services/site-settings.service";
 import { getWorkspaceAppScripts } from "@server/services/marketplace.service";
@@ -149,9 +150,21 @@ export async function POST(
 
     const completedSite = await prisma.site.findUnique({
       where: { id: job.siteId },
-      select: { workspaceId: true, lastPublishedBy: true },
+      select: { workspaceId: true, lastPublishedBy: true, name: true },
     });
     if (completedSite) {
+      /* The OUTCOME notification. Only the publish START sent one, so the bell
+         filled with "publish started" lines and never once said whether the
+         site went live — and `SITE_PUBLISH_FAILED`, a type that has always been
+         in the enum with its own preference category, had no writer at all: a
+         failed deploy notified nobody. */
+      notifyWorkspaceOwner(
+        completedSite.workspaceId,
+        "SITE_PUBLISHED",
+        `Site "${completedSite.name}" is live at ${publicUrl}`,
+        `/dashboard/sites/${job.siteId}`,
+      ).catch(() => {});
+
       await recordActivity({
         workspaceId: completedSite.workspaceId,
         siteId: job.siteId,
@@ -197,9 +210,16 @@ export async function POST(
 
     const failedSite = await prisma.site.findUnique({
       where: { id: job.siteId },
-      select: { workspaceId: true, lastPublishedBy: true },
+      select: { workspaceId: true, lastPublishedBy: true, name: true },
     });
     if (failedSite) {
+      notifyWorkspaceOwner(
+        failedSite.workspaceId,
+        "SITE_PUBLISH_FAILED",
+        `Site "${failedSite.name}" didn't publish: ${message}`,
+        `/dashboard/sites/${job.siteId}`,
+      ).catch(() => {});
+
       await recordActivity({
         workspaceId: failedSite.workspaceId,
         siteId: job.siteId,
