@@ -78,8 +78,14 @@ const SETTINGS_TEXT_INPUT_THEME: NonNullable<CustomFlowbiteTheme["textInput"]> =
   field: {
     input: {
       colors: {
+        /* `aria-invalid` paints the border, so a screen that marks a field
+           invalid does not also have to hand-roll a border colour — the OG
+           image field said "Needs a full URL" beside an input that still
+           looked fine, and the Analytics screen carries inline `borderColor`
+           for exactly this. Same pair chrome-ui's own TextField uses, focus
+           included so a focused invalid field stays red. */
         gray:
-          "tw:border-[var(--bk-border)] tw:bg-white tw:text-[var(--bk-ink)] tw:focus:border-[var(--bk-accent)] tw:focus:ring-[3px] tw:focus:ring-[var(--bk-accent-tint)] tw:focus:outline-none",
+          "tw:border-[var(--bk-border)] tw:bg-white tw:text-[var(--bk-ink)] tw:focus:border-[var(--bk-accent)] tw:focus:ring-[3px] tw:focus:ring-[var(--bk-accent-tint)] tw:focus:outline-none tw:aria-invalid:border-[var(--bk-error)] tw:aria-invalid:focus:border-[var(--bk-error)]",
       },
       sizes: {
         md: "tw:py-[7px] tw:px-[9px] tw:text-[11.5px] tw:font-medium tw:[font-family:var(--bk-font-ui)]",

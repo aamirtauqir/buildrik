@@ -140,6 +140,14 @@ describe("SeoScreen — the OG image field says what the server will accept", ()
     expect(screen.getByLabelText(/Default OG Image URL/i)).toHaveAttribute("aria-invalid", "true");
   });
 
+  it("marks the input invalid, which is what paints the border", () => {
+    /* Measured live: rgb(224, 36, 36) with an invalid value — the settings
+       Input theme carries the aria-invalid border pair now, so no screen has
+       to hand-roll `borderColor` (and the styling ratchet counts those). */
+    type("mysite.com/og.png");
+    expect(screen.getByLabelText(/Default OG Image URL/i)).toHaveAttribute("aria-invalid", "true");
+  });
+
   it("accepts a full https URL", () => {
     type("https://mysite.com/og.png");
     expect(screen.queryByRole("alert")).toBeNull();
