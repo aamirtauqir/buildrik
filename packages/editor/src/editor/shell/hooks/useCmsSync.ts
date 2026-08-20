@@ -46,9 +46,14 @@ export function useCmsSync(
           toastShown = true;
           addToast({
             title: "Some content changes didn't sync",
+            /* Two fixes, both read off the live toast: "1 CMS change ARE
+               saved" (the noun pluralised, the verb did not), and a promise of
+               an automatic retry that only fires on a reconnect — this toast
+               also appears when the server itself errors while you are online,
+               and then nothing retries until the button is pressed. */
             description:
-              `${pending} CMS change${pending === 1 ? "" : "s"} are saved on this device but ` +
-              `not yet on the server. They'll retry automatically when you're back online.`,
+              `${pending} CMS change${pending === 1 ? " is" : "s are"} saved on this device but ` +
+              `not yet on the server. Retry now, or leave it — a reconnect replays the queue.`,
             tone: "error",
             duration: Infinity,
             action: {
