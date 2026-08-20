@@ -22,6 +22,7 @@ import { AssetBundler } from "./AssetBundler";
 import {
   RESET_CSS,
   siteFontCSS,
+  siteTokensCSS,
   googleFontsHeadLinks,
   siteFontsFromTokens,
   getTagForType,
@@ -233,6 +234,10 @@ export class ExportEngine {
     // The site's fonts, after the reset so they win over its one hardcoded
     // family. Read from the project's own tokens — the Brand panel's three
     // font slots reached the canvas and stopped there.
+    /* The token DEFINITIONS first — every Brand preset and class binding emits
+       `var(--buildrick-design-*)`, and an export that names them without
+       declaring them resolves to nothing on the published page. */
+    css += siteTokensCSS(this.composer.getProjectSettings?.()?.designTokens);
     css += siteFontCSS(siteFontsFromTokens(this.composer.getProjectSettings?.()?.designTokens));
 
     const page = this.composer.elements.getActivePage?.();
@@ -646,7 +651,9 @@ export class ExportEngine {
        whatever the reset named. Found by the whole-page test, which exists to
        catch exactly this — it was the ninth thing a publish dropped in one
        day. */
-    const siteCss = siteFontCSS(siteFontsFromTokens(this.composer.getProjectSettings?.()?.designTokens));
+    const projectTokens = this.composer.getProjectSettings?.()?.designTokens;
+    const siteCss =
+      siteTokensCSS(projectTokens) + siteFontCSS(siteFontsFromTokens(projectTokens));
 
     let css = [baseCss, responsiveCss, siteCss].filter(Boolean).join(options.minify ? "" : "\n\n");
 

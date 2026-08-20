@@ -32,7 +32,7 @@ import { TraitDataBinding } from "./data/TraitDataBinding";
 import { DragManager } from "./drag/DragManager";
 import { ElementManager } from "./elements/ElementManager";
 import { EventEmitter } from "./EventEmitter";
-import { RESET_CSS, siteFontCSS, googleFontsHeadLinks, siteFontsFromTokens } from "./export/ExportHelpers";
+import { RESET_CSS, siteFontCSS, siteTokensCSS, googleFontsHeadLinks, siteFontsFromTokens } from "./export/ExportHelpers";
 import { resolvePageTitle } from "./export/SEOInjector";
 import { escapeHTML } from "../shared/utils/html/encoding";
 import { FontManager } from "./fonts/FontManager";
@@ -565,7 +565,11 @@ export class Composer extends EventEmitter {
     // the families that need fetching, and this document — the one the preview
     // renders — kept building a head with neither.
     const fonts = siteFontsFromTokens(this.getProjectSettings?.()?.designTokens);
-    const siteCss = siteFontCSS(fonts);
+    /* Preview builds its own document, so it needs the token definitions too —
+       otherwise the preview and the published page disagree on every value a
+       Brand preset binds. */
+    const siteCss =
+      siteTokensCSS(this.getProjectSettings?.()?.designTokens) + siteFontCSS(fonts);
     // The HTML too, not just the CSS: this document carries element styles
     // INLINE (`elements.toHTML`), so a heading set in Lora names its family in
     // a style attribute and nowhere in the stylesheet.

@@ -66,6 +66,36 @@ export function siteFontCSS(fonts: {
 }
 
 /**
+ * The site's design tokens, as the custom properties a published page needs.
+ *
+ * The Brand panel writes every token into the project ("Apply Changes to go
+ * live") and the canvas paints from them — but nothing emitted their
+ * DEFINITIONS into an export. Measured on a site whose Text Primary token was
+ * changed: the value reached project settings and the canvas custom property,
+ * while the exported document contained no `--buildrick-design-*` declaration
+ * at all. Any style bound to a token — every Brand preset and class binding —
+ * therefore resolved to nothing once the page left the editor.
+ *
+ * A token value is user data, so it is stripped of the characters that could
+ * leave its declaration: `;` and `}` end the declaration or the rule, `{`
+ * opens a block, and `<` could close the surrounding `</style>`.
+ */
+export function siteTokensCSS(
+  tokens: ReadonlyArray<{ cssVar?: string; value?: string }> = []
+): string {
+  const decls: string[] = [];
+  const seen = new Set<string>();
+  for (const t of tokens) {
+    const name = (t.cssVar ?? "").trim();
+    const value = (t.value ?? "").trim().replace(/[;{}<]/g, "");
+    if (!name.startsWith("--") || !value || seen.has(name)) continue;
+    seen.add(name);
+    decls.push(`${name}:${value}`);
+  }
+  return decls.length ? `\n:root{${decls.join(";")}}\n` : "";
+}
+
+/**
  * The stylesheet link the published page needs for the Google families it uses.
  *
  * The font picker loads a family into the EDITOR (`GoogleFontsService` injects
