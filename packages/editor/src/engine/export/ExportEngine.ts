@@ -33,7 +33,7 @@ import {
   downloadFile,
 } from "./ExportHelpers";
 import { FormspreeInjector } from "./FormspreeInjector";
-import { SEOInjector } from "./SEOInjector";
+import { SEOInjector, resolveLanguage } from "./SEOInjector";
 import { sanitizeHeadCode } from "./sanitizeHeadCode";
 import { SitemapGenerator } from "./SitemapGenerator";
 import { ReactExporter } from "./ReactExporter";
@@ -533,7 +533,8 @@ export class ExportEngine {
     const bodyScripts = sanitizeHeadCode(customCode?.bodyScripts);
     const bodyTail = bodyScripts ? `${nl}${indent}${bodyScripts}` : "";
 
-    return `<!DOCTYPE html>${nl}<html lang="en">${nl}<head>${nl}${head}</head>${nl}<body>${nl}${content}${interactionScript}${bodyTail}</body>${nl}</html>`;
+    const lang = resolveLanguage(this.composer.getProjectSettings?.()?.seo);
+    return `<!DOCTYPE html>${nl}<html lang="${lang}">${nl}<head>${nl}${head}</head>${nl}<body>${nl}${content}${interactionScript}${bodyTail}</body>${nl}</html>`;
   }
 
   /**
@@ -822,7 +823,7 @@ export class ExportEngine {
       : "";
 
     let html = `<!DOCTYPE html>
-<html lang="en">
+<html lang="${resolveLanguage(siteSEO)}">
 <head>
 ${headParts.join("\n")}
 </head>

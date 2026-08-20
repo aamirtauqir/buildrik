@@ -64,6 +64,7 @@ function labelFor(code: string): string {
 }
 
 export const LocalizationScreen: React.FC<ScreenProps> = ({
+  composer,
   projectId,
   onDirtyChange,
   registerSaveHandler,
@@ -134,6 +135,20 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
         defaultLocale,
         enabledLocales,
       });
+      /* The exported document's `lang` comes from the project's own SEO block,
+         which no screen writes — so every published page announced itself as
+         English however this was set. Phase D routing is still ahead, but the
+         document language is not routing: it is what a screen reader uses to
+         choose a voice (WCAG 3.1.1). */
+      if (composer) {
+        const current = composer.getProjectSettings();
+        if (current.seo?.language !== defaultLocale) {
+          composer.setProjectSettings({
+            ...current,
+            seo: { ...current.seo, language: defaultLocale },
+          });
+        }
+      }
       setDirty(false);
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Failed to save locales.";
@@ -143,7 +158,7 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
     } finally {
       setSaving(false);
     }
-  }, [projectId, dirty, defaultLocale, enabledLocales]);
+  }, [projectId, dirty, defaultLocale, enabledLocales, composer]);
 
   // Register with central savebar so its Save button writes locale fields
   // instead of falling back to composer.saveProject() (which omits them).

@@ -472,7 +472,7 @@ describe("PageManager.removeAppliedTemplate (S9 — emits TEMPLATE_REMOVED)", ()
 describe("PageManager.setActivePage", () => {
   it("announces the switch as a page event, not only as a project change", () => {
     const { pm, composer } = makeHarness();
-    const page = pm.createPage("Second", "second");
+    const page = pm.createPage("Second");
     composer.emit.mockClear();
 
     pm.setActivePage(page.id);

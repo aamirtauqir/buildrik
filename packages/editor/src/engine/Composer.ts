@@ -33,7 +33,7 @@ import { DragManager } from "./drag/DragManager";
 import { ElementManager } from "./elements/ElementManager";
 import { EventEmitter } from "./EventEmitter";
 import { RESET_CSS, siteFontCSS, siteTokensCSS, googleFontsHeadLinks, siteFontsFromTokens } from "./export/ExportHelpers";
-import { resolvePageTitle } from "./export/SEOInjector";
+import { resolvePageTitle, resolveLanguage } from "./export/SEOInjector";
 import { buildInteractionRuntimeScript, INTERACTION_ATTR } from "./export/interactionRuntime";
 import { escapeHTML } from "../shared/utils/html/encoding";
 import { FontManager } from "./fonts/FontManager";
@@ -610,7 +610,7 @@ export class Composer extends EventEmitter {
       html,
       css,
       combined: `<!DOCTYPE html>
-<html lang="en">
+<html lang="${resolveLanguage(this.getProjectSettings?.()?.seo)}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">

@@ -34,9 +34,25 @@ beforeEach(() => {
 
 afterEach(() => cleanup());
 
-function setup(props: { projectId?: string | null } = {}) {
+function makeComposer(seo: Record<string, unknown> = {}) {
+  let settings: Record<string, unknown> = { seo };
+  return {
+    getProjectSettings: () => settings,
+    setProjectSettings: vi.fn((next: Record<string, unknown>) => {
+      settings = next;
+    }),
+    get settings() {
+      return settings;
+    },
+  };
+}
+
+function setup(props: { projectId?: string | null; composer?: unknown } = {}) {
   return render(
-    <LocalizationScreen projectId={props.projectId === undefined ? "s1" : props.projectId} />
+    <LocalizationScreen
+      composer={props.composer as never}
+      projectId={props.projectId === undefined ? "s1" : props.projectId}
+    />
   );
 }
 
@@ -135,5 +151,46 @@ describe("LocalizationScreen — default change + save", () => {
     setup();
     await screen.findByText(/Enabled locales \(1\)/);
     expect(screen.getByRole("button", { name: /save locales/i })).toBeDisabled();
+  });
+});
+
+/* The exported document's language comes from the project's SEO block, which
+   no screen wrote — so all three heads shipped `<html lang="en">` however the
+   site's default locale was set, while the og:locale two lines below it told
+   the truth. Walked live: Settings › Localization → French → Save, and the
+   preview head reads `<html lang="fr">`. */
+describe("LocalizationScreen — the document language follows the default locale", () => {
+  it("writes the chosen locale into the project's SEO language on save", async () => {
+    getMock.mockResolvedValue({ defaultLocale: "en", enabledLocales: ["en", "fr"] });
+    const composer = makeComposer({ language: "en", siteName: "Acme" });
+    setup({ composer });
+    await screen.findByText(/Enabled locales \(2\)/);
+
+    const defaultSelect = screen.getAllByRole("combobox")[0] as HTMLSelectElement;
+    fireEvent.change(defaultSelect, { target: { value: "fr" } });
+    fireEvent.click(screen.getByRole("button", { name: /save locales/i }));
+
+    await waitFor(() =>
+      expect(composer.setProjectSettings).toHaveBeenCalledWith(
+        expect.objectContaining({ seo: expect.objectContaining({ language: "fr" }) })
+      )
+    );
+    // the rest of the SEO block survives the write
+    expect(composer.setProjectSettings).toHaveBeenCalledWith(
+      expect.objectContaining({ seo: expect.objectContaining({ siteName: "Acme" }) })
+    );
+  });
+
+  it("leaves the composer alone when the language already matches", async () => {
+    getMock.mockResolvedValue({ defaultLocale: "en", enabledLocales: ["en", "fr"] });
+    const composer = makeComposer({ language: "en" });
+    setup({ composer });
+    await screen.findByText(/Enabled locales \(2\)/);
+
+    fireEvent.click(within(localeRow("fr")).getByRole("button", { name: /remove/i }));
+    fireEvent.click(screen.getByRole("button", { name: /save locales/i }));
+
+    await waitFor(() => expect(updateMock).toHaveBeenCalled());
+    expect(composer.setProjectSettings).not.toHaveBeenCalled();
   });
 });

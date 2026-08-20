@@ -60,6 +60,18 @@ function applyTitleTemplate(title: string, siteSEO?: SiteSEO): string {
 }
 
 /**
+ * The language a site declares, for `<html lang>` and og:locale.
+ *
+ * All three heads hardcoded `lang="en"` while the SEO block right under them
+ * printed `og:locale` from this same field, so a French site announced itself
+ * as English to screen readers and to anything that reads the document
+ * language (WCAG 3.1.1) while telling Facebook the truth.
+ */
+export function resolveLanguage(siteSEO?: { language?: string }): string {
+  return siteSEO?.language?.trim() || "en";
+}
+
+/**
  * The robots directives a page asks for, from its "Allow indexing" and "Follow
  * links" toggles.
  *
@@ -114,7 +126,7 @@ export class SEOInjector {
     const ogDescription = pageSEO?.ogDescription || description;
     const twitterCard = pageSEO?.twitterCard || "summary_large_image";
     const canonicalUrl = pageSEO?.canonicalUrl || this.getPageUrl(page);
-    const language = siteSEO?.language || "en";
+    const language = resolveLanguage(siteSEO);
 
     const tags: string[] = [];
 

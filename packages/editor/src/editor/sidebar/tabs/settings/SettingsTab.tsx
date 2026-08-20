@@ -682,6 +682,7 @@ export const SettingsTab: React.FC<
       case "localization":
         return (
           <LocalizationScreen
+            composer={composer}
             projectId={projectId}
             onDirtyChange={handleScreenDirty}
             registerSaveHandler={registerSaveHandler}
