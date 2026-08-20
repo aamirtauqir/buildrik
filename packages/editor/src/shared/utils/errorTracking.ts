@@ -8,7 +8,7 @@
  * @module utils/errorTracking
  */
 
-import { SENTRY_DSN } from "./runtimeEnv";
+import { IS_DEV_BUILD, SENTRY_DSN } from "./runtimeEnv";
 
 // Lazy-loaded Sentry — avoids build error when @sentry/react isn't installed
 let _sentry: typeof import("@sentry/react") | null = null;
@@ -35,8 +35,12 @@ export async function initErrorTracking(): Promise<void> {
 
   Sentry.init({
     dsn: SENTRY_DSN!,
-    environment: import.meta.env.MODE,
-    enabled: import.meta.env.PROD,
+    /* `import.meta.env` does not exist in the Next-bundled editor, which is
+       the build that ships — reading .MODE off undefined throws, and it would
+       have thrown here only on the deployments that actually configure a DSN.
+       runtimeEnv resolves this for both builds. */
+    environment: IS_DEV_BUILD ? "development" : "production",
+    enabled: !IS_DEV_BUILD,
     tracesSampleRate: 0.1,
     sendDefaultPii: false,
     ignoreErrors: ["ResizeObserver loop", "Non-Error promise rejection", "AbortError"],

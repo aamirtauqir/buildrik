@@ -6,8 +6,11 @@
  * @license BSD-3-Clause
  */
 
-// Check if we're in development mode
-const isDev = typeof import.meta !== "undefined" && import.meta.env?.DEV;
+// Check if we're in development mode. Via runtimeEnv, which resolves it for
+// the Vite demo AND the Next-bundled build (where `import.meta.env` is absent).
+import { IS_DEV_BUILD } from "./runtimeEnv";
+
+const isDev = IS_DEV_BUILD;
 
 /**
  * Log a warning message in development mode only

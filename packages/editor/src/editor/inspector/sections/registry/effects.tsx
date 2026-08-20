@@ -10,6 +10,7 @@ import { EffectsSection } from "../EffectsSection";
 import { AnimationSection } from "../AnimationSection";
 import { InteractionsSection, type Interaction } from "../interactions";
 import { VisibilitySection } from "../VisibilitySection";
+import { IS_DEV_BUILD } from "@/shared/utils/runtimeEnv";
 
 export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
   effects: defineSection({
@@ -29,7 +30,7 @@ export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
         if (!ctx.composer) return null;
         const el = ctx.composer.elements.getElement(ctx.selectedElement.id);
         if (!el?.getAnimation) {
-          if (import.meta.env.DEV) console.warn(`[Inspector] getAnimation not implemented on element ${ctx.selectedElement.id}`);
+          if (IS_DEV_BUILD) console.warn(`[Inspector] getAnimation not implemented on element ${ctx.selectedElement.id}`);
           return null;
         }
         return el.getAnimation() ?? null;
@@ -43,10 +44,10 @@ export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
         ctx.composer.beginTransaction?.("animation-change");
         try {
           if (animation) {
-            if (!el.setAnimation && import.meta.env.DEV) console.warn(`[Inspector] setAnimation not implemented on element ${ctx.selectedElement.id}`);
+            if (!el.setAnimation && IS_DEV_BUILD) console.warn(`[Inspector] setAnimation not implemented on element ${ctx.selectedElement.id}`);
             el.setAnimation?.(animation);
           } else {
-            if (!el.clearAnimation && import.meta.env.DEV) console.warn(`[Inspector] clearAnimation not implemented on element ${ctx.selectedElement.id}`);
+            if (!el.clearAnimation && IS_DEV_BUILD) console.warn(`[Inspector] clearAnimation not implemented on element ${ctx.selectedElement.id}`);
             el.clearAnimation?.();
           }
         } finally {
@@ -84,7 +85,7 @@ export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
         const el = ctx.composer.elements.getElement(ctx.selectedElement.id);
         if (!el) return [];
         if (!el.getInteractions) {
-          if (import.meta.env.DEV) console.warn(`[Inspector] getInteractions not implemented on element ${ctx.selectedElement.id}`);
+          if (IS_DEV_BUILD) console.warn(`[Inspector] getInteractions not implemented on element ${ctx.selectedElement.id}`);
           return [];
         }
         return (el.getInteractions() as Interaction[]) ?? [];
@@ -95,7 +96,7 @@ export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
         if (!el) return;
         ctx.composer.beginTransaction?.("interactions-change");
         try {
-          if (!el.setInteractions && import.meta.env.DEV) console.warn(`[Inspector] setInteractions not implemented on element ${ctx.selectedElement.id}`);
+          if (!el.setInteractions && IS_DEV_BUILD) console.warn(`[Inspector] setInteractions not implemented on element ${ctx.selectedElement.id}`);
           el.setInteractions?.(interactions);
         } finally {
           ctx.composer.endTransaction?.();

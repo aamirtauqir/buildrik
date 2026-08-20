@@ -46,6 +46,7 @@ import {
 } from "../sections/registry";
 import type { SectionTier } from "../shared/controls";
 import { BK_HELPER_CLASS, Button, HelperText } from "@/editor/chrome-ui";
+import { IS_DEV_BUILD } from "@/shared/utils/runtimeEnv";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -141,7 +142,7 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
     return orderedIds.filter((id) => {
       const entry = SECTION_REGISTRY[id];
       if (!entry) {
-        if (import.meta.env.DEV) {
+        if (IS_DEV_BUILD) {
           // eslint-disable-next-line no-console
           console.warn(
             `[InspectorTabContent] Unknown section id "${id}" in profile "${selectedElement.type}.${tabId}" — skipping.`
