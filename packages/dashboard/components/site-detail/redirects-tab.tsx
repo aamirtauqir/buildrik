@@ -104,8 +104,15 @@ export function RedirectsTab({ redirects, limit, canEdit, onCreate, onUpdate, on
       <div className="flex items-start justify-between">
         <div>
           <h2 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>Redirects</h2>
+          {/* This said "Forward old URLs to new ones", which the product does
+              not do: the publish payload is HTML pages plus robots.txt — no
+              vercel.json, no redirect config — so nothing here is ever applied
+              to the deployed site. The rules ARE stored and exportable, which
+              is what the copy now claims. */}
           <p className="mt-1 text-body" style={{ color: "var(--color-text-secondary)" }}>
-            Forward old URLs to new ones. 301 = permanent (SEO), 302 = temporary.
+            Plan and keep your redirect map here — 301 = permanent (SEO), 302 = temporary. Applying
+            it to the published site isn&rsquo;t wired up yet; export the CSV for your host in the
+            meantime.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -171,7 +178,11 @@ export function RedirectsTab({ redirects, limit, canEdit, onCreate, onUpdate, on
         empty={
           <div className="rounded-lg border border-dashed p-8 text-center" style={{ borderColor: "var(--color-border-default)" }}>
             <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>No redirects yet</p>
-            <p className="mt-0.5 text-body" style={{ color: "var(--color-text-secondary)" }}>Renaming a page slug auto-creates one, or add yours above.</p>
+            {/* "Renaming a page slug auto-creates one" — nothing does: the
+                editor keeps a page's slug history on the page itself and no
+                code path writes a Redirect row. Every row here is one someone
+                typed or imported. */}
+            <p className="mt-0.5 text-body" style={{ color: "var(--color-text-secondary)" }}>Add one above, or import a CSV.</p>
           </div>
         }
       />
