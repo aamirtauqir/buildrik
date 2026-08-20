@@ -64,7 +64,7 @@ vi.mock("@/services/BuildrikSyncProvider", () => ({
 }));
 vi.mock("@/services/AssetUploadService", () => ({ createRemoteAssetSync: vi.fn(() => ({})) }));
 
-function mount(openCollectionSetup: ReturnType<typeof vi.fn>) {
+function mount(openCollectionSetup: (onConfirm: (includeSampleData: boolean) => Promise<void>) => void) {
   const div = document.createElement("div");
   return renderHook(() =>
     useComposerInit({

@@ -164,6 +164,24 @@ export class SEOInjector {
       tags.push(`<script type="application/ld+json">${jsonLd}</script>`);
     }
 
+    /* Settings → Site Settings → Social Links writes three URLs into project
+       settings and, until now, NOTHING anywhere read them: not this injector,
+       not the canvas, not the publish path. Filled in, they left the editor
+       and reached no page. `sameAs` on an Organization is what a site-wide
+       social profile means to a search engine, so that is what they emit. */
+    const sameAs = this.socialProfiles(siteSEO);
+    if (sameAs.length) {
+      const org: Record<string, unknown> = {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        sameAs,
+      };
+      if (siteSEO?.siteName) org.name = siteSEO.siteName;
+      if (canonicalUrl) org.url = this.options.baseUrl || canonicalUrl;
+      const orgLd = JSON.stringify(org).replace(/<\/script/gi, "<\\/script");
+      tags.push(`<script type="application/ld+json">${orgLd}</script>`);
+    }
+
     // A2: Custom head code. Was previously persisted but NEVER injected —
     // the "runs on every page load" banner was a lie. Now sanitized via
     // DOMPurify allowlist (inline <script>, event handlers, unknown tags
@@ -232,6 +250,16 @@ export class SEOInjector {
   // PRIVATE HELPERS
   // --------------------------------------------------------------------------
 
+
+  /** The site's social profile URLs, http(s) only — these are user input and
+   *  land inside a <script>, so a `javascript:` value has no business here. */
+  private socialProfiles(siteSEO?: SiteSEO): string[] {
+    const links = siteSEO?.socialLinks;
+    if (!links) return [];
+    return [links.twitter, links.facebook, links.linkedin]
+      .map((v) => (v ?? "").trim())
+      .filter((v) => /^https?:\/\//i.test(v));
+  }
 
   private getDescription(pageSEO?: PageSEO, pageSettings?: { description?: string }): string {
     return pageSEO?.metaDescription || pageSettings?.description || "";
