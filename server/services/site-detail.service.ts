@@ -15,6 +15,7 @@ export async function getSiteOverview(siteId: string): Promise<SiteOverview> {
       createdAt: true,
       workspaceId: true,
       touchIcon: true,
+      favicon: true,
     },
   });
 
@@ -59,8 +60,15 @@ export async function getSiteOverview(siteId: string): Promise<SiteOverview> {
       take: 5,
       select: { id: true, action: true, description: true, createdAt: true },
     }),
-    prisma.page.count({
-      where: { siteId, seoTitle: { not: null }, seoDescription: { not: null } },
+    /* SEO health used to count pages whose `seoTitle` AND `seoDescription`
+       COLUMNS were set. The editor writes a page's SEO into its `settings`
+       JSON — checked in the database: settings.seo populated, both columns
+       null — so this scored 0% for every site built in the editor, which is
+       every site. Read both and decide in JS; a site's page count is tens, not
+       thousands. */
+    prisma.page.findMany({
+      where: { siteId },
+      select: { seoTitle: true, seoDescription: true, settings: true },
     }),
     prisma.page.count({
       where: { siteId, NOT: { blocks: { equals: [] } } },
@@ -78,10 +86,24 @@ export async function getSiteOverview(siteId: string): Promise<SiteOverview> {
     ? Math.round(((monthlyVisitors - previousVisitors) / previousVisitors) * 100)
     : 0;
 
-  const seoScore = totalPages > 0 ? Math.round((pagesWithSeo / totalPages) * 100) : 0;
+  const filled = (v: unknown) => typeof v === "string" && v.trim().length > 0;
+  const pagesWithSeoCount = pagesWithSeo.filter((page) => {
+    const seo =
+      typeof page.settings === "object" && page.settings !== null
+        ? ((page.settings as { seo?: Record<string, unknown> }).seo ?? {})
+        : {};
+    const title = filled(seo.metaTitle) ? seo.metaTitle : page.seoTitle;
+    const description = filled(seo.metaDescription) ? seo.metaDescription : page.seoDescription;
+    return filled(title) && filled(description);
+  }).length;
+
+  const seoScore = totalPages > 0 ? Math.round((pagesWithSeoCount / totalPages) * 100) : 0;
   const contentScore = totalPages > 0 ? Math.round((pagesWithContent / totalPages) * 100) : 0;
   const sslScore = sslDomain ? 100 : 0;
-  const faviconScore = site.touchIcon ? 100 : 0;
+  /* Scored on `touchIcon` alone while calling itself "favicon", so a site with
+     a favicon and no Apple touch icon read 0 on a row that names the thing it
+     has. Either counts. */
+  const faviconScore = site.favicon || site.touchIcon ? 100 : 0;
   const healthScore = Math.round(seoScore * 0.3 + contentScore * 0.3 + sslScore * 0.2 + faviconScore * 0.2);
 
   return {
