@@ -278,16 +278,25 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange
 
       <Section title="Cookie Consent">
         <SwitchRow
-          title="Show Cookie Banner"
+          title="Show cookie banner (stored, not yet shown)"
           checked={cookieBanner}
           onChange={(next) => {
             setCookieBanner(next);
             setHasChanges(true);
           }}
         />
+        {/* This said the banner "asks visitors to accept cookies before
+            tracking begins. Required in the EU (GDPR)". Neither half happens:
+            `cookieConsent` is written here and read by nothing — no export
+            path, no publish worker, no runtime — and
+            `generateAnalyticsScripts` injects each enabled provider outright,
+            with no consent check and no gtag consent mode. A compliance
+            promise is the worst kind to leave unbacked, so the switch says
+            what it does today: it records the preference. */}
         <div className={SCREEN_INFO}>
-          Displays a banner asking visitors to accept cookies before tracking begins. Required in
-          the EU (GDPR) and recommended everywhere else.
+          Records the preference only. Buildrick does not render a consent banner yet, and the
+          analytics above load as soon as the page does — they do not wait for consent. If you
+          need GDPR consent today, add your own banner in Settings → Custom code.
         </div>
       </Section>
     </Screen>
