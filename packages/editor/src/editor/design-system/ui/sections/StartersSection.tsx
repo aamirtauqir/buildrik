@@ -14,7 +14,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { StarterGrid } from "../StarterGalleryModal";
+import { StarterGrid } from "../StarterGrid";
 import { STARTER_DS_REGISTRY } from "../../starters";
 import { useApplyStarter } from "../../state/useApplyStarter";
 

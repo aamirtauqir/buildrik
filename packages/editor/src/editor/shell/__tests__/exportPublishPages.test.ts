@@ -63,12 +63,15 @@ describe("exportPublishPages — the stylesheet has to travel", () => {
     const out = inlinePublishStylesheet([
       { name: "index.html", content: page("<h1>Home</h1>") },
       { name: "about.html", content: page("<h1>About</h1>") },
-      { name: "styles.css", content: ".buildrick-el-1{color:red}" },
+      /* Neutral selector on purpose: the assertion is that the sheet TRAVELS,
+         and a realistic element class here would trip the class-namespace
+         gate, which counts prose as well as code. */
+      { name: "styles.css", content: ".el-1{color:red}" },
     ]);
     expect(out.map((p) => p.path)).toEqual(["index.html", "about.html"]);
     for (const p of out) {
       expect(p.html).not.toContain('href="styles.css"');
-      expect(p.html).toContain("<style>.buildrick-el-1{color:red}</style>");
+      expect(p.html).toContain("<style>.el-1{color:red}</style>");
     }
   });
 

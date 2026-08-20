@@ -26,7 +26,6 @@ import { LeftSidebar } from "../sidebar/LeftSidebar";
 import { FullPageView } from "../sidebar/FullPageView";
 import { TokenRegistryProvider, DSModeProvider, StylePresetRegistryProvider } from "@/editor/design-system";
 import { MigrationProgressMount } from "@/editor/design-system/ui/MigrationProgressMount";
-import { StarterGalleryMount } from "@/editor/design-system/ui/StarterGalleryMount";
 import { DSLintRunner } from "@/editor/design-system/ui/DSLintRunner";
 import { ProjectTokensApplier } from "@/editor/design-system/ui/ProjectTokensApplier";
 import { useBlockInsertion } from "./hooks/useBlockInsertion";
@@ -361,7 +360,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           tokens reached the page only when the Brand panel mounted, so a
           machine without the localStorage cache drew the DEFAULT brand. */}
       <ProjectTokensApplier composer={composer} />
-      <StarterGalleryMount projectId={projectId} composer={composer} />
       <LayoutShell
         drawerOpen={isLeftPanelOpen && !effectiveFullPageMode}
         drawerWidth={drawerWidth}
