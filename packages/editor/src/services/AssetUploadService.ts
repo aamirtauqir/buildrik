@@ -99,30 +99,6 @@ export async function uploadBlob(
 }
 
 /**
- * Probe whether the upload route is reachable. Used by MediaManager to
- * decide between server-mirroring and local-only paths at startup.
- *
- * Returns false on offline, dashboard unconfigured, or auth fail.
- */
-export async function isUploadServiceReachable(): Promise<boolean> {
-  try {
-    const res = await fetch(`${DASHBOARD_URL}/api/asset-upload`, {
-      method: "POST",
-      credentials: "include",
-      headers: { "content-type": "application/json" },
-      // Empty body — for an authenticated session the route's handleUpload
-      // rejects with 400 (route reachable + usable). A 401 means the session
-      // is dead, so the service is NOT usable for server-mirroring — return
-      // false per this function's contract ("false on ... auth fail").
-      body: JSON.stringify({}),
-    });
-    return res.status === 400;
-  } catch {
-    return false;
-  }
-}
-
-/**
  * Phase B2: build a RemoteAssetSync implementation backed by Vercel Blob
  * + media tRPC. Composer accepts this in ComposerConfig and threads it
  * into MediaManager. Returns null on any failure so MediaManager can

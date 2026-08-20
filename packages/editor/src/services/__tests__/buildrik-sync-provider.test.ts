@@ -44,7 +44,6 @@ import {
   saveProject,
   loadServerMedia,
   getSiteIdFromUrl,
-  getBuildrikStorageHandlers,
   getEditorPlanTier,
   setBaselineLastEditedAt,
   SaveConflictError,
@@ -210,19 +209,6 @@ describe("getSiteIdFromUrl", () => {
       value: originalLocation,
       writable: true,
     });
-  });
-});
-
-describe("getBuildrikStorageHandlers", () => {
-  it("returns load/save handlers bound to siteId", async () => {
-    mocks.sitesGetQuery.mockResolvedValue({ id: "s1", name: "Test" });
-    mocks.pagesListQuery.mockResolvedValue([
-      { id: "p1", name: "Home", slug: "/", isHomePage: true, blocks: null, position: 1 },
-    ]);
-
-    const handlers = getBuildrikStorageHandlers("s1");
-    const data = await handlers.load();
-    expect(data?.metadata?.name).toBe("Test");
   });
 });
 

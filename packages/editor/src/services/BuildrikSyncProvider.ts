@@ -426,18 +426,6 @@ export function getSiteIdFromUrl(): string | null {
   return new URLSearchParams(window.location.search).get("siteId");
 }
 
-/**
- * Returns StorageConfig handlers for the Buildrik dashboard API.
- * Wire into AquibraStudio via options.storage.handlers.
- */
-export function getBuildrikStorageHandlers(siteId: string) {
-  return {
-    load: () => loadProject(siteId),
-    save: (data: ProjectData) =>
-      saveProject(siteId, data).then(() => undefined),
-  };
-}
-
 /* `initBuildrikSync` lived here until 2026-08-19: a second autosave loop —
    load, import, debounce on project:changed, save, retry once — that nothing
    ever called. The shipping path is `useComposerInit` (load + autosave) and
@@ -448,4 +436,8 @@ export function getBuildrikStorageHandlers(siteId: string) {
    child, so it counts as content and the wipe went through anyway (proved on
    a scratch site — 2 pages became one). The protection now lives at the write
    boundary as `_loadedSites` + `ProjectNotLoadedError`, where every caller
-   gets it. Do not re-add a loop here; wire the shell instead. */
+   gets it. Do not re-add a loop here; wire the shell instead.
+
+   `getBuildrikStorageHandlers` went the same way 2026-08-20 — a {load, save}
+   pair that delegated straight to loadProject/saveProject, documented as "wire
+   into AquibraStudio via options.storage.handlers", wired into nothing. */

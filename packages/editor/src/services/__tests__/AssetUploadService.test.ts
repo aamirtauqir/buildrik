@@ -42,7 +42,6 @@ vi.mock("../../shared/utils/runtimeEnv", () => ({
 
 import {
   uploadBlob,
-  isUploadServiceReachable,
   createRemoteAssetSync,
 } from "../AssetUploadService";
 
@@ -110,31 +109,6 @@ describe("uploadBlob", () => {
     await expect(
       uploadBlob(pngBlob(), "x.png", "image/png", { type: "image" })
     ).rejects.toThrow("quota exceeded");
-  });
-});
-
-describe("isUploadServiceReachable", () => {
-  it("returns true on a 400 — route reachable, session valid, empty body rejected", async () => {
-    const fetchMock = vi.fn().mockResolvedValue({ status: 400 });
-    vi.stubGlobal("fetch", fetchMock);
-
-    await expect(isUploadServiceReachable()).resolves.toBe(true);
-    expect(fetchMock).toHaveBeenCalledWith("http://dash.test/api/asset-upload", {
-      method: "POST",
-      credentials: "include",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({}),
-    });
-  });
-
-  it("returns false on a 401 — dead session cannot server-mirror", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ status: 401 }));
-    await expect(isUploadServiceReachable()).resolves.toBe(false);
-  });
-
-  it("returns false when fetch itself throws (offline / unconfigured)", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new TypeError("Failed to fetch")));
-    await expect(isUploadServiceReachable()).resolves.toBe(false);
   });
 });
 
