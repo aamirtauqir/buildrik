@@ -202,6 +202,10 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
           <TextField
             ref={editInputRef}
             type="text"
+            /* The rename input replaces the row's name, so it had no label of
+               any kind — axe: label, critical. It is the layer's name that is
+               being edited, so say which layer. */
+            aria-label={`Rename ${displayName}`}
             className="bdc-lr-edit"
             value={editingName}
             onChange={(e) => onEditingNameChange(e.target.value)}
