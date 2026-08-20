@@ -212,7 +212,11 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
 
       <Section
         title={`Enabled locales (${enabledLocales.length})`}
-        desc="Locales available to visitors. Each enabled non-default locale serves under its own path prefix (e.g. /fr/, /de/)."
+        /* Present tense here ("serves") contradicted the note at the bottom of
+           the same screen, which says routing ships in Phase D. Two sentences
+           on one screen disagreeing is how a reader ends up believing the
+           optimistic one. */
+        desc="Locales you plan to offer. Once locale routing ships, each enabled non-default locale will serve under its own path prefix (e.g. /fr/, /de/)."
       >
         <ul style={listStyles}>
           {enabledLocales.map((code) => {
