@@ -6,7 +6,10 @@ import { describe, it, expect, vi } from "vitest";
    subject here. */
 vi.mock("../storage/VersionHistoryStorage", () => ({
   saveVersion: vi.fn().mockResolvedValue(undefined),
-  loadVersions: vi.fn().mockResolvedValue([]),
+  /* A fresh array per call. `mockResolvedValue([])` hands every manager the
+     SAME array instance, and `versions.unshift(...)` mutates it — so one
+     test's checkpoints turned up inside the next test's manager. */
+  loadVersions: vi.fn(async () => []),
   loadVersion: vi.fn().mockResolvedValue(null),
   deleteVersion: vi.fn().mockResolvedValue(undefined),
   deleteAllVersions: vi.fn().mockResolvedValue(undefined),
@@ -143,3 +146,71 @@ describe("VersionTimelineManager.autoCheckpoint — an empty snapshot is not a r
   });
 });
 
+/* `project:loaded` fires on every open, so simply OPENING the editor wrote a
+   checkpoint. A scratch site with one page held fifty rows, all of them
+   "Auto: project:loaded" — which is the cap, so the entire auto-history was
+   "the last fifty times this was opened" rather than fifty points worth
+   returning to. Walked live: two reloads with no edit leave one checkpoint;
+   an edit then a reload makes it two. */
+describe("VersionTimelineManager.autoCheckpoint — a project nobody touched is not a new point", () => {
+  const project = (letterSpacing?: string) => ({
+    pages: [
+      {
+        id: "p1",
+        name: "Home",
+        root: {
+          id: "root",
+          type: "container",
+          children: [{ id: "h", type: "heading", styles: letterSpacing ? { "letter-spacing": letterSpacing } : {} }],
+        },
+      },
+    ],
+    styles: [],
+    assets: [],
+    settings: {},
+    metadata: { updatedAt: new Date().toISOString() },
+  });
+
+  async function makeManager() {
+    let current: unknown = project();
+    const composer = {
+      on: () => {},
+      off: () => {},
+      emit: () => {},
+      importProject: vi.fn(),
+      /* Stamped fresh on every call, exactly like the real one — which is why
+         a whole-snapshot byte comparison could never match. */
+      exportProject: () => ({ ...(current as object), metadata: { updatedAt: new Date().toISOString() } }),
+      elements: { getPages: () => [], getElement: () => null },
+      styles: { exportStyles: () => [] },
+    };
+    const { VersionTimelineManager } = await import("../VersionTimelineManager");
+    const m = new VersionTimelineManager(composer as never);
+    /* The constructor kicks off a storage read that assigns `versions` when it
+       settles — start the checkpoints after it, or the first one is wiped by a
+       load that lands between them. */
+    await m.reloadVersions();
+    return { m, edit: (v: string) => { current = project(v); } };
+  }
+
+  it("skips a checkpoint identical to the newest one", async () => {
+    const { m } = await makeManager();
+    expect(await m.autoCheckpoint("Auto: project:loaded")).not.toBeNull();
+    expect(await m.autoCheckpoint("Auto: project:loaded")).toBeNull();
+    expect(m.getVersions()).toHaveLength(1);
+  });
+
+  it("stores one once something actually changed", async () => {
+    const { m, edit } = await makeManager();
+    await m.autoCheckpoint("Auto: project:loaded");
+    edit("0.3px");
+    expect(await m.autoCheckpoint("Auto: project:loaded")).not.toBeNull();
+    expect(m.getVersions()).toHaveLength(2);
+  });
+
+  it("a NAMED version never suppresses one — that checkpoint is the before-I-started point", async () => {
+    const { m } = await makeManager();
+    await m.createVersion("Launch");
+    expect(await m.autoCheckpoint("Auto: project:loaded")).not.toBeNull();
+  });
+});

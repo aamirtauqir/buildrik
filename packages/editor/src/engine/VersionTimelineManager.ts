@@ -213,6 +213,20 @@ export class VersionTimelineManager {
        page, so this cannot suppress a legitimate auto-save. */
     if (!snapshot.pages?.length) return null;
 
+    /* …and neither is the fiftieth copy of a project nobody has touched.
+       `project:loaded` fires on every open, so simply opening the editor wrote
+       a checkpoint: a scratch site with one page held 50 rows, every one of
+       them "Auto: project:loaded", which is the cap — the whole auto-history
+       was "the last fifty times this was opened" instead of fifty points worth
+       returning to. If the newest auto-checkpoint already holds this exact
+       project, there is nothing new to restore to. A NAMED version is never
+       treated as the same thing: those are decisions, and a checkpoint taken
+       after one is the "before I started today" point. */
+    const newest = this.versions[0];
+    if (newest?.isAutoCheckpoint && sameProject(newest.snapshot, snapshot)) {
+      return null;
+    }
+
     const version: NamedVersion = {
       id: generateVersionId(),
       name: label,
@@ -1024,4 +1038,21 @@ export class VersionTimelineManager {
     this.removeAutoCheckpoints();
     this.versions = [];
   }
+}
+
+/**
+ * Two snapshots of the same untouched project.
+ *
+ * `exportProject()` stamps `metadata.updatedAt` with the current time on every
+ * call, so a byte comparison of the whole snapshot never matches — the parts
+ * that decide whether there is anything to restore to are the pages, the
+ * styles and the settings.
+ */
+function sameProject(a: ProjectData | undefined, b: ProjectData): boolean {
+  if (!a) return false;
+  return (
+    JSON.stringify(a.pages) === JSON.stringify(b.pages) &&
+    JSON.stringify(a.styles) === JSON.stringify(b.styles) &&
+    JSON.stringify(a.settings) === JSON.stringify(b.settings)
+  );
 }
