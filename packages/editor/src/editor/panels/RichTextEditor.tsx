@@ -126,6 +126,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
     >
       {/* Heading Selector */}
       <Select
+        /* Both toolbar selects shipped unnamed — axe critical, and a toolbar
+           that reads out as "combo box, combo box" tells a screen-reader user
+           nothing about which one sets the block and which the size. */
+        aria-label="Text style"
         onChange={(e) => onCommand("formatBlock", e.target.value)}
         style={{
           padding: "2px 6px",
@@ -147,6 +151,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
       </Select>
       {/* Font Size */}
       <Select
+        aria-label="Font size"
         onChange={(e) => onCommand("fontSize", e.target.value)}
         style={{
           padding: "2px 6px",
