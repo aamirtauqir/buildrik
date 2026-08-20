@@ -139,11 +139,17 @@ export const PublishConfirmFacts: React.FC<PublishConfirmFactsProps> = ({
       <div className={ROW}>
         <span className={KEY}>Rollback</span>
         <span className={VAL}>
+          {/* "Every version stays restorable" was the first-publish line, and
+              publish history keeps twenty: `runPublishJob` nulls the stored
+              payload on COMPLETED jobs beyond the 20 most recent
+              (PUBLISH_HISTORY_RETAINED), and a job with no payload is not
+              rollbackable. The panel next door already says "the last 20" —
+              this said something the retention cannot keep. */}
           {rollbackTo !== null
             ? `v${rollbackTo} stays restorable in publish history`
             : isPublished
               ? "The current version stays restorable"
-              : "Every version stays restorable"}
+              : "The last 20 versions stay restorable"}
         </span>
       </div>
     </div>
