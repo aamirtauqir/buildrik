@@ -34,6 +34,7 @@ import { ElementManager } from "./elements/ElementManager";
 import { EventEmitter } from "./EventEmitter";
 import { RESET_CSS, siteFontCSS, siteTokensCSS, googleFontsHeadLinks, siteFontsFromTokens } from "./export/ExportHelpers";
 import { resolvePageTitle } from "./export/SEOInjector";
+import { buildInteractionRuntimeScript, INTERACTION_ATTR } from "./export/interactionRuntime";
 import { escapeHTML } from "../shared/utils/html/encoding";
 import { FontManager } from "./fonts/FontManager";
 import { FormHandler } from "./forms/FormHandler";
@@ -590,6 +591,16 @@ export class Composer extends EventEmitter {
       ? resolvePageTitle(titlePage, titlePage.settings?.seo, titlePage.settings)
       : "Untitled";
 
+    /* The interaction runtime, on the same rule the export uses: ship it only
+       when the page carries a configured interaction. Without it this document
+       had the triggers written into the markup and nothing listening, so a
+       click animation set in the inspector did nothing in Preview — the one
+       surface whose job is to show what a visitor gets — while working on the
+       published page. */
+    const interactionScript = html.includes(INTERACTION_ATTR)
+      ? `\n${buildInteractionRuntimeScript()}`
+      : "";
+
     return {
       html,
       css,
@@ -602,7 +613,7 @@ export class Composer extends EventEmitter {
 ${fontLinks ? `${fontLinks}\n` : ""}  <style>${RESET_CSS}${css}${siteCss}</style>
 </head>
 <body>
-${html}
+${html}${interactionScript}
 </body>
 </html>`,
     };

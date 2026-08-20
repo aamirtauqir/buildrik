@@ -19,7 +19,14 @@ vi.mock("../storage/VersionHistoryStorage", () => ({
 
 describe("VersionTimelineManager compareVersions performance", () => {
   it("flattens snapshots into Maps for O(n) comparison", async () => {
-    const manager = new (await import("../VersionTimelineManager")).VersionTimelineManager({} as any);
+    /* The constructor starts a storage read and reports failures through the
+       composer, so `{}` here surfaced as an unhandled rejection that failed the
+       whole run while every test still passed. */
+    const manager = new (await import("../VersionTimelineManager")).VersionTimelineManager({
+      on: () => {},
+      off: () => {},
+      emit: () => {},
+    } as any);
     const snapshot = {
       pages: [{
         id: "p1",

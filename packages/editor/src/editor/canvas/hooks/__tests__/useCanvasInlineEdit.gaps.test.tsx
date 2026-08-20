@@ -16,6 +16,8 @@ function makeMockComposer() {
   const composer = {
     beginTransaction: vi.fn(),
     endTransaction: vi.fn(),
+    /* The real composer is an emitter; a commit announces itself. */
+    emit: vi.fn(),
     saveProject: vi.fn().mockResolvedValue(undefined),
     elements: {
       getElement: vi.fn().mockReturnValue({ setContent }),

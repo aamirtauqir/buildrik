@@ -48,6 +48,8 @@ export function buildAttributeString(
     classes?: string[];
     attributes?: Record<string, string>;
     styles?: Record<string, string>;
+    /** Interactions live here, not in `attributes` — see below. */
+    data?: Record<string, unknown>;
   },
   options: HTMLGenerationOptions = {}
 ): string {
@@ -89,6 +91,17 @@ export function buildAttributeString(
         parts.push(`${key}="${escapeAttr(value)}"`);
       }
     });
+  }
+
+  /* Interactions are stored on `data.data.interactions`, and only the LIVE
+     element's `getAttributes()` folds them into an attribute — so anything
+     serialized from ElementData lost them. That is the path the in-shell
+     preview takes (`HTMLParser.toHTML`), which is why a click animation
+     configured in the inspector did nothing in Preview while working on the
+     published page (the export emits this itself, ExportEngine:985). */
+  const interactions = data.data?.interactions;
+  if (Array.isArray(interactions) && interactions.length > 0) {
+    parts.push(`data-buildrick-interactions="${escapeAttr(JSON.stringify(interactions))}"`);
   }
 
   // Inline styles — drop the whole declaration block if it carries a dangerous
