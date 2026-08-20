@@ -347,10 +347,17 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
         className="tw:fixed tw:inset-0 tw:bg-black/60 tw:[z-index:calc(var(--bk-z-modal)-1)]"
       />
       {/* Panel */}
+      {/* The key handling lived on the search input alone, so it only worked
+          while focus sat there: one Tab moved focus to a result button and
+          Escape stopped closing the palette — measured, twice in a row, with
+          the dialog still open. Arrow keys and Enter had the same reach. On
+          the panel it covers everything inside, and the input still receives
+          it by bubbling. */}
       <div
         role="dialog"
         aria-label="Command Palette"
         aria-modal="true"
+        onKeyDown={handleKeyDown}
         className="tw:flex tw:flex-col tw:gap-0 tw:fixed tw:top-1/5 tw:left-1/2 tw:-translate-x-1/2 tw:w-140 tw:max-w-[90vw] tw:overflow-hidden tw:rounded-lg tw:border tw:border-gray-200 tw:bg-[var(--bk-bg-subtle)] tw:[box-shadow:var(--bk-shadow-overlay)] tw:[z-index:var(--bk-z-modal)]"
       >
         {/* Search row */}
@@ -381,7 +388,6 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
             placeholder="Type a command or search…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={handleKeyDown}
             className="tw:flex-1 tw:[&_input]:h-full tw:[&_input]:border-0 tw:[&_input]:bg-transparent tw:[&_input]:text-base"
           />
         </div>
