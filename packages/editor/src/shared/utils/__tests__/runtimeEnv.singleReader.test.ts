@@ -35,8 +35,27 @@ function walk(dir: string, out: string[] = []): string[] {
   return out;
 }
 
-describe("import.meta.env has exactly one reader", () => {
-  it("is not read anywhere else under src/", () => {
+/* `process.env` is the mirror image: Next defines it, the Vite demo does not,
+   and all three reads were dev-warning guards — the branch that turns a missing
+   token or an unregistered control into a warning would instead throw there.
+   Not reproduced in the demo (it was not running); the shipping Next build
+   defines NODE_ENV, so it was never at risk on that side. runtimeEnv resolves
+   both, which is the point of the file. */
+describe("the env globals have exactly one reader", () => {
+  it("process.env is not read anywhere else under src/", () => {
+    const offenders = walk(SRC)
+      .filter((p) => !ALLOWED.some((a) => p.endsWith(a)))
+      .filter((p) =>
+        readFileSync(p, "utf8")
+          .replace(/\/\*[\s\S]*?\*\//g, "")
+          .replace(/\/\/[^\n]*/g, "")
+          .includes("process.env")
+      );
+
+    expect(offenders.map((p) => p.slice(SRC.length + 1))).toEqual([]);
+  });
+
+  it("import.meta.env is not read anywhere else under src/", () => {
     const offenders = walk(SRC)
       .filter((p) => !ALLOWED.some((a) => p.endsWith(a)))
       /* Comments explain the banned pattern by name — strip them, or the

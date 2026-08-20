@@ -29,6 +29,7 @@ import type {
   SectionSchema,
 } from "./schema";
 import { Button } from "@/editor/chrome-ui";
+import { IS_DEV_BUILD } from "@/shared/utils/runtimeEnv";
 
 export interface InspectorRendererProps {
   schema: SectionSchema;
@@ -100,7 +101,7 @@ function renderAtomic(
 
   const Control = resolved[field.type] as React.FC<ControlProps<typeof field>>;
   if (!Control) {
-    if (process.env.NODE_ENV !== "production") {
+    if (IS_DEV_BUILD) {
       // eslint-disable-next-line no-console
       console.warn(
         `InspectorRenderer: no control registered for field.type="${field.type}" in section "${sectionId}".`,

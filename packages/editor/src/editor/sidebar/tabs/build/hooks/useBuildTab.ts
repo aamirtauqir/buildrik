@@ -13,6 +13,7 @@ import type { FlatElEntry } from "../catalog/types";
 import { searchInsert, type InsertSearchHit } from "../utils/search";
 import { blockRows, componentRows } from "../catalog/groups";
 import { getBlockDefinitions } from "../../../../../blocks";
+import { IS_DEV_BUILD } from "@/shared/utils/runtimeEnv";
 
 // ─── Storage helpers ─────────────────────────────────────────────────────────
 
@@ -194,7 +195,7 @@ export function useBuildTab(
   const handleElClick: ElClickFn = React.useCallback(
     (el) => {
       // Dev-mode validation: warn if catalog blockId has no registry entry
-      if (process.env.NODE_ENV === "development") {
+      if (IS_DEV_BUILD) {
         const def = getBlockDefinitions().find((b) => b.id === el.blockId);
         if (!def) {
           console.warn(`[useBuildTab] blockId "${el.blockId}" (${el.name}) has no registry entry. Catalog may be out of sync with blockRegistry.`);
