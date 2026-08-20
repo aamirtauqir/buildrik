@@ -71,7 +71,8 @@
       "copy": "No brand set. Start from a theme or import your client's tokens.",
       "status": "missing",
       "file": null,
-      "shipsInstead": null
+      "shipsInstead": null,
+      "note": "Walked the surface 2026-08-20: Brand > Starters always lists the six built-in starters with the warning 'Applying a starter overwrites your tokens', so the empty state this line describes cannot occur. A site never has zero starters to choose from."
     },
     {
       "surface": "Inspector · no selection",
@@ -92,14 +93,16 @@
       "copy": "No comments yet. Turn on comment mode to leave one.",
       "status": "missing",
       "file": null,
-      "shipsInstead": null
+      "shipsInstead": null,
+      "note": "Walked 2026-08-20: comments are canvas PINS, not a list. The topbar toggle turns comment mode on and a canvas click opens a composer labelled 'New comment' with the placeholder 'Leave a comment...'. There is no comments-list surface for this empty state; ReviewTab shows a round's comments once a review exists."
     },
     {
       "surface": "Versions · fresh site",
       "copy": "No saved versions yet. Versions are created every time you publish, or whenever you name one.",
       "status": "missing",
       "file": null,
-      "shipsInstead": null
+      "shipsInstead": null,
+      "note": "Do NOT implement as written. 'Versions are created every time you publish' is false in the code: auto-checkpoints fire on project:loaded and template:applied only (DEFAULT_VERSION config autoCheckpointEvents), publish creates a PublishBuildJob and no NamedVersion, and nothing else calls createVersion. The panel ships 'No saved versions yet' with the true hint ('Save Version creates a named milestone you can restore anytime'). Either the spec line changes or publish starts snapshotting - a founder call, recorded 2026-08-20."
     },
     {
       "surface": "Canvas · blank page",
