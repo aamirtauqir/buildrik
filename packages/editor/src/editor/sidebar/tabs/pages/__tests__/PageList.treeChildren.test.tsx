@@ -57,6 +57,9 @@ function renderList(pages: ReturnType<typeof page>[]) {
       onBulkDelete={vi.fn()}
       onBulkDuplicate={vi.fn()}
       onClearSelection={vi.fn()}
+      onAddFolder={vi.fn()}
+      onBulkMoveToFolder={vi.fn()}
+      onBulkRemoveFromFolders={vi.fn()}
     />,
   );
 }
