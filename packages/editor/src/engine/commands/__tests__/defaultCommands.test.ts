@@ -17,10 +17,17 @@ import type { CommandData } from "@/shared/types";
 interface MockElement {
   getId: () => string;
   getType: () => string;
+  getParent: () => MockElement | null;
+  getChildren: () => MockElement[];
 }
 
 function makeElement(id: string, type = "container"): MockElement {
-  return { getId: () => id, getType: () => type };
+  return {
+    getId: () => id,
+    getType: () => type,
+    getParent: () => null,
+    getChildren: () => [],
+  };
 }
 
 function makeComposer() {
@@ -53,7 +60,7 @@ function makeComposer() {
     exportJSON: vi.fn(() => "{}"),
     beginTransaction: vi.fn(),
     endTransaction: vi.fn(),
-    clipboard: null as string | null,
+    clipboard: null as { type: string } | null,
   };
 }
 
@@ -118,29 +125,77 @@ describe("clipboard", () => {
     expect(composer.emit).toHaveBeenCalledWith(EVENTS.CLIPBOARD_CUT, { elementId: "el-2" });
   });
 
-  it("paste targets the selection when present", () => {
-    composer.clipboard = "payload";
-    const target = makeElement("el-3");
+  /* Paste used to target whatever was selected, with no nesting check, and to
+     emit CLIPBOARD_PASTE a second time on top of the one `pasteElement`
+     already sends. Live: copying a heading and pasting with that heading still
+     selected put the copy INSIDE the heading — which `rules.ts` forbids
+     outright — and raised two "Element pasted" toasts for one paste. */
+  it("pastes into the selection when the selection can hold it", () => {
+    composer.clipboard = { type: "heading" };
+    const target = makeElement("el-3", "container");
     composer.selection.getSelected.mockReturnValue(target);
-    composer.elements.getElement.mockReturnValue(target);
 
     run("paste");
 
-    expect(composer.elements.getElement).toHaveBeenCalledWith("el-3");
-    expect(composer.elements.pasteElement).toHaveBeenCalledWith("payload", target);
-    expect(composer.emit).toHaveBeenCalledWith(EVENTS.CLIPBOARD_PASTE, { targetId: "el-3" });
+    expect(composer.elements.pasteElement).toHaveBeenCalledWith(
+      composer.clipboard,
+      target,
+      undefined,
+    );
+  });
+
+  it("pastes AFTER a leaf that cannot hold it, not inside it", () => {
+    composer.clipboard = { type: "heading" };
+    const sibling = makeElement("el-sib", "heading");
+    const heading = makeElement("el-h", "heading");
+    const parent = makeElement("el-parent", "container");
+    heading.getParent = () => parent;
+    parent.getChildren = () => [sibling, heading];
+    composer.selection.getSelected.mockReturnValue(heading);
+
+    run("paste");
+
+    expect(composer.elements.pasteElement).toHaveBeenCalledWith(composer.clipboard, parent, 2);
+  });
+
+  it("falls back to the page root when the parent cannot hold it either", () => {
+    composer.clipboard = { type: "section" };
+    const root = makeElement("root-1", "container");
+    const heading = makeElement("el-h", "heading");
+    const parent = makeElement("el-parent", "heading");
+    heading.getParent = () => parent;
+    parent.getChildren = () => [heading];
+    composer.selection.getSelected.mockReturnValue(heading);
+    composer.elements.getActivePage.mockReturnValue({ root: { id: "root-1" } });
+    composer.elements.getElement.mockReturnValue(root);
+
+    run("paste");
+
+    expect(composer.elements.pasteElement).toHaveBeenCalledWith(composer.clipboard, root, undefined);
+  });
+
+  it("announces the paste once — pasteElement already emits it", () => {
+    composer.clipboard = { type: "heading" };
+    composer.selection.getSelected.mockReturnValue(makeElement("el-3", "container"));
+
+    run("paste");
+
+    expect(composer.emit).not.toHaveBeenCalledWith(
+      EVENTS.CLIPBOARD_PASTE,
+      expect.anything(),
+    );
   });
 
   it("paste falls back to the active page root when nothing is selected", () => {
-    composer.clipboard = "payload";
-    const root = makeElement("root-1");
+    composer.clipboard = { type: "heading" };
+    const root = makeElement("root-1", "container");
     composer.elements.getActivePage.mockReturnValue({ root: { id: "root-1" } });
     composer.elements.getElement.mockReturnValue(root);
 
     run("paste");
 
     expect(composer.elements.getElement).toHaveBeenCalledWith("root-1");
-    expect(composer.elements.pasteElement).toHaveBeenCalledWith("payload", root);
+    expect(composer.elements.pasteElement).toHaveBeenCalledWith(composer.clipboard, root, undefined);
   });
 
   it("paste with an empty clipboard is a no-op", () => {

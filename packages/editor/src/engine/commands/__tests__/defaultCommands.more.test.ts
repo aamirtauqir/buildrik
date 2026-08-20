@@ -14,8 +14,15 @@ import type { CommandData } from "@/shared/types";
 interface MockElement {
   getId: () => string;
   getType: () => string;
+  getParent: () => MockElement | null;
+  getChildren: () => MockElement[];
 }
-const el = (id: string, type = "container"): MockElement => ({ getId: () => id, getType: () => type });
+const el = (id: string, type = "container"): MockElement => ({
+  getId: () => id,
+  getType: () => type,
+  getParent: () => null,
+  getChildren: () => [],
+});
 
 function makeComposer() {
   return {
@@ -47,7 +54,7 @@ function makeComposer() {
     exportJSON: vi.fn(() => "{}"),
     beginTransaction: vi.fn(),
     endTransaction: vi.fn(),
-    clipboard: null as string | null,
+    clipboard: null as { type: string } | null,
   };
 }
 
@@ -91,15 +98,19 @@ describe("guard / empty paths", () => {
   });
 
   it("paste with no selection and no active page is a no-op", () => {
-    composer.clipboard = "payload";
-    run("paste"); // getActivePage → null → targetId undefined
+    composer.clipboard = { type: "heading" };
+    run("paste"); // getActivePage → null → no target at all
     expect(composer.elements.pasteElement).not.toHaveBeenCalled();
   });
 
-  it("paste whose target element cannot be resolved is a no-op", () => {
-    composer.clipboard = "payload";
-    composer.selection.getSelected.mockReturnValue(el("sel"));
-    composer.elements.getElement.mockReturnValue(null);
+  /* The selection IS the target now — `getElement` is only consulted for the
+     page-root fallback — so "target cannot be resolved" is the case where the
+     selection can't hold the paste, has no parent that can, and there is no
+     active page to fall back to. */
+  it("paste with nowhere valid to land is a no-op", () => {
+    composer.clipboard = { type: "section" };
+    composer.selection.getSelected.mockReturnValue(el("sel", "heading"));
+    composer.elements.getActivePage.mockReturnValue(null);
     run("paste");
     expect(composer.elements.pasteElement).not.toHaveBeenCalled();
   });

@@ -7,7 +7,8 @@
  */
 
 import { EVENTS } from "../../shared/constants";
-import type { CommandData } from "../../shared/types";
+import type { CommandData, ElementType } from "../../shared/types";
+import { canNestElement } from "../../shared/utils/nesting";
 import type { Composer } from "../Composer";
 import { nudgeSelected, reorderElement } from "./commandOperations";
 
@@ -135,16 +136,37 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
         if (!c.clipboard) return;
         const selected = c.selection.getSelected();
         const page = c.elements.getActivePage();
-        const targetId = selected?.getId() || page?.root.id;
-        if (!targetId) return;
+        const root = page ? c.elements.getElement(page.root.id) : null;
 
-        const target = c.elements.getElement(targetId);
+        /* Paste where the copy can actually live. The target used to be
+           whatever was selected, with no nesting check — so copying a heading
+           and pasting with that heading still selected put the copy INSIDE the
+           heading, which the rules forbid outright ("heading" is in a
+           heading's forbiddenChildren). Measured live: the heading went from 0
+           children to 1 and the copy was swallowed. Selecting a container
+           still means "paste in here". */
+        const pastedType = c.clipboard.type as ElementType;
+        let target = root;
+        let index: number | undefined;
+        if (selected) {
+          if (canNestElement(pastedType, selected.getType() as ElementType)) {
+            target = selected;
+          } else {
+            const parent = selected.getParent();
+            if (parent && canNestElement(pastedType, parent.getType() as ElementType)) {
+              target = parent;
+              index = parent.getChildren().indexOf(selected) + 1;
+            }
+          }
+        }
         if (!target) return;
 
         c.beginTransaction("paste");
-        c.elements.pasteElement(c.clipboard, target);
+        /* `pasteElement` announces CLIPBOARD_PASTE itself, with the element,
+           target and index. Emitting a second, thinner one here gave every
+           paste two "Element pasted" toasts (useClipboardToasts listens once). */
+        c.elements.pasteElement(c.clipboard, target, index);
         c.endTransaction();
-        c.emit(EVENTS.CLIPBOARD_PASTE, { targetId });
       },
     },
 
