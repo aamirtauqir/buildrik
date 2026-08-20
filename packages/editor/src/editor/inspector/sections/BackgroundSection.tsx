@@ -3,6 +3,7 @@
  */
 
 import * as React from "react";
+import type { Composer } from "../../../engine";
 import type { MediaAsset, MediaAssetType } from "../../../shared/types/media";
 import { extractGradientUI, composeGradient, deriveBgType } from "../../../shared/utils/parsers/gradientHelpers";
 import { Section, ColorInput, SelectRow, InputRow, MoreSettingsToggle, type SectionTier, MixedValueIndicator } from "../shared/controls";
@@ -29,6 +30,8 @@ export interface BackgroundSectionProps {
   onAdvancedToggle?: () => void;
   mixedKeys?: ReadonlySet<string>;
   isMultiSelect?: boolean;
+  /** Threaded so the colour chips can jump to the Design panel. */
+  composer?: Composer | null;
 }
 
 export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
@@ -42,6 +45,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
   onAdvancedToggle,
   mixedKeys,
   isMultiSelect,
+  composer,
 }) => {
   const [bgType, setBgType] = React.useState<"color" | "gradient" | "image">(() => deriveBgType(styles));
 
@@ -117,6 +121,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
             label="Fill"
             value={styles["background-color"] || ""}
             onChange={(v) => onChange("background-color", v)}
+            composer={composer}
           />
         </div>
       )}
@@ -181,6 +186,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
               });
               onChange("background", result);
             }}
+            composer={composer}
           />
           <ColorInput
             label="Color 2"
@@ -194,6 +200,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
               });
               onChange("background", result);
             }}
+            composer={composer}
           />
 
           {/* Gradient Angle (for linear) */}

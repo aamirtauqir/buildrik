@@ -251,6 +251,10 @@ export interface BaseStyleSectionProps {
   mixedKeys?: ReadonlySet<string>;
   /** True when 2+ elements selected (Wave 2). */
   isMultiSelect?: boolean;
+  /** Lets a section's binding chips jump to the Design panel — see ColorInput
+   *  and SpacingControls, whose chips were static everywhere because no call
+   *  site ever passed this down. */
+  composer?: Composer | null;
 }
 
 export function adaptBaseStyleProps(ctx: SectionContext): BaseStyleSectionProps {
@@ -261,6 +265,7 @@ export function adaptBaseStyleProps(ctx: SectionContext): BaseStyleSectionProps 
     onToggle: ctx.onToggle,
     tier: ctx.tier,
     mixedKeys: ctx.mixedKeys ?? EMPTY_MIXED_KEYS,
+    composer: ctx.composer,
     isMultiSelect: ctx.isMultiSelect ?? false,
   };
 }

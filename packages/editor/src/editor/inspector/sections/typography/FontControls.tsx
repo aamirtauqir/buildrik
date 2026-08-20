@@ -14,6 +14,7 @@ import { Popover, Button } from "@/editor/chrome-ui";
 
 import { Link2, Link2Off } from "lucide-react";
 import * as React from "react";
+import type { Composer } from "../../../../engine";
 import { useTypeRegistry } from "../../../design-system/state/TokenRegistryContext";
 import { TokenPickerPopover } from "../../shared/TokenPickerPopover";
 import { SelectRow, ButtonGroup, ColorInput, InputWithUnit, MixedValueIndicator } from "../../shared/controls";
@@ -124,9 +125,11 @@ interface FontControlsProps {
   onChange: (property: string, value: string) => void;
   mixedKeys?: ReadonlySet<string>;
   isMultiSelect?: boolean;
+  /** Threaded so the colour chip can jump to the Design panel. */
+  composer?: Composer | null;
 }
 
-export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mixedKeys }) => {
+export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mixedKeys, composer }) => {
   return (
     <>
       {/* Board 807:8342 pairs the two type numbers on one row — "Size 14 | 1.5"
@@ -209,7 +212,7 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mi
       {/* Colour */}
       <div className="tw:relative">
         <MixedValueIndicator prop="color" mixedKeys={mixedKeys} />
-        <ColorInput label="Color" value={styles.color || ""} onChange={(v) => onChange("color", v)} />
+        <ColorInput label="Color" value={styles.color || ""} onChange={(v) => onChange("color", v)} composer={composer} />
       </div>
 
       {/* Text Transform */}

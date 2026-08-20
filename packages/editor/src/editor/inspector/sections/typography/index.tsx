@@ -12,6 +12,7 @@
  */
 
 import * as React from "react";
+import type { Composer } from "../../../../engine";
 import { Section, MoreSettingsToggle, type SectionTier, MixedValueIndicator } from "../../shared/controls";
 import { FontControls } from "./FontControls";
 import { FontPicker } from "./FontPicker";
@@ -36,6 +37,8 @@ export interface TypographySectionProps {
   onAdvancedToggle?: () => void;
   mixedKeys?: ReadonlySet<string>;
   isMultiSelect?: boolean;
+  /** Threaded so the colour chip can jump to the Design panel. */
+  composer?: Composer | null;
 }
 
 // ============================================================================
@@ -52,6 +55,7 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
   onAdvancedToggle,
   mixedKeys,
   isMultiSelect,
+  composer,
 }) => {
   // Handle font-family changes from FontPicker
   const handleFontChange = React.useCallback(
@@ -101,7 +105,7 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
       </div>
 
       {/* Font Size, Weight, Line Height, Letter Spacing, Decoration, Style */}
-      <FontControls styles={styles} onChange={onChange} mixedKeys={mixedKeys} isMultiSelect={isMultiSelect} />
+      <FontControls styles={styles} onChange={onChange} mixedKeys={mixedKeys} isMultiSelect={isMultiSelect} composer={composer} />
 
       {/* ─── Advanced: Color, Alignment, Transform, White Space, Word Break ─── */}
       {advancedExpanded && <TypographyControls styles={styles} onChange={onChange} mixedKeys={mixedKeys} isMultiSelect={isMultiSelect} />}

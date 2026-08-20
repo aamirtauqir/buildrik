@@ -4,6 +4,7 @@
  */
 
 import * as React from "react";
+import type { Composer } from "../../../engine";
 import {
   Section,
   SelectRow,
@@ -37,6 +38,8 @@ export interface BorderSectionProps {
   onAdvancedToggle?: () => void;
   mixedKeys?: ReadonlySet<string>;
   isMultiSelect?: boolean;
+  /** Threaded so binding chips can jump to the Design panel. */
+  composer?: Composer | null;
 }
 
 export const BorderSection: React.FC<BorderSectionProps> = ({
@@ -49,6 +52,7 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
   onAdvancedToggle,
   mixedKeys,
   isMultiSelect,
+  composer,
 }) => {
   // Preview: width + style, shown as indicator pill
   const borderStyle = styles["border-style"] || (styles["border"] ? "set" : undefined);
@@ -100,6 +104,7 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
           label="Color"
           value={styles["border-color"] || ""}
           onChange={(v) => onChange("border-color", v)}
+          composer={composer}
         />
       </div>
 
@@ -175,6 +180,7 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
               label="Color"
               value={styles["outline-color"] || ""}
               onChange={(v) => onChange("outline-color", v)}
+              composer={composer}
             />
 
             <InputWithUnit

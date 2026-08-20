@@ -4,6 +4,7 @@
  */
 
 import * as React from "react";
+import type { Composer } from "../../../engine";
 import { Link, Link2Off } from "lucide-react";
 import { Section, SpacingBox, InputWithUnit, MoreSettingsToggle, type SectionTier, MixedValueIndicator } from "../shared/controls";
 import { MixedValueBadge } from "../shared/MixedValueBadge";
@@ -27,6 +28,8 @@ export interface SpacingSectionProps {
   onAdvancedToggle?: () => void;
   mixedKeys?: ReadonlySet<string>;
   isMultiSelect?: boolean;
+  /** Threaded so binding chips can jump to the Design panel. */
+  composer?: Composer | null;
 }
 
 export const SpacingSection: React.FC<SpacingSectionProps> = ({
@@ -40,6 +43,7 @@ export const SpacingSection: React.FC<SpacingSectionProps> = ({
   advancedExpanded = false,
   onAdvancedToggle,
   mixedKeys,
+  composer,
 }) => {
   const [marginLinked, setMarginLinked] = React.useState(false);
   const [paddingLinked, setPaddingLinked] = React.useState(false);
@@ -253,6 +257,7 @@ export const SpacingSection: React.FC<SpacingSectionProps> = ({
                 bottom: disabledPadding("bottom")?.disabled,
                 left: disabledPadding("left")?.disabled,
               }}
+              composer={composer}
             />
           </div>
 
