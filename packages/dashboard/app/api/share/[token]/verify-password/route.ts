@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@lib/prisma";
 import { checkRateLimit } from "@server/services/rate-limiter";
+import { shareDestination } from "@lib/share-destination";
+
+/** The link is fine; the site behind it has never been published. */
+const NOT_PUBLISHED = "This site isn't published yet, so there's nothing to open.";
 
 const VERIFY_MAX_ATTEMPTS = 5;
 const VERIFY_WINDOW_MS = 60_000;
@@ -54,7 +58,8 @@ export async function POST(
       where: { id: link.id },
       data: { viewCount: { increment: 1 } },
     });
-    const redirectUrl = link.site.publishedUrl ?? `/${link.site.slug}`;
+    const redirectUrl = shareDestination(link.site);
+    if (!redirectUrl) return NextResponse.json({ error: NOT_PUBLISHED }, { status: 409 });
     return NextResponse.json({ redirectUrl });
   }
 
@@ -70,7 +75,10 @@ export async function POST(
     data: { viewCount: { increment: 1 } },
   });
 
-  const redirectUrl = link.site.publishedUrl ?? `/${link.site.slug}`;
+  /* Same dead end the page had: `/<slug>` is not a route, so an unpublished
+     site sent the visitor to a 404 right after they typed the password. */
+  const redirectUrl = shareDestination(link.site);
+  if (!redirectUrl) return NextResponse.json({ error: NOT_PUBLISHED }, { status: 409 });
 
   const res = NextResponse.json({ redirectUrl });
   res.cookies.set(`share_${token}`, "1", {

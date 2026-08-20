@@ -29,7 +29,12 @@ export function SharePasswordGate() {
         }
       } else {
         const data = await res.json();
-        if (res.status === 410) {
+        if (res.status === 409) {
+          /* The link is valid and the password was right — the site simply has
+             nothing published to open. Say that instead of navigating to a
+             route that does not exist. */
+          setError(data.error ?? "This site isn't published yet.");
+        } else if (res.status === 410) {
           setError("This share link has expired.");
         } else if (res.status === 404) {
           setError("This share link is no longer available.");

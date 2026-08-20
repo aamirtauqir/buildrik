@@ -1,7 +1,9 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { prisma } from "@lib/prisma";
+import { shareDestination } from "@lib/share-destination";
 import { SharePasswordGate } from "./password-gate";
+import { ShareNotPublished } from "./not-published";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +22,7 @@ export default async function SharePage({
 
   const link = await prisma.shareLink.findUnique({
     where: { token },
-    include: { site: { select: { publishedUrl: true, slug: true } } },
+    include: { site: { select: { publishedUrl: true, slug: true, name: true } } },
   });
 
   if (!link || !link.isActive) {
@@ -30,16 +32,25 @@ export default async function SharePage({
     return <SharePasswordGate />;
   }
 
+  /* Nothing to send them to: the site has never been published, and no draft
+     renderer exists on the server. This used to redirect to `/<slug>`, which is
+     not a route — the visitor got a 404 with no idea whether the link was
+     broken, expired, or wrong. */
+  const destination = shareDestination(link.site);
+  if (!destination) {
+    return <ShareNotPublished siteName={link.site.name} />;
+  }
+
   // No password → straight through (count handled by the verify route when
   // used; here we just forward).
   if (!link.passwordHash) {
-    redirect(link.site.publishedUrl ?? `/${link.site.slug}`);
+    redirect(destination);
   }
 
   // Password set: honor a prior successful verification cookie.
   const jar = await cookies();
   if (jar.get(`share_${token}`)?.value === "1") {
-    redirect(link.site.publishedUrl ?? `/${link.site.slug}`);
+    redirect(destination);
   }
 
   return <SharePasswordGate />;
