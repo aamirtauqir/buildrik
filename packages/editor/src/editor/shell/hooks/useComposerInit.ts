@@ -21,6 +21,7 @@ import {
   loadProject,
   loadServerMedia,
   saveProject,
+  SaveConflictError,
 } from "@/services/BuildrikSyncProvider";
 import { createRemoteAssetSync } from "@/services/AssetUploadService";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
@@ -385,6 +386,19 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
             setIsDirty(false);
           })
           .catch((err) => {
+            /* A refused save is not a failed one. `BuildrikSyncProvider` has
+               already opened the conflict modal — "Your copy is behind …
+               nothing is lost without your choice" — and this catch used to
+               paint a red "Save failed — retry" chip and a toast saying
+               "Changes are unsaved" straight over it. Walked live in two tabs:
+               modal and contradiction on screen together. The manual-save path
+               (`useSaveCallback`) already distinguishes these two; autosave
+               now does the same. */
+            if (err instanceof SaveConflictError) {
+              setSaveState((prev) => ({ ...prev, status: "conflict", error: undefined }));
+              setIsDirty(true);
+              return;
+            }
             const message = err instanceof Error ? err.message : "Auto-save failed";
             console.error("[BuildrikSync] auto-save failed:", message);
             setSaveState((prev) => ({

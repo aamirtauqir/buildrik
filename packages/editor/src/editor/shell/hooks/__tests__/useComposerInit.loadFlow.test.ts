@@ -9,10 +9,9 @@
  *      buildrick-project {project} → importProject,
  *      {content} → importHTMLToActivePage, empty → createPage("Page 1")
  *      + default pages from options.
- *   3. PIN §P1-2: autosave does NOT special-case SaveConflictError the
- *      way useSaveCallback does — a conflict rejection during autosave
- *      fires the generic "Save failed" toast ON TOP of the conflict
- *      dialog opened by BuildrikSyncProvider (double messaging).
+ *   3. autosave special-cases SaveConflictError the same way useSaveCallback
+ *      does: the conflict dialog opened by BuildrikSyncProvider owns the
+ *      message, so no "Save failed" toast and no error chip on top of it.
  *   4. E-commerce CollectionSetupModal trigger — once per session.
  *
  * @license BSD-3-Clause
@@ -88,6 +87,14 @@ vi.mock("@/services/BuildrikSyncProvider", () => ({
   loadProject: vi.fn(() => Promise.resolve({})),
   loadServerMedia: vi.fn(() => Promise.resolve(null)),
   saveProject: vi.fn(() => Promise.resolve({ success: true })),
+  /* The real class, so `instanceof` in the autosave catch behaves as it does
+     in the app. */
+  SaveConflictError: class SaveConflictError extends Error {
+    constructor(public serverToken?: string) {
+      super("SAVE_CONFLICT");
+      this.name = "SaveConflictError";
+    }
+  },
 }));
 
 vi.mock("@/services/AssetUploadService", () => ({
@@ -99,6 +106,7 @@ import {
   loadProject,
   loadServerMedia,
   saveProject as syncSaveProject,
+  SaveConflictError,
 } from "@/services/BuildrikSyncProvider";
 
 // ---------------------------------------------------------------------------
@@ -398,16 +406,15 @@ describe("useComposerInit — autosave conflict handling", () => {
     vi.useRealTimers();
   });
 
-  it("PIN §P1-2: a conflict rejection during autosave STILL fires the generic 'Save failed' toast (double messaging with the conflict dialog)", async () => {
-    // useSaveCallback suppresses the toast for SaveConflictError because the
-    // conflict dialog (registered in BuildrikSyncProvider) already opened.
-    // The autosave path in useComposerInit has NO such special case — the
-    // user gets the conflict dialog AND this red toast for the same event.
-    // Pinned until the autosave path learns the same instanceof check.
-    const conflictErr = new Error("SaveConflictError: server copy is newer");
-    conflictErr.name = "SaveConflictError";
+  /* Was pinned as §P1-2: "a conflict rejection during autosave STILL fires the
+     generic 'Save failed' toast (double messaging with the conflict dialog)".
+     Walked live in two tabs — the modal saying "nothing is lost without your
+     choice" sat under a red chip reading "Save failed — retry" and a toast
+     saying the changes were unsaved. The refusal is not a failure; the modal
+     owns it, exactly as `useSaveCallback` already had it. */
+  it("a conflict during autosave sets the conflict state and stays quiet", async () => {
     vi.mocked(getSiteIdFromUrl).mockReturnValue("site-9");
-    vi.mocked(syncSaveProject).mockRejectedValue(conflictErr);
+    vi.mocked(syncSaveProject).mockRejectedValue(new SaveConflictError("server-token"));
 
     const params = makeParams();
     renderHook(() => useComposerInit(params));
@@ -420,7 +427,30 @@ describe("useComposerInit — autosave conflict handling", () => {
     });
 
     expect(syncSaveProject).toHaveBeenCalled();
-    // PIN: the generic failure toast fires even for a conflict.
+    expect(params.addToast).not.toHaveBeenCalledWith(
+      expect.objectContaining({ title: "Save failed" }),
+    );
+    const states = vi.mocked(params.setSaveState).mock.calls.map(([arg]) =>
+      typeof arg === "function" ? arg({ status: "saving" }) : arg,
+    );
+    expect(states.some((st) => st && st.status === "conflict")).toBe(true);
+    expect(states.some((st) => st && st.status === "error")).toBe(false);
+  });
+
+  it("a real failure still says so", async () => {
+    vi.mocked(getSiteIdFromUrl).mockReturnValue("site-9");
+    vi.mocked(syncSaveProject).mockRejectedValue(new Error("500 from dashboard"));
+
+    const params = makeParams();
+    renderHook(() => useComposerInit(params));
+
+    act(() => {
+      mockComposer.emit("project:changed");
+    });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(THRESHOLDS.AUTOSAVE_DEBOUNCE + 1);
+    });
+
     expect(params.addToast).toHaveBeenCalledWith(
       expect.objectContaining({ title: "Save failed", tone: "error" }),
     );
