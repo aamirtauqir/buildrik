@@ -42,7 +42,12 @@ const COPY: Record<Exclude<SaveState, "saved">, string> = {
   saving: "Saving…",
   unsaved: "Unsaved changes",
   conflict: "Conflict — reload",
-  offline: "Offline — saved locally",
+  /* Not "saved locally": for a dashboard-backed site the save is a bare RPC —
+     nothing is written to this device and nothing replays on reconnect. Read
+     live while offline, the visible pill promised a local copy while the
+     screen-reader announcement two elements away said "changes not saved".
+     The announcement was the true one. */
+  offline: "Offline — not saved",
   error: "Save failed — retry",
 };
 

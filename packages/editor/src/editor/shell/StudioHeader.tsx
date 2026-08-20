@@ -61,7 +61,9 @@ export interface StudioHeaderProps {
   saveStatus: StudioSaveState["status"];
   /** Has unsaved changes */
   isDirty: boolean;
-  /** Network offline — edits are queued locally (60-save-states). */
+  /** Network offline. Nothing is queued for a dashboard-backed site — the save
+   *  is a bare RPC and the reconnect queue carries CMS/components/templates/
+   *  versions, never the project. */
   isOffline?: boolean;
   /** Last saved timestamp */
   lastSaved: Date | null;

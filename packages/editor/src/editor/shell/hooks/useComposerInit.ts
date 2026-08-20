@@ -400,6 +400,31 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               return;
             }
             const message = err instanceof Error ? err.message : "Auto-save failed";
+            /* Offline is not a server error. `useSaveCallback` already draws
+               this line for a manual save; autosave shouted "Save failed —
+               Could not save to dashboard" at someone whose wifi dropped.
+               Read live with the browser offline: that toast sat under a chip
+               already saying Offline. Same words as the manual path, so the
+               two agree about what happened and what to do. */
+            const offline =
+              (typeof navigator !== "undefined" && !navigator.onLine) ||
+              /network|fetch|offline|failed to fetch|connection/i.test(message);
+            if (offline) {
+              /* `status: "error"` matches `useSaveCallback`; the topbar's own
+                 offline flag outranks it and draws the Offline pill. There is
+                 no "offline" status in this state machine. */
+              setSaveState((prev) => ({ ...prev, status: "error", error: message }));
+              setIsDirty(true);
+              if (siteId) {
+                addToast({
+                  title: "Offline — not saved",
+                  description:
+                    "Your changes are still open in this tab. Keep it open and save again once you're back online.",
+                  tone: "warning",
+                });
+              }
+              return;
+            }
             console.error("[BuildrikSync] auto-save failed:", message);
             setSaveState((prev) => ({
               ...prev,

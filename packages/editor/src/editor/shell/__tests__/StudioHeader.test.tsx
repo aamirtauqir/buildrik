@@ -237,12 +237,12 @@ describe("StudioHeader", () => {
 
     it("offline outranks a save error — queued is not lost", () => {
       save({ saveStatus: "error", isOffline: true });
-      expect(screen.getByText("Offline — saved locally")).toBeTruthy();
+      expect(screen.getByText("Offline — not saved")).toBeTruthy();
     });
 
     it("a disconnected sync is also offline", () => {
       save({ studioSyncStatus: "offline" });
-      expect(screen.getByText("Offline — saved locally")).toBeTruthy();
+      expect(screen.getByText("Offline — not saved")).toBeTruthy();
     });
   });
 

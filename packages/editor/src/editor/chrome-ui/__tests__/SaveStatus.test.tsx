@@ -20,7 +20,11 @@ describe("SaveStatus", () => {
     ["saving", "Saving…"],
     ["unsaved", "Unsaved changes"],
     ["conflict", "Conflict — reload"],
-    ["offline", "Offline — saved locally"],
+    /* Not "saved locally" — for a dashboard-backed site nothing is written to
+       the device and nothing replays on reconnect. Read live while offline,
+       this pill promised a local copy while the announcement beside it said
+       "changes not saved". */
+    ["offline", "Offline — not saved"],
   ] as const)("renders the %s truth", (state, copy) => {
     render(<SaveStatus state={state} />);
     expect(screen.getByText(copy)).toBeTruthy();
