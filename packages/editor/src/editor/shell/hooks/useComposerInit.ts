@@ -10,12 +10,11 @@ import * as React from "react";
 import { ToastInput } from "@/editor/chrome-ui";
 import { createComposer, Composer } from "../../../engine";
 import { ProductCollectionService } from "../../../engine/cms";
-import type { Element } from "../../../engine/elements/Element";
 import { THRESHOLDS } from "../../../shared/constants/config";
 import { EVENTS } from "../../../shared/constants/events";
 import type { SaveState } from "./useStudioState";
 import { attachAdoptionRevertListener } from "../../../services/ai/adoptionTracker";
-import type { ComposerConfig, ProjectData, DeviceType, ElementType } from "../../../shared/types";
+import type { ComposerConfig, ProjectData, DeviceType } from "../../../shared/types";
 import type { DesignToken } from "@/editor/design-system";
 import {
   getSiteIdFromUrl,
@@ -451,29 +450,33 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
     };
   }, [composer, setCanUndo, setCanRedo]);
 
-  // E-commerce block detection - trigger collection setup modal when needed
+  /* Offer the Products collection the first time a product block is inserted.
+     This listened for ELEMENT_CREATED on an element whose type was one of the
+     three product types, and neither half was ever true: all three blocks are
+     HTML-content blocks, so they come in through `insertHTMLToElement`, which
+     emits nothing and derives each element's type from its TAG — measured
+     live, a Product Card insert produced a `container`, not a `product-card`.
+     The modal, `ProductCollectionService` and the sample-data flow behind it
+     were therefore unreachable from the only door that inserts these blocks.
+     ELEMENT_INSERTED carries the block id, which is the identity this wants. */
   const hasPromptedForCollectionRef = React.useRef(false);
   React.useEffect(() => {
     if (!composer || !openCollectionSetup) return;
 
-    const ECOMMERCE_BLOCK_TYPES: ElementType[] = ["product-card", "product-grid", "product-detail"];
+    const ECOMMERCE_BLOCK_IDS = ["product-card", "product-grid", "product-detail"];
 
-    const handleElementCreated = async (element: Element | { element: Element }) => {
-      // Handle both single element and object with element property
-      const el = "element" in element ? element.element : element;
-      const elementType = el.getType?.() as ElementType | undefined;
+    const handleElementCreated = async ({ blockId }: { blockId?: string }) => {
+      if (!blockId || !ECOMMERCE_BLOCK_IDS.includes(blockId)) return;
 
-      if (!elementType || !ECOMMERCE_BLOCK_TYPES.includes(elementType)) return;
-
-      // Only prompt once per session
+      /* Claim the one prompt BEFORE the await. Claiming it after the
+         collection lookup let two inserts in flight at once both pass the
+         guard and open the dialog twice — and "already has a collection" is
+         also a reason never to ask again, so the flag is right either way. */
       if (hasPromptedForCollectionRef.current) return;
-
-      // Check if Products collection already exists
-      const service = new ProductCollectionService(composer.cms.collections);
-      const hasCollection = await service.hasProductsCollection();
-      if (hasCollection) return;
-
       hasPromptedForCollectionRef.current = true;
+
+      const service = new ProductCollectionService(composer.cms.collections);
+      if (await service.hasProductsCollection()) return;
 
       // Open the collection setup modal
       openCollectionSetup(async (includeSampleData: boolean) => {
@@ -489,9 +492,9 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
       });
     };
 
-    composer.on("element:created", handleElementCreated);
+    composer.on(EVENTS.ELEMENT_INSERTED, handleElementCreated);
     return () => {
-      composer.off("element:created", handleElementCreated);
+      composer.off(EVENTS.ELEMENT_INSERTED, handleElementCreated);
     };
   }, [composer, openCollectionSetup, addToast]);
 
