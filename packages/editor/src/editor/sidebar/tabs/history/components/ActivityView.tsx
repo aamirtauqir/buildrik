@@ -136,7 +136,7 @@ export const ActivityView: React.FC<ExtendedActivityViewProps> = ({
   const [focusedIndex, setFocusedIndex] = React.useState<number>(0);
   const [confirmingClear, setConfirmingClear] = React.useState(false);
 
-  const scrollHostRef = React.useRef<HTMLDivElement>(null);
+  const scrollHostRef = React.useRef<HTMLDivElement | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const listRef = React.useRef<any>(null);
   const [measuredHeight, setMeasuredHeight] = React.useState<number>(0);
@@ -238,21 +238,29 @@ export const ActivityView: React.FC<ExtendedActivityViewProps> = ({
     listRef.current?.resetAfterIndex?.(0, true);
   }, [rows, expandedGroupId, showAllIds, collapsedByEntry]);
 
-  // F1 — Measure container height via ResizeObserver.
-  React.useLayoutEffect(() => {
-    const host = scrollHostRef.current;
+  /* F1 — Measure the scroll host, via a CALLBACK ref rather than a mount-time
+     effect. The effect ran once, on mount, when this component was still
+     rendering its loading skeleton — a branch that never renders the ref'd
+     div. So `scrollHostRef.current` was null, the effect returned early, and
+     with `[]` deps it never ran again: `measuredHeight` stayed 0 for the life
+     of the panel and `{measuredHeight > 0 && <VariableSizeList/>}` rendered
+     NOTHING. Measured in the editor with three real undo entries: History →
+     All changes drew its header and an empty 430px box — no rows, and not the
+     empty state either. A callback ref fires when the node actually attaches,
+     which is the moment there is something to measure. */
+  const roRef = React.useRef<ResizeObserver | null>(null);
+  const attachScrollHost = React.useCallback((host: HTMLDivElement | null) => {
+    scrollHostRef.current = host;
+    roRef.current?.disconnect();
+    roRef.current = null;
     if (!host) return;
-    const update = () => setMeasuredHeight(host.clientHeight);
-    update();
-    const RO = typeof ResizeObserver !== "undefined" ? ResizeObserver : null;
-    if (!RO) {
-      window.addEventListener("resize", update);
-      return () => window.removeEventListener("resize", update);
-    }
-    const ro = new RO(update);
+    setMeasuredHeight(host.clientHeight);
+    if (typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(() => setMeasuredHeight(host.clientHeight));
     ro.observe(host);
-    return () => ro.disconnect();
+    roRef.current = ro;
   }, []);
+  React.useEffect(() => () => roRef.current?.disconnect(), []);
 
   // Keyboard nav (j/k/g/G/Enter/Esc) — unchanged semantics, operates on entry list.
   React.useEffect(() => {
@@ -705,7 +713,7 @@ export const ActivityView: React.FC<ExtendedActivityViewProps> = ({
     <div className="activity-view">
       {renderHeader()}
       <div
-        ref={scrollHostRef}
+        ref={attachScrollHost}
         className="virtual-list"
         role="list"
         style={STYLE_VIRTUAL_HOST}

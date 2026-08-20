@@ -132,3 +132,46 @@ describe("ActivityView — time-travel trigger", () => {
     expect(onOpenTimeTravel).toHaveBeenCalledTimes(1);
   });
 });
+
+/* The header comment above says the react-window body "needs a measured height
+   (always 0 under jsdom)" — and that gap hid a real defect for the whole life
+   of this panel. The height was measured in a mount-time `useLayoutEffect`
+   with `[]` deps, which ran while the component was still rendering its
+   loading skeleton: the ref'd scroll host does not exist in that branch, the
+   effect returned early, and it never ran again. `measuredHeight` stayed 0, so
+   `{measuredHeight > 0 && <VariableSizeList/>}` rendered nothing at all.
+   Measured live with three real undo entries: History → All changes drew its
+   header over an empty 430px box — no rows, and not the empty state either.
+   These tests stub the two things jsdom lacks, so the branch is covered. */
+describe("ActivityView — the list body actually mounts", () => {
+  const withHeight = (px: number) => {
+    const original = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "clientHeight");
+    Object.defineProperty(HTMLElement.prototype, "clientHeight", {
+      configurable: true,
+      get() {
+        return this.classList?.contains("virtual-list") ? px : 0;
+      },
+    });
+    return () => {
+      if (original) Object.defineProperty(HTMLElement.prototype, "clientHeight", original);
+    };
+  };
+
+  it("renders rows after loading finishes, not an empty box", () => {
+    const restore = withHeight(400);
+    try {
+      // First paint is the skeleton — the branch with no scroll host at all.
+      setHistory([], true);
+      const view = renderView();
+      expect(view.container.querySelectorAll(".skeleton").length).toBeGreaterThan(0);
+
+      setHistory([entry({ id: "h1", label: "Move heading" })], false);
+      view.rerender(<ActivityView composer={{} as never} />);
+
+      expect(view.container.querySelector(".virtual-list")).toBeTruthy();
+      expect(screen.getByText("Move heading")).toBeInTheDocument();
+    } finally {
+      restore();
+    }
+  });
+});
