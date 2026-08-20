@@ -11,6 +11,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, cleanup, waitFor, act } from "@testing-library/react";
 import { ContentTab } from "../ContentTab";
 import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
+import { CMSValidationError } from "@/engine/cms/CollectionManager";
 
 type Handler = (p: unknown) => void;
 
@@ -169,6 +170,27 @@ describe("ContentTab", () => {
         }),
       ),
     );
+  });
+
+  /* Publishing runs the collection's rules now (CollectionManager throws
+     CMSValidationError). The panel used to let that reject unheard: the promise
+     failed, the view moved on, and the "required" tag beside the field named a
+     check nothing ran. Walked live — the message lands under the field and the
+     record stays a draft. */
+  it("shows the rejection under the field when a publish fails validation", async () => {
+    const { composer } = makeEngine({ collections: [MENU], items: [ITEM] });
+    vi.mocked(composer.cms.collections.updateContentItem).mockRejectedValueOnce(
+      new CMSValidationError({ name: "Name is required" }),
+    );
+    render(<ContentTab composer={composer as never} />);
+    fireEvent.click(await screen.findByText("Menu items"));
+    fireEvent.click(await screen.findByText("Margherita"));
+    fireEvent.change(await screen.findByLabelText("Name"), { target: { value: "" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Name is required");
+    // still on the record, with the edit intact — not bounced back to the list
+    expect(screen.getByLabelText("Name")).toBeInTheDocument();
   });
 
   it("fields view lists types + required and adds a field through the engine", async () => {

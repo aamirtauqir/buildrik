@@ -16,6 +16,18 @@ import { EVENTS } from "../../shared/constants/events";
 import { EventEmitter } from "../EventEmitter";
 import * as Storage from "./CollectionStorage";
 
+/**
+ * A record was published with field values its own collection forbids. Thrown
+ * by `updateContentItem`, caught by the two record editors (Content panel,
+ * CMS records modal) to mark the offending fields.
+ */
+export class CMSValidationError extends Error {
+  constructor(readonly errors: Record<string, string>) {
+    super(Object.values(errors).join(", "));
+    this.name = "CMSValidationError";
+  }
+}
+
 // ============================================
 // Collection Manager Class
 // ============================================
@@ -254,6 +266,21 @@ export class CollectionManager extends EventEmitter {
       ...updates,
       updatedAt: new Date().toISOString(),
     };
+
+    /* Publishing is where the collection's own rules start to matter.
+       `validateContent` was written with the schemas and then called by
+       nothing, so "Validation rules included" (the ecommerce setup modal) and
+       the "required" tag beside a field in the Content panel described checks
+       that never ran: a Product could go live with no Name, no Price and a
+       negative Inventory. Drafts stay free-form on purpose — an unfinished
+       record is the point of a draft. */
+    if (updated.status === "published") {
+      // The collections map is the validator's source; a cold manager has an
+      // empty one and would read as "Collection not found" on every publish.
+      await this.ensureInitialized();
+      const check = this.validateContent(updated.collectionId, updated.data);
+      if (!check.valid) throw new CMSValidationError(check.errors);
+    }
 
     // Handle publish/unpublish
     if (updates.status === "published" && existing.status !== "published") {

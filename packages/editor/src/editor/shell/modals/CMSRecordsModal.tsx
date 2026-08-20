@@ -12,6 +12,7 @@
 import * as React from "react";
 import { Plus, Trash2, Pencil } from "lucide-react";
 import type { Composer } from "../../../engine";
+import { CMSValidationError } from "../../../engine/cms/CollectionManager";
 import type { CMSCollection, CMSContentItem, CMSField } from "../../../shared/types/cms";
 import { Button, Checkbox, ModalBody, ModalClose, ModalContent, ModalRoot, ModalTitle, Select, TextInput, Textarea } from "@/editor/chrome-ui";
 
@@ -82,6 +83,10 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
   const [editingId, setEditingId] = React.useState<string | null>(null); // null=not editing, ""=new
   const [form, setForm] = React.useState<Record<string, unknown>>({});
   const [busy, setBusy] = React.useState(false);
+  /* Publishing runs the collection's validation rules now (CollectionManager),
+     so this row can be refused. Say which fields, on the row that was clicked —
+     the list has no per-field form to mark up. */
+  const [publishError, setPublishError] = React.useState<{ id: string; message: string } | null>(null);
 
   const collection = collections.find((c) => c.id === collectionId) ?? null;
   /* Columns follow the collection's field order, which is the order the user
@@ -156,9 +161,13 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
   const setStatus = async (id: string, status: CMSContentItem["status"]) => {
     if (!composer) return;
     setBusy(true);
+    setPublishError(null);
     try {
       await composer.cms.collections.updateContentItem(id, { status });
       await reloadItems();
+    } catch (e) {
+      if (e instanceof CMSValidationError) setPublishError({ id, message: e.message });
+      else throw e;
     } finally {
       setBusy(false);
     }
@@ -331,7 +340,7 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                           </td>
                         </tr>
                       ) : (
-                        items.map((item) => (
+                        items.map((item) => [
                           <tr key={item.id} className="tw:hover:bg-blue-50">
                             {columns.map((f, idx) => (
                               <td key={f.id} className="tw:px-3 tw:py-2.5 tw:text-gray-900">
@@ -371,8 +380,15 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                                 </Button>
                               </span>
                             </td>
-                          </tr>
-                        ))
+                          </tr>,
+                          publishError?.id === item.id ? (
+                            <tr key={`${item.id}-error`}>
+                              <td colSpan={(collection?.fields.length ?? 0) + 2} className="tw:px-3 tw:pb-2.5 tw:text-xs tw:text-[var(--bk-error)]">
+                                <span role="alert">Can&apos;t publish: {publishError.message}</span>
+                              </td>
+                            </tr>
+                          ) : null,
+                        ])
                       )}
                     </tbody>
                   </table>

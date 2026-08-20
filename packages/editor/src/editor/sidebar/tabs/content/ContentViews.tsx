@@ -32,6 +32,7 @@ import {
   TextInput,
   ToggleSwitch,
 } from "@/editor/chrome-ui";
+import { CMSValidationError } from "@/engine/cms/CollectionManager";
 import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
 import type { ConditionExpression, ConditionOperator, DataSource } from "@/shared/types/data";
 import { conditionSummary, fieldDefault, isValidVariableKey, type SiteVariable } from "./contentPanelUtils";
@@ -264,9 +265,15 @@ export function RecordView({
   const [data, setData] = React.useState<Record<string, unknown>>(initial);
   const [published, setPublished] = React.useState(record?.status === "published");
   const [saving, setSaving] = React.useState(false);
+  /* Publishing runs the collection's own rules (CollectionManager). Until it
+     did, the "required" tag on the Fields screen was decoration and a record
+     could go live empty; now the failure has to land on the fields it names
+     rather than as a rejected promise nobody sees. */
+  const [errors, setErrors] = React.useState<Record<string, string>>({});
   React.useEffect(() => {
     setData(initial);
     setPublished(record?.status === "published");
+    setErrors({});
   }, [initial, record]);
 
   const dirty =
@@ -297,6 +304,11 @@ export function RecordView({
                   aria-label={f.name}
                   onChange={() => setField(f.slug, !data[f.slug])}
                 />
+                {errors[f.slug] && (
+                  <span className="tw:ml-2 tw:text-xs tw:text-[var(--bk-error)]" role="alert">
+                    {errors[f.slug]}
+                  </span>
+                )}
               </div>
             ) : (
               <>
@@ -318,6 +330,11 @@ export function RecordView({
                     />
                   )}
                 </div>
+                {errors[f.slug] && (
+                  <div className="tw:mx-3 tw:mt-1 tw:text-xs tw:text-[var(--bk-error)]" role="alert">
+                    {errors[f.slug]}
+                  </div>
+                )}
               </>
             )}
           </div>
@@ -364,7 +381,13 @@ export function RecordView({
             aria-busy={saving || undefined}
             onClick={() => {
               setSaving(true);
-              void onSave(data, published).finally(() => setSaving(false));
+              setErrors({});
+              void onSave(data, published)
+                .catch((e: unknown) => {
+                  if (e instanceof CMSValidationError) setErrors(e.errors);
+                  else throw e;
+                })
+                .finally(() => setSaving(false));
             }}
           >
             {saving ? "Saving…" : "Save"}
