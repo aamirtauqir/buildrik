@@ -105,7 +105,11 @@ export const PageList: React.FC<Props> = ({
   if (pages.length === 0) {
     return (
       <div className="bd-pg-list-shell">
-        <div className="bd-pg-list empty" role="tree" aria-label="Pages">
+        {/* No `role="tree"` on the empty state: its children are the two
+            create buttons, and a tree may only own treeitems — axe called it
+            "Element has children which are not allowed". There is no tree to
+            announce when there are no pages. */}
+        <div className="bd-pg-list empty">
           <EmptyState size="compact">
             <EmptyStateTitle>No pages yet</EmptyStateTitle>
             <EmptyStateDesc>Add your first page to get started. Pages are the screens visitors see.</EmptyStateDesc>
@@ -192,7 +196,7 @@ export const PageList: React.FC<Props> = ({
           <span>Select all ({pages.length} page{pages.length !== 1 ? "s" : ""})</span>
         </div>
       )}
-      <div className="bd-pg-list" role="tree" aria-label="Pages">
+      <div className="bd-pg-list">
         {visible.length === 0 && search ? (
           <div className="bd-pg-nores" role="status" aria-live="polite" data-testid="pages-no-results">
             <p>Nothing matches {"\u2018"}{search}{"\u2019"}.</p>
@@ -207,6 +211,11 @@ export const PageList: React.FC<Props> = ({
           </div>
         ) : (
           <>
+            {/* Only treeitems inside the tree. The one-page note below carries
+                an Add-page button, and axe (correctly) refuses a button as a
+                tree's child — the scroll container, not the tree, is what those
+                blocks belong to. */}
+            <div className="bd-pg-tree" role="tree" aria-label="Pages">
             {!search && folders.map((folder) => {
               const folderPages = folder.pageIds
                 .map((id) => pages.find((p) => p.id === id))
@@ -273,6 +282,7 @@ export const PageList: React.FC<Props> = ({
                   }
                 />
               ))}
+            </div>
             {/* Board 141:124: with exactly one page the list carries the
                 one-page note + a centered Add link under the row. */}
             {!search && pages.length === 1 && (

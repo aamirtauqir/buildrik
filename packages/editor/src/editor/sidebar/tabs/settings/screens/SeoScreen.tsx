@@ -122,7 +122,8 @@ export const SeoScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange, regi
           border: "1px solid var(--bk-border)",
           borderRadius: "var(--bk-radius-sm)",
           fontSize: 12,
-          color: "var(--bk-ink-muted)",
+          /* muted on subtle is 4.39:1 — under AA at 12px (axe). */
+          color: "var(--bk-ink-soft)",
           lineHeight: 1.5,
         }}
       >

@@ -220,7 +220,8 @@ const breadcrumbStyles: React.CSSProperties = {
 const breadcrumbItemStyles: React.CSSProperties = {
   fontSize: "var(--bk-text-12)",
   fontWeight: 400,
-  color: "var(--bk-ink-muted)",
+  /* muted on the subtle panel is 4.39:1 — under AA at 12px (axe). */
+  color: "var(--bk-ink-soft)",
 };
 
 const breadcrumbSeparatorStyles: React.CSSProperties = {
