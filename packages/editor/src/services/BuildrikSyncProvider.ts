@@ -133,6 +133,12 @@ interface SiteColumnSettings {
  *   settings.customCode.bodyScripts → bodyCode
  *   settings.publishing.publishedPassword → publishedPassword
  */
+/** "" is how a text input says "cleared"; null is how the server hears it. */
+function emptyToNull(value: string | null | undefined): string | null {
+  const trimmed = typeof value === "string" ? value.trim() : value;
+  return trimmed ? trimmed : null;
+}
+
 function extractSiteColumnPatch(projectData: ProjectData): SiteColumnSettings {
   const settings = projectData.settings;
   if (!settings) return {};
@@ -140,11 +146,18 @@ function extractSiteColumnPatch(projectData: ProjectData): SiteColumnSettings {
   const customCode = settings.customCode;
   const publishing = settings.publishing;
   const patch: SiteColumnSettings = {};
-  if (seo?.metaTitle !== undefined) patch.metaTitle = seo.metaTitle;
-  if (seo?.metaDescription !== undefined) patch.metaDescription = seo.metaDescription;
-  if (seo?.metaTitleTemplate !== undefined) patch.metaTitleTemplate = seo.metaTitleTemplate;
-  if (seo?.defaultOgImage !== undefined) patch.ogImage = seo.defaultOgImage;
-  if (seo?.touchIcon !== undefined) patch.touchIcon = seo.touchIcon;
+  if (seo?.metaTitle !== undefined) patch.metaTitle = emptyToNull(seo.metaTitle);
+  if (seo?.metaDescription !== undefined) patch.metaDescription = emptyToNull(seo.metaDescription);
+  if (seo?.metaTitleTemplate !== undefined) patch.metaTitleTemplate = emptyToNull(seo.metaTitleTemplate);
+  /* Empty means "cleared", and the server's contract for cleared is null —
+     `ogImage` is `z.string().url().nullable().optional()`, so "" is neither a
+     URL nor null and the whole settings mutation 400s. It rides in the same
+     batch as `sites.saveProject`, so the page content saved and the topbar
+     still said "Save failed — retry": every site that never set an OG image
+     (the SEO screen writes "" for an untouched field) saved under a red
+     banner. Measured live — batch 207, `ogImage: Invalid url`. */
+  if (seo?.defaultOgImage !== undefined) patch.ogImage = emptyToNull(seo.defaultOgImage);
+  if (seo?.touchIcon !== undefined) patch.touchIcon = emptyToNull(seo.touchIcon);
   if (seo?.socialLinks !== undefined) patch.socialLinks = seo.socialLinks as Record<string, string>;
   if (customCode?.headScripts !== undefined) patch.headCode = customCode.headScripts;
   if (customCode?.bodyScripts !== undefined) patch.bodyCode = customCode.bodyScripts;

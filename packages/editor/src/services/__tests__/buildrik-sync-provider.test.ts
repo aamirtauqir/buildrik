@@ -400,6 +400,33 @@ describe("saveProject dual-save routing (P0.2b)", () => {
     expect(mocks.saveProjectMutate).toHaveBeenCalledTimes(1);
   });
 
+  /* An empty text field means "cleared", and the server's contract for cleared
+     is null — `ogImage` is z.string().url().nullable().optional(), so "" is
+     neither. The whole settings mutation 400'd inside the same batch as
+     sites.saveProject: the pages saved and the topbar said "Save failed —
+     retry". Measured live before the fix (batch 207, "ogImage: Invalid url")
+     and after (200, "Saved"). Every site that never set an OG image was in
+     this state, because the SEO screen flushes "" for an untouched field. */
+  it("sends null, not \"\", for a cleared URL-ish field", async () => {
+    await saveProject("s1", {
+      version: "1.0",
+      pages: [],
+      styles: [],
+      assets: [],
+      settings: {
+        seo: { defaultOgImage: "", metaTitle: "   ", metaTitleTemplate: "{page_title}", touchIcon: "" },
+      },
+    } as any);
+
+    expect(mocks.siteDetailSettingsUpdateMutate).toHaveBeenCalledWith({
+      id: "s1",
+      ogImage: null,
+      metaTitle: null,
+      metaTitleTemplate: "{page_title}",
+      touchIcon: null,
+    });
+  });
+
   it("skips the settings call entirely when no mirrored fields are present", async () => {
     await saveProject("s1", {
       version: "1.0",
