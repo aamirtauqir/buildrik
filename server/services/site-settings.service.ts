@@ -163,7 +163,14 @@ export async function updateSiteSettings(
   const wantsCustomCode =
     (data.headCode != null && data.headCode !== "") ||
     (data.bodyCode != null && data.bodyCode !== "");
-  if (wantsCustomCode || data.slug) {
+  /* The published-site password is a Pro feature, and the only thing enforcing
+     that was the dashboard's own <ProGate> — a disabled toggle. Verified live
+     from a FREE workspace: posting `publishedPassword` to
+     siteDetail.settings.update returned 200 and the site came back with a
+     password set. Clearing one (null) stays free — nobody should be locked
+     out of removing a gate they can no longer manage. */
+  const wantsPublishedPassword = data.publishedPassword != null && data.publishedPassword !== "";
+  if (wantsCustomCode || wantsPublishedPassword || data.slug) {
     const current = await prisma.site.findUnique({
       where: { id: siteId },
       select: {
@@ -174,9 +181,10 @@ export async function updateSiteSettings(
     });
     if (current?.deletedAt) throw new Error("SITE_NOT_FOUND");
 
-    if (wantsCustomCode) {
-      const plan = current?.workspace?.plan ?? "FREE";
-      if (plan === "FREE") throw new Error("CUSTOM_CODE_NOT_AVAILABLE");
+    const plan = current?.workspace?.plan ?? "FREE";
+    if (wantsCustomCode && plan === "FREE") throw new Error("CUSTOM_CODE_NOT_AVAILABLE");
+    if (wantsPublishedPassword && plan === "FREE") {
+      throw new Error("SITE_PASSWORD_NOT_AVAILABLE");
     }
 
     if (data.slug && current && current.slug !== data.slug) {

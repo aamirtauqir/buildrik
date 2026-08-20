@@ -65,6 +65,11 @@ export const siteDetailRouter = router({
         } catch (e: unknown) {
           if (e instanceof Error && e.message === "CUSTOM_CODE_NOT_AVAILABLE")
             throw new TRPCError({ code: "FORBIDDEN", message: "Custom code requires Pro or above" });
+          if (e instanceof Error && e.message === "SITE_PASSWORD_NOT_AVAILABLE")
+            throw new TRPCError({
+              code: "FORBIDDEN",
+              message: "A published-site password requires Pro or above",
+            });
           if (e instanceof Error && e.message === "DEFAULT_LOCALE_NOT_ENABLED")
             throw new TRPCError({ code: "BAD_REQUEST", message: "The default locale must be in the enabled locales list." });
           throw e;
