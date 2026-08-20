@@ -13,7 +13,7 @@ import type { Composer } from "../../../engine";
 import { STORAGE_KEYS } from "../../../shared/constants/config";
 import type { BlockData } from "../../../shared/types";
 import { canNestElement } from "../../../shared/utils/nesting";
-import { mirrorUserTemplate } from "../../../services/templateSync";
+import { mirrorUserTemplate, retryTemplateSync } from "../../../services/templateSync";
 import { inverseResolveTokens } from "../../sidebar/tabs/templates/utils/inverseResolveTokens";
 import { snapshotFromComputedStyle } from "../../sidebar/tabs/templates/utils/tokenSnapshot";
 import { DEFAULT_TOKENS } from "../../design-system/constants";
@@ -80,14 +80,30 @@ export function useStudioHandlers(params: UseStudioHandlersParams): UseStudioHan
         const myTemplates = saved ? JSON.parse(saved) : [];
         myTemplates.unshift(newTemplate);
         localStorage.setItem(STORAGE_KEYS.MY_TEMPLATES, JSON.stringify(myTemplates));
-        // #13/25: mirror to the server (workspace-scoped) so the template is
-        // shared across the agency's sites + survives device loss. Best-effort.
-        void mirrorUserTemplate(newTemplate);
         addToast({
           title: "Template saved",
           description: `${data.name} saved to My Templates`,
           tone: "success",
           duration: 2000,
+        });
+        /* #13/25: mirror to the server (workspace-scoped) so the template is
+           shared across the agency's sites + survives device loss. Best-effort,
+           and the local save above already succeeded — so this reports rather
+           than blocks. It used to be a bare `void`: templateSync queues and
+           notifies on failure exactly like version/component sync, but nothing
+           ever subscribed (`onTemplateSyncError` and `retryTemplateSync` had no
+           callers at all), so a template that never left this device looked
+           identical to one that did. */
+        void mirrorUserTemplate(newTemplate).then((mirrored) => {
+          if (mirrored) return;
+          addToast({
+            title: "Template saved on this device only",
+            description:
+              "It didn't reach the server, so your other sites can't use it yet. Retry now, or leave it — a reconnect replays the queue.",
+            tone: "error",
+            duration: Infinity,
+            action: { label: "Retry now", onClick: () => void retryTemplateSync() },
+          });
         });
       } catch {
         addToast({ title: "Save failed", description: "Could not save template.", tone: "error" });

@@ -96,10 +96,12 @@ function readLocal(): MyTemplateRow[] {
 }
 
 /** Mirror a just-saved template to the server (called from handleSaveTemplate). */
-export async function mirrorUserTemplate(t: MyTemplateRow): Promise<void> {
+/** Resolves false when the mirror failed and is queued — see the save handler. */
+export async function mirrorUserTemplate(t: MyTemplateRow): Promise<boolean> {
   const siteId = currentSiteId();
-  if (!siteId) return;
-  await queue.run(
+  // Standalone demo: no server to mirror to, so nothing failed.
+  if (!siteId) return true;
+  return queue.run(
     `templateUpsert:${t.id}`,
     () =>
       client().userTemplates.upsert.mutate({

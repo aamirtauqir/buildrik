@@ -22,7 +22,7 @@ export interface SyncRetryInfo {
 }
 
 export class SyncRetryQueue {
-  private queue = new Map<string, () => Promise<void>>();
+  private queue = new Map<string, () => Promise<boolean>>();
   private subscribers = new Set<(info: SyncRetryInfo) => void>();
 
   constructor() {
@@ -68,19 +68,25 @@ export class SyncRetryQueue {
    * Run one mirror task. On success the target clears from the queue; on failure
    * the (latest) task is queued under `key`, `onWarn` fires, and subscribers are
    * notified with the new pending count. Never throws.
+   *
+   * Resolves true when THIS op reached the server, false when it was queued —
+   * `pendingCount()` cannot answer that, since it counts every target and a
+   * different record's stale failure would read as this one failing.
    */
   async run(
     key: string,
     task: () => Promise<unknown>,
     onWarn: (e: unknown) => void
-  ): Promise<void> {
+  ): Promise<boolean> {
     try {
       await task();
       this.queue.delete(key);
+      return true;
     } catch (e) {
       onWarn(e);
       this.queue.set(key, () => this.run(key, task, onWarn));
       this.notify();
+      return false;
     }
   }
 

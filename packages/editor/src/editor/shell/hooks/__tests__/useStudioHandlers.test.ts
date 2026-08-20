@@ -27,12 +27,13 @@ vi.mock("../../../../shared/utils/nesting", () => ({
 }));
 
 vi.mock("../../../../services/templateSync", () => ({
-  mirrorUserTemplate: vi.fn(() => Promise.resolve()),
+  mirrorUserTemplate: vi.fn(() => Promise.resolve(true)),
+  retryTemplateSync: vi.fn(() => Promise.resolve()),
 }));
 
 import { getBlockDefinitions, insertBlock } from "../../../../blocks/blockRegistry";
 import { canNestElement } from "../../../../shared/utils/nesting";
-import { mirrorUserTemplate } from "../../../../services/templateSync";
+import { mirrorUserTemplate, retryTemplateSync } from "../../../../services/templateSync";
 
 // ---------------------------------------------------------------------------
 // Mock element / composer factories
@@ -227,6 +228,68 @@ describe("useStudioHandlers", () => {
         expect.objectContaining({ title: "Save failed", tone: "error" }),
       );
       spy.mockRestore();
+    });
+
+    /* The mirror used to be a bare `void`: templateSync queues + notifies on
+       failure like version/component sync, but `onTemplateSyncError` and
+       `retryTemplateSync` had zero callers, so a template that never left this
+       device looked exactly like one that reached the server. Walked live —
+       blocked userTemplates.upsert with a 500, saved from ⌘⇧P → Save page as
+       template, got this toast, pressed Retry, and the row appeared in
+       user_templates. */
+    it("says so, with a working Retry, when the mirror fails", async () => {
+      vi.mocked(mirrorUserTemplate).mockResolvedValueOnce(false);
+      const { hook, addToast } = mount();
+      act(() => hook.result.current.handleSaveTemplate(data));
+      await act(async () => { await Promise.resolve(); });
+
+      expect(addToast).toHaveBeenCalledWith(
+        expect.objectContaining({ title: "Template saved on this device only", tone: "error" }),
+      );
+      const failure = addToast.mock.calls
+        .map((c) => c[0])
+        .find((t) => t.tone === "error");
+      expect(failure.description).not.toMatch(/next|will retry/i);
+      failure.action.onClick();
+      expect(retryTemplateSync).toHaveBeenCalled();
+    });
+
+    it("stays quiet when the mirror succeeds", async () => {
+      const { hook, addToast } = mount();
+      act(() => hook.result.current.handleSaveTemplate(data));
+      await act(async () => { await Promise.resolve(); });
+      expect(addToast.mock.calls.filter((c) => c[0].tone === "error")).toHaveLength(0);
+    });
+
+    /* The mirror used to be a bare `void`: templateSync queues + notifies on
+       failure like version/component sync, but `onTemplateSyncError` and
+       `retryTemplateSync` had zero callers, so a template that never left this
+       device looked exactly like one that reached the server. Walked live —
+       blocked userTemplates.upsert with a 500, saved from ⌘⇧P → Save page as
+       template, got this toast, pressed Retry, and the row appeared in
+       user_templates. */
+    it("says so, with a working Retry, when the mirror fails", async () => {
+      vi.mocked(mirrorUserTemplate).mockResolvedValueOnce(false);
+      const { hook, addToast } = mount();
+      act(() => hook.result.current.handleSaveTemplate(data));
+      await act(async () => { await Promise.resolve(); });
+
+      expect(addToast).toHaveBeenCalledWith(
+        expect.objectContaining({ title: "Template saved on this device only", tone: "error" }),
+      );
+      const failure = addToast.mock.calls
+        .map((c) => c[0])
+        .find((t) => t.tone === "error");
+      expect(failure.description).not.toMatch(/next|will retry/i);
+      failure.action.onClick();
+      expect(retryTemplateSync).toHaveBeenCalled();
+    });
+
+    it("stays quiet when the mirror succeeds", async () => {
+      const { hook, addToast } = mount();
+      act(() => hook.result.current.handleSaveTemplate(data));
+      await act(async () => { await Promise.resolve(); });
+      expect(addToast.mock.calls.filter((c) => c[0].tone === "error")).toHaveLength(0);
     });
 
     it("no-ops without composer", () => {

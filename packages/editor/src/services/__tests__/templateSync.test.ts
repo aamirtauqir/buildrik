@@ -98,9 +98,11 @@ describe("templateSync failure semantics (audit P1-1 — retry queue)", () => {
     upsert.mockRejectedValueOnce(new Error("network down"));
     const heard: number[] = [];
     const off = onTemplateSyncError(() => heard.push(1));
+    /* Resolves FALSE, not undefined: the save handler needs to know whether
+       THIS mirror landed (pendingCount can't say — it counts every target). */
     await expect(
       mirrorUserTemplate({ id: "user-1", name: "Hero", html: "<p>" })
-    ).resolves.toBeUndefined();
+    ).resolves.toBe(false);
     expect(upsert).toHaveBeenCalledTimes(1); // queued, not re-fired synchronously
     expect(heard).toEqual([1]); // no longer fully silent to the UI
     expect(getTemplateSyncPendingCount()).toBe(1); // kept for retry, not dropped
