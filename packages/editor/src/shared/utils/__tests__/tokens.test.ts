@@ -22,14 +22,20 @@ describe("getToken", () => {
     expect(getToken("nonexistent" as TokenName)).toBe("");
   });
 
-  it("warns in development when token is missing", () => {
-    // vi.stubEnv handles read-only NODE_ENV in @types/node 22+ where direct
-    // assignment was tightened. Unstubs automatically on test teardown.
+  /* The dev guard reads IS_DEV_BUILD now, not `process.env.NODE_ENV` — that
+     global does not exist in the Vite demo, so the warning branch threw there
+     instead of warning. IS_DEV_BUILD is resolved once at module load, so
+     stubbing NODE_ENV mid-test no longer reaches it; the module is re-imported
+     with the env in place instead. */
+  it("warns in development when token is missing", async () => {
     vi.stubEnv("NODE_ENV", "development");
+    vi.resetModules();
+    const { getToken: freshGetToken } = await import("../tokens");
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-    getToken("nonexistent" as TokenName);
+    freshGetToken("nonexistent" as TokenName);
     expect(warn).toHaveBeenCalledWith(expect.stringContaining("not defined"));
     warn.mockRestore();
     vi.unstubAllEnvs();
+    vi.resetModules();
   });
 });

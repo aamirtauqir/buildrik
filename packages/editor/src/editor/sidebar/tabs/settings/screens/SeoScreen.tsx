@@ -6,7 +6,7 @@
  */
 
 import * as React from "react";
-import { Field, Input, Screen, Section } from "../shared";
+import { Field, Input, SCREEN_FIELD_ERROR, Screen, Section } from "../shared";
 import { useSettingsScreen } from "../hooks/useSettingsScreen";
 import type { ScreenProps } from "../types";
 
@@ -32,6 +32,13 @@ export const SeoScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange, regi
   /* The template column has existed (and been graded by the pre-publish "SEO
      configured" check) with no field anywhere that could set it. */
   const [titleTemplate, setTitleTemplate] = React.useState(seo.metaTitleTemplate);
+
+  /* The server takes this column as `z.string().url()`, so "mysite.com/og.png"
+     — a plausible thing to type — is refused. Before this, the only sign was a
+     toast after saving, from a mutation two layers away. Same inline shape the
+     Analytics screen uses for its ID fields. */
+  const ogImageError =
+    defaultOgImage.trim() !== "" && !/^https?:\/\/\S+$/i.test(defaultOgImage.trim());
 
   React.useEffect(() => {
     onDirtyChange?.(isDirty);
@@ -105,6 +112,7 @@ export const SeoScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange, regi
           <Input
             id="seo-og"
             type="url"
+            aria-invalid={ogImageError || undefined}
             value={defaultOgImage}
             onChange={(e) => {
               setDefaultOgImage(e.target.value);
@@ -112,6 +120,11 @@ export const SeoScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange, regi
             }}
             placeholder="https://example.com/og-image.jpg"
           />
+          {ogImageError && (
+            <div role="alert" className={SCREEN_FIELD_ERROR}>
+              Needs a full URL, starting with https://
+            </div>
+          )}
         </Field>
       </Section>
 

@@ -122,3 +122,31 @@ describe("SeoScreen — flush handler contract", () => {
     expect(settings.seo.siteName).toBe("Keep Me");
   });
 });
+
+/* The column is `z.string().url()` on the server, so "mysite.com/og.png" — the
+   thing a person types — is refused, and before this the only sign was a toast
+   after saving, raised by a mutation two layers away. Measured live: typing it
+   showed nothing until Save, then "The site-level settings were refused:
+   ogImage: Invalid url". */
+describe("SeoScreen — the OG image field says what the server will accept", () => {
+  const type = (value: string) => {
+    setup();
+    fireEvent.change(screen.getByLabelText(/Default OG Image URL/i), { target: { value } });
+  };
+
+  it("flags a URL with no scheme, inline", () => {
+    type("mysite.com/og.png");
+    expect(screen.getByRole("alert")).toHaveTextContent(/full URL/i);
+    expect(screen.getByLabelText(/Default OG Image URL/i)).toHaveAttribute("aria-invalid", "true");
+  });
+
+  it("accepts a full https URL", () => {
+    type("https://mysite.com/og.png");
+    expect(screen.queryByRole("alert")).toBeNull();
+  });
+
+  it("says nothing about an empty field — empty means cleared", () => {
+    type("");
+    expect(screen.queryByRole("alert")).toBeNull();
+  });
+});
