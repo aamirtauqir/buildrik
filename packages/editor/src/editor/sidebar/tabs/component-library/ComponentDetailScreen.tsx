@@ -62,7 +62,8 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   // outside a DSModeProvider in some screens (e.g. component-library
   // standalone). Default-to-beginner when provider is absent.
   const dsMode = useDSModeOptional();
-  const isPro = dsMode?.mode === "pro";
+  /* The DS density mode, not a billing tier — see the Instance Actions note. */
+  const isProMode = dsMode?.mode === "pro";
 
   // Delete confirmation dialog state
   const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
@@ -250,10 +251,13 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
         </div>
 
         {/* Instance Actions (shown when an instance is selected on canvas).
-            Detach is Pro-only. The "Swap component" action was removed —
-            it had no completion path (no engine swap API), so it only
-            toasted and never swapped. */}
-        {isInstanceSelected && isPro && (
+            Detach shows in the design system's PRO MODE — the Beginner/Pro
+            density toggle a user flips freely (`DSModeContext`), not the
+            billing plan. This comment said "Pro-only", which reads like a paid
+            gate; nothing here checks a plan. The "Swap component" action was
+            removed — it had no completion path (no engine swap API), so it
+            only toasted and never swapped. */}
+        {isInstanceSelected && isProMode && (
           <div>
             <h4>Instance Actions</h4>
             <Button
