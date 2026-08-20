@@ -10,6 +10,23 @@ import type { AppRouter } from "@/server/trpc/router";
 
 export const trpc = createTRPCReact<AppRouter>();
 
+/** tRPC codes that will answer the same way however many times we ask. */
+const FINAL_CODES = new Set([
+  "UNAUTHORIZED",
+  "FORBIDDEN",
+  "NOT_FOUND",
+  "BAD_REQUEST",
+  "CONFLICT",
+  "PRECONDITION_FAILED",
+  "UNPROCESSABLE_CONTENT",
+  "METHOD_NOT_SUPPORTED",
+  "PAYLOAD_TOO_LARGE",
+]);
+
+export function isFinalAnswer(code: unknown): boolean {
+  return typeof code === "string" && FINAL_CODES.has(code);
+}
+
 function showErrorToast(title: string, message?: string) {
   const container = document.getElementById("trpc-toast-root");
   if (!container) return;
@@ -74,10 +91,14 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
         defaultOptions: {
           queries: {
             retry: (failureCount, error) => {
-              if (
-                error instanceof TRPCClientError &&
-                error.data?.code === "UNAUTHORIZED"
-              ) {
+              /* A definitive answer is not worth asking again. Only
+                 UNAUTHORIZED was listed here, so opening a site you have no
+                 access to sat behind the loading skeleton for ~6 seconds of
+                 retries before the page could say "Site not found" — measured
+                 on /dashboard/sites/<someone-else's-id>: skeleton at t+4s, the
+                 real message only at t+6s. These codes mean the server has
+                 answered; retrying changes nothing. */
+              if (error instanceof TRPCClientError && isFinalAnswer(error.data?.code)) {
                 return false;
               }
               return failureCount < 3;
