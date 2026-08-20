@@ -106,9 +106,6 @@
 }
 
 /* A1 day-1: group headers in 4-group nav structure */
-/* 10px labels on --bk-bg-subtle: --bk-ink-muted measures 4.39:1 there, under
-   the 4.5 AA needs at this size — measured with axe on the live panel, 6
-   nodes. --bk-ink-soft is the same family and clears it at about 7:1. */
 .bd-set-snav-group {
   font: 600 10px/1.2 var(--bk-font-ui);
   color: var(--bk-ink-soft);
@@ -175,8 +172,6 @@
 .bd-set-snav-badge {
   margin-left: auto;
   font: 500 9px var(--bk-font-mono);
-  /* Same reason as the group label above: 9px muted on --bk-bg-subtle is
-     4.39:1, under AA. */
   color: var(--bk-ink-soft);
   padding: 1px 5px;
   border-radius: 3px;

@@ -153,7 +153,16 @@ export function RedirectsTab({ redirects, limit, canEdit, onCreate, onUpdate, on
                 <label className="block text-body-sm font-medium text-[var(--color-text-muted)]">To</label>
                 <InputField value={toUrl} onChange={(e) => setToUrl(e.target.value)} placeholder="/new-page" className="font-mono" wrapperClassName="mt-1" />
               </div>
-              <select value={type} onChange={(e) => setType(e.target.value as "301" | "302")} className="rounded-md border px-2 py-1.5 text-body" style={{ borderColor: "var(--color-border-default)" }}>
+              {/* Named: the two option values are the only text near it, so a
+                  screen reader announced "combo box" with no idea it chose the
+                  redirect kind (axe: select-name). */}
+              <select
+                aria-label="Redirect type"
+                value={type}
+                onChange={(e) => setType(e.target.value as "301" | "302")}
+                className="rounded-md border px-2 py-1.5 text-body"
+                style={{ borderColor: "var(--color-border-default)" }}
+              >
                 <option value="301">301</option>
                 <option value="302">302</option>
               </select>

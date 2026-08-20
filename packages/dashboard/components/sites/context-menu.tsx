@@ -21,10 +21,12 @@ const iconMap = { Pencil, Settings, Type, Copy, UserCheck, ExternalLink, Link2, 
 
 interface ContextMenuProps {
   siteStatus?: string;
+  /** Names the trigger for assistive tech: "More options for <site>". */
+  siteName?: string;
   onAction: (action: string) => void;
 }
 
-export function ContextMenu({ siteStatus, onAction }: ContextMenuProps) {
+export function ContextMenu({ siteStatus, siteName, onAction }: ContextMenuProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -38,7 +40,17 @@ export function ContextMenu({ siteStatus, onAction }: ContextMenuProps) {
 
   return (
     <div ref={ref} className="relative">
-      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(!open); }} className="rounded-lg p-1.5 transition-colors hover:bg-[var(--color-bg-subtle)]">
+      {/* An icon-only trigger with no text: axe reported "Element does not
+          have inner text that is visible to screen readers" for every row on
+          the Sites page. */}
+      <button
+        type="button"
+        aria-label={siteName ? `More options for ${siteName}` : "More options"}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(!open); }}
+        className="rounded-lg p-1.5 transition-colors hover:bg-[var(--color-bg-subtle)]"
+      >
         <MoreHorizontal className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} />
       </button>
       {open && (

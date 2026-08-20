@@ -152,12 +152,17 @@ function TechnicalSeoSection({ siteId }: { siteId: string }) {
               <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>Allow search engines to index this site</p>
               <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>Off adds a noindex directive — useful for staging.</p>
             </div>
+            {/* Icon-only switch: axe reported "does not have inner text that is
+                visible to screen readers". role=switch + aria-checked + a name,
+                the same trio the Settings toggles carry. */}
             <button
               type="button"
+              role="switch"
+              aria-checked={indexing}
+              aria-label="Allow search engines to index this site"
               onClick={() => setAllowIndexing(!indexing)}
               className="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors"
               style={{ backgroundColor: indexing ? "var(--color-primary)" : "var(--color-border-default)" }}
-              aria-pressed={indexing}
             >
               <span className="inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform" style={{ transform: indexing ? "translateX(18px)" : "translateX(2px)" }} />
             </button>

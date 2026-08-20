@@ -66,7 +66,14 @@ export function AvatarStack({ avatars }: { avatars: { name: string; avatar: stri
 export function TrendArrow({ value }: { value: number }) {
   const isPositive = value > 0;
   const isZero = value === 0;
-  const color = isZero ? "var(--color-text-secondary)" : isPositive ? "var(--color-success)" : "var(--color-error)";
+  /* The -text variants, not the fill colours: --color-success on white is
+     3.38:1 (axe on the site overview), under AA for text this size. The
+     -text tokens exist for exactly this — same hue, enough contrast. */
+  const color = isZero
+    ? "var(--color-text-secondary)"
+    : isPositive
+      ? "var(--color-success-text)"
+      : "var(--color-error-text)";
   const arrow = isZero ? "" : isPositive ? "↑" : "↓";
   const sign = isPositive ? "+" : "";
   return (

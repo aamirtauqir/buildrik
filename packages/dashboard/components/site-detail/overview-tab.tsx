@@ -111,7 +111,16 @@ export function OverviewTab({
     );
   }
 
+  /* Two uses, two colours: the BAR is a fill (contrast rules don't apply) and
+     the SCORE is text, where --color-success (3.38:1) and --color-warning both
+     fall under AA on white — axe flagged the score on this page. */
   const healthColor = stats.healthScore > 70 ? "var(--color-success)" : stats.healthScore > 40 ? "var(--color-warning)" : "var(--color-primary)";
+  const healthTextColor =
+    stats.healthScore > 70
+      ? "var(--color-success-text)"
+      : stats.healthScore > 40
+        ? "var(--color-warning-text)"
+        : "var(--color-primary)";
 
   // Surface the biggest drag on the score without making the user expand the
   // panel first (audit SD2). Only worth showing when it's actually weak.
@@ -135,7 +144,9 @@ export function OverviewTab({
           label="Monthly Visitors"
           value={<MetricValue>{formatNumber(stats.monthlyVisitors)}</MetricValue>}
           delta={
-            <span style={{ color: stats.visitorsChange >= 0 ? "var(--color-success)" : "var(--color-primary)" }}>
+            /* -text variant: --color-success is 3.38:1 on white (axe), under
+               AA for a 12px figure. */
+            <span style={{ color: stats.visitorsChange >= 0 ? "var(--color-success-text)" : "var(--color-primary)" }}>
               {stats.visitorsChange >= 0 ? "\u2191" : "\u2193"} <MetricValue>{Math.abs(stats.visitorsChange)}%</MetricValue>
             </span>
           }
@@ -163,7 +174,7 @@ export function OverviewTab({
         <StatCard
           icon={<Heart className="h-5 w-5" />}
           label="Site Health"
-          value={<span style={{ color: healthColor }}><MetricValue>{stats.healthScore}</MetricValue>/100</span>}
+          value={<span style={{ color: healthTextColor }}><MetricValue>{stats.healthScore}</MetricValue>/100</span>}
         />
       </div>
 
@@ -175,7 +186,7 @@ export function OverviewTab({
         >
           <div className="flex min-w-0 items-center gap-3">
             <h3 className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>Health Score</h3>
-            <span className="text-body font-bold" style={{ color: healthColor }}>{stats.healthScore}/100</span>
+            <span className="text-body font-bold" style={{ color: healthTextColor }}>{stats.healthScore}/100</span>
             {/* The single weakest area, inline — the top thing to fix, visible
                 before expanding. Hidden once the full breakdown is open. */}
             {!healthExpanded && weakestScore <= 70 && (

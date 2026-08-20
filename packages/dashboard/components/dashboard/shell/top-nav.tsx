@@ -86,7 +86,11 @@ export function TopNav({ onSearch }: { onSearch: () => void }) {
       <button
         onClick={onSearch}
         className="flex h-9 w-[230px] items-center gap-2 rounded-lg border px-3 text-body transition-colors hover:border-[var(--color-text-muted)]"
-        style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-placeholder)", backgroundColor: "var(--color-bg-subtle)" }}
+        /* --color-text-secondary, not --color-text-placeholder: this button's
+           own background is --color-bg-subtle, where the placeholder colour
+           measures 4.39:1 — under AA. axe flagged it on all eight dashboard
+           pages, since the search box is in the top nav everywhere. */
+        style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)", backgroundColor: "var(--color-bg-subtle)" }}
         aria-label="Search"
       >
         <Search className="h-4 w-4" />

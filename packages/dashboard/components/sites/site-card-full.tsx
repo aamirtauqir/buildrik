@@ -36,7 +36,14 @@ export function SiteCardFull({ site, selected, onSelect, onAction }: SiteCardFul
       style={{ borderColor: "var(--color-border-default)" }}
     >
       <div className="absolute left-3 top-3 z-10">
-        <input type="checkbox" checked={selected} onChange={() => {}} className="h-4 w-4 rounded border-gray-300 accent-[var(--color-primary)]" onClick={(e) => { e.stopPropagation(); onSelect(site.id, e); }} />
+        <input
+          type="checkbox"
+          aria-label={`Select ${site.name}`}
+          checked={selected}
+          onChange={() => {}}
+          className="h-4 w-4 rounded border-gray-300 accent-[var(--color-primary)]"
+          onClick={(e) => { e.stopPropagation(); onSelect(site.id, e); }}
+        />
       </div>
       <Link href={`/dashboard/sites/${site.id}`}>
         {/* 16:10 preview. A real screenshot when we have one; otherwise a
@@ -88,7 +95,7 @@ export function SiteCardFull({ site, selected, onSelect, onAction }: SiteCardFul
           <Settings className="h-3.5 w-3.5" />Manage
         </Link>
         <div className="ml-auto">
-          <ContextMenu siteStatus={site.status} onAction={(action) => onAction(action, site.id)} />
+          <ContextMenu siteStatus={site.status} siteName={site.name} onAction={(action) => onAction(action, site.id)} />
         </div>
       </div>
     </div>

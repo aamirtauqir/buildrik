@@ -162,7 +162,12 @@ export function NotificationPrefs() {
               </div>
 
               <div className="flex justify-center">
+                {/* Named: eight of these sit in a grid whose only header is a
+                    column caption, so axe reported eight "select-name"
+                    criticals — a screen reader announced "combo box" with no
+                    idea which category it changed. */}
                 <select
+                  aria-label={`Email frequency for ${pref.category}`}
                   value={pref.email}
                   disabled={isSecurity}
                   onChange={(e) => update(pref.category, { email: e.target.value as EmailFrequency })}

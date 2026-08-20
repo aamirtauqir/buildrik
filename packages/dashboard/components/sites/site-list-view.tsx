@@ -60,7 +60,7 @@ export function SiteListView({ sites, selectedIds, onSelect, onSelectAll, allSel
               </td>
               <td className="px-[18px] py-3.5" style={{ color: "var(--color-text-secondary)" }}><MetricValue>{getTimeAgo(site.lastEditedAt)}</MetricValue></td>
               <td className="px-[18px] py-3.5"><Pill tone={siteStatusTone(site.status)}>{siteStatusLabel(site.status)}</Pill></td>
-              <td className="px-[18px] py-3.5"><ContextMenu siteStatus={site.status} onAction={(action) => onAction(action, site.id)} /></td>
+              <td className="px-[18px] py-3.5"><ContextMenu siteStatus={site.status} siteName={site.name} onAction={(action) => onAction(action, site.id)} /></td>
             </tr>
           ))}
         </tbody>

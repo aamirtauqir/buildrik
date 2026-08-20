@@ -112,9 +112,14 @@ export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
               <ExternalLink className="h-4 w-4" />View site
             </a>
           ) : (
+            /* Dimmed by colour, not by opacity: `opacity-50` over the page
+               background computed out to 4.39:1 (axe, three site tabs). This
+               is a span, not a disabled control, so the contrast exemption
+               does not apply — --color-text-muted reads as "unavailable" and
+               still clears AA. */
             <span
-              className="flex cursor-not-allowed items-center gap-2 rounded-lg border px-4 py-2 text-body font-medium opacity-50"
-              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
+              className="flex cursor-not-allowed items-center gap-2 rounded-lg border px-4 py-2 text-body font-medium"
+              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-muted)" }}
               title="Publish your site first"
             >
               <ExternalLink className="h-4 w-4" />View site
