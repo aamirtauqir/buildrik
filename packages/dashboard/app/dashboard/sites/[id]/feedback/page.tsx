@@ -16,7 +16,9 @@ export default function SiteFeedbackPage() {
     <div>
       <PageHeader
         title="Submissions"
-        description="Form entries captured from your published site."
+        /* Not "captured from your published site" — nothing on a published
+           page posts here yet (see the panel's empty states). */
+        description="Form entries sent to this site's form endpoint."
       />
       {blocksQuery.isError ? (
         <ErrorState title="Couldn't load submissions" onRetry={() => blocksQuery.refetch()} />
