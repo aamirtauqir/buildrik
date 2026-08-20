@@ -275,8 +275,15 @@ export const KeyboardCheatSheet: React.FC<KeyboardCheatSheetProps> = ({ isOpen, 
           />
         </div>
 
-        {/* Content - Scrollable grid of shortcut groups */}
+        {/* Content - Scrollable grid of shortcut groups.
+            tabIndex/role: the list itself holds no focusable element, so a
+            keyboard user had no way to scroll it (axe:
+            scrollable-region-focusable). Making the region focusable gives the
+            arrow keys somewhere to land. */}
         <div
+          tabIndex={0}
+          role="group"
+          aria-label="Shortcut list"
           style={{
             flex: 1,
             overflow: "auto",

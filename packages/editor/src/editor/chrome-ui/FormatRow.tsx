@@ -44,9 +44,13 @@ export function FormatRow({
   name, value, title, description, checked, onChange, trailing, disabled, className, ...rest
 }: FormatRowProps) {
   return (
+    /* No `aria-checked` here: this is a <label>, and axe rejects it outright
+       ("ARIA attribute is not allowed", 3 nodes in the export modal). The real
+       <Radio> inside already reports checked state to assistive tech, and the
+       label supplies its name — adding a second, roleless "checked" only
+       created an invalid element. */
     <label
       className={[BASE, className].filter(Boolean).join(" ")}
-      aria-checked={disabled ? undefined : Boolean(checked)}
       aria-disabled={disabled || undefined}
       {...rest}
     >
@@ -71,7 +75,9 @@ export function FormatRow({
           stylesheet, and the algorithm reads computed display. */}
       <div className="tw:flex-1 tw:flex tw:flex-col tw:gap-0.5 tw:min-w-0">
         <div>{title}</div>
-        {description ? <div className="tw:text-gray-500 tw:text-xs">{description}</div> : null}
+        {/* gray-600: a selected row's tint is light enough that gray-500
+            measures 4.38:1 on it — under AA at 12px (axe, export modal). */}
+        {description ? <div className="tw:text-gray-600 tw:text-xs">{description}</div> : null}
       </div>
       {trailing}
     </label>

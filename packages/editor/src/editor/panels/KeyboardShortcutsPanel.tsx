@@ -191,7 +191,8 @@ export const KeyboardShortcutsPanel: React.FC<KeyboardShortcutsPanelProps> = ({
         background: "var(--bk-bg-subtle)",
         borderRadius: "var(--bk-radius-sm)",
         fontSize: 12,
-        color: "var(--bk-ink-muted)",
+        /* muted on subtle is 4.39:1 — under AA at 12px (axe). */
+        color: "var(--bk-ink-soft)",
         textAlign: "center",
       }}
     >

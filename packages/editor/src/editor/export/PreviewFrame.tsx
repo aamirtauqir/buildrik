@@ -80,8 +80,14 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
   const scaledHeight = Math.min(deviceDimensions.height * scale, maxHeight);
 
   return (
+    /* tabIndex/role: this frame scrolls (a tall page at a small device width)
+       and contains only a non-focusable preview, so a keyboard user could not
+       reach the scroll (axe: scrollable-region-focusable). */
     <div
       ref={containerRef}
+      tabIndex={0}
+      role="group"
+      aria-label="Device preview"
       style={{
         background: /* @lint-hex-policy: device-preview frame mockup color, not editor chrome */ "#1a1a2e",
         borderRadius: 8,

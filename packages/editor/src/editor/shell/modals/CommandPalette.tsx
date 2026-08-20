@@ -205,7 +205,8 @@ const ShortcutBadge: React.FC<{ shortcut: string }> = ({ shortcut }) => {
     .replace(/Alt/g, isMac ? "⌥" : "Alt");
 
   return (
-    <span className="tw:flex-none tw:whitespace-nowrap tw:px-1.5 tw:py-0.5 tw:rounded tw:bg-gray-200 tw:text-[11px] tw:text-gray-500 tw:[font-family:var(--bk-font-mono)]">
+    /* gray-700 on the gray-200 chip: gray-500 measured 3.9:1 there (axe). */
+    <span className="tw:flex-none tw:whitespace-nowrap tw:px-1.5 tw:py-0.5 tw:rounded tw:bg-gray-200 tw:text-[11px] tw:text-gray-700 tw:[font-family:var(--bk-font-mono)]">
       {display}
     </span>
   );
@@ -437,7 +438,10 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
                 <div key={group}>
                   {/* Section header */}
                   <div
-                    className="tw:flex tw:items-center tw:h-7 tw:px-4 tw:text-[11px] tw:uppercase tw:tracking-[0.5px] tw:text-gray-500 tw:bg-[var(--bk-bg-subtle)]"
+                    /* gray-600: these band labels are 11px on
+                       --bk-bg-subtle, where gray-500 measures 4.39:1 — under
+                       AA (axe, 6 nodes in this palette). */
+                    className="tw:flex tw:items-center tw:h-7 tw:px-4 tw:text-[11px] tw:uppercase tw:tracking-[0.5px] tw:text-gray-600 tw:bg-[var(--bk-bg-subtle)]"
                   >
                     {group}
                   </div>
@@ -487,7 +491,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
 
         {/* Footer */}
         <div
-          className="tw:flex tw:items-center tw:justify-center tw:h-9 tw:gap-4 tw:border-t tw:border-gray-200 tw:text-[11px] tw:text-gray-500"
+          className="tw:flex tw:items-center tw:justify-center tw:h-9 tw:gap-4 tw:border-t tw:border-gray-200 tw:text-[11px] tw:text-gray-600"
         >
           <span>↑↓ navigate</span>
           <span>↵ run</span>
