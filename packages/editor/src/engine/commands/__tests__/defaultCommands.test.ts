@@ -300,3 +300,31 @@ describe("export commands", () => {
     expect(byId.get("export-json")?.shortcut).toBeUndefined();
   });
 });
+
+/* ⌘1–⌘4 used to sit on the four device presets while the canvas zoom flyout
+   binds ⌘1 (fit), ⌘2 (zoom to selection), ⌘0 (100%) and ⌘= / ⌘- — the chords
+   board 817:4723 prints on that flyout. Both handlers fired: measured in the
+   running editor, one ⌘2 took the zoom to 104% AND set the device to tablet,
+   which is where the inspector would then write styles. */
+describe("device presets carry no shortcut", () => {
+  it("leaves ⌘1–⌘4 to the zoom flyout that prints them", () => {
+    const withShortcut = buildDefaultCommands(composer as unknown as Composer)
+      .filter((c) => c.id.startsWith("device-"))
+      .filter((c) => c.shortcut);
+    expect(withShortcut.map((c) => c.id)).toEqual([]);
+  });
+
+  it("keeps the zoom chords that are printed", () => {
+    const byId = new Map(buildDefaultCommands(composer as unknown as Composer).map((c) => [c.id, c]));
+    expect(byId.get("zoom-reset")?.shortcut).toBe("ctrl+0");
+    expect(byId.get("zoom-in")?.shortcut).toBe("ctrl+=");
+    expect(byId.get("zoom-out")?.shortcut).toBe("ctrl+-");
+  });
+
+  it("still exposes the presets by name for the palette", () => {
+    const ids = buildDefaultCommands(composer as unknown as Composer).map((c) => c.id);
+    for (const id of ["device-desktop", "device-tablet", "device-mobile", "device-watch"]) {
+      expect(ids).toContain(id);
+    }
+  });
+});

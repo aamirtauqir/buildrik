@@ -351,28 +351,31 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
     // ============================================
     // Device Presets
     // ============================================
+    /* No shortcuts on these four. ⌘1–⌘4 collided with the canvas zoom
+       flyout, which board 817:4723 PRINTS as fit / zoom-to-selection / 100% /
+       in / out — and both handlers ran: measured in the editor, ⌘2 zoomed to
+       the selection AND switched the canvas to tablet, so the next style edit
+       would have landed on the tablet breakpoint instead of desktop. The
+       printed chord wins; the device commands stay reachable by name in the
+       palette, which is where they are actually discovered. */
     {
       id: "device-desktop",
       label: "Desktop View",
-      shortcut: "ctrl+1",
       run: (c) => c.setDevice("desktop"),
     },
     {
       id: "device-tablet",
       label: "Tablet View",
-      shortcut: "ctrl+2",
       run: (c) => c.setDevice("tablet"),
     },
     {
       id: "device-mobile",
       label: "Mobile View",
-      shortcut: "ctrl+3",
       run: (c) => c.setDevice("mobile"),
     },
     {
       id: "device-watch",
       label: "Watch View",
-      shortcut: "ctrl+4",
       run: (c) => c.setDevice("watch"),
     },
   ];
