@@ -137,7 +137,7 @@ export const INTERACTION_PRESET_KEYFRAMES: Record<
 
 /** Easing name → CSS timing function. Mirrors the named easings the inspector
  *  offers (`engine/interactions/types.ts` EasingFunction). */
-export const INTERACTION_EASINGS: Record<EasingFunction, string> = {
+export const INTERACTION_EASINGS: Record<EasingFunction | string, string> = {
   linear: "linear",
   easeIn: "cubic-bezier(0.4,0,1,1)",
   easeOut: "cubic-bezier(0,0,0.2,1)",
@@ -150,6 +150,33 @@ export const INTERACTION_EASINGS: Record<EasingFunction, string> = {
   easeOutQuart: "cubic-bezier(0.165,0.84,0.44,1)",
   spring: "cubic-bezier(0.5,1.5,0.5,1)",
   bounce: "cubic-bezier(0.68,-0.55,0.265,1.55)",
+
+  /* The OTHER easing vocabulary — and the only one the inspector can currently
+     write. Its dropdown is built from `GSAPEngine.EASINGS`, whose VALUES are
+     GSAP ease strings, so every published animation looked these up, missed,
+     and fell back to a plain `ease`: the editor honoured the choice (GSAP
+     speaks these natively) and the visitor's page ignored all ten of them.
+     GSAP's power1..power4 are quad, cubic, quart, quint. */
+  none: "linear",
+  "power1.in": "cubic-bezier(0.55,0.085,0.68,0.53)",
+  "power1.out": "cubic-bezier(0.25,0.46,0.45,0.94)",
+  "power1.inOut": "cubic-bezier(0.455,0.03,0.515,0.955)",
+  "power2.in": "cubic-bezier(0.55,0.055,0.675,0.19)",
+  "power2.out": "cubic-bezier(0.215,0.61,0.355,1)",
+  "power2.inOut": "cubic-bezier(0.645,0.045,0.355,1)",
+  "power3.in": "cubic-bezier(0.895,0.03,0.685,0.22)",
+  "power3.out": "cubic-bezier(0.165,0.84,0.44,1)",
+  "power3.inOut": "cubic-bezier(0.77,0,0.175,1)",
+  "power4.in": "cubic-bezier(0.755,0.05,0.855,0.06)",
+  "power4.out": "cubic-bezier(0.23,1,0.32,1)",
+  "power4.inOut": "cubic-bezier(0.86,0,0.07,1)",
+  /* Overshoot/oscillation can only be approximated by a bezier; these are the
+     closest single curves, which is what the CSS engine can express. */
+  "elastic.out(1, 0.3)": "cubic-bezier(0.5,1.5,0.5,1)",
+  "bounce.out": "cubic-bezier(0.68,-0.55,0.265,1.55)",
+  "back.out(1.7)": "cubic-bezier(0.34,1.56,0.64,1)",
+  "expo.out": "cubic-bezier(0.19,1,0.22,1)",
+  "circ.out": "cubic-bezier(0.075,0.82,0.165,1)",
 };
 
 /** Marker the export uses to detect whether a page needs the runtime. */
