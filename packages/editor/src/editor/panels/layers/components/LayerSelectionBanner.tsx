@@ -42,7 +42,14 @@ export const LayerSelectionBanner: React.FC<LayerSelectionBannerProps> = ({
           <rect x="13" y="13" width="8" height="8" rx="1.5" />
         </svg>
       </Button>
-      <Button className="bdc-icon-btn" title="Hide" aria-label="Hide" onClick={onHide}>
+      {/* Same editor-only dim as the row eye — it does not keep the elements
+          off the published page. */}
+      <Button
+        className="bdc-icon-btn"
+        title="Dim in editor — these elements still publish"
+        aria-label="Dim in editor"
+        onClick={onHide}
+      >
         <svg viewBox="0 0 24 24">
           <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" />
           <circle cx="12" cy="12" r="2.5" />

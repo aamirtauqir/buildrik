@@ -248,12 +248,28 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
           </>
         )}
 
-        {/* Board 244:1580 trailing order: 👁 then 🔒 — eye first. */}
+        {/* Board 244:1580 trailing order: 👁 then 🔒 — eye first.
+
+            The name said "Hide element", which in this product already means
+            something else: a page set to Hidden is EXCLUDED from the publish
+            (ExportEngine.isPageLive). This eye does not touch the element
+            model at all — it sets `data-hidden` on the canvas node, which
+            Canvas.css draws at opacity .25 with pointer-events off, and the
+            element publishes exactly as before. Measured: toggled it, then
+            read the export — the element was still in the body.
+
+            Hiding an element ON THE SITE is the inspector's Visibility
+            section, which writes a per-breakpoint hide into the styles the
+            export emits. So this one says which of the two it is. */}
         <Button
           type="button"
           className={`bdc-lr-eye${isHidden ? " bdc-off" : ""}`}
-          title={isHidden ? "Show element" : "Hide element"}
-          aria-label={isHidden ? "Show element" : "Hide element"}
+          title={
+            isHidden
+              ? "Show in editor — this element publishes either way"
+              : "Dim in editor — the element still publishes"
+          }
+          aria-label={isHidden ? "Show in editor" : "Dim in editor"}
           onClick={(e) => onToggleVisibility(layer.id, e)}
         >
           <svg viewBox="0 0 24 24">
