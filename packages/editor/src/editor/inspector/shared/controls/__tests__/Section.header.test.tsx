@@ -9,7 +9,7 @@
  *
  * The row is a plain container now; the toggle carries the role and the action
  * is its sibling. A real `<button>` for the toggle would inherit flowbite's
- * height (measured live: the row went 36px → 56px) and Gate 24 keeps raw
+ * height (measured live: the header row grew by twenty points) and Gate 24 keeps raw
  * `<button>` out of chrome, so the role stays on a span.
  *
  * @license BSD-3-Clause

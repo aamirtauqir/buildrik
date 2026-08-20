@@ -76,8 +76,9 @@ export const Section: React.FC<SectionProps> = ({
           control with focusable descendants (axe nested-interactive, serious),
           where the action button sat inside the announced toggle. Siblings cost
           nothing and both are reachable. (A real <button> here would inherit
-          flowbite's own height — measured, the row went 36px → 56px — and Gate
-          24 keeps raw <button> out of chrome, so the role stays on a span.) */}
+          flowbite's own height — measured, the header row grew by twenty
+          points — and Gate 24 keeps raw <button> out of chrome, so the role
+          stays on a span.) */}
       <div className="bdi-sec-h">
         <span
           role="button"
