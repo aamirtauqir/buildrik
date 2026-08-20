@@ -49,14 +49,16 @@ describe("CommandPalette", () => {
     delete (document as unknown as Record<string, unknown>).execCommand;
   });
 
-  // ── §2-B8 pin: hardcoded command list ────────────────────────────────────
+  // ── the command list ─────────────────────────────────────────────────────
   describe("command list", () => {
-    // PIN §2-B8: registry bypass — commands hardcoded here, not from a registry.
-    // buildCommands() inlines the Edit (5) / View (4) / History (2) commands in
-    // this file; only Navigation (13) derives from GROUPED_TABS_CONFIG (every
-    // tab with a shortcut — the `review` tab (P0) added one, so nav is 13).
-    // Total with a composer: 24. If a command registry ever lands, this pin
-    // should break and be replaced.
+    /* The §2-B8 pin here said "registry bypass — commands hardcoded, not from a
+       registry", and that stopped being true when B8 was fixed:
+       `buildCommands` still inlines Edit/View/History and derives Navigation
+       from GROUPED_TABS_CONFIG, but it then appends every CommandCenter
+       command not already covered. Confirmed in the running editor — ⌘K finds
+       "Tablet View", "Toggle Snap to Grid", "Bring to Front" and "Group",
+       none of which appear in this file. The counts below are the hardcoded
+       head, which is what these tests exercise with a stub composer. */
     /* Boards 166:2 / 166:27 band by what a row DOES — Recent · Suggested
        before you type, Actions · Go to after — not by which internal group
        owns it. The `group:` strings are still the filter's material; they are
@@ -81,9 +83,9 @@ describe("CommandPalette", () => {
       expect(screen.getByText("Undo last action")).toBeInTheDocument();
     });
 
-    // PIN §2-B8 (continued): without a composer only the 13 navigation
-    // commands survive — Edit/View/History are appended after an early
-    // `if (!composer) return commands;`.
+    /* Without a composer only the 13 navigation commands survive —
+       Edit/View/History (and the registry append) come after an early
+       `if (!composer) return commands;`. */
     it("without a composer: only the 13 navigation commands", () => {
       renderPalette(null);
       expect(commandButtons()).toHaveLength(13);
