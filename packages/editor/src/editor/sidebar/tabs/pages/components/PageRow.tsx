@@ -159,9 +159,16 @@ export const PageRow = React.memo<Props>(
       .join(" ");
 
     return (
+      /* No `role="listitem"`: this wrapper sits inside `role="tree"`
+         (PageList), where a tree's only allowed children are treeitem and
+         group. axe flagged all three of the resulting errors on the live panel
+         — "Element has children which are not allowed: [role=listitem]",
+         "Required ARIA parent role not present: list", and the treeitems'
+         missing group/tree parent. Presentation is the honest role for a drag
+         wrapper: it carries no semantics of its own. */
       <div
         className="bd-pg-row-wrap"
-        role="listitem"
+        role="presentation"
         draggable={isDraggable}
         onDragStart={isDraggable ? handleDragStart : undefined}
         onDragOver={onReorderDrop ? handleReorderDragOver : undefined}
@@ -172,9 +179,11 @@ export const PageRow = React.memo<Props>(
           role="treeitem"
           tabIndex={0}
           aria-label={ariaLabel}
-          aria-selected={page.isActive ?? false}
           aria-current={page.isActive ? "page" : undefined}
-          aria-pressed={onToggleSelect ? isSelected : undefined}
+          /* `aria-pressed` is not allowed on a treeitem (axe: "ARIA attribute
+             is not allowed"), and it duplicated what this row already says:
+             `aria-selected` carries the multi-select state below. */
+          aria-selected={onToggleSelect ? isSelected : (page.isActive ?? false)}
           onClick={(e) => {
             if (onToggleSelect && (e.ctrlKey || e.metaKey || e.shiftKey)) {
               onToggleSelect(e);

@@ -665,14 +665,18 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           )}
         </div>
       </div>
-      {/* Privacy & Terms footer */}
-      <div className="tw:px-4 tw:py-2.5 tw:text-xs tw:leading-normal tw:text-gray-500 tw:text-center">
+      {/* Privacy & Terms footer. The two links are underlined and the sentence
+          around them is gray-600: inside a text block, colour alone cannot
+          carry "this is a link" (WCAG 1.4.1), and axe measured these two at
+          1.27:1 against their surrounding text — nowhere near the 3:1 that
+          would let colour do the work on its own. */}
+      <div className="tw:px-4 tw:py-2.5 tw:text-xs tw:leading-normal tw:text-gray-600 tw:text-center">
         By publishing, your site is deployed to your connected Vercel account.{" "}
-        <a href={`${DASHBOARD_URL}/privacy`} target="_blank" rel="noopener noreferrer" className="tw:text-blue-700 tw:no-underline">
+        <a href={`${DASHBOARD_URL}/privacy`} target="_blank" rel="noopener noreferrer" className="tw:text-blue-700 tw:underline">
           Privacy policy
         </a>
         {" · "}
-        <a href={`${DASHBOARD_URL}/terms`} target="_blank" rel="noopener noreferrer" className="tw:text-blue-700 tw:no-underline">
+        <a href={`${DASHBOARD_URL}/terms`} target="_blank" rel="noopener noreferrer" className="tw:text-blue-700 tw:underline">
           Terms of service
         </a>
       </div>

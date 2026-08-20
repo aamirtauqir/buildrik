@@ -39,7 +39,9 @@ export const DesignTabFooter: React.FC<FooterProps> = ({
       flexShrink: 0,
     }}
   >
-    <div style={{ flex: 1, fontSize: 12, color: "var(--bk-ink-muted)" }}>
+    {/* --bk-ink-soft, not --bk-ink-muted: this footer sits on --bk-bg-subtle,
+        where muted measures 4.39:1 at 12px — under AA. Measured with axe. */}
+    <div style={{ flex: 1, fontSize: 12, color: "var(--bk-ink-soft)" }}>
       {isDirty ? `${dirtyCount} previewing` : "All changes saved"}
     </div>
     <Button

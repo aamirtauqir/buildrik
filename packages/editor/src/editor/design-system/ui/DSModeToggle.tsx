@@ -56,7 +56,10 @@ export const DSModeToggle: React.FC<DSModeToggleProps> = ({ className }) => {
             className={`tw:px-2.5 tw:py-1 tw:text-xs tw:rounded tw:select-none tw:[transition:var(--bk-transition-fast)] ${
               active
                 ? "tw:bg-blue-700 tw:text-white tw:font-semibold tw:border-blue-700"
-                : "tw:bg-transparent tw:text-gray-500 tw:font-medium tw:border-transparent"
+                /* gray-600: the unselected pill sits on the group's
+                   --bk-bg-subtle track, where gray-500 measures 4.39:1 —
+                   under AA at this size. Measured with axe. */
+                : "tw:bg-transparent tw:text-gray-600 tw:font-medium tw:border-transparent"
             }`}
           >
             {seg.label}

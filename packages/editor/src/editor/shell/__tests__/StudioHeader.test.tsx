@@ -556,7 +556,9 @@ describe("StudioHeader", () => {
         "Open client view",
         "Invite teammates",
         "Account settings",
-        "Keyboard shortcuts?",
+        /* Prints ⌘/ now: "?" opens the canvas cheat sheet, a different screen
+           from the one this row opens. */
+        "Keyboard shortcutsCtrl /",
       ]);
     });
 
