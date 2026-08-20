@@ -93,8 +93,25 @@ describe("history + save", () => {
     expect(composer.saveProject).toHaveBeenCalledTimes(1);
   });
 
-  it("redo carries ctrl+y as a shortcut alias", () => {
-    expect(byId.get("redo")?.shortcuts).toContain("ctrl+y");
+  /* These three used to carry key bindings that the shell also binds
+     (`useEditorShortcuts`), and both handlers ran: measured in the editor, one
+     ⌘Z fired two `history:undo` events — throwing away the text edit AND the
+     element that was edited — ⇧⌘Z redid two, and ⌘P opened a popup window of
+     the export on top of toggling the in-editor preview. */
+  it("leaves the undo/redo/preview chords to the shell", () => {
+    for (const id of ["undo", "redo", "preview"]) {
+      const command = byId.get(id);
+      expect(command, id).toBeTruthy();
+      expect(command?.shortcut, id).toBeUndefined();
+      expect(command?.shortcuts, id).toBeUndefined();
+    }
+  });
+
+  it("keeps them runnable by name for the palette", () => {
+    run("undo");
+    run("redo");
+    expect(composer.history.undo).toHaveBeenCalled();
+    expect(composer.history.redo).toHaveBeenCalled();
   });
 });
 

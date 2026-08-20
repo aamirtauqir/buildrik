@@ -653,13 +653,17 @@ export class HistoryManager {
     const entry = entries.find((e) => e.id === entryId);
     if (!entry) return null;
 
-    // Map display index back to undoStack index
-    // buildHistoryDisplayEntries skips index 0, so display index i = undoStack index i+1
-    const undoStackIndex = entry.index + 1;
-    if (undoStackIndex < 0 || undoStackIndex >= this.undoStack.length) return null;
+    /* `entry.index` is ALREADY the undoStack index — `buildHistoryDisplayEntries`
+       walks the stack backwards and stores `i`, it does not renumber. The `+ 1`
+       that used to be here shifted every lookup by one step: the newest entry
+       resolved past the end of the stack and returned null, and every other
+       entry previewed the state AFTER the change it names. Measured in the
+       editor on a three-step stack (loaded → insert → inline edit): the "Inline
+       Edit" row gave nothing and the "Added block" row gave the edited state. */
+    if (entry.index < 0 || entry.index >= this.undoStack.length) return null;
 
     try {
-      return this.reconstructState(undoStackIndex);
+      return this.reconstructState(entry.index);
     } catch {
       return null;
     }
@@ -674,17 +678,19 @@ export class HistoryManager {
     const entry = entries.find((e) => e.id === entryId);
     if (!entry) return false;
 
-    const undoStackIndex = entry.index + 1;
-    if (undoStackIndex < 0 || undoStackIndex >= this.undoStack.length) return false;
+    // Same off-by-one as getEntrySnapshot: clicking a row in History → All
+    // changes restored the state after the change that row names, and the
+    // newest row restored nothing at all.
+    if (entry.index < 0 || entry.index >= this.undoStack.length) return false;
 
     try {
-      const snapshot = this.reconstructState(undoStackIndex);
+      const snapshot = this.reconstructState(entry.index);
 
       // Clear redo stack
       this.redoStack = [];
 
       // Replace everything after target with a checkpoint at target position
-      this.undoStack = this.undoStack.slice(0, undoStackIndex);
+      this.undoStack = this.undoStack.slice(0, entry.index + 1);
 
       // Record new checkpoint at current position
       this.undoStack.push({

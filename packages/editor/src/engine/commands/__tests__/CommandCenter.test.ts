@@ -296,15 +296,19 @@ describe("shortcut guard (shouldHandleShortcut)", () => {
     expect(composer.selection.getSelected).toHaveBeenCalled();
   });
 
-  it("a modified shortcut still fires from inside a widget — ⌘Z is not a menu key", () => {
+  /* Was written on ⌘Z, which the engine no longer binds — the shell owns that
+     chord now (two handlers ran and one press undid two steps). ⌘S is still
+     the engine's, and it makes the same point: a modified shortcut is not a
+     menu key, so it fires from inside a widget. */
+  it("a modified shortcut still fires from inside a widget", () => {
     const { composer } = makeCenter();
     const widget = document.createElement("div");
     widget.setAttribute("role", "dialog");
     document.body.appendChild(widget);
 
-    widget.dispatchEvent(new KeyboardEvent("keydown", { key: "z", ctrlKey: true, bubbles: true }));
+    widget.dispatchEvent(new KeyboardEvent("keydown", { key: "s", ctrlKey: true, bubbles: true }));
 
-    expect(composer.history.undo).toHaveBeenCalled();
+    expect(composer.saveProject).toHaveBeenCalled();
   });
 });
 

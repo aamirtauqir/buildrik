@@ -27,17 +27,22 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
     // ============================================
     // Clipboard & History
     // ============================================
+    /* No key bindings on undo/redo/preview. `useEditorShortcuts` binds the
+       same three chords in the shell, and BOTH ran: measured in the editor,
+       one ⌘Z fired two `history:undo` events and threw away two steps (the
+       text edit AND the element that was edited), ⇧⌘Z redid two, and ⌘P both
+       opened a popup window of the export AND toggled the in-editor preview.
+       The chords the product prints — the ⌘K palette and the shortcuts panel
+       both carry them — belong to one owner; these stay in the registry so the
+       palette can still run them by name. */
     {
       id: "undo",
       label: "Undo",
-      shortcut: "ctrl+z",
       run: (c) => c.history.undo(),
     },
     {
       id: "redo",
       label: "Redo",
-      shortcut: "ctrl+shift+z",
-      shortcuts: ["ctrl+shift+z", "ctrl+y"],
       run: (c) => c.history.redo(),
     },
     {
@@ -292,7 +297,6 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
     {
       id: "preview",
       label: "Preview",
-      shortcut: "ctrl+p",
       run: (c) => {
         const html = c.exportHTML();
         const previewWindow = window.open("", "_blank");
