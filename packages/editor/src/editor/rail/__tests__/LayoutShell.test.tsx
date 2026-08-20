@@ -5,7 +5,7 @@
  * The shell routes children by displayName into named grid regions (topbar,
  * rail, drawer, sidebar, canvas, inspector, fullpage, footer) and injects
  * open/overlay state into Drawer and Inspector via cloneElement inside a
- * useMemo. That memo's dep list omits `drawerPinned` — see the PIN §3 tests.
+ * useMemo, whose deps include `drawerPinned` — see the pin/unpin tests.
  */
 
 import { describe, it, expect, afterEach } from "vitest";
@@ -230,21 +230,22 @@ describe("LayoutShell — drawer/inspector prop injection", () => {
   });
 });
 
-describe("LayoutShell — PIN §3: drawerPinned stale-memo", () => {
-  // The slots useMemo (LayoutShell.tsx ~line 274) lists deps
-  // [children, drawerOpen, inspectorOpen] — drawerPinned is OMITTED even
-  // though the Drawer clone reads it (overlay: !drawerPinned). When the
-  // children prop is referentially stable across renders, toggling
-  // drawerPinned never recomputes the memo, so the drawer aside keeps its
-  // stale overlay prop while the wrapper class (computed outside the memo)
-  // updates. Result: wrapper and drawer disagree about overlay mode.
+describe("LayoutShell — pin/unpin reaches the drawer slot", () => {
+  /* Was pinned as §3: the slots useMemo listed [children, drawerOpen,
+     inspectorOpen] and omitted `drawerPinned`, which the Drawer clone reads
+     (`overlay: !drawerPinned`). With referentially stable children a pin/unpin
+     never recomputed the memo, so the drawer kept its stale overlay prop while
+     the wrapper class — computed outside the memo — flipped, and the two
+     disagreed about overlay mode. It did not bite in the app only because
+     AquibraStudio re-creates its children every render; any memoised caller
+     would have hit it. */
 
   const stableChildren = [
     <LayoutShell.Drawer key="drawer">drawer-content</LayoutShell.Drawer>,
     <LayoutShell.Canvas key="canvas">canvas-content</LayoutShell.Canvas>,
   ];
 
-  it("with stable children, unpinning updates the wrapper but NOT the drawer slot", () => {
+  it("with stable children, unpinning updates the wrapper AND the drawer slot", () => {
     const { container, rerender } = render(
       <LayoutShell drawerOpen drawerPinned>
         {stableChildren}
@@ -262,19 +263,28 @@ describe("LayoutShell — PIN §3: drawerPinned stale-memo", () => {
       </LayoutShell>
     );
 
-    // Wrapper class is computed outside the memo → it sees the new value.
     expect(
       container.querySelector(".layout-shell--drawer-overlay")
     ).not.toBeNull();
-
-    // PIN §3: drawerPinned stale-memo — the slots useMemo deps omit
-    // drawerPinned, so the cloned Drawer keeps overlay:false from the first
-    // render: the aside never receives layout-shell__drawer--overlay even
-    // though the shell wrapper now says overlay mode. Pinning current
-    // (inconsistent) behavior; a fix would add drawerPinned to the dep list.
     expect(drawer().classList.contains("layout-shell__drawer--overlay")).toBe(
-      false
+      true
     );
+  });
+
+  it("re-pinning goes back", () => {
+    const { container, rerender } = render(
+      <LayoutShell drawerOpen drawerPinned={false}>
+        {stableChildren}
+      </LayoutShell>
+    );
+    rerender(
+      <LayoutShell drawerOpen drawerPinned>
+        {stableChildren}
+      </LayoutShell>
+    );
+    const drawer = container.querySelector(".layout-shell__drawer")!;
+    expect(drawer.classList.contains("layout-shell__drawer--overlay")).toBe(false);
+    expect(container.querySelector(".layout-shell--drawer-overlay")).toBeNull();
   });
 
   it("with stable children, drawerOpen still propagates (it IS a memo dep)", () => {

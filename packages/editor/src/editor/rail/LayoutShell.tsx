@@ -271,7 +271,12 @@ export const LayoutShell: React.FC<LayoutShellProps> & {
     });
 
     return result;
-  }, [children, drawerOpen, inspectorOpen]);
+    /* `drawerPinned` belongs here: the Drawer clone below reads it
+       (`overlay: !drawerPinned`). Left out, a pin/unpin with referentially
+       stable children never recomputed the memo, so the drawer kept its stale
+       overlay prop while the wrapper class — computed outside the memo — flipped.
+       The two then disagreed about overlay mode. */
+  }, [children, drawerOpen, inspectorOpen, drawerPinned]);
 
   const shellClass = [
     "layout-shell",
