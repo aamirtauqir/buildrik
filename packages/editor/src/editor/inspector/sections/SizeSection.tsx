@@ -321,6 +321,10 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
           <label className="tw:min-w-[70px] tw:text-xs tw:font-medium tw:text-gray-500">Object Fit</label>
           <div className={CONTROL_SELECT_WRAP}>
           <Select
+            /* The <label> beside it names nothing: no htmlFor, no wrapping —
+               axe read this as an unnamed select (critical), and it is the one
+               control an image's inspector adds. */
+            aria-label="Object fit"
             value={styles["object-fit"] || ""}
             onChange={(e) => onChange("object-fit", e.target.value)}
             disabled={disabled("object-fit")}

@@ -330,7 +330,7 @@
 }
 .bdi-fld .bdi-u {
   font: 500 9.5px var(--bk-font-mono);
-  color: var(--bk-ink-muted);
+  color: var(--bk-ink-soft);
   padding: 0 6px 0 0;
   text-transform: lowercase;
   letter-spacing: -0.02em;
@@ -680,7 +680,7 @@
 }
 .bdi-fill .bdi-pct {
   font: 500 10px var(--bk-font-mono);
-  color: var(--bk-ink-muted);
+  color: var(--bk-ink-soft);
   min-width: 30px;
   text-align: right;
   flex-shrink: 0;
@@ -972,7 +972,7 @@ textarea.bdi-text {
 }
 .bdi-num .bdi-u {
   font: 500 9.5px var(--bk-font-mono);
-  color: var(--bk-ink-muted);
+  color: var(--bk-ink-soft);
   padding: 0 6px 0 2px;
   height: 100%;
   display: flex;

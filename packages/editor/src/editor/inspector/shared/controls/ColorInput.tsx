@@ -124,22 +124,22 @@ export const ColorInput: React.FC<ColorInputProps> = ({
           label={`${label} color tokens`}
           block
           trigger={
-            <div
-              className={`bdi-fill${isBound ? " bound" : ""}`}
-              role="button"
-              tabIndex={0}
-              aria-expanded={isOpen}
-              onClick={() => setIsOpen((v) => !v)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  setIsOpen((v) => !v);
-                }
-              }}
-            >
-              <span className="bdi-sw" aria-hidden="true">
+            /* The row is a container, not a control: it holds the hex field
+               and one or two icon buttons, and wrapping those in
+               role="button" tabIndex={0} is what axe calls nested-interactive
+               — a button whose focusable children a screen reader cannot
+               announce or reach cleanly. The SWATCH is the control that opens
+               the picker, so it carries the button. */
+            <div className={`bdi-fill${isBound ? " bound" : ""}`}>
+              <Button
+                type="button"
+                className="bdi-sw"
+                aria-label={`Choose ${label} color`}
+                aria-expanded={isOpen}
+                onClick={() => setIsOpen((v) => !v)}
+              >
                 <span className="bdi-sw-fill" style={{ background: swatchColor }} />
-              </span>
+              </Button>
 
               {isBound ? (
                 <>
