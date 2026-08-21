@@ -87,6 +87,13 @@ export function injectSeoTags(
   const tags: string[] = [];
   if (seo.canonical && !/<link[^>]+rel=["']?canonical/i.test(html)) {
     tags.push(`<link rel="canonical" href="${escapeAttr(seo.canonical)}">`);
+    /* og:url is the same fact for the share card. The editor emits og:title,
+       og:description, og:type and og:locale but cannot emit this one — it does
+       not know the domain the site will be deployed to. Without it a shared
+       link's preview has no address of its own to point at. */
+    if (!/<meta[^>]+property=["']?og:url/i.test(html)) {
+      tags.push(`<meta property="og:url" content="${escapeAttr(seo.canonical)}">`);
+    }
   }
   if (!seo.allowIndexing && !/<meta[^>]+name=["']?robots/i.test(html)) {
     tags.push(`<meta name="robots" content="noindex,nofollow">`);

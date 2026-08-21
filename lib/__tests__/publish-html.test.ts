@@ -81,6 +81,25 @@ describe("canonical, across a multi-page site", () => {
       .toBe("https://mine.example/x");
   });
 
+  it("gives the share card the page's own address too", () => {
+    // The editor emits og:title/description/type/locale but cannot emit og:url
+    // — it does not know the deploy domain.
+    const html = publishPage("about.html", page("About"), { canonicalDomain: "https://example.com" });
+    expect(html).toContain('<meta property="og:url" content="https://example.com/about.html">');
+  });
+
+  it("adds no og:url when there is no canonical to point at", () => {
+    expect(publishPage("about.html", page("About"))).not.toContain("og:url");
+  });
+
+  it("leaves an og:url the page already declares", () => {
+    const declared =
+      '<!doctype html><html><head><meta property="og:url" content="https://mine.example/x"></head><body></body></html>';
+    const out = publishPage("about.html", declared, { canonicalDomain: "https://example.com" });
+    expect(out).toContain('content="https://mine.example/x"');
+    expect(out).not.toContain('og:url" content="https://example.com');
+  });
+
   it("escapes the href rather than closing the attribute", () => {
     const html = publishPage("a\"b.html", page("X"), { canonicalDomain: "https://example.com" });
     expect(html).not.toMatch(/href="[^"]*"[^>]*"/);
