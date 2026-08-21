@@ -457,7 +457,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                     ? "Not saved — this site never loaded"
                     : "Save failed",
                 description: gone
-                  ? "It may have been deleted, so nothing can be saved to it."
+                  ? "It was deleted, or it isn't yours to open — either way nothing can be saved to it."
                   : notLoaded
                     ? "Autosave is held back so it can't overwrite the stored pages. Reload to get the real site."
                     : "Could not save to dashboard. Changes are unsaved.",

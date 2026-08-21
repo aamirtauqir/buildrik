@@ -6,12 +6,15 @@
  *
  *   auth     → the session expired; Sign in (→ dashboard) or Retry.
  *   network  → the dashboard didn't answer; Retry.
- *   missing  → the server says this site does not exist (deleted, or a stale
- *              link). "You're seeing local changes for now" is the wrong story
- *              here: there is no "for now", nothing can ever save, and Retry
- *              cannot succeed — so it is not offered. Verified live against a
- *              trashed site, where the editor showed a blank "Page 1" and
- *              invited the user to start building.
+ *   missing  → the server says this site does not exist (deleted, a stale
+ *              link, or someone else's site). "You're seeing local changes for
+ *              now" is the wrong story here: there is no "for now", nothing can
+ *              ever save, and Retry cannot succeed — so it is not offered.
+ *              Verified live against a deleted site, where the editor showed a
+ *              blank "Page 1" and invited the user to start building.
+ *              The copy does NOT offer a trash: `deleteSite` soft-deletes for a
+ *              purge cron, no route restores it, no screen lists it, and the
+ *              delete dialog itself says "This action cannot be undone".
  *
  * Retry is a full reload (re-runs the load fresh) — honest and side-effect-free.
  *
@@ -50,7 +53,7 @@ export const LoadErrorBanner: React.FC<LoadErrorBannerProps> = ({ kind, onRetry,
           </>
         ) : isMissing ? (
           <>
-            <strong className="tw:font-semibold">This site isn't there anymore.</strong> It may have been deleted. Nothing you do here can be saved — check the dashboard, or your trash.
+            <strong className="tw:font-semibold">This site isn't there anymore.</strong> It was deleted, or it isn't yours to open. Deleting is permanent — there is no trash to restore from — so nothing you do here can be saved.
           </>
         ) : (
           <>

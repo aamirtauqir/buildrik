@@ -44,6 +44,11 @@ describe("LoadErrorBanner", () => {
     renderBanner({ kind: "missing", onRetry, onSignIn });
     expect(screen.getByText(/isn't there anymore/i)).toBeInTheDocument();
     expect(screen.getByText(/nothing you do here can be saved/i)).toBeInTheDocument();
+    /* No trash is offered, because there is none: deleteSite soft-deletes for a
+       purge cron, nothing restores it, and the delete dialog says the action
+       cannot be undone. */
+    expect(screen.queryByText(/trash to restore from/i)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /restore/i })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /^retry$/i })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /go to dashboard/i }));
     expect(onSignIn).toHaveBeenCalled();

@@ -185,7 +185,7 @@ export function useSaveCallback({
           addToast({
             title: gone ? "This site isn't there anymore" : "Not saved — this site never loaded",
             description: gone
-              ? "It may have been deleted, so nothing can be saved to it. Check the dashboard, or your trash."
+              ? "It was deleted, or it isn't yours to open — either way nothing can be saved to it."
               : "Saving now would overwrite the stored pages with what's on screen. Reload to get the real site first.",
             tone: "warning",
             action: gone
