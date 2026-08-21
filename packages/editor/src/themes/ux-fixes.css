@@ -49,7 +49,7 @@
   background: var(--bk-bg-card);
   box-shadow:
     var(--bk-shadow-focus),
-    0 4px 12px rgba(45, 109, 255, 0.15);
+    0 4px 12px rgba(26, 86, 219, 0.15);
   transform: translateY(0);
   transition: all 0.2s ease;
 }
@@ -112,22 +112,22 @@ button:disabled,
 .buildrick-slider::-webkit-slider-thumb {
   box-shadow:
     0 2px 4px rgba(0, 0, 0, 0.25),
-    0 0 0 4px rgba(45, 109, 255, 0);
+    0 0 0 4px rgba(26, 86, 219, 0);
   transition: all 0.2s ease;
 }
 
 .buildrick-slider:hover::-webkit-slider-thumb {
   transform: scale(1.15);
   box-shadow:
-    0 3px 8px rgba(45, 109, 255, 0.4),
-    0 0 0 6px rgba(45, 109, 255, 0.15);
+    0 3px 8px rgba(26, 86, 219, 0.4),
+    0 0 0 6px rgba(26, 86, 219, 0.15);
 }
 
 .buildrick-slider:active::-webkit-slider-thumb {
   transform: scale(1.3);
   box-shadow:
-    0 4px 12px rgba(45, 109, 255, 0.5),
-    0 0 0 8px rgba(45, 109, 255, 0.2);
+    0 4px 12px rgba(26, 86, 219, 0.5),
+    0 0 0 8px rgba(26, 86, 219, 0.2);
 }
 
 .buildrick-slider::-moz-range-thumb {

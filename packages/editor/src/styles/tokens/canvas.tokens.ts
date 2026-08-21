@@ -12,18 +12,25 @@ import { css, keyframes } from "@emotion/react";
 
 export const canvasTokens = {
   colors: {
-    // Cobalt accent ramp — references themes/design-system/color.css canonical values
+    /* The accent ramp. `default`/`light`/`dark` follow --bk-accent (#1A56DB);
+       the alpha steps have to be literal rgba because some of them are handed
+       to a 2D context (see alpha30 below), so they carry the SAME rgb by hand:
+       26, 86, 219. They used to carry 45, 109, 255 — the retired --bd-cobalt —
+       which meant the canvas painted its selection outline in one blue and the
+       glow, grid and guides around it in another. Measured live: the grid
+       overlay drew rgba(45, 109, 255, 0.1) next to a #1A56DB outline. If the
+       accent moves again, these move with it. */
     primary: {
       default: "var(--bk-accent)",
       light: "var(--bk-accent-hover)",
       dark: "var(--bk-accent-pressed)",
-      subtle: "rgba(45, 109, 255, 0.1)",
-      alpha10: "rgba(45, 109, 255, 0.1)",
-      alpha15: "rgba(45, 109, 255, 0.15)",
-      alpha20: "rgba(45, 109, 255, 0.2)",
+      subtle: "rgba(26, 86, 219, 0.1)",
+      alpha10: "rgba(26, 86, 219, 0.1)",
+      alpha15: "rgba(26, 86, 219, 0.15)",
+      alpha20: "rgba(26, 86, 219, 0.2)",
       // alpha30 is passed to ctx.fillStyle (RulersOverlay) — must stay raw rgba
-      alpha30: "rgba(45, 109, 255, 0.3)",
-      alpha40: "rgba(45, 109, 255, 0.4)",
+      alpha30: "rgba(26, 86, 219, 0.3)",
+      alpha40: "rgba(26, 86, 219, 0.4)",
     },
 
     // Obsidian Surface Colors
@@ -74,7 +81,7 @@ export const canvasTokens = {
 
     // DevTools Box Model Colors
     devtools: {
-      content: "rgba(45, 109, 255, 0.3)",
+      content: "rgba(26, 86, 219, 0.3)",
       padding: "rgba(16, 185, 129, 0.3)",
       margin: "rgba(245, 158, 11, 0.3)",
       border: "rgba(255, 229, 153, 0.4)",
@@ -93,9 +100,9 @@ export const canvasTokens = {
   selection: {
     outline: "var(--bk-accent)",
     handleGradient: "linear-gradient(135deg, var(--bk-accent) 0%, var(--bk-accent-hover) 100%)",
-    glow: "0 0 0 3px rgba(45, 109, 255, 0.2)",
-    glowStrong: "0 0 0 4px rgba(45, 109, 255, 0.4)",
-    glowSubtle: "0 0 0 2px rgba(45, 109, 255, 0.15)",
+    glow: "0 0 0 3px rgba(26, 86, 219, 0.2)",
+    glowStrong: "0 0 0 4px rgba(26, 86, 219, 0.4)",
+    glowSubtle: "0 0 0 2px rgba(26, 86, 219, 0.15)",
   },
 
   // Shadows
@@ -104,10 +111,10 @@ export const canvasTokens = {
     md: "0 4px 12px rgba(0, 0, 0, 0.5)",
     lg: "0 8px 25px rgba(0, 0, 0, 0.6)",
     xl: "0 12px 32px rgba(0, 0, 0, 0.7)",
-    glowSm: "0 2px 8px rgba(45, 109, 255, 0.3)",
-    glowMd: "0 4px 14px rgba(45, 109, 255, 0.4)",
-    glowLg: "0 8px 25px rgba(45, 109, 255, 0.5)",
-    badge: "0 4px 12px rgba(45, 109, 255, 0.4)",
+    glowSm: "0 2px 8px rgba(26, 86, 219, 0.3)",
+    glowMd: "0 4px 14px rgba(26, 86, 219, 0.4)",
+    glowLg: "0 8px 25px rgba(26, 86, 219, 0.5)",
+    badge: "0 4px 12px rgba(26, 86, 219, 0.4)",
     panel: "var(--bk-shadow-overlay)",
     glass: "0 8px 32px 0 rgba(0, 0, 0, 0.37)",
   },
