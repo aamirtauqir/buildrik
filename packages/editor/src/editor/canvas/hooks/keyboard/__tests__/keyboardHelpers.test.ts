@@ -328,48 +328,72 @@ describe("moveElementPosition", () => {
 // reorderElement
 // ─────────────────────────────────────────────────────────────────────────────
 
-/** Element with a parent whose children list drives reorder indices. */
+/**
+ * Element with a parent whose children list drives reorder indices.
+ *
+ * `moveElement` here is not a bare spy: it REPLAYS ElementCRUD.moveElement's
+ * same-parent index rule (a slot in the pre-removal list, decremented when it
+ * sits after the element) and exposes the resulting order. Asserting the
+ * argument alone is what let ⌥↓ ship as a silent no-op — target+1 came back
+ * as target and the element never moved. Assert `order()`, not the number.
+ */
 function makeReorderFixture(selectedId: string, childIds: string[]) {
-  const children = childIds.map((id) => ({ getId: () => id }) as unknown as Element);
+  let ids = [...childIds];
+  const children = () => ids.map((id) => ({ getId: () => id }) as unknown as Element);
   const parent = {
     getId: () => "parent",
-    getChildren: () => children,
+    getChildren: children,
   } as unknown as Element;
   const element = {
     getParent: () => parent,
   } as unknown as Element;
-  const moveElement = vi.fn();
+  const moveElement = vi.fn((id: string, _parentId: string, index: number) => {
+    const oldIndex = ids.indexOf(id);
+    if (oldIndex === -1) return false;
+    let adjusted = index;
+    if (oldIndex > -1 && oldIndex < adjusted) adjusted = Math.max(0, adjusted - 1);
+    adjusted = Math.min(Math.max(adjusted, 0), ids.length - 1);
+    ids = ids.filter((x) => x !== id);
+    ids.splice(adjusted, 0, id);
+    return true;
+  });
   const composer = {
     elements: { moveElement },
     beginTransaction: vi.fn(),
     endTransaction: vi.fn(),
   } as unknown as Composer;
-  return { element, composer, moveElement };
+  return { element, composer, moveElement, order: () => ids.join(","), selectedId };
 }
 
 describe("reorderElement", () => {
-  it("moves up to index-1", () => {
-    const { element, composer, moveElement } = makeReorderFixture("b", ["a", "b", "c"]);
+  it("moves up one slot", () => {
+    const { element, composer, order } = makeReorderFixture("b", ["a", "b", "c"]);
     reorderElement(element, composer, "b", "up");
-    expect(moveElement).toHaveBeenCalledWith("b", "parent", 0);
+    expect(order()).toBe("b,a,c");
   });
 
-  it("moves down to index+1", () => {
-    const { element, composer, moveElement } = makeReorderFixture("b", ["a", "b", "c"]);
+  it("moves down one slot", () => {
+    const { element, composer, order } = makeReorderFixture("b", ["a", "b", "c"]);
     reorderElement(element, composer, "b", "down");
-    expect(moveElement).toHaveBeenCalledWith("b", "parent", 2);
+    expect(order()).toBe("a,c,b");
   });
 
-  it("moves to first (index 0)", () => {
-    const { element, composer, moveElement } = makeReorderFixture("c", ["a", "b", "c"]);
+  it("moves to first", () => {
+    const { element, composer, order } = makeReorderFixture("c", ["a", "b", "c"]);
     reorderElement(element, composer, "c", "first");
-    expect(moveElement).toHaveBeenCalledWith("c", "parent", 0);
+    expect(order()).toBe("c,a,b");
   });
 
-  it("moves to last (index length-1)", () => {
-    const { element, composer, moveElement } = makeReorderFixture("a", ["a", "b", "c"]);
+  it("moves to last — all the way, not one short", () => {
+    const { element, composer, order } = makeReorderFixture("a", ["a", "b", "c", "d"]);
     reorderElement(element, composer, "a", "last");
-    expect(moveElement).toHaveBeenCalledWith("a", "parent", 2);
+    expect(order()).toBe("b,c,d,a");
+  });
+
+  it("moving down from the middle of four lands after exactly one sibling", () => {
+    const { element, composer, order } = makeReorderFixture("b", ["a", "b", "c", "d"]);
+    reorderElement(element, composer, "b", "down");
+    expect(order()).toBe("a,c,b,d");
   });
 
   it("does nothing when moving up from the first position", () => {

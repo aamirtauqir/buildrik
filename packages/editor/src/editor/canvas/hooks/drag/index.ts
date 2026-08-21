@@ -7,12 +7,6 @@
  */
 
 export { useTouchDrag, type UseTouchDragOptions, type UseTouchDragResult } from "./useTouchDrag";
-export {
-  useKeyboardMove,
-  type UseKeyboardMoveOptions,
-  type UseKeyboardMoveResult,
-} from "./useKeyboardMove";
-
 // Drag calculation utilities (extracted from useCanvasDragDrop)
 export {
   calculateDropPositionFromCursor,

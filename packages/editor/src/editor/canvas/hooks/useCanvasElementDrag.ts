@@ -32,7 +32,7 @@ import {
   type AxisConstraint,
   type DragModifiers,
 } from "./elementDragTypes";
-import { useTouchDrag, useKeyboardMove } from "./drag";
+import { useTouchDrag } from "./drag";
 import { useElementDragAutoScroll } from "./useElementDragAutoScroll";
 import { useElementDragDomSync } from "./useElementDragDomSync";
 
@@ -79,12 +79,6 @@ export function useCanvasElementDrag({
     showGuides,
     onDraggingChange,
     onSnapLinesChange,
-  });
-
-  // Keyboard movement handling via dedicated hook
-  useKeyboardMove({
-    composer,
-    rootIdRef,
   });
 
   // Drag modifiers state (Alt, Shift, Ctrl)

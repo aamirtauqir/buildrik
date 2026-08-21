@@ -31,7 +31,6 @@ vi.mock("../drag", () => ({
       onTouchCancel: vi.fn(),
     },
   }),
-  useKeyboardMove: () => ({ stepConfig: {} }),
 }));
 
 vi.mock("../useElementDragAutoScroll", () => ({

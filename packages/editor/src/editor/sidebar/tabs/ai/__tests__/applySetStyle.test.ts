@@ -382,27 +382,49 @@ describe("applyDeleteElement / applyDuplicateElement", () => {
 });
 
 describe("applyMoveElement", () => {
+  /* moveElement REPLAYS ElementCRUD's same-parent index rule (a slot in the
+     pre-removal list, decremented when it sits after the element) and exposes
+     the resulting order. Asserting the argument alone is what let "move down"
+     ship as a silent no-op: idx + 1 came back as idx. Assert order(). */
   function makeMoveComposer(elementId: string, siblingIds: string[]) {
-    const moveElement = vi.fn(() => true);
-    const siblings = siblingIds.map((id) => ({ getId: () => id }));
-    const parent = { getId: () => "parent", getChildren: () => siblings };
+    let ids = [...siblingIds];
+    const moveElement = vi.fn((id: string, _parentId: string, index: number) => {
+      const oldIndex = ids.indexOf(id);
+      if (oldIndex === -1) return false;
+      let adjusted = index;
+      if (oldIndex < adjusted) adjusted = Math.max(0, adjusted - 1);
+      adjusted = Math.min(Math.max(adjusted, 0), ids.length - 1);
+      ids = ids.filter((x) => x !== id);
+      ids.splice(adjusted, 0, id);
+      return true;
+    });
+    const parent = {
+      getId: () => "parent",
+      getChildren: () => ids.map((id) => ({ getId: () => id })),
+    };
     const el = { getParent: () => parent };
     const composer = {
       elements: { getElement: vi.fn(() => el), moveElement },
     } as unknown as Composer;
-    return { composer, moveElement };
+    return { composer, moveElement, order: () => ids.join(","), elementId };
   }
 
-  it("moves up to the previous index", () => {
-    const { composer, moveElement } = makeMoveComposer("b", ["a", "b", "c"]);
+  it("moves up one slot", () => {
+    const { composer, order } = makeMoveComposer("b", ["a", "b", "c"]);
     applyMoveElement(composer, { elementId: "b", direction: "up" });
-    expect(moveElement).toHaveBeenCalledWith("b", "parent", 0);
+    expect(order()).toBe("b,a,c");
   });
 
-  it("moves down to the next index", () => {
-    const { composer, moveElement } = makeMoveComposer("b", ["a", "b", "c"]);
+  it("moves down one slot", () => {
+    const { composer, order } = makeMoveComposer("b", ["a", "b", "c"]);
     applyMoveElement(composer, { elementId: "b", direction: "down" });
-    expect(moveElement).toHaveBeenCalledWith("b", "parent", 2);
+    expect(order()).toBe("a,c,b");
+  });
+
+  it("is a no-op at the bottom edge (down from the last index)", () => {
+    const { composer, moveElement } = makeMoveComposer("c", ["a", "b", "c"]);
+    applyMoveElement(composer, { elementId: "c", direction: "down" });
+    expect(moveElement).not.toHaveBeenCalled();
   });
 
   it("is a no-op at the top edge (up from index 0)", () => {

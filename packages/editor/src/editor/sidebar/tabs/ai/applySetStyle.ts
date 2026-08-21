@@ -301,8 +301,13 @@ export function applyMoveElement(composer: Composer, args: MoveElementArgs): voi
   const idx = siblings.findIndex((c) => c.getId() === args.elementId);
   if (idx < 0) throw new Error(`move-element: not a child (${args.elementId})`);
 
-  const target = args.direction === "up" ? idx - 1 : idx + 1;
-  if (target < 0 || target >= siblings.length) return; // already at the edge — no-op
+  if (args.direction === "up" ? idx === 0 : idx === siblings.length - 1) return; // at the edge
+  /* `moveElement`'s index is a slot in the sibling list BEFORE the element is
+     pulled out of it, and a same-parent move decrements any slot that sits
+     after the element (ElementCRUD.moveElement). Down therefore has to ask for
+     idx + 2; asking for idx + 1 came straight back as idx and the element
+     never moved — "move it down" reported success and did nothing. */
+  const target = args.direction === "up" ? idx - 1 : idx + 2;
   if (!composer.elements.moveElement(args.elementId, parent.getId(), target)) {
     throw new Error(`move-element: move failed (${args.elementId})`);
   }

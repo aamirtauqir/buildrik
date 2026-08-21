@@ -32,11 +32,8 @@ export {
 // Element drag sub-hooks
 export {
   useTouchDrag,
-  useKeyboardMove,
   type UseTouchDragOptions,
   type UseTouchDragResult,
-  type UseKeyboardMoveOptions,
-  type UseKeyboardMoveResult,
 } from "./drag";
 export {
   useCanvasInlineEdit,

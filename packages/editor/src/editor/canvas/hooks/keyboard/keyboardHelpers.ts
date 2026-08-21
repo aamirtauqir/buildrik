@@ -141,6 +141,15 @@ export function reorderElement(
   const currentIndex = siblings.findIndex((s) => s.getId() === selectedId);
   if (currentIndex === -1) return;
 
+  /* `moveElement`'s index is a slot in the sibling list AS IT IS NOW, before
+     the element is pulled out of it — the drop-indicator position, not the
+     final array index. When the move stays inside the same parent it
+     decrements any slot that sits after the element (ElementCRUD.moveElement).
+     So the final index the caller wants has to be expressed one slot later
+     when moving down. Passing the final index instead made ⌥↓ a silent no-op
+     (target+1 came straight back to target) and left ⌥End one short of last —
+     both measured live before this was written. `moveToBottom` in
+     useLayerActions already speaks this dialect (it passes getChildCount()). */
   let newIndex: number | null = null;
 
   switch (direction) {
@@ -148,13 +157,13 @@ export function reorderElement(
       if (currentIndex > 0) newIndex = currentIndex - 1;
       break;
     case "down":
-      if (currentIndex < siblings.length - 1) newIndex = currentIndex + 1;
+      if (currentIndex < siblings.length - 1) newIndex = currentIndex + 2;
       break;
     case "first":
       if (currentIndex > 0) newIndex = 0;
       break;
     case "last":
-      if (currentIndex < siblings.length - 1) newIndex = siblings.length - 1;
+      if (currentIndex < siblings.length - 1) newIndex = siblings.length;
       break;
   }
 

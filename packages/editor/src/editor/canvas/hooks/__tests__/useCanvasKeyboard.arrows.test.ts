@@ -1,13 +1,16 @@
 /**
- * useCanvasKeyboard — arrow-key branches + KNOWN dual arrow-handler pin (§1).
+ * useCanvasKeyboard — arrow-key branches, and the single-owner rule for them.
  *
- * §1 pin: TWO independent arrow handlers exist in the canvas stack —
- *   1. useCanvasKeyboard (React handler on the canvas): plain arrows navigate
- *      selection, Ctrl = 1px position move, Shift = 10px, Alt = reorder.
- *   2. useKeyboardMove (window-level listener mounted by useCanvasElementDrag):
- *      plain arrows REORDER the selected element among siblings / re-parent.
- * A single physical keystroke on a focused canvas can hit both. This file
- * pins that both fire with their divergent semantics (KNOWN, not fixed here).
+ * There used to be a second arrow handler: `useKeyboardMove`, a window-level
+ * listener mounted by useCanvasElementDrag, on which plain arrows REORDERED
+ * the selected element among its siblings and re-parented it. This file
+ * pinned that as KNOWN. It is now deleted — measured live at 1440x900 with an
+ * element selected and focus outside the canvas (the ordinary state after a
+ * click anywhere in the chrome): a bare ArrowUp moved a heading up a slot and
+ * a bare ArrowLeft lifted it out of its container into the page root, with no
+ * shortcut printed anywhere that says so. `useCanvasKeyboard` is the only
+ * arrow owner now: plain arrows navigate selection, ⌘ = 1px move, ⇧ = 10px,
+ * ⌥ = reorder — which is what the cheat sheet prints.
  *
  * @license BSD-3-Clause
  */
@@ -15,7 +18,6 @@ import { renderHook, act } from "@testing-library/react";
 import type * as React from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import type { Composer } from "../../../../engine/Composer";
-import { useKeyboardMove } from "../drag/useKeyboardMove";
 import { useCanvasKeyboard } from "../useCanvasKeyboard";
 
 const helperMocks = vi.hoisted(() => ({
@@ -162,78 +164,5 @@ describe("useCanvasKeyboard — arrow navigation and movement", () => {
     );
     act(() => result.current.handleKeyDown(key("ArrowUp")));
     expect(select).not.toHaveBeenCalled();
-  });
-});
-
-describe("KNOWN §1 — dual arrow handlers (useCanvasKeyboard + useKeyboardMove)", () => {
-  afterEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it("window-level useKeyboardMove ALSO consumes plain ArrowUp and reorders the selection", () => {
-    // Same conceptual keystroke handled by a second, independent listener
-    // with different semantics (reorder vs navigate). Pinned as KNOWN.
-    const siblings = [{ getId: () => "el-0" }, { getId: () => "el-1" }];
-    const parent = { getId: () => "parent-1", getChildren: () => siblings, getParent: () => null };
-    const selected = {
-      getId: () => "el-1",
-      getType: () => "text",
-      getParent: () => parent,
-    };
-    const moveComposer = {
-      selection: {
-        getSelected: vi.fn(() => selected),
-        reselect: vi.fn(),
-      },
-      elements: { moveElement: vi.fn() },
-      beginTransaction: vi.fn(),
-      endTransaction: vi.fn(),
-      rollbackTransaction: vi.fn(),
-    } as unknown as Composer;
-
-    renderHook(() => useKeyboardMove({ composer: moveComposer, rootIdRef: { current: "root-1" } }));
-
-    act(() => {
-      window.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true }));
-    });
-
-    // useKeyboardMove reorders el-1 from index 1 → 0 within the same parent —
-    // while useCanvasKeyboard would have navigated selection for the same key.
-    expect(
-      (moveComposer.elements as unknown as { moveElement: ReturnType<typeof vi.fn> }).moveElement
-    ).toHaveBeenCalledWith("el-1", "parent-1", 0);
-    expect(
-      (moveComposer.selection as unknown as { reselect: ReturnType<typeof vi.fn> }).reselect
-    ).toHaveBeenCalled();
-  });
-
-  it("useKeyboardMove stays inert while a form control or contentEditable owns focus", () => {
-    const selected = {
-      getId: () => "el-1",
-      getType: () => "text",
-      getParent: () => ({ getId: () => "p", getChildren: () => [], getParent: () => null }),
-    };
-    const moveComposer = {
-      selection: { getSelected: vi.fn(() => selected), reselect: vi.fn() },
-      elements: { moveElement: vi.fn() },
-      beginTransaction: vi.fn(),
-      endTransaction: vi.fn(),
-      rollbackTransaction: vi.fn(),
-    } as unknown as Composer;
-
-    const input = document.createElement("input");
-    document.body.appendChild(input);
-    input.focus();
-
-    renderHook(() => useKeyboardMove({ composer: moveComposer, rootIdRef: { current: "root-1" } }));
-
-    act(() => {
-      window.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true }));
-    });
-
-    expect(
-      (moveComposer as unknown as { beginTransaction: ReturnType<typeof vi.fn> }).beginTransaction
-    ).not.toHaveBeenCalled();
-    input.remove();
   });
 });
