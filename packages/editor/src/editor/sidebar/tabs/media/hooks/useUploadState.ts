@@ -11,7 +11,7 @@ import { MEDIA_EVENTS, STORAGE_QUOTA_BYTES } from "../../../../../shared/constan
 import type { UploadProgress } from "../../../../../shared/types/media";
 import type { FailedUpload, UploadStateResult } from "../data/mediaTypes";
 
-type ShowToast = (msg: string, type: "success" | "error" | "info") => void;
+type ShowToast = (msg: string, type: "success" | "error" | "info" | "warning") => void;
 
 interface ServerQuota {
   usedBytes: number;

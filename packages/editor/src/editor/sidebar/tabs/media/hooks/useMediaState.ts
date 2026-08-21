@@ -21,7 +21,7 @@ export function useMediaState(composer: Composer): MediaStateResult {
   const { addToast } = useToast();
 
   const showToast = useCallback(
-    (msg: string, type: "success" | "error" | "info") => {
+    (msg: string, type: "success" | "error" | "info" | "warning") => {
       addToast({ description: msg, tone: type });
     },
     [addToast]
@@ -171,7 +171,9 @@ export function useMediaState(composer: Composer): MediaStateResult {
 
   const insertToCanvas = useCallback(
     async (key: string) => {
-      let asset: { src: string; type: string; name: string } | undefined = composer.media.getAsset(key);
+      let asset:
+        | { src: string; type: string; name: string; localOnly?: boolean }
+        | undefined = composer.media.getAsset(key);
       let isStock = false;
 
       // If not in library, check discovery stubs (icons/fonts)
@@ -244,6 +246,17 @@ export function useMediaState(composer: Composer): MediaStateResult {
             if (insertedEl) composer.selection.select(insertedEl);
             if (result.kind === "font-applied") {
               showToast(`Font "${asset.name}" applied to selection ✓`, "success");
+            } else if (asset.localOnly) {
+              /* The upload never reached the server, so this asset's src is a
+                 session Object URL. The sanitizer drops that scheme on the way
+                 into the document and the URL is revoked besides — measured
+                 2026-08-19 — so the element mounts with no src and the page
+                 shows nothing. Saying "added ✓" over that is the lie; the
+                 element IS added, and it will not render or publish. */
+              showToast(
+                `${asset.name} is only on this device — it won't show on the page or publish. Re-upload when you're back online.`,
+                "warning",
+              );
             } else {
               showToast(`${asset.name} added to page ✓`, "success");
             }

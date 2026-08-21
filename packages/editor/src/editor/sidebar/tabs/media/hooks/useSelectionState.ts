@@ -8,7 +8,7 @@ import { useCallback, useState } from "react";
 import type { Composer } from "../../../../../engine/Composer";
 import type { ConfirmDeletePayload, LibraryItem, SelectionStateResult } from "../data/mediaTypes";
 
-type ShowToast = (msg: string, type: "success" | "error" | "info") => void;
+type ShowToast = (msg: string, type: "success" | "error" | "info" | "warning") => void;
 
 export function useSelectionState(
   composer: Composer,

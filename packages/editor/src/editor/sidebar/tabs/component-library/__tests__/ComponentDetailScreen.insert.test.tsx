@@ -81,7 +81,12 @@ describe("ComponentDetailScreen — Insert", () => {
       </ToastProvider>,
     );
     fireEvent.click(screen.getByRole("button", { name: /insert/i }));
-    await waitFor(() => expect(composer.components.instantiateComponent).toHaveBeenCalled());
+    await waitFor(() =>
+      expect(
+        (composer as unknown as { components: { instantiateComponent: unknown } }).components
+          .instantiateComponent,
+      ).toHaveBeenCalled(),
+    );
     expect(toastText()).toBe("");
   });
 });
