@@ -221,7 +221,17 @@ export function useMediaState(composer: Composer): MediaStateResult {
             asset.src
           );
           if (result) {
-            showToast(`${asset.name} applied ✓`, "success");
+            /* Replacing an element's media has the same trap as inserting one:
+               a device-only asset's src is a session Object URL the sanitizer
+               strips, so the element ends up with nothing. */
+            if (asset.localOnly) {
+              showToast(
+                `${asset.name} is only on this device — it won't show on the page or publish. Re-upload when you're back online.`,
+                "warning",
+              );
+            } else {
+              showToast(`${asset.name} applied ✓`, "success");
+            }
             composer.emit("ui:switch-tab", { tab: "add" });
             setSelectionContext(null);
           }

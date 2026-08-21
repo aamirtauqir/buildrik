@@ -102,6 +102,32 @@ describe("insertToCanvas — a local-only asset", () => {
     expect(last.description).not.toContain("added to page ✓");
   });
 
+  it("says the same thing when REPLACING a selected element's media", async () => {
+    toasts.length = 0;
+    const composer = composerWith({ src: "blob:http://x/1", type: "img", name: "shot.png", localOnly: true });
+    (composer as unknown as { mediaOps: Record<string, unknown> }).mediaOps.replaceMedia = vi.fn(() => true);
+    const { result } = renderHook(() => useMediaState(composer as never));
+
+    /* The hook exposes the setter (MediaTab uses it to cancel selection); the
+       replace branch only runs when a selection context is set, so assert we
+       actually got there rather than falling through to the insert path. */
+    act(() => {
+      result.current.setSelectionContext({ elementId: "el-1" });
+    });
+    expect(result.current.selectionContext).toEqual({ elementId: "el-1" });
+    await act(async () => {
+      await result.current.insertToCanvas("a1");
+    });
+
+    expect(
+      (composer as unknown as { mediaOps: { replaceMedia: ReturnType<typeof vi.fn> } }).mediaOps
+        .replaceMedia,
+    ).toHaveBeenCalled();
+    const last = toasts[toasts.length - 1];
+    expect(last.tone).toBe("warning");
+    expect(last.description).toContain("only on this device");
+  });
+
   it("still says added for an asset that reached the server", async () => {
     toasts.length = 0;
     const composer = composerWith({ src: "https://cdn/1.png", type: "img", name: "shot.png" });
