@@ -435,3 +435,62 @@ describe("CommandPalette — the keyboard highlight is announced", () => {
     for (const o of options) expect(o.closest("[role=listbox]")).not.toBeNull();
   });
 });
+
+/**
+ * Registry commands used to arrive with no conditions at all. Walked the
+ * palette command by command against the running editor: Group with one element
+ * selected, Ungroup on a non-container, and the nudges and reorders with
+ * nothing selected each looked available, ran, and did nothing.
+ */
+describe("CommandPalette — registry commands say when they cannot run", () => {
+  /* The palette's own composer stub has no registry, so these build one: the
+     four ids the guard covers, shaped the way CommandCenter.getAll() returns
+     them. */
+  const REGISTRY = [
+    { id: "group", label: "Group", shortcut: "ctrl+g" },
+    { id: "ungroup", label: "Ungroup", shortcut: "ctrl+shift+g" },
+    { id: "nudge-up", label: "Nudge Up" },
+    { id: "bring-forward", label: "Bring Forward" },
+    { id: "send-to-back", label: "Send to Back" },
+  ];
+
+  const withSelection = (ids: string[], type = "heading") =>
+    ({
+      emit: vi.fn(),
+      history: { undo: vi.fn(), redo: vi.fn(), canUndo: () => true, canRedo: () => true },
+      elements: { removeElement: vi.fn() },
+      commands: { getAll: () => REGISTRY, run: vi.fn() },
+      selection: {
+        getSelectedIds: () => ids,
+        getSelected: () => (ids.length ? { getType: () => type } : null),
+      },
+    }) as unknown as ReturnType<typeof makeComposer>;
+
+  const rowFor = (label: RegExp) => screen.getByRole("option", { name: label });
+
+  it("disables Group until two things are selected, with the reason on screen", () => {
+    renderPalette(withSelection(["a"]));
+    expect(rowFor(/Group/)).toHaveAttribute("aria-disabled", "true");
+    expect(screen.getByText("select two or more")).toBeInTheDocument();
+
+    cleanup();
+    renderPalette(withSelection(["a", "b"]));
+    expect(rowFor(/^Group/)).not.toHaveAttribute("aria-disabled");
+  });
+
+  it("disables Ungroup unless the selection is a container", () => {
+    renderPalette(withSelection(["a"], "heading"));
+    expect(rowFor(/Ungroup/)).toHaveAttribute("aria-disabled", "true");
+
+    cleanup();
+    renderPalette(withSelection(["a"], "container"));
+    expect(rowFor(/Ungroup/)).not.toHaveAttribute("aria-disabled");
+  });
+
+  it("disables the nudges and reorders with nothing selected", () => {
+    renderPalette(withSelection([]));
+    for (const label of [/Nudge Up/, /Bring Forward/, /Send to Back/]) {
+      expect(rowFor(label)).toHaveAttribute("aria-disabled", "true");
+    }
+  });
+});

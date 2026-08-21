@@ -176,15 +176,43 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
   // hardcoded commands above keep their exact behavior.
   const registry = composer.commands?.getAll?.() ?? [];
   const seenLabels = new Set(commands.map((c) => c.label.toLowerCase()));
+  const selectedCount = composer.selection?.getSelectedIds?.().length ?? 0;
+  const selectedType = composer.selection?.getSelected?.()?.getType?.();
+  /* Registry commands that quietly return when the selection is wrong. Walked
+     the palette command by command: Group with one element selected, Ungroup
+     with a non-container, and every nudge/reorder with nothing selected all
+     looked perfectly available, ran, and did nothing. The engine cannot carry
+     this — its command list is built once at startup, while the selection
+     changes under it — so the reason is computed here, where the list is built
+     each time the palette opens. Same treatment Undo and Delete already got. */
+  const registryGuard = (id: string): string | undefined => {
+    if (id === "group") return selectedCount < 2 ? "select two or more" : undefined;
+    if (id === "ungroup") return selectedType !== "container" ? "select a group" : undefined;
+    if (
+      id === "duplicate" ||
+      id === "cut" ||
+      id.startsWith("nudge-") ||
+      id === "bring-forward" ||
+      id === "send-backward" ||
+      id === "bring-to-front" ||
+      id === "send-to-back"
+    ) {
+      return selectedCount === 0 ? "nothing selected" : undefined;
+    }
+    return undefined;
+  };
   for (const cmd of registry) {
     const label = cmd.label ?? cmd.id;
     if (seenLabels.has(label.toLowerCase())) continue;
     seenLabels.add(label.toLowerCase());
+    const reason = registryGuard(cmd.id);
     commands.push({
       id: `cmd-${cmd.id}`,
       label,
       group: "Commands",
       shortcut: cmd.shortcut,
+      disabled: reason !== undefined,
+      disabledReason: reason,
       handler: () => { composer.commands.run(cmd.id); onClose(); },
     });
   }
