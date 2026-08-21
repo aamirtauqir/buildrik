@@ -17,6 +17,21 @@ export interface CMSExportOptions {
 /**
  * Resolves CMS bindings in HTML for export
  */
+/**
+ * Give back what we were given: a full document round-trips as a full document.
+ *
+ * Both resolvers returned `doc.body.innerHTML`, which was survivable while
+ * nothing called them and fatal the moment resolution became the default — a
+ * whole page went in and came back as a bare <div>, with the title, the
+ * stylesheet, the SEO tags and the analytics gone.
+ */
+function serialize(doc: Document, original: string): string {
+  const wasDocument = /<html[\s>]/i.test(original) || /<!doctype/i.test(original);
+  if (!wasDocument) return doc.body.innerHTML;
+  const doctype = /<!doctype[^>]*>/i.exec(original)?.[0] ?? "<!DOCTYPE html>";
+  return `${doctype}\n${doc.documentElement.outerHTML}`;
+}
+
 export class CMSExportResolver {
   private composer: Composer;
 
@@ -47,7 +62,13 @@ export class CMSExportResolver {
    * Resolve with actual CMS content values (static mode)
    */
   private async resolveStatic(html: string): Promise<string> {
-    if (!this.composer.cms.bindings) return html;
+    /* Optional all the way down. Now that resolution is the DEFAULT rather than
+       an opt-in flag, every export runs through here — including composers
+       built without a CMS manager at all, where `composer.cms.bindings` threw
+       and the export returned `success: false` with no page at all. A site
+       without bindings must come out exactly as it did before. */
+    if (!this.composer.cms?.bindings) return html;
+    if (typeof DOMParser === "undefined") return html;
 
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
@@ -70,21 +91,24 @@ export class CMSExportResolver {
 
     await Promise.all(promises);
 
-    // Clean up builder-specific attributes for production
+    /* Editor-only state goes; the ID STAYS. `data-buildrick-id` is what the
+       StyleEngine's breakpoint rules target (`@media { [data-buildrick-id] }`)
+       — stripping it leaves a deployed site unstyled at every breakpoint,
+       which is a bug this export has already had once (ExportEngine:997). */
     elements.forEach((el) => {
-      el.removeAttribute("data-buildrick-id");
       el.removeAttribute("data-buildrick-selected");
       el.removeAttribute("data-cms-bound");
     });
 
-    return doc.body.innerHTML;
+    return serialize(doc, html);
   }
 
   /**
    * Convert to template syntax (template mode)
    */
   private resolveTemplate(html: string, syntax: TemplateSyntax): string {
-    if (!this.composer.cms.bindings) return html;
+    if (!this.composer.cms?.bindings) return html;
+    if (typeof DOMParser === "undefined") return html;
 
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
@@ -107,15 +131,15 @@ export class CMSExportResolver {
       }
     });
 
-    // Clean up builder-specific attributes for production
+    /* Same rule as the static path: editor state goes, the ID stays — the
+       breakpoint CSS selects on it. */
     doc.querySelectorAll("[data-buildrick-id]").forEach((el) => {
-      el.removeAttribute("data-buildrick-id");
       el.removeAttribute("data-buildrick-selected");
       el.removeAttribute("data-cms-bound");
       el.removeAttribute("data-cms-repeater-template");
     });
 
-    return doc.body.innerHTML;
+    return serialize(doc, html);
   }
 
   /**

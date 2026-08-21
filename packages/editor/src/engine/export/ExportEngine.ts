@@ -178,7 +178,14 @@ export class ExportEngine {
         return reactExporter.export();
       }
 
-      const html = this.generateHTML(exportConfig);
+      /* The single file resolves bindings too. It did not, so the two exports
+         disagreed on the one thing a CMS is for: the downloaded file showed
+         placeholder copy where the published page (after the same fix) shows
+         the entry. Same resolver, same mode. */
+      const html = await this.cmsResolver.resolve(
+        this.generateHTML(exportConfig),
+        { mode: "static" },
+      );
       const css = this.generateCSS(exportConfig);
       const stats = this.calculateStats(html, css);
 
@@ -681,9 +688,14 @@ export class ExportEngine {
     const publishKeyframes = collectUsedKeyframes(css);
     if (publishKeyframes) css += (options.minify ? "" : "\n") + publishKeyframes;
 
-    // CMS export options
+    /* CMS export options. The default was "none", and nothing set it: publish
+       calls exportAllPages({format,minify}) and the ZIP path does the same, so
+       an element bound to a collection shipped whatever static text sat in the
+       tree while the canvas beside it showed the real entry. "static" embeds
+       the values — the only mode a static deploy can honour — and is a no-op
+       for a site with no bindings. */
     const cmsOptions: CMSExportOptions = {
-      mode: options.cmsMode || "none",
+      mode: options.cmsMode ?? "static",
       syntax: options.cmsSyntax,
     };
 
