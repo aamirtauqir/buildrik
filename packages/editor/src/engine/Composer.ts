@@ -7,6 +7,7 @@
  */
 
 import { emailService } from "../services/EmailService";
+import { MEDIA_EVENTS } from "../shared/constants/media";
 import { EVENTS, THRESHOLDS } from "../shared/constants";
 import type {
   ComposerConfig,
@@ -363,8 +364,38 @@ export class Composer extends EventEmitter {
   /**
    * Initialize the composer
    */
+  /** Old → new object URLs for locally-stored media, from this session's rebuild. */
+  private localMediaUrlRemap: Record<string, string> = {};
+
+  /** Point any element carrying a dead local media URL at its live one. */
+  private repairLocalMediaUrls(): void {
+    if (Object.keys(this.localMediaUrlRemap).length === 0) return;
+    for (const element of this.elements.getAllElements()) {
+      const src = element.getAttributes().src;
+      const next = src ? this.localMediaUrlRemap[src] : undefined;
+      if (next) element.setAttribute("src", next);
+    }
+  }
+
   private async initialize(): Promise<void> {
     this.emit(EVENTS.COMPOSER_READY); // initializing phase
+
+    /* Repair pages that point at a local asset's PREVIOUS object URL. The media
+       library re-creates those on every load (blob: URLs die with the window)
+       and until now healed only itself: measured live, after a reload the
+       library held a fresh URL while the placed <img> still carried the dead
+       one.
+
+       Applied twice on purpose. The library rebuilds during media.init(), when
+       no page has loaded yet, and the project arrives afterwards carrying the
+       stale value — so the map is kept and replayed when it does. */
+    this.media.on(MEDIA_EVENTS.LOCAL_URLS_REBUILT, (payload: unknown) => {
+      const remapped = (payload as { remapped?: Record<string, string> })?.remapped;
+      if (!remapped) return;
+      Object.assign(this.localMediaUrlRemap, remapped);
+      this.repairLocalMediaUrls();
+    });
+    this.on(EVENTS.PROJECT_LOADED, () => this.repairLocalMediaUrls());
 
     // Initialize async managers
     await this.media.init();

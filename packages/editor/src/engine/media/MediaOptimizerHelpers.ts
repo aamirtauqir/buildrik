@@ -53,11 +53,30 @@ export function loadImage(src: string): Promise<HTMLImageElement> {
 }
 
 /**
- * Convert data URL to Blob
+ * Convert data URL to Blob.
+ *
+ * Decoded here rather than through `fetch(dataUrl)`. A data: URL is bytes the
+ * page already holds, but fetching one is still a network request as far as the
+ * browser is concerned, so the dashboard's CSP refused it — "Fetch API cannot
+ * load data:image/webp", observed live — and image optimization failed with
+ * nothing on screen to say why. Decoding needs no permission from anybody.
  */
 export async function dataUrlToBlob(dataUrl: string): Promise<Blob> {
-  const response = await fetch(dataUrl);
-  return response.blob();
+  const comma = dataUrl.indexOf(",");
+  if (!dataUrl.startsWith("data:") || comma === -1) {
+    throw new Error("Not a data URL");
+  }
+  const meta = dataUrl.slice(5, comma);
+  const body = dataUrl.slice(comma + 1);
+  const mimeType = meta.split(";")[0] || "application/octet-stream";
+
+  if (!meta.includes("base64")) {
+    return new Blob([decodeURIComponent(body)], { type: mimeType });
+  }
+  const binary = atob(body);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return new Blob([bytes], { type: mimeType });
 }
 
 /**

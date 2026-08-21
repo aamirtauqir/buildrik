@@ -99,6 +99,11 @@ export const MEDIA_EVENTS = {
   INIT_FAILED: "media:init-failed",
   /** Emitted when a media asset is added */
   MEDIA_ADDED: "media:added",
+  /* A new session rebuilt the object URLs for locally-stored assets. blob: URLs
+     die with the window that made them, so the library re-creates them on
+     load — and anything already placed on a page still points at the dead one.
+     The payload maps old src → new src so those can be repaired. */
+  LOCAL_URLS_REBUILT: "media:local-urls-rebuilt",
   /** Emitted when a media asset is updated */
   MEDIA_UPDATED: "media:updated",
   /** Emitted when a media asset is deleted */

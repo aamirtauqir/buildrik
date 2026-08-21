@@ -73,14 +73,14 @@ describe("dataUrlToBlob", () => {
     expect(await blob.text()).toBe("hello");
   });
 
-  it("propagates fetch failures", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi.fn(() => Promise.reject(new Error("network down"))),
-    );
-    await expect(dataUrlToBlob("data:text/plain;base64,aGVsbG8=")).rejects.toThrow(
-      "network down",
-    );
+  /* This asserted that a fetch failure propagates — a contract that only
+     existed because the function fetched the data URL, which the dashboard's
+     CSP refused ("Fetch API cannot load data:image/webp", seen live). It
+     decodes now, so there is no network to fail; what CAN go wrong is being
+     handed something that is not a data URL. */
+  it("rejects input that is not a data URL", async () => {
+    await expect(dataUrlToBlob("https://cdn.example/x.png")).rejects.toThrow("Not a data URL");
+    await expect(dataUrlToBlob("data:image/png;base64")).rejects.toThrow("Not a data URL");
   });
 });
 
@@ -149,5 +149,35 @@ describe("getCompressionSavings", () => {
   it("guards division by zero: originalSize <= 0 → '0%'", () => {
     expect(getCompressionSavings(0, 100)).toBe("0%");
     expect(getCompressionSavings(-10, 100)).toBe("0%");
+  });
+});
+
+/**
+ * `dataUrlToBlob` used to call `fetch(dataUrl)`. A data: URL is bytes the page
+ * already holds, but fetching one is a network request as far as the browser is
+ * concerned, and the dashboard's CSP refused it — "Fetch API cannot load
+ * data:image/webp", seen live — so image optimization failed silently.
+ */
+describe("dataUrlToBlob decodes without asking the network", () => {
+  const PNG_1x1 =
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==";
+
+  it("returns the bytes with the right type, and never calls fetch", async () => {
+    const spy = vi.spyOn(globalThis, "fetch");
+    const blob = await dataUrlToBlob(PNG_1x1);
+    expect(blob.type).toBe("image/png");
+    expect(blob.size).toBeGreaterThan(60);
+    expect(spy).not.toHaveBeenCalled();
+    spy.mockRestore();
+  });
+
+  it("handles a plain (non-base64) data URL", async () => {
+    const blob = await dataUrlToBlob("data:text/plain,hello%20there");
+    expect(blob.type).toBe("text/plain");
+    expect(await blob.text()).toBe("hello there");
+  });
+
+  it("refuses something that is not a data URL", async () => {
+    await expect(dataUrlToBlob("https://cdn.example/x.png")).rejects.toThrow("Not a data URL");
   });
 });

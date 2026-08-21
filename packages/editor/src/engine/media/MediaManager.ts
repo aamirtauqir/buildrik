@@ -676,6 +676,7 @@ export class MediaManager extends MediaEventEmitter {
     // Rebuild blob URLs — stored src values are stale blob URLs from previous
     // sessions (blob: URLs are tied to the Window object and die on reload).
     // Without this, ImageEditorModal and any consumer of asset.src sees dead URLs.
+    const remapped: Record<string, string> = {};
     await Promise.all(
       assets.map(async (asset) => {
         if (asset.src.startsWith("http") || asset.src.startsWith("data:")) {
@@ -686,6 +687,10 @@ export class MediaManager extends MediaEventEmitter {
           if (blob) {
             const url = URL.createObjectURL(blob);
             this.blobUrlMap.set(asset.id, url);
+            /* Anything already placed on a page still carries the DEAD url —
+               the library healed itself and left the canvas broken. Report the
+               swap so the elements can be repaired too. */
+            if (asset.src !== url) remapped[asset.src] = url;
             asset.src = url;
           }
         } catch {
@@ -696,6 +701,10 @@ export class MediaManager extends MediaEventEmitter {
 
     this.state.assets = assets;
     this.state.folders = folders;
+
+    if (Object.keys(remapped).length > 0) {
+      this.emit(MEDIA_EVENTS.LOCAL_URLS_REBUILT, { remapped });
+    }
   }
 
   private createInitialState(): MediaLibraryState {
