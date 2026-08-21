@@ -269,6 +269,16 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
               Require password to view published site
             </span>
           </div>
+          {/* The password is enforced by Vercel deployment protection, and the
+              publish worker is the only thing that pushes it
+              (`publish.service.ts` — "Reconcile published-site password
+              protection on the live URL"). Saving here changes the stored
+              value and nothing on the live site, so a site switched ON stays
+              open to anyone with the URL until the next publish. The toggle
+              said none of that. */}
+          <p className="mt-2 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
+            Applied when you next publish — the live site keeps its current access until then.
+          </p>
           {passwordEnabled && (
             <div className="mt-3">
               <InputField
