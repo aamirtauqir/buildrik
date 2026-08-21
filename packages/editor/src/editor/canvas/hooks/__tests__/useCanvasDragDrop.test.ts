@@ -571,6 +571,35 @@ describe("useCanvasDragDrop — handleDrop", () => {
     expect(targetEl.setAttribute).toHaveBeenCalledWith("src", "blob:uploaded.png");
   });
 
+  it("an OS-file drop whose upload stayed local says so too", async () => {
+    const targetEl = { setAttribute: vi.fn() } as never;
+    const composer = makeStubComposer();
+    composer.elements.getElement = vi.fn(() => targetEl);
+    composer.media.uploadFile = vi.fn().mockResolvedValue({
+      success: true,
+      asset: { src: "blob:uploaded.png", localOnly: true },
+    });
+
+    const { result, onDropError, onDropSuccess } = renderDragDrop({ composer });
+    const file = new File(["x"], "img.png", { type: "image/png" });
+
+    await act(async () => {
+      await result.current.handleDrop(makeDragEvent({}, [file]));
+    });
+
+    // the src is still applied — the element exists, it just cannot render
+    expect((targetEl as unknown as { setAttribute: ReturnType<typeof vi.fn> }).setAttribute)
+      .toHaveBeenCalledWith("src", "blob:uploaded.png");
+    /* The path opens with an "Uploading …" progress toast, which is fine —
+       what must not follow it is "applied ✓". */
+    expect(onDropSuccess.mock.calls.map((c) => c[0].elementLabel)).toEqual([
+      "Uploading img.png...",
+    ]);
+    expect(onDropError).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "LOCAL_ONLY_MEDIA" }),
+    );
+  });
+
   it("internal-media drop is no-op when src payload is empty", async () => {
     const composer = makeStubComposer();
     const { result } = renderDragDrop({ composer });

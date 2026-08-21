@@ -252,10 +252,22 @@ export function useDropExecution({
                 const result = await composer.media.uploadFile(file);
                 if (result.success && result.asset) {
                   el.setAttribute("src", result.asset.src);
-                  onDropSuccessRef.current?.({
-                    elementLabel: `${file.name} applied ✓`,
-                    elementType: "image",
-                  });
+                  /* Third path with the same trap: a file dropped straight onto
+                     the canvas is uploaded here, and when that upload never
+                     reaches the server its src is a session Object URL the
+                     sanitizer strips. The attribute is set either way; only the
+                     sentence changes. */
+                  if (result.asset.localOnly || String(result.asset.src).startsWith("blob:")) {
+                    onDropErrorRef.current?.({
+                      type: "LOCAL_ONLY_MEDIA",
+                      message: `${file.name} is only on this device — it won't show on the page or publish. Re-upload when you're back online.`,
+                    });
+                  } else {
+                    onDropSuccessRef.current?.({
+                      elementLabel: `${file.name} applied ✓`,
+                      elementType: "image",
+                    });
+                  }
                 }
               } catch (err) {
                 onDropErrorRef.current?.({
