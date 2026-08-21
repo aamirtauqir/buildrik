@@ -310,5 +310,28 @@
       ]
     }
   ],
-  "_verified": "2026-08-21: every entry below was replayed against localhost:3000 and the resulting state read back on screen before any capture ran. Three corrections came out of that: the Publish button opens the confirm dialog directly (there is no separate publish-open state), comment mode's only cue is the pressed toggle plus a crosshair capture layer, and the ⌘K palette cannot be captured at all — it closes when the capture script takes focus. | 2026-08-22: added BL-0213..BL-0217, the six-toggle canvas overlay states and the '?' cheat sheet — states the baseline had no board for at all, found by walking CanvasFooterToolbar. `button:text-is(\"Grid\")` is unambiguous: the Insert drawer's own Grid row is a DIV, not a button. Two things these recipes cannot promise: a CSS-painted overlay (grid lines, badges) does not survive html-to-design, and the click leaves the pointer on the toggle so its hover tooltip lands in the frame."
+  "_verified": "2026-08-21: every entry below was replayed against localhost:3000 and the resulting state read back on screen before any capture ran. Three corrections came out of that: the Publish button opens the confirm dialog directly (there is no separate publish-open state), comment mode's only cue is the pressed toggle plus a crosshair capture layer, and the ⌘K palette cannot be captured at all — it closes when the capture script takes focus. | 2026-08-22: added BL-0213..BL-0217, the six-toggle canvas overlay states and the '?' cheat sheet — states the baseline had no board for at all, found by walking CanvasFooterToolbar. `button:text-is(\"Grid\")` is unambiguous: the Insert drawer's own Grid row is a DIV, not a button. Two things these recipes cannot promise: a CSS-painted overlay (grid lines, badges) does not survive html-to-design, and the click leaves the pointer on the toggle so its hover tooltip lands in the frame.",
+  "_flow": {
+    "measuredAt": "2026-08-22",
+    "page": "75:2",
+    "method": "BFS from flowStartingPoints, carriers = [frame, ...frame.findAll()] — in-degree is not reachability, and a reaction on the FRAME itself is invisible to findAll alone.",
+    "before": {
+      "frames": 68,
+      "edges": 15,
+      "reachable": 12,
+      "deadEndsAmongReachable": 5
+    },
+    "after": {
+      "frames": 68,
+      "edges": 26,
+      "reachable": 12,
+      "deadEndsAmongReachable": 0
+    },
+    "wired": [
+      "shell-default's footer-toolbar chips → the four overlay frames (Grid/Rulers/Badges/X-Ray), and the help chip → the cheat sheet",
+      "each overlay frame's own chip → back to shell-default; the cheat sheet's ✕ → back to shell-default",
+      "every drawer frame's Close → back to shell-default (both the 2026-08-19 redraws AND the 2026-08-21 re-captures — there are two frames per state and only the re-captures were the reachable dead ends)"
+    ],
+    "openState": "56 of 68 frames are still unreachable from a flow starting point. They are the older redraws plus boards with no wired door from the shell. Wiring them means deciding which door each represents, which is a founder call about the prototype's intent, not a mechanical fix — recorded, not guessed."
+  }
 }
