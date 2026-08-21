@@ -131,6 +131,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         onInsert={state.handleDetailInsert}
         onDelete={state.handleDetailDelete}
         isInstanceSelected={state.isDetailInstanceSelected}
+        selectedElementId={state.canvasSelection[0] ?? null}
         onDetachInstance={state.handleDetachInstance}
       />
     );

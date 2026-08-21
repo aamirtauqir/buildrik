@@ -34,6 +34,8 @@ export interface ComponentDetailScreenProps {
   onDelete?: () => void;
   /** Whether an instance of this component is selected on canvas */
   isInstanceSelected?: boolean;
+  /** The element currently selected on canvas — what "Update component" promotes. */
+  selectedElementId?: string | null;
   /** Callback to detach instance */
   onDetachInstance?: () => void;
   /** Callback to swap component */
@@ -52,6 +54,7 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   onDuplicate,
   onDelete,
   isInstanceSelected = false,
+  selectedElementId = null,
   onDetachInstance,
 }) => {
   // DrillInHeader handles focus-on-mount automatically
@@ -67,6 +70,10 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
 
   // Delete confirmation dialog state
   const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
+
+  // "Update component" confirmation — the change is destructive to instance
+  // overrides, so it is never one click.
+  const [showUpdateConfirm, setShowUpdateConfirm] = React.useState(false);
 
   // Detach confirmation modal state — populated with derived label/master/count
   // computed from the currently-selected canvas instance at click time.
@@ -149,6 +156,56 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
     if (duplicate) {
       onDuplicate?.();
     }
+  };
+
+  /**
+   * Promote the canvas selection to this component's master.
+   *
+   * This is the door onto `updateComponentMaster` — the engine half has been
+   * built and tested for months with no caller, so "change it once and every
+   * instance follows", the reason components exist, could not be reached from
+   * the product at all.
+   */
+  const confirmUpdateAction = async () => {
+    setShowUpdateConfirm(false);
+    if (!composer || !selectedElementId) return;
+
+    const { updated, instancesSynced, overridesDropped } =
+      await composer.components.updateComponentMaster(component.id, selectedElementId);
+
+    if (!updated) {
+      addToast({
+        description: `Couldn't update "${component.name}" from that selection.`,
+        tone: "error",
+        duration: 4000,
+      });
+      return;
+    }
+
+    const followed =
+      instancesSynced > 0
+        ? `${instancesSynced} instance${instancesSynced === 1 ? "" : "s"} followed`
+        : "no instances placed yet";
+
+    // Overrides whose target the new master no longer has cannot be re-applied.
+    // They are gone; the engine used to report that only to devError, which is
+    // a no-op in production, so the user watched their edits revert in silence.
+    if (overridesDropped > 0) {
+      addToast({
+        description: `"${component.name}" updated — ${followed}. ${overridesDropped} override${
+          overridesDropped === 1 ? "" : "s"
+        } couldn't be re-applied and ${overridesDropped === 1 ? "was" : "were"} lost.`,
+        tone: "warning",
+        duration: 8000,
+      });
+      return;
+    }
+
+    addToast({
+      description: `"${component.name}" updated — ${followed}.`,
+      tone: "success",
+      duration: 4000,
+    });
   };
 
   // Handle delete action — opens ConfirmDialog
@@ -258,6 +315,18 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
             <span>Duplicate</span>
           </Button>
           <Button
+            onClick={() => setShowUpdateConfirm(true)}
+            disabled={!selectedElementId}
+            title={
+              selectedElementId
+                ? "Replace this component with the element selected on canvas"
+                : "Select an element on the canvas to update this component from"
+            }
+          >
+            <RefreshCw size={14} />
+            <span>Update</span>
+          </Button>
+          <Button
             className="danger"
             onClick={handleDelete}
             title="Delete component"
@@ -314,6 +383,21 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
             : `Are you sure you want to delete "${component.name}"?`
         }
         confirmLabel="Delete"
+        tone="destructive"
+      />
+      {/* Update-from-selection confirmation. It names the cost: instances change,
+          and overrides pointing at elements the new master drops are lost. */}
+      <ConfirmDialog
+        open={showUpdateConfirm}
+        onClose={() => setShowUpdateConfirm(false)}
+        onConfirm={confirmUpdateAction}
+        title="Update component"
+        message={
+          instanceCount > 0
+            ? `Replace "${component.name}" with the element selected on the canvas? ${instanceCount} instance(s) will change to match. Any edits made on an instance are kept where they still fit, and lost where the new version no longer has that part.`
+            : `Replace "${component.name}" with the element selected on the canvas?`
+        }
+        confirmLabel="Update component"
         tone="destructive"
       />
       {/* Detach confirmation modal (Task 13) */}

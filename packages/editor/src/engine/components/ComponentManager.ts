@@ -35,6 +35,19 @@ import {
   syncAllInstances,
   updateInstanceVariant,
 } from "./ComponentInstances";
+
+/** What `updateComponentMaster` did — see the method for why it is not a boolean. */
+export interface UpdateMasterOutcome {
+  updated: boolean;
+  instancesSynced: number;
+  overridesDropped: number;
+}
+
+const FAILED_UPDATE: UpdateMasterOutcome = {
+  updated: false,
+  instancesSynced: 0,
+  overridesDropped: 0,
+};
 import {
   saveComponent,
   loadComponents,
@@ -226,17 +239,34 @@ export class ComponentManager {
     return this.updateComponentMetadata(id, updates);
   }
 
-  async updateComponentMaster(id: string, elementId: string): Promise<boolean> {
+  /**
+   * Promote an element's tree to be the component's master, then fan it out.
+   *
+   * Returns what it cost, not just whether it ran: an instance override whose
+   * target element no longer exists in the new master cannot be re-applied and
+   * is lost. That number used to reach only `devError` — a no-op in production
+   * — so a user watched their instance customisation vanish with no word from
+   * the app. The caller is expected to say so.
+   */
+  async updateComponentMaster(
+    id: string,
+    elementId: string,
+  ): Promise<UpdateMasterOutcome> {
     const component = this.components.get(id);
-    if (!component) return false;
+    if (!component) return FAILED_UPDATE;
 
     const element = this.composer.elements.getElement(elementId);
-    if (!element) return false;
+    if (!element) return FAILED_UPDATE;
 
     const newMasterTree = element.toJSON();
-    if (!newMasterTree) return false;
+    if (!newMasterTree) return FAILED_UPDATE;
 
-    component.masterTree = deepClone(newMasterTree);
+    const promoted = deepClone(newMasterTree);
+    // The element being promoted may itself be an instance — pushing an
+    // instance's edits up is a legitimate way to reach here — and its subtree
+    // still carries instance bookkeeping that toJSON copies verbatim.
+    this.instanceUtils.clearInstanceMarkers(promoted);
+    component.masterTree = promoted;
     component.version++;
     component.updatedAt = Date.now();
 
@@ -247,11 +277,16 @@ export class ComponentManager {
       changedFields: ["masterTree", "version"],
     });
 
-    if (this.config.autoSyncInstances) {
-      await syncAllInstances(this.composer, this.maps, id);
+    if (!this.config.autoSyncInstances) {
+      return { updated: true, instancesSynced: 0, overridesDropped: 0 };
     }
 
-    return true;
+    const { instancesSynced, overridesDropped } = await syncAllInstances(
+      this.composer,
+      this.maps,
+      id,
+    );
+    return { updated: true, instancesSynced, overridesDropped };
   }
 
   // ============================================
@@ -420,11 +455,12 @@ export class ComponentManager {
 
   /** Board 160:2 — throw away this instance's own edits and take the master. */
   async resetInstance(elementId: string): Promise<boolean> {
-    return resetInstance(this.composer, this.maps, elementId);
+    return (await resetInstance(this.composer, this.maps, elementId)).synced;
   }
 
+  /** Dropped overrides are a whole-component concern — see updateComponentMaster. */
   async syncInstance(elementId: string): Promise<boolean> {
-    return syncInstance(this.composer, this.maps, elementId);
+    return (await syncInstance(this.composer, this.maps, elementId)).synced;
   }
 
   async updateInstanceVariant(elementId: string, variantId: string): Promise<boolean> {

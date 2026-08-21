@@ -176,8 +176,8 @@ describe("ComponentManager.updateComponentMaster — version bump + autosync", (
     const { manager, mgr, page } = makeStack();
     const card = sourceElement(manager, page.root.id);
     const comp = (await mgr.createComponent("Card", card.getId()))!;
-    expect(await mgr.updateComponentMaster("ghost", card.getId())).toBe(false);
-    expect(await mgr.updateComponentMaster(comp.id, "ghost")).toBe(false);
+    expect((await mgr.updateComponentMaster("ghost", card.getId())).updated).toBe(false);
+    expect((await mgr.updateComponentMaster(comp.id, "ghost")).updated).toBe(false);
     expect(comp.version).toBe(1);
   });
 
@@ -197,7 +197,7 @@ describe("ComponentManager.updateComponentMaster — version bump + autosync", (
     // Master edit: source card gains a class; push to master.
     card.addClass("v2");
     composer.emit.mockClear();
-    expect(await mgr.updateComponentMaster(comp.id, card.getId())).toBe(true);
+    expect((await mgr.updateComponentMaster(comp.id, card.getId())).updated).toBe(true);
 
     expect(comp.version).toBe(2);
     expect(comp.masterTree.classes).toContain("v2");
@@ -216,6 +216,37 @@ describe("ComponentManager.updateComponentMaster — version bump + autosync", (
     expect(freshEl.hasClass("v2")).toBe(true);
     expect(freshEl.getChildren()[0].getStyle("color")).toBe("hotpink");
     expect(mgr.getInstance(payload.instanceId)!.syncedVersion).toBe(2);
+  });
+
+  it("reports how many instances it synced and how many overrides it could not keep", async () => {
+    const { manager, mgr, page } = makeStack();
+    const card = sourceElement(manager, page.root.id);
+    const comp = (await mgr.createComponent("Card", card.getId()))!;
+
+    const a = (await mgr.instantiateComponent(comp.id, page.root.id))!;
+    const b = (await mgr.instantiateComponent(comp.id, page.root.id))!;
+    // Each instance overrides the heading the master is about to lose.
+    manager.getElement(a)!.getChildren()[0].setStyle("color", "hotpink");
+    manager.getElement(b)!.getChildren()[0].setStyle("color", "teal");
+    expect(mgr.getInstance(a)!.overrides).toHaveLength(1);
+    expect(mgr.getInstance(b)!.overrides).toHaveLength(1);
+
+    // The new master drops the heading, so neither override has a target left.
+    manager.removeElement(card.getChildren()[0].getId());
+
+    const outcome = await mgr.updateComponentMaster(comp.id, card.getId());
+
+    expect(outcome).toEqual({
+      updated: true,
+      instancesSynced: 2,
+      overridesDropped: 2,
+    });
+
+    // The lost overrides are gone from the instances too. Left in place they
+    // would be re-counted on every later update — the same warning, forever,
+    // about an edit the user can no longer see.
+    const again = await mgr.updateComponentMaster(comp.id, card.getId());
+    expect(again.overridesDropped).toBe(0);
   });
 });
 

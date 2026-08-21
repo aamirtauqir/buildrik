@@ -221,31 +221,47 @@ export async function detachAllInstances(
 // ============================================
 
 /**
+ * What a sync did, not just whether it happened.
+ *
+ * `overridesDropped` counts this instance's own edits that pointed at a master
+ * element the new master no longer has. They cannot be re-applied, so they are
+ * lost — and the only place that ever said so was `devError`, which is a no-op
+ * in production. A user who customised an instance had it silently reverted.
+ */
+export interface SyncOutcome {
+  synced: boolean;
+  overridesDropped: number;
+}
+
+const NOT_SYNCED: SyncOutcome = { synced: false, overridesDropped: 0 };
+
+/**
  * Sync an instance to the latest master version.
  */
 export async function syncInstance(
   composer: Composer,
   maps: InstanceMaps,
   elementId: string
-): Promise<boolean> {
+): Promise<SyncOutcome> {
   const instance = maps.instances.get(elementId);
-  if (!instance || instance.isDetached) return false;
+  if (!instance || instance.isDetached) return NOT_SYNCED;
 
   const component = maps.components.get(instance.componentId);
-  if (!component) return false;
+  if (!component) return NOT_SYNCED;
 
   if (instance.syncedVersion >= component.version) {
-    return true;
+    return { synced: true, overridesDropped: 0 };
   }
 
   const previousVersion = instance.syncedVersion;
 
   const element = composer.elements.getElement(elementId);
-  if (!element) return false;
+  if (!element) return NOT_SYNCED;
 
   const parent = element.getParent();
-  if (!parent) return false;
+  if (!parent) return NOT_SYNCED;
 
+  let overridesDropped = 0;
   composer.beginTransaction?.("instance-sync");
   try {
     const index = parent.getChildIndex(element);
@@ -266,13 +282,8 @@ export async function syncInstance(
     // position path, so they re-target correctly as long as the master structure
     // is unchanged. Orphaned overrides (master element removed) are dropped and
     // reported, never silently lost.
-    const { applied, dropped } = applyOverridesToTree(clonedData, instance.overrides);
-    if (dropped > 0) {
-      devError(
-        "ComponentManager",
-        `Sync dropped ${dropped} override(s) for instance ${elementId} (master element removed)`
-      );
-    }
+    const { applied, dropped, kept } = applyOverridesToTree(clonedData, instance.overrides);
+    overridesDropped = dropped;
 
     const newElement = composer.elements.pasteElement(clonedData, parent, index);
     if (!newElement) throw new Error("Failed to re-instantiate during sync");
@@ -281,6 +292,8 @@ export async function syncInstance(
       ...instance,
       elementId: newElement.getId(),
       syncedVersion: component.version,
+      // Only the overrides that still have a target survive — see `kept`.
+      overrides: kept,
     };
 
     maps.instances.delete(elementId);
@@ -303,12 +316,12 @@ export async function syncInstance(
     composer.markDirty();
   } catch (err) {
     devError("ComponentManager", "Sync failed", err);
-    return false;
+    return NOT_SYNCED;
   } finally {
     composer.endTransaction?.();
   }
 
-  return true;
+  return { synced: true, overridesDropped };
 }
 
 /**
@@ -326,26 +339,40 @@ export async function resetInstance(
   composer: Composer,
   maps: InstanceMaps,
   elementId: string
-): Promise<boolean> {
+): Promise<SyncOutcome> {
   const instance = maps.instances.get(elementId);
-  if (!instance || instance.isDetached) return false;
+  if (!instance || instance.isDetached) return NOT_SYNCED;
 
   maps.instances.set(elementId, { ...instance, overrides: [], syncedVersion: -1 });
   return syncInstance(composer, maps, elementId);
 }
 
+/** What one master update cost, summed over the instances it touched. */
+export interface SyncAllOutcome {
+  instancesSynced: number;
+  overridesDropped: number;
+}
+
 /**
  * Sync all instances of a component.
+ *
+ * The instance list is read up front: syncInstance re-keys the map (the synced
+ * instance gets a new element id), so iterating the live map would skip.
  */
 export async function syncAllInstances(
   composer: Composer,
   maps: InstanceMaps,
   componentId: string
-): Promise<void> {
+): Promise<SyncAllOutcome> {
   const instances = getInstancesOfComponent(maps, componentId);
+  let instancesSynced = 0;
+  let overridesDropped = 0;
   for (const instance of instances) {
-    await syncInstance(composer, maps, instance.elementId);
+    const outcome = await syncInstance(composer, maps, instance.elementId);
+    if (outcome.synced) instancesSynced++;
+    overridesDropped += outcome.overridesDropped;
   }
+  return { instancesSynced, overridesDropped };
 }
 
 // ============================================

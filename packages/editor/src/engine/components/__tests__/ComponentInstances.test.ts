@@ -399,7 +399,7 @@ describe("resetInstance — board 160:2's Reset to master", () => {
     recordInstanceOverride(c, maps, utils, title.getId(), "style", "color", "hotpink");
     expect(maps.instances.get(instanceId)!.overrides.length).toBeGreaterThan(0);
 
-    expect(await resetInstance(c, maps, instanceId)).toBe(true);
+    expect((await resetInstance(c, maps, instanceId)).synced).toBe(true);
 
     // The element is re-cloned, so find the surviving instance by its record.
     const [, record] = [...maps.instances.entries()].find(
@@ -411,7 +411,7 @@ describe("resetInstance — board 160:2's Reset to master", () => {
   it("runs even when the instance is already on the master's current version", async () => {
     const { manager, maps, instanceId, c } = await seed();
     const before = manager.getElement(instanceId)!;
-    expect(await resetInstance(c, maps, instanceId)).toBe(true);
+    expect((await resetInstance(c, maps, instanceId)).synced).toBe(true);
     // sync alone would have early-returned with the same live object.
     expect(manager.getElement(instanceId)).not.toBe(before);
   });
@@ -419,7 +419,7 @@ describe("resetInstance — board 160:2's Reset to master", () => {
   it("refuses a detached instance — it has no master to go back to", async () => {
     const { maps, instanceId, c } = await seed();
     maps.instances.get(instanceId)!.isDetached = true;
-    expect(await resetInstance(c, maps, instanceId)).toBe(false);
+    expect((await resetInstance(c, maps, instanceId)).synced).toBe(false);
   });
 });
 
@@ -427,7 +427,7 @@ describe("syncInstance — override survival across master re-clone", () => {
   it("returns true WITHOUT re-cloning when already at the master version", async () => {
     const { manager, maps, instanceId, c } = await seed();
     const before = manager.getElement(instanceId)!;
-    expect(await syncInstance(c, maps, instanceId)).toBe(true);
+    expect((await syncInstance(c, maps, instanceId)).synced).toBe(true);
     expect(manager.getElement(instanceId)).toBe(before); // same live object
   });
 
@@ -437,19 +437,19 @@ describe("syncInstance — override survival across master re-clone", () => {
 
     // Missing component
     maps.components.delete(component.id);
-    expect(await syncInstance(c, maps, instanceId)).toBe(false);
+    expect((await syncInstance(c, maps, instanceId)).synced).toBe(false);
     maps.components.set(component.id, component);
 
     // Parent-less element
     const el = manager.getElement(instanceId)!;
     const parent = el.getParent()!;
     parent.removeChild(el);
-    expect(await syncInstance(c, maps, instanceId)).toBe(false);
+    expect((await syncInstance(c, maps, instanceId)).synced).toBe(false);
     parent.addChild(el);
 
     // Detached
     maps.instances.get(instanceId)!.isDetached = true;
-    expect(await syncInstance(c, maps, instanceId)).toBe(false);
+    expect((await syncInstance(c, maps, instanceId)).synced).toBe(false);
   });
 
   it("re-clones the new master, re-applies overrides, and reports preserved/dropped", async () => {
@@ -469,7 +469,7 @@ describe("syncInstance — override survival across master re-clone", () => {
     component.version = 2;
     composer.emit.mockClear();
 
-    expect(await syncInstance(c, maps, instanceId)).toBe(true);
+    expect((await syncInstance(c, maps, instanceId)).synced).toBe(true);
 
     // Old instance element replaced in place under the page root — fully
     // deregistered from the ElementManager registry, not merely detached.
@@ -505,7 +505,7 @@ describe("syncInstance — override survival across master re-clone", () => {
     expect(oldIds.length).toBeGreaterThan(1);
 
     component.version = 2;
-    expect(await syncInstance(c, maps, instanceId)).toBe(true);
+    expect((await syncInstance(c, maps, instanceId)).synced).toBe(true);
 
     // None of the old clone's Element objects remain in the registry.
     const liveIds = new Set(manager.getAllElements().map((e) => e.getId()));

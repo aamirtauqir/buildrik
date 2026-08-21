@@ -134,9 +134,14 @@ function applyOverrideToNode(
 export function applyOverridesToTree(
   tree: ElementData,
   overrides: Patch
-): { applied: number; dropped: number } {
+): { applied: number; dropped: number; kept: Patch } {
   let applied = 0;
   let dropped = 0;
+  /* `kept` exists so a caller can STORE the survivors. An override whose target
+     is gone can never apply again, and leaving it on the instance means every
+     later master update re-reports the same lost edit — a warning that cries
+     wolf is worse than the silence it replaced. */
+  const kept: Patch = [];
   for (const op of overrides) {
     const parsed = parseCanonicalOverridePath(op.path);
     if (!parsed) {
@@ -150,8 +155,9 @@ export function applyOverridesToTree(
     }
     applyOverrideToNode(node, parsed.type, parsed.property, (op as { value?: unknown }).value);
     applied++;
+    kept.push(op);
   }
-  return { applied, dropped };
+  return { applied, dropped, kept };
 }
 
 // ============================================
@@ -396,9 +402,14 @@ export class ComponentInstanceUtils {
   }
 
   /**
-   * Clear component instance markers from element data
+   * Clear component instance markers from element data.
+   *
+   * Public because promoting an element to master needs the same scrub: an
+   * element that is itself an instance carries `data.data.componentInstance`,
+   * and toJSON copies it, so without this every future clone of the master
+   * would be born wearing another instance's bookkeeping.
    */
-  private clearInstanceMarkers(data: ElementData): void {
+  clearInstanceMarkers(data: ElementData): void {
     if (data.data) {
       delete (data.data as Record<string, unknown>).componentInstance;
     }
