@@ -88,9 +88,22 @@ export function useUploadState(
     const onDeleted = () => recalcStorage();
 
     const onComplete = (payload: unknown) => {
-      const p = payload as { fileName?: string; mimeType?: string };
+      const p = payload as {
+        fileName?: string;
+        mimeType?: string;
+        asset?: { localOnly?: boolean };
+      };
       if (p?.mimeType?.includes("font")) {
         showToast("Font uploaded! Use it via Text Style → Font → My Fonts", "info");
+      } else if (p?.asset?.localOnly) {
+        /* "uploaded ✓" over a file that never left the browser. The mirror
+           failed (offline, auth, no blob token), so the asset is in this
+           device's IndexedDB and nowhere else — which also decides what happens
+           when it is placed on a page. */
+        showToast(
+          `${p?.fileName ?? "File"} saved on this device — it didn't reach the server, so it won't publish yet.`,
+          "warning",
+        );
       } else {
         showToast(`${p?.fileName ?? "File"} uploaded ✓`, "success");
       }

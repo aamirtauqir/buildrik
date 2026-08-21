@@ -344,6 +344,29 @@ describe("useUploadState — media event listeners", () => {
     );
   });
 
+  /* "uploaded ✓" over a file that never left the browser. The server mirror is
+     best-effort (offline, auth, no blob token) and its failure leaves the asset
+     `localOnly` — in this device's IndexedDB and nowhere else, which also
+     decides what happens when it is placed on a page. Walked live: uploading
+     here (no BLOB token) now reads "saved on this device — it didn't reach the
+     server, so it won't publish yet." */
+  it("says saved-on-this-device when the mirror didn't take", () => {
+    const { composer, showToast } = setup();
+
+    act(() => {
+      composer._emitMedia(MEDIA_EVENTS.UPLOAD_COMPLETE, {
+        fileName: "pic.png",
+        mimeType: "image/png",
+        asset: { localOnly: true },
+      });
+    });
+
+    const [message, tone] = asMock(showToast).mock.calls.at(-1) as [string, string];
+    expect(tone).toBe("warning");
+    expect(message).toContain("saved on this device");
+    expect(message).not.toContain("uploaded ✓");
+  });
+
   it("removes all five media listeners on unmount", () => {
     const { composer, unmount } = setup();
     const off = asMock(composer.media.off);
