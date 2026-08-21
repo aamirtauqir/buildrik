@@ -640,3 +640,84 @@ describe("ExportEngine.exportAllPages — index.html always exists", () => {
     expect(names(html)).toEqual(["index.html", "page-2.html", "terms-2.html", "terms.html"]);
   });
 });
+
+// ============================================================================
+// exportAllPages — FORM FIELDS THAT ARE ACTUALLY FIELDS
+// ============================================================================
+
+/**
+ * Twelve of the sixteen form types were missing from the tag map, so every
+ * element ever created from them was STORED as a div with no type attribute.
+ * Fixing the map helps new elements; these pin the healing of the ones already
+ * saved, which is what every existing site is made of.
+ */
+describe("ExportEngine.exportAllPages — stored form fields publish as controls", () => {
+  const field = (id: string, type: string, attributes: Record<string, string> = {}) => ({
+    id,
+    type,
+    tagName: "div", // what the old map stored
+    attributes,
+    children: [],
+  });
+
+  const formPage = {
+    id: "p-form",
+    name: "Contact",
+    slug: "contact",
+    isHome: true,
+    root: {
+      id: "root-form",
+      type: "container",
+      tagName: "div",
+      children: [
+        {
+          id: "f1",
+          type: "form",
+          tagName: "form",
+          children: [
+            field("e1", "email", { name: "email" }),
+            field("c1", "checkbox", { name: "subscribe" }),
+            field("s1", "submit"),
+            field("box", "container"),
+          ],
+        },
+      ],
+    },
+  };
+
+  it("emits inputs and a button, not a stack of divs", async () => {
+    const result = await new ExportEngine(makeComposer({ pages: [formPage] })).exportAllPages({
+      format: "html",
+    });
+    const html = result.files.find((f) => f.name === "index.html")!.content;
+
+    expect(html).toMatch(/<input[^>]*type="email"[^>]*name="email"/);
+    expect(html).toMatch(/<input[^>]*type="checkbox"/);
+    expect(html).toMatch(/<button[^>]*type="submit"/);
+    // A container is still a div — the heal only touches types with a real tag.
+    expect(html).toMatch(/<div[^>]*data-buildrick-id="box"/);
+  });
+
+  it("does not overwrite an attribute the element already carries", async () => {
+    const withOwnType = {
+      ...formPage,
+      root: {
+        ...formPage.root,
+        children: [
+          {
+            id: "f2",
+            type: "form",
+            tagName: "form",
+            children: [field("e2", "email", { type: "text", name: "email" })],
+          },
+        ],
+      },
+    };
+    const result = await new ExportEngine(makeComposer({ pages: [withOwnType] })).exportAllPages({
+      format: "html",
+    });
+    const html = result.files.find((f) => f.name === "index.html")!.content;
+    expect(html).toMatch(/<input[^>]*type="text"/);
+    expect(html).not.toMatch(/type="email"/);
+  });
+});

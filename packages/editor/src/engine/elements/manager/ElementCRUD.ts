@@ -10,7 +10,7 @@ import { EVENTS } from "../../../shared/constants";
 import type { ElementData } from "../../../shared/types";
 import { devWarn } from "../../../shared/utils/devLogger";
 import { generateId } from "../../../shared/utils/helpers";
-import { getDefaultTagName, CONTAINER_TYPES } from "../../../shared/utils/html";
+import { getDefaultTagName, getDefaultAttributes, CONTAINER_TYPES } from "../../../shared/utils/html";
 import { Element } from "../Element";
 import type { ElementManagerContext } from "./types";
 
@@ -32,13 +32,19 @@ export class ElementCRUD {
       id: generateId("el"),
       type,
       tagName: getDefaultTagName(type),
-      attributes: {},
+      /* An <input> with no `type` is a text box, so an email field without one
+         is a text box wearing an email label — and a submit button that never
+         submits. Caller-supplied attributes still win. */
+      attributes: { ...getDefaultAttributes(type), ...(options?.attributes ?? {}) },
       classes: [],
       styles: {},
       children: [],
       draggable: true,
       droppable: CONTAINER_TYPES.has(type),
       ...options,
+      ...(options?.attributes
+        ? { attributes: { ...getDefaultAttributes(type), ...options.attributes } }
+        : {}),
     };
 
     const element = new Element(data, this.ctx.composer);

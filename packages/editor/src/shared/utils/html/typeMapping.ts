@@ -122,7 +122,32 @@ export const TYPE_TO_TAG_MAP: Record<string, string> = {
   input: "input",
   textarea: "textarea",
   select: "select",
+  /* The rest of the form family. The Insert panel offers Email, Password,
+     Number, Date, Time, Color, Checkbox, Radio, Switch, Slider, Upload and
+     Submit; none was in this map, so every one fell through to "div" —
+     measured live, twelve of the sixteen field types rendered as an empty div
+     on the canvas AND published as one. A visitor could not type into a
+     contact form, let alone submit it. */
+  email: "input",
+  password: "input",
+  number: "input",
+  date: "input",
+  time: "input",
+  color: "input",
+  checkbox: "input",
+  radio: "input",
+  switch: "input",
+  upload: "input",
+  submit: "button",
   list: "ul",
+  /* The export carried a second, smaller copy of this map; merging them showed
+     these five had only ever existed there, so the engine mapped them to "div"
+     while the export mapped them properly. */
+  "list-item": "li",
+  div: "div",
+  article: "article",
+  aside: "aside",
+  main: "main",
   divider: "hr",
   table: "table",
   section: "section",
@@ -135,7 +160,7 @@ export const TYPE_TO_TAG_MAP: Record<string, string> = {
   audio: "audio",
   svg: "svg",
   gallery: "div",
-  slider: "div",
+  slider: "input",
   testimonials: "div",
   countdown: "div",
   progress: "div",
@@ -175,6 +200,34 @@ export const CONTAINER_TYPES = new Set([
 /**
  * Get default tag name for an element type
  */
+/**
+ * The `type` attribute each input-ish element needs in order to BE that
+ * control. `<input>` with no type is a text box, so an email field without it
+ * is a text box wearing an email label.
+ */
+export const TYPE_TO_INPUT_TYPE: Record<string, string> = {
+  email: "email",
+  password: "password",
+  number: "number",
+  date: "date",
+  time: "time",
+  color: "color",
+  checkbox: "checkbox",
+  radio: "radio",
+  switch: "checkbox",
+  slider: "range",
+  upload: "file",
+  submit: "submit",
+};
+
+/** Default attributes a newly created element needs to work as its type. */
+export function getDefaultAttributes(type: string): Record<string, string> {
+  const inputType = TYPE_TO_INPUT_TYPE[type];
+  if (!inputType) return {};
+  // A switch is a checkbox to the browser and a switch to assistive tech.
+  return type === "switch" ? { type: inputType, role: "switch" } : { type: inputType };
+}
+
 export function getDefaultTagName(type: string): string {
   return TYPE_TO_TAG_MAP[type] || "div";
 }

@@ -13,6 +13,7 @@ import type { AnimationConfig } from "../../shared/types/animations";
 import type { BreakpointStyles } from "../../shared/types/breakpoints";
 import type { DataBinding } from "../../shared/types/data";
 import type { ElementCategory } from "../../shared/utils/nesting/types";
+import { getDefaultTagName } from "../../shared/utils/html";
 import type { Composer } from "../Composer";
 import { ElementChildren } from "./ElementChildren";
 import { ElementOperations } from "./ElementOperations";
@@ -101,8 +102,21 @@ export class Element {
   getType(): ElementData["type"] {
     return this.data.type;
   }
+  /**
+   * The tag this element renders as.
+   *
+   * Falls back to the type's canonical tag when the stored one is "div",
+   * because twelve form types were missing from the tag map and every element
+   * ever created from them was saved as a div — on the canvas and in the
+   * export. Fixing the map only helps NEW elements; this heals the ones
+   * already stored, and it cannot change anything whose type legitimately maps
+   * to "div" (container, card, spacer …) because the mapping returns "div"
+   * for those too.
+   */
   getTagName(): string {
-    return this.data.tagName || "div";
+    const stored = this.data.tagName;
+    if (!stored || stored === "div") return getDefaultTagName(this.data.type);
+    return stored;
   }
   getData(): ElementData {
     return { ...this.data };

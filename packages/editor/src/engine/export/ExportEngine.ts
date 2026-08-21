@@ -14,6 +14,7 @@ import type {
 } from "../../shared/types/export";
 import { DEFAULT_EXPORT_CONFIG } from "../../shared/types/export";
 import { collectUsedKeyframes } from "../../shared/constants/animationKeyframes";
+import { getDefaultAttributes, getDefaultTagName } from "../../shared/utils/html";
 import { CMSExportResolver } from "../cms/CMSExportResolver";
 import type { CMSExportMode, CMSExportOptions } from "../cms/CMSExportResolver";
 import type { Composer } from "../Composer";
@@ -25,7 +26,6 @@ import {
   siteTokensCSS,
   googleFontsHeadLinks,
   siteFontsFromTokens,
-  getTagForType,
   escapeHTML,
   stylesToString,
   stylesToCSS,
@@ -306,9 +306,12 @@ export class ExportEngine {
     const styles = element.getStyles?.() || {};
     const children = element.getChildren?.() || [];
 
-    // Prefer the element's explicit tagName (e.g. an h1/h3 heading the user
-    // chose) so the export matches the canvas; fall back to the type→tag map.
-    const tag = element.getData?.().tagName || getTagForType(type);
+    /* Prefer the element's explicit tagName (e.g. an h1/h3 heading the user
+       chose) so the export matches the canvas; fall back to the type→tag map.
+       A stored "div" is not a choice — twelve form types were missing from the
+       map, so everything created from them was saved that way. */
+    const storedTag = element.getData?.().tagName;
+    const tag = storedTag && storedTag !== "div" ? storedTag : getDefaultTagName(type);
     /* The user's own classes belong here too. The multi-page writer has always
        joined them (:753); this one emitted only the generated per-element
        class, so a download dropped every class the Classes panel adds and the
@@ -974,7 +977,11 @@ ${bodyContent}${interactionScript}${sanitizeHeadCode(siteCustomCode?.bodyScripts
   private renderPageElement(element: PageData["root"], indent = 1): string {
     if (!element) return "";
 
-    const tag = element.tagName || getTagForType(element.type);
+    // Same rule as the live-element writer: a stored "div" defers to the type.
+    const tag =
+      element.tagName && element.tagName !== "div"
+        ? element.tagName
+        : getDefaultTagName(element.type);
     const indentStr = "  ".repeat(indent);
     const children = element.children ?? [];
     const content = element.content ?? "";
@@ -1003,6 +1010,17 @@ ${bodyContent}${interactionScript}${sanitizeHeadCode(siteCustomCode?.bodyScripts
     attrParts.push(`data-buildrick-id="${escapeHTML(element.id)}"`);
     const classNames = [`${this.config.cssPrefix}${element.id}`, ...(element.classes ?? [])].join(" ");
     attrParts.push(`class="${escapeHTML(classNames)}"`);
+
+    /* An <input> with no `type` is a text box. Twelve form types were missing
+       from the tag map, so everything already stored from them is a div with no
+       type attribute; healing the tag alone would publish a row of text boxes
+       where the user placed an email field, a date picker and a submit button.
+       Caller attributes still win — this only fills a gap. */
+    const defaultAttrs = getDefaultAttributes(element.type);
+    for (const [key, value] of Object.entries(defaultAttrs)) {
+      if (element.attributes?.[key]) continue;
+      attrParts.push(`${key}="${escapeHTML(String(value))}"`);
+    }
 
     if (element.attributes) {
       for (const [key, value] of Object.entries(element.attributes)) {

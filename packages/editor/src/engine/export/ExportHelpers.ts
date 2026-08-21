@@ -154,34 +154,12 @@ p,h1,h2,h3,h4,h5,h6{overflow-wrap:break-word}
 // TAG MAPPING
 // ============================================================================
 
-const TAG_MAP: Record<string, string> = {
-  div: "div",
-  section: "section",
-  header: "header",
-  footer: "footer",
-  nav: "nav",
-  article: "article",
-  aside: "aside",
-  main: "main",
-  heading: "h2",
-  paragraph: "p",
-  text: "span",
-  link: "a",
-  button: "button",
-  image: "img",
-  video: "video",
-  input: "input",
-  form: "form",
-  list: "ul",
-  "list-item": "li",
-};
-
-/**
- * Map element type to HTML tag
- */
-export function getTagForType(type: string): string {
-  return TAG_MAP[type] || "div";
-}
+/* The type→tag map lived here as a second, smaller copy of the shared one — it
+   had no email, no submit, no checkbox, so the export disagreed with the engine
+   about what a form field even is, and it alone knew about list-item/article/
+   aside/main. Both are merged into shared/utils/html's TYPE_TO_TAG_MAP, and the
+   local `getTagForType` wrapper went with them: it added nothing, which the
+   SSOT gate says out loud. Callers import getDefaultTagName directly. */
 
 // ============================================================================
 // STRING UTILITIES

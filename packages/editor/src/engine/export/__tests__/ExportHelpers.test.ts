@@ -7,17 +7,8 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import {
-  RESET_CSS,
-  getTagForType,
-  camelToKebab,
-  escapeHTML,
-  stylesToString,
-  stylesToCSS,
-  minifyCSS,
-  downloadHTML,
-  downloadCSS,
-} from "../ExportHelpers";
+import { RESET_CSS, camelToKebab, escapeHTML, stylesToString, stylesToCSS, minifyCSS, downloadHTML, downloadCSS } from "../ExportHelpers";
+import { getDefaultTagName } from "../../../shared/utils/html";
 import { THEME } from "../../../shared/constants/defaultStyles";
 
 describe("RESET_CSS", () => {
@@ -42,23 +33,23 @@ describe("RESET_CSS", () => {
   });
 });
 
-describe("getTagForType", () => {
+describe("getDefaultTagName", () => {
   it("maps element types to semantic HTML tags", () => {
-    expect(getTagForType("heading")).toBe("h2");
-    expect(getTagForType("paragraph")).toBe("p");
-    expect(getTagForType("text")).toBe("span");
-    expect(getTagForType("link")).toBe("a");
-    expect(getTagForType("image")).toBe("img");
-    expect(getTagForType("list")).toBe("ul");
-    expect(getTagForType("list-item")).toBe("li");
-    expect(getTagForType("section")).toBe("section");
-    expect(getTagForType("button")).toBe("button");
+    expect(getDefaultTagName("heading")).toBe("h2");
+    expect(getDefaultTagName("paragraph")).toBe("p");
+    expect(getDefaultTagName("text")).toBe("span");
+    expect(getDefaultTagName("link")).toBe("a");
+    expect(getDefaultTagName("image")).toBe("img");
+    expect(getDefaultTagName("list")).toBe("ul");
+    expect(getDefaultTagName("list-item")).toBe("li");
+    expect(getDefaultTagName("section")).toBe("section");
+    expect(getDefaultTagName("button")).toBe("button");
   });
 
   it("falls back to div for unknown types", () => {
-    expect(getTagForType("container")).toBe("div");
-    expect(getTagForType("lottie")).toBe("div");
-    expect(getTagForType("")).toBe("div");
+    expect(getDefaultTagName("container")).toBe("div");
+    expect(getDefaultTagName("lottie")).toBe("div");
+    expect(getDefaultTagName("")).toBe("div");
   });
 });
 

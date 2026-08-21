@@ -8,7 +8,8 @@ import JSZip from "jszip";
 import type { ElementData, PageData } from "../../shared/types";
 import type { Composer } from "../Composer";
 import type { ExportResult, ExportedFile } from "../../shared/types/export";
-import { getTagForType, camelToKebab, escapeHTML } from "./ExportHelpers";
+import { camelToKebab, escapeHTML } from "./ExportHelpers";
+import { getDefaultTagName } from "../../shared/utils/html";
 
 // ============================================================================
 // TYPES
@@ -188,7 +189,7 @@ export class ReactExporter {
     cssClasses: Map<string, CSSClassEntry>,
     indent: number
   ): string {
-    const tag = element.tagName || getTagForType(element.type);
+    const tag = element.tagName || getDefaultTagName(element.type);
     const indentStr = "  ".repeat(indent);
     const children = element.children ?? [];
     const content = element.content ?? "";

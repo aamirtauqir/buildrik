@@ -110,6 +110,8 @@ export {
   isDeprecatedTag,
   getTagCategory,
   getDefaultTagName,
+  getDefaultAttributes,
+  TYPE_TO_INPUT_TYPE,
   getElementTypeFromTag,
   // Escape utilities
   escapeAttr,

@@ -53,6 +53,8 @@ export {
   TYPE_TO_TAG_MAP,
   CONTAINER_TYPES,
   getDefaultTagName,
+  getDefaultAttributes,
+  TYPE_TO_INPUT_TYPE,
   getElementTypeFromTag,
 } from "./typeMapping";
 
