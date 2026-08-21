@@ -294,7 +294,15 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
 
       <SectionCard title="Custom Code">
         <ProGate isPro={isPro}>
-          <Field label="Head Code" hint="Injected before </head>. Max 10KB.">
+          {/* The editor's own Advanced screen carries this warning; this copy of
+              the same two fields did not, so a Pro user could paste an inline
+              analytics snippet here, save, and never learn that the export
+              sanitiser drops it (`sanitizeHeadCode`, applied to both fields). */}
+          <p className="mb-3 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
+            Scripts must load from a file — <code>&lt;script src=&quot;…&quot;&gt;</code>. Inline
+            JavaScript is removed when the site is published.
+          </p>
+          <Field label="Head Code" hint="Injected before </head> on publish. Max 10KB.">
             <textarea
               value={headCode}
               onChange={(e) => {
@@ -307,7 +315,7 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
               disabled={!isPro}
             />
           </Field>
-          <Field label="Body Code" hint="Injected before </body>. Max 10KB.">
+          <Field label="Body Code" hint="Injected before </body> on publish. Max 10KB.">
             <textarea
               value={bodyCode}
               onChange={(e) => {

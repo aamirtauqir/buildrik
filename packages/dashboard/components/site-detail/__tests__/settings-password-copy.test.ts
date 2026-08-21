@@ -31,6 +31,21 @@ describe("technical SEO copy", () => {
   });
 });
 
+describe("custom code copy", () => {
+  /* Both fields run through `sanitizeHeadCode` on export, which keeps
+     <script src> and drops inline JavaScript. The editor's Advanced screen says
+     so; this screen offered the same two fields and did not. */
+  it("warns that inline JavaScript is stripped", () => {
+    expect(rendered).toMatch(/Scripts must load from a file/);
+    expect(rendered).toMatch(/Inline\s*\n?\s*JavaScript is removed when the site is published/);
+  });
+
+  it("says the code is injected on publish, not on save", () => {
+    expect(rendered).toMatch(/Injected before <\/head> on publish/);
+    expect(rendered).toMatch(/Injected before <\/body> on publish/);
+  });
+});
+
 describe("site password copy", () => {
   it("says the change reaches the live site on the next publish", () => {
     expect(rendered).toMatch(/Applied when you next publish/);
