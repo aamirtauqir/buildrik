@@ -15,7 +15,7 @@ import { getTabWidth, getTabConfig, getTabsByZone, getRailTools, getTabsByTool, 
 import { getEditorViewMode } from "../../shared/utils/editorViewMode";
 import type { BlockData } from "../../shared/types";
 import type { UsePublishJobResult } from "../shell/hooks/usePublishJob";
-import { ConfirmDialog, Button, Tooltip } from "@/editor/chrome-ui";
+import { ConfirmDialog, Button, HintTooltip } from "@/editor/chrome-ui";
 import { InspectorErrorBoundary } from "../inspector/components/InspectorErrorBoundary";
 import { PanelSkeleton, SidebarErrorFallback } from "./SidebarFallbacks";
 import { TabRouter } from "./TabRouter";
@@ -138,12 +138,10 @@ function RailZone({
         const isDirty = dirtyTabIds?.has(tab.id) ?? false;
 
         return (
-          <Tooltip
+          <HintTooltip
             key={tab.id}
             content={tab.shortcut ? `${tab.label} · ${tab.shortcut}` : tab.label}
             placement="bottom"
-            arrow={false}
-            className="tw:max-w-[280px] tw:whitespace-normal"
           >
             <Button
               color="light"
@@ -171,7 +169,7 @@ function RailZone({
               <Icon size={20} />
               {showLabels && <span className="ls-btn__label">{tab.label}</span>}
             </Button>
-          </Tooltip>
+          </HintTooltip>
         );
       })}
     </div>
@@ -253,12 +251,10 @@ function FourToolRail({
         const isSelected = tool === activeTool;
         const isVisibleActive = isSelected && drawerOpen;
         return (
-          <Tooltip
+          <HintTooltip
             key={tool}
             content={meta.label}
             placement="bottom"
-            arrow={false}
-            className="tw:max-w-[280px] tw:whitespace-normal"
           >
             <Button
               color="light"
@@ -284,7 +280,7 @@ function FourToolRail({
               )}
               <Icon size={20} />
             </Button>
-          </Tooltip>
+          </HintTooltip>
         );
       })}
     </div>

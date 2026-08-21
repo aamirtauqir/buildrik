@@ -94,6 +94,7 @@ export { Rail, RailItem, RailSpacer, type RailProps, type RailItemProps } from "
 export { FieldRow, type FieldRowProps } from "./FieldRow";
 export { FormField, type FormFieldProps } from "./FormField";
 export { HelpTooltip, type HelpTooltipProps } from "./HelpTooltip";
+export { HintTooltip, type HintTooltipProps, type HintTooltipPlacement } from "./HintTooltip";
 export { Slider, type SliderProps } from "./Slider";
 export { Tabs, type TabsProps, type Tab } from "./Tabs";
 export { Toolbar, ToolbarSpacer, type ToolbarProps } from "./Toolbar";
