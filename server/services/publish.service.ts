@@ -30,7 +30,7 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
     }),
     prisma.site.findUnique({
       where: { id: siteId },
-      select: { metaTitleTemplate: true, touchIcon: true, deletedAt: true, workspaceId: true },
+      select: { metaTitleTemplate: true, favicon: true, touchIcon: true, deletedAt: true, workspaceId: true },
     }),
     prisma.domain.findFirst({
       where: { siteId, status: "VERIFIED" },
@@ -93,8 +93,13 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
     checks.push({ label: "Empty pages", status: "pass", detail: "All pages have content." });
   }
 
-  // Favicon
-  if (!site?.touchIcon) {
+  /* Favicon — the FAVICON column, which is what the deploy turns into
+     `<link rel="icon">`. This read `touchIcon`, a different column filled by a
+     different upload in Site settings and shipped as `apple-touch-icon`. So a
+     site with a favicon and no touch icon was told "No favicon set. Browsers
+     will show a default icon" — about an icon it had — and a site with only a
+     touch icon was told its favicon was configured. */
+  if (!site?.favicon) {
     checks.push({ label: "Favicon", status: "warning", detail: "No favicon set. Browsers will show a default icon." });
   } else {
     checks.push({ label: "Favicon", status: "pass", detail: "Favicon is configured." });

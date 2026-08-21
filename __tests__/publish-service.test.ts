@@ -79,6 +79,7 @@ describe("Publish Service", () => {
       vi.mocked(prisma.page.count).mockResolvedValue(3);
       vi.mocked(prisma.site.findUnique).mockResolvedValue({
         metaTitleTemplate: "t",
+        favicon: "i",
         touchIcon: "i",
         deletedAt: null,
         workspaceId: "w1",
@@ -138,7 +139,8 @@ describe("Publish Service", () => {
       vi.mocked(prisma.site.findUnique).mockResolvedValue({
         id: "s1",
         metaTitleTemplate: "Title",
-        touchIcon: "/favicon.png",
+        favicon: "/favicon.png",
+        touchIcon: null,
       } as any);
       vi.mocked(prisma.domain.findFirst).mockResolvedValue({
         id: "d1",
@@ -157,7 +159,8 @@ describe("Publish Service", () => {
       vi.mocked(prisma.site.findUnique).mockResolvedValue({
         id: "s1",
         metaTitleTemplate: "Title",
-        touchIcon: "/fav.png",
+        favicon: "/fav.png",
+        touchIcon: null,
       } as any);
       vi.mocked(prisma.domain.findFirst).mockResolvedValue(null);
       vi.mocked(prisma.page.findMany).mockResolvedValue([
@@ -170,19 +173,37 @@ describe("Publish Service", () => {
       expect(emptyCheck?.detail).toContain("1");
     });
 
-    it("warns about missing favicon", async () => {
+    /* The Favicon check read `touchIcon` — a different column, filled by a
+       different upload in Site settings and shipped as apple-touch-icon. The
+       fixtures encoded the same confusion (`touchIcon: "/favicon.png"`). These
+       three cases pin the check to the column the deploy actually turns into
+       <link rel="icon">. */
+    const faviconCase = async (icons: { favicon: string | null; touchIcon: string | null }) => {
       vi.mocked(prisma.page.count).mockResolvedValue(2);
       vi.mocked(prisma.site.findUnique).mockResolvedValue({
         id: "s1",
         metaTitleTemplate: "T",
-        touchIcon: null,
+        workspaceId: "ws1",
+        ...icons,
       } as any);
       vi.mocked(prisma.domain.findFirst).mockResolvedValue(null);
       vi.mocked(prisma.page.findMany).mockResolvedValue([]);
-
       const result = await runPrePublishChecks("s1");
-      const faviconCheck = result.checks.find((c) => c.label === "Favicon");
-      expect(faviconCheck?.status).toBe("warning");
+      return result.checks.find((c) => c.label === "Favicon");
+    };
+
+    it("warns about missing favicon", async () => {
+      expect((await faviconCase({ favicon: null, touchIcon: null }))?.status).toBe("warning");
+    });
+
+    it("passes on a favicon even with no apple-touch-icon", async () => {
+      expect((await faviconCase({ favicon: "/favicon.png", touchIcon: null }))?.status).toBe("pass");
+    });
+
+    it("does not call a touch icon a favicon", async () => {
+      const check = await faviconCase({ favicon: null, touchIcon: "/apple-touch-icon.png" });
+      expect(check?.status).toBe("warning");
+      expect(check?.detail).toContain("No favicon set");
     });
   });
 
