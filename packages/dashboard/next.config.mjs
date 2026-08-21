@@ -27,9 +27,20 @@ const contentSecurityPolicy = [
   `script-src ${scriptSrc}`,
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.bunny.net",
   "style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.bunny.net",
-  "img-src 'self' data: https:",
+  /* blob: is how the editor previews a file the user just picked — it makes the
+     URL from bytes already in the page. Without it the browser refused every
+     local upload with "violates the following Content Security Policy
+     directive: img-src", and the media library looked like it had silently
+     done nothing. Same for media-src, which had no directive at all and so
+     fell back to default-src 'self' — blocking a locally-added video. */
+  "img-src 'self' data: blob: https:",
+  "media-src 'self' data: blob: https:",
   "font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://fonts.bunny.net",
-  "connect-src 'self' https://fonts.bunny.net",
+  /* The editor reads its own local media back through fetch() — the image
+     editor loads a blob: source, and the optimizer decodes data: URLs. Neither
+     scheme was listed, so the browser refused both with "Fetch API cannot load
+     data:image/webp" and optimization failed with nothing on screen to say so. */
+  "connect-src 'self' data: blob: https://fonts.bunny.net",
   `frame-src 'self' ${videoFrameSrc}`,
 ].join("; ");
 

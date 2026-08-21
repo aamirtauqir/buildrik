@@ -21,6 +21,7 @@ import DOMPurify from "dompurify";
 import type { ElementData } from "../../types";
 import {
   ALLOWED_URL_SCHEMES,
+  ALLOWED_SRC_SCHEMES,
   DANGEROUS_PATTERNS,
   type SanitizeOptions,
 } from "./sanitizationConfig";
@@ -30,6 +31,7 @@ export {
   DEFAULT_ALLOWED_TAGS,
   DEFAULT_ALLOWED_ATTRS,
   ALLOWED_URL_SCHEMES,
+  ALLOWED_SRC_SCHEMES,
   type SanitizeOptions,
 } from "./sanitizationConfig";
 
@@ -77,8 +79,12 @@ export function isSafeAttrValue(attr: string, value: string, _tag: string): bool
     }
   }
 
-  // URL attributes need special validation
-  if (attr === "href" || attr === "src" || attr === "action") {
+  // URL attributes need special validation. `src` additionally allows blob:,
+  // which is how a just-uploaded image is previewed before it reaches a server.
+  if (attr === "src") {
+    return isSafeUrl(value, ALLOWED_SRC_SCHEMES);
+  }
+  if (attr === "href" || attr === "action") {
     return isSafeUrl(value);
   }
 

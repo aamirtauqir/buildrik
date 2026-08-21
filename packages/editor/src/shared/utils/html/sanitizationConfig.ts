@@ -260,6 +260,17 @@ export const ALLOWED_URL_SCHEMES = new Set([
 ]);
 
 /**
+ * Schemes allowed additionally on `src` — never on `href`.
+ *
+ * A locally-uploaded image is previewed from a `blob:` URL the page made from
+ * bytes it already holds. Without this the sanitizer dropped the src and the
+ * upload appeared to do nothing. It stays off `href` because a blob can hold
+ * text/html, and navigating to one runs it in this origin; as an image source
+ * it is only ever decoded.
+ */
+export const ALLOWED_SRC_SCHEMES = new Set([...ALLOWED_URL_SCHEMES, "blob:"]);
+
+/**
  * Dangerous attribute values (patterns to block)
  */
 export const DANGEROUS_PATTERNS = [
