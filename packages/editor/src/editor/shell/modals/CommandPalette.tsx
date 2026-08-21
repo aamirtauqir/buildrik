@@ -256,6 +256,9 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
   const commands = React.useMemo(
     () => buildCommands(composer, onClose),
     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // The palette unmounts on close (StudioHeader renders it conditionally), so
+    // this list — and every "cannot run" reason in it — is rebuilt on each open
+    // against the selection of that moment.
     [composer]
   );
 
