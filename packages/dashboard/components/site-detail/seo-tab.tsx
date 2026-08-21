@@ -181,7 +181,14 @@ function TechnicalSeoSection({ siteId }: { siteId: string }) {
             />
           </div>
 
-          <div className="flex justify-end">
+          {/* All three of these reach visitors through the deploy, not through
+              this save: the publish worker writes robots.txt, the noindex meta
+              and the canonical link into each page as it uploads them. Saving
+              stores the values and leaves the live site exactly as it was. */}
+          <div className="flex items-center justify-between gap-4">
+            <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
+              Applied when you next publish — the live site keeps its current rules until then.
+            </p>
             <Button type="button" onClick={save} disabled={update.isPending}>
               {update.isPending ? "Saving…" : "Save technical SEO"}
             </Button>

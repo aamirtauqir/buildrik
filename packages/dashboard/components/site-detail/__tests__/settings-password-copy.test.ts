@@ -18,6 +18,19 @@ import { describe, expect, it } from "vitest";
 const tab = readFileSync(join(__dirname, "../settings-tab.tsx"), "utf8");
 const rendered = tab.slice(tab.indexOf("return (")).replace(/\{\/\*[\s\S]*?\*\/\}/g, "");
 
+const seo = readFileSync(join(__dirname, "../seo-tab.tsx"), "utf8");
+const seoRendered = seo.slice(seo.indexOf("return (")).replace(/\{\/\*[\s\S]*?\*\/\}/g, "");
+
+describe("technical SEO copy", () => {
+  /* Canonical, noindex and robots.txt all reach visitors through the publish
+     worker, which writes them into each page as it uploads. Saving here stores
+     values and leaves the deployed site untouched. */
+  it("says the change reaches the live site on the next publish", () => {
+    expect(seoRendered).toMatch(/Applied when you next publish/);
+    expect(seoRendered).toMatch(/keeps its current rules until then/);
+  });
+});
+
 describe("site password copy", () => {
   it("says the change reaches the live site on the next publish", () => {
     expect(rendered).toMatch(/Applied when you next publish/);
