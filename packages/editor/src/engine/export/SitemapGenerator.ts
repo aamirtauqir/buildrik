@@ -21,11 +21,17 @@ export class SitemapGenerator {
   /**
    * Generate XML sitemap from pages array
    * Excludes pages marked with noIndex in their SEO settings
+   *
+   * `hrefs` maps page id → the file the export actually wrote (index.html,
+   * about.html, terms-2.html). Without it this built `${base}/${slug}`, so the
+   * sitemap advertised /about while the deploy served /about.html and there is
+   * no vercel.json asking for clean URLs — a sitemap of 404s. The export knows
+   * the real names; it just wasn't telling.
    */
-  generate(pages: PageData[]): string {
+  generate(pages: PageData[], hrefs?: ReadonlyMap<string, string>): string {
     const urls = pages
       .filter((page) => !page.settings?.seo?.noIndex)
-      .map((page) => this.buildUrlEntry(page))
+      .map((page) => this.buildUrlEntry(page, hrefs?.get(page.id)))
       .join("\n");
 
     return `<?xml version="1.0" encoding="UTF-8"?>
@@ -37,10 +43,11 @@ ${urls}
   /**
    * Build a single URL entry for the sitemap
    */
-  private buildUrlEntry(page: PageData): string {
-    const path = page.isHome || !page.slug ? "" : page.slug;
+  private buildUrlEntry(page: PageData, href?: string): string {
+    // index.html is the site root, so it advertises the bare origin.
+    const path = href ? (href === "index.html" ? "" : href) : page.isHome || !page.slug ? "" : page.slug;
     const loc = `${this.baseUrl}/${path}`;
-    const priority = page.isHome ? "1.0" : "0.8";
+    const priority = (href ? href === "index.html" : page.isHome) ? "1.0" : "0.8";
     const lastmod = new Date().toISOString().split("T")[0];
 
     return `  <url>

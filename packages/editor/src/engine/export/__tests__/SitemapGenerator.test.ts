@@ -106,3 +106,49 @@ describe("SitemapGenerator", () => {
     expect(xml).toContain("</urlset>");
   });
 });
+
+/**
+ * The sitemap has to name files the deploy actually serves.
+ *
+ * It built `${base}/${slug}` — /about — while the export writes about.html and
+ * the deploy uploads that name with no vercel.json asking for clean URLs. Every
+ * non-home entry was a 404 waiting to be crawled.
+ */
+describe("SitemapGenerator — urls match the exported filenames", () => {
+  const pages = [
+    makePage({ id: "p1", slug: "home", isHome: true }),
+    makePage({ id: "p2", slug: "about" }),
+    makePage({ id: "p3", slug: "terms" }),
+  ];
+  const hrefs = new Map([
+    ["p1", "index.html"],
+    ["p2", "about.html"],
+    ["p3", "terms-2.html"],
+  ]);
+
+  it("uses the export's own filenames, including a de-duplicated one", () => {
+    const xml = new SitemapGenerator("https://example.com").generate(pages, hrefs);
+    expect(xml).toContain("<loc>https://example.com/about.html</loc>");
+    expect(xml).toContain("<loc>https://example.com/terms-2.html</loc>");
+    expect(xml).not.toContain("<loc>https://example.com/about</loc>");
+  });
+
+  it("advertises index.html as the bare origin, at priority 1.0", () => {
+    const xml = new SitemapGenerator("https://example.com").generate(pages, hrefs);
+    expect(xml).toContain("<loc>https://example.com/</loc>");
+    expect(xml).not.toContain("index.html");
+    const home = xml.slice(xml.indexOf("https://example.com/</loc>"));
+    expect(home).toContain("<priority>1.0</priority>");
+  });
+
+  it("gives the home priority to whichever page became index.html, not to isHome", () => {
+    // After the index.html fix, a site with no isHome page still has a root.
+    const noHome = [makePage({ id: "a", slug: "one" }), makePage({ id: "b", slug: "two" })];
+    const xml = new SitemapGenerator("https://example.com").generate(
+      noHome,
+      new Map([["a", "index.html"], ["b", "two.html"]]),
+    );
+    expect(xml.slice(xml.indexOf("<loc>https://example.com/</loc>"))).toContain("1.0");
+    expect(xml).toContain("<loc>https://example.com/two.html</loc>");
+  });
+});

@@ -3,7 +3,12 @@ import { Prisma } from "@prisma/client";
 import { deliverWebhook } from "@/server/services/webhook.service";
 import { prisma } from "@lib/prisma";
 import { slugifyProjectName, type VercelFile } from "@lib/vercel";
-import { pageCanonicalUrl } from "@lib/publish-urls";
+import {
+  pageCanonicalUrl,
+  resolveSiteOrigin,
+  buildSitemapXml,
+  withSitemapDirective,
+} from "@lib/publish-urls";
 import {
   injectAnalyticsBeacon,
   injectWorkspaceApps,
@@ -317,14 +322,42 @@ async function runVercelDeployJob(
     ),
   }));
 
+  // Named here rather than at the deploy call: the sitemap needs the origin
+  // this deploy will land on, and that is derived from the project name.
+  const projectName = slugifyProjectName(site.slug);
+
+  /* The site's own origin, for the absolute URLs a sitemap and a canonical
+     need: the canonical domain the owner typed, else a verified custom domain,
+     else the Vercel project this deploy lands on. */
+  const verifiedDomain = await prisma.domain.findFirst({
+    where: { siteId, status: "VERIFIED" },
+    select: { domain: true },
+  });
+  const origin = resolveSiteOrigin({
+    canonicalUrl: seo.canonicalUrl,
+    verifiedDomain: verifiedDomain?.domain ?? null,
+    vercelProjectName: projectName,
+  });
+
   // Technical SEO (d5): ship robots.txt — the site's custom rules if set, else a
-  // sensible default driven by the indexing toggle.
+  // sensible default driven by the indexing toggle. Plus the pointer to the
+  // sitemap, unless the author wrote their own Sitemap: line.
+  const robotsBody = site.robotsTxt?.trim()
+    ? site.robotsTxt
+    : `User-agent: *\n${site.allowIndexing ? "Allow: /" : "Disallow: /"}\n`;
   files.push({
     file: "robots.txt",
-    data: site.robotsTxt?.trim()
-      ? site.robotsTxt
-      : `User-agent: *\n${site.allowIndexing ? "Allow: /" : "Disallow: /"}\n`,
+    data: site.allowIndexing ? withSitemapDirective(robotsBody, origin) : robotsBody,
   });
+
+  /* sitemap.xml — published sites shipped none. SitemapGenerator has existed
+     and been tested in the editor for months, but it only runs on the ZIP
+     export and the publish payload carries pages, so it never reached a
+     deploy. Skipped when indexing is off: a staging site asking to be crawled
+     is the opposite of what the switch means. */
+  if (site.allowIndexing && origin) {
+    files.push({ file: "sitemap.xml", data: buildSitemapXml(origin, pages) });
+  }
 
   // Step 0 — Generating pages: editor already rendered HTML; just mark done.
   await checkCancelled(jobId);
@@ -337,7 +370,6 @@ async function runVercelDeployJob(
 
   // Step 2 — Deploying to CDN: delegate to service (handles OAuth connection gating).
   await checkCancelled(jobId);
-  const projectName = slugifyProjectName(site.slug);
   const result = await runVercelDeploy(workspaceId, projectName, files, passwordPlain);
   if (result === null) {
     // dev mode + no workspace connection → fall through to simulation

@@ -712,7 +712,7 @@ export class ExportEngine {
       const generator = new SitemapGenerator(options.baseUrl);
       files.push({
         name: "sitemap.xml",
-        content: generator.generate(pages),
+        content: generator.generate(pages, this.pageHrefs),
         type: "xml",
       });
     }
