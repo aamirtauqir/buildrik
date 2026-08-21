@@ -19,6 +19,7 @@ vi.mock("../tabs/publish/PublishTab", () => ({ default: () => null }));
 vi.mock("../tabs/history/HistoryTab", () => ({ default: () => null }));
 vi.mock("../tabs/settings/SettingsTab", () => ({ default: () => null }));
 
+import { ToastProvider } from "@/editor/chrome-ui";
 import { LeftSidebar } from "../LeftSidebar";
 
 beforeAll(() => {
@@ -51,7 +52,12 @@ function renderSidebar(overrides: {
 }) {
   const onTabChange = overrides.onTabChange ?? vi.fn();
   const onDrawerToggle = overrides.onDrawerToggle ?? vi.fn();
+  /* LeftSidebar reads useToast (the Components create door tells the user when
+     nothing is selected), and useToast throws outside its provider. The app
+     always has one — AquibraStudio wraps the whole studio in ToastProvider —
+     so the provider belongs in the harness, not a fallback in the component. */
   render(
+    <ToastProvider>
     <LeftSidebar
       composer={null}
       activeTab={overrides.activeTab ?? "layers"}
@@ -59,6 +65,7 @@ function renderSidebar(overrides: {
       drawerOpen={overrides.drawerOpen ?? true}
       onDrawerToggle={onDrawerToggle}
     />
+    </ToastProvider>
   );
   return { onTabChange, onDrawerToggle };
 }

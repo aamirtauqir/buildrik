@@ -15,7 +15,7 @@ import { getTabWidth, getTabConfig, getTabsByZone, getRailTools, getTabsByTool, 
 import { getEditorViewMode } from "../../shared/utils/editorViewMode";
 import type { BlockData } from "../../shared/types";
 import type { UsePublishJobResult } from "../shell/hooks/usePublishJob";
-import { ConfirmDialog, Button, HintTooltip } from "@/editor/chrome-ui";
+import { ConfirmDialog, Button, HintTooltip, useToast } from "@/editor/chrome-ui";
 import { InspectorErrorBoundary } from "../inspector/components/InspectorErrorBoundary";
 import { PanelSkeleton, SidebarErrorFallback } from "./SidebarFallbacks";
 import { TabRouter } from "./TabRouter";
@@ -469,6 +469,8 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   // Global keyboard shortcuts (A, T, Z, etc.)
   useSidebarKeyboard(safeTabChange);
 
+  const { addToast } = useToast();
+
   // Rail mode — read once. Default "figma" (F1); "e3" and "legacy" are escape hatches.
   const railMode = React.useMemo(() => getEditorViewMode().railMode, []);
   const useFourToolRail = railMode === "e3";
@@ -492,10 +494,23 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
     if (!composer.components?.isAvailable?.()) return;
     const selectedIds = composer.selection.getSelectedIds();
     const elementId = selectedIds[0];
-    if (elementId) {
-      composer.emit(EVENTS.COMPONENT_CREATE_REQUESTED, { elementId });
+    /* And with NOTHING selected it returned silently on the next line, which is
+       the state the empty state is FOR: both of its actions sit under copy that
+       says "Select an element on the canvas and save it as a component", and a
+       new user who clicks them first got no dialog, no toast, nothing. Say what
+       is missing instead of saying nothing. Measured live 2026-08-22: three
+       clicks (the header +, the inline link, the footer button), zero change of
+       any kind. */
+    if (!elementId) {
+      addToast({
+        description: "Select an element on the canvas first — a component is made from something.",
+        tone: "info",
+        duration: 4000,
+      });
+      return;
     }
-  }, [composer]);
+    composer.emit(EVENTS.COMPONENT_CREATE_REQUESTED, { elementId });
+  }, [composer, addToast]);
 
   // Panel header info
   const tabConfig = getTabConfig(activeTab);
