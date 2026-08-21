@@ -49,6 +49,21 @@ function makeComposer(initialPages: PageData[]) {
       pages = [...pages, makePage({ id: `p-${pages.length + 1}-new`, name })];
       emit(EVENTS.PROJECT_CHANGED, { type: "page:created" });
     }),
+    /* The engine's duplicate deep-clones the source and names the copy itself.
+       The tab bar must call THIS, not createPage — createPage produces an empty
+       page wearing the copy's name. */
+    duplicatePage: vi.fn((id: string) => {
+      const source = pages.find((p) => p.id === id);
+      if (!source) return null;
+      const copy = makePage({
+        id: `p-${pages.length + 1}-copy`,
+        name: `${source.name} Copy`,
+        root: source.root,
+      });
+      pages = [...pages, copy];
+      emit(EVENTS.PROJECT_CHANGED, { type: "page:created" });
+      return copy;
+    }),
     updatePage: vi.fn((id: string, patch: Partial<PageData>) => {
       pages = pages.map((p) => (p.id === id ? { ...p, ...patch } : p));
       emit(EVENTS.PROJECT_CHANGED, { type: "page:updated" });
@@ -245,12 +260,26 @@ describe("PageTabBar", () => {
   });
 
   // ── other actions ──────────────────────────────────────────────────────────
-  it("'Duplicate' creates a '[Name] Copy' page", () => {
+  /* This test used to assert `createPage("About Copy")` — it pinned the bug.
+     createPage makes an EMPTY page with that name; measured live, a Home page
+     with four blocks duplicated to a canvas holding one node. Duplicate has to
+     go through the engine's deep clone. */
+  it("'Duplicate' deep-clones the source page, it does not create an empty one", () => {
     const { composer, elements } = makeComposer(TWO_PAGES);
     renderBar(composer);
     fireEvent.contextMenu(screen.getByRole("tab", { name: "About" }));
     fireEvent.click(screen.getByRole("menuitem", { name: /Duplicate/ }));
-    expect(elements.createPage).toHaveBeenCalledWith("About Copy");
+    expect(elements.duplicatePage).toHaveBeenCalledWith("p-2");
+    expect(elements.createPage).not.toHaveBeenCalled();
+  });
+
+  it("warns instead of failing silently when the source page is gone", () => {
+    const { composer, elements } = makeComposer(TWO_PAGES);
+    elements.duplicatePage.mockReturnValueOnce(null);
+    renderBar(composer);
+    fireEvent.contextMenu(screen.getByRole("tab", { name: "About" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: /Duplicate/ }));
+    expect(elements.duplicatePage).toHaveBeenCalledWith("p-2");
   });
 
   it("'+' adds a page with the smart default name", () => {

@@ -139,12 +139,31 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
 
   const handleDuplicate = (pageId: string) => {
     if (!composer) return;
-    const page = pages.find((p) => p.id === pageId);
-    if (page) {
-      // Match PagesTab pattern: "[Name] Copy" not "[Name] (Copy)"
-      composer.elements.createPage(`${page.name} Copy`);
-    }
     setContextMenu(null);
+    /* `createPage(name + " Copy")` makes an EMPTY page wearing the copy's
+       name — the exact feature-theater PageManager.duplicatePage was written
+       to fix, fixed in the Pages tab and never here. Measured live: a Home
+       page with four blocks duplicated to a "Home Copy" whose canvas held one
+       node and 133 characters of HTML, and duplicating twice produced two
+       tabs both called "Home Copy" because createPage does not de-duplicate
+       names. The engine's duplicate deep-clones the LIVE tree, mints fresh
+       ids, and names the copy itself. */
+    try {
+      if (!composer.elements.duplicatePage(pageId)) {
+        addToast({
+          description: "Couldn't duplicate — source page not found.",
+          tone: "warning",
+          duration: 3000,
+        });
+      }
+    } catch (err) {
+      addToast({
+        description: "Duplicate failed — page may have corrupt content.",
+        tone: "error",
+        duration: 4000,
+      });
+      console.error("[page-tabs] duplicatePage failed", err);
+    }
   };
 
   const handleDeleteRequest = (pageId: string) => {
