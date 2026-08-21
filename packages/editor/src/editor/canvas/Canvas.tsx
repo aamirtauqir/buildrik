@@ -430,6 +430,19 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
 
     // Empty canvas CTA overlay state
     const [emptyDismissed, setEmptyDismissed] = React.useState(false);
+    /* A site the server says is gone gets no invitation to start work. The
+       banner above the canvas explains it; this half was still offering
+       "Browse templates" and "Start blank" over a project whose every save is
+       refused. */
+    const [projectUnavailable, setProjectUnavailable] = React.useState(false);
+    React.useEffect(() => {
+      if (!composer) return;
+      const onGone = () => setProjectUnavailable(true);
+      composer.on(EVENTS.PROJECT_UNAVAILABLE, onGone);
+      return () => {
+        composer.off(EVENTS.PROJECT_UNAVAILABLE, onGone);
+      };
+    }, [composer]);
     React.useEffect(() => {
       if (content) setEmptyDismissed(false);
     }, [content]);
@@ -455,7 +468,8 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       const rootEl = rootId ? composer?.elements?.getElement?.(rootId) : null;
       return !!rootEl && rootEl.getChildren().length === 0;
     }, [composer, content]);
-    const isCanvasEmpty = pageIsEmpty && !emptyDismissed && !projectLoading;
+    const isCanvasEmpty =
+      pageIsEmpty && !emptyDismissed && !projectLoading && !projectUnavailable;
     const showLoadingCanvas = pageIsEmpty && projectLoading;
 
     // Toolbar action callbacks (delegated to useCanvasToolbarActions)

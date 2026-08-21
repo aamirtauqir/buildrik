@@ -225,6 +225,11 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               err instanceof Error && /not_found/i.test(err.message);
             // S1.5: prefer a persistent banner over a transient toast when the
             // shell wired onLoadError; the toast stays as the back-compat path.
+            if (isMissing) {
+              // The canvas invites work ("Start blank") and cannot see the
+              // banner; it has to hear that this site is not coming back.
+              instance.emit(EVENTS.PROJECT_UNAVAILABLE, { reason: "missing" });
+            }
             if (onLoadErrorRef.current) {
               onLoadErrorRef.current(isAuth ? "auth" : isMissing ? "missing" : "network");
             } else if (isAuth) {
