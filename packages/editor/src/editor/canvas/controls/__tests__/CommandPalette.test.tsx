@@ -1,6 +1,11 @@
 /**
  * Tests for CommandPalette — context-awareness (D9)
  *
+ * Rows are queried as `option`, not `button`: the palette is a combobox over a
+ * listbox now. It used to be an input beside a list of plain buttons, so the
+ * arrow keys moved a highlight that assistive tech could not follow and the
+ * selected command was never announced.
+ *
  * Verifies that commands with requiresSelection=true are rendered as
  * visually disabled (with hint text) when selectedId is null, and
  * are enabled when an element is selected. Commands without
@@ -76,7 +81,7 @@ describe("CommandPalette — requiresSelection context awareness", () => {
   it("marks requiresSelection button as disabled when selectedId is null", () => {
     renderPalette([deleteCommand], null);
 
-    const btn = screen.getByRole("button", { name: /delete/i });
+    const btn = screen.getByRole("option", { name: /delete/i });
     expect(btn).toHaveAttribute("disabled");
     expect(btn).toHaveAttribute("aria-disabled", "true");
   });
@@ -86,7 +91,7 @@ describe("CommandPalette — requiresSelection context awareness", () => {
     const cmd: CommandAction = { ...deleteCommand, handler };
     renderPalette([cmd], null);
 
-    const btn = screen.getByRole("button", { name: /delete/i });
+    const btn = screen.getByRole("option", { name: /delete/i });
     // disabled buttons don't fire click handlers natively in jsdom, but
     // we also guard in executeCommand — verify the handler is not called.
     await userEvent.click(btn);
@@ -104,7 +109,7 @@ describe("CommandPalette — requiresSelection context awareness", () => {
   it("does NOT mark requiresSelection button as disabled when selectedId is set", () => {
     renderPalette([deleteCommand], "el-1");
 
-    const btn = screen.getByRole("button", { name: /delete/i });
+    const btn = screen.getByRole("option", { name: /delete/i });
     expect(btn).not.toHaveAttribute("disabled");
   });
 
@@ -122,7 +127,7 @@ describe("CommandPalette — requiresSelection context awareness", () => {
   it("never disables a command without requiresSelection", () => {
     renderPalette([undoCommand], null);
 
-    const btn = screen.getByRole("button", { name: /undo/i });
+    const btn = screen.getByRole("option", { name: /undo/i });
     expect(btn).not.toHaveAttribute("disabled");
   });
 
@@ -131,9 +136,9 @@ describe("CommandPalette — requiresSelection context awareness", () => {
   it("disables only requiresSelection commands in a mixed list when selectedId is null", () => {
     renderPalette([undoCommand, deleteCommand, duplicateCommand], null);
 
-    const undoBtn = screen.getByRole("button", { name: /undo/i });
-    const deleteBtn = screen.getByRole("button", { name: /delete/i });
-    const duplicateBtn = screen.getByRole("button", { name: /duplicate/i });
+    const undoBtn = screen.getByRole("option", { name: /undo/i });
+    const deleteBtn = screen.getByRole("option", { name: /delete/i });
+    const duplicateBtn = screen.getByRole("option", { name: /duplicate/i });
 
     expect(undoBtn).not.toHaveAttribute("disabled");
     expect(deleteBtn).toHaveAttribute("disabled");
@@ -143,9 +148,9 @@ describe("CommandPalette — requiresSelection context awareness", () => {
   it("enables all commands in a mixed list when selectedId is set", () => {
     renderPalette([undoCommand, deleteCommand, duplicateCommand], "el-1");
 
-    const undoBtn = screen.getByRole("button", { name: /undo/i });
-    const deleteBtn = screen.getByRole("button", { name: /delete/i });
-    const duplicateBtn = screen.getByRole("button", { name: /duplicate/i });
+    const undoBtn = screen.getByRole("option", { name: /undo/i });
+    const deleteBtn = screen.getByRole("option", { name: /delete/i });
+    const duplicateBtn = screen.getByRole("option", { name: /duplicate/i });
 
     expect(undoBtn).not.toHaveAttribute("disabled");
     expect(deleteBtn).not.toHaveAttribute("disabled");

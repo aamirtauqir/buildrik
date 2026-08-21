@@ -394,3 +394,44 @@ describe("CommandPalette — keys reach the whole dialog", () => {
     expect(selectedNow === null || selectedNow !== first).toBe(true);
   });
 });
+
+/**
+ * The palette is the app's own list of what it can do, and until now it was an
+ * input sitting beside a list of plain buttons: no combobox, no listbox, no
+ * activedescendant. Measured live — the arrow keys moved a highlight that
+ * assistive tech could not follow, and typing changed the results silently.
+ */
+describe("CommandPalette — the keyboard highlight is announced", () => {
+  it("wires the input as a combobox pointing at the highlighted option", () => {
+    renderPalette();
+    const input = screen.getByRole("combobox");
+    expect(input).toHaveAttribute("aria-expanded", "true");
+    const listId = input.getAttribute("aria-controls");
+    expect(listId).toBeTruthy();
+    expect(screen.getByRole("listbox")).toHaveAttribute("id", listId!);
+
+    const active = input.getAttribute("aria-activedescendant");
+    expect(active).toBeTruthy();
+    expect(document.getElementById(active!)).toHaveAttribute("aria-selected", "true");
+  });
+
+  it("moves aria-activedescendant with the arrow keys", () => {
+    renderPalette();
+    const input = screen.getByRole("combobox");
+    const first = input.getAttribute("aria-activedescendant");
+
+    fireEvent.keyDown(input, { key: "ArrowDown" });
+
+    const second = input.getAttribute("aria-activedescendant");
+    expect(second).not.toBe(first);
+    expect(document.getElementById(second!)).toHaveAttribute("aria-selected", "true");
+    expect(document.getElementById(first!)).toHaveAttribute("aria-selected", "false");
+  });
+
+  it("renders every command as an option of the listbox", () => {
+    renderPalette();
+    const options = screen.getAllByRole("option");
+    expect(options.length).toBeGreaterThan(0);
+    for (const o of options) expect(o.closest("[role=listbox]")).not.toBeNull();
+  });
+});

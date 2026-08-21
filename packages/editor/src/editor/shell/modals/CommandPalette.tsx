@@ -216,6 +216,9 @@ const ShortcutBadge: React.FC<{ shortcut: string }> = ({ shortcut }) => {
 // COMPONENT
 // =============================================================================
 
+/** One id for the listbox, so the input can point at it and at its rows. */
+const LIST_ID = "bk-cmdk-list";
+
 export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, composer }) => {
   const [query, setQuery] = React.useState("");
   const [selectedIndex, setSelectedIndex] = React.useState(0);
@@ -389,6 +392,19 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
             placeholder="Type a command or search…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            /* The arrow keys move a highlight that assistive tech could not
+               see: this was an input and a list of plain buttons, with no
+               combobox, no listbox and no activedescendant, so a screen-reader
+               user typing here heard the results change not at all. The list
+               below carries role=listbox and each row role=option. */
+            role="combobox"
+            aria-expanded
+            aria-controls={LIST_ID}
+            aria-autocomplete="list"
+            aria-activedescendant={
+              displayCommands[selectedIndex] ? `${LIST_ID}-${selectedIndex}` : undefined
+            }
+            aria-label="Type a command or search"
             className="tw:flex-1 tw:[&_input]:h-full tw:[&_input]:border-0 tw:[&_input]:bg-transparent tw:[&_input]:text-base"
           />
         </div>
@@ -396,6 +412,9 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
         {/* Results list */}
         <div
           ref={listRef}
+          id={LIST_ID}
+          role="listbox"
+          aria-label="Commands"
           className="tw:max-h-90 tw:overflow-y-auto tw:[scrollbar-width:thin] tw:[scrollbar-color:var(--bk-gray-200)_transparent]"
         >
           {displayCommands.length === 0 ? (
@@ -438,6 +457,9 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
                 <div key={group}>
                   {/* Section header */}
                   <div
+                    /* A listbox may only own options and groups, so the band
+                       label is the group's own name rather than a loose div. */
+                    role="presentation"
                     /* gray-600: these band labels are 11px on
                        --bk-bg-subtle, where gray-500 measures 4.39:1 — under
                        AA (axe, 6 nodes in this palette). */
@@ -453,7 +475,10 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
                     return (
                       <Button
                         key={`${group}-${cmd.id}`}
+                        id={`${LIST_ID}-${globalIdx}`}
                         data-idx={globalIdx}
+                        role="option"
+                        aria-selected={isSelected}
                         onClick={() => runCommand(cmd)}
                         onMouseEnter={() => setSelectedIndex(globalIdx)}
                         aria-disabled={cmd.disabled || undefined}

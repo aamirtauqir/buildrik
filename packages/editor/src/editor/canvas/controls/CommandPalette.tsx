@@ -94,6 +94,9 @@ const orderedGroups = (grouped: Record<string, CommandAction[]>): [string, Comma
     return (ai === -1 ? CATEGORY_ORDER.length : ai) - (bi === -1 ? CATEGORY_ORDER.length : bi);
   });
 
+/** One id for this palette's listbox and its rows. */
+const CANVAS_LIST_ID = "bk-canvas-cmd-list";
+
 export const CommandPalette: React.FC<CommandPaletteProps> = ({
   isOpen,
   onClose,
@@ -274,6 +277,18 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
+            /* Same gap the shell ⌘K palette had: the arrows moved a highlight
+               nothing could announce, because this was an input beside a list
+               of plain buttons. combobox + listbox + activedescendant is the
+               pattern; the input keeps focus throughout. */
+            role="combobox"
+            aria-expanded
+            aria-controls={CANVAS_LIST_ID}
+            aria-autocomplete="list"
+            aria-activedescendant={
+              filteredCommands[selectedIndex] ? `${CANVAS_LIST_ID}-${selectedIndex}` : undefined
+            }
+            aria-label="Type a command or search"
             style={{
               width: "100%",
               padding: 0,
@@ -289,6 +304,9 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         {/* Command List */}
         <div
           ref={listRef}
+          id={CANVAS_LIST_ID}
+          role="listbox"
+          aria-label="Commands"
           style={{
             flex: 1,
             overflowY: "auto",
@@ -333,6 +351,9 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                   return (
                     <Button
                       key={cmd.id}
+                      id={`${CANVAS_LIST_ID}-${globalIndex}`}
+                      role="option"
+                      aria-selected={isSelected}
                       onClick={() => executeCommand(cmd)}
                       disabled={isDisabled}
                       aria-disabled={isDisabled}
