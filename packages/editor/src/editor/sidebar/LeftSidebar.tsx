@@ -615,6 +615,11 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
         data-testid="sidebar-panel"
         role="tabpanel"
         aria-hidden={!drawerOpen}
+        /* `inert` as well as aria-hidden: the closed drawer is width 0 and
+           opacity 0 but its whole tree stays mounted, so every control inside
+           it kept its tab stop. axe called it (aria-hidden-focus, serious) and
+           a keyboard user could Tab into an invisible panel and operate it. */
+        inert={!drawerOpen}
       >
         {/* ls-panel-close removed: PanelHeader inside each tab owns the close X.
             Tabs without a PanelHeader (Layers, Add) can be closed by re-clicking

@@ -98,6 +98,25 @@ describe("LeftSidebar rail click semantics", () => {
     expect(onDrawerToggle).not.toHaveBeenCalled();
   });
 
+  /* The closed drawer is width 0 and opacity 0, but its whole tree stays
+     mounted — every control inside kept its tab stop, so a keyboard user could
+     Tab into an invisible panel and operate it. axe: aria-hidden-focus,
+     serious. `inert` is what actually removes the tab stops; aria-hidden alone
+     only lies to the AT about content the keyboard can still reach. */
+  it("the closed drawer is inert, not merely hidden", () => {
+    renderSidebar({ activeTab: "layers", drawerOpen: false });
+    const panel = screen.getByTestId("sidebar-panel");
+    expect(panel).toHaveAttribute("aria-hidden", "true");
+    expect(panel).toHaveAttribute("inert");
+  });
+
+  it("the open drawer is not inert", () => {
+    renderSidebar({ activeTab: "layers", drawerOpen: true });
+    const panel = screen.getByTestId("sidebar-panel");
+    expect(panel).toHaveAttribute("aria-hidden", "false");
+    expect(panel).not.toHaveAttribute("inert");
+  });
+
   it("different tab click while drawer CLOSED switches AND opens drawer", () => {
     const { onTabChange, onDrawerToggle } = renderSidebar({
       activeTab: "add",
