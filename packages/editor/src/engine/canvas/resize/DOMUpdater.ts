@@ -67,6 +67,38 @@ export function expandParentDOM(
 // MODEL APPLICATION (requires composer)
 // =============================================================================
 
+/** A px length, or null for anything this cannot resolve here (%, em, vw, calc). */
+function pxOrNull(value: string | undefined): number | null {
+  if (!value) return null;
+  const m = /^(-?\d+(?:\.\d+)?)px$/.exec(value.trim());
+  return m ? Number(m[1]) : null;
+}
+
+/**
+ * Keep a resized size inside the element's OWN min/max constraints.
+ *
+ * The browser already clamps the rendered box, so a card carrying
+ * `max-width: 320px` stops growing on screen while the drag keeps going — and
+ * the model happily stored the overshoot. Measured live: dragging the
+ * bottom-right handle wrote `width: 380px` on an element that stayed 320px
+ * wide, so the inspector read 380 for a 320px card. Clamping only changes what
+ * is STORED; the rendered size is unchanged, which is the point — the two now
+ * agree. Constraints in units this cannot resolve (%, em, vw, calc) are left
+ * alone rather than guessed at.
+ */
+function clampToConstraints(
+  value: number,
+  min: string | undefined,
+  max: string | undefined
+): number {
+  const maxPx = pxOrNull(max);
+  const minPx = pxOrNull(min);
+  let out = value;
+  if (maxPx !== null) out = Math.min(out, maxPx);
+  if (minPx !== null) out = Math.max(out, minPx);
+  return out;
+}
+
 /**
  * Apply bounds to element model
  * Updates width, height, position, and rotation in data model
@@ -90,8 +122,14 @@ export function applyBoundsToModel(
   const element = composer.elements.getElement(elementId);
   if (!element) return;
 
-  element.setStyle?.("width", `${Math.round(bounds.width)}px`);
-  element.setStyle?.("height", `${Math.round(bounds.height)}px`);
+  element.setStyle?.(
+    "width",
+    `${clampToConstraints(Math.round(bounds.width), element.getStyle?.("min-width"), element.getStyle?.("max-width"))}px`
+  );
+  element.setStyle?.(
+    "height",
+    `${clampToConstraints(Math.round(bounds.height), element.getStyle?.("min-height"), element.getStyle?.("max-height"))}px`
+  );
 
   const position = element.getStyle?.("position");
   if (position === "absolute" || position === "fixed") {
