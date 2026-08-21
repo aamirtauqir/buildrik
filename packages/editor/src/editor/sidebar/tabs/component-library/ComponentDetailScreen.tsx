@@ -113,11 +113,28 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
       const activePage = composer.elements.getActivePage();
       if (activePage?.root) parentId = activePage.root.id;
     }
-    if (!parentId) return;
+    if (!parentId) {
+      /* The row action on the list says this; the detail screen's own Insert
+         button returned in silence — same click, same nothing, no message. */
+      addToast({
+        description: "Open a page first to add this component.",
+        tone: "warning",
+        duration: 4000,
+      });
+      return;
+    }
 
     composer.beginTransaction("insert-component");
     try {
-      await composer.components.instantiateComponent(component.id, parentId);
+      const id = await composer.components.instantiateComponent(component.id, parentId);
+      if (!id) {
+        addToast({
+          description: `Couldn't add "${component.name}" here.`,
+          tone: "error",
+          duration: 4000,
+        });
+        return;
+      }
       onInsert?.();
     } finally {
       composer.endTransaction();
