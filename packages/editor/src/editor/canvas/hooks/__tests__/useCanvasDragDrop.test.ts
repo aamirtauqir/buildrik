@@ -588,6 +588,54 @@ describe("useCanvasDragDrop — handleDrop", () => {
     expect(composer.mediaOps.insertMediaAt).not.toHaveBeenCalled();
   });
 
+  /* An asset that never reached the server carries a session Object URL. The
+     sanitizer's scheme list has no `blob:`, so the src is dropped on the way
+     into the document and the element renders nothing — while the drop toast
+     said "added ✓". Measured 2026-08-19; the Media panel's click-insert was
+     corrected the same way. */
+  it("warns instead of celebrating when the dropped media is device-only", async () => {
+    const composer = makeStubComposer();
+    composer.elements.getElement = vi.fn(() => ({}) as never);
+
+    const { result, onDropError, onDropSuccess } = renderDragDrop({ composer });
+    const e = makeDragEvent({
+      "application/x-aquibra-media-src": "blob:http://localhost:3000/abc",
+      "application/x-aquibra-media-type": "image",
+      "application/x-aquibra-media-name": "shot.png",
+    });
+
+    await act(async () => {
+      await result.current.handleDrop(e);
+    });
+
+    expect(composer.mediaOps.insertMediaAt).toHaveBeenCalled();
+    expect(onDropSuccess).not.toHaveBeenCalled();
+    expect(onDropError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "LOCAL_ONLY_MEDIA",
+        message: expect.stringContaining("only on this device"),
+      }),
+    );
+  });
+
+  it("still celebrates a server-backed drop", async () => {
+    const composer = makeStubComposer();
+    composer.elements.getElement = vi.fn(() => ({}) as never);
+
+    const { result, onDropSuccess } = renderDragDrop({ composer });
+    const e = makeDragEvent({
+      "application/x-aquibra-media-src": "https://cdn.example/img.png",
+      "application/x-aquibra-media-type": "image",
+      "application/x-aquibra-media-name": "shot.png",
+    });
+
+    await act(async () => {
+      await result.current.handleDrop(e);
+    });
+
+    expect(onDropSuccess).toHaveBeenCalled();
+  });
+
   it("emits INSERT_FAILED when internal-media insertMediaAt returns null", async () => {
     const composer = makeStubComposer();
     composer.mediaOps.insertMediaAt = vi.fn(() => null) as any;

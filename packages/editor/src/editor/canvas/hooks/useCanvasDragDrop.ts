@@ -31,6 +31,10 @@ export type DropErrorType =
   | "INVALID_DATA"
   | "NESTING_FORBIDDEN"
   | "VALIDATION_FAILED"
+  /* The media landed, but its src is a session Object URL — the sanitizer
+     drops that scheme and the URL is revoked, so the element cannot render or
+     publish. Not a failed drop; a drop worth a word. */
+  | "LOCAL_ONLY_MEDIA"
   | "MOVE_FAILED"
   | "INSERT_FAILED";
 

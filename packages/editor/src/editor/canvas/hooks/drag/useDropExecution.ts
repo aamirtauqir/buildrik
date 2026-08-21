@@ -123,7 +123,16 @@ export function useDropExecution({
           path: "drag",
         });
 
-        if (result) {
+        if (result && src.startsWith("blob:")) {
+          /* Same truth the Media panel's click-insert tells: an asset that
+             never reached the server carries a session URL, which the
+             sanitizer strips on the way into the document. The element is
+             there; it will not render and will not publish. */
+          onDropErrorRef.current?.({
+            type: "LOCAL_ONLY_MEDIA",
+            message: `${name || "That file"} is only on this device — it won't show on the page or publish. Re-upload when you're back online.`,
+          });
+        } else if (result) {
           onDropSuccessRef.current?.({
             elementLabel: `${name || "Media"} ${targetId ? "applied" : "added"} ✓`,
             elementType: insertType,
