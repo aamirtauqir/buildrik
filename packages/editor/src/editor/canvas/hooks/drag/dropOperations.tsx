@@ -17,7 +17,6 @@ import {
   findDropTargetElement,
   getElementId,
   findValidDOMTarget,
-  calculateFinalIndex,
   findValidDropTargetWithFallback,
 } from "../../../../shared/utils/dragDrop";
 import { animateDropSuccess } from "../../../../shared/utils/dragDrop/animations";
@@ -85,16 +84,6 @@ export function handleMultiElementDrop(e: React.DragEvent, ctx: DropContext): bo
     const parent = target?.getParent?.() || rootElement;
     const parentId = parent.getId();
 
-    const siblings = parent.getChildren?.() || [];
-    let baseIndex = siblings.length;
-
-    if (target && target !== rootElement) {
-      const targetIndex = siblings.findIndex((s: GrapesElement) => s.getId() === freshTargetId);
-      if (targetIndex >= 0) {
-        baseIndex = freshDropPosition === "before" ? targetIndex : targetIndex + 1;
-      }
-    }
-
     composer.beginTransaction("multi-element-move");
     try {
       // Sort by original index descending to process from bottom to top
@@ -111,22 +100,22 @@ export function handleMultiElementDrop(e: React.DragEvent, ctx: DropContext): bo
         const descendantIds = new Set(descendants.map((d: GrapesElement) => d.getId()));
         if (descendantIds.has(parentId)) continue;
 
-        // Re-fetch FRESH siblings after each move
+        /* Re-derive the drop slot from the target's CURRENT position: every
+           move in this loop shifts the list the next one is measured against.
+           No manual "account for removal" shift here — moveElement owns that
+           (ElementCRUD), and doing it twice landed the drop one slot short. */
         const freshSiblings = parent.getChildren?.() || [];
-        const currentParent = element.getParent?.();
-        let finalIndex = baseIndex;
-
-        // Adjust index if element is already in target parent
-        if (currentParent?.getId() === parentId) {
-          const currentIndex = freshSiblings.findIndex(
-            (s: GrapesElement) => s.getId() === elementId
+        let slot = freshSiblings.length;
+        if (target && target !== rootElement) {
+          const targetSlot = freshSiblings.findIndex(
+            (s: GrapesElement) => s.getId() === freshTargetId
           );
-          if (currentIndex >= 0 && currentIndex < finalIndex) {
-            finalIndex = Math.max(0, finalIndex - 1);
+          if (targetSlot >= 0) {
+            slot = freshDropPosition === "before" ? targetSlot : targetSlot + 1;
           }
         }
 
-        composer.elements.moveElement(elementId, parentId, finalIndex);
+        composer.elements.moveElement(elementId, parentId, slot);
       }
       composer.endTransaction();
       setTimeout(() => composer.selection.reselect(), 0);
@@ -211,11 +200,18 @@ export function handleElementDrop(
 
     const { parent: newParent, index: resolvedIndex } = resolved.result;
     const newParentId = newParent.getId();
-    const finalIndex = calculateFinalIndex(sourceEl, newParent, resolvedIndex);
 
     composer.beginTransaction("move-element");
     try {
-      composer.elements.moveElement(elementId, newParentId, finalIndex);
+      /* `resolvedIndex` is already the slot moveElement wants: findValidDropTarget
+         reads the CURRENT sibling list and returns siblingIndex, or siblingIndex + 1
+         for "after". ElementCRUD.moveElement applies the same-parent shift itself.
+         Running calculateFinalIndex in between subtracted a second time and a drop
+         below a later sibling landed one slot short — measured live at 1440x900,
+         dropping the first root child onto the bottom of the LAST one put it
+         second-to-last. calculateFinalIndex still answers "where does it end up",
+         which is what wouldMoveChangePosition needs; it is not an argument. */
+      composer.elements.moveElement(elementId, newParentId, resolvedIndex);
       composer.endTransaction();
       setTimeout(() => composer.selection.reselect(), 0);
     } catch (error) {

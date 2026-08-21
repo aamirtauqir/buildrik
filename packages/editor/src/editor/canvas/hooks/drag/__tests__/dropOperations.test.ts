@@ -34,7 +34,6 @@ vi.mock("../../../../../shared/utils/dragDrop", () => ({
     el?.getAttribute?.("data-buildrick-id") ?? null,
   ),
   findValidDOMTarget: vi.fn((el: HTMLElement | null) => el),
-  calculateFinalIndex: vi.fn(() => 0),
   findValidDropTargetWithFallback: vi.fn(() => ({
     success: false,
     result: null,
@@ -662,6 +661,61 @@ describe("handleElementDrop", () => {
 
     vi.runAllTimers();
     expect(composer.selection.reselect).toHaveBeenCalled();
+  });
+
+  /* The happy-path test above asserts `expect.any(Number)`, which is green over
+     any index at all. This one replays ElementCRUD.moveElement's same-parent
+     rule — the index is a slot in the list BEFORE the element is pulled out,
+     and a slot that sits after the element is decremented — and asserts the
+     ORDER that comes out. With calculateFinalIndex also subtracting, a drop
+     below a later sibling landed one slot short (measured live). */
+  it("a same-parent drop below a later sibling lands where it was dropped", () => {
+    vi.useFakeTimers();
+    let order = ["el1", "b", "c", "d"];
+    const parent = makeStubElement({
+      id: "p2",
+      getChildren: () => order.map((id) => makeStubElement({ id })),
+    });
+    const sourceEl = makeStubElement({
+      id: "el1",
+      getType: () => "text",
+      getParent: () => parent,
+    });
+    const root = makeStubElement({ id: "r1" });
+
+    const dEl = makeStubElement({ id: "d", getParent: () => parent });
+    const composer = makeStubComposer({
+      activePage: { id: "p1", root: { id: "r1" } },
+      elements: new Map([["el1", sourceEl], ["p2", parent], ["r1", root], ["d", dEl]]),
+    });
+    composer.elements.moveElement.mockImplementation(
+      (id: string, _parentId: string, index: number) => {
+        const oldIndex = order.indexOf(id);
+        let adjusted = index;
+        if (oldIndex > -1 && oldIndex < adjusted) adjusted = Math.max(0, adjusted - 1);
+        adjusted = Math.min(Math.max(adjusted, 0), order.length - 1);
+        order = order.filter((x) => x !== id);
+        order.splice(adjusted, 0, id);
+        return true;
+      },
+    );
+    const ctx = makeDropContext(composer);
+    const e = makeDragEvent({ element: JSON.stringify({ elementId: "el1" }) });
+
+    const targetDom = document.createElement("div");
+    targetDom.setAttribute("data-buildrick-id", "d");
+    vi.mocked(findDropTargetElement).mockReturnValue(targetDom);
+    // "after d" in the CURRENT list [el1, b, c, d] — the slot findValidDropTarget
+    // returns is siblingIndex + 1 = 4.
+    vi.mocked(findValidDropTargetWithFallback).mockReturnValue({
+      success: true,
+      result: { parent: parent as any, index: 4, position: "after" },
+      elementsChecked: 1,
+    });
+
+    expect(handleElementDrop(e, ctx, null)).toBe(true);
+    expect(order.join(",")).toBe("b,c,d,el1");
+    vi.runAllTimers();
   });
 
   it("returns true when resolved target id has no element record", () => {
