@@ -112,8 +112,15 @@ export class ResizeHandler extends EventEmitter {
       ...options.constraints,
     };
 
+    /* The project's own snap setting is the base. It used to be DEFAULT_SNAP_CONFIG
+       (snapToGrid: false) merged with options.snap, and no caller passes
+       options.snap — so `composer.setSnapToGrid(true)` set a flag nothing read.
+       Two doors promise that setting: the ⌘K "Toggle Snap to Grid" command and
+       the Project Settings checkbox. Neither changed a single resize.
+       An explicit options.snap still wins, which is what per-drag overrides need. */
     const snap: SnapConfig = {
       ...DEFAULT_SNAP_CONFIG,
+      snapToGrid: this.composer.getState?.()?.snapToGrid ?? DEFAULT_SNAP_CONFIG.snapToGrid,
       ...options.snap,
     };
 
