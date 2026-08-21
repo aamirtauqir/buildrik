@@ -1,0 +1,249 @@
+{
+  "_note": "How each editor baseline state is reached in the RUNNING app. Written 2026-08-21 while refreshing the Figma baseline: the original spec was never committed, so every re-capture started by rediscovering the routes. Drive it with figma-capture-live.mjs. `selectType` selects through the engine rather than clicking canvas coordinates, because the canvas is engine-rendered HTML and a coordinate click lands wherever the layout put it.",
+  "site": "cmrsur1fp000unh3rvmmiq25t",
+  "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
+  "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
+  "screens": [
+    {
+      "id": "BL-0100",
+      "state": "shell-default",
+      "figmaNodeId": "62:2",
+      "actions": []
+    },
+    {
+      "id": "BL-0101",
+      "state": "panel-layers",
+      "figmaNodeId": "64:2",
+      "actions": [
+        {
+          "click": ".ls-rail [data-tab=layers]"
+        },
+        {
+          "waitMs": 1500
+        }
+      ]
+    },
+    {
+      "id": "BL-0102",
+      "state": "panel-pages",
+      "figmaNodeId": "66:2",
+      "actions": [
+        {
+          "click": ".ls-rail [data-tab=pages]"
+        },
+        {
+          "waitMs": 1500
+        }
+      ]
+    },
+    {
+      "id": "BL-0103",
+      "state": "panel-media",
+      "figmaNodeId": "68:2",
+      "actions": [
+        {
+          "click": ".ls-rail [data-tab=assets]"
+        },
+        {
+          "waitMs": 2000
+        }
+      ]
+    },
+    {
+      "id": "BL-0104",
+      "state": "panel-content",
+      "figmaNodeId": "69:2",
+      "actions": [
+        {
+          "click": ".ls-rail [data-tab=content]"
+        },
+        {
+          "waitMs": 2000
+        }
+      ]
+    },
+    {
+      "id": "BL-0105",
+      "state": "panel-brand",
+      "figmaNodeId": "70:2",
+      "actions": [
+        {
+          "click": ".ls-rail [data-tab=design]"
+        },
+        {
+          "waitMs": 2000
+        }
+      ]
+    },
+    {
+      "id": "BL-0106",
+      "state": "publish-open",
+      "figmaNodeId": "71:2",
+      "actions": [
+        {
+          "click": "button:has-text('Publish')"
+        },
+        {
+          "waitMs": 1500
+        }
+      ]
+    },
+    {
+      "id": "BL-0107",
+      "state": "comments-open",
+      "figmaNodeId": "65:2",
+      "actions": [
+        {
+          "click": "[aria-label*='omment' i]"
+        },
+        {
+          "waitMs": 1500
+        }
+      ]
+    },
+    {
+      "id": "BL-0108",
+      "state": "notifications-open",
+      "figmaNodeId": "67:2",
+      "actions": [
+        {
+          "click": "[aria-label*='otification' i]"
+        },
+        {
+          "waitMs": 1500
+        }
+      ]
+    },
+    {
+      "id": "BL-0109",
+      "state": "site-menu-open",
+      "figmaNodeId": "73:2",
+      "actions": [
+        {
+          "click": "[aria-label*='ite menu' i], [aria-label*='More' i]"
+        },
+        {
+          "waitMs": 1200
+        }
+      ]
+    },
+    {
+      "id": "BL-0110",
+      "state": "review-pill-open",
+      "figmaNodeId": "74:2",
+      "actions": [
+        {
+          "click": "button:has-text('Opened')"
+        },
+        {
+          "waitMs": 1200
+        }
+      ]
+    },
+    {
+      "id": "BL-0111",
+      "state": "cmdk-open",
+      "figmaNodeId": "72:2",
+      "actions": [
+        {
+          "press": "Meta+k"
+        },
+        {
+          "waitMs": 1200
+        }
+      ]
+    },
+    {
+      "id": "BL-0123",
+      "state": "inspector-text",
+      "figmaNodeId": "88:2",
+      "actions": [
+        {
+          "selectType": "paragraph"
+        },
+        {
+          "waitMs": 1800
+        }
+      ]
+    },
+    {
+      "id": "BL-0124",
+      "state": "inspector-button",
+      "figmaNodeId": "90:2",
+      "actions": [
+        {
+          "selectType": "button"
+        },
+        {
+          "waitMs": 1800
+        }
+      ]
+    },
+    {
+      "id": "BL-0125",
+      "state": "inspector-container",
+      "figmaNodeId": "91:2",
+      "actions": [
+        {
+          "selectType": "container"
+        },
+        {
+          "waitMs": 1800
+        }
+      ]
+    },
+    {
+      "id": "BL-0126",
+      "state": "inspector-grid",
+      "figmaNodeId": "93:2",
+      "actions": [
+        {
+          "selectType": "grid"
+        },
+        {
+          "waitMs": 1800
+        }
+      ]
+    },
+    {
+      "id": "BL-0127",
+      "state": "inspector-flex",
+      "figmaNodeId": "94:2",
+      "actions": [
+        {
+          "selectType": "flex"
+        },
+        {
+          "waitMs": 1800
+        }
+      ]
+    },
+    {
+      "id": "BL-0128",
+      "state": "inspector-input",
+      "figmaNodeId": "95:2",
+      "actions": [
+        {
+          "selectType": "input"
+        },
+        {
+          "waitMs": 1800
+        }
+      ]
+    },
+    {
+      "id": "BL-0129",
+      "state": "inspector-heading",
+      "figmaNodeId": "96:2",
+      "actions": [
+        {
+          "selectType": "heading"
+        },
+        {
+          "waitMs": 1800
+        }
+      ]
+    }
+  ],
+  "_verified": "2026-08-21: every entry below was replayed against localhost:3000 and the resulting state read back on screen before any capture ran. Three corrections came out of that: the Publish button opens the confirm dialog directly (there is no separate publish-open state), comment mode's only cue is the pressed toggle plus a crosshair capture layer, and the \u2318K palette cannot be captured at all \u2014 it closes when the capture script takes focus."
+}

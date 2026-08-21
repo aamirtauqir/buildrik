@@ -17,7 +17,7 @@
    "siteName": "E2E Blank Full d013128c",
    "ownerUserId": "cmpa9ohx10000wrjux4ecumzo",
    "ownerEmail": "qa@buildrik.local",
-   "note": "The site the editor reference renders were actually captured against, recovered 2026-08-18 by reading the site name off BL-0159's PNG. It was never recorded, so nothing could be recaptured comparably: a recapture against any other site differs by whatever its canvas holds, which on a 1440x900 editor frame is most of the picture. It is an e2e leftover from 2026-07-20, not a deliberate fixture — treat it as load-bearing until a real seed exists, and do not let the e2e cleanup delete it."
+   "note": "The site the editor reference renders were actually captured against, recovered 2026-08-18 by reading the site name off BL-0159's PNG. It was never recorded, so nothing could be recaptured comparably: a recapture against any other site differs by whatever its canvas holds, which on a 1440x900 editor frame is most of the picture. It is an e2e leftover from 2026-07-20, not a deliberate fixture \u2014 treat it as load-bearing until a real seed exists, and do not let the e2e cleanup delete it."
   },
   "envManifestRef": "docs/plans/2026-08-08-figma-existing-ui-baseline.md",
   "figmaPlan": "team::1653084145714197185",
@@ -26,7 +26,7 @@
    "date": "2026-08-08",
    "Inter": "PASS",
    "GeistMono": "PASS",
-   "InterTight": "MISSING — batch 1 (auth/onboarding) blocked until installed"
+   "InterTight": "MISSING \u2014 batch 1 (auth/onboarding) blocked until installed"
   },
   "gateKit": {
    "plantedViolationsCaught": [
@@ -60,38 +60,38 @@
    "date": "2026-08-09",
    "scope": "wizard-state manufacture + share/review/transfer",
    "ok": 7,
-   "trap": "wizardDataSchema is FLAT (shared/schemas/onboarding.ts:38); prisma schema comment claims nested data:{} — comment lies, zod is truth"
+   "trap": "wizardDataSchema is FLAT (shared/schemas/onboarding.ts:38); prisma schema comment claims nested data:{} \u2014 comment lies, zod is truth"
   },
   "captureRun5": {
    "date": "2026-08-09",
    "scope": "editor shell + 5 rail panels + 6 topbar surfaces + cmdk",
    "ok": 12,
-   "traps": "rail-drawer rail buttons carry NO testids (tab-* testids are stale source refs) — drive by :has-text/aria-label; Insert drawer open by default in shell; History/Templates/Components/AI/Settings NOT on rail (post-rebuild IA — find their entry points in states sweep); cmdk opened via body-click then Meta+k"
+   "traps": "rail-drawer rail buttons carry NO testids (tab-* testids are stale source refs) \u2014 drive by :has-text/aria-label; Insert drawer open by default in shell; History/Templates/Components/AI/Settings NOT on rail (post-rebuild IA \u2014 find their entry points in states sweep); cmdk opened via body-click then Meta+k"
   },
   "captureRun6": {
    "date": "2026-08-10",
    "scope": "site-menu 11 surfaces + 7 inspector profiles",
    "ok": 18,
-   "traps": "rail panel-state persists per-user server-side (Insert NOT default-open after other runs); flowbite tooltip (z-20) intercepts rail clicks — force:true insufficient, use keyboard shortcuts (Insert=A) then drawer clicks; insert auto-selects new element (footer shows 'Heading · h2') so inspector renders without canvas click; inserts MUTATE fixture site (accepted, e2e data)"
+   "traps": "rail panel-state persists per-user server-side (Insert NOT default-open after other runs); flowbite tooltip (z-20) intercepts rail clicks \u2014 force:true insufficient, use keyboard shortcuts (Insert=A) then drawer clicks; insert auto-selects new element (footer shows 'Heading \u00b7 h2') so inspector renders without canvas click; inserts MUTATE fixture site (accepted, e2e data)"
   },
   "captureRun7": {
    "date": "2026-08-10",
    "scope": "23 email templates (batch 5)",
    "ok": 23,
-   "method": "tsx import → @react-email/render → file:// screenshot @800px; default props baked in templates"
+   "method": "tsx import \u2192 @react-email/render \u2192 file:// screenshot @800px; default props baked in templates"
   },
   "captureRun8": {
    "date": "2026-08-10",
    "scope": "batch-4 set A: 5 dashboard modals + 10 editor drill-ins/menus",
    "ok": 15,
-   "traps": "rail click on ACTIVE family TOGGLES drawer closed — normalize with Insert(A) first; hover-only controls (List view toggle, row More-options) need hover action before click"
+   "traps": "rail click on ACTIVE family TOGGLES drawer closed \u2014 normalize with Insert(A) first; hover-only controls (List view toggle, row More-options) need hover action before click"
   },
   "captureRun9": {
    "date": "2026-08-10",
    "scope": "batch-4 set B: brand/content/publish/template + PAST_DUE + VIEWER variants",
    "ok": 11,
    "blocked": 2,
-   "traps": "Subscription fixture needs 5 stripe fields (schema strict); FIRST pastdue run captured FREE state mislabeled — pipe ate set -e, shas exposed it (502b17 unchanged = no variant rendered); always sha-compare variant captures against base state"
+   "traps": "Subscription fixture needs 5 stripe fields (schema strict); FIRST pastdue run captured FREE state mislabeled \u2014 pipe ate set -e, shas exposed it (502b17 unchanged = no variant rendered); always sha-compare variant captures against base state"
   },
   "captureRun10": {
    "date": "2026-08-10",
@@ -103,14 +103,14 @@
    "method": "route-file scan + email-file scan + ledger-doc scan (independent of capture manifests)",
    "routes": "102/102 covered, 0 missing",
    "emails": "23=23",
-   "deadLedger": "doc 30 = inv 28 museum + 2 live-captured experimental (D20→BL-0182, D21→BL-0183)",
+   "deadLedger": "doc 30 = inv 28 museum + 2 live-captured experimental (D20\u2192BL-0182, D21\u2192BL-0183)",
    "verdict": "NO UNEXPLAINED OMISSION on capture side"
   },
   "framePipeline": {
    "started": "2026-08-10",
-   "method": "generate_figma_design capture (login+CSP-strip Playwright driver figma-capture.mjs) → rename BL-id → read-back → screenshot compare",
-   "checkpointSwap": "fidelity checkpoint moved from auth to dashboard (Inter-only) — auth frames deferred until Inter Tight installed (13 checks missing); documented tactical adaptation",
-   "firstFrame": "BL-0037 → Micuc1rmLcFhjxF1A08Kk2#1:2"
+   "method": "generate_figma_design capture (login+CSP-strip Playwright driver figma-capture.mjs) \u2192 rename BL-id \u2192 read-back \u2192 screenshot compare",
+   "checkpointSwap": "fidelity checkpoint moved from auth to dashboard (Inter-only) \u2014 auth frames deferred until Inter Tight installed (13 checks missing); documented tactical adaptation",
+   "firstFrame": "BL-0037 \u2192 Micuc1rmLcFhjxF1A08Kk2#1:2"
   },
   "surfaceDriftSincePin": {
    "measuredAt": "2026-08-18",
@@ -129,7 +129,7 @@
     "pages": 7,
     "insert": 3
    },
-   "note": "Commit counts are a WHERE-TO-LOOK signal, not a verdict — a commit can touch a surface without moving a pixel. The one row measured properly (BL-0169 brand-pro-mode, recaptured on the seed fixture) differs by 45.67% of pixels. media and insert are the only surfaces untouched since the pin.",
+   "note": "Commit counts are a WHERE-TO-LOOK signal, not a verdict \u2014 a commit can touch a surface without moving a pixel. The one row measured properly (BL-0169 brand-pro-mode, recaptured on the seed fixture) differs by 45.67% of pixels. media and insert are the only surfaces untouched since the pin.",
    "measuredRows": {
     "BL-0103 panel-media": "12.61%",
     "BL-0100 shell-default": "13.02%",
@@ -139,8 +139,8 @@
     "BL-0105 panel-brand": "14.56%",
     "BL-0169 brand-pro-mode": "45.67%"
    },
-   "floorExplained": "Six panel roots landed in a 12.6-14.6% band, media included, and media has zero commits since the pin. Read side by side, the Media panel body is unchanged — the band is the SHELL every editor frame contains. ReviewBar (869cebb2, 2026-08-17, board 200:213) added a whole row under the topbar whenever a round is open, and the seed fixture has one; the inspector is present in the new renders and absent in the old. Vertical re-alignment does not cancel it (best offset is 0), because a new row is not a translation. CONSEQUENCE for the per-row path: the panel-level signal is real and usable — 45.67% on Brand vs a flat floor on Media is exactly the discrimination it was built for — but every editor frame's chrome is stale regardless of its panel, so 'redraw only what moved' still touches the shell band of all 48. Founder call: redraw all 48, or redraw the shell band once if the frames are componentised enough to swap it.",
-   "panelRegionMethod": "drift-diff.mjs --region 60,56,320,844 confines the comparison to the left drawer and searches +-64px of vertical alignment. It settles on dy=48px by itself — the ReviewBar's own height — which is the shell offset cancelled. Calibrated: media 2.13% (zero commits since the pin, panel confirmed identical by eye), layers 4.23% (the eye/lock icons were recoloured), brand 15.70% (tabs became a drill-in list). Read >~8% as 'the panel moved'.",
+   "floorExplained": "Six panel roots landed in a 12.6-14.6% band, media included, and media has zero commits since the pin. Read side by side, the Media panel body is unchanged \u2014 the band is the SHELL every editor frame contains. ReviewBar (869cebb2, 2026-08-17, board 200:213) added a whole row under the topbar whenever a round is open, and the seed fixture has one; the inspector is present in the new renders and absent in the old. Vertical re-alignment does not cancel it (best offset is 0), because a new row is not a translation. CONSEQUENCE for the per-row path: the panel-level signal is real and usable \u2014 45.67% on Brand vs a flat floor on Media is exactly the discrimination it was built for \u2014 but every editor frame's chrome is stale regardless of its panel, so 'redraw only what moved' still touches the shell band of all 48. Founder call: redraw all 48, or redraw the shell band once if the frames are componentised enough to swap it.",
+   "panelRegionMethod": "drift-diff.mjs --region 60,56,320,844 confines the comparison to the left drawer and searches +-64px of vertical alignment. It settles on dy=48px by itself \u2014 the ReviewBar's own height \u2014 which is the shell offset cancelled. Calibrated: media 2.13% (zero commits since the pin, panel confirmed identical by eye), layers 4.23% (the eye/lock icons were recoloured), brand 15.70% (tabs became a drill-in list). Read >~8% as 'the panel moved'.",
    "panelDrift": {
     "_threshold": ">~8% = the panel moved; below = keep the frame (calibrated on media 2.13%, zero commits since the pin, confirmed identical by eye)",
     "BL-0100 shell-default": "10.51% REDRAWN (96.85% agreement)",
@@ -181,30 +181,30 @@
     "BL-0117 sitemenu-components": "5.79% keep",
     "BL-0176 publish-confirm": "15.57% REDRAWN (94.49% agreement)"
    },
-   "shellBandNote": "FOUNDER CALL 2026-08-18: redraw a frame only when its PANEL moved; the shell band in every editor frame stays as drawn and is known-stale — it predates ReviewBar (869cebb2, 2026-08-17). Componentising the shell was considered and declined for now: the frames hold zero components (433 raw frames each), so there is nothing to swap without building it first.",
+   "shellBandNote": "FOUNDER CALL 2026-08-18: redraw a frame only when its PANEL moved; the shell band in every editor frame stays as drawn and is known-stale \u2014 it predates ReviewBar (869cebb2, 2026-08-17). Componentising the shell was considered and declined for now: the frames hold zero components (433 raw frames each), so there is nothing to swap without building it first.",
    "unmeasured": {
-    "BL-0107 comments-open": "the Comments button opens no [role=menu|dialog] and no 'Comments' text within 8s — door unknown",
+    "BL-0107 comments-open": "the Comments button opens no [role=menu|dialog] and no 'Comments' text within 8s \u2014 door unknown",
     "BL-0110 review-pill-open": "clicking the review pill changes nothing the capture can assert; a run without an assertion returns the same sha as an untouched frame, so any number from it is the shell",
     "BL-0123 inspector-text": "the seed fixture has no element of data-buildrick-type=text",
-    "_rest": "31 rows still unmeasured — see driftSweepProgress",
-    "BL-0119 sitemenu-plugins": "the door is broken — AquibraStudio:464 deep-links to a settings screen id of 'plugins' that does not exist, so it opens Settings at its root. The state cannot be captured until the id becomes 'integrations'.",
-    "BL-0120 sitemenu-invite-teammates": "not an editor state — the item opens /dashboard/settings/team in a NEW TAB (openDashboard uses window.open '_blank'), so nothing in the editor changes.",
-    "BL-0112/0113/0117/0121": "site-settings, version-history, components and keyboard-shortcuts are no longer labels in the site menu — their routes changed since the pin and each needs its door found again before it can be captured.",
-    "BL-0162 media-list-view": "[aria-label='List view'] is in the panel toolbar when probed directly, but the click never lands from a capture spec — needs its own investigation",
+    "_rest": "31 rows still unmeasured \u2014 see driftSweepProgress",
+    "BL-0119 sitemenu-plugins": "the door is broken \u2014 AquibraStudio:464 deep-links to a settings screen id of 'plugins' that does not exist, so it opens Settings at its root. The state cannot be captured until the id becomes 'integrations'.",
+    "BL-0120 sitemenu-invite-teammates": "not an editor state \u2014 the item opens /dashboard/settings/team in a NEW TAB (openDashboard uses window.open '_blank'), so nothing in the editor changes.",
+    "BL-0112/0113/0117/0121": "site-settings, version-history, components and keyboard-shortcuts are no longer labels in the site menu \u2014 their routes changed since the pin and each needs its door found again before it can be captured.",
+    "BL-0162 media-list-view": "[aria-label='List view'] is in the panel toolbar when probed directly, but the click never lands from a capture spec \u2014 needs its own investigation",
     "BL-0163 pages-context-menu": "same shape: [aria-label='More options for Home'] not clickable from a spec",
     "BL-0168 layers-context-menu": "the LAYERS RAIL BUTTON itself refuses the click (aria-label 'View and reorder page structure'); nothing in the panel was ever reached",
     "BL-0121 sitemenu-keyboard-shortcuts": "'?' does not open the shortcuts overlay; the real binding was not found"
    },
-   "specsMustAssertTheState": "A capture spec whose actions do not END in a waitFor on something the state proves will happily screenshot the state it failed to open, and the diff then reports a plausible number. Caught here: comments-open and review-pill-open both read exactly 10.86%, which is the shell region and nothing else — adding waitFor on [role=menu],[role=dialog],[role=listbox] turned both into honest FAILs while the other four still passed.",
-   "capturesLeakThroughLocalStorage": "capture.mjs runs every screen in ONE browser context, and the editor remembers its open panel in localStorage. So screen N's destination is still open when screen N+1 loads: an 'Export code' capture came back showing Version History because the previous row had opened it. Normalise at the top of each spec's actions (click a known rail tab first) or the batch quietly measures the wrong screens — the first sitemenu run produced three PAIRS of identical percentages and two byte-identical PNGs.",
-   "correction": "An earlier version of this table said media 0 and insert 0, and a commit message repeated that they were 'the only surfaces untouched since the pin'. Both were wrong. The media count was taken with two paths in one unquoted shell variable and came back 0 instead of 37; the insert count was 0 because the path it named does not exist (the tab is sidebar/tabs/elements + ElementsTab.tsx, not sidebar/tabs/insert). No editor surface is untouched since the pin. This is exactly why the founder's per-row pixel measure is the authority and the counts are only a where-to-look hint: BL-0103, the media panel ROOT, measures 2.13%% and is identical by eye, while BL-0161, the media FULL-PAGE library on the same 37-commit surface, measures 40.73%% and was rebuilt outright — 'Media library EXPANDED' with Stock/Compact became 'Asset Library MANAGE' with a folders sidebar and Import URL. One commit count cannot tell those two apart. The pixels can.",
-   "doorsThatMoved": "Brand's rows were renamed since the pin and the old row names are dead ends for a capture spec: BL-0173 'brand-styles-tab' is now the row labelled **Presets** (id still `styles`), and BL-0170 'brand-dark-preview' is now **Colour mode**. Four site-menu rows lost their labels entirely — site-settings, version-history, components, keyboard-shortcuts. A row that cannot be captured is not necessarily a broken product; usually its door was renamed.",
+   "specsMustAssertTheState": "A capture spec whose actions do not END in a waitFor on something the state proves will happily screenshot the state it failed to open, and the diff then reports a plausible number. Caught here: comments-open and review-pill-open both read exactly 10.86%, which is the shell region and nothing else \u2014 adding waitFor on [role=menu],[role=dialog],[role=listbox] turned both into honest FAILs while the other four still passed.",
+   "capturesLeakThroughLocalStorage": "capture.mjs runs every screen in ONE browser context, and the editor remembers its open panel in localStorage. So screen N's destination is still open when screen N+1 loads: an 'Export code' capture came back showing Version History because the previous row had opened it. Normalise at the top of each spec's actions (click a known rail tab first) or the batch quietly measures the wrong screens \u2014 the first sitemenu run produced three PAIRS of identical percentages and two byte-identical PNGs.",
+   "correction": "An earlier version of this table said media 0 and insert 0, and a commit message repeated that they were 'the only surfaces untouched since the pin'. Both were wrong. The media count was taken with two paths in one unquoted shell variable and came back 0 instead of 37; the insert count was 0 because the path it named does not exist (the tab is sidebar/tabs/elements + ElementsTab.tsx, not sidebar/tabs/insert). No editor surface is untouched since the pin. This is exactly why the founder's per-row pixel measure is the authority and the counts are only a where-to-look hint: BL-0103, the media panel ROOT, measures 2.13%% and is identical by eye, while BL-0161, the media FULL-PAGE library on the same 37-commit surface, measures 40.73%% and was rebuilt outright \u2014 'Media library EXPANDED' with Stock/Compact became 'Asset Library MANAGE' with a folders sidebar and Import URL. One commit count cannot tell those two apart. The pixels can.",
+   "doorsThatMoved": "Brand's rows were renamed since the pin and the old row names are dead ends for a capture spec: BL-0173 'brand-styles-tab' is now the row labelled **Presets** (id still `styles`), and BL-0170 'brand-dark-preview' is now **Colour mode**. Four site-menu rows lost their labels entirely \u2014 site-settings, version-history, components, keyboard-shortcuts. A row that cannot be captured is not necessarily a broken product; usually its door was renamed.",
    "regionMustMatchTheState": "BL-0175 measured 92.30%% against the drawer region and 26.14%% against the modal region. Both numbers are real: the old shot dims the drawer behind an open modal and the new one does not, so the drawer region was measuring a backdrop. Measure a modal row in the modal.",
-   "offRailDoorsAreByDesign": "Settings, Version History, Components, Publish and History have no rail icon: the rail is six items by board 52:2, and LeftSidebar says off-rail panels open from ⌘K, shortcuts and the topbar (guarded by tabsConfig.figma.test.ts). Checked before calling anything stranded — pressing S really does open Settings. So the inventory rows named 'sitemenu-site-settings' and 'sitemenu-version-history' are still capturable, just not from the site menu: S, H, ⇧A, U reach them.",
+   "offRailDoorsAreByDesign": "Settings, Version History, Components, Publish and History have no rail icon: the rail is six items by board 52:2, and LeftSidebar says off-rail panels open from \u2318K, shortcuts and the topbar (guarded by tabsConfig.figma.test.ts). Checked before calling anything stranded \u2014 pressing S really does open Settings. So the inventory rows named 'sitemenu-site-settings' and 'sitemenu-version-history' are still capturable, just not from the site menu: S, H, \u21e7A, U reach them.",
    "knownResiduals": "Two things a DOM measure cannot reach, both small and both recorded rather than faked: unit suffixes in the inspector ('px' after a number) are CSS ::after content and have no node to read; and Figma renders Inter a shade wider than Chrome, so a line of wrapped copy can break one word earlier or later. Text alignment WAS missing for the first inspector frame (labels are right-aligned in the app, left in BL-0129) and is captured from BL-0124 on.",
-   "correctionSiteMenu": "An earlier note here said site-settings, version-history, components and keyboard-shortcuts were 'no longer labels in the site menu'. They are all there — the claim came from a regex over SiteMenu.tsx that only matched a subset of the markup. Measuring the open menu listed nineteen items across five groups, including all four.",
-   "overlayMeasureNotes": "Overlays needed three fixes before they measured at all. The walk stopped descending at a zero-size box, and a portal root has no size — every popover came back as two nodes. It also stopped descending when a node fell outside the region, but an absolutely-positioned child escapes its parent: the site menu hangs off the 32x32 topbar button, nowhere near the region the menu occupies. And a region-only walk picked up the page BEHIND the overlay, so specs now name a `root` selector and the walk starts there.",
-   "measureRespectsAncestorOpacity": "Opacity does not inherit as a computed value, so a child of a faded ancestor still reports opacity 1. Until the walk checked ancestors, a CLOSED panel measured as a full screen of content — 50 nodes with real geometry for a surface at opacity 0. The walk climbs now."
+   "correctionSiteMenu": "An earlier note here said site-settings, version-history, components and keyboard-shortcuts were 'no longer labels in the site menu'. They are all there \u2014 the claim came from a regex over SiteMenu.tsx that only matched a subset of the markup. Measuring the open menu listed nineteen items across five groups, including all four.",
+   "overlayMeasureNotes": "Overlays needed three fixes before they measured at all. The walk stopped descending at a zero-size box, and a portal root has no size \u2014 every popover came back as two nodes. It also stopped descending when a node fell outside the region, but an absolutely-positioned child escapes its parent: the site menu hangs off the 32x32 topbar button, nowhere near the region the menu occupies. And a region-only walk picked up the page BEHIND the overlay, so specs now name a `root` selector and the walk starts there.",
+   "measureRespectsAncestorOpacity": "Opacity does not inherit as a computed value, so a child of a faded ancestor still reports opacity 1. Until the walk checked ancestors, a CLOSED panel measured as a full screen of content \u2014 50 nodes with real geometry for a surface at opacity 0. The walk climbs now."
   },
   "driftRegions": {
    "_note": "Whole-frame comparison does not work: the alignment search picks dy=0 because the topbar never moved and the canvas content dominates, so the ReviewBar offset below it is never cancelled. Each state family needs the band its state actually lives in. Rail is 0-60, drawer 60-380, canvas 380-1140, inspector 1140-1440; the shell above starts at 56.",
@@ -263,8 +263,8 @@
     "BL-0176"
    ],
    "remaining": 2,
-   "note": "Each remaining row needs its capture spec rebuilt by hand — the originals were never committed (only screens-auth.json was). Reaching a state is the slow part: BL-0159's stock browser took three attempts because the entry moved into the panel footer as 'Browse stock' and even that lands on a source picker. Log in as the seed fixture's owner (qa@buildrik.local), not your own user, or /edit redirects and the failure reads as a sentinel timeout.",
-   "remainingRows": "BL-0162 (fixture has no media, so the list toggle is disabled — adding an asset would restate every verified Media row) · BL-0172 (NEXT_PUBLIC_FEATURE_DS_AI unset, so there is no state to capture)",
+   "note": "Each remaining row needs its capture spec rebuilt by hand \u2014 the originals were never committed (only screens-auth.json was). Reaching a state is the slow part: BL-0159's stock browser took three attempts because the entry moved into the panel footer as 'Browse stock' and even that lands on a source picker. Log in as the seed fixture's owner (qa@buildrik.local), not your own user, or /edit redirects and the failure reads as a sentinel timeout.",
+   "remainingRows": "BL-0162 (fixture has no media, so the list toggle is disabled \u2014 adding an asset would restate every verified Media row) \u00b7 BL-0172 (NEXT_PUBLIC_FEATURE_DS_AI unset, so there is no state to capture)",
    "redrawn": [
     "BL-0100",
     "BL-0105",
@@ -297,9 +297,30 @@
    ],
    "redrawCost": "BL-0105, the first: 1 clean recapture (the rail tooltip was covering a row in the first reference), 1 computed-style measuring probe, 5 use_figma calls (structure / rows / footer / icons / icon size), 3 screenshots to check. The subtree is 260 nodes; building it as data-driven auto-layout rather than node by node is what kept it to five calls.",
    "redrawRemaining": 0,
-   "redrawVerification": "25 of 25 drawn and 25 verified against a reference render (92.5-97.8%). BL-0112 was the last: it could not be verified while the Settings surface was broken, so the surface was FIXED first and a fresh reference captured. Comparison trap: a frame screenshot is NOT symmetrically padded (x is +12 per side, y about +1 at the top), so a centre-crop comparison reads ~10px low and understates agreement — crop the figma image at the target's own measured edge instead. Interpreter trap: a measured child of a plain TEXT node is positioned relative to that text, but a text node cannot hold children, so the rebuild attaches it to the text's PARENT and must add the text's own origin — BL-0112's \"opens dashboard\" hint landed 626px too high without it.",
-   "harness": "Two fixes on 2026-08-19 unblocked five rows that had been written off as unreachable. (1) capture.mjs and measure-region.mjs now accept a `rightClick` action — context menus need the right button, and three rows sat as \"controls refuse the click from a spec\" for want of it. (2) Both scripts seed the `buildrik_consent` cookie on every context instead of clicking \"Essential Only\" per screen: the banner covers the editor's status bar and eats clicks, and a per-screen click FAILS THE WHOLE RUN on the second screen, because the contexts are reused and there is no banner left to click.",
-   "referenceCorpus": "Checked, not assumed (2026-08-19): the site name was read off the topbar of all 49 editor references by cropping x74-240,y16-40 and comparing. 48 are the seed fixture (\"E2E Blank Full d013128c\"). Exactly ONE is not — BL-0171, whose topbar reads \"Demo AI Site\"; comparing a seed-fixture render against it read ~81% for no reason but the canvas content, and it has been recaptured on the fixture as `brand-starter-themes__seed.png`. Five rows (BL-0106, 0111, 0112, 0121, 0175) look different at first and are not: a modal scrim dims the topbar, and they match the seed template exactly once brightness is normalised. So the corpus IS uniform, with one row's worth of exception — but read the site name off a reference before believing a drift number, because nothing else in the pipeline records which site a render came from."
+   "redrawVerification": "25 of 25 drawn and 25 verified against a reference render (92.5-97.8%). BL-0112 was the last: it could not be verified while the Settings surface was broken, so the surface was FIXED first and a fresh reference captured. Comparison trap: a frame screenshot is NOT symmetrically padded (x is +12 per side, y about +1 at the top), so a centre-crop comparison reads ~10px low and understates agreement \u2014 crop the figma image at the target's own measured edge instead. Interpreter trap: a measured child of a plain TEXT node is positioned relative to that text, but a text node cannot hold children, so the rebuild attaches it to the text's PARENT and must add the text's own origin \u2014 BL-0112's \"opens dashboard\" hint landed 626px too high without it.",
+   "harness": "Two fixes on 2026-08-19 unblocked five rows that had been written off as unreachable. (1) capture.mjs and measure-region.mjs now accept a `rightClick` action \u2014 context menus need the right button, and three rows sat as \"controls refuse the click from a spec\" for want of it. (2) Both scripts seed the `buildrik_consent` cookie on every context instead of clicking \"Essential Only\" per screen: the banner covers the editor's status bar and eats clicks, and a per-screen click FAILS THE WHOLE RUN on the second screen, because the contexts are reused and there is no banner left to click.",
+   "referenceCorpus": "Checked, not assumed (2026-08-19): the site name was read off the topbar of all 49 editor references by cropping x74-240,y16-40 and comparing. 48 are the seed fixture (\"E2E Blank Full d013128c\"). Exactly ONE is not \u2014 BL-0171, whose topbar reads \"Demo AI Site\"; comparing a seed-fixture render against it read ~81% for no reason but the canvas content, and it has been recaptured on the fixture as `brand-starter-themes__seed.png`. Five rows (BL-0106, 0111, 0112, 0121, 0175) look different at first and are not: a modal scrim dims the topbar, and they match the seed template exactly once brightness is normalised. So the corpus IS uniform, with one row's worth of exception \u2014 but read the site name off a reference before believing a drift number, because nothing else in the pipeline records which site a render came from."
+  },
+  "lastRefresh": {
+   "date": "2026-08-21",
+   "rows": [
+    "BL-0100",
+    "BL-0101",
+    "BL-0102",
+    "BL-0103",
+    "BL-0104",
+    "BL-0105",
+    "BL-0107",
+    "BL-0108",
+    "BL-0109",
+    "BL-0111",
+    "BL-0117",
+    "BL-0123",
+    "BL-0124",
+    "BL-0125",
+    "BL-0176"
+   ],
+   "how": "scripts/baseline/screens-editor.json + Figma html-to-design capture"
   }
  },
  "rows": [
@@ -423,7 +444,7 @@
    "requires": "session",
    "screenshotHash": "d0d60fed5ebf13b5",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
-   "notes": "loading state (stalled trpc) — 'Completing sign in…' spinner",
+   "notes": "loading state (stalled trpc) \u2014 'Completing sign in\u2026' spinner",
    "figmaNodeId": "182:2",
    "figmaPageId": "183:2"
   },
@@ -693,7 +714,7 @@
    "requires": "token",
    "screenshotHash": "0719a4c24516068f",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
-   "notes": "loading state (stalled trpc) — 'Loading invitation…'; loaded state redirects into signup flow",
+   "notes": "loading state (stalled trpc) \u2014 'Loading invitation\u2026'; loaded state redirects into signup flow",
    "figmaNodeId": "194:2",
    "figmaPageId": "183:2"
   },
@@ -711,7 +732,7 @@
    "requires": "token",
    "screenshotHash": "0719a4c24516068f",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
-   "notes": "loading state — IDENTICAL render to BL-0021 (same sha, as-built source duplicate)",
+   "notes": "loading state \u2014 IDENTICAL render to BL-0021 (same sha, as-built source duplicate)",
    "figmaNodeId": "195:2",
    "figmaPageId": "183:2"
   },
@@ -801,7 +822,7 @@
    "requires": "session",
    "screenshotHash": "825fd34af51ff9b5",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
-   "notes": "session + stalled /api/auth/session — 'Signing you in…' spinner",
+   "notes": "session + stalled /api/auth/session \u2014 'Signing you in\u2026' spinner",
    "figmaNodeId": "208:2",
    "figmaPageId": "183:2"
   },
@@ -855,7 +876,7 @@
    "requires": "token",
    "screenshotHash": "783d2b533613456e",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
-   "notes": "loading state (stalled trpc) — 'Verifying your email…'",
+   "notes": "loading state (stalled trpc) \u2014 'Verifying your email\u2026'",
    "figmaNodeId": "212:2",
    "figmaPageId": "183:2"
   },
@@ -1103,7 +1124,7 @@
    "pipelineState": "readback-verified",
    "screenshotHash": "de40676cf009514e",
    "capturedFrom": "prod@f7b39a4c (APP_URL baked localhost:3100)",
-   "notes": "agency [id] with ws id — record as-rendered",
+   "notes": "agency [id] with ws id \u2014 record as-rendered",
    "figmaNodeId": "107:2",
    "figmaPageId": "108:2"
   },
@@ -1709,8 +1730,8 @@
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
    "pipelineState": "blocked",
-   "blockReason": "router page — redirects to current wizard step (nav behavior, no stable frame)",
-   "notes": "NOT A SCREEN (established 2026-08-18): /onboarding is an entry frame — it renders a bare Spinner and router.replace()s to the saved wizard route (observed: /onboarding/workspace). Capturable only with allowRedirect + a spinner sentinel, which would put a transient redirect frame into the baseline. Recommend reclassifying rather than capturing."
+   "blockReason": "router page \u2014 redirects to current wizard step (nav behavior, no stable frame)",
+   "notes": "NOT A SCREEN (established 2026-08-18): /onboarding is an entry frame \u2014 it renders a bare Spinner and router.replace()s to the saved wizard route (observed: /onboarding/workspace). Capturable only with allowRedirect + a spinner sentinel, which would put a transient redirect frame into the baseline. Recommend reclassifying rather than capturing."
   },
   {
    "id": "BL-0084",
@@ -1819,8 +1840,8 @@
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
    "pipelineState": "blocked",
-   "blockReason": "wizard guard — needs in-progress AI generation state",
-   "notes": "BLOCKED (reason established 2026-08-18): /onboarding/ai/generating redirects to /onboarding/ai/basics without an active AI draft job. Sentinel is 'Creating your site draft'; the harness supports blockPatterns to stall the job request and hold this loading state open — needs a wizard seeded to the AI path first."
+   "blockReason": "wizard guard \u2014 needs in-progress AI generation state",
+   "notes": "BLOCKED (reason established 2026-08-18): /onboarding/ai/generating redirects to /onboarding/ai/basics without an active AI draft job. Sentinel is 'Creating your site draft'; the harness supports blockPatterns to stall the job request and hold this loading state open \u2014 needs a wizard seeded to the AI path first."
   },
   {
    "id": "BL-0091",
@@ -1835,7 +1856,7 @@
    "pipelineState": "readback-verified",
    "screenshotHash": "e3649b006232ba6c",
    "capturedFrom": "prod@f7b39a4c",
-   "notes": " captured via server wizardData manufacture (onboarding_states, FLAT schema — prisma comment shows nested data:{} which is WRONG)",
+   "notes": " captured via server wizardData manufacture (onboarding_states, FLAT schema \u2014 prisma comment shows nested data:{} which is WRONG)",
    "figmaNodeId": "54:2",
    "figmaPageId": "175:2"
   },
@@ -1884,7 +1905,7 @@
    "pipelineState": "readback-verified",
    "screenshotHash": "0fcf63998137a265",
    "capturedFrom": "prod@f7b39a4c",
-   "notes": " captured via server wizardData manufacture (onboarding_states, FLAT schema — prisma comment shows nested data:{} which is WRONG)",
+   "notes": " captured via server wizardData manufacture (onboarding_states, FLAT schema \u2014 prisma comment shows nested data:{} which is WRONG)",
    "figmaNodeId": "58:2",
    "figmaPageId": "175:2"
   },
@@ -1901,7 +1922,7 @@
    "pipelineState": "readback-verified",
    "screenshotHash": "f32aa1ceddceae69",
    "capturedFrom": "prod@f7b39a4c",
-   "notes": " captured via server wizardData manufacture (onboarding_states, FLAT schema — prisma comment shows nested data:{} which is WRONG)",
+   "notes": " captured via server wizardData manufacture (onboarding_states, FLAT schema \u2014 prisma comment shows nested data:{} which is WRONG)",
    "figmaNodeId": "59:2",
    "figmaPageId": "175:2"
   },
@@ -1918,7 +1939,7 @@
    "pipelineState": "readback-verified",
    "screenshotHash": "9c95e518fa18b2bc",
    "capturedFrom": "prod@f7b39a4c",
-   "notes": " captured via server wizardData manufacture (onboarding_states, FLAT schema — prisma comment shows nested data:{} which is WRONG)",
+   "notes": " captured via server wizardData manufacture (onboarding_states, FLAT schema \u2014 prisma comment shows nested data:{} which is WRONG)",
    "figmaNodeId": "60:2",
    "figmaPageId": "175:2"
   },
@@ -1980,12 +2001,13 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "readback-verified",
+   "pipelineState": "captured-current",
    "screenshotHash": "dcaff6eb45f92ba8",
-   "capturedFrom": "prod@f7b39a4c",
-   "figmaNodeId": "62:2",
+   "capturedFrom": "localhost@42eb22c0",
+   "figmaNodeId": "315:2",
    "figmaPageId": "75:2",
-   "notes": "REDRAWN 2026-08-19 (drift 10.51%). Drawer subtree rebuilt from the measured live DOM through measure-region.mjs → pack-measure.mjs → a use_figma interpreter; 96.85% pixel agreement against the reference render. Shell band left as drawn per the founder call. Note: search placeholder restored and the element list clipped where the app clips it."
+   "notes": "REDRAWN 2026-08-19 (drift 10.51%). Drawer subtree rebuilt from the measured live DOM through measure-region.mjs \u2192 pack-measure.mjs \u2192 a use_figma interpreter; 96.85% pixel agreement against the reference render. Shell band left as drawn per the founder call. Note: search placeholder restored and the element list clipped where the app clips it. Refreshed 2026-08-21 by re-capturing the RUNNING editor (localhost:3000, site cmrsur1fp\u2026) through Figma's html-to-design pipeline; recipe committed as scripts/baseline/screens-editor.json. The 2026-08-19 frame was drawn from prod@f7b39a4c and is kept on the same page for comparison.",
+   "figmaNodeIdPrev": "62:2"
   },
   {
    "id": "BL-0101",
@@ -1997,11 +2019,13 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "readback-verified",
+   "pipelineState": "captured-current",
    "screenshotHash": "be845c3a4a3ef6dc",
-   "capturedFrom": "prod@f7b39a4c",
-   "figmaNodeId": "64:2",
-   "figmaPageId": "75:2"
+   "capturedFrom": "localhost@42eb22c0",
+   "figmaNodeId": "316:2",
+   "figmaPageId": "75:2",
+   "figmaNodeIdPrev": "64:2",
+   "notes": "Refreshed 2026-08-21 by re-capturing the RUNNING editor (localhost:3000, site cmrsur1fp\u2026) through Figma's html-to-design pipeline; recipe committed as scripts/baseline/screens-editor.json. The 2026-08-19 frame was drawn from prod@f7b39a4c and is kept on the same page for comparison."
   },
   {
    "id": "BL-0102",
@@ -2013,11 +2037,13 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "readback-verified",
+   "pipelineState": "captured-current",
    "screenshotHash": "181b9e3e11600f66",
-   "capturedFrom": "prod@f7b39a4c",
-   "figmaNodeId": "66:2",
-   "figmaPageId": "75:2"
+   "capturedFrom": "localhost@42eb22c0",
+   "figmaNodeId": "318:2",
+   "figmaPageId": "75:2",
+   "figmaNodeIdPrev": "66:2",
+   "notes": "Refreshed 2026-08-21 by re-capturing the RUNNING editor (localhost:3000, site cmrsur1fp\u2026) through Figma's html-to-design pipeline; recipe committed as scripts/baseline/screens-editor.json. The 2026-08-19 frame was drawn from prod@f7b39a4c and is kept on the same page for comparison."
   },
   {
    "id": "BL-0103",
@@ -2029,11 +2055,13 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "readback-verified",
+   "pipelineState": "captured-current",
    "screenshotHash": "f71d9b0ac0c5c7c4",
-   "capturedFrom": "prod@f7b39a4c",
-   "figmaNodeId": "68:2",
-   "figmaPageId": "75:2"
+   "capturedFrom": "localhost@42eb22c0",
+   "figmaNodeId": "319:2",
+   "figmaPageId": "75:2",
+   "figmaNodeIdPrev": "68:2",
+   "notes": "Refreshed 2026-08-21 by re-capturing the RUNNING editor (localhost:3000, site cmrsur1fp\u2026) through Figma's html-to-design pipeline; recipe committed as scripts/baseline/screens-editor.json. The 2026-08-19 frame was drawn from prod@f7b39a4c and is kept on the same page for comparison."
   },
   {
    "id": "BL-0104",
@@ -2045,11 +2073,13 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "readback-verified",
+   "pipelineState": "captured-current",
    "screenshotHash": "d28d601a15500e8d",
-   "capturedFrom": "prod@f7b39a4c",
-   "figmaNodeId": "69:2",
-   "figmaPageId": "75:2"
+   "capturedFrom": "localhost@42eb22c0",
+   "figmaNodeId": "321:2",
+   "figmaPageId": "75:2",
+   "figmaNodeIdPrev": "69:2",
+   "notes": "Refreshed 2026-08-21 by re-capturing the RUNNING editor (localhost:3000, site cmrsur1fp\u2026) through Figma's html-to-design pipeline; recipe committed as scripts/baseline/screens-editor.json. The 2026-08-19 frame was drawn from prod@f7b39a4c and is kept on the same page for comparison."
   },
   {
    "id": "BL-0105",
@@ -2061,12 +2091,13 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "readback-verified",
+   "pipelineState": "captured-current",
    "screenshotHash": "2be6a222459d9065",
-   "capturedFrom": "prod@f7b39a4c",
-   "figmaNodeId": "70:2",
+   "capturedFrom": "localhost@42eb22c0",
+   "figmaNodeId": "322:2",
    "figmaPageId": "75:2",
-   "notes": "REDRAWN 2026-08-18 from live code (drift was 15.70%). The Tab Panel subtree 70:128 was emptied and rebuilt: header + shared-theme block + Beginner/Pro toggle + the nine drill-in rows + Basic-mode footnote + save bar, all from measured geometry (getComputedStyle on the running editor, not eyeballed off the PNG). Header icons are real vectors, not images. Read back against the live render: 94.95% pixel agreement over the content, 93.45% including the save bar. The residual is (a) the save bar sits at the frame's 780px bottom while the live drawer is 732px tall — that is the known-stale shell band, left alone per the founder call; (b) the chevron glyph renders lighter in Figma than in Chrome; (c) the footnote wraps one word later. Shell, canvas and inspector untouched."
+   "notes": "REDRAWN 2026-08-18 from live code (drift was 15.70%). The Tab Panel subtree 70:128 was emptied and rebuilt: header + shared-theme block + Beginner/Pro toggle + the nine drill-in rows + Basic-mode footnote + save bar, all from measured geometry (getComputedStyle on the running editor, not eyeballed off the PNG). Header icons are real vectors, not images. Read back against the live render: 94.95% pixel agreement over the content, 93.45% including the save bar. The residual is (a) the save bar sits at the frame's 780px bottom while the live drawer is 732px tall \u2014 that is the known-stale shell band, left alone per the founder call; (b) the chevron glyph renders lighter in Figma than in Chrome; (c) the footnote wraps one word later. Shell, canvas and inspector untouched. Refreshed 2026-08-21 by re-capturing the RUNNING editor (localhost:3000, site cmrsur1fp\u2026) through Figma's html-to-design pipeline; recipe committed as scripts/baseline/screens-editor.json. The 2026-08-19 frame was drawn from prod@f7b39a4c and is kept on the same page for comparison.",
+   "figmaNodeIdPrev": "70:2"
   },
   {
    "id": "BL-0106",
@@ -2094,12 +2125,13 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "readback-verified",
+   "pipelineState": "captured-current",
    "screenshotHash": "ec7d264b90de08ce",
-   "capturedFrom": "prod@f7b39a4c",
-   "figmaNodeId": "65:2",
+   "capturedFrom": "localhost@42eb22c0",
+   "figmaNodeId": "329:2",
    "figmaPageId": "75:2",
-   "notes": "DRIFT MEASURED 2026-08-19: 16.54% against the pinned render, on a ~13% shell floor. No redraw — the extra sits in the shell (ReviewBar row, no cookie banner), not in the comments panel. Door: `button[aria-label='Comments']`; the row was never unreachable, the spec was missing."
+   "notes": "DRIFT MEASURED 2026-08-19: 16.54% against the pinned render, on a ~13% shell floor. No redraw \u2014 the extra sits in the shell (ReviewBar row, no cookie banner), not in the comments panel. Door: `button[aria-label='Comments']`; the row was never unreachable, the spec was missing. Refreshed 2026-08-21 by re-capturing the RUNNING editor (localhost:3000, site cmrsur1fp\u2026) through Figma's html-to-design pipeline; recipe committed as scripts/baseline/screens-editor.json. The 2026-08-19 frame was drawn from prod@f7b39a4c and is kept on the same page for comparison. NOTE: state renamed comments-mode-on. The 2026-08-19 frame showed an element selected with the cookie banner up, not comment mode at all. Comment mode's only cue is the pressed toggle plus a crosshair capture layer (measured 712x684).",
+   "figmaNodeIdPrev": "65:2"
   },
   {
    "id": "BL-0108",
@@ -2111,12 +2143,13 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "readback-verified",
+   "pipelineState": "captured-current",
    "screenshotHash": "7d6589115c68525f",
-   "capturedFrom": "prod@f7b39a4c",
-   "figmaNodeId": "67:2",
+   "capturedFrom": "localhost@42eb22c0",
+   "figmaNodeId": "326:2",
    "figmaPageId": "75:2",
-   "notes": "REDRAWN 2026-08-19 (drift 28.52%). Overlay rebuilt from the measured live DOM; 75.67% pixel agreement. Note: date groups, rows with status dots, relative times, See all footer; the times and group labels differ because days passed between the reference and the measure."
+   "notes": "REDRAWN 2026-08-19 (drift 28.52%). Overlay rebuilt from the measured live DOM; 75.67% pixel agreement. Note: date groups, rows with status dots, relative times, See all footer; the times and group labels differ because days passed between the reference and the measure. Refreshed 2026-08-21 by re-capturing the RUNNING editor (localhost:3000, site cmrsur1fp\u2026) through Figma's html-to-design pipeline; recipe committed as scripts/baseline/screens-editor.json. The 2026-08-19 frame was drawn from prod@f7b39a4c and is kept on the same page for comparison.",
+   "figmaNodeIdPrev": "67:2"
   },
   {
    "id": "BL-0109",
@@ -2128,12 +2161,13 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "readback-verified",
+   "pipelineState": "captured-current",
    "screenshotHash": "78fb3122a1653b31",
-   "capturedFrom": "prod@f7b39a4c",
-   "figmaNodeId": "73:2",
+   "capturedFrom": "localhost@42eb22c0",
+   "figmaNodeId": "324:2",
    "figmaPageId": "75:2",
-   "notes": "REDRAWN 2026-08-19 (drift 9.41%). Overlay rebuilt from the measured live DOM; 89.22% pixel agreement. Note: the full site menu, including the Site settings / Version history / Components / Keyboard shortcuts items an earlier grep had wrongly reported as gone."
+   "notes": "REDRAWN 2026-08-19 (drift 9.41%). Overlay rebuilt from the measured live DOM; 89.22% pixel agreement. Note: the full site menu, including the Site settings / Version history / Components / Keyboard shortcuts items an earlier grep had wrongly reported as gone. Refreshed 2026-08-21 by re-capturing the RUNNING editor (localhost:3000, site cmrsur1fp\u2026) through Figma's html-to-design pipeline; recipe committed as scripts/baseline/screens-editor.json. The 2026-08-19 frame was drawn from prod@f7b39a4c and is kept on the same page for comparison.",
+   "figmaNodeIdPrev": "73:2"
   },
   {
    "id": "BL-0110",
@@ -2150,7 +2184,7 @@
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "74:2",
    "figmaPageId": "75:2",
-   "notes": "DRIFT MEASURED 2026-08-19: 14.74%, at the shell floor. No redraw. Door: the review pill itself, `button:has-text('Opened · no reply')`."
+   "notes": "DRIFT MEASURED 2026-08-19: 14.74%, at the shell floor. No redraw. Door: the review pill itself, `button:has-text('Opened \u00b7 no reply')`."
   },
   {
    "id": "BL-0111",
@@ -2162,12 +2196,13 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "readback-verified",
+   "pipelineState": "captured-current",
    "screenshotHash": "52362d3c4aaf843c",
-   "capturedFrom": "prod@f7b39a4c",
-   "figmaNodeId": "72:2",
+   "capturedFrom": "localhost@42eb22c0",
+   "figmaNodeId": "328:2",
    "figmaPageId": "75:2",
-   "notes": "REDRAWN 2026-08-19 (drift 9.18%). Overlay rebuilt from the measured live DOM; 94.64% pixel agreement. Note: search row, Suggested and Go to groups with shortcut chips, and the navigate/run/close hint bar."
+   "notes": "REDRAWN 2026-08-19 (drift 9.18%). Overlay rebuilt from the measured live DOM; 94.64% pixel agreement. Note: search row, Suggested and Go to groups with shortcut chips, and the navigate/run/close hint bar. Refreshed 2026-08-21 by re-capturing the RUNNING editor (localhost:3000, site cmrsur1fp\u2026) through Figma's html-to-design pipeline; recipe committed as scripts/baseline/screens-editor.json. The 2026-08-19 frame was drawn from prod@f7b39a4c and is kept on the same page for comparison. NOTE: the \u2318K palette is NOT in the refreshed frame \u2014 it closes when the capture script takes focus, verified twice; the frame shows the shell behind it.",
+   "figmaNodeIdPrev": "72:2"
   },
   {
    "id": "BL-0112",
@@ -2184,7 +2219,7 @@
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "77:2",
    "figmaPageId": "75:2",
-   "notes": "REDRAWN 2026-08-19 and now VERIFIED — 97.76% pixel agreement, the highest in the redraw set. The earlier note on this row said the Settings surface never paints and called that a product defect. It WAS one, and it is fixed: PanelFrame's default `narrow` width carries `tw:flex-none`, and Settings' host `.ls-fullpage-container` is a flex column, so the root resolved to its header height and every screen under it measured 1379 wide by 0 tall. `width=\"fullpage\"` (the variant PanelFrame already shipped for this host) fixes it; a second, hidden SettingsTab that the retired drawer route still mounted was removed with it. So the reference render this row was pinned to — an empty page under a Settings header — was a picture of the bug, not of the design. A fresh reference was captured after the fix as `sitemenu-site-settings__fixed.png`; the pinned one is kept untouched. What is drawn: the whole content band (rail + full-page surface, 1440x764), replacing the old 380px drawer node 77:55, placed at frame y=104 so its bottom meets the status bar. The 48px gap above it is the ReviewBar row this frame's shell predates — the known-stale shell band, declared, not drawn."
+   "notes": "REDRAWN 2026-08-19 and now VERIFIED \u2014 97.76% pixel agreement, the highest in the redraw set. The earlier note on this row said the Settings surface never paints and called that a product defect. It WAS one, and it is fixed: PanelFrame's default `narrow` width carries `tw:flex-none`, and Settings' host `.ls-fullpage-container` is a flex column, so the root resolved to its header height and every screen under it measured 1379 wide by 0 tall. `width=\"fullpage\"` (the variant PanelFrame already shipped for this host) fixes it; a second, hidden SettingsTab that the retired drawer route still mounted was removed with it. So the reference render this row was pinned to \u2014 an empty page under a Settings header \u2014 was a picture of the bug, not of the design. A fresh reference was captured after the fix as `sitemenu-site-settings__fixed.png`; the pinned one is kept untouched. What is drawn: the whole content band (rail + full-page surface, 1440x764), replacing the old 380px drawer node 77:55, placed at frame y=104 so its bottom meets the status bar. The 48px gap above it is the ReviewBar row this frame's shell predates \u2014 the known-stale shell band, declared, not drawn."
   },
   {
    "id": "BL-0113",
@@ -2201,7 +2236,7 @@
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "78:2",
    "figmaPageId": "75:2",
-   "notes": "REDRAWN 2026-08-19 (drift 10.45%). Rebuilt from the measured live DOM; 87.68% pixel agreement. Timestamps and row counts differ from the reference — sample data. Note: tabs, the Milestones/All changes pills, search, and the TODAY group of auto-saves."
+   "notes": "REDRAWN 2026-08-19 (drift 10.45%). Rebuilt from the measured live DOM; 87.68% pixel agreement. Timestamps and row counts differ from the reference \u2014 sample data. Note: tabs, the Milestones/All changes pills, search, and the TODAY group of auto-saves."
   },
   {
    "id": "BL-0114",
@@ -2234,7 +2269,7 @@
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "80:2",
    "figmaPageId": "75:2",
-   "notes": "REDRAWN 2026-08-19 (drift 24.16%). Dialog rebuilt from the measured live DOM: the frame held NO modal node at all, so a scrim plus a 720x720 dialog were created at the measured position. Frame 80:2 is a VERTICAL auto-layout, which stacked both new children below the screen until they were pinned with layoutPositioning=ABSOLUTE — check that before trusting a first screenshot. Two things measure-region could not give: (1) the live preview panel is a rendered site inside the modal, which the DOM walk does not descend into — it is drawn as its real chrome (#1a1a2e bezel, radius 8) plus the white page and the 18 block rects extracted from the reference pixels, the same policy the canvas gets, so the sample site is shape-not-content; (2) the five format cards measured 12px lower than the reference render shows them — the payload and the reference are two different live sessions — and the drawn frame follows the REFERENCE, since that is what verification compares against. 94.16% pixel agreement."
+   "notes": "REDRAWN 2026-08-19 (drift 24.16%). Dialog rebuilt from the measured live DOM: the frame held NO modal node at all, so a scrim plus a 720x720 dialog were created at the measured position. Frame 80:2 is a VERTICAL auto-layout, which stacked both new children below the screen until they were pinned with layoutPositioning=ABSOLUTE \u2014 check that before trusting a first screenshot. Two things measure-region could not give: (1) the live preview panel is a rendered site inside the modal, which the DOM walk does not descend into \u2014 it is drawn as its real chrome (#1a1a2e bezel, radius 8) plus the white page and the 18 block rects extracted from the reference pixels, the same policy the canvas gets, so the sample site is shape-not-content; (2) the five format cards measured 12px lower than the reference render shows them \u2014 the payload and the reference are two different live sessions \u2014 and the drawn frame follows the REFERENCE, since that is what verification compares against. 94.16% pixel agreement."
   },
   {
    "id": "BL-0116",
@@ -2263,11 +2298,13 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "readback-verified",
+   "pipelineState": "captured-current",
    "screenshotHash": "2cdf6c78e4a56107",
-   "capturedFrom": "prod@f7b39a4c",
-   "figmaNodeId": "82:2",
-   "figmaPageId": "75:2"
+   "capturedFrom": "localhost@42eb22c0",
+   "figmaNodeId": "314:2",
+   "figmaPageId": "75:2",
+   "figmaNodeIdPrev": "82:2",
+   "notes": "Refreshed 2026-08-21 by re-capturing the RUNNING editor (localhost:3000, site cmrsur1fp\u2026) through Figma's html-to-design pipeline; recipe committed as scripts/baseline/screens-editor.json. The 2026-08-19 frame was drawn from prod@f7b39a4c and is kept on the same page for comparison."
   },
   {
    "id": "BL-0118",
@@ -2301,7 +2338,7 @@
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "84:2",
    "figmaPageId": "75:2",
-   "notes": "DRIFT MEASURED 2026-08-19: 11.45%, below the shell floor. No redraw. The door works — site menu → Plugins — but it still lands on the Settings ROOT, because AquibraStudio.tsx asks for a screen id (\"plugins\") the Settings panel does not have; the real one is \"integrations\". That is the state captured, and it is today's behaviour, not a capture failure."
+   "notes": "DRIFT MEASURED 2026-08-19: 11.45%, below the shell floor. No redraw. The door works \u2014 site menu \u2192 Plugins \u2014 but it still lands on the Settings ROOT, because AquibraStudio.tsx asks for a screen id (\"plugins\") the Settings panel does not have; the real one is \"integrations\". That is the state captured, and it is today's behaviour, not a capture failure."
   },
   {
    "id": "BL-0120",
@@ -2318,7 +2355,7 @@
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "85:2",
    "figmaPageId": "75:2",
-   "notes": "DRIFT MEASURED 2026-08-19: 12.63%, at the shell floor. No redraw. Captured with the site menu open and the item hovered — clicking it opens the dashboard in a NEW tab, so a click would have left this tab unchanged and proved nothing."
+   "notes": "DRIFT MEASURED 2026-08-19: 12.63%, at the shell floor. No redraw. Captured with the site menu open and the item hovered \u2014 clicking it opens the dashboard in a NEW tab, so a click would have left this tab unchanged and proved nothing."
   },
   {
    "id": "BL-0121",
@@ -2335,7 +2372,7 @@
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "86:2",
    "figmaPageId": "75:2",
-   "notes": "DRIFT MEASURED 2026-08-19: 12.64%, at the shell floor. No redraw. Door: site menu → Keyboard shortcuts."
+   "notes": "DRIFT MEASURED 2026-08-19: 12.64%, at the shell floor. No redraw. Door: site menu \u2192 Keyboard shortcuts."
   },
   {
    "id": "BL-0122",
@@ -2364,12 +2401,13 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "readback-verified",
+   "pipelineState": "captured-current",
    "screenshotHash": "2828e17a715849f6",
-   "capturedFrom": "prod@f7b39a4c",
-   "figmaNodeId": "88:2",
+   "capturedFrom": "localhost@42eb22c0",
+   "figmaNodeId": "330:2",
    "figmaPageId": "75:2",
-   "notes": "REDRAWN 2026-08-19 (drift 44.58%). The text inspector changed shape: the old \"TEXT · Inter · 16px\" block with a Font Family label and a collapsed list under it is now a TYPOGRAPHY section carrying Family / Size+line-height / Weight / Align / Color (with a contrast-warning chip) / Transform / Decoration / Letter / Word, followed by an EXPANDED Spacing section and then SIZE / BACKGROUND / BORDER. 92.83% pixel agreement. Door: `[data-buildrick-type='paragraph']` — a text match on the canvas copy times out, because the canvas mounts engine HTML and the click has to land on the element the engine owns. HARNESS FIX in the same commit: measure-region read an input's `placeholder` and never its `value`, so the first rebuild drew every number field in its empty state — Size 0 where the app showed 16, line-height 1.5 where it showed 1.6 — and left the Weight select blank. It now reads `value` first and a select's chosen option, which also brought the px unit labels in. Still missing by construction: the colour chip's checkerboard swatch (a CSS background, not a node) and the align/decoration glyphs, which measure as their fallback characters."
+   "notes": "REDRAWN 2026-08-19 (drift 44.58%). The text inspector changed shape: the old \"TEXT \u00b7 Inter \u00b7 16px\" block with a Font Family label and a collapsed list under it is now a TYPOGRAPHY section carrying Family / Size+line-height / Weight / Align / Color (with a contrast-warning chip) / Transform / Decoration / Letter / Word, followed by an EXPANDED Spacing section and then SIZE / BACKGROUND / BORDER. 92.83% pixel agreement. Door: `[data-buildrick-type='paragraph']` \u2014 a text match on the canvas copy times out, because the canvas mounts engine HTML and the click has to land on the element the engine owns. HARNESS FIX in the same commit: measure-region read an input's `placeholder` and never its `value`, so the first rebuild drew every number field in its empty state \u2014 Size 0 where the app showed 16, line-height 1.5 where it showed 1.6 \u2014 and left the Weight select blank. It now reads `value` first and a select's chosen option, which also brought the px unit labels in. Still missing by construction: the colour chip's checkerboard swatch (a CSS background, not a node) and the align/decoration glyphs, which measure as their fallback characters. Refreshed 2026-08-21 by re-capturing the RUNNING editor (localhost:3000, site cmrsur1fp\u2026) through Figma's html-to-design pipeline; recipe committed as scripts/baseline/screens-editor.json. The 2026-08-19 frame was drawn from prod@f7b39a4c and is kept on the same page for comparison.",
+   "figmaNodeIdPrev": "88:2"
   },
   {
    "id": "BL-0124",
@@ -2381,12 +2419,13 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "readback-verified",
+   "pipelineState": "captured-current",
    "screenshotHash": "ecc180d61cfb5aa7",
-   "capturedFrom": "prod@f7b39a4c",
-   "figmaNodeId": "90:2",
+   "capturedFrom": "localhost@42eb22c0",
+   "figmaNodeId": "331:2",
    "figmaPageId": "75:2",
-   "notes": "REDRAWN 2026-08-19 (drift 14.99%). Inspector column rebuilt from the measured live DOM; 94.86% pixel agreement. Control VALUES differ from the reference (different element selected when each was taken) — sample data, not shape. Note: Typography with the size-unit toggle and align picker, Background color/gradient/image tabs, Border."
+   "notes": "REDRAWN 2026-08-19 (drift 14.99%). Inspector column rebuilt from the measured live DOM; 94.86% pixel agreement. Control VALUES differ from the reference (different element selected when each was taken) \u2014 sample data, not shape. Note: Typography with the size-unit toggle and align picker, Background color/gradient/image tabs, Border. Refreshed 2026-08-21 by re-capturing the RUNNING editor (localhost:3000, site cmrsur1fp\u2026) through Figma's html-to-design pipeline; recipe committed as scripts/baseline/screens-editor.json. The 2026-08-19 frame was drawn from prod@f7b39a4c and is kept on the same page for comparison.",
+   "figmaNodeIdPrev": "90:2"
   },
   {
    "id": "BL-0125",
@@ -2398,12 +2437,13 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "readback-verified",
+   "pipelineState": "captured-current",
    "screenshotHash": "aa6557bf2dd28b85",
-   "capturedFrom": "prod@f7b39a4c",
-   "figmaNodeId": "91:2",
+   "capturedFrom": "localhost@42eb22c0",
+   "figmaNodeId": "332:2",
    "figmaPageId": "75:2",
-   "notes": "REDRAWN 2026-08-19 (drift 13.58%). Inspector column rebuilt from the measured live DOM; 94.87% pixel agreement. Text alignment is carried through from this frame on. Two residuals: the Desktop scope chip wraps because Figma's Inter is wider than Chrome's at a fixed 47.5px, and the collapsed-section chevrons point down rather than right because the measure ran with the sections remembered open — measure-region.mjs clears localStorage from now on."
+   "notes": "REDRAWN 2026-08-19 (drift 13.58%). Inspector column rebuilt from the measured live DOM; 94.87% pixel agreement. Text alignment is carried through from this frame on. Two residuals: the Desktop scope chip wraps because Figma's Inter is wider than Chrome's at a fixed 47.5px, and the collapsed-section chevrons point down rather than right because the measure ran with the sections remembered open \u2014 measure-region.mjs clears localStorage from now on. Refreshed 2026-08-21 by re-capturing the RUNNING editor (localhost:3000, site cmrsur1fp\u2026) through Figma's html-to-design pipeline; recipe committed as scripts/baseline/screens-editor.json. The 2026-08-19 frame was drawn from prod@f7b39a4c and is kept on the same page for comparison.",
+   "figmaNodeIdPrev": "91:2"
   },
   {
    "id": "BL-0126",
@@ -2420,7 +2460,7 @@
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "93:2",
    "figmaPageId": "75:2",
-   "notes": "REDRAWN 2026-08-19 (drift 17.07%). Inspector column rebuilt from the measured live DOM; 95.27% pixel agreement. Control VALUES differ from the reference (different element selected when each was taken) — sample data, not shape. Note: the Corner radius inputs carry real 'px' text nodes here, unlike the Typography ones."
+   "notes": "REDRAWN 2026-08-19 (drift 17.07%). Inspector column rebuilt from the measured live DOM; 95.27% pixel agreement. Control VALUES differ from the reference (different element selected when each was taken) \u2014 sample data, not shape. Note: the Corner radius inputs carry real 'px' text nodes here, unlike the Typography ones."
   },
   {
    "id": "BL-0127",
@@ -2437,7 +2477,7 @@
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "94:2",
    "figmaPageId": "75:2",
-   "notes": "REDRAWN 2026-08-19 (drift 24.85%). Inspector column rebuilt from the measured live DOM; 95.15% pixel agreement. Control VALUES differ from the reference (different element selected when each was taken) — sample data, not shape. Note: the Flexbox section with Enable Flex and the Flex Item self controls."
+   "notes": "REDRAWN 2026-08-19 (drift 24.85%). Inspector column rebuilt from the measured live DOM; 95.15% pixel agreement. Control VALUES differ from the reference (different element selected when each was taken) \u2014 sample data, not shape. Note: the Flexbox section with Enable Flex and the Flex Item self controls."
   },
   {
    "id": "BL-0128",
@@ -2454,7 +2494,7 @@
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "95:2",
    "figmaPageId": "75:2",
-   "notes": "REDRAWN 2026-08-19 (drift 14.40%). Inspector column rebuilt from the measured live DOM; 95.19% pixel agreement. Control VALUES differ from the reference (different element selected when each was taken) — sample data, not shape. Note: Typography, Border with width/style/colour, Spacing."
+   "notes": "REDRAWN 2026-08-19 (drift 14.40%). Inspector column rebuilt from the measured live DOM; 95.19% pixel agreement. Control VALUES differ from the reference (different element selected when each was taken) \u2014 sample data, not shape. Note: Typography, Border with width/style/colour, Spacing."
   },
   {
    "id": "BL-0129",
@@ -2471,7 +2511,7 @@
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "96:2",
    "figmaPageId": "75:2",
-   "notes": "REDRAWN 2026-08-19 (drift 11.90%). Subtree rebuilt from the measured live DOM; 94.21% pixel agreement. Shell band left as drawn. Note: control VALUES differ from the reference (36/1.2/Bold against 0/1.5/empty) because a different element was selected when each was taken — sample data, not shape."
+   "notes": "REDRAWN 2026-08-19 (drift 11.90%). Subtree rebuilt from the measured live DOM; 94.21% pixel agreement. Shell band left as drawn. Note: control VALUES differ from the reference (36/1.2/Bold against 0/1.5/empty) because a different element was selected when each was taken \u2014 sample data, not shape."
   },
   {
    "id": "BL-0131",
@@ -2989,7 +3029,7 @@
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "120:2",
    "figmaPageId": "75:2",
-   "notes": "REDRAWN 2026-08-19 (drift 40.73%). The old frame drew this as a 560px drawer beside the canvas and inspector — 'Media library EXPANDED'. Today it is a full-width takeover, so the sidebar ancestors were widened to 1379 and the canvas and inspector it covers were removed. Rebuilt from the measured live DOM: folders rail, toolbar with Import URL / Upload / Add from stock, empty state, details rail, storage footer. 93.30% pixel agreement."
+   "notes": "REDRAWN 2026-08-19 (drift 40.73%). The old frame drew this as a 560px drawer beside the canvas and inspector \u2014 'Media library EXPANDED'. Today it is a full-width takeover, so the sidebar ancestors were widened to 1379 and the canvas and inspector it covers were removed. Rebuilt from the measured live DOM: folders rail, toolbar with Import URL / Upload / Add from stock, empty state, details rail, storage footer. 93.30% pixel agreement."
   },
   {
    "id": "BL-0162",
@@ -3006,7 +3046,7 @@
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "121:2",
    "figmaPageId": "75:2",
-   "notes": "BLOCKED ON FIXTURE DATA 2026-08-19 — not a selector, and not a broken door. The Media panel opens and the toggle exists at `button[aria-label='List view']`, but it is DISABLED, because the seed fixture's library is empty (the type chips read image 0 / video 0 / svg 0 / icon 0). There is no list to switch to. Capturing this row needs a media asset on the fixture — and adding one would change what every already-verified Media row renders, so it is a deliberate decision, not a fix to slip in. Worth a separate question: whether a view toggle should be disabled at all when the library is empty."
+   "notes": "BLOCKED ON FIXTURE DATA 2026-08-19 \u2014 not a selector, and not a broken door. The Media panel opens and the toggle exists at `button[aria-label='List view']`, but it is DISABLED, because the seed fixture's library is empty (the type chips read image 0 / video 0 / svg 0 / icon 0). There is no list to switch to. Capturing this row needs a media asset on the fixture \u2014 and adding one would change what every already-verified Media row renders, so it is a deliberate decision, not a fix to slip in. Worth a separate question: whether a view toggle should be disabled at all when the library is empty."
   },
   {
    "id": "BL-0163",
@@ -3023,7 +3063,7 @@
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "122:2",
    "figmaPageId": "75:2",
-   "notes": "REDRAWN 2026-08-19 (drift 45.42%). The row menu really moved: it gained a white card with a 1px #e5e7eb border and radius 8, the labels changed (\"Copy Page Link\" → \"Copy link\", \"Page Settings\" → \"Page settings…\", \"Rename\" → \"Rename…\"), and the F2 / ⌘D / ⌘, shortcut hints the old node drew are GONE from the live menu — worth a design decision, since the site menu still shows its own hints. 95.59% pixel agreement. Reached with the new `rightClick` action; \"controls refuse the click from a spec\" was the harness having only a left button."
+   "notes": "REDRAWN 2026-08-19 (drift 45.42%). The row menu really moved: it gained a white card with a 1px #e5e7eb border and radius 8, the labels changed (\"Copy Page Link\" \u2192 \"Copy link\", \"Page Settings\" \u2192 \"Page settings\u2026\", \"Rename\" \u2192 \"Rename\u2026\"), and the F2 / \u2318D / \u2318, shortcut hints the old node drew are GONE from the live menu \u2014 worth a design decision, since the site menu still shows its own hints. 95.59% pixel agreement. Reached with the new `rightClick` action; \"controls refuse the click from a spec\" was the harness having only a left button."
   },
   {
    "id": "BL-0164",
@@ -3088,7 +3128,7 @@
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "127:2",
    "figmaPageId": "75:2",
-   "notes": "REDRAWN 2026-08-19 (drift 28.99%). Rebuilt from the measured live DOM; 94.38% pixel agreement. Timestamps and row counts differ from the reference — sample data. Note: the full-page Pages surface — search, Listings toggle, page rows with checkboxes, Add page."
+   "notes": "REDRAWN 2026-08-19 (drift 28.99%). Rebuilt from the measured live DOM; 94.38% pixel agreement. Timestamps and row counts differ from the reference \u2014 sample data. Note: the full-page Pages surface \u2014 search, Listings toggle, page rows with checkboxes, Add page."
   },
   {
    "id": "BL-0168",
@@ -3105,7 +3145,7 @@
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "128:2",
    "figmaPageId": "75:2",
-   "notes": "REDRAWN 2026-08-19 (drift 31.43%). The frame held NO menu node at all, so the layer row menu was created: Cut / Copy / Paste (disabled) · Duplicate / Delete · Rename / Group selection (disabled), on a white card, radius 8. 91.86% pixel agreement. Trap worth keeping: each measured row box spans the full card and its padding lives in CSS, not in a child node, so the labels rebuild flush against the card edge — they need the inset added back (+12x, and +5y to centre in the 28px row)."
+   "notes": "REDRAWN 2026-08-19 (drift 31.43%). The frame held NO menu node at all, so the layer row menu was created: Cut / Copy / Paste (disabled) \u00b7 Duplicate / Delete \u00b7 Rename / Group selection (disabled), on a white card, radius 8. 91.86% pixel agreement. Trap worth keeping: each measured row box spans the full card and its padding lives in CSS, not in a child node, so the labels rebuild flush against the card edge \u2014 they need the inset added back (+12x, and +5y to centre in the 28px row)."
   },
   {
    "id": "BL-0169",
@@ -3138,7 +3178,7 @@
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "130:2",
    "figmaPageId": "75:2",
-   "notes": "REDRAWN 2026-08-19 (drift 15.38%). Drawer subtree rebuilt from the measured live DOM through measure-region.mjs → pack-measure.mjs → a use_figma interpreter; 95.83% pixel agreement against the reference render. Shell band left as drawn per the founder call. Note: token names in Geist Mono, and the CSS-uppercased summary label."
+   "notes": "REDRAWN 2026-08-19 (drift 15.38%). Drawer subtree rebuilt from the measured live DOM through measure-region.mjs \u2192 pack-measure.mjs \u2192 a use_figma interpreter; 95.83% pixel agreement against the reference render. Shell band left as drawn per the founder call. Note: token names in Geist Mono, and the CSS-uppercased summary label."
   },
   {
    "id": "BL-0171",
@@ -3151,8 +3191,8 @@
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
    "pipelineState": "readback-verified",
-   "blockReason": "control not reachable via drive recipe (probe lists it; 3 recipe attempts) — manual capture or deeper recipe needed",
-   "notes": "FRAME WRITTEN 2026-08-19 — the row had a capture and no frame. Drawn as a whole 1440x900 screen from the measured live DOM (121 nodes, 18 icons), so its shell is TODAY's, not the pinned one. 92.46% against a reference recaptured on the seed fixture. IMPORTANT about the pinned reference: `default.png` was captured against a DIFFERENT SITE — the topbar reads \"Demo AI Site\", not \"E2E Blank Full d013128c\" — so its canvas is another project's content and comparing against it read 81%. The corpus is NOT uniformly on the seed fixture; check the site name in a reference before trusting a drift number. The fresh one is `brand-starter-themes__seed.png`; the pinned shot is untouched. HARNESS FIX in the same commit: measure-region computed a node's CSS gradient and then left `grad` out of the emit test, so a node painted ONLY by a gradient was never written out — the six starter thumbnails rebuilt as empty cards. They are real Figma gradient fills now. Still missing by construction: the canvas's \"Drop a block here…\" hint, which is a pseudo-element and invisible to a DOM walk.",
+   "blockReason": "control not reachable via drive recipe (probe lists it; 3 recipe attempts) \u2014 manual capture or deeper recipe needed",
+   "notes": "FRAME WRITTEN 2026-08-19 \u2014 the row had a capture and no frame. Drawn as a whole 1440x900 screen from the measured live DOM (121 nodes, 18 icons), so its shell is TODAY's, not the pinned one. 92.46% against a reference recaptured on the seed fixture. IMPORTANT about the pinned reference: `default.png` was captured against a DIFFERENT SITE \u2014 the topbar reads \"Demo AI Site\", not \"E2E Blank Full d013128c\" \u2014 so its canvas is another project's content and comparing against it read 81%. The corpus is NOT uniformly on the seed fixture; check the site name in a reference before trusting a drift number. The fresh one is `brand-starter-themes__seed.png`; the pinned shot is untouched. HARNESS FIX in the same commit: measure-region computed a node's CSS gradient and then left `grad` out of the emit test, so a node painted ONLY by a gradient was never written out \u2014 the six starter thumbnails rebuilt as empty cards. They are real Figma gradient fills now. Still missing by construction: the canvas's \"Drop a block here\u2026\" hint, which is a pseudo-element and invisible to a DOM walk.",
    "figmaNodeId": "271:2",
    "figmaPageId": "75:2"
   },
@@ -3168,7 +3208,7 @@
    "requires": "session",
    "pipelineState": "blocked",
    "blockReason": "same as BL-0171",
-   "notes": "BLOCKED (reason established 2026-08-18): NEXT_PUBLIC_FEATURE_DS_AI is unset, so the Brand panel's AI entry points do not render at all — there is no state to capture. Setting only VITE_FEATURE_DS_AI does NOT help: the shipping editor is the Next-bundled one, where import.meta.env.VITE_* does not exist. Set the NEXT_PUBLIC_ half, restart, then capture."
+   "notes": "BLOCKED (reason established 2026-08-18): NEXT_PUBLIC_FEATURE_DS_AI is unset, so the Brand panel's AI entry points do not render at all \u2014 there is no state to capture. Setting only VITE_FEATURE_DS_AI does NOT help: the shipping editor is the Next-bundled one, where import.meta.env.VITE_* does not exist. Set the NEXT_PUBLIC_ half, restart, then capture."
   },
   {
    "id": "BL-0173",
@@ -3185,7 +3225,7 @@
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "131:2",
    "figmaPageId": "75:2",
-   "notes": "REDRAWN 2026-08-19 (drift 12.43%). Drawer subtree rebuilt from the measured live DOM through measure-region.mjs → pack-measure.mjs → a use_figma interpreter; 97.35% pixel agreement against the reference render. Shell band left as drawn per the founder call. Note: the row this frame is named after is labelled Presets in the app now."
+   "notes": "REDRAWN 2026-08-19 (drift 12.43%). Drawer subtree rebuilt from the measured live DOM through measure-region.mjs \u2192 pack-measure.mjs \u2192 a use_figma interpreter; 97.35% pixel agreement against the reference render. Shell band left as drawn per the founder call. Note: the row this frame is named after is labelled Presets in the app now."
   },
   {
    "id": "BL-0174",
@@ -3202,7 +3242,7 @@
    "capturedFrom": "prod@f7b39a4c",
    "figmaNodeId": "132:2",
    "figmaPageId": "75:2",
-   "notes": "REDRAWN 2026-08-19 (drift 15.86%). Drawer subtree rebuilt from the measured live DOM through measure-region.mjs → pack-measure.mjs → a use_figma interpreter; 96.20% pixel agreement against the reference render. Shell band left as drawn per the founder call. Note: eighteen component rows with variant counts."
+   "notes": "REDRAWN 2026-08-19 (drift 15.86%). Drawer subtree rebuilt from the measured live DOM through measure-region.mjs \u2192 pack-measure.mjs \u2192 a use_figma interpreter; 96.20% pixel agreement against the reference render. Shell band left as drawn per the founder call. Note: eighteen component rows with variant counts."
   },
   {
    "id": "BL-0175",
@@ -3231,12 +3271,13 @@
    "viewport": "1440x900",
    "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
    "requires": "session",
-   "pipelineState": "readback-verified",
+   "pipelineState": "captured-current",
    "screenshotHash": "7dc962ca6e6c838e",
-   "capturedFrom": "prod@f7b39a4c",
-   "figmaNodeId": "134:2",
+   "capturedFrom": "localhost@42eb22c0",
+   "figmaNodeId": "323:2",
    "figmaPageId": "75:2",
-   "notes": "REDRAWN 2026-08-19 (drift 15.57%). Drawer subtree rebuilt from the measured live DOM; 94.49% pixel agreement. Shell band left as drawn. Note: the change counters differ because the fixture had an edit when the reference was taken and none when it was measured — sample data, not shape."
+   "notes": "REDRAWN 2026-08-19 (drift 15.57%). Drawer subtree rebuilt from the measured live DOM; 94.49% pixel agreement. Shell band left as drawn. Note: the change counters differ because the fixture had an edit when the reference was taken and none when it was measured \u2014 sample data, not shape. Refreshed 2026-08-21 by re-capturing the RUNNING editor (localhost:3000, site cmrsur1fp\u2026) through Figma's html-to-design pipeline; recipe committed as scripts/baseline/screens-editor.json. The 2026-08-19 frame was drawn from prod@f7b39a4c and is kept on the same page for comparison. NOTE: the Publish button opens this confirm directly \u2014 there is no separate publish dropdown state, so BL-0106 'publish-open' no longer describes anything.",
+   "figmaNodeIdPrev": "134:2"
   },
   {
    "id": "BL-0177",
@@ -3360,7 +3401,7 @@
    "viewport": "n/a",
    "figmaFileKey": "wQsxXDoVQ2LpPkpnaKIVtR",
    "pipelineState": "readback-verified",
-   "notes": "non-visual artifact — inventory entry + annotation only, no frame",
+   "notes": "non-visual artifact \u2014 inventory entry + annotation only, no frame",
    "figmaNodeId": "1:3",
    "figmaPageId": "1:2"
   },
@@ -3405,7 +3446,7 @@
    "viewport": "n/a",
    "figmaFileKey": "wQsxXDoVQ2LpPkpnaKIVtR",
    "pipelineState": "readback-verified",
-   "notes": "non-visual artifact — inventory entry + annotation only, no frame",
+   "notes": "non-visual artifact \u2014 inventory entry + annotation only, no frame",
    "figmaNodeId": "1:15",
    "figmaPageId": "1:2"
   },
@@ -3420,7 +3461,7 @@
    "viewport": "n/a",
    "figmaFileKey": "wQsxXDoVQ2LpPkpnaKIVtR",
    "pipelineState": "readback-verified",
-   "notes": "non-visual artifact — inventory entry + annotation only, no frame",
+   "notes": "non-visual artifact \u2014 inventory entry + annotation only, no frame",
    "figmaNodeId": "1:19",
    "figmaPageId": "1:2"
   },
@@ -3450,7 +3491,7 @@
    "viewport": "n/a",
    "figmaFileKey": "wQsxXDoVQ2LpPkpnaKIVtR",
    "pipelineState": "readback-verified",
-   "notes": "non-visual artifact — inventory entry + annotation only, no frame",
+   "notes": "non-visual artifact \u2014 inventory entry + annotation only, no frame",
    "figmaNodeId": "1:27",
    "figmaPageId": "1:2"
   },
@@ -3495,7 +3536,7 @@
    "viewport": "n/a",
    "figmaFileKey": "wQsxXDoVQ2LpPkpnaKIVtR",
    "pipelineState": "readback-verified",
-   "notes": "non-visual artifact — inventory entry + annotation only, no frame",
+   "notes": "non-visual artifact \u2014 inventory entry + annotation only, no frame",
    "figmaNodeId": "1:39",
    "figmaPageId": "1:2"
   },
@@ -3510,7 +3551,7 @@
    "viewport": "n/a",
    "figmaFileKey": "wQsxXDoVQ2LpPkpnaKIVtR",
    "pipelineState": "readback-verified",
-   "notes": "non-visual artifact — inventory entry + annotation only, no frame",
+   "notes": "non-visual artifact \u2014 inventory entry + annotation only, no frame",
    "figmaNodeId": "1:43",
    "figmaPageId": "1:2"
   },
@@ -3540,7 +3581,7 @@
    "viewport": "n/a",
    "figmaFileKey": "wQsxXDoVQ2LpPkpnaKIVtR",
    "pipelineState": "readback-verified",
-   "notes": "non-visual artifact — inventory entry + annotation only, no frame",
+   "notes": "non-visual artifact \u2014 inventory entry + annotation only, no frame",
    "figmaNodeId": "1:51",
    "figmaPageId": "1:2"
   },
@@ -3555,7 +3596,7 @@
    "viewport": "n/a",
    "figmaFileKey": "wQsxXDoVQ2LpPkpnaKIVtR",
    "pipelineState": "readback-verified",
-   "notes": "non-visual artifact — inventory entry + annotation only, no frame",
+   "notes": "non-visual artifact \u2014 inventory entry + annotation only, no frame",
    "figmaNodeId": "1:55",
    "figmaPageId": "1:2"
   },
@@ -3660,7 +3701,7 @@
    "viewport": "n/a",
    "figmaFileKey": "wQsxXDoVQ2LpPkpnaKIVtR",
    "pipelineState": "readback-verified",
-   "notes": "non-visual artifact — inventory entry + annotation only, no frame",
+   "notes": "non-visual artifact \u2014 inventory entry + annotation only, no frame",
    "figmaNodeId": "2:26",
    "figmaPageId": "1:2"
   },
@@ -3675,7 +3716,7 @@
    "viewport": "n/a",
    "figmaFileKey": "wQsxXDoVQ2LpPkpnaKIVtR",
    "pipelineState": "readback-verified",
-   "notes": "non-visual artifact — inventory entry + annotation only, no frame",
+   "notes": "non-visual artifact \u2014 inventory entry + annotation only, no frame",
    "figmaNodeId": "2:30",
    "figmaPageId": "1:2"
   },
@@ -3690,7 +3731,7 @@
    "viewport": "n/a",
    "figmaFileKey": "wQsxXDoVQ2LpPkpnaKIVtR",
    "pipelineState": "readback-verified",
-   "notes": "non-visual artifact — inventory entry + annotation only, no frame",
+   "notes": "non-visual artifact \u2014 inventory entry + annotation only, no frame",
    "figmaNodeId": "2:34",
    "figmaPageId": "1:2"
   },
@@ -3705,7 +3746,7 @@
    "viewport": "n/a",
    "figmaFileKey": "wQsxXDoVQ2LpPkpnaKIVtR",
    "pipelineState": "readback-verified",
-   "notes": "non-visual artifact — inventory entry + annotation only, no frame",
+   "notes": "non-visual artifact \u2014 inventory entry + annotation only, no frame",
    "figmaNodeId": "2:38",
    "figmaPageId": "1:2"
   },
@@ -3720,7 +3761,7 @@
    "viewport": "n/a",
    "figmaFileKey": "wQsxXDoVQ2LpPkpnaKIVtR",
    "pipelineState": "readback-verified",
-   "notes": "non-visual artifact — inventory entry + annotation only, no frame",
+   "notes": "non-visual artifact \u2014 inventory entry + annotation only, no frame",
    "figmaNodeId": "2:42",
    "figmaPageId": "1:2"
   },
@@ -3776,7 +3817,7 @@
    "sourceFile": "packages/dashboard/newdeisgn/Buildrik Dashboard (standalone) (1).html (UNTRACKED)",
    "statusClass": 13,
    "flow": "unclassified",
-   "state": "standalone dashboard HTML — untracked working-tree file",
+   "state": "standalone dashboard HTML \u2014 untracked working-tree file",
    "viewport": "n/a",
    "figmaFileKey": "wQsxXDoVQ2LpPkpnaKIVtR",
    "pipelineState": "readback-verified",
