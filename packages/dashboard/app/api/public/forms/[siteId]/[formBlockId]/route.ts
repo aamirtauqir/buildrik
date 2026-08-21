@@ -35,11 +35,25 @@ export async function POST(
   if (raw.length > MAX_BODY_BYTES) {
     return NextResponse.json({ error: "Payload too large" }, { status: 413 });
   }
+  /* A published form is plain HTML: `<form method="POST">` sends
+     application/x-www-form-urlencoded, and this endpoint accepted JSON only —
+     so a real browser submission died at JSON.parse with a 400 before it ever
+     reached validation. Both shapes are accepted now; the JSON one is what
+     scripted submissions send. */
+  const isForm = (req.headers.get("content-type") ?? "").includes(
+    "application/x-www-form-urlencoded",
+  );
   let parsedJson: unknown;
-  try {
-    parsedJson = JSON.parse(raw);
-  } catch {
-    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  if (isForm) {
+    const fields = Object.fromEntries(new URLSearchParams(raw).entries());
+    const { _honeypot, ...data } = fields;
+    parsedJson = { data, ...(_honeypot !== undefined ? { honeypot: _honeypot } : {}) };
+  } else {
+    try {
+      parsedJson = JSON.parse(raw);
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+    }
   }
   const parsed = formSubmissionSchema.safeParse(parsedJson);
   if (!parsed.success) {
@@ -48,6 +62,21 @@ export async function POST(
 
   try {
     const result = await submitForm(siteId, formBlockId, parsed.data, ip);
+    /* A browser that posted a form expects a page, not JSON. Send it back where
+       it came from with a marker the site can act on; a scripted caller still
+       gets the id. */
+    if (isForm) {
+      const back = req.headers.get("referer");
+      if (back) {
+        const url = new URL(back);
+        url.searchParams.set("submitted", "1");
+        return NextResponse.redirect(url.toString(), 303);
+      }
+      return new NextResponse(
+        "<!DOCTYPE html><meta charset=\"utf-8\"><title>Thanks</title><p>Thanks — your message was sent.</p>",
+        { status: 200, headers: { "content-type": "text/html; charset=utf-8" } },
+      );
+    }
     return NextResponse.json({ id: result.id, message: "Submission received" }, { status: 201 });
   } catch (e: unknown) {
     if (e instanceof Error) {

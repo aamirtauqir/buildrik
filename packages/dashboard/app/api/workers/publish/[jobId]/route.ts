@@ -5,6 +5,7 @@ import { prisma } from "@lib/prisma";
 import { slugifyProjectName, type VercelFile } from "@lib/vercel";
 import { resolveSiteOrigin } from "@lib/publish-urls";
 import { buildDeployFiles } from "@lib/publish-files";
+import { wireForms, type DiscoveredForm } from "@lib/publish-forms";
 import type { PublishPage } from "@buildrik/shared/schemas/publish";
 import { record as recordActivity } from "@server/services/activity-log.service";
 import { notifyWorkspaceOwner } from "@server/services/notification.trigger";
@@ -305,9 +306,50 @@ async function runVercelDeployJob(
     select: { domain: true },
   });
 
+  /* Forms: point every actionless one at the public endpoint and record it.
+     The endpoint, its validation, its rate limit and the Submissions tab were
+     all built; nothing ever created the FormBlock row they need, and the export
+     only sets an action for Formspree or a custom webhook — so a form built in
+     the editor published with no action at all and submitting reloaded the
+     page. The row id IS the form element's id, taken from the URL we ship, so
+     the two cannot drift. */
+  const appOrigin = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/+$/, "") ?? "";
+  const discovered: DiscoveredForm[] = [];
+  const wiredPages = appOrigin
+    ? pages.map((p) => {
+        const { html, forms } = wireForms(p.html, { siteId, appOrigin, path: p.path });
+        discovered.push(...forms);
+        return { ...p, html };
+      })
+    : pages;
+
+  for (const form of discovered) {
+    await prisma.formBlock.upsert({
+      where: { id: form.blockId },
+      create: {
+        id: form.blockId,
+        siteId,
+        blockId: form.blockId,
+        name: form.name,
+        fields: form.fields,
+        isActive: true,
+      },
+      // Republishing must not clobber what the owner set in the dashboard
+      // (notify email, webhook, the name they gave it) — only the shape.
+      update: { fields: form.fields, isActive: true },
+    });
+  }
+  /* Forms deleted from the site stop accepting submissions, but their rows and
+     everything already submitted stay — the Submissions tab is a record, not a
+     mirror of the current design. */
+  await prisma.formBlock.updateMany({
+    where: { siteId, id: { notIn: discovered.map((f) => f.blockId) } },
+    data: { isActive: false },
+  });
+
   const files: VercelFile[] = buildDeployFiles({
     siteId,
-    pages,
+    pages: wiredPages,
     origin: resolveSiteOrigin({
       canonicalUrl: site.canonicalUrl,
       verifiedDomain: verifiedDomain?.domain ?? null,
