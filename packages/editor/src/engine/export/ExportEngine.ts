@@ -134,6 +134,18 @@ function hideRulesFor(selector: string, styles: Record<string, string>): string[
     .map(([, query]) => `@media ${query}{${selector}{display:none!important}}`);
 }
 
+/**
+ * The page that becomes `index.html`.
+ *
+ * `isHome` is not guaranteed: pages arrive from AI generation, template apply,
+ * duplication and seeds, and a site can reach publish with the flag on none of
+ * them. Falling back to the first page keeps the deployed site answering at its
+ * own root, which is the whole point of publishing it.
+ */
+export function resolveHomePageId(pages: PageData[]): string | undefined {
+  return (pages.find((p) => p.isHome) ?? pages[0])?.id;
+}
+
 export class ExportEngine {
   private composer: Composer;
   private config: ExportConfig;
@@ -636,7 +648,10 @@ export class ExportEngine {
     const livePages = allPages.filter(isPageLive);
     // …unless that leaves nothing to deploy. A site with no index.html is a
     // broken deploy, which helps nobody.
-    const pages = livePages.length > 0 ? livePages : allPages.filter((p) => p.isHome).slice(0, 1);
+    const pages =
+      livePages.length > 0
+        ? livePages
+        : allPages.filter((p) => p.id === resolveHomePageId(allPages));
     const files: MultiPageExportFile[] = [];
 
     // CSS = class-based base styles FIRST, then StyleEngine breakpoint overrides.
@@ -746,10 +761,23 @@ export class ExportEngine {
    * than a missing file.
    */
   private buildPageHrefs(pages: PageData[]): void {
+    /* Exactly one page becomes index.html, and something always does.
+       `isHome` is a flag the product does not guarantee — a site can reach
+       publish with no page marked home (four in the database today), and this
+       map then produced home.html, about.html and no index.html at all, so the
+       deployed site answered 404 at its own root.
+       The old rule also sent every slugless page to index.html, and two pages
+       sharing a slug to the same file: one silently overwrote the other. */
+    const homeId = resolveHomePageId(pages);
+    const used = new Set<string>(["index.html"]);
     this.pageHrefs = new Map(
-      pages.map((p) => {
-        const slug = (p.slug ?? "").replace(/^\/+/, "");
-        return [p.id, p.isHome || !slug ? "index.html" : `${slug}.html`];
+      pages.map((p, index) => {
+        if (p.id === homeId) return [p.id, "index.html"];
+        const slug = (p.slug ?? "").replace(/^\/+/, "") || `page-${index + 1}`;
+        let name = `${slug}.html`;
+        for (let n = 2; used.has(name); n++) name = `${slug}-${n}.html`;
+        used.add(name);
+        return [p.id, name];
       }),
     );
   }

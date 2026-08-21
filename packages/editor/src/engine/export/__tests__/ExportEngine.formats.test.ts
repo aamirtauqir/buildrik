@@ -582,3 +582,61 @@ describe("ExportEngine.generateZip", () => {
     expect(Object.keys(zip.files).sort()).toEqual(["index.html", "styles.css"]);
   });
 });
+
+// ============================================================================
+// exportAllPages — WHICH PAGE IS index.html
+// ============================================================================
+
+/**
+ * `isHome` is a flag nothing guarantees. Pages arrive from AI generation,
+ * template apply, duplication and seeds; four sites in the database today carry
+ * it on no page at all. The export used to send every such page to <slug>.html
+ * and write no index.html, so the deployed site answered 404 at its own root —
+ * and if every page was also Hidden, it wrote nothing whatsoever.
+ */
+describe("ExportEngine.exportAllPages — index.html always exists", () => {
+  const names = (files: Array<{ name: string }>) => files.map((f) => f.name).sort();
+
+  it("uses the page marked home", async () => {
+    const pages = [page("About"), page("Home", { isHome: true })];
+    const result = await new ExportEngine(makeComposer({ pages })).exportAllPages({ format: "html" });
+    expect(names(result.files.filter((f) => f.type === "html"))).toEqual([
+      "about.html",
+      "index.html",
+    ]);
+    expect(result.files.find((f) => f.name === "index.html")!.content).toContain("<title>Home</title>");
+  });
+
+  it("falls back to the first page when NO page is marked home", async () => {
+    const pages = [page("Home"), page("About"), page("Pricing")];
+    const result = await new ExportEngine(makeComposer({ pages })).exportAllPages({ format: "html" });
+    const html = result.files.filter((f) => f.type === "html");
+    expect(names(html)).toEqual(["about.html", "index.html", "pricing.html"]);
+    expect(result.files.find((f) => f.name === "index.html")!.content).toContain("<title>Home</title>");
+  });
+
+  it("still deploys a root page when every page is hidden", async () => {
+    const pages = [
+      page("Home", { settings: { visibility: "hidden" } }),
+      page("About", { settings: { visibility: "hidden" } }),
+    ];
+    const result = await new ExportEngine(makeComposer({ pages })).exportAllPages({ format: "html" });
+    expect(names(result.files.filter((f) => f.type === "html"))).toEqual(["index.html"]);
+  });
+
+  it("does not let two pages collide on one file", async () => {
+    // Two slugless pages both became index.html, and one silently overwrote the
+    // other — the visitor lost a page and nothing said so.
+    const pages = [
+      page("Home", { isHome: true }),
+      page("", { slug: undefined }),
+      page("Legal", { slug: "terms" }),
+      page("Terms", { slug: "terms" }),
+    ];
+    const result = await new ExportEngine(makeComposer({ pages })).exportAllPages({ format: "html" });
+    const html = result.files.filter((f) => f.type === "html");
+    expect(html).toHaveLength(4);
+    expect(new Set(html.map((f) => f.name)).size).toBe(4);
+    expect(names(html)).toEqual(["index.html", "page-2.html", "terms-2.html", "terms.html"]);
+  });
+});
