@@ -448,13 +448,21 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                  overwriting the real site with the fallback. Say so, and
                  offer the only action that helps. */
               const notLoaded = message.includes("PROJECT_NOT_LOADED");
+              // Deleted is not "not loaded yet" — no reload will fix it.
+              const gone = message.includes("SITE_MISSING");
               addToast({
-                title: notLoaded ? "Not saved — this site never loaded" : "Save failed",
-                description: notLoaded
-                  ? "Autosave is held back so it can't overwrite the stored pages. Reload to get the real site."
-                  : "Could not save to dashboard. Changes are unsaved.",
+                title: gone
+                  ? "This site isn't there anymore"
+                  : notLoaded
+                    ? "Not saved — this site never loaded"
+                    : "Save failed",
+                description: gone
+                  ? "It may have been deleted, so nothing can be saved to it."
+                  : notLoaded
+                    ? "Autosave is held back so it can't overwrite the stored pages. Reload to get the real site."
+                    : "Could not save to dashboard. Changes are unsaved.",
                 tone: notLoaded ? "warning" : "error",
-                ...(notLoaded
+                ...(notLoaded && !gone
                   ? { action: { label: "Reload", onClick: () => window.location.reload() } }
                   : {}),
               });

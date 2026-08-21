@@ -178,12 +178,24 @@ export function useSaveCallback({
            overwrite. */
         if (errorMessage.includes("PROJECT_NOT_LOADED")) {
           setSaveState((prev) => ({ ...prev, status: "error", error: errorMessage }));
+          /* A deleted site gets a different story and a different action:
+             Reload cannot bring it back, so offering it sends the user round a
+             loop that ends where it started. */
+          const gone = errorMessage.includes("SITE_MISSING");
           addToast({
-            title: "Not saved — this site never loaded",
-            description:
-              "Saving now would overwrite the stored pages with what's on screen. Reload to get the real site first.",
+            title: gone ? "This site isn't there anymore" : "Not saved — this site never loaded",
+            description: gone
+              ? "It may have been deleted, so nothing can be saved to it. Check the dashboard, or your trash."
+              : "Saving now would overwrite the stored pages with what's on screen. Reload to get the real site first.",
             tone: "warning",
-            action: { label: "Reload", onClick: () => window.location.reload() },
+            action: gone
+              ? {
+                  label: "Go to dashboard",
+                  onClick: () => {
+                    window.location.href = `${DASHBOARD_URL}/dashboard`;
+                  },
+                }
+              : { label: "Reload", onClick: () => window.location.reload() },
           });
           return "error";
         }

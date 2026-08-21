@@ -156,6 +156,36 @@ describe("saveProject", () => {
     expect(mocks.saveProjectMutate).not.toHaveBeenCalled();
   });
 
+  /* A load that failed once and a site that is GONE need different advice.
+     "Reload to get the real site" is right for the first and a lie for the
+     second — the reload returns the same 404 forever, and the UI branches on
+     this token to offer the dashboard instead. */
+  it("marks a refusal SITE_MISSING once the server has said NOT_FOUND", async () => {
+    mocks.sitesGetQuery.mockRejectedValue(new Error("NOT_FOUND"));
+    await expect(loadProject("gone-site")).rejects.toThrow("NOT_FOUND");
+
+    const err = await saveProject("gone-site", {
+      version: "1.0" as const, pages: [], styles: [], assets: [], metadata: { name: "X" },
+    }).catch((e: unknown) => e);
+
+    expect(err).toBeInstanceOf(ProjectNotLoadedError);
+    expect((err as ProjectNotLoadedError).missing).toBe(true);
+    expect((err as Error).message).toContain("SITE_MISSING");
+    expect(mocks.saveProjectMutate).not.toHaveBeenCalled();
+  });
+
+  it("does NOT mark a site missing when the load failed for another reason", async () => {
+    mocks.sitesGetQuery.mockRejectedValue(new Error("fetch failed"));
+    await expect(loadProject("flaky-site")).rejects.toThrow("fetch failed");
+
+    const err = await saveProject("flaky-site", {
+      version: "1.0" as const, pages: [], styles: [], assets: [], metadata: { name: "X" },
+    }).catch((e: unknown) => e);
+
+    expect((err as ProjectNotLoadedError).missing).toBe(false);
+    expect((err as Error).message).not.toContain("SITE_MISSING");
+  });
+
   it("calls sites.saveProject.mutate with siteId and projectData", async () => {
     await loadedSite("site-1");
     const projectData = {

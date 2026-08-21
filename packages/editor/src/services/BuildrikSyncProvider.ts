@@ -56,13 +56,24 @@ let _baselineLastEditedAt: string | null = null;
    fallback project has a child, so it counts as content. */
 const _loadedSites = new Set<string>();
 
+/* Sites the server says do not exist. A refused save is not the same story for
+   these: "Reload to get the real site" is the right advice for a load that
+   failed once, and a lie for a site that has been deleted — the reload returns
+   the same 404 forever. */
+const _missingSites = new Set<string>();
+
 /** A save refused because the site's project never loaded — not a failure to
  *  reach the server, and deliberately worded so the network-error branch in
  *  useSaveCallback does not claim it. */
 export class ProjectNotLoadedError extends Error {
-  constructor(public readonly siteId: string) {
+  constructor(
+    public readonly siteId: string,
+    /** The server answered NOT_FOUND — this site is gone, not merely unloaded. */
+    public readonly missing = false,
+  ) {
     super(
-      `PROJECT_NOT_LOADED: refusing to save site ${siteId} — its project never loaded this session, ` +
+      (missing ? "SITE_MISSING " : "") +
+        `PROJECT_NOT_LOADED: refusing to save site ${siteId} — its project never loaded this session, ` +
         "so this save would replace the stored pages with what the fallback put on screen.",
     );
     this.name = "ProjectNotLoadedError";
@@ -316,6 +327,7 @@ export async function loadProject(siteId: string): Promise<ProjectData> {
     };
   } catch (cause) {
     const error = cause instanceof Error ? cause : new Error(String(cause));
+    if (/not_found/i.test(error.message)) _missingSites.add(siteId);
     throw new Error(`BuildrikSyncProvider.loadProject failed for site ${siteId}: ${error.message}`, { cause: error });
   }
 }
@@ -331,7 +343,9 @@ export async function saveProject(
   siteId: string,
   projectData: ProjectData
 ): Promise<{ success: boolean; savedAt: Date }> {
-  if (!_loadedSites.has(siteId)) throw new ProjectNotLoadedError(siteId);
+  if (!_loadedSites.has(siteId)) {
+    throw new ProjectNotLoadedError(siteId, _missingSites.has(siteId));
+  }
   const client = getClient();
   const siteColumnPatch = extractSiteColumnPatch(projectData);
   const hasSiteColumnChanges = Object.keys(siteColumnPatch).length > 0;
