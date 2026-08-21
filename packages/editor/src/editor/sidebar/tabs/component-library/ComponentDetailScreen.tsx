@@ -393,9 +393,15 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
         onConfirm={confirmUpdateAction}
         title="Update component"
         message={
-          instanceCount > 0
-            ? `Replace "${component.name}" with the element selected on the canvas? ${instanceCount} instance(s) will change to match. Any edits made on an instance are kept where they still fit, and lost where the new version no longer has that part.`
-            : `Replace "${component.name}" with the element selected on the canvas?`
+          /* The undo caveat is measured, not assumed: with history primed, one
+             Cmd+Z after an update reverted the instance on the canvas and left
+             the component at the new version — element history holds the pages,
+             not the component definition. Saying "can't be undone" flatly would
+             be wrong too, because the canvas DOES revert. */
+          (instanceCount > 0
+            ? `Replace "${component.name}" with the element selected on the canvas? ${instanceCount} instance(s) will change to match. Any edits made on an instance are kept where they still fit, and lost where the new version no longer has that part. `
+            : `Replace "${component.name}" with the element selected on the canvas? `) +
+          "Undo won't take the component back — it reverts the pages, not the component itself."
         }
         confirmLabel="Update component"
         tone="destructive"
