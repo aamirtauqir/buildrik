@@ -34,6 +34,27 @@ describe("LoadErrorBanner", () => {
     expect(onRetry).toHaveBeenCalled();
   });
 
+  /* A deleted site is not a blip. Walked live against a trashed site: the
+     editor loaded a blank "Page 1", the banner said "you're seeing local
+     changes for now", and the canvas invited the user to Start blank —
+     while every save was refused. */
+  it("a missing site says so, and does not offer a Retry that cannot work", () => {
+    const onRetry = vi.fn();
+    const onSignIn = vi.fn();
+    renderBanner({ kind: "missing", onRetry, onSignIn });
+    expect(screen.getByText(/isn't there anymore/i)).toBeInTheDocument();
+    expect(screen.getByText(/nothing you do here can be saved/i)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /^retry$/i })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /go to dashboard/i }));
+    expect(onSignIn).toHaveBeenCalled();
+    expect(onRetry).not.toHaveBeenCalled();
+  });
+
+  it("does not tell a missing site it is seeing local changes for now", () => {
+    renderBanner({ kind: "missing" });
+    expect(screen.queryByText(/local changes for now/i)).not.toBeInTheDocument();
+  });
+
   it("network failure offers Retry and does not offer Sign in", () => {
     const onRetry = vi.fn();
     renderBanner({ kind: "network", onRetry });

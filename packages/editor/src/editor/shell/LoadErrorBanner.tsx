@@ -6,6 +6,12 @@
  *
  *   auth     → the session expired; Sign in (→ dashboard) or Retry.
  *   network  → the dashboard didn't answer; Retry.
+ *   missing  → the server says this site does not exist (deleted, or a stale
+ *              link). "You're seeing local changes for now" is the wrong story
+ *              here: there is no "for now", nothing can ever save, and Retry
+ *              cannot succeed — so it is not offered. Verified live against a
+ *              trashed site, where the editor showed a blank "Page 1" and
+ *              invited the user to start building.
  *
  * Retry is a full reload (re-runs the load fresh) — honest and side-effect-free.
  *
@@ -14,7 +20,7 @@
 
 import * as React from "react";
 import { Button } from "@/editor/chrome-ui";
-export type LoadErrorKind = "auth" | "network" | null;
+export type LoadErrorKind = "auth" | "network" | "missing" | null;
 
 export interface LoadErrorBannerProps {
   kind: LoadErrorKind;
@@ -26,7 +32,6 @@ export interface LoadErrorBannerProps {
 const S: Record<string, React.CSSProperties> = {
   bar: { display: "flex", alignItems: "center", gap: 12, padding: "10px 16px", background: "var(--bk-warning-tint)", borderBottom: "1px solid var(--bk-border)", fontSize: 13, color: "var(--bk-ink)" },
   text: { flex: 1, lineHeight: 1.4 },
-  strong: { fontWeight: 600 },
   actions: { display: "flex", alignItems: "center", gap: 8 },
 };
 
@@ -34,23 +39,33 @@ export const LoadErrorBanner: React.FC<LoadErrorBannerProps> = ({ kind, onRetry,
   if (!kind) return null;
 
   const isAuth = kind === "auth";
+  const isMissing = kind === "missing";
+  const label = isAuth ? "Session expired" : isMissing ? "Site not found" : "Load failed";
   return (
-    <div style={S.bar} role="alert" aria-label={isAuth ? "Session expired" : "Load failed"}>
+    <div style={S.bar} role="alert" aria-label={label}>
       <div style={S.text}>
         {isAuth ? (
           <>
-            <span style={S.strong}>Session expired.</span> Sign in to load this site from the dashboard — you're seeing local changes for now.
+            <strong className="tw:font-semibold">Session expired.</strong> Sign in to load this site from the dashboard — you're seeing local changes for now.
+          </>
+        ) : isMissing ? (
+          <>
+            <strong className="tw:font-semibold">This site isn't there anymore.</strong> It may have been deleted. Nothing you do here can be saved — check the dashboard, or your trash.
           </>
         ) : (
           <>
-            <span style={S.strong}>Couldn't load this site</span> from the dashboard. You're seeing local changes for now.
+            <strong className="tw:font-semibold">Couldn't load this site</strong> from the dashboard. You're seeing local changes for now.
           </>
         )}
       </div>
       <div style={S.actions}>
         {onDismiss && <Button color="light" size="xs" onClick={onDismiss} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">Dismiss</Button>}
         {isAuth && <Button color="light" size="xs" onClick={onSignIn}>Sign in</Button>}
-        <Button size="xs" onClick={onRetry}>Retry</Button>
+        {isMissing ? (
+          <Button size="xs" onClick={onSignIn}>Go to dashboard</Button>
+        ) : (
+          <Button size="xs" onClick={onRetry}>Retry</Button>
+        )}
       </div>
     </div>
   );

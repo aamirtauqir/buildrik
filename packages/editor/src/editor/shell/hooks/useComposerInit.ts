@@ -58,7 +58,7 @@ export interface UseComposerInitParams {
   /** S1.5: surface a dashboard load failure as a persistent banner instead of
    *  a transient toast. `auth` = session expired, `network` = generic failure.
    *  When wired, it replaces the toast; when omitted, the toast is kept (back-compat). */
-  onLoadError?: (kind: "auth" | "network") => void;
+  onLoadError?: (kind: "auth" | "network" | "missing") => void;
 }
 
 export function useComposerInit(params: UseComposerInitParams): Composer | null {
@@ -217,10 +217,16 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
             // see because they are signed out. Point them at sign-in instead.
             const isAuth =
               err instanceof Error && /unauthorized/i.test(err.message);
+            /* NOT_FOUND is not a blip. The site is deleted or the link is
+               stale, so no retry will ever succeed and no save will ever land
+               — the editor was offering a blank canvas and "Start blank" to
+               someone whose work could not be stored anywhere. */
+            const isMissing =
+              err instanceof Error && /not_found/i.test(err.message);
             // S1.5: prefer a persistent banner over a transient toast when the
             // shell wired onLoadError; the toast stays as the back-compat path.
             if (onLoadErrorRef.current) {
-              onLoadErrorRef.current(isAuth ? "auth" : "network");
+              onLoadErrorRef.current(isAuth ? "auth" : isMissing ? "missing" : "network");
             } else if (isAuth) {
               addToastRef.current({
                 title: "Session expired",
