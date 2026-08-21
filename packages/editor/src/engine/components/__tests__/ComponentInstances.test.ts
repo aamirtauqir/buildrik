@@ -145,6 +145,44 @@ describe("instantiateComponent", () => {
     expect(manager.getElement(link.getId())).toBe(link);
   });
 
+  /* Callers pass whatever is SELECTED — the components panel does, from two
+     screens — and `pasteElement` performs no nesting check, so inserting a
+     BUTTON-rooted component with a heading selected nested it INSIDE the
+     heading, which rules.ts forbids ("button" is not allowed in a heading).
+     The paste COMMAND does its own walk-up, which is why ⌘V behaved and this
+     did not. Walked live: with a heading selected, a button component lands in
+     the heading's container and the heading keeps zero children.
+
+     (A CONTAINER in a heading is allowed by the matrix, so the same insert with
+     the card component is legal and stays where it was put — that is the case
+     the first assertion pins.) */
+  it("leaves a legal target alone", async () => {
+    const { manager, maps, c, instanceId } = await seed();
+    const heading = manager.getElement(instanceId)!.getChildren()[0];
+    expect(heading.getType()).toBe("heading");
+
+    const id = (await instantiateComponent(c, maps, "comp-1", heading.getId()))!;
+
+    expect(manager.getElement(id)!.getParent()?.getId()).toBe(heading.getId());
+  });
+
+  it("walks up to a parent that can hold it, rather than nesting illegally", async () => {
+    const { manager, maps, c, instanceId } = await seed();
+    const heading = manager.getElement(instanceId)!.getChildren()[0];
+    maps.components.set("comp-btn", {
+      ...makeComponent(),
+      id: "comp-btn",
+      masterTree: { id: "m-btn", type: "button", tagName: "button", content: "Go", children: [] },
+    });
+
+    const id = (await instantiateComponent(c, maps, "comp-btn", heading.getId()))!;
+
+    expect(id).toBeTruthy();
+    expect(heading.getChildCount()).toBe(0);
+    // the heading's own parent is the instance root (a container) — that holds it
+    expect(manager.getElement(id)!.getParent()?.getId()).toBe(instanceId);
+  });
+
   it("registers the instance record and persists it on the element data-bag", async () => {
     const { composer, manager, maps, instanceId, component } = await seed();
     const instance = maps.instances.get(instanceId)!;

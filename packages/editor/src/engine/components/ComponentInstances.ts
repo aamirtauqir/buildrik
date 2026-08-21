@@ -7,7 +7,7 @@
  */
 
 import { EVENTS } from "../../shared/constants";
-import type { ElementData } from "../../shared/types";
+import type { ElementData, ElementType } from "../../shared/types";
 import type {
   ComponentDefinition,
   ComponentInstance,
@@ -15,7 +15,9 @@ import type {
 } from "../../shared/types/components";
 import { devError } from "../../shared/utils/devLogger";
 import { deepClone } from "../../shared/utils/helpers";
+import { canNestElement } from "../../shared/utils/nesting";
 import type { Composer } from "../Composer";
+import type { Element } from "../elements/Element";
 import { applyOverridesToTree, ComponentInstanceUtils } from "./ComponentInstance";
 import {
   findInstanceContainingElement,
@@ -70,12 +72,32 @@ export async function instantiateComponent(
   const component = maps.components.get(componentId);
   if (!component) return null;
 
-  const parent = composer.elements.getElement(parentId);
+  const requested = composer.elements.getElement(parentId);
+  if (!requested) return null;
+
+  /* Put the instance where it can legally live. Callers pass whatever is
+     SELECTED — the components panel does, twice — so inserting a card with a
+     heading selected nested it inside that heading, which `rules.ts` forbids
+     outright. `pasteElement` performs no nesting check (the paste COMMAND does
+     its own walk-up, which is why ⌘V behaves and this did not). Walk up from
+     the requested parent, then fall back to the page root. */
+  const childType = component.masterTree.type as ElementType;
+  let parent: Element | null = requested;
+  while (parent && !canNestElement(childType, parent.getType() as ElementType)) {
+    parent = parent.getParent() ?? null;
+  }
+  if (!parent) {
+    const page = composer.elements.getActivePage();
+    const root = page?.root?.id ? composer.elements.getElement(page.root.id) : null;
+    parent = root && canNestElement(childType, root.getType() as ElementType) ? root : null;
+  }
   if (!parent) return null;
 
   const clonedData = cloneWithNewIds(component.masterTree);
 
-  const element = composer.elements.pasteElement(clonedData, parent, _index);
+  // The index only means something inside the parent the caller asked for.
+  const index = parent === requested ? _index : undefined;
+  const element = composer.elements.pasteElement(clonedData, parent, index);
   if (!element) return null;
 
   const instance: ComponentInstance = {
@@ -92,7 +114,7 @@ export async function instantiateComponent(
   composer.emit(EVENTS.COMPONENT_INSTANTIATED, {
     instance,
     component,
-    parentId,
+    parentId: parent.getId(),
   });
   composer.markDirty();
 
