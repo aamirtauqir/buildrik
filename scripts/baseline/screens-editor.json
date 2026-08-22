@@ -942,6 +942,16 @@
       "actions": null,
       "_note": "Door with no baseline frame on the board at all. The site menu has sixteen rows and only ten were ever captured; this is one of the six that were missed. Row label read off the running menu — the DOM text carries the chord appended (\"Site settings⌃,\"), so substring matching is required, not exact.",
       "_capture_status": "VERIFIED 2026-08-23: this door opens a NEW TAB and leaves the editor untouched — measured by counting context pages, not by reading the drawer. An editor-page frame is the wrong surface for it; the state lives on the dashboard. Same shape as BL-0120 invite-teammates."
+    },
+    {
+      "id": "BL-0235",
+      "state": "client-view (?view=client)",
+      "path": "/edit/cmrsur1fp000unh3rvmmiq25t?view=client",
+      "actions": [],
+      "_marker": "Exit client view",
+      "_note": "The read-only view, rebuilt 2026-08-23 on the founder's call that a client must not see the editing rail or anything else — Figma's view mode is the bar. Reached by URL, not by an action, so the recipe carries the query instead of a click. What the frame must NOT contain is the point: no rail, no drawer, no inspector, no canvas footer toolbar, no Publish, no Send for review, and page tabs without their + or context menu.",
+      "figmaNodeId": "465:2",
+      "_verified": "2026-08-23 — verified by what the frame does NOT contain, which is the point of this state: no rail, no Publish, no Send for review, no inspector, no footer tools. 27 text nodes against the editor's 120+. Screenshot read back."
     }
   ],
   "_verified": "2026-08-21: every entry below was replayed against localhost:3000 and the resulting state read back on screen before any capture ran. Three corrections came out of that: the Publish button opens the confirm dialog directly (there is no separate publish-open state), comment mode's only cue is the pressed toggle plus a crosshair capture layer, and the ⌘K palette cannot be captured at all — it closes when the capture script takes focus. | 2026-08-22: added BL-0213..BL-0217, the six-toggle canvas overlay states and the '?' cheat sheet — states the baseline had no board for at all, found by walking CanvasFooterToolbar. `button:text-is(\"Grid\")` is unambiguous: the Insert drawer's own Grid row is a DIV, not a button. Two things these recipes cannot promise: a CSS-painted overlay (grid lines, badges) does not survive html-to-design, and the click leaves the pointer on the toggle so its hover tooltip lands in the frame.",
