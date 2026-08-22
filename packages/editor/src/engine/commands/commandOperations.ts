@@ -75,36 +75,37 @@ export function reorderElement(composer: Composer, direction: ReorderDirection):
 
   composer.beginTransaction("reorder");
 
+  /* `x.insertAfter(y)` puts Y after X — the DOM's direction, and what
+     Element.ops.test locks. These four read the other way round for a while,
+     so Bring Forward moved the NEXT sibling and Bring to Front moved the last
+     one; only Send Backward looked right, because swapping two adjacent
+     siblings gives the same answer whichever one you move. */
   switch (direction) {
     case "forward":
-      // Move up one position (swap with next sibling)
+      // One position later (the next sibling ends up in front of it)
       if (currentIndex < siblings.length - 1) {
-        const nextSibling = siblings[currentIndex + 1];
-        selected.insertAfter(nextSibling);
+        siblings[currentIndex + 1].insertAfter(selected);
       }
       break;
 
     case "backward":
-      // Move down one position (swap with previous sibling)
+      // One position earlier
       if (currentIndex > 0) {
-        const prevSibling = siblings[currentIndex - 1];
-        selected.insertBefore(prevSibling);
+        siblings[currentIndex - 1].insertBefore(selected);
       }
       break;
 
     case "front":
-      // Move to end (last child = visually on top)
+      // Last child = painted on top
       if (currentIndex < siblings.length - 1) {
-        const lastSibling = siblings[siblings.length - 1];
-        selected.insertAfter(lastSibling);
+        siblings[siblings.length - 1].insertAfter(selected);
       }
       break;
 
     case "back":
-      // Move to beginning (first child = visually behind)
+      // First child = painted behind
       if (currentIndex > 0) {
-        const firstSibling = siblings[0];
-        selected.insertBefore(firstSibling);
+        siblings[0].insertBefore(selected);
       }
       break;
   }

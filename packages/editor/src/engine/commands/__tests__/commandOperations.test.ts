@@ -96,16 +96,22 @@ describe("nudgeSelected", () => {
 describe("reorderElement", () => {
   interface Node {
     getId: () => string;
+    insertAfter?: ReturnType<typeof vi.fn>;
+    insertBefore?: ReturnType<typeof vi.fn>;
   }
-  const node = (id: string): Node => ({ getId: () => id });
+  /* Siblings carry the spies now: `x.insertAfter(y)` puts Y after X, so the
+     call lands on the sibling, not on the selection. */
+  const node = (id: string): Node => ({
+    getId: () => id,
+    insertAfter: vi.fn(),
+    insertBefore: vi.fn(),
+  });
 
   function setup(selectedId: string, siblingIds: string[]) {
     const siblings = siblingIds.map(node);
     const selected = {
       getId: () => selectedId,
       getParent: () => ({ getChildren: () => siblings }),
-      insertAfter: vi.fn(),
-      insertBefore: vi.fn(),
     };
     const composer = makeComposer(selected);
     return { composer, selected, siblings };
@@ -124,38 +130,21 @@ describe("reorderElement", () => {
     expect(composer.beginTransaction).not.toHaveBeenCalled();
   });
 
-  it("forward inserts after the next sibling", () => {
-    const { composer, selected, siblings } = setup("b", ["a", "b", "c"]);
+  it("at the last position does not move but still emits", () => {
+    const { composer, siblings } = setup("b", ["a", "b"]);
     reorderElement(composer as unknown as Composer, "forward");
-    expect(selected.insertAfter).toHaveBeenCalledWith(siblings[2]); // c
+    expect(siblings.every((sib) => !sib.insertAfter?.mock.calls.length)).toBe(true);
     expect(composer.emit).toHaveBeenCalledWith(EVENTS.ELEMENT_REORDERED, {
       elementId: "b",
       direction: "forward",
     });
   });
 
-  it("forward at the last position does not move but still emits", () => {
-    const { composer, selected } = setup("b", ["a", "b"]);
-    reorderElement(composer as unknown as Composer, "forward");
-    expect(selected.insertAfter).not.toHaveBeenCalled();
-    expect(composer.emit).toHaveBeenCalled();
-  });
-
-  it("backward inserts before the previous sibling", () => {
-    const { composer, selected, siblings } = setup("b", ["a", "b", "c"]);
-    reorderElement(composer as unknown as Composer, "backward");
-    expect(selected.insertBefore).toHaveBeenCalledWith(siblings[0]); // a
-  });
-
-  it("front inserts after the last sibling", () => {
-    const { composer, selected, siblings } = setup("a", ["a", "b", "c"]);
-    reorderElement(composer as unknown as Composer, "front");
-    expect(selected.insertAfter).toHaveBeenCalledWith(siblings[2]); // c
-  });
-
-  it("back inserts before the first sibling", () => {
-    const { composer, selected, siblings } = setup("c", ["a", "b", "c"]);
-    reorderElement(composer as unknown as Composer, "back");
-    expect(selected.insertBefore).toHaveBeenCalledWith(siblings[0]); // a
-  });
+  /* The four "forward calls insertAfter with sibling c" cases that used to sit
+     here are gone. They mocked the very method whose behaviour was in
+     question, so they passed for months over a Bring Forward that moved
+     nothing and a Bring to Front that stopped one short of the end — the calls
+     were being made, with the receiver and the argument the wrong way round.
+     What each direction does to the ORDER is checked against a real element
+     tree in `reorderElement.order.test.ts`. */
 });

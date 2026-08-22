@@ -122,6 +122,27 @@ describe("ElementOperations.replaceWith / insertBefore / insertAfter", () => {
     ]);
   });
 
+  /* Moving an EXISTING sibling, not a fresh element. moveTo removes before it
+     inserts, so an index read before the removal is one too many whenever the
+     mover sat earlier in the same parent — the case the fresh-element test
+     above can never reach. Z-order (Bring Forward / Send to Back) is nothing
+     but this case. */
+  it("insertBefore / insertAfter reposition an existing earlier sibling", () => {
+    /* Four siblings, not three: with `c` last, "insert at index 3" and "append"
+       are the same answer, and the off-by-one hides. */
+    const { manager, parent, a, b, c, order } = siblings();
+    const d = manager.createElement("text");
+    parent.addChild(d);
+    c.insertAfter(a);
+    expect(order()).toEqual([b.getId(), c.getId(), a.getId(), d.getId()]);
+  });
+
+  it("insertBefore repositions an existing earlier sibling", () => {
+    const { a, b, c, order } = siblings();
+    c.insertBefore(a);
+    expect(order()).toEqual([b.getId(), a.getId(), c.getId()]);
+  });
+
   it("insertBefore/insertAfter are no-ops when self has no parent", () => {
     const { manager } = makeEngine();
     const orphan = manager.createElement("text");

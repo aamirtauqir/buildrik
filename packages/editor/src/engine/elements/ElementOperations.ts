@@ -150,14 +150,29 @@ export class ElementOperations {
   }
 
   /**
+   * Slot in `parent` that lands `element` at `offset` relative to this one.
+   *
+   * `moveTo` detaches before it inserts, so the index it takes is a slot in
+   * the list AFTER the removal. Reading this element's index first is one too
+   * many whenever `element` is already an earlier sibling of the same parent —
+   * which is every z-order move, and is why Bring Forward did nothing and
+   * Bring to Front dropped the element one short of the end.
+   */
+  private slotFor(parent: Element, element: Element, offset: 0 | 1): number {
+    const children = parent.getChildren();
+    const index = children.indexOf(this.getSelf()) + offset;
+    const from = children.indexOf(element);
+    return from > -1 && from < index ? index - 1 : index;
+  }
+
+  /**
    * Insert element before this one
    */
   insertBefore(element: Element): void {
     const parent = this.getParentRef();
     if (!parent) return;
 
-    const index = parent.getChildren().indexOf(this.getSelf());
-    element.moveTo(parent, index);
+    element.moveTo(parent, this.slotFor(parent, element, 0));
   }
 
   /**
@@ -167,8 +182,7 @@ export class ElementOperations {
     const parent = this.getParentRef();
     if (!parent) return;
 
-    const index = parent.getChildren().indexOf(this.getSelf());
-    element.moveTo(parent, index + 1);
+    element.moveTo(parent, this.slotFor(parent, element, 1));
   }
 
   // ============================================
