@@ -176,7 +176,21 @@ Every row below was measured in code or by running it, not read off a document.
 | 6-7 | Expired and superseded review links told the client the link was mistyped and to click it again — two of four dead-link screens were unreachable, and the reason travelled as a bare string the errorFormatter shredded into character indices | `201d7885` |
 | 1-2 | A failed verification email was invisible to everyone: empty catch, a router that answered "Verification email sent" regardless, and a screen telling the user to check an inbox nothing reached | `ce3b97a3` |
 | 6 | A draft share link built with no configured origin was a bare `/share/<token>` — not a link once pasted. Trailing-slash double-slash found by the test | `dc842554` |
-| 5 | **A save carrying no pages deleted every page on the site and returned `{success: true}`.** `[].every(...)` is true, so an empty list read as a complete snapshot of an empty site. Proved by running it: `page.deleteMany({id:{in:["p_1","p_2"]}})`. No client-side guard existed either | see below |
+| 5 | **A save carrying no pages deleted every page on the site and returned `{success: true}`.** `[].every(...)` is true, so an empty list read as a complete snapshot of an empty site. Proved by running it: `page.deleteMany({id:{in:["p_1","p_2"]}})` | `6cae115c` |
+
+### One correction to the record
+
+`6cae115c`'s message says "there is no client-side guard either — BuildrikSyncProvider
+has no page-count check". The second half is true and the first half is not: the
+editor refuses to save a siteId that is not in `_loadedSites`
+(`BuildrikSyncProvider.ts:346`, `ProjectNotLoadedError`, added in `1ebb1a71` after
+the 2026-08-19 wipe). I grepped for a page-count check and concluded no guard
+existed — the same mistake as grepping one syntactic form and missing the other.
+
+The server-side guard is still the right fix and still needed: the editor guard
+protects the editor's own path, while the delete is issued at a boundary any
+caller can reach. Two guards, different scopes. But the commit overstates what
+was missing.
 
 ### Recorded, not fixed
 
