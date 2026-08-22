@@ -86,8 +86,20 @@ export const authRouter = router({
     .input(signupSchema)
     .mutation(async ({ input }) => {
       try {
-        const user = await signup(input.fullName, input.email, input.password);
-        return { user: { id: user.id, email: user.email }, message: "Verification email sent" };
+        const { user, verificationEmailSent } = await signup(
+          input.fullName,
+          input.email,
+          input.password,
+        );
+        /* The message used to be the constant "Verification email sent",
+           regardless of whether one was. */
+        return {
+          user: { id: user.id, email: user.email },
+          verificationEmailSent,
+          message: verificationEmailSent
+            ? "Verification email sent"
+            : "Account created, but we could not send the verification email.",
+        };
       } catch (err) {
         handleAuthError(err);
       }

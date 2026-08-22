@@ -195,13 +195,27 @@ export async function signup(fullName: string, email: string, password: string) 
   await logAuditEvent("SIGNUP", "success", { userId: user.id, email });
 
   const token = await generateToken("email_verify", user.id, 60 * 24); // 24h
+  /* The account is made either way — throwing here would strand a user who is
+     already in the database. But an empty catch made a broken mail server
+     indistinguishable from a working one: the router answered "Verification
+     email sent", the page told them to check an inbox nothing reached, and no
+     log line existed for an operator to find. Production SMTP has failed in
+     exactly this way before (a `$` in SMTP_PASS eaten by the cPanel shell —
+     SMTP_PASS_B64 exists because of it), and under that failure every signup
+     dead-ends invisibly. Report it up, and record it. */
+  let verificationEmailSent = true;
   try {
     await sendVerificationEmail(email, token);
-  } catch {
-    // User is created but email failed — let them resend verification later.
+  } catch (err) {
+    verificationEmailSent = false;
+    await logAuditEvent("VERIFICATION_EMAIL_FAILED", "failure", {
+      userId: user.id,
+      email,
+      metadata: { reason: err instanceof Error ? err.message : String(err) },
+    });
   }
 
-  return user;
+  return { user, verificationEmailSent };
 }
 
 export async function verifyEmail(token: string) {
@@ -245,8 +259,17 @@ export async function resendVerification(email: string) {
   const token = await generateToken("email_verify", user.id, 60 * 24);
   try {
     await sendVerificationEmail(email, token);
-  } catch {
-    // Email failed but don't crash — user can retry
+  } catch (err) {
+    /* Deliberately NOT reported to the caller, unlike signup. This endpoint
+       answers identically for an address that exists and one that does not, so
+       a "we could not send it" would be an existence oracle for anyone who can
+       reach it. The operator gets the row; the user gets the same answer either
+       way and can retry. */
+    await logAuditEvent("VERIFICATION_EMAIL_FAILED", "failure", {
+      userId: user.id,
+      email,
+      metadata: { reason: err instanceof Error ? err.message : String(err), path: "resend" },
+    });
   }
 }
 

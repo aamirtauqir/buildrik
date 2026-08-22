@@ -15,6 +15,7 @@ function VerifyEmailContent() {
   const router = useRouter();
   const token = searchParams.get("token") ?? "";
   const email = searchParams.get("email") ?? "";
+  const sendFailed = searchParams.get("sent") === "0";
 
   const [verified, setVerified] = useState(false);
   const [rateLimited, setRateLimited] = useState(false);
@@ -99,11 +100,22 @@ function VerifyEmailContent() {
     <AuthCard>
       <div className="text-center">
         <h1 className="text-auth-title text-auth-text-primary">Verify your email</h1>
-        <p className="text-auth-subtitle text-auth-text-muted mt-2">
-          We sent a verification link to{" "}
-          {email ? <span className="text-auth-text-body font-medium">{email}</span> : "your email address"}. Confirm it
-          to finish setting up your account.
-        </p>
+        {/* signup passes sent=0 when the send threw. Telling someone to check
+            an inbox nothing reached leaves them waiting on a mail that is not
+            coming; the account exists, so Resend is the way out. */}
+        {sendFailed ? (
+          <p className="text-auth-subtitle text-auth-text-muted mt-2">
+            Your account was created, but we couldn&apos;t send the verification link to{" "}
+            {email ? <span className="text-auth-text-body font-medium">{email}</span> : "your email address"} just now.
+            Use Resend below — nothing is lost.
+          </p>
+        ) : (
+          <p className="text-auth-subtitle text-auth-text-muted mt-2">
+            We sent a verification link to{" "}
+            {email ? <span className="text-auth-text-body font-medium">{email}</span> : "your email address"}. Confirm it
+            to finish setting up your account.
+          </p>
+        )}
       </div>
 
       <div className="h-6" />

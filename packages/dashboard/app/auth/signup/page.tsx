@@ -53,7 +53,14 @@ function SignupContent() {
   });
 
   const signupMutation = trpc.auth.signup.useMutation({
-    onSuccess: () => router.push(`/auth/verify-email?email=${encodeURIComponent(email)}`),
+    onSuccess: (res) =>
+      router.push(
+        // Carry the truth forward: the next screen says "we sent a link to
+        // <email>", which is wrong when the send failed. The account exists
+        // either way, so the user is not stopped — only told accurately.
+        `/auth/verify-email?email=${encodeURIComponent(email)}` +
+          (res?.verificationEmailSent === false ? "&sent=0" : ""),
+      ),
     onError: (err) => {
       // auth.service.signup throws EMAIL_EXISTS (409 → CONFLICT) when the address
       // was claimed between the checkEmail probe and submit. Same destination.

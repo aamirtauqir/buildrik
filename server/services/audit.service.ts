@@ -11,6 +11,10 @@ type AuditAction =
   | "SESSION_CREATED"
   | "OAUTH_LOGIN" | "OAUTH_SIGNUP"
   | "EMAIL_CHANGED"
+  // The verification mail did not go out. Signup still succeeded, so nothing
+  // else records it — and without a row here a broken SMTP config looks
+  // identical to nobody signing up.
+  | "VERIFICATION_EMAIL_FAILED"
   | "LOGOUT";
 
 export async function logAuditEvent(
