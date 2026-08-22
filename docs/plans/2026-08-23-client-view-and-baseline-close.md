@@ -60,3 +60,69 @@ comment on it → [Send for review]"*.
 2. The nine UNVERIFIED frames either named against a real marker or re-captured.
 3. Client view captured into the Figma baseline as its own frame.
 4. Tests green, and any test that protected the old client view rewritten, not deleted.
+
+---
+
+## 6. What the autoplan review found (2026-08-23)
+
+Two independent voices per phase — a Claude subagent and Codex — plus my own
+probes. Everything below was confirmed by running it, not by accepting a finding.
+
+### The change did not do what §2 measured
+
+§2's table is all geometry, and geometry was the wrong quantity. With the rail,
+the drawer, the inspector, inline edit, drop, the context menu and the canvas
+keydown all withheld, **the document was still mutable**:
+
+- double-click a heading → `contenteditable="true"`, and typing replaced it
+- click an element, press Delete → 203 elements became 202, and autosave writes it
+
+`KeybindingManager` binds `keydown` on **window, capture phase**. No number of
+React gates sits between the window and the command. The gate is
+`Composer.readOnly`, consulted by `CommandCenter.shouldHandleShortcut` against a
+named `MUTATING_COMMANDS` set — the gateway CLAUDE.md already names.
+
+### Every other write path, and how each was missed
+
+| Path | Why the first pass missed it |
+|---|---|
+| ⌘K command palette | registered on `document` in StudioHeader, nowhere near the canvas |
+| F2 rename / ⇧F10 menu on page tabs | `onContextMenu` was guarded and `onKeyDown` beside it was not — a mouse-only guard |
+| selection box + unified toolbar (Duplicate, Delete, Copy, Wrap, Move) | click-to-select was deliberately kept, and selection *draws* the edit chrome |
+| SaveStatus | renders as a `<button>` firing onSave when the state is unsaved |
+| empty-page "Browse templates / Start blank" | the *container* placeholder was suppressed in CSS and the larger CTA beside it was not |
+| review bar, onboarding checklist, selection dims | rendered by `AquibraStudio`, outside the shell this work could reach by prop |
+
+### Three regressions I introduced, in one line
+
+Moving Send for review to the Review panel dropped every prop the topbar had
+been passing: `disabledReason` (a VIEWER got a live button and a silent
+failure), `onSent` (the pill never refreshed; the panel said "No review yet"
+under a button reading "Sent ✓"), and `reviewStatus` pinned to `null` (which
+wedges the button forever, since it unlocks only when the round's `at` moves).
+
+### "Pass undefined" was not enough, three times
+
+`publish={undefined}` fell back to its `"ready"` default. Emptying the `action`
+slot made Publish *appear*, because SendForReview had been the thing hiding it.
+`save={undefined}` did not compile, since the prop was required. Each time the
+component had to be told the control **does not exist** — `publish="hidden"`,
+`save?:`, an explicit `null` branch.
+
+### Declined
+
+Dropping `clientView ||` from `density`. It is unobservable — the inspector is
+density's only consumer and does not render here — but removing it breaks three
+tests and buys nothing. Kept, with a comment saying why.
+
+## 7. Two questions for the founder, not for me
+
+1. **What is `?view=client` a preview OF?** Nothing in the codebase routes
+   anyone to it; the only door is the owner's own site menu. A client receives
+   `/review/<token>` — frozen snapshot, agency header, Approve / Request
+   changes. This mode shows the live draft with none of that. Both voices
+   reached it independently.
+2. **The `Content editor` role exists and is invitable** (`invite-modal.tsx`,
+   `permission.service.ts`, the client screens that say "invite the client to
+   edit content"). What never existed is a shell wired to it. Client view was
+   the closest thing and is now a viewer.
