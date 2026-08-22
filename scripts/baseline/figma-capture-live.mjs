@@ -67,8 +67,9 @@ await page.waitForTimeout(Number(DELAYMS || 9000));
 // Sentinel: never submit a login page or a blank shell as a baseline.
 const ok = await page.locator(SENTINEL).count();
 if (!ok) { console.log(JSON.stringify({ error: `SENTINEL_MISSING ${SENTINEL}`, url: page.url() })); await b.close(); process.exit(2); }
-const r = await page.context().request.get("https://mcp.figma.com/mcp/html-to-design/capture.js");
-await page.evaluate((s) => { const el = document.createElement("script"); el.textContent = s; document.head.appendChild(el); }, await r.text());
+const captureJs = await (await page.context().request.get("https://mcp.figma.com/mcp/html-to-design/capture.js")).text();
+const inject = async () => page.evaluate((s) => { const el = document.createElement("script"); el.textContent = s; document.head.appendChild(el); }, captureJs);
+await inject();
 /* Actions run AFTER the capture script is injected. Injecting it moves focus,
    and a surface that closes on blur — the ⌘K palette — was gone by the time the
    capture ran: the frame came out as the plain shell. */
@@ -94,6 +95,23 @@ if (ACTIONS_JSON && ACTIONS_JSON !== "none") {
       }, a.selectType);
       if (found !== "ok") console.log("selectType:", found);
     }
+    /* `openTab` instead of a bare click on the rail: the tabs TOGGLE, and the
+       editor restores whichever panel was last open, so a blind click closes
+       the drawer exactly when the wanted panel is already showing. That is why
+       four Pages recipes "missed" controls that a single-shot probe clicks
+       fine — the misses depended on what the previous run left behind. Ask the
+       DOM whether the panel is open, and click only when it is not. */
+    if (a.openTab) {
+      const ok = await page.evaluate((tab) => {
+        const btn = document.querySelector(`.ls-rail [data-tab="${tab}"]`);
+        if (!btn) return "no-rail-button";
+        const open = btn.getAttribute("aria-selected") === "true" || /active|selected/.test(btn.className);
+        if (!open) btn.click();
+        return open ? "already-open" : "opened";
+      }, a.openTab);
+      console.log("openTab", a.openTab, "->", ok);
+      await page.waitForTimeout(a.waitAfter ?? 2500);
+    }
     if (a.click) await page.click(a.click, { timeout: 8000, force: !!a.force }).catch((e) => console.log("click miss:", a.click));
     if (a.press) await page.keyboard.press(a.press);
     if (a.waitMs) await page.waitForTimeout(a.waitMs);
@@ -101,6 +119,16 @@ if (ACTIONS_JSON && ACTIONS_JSON !== "none") {
 }
 
 await page.waitForTimeout(1200);
+/* A door that NAVIGATES the same tab throws the injected script away with the
+   old document — `captureForDesign missing, keys: []`, which is what "Open
+   client view" did. Re-inject when it is gone rather than reordering the whole
+   run: the actions still have to happen after the first injection for the
+   surfaces that close on blur, so both needs are met. */
+if (!(await page.evaluate(() => typeof window.figma?.captureForDesign === "function"))) {
+  console.log("re-injecting: the page navigated and took the capture script with it");
+  await inject();
+  await page.waitForTimeout(1200);
+}
 const preState = await page.evaluate(() => ({
   dialogs: Array.from(document.querySelectorAll("[role=dialog],[role=alertdialog],[role=menu]")).map((d) => (d.textContent||"").trim().slice(0,40)),
   overlayRootChildren: document.getElementById("bk-overlay-root")?.childElementCount ?? -1,

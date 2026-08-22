@@ -739,12 +739,13 @@
           "click": "text=Pro"
         },
         {
-          "waitMs": 2000
+          "waitMs": 1500
         }
       ],
       "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible. Brand rows carry a count suffix in the DOM (\"Starters6›\"), so these match on substring, not exact text.",
       "_capture_status": "CAPTURED but not confirmed. The Brand rows print their own labels on the panel, so a marker like 'Colour mode' or 'Starters' matches whether or not the drill-in opened. Needs a marker only the drill-in renders, read off the open panel.",
-      "_brand_mode_note": "The Brand panel's Beginner/Pro switch PERSISTS across reloads and changes the row set — Beginner reads 'Tokens4›', Pro reads 'Tokens55›'. A recipe that does not set the mode first is non-deterministic: it captures whichever mode the last session left behind. Observed 2026-08-23, when rows that matched under Beginner stopped matching after an earlier capture switched the panel to Pro."
+      "_brand_mode_note": "The Beginner/Pro switch PERSISTS across reloads and changes the row set — Beginner reads 'Tokens4›', Pro reads 'Tokens55›'. Every Brand recipe therefore SETS the mode before it does anything else, or it captures whichever mode the previous session left behind. Observed 2026-08-23: rows that matched under Beginner stopped matching after an earlier capture in the same session clicked Pro.",
+      "_marker": "Tokens55"
     },
     {
       "id": "BL-0170",
@@ -757,6 +758,12 @@
           "waitMs": 2500
         },
         {
+          "click": "text=Beginner"
+        },
+        {
+          "waitMs": 1500
+        },
+        {
           "click": "text=Colour mode"
         },
         {
@@ -765,7 +772,7 @@
       ],
       "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible. Brand rows carry a count suffix in the DOM (\"Starters6›\"), so these match on substring, not exact text.",
       "_capture_status": "CAPTURED but not confirmed. The Brand rows print their own labels on the panel, so a marker like 'Colour mode' or 'Starters' matches whether or not the drill-in opened. Needs a marker only the drill-in renders, read off the open panel.",
-      "_brand_mode_note": "The Brand panel's Beginner/Pro switch PERSISTS across reloads and changes the row set — Beginner reads 'Tokens4›', Pro reads 'Tokens55›'. A recipe that does not set the mode first is non-deterministic: it captures whichever mode the last session left behind. Observed 2026-08-23, when rows that matched under Beginner stopped matching after an earlier capture switched the panel to Pro."
+      "_brand_mode_note": "The Beginner/Pro switch PERSISTS across reloads and changes the row set — Beginner reads 'Tokens4›', Pro reads 'Tokens55›'. Every Brand recipe therefore SETS the mode before it does anything else, or it captures whichever mode the previous session left behind. Observed 2026-08-23: rows that matched under Beginner stopped matching after an earlier capture in the same session clicked Pro."
     },
     {
       "id": "BL-0171",
@@ -778,6 +785,12 @@
           "waitMs": 2500
         },
         {
+          "click": "text=Beginner"
+        },
+        {
+          "waitMs": 1500
+        },
+        {
           "click": "text=Starters"
         },
         {
@@ -786,7 +799,7 @@
       ],
       "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible. Brand rows carry a count suffix in the DOM (\"Starters6›\"), so these match on substring, not exact text.",
       "_capture_status": "CAPTURED but not confirmed. The Brand rows print their own labels on the panel, so a marker like 'Colour mode' or 'Starters' matches whether or not the drill-in opened. Needs a marker only the drill-in renders, read off the open panel.",
-      "_brand_mode_note": "The Brand panel's Beginner/Pro switch PERSISTS across reloads and changes the row set — Beginner reads 'Tokens4›', Pro reads 'Tokens55›'. A recipe that does not set the mode first is non-deterministic: it captures whichever mode the last session left behind. Observed 2026-08-23, when rows that matched under Beginner stopped matching after an earlier capture switched the panel to Pro."
+      "_brand_mode_note": "The Beginner/Pro switch PERSISTS across reloads and changes the row set — Beginner reads 'Tokens4›', Pro reads 'Tokens55›'. Every Brand recipe therefore SETS the mode before it does anything else, or it captures whichever mode the previous session left behind. Observed 2026-08-23: rows that matched under Beginner stopped matching after an earlier capture in the same session clicked Pro."
     },
     {
       "id": "BL-0174",
@@ -799,6 +812,12 @@
           "waitMs": 2500
         },
         {
+          "click": "text=Beginner"
+        },
+        {
+          "waitMs": 1500
+        },
+        {
           "click": "text=Components"
         },
         {
@@ -807,7 +826,7 @@
       ],
       "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible. Brand rows carry a count suffix in the DOM (\"Starters6›\"), so these match on substring, not exact text.",
       "_capture_status": "CAPTURED but not confirmed. The Brand rows print their own labels on the panel, so a marker like 'Colour mode' or 'Starters' matches whether or not the drill-in opened. Needs a marker only the drill-in renders, read off the open panel.",
-      "_brand_mode_note": "The Brand panel's Beginner/Pro switch PERSISTS across reloads and changes the row set — Beginner reads 'Tokens4›', Pro reads 'Tokens55›'. A recipe that does not set the mode first is non-deterministic: it captures whichever mode the last session left behind. Observed 2026-08-23, when rows that matched under Beginner stopped matching after an earlier capture switched the panel to Pro."
+      "_brand_mode_note": "The Beginner/Pro switch PERSISTS across reloads and changes the row set — Beginner reads 'Tokens4›', Pro reads 'Tokens55›'. Every Brand recipe therefore SETS the mode before it does anything else, or it captures whichever mode the previous session left behind. Observed 2026-08-23: rows that matched under Beginner stopped matching after an earlier capture in the same session clicked Pro."
     },
     {
       "id": "BL-0175",
@@ -840,6 +859,12 @@
           "waitMs": 2500
         },
         {
+          "click": "text=Beginner"
+        },
+        {
+          "waitMs": 1500
+        },
+        {
           "click": "text=Presets"
         },
         {
@@ -848,7 +873,7 @@
       ],
       "_note": "The board calls this frame 'brand-styles-tab' and no control on the Brand panel is called Styles. Reading the 08-19 frame settled it: it draws '‹ Presets' with Button / Card / Form input / Link / Badge / Alert / Tooltip / Modal / Nav / Table — the Presets drill-in. The board name is wrong, the frame is not; BL-0174 is the Components row beside it, which is consistent.",
       "_verified": "2026-08-22 — state confirmed in the captured frame by a marker only that state renders.",
-      "_brand_mode_note": "The Brand panel's Beginner/Pro switch PERSISTS across reloads and changes the row set — Beginner reads 'Tokens4›', Pro reads 'Tokens55›'. A recipe that does not set the mode first is non-deterministic: it captures whichever mode the last session left behind. Observed 2026-08-23, when rows that matched under Beginner stopped matching after an earlier capture switched the panel to Pro."
+      "_brand_mode_note": "The Beginner/Pro switch PERSISTS across reloads and changes the row set — Beginner reads 'Tokens4›', Pro reads 'Tokens55›'. Every Brand recipe therefore SETS the mode before it does anything else, or it captures whichever mode the previous session left behind. Observed 2026-08-23: rows that matched under Beginner stopped matching after an earlier capture in the same session clicked Pro."
     },
     {
       "id": "BL-0168",
@@ -918,11 +943,11 @@
           "click": "text=Open client view"
         },
         {
-          "waitMs": 2500
+          "waitMs": 4000
         }
       ],
       "_note": "Door with no baseline frame on the board at all. The site menu has sixteen rows and only ten were ever captured; this is one of the six that were missed. Row label read off the running menu — the DOM text carries the chord appended (\"Site settings⌃,\"), so substring matching is required, not exact.",
-      "_capture_status": "Fails with `captureForDesign missing, keys: []` — the injected capture script is gone by the time it runs, which means this door NAVIGATES the same tab rather than opening an overlay. Client view is a different mode of the editor, so it is a real state worth a frame; the capture has to be made after the navigation settles, not by injecting first and clicking after."
+      "_capture_status": "Fixed in the harness rather than the recipe: this door navigates the same tab, which threw the injected capture script away (`captureForDesign missing, keys: []`). figma-capture-live.mjs now checks for the function after the actions and re-injects when it is gone. Reordering the whole run was the wrong fix — surfaces that close on blur still need the actions to run after the first injection."
     },
     {
       "id": "BL-0234",
