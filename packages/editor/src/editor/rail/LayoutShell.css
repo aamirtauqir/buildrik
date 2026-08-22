@@ -65,12 +65,12 @@
     "footer footer footer footer";
 }
 
-/* Client view — the whole editing chrome is gone, so every column but the
+/* View mode — the whole editing chrome is gone, so every column but the
    canvas collapses. The rail column is 60px in the base grid even when no
    Sidebar slot is passed, which would have left a blank strip. */
-.layout-shell--client-view,
-.layout-shell--client-view.layout-shell--drawer-open,
-.layout-shell--client-view.layout-shell--inspector-open {
+.layout-shell--read-only-view,
+.layout-shell--read-only-view.layout-shell--drawer-open,
+.layout-shell--read-only-view.layout-shell--inspector-open {
   grid-template-columns: 0px 0px 1fr 0px;
 }
 

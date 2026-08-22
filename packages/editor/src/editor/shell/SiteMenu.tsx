@@ -7,14 +7,22 @@
  *
  *   Site       — settings · version history · publish history · export code
  *   Build      — templates · components · design system · plugins
- *   Share      — open client view · view live site · copy live URL
+ *   Share      — enter view mode · view live site · copy live URL · share preview link
  *   Workspace  — invite · account · start collaboration (flag-gated)
  *   (footer)   — keyboard shortcuts
  *
  * Moved OUT to the bar's tool cluster (plan §2): Preview, Comments, Issues.
  * Removed (D8): "Exit to dashboard" — the bar's ‹ Exit is always visible; a
- * second door in the overflow was dead weight. Renamed (D9): "Preview as
- * client" → "Open client view".
+ * second door in the overflow was dead weight.
+ *
+ * The view-mode row has now been named three times. D9 renamed "Preview as
+ * client" → "Open client view"; 2026-08-23 renamed it again to "Enter view
+ * mode", because both earlier names claimed an audience that never receives
+ * this surface. A client is sent /share/<token> or /review/<token> — the row
+ * below this one, and the review round respectively. This row is the owner
+ * looking at their own draft with the editor out of the way, which is what
+ * Figma calls view mode. Board 642:3664 still carries the D9 copy; the board
+ * is being updated in the same arc, so if it disagrees, the board is stale.
  *
  * A group renders only when at least one of its rows is present (eng D8) —
  * the Share group is all-conditional and an empty MenuGroup div would still
@@ -61,10 +69,10 @@ export interface SiteMenuProps {
   onOpenDesignSystem?: () => void;
   onOpenPlugins?: () => void;
   // ── Share ─────────────────────────────────────────────────────────────────
-  clientView?: boolean;
+  readOnlyView?: boolean;
   /** Client-view toggle is a full-page navigation, so the container owns it —
    *  it must pass through the dirty-exit guard (F1) like every other exit. */
-  onToggleClientView?: () => void;
+  onToggleReadOnlyView?: () => void;
   /** Live URL once the site has been published. */
   publishedUrl?: string | null;
   /** Copying can fail (no clipboard on insecure origins), so the container
@@ -123,8 +131,8 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
   onOpenComponents,
   onOpenDesignSystem,
   onOpenPlugins,
-  clientView = false,
-  onToggleClientView,
+  readOnlyView = false,
+  onToggleReadOnlyView,
   publishedUrl,
   onCopyLiveUrl,
   siteId,
@@ -142,7 +150,7 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
     onOpenSiteSettings || onOpenHistory || onOpenPublish || onOpenPublishHistory || onExportCode,
   );
   const hasBuild = Boolean(onOpenTemplates || onOpenComponents || onOpenDesignSystem || onOpenPlugins);
-  const hasShare = Boolean(onToggleClientView || publishedUrl || siteId);
+  const hasShare = Boolean(onToggleReadOnlyView || publishedUrl || siteId);
 
   return (
     <Popover
@@ -183,7 +191,7 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
             that the editor simply had no door to. They deep-link to their own
             section rather than to the page, so each lands where its label
             says it will. */}
-        {siteId && !clientView && (
+        {siteId && !readOnlyView && (
           <MenuGroup>
             <MenuItem onClick={run(() => openDashboard(`/dashboard/sites/${siteId}#site-health`))}>
               Site health
@@ -215,9 +223,9 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
         {hasShare && (
           <MenuGroup>
             <MenuLabel>Share</MenuLabel>
-            {onToggleClientView ? (
-              <MenuItem onClick={run(onToggleClientView)}>
-                {clientView ? "Exit client view" : "Open client view"}
+            {onToggleReadOnlyView ? (
+              <MenuItem onClick={run(onToggleReadOnlyView)}>
+                {readOnlyView ? "Exit view mode" : "Enter view mode"}
               </MenuItem>
             ) : null}
             {publishedUrl ? (
@@ -232,7 +240,7 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
                 dashboard's ShareDraftModal; this hands off to it directly,
                 the way "Invite teammates" below hands off to team settings,
                 rather than landing the user on a page to hunt for a button. */}
-            {siteId && !clientView ? (
+            {siteId && !readOnlyView ? (
               <MenuItem onClick={run(() => openDashboard(`/dashboard/sites/${siteId}?share=1`))}>
                 Share preview link
               </MenuItem>
@@ -240,10 +248,10 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
           </MenuGroup>
         )}
 
-        {/* Workspace doors belong to whoever owns the workspace. In client view
-            the menu keeps only the way back out, so a client holding a review
-            link is not offered Invite teammates or Account settings. */}
-        {clientView ? null : (
+        {/* Workspace doors belong to whoever owns the workspace. In view mode
+            the menu keeps only the way back out — the mode is for looking at
+            the draft, not for administering the workspace from it. */}
+        {readOnlyView ? null : (
         <MenuGroup>
           <MenuLabel>Workspace</MenuLabel>
           <MenuItem onClick={run(() => openDashboard("/dashboard/settings/team"))}>Invite teammates</MenuItem>

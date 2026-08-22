@@ -22,7 +22,7 @@ Formats: type allows html|zip|json|react|vue|nextjs (`shared/types/export.ts:16`
 
 ## 8.3 Preview & share
 
-Device preview: desktop 1440×900 / tablet 768×1024 / mobile 375×667, scale-to-fit + device chrome, relative→absolute URL fix BUG-006 (`export.ts:129-147`, `PreviewFrame.tsx:37-166`). **"Preview as client" = `?view=client` URL param (full reload) — NO shareable/tokenized link exists in editor** (`shell/Topbar.tsx:614-623`; grep confirms) — ties to v1.0 finding that ShareLink model exists server-side only.
+Device preview: desktop 1440×900 / tablet 768×1024 / mobile 375×667, scale-to-fit + device chrome, relative→absolute URL fix BUG-006 (`export.ts:129-147`, `PreviewFrame.tsx:37-166`). **View mode = `?view=readonly` URL param (full reload), renamed from `?view=client` 2026-08-23** — a read-only view of the owner's own draft, not a client surface. The tokenized links a client actually receives are `/share/<token>` (draft, opened by the site menu's "Share preview link") and `/review/<token>` (a review round).
 
 ## 8.4 Defects (feeds §13)
 

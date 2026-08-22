@@ -626,7 +626,7 @@ export class Composer extends EventEmitter {
 
     // The THIRD head this codebase assembles, after the single-file export and
     // the publish pipeline — and the one behind Quick preview, the preview
-    // modal, the client view and the "copy page HTML" command. Both of the
+    // modal, the view mode and the "copy page HTML" command. Both of the
     // others were taught to resolve the page's own title today; this one still
     // stamped the literal "Buildrick Export" on every page, so the preview tab
     // and any HTML the user copied out carried our brand name as their title.

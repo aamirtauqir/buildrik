@@ -3,7 +3,7 @@
  *
  * `Composer.exportHTML` is the third head this codebase assembles — after the
  * single-file export and the publish pipeline — and it is the one behind Quick
- * preview, the preview modal, the client view and the "copy page HTML"
+ * preview, the preview modal, the view mode and the "copy page HTML"
  * command. Both of the others resolve the page's own title; this one stamped
  * the literal "Buildrick Export" on every page, so a preview tab and any HTML
  * copied out of the editor carried our brand name as the page's title.

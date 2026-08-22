@@ -918,7 +918,7 @@
     },
     {
       "id": "BL-0233",
-      "state": "sitemenu-client-view",
+      "state": "sitemenu-view-mode",
       "actions": [
         {
           "click": "[aria-label*='ite menu' i], [aria-label*='More' i]"
@@ -927,14 +927,14 @@
           "waitMs": 1200
         },
         {
-          "click": "text=Open client view"
+          "click": "text=Enter view mode"
         },
         {
           "waitMs": 4000
         }
       ],
       "_note": "Door with no baseline frame on the board at all. The site menu has sixteen rows and only ten were ever captured; this is one of the six that were missed. Row label read off the running menu — the DOM text carries the chord appended (\"Site settings⌃,\"), so substring matching is required, not exact.",
-      "_verified": "2026-08-23 — the URL becomes ?view=client, so the door works. The frame looked like the ordinary editor because client view IS nearly the ordinary editor: `viewMode.clientView` is read in exactly one place, StudioHeader, where it trims the header tools to Comments only. Measured: 700 DOM nodes before, 696 after, and the rail is still there. The frame is accurate; my expectation was not."
+      "_verified": "2026-08-23 — the door works. The FIRST capture found the frame looked like the ordinary editor, because at the time the flag was read in exactly one place (StudioHeader, trimming the header tools to Comments): 700 DOM nodes before, 696 after, rail still present. That reading was correct and is what triggered the rebuild. Re-captured after it: the row reads 'Enter view mode' and lands on ?view=readonly."
     },
     {
       "id": "BL-0234",
@@ -945,10 +945,10 @@
     },
     {
       "id": "BL-0235",
-      "state": "client-view (?view=client)",
-      "path": "/edit/cmrsur1fp000unh3rvmmiq25t?view=client",
+      "state": "view-mode (?view=readonly)",
+      "path": "/edit/cmrsur1fp000unh3rvmmiq25t?view=readonly",
       "actions": [],
-      "_marker": "Exit client view",
+      "_marker": "Exit view mode",
       "_note": "The read-only view, rebuilt 2026-08-23 on the founder's call that a client must not see the editing rail or anything else — Figma's view mode is the bar. Reached by URL, not by an action, so the recipe carries the query instead of a click. What the frame must NOT contain is the point: no rail, no drawer, no inspector, no canvas footer toolbar, no Publish, no Send for review, and page tabs without their + or context menu.",
       "figmaNodeId": "465:2",
       "_verified": "2026-08-23 — verified by what the frame does NOT contain, which is the point of this state: no rail, no Publish, no Send for review, no inspector, no footer tools. 27 text nodes against the editor's 120+. Screenshot read back."

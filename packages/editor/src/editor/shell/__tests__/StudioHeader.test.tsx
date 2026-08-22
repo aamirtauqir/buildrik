@@ -24,7 +24,7 @@ vi.mock("../../../shared/utils/editorViewMode", () => ({
     railMode: "figma",
     fourToolRail: false,
     density: "full",
-    clientView: false,
+    readOnlyView: false,
   })),
 }));
 
@@ -99,7 +99,7 @@ function setViewMode(partial: Partial<ReturnType<typeof getEditorViewMode>>) {
     railMode: "figma",
     fourToolRail: false,
     density: "full",
-    clientView: false,
+    readOnlyView: false,
     ...partial,
   });
 }
@@ -414,11 +414,11 @@ describe("StudioHeader", () => {
       expect(screen.getByRole("button", { name: "Publish" })).not.toBeDisabled();
     });
 
-    /* Was: a viewer in client view sees a disabled "Send for review". There is
-       no send control in client view at all now, for any role — the viewer
+    /* Was: a viewer in view mode sees a disabled "Send for review". There is
+       no send control in view mode at all now, for any role — the viewer
        gating that matters moved with the control, to the Review panel. */
-    it("a viewer in client view is offered no send control at all", () => {
-      setViewMode({ clientView: true });
+    it("a viewer in view mode is offered no send control at all", () => {
+      setViewMode({ readOnlyView: true });
       roleState.role = "VIEWER";
       render(<StudioHeader {...makeProps()} />);
       expect(screen.queryByRole("button", { name: "Send for review" })).toBeNull();
@@ -448,13 +448,13 @@ describe("StudioHeader", () => {
     });
   });
 
-  /* Rewritten 2026-08-23. These asserted that client view REPLACED Publish with
-     "Send for review" — true until client view became a view rather than an
+  /* Rewritten 2026-08-23. These asserted that view mode REPLACED Publish with
+     "Send for review" — true until view mode became a view rather than an
      invited-editor mode (founder call). The compose form still exists and is
      still covered; it moved to the Review panel, which is where inviting a
-     client belongs. What client view owes now is that none of it is here. */
-  describe("client view shows no owner controls at all", () => {
-    beforeEach(() => setViewMode({ clientView: true }));
+     client belongs. What view mode owes now is that none of it is here. */
+  describe("view mode shows no owner controls at all", () => {
+    beforeEach(() => setViewMode({ readOnlyView: true }));
 
     it("has no Publish button", () => {
       render(<StudioHeader {...makeProps()} />);
@@ -467,7 +467,7 @@ describe("StudioHeader", () => {
     });
 
     it("keeps Publish and the site menu in the ordinary editor", () => {
-      setViewMode({ clientView: false });
+      setViewMode({ readOnlyView: false });
       render(<StudioHeader {...makeProps()} />);
       expect(screen.getByRole("button", { name: /^Publish/ })).toBeTruthy();
     });
@@ -518,7 +518,7 @@ describe("StudioHeader", () => {
     };
 
     // Topbar redesign §3 (D8/D9, eng D8) — five named groups, no "More" dump,
-    // no Exit row, "Open client view" naming.
+    // no Exit row, "Enter view mode" naming.
     it("opens with the regrouped items in plan order", () => {
       render(<StudioHeader {...makeProps(menuProps)} />);
       fireEvent.click(screen.getByRole("button", { name: "Site menu" }));
@@ -532,7 +532,7 @@ describe("StudioHeader", () => {
         "Export code",
         "Templates",
         "Components⇧A",
-        "Open client view",
+        "Enter view mode",
         "Invite teammates",
         "Account settings",
         /* Prints ⌘/ now: "?" opens the canvas cheat sheet, a different screen
@@ -553,7 +553,7 @@ describe("StudioHeader", () => {
       expect(screen.queryByRole("menuitem", { name: /Exit/ })).toBeNull();
     });
 
-    it.each(["Open client view", "Invite teammates", "Account settings"])(
+    it.each(["Enter view mode", "Invite teammates", "Account settings"])(
       "keeps %s reachable in the menu",
       (label) => {
         render(<StudioHeader {...makeProps(menuProps)} />);

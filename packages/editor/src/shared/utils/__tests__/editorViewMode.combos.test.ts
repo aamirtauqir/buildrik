@@ -15,23 +15,23 @@ function setSearch(s: string) {
 afterEach(() => setSearch("/"));
 
 describe("getEditorViewMode — parameter combinations", () => {
-  it("?view=client&rail=e3 → client keeps the requested rail, density forced fewer", () => {
-    setSearch("?view=client&rail=e3");
+  it("?view=readonly&rail=e3 → view mode keeps the requested rail, density forced fewer", () => {
+    setSearch("?view=readonly&rail=e3");
     expect(getEditorViewMode()).toEqual({
       railMode: "e3",
       fourToolRail: true,
       density: "fewer",
-      clientView: true,
+      readOnlyView: true,
     });
   });
 
-  it("?view=client&rail=legacy → legacy rail + client density", () => {
-    setSearch("?view=client&rail=legacy");
+  it("?view=readonly&rail=legacy → legacy rail + view-mode density", () => {
+    setSearch("?view=readonly&rail=legacy");
     expect(getEditorViewMode()).toMatchObject({
       railMode: "legacy",
       fourToolRail: false,
       density: "fewer",
-      clientView: true,
+      readOnlyView: true,
     });
   });
 
@@ -40,7 +40,7 @@ describe("getEditorViewMode — parameter combinations", () => {
     expect(getEditorViewMode()).toMatchObject({
       railMode: "legacy",
       density: "fewer",
-      clientView: false,
+      readOnlyView: false,
     });
   });
 
@@ -51,8 +51,8 @@ describe("getEditorViewMode — parameter combinations", () => {
     expect(getEditorViewMode().density).toBe("full");
   });
 
-  it("?view=editor (non-'client' value) is NOT client view", () => {
+  it("?view=editor (non-'readonly' value) is NOT view mode", () => {
     setSearch("?view=editor");
-    expect(getEditorViewMode()).toMatchObject({ clientView: false, density: "full" });
+    expect(getEditorViewMode()).toMatchObject({ readOnlyView: false, density: "full" });
   });
 });

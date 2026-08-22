@@ -1,6 +1,6 @@
 /**
  * Editor → dashboard "Send for review" (redesign E4). A content editor (the
- * ?view=client experience) submits the current site for an admin to approve,
+ * ?view=readonly experience) submits the current site for an admin to approve,
  * instead of publishing. Calls the dashboard `reviews.submit` tRPC endpoint.
  *
  * @license BSD-3-Clause

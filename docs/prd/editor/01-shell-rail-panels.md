@@ -21,7 +21,7 @@
 ## 1.2 Key behaviors
 
 - **Save pill** 4 variants ok/saving/warn/error, clickable retry; labels incl. "Offline — changes queued"; relative-ago refresh 30s (`Topbar.tsx:187-195,270-317`).
-- **Client view** (`?view=client`): Publish → "Send for review" popover (note ≤500) (`Topbar.tsx:463-529`); density `fewer`.
+- **View mode** (`?view=readonly`, renamed from `?view=client` 2026-08-23): a read-only view — no rail, drawer, inspector, footer toolbar, Publish or Send for review, and `Composer.readOnly` blocks every mutating command. Density `fewer`. Send for review now lives in the Review panel, not here.
 - **Publish workflow states** draft/in-review/approved/published drive label+options; ⚠ **only Publish Now/Directly/Update wired — Submit-for-Review/Approve/Unpublish are no-ops** ("backend RBAC Phase 7", `PublishDropdown.tsx:163-165`). Approve disabled: "Can't approve your own submission" (`:99-103`).
 - **Conflict handling**: SAVE_CONFLICT_EVENT → ConflictModal Reload / Save-backup (`buildrik-backup-{ts}.json`) / Overwrite (`AquibraStudio.tsx:278-538`).
 - **Wizard on blank canvas** unless dismissed/starter-seen (`AquibraStudio.tsx:140-153`).

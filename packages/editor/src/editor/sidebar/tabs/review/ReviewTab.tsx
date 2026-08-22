@@ -413,8 +413,8 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
           title="No review yet"
           /* This used to read "Open client view from the Site menu, then use
              'Send for review' there" — accurate at the time, because
-             StudioHeader rendered that control under viewMode.clientView and
-             nowhere else. Client view is a VIEW now (founder, 2026-08-23), so
+             StudioHeader rendered that control under viewMode.readOnlyView and
+             nowhere else. View mode is a VIEW now (founder, 2026-08-23), so
              that door is shut and the instruction would point at nothing.
              Inviting a client is the owner's act and this panel already owns
              the review lifecycle, so the control lives here instead of being

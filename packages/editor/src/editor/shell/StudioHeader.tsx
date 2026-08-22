@@ -235,11 +235,11 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   React.useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        /* Client view has no palette. It offers Delete element, Paste, Undo and
+        /* View mode has no palette. It offers Delete element, Paste, Undo and
            "Open <tab> panel" rows for panels that are not rendered — a keyboard
            door into the editor from a mode built to have none. Confirmed by
            pressing it: the palette opened on Insert / AI / Templates / Media. */
-        if (viewMode.clientView) return;
+        if (viewMode.readOnlyView) return;
         // F9: a modal dialog (exit guard, confirm) owns the keyboard — opening
         // the palette on top of it would stack two focus traps.
         if (isModalOpen()) return;
@@ -249,7 +249,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, [viewMode.clientView]);
+  }, [viewMode.readOnlyView]);
 
   // S5.2: the persistent review pill. Fails closed to "none" (flag off, no
   // review), which renders nothing — safe for non-agency workspaces too.
@@ -416,15 +416,15 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
     guardNavigation(() => window.location.assign(`${DASHBOARD_URL}/dashboard/projects`));
   }, [guardNavigation]);
 
-  /** Client view is a URL mode, so toggling it is a navigation, not local state. */
-  const toggleClientView = React.useCallback(() => {
+  /** View mode is a URL mode, so toggling it is a navigation, not local state. */
+  const toggleReadOnlyView = React.useCallback(() => {
     guardNavigation(() => {
       const url = new URL(window.location.href);
-      if (viewMode.clientView) url.searchParams.delete("view");
-      else url.searchParams.set("view", "client");
+      if (viewMode.readOnlyView) url.searchParams.delete("view");
+      else url.searchParams.set("view", "readonly");
       window.location.assign(url.toString());
     });
-  }, [guardNavigation, viewMode.clientView]);
+  }, [guardNavigation, viewMode.readOnlyView]);
 
   const navigateFromNotification = React.useCallback(
     (url: string) => {
@@ -551,11 +551,11 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   const confirmMore = errorCount + warnCount - confirmRows.length;
 
   // Plan §2/eng D12: the CONTAINER composes the tool cluster per role/view —
-  // the bar renders exactly what it receives. Client view is itself a preview,
+  // the bar renders exactly what it receives. View mode is itself a preview,
   // so it gets Comments only; viewers keep the chip with the fix door
   // labelled shut.
   const toggleComments = composer ? () => composer.emit("ui:comment-mode", {}) : undefined;
-  const tools = viewMode.clientView
+  const tools = viewMode.readOnlyView
     ? { commentsPressed: commentsOn, onToggleComments: toggleComments }
     : {
         onPreview: handlePreview,
@@ -605,16 +605,16 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
       </div>
       <Topbar
         siteName={siteName}
-        /* In client view the leftmost control leaves the MODE. It used to
+        /* In view mode the leftmost control leaves the MODE. It used to
            leave the product — the loudest button on a preview took you to the
            dashboard, while returning to the editor was buried in ⋯. */
-        onExit={viewMode.clientView ? toggleClientView : exitToDashboard}
-        exitLabel={viewMode.clientView ? "‹ Back to editing" : "‹ Exit"}
-        save={viewMode.clientView ? undefined : save}
+        onExit={viewMode.readOnlyView ? toggleReadOnlyView : exitToDashboard}
+        exitLabel={viewMode.readOnlyView ? "‹ Back to editing" : "‹ Exit"}
+        save={viewMode.readOnlyView ? undefined : save}
         savedAt={lastSavedAt ?? lastSaved?.getTime()}
         /* SaveStatus renders as a BUTTON that fires onSave when the state is
            unsaved or error. A view does not offer a save control. */
-        onSave={viewMode.clientView ? undefined : onSave}
+        onSave={viewMode.readOnlyView ? undefined : onSave}
         review={review}
         tools={tools}
         presence={
@@ -635,26 +635,26 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         }
         unreadCount={unread}
         onOpenNotifications={() => setNotifOpen((v) => !v)}
-        /* Publishing is the owner's act. It stayed visible in client view
-           because nothing here ever read clientView for it. */
-        publish={viewMode.clientView ? "hidden" : publish}
+        /* Publishing is the owner's act. It stayed visible in view mode
+           because nothing here ever read readOnlyView for it. */
+        publish={viewMode.readOnlyView ? "hidden" : publish}
         publishBusy={publishLoading}
         publishBlockedReason={publishBlockedReason}
         onPublish={handlePublishClick}
-        /* SendForReview used to render ONLY in client view, from when
-           ?view=client meant "invited content editor". It is a viewer now
+        /* SendForReview used to render ONLY in view mode, from when
+           ?view=client (now ?view=readonly) meant "invited content editor". It is a viewer now
            (founder, 2026-08-23), and sending a site for review is the owner's
            act, so the slot is empty there. */
         action={undefined}
         menu={
-          /* Every build door is withheld in client view; the menu keeps only
+          /* Every build door is withheld in view mode; the menu keeps only
              the toggle back out, which is the one thing an owner previewing
              their client's view still needs. */
           <SiteMenu
-            onOpenSiteSettings={viewMode.clientView ? undefined : onOpenProjectSettings}
-            onOpenHistory={viewMode.clientView ? undefined : onOpenHistory}
-            onOpenPublish={viewMode.clientView ? undefined : onOpenPublish}
-            onOpenPublishHistory={viewMode.clientView ? undefined : onOpenPublishHistory}
+            onOpenSiteSettings={viewMode.readOnlyView ? undefined : onOpenProjectSettings}
+            onOpenHistory={viewMode.readOnlyView ? undefined : onOpenHistory}
+            onOpenPublish={viewMode.readOnlyView ? undefined : onOpenPublish}
+            onOpenPublishHistory={viewMode.readOnlyView ? undefined : onOpenPublishHistory}
             /* Board 1172:4825 is a MODAL — format chips, a preview, a code
                view, options — and it had no door. `handleExport` opens it, but
                `handleExport` is third in `onVercelPublish ?? onOpenPublish ??
@@ -664,19 +664,19 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
                screen for CHOOSING a format was skipped by the only control
                that mentions exporting. The row opens the modal; the immediate
                zip is what the modal's own ZIP button does. */
-            onExportCode={viewMode.clientView ? undefined : handleExport}
-            onOpenTemplates={viewMode.clientView ? undefined : onOpenTemplates}
-            onOpenComponents={viewMode.clientView ? undefined : onOpenComponents}
-            onOpenShortcuts={viewMode.clientView ? undefined : onOpenShortcuts}
+            onExportCode={viewMode.readOnlyView ? undefined : handleExport}
+            onOpenTemplates={viewMode.readOnlyView ? undefined : onOpenTemplates}
+            onOpenComponents={viewMode.readOnlyView ? undefined : onOpenComponents}
+            onOpenShortcuts={viewMode.readOnlyView ? undefined : onOpenShortcuts}
             onAskAI={viewMode.fourToolRail ? onShowAI : undefined}
             onStartCollaboration={collabOn && !isConnected ? startCollab : undefined}
-            onOpenDesignSystem={viewMode.clientView ? undefined : onOpenDesignSystem}
-            onOpenPlugins={viewMode.clientView ? undefined : onOpenPlugins}
+            onOpenDesignSystem={viewMode.readOnlyView ? undefined : onOpenDesignSystem}
+            onOpenPlugins={viewMode.readOnlyView ? undefined : onOpenPlugins}
             publishedUrl={publishedUrl}
             onCopyLiveUrl={copyLiveUrl}
             siteId={getSiteIdFromUrl()}
-            clientView={viewMode.clientView}
-            onToggleClientView={toggleClientView}
+            readOnlyView={viewMode.readOnlyView}
+            onToggleReadOnlyView={toggleReadOnlyView}
           />
         }
       />

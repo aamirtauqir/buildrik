@@ -73,7 +73,7 @@ export interface CanvasOverlayGroupProps {
   onDuplicate: () => void;
   onDelete: () => void;
   /**
-   * Client view. Selection itself is harmless, but the chrome it draws is not:
+   * View mode. Selection itself is harmless, but the chrome it draws is not:
    * the resize box and the unified toolbar carry Duplicate, Delete, Copy, Wrap
    * and Move. Withholding the canvas's own mutation handlers left this whole
    * layer reachable by a single click.

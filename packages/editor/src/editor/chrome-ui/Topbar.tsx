@@ -59,7 +59,7 @@ const EXIT_BTN_CLASS =
  * natively disabled for the beat so the ✓ cannot be re-clicked.
  */
 /* "hidden" is not a disabled Publish — it is no Publish control at all, for
-   surfaces where publishing is not the viewer's to do. Client view is the
+   surfaces where publishing is not the viewer's to do. View mode is the
    case: the `action` slot used to hold SendForReview there and so replaced
    this button by accident; emptying the slot made Publish reappear. */
 export type PublishState = "ready" | "disabled" | "anyway" | "published" | "hidden";
@@ -68,7 +68,7 @@ export type PublishState = "ready" | "disabled" | "anyway" | "published" | "hidd
  * The tool cluster (plan §2, eng D12) — DATA props, never a node: the deleted
  * `extra` slot let arbitrary buttons walk back into the bar within a day.
  * Role/view branching lives in the CONTAINER: it composes which fields to
- * pass (client view: comments only; viewer: read-only-labelled issues); the
+ * pass (view mode: comments only; viewer: read-only-labelled issues); the
  * bar renders exactly what it receives and learns no roles.
  */
 export interface TopbarTools {
@@ -97,13 +97,13 @@ export interface TopbarProps {
   siteName: string;
   onExit?: () => void;
   /**
-   * What the leftmost control says and does. In client view it leaves the MODE,
+   * What the leftmost control says and does. In view mode it leaves the MODE,
    * not the product: "‹ Exit" there still went to the dashboard, so the most
    * prominent control on a preview screen took you out of the site entirely,
    * while getting back to editing was one row inside a ⋯ menu.
    */
   exitLabel?: string;
-  /** Omit to render no save indicator at all — client view, where nothing can
+  /** Omit to render no save indicator at all — view mode, where nothing can
       become unsaved and the pill would be status about a machine the viewer is
       not operating. */
   save?: SaveState;

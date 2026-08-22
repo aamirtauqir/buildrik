@@ -47,12 +47,12 @@ const TEXT_OWNED_COMMANDS = new Set(["select-all", "cut", "copy", "paste", "undo
  * Commands that CHANGE the document. In a read-only composer they must not run,
  * whatever the chord.
  *
- * This list is the one that matters for client view. The chrome withheld the
+ * This list is the one that matters for view mode. The chrome withheld the
  * React handlers — inline edit, drop, the context menu, the wrapper's keydown —
  * and the document stayed mutable anyway, because KeybindingManager binds
  * `keydown` on WINDOW in the capture phase. Click-to-select is deliberately
  * left on, so: click an element, press Delete, and it is gone. Measured on a
- * scratch site in client view — 203 elements became 202, and autosave writes
+ * scratch site in view mode — 203 elements became 202, and autosave writes
  * that to the server. Gating N React leaves cannot close a window listener; the
  * gate belongs at the gateway.
  */

@@ -193,26 +193,26 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
 
   const [canvasHoveredId, setCanvasHoveredId] = React.useState<string | null>(null);
   /** AI drills in over the inspector (boards 170:* · 66:225). */
-  /* URL-derived, so it is stable for the life of the document — client view
-     is entered by navigation (StudioHeader.toggleClientView), never by state. */
-  const clientView = React.useMemo(() => getEditorViewMode().clientView, []);
+  /* URL-derived, so it is stable for the life of the document — view mode
+     is entered by navigation (StudioHeader.toggleReadOnlyView), never by state. */
+  const readOnlyView = React.useMemo(() => getEditorViewMode().readOnlyView, []);
   /* A root class, not a prop, because the surfaces that still leak editing
-     chrome into client view are reached by CSS alone: the empty-container
+     chrome into view mode are reached by CSS alone: the empty-container
      placeholder is a ::after in Canvas.css, and the footer's selection label is
      rendered by AquibraStudio, which an agent session must not stage. */
   /* The engine gate. Withholding React handlers left the document mutable —
      KeybindingManager listens on window in the capture phase, so click-then-
      Delete still worked. One flag on the gateway closes every chord at once. */
   React.useEffect(() => {
-    if (composer) composer.readOnly = clientView;
-  }, [composer, clientView]);
+    if (composer) composer.readOnly = readOnlyView;
+  }, [composer, readOnlyView]);
 
   React.useEffect(() => {
     const root = document.documentElement;
-    if (!clientView) return;
-    root.classList.add("bk-client-view");
-    return () => root.classList.remove("bk-client-view");
-  }, [clientView]);
+    if (!readOnlyView) return;
+    root.classList.add("bk-read-only-view");
+    return () => root.classList.remove("bk-read-only-view");
+  }, [readOnlyView]);
 
   const [aiInInspector, setAiInInspector] = React.useState(false);
 
@@ -383,24 +383,24 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           machine without the localStorage cache drew the DEFAULT brand. */}
       <ProjectTokensApplier composer={composer} />
       <LayoutShell
-        /* Client view is a VIEW, the way Figma's is: the person holding the link
+        /* View mode is a VIEW, the way Figma's is: the person holding the link
            is looking, not building, so the rail, the drawer and the inspector are
            not rendered at all and the canvas takes the whole width. It used to
            trim four header tools and leave every editing surface in place, so an
            owner opening "what my client sees" was shown the full editor.
            (Founder call, 2026-08-23.) */
-        className={clientView ? "layout-shell--client-view" : ""}
-        drawerOpen={!clientView && isLeftPanelOpen && !effectiveFullPageMode}
+        className={readOnlyView ? "layout-shell--read-only-view" : ""}
+        drawerOpen={!readOnlyView && isLeftPanelOpen && !effectiveFullPageMode}
         drawerWidth={drawerWidth}
-        fullPageMode={!clientView && effectiveFullPageMode && isLeftPanelOpen}
+        fullPageMode={!readOnlyView && effectiveFullPageMode && isLeftPanelOpen}
         // Open whenever not fullpage — the no-selection state is a DRAWN
         // board (2 lines + ✦ Ask AI); gating on selectedElement collapsed the
         // column to 1px, so that state rendered off-viewport, unseeable.
-        inspectorOpen={!clientView && !effectiveFullPageMode}
+        inspectorOpen={!readOnlyView && !effectiveFullPageMode}
         style={styles.container}
       >
-        {/* Left Sidebar — merged rail + panel. Absent in client view. */}
-        {clientView ? null : (
+        {/* Left Sidebar — merged rail + panel. Absent in view mode. */}
+        {readOnlyView ? null : (
         <LayoutShell.Sidebar>
           <LeftSidebar
             composer={composer}
@@ -434,8 +434,8 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
               ref={canvasRef as React.Ref<CanvasRef>}
               /* The overlay toggles (Grid / Rulers / Badges / X-Ray) are build
                  tools, so they go with the rest of the editing chrome. */
-              showFooterToolbar={!clientView}
-              readOnly={clientView}
+              showFooterToolbar={!readOnlyView}
+              readOnly={readOnlyView}
               composer={composer}
               device={device}
               zoom={zoom}
@@ -458,12 +458,12 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           </div>
           {/* Board 435:2348: the tab bar sits at the canvas FOOT — the
               context menu opens upward from it. */}
-          <PageTabBar composer={composer} readOnly={clientView} />
+          <PageTabBar composer={composer} readOnly={readOnlyView} />
         </LayoutShell.Canvas>
 
         {/* Right Inspector — element properties, or the AI drill-in that
-            replaces them (boards 170:*). Absent in client view. */}
-        {clientView ? null : (
+            replaces them (boards 170:*). Absent in view mode. */}
+        {readOnlyView ? null : (
         <LayoutShell.Inspector>
           {aiInInspector ? (
             <AITab

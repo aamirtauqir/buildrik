@@ -645,7 +645,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
 
           {/* "Start with a template, or drop your first section" with Browse
              templates / Start blank — build CTAs, and Browse templates emits an
-             event whose drawer is not mounted in client view, so it is a dead
+             event whose drawer is not mounted in view mode, so it is a dead
              door as well as a wrong one. The container placeholder next to it
              was already suppressed; this larger one was missed. */}
           {isCanvasEmpty && !readOnly && (

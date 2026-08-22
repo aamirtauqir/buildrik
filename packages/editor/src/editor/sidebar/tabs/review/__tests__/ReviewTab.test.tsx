@@ -118,7 +118,7 @@ describe("load states", () => {
     expect(await screen.findByText(/No review yet/i)).toBeInTheDocument();
     /* Rewritten 2026-08-23. This used to assert the instruction "Open client
        view from the Site menu, then use Send for review there", which named a
-       door that has since been shut: client view is a view now and carries no
+       door that has since been shut: view mode is a view now and carries no
        owner controls. So the panel carries the control itself — a state that
        tells you to go somewhere else is one redirect away from being wrong
        again, which is exactly how this line got written the first time. */

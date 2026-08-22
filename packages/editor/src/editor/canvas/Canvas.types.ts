@@ -27,7 +27,7 @@ export interface CanvasProps {
   /** Show the canvas footer toolbar with overlays and zoom controls */
   showFooterToolbar?: boolean;
   /**
-   * Client view. Hiding the rail and the inspector left the canvas itself fully
+   * View mode. Hiding the rail and the inspector left the canvas itself fully
    * live: double-click still opened contentEditable and typing replaced the
    * heading — measured, not assumed. A view that can be edited is not a view,
    * so the handlers that MUTATE the document are withheld. Selection and cursor

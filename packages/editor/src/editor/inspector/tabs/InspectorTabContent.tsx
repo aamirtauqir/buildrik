@@ -75,7 +75,7 @@ export interface InspectorTabContentProps {
     s: (i: IconConfig) => void
   ) => void;
   devMode: boolean;
-  /** E3 per-user density. "fewer" (content editors / ?view=client) trims the
+  /** E3 per-user density. "fewer" (?view=readonly) trims the
    *  inspector to its primary + secondary sections, hiding tertiary (advanced)
    *  ones; "full" shows everything. Row heights are unaffected (density learning). */
   density?: "full" | "fewer";

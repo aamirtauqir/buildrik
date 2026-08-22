@@ -1,9 +1,9 @@
 /**
  * A read-only composer runs no command that changes the document.
  *
- * This is the gate client view needs, and the reason it lives in the engine
+ * This is the gate view mode needs, and the reason it lives in the engine
  * rather than the chrome: KeybindingManager binds `keydown` on WINDOW in the
- * capture phase. Client view had already withheld the rail, the inspector,
+ * capture phase. View mode had already withheld the rail, the inspector,
  * inline edit, drop, the context menu and the canvas keydown — and clicking an
  * element then pressing Delete still removed it, because none of those gates
  * sit between window and the command. Measured in the running app on a scratch

@@ -19,7 +19,7 @@ import { normalizeSlug } from "../sidebar/tabs/pages/utils/slug";
 interface PageTabBarProps {
   composer: Composer | null;
   /**
-   * Client view. Switching pages is looking, so the tabs stay — Figma's view
+   * View mode. Switching pages is looking, so the tabs stay — Figma's view
    * mode navigates a file too. Add, rename, duplicate and delete are not, so
    * the + button and the row's context menu are withheld. Hiding the rail and
    * the inspector had left both of them reachable here.

@@ -159,18 +159,18 @@
   padding: var(--bk-space-8) var(--bk-space-16);
 }
 
-/* Client view is a VIEW. An empty container's dashed box and its "Drop a block
+/* View mode is a VIEW. An empty container's dashed box and its "Drop a block
    here" hint are build-time affordances — they tell you where to put something,
    which is not a thing the person holding a review link can do. Founder call,
    2026-08-23: the client sees what Figma's view mode shows, not the editor. */
-.bk-client-view [data-buildrick-type="container"]:not(.buildrick-page-root):empty::after,
-.bk-client-view [data-buildrick-type="columns"]:empty::after {
+.bk-read-only-view [data-buildrick-type="container"]:not(.buildrick-page-root):empty::after,
+.bk-read-only-view [data-buildrick-type="columns"]:empty::after {
   content: "";
   padding: 0;
 }
 
-.bk-client-view [data-buildrick-type="container"]:not(.buildrick-page-root):empty,
-.bk-client-view [data-buildrick-type="columns"]:empty {
+.bk-read-only-view [data-buildrick-type="container"]:not(.buildrick-page-root):empty,
+.bk-read-only-view [data-buildrick-type="columns"]:empty {
   background: transparent;
   border-color: transparent;
   min-height: 0;
@@ -182,16 +182,16 @@
    to someone who is only looking:
      · "Nothing selected" / a bare "1440 × 320" — selection vocabulary
      · the review bar's Compare and Re-send — the OWNER's next actions, and
-       Compare opens a panel that client view does not render
+       Compare opens a panel that view mode does not render
      · "Get started — 0 of 7 complete" — the owner's onboarding, in a preview of
        what a client sees
    The selection LABEL was hidden in the first pass and the DIMS beside it were
    missed, which left a number floating with nothing to name it. */
-.bk-client-view [data-testid="footer-selection-label"],
-.bk-client-view [data-testid="footer-selection-dims"],
-.bk-client-view [data-testid="review-bar"],
-.bk-client-view [aria-label="Getting started checklist"],
-.bk-client-view [aria-label^="Get started —"] {
+.bk-read-only-view [data-testid="footer-selection-label"],
+.bk-read-only-view [data-testid="footer-selection-dims"],
+.bk-read-only-view [data-testid="review-bar"],
+.bk-read-only-view [aria-label="Getting started checklist"],
+.bk-read-only-view [aria-label^="Get started —"] {
   display: none;
 }
 

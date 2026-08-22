@@ -14,7 +14,7 @@ describe("getEditorViewMode (F1/E3/E4 SSOT)", () => {
       railMode: "figma",
       fourToolRail: false,
       density: "full",
-      clientView: false,
+      readOnlyView: false,
     });
   });
 
@@ -33,13 +33,13 @@ describe("getEditorViewMode (F1/E3/E4 SSOT)", () => {
     expect(getEditorViewMode()).toMatchObject({ railMode: "figma", fourToolRail: false, density: "fewer" });
   });
 
-  it("?view=client → the invited-client seed: Figma rail AND fewer density", () => {
-    setSearch("?view=client");
+  it("?view=readonly → view mode: Figma rail AND fewer density", () => {
+    setSearch("?view=readonly");
     expect(getEditorViewMode()).toEqual({
       railMode: "figma",
       fourToolRail: false,
       density: "fewer",
-      clientView: true,
+      readOnlyView: true,
     });
   });
 
