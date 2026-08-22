@@ -145,8 +145,14 @@ export function ReviewClient({ token }: { token: string }) {
   // and "wrong link" are different problems for the person holding it, and a
   // single "something went wrong" tells them nothing they can act on.
   if (review.error) {
+    /* The domain reason first, the transport code second. Keying on the code
+       alone made two of these four screens unreachable: the router maps EXPIRED
+       and REVOKED to one FORBIDDEN on purpose, so both landed on the malformed
+       copy and told a client with a perfectly well-formed link to click it
+       again. `cause.reason` is what the router now sends alongside it. */
+    const reason = (review.error.data?.cause as { reason?: string } | undefined)?.reason;
     const code = review.error.data?.code ?? "NOT_FOUND";
-    const copy = DEAD_LINK_COPY[code] ?? DEAD_LINK_COPY.NOT_FOUND;
+    const copy = DEAD_LINK_COPY[reason ?? ""] ?? DEAD_LINK_COPY[code] ?? DEAD_LINK_COPY.NOT_FOUND;
     return (
       <Shell agency="Buildrick">
         <Centered>

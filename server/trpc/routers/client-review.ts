@@ -58,7 +58,10 @@ function translate(e: unknown): never {
             : // EXPIRED and REVOKED are both "this link is dead" — FORBIDDEN, so
               // the page can render the expired screen rather than a 404.
               "FORBIDDEN";
-    throw new TRPCError({ code, message: e.message, cause: e.code });
+    /* An OBJECT, not the bare code string: the global errorFormatter lifts a
+       cause's enumerable fields with Object.entries, so a string arrived at the
+       client as {0:"E",1:"X",2:"P"…} and the page could not read it. */
+    throw new TRPCError({ code, message: e.message, cause: { reason: e.code } });
   }
   throw e;
 }
