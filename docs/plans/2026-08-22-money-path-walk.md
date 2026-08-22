@@ -261,12 +261,38 @@ and count.
 `BK_STATE` picks the session, because BL-0228 and BL-0229 are the same screen
 and differ only by who is looking.
 
+### Editor page, second pass — the numbers
+
+| | before | after |
+|---|---|---|
+| BL frames on the page | 71 | 92 |
+| distinct states with a CURRENT twin | 19 | **40** |
+| held as UNVERIFIED (captured, state not proven) | — | 9 |
+| truly stale, no current capture of any date | 37 | **2** |
+
+The two left are BL-0160 (media icon picker) and BL-0168 (layers context menu),
+and they fail the same way: the capture script is injected before the actions
+run, injection moves focus, and a surface that closes on blur is gone by capture
+time. That is the ⌘K trap, and it needs a harness change rather than a better
+selector.
+
+Five canvas-overlay frames were relabelled rather than re-captured — this page's
+own earlier note records them as 2026-08-22 captures, so the label now says that
+and says whose claim it is.
+
 ### Still out
 
-- **Sixteen editor states have no recipe** — media sub-views, pages sub-views,
-  brand tabs, content. Their controls live inside panels that have to be opened
-  before a selector can be written honestly, so guessing one would capture the
-  wrong state quietly. Ten site-menu doors did have unambiguous paths and got
-  recipes; `screens-editor.json` carries them.
+- **Five site-menu doors have no frame at all** — Publish panel, Site health,
+  Activity log, Open client view, Share preview link. Found by driving the real
+  menu, which prints sixteen rows against the board's ten. Recipes exist
+  (BL-0230–BL-0234); captures do not.
+- **BL-0120 baselines the wrong surface.** "Invite teammates" opens the
+  dashboard in a new tab, so the editor frame shows an unchanged editor. The
+  frame name now says so.
+- **Media list view cannot differ from grid view** until the library has an
+  asset. Both render the same empty state.
+- ~~Sixteen editor states have no recipe~~ — closed. Every state in
+  `screens-editor.json` now has one, derived by driving the panels and reading
+  their controls rather than guessing selectors.
 - The editor page's own note still records drift measured against the 08-19
   cluster. It is accurate for the frames that remain stale.
