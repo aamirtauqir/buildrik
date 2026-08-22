@@ -88,13 +88,39 @@ async function dispatchAIWorker(jobId: string): Promise<void> {
     process.env.NEXTAUTH_URL ??
     "http://localhost:3000"
   ).replace(/\/$/, "");
+  /* Read the answer. A 401 — what the worker returns when CRON_SECRET is
+     missing or wrong, and this dispatch sends `?? ""` — is a SUCCESSFUL fetch,
+     so the catch below never fired and nothing recorded that the job would
+     never start. The row stayed QUEUED and the onboarding screen span forever.
+     `publish.service.ts:175` already draws the line in the right place: 401 and
+     404 mean the worker did not claim the job. Anything else it answered, it
+     owns, including a 500 it will write its own FAILED row for — overwriting
+     that would replace a diagnosis with a dispatch message. */
+  let unclaimed: string | null = null;
   try {
-    await fetch(`${base}/api/workers/ai-generate/${jobId}`, {
+    const res = await fetch(`${base}/api/workers/ai-generate/${jobId}`, {
       method: "POST",
       headers: { "x-worker-secret": process.env.CRON_SECRET ?? "" },
     });
+    if (res.status === 401 || res.status === 404) {
+      unclaimed =
+        res.status === 401
+          ? "The generator refused this job (worker secret rejected). Check CRON_SECRET."
+          : "The generator could not be reached at this deployment.";
+    }
   } catch {
-    // Worker dispatch failed — job stays QUEUED and can be re-dispatched.
+    unclaimed = "The generator could not be reached. Nothing answered the request.";
+  }
+
+  if (unclaimed) {
+    /* Fail it loudly rather than leaving a QUEUED row nobody will ever pick up.
+       The onboarding screen already renders FAILED (generating/page.tsx:83); it
+       has no rendering at all for "queued forever". */
+    await prisma.aIGenerationJob
+      .update({ where: { id: jobId }, data: { status: "FAILED", error: unclaimed } })
+      .catch(() => {
+        /* The job row is gone or already resolved; nothing left to report to. */
+      });
   }
 }
 
