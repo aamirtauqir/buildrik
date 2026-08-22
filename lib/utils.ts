@@ -53,7 +53,14 @@ export function formatCompact(n: number): string {
  * build time, so this is safe in both the server and client halves of a page.
  */
 export function shareUrl(token: string): string {
-  return `${process.env.NEXT_PUBLIC_APP_URL ?? ""}/share/${token}`;
+  /* When the var was never baked in, `${undefined ?? ""}` left a bare
+     `/share/<token>` — which looks like a link in the copy box and is not one
+     once it is pasted into an email. The browser always knows the origin these
+     links are served from, so fall back to it rather than emitting a path.
+     A trailing slash on the configured value produced `//share/...`. */
+  const configured = process.env.NEXT_PUBLIC_APP_URL;
+  const base = (configured || (typeof window !== "undefined" ? window.location.origin : "")).replace(/\/+$/, "");
+  return `${base}/share/${token}`;
 }
 
 /**
