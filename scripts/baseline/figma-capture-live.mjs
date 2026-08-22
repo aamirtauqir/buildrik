@@ -110,7 +110,11 @@ if (ACTIONS_JSON && ACTIONS_JSON !== "none") {
         return open ? "already-open" : "opened";
       }, a.openTab);
       console.log("openTab", a.openTab, "->", ok);
-      await page.waitForTimeout(a.waitAfter ?? 2500);
+      /* A panel that was already showing is rendered; one just opened is not.
+         2.5s was enough for the former and not the latter — the first Pages
+         case missed its row while the other three, which found the panel
+         already open, clicked fine. */
+      await page.waitForTimeout(a.waitAfter ?? (ok === "opened" ? 4500 : 2500));
     }
     if (a.click) await page.click(a.click, { timeout: 8000, force: !!a.force }).catch((e) => console.log("click miss:", a.click));
     if (a.press) await page.keyboard.press(a.press);

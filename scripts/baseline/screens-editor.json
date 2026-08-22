@@ -544,10 +544,7 @@
       "state": "media-stock-browser",
       "actions": [
         {
-          "click": ".ls-rail [data-tab=assets]"
-        },
-        {
-          "waitMs": 2000
+          "openTab": "assets"
         },
         {
           "click": "text=Browse stock"
@@ -564,10 +561,7 @@
       "state": "media-icon-picker",
       "actions": [
         {
-          "click": ".ls-rail [data-tab=assets]"
-        },
-        {
-          "waitMs": 2000
+          "openTab": "assets"
         },
         {
           "click": "text=Icons"
@@ -584,16 +578,13 @@
       "state": "media-fullpage-library",
       "actions": [
         {
-          "click": ".ls-rail [data-tab=assets]"
-        },
-        {
-          "waitMs": 2000
+          "openTab": "assets"
         },
         {
           "click": "[aria-label='Expand Media']"
         },
         {
-          "waitMs": 3000
+          "waitMs": 3500
         }
       ],
       "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible.",
@@ -604,26 +595,23 @@
       "state": "media-list-view",
       "actions": [
         {
-          "click": ".ls-rail [data-tab=assets]"
-        },
-        {
-          "waitMs": 2000
+          "openTab": "assets"
         },
         {
           "click": "[aria-label='Expand Media']"
         },
         {
-          "waitMs": 3000
+          "waitMs": 3500
         },
         {
           "click": "[aria-label='List view']"
         },
         {
-          "waitMs": 1500
+          "waitMs": 2000
         }
       ],
       "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible.",
-      "_capture_status": "MISSES TODAY for a fixture reason, not a recipe one: the media library holds 0 assets, so grid and list render the same empty state and the two frames are byte-identical. Seed an asset before capturing this pair or the difference cannot exist."
+      "_capture_status": "Fixed at the fixture, not the recipe: three assets are seeded into the library by scripts/baseline/media-fixtures.sql. With zero assets grid and list render the same empty state and the pair is byte-identical, so the difference the frame exists to show cannot exist."
     },
     {
       "id": "BL-0163",
