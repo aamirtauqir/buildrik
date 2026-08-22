@@ -1,5 +1,5 @@
 import { TRPCError } from "@trpc/server";
-import { publicProcedure, router } from "../trpc";
+import { publicProcedure, createRateLimitedProcedure, router } from "../trpc";
 import {
   getReviewByToken,
   identifyReviewer,
@@ -35,6 +35,10 @@ import {
  * NOT gated on the `agency_layer` flag, unlike `reviews.ts`. A link that was
  * legitimately issued must keep working; killing a client's live link because
  * a workspace flag flipped is a support ticket and a broken promise.
+ *
+ * Public by design still means budgeted. The three mutations are rate-limited
+ * per IP (see below); they were not, and `createRateLimitedProcedure` had two
+ * callers in the entire app, both in auth.ts.
  */
 
 function translate(e: unknown): never {
@@ -59,6 +63,21 @@ function translate(e: unknown): never {
   throw e;
 }
 
+/* `identify` matches the visitor's email against the address the link was sent
+   to. Unthrottled that is an address oracle for anyone holding the link, and
+   the address it accepts becomes the identity that signs the approval.
+   `resolve` is the signature itself. Both take the strict budget auth uses for
+   2FA and token verification — a real client types their email once.
+
+   `comment` is looser: a reviewer leaves several in one sitting, and being
+   wrong there costs spam rather than a forged sign-off.
+
+   The two reads stay unthrottled. The token is 32 random bytes, so there is
+   nothing cheap to guess, and throttling a read breaks a reviewer who
+   refreshes the page. */
+const strictClientLimit = createRateLimitedProcedure(5, 15 * 60 * 1000);
+const commentLimit = createRateLimitedProcedure(20, 15 * 60 * 1000);
+
 export const clientReviewRouter = router({
   /** Load the page. Safe before identity — the form renders over the site. */
   get: publicProcedure.input(reviewTokenInput).query(async ({ input }) => {
@@ -70,7 +89,7 @@ export const clientReviewRouter = router({
   }),
 
   /** Name + email on first visit. Upserts, so round 2 knows the same person. */
-  identify: publicProcedure.input(identifyReviewerInput).mutation(async ({ input }) => {
+  identify: strictClientLimit.input(identifyReviewerInput).mutation(async ({ input }) => {
     try {
       return await identifyReviewer(input.token, input.name, input.email);
     } catch (e) {
@@ -86,7 +105,7 @@ export const clientReviewRouter = router({
     }
   }),
 
-  comment: publicProcedure.input(clientCommentInput).mutation(async ({ input }) => {
+  comment: commentLimit.input(clientCommentInput).mutation(async ({ input }) => {
     const { token, ...rest } = input;
     try {
       return await createClientComment(token, rest);
@@ -96,7 +115,7 @@ export const clientReviewRouter = router({
   }),
 
   /** The signature. The reason the product exists. */
-  resolve: publicProcedure.input(clientResolveInput).mutation(async ({ input }) => {
+  resolve: strictClientLimit.input(clientResolveInput).mutation(async ({ input }) => {
     try {
       return await resolveReviewByToken(input.token, input.status);
     } catch (e) {
