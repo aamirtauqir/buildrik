@@ -85,6 +85,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       showXRay = false,
       devMode = false,
       showFooterToolbar = true,
+      readOnly = false,
       onZoomChange,
       onOverlayChange,
       onDeviceChange,
@@ -580,17 +581,21 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     const size = DEVICE_SIZES[device];
     const scale = zoom / 100;
 
+    /* readOnly withholds every handler that can change the document — inline
+       edit, drop, the context menu and the keyboard (Delete, ⌘Z, ⌘D). Click and
+       mouse-move stay: selection changes nothing when there is no inspector to
+       drive, and comment pinning needs the pointer. */
     return (
-      <div ref={wrapperRef} tabIndex={0} onKeyDown={handleKeyDown} style={wrapperStyles}>
+      <div ref={wrapperRef} tabIndex={0} onKeyDown={readOnly ? undefined : handleKeyDown} style={wrapperStyles}>
         <DeviceFramePreview device={device} active={deviceFrameActive}>
         <div
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
+          onDragOver={readOnly ? undefined : handleDragOver}
+          onDragLeave={readOnly ? undefined : handleDragLeave}
+          onDrop={readOnly ? undefined : handleDrop}
           onClick={handleCanvasClick}
-          onDoubleClick={handleDoubleClick}
-          onContextMenu={handleContextMenu}
-          onMouseDown={handleMarqueeStart}
+          onDoubleClick={readOnly ? undefined : handleDoubleClick}
+          onContextMenu={readOnly ? undefined : handleContextMenu}
+          onMouseDown={readOnly ? undefined : handleMarqueeStart}
           onMouseMove={(e) => {
             handleCanvasMouseMove(e);
             handleMarqueeMove(e);

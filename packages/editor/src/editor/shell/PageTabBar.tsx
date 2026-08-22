@@ -18,6 +18,13 @@ import { normalizeSlug } from "../sidebar/tabs/pages/utils/slug";
 
 interface PageTabBarProps {
   composer: Composer | null;
+  /**
+   * Client view. Switching pages is looking, so the tabs stay — Figma's view
+   * mode navigates a file too. Add, rename, duplicate and delete are not, so
+   * the + button and the row's context menu are withheld. Hiding the rail and
+   * the inspector had left both of them reachable here.
+   */
+  readOnly?: boolean;
 }
 
 interface ContextMenuState {
@@ -30,7 +37,7 @@ interface ContextMenuState {
 // COMPONENT
 // ============================================================================
 
-export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
+export const PageTabBar: React.FC<PageTabBarProps> = ({ composer, readOnly = false }) => {
   const [pages, setPages] = React.useState<PageData[]>([]);
   const [activePageId, setActivePageId] = React.useState<string | null>(null);
   const [contextMenu, setContextMenu] = React.useState<ContextMenuState | null>(null);
@@ -233,7 +240,7 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
               aria-selected={page.id === activePageId}
               aria-label={`${page.name}${page.isHome ? ", Homepage" : ""}${dirtyPages.has(page.id) ? ", unsaved changes" : ""}`}
               onClick={() => handleTabClick(page.id)}
-              onContextMenu={(e) => handleContextMenu(e, page.id)}
+              onContextMenu={readOnly ? undefined : (e) => handleContextMenu(e, page.id)}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();
@@ -334,6 +341,7 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
           ))}
         </div>
         {/* Add button outside tablist — ARIA: only role="tab" may be tablist children */}
+        {readOnly ? null : (
         <Button
           onClick={handleAddPage}
           className={ADD_BTN}
@@ -342,6 +350,7 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
         >
           +
         </Button>
+        )}
       </div>
       {/* Context menu — portal so it escapes overflow:hidden parents */}
       {contextMenu && (

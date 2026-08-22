@@ -428,6 +428,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
               /* The overlay toggles (Grid / Rulers / Badges / X-Ray) are build
                  tools, so they go with the rest of the editing chrome. */
               showFooterToolbar={!clientView}
+              readOnly={clientView}
               composer={composer}
               device={device}
               zoom={zoom}
@@ -450,7 +451,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           </div>
           {/* Board 435:2348: the tab bar sits at the canvas FOOT — the
               context menu opens upward from it. */}
-          <PageTabBar composer={composer} />
+          <PageTabBar composer={composer} readOnly={clientView} />
         </LayoutShell.Canvas>
 
         {/* Right Inspector — element properties, or the AI drill-in that

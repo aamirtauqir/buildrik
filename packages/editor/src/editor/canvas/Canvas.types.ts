@@ -26,6 +26,14 @@ export interface CanvasProps {
   devMode?: boolean;
   /** Show the canvas footer toolbar with overlays and zoom controls */
   showFooterToolbar?: boolean;
+  /**
+   * Client view. Hiding the rail and the inspector left the canvas itself fully
+   * live: double-click still opened contentEditable and typing replaced the
+   * heading — measured, not assumed. A view that can be edited is not a view,
+   * so the handlers that MUTATE the document are withheld. Selection and cursor
+   * sync stay: they change nothing and comments need the pointer.
+   */
+  readOnly?: boolean;
   /** Callback when zoom changes (from footer toolbar) */
   onZoomChange?: (zoom: number) => void;
   /** Callback when overlay toggles change (from footer toolbar) */
