@@ -618,20 +618,24 @@
       "state": "pages-context-menu",
       "actions": [
         {
-          "click": ".ls-rail [data-tab=pages]"
+          "openTab": "pages"
         },
         {
-          "waitMs": 2000
+          "hover": "text=Home"
+        },
+        {
+          "waitMs": 800
         },
         {
           "click": "[aria-label='More options for Home']"
         },
         {
-          "waitMs": 1500
+          "waitMs": 1800
         }
       ],
-      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible.",
-      "_capture_status": "Still missing after openTab and a 4.5s settle. The row control [aria-label='More options for Home'] exists and a single-shot probe clicks it, but not in this sequence. Unresolved — and NOT diagnosed, so no guess is recorded here."
+      "_note": "The row's More-options button is `display:none` at 0x0 until the row is hovered — measured with getComputedStyle, after three passes of guessing at timing and toggles. Hover the row first and it becomes 40x22 and clickable; the menu is Rename… / Duplicate / Copy link / Page settings… / Delete page. Any hover-revealed control needs this step; a click alone waits for a visibility that never arrives.",
+      "_marker": "Delete page",
+      "_verified": "2026-08-23 — 'Delete page' read back from the captured frame; PRE-CAPTURE also showed the menu open."
     },
     {
       "id": "BL-0164",
@@ -706,7 +710,7 @@
         }
       ],
       "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible.",
-      "_capture_status": "'Expand Pages' clicks fine and the DRAWER does not change, so whatever full-page view it opens renders outside the drawer — my check looked in the wrong place, the same error that made me read the Project settings modal as a miss. Needs a check against the full document, not the drawer."
+      "_capture_status": "'Expand Pages' clicks fine and the DRAWER does not change, so the full-page view renders outside it — the same place I looked wrongly for the Project settings modal. Check the whole document, or count nodes the way BL-0161/BL-0162 had to be compared; text and drawer content both fail here."
     },
     {
       "id": "BL-0169",
