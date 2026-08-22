@@ -2,6 +2,18 @@ import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 
 /**
+ * What the user is told, wherever they hit it.
+ *
+ * The three doors that raise SITE_LIMIT each wrote their own copy, and only
+ * `sites.create` mentioned upgrading — duplicating a site or applying a
+ * template said "Site limit reached." and stopped, at the exact moment the
+ * product has a paid answer to the problem it just described. One string, so
+ * the next door added cannot get it wrong either.
+ */
+export const SITE_LIMIT_MESSAGE =
+  "Site limit reached. Upgrade your plan in Settings → Billing to create more sites.";
+
+/**
  * Refuse a new site when the workspace is at its plan's cap.
  *
  * Lives in its own module rather than in `sites.service.ts` because
@@ -16,8 +28,7 @@ import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
  * `deletedAt: null`, which is what makes "delete one, make another" work on a
  * full FREE workspace.
  *
- * @throws Error("SITE_LIMIT") — callers translate it; the routers already map
- *   this message to a user-facing upgrade prompt.
+ * @throws Error("SITE_LIMIT") — routers translate it with SITE_LIMIT_MESSAGE.
  */
 export async function assertSiteQuota(workspaceId: string, userId: string): Promise<void> {
   const membership = await prisma.workspaceMember.findFirst({

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
+import { SITE_LIMIT_MESSAGE } from "@/server/services/site-quota";
 import { listTemplates, getTemplate, useTemplate, cloneSiteAsTemplate, applyTemplateToSite, TemplateError } from "@/server/services/template.service";
 import { createGenerationJob, getJobStatus, cancelJob } from "@/server/services/ai-generation.service";
 import { listTemplatesSchema, generateSiteSchema, applyTemplateToSiteSchema } from "@buildrik/shared/schemas/templates";
@@ -57,7 +58,7 @@ export const templatesRouter = router({
         return await useTemplate(workspaceId, ctx.session.user.id, input.templateId, input.siteName);
       } catch (e: unknown) {
         if (e instanceof Error && e.message === "SITE_LIMIT")
-          throw new TRPCError({ code: "FORBIDDEN", message: "Site limit reached." });
+          throw new TRPCError({ code: "FORBIDDEN", message: SITE_LIMIT_MESSAGE });
         if (e instanceof Error && e.message === "TEMPLATE_NOT_FOUND")
           throw new TRPCError({ code: "NOT_FOUND", message: "Template not found." });
         throw e;

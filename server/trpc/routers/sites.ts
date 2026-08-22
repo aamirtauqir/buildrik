@@ -47,6 +47,7 @@ import {
 import { prePublishCheckSchema, publishInputSchema, publishHistoryInput, rollbackInput, PUBLISH_APPROVAL_MESSAGES } from "@buildrik/shared/schemas/publish";
 import { recordForSite } from "@/server/services/activity-log.service";
 import { resolveWorkspaceId as getWorkspaceId } from "@/server/trpc/workspace-ctx";
+import { SITE_LIMIT_MESSAGE } from "@/server/services/site-quota";
 
 export const sitesRouter = router({
   list: protectedProcedure
@@ -86,10 +87,7 @@ export const sitesRouter = router({
         return await createSite(workspaceId, ctx.session.user.id, input);
       } catch (e: unknown) {
         if (e instanceof Error && e.message === "SITE_LIMIT")
-          throw new TRPCError({
-            code: "FORBIDDEN",
-            message: "Site limit reached. Upgrade your plan.",
-          });
+          throw new TRPCError({ code: "FORBIDDEN", message: SITE_LIMIT_MESSAGE });
         if (e instanceof Error && e.message === "TEMPLATE_NOT_FOUND")
           throw new TRPCError({
             code: "NOT_FOUND",
@@ -125,10 +123,7 @@ export const sitesRouter = router({
         return await duplicateSite(input.id, workspaceId, ctx.session.user.id);
       } catch (e: unknown) {
         if (e instanceof Error && e.message === "SITE_LIMIT")
-          throw new TRPCError({
-            code: "FORBIDDEN",
-            message: "Site limit reached.",
-          });
+          throw new TRPCError({ code: "FORBIDDEN", message: SITE_LIMIT_MESSAGE });
         throw e;
       }
     }),
