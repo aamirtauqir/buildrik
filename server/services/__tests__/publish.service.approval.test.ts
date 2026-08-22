@@ -106,6 +106,52 @@ describe("startPublish · approval gate enforcement", () => {
     expect(approvalError).toBe(false);
   });
 
+  /* Revoking a review round is the product's only escape from a review nobody
+     can resolve — the submitter is refused a self-resolve by design, so on a
+     one-seat workspace a PENDING round is otherwise permanent. `revoke` sets
+     `revokedAt`, and the gate's "latest review" query did not filter on it, so
+     the revoked round kept answering for the site and publish stayed
+     APPROVAL_PENDING forever. The mock filters the way Prisma would, so the
+     assertion is about the query the gate actually issues. */
+  const revokedAwareFindFirst = (row: Record<string, unknown>) =>
+    (args: { where?: Record<string, unknown> }) =>
+      Promise.resolve(args?.where?.revokedAt === null && row.revokedAt ? null : row);
+
+  it("a revoked PENDING round stops answering for the site, so the publisher is told nobody has asked yet", async () => {
+    baseHappyMocks();
+    workspaceFindUnique.mockResolvedValue({ editsRequireApproval: true });
+    memberFindUnique.mockResolvedValue({ role: "ADMIN" });
+    reviewFindFirst.mockImplementation(
+      revokedAwareFindFirst({ status: "PENDING", resolvedAt: null, revokedAt: new Date() })
+    );
+
+    await expect(startPublish("site-1", "ws-1", "user-admin")).rejects.toThrow("APPROVAL_NONE");
+    expect(jobCreate).not.toHaveBeenCalled();
+  });
+
+  it("a revoked APPROVAL stops permitting the publish it approved", async () => {
+    baseHappyMocks();
+    workspaceFindUnique.mockResolvedValue({ editsRequireApproval: true });
+    memberFindUnique.mockResolvedValue({ role: "ADMIN" });
+    reviewFindFirst.mockImplementation(
+      revokedAwareFindFirst({ status: "APPROVED", resolvedAt: new Date(), revokedAt: new Date() })
+    );
+
+    await expect(startPublish("site-1", "ws-1", "user-admin")).rejects.toThrow("APPROVAL_NONE");
+    expect(jobCreate).not.toHaveBeenCalled();
+  });
+
+  it("an unrevoked PENDING round still blocks, so the filter did not disable the gate", async () => {
+    baseHappyMocks();
+    workspaceFindUnique.mockResolvedValue({ editsRequireApproval: true });
+    memberFindUnique.mockResolvedValue({ role: "ADMIN" });
+    reviewFindFirst.mockImplementation(
+      revokedAwareFindFirst({ status: "PENDING", resolvedAt: null, revokedAt: null })
+    );
+
+    await expect(startPublish("site-1", "ws-1", "user-admin")).rejects.toThrow("APPROVAL_PENDING");
+  });
+
   it("Owner + gate ON + no review → NOT blocked by approval (exempt)", async () => {
     baseHappyMocks();
     workspaceFindUnique.mockResolvedValue({ editsRequireApproval: true });

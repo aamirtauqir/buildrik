@@ -147,8 +147,11 @@ export interface ReviewPillStatus {
  * Returns `none` when the site has never been sent for review.
  */
 export async function getReviewStatusForSite(siteId: string): Promise<ReviewPillStatus> {
+  /* Same `revokedAt: null` rule as the publish gate: a revoked round is not the
+     site's current review, and showing it as one told the user they were
+     waiting on a reply that could never come. */
   const r = await prisma.reviewRequest.findFirst({
-    where: { siteId },
+    where: { siteId, revokedAt: null },
     orderBy: { createdAt: "desc" },
     select: {
       status: true,
@@ -248,7 +251,7 @@ export async function getApprovedSnapshot(
   siteId: string,
 ): Promise<{ path: string; html: string }[] | null> {
   const r = await prisma.reviewRequest.findFirst({
-    where: { siteId, status: "APPROVED" },
+    where: { siteId, status: "APPROVED", revokedAt: null },
     orderBy: { createdAt: "desc" },
     select: { snapshotPages: true },
   });

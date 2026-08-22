@@ -257,8 +257,15 @@ export async function startPublish(
       }),
     ]);
     if (workspace?.editsRequireApproval) {
+      /* `revokedAt: null` is load-bearing. Revoking a round is the only way out
+         of a review nobody can resolve — the submitter is refused a self-resolve
+         by design, so on a one-seat workspace a PENDING round is otherwise
+         permanent. Without this filter the revoked round kept answering for the
+         site and publish stayed APPROVAL_PENDING forever. It cuts the other way
+         too: a revoked APPROVAL (a leaked client link, say) must stop permitting
+         the publish it approved. */
       const latestReview = await prisma.reviewRequest.findFirst({
-        where: { siteId },
+        where: { siteId, revokedAt: null },
         orderBy: { createdAt: "desc" },
         select: { status: true, resolvedAt: true },
       });

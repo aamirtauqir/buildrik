@@ -92,9 +92,12 @@ describe("getApprovedSnapshot", () => {
     const pages = [{ path: "home", html: "<div>hi</div>" }];
     rrFindFirst.mockResolvedValue({ snapshotPages: pages });
     expect(await getApprovedSnapshot("s1")).toEqual(pages);
-    // scoped to APPROVED, newest first
+    /* Scoped to APPROVED, newest first — and NOT revoked. The `revokedAt: null`
+       clause is new: a revoked round is not the site's approval any more, so
+       handing back the pages it approved would keep a withdrawn sign-off alive.
+       Same filter the publish gate gained. */
     expect(rrFindFirst).toHaveBeenCalledWith({
-      where: { siteId: "s1", status: "APPROVED" },
+      where: { siteId: "s1", status: "APPROVED", revokedAt: null },
       orderBy: { createdAt: "desc" },
       select: { snapshotPages: true },
     });
