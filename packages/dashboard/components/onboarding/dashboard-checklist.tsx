@@ -66,13 +66,23 @@ type InvitedChecklistItemId = (typeof INVITED_CHECKLIST_ITEMS)[number]["id"];
 export type ChecklistItemId = FullChecklistItemId | InvitedChecklistItemId;
 
 interface DashboardChecklistProps {
-  variant?: "full" | "invited";
+  /**
+   * The viewer's role in the workspace, straight off `stats.memberRole` — the
+   * same value the dashboard picks its empty state from. This used to be a
+   * `variant` prop defaulting to "full" that no caller ever passed, so the
+   * invited list below was unreachable and every invited member was handed
+   * the owner checklist, "Publish your site" and all. Anything that is not a
+   * confirmed OWNER gets the invited list, including undefined while the
+   * query is still in flight — showing owner-only tasks to a non-owner is the
+   * failure worth avoiding, not a first paint with three items.
+   */
+  memberRole?: string | null;
   completedIds?: string[];
   onDismiss?: () => void;
 }
 
 export function DashboardChecklist({
-  variant = "full",
+  memberRole,
   completedIds = [],
   onDismiss,
 }: DashboardChecklistProps) {
@@ -83,7 +93,7 @@ export function DashboardChecklist({
   // the "Getting Started 0/7" bar, so the checklist stays discoverable.
   const [collapsed, setCollapsed] = useState(true);
 
-  const items = variant === "invited" ? INVITED_CHECKLIST_ITEMS : FULL_CHECKLIST_ITEMS;
+  const items = memberRole === "OWNER" ? FULL_CHECKLIST_ITEMS : INVITED_CHECKLIST_ITEMS;
   const completedSet = new Set(completedIds);
   const completedCount = items.filter((item) => completedSet.has(item.id)).length;
   const total = items.length;

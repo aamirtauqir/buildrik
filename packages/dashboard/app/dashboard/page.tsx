@@ -271,6 +271,7 @@ export default function DashboardPage() {
       )}
       {showChecklist && (
         <DashboardChecklist
+          memberRole={memberRole}
           completedIds={onboardingState.data?.dashboardTasks as string[] | undefined}
           onDismiss={() => dismissOnboarding.mutate()}
         />
