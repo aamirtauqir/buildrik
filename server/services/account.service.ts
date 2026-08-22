@@ -7,6 +7,7 @@ import { sendAccountDeletionEmail, sendEmailChangedEmail } from "@/server/servic
 import { createNotification } from "@/server/services/notification.trigger";
 import { generateToken } from "@/server/services/token.service";
 import { getDailyPromptUsage } from "@/server/services/quota.service";
+import { isSubscriptionLive } from "@/server/services/subscription-status";
 
 export async function changePassword(userId: string, currentPassword: string, newPassword: string) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
@@ -226,9 +227,13 @@ export async function getAccountDeletionEligibility(userId: string) {
   });
   // Sole owner of a workspace that has OTHER active members — deleting strands them.
   const isSoleOwner = owned.some((w) => w._count.members > 1);
-  const hasActiveSubscription = owned.some(
-    (w) => w.subscription != null && ["ACTIVE", "PAST_DUE"].includes(w.subscription.status),
-  );
+  /* Not an allow-list. Stripe has more live states than ACTIVE and PAST_DUE,
+     and the status column stores whatever the webhook was told — INCOMPLETE (a
+     first payment awaiting 3DS), UNPAID, TRIALING, PAUSED all reach it. Each
+     was invisible here, so a sole owner could delete their account out from
+     under a subscription that still existed, which is the exact thing this
+     guard was added to stop. */
+  const hasActiveSubscription = owned.some((w) => isSubscriptionLive(w.subscription?.status));
   return { isSoleOwner, hasActiveSubscription, blocked: isSoleOwner || hasActiveSubscription };
 }
 
