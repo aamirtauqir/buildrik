@@ -588,7 +588,7 @@
         }
       ],
       "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible.",
-      "_verified": "2026-08-22 — state confirmed in the captured frame by a marker only that state renders."
+      "_verified": "2026-08-23 — captured with three seeded assets; the footer reads '1 MB / 524 MB' and the cards render at 144x120."
     },
     {
       "id": "BL-0162",
@@ -611,7 +611,7 @@
         }
       ],
       "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible.",
-      "_capture_status": "Fixed at the fixture, not the recipe: three assets are seeded into the library by scripts/baseline/media-fixtures.sql. With zero assets grid and list render the same empty state and the pair is byte-identical, so the difference the frame exists to show cannot exist."
+      "_capture_status": "STILL NOT CAPTURABLE, and now for a known reason rather than a guess. Seeding the library was necessary and not sufficient. Inside the expanded library `[aria-label='List view']` resolves to exactly one element but a click on it fails: that control belongs to the DRAWER, which the expanded library covers. The full-page library's own view switch is a pair of text buttons in MediaLibraryPanel.tsx, and only 'Grid' is in the DOM — no 'List' — so either the switch renders one button in this state or the expanded view is a different component than the source suggests. Worth a look on its own: a missing List button would be a product bug, not a baseline one.\\n\\nAlso: grid and list differ only in LAYOUT. Two captures of them had identical text AND identical node counts (342) and box geometry, so a text-marker check can never tell them apart. This pair needs a geometry or screenshot comparison, whatever fixes the control."
     },
     {
       "id": "BL-0163",
@@ -930,7 +930,7 @@
         }
       ],
       "_note": "Door with no baseline frame on the board at all. The site menu has sixteen rows and only ten were ever captured; this is one of the six that were missed. Row label read off the running menu — the DOM text carries the chord appended (\"Site settings⌃,\"), so substring matching is required, not exact.",
-      "_capture_status": "Fixed in the harness rather than the recipe: this door navigates the same tab, which threw the injected capture script away (`captureForDesign missing, keys: []`). figma-capture-live.mjs now checks for the function after the actions and re-injects when it is gone. Reordering the whole run was the wrong fix — surfaces that close on blur still need the actions to run after the first injection."
+      "_capture_status": "Captured — the re-injection fix works and the submit returns 200 — but the frame shows the ordinary editor, so either the door did not reach client view in that run or client view looks like this. Held UNVERIFIED rather than named."
     },
     {
       "id": "BL-0234",
