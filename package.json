@@ -22,7 +22,8 @@
     "stripe:setup": "tsx --tsconfig packages/dashboard/tsconfig.json scripts/stripe-setup.ts",
     "dev:clean": "node scripts/dev-clean.mjs",
     "dev:reset": "node scripts/dev-clean.mjs && rm -rf packages/dashboard/.next packages/editor/dist packages/editor/node_modules/.vite",
-    "smoke:prod": "node scripts/smoke-deployed.mjs"
+    "smoke:prod": "node scripts/smoke-deployed.mjs",
+    "audit:links": "node scripts/audit/link-audit.mjs"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.0.0",
