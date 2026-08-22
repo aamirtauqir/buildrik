@@ -29,6 +29,10 @@ vi.mock("../../../../../services/ReviewService", () => ({
   resolveReviewComment: (...a: unknown[]) => resolveReviewComment(...a),
   revokeReview: (...a: unknown[]) => revokeReview(...a),
   fetchApprovedSnapshot: vi.fn(),
+  /* RoleService reads currentSiteId, and the panel now asks for the role
+     so a VIEWER gets the send control disabled with its reason — the
+     gating that did not travel with the control when it moved here. */
+  currentSiteId: () => "site_test",
 }));
 
 import { ReviewTab } from "../ReviewTab";

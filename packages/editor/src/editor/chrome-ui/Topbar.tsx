@@ -96,6 +96,13 @@ export interface ReviewPill {
 export interface TopbarProps {
   siteName: string;
   onExit?: () => void;
+  /**
+   * What the leftmost control says and does. In client view it leaves the MODE,
+   * not the product: "‹ Exit" there still went to the dashboard, so the most
+   * prominent control on a preview screen took you out of the site entirely,
+   * while getting back to editing was one row inside a ⋯ menu.
+   */
+  exitLabel?: string;
   save: SaveState;
   savedAt?: number;
   /** Save now — turns the save pill into a button for the states worth retrying. */
@@ -127,7 +134,7 @@ const PUBLISH_LABEL: Record<PublishState, string> = {
 };
 
 export function Topbar({
-  siteName, onExit, save, savedAt, onSave, review, tools, presence,
+  siteName, onExit, exitLabel = "‹ Exit", save, savedAt, onSave, review, tools, presence,
   unreadCount = 0, onOpenNotifications, publish = "ready", publishBusy, onPublish,
   publishBlockedReason, action, menu,
 }: TopbarProps) {
@@ -152,7 +159,7 @@ export function Topbar({
       }
     >
       <Button color="light" size="xs" onClick={onExit} className={EXIT_BTN_CLASS}>
-        ‹ Exit
+        {exitLabel}
       </Button>
 
       <span

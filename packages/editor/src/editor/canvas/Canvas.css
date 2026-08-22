@@ -176,9 +176,22 @@
   min-height: 0;
 }
 
-/* Selection state is editor vocabulary; "Nothing selected" means nothing to
-   someone who cannot select. */
-.bk-client-view [data-testid="footer-selection-label"] {
+/* Author-side chrome that AquibraStudio renders outside the shell, so it cannot
+   be gated by a prop from here — StudioFooter's selection readout, the review
+   worklist bar, and the owner's onboarding checklist. None of them mean anything
+   to someone who is only looking:
+     · "Nothing selected" / a bare "1440 × 320" — selection vocabulary
+     · the review bar's Compare and Re-send — the OWNER's next actions, and
+       Compare opens a panel that client view does not render
+     · "Get started — 0 of 7 complete" — the owner's onboarding, in a preview of
+       what a client sees
+   The selection LABEL was hidden in the first pass and the DIMS beside it were
+   missed, which left a number floating with nothing to name it. */
+.bk-client-view [data-testid="footer-selection-label"],
+.bk-client-view [data-testid="footer-selection-dims"],
+.bk-client-view [data-testid="review-bar"],
+.bk-client-view [aria-label="Getting started checklist"],
+.bk-client-view [aria-label^="Get started —"] {
   display: none;
 }
 

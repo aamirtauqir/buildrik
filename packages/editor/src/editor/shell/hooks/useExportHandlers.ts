@@ -35,10 +35,13 @@ import { captureAndUploadThumbnail } from "../captureThumbnail";
 const APPROVAL_GATE_TOASTS: Record<string, { title: string; description: string }> = {
   "no-review": {
     title: "Approval needed",
-    /* "from the top bar" — the Send-for-review control lives in client view
-       only (StudioHeader renders it under viewMode.clientView). */
+    /* This named client view until 2026-08-23, which was true when the control
+       rendered only there. Client view is a VIEW now and carries no owner
+       controls, so that sentence pointed at a shut door — on the exact path a
+       user hits when publish is blocked. The control lives in the Review panel;
+       `r` opens it whether or not a round exists. */
     description:
-      "This site hasn't been sent for review yet. Open client view from the Site menu and send it from there.",
+      "This site hasn't been sent for review yet. Open the Review panel (press R) and send it from there.",
   },
   "review-pending": {
     title: "Waiting on review",

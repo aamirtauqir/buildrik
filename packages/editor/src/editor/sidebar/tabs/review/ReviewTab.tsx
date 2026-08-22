@@ -45,6 +45,7 @@ import {
   Toolbar,
 } from "@/editor/chrome-ui";
 import { SendForReview } from "@/editor/shell/SendForReview";
+import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
 import { ApprovedCompareView } from "@/editor/panels/version-history/ApprovedCompareView";
 import type { PublishPage } from "@/editor/shell/exportPublishPages";
 import {
@@ -136,6 +137,8 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
 }) => {
   const [state, setState] = React.useState<LoadState>("loading");
   const [round, setRound] = React.useState<CurrentRound | null>(null);
+  /* The viewer gating did not move with the control — see the props below. */
+  const isViewer = useEditorRole() === "VIEWER";
   const [comments, setComments] = React.useState<ReviewComment[]>([]);
   const [resolvedOpen, setResolvedOpen] = React.useState(false);
   const [draft, setDraft] = React.useState("");
@@ -419,7 +422,21 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
           body="Send this site to a client and they get a link to comment on it."
         />
         <div className="tw:px-[16px] tw:pb-[16px]">
-          <SendForReview composer={composer ?? null} reviewStatus={null} />
+          {/* Three things this line lost when the control moved off the topbar,
+              all of them in the props the topbar used to pass:
+              · disabledReason — a VIEWER got a live button and a silent failure
+              · onSent — the topbar's review pill never refreshed after a send,
+                and this panel kept saying "No review yet" under a button that
+                said it had been sent
+              · reviewStatus={null} — SendForReview unlocks "Sent ✓" into "Send
+                again" only when the round's `at` moves, so a literal null
+                wedged the button forever. */}
+          <SendForReview
+            composer={composer ?? null}
+            disabledReason={isViewer ? "Viewers can't send for review — ask an editor" : undefined}
+            reviewStatus={round ?? null}
+            onSent={() => void load()}
+          />
         </div>
       </div>
     );

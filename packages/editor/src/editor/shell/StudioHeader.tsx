@@ -43,7 +43,6 @@ import type { SyncStatus, Issue } from "./hooks/useStudioState";
 import { useEditorRole } from "./hooks/useEditorRole";
 import { CommandPalette } from "./modals/CommandPalette";
 import { NotificationPanel, useUnreadCount } from "./NotificationPanel";
-import { SendForReview } from "./SendForReview";
 import { SiteMenu } from "./SiteMenu";
 import "./header.css";
 
@@ -606,7 +605,11 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
       </div>
       <Topbar
         siteName={siteName}
-        onExit={exitToDashboard}
+        /* In client view the leftmost control leaves the MODE. It used to
+           leave the product — the loudest button on a preview took you to the
+           dashboard, while returning to the editor was buried in ⋯. */
+        onExit={viewMode.clientView ? toggleClientView : exitToDashboard}
+        exitLabel={viewMode.clientView ? "‹ Back to editing" : "‹ Exit"}
         save={save}
         savedAt={lastSavedAt ?? lastSaved?.getTime()}
         /* SaveStatus renders as a BUTTON that fires onSave when the state is
