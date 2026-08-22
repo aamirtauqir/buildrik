@@ -60,6 +60,14 @@ export const workspaceHealthSchema = z.object({
   storage: z.object({ usedMB: z.number(), limitMB: z.number() }),
   aiCredits: z.object({ used: z.number(), limit: z.number() }),
   bandwidth: z.object({ usedMB: z.number(), limitMB: z.number() }),
+  /**
+   * The caller's own role in this workspace. Carried on health because every
+   * surface that reports a limit also has to decide whether to offer the way
+   * past it — checkout is owner-only (`requireOwner` on
+   * `billing.createCheckoutSession`), so showing an editor an Upgrade button
+   * walks them into a FORBIDDEN.
+   */
+  role: z.string().nullable(),
 });
 
 export type DashboardStats = z.infer<typeof dashboardStatsSchema>;

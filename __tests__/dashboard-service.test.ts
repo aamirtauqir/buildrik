@@ -153,5 +153,35 @@ describe("Dashboard Service", () => {
       expect(health.aiCredits.used).toBe(1);
       expect(health.storage.usedMB).toBe(5); // real storage from media bytes
     });
+
+    it("does not meter storage held by deleted sites", async () => {
+      vi.mocked(prisma.site.count).mockResolvedValue(1);
+      vi.mocked(prisma.site.findMany).mockResolvedValue([{ id: "s1" }] as any);
+      vi.mocked(prisma.mediaAsset.aggregate).mockResolvedValue({ _sum: { bytes: 0 } } as any);
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({
+        workspace: { plan: "FREE" },
+      } as any);
+      vi.mocked(prisma.aIGenerationJob.count).mockResolvedValue(0);
+      await getWorkspaceHealth("ws_123", "u1");
+      // The site COUNT beside it has always been scoped this way; the id list
+      // feeding the storage sum was not, so a deleted site kept charging for
+      // its media forever.
+      expect(prisma.site.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { workspaceId: "ws_123", deletedAt: null } }),
+      );
+    });
+
+    it("reports the caller's role, so the UI can tell who may upgrade", async () => {
+      vi.mocked(prisma.site.count).mockResolvedValue(1);
+      vi.mocked(prisma.site.findMany).mockResolvedValue([] as any);
+      vi.mocked(prisma.mediaAsset.aggregate).mockResolvedValue({ _sum: { bytes: 0 } } as any);
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({
+        role: "EDITOR",
+        workspace: { plan: "FREE" },
+      } as any);
+      vi.mocked(prisma.aIGenerationJob.count).mockResolvedValue(0);
+      const health = await getWorkspaceHealth("ws_123", "u1");
+      expect(health.role).toBe("EDITOR");
+    });
   });
 });

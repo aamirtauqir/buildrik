@@ -37,6 +37,7 @@ export function CreateSiteModal({ open, onClose, onSubmit }: CreateSiteModalProp
   const sitesUsed = health.data?.sites?.used ?? 0;
   const sitesLimit = health.data?.sites?.limit ?? 0;
   const atSiteLimit = health.data !== undefined && sitesLimit > 0 && sitesUsed >= sitesLimit;
+  const isOwner = health.data?.role === "OWNER";
 
   return (
     <Modal
@@ -73,17 +74,29 @@ export function CreateSiteModal({ open, onClose, onSubmit }: CreateSiteModalProp
           <p className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>
             Site limit reached ({sitesUsed}/{sitesLimit})
           </p>
-          <p className="mt-1 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
-            Upgrade your plan to create more sites.
-          </p>
-          <Link
-            href="/dashboard/settings/billing"
-            onClick={onClose}
-            className="mt-4 inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-body font-semibold text-white"
-            style={{ backgroundColor: "var(--color-primary)" }}
-          >
-            Upgrade Plan <ArrowUpRight className="h-3.5 w-3.5" />
-          </Link>
+          {/* Checkout is owner-only (`requireOwner` on
+              billing.createCheckoutSession), so an editor who followed this
+              button reached billing and was refused there. Tell them who can
+              do it instead. */}
+          {isOwner ? (
+            <>
+              <p className="mt-1 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
+                Upgrade your plan to create more sites.
+              </p>
+              <Link
+                href="/dashboard/settings/billing"
+                onClick={onClose}
+                className="mt-4 inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-body font-semibold text-white"
+                style={{ backgroundColor: "var(--color-primary)" }}
+              >
+                Upgrade Plan <ArrowUpRight className="h-3.5 w-3.5" />
+              </Link>
+            </>
+          ) : (
+            <p className="mt-1 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
+              Ask a workspace owner to upgrade the plan, or delete a site to free a slot.
+            </p>
+          )}
         </div>
       ) : (
         <div className="mt-6 space-y-3">

@@ -351,7 +351,13 @@ export async function getWorkspaceHealth(
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
   // MediaAsset.siteId is a bare string — sum storage by siteId ∈ workspace sites.
-  const siteIds = (await prisma.site.findMany({ where: { workspaceId }, select: { id: true } })).map((s) => s.id);
+  // `deletedAt: null` for the same reason the site COUNT below has always had
+  // it: a soft-deleted site does not hold a slot, and it must not go on
+  // charging for the media it held either. Usage and billing were corrected
+  // the same way; this was the sibling they left behind.
+  const siteIds = (
+    await prisma.site.findMany({ where: { workspaceId, deletedAt: null }, select: { id: true } })
+  ).map((s) => s.id);
 
   const [siteCount, membership, aiJobCount, storageAgg] = await Promise.all([
     prisma.site.count({ where: { workspaceId, deletedAt: null } }),
@@ -370,6 +376,7 @@ export async function getWorkspaceHealth(
 
   return {
     plan,
+    role: membership?.role ?? null,
     sites: {
       used: siteCount,
       limit: limits.sites as number,
