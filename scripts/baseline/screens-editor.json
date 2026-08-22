@@ -813,15 +813,41 @@
     },
     {
       "id": "BL-0173",
-      "state": "brand-styles-tab",
-      "actions": null,
-      "_blocked": "No control on the Brand panel is called Styles. The rows are Tokens / Presets / Starters / Classes / Components / Typography / Colour mode / Lint / Import-export, so the board name maps to one of Classes or Typography and picking either would be a guess. Needs a look at the 08-19 frame to see which one it drew."
+      "state": "brand-presets",
+      "actions": [
+        {
+          "click": ".ls-rail [data-tab=design]"
+        },
+        {
+          "waitMs": 2500
+        },
+        {
+          "click": "text=Presets"
+        },
+        {
+          "waitMs": 2000
+        }
+      ],
+      "_note": "The board calls this frame 'brand-styles-tab' and no control on the Brand panel is called Styles. Reading the 08-19 frame settled it: it draws '‹ Presets' with Button / Card / Form input / Link / Badge / Alert / Tooltip / Modal / Nav / Table — the Presets drill-in. The board name is wrong, the frame is not; BL-0174 is the Components row beside it, which is consistent."
     },
     {
       "id": "BL-0168",
       "state": "layers-context-menu",
-      "actions": null,
-      "_blocked": "Reached by right-clicking a row in the Layers panel; the rows are element names from the page, so the recipe has to name one and this fixture's tree was not walked for it."
+      "actions": [
+        {
+          "click": ".ls-rail [data-tab=layers]"
+        },
+        {
+          "waitMs": 2500
+        },
+        {
+          "rightClick": "[role=treeitem].bdc-lr >> nth=0"
+        },
+        {
+          "waitMs": 1500
+        }
+      ],
+      "_note": "Layer rows are div[role=treeitem].bdc-lr — read off the running panel. Targeting the FIRST row rather than a name, because the names are the page's own element labels and change with the fixture; nth=0 is the root Container on any tree."
     }
   ],
   "_verified": "2026-08-21: every entry below was replayed against localhost:3000 and the resulting state read back on screen before any capture ran. Three corrections came out of that: the Publish button opens the confirm dialog directly (there is no separate publish-open state), comment mode's only cue is the pressed toggle plus a crosshair capture layer, and the ⌘K palette cannot be captured at all — it closes when the capture script takes focus. | 2026-08-22: added BL-0213..BL-0217, the six-toggle canvas overlay states and the '?' cheat sheet — states the baseline had no board for at all, found by walking CanvasFooterToolbar. `button:text-is(\"Grid\")` is unambiguous: the Insert drawer's own Grid row is a DIV, not a button. Two things these recipes cannot promise: a CSS-painted overlay (grid lines, badges) does not survive html-to-design, and the click leaves the pointer on the toggle so its hover tooltip lands in the frame.",
