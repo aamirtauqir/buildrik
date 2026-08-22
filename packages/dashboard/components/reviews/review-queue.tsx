@@ -1,6 +1,6 @@
 "use client";
 
-import { ClipboardCheck, Check, RotateCcw } from "lucide-react";
+import { ClipboardCheck, Check, RotateCcw, Undo2 } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { SectionCard, Pill, type PillTone } from "@/components/dashboard/primitives";
@@ -35,6 +35,23 @@ export function ReviewQueue() {
     { status: "PENDING" },
     { retry: false, getNextPageParam: (last) => last.nextCursor ?? undefined },
   );
+
+  /* A submitter cannot resolve their own review (review.service.ts:348 — the
+     gate is a second pair of eyes). Rendering Approve / Request changes on
+     those rows anyway gave a one-seat workspace two buttons that both throw and
+     no way out, while `editsRequireApproval` kept publish blocked. Withdraw is
+     the way out, and it is the same race-safe revoke the editor's Review panel
+     uses. */
+  const revokeMut = trpc.reviews.revoke.useMutation({
+    onSuccess: (res) => {
+      if (res.revoked) addToast("success", "Review request withdrawn");
+      else if (res.reason === "token-changed") addToast("info", "That request changed — refreshing");
+      else if (res.reason === "already-revoked") addToast("info", "Already withdrawn");
+      else addToast("error", "Couldn't withdraw that request");
+      void reviewsQuery.refetch();
+    },
+    onError: () => addToast("error", "Couldn't withdraw that request"),
+  });
 
   const resolveMut = trpc.reviews.resolve.useMutation({
     onSuccess: (_d, vars) => {
@@ -104,6 +121,25 @@ export function ReviewQueue() {
                 <div className="flex shrink-0 flex-col items-end gap-2">
                   <Pill tone={meta.tone}>{meta.label}</Pill>
                   <div className="flex gap-2">
+                    {r.isOwnSubmission ? (
+                      <button
+                        onClick={() =>
+                          revokeMut.mutate({
+                            siteId: r.siteId,
+                            reviewId: r.id,
+                            expectedRevision: r.revision,
+                          })
+                        }
+                        disabled={revokeMut.isPending}
+                        title="You submitted this one, so someone else has to sign it off. Withdraw it to unblock publishing or send it again."
+                        className="flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-body-sm font-medium disabled:opacity-50"
+                        style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
+                      >
+                        <Undo2 className="h-3.5 w-3.5" />
+                        Withdraw
+                      </button>
+                    ) : (
+                    <>
                     <button
                       onClick={() => resolveMut.mutate({ id: r.id, status: "CHANGES_REQUESTED" })}
                       disabled={resolveMut.isPending}
@@ -122,6 +158,8 @@ export function ReviewQueue() {
                       <Check className="h-3.5 w-3.5" />
                       Approve
                     </button>
+                    </>
+                    )}
                   </div>
                 </div>
               </div>

@@ -91,7 +91,21 @@ export const reviewsRouter = router({
       if (!(await isFeatureEnabled(workspaceId, "agency_layer")))
         return { items: [], nextCursor: null };
       await requireAdmin(ctx, workspaceId);
-      return listReviews(workspaceId, input?.status, { limit: input?.limit, cursor: input?.cursor });
+      const page = await listReviews(workspaceId, input?.status, {
+        limit: input?.limit,
+        cursor: input?.cursor,
+      });
+      /* `resolveReview` refuses a self-resolve — the gate exists for a second
+         pair of eyes. The queue rendered Approve and Request-changes on every
+         row anyway, so on your own submission both throw and there is no third
+         option; on a one-seat workspace that is the whole exit, and publish
+         stays blocked meanwhile. Tell the client which rows are its own so it
+         can offer Withdraw instead. */
+      const me = ctx.session.user.id;
+      return {
+        ...page,
+        items: page.items.map((r) => ({ ...r, isOwnSubmission: r.requestedById === me })),
+      };
     }),
 
   // The editor's review-status pill (S5.2) for the current site. Flag off →

@@ -127,6 +127,9 @@ export interface ReviewRow {
   resolvedById: string | null;
   resolvedAt: Date | null;
   createdAt: Date;
+  /** `updatedAt` as ISO — the revision `revokeReviewRound` compares against, so
+      a withdraw from the queue loses a race rather than clobbering a re-send. */
+  revision: string;
 }
 
 export interface ReviewPillStatus {
@@ -319,13 +322,18 @@ export async function listReviews(
       resolvedById: true,
       resolvedAt: true,
       createdAt: true,
+      updatedAt: true,
       site: { select: { name: true } },
     },
   });
   const hasMore = rows.length > take;
   const slice = hasMore ? rows.slice(0, take) : rows;
   return {
-    items: slice.map(({ site, ...r }) => ({ ...r, siteName: site.name })),
+    items: slice.map(({ site, updatedAt, ...r }) => ({
+      ...r,
+      siteName: site.name,
+      revision: updatedAt.toISOString(),
+    })),
     nextCursor: hasMore ? slice[slice.length - 1].id : null,
   };
 }

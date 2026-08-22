@@ -151,10 +151,12 @@ describe("submitReview", () => {
 describe("listReviews", () => {
   it("flattens site.name into siteName, scoped to the workspace, single bounded page", async () => {
     findMany.mockResolvedValueOnce([
-      { id: "r1", siteId: "s1", requestedById: "u1", status: "PENDING", note: null, changeSummary: null, resolvedById: null, resolvedAt: null, createdAt: new Date(0), site: { name: "Acme" } },
+      { id: "r1", siteId: "s1", requestedById: "u1", status: "PENDING", note: null, changeSummary: null, resolvedById: null, resolvedAt: null, createdAt: new Date(0), updatedAt: new Date(0), site: { name: "Acme" } },
     ]);
     const out = await listReviews("ws-1", "PENDING");
-    expect(out.items[0]).toMatchObject({ id: "r1", siteName: "Acme" });
+    /* `revision` is the row's updatedAt as ISO — the queue passes it back to
+       `revoke` so a withdraw loses a race instead of clobbering a re-send. */
+    expect(out.items[0]).toMatchObject({ id: "r1", siteName: "Acme", revision: new Date(0).toISOString() });
     // fewer rows than the page size → last page, no cursor
     expect(out.nextCursor).toBeNull();
     expect(findMany.mock.calls[0][0].where).toEqual({ site: { workspaceId: "ws-1" }, status: "PENDING" });
@@ -164,7 +166,7 @@ describe("listReviews", () => {
     // limit 2 → the service fetches take+1 (3); the 3rd row signals "more".
     const rows = [1, 2, 3].map((n) => ({
       id: `r${n}`, siteId: "s1", requestedById: "u1", status: "PENDING", note: null,
-      changeSummary: null, resolvedById: null, resolvedAt: null, createdAt: new Date(0), site: { name: "Acme" },
+      changeSummary: null, resolvedById: null, resolvedAt: null, createdAt: new Date(0), updatedAt: new Date(0), site: { name: "Acme" },
     }));
     findMany.mockResolvedValueOnce(rows);
     const out = await listReviews("ws-1", "PENDING", { limit: 2 });
