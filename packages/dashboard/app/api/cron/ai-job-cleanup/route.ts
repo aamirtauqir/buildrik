@@ -1,5 +1,6 @@
 import { type NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { checkCronAuth } from "@/lib/cron-auth";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -9,10 +10,8 @@ export const maxDuration = 60;
 // rows the same way. The worker writes site+pages atomically at the end, so
 // failing a stale job never leaves a partial site behind.
 export async function GET(req: NextRequest) {
-  const authHeader = req.headers.get("authorization");
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return new Response("Unauthorized", { status: 401 });
-  }
+  const denied = checkCronAuth(req);
+  if (denied) return denied;
 
   const cutoff = new Date(Date.now() - 60 * 60 * 1000); // 1 hour ago
 

@@ -1,6 +1,7 @@
 import { type NextRequest } from "next/server";
 import { prisma } from "@lib/prisma";
 import { sendDunningReminderEmail } from "@server/services/email.service";
+import { checkCronAuth } from "@/lib/cron-auth";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -9,10 +10,8 @@ const GRACE_DAYS = 7;
 const WARN_AT_DAYS = [GRACE_DAYS, 3, 1];
 
 export async function GET(req: NextRequest) {
-  const authHeader = req.headers.get("authorization");
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return new Response("Unauthorized", { status: 401 });
-  }
+  const denied = checkCronAuth(req);
+  if (denied) return denied;
 
   const now = new Date();
 

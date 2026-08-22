@@ -1,3 +1,5 @@
+import { randomInt } from "node:crypto";
+
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 import type { UpdateProfileInput, NotificationPrefInput, UpdatePreferencesInput } from "@buildrik/shared/schemas/account";
@@ -333,9 +335,14 @@ export async function enable2FA(userId: string) {
   const secret = authenticator.generateSecret();
   const otpauth = authenticator.keyuri(user.email, "Buildrick", secret);
 
+  /* CSPRNG, not Math.random. A backup code bypasses TOTP outright, and all ten
+     used to come off one xorshift128+ stream in one call — recoverable state,
+     and 120 draws is more than enough of it. `randomInt` is rejection-sampled,
+     so there is no modulo bias across the 36-char alphabet either. Same lesson
+     as auth.service.ts:71, which learned it first. */
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   const randomChars = (n: number) =>
-    Array.from({ length: n }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+    Array.from({ length: n }, () => chars[randomInt(chars.length)]).join("");
   const codes = Array.from({ length: 10 }, () => `${randomChars(4)}-${randomChars(4)}-${randomChars(4)}`);
 
   const { encryptSecret, hashBackupCodes } = await import("@/server/services/auth.service");

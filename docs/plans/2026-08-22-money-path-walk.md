@@ -14,15 +14,25 @@ One user, one unbroken sequence. Every link is a real action in the running
 product, not a code reading:
 
 ```
-  1 sign up            →  workspace + onboarding state exist
-  2 onboard            →  project set up, first site created (AI / template / blank)
-  3 build              →  edit a page in the editor, changes persist
-  4 send for review    →  /review/<token> opens for someone who is not the owner
-  5 client approves    →  approval recorded, publish gate honours it
-  6 publish            →  real deploy, live URL serves the built site
-  7 hit a limit        →  upgrade offered
-  8 pay                →  Stripe Checkout → verified webhook → plan ACTIVE
+  1 sign up            →  unverified user + workspace + onboarding state exist
+  2 verify email       →  token consumed, account usable
+  3 log in             →  /auth/redirect routes on (may stop at workspace-select)
+  4 onboard            →  wizard → first site created → EDITOR OPENS → checklist
+  5 build              →  edit a page in the editor, changes persist
+  6 send for review    →  /review/<token> opens for someone who is not the owner
+  7 client approves    →  resolved through clientReview.resolve, publish gate honours it
+  8 publish            →  editor-originated deploy, live URL serves the built site
+  9 hit the site limit →  upgrade offered
+ 10 pay                →  Stripe Checkout → verified webhook → plan ACTIVE
 ```
+
+Links 2, 3 and the editor-open half of 4 were missing from the first draft of
+this chain; the eng review found them in code. `signup` only creates an
+UNVERIFIED user and emails a token (`auth.service.ts:152`), and onboarding does
+not end at site creation — the wizard flips to the checklist when the user
+reaches the editor (`use-onboarding-flow.ts:18`, `onboarding.service.ts:76`).
+Link 9 is the site limit specifically (`sites.ts:73`, `dashboard.ts:96`); that is
+the only concrete quota on the spine that offers an upgrade.
 
 **The rule: walk link N, and fix whatever stops link N, before walking N+1.**
 No link is "verified" on a code reading. Verified means the action was taken in
@@ -53,13 +63,23 @@ its §15 event as it is walked, so the funnel exists by the time the walk ends.
 
 | # | Link | Fix known now | Event fired |
 |---|---|---|---|
-| 1 | sign up | CSPRNG backup codes | `signup_completed` |
-| 2 | onboard + first site | — | `onboarding_completed`, `first_site_created` |
-| 3 | build | contact-form registration | — |
-| 4-5 | review + approve | walk it; fix what breaks | — |
-| 6 | publish | walk it for real (§5) | `first_publish` |
-| 7 | limit | — | `near_limit`, `limit_blocked` |
-| 8 | pay | provision live Stripe, then one real test-card checkout | — |
+| 1-3 | sign up, verify, log in | CSPRNG backup codes | `signup_completed` |
+| 4 | onboard → editor opens | — | `onboarding_completed`, `first_site_created` |
+| 5 | build | contact-form registration (done, `07dbe5f3`) | — |
+| 6-7 | review + approve | walk it; fix what breaks | — |
+| 8 | publish | walk it for real (§5) | `first_publish` |
+| 9 | site limit | — | `near_limit`, `limit_blocked` |
+| 10 | pay | prove test-mode checkout → webhook → ACTIVE first | — |
+
+**Product events only, never visitor tracking.** Publish already injects a
+first-party beacon into every deployed page, and the public `track` endpoint is
+`Access-Control-Allow-Origin: *`, stores path / referrer / sessionId /
+user-agent / country / viewport, and rate-limits on visitor IP — with no consent
+gate, opt-out, or DPA path anywhere in it (`publish-html.ts:22`,
+`track route.ts:12,44`, `analytics.service.ts:59`). That is a live compliance
+exposure this arc did not create and must not extend. The six events below are
+authenticated product actions on the owner's own session; nothing here touches
+published-site traffic, and the beacon question goes to the founder separately.
 
 Six events is exactly §15 Sprint 1's list. Doing them inline costs a few minutes
 per link and closes an approved commitment that has been open since 2026-07-06.
@@ -92,6 +112,22 @@ So: publish **one throwaway site** from a scratch workspace to its own
 purpose, and delete it after. Nothing publishes to a customer domain. Nothing
 runs with `PUBLISH_ALLOW_SIMULATION` set — that flag permits the fallback, it
 does not force it, which is how a "simulation" publish went live before.
+
+Four more conditions, all from the eng review, all in code:
+
+- **Publish from the editor, not the dashboard.** The dashboard route calls
+  `sites.publish` with only `siteId`, so no page payload is persisted and the
+  worker hard-fails with "Open the site in the editor and publish from there"
+  (`publish/page.tsx:42`, `publish-worker route.ts:89`). Publishing there would
+  produce a false failure and prove nothing.
+- **Scratch workspace with no outbound integrations.** A real publish also fires
+  workspace webhooks and owner notifications, records activity, and upserts or
+  deactivates `formBlock` rows (`publish-worker route.ts:146,309`).
+- **`allowIndexing=false`.** Publish emits `robots.txt` and `sitemap.xml`
+  (`publish-files.ts:52`), so the throwaway URL is crawlable by default.
+- **Password protection is not a safety rail.** Vercel 402/403/404 responses are
+  swallowed as warnings (`publish.service.ts:595`), so a "protected" site can
+  deploy unprotected and the job still reads as fine.
 
 Link 8 needs the founder to create live-mode Products in the Stripe dashboard;
 that is not a code task. Test-mode Price ids already exist in `.env.local`, so
