@@ -557,6 +557,271 @@
         }
       ],
       "_note": "'Browse stock' is SlimLauncher's own label (SlimLauncher.tsx:292) — the button moved to the footer when search took the lead, so an older recipe aimed at a '+ Stock' chip would miss."
+    },
+    {
+      "id": "BL-0160",
+      "state": "media-icon-picker",
+      "actions": [
+        {
+          "click": ".ls-rail [data-tab=assets]"
+        },
+        {
+          "waitMs": 2000
+        },
+        {
+          "click": "text=Icons and SVG"
+        },
+        {
+          "waitMs": 2500
+        }
+      ],
+      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible."
+    },
+    {
+      "id": "BL-0161",
+      "state": "media-fullpage-library",
+      "actions": [
+        {
+          "click": ".ls-rail [data-tab=assets]"
+        },
+        {
+          "waitMs": 2000
+        },
+        {
+          "click": "[aria-label='Expand Media']"
+        },
+        {
+          "waitMs": 3000
+        }
+      ],
+      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible."
+    },
+    {
+      "id": "BL-0162",
+      "state": "media-list-view",
+      "actions": [
+        {
+          "click": ".ls-rail [data-tab=assets]"
+        },
+        {
+          "waitMs": 2000
+        },
+        {
+          "click": "[aria-label='Expand Media']"
+        },
+        {
+          "waitMs": 3000
+        },
+        {
+          "click": "[aria-label='List view']"
+        },
+        {
+          "waitMs": 1500
+        }
+      ],
+      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible."
+    },
+    {
+      "id": "BL-0163",
+      "state": "pages-context-menu",
+      "actions": [
+        {
+          "click": ".ls-rail [data-tab=pages]"
+        },
+        {
+          "waitMs": 2000
+        },
+        {
+          "click": "[aria-label='More options for Home']"
+        },
+        {
+          "waitMs": 1500
+        }
+      ],
+      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible."
+    },
+    {
+      "id": "BL-0164",
+      "state": "pages-add-page",
+      "actions": [
+        {
+          "click": ".ls-rail [data-tab=pages]"
+        },
+        {
+          "waitMs": 2000
+        },
+        {
+          "click": "[aria-label='Add new page']"
+        },
+        {
+          "waitMs": 2000
+        }
+      ],
+      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible."
+    },
+    {
+      "id": "BL-0165",
+      "state": "pages-listings-view",
+      "actions": [
+        {
+          "click": ".ls-rail [data-tab=pages]"
+        },
+        {
+          "waitMs": 2000
+        },
+        {
+          "click": "text=Listings"
+        },
+        {
+          "waitMs": 2000
+        }
+      ],
+      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible."
+    },
+    {
+      "id": "BL-0166",
+      "state": "pages-more-add-options",
+      "actions": [
+        {
+          "click": ".ls-rail [data-tab=pages]"
+        },
+        {
+          "waitMs": 2000
+        },
+        {
+          "click": "[aria-label='More add options']"
+        },
+        {
+          "waitMs": 1500
+        }
+      ],
+      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible."
+    },
+    {
+      "id": "BL-0167",
+      "state": "pages-fullpage",
+      "actions": [
+        {
+          "click": ".ls-rail [data-tab=pages]"
+        },
+        {
+          "waitMs": 2000
+        },
+        {
+          "click": "[aria-label='Expand Pages']"
+        },
+        {
+          "waitMs": 3000
+        }
+      ],
+      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible."
+    },
+    {
+      "id": "BL-0169",
+      "state": "brand-pro-mode",
+      "actions": [
+        {
+          "click": ".ls-rail [data-tab=design]"
+        },
+        {
+          "waitMs": 2500
+        },
+        {
+          "click": "text=Pro"
+        },
+        {
+          "waitMs": 2000
+        }
+      ],
+      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible. Brand rows carry a count suffix in the DOM (\"Starters6›\"), so these match on substring, not exact text."
+    },
+    {
+      "id": "BL-0170",
+      "state": "brand-dark-preview",
+      "actions": [
+        {
+          "click": ".ls-rail [data-tab=design]"
+        },
+        {
+          "waitMs": 2500
+        },
+        {
+          "click": "text=Colour mode"
+        },
+        {
+          "waitMs": 2000
+        }
+      ],
+      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible. Brand rows carry a count suffix in the DOM (\"Starters6›\"), so these match on substring, not exact text."
+    },
+    {
+      "id": "BL-0171",
+      "state": "brand-starter-themes",
+      "actions": [
+        {
+          "click": ".ls-rail [data-tab=design]"
+        },
+        {
+          "waitMs": 2500
+        },
+        {
+          "click": "text=Starters"
+        },
+        {
+          "waitMs": 2000
+        }
+      ],
+      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible. Brand rows carry a count suffix in the DOM (\"Starters6›\"), so these match on substring, not exact text."
+    },
+    {
+      "id": "BL-0174",
+      "state": "brand-components-tab",
+      "actions": [
+        {
+          "click": ".ls-rail [data-tab=design]"
+        },
+        {
+          "waitMs": 2500
+        },
+        {
+          "click": "text=Components"
+        },
+        {
+          "waitMs": 2000
+        }
+      ],
+      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible. Brand rows carry a count suffix in the DOM (\"Starters6›\"), so these match on substring, not exact text."
+    },
+    {
+      "id": "BL-0175",
+      "state": "content-create-collection",
+      "actions": [
+        {
+          "click": ".ls-rail [data-tab=content]"
+        },
+        {
+          "waitMs": 2000
+        },
+        {
+          "click": "text=Create a collection"
+        },
+        {
+          "waitMs": 2000
+        }
+      ],
+      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible."
+    },
+    {
+      "id": "BL-0173",
+      "state": "brand-styles-tab",
+      "actions": null,
+      "_blocked": "No control on the Brand panel is called Styles. The rows are Tokens / Presets / Starters / Classes / Components / Typography / Colour mode / Lint / Import-export, so the board name maps to one of Classes or Typography and picking either would be a guess. Needs a look at the 08-19 frame to see which one it drew."
+    },
+    {
+      "id": "BL-0168",
+      "state": "layers-context-menu",
+      "actions": null,
+      "_blocked": "Reached by right-clicking a row in the Layers panel; the rows are element names from the page, so the recipe has to name one and this fixture's tree was not walked for it."
     }
   ],
   "_verified": "2026-08-21: every entry below was replayed against localhost:3000 and the resulting state read back on screen before any capture ran. Three corrections came out of that: the Publish button opens the confirm dialog directly (there is no separate publish-open state), comment mode's only cue is the pressed toggle plus a crosshair capture layer, and the ⌘K palette cannot be captured at all — it closes when the capture script takes focus. | 2026-08-22: added BL-0213..BL-0217, the six-toggle canvas overlay states and the '?' cheat sheet — states the baseline had no board for at all, found by walking CanvasFooterToolbar. `button:text-is(\"Grid\")` is unambiguous: the Insert drawer's own Grid row is a DIV, not a button. Two things these recipes cannot promise: a CSS-painted overlay (grid lines, badges) does not survive html-to-design, and the click leaves the pointer on the toggle so its hover tooltip lands in the frame.",
