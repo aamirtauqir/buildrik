@@ -2,7 +2,7 @@
  * A published form used to post nowhere — see publish-forms.ts.
  */
 import { describe, it, expect } from "vitest";
-import { wireForms } from "../publish-forms";
+import { planFormWiring, wireForms } from "../publish-forms";
 
 const opts = { siteId: "site-1", appOrigin: "https://app.buildrick.io", path: "contact.html" };
 
@@ -57,5 +57,45 @@ describe("wireForms", () => {
   it("does not touch a page with no forms", () => {
     const page = "<html><body><p>no forms here</p></body></html>";
     expect(wireForms(page, opts)).toEqual({ html: page, forms: [] });
+  });
+});
+
+describe("planFormWiring", () => {
+  const pages = [{ path: "contact.html", html: FORM }];
+
+  it("wires every page and lets the sweep run when the origin is known", () => {
+    const plan = planFormWiring(pages, { siteId: "site-1", appOrigin: "https://app.buildrick.io" });
+    expect(plan.error).toBeNull();
+    expect(plan.deactivateMissing).toBe(true);
+    expect(plan.forms.map((f) => f.blockId)).toEqual(["f1"]);
+    expect(plan.pages[0]?.html).toContain('action="https://app.buildrick.io/api/public/forms/site-1/f1"');
+  });
+
+  it("refuses the deploy rather than shipping a form that posts nowhere", () => {
+    const plan = planFormWiring(pages, { siteId: "site-1", appOrigin: "" });
+    expect(plan.error).toMatch(/NEXT_PUBLIC_APP_URL/);
+  });
+
+  it("never sweeps rows off when wiring could not run", () => {
+    const plan = planFormWiring(pages, { siteId: "site-1", appOrigin: "" });
+    expect(plan.deactivateMissing).toBe(false);
+    expect(plan.forms).toEqual([]);
+  });
+
+  it("lets a site with no forms publish without an origin", () => {
+    const plan = planFormWiring([{ path: "index.html", html: "<p>hi</p>" }], {
+      siteId: "site-1",
+      appOrigin: "",
+    });
+    expect(plan.error).toBeNull();
+    expect(plan.deactivateMissing).toBe(false);
+  });
+
+  it("ignores a form the owner already pointed elsewhere when deciding to refuse", () => {
+    const plan = planFormWiring(
+      [{ path: "c.html", html: '<form id="f2" action="https://formspree.io/x"></form>' }],
+      { siteId: "site-1", appOrigin: "" },
+    );
+    expect(plan.error).toBeNull();
   });
 });

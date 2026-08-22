@@ -47,6 +47,11 @@ const settle = () => new Promise((r) => setTimeout(r, 0));
 
 beforeEach(() => {
   vi.clearAllMocks();
+  /* The failure write is fire-and-forget with a `.catch` on it, so a bare
+     vi.fn() returning undefined throws inside the detached promise — the
+     assertions still pass and vitest reports an unhandled rejection beside a
+     green suite. Resolve it, so the path under test is the real one. */
+  jobUpdate.mockResolvedValue({});
   workspaceFindUnique.mockResolvedValue({ plan: "FREE" });
   jobCount.mockResolvedValue(0);
   jobCreate.mockResolvedValue({ id: "job-1" });

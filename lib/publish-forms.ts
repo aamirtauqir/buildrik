@@ -91,3 +91,66 @@ export function wireForms(
 
   return { html: out, forms: found };
 }
+
+/** One page as the publish worker holds it, and hands it to the deploy. */
+export interface PublishPage {
+  path: string;
+  html: string;
+}
+
+/** What a deploy should do about forms. */
+export interface FormWiringPlan {
+  /** Pages to deploy — rewritten when wiring ran, untouched when it could not. */
+  pages: PublishPage[];
+  /** Forms to upsert a row for. Empty when wiring could not run. */
+  forms: DiscoveredForm[];
+  /**
+   * Whether rows absent from `forms` may be switched off. False whenever
+   * wiring did not run: `forms` is then empty for want of an origin, not
+   * because the site has no forms, and sweeping on it would deactivate every
+   * working form on the site.
+   */
+  deactivateMissing: boolean;
+  /** Set when the deploy must not proceed, and why. */
+  error: string | null;
+}
+
+/** A form this publish would have wired, had it been able to. */
+const wouldHaveWired = (pages: PublishPage[]): boolean =>
+  pages.some(({ html }) => wireForms(html, { siteId: "x", appOrigin: "https://x", path: "" }).forms.length > 0);
+
+/**
+ * Decide the whole of it in one place, because the origin being missing has
+ * two consequences and the worker only ever acted on one. Without an origin no
+ * form can be pointed at the endpoint, so `discovered` comes back empty — and
+ * an empty list fed to a `notIn` sweep matches every row, which switched off
+ * every live form on the site while the job reported success. Publishing a
+ * form with no action is the exact failure this module exists to close, so a
+ * site that has one refuses to deploy instead; a site with none is unaffected
+ * and publishes as before.
+ */
+export function planFormWiring(
+  pages: PublishPage[],
+  opts: { siteId: string; appOrigin: string },
+): FormWiringPlan {
+  const appOrigin = opts.appOrigin.replace(/\/+$/, "");
+  if (!appOrigin) {
+    return {
+      pages,
+      forms: [],
+      deactivateMissing: false,
+      error: wouldHaveWired(pages)
+        ? "This site has a form, and NEXT_PUBLIC_APP_URL is not set — the form would publish with no action and submitting it would reload the page."
+        : null,
+    };
+  }
+
+  const forms: DiscoveredForm[] = [];
+  const wired = pages.map((page) => {
+    const r = wireForms(page.html, { siteId: opts.siteId, appOrigin, path: page.path });
+    forms.push(...r.forms);
+    return { ...page, html: r.html };
+  });
+
+  return { pages: wired, forms, deactivateMissing: true, error: null };
+}

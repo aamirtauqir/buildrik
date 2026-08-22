@@ -5,7 +5,7 @@ import { prisma } from "@lib/prisma";
 import { slugifyProjectName, type VercelFile } from "@lib/vercel";
 import { resolveSiteOrigin } from "@lib/publish-urls";
 import { buildDeployFiles } from "@lib/publish-files";
-import { wireForms, type DiscoveredForm } from "@lib/publish-forms";
+import { planFormWiring } from "@lib/publish-forms";
 import type { PublishPage } from "@buildrik/shared/schemas/publish";
 import { record as recordActivity } from "@server/services/activity-log.service";
 import { notifyWorkspaceOwner } from "@server/services/notification.trigger";
@@ -312,15 +312,12 @@ async function runVercelDeployJob(
      the editor published with no action at all and submitting reloaded the
      page. The row id IS the form element's id, taken from the URL we ship, so
      the two cannot drift. */
-  const appOrigin = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/+$/, "") ?? "";
-  const discovered: DiscoveredForm[] = [];
-  const wiredPages = appOrigin
-    ? pages.map((p) => {
-        const { html, forms } = wireForms(p.html, { siteId, appOrigin, path: p.path });
-        discovered.push(...forms);
-        return { ...p, html };
-      })
-    : pages;
+  const plan = planFormWiring(pages, {
+    siteId,
+    appOrigin: process.env.NEXT_PUBLIC_APP_URL ?? "",
+  });
+  if (plan.error) throw new Error(plan.error);
+  const { pages: wiredPages, forms: discovered } = plan;
 
   for (const form of discovered) {
     await prisma.formBlock.upsert({
@@ -341,10 +338,12 @@ async function runVercelDeployJob(
   /* Forms deleted from the site stop accepting submissions, but their rows and
      everything already submitted stay — the Submissions tab is a record, not a
      mirror of the current design. */
-  await prisma.formBlock.updateMany({
-    where: { siteId, id: { notIn: discovered.map((f) => f.blockId) } },
-    data: { isActive: false },
-  });
+  if (plan.deactivateMissing) {
+    await prisma.formBlock.updateMany({
+      where: { siteId, id: { notIn: discovered.map((f) => f.blockId) } },
+      data: { isActive: false },
+    });
+  }
 
   const files: VercelFile[] = buildDeployFiles({
     siteId,
