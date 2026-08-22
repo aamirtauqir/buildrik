@@ -321,11 +321,50 @@
           "waitMs": 2500
         }
       ]
+    },
+    {
+      "id": "BL-0219",
+      "state": "publish-open",
+      "figmaNodeId": "359:2",
+      "actions": [
+        {
+          "click": "button:has-text(\"Publish\")"
+        },
+        {
+          "waitMs": 2000
+        }
+      ]
+    },
+    {
+      "id": "BL-0220",
+      "state": "panel-templates",
+      "figmaNodeId": "360:2",
+      "actions": [
+        {
+          "press": "t"
+        },
+        {
+          "waitMs": 2500
+        }
+      ]
+    },
+    {
+      "id": "BL-0221",
+      "state": "panel-publish",
+      "figmaNodeId": "361:2",
+      "actions": [
+        {
+          "press": "u"
+        },
+        {
+          "waitMs": 2500
+        }
+      ]
     }
   ],
   "_verified": "2026-08-21: every entry below was replayed against localhost:3000 and the resulting state read back on screen before any capture ran. Three corrections came out of that: the Publish button opens the confirm dialog directly (there is no separate publish-open state), comment mode's only cue is the pressed toggle plus a crosshair capture layer, and the ⌘K palette cannot be captured at all — it closes when the capture script takes focus. | 2026-08-22: added BL-0213..BL-0217, the six-toggle canvas overlay states and the '?' cheat sheet — states the baseline had no board for at all, found by walking CanvasFooterToolbar. `button:text-is(\"Grid\")` is unambiguous: the Insert drawer's own Grid row is a DIV, not a button. Two things these recipes cannot promise: a CSS-painted overlay (grid lines, badges) does not survive html-to-design, and the click leaves the pointer on the toggle so its hover tooltip lands in the frame.",
   "_flow": {
-    "measuredAt": "2026-08-22 (third pass)",
+    "measuredAt": "2026-08-22 (fourth pass)",
     "page": "75:2",
     "method": "BFS from flowStartingPoints, carriers = [frame, ...frame.findAll()] — in-degree is not reachability, and a reaction on the FRAME itself is invisible to findAll alone.",
     "before": {
@@ -335,16 +374,16 @@
       "deadEndsAmongReachable": 0
     },
     "after": {
-      "frames": 69,
-      "edges": 52,
-      "reachable": 27,
+      "frames": 72,
+      "edges": 58,
+      "reachable": 30,
       "deadEndsAmongReachable": 0
     },
     "currentEra": {
-      "frames": 21,
+      "frames": 24,
       "reachableBefore": 5,
-      "reachableAfter": 21,
-      "note": "The 2026-08-21 re-captures, the five 2026-08-22 canvas-overlay frames, and BL-0218 panel-review. Every one is reachable from the CURRENT shell."
+      "reachableAfter": 24,
+      "note": "The 2026-08-21 re-captures, the five canvas-overlay frames, and the four money-path captures (review, publish-open, templates, publish panel)."
     },
     "wired": [
       "CURRENT shell header: Site menu -> site-menu-open, Notifications -> notifications-open, Comments -> comments-mode-on, Publish -> publish-confirm; each of those returns by pressing the same control again, and publish-confirm by Cancel.",
@@ -354,7 +393,8 @@
       "Cmd+K on the shell -> cmdk-open; the palette's own 'Esc close' -> shell.",
       "The five canvas-overlay frames were captured 2026-08-22 but hung off the 2026-08-19 shell. Both directions moved onto the CURRENT shell.",
       "The superseded 2026-08-19 shell had no way out once its overlay links moved, so its rail was wired to its own five panels — it is a comparison cluster, but a flow starting point that goes nowhere is a defect in the file.",
-      "The topbar review pill and the R chord -> BL-0218 panel-review; the panel's own Close Review -> shell. Captured after the Withdraw-request fix, so the board shows the copy the product now ships."
+      "The topbar review pill and the R chord -> BL-0218 panel-review; the panel's own Close Review -> shell. Captured after the Withdraw-request fix, so the board shows the copy the product now ships.",
+      "Publish button -> publish-open (the dropdown), and the dropdown's own Publish row -> publish-confirm. The button used to jump straight to the confirm, skipping the surface the user actually sees first. T -> templates, U -> publish panel, each out via its own Close."
     ],
     "openState": "42 frames remain outside the flow and every one of them is in the 2026-08-19 cluster below its five panels. They are not unwired doors — they have no CURRENT twin at all: roughly 30 editor states are still described by an 08-19 prod render (publish-open, review-pill, ten sitemenu destinations, four more inspector states, four media, five pages, layers-context-menu, four brand, content-create-collection). Capturing those is the next baseline pass, not a wiring job.",
     "harnessNote": "capture.mjs takes `sentinel` as an OBJECT — {selector} or {text}. A bare string is read as no sentinel at all and the row is refused as an unverifiable capture, which reads like a broken app rather than a malformed row."

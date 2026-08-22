@@ -3922,6 +3922,54 @@
       "state": "panel-review",
       "figmaNodeId": "357:2",
       "notes": "Captured 2026-08-22 from the running editor, first surface of the money-path arc to reach Figma. Carries the fix in 36b5c1a1: the round has no client link, so the panel reads 'Withdraw request' rather than 'Revoke link'. html-to-design dropped the capture on page 0:1 (the Dashboard page), not the editor page — a NAVIGATE reaction may only target a top-level frame on the SAME page, so it has to be appendChild'd onto 75:2 before any wiring will take."
+    },
+    {
+      "kind": "editor-state",
+      "route": "/edit/[siteId]",
+      "statusClass": 1,
+      "flow": "editor",
+      "viewport": "1440x900",
+      "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
+      "figmaPageId": "75:2",
+      "requires": "session",
+      "pipelineState": "captured-current",
+      "capturedFrom": "localhost@40c4e3d2",
+      "id": "BL-0219",
+      "state": "publish-open",
+      "figmaNodeId": "359:2",
+      "notes": "Captured 2026-08-22 from the running editor at 1440x900. the topbar Publish button opens this dropdown; the dropdown's own Publish row is what reaches publish-confirm, which the button used to jump to directly."
+    },
+    {
+      "kind": "editor-state",
+      "route": "/edit/[siteId]",
+      "statusClass": 1,
+      "flow": "editor",
+      "viewport": "1440x900",
+      "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
+      "figmaPageId": "75:2",
+      "requires": "session",
+      "pipelineState": "captured-current",
+      "capturedFrom": "localhost@40c4e3d2",
+      "id": "BL-0220",
+      "state": "panel-templates",
+      "figmaNodeId": "360:2",
+      "notes": "Captured 2026-08-22 from the running editor at 1440x900. link 4 of the money path — the template route to a first site."
+    },
+    {
+      "kind": "editor-state",
+      "route": "/edit/[siteId]",
+      "statusClass": 1,
+      "flow": "editor",
+      "viewport": "1440x900",
+      "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
+      "figmaPageId": "75:2",
+      "requires": "session",
+      "pipelineState": "captured-current",
+      "capturedFrom": "localhost@40c4e3d2",
+      "id": "BL-0221",
+      "state": "panel-publish",
+      "figmaNodeId": "361:2",
+      "notes": "Captured 2026-08-22 from the running editor at 1440x900. the Publish panel, link 8's own surface."
     }
   ]
 }
