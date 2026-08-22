@@ -173,6 +173,7 @@ Every row below was measured in code or by running it, not read off a document.
 | 4 | `completeStep` advanced from the step the *caller named*, so one call could finish all of onboarding and permanently hide the checklist | `514a1d84` |
 | 9 | Two of three site-limit doors (duplicate, apply-template) named the limit and offered no way past it | `01010146` |
 | 9 | The upgrade button was shown to editors, who are refused at checkout by `requireOwner`; plus health's storage sum counted media on soft-deleted sites | `de4eb01a` |
+| 6-7 | Expired and superseded review links told the client the link was mistyped and to click it again — two of four dead-link screens were unreachable, and the reason travelled as a bare string the errorFormatter shredded into character indices | `201d7885` |
 
 ### Recorded, not fixed
 
@@ -181,6 +182,18 @@ Every row below was measured in code or by running it, not read off a document.
 - **Published forms emit no `_honeypot` field.** The endpoint reads one; the export never writes one. Spam defence is rate-limiting alone.
 - **`saveWizard` / `completeWizard` / `dismiss` call `update` on a row that may not exist**, giving a 500 rather than a clean error. Reachable only if a client skips `getState`, which nothing currently does.
 - **Onboarding can create a second site** if the wizard restarts after S2. FREE allows 3, so nobody is trapped today.
+
+### Walked and found sound
+
+- **Review round lifecycle.** One PENDING row behind a partial unique index, a
+  P2002 loser that converges on the winner instead of erroring, revocation
+  guarded on both `revokedAt: null` and the revision the editor last saw, and a
+  token rotation that only fires when a client is actually being invited. The
+  90-day TTL in `client-review.service.ts` matches the 90 days the expiry screen
+  promises. Comments are never deleted, so "your earlier comments are still
+  saved" is true.
+- **The public form endpoint** accepts urlencoded as well as JSON, redirects a
+  browser back with `?submitted=1`, and validates before storing.
 
 ### Still needs the founder — unchanged
 
