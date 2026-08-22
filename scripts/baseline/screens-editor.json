@@ -16,19 +16,12 @@
       "figmaNodeId": "64:2",
       "actions": [
         {
-          "click": ".ls-rail [data-tab=insert]"
-        },
-        {
-          "waitMs": 800
-        },
-        {
           "click": ".ls-rail [data-tab=layers]"
         },
         {
           "waitMs": 1500
         }
-      ],
-      "_rail_note": "The rail tabs toggle. Whichever panel the editor restores on load, clicking THAT tab closes the drawer instead of opening it — which is how four Pages recipes 'missed' a control that plainly exists. Parking on Insert first makes the target click an open."
+      ]
     },
     {
       "id": "BL-0102",
@@ -36,19 +29,12 @@
       "figmaNodeId": "66:2",
       "actions": [
         {
-          "click": ".ls-rail [data-tab=insert]"
-        },
-        {
-          "waitMs": 800
-        },
-        {
           "click": ".ls-rail [data-tab=pages]"
         },
         {
           "waitMs": 1500
         }
-      ],
-      "_rail_note": "The rail tabs toggle. Whichever panel the editor restores on load, clicking THAT tab closes the drawer instead of opening it — which is how four Pages recipes 'missed' a control that plainly exists. Parking on Insert first makes the target click an open."
+      ]
     },
     {
       "id": "BL-0103",
@@ -56,19 +42,12 @@
       "figmaNodeId": "68:2",
       "actions": [
         {
-          "click": ".ls-rail [data-tab=insert]"
-        },
-        {
-          "waitMs": 800
-        },
-        {
           "click": ".ls-rail [data-tab=assets]"
         },
         {
           "waitMs": 2000
         }
-      ],
-      "_rail_note": "The rail tabs toggle. Whichever panel the editor restores on load, clicking THAT tab closes the drawer instead of opening it — which is how four Pages recipes 'missed' a control that plainly exists. Parking on Insert first makes the target click an open."
+      ]
     },
     {
       "id": "BL-0104",
@@ -76,19 +55,12 @@
       "figmaNodeId": "69:2",
       "actions": [
         {
-          "click": ".ls-rail [data-tab=insert]"
-        },
-        {
-          "waitMs": 800
-        },
-        {
           "click": ".ls-rail [data-tab=content]"
         },
         {
           "waitMs": 2000
         }
-      ],
-      "_rail_note": "The rail tabs toggle. Whichever panel the editor restores on load, clicking THAT tab closes the drawer instead of opening it — which is how four Pages recipes 'missed' a control that plainly exists. Parking on Insert first makes the target click an open."
+      ]
     },
     {
       "id": "BL-0105",
@@ -96,19 +68,12 @@
       "figmaNodeId": "70:2",
       "actions": [
         {
-          "click": ".ls-rail [data-tab=insert]"
-        },
-        {
-          "waitMs": 800
-        },
-        {
           "click": ".ls-rail [data-tab=design]"
         },
         {
           "waitMs": 2000
         }
-      ],
-      "_rail_note": "The rail tabs toggle. Whichever panel the editor restores on load, clicking THAT tab closes the drawer instead of opening it — which is how four Pages recipes 'missed' a control that plainly exists. Parking on Insert first makes the target click an open."
+      ]
     },
     {
       "id": "BL-0106",
@@ -579,12 +544,6 @@
       "state": "media-stock-browser",
       "actions": [
         {
-          "click": ".ls-rail [data-tab=insert]"
-        },
-        {
-          "waitMs": 800
-        },
-        {
           "click": ".ls-rail [data-tab=assets]"
         },
         {
@@ -598,19 +557,12 @@
         }
       ],
       "_note": "'Browse stock' is SlimLauncher's own label (SlimLauncher.tsx:292) — the button moved to the footer when search took the lead, so an older recipe aimed at a '+ Stock' chip would miss.",
-      "_verified": "2026-08-22 — state confirmed in the captured frame by a marker only that state renders.",
-      "_rail_note": "The rail tabs toggle. Whichever panel the editor restores on load, clicking THAT tab closes the drawer instead of opening it — which is how four Pages recipes 'missed' a control that plainly exists. Parking on Insert first makes the target click an open."
+      "_verified": "2026-08-22 — state confirmed in the captured frame by a marker only that state renders."
     },
     {
       "id": "BL-0160",
       "state": "media-icon-picker",
       "actions": [
-        {
-          "click": ".ls-rail [data-tab=insert]"
-        },
-        {
-          "waitMs": 800
-        },
         {
           "click": ".ls-rail [data-tab=assets]"
         },
@@ -625,19 +577,12 @@
         }
       ],
       "_note": "'Icons and SVG' is an aria-label on a filter pill whose visible text is 'svg0' — a text= selector for it matches nothing. The control that opens the picker is the plain 'Icons' button. Verified live: the dialog reads 'Media ✕ ‹ Icons All ▾ 17 categories'.",
-      "_marker": "17 categories",
-      "_rail_note": "The rail tabs toggle. Whichever panel the editor restores on load, clicking THAT tab closes the drawer instead of opening it — which is how four Pages recipes 'missed' a control that plainly exists. Parking on Insert first makes the target click an open."
+      "_marker": "17 categories"
     },
     {
       "id": "BL-0161",
       "state": "media-fullpage-library",
       "actions": [
-        {
-          "click": ".ls-rail [data-tab=insert]"
-        },
-        {
-          "waitMs": 800
-        },
         {
           "click": ".ls-rail [data-tab=assets]"
         },
@@ -652,19 +597,12 @@
         }
       ],
       "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible.",
-      "_verified": "2026-08-22 — state confirmed in the captured frame by a marker only that state renders.",
-      "_rail_note": "The rail tabs toggle. Whichever panel the editor restores on load, clicking THAT tab closes the drawer instead of opening it — which is how four Pages recipes 'missed' a control that plainly exists. Parking on Insert first makes the target click an open."
+      "_verified": "2026-08-22 — state confirmed in the captured frame by a marker only that state renders."
     },
     {
       "id": "BL-0162",
       "state": "media-list-view",
       "actions": [
-        {
-          "click": ".ls-rail [data-tab=insert]"
-        },
-        {
-          "waitMs": 800
-        },
         {
           "click": ".ls-rail [data-tab=assets]"
         },
@@ -685,19 +623,12 @@
         }
       ],
       "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible.",
-      "_capture_status": "MISSES TODAY for a fixture reason, not a recipe one: the media library holds 0 assets, so grid and list render the same empty state and the two frames are byte-identical. Seed an asset before capturing this pair or the difference cannot exist.",
-      "_rail_note": "The rail tabs toggle. Whichever panel the editor restores on load, clicking THAT tab closes the drawer instead of opening it — which is how four Pages recipes 'missed' a control that plainly exists. Parking on Insert first makes the target click an open."
+      "_capture_status": "MISSES TODAY for a fixture reason, not a recipe one: the media library holds 0 assets, so grid and list render the same empty state and the two frames are byte-identical. Seed an asset before capturing this pair or the difference cannot exist."
     },
     {
       "id": "BL-0163",
       "state": "pages-context-menu",
       "actions": [
-        {
-          "click": ".ls-rail [data-tab=insert]"
-        },
-        {
-          "waitMs": 800
-        },
         {
           "click": ".ls-rail [data-tab=pages]"
         },
@@ -712,19 +643,12 @@
         }
       ],
       "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible.",
-      "_capture_status": "CAPTURED but not confirmed. 'Listings' appears on the Pages panel itself, so it cannot tell an opened sub-view from the panel at rest. Needs a marker unique to the sub-view.",
-      "_rail_note": "The rail tabs toggle. Whichever panel the editor restores on load, clicking THAT tab closes the drawer instead of opening it — which is how four Pages recipes 'missed' a control that plainly exists. Parking on Insert first makes the target click an open."
+      "_capture_status": "The control is present and a direct Playwright click on it succeeds — verified 2026-08-23 with elementFromPoint (the button is its own topmost element, nothing intercepts). What is NOT established is what the click produces: 'Add new page' opens no dialog or menu, so the state this frame is supposed to show may be inline in the drawer rather than an overlay. The board name is the only description of it, and that has already proved unreliable once (BL-0173). Needs the 08-19 frame read to see what it drew, the way BL-0173 was settled."
     },
     {
       "id": "BL-0164",
       "state": "pages-add-page",
       "actions": [
-        {
-          "click": ".ls-rail [data-tab=insert]"
-        },
-        {
-          "waitMs": 800
-        },
         {
           "click": ".ls-rail [data-tab=pages]"
         },
@@ -739,19 +663,12 @@
         }
       ],
       "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible.",
-      "_capture_status": "CAPTURED but not confirmed. 'Listings' appears on the Pages panel itself, so it cannot tell an opened sub-view from the panel at rest. Needs a marker unique to the sub-view.",
-      "_rail_note": "The rail tabs toggle. Whichever panel the editor restores on load, clicking THAT tab closes the drawer instead of opening it — which is how four Pages recipes 'missed' a control that plainly exists. Parking on Insert first makes the target click an open."
+      "_capture_status": "The control is present and a direct Playwright click on it succeeds — verified 2026-08-23 with elementFromPoint (the button is its own topmost element, nothing intercepts). What is NOT established is what the click produces: 'Add new page' opens no dialog or menu, so the state this frame is supposed to show may be inline in the drawer rather than an overlay. The board name is the only description of it, and that has already proved unreliable once (BL-0173). Needs the 08-19 frame read to see what it drew, the way BL-0173 was settled."
     },
     {
       "id": "BL-0165",
       "state": "pages-listings-view",
       "actions": [
-        {
-          "click": ".ls-rail [data-tab=insert]"
-        },
-        {
-          "waitMs": 800
-        },
         {
           "click": ".ls-rail [data-tab=pages]"
         },
@@ -766,19 +683,12 @@
         }
       ],
       "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible.",
-      "_capture_status": "CAPTURED but not confirmed. 'Listings' appears on the Pages panel itself, so it cannot tell an opened sub-view from the panel at rest. Needs a marker unique to the sub-view.",
-      "_rail_note": "The rail tabs toggle. Whichever panel the editor restores on load, clicking THAT tab closes the drawer instead of opening it — which is how four Pages recipes 'missed' a control that plainly exists. Parking on Insert first makes the target click an open."
+      "_capture_status": "The control is present and a direct Playwright click on it succeeds — verified 2026-08-23 with elementFromPoint (the button is its own topmost element, nothing intercepts). What is NOT established is what the click produces: 'Add new page' opens no dialog or menu, so the state this frame is supposed to show may be inline in the drawer rather than an overlay. The board name is the only description of it, and that has already proved unreliable once (BL-0173). Needs the 08-19 frame read to see what it drew, the way BL-0173 was settled."
     },
     {
       "id": "BL-0166",
       "state": "pages-more-add-options",
       "actions": [
-        {
-          "click": ".ls-rail [data-tab=insert]"
-        },
-        {
-          "waitMs": 800
-        },
         {
           "click": ".ls-rail [data-tab=pages]"
         },
@@ -793,19 +703,12 @@
         }
       ],
       "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible.",
-      "_verified": "2026-08-22 — state confirmed in the captured frame by a marker only that state renders.",
-      "_rail_note": "The rail tabs toggle. Whichever panel the editor restores on load, clicking THAT tab closes the drawer instead of opening it — which is how four Pages recipes 'missed' a control that plainly exists. Parking on Insert first makes the target click an open."
+      "_verified": "2026-08-22 — state confirmed in the captured frame by a marker only that state renders."
     },
     {
       "id": "BL-0167",
       "state": "pages-fullpage",
       "actions": [
-        {
-          "click": ".ls-rail [data-tab=insert]"
-        },
-        {
-          "waitMs": 800
-        },
         {
           "click": ".ls-rail [data-tab=pages]"
         },
@@ -820,19 +723,12 @@
         }
       ],
       "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible.",
-      "_capture_status": "CAPTURED but not confirmed. 'Listings' appears on the Pages panel itself, so it cannot tell an opened sub-view from the panel at rest. Needs a marker unique to the sub-view.",
-      "_rail_note": "The rail tabs toggle. Whichever panel the editor restores on load, clicking THAT tab closes the drawer instead of opening it — which is how four Pages recipes 'missed' a control that plainly exists. Parking on Insert first makes the target click an open."
+      "_capture_status": "The control is present and a direct Playwright click on it succeeds — verified 2026-08-23 with elementFromPoint (the button is its own topmost element, nothing intercepts). What is NOT established is what the click produces: 'Add new page' opens no dialog or menu, so the state this frame is supposed to show may be inline in the drawer rather than an overlay. The board name is the only description of it, and that has already proved unreliable once (BL-0173). Needs the 08-19 frame read to see what it drew, the way BL-0173 was settled."
     },
     {
       "id": "BL-0169",
       "state": "brand-pro-mode",
       "actions": [
-        {
-          "click": ".ls-rail [data-tab=insert]"
-        },
-        {
-          "waitMs": 800
-        },
         {
           "click": ".ls-rail [data-tab=design]"
         },
@@ -848,19 +744,12 @@
       ],
       "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible. Brand rows carry a count suffix in the DOM (\"Starters6›\"), so these match on substring, not exact text.",
       "_capture_status": "CAPTURED but not confirmed. The Brand rows print their own labels on the panel, so a marker like 'Colour mode' or 'Starters' matches whether or not the drill-in opened. Needs a marker only the drill-in renders, read off the open panel.",
-      "_rail_note": "The rail tabs toggle. Whichever panel the editor restores on load, clicking THAT tab closes the drawer instead of opening it — which is how four Pages recipes 'missed' a control that plainly exists. Parking on Insert first makes the target click an open.",
       "_brand_mode_note": "The Brand panel's Beginner/Pro switch PERSISTS across reloads and changes the row set — Beginner reads 'Tokens4›', Pro reads 'Tokens55›'. A recipe that does not set the mode first is non-deterministic: it captures whichever mode the last session left behind. Observed 2026-08-23, when rows that matched under Beginner stopped matching after an earlier capture switched the panel to Pro."
     },
     {
       "id": "BL-0170",
       "state": "brand-dark-preview",
       "actions": [
-        {
-          "click": ".ls-rail [data-tab=insert]"
-        },
-        {
-          "waitMs": 800
-        },
         {
           "click": ".ls-rail [data-tab=design]"
         },
@@ -876,19 +765,12 @@
       ],
       "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible. Brand rows carry a count suffix in the DOM (\"Starters6›\"), so these match on substring, not exact text.",
       "_capture_status": "CAPTURED but not confirmed. The Brand rows print their own labels on the panel, so a marker like 'Colour mode' or 'Starters' matches whether or not the drill-in opened. Needs a marker only the drill-in renders, read off the open panel.",
-      "_rail_note": "The rail tabs toggle. Whichever panel the editor restores on load, clicking THAT tab closes the drawer instead of opening it — which is how four Pages recipes 'missed' a control that plainly exists. Parking on Insert first makes the target click an open.",
       "_brand_mode_note": "The Brand panel's Beginner/Pro switch PERSISTS across reloads and changes the row set — Beginner reads 'Tokens4›', Pro reads 'Tokens55›'. A recipe that does not set the mode first is non-deterministic: it captures whichever mode the last session left behind. Observed 2026-08-23, when rows that matched under Beginner stopped matching after an earlier capture switched the panel to Pro."
     },
     {
       "id": "BL-0171",
       "state": "brand-starter-themes",
       "actions": [
-        {
-          "click": ".ls-rail [data-tab=insert]"
-        },
-        {
-          "waitMs": 800
-        },
         {
           "click": ".ls-rail [data-tab=design]"
         },
@@ -904,19 +786,12 @@
       ],
       "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible. Brand rows carry a count suffix in the DOM (\"Starters6›\"), so these match on substring, not exact text.",
       "_capture_status": "CAPTURED but not confirmed. The Brand rows print their own labels on the panel, so a marker like 'Colour mode' or 'Starters' matches whether or not the drill-in opened. Needs a marker only the drill-in renders, read off the open panel.",
-      "_rail_note": "The rail tabs toggle. Whichever panel the editor restores on load, clicking THAT tab closes the drawer instead of opening it — which is how four Pages recipes 'missed' a control that plainly exists. Parking on Insert first makes the target click an open.",
       "_brand_mode_note": "The Brand panel's Beginner/Pro switch PERSISTS across reloads and changes the row set — Beginner reads 'Tokens4›', Pro reads 'Tokens55›'. A recipe that does not set the mode first is non-deterministic: it captures whichever mode the last session left behind. Observed 2026-08-23, when rows that matched under Beginner stopped matching after an earlier capture switched the panel to Pro."
     },
     {
       "id": "BL-0174",
       "state": "brand-components-tab",
       "actions": [
-        {
-          "click": ".ls-rail [data-tab=insert]"
-        },
-        {
-          "waitMs": 800
-        },
         {
           "click": ".ls-rail [data-tab=design]"
         },
@@ -932,19 +807,12 @@
       ],
       "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible. Brand rows carry a count suffix in the DOM (\"Starters6›\"), so these match on substring, not exact text.",
       "_capture_status": "CAPTURED but not confirmed. The Brand rows print their own labels on the panel, so a marker like 'Colour mode' or 'Starters' matches whether or not the drill-in opened. Needs a marker only the drill-in renders, read off the open panel.",
-      "_rail_note": "The rail tabs toggle. Whichever panel the editor restores on load, clicking THAT tab closes the drawer instead of opening it — which is how four Pages recipes 'missed' a control that plainly exists. Parking on Insert first makes the target click an open.",
       "_brand_mode_note": "The Brand panel's Beginner/Pro switch PERSISTS across reloads and changes the row set — Beginner reads 'Tokens4›', Pro reads 'Tokens55›'. A recipe that does not set the mode first is non-deterministic: it captures whichever mode the last session left behind. Observed 2026-08-23, when rows that matched under Beginner stopped matching after an earlier capture switched the panel to Pro."
     },
     {
       "id": "BL-0175",
       "state": "content-create-collection",
       "actions": [
-        {
-          "click": ".ls-rail [data-tab=insert]"
-        },
-        {
-          "waitMs": 800
-        },
         {
           "click": ".ls-rail [data-tab=content]"
         },
@@ -959,19 +827,12 @@
         }
       ],
       "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible.",
-      "_verified": "2026-08-22 — state confirmed in the captured frame by a marker only that state renders.",
-      "_rail_note": "The rail tabs toggle. Whichever panel the editor restores on load, clicking THAT tab closes the drawer instead of opening it — which is how four Pages recipes 'missed' a control that plainly exists. Parking on Insert first makes the target click an open."
+      "_verified": "2026-08-22 — state confirmed in the captured frame by a marker only that state renders."
     },
     {
       "id": "BL-0173",
       "state": "brand-presets",
       "actions": [
-        {
-          "click": ".ls-rail [data-tab=insert]"
-        },
-        {
-          "waitMs": 800
-        },
         {
           "click": ".ls-rail [data-tab=design]"
         },
@@ -987,19 +848,12 @@
       ],
       "_note": "The board calls this frame 'brand-styles-tab' and no control on the Brand panel is called Styles. Reading the 08-19 frame settled it: it draws '‹ Presets' with Button / Card / Form input / Link / Badge / Alert / Tooltip / Modal / Nav / Table — the Presets drill-in. The board name is wrong, the frame is not; BL-0174 is the Components row beside it, which is consistent.",
       "_verified": "2026-08-22 — state confirmed in the captured frame by a marker only that state renders.",
-      "_rail_note": "The rail tabs toggle. Whichever panel the editor restores on load, clicking THAT tab closes the drawer instead of opening it — which is how four Pages recipes 'missed' a control that plainly exists. Parking on Insert first makes the target click an open.",
       "_brand_mode_note": "The Brand panel's Beginner/Pro switch PERSISTS across reloads and changes the row set — Beginner reads 'Tokens4›', Pro reads 'Tokens55›'. A recipe that does not set the mode first is non-deterministic: it captures whichever mode the last session left behind. Observed 2026-08-23, when rows that matched under Beginner stopped matching after an earlier capture switched the panel to Pro."
     },
     {
       "id": "BL-0168",
       "state": "layers-context-menu",
       "actions": [
-        {
-          "click": ".ls-rail [data-tab=insert]"
-        },
-        {
-          "waitMs": 800
-        },
         {
           "click": ".ls-rail [data-tab=layers]"
         },
@@ -1014,8 +868,7 @@
         }
       ],
       "_note": "Right-click opens Cut / Copy / Paste / Duplicate / Delete / Rename / Group selection — read off the running menu. An earlier pass checked this frame against invented items ('Bring forward', 'Send backward') and wrongly concluded the capture had missed.",
-      "_marker": "Group selection",
-      "_rail_note": "The rail tabs toggle. Whichever panel the editor restores on load, clicking THAT tab closes the drawer instead of opening it — which is how four Pages recipes 'missed' a control that plainly exists. Parking on Insert first makes the target click an open."
+      "_marker": "Group selection"
     },
     {
       "id": "BL-0230",
