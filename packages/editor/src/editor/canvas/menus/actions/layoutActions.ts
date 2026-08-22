@@ -13,7 +13,6 @@ export const layoutSubmenu: ContextAction[] = [
     label: "Make Flex Row",
     icon: "arrow-right",
     group: "Layout",
-    shortcut: "Alt+R",
     isVisible: (ctx) => ctx.element.isContainer(),
     handler: ({ composer, element }) =>
       runTransaction(composer, "layout-flex-row", () => {
@@ -26,7 +25,6 @@ export const layoutSubmenu: ContextAction[] = [
     label: "Make Flex Column",
     icon: "arrow-down",
     group: "Layout",
-    shortcut: "Alt+C",
     isVisible: (ctx) => ctx.element.isContainer(),
     handler: ({ composer, element }) =>
       runTransaction(composer, "layout-flex-column", () => {
@@ -39,7 +37,6 @@ export const layoutSubmenu: ContextAction[] = [
     label: "Make Grid (2 cols)",
     icon: "grid",
     group: "Layout",
-    shortcut: "Alt+G",
     isVisible: (ctx) => ctx.element.isContainer(),
     handler: ({ composer, element }) =>
       runTransaction(composer, "layout-grid", () => {
@@ -53,7 +50,6 @@ export const layoutSubmenu: ContextAction[] = [
     label: "Center Content",
     icon: "align-center",
     group: "Layout",
-    shortcut: "Alt+M",
     isVisible: (ctx) => ctx.element.isContainer(),
     handler: ({ composer, element }) =>
       runTransaction(composer, "layout-center", () => {
@@ -67,7 +63,6 @@ export const layoutSubmenu: ContextAction[] = [
     label: "Space Between",
     icon: "maximize-2",
     group: "Layout",
-    shortcut: "Alt+B",
     isVisible: (ctx) => ctx.element.isContainer(),
     handler: ({ composer, element }) =>
       runTransaction(composer, "layout-space-between", () => {
@@ -81,7 +76,7 @@ export const layoutSubmenu: ContextAction[] = [
     label: "Bring to Front",
     icon: "chevrons-up",
     group: "Layout",
-    shortcut: "Ctrl+Shift+]",
+    shortcut: "Cmd+Shift+]",
     isVisible: ({ isRoot }) => !isRoot,
     handler: ({ composer }) => {
       composer.commands.run("bring-to-front");
@@ -92,7 +87,7 @@ export const layoutSubmenu: ContextAction[] = [
     label: "Bring Forward",
     icon: "chevron-up",
     group: "Layout",
-    shortcut: "Ctrl+]",
+    shortcut: "Cmd+]",
     isVisible: ({ isRoot }) => !isRoot,
     handler: ({ composer }) => {
       composer.commands.run("bring-forward");
@@ -103,7 +98,7 @@ export const layoutSubmenu: ContextAction[] = [
     label: "Send Backward",
     icon: "chevron-down",
     group: "Layout",
-    shortcut: "Ctrl+[",
+    shortcut: "Cmd+[",
     isVisible: ({ isRoot }) => !isRoot,
     handler: ({ composer }) => {
       composer.commands.run("send-backward");
@@ -114,7 +109,7 @@ export const layoutSubmenu: ContextAction[] = [
     label: "Send to Back",
     icon: "chevrons-down",
     group: "Layout",
-    shortcut: "Ctrl+Shift+[",
+    shortcut: "Cmd+Shift+[",
     isVisible: ({ isRoot }) => !isRoot,
     handler: ({ composer }) => {
       composer.commands.run("send-to-back");

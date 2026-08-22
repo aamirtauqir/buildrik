@@ -24,7 +24,6 @@ export const insertSubmenu: ContextAction[] = [
     label: "Insert Before",
     icon: "arrow-up",
     group: "Insert",
-    shortcut: "Cmd+Shift+Up",
     isVisible: ({ element }) => Boolean(element.getParent()),
     handler: ({ composer, element }) => {
       const parent = element.getParent();
@@ -44,7 +43,6 @@ export const insertSubmenu: ContextAction[] = [
     label: "Insert After",
     icon: "arrow-down",
     group: "Insert",
-    shortcut: "Cmd+Shift+Down",
     isVisible: ({ element }) => Boolean(element.getParent()),
     handler: ({ composer, element }) => {
       const parent = element.getParent();
@@ -99,7 +97,6 @@ export const insertSubmenu: ContextAction[] = [
     label: "Wrap in Section",
     icon: "box",
     group: "Insert",
-    shortcut: "Cmd+Shift+W",
     isVisible: (ctx) => ctx.element.canBeWrapped(),
     handler: ({ element }) => {
       element.wrap("section");
@@ -110,7 +107,6 @@ export const insertSubmenu: ContextAction[] = [
     label: "Unwrap Element",
     icon: "minimize-2",
     group: "Insert",
-    shortcut: "Cmd+Shift+U",
     /* Board 1176:4866 draws this row greyed rather than absent. Hiding it made
        the menu change shape between elements, and left no way to learn the
        command exists — which is what a disabled row with its chord is for. */

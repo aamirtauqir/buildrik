@@ -69,7 +69,7 @@ export const standaloneActions: ContextAction[] = [
     label: "Group",
     icon: "box",
     group: "standalone",
-    shortcut: "Ctrl+G",
+    shortcut: "Cmd+G",
     // Group the current multi-selection (≥2 elements sharing a parent).
     isVisible: ({ composer }) => composer.selection.getSelectedIds().length >= 2,
     handler: ({ composer }) => {
@@ -86,7 +86,7 @@ export const standaloneActions: ContextAction[] = [
     label: "Ungroup",
     icon: "box-select",
     group: "standalone",
-    shortcut: "Ctrl+Shift+G",
+    shortcut: "Cmd+Shift+G",
     isVisible: ({ element }) => {
       const type = element.getType?.();
       // Show Ungroup for containers that wrap other elements

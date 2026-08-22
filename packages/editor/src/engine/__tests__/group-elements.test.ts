@@ -4,55 +4,15 @@
  */
 
 import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from "vitest";
-import { Composer } from "../Composer";
+import type { Composer } from "@/engine/Composer";
+import {
+  createTestComposer,
+  installEngineBrowserStubs,
+  removeEngineBrowserStubs,
+} from "./test-utils/realComposer";
 
-let originalGetContext: typeof HTMLCanvasElement.prototype.getContext;
-
-beforeAll(() => {
-  if (typeof globalThis.indexedDB === "undefined") {
-    const fire = (req: Record<string, unknown>) =>
-      Promise.resolve().then(() => (req.onsuccess as (() => void) | undefined)?.());
-    Object.defineProperty(globalThis, "indexedDB", {
-      value: {
-        open: () => {
-          const req: Record<string, unknown> = {
-            onsuccess: () => {}, onerror: () => {}, onupgradeneeded: () => {},
-            result: {
-              createObjectStore: () => ({ createIndex: () => {} }),
-              transaction: () => ({
-                objectStore: () => ({
-                  get: () => { const r = { result: undefined }; fire(r); return r; },
-                  put: () => { const r = {}; fire(r); return r; },
-                  getAll: () => { const r = { result: [] }; fire(r); return r; },
-                  index: () => ({ getAll: () => { const r = { result: [] }; fire(r); return r; } }),
-                }),
-              }),
-              close: () => {}, objectStoreNames: { contains: () => false },
-            },
-          };
-          fire(req);
-          return req;
-        },
-        deleteDatabase: () => ({ onsuccess: () => {}, onerror: () => {} }),
-      },
-      writable: true, configurable: true,
-    });
-  }
-  originalGetContext = HTMLCanvasElement.prototype.getContext;
-  HTMLCanvasElement.prototype.getContext = function (this: HTMLCanvasElement, id: string) {
-    if (id === "2d") {
-      return {
-        fillStyle: "", clearRect: () => {}, fillRect: () => {},
-        getImageData: () => ({ data: new Uint8ClampedArray(4) }),
-      } as unknown as CanvasRenderingContext2D;
-    }
-    return originalGetContext.call(this, id);
-  } as typeof HTMLCanvasElement.prototype.getContext;
-});
-
-afterAll(() => {
-  HTMLCanvasElement.prototype.getContext = originalGetContext;
-});
+beforeAll(installEngineBrowserStubs);
+afterAll(removeEngineBrowserStubs);
 
 describe("groupElements / ungroupElement", () => {
   beforeEach(() => {
@@ -61,7 +21,7 @@ describe("groupElements / ungroupElement", () => {
   });
 
   function setup() {
-    const composer = new Composer({ project: { autoLoad: false } } as never);
+    const composer = createTestComposer();
     const page = composer.elements.createPage("Home");
     const rootId = page.root.id;
     const a = composer.elements.createElement("heading" as never);

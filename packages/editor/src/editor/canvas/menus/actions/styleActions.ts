@@ -63,7 +63,7 @@ export const quickStyleSubmenu: ContextAction[] = [
     label: "Copy Styles",
     icon: "clipboard",
     group: "Quick Style",
-    shortcut: "Cmd+Shift+C",
+    shortcut: "Cmd+Alt+C",
     handler: ({ composer, element }) => {
       composer.styleClipboard = element.getStyles?.() || {};
     },
@@ -73,7 +73,7 @@ export const quickStyleSubmenu: ContextAction[] = [
     label: "Paste Styles",
     icon: "clipboard-paste",
     group: "Quick Style",
-    shortcut: "Cmd+Shift+V",
+    shortcut: "Cmd+Alt+V",
     isEnabled: ({ composer }) =>
       Boolean(composer.styleClipboard && Object.keys(composer.styleClipboard).length),
     handler: ({ composer, element }) => {
