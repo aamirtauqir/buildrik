@@ -610,7 +610,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
            dashboard, while returning to the editor was buried in ⋯. */
         onExit={viewMode.clientView ? toggleClientView : exitToDashboard}
         exitLabel={viewMode.clientView ? "‹ Back to editing" : "‹ Exit"}
-        save={save}
+        save={viewMode.clientView ? undefined : save}
         savedAt={lastSavedAt ?? lastSaved?.getTime()}
         /* SaveStatus renders as a BUTTON that fires onSave when the state is
            unsaved or error. A view does not offer a save control. */

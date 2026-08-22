@@ -103,7 +103,10 @@ export interface TopbarProps {
    * while getting back to editing was one row inside a ⋯ menu.
    */
   exitLabel?: string;
-  save: SaveState;
+  /** Omit to render no save indicator at all — client view, where nothing can
+      become unsaved and the pill would be status about a machine the viewer is
+      not operating. */
+  save?: SaveState;
   savedAt?: number;
   /** Save now — turns the save pill into a button for the states worth retrying. */
   onSave?: () => void;
@@ -169,7 +172,10 @@ export function Topbar({
         {siteName}
       </span>
 
-      <SaveStatus state={save} savedAt={savedAt} onRetry={onSave} />
+      {/* Nothing in a read-only view can become unsaved, so "Saved · just now"
+          is status about a machine the viewer is not operating. `save` is
+          omitted there rather than rendering a permanently-green pill. */}
+      {save ? <SaveStatus state={save} savedAt={savedAt} onRetry={onSave} /> : null}
 
       {review ? (
         <ReviewBadge {...review} />
