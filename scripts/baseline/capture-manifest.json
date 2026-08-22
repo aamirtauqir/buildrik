@@ -1,14 +1,14 @@
 {
- "commit": "1e70427d",
+ "commit": "36b5c1a1",
  "base": "http://localhost:3000",
- "generated": "2026-08-18T23:09:55.664Z",
+ "generated": "2026-08-22T11:11:32.713Z",
  "captures": [
   {
-   "id": "BL-0171",
+   "id": "BL-0218",
    "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
-   "state": "brand-starter-themes__seed",
+   "state": "panel-review",
    "status": 200,
-   "sha256": "df3f83b060a04a1c",
+   "sha256": "121820b71596ad17",
    "scrollHeight": 905,
    "elCount": 20
   }

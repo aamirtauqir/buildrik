@@ -3906,6 +3906,22 @@
       "state": "canvas-cheat-sheet",
       "figmaNodeId": "340:2",
       "notes": "NEW ROW 2026-08-22 — the '?' cheat sheet (KeyboardCheatSheet), captured whole: a Radix modal, so unlike the ⌘K palette it survives the capture script taking focus. This frame is the printed keyboard CONTRACT — Selection / Navigation / Positioning / Editing / View / Context Menu — and is what the 2026-08-22 arrow-key walk was measured against. Distinct from BL-0121 sitemenu-keyboard-shortcuts, which is the ⌘/ app panel; see the dead-ledger row BL-0210 for the two-overlay history. Measured: '?' opens only this one, ⌘/ opens only the other. Reference PNG captured 2026-08-22 via capture.mjs. Until then these rows existed only as Figma frames — captured straight through html-to-design — so drift-diff had nothing on disk to compare and could never have measured them. Baseline established at 0; the next run has something to diff."
+    },
+    {
+      "kind": "editor-state",
+      "route": "/edit/[siteId]",
+      "statusClass": 1,
+      "flow": "editor",
+      "viewport": "1440x900",
+      "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
+      "figmaPageId": "75:2",
+      "requires": "session",
+      "pipelineState": "captured-current",
+      "capturedFrom": "localhost@36b5c1a1",
+      "id": "BL-0218",
+      "state": "panel-review",
+      "figmaNodeId": "357:2",
+      "notes": "Captured 2026-08-22 from the running editor, first surface of the money-path arc to reach Figma. Carries the fix in 36b5c1a1: the round has no client link, so the panel reads 'Withdraw request' rather than 'Revoke link'. html-to-design dropped the capture on page 0:1 (the Dashboard page), not the editor page — a NAVIGATE reaction may only target a top-level frame on the SAME page, so it has to be appendChild'd onto 75:2 before any wiring will take."
     }
   ]
 }
