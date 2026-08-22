@@ -631,47 +631,42 @@
         }
       ],
       "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible.",
-      "_capture_status": "The control is present and a direct Playwright click on it succeeds — verified 2026-08-23 with elementFromPoint (the button is its own topmost element, nothing intercepts). What is NOT established is what the click produces: 'Add new page' opens no dialog or menu, so the state this frame is supposed to show may be inline in the drawer rather than an overlay. The board name is the only description of it, and that has already proved unreliable once (BL-0173). Needs the 08-19 frame read to see what it drew, the way BL-0173 was settled."
+      "_capture_status": "Still missing after openTab and a 4.5s settle. The row control [aria-label='More options for Home'] exists and a single-shot probe clicks it, but not in this sequence. Unresolved — and NOT diagnosed, so no guess is recorded here."
     },
     {
       "id": "BL-0164",
       "state": "pages-add-page",
       "actions": [
         {
-          "click": ".ls-rail [data-tab=pages]"
-        },
-        {
-          "waitMs": 2000
+          "openTab": "pages"
         },
         {
           "click": "[aria-label='Add new page']"
         },
         {
-          "waitMs": 2000
+          "waitMs": 2500
         }
       ],
       "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible.",
-      "_capture_status": "The control is present and a direct Playwright click on it succeeds — verified 2026-08-23 with elementFromPoint (the button is its own topmost element, nothing intercepts). What is NOT established is what the click produces: 'Add new page' opens no dialog or menu, so the state this frame is supposed to show may be inline in the drawer rather than an overlay. The board name is the only description of it, and that has already proved unreliable once (BL-0173). Needs the 08-19 frame read to see what it drew, the way BL-0173 was settled."
+      "_capture_status": "The click WORKS and does exactly one thing: it appends a page to the list. Verified by counting — each run left the fixture one page longer, which is how I noticed my own probes had grown it from four pages to nine (cleaned up). So the state this frame shows is 'the page list, one longer', which is almost indistinguishable from the panel at rest and has no marker of its own. It also MUTATES the fixture, so capturing it repeatedly is not free. Decide whether the frame is worth keeping before capturing it again."
     },
     {
       "id": "BL-0165",
       "state": "pages-listings-view",
       "actions": [
         {
-          "click": ".ls-rail [data-tab=pages]"
-        },
-        {
-          "waitMs": 2000
+          "openTab": "pages"
         },
         {
           "click": "text=Listings"
         },
         {
-          "waitMs": 2000
+          "waitMs": 2500
         }
       ],
       "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible.",
-      "_capture_status": "The control is present and a direct Playwright click on it succeeds — verified 2026-08-23 with elementFromPoint (the button is its own topmost element, nothing intercepts). What is NOT established is what the click produces: 'Add new page' opens no dialog or menu, so the state this frame is supposed to show may be inline in the drawer rather than an overlay. The board name is the only description of it, and that has already proved unreliable once (BL-0173). Needs the 08-19 frame read to see what it drew, the way BL-0173 was settled."
+      "_marker": "SCORE",
+      "_verified": "2026-08-23 — the drawer changes to '‹ Pages | PAGE | TITLE | DESC | SCORE | Home Missing 45 …', the listings drill-in. The old 08-19 frame drew the same thing, so name and content agree here."
     },
     {
       "id": "BL-0166",
@@ -711,7 +706,7 @@
         }
       ],
       "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible.",
-      "_capture_status": "The control is present and a direct Playwright click on it succeeds — verified 2026-08-23 with elementFromPoint (the button is its own topmost element, nothing intercepts). What is NOT established is what the click produces: 'Add new page' opens no dialog or menu, so the state this frame is supposed to show may be inline in the drawer rather than an overlay. The board name is the only description of it, and that has already proved unreliable once (BL-0173). Needs the 08-19 frame read to see what it drew, the way BL-0173 was settled."
+      "_capture_status": "'Expand Pages' clicks fine and the DRAWER does not change, so whatever full-page view it opens renders outside the drawer — my check looked in the wrong place, the same error that made me read the Project settings modal as a miss. Needs a check against the full document, not the drawer."
     },
     {
       "id": "BL-0169",
