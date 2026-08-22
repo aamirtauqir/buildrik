@@ -224,3 +224,49 @@ was missing.
 1. **SMTP** — links 1 and 6 send real mail from `info@buildrick.io`.
 2. **A Stripe test-mode subscription** — `handleCheckoutCompleted` calls a real `subscriptions.retrieve`.
 3. **PostHog** — no analytics SDK in the repo; `NEXT_PUBLIC_POSTHOG_KEY` is baked at build.
+
+---
+
+## 9. Figma baseline — what this arc put into the file (2026-08-22)
+
+File `Micuc1rmLcFhjxF1A08Kk2`. The MCP tools were not registered in this
+session; the keychain-token route in
+`reference_figma_mcp_session_registry_gap` reached all 32 of them.
+
+Every fix in §8 that changes something a person sees is now a frame, each one
+read back after writing — by screenshot where the copy is the point.
+
+| Frame | State | Why it did not exist before |
+|---|---|---|
+| BL-0225 | `/auth/verify-email` send-failed | `signup` only started reporting the failure in `ce3b97a3`; the page claimed the mail was sent either way |
+| BL-0226 | `/review/:token` expired | `201d7885` — the copy map was keyed on the tRPC code and both reasons map to one FORBIDDEN, so this screen could not render |
+| BL-0227 | `/review/:token` superseded | same |
+| BL-0228 | create-site at 3/3, owner | the owner half of `de4eb01a` |
+| BL-0229 | create-site at 3/3, non-owner **+ checklist 0/3** | the non-owner half of `de4eb01a`, and `b6170b5c` — the 3-item invited checklist had no caller |
+| BL-0106, BL-0110, BL-0126–BL-0129 | publish dropdown, review pill, four inspector states | not new, just stale: they were still an 08-19 prod render |
+
+### What the harness was doing wrong
+
+`figma-capture-live.mjs` raced a promise that never settles against a 45s timer
+and resolved `{ submitted: true }` from the timer. A submit that died on the
+network printed success and nothing landed. The submit's own HTTP status is the
+signal now.
+
+Then the correction: **a reported failure is not proof of nothing landing.**
+Four runs reported `ERR_NETWORK_CHANGED` and every one of them arrived — the
+POST completed server-side and only the response was lost. Retrying on that
+signal left five duplicate frames, which had to be deleted. Read the page back
+and count.
+
+`BK_STATE` picks the session, because BL-0228 and BL-0229 are the same screen
+and differ only by who is looking.
+
+### Still out
+
+- **Sixteen editor states have no recipe** — media sub-views, pages sub-views,
+  brand tabs, content. Their controls live inside panels that have to be opened
+  before a selector can be written honestly, so guessing one would capture the
+  wrong state quietly. Ten site-menu doors did have unambiguous paths and got
+  recipes; `screens-editor.json` carries them.
+- The editor page's own note still records drift measured against the 08-19
+  cluster. It is accurate for the frames that remain stale.
