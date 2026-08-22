@@ -43,6 +43,26 @@ const WIDGET_ROLES = [
  */
 const TEXT_OWNED_COMMANDS = new Set(["select-all", "cut", "copy", "paste", "undo", "redo"]);
 
+/**
+ * Commands that CHANGE the document. In a read-only composer they must not run,
+ * whatever the chord.
+ *
+ * This list is the one that matters for client view. The chrome withheld the
+ * React handlers — inline edit, drop, the context menu, the wrapper's keydown —
+ * and the document stayed mutable anyway, because KeybindingManager binds
+ * `keydown` on WINDOW in the capture phase. Click-to-select is deliberately
+ * left on, so: click an element, press Delete, and it is gone. Measured on a
+ * scratch site in client view — 203 elements became 202, and autosave writes
+ * that to the server. Gating N React leaves cannot close a window listener; the
+ * gate belongs at the gateway.
+ */
+const MUTATING_COMMANDS = new Set([
+  "delete", "duplicate", "cut", "paste", "undo", "redo", "save",
+  "group", "ungroup",
+  "bring-forward", "send-backward", "bring-to-front", "send-to-back",
+  "move-up", "move-down", "nudge-up", "nudge-down", "nudge-left", "nudge-right",
+]);
+
 /** Is the keystroke aimed at somewhere the user is typing? */
 function isTextEntry(el: HTMLElement | null): boolean {
   if (!el) return false;
@@ -156,6 +176,9 @@ export class CommandCenter {
    */
   private shouldHandleShortcut(e: KeyboardEvent, commandId: string): boolean {
     const target = e.target as HTMLElement | null;
+
+    // A read-only composer runs no command that changes the document.
+    if (this.composer.readOnly && MUTATING_COMMANDS.has(commandId)) return false;
 
     if (e.metaKey || e.ctrlKey) {
       // Carve-out 1: the clipboard/undo/select chords belong to the caret.

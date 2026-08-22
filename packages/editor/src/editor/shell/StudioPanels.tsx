@@ -200,6 +200,13 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
      chrome into client view are reached by CSS alone: the empty-container
      placeholder is a ::after in Canvas.css, and the footer's selection label is
      rendered by AquibraStudio, which an agent session must not stage. */
+  /* The engine gate. Withholding React handlers left the document mutable —
+     KeybindingManager listens on window in the capture phase, so click-then-
+     Delete still worked. One flag on the gateway closes every chord at once. */
+  React.useEffect(() => {
+    if (composer) composer.readOnly = clientView;
+  }, [composer, clientView]);
+
   React.useEffect(() => {
     const root = document.documentElement;
     if (!clientView) return;

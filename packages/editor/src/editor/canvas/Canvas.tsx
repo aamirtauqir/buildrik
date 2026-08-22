@@ -643,7 +643,12 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
 
           {showLoadingCanvas && <CanvasLoadingSkeleton />}
 
-          {isCanvasEmpty && (
+          {/* "Start with a template, or drop your first section" with Browse
+             templates / Start blank — build CTAs, and Browse templates emits an
+             event whose drawer is not mounted in client view, so it is a dead
+             door as well as a wrong one. The container placeholder next to it
+             was already suppressed; this larger one was missed. */}
+          {isCanvasEmpty && !readOnly && (
             <CanvasEmptyCTA
               onBrowseTemplates={() => composer?.emit("ui:browse-templates", {})}
               onStartBlank={() => setEmptyDismissed(true)}
@@ -652,6 +657,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
 
           {/* All overlays delegated to CanvasOverlayGroup */}
           <CanvasOverlayGroup
+            readOnly={readOnly}
             composer={composer}
             canvasRef={canvasRef}
             showGrid={showGrid}

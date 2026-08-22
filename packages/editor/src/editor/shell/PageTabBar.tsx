@@ -246,11 +246,14 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer, readOnly = fal
                   e.preventDefault();
                   handleTabClick(page.id);
                 }
-                if (e.key === "F2") {
+                /* readOnly guarded onContextMenu but not the keyboard, so F2
+                   still opened the rename input and ⇧F10 still opened the menu
+                   with Delete in it. A mouse-only guard is not a guard. */
+                if (e.key === "F2" && !readOnly) {
                   e.preventDefault();
                   handleRename(page.id);
                 }
-                if (e.key === "ContextMenu" || (e.shiftKey && e.key === "F10")) {
+                if (!readOnly && (e.key === "ContextMenu" || (e.shiftKey && e.key === "F10"))) {
                   e.preventDefault();
                   const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
                   // Open above the tab — tab bar is at the bottom, rect.bottom is off-screen

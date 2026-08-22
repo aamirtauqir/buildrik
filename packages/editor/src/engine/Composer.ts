@@ -116,6 +116,20 @@ export class Composer extends EventEmitter {
   readonly elements: ElementManager;
   readonly styles: StyleEngine;
   readonly commands!: CommandCenter;
+
+  /**
+   * Read-only composer: every command that would change the document stands
+   * down (see MUTATING_COMMANDS in CommandCenter). Set by the chrome for client
+   * view, which is a VIEW — whoever is holding it is looking, not building.
+   *
+   * It lives here rather than in the chrome because KeybindingManager binds
+   * keydown on WINDOW in the capture phase, so gating React handlers cannot
+   * reach it: with the rail, inspector, inline edit and context menu all
+   * withheld, click-then-Delete still removed an element and autosave still
+   * wrote it. CLAUDE.md says the Composer is the single gateway to the engine;
+   * this is the gate.
+   */
+  readOnly = false;
   readonly selection!: SelectionManager;
   readonly history!: HistoryManager;
   readonly versions!: VersionTimelineManager;

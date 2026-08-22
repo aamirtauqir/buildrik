@@ -236,6 +236,11 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   React.useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        /* Client view has no palette. It offers Delete element, Paste, Undo and
+           "Open <tab> panel" rows for panels that are not rendered — a keyboard
+           door into the editor from a mode built to have none. Confirmed by
+           pressing it: the palette opened on Insert / AI / Templates / Media. */
+        if (viewMode.clientView) return;
         // F9: a modal dialog (exit guard, confirm) owns the keyboard — opening
         // the palette on top of it would stack two focus traps.
         if (isModalOpen()) return;
@@ -245,7 +250,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, []);
+  }, [viewMode.clientView]);
 
   // S5.2: the persistent review pill. Fails closed to "none" (flag off, no
   // review), which renders nothing — safe for non-agency workspaces too.
@@ -604,7 +609,9 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         onExit={exitToDashboard}
         save={save}
         savedAt={lastSavedAt ?? lastSaved?.getTime()}
-        onSave={onSave}
+        /* SaveStatus renders as a BUTTON that fires onSave when the state is
+           unsaved or error. A view does not offer a save control. */
+        onSave={viewMode.clientView ? undefined : onSave}
         review={review}
         tools={tools}
         presence={

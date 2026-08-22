@@ -72,6 +72,13 @@ export interface CanvasOverlayGroupProps {
   onSelectAncestor: (id: string) => void;
   onDuplicate: () => void;
   onDelete: () => void;
+  /**
+   * Client view. Selection itself is harmless, but the chrome it draws is not:
+   * the resize box and the unified toolbar carry Duplicate, Delete, Copy, Wrap
+   * and Move. Withholding the canvas's own mutation handlers left this whole
+   * layer reachable by a single click.
+   */
+  readOnly?: boolean;
   onCopy: () => void;
   onWrap: () => void;
   onMoveUp: () => void;
@@ -152,6 +159,7 @@ export function CanvasOverlayGroup({
   onSelectAncestor,
   onDuplicate,
   onDelete,
+  readOnly = false,
   onCopy,
   onWrap,
   onMoveUp,
@@ -256,8 +264,8 @@ export function CanvasOverlayGroup({
       {/* Snap lines during drag — single renderer, zoom-aware */}
       {showGuides && <SmartGuidesOverlay snapLines={snapLines} zoom={zoom} />}
 
-      {/* Selection overlays */}
-      {selectedId && (
+      {/* Selection overlays — every one of them is an edit affordance. */}
+      {selectedId && !readOnly && (
         <div style={spotsOverlayStyles}>
           {showSpacing && spacingIndicators.length > 0 && (
             <CanvasSpotSpacing
