@@ -15,5 +15,5 @@ export const rangeInputBlockConfig: RangeInputBlockConfig = {
   category: "Forms",
   elementType: "input",
   icon: "/src/assets/icons/blocks/input.svg",
-  content: '<input type="range" min="0" max="100" value="50" style="width:100%"/>',
+  content: '<input type="range" name="range" min="0" max="100" value="50" style="width:100%"/>',
 };

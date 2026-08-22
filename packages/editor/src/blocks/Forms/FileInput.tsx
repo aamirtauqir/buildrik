@@ -15,5 +15,5 @@ export const fileInputBlockConfig: FileInputBlockConfig = {
   category: "Forms",
   elementType: "input",
   icon: "/src/assets/icons/blocks/upload.svg",
-  content: '<input type="file" style="padding:8px"/>',
+  content: '<input type="file" name="file" style="padding:8px"/>',
 };

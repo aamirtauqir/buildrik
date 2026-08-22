@@ -16,5 +16,5 @@ export const passwordInputBlockConfig: PasswordInputBlockConfig = {
   elementType: "input",
   icon: "/src/assets/icons/blocks/input.svg",
   content:
-    '<input type="password" placeholder="Password" style="padding:8px;border:1px solid #ccc;border-radius:4px;width:100%"/>',
+    '<input type="password" name="password" placeholder="Password" style="padding:8px;border:1px solid #ccc;border-radius:4px;width:100%"/>',
 };

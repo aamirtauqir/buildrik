@@ -16,5 +16,5 @@ export const numberInputBlockConfig: NumberInputBlockConfig = {
   elementType: "input",
   icon: "/src/assets/icons/blocks/input.svg",
   content:
-    '<input type="number" placeholder="0" style="padding:8px;border:1px solid #ccc;border-radius:4px"/>',
+    '<input type="number" name="number" placeholder="0" style="padding:8px;border:1px solid #ccc;border-radius:4px"/>',
 };

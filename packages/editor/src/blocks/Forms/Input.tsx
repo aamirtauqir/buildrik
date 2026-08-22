@@ -14,5 +14,5 @@ export const inputBlockConfig: InputBlockConfig = {
   label: "Input",
   category: "Forms",
   elementType: "input",
-  content: '<input type="text" placeholder="Enter text..."/>',
+  content: '<input type="text" name="text" placeholder="Enter text..."/>',
 };

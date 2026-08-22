@@ -14,5 +14,5 @@ export const selectBlockConfig: SelectBlockConfig = {
   label: "Select",
   category: "Forms",
   elementType: "select",
-  content: "<select><option>Option 1</option><option>Option 2</option></select>",
+  content: "<select name='choice'><option>Option 1</option><option>Option 2</option></select>",
 };

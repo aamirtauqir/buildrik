@@ -16,5 +16,5 @@ export const checkboxBlockConfig: CheckboxBlockConfig = {
   elementType: "input",
   icon: "/src/assets/icons/blocks/input.svg",
   content:
-    '<label style="display:flex;align-items:center;gap:8px"><input type="checkbox"/> Checkbox option</label>',
+    '<label style="display:flex;align-items:center;gap:8px"><input type="checkbox" name="checkbox"/> Checkbox option</label>',
 };

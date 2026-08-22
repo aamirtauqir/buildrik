@@ -14,5 +14,5 @@ export const textareaBlockConfig: TextareaBlockConfig = {
   label: "Textarea",
   category: "Forms",
   elementType: "textarea",
-  content: '<textarea placeholder="Enter message..."></textarea>',
+  content: '<textarea name="message" placeholder="Enter message..."></textarea>',
 };

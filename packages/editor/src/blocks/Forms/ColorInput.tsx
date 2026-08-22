@@ -16,5 +16,5 @@ export const colorInputBlockConfig: ColorInputBlockConfig = {
   elementType: "input",
   icon: "/src/assets/icons/blocks/input.svg",
   content:
-    '<input type="color" value="#667eea" style="width:50px;height:40px;border:none;cursor:pointer"/>',
+    '<input type="color" name="color" value="#667eea" style="width:50px;height:40px;border:none;cursor:pointer"/>',
 };

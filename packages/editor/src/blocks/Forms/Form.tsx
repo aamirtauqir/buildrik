@@ -15,5 +15,5 @@ export const formBlockConfig: FormBlockConfig = {
   category: "Forms",
   elementType: "form",
   content:
-    '<form><input type="text" placeholder="Name"/><input type="email" placeholder="Email"/><button type="submit">Submit</button></form>',
+    '<form><input type="text" name="fullname" placeholder="Name"/><input type="email" name="email" placeholder="Email"/><button type="submit">Submit</button></form>',
 };
