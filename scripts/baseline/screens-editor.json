@@ -1,5 +1,5 @@
 {
-  "_note": "How each editor baseline state is reached in the RUNNING app. Written 2026-08-21 while refreshing the Figma baseline: the original spec was never committed, so every re-capture started by rediscovering the routes. Drive it with figma-capture-live.mjs. `selectType` selects through the engine rather than clicking canvas coordinates, because the canvas is engine-rendered HTML and a coordinate click lands wherever the layout put it.",
+  "_note": "How each editor baseline state is reached in the RUNNING app. Written 2026-08-21 while refreshing the Figma baseline: the original spec was never committed, so every re-capture started by rediscovering the routes. Drive it with figma-capture-live.mjs. `selectType` selects through the engine rather than clicking canvas coordinates, because the canvas is engine-rendered HTML and a coordinate click lands wherever the layout put it. | 2026-08-22: 32 states re-captured. 21 confirmed by content, 9 held on the board as UNVERIFIED because the marker used could not tell the state from the panel at rest, 2 deleted because they provably never reached their state. Naming by arrival order was avoided deliberately — three frames this session would have been mislabelled that way.",
   "site": "cmrsur1fp000unh3rvmmiq25t",
   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
   "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
@@ -556,7 +556,8 @@
           "waitMs": 2500
         }
       ],
-      "_note": "'Browse stock' is SlimLauncher's own label (SlimLauncher.tsx:292) — the button moved to the footer when search took the lead, so an older recipe aimed at a '+ Stock' chip would miss."
+      "_note": "'Browse stock' is SlimLauncher's own label (SlimLauncher.tsx:292) — the button moved to the footer when search took the lead, so an older recipe aimed at a '+ Stock' chip would miss.",
+      "_verified": "2026-08-22 — state confirmed in the captured frame by a marker only that state renders."
     },
     {
       "id": "BL-0160",
@@ -575,7 +576,8 @@
           "waitMs": 2500
         }
       ],
-      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible."
+      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible.",
+      "_capture_status": "MISSES TODAY. Actions run AFTER the capture script is injected and injection moves focus, so any surface that closes on blur is gone by capture time — the same trap that captured the ⌘K palette as a plain shell. A right-click menu and an overlay opened from a launcher both behave that way. Re-open the surface as the LAST action, or teach the harness to inject before the actions for these."
     },
     {
       "id": "BL-0161",
@@ -594,7 +596,8 @@
           "waitMs": 3000
         }
       ],
-      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible."
+      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible.",
+      "_verified": "2026-08-22 — state confirmed in the captured frame by a marker only that state renders."
     },
     {
       "id": "BL-0162",
@@ -619,7 +622,8 @@
           "waitMs": 1500
         }
       ],
-      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible."
+      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible.",
+      "_capture_status": "MISSES TODAY for a fixture reason, not a recipe one: the media library holds 0 assets, so grid and list render the same empty state and the two frames are byte-identical. Seed an asset before capturing this pair or the difference cannot exist."
     },
     {
       "id": "BL-0163",
@@ -638,7 +642,8 @@
           "waitMs": 1500
         }
       ],
-      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible."
+      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible.",
+      "_capture_status": "CAPTURED but not confirmed. 'Listings' appears on the Pages panel itself, so it cannot tell an opened sub-view from the panel at rest. Needs a marker unique to the sub-view."
     },
     {
       "id": "BL-0164",
@@ -657,7 +662,8 @@
           "waitMs": 2000
         }
       ],
-      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible."
+      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible.",
+      "_capture_status": "CAPTURED but not confirmed. 'Listings' appears on the Pages panel itself, so it cannot tell an opened sub-view from the panel at rest. Needs a marker unique to the sub-view."
     },
     {
       "id": "BL-0165",
@@ -676,7 +682,8 @@
           "waitMs": 2000
         }
       ],
-      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible."
+      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible.",
+      "_capture_status": "CAPTURED but not confirmed. 'Listings' appears on the Pages panel itself, so it cannot tell an opened sub-view from the panel at rest. Needs a marker unique to the sub-view."
     },
     {
       "id": "BL-0166",
@@ -695,7 +702,8 @@
           "waitMs": 1500
         }
       ],
-      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible."
+      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible.",
+      "_verified": "2026-08-22 — state confirmed in the captured frame by a marker only that state renders."
     },
     {
       "id": "BL-0167",
@@ -714,7 +722,8 @@
           "waitMs": 3000
         }
       ],
-      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible."
+      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible.",
+      "_capture_status": "CAPTURED but not confirmed. 'Listings' appears on the Pages panel itself, so it cannot tell an opened sub-view from the panel at rest. Needs a marker unique to the sub-view."
     },
     {
       "id": "BL-0169",
@@ -733,7 +742,8 @@
           "waitMs": 2000
         }
       ],
-      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible. Brand rows carry a count suffix in the DOM (\"Starters6›\"), so these match on substring, not exact text."
+      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible. Brand rows carry a count suffix in the DOM (\"Starters6›\"), so these match on substring, not exact text.",
+      "_capture_status": "CAPTURED but not confirmed. The Brand rows print their own labels on the panel, so a marker like 'Colour mode' or 'Starters' matches whether or not the drill-in opened. Needs a marker only the drill-in renders, read off the open panel."
     },
     {
       "id": "BL-0170",
@@ -752,7 +762,8 @@
           "waitMs": 2000
         }
       ],
-      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible. Brand rows carry a count suffix in the DOM (\"Starters6›\"), so these match on substring, not exact text."
+      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible. Brand rows carry a count suffix in the DOM (\"Starters6›\"), so these match on substring, not exact text.",
+      "_capture_status": "CAPTURED but not confirmed. The Brand rows print their own labels on the panel, so a marker like 'Colour mode' or 'Starters' matches whether or not the drill-in opened. Needs a marker only the drill-in renders, read off the open panel."
     },
     {
       "id": "BL-0171",
@@ -771,7 +782,8 @@
           "waitMs": 2000
         }
       ],
-      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible. Brand rows carry a count suffix in the DOM (\"Starters6›\"), so these match on substring, not exact text."
+      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible. Brand rows carry a count suffix in the DOM (\"Starters6›\"), so these match on substring, not exact text.",
+      "_capture_status": "CAPTURED but not confirmed. The Brand rows print their own labels on the panel, so a marker like 'Colour mode' or 'Starters' matches whether or not the drill-in opened. Needs a marker only the drill-in renders, read off the open panel."
     },
     {
       "id": "BL-0174",
@@ -790,7 +802,8 @@
           "waitMs": 2000
         }
       ],
-      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible. Brand rows carry a count suffix in the DOM (\"Starters6›\"), so these match on substring, not exact text."
+      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible. Brand rows carry a count suffix in the DOM (\"Starters6›\"), so these match on substring, not exact text.",
+      "_capture_status": "CAPTURED but not confirmed. The Brand rows print their own labels on the panel, so a marker like 'Colour mode' or 'Starters' matches whether or not the drill-in opened. Needs a marker only the drill-in renders, read off the open panel."
     },
     {
       "id": "BL-0175",
@@ -809,7 +822,8 @@
           "waitMs": 2000
         }
       ],
-      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible."
+      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible.",
+      "_verified": "2026-08-22 — state confirmed in the captured frame by a marker only that state renders."
     },
     {
       "id": "BL-0173",
@@ -828,7 +842,8 @@
           "waitMs": 2000
         }
       ],
-      "_note": "The board calls this frame 'brand-styles-tab' and no control on the Brand panel is called Styles. Reading the 08-19 frame settled it: it draws '‹ Presets' with Button / Card / Form input / Link / Badge / Alert / Tooltip / Modal / Nav / Table — the Presets drill-in. The board name is wrong, the frame is not; BL-0174 is the Components row beside it, which is consistent."
+      "_note": "The board calls this frame 'brand-styles-tab' and no control on the Brand panel is called Styles. Reading the 08-19 frame settled it: it draws '‹ Presets' with Button / Card / Form input / Link / Badge / Alert / Tooltip / Modal / Nav / Table — the Presets drill-in. The board name is wrong, the frame is not; BL-0174 is the Components row beside it, which is consistent.",
+      "_verified": "2026-08-22 — state confirmed in the captured frame by a marker only that state renders."
     },
     {
       "id": "BL-0168",
@@ -847,7 +862,8 @@
           "waitMs": 1500
         }
       ],
-      "_note": "Layer rows are div[role=treeitem].bdc-lr — read off the running panel. Targeting the FIRST row rather than a name, because the names are the page's own element labels and change with the fixture; nth=0 is the root Container on any tree."
+      "_note": "Layer rows are div[role=treeitem].bdc-lr — read off the running panel. Targeting the FIRST row rather than a name, because the names are the page's own element labels and change with the fixture; nth=0 is the root Container on any tree.",
+      "_capture_status": "MISSES TODAY. Actions run AFTER the capture script is injected and injection moves focus, so any surface that closes on blur is gone by capture time — the same trap that captured the ⌘K palette as a plain shell. A right-click menu and an overlay opened from a launcher both behave that way. Re-open the surface as the LAST action, or teach the harness to inject before the actions for these."
     },
     {
       "id": "BL-0230",
