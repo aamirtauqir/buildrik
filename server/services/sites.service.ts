@@ -619,6 +619,16 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
         where: { siteId: input.siteId },
         select: { id: true },
       });
+      /* `[].every(...)` is true, so a save carrying no pages read as a complete
+         snapshot of an empty site and deleted every page there was — returning
+         { success: true } while it did. One failed project load followed by one
+         autosave is enough to produce that request; the editor has nothing to
+         send and this boundary treated nothing as "the user removed it all".
+         A site that genuinely has no pages is untouched, so a real no-op still
+         works; only a delete-everything is refused. */
+      if (input.pages.length === 0 && existingPages.length > 0) {
+        throw new Error("EMPTY_SNAPSHOT");
+      }
       const incomingPageIds = new Set(input.pages.map((p: { id: string }) => p.id));
       const pagesToDelete = existingPages.filter((p) => !incomingPageIds.has(p.id));
       if (pagesToDelete.length > 0) {

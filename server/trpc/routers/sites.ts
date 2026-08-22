@@ -270,6 +270,15 @@ export const sitesRouter = router({
             code: "NOT_FOUND",
             message: "Site not found",
           });
+        /* The editor sent a full snapshot with no pages in it — refused at the
+           write boundary before it could delete the site's pages. Surfaced as a
+           precondition rather than a 500 so the editor can say something true
+           instead of retrying the same empty save on the next autosave tick. */
+        if (e instanceof Error && e.message === "EMPTY_SNAPSHOT")
+          throw new TRPCError({
+            code: "PRECONDITION_FAILED",
+            message: "This save carried no pages, so it was not applied. Reload the site before editing.",
+          });
         // 61-conflict: the site changed elsewhere since this editor loaded it.
         // The serverLastEditedAt suffix lets the client offer "Reload latest".
         if (e instanceof Error && e.message.startsWith("SAVE_CONFLICT"))
@@ -495,6 +504,13 @@ export const sitesRouter = router({
       } catch (e: unknown) {
         if (e instanceof Error && e.message === "SITE_NOT_FOUND")
           throw new TRPCError({ code: "NOT_FOUND", message: "Site not found." });
+        // Same refusal as the editor save above — this door writes through the
+        // same boundary, so it must report the same thing.
+        if (e instanceof Error && e.message === "EMPTY_SNAPSHOT")
+          throw new TRPCError({
+            code: "PRECONDITION_FAILED",
+            message: "This save carried no pages, so it was not applied. Reload the site before editing.",
+          });
         throw e;
       }
     }),

@@ -174,8 +174,18 @@ Every row below was measured in code or by running it, not read off a document.
 | 9 | Two of three site-limit doors (duplicate, apply-template) named the limit and offered no way past it | `01010146` |
 | 9 | The upgrade button was shown to editors, who are refused at checkout by `requireOwner`; plus health's storage sum counted media on soft-deleted sites | `de4eb01a` |
 | 6-7 | Expired and superseded review links told the client the link was mistyped and to click it again — two of four dead-link screens were unreachable, and the reason travelled as a bare string the errorFormatter shredded into character indices | `201d7885` |
+| 1-2 | A failed verification email was invisible to everyone: empty catch, a router that answered "Verification email sent" regardless, and a screen telling the user to check an inbox nothing reached | `ce3b97a3` |
+| 6 | A draft share link built with no configured origin was a bare `/share/<token>` — not a link once pasted. Trailing-slash double-slash found by the test | `dc842554` |
+| 5 | **A save carrying no pages deleted every page on the site and returned `{success: true}`.** `[].every(...)` is true, so an empty list read as a complete snapshot of an empty site. Proved by running it: `page.deleteMany({id:{in:["p_1","p_2"]}})`. No client-side guard existed either | see below |
 
 ### Recorded, not fixed
+
+- **Nothing gates on `User.emailVerified`.** `login()` never reads it and no
+  middleware checks it; the only `emailVerified` logic in `auth.config.ts` is the
+  OAuth provider's own flag. A credentials user who never verifies can use the
+  product fully, so the verification flow currently gates nothing. Changing that
+  is a founder decision — a hard gate would lock out every unverified account
+  that already exists.
 
 - **The checklist is self-report.** Ticking "Publish your site" marks it done; nothing observes a publish. Fine as a design, but `onboarding_completed` derived from it would not mean what §15 wants it to mean. Decide before wiring that event.
 - **`components/billing/limit-reached.tsx` has zero consumers.** It is role-aware and shows usage — better than the inline block it lost to — but wiring it is a visual change with no board, and it hard-codes `$29/mo` where `plan-limits.ts` is the SSOT.
