@@ -21,6 +21,7 @@ vi.mock("../../sidebar/tabs/history/HistoryTab", () => ({ default: () => null })
 vi.mock("../../sidebar/tabs/settings/SettingsTab", () => ({ default: () => null }));
 
 import { GROUPED_TABS_CONFIG } from "../tabsConfig";
+import { ToastProvider } from "@/editor/chrome-ui";
 import { LeftSidebar } from "../../sidebar/LeftSidebar";
 
 beforeAll(() => {
@@ -54,14 +55,20 @@ describe("Rail — Design entry", () => {
   });
 
   it("renders Design between Components and Settings in rail", () => {
+    /* LeftSidebar reads useToast (the Components create door tells the user
+       when nothing is selected) and useToast throws outside its provider. The
+       app always has one — AquibraStudio wraps the studio in ToastProvider —
+       so it belongs in the harness, not as a fallback in the component. */
     const { container } = render(
-      <LeftSidebar
-        composer={null}
-        activeTab="add"
-        onTabChange={vi.fn()}
-        drawerOpen={false}
-        onDrawerToggle={vi.fn()}
-      />
+      <ToastProvider>
+        <LeftSidebar
+          composer={null}
+          activeTab="add"
+          onTabChange={vi.fn()}
+          drawerOpen={false}
+          onDrawerToggle={vi.fn()}
+        />
+      </ToastProvider>
     );
     const buttons = Array.from(
       container.querySelectorAll<HTMLButtonElement>(".ls-rail button[data-tab]")
