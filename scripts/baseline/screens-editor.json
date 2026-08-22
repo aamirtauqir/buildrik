@@ -570,14 +570,14 @@
           "waitMs": 2000
         },
         {
-          "click": "text=Icons and SVG"
+          "click": "text=Icons"
         },
         {
           "waitMs": 2500
         }
       ],
-      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible.",
-      "_capture_status": "MISSES TODAY. Actions run AFTER the capture script is injected and injection moves focus, so any surface that closes on blur is gone by capture time — the same trap that captured the ⌘K palette as a plain shell. A right-click menu and an overlay opened from a launcher both behave that way. Re-open the surface as the LAST action, or teach the harness to inject before the actions for these."
+      "_note": "'Icons and SVG' is an aria-label on a filter pill whose visible text is 'svg0' — a text= selector for it matches nothing. The control that opens the picker is the plain 'Icons' button. Verified live: the dialog reads 'Media ✕ ‹ Icons All ▾ 17 categories'.",
+      "_marker": "17 categories"
     },
     {
       "id": "BL-0161",
@@ -862,8 +862,8 @@
           "waitMs": 1500
         }
       ],
-      "_note": "Layer rows are div[role=treeitem].bdc-lr — read off the running panel. Targeting the FIRST row rather than a name, because the names are the page's own element labels and change with the fixture; nth=0 is the root Container on any tree.",
-      "_capture_status": "MISSES TODAY. Actions run AFTER the capture script is injected and injection moves focus, so any surface that closes on blur is gone by capture time — the same trap that captured the ⌘K palette as a plain shell. A right-click menu and an overlay opened from a launcher both behave that way. Re-open the surface as the LAST action, or teach the harness to inject before the actions for these."
+      "_note": "Right-click opens Cut / Copy / Paste / Duplicate / Delete / Rename / Group selection — read off the running menu. An earlier pass checked this frame against invented items ('Bring forward', 'Send backward') and wrongly concluded the capture had missed.",
+      "_marker": "Group selection"
     },
     {
       "id": "BL-0230",
