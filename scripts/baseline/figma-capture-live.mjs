@@ -44,7 +44,15 @@ const page = await c.newPage();
 page.on("console", (m) => { const t = m.text(); if (/figma|capture|csp|refused/i.test(t)) console.log("PAGE:", m.type(), t.slice(0, 200)); });
 page.on("pageerror", (e) => console.log("PAGEERROR:", String(e).slice(0, 200)));
 page.on("requestfailed", (r) => { if (/figma/.test(r.url())) console.log("REQFAIL:", r.url().slice(0, 90), r.failure()?.errorText); });
-page.on("response", (r) => { if (/mcp\.figma\.com/.test(r.url())) console.log("FIGMA HTTP", r.status(), r.url().slice(0, 90)); });
+/* The submit's HTTP status IS the outcome — see the race below, which used to
+   report success off a timer and called a failed submit "submitted". */
+let submitStatus = null;
+page.on("response", (r) => {
+  if (/mcp\.figma\.com/.test(r.url())) console.log("FIGMA HTTP", r.status(), r.url().slice(0, 90));
+  if (/\/submit/.test(r.url())) submitStatus = r.status();
+});
+let submitFailed = null;
+page.on("requestfailed", (r) => { if (/\/submit/.test(r.url())) submitFailed = r.failure()?.errorText ?? "failed"; });
 /* The dashboard sets a CSP and the capture script must be injectable — but
    intercepting EVERY request breaks the app: Next streams RSC payloads, and
    refetch+fulfill mangles them, so the editor never mounts and the sentinel
@@ -99,7 +107,13 @@ if (process.env.DRY === "1") { await b.close(); process.exit(0); }
 const SEL = SELECTOR && SELECTOR !== "none" ? SELECTOR : "body";
 console.log("capturing selector:", SEL, "node count:", await page.evaluate((sel) => document.querySelector(sel)?.querySelectorAll("*").length ?? -1, SEL));
 const result = await Promise.race([
-  new Promise((res) => setTimeout(() => res({ submitted: true, note: 'promise never settles; the 200 above is the signal' }), 45000)),
+  /* captureForDesign's promise does not settle, so the timer is how we stop
+     waiting — but it is NOT evidence of success. It used to resolve
+     { submitted: true } unconditionally, so a submit that died on
+     ERR_NETWORK_CHANGED (Chromium throws it when a VPN/tunnel interface
+     flaps mid-POST, and this machine has several) still printed success and
+     nothing landed in Figma. Report what the network actually did. */
+  new Promise((res) => setTimeout(() => res({ submitted: submitStatus === 200, submitStatus, submitFailed, note: 'timer elapsed; the submit response is the signal' }), 45000)),
   page.evaluate(async ({ cid, sel }) => {
     if (!window.figma || typeof window.figma.captureForDesign !== "function") {
       return { error: "captureForDesign missing", keys: Object.keys(window.figma || {}) };
@@ -113,6 +127,10 @@ const result = await Promise.race([
     } catch (e) { return { error: String(e).slice(0, 300) }; }
   }, { cid: CAPTURE_ID, sel: SEL }),
 ]);
-console.log(JSON.stringify(result));
 await page.waitForTimeout(4000);
+/* Late-arriving response: the race can elapse before the POST answers. */
+const final = { ...result, submitStatus: submitStatus ?? result.submitStatus, submitFailed: submitFailed ?? result.submitFailed };
+final.submitted = final.submitStatus === 200;
+console.log(JSON.stringify(final));
 await b.close();
+if (!final.submitted) process.exit(3);

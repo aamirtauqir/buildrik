@@ -1,0 +1,37 @@
+{
+  "_note": "The client review page — /review/<token>, the one surface in the product built for someone with no account. Four dead-link states exist; two of them (expired, superseded) were unreachable until 201d7885, because the copy map was keyed on the tRPC code and the router maps both to one FORBIDDEN. Capturing them needs rows, not a route: the state IS the row.",
+  "path": "/review",
+  "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
+  "figmaPageId": "0:1",
+  "_fixtures": "scripts/baseline/review-fixtures.sql — two non-PENDING rows on the Riverstone demo site. Non-PENDING deliberately: review_requests_pending_unique allows only one PENDING row per site, and the demo site already has one.",
+  "screens": [
+    {
+      "id": "BL-0223",
+      "state": "invalid-token",
+      "path": "/review/blfixturenosuchtoken0000000001",
+      "sentinel": { "text": "This link doesn't work" },
+      "figmaNodeId": "364:2"
+    },
+    {
+      "id": "BL-0226",
+      "state": "expired",
+      "path": "/review/blfixtureexpiredtoken0000000001",
+      "sentinel": { "text": "This link has expired" },
+      "_verified": "2026-08-22 — rendered in the running app: 'Review links work for 90 days. Ask your designer to send a new one — your earlier comments are still saved.' Not yet in Figma: the html-to-design submit POST failed three times with ERR_INTERNET_DISCONNECTED / ERR_NETWORK_CHANGED from inside the browser context while curl to the same host returned 200."
+    },
+    {
+      "id": "BL-0227",
+      "state": "superseded",
+      "path": "/review/blfixturerevokedtoken0000000001",
+      "sentinel": { "text": "There's a newer version" },
+      "_verified": "2026-08-22 — rendered in the running app: 'Your designer sent an updated link, which replaced this one.' Not yet in Figma, same network fault as BL-0226."
+    },
+    {
+      "id": "BL-0224",
+      "state": "client-sign-off",
+      "path": "/review/<a live PENDING token>",
+      "sentinel": { "text": "is asking for your feedback" },
+      "figmaNodeId": "366:2"
+    }
+  ]
+}
