@@ -158,6 +158,34 @@ describe("load states", () => {
     expect(screen.queryByRole("button", { name: "Revoke link" })).not.toBeInTheDocument();
   });
 
+  /* Two kinds of round reach this panel and the boards only draw one. A round
+     submitted from the dashboard's "Send for Review" carries no clientEmail, so
+     `review.service.ts` mints no token — there is no link, and every string
+     here named one. That is also the round that can wedge publish, so the copy
+     it shows while the user digs their way out has to describe what actually
+     happened. */
+  it("a round with no client link is withdrawn, not revoked, and names no link", async () => {
+    fetchCurrentRound.mockResolvedValue({ ...ROUND, invitedEmail: null, reviewerName: null, revoked: true });
+    renderTab();
+    expect(await screen.findByText("This review request was withdrawn.")).toBeInTheDocument();
+    expect(screen.queryByText(/link was revoked/i)).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Send for review again" })).toBeInTheDocument();
+  });
+
+  it("asks to withdraw, not to revoke a link, when there is no client link", async () => {
+    fetchCurrentRound.mockResolvedValue({ ...ROUND, invitedEmail: null, reviewerName: null });
+    renderTab();
+    fireEvent.click(await screen.findByRole("button", { name: "Withdraw request" }));
+    expect(await screen.findByRole("alertdialog", { name: "Withdraw this review request?" })).toBeInTheDocument();
+    expect(screen.queryByText(/lose access/i)).not.toBeInTheDocument();
+  });
+
+  it("keeps the client-link wording when there IS a client link", async () => {
+    fetchCurrentRound.mockResolvedValue({ ...ROUND, revoked: true });
+    renderTab();
+    expect(await screen.findByText("This review link was revoked.")).toBeInTheDocument();
+  });
+
   it("resolved comments are collapsed behind a count until asked for", async () => {
     renderTab();
     await screen.findByText(/hero photo is too dark/);

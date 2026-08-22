@@ -239,16 +239,16 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
     if (!round) return;
     const res = await revokeReview(round.id, round.revision);
     if (res.revoked) {
-      setNotice("Review link revoked.");
+      setNotice(hasClientLink ? "Review link revoked." : "Review request withdrawn.");
       await reload();
     } else if (res.reason === "token-changed") {
       setNotice("This round changed (a re-send happened) — reloading.");
       await reload();
     } else if (res.reason === "already-revoked") {
-      setNotice("This link was already revoked.");
+      setNotice(hasClientLink ? "This link was already revoked." : "This request was already withdrawn.");
       await reload();
     } else {
-      setNotice("Couldn't revoke the link. Try again.");
+      setNotice(hasClientLink ? "Couldn't revoke the link. Try again." : "Couldn't withdraw the request. Try again.");
     }
   };
 
@@ -491,12 +491,24 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
     />
   );
 
+  /* Two kinds of round land here and the boards draw only one. A round
+     submitted from the dashboard's "Send for Review" carries no clientEmail, so
+     `review.service.ts` mints no token: there is no link to revoke, nobody to
+     lose access, and nothing to re-send to. Every string below used to name a
+     link anyway. It is also the round that can wedge publish, so the copy shown
+     while the user digs out has to describe what actually happened. */
+  const hasClientLink = round.invitedEmail !== null;
+
   /* Board 158:162 — the link is dead, the comments are not. */
   const revokedBody = (
     <div className="tw:px-6 tw:py-8 tw:text-center tw:flex tw:flex-col tw:gap-2">
-      <span className="tw:text-[14px] tw:text-[var(--bk-error)]">This review link was revoked.</span>
+      <span className="tw:text-[14px] tw:text-[var(--bk-error)]">
+        {hasClientLink ? "This review link was revoked." : "This review request was withdrawn."}
+      </span>
       <span className={META}>
-        {round.reviewerName ?? "The reviewer"} can no longer open it. Earlier comments are kept below.
+        {hasClientLink
+          ? `${round.reviewerName ?? "The reviewer"} can no longer open it. Earlier comments are kept below.`
+          : "Nobody is waiting on it now. Earlier comments are kept below."}
       </span>
     </div>
   );
@@ -524,7 +536,9 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
   const primaryLabel = resending
     ? `Sending round ${round.roundNumber + 1}…`
     : round.revoked
-      ? "Send a new link"
+      ? hasClientLink
+        ? "Send a new link"
+        : "Send for review again"
       : "Re-send for review";
 
   return (
@@ -533,11 +547,18 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
 
       {/* Board 158:105: revoke asks at the top of the panel, in the panel. */}
       {confirmRevoke && (
-        <div className={CONFIRM} role="alertdialog" aria-label="Revoke this review link?">
-          <span className="tw:text-[14px] tw:text-[var(--bk-error)]">Revoke this review link?</span>
+        <div
+          className={CONFIRM}
+          role="alertdialog"
+          aria-label={hasClientLink ? "Revoke this review link?" : "Withdraw this review request?"}
+        >
+          <span className="tw:text-[14px] tw:text-[var(--bk-error)]">
+            {hasClientLink ? "Revoke this review link?" : "Withdraw this review request?"}
+          </span>
           <span className={META}>
-            {round.reviewerName ?? "The reviewer"} will lose access immediately. You can send a new
-            link any time.
+            {hasClientLink
+              ? `${round.reviewerName ?? "The reviewer"} will lose access immediately. You can send a new link any time.`
+              : "The request stops waiting for a reply. You can send it again any time."}
           </span>
           <div className="tw:flex tw:items-center tw:justify-between tw:gap-2 tw:pt-1">
             <Button color="light" size="sm" onClick={() => setConfirmRevoke(false)}>
@@ -706,7 +727,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
               className={`${GHOST} tw:self-center`}
               onClick={() => setConfirmRevoke(true)}
             >
-              Revoke link
+              {hasClientLink ? "Revoke link" : "Withdraw request"}
             </Button>
           )}
         </div>
