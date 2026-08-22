@@ -58,7 +58,11 @@ const EXIT_BTN_CLASS =
  * D10/eng D11) — the container's timer returns it to `ready`; the button is
  * natively disabled for the beat so the ✓ cannot be re-clicked.
  */
-export type PublishState = "ready" | "disabled" | "anyway" | "published";
+/* "hidden" is not a disabled Publish — it is no Publish control at all, for
+   surfaces where publishing is not the viewer's to do. Client view is the
+   case: the `action` slot used to hold SendForReview there and so replaced
+   this button by accident; emptying the slot made Publish reappear. */
+export type PublishState = "ready" | "disabled" | "anyway" | "published" | "hidden";
 
 /**
  * The tool cluster (plan §2, eng D12) — DATA props, never a node: the deleted
@@ -119,6 +123,7 @@ const PUBLISH_LABEL: Record<PublishState, string> = {
   disabled: "Publish",
   anyway: "Publish anyway",
   published: "✓ Published",
+  hidden: "",
 };
 
 export function Topbar({
@@ -204,6 +209,7 @@ export function Topbar({
       </span>
 
       {action ?? (
+        publish === "hidden" ? null :
         publish === "published" ? (
           /* Success transient — disabled for its 2s beat. green-100/green-600
              are exact hex matches for --bk-success-tint/--bk-success-text. */

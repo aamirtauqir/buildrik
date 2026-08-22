@@ -414,14 +414,14 @@ describe("StudioHeader", () => {
       expect(screen.getByRole("button", { name: "Publish" })).not.toBeDisabled();
     });
 
-    it("a viewer in client view cannot send for review either", () => {
+    /* Was: a viewer in client view sees a disabled "Send for review". There is
+       no send control in client view at all now, for any role — the viewer
+       gating that matters moved with the control, to the Review panel. */
+    it("a viewer in client view is offered no send control at all", () => {
       setViewMode({ clientView: true });
       roleState.role = "VIEWER";
       render(<StudioHeader {...makeProps()} />);
-      const btn = screen.getByRole("button", { name: "Send for review" });
-      expect(btn.getAttribute("aria-disabled")).toBe("true");
-      fireEvent.focus(btn);
-      expect(screen.getByRole("tooltip").textContent).toMatch(/ask an editor/);
+      expect(screen.queryByRole("button", { name: "Send for review" })).toBeNull();
     });
   });
 
@@ -448,49 +448,28 @@ describe("StudioHeader", () => {
     });
   });
 
-  describe("client view sends for review instead of publishing", () => {
+  /* Rewritten 2026-08-23. These asserted that client view REPLACED Publish with
+     "Send for review" — true until client view became a view rather than an
+     invited-editor mode (founder call). The compose form still exists and is
+     still covered; it moved to the Review panel, which is where inviting a
+     client belongs. What client view owes now is that none of it is here. */
+  describe("client view shows no owner controls at all", () => {
     beforeEach(() => setViewMode({ clientView: true }));
 
-    it("replaces the Publish button entirely", () => {
+    it("has no Publish button", () => {
       render(<StudioHeader {...makeProps()} />);
-      expect(screen.getByRole("button", { name: "Send for review" })).toBeTruthy();
       expect(screen.queryByRole("button", { name: /^Publish/ })).toBeNull();
     });
 
-    it("opens a form with a summary and a note", () => {
+    it("has no Send for review — inviting a client is the owner's act", () => {
       render(<StudioHeader {...makeProps()} />);
-      fireEvent.click(screen.getByRole("button", { name: "Send for review" }));
-      expect(screen.getByLabelText(/What changed/)).toBeTruthy();
-      expect(screen.getByLabelText(/Note to the reviewer/)).toBeTruthy();
+      expect(screen.queryByRole("button", { name: "Send for review" })).toBeNull();
     });
 
-    it("caps the free-text fields at 500 characters", () => {
+    it("keeps Publish and the site menu in the ordinary editor", () => {
+      setViewMode({ clientView: false });
       render(<StudioHeader {...makeProps()} />);
-      fireEvent.click(screen.getByRole("button", { name: "Send for review" }));
-      expect(screen.getByLabelText(/What changed/).getAttribute("maxlength")).toBe("500");
-      expect(screen.getByLabelText(/Note to the reviewer/).getAttribute("maxlength")).toBe("500");
-    });
-
-    it("submits note + summary and confirms in place", async () => {
-      render(<StudioHeader {...makeProps()} />);
-      fireEvent.click(screen.getByRole("button", { name: "Send for review" }));
-      fireEvent.change(screen.getByLabelText(/What changed/), { target: { value: "hero copy" } });
-      fireEvent.change(screen.getByLabelText(/Note to the reviewer/), { target: { value: "take a look" } });
-      fireEvent.click(screen.getByRole("button", { name: "Send" }));
-      await waitFor(() =>
-        expect(submitForReview).toHaveBeenCalledWith("take a look", "hero copy", undefined, undefined),
-      );
-      expect(await screen.findByRole("button", { name: "Sent for review ✓" })).toBeTruthy();
-    });
-
-    it("sends the client's email through — that is what issues the link", async () => {
-      render(<StudioHeader {...makeProps()} />);
-      fireEvent.click(screen.getByRole("button", { name: "Send for review" }));
-      fireEvent.change(screen.getByLabelText(/Client email/), { target: { value: "c@example.com" } });
-      fireEvent.click(screen.getByRole("button", { name: "Send" }));
-      await waitFor(() =>
-        expect(submitForReview).toHaveBeenCalledWith(undefined, undefined, "c@example.com", undefined),
-      );
+      expect(screen.getByRole("button", { name: /^Publish/ })).toBeTruthy();
     });
   });
 

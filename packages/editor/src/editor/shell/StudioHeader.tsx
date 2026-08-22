@@ -625,26 +625,26 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         }
         unreadCount={unread}
         onOpenNotifications={() => setNotifOpen((v) => !v)}
-        publish={publish}
+        /* Publishing is the owner's act. It stayed visible in client view
+           because nothing here ever read clientView for it. */
+        publish={viewMode.clientView ? "hidden" : publish}
         publishBusy={publishLoading}
         publishBlockedReason={publishBlockedReason}
         onPublish={handlePublishClick}
-        action={
-          viewMode.clientView ? (
-            <SendForReview
-              composer={composer}
-              disabledReason={isViewer ? "Viewers can't send for review — ask an editor" : undefined}
-              onSent={refreshReview}
-              reviewStatus={reviewStatus}
-            />
-          ) : undefined
-        }
+        /* SendForReview used to render ONLY in client view, from when
+           ?view=client meant "invited content editor". It is a viewer now
+           (founder, 2026-08-23), and sending a site for review is the owner's
+           act, so the slot is empty there. */
+        action={undefined}
         menu={
+          /* Every build door is withheld in client view; the menu keeps only
+             the toggle back out, which is the one thing an owner previewing
+             their client's view still needs. */
           <SiteMenu
-            onOpenSiteSettings={onOpenProjectSettings}
-            onOpenHistory={onOpenHistory}
-            onOpenPublish={onOpenPublish}
-            onOpenPublishHistory={onOpenPublishHistory}
+            onOpenSiteSettings={viewMode.clientView ? undefined : onOpenProjectSettings}
+            onOpenHistory={viewMode.clientView ? undefined : onOpenHistory}
+            onOpenPublish={viewMode.clientView ? undefined : onOpenPublish}
+            onOpenPublishHistory={viewMode.clientView ? undefined : onOpenPublishHistory}
             /* Board 1172:4825 is a MODAL — format chips, a preview, a code
                view, options — and it had no door. `handleExport` opens it, but
                `handleExport` is third in `onVercelPublish ?? onOpenPublish ??
@@ -654,14 +654,14 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
                screen for CHOOSING a format was skipped by the only control
                that mentions exporting. The row opens the modal; the immediate
                zip is what the modal's own ZIP button does. */
-            onExportCode={handleExport}
-            onOpenTemplates={onOpenTemplates}
-            onOpenComponents={onOpenComponents}
-            onOpenShortcuts={onOpenShortcuts}
+            onExportCode={viewMode.clientView ? undefined : handleExport}
+            onOpenTemplates={viewMode.clientView ? undefined : onOpenTemplates}
+            onOpenComponents={viewMode.clientView ? undefined : onOpenComponents}
+            onOpenShortcuts={viewMode.clientView ? undefined : onOpenShortcuts}
             onAskAI={viewMode.fourToolRail ? onShowAI : undefined}
             onStartCollaboration={collabOn && !isConnected ? startCollab : undefined}
-            onOpenDesignSystem={onOpenDesignSystem}
-            onOpenPlugins={onOpenPlugins}
+            onOpenDesignSystem={viewMode.clientView ? undefined : onOpenDesignSystem}
+            onOpenPlugins={viewMode.clientView ? undefined : onOpenPlugins}
             publishedUrl={publishedUrl}
             onCopyLiveUrl={copyLiveUrl}
             siteId={getSiteIdFromUrl()}

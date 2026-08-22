@@ -183,7 +183,7 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
             that the editor simply had no door to. They deep-link to their own
             section rather than to the page, so each lands where its label
             says it will. */}
-        {siteId && (
+        {siteId && !clientView && (
           <MenuGroup>
             <MenuItem onClick={run(() => openDashboard(`/dashboard/sites/${siteId}#site-health`))}>
               Site health
@@ -232,7 +232,7 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
                 dashboard's ShareDraftModal; this hands off to it directly,
                 the way "Invite teammates" below hands off to team settings,
                 rather than landing the user on a page to hunt for a button. */}
-            {siteId ? (
+            {siteId && !clientView ? (
               <MenuItem onClick={run(() => openDashboard(`/dashboard/sites/${siteId}?share=1`))}>
                 Share preview link
               </MenuItem>
@@ -240,6 +240,10 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
           </MenuGroup>
         )}
 
+        {/* Workspace doors belong to whoever owns the workspace. In client view
+            the menu keeps only the way back out, so a client holding a review
+            link is not offered Invite teammates or Account settings. */}
+        {clientView ? null : (
         <MenuGroup>
           <MenuLabel>Workspace</MenuLabel>
           <MenuItem onClick={run(() => openDashboard("/dashboard/settings/team"))}>Invite teammates</MenuItem>
@@ -249,6 +253,7 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
           ) : null}
           {onAskAI ? <MenuItem onClick={run(onAskAI)}>Ask AI</MenuItem> : null}
         </MenuGroup>
+        )}
 
         {onOpenShortcuts ? (
           <MenuGroup>
