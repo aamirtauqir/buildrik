@@ -159,6 +159,29 @@
   padding: var(--bk-space-8) var(--bk-space-16);
 }
 
+/* Client view is a VIEW. An empty container's dashed box and its "Drop a block
+   here" hint are build-time affordances — they tell you where to put something,
+   which is not a thing the person holding a review link can do. Founder call,
+   2026-08-23: the client sees what Figma's view mode shows, not the editor. */
+.bk-client-view [data-buildrick-type="container"]:not(.buildrick-page-root):empty::after,
+.bk-client-view [data-buildrick-type="columns"]:empty::after {
+  content: "";
+  padding: 0;
+}
+
+.bk-client-view [data-buildrick-type="container"]:not(.buildrick-page-root):empty,
+.bk-client-view [data-buildrick-type="columns"]:empty {
+  background: transparent;
+  border-color: transparent;
+  min-height: 0;
+}
+
+/* Selection state is editor vocabulary; "Nothing selected" means nothing to
+   someone who cannot select. */
+.bk-client-view [data-testid="footer-selection-label"] {
+  display: none;
+}
+
 .row,
 [data-buildrick-type="columns"] {
   display: flex;

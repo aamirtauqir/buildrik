@@ -33,6 +33,7 @@ import { useClipboardToasts } from "./hooks/useClipboardToasts";
 import { useAltTextAutoTrigger } from "./hooks/useAltTextAutoTrigger";
 import { PageTabBar } from "./PageTabBar";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
+import { getEditorViewMode } from "@shared/utils/editorViewMode";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -192,6 +193,20 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
 
   const [canvasHoveredId, setCanvasHoveredId] = React.useState<string | null>(null);
   /** AI drills in over the inspector (boards 170:* · 66:225). */
+  /* URL-derived, so it is stable for the life of the document — client view
+     is entered by navigation (StudioHeader.toggleClientView), never by state. */
+  const clientView = React.useMemo(() => getEditorViewMode().clientView, []);
+  /* A root class, not a prop, because the surfaces that still leak editing
+     chrome into client view are reached by CSS alone: the empty-container
+     placeholder is a ::after in Canvas.css, and the footer's selection label is
+     rendered by AquibraStudio, which an agent session must not stage. */
+  React.useEffect(() => {
+    const root = document.documentElement;
+    if (!clientView) return;
+    root.classList.add("bk-client-view");
+    return () => root.classList.remove("bk-client-view");
+  }, [clientView]);
+
   const [aiInInspector, setAiInInspector] = React.useState(false);
 
   // Media tab dual-mode: panel (slim launcher) or fullpage (library manager)
@@ -361,16 +376,24 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           machine without the localStorage cache drew the DEFAULT brand. */}
       <ProjectTokensApplier composer={composer} />
       <LayoutShell
-        drawerOpen={isLeftPanelOpen && !effectiveFullPageMode}
+        /* Client view is a VIEW, the way Figma's is: the person holding the link
+           is looking, not building, so the rail, the drawer and the inspector are
+           not rendered at all and the canvas takes the whole width. It used to
+           trim four header tools and leave every editing surface in place, so an
+           owner opening "what my client sees" was shown the full editor.
+           (Founder call, 2026-08-23.) */
+        className={clientView ? "layout-shell--client-view" : ""}
+        drawerOpen={!clientView && isLeftPanelOpen && !effectiveFullPageMode}
         drawerWidth={drawerWidth}
-        fullPageMode={effectiveFullPageMode && isLeftPanelOpen}
+        fullPageMode={!clientView && effectiveFullPageMode && isLeftPanelOpen}
         // Open whenever not fullpage — the no-selection state is a DRAWN
         // board (2 lines + ✦ Ask AI); gating on selectedElement collapsed the
         // column to 1px, so that state rendered off-viewport, unseeable.
-        inspectorOpen={!effectiveFullPageMode}
+        inspectorOpen={!clientView && !effectiveFullPageMode}
         style={styles.container}
       >
-        {/* Left Sidebar — merged rail + panel */}
+        {/* Left Sidebar — merged rail + panel. Absent in client view. */}
+        {clientView ? null : (
         <LayoutShell.Sidebar>
           <LeftSidebar
             composer={composer}
@@ -394,6 +417,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
             onOpenIconPicker={onOpenIconPicker}
           />
         </LayoutShell.Sidebar>
+        )}
 
         {/* Canvas Area — main editing surface */}
         <LayoutShell.Canvas>
@@ -401,6 +425,9 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           <div ref={composerContainerRef} style={styles.canvasContent}>
             <Canvas
               ref={canvasRef as React.Ref<CanvasRef>}
+              /* The overlay toggles (Grid / Rulers / Badges / X-Ray) are build
+                 tools, so they go with the rest of the editing chrome. */
+              showFooterToolbar={!clientView}
               composer={composer}
               device={device}
               zoom={zoom}
@@ -427,7 +454,8 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
         </LayoutShell.Canvas>
 
         {/* Right Inspector — element properties, or the AI drill-in that
-            replaces them (boards 170:*). */}
+            replaces them (boards 170:*). Absent in client view. */}
+        {clientView ? null : (
         <LayoutShell.Inspector>
           {aiInInspector ? (
             <AITab
@@ -450,6 +478,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           />
           )}
         </LayoutShell.Inspector>
+        )}
 
         {/* FullPage View — Templates, Settings, History, Design (replaces canvas area) */}
         <LayoutShell.FullPage>
