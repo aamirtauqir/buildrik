@@ -9,7 +9,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { checkCronAuth } from "../cron-auth";
+import { checkCronAuth, checkWorkerAuth } from "../cron-auth";
 
 const req = (authorization: string | null) => ({
   headers: { get: (n: string) => (n.toLowerCase() === "authorization" ? authorization : null) },
@@ -47,5 +47,30 @@ describe("checkCronAuth", () => {
     expect(checkCronAuth(req("Bearer wrong"))?.status).toBe(401);
     expect(checkCronAuth(req(null))?.status).toBe(401);
     expect(checkCronAuth(req("s3cr3t-value"))?.status).toBe(401);
+  });
+});
+
+describe("checkWorkerAuth", () => {
+  const wreq = (secret: string | null) => ({
+    headers: { get: (n: string) => (n === "x-worker-secret" ? secret : null) },
+  });
+
+  it("says 'not configured' rather than 401 when the secret is unset", async () => {
+    delete process.env.CRON_SECRET;
+    const res = checkWorkerAuth(wreq("anything"));
+    expect(res?.status).toBe(500);
+    await expect(res!.text()).resolves.toMatch(/not configured/i);
+  });
+
+  it("lets the worker through with the raw secret, no Bearer prefix", () => {
+    process.env.CRON_SECRET = "s3cr3t-value";
+    expect(checkWorkerAuth(wreq("s3cr3t-value"))).toBeNull();
+    expect(checkWorkerAuth(wreq("Bearer s3cr3t-value"))?.status).toBe(401);
+  });
+
+  it("rejects a wrong secret and a missing header", () => {
+    process.env.CRON_SECRET = "s3cr3t-value";
+    expect(checkWorkerAuth(wreq("nope"))?.status).toBe(401);
+    expect(checkWorkerAuth(wreq(null))?.status).toBe(401);
   });
 });

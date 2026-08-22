@@ -3,6 +3,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@lib/prisma";
 import { generatePage } from "@server/services/ai.service";
 import { rewriteImageSources, type ImagesPreference } from "@lib/ai/rewrite-image-sources";
+import { checkWorkerAuth } from "@/lib/cron-auth";
 
 // AI site-generation worker. The dashboard creates an AIGenerationJob (QUEUED)
 // and polls it — but nothing processed the queue, so the "AI is building your
@@ -102,9 +103,8 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ jobId: string }> },
 ) {
-  if (req.headers.get("x-worker-secret") !== process.env.CRON_SECRET) {
-    return new Response("Unauthorized", { status: 401 });
-  }
+  const denied = checkWorkerAuth(req);
+  if (denied) return denied;
 
   const { jobId } = await params;
   const job = await prisma.aIGenerationJob.findUnique({ where: { id: jobId } });

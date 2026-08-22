@@ -12,6 +12,7 @@ import { notifyWorkspaceOwner } from "@server/services/notification.trigger";
 import { runVercelDeploy } from "@server/services/publish.service";
 import { decryptPublishedPassword } from "@server/services/site-settings.service";
 import { getWorkspaceAppScripts } from "@server/services/marketplace.service";
+import { checkWorkerAuth } from "@/lib/cron-auth";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
@@ -53,10 +54,8 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ jobId: string }> },
 ) {
-  const secret = req.headers.get("x-worker-secret");
-  if (secret !== process.env.CRON_SECRET) {
-    return new Response("Unauthorized", { status: 401 });
-  }
+  const denied = checkWorkerAuth(req);
+  if (denied) return denied;
 
   const { jobId } = await params;
 
