@@ -33,7 +33,16 @@ export async function getWorkspaceUsage(workspaceId: string): Promise<WorkspaceU
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const fourteenDaysAgo = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 13);
 
-  const siteIds = (await prisma.site.findMany({ where: { workspaceId }, select: { id: true } })).map((s) => s.id);
+  /* `deletedAt: null`, because this list feeds the numbers the user is shown
+     against their plan and `assertSiteQuota` counts live sites only. Without
+     it a soft-deleted site kept its slot in the display while the quota check
+     handed the slot back: on the dev database that read "30 of 3 sites" for a
+     FREE workspace with 3 live sites and 27 deleted. It also scopes storage and
+     submissions, which were aggregating over sites the workspace had thrown
+     away. */
+  const siteIds = (
+    await prisma.site.findMany({ where: { workspaceId, deletedAt: null }, select: { id: true } })
+  ).map((s) => s.id);
 
   const [workspace, storageAgg, submissionCount, recentSubmissions, memberCount, aiCount] = await Promise.all([
     prisma.workspace.findUnique({ where: { id: workspaceId }, select: { plan: true } }),

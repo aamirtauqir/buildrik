@@ -9,7 +9,13 @@ async function getUsageCounts(workspaceId: string) {
 
   // MediaAsset.siteId is a bare string (no relation), so storage is summed by
   // siteId ∈ the workspace's sites. Real figure — was hardcoded 0.
-  const siteIds = (await prisma.site.findMany({ where: { workspaceId }, select: { id: true } })).map((s) => s.id);
+  // `deletedAt: null` for the same reason as usage.service: the `sites` count
+  // below already excludes soft-deleted sites, so leaving them in the storage
+  // aggregate made the two halves of the same object disagree about which
+  // sites the workspace has.
+  const siteIds = (
+    await prisma.site.findMany({ where: { workspaceId, deletedAt: null }, select: { id: true } })
+  ).map((s) => s.id);
 
   const [sites, teamMembers, domains, aiCredits, formSubmissions, redirects, storageAgg] =
     await Promise.all([
