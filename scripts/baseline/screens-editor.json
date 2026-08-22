@@ -1,5 +1,5 @@
 {
-  "_note": "How each editor baseline state is reached in the RUNNING app. Written 2026-08-21 while refreshing the Figma baseline: the original spec was never committed, so every re-capture started by rediscovering the routes. Drive it with figma-capture-live.mjs. `selectType` selects through the engine rather than clicking canvas coordinates, because the canvas is engine-rendered HTML and a coordinate click lands wherever the layout put it. | 2026-08-22: 32 states re-captured. 21 confirmed by content, 9 held on the board as UNVERIFIED because the marker used could not tell the state from the panel at rest, 2 deleted because they provably never reached their state. Naming by arrival order was avoided deliberately — three frames this session would have been mislabelled that way. | 2026-08-23: of the five site-menu doors that had no frame, ONE is a real editor state and is now captured (BL-0230 publish panel). Three open a new tab and belong to the dashboard, not here. One navigates in place and needs a different capture order.",
+  "_note": "How each editor baseline state is reached in the RUNNING app. Written 2026-08-21 while refreshing the Figma baseline: the original spec was never committed, so every re-capture started by rediscovering the routes. Drive it with figma-capture-live.mjs. `selectType` selects through the engine rather than clicking canvas coordinates, because the canvas is engine-rendered HTML and a coordinate click lands wherever the layout put it. | 2026-08-22: 32 states re-captured. 21 confirmed by content, 9 held on the board as UNVERIFIED because the marker used could not tell the state from the panel at rest, 2 deleted because they provably never reached their state. Naming by arrival order was avoided deliberately — three frames this session would have been mislabelled that way. | 2026-08-23: of the five site-menu doors that had no frame, ONE is a real editor state and is now captured (BL-0230 publish panel). Three open a new tab and belong to the dashboard, not here. One navigates in place and needs a different capture order. | 2026-08-23 close: every editor state that CAN be captured has been. The one product question left is what client view ought to be — it currently hides four header tools and leaves the rail, drawer and inspector in place, so an owner checking 'what my client sees' is shown the full editor.",
   "site": "cmrsur1fp000unh3rvmmiq25t",
   "path": "/edit/cmrsur1fp000unh3rvmmiq25t",
   "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
@@ -710,7 +710,7 @@
         }
       ],
       "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible.",
-      "_capture_status": "'Expand Pages' clicks fine and the DRAWER does not change, so the full-page view renders outside it — the same place I looked wrongly for the Project settings modal. Check the whole document, or count nodes the way BL-0161/BL-0162 had to be compared; text and drawer content both fail here."
+      "_verified": "2026-08-23 — screenshot read back: the drawer becomes a wide panel across the left half with the page list, Search, Listings and + Add page, and the expand control is active. The node count nearly matched the plain panel (372 against 376) and would have said 'not expanded' — html-to-design collapses nodes, so counts are only comparable between two captures of the SAME kind, as with grid against list."
     },
     {
       "id": "BL-0169",
@@ -934,7 +934,7 @@
         }
       ],
       "_note": "Door with no baseline frame on the board at all. The site menu has sixteen rows and only ten were ever captured; this is one of the six that were missed. Row label read off the running menu — the DOM text carries the chord appended (\"Site settings⌃,\"), so substring matching is required, not exact.",
-      "_capture_status": "Captured — the re-injection fix works and the submit returns 200 — but the frame shows the ordinary editor, so either the door did not reach client view in that run or client view looks like this. Held UNVERIFIED rather than named."
+      "_verified": "2026-08-23 — the URL becomes ?view=client, so the door works. The frame looked like the ordinary editor because client view IS nearly the ordinary editor: `viewMode.clientView` is read in exactly one place, StudioHeader, where it trims the header tools to Comments only. Measured: 700 DOM nodes before, 696 after, and the rail is still there. The frame is accurate; my expectation was not."
     },
     {
       "id": "BL-0234",

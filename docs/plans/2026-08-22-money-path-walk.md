@@ -265,8 +265,8 @@ and differ only by who is looking.
 
 | | before | after |
 |---|---|---|
-| BL frames on the page | 71 | 98 |
-| states with a current capture | 19 | **48** |
+| BL frames on the page | 71 | 104 |
+| states with a current capture | 19 | **52** |
 | held as UNVERIFIED (captured, state not proven) | — | 9 |
 | genuinely stale editor states | 37 | **0** |
 
@@ -302,3 +302,35 @@ and says whose claim it is.
   their controls rather than guessing selectors.
 - The editor page's own note still records drift measured against the 08-19
   cluster. It is accurate for the frames that remain stale.
+
+### What the last four open items turned out to be
+
+All four are closed, and none of them was what the first diagnosis said.
+
+- **Pages context menu** — the row's More-options button is `display: none` at
+  0x0 until the row is hovered. Three passes guessed at a blur trap, a rail
+  toggle and timing; one `getComputedStyle` call answered it. That also explains
+  why single-shot probes worked and batches did not: the probe's mouse crossed
+  the row on its way.
+- **Media list view** — the expanded library is `LibraryManager → AssetGrid`,
+  not `MediaLibraryPanel`. I read the wrong component twice and concluded the
+  List button was absent. It was there, named only by `title`, so
+  `[aria-label='List view']` matched the drawer's button behind the overlay. The
+  buttons carry `aria-label` now, which is an accessibility fix as much as a
+  capture one.
+- **Pages full page** — captured all along. Its node count came back at 372
+  against a plain panel's 376, which reads as "not expanded"; the screenshot
+  shows a wide panel across the left half. html-to-design collapses nodes, so
+  counts only compare between two captures of the same kind.
+- **Client view** — the door works; `?view=client` is set. The frame looks like
+  the ordinary editor because client view IS nearly the ordinary editor:
+  `viewMode.clientView` is read in exactly one place, `StudioHeader`, where it
+  trims the header tools to Comments. 700 DOM nodes before, 696 after, rail
+  still present. **This one leaves a product question rather than a baseline
+  one** — an owner opening it to see what their client sees is shown the full
+  editing rail, drawer and inspector.
+
+Nine frames remain UNVERIFIED by choice. They captured, but the markers they
+were first judged against were invented rather than read, and the Brand ones
+were captured before their recipes set the Beginner/Pro mode. Every recipe now
+carries a `_marker` from the running product, so re-doing them is mechanical.
