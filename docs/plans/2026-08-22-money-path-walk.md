@@ -156,3 +156,34 @@ Not "N rows have verdicts". Two of these are events in the running product:
 3. The six §15 funnel events are visible in PostHog.
 4. Every fix made along the way has a test that was watched to fail first, and
    anything left undone is named with its reason.
+
+---
+
+## 8. Walk log — what was found and what was left (2026-08-22)
+
+Every row below was measured in code or by running it, not read off a document.
+
+### Fixed on the chain
+
+| Link | Defect | Commit |
+|---|---|---|
+| 5→8 | A published Form block posted nowhere and shipped its markup as escaped text — the first reading was my own harness (`createElement` with raw content is not how blocks are inserted); the real path parses it into an element tree and exports correctly | probe only, no fix needed |
+| 8 | A missing `NEXT_PUBLIC_APP_URL` skipped form wiring, then fed the empty result to a `notIn` sweep, deactivating **every** form on the site while reporting success | `a7f5a2fd` |
+| 4 | The invited checklist had no door — `variant` was never passed by any caller, so every invited member got the owner list | `b6170b5c` |
+| 4 | `completeStep` advanced from the step the *caller named*, so one call could finish all of onboarding and permanently hide the checklist | `514a1d84` |
+| 9 | Two of three site-limit doors (duplicate, apply-template) named the limit and offered no way past it | `01010146` |
+| 9 | The upgrade button was shown to editors, who are refused at checkout by `requireOwner`; plus health's storage sum counted media on soft-deleted sites | `de4eb01a` |
+
+### Recorded, not fixed
+
+- **The checklist is self-report.** Ticking "Publish your site" marks it done; nothing observes a publish. Fine as a design, but `onboarding_completed` derived from it would not mean what §15 wants it to mean. Decide before wiring that event.
+- **`components/billing/limit-reached.tsx` has zero consumers.** It is role-aware and shows usage — better than the inline block it lost to — but wiring it is a visual change with no board, and it hard-codes `$29/mo` where `plan-limits.ts` is the SSOT.
+- **Published forms emit no `_honeypot` field.** The endpoint reads one; the export never writes one. Spam defence is rate-limiting alone.
+- **`saveWizard` / `completeWizard` / `dismiss` call `update` on a row that may not exist**, giving a 500 rather than a clean error. Reachable only if a client skips `getState`, which nothing currently does.
+- **Onboarding can create a second site** if the wizard restarts after S2. FREE allows 3, so nobody is trapped today.
+
+### Still needs the founder — unchanged
+
+1. **SMTP** — links 1 and 6 send real mail from `info@buildrick.io`.
+2. **A Stripe test-mode subscription** — `handleCheckoutCompleted` calls a real `subscriptions.retrieve`.
+3. **PostHog** — no analytics SDK in the repo; `NEXT_PUBLIC_POSTHOG_KEY` is baked at build.
