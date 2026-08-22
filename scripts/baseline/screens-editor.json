@@ -538,6 +538,25 @@
         }
       ],
       "_note": "Reached by the chord, not the menu row — the row prints the same chord, and pressing it is what a user does."
+    },
+    {
+      "id": "BL-0159",
+      "state": "media-stock-browser",
+      "actions": [
+        {
+          "click": ".ls-rail [data-tab=assets]"
+        },
+        {
+          "waitMs": 2000
+        },
+        {
+          "click": "text=Browse stock"
+        },
+        {
+          "waitMs": 2500
+        }
+      ],
+      "_note": "'Browse stock' is SlimLauncher's own label (SlimLauncher.tsx:292) — the button moved to the footer when search took the lead, so an older recipe aimed at a '+ Stock' chip would miss."
     }
   ],
   "_verified": "2026-08-21: every entry below was replayed against localhost:3000 and the resulting state read back on screen before any capture ran. Three corrections came out of that: the Publish button opens the confirm dialog directly (there is no separate publish-open state), comment mode's only cue is the pressed toggle plus a crosshair capture layer, and the ⌘K palette cannot be captured at all — it closes when the capture script takes focus. | 2026-08-22: added BL-0213..BL-0217, the six-toggle canvas overlay states and the '?' cheat sheet — states the baseline had no board for at all, found by walking CanvasFooterToolbar. `button:text-is(\"Grid\")` is unambiguous: the Insert drawer's own Grid row is a DIV, not a button. Two things these recipes cannot promise: a CSS-painted overlay (grid lines, badges) does not survive html-to-design, and the click leaves the pointer on the toggle so its hover tooltip lands in the frame.",
