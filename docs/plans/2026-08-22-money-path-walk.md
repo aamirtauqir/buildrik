@@ -261,20 +261,26 @@ and count.
 `BK_STATE` picks the session, because BL-0228 and BL-0229 are the same screen
 and differ only by who is looking.
 
-### Editor page, second pass — the numbers
+### Editor page — final
 
 | | before | after |
 |---|---|---|
-| BL frames on the page | 71 | 92 |
-| distinct states with a CURRENT twin | 19 | **40** |
+| BL frames on the page | 71 | 98 |
+| states with a current capture | 19 | **48** |
 | held as UNVERIFIED (captured, state not proven) | — | 9 |
-| truly stale, no current capture of any date | 37 | **2** |
+| genuinely stale editor states | 37 | **0** |
 
-The two left are BL-0160 (media icon picker) and BL-0168 (layers context menu),
-and they fail the same way: the capture script is injected before the actions
-run, injection moves focus, and a surface that closes on blur is gone by capture
-time. That is the ⌘K trap, and it needs a harness change rather than a better
-selector.
+The three frames that still read as stale are Site health, Activity log and
+Share preview link — doors that open a new tab, so an editor frame was never the
+right surface for them. Their names say so now.
+
+Both of those are now captured. The blur-trap diagnosis above was wrong:
+BL-0168's recipe worked the whole time — the harness's own PRE-CAPTURE line
+shows the menu open — and I had judged the frame against menu items I invented
+("Bring forward"), then deleted a good capture. BL-0160 failed for a precise
+reason: "Icons and SVG" is an aria-label on a pill whose visible text is "svg0",
+so a `text=` selector for it matches nothing; the picker opens from the plain
+"Icons" button.
 
 Five canvas-overlay frames were relabelled rather than re-captured — this page's
 own earlier note records them as 2026-08-22 captures, so the label now says that
