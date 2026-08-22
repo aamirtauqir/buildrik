@@ -327,6 +327,19 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       };
     }, [composer, handleZoomToSelection]);
 
+    /* React state and composer state each hold a zoom, and only some paths
+       wrote both. The canvas paints from the PROP (zoom / 100), while
+       `EVENTS.ZOOM_IN` above steps from `composer.getState().zoom` — so after
+       a chord that moved only React state, the flyout's Zoom In computed from
+       a stale percent and the canvas jumped. Push the prop down whenever they
+       disagree; `setZoom` no-ops when the value already matches, and the
+       VIEWPORT_ZOOM listener that feeds React back is equally idempotent, so
+       this settles rather than ping-pongs. */
+    React.useEffect(() => {
+      if (!composer) return;
+      if (Math.round(composer.getState().zoom) !== Math.round(zoom)) composer.setZoom(zoom);
+    }, [composer, zoom]);
+
     /* ZOOM_IN / ZOOM_OUT had no listener anywhere. BOTH command palettes emit
        them — the shell's ⌘K (CommandPalette.tsx:125,132) and the canvas's own
        ⌘⇧P (useCanvasCommandPalette.ts:113,121) — so "Zoom in" was a command you

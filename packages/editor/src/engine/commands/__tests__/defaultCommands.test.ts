@@ -386,11 +386,19 @@ describe("device presets carry no shortcut", () => {
     expect(withShortcut.map((c) => c.id)).toEqual([]);
   });
 
-  it("keeps the zoom chords that are printed", () => {
+  /* This case used to assert the opposite — that zoom-reset/in/out KEPT
+     ctrl+0 / ctrl+= / ctrl+-. They are printed, but by the zoom flyout, which
+     binds them itself in CanvasFooterToolbar; holding them here meant both
+     listeners ran on one press. Measured at 100%: the flyout's + button
+     stepped to the next preset, the chord stepped by 10. ⌘' was the same
+     collision with a worse symptom — it flipped snapToGrid, which resize
+     reads, while the user was toggling the Grid overlay. */
+  it("leaves the flyout's and overlay bar's chords to the surfaces that print them", () => {
     const byId = new Map(buildDefaultCommands(composer as unknown as Composer).map((c) => [c.id, c]));
-    expect(byId.get("zoom-reset")?.shortcut).toBe("ctrl+0");
-    expect(byId.get("zoom-in")?.shortcut).toBe("ctrl+=");
-    expect(byId.get("zoom-out")?.shortcut).toBe("ctrl+-");
+    for (const id of ["zoom-reset", "zoom-in", "zoom-out", "toggle-snap-to-grid"]) {
+      expect(byId.get(id)).toBeDefined();
+      expect(byId.get(id)?.shortcut).toBeUndefined();
+    }
   });
 
   it("still exposes the presets by name for the palette", () => {

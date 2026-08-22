@@ -257,10 +257,14 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
     // ============================================
     // Snap to Grid
     // ============================================
+    /* No chord. ⌘' is printed on the canvas overlay bar for the Grid overlay
+       and bound there; both listeners sit on window and both used to run, so
+       one press toggled the overlay AND flipped this setting — which resize
+       reads, and which nothing on screen shows changing. Same tie-break as
+       ⌘1–⌘4 below: the printed chord wins, the command keeps its palette row. */
     {
       id: "toggle-snap-to-grid",
       label: "Toggle Snap to Grid",
-      shortcut: "ctrl+'",
       run: (c) => {
         const current = c.getState().snapToGrid;
         c.setSnapToGrid(!current);
@@ -349,10 +353,14 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
     // ============================================
     // Zoom
     // ============================================
+    /* Also chordless, for the same reason and with a visible symptom: ⌘= and
+       ⌘- are printed beside the zoom flyout's + and − buttons, which step
+       through ZOOM_PRESETS, while these step by 10. Measured at 100%: the
+       button gave 150, the chord gave 110. CanvasFooterToolbar owns all five
+       of the flyout's printed rows (fit, selection, 100%, in, out). */
     {
       id: "zoom-in",
       label: "Zoom In",
-      shortcut: "ctrl+=",
       run: (c) => {
         const current = c.getState().zoom;
         c.setZoom(current + 10);
@@ -361,7 +369,6 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
     {
       id: "zoom-out",
       label: "Zoom Out",
-      shortcut: "ctrl+-",
       run: (c) => {
         const current = c.getState().zoom;
         c.setZoom(current - 10);
@@ -370,7 +377,6 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
     {
       id: "zoom-reset",
       label: "Reset Zoom",
-      shortcut: "ctrl+0",
       run: (c) => c.setZoom(100),
     },
 
