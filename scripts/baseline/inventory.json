@@ -322,7 +322,8 @@
       ],
       "how": "scripts/baseline/screens-editor.json + Figma html-to-design capture"
     },
-    "generatedAt": "2026-08-22"
+    "generatedAt": "2026-08-22",
+    "driftMeasuredAt": "2026-08-22"
   },
   "rows": [
     {
@@ -2007,7 +2008,7 @@
       "capturedFrom": "localhost@42eb22c0",
       "figmaNodeId": "315:2",
       "figmaPageId": "75:2",
-      "notes": "REDRAWN 2026-08-19 (drift 10.51%). Drawer subtree rebuilt from the measured live DOM through measure-region.mjs → pack-measure.mjs → a use_figma interpreter; 96.85% pixel agreement against the reference render. Shell band left as drawn per the founder call. Note: search placeholder restored and the element list clipped where the app clips it. Refreshed 2026-08-21 by re-capturing the RUNNING editor (localhost:3000, site cmrsur1fp…) through Figma's html-to-design pipeline; recipe committed as scripts/baseline/screens-editor.json. The 2026-08-19 frame was drawn from prod@f7b39a4c and is kept on the same page for comparison.",
+      "notes": "REDRAWN 2026-08-19 (drift 10.51%). Drawer subtree rebuilt from the measured live DOM through measure-region.mjs → pack-measure.mjs → a use_figma interpreter; 96.85% pixel agreement against the reference render. Shell band left as drawn per the founder call. Note: search placeholder restored and the element list clipped where the app clips it. Refreshed 2026-08-21 by re-capturing the RUNNING editor (localhost:3000, site cmrsur1fp…) through Figma's html-to-design pipeline; recipe committed as scripts/baseline/screens-editor.json. The 2026-08-19 frame was drawn from prod@f7b39a4c and is kept on the same page for comparison. DRIFT MEASURED 2026-08-22 against the running app: 14.34% full frame (no region). Every editor row aligns at dy=48px and the frame grew 900→905 — that is the shell's ReviewBar row, shared by all of them, not panel drift.",
       "figmaNodeIdPrev": "62:2"
     },
     {
@@ -2026,7 +2027,7 @@
       "figmaNodeId": "316:2",
       "figmaPageId": "75:2",
       "figmaNodeIdPrev": "64:2",
-      "notes": "Refreshed 2026-08-21 by re-capturing the RUNNING editor (localhost:3000, site cmrsur1fp…) through Figma's html-to-design pipeline; recipe committed as scripts/baseline/screens-editor.json. The 2026-08-19 frame was drawn from prod@f7b39a4c and is kept on the same page for comparison."
+      "notes": "Refreshed 2026-08-21 by re-capturing the RUNNING editor (localhost:3000, site cmrsur1fp…) through Figma's html-to-design pipeline; recipe committed as scripts/baseline/screens-editor.json. The 2026-08-19 frame was drawn from prod@f7b39a4c and is kept on the same page for comparison. DRIFT MEASURED 2026-08-22 against the running app: 3.91%. Every editor row aligns at dy=48px and the frame grew 900→905 — that is the shell's ReviewBar row, shared by all of them, not panel drift."
     },
     {
       "id": "BL-0102",
@@ -2044,7 +2045,7 @@
       "figmaNodeId": "318:2",
       "figmaPageId": "75:2",
       "figmaNodeIdPrev": "66:2",
-      "notes": "Refreshed 2026-08-21 by re-capturing the RUNNING editor (localhost:3000, site cmrsur1fp…) through Figma's html-to-design pipeline; recipe committed as scripts/baseline/screens-editor.json. The 2026-08-19 frame was drawn from prod@f7b39a4c and is kept on the same page for comparison."
+      "notes": "Refreshed 2026-08-21 by re-capturing the RUNNING editor (localhost:3000, site cmrsur1fp…) through Figma's html-to-design pipeline; recipe committed as scripts/baseline/screens-editor.json. The 2026-08-19 frame was drawn from prod@f7b39a4c and is kept on the same page for comparison. DRIFT MEASURED 2026-08-22 against the running app: 1.51%. Every editor row aligns at dy=48px and the frame grew 900→905 — that is the shell's ReviewBar row, shared by all of them, not panel drift."
     },
     {
       "id": "BL-0103",
@@ -2062,7 +2063,7 @@
       "figmaNodeId": "319:2",
       "figmaPageId": "75:2",
       "figmaNodeIdPrev": "68:2",
-      "notes": "Refreshed 2026-08-21 by re-capturing the RUNNING editor (localhost:3000, site cmrsur1fp…) through Figma's html-to-design pipeline; recipe committed as scripts/baseline/screens-editor.json. The 2026-08-19 frame was drawn from prod@f7b39a4c and is kept on the same page for comparison."
+      "notes": "Refreshed 2026-08-21 by re-capturing the RUNNING editor (localhost:3000, site cmrsur1fp…) through Figma's html-to-design pipeline; recipe committed as scripts/baseline/screens-editor.json. The 2026-08-19 frame was drawn from prod@f7b39a4c and is kept on the same page for comparison. DRIFT MEASURED 2026-08-22 against the running app: 1.85%. Every editor row aligns at dy=48px and the frame grew 900→905 — that is the shell's ReviewBar row, shared by all of them, not panel drift."
     },
     {
       "id": "BL-0104",
@@ -2080,7 +2081,7 @@
       "figmaNodeId": "321:2",
       "figmaPageId": "75:2",
       "figmaNodeIdPrev": "69:2",
-      "notes": "Refreshed 2026-08-21 by re-capturing the RUNNING editor (localhost:3000, site cmrsur1fp…) through Figma's html-to-design pipeline; recipe committed as scripts/baseline/screens-editor.json. The 2026-08-19 frame was drawn from prod@f7b39a4c and is kept on the same page for comparison."
+      "notes": "Refreshed 2026-08-21 by re-capturing the RUNNING editor (localhost:3000, site cmrsur1fp…) through Figma's html-to-design pipeline; recipe committed as scripts/baseline/screens-editor.json. The 2026-08-19 frame was drawn from prod@f7b39a4c and is kept on the same page for comparison. DRIFT MEASURED 2026-08-22 against the running app: 4.26%. Every editor row aligns at dy=48px and the frame grew 900→905 — that is the shell's ReviewBar row, shared by all of them, not panel drift."
     },
     {
       "id": "BL-0105",
@@ -2097,7 +2098,7 @@
       "capturedFrom": "localhost@42eb22c0",
       "figmaNodeId": "322:2",
       "figmaPageId": "75:2",
-      "notes": "REDRAWN 2026-08-18 from live code (drift was 15.70%). The Tab Panel subtree 70:128 was emptied and rebuilt: header + shared-theme block + Beginner/Pro toggle + the nine drill-in rows + Basic-mode footnote + save bar, all from measured geometry (getComputedStyle on the running editor, not eyeballed off the PNG). Header icons are real vectors, not images. Read back against the live render: 94.95% pixel agreement over the content, 93.45% including the save bar. The residual is (a) the save bar sits at the frame's 780px bottom while the live drawer is 732px tall — that is the known-stale shell band, left alone per the founder call; (b) the chevron glyph renders lighter in Figma than in Chrome; (c) the footnote wraps one word later. Shell, canvas and inspector untouched. Refreshed 2026-08-21 by re-capturing the RUNNING editor (localhost:3000, site cmrsur1fp…) through Figma's html-to-design pipeline; recipe committed as scripts/baseline/screens-editor.json. The 2026-08-19 frame was drawn from prod@f7b39a4c and is kept on the same page for comparison.",
+      "notes": "REDRAWN 2026-08-18 from live code (drift was 15.70%). The Tab Panel subtree 70:128 was emptied and rebuilt: header + shared-theme block + Beginner/Pro toggle + the nine drill-in rows + Basic-mode footnote + save bar, all from measured geometry (getComputedStyle on the running editor, not eyeballed off the PNG). Header icons are real vectors, not images. Read back against the live render: 94.95% pixel agreement over the content, 93.45% including the save bar. The residual is (a) the save bar sits at the frame's 780px bottom while the live drawer is 732px tall — that is the known-stale shell band, left alone per the founder call; (b) the chevron glyph renders lighter in Figma than in Chrome; (c) the footnote wraps one word later. Shell, canvas and inspector untouched. Refreshed 2026-08-21 by re-capturing the RUNNING editor (localhost:3000, site cmrsur1fp…) through Figma's html-to-design pipeline; recipe committed as scripts/baseline/screens-editor.json. The 2026-08-19 frame was drawn from prod@f7b39a4c and is kept on the same page for comparison. DRIFT MEASURED 2026-08-22 against the running app: 15.59%. Every editor row aligns at dy=48px and the frame grew 900→905 — that is the shell's ReviewBar row, shared by all of them, not panel drift. Four times the next highest, but NOT a regression: the reference PNG is from 08-09 and predates the Brand rebuild. Against the 08-18 __clean capture of the same screen the drawer differs by 2.19%. The number is measuring a stale reference, and BL-0105 is the only one of the six that has a newer capture on disk to prove it — the other five are read against 08-09 references too, so their numbers carry the same caveat with no second capture to separate rebuild-since-reference from regression.",
       "figmaNodeIdPrev": "70:2"
     },
     {
@@ -3840,7 +3841,7 @@
       "id": "BL-0213",
       "state": "canvas-overlay-grid",
       "figmaNodeId": "336:2",
-      "notes": "NEW ROW 2026-08-22 — a canvas state with no board until now, found by walking the six overlay toggles in CanvasFooterToolbar. Captured from the RUNNING editor (localhost:3000, seed fixture) with the Grid toggle on. Note what the html-to-design pipeline can and cannot carry: the toolbar's pressed state IS in the frame, the grid itself is NOT — GridPattern paints through a CSS background-image (two linear-gradients) and the capture drops it. Verified in the app instead by computed style: a 712x684 layer at z-index 10 painting rgba(26, 86, 219, 0.1). The hover tooltip 'Grid · ⌘' is in the frame because the click leaves the pointer on the button."
+      "notes": "NEW ROW 2026-08-22 — a canvas state with no board until now, found by walking the six overlay toggles in CanvasFooterToolbar. Captured from the RUNNING editor (localhost:3000, seed fixture) with the Grid toggle on. Note what the html-to-design pipeline can and cannot carry: the toolbar's pressed state IS in the frame, the grid itself is NOT — GridPattern paints through a CSS background-image (two linear-gradients) and the capture drops it. Verified in the app instead by computed style: a 712x684 layer at z-index 10 painting rgba(26, 86, 219, 0.1). The hover tooltip 'Grid · ⌘' is in the frame because the click leaves the pointer on the button. Reference PNG captured 2026-08-22 via capture.mjs. Until then these rows existed only as Figma frames — captured straight through html-to-design — so drift-diff had nothing on disk to compare and could never have measured them. Baseline established at 0; the next run has something to diff."
     },
     {
       "kind": "editor-state",
@@ -3856,7 +3857,7 @@
       "id": "BL-0214",
       "state": "canvas-overlay-rulers",
       "figmaNodeId": "337:2",
-      "notes": "NEW ROW 2026-08-22 — Rulers on. RulersOverlay draws into two real <canvas> elements (692x20 top, 20x1212 left, measured live); whether the capture carries their pixels is not something the frame can be trusted for, so the row's contract is the SHELL around them: the rail, drawer, canvas frame and the toolbar's pressed Rulers chip."
+      "notes": "NEW ROW 2026-08-22 — Rulers on. RulersOverlay draws into two real <canvas> elements (692x20 top, 20x1212 left, measured live); whether the capture carries their pixels is not something the frame can be trusted for, so the row's contract is the SHELL around them: the rail, drawer, canvas frame and the toolbar's pressed Rulers chip. Reference PNG captured 2026-08-22 via capture.mjs. Until then these rows existed only as Figma frames — captured straight through html-to-design — so drift-diff had nothing on disk to compare and could never have measured them. Baseline established at 0; the next run has something to diff."
     },
     {
       "kind": "editor-state",
@@ -3872,7 +3873,7 @@
       "id": "BL-0215",
       "state": "canvas-overlay-badges",
       "figmaNodeId": "338:2",
-      "notes": "NEW ROW 2026-08-22 — Badges on. The toggle sets data-badges=\"true\" on .buildrick-canvas and the badges themselves come from CSS on that attribute, so like the grid they are a paint the capture may not carry. Toolbar state is the reliable half."
+      "notes": "NEW ROW 2026-08-22 — Badges on. The toggle sets data-badges=\"true\" on .buildrick-canvas and the badges themselves come from CSS on that attribute, so like the grid they are a paint the capture may not carry. Toolbar state is the reliable half. Reference PNG captured 2026-08-22 via capture.mjs. Until then these rows existed only as Figma frames — captured straight through html-to-design — so drift-diff had nothing on disk to compare and could never have measured them. Baseline established at 0; the next run has something to diff."
     },
     {
       "kind": "editor-state",
@@ -3888,7 +3889,7 @@
       "id": "BL-0216",
       "state": "canvas-xray",
       "figmaNodeId": "339:2",
-      "notes": "NEW ROW 2026-08-22 — X-Ray on. This one the pipeline DOES carry: the frame shows the flattened canvas (button fills gone, every element outlined) that .buildrick-canvas[data-xray-mode=\"true\"] produces, next to the Grid frame where the same button is solid blue. Confirmed live by computed style: the first [data-buildrick-id] goes from outline-style none to solid 1px rgb(209, 213, 219)."
+      "notes": "NEW ROW 2026-08-22 — X-Ray on. This one the pipeline DOES carry: the frame shows the flattened canvas (button fills gone, every element outlined) that .buildrick-canvas[data-xray-mode=\"true\"] produces, next to the Grid frame where the same button is solid blue. Confirmed live by computed style: the first [data-buildrick-id] goes from outline-style none to solid 1px rgb(209, 213, 219). Reference PNG captured 2026-08-22 via capture.mjs. Until then these rows existed only as Figma frames — captured straight through html-to-design — so drift-diff had nothing on disk to compare and could never have measured them. Baseline established at 0; the next run has something to diff."
     },
     {
       "kind": "editor-state",
@@ -3904,7 +3905,7 @@
       "id": "BL-0217",
       "state": "canvas-cheat-sheet",
       "figmaNodeId": "340:2",
-      "notes": "NEW ROW 2026-08-22 — the '?' cheat sheet (KeyboardCheatSheet), captured whole: a Radix modal, so unlike the ⌘K palette it survives the capture script taking focus. This frame is the printed keyboard CONTRACT — Selection / Navigation / Positioning / Editing / View / Context Menu — and is what the 2026-08-22 arrow-key walk was measured against. Distinct from BL-0121 sitemenu-keyboard-shortcuts, which is the ⌘/ app panel; see the dead-ledger row BL-0210 for the two-overlay history. Measured: '?' opens only this one, ⌘/ opens only the other."
+      "notes": "NEW ROW 2026-08-22 — the '?' cheat sheet (KeyboardCheatSheet), captured whole: a Radix modal, so unlike the ⌘K palette it survives the capture script taking focus. This frame is the printed keyboard CONTRACT — Selection / Navigation / Positioning / Editing / View / Context Menu — and is what the 2026-08-22 arrow-key walk was measured against. Distinct from BL-0121 sitemenu-keyboard-shortcuts, which is the ⌘/ app panel; see the dead-ledger row BL-0210 for the two-overlay history. Measured: '?' opens only this one, ⌘/ opens only the other. Reference PNG captured 2026-08-22 via capture.mjs. Until then these rows existed only as Figma frames — captured straight through html-to-design — so drift-diff had nothing on disk to compare and could never have measured them. Baseline established at 0; the next run has something to diff."
     }
   ]
 }
