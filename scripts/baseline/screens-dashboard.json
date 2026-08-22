@@ -1,0 +1,35 @@
+{
+  "_note": "Dashboard states that branch on WHO is looking. Both of these were shipped as one path for everyone and corrected on 2026-08-22, so the pair is the point: capture them with two sessions against the SAME workspace, or the difference disappears.",
+  "path": "/dashboard",
+  "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
+  "figmaPageId": "0:1",
+  "_fixtures": "Workspace 'E2E Blank WS 0a95fc' sits at 3/3 sites, which is what makes the limit panel render at all. Owner session: /tmp/bk-media-state.json (qa@buildrik.local). Non-owner: mint a magic_link token for viewer-fixture@buildrik.local's USER ID, drive /auth/callback, save storageState, then pass it as BK_STATE.",
+  "screens": [
+    {
+      "id": "BL-0228",
+      "state": "create-site-at-limit-owner",
+      "session": "owner",
+      "actions": [{ "click": "text=Create a site" }, { "waitMs": 2500 }],
+      "sentinel": { "text": "Create a site" },
+      "expect": ["Site limit reached (3/3)", "Upgrade Plan"],
+      "figmaNodeId": "382:2",
+      "_verified": "2026-08-22 — read back from the Figma frame."
+    },
+    {
+      "id": "BL-0229",
+      "state": "create-site-at-limit-non-owner + invited checklist",
+      "session": "viewer",
+      "actions": [{ "click": "text=Create a site" }, { "waitMs": 2500 }],
+      "sentinel": { "text": "Create a site" },
+      "expect": [
+        "Site limit reached (3/3)",
+        "Ask a workspace owner to upgrade the plan, or delete a site to free a slot.",
+        "Getting Started",
+        "0/3"
+      ],
+      "_expectAbsent": ["Upgrade Plan"],
+      "figmaNodeId": "384:2",
+      "_verified": "2026-08-22 — read back from the Figma frame by screenshot. The absent Upgrade button is the fix (de4eb01a): checkout is owner-only, so it used to walk a viewer into a FORBIDDEN. 0/3 rather than 0/7 is the invited checklist finally reachable (b6170b5c)."
+    }
+  ]
+}

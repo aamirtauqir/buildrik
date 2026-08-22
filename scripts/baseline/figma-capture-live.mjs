@@ -30,6 +30,9 @@ import { createRequire } from "node:module";
 const require = createRequire("/Users/shahg/Desktop/pencil/buildrik/packages/dashboard/package.json");
 const { chromium } = require("@playwright/test");
 const [,, CAPTURE_ID, PATH, DELAYMS, ACTIONS_JSON, SELECTOR, SENTINEL_ARG] = process.argv;
+/* BK_STATE picks the session. The owner storageState cannot reach a
+   non-owner state, and several baselines differ ONLY by role — the
+   create-site limit panel and the dashboard checklist both branch on it. */
 /* The sentinel was hardcoded to `.bd-studio`, which made this an editor-only
    script: every dashboard or public page failed with SENTINEL_MISSING even
    though it had rendered fine. Editor callers keep the default. */
@@ -38,7 +41,7 @@ const BASE = "http://localhost:3000";
 const b = await chromium.launch();
 /* bypassCSP instead of rewriting responses: Next streams its RSC payload,
    and refetch+fulfill mangles it so the editor never mounts. */
-const c = await b.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1, storageState: "/tmp/bk-media-state.json", bypassCSP: true });
+const c = await b.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1, storageState: process.env.BK_STATE || "/tmp/bk-media-state.json", bypassCSP: true });
 await c.addCookies([{ name: "buildrik_consent", value: encodeURIComponent(JSON.stringify({essential:true,analytics:false})), url: BASE }]);
 const page = await c.newPage();
 page.on("console", (m) => { const t = m.text(); if (/figma|capture|csp|refused/i.test(t)) console.log("PAGE:", m.type(), t.slice(0, 200)); });
