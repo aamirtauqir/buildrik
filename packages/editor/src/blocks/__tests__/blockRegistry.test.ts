@@ -251,8 +251,8 @@ describe("insertBlock — elementType fallback branch", () => {
 // ---------------------------------------------------------------------------
 
 describe("blockDefinitions — registry integrity", () => {
-  it("registers exactly 63 blocks (11 Basic + 9 Media + 5 Layout + 16 Forms + 5 Sections + 13 Components + 4 Ecommerce)", () => {
-    expect(blockDefinitions).toHaveLength(63);
+  it("registers exactly 64 blocks (11 Basic + 9 Media + 5 Layout + 16 Forms + 5 Sections + 14 Components + 4 Ecommerce)", () => {
+    expect(blockDefinitions).toHaveLength(64);
   });
 
   it("has no duplicate block ids", () => {
@@ -269,19 +269,17 @@ describe("blockDefinitions — registry integrity", () => {
     expect(getBlockById("does-not-exist")).toBeUndefined();
   });
 
-  it("PIN: contact-form is exported from blocks/ but NOT registered in blockDefinitions", () => {
-    // Known audit finding — pinned only, not fixed here. contactFormBlockConfig
-    // is a fully-formed config (id/label/elementType/content) re-exported via
-    // src/blocks/index.ts, yet absent from the registry, so it is unreachable
-    // through getBlockById / getBlockDefinitions.
+  /* This case used to PIN the opposite — that contact-form was exported and
+     NOT registered — alongside an it.todo reading "register
+     contactFormBlockConfig in blockDefinitions or delete the orphan export".
+     Registered, which is the resolution that todo named: the config is
+     fully formed (id/label/elementType/content) and the block rendered fine;
+     the only thing wrong was that no Insert row could reach it. */
+  it("registers contact-form, so the Insert panel can reach it", () => {
     expect(contactFormBlockConfig.id).toBe("contact-form");
     expect(typeof contactFormBlockConfig.content).toBe("string");
-    expect(getBlockById("contact-form")).toBeUndefined();
+    expect(getBlockById("contact-form")).toBe(contactFormBlockConfig);
   });
-
-  it.todo(
-    "AUDIT (known): register contactFormBlockConfig in blockDefinitions or delete the orphan export"
-  );
 });
 
 /* The four insert doors — Insert-panel click, canvas drop, block picker and

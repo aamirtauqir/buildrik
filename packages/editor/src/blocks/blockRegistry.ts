@@ -30,6 +30,7 @@ import {
   countdownBlockConfig,
   accordionBlockConfig,
   socialIconsBlockConfig,
+  contactFormBlockConfig,
   // GAP-FIX: Additional components from spec
   stackBlockConfig,
   switchBlockConfig,
@@ -160,6 +161,7 @@ export const blockDefinitions: BlockDefinition[] = [
   countdownBlockConfig,
   accordionBlockConfig,
   socialIconsBlockConfig,
+  contactFormBlockConfig,
   // GAP-FIX: Additional components from spec
   stackBlockConfig,
   switchBlockConfig,
@@ -189,6 +191,7 @@ export const componentBlockDefinitions: BlockDefinition[] = [
   countdownBlockConfig,
   accordionBlockConfig,
   socialIconsBlockConfig,
+  contactFormBlockConfig,
   stackBlockConfig,
   switchBlockConfig,
   tabsBlockConfig,
