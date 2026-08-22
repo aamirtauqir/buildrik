@@ -323,7 +323,8 @@
       "how": "scripts/baseline/screens-editor.json + Figma html-to-design capture"
     },
     "generatedAt": "2026-08-22",
-    "driftMeasuredAt": "2026-08-22"
+    "driftMeasuredAt": "2026-08-22",
+    "captureCaveat": "html-to-design does NOT carry an inset box-shadow. The dashboard's InputField draws its hairline as `shadow-[inset_0_0_0_1px_var(--color-border-input)]` rather than a CSS border, so every captured form field renders in Figma as a bare label with no visible box. Measured on the live client sign-off page: 374x42 wrapper, 1px inset rgb(156,163,175) = #9ca3af = the resolved token, white background. The board is wrong there, not the app — do not 'fix' a field that looks borderless in a capture."
   },
   "rows": [
     {
@@ -3970,6 +3971,57 @@
       "state": "panel-publish",
       "figmaNodeId": "361:2",
       "notes": "Captured 2026-08-22 from the running editor at 1440x900. the Publish panel, link 8's own surface."
+    },
+    {
+      "kind": "editor-state",
+      "route": "/edit/[siteId]",
+      "statusClass": 1,
+      "flow": "editor",
+      "viewport": "1440x900",
+      "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
+      "figmaPageId": "75:2",
+      "requires": "session",
+      "pipelineState": "captured-current",
+      "capturedFrom": "localhost@6c140eb1",
+      "id": "BL-0222",
+      "state": "dashboard-agency-reviews",
+      "figmaNodeId": "363:2",
+      "notes": "Captured 2026-08-22 from the running app at 1440x900, placed on the Dashboard page (0:1) — these are dashboard-app routes, and a NAVIGATE reaction only reaches a frame on the same page. The internal review queue. Carries the Withdraw action added in 40c4e3d2 for rows the caller submitted.",
+      "path": "/dashboard/agency/reviews"
+    },
+    {
+      "kind": "editor-state",
+      "route": "/edit/[siteId]",
+      "statusClass": 1,
+      "flow": "editor",
+      "viewport": "1440x900",
+      "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
+      "figmaPageId": "75:2",
+      "requires": "session",
+      "pipelineState": "captured-current",
+      "capturedFrom": "localhost@6c140eb1",
+      "id": "BL-0223",
+      "state": "review-invalid-token",
+      "figmaNodeId": "364:2",
+      "notes": "Captured 2026-08-22 from the running app at 1440x900, placed on the Dashboard page (0:1) — these are dashboard-app routes, and a NAVIGATE reaction only reaches a frame on the same page. The invalid-token screen. Captured by accident, kept on purpose: pointed at an e2e fixture token of 17 characters while the input schema requires 20, so the request was refused before the service ran and the page rendered 'This link doesn't work'. A real state, and a reminder that a 200 from curl is not a working page.",
+      "path": "/review/:token"
+    },
+    {
+      "kind": "editor-state",
+      "route": "/edit/[siteId]",
+      "statusClass": 1,
+      "flow": "editor",
+      "viewport": "1440x900",
+      "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
+      "figmaPageId": "75:2",
+      "requires": "session",
+      "pipelineState": "captured-current",
+      "capturedFrom": "localhost@6c140eb1",
+      "id": "BL-0224",
+      "state": "client-sign-off",
+      "figmaNodeId": "366:2",
+      "notes": "Captured 2026-08-22 from the running app at 1440x900, placed on the Dashboard page (0:1) — these are dashboard-app routes, and a NAVIGATE reaction only reaches a frame on the same page. The client sign-off page — the agency wedge, and the first screen an agency's client ever sees. Identity gate before any comment or approval. Token minted with scripts/mint-review-link.ts.",
+      "path": "/review/:token"
     }
   ]
 }

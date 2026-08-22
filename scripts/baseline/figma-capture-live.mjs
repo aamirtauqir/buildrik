@@ -6,7 +6,7 @@
  * magic token. This one drives the ordinary dev server on :3000 with a saved
  * storageState, so a state can be refreshed without minting a token first.
  *
- * Usage: node figma-capture-live.mjs <captureId> <path> <delayMs> <actionsJson|none> [selector]
+ * Usage: node figma-capture-live.mjs <captureId> <path> <delayMs> <actionsJson|none> [selector] [sentinel]
  *   captureId — from the Figma MCP generate_figma_design tool; SINGLE USE and
  *               short-lived. A stale one answers 410 and the capture silently
  *               never lands.
@@ -29,7 +29,11 @@
 import { createRequire } from "node:module";
 const require = createRequire("/Users/shahg/Desktop/pencil/buildrik/packages/dashboard/package.json");
 const { chromium } = require("@playwright/test");
-const [,, CAPTURE_ID, PATH, DELAYMS, ACTIONS_JSON, SELECTOR] = process.argv;
+const [,, CAPTURE_ID, PATH, DELAYMS, ACTIONS_JSON, SELECTOR, SENTINEL_ARG] = process.argv;
+/* The sentinel was hardcoded to `.bd-studio`, which made this an editor-only
+   script: every dashboard or public page failed with SENTINEL_MISSING even
+   though it had rendered fine. Editor callers keep the default. */
+const SENTINEL = SENTINEL_ARG && SENTINEL_ARG !== "none" ? SENTINEL_ARG : ".bd-studio";
 const BASE = "http://localhost:3000";
 const b = await chromium.launch();
 /* bypassCSP instead of rewriting responses: Next streams its RSC payload,
@@ -47,11 +51,11 @@ page.on("response", (r) => { if (/mcp\.figma\.com/.test(r.url())) console.log("F
    fails. Only the top-level document carries the header that matters. */
 await page.addInitScript(() => { const kill=()=>{for(const el of document.querySelectorAll('[class*="rearrangeOverlay"],[class*="agentation"]'))el.remove();};document.addEventListener("DOMContentLoaded",kill);setInterval(kill,400); });
 await page.goto(BASE + PATH, { waitUntil: "domcontentloaded", timeout: 90000 });
-await page.waitForSelector(".bd-studio", { timeout: 60000 }).catch(() => {});
+await page.waitForSelector(SENTINEL, { timeout: 60000 }).catch(() => {});
 await page.waitForTimeout(Number(DELAYMS || 9000));
 // Sentinel: never submit a login page or a blank shell as a baseline.
-const ok = await page.locator(".bd-studio").count();
-if (!ok) { console.log(JSON.stringify({ error: "SENTINEL_MISSING .bd-studio", url: page.url() })); await b.close(); process.exit(2); }
+const ok = await page.locator(SENTINEL).count();
+if (!ok) { console.log(JSON.stringify({ error: `SENTINEL_MISSING ${SENTINEL}`, url: page.url() })); await b.close(); process.exit(2); }
 const r = await page.context().request.get("https://mcp.figma.com/mcp/html-to-design/capture.js");
 await page.evaluate((s) => { const el = document.createElement("script"); el.textContent = s; document.head.appendChild(el); }, await r.text());
 /* Actions run AFTER the capture script is injected. Injecting it moves focus,
