@@ -604,14 +604,14 @@
           "waitMs": 3500
         },
         {
-          "click": "[aria-label='List view']"
+          "click": ".mgr-view-toggle [aria-label='List view']"
         },
         {
           "waitMs": 2000
         }
       ],
-      "_note": "Control labels read off the running panel, not guessed — a selector that misses does not fail, it captures the panel unopened and the frame looks plausible.",
-      "_capture_status": "STILL NOT CAPTURABLE, and now for a known reason rather than a guess. Seeding the library was necessary and not sufficient. Inside the expanded library `[aria-label='List view']` resolves to exactly one element but a click on it fails: that control belongs to the DRAWER, which the expanded library covers. The full-page library's own view switch is a pair of text buttons in MediaLibraryPanel.tsx, and only 'Grid' is in the DOM — no 'List' — so either the switch renders one button in this state or the expanded view is a different component than the source suggests. Worth a look on its own: a missing List button would be a product bug, not a baseline one.\\n\\nAlso: grid and list differ only in LAYOUT. Two captures of them had identical text AND identical node counts (342) and box geometry, so a text-marker check can never tell them apart. This pair needs a geometry or screenshot comparison, whatever fixes the control."
+      "_note": "The expanded library is LibraryManager → AssetGrid, NOT MediaLibraryPanel — I read the wrong component twice. AssetGrid's view toggle is two icon buttons whose only name was `title`, so [aria-label='List view'] matched the DRAWER's button instead, which the expanded library covers, and the click failed. The buttons carry aria-label now and the selector is scoped to .mgr-view-toggle so it cannot reach the drawer's.",
+      "_verified": "2026-08-23 — screenshot read back: a real table with Name / Type / Size / Usage and the three seeded assets (storefront.jpg IMG 180 KB, dining-room.jpg IMG 256 KB, room-tour.mp4 VID 324 KB). Node count 353 against the grid frame's 254, which is the check that works for a layout-only difference; text cannot tell these two apart."
     },
     {
       "id": "BL-0163",

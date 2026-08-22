@@ -315,6 +315,10 @@ export function AssetGrid({
             className={viewMode === "grid" ? "active" : ""}
             onClick={() => setViewMode("grid")}
             title="Grid view"
+            /* Icon-only, so `title` was its whole accessible name — browsers do
+               fall back to it, but it is the weakest form and nothing else here
+               relies on that. Name it properly. */
+            aria-label="Grid view"
             aria-pressed={viewMode === "grid"}
           >
             <Grid2X2 size={12} />
@@ -323,6 +327,7 @@ export function AssetGrid({
             className={viewMode === "list" ? "active" : ""}
             onClick={() => setViewMode("list")}
             title="List view"
+            aria-label="List view"
             aria-pressed={viewMode === "list"}
           >
             <List size={12} />
