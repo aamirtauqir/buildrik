@@ -10,7 +10,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi } from "vitest";
-import { applyBoundsToModel } from "../DOMUpdater";
+import { applyBoundsToModel, expandParent } from "../DOMUpdater";
 
 function makeElement(styles: Record<string, string>) {
   const written: Record<string, string> = {};
@@ -74,5 +74,38 @@ describe("applyBoundsToModel — the stored size honours the element's own const
     expect(written.width).toBe("320px");
     expect(written.left).toBe("12px");
     expect(written.top).toBe("34px");
+  });
+});
+
+describe("expandParent — growing a parent to fit still honours its constraints", () => {
+  function parentEl(styles: Record<string, string>) {
+    const written: Record<string, string> = {};
+    return {
+      written,
+      model: {
+        getStyle: (prop: string) => styles[prop],
+        setStyle: (prop: string, value: string) => {
+          written[prop] = value;
+        },
+      },
+    };
+  }
+  const domStub = () => ({ style: {} }) as unknown as HTMLElement;
+
+  it("does not store a parent width past its max-width", () => {
+    const { written, model } = parentEl({ "max-width": "1200px" });
+    expandParent("p-1", domStub(), 1400, 900, {
+      elements: { getElement: () => model },
+    });
+    expect(written.width).toBe("1200px");
+    expect(written.height).toBe("900px");
+  });
+
+  it("leaves a parent inside its constraints exactly as grown", () => {
+    const { written, model } = parentEl({ "max-width": "1600px" });
+    expandParent("p-1", domStub(), 1400, 900, {
+      elements: { getElement: () => model },
+    });
+    expect(written.width).toBe("1400px");
   });
 });

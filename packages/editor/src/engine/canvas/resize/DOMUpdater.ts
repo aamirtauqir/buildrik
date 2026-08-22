@@ -185,6 +185,7 @@ export function expandParent(
     elements: {
       getElement(id: string):
         | {
+            getStyle?(prop: string): string | undefined;
             setStyle?(prop: string, value: string): void;
           }
         | null
@@ -196,7 +197,18 @@ export function expandParent(
 
   const parentModel = composer.elements.getElement(parentId);
   if (parentModel) {
-    parentModel.setStyle?.("width", `${Math.round(newWidth)}px`);
-    parentModel.setStyle?.("height", `${Math.round(newHeight)}px`);
+    /* Same invariant as applyBoundsToModel: never store a size the element
+       cannot have. Growing a parent to fit a resized child is a different
+       intent, but the browser clamps the parent's box against its own
+       min/max exactly the same way, so an unclamped write leaves the model
+       holding a width the parent never renders at. */
+    parentModel.setStyle?.(
+      "width",
+      `${clampToConstraints(Math.round(newWidth), parentModel.getStyle?.("min-width"), parentModel.getStyle?.("max-width"))}px`
+    );
+    parentModel.setStyle?.(
+      "height",
+      `${clampToConstraints(Math.round(newHeight), parentModel.getStyle?.("min-height"), parentModel.getStyle?.("max-height"))}px`
+    );
   }
 }
