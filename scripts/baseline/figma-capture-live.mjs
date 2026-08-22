@@ -112,7 +112,14 @@ const result = await Promise.race([
      { submitted: true } unconditionally, so a submit that died on
      ERR_NETWORK_CHANGED (Chromium throws it when a VPN/tunnel interface
      flaps mid-POST, and this machine has several) still printed success and
-     nothing landed in Figma. Report what the network actually did. */
+     nothing landed in Figma. Report what the network actually did.
+
+     But read this before trusting a false: the status UNDER-reports too. Four
+     runs reported ERR_NETWORK_CHANGED / ERR_INTERNET_DISCONNECTED and every
+     one of them LANDED — the POST completed server-side and only the response
+     was lost, so retrying produced five duplicate frames on the page. A false
+     here means "the browser did not see a 200", not "nothing arrived".
+     The only sound check is reading the target page back and counting. */
   new Promise((res) => setTimeout(() => res({ submitted: submitStatus === 200, submitStatus, submitFailed, note: 'timer elapsed; the submit response is the signal' }), 45000)),
   page.evaluate(async ({ cid, sel }) => {
     if (!window.figma || typeof window.figma.captureForDesign !== "function") {
