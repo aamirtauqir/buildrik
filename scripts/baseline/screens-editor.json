@@ -360,6 +360,184 @@
           "waitMs": 2500
         }
       ]
+    },
+    {
+      "id": "BL-0122",
+      "state": "sitemenu-open",
+      "actions": [
+        {
+          "click": "[aria-label*='ite menu' i], [aria-label*='More' i]"
+        },
+        {
+          "waitMs": 1200
+        }
+      ],
+      "_note": "The menu itself. BL-0109 captures the same surface from the earlier pass; kept separate because both ids exist on the board."
+    },
+    {
+      "id": "BL-0112",
+      "state": "sitemenu-site-settings",
+      "actions": [
+        {
+          "click": "[aria-label*='ite menu' i], [aria-label*='More' i]"
+        },
+        {
+          "waitMs": 1200
+        },
+        {
+          "click": "text=Site settings"
+        },
+        {
+          "waitMs": 2000
+        }
+      ],
+      "_note": "The row labels come from SiteMenu.tsx, which renders each door as a MenuItem whose text IS the label — so the recipe breaks loudly if a label is renamed, rather than capturing the menu with nothing opened."
+    },
+    {
+      "id": "BL-0113",
+      "state": "sitemenu-version-history",
+      "actions": [
+        {
+          "click": "[aria-label*='ite menu' i], [aria-label*='More' i]"
+        },
+        {
+          "waitMs": 1200
+        },
+        {
+          "click": "text=Version history"
+        },
+        {
+          "waitMs": 2000
+        }
+      ],
+      "_note": "The row labels come from SiteMenu.tsx, which renders each door as a MenuItem whose text IS the label — so the recipe breaks loudly if a label is renamed, rather than capturing the menu with nothing opened."
+    },
+    {
+      "id": "BL-0114",
+      "state": "sitemenu-publish-history",
+      "actions": [
+        {
+          "click": "[aria-label*='ite menu' i], [aria-label*='More' i]"
+        },
+        {
+          "waitMs": 1200
+        },
+        {
+          "click": "text=Publish history"
+        },
+        {
+          "waitMs": 2000
+        }
+      ],
+      "_note": "The row labels come from SiteMenu.tsx, which renders each door as a MenuItem whose text IS the label — so the recipe breaks loudly if a label is renamed, rather than capturing the menu with nothing opened."
+    },
+    {
+      "id": "BL-0115",
+      "state": "sitemenu-export-code",
+      "actions": [
+        {
+          "click": "[aria-label*='ite menu' i], [aria-label*='More' i]"
+        },
+        {
+          "waitMs": 1200
+        },
+        {
+          "click": "text=Export code"
+        },
+        {
+          "waitMs": 2000
+        }
+      ],
+      "_note": "The row labels come from SiteMenu.tsx, which renders each door as a MenuItem whose text IS the label — so the recipe breaks loudly if a label is renamed, rather than capturing the menu with nothing opened."
+    },
+    {
+      "id": "BL-0116",
+      "state": "sitemenu-templates",
+      "actions": [
+        {
+          "click": "[aria-label*='ite menu' i], [aria-label*='More' i]"
+        },
+        {
+          "waitMs": 1200
+        },
+        {
+          "click": "text=Templates"
+        },
+        {
+          "waitMs": 2000
+        }
+      ],
+      "_note": "The row labels come from SiteMenu.tsx, which renders each door as a MenuItem whose text IS the label — so the recipe breaks loudly if a label is renamed, rather than capturing the menu with nothing opened."
+    },
+    {
+      "id": "BL-0118",
+      "state": "sitemenu-design-system",
+      "actions": [
+        {
+          "click": "[aria-label*='ite menu' i], [aria-label*='More' i]"
+        },
+        {
+          "waitMs": 1200
+        },
+        {
+          "click": "text=Design system"
+        },
+        {
+          "waitMs": 2000
+        }
+      ],
+      "_note": "The row labels come from SiteMenu.tsx, which renders each door as a MenuItem whose text IS the label — so the recipe breaks loudly if a label is renamed, rather than capturing the menu with nothing opened."
+    },
+    {
+      "id": "BL-0119",
+      "state": "sitemenu-plugins",
+      "actions": [
+        {
+          "click": "[aria-label*='ite menu' i], [aria-label*='More' i]"
+        },
+        {
+          "waitMs": 1200
+        },
+        {
+          "click": "text=Plugins"
+        },
+        {
+          "waitMs": 2000
+        }
+      ],
+      "_note": "The row labels come from SiteMenu.tsx, which renders each door as a MenuItem whose text IS the label — so the recipe breaks loudly if a label is renamed, rather than capturing the menu with nothing opened."
+    },
+    {
+      "id": "BL-0120",
+      "state": "sitemenu-invite-teammates",
+      "actions": [
+        {
+          "click": "[aria-label*='ite menu' i], [aria-label*='More' i]"
+        },
+        {
+          "waitMs": 1200
+        },
+        {
+          "click": "text=Invite teammates"
+        },
+        {
+          "waitMs": 2000
+        }
+      ],
+      "_note": "The row labels come from SiteMenu.tsx, which renders each door as a MenuItem whose text IS the label — so the recipe breaks loudly if a label is renamed, rather than capturing the menu with nothing opened."
+    },
+    {
+      "id": "BL-0121",
+      "state": "sitemenu-keyboard-shortcuts",
+      "actions": [
+        {
+          "press": "Shift+Slash"
+        },
+        {
+          "waitMs": 1500
+        }
+      ],
+      "_note": "Reached by the chord, not the menu row — the row prints the same chord, and pressing it is what a user does."
     }
   ],
   "_verified": "2026-08-21: every entry below was replayed against localhost:3000 and the resulting state read back on screen before any capture ran. Three corrections came out of that: the Publish button opens the confirm dialog directly (there is no separate publish-open state), comment mode's only cue is the pressed toggle plus a crosshair capture layer, and the ⌘K palette cannot be captured at all — it closes when the capture script takes focus. | 2026-08-22: added BL-0213..BL-0217, the six-toggle canvas overlay states and the '?' cheat sheet — states the baseline had no board for at all, found by walking CanvasFooterToolbar. `button:text-is(\"Grid\")` is unambiguous: the Insert drawer's own Grid row is a DIV, not a button. Two things these recipes cannot promise: a CSS-painted overlay (grid lines, badges) does not survive html-to-design, and the click leaves the pointer on the toggle so its hover tooltip lands in the frame.",
