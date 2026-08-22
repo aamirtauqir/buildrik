@@ -4,9 +4,12 @@
  * Groups Duplicate / Copy styles / Paste styles / Delete under a single
  * affordance in the inspector header. Replaces the old absolutely-positioned
  * delete button so the corner isn't competing with the binding popover for
- * attention. Uses a module-level style clipboard so "Copy styles" on one
- * element works when you later paste onto another selection — a single
- * in-memory clipboard is enough for the common case.
+ * Copy styles / Paste styles read and write `composer.styleClipboard`, the
+ * same slot the canvas keyboard (⌘⌥C / ⌘⌥V) and the right-click menu use.
+ * This menu kept its own module-level clipboard until 2026-08-22, which meant
+ * two controls with the same name and icon shared nothing: copying here left
+ * ⌘⌥V with nothing to paste, and a module-level `let` also outlived the
+ * project, so a freshly opened site offered a paste from the previous one.
  *
  * The menu uses a simple click-outside handler rather than a full Popover
  * primitive to keep the dependency surface small and avoid coupling header
@@ -20,12 +23,6 @@ import * as React from "react";
 import type { Composer } from "../../../engine";
 import { useClickOutside } from "../../../shared/hooks/useClickOutside";
 import { Button } from "@/editor/chrome-ui";
-// ============================================================================
-// STYLE CLIPBOARD — module-level so it survives across element selections
-// ============================================================================
-
-let styleClipboard: Record<string, string> | null = null;
-
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -164,17 +161,17 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({
     // Clone the styles object so subsequent edits to the source element
     // don't mutate the clipboard snapshot.
     const snapshot = el.getStyles?.() ?? {};
-    styleClipboard = { ...snapshot };
+    composer.styleClipboard = { ...snapshot };
     setIsOpen(false);
   };
 
   const handlePasteStyles = () => {
-    if (!composer || !styleClipboard) return;
+    if (!composer?.styleClipboard) return;
     const el = composer.elements.getElement(selectedElementId);
     if (!el) return;
     composer.beginTransaction?.("paste-styles");
     try {
-      el.setStyles?.(styleClipboard);
+      el.setStyles?.(composer.styleClipboard);
     } finally {
       composer.endTransaction?.();
     }
@@ -204,7 +201,7 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({
       label: "Paste styles",
       icon: <ClipboardPaste size={14} aria-hidden="true" />,
       onClick: handlePasteStyles,
-      disabled: !styleClipboard,
+      disabled: !composer?.styleClipboard,
     },
     {
       id: "delete",
