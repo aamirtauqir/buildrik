@@ -32,6 +32,12 @@ const styles = {
     fontSize: 12,
     color: "var(--bk-ink)",
   } as React.CSSProperties,
+  nameWarning: {
+    margin: "-6px 0 10px",
+    fontSize: 11,
+    lineHeight: 1.45,
+    color: "var(--bk-warning-ink, var(--bk-ink-muted))",
+  } as React.CSSProperties,
   srcRow: {
     display: "flex",
     gap: 8,
@@ -70,6 +76,17 @@ export interface PropertyFieldProps {
 // ============================================================================
 // COMPONENT
 // ============================================================================
+
+/* A `name` whose value is a form/document property is stripped by the
+   sanitizer as DOM clobbering: `name="name"` inside a form makes `form.name`
+   return the input rather than the form's name. The value disappears at
+   publish, not at typing — the editor shows it, the canvas shows it, and the
+   visitor's browser receives an unnamed control whose answer is dropped from
+   the submission. Measured through `sanitizeHTML`: these five are stripped,
+   while email / fullname / message / choice survive. Warn rather than rewrite:
+   silently changing what someone typed is the same failure in the other
+   direction. */
+const CLOBBERING_NAMES = new Set(["name", "id", "submit", "action", "method"]);
 
 export const PropertyField: React.FC<PropertyFieldProps> = ({
   prop,
@@ -156,11 +173,20 @@ export const PropertyField: React.FC<PropertyFieldProps> = ({
 
   // DEFAULT TEXT FIELD
   return (
-    <InputRow
-      label={prop.label}
-      value={value}
-      onChange={(v) => onChange(prop.id, v)}
-      placeholder={prop.placeholder}
-    />
+    <>
+      <InputRow
+        label={prop.label}
+        value={value}
+        onChange={(v) => onChange(prop.id, v)}
+        placeholder={prop.placeholder}
+      />
+      {prop.id === "name" && CLOBBERING_NAMES.has(value.trim().toLowerCase()) && (
+        <p style={styles.nameWarning} role="status">
+          &ldquo;{value.trim()}&rdquo; won&rsquo;t survive publishing — it collides with a form
+          property, so the field ships with no name and its answer is dropped from the submission.
+          Try &ldquo;full{value.trim().toLowerCase() === "name" ? "name" : "_" + value.trim().toLowerCase()}&rdquo;.
+        </p>
+      )}
+    </>
   );
 };

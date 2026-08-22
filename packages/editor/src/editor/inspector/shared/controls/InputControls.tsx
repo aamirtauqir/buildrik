@@ -55,9 +55,15 @@ export const InputRow: React.FC<InputRowProps> = ({
   textarea = false,
   isOverridden,
   helperText,
-}) => (
+}) => {
+  /* The label sat next to the control with nothing joining them, so every row
+     in the inspector had a visible label and no accessible name: a screen
+     reader announced "edit text", and `getByLabelText` could not find the
+     control it obviously belongs to. `htmlFor` costs one id. */
+  const controlId = React.useId();
+  return (
   <div className="bdi-row-ctrl">
-    <label className="bdi-lb">
+    <label className="bdi-lb" htmlFor={controlId}>
       {label}
       {isOverridden && <OverrideDot />}
       {helperText && <HelperIcon text={helperText} />}
@@ -65,6 +71,7 @@ export const InputRow: React.FC<InputRowProps> = ({
     <div className="bdi-row-content">
       {textarea ? (
         <Textarea
+          id={controlId}
           className="bdi-text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
@@ -72,6 +79,7 @@ export const InputRow: React.FC<InputRowProps> = ({
         />
       ) : (
         <TextField
+          id={controlId}
           className="bdi-text"
           type={type}
           value={value}
@@ -81,7 +89,8 @@ export const InputRow: React.FC<InputRowProps> = ({
       )}
     </div>
   </div>
-);
+  );
+};
 
 // ============================================================================
 // INPUT WITH UNIT (.bdi-num with inline unit selector)
