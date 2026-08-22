@@ -38,7 +38,7 @@ export const ToolbarNavSection: React.FC<ToolbarNavSectionProps> = ({
   <>
     {/* Parent button */}
     {hasParent && (
-      <Tooltip content="Select Parent · ⌥↑" placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
+      <Tooltip content="Select Parent · ←" placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
         <Button color="light" onClick={onSelectParent} style={parentBtnStyles} aria-label="Select parent element" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
           <svg
             width="12"
