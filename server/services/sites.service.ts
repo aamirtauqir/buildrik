@@ -1,6 +1,5 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 import { sanitizeBlocks } from "@/lib/sanitize-blocks";
 import { pagesFromTemplate } from "@/server/services/template.service";
 import { checkSiteRole, PermissionError } from "@/server/services/permission.service";
@@ -11,6 +10,7 @@ import type {
   SaveProjectDataInput,
 } from "@buildrik/shared/schemas/sites";
 import { sendSiteTransferredEmail } from "@/server/services/email.service";
+import { assertSiteQuota } from "@/server/services/site-quota";
 
 function slugify(name: string): string {
   return name
@@ -166,21 +166,7 @@ export async function createSite(
   userId: string,
   input: CreateSiteInput
 ) {
-  const membership = await prisma.workspaceMember.findFirst({
-    where: { workspaceId, userId },
-    include: { workspace: { select: { plan: true } } },
-  });
-
-  const plan = (membership?.workspace?.plan as PlanName) ?? "FREE";
-  const limit = PLAN_LIMITS[plan].sites as number;
-
-  const currentCount = await prisma.site.count({
-    where: { workspaceId, deletedAt: null },
-  });
-
-  if (currentCount >= limit) {
-    throw new Error("SITE_LIMIT");
-  }
+  await assertSiteQuota(workspaceId, userId);
 
   const slug = await generateUniqueSlug(input.name);
 
@@ -364,21 +350,7 @@ export async function duplicateSite(
   const original = await prisma.site.findUnique({ where: { id: siteId } });
   if (!original || original.deletedAt) throw new Error("SITE_NOT_FOUND");
 
-  const membership = await prisma.workspaceMember.findFirst({
-    where: { workspaceId, userId },
-    include: { workspace: { select: { plan: true } } },
-  });
-
-  const plan = (membership?.workspace?.plan as PlanName) ?? "FREE";
-  const limit = PLAN_LIMITS[plan].sites as number;
-
-  const currentCount = await prisma.site.count({
-    where: { workspaceId, deletedAt: null },
-  });
-
-  if (currentCount >= limit) {
-    throw new Error("SITE_LIMIT");
-  }
+  await assertSiteQuota(workspaceId, userId);
 
   const copyName = `${original.name} (Copy)`;
   const slug = await generateUniqueSlug(copyName);

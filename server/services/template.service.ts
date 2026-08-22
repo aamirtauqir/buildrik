@@ -1,8 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
-import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 import { sanitizeBlocks } from "@/lib/sanitize-blocks";
 import type { ListTemplatesInput } from "@buildrik/shared/schemas/templates";
+import { assertSiteQuota } from "@/server/services/site-quota";
 
 const SORT_MAP: Record<string, Record<string, string>> = {
   popular: { usageCount: "desc" },
@@ -131,21 +131,7 @@ export async function useTemplate(
   templateId: string,
   siteName: string
 ) {
-  const membership = await prisma.workspaceMember.findFirst({
-    where: { workspaceId, userId },
-    include: { workspace: { select: { plan: true } } },
-  });
-
-  const plan = (membership?.workspace?.plan as PlanName) ?? "FREE";
-  const limit = PLAN_LIMITS[plan].sites as number;
-
-  const currentCount = await prisma.site.count({
-    where: { workspaceId, deletedAt: null },
-  });
-
-  if (currentCount >= limit) {
-    throw new Error("SITE_LIMIT");
-  }
+  await assertSiteQuota(workspaceId, userId);
 
   // Scoped read, same predicate as getTemplate. An unscoped findUnique here
   // let any authenticated caller instantiate another workspace's PRIVATE
