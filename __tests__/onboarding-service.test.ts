@@ -111,29 +111,59 @@ describe("Onboarding Service", () => {
 
 
   describe("completeStep", () => {
+    /** What the caller says it finished only counts if that is where they are. */
+    function standingOn(step: string) {
+      vi.mocked(prisma.onboardingState.findUnique).mockResolvedValue({
+        ...mockState,
+        step,
+      } as any);
+    }
+
     it("advances from SITE_CREATION to EDITOR_TOUR", async () => {
-      const updated = { ...mockState, step: "EDITOR_TOUR" };
-      vi.mocked(prisma.onboardingState.update).mockResolvedValue(updated as any);
-      const result = await completeStep("user_1", "SITE_CREATION");
-      expect(result.step).toBe("EDITOR_TOUR");
+      standingOn("SITE_CREATION");
+      vi.mocked(prisma.onboardingState.update).mockResolvedValue({} as any);
+      await completeStep("user_1", "SITE_CREATION");
+      expect(prisma.onboardingState.update).toHaveBeenCalledWith(
+        expect.objectContaining({ data: expect.objectContaining({ step: "EDITOR_TOUR" }) }),
+      );
     });
 
     it("advances from EDITOR_TOUR to CHECKLIST", async () => {
-      const updated = { ...mockState, step: "CHECKLIST" };
-      vi.mocked(prisma.onboardingState.update).mockResolvedValue(updated as any);
-      const result = await completeStep("user_1", "EDITOR_TOUR");
-      expect(result.step).toBe("CHECKLIST");
+      standingOn("EDITOR_TOUR");
+      vi.mocked(prisma.onboardingState.update).mockResolvedValue({} as any);
+      await completeStep("user_1", "EDITOR_TOUR");
+      expect(prisma.onboardingState.update).toHaveBeenCalledWith(
+        expect.objectContaining({ data: expect.objectContaining({ step: "CHECKLIST" }) }),
+      );
     });
 
     it("sets completed=true when completing CHECKLIST", async () => {
-      const updated = { ...mockState, step: "COMPLETED", completed: true };
-      vi.mocked(prisma.onboardingState.update).mockResolvedValue(updated as any);
-      const result = await completeStep("user_1", "CHECKLIST");
-      expect(result.completed).toBe(true);
+      standingOn("CHECKLIST");
+      vi.mocked(prisma.onboardingState.update).mockResolvedValue({} as any);
+      await completeStep("user_1", "CHECKLIST");
+      expect(prisma.onboardingState.update).toHaveBeenCalledWith(
+        expect.objectContaining({ data: expect.objectContaining({ completed: true }) }),
+      );
     });
 
     it("rejects unknown step ids instead of completing all onboarding", async () => {
       await expect(completeStep("user_1", "add-text-block")).rejects.toThrow("INVALID_STEP");
+      expect(prisma.onboardingState.update).not.toHaveBeenCalled();
+    });
+
+    it("will not finish onboarding for someone who is still on the first step", async () => {
+      standingOn("ROLE_SELECT");
+      await completeStep("user_1", "CHECKLIST");
+      expect(prisma.onboardingState.update).not.toHaveBeenCalled();
+    });
+
+    it("is a no-op when the same step arrives twice", async () => {
+      standingOn("CHECKLIST");
+      vi.mocked(prisma.onboardingState.update).mockResolvedValue({} as any);
+      await completeStep("user_1", "CHECKLIST");
+      vi.mocked(prisma.onboardingState.update).mockClear();
+      standingOn("COMPLETED");
+      await completeStep("user_1", "CHECKLIST");
       expect(prisma.onboardingState.update).not.toHaveBeenCalled();
     });
   });

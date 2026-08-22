@@ -89,6 +89,17 @@ export async function completeStep(userId: string, step: string) {
   if (!STEP_SEQUENCE.includes(step as OnboardingStep)) {
     throw new Error("INVALID_STEP");
   }
+  // Closing the other half of the same hole: a KNOWN step was taken on trust
+  // and advanced from whatever the caller named, so completeStep("CHECKLIST")
+  // finished all of onboarding from a standing start no matter where the user
+  // actually was. That is not only a skip — `completed` permanently hides the
+  // dashboard checklist, and nothing brings it back. The step a caller reports
+  // finishing only counts when it is the one they are standing on; anything
+  // else, including the same step arriving twice, leaves the state alone.
+  const state = await prisma.onboardingState.findUnique({ where: { userId } });
+  if (!state) throw new Error("ONBOARDING_NOT_FOUND");
+  if (state.step !== step) return state;
+
   const next = nextStep(step as OnboardingStep);
   const isCompleted = next === "COMPLETED";
   return prisma.onboardingState.update({
