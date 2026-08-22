@@ -126,3 +126,59 @@ tests and buys nothing. Kept, with a comment saying why.
    `permission.service.ts`, the client screens that say "invite the client to
    edit content"). What never existed is a shell wired to it. Client view was
    the closest thing and is now a viewer.
+
+## 8. Both answered — founder, 2026-08-23
+
+### Q1 → rename it. It is view mode, and it always was.
+
+`?view=client` → `?view=readonly`; symbol `clientView` → `readOnlyView`; the
+menu row "Open client view" → "Enter view mode"; CSS `bk-client-view` →
+`bk-read-only-view`. The capability did not change — only the claim did. The
+mode is the owner looking at their own draft with the editor out of the way,
+which is what Figma calls view mode. The audiences it pretended to serve are
+served by two links that already exist: `/share/<token>` (the site menu's
+"Share preview link" row, right below this one) and `/review/<token>`.
+
+The row has now been named three times — "Preview as client" → "Open client
+view" (D9) → "Enter view mode". Board 642:3664 still carries the D9 copy and is
+updated in this arc.
+
+**Dropped from the plan: a site-menu row that opens the client's review link.**
+I costed it as cheap and it is not. `getCurrentRound` deliberately does not
+return the token (`review.service.ts:210-243`) — it is a bearer credential that
+reaches the client by email. Adding the row means widening that credential's
+exposure to satisfy a convenience. Not doing it silently: the owner already has
+the round's state in the Review panel, and Compare for the approved snapshot.
+
+### Q2 → the role does not need a shell. It needs to stop lying.
+
+Verified while answering, and this is the finding of the thread:
+
+| Claim on screen | What the server does |
+|---|---|
+| "Content editor — Can edit content on sites they have access to" | `EDITOR` and `DESIGNER` are the **same** `ROLE_RANK` (`permission.service.ts:4-11`) |
+| team empty state: "**Cannot publish** or manage team" | `sites.publish` requires exactly `EDITOR` (`sites.ts:316`), by design — the comment there says a designer may publish |
+| "…send changes for review instead of publishing directly" | `Workspace.editsRequireApproval` **defaults to `false`** (`schema.prisma:198`), so on a default workspace that editor publishes straight to the live site |
+
+So an invited "Content editor" — including a client invited through
+`client-detail-view.tsx` — can publish the site to the internet, on a screen
+that told the inviter they cannot.
+
+Fixed by making the label and the description tell the truth, and by giving
+them one home. `RoleLabel` in `lib/constants/enums.ts` already declared itself
+"SSOT for every role-label render site" and had **zero consumers** outside its
+own test; the two render sites each kept a hand-written copy, which is how they
+drifted. `RoleDescription` is new and sits beside it. Both render sites now read
+from it, `EDITOR` reads "Editor", and the empty-state cards gained the Designer
+row they had been missing.
+
+This overrides redesign build-spec E1 ("the role a client gets is named Content
+editor"). E1's other half stands: "Client" names the account node, never a role.
+`enums.test.ts` locked the old label and locked *against* the bare word
+"Editor"; it is rewritten in the same commit, and gained two locks the old copy
+would have failed — that EDITOR and DESIGNER are not described as different
+capabilities, and that the editor role is never described as unable to publish.
+
+**Not done, and it is a product decision, not a copy one:** a client invited to
+review a site is given publish rights. Truthful copy is not the same as a
+correct permission model.

@@ -198,7 +198,7 @@ State machine per user (`OnboardingState`, created at signup):
 
 ## 10. Enum reference (condensed)
 
-- **Roles:** OWNER, ADMIN, EDITOR ("Content editor"), DESIGNER, VIEWER. **MemberStatus:** ACTIVE, SUSPENDED. **InviteStatus:** PENDING, ACCEPTED, DECLINED, EXPIRED. **Provider:** email, google, github.
+- **Roles:** OWNER, ADMIN, EDITOR ("Editor" — labelled "Content editor" until 2026-08-23; EDITOR and DESIGNER share a ROLE_RANK and both may publish), DESIGNER, VIEWER. **MemberStatus:** ACTIVE, SUSPENDED. **InviteStatus:** PENDING, ACCEPTED, DECLINED, EXPIRED. **Provider:** email, google, github.
 - **Token types (real SSOT = token.service.ts):** email_verify, password_reset, magic_link, 2fa_temp, session_grant, email_change (+ internal 2fa_attempt; `invite` declared but dead). ⚠ B9: the exported `VerificationTokenType` constant lists only 4 and is out of sync.
 - **Auth errors:** ACCOUNT_LOCKED(423), INVALID_CREDENTIALS(401), EMAIL_EXISTS(409), TOKEN_EXPIRED(410), INVALID_2FA_CODE(401), 2FA_LOCKED(423), SLUG_COLLISION(500).
 - **Onboarding:** steps (6, one dead) · density full/fewer · method ai/template/blank · 8 task ids (7 = full checklist) · AI types (6), tones (6), content (3), images (3) · template categories (7), sorts (3).

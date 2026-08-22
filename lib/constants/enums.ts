@@ -17,16 +17,39 @@ export const UserRole = {
 
 // User-facing display labels for workspace roles. The stored enum value stays
 // EDITOR (JWT claims + ROLE_RANK in permission.service reference it); only the
-// label a user reads is "Content editor". SSOT for every role-label render site
-// (team table, invites, member detail, auth screens). Redesign build-spec E1:
-// "the role a client gets is named Content editor", "Client" only names the
-// company/account node — never a role.
+// label a user reads comes from here. SSOT for every role-label render site
+// (team table, invites, member detail, auth screens).
+//
+// EDITOR read "Content editor" until 2026-08-23, per redesign build-spec E1.
+// Founder overrode it, because the word "content" promised a narrower
+// permission than anything enforces:
+//
+//   - ROLE_RANK gives EDITOR and DESIGNER the same rank (permission.service.ts),
+//     so the two labels describe one permission level.
+//   - `sites.publish` requires exactly EDITOR (sites.ts) — deliberately; the
+//     comment there says a designer may publish.
+//   - `Workspace.editsRequireApproval` defaults to FALSE, so on a default
+//     workspace an EDITOR publishes to the live site with no approval at all.
+//
+// The team empty state told users this role "Cannot publish", which was false
+// on a permission boundary. Descriptions live here now so a render site cannot
+// invent its own. Build-spec E1's other half still holds: "Client" names the
+// company/account node, never a role.
 export const RoleLabel: Record<UserRoleType, string> = {
   OWNER: "Owner",
   ADMIN: "Admin",
-  EDITOR: "Content editor",
+  EDITOR: "Editor",
   DESIGNER: "Designer",
   VIEWER: "Viewer",
+};
+
+/** One-line capability summary per role. SSOT — see RoleLabel above. */
+export const RoleDescription: Record<UserRoleType, string> = {
+  OWNER: "Full control of the workspace, billing, and settings",
+  ADMIN: "Manage team, sites, and settings. No billing access.",
+  EDITOR: "Edit and publish the sites they have access to",
+  DESIGNER: "Edit and publish the sites they have access to — same access as Editor",
+  VIEWER: "Read-only. Cannot open the editor.",
 };
 
 export function roleLabel(role: string): string {

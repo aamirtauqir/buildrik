@@ -1,16 +1,30 @@
 "use client";
 
-import { Users, Crown, ShieldCheck, Pencil, Eye } from "lucide-react";
+import { Users, Crown, ShieldCheck, Pencil, Palette, Eye } from "lucide-react";
 import { Button } from "@/components/dashboard/primitives";
+import { RoleDescription, RoleLabel, UserRole } from "@lib/constants/enums";
 
 // Role reference cards: informative, not decorative — neutral icon tiles per
 // the anti-slop rule (no icon-in-colored-circle grids; DESIGN.md).
-const ROLE_CARDS = [
-  { role: "Owner", description: "Full control of workspace, billing, and settings", Icon: Crown },
-  { role: "Admin", description: "Manage team members, sites, and settings. No billing access.", Icon: ShieldCheck },
-  { role: "Content editor", description: "Create and edit site content. Cannot publish or manage team.", Icon: Pencil },
-  { role: "Viewer", description: "View published sites only. Read-only access.", Icon: Eye },
-];
+//
+// Only the icon is this component's own. Label and description come from the
+// enums SSOT: the hand-written copy here claimed the editor role "Cannot
+// publish", which is false — `sites.publish` requires exactly EDITOR and
+// `editsRequireApproval` defaults off. It also omitted Designer, a role the
+// invite modal offers.
+const ROLE_ICONS = [
+  { role: UserRole.OWNER, Icon: Crown },
+  { role: UserRole.ADMIN, Icon: ShieldCheck },
+  { role: UserRole.EDITOR, Icon: Pencil },
+  { role: UserRole.DESIGNER, Icon: Palette },
+  { role: UserRole.VIEWER, Icon: Eye },
+] as const;
+
+const ROLE_CARDS = ROLE_ICONS.map(({ role, Icon }) => ({
+  role: RoleLabel[role],
+  description: RoleDescription[role],
+  Icon,
+}));
 
 interface TeamEmptyStateProps {
   onInvite: () => void;

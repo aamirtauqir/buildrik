@@ -4,15 +4,22 @@ import { useState } from "react";
 import { cn } from "@lib/utils";
 import { trpc } from "@lib/trpc/client";
 import { Button, Modal } from "@/components/dashboard/primitives";
+import { RoleDescription, RoleLabel } from "@lib/constants/enums";
 
-export const ROLE_OPTIONS = [
-  { value: "ADMIN", label: "Admin", description: "Can manage everything except billing" },
-  { value: "EDITOR", label: "Content editor", description: "Can edit content on sites they have access to" },
-  { value: "DESIGNER", label: "Designer", description: "Can edit design & layout on sites they have access to" },
-  { value: "VIEWER", label: "Viewer", description: "Can only view published sites" },
-] as const;
+// Which roles may be invited, in the order they are offered. OWNER is absent
+// because a workspace has exactly one and it is not handed out by invite.
+// Label and description come from the enums SSOT — this list used to carry its
+// own copy, which drifted into describing a narrower permission than EDITOR
+// actually has (see RoleLabel).
+const INVITABLE_ROLES = ["ADMIN", "EDITOR", "DESIGNER", "VIEWER"] as const;
 
-export type RoleValue = (typeof ROLE_OPTIONS)[number]["value"];
+export const ROLE_OPTIONS = INVITABLE_ROLES.map((value) => ({
+  value,
+  label: RoleLabel[value],
+  description: RoleDescription[value],
+}));
+
+export type RoleValue = (typeof INVITABLE_ROLES)[number];
 
 type SiteAccessMode = "all" | "specific";
 

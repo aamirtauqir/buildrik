@@ -143,8 +143,10 @@ function InviteEditorDialog({
       }
     >
       <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>
-        They&apos;ll join as a <strong>Content editor</strong> with access to {clientName}&apos;s{" "}
-        {siteCount} {siteCount === 1 ? "site" : "sites"} — and nothing else.
+        They&apos;ll join as an <strong>Editor</strong> on {clientName}&apos;s{" "}
+        {siteCount} {siteCount === 1 ? "site" : "sites"} and nothing else — which
+        includes publishing them, unless this workspace requires approval before
+        publishing.
       </p>
       <InputField
         type="email"

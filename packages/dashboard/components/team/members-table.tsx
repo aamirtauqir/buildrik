@@ -22,7 +22,7 @@ export interface Member {
 }
 
 // Owner is the only role that reads as accent (primary). Every other role —
-// Admin, Content editor, Designer, Viewer — is a neutral chip so the table
+// Admin, Editor, Designer, Viewer — is a neutral chip so the table
 // never implies Admin/Editor carry owner-level authority.
 const ROLE_TONE: Record<Role, PillTone> = {
   OWNER: "accent",

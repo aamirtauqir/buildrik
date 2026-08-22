@@ -7,14 +7,7 @@ import Link from "next/link";
 import { ChevronRight, Loader2 } from "lucide-react";
 import { AuthCard } from "@/components/auth/auth-card";
 import { trpc } from "@lib/trpc/client";
-
-const ROLE_LABELS: Record<string, string> = {
-  OWNER: "Owner",
-  ADMIN: "Admin",
-  EDITOR: "Content editor",
-  DESIGNER: "Designer",
-  VIEWER: "Viewer",
-};
+import { roleLabel } from "@lib/constants/enums";
 
 function initials(name: string) {
   return name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
@@ -24,7 +17,7 @@ function initials(name: string) {
 function meta(role: string, memberCount: number, siteCount: number) {
   const who = memberCount === 1 ? "Just you" : `${memberCount} members`;
   const sites = `${siteCount} ${siteCount === 1 ? "site" : "sites"}`;
-  return `${ROLE_LABELS[role] ?? role} · ${who} · ${sites}`;
+  return `${roleLabel(role)} · ${who} · ${sites}`;
 }
 
 export default function WorkspaceSelectPage() {

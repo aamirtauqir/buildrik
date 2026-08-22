@@ -338,7 +338,7 @@ export function WorkspaceForm({
                 Edits need approval before publishing
               </p>
               <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
-                Content editors send changes for review instead of publishing directly. An admin approves to go live.
+                Editors and designers send changes for review instead of publishing directly. An admin approves to go live.
               </p>
             </div>
             <button
