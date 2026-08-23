@@ -76,7 +76,7 @@
 | My Templates | save/rename/delete | 🟡 | localStorage + userTemplates server mirror (`templateSync.ts:47-89`) |
 | Media (M) | 3 modes; pills+counts; stock modal; folders; bulk; detail overlay; versions | ✅ | Ch.08 — ⚠ UI ceiling 50MB vs copy "10MB each" (`UploadZone.tsx:18` vs `mediaData.ts:67-75`) |
 | Layers (Z) | tree, search+SR, drag reorder 30/40/30, hide/lock (⚪ localStorage/page), rename F2, group, 11 context actions, ⚡ badges | ✅ | `panels/layers/index.tsx` |
-| Components (⇧A) | groups, create-from-selection, instantiate, variant swap, detach; MAX 100 | 🟡 | override reset UI dead (§13 A2); V2 panel 🔒 flag off; V2 "+AI" → localStorage only |
+| Components (⇧A) | groups, create-from-selection, instantiate, variant swap, detach; MAX 100 | 🟡 | override reset UI dead (§13 A2); ~~V2 panel 🔒 flag off; V2 "+AI" → localStorage only~~ — **stale, verified 2026-08-23**: `ComponentsPanelV2` and its flag were deleted 2026-08-16 (root `CLAUDE.md`) |
 | Design (D) | DS tab v12: Tokens(14 kinds)/Styles(11 cats)/Components(read-only)/Export; starters ×6; lint; import/export | ✅ | Ch.06 — persistAll 3/14 kinds (§13 A3); Figma export stub; preset binding click no-op v1 |
 | Settings (S) | 10 screens 3 groups + 3 workspace deep-links; dirty savebar; plan gates advanced+integrations→Pro | ✅ | screens detail Ch.11 report §2E |
 | — Redirects/Headers/Localization | saved server-side | 🟡 not enforced live | explicit banners (§13b B8) |
@@ -148,7 +148,7 @@
 | Shared theme push (agency→clients) | ⚪ editor side | link-out only; theme.* routers ADMIN+flag, zero editor wiring |
 | AITab chat/agent/models | ✅ | F-A5 |
 | AIAssistant modal (6 tabs) | 🟡 legacy | Analyze/Colors/A11y = client-side non-AI |
-| AIAssistantBar (⌘K bar) | 🟡 legacy + DESIGN.md violation | dark glass; credits display-only |
+| ~~AIAssistantBar (⌘K bar)~~ | — | **deleted, verified 2026-08-23**: `AIAssistantBar` is 0 hits repo-wide |
 | AICopilot | 👻 | mounted, no trigger calls openCopilot |
 | AIPageGenerator/AIContentPanel/AICodeEditor | 👻 L0 | `ai/index.ts:24-25` |
 | Image generation | 🔵 fake | picsum fallback (`openai.ts:150-157`) |
@@ -157,7 +157,7 @@
 | Sidebar analytics | 🔵 no-op | provider never set (`sidebarAnalytics.ts:4-44`) |
 | Collab presence/quality UI | 🔴🔒 | MOCK_USERS fallback; ConnectionQualityIndicator 👻 never mounted |
 | Ecommerce CollectionSetupModal | ✅ local CMS | once/session on e-com block drop |
-| Ecommerce blocks (4) | 🟡 | registered but excluded from build catalog |
+| Ecommerce blocks (4) | ✅ | ~~registered but excluded from build catalog~~ — **wrong, corrected 2026-08-23**: reachable under "Advanced"; this row contradicted the footer note below for months |
 | contact-form block | 👻 | exported, unregistered (§13b A14) |
 | Forms runtime (editor preview) | ⚪ in-memory | `FormSubmissionService.ts:99` — published sites use real POST endpoint |
 | EmailService cloud providers | 🔵 throw | `/api/email/send` unimplemented (§13b A16) |
@@ -166,7 +166,7 @@
 
 ## 12.7 Counts snapshot
 
-Blocks **63** (registry) / build catalog shows **53** *(divergent from the 63 registry — defect N2; ecommerce blocks ARE reachable under "Advanced", the earlier "excluded" note was wrong)* · element types **48** · inspector sections **18** · element profiles **7** · sidebar tabs **11** (4-tool folded) · templates **10** (tab) + **15** (TemplateLibrary modal) + **11** section quick-inserts — ⚠ three template surfaces (§12 #F2 collapse "won't do") · DS token kinds **14** · presets **18** seeded / **11** categories · starter themes **6** · catalog components **27** (8 atoms / 11 molecules / 8 organisms, `catalog.ts`) *(corrected 2026-07-18; was "27-30 [TBC]")* · Lucide icons **370** (17 categories) *(corrected 2026-07-18)* · interaction triggers **14** (element 5 · page 3 · scroll 3 · mouse 3) × presets **39** *(corrected 2026-07-18; was 13 × 42 — the prose enumeration already summed to 14)* · animation presets **25** · events catalog **~293** · settings screens **10** + 3 deep-links · shortcuts: full map Ch.04 §4.2.
+Blocks **64** (registry) / build catalog shows **50** in BLOCKS + **14** in COMPONENTS *(**"defect N2" was not a defect — corrected 2026-08-23 by counting.** `blockDefinitions` = 64, `componentBlockDefinitions` = 14 and all 14 sit inside the 64, so `catalog/groups.ts:46` `blockRows` = 64 − 14 = 50. `BuildTab.tsx:200-201` renders BOTH groups and `useBuildTab.ts:235` searches both, so every one of the 64 is reachable — the split is deliberate, not a loss. The old "63 / 53" numbers were stale in both halves.)* · element types **48** · inspector sections **18** · element profiles **7** · sidebar tabs **11** (4-tool folded) · templates **10** (tab) + **15** (TemplateLibrary modal) + **11** section quick-inserts — ⚠ three template surfaces (§12 #F2 collapse "won't do") · DS token kinds **14** · presets **18** seeded / **11** categories · starter themes **6** · catalog components **27** (8 atoms / 11 molecules / 8 organisms, `catalog.ts`) *(corrected 2026-07-18; was "27-30 [TBC]")* · Lucide icons **370** (17 categories) *(corrected 2026-07-18)* · interaction triggers **14** (element 5 · page 3 · scroll 3 · mouse 3) × presets **39** *(corrected 2026-07-18; was 13 × 42 — the prose enumeration already summed to 14)* · animation presets **25** · events catalog **~293** · settings screens **10** + 3 deep-links · shortcuts: full map Ch.04 §4.2.
 
 ## 12.8 New drift found this pass (feeds §13 as E/F rows)
 

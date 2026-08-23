@@ -71,7 +71,7 @@ Topbar Publish (flag publish=true, siteId required)
   └─ CANCELLED (sites.cancelPublish)
 ```
 - Republish blocked only while job non-terminal (`usePublishJob.ts:92-96`); prior published state hydrated on mount (`:144-160`).
-- ⛔ PublishDropdown states in-review/approved defined but never driven — shell passes only draft|published (`AquibraStudio.tsx:402`); Submit-for-Review / Approve / Unpublish menu items are no-ops ("Phase 7", `PublishDropdown.tsx:163-165`).
+- ~~⛔ PublishDropdown states in-review/approved defined but never driven~~ — **stale, verified 2026-08-23**: `PublishDropdown` **no longer exists** (2 stray comments reference it; no file). Original text: PublishDropdown states in-review/approved defined but never driven — shell passes only draft|published (`AquibraStudio.tsx:402`); Submit-for-Review / Approve / Unpublish menu items are no-ops ("Phase 7", `PublishDropdown.tsx:163-165`).
 - ~~⛔ Review approval gates nothing server-side (`editsRequireApproval` never read)~~ — **stale, verified 2026-08-23**: `publish.service.ts:252,259` reads it and `startPublish` throws APPROVAL_NONE / APPROVAL_PENDING / APPROVAL_CHANGES / APPROVAL_STALE. The gate exists. What is worth knowing instead is that the flag **defaults to false** (`schema.prisma:198`), so an unconfigured workspace has no approval step at all.
 - Sources: `useExportHandlers.ts:83-159`, `PublishService.ts:19-105`, Ch.10 §10.2.
 
@@ -109,7 +109,7 @@ Quota 403 → window "upgrade-modal-open" → UpgradeModal → ${DASHBOARD_URL}/
 Privileged action (site.publish only): propose→ConfirmDialog→confirm w/ single-use 5-min token, role re-checked
 Client transport guards: 30 req/60s sliding window, timeout 30s, retry ×2 (5xx/408/429 only), queue concurrency 3, cache TTL 5min
 ```
-- ⛔ Parallel legacy surfaces: AIAssistantBar (dark-glass, credits via window event, never enforced client-side) + AIAssistant modal both open on `showAI` simultaneously (`StudioModals.tsx:240-247` + `AquibraStudio.tsx:570-574`); AICopilot mounted but **no trigger calls openCopilot** — orphan. Image gen + streaming in `openai.ts` facade are fake (picsum / non-streaming fallback).
+- ~~⛔ Parallel legacy surfaces: AIAssistantBar~~ — **stale, verified 2026-08-23**: `AIAssistantBar`, `AICopilot` and the `showAI` prop are **0 hits** repo-wide; the surfaces this described were deleted. Original text: Parallel legacy surfaces: AIAssistantBar (dark-glass, credits via window event, never enforced client-side) + AIAssistant modal both open on `showAI` simultaneously (`StudioModals.tsx:240-247` + `AquibraStudio.tsx:570-574`); AICopilot mounted but **no trigger calls openCopilot** — orphan. Image gen + streaming in `openai.ts` facade are fake (picsum / non-streaming fallback).
 - Sources: Ch.02 §2.2/2.4, Ch.09 §9.1-9.2, `AiTrpcClient.ts:14-18,106`.
 
 ### F-A6 · Version snapshot / restore
@@ -152,7 +152,7 @@ canUndo requires stack >1 (baseline checkpoint protected); depth 100; RAM-only �
 
 ### U1 · First-run builder → first publish
 1. Dashboard "Edit site" → `/edit/:id` (needs `NEXT_PUBLIC_UNIFIED_EDITOR=true`, else dead legacy demo — root CLAUDE.md env table).
-2. F-A1 load → blank canvas → **PageWizard** (7 hardcoded steps insert static HTML; ⛔ "AI" simulated — inputs discarded, `PageWizard.tsx:53-135`) or empty-canvas CTA "Browse Templates / Start blank".
+2. F-A1 load → blank canvas → **PageWizard** (~~⛔ 7 hardcoded steps insert static HTML; "AI" simulated — inputs discarded~~ — **stale, verified 2026-08-23**: `PageWizard` is **0 hits** repo-wide, the component is gone) or empty-canvas CTA "Browse Templates / Start blank".
 3. Onboarding checklist (7 steps: name-project → pick-start → add-element → edit-text → change-style → preview → publish) bottom-right pill; achievement modal 4s per completion; collapses on element select (`useOnboardingOrchestrator.ts:114`). ⛔ WelcomeModal + SpotlightOverlay orphans — never mounted.
 4. Build (U2) → Preview ⌘P (sanitized sandboxed window) → Publish (F-A3).
 
@@ -190,7 +190,7 @@ canUndo requires stack >1 (baseline checkpoint protected); depth 100; RAM-only �
 ### U6 · Review / approval loop (⛔ broken as designed)
 1. EDITOR submits review (U5) → ADMIN notified by email → resolve APPROVED | CHANGES_REQUESTED (1 PENDING/site).
 2. ~~⛔ Publish never checks review state~~ — **stale, verified 2026-08-23**, same as §11.1: the check is in `startPublish`. The live gap is the default (`false`), not the wiring.
-3. ⛔ External client not in loop: comments backend complete (create incl. VIEWER, pins, resolve) — zero editor UI (§13 A4/B4).
+3. ~~⛔ External client not in loop: comments backend complete — zero editor UI~~ — **stale, verified 2026-08-23**: `editor/sidebar/tabs/review/ReviewTab.tsx` and `editor/shell/ReviewBar.tsx` both ship. What is NOT re-verified here is whether the client's own `/review/<token>` view reaches them — that leg was not walked.
 
 ### U7 · Media flow
 1. Rail Media (M) → 3 modes (280/320 launcher · 560 expanded · fullpage LibraryManager, shortcut J).
@@ -218,7 +218,7 @@ Topbar Export (flag off) → engine ZIP download direct; or ExportModal (StudioM
 1. PageTabBar above canvas: switch, + add, rename (F2, live slug preview), duplicate ("X Copy"), set-home 🏠, delete (confirm + 8s undo toast; home/last page protected — `PageTabBar.tsx:37,160-171`).
 2. Rail Pages (P): CRUD + localStorage-only folders, bulk multi-select (⌘/Shift/Space) duplicate/move/delete, drag reorder, ⌘K palette, copy link, SEO table view.
 3. Per-page settings drawer: SEO (score algorithm max 100; noIndex→0)/Social/Advanced; slug normalize + collision check; head-code tag-balance guard; autosave 500ms, ⌘S immediate.
-4. ⛔ SEO counters lie: title shows /60 but maxLength 80; desc /160 slices 200 (`SeoTab.tsx:149-218`); score labels contradict algorithm (§13b B10).
+4. ~~⛔ SEO counters lie: title shows /60 but maxLength 80; desc /160 slices 200; score labels contradict algorithm~~ — **stale, verified 2026-08-23**: `SeoTab.tsx:196-197` is `slice(0,60)` + `maxLength={60}`, `:246` is `slice(0,160)` against a `/160` counter, and the check labels mirror `calculateSeoScore`'s real weights. The live defect found in the same pass was different and is now fixed (`ea33fe24`): the panel advertised "+30 pts" for a clean slug and the score paid 20, because the rule was the literal `slug !== "page-1"` — which caught a new project's first page and let `page-2`..`page-N` through.
 
 ### U12 · Site settings flow
 Rail Site (S) → SettingsTab drill-in (root ⇄ section, 180ms lock + dirty guard): 10 sections in 3 groups (SITE/DISTRIBUTION/PLUMBING) + 3 workspace deep-links (Domains/Members/Billing → dashboard). Central dirty counter + sticky savebar. Plan gates: advanced + integrations require pro → LockedScreen → billing. ⛔ Redirects/Headers saved but not enforced on live sites (explicit banners); Integrations all "Coming Soon"; Localization routing "Phase D" (§13b B8).
