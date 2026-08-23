@@ -144,15 +144,16 @@
     {
       "id": "BL-0111",
       "state": "cmdk-open",
-      "figmaNodeId": "72:2",
+      "figmaNodeId": "481:2",
       "actions": [
         {
           "press": "Meta+k"
         },
         {
-          "waitMs": 1200
+          "waitMs": 2000
         }
-      ]
+      ],
+      "_verified": "2026-08-23 — the FIRST cmdk capture with the palette actually in it. Two earlier frames (72:2, 328:2) were named cmdk-open and drew the plain shell, because the palette closes on blur and the capture script's injection moved focus; figma-capture-live.mjs replays actions AFTER injection, which is what fixes it. DRY=1 first, so the single-use capture id was only spent once PRE-CAPTURE showed the palette open. Read back from Figma: 272 text nodes, one Copy row, one Paste row, one 'Delete element', zero bare 'Delete' — the state after the three palette fixes, where there had been a dead Copy, a dead Paste and two Delete rows."
     },
     {
       "id": "BL-0123",
