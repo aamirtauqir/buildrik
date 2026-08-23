@@ -21,7 +21,7 @@ export const editSubmenu: ContextAction[] = [
       // context-menu Paste below — which runs the engine `paste` command —
       // has something to paste. Without this, copy→paste from the right-click
       // menu silently did nothing (the two used separate clipboards).
-      if (composer) composer.clipboard = data ?? null;
+      if (composer) composer.clipboard = data ? [data] : null;
       const text = JSON.stringify(data, null, 2);
       navigator?.clipboard
         ?.writeText(text)
@@ -96,7 +96,7 @@ export const editSubmenu: ContextAction[] = [
       // Was emitting a "clipboard:paste" event that nothing listened to, so the
       // right-click Paste silently did nothing. Run the real engine `paste`
       // command (the same path Cmd+V uses) and report the outcome.
-      if (!composer.clipboard) {
+      if (!composer.clipboard?.length) {
         addToast?.({
           description: "Nothing to paste — copy an element first",
           tone: "info",

@@ -85,7 +85,8 @@ export function useCanvasToolbarActions({
     if (!composer || !selectedId) return;
     const element = composer.elements.getElement(selectedId);
     if (element) {
-      composer.clipboard = element.toJSON?.() || null;
+      const data = element.toJSON?.();
+      composer.clipboard = data ? [data] : null;
       const elType = element.getType?.() || "element";
       const elName = elType.charAt(0).toUpperCase() + elType.slice(1);
       addToast({

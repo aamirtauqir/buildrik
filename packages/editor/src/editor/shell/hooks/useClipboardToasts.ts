@@ -32,9 +32,42 @@ export function useClipboardToasts(
   React.useEffect(() => {
     if (!composer || !addToast) return;
 
-    const copied = () => addToast({ description: "Element copied", tone: "info", duration: 2000 });
-    const cut = () => addToast({ description: "Element cut", tone: "info", duration: 2000 });
-    const pasted = () => addToast({ description: "Element pasted", tone: "success", duration: 2000 });
+    const plural = (n: number, one: string, many: string) =>
+      n === 1 ? one : `${n} ${many}`;
+
+    /* Copy and cut carry every selected id since 2026-08-23, so the toast says
+       how many rather than always "Element". */
+    const count = (e: unknown) =>
+      Array.isArray((e as { elementIds?: unknown[] })?.elementIds)
+        ? (e as { elementIds: unknown[] }).elementIds.length
+        : 1;
+
+    const copied = (e: unknown) =>
+      addToast({ description: `${plural(count(e), "Element", "elements")} copied`, tone: "info", duration: 2000 });
+    const cut = (e: unknown) =>
+      addToast({ description: `${plural(count(e), "Element", "elements")} cut`, tone: "info", duration: 2000 });
+
+    /* CLIPBOARD_PASTE is emitted by pasteElement, once PER element — so a
+       three-element paste fired three toasts stacked on top of each other. The
+       header above records that even TWO was a bug worth fixing. Collect the
+       burst and speak once: they all arrive inside one transaction, so a single
+       macrotask is enough and nothing user-visible waits on it. */
+    let pastedInBurst = 0;
+    let burst: ReturnType<typeof setTimeout> | null = null;
+    const pasted = () => {
+      pastedInBurst += 1;
+      if (burst) return;
+      burst = setTimeout(() => {
+        addToast({
+          description: `${plural(pastedInBurst, "Element", "elements")} pasted`,
+          tone: "success",
+          duration: 2000,
+        });
+        pastedInBurst = 0;
+        burst = null;
+      }, 0);
+    };
+
     const duplicated = () =>
       addToast({ description: "Element duplicated", tone: "success", duration: 2000 });
 
@@ -43,6 +76,7 @@ export function useClipboardToasts(
     composer.on(EVENTS.CLIPBOARD_PASTE, pasted);
     composer.on(EVENTS.ELEMENT_DUPLICATED, duplicated);
     return () => {
+      if (burst) clearTimeout(burst);
       composer.off(EVENTS.CLIPBOARD_COPY, copied);
       composer.off(EVENTS.CLIPBOARD_CUT, cut);
       composer.off(EVENTS.CLIPBOARD_PASTE, pasted);

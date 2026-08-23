@@ -36,6 +36,9 @@ function makeComposer() {
     history: { undo: vi.fn(), redo: vi.fn() },
     selection: {
       getSelected: vi.fn(() => null as MockElement | null),
+      /* copy and cut read the WHOLE selection now; select() keeps the single
+         case in multiSelected, so this is the one they both go through. */
+      getAllSelected: vi.fn(() => [] as MockElement[]),
       getSelectedIds: vi.fn(() => [] as string[]),
       select: vi.fn(),
       selectMultiple: vi.fn(),
@@ -60,7 +63,7 @@ function makeComposer() {
     exportJSON: vi.fn(() => "{}"),
     beginTransaction: vi.fn(),
     endTransaction: vi.fn(),
-    clipboard: null as { type: string } | null,
+    clipboard: null as { type: string }[] | null,
   };
 }
 
@@ -117,12 +120,36 @@ describe("history + save", () => {
 
 describe("clipboard", () => {
   it("copy serializes the selection into composer.clipboard and emits clipboard:copy", () => {
-    composer.selection.getSelected.mockReturnValue(makeElement("el-1"));
+    composer.selection.getAllSelected.mockReturnValue([makeElement("el-1")]);
     run("copy");
 
     expect(composer.elements.serializeElement).toHaveBeenCalledWith("el-1");
-    expect(composer.clipboard).toBe("serialized-el");
-    expect(composer.emit).toHaveBeenCalledWith(EVENTS.CLIPBOARD_COPY, { elementId: "el-1" });
+    expect(composer.clipboard).toEqual(["serialized-el"]);
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.CLIPBOARD_COPY, { elementIds: ["el-1"] });
+  });
+
+  /* Measured live before the fix: three elements selected, Copy put ONE on the
+     clipboard and Cut removed ONE and left two (49 -> 48). Cut is the bad half
+     — a destructive command silently doing a third of what it was asked. */
+  it("copy takes every selected element, not just the primary", () => {
+    composer.selection.getAllSelected.mockReturnValue([
+      makeElement("el-1"), makeElement("el-2"), makeElement("el-3"),
+    ]);
+    run("copy");
+    expect(composer.clipboard).toHaveLength(3);
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.CLIPBOARD_COPY, {
+      elementIds: ["el-1", "el-2", "el-3"],
+    });
+  });
+
+  it("cut removes every selected element inside ONE transaction", () => {
+    composer.selection.getAllSelected.mockReturnValue([
+      makeElement("el-1"), makeElement("el-2"), makeElement("el-3"),
+    ]);
+    run("cut");
+    expect(composer.elements.removeElement).toHaveBeenCalledTimes(3);
+    expect(composer.beginTransaction).toHaveBeenCalledTimes(1);
+    expect(composer.endTransaction).toHaveBeenCalledTimes(1);
   });
 
   it("copy without a selection is a no-op", () => {
@@ -132,14 +159,14 @@ describe("clipboard", () => {
   });
 
   it("cut serializes, removes the element in a transaction, and emits clipboard:cut", () => {
-    composer.selection.getSelected.mockReturnValue(makeElement("el-2"));
+    composer.selection.getAllSelected.mockReturnValue([makeElement("el-2")]);
     run("cut");
 
-    expect(composer.clipboard).toBe("serialized-el");
+    expect(composer.clipboard).toEqual(["serialized-el"]);
     expect(composer.beginTransaction).toHaveBeenCalledWith("cut");
     expect(composer.elements.removeElement).toHaveBeenCalledWith("el-2");
     expect(composer.endTransaction).toHaveBeenCalled();
-    expect(composer.emit).toHaveBeenCalledWith(EVENTS.CLIPBOARD_CUT, { elementId: "el-2" });
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.CLIPBOARD_CUT, { elementIds: ["el-2"] });
   });
 
   /* Paste used to target whatever was selected, with no nesting check, and to
@@ -148,21 +175,21 @@ describe("clipboard", () => {
      selected put the copy INSIDE the heading — which `rules.ts` forbids
      outright — and raised two "Element pasted" toasts for one paste. */
   it("pastes into the selection when the selection can hold it", () => {
-    composer.clipboard = { type: "heading" };
+    composer.clipboard = [{ type: "heading" }];
     const target = makeElement("el-3", "container");
     composer.selection.getSelected.mockReturnValue(target);
 
     run("paste");
 
     expect(composer.elements.pasteElement).toHaveBeenCalledWith(
-      composer.clipboard,
+      composer.clipboard![0],
       target,
       undefined,
     );
   });
 
   it("pastes AFTER a leaf that cannot hold it, not inside it", () => {
-    composer.clipboard = { type: "heading" };
+    composer.clipboard = [{ type: "heading" }];
     const sibling = makeElement("el-sib", "heading");
     const heading = makeElement("el-h", "heading");
     const parent = makeElement("el-parent", "container");
@@ -172,11 +199,11 @@ describe("clipboard", () => {
 
     run("paste");
 
-    expect(composer.elements.pasteElement).toHaveBeenCalledWith(composer.clipboard, parent, 2);
+    expect(composer.elements.pasteElement).toHaveBeenCalledWith(composer.clipboard![0], parent, 2);
   });
 
   it("falls back to the page root when the parent cannot hold it either", () => {
-    composer.clipboard = { type: "section" };
+    composer.clipboard = [{ type: "section" }];
     const root = makeElement("root-1", "container");
     const heading = makeElement("el-h", "heading");
     const parent = makeElement("el-parent", "heading");
@@ -188,11 +215,11 @@ describe("clipboard", () => {
 
     run("paste");
 
-    expect(composer.elements.pasteElement).toHaveBeenCalledWith(composer.clipboard, root, undefined);
+    expect(composer.elements.pasteElement).toHaveBeenCalledWith(composer.clipboard![0], root, undefined);
   });
 
   it("announces the paste once — pasteElement already emits it", () => {
-    composer.clipboard = { type: "heading" };
+    composer.clipboard = [{ type: "heading" }];
     composer.selection.getSelected.mockReturnValue(makeElement("el-3", "container"));
 
     run("paste");
@@ -204,7 +231,7 @@ describe("clipboard", () => {
   });
 
   it("paste falls back to the active page root when nothing is selected", () => {
-    composer.clipboard = { type: "heading" };
+    composer.clipboard = [{ type: "heading" }];
     const root = makeElement("root-1", "container");
     composer.elements.getActivePage.mockReturnValue({ root: { id: "root-1" } });
     composer.elements.getElement.mockReturnValue(root);
@@ -212,7 +239,7 @@ describe("clipboard", () => {
     run("paste");
 
     expect(composer.elements.getElement).toHaveBeenCalledWith("root-1");
-    expect(composer.elements.pasteElement).toHaveBeenCalledWith(composer.clipboard, root, undefined);
+    expect(composer.elements.pasteElement).toHaveBeenCalledWith(composer.clipboard![0], root, undefined);
   });
 
   it("paste with an empty clipboard is a no-op", () => {

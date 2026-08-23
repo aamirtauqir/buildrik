@@ -187,7 +187,9 @@ describe("CommandPalette", () => {
       const run = vi.fn();
       /* clipboard non-null or the guard disables the row, which is the point of
          the next test. */
-      const composer = { ...makeComposer(), clipboard: { type: "heading" },
+      /* An array — the clipboard holds the whole selection now, and the guard
+         reads `.length`. */
+      const composer = { ...makeComposer(), clipboard: [{ type: "heading" }],
         commands: { run, getAll: () => [{ id: "paste", label: "Paste", shortcut: "ctrl+v", run: vi.fn() }] } };
       render(<CommandPalette onClose={vi.fn()} composer={composer as unknown as Composer} />);
       fireEvent.click(screen.getByText("Paste"));

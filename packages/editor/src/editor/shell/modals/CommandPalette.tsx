@@ -185,7 +185,7 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
     if (id === "ungroup") return selectedType !== "container" ? "select a group" : undefined;
     /* `paste` reads composer.clipboard and returns silently when it is empty —
        the same shape as the nudges below, and the same reason it is guarded. */
-    if (id === "paste") return composer.clipboard ? undefined : "nothing copied";
+    if (id === "paste") return composer.clipboard?.length ? undefined : "nothing copied";
     if (
       id === "copy" ||
       id === "duplicate" ||

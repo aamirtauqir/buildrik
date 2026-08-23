@@ -17,23 +17,32 @@ export function useLayerContextActions(state: UseLayersStateReturn) {
         // Board 1082:4527 Cut/Copy/Paste — the same composer.clipboard
         // contract the canvas ⌘X/⌘C/⌘V path uses (useCanvasKeyboard).
         case "copy": {
-          if (composer) composer.clipboard = composer.elements.serializeElement(nodeId);
+          if (composer) {
+            const data = composer.elements.serializeElement(nodeId);
+            composer.clipboard = data ? [data] : null;
+          }
           break;
         }
         case "cut": {
           if (!composer) break;
-          composer.clipboard = composer.elements.serializeElement(nodeId);
+          const cutData = composer.elements.serializeElement(nodeId);
+          composer.clipboard = cutData ? [cutData] : null;
           actionsHook.deleteLayer(nodeId, treeHook.layers, () => selectionHook.clearSelection());
           break;
         }
         case "paste": {
-          if (!composer?.clipboard) break;
+          if (!composer?.clipboard?.length) break;
           const target = composer.elements.getElement(nodeId);
           const parent = target?.getParent?.() ?? target;
           if (!parent) break;
           composer.beginTransaction("paste-element");
           try {
-            const pasted = composer.elements.pasteElement?.(composer.clipboard, parent);
+            /* The clipboard can hold more than one element now (a multi-select
+               copy), so paste them all — the last one takes the selection. */
+            let pasted;
+            for (const data of composer.clipboard) {
+              pasted = composer.elements.pasteElement?.(data, parent);
+            }
             if (pasted) composer.selection.select(pasted);
           } finally {
             composer.endTransaction();

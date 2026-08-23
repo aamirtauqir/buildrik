@@ -22,13 +22,15 @@ function fakeComposer() {
       on: (e: string, cb: () => void) => { (handlers[e] ??= []).push(cb); },
       off: (e: string, cb: () => void) => { handlers[e] = (handlers[e] ?? []).filter((h) => h !== cb); },
     } as unknown as Composer,
-    fire: (e: string) => (handlers[e] ?? []).forEach((h) => h()),
+    fire: (e: string, payload?: unknown) => (handlers[e] ?? []).forEach((h) => h(payload)),
     count: (e: string) => (handlers[e] ?? []).length,
   };
 }
 
 describe("useClipboardToasts", () => {
-  it("says something for each of the four actions", () => {
+  const flush = () => new Promise((r) => setTimeout(r, 0));
+
+  it("says something for each of the four actions", async () => {
     const { composer, fire } = fakeComposer();
     const addToast = vi.fn();
     renderHook(() => useClipboardToasts(composer, addToast));
@@ -37,9 +39,41 @@ describe("useClipboardToasts", () => {
     fire(EVENTS.CLIPBOARD_CUT);
     fire(EVENTS.CLIPBOARD_PASTE);
     fire(EVENTS.ELEMENT_DUPLICATED);
+    /* Paste is coalesced across a macrotask — see below for why. */
+    await flush();
 
     expect(addToast.mock.calls.map((c) => c[0].description)).toEqual([
-      "Element copied", "Element cut", "Element pasted", "Element duplicated",
+      "Element copied", "Element cut", "Element duplicated", "Element pasted",
+    ]);
+  });
+
+  /* `pasteElement` emits CLIPBOARD_PASTE once PER element, and one paste can
+     now place the whole clipboard. Three elements meant three toasts stacked
+     on each other; the hook's own header records that even two was a bug. */
+  it("collapses a multi-element paste into one toast that counts", async () => {
+    const { composer, fire } = fakeComposer();
+    const addToast = vi.fn();
+    renderHook(() => useClipboardToasts(composer, addToast));
+
+    fire(EVENTS.CLIPBOARD_PASTE);
+    fire(EVENTS.CLIPBOARD_PASTE);
+    fire(EVENTS.CLIPBOARD_PASTE);
+    await flush();
+
+    expect(addToast).toHaveBeenCalledTimes(1);
+    expect(addToast.mock.calls[0][0].description).toBe("3 elements pasted");
+  });
+
+  it("counts the elements a copy or cut carried", async () => {
+    const { composer, fire } = fakeComposer();
+    const addToast = vi.fn();
+    renderHook(() => useClipboardToasts(composer, addToast));
+
+    fire(EVENTS.CLIPBOARD_COPY, { elementIds: ["a", "b"] });
+    fire(EVENTS.CLIPBOARD_CUT, { elementIds: ["a"] });
+
+    expect(addToast.mock.calls.map((c) => c[0].description)).toEqual([
+      "2 elements copied", "Element cut",
     ]);
   });
 

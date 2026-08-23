@@ -106,7 +106,11 @@ export class Composer extends EventEmitter {
   };
 
   // Clipboard for copy/paste - stores serialized element data
-  clipboard: import("../shared/types").ElementData | null = null;
+  /* An ARRAY since 2026-08-23: copy and cut read the whole selection, not
+     the primary element. A single copy is a one-item array, so callers have
+     one shape to handle — but note an empty array is truthy, so guard on
+     `.length`, never on the field itself. */
+  clipboard: import("../shared/types").ElementData[] | null = null;
 
   // Style clipboard for copy/paste styles only
   styleClipboard: Record<string, string> | null = null;

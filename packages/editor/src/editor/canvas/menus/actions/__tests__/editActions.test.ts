@@ -60,7 +60,7 @@ describe("editActions — copy populates the in-app clipboard", () => {
       addToast: vi.fn(),
     } as Ctx);
 
-    expect(composer.clipboard).toEqual(sampleData);
+    expect(composer.clipboard).toEqual([sampleData]);
   });
 });
 
@@ -90,7 +90,7 @@ describe("editActions — paste reports its outcome", () => {
   });
 
   it("with a populated clipboard: runs the engine paste command and toasts success", () => {
-    composer.clipboard = sampleData;
+    composer.clipboard = [sampleData];
     const paste = editSubmenu.find((a) => a.id === "paste");
 
     paste!.handler!({

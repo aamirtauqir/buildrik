@@ -226,7 +226,8 @@ export const UnifiedSelectionToolbar: React.FC<UnifiedSelectionToolbarProps> = (
     if (onCopy) {
       onCopy();
     } else if (element) {
-      composer.clipboard = element.toJSON?.() || null;
+      const data = element.toJSON?.();
+      composer.clipboard = data ? [data] : null;
     }
     setShowMoreMenu(false);
   };

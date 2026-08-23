@@ -54,7 +54,7 @@ function makeComposer() {
     exportJSON: vi.fn(() => "{}"),
     beginTransaction: vi.fn(),
     endTransaction: vi.fn(),
-    clipboard: null as { type: string } | null,
+    clipboard: null as { type: string }[] | null,
   };
 }
 
@@ -98,7 +98,7 @@ describe("guard / empty paths", () => {
   });
 
   it("paste with no selection and no active page is a no-op", () => {
-    composer.clipboard = { type: "heading" };
+    composer.clipboard = [{ type: "heading" }];
     run("paste"); // getActivePage → null → no target at all
     expect(composer.elements.pasteElement).not.toHaveBeenCalled();
   });
@@ -108,7 +108,7 @@ describe("guard / empty paths", () => {
      selection can't hold the paste, has no parent that can, and there is no
      active page to fall back to. */
   it("paste with nowhere valid to land is a no-op", () => {
-    composer.clipboard = { type: "section" };
+    composer.clipboard = [{ type: "section" }];
     composer.selection.getSelected.mockReturnValue(el("sel", "heading"));
     composer.elements.getActivePage.mockReturnValue(null);
     run("paste");

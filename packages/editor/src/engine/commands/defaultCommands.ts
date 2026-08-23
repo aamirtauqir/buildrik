@@ -106,16 +106,29 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
         else if (clones.length > 1) c.selection.selectMultiple(clones);
       },
     },
+    /* `getAllSelected()`, not `getSelected()`. Both of these read the PRIMARY
+       element until 2026-08-23, so with three elements selected Copy put one on
+       the clipboard and Cut removed one and left two standing — measured live,
+       49 -> 48 on a three-selection, with nothing on screen saying so. Cut is
+       the bad one: it is a destructive command that silently did a third of
+       what it was asked.
+
+       `select()` clears multiSelected and re-adds the single element
+       (SelectionManager.ts:35-38), so getAllSelected() covers the one-element
+       case too and there is no branch here. */
     {
       id: "copy",
       label: "Copy",
       shortcut: "ctrl+c",
       run: (c) => {
-        const selected = c.selection.getSelected();
-        if (selected) {
-          c.clipboard = c.elements.serializeElement(selected.getId());
-          c.emit(EVENTS.CLIPBOARD_COPY, { elementId: selected.getId() });
-        }
+        const selected = c.selection.getAllSelected();
+        if (selected.length === 0) return;
+        /* serializeElement returns null for an element it cannot serialise;
+           a clipboard slot holding null would paste nothing and count as one. */
+        c.clipboard = selected
+          .map((el) => c.elements.serializeElement(el.getId()))
+          .filter((d): d is NonNullable<typeof d> => d !== null);
+        c.emit(EVENTS.CLIPBOARD_COPY, { elementIds: selected.map((el) => el.getId()) });
       },
     },
     {
@@ -123,14 +136,18 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
       label: "Cut",
       shortcut: "ctrl+x",
       run: (c) => {
-        const selected = c.selection.getSelected();
-        if (selected) {
-          c.clipboard = c.elements.serializeElement(selected.getId());
-          c.beginTransaction("cut");
-          c.elements.removeElement(selected.getId());
-          c.endTransaction();
-          c.emit(EVENTS.CLIPBOARD_CUT, { elementId: selected.getId() });
-        }
+        const selected = c.selection.getAllSelected();
+        if (selected.length === 0) return;
+        const ids = selected.map((el) => el.getId());
+        c.clipboard = ids
+          .map((id) => c.elements.serializeElement(id))
+          .filter((d): d is NonNullable<typeof d> => d !== null);
+        /* One transaction for the whole cut: undo has to put all of them back
+           together, not one press per element. */
+        c.beginTransaction("cut");
+        for (const id of ids) c.elements.removeElement(id);
+        c.endTransaction();
+        c.emit(EVENTS.CLIPBOARD_CUT, { elementIds: ids });
       },
     },
     {
@@ -138,7 +155,8 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
       label: "Paste",
       shortcut: "ctrl+v",
       run: (c) => {
-        if (!c.clipboard) return;
+        const items = c.clipboard;
+        if (!items || items.length === 0) return;
         const selected = c.selection.getSelected();
         const page = c.elements.getActivePage();
         const root = page ? c.elements.getElement(page.root.id) : null;
@@ -149,28 +167,38 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
            heading, which the rules forbid outright ("heading" is in a
            heading's forbiddenChildren). Measured live: the heading went from 0
            children to 1 and the copy was swallowed. Selecting a container
-           still means "paste in here". */
-        const pastedType = c.clipboard.type as ElementType;
-        let target = root;
-        let index: number | undefined;
-        if (selected) {
-          if (canNestElement(pastedType, selected.getType() as ElementType)) {
-            target = selected;
-          } else {
-            const parent = selected.getParent();
-            if (parent && canNestElement(pastedType, parent.getType() as ElementType)) {
-              target = parent;
-              index = parent.getChildren().indexOf(selected) + 1;
+           still means "paste in here".
+
+           The loop is per item because the target depends on the item's TYPE —
+           a clipboard holding a heading and a container can legally land in
+           different places. `placed` shifts each insert one slot further along,
+           or every item resolves to the same index and they arrive reversed. */
+        c.beginTransaction("paste");
+        let placed = 0;
+        for (const data of items) {
+          const pastedType = data.type as ElementType;
+          let target = root;
+          let index: number | undefined;
+          if (selected) {
+            if (canNestElement(pastedType, selected.getType() as ElementType)) {
+              target = selected;
+            } else {
+              const parent = selected.getParent();
+              if (parent && canNestElement(pastedType, parent.getType() as ElementType)) {
+                target = parent;
+                index = parent.getChildren().indexOf(selected) + 1 + placed;
+              }
             }
           }
+          if (!target) continue;
+          /* `pasteElement` announces CLIPBOARD_PASTE itself, with the element,
+             target and index. Emitting a second, thinner one here gave every
+             paste two "Element pasted" toasts — and now that one paste can
+             place N elements it fires N times, which useClipboardToasts
+             coalesces rather than stacking N toasts. */
+          c.elements.pasteElement(data, target, index);
+          placed += 1;
         }
-        if (!target) return;
-
-        c.beginTransaction("paste");
-        /* `pasteElement` announces CLIPBOARD_PASTE itself, with the element,
-           target and index. Emitting a second, thinner one here gave every
-           paste two "Element pasted" toasts (useClipboardToasts listens once). */
-        c.elements.pasteElement(c.clipboard, target, index);
         c.endTransaction();
       },
     },
