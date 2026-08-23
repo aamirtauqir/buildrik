@@ -31,22 +31,21 @@ export function useLayerContextActions(state: UseLayersStateReturn) {
           break;
         }
         case "paste": {
+          /* Select the clicked row, then run the ENGINE command.
+             This used to resolve its own target as `target.getParent() ?? target`
+             and call pasteElement directly — two bugs codex found in review:
+             a container row pasted into the container's PARENT rather than into
+             the container, and pasteElement does no legality check at all (it
+             calls addChild straight), so this path could nest a heading inside a
+             heading, which the engine's own paste exists to prevent. Running the
+             registry command gets the per-item target resolution, the nesting
+             rules, the sibling index and the transaction — and deletes the
+             duplicate implementation. */
           if (!composer?.clipboard?.length) break;
           const target = composer.elements.getElement(nodeId);
-          const parent = target?.getParent?.() ?? target;
-          if (!parent) break;
-          composer.beginTransaction("paste-element");
-          try {
-            /* The clipboard can hold more than one element now (a multi-select
-               copy), so paste them all — the last one takes the selection. */
-            let pasted;
-            for (const data of composer.clipboard) {
-              pasted = composer.elements.pasteElement?.(data, parent);
-            }
-            if (pasted) composer.selection.select(pasted);
-          } finally {
-            composer.endTransaction();
-          }
+          if (!target) break;
+          composer.selection.select(target);
+          composer.commands.run("paste");
           break;
         }
         case "rename": {

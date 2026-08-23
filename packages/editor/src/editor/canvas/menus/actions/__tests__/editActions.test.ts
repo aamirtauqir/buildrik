@@ -89,7 +89,12 @@ describe("editActions — paste reports its outcome", () => {
     expect(addToast.mock.calls[0][0]).toMatchObject({ tone: "info" });
   });
 
-  it("with a populated clipboard: runs the engine paste command and toasts success", () => {
+  /* Rewritten 2026-08-23. It asserted a success toast from this handler, which
+     is a double: useClipboardToasts already speaks for CLIPBOARD_PASTE, and a
+     paste can place N elements — so right-click Paste showed a collapsed
+     "3 elements pasted" AND a plain "Pasted" on top. The empty-clipboard toast
+     above stays: no command runs in that case, so nothing else would speak. */
+  it("with a populated clipboard: runs the engine paste command and leaves the toast to the hook", () => {
     composer.clipboard = [sampleData];
     const paste = editSubmenu.find((a) => a.id === "paste");
 
@@ -101,7 +106,6 @@ describe("editActions — paste reports its outcome", () => {
     } as Ctx);
 
     expect(composer.commands.run).toHaveBeenCalledWith("paste");
-    expect(addToast).toHaveBeenCalledTimes(1);
-    expect(addToast.mock.calls[0][0]).toMatchObject({ tone: "success" });
+    expect(addToast).not.toHaveBeenCalled();
   });
 });

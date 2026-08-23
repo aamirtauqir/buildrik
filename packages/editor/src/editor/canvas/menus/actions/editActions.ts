@@ -104,8 +104,12 @@ export const editSubmenu: ContextAction[] = [
         });
         return;
       }
+      /* No toast here. useClipboardToasts already speaks for CLIPBOARD_PASTE,
+         and a paste can now place N elements — so this entry point was showing
+         a collapsed "3 elements pasted" AND a plain "Pasted" on top of it. The
+         hook's own header records that two toasts for one paste was the
+         original bug. */
       composer.commands.run("paste");
-      addToast?.({ description: "Pasted", tone: "success", duration: 2000 });
     },
   },
   {

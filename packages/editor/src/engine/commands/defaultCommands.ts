@@ -8,6 +8,8 @@
 
 import { EVENTS } from "../../shared/constants";
 import type { CommandData, ElementType } from "../../shared/types";
+/* Explicit: without it `Element` in this file resolves to the DOM one. */
+import type { Element } from "../elements/Element";
 import { canNestElement } from "../../shared/utils/nesting";
 import type { Composer } from "../Composer";
 import { nudgeSelected, reorderElement } from "./commandOperations";
@@ -19,6 +21,25 @@ import { nudgeSelected, reorderElement } from "./commandOperations";
  * @param composer - reference to the Composer, needed by UI-toggle commands
  *                   that emit events directly on the composer instance.
  */
+/**
+ * Drop any element whose ancestor is also selected.
+ *
+ * A multi-selection can hold a parent AND something inside it — SelectionManager
+ * does not prune — and `serializeElement` snapshots a whole subtree. Copying
+ * both put that child on the clipboard twice, once nested inside its parent's
+ * snapshot and once standalone, so pasting produced a duplicate nobody asked
+ * for. Found by codex reviewing the multi-selection fix.
+ */
+function topMost(elements: Element[]): Element[] {
+  const set = new Set(elements);
+  return elements.filter((el) => {
+    for (let p = el.getParent?.(); p; p = p.getParent?.()) {
+      if (set.has(p)) return false;
+    }
+    return true;
+  });
+}
+
 export function buildDefaultCommands(composer: Composer): CommandData[] {
   const nudgeAmount = 1; // pixels for normal nudge
   const nudgeAmountLarge = 10; // pixels for shift+arrow
@@ -66,7 +87,10 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
            transaction, so undoing a three-element delete took three presses.
            Same defect cut carried; measured live at 49 -> 48 on a
            three-selection. */
-        const selected = c.selection.getAllSelected();
+        /* Pruned like cut: removing a parent already removes its children and
+           the descendant's own removeElement then no-ops, but the history
+           label would still count it. */
+        const selected = topMost(c.selection.getAllSelected());
         if (selected.length === 0) return;
         c.beginTransaction("delete");
         for (const el of selected) c.elements.removeElement(el.getId());
@@ -131,7 +155,7 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
       label: "Copy",
       shortcut: "ctrl+c",
       run: (c) => {
-        const selected = c.selection.getAllSelected();
+        const selected = topMost(c.selection.getAllSelected());
         if (selected.length === 0) return;
         /* serializeElement returns null for an element it cannot serialise;
            a clipboard slot holding null would paste nothing and count as one. */
@@ -146,7 +170,7 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
       label: "Cut",
       shortcut: "ctrl+x",
       run: (c) => {
-        const selected = c.selection.getAllSelected();
+        const selected = topMost(c.selection.getAllSelected());
         if (selected.length === 0) return;
         const ids = selected.map((el) => el.getId());
         c.clipboard = ids
@@ -183,11 +207,25 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
            a clipboard holding a heading and a container can legally land in
            different places. `placed` shifts each insert one slot further along,
            or every item resolves to the same index and they arrive reversed. */
-        c.beginTransaction("paste");
-        let placed = 0;
+        /* Resolve every landing place BEFORE opening a transaction, for two
+           reasons codex found in review:
+
+           · the sibling offset is per PARENT, not global. It used to increment
+             on every paste including ones appended INSIDE the selected
+             container, which consume no slot in the parent — so a clipboard of
+             [heading, section] pasted onto a selected container put the heading
+             inside it and then inserted the section one sibling too far down.
+           · nothing should open a transaction it cannot fill. An item with no
+             legal target is skipped; if none can land, no transaction is opened
+             at all, which is what the single-item version always did.
+
+           A mixed clipboard still pastes the part that fits rather than
+           refusing wholesale, and the toast counts what actually landed. */
+        const usedSlots = new Map<Element, number>();
+        const plan: { data: (typeof items)[number]; target: Element; index?: number }[] = [];
         for (const data of items) {
           const pastedType = data.type as ElementType;
-          let target = root;
+          let target: Element | null = root ?? null;
           let index: number | undefined;
           if (selected) {
             if (canNestElement(pastedType, selected.getType() as ElementType)) {
@@ -196,18 +234,29 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
               const parent = selected.getParent();
               if (parent && canNestElement(pastedType, parent.getType() as ElementType)) {
                 target = parent;
-                index = parent.getChildren().indexOf(selected) + 1 + placed;
+                const used = usedSlots.get(parent) ?? 0;
+                index = parent.getChildren().indexOf(selected) + 1 + used;
+                usedSlots.set(parent, used + 1);
               }
+              /* No else. When neither the selection nor its parent can hold the
+                 item, `target` stays the page root — that fallback is the
+                 contract ("falls back to the page root when the parent cannot
+                 hold it either") and rewriting this loop briefly dropped it.
+                 An item is unplaceable only when there is no page at all. */
             }
           }
           if (!target) continue;
+          plan.push({ data, target, index });
+        }
+        if (plan.length === 0) return;
+
+        c.beginTransaction("paste");
+        for (const step of plan) {
           /* `pasteElement` announces CLIPBOARD_PASTE itself, with the element,
              target and index. Emitting a second, thinner one here gave every
-             paste two "Element pasted" toasts — and now that one paste can
-             place N elements it fires N times, which useClipboardToasts
-             coalesces rather than stacking N toasts. */
-          c.elements.pasteElement(data, target, index);
-          placed += 1;
+             paste two "Element pasted" toasts — and one paste can place N
+             elements, which useClipboardToasts coalesces. */
+          c.elements.pasteElement(step.data, step.target, step.index);
         }
         c.endTransaction();
       },
