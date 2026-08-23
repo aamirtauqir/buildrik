@@ -44,6 +44,29 @@ Board sample data ("Bella Cucina", "In review · 3 open", "Nothing matches
 4. Tests protecting the OLD design get rewritten in the same commit
    (`PageList.test.tsx:55` asserted drifted copy for months).
 
+**When the Figma tools are not in your tool list — they usually are not.**
+`claude mcp list` reports `plugin:figma:figma — ! Needs authentication` and the
+session gets no Figma tools at all, so `ToolSearch` finds nothing. The SERVER is
+fine. Two ways through, in order:
+
+1. `scripts/baseline/figma-mcp.mjs` — committed JSON-RPC client over the login
+   keychain's OAuth token. `node scripts/baseline/figma-mcp.mjs tools/list`, or
+   import `{ connect, rpc }` for large payloads (the CLI branch truncates at
+   6000 chars and will break `JSON.parse` on a big metadata read). It sends
+   `X-Figma-Plugin-Bundle`, which is load-bearing: **without that header the
+   server answers with 20 READ tools and no write tool; with it, 30, including
+   `use_figma`.** An arc was recorded as "this toolchain cannot delete or rename
+   a Figma node" on the strength of the short list. A tool list is a fact about
+   the request.
+2. To restore the tools in-session, the founder runs `/mcp` and re-authenticates
+   Figma. Suspected trigger: the credential is keyed by a hash of the server
+   config and the plugin's bundle header carries its version, so a plugin update
+   orphans the stored token — two `plugin:figma:figma|<hash>` entries sit in the
+   keychain today. Unconfirmed; the fallback above does not care either way.
+
+Writes are not verified by the write. Read the node back — a capture submit has
+reported success on a dead POST and failure on four that landed.
+
 **The conformance harness (`scripts/conformance/`) is a REGRESSION NET ONLY.**
 Property probes are thermometers — they answer only what they are asked and
 went silent while the inspector body diverged wholesale from its board. A
