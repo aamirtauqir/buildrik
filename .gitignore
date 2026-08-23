@@ -56,3 +56,6 @@ packages.zip
 
 # gstack QA artifacts
 packages/dashboard/.gstack/
+
+# board-diff scratch output (board PNGs are short-lived Figma assets)
+.board-diff/
