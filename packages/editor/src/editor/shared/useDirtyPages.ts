@@ -3,48 +3,89 @@
  *
  * Two surfaces draw this: the page tab bar's accent dot (board 435:2368) and
  * the Pages tree's dirty ● (boards 140:21 / 1171:4729, whose caption spells the
- * row out as "checkbox · chevron · icon · name · home ⌂ · dirty ●"). The
- * tracking lived inside PageTabBar, so the tree had no way to read it and the
- * dot was deferred as "no per-page unsaved-state source" — there was one, it
- * just was not shared.
+ * row out as "checkbox · chevron · icon · name · home ⌂ · dirty ●").
  *
  * The engine has no per-page dirty flag: element events carry no page id. What
  * it does have is an active page, so an edit marks THAT page and a project save
  * clears everything.
+ *
+ * WHY THE STATE IS NOT IN THE HOOK. It was, and the markers were panel state
+ * rather than document state: the tracking lived in a `useState` inside the
+ * component that rendered it, so both halves died with the panel. Walked live
+ * — edit a page, watch its ● light, click Layers, click back to Pages, and the
+ * ● is gone with nothing saved. Worse, while the Pages panel was closed no
+ * listener existed at all, so edits made from anywhere else were never
+ * recorded. A per-composer store fixes both: it is attached to the document,
+ * outlives every panel, and a remount re-reads what is already there.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
 import type { Composer } from "../../engine";
-import { EVENTS } from "../../shared/constants";
+import { DOCUMENT_CHANGED_EVENTS, EVENTS, isNavigationOnlyChange } from "../../shared/constants";
+
+interface DirtyStore {
+  /** Frozen between mutations — useSyncExternalStore compares by identity. */
+  snapshot: ReadonlySet<string>;
+  subscribers: Set<() => void>;
+}
+
+const EMPTY: ReadonlySet<string> = new Set();
+const stores = new WeakMap<Composer, DirtyStore>();
+
+/**
+ * One store per composer, wired on first use and never torn down — the
+ * composer outlives every panel, and its own `destroy()` takes the listeners
+ * with it. Keyed weakly so a discarded composer is still collectable.
+ */
+function getStore(composer: Composer): DirtyStore {
+  const existing = stores.get(composer);
+  if (existing) return existing;
+
+  const store: DirtyStore = { snapshot: EMPTY, subscribers: new Set() };
+  stores.set(composer, store);
+
+  const publish = (next: ReadonlySet<string>) => {
+    if (next === store.snapshot) return;
+    store.snapshot = next;
+    store.subscribers.forEach((fn) => fn());
+  };
+
+  const markDirty = (payload?: unknown) => {
+    /* Looking at a page is not editing it. `setActivePage` emits
+       `project:changed` too, so without this a plain page switch lit an
+       unsaved dot on a page nothing had touched. */
+    if (isNavigationOnlyChange(payload)) return;
+    const active = composer.elements.getActivePage();
+    if (!active || store.snapshot.has(active.id)) return;
+    publish(new Set(store.snapshot).add(active.id));
+  };
+  const clearDirty = () => publish(EMPTY);
+
+  /* The same four events autosave listens to, from the same constant — see
+     DOCUMENT_CHANGED_EVENTS. This hook used to watch element:updated and
+     element:deleted instead, which agreed with autosave on neither end:
+     inserting an element never lit the dot, and an undo (which emits only
+     history:undo) neither lit it nor saved it. */
+  DOCUMENT_CHANGED_EVENTS.forEach((name) => composer.on(name, markDirty));
+  composer.on(EVENTS.PROJECT_SAVED, clearDirty);
+
+  return store;
+}
 
 export function useDirtyPages(composer: Composer | null): ReadonlySet<string> {
-  const [dirtyPages, setDirtyPages] = React.useState<ReadonlySet<string>>(() => new Set());
+  const store = composer ? getStore(composer) : null;
 
-  React.useEffect(() => {
-    if (!composer) return;
-    const markDirty = () => {
-      const active = composer.elements.getActivePage();
-      if (!active) return;
-      setDirtyPages((prev) => {
-        if (prev.has(active.id)) return prev;
-        const next = new Set(prev);
-        next.add(active.id);
-        return next;
-      });
-    };
-    const clearDirty = () => setDirtyPages((prev) => (prev.size === 0 ? prev : new Set()));
+  const subscribe = React.useCallback(
+    (onChange: () => void) => {
+      if (!store) return () => {};
+      store.subscribers.add(onChange);
+      return () => store.subscribers.delete(onChange);
+    },
+    [store]
+  );
+  const getSnapshot = React.useCallback(() => store?.snapshot ?? EMPTY, [store]);
 
-    composer.on(EVENTS.ELEMENT_UPDATED, markDirty);
-    composer.on(EVENTS.ELEMENT_DELETED, markDirty);
-    composer.on(EVENTS.PROJECT_SAVED, clearDirty);
-    return () => {
-      composer.off(EVENTS.ELEMENT_UPDATED, markDirty);
-      composer.off(EVENTS.ELEMENT_DELETED, markDirty);
-      composer.off(EVENTS.PROJECT_SAVED, clearDirty);
-    };
-  }, [composer]);
-
-  return dirtyPages;
+  return React.useSyncExternalStore(subscribe, getSnapshot, () => EMPTY);
 }

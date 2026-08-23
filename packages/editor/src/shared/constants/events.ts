@@ -631,6 +631,49 @@ export const EVENTS = {
 /**
  * Type for all valid event names
  */
+/**
+ * Every event that means "the document changed and is not yet persisted".
+ *
+ * There is more than one, and the list is not guessable: undo, redo and
+ * "Restore version" all go through `importProject`, which emits only
+ * `history:*` / `version:restored` and never `project:changed`. Autosave
+ * learned that the expensive way — before it listened to all four, an undo
+ * was never saved and the server kept the pre-undo state until the next
+ * unrelated edit.
+ *
+ * It lives here, and not inline at each listener, because two surfaces answer
+ * the same question and must not drift apart: the autosave in
+ * `useComposerInit` and the per-page dirty markers in `useDirtyPages`. When
+ * they disagree, the editor shows a page as unsaved that is already on the
+ * server, or the reverse.
+ */
+/**
+ * Not every `project:changed` is a document mutation.
+ * `PageManager.setActivePage` emits one carrying `{ type: "page:activated" }`,
+ * and the comment right beside that emit already spells out the trap: "a type
+ * on PROJECT_CHANGED is not a subscription — anyone who wants page switches
+ * has to filter every project change to find them."
+ *
+ * Autosave can afford to re-save on a page switch. A dirty MARKER cannot: it
+ * would light an unsaved dot on a page the user only looked at. Every other
+ * payload type on this event — page:created / updated / deleted / home /
+ * reordered / imported — is a real mutation and must still count.
+ */
+export function isNavigationOnlyChange(payload: unknown): boolean {
+  return (
+    typeof payload === "object" &&
+    payload !== null &&
+    (payload as { type?: unknown }).type === "page:activated"
+  );
+}
+
+export const DOCUMENT_CHANGED_EVENTS = [
+  EVENTS.PROJECT_CHANGED,
+  EVENTS.HISTORY_UNDO,
+  EVENTS.HISTORY_REDO,
+  EVENTS.VERSION_RESTORED,
+] as const;
+
 export type EventName = (typeof EVENTS)[keyof typeof EVENTS];
 
 /**

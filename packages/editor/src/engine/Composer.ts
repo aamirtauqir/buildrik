@@ -503,12 +503,35 @@ export class Composer extends EventEmitter {
     try {
       const data = this.exportProject();
       await this.storage.save(data);
-      this.state.dirty = false;
-      this.emit(EVENTS.PROJECT_SAVED, data);
+      this.markSaved(data);
     } catch (error) {
       this.emit(EVENTS.ERROR, { error, operation: "save" });
       throw error;
     }
+  }
+
+  /**
+   * Announce that the project as it stands is persisted — whoever wrote it.
+   *
+   * `saveProject()` writes through `this.storage` and calls this itself. The
+   * shipping editor does NOT take that path: with a siteId in the URL,
+   * `useComposerInit`'s autosave hands the snapshot to BuildrikSyncProvider,
+   * which persists to the dashboard and knows nothing about this object. So
+   * the engine went on believing the project had never been saved, and
+   * `useDirtyPages` — which clears its markers on PROJECT_SAVED — kept every
+   * page's dirty dot lit over work that was already on the server.
+   *
+   * Measured live on a scratch site, 7s after an edit with no manual save:
+   * the topbar read "Saved · just now", a second browser confirmed the server
+   * had the edit, and the Pages tree still showed the page dirty. Three
+   * readings of one question, and the panel was the one that lied.
+   *
+   * Takes the snapshot that was persisted so the caller does not pay for a
+   * second `exportProject()` on every autosave tick.
+   */
+  markSaved(data?: ProjectData): void {
+    this.state.dirty = false;
+    this.emit(EVENTS.PROJECT_SAVED, data ?? this.exportProject());
   }
 
   /**

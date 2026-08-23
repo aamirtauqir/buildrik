@@ -381,18 +381,47 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
     const siteId = getSiteIdFromUrl();
     let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
+    /* Counts document changes so a save that is still in flight can tell
+       whether it is still the newest state. Without it, an edit made WHILE a
+       save was travelling was announced as saved when the older payload came
+       back: `setIsDirty(false)` and `markSaved()` both fire, every dirty dot
+       clears, and the editor claims work is on the server that never left the
+       tab. Close it there and the edit is gone. */
+    let changeSeq = 0;
+
     const handler = () => {
       setIsDirty(true);
+      changeSeq += 1;
       if (timeoutId) clearTimeout(timeoutId);
       timeoutId = setTimeout(() => {
+        const seqAtSend = changeSeq;
         setSaveState((prev) => ({ ...prev, status: "saving", error: undefined }));
 
-        const savePromise = siteId
-          ? saveProject(siteId, composer.exportProject()).then(() => undefined)
+        /* Captured, not re-derived: `markSaved` below re-announces THIS
+           snapshot, and a second `exportProject()` per autosave tick is a full
+           serialize of the document. */
+        const snapshot = siteId ? composer.exportProject() : null;
+        const savePromise = snapshot
+          ? saveProject(siteId!, snapshot).then(() => undefined)
           : composer.saveProject();
 
         savePromise
           .then(() => {
+            /* A newer edit landed while this one was in flight, so what came
+               back is not the current document. Say nothing: leave the dirty
+               state standing and let the save this edit already scheduled
+               report on the newer payload. Announcing here would clear every
+               marker over work that is still only local. */
+            if (changeSeq !== seqAtSend) return;
+            /* Tell the engine, not just this component. The dashboard branch
+               persists through BuildrikSyncProvider, which never touches the
+               composer — so `composer.isDirty()` stayed true and
+               `useDirtyPages` kept every page's dirty dot lit over work that
+               was already on the server, while the topbar chip beside it read
+               "Saved · just now". `composer.saveProject()` (the no-siteId
+               branch, and the manual ⌘S path) has always announced itself;
+               only the branch every real user takes did not. */
+            if (snapshot) composer.markSaved(snapshot);
             setSaveState({ status: "idle", lastSavedAt: Date.now(), error: undefined });
             setIsDirty(false);
           })

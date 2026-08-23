@@ -9,6 +9,8 @@
 // Event constants
 export {
   EVENTS,
+  DOCUMENT_CHANGED_EVENTS,
+  isNavigationOnlyChange,
   type EventName,
   type EventCategory,
   isValidEventName,
