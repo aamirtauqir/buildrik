@@ -63,9 +63,15 @@ describe("CommandPalette", () => {
        before you type, Actions · Go to after — not by which internal group
        owns it. The `group:` strings are still the filter's material; they are
        no longer what the reader sees. */
-    it("with a composer: exactly 24 commands, banded the way the boards band them", () => {
+    /* 24 -> 22 on 2026-08-23: the hardcoded Copy and Paste rows were removed.
+       They ran document.execCommand, which cannot reach the editor's element
+       clipboard, and — because the registry loop dedups by label — they also
+       kept the engine's real `copy` and `paste` out of the palette entirely.
+       This stub composer has no registry, so here the two simply go; live the
+       registry supplies them, guarded. */
+    it("with a composer: exactly 22 hardcoded commands, banded the way the boards band them", () => {
       renderPalette();
-      expect(commandButtons()).toHaveLength(24);
+      expect(commandButtons()).toHaveLength(22);
       expect(screen.getByText("Suggested")).toBeInTheDocument();
       for (const internal of ["Navigation", "Edit", "View", "History"]) {
         expect(screen.queryByText(internal)).toBeNull();
@@ -134,7 +140,7 @@ describe("CommandPalette", () => {
       renderPalette();
       fireEvent.change(searchInput(), { target: { value: "zoom" } });
       fireEvent.change(searchInput(), { target: { value: "" } });
-      expect(commandButtons()).toHaveLength(24);
+      expect(commandButtons()).toHaveLength(22);
     });
   });
 
@@ -161,10 +167,56 @@ describe("CommandPalette", () => {
       expect(composer!.elements.removeElement).toHaveBeenCalledWith("el-1");
     });
 
-    it("'Copy' routes through document.execCommand", () => {
-      renderPalette();
+    /* Rewritten 2026-08-23. This asserted the bug: Copy was a hardcoded
+       `document.execCommand("copy")` entry, and because the registry loop
+       dedups by LABEL, that entry also SHADOWED the engine's real `copy`
+       command out of the palette. Paste was worse — execCommand("paste") is
+       refused by every modern browser, so the only Paste a user could reach
+       did nothing at all. Both come from the registry now. */
+    it("'Copy' runs the engine command, not document.execCommand", () => {
+      const run = vi.fn();
+      const composer = { ...makeComposer(), clipboard: null,
+        commands: { run, getAll: () => [{ id: "copy", label: "Copy", shortcut: "ctrl+c", run: vi.fn() }] } };
+      render(<CommandPalette onClose={vi.fn()} composer={composer as unknown as Composer} />);
       fireEvent.click(screen.getByText("Copy"));
-      expect(document.execCommand).toHaveBeenCalledWith("copy");
+      expect(run).toHaveBeenCalledWith("copy");
+      expect(document.execCommand).not.toHaveBeenCalledWith("copy");
+    });
+
+    it("'Paste' runs the engine command and never document.execCommand", () => {
+      const run = vi.fn();
+      /* clipboard non-null or the guard disables the row, which is the point of
+         the next test. */
+      const composer = { ...makeComposer(), clipboard: { type: "heading" },
+        commands: { run, getAll: () => [{ id: "paste", label: "Paste", shortcut: "ctrl+v", run: vi.fn() }] } };
+      render(<CommandPalette onClose={vi.fn()} composer={composer as unknown as Composer} />);
+      fireEvent.click(screen.getByText("Paste"));
+      expect(run).toHaveBeenCalledWith("paste");
+      expect(document.execCommand).not.toHaveBeenCalledWith("paste");
+    });
+
+    /* Both were unguarded when they were hardcoded: the palette offered Copy
+       with nothing selected and Paste with an empty clipboard, and both looked
+       perfectly available. Live-verified 2026-08-23: Paste disabled reading
+       "nothing copied", enabled after a Copy, and the paste added an element
+       (49 -> 50, undone). */
+    it("guards Copy on the selection and Paste on the clipboard", () => {
+      const composer = {
+        ...makeComposer(),
+        selection: { getSelectedIds: vi.fn(() => []), getSelected: vi.fn(() => null) },
+        clipboard: null,
+        commands: { run: vi.fn(), getAll: () => [
+          { id: "copy", label: "Copy", run: vi.fn() },
+          { id: "paste", label: "Paste", run: vi.fn() },
+        ] },
+      };
+      render(<CommandPalette onClose={vi.fn()} composer={composer as unknown as Composer} />);
+      /* Scope to the rows: "nothing selected" is also Delete element's reason,
+         so a bare getByText matches more than one node. */
+      const row = (label: string) =>
+        commandButtons().find((b) => (b.textContent ?? "").startsWith(label));
+      expect(row("Copy")?.textContent).toContain("nothing selected");
+      expect(row("Paste")?.textContent).toContain("nothing copied");
     });
 
     it("Enter executes the currently selected command (first by default)", () => {
@@ -250,6 +302,10 @@ describe("CommandPalette", () => {
           getAll: () => [
             { id: "export-html", label: "Export HTML", run: vi.fn() },
             { id: "undo", label: "Undo", run: vi.fn() }, // dup label — must be skipped
+            /* Copy and Paste come from the registry now, not from the
+               hardcoded head. Live there are 39 of these. */
+            { id: "copy", label: "Copy", shortcut: "ctrl+c", run: vi.fn() },
+            { id: "paste", label: "Paste", shortcut: "ctrl+v", run: vi.fn() },
           ],
         },
       };

@@ -85,20 +85,15 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
       disabledReason: "nothing to redo",
       handler: () => { composer.history.redo(); onClose(); },
     },
-    {
-      id: "edit-copy",
-      label: "Copy",
-      group: "Edit",
-      shortcut: "Ctrl+C",
-      handler: () => { document.execCommand("copy"); onClose(); },
-    },
-    {
-      id: "edit-paste",
-      label: "Paste",
-      group: "Edit",
-      shortcut: "Ctrl+V",
-      handler: () => { document.execCommand("paste"); onClose(); },
-    },
+    /* Copy and Paste are NOT hardcoded here. They used to be, as
+       `document.execCommand("copy"|"paste")`, and both were dead: the editor's
+       clipboard is `composer.clipboard` holding a serialised element, while
+       execCommand("copy") copies a DOM text selection the palette does not
+       have, and execCommand("paste") is refused outright by every modern
+       browser. Worse, the registry loop below dedups by LABEL — so the real
+       `copy` and `paste` commands were skipped as duplicates of these two, and
+       the only Copy and Paste a user could reach were the broken ones. They
+       come from the registry now, guarded like the rest. */
     {
       id: "edit-delete",
       label: "Delete element",
@@ -188,7 +183,11 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
   const registryGuard = (id: string): string | undefined => {
     if (id === "group") return selectedCount < 2 ? "select two or more" : undefined;
     if (id === "ungroup") return selectedType !== "container" ? "select a group" : undefined;
+    /* `paste` reads composer.clipboard and returns silently when it is empty —
+       the same shape as the nudges below, and the same reason it is guarded. */
+    if (id === "paste") return composer.clipboard ? undefined : "nothing copied";
     if (
+      id === "copy" ||
       id === "duplicate" ||
       id === "cut" ||
       id.startsWith("nudge-") ||
