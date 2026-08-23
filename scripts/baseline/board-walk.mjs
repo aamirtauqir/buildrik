@@ -35,6 +35,20 @@ const require = createRequire(join(ROOT, "packages", "dashboard", "package.json"
 const { chromium } = require("@playwright/test");
 
 const cfg = JSON.parse(readFileSync(join(HERE, "board-recipes.json"), "utf8"));
+
+/* boards.json records, per board, WHICH ARTEFACT WINS on conflict — and the
+   ranking is misleading without it. Every Shell-states board carries
+   `code:topbar`, so a whole-frame number against them is partly measuring a
+   region the code already owns; 199:409's page tabs are settled by the
+   dedicated board 435:2348 ("bar sits at the canvas foot") and the code was
+   already right; 66:441 "Offline" is a placeholder board the code is ahead of.
+   Three of the first eight rows I ranked were already adjudicated somewhere
+   else, and the number said nothing about that. Print it beside every row. */
+const MANIFEST = join(ROOT, "packages", "editor", "scripts", "conformance", "boards.json");
+const authorityOf = (() => {
+  const byId = new Map(JSON.parse(readFileSync(MANIFEST, "utf8")).boards.map((b) => [b.nodeId, b.authority]));
+  return (id) => byId.get(id) ?? "(not in manifest)";
+})();
 const argv = process.argv.slice(2);
 const arg = (n) => (argv.includes(n) ? argv[argv.indexOf(n) + 1] : null);
 const only = arg("--only");
@@ -146,9 +160,9 @@ for (const r of recipes) {
     ], { encoding: "utf8" });
     const pct = Number((out.match(/([\d.]+)% differ/) || [])[1] ?? NaN);
     const eyes = (out.match(/eyes: (.+)/) || [])[1] ?? "";
-    results.push({ nodeId: r.nodeId, name: r.name, pct, steps, eyes });
+    results.push({ nodeId: r.nodeId, name: r.name, pct, steps, eyes, authority: authorityOf(r.nodeId) });
   } catch (e) {
-    results.push({ nodeId: r.nodeId, name: r.name, pct: NaN, steps, error: String(e).slice(0, 120) });
+    results.push({ nodeId: r.nodeId, name: r.name, pct: NaN, steps, error: String(e).slice(0, 120), authority: authorityOf(r.nodeId) });
   }
   await ctx.close();
 }
@@ -156,9 +170,11 @@ await browser.close();
 
 results.sort((a, b) => (Number.isNaN(b.pct) ? -1 : b.pct) - (Number.isNaN(a.pct) ? -1 : a.pct));
 console.log(`\n  %   board        state`);
+console.log(`  (read 'authority' before reading the number: it names which artefact wins)`);
 for (const r of results) {
   const p = Number.isNaN(r.pct) ? "  err" : `${r.pct.toFixed(2)}%`.padStart(6);
   console.log(`${p}  ${r.nodeId.padEnd(11)}  ${r.name}`);
+  console.log(`         authority: ${r.authority}`);
   console.log(`         ${r.steps.join(" · ")}${r.error ? ` · ERROR ${r.error}` : ""}`);
 }
 console.log(`\nNot reached (see board-recipes.json _notReached):`);
