@@ -532,15 +532,28 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
       setCanRedo(composer.history.canRedo());
     };
     update();
-    composer.on("history:undo", update);
-    composer.on("history:redo", update);
-    composer.on("history:recorded", update);
-    composer.on("history:cleared", update);
+    /* PROJECT_LOADED belongs here even though it is not a `history:*` event.
+       `importProject` — project load, undo/redo internals, version restore —
+       rebuilds the tree and emits ONLY `project:loaded`, so without this line
+       the React copy of canUndo keeps whatever the last history event left it
+       as and is never corrected.
+
+       Walked live 2026-08-24 on a freshly loaded site: the command palette,
+       which calls `composer.history.canUndo()` at render, said "nothing to
+       undo" while the canvas footer's Undo button — reading this React state —
+       was ENABLED, and clicking it did nothing. Two surfaces, one question,
+       opposite answers. Same shape as the dirty-dot bug fixed in 768e9661. */
+    const HISTORY_STATE_EVENTS = [
+      "history:undo",
+      "history:redo",
+      "history:recorded",
+      "history:cleared",
+      EVENTS.PROJECT_LOADED,
+      EVENTS.VERSION_RESTORED,
+    ] as const;
+    HISTORY_STATE_EVENTS.forEach((e) => composer.on(e, update));
     return () => {
-      composer.off("history:undo", update);
-      composer.off("history:redo", update);
-      composer.off("history:recorded", update);
-      composer.off("history:cleared", update);
+      HISTORY_STATE_EVENTS.forEach((e) => composer.off(e, update));
     };
   }, [composer, setCanUndo, setCanRedo]);
 
