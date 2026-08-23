@@ -12,41 +12,9 @@ import type {
   ComponentInstance,
   Override,
   OverrideType,
-  SyncResult,
 } from "../../shared/types/components";
-import { deepClone } from "../../shared/utils/helpers";
 import type { Composer } from "../Composer";
-import { createPatch, type Patch } from "../utils/JsonPatch";
-
-// ============================================
-// Override Path Helpers
-// ============================================
-
-/**
- * Parse a path to extract element ID and property info
- */
-function parsePath(path: string): {
-  elementId: string;
-  type: OverrideType;
-  property: string;
-} | null {
-  const match = path.match(/^\/elements\/([^/]+)\/(content|styles|attributes|traits)(?:\/(.+))?$/);
-  if (!match) return null;
-
-  const [, elementId, category, property] = match;
-  const typeMap: Record<string, OverrideType> = {
-    content: "content",
-    styles: "style",
-    attributes: "attribute",
-    traits: "trait",
-  };
-
-  return {
-    elementId,
-    type: typeMap[category] ?? "style",
-    property: property ?? "",
-  };
-}
+import type { Patch } from "../utils/JsonPatch";
 
 // ============================================
 // Canonical Override Application (position-path scheme)
@@ -174,24 +142,6 @@ export class ComponentInstanceUtils {
     this.composer = composer;
   }
 
-  /**
-   * Create a JSON pointer path for an element property
-   */
-  getPropertyPath(elementId: string, type: OverrideType, property: string): string {
-    switch (type) {
-      case "content":
-        return `/elements/${elementId}/content`;
-      case "style":
-        return `/elements/${elementId}/styles/${property}`;
-      case "attribute":
-        return `/elements/${elementId}/attributes/${property}`;
-      case "trait":
-        return `/elements/${elementId}/traits/${property}`;
-      default:
-        return `/elements/${elementId}/${property}`;
-    }
-  }
-
   // ============================================
   // Override Operations
   // ============================================
@@ -223,159 +173,13 @@ export class ComponentInstanceUtils {
     return updatedInstance;
   }
 
-  /**
-   * Remove an override from an instance
-   */
-  removeOverride(instance: ComponentInstance, path: string): ComponentInstance {
-    // Filter out operations for this path
-    const newOverrides = instance.overrides.filter((op) => op.path !== path);
-
-    return {
-      ...instance,
-      overrides: newOverrides,
-    };
-  }
-
-  /**
-   * Get all overrides for an instance
-   */
-  getOverrides(instance: ComponentInstance): Override[] {
-    return instance.overrides.map((op) => {
-      const parsed = parsePath(op.path);
-      return {
-        path: op.path,
-        type: parsed?.type ?? "style",
-        value: op.value,
-        createdAt: Date.now(),
-      };
-    });
-  }
-
-  /**
-   * Check if a property is overridden
-   */
-  isPropertyOverridden(
-    instance: ComponentInstance,
-    elementId: string,
-    type: OverrideType,
-    property: string
-  ): boolean {
-    const path = this.getPropertyPath(elementId, type, property);
-    return instance.overrides.some((op) => op.path === path);
-  }
-
-  /**
-   * Reset a specific override (restore to master value)
-   */
-  resetOverride(
-    instance: ComponentInstance,
-    elementId: string,
-    type: OverrideType,
-    property: string
-  ): ComponentInstance {
-    const path = this.getPropertyPath(elementId, type, property);
-    return this.removeOverride(instance, path);
-  }
-
-  /**
-   * Reset all overrides for an element
-   */
-  resetElementOverrides(instance: ComponentInstance, elementId: string): ComponentInstance {
-    const prefix = `/elements/${elementId}/`;
-    const newOverrides = instance.overrides.filter((op) => !op.path.startsWith(prefix));
-
-    return {
-      ...instance,
-      overrides: newOverrides,
-    };
-  }
-
   // ============================================
   // Sync Operations
   // ============================================
 
-  /**
-   * Sync an instance to a new master version
-   * Attempts to preserve overrides
-   */
-  syncToMaster(
-    instance: ComponentInstance,
-    oldMaster: ElementData,
-    newMaster: ElementData
-  ): SyncResult {
-    const errors: string[] = [];
-    let overridesPreserved = 0;
-    let overridesConflicted = 0;
-
-    // Create patch from old master to new master
-    const masterPatch = createPatch(oldMaster, newMaster);
-
-    // Check for conflicts with existing overrides
-    const conflictingPaths = new Set<string>();
-
-    for (const masterOp of masterPatch) {
-      for (const instanceOp of instance.overrides) {
-        if (this.pathsOverlap(masterOp.path, instanceOp.path)) {
-          conflictingPaths.add(instanceOp.path);
-        }
-      }
-    }
-
-    // Count preserved vs conflicted
-    for (const op of instance.overrides) {
-      if (conflictingPaths.has(op.path)) {
-        overridesConflicted++;
-        errors.push(`Conflict at ${op.path}`);
-      } else {
-        overridesPreserved++;
-      }
-    }
-
-    // Note: In a full implementation, we would filter out conflicting overrides
-    // and apply preservedOverrides to the updated instance
-
-    return {
-      success: overridesConflicted === 0,
-      instanceId: instance.elementId,
-      overridesPreserved,
-      overridesConflicted,
-      errors: errors.length > 0 ? errors : undefined,
-    };
-  }
-
-  /**
-   * Build the final element tree by applying overrides to master
-   */
-  buildInstanceTree(masterTree: ElementData, instance: ComponentInstance): ElementData {
-    const tree = deepClone(masterTree);
-    if (instance.overrides.length === 0) {
-      return tree;
-    }
-    // Apply overrides via the canonical position-path scheme the overrides are
-    // actually stored in (`#/<elementPath>/<type>/<property>`). The previous
-    // applyPatch() path treated them as JSON-Patch pointers (`/children/...`),
-    // which never matched — detach silently dropped every override (F1a #1/C).
-    applyOverridesToTree(tree, instance.overrides);
-    return tree;
-  }
-
   // ============================================
   // Detach Operations
   // ============================================
-
-  /**
-   * Convert an instance to a regular element tree
-   * Returns the element data with all overrides applied
-   */
-  detachToElements(masterTree: ElementData, instance: ComponentInstance): ElementData {
-    // Apply all overrides to get final tree
-    const detachedTree = this.buildInstanceTree(masterTree, instance);
-
-    // Clear component instance markers recursively
-    this.clearInstanceMarkers(detachedTree);
-
-    return detachedTree;
-  }
 
   // ============================================
   // Private Helpers
@@ -392,13 +196,6 @@ export class ComponentInstanceUtils {
       value,
     });
     return newPatch;
-  }
-
-  /**
-   * Check if two paths overlap (one is parent of the other)
-   */
-  private pathsOverlap(path1: string, path2: string): boolean {
-    return path1.startsWith(path2) || path2.startsWith(path1);
   }
 
   /**
