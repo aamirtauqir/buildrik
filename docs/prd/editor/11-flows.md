@@ -154,7 +154,7 @@ canUndo requires stack >1 (baseline checkpoint protected); depth 100; RAM-only �
 ### U1 · First-run builder → first publish
 1. Dashboard "Edit site" → `/edit/:id` (needs `NEXT_PUBLIC_UNIFIED_EDITOR=true`, else dead legacy demo — root CLAUDE.md env table).
 2. F-A1 load → blank canvas → **PageWizard** (~~⛔ 7 hardcoded steps insert static HTML; "AI" simulated — inputs discarded~~ — **stale, verified 2026-08-23**: `PageWizard` is **0 hits** repo-wide, the component is gone) or empty-canvas CTA "Browse Templates / Start blank".
-3. Onboarding checklist (7 steps: name-project → pick-start → add-element → edit-text → change-style → preview → publish) bottom-right pill; achievement modal 4s per completion; collapses on element select (`useOnboardingOrchestrator.ts:114`). ⛔ WelcomeModal + SpotlightOverlay orphans — never mounted.
+3. Onboarding checklist (7 steps: name-project → pick-start → add-element → edit-text → change-style → preview → publish) bottom-right pill; achievement modal 4s per completion; collapses on element select (`useOnboardingOrchestrator.ts:114`). ~~⛔ WelcomeModal + SpotlightOverlay orphans — never mounted~~ — **stale, verified 2026-08-24**: both have **0 references and no files**; they were deleted, not left orphaned. Walked the rest of this step live the same day (`docs/walks/U1-first-run.md`): the checklist pill reads `0 / 7 done` and moves to `1 / 7` when an element is actually inserted.
 4. Build (U2) → Preview ⌘P (sanitized sandboxed window) → Publish (F-A3).
 
 ### U2 · Build a page (core loop)
