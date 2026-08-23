@@ -6,7 +6,6 @@
  */
 
 import * as React from "react";
-import { camelToKebab } from "@/shared/utils/helpers";
 
 // ============================================================================
 // TYPES
@@ -123,20 +122,14 @@ export function useAdvancedSettings(
     const groupsToExpand: string[] = [];
     for (const [groupId, props] of Object.entries(advancedPropsMap)) {
       const hasValue = props.some((prop) => {
-        /* Two conversions, not one. The registry ids are dotted AND camelCase
-           ("size.minWidth", "position.zIndex"); element styles are keyed in
-           kebab-case and nothing else — measured on a real page, 0 camelCase
-           keys against `border-radius`, `align-items`, `grid-template-columns`.
-           Taking the tail alone fixed the dot and left the casing, so
-           `styles["minWidth"]` was looked up against a kebab map and came back
-           undefined every time. 43 of the registry's 57 advanced properties
-           have a camelCase tail, so the auto-expand never fired for any of
-           them: set a min-width, reopen the inspector, and the group that holds
-           the value you set is collapsed. The 14 single-word ids — visibility,
-           isolation, contain — are spelled the same either way and were the
-           only ones this lookup could ever have matched. */
-        const tail = prop.split(".").pop() ?? prop;
-        const val = styles[camelToKebab(tail)] ?? styles[tail];
+        /* `prop` is a raw kebab CSS name now — the section declares what its
+           advanced block renders (SectionEntry.advancedProps), so there is
+           nothing to convert. It used to be a dotted, camelCase registry id
+           ("size.minWidth") read straight against a kebab-keyed style map, so
+           `styles["minWidth"]` came back undefined for 43 of the registry's 57
+           advanced ids. Fixing the lookup was only half of it: the ids came
+           from a set the sections did not draw. */
+        const val = styles[prop];
         return val !== undefined && val !== "" && val !== "0" && val !== "none";
       });
       if (hasValue) groupsToExpand.push(groupId);

@@ -1,50 +1,45 @@
 /**
  * The inspector's advanced groups open by themselves when they hold a value.
  *
- * They did not, for 43 of the registry's 57 advanced properties. The registry
- * ids are dotted AND camelCase ("size.minWidth", "position.zIndex"); element
- * styles are keyed kebab-case and nothing else — measured on a real page, zero
- * camelCase keys against `border-radius`, `align-items`,
- * `grid-template-columns`. Taking the tail of the dotted path fixed the dot and
- * left the casing, so `styles["minWidth"]` was read from a kebab map and came
- * back undefined every time. Set a min-width, reopen the inspector, and the
- * group holding the value you just set is collapsed.
+ * They did not, and three defects were stacked:
  *
- * The 14 that did work are the single-word ones — visibility, isolation,
- * contain — spelled the same either way, which is why this looked healthy.
+ *  1. The once-per-element guard was spent before the styles existed. `styles`
+ *     is `{}` on the first render after a selection — useStyleHandlers fills it
+ *     in a later effect — and `{}` is truthy, so the element was marked done,
+ *     the scan ran against an empty object, and every later pass returned at
+ *     the `has()` check. Nothing could auto-expand at all.
+ *  2. The lookup read dotted, camelCase registry ids ("size.minWidth") against
+ *     a style map keyed in kebab-case and nothing else. 43 of the registry's 57
+ *     advanced ids have a camelCase tail.
+ *  3. And the ids came from the wrong place entirely: a prefix over
+ *     propertiesRegistry, not from what the section's advanced block draws.
+ *     Layout's renders Position / Overflow / Visibility; Typography's renders
+ *     font-style, text-indent and vertical-align, which the registry does not
+ *     list at all. Sections declare their own set now.
+ *
+ * The registry test at the bottom is the one that would have caught (3). The
+ * hardcoded map above it would not — which is exactly how this survived.
  *
  * @license BSD-3-Clause
  */
 import { describe, it, expect } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useAdvancedSettings } from "../useAdvancedSettings";
+import { buildAdvancedPropsMapFromRegistry } from "../../sections/registry";
 
 const MAP = {
-  size: ["size.minWidth", "size.maxHeight"],
-  position: ["position.zIndex"],
-  layout: ["layout.visibility"],
+  size: ["min-width", "max-height"],
+  position: ["z-index"],
+  layout: ["visibility"],
 };
 
-const render = (styles: Record<string, string>) =>
-  renderHook(() =>
-    useAdvancedSettings({ advancedPropsMap: MAP, styles, elementId: "el-1" })
-  );
+const render = (styles: Record<string, string>, map: Record<string, string[]> = MAP) =>
+  renderHook(() => useAdvancedSettings({ advancedPropsMap: map, styles, elementId: "el-1" }));
 
 describe("advanced group auto-expand", () => {
-  it("opens the group when a camelCase-id property has a kebab-cased value", () => {
+  it("opens the group holding the value", () => {
     const { result } = render({ "min-width": "240px" });
     expect(result.current.isExpanded("size")).toBe(true);
-  });
-
-  it("opens position for z-index, the id the registry spells zIndex", () => {
-    const { result } = render({ "z-index": "10" });
-    expect(result.current.isExpanded("position")).toBe(true);
-  });
-
-  /* The case that always worked, kept so a regression cannot hide behind it. */
-  it("still opens on a single-word property", () => {
-    const { result } = render({ visibility: "hidden" });
-    expect(result.current.isExpanded("layout")).toBe(true);
   });
 
   it("leaves a group closed when none of its advanced props carry a value", () => {
@@ -60,25 +55,18 @@ describe("advanced group auto-expand", () => {
     expect(result.current.isExpanded("position")).toBe(false);
   });
 
-  /* The defect that hid the one above. In the running inspector `styles` is
-     `{}` on the first render after a selection — useStyleHandlers fills it in
-     an effect that runs later — and `{}` is truthy, so the once-per-element
-     guard was spent on the empty pass and every later one returned early. The
-     auto-expand could not fire for any property at all. */
   it("waits for the styles to arrive instead of spending its one shot on {}", () => {
     const { result, rerender } = renderHook(
       ({ styles }: { styles: Record<string, string> }) =>
         useAdvancedSettings({ advancedPropsMap: MAP, styles, elementId: "el-1" }),
       { initialProps: { styles: {} as Record<string, string> } }
     );
-
     expect(result.current.isExpanded("size")).toBe(false);
 
     rerender({ styles: { "min-width": "240px" } });
     expect(result.current.isExpanded("size")).toBe(true);
   });
 
-  /* And it is still once per element: a collapse the user makes has to stick. */
   it("does not re-expand a group the user collapsed", () => {
     const { result, rerender } = renderHook(
       ({ styles }: { styles: Record<string, string> }) =>
@@ -92,5 +80,41 @@ describe("advanced group auto-expand", () => {
 
     rerender({ styles: { "min-width": "300px" } });
     expect(result.current.isExpanded("size")).toBe(false);
+  });
+});
+
+/* Against the REAL map the inspector builds. A hardcoded map cannot see the
+   defect that mattered most — the sections and the property list disagreeing —
+   because the test supplies both sides itself. */
+describe("auto-expand against the registry the inspector actually uses", () => {
+  const real = buildAdvancedPropsMapFromRegistry();
+
+  it("every declared advanced property is a kebab CSS name, not a dotted id", () => {
+    for (const [group, props] of Object.entries(real)) {
+      for (const prop of props) {
+        expect(prop, `${group}.${prop}`).not.toContain(".");
+        expect(prop, `${group}.${prop}`).not.toMatch(/[a-z][A-Z]/);
+      }
+    }
+  });
+
+  it("opens Typography for font-style — a property the old registry never listed", () => {
+    const { result } = render({ "font-style": "italic" }, real);
+    expect(result.current.isExpanded("typography")).toBe(true);
+  });
+
+  it("opens Layout for z-index and overflow, which its advanced block draws", () => {
+    expect(render({ "z-index": "10" }, real).result.current.isExpanded("layout")).toBe(true);
+    expect(render({ "overflow-x": "scroll" }, real).result.current.isExpanded("layout")).toBe(true);
+  });
+
+  it("opens Background for background-blend-mode", () => {
+    const { result } = render({ "background-blend-mode": "multiply" }, real);
+    expect(result.current.isExpanded("background")).toBe(true);
+  });
+
+  it("opens Size for min-width and Border for outline-width", () => {
+    expect(render({ "min-width": "240px" }, real).result.current.isExpanded("size")).toBe(true);
+    expect(render({ "outline-width": "2px" }, real).result.current.isExpanded("border")).toBe(true);
   });
 });

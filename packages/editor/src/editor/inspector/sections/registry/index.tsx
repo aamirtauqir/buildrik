@@ -29,7 +29,6 @@
  * @license BSD-3-Clause
  */
 
-import { getAdvancedPropsForGroup } from "../../config/propertiesRegistry";
 import type { AnySectionEntry, SectionId } from "./_shared";
 import { ELEMENT_SECTIONS } from "./element";
 import { EFFECTS_SECTIONS } from "./effects";
@@ -121,8 +120,13 @@ export function sectionApplies(
 export function buildAdvancedPropsMapFromRegistry(): Record<string, string[]> {
   const map: Record<string, string[]> = {};
   for (const entry of Object.values(SECTION_REGISTRY)) {
-    if (entry.advancedKey) {
-      map[entry.advancedKey] = getAdvancedPropsForGroup(entry.advancedKey);
+    /* From the section's own declaration, not from a registry prefix. The
+       prefix derivation asked propertiesRegistry which ids start with e.g.
+       "layout." and are tiered advanced — a different set from what the
+       section's advanced block renders, so groups stayed shut on values the
+       user had just set. Sections declare what they draw. */
+    if (entry.advancedKey && entry.advancedProps?.length) {
+      map[entry.advancedKey] = [...entry.advancedProps];
     }
   }
   return map;

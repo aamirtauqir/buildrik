@@ -18,7 +18,6 @@ export type { ElementProfile } from "./elementProfiles";
 // Properties Registry (dead functions purged in Commit B)
 export {
   PROPERTIES,
-  getAdvancedPropsForGroup,
 } from "./propertiesRegistry";
 export type { PropertyDefinition, PropertyType } from "./propertiesRegistry";
 

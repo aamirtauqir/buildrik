@@ -1095,15 +1095,3 @@ export const PROPERTIES: Record<string, PropertyDefinition> = {
 // HELPER FUNCTIONS
 // ============================================================================
 
-/**
- * Get IDs of all advanced-tier properties within a group prefix.
- * Used by progressive disclosure controls to know which props to hide by default.
- *
- * @param groupPrefix - e.g. "size", "spacing", "flex"
- * @returns Array of property IDs where tier === "advanced"
- */
-export function getAdvancedPropsForGroup(groupPrefix: string): string[] {
-  return Object.entries(PROPERTIES)
-    .filter(([id, def]) => id.startsWith(groupPrefix + ".") && def.tier === "advanced")
-    .map(([id]) => id);
-}

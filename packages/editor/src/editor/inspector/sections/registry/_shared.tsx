@@ -171,6 +171,23 @@ export interface SectionEntry<P extends object = object> {
    */
   advancedKey?: string;
   /**
+   * The CSS properties this section's ADVANCED block actually renders.
+   *
+   * This used to be derived from the registry by prefix — `advancedKey: "layout"`
+   * meant "every propertiesRegistry id starting layout. and tiered advanced".
+   * The two drifted, because a section's advanced block is not organised by
+   * registry prefix: Layout's renders Position, Overflow and Visibility, and
+   * Typography's renders font-style / text-indent / vertical-align, which the
+   * registry does not list at all. So the auto-expand asked one source of truth
+   * about a set owned by another, and groups stayed shut on values the user had
+   * just set. Measured live: a heading with font-style italic showed
+   * "More settings 5", collapsed.
+   *
+   * Raw kebab CSS names, the same spelling the style map uses — no dotted ids,
+   * no camelCase, nothing to convert.
+   */
+  advancedProps?: readonly string[];
+  /**
    * CSS property keys this section reads from ctx.styles. The adapter will
    * receive only these keys (via pickKeys), so a single-property edit only
    * triggers re-render of sections that actually care about that property.
@@ -197,6 +214,8 @@ export interface AnySectionEntry {
   render: (ctx: SectionContext) => React.ReactElement | null;
   shouldRender?: (ctx: ShouldRenderContext) => boolean;
   advancedKey?: string;
+  /** CSS properties this section's advanced block renders. See SectionEntry. */
+  advancedProps?: readonly string[];
   /** CSS property keys this section reads — mirrors SectionEntry.styleKeys. */
   styleKeys: readonly string[];
   /** Section id — set by the registry loop for test / introspection helpers. */
@@ -226,6 +245,7 @@ export function defineSection<P extends object>(
     },
     shouldRender: entry.shouldRender,
     advancedKey: entry.advancedKey,
+    advancedProps: entry.advancedProps,
     styleKeys: entry.styleKeys,
   };
 }

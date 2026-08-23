@@ -16,6 +16,9 @@ export const LAYOUT_SECTIONS: Record<string, AnySectionEntry> = {
   layout: defineSection({
     Component: LayoutSection,
     advancedKey: "layout",
+    /* Extracted from this section's own advanced block, not from a registry
+       prefix — see SectionEntry.advancedProps. */
+    advancedProps: ["position", "top", "right", "bottom", "left", "z-index", "overflow", "overflow-x", "overflow-y", "box-sizing", "float", "clear", "visibility"],
     styleKeys: ["display", "position", "width", "height", "top", "right", "bottom", "left", "z-index", "overflow", "overflow-x", "overflow-y", "box-sizing", "float", "clear", "visibility"],
     adaptProps: (ctx) => ({
       ...adaptBaseStyleProps(ctx),
@@ -28,6 +31,9 @@ export const LAYOUT_SECTIONS: Record<string, AnySectionEntry> = {
   size: defineSection({
     Component: SizeSection,
     advancedKey: "size",
+    /* Extracted from this section's own advanced block, not from a registry
+       prefix — see SectionEntry.advancedProps. */
+    advancedProps: ["min-width", "max-width", "min-height", "max-height", "object-fit"],
     styleKeys: ["width", "height", "min-width", "min-height", "max-width", "max-height", "aspect-ratio", "object-fit"],
     adaptProps: (ctx) => ({
       ...adaptBaseStyleProps(ctx),
@@ -40,6 +46,9 @@ export const LAYOUT_SECTIONS: Record<string, AnySectionEntry> = {
   spacing: defineSection({
     Component: SpacingSection,
     advancedKey: "spacing",
+    /* Extracted from this section's own advanced block, not from a registry
+       prefix — see SectionEntry.advancedProps. */
+    advancedProps: ["gap", "row-gap", "column-gap"],
     styleKeys: ["padding", "padding-top", "padding-right", "padding-bottom", "padding-left", "margin", "margin-top", "margin-right", "margin-bottom", "margin-left", "gap", "row-gap", "column-gap"],
     adaptProps: (ctx) => ({
       ...adaptBaseStyleProps(ctx),
