@@ -9,8 +9,8 @@
 | Persona | Entry | Rail/density | Ship action |
 |---|---|---|---|
 | Agency designer (OWNER/ADMIN/DESIGNER) | dashboard "Edit site" → `/edit/:id` or `?siteId=` (`BuildrikSyncProvider.ts:402-413`) | 4-tool rail, full inspector | Publish dropdown (flag `publish`) or Export fallback (`Topbar.tsx:530-548`) |
-| Invited content editor | same URL, member session | 4-tool, full | same (server enforces ADMIN on publish) |
-| Client-view editor | `?view=client` (`editorViewMode.ts:31-38`) | 4-tool + density `fewer` | "Send for review" popover (`Topbar.tsx:463-529`) |
+| Invited editor (role `EDITOR`, labelled "Editor" since 2026-08-23) | same URL, member session | 4-tool, full | same. **Publish requires EDITOR, not ADMIN** (`routers/sites.ts:316`) — this row said ADMIN. `Workspace.editsRequireApproval` defaults FALSE, so on a default workspace this member publishes to the live site with no approval. |
+| Owner in view mode | `?view=readonly` (renamed from `?view=client` 2026-08-23) | no rail, no drawer, no inspector; `Composer.readOnly` blocks every mutating command | none — Publish and Send for review are both withheld. Send for review lives in the Review panel now. This row described an "editor" persona; nothing ever routed anyone here, and the mode grants no editing at all. |
 | Anonymous/local (demo) | no siteId | 4-tool | Export only; saves to localStorage |
 | Legacy rail escape | `?rail=legacy` | 11-tab rail (`editorViewMode.ts:34`) | as above |
 
@@ -72,7 +72,7 @@ Topbar Publish (flag publish=true, siteId required)
 ```
 - Republish blocked only while job non-terminal (`usePublishJob.ts:92-96`); prior published state hydrated on mount (`:144-160`).
 - ⛔ PublishDropdown states in-review/approved defined but never driven — shell passes only draft|published (`AquibraStudio.tsx:402`); Submit-for-Review / Approve / Unpublish menu items are no-ops ("Phase 7", `PublishDropdown.tsx:163-165`).
-- ⛔ Review approval gates nothing server-side (`editsRequireApproval` never read — master §13 A1).
+- ~~⛔ Review approval gates nothing server-side (`editsRequireApproval` never read)~~ — **stale, verified 2026-08-23**: `publish.service.ts:252,259` reads it and `startPublish` throws APPROVAL_NONE / APPROVAL_PENDING / APPROVAL_CHANGES / APPROVAL_STALE. The gate exists. What is worth knowing instead is that the flag **defaults to false** (`schema.prisma:198`), so an unconfigured workspace has no approval step at all.
 - Sources: `useExportHandlers.ts:83-159`, `PublishService.ts:19-105`, Ch.10 §10.2.
 
 ### F-A4 · Media upload pipeline
@@ -185,11 +185,11 @@ canUndo requires stack >1 (baseline checkpoint protected); depth 100; RAM-only �
 1. Full reload with param → 4-tool rail + density `fewer` (inspector = first 3 sections + "Show all controls").
 2. Edits identical engine path (no scoped permissions client-side).
 3. Ship = "Send for review" popover: summary + note ≤500 → `reviews.submit` (states idle/sending/sent/error).
-4. ⛔ No tokenized share link exists (ShareLink model server-only, §13 B12); "preview as client" = URL param only.
+4. ~~⛔ No tokenized share link exists~~ — **stale, verified 2026-08-23**: `/share/<token>` and `/review/<token>` both ship (`app/share/[token]`, `app/review/[token]`), and the editor's site menu opens the first through the dashboard's ShareDraftModal. What the URL param is has been renamed accordingly: it is view mode, not a client preview.
 
 ### U6 · Review / approval loop (⛔ broken as designed)
 1. EDITOR submits review (U5) → ADMIN notified by email → resolve APPROVED | CHANGES_REQUESTED (1 PENDING/site).
-2. ⛔ Publish never checks review state; `editsRequireApproval` saved but unenforced (§13 A1/C1).
+2. ~~⛔ Publish never checks review state~~ — **stale, verified 2026-08-23**, same as §11.1: the check is in `startPublish`. The live gap is the default (`false`), not the wiring.
 3. ⛔ External client not in loop: comments backend complete (create incl. VIEWER, pins, resolve) — zero editor UI (§13 A4/B4).
 
 ### U7 · Media flow
