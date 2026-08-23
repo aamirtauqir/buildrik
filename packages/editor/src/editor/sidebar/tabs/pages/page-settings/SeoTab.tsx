@@ -151,18 +151,15 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
           </div>
 
           {/* Reach 80+ banner — shown when score < 80 and indexing is on.
-              Names the specific thing standing between this page and 80, in
-              the order that pays most. A grey tick with no reason beside it is
-              a puzzle, not advice — the slug line exists because "Clean URL
-              slug" can go grey on a slug that looks perfectly clean, and
-              nothing on screen said why. */}
+              ONE clause. A first version chained the slug reason on with a
+              second em-dash and the box became a two-line run-on sentence in a
+              260px drawer — a wall, not advice. Read it on screen and it was
+              obvious. Per-item guidance belongs beside the control that fixes
+              the item, not stacked here; the slug's lives under the slug
+              field. */}
           {s.seoScore < 80 && s.allowIndex && (
             <div className={`tw:px-2.5 tw:py-2 tw:text-[11.5px] ${UI} ${BANNER}`} role="note">
-              Reach 80+ before publishing
-              {s.seoChecks.descSet ? "" : " — add a meta description (up to +40 pts)"}
-              {isPlaceholderSlug(s.slug)
-                ? ` — “${s.slug}” reads as a placeholder URL; a descriptive slug ranks better (+10 pts)`
-                : ""}
+              Reach 80+ before publishing{s.seoChecks.descSet ? "" : " — add a meta description (up to +40 pts)"}
             </div>
           )}
         </>
@@ -295,8 +292,17 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
             </span>
           </div>
         )}
+        {/* Three states, in the order they matter: a rejected slug, a slug the
+            app generated for you, then the format rule. The middle one exists
+            because "Clean URL slug" goes grey on `page-4` — lowercase,
+            hyphenated, perfectly valid — and nothing said why. It says so here,
+            beside the field that fixes it. */}
         {s.slugError ? (
           <HelperText color="failure" className={BK_HELPER_ERROR_CLASS}>{s.slugError}</HelperText>
+        ) : isPlaceholderSlug(s.slug) ? (
+          <HelperText className={BK_HELPER_CLASS}>
+            “{s.slug}” is auto-generated — a descriptive slug ranks better (+10 pts)
+          </HelperText>
         ) : (
           <HelperText className={BK_HELPER_CLASS}>Lowercase letters, numbers, and hyphens only — auto-formatted as you type</HelperText>
         )}

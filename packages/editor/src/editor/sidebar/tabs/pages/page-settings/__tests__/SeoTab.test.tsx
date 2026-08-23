@@ -228,24 +228,38 @@ describe("SeoTab slug field", () => {
    slug" goes grey on a slug that LOOKS clean — page-4 is lowercase, hyphenated
    and valid — because it is the shape the app itself generates and it earns
    only 20 of the 30 the panel advertises. The banner has to say so. */
-describe("SeoTab — placeholder slug is explained, not just penalised", () => {
-  it("names the placeholder slug and what fixing it is worth", () => {
-    render(<SeoTab s={{ ...makeSettings(), slug: "page-4", seoScore: 30, seoChecks: { titleSet: false, slugClean: false, indexingOn: true, descSet: false } }} page={makePage()} />);
-    const note = screen.getByRole("note");
-    expect(note.textContent).toMatch(/page-4/);
-    expect(note.textContent).toMatch(/placeholder URL/);
-    expect(note.textContent).toMatch(/\+10 pts/);
+describe("SeoTab — a placeholder slug is explained where it is fixed", () => {
+  const settings = (over: Record<string, unknown>) =>
+    ({ ...makeSettings(), seoScore: 30, seoChecks: { titleSet: false, slugClean: false, indexingOn: true, descSet: false }, ...over }) as never;
+
+  it("says so under the slug field, naming the slug and what fixing it is worth", () => {
+    render(<SeoTab s={settings({ slug: "page-4" })} page={makePage()} />);
+    const hint = document.getElementById("seo-slug")?.getAttribute("aria-describedby");
+    expect(hint).toBe("seo-slug-hint");
+    expect(screen.getByText(/is auto-generated/).textContent).toMatch(/page-4/);
+    expect(screen.getByText(/is auto-generated/).textContent).toMatch(/\+10 pts/);
   });
 
-  it("says nothing about placeholders when the slug is a real one", () => {
-    render(<SeoTab s={{ ...makeSettings(), slug: "pricing", seoScore: 30, seoChecks: { titleSet: false, slugClean: true, indexingOn: true, descSet: false } }} page={makePage()} />);
-    expect(screen.getByRole("note").textContent).not.toMatch(/placeholder/);
+  /* The banner stays ONE clause. Chaining the slug reason onto it with a
+     second em-dash turned a 260px amber box into a two-line run-on — caught by
+     looking at the rendered panel, not at the JSX. */
+  it("keeps the reason OUT of the reach-80 banner", () => {
+    render(<SeoTab s={settings({ slug: "page-4" })} page={makePage()} />);
+    const note = screen.getByRole("note").textContent ?? "";
+    expect(note).not.toMatch(/auto-generated/);
+    expect(note.split("—").length).toBeLessThanOrEqual(2);
   });
 
-  /* An empty or rejected slug also greys the tick, and calling THAT a
-     placeholder would be a second wrong explanation. */
-  it("does not call an empty slug a placeholder", () => {
-    render(<SeoTab s={{ ...makeSettings(), slug: "", seoScore: 20, seoChecks: { titleSet: false, slugClean: false, indexingOn: true, descSet: false } }} page={makePage()} />);
-    expect(screen.getByRole("note").textContent).not.toMatch(/placeholder/);
+  it("shows the plain format rule when the slug is a real one", () => {
+    render(<SeoTab s={settings({ slug: "pricing", seoChecks: { titleSet: false, slugClean: true, indexingOn: true, descSet: false } })} page={makePage()} />);
+    expect(screen.queryByText(/is auto-generated/)).toBeNull();
+    expect(screen.getByText(/Lowercase letters/)).toBeTruthy();
+  });
+
+  /* An empty or rejected slug also greys the tick, and calling THAT
+     auto-generated would be a second wrong explanation. */
+  it("does not call an empty slug auto-generated", () => {
+    render(<SeoTab s={settings({ slug: "", seoScore: 20 })} page={makePage()} />);
+    expect(screen.queryByText(/is auto-generated/)).toBeNull();
   });
 });
