@@ -223,3 +223,29 @@ describe("SeoTab slug field", () => {
     expect(screen.queryByRole("alert")).toBeNull();
   });
 });
+
+/* A grey tick with no reason beside it is a puzzle, not advice. "Clean URL
+   slug" goes grey on a slug that LOOKS clean — page-4 is lowercase, hyphenated
+   and valid — because it is the shape the app itself generates and it earns
+   only 20 of the 30 the panel advertises. The banner has to say so. */
+describe("SeoTab — placeholder slug is explained, not just penalised", () => {
+  it("names the placeholder slug and what fixing it is worth", () => {
+    render(<SeoTab s={{ ...makeSettings(), slug: "page-4", seoScore: 30, seoChecks: { titleSet: false, slugClean: false, indexingOn: true, descSet: false } }} page={makePage()} />);
+    const note = screen.getByRole("note");
+    expect(note.textContent).toMatch(/page-4/);
+    expect(note.textContent).toMatch(/placeholder URL/);
+    expect(note.textContent).toMatch(/\+10 pts/);
+  });
+
+  it("says nothing about placeholders when the slug is a real one", () => {
+    render(<SeoTab s={{ ...makeSettings(), slug: "pricing", seoScore: 30, seoChecks: { titleSet: false, slugClean: true, indexingOn: true, descSet: false } }} page={makePage()} />);
+    expect(screen.getByRole("note").textContent).not.toMatch(/placeholder/);
+  });
+
+  /* An empty or rejected slug also greys the tick, and calling THAT a
+     placeholder would be a second wrong explanation. */
+  it("does not call an empty slug a placeholder", () => {
+    render(<SeoTab s={{ ...makeSettings(), slug: "", seoScore: 20, seoChecks: { titleSet: false, slugClean: false, indexingOn: true, descSet: false } }} page={makePage()} />);
+    expect(screen.getByRole("note").textContent).not.toMatch(/placeholder/);
+  });
+});

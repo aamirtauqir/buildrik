@@ -13,7 +13,7 @@ import * as React from "react";
 import { useToast } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../../engine";
 import type { PageItem, DrawerTab } from "../types";
-import { calculateSeoScore } from "../utils/seoScore";
+import { calculateSeoScore, isPlaceholderSlug } from "../utils/seoScore";
 import { normalizeSlug, validateSlug, isSlugDuplicate } from "../utils/slug";
 
 export type SaveState = "clean" | "saving" | "error";
@@ -331,7 +331,10 @@ export function usePageSettings(
   );
   const seoChecks = {
     titleSet: seoTitle.length >= 10,
-    slugClean: !slugError && slug.length > 0,
+    /* Green means the full "+30 pts" the panel advertises is actually earned.
+       It used to mean "valid and non-empty", which is only 20 of them on a
+       placeholder slug — the tick said yes while the score said no. */
+    slugClean: !slugError && slug.length > 0 && !isPlaceholderSlug(slug),
     indexingOn: allowIndex,
     descSet: seoDesc.length >= 50,
   };

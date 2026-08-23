@@ -12,6 +12,7 @@ import { generateContent } from "@/shared/utils/openai";
 import type { PageItem } from "../types";
 import type { UsePageSettingsReturn } from "./usePageSettings";
 import { BK_HELPER_CLASS, BK_HELPER_ERROR_CLASS, BK_LABEL_CLASS, Button, HelperText, Label, Textarea, TextInput, Tooltip } from "@/editor/chrome-ui";
+import { isPlaceholderSlug } from "../utils/seoScore";
 
 interface Props {
   s: UsePageSettingsReturn;
@@ -149,10 +150,19 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
             </div>
           </div>
 
-          {/* Reach 80+ banner — shown when score < 80 and indexing is on */}
+          {/* Reach 80+ banner — shown when score < 80 and indexing is on.
+              Names the specific thing standing between this page and 80, in
+              the order that pays most. A grey tick with no reason beside it is
+              a puzzle, not advice — the slug line exists because "Clean URL
+              slug" can go grey on a slug that looks perfectly clean, and
+              nothing on screen said why. */}
           {s.seoScore < 80 && s.allowIndex && (
             <div className={`tw:px-2.5 tw:py-2 tw:text-[11.5px] ${UI} ${BANNER}`} role="note">
-              Reach 80+ before publishing{s.seoChecks.descSet ? "" : " — add a meta description (+30 pts)"}
+              Reach 80+ before publishing
+              {s.seoChecks.descSet ? "" : " — add a meta description (up to +40 pts)"}
+              {isPlaceholderSlug(s.slug)
+                ? ` — “${s.slug}” reads as a placeholder URL; a descriptive slug ranks better (+10 pts)`
+                : ""}
             </div>
           )}
         </>
