@@ -47,10 +47,11 @@ any edit → markDirty → PROJECT_CHANGED (fan-out hub, Composer.ts:696-710)
 saveProject (BuildrikSyncProvider):
   dual-write sites.saveProject{expectedLastEditedAt} + siteDetail.settings.update (Site-column fields only)
   ├─ OK → baseline lastEditedAt advances; pendingChanges re-emitted
-  ├─ retry ×1 → onSaveError → save pill "Save failed" (clickable retry)
+  ├─ NO auto-retry → onSaveError → save pill "Save failed — retry" (clickable, and it works)
   └─ SAVE_CONFLICT:<ts> → SaveConflictError → window "buildrik:save-conflict"
        → ConflictModal: Reload | Save backup (buildrik-backup-<ts>.json) | Overwrite (adopt token, re-save)
 ```
+- *Walked live 2026-08-24 (`docs/walks/F-A2-save-autosave-conflict.md`): the conflict modal, its three actions and the backup file are all real — the backup is a full 41KB project carrying the unsaved edit that caused the conflict. The `retry ×1` this diagram used to claim was never the shipping path; it belonged to `initBuildrikSync`, deleted 2026-08-19 as uncalled. Not adding one: the chip is honest immediately and a silent retry would delay that.*
 - Data-loss guard: empty tree never auto-saved until content observed this session (2026-06-04 fixture-wipe incident, `BuildrikSyncProvider.ts:86-92,444-474`).
 - ~~⛔ Engine-level autosave has no conflict handling and never clears dirty flag~~ — **mostly stale, verified 2026-08-23**. Conflict handling ships: `SaveConflictError` (`BuildrikSyncProvider.ts:85`) is thrown, caught and given its own state by both save paths — the autosave catch in `useComposerInit` and the manual one in `useSaveCallback`. The dirty half was true until `768e9661`: the dashboard autosave persisted through the sync provider and told the composer nothing, so `composer.isDirty()` stayed true and every page kept its dirty dot over work already on the server. It now calls `composer.markSaved(snapshot)`. What REMAINS true, and is not a defect: `StorageAdapter`'s own 5s localStorage autosave (`:45-57`) still announces nothing — it writes a crash-recovery cache, not a save.
 - Sources: `BuildrikSyncProvider.ts:288-329,457-494`, `AquibraStudio.tsx:278-538`.
