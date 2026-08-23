@@ -17,6 +17,7 @@ import { mirrorUserTemplate, retryTemplateSync } from "../../../services/templat
 import { inverseResolveTokens } from "../../sidebar/tabs/templates/utils/inverseResolveTokens";
 import { snapshotFromComputedStyle } from "../../sidebar/tabs/templates/utils/tokenSnapshot";
 import { DEFAULT_TOKENS } from "../../design-system/constants";
+import { getDefaultPageName } from "@/shared/utils/pageUtils";
 
 export interface UseStudioHandlersParams {
   composer: Composer | null;
@@ -36,7 +37,9 @@ export function useStudioHandlers(params: UseStudioHandlersParams): UseStudioHan
       if (!composer) return;
       composer.beginTransaction("Add Element");
       try {
-        const page = composer.elements.getActivePage() || composer.elements.createPage("Page 1");
+        const page =
+          composer.elements.getActivePage() ||
+          composer.elements.createPage(getDefaultPageName(composer.elements.getAllPages()));
         const root = composer.elements.getElement(page.root.id);
         if (!root) return;
         const def = getBlockDefinitions().find((b) => b.id === block.id);

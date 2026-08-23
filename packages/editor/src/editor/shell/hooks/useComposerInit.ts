@@ -28,6 +28,7 @@ import { isFeatureEnabled } from "@/shared/utils/featureFlags";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { ComponentSchemaAIClient } from "@/engine/designSystem/services";
 import { getAiSubscriptionClient } from "@/services/ai/subscriptionClient";
+import { getDefaultPageName } from "@/shared/utils/pageUtils";
 
 export type ComposerOptions = Partial<ComposerConfig> & {
   project?: {
@@ -298,7 +299,13 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
           }
           if (loadedFromStorage) return;
           const existingPages = inst.elements.getAllPages();
-          if (!existingPages || existingPages.length === 0) inst.elements.createPage("Page 1");
+          /* One condition, one name. This said "Page 1" while Composer's own
+             repair for the same condition said "Home" and `getDefaultPageName`
+             said a third thing — and "Page 1" slugifies to `page-1`, the one
+             slug the SEO score singles out as a placeholder. */
+          if (!existingPages || existingPages.length === 0) {
+            inst.elements.createPage(getDefaultPageName(existingPages ?? []));
+          }
           config?.default?.pages?.forEach((page) => {
             const p = inst.elements.createPage(page.name);
             if (page.component && p.root?.id) {

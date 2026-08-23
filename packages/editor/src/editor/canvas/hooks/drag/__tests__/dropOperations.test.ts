@@ -52,6 +52,7 @@ vi.mock("../../../../../shared/utils/devLogger", () => ({
 
 import { getBlockById, insertBlock } from "../../../../../blocks/blockRegistry";
 import { canNestElement } from "../../../../../shared/utils/nesting";
+import { getDefaultPageName } from "@/shared/utils/pageUtils";
 import {
   findDropTargetElement,
   findValidDropTargetWithFallback,
@@ -99,6 +100,7 @@ function makeStubElement(overrides: Partial<StubElement> & { id: string }): Stub
 interface StubComposer {
   elements: {
     getActivePage: ReturnType<typeof vi.fn>;
+    getAllPages: ReturnType<typeof vi.fn>;
     createPage: ReturnType<typeof vi.fn>;
     getElement: ReturnType<typeof vi.fn>;
     moveElement: ReturnType<typeof vi.fn>;
@@ -129,6 +131,10 @@ function makeStubComposer(opts: {
   const c: StubComposer = {
     elements: {
       getActivePage: vi.fn(() => activePage),
+      /* The fallback derives the page name from the page list rather than
+         restating one — six call sites used to answer "the project has no
+         pages" and gave three different names. */
+      getAllPages: vi.fn(() => []),
       createPage: vi.fn(() => ({ id: "p1", root: { id: "r1" } })),
       getElement: vi.fn((id: string) => elements.get(id) ?? null),
       moveElement: vi.fn(),
@@ -285,7 +291,7 @@ describe("handleBlockDrop", () => {
 
     handleBlockDrop(e, ctx);
 
-    expect(composer.elements.createPage).toHaveBeenCalledWith("Page 1");
+    expect(composer.elements.createPage).toHaveBeenCalledWith(getDefaultPageName([]));
   });
 
   it("returns true + NO_VALID_TARGET when page root cannot be resolved", () => {

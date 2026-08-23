@@ -21,6 +21,7 @@ import { EVENTS } from "../../shared/constants/events";
 import { generateId } from "../../shared/utils/helpers";
 import type { Composer } from "../Composer";
 import type { ElementManagerContext } from "../elements/manager/types";
+import { getDefaultPageName } from "../../shared/utils/pageUtils";
 
 /** sessionStorage key holding the last detected crash record. */
 const CRASH_SENTINEL_KEY = "buildrick:last-crash";
@@ -139,7 +140,7 @@ export class RecoveryManager {
         if (pages.length > 0) {
           this.composer.elements.setActivePage(pages[0].id);
         } else {
-          this.composer.elements.createPage("Home");
+          this.composer.elements.createPage(getDefaultPageName(pages));
         }
       }
 

@@ -24,6 +24,7 @@ import type { MultiDragElement } from "../../../../shared/utils/dragDrop/types";
 import { canNestElement } from "../../../../shared/utils/nesting";
 import type { DropError, DropSuccess } from "../useCanvasDragDrop";
 import type { DropPosition } from "../useDragSession";
+import { getDefaultPageName } from "@/shared/utils/pageUtils";
 
 // =============================================================================
 // TYPES
@@ -395,7 +396,8 @@ export function handleBlockDrop(e: React.DragEvent, ctx: DropContext): boolean {
     composer.beginTransaction("insert-block-drop");
     try {
       const activePage =
-        composer.elements.getActivePage() || composer.elements.createPage("Page 1");
+        composer.elements.getActivePage() ||
+        composer.elements.createPage(getDefaultPageName(composer.elements.getAllPages()));
       const rootElement = composer.elements.getElement(activePage.root.id);
 
       if (!rootElement) {

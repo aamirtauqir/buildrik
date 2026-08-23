@@ -34,6 +34,7 @@ vi.mock("../../../../services/templateSync", () => ({
 import { getBlockDefinitions, insertBlock } from "../../../../blocks/blockRegistry";
 import { canNestElement } from "../../../../shared/utils/nesting";
 import { mirrorUserTemplate, retryTemplateSync } from "../../../../services/templateSync";
+import { getDefaultPageName } from "@/shared/utils/pageUtils";
 
 // ---------------------------------------------------------------------------
 // Mock element / composer factories
@@ -73,6 +74,9 @@ function makeComposer(root: MockElement) {
     exportHTML: vi.fn(() => ({ combined: "<html>x</html>" })),
     elements: {
       getActivePage: vi.fn(() => ({ root: { id: "root-1" } })),
+      /* The default-page name is derived from the page list, not restated at
+         the call site, so the fallback path reads this. */
+      getAllPages: vi.fn(() => []),
       createPage: vi.fn(),
       getElement: vi.fn(() => root),
       removeElement: vi.fn(),
@@ -151,12 +155,14 @@ describe("useStudioHandlers", () => {
       expect(composer.endTransaction).toHaveBeenCalledTimes(1);
     });
 
-    it("creates 'Page 1' when there is no active page", () => {
+    /* Whatever `getDefaultPageName` says, not a name restated here — six call
+       sites answered "the project has no pages" and gave three answers. */
+    it("creates the shared default page when there is no active page", () => {
       const { hook, composer } = mount();
       composer.elements.getActivePage.mockReturnValue(null as never);
       composer.elements.createPage.mockReturnValue({ root: { id: "root-new" } } as never);
       act(() => hook.result.current.handleQuickAdd(BLOCK));
-      expect(composer.elements.createPage).toHaveBeenCalledWith("Page 1");
+      expect(composer.elements.createPage).toHaveBeenCalledWith(getDefaultPageName([]));
     });
   });
 

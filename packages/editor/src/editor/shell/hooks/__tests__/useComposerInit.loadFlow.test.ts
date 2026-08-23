@@ -7,7 +7,7 @@
  *      saveState seeding (P1-3), server-media hydration, success toast.
  *   2. localStorage fallback ladder when no siteId / load fails:
  *      buildrick-project {project} → importProject,
- *      {content} → importHTMLToActivePage, empty → createPage("Page 1")
+ *      {content} → importHTMLToActivePage, empty → createPage(getDefaultPageName([]))
  *      + default pages from options.
  *   3. autosave special-cases SaveConflictError the same way useSaveCallback
  *      does: the conflict dialog opened by BuildrikSyncProvider owns the
@@ -101,6 +101,7 @@ vi.mock("@/services/AssetUploadService", () => ({
   createRemoteAssetSync: vi.fn(() => ({})),
 }));
 
+import { getDefaultPageName } from "@/shared/utils/pageUtils";
 import {
   getSiteIdFromUrl,
   loadProject,
@@ -332,14 +333,18 @@ describe("useComposerInit — localStorage fallback ladder", () => {
     expect(mockComposer.importProject).not.toHaveBeenCalled();
   });
 
-  it("creates 'Page 1' when nothing is saved and the engine has no pages", async () => {
+  /* The name comes from `getDefaultPageName`, not from this call site. It said
+     "Page 1" while Composer's repair for the same condition said "Home" — and
+     "Page 1" slugifies to `page-1`, the shape the SEO score marks as a
+     placeholder, so a fresh project was handed a slug its own panel docked. */
+  it("creates the shared default page when nothing is saved and the engine has no pages", async () => {
     mockComposer.elements.getAllPages.mockReturnValue([] as never);
     renderHook(() => useComposerInit(makeParams()));
     await act(async () => {
       mockComposer.emit("composer:ready");
       await flushMicrotasks();
     });
-    expect(mockComposer.elements.createPage).toHaveBeenCalledWith("Page 1");
+    expect(mockComposer.elements.createPage).toHaveBeenCalledWith(getDefaultPageName([]));
   });
 
   it("creates default pages from options.project.default and seeds their content", async () => {
@@ -387,7 +392,7 @@ describe("useComposerInit — localStorage fallback ladder", () => {
       mockComposer.emit("composer:ready");
       await flushMicrotasks();
     });
-    expect(mockComposer.elements.createPage).toHaveBeenCalledWith("Page 1");
+    expect(mockComposer.elements.createPage).toHaveBeenCalledWith(getDefaultPageName([]));
   });
 });
 

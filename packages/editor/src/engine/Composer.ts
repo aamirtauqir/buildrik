@@ -67,6 +67,7 @@ import { DSLinter } from "./designSystem/linter";
 import { AIAssistService } from "./designSystem/services";
 import { VersionTimelineManager } from "./VersionTimelineManager";
 import { Viewport } from "./Viewport";
+import { getDefaultPageName } from "../shared/utils/pageUtils";
 
 /**
  * From-address for form-submission notifications on published sites. Must stay on
@@ -586,7 +587,7 @@ export class Composer extends EventEmitter {
        rather than minutes later on RecoveryManager's inactivity timer. */
     const pages = this.elements.getAllPages();
     if (pages.length === 0) {
-      this.elements.createPage("Home");
+      this.elements.createPage(getDefaultPageName(pages));
     } else if (!this.elements.getActivePage()) {
       this.elements.setActivePage(pages[0].id);
     }
