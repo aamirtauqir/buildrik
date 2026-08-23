@@ -207,7 +207,12 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
     if (composer) composer.readOnly = readOnlyView;
   }, [composer, readOnlyView]);
 
-  React.useEffect(() => {
+  /* useLayoutEffect, not useEffect: this class now drives LAYOUT as well as the
+     canvas placeholder rules — it collapses the rail column via
+     --layout-rail-width (LayoutShell.css). Under useEffect the browser can
+     paint one frame with the 60px rail track still reserved, i.e. an empty
+     strip beside the canvas, before the class lands. */
+  React.useLayoutEffect(() => {
     const root = document.documentElement;
     if (!readOnlyView) return;
     root.classList.add("bk-read-only-view");
@@ -389,7 +394,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
            trim four header tools and leave every editing surface in place, so an
            owner opening "what my client sees" was shown the full editor.
            (Founder call, 2026-08-23.) */
-        className={readOnlyView ? "layout-shell--read-only-view" : ""}
         drawerOpen={!readOnlyView && isLeftPanelOpen && !effectiveFullPageMode}
         drawerWidth={drawerWidth}
         fullPageMode={!readOnlyView && effectiveFullPageMode && isLeftPanelOpen}

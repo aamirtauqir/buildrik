@@ -65,14 +65,9 @@
     "footer footer footer footer";
 }
 
-/* View mode — the whole editing chrome is gone, so every column but the
-   canvas collapses. The rail column is 60px in the base grid even when no
-   Sidebar slot is passed, which would have left a blank strip. */
-.layout-shell--read-only-view,
-.layout-shell--read-only-view.layout-shell--drawer-open,
-.layout-shell--read-only-view.layout-shell--inspector-open {
-  grid-template-columns: 0px 0px 1fr 0px;
-}
+/* View mode: collapse the rail column. Columns 2 and 4 are already 0px here —
+   StudioPanels passes drawerOpen/inspectorOpen false — so one property does it. */
+html.bk-read-only-view { --layout-rail-width: 0px; }
 
 /* Drawer open state - expand drawer column */
 .layout-shell--drawer-open {
