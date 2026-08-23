@@ -42,7 +42,25 @@ try {
 const live = JSON.parse(scannerOut);
 const baseline = JSON.parse(readFileSync(BASELINE, 'utf8'));
 
-function key(v) { return `${v.path}:${v.line}:${v.message}`; }
+/*
+  A grandfathered violation is identified by WHAT it is, not by where it sits.
+
+  The key used to be `path:line:message`, and the message embeds line numbers
+  too ("defined in 2 files: Canvas.css:533, a11y.css:60"). So editing anything
+  ABOVE a grandfathered violation moved it and the gate reported the very same
+  duplicate as a brand-new one — while also reporting the baseline entry as
+  "removed". This is not hypothetical: `.bd-depth-badge` in Canvas.css drifted
+  533 -> 556 -> 569 across two arcs, and the gate sat red the whole time on a
+  duplicate that was deliberately grandfathered (CLAUDE.md names it as one of
+  the four real concerns: a11y.css is the only file allowed @media (prefers-*),
+  so the second definition is intentional).
+
+  Stripping :NNN from both halves makes the key positional-insensitive. A
+  genuinely new duplicate — a different selector, or the same selector in a
+  different FILE — still changes the key and still fails the gate.
+*/
+const stripLines = (s) => String(s).replace(/:\d+\b/g, "");
+function key(v) { return `${v.path}:${stripLines(v.message)}`; }
 
 let failed = false;
 const updatedBaseline = [];
