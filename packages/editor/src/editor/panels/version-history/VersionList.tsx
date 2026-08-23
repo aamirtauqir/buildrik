@@ -154,7 +154,7 @@ export function VersionRow({
       <div
         ref={rowRef}
         className={`version-row${isDeleteConfirm ? " delete-confirm" : ""}`}
-        aria-label={`Version "${versionDisplayName(version.name)}" from ${relative}`}
+        aria-label={`Version "${versionDisplayName(version)}" from ${relative}`}
         role="listitem"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
@@ -163,7 +163,7 @@ export function VersionRow({
           <div>
             {/* Board 162:2 — "Auto-save", not the engine event id the name
                 is stored as. See versionDisplayName. */}
-            <div className="version-name">{versionDisplayName(version.name)}</div>
+            <div className="version-name">{versionDisplayName(version)}</div>
             <div className="version-meta">
               <span className="version-time">{formatTime(version.createdAt)}</span>
               <span>{relative}</span>
@@ -203,7 +203,7 @@ export function VersionRow({
                 <Button
                   onClick={onCompare}
                   className="action-btn primary"
-                  aria-label={`Compare "${version.name}"`}
+                  aria-label={`Compare "${versionDisplayName(version)}"`}
                 >
                   Compare
                 </Button>
@@ -211,14 +211,14 @@ export function VersionRow({
                   onClick={onRestore}
                   className="action-btn"
                   disabled={isRestoring}
-                  aria-label={`Restore "${version.name}"`}
+                  aria-label={`Restore "${versionDisplayName(version)}"`}
                 >
                   {isRestoring ? "..." : "Restore"}
                 </Button>
                 <Button
                   onClick={onDeleteRequest}
                   className="action-btn danger"
-                  aria-label={`Delete "${version.name}"`}
+                  aria-label={`Delete "${versionDisplayName(version)}"`}
                 >
                   ×
                 </Button>

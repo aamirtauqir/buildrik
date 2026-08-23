@@ -222,7 +222,7 @@ export function VersionHistoryPanel({
     try {
       await deleteVersion(versionId);
       if (expandedId === versionId) setExpandedId(null);
-      if (target) pushToast(`Deleted ${target.name}`, "success");
+      if (target) pushToast(`Deleted ${versionDisplayName(target)}`, "success");
     } catch {
       pushToast("Delete failed", "error");
     }
@@ -341,7 +341,7 @@ export function VersionHistoryPanel({
       {restoreConfirmVersion && (
         <div className={RESTORE_CONFIRM} role="alertdialog" aria-label="Confirm restore">
           <strong className={RESTORE_CONFIRM_TITLE}>
-            Restore “{versionDisplayName(restoreConfirmVersion.name)}”?
+            Restore “{versionDisplayName(restoreConfirmVersion)}”?
           </strong>
           <span className={RESTORE_CONFIRM_SUB}>
             Your current work is saved first — nothing is lost.

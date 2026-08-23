@@ -15,7 +15,20 @@
  * @license BSD-3-Clause
  */
 
-/** Board 162:2's row title. */
-export function versionDisplayName(name: string): string {
-  return /^Auto:\s/.test(name) ? "Auto-save" : name;
+/**
+ * Board 162:2's row title.
+ *
+ * Reads the MODEL, not the string. This sniffed `/^Auto:\s/` until 2026-08-24,
+ * which meant a version a person deliberately named "Auto: launch checklist"
+ * was silently relabelled "Auto-save" — a user's own words overwritten because
+ * they happened to start with a prefix the engine also uses. `NamedVersion`
+ * carries `isAutoCheckpoint`, so the guess was never needed. Codex caught the
+ * collapse while reviewing the label fix; the prefix test was the real bug
+ * underneath it.
+ */
+export function versionDisplayName(version: {
+  name: string;
+  isAutoCheckpoint?: boolean;
+}): string {
+  return version.isAutoCheckpoint ? "Auto-save" : version.name;
 }
