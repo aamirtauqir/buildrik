@@ -67,21 +67,24 @@ describe("CommandPalette", () => {
        They ran document.execCommand, which cannot reach the editor's element
        clipboard, and — because the registry loop dedups by label — they also
        kept the engine's real `copy` and `paste` out of the palette entirely.
-       This stub composer has no registry, so here the two simply go; live the
-       registry supplies them, guarded. */
-    it("with a composer: exactly 22 hardcoded commands, banded the way the boards band them", () => {
+       This stub composer has no registry, so here they simply go; live the
+       registry supplies them, guarded. 22 -> 21 in the same arc when the
+       hardcoded "Delete element" row went the same way — it duplicated the
+       registry's `delete` and, like it, removed exactly one element. */
+    it("with a composer: exactly 21 hardcoded commands, banded the way the boards band them", () => {
       renderPalette();
-      expect(commandButtons()).toHaveLength(22);
+      expect(commandButtons()).toHaveLength(21);
       expect(screen.getByText("Suggested")).toBeInTheDocument();
       for (const internal of ["Navigation", "Edit", "View", "History"]) {
         expect(screen.queryByText(internal)).toBeNull();
       }
       // Representative hardcoded entries (id → label):
       // nav-add → "Open Insert panel", edit-undo → "Undo",
-      // edit-delete → "Delete element", view-zoom-in → "Zoom In",
-      // history-clear → "Clear History".
+      // view-zoom-in → "Zoom In", history-clear → "Clear History".
+      // "Delete element" is deliberately NOT here any more: it comes from the
+      // registry, which this stub composer does not have.
       expect(screen.getByText("Open Insert panel")).toBeInTheDocument();
-      expect(screen.getByText("Delete element")).toBeInTheDocument();
+      expect(screen.queryByText("Delete element")).toBeNull();
       expect(screen.getByText("Zoom In")).toBeInTheDocument();
       expect(screen.getByText("Clear History")).toBeInTheDocument();
       // The list even hardcodes Undo twice (edit-undo + history-undo).
@@ -140,7 +143,7 @@ describe("CommandPalette", () => {
       renderPalette();
       fireEvent.change(searchInput(), { target: { value: "zoom" } });
       fireEvent.change(searchInput(), { target: { value: "" } });
-      expect(commandButtons()).toHaveLength(22);
+      expect(commandButtons()).toHaveLength(21);
     });
   });
 
@@ -160,11 +163,21 @@ describe("CommandPalette", () => {
       expect(onClose).toHaveBeenCalledTimes(1);
     });
 
-    it("'Delete element' removes the first selected element", () => {
-      const { composer } = renderPalette();
+    /* Rewritten 2026-08-23. "removes the FIRST selected element" was the
+       defect, stated as a requirement: the hardcoded row read getSelectedIds()
+       for its guard and then deleted ids[0], so a three-element selection lost
+       one. The row is gone — it duplicated the registry's `delete`, which is
+       multi-aware and transactional now — and the palette runs that. */
+    it("'Delete element' runs the engine command, which takes the whole selection", () => {
+      const run = vi.fn();
+      const composer = {
+        ...makeComposer(),
+        commands: { run, getAll: () => [{ id: "delete", label: "Delete element", run: vi.fn() }] },
+      };
+      render(<CommandPalette onClose={vi.fn()} composer={composer as unknown as Composer} />);
       fireEvent.click(screen.getByText("Delete element"));
-      expect(composer!.selection.getSelectedIds).toHaveBeenCalled();
-      expect(composer!.elements.removeElement).toHaveBeenCalledWith("el-1");
+      expect(run).toHaveBeenCalledWith("delete");
+      expect(composer.elements.removeElement).not.toHaveBeenCalled();
     });
 
     /* Rewritten 2026-08-23. This asserted the bug: Copy was a hardcoded
@@ -396,8 +409,17 @@ describe("CommandPalette", () => {
      reason beside it. "Delete element" used to look live with nothing
      selected, close the palette, and do nothing. */
   describe("disabled commands (board 166:58)", () => {
+    /* The row moved to the registry (it duplicated `delete` and, like it, only
+       removed one element), so the composer needs one — the guard and the
+       board's treatment are unchanged. */
+    const withDelete = (ids: string[]) => ({
+      ...makeComposer(),
+      selection: { getSelectedIds: vi.fn(() => ids), getSelected: vi.fn(() => null) },
+      commands: { run: vi.fn(), getAll: () => [{ id: "delete", label: "Delete element", run: vi.fn() }] },
+    });
+
     it("shows Delete element with its reason when nothing is selected", () => {
-      const composer = { ...makeComposer(), selection: { getSelectedIds: vi.fn(() => []) } };
+      const composer = withDelete([]);
       render(<CommandPalette onClose={vi.fn()} composer={composer as unknown as Composer} />);
       const row = screen.getByText("Delete element").closest("button")!;
       /* aria-disabled, not `disabled`: the row stays reachable so the reason
@@ -407,12 +429,12 @@ describe("CommandPalette", () => {
       expect(row).toHaveTextContent("nothing selected");
 
       fireEvent.click(row);
-      expect(composer.elements.removeElement).not.toHaveBeenCalled();
+      expect(composer.commands.run).not.toHaveBeenCalled();
     });
 
     it("enables it once something is selected", () => {
-      // The shared composer double already has one element selected.
-      renderPalette();
+      const composer = withDelete(["el-1"]);
+      render(<CommandPalette onClose={vi.fn()} composer={composer as unknown as Composer} />);
       expect(
         screen.getByText("Delete element").closest("button"),
       ).not.toHaveAttribute("aria-disabled");

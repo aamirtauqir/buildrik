@@ -17,6 +17,10 @@ function makeComposer() {
     history: { undo: vi.fn(), redo: vi.fn() },
     selection: {
       getSelected: vi.fn(() => null),
+      /* `delete` reads the WHOLE selection since 2026-08-23 — it removed one
+         element out of a multi-selection before. These specs only care that the
+         command ran, so they probe this instead. */
+      getAllSelected: vi.fn(() => [] as unknown[]),
       getSelectedIds: vi.fn(() => [] as string[]),
       select: vi.fn(),
       selectMultiple: vi.fn(),
@@ -198,7 +202,7 @@ describe("shortcut guard (shouldHandleShortcut)", () => {
 
     input.dispatchEvent(new KeyboardEvent("keydown", { key: "Delete", bubbles: true }));
 
-    expect(composer.selection.getSelected).not.toHaveBeenCalled();
+    expect(composer.selection.getAllSelected).not.toHaveBeenCalled();
   });
 
   it("suppresses the delete command inside contenteditable", () => {
@@ -209,7 +213,7 @@ describe("shortcut guard (shouldHandleShortcut)", () => {
 
     div.dispatchEvent(new KeyboardEvent("keydown", { key: "Backspace", bubbles: true }));
 
-    expect(composer.selection.getSelected).not.toHaveBeenCalled();
+    expect(composer.selection.getAllSelected).not.toHaveBeenCalled();
   });
 
   it("runs the delete command when the target is not editable", () => {
@@ -217,7 +221,7 @@ describe("shortcut guard (shouldHandleShortcut)", () => {
 
     document.body.dispatchEvent(new KeyboardEvent("keydown", { key: "Delete", bubbles: true }));
 
-    expect(composer.selection.getSelected).toHaveBeenCalled();
+    expect(composer.selection.getAllSelected).toHaveBeenCalled();
   });
 
   it("lets an app-level modified shortcut through inside an input — ⌘S must save mid-sentence", () => {
@@ -270,7 +274,7 @@ describe("shortcut guard (shouldHandleShortcut)", () => {
 
     item.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
 
-    expect(composer.selection.getSelected).not.toHaveBeenCalled();
+    expect(composer.selection.getAllSelected).not.toHaveBeenCalled();
   });
 
   /* This asserted that a bare ArrowDown outside a widget runs a command,
@@ -285,7 +289,7 @@ describe("shortcut guard (shouldHandleShortcut)", () => {
 
     document.body.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
 
-    expect(composer.selection.getSelected).not.toHaveBeenCalled();
+    expect(composer.selection.getAllSelected).not.toHaveBeenCalled();
   });
 
   it("still runs a bare shortcut it does own, outside a widget", () => {
@@ -293,7 +297,7 @@ describe("shortcut guard (shouldHandleShortcut)", () => {
 
     document.body.dispatchEvent(new KeyboardEvent("keydown", { key: "Delete", bubbles: true }));
 
-    expect(composer.selection.getSelected).toHaveBeenCalled();
+    expect(composer.selection.getAllSelected).toHaveBeenCalled();
   });
 
   /* Was written on ⌘Z, which the engine no longer binds — the shell owns that

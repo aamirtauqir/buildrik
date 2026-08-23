@@ -53,14 +53,24 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
     },
     {
       id: "delete",
-      label: "Delete",
+      /* "Delete element", not "Delete" — the keyboard cheat sheet already calls
+         the Del key that (KeyboardCheatSheet.tsx:74), and the palette's own
+         hardcoded row used the same phrase before it was removed as a
+         duplicate. A bare "Delete" beside page and site actions says nothing
+         about what it deletes. */
+      label: "Delete element",
       shortcut: "delete",
       shortcuts: ["delete", "backspace"],
       run: (c) => {
-        const selected = c.selection.getSelected();
-        if (selected) {
-          c.elements.removeElement(selected.getId());
-        }
+        /* Was `getSelected()` — one element out of a multi-selection, and no
+           transaction, so undoing a three-element delete took three presses.
+           Same defect cut carried; measured live at 49 -> 48 on a
+           three-selection. */
+        const selected = c.selection.getAllSelected();
+        if (selected.length === 0) return;
+        c.beginTransaction("delete");
+        for (const el of selected) c.elements.removeElement(el.getId());
+        c.endTransaction();
       },
     },
     {

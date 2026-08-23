@@ -94,23 +94,15 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
        `copy` and `paste` commands were skipped as duplicates of these two, and
        the only Copy and Paste a user could reach were the broken ones. They
        come from the registry now, guarded like the rest. */
-    {
-      id: "edit-delete",
-      label: "Delete element",
-      group: "Edit",
-      shortcut: "Del",
-      /* Board 166:58: "A command you cannot run is still worth seeing — hiding
-         it means the shortcut someone memorised silently vanishes." With
-         nothing selected this used to close the palette and do nothing at
-         all; now it says why it cannot run, like Undo already did. */
-      disabled: (composer.selection?.getSelectedIds?.() ?? []).length === 0,
-      disabledReason: "nothing selected",
-      handler: () => {
-        const ids = composer.selection?.getSelectedIds?.();
-        if (ids && ids.length > 0) composer.elements.removeElement(ids[0]);
-        onClose();
-      },
-    }
+    /* Delete is not hardcoded either, and for a sharper reason than Copy and
+       Paste: this row AND the registry's `delete` both appeared in the palette
+       — two rows a reader cannot tell apart — and both removed exactly one
+       element. This one checked getSelectedIds() for its guard and then
+       deleted ids[0]. The registry's is multi-aware and transactional now, and
+       carries this row's clearer label. Board 166:58 still governs the
+       disabled treatment ("A command you cannot run is still worth seeing —
+       hiding it means the shortcut someone memorised silently vanishes");
+       registryGuard supplies the reason. */
   );
 
   // 3. View
@@ -188,6 +180,7 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
     if (id === "paste") return composer.clipboard?.length ? undefined : "nothing copied";
     if (
       id === "copy" ||
+      id === "delete" ||
       id === "duplicate" ||
       id === "cut" ||
       id.startsWith("nudge-") ||

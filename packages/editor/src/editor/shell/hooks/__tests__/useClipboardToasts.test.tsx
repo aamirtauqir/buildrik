@@ -16,11 +16,11 @@ import { useClipboardToasts } from "../useClipboardToasts";
  * The second implementation is gone; these lock the pieces that replaced it.
  */
 function fakeComposer() {
-  const handlers: Record<string, Array<() => void>> = {};
+  const handlers: Record<string, Array<(p?: unknown) => void>> = {};
   return {
     composer: {
-      on: (e: string, cb: () => void) => { (handlers[e] ??= []).push(cb); },
-      off: (e: string, cb: () => void) => { handlers[e] = (handlers[e] ?? []).filter((h) => h !== cb); },
+      on: (e: string, cb: (p?: unknown) => void) => { (handlers[e] ??= []).push(cb); },
+      off: (e: string, cb: (p?: unknown) => void) => { handlers[e] = (handlers[e] ?? []).filter((h) => h !== cb); },
     } as unknown as Composer,
     fire: (e: string, payload?: unknown) => (handlers[e] ?? []).forEach((h) => h(payload)),
     count: (e: string) => (handlers[e] ?? []).length,

@@ -250,9 +250,22 @@ describe("clipboard", () => {
 
 describe("delete / duplicate / group", () => {
   it("delete removes the selected element", () => {
-    composer.selection.getSelected.mockReturnValue(makeElement("el-4"));
+    composer.selection.getAllSelected.mockReturnValue([makeElement("el-4")]);
     run("delete");
     expect(composer.elements.removeElement).toHaveBeenCalledWith("el-4");
+  });
+
+  /* Measured live at 49 -> 48 with three elements selected: delete read the
+     PRIMARY element, exactly as cut did, and wrapped nothing in a transaction —
+     so undoing a three-element delete would have taken three presses. */
+  it("delete takes the whole selection, in one transaction", () => {
+    composer.selection.getAllSelected.mockReturnValue([
+      makeElement("el-1"), makeElement("el-2"), makeElement("el-3"),
+    ]);
+    run("delete");
+    expect(composer.elements.removeElement).toHaveBeenCalledTimes(3);
+    expect(composer.beginTransaction).toHaveBeenCalledTimes(1);
+    expect(composer.endTransaction).toHaveBeenCalledTimes(1);
   });
 
   it("duplicate clones every selected id and re-selects the clones", () => {
