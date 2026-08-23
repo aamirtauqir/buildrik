@@ -259,7 +259,6 @@ export const zIndex = {
 export const sizes = {
   handleSize: 8,
   edgeThreshold: 8,
-  minElementSize: 20,
 } as const;
 
 /**

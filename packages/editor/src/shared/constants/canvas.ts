@@ -322,7 +322,6 @@ export const Z_INDEX = {
 export const SIZES = {
   handleSize: 8,
   edgeThreshold: 8,
-  minElementSize: 20,
   borderRadius: {
     sm: 4,
     md: 6,
