@@ -269,8 +269,11 @@ describe("delete / duplicate / group", () => {
     expect(composer.endTransaction).toHaveBeenCalledTimes(1);
   });
 
+  /* getAllSelected, not getSelectedIds: duplicate prunes to top-most elements
+     like copy/cut/delete, because duplicateElement clones a whole subtree and an
+     ancestor plus its selected descendant produced that descendant twice. */
   it("duplicate clones every selected id and re-selects the clones", () => {
-    composer.selection.getSelectedIds.mockReturnValue(["a", "b"]);
+    composer.selection.getAllSelected.mockReturnValue([makeElement("a"), makeElement("b")]);
     const cloneA = makeElement("a2");
     const cloneB = makeElement("b2");
     composer.elements.duplicateElement.mockReturnValueOnce(cloneA).mockReturnValueOnce(cloneB);
@@ -283,7 +286,7 @@ describe("delete / duplicate / group", () => {
   });
 
   it("duplicate of a single id selects the single clone", () => {
-    composer.selection.getSelectedIds.mockReturnValue(["a"]);
+    composer.selection.getAllSelected.mockReturnValue([makeElement("a")]);
     const clone = makeElement("a2");
     composer.elements.duplicateElement.mockReturnValue(clone);
 

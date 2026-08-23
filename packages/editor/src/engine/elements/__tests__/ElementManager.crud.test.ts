@@ -142,22 +142,30 @@ describe("ElementManager.removeElement", () => {
     expect(root.getChildren()).toHaveLength(0);
   });
 
-  it("reassigns selection to the parent when the selected element is deleted", () => {
+  /* Rewritten 2026-08-23. Reassigning to the parent is right and still happens —
+     but NOT when that parent is the page root. Selecting the root is a state
+     nothing can act on: removeElement refuses it by design and copy serialises
+     the entire page as one item. It used to be reachable only on purpose; after
+     ⌘A -> Delete it became the state you were LEFT in, and undo restores the
+     tree but not the selection, so the next Delete no-opped. These two specs
+     deleted a direct child of the page root, which is exactly that case. */
+  it("clears the selection rather than selecting the PAGE ROOT as parent", () => {
     const { composer, manager } = makeEngine();
     const page = manager.createPage("Home");
     const child = manager.createElement("text");
     manager.addElement(child, page.root.id);
 
     composer.selection.getSelected.mockReturnValue(child);
+    /* addElement selects what it adds, so the spy carries setup calls. */
+    composer.selection.select.mockClear();
     manager.removeElement(child.getId());
 
-    expect(composer.selection.select).toHaveBeenCalledTimes(1);
-    const selected = composer.selection.select.mock.calls[0][0] as Element;
-    expect(selected.getId()).toBe(page.root.id);
-    expect(composer.selection.clear).not.toHaveBeenCalled();
+    expect(composer.selection.clear).toHaveBeenCalledTimes(1);
+    expect(composer.selection.select).not.toHaveBeenCalled();
+    void page;
   });
 
-  it("reassigns selection when a DESCENDANT of the deleted element was selected", () => {
+  it("clears when a DESCENDANT was selected and the deleted element sat on the page root", () => {
     const { composer, manager } = makeEngine();
     const page = manager.createPage("Home");
     const parent = manager.createElement("container");
@@ -166,10 +174,41 @@ describe("ElementManager.removeElement", () => {
     manager.addElement(child, parent.getId());
 
     composer.selection.getSelected.mockReturnValue(child);
+    composer.selection.select.mockClear();
     manager.removeElement(parent.getId());
 
+    /* Removing a container walks its children, and each of those reassigns to
+       the container while it still exists — so `select` IS called here. The
+       contract is narrower and this is the whole of it: the page ROOT is never
+       what gets selected. */
+    expect(composer.selection.clear).toHaveBeenCalled();
+    const selectedRoots = composer.selection.select.mock.calls
+      .map((c) => (c[0] as Element | null)?.getId?.())
+      .filter((id) => id === page.root.id);
+    expect(selectedRoots).toEqual([]);
+  });
+
+  /* The reassignment itself is unchanged wherever the parent is a real element:
+     delete something inside a container and that container takes the selection,
+     so the next action still has somewhere to land. */
+  it("still reassigns to the parent when that parent is NOT the page root", () => {
+    const { composer, manager } = makeEngine();
+    const page = manager.createPage("Home");
+    const outer = manager.createElement("container");
+    const inner = manager.createElement("container");
+    const leaf = manager.createElement("text");
+    manager.addElement(outer, page.root.id);
+    manager.addElement(inner, outer.getId());
+    manager.addElement(leaf, inner.getId());
+
+    composer.selection.getSelected.mockReturnValue(leaf);
+    composer.selection.select.mockClear();
+    manager.removeElement(leaf.getId());
+
+    expect(composer.selection.select).toHaveBeenCalledTimes(1);
     const selected = composer.selection.select.mock.calls[0][0] as Element;
-    expect(selected.getId()).toBe(page.root.id);
+    expect(selected.getId()).toBe(inner.getId());
+    expect(composer.selection.clear).not.toHaveBeenCalled();
   });
 
   it("clears selection when the deleted selected element has no parent", () => {

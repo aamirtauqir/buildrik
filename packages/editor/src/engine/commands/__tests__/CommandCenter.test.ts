@@ -13,6 +13,8 @@ import type { CommandData } from "@/shared/types";
 
 function makeComposer() {
   return {
+    /* The read-only gate reads this on the composer. */
+    readOnly: false,
     emit: vi.fn(),
     history: { undo: vi.fn(), redo: vi.fn() },
     selection: {
