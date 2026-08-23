@@ -52,7 +52,7 @@ saveProject (BuildrikSyncProvider):
        → ConflictModal: Reload | Save backup (buildrik-backup-<ts>.json) | Overwrite (adopt token, re-save)
 ```
 - Data-loss guard: empty tree never auto-saved until content observed this session (2026-06-04 fixture-wipe incident, `BuildrikSyncProvider.ts:86-92,444-474`).
-- ⛔ Engine-level autosave has no conflict handling and never clears dirty flag (`StorageAdapter.ts:45-57`, master §13).
+- ~~⛔ Engine-level autosave has no conflict handling and never clears dirty flag~~ — **mostly stale, verified 2026-08-23**. Conflict handling ships: `SaveConflictError` (`BuildrikSyncProvider.ts:85`) is thrown, caught and given its own state by both save paths — the autosave catch in `useComposerInit` and the manual one in `useSaveCallback`. The dirty half was true until `768e9661`: the dashboard autosave persisted through the sync provider and told the composer nothing, so `composer.isDirty()` stayed true and every page kept its dirty dot over work already on the server. It now calls `composer.markSaved(snapshot)`. What REMAINS true, and is not a defect: `StorageAdapter`'s own 5s localStorage autosave (`:45-57`) still announces nothing — it writes a crash-recovery cache, not a save.
 - Sources: `BuildrikSyncProvider.ts:288-329,457-494`, `AquibraStudio.tsx:278-538`.
 
 ### F-A3 · Publish pipeline (end-to-end)
@@ -168,7 +168,7 @@ canUndo requires stack >1 (baseline checkpoint protected); depth 100; RAM-only �
 1. Rail Styles (D) → DesignSystemTab v12: Tokens / Styles / Components / Export sections.
 2. Tokens: 14 kinds; edit → live CSS var on documentElement; per-token undo; lint (no-black, banned purple/violet/indigo, alias depth ≤3, contrast auto-fix to AA 4.5).
 3. Starter themes ×6 (cobalt/stripe/notion/apple/linear/vercel) — restyles tokens, keeps elements.
-4. Apply → `composer.setProjectSettings({designTokens, schemaVersion:4, designPresets})` + markSaved. ⛔ `persistAll` localStorage path serializes only 3/14 kinds (§13 A3).
+4. Apply → `composer.setProjectSettings({designTokens, schemaVersion:4, designPresets})` + markSaved. ~~⛔ `persistAll` localStorage path serializes only 3/14 kinds~~ — **stale, verified 2026-08-23**: `TokenRegistryContext.tsx:197-200` persists all 14, and its own comment records the bug this line describes — "Previously only color/spacing/type were saved, so edits to the other 11 … were silently lost on reload".
 5. Bind in inspector: token chains stored `var(--buildrick-design-<id>)`; Reach strip This item / All like this (blast-radius confirm) / Whole site.
 6. Export: CSS (dark: media|data-attr|off) / JSON / Tailwind (drops dark variants, warned) / ⛔ Figma stub. Import: JSON-only parser, conflict strategies Replace/keep-mine/keep-theirs.
 7. Cross-site brand: "Open Shared theme ↗" **link-out to dashboard only** — no push UI in editor (§12 #7).
@@ -177,7 +177,7 @@ canUndo requires stack >1 (baseline checkpoint protected); depth 100; RAM-only �
 1. Select subtree → context "Save as component" or rail Components (⇧A; MAX 100).
 2. Instantiate from panel → per-instance overrides stored as `#/` position paths.
 3. Variant swap via inspector VariantSection; detach = pro-DS-mode only.
-4. Master edit → sync re-applies overrides (style+attr survive — F1a; content/trait disputed; ⛔ reorder survival F1b deferred; ⛔ "reset to master"/is-overridden UI dead — path-scheme mismatch `#/` vs `/elements/`, §13 A2).
+4. Master edit → sync re-applies overrides (style+attr survive — F1a; content/trait disputed; ⛔ reorder survival F1b deferred; ~~⛔ "reset to master"/is-overridden UI dead — path-scheme mismatch `#/` vs `/elements/`~~ — **stale on both halves, verified 2026-08-23**. The button ships: `VariantSection.tsx:142` "Reset to master" → `composer.components.resetInstance()` (`ComponentManager.ts:457`), which is real, awaited and covered by tests written against board 160:2. The path scheme is unified on `#/` and documented as canonical (`ComponentInstance.ts:59,68`). (A first pass of this walk called the feature dead on the strength of `ComponentInstance.resetOverride()` having zero callers. That method IS dead — it resets ONE property override, a finer-grained thing than the shipped button — but a symbol with no callers is not a feature with no door, and the two were conflated. The dead method is a cleanup item, not a broken flow.)).
 5. Masters mirrored via componentSync → siteComponents.*.
 6. Catalog (27 read-only polished components) inserts via `placeCatalogComponent` one-transaction; ⛔ catalog drag-to-canvas stub; ⛔ ComponentsPanelV2 "+AI" schema → localStorage only, canvas insert unbuilt.
 
