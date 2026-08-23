@@ -182,3 +182,39 @@ capabilities, and that the editor role is never described as unable to publish.
 **Not done, and it is a product decision, not a copy one:** a client invited to
 review a site is given publish rights. Truthful copy is not the same as a
 correct permission model.
+
+## 9. Correction — the toolchain could do it all along
+
+§8 and commit `b67f3dc7` recorded that the Figma frames had to be deleted and
+renamed by hand, because "the Figma MCP surface available here has read tools
+and a capture tool, no delete and no rename".
+
+That was wrong, and the cause was one HTTP header. The installed plugin's own
+config (`~/.claude/plugins/cache/claude-plugins-official/figma/2.2.96/
+server.json`) sends `X-Figma-Plugin-Bundle`. The direct JSON-RPC client did
+not. Without it the server answers `tools/list` with 20 read tools; with it,
+30 — including `use_figma`, `create_new_file`, `upload_assets`,
+`search_design_system` and `get_libraries`.
+
+I read a short tool list and concluded something about Figma. The tool list is
+a fact about the REQUEST.
+
+The client now lives at `scripts/baseline/figma-mcp.mjs` — in the repo rather
+than a scratch directory, so the next session does not rediscover this — and
+its header carries both failure modes: the session tool-registry gap (Figma
+tools absent from the tool list entirely, the server unaffected) and the bundle
+header.
+
+Done with it, read back from Figma afterwards rather than trusted off the
+write's own report:
+
+| node | was | is |
+|---|---|---|
+| `473:2` | `Buildrick` (html-to-design default) | `BL-0109 … site-menu-open … — CURRENT 2026-08-23` |
+| `73:2` | `BL-0109 … site-menu-open … 1440` | same, `— SUPERSEDED 2026-08-23 by 473:2` |
+| `471:2` | `BL-0235 … client-view, read-only …` | `BL-0235 … view-mode (?view=readonly) …` |
+
+`465:2` does not exist — the json had been pointing at a deleted node.
+
+**Left for the founder:** deleting `73:2`. It is marked SUPERSEDED and is
+harmless where it is; deletion is irreversible and was not asked for.
