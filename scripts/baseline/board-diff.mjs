@@ -54,10 +54,29 @@
  *      board sample data is never conformed to literally, only its SHAPE.
  * Until both hold, use this per-board with a chrome region and read the image.
  *
- * It earns its keep even so: that first run found a real drift the property
+ * MEASURED, not asserted. The claim above — that capture fidelity dominates the
+ * number — was then tested by capturing 199:2's state deliberately and getting
+ * it wrong twice:
+ *
+ *   full 47.86%   selecting an element to match the board's highlighted layer
+ *                 row ALSO opened the inspector, which the board does not show
+ *                 (its right panel reads "Select something on the canvas"), and
+ *                 the capture had no consent cookie so a cookie banner sat
+ *                 across the bottom. Both are the harness, not the product.
+ *   full 16.20%   same board, same app, after clearing the selection and
+ *                 setting `buildrik_consent`. Drawer 11.59% -> 9.26%.
+ *
+ * 31.7 points of "drift" was the capture. That is the whole argument for doing
+ * recipes before ranking, and it is why this prints a path to an image next to
+ * every number.
+ *
+ * It earns its keep even so: the first run found a real drift the property
  * probes never reported — the board draws "Saved 2m ago" as a green pill and
  * the app draws a dot plus text, and the board's topbar carries none of the
- * eye / comments / issues icons the app puts there.
+ * eye / comments / issues icons the app puts there. That one turned out to be
+ * a founder decision open since 2026-08-06 (see the rail-drawer-rebuild plan,
+ * "The save chip"), which reading the component's own board 697:461 sharpened:
+ * all six of its variants are tinted pills.
  *
  * @license BSD-3-Clause
  */
