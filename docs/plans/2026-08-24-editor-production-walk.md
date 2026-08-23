@@ -415,3 +415,55 @@ and every §4 UI rule beyond the ones already gated. Same per-increment protocol
 These are recorded here so the next plan inherits them instead of rediscovering
 them. Three prior plans in three days did not carry their predecessors' open
 conditions forward; this one says so out loud.
+
+---
+
+## SHIP gate item 1 — DEPLOYED, 2026-08-24
+
+869 commits are live on `app.buildrick.io`. The gap that made this plan's title
+false is closed.
+
+| step | result |
+|---|---|
+| migrations | **zero schema changes in 869 commits** — `prisma/migrations` and `schema.prisma` untouched since 2026-08-02, so this was code-only and the highest deploy risk never existed |
+| build | ✓ 32.3s, 95/95 static pages |
+| grafts | static ✓ · public ✓ · **openai 2046 files** (the standalone tracer copies none) |
+| baked env | `NEXT_PUBLIC_APP_URL=https://app.buildrick.io`, `UNIFIED_EDITOR=true`. Two `localhost:3000` hits in the bundle are benign — a `window.location.origin` fallback that cannot fire in a browser, and NextAuth's URL-parsing base |
+| local smoke | `/auth` 200, `/` 307 on `PORT=3055` |
+| rsync | 178M / 6518 files to `apps/dashboard-new`, no errors; staging BUILD_ID + openai + server.js verified before the swap |
+| swap | old → `apps/dashboard.old-20260823-160518` |
+| kill | pid 2040086, whose cwd had **followed the mv** into `.old` exactly as the procedure warns. `kill -9`, ranklur (3863252) skipped by cwd filter and left running |
+| respawn | lsnode brought up pid **2610058** on the first curl |
+
+**Verified by BUILD_ID read from the serving process, not by `/auth` 200:**
+`/proc/2610058/cwd/.next/BUILD_ID` = `6DBSkaIG5kclQvXF-PQPu` = this build.
+Previous prod was `IMCNrIwu6tYK4h1t_lNWk`.
+
+**And verified functionally — the actual fixes, not just a newer hash:**
+
+| string | new build | old build |
+|---|---|---|
+| `is auto-generated` (SEO hint added today) | 1 | **0** |
+| `reads as a placeholder` (the run-on removed today) | **0** | — |
+| `up to +40 pts` (banner fix) | 1 | **0** |
+| `read-only: this command changes` (read-only gate) | 1 | — |
+
+The removed wording is absent and its replacement is present, so this is the
+LATEST build, not merely a newer one.
+
+Routes: `/auth` 200 · `/` `/dashboard` `/edit/<id>` 307 (auth gate) ·
+`/share/<bad-token>` 200 (renders its own error state — 200 is expected there).
+No 500s.
+
+Rollback if needed: swap `apps/dashboard.old-20260823-160518` back and kill by cwd.
+
+**Flagged, not acted on:** three `dashboard.old-*` backups now accumulate on a
+volume at 89% (475G free). Deleting them is destructive and is the founder's
+call.
+
+### SHIP gate status
+
+- [x] 1. Deploy the backlog and verify there
+- [ ] 2. F-A1/A2/A3/A6/A7 + U1/U2 walked live, zero open data-loss defects
+- [ ] 3. One real Vercel publish observed end to end in production
+- [ ] 4. Stripe live-mode provisioned (6 vars) — founder step, ~30 min
