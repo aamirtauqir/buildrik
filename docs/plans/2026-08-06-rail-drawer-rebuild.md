@@ -2014,6 +2014,39 @@ from the topbar arc, and it contradicts the board deliberately. Live also reads
 "Saved · just now" where the board has no separator. Both are one call: keep
 D7 rule 4 (and note it on the boards), or conform to the pill.
 
+*Sharpened 2026-08-23, by reading the component's own board rather than the
+shell boards.* `697:461` — the node `SaveStatus.tsx`'s header cites as its
+source — is a COMPONENT_SET named "Save status" with six variants, and **every
+one of them is a tinted pill at radius 9999**:
+
+| variant | board fill | code renders |
+|---|---|---|
+| saved | `#def7ec` green-100 | transparent + grey text |
+| saving | `#f3f4f6` gray-100 | transparent + grey text |
+| unsaved | `#fdfdea` yellow-50 | transparent + grey text |
+| conflict | `#fde8e8` red-100 | `bg-yellow-50` + yellow-800 |
+| offline | `#f3f4f6` gray-100 | `bg-yellow-50` + yellow-800 |
+| error | `#fde8e8` red-100 | `bg-red-100` + red-700 — the one that matches |
+
+So this is not "the shell boards disagree with a component decision". The
+component's own board disagrees, on all six variants, including the two D7
+rule 4 explicitly makes plain.
+
+It also shows a second disagreement that rule 4 does not cover — rule 4 governs
+WHICH states are tinted, not which colour. The board makes `conflict` red and
+`offline` NEUTRAL GREY; the code makes both amber. That reads as separable, and
+it is not: D7 rule 6 arbitrates the topbar's amber budget in StudioHeader
+("warning review pill demotes when an amber save AND amber chip already spend
+the budget"). Take amber off offline and conflict and rule 6 has less to
+arbitrate. One call, not two.
+
+All three colours already exist as tokens — `--bk-success-tint` `#DEF7EC`,
+`--bk-success` `#0E9F6E`, `--bk-success-text` `#057A55` — so conforming needs
+no hex literal and does not touch the Gate 16 ratchet.
+
+Found by `scripts/baseline/board-diff.mjs` on its first run, which is the point
+of that tool: no property probe had ever reported it.
+
 
 **Where does a user open Templates, and where does "new page from template"
 start?** Two holes with one answer. Today the Templates panel opens from the
