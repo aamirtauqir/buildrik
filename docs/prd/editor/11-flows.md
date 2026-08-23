@@ -29,9 +29,9 @@ demo/main.tsx → <AquibraStudio> → StudioSkeleton until composer:ready
      │               ▶ importProject (DOMPurify sanitize per page root, Composer.ts:452-470)
      │               ▶ save pill seeded "Saved · just now" ▶ loadServerMedia (200 assets cap)
      │               ▶ toast "Project loaded / Loaded from dashboard"
-     └──no───▶ engine IndexedDB → localStorage["buildrick-project"] → else create "Page 1"
+     └──no───▶ engine IndexedDB → localStorage["buildrick-project"] → else create getDefaultPageName([]) = "Home"
 ```
-- Auth fail on load: `UNAUTHORIZED` → toast "Session expired / Sign in" → `${DASHBOARD_URL}/auth`; other errors → "Load failed / falling back to local" (`useComposerInit.ts:209-232`).
+- Auth fail on load: `UNAUTHORIZED` → toast **"Session expired. Sign in to load this site from the dashboard — you're seeing local changes for now."** (Dismiss / Sign in / Retry) → `${DASHBOARD_URL}/auth`; other errors → **"Couldn't load this site from the dashboard. You're seeing local changes for now."** (Dismiss / Retry) (`useComposerInit.ts:209-232`). *Copy re-read from the running app 2026-08-24 — the short forms recorded here were never the shipped strings. Walk record: `docs/walks/F-A1-boot-and-project-load.md`.*
 - First-run blank canvas → PageWizard mounts unless `buildrik:page-wizard-dismissed`/starter-seen (`AquibraStudio.tsx:140-161,582-588`).
 - Crash recovery: sessionStorage sentinel `buildrick:last-crash` restores page/root/selection (`recovery/RecoveryManager.ts:26-198`).
 - Sources: `useComposerInit.ts:137-285`, `BuildrikSyncProvider.ts:197-233`.
