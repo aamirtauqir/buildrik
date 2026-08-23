@@ -182,10 +182,11 @@ canUndo requires stack >1 (baseline checkpoint protected); depth 100; RAM-only �
 5. Masters mirrored via componentSync → siteComponents.*.
 6. Catalog (27 read-only polished components) inserts via `placeCatalogComponent` one-transaction; ⛔ catalog drag-to-canvas stub; ⛔ ComponentsPanelV2 "+AI" schema → localStorage only, canvas insert unbuilt.
 
-### U5 · Client editor flow (`?view=client`)
-1. Full reload with param → 4-tool rail + density `fewer` (inspector = first 3 sections + "Show all controls").
-2. Edits identical engine path (no scoped permissions client-side).
-3. Ship = "Send for review" popover: summary + note ≤500 → `reviews.submit` (states idle/sending/sent/error).
+### U5 · View mode (`?view=readonly`) — was "client editor flow"
+*Walked live 2026-08-24 (`docs/walks/U5-view-mode.md`). All three original steps were stale; measured behaviour below.*
+1. ~~Full reload with param → 4-tool rail + density `fewer`~~ — view mode has **no rail at all** and a topbar of `‹ Back to editing`. Chrome is stripped, not trimmed.
+2. ~~Edits identical engine path (no scoped permissions client-side)~~ — **stale as of this session**: `Composer.readOnly` gates every mutating command at the command centre. Measured: with `?view=readonly`, select an element and press Delete and the count does not move (10 → 10). With the legacy `?view=client` it does (10 → 9) — that param no longer means anything and falls through to the ordinary editor. `editorViewMode.ts` records that nothing ever set it, so no link in the wild carries it; the fiction was in this document.
+3. ~~Ship = "Send for review" popover~~ — `StudioHeader.tsx:644` leaves that slot deliberately empty in view mode ("sending a site for review is the owner's act"). `SendForReview` renders from the owner's Review tab (`ReviewTab.tsx:434`).
 4. ~~⛔ No tokenized share link exists~~ — **stale, verified 2026-08-23**: `/share/<token>` and `/review/<token>` both ship (`app/share/[token]`, `app/review/[token]`), and the editor's site menu opens the first through the dashboard's ShareDraftModal. What the URL param is has been renamed accordingly: it is view mode, not a client preview.
 
 ### U6 · Review / approval loop (⛔ broken as designed)
