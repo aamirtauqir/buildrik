@@ -23,7 +23,8 @@
     "dev:clean": "node scripts/dev-clean.mjs",
     "dev:reset": "node scripts/dev-clean.mjs && rm -rf packages/dashboard/.next packages/editor/dist packages/editor/node_modules/.vite",
     "smoke:prod": "node scripts/smoke-deployed.mjs",
-    "audit:links": "node scripts/audit/link-audit.mjs"
+    "audit:links": "node scripts/audit/link-audit.mjs",
+    "gate:baked-flags": "node scripts/check-baked-flags.mjs"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.0.0",
