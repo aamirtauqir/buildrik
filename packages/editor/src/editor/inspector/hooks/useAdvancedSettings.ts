@@ -6,6 +6,7 @@
  */
 
 import * as React from "react";
+import { camelToKebab } from "@/shared/utils/helpers";
 
 // ============================================================================
 // TYPES
@@ -108,16 +109,34 @@ export function useAdvancedSettings(
   // once per element ID change so user collapses aren't overridden on every render.
   React.useEffect(() => {
     if (!elementId || !advancedPropsMap || !styles) return;
+    /* Wait for the styles to arrive before spending the one-shot. `styles` is
+       `{}` on the first render after a selection — useStyleHandlers fills it in
+       an effect that runs later — and `{}` is truthy, so this used to mark the
+       element as done, scan an empty object, find nothing, and return early on
+       every later pass. The auto-expand could not fire for ANY property, which
+       is why the casing bug below sat unnoticed: the second defect hid the
+       first. */
+    if (Object.keys(styles).length === 0) return;
     if (autoExpandedIdsRef.current.has(elementId)) return;
     autoExpandedIdsRef.current.add(elementId);
 
     const groupsToExpand: string[] = [];
     for (const [groupId, props] of Object.entries(advancedPropsMap)) {
       const hasValue = props.some((prop) => {
-        // advancedPropsMap sometimes uses dotted ids (e.g., "position.zIndex"); match
-        // against the tail of the path, which is the CSS property name.
+        /* Two conversions, not one. The registry ids are dotted AND camelCase
+           ("size.minWidth", "position.zIndex"); element styles are keyed in
+           kebab-case and nothing else — measured on a real page, 0 camelCase
+           keys against `border-radius`, `align-items`, `grid-template-columns`.
+           Taking the tail alone fixed the dot and left the casing, so
+           `styles["minWidth"]` was looked up against a kebab map and came back
+           undefined every time. 43 of the registry's 57 advanced properties
+           have a camelCase tail, so the auto-expand never fired for any of
+           them: set a min-width, reopen the inspector, and the group that holds
+           the value you set is collapsed. The 14 single-word ids — visibility,
+           isolation, contain — are spelled the same either way and were the
+           only ones this lookup could ever have matched. */
         const tail = prop.split(".").pop() ?? prop;
-        const val = styles[tail];
+        const val = styles[camelToKebab(tail)] ?? styles[tail];
         return val !== undefined && val !== "" && val !== "0" && val !== "none";
       });
       if (hasValue) groupsToExpand.push(groupId);
