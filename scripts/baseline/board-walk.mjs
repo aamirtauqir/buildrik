@@ -126,9 +126,22 @@ for (const r of recipes) {
         await page.waitForTimeout(1500);
       }
       if (a.selectType) {
+        /* Never the page root. `getAllElements().find(type === "container")`
+           returns it first, and it carries no styles — so an inspector profile
+           captured that way shows every section collapsed because there is
+           nothing in them, which reads exactly like a product defect. It fooled
+           three probes in this arc before it was pinned. */
         const s = await page.evaluate(`(() => { const c = ${COMPOSER}; if (!c) return "no-composer";
-          const el = c.elements.getAllElements().find(e => e.getType() === ${JSON.stringify(a.selectType)});
-          if (!el) return "no-element"; c.selection.select(el); return "selected"; })()`);
+          const rootId = c.elements.getActivePage()?.root?.id;
+          const all = c.elements.getAllElements().filter(e => e.getId() !== rootId);
+          const want = ${JSON.stringify(a.selectType)};
+          const styled = all.filter(e => e.getType() === want);
+          if (styled.length === 0) return "no-element";
+          /* Prefer one that actually has styles set — a profile board is about
+             what the panel shows, and an unstyled element shows nothing. */
+          const el = styled.find(e => Object.keys(e.getStyles?.() ?? {}).length > 0) ?? styled[0];
+          c.selection.select(el);
+          return "selected"; })()`);
         steps.push(`selectType:${a.selectType}=${s}`);
         await page.waitForTimeout(2000);
       }
@@ -167,9 +180,13 @@ for (const r of recipes) {
 
     const shot = join(SHOTS, `${r.nodeId.replace(/:/g, "-")}.png`);
     await page.screenshot({ path: shot });
+    /* A recipe may pin its own region — the inspector profile boards each draw
+       one 300px column, and passing that on the command line for every run is
+       how a region gets applied to the wrong board. */
+    const region = r.region ? r.region.join(",") : regionArg;
     const out = execFileSync("node", [
       join(HERE, "board-diff.mjs"), r.nodeId, shot,
-      ...(regionArg ? ["--region", regionArg] : []),
+      ...(region ? ["--region", region] : []),
       "--out", join(ROOT, ".board-diff", `walk-${r.nodeId.replace(/:/g, "-")}`),
     ], { encoding: "utf8" });
     const pct = Number((out.match(/([\d.]+)% differ/) || [])[1] ?? NaN);

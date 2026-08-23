@@ -160,10 +160,24 @@ const cropMeta = await sharp(liveOut).metadata();
        comparison was a squeezed picture of the canvas against the real rail,
        and it reported 18.85%. Looking at the side-by-side is what caught it;
        the number looked perfectly plausible. */
+/* A region means one of two different things and the board's own size says
+   which. A shell board is a whole 1440-wide screen, so the region names a part
+   of it and BOTH sides get cropped. An inspector profile board IS the 300px
+   column — it is already the region — so only the live capture is cropped and
+   the board is scaled to that crop.
+
+   Getting this wrong is silent in one direction and loud in the other. Cropping
+   only the live side squashed a whole 1440x900 board into a 60x844 strip and
+   printed 18.85% for it. Cropping both sides when the board IS the region asks
+   sharp for a negative width (300 - 1140) and throws, which is how this was
+   found. */
+const boardIsWholeScreen =
+  !region || shot.original_width >= Math.max(region[2] * 1.5, region[0] + region[2] * 0.5);
+
 let boardImg = sharp(boardRaw).resize({
   width: shot.original_width, height: shot.original_height, fit: "fill",
 });
-if (region) {
+if (region && boardIsWholeScreen) {
   const [x, y, w, h] = region;
   boardImg = sharp(await boardImg.png().toBuffer()).extract({
     left: Math.min(x, shot.original_width - 1),
@@ -171,6 +185,9 @@ if (region) {
     width: Math.min(w, shot.original_width - x),
     height: Math.min(h, shot.original_height - y),
   });
+} else if (region) {
+  boardImg = sharp(await boardImg.png().toBuffer())
+    .resize({ width: cropMeta.width, height: cropMeta.height, fit: "fill" });
 }
 await boardImg.png().toFile(boardOut);
 
@@ -188,4 +205,5 @@ const where = region ? ` · region ${regionArg}` : "";
 console.log(`${nodeId} "${board.name}" [${board.family}]`);
 console.log(`  ${(share * 100).toFixed(2)}% differ${shift}${where}`);
 console.log(`  board ${shot.original_width}x${shot.original_height} → ${a.width}x${a.height} · live ${liveMeta.width}x${liveMeta.height} → ${b.width}x${b.height}`);
+console.log(`  board treated as: ${region ? (boardIsWholeScreen ? "a whole screen (both sides cropped)" : "the region itself (live cropped, board scaled)") : "a whole screen (no region)"}`);
 console.log(`  eyes: ${sideBySide}`);
