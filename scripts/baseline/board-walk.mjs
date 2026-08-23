@@ -133,13 +133,18 @@ for (const r of recipes) {
         await page.waitForTimeout(2000);
       }
       if (a.selectTypes) {
+        /* `selectMultiple`, not `selectMany` — the latter does not exist, and
+           the optional-chained `add?.()` fallback this used to carry selected
+           ONE element and still returned "selected:2". Board 66:4 was ranked at
+           47.74% off a single-selection capture. The postcondition is read back
+           from the engine now, so the lie cannot repeat. */
         const s = await page.evaluate(`(() => { const c = ${COMPOSER}; if (!c) return "no-composer";
           const want = ${JSON.stringify(a.selectTypes)};
           const els = want.map(t => c.elements.getAllElements().find(e => e.getType() === t)).filter(Boolean);
           if (els.length < want.length) return "missing:" + (want.length - els.length);
-          if (typeof c.selection.selectMany === "function") c.selection.selectMany(els);
-          else { c.selection.select(els[0]); els.slice(1).forEach(e => c.selection.add?.(e)); }
-          return "selected:" + els.length; })()`);
+          c.selection.selectMultiple(els);
+          const got = c.selection.getAllSelected().length;
+          return got === want.length ? "selected:" + got : "WANTED " + want.length + " GOT " + got; })()`);
         steps.push(`selectTypes=${s}`);
         await page.waitForTimeout(2000);
       }
@@ -150,6 +155,15 @@ for (const r of recipes) {
       }
       if (a.waitMs) await page.waitForTimeout(a.waitMs);
     }
+
+    /* A recipe whose setup failed must NOT produce a number. Every step above
+       reports a string; the ones below mean the editor is not in the board's
+       state, and diffing anyway ranks a screenshot of the wrong screen. This
+       is the failure mode codex named, and it is the same shape as every other
+       "plausible number, wrong picture" in this arc. */
+    const BAD = /^(no-button|no-composer|no-element|miss|missing:|WANTED )/;
+    const failed = steps.filter((t) => BAD.test(t.split("=").pop() ?? ""));
+    if (failed.length) throw new Error(`state not reached: ${failed.join(", ")}`);
 
     const shot = join(SHOTS, `${r.nodeId.replace(/:/g, "-")}.png`);
     await page.screenshot({ path: shot });
