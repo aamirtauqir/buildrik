@@ -17,12 +17,15 @@ interface UseCanvasCommandPaletteParams {
   composer: Composer | null;
   selectedId: string | null;
   clear: () => void;
+  /** View mode. No palette is bound at all — see the effect below. */
+  readOnly?: boolean;
 }
 
 export function useCanvasCommandPalette({
   composer,
   selectedId,
   clear,
+  readOnly = false,
 }: UseCanvasCommandPaletteParams) {
   const [isPaletteOpen, setIsPaletteOpen] = React.useState(false);
   const closePalette = React.useCallback(() => setIsPaletteOpen(false), []);
@@ -30,6 +33,12 @@ export function useCanvasCommandPalette({
 
   // Keyboard shortcut: Cmd+Shift+P toggles, Escape closes
   React.useEffect(() => {
+    /* View mode has no command palette. ⌘K is already withheld there by the
+       shell; this one binds its OWN window listener, so it kept opening —
+       measured 2026-08-23 with ?view=readonly: ⌘K stayed shut and ⌘⇧P opened a
+       full palette. Not binding at all beats rendering a palette whose rows are
+       refused one layer down. */
+    if (readOnly) return;
     const handlePaletteShortcut = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
       if (
@@ -49,7 +58,7 @@ export function useCanvasCommandPalette({
     };
     window.addEventListener("keydown", handlePaletteShortcut);
     return () => window.removeEventListener("keydown", handlePaletteShortcut);
-  }, [isPaletteOpen]);
+  }, [isPaletteOpen, readOnly]);
 
   const commands = React.useMemo<CommandAction[]>(() => {
     if (!composer) return [];
@@ -59,10 +68,19 @@ export function useCanvasCommandPalette({
        engine already owns, and single-element ones at that, so Delete here took
        one element out of a multi-selection and wrapped nothing in a
        transaction. That is the same defect the ⌘K palette carried in two other
-       rows. Zoom is deliberately NOT routed: the registry's zoom-in steps
-       setZoom(+10) while these emit ZOOM_IN, and defaultCommands.ts records
-       that the two already give different numbers (150 vs 110) — collapsing
-       them is a behaviour decision, not a cleanup. */
+       rows.
+
+       Zoom is deliberately NOT routed, but not for the reason first written
+       here. That comment said the two paths give different numbers; they do
+       not — the ZOOM_IN listener does setZoom(current + ZOOM_STEP) with
+       ZOOM_STEP = 10 (Canvas.tsx, config.ts:90), the same step the registry
+       takes. The 150-vs-110 split recorded in defaultCommands.ts comes from the
+       FOOTER's own keyboard handler walking ZOOM_PRESETS
+       (CanvasFooterToolbar.tsx), a third path again. The real reason to leave
+       these emitting is ownership: zoom state lives on the canvas and the
+       events are how it hears about it. Routing them through the engine moves
+       that ownership, which is a decision, not a cleanup. Corrected after
+       codex checked the claim. */
     return [
       {
         id: "undo",

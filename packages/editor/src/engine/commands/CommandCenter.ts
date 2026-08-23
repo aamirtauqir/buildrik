@@ -114,6 +114,22 @@ export class CommandCenter {
     const command = this.commands.get(id);
     if (!command) return;
 
+    /* The read-only gate lives HERE too, not only on the keyboard path.
+       `shouldHandleShortcut` below covers chords; it does nothing for a command
+       invoked by a click. Measured in the running app on 2026-08-23: with
+       `?view=readonly` and composer.readOnly true, `commands.run("delete")`
+       deleted an element and AUTOSAVE WROTE IT TO THE SERVER — 48 rows became
+       47 and survived a reload. Undo could not take it back, because undo is
+       itself a mutating command and the keyboard path refused it.
+       Every caller funnels through run(), so this is the gateway. */
+    if (this.composer.readOnly && MUTATING_COMMANDS.has(id)) {
+      this.composer.emit(EVENTS.COMMAND_ERROR, {
+        id,
+        error: new Error("read-only: this command changes the document"),
+      });
+      return;
+    }
+
     this.composer.emit(EVENTS.COMMAND_BEFORE, { id, options });
 
     try {

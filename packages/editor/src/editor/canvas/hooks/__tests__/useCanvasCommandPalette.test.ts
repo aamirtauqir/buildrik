@@ -141,7 +141,10 @@ describe("useCanvasCommandPalette — commands", () => {
      that reimplementation is the bug: it acted on ONE element out of a
      multi-selection and wrapped nothing in a transaction, the same defect the
      ⌘K palette carried in two other rows. Edit rows run the registry now, which
-     owns the multi-selection handling, the transaction and the read-only gate. */
+     owns the multi-selection handling and the transaction. (An earlier version
+     of this comment also claimed the registry owned the read-only gate — it did
+     not: CommandCenter.run() had no such guard until the same day, only the
+     keyboard path did. It does now.) */
   it("undo/redo run the registry commands", () => {
     const composer = makeComposer();
     const { result } = renderPalette(composer);

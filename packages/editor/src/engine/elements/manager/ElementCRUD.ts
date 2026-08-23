@@ -110,9 +110,17 @@ export class ElementCRUD {
       const isAncestor = selectedElement.isDescendantOf?.(element);
 
       if (isSelected || isAncestor) {
-        // Select parent instead, or clear if no parent
+        /* Select the parent instead — UNLESS that parent is the page root.
+           Selecting the root is a state nothing can act on: removeElement
+           refuses it (see the guard at the top of this method) and copy would
+           serialise the entire page as one item. It used to be reachable only
+           deliberately; after ⌘A -> Delete it became the state you were LEFT in,
+           because the first top-level removal reselects the parent and for a
+           full-page selection that parent is the root. Undo restores the tree
+           but not the selection, so the next Delete no-opped. Found by codex. */
         const parent = element.getParent();
-        if (parent) {
+        const activeRootId = this.ctx.composer.elements.getActivePage()?.root?.id;
+        if (parent && parent.getId() !== activeRootId) {
           this.ctx.composer.selection.select(parent);
         } else {
           this.ctx.composer.selection.clear();

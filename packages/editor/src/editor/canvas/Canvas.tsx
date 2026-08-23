@@ -366,6 +366,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       composer,
       selectedId,
       clear,
+      readOnly,
     });
     const {
       isOpen: isCheatSheetOpen,

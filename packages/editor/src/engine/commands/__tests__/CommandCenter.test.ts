@@ -216,6 +216,33 @@ describe("shortcut guard (shouldHandleShortcut)", () => {
     expect(composer.selection.getAllSelected).not.toHaveBeenCalled();
   });
 
+  /* The read-only gate lived only on the keyboard path. Measured in the running
+     app: with ?view=readonly and composer.readOnly true, commands.run("delete")
+     deleted an element and autosave wrote it to the server — and undo could not
+     take it back, because undo is itself a mutating command and the keyboard
+     path refused it. run() is the gateway every caller funnels through. */
+  it("run() refuses a mutating command on a read-only composer", () => {
+    const { center, composer } = makeCenter();
+    composer.readOnly = true;
+
+    center.run("delete");
+
+    expect(composer.selection.getAllSelected).not.toHaveBeenCalled();
+    expect(composer.emit).toHaveBeenCalledWith(
+      EVENTS.COMMAND_ERROR,
+      expect.objectContaining({ id: "delete" }),
+    );
+  });
+
+  it("run() still allows a command that changes nothing", () => {
+    const { center, composer } = makeCenter();
+    composer.readOnly = true;
+
+    center.run("deselect");
+
+    expect(composer.selection.clear).toHaveBeenCalled();
+  });
+
   it("runs the delete command when the target is not editable", () => {
     const { composer } = makeCenter();
 

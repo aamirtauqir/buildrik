@@ -128,7 +128,13 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
       label: "Duplicate",
       shortcut: "ctrl+d",
       run: (c) => {
-        const ids = c.selection.getSelectedIds();
+        /* Pruned like copy/cut/delete. duplicateElement clones a whole subtree,
+           so an ancestor AND its selected descendant produced the descendant
+           twice — once inside the ancestor's clone, once standalone. It went
+           unnoticed while ⌘A selected only the page root; now that Select All
+           takes every element, ⌘A then ⌘D would have duplicated most of the
+           page several times over. Found by codex. */
+        const ids = topMost(c.selection.getAllSelected()).map((el) => el.getId());
         if (ids.length === 0) return;
         c.beginTransaction("duplicate");
         const clones = ids
