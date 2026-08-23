@@ -365,15 +365,20 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
       id: "select-all",
       label: "Select All",
       shortcut: "ctrl+a",
-      run: (c) => {
-        const page = c.elements.getActivePage();
-        if (page) {
-          const root = c.elements.getElement(page.root.id);
-          if (root) {
-            c.selection.select(root);
-          }
-        }
-      },
+      /* Selected the page ROOT — one container — which is not what Select All
+         means in any editor, and is not what the OTHER Select All in this app
+         did: the canvas palette's row calls selection.selectAll(), which takes
+         every element (measured live: 1 against 47, on the same page). Two rows
+         with the same name and the same ⌘A badge, doing different things.
+
+         The consequences of the root version were quiet rather than loud:
+         ⌘A then Delete did NOTHING (removeElement refuses the page root by
+         design), and ⌘A then Copy put the entire page on the clipboard.
+
+         selection.selectAll() is the honest one and is what this uses now.
+         copy/cut/delete prune to top-most elements, so acting on it behaves the
+         way it reads. */
+      run: (c) => c.selection.selectAll(),
     },
     {
       id: "deselect",

@@ -53,6 +53,16 @@ export function useCanvasCommandPalette({
 
   const commands = React.useMemo<CommandAction[]>(() => {
     if (!composer) return [];
+    /* Edit rows run the REGISTRY, they do not reimplement it. This palette used
+       to call composer.elements.removeElement(selectedId) and
+       duplicateElement(selectedId) straight — a third copy of commands the
+       engine already owns, and single-element ones at that, so Delete here took
+       one element out of a multi-selection and wrapped nothing in a
+       transaction. That is the same defect the ⌘K palette carried in two other
+       rows. Zoom is deliberately NOT routed: the registry's zoom-in steps
+       setZoom(+10) while these emit ZOOM_IN, and defaultCommands.ts records
+       that the two already give different numbers (150 vs 110) — collapsing
+       them is a behaviour decision, not a cleanup. */
     return [
       {
         id: "undo",
@@ -60,7 +70,7 @@ export function useCanvasCommandPalette({
         category: "Edit",
         shortcut: "Cmd+Z",
         icon: "\u21a9",
-        handler: () => composer.history.undo(),
+        handler: () => composer.commands.run("undo"),
       },
       {
         id: "redo",
@@ -68,7 +78,7 @@ export function useCanvasCommandPalette({
         category: "Edit",
         shortcut: "Cmd+Shift+Z",
         icon: "\u21aa",
-        handler: () => composer.history.redo(),
+        handler: () => composer.commands.run("redo"),
       },
       {
         id: "duplicate",
@@ -77,7 +87,7 @@ export function useCanvasCommandPalette({
         shortcut: "Cmd+D",
         icon: "\u29c9",
         requiresSelection: true,
-        handler: () => selectedId && composer.elements.duplicateElement(selectedId),
+        handler: () => composer.commands.run("duplicate"),
       },
       {
         id: "delete",
@@ -86,7 +96,7 @@ export function useCanvasCommandPalette({
         shortcut: "Del",
         icon: "\ud83d\uddd1",
         requiresSelection: true,
-        handler: () => selectedId && composer.elements.removeElement(selectedId),
+        handler: () => composer.commands.run("delete"),
       },
       {
         id: "select-all",
@@ -94,7 +104,7 @@ export function useCanvasCommandPalette({
         category: "Edit",
         shortcut: "Cmd+A",
         icon: "\u2610",
-        handler: () => composer.selection.selectAll(),
+        handler: () => composer.commands.run("select-all"),
       },
       {
         id: "deselect",

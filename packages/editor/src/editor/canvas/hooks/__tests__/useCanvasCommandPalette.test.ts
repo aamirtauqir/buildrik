@@ -22,6 +22,8 @@ function makeComposer() {
       getElement: vi.fn(() => ({ getType: () => "image" })),
     },
     selection: { selectAll: vi.fn() },
+    /* Edit rows go through the registry now, not straight at elements/history. */
+    commands: { run: vi.fn() },
     collab: { manager: { startSession: vi.fn().mockResolvedValue(undefined) } },
     emit: vi.fn(),
   };
@@ -134,17 +136,24 @@ describe("useCanvasCommandPalette — commands", () => {
     expect(result.current.commands).toEqual([]);
   });
 
-  it("undo/redo dispatch to composer.history", () => {
+  /* Rewritten 2026-08-23. These asserted that this palette reimplements the
+     engine — history.undo() directly, removeElement(selectedId) directly — and
+     that reimplementation is the bug: it acted on ONE element out of a
+     multi-selection and wrapped nothing in a transaction, the same defect the
+     ⌘K palette carried in two other rows. Edit rows run the registry now, which
+     owns the multi-selection handling, the transaction and the read-only gate. */
+  it("undo/redo run the registry commands", () => {
     const composer = makeComposer();
     const { result } = renderPalette(composer);
 
     findCommand(result, "undo").handler();
     findCommand(result, "redo").handler();
-    expect(composer.history.undo).toHaveBeenCalledTimes(1);
-    expect(composer.history.redo).toHaveBeenCalledTimes(1);
+    expect(composer.commands.run).toHaveBeenCalledWith("undo");
+    expect(composer.commands.run).toHaveBeenCalledWith("redo");
+    expect(composer.history.undo).not.toHaveBeenCalled();
   });
 
-  it("duplicate/delete require a selection and act on the selected id", () => {
+  it("duplicate/delete run the registry commands, which take the whole selection", () => {
     const composer = makeComposer();
     const { result } = renderPalette(composer, { selectedId: "el-1" });
 
@@ -155,27 +164,32 @@ describe("useCanvasCommandPalette — commands", () => {
 
     duplicate.handler();
     del.handler();
-    expect(composer.elements.duplicateElement).toHaveBeenCalledWith("el-1");
-    expect(composer.elements.removeElement).toHaveBeenCalledWith("el-1");
+    expect(composer.commands.run).toHaveBeenCalledWith("duplicate");
+    expect(composer.commands.run).toHaveBeenCalledWith("delete");
+    expect(composer.elements.removeElement).not.toHaveBeenCalled();
+    expect(composer.elements.duplicateElement).not.toHaveBeenCalled();
   });
 
-  it("duplicate/delete no-op when nothing is selected", () => {
+  /* `requiresSelection` is what greys the row; the registry commands are also
+     no-ops without a selection, so the guard lives in both places on purpose. */
+  it("duplicate/delete are still marked as needing a selection", () => {
     const composer = makeComposer();
     const { result } = renderPalette(composer, { selectedId: null });
 
-    findCommand(result, "duplicate").handler();
-    findCommand(result, "delete").handler();
-    expect(composer.elements.duplicateElement).not.toHaveBeenCalled();
-    expect(composer.elements.removeElement).not.toHaveBeenCalled();
+    expect(findCommand(result, "duplicate").requiresSelection).toBe(true);
+    expect(findCommand(result, "delete").requiresSelection).toBe(true);
   });
 
-  it("select-all calls composer.selection.selectAll; deselect calls the clear prop", () => {
+  it("select-all runs the registry command; deselect calls the clear prop", () => {
     const composer = makeComposer();
     const clear = vi.fn();
     const { result } = renderPalette(composer, { clear });
 
+    /* The registry's select-all now IS selection.selectAll() — it used to select
+       the page root, one container, while this row took every element. Same
+       command, one meaning. */
     findCommand(result, "select-all").handler();
-    expect(composer.selection.selectAll).toHaveBeenCalledTimes(1);
+    expect(composer.commands.run).toHaveBeenCalledWith("select-all");
 
     findCommand(result, "deselect").handler();
     expect(clear).toHaveBeenCalledTimes(1);

@@ -31,7 +31,9 @@ function makeComposer() {
     selection: {
       getSelected: vi.fn(() => null as MockElement | null),
       getSelectedIds: vi.fn(() => [] as string[]),
+      getAllSelected: vi.fn(() => [] as MockElement[]),
       select: vi.fn(),
+      selectAll: vi.fn(),
       selectMultiple: vi.fn(),
       clear: vi.fn(),
     },
@@ -115,8 +117,11 @@ describe("guard / empty paths", () => {
     expect(composer.elements.pasteElement).not.toHaveBeenCalled();
   });
 
-  it("select-all with no active page does nothing", () => {
+  /* SelectionManager.selectAll() makes the no-page decision itself (it returns
+     early without an active page), so the command has nothing left to guard. */
+  it("select-all delegates to SelectionManager, which handles the no-page case", () => {
     run("select-all");
+    expect(composer.selection.selectAll).toHaveBeenCalled();
     expect(composer.selection.select).not.toHaveBeenCalled();
   });
 });

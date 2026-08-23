@@ -39,6 +39,7 @@ function makeComposer() {
       /* copy and cut read the WHOLE selection now; select() keeps the single
          case in multiSelected, so this is the one they both go through. */
       getAllSelected: vi.fn(() => [] as MockElement[]),
+      selectAll: vi.fn(),
       getSelectedIds: vi.fn(() => [] as string[]),
       select: vi.fn(),
       selectMultiple: vi.fn(),
@@ -346,14 +347,15 @@ describe("device presets", () => {
 });
 
 describe("selection + toggles", () => {
-  it("select-all selects the active page root", () => {
-    const root = makeElement("root-9");
-    composer.elements.getActivePage.mockReturnValue({ root: { id: "root-9" } });
-    composer.elements.getElement.mockReturnValue(root);
-
+  /* Rewritten 2026-08-23: "selects the active page root" was the defect stated
+     as the requirement. One container is not Select All — and the canvas
+     palette's own Select All row already took every element (measured live on
+     the same page: 1 against 47). The root version also made ⌘A then Delete do
+     nothing at all, because removeElement refuses the page root by design. */
+  it("select-all hands the whole page to SelectionManager.selectAll", () => {
     run("select-all");
-
-    expect(composer.selection.select).toHaveBeenCalledWith(root);
+    expect(composer.selection.selectAll).toHaveBeenCalled();
+    expect(composer.selection.select).not.toHaveBeenCalled();
   });
 
   it("deselect clears the selection", () => {
