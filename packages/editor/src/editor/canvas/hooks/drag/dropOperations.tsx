@@ -376,7 +376,7 @@ export function handleBlockDrop(e: React.DragEvent, ctx: DropContext): boolean {
   const blockData = e.dataTransfer.getData("block");
   if (!blockData) return false;
 
-  const { composer, canvasRef, freshTargetId, onDropError, onDropSuccess } = ctx;
+  const { composer, canvasRef, freshTargetId, freshDropPosition, onDropError, onDropSuccess } = ctx;
 
   try {
     const block = JSON.parse(blockData);
@@ -424,6 +424,49 @@ export function handleBlockDrop(e: React.DragEvent, ctx: DropContext): boolean {
       if (resolved.success && resolved.result) {
         parentElement = resolved.result.parent;
         dropIndex = resolved.result.index;
+
+        /* Honour the before/after the user was SHOWN. This branch never read
+           `freshDropPosition` at all: the resolver computed it, the overlay drew
+           a line at the target's top or bottom edge, and then the block was
+           placed wherever `findValidDropTargetWithFallback` happened to say.
+           Walked live — drop at 2px into a 24px heading (the 25% edge zone),
+           `bd-drop-position-line` renders at the heading's TOP edge, and the
+           block lands AFTER it.
+
+           Only applied when the resolved parent is the target's OWN parent.
+           `findValidDropTarget` walks up until it finds something that can host
+           this element type, and once it has moved to a different parent the
+           target's index says nothing about where the user pointed. */
+        if ((freshDropPosition === "before" || freshDropPosition === "after") && targetEl) {
+          /* An EDGE means "beside this element", and that has to hold even when
+             the element could have hosted the block. `findValidDropTarget`
+             prefers hosting, so a container/card/column that accepts the block
+             resolves to `parent = target, index = undefined` — and the first
+             version of this fix, which only ran when the resolved parent was
+             the target's PARENT, never fired there. Codex caught it: the line
+             still promised before/after and the block still went inside.
+
+             So: if the resolver chose the target itself, step out to the
+             target's parent and take the sibling slot. `canNestElement` runs
+             below on whatever parent we end up with, so an illegal placement is
+             still refused rather than forced. */
+          const resolvedIsTarget = parentElement.getId() === targetEl.getId();
+          const siblingParent = resolvedIsTarget ? targetEl.getParent?.() : parentElement;
+
+          if (
+            siblingParent &&
+            (resolvedIsTarget || siblingParent.getId() === targetEl.getParent?.()?.getId())
+          ) {
+            const siblings = siblingParent.getChildren?.() || [];
+            const targetIndex = siblings.findIndex(
+              (sib: GrapesElement) => sib.getId() === targetEl?.getId()
+            );
+            if (targetIndex >= 0) {
+              parentElement = siblingParent;
+              dropIndex = freshDropPosition === "before" ? targetIndex : targetIndex + 1;
+            }
+          }
+        }
 
         // Clear column placeholder text
         const targetClasses = parentElement.getClasses?.() || [];

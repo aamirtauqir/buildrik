@@ -59,9 +59,9 @@ one — the exact discipline this walk applies to everything else.
 
 ## Not covered
 
-Drag-to-canvas (snap guides 5px, 25% edge drop zones, 500ms touch long-press),
-the smart parent walk-up and its nesting-error toast, the 300ms debounced style
-write, per-breakpoint override behaviour, and pseudo-state pills.
+The smart parent walk-up and its nesting-error toast, the 300ms debounced style
+write, per-breakpoint override behaviour, pseudo-state pills, and drag-to-canvas's
+remaining two claims (snap guides 5px, 500ms touch long-press).
 
 **Inline text edit and the right-click context menu are worked below** — they
 were the first two of this list to be walked live, on 2026-08-24.
@@ -148,4 +148,89 @@ Also carried, not fixed: the previously-written bare `sessionStorage` key
 becomes dead session data. No user-visible regression, because `TemplatesTab`
 rehydrates from `page.meta.appliedTemplates` on mount; the only edge case is
 state that existed ONLY in the old key and nowhere in page meta.
+
+## 2026-08-24 — drag-to-canvas: the editor showed one placement and made another
+
+Third of U2's unwalked surfaces. The basics hold: 85 draggable items in the
+Insert panel, a drag from the panel to the canvas takes the tree from 33 to 34
+elements, drop overlays appear mid-drag, and the drop target resolves to exactly
+the element under the cursor.
+
+**The defect is the 25% edge zone.** Dropping into the top quarter of an element
+is supposed to place the new block BEFORE it. Measured on a 24px heading, cursor
+2px in — well inside the 6px edge:
+
+```
+indicator line : {"top":301,"h":2,"cls":"bd-drop-position-line"} → the heading's TOP edge, i.e. BEFORE
+landed         : AFTER
+```
+
+The line the user is looking at and the placement they get are different things.
+
+**Why.** The rule itself is implemented and correct — `calculateDropPosition`
+returns `"before"` when `relativeY < height * 0.25`, the resolver calls it with
+`0.25`, and the overlay draws from that. The engine is correct too:
+`addChild(child, index)` splices at `index`, which is genuine before-semantics.
+
+`handleBlockDrop` — the path for a NEW block from the Insert panel — simply
+never read it. Its destructure was
+`{ composer, canvasRef, freshTargetId, onDropError, onDropSuccess }`, with no
+`freshDropPosition` in it, and the index came from whatever
+`findValidDropTargetWithFallback` returned. `handleTemplateDrop`, ten lines
+away, honours the position properly. One of the two paths was finished.
+
+**Fixed:** when the position is before/after **and** the resolved parent is the
+target's own parent, the index comes from the target's slot among its siblings.
+The parent check matters — `findValidDropTarget` walks UP until it finds
+something that can host the element type, and once it has moved to a different
+parent the target's index says nothing about where the user pointed.
+
+**Verified live, same probe, after:** `indicator promised BEFORE, landed BEFORE`.
+
+### Harness note — the jiggle, and a defect I nearly invented
+
+Before the real finding, this walk produced a much more alarming one: *"the app
+resolves the drop target to an ancestor `<SECTION>` spanning 100..1247 while the
+cursor is over a heading at 302..326"*. That would have been a serious bug. It
+was not true.
+
+A synthetic `mouse.move(..., {steps: 14})` emits only about **four** `dragover`
+events, and the resolver throttles at 50ms — so a single sample after the move
+reads whichever resolution was made part-way along the path, over whatever the
+cursor happened to pass. Adding six 1px jiggles **at** the target, so the last
+`dragover` fires from the final position, made the app and the cursor agree
+immediately.
+
+Sixth null-or-wrong reading this session that turned out to be the probe. The
+rule that keeps paying: never write up the first reading.
+
+(Also confirmed on the way: `dragstart:1, dragover:5, drop:1` — the synthetic
+drag really does drive the shipping HTML5 path, so what is measured here is what
+ships.)
+
+### Codex review — the fix was half a fix
+
+`findValidDropTarget` **prefers hosting**. A container, card or column that can
+accept the block resolves to `parent = target, index = undefined` — and the
+first version of this fix only ran when the resolved parent was the target's
+PARENT, so it never fired there at all. Drag a paragraph 2px into the top edge
+of a container that accepts paragraphs: the line still promised before, the
+block still went inside. The same defect, in the other half of the cases.
+
+An edge means "beside this element", and that has to hold even when the element
+could have hosted it. The fix now steps out to the target's parent and takes the
+sibling slot in that case. `canNestElement` still runs on whatever parent it
+ends up with, so an illegal placement is refused rather than forced.
+
+Codex also confirmed what the questions were aimed at: `dropIndex` is a
+pre-insert slot, `before` at index 0 and `after` at the last index both behave,
+the `getId()` parent-identity check matches the engine's identity model, and
+there is no transaction-boundary race — the index is computed and consumed
+synchronously with nothing mutating sibling order in between.
+
+**Not verified live:** the container-edge case. This site's canvas is built from
+spans and headings — there is no DIV/SECTION with children in the viewport band
+to aim at, and building that fixture was not paid for here. It is covered by two
+unit tests, both negative-tested: disabling the step-out drops exactly the
+edge-on-a-container case and nothing else.
 

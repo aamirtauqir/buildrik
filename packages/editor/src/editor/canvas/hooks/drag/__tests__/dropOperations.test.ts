@@ -212,6 +212,135 @@ afterEach(() => {
 // handleBlockDrop
 // =============================================================================
 
+describe("handleBlockDrop — the position it SHOWED is the position it uses", () => {
+  /* This branch never read `freshDropPosition`. The resolver computed it and
+     the overlay drew `bd-drop-position-line` at the target's top or bottom
+     edge — and then the block went wherever `findValidDropTargetWithFallback`
+     happened to say. Walked live on 2026-08-24: drop 2px into a 24px heading
+     (inside the 25% edge zone), the line renders at the heading's TOP, and the
+     block lands AFTER it. */
+  function sceneWithSiblings() {
+    const parent = makeStubElement({ id: "parent", getType: () => "container" });
+    const a = makeStubElement({ id: "a", getParent: () => parent });
+    const target = makeStubElement({ id: "target", getParent: () => parent });
+    const c = makeStubElement({ id: "c", getParent: () => parent });
+    (parent as { getChildren: () => StubElement[] }).getChildren = () => [a, target, c];
+
+    const elements = new Map<string, StubElement>([
+      ["r1", makeStubElement({ id: "r1" })],
+      ["parent", parent],
+      ["target", target],
+    ]);
+    const composer = makeStubComposer({ elements });
+    vi.mocked(getBlockById).mockReturnValue({ id: "heading", label: "Heading", elementType: "heading" } as never);
+    vi.mocked(findValidDropTargetWithFallback).mockReturnValue({
+      success: true,
+      result: { parent, index: undefined, position: "last" },
+      elementsChecked: 1,
+    } as never);
+    return { composer, parent };
+  }
+
+  const droppedIndex = () => vi.mocked(insertBlock).mock.calls.at(-1)?.[3];
+
+  it("inserts BEFORE the target when the line said before", () => {
+    const { composer } = sceneWithSiblings();
+    const ctx = makeDropContext(composer, { freshTargetId: "target", freshDropPosition: "before" });
+    handleBlockDrop(makeDragEvent({ block: JSON.stringify({ id: "heading" }) }), ctx);
+    expect(droppedIndex()).toBe(1);
+  });
+
+  it("inserts AFTER the target when the line said after", () => {
+    const { composer } = sceneWithSiblings();
+    const ctx = makeDropContext(composer, { freshTargetId: "target", freshDropPosition: "after" });
+    handleBlockDrop(makeDragEvent({ block: JSON.stringify({ id: "heading" }) }), ctx);
+    expect(droppedIndex()).toBe(2);
+  });
+
+  it("leaves the resolver's index alone for an inside drop", () => {
+    const { composer } = sceneWithSiblings();
+    const ctx = makeDropContext(composer, { freshTargetId: "target", freshDropPosition: "inside" });
+    handleBlockDrop(makeDragEvent({ block: JSON.stringify({ id: "heading" }) }), ctx);
+    expect(droppedIndex()).toBeUndefined();
+  });
+
+  /* The resolver PREFERS hosting: a container that accepts the block resolves
+     to `parent = target, index = undefined`. An edge drop still means "beside
+     this element", so it has to step out to the target's parent — the first
+     version of the fix only ran when the resolved parent was the target's
+     parent, and never fired here. (Codex review, 2026-08-24.) */
+  it("steps out of a host-capable target when the user pointed at its EDGE", () => {
+    const root = makeStubElement({ id: "root", getType: () => "container" });
+    const before = makeStubElement({ id: "before", getParent: () => root });
+    const host = makeStubElement({ id: "host", getType: () => "container", getParent: () => root });
+    (root as { getChildren: () => StubElement[] }).getChildren = () => [before, host];
+    (host as { getChildren: () => StubElement[] }).getChildren = () => [];
+
+    const elements = new Map<string, StubElement>([["r1", makeStubElement({ id: "r1" })], ["host", host]]);
+    const composer = makeStubComposer({ elements });
+    vi.mocked(getBlockById).mockReturnValue({ id: "text", label: "Text", elementType: "text" } as never);
+    // the resolver picks the target ITSELF, because it can host the block
+    vi.mocked(findValidDropTargetWithFallback).mockReturnValue({
+      success: true,
+      result: { parent: host, index: undefined, position: "last" },
+      elementsChecked: 1,
+    } as never);
+
+    const ctx = makeDropContext(composer, { freshTargetId: "host", freshDropPosition: "before" });
+    handleBlockDrop(makeDragEvent({ block: JSON.stringify({ id: "text" }) }), ctx);
+
+    const call = vi.mocked(insertBlock).mock.calls.at(-1);
+    expect(call?.[2]).toBe("root");  // parent stepped out to the target's parent
+    expect(call?.[3]).toBe(1);       // and took the target's own slot
+  });
+
+  it("still drops INSIDE a host-capable target when the cursor was in its middle", () => {
+    const root = makeStubElement({ id: "root", getType: () => "container" });
+    const host = makeStubElement({ id: "host", getType: () => "container", getParent: () => root });
+    (root as { getChildren: () => StubElement[] }).getChildren = () => [host];
+    (host as { getChildren: () => StubElement[] }).getChildren = () => [];
+
+    const elements = new Map<string, StubElement>([["r1", makeStubElement({ id: "r1" })], ["host", host]]);
+    const composer = makeStubComposer({ elements });
+    vi.mocked(getBlockById).mockReturnValue({ id: "text", label: "Text", elementType: "text" } as never);
+    vi.mocked(findValidDropTargetWithFallback).mockReturnValue({
+      success: true,
+      result: { parent: host, index: undefined, position: "last" },
+      elementsChecked: 1,
+    } as never);
+
+    const ctx = makeDropContext(composer, { freshTargetId: "host", freshDropPosition: "inside" });
+    handleBlockDrop(makeDragEvent({ block: JSON.stringify({ id: "text" }) }), ctx);
+
+    const call = vi.mocked(insertBlock).mock.calls.at(-1);
+    expect(call?.[2]).toBe("host");
+    expect(call?.[3]).toBeUndefined();
+  });
+
+  /* `findValidDropTarget` walks UP until it finds something that can host this
+     element type. Once it has moved to a different parent, the target's index
+     says nothing about where the user pointed — so before/after must not be
+     applied against a parent the target does not belong to. */
+  it("ignores before/after when the resolved parent is not the target's parent", () => {
+    const parent = makeStubElement({ id: "parent" });
+    const other = makeStubElement({ id: "other", getType: () => "container" });
+    const target = makeStubElement({ id: "target", getParent: () => parent });
+    (other as { getChildren: () => StubElement[] }).getChildren = () => [];
+    const elements = new Map<string, StubElement>([["r1", makeStubElement({ id: "r1" })], ["target", target]]);
+    const composer = makeStubComposer({ elements });
+    vi.mocked(getBlockById).mockReturnValue({ id: "heading", label: "Heading", elementType: "heading" } as never);
+    vi.mocked(findValidDropTargetWithFallback).mockReturnValue({
+      success: true,
+      result: { parent: other, index: 7, position: "last" },
+      elementsChecked: 2,
+    } as never);
+
+    const ctx = makeDropContext(composer, { freshTargetId: "target", freshDropPosition: "before" });
+    handleBlockDrop(makeDragEvent({ block: JSON.stringify({ id: "heading" }) }), ctx);
+    expect(droppedIndex()).toBe(7);
+  });
+});
+
 describe("handleBlockDrop", () => {
   it("returns false when dataTransfer has no block payload", () => {
     const composer = makeStubComposer();
