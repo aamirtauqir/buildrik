@@ -19,7 +19,7 @@
  */
 import { describe, it, expect, vi } from "vitest";
 import { insertBlock } from "../blockRegistry";
-import { getDefaultStyles } from "../../shared/constants/defaultStyles";
+import { getDefaultStyles, THEME } from "../../shared/constants/defaultStyles";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 function fakeElement(type: string, tagName: string, existing: Record<string, string> = {}) {
@@ -54,8 +54,15 @@ const headingBlock = { id: "heading", label: "Heading", elementType: "heading", 
 /* The site paints these from its design tokens (`siteFontCSS`). An element style
    is emitted INLINE and beats that layer outright, so seeding them would strand
    every newly inserted block on the shipped defaults — changing the brand font
-   or text colour would no longer reach it. */
+   or text colour would no longer reach it.
+
+   `color` only counts when the default restates the BODY text colour, which is
+   the only colour `siteFontCSS` paints. A heading's default is exactly that; a
+   button's is white and a link's is the accent, and those are the element's own
+   design — see the two tests at the bottom. */
 const TOKEN_OWNED = ["font-family", "color"];
+
+const buttonBlock = { id: "button", label: "Button", elementType: "button", content: '<button class="btn">Click Me</button>' } as any;
 
 describe("a catalog block gets its type's default styles", () => {
   it("seeds a dropped heading instead of leaving it style-less", () => {
@@ -96,6 +103,31 @@ describe("a catalog block gets its type's default styles", () => {
     root.__kids.push(item);
     insertBlock(composerWith([root]), { id: "list", label: "List", elementType: "list", content: "<ul><li>One</li></ul>" } as any, "parent");
     expect(Object.keys(item.__styles)).toEqual([]);
+  });
+
+  /* The Basic Button ships as `<button class="btn">` with no inline style at
+     all. Withholding `color` outright kept its accent BACKGROUND and dropped its
+     white TEXT — dark body text on a blue button. */
+  it("keeps a colour the site does not paint, like the button's white text", () => {
+    const el = fakeElement("button", "button");
+    insertBlock(composerWith([el]), buttonBlock, "parent");
+    const expected = getDefaultStyles("button", "button");
+    expect(expected.color).toBe("#ffffff");
+    expect(expected.color).not.toBe(THEME.textPrimary);
+    expect(el.__styles.color).toBe("#ffffff");
+    expect(el.__styles["background-color"]).toBe(expected["background-color"]);
+  });
+
+  /* `style="padding:10px 20px"` parses to the single key `padding`, so a plain
+     getStyle("padding-left") reads undefined. Seeding a token longhand after it
+     wins the cascade and eats the block's authored sides. */
+  it("treats an authored shorthand as covering the longhands it sets", () => {
+    const el = fakeElement("button", "button", { padding: "10px 20px" });
+    insertBlock(composerWith([el]), buttonBlock, "parent");
+    expect(getDefaultStyles("button", "button")["padding-left"]).toBeTruthy();
+    expect(el.__styles["padding-left"]).toBeUndefined();
+    expect(el.__styles["padding-right"]).toBeUndefined();
+    expect(el.__styles.padding).toBe("10px 20px");
   });
 
   /* The caller wraps this in a try/catch that turns any throw into "the block

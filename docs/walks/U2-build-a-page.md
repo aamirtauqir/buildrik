@@ -576,3 +576,45 @@ descendant walk, and removing the seeding call each fail a distinct test).
 **Still open, unchanged:** the site's own H1 carries `font-size: 52px` in its data
 and renders 52px while the inspector's Font size field reads `inherit` and is
 disabled. Unexplained; not touched by this fix.
+
+### Second codex pass — two more, both real, both mine
+
+The narrowed version above went back through review and came back with two
+defects that the first pass had not reached. Verified against the code before
+acting on either.
+
+**The `color` carve-out was too broad, and it broke buttons.** `siteFontCSS`
+paints exactly three rules: `body{font-family,color}`, `h1..h6{font-family}` and
+`code,pre,kbd,samp{font-family}`. So the site owns `font-family` everywhere, but
+it owns only the **body** text colour. Withholding `color` outright therefore
+withheld colours the site never paints. The Basic Button ships as
+`<button class="btn">Click Me</button>` with no inline style at all: it kept its
+seeded accent BACKGROUND and lost its white TEXT — dark body text on a blue
+button. The Basic Link (`<a href="#">Link</a>`) lost its accent entirely.
+
+The rule is now the distinction itself: `color` is the site's only when the
+default restates the body colour (`THEME.textPrimary`). Measured after the fix:
+
+```
+button : styles color #ffffff · background-color #1A56DB
+         computed rgb(255,255,255) on rgb(26,86,219)
+link   : styles color #1A56DB → computed rgb(26,86,219)
+```
+
+**"Only fill gaps" did not understand shorthands.** Inline styles are parsed as
+written, so `style="padding:8px"` becomes the single key `padding` and
+`getStyle("padding-left")` reads undefined. The seeding then appended a token
+`padding-left` AFTER it, and the later key wins — the block's own authored
+padding silently lost its sides. It hits every shipped block that declares a
+`padding` shorthand: `submit`, `cart-button`, and six Forms inputs. A
+longhand→shorthand map now covers it; `border`/`border-radius` is deliberately
+NOT a pair, because `border` does not set radius. Measured on the Email input:
+
+```
+styles : padding 8px · border 1px solid #ccc · border-radius 4px · width 100%
+         (+ font-size, height, background-color seeded)
+computed padding: 8px 8px 8px 8px       ← authored shorthand intact
+```
+
+Tests are now 7, negative-tested three ways again: withholding `color` always,
+withholding it never, and dropping the shorthand guard each fail a distinct test.

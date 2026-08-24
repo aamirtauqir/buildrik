@@ -5,7 +5,7 @@
  */
 import type { Composer } from "../engine";
 import type { Element as EngineElement } from "../engine/elements/Element";
-import { getDefaultStyles } from "../shared/constants/defaultStyles";
+import { getDefaultStyles, THEME } from "../shared/constants/defaultStyles";
 import type { ElementType } from "../shared/types";
 import { sanitizeHTML } from "../shared/utils/html";
 import { canNestElement } from "../shared/utils/nesting";
@@ -267,16 +267,58 @@ export function insertBlock(
 
 /** The three shapes a block can take. Split out so `insertBlock` has one exit. */
 /**
- * Properties the SITE owns, not the element.
+ * Does the SITE paint this property, rather than the element?
  *
- * `siteFontCSS` paints `font-family` and the body text `color` from the design
- * tokens. An element style is emitted INLINE, which beats that layer outright —
- * so seeding these two would mean every newly inserted heading and paragraph
- * stopped following the site's brand font and text colour, and changing the
- * brand would no longer reach them. A worse bug than the one being fixed.
- * (Codex review, 2026-08-24.)
+ * `siteFontCSS` emits three rules: `body{font-family,color}`,
+ * `h1..h6{font-family}` and `code,pre,kbd,samp{font-family}`. An element style
+ * is emitted INLINE and beats all of them, so seeding one of those properties
+ * freezes a newly inserted block onto the shipped default — change the brand
+ * font afterwards and it never reaches anything dropped from the catalog.
+ *
+ * `font-family` is therefore always the site's. `color` is NOT: the site paints
+ * only the BODY text colour, so a default that merely restates it
+ * (`THEME.textPrimary`) is the site's, while a default that names a different
+ * colour is the element's own design. The first version of this carve-out
+ * withheld `color` outright and broke exactly that distinction — the Basic
+ * Button ships as `<button class="btn">` with no inline style, so it kept its
+ * accent BACKGROUND and lost its white TEXT, and the Basic Link lost its accent
+ * entirely. (Codex review, 2026-08-25, second pass.)
  */
-const TOKEN_OWNED_PROPS = new Set(["font-family", "color"]);
+function isSiteOwned(prop: string, value: string): boolean {
+  if (prop === "font-family") return true;
+  return prop === "color" && value === THEME.textPrimary;
+}
+
+/**
+ * The shorthand that would already have set each longhand we seed.
+ *
+ * Inline styles are parsed as written: `style="padding:8px"` becomes the single
+ * key `padding`, so a plain `getStyle("padding-left")` reads undefined and the
+ * seeding below would add a token `padding-left` AFTER it. Later key wins, so
+ * the block's authored padding silently lost its sides — measurable on
+ * SubmitButton, CartButton and six Forms inputs, all of which ship a `padding`
+ * shorthand. Only the pairs that really do cascade are listed: `border` does
+ * not set `border-radius`, so that pair is deliberately absent.
+ */
+const SHORTHAND_FOR: Record<string, string> = {
+  "padding-top": "padding",
+  "padding-right": "padding",
+  "padding-bottom": "padding",
+  "padding-left": "padding",
+  "margin-top": "margin",
+  "margin-right": "margin",
+  "margin-bottom": "margin",
+  "margin-left": "margin",
+  "border-width": "border",
+  "border-style": "border",
+  "border-color": "border",
+  "background-color": "background",
+  "background-image": "background",
+  "font-size": "font",
+  "font-weight": "font",
+  "font-style": "font",
+  "line-height": "font",
+};
 
 /**
  * Fill in the block type's default styles on the element the catalog just
@@ -294,8 +336,11 @@ function applyTypeDefaults(el: EngineElement, elementType: string): void {
      did not insert", which is a far worse failure than a missing default. */
   const defaults = getDefaultStyles(elementType, el.getData?.()?.tagName);
   for (const [prop, value] of Object.entries(defaults)) {
-    if (TOKEN_OWNED_PROPS.has(prop)) continue;
-    if (!el.getStyle?.(prop)) el.setStyle?.(prop, value);
+    if (isSiteOwned(prop, value)) continue;
+    if (el.getStyle?.(prop)) continue;
+    const shorthand = SHORTHAND_FOR[prop];
+    if (shorthand && el.getStyle?.(shorthand)) continue;
+    el.setStyle?.(prop, value);
   }
 }
 
