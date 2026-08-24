@@ -340,7 +340,7 @@ export class MediaManager extends MediaEventEmitter {
         const newFolderId = asset.folderId ? folderRemap.get(asset.folderId) : undefined;
         if (newFolderId) {
           asset.folderId = newFolderId;
-          await this.storage.saveAsset({ ...asset });
+          await this.persist({ ...asset });
         }
       }
     }
@@ -414,6 +414,44 @@ export class MediaManager extends MediaEventEmitter {
    * and then "Load more" would appear to do nothing, because the rows it
    * fetches are already present. (Codex review, 2026-08-24.)
    */
+  /**
+   * The site this library belongs to. Null in the standalone demo, which has no
+   * site and therefore nothing to bleed into.
+   *
+   * Media was browser-global: the IndexedDB store carries no site, nothing
+   * filtered on read, and `useComposerInit` scoped only `versions` and
+   * `components`. Observed live on 2026-08-24 — a site created seconds earlier,
+   * never uploaded to, listed another site's `Aalv-renamed.png`, because the
+   * row was simply sitting in the same browser store.
+   */
+  private projectId: string | null = null;
+
+  /**
+   * Scope this library to a site and re-read what belongs to it.
+   *
+   * Deliberately NOT the `projectId` INDEX pattern `ComponentStorage` uses.
+   * That one buckets legacy rows under "default" and then never reads them
+   * again, which is acceptable for components — they re-hydrate from the server
+   * — but a media asset can be local-only (uploaded offline, never mirrored),
+   * and making those invisible would be a loss the user cannot undo. Rows with
+   * no `siteId` stay visible everywhere; everything written from now on carries
+   * one, and a server import stamps the site it came from, so the bleed stops
+   * after one load per site without anything disappearing.
+   */
+  async setProjectId(projectId: string): Promise<void> {
+    if (this.projectId === projectId) return;
+    this.projectId = projectId;
+    if (!this.isInitialized) return;
+    await this.loadFromStorage();
+    /* Announced, or the panel never learns. `useLibraryState` snapshots
+       `getAssets()` on mount and re-reads on INITIALIZED / MEDIA_* / folder
+       events; a silent reload here left a drawer that had already mounted
+       showing the pre-scope global library for the rest of the session. The
+       live probe missed it by navigating fresh each time, which mounts the
+       drawer after scoping. (Codex review, 2026-08-24.) */
+    this.emit(MEDIA_EVENTS.INITIALIZED, { assets: this.state.assets.length });
+  }
+
   private serverPage: { nextCursor: string | null; total: number; loaded: number } | null = null;
 
   setServerPage(page: { nextCursor: string | null; total: number; loaded: number }): void {
@@ -457,7 +495,7 @@ export class MediaManager extends MediaEventEmitter {
         createdAt: typeof sf.createdAt === "string" ? sf.createdAt : sf.createdAt.toISOString(),
         updatedAt: typeof sf.updatedAt === "string" ? sf.updatedAt : sf.updatedAt.toISOString(),
       };
-      await this.storage.saveFolder(folder);
+      await this.persistFolder(folder);
       this.state.folders.push(folder);
       this.emit(MEDIA_EVENTS.FOLDER_CREATED, folder);
     }
@@ -491,7 +529,7 @@ export class MediaManager extends MediaEventEmitter {
       // Metadata-only IndexedDB write. Blob arg omitted — first render
       // request fetches the public URL into a Blob via the existing
       // getAssetSrc lazy path.
-      await this.storage.saveAsset(asset);
+      await this.persist(asset);
       this.state.assets.push(asset);
       this.emit(MEDIA_EVENTS.MEDIA_ADDED, asset);
     }
@@ -521,7 +559,7 @@ export class MediaManager extends MediaEventEmitter {
     // Move IndexedDB record under the new key, then drop old key.
     const blob = await this.storage.getBlob(oldId);
     if (blob) {
-      await this.storage.saveAsset(updated, blob);
+      await this.persist(updated, blob);
       await this.storage.deleteAsset(oldId);
     }
     this.state.assets[idx] = updated;
@@ -691,18 +729,46 @@ export class MediaManager extends MediaEventEmitter {
     await this.init();
   }
 
+  /**
+   * The single door to `storage.saveAsset`. Six call sites wrote assets and
+   * none of them knew about the site; stamping here means a new upload, an
+   * edit and a server import all carry it without six chances to forget.
+   */
+  private async persist(asset: MediaAsset, blob?: Blob): Promise<void> {
+    const stamped = this.projectId ? { ...asset, siteId: this.projectId } : asset;
+    await (blob === undefined ? this.storage.saveAsset(stamped) : this.storage.saveAsset(stamped, blob));
+  }
+
+  /** The same single door for folders. */
+  private async persistFolder(folder: MediaFolder): Promise<void> {
+    await this.storage.saveFolder(this.projectId ? { ...folder, siteId: this.projectId } : folder);
+  }
+
   private async loadFromStorage(): Promise<void> {
-    const [assets, folders] = await Promise.all([
+    const [allAssets, allFolders] = await Promise.all([
       this.storage.getAllAssets(),
       this.storage.getAllFolders(),
     ]);
+
+    /* Another site's rows are in this same browser store. `siteId == null`
+       survives on purpose: those predate scoping and may be local-only, so
+       hiding them would take away media the user cannot get back. */
+    const mine = <T extends { siteId?: string }>(rows: T[]): T[] =>
+      this.projectId ? rows.filter((r) => r.siteId === this.projectId || r.siteId == null) : rows;
+    const assets = mine(allAssets);
+    const folders = mine(allFolders);
 
     // Rebuild blob URLs — stored src values are stale blob URLs from previous
     // sessions (blob: URLs are tied to the Window object and die on reload).
     // Without this, ImageEditorModal and any consumer of asset.src sees dead URLs.
     const remapped: Record<string, string> = {};
+    /* Over ALL rows, not the scoped ones. A page in this site may still point
+       at an asset that now belongs to another — inserted back when the library
+       was global — and skipping it means its `blob:` URL is never rebuilt, the
+       image breaks, and the drawer no longer lists it to recover.
+       (Codex review, 2026-08-24.) */
     await Promise.all(
-      assets.map(async (asset) => {
+      allAssets.map(async (asset) => {
         if (asset.src.startsWith("http") || asset.src.startsWith("data:")) {
           return; // Remote or inline — already valid
         }
@@ -891,7 +957,7 @@ export class MediaManager extends MediaEventEmitter {
 
       // Save both metadata and binary blob locally first — server mirror is
       // best-effort; offline / auth-fail / quota all fall back to localOnly.
-      await this.storage.saveAsset(asset, finalBlob);
+      await this.persist(asset, finalBlob);
       this.blobUrlMap.set(assetId, previewUrl);
       this.state.assets.push(asset);
 
@@ -963,7 +1029,7 @@ export class MediaManager extends MediaEventEmitter {
           // Remote sync failed — flag local-only and queue for retry.
           asset.localOnly = true;
           this.retryQueue.add(assetId);
-          await this.storage.saveAsset(asset, finalBlob);
+          await this.persist(asset, finalBlob);
         }
       }
       // serverType=null (audio) means we keep the asset local without queuing
@@ -1045,7 +1111,7 @@ export class MediaManager extends MediaEventEmitter {
       updatedAt: new Date().toISOString(),
     };
 
-    await this.storage.saveAsset(updated);
+    await this.persist(updated);
     const index = this.state.assets.findIndex((a) => a.id === id);
     if (index >= 0) {
       this.state.assets[index] = updated;
@@ -1168,7 +1234,7 @@ export class MediaManager extends MediaEventEmitter {
       localOnly,
     };
 
-    await this.storage.saveFolder(folder);
+    await this.persistFolder(folder);
     this.state.folders.push(folder);
     this.emit(MEDIA_EVENTS.FOLDER_CREATED, folder);
     return folder;
@@ -1235,7 +1301,7 @@ export class MediaManager extends MediaEventEmitter {
               id: created.serverId,
               localOnly: false,
             };
-            await this.storage.saveFolder(updated);
+            await this.persistFolder(updated);
             await this.storage.deleteFolder(localId);
             this.state.folders[idx] = updated;
             remapped.set(localId, created.serverId);
@@ -1246,7 +1312,7 @@ export class MediaManager extends MediaEventEmitter {
           for (const f of this.state.folders) {
             if (f.parentId === localId) {
               f.parentId = created.serverId;
-              await this.storage.saveFolder(f);
+              await this.persistFolder(f);
             }
           }
           // Same carry-forward for queued descendants — they need the
@@ -1332,7 +1398,7 @@ export class MediaManager extends MediaEventEmitter {
       updatedAt: new Date().toISOString(),
     };
     this.state.folders[idx] = updated;
-    await this.storage.saveFolder(updated);
+    await this.persistFolder(updated);
 
     // S-tier wire (2026-06-24): mirror the rename server-side. Was local-only
     // before, so folder names diverged per browser. The local folder id is

@@ -149,6 +149,12 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
         // imports ANOTHER site's content (then autosave persists the bleed).
         void instance.versions?.setProjectId?.(siteId);
         void instance.components?.setProjectId?.(siteId);
+        /* Media was left out of this list, and the comment above was therefore
+           only two-thirds true. Walked live on 2026-08-24: a site created
+           seconds earlier and never uploaded to listed another site's asset,
+           because `MediaManager` and its IndexedDB store carry no site at all. */
+        void instance.media?.setProjectId?.(siteId);
+        void instance.cms?.collections?.setProjectId?.(siteId);
 
         /* The shell is already fully mounted at this point — the canvas is up
            and empty, which is the state that draws "Start building · Browse

@@ -51,6 +51,17 @@ export interface CMSField {
 /** CMS collection schema */
 export interface CMSCollection {
   id: string;
+
+  /**
+   * Which site owns this collection. Absent on rows written before CMS was
+   * scoped — those stay visible everywhere rather than vanishing, so reads test
+   * `siteId === current || siteId == null`.
+   *
+   * Without it the store is browser-global, exactly as the media library was:
+   * open a second site in the same browser and its Content panel lists the
+   * first site's collections. (2026-08-24.)
+   */
+  siteId?: string;
   name: string;
   slug: string;
   description?: string;

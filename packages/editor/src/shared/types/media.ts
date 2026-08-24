@@ -91,6 +91,19 @@ export interface MediaAsset {
   /** Unique identifier */
   readonly id: string;
 
+  /**
+   * Which site this asset belongs to. Absent on rows written before media was
+   * scoped — those stay visible everywhere rather than vanishing, which is why
+   * reads test `siteId === current || siteId == null` instead of matching an
+   * index outright.
+   *
+   * Without it the library is browser-global: `MediaManager` and its IndexedDB
+   * store carried no site at all, so opening a second site in the same browser
+   * showed the first one's assets. Observed live on 2026-08-24 — a site created
+   * seconds earlier, never uploaded to, listed another site's `Aalv-renamed.png`.
+   */
+  siteId?: string;
+
   /** Asset type */
   readonly type: MediaAssetType;
 
@@ -258,6 +271,16 @@ export interface RemoteAssetSync {
 export interface MediaFolder {
   /** Unique identifier */
   readonly id: string;
+
+  /**
+   * Which site owns this folder. Same rule as `MediaAsset.siteId` — absent on
+   * rows written before scoping, and those stay visible.
+   *
+   * Scoping assets while leaving folders global does not half-fix the bleed, it
+   * moves it: site B still lists site A's folders, and dropping an asset into
+   * one writes across sites. (Codex review, 2026-08-24.)
+   */
+  siteId?: string;
 
   /** Folder name */
   name: string;

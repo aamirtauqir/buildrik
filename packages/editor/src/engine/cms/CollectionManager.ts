@@ -34,6 +34,15 @@ export class CMSValidationError extends Error {
 
 export class CollectionManager extends EventEmitter {
   private collections: Map<string, CMSCollection> = new Map();
+
+  /**
+   * The site this store belongs to. Null in the standalone demo, which has no
+   * site and nothing to bleed into. Same defect and same remedy as
+   * `MediaManager` — rows with no `siteId` stay visible, everything written
+   * from here on carries one, and a server hydration stamps the site it came
+   * from, so the bleed stops after one load per site with nothing disappearing.
+   */
+  private projectId: string | null = null;
   private contentCache: Map<string, CMSContentItem[]> = new Map();
   private initialized = false;
 
@@ -41,10 +50,25 @@ export class CollectionManager extends EventEmitter {
   // Initialization
   // ============================================
 
+  /** Scope this store to a site and re-read what belongs to it. */
+  async setProjectId(projectId: string): Promise<void> {
+    if (this.projectId === projectId) return;
+    this.projectId = projectId;
+    if (this.initialized) await this.refreshFromStorage();
+  }
+
+  /** Another site's rows share this browser store; `siteId == null` predates
+   *  scoping and survives on purpose. */
+  private mine(collections: CMSCollection[]): CMSCollection[] {
+    return this.projectId
+      ? collections.filter((c) => c.siteId === this.projectId || c.siteId == null)
+      : collections;
+  }
+
   async initialize(): Promise<void> {
     if (this.initialized) return;
 
-    const collections = await Storage.loadCollections();
+    const collections = this.mine(await Storage.loadCollections());
     for (const collection of collections) {
       this.collections.set(collection.id, collection);
     }
@@ -69,7 +93,7 @@ export class CollectionManager extends EventEmitter {
    * back to the server.
    */
   async refreshFromStorage(): Promise<void> {
-    const collections = await Storage.loadCollections();
+    const collections = this.mine(await Storage.loadCollections());
     this.collections = new Map(collections.map((c) => [c.id, c]));
     this.contentCache.clear();
     this.initialized = true;
@@ -98,7 +122,7 @@ export class CollectionManager extends EventEmitter {
       updatedAt: now,
     };
 
-    await Storage.saveCollection(collection);
+    await Storage.saveCollection(this.projectId ? { ...collection, siteId: this.projectId } : collection);
     this.collections.set(collection.id, collection);
     this.emit(EVENTS.CMS_COLLECTION_CREATED, collection);
 
@@ -120,7 +144,7 @@ export class CollectionManager extends EventEmitter {
       updatedAt: new Date().toISOString(),
     };
 
-    await Storage.saveCollection(updated);
+    await Storage.saveCollection(this.projectId ? { ...updated, siteId: this.projectId } : updated);
     this.collections.set(id, updated);
     this.emit(EVENTS.CMS_COLLECTION_UPDATED, updated);
 

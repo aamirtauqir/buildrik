@@ -39,5 +39,93 @@ permitted for a site whose project actually came back from the server.
 
 ## Not covered by this walk
 
-`loadServerMedia`'s 200-asset cap, the DS schema migration step, and per-site
-IndexedDB scoping. Named so the next pass knows they are open, not assumed.
+The DS schema migration step. The other two are closed: `loadServerMedia`'s
+200-asset cap (fixed 2026-08-24, see `U7-F-A4-media.md`) and per-site IndexedDB
+scoping — worked below, because it turned out to be a live cross-site bleed.
+
+## Addendum, 2026-08-24 — "per-site IndexedDB scoping" was a live data bleed
+
+The walk listed this as unverified. It is not a hygiene item: two of the four
+browser stores were never scoped at all, and the result is visible in the
+product.
+
+`useComposerInit` scoped `versions` and `components` by `setProjectId(siteId)`,
+under a comment explaining exactly why that matters — *"every site edited in the
+same browser shares the 'default' bucket"*. **Media and CMS were left out of that
+list**, and neither manager knows what a site is: `MediaManager` and
+`CollectionManager` each contain **zero** references to `siteId` or `projectId`,
+their IndexedDB stores carry no site column, and nothing filters on read.
+
+**Reproduced live.** A second site was created in the founder's own workspace,
+opened in the same browser context immediately after the first:
+
+```
+site A (cmpxu9tt…) → {"cells":1,"names":["Aalv-renamed.png"]}
+site B (cmt79bsu…) → {"cells":1,"names":["Aalv-renamed.png"]}
+```
+
+Site B was seconds old and had never been uploaded to. It was showing site A's
+asset — not a stale cache, the actual row sitting in a browser-global store.
+
+### The remedy, and the one it deliberately is not
+
+`ComponentStorage` solves this with a `projectId` IndexedDB **index**, defaulting
+to `"default"`. That buckets every pre-existing row under `"default"` and then
+never reads it again. For components that is survivable — they re-hydrate from
+the server. **A media asset can be local-only**: uploaded while offline, never
+mirrored. Bucketing those away would make media disappear with no way back.
+
+So instead: `MediaAsset.siteId?` and `CMSCollection.siteId?`; reads test
+`siteId === current || siteId == null`; every write stamps the current site —
+media through a single private `persist()`, because six call sites wrote assets
+and none of them knew about the site; and the CMS server hydration, which writes
+straight past the manager, stamps the site it fetched from.
+
+Net effect: rows that predate scoping stay visible everywhere, everything from
+here on is scoped, and because a server import stamps the site it came from, the
+bleed stops after one load per site with nothing vanishing.
+
+**Verified live, same probe:**
+
+```
+site A → {"cells":1,"names":["Aalv-renamed.png"]}
+site B → {"cells":0,"names":[]}
+```
+
+### Not verified
+
+CMS was fixed on the same shape and covered by tests, but the two-site CMS bleed
+was not walked in the app — the media one was, and the code paths are the same
+two lines. The scratch site created for this (`Bleed probe B`) is deleted; it is
+one Prisma insert to recreate if a future walk needs two sites.
+
+### Codex review of the bleed fix — four findings, three of them mine to fix
+
+**1 (High) — the scope was applied and never announced.** `setProjectId` reloads
+storage silently, and `useLibraryState` snapshots `getAssets()` on mount and
+re-reads only on `INITIALIZED` / `MEDIA_*` / folder events. A drawer that had
+already mounted therefore kept showing the pre-scope global library for the rest
+of the session. **My live probe missed this by construction** — it navigates to
+each site fresh, which mounts the drawer *after* scoping. `setProjectId` emits
+`INITIALIZED` now, and only when the site actually changed.
+
+**2 (High) — folders were still completely global.** Scoping assets and leaving
+folders alone does not half-fix the bleed, it moves it: site B still lists site
+A's folders, and dropping an asset into one writes across sites. `MediaFolder`
+carries `siteId` now, reads filter it, and all five folder writes go through one
+`persistFolder`.
+
+**3 (Medium) — a legacy row is adopted by whichever site edits it first.** True,
+and deliberate: the alternative is `ComponentStorage`'s index, which hides those
+rows forever. Recorded rather than changed.
+
+**4 — a filtered-out asset stopped getting its blob URL repaired.** A page in
+this site may still point at an asset that now belongs to another, inserted back
+when the library was global. The remap runs over **every** row again — only the
+scoped set is exposed — so the image is repaired even though the drawer no
+longer lists the asset.
+
+Negative-tested: removing the emit drops exactly the announce test, unfiltering
+folders drops exactly the folder test, dropping the folder stamp drops exactly
+that one, and remapping over the scoped set only drops exactly the blob test.
+

@@ -348,6 +348,10 @@ describe("hydrateCmsFromServer", () => {
     await hydrateCmsFromServer();
     expect(saveCollection).toHaveBeenCalledWith({
       id: "srv-1",
+      /* Hydration writes straight into IndexedDB, past CollectionManager, so it
+         has to stamp the site itself — otherwise the row lands unscoped and
+         keeps showing on every other site in this browser. */
+      siteId: "site-123",
       name: "Posts",
       slug: "posts",
       description: "Blog posts",

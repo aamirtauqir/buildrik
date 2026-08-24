@@ -125,7 +125,13 @@ export async function hydrateCmsFromServer(): Promise<void> {
     for (const rc of remote) {
       if (localIds.has(rc.id)) continue;
       const collection: CMSCollection = {
-        id: rc.id, name: rc.name, slug: rc.slug,
+        id: rc.id,
+        /* Stamped with the site it came FROM. Hydration writes straight into
+           IndexedDB, past `CollectionManager`, so without this the rows would
+           land unscoped and keep showing on every other site in this browser —
+           the store is browser-global. (2026-08-24.) */
+        siteId,
+        name: rc.name, slug: rc.slug,
         description: rc.description ?? undefined, icon: rc.icon ?? undefined,
         displayField: rc.displayField ?? undefined,
         fields: (rc.fields as CMSField[]) ?? [],
