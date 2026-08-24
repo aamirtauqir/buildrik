@@ -59,8 +59,8 @@ one — the exact discipline this walk applies to everything else.
 
 ## Not covered
 
-The 300ms debounced style write, pseudo-state pills, and drag-to-canvas's
-remaining two claims (snap guides 5px, 500ms touch long-press).
+Drag-to-canvas's remaining two claims (snap guides 5px, 500ms touch
+long-press). Everything else on this list is worked below.
 
 **Inline text edit and the right-click context menu are worked below** — they
 were the first two of this list to be walked live, on 2026-08-24.
@@ -421,4 +421,57 @@ increment with a blast radius across canvas, export and publish — not a line i
 **What is true today, unchanged:** drop a Heading and it renders as body text
 while the inspector says 36. The inspector is the only thing consulting the
 defaults.
+
+## 2026-08-24 — pseudo-states, and the style-write cadence
+
+**Pseudo-state pills work.** The state control offers `Base`, `:hover`,
+`:focus`, `:active`, `:disabled`. Choosing `:hover` puts an explicit banner up —
+*"Editing :hover — not Base"* — and an edit lands in its own rule:
+
+```
+[data-buildrick-id="…"]:hover { font-size: 44px; }
+@media (max-width: 767px) { [data-buildrick-id="…"] { font-size: 18px; } }
+```
+
+Base untouched, the breakpoint override untouched beside it. Three independent
+style layers on one element, each in its own place.
+
+**The style write is not per-keystroke.** Typing two digits into Font size while
+polling the element's computed size every 40ms produced two distinct values: the
+starting one and a single settled one. Intermediates did not each reach the
+canvas.
+
+**What that does NOT establish:** whether this is the documented 300ms debounce
+or simply commit-on-settle. The two are indistinguishable from outside, and this
+walk did not instrument the write path — a first attempt hooked
+`CSSStyleDeclaration.setProperty` and counted **zero** calls for a write that
+demonstrably happened, so the engine does not go through that API and the hook
+was measuring nothing.
+
+### A control that looks broken and is not
+
+Selecting the site's own `H1` shows the Font size field **disabled**, reading
+`inherit`. That looks like "you cannot change the size of your own heading".
+
+It is a gate, not a wall: `InputControls.tsx:265` disables the NUMBER input while
+the unit is a keyword (`auto` / `none` / `inherit`), and leaves the UNIT select
+enabled (`:312`). Switch the unit to `px` and the number opens;
+`commitValue` already converts a keyword unit to px on write. Whether that gate
+is *discoverable* is a design question, not a defect, and it is not one this walk
+is qualified to settle by itself.
+
+### Housekeeping
+
+These walks inserted Heading blocks into the founder's Demo AI Site to have
+something to measure. **19 of them, plus 2 stale style rules for elements that no
+longer existed, have been removed** — the page is back to what it was before the
+session. Verified by re-reading the saved blocks: zero ids created today remain.
+
+### Harness notes
+
+Two more probe artifacts, both caught before they became findings: the state
+dropdown's options are labelled `:hover`, not `Hover`, so an exact-match selector
+found nothing and reported the feature missing; and setting `.value` on a
+React-controlled `<select>` and dispatching `change` does not move React state,
+which hung a probe until it timed out. That is nine this session.
 
