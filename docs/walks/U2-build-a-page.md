@@ -475,3 +475,52 @@ found nothing and reported the feature missing; and setting `.value` on a
 React-controlled `<select>` and dispatching `change` does not move React state,
 which hung a probe until it timed out. That is nine this session.
 
+## 2026-08-24 — CORRECTION: the Heading-defaults mechanism above is wrong
+
+The section "why the Heading defaults cannot be fixed where they look broken"
+states that element-data styles never reach the canvas, and that
+`buildAttributeString` declares a `styles` field it never emits. **Both claims
+are false.** They were reached by reading a slice of that function and by
+measuring an element that could not have shown the difference. Measured
+properly:
+
+```
+[data-buildrick-id="el-mt2vjgwy-1uxctjr188y"]  (the site's own H1)
+  inline   : color: rgb(255,255,255); margin: 0 0 16px; font-size: 52px;
+             font-weight: 900; letter-spacing: -0.04em; cursor: grab;
+  computed : 52px
+  rules for its id: []
+```
+
+Element styles reach the canvas as **inline styles**, and no per-id CSS rule is
+needed. That is why the site's own headings look like headings.
+
+**Why the dropped Heading did not.** `insertOne` has three branches, and the
+Heading block's `content` is `"<h2>Heading</h2>"`, which matches
+`HTML_CONTENT_PATTERN` — so it takes the **HTML branch**
+(`insertHTMLToElement`), which builds elements from parsed HTML. `<h2>Heading</h2>`
+carries no `style` attribute, and nothing on that path applies type defaults. The
+element is therefore genuinely style-less, and being style-less it emits nothing.
+
+**So the `createElement` change that was written and reverted never touched this
+path at all** — the live measurement that justified reverting it was measuring
+a branch the change did not run in. The revert was right for the wrong reason;
+the change was also not the fix.
+
+**Where the fix actually is:** the HTML insert branch. Either
+`htmlToElementDataList` / `domElementToElementData` seeds each node with
+`getDefaultStyles(type, tagName)`, or `insertOne`'s HTML branch applies them to
+what it created. Element styles already render inline, so defaults applied there
+would show on the canvas AND export consistently — no editor-versus-published
+divergence, which was the stated fear and does not apply.
+
+Still true, and still the user-visible bug: drop a Heading and it renders as body
+text while the inspector reads 36.
+
+**And one more measured fact that does not fit yet:** that same H1 carries
+`font-size: 52px` in its data and renders at 52px, and the inspector's Font size
+field reads `inherit` and is disabled. Where `inherit` comes from for an element
+whose own styles say `52px` is not established — `computeEffectiveStyles` starts
+from `el.getStyles()`, which should contain it. Named here rather than guessed
+at.
+
