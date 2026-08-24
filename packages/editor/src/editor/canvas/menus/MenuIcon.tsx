@@ -6,15 +6,19 @@
  */
 
 import * as React from "react";
-import { CANVAS_COLORS } from "../shared";
 
 interface MenuIconProps {
   name?: string;
   size?: number;
 }
 
-// Simple SVG path definitions for menu icons
-const ICON_PATHS: Record<string, string> = {
+/**
+ * Exported so the coverage test can read the REAL map instead of regexing this
+ * file. A textual scan fails the moment the icons are extracted into a helper
+ * and spread in, or a key changes quote style — a legitimate refactor breaking
+ * a guard is how guards get deleted. (Codex review, 2026-08-24.)
+ */
+export const ICON_PATHS: Record<string, string> = {
   // Edit actions
   edit: "M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7",
   clipboard: "M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2",
@@ -34,6 +38,23 @@ const ICON_PATHS: Record<string, string> = {
   "corner-down-left": "M9 10l-5 5 5 5",
   box: "M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z",
   "minimize-2": "M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7",
+
+  /* Order, lock and stack actions. These eight names were REFERENCED by menu
+     actions and missing from this map, so `Bring Forward`, `Send Backward`,
+     `Bring to Front`, `Send to Back`, `Lock`, `Unlock`, `Save as component`
+     and `Select from stack` each rendered the fallback below — a literal
+     asterisk where an icon belongs. Found by walking the canvas right-click
+     menu, 2026-08-24. */
+  "chevron-up": "m18 15-6-6-6 6",
+  "chevron-down": "m6 9 6 6 6-6",
+  "chevrons-up": "m17 11-5-5-5 5M17 18l-5-5-5 5",
+  "chevrons-down": "m7 6 5 5 5-5M7 13l5 5 5-5",
+  lock: "M19 11H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2zM7 11V7a5 5 0 0 1 10 0v4",
+  unlock: "M19 11H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2zM7 11V7a5 5 0 0 1 9.9-1",
+  package:
+    "M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16zM3.3 7l8.7 5 8.7-5M12 22V12",
+  "box-select":
+    "M5 3a2 2 0 0 0-2 2M19 3a2 2 0 0 1 2 2M21 19a2 2 0 0 1-2 2M5 21a2 2 0 0 1-2-2M9 3h1M9 21h1M14 3h1M14 21h1M3 9v1M21 9v1M3 14v1M21 14v1",
 
   // Layout actions
   layout: "M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zM3 9h18M9 21V9",
@@ -62,20 +83,13 @@ export const MenuIcon: React.FC<MenuIconProps> = ({ name = "default", size = 14 
   const path = ICON_PATHS[name] || ICON_PATHS.default;
 
   if (!path) {
-    // Fallback to a simple dot for unknown icons
+    /* Holds the slot, draws nothing. It used to draw a literal "*", which does
+       not read as "icon missing" — it reads as a typo, or a footnote marker, or
+       a required-field mark, next to a perfectly ordinary menu label. Eight
+       actions were rendering it. The label carries the meaning; an unknown icon
+       should cost alignment, not credibility. */
     return (
-      <span
-        style={{
-          display: "inline-block",
-          width: size,
-          height: size,
-          textAlign: "center",
-          color: CANVAS_COLORS.textMuted,
-          fontSize: size - 2,
-        }}
-      >
-        {"*"}
-      </span>
+      <span aria-hidden="true" style={{ display: "inline-block", width: size, height: size }} />
     );
   }
 
