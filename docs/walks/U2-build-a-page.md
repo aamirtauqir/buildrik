@@ -524,3 +524,55 @@ whose own styles say `52px` is not established — `computeEffectiveStyles` star
 from `el.getStyles()`, which should contain it. Named here rather than guessed
 at.
 
+
+---
+
+## Fixed — 2026-08-25, at the HTML insert branch
+
+`insertOne`'s HTML branch now seeds the element it created with
+`getDefaultStyles(block.elementType, tagName)`, filling only the properties the
+element does not already carry. Measured in the running editor on the E2E scratch
+site, clicking **Heading** in the Insert panel's BLOCKS section:
+
+```
+data styles : font-size 36px · font-weight 700 · line-height 1.2 · margin-bottom 20px
+inline attr : "font-size: 36px; font-weight: 700; line-height: 1.2; margin-bottom: 20px; cursor: grab;"
+computed    : 36px / 700 / 43.2px, Inter sans-serif, rgb(17,24,39)
+```
+
+A dropped Heading now renders as a heading. The inspector's 36 and the canvas
+agree for the first time.
+
+### Two things the fix deliberately does NOT do
+
+Both came out of the codex review of the first version, and both were real.
+
+**It seeds only the inserted root, never descendants.** The first version walked
+`getDescendants()` and re-derived each node's type from its tag. But
+`getElementTypeFromTag` falls back to `"container"` for every tag it does not
+map — `li` among them — so a List block's three items would have been stamped
+with container defaults they should never have had. Measured after the narrowing,
+inserting the List block:
+
+```
+list root : font-size 16px · line-height 1.6 · padding-left 24px · margin-bottom 12px
+li × 3    : {}   ← untouched
+```
+
+**It withholds `font-family` and `color`.** `siteFontCSS` paints both from the
+site's design tokens (`ExportHelpers.ts` — `font-family:${family(fonts.body)}`,
+`color:${family(fonts.text)}`). An element style is emitted INLINE and beats that
+layer outright, so seeding those two would freeze every newly inserted block onto
+the shipped defaults: change the brand font or text colour afterwards and it
+would no longer reach anything inserted from the catalog. That is a worse bug
+than the one being fixed. The computed read above confirms the carve-out works —
+`Inter, sans-serif` and `rgb(17,24,39)` are on the element, and neither is in its
+inline attribute, so both are still arriving from the site's own layer.
+
+Covered by `blocks/__tests__/blockRegistry.typeDefaults.test.ts` (5 tests,
+negative-tested three ways: removing the token-owned skip, restoring the
+descendant walk, and removing the seeding call each fail a distinct test).
+
+**Still open, unchanged:** the site's own H1 carries `font-size: 52px` in its data
+and renders 52px while the inspector's Font size field reads `inherit` and is
+disabled. Unexplained; not touched by this fix.
