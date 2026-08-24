@@ -277,10 +277,9 @@ inspector says 36 — confidently, in an editable field. The same shape as the
 drop-position bug fixed earlier today: the editor displays one thing and the
 canvas does another.
 
-**Not fixed here, deliberately.** The fix decides where element defaults live —
-the block definition, the theme, or the insert path — and it changes the
-appearance of every newly inserted element. That is a founder call and a fresh
-increment, not a tail-end patch on a long session.
+**Traced properly on 2026-08-24 — and the obvious fix is the wrong one.** See
+the section below; calling it a founder call was the wrong framing, but so was
+the one-line fix.
 
 **Not verified:** whether the published/exported page has the same gap. The
 engine has no styles to export, so it almost certainly does — but "almost
@@ -374,4 +373,52 @@ which this probe does not perform.
 repeat of its own message (`if (next !== prevRef.current)`), so selecting two
 headings in a row announces once. Same defect class as (1), in a hook this
 change deliberately did not widen into.
+
+## 2026-08-24 — why the Heading defaults cannot be fixed where they look broken
+
+`getDefaultStyles` is defined, keyed by element type, and has exactly one
+consumer: the inspector. `createElement` applies default ATTRIBUTES on the line
+above — with a comment explaining why an `<input>` without a `type` is a text
+box wearing an email label — and leaves `styles: {}`. The twin is simply not
+wired. It reads like a one-line fix.
+
+It was written, tested (4 new tests, both stale tests rewritten, all
+negative-tested), and then **reverted**, because measuring it live showed the
+one-line fix creates a worse bug than the one it closes.
+
+**What the measurement said.** With defaults applied at `createElement`, a
+freshly dropped Heading still rendered at **16px**, and:
+
+```
+how styles reach it: {"inline":"cursor: grab;","rulesForId":[],"tag":"H2"}
+```
+
+No inline style. No CSS rule naming its id. The element now HELD heading styles
+and the canvas showed none of them.
+
+**Why.** The canvas renders from `elementDataToHTML`, whose `buildAttributeString`
+declares `styles?: Record<string, string>` in its input type **and never emits a
+`style=` attribute**. Element-data styles do not reach the canvas at all. What
+reaches the canvas is `StyleEngine` rules — which is why editing works: the
+inspector calls `setBreakpointStyle` → `setRule` → a real CSS rule. `Element.
+setStyle` writes `data.styles` and emits events; it does not write a rule.
+
+So element `styles` are, for the canvas, write-only.
+
+**And the export path is not.** `ExportEngine` builds inline styles from that
+same element data. So applying defaults at `createElement` would have shipped a
+published page with 32px headings while the editor kept showing 16px — an
+editor-versus-published divergence pointing the opposite way to the ones fixed
+earlier this month, created by the fix rather than found by it.
+
+**Where the fix actually belongs:** the render seam. Either
+`buildAttributeString` emits element styles (and export/publish is re-checked
+for double application), or `createElement` puts its defaults through
+`StyleEngine` so a rule exists the moment the element does. That is a real
+increment with a blast radius across canvas, export and publish — not a line in
+`ElementCRUD`.
+
+**What is true today, unchanged:** drop a Heading and it renders as body text
+while the inspector says 36. The inspector is the only thing consulting the
+defaults.
 
