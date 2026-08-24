@@ -110,16 +110,41 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       [addToast]
     );
 
-    // GAP-FIX: Toast notification for successful element insertion
+    /* Announced, not toasted.
+       Every successful drop raised a toast — "Inserted: Heading" — and building
+       a page of thirty elements meant thirty of them stacking over the canvas.
+       It also said nothing the canvas had not already said louder: the element
+       appears, `animateDropSuccess` flashes it, and it is auto-selected, which
+       moves the inspector.
+
+       Deleting it outright would have taken the one channel that DID reach a
+       screen reader, since the toast viewport is the editor's `role="status"`
+       region. So the message survives in a visually-hidden live region and the
+       visual noise goes. Walked live 2026-08-24: one routine drop, one toast. */
+    const [announcement, setAnnouncement] = React.useState({ text: "", seq: 0 });
+    const announce = React.useCallback((text: string) => {
+      /* The seq is load-bearing. A plain string skips the DOM mutation when the
+         same message repeats — drop a Heading, drop another Heading, and a
+         screen reader hears the first one only. `aria-atomic` does not help;
+         it governs how much is read once something changes, not whether
+         anything changed. The span is keyed on seq, so an identical message
+         still remounts. (Codex review, 2026-08-24.) */
+      setAnnouncement((a) => ({ text, seq: a.seq + 1 }));
+    }, []);
+
     const handleDropSuccess = React.useCallback(
       (success: DropSuccess) => {
-        addToast({
-          description: `Inserted: ${success.elementLabel}`,
-          tone: "success",
-          duration: 2000,
-        });
+        announce(`Inserted: ${success.elementLabel}`);
+        /* An async drop is PROGRESS, not completion — an OS image drop reports
+           "Uploading file.png..." before the upload finishes. Removing its
+           visible signal made a slow upload look like an ignored drop, which
+           invites a second attempt and makes the eventual error read as
+           spurious. Completion stays silent; work-in-flight does not. */
+        if (success.pending) {
+          addToast({ description: success.elementLabel, tone: "info", duration: 4000 });
+        }
       },
-      [addToast]
+      [announce, addToast]
     );
 
     // Core hooks
@@ -524,6 +549,13 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
 
     // ── Aria-live selection announcements (WCAG 4.1.3) ──────────────────────
     const liveAnnouncement = useSelectionAnnouncement({ composer, selectedId, selectedIds });
+    /* Selection speaks through the same single region. The hook still suppresses
+       a repeat of its OWN message — select two headings in a row and it emits
+       nothing the second time — which is its own pre-existing gap, recorded in
+       the U2 walk rather than widened into this change. */
+    React.useEffect(() => {
+      if (liveAnnouncement) announce(liveAnnouncement);
+    }, [liveAnnouncement, announce]);
 
     // Canvas click handler - wraps selection behavior with focus management.
     // If inspector pick mode is active, intercept: resolve target element id
@@ -773,9 +805,14 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
         {/* Keyboard Cheat Sheet ('?' key) */}
         <KeyboardCheatSheet isOpen={isCheatSheetOpen} onClose={closeCheatSheet} />
 
-        {/* Aria-live region for selection announcements (WCAG 4.1.3 — always in DOM) */}
+        {/* ONE polite region for the canvas, not two. A successful drop selects
+            the new element and then reports the insert, so a second region meant
+            two polite updates from one action — and AT that coalesces them can
+            drop whichever it likes, which would have quietly thrown away the
+            channel the toast removal was trying to preserve. Selection and
+            insertion now queue through the same voice. (Codex review.) */}
         <div aria-live="polite" aria-atomic="true" className="bd-sr-only">
-          {liveAnnouncement}
+          <span key={announcement.seq}>{announcement.text}</span>
         </div>
       </div>
     );

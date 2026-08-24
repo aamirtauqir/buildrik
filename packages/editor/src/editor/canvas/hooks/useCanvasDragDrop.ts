@@ -47,6 +47,13 @@ export interface DropError {
 export interface DropSuccess {
   elementLabel: string;
   elementType: string;
+  /**
+   * The drop started WORK rather than finishing it — an OS image drop reports
+   * `Uploading file.png...` long before the asset exists. Completion is already
+   * visible on the canvas and stays silent; work in flight needs to be seen, or
+   * a slow upload reads as a drop the editor ignored.
+   */
+  pending?: boolean;
 }
 
 export interface UseCanvasDragDropOptions {

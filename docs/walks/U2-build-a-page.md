@@ -59,8 +59,7 @@ one — the exact discipline this walk applies to everything else.
 
 ## Not covered
 
-The smart parent walk-up and its nesting-error toast, the 300ms debounced style
-write, per-breakpoint override behaviour, pseudo-state pills, and drag-to-canvas's
+The 300ms debounced style write, pseudo-state pills, and drag-to-canvas's
 remaining two claims (snap guides 5px, 500ms touch long-press).
 
 **Inline text edit and the right-click context menu are worked below** — they
@@ -286,4 +285,93 @@ increment, not a tail-end patch on a long session.
 **Not verified:** whether the published/exported page has the same gap. The
 engine has no styles to export, so it almost certainly does — but "almost
 certainly" is not a walk.
+
+## 2026-08-24 — the walk-up holds; the editor congratulated itself on every drop
+
+Fifth surface.
+
+**The smart parent walk-up works.** Dropping a Heading onto an `H2` leaf — which
+cannot host it — walked up to an ancestor that could and inserted there
+(44 → 45 elements), with no error. `findValidDropTargetWithFallback` doing its
+job, and the `NESTING_FORBIDDEN` toast stays out of the way when a valid parent
+exists.
+
+**Beside it, a UI finding.** Every successful drop raised a toast:
+
+```
+toasts after ONE routine drop: ["Inserted: Heading"]
+```
+
+Thirty elements on a page means thirty of them, stacked over the bottom-right of
+the canvas while you are still building. And the toast says nothing the canvas
+has not already said louder: the element appears, `animateDropSuccess` flashes
+it, and it is auto-selected, which moves the whole inspector. Webflow shows
+nothing here.
+
+Deleting it outright would have been wrong for a different reason: the toast
+viewport IS the editor's `role="status"` region, so it was also the only channel
+that reached a screen reader. The message now lives in a visually-hidden
+`aria-live` region beside the canvas.
+
+**Verified live after:** `toasts: []`, and `bd-sr-only` carrying
+`"Inserted: Heading"`.
+
+**Not unit-guarded, and said plainly.** The contract is "one drop, zero toasts",
+which needs the real Canvas rendered — there is no cheap scaffolding for that
+here, and a source-text assertion is the exact brittle guard codex flagged
+earlier today. The intent is written into the code so nobody restores the toast
+by accident; the live probe is the check.
+
+### Recorded, not fixed — five live regions for one drop
+
+The same probe read every `aria-live` region carrying text right after a single
+insert:
+
+```
+"Saved" · "Inserted: Heading" · "Selected: heading" · "Heading selected"
+· "Step complete: Add an element. Next: Edi…"
+```
+
+A screen-reader user drops one element and hears five announcements, two of
+which are the same fact in different words. This predates today's change — the
+toast was itself a live region, so the count is unchanged — and untangling which
+region owns which fact is its own increment.
+
+### Codex review — the replacement channel had three holes
+
+**1 (High) — an identical message never announced twice.** `setState` with a
+plain string skips the DOM mutation when the text repeats: drop a Heading, drop
+another Heading, and a screen reader hears the first one only. `aria-atomic`
+does not help — it governs how MUCH is read once something changes, not whether
+anything changed. The state carries a sequence now and the span is keyed on it,
+so an identical message still remounts. Verified live: two consecutive Heading
+drops, `["Inserted: Heading", "Inserted: Heading"]`.
+
+**2 (Medium) — two polite regions, one action.** A successful drop selects the
+new element and THEN reports the insert, so my new region and the pre-existing
+selection region both updated from one gesture; AT that coalesces polite updates
+can keep whichever it likes, which would have quietly thrown away the very
+channel the toast removal was meant to preserve. There is one region now, and
+selection queues through it. Verified live: `regions in canvas: 1`.
+
+**3 (Medium) — the OS file-drop lost its only visible signal.** That path emits
+`onDropSuccess("Uploading file.png...")` BEFORE the upload finishes — progress,
+not completion. Silently announcing it made a slow upload look like a drop the
+editor had ignored, inviting a second attempt and making the eventual error read
+as spurious. `DropSuccess` carries `pending` now: completion stays silent,
+work-in-flight still toasts.
+
+Codex also cleared what the questions were aimed at: `bd-sr-only` is the clipped
+off-screen utility rather than `display:none`, so the region is still announced;
+and the announcement state does not reopen the `dangerouslySetInnerHTML`
+reference-stability bug, because the injected HTML prop is still memoised off
+`displayContent`.
+
+**Not verified live:** the `pending` upload toast — that needs an OS file drop,
+which this probe does not perform.
+
+**Still open, and now named twice:** `useSelectionAnnouncement` suppresses a
+repeat of its own message (`if (next !== prevRef.current)`), so selecting two
+headings in a row announces once. Same defect class as (1), in a hook this
+change deliberately did not widen into.
 

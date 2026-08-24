@@ -245,6 +245,7 @@ export function useDropExecution({
               const file = imageFiles[0];
               onDropSuccessRef.current?.({
                 elementLabel: `Uploading ${file.name}...`,
+                pending: true,
                 elementType: "image",
               });
 
