@@ -17,7 +17,7 @@ import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
 import { currentSiteId } from "./ReviewService";
 import * as Storage from "../engine/cms/CollectionStorage";
 import type { CMSCollection, CMSContentItem, CMSField } from "../shared/types/cms";
-import { SyncRetryQueue, type SyncRetryInfo } from "./syncRetryQueue";
+import { SyncRetryQueue, type SyncRetryInfo, registerPendingSource } from "./syncRetryQueue";
 
 function client() {
   return getBuildrikClient(DASHBOARD_URL);
@@ -33,6 +33,7 @@ const iso = (d: Date | string): string => (typeof d === "string" ? d : d.toISOSt
 // target), notifies subscribers so the editor surfaces a retryable toast, and
 // auto-retries on reconnect ('online'). Still never throws.
 const queue = new SyncRetryQueue();
+registerPendingSource("cms", () => queue.pendingCount());
 
 export type CmsSyncErrorInfo = SyncRetryInfo;
 

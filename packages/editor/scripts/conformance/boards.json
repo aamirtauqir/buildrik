@@ -4471,7 +4471,7 @@
     },
     {
       "nodeId": "1172:4804",
-      "name": "Exit · guard — dirty · risky-offline",
+      "name": "Exit · guard — dirty · risky-offline · stranded",
       "family": "Exit",
       "state": "guard dual-state",
       "width": 0,

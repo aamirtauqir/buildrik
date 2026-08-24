@@ -43,6 +43,7 @@ import type { SyncStatus, Issue } from "./hooks/useStudioState";
 import { useEditorRole } from "./hooks/useEditorRole";
 import { CommandPalette } from "./modals/CommandPalette";
 import { NotificationPanel, useUnreadCount } from "./NotificationPanel";
+import { totalPendingMirrors } from "@/services/syncRetryQueue";
 import { SiteMenu } from "./SiteMenu";
 import "./header.css";
 
@@ -330,7 +331,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   // callers: ‹ Exit, menu "Exit to dashboard", "Preview as client", and
   // notification row jumps. `nav` is injectable so tests never touch
   // window.location (redirect-mock pattern).
-  type ExitDialog = { kind: "dirty" | "risky"; error?: string; nav: () => void };
+  type ExitDialog = { kind: "dirty" | "risky" | "stranded"; error?: string; pending?: number; nav: () => void };
   const [exitDialog, setExitDialog] = React.useState<ExitDialog | null>(null);
   const [leaving, setLeaving] = React.useState(false);
   // 2A: set immediately before a user-confirmed programmatic navigation so the
@@ -362,6 +363,15 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
           nav,
         });
       }
+      /* Everything above is PROJECT-save state. CMS collections, components,
+         templates and versions mirror through `SyncRetryQueue`, which never
+         touches the project — so a site with a clean project and a queue full
+         of failed mirrors walked out of here with no dialog at all. The queue
+         is a Map of closures in memory, so the navigation ends them: the local
+         copy survives and the server never hears about it. Read at call time,
+         not from state, because the count changes from `window` callbacks. */
+      const stranded = totalPendingMirrors();
+      if (stranded > 0) return setExitDialog({ kind: "stranded", pending: stranded, nav });
       nav();
     },
     [offline, isDirty, saveStatus],
@@ -401,10 +411,15 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   // 2A: browser-chrome exits (⌘W, refresh, tab close) get the native prompt
   // while there is anything a navigation would strand.
   React.useEffect(() => {
-    const shouldGuard = isDirty || saveStatus === "saving";
-    if (!shouldGuard) return;
+    /* Registered unconditionally and decided when it fires. It used to be
+       mounted only while `isDirty || saving`, which cannot see the mirror
+       queue: that count changes from `window` event callbacks with no render
+       in between, so a listener gated on React state would still be absent at
+       the moment it was needed. Reading at fire time has no staleness. */
     const onBefore = (e: BeforeUnloadEvent) => {
       if (bypassRef.current) return;
+      const stranded = totalPendingMirrors();
+      if (!isDirty && saveStatus !== "saving" && stranded === 0) return;
       e.preventDefault();
       e.returnValue = "";
     };
@@ -786,12 +801,24 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
             <ModalTitle id="bk-exit-title">
               {exitDialog.kind === "risky"
                 ? "You're offline with unsaved changes"
-                : "Leave with unsaved changes?"}
+                : exitDialog.kind === "stranded"
+                  ? "Some changes are only on this device"
+                  : "Leave with unsaved changes?"}
             </ModalTitle>
             <ModalDescription>
               {exitDialog.kind === "risky"
                 ? "Saving isn't possible right now — leaving loses this work. Reconnect first, or stay until the connection returns."
-                : "Your last edits aren't saved yet."}
+                : exitDialog.kind === "stranded"
+                  ? /* Says what actually happens, which is not "you lose your
+                       work": the local copy survives, the retry queue does not.
+                       Naming the wrong loss would be its own defect — and the
+                       first wording did exactly that, promising "your other
+                       sites won't see them" for a count that also covers CMS
+                       entries and saved versions, both of which are site-scoped
+                       and would never appear on another site even after a
+                       perfect sync. (Codex review, 2026-08-24.) */
+                    `${exitDialog.pending} change${exitDialog.pending === 1 ? "" : "s"} ${exitDialog.pending === 1 ? "hasn't" : "haven't"} reached the server yet. Leaving drops the retry queue — they stay on this device and never reach your account.`
+                  : "Your last edits aren't saved yet."}
             </ModalDescription>
             {exitDialog.error ? (
               <p className="bk-exit-dialog__error" role="alert">
@@ -799,7 +826,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
               </p>
             ) : null}
             <ModalFooter>
-              {exitDialog.kind === "risky" ? (
+              {exitDialog.kind === "risky" || exitDialog.kind === "stranded" ? (
                 <>
                   <Button onClick={() => setExitDialog(null)}>Stay</Button>
                   <Button
@@ -807,7 +834,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
                     onClick={leaveAnyway}
                     className="tw:border-[var(--bk-error)] tw:bg-transparent tw:text-[var(--bk-error)]"
                   >
-                    Leave and lose changes
+                    {exitDialog.kind === "stranded" ? "Leave anyway" : "Leave and lose changes"}
                   </Button>
                 </>
               ) : (

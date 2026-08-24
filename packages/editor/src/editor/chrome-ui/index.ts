@@ -126,6 +126,7 @@ export { ConfirmDialog, type ConfirmDialogProps } from "./ConfirmDialog";
 export {
   ToastProvider,
   useToast,
+  dismissToast,
   type ToastInput,
   type QueuedToast,
   type ToastTone,

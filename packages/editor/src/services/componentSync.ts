@@ -17,7 +17,7 @@ import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
 import { currentSiteId } from "./ReviewService";
 import { loadComponents, saveComponent } from "../engine/components/ComponentStorage";
 import type { ComponentDefinition } from "../shared/types/components";
-import { SyncRetryQueue } from "./syncRetryQueue";
+import { SyncRetryQueue, registerPendingSource } from "./syncRetryQueue";
 
 function client() {
   return getBuildrikClient(DASHBOARD_URL);
@@ -26,6 +26,7 @@ function client() {
 // A failed mirror used to be console.warn'd (upsert also one-shot-notified) and
 // then dropped forever. Now it queues + retries on reconnect like cmsSync.
 const queue = new SyncRetryQueue();
+registerPendingSource("component", () => queue.pendingCount());
 
 /** Subscribe to component-sync failures. Returns an unsubscribe fn. */
 export function onComponentSyncError(cb: () => void): () => void {

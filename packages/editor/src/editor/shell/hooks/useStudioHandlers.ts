@@ -7,13 +7,13 @@
  */
 
 import * as React from "react";
-import { ToastInput } from "@/editor/chrome-ui";
+import { ToastInput, dismissToast } from "@/editor/chrome-ui";
 import { getBlockDefinitions, insertBlock } from "../../../blocks/blockRegistry";
 import type { Composer } from "../../../engine";
 import { STORAGE_KEYS } from "../../../shared/constants/config";
 import type { BlockData } from "../../../shared/types";
 import { canNestElement } from "../../../shared/utils/nesting";
-import { mirrorUserTemplate, retryTemplateSync } from "../../../services/templateSync";
+import { mirrorUserTemplate, retryTemplateSync, getTemplateSyncPendingCount, onTemplateSyncError } from "../../../services/templateSync";
 import { inverseResolveTokens } from "../../sidebar/tabs/templates/utils/inverseResolveTokens";
 import { snapshotFromComputedStyle } from "../../sidebar/tabs/templates/utils/tokenSnapshot";
 import { DEFAULT_TOKENS } from "../../design-system/constants";
@@ -31,6 +31,45 @@ export interface UseStudioHandlersReturn {
 
 export function useStudioHandlers(params: UseStudioHandlersParams): UseStudioHandlersReturn {
   const { composer, addToast } = params;
+
+  /* One coalesced "template didn't reach the server" notice, owned by the sync
+     queue's own error channel — the same shape `useCmsSync`, `useComponentSync`
+     and `useVersionSync` use. Templates were the odd one out: nothing subscribed
+     to `onTemplateSyncError` at all, so the notice was raised from the save
+     handler and could never be retracted by anything the handler did not do
+     itself. */
+  React.useEffect(() => {
+    let toastShown = false;
+    let toastId: string | null = null;
+    const clear = () => {
+      if (toastId) dismissToast(toastId);
+      toastId = null;
+      toastShown = false;
+    };
+    const off = onTemplateSyncError(() => {
+      if (getTemplateSyncPendingCount() === 0) return clear();
+      if (toastShown) return;
+      toastShown = true;
+      toastId = addToast({
+        title: "Template saved on this device only",
+        description:
+          "It didn't reach the server, so your other sites can't use it yet. Retry now, or leave it — a reconnect replays the queue.",
+        tone: "error",
+        duration: Infinity,
+        action: {
+          label: "Retry now",
+          onClick: () => {
+            clear();
+            void retryTemplateSync();
+          },
+        },
+      });
+    });
+    return () => {
+      off();
+      clear();
+    };
+  }, [addToast]);
 
   const handleQuickAdd = React.useCallback(
     (block: BlockData) => {
@@ -97,17 +136,12 @@ export function useStudioHandlers(params: UseStudioHandlersParams): UseStudioHan
            ever subscribed (`onTemplateSyncError` and `retryTemplateSync` had no
            callers at all), so a template that never left this device looked
            identical to one that did. */
-        void mirrorUserTemplate(newTemplate).then((mirrored) => {
-          if (mirrored) return;
-          addToast({
-            title: "Template saved on this device only",
-            description:
-              "It didn't reach the server, so your other sites can't use it yet. Retry now, or leave it — a reconnect replays the queue.",
-            tone: "error",
-            duration: Infinity,
-            action: { label: "Retry now", onClick: () => void retryTemplateSync() },
-          });
-        });
+        /* The stranded-template notice is raised by the subscriber effect at the
+           top of this hook, not here. Raised inline it could see only ITS OWN
+           mirror's outcome: a reconnect that drained the queue left the notice
+           standing, and a second failed template stacked a second identical
+           permanent notice beside the first. (Codex review, 2026-08-24.) */
+        void mirrorUserTemplate(newTemplate);
       } catch {
         addToast({ title: "Save failed", description: "Could not save template.", tone: "error" });
       }

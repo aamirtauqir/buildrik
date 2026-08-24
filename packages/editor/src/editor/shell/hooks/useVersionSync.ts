@@ -7,7 +7,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { ToastInput } from "@/editor/chrome-ui";
+import { ToastInput, dismissToast } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
 import { EVENTS } from "../../../shared/constants/events";
 import type {
@@ -19,6 +19,7 @@ import {
   mirrorVersionDelete,
   hydrateVersionsFromServer,
   onVersionSyncError,
+  getVersionSyncPendingCount,
   retryVersionSync,
 } from "../../../services/versionSync";
 import { currentSiteId } from "../../../services/ReviewService";
@@ -50,11 +51,23 @@ export function useVersionSync(
     // Surface it once (coalesced) instead of silently — version history is a
     // trust feature, and the whole point is that it's NOT browser-local anymore.
     let toastShown = false;
+    let toastId: string | null = null;
+    /* Retract, don't just stop repeating. This toast is `duration: Infinity`
+       and asserts the change is not on the server; when the queue drains — by
+       the button below, or by `SyncRetryQueue`'s own `online` replay with no UI
+       involved — it has to come off, or it keeps saying so after it stopped
+       being true. */
+    const clear = () => {
+      if (toastId) dismissToast(toastId);
+      toastId = null;
+      toastShown = false;
+    };
     const unsubscribe = addToast
       ? onVersionSyncError(() => {
+          if (getVersionSyncPendingCount() === 0) return clear();
           if (toastShown) return;
           toastShown = true;
-          addToast({
+          toastId = addToast({
             title: "A saved version didn't sync to the cloud",
             /* "It'll retry when you save the next version" was not true:
                `SyncRetryQueue.run` replays only the op it is given, so a later
@@ -69,7 +82,11 @@ export function useVersionSync(
             action: {
               label: "Retry now",
               onClick: () => {
-                toastShown = false;
+                /* Take this one down before retrying, not after. On success
+                   there is nothing left to correct it with; on a second
+                   failure the subscriber raises a fresh one, and leaving this
+                   one up stacked two identical Infinity toasts. */
+                clear();
                 void retryVersionSync();
               },
             },

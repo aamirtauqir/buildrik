@@ -39,6 +39,11 @@ vi.mock("../../../services/ReviewService", () => ({
 
 // P6 role gating — controllable per test; null = unknown (no gating).
 const roleState = vi.hoisted(() => ({ role: null as string | null }));
+let strandedMirrors = 0;
+vi.mock("@/services/syncRetryQueue", () => ({
+  totalPendingMirrors: () => strandedMirrors,
+}));
+
 vi.mock("../hooks/useEditorRole", () => ({ useEditorRole: () => roleState.role }));
 
 vi.mock("../../../services/NotificationService", () => ({
@@ -749,19 +754,107 @@ describe("F1 dirty-exit guard", () => {
     unmount();
   });
 
-  it("beforeunload guard registers only while dirty/saving and honors the bypass", () => {
-    const addSpy = vi.spyOn(window, "addEventListener");
-    const { rerender } = render(<StudioHeader {...makeProps()} />);
-    expect(addSpy.mock.calls.filter(([t]) => t === "beforeunload")).toHaveLength(0);
-    rerender(<StudioHeader {...makeProps({ isDirty: true })} />);
-    expect(addSpy.mock.calls.filter(([t]) => t === "beforeunload")).toHaveLength(1);
-    const handler = addSpy.mock.calls.find(([t]) => t === "beforeunload")?.[1] as (
+  /* Asserts what the guard DOES, not when it is mounted. The listener is now
+     registered unconditionally and decides at fire time, because the stranded-
+     mirror count changes from `window` callbacks with no render in between —
+     a listener gated on React state would be absent exactly when it mattered.
+     The old version of this test asserted zero listeners on a clean header,
+     which locked in that gating. */
+  function fireBeforeUnload(): { prevented: boolean } {
+    const spy = vi.spyOn(window, "addEventListener");
+    const { unmount } = render(<StudioHeader {...lastProps} />);
+    const handler = spy.mock.calls.filter(([t]) => t === "beforeunload").pop()?.[1] as (
       e: Partial<BeforeUnloadEvent>,
     ) => void;
     const e = { preventDefault: vi.fn(), returnValue: undefined as unknown };
     handler(e as unknown as BeforeUnloadEvent);
-    expect(e.preventDefault).toHaveBeenCalled();
-    addSpy.mockRestore();
+    spy.mockRestore();
+    unmount();
+    return { prevented: (e.preventDefault as ReturnType<typeof vi.fn>).mock.calls.length > 0 };
+  }
+  let lastProps = makeProps();
+
+  it("beforeunload stays silent when nothing would be stranded", () => {
+    strandedMirrors = 0;
+    lastProps = makeProps();
+    expect(fireBeforeUnload().prevented).toBe(false);
+  });
+
+  it("beforeunload prompts while the project is dirty", () => {
+    strandedMirrors = 0;
+    lastProps = makeProps({ isDirty: true });
+    expect(fireBeforeUnload().prevented).toBe(true);
+  });
+
+  /* The defect this covers: CMS / component / template / version mirrors queue
+     in `SyncRetryQueue`, which never touches the project save — so with a clean
+     project the guard saw nothing and the tab closed silently, ending an
+     in-memory queue of closures. */
+  it("beforeunload prompts on a CLEAN project when mirrors are stranded", () => {
+    strandedMirrors = 3;
+    lastProps = makeProps();
+    expect(fireBeforeUnload().prevented).toBe(true);
+    strandedMirrors = 0;
+  });
+});
+
+describe("exit dialog — stranded mirrors", () => {
+  const realLocation = window.location;
+  function stubLocation() {
+    const assign = vi.fn();
+    Object.defineProperty(window, "location", {
+      configurable: true,
+      writable: true,
+      value: { ...realLocation, assign, href: realLocation.href },
+    });
+    return assign;
+  }
+  afterEach(() => {
+    strandedMirrors = 0;
+    Object.defineProperty(window, "location", {
+      configurable: true,
+      writable: true,
+      value: realLocation,
+    });
+  });
+
+  /* The defect: mirrors queue in `SyncRetryQueue`, which never touches the
+     project save, so a clean project walked straight out and the in-memory
+     queue died with the page. */
+  it("names what is actually lost, and does not claim the work is gone", () => {
+    strandedMirrors = 2;
+    const assign = stubLocation();
+    render(<StudioHeader {...makeProps()} />);
+    fireEvent.click(screen.getByRole("button", { name: "‹ Exit" }));
+    expect(assign).not.toHaveBeenCalled();
+    expect(screen.getByText("Some changes are only on this device")).toBeTruthy();
+    const body = screen.getByText(/reached the server/).textContent ?? "";
+    expect(body).toMatch(/2 changes/);
+    expect(body).toMatch(/stay on this device/);
+    /* Not "your other sites won't see them": the count also covers CMS entries
+       and saved versions, which are site-scoped and would never show on another
+       site even after a perfect sync. */
+    expect(body).not.toMatch(/other sites/);
+    /* Not "lose changes" — the local copy survives; the retry queue does not. */
+    expect(screen.getByRole("button", { name: "Leave anyway" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Leave and lose changes" })).toBeNull();
+  });
+
+  it("says 'change' and 'hasn't' for exactly one", () => {
+    strandedMirrors = 1;
+    stubLocation();
+    render(<StudioHeader {...makeProps()} />);
+    fireEvent.click(screen.getByRole("button", { name: "‹ Exit" }));
+    expect(screen.getByText(/hasn't reached the server/).textContent).toMatch(/1 change /);
+  });
+
+  it("a clean project with an empty queue exits without a dialog", () => {
+    strandedMirrors = 0;
+    const assign = stubLocation();
+    render(<StudioHeader {...makeProps()} />);
+    fireEvent.click(screen.getByRole("button", { name: "‹ Exit" }));
+    expect(screen.queryByText("Some changes are only on this device")).toBeNull();
+    expect(assign).toHaveBeenCalled();
   });
 });
 

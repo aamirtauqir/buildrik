@@ -7,7 +7,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { ToastInput } from "@/editor/chrome-ui";
+import { ToastInput, dismissToast } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
 import { EVENTS } from "../../../shared/constants/events";
 import type {
@@ -20,6 +20,7 @@ import {
   mirrorComponentDelete,
   hydrateComponentsFromServer,
   onComponentSyncError,
+  getComponentSyncPendingCount,
   retryComponentSync,
 } from "../../../services/componentSync";
 import { currentSiteId } from "../../../services/ReviewService";
@@ -53,11 +54,23 @@ export function useComponentSync(
     // shared across the agency's sites. Surface it once (coalesced) instead of
     // silently dropping.
     let toastShown = false;
+    let toastId: string | null = null;
+    /* Retract, don't just stop repeating. This toast is `duration: Infinity`
+       and asserts the change is not on the server; when the queue drains — by
+       the button below, or by `SyncRetryQueue`'s own `online` replay with no UI
+       involved — it has to come off, or it keeps saying so after it stopped
+       being true. */
+    const clear = () => {
+      if (toastId) dismissToast(toastId);
+      toastId = null;
+      toastShown = false;
+    };
     const unsubscribe = addToast
       ? onComponentSyncError(() => {
+          if (getComponentSyncPendingCount() === 0) return clear();
           if (toastShown) return;
           toastShown = true;
-          addToast({
+          toastId = addToast({
             title: "A component didn't sync to the cloud",
             /* Same correction as the version toast: editing another component
                mirrors THAT one and leaves this one queued (`SyncRetryQueue.run`
@@ -69,7 +82,11 @@ export function useComponentSync(
             action: {
               label: "Retry now",
               onClick: () => {
-                toastShown = false;
+                /* Take this one down before retrying, not after. On success
+                   there is nothing left to correct it with; on a second
+                   failure the subscriber raises a fresh one, and leaving this
+                   one up stacked two identical Infinity toasts. */
+                clear();
                 void retryComponentSync();
               },
             },

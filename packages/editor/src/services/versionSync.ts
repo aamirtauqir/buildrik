@@ -19,7 +19,7 @@ import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
 import { currentSiteId } from "./ReviewService";
 import { loadVersions, saveVersion } from "../engine/storage/VersionHistoryStorage";
 import type { NamedVersion } from "../shared/types/versions";
-import { SyncRetryQueue } from "./syncRetryQueue";
+import { SyncRetryQueue, registerPendingSource } from "./syncRetryQueue";
 
 function client() {
   return getBuildrikClient(DASHBOARD_URL);
@@ -28,6 +28,7 @@ function client() {
 // A failed mirror used to be console.warn'd (create also one-shot-notified) and
 // then dropped forever. Now it queues + retries on reconnect like cmsSync.
 const queue = new SyncRetryQueue();
+registerPendingSource("version", () => queue.pendingCount());
 
 /** Subscribe to version-sync failures. Returns an unsubscribe fn. */
 export function onVersionSyncError(cb: () => void): () => void {

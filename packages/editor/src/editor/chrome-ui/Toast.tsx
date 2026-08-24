@@ -125,6 +125,17 @@ const store = (() => {
   };
 })();
 
+/**
+ * Dismiss a toast by the id `addToast` returned, from outside React.
+ *
+ * This is the same singleton method the context hands out as `removeToast` —
+ * `store` itself stays private so nothing can reach `add`/`subscribe` around
+ * the provider. It exists because the sync layer's stranded-mirror notices are
+ * raised from `window` event callbacks that were handed only `addToast`, and
+ * `useToast()` throws outside a provider, which their tests run without.
+ */
+export const dismissToast = store.remove;
+
 const ToastContext = React.createContext<UseToastReturn | null>(null);
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {

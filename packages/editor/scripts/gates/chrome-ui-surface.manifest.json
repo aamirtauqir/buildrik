@@ -178,6 +178,7 @@
     "ToastActionPayload": "local",
     "ToastInput": "local",
     "ToastProvider": "local",
+    "dismissToast": "local",
     "ToastTone": "local",
     "ToggleSwitch": "flowbite-reexport",
     "toneFor": "local",

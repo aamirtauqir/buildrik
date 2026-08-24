@@ -14,7 +14,7 @@ import { getBuildrikClient } from "./api-client";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
 import { currentSiteId } from "./ReviewService";
 import { STORAGE_KEYS } from "../shared/constants/storageKeys";
-import { SyncRetryQueue } from "./syncRetryQueue";
+import { SyncRetryQueue, registerPendingSource } from "./syncRetryQueue";
 
 function client() {
   return getBuildrikClient(DASHBOARD_URL);
@@ -24,6 +24,7 @@ function client() {
 // error channel at all (unlike version/component which at least notified). Now
 // it queues + notifies + retries on reconnect like cmsSync.
 const queue = new SyncRetryQueue();
+registerPendingSource("template", () => queue.pendingCount());
 
 /*
   Hydration status, so the panel can say what happened.
