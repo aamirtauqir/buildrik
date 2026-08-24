@@ -118,6 +118,34 @@ describe("useDirtyPages", () => {
     expect(result.current.size).toBe(0);
   });
 
+  /* Codex, reviewing the whole session at once: `PageManager` emits
+     page:updated / page:home / page:created / page:deleted / page:reordered /
+     page:imported with the affected page IN THE PAYLOAD, and it is routinely
+     not the active one. Renaming a page from the Pages tree, or setting a
+     different page as home, marked whichever page happened to be OPEN and left
+     the edited one looking clean. */
+  it.each([
+    ["page:updated", "p2"],
+    ["page:home", "p3"],
+    ["page:created", "p4"],
+    ["page:reordered", "p2"],
+  ])("%s marks the page in the payload, not the active one", (type, target) => {
+    const composer = makeComposer("p1");                       // p1 is ACTIVE
+    const { result } = renderHook(() => useDirtyPages(composer));
+    act(() => composer.emit(EVENTS.PROJECT_CHANGED, { type, page: { id: target } }));
+    expect(result.current.has(target)).toBe(true);
+    expect(result.current.has("p1")).toBe(false);
+  });
+
+  /* An element edit carries no page, and for those the active page IS the
+     right answer — the engine has no per-page flag on element events. */
+  it("falls back to the active page when the event names none", () => {
+    const composer = makeComposer("p1");
+    const { result } = renderHook(() => useDirtyPages(composer));
+    act(() => composer.emit(EVENTS.PROJECT_CHANGED));
+    expect(result.current.has("p1")).toBe(true);
+  });
+
   /* The defect this replaced: click Layers, click back to Pages, and every
      dot was gone with nothing saved, because the markers were the panel's
      useState. */

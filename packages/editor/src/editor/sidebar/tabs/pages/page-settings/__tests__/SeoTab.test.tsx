@@ -236,8 +236,8 @@ describe("SeoTab — a placeholder slug is explained where it is fixed", () => {
     render(<SeoTab s={settings({ slug: "page-4" })} page={makePage()} />);
     const hint = document.getElementById("seo-slug")?.getAttribute("aria-describedby");
     expect(hint).toBe("seo-slug-hint");
-    expect(screen.getByText(/is auto-generated/).textContent).toMatch(/page-4/);
-    expect(screen.getByText(/is auto-generated/).textContent).toMatch(/\+10 pts/);
+    expect(screen.getByText(/is a numbered URL/).textContent).toMatch(/page-4/);
+    expect(screen.getByText(/is a numbered URL/).textContent).toMatch(/\+10 pts/);
   });
 
   /* The banner stays ONE clause. Chaining the slug reason onto it with a
@@ -252,14 +252,14 @@ describe("SeoTab — a placeholder slug is explained where it is fixed", () => {
 
   it("shows the plain format rule when the slug is a real one", () => {
     render(<SeoTab s={settings({ slug: "pricing", seoChecks: { titleSet: false, slugClean: true, indexingOn: true, descSet: false } })} page={makePage()} />);
-    expect(screen.queryByText(/is auto-generated/)).toBeNull();
+    expect(screen.queryByText(/is a numbered URL/)).toBeNull();
     expect(screen.getByText(/Lowercase letters/)).toBeTruthy();
   });
 
-  /* An empty or rejected slug also greys the tick, and calling THAT
-     auto-generated would be a second wrong explanation. */
-  it("does not call an empty slug auto-generated", () => {
+  /* An empty or rejected slug also greys the tick, and calling THAT a
+     numbered URL would be a second wrong explanation. */
+  it("does not call an empty slug a numbered URL", () => {
     render(<SeoTab s={settings({ slug: "", seoScore: 20 })} page={makePage()} />);
-    expect(screen.queryByText(/is auto-generated/)).toBeNull();
+    expect(screen.queryByText(/is a numbered URL/)).toBeNull();
   });
 });

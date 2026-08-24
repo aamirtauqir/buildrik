@@ -296,12 +296,20 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
             app generated for you, then the format rule. The middle one exists
             because "Clean URL slug" goes grey on `page-4` — lowercase,
             hyphenated, perfectly valid — and nothing said why. It says so here,
-            beside the field that fixes it. */}
+            beside the field that fixes it.
+
+            It describes the URL and does NOT claim who wrote it. The first
+            wording said "is auto-generated", which is a statement about
+            provenance this code cannot check: `page-404` may well have been
+            typed on purpose. The SCORE still applies — /page-404 is a weak URL
+            for search whoever chose it, and scoring by provenance would give
+            one URL two different scores — but the COPY must not assert a fact
+            it does not have. Codex, whole-session review. */}
         {s.slugError ? (
           <HelperText color="failure" className={BK_HELPER_ERROR_CLASS}>{s.slugError}</HelperText>
         ) : isPlaceholderSlug(s.slug) ? (
           <HelperText className={BK_HELPER_CLASS}>
-            “{s.slug}” is auto-generated — a descriptive slug ranks better (+10 pts)
+            “{s.slug}” is a numbered URL — a descriptive slug ranks better (+10 pts)
           </HelperText>
         ) : (
           <HelperText className={BK_HELPER_CLASS}>Lowercase letters, numbers, and hyphens only — auto-formatted as you type</HelperText>

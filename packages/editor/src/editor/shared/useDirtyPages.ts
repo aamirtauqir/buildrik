@@ -57,9 +57,24 @@ function getStore(composer: Composer): DirtyStore {
        `project:changed` too, so without this a plain page switch lit an
        unsaved dot on a page nothing had touched. */
     if (isNavigationOnlyChange(payload)) return;
-    const active = composer.elements.getActivePage();
-    if (!active || store.snapshot.has(active.id)) return;
-    publish(new Set(store.snapshot).add(active.id));
+
+    /* Mark the page the event is ABOUT, not whichever one is open.
+       `PageManager` emits `page:updated`, `page:home`, `page:created`,
+       `page:deleted`, `page:reordered` and `page:imported` with the affected
+       page in the payload, and it is routinely NOT the active one — rename a
+       page from the Pages tree, or set a different page as home, and the edit
+       belongs to that page. Tagging the active page instead lit the dot on the
+       wrong row and left the edited page looking clean. Codex caught it in the
+       whole-session review; element edits carry no page, so they still fall
+       back to the active page, which is correct for them. */
+    const target =
+      (typeof payload === "object" &&
+        payload !== null &&
+        (payload as { page?: { id?: unknown } }).page?.id) ||
+      composer.elements.getActivePage()?.id;
+
+    if (typeof target !== "string" || store.snapshot.has(target)) return;
+    publish(new Set(store.snapshot).add(target));
   };
   const clearDirty = () => publish(EMPTY);
 
