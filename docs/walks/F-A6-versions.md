@@ -66,6 +66,13 @@ prune."* Leg passes.
 The Compare diptych / semantic list, the time-travel scrubber, the 300 ms hover
 preview banner, and the server mirror's own 50-per-site cap.
 
+**Three of those four were walked 2026-08-25 — `docs/walks/U9-version-rescue.md`.**
+Compare printed the raw `Auto: project:loaded` in its own copy, a fifth caller
+that skipped `versionDisplayName` after this walk fixed four; and its toggle
+group was `rgba(255,255,255,0.04)` on a white panel, which turned out to be one
+of three surviving dark-theme grounds. The hover preview and the cap both came
+back clean. The **scrubber is still unwalked.**
+
 **Disclosed:** this walk's probes inserted headings into `scratch-smoke`
 repeatedly, taking it to 48 elements; the leg-2 restore then dropped it to 8.
 Its content is arbitrary, but the churn is mine.

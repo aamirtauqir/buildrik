@@ -22,13 +22,19 @@ import * as React from "react";
 import type { CompareResult, NamedVersion } from "../../../shared/types/versions";
 import { AIResultText, AIControls } from "./AIPanel";
 import { Button } from "@/editor/chrome-ui";
+import { versionDisplayName } from "@/shared/utils/versionLabel";
 // ─── Style constants ──────────────────────────────────────────────────
 
+/* `rgba(255,255,255,0.04)` sat here until 2026-08-25 — white at 4% over the
+   panel's own white, i.e. no ground at all. It reads as a dark-theme leftover,
+   and measured live the group had `background rgba(255,255,255,0.04)` against
+   `rgb(255,255,255)`: only the border was visible, so the two pills floated with
+   nothing holding them together. */
 const TOGGLE_PILL_CONTAINER: React.CSSProperties = {
   display: "inline-flex",
   gap: 2,
   padding: 2,
-  background: "rgba(255,255,255,0.04)",
+  background: "var(--bk-bg-subtle)",
   border: "1px solid var(--bk-border)",
   borderRadius: 999,
   marginBottom: 8,
@@ -137,8 +143,8 @@ export function CompareView({
           )}
           {version.visualSnapshot && (
             <div className="screenshot-thumb">
-              <img src={version.visualSnapshot} alt={version.name} />
-              <span className="screenshot-label">{version.name}</span>
+              <img src={version.visualSnapshot} alt={versionDisplayName(version)} />
+              <span className="screenshot-label">{versionDisplayName(version)}</span>
             </div>
           )}
         </div>
@@ -159,13 +165,7 @@ export function CompareView({
             <span className="diff-summary-badge content">{summary.content} content</span>
           )}
           {summary.other > 0 && (
-            <span
-              className="diff-summary-badge"
-              style={{
-                background: "rgba(144,141,133,0.15)",
-                color: "var(--bk-ink-muted)",
-              }}
-            >
+            <span className="diff-summary-badge tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink-muted)]">
               {summary.other} other
             </span>
           )}
@@ -191,7 +191,7 @@ export function CompareView({
         <p className="tw:mt-[var(--bk-space-8)] tw:mb-0 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)] tw:text-center">
           {compareResult === null
             ? "This is the newest version — there is nothing later to compare it against."
-            : `Nothing changed since “${version.name}”.`}
+            : `Nothing changed since “${versionDisplayName(version)}”.`}
         </p>
       )}
       {/* Semantic mode — change list */}

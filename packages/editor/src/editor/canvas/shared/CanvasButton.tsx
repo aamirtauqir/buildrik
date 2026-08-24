@@ -30,7 +30,11 @@ const SIZE_STYLES: Record<string, React.CSSProperties> = {
 const VARIANT_STYLES: Record<string, { base: React.CSSProperties; hover: React.CSSProperties }> = {
   default: {
     base: {
-      background: "rgba(255,255,255,0.06)",
+      /* The dark theme's 6%-white ground, missed when CANVAS_COLORS itself was
+         repointed at the light tokens (see the note above the palette). Its own
+         constant for a recessed surface is `bgPanelSecondary`, so use that
+         rather than a fourth literal. */
+      background: CANVAS_COLORS.bgPanelSecondary,
       border: `1px solid ${CANVAS_COLORS.border}`,
       color: CANVAS_COLORS.textPrimary,
     },

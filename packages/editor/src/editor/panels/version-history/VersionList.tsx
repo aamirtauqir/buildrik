@@ -230,7 +230,7 @@ export function VersionRow({
       {showPreview && version.visualSnapshot && previewRect && (
         <SnapshotPreview
           snapshotUrl={version.visualSnapshot}
-          versionName={version.name}
+          versionName={versionDisplayName(version)}
           anchorRect={previewRect}
         />
       )}
