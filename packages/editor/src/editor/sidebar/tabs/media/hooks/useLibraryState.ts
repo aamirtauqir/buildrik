@@ -36,6 +36,7 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
   const [serverPage, setServerPage] = useState(() => composer.media.getServerPage());
   const [loadingMore, setLoadingMore] = useState(false);
   const inFlight = useRef(false);
+  const [searchState, setSearchState] = useState<"idle" | "searching" | "whole" | "truncated" | "failed">("idle");
   const [loadMoreError, setLoadMoreError] = useState(false);
   const [folders, setFolders] = useState(() => composer.media.getFolders());
   const [allFolders, setAllFolders] = useState(() => composer.media.getAllFolders());
@@ -286,7 +287,7 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
   /* Subscribed rather than read once: the first page lands from the shell's
      boot path, long after this hook mounts. */
   useEffect(() => {
-    const onPage = (p: unknown) => setServerPage(p as { nextCursor: string | null; total: number });
+    const onPage = (p: unknown) => setServerPage(p as { nextCursor: string | null; total: number; loaded: number });
     composer.media.on(MEDIA_EVENTS.SERVER_PAGE_CHANGED, onPage);
     return () => composer.media.off(MEDIA_EVENTS.SERVER_PAGE_CHANGED, onPage);
   }, [composer]);
@@ -323,6 +324,10 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
           nextCursor: next.nextCursor,
           // The server counts once per pull; later pages carry no total.
           total: next.total ?? page.total,
+          /* Only PAGING advances this. A search also imports assets, and
+             counting those would climb the footer toward the total while the
+             cursor stood still. */
+          loaded: page.loaded + next.assets.length,
         });
       }
       setRawAssets(composer.media.getAssets());
@@ -334,6 +339,62 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
     }
   }, [composer]);
 
+  /* A search reaches the WHOLE library, not just the page that happens to be
+     loaded. Every filter in this drawer — type pills, folder, search — runs on
+     the client over `rawAssets`, so before this a query on a 412-asset library
+     searched 200 of them and said "Nothing matches" about a file that exists.
+     `listAssets` has always taken a `search` argument; nothing sent it.
+
+     The matches are IMPORTED rather than displayed on a separate path:
+     `importServerAssets` appends and skips ids already held, so the existing
+     client filter renders them with everything else and there is no second
+     rendering path to keep in step. Skipped entirely when the library is
+     already fully local — then the client filter is the whole truth. */
+  useEffect(() => {
+    const q = librarySearch.trim();
+    if (q.length < 2) {
+      setSearchState("idle");
+      return;
+    }
+    const siteId = getSiteIdFromUrl();
+    /* Depends on `serverPage`, not just the query. Reading it inside the effect
+       and depending only on [composer, librarySearch] meant a query typed
+       BEFORE the boot page landed bailed on `!page` and never ran again — the
+       drawer then showed "Nothing matches" beside a scope line promising the
+       whole library. (Codex review, 2026-08-24.) */
+    if (!serverPage || !siteId || serverPage.total <= serverPage.loaded) return;
+
+    let cancelled = false;
+    setSearchState("searching");
+    const timer = setTimeout(async () => {
+      try {
+        const hit = await loadServerMedia(siteId, undefined, q);
+        if (cancelled) return;
+        if (!hit) {
+          /* A refused leg is NOT "no match". `loadServerMedia` turns offline,
+             signed-out and RPC failures into null, and swallowing that put the
+             original false negative straight back: the drawer would say
+             "Nothing matches" for a file that exists, under a line claiming the
+             whole library had been searched. */
+          setSearchState("failed");
+          return;
+        }
+        await composer.media.importServerAssets(hit.assets, hit.folders);
+        setRawAssets(composer.media.getAssets());
+        /* The search is paged too. Claiming "all 412 items" while holding the
+           first 200 MATCHES is the same overstatement in a smaller place. */
+        setSearchState(hit.nextCursor ? "truncated" : "whole");
+      } catch {
+        if (!cancelled) setSearchState("failed");
+      }
+    }, 350);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [composer, librarySearch, serverPage]);
+
   const retryLibraryLoad = useCallback(() => {
     setLibraryError(null);
     setLibraryLoading(true);
@@ -342,10 +403,7 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
 
   return {
     rawAssets,
-    /* What has been PULLED, which is the only thing the server's total can
-       honestly be compared against — `libraryItems` is filtered on the client
-       by type, folder and search. */
-    loadedCount: rawAssets.length,
+    searchState,
     serverPage,
     loadingMore,
     loadMoreError,

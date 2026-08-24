@@ -336,7 +336,7 @@ function MediaTabWithComposer({
         loadError={state.libraryError}
         onRetryLoad={state.retryLibraryLoad}
         serverPage={state.serverPage}
-        loadedCount={state.loadedCount}
+        searchState={state.searchState}
         loadingMore={state.loadingMore}
         loadMoreError={state.loadMoreError}
         onLoadMore={state.loadMoreAssets}

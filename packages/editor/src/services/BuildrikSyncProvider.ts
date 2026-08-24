@@ -406,6 +406,7 @@ export async function saveProject(
 export async function loadServerMedia(
   siteId: string,
   cursor?: string,
+  search?: string,
 ): Promise<{
   assets: ReadonlyArray<{
     id: string;
@@ -440,7 +441,17 @@ export async function loadServerMedia(
        200, silently, and the grid, the picker and replace-across-site all read
        that same truncated set. */
     const [assetsResult, foldersResult] = await Promise.all([
-      client.media.listAssets.query({ siteId, limit: MEDIA_PAGE_SIZE, ...(cursor ? { cursor } : {}) }),
+      client.media.listAssets.query({
+        siteId,
+        limit: MEDIA_PAGE_SIZE,
+        ...(cursor ? { cursor } : {}),
+        /* Sent so a search can reach assets this browser has never pulled. The
+           drawer's type, folder and search filters all run on the client over
+           the loaded set, so on a 412-asset library a search reached 200 of
+           them and quietly reported "Nothing matches" for a file that exists.
+           `listAssets` has always accepted this argument; nothing ever sent it. */
+        ...(search ? { search } : {}),
+      }),
       /* Fetched on EVERY page, including "load more". Skipping it read as a
          free optimisation — folders are not paged — but folders are not FROZEN
          either: create a folder in another tab and move an asset into it

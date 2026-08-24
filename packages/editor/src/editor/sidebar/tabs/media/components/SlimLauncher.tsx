@@ -100,9 +100,9 @@ interface SlimLauncherProps {
    */
   onRetryUpload?(fileName: string): void;
   /** Server paging edges — null in the standalone demo, which has no server. */
-  serverPage?: { nextCursor: string | null; total: number } | null;
-  /** Assets pulled from the server so far — NOT the filtered list on screen. */
-  loadedCount?: number;
+  serverPage?: { nextCursor: string | null; total: number; loaded: number } | null;
+  /** Where a whole-library search stands — see `LibraryStateResult`. */
+  searchState?: "idle" | "searching" | "whole" | "truncated" | "failed";
   loadingMore?: boolean;
   loadMoreError?: boolean;
   onLoadMore?(): Promise<void> | void;
@@ -188,6 +188,33 @@ export function SlimLauncher(props: SlimLauncherProps) {
           aria-label="Search library"
         />
       </div>
+
+      {/* Search scope — board `145:2` → `Search scope` (1313:11), 22h under the
+          field. Shown only while a query is running against a library that is
+          NOT fully loaded, because that is the only case where the scope is a
+          question: every filter in this drawer runs on the client over what has
+          been pulled, so a search used to reach 200 of 412 assets and report
+          "Nothing matches" about a file that exists. */}
+      {props.serverPage && searchQuery.trim().length >= 2 && props.serverPage.total > props.serverPage.loaded ? (
+        <div
+          className={`tw:flex tw:min-h-[22px] tw:items-center tw:px-4 tw:text-[12px] tw:leading-4 ${props.searchState === "failed" ? "tw:text-red-700" : "tw:text-gray-500"}`}
+          data-testid="media-search-scope"
+          role="status"
+        >
+          {/* Each state says something the code can actually stand behind.
+              "Searching all N" over a TRUNCATED search result would be the same
+              overstatement this line exists to fix, one level down; and a failed
+              leg shown as silence is the original false negative back again —
+              "Nothing matches" for a file that is on the server. */}
+          {props.searchState === "searching"
+            ? `Searching all ${props.serverPage.total} items…`
+            : props.searchState === "truncated"
+              ? "First 200 matches — narrow the search to see more"
+              : props.searchState === "failed"
+                ? "Couldn't reach the rest of your library"
+                : `Searching all ${props.serverPage.total} items`}
+        </div>
+      ) : null}
 
       {/*
         Folder row — board `144:10`. Scope on the left, view + sort on the
@@ -429,18 +456,19 @@ export function SlimLauncher(props: SlimLauncherProps) {
             showed its first page and said nothing — the grid, the picker and
             replace-across-site all read that same truncated set. The count is
             the honest half: it names what is on screen AND what exists. */}
-        {props.serverPage && props.serverPage.total > (props.loadedCount ?? props.libraryItems.length) ? (
+        {props.serverPage && props.serverPage.total > props.serverPage.loaded ? (
           <div
             className="tw:flex tw:h-9 tw:items-center tw:justify-between tw:px-4 tw:text-[12px] tw:leading-4"
             data-testid="media-load-more-row"
           >
-            {/* LOADED against the server's total, never the filtered list. The
-                filters (type pills, folder, search) run on what has been pulled,
-                so "Showing 3 of 412" with a video filter on would be comparing
-                two different questions — and with a search that matches nothing
-                it would read "Showing 0 of 412" next to the no-results state. */}
+            {/* The PAGING position against the server's total. Not the filtered
+                list — with a video pill on it would read "Showing 3 of 412",
+                comparing two different questions. And not the local asset count
+                either: a server-side search imports real assets without moving
+                the cursor, so counting those climbed the footer toward the total
+                while "Load more" still had the same page to fetch. */}
             <span className="tw:text-gray-500" data-testid="media-shown-count">
-              Showing {props.loadedCount ?? props.libraryItems.length} of {props.serverPage.total}
+              Showing {props.serverPage.loaded} of {props.serverPage.total}
             </span>
             <Button
               type="button"

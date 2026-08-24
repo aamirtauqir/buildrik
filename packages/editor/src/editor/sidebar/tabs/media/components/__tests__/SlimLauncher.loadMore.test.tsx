@@ -65,7 +65,7 @@ function mount(over: Record<string, unknown> = {}) {
 
 describe("SlimLauncher — Load more", () => {
   it("says nothing when the library is entirely on screen", () => {
-    mount({ serverPage: { nextCursor: null, total: 3 } });
+    mount({ serverPage: { nextCursor: null, total: 3, loaded: 3 } });
     expect(screen.queryByTestId("media-load-more-row")).toBeNull();
   });
 
@@ -77,7 +77,7 @@ describe("SlimLauncher — Load more", () => {
   /* The count is the honest half: a "Load more" with no number tells the user
      there is more, not how much they cannot see. */
   it("names what is shown AND what exists", () => {
-    mount({ serverPage: { nextCursor: "cur-1", total: 412 } });
+    mount({ serverPage: { nextCursor: "cur-1", total: 412, loaded: 3 } });
     expect(screen.getByTestId("media-shown-count").textContent).toBe("Showing 3 of 412");
   });
 
@@ -88,23 +88,23 @@ describe("SlimLauncher — Load more", () => {
      read "Showing 3 of 412", and a search that matched nothing read
      "Showing 0 of 412" beside the no-results state. */
   it("counts what was pulled, not what survived the filters", () => {
-    mount({ serverPage: { nextCursor: "cur-1", total: 412 }, libraryItems: items(3), loadedCount: 200 });
+    mount({ serverPage: { nextCursor: "cur-1", total: 412, loaded: 200 }, libraryItems: items(3) });
     expect(screen.getByTestId("media-shown-count").textContent).toBe("Showing 200 of 412");
   });
 
   it("stays quiet when everything on the server is already pulled, however it is filtered", () => {
-    mount({ serverPage: { nextCursor: null, total: 200 }, libraryItems: items(3), loadedCount: 200 });
+    mount({ serverPage: { nextCursor: null, total: 200, loaded: 200 }, libraryItems: items(3) });
     expect(screen.queryByTestId("media-load-more-row")).toBeNull();
   });
 
   it("asks for the next page when pressed", () => {
-    const { onLoadMore } = mount({ serverPage: { nextCursor: "cur-1", total: 412 } });
+    const { onLoadMore } = mount({ serverPage: { nextCursor: "cur-1", total: 412, loaded: 3 } });
     fireEvent.click(screen.getByTestId("media-load-more"));
     expect(onLoadMore).toHaveBeenCalledTimes(1);
   });
 
   it("cannot be pressed twice while a page is in flight", () => {
-    const { onLoadMore } = mount({ serverPage: { nextCursor: "cur-1", total: 412 }, loadingMore: true });
+    const { onLoadMore } = mount({ serverPage: { nextCursor: "cur-1", total: 412, loaded: 3 }, loadingMore: true });
     const btn = screen.getByTestId("media-load-more");
     expect(btn.textContent).toBe("Loading…");
     fireEvent.click(btn);
@@ -114,16 +114,84 @@ describe("SlimLauncher — Load more", () => {
   /* A failed page is offered again in place rather than as a toast: the thing
      that failed is on screen, and so is the retry. */
   it("offers the failed page again in place", () => {
-    mount({ serverPage: { nextCursor: "cur-1", total: 412 }, loadMoreError: true });
+    mount({ serverPage: { nextCursor: "cur-1", total: 412, loaded: 3 }, loadMoreError: true });
     expect(screen.getByTestId("media-load-more").textContent).toBe("Try again");
   });
 
   /* total > shown, but no cursor: the count is still worth showing and the
      button must not fire a request it cannot make. */
   it("shows the count but refuses the press when there is no cursor", () => {
-    const { onLoadMore } = mount({ serverPage: { nextCursor: null, total: 412 } });
+    const { onLoadMore } = mount({ serverPage: { nextCursor: null, total: 412, loaded: 3 } });
     expect(screen.getByTestId("media-shown-count").textContent).toBe("Showing 3 of 412");
     fireEvent.click(screen.getByTestId("media-load-more"));
     expect(onLoadMore).not.toHaveBeenCalled();
+  });
+});
+
+describe("SlimLauncher — search scope", () => {
+  /* Board `145:2` → `Search scope` (1313:11). The scope is only a QUESTION when
+     the library is not fully loaded — every filter in this drawer runs on the
+     client over what has been pulled, so a query used to reach 200 of 412
+     assets and report "Nothing matches" about a file that exists. */
+  it("says the query covers the whole library while one is running", () => {
+    mount({ serverPage: { nextCursor: "c1", total: 412, loaded: 200 }, searchQuery: "logo", searchState: "searching" });
+    expect(screen.getByTestId("media-search-scope").textContent).toBe("Searching all 412 items…");
+  });
+
+  it("keeps saying so after the request settles, because the SCOPE has not changed", () => {
+    mount({ serverPage: { nextCursor: "c1", total: 412, loaded: 200 }, searchQuery: "logo", searchState: "whole" });
+    expect(screen.getByTestId("media-search-scope").textContent).toBe("Searching all 412 items");
+  });
+
+  it("says nothing when the whole library is already local", () => {
+    mount({ serverPage: { nextCursor: null, total: 200, loaded: 200 }, searchQuery: "logo" });
+    expect(screen.queryByTestId("media-search-scope")).toBeNull();
+  });
+
+  /* One character is a keystroke, not a query — the hook does not go to the
+     server for it, so the drawer must not claim it did. */
+  it("says nothing for a single character", () => {
+    mount({ serverPage: { nextCursor: "c1", total: 412, loaded: 200 }, searchQuery: "l" });
+    expect(screen.queryByTestId("media-search-scope")).toBeNull();
+  });
+
+  it("says nothing with no query at all", () => {
+    mount({ serverPage: { nextCursor: "c1", total: 412, loaded: 200 }, searchQuery: "" });
+    expect(screen.queryByTestId("media-search-scope")).toBeNull();
+  });
+});
+
+describe("SlimLauncher — the scope line only claims what happened", () => {
+  const paged = { nextCursor: "c1", total: 412, loaded: 200 };
+
+  it("says the search itself was cut, rather than repeating the whole-library claim", () => {
+    mount({ serverPage: paged, searchQuery: "logo", searchState: "truncated" });
+    expect(screen.getByTestId("media-search-scope").textContent)
+      .toBe("First 200 matches — narrow the search to see more");
+  });
+
+  /* Silence here is the original bug: "Nothing matches" for a file that is on
+     the server, under a line saying the whole library was searched. */
+  it("says the server leg failed, and marks it as an error", () => {
+    mount({ serverPage: paged, searchQuery: "logo", searchState: "failed" });
+    const el = screen.getByTestId("media-search-scope");
+    /* One line. Two lines of error copy in a 320 drawer pushed the footer off
+       board `782:4353` entirely — the panel is a fixed height. */
+    expect(el.textContent).toBe("Couldn't reach the rest of your library");
+    expect(el.className).toMatch(/text-red-700/);
+  });
+
+  it("does not paint the ordinary case as an error", () => {
+    mount({ serverPage: paged, searchQuery: "logo", searchState: "whole" });
+    expect(screen.getByTestId("media-search-scope").className).not.toMatch(/text-red-700/);
+  });
+
+  /* The line is keyed on the PAGING position, not on how many assets happen to
+     be local — a search that imported 60 hits must not make the drawer think
+     the library is fully pulled. */
+  it("keeps showing while paging is behind, whatever a search imported", () => {
+    mount({ serverPage: { nextCursor: "c1", total: 412, loaded: 200 }, searchQuery: "logo", searchState: "whole" });
+    expect(screen.getByTestId("media-search-scope")).toBeTruthy();
+    expect(screen.getByTestId("media-shown-count").textContent).toBe("Showing 200 of 412");
   });
 });

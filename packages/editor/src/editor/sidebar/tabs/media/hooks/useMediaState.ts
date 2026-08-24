@@ -335,7 +335,7 @@ export function useMediaState(composer: Composer): MediaStateResult {
 
     // Library
     serverPage: library.serverPage,
-    loadedCount: library.loadedCount,
+    searchState: library.searchState,
     loadingMore: library.loadingMore,
     loadMoreError: library.loadMoreError,
     loadMoreAssets: library.loadMoreAssets,

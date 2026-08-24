@@ -402,19 +402,26 @@ export class MediaManager extends MediaEventEmitter {
    * editor explicitly deletes (no GC pass yet; safe to defer).
    */
   /**
-   * How far the server pull got: the cursor for the next page, and how many
-   * assets match in total. Held here because the FIRST page is fetched by the
-   * shell at boot while "Load more" is pressed in the drawer — the two are in
-   * different trees and the edges belong to the media domain, not to either.
+   * How far the server pull got: the cursor for the next page, how many assets
+   * match in total, and how many PAGING has brought in. Held here because the
+   * FIRST page is fetched by the shell at boot while "Load more" is pressed in
+   * the drawer — the two are in different trees and the edges belong to the
+   * media domain, not to either.
+   *
+   * `loaded` counts only what paging pulled. A server-side SEARCH also imports
+   * assets, and counting those would make "Showing N of M" grow on every query
+   * while `nextCursor` stayed put — so the footer would climb toward the total
+   * and then "Load more" would appear to do nothing, because the rows it
+   * fetches are already present. (Codex review, 2026-08-24.)
    */
-  private serverPage: { nextCursor: string | null; total: number } | null = null;
+  private serverPage: { nextCursor: string | null; total: number; loaded: number } | null = null;
 
-  setServerPage(page: { nextCursor: string | null; total: number }): void {
+  setServerPage(page: { nextCursor: string | null; total: number; loaded: number }): void {
     this.serverPage = page;
     this.emit(MEDIA_EVENTS.SERVER_PAGE_CHANGED, page);
   }
 
-  getServerPage(): { nextCursor: string | null; total: number } | null {
+  getServerPage(): { nextCursor: string | null; total: number; loaded: number } | null {
     return this.serverPage;
   }
 

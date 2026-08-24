@@ -128,9 +128,87 @@ and neither touches the other three.
 
 ### Also true, and not fixed here
 
-**Search only searches what has been pulled.** The filters — type, folder,
-search — all run on the client over the loaded set, so on a 412-asset library a
-search reaches 200 of them. `listAssets` accepts a `search` argument the editor
-never sends. That is a real gap, it is not what "Load more" was asked to fix,
-and it is recorded here rather than folded in silently.
+**Search only searched what had been pulled — FIXED the same day**, below.
+
+## 2026-08-24 — a search that only reached the loaded page
+
+Recorded above as "not fixed here"; fixed immediately after, because leaving it
+made the paging fix half a feature: you could now load the rest of the library,
+but only by hand, and a search still reported "Nothing matches" about a file
+that was sitting on the server.
+
+Every filter in the drawer — type pills, folder, search — runs on the client
+over `rawAssets`. `media.listAssets` has always accepted a `search` argument.
+Nothing sent it.
+
+**Figma first, two boards.** `Media · filtered` (145:2) gained a `Search scope`
+row (1313:11) under the field — *"Searching all 412 items"* — and
+`Media · no-results` (782:4353) gained `Search scope · failed` (1314:20),
+cloned from the load-error text (453:3953) so it carries the error style rather
+than a hand-picked red.
+
+Both boards fought back, differently, and both were caught by reading them back:
+
+- On 145:2 the spacer has `layoutGrow: 1`, so it absorbed the new 22px and the
+  footer never moved.
+- On 782:4353 it does **not** grow. The row pushed the footer to 790, and the
+  first draft of the failure copy wrapped to two lines (40px), which pushed it
+  to **814 on an 812-tall board** — off the panel entirely. The copy is one line
+  now and the spacer gives the 22 back by hand: footer at 768, bottom edge
+  exactly 812.
+
+**The code**, and then four states it can honestly report:
+
+| state | line |
+|---|---|
+| `searching` | Searching all 412 items… |
+| `whole` | Searching all 412 items |
+| `truncated` | First 200 matches — narrow the search to see more |
+| `failed` | Couldn't reach the rest of your library *(error colour)* |
+
+A query of 2+ characters, on a library that is not fully paged, is debounced
+350ms and sent to the server. The matches are **imported** rather than rendered
+on a separate path — `importServerAssets` appends and skips ids already held, so
+the existing client filter shows them alongside everything else and there is no
+second rendering path to keep in step.
+
+**Verified live** at 1440×900, driving the real drawer with the paging edges
+faked and the search leg forced through each outcome:
+
+```
+whole      → {"text":"Searching all 412 items","red":false}
+truncated  → {"text":"First 200 matches — narrow the search to see more","red":false}
+failed     → {"text":"Couldn't reach the rest of your library","red":true}
+footer     → "Showing 1 of 412"
+```
+
+That last line is the point of one of the fixes below: the footer still reports
+the PAGING position after a search imported assets.
+
+### Codex review — four findings, all four real
+
+1. **The effect never re-ran when the page arrived late.** It read `serverPage`
+   inside while depending only on `[composer, librarySearch]`, so a query typed
+   before the boot page landed bailed on `!page` and stayed bailed — "Nothing
+   matches" under a line promising the whole library. `serverPage` is a
+   dependency now.
+2. **"Searching all 412 items" was itself overstated.** The search is paged too;
+   only its first 200 matches arrive. When the search response carries a cursor
+   the line says so instead.
+3. **A refused leg looked exactly like "no match"** — `loadServerMedia` turns
+   offline, signed-out and RPC failures into `null`, and the first version
+   exited silently on it. That is the original false negative, restored, in the
+   one case this change exists to fix. It reports `failed` now, in the error
+   colour.
+4. **Search imports inflated the footer without moving the cursor.** "Showing
+   260 of 412" would climb toward the total while `Load more` still had the same
+   page to fetch and would appear to do nothing. `serverPage` now carries
+   `loaded`, advanced only by paging, and the footer reads that. `loadedCount`
+   — which I had added for the earlier fix — is gone from the whole chain, since
+   nothing should ever compare a local asset count against a server total again.
+
+Each negative-tested: neutering the dependency drops exactly the late-page test,
+neutering the failure branch drops exactly the refused-leg test, collapsing
+`truncated` into `whole` drops exactly that one, and making the search advance
+`loaded` drops exactly the paging-position test.
 

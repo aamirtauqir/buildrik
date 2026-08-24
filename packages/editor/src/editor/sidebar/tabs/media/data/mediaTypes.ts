@@ -109,9 +109,13 @@ export interface LibraryStateResult {
    * the first page lands — or forever in the standalone demo, which has no
    * server to page.
    */
-  serverPage: { nextCursor: string | null; total: number } | null;
-  /** Assets pulled from the server so far — NOT the filtered list on screen. */
-  loadedCount: number;
+  serverPage: { nextCursor: string | null; total: number; loaded: number } | null;
+  /**
+   * Where a whole-library search stands. `truncated` means the SEARCH itself
+   * was paged and only its first page is in hand; `failed` means the server leg
+   * did not come back, which must never be shown as "no match".
+   */
+  searchState: "idle" | "searching" | "whole" | "truncated" | "failed";
   loadingMore: boolean;
   /** The last "Load more" did not come back. Offered as a retry, not a toast. */
   loadMoreError: boolean;
@@ -212,8 +216,8 @@ export interface DiscoveryStateResult {
 export interface MediaStateResult {
   /** See `LibraryStateResult` — forwarded so the drawer can say how much of the
    *  server library it is showing. */
-  serverPage: { nextCursor: string | null; total: number } | null;
-  loadedCount: number;
+  serverPage: { nextCursor: string | null; total: number; loaded: number } | null;
+  searchState: "idle" | "searching" | "whole" | "truncated" | "failed";
   loadingMore: boolean;
   loadMoreError: boolean;
   loadMoreAssets(): Promise<void>;

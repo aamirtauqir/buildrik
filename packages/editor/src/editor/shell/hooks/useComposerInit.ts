@@ -207,7 +207,11 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                  page; the drawer's "Load more" walks the rest, and it can only
                  do that if the cursor survives past this line. It used to be
                  discarded here, which is how a 200-asset cap became invisible.  */
-              instance.media.setServerPage({ nextCursor: remote.nextCursor, total: remote.total ?? remote.assets.length });
+              instance.media.setServerPage({
+                nextCursor: remote.nextCursor,
+                total: remote.total ?? remote.assets.length,
+                loaded: remote.assets.length,
+              });
             }
             addToastRef.current({
               title: "Project loaded",
