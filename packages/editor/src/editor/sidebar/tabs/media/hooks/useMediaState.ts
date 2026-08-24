@@ -334,6 +334,11 @@ export function useMediaState(composer: Composer): MediaStateResult {
     setCurrentFolderId: library.setCurrentFolderId,
 
     // Library
+    serverPage: library.serverPage,
+    loadedCount: library.loadedCount,
+    loadingMore: library.loadingMore,
+    loadMoreError: library.loadMoreError,
+    loadMoreAssets: library.loadMoreAssets,
     libraryItems: library.libraryItems,
     folders: library.folders,
     allFolders: library.allFolders,

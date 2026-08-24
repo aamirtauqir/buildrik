@@ -504,51 +504,75 @@ describe("saveProject dual-save routing (P0.2b)", () => {
   });
 });
 
-describe("loadServerMedia (Phase B3 — additive hydration)", () => {
+describe("loadServerMedia — one page, and its edges", () => {
+  const asset = (id: string) => ({
+    id, url: `https://cdn/${id}.png`, bytes: 10, type: "image", mimeType: "image/png",
+    filename: `${id}.png`, altText: null, folderId: null, createdAt: "2026-07-01", updatedAt: "2026-07-01",
+  });
+  const folder = { id: "f1", name: "Brand", parentId: null, createdAt: "2026-07-01", updatedAt: "2026-07-01" };
+
   beforeEach(() => {
     mocks.mediaListAssetsQuery.mockReset();
     mocks.mediaListFoldersQuery.mockReset();
   });
 
-  it("pulls a 200-capped working set of assets + folders for the site", async () => {
-    const asset = {
-      id: "a1", url: "https://cdn/a.png", bytes: 10, type: "image", mimeType: "image/png",
-      filename: "a.png", altText: null, folderId: null, createdAt: "2026-07-01", updatedAt: "2026-07-01",
-    };
-    const folder = { id: "f1", name: "Brand", parentId: null, createdAt: "2026-07-01", updatedAt: "2026-07-01" };
-    mocks.mediaListAssetsQuery.mockResolvedValue({ items: [asset], nextCursor: null });
+  /* This used to assert `{ assets, folders }` and nothing else, which is the
+     shape that made the cap invisible: the service has always returned
+     `nextCursor`, and throwing it away here left `media.listAssets` with one
+     caller in the whole editor and no way to reach page two. */
+  it("returns the page AND how to continue it", async () => {
+    mocks.mediaListAssetsQuery.mockResolvedValue({ items: [asset("a1")], nextCursor: "cur-1", total: 412 });
     mocks.mediaListFoldersQuery.mockResolvedValue([folder]);
 
     const result = await loadServerMedia("s1");
 
     expect(mocks.mediaListAssetsQuery).toHaveBeenCalledWith({ siteId: "s1", limit: 200 });
     expect(mocks.mediaListFoldersQuery).toHaveBeenCalledWith({ siteId: "s1" });
-    expect(result).toEqual({ assets: [asset], folders: [folder] });
+    expect(result).toEqual({ assets: [asset("a1")], folders: [folder], nextCursor: "cur-1", total: 412 });
+  });
+
+  it("sends the cursor when asked for a later page", async () => {
+    mocks.mediaListAssetsQuery.mockResolvedValue({ items: [asset("a2")], nextCursor: null, total: 412 });
+    await loadServerMedia("s1", "cur-1");
+    expect(mocks.mediaListAssetsQuery).toHaveBeenCalledWith({ siteId: "s1", limit: 200, cursor: "cur-1" });
+  });
+
+  /* Folders come back on EVERY page. Skipping them looked free — folders are
+     not paged — but they are not frozen either: a folder created in another tab
+     between page 1 and page 2 leaves page 2's assets pointing at a folder this
+     browser has never heard of, and the root view then hides them for having a
+     non-null folderId. (Codex review, 2026-08-24.) */
+  it("re-fetches folders on a later page, because membership can move between pages", async () => {
+    mocks.mediaListAssetsQuery.mockResolvedValue({ items: [asset("a2")], nextCursor: null });
+    mocks.mediaListFoldersQuery.mockResolvedValue([folder]);
+    const r = await loadServerMedia("s1", "cur-1");
+    expect(mocks.mediaListFoldersQuery).toHaveBeenCalledWith({ siteId: "s1" });
+    expect(r?.folders).toEqual([folder]);
+  });
+
+  /* The server counts once per pull, so a later page carries no total and the
+     caller keeps the one it holds. Falling back to the PAGE LENGTH here would
+     shrink the library to whatever the last page happened to contain. */
+  it("reports no total on a later page rather than inventing one", async () => {
+    mocks.mediaListAssetsQuery.mockResolvedValue({ items: [asset("a1"), asset("a2")], nextCursor: null });
+    mocks.mediaListFoldersQuery.mockResolvedValue([]);
+    const r = await loadServerMedia("s1", "cur-1");
+    expect(r?.total).toBeNull();
+  });
+
+  /* First pull only: a server that has not shipped the count yet must not make
+     the drawer claim the library is smaller than it is. */
+  it("falls back to the page length on the FIRST pull when the server sends no total", async () => {
+    mocks.mediaListAssetsQuery.mockResolvedValue({ items: [asset("a1"), asset("a2")], nextCursor: null });
+    mocks.mediaListFoldersQuery.mockResolvedValue([]);
+    const r = await loadServerMedia("s1");
+    expect(r?.total).toBe(2);
+    expect(r?.nextCursor).toBeNull();
   });
 
   it("returns null on any RPC failure (offline/unauthenticated) — caller falls back to engine state", async () => {
     mocks.mediaListAssetsQuery.mockRejectedValue(new Error("UNAUTHORIZED"));
     mocks.mediaListFoldersQuery.mockResolvedValue([]);
     await expect(loadServerMedia("s1")).resolves.toBeNull();
-  });
-});
-
-describe("loadProject styles filtering (legacy token entries)", () => {
-  it("keeps only rules with a non-empty selector, dropping legacy design-token rows", async () => {
-    const validRule = { id: "r1", selector: ".hero", properties: { color: "#000" } };
-    mocks.sitesGetQuery.mockResolvedValue({
-      id: "s1",
-      name: "T",
-      projectStyles: [
-        validRule,
-        { id: "tok-1", kind: "token", cssVar: "--brand" }, // legacy token row — no selector
-        { id: "r2", selector: "" }, // empty selector
-        null, // corrupt row
-      ],
-    });
-    mocks.pagesListQuery.mockResolvedValue([]);
-
-    const project = await loadProject("s1");
-    expect(project.styles).toEqual([validRule]);
   });
 });

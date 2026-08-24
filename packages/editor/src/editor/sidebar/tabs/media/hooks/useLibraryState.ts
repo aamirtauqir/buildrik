@@ -4,10 +4,11 @@
  * @license BSD-3-Clause
  */
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Composer } from "../../../../../engine/Composer";
 import { MEDIA_EVENTS } from "../../../../../shared/constants/media";
 import { STORAGE_KEYS } from "../../../../../shared/constants/storageKeys";
+import { getSiteIdFromUrl, loadServerMedia } from "../../../../../services/BuildrikSyncProvider";
 import type { MediaSortBy, SortDirection } from "../../../../../shared/types/media";
 import type { LibraryItem, LibraryStateResult, MediaBucket, MediaTypeFilter } from "../data/mediaTypes";
 import {
@@ -29,6 +30,13 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
    */
   const [libraryLoading, setLibraryLoading] = useState(() => !composer.media.isInitialized);
   const [libraryError, setLibraryError] = useState<string | null>(() => composer.media.initFailure);
+  /* How much of the server library is on screen. The boot pull is ONE page;
+     without these the drawer could not tell a complete library from a
+     truncated one, and neither could the user. */
+  const [serverPage, setServerPage] = useState(() => composer.media.getServerPage());
+  const [loadingMore, setLoadingMore] = useState(false);
+  const inFlight = useRef(false);
+  const [loadMoreError, setLoadMoreError] = useState(false);
   const [folders, setFolders] = useState(() => composer.media.getFolders());
   const [allFolders, setAllFolders] = useState(() => composer.media.getAllFolders());
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
@@ -275,6 +283,57 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
     [composer]
   );
 
+  /* Subscribed rather than read once: the first page lands from the shell's
+     boot path, long after this hook mounts. */
+  useEffect(() => {
+    const onPage = (p: unknown) => setServerPage(p as { nextCursor: string | null; total: number });
+    composer.media.on(MEDIA_EVENTS.SERVER_PAGE_CHANGED, onPage);
+    return () => composer.media.off(MEDIA_EVENTS.SERVER_PAGE_CHANGED, onPage);
+  }, [composer]);
+
+  const loadMoreAssets = useCallback(async () => {
+    const page = composer.media.getServerPage();
+    const siteId = getSiteIdFromUrl();
+    /* The lock is a REF, not the `loadingMore` state the button is disabled
+       from. State lands on the next render, so two clicks in the same tick both
+       read `loadingMore === false` and both fire — the same page fetched twice,
+       and if a later page resolves first, the stale response writes its own
+       (older) `nextCursor` back and the next press re-fetches a page already
+       imported. (Codex review, 2026-08-24.) */
+    if (!page?.nextCursor || !siteId || inFlight.current) return;
+    inFlight.current = true;
+    const cursorAtSend = page.nextCursor;
+    setLoadingMore(true);
+    setLoadMoreError(false);
+    try {
+      const next = await loadServerMedia(siteId, cursorAtSend);
+      if (!next) {
+        setLoadMoreError(true);
+        return;
+      }
+      /* `importServerAssets` appends and skips ids it already holds, so an
+         import is safe to run whatever else has landed. */
+      await composer.media.importServerAssets(next.assets, next.folders);
+      /* Only advance FROM the cursor this request was sent with. Anything else
+         means a newer page already moved the edge and this response is behind
+         it — importing its assets is still correct, rewinding the cursor is
+         not. */
+      if (composer.media.getServerPage()?.nextCursor === cursorAtSend) {
+        composer.media.setServerPage({
+          nextCursor: next.nextCursor,
+          // The server counts once per pull; later pages carry no total.
+          total: next.total ?? page.total,
+        });
+      }
+      setRawAssets(composer.media.getAssets());
+    } catch {
+      setLoadMoreError(true);
+    } finally {
+      inFlight.current = false;
+      setLoadingMore(false);
+    }
+  }, [composer]);
+
   const retryLibraryLoad = useCallback(() => {
     setLibraryError(null);
     setLibraryLoading(true);
@@ -283,6 +342,14 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
 
   return {
     rawAssets,
+    /* What has been PULLED, which is the only thing the server's total can
+       honestly be compared against — `libraryItems` is filtered on the client
+       by type, folder and search. */
+    loadedCount: rawAssets.length,
+    serverPage,
+    loadingMore,
+    loadMoreError,
+    loadMoreAssets,
     libraryLoading,
     libraryError,
     retryLibraryLoad,

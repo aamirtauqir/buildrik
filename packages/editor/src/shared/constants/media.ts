@@ -97,6 +97,14 @@ export const MEDIA_EVENTS = {
    * two differently (`453:3931` "Couldn't load your media." + Try again).
    */
   INIT_FAILED: "media:init-failed",
+  /**
+   * The server's paging edges moved — a page landed, or the last one did.
+   * Carries `{ nextCursor, total }`. The drawer needs both to say how much of
+   * the library it is actually showing; before this the cursor was fetched at
+   * boot and thrown away, so nothing downstream could know a library had been
+   * truncated at all.
+   */
+  SERVER_PAGE_CHANGED: "media:server-page",
   /** Emitted when a media asset is added */
   MEDIA_ADDED: "media:added",
   /* A new session rebuilt the object URLs for locally-stored assets. blob: URLs

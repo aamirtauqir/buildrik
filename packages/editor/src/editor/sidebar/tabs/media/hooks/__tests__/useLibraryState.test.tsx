@@ -36,6 +36,12 @@ function makeComposer(assets: MediaAsset[], folders: Array<{ id: string }> = [])
         ? store.filter((a) => (a.folderId ?? null) === opts.folderId)
         : [...store],
     ),
+    /* Server paging edges. Null here: this stub has no server, which is also
+       the standalone demo's situation — the drawer must simply not offer a
+       page it cannot fetch. */
+    getServerPage: vi.fn(() => null),
+    setServerPage: vi.fn(),
+    importServerAssets: vi.fn(async () => {}),
     getFolders: vi.fn((_parent?: string) => folders),
     getAllFolders: vi.fn(() => folders),
     createFolder: vi.fn(async () => {}),

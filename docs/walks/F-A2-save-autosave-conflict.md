@@ -154,11 +154,9 @@ retract cases, and nothing else.
 
 ### Still not verified
 
-**D3, the 200-asset media cap, remains code-read only.** Reproducing it needs a
-site with more than 200 assets, which is a fixture cost this walk did not pay.
-Its code path is deterministic and quoted above; nothing about it is fixed yet.
-Fixing it properly needs a "load more" affordance that no board draws, so it is
-a founder decision, not a silent widening of this increment.
+**D3, the 200-asset media cap — FIXED 2026-08-24**, founder-chosen route
+"Load more". Recorded in `U7-F-A4-media.md`; the founder call was between
+paging on demand, pulling everything at boot, and simply raising the cap.
 
 ### Harness notes, so the next walk does not pay for them again
 

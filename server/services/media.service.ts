@@ -101,20 +101,35 @@ export async function listAssets(userId: string, input: ListAssetsInput) {
       : {}),
   };
 
-  const assets = await prisma.mediaAsset.findMany({
-    where,
-    orderBy: { createdAt: "desc" },
-    take: input.limit + 1, // fetch one extra for hasMore detection
-    ...(input.cursor
-      ? { cursor: { id: input.cursor }, skip: 1 }
-      : {}),
-  });
+  const [assets, total] = await Promise.all([
+    prisma.mediaAsset.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      take: input.limit + 1, // fetch one extra for hasMore detection
+      ...(input.cursor
+        ? { cursor: { id: input.cursor }, skip: 1 }
+        : {}),
+    }),
+    /* How many match, not how many were sent. The editor pulls a page at a
+       time and had no way to say "showing 200 of 412" — so a library past the
+       page size looked complete and the assets past it were simply absent from
+       the grid, the picker and replace-across-site alike. `hasMore` answers
+       "is there another page", never "how much is there".
+
+       Counted only on the FIRST page. `findMany` can stop as soon as it has a
+       page; `count` has to walk the whole match set, and on `search` there is
+       no index on filename/altText to walk — so counting again on every page
+       makes the later pages, the slowest ones already, slower still for an
+       answer that has not changed. Later pages return null and the caller keeps
+       the total it already has. (Codex review, 2026-08-24.) */
+    input.cursor ? Promise.resolve(null) : prisma.mediaAsset.count({ where }),
+  ]);
 
   const hasMore = assets.length > input.limit;
   const items = hasMore ? assets.slice(0, input.limit) : assets;
   const nextCursor = hasMore ? items[items.length - 1].id : null;
 
-  return { items, nextCursor };
+  return { items, nextCursor, total };
 }
 
 export async function createAsset(userId: string, input: CreateAssetInput): Promise<{ id: string; url: string; bytes: number }> {

@@ -15,7 +15,7 @@
 | Autosave (dashboard) | any edit | ✅ | sites.saveProject dual-write | F-A2 | `BuildrikSyncProvider.ts:288-329,494` |
 | Save-conflict UX | concurrent edit | ✅ | expectedLastEditedAt → CONFLICT | F-A2 | `AquibraStudio.tsx:278-538` |
 | Undo/redo | ⌘Z/⌘⇧Z | ✅⚪ RAM-only | — | F-A7 | `HistoryManager.ts:70-274` |
-| Save pill (4 variants + offline queue) | topbar | ✅ | — | F-A2 | `Topbar.tsx:270-317` |
+| Save pill (4 variants + offline queue) | topbar | ✅ | — | F-A2 | `Topbar.tsx:270-317`. The queue half was ✅ over two defects until 2026-08-24: its notice could not be retracted (a successful retry left a permanent "not on the server" toast; a second failure stacked another), and both exit doors were blind to it, so a clean project walked out on a full queue and ended it — the queue is a `Map` of closures in memory. Fixed; see `docs/walks/F-A2-save-autosave-conflict.md`. |
 | Breakpoint switcher (wide/desktop/tablet/mobile) | topbar | ✅ | — | U2 | `Topbar.tsx:388-393` |
 | Color mode light/dark/system | topbar cycle | ✅ | persisted `buildrik:colorMode` | FF28 | `ColorMode.ts:4-71` |
 | Preview (sanitized window) | ⌘P | ✅ | client-side | FF33 | `StudioHeader.tsx:197-217` |
@@ -74,7 +74,7 @@
 | Page settings drawer | SEO/Social/Advanced; autosave 500ms; slug validate+history; visibility live/hidden/password; head-code guard | ✅ | ⚠ SEO counter lies (80 vs /60, 200 vs /160); score UI weights ≠ algorithm (`seoScore.ts:10-22` vs `SeoTab.tsx:120-124`) |
 | Templates (T) | 10 site templates + sections; 2-stage filters; page-size 6; detail 320→700; apply/add-as-page/replace+backup; premium 🔒 upgrade modal; usage drawer | ✅ | `templatesData.ts:160-285`, apply FSM 15s timeout |
 | My Templates | save/rename/delete | 🟡 | localStorage + userTemplates server mirror (`templateSync.ts:47-89`) |
-| Media (M) | 3 modes; pills+counts; stock modal; folders; bulk; detail overlay; versions | ✅ | Ch.08 — ⚠ UI ceiling 50MB vs copy "10MB each" (`UploadZone.tsx:18` vs `mediaData.ts:67-75`) |
+| Media (M) | 3 modes; pills+counts; stock modal; folders; bulk; detail overlay; versions; **paging** | ✅ | Ch.08 — ⚠ UI ceiling 50MB vs copy "10MB each" (`UploadZone.tsx:18` vs `mediaData.ts:67-75`). Paging added 2026-08-24: this row read ✅ while the library silently stopped at 200 assets — `media.listAssets` had one caller in the editor and it discarded `nextCursor`. Board `144:2` now draws the `Load more` row; see `docs/walks/U7-F-A4-media.md`. |
 | Layers (Z) | tree, search+SR, drag reorder 30/40/30, hide/lock (⚪ localStorage/page), rename F2, group, 11 context actions, ⚡ badges | ✅ | `panels/layers/index.tsx` |
 | Components (⇧A) | groups, create-from-selection, instantiate, variant swap, detach; MAX 100 | 🟡 | override reset UI dead (§13 A2); ~~V2 panel 🔒 flag off; V2 "+AI" → localStorage only~~ — **stale, verified 2026-08-23**: `ComponentsPanelV2` and its flag were deleted 2026-08-16 (root `CLAUDE.md`) |
 | Design (D) | DS tab v12: Tokens(14 kinds)/Styles(11 cats)/Components(read-only)/Export; starters ×6; lint; import/export | ✅ | Ch.06 — persistAll 3/14 kinds (§13 A3); Figma export stub; preset binding click no-op v1 |

@@ -46,6 +46,11 @@ function getClient() {
 // successful save; the caller may force it (to the server's value) to overwrite.
 let _baselineLastEditedAt: string | null = null;
 
+/** Assets per `loadServerMedia` page. The drawer's "Load more" walks the rest.
+ *  Not exported: nothing outside this module decides the page size, and an
+ *  export with no importer is what `gate:ds-ssot` calls a dead export. */
+const MEDIA_PAGE_SIZE = 200;
+
 /* Site ids whose project actually came back from the server this session.
    A save is only safe for a site in this set: `saveProjectData` treats a
    full snapshot as authoritative and DELETES pages the payload omits, so
@@ -400,6 +405,7 @@ export async function saveProject(
  */
 export async function loadServerMedia(
   siteId: string,
+  cursor?: string,
 ): Promise<{
   assets: ReadonlyArray<{
     id: string;
@@ -420,14 +426,29 @@ export async function loadServerMedia(
     createdAt: string | Date;
     updatedAt: string | Date;
   }>;
+  nextCursor: string | null;
+  /** Counted once per pull — null on any page after the first. */
+  total: number | null;
 } | null> {
   try {
     const client = getClient();
-    // Cap initial pull at 200 — UI can paginate via media.listAssets cursor
-    // once user opens MediaTab. Per spec: B3 pulls a working set, not
-    // unbounded history.
+    /* A page at a time, and the page's own edges come back with it. The cap
+       used to be a bare `limit: 200` under a comment saying the UI could
+       paginate "once user opens MediaTab" — and no cursor consumer was ever
+       built, so `media.listAssets` had exactly one caller in the whole editor,
+       this one, which threw `nextCursor` away. A site past 200 assets showed
+       200, silently, and the grid, the picker and replace-across-site all read
+       that same truncated set. */
     const [assetsResult, foldersResult] = await Promise.all([
-      client.media.listAssets.query({ siteId, limit: 200 }),
+      client.media.listAssets.query({ siteId, limit: MEDIA_PAGE_SIZE, ...(cursor ? { cursor } : {}) }),
+      /* Fetched on EVERY page, including "load more". Skipping it read as a
+         free optimisation — folders are not paged — but folders are not FROZEN
+         either: create a folder in another tab and move an asset into it
+         between page 1 and page 2, and page 2 imports an asset whose
+         `folderId` names a folder this browser has never heard of. The root
+         view filters it out for having a non-null folderId, no picker entry
+         exists for it, and the asset is simply invisible. (Codex review,
+         2026-08-24.) */
       client.media.listFolders.query({ siteId }),
     ]);
     // tRPC's inferred return shape includes Prisma scalars + extras
@@ -453,7 +474,16 @@ export async function loadServerMedia(
       createdAt: string | Date;
       updatedAt: string | Date;
     }>;
-    return { assets: items, folders };
+    const page = assetsResult as { nextCursor?: string | null; total?: number | null };
+    return {
+      assets: items,
+      folders,
+      nextCursor: page.nextCursor ?? null,
+      /* null on a later page — the server counts once per pull, and the caller
+         keeps the total it already holds. Only the FIRST pull falls back to the
+         page length, for a server that has not shipped the count. */
+      total: typeof page.total === "number" ? page.total : cursor ? null : items.length,
+    };
   } catch {
     // Auth fail / offline / unconfigured — caller continues with engine state.
     return null;

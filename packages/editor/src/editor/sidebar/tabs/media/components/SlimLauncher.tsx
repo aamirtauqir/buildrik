@@ -99,6 +99,13 @@ interface SlimLauncherProps {
    * here without one. Found by building that state as a probe case.
    */
   onRetryUpload?(fileName: string): void;
+  /** Server paging edges — null in the standalone demo, which has no server. */
+  serverPage?: { nextCursor: string | null; total: number } | null;
+  /** Assets pulled from the server so far — NOT the filtered list on screen. */
+  loadedCount?: number;
+  loadingMore?: boolean;
+  loadMoreError?: boolean;
+  onLoadMore?(): Promise<void> | void;
   onOpenStock(): void;
   onOpenLibrary?(opts?: { searchQuery?: string; folderId?: string | null }): void;
   onClose?(): void;
@@ -415,6 +422,39 @@ export function SlimLauncher(props: SlimLauncherProps) {
             ))}
           </div>
         )}
+
+        {/* Board `144:2` → `Load more` (1311:11), 36h between the grid and the
+            spacer. The server has always paged `media.listAssets`; nothing in
+            the editor ever asked for page two, so a library past the page size
+            showed its first page and said nothing — the grid, the picker and
+            replace-across-site all read that same truncated set. The count is
+            the honest half: it names what is on screen AND what exists. */}
+        {props.serverPage && props.serverPage.total > (props.loadedCount ?? props.libraryItems.length) ? (
+          <div
+            className="tw:flex tw:h-9 tw:items-center tw:justify-between tw:px-4 tw:text-[12px] tw:leading-4"
+            data-testid="media-load-more-row"
+          >
+            {/* LOADED against the server's total, never the filtered list. The
+                filters (type pills, folder, search) run on what has been pulled,
+                so "Showing 3 of 412" with a video filter on would be comparing
+                two different questions — and with a search that matches nothing
+                it would read "Showing 0 of 412" next to the no-results state. */}
+            <span className="tw:text-gray-500" data-testid="media-shown-count">
+              Showing {props.loadedCount ?? props.libraryItems.length} of {props.serverPage.total}
+            </span>
+            <Button
+              type="button"
+              color="light"
+              size="xs"
+              className="tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:font-normal tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+              data-testid="media-load-more"
+              disabled={props.loadingMore || !props.serverPage.nextCursor}
+              onClick={() => void props.onLoadMore?.()}
+            >
+              {props.loadingMore ? "Loading…" : props.loadMoreError ? "Try again" : "Load more"}
+            </Button>
+          </div>
+        ) : null}
       </div>
 
       {props.selectionMode ? (

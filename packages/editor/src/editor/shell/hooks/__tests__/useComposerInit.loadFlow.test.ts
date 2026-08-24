@@ -49,7 +49,7 @@ const mockComposer = {
   },
   versions: { setProjectId: vi.fn(() => Promise.resolve()) },
   components: { setProjectId: vi.fn(() => Promise.resolve()) },
-  media: { importServerAssets: vi.fn(() => Promise.resolve()) },
+  media: { importServerAssets: vi.fn(() => Promise.resolve()), setServerPage: vi.fn() },
   cms: { collections: {} },
   migration: {
     run: vi.fn(({ project, currentVersion }) => ({

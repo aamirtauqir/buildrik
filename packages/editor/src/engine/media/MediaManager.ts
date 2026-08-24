@@ -401,6 +401,23 @@ export class MediaManager extends MediaEventEmitter {
    * Asset deleted on another device → still in IndexedDB until the local
    * editor explicitly deletes (no GC pass yet; safe to defer).
    */
+  /**
+   * How far the server pull got: the cursor for the next page, and how many
+   * assets match in total. Held here because the FIRST page is fetched by the
+   * shell at boot while "Load more" is pressed in the drawer — the two are in
+   * different trees and the edges belong to the media domain, not to either.
+   */
+  private serverPage: { nextCursor: string | null; total: number } | null = null;
+
+  setServerPage(page: { nextCursor: string | null; total: number }): void {
+    this.serverPage = page;
+    this.emit(MEDIA_EVENTS.SERVER_PAGE_CHANGED, page);
+  }
+
+  getServerPage(): { nextCursor: string | null; total: number } | null {
+    return this.serverPage;
+  }
+
   async importServerAssets(
     serverAssets: ReadonlyArray<{
       id: string;

@@ -103,6 +103,19 @@ export interface CtxMenuState {
 // --- Sub-hook result interfaces ---
 
 export interface LibraryStateResult {
+  /**
+   * How far the server pull got: the cursor for the next page (null when the
+   * library is fully on screen) and how many assets exist in total. Null until
+   * the first page lands — or forever in the standalone demo, which has no
+   * server to page.
+   */
+  serverPage: { nextCursor: string | null; total: number } | null;
+  /** Assets pulled from the server so far — NOT the filtered list on screen. */
+  loadedCount: number;
+  loadingMore: boolean;
+  /** The last "Load more" did not come back. Offered as a retry, not a toast. */
+  loadMoreError: boolean;
+  loadMoreAssets(): Promise<void>;
   /** False only once storage has been read — see useLibraryState. */
   libraryLoading: boolean;
   /** Non-null when storage could not be read at all. NOT the same as empty. */
@@ -197,6 +210,13 @@ export interface DiscoveryStateResult {
 // --- Full state result (returned by useMediaState) ---
 
 export interface MediaStateResult {
+  /** See `LibraryStateResult` — forwarded so the drawer can say how much of the
+   *  server library it is showing. */
+  serverPage: { nextCursor: string | null; total: number } | null;
+  loadedCount: number;
+  loadingMore: boolean;
+  loadMoreError: boolean;
+  loadMoreAssets(): Promise<void>;
   /** False only once storage has been read — see useLibraryState. */
   libraryLoading: boolean;
   /** Non-null when storage could not be read at all. NOT the same as empty. */

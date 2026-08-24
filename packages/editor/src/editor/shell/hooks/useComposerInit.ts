@@ -203,6 +203,11 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
             const remote = await loadServerMedia(siteId);
             if (remote) {
               await instance.media.importServerAssets(remote.assets, remote.folders);
+              /* Hand the page's edges to the media domain. This pull is one
+                 page; the drawer's "Load more" walks the rest, and it can only
+                 do that if the cursor survives past this line. It used to be
+                 discarded here, which is how a 200-asset cap became invisible.  */
+              instance.media.setServerPage({ nextCursor: remote.nextCursor, total: remote.total ?? remote.assets.length });
             }
             addToastRef.current({
               title: "Project loaded",
