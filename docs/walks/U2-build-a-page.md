@@ -234,3 +234,56 @@ to aim at, and building that fixture was not paid for here. It is covered by two
 unit tests, both negative-tested: disabling the step-out drops exactly the
 edge-on-a-container case and nothing else.
 
+## 2026-08-24 — per-breakpoint overrides work; the inspector's numbers do not
+
+Fourth surface. **Overrides are correct**, walked live on a heading:
+
+```
+desktop            field 36 · computed 16px
+→ Mobile           field 36 · computed 16px      (inherits, correct)
+set 18 on Mobile   field 18 · computed 18px
+→ back to Desktop  field 36 · computed 16px      (untouched)
+media rules for this element: ["(max-width: 767px)"]
+```
+
+The override lands in its own media query and desktop is left alone. The chain
+is wired end to end — `StudioPanels` passes `currentBreakpoint={device}`, and
+the inspector calls `setBreakpointStyle(id, currentBreakpoint, …)`. The optional
+`currentBreakpoint?: DeviceType` prop defaulting to `"desktop"` looked like the
+classic unwired-chain trap and is not one; checked rather than assumed.
+
+### OPEN — the inspector shows styles the element does not have
+
+Look again at the first line: **field 36, computed 16px.**
+
+That element is a `Heading` block dropped from the Insert panel during this
+walk. Its saved record carries no base styles at all:
+
+```json
+"id":"el-mt7d1x3m-…","type":"heading","tagName":"h2","content":"Heading",
+"breakpointStyles":{"mobile":{"font-size":"18px"}}
+```
+
+— only the mobile override created above. No `font-size` declaration for it
+exists anywhere in the document, and it renders at **16px**, i.e. body text.
+
+`getDefaultStyles` (`shared/constants/defaultStyles.ts`, `heading: font-size
+32px`, with a larger value for `h2`) has exactly **one** consumer outside its own
+module: `useStyleHandlers.ts:96` — the INSPECTOR. Nothing on the insert path
+applies it. So the panel merges the defaults into what it displays, and shows a
+number the element was never given.
+
+**What the user sees:** drop a Heading, it looks like a paragraph, and the
+inspector says 36 — confidently, in an editable field. The same shape as the
+drop-position bug fixed earlier today: the editor displays one thing and the
+canvas does another.
+
+**Not fixed here, deliberately.** The fix decides where element defaults live —
+the block definition, the theme, or the insert path — and it changes the
+appearance of every newly inserted element. That is a founder call and a fresh
+increment, not a tail-end patch on a long session.
+
+**Not verified:** whether the published/exported page has the same gap. The
+engine has no styles to export, so it almost certainly does — but "almost
+certainly" is not a walk.
+
