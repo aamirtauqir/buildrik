@@ -129,3 +129,138 @@ Negative-tested: removing the emit drops exactly the announce test, unfiltering
 folders drops exactly the folder test, dropping the folder stamp drops exactly
 that one, and remapping over the scoped set only drops exactly the blob test.
 
+
+---
+
+## Addendum, 2026-08-25 — the two legs this record left uncovered, walked live
+
+Lane 1 of `docs/plans/2026-08-25-editor-flow-walk-arc.md`. Both remaining
+entries from "Not covered by this walk" are now exercised against the running
+editor on the committed rig (`scripts/baseline/editor-rig.mjs`), fixture
+`cmrsur1fp000unh3rvmmiq25t`, 1440×900. Editor booted with **0 console errors**.
+
+### Leg 4 — crash recovery. **PASS**, and this record's reasoning about it was wrong.
+
+The 08-24 entry said the sentinel is *"consumed+removed at the next bootstrap
+(`:113-115`)"*. Nothing in bootstrap calls it. The real consumer is
+`RecoveryBanner.tsx:47`, which calls `RecoveryManager.consumeLastCrash()` **in
+a `useState` initialiser on first render**. Same net effect, different
+mechanism — and the difference matters, because a bootstrap consumer would fire
+with no UI attached while this one cannot surface unless the banner mounts.
+
+Walked with a **real uncaught error**, not a hand-written key:
+
+| step | observed |
+|---|---|
+| clean boot | `sessionStorage["buildrick:last-crash"]` = `null` — correct, and this record was right that absence is not a defect |
+| `setTimeout(() => { throw … })` | sentinel written: `{"at":…,"source":"error","reason":"walk F-A1: simulated runtime fault"}` |
+| reload, same tab | banner renders: **"Recovered your work** after an unexpected close · moments ago · 4 pages."· `Discard & reload` · `Keep changes` |
+| after render | sentinel `null` — consumed once, will not re-surface |
+
+`role="status"`, `aria-label="Recovered work"`, page count correct against the
+4-page fixture. Board `C6 · Recovery banner` covers this state.
+
+**Note, not a defect:** the banner is 53px and pushes the whole shell down. It
+stacks with the review bar (32px) and the cookie-consent bar at the bottom, so
+in the worst case the canvas loses ~85px of height at the top and ~40px at the
+bottom at once. Visual, so out of this arc's instrument — recorded for the
+redesign arc.
+
+**Dead event:** `EVENTS.RUNTIME_FAULT_CAUGHT` is emitted at
+`RecoveryManager.ts:101` and has **zero subscribers** outside its own test.
+The banner reads the sentinel instead, so nothing is broken — but the emit is
+decoration.
+
+### Leg — the DS/storage schema migration. **v3 PASS · v1 partial, and it litters.**
+
+Two generations run at module scope from `AquibraStudio.tsx:64-65`:
+`migrateStorageKeys()` (`aquibra-` → canonical) then `migrateAqbKeys()`
+(`aqb-` → `buildrick-`). Walked by seeding both legacy generations, clearing
+both completion flags, and reloading.
+
+**v3 (`aqb-` → `buildrick-`) — full pass.**
+
+| case | result |
+|---|---|
+| static map — `aqb-recent-icons` | → `buildrick-recent-icons` = `WALK_V3_STATIC`, old key removed |
+| dynamic family — `aqb-layers-PAGE1-open` | → `buildrick-layers-PAGE1-open` = `WALK_V3_DYNAMIC`, old key removed |
+| completion flag | `buildrick-aqb-migration-v1-complete` written |
+| the flag itself | correctly **excluded** from the dynamic rename (`EXCLUDED_AQB_PREFIXES`), so it cannot rename itself mid-loop |
+
+**v1 (`aquibra-` → canonical) — migrates, but abandons what it skips.**
+
+`aquibra-guides` → `buildrick-guides` = `WALK_V1_GUIDES`. But
+`aquibra-inspector-mode` was **not** migrated and **was left in place**, because
+`buildrick-inspector-mode` already held a value.
+
+That skip is the documented safety model — never clobber an existing new-key
+value — and it is right. What is not right is the litter:
+
+```js
+if (value !== null && !localStorage.getItem(newKey)) {   // storageMigration.ts
+  localStorage.setItem(newKey, value);
+  localStorage.removeItem(oldKey);        // <- only reached when NOT skipped
+}
+```
+
+The skip branch does nothing at all, so the legacy key survives. And the
+completion flag is written **unconditionally** after the pass, so the next boot
+returns early and never revisits it. For any user who had both keys, the
+`aquibra-*` row is permanent: never read, never removed, forever. Same shape in
+`migrateAqbKeys`.
+
+Low severity — no data loss, no user-visible effect, and it is bounded by the
+size of `MIGRATION_MAP`. Recorded rather than fixed, because the safe fix
+(remove the old key on skip) discards a value a user might still want if the
+new key was written by accident, and that is a product call.
+
+**Verified remaining after the walk:** `aqb-migration-v1-complete` (v1's own
+flag, correctly excluded), `aquibra-inspector-mode` and `aquibra-project` (the
+skipped rows).
+
+### What this walk did NOT assess
+
+**Visual and IA.** A walk exercises behaviour, state and data. It does not
+detect visual or information-architecture defects — see the arc plan's
+"What a walk detects". The redesign arc's ledger rates surfaces this walk
+touched (`R0` element glyphs, `R2` stacked floats) and none of that is visible
+from here.
+
+### Figma — coverage exists; one duplicate and one copy conflict
+
+No boards drawn (board creation belongs to the redesign arc). Coverage checked
+against `boards.json`, then both candidates read at native size.
+
+**Duplicate.** `C6 · Recovery banner` (`307:2223`, 1440×140) is a banner-only
+crop of the exact state `S1.2 · crash-recovery` (`297:2027`, 1440×900) already
+shows in context — same flow-step, same state, different name. Recorded in
+`boards.json`; not deleted, that is the founder's call.
+
+**Both boards' copy contradicts the shipped product, and the product is right.**
+
+| | board `297:2027` / `307:2223` | shipped, walked 2026-08-25 |
+|---|---|---|
+| copy | "↩ Restore unsaved work from 3 minutes ago?" | "Recovered your work after an unexpected close · moments ago · 4 pages." |
+| buttons | **Restore** · Discard | **Discard & reload** · **Keep changes** |
+| framing | a question — nothing restored yet | a statement — the work is already back |
+
+Not a wording nit. The board's framing says the restore has not happened and
+offers to perform it; the code has already restored and offers to throw it
+away. Opposite mechanisms wearing similar words — a behaviour claim dressed as
+copy. Per the repo's precedence rule behaviour follows the **code**, so both
+boards are the stale side, and `authority` on each is now `code:copy-wins`.
+
+The shipped copy is **test-locked** — `RecoveryBanner.test.tsx` asserts
+`/recovered your work/i`, `/keep changes/i`, `/discard/i` and the page count —
+so it cannot drift back to the board silently.
+
+### Tests
+
+`RecoveryManager.test.ts` + `RecoveryBanner.test.tsx` — **30 passed**. No new
+test written: this lane found no code defect that needed fixing. The migration
+litter is recorded-not-fixed (the safe fix discards a value a user may want,
+which is a product call) and the dead `RUNTIME_FAULT_CAUGHT` emit is
+decoration, not a fault.
+
+**Lane 1 status: both uncovered legs closed.** Crash recovery passes end to
+end; the schema migration passes on v3 and litters on v1.

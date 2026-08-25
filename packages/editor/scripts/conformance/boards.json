@@ -2222,7 +2222,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "code:copy-wins — board copy contradicts shipped mechanism, walked 2026-08-25",
       "recipe": null
     },
     {
@@ -3971,7 +3971,7 @@
       "width": 0,
       "height": 0,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "code:copy-wins — DUPLICATE of S1.2 · crash-recovery (297:2027), same state, banner-only crop",
       "recipe": null
     },
     {
