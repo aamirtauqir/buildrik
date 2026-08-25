@@ -284,3 +284,63 @@ instruction; method rewritten. Eng review runs after task 0.
 
 **UNRESOLVED DECISIONS:**
 - Whether a genuinely-missing state board discovered during a walk gets drawn here or queued for the redesign arc's family. Default taken: queue it in `boards.json`, draw nothing.
+
+---
+
+## ARC STATUS — 2026-08-25
+
+18 commits. **Zero changes to `packages/editor/src`** — this arc walked,
+measured and documented; it did not change product code, so it carries no
+regression risk. `gate:boards` PASS (422 rows, 34 families).
+
+### Lanes
+
+| lane | state | headline |
+|---|---|---|
+| `F-A1` boot & load | **closed** | crash recovery walked for the first time — PASS. Migration v3 passes, v1 abandons what it skips |
+| `F-A5` AI pipeline | **closed** | fired for the first time; `OLLAMA_BASE_URL`'s presence routes all AI to a dead provider; with routing fixed the whole pipeline passes and "one undo step" is measured true |
+| `F-A2` save / conflict | **closed** | stranded-mirror guard holds against a real blocked mirror |
+| `U4` components | **partial** | the real harness blocker found (dev overlay impersonates the inspector); override chain still not walked |
+| `U11` pages | **closed** | home delete guarded and visible; engine last-page guard still absent |
+| `F-A7` undo / redo | **closed** | caps and exclusions verified; one listed exclusion was the wrong direction |
+| `U6` review round | **closed** | **the round closes end to end — the differentiator has now run** |
+| `U12` settings | **partial** | two settings surfaces; the menu row names the wrong one |
+| `U3` brand | **partial** | the linter names `color-accent` and `color-success` as WCAG failures; no auto-fix exists |
+| `U7` media | **partial** | filter counts are real with assets present; refines the redesign arc's `R7` |
+| `U8` CMS / e-com | **closed** | the e-com ⛔ is stale for the third time |
+| `U1` first-run | **partial** | dashboard `Edit` door wired to `/edit/:id` |
+| `F-A6` versions | **closed** | 50-cap real and running; named milestones are never pruned |
+| `F-A8` sync fan-out | **closed** | four registrations, one domain exercised live, and only that one claimed |
+| `U10` export | **closed** | HTML/ZIP/React live, Vue and Next.js labelled "Soon", real output size shown pre-export |
+| `U5` view mode | **closed** | rail 0, no Publish, no review controls, and **Delete on a selected element left 50 elements at 50** |
+| Figma | **closed** | audited before drawing; S5 wiring already complete, nothing to add, three "unwired" entries were caption strips |
+| `U2` build a page | **not run** | its two remaining legs are P3 (snap-guide 5px, 500 ms long-press) |
+| `U9` version rescue | **not run** | its five markers remain |
+
+### Seven false findings caught before filing
+
+The number worth carrying forward. Each would have been a confident, wrong bug
+report:
+
+1. Ch.11's inspector taxonomy — refuted by the code's single `SECTION_REGISTRY`.
+2. "Identical grey glyphs" — capture artifact **in the baseline**, but real in
+   the live product (the redesign arc's `R0`). Both halves needed measuring.
+3. "Undo does not revert an AI apply" — confounded baseline; the property was
+   already applied from a prior run.
+4. "`consumeLastCrash` has no production caller" — a filtered grep hid
+   `RecoveryBanner.tsx:47`.
+5. Three census defects from the reviewers — board set, `activeFamilies` and
+   `generatedAt` all survived verification.
+6. "`⌃,` is a dead chord" — my own `stripDevOverlays` was deleting the modal.
+7. "Three S5 boards are unwired duplicates" — they are 19px-tall caption strips.
+
+Plus two bugs in my own tooling, both found by the walks they were meant to
+serve: `stripDevOverlays` removed `<html>` and blanked the page, then removed
+product modals.
+
+### What remains
+
+`U2`'s two P3 legs · `U9`'s five markers · `U4`'s override chain · the
+per-section `U12` drill-ins · `U3`'s remaining lint rules and export formats ·
+`U7`'s eight uncovered media surfaces · `U6`'s `Ask for changes` branch and
+share-link password/expiry.
