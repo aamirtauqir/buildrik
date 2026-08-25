@@ -251,6 +251,29 @@ Three behaviours worth recording as contract, found by walking:
   surfaces name the reviewer correctly.
 - `changeSummary` is cleared by a re-send rather than carried forward.
 
+
+**`Ask for changes` walked 2026-08-25 — the branch passes, the round after it
+does not.** One click on the client surface → `clientReview.resolve` 200 → DB
+`PENDING → CHANGES_REQUESTED` → editor pill "Changes requested" → publish gate
+blocks. Three defects came out of walking it, all in
+`docs/walks/U6-review-and-share.md`:
+
+- ⛔ **A client can be invited to exactly one round, ever.**
+  `AquibraStudio.tsx:392` re-sends with `clientEmail: undefined`, so
+  `review.service.ts:85` mints no token; and `ReviewTab.tsx:405` gates the only
+  "Client email" form behind `!round`, so it disappears after the first send.
+  Round 2+ are internal-only and invisible to the client, while the button reads
+  "Re-send for review" and the client's old link reads "You approved this".
+  The client is told *"They'll send a new link"* — nothing in the product mints
+  one.
+- ⛔ `ReviewTab.tsx:601-607` picks its body from comment counts and never reads
+  round status, so a `CHANGES_REQUESTED` round with no note renders "has not
+  commented yet. You will be notified." beside a pill that says the opposite.
+- ⛔ `PublishConfirmFacts.tsx:41` falls through to "Round N is still open." for
+  `CHANGES_REQUESTED`. Right decision, wrong reason.
+
+D2 and D3 are one shape: three statuses in the schema, two in the UI.
+
 1. EDITOR submits review (U5) → ADMIN notified by email → resolve APPROVED | CHANGES_REQUESTED (1 PENDING/site).
 2. ~~⛔ Publish never checks review state~~ — **stale, verified 2026-08-23**, same as §11.1: the check is in `startPublish`. The live gap is the default (`false`), not the wiring.
 3. ~~⛔ External client not in loop: comments backend complete — zero editor UI~~ — **stale, verified 2026-08-23**: `editor/sidebar/tabs/review/ReviewTab.tsx` and `editor/shell/ReviewBar.tsx` both ship. What is NOT re-verified here is whether the client's own `/review/<token>` view reaches them — that leg was not walked.

@@ -182,16 +182,86 @@ Thanks — … can take it from here.
 The heading asks for feedback that has already been given. One line, and it is
 the last thing a client sees on the wedge surface.
 
-### `Ask for changes` — still not walked, and why
+### `Ask for changes` — WALKED 2026-08-25, and it passes
 
-It needs a **PENDING** round. This fixture's only round is now `APPROVED`, and
-in the editor's `Approved · edited since` state there is no visible re-open or
-new-round door — clicking the approval pill opens the Review panel, which
-offers comments, not a re-send. So the branch is unreachable here without
-seeding a second round directly.
+The earlier note said the branch was unreachable because the panel offered "no
+visible re-open or new-round door". That was wrong about the door and right
+about the outcome: the door is **in** the Review panel — `Re-send for review`,
+below the comment list — and it does open a fresh round. It just opens one the
+client can never see. Walking that is what turned up the three defects below.
 
-Named with its precondition rather than guessed at: to walk it, create a fresh
-`reviewRequest` in `PENDING` and take `Ask for changes` on the client surface.
+The branch itself is sound. On `/review/<token>` with no session, identified as
+the reviewer:
+
+    Ask for changes  →  clientReview.resolve 200
+                     →  "You asked for changes — Your notes are with your
+                        designer. They'll send a new link when the changes are
+                        ready for you."
+    DB               →  status PENDING → CHANGES_REQUESTED, resolvedAt stamped
+
+One click, no confirm step. Editor side picks it up: topbar pill reads
+**"Changes requested"**, the Review panel's revoke control correctly becomes
+`Revoke link` (not `Withdraw request`) now that `invitedEmail` is set, and the
+publish gate blocks. Identity carried across the round without re-asking, which
+is what `client-review.service.ts:163` claims it does.
+
+### ⛔ D1 — a client can be invited to exactly one review round, ever
+
+Two halves, both verified in code and live:
+
+- `AquibraStudio.tsx:392` — `resendReview` calls
+  `submitForReview(undefined, undefined, undefined, snapshotPages)`. The third
+  argument is `clientEmail`. `review.service.ts:85` only mints a token
+  `if (clientEmail)`, so **every round after the first has `token: null`**.
+- `ReviewTab.tsx:405` — `SendForReview`, the only form in the product with a
+  "Client email" field, renders under `if (!round)`. Once *any* round exists —
+  pending, approved, revoked — that form is gone for good.
+
+So there is no path from "a round exists" back to "invite a client". Measured:
+panel `Re-send for review` on the approved fixture produced a PENDING round with
+`token: null`, and the client's old link still opened round 1's terminal screen —
+*"You approved this. Thanks, E2E Blank WS can take it from here."* The reviewer
+has no way to reach round 2. The button says "Re-send for review"; nothing was
+sent.
+
+This lands directly on the copy the client is left holding: *"They'll send a new
+link when the changes are ready for you."* No control in the product mints that
+link.
+
+### ⛔ D2 — the panel tells the designer to keep waiting on a closed round
+
+`ReviewTab.tsx:601-607` chooses the body from `round.revoked`, then `total`,
+then `openComments.length`. Round **status is never consulted**. A round the
+client closed with `Ask for changes` and no note has `total === 0`, so it renders
+`emptyBody`:
+
+> Fixture Reviewer has not commented yet. You will be notified.
+
+Measured with the DB reading `CHANGES_REQUESTED`. The topbar pill beside it says
+"Changes requested" — the two disagree on the same screen.
+
+### ⛔ D3 — the publish gate calls a resolved round "still open"
+
+`PublishConfirmFacts.tsx:41`. `approvalLine` branches on `approved`, `revoked`
+and `openCommentCount > 0`, then falls through to `Round ${n} is still open.`
+`CHANGES_REQUESTED` takes the fallthrough. Measured in the gate:
+
+> Client approval — Round 2 is still open.
+
+The gate's *decision* is right (publish stays blocked); its *reason* is wrong.
+D2 and D3 are one shape — three statuses in the schema
+(`PENDING | APPROVED | CHANGES_REQUESTED`), two in the UI.
+
+### Noted, not filed
+
+`issueReviewToken`'s comment promises re-sending "must invalidate the old link".
+It nulls the token on the row it updates, and a new round is a new row — so
+round 1's token stays live across rounds. Harmless here because an APPROVED
+round renders a terminal screen with no controls, but the invariant is per-row,
+not per-site.
+
+`resolvedById` is null on both resolved rounds. It is a `User` foreign key and a
+client reviewer is a `Reviewer`, so nothing on the client path can ever fill it.
 
 ### Also confirmed live
 
