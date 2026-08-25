@@ -62,7 +62,11 @@ export const insertSubmenu: ContextAction[] = [
     label: "Insert Inside (First)",
     icon: "corner-down-right",
     group: "Insert",
-    isVisible: (ctx) => ctx.element.canHaveChildren() && !ctx.element.isLocked(),
+    // Structural inserts inside an instance subtree are discarded by the next
+    // syncInstance, so they stay blocked — explicitly now that isLocked() no
+    // longer implies "is an instance".
+    isVisible: (ctx) =>
+      ctx.element.canHaveChildren() && !ctx.element.isLocked() && !ctx.element.isComponentInstance(),
     handler: ({ composer, element }) => {
       const elementType = element.getType() as ElementType;
       const newEl = createPlaceholderElement(composer, elementType);
@@ -79,7 +83,11 @@ export const insertSubmenu: ContextAction[] = [
     label: "Insert Inside (Last)",
     icon: "corner-down-left",
     group: "Insert",
-    isVisible: (ctx) => ctx.element.canHaveChildren() && !ctx.element.isLocked(),
+    // Structural inserts inside an instance subtree are discarded by the next
+    // syncInstance, so they stay blocked — explicitly now that isLocked() no
+    // longer implies "is an instance".
+    isVisible: (ctx) =>
+      ctx.element.canHaveChildren() && !ctx.element.isLocked() && !ctx.element.isComponentInstance(),
     handler: ({ composer, element }) => {
       const elementType = element.getType() as ElementType;
       const newEl = createPlaceholderElement(composer, elementType);

@@ -342,7 +342,12 @@ describe("ElementSerialization — capability queries", () => {
     expect(img.isVoid()).toBe(true);
   });
 
-  it("isLocked is true for the locked flag OR component-instance membership", () => {
+  /* This used to be one test asserting `isLocked` is true for the locked flag
+     OR component-instance membership. Both halves are worth keeping; their
+     conjunction was the defect — it made every instance permanently locked, so
+     instances could not be selected on canvas and the product's own "unlock it
+     in the Layers panel" toast could not succeed. Split, not deleted. */
+  it("isLocked reflects the locked flag, and NOT instance membership", () => {
     const { composer, manager } = makeEngine();
     const plain = manager.createElement("text");
     expect(plain.isLocked()).toBe(false);
@@ -355,8 +360,38 @@ describe("ElementSerialization — capability queries", () => {
         id === plain.getId() ? { elementId: plain.getId() } : null
       ),
     };
-    expect(plain.isLocked()).toBe(true);
-    expect(plain.isComponentInstance()).toBe(true);
+    // Being inside an instance must not lock the element — that is what made
+    // instances unselectable.
+    expect(plain.isLocked()).toBe(false);
+  });
+
+  it("isComponentInstance is true for instance-subtree membership", () => {
+    const { composer, manager } = makeEngine();
+    const inside = manager.createElement("text");
+    const outside = manager.createElement("text");
+
+    composer.components = {
+      findInstanceContainingElement: vi.fn((id: string) =>
+        id === inside.getId() ? { elementId: inside.getId() } : null
+      ),
+    };
+    expect(inside.isComponentInstance()).toBe(true);
+    expect(outside.isComponentInstance()).toBe(false);
+  });
+
+  it("canBeWrapped still refuses an instance — structural edits are discarded on sync", () => {
+    const { composer, manager } = makeEngine();
+    const parent = manager.createElement("container");
+    const child = manager.createElement("text");
+    parent.addChild(child);
+    expect(child.canBeWrapped()).toBe(true);
+
+    composer.components = {
+      findInstanceContainingElement: vi.fn((id: string) =>
+        id === child.getId() ? { elementId: child.getId() } : null
+      ),
+    };
+    expect(child.canBeWrapped()).toBe(false);
   });
 
   it("isRoot / canBeWrapped / canBeUnwrapped derive from parent + children + lock", () => {

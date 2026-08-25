@@ -137,7 +137,12 @@ export function useCanvasKeyboard({
             .filter((id) => id !== rootId)
             .filter((id) => {
               const el = composer.elements.getElement(id);
-              return el && !el.isLocked?.();
+              // isComponentInstance was folded into isLocked until 2026-08-25.
+              // It is named here now because it is doing real work:
+              // `removeElement` does not prune `ComponentManager.instances`
+              // (only `detachInstance` does), so deleting an instance element
+              // leaves a stale map entry behind.
+              return el && !el.isLocked?.() && !el.isComponentInstance?.();
             });
 
           if (idsToDelete.length === 0) return;
