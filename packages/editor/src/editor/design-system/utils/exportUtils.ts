@@ -118,10 +118,41 @@ export function buildExport(
   if (format === "json") {
     return { content: JSON.stringify(tokens, null, 2), filename: "design-tokens.json" };
   }
-  const colorTokens = tokens.filter((t) => t.type === "color");
-  const colors: Record<string, string> = {};
-  colorTokens.forEach((t) => (colors[t.name.toLowerCase().replace(/\s+/g, "-")] = t.value));
-  const content = `/** @type {import('tailwindcss').Config} */\nmodule.exports = {\n  theme: {\n    extend: {\n      colors: ${JSON.stringify(colors, null, 6)},\n    },\n  },\n};\n`;
+  /* This emitted colors only, under a button labelled "theme.extend config".
+     A design system is not its palette, and the label was a promise. Every kind
+     Tailwind can actually express in `theme.extend` is emitted now; kinds it
+     cannot (motion, grid, icon, imagery) are left out rather than guessed at. */
+  const key = (t: DesignToken) => t.name.toLowerCase().replace(/\s+/g, "-");
+  const bucket = (kinds: string[], types: string[] = []) => {
+    const out: Record<string, string> = {};
+    for (const t of tokens) {
+      const k = t.kind ?? "";
+      if (kinds.includes(k) || types.includes(t.type)) out[key(t)] = t.value;
+    }
+    return out;
+  };
+
+  const sections: Array<[string, Record<string, string>]> = [
+    ["colors", bucket(["color"], ["color"])],
+    ["fontFamily", bucket(["type"], ["font-family"])],
+    ["fontSize", bucket([], ["font-size"])],
+    ["spacing", bucket(["spacing", "sizing"])],
+    ["borderRadius", bucket(["radius"])],
+    ["boxShadow", bucket(["shadow"], ["shadow"])],
+    ["opacity", bucket(["opacity"])],
+    ["zIndex", bucket(["zindex"])],
+    ["screens", bucket(["breakpoint"])],
+    ["borderWidth", bucket(["border"])],
+  ];
+
+  const body = sections
+    .filter(([, v]) => Object.keys(v).length > 0)
+    .map(([name, v]) => `      ${name}: ${JSON.stringify(v, null, 8).replace(/\n/g, "\n      ")},`)
+    .join("\n");
+
+  const content =
+    `/** @type {import('tailwindcss').Config} */\nmodule.exports = {\n  theme: {\n    extend: {\n` +
+    `${body}\n    },\n  },\n};\n`;
   return { content, filename: "tailwind.config.js" };
 }
 

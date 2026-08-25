@@ -39,7 +39,17 @@ interface RegistryHandle {
   addToken?: (token: DesignToken) => void;
 }
 
-function inferKind(t: DesignToken): TokenKind | null {
+/**
+ * Which registry a token belongs to. `kind` is authoritative; `category` is a
+ * COARSER taxonomy (9 values against 14 kinds — radius, shadow, motion and
+ * border can all be "effects"), so it can only resolve the three kinds that
+ * happen to have a category of their own. Everything else needs `kind`.
+ *
+ * Exported because the import preflight has to apply exactly this rule: a token
+ * this returns null for cannot be applied, and counting it as "valid" is what
+ * produced "Valid tokens 3 / Errors 0" followed by a silent "2 skipped".
+ */
+export function inferKind(t: DesignToken): TokenKind | null {
   if (t.kind) return t.kind;
   switch (t.category) {
     case "colors":     return "color";

@@ -30,6 +30,8 @@ export interface DiffResult {
   modified: TokenModification[];
 }
 
+import { inferKind } from "../state/useImportTokens";
+
 const REQUIRED_FIELDS = ["id", "name", "value", "category", "cssVar", "type"] as const;
 
 function isCandidateToken(x: unknown): x is DesignToken {
@@ -67,11 +69,23 @@ export function parseImportJSON(raw: string): ParseResult {
   const errors: string[] = [];
   const tokens: DesignToken[] = [];
   candidates.forEach((c, i) => {
-    if (isCandidateToken(c)) {
-      tokens.push(c);
-    } else {
+    if (!isCandidateToken(c)) {
       errors.push(`Token #${i} is missing required fields (${REQUIRED_FIELDS.join(", ")})`);
+      return;
     }
+    /* "Valid" used to mean only "has six string fields" — `kind` is not among
+       them — so a token in any of the eleven kinds that `category` cannot
+       resolve was counted in "Valid tokens N" and in "Apply N valid only", then
+       silently dropped at apply time with a count-only toast. A token that
+       cannot be routed is not valid; say so here, with its id. */
+    if (inferKind(c) === null) {
+      errors.push(
+        `Token "${c.id}" has no "kind" and category "${c.category}" doesn't name one — ` +
+          `add "kind" (e.g. radius, shadow, motion) so it can be applied.`,
+      );
+      return;
+    }
+    tokens.push(c);
   });
 
   if (errors.length > 0) return { tokens: [], errors };

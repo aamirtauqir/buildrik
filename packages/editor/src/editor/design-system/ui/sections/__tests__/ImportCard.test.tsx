@@ -96,10 +96,10 @@ describe("ImportCard — file ingestion", () => {
 });
 
 describe("ImportCard — conflict resolution", () => {
-  it("conflicts > 0 → Resolve box + 3 strategy buttons visible", async () => {
+  it("conflicts > 0 → Resolve box + 2 strategy buttons visible", async () => {
     // color-primary lives in DEFAULT_TOKENS — drop a payload with the same id
     // but a different value to force a single conflict against the seeded set.
-    const { getByTestId, findByText, findByTestId } = render(wrap(<ImportCard />));
+    const { getByTestId, findByText, queryByText, findByTestId } = render(wrap(<ImportCard />));
 
     const file = makeJsonFile([
       {
@@ -116,7 +116,10 @@ describe("ImportCard — conflict resolution", () => {
     expect(await findByTestId("import-resolve-box")).toBeTruthy();
     expect(await findByText(/^Replace$/i)).toBeTruthy();
     expect(await findByText(/Merge · keep mine/i)).toBeTruthy();
-    expect(await findByText(/Merge · keep theirs/i)).toBeTruthy();
+    /* There were three buttons and two outcomes: `handleApply` filtered on
+       "keep-mine" and sent everything otherwise, so Replace and
+       "Merge · keep theirs" were the same branch. The third is gone. */
+    expect(queryByText(/Merge · keep theirs/i)).toBeNull();
     expect(await findByText(/1 ID collisions/i)).toBeTruthy();
   });
 });
@@ -196,8 +199,12 @@ describe("ImportCard — conflict strategy behavior", () => {
     expect(colors.current.find((t) => t.id === "color-primary")?.value).toBe(originalPrimary);
   });
 
-  it("'Merge · keep theirs' behaves like Replace in v1 (all incoming staged)", async () => {
+  /* Replaces "'Merge · keep theirs' behaves like Replace in v1", which pinned
+     the duplicate branch rather than a behaviour. What is worth asserting is
+     that the two surviving strategies actually differ. */
+  it("the two strategies differ: Replace overwrites a conflict, keep-mine does not", async () => {
     const { getByTestId, getByText, findByTestId, colors } = renderWithProbe();
+    const originalPrimary = colors.current.find((t) => t.id === "color-primary")?.value;
 
     await act(async () => {
       fireEvent.drop(getByTestId("import-drop-zone"), {
@@ -206,11 +213,11 @@ describe("ImportCard — conflict strategy behavior", () => {
     });
     await findByTestId("import-resolve-box");
 
-    fireEvent.click(getByText(/Merge · keep theirs/i));
+    // Replace is the default and takes the incoming value.
     fireEvent.click(getByText(/Apply 2 valid only/i));
-
     await waitFor(() => {
       expect(colors.current.find((t) => t.id === "color-primary")?.value).toBe("#222222");
+      expect(colors.current.find((t) => t.id === "color-primary")?.value).not.toBe(originalPrimary);
     });
   });
 });

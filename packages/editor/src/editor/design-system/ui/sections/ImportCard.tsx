@@ -17,7 +17,6 @@
  * the staged token set before calling useImportTokens:
  *   - replace          → all incoming tokens (existing-id rows update in place)
  *   - merge-keep-mine  → only NEW ids (skip existing-id rows)
- *   - merge-keep-theirs → all incoming tokens (same as replace for v1)
  *
  * @license BSD-3-Clause
  */
@@ -34,7 +33,14 @@ import {
   useIconRegistry, useImageryRegistry,
 } from "../../state/TokenRegistryContext";
 import type { DesignToken } from "../../types";
-type ConflictStrategy = "replace" | "keep-mine" | "keep-theirs";
+/* Was `"replace" | "keep-mine" | "keep-theirs"`. `handleApply` filtered on
+   "keep-mine" and sent everything otherwise, so Replace and "Merge · keep
+   theirs" were the SAME branch — this file's own header said "same as replace
+   for v1". Three buttons, two outcomes, and nothing on screen said so. Giving
+   Replace its distinct meaning (drop tokens absent from the import) is a
+   destructive operation that would need a warning and an undo path; two honest
+   buttons is the smaller true thing. */
+type ConflictStrategy = "replace" | "keep-mine";
 
 interface ParsedState {
   rawSource: string;
@@ -184,8 +190,8 @@ export const ImportCard: React.FC = () => {
 
   const handleApply = () => {
     if (!parsed) return;
-    // Strategy filters the staged token set. `replace` and `keep-theirs` send
-    // everything; `keep-mine` skips tokens whose id is already in any registry.
+    // Strategy filters the staged token set: `replace` sends everything,
+    // `keep-mine` skips tokens whose id is already in any registry.
     const toApply: DesignToken[] =
       strategy === "keep-mine"
         ? parsed.tokens.filter((t) => parsed.diff.added.some((a) => a.id === t.id))
@@ -198,7 +204,11 @@ export const ImportCard: React.FC = () => {
 
     const stats = apply(toApply);
     addToast({
-      description: `Imported · ${stats.modified} modified · ${stats.added} added${stats.skipped.length ? ` · ${stats.skipped.length} skipped` : ""}`,
+      /* `ImportStats.skipped` has always carried the ids; the toast reported
+         only its length, so "2 skipped" named nothing the user could act on. */
+      description:
+        `Imported · ${stats.modified} modified · ${stats.added} added` +
+        (stats.skipped.length ? ` · skipped ${stats.skipped.join(", ")}` : ""),
       tone: "success",
     });
     handleCancel();
@@ -358,15 +368,6 @@ export const ImportCard: React.FC = () => {
                   onClick={() => setStrategy("keep-mine")}
                 >
                   Merge · keep mine
-                </Button>
-                <Button
-                  type="button"
-                  size="xs"
-                  color={strategy === "keep-theirs" ? undefined : "light"}
-                  aria-pressed={strategy === "keep-theirs"}
-                  onClick={() => setStrategy("keep-theirs")}
-                >
-                  Merge · keep theirs
                 </Button>
               </div>
             </div>
