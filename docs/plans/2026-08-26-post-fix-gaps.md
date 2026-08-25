@@ -325,3 +325,72 @@ Work, in the order both voices converge on:
 **G1 stays with the founder.** `docs/PRODUCT-OVERVIEW.md:178` already says the
 next move is to flip it for a named pilot workspace — one click in Settings,
 zero code. This plan clears the blockers so that click is safe.
+
+---
+
+# OUTCOME — 2026-08-26
+
+**Eight issues fixed. The one decision this plan opened with is NOT made here.**
+
+All gates PASS (14 DS + 4 chrome-axiom, tsc 0 in both packages, token-resolution,
+boards, hex-drift, copy, chrome-ui surface, styling ratchet). 486 server tests,
+173 dashboard tests.
+
+| # | Verdict | Measurement |
+|---|---|---|
+| I1 | fixed | Partner tab gone from the rail and the palette; the route redirects; `partner-view.tsx` keeps the code |
+| I2 | fixed | onboarding defaults to "My own business" and offers the client branches only when they can be saved |
+| I3 | fixed | capture refuses an empty source instead of toasting success over a `DbNull` write |
+| I4 | fixed | the white-label dialog says the fields are stored and not applied; the Clients copy stops selling it |
+| I5 | fixed | "N admins notified" / "You're the only admin on this workspace, so no notification was sent" |
+| I6 | fixed | **verified live with SMTP unset at launch**: panel reads "Round created — but the invite email didn't go out", the round still lands, and `REVIEW_INVITE_EMAIL_FAILED` is in the audit log |
+| I7 | fixed | `pnpm funnel` prints weekly signups / sites / rounds sent / approved / conversion / publishes off tables that already held all of it |
+| I8 | fixed | `siteCount` applies the same `deletedAt: null` filter `listSites` does |
+
+Two things came along the way that were not on the list:
+
+- **`requireAgencyLayer` was copy-pasted into three routers** and lives once in
+  `trpc/guards.ts` now — which is what made it obvious that
+  **`dashboard.partner` never had a server-side gate at all**. It was protected
+  only by a client-side redirect whose own comment calls it "UX", not security.
+  Gated.
+- **A test mock lagged its function again** (`submitForReview` resolved
+  `undefined` while the caller started reading `inviteEmailSent`). Third time
+  this shape has appeared in two days; the fix is always to move the mock to the
+  real contract, not to weaken the caller.
+
+## G1 stays with the founder — and it is now safe to take
+
+`docs/PRODUCT-OVERVIEW.md:178` already lists *"Flip `agency_layer` for a real
+named pilot workspace"* under founder/pilot-gated. Both review voices reached
+the same place independently, and the audit showed why it mattered: the flag
+opens six tabs, and three of the things behind it were lying.
+
+They are not lying now. What is left to decide is the product question, not a
+defect:
+
+- **Flip it by hand for a named pilot** — one click in Settings, zero code, and
+  the only move that reaches a real person this week. This is what the product
+  doc prescribes and what both voices recommend.
+- **Seed it on create from `OnboardingState.role === "agency"`** — the answer the
+  product already collects and persists (`onboarding/path/page.tsx:20-21` →
+  `onboarding/workspace/page.tsx:74` → `schema.prisma:885`). Deliberate, keeps
+  the kill-switch, leaves solo users out. **Not built here** — it is the
+  positioning call, and it belongs to the founder.
+- **Do not touch `?? false`.** It would flip every existing workspace that never
+  made a choice.
+
+## Still true, and not addressed by this plan
+
+- **`client_mode` gates nothing.** Declared in `FEATURE_KEYS`, referenced only by
+  comments and tests; all nine production `isFeatureEnabled` calls pass
+  `agency_layer`. Either delete the key or leave it — do not seed it and imply
+  it does something.
+- **`theme.presets.*` (4 endpoints, 4 service functions, its own table) and
+  `theme.snapshots` have zero callers.** Built, ADMIN-gated, unreachable.
+- **Five of six agency tabs have no component tests.** The only one in the whole
+  area is `agency/(tabs)/__tests__/layout.test.tsx`.
+- **`Client` has no email column**, so the address onboarding collects under
+  *"Used for review and approval links"* has nowhere to go even with the flag on.
+- **Publish is still the end of the loop and still out of scope.** `pnpm funnel`
+  reports `approved → published` as its own column for exactly this reason.
