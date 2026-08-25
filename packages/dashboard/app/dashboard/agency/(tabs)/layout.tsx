@@ -39,7 +39,9 @@ export default function AgencyTabsLayout({ children }: { children: React.ReactNo
     <div>
       <PageHeader
         title="Agency"
-        description="Clients, sign-off, shared theme, and partner program."
+        /* Partner is closed — its route redirects and its tab is gone, because
+           nothing writes a `Referral` row. Naming it here advertised it anyway. */
+        description="Clients, sign-off, shared theme, and a shared component library."
         actions={
           onClientsTab ? (
             <Button onClick={() => router.push("/dashboard/agency?new=1")} className="gap-1.5">

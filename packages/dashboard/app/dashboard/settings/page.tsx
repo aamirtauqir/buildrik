@@ -27,7 +27,7 @@ function SettingsCard({ entry }: { entry: SettingsSection }) {
 }
 
 export default function SettingsIndexPage() {
-  // Reviews and the partner program live behind the agency layer; hiding those
+  // Reviews live behind the agency layer; hiding those
   // cards keeps every card on this page a destination the user can actually open.
   const features = trpc.features.list.useQuery(undefined, { staleTime: 60_000 });
   const agency = !!features.data?.agency_layer;
