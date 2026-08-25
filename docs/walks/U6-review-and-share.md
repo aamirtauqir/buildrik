@@ -267,3 +267,43 @@ client reviewer is a `Reviewer`, so nothing on the client path can ever fill it.
 
 `Approved · edited since` in the topbar — the `S5.6 · approved-edited-since`
 board state — appears as soon as an edit lands after approval.
+
+### Figma coverage of the client surface — measured 2026-08-25
+
+Read from the file, not from the census, because inferring a gap from
+`boards.json` names has been wrong twice in this arc.
+
+`S5.5 · reviewer-view · external-reviewer` (`807:8723`, 1440×900) is the **only**
+client-facing board. It draws three frames — `review-toolbar` /  `site-preview` /
+`review-bottom-bar` — i.e. the **active review state**: site name, "In review",
+page tabs, a comment thread, and the two decisions.
+
+The `S5.2` family is **editor-side**, not client-side. `S5.2 · approved`
+(`130:798`) and `S5.2 · pending` (`130:201`) both draw the editor — `‹ Exit`,
+the Insert/Layers/Pages/Media/Content/Brand rail, `Publish`, and the review bar
+with `Re-send`. They are the review pill's states seen from the owner's chair.
+
+So of the four client states this walk measured live, **one has a board**:
+
+| Client state | Board |
+|---|---|
+| Active review — pages, notes, the two decisions | `S5.5 · reviewer-view` |
+| Identity gate — *"Before you start, tell us who you are…"* | **none** |
+| Terminal — *"You approved this"* | **none** |
+| Terminal — *"You asked for changes"* | **none** |
+
+⚠ **A copy divergence, board vs code.** `S5.5`'s bottom bar reads
+**"Request changes"**; the live surface reads **"Ask for changes"**. Button copy
+is UI copy, not board sample data ("Bella Cucina", "Sara M." are), so the
+founder's precedence rule applies: visual and on-screen copy → the board. The
+code is the side out of step.
+
+Wiring is present and healthy — `S5.2 · approved` carries
+`hotspot/state · S5.6 · approved-clean` and `S5.2 · pending` carries
+`hotspot/state · S5.2 · none`, consistent with this arc's Figma lane closing as
+"wire, do not redraw; nothing to add".
+
+**Not drawn here.** Adding three 1440×900 client boards is a design act, and
+`docs/plans/2026-08-25-editor-ui-redesign.md` is actively redrawing this surface
+under the founder's full-scope choice. Drawing them from a behaviour walk is how
+the file gets duplicates.
