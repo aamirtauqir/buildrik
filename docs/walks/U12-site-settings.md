@@ -116,3 +116,45 @@ actually does. This pass reached the modal, not the full-page surface.
 ### What this walk did NOT assess
 
 Visual and IA beyond the naming mismatch above. Behaviour, state and data only.
+
+---
+
+## Addendum 2, 2026-08-25 — two site-menu rows leave the editor, by design
+
+Chasing the 13-section full-page Settings surface, `Site health` looked like a
+dead door: clicking it — with a real `page.mouse.click`, and again with a
+programmatic `.click()` on the actual `BUTTON[role="menuitem"]` — left the
+editor unchanged. Two different click mechanisms, no navigation, nothing opened.
+
+**It is not a dead door.** Caught by listening for popups instead of scraping
+the page:
+
+```
+NEW TABS OPENED:
+  http://localhost:3000/dashboard/sites/<siteId>#site-health
+editor page still at:
+  http://localhost:3000/edit/<siteId>
+```
+
+`SiteMenu.tsx:195-199` calls
+`openDashboard('/dashboard/sites/<id>#site-health')` for `Site health` and
+`#activity-log` for `Activity log`, and the comment above it says so plainly:
+*"Both are real dashboard surfaces … that the editor simply had no door to.
+They deep-link to their own section rather than to the page."*
+`screens-editor.json`'s own note recorded the same thing on 08-23 — *"Three open
+a new tab and belong to the dashboard, not here."*
+
+So the editor page staying put is **correct behaviour**, and any probe that
+measures "did this page change" will read these two rows as broken forever.
+Eighth false finding this arc, caught before filing.
+
+**Harness rule that follows:** for a menu row that may leave the editor, listen
+on `context.on("page", …)` before clicking. A page-scrape cannot see a new tab.
+
+### The 13-section surface — still not reached
+
+`Site health` and `Activity log` are dashboard deep-links, not doors to it.
+`FullPageRouter.tsx:87` renders `SettingsTab` into `LayoutShell.FullPage` when a
+**fullpage tab** is active, and this pass did not find which control activates
+that tab. The per-section drill-ins, the 180 ms lock, the dirty counter and the
+sticky savebar remain uncovered.
