@@ -2783,7 +2783,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-25 — client Approve flipped DB to APPROVED; editor topbar read 'Approved by Fixture Reviewer · just now'",
       "recipe": null
     },
     {
@@ -2838,7 +2838,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-25 — round observed PENDING before the client resolved it",
       "recipe": null
     },
     {
@@ -2937,7 +2937,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "scope:dashboard",
+      "authority": "walked:2026-08-25 — /review/<token> opened anonymously, 200, pages listed, Approve taken",
       "recipe": null
     },
     {
