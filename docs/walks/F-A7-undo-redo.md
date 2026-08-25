@@ -55,3 +55,40 @@ here rather than filed as a defect.
 The `runWithoutTracking` / collab-remote-op / restore-in-progress exclusions,
 the depth-100 cap, and the "bail out without mutation if the patch path
 diverges" guard.
+
+---
+
+## Addendum, 2026-08-25 — the exclusions and caps, verified
+
+Lane of `docs/plans/2026-08-25-editor-flow-walk-arc.md`. This record's "Not
+covered" list is three engine-internal guards with **no UI of their own**, so
+the instrument is code verification plus the existing suites, not a walk. Said
+plainly rather than dressed up as a walk.
+
+All three are present at HEAD in `packages/editor/src/engine/HistoryManager.ts`:
+
+| leg | verified |
+|---|---|
+| `runWithoutTracking` | `:432` — sets `isRecording = false` **and** `isRestoringFromHistory = true`, both restored in a `finally`. Its docstring names the failure it prevents: `importProject` re-emits `PROJECT_LOADED`, which the load handler would otherwise treat as a fresh project and wipe history. Only caller is `Composer.ts:967`, a transaction rollback |
+| restore-in-progress exclusion | `:131` — `if (this.isRestoringFromHistory) return;` in the record path |
+| "bail out without mutation if the patch diverges" | `:193` — `if (isPatchEmpty(patch)) return;`, before anything is pushed |
+| depth-100 cap | `maxHistory: THRESHOLDS.HISTORY_MAX_SIZE` (`:71`), and `HISTORY_MAX_SIZE: 100` in `shared/constants/config.ts:108`. **The number in the PRD is the number in the code** |
+| the other two contract numbers | `checkpointInterval: 10` and `coalesceDelay: 500` (`:72-73`) — matching "500 ms coalesce / checkpoint-every-10". F-A2's record read these too; this is a second, independent confirmation |
+
+**Corrected, not confirmed — the collab exclusion.** This record listed
+"collab-remote-op" among the exclusions. What the code actually does at
+`:230-233` is the opposite direction: when a collab session is connected it
+**broadcasts the local op outward** (`collab.broadcastOperation(op)`). Whether
+an *incoming* remote op is excluded from the local undo stack is not settled by
+this code path, and this pass did not chase it into the collab manager.
+Recorded as still-open rather than claimed — and note `NEXT_PUBLIC_FEATURE_COLLAB`
+is off by founder policy, so nothing here is reachable in production today.
+
+**Tests:** `HistoryManager.test.ts`, `.noop.test.ts`, `.entryIndex.test.ts` —
+**9 passed**. No new test: this lane found no defect. The one-undo-step contract
+itself was measured live in the F-A5 lane (AI apply → single ⌘Z reverts), which
+is the strongest evidence in this area and it holds.
+
+### What this walk did NOT assess
+
+Visual and IA. And the collab-remote-op direction, named above.
