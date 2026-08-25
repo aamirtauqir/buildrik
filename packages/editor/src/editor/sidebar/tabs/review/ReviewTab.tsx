@@ -449,7 +449,16 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
             composer={composer ?? null}
             disabledReason={isViewer ? "Viewers can't send for review — ask an editor" : undefined}
             reviewStatus={round ?? null}
-            onSent={() => void load()}
+            onSent={(outcome) => {
+                  /* The panel keeps this, not SendForReview — that component is
+                     unmounted by the very reload this triggers. */
+                  setNotice(
+                    outcome?.inviteEmailSent === false
+                      ? "Round created — but the invite email didn't go out. Send your client the link yourself."
+                      : null,
+                  );
+                  void load();
+                }}
           />
         </div>
       </div>
@@ -790,7 +799,16 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
                 /* `revision` IS the round's updatedAt — the same "the at moved,
                    so OUR send landed" signal the pill passes. */
                 reviewStatus={{ at: round.revision }}
-                onSent={() => void load()}
+                onSent={(outcome) => {
+                  /* The panel keeps this, not SendForReview — that component is
+                     unmounted by the very reload this triggers. */
+                  setNotice(
+                    outcome?.inviteEmailSent === false
+                      ? "Round created — but the invite email didn't go out. Send your client the link yourself."
+                      : null,
+                  );
+                  void load();
+                }}
                 idleLabel="Invite a client…"
               />
             </div>

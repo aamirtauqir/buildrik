@@ -22,8 +22,13 @@ export interface SendForReviewProps {
   composer: Composer | null;
   /** Viewers cannot send — the control stays visible with the reason attached. */
   disabledReason?: string;
-  /** Refresh the topbar's review pill once a send lands. */
-  onSent?: () => void;
+  /** Refresh the topbar's review pill once a send lands. Carries the invite
+   *  outcome, because this component is UNMOUNTED by the refresh it triggers:
+   *  on a first send the panel swaps from its `!round` branch to the round
+   *  view, taking the failure notice below with it. The panel has to own the
+   *  message. Measured on a real signup, 2026-08-26 — the audit row was
+   *  written and the user was told nothing. */
+  onSent?: (outcome?: { inviteEmailSent: boolean | null }) => void;
   /**
    * The review round's current truth (F4). When a new round lands after our
    * send — the `at` timestamp moves, even on a pending→pending re-send — the
@@ -111,7 +116,7 @@ export const SendForReview: React.FC<SendForReviewProps> = ({
       setReviewUrl(outcome?.reviewUrl ?? null);
       setState("sent");
       setOpen(outcome?.inviteEmailSent === false);
-      onSent?.();
+      onSent?.({ inviteEmailSent: outcome?.inviteEmailSent ?? null });
     } catch {
       setState("error");
     }
