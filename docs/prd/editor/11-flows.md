@@ -174,7 +174,7 @@ canUndo requires stack >1 (baseline checkpoint protected); depth 100; RAM-only �
 
 ### U3 · Brand / design-system flow
 1. Rail Styles (D) → DesignSystemTab v12: Tokens / Styles / Components / Export sections.
-2. Tokens: 14 kinds; edit → live CSS var on documentElement; per-token undo; lint — **eight rules ship** (`LintSection.tsx:37-47`): `contrast`, `banned-hue`, `pure-black`, `empty-value`, `missing-dark`, `unresolved-binding`, `alias-depth-exceeded`, `semantic-needs-alias`, all through one pipeline (`useDSLint.ts:44` adds contrast on top of `DSLinter`). ~~contrast auto-fix to AA 4.5~~ — **there is no auto-fix**, and the screen says so: *"Auto-fix isn't available yet — the linter reports what is wrong, not what to replace it with."* On this fixture only the two contrast rows appear; the other seven have nothing to flag (`missing-dark` cannot fire at all on a project with `0 dark variants`), and confirming them live needs a planted violation, which the Import wedge in §6 blocks.
+2. Tokens: 14 kinds; edit → live CSS var on documentElement; per-token undo; lint — **eight rules ship** (`LintSection.tsx:37-47`): `contrast`, `banned-hue`, `pure-black`, `empty-value`, `missing-dark`, `unresolved-binding`, `alias-depth-exceeded`, `semantic-needs-alias`, all through one pipeline (`useDSLint.ts:44` adds contrast on top of `DSLinter`). ~~contrast auto-fix to AA 4.5~~ — **there is no auto-fix**, and the screen says so: *"Auto-fix isn't available yet — the linter reports what is wrong, not what to replace it with."* On this fixture only the two contrast rows appear; the other seven have nothing to flag (`missing-dark` cannot fire at all on a project with `0 dark variants`), and confirming them live needed a planted violation, which the Import wedge in §6 blocked. **The wedge is fixed (`89af41c5`) and the test now runs: 2026-08-25, planting a black and a violet token took the count 2 → 4 and the linter named both — `Pure black · walk-black` and `Banned hue — purple, violet or indigo · walk-violet`.**
 3. Starter themes ×6 (cobalt/stripe/notion/apple/linear/vercel) — restyles tokens, keeps elements.
 4. Apply → `composer.setProjectSettings({designTokens, schemaVersion:4, designPresets})` + markSaved. ~~⛔ `persistAll` localStorage path serializes only 3/14 kinds~~ — **stale, verified 2026-08-23**: `TokenRegistryContext.tsx:197-200` persists all 14, and its own comment records the bug this line describes — "Previously only color/spacing/type were saved, so edits to the other 11 … were silently lost on reload".
 5. Bind in inspector: token chains stored `var(--buildrick-design-<id>)`; Reach strip This item / All like this (blast-radius confirm) / Whole site.
@@ -185,13 +185,18 @@ canUndo requires stack >1 (baseline checkpoint protected); depth 100; RAM-only �
    - ⚠ The exported CSS carries **two prefixes** — `--buildrick-design-*` for colors/typography, `--bd-*` for the other eleven kinds. Seed-data drift in the site-builder token set, surfacing in a customer's stylesheet (not a Gate 15 matter — that gate covers chrome tokens).
    - ⚠ `Replace` and `Merge · keep theirs` are the **same branch** (`ImportCard.tsx:189-192`; the file's header says "same as replace for v1"). Three buttons, two outcomes, nothing on screen saying so.
    - ⚠ Parse-valid ≠ apply-routable. `parseImportJSON` requires six string fields and **not** `kind` (`importUtils.ts:33`); `inferKind` maps only `colors`/`typography`/`spacing` of **14** registries (`useImportTokens.ts:42-49`). A `kind`-less token in the other eleven categories is counted in "Valid tokens N" and "Apply N valid only", then silently skipped — the toast gives a count, never the ids it already holds in `ImportStats.skipped`.
-   - ⛔ **After an import Apply, the Brand panel wedges on Import / export.** Same back button, same click: works before Apply, inert after. `✕` and reopening Brand returns to the same screen. Reproduced 4×. This is what blocks the planted-violation test for the lint rules below.
+   - ~~⛔ After an import Apply, the Brand panel wedges on Import / export.~~ **FIXED 2026-08-25** (`89af41c5` — the guard had a false premise and is gone). Same back button, same click: works before Apply, inert after. `✕` and reopening Brand returns to the same screen. Reproduced 4×. This is what blocks the planted-violation test for the lint rules below.
 7. Cross-site brand: "Open Shared theme ↗" **link-out to dashboard only** — no push UI in editor (§12 #7).
 
 ### U4 · Component flow
 
-> **⛔ Instances cannot be selected on canvas, and the message that says how to
-> fix that is wrong.** Verified live 2026-08-25 across three sessions
+> **~~⛔ Instances cannot be selected on canvas, and the message that says how to
+> fix that is wrong.~~ FIXED 2026-08-25 (`16ffcf96`)** — `isLocked()` no longer
+> returns true for instance membership. The guards that the disjunct was doing
+> incidentally (structural inserts, wrap, multi-select delete) are now explicit
+> `isComponentInstance()` checks, so nothing they protected was lost. Verified
+> live: insert a component, deselect, click it on canvas — it selects, and no
+> toast fires. Original finding below. Verified live 2026-08-25 across three sessions
 > (`docs/walks/U4-components.md` addenda 2-3).
 >
 > `ElementSerialization.ts:118-120` —
@@ -265,7 +270,7 @@ does not.** One click on the client surface → `clientReview.resolve` 200 → D
 blocks. Three defects came out of walking it, all in
 `docs/walks/U6-review-and-share.md`:
 
-- ⛔ **A client can be invited to exactly one round, ever.**
+- ~~⛔ A client can be invited to exactly one round, ever.~~ **FIXED 2026-08-25** (`81decfaa`) —
   `AquibraStudio.tsx:392` re-sends with `clientEmail: undefined`, so
   `review.service.ts:85` mints no token; and `ReviewTab.tsx:405` gates the only
   "Client email" form behind `!round`, so it disappears after the first send.
@@ -273,11 +278,11 @@ blocks. Three defects came out of walking it, all in
   "Re-send for review" and the client's old link reads "You approved this".
   The client is told *"They'll send a new link"* — nothing in the product mints
   one.
-- ⛔ `ReviewTab.tsx:601-607` picks its body from comment counts and never reads
+- ~~⛔~~ **FIXED** — `ReviewTab.tsx` now branches on `CHANGES_REQUESTED`; it picked its body from comment counts and never read
   round status, so a `CHANGES_REQUESTED` round with no note renders "has not
   commented yet. You will be notified." beside a pill that says the opposite.
-- ⛔ `PublishConfirmFacts.tsx:41` falls through to "Round N is still open." for
-  `CHANGES_REQUESTED`. Right decision, wrong reason.
+- ~~⛔~~ **FIXED** — the gate now names the change request; it fell through to "Round N is still open." for
+  `CHANGES_REQUESTED`, the right decision with the wrong reason.
 
 D2 and D3 are one shape: three statuses in the schema, two in the UI.
 
@@ -288,8 +293,8 @@ D2 and D3 are one shape: three statuses in the schema, two in the UI.
 ### U7 · Media flow
 1. Rail Media (M) → ~~3 modes (280/320 launcher · 560 expanded · fullpage LibraryManager, shortcut J)~~ — **2 modes, walked 2026-08-25**: the 320 launcher and the fullpage `LibraryManager`. The 560 expanded panel is deliberately gone (`MediaTab.tsx:88-93` — *"Board 1159:4593 draws ONE manager"*), so `Expand Media` jumps straight to fullpage. **There is no `J` shortcut** — `useEditorShortcuts.ts:159` binds `⌘J` to the AI tab.
 2. Upload (F-A4) / Import URL — **both surfaces import, walked 2026-08-25**: the manager's `Import URL` lands the asset and it survives a reload, and ~~⛔ modal "From URL" tab = coming-soon stub~~ is stale (`MediaLibraryPanel.tsx:346-349` records the stub copy being removed once board 1205:4804 shipped the import) / Add from stock (Unsplash/Pexels server-proxied; tabs Photos/Videos/Icons/Fonts + Any/L/P/S orientation). ⚠ With `UNSPLASH_ACCESS_KEY` / `PEXELS_API_KEY` unset the search returns 200 and "No photos found for X" — deliberate (`stock.service.ts:4-6`) but indistinguishable from an upstream outage or an unconfigured production, and neither key is in `check-prod-env.mjs`.
-3. Organize: folders (create/delete — **walked, both work**; smart folders Recent / In-use / Unused all filter, and Unused explains itself in a toast; ⛔ Trash = `"Trash coming soon"` toast stub, **confirmed live**), bulk **Move to folder… / Download / Delete / ✕ Clear** off `Select all assets` plus a bulk `Regenerate`, sort, grid/list. ⚠ **The whole folder rail is keyboard-unreachable** — every row is a bare `<div class="mgr-node">` with an `onClick` and no `role`/`tabindex` (`FolderTree.tsx:108-113`); `New folder` is icon-only with `title` and no `aria-label`.
-4. Detail rail: alt text ≤125 (`28 / 125` counter) + AI generate — **walked**, `media.generateAltText` → `media.updateAsset` writes a real caption; Versions tab (revert = replaceAcross) renders only under `versions.length > 1` (`AssetDetailsPanel.tsx:151`), so its absence on a single-version asset is the precondition, not a gap; Used-in tab. Image editor walked — Crop/Adjust/Resize, aspect presets, rotate, flip, Compare, Reset. ⛔ **The `Optimize` tab lives on the picker** (`MediaLibraryPanel:184`, mounted by `StudioModals:171` as `openMediaLibrary(allowedTypes, onSelect)`) — the fullpage manager has no optimize control, so the only door to it is being mid-way through choosing an image for an element. ⛔ **The `"This device only"` sync pill is hardcoded** (`LibraryManager.tsx:428-431`) — no state, always shown; in production, where the blob token is required, assets do reach the server and it still says they did not. The per-asset toast is correct (*"…saved on this device — it didn't reach the server, so it won't publish yet"*) but ⚠ fires twice per asset. Walk record: `docs/walks/U7-F-A4-media.md`.
+3. Organize: folders (create/delete — **walked, both work**; smart folders Recent / In-use / Unused all filter, and Unused explains itself in a toast; ⛔ Trash = `"Trash coming soon"` toast stub, **confirmed live**), bulk **Move to folder… / Download / Delete / ✕ Clear** off `Select all assets` plus a bulk `Regenerate`, sort, grid/list. ~~⚠ The whole folder rail is keyboard-unreachable~~ **FIXED 2026-08-25** (`71d685d8`) — every row is a bare `<div class="mgr-node">` with an `onClick` and no `role`/`tabindex` (`FolderTree.tsx:108-113`); `New folder` is icon-only with `title` and no `aria-label`.
+4. Detail rail: alt text ≤125 (`28 / 125` counter) + AI generate — **walked**, `media.generateAltText` → `media.updateAsset` writes a real caption; Versions tab (revert = replaceAcross) renders only under `versions.length > 1` (`AssetDetailsPanel.tsx:151`), so its absence on a single-version asset is the precondition, not a gap; Used-in tab. Image editor walked — Crop/Adjust/Resize, aspect presets, rotate, flip, Compare, Reset. ~~⛔ The `Optimize` tab lives on the picker~~ **FIXED 2026-08-25** (`e2249d1e`, it now sits in the asset detail rail beside Edit) (`MediaLibraryPanel:184`, mounted by `StudioModals:171` as `openMediaLibrary(allowedTypes, onSelect)`) — the fullpage manager has no optimize control, so the only door to it is being mid-way through choosing an image for an element. ~~⛔ The `"This device only"` sync pill is hardcoded~~ **FIXED 2026-08-25** (`e97f1abb`, it now counts real `localOnly` assets) (`LibraryManager.tsx:428-431`) — no state, always shown; in production, where the blob token is required, assets do reach the server and it still says they did not. The per-asset toast is correct (*"…saved on this device — it didn't reach the server, so it won't publish yet"*) but ~~⚠ fires twice per asset~~ — **FIXED**, one toast per asset (`e97f1abb`). Walk record: `docs/walks/U7-F-A4-media.md`.
 5. Edit image: crop (aspect presets, rotate ±180, flip, zoom 1-3×) / adjust (b/c/s ±100, blur 0-20, 6 filter presets) / resize → WebP q0.92 saved as `_v{n}` version.
 6. Optimize: WebP/AVIF/JPEG/PNG, quality 10-100 (default 85), max-dim clamp, live savings.
 7. Replace-across: all usages atomic (one undo) or per-page selective modal.
@@ -318,7 +323,7 @@ Topbar Export (flag off) → engine ZIP download direct; or ExportModal (StudioM
 
 **All 13 sections walked live 2026-08-25** (record: `docs/walks/U12-site-settings.md`) — every one drills in and renders real content, zero console errors and zero tRPC ≥400 across the sweep. The door is the **`S` shortcut**; `.ls-fullpage-container` goes 0 → 1379px. The dirty counter (`0 unsaved` → `1 unsaved`), the sticky savebar, the guard on `Back to Settings` and on `Escape`, and the **180 ms re-entrancy lock** (same-tick and mid-animation) all pass.
 
-⛔ **The header ✕ bypasses the dirty guard — silent data loss.** Typed a value, counter read `1 unsaved`, clicked ✕: no dialog, **zero POSTs during close**, field empty again on reopen. `Escape` on the identical state raises "Discard changes?". `SettingsTab.tsx:802` passes the parent's `onClose` through untouched, while `:551` guards Escape and `LeftSidebar.tsx:391` guards rail switches — the ✕ is a close path, not a pop path, so nothing covers it. Its accessible name is **"Close General"**: it names the section but closes the whole surface. Minor on the same bar — `Save` is enabled, opacity 1, cursor pointer at `0 unsaved`, byte-identical to its dirty state.
+~~⛔ The header ✕ bypasses the dirty guard — silent data loss.~~ **FIXED 2026-08-25** (`3f3dee2e`) — Typed a value, counter read `1 unsaved`, clicked ✕: no dialog, **zero POSTs during close**, field empty again on reopen. `Escape` on the identical state raises "Discard changes?". `SettingsTab.tsx:802` passes the parent's `onClose` through untouched, while `:551` guards Escape and `LeftSidebar.tsx:391` guards rail switches — the ✕ is a close path, not a pop path, so nothing covers it. Its accessible name is **"Close General"**: it names the section but closes the whole surface. Minor on the same bar — `Save` is enabled, opacity 1, cursor pointer at `0 unsaved`, byte-identical to its dirty state.
 
 ---
 
