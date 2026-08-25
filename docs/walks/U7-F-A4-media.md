@@ -238,6 +238,114 @@ kinds (`svg 0`, `icon 0`) show zeros. So `R7` is narrower than written: it is
 about zero-count chips specifically, not the chip row as a whole. Handed to that
 lane.
 
+### The eight uncovered surfaces — WALKED 2026-08-25
+
+Every one of them reached and exercised. **Zero tRPC ≥400, zero console errors**
+across the whole sweep (one `ResizeObserver loop completed with undelivered
+notifications`, logged by the recovery layer as a runtime fault, raised by the
+image editor — benign).
+
+#### The door, corrected
+
+There is **no `J` shortcut** for media. `useEditorShortcuts.ts:159` binds
+`⌘J` to *"AI is one surface now — open the AITab rail panel"*. The manager
+opens from the rail Media panel's `Expand Media`, which jumps **straight to
+fullpage**: there is no 560px intermediate. `MediaTab.tsx:88-93` says why —
+*"Board 1159:4593 draws ONE manager. The 560 'expanded' panel was a second one
+with its own grid, folder rail and toolbar; it is gone, so every expand signal
+opens the fullpage manager instead."* So media has **two** modes, not three.
+
+#### What works
+
+| Surface | Result |
+|---|---|
+| Import from URL | works end to end — modal, `MEDIA URL` field, asset lands in the grid and **survives a reload** |
+| Stock browser | real: Photos / Videos / Icons / Fonts tabs + `Any/L/P/S` orientation filters + search |
+| Smart folders | `Recent` · `In use` · `Unused` all filter; `Unused` explains itself — *"Showing 3 unused assets — safe to delete, nothing on the site references them."* |
+| Create folder | `+` → `Folder name` → Enter → the folder appears under MY FOLDERS |
+| Trash | `"Trash coming soon"` toast — the stub the PRD describes, exactly |
+| Bulk | `Select all assets` → `3 selected` → **Move to folder… · Download · Delete · ✕ Clear**, plus a bulk `Regenerate` |
+| Alt text + AI | field with a `28 / 125` counter; `Generate` → `media.generateAltText` → `media.updateAsset`, producing *"A stylish retail space featuring clothing and accessories displayed on shelves and a central table under bright lights."* |
+| Image editor | Crop / Adjust / Resize · `712×534` · Compare · Free 1:1 4:3 16:9 3:2 9:16 · rotate L/R · flip H/V · Reset |
+| Versions tab | renders under `versions.length > 1` (`AssetDetailsPanel.tsx:151`). The fixture's assets have one version each, so its absence is the condition, not a gap |
+
+#### ⛔ "This device only" is a constant, not a status
+
+`LibraryManager.tsx:428-431` renders the sync pill unconditionally — no prop, no
+state, no condition:
+
+```jsx
+<span className="mgr-sync-pill">
+  <AlertCircle size={10} />
+  This device only
+</span>
+```
+
+It is the one persistent indicator of whether the library reached the server,
+and it cannot distinguish the two cases it exists for. In production, where
+`BLOB_READ_WRITE_TOKEN` is required by `check-prod-env.mjs`, assets **do** reach
+the server and this pill still says they did not.
+
+The per-asset path, by contrast, is exactly right. With the token unset the blob
+POST 400s, `AssetUploadService.ts:137` falls back to local-only *by design*, and
+the user is told precisely what happened:
+
+> signin-art.jpg saved on this device — it didn't reach the server, so it won't
+> publish yet.
+
+⚠ That warning fires **twice** for one asset — two identical toasts in the same
+host, measured.
+
+#### ⚠ The folder rail is not reachable from a keyboard
+
+Every row in it — `Recent`, `In use`, `Unused`, `All assets`, `Trash` and each
+user folder — is a bare `<div class="mgr-node">` carrying an `onClick`
+(`FolderTree.tsx:108-113`). No `role`, no `tabindex`, no button semantics. The
+only real buttons in that column are the chevron, `New folder` and
+`Delete folder`. `New folder` is icon-only with `title="New folder"` and no
+`aria-label`.
+
+#### ⚠ The image optimizer has no door from the manager
+
+`Optimize` is a tab on `MediaLibraryPanel` (`:184`), which `StudioModals.tsx:171`
+mounts as the **picker** — `openMediaLibrary(allowedTypes, onSelect)`, opened
+only when something needs an image chosen for it. The fullpage manager, where a
+user actually manages assets, has no optimize control at all. Same shape as the
+doors this arc has found before: the surface is built, and the place you would
+look for it does not lead there.
+
+#### Stock search hides a missing key as an empty result
+
+With `UNSPLASH_ACCESS_KEY` / `PEXELS_API_KEY` unset, a search for "kitchen"
+returns HTTP 200 and the UI says **"No photos found for 'kitchen'"**. That is
+deliberate and documented — `stock.service.ts:4-6`: *"When a key is unset OR the
+upstream errors, returns `[]` — exactly the prior stub behavior, so the editor's
+'no results' empty state still holds."*
+
+Recording it anyway, because neither key is in `scripts/check-prod-env.mjs`, and
+this is the precise shape of the `GOOGLE_CLIENT_ID` incident in the root
+`CLAUDE.md`: *"A feature that is silently false in production looks exactly like
+a feature that was never built."* A missing key, an upstream outage and a
+genuinely empty search are one screen.
+
+#### Two harness traps this lane cost
+
+Both produced confident readings that were wrong, and both are now in the rig:
+
+- **`offsetParent` is null for every `position: fixed` element.** The toast
+  viewport is `tw:fixed`, so the natural visibility filter discards every toast
+  and reports `[]`. That read gave "Trash is a dead row, not even a stub" and
+  "the URL import reports success with no toast" — the product raises a toast on
+  the first and **three** on the second.
+- **The first `[role="status"]` in this shell is `bk-sr-only`,** an always-empty
+  announcement region. `querySelector` reads that one. `readToasts()` in the rig
+  now skips it and reads every host.
+
+A third near-miss: `Generate` appeared to no-op because the alt field was
+already filled from an earlier run — the same confounded-baseline shape that
+nearly produced "AI apply cannot be undone" in F-A5. Re-run against a field the
+walk had not already populated and it produces a fresh caption.
+
 ### Still not covered
 
 Import-from-URL (⛔ coming-soon stub), stock search, folders and smart folders,

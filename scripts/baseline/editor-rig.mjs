@@ -254,6 +254,38 @@ export async function clickCanvasElement(page, elementId) {
 }
 
 /**
+ * Trap 8 — read toasts. `offsetParent` is null for EVERY `position: fixed`
+ * element, and the toast viewport is `tw:fixed`, so the obvious visibility
+ * filter — `[...q('[role=status]')].filter(e => e.offsetParent !== null)` —
+ * throws away every toast the product raises and reports `[]`.
+ *
+ * That read cost two false findings in one lane: "Trash is a dead row, not even
+ * a stub" (it raises "Trash coming soon", exactly as its PRD entry says) and
+ * "the URL import reports success with no toast" (it raises three).
+ *
+ * `stripDevOverlays` is NOT the culprit here — the toast host sits at z-index
+ * 80, far under the 9000 sweep — but call this BEFORE stripping anyway, since a
+ * future host at a higher z would be taken.
+ */
+export async function readToasts(page) {
+  return page.evaluate(() => {
+    // There are THREE `role="status"` hosts in this shell and the first one in
+    // document order is `bk-sr-only`, an announcement live region that is
+    // always empty. Taking `querySelector(...)` reads that one and reports no
+    // toasts forever. Read every host and skip the sr-only ones.
+    const out = [];
+    for (const host of document.querySelectorAll('[role="status"], [role="alert"]')) {
+      if (host.classList.contains("bk-sr-only")) continue;
+      for (const n of host.children) {
+        const t = (n.innerText || "").trim().replace(/\s*\n+\s*/g, " · ");
+        if (t) out.push(t);
+      }
+    }
+    return out;
+  });
+}
+
+/**
  * Trap 7 — click a site-menu row and report BOTH outcomes: what changed on the
  * page, and any new tab it opened. Returns `{ newTabs, url }`.
  *
