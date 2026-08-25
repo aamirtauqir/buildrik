@@ -42,6 +42,13 @@ function createMockComposer() {
       createVersion: vi.fn().mockResolvedValue(undefined),
     },
     exportProject: vi.fn(() => ({ pages: [] as { root: { id: string } }[] })),
+    /* The hook reads `elements.getAllElements()` for the AI prompt's element
+       count. That count used to be hardcoded `0`, so the mock never needed
+       this — and the moment it stopped being hardcoded, every suggestion test
+       threw here instead of asserting anything. */
+    elements: {
+      getAllElements: vi.fn(() => [] as unknown[]),
+    },
   };
 }
 
