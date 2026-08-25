@@ -253,3 +253,42 @@ maintained. Diff Ch.12 by walking its **evidence column** and checking each
 8. **Canvas nodes carry `data-buildrick-id`, not `data-element-id`.** Any probe
    or test written against the latter silently matches nothing — a documented
    harness trap that has produced false "the panel is broken" readings.
+
+### Lane U4 — code ahead of the PRD, added 2026-08-25
+
+9. **Every component instance is locked by construction.**
+   `engine/elements/ElementSerialization.ts:119` —
+   `return this.getData().locked === true || this.isComponentInstance();`
+   `isLocked()` is true for instances whether or not anyone locked them, and
+   the three selection guards in `useSelectionBehavior.ts` (`:90`, `:108`,
+   `:136`) refuse the click with *"This element is locked. Unlock it in the
+   Layers panel."*
+
+   **Consequence the PRD does not state:** an instance cannot be selected on
+   canvas, so F1a's "style + attr survive a master edit" is not reachable the
+   obvious way. The documented route is the toast's own escape hatch —
+   unlock the row in Layers first. Verified live 2026-08-25
+   (`docs/walks/U4-components.md` addendum 2); two prior probe attempts read
+   this as "my click did not select" because a right-column scrape never sees a
+   bottom-right toast.
+
+10. **`Re-send` on a PENDING review updates the request in place.** Same row,
+    same `id`, same `token`, refreshed `snapshotPages` — no new round row. The
+    client's link keeps working, but anything counting rounds by counting rows
+    is wrong, and the Review panel's **"Sent Nd ago"** keeps counting from the
+    original `createdAt` (observed: "Sent 16d ago" on a round re-sent that day).
+    Verified live 2026-08-25 (`docs/walks/U6-review-and-share.md`).
+
+11. **The Time-Travel scrubber and the All-changes list read the in-session
+    undo stack, not saved versions.** Empty on a fresh load by construction —
+    Ch.12 §12.1 already records undo/redo as `✅⚪ RAM-only`, and this is the
+    user-visible consequence. One edit populates it. The panel also advertises
+    `j` / `k` navigate, `Enter` expand, `g` / `G` start-end, which no chapter
+    documents. Verified live 2026-08-25 (`docs/walks/U9-version-rescue.md`).
+
+12. **`SNAP_THRESHOLD` is defined twice** — `engine/canvas/constants.ts:14`
+    (exported, imported by `useDragSnapGuides.ts:21`) and a local shadow at
+    `editor/canvas/hooks/useCanvasSnapping.ts:32`. Both are `5` today, so
+    nothing is broken, but a change to the engine constant would not reach the
+    hook. The local one also carries the comment *"Configurable threshold (4px
+    at 100% zoom)"* directly above `= 5`.
