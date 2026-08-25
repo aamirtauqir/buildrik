@@ -78,7 +78,6 @@ const MOVED_ITEMS: MovedItem[] = [
   { id: "m-reviews", label: "Reviews", description: "Moved → Agency › Reviews", href: "/dashboard/agency/reviews", scope: "moved", aliases: ["reviews", "approval", "approve", "publishing"], agencyOnly: true },
   { id: "m-comments", label: "Comments", description: "Moved → Agency › Reviews", href: "/dashboard/agency/reviews", scope: "moved", aliases: ["comments", "review comments"], agencyOnly: true },
   { id: "m-shared-theme", label: "Shared theme", description: "Moved → Agency › Shared theme", href: "/dashboard/agency/theme", scope: "moved", aliases: ["shared theme", "design system", "theme", "tokens", "ds"], agencyOnly: true },
-  { id: "m-partner", label: "Partner program", description: "Moved → Agency › Partner", href: "/dashboard/agency/partner", scope: "moved", aliases: ["partner", "partner program", "referral"], agencyOnly: true },
   { id: "m-team", label: "Team", description: "Moved → Settings › Team", href: "/dashboard/settings/team", scope: "moved", aliases: ["team", "members", "invite"] },
   { id: "m-plans", label: "Plans", description: "Moved → Settings › Plans", href: "/dashboard/settings/plans", scope: "moved", aliases: ["plans", "pricing", "upgrade"] },
   { id: "m-billing", label: "Billing", description: "Moved → Settings › Billing", href: "/dashboard/settings/billing", scope: "moved", aliases: ["billing", "invoices", "payment"] },

@@ -15,6 +15,10 @@ type AuditAction =
   // else records it — and without a row here a broken SMTP config looks
   // identical to nobody signing up.
   | "VERIFICATION_EMAIL_FAILED"
+  // Same shape, on the review loop: the client's invite mail did not go out.
+  // The round and its token still exist, so without a row here a misconfigured
+  // SMTP looks identical to a client who simply hasn't opened the link.
+  | "REVIEW_INVITE_EMAIL_FAILED"
   | "LOGOUT";
 
 export async function logAuditEvent(

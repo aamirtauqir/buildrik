@@ -30,7 +30,7 @@ export interface ReviewBarProps {
   /** Opens the Review panel's Compare — the same one the panel's own foot opens. */
   onCompare: () => void;
   /** Re-send the round. The shell owns it (it re-renders the snapshot). */
-  onResend?: (clientEmail?: string) => Promise<void>;
+  onResend?: (clientEmail?: string) => Promise<{ inviteEmailSent: boolean | null } | void>;
 }
 
 const BAR =

@@ -10,7 +10,11 @@ import { render, screen, fireEvent, cleanup, act, waitFor } from "@testing-libra
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("../../../services/ReviewService", () => ({
-  submitForReview: vi.fn(() => Promise.resolve()),
+  /* Returns the real `SubmitOutcome` shape. It used to resolve `undefined`,
+     which was fine while the caller ignored the value — the moment the caller
+     started reading `inviteEmailSent`, two unrelated tests failed on a mock
+     that lagged the function. */
+  submitForReview: vi.fn(() => Promise.resolve({ inviteEmailSent: null, reviewUrl: null })),
 }));
 vi.mock("../exportPublishPages", () => ({
   exportPublishPages: vi.fn(() => Promise.resolve([])),

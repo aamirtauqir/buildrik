@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
+import { requireAgencyLayer } from "@/server/trpc/guards";
 import { protectedProcedure, router } from "../trpc";
 import { resolveWorkspaceId } from "@/server/trpc/workspace-ctx";
 import { isFeatureEnabled } from "@/server/services/feature-flag.service";
@@ -24,14 +25,6 @@ import {
 // The agency layer ships dark behind the E0 `agency_layer` flag (runtime
 // kill-switch). Mutations hard-fail when it's off; list collapses to empty so a
 // solo workspace renders a flat Sites view, never empty agency chrome.
-async function requireAgencyLayer(workspaceId: string): Promise<void> {
-  if (!(await isFeatureEnabled(workspaceId, "agency_layer"))) {
-    throw new TRPCError({
-      code: "FORBIDDEN",
-      message: "Agency layer is not enabled for this workspace",
-    });
-  }
-}
 
 async function requireAdmin(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

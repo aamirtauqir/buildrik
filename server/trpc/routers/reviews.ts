@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
+import { requireAgencyLayer } from "@/server/trpc/guards";
 import { protectedProcedure, router } from "../trpc";
 import { resolveWorkspaceId } from "@/server/trpc/workspace-ctx";
 import { isFeatureEnabled } from "@/server/services/feature-flag.service";
@@ -37,14 +38,6 @@ function translateReviewError(e: unknown): never {
 // Reviews are part of the agency layer (IA v2 E1) — same `agency_layer` flag
 // that gates clients + theme. Mutations hard-fail when it's off; the list
 // collapses to empty so a non-agency workspace never sees agency chrome.
-async function requireAgencyLayer(workspaceId: string): Promise<void> {
-  if (!(await isFeatureEnabled(workspaceId, "agency_layer"))) {
-    throw new TRPCError({
-      code: "FORBIDDEN",
-      message: "Agency layer is not enabled for this workspace",
-    });
-  }
-}
 
 async function requireAdmin(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -80,7 +80,7 @@ export interface StudioPanelsProps {
   ) => void;
   onOpenCreateCollection?: () => void;
   /** P0 review loop: full re-send for the Review panel. */
-  onResendReview?: (clientEmail?: string) => Promise<void>;
+  onResendReview?: (clientEmail?: string) => Promise<{ inviteEmailSent: boolean | null } | void>;
   onOpenImageEditor?: (
     imageSrc: string,
     onSave: (editedSrc: string) => void | Promise<void>,

@@ -18,9 +18,18 @@ export function SendReviewModal({ open, onClose, siteId, siteName }: SendReviewM
   const utils = trpc.useUtils();
 
   const submitMutation = trpc.reviews.submit.useMutation({
-    onSuccess: () => {
+    onSuccess: (result) => {
       utils.reviews.list.invalidate();
-      addToast("success", "Sent for review", "An admin has been notified.");
+      /* This said "An admin has been notified." unconditionally. On a one-seat
+         workspace the requester is the only admin and the notify filter excludes
+         them, so nobody is emailed — which is every new workspace. */
+      addToast(
+        "success",
+        "Sent for review",
+        result.adminsNotified > 0
+          ? `${result.adminsNotified} admin${result.adminsNotified === 1 ? "" : "s"} notified.`
+          : "You're the only admin on this workspace, so no notification was sent.",
+      );
       setNote("");
       onClose();
     },

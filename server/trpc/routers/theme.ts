@@ -1,4 +1,5 @@
 import { TRPCError } from "@trpc/server";
+import { requireAgencyLayer } from "@/server/trpc/guards";
 import { protectedProcedure, router } from "../trpc";
 import { resolveWorkspaceId } from "@/server/trpc/workspace-ctx";
 import { isFeatureEnabled } from "@/server/services/feature-flag.service";
@@ -33,14 +34,6 @@ import {
 
 // Shared-theme push is part of the agency layer — gated behind the E0
 // `agency_layer` flag (runtime kill-switch), same as clients/reviews.
-async function requireAgencyLayer(workspaceId: string): Promise<void> {
-  if (!(await isFeatureEnabled(workspaceId, "agency_layer"))) {
-    throw new TRPCError({
-      code: "FORBIDDEN",
-      message: "Agency layer is not enabled for this workspace",
-    });
-  }
-}
 
 async function requireAdmin(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

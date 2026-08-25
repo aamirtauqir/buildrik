@@ -71,21 +71,38 @@ export async function fetchReviewStatusOrNull(): Promise<ReviewStatus | null> {
  * payload publish uses). Stored frozen so the client reviews the version they
  * were sent, never the live draft (frozen-snapshot contract §1.6).
  */
+/** What the submit tells the caller about the INVITE, separately from whether
+ *  the round was created. `null` = no invite was attempted (an internal submit
+ *  with no client). `false` = it was attempted and the mail did not go, which
+ *  used to be swallowed into a server-side `console.error` — the round existed,
+ *  the token existed, and the editor said "Sent". */
+export interface SubmitOutcome {
+  inviteEmailSent: boolean | null;
+  /** The round's client link, fully formed. Present so a failed send still
+   *  leaves the designer something to hand over by hand. Built here because
+   *  this module owns `DASHBOARD_URL`; the UI should not assemble origins. */
+  reviewUrl: string | null;
+}
+
 export async function submitForReview(
   note?: string,
   changeSummary?: string,
   clientEmail?: string,
   snapshotPages?: PublishPage[],
-): Promise<void> {
+): Promise<SubmitOutcome> {
   const siteId = currentSiteId();
   if (!siteId) throw new Error("No site to send for review");
-  await getBuildrikClient(DASHBOARD_URL).reviews.submit.mutate({
+  const r = (await getBuildrikClient(DASHBOARD_URL).reviews.submit.mutate({
     siteId,
     note,
     changeSummary,
     clientEmail,
     snapshotPages,
-  });
+  })) as { inviteEmailSent?: boolean | null; token?: string | null };
+  return {
+    inviteEmailSent: r?.inviteEmailSent ?? null,
+    reviewUrl: r?.token ? `${DASHBOARD_URL}/review/${r.token}` : null,
+  };
 }
 
 /* ── P0 review panel — data + actions ─────────────────────────────────────── */

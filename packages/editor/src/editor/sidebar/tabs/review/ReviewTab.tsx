@@ -69,7 +69,7 @@ export interface ReviewTabProps {
   /** A re-send goes to whoever the round was sent to. The panel passes the
    *  round's `invitedEmail`; without it `submitReview` mints no token and the
    *  new round is invisible to the client — measured 2026-08-25. */
-  onResend?: (clientEmail?: string) => Promise<void>;
+  onResend?: (clientEmail?: string) => Promise<{ inviteEmailSent: boolean | null } | void>;
   /** Live-render the current site to pages for the §3 Compare — same decoupling
    *  as onResend (the shell owns the composer/export path). Absent → no Compare. */
   onExportCurrentPages?: () => Promise<PublishPage[]>;
@@ -267,8 +267,16 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
       // Carry the round's client forward. `submitReview` only mints a token
       // when it is given an email, so a re-send without this produced a round
       // with `token: null` that the client could never open.
-      await onResend(round?.invitedEmail ?? undefined);
+      const outcome = await onResend(round?.invitedEmail ?? undefined);
       await reload();
+      /* The round lands either way — a mail failure must never fail the
+         re-send. Saying nothing is what made a misconfigured SMTP look
+         identical to a client who simply had not opened the link. */
+      setNotice(
+        outcome && outcome.inviteEmailSent === false
+          ? "Round created — but the invite email didn't go out. Send your client the link yourself."
+          : null,
+      );
     } finally {
       setResending(false);
     }

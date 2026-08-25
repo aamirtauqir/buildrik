@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
+import { requireAgencyLayer } from "@/server/trpc/guards";
 import type { PrismaClient } from "@prisma/client";
 
 interface WorkspaceCtx {
@@ -83,6 +84,12 @@ export const dashboardRouter = router({
 
   partner: protectedProcedure.query(async ({ ctx }) => {
     const member = await getWorkspaceMember(ctx);
+    /* The one agency procedure that never got a flag gate. Every sibling
+       (clients, reviews, theme, handover) has had one since E0; this was
+       protected only by the client-side redirect in
+       `agency/(tabs)/layout.tsx`, which that file's own comment calls "UX",
+       not security. */
+    await requireAgencyLayer(member.workspaceId);
     return getPartnerDashboard(member.workspaceId);
   }),
 

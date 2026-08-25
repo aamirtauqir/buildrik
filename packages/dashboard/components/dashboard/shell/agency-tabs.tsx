@@ -13,7 +13,13 @@ const AGENCY_TABS: AgencyTab[] = [
   { label: "Handover", href: "/dashboard/agency/handover" },
   { label: "Library", href: "/dashboard/agency/library" },
   { label: "Shared theme", href: "/dashboard/agency/theme" },
-  { label: "Partner", href: "/dashboard/agency/partner" },
+  /* Partner is deliberately absent. The tab renders commission tiers
+     (15/20/25%), "MRR influenced" and a "Get referral link" button — and
+     `prisma.referral` has exactly one consumer in the repo, a `findMany` read
+     at `partner.service.ts:31`. Nothing writes a `Referral` row; nothing reads
+     the `?ref=` param the button hands out. It is a financial promise with no
+     fulfilment path. The code stays; the door does not, until the commercial
+     program exists (`partner.service.ts:22-23` says it does not yet). */
 ];
 
 function AgencyTabLink({ tab }: { tab: AgencyTab }) {

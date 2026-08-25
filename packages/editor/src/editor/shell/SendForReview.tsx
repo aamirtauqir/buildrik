@@ -43,6 +43,10 @@ export interface SendForReviewProps {
 
 type SendState = "idle" | "sending" | "sent" | "again" | "error";
 
+const INVITE_FAILED =
+  "tw:flex tw:flex-col tw:gap-1.5 tw:rounded-lg tw:border tw:border-[var(--bk-error)] " +
+  "tw:bg-[var(--bk-error-bg)] tw:px-3 tw:py-2";
+
 const LABEL: Record<SendState, string> = {
   idle: "Send for review",
   sending: "Sending…",
@@ -59,6 +63,10 @@ export const SendForReview: React.FC<SendForReviewProps> = ({
   idleLabel,
 }) => {
   const [state, setState] = React.useState<SendState>("idle");
+  /** The round landed but its invite mail did not. */
+  const [inviteFailed, setInviteFailed] = React.useState(false);
+  const [reviewUrl, setReviewUrl] = React.useState<string | null>(null);
+  const [linkCopied, setLinkCopied] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const [email, setEmail] = React.useState("");
   const [summary, setSummary] = React.useState("");
@@ -88,14 +96,21 @@ export const SendForReview: React.FC<SendForReviewProps> = ({
           console.warn("[review] snapshot render failed; sending without preview", e);
         }
       }
-      await submitForReview(
+      const outcome = await submitForReview(
         note.trim() || undefined,
         summary.trim() || undefined,
         email.trim() || undefined,
         snapshotPages,
       );
+      /* The round is created either way — a mail failure must never fail the
+         submit. But "Sent for review ✓" over an invite that never left the
+         server is the same lie the 2026-08-25 pass spent a day removing, and
+         it is the failure most likely to hit a real pilot invite: an unset
+         SMTP_HOST throws straight into the server's catch. */
+      setInviteFailed(outcome?.inviteEmailSent === false);
+      setReviewUrl(outcome?.reviewUrl ?? null);
       setState("sent");
-      setOpen(false);
+      setOpen(outcome?.inviteEmailSent === false);
       onSent?.();
     } catch {
       setState("error");
@@ -176,6 +191,30 @@ export const SendForReview: React.FC<SendForReviewProps> = ({
           <p className="bk-send-review__error" role="alert">
             Couldn&apos;t send — try again.
           </p>
+        ) : null}
+        {inviteFailed ? (
+          <div className={INVITE_FAILED} role="alert">
+            <span className="tw:text-[13px] tw:text-[var(--bk-error)]">
+              The round was created, but the invite email didn&apos;t go out.
+            </span>
+            <span className="tw:text-[11px] tw:text-[var(--bk-ink-muted)]">
+              Nothing is lost — send your client the link yourself.
+            </span>
+            {reviewUrl ? (
+              <Button
+                color="light"
+                size="xs"
+                onClick={() => {
+                  void navigator.clipboard
+                    ?.writeText(reviewUrl)
+                    .then(() => setLinkCopied(true))
+                    .catch(() => setLinkCopied(false));
+                }}
+              >
+                {linkCopied ? "Link copied ✓" : "Copy the review link"}
+              </Button>
+            ) : null}
+          </div>
         ) : null}
         <div className="bk-send-review__actions">
           <Button color="light" size="xs" onClick={() => setOpen(false)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">

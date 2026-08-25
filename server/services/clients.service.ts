@@ -45,7 +45,10 @@ export async function listClients(
       brandColor: true,
       customDomain: true,
       hideBuildrik: true,
-      _count: { select: { sites: true } },
+      /* `listSites` filters `deletedAt: null`; this count did not, so the
+         Clients table and the client's own site list disagreed after any
+         delete. Same filter, one source of truth. */
+      _count: { select: { sites: { where: { deletedAt: null } } } },
     },
   });
   return rows.map(({ _count, ...c }) => ({ ...c, siteCount: _count.sites }));
@@ -113,7 +116,10 @@ export async function getClient(
       brandColor: true,
       customDomain: true,
       hideBuildrik: true,
-      _count: { select: { sites: true } },
+      /* `listSites` filters `deletedAt: null`; this count did not, so the
+         Clients table and the client's own site list disagreed after any
+         delete. Same filter, one source of truth. */
+      _count: { select: { sites: { where: { deletedAt: null } } } },
     },
   });
   if (!c) throw new ClientError("NOT_FOUND", "Client not found");

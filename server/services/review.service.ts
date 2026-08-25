@@ -9,6 +9,7 @@ import {
 } from "@/server/services/email.service";
 import { issueReviewToken } from "@/server/services/client-review.service";
 import { isApprovalStale } from "@/server/services/publish-approval";
+import { logAuditEvent } from "@/server/services/audit.service";
 
 /**
  * Invited-client review workflow (E4) — the ONLY layer that reads/writes the
@@ -107,12 +108,19 @@ export async function submitReview(
     });
   }
 
-  await notifyReviewSubmitted(siteId, requestedById, note, changeSummary);
+  const adminsNotified = await notifyReviewSubmitted(siteId, requestedById, note, changeSummary);
+  let inviteEmailSent: boolean | null = null;
   if (clientEmail && token) {
-    await notifyClientInvited(siteId, requestedById, clientEmail, token, note, changeSummary);
+    inviteEmailSent = await notifyClientInvited(
+      siteId, requestedById, clientEmail, token, note, changeSummary,
+    );
   }
   await pruneSupersededSnapshots(siteId);
-  return request;
+  /* `inviteEmailSent` is null when no invite was attempted (an internal submit
+     with no client), false when it was attempted and failed. `token` rides
+     along so a failed send still leaves the designer something to hand over by
+     hand — the link is the whole point of the round. */
+  return { ...request, inviteEmailSent, adminsNotified, token: token ?? null };
 }
 
 /**
@@ -398,6 +406,13 @@ export async function resolveReview(
  * long time only the admin one existed, so "send for review" never actually
  * reached a client.
  */
+/** Returns false when the invite mail did not go. Sending stays best-effort —
+ *  a mail failure must never fail the submit — but REPORTING it must not be
+ *  best-effort too. Before 2026-08-26 this swallowed into `console.error`, so a
+ *  misconfigured SMTP in production meant the client never got the link, the
+ *  round existed, the token existed, and the editor read "Sent". The root
+ *  CLAUDE.md records the precedent: `SMTP_PASS` carrying a `$` was eaten by the
+ *  cPanel shell — dev worked, prod returned 535. */
 async function notifyClientInvited(
   siteId: string,
   requesterId: string,
@@ -405,13 +420,13 @@ async function notifyClientInvited(
   token: string,
   note?: string,
   changeSummary?: string,
-) {
+): Promise<boolean> {
   try {
     const site = await prisma.site.findUnique({
       where: { id: siteId },
       select: { name: true, workspace: { select: { name: true } } },
     });
-    if (!site) return;
+    if (!site) return false;
     const designer = await prisma.user.findUnique({
       where: { id: requesterId },
       select: { fullName: true, displayName: true },
@@ -424,8 +439,15 @@ async function notifyClientInvited(
       note,
       changeSummary,
     });
+    return true;
   } catch (e) {
     console.error("[review] client invite failed", { siteId, error: e });
+    await logAuditEvent("REVIEW_INVITE_EMAIL_FAILED", "failure", {
+      userId: requesterId,
+      email: clientEmail,
+      metadata: { siteId, error: e instanceof Error ? e.message : String(e) },
+    });
+    return false;
   }
 }
 
@@ -438,13 +460,13 @@ async function notifyReviewSubmitted(
   requesterId: string,
   note?: string,
   changeSummary?: string,
-) {
+): Promise<number> {
   try {
     const site = await prisma.site.findUnique({
       where: { id: siteId },
       select: { name: true, workspaceId: true },
     });
-    if (!site) return;
+    if (!site) return 0;
     const requester = await prisma.user.findUnique({
       where: { id: requesterId },
       select: { fullName: true, displayName: true, email: true },
@@ -458,13 +480,19 @@ async function notifyReviewSubmitted(
     const recipients = admins
       .map((m) => m.user.email)
       .filter((e): e is string => !!e && e !== requester?.email);
+    /* On a ONE-SEAT workspace — which is what every new workspace is — the
+       requester IS the only admin, so this filter leaves `recipients` empty and
+       nobody is emailed. The dashboard modal nonetheless toasted "An admin has
+       been notified." Return the count so the caller can tell the truth. */
     await Promise.all(
       recipients.map((to) =>
         sendReviewRequestedEmail(to, { siteName: site.name, requesterName, note, changeSummary }),
       ),
     );
+    return recipients.length;
   } catch (e) {
     console.error("[review] submit notify failed", { siteId, error: e });
+    return 0;
   }
 }
 
