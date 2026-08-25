@@ -28,9 +28,31 @@
  *     is NOT evidence the token expired — check the bucket. (It is also a real
  *     product defect: the error page misattributes the cause.)
  *
- *  4. A DEV OVERLAY FLOATS AT z-index 100000 / 99996 (`v3.0.2 Output Detail…`).
- *     Any "list every position:fixed element" probe picks it up as product
- *     chrome. Strip it before counting floats, or the float ledger is wrong.
+ *  4. A DEV OVERLAY IMPERSONATES THE INSPECTOR. The agentation panel
+ *     (`v3.0.2 · Output Detail · Manage MCP & Webhooks · Webhooks · Auto-Send`)
+ *     sits at z-index 99000+ AND occupies the same screen region as the right
+ *     inspector column. So it does two separate kinds of damage:
+ *       - a "list every position:fixed element" probe counts it as product chrome
+ *       - **a right-column read returns ITS text instead of the inspector's**,
+ *         so the probe sees no element name and concludes "nothing is selected"
+ *     The second one is worse: it does not add noise, it answers in the
+ *     inspector's place. It is what made the 2026-08-24 U4 walk file
+ *     "my canvas click did not select" — the click was fine; the read was the
+ *     overlay. Measured A/B on 2026-08-25: selection works with the overlay
+ *     present. **Strip before READING, not before clicking** — see
+ *     `stripDevOverlays(page)`.
+ *
+ * TWO MORE, learned the same day:
+ *
+ *  5. CANVAS NODES ARE `[data-buildrick-id]`. `data-element-id` does not exist;
+ *     a probe written against it matches nothing and reports no error.
+ *
+ *  6. A COORDINATE CLICK OUTSIDE THE VIEWPORT SILENTLY DOES NOTHING. Elements
+ *     appended to the end of a page sit below the fold. `scrollIntoView` first,
+ *     then re-read the box — `getBoundingClientRect()` from before the scroll
+ *     is stale. And run multi-step chains in ONE session: every `openEditor()`
+ *     is a fresh context, so an element created in run N may not be there in
+ *     run N+1.
  *
  * Never `waitUntil: "networkidle"` against the dev server — the HMR socket
  * never idles.
@@ -142,10 +164,62 @@ export async function openEditor({
   return { browser, ctx, page, consoleErrors };
 }
 
-/** Trap 4 — the dev overlay is not product chrome. Drop it from any float scan. */
-export const DEV_OVERLAY_PREDICATE = `
-  (el) => {
-    const z = Number(getComputedStyle(el).zIndex);
-    return Number.isFinite(z) && z >= 99000;
-  }
-`;
+/**
+ * Trap 4 — remove the dev overlays before READING any panel.
+ * Returns how many nodes were removed. Safe to call more than once.
+ *
+ * Call this before every inspector / panel scrape. Do NOT call it to "fix"
+ * clicking: selection works with the overlay present, and stripping for the
+ * wrong reason hides that the read is what was broken.
+ */
+export async function stripDevOverlays(page) {
+  return page.evaluate(() => {
+    let n = 0;
+    for (const el of [...document.querySelectorAll("body > *")]) {
+      const z = Number(getComputedStyle(el).zIndex);
+      if (Number.isFinite(z) && z >= 9000) { el.remove(); n++; }
+    }
+    // the agentation panel is not a body child in every build
+    for (const el of [...document.querySelectorAll("*")]) {
+      if (/Manage MCP & Webhooks/.test(el.innerText || "") && el.children.length < 40) {
+        el.remove(); n++; break;
+      }
+    }
+    return n;
+  });
+}
+
+/**
+ * Read the right-hand inspector column as lines. Strips the dev overlays first
+ * (trap 4) — without that this returns the overlay's text and every caller
+ * concludes "nothing is selected".
+ */
+export async function readInspector(page, limit = 16) {
+  await stripDevOverlays(page);
+  return page.evaluate((n) => {
+    const col = [...document.querySelectorAll("div,aside,section")]
+      .filter((e) => {
+        const r = e.getBoundingClientRect();
+        return r.left > 1140 && r.width > 150 && r.width < 420 && r.height > 300;
+      })
+      .sort((a, b) => a.getBoundingClientRect().width - b.getBoundingClientRect().width)[0];
+    if (!col) return "NO-COLUMN";
+    return (col.innerText || "").split("\n").map((s) => s.trim()).filter(Boolean).slice(0, n);
+  }, limit);
+}
+
+/** Trap 5+6 — click a canvas element by id, scrolling it into view first. */
+export async function clickCanvasElement(page, elementId) {
+  const box = await page.evaluate((id) => {
+    const el = document.querySelector(`[data-buildrick-id="${id}"]`);
+    if (!el) return null;
+    el.scrollIntoView({ block: "center" });
+    const r = el.getBoundingClientRect();          // re-read AFTER the scroll
+    return { x: Math.round(r.x + r.width / 2), y: Math.round(r.y + r.height / 2) };
+  }, elementId);
+  if (!box) return false;
+  await page.waitForTimeout(500);
+  await page.mouse.click(box.x, box.y);
+  await page.waitForTimeout(1400);
+  return true;
+}
