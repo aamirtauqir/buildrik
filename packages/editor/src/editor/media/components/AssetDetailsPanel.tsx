@@ -17,7 +17,7 @@
  * @license BSD-3-Clause
  */
 
-import { Download, FolderOpen, Pencil, Replace, Sparkles, Trash2, X } from "lucide-react";
+import { Download, FolderOpen, Gauge, Pencil, Replace, Sparkles, Trash2, X } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "../../../engine/Composer";
 import type { LibraryItem } from "../../sidebar/tabs/media/data/mediaTypes";
@@ -62,6 +62,11 @@ export interface AssetDetailsPanelProps {
   onInsert(key: string): void;
   /** "Edit" button on image assets — orchestrator routes to image editor. */
   onEditImage(item: LibraryItem): void | Promise<void>;
+  /** "Optimize" on image assets. The optimizer used to be a tab on the PICKER
+   *  modal (`MediaLibraryPanel`), so the only way to reach it was to be
+   *  mid-way through choosing an image for an element — the manager, where a
+   *  user actually manages assets, had no optimize control at all. */
+  onOptimizeImage?(item: LibraryItem): void;
   /** "Rename" button on non-image assets — opens rename overlay. */
   onOpenRename(item: LibraryItem): void;
   /** Delete request (orchestrator's state.requestDelete). */
@@ -94,6 +99,7 @@ export function AssetDetailsPanel({
   onSelectAsset,
   onInsert,
   onEditImage,
+  onOptimizeImage,
   onOpenRename,
   onRequestDelete,
   composer,
@@ -271,6 +277,12 @@ export function AssetDetailsPanel({
               <Pencil size={12} />
               {selectedItem.type === "img" ? "Edit" : "Rename"}
             </Button>
+            {selectedItem.type === "img" && onOptimizeImage && (
+              <Button className="mgr-btn" onClick={() => onOptimizeImage(selectedItem)}>
+                <Gauge size={12} />
+                Optimize
+              </Button>
+            )}
             {/* Bug #5 fix: Replace all opens library picker instead of URL prompt. */}
             {usageCount > 0 && (
               <Button className="mgr-btn" onClick={() => setReplaceAllPickerOpen(true)}>

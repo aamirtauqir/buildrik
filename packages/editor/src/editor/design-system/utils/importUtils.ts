@@ -32,6 +32,16 @@ export interface DiffResult {
 
 import { inferKind } from "../state/useImportTokens";
 
+/* `DesignSystemTab.handleApply` persists only tokens whose category is in this
+   set (it must — `DesignTokenRecord["category"]` is exactly this union), so a
+   token with a category outside it routes to a registry, applies, and is then
+   dropped at persist with nothing said. Same class of silent loss as the
+   `kind` gap below, one layer down. Rejected here instead. */
+const PERSISTABLE_CATEGORIES = [
+  "colors", "typography", "spacing", "effects",
+  "layout", "icons", "buttons", "forms", "theme",
+] as const;
+
 const REQUIRED_FIELDS = ["id", "name", "value", "category", "cssVar", "type"] as const;
 
 function isCandidateToken(x: unknown): x is DesignToken {
@@ -78,6 +88,13 @@ export function parseImportJSON(raw: string): ParseResult {
        resolve was counted in "Valid tokens N" and in "Apply N valid only", then
        silently dropped at apply time with a count-only toast. A token that
        cannot be routed is not valid; say so here, with its id. */
+    if (!(PERSISTABLE_CATEGORIES as readonly string[]).includes(c.category)) {
+      errors.push(
+        `Token "${c.id}" has category "${c.category}", which isn't one of ` +
+          `${PERSISTABLE_CATEGORIES.join(", ")} — it would not survive a save.`,
+      );
+      return;
+    }
     if (inferKind(c) === null) {
       errors.push(
         `Token "${c.id}" has no "kind" and category "${c.category}" doesn't name one — ` +

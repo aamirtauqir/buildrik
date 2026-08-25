@@ -22,7 +22,8 @@ import { ImportUrlModal } from "./components/ImportUrlModal";
 import { fetchUrlAsFile } from "./fetchUrlAsFile";
 import { AssetDetailOverlay } from "../sidebar/tabs/media/components/AssetDetailOverlay";
 import { STORAGE_QUOTA_BYTES } from "../../shared/constants/media";
-import { useToast, Button, TextInput } from "@/editor/chrome-ui";
+import { useToast, Button, TextInput, OverlayMount } from "@/editor/chrome-ui";
+import { OptimizationPanel } from "./OptimizationPanel";
 import type { LibraryItem } from "../sidebar/tabs/media/data/mediaTypes";
 import type { IconConfig } from "../../shared/types/media";
 import { FolderTree, type SmartFolder } from "./components/FolderTree";
@@ -172,6 +173,10 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
   );
 
   const [importUrlOpen, setImportUrlOpen] = React.useState(false);
+  /* The optimizer shipped as a tab on the PICKER modal, so the only door to it
+     was being mid-way through choosing an image for an element. It belongs
+     beside Edit, on the asset you are looking at. */
+  const [optimizeItem, setOptimizeItem] = React.useState<LibraryItem | null>(null);
 
   const handleImportFromUrl = React.useCallback(async (url: string) => {
     try {
@@ -395,6 +400,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           onSelectAsset={setSelectedAssetId}
           onInsert={state.insertToCanvas}
           onEditImage={handleEditImage}
+          onOptimizeImage={setOptimizeItem}
           onOpenRename={state.openDetail}
           onRequestDelete={state.requestDelete}
           composer={composer}
@@ -501,6 +507,19 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           onClose={state.closeCtxMenu}
           onEditImage={handleEditImage}
         />
+      )}
+      {optimizeItem && (
+        <OverlayMount open onClose={() => setOptimizeItem(null)}>
+          <OptimizationPanel
+            imageSrc={optimizeItem.src}
+            onOptimized={async (src) => {
+              await state.updateItem(optimizeItem.key, { src });
+              setOptimizeItem(null);
+              addToast({ description: `${optimizeItem.name} optimized`, tone: "success" });
+            }}
+            onClose={() => setOptimizeItem(null)}
+          />
+        </OverlayMount>
       )}
       <ImportUrlModal
         open={importUrlOpen}
