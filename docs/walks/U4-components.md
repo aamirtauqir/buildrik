@@ -119,3 +119,59 @@ read-only catalog and its ⛔ drag-to-canvas stub, and the MAX-100 cap.
 ### What this walk did NOT assess
 
 Visual and IA. Behaviour, state and data only.
+
+---
+
+## Addendum 2, 2026-08-25 — the real blocker: instances are locked by construction
+
+The addendum above blamed the dev overlay for the 08-24 failure. That was one
+of two causes and not the deeper one.
+
+Retried the chain end to end in a single session with the fixed rig: library →
+`Insert Component` → instance appears on canvas (node count went 1 → 4 across
+runs) → select it. Selection produced nothing, and this time the screenshot
+showed why — a toast in the **bottom-right**:
+
+> **"This element is locked. Unlock it in the Layers panel."**
+
+A right-column scrape never sees a bottom-right toast. That is why two probes
+in a row reported "nothing is selected" without saying why.
+
+### It is by design, in one line
+
+`engine/elements/ElementSerialization.ts:119`:
+
+```js
+return this.getData().locked === true || this.isComponentInstance();
+```
+
+**Every component instance is locked**, not because someone locked it, but
+because `isLocked()` returns true for instances by construction. The three
+selection guards in `useSelectionBehavior.ts` (`:90`, `:108`, `:136`) all fire
+the same toast.
+
+So the override-survival chain **cannot be reached by clicking the instance on
+canvas at all** — not on 08-24, not today, not by any probe. The PRD's F1a
+("style+attr survive a master edit") implies overriding an instance; the only
+route to that is the toast's own escape hatch: unlock it in the Layers panel
+first.
+
+That is a real contract nobody had written down, and it changes what the leg
+even is.
+
+### Still not completed, and the exact next step
+
+The Layers panel lists the instances (four `Button` rows on this fixture — the
+original plus three inserts). The per-row lock control was not found at the
+x-range this pass guessed, so the unlock was not performed.
+
+**Next step, precisely:** open Layers, find the instance row, click its lock
+glyph, confirm the canvas selection now succeeds, then override a style and edit
+the master. Everything before that is now known and does not need rediscovering.
+
+### Corrected from addendum 1
+
+Addendum 1 said the dev overlay was "the real harness blocker". It is *a*
+blocker — it impersonates the inspector on read — but the instance lock is the
+one that makes the click itself a no-op. Both are true; the lock is the reason
+the chain is unreachable.
