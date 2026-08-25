@@ -314,8 +314,8 @@ regression risk. `gate:boards` PASS (422 rows, 34 families).
 | `U10` export | **closed** | HTML/ZIP/React live, Vue and Next.js labelled "Soon", real output size shown pre-export |
 | `U5` view mode | **closed** | rail 0, no Publish, no review controls, and **Delete on a selected element left 50 elements at 50** |
 | Figma | **closed** | audited before drawing; S5 wiring already complete, nothing to add, three "unwired" entries were caption strips |
-| `U2` build a page | **not run** | its two remaining legs are P3 (snap-guide 5px, 500 ms long-press) |
-| `U9` version rescue | **not run** | its five markers remain |
+| `U2` build a page | **closed** | both P3 legs verified; `SNAP_THRESHOLD` is defined twice and one comment contradicts its own line |
+| `U9` version rescue | **closed** | the scrubber reads the in-session undo stack, not saved versions; the approval band counts and names post-approval drift |
 
 ### Seven false findings caught before filing
 
@@ -340,7 +340,7 @@ product modals.
 
 ### What remains
 
-`U2`'s two P3 legs · `U9`'s five markers · `U4`'s override chain · the
+`U4`'s override chain · the
 per-section `U12` drill-ins · `U3`'s remaining lint rules and export formats ·
 `U7`'s eight uncovered media surfaces · `U6`'s `Ask for changes` branch and
 share-link password/expiry.
