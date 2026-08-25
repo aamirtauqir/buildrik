@@ -45,7 +45,7 @@ type SendState = "idle" | "sending" | "sent" | "again" | "error";
 
 const INVITE_FAILED =
   "tw:flex tw:flex-col tw:gap-1.5 tw:rounded-lg tw:border tw:border-[var(--bk-error)] " +
-  "tw:bg-[var(--bk-error-bg)] tw:px-3 tw:py-2";
+  "tw:bg-[var(--bk-error-tint)] tw:px-3 tw:py-2";
 
 const LABEL: Record<SendState, string> = {
   idle: "Send for review",
