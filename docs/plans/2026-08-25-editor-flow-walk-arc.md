@@ -236,11 +236,23 @@ were removed from scope by founder call 08-25; item 1 landed 08-24. Note that
 the same source plan classifies "Ch.12's 134 rows, board reconciliation" as
 **POST-SHIP** — so this arc is post-ship work and is not release-blocking.
 
-Carried, none addressed here: nobody has been asked since 2026-06-21;
-`agency_layer` has never run; no analytics (`sidebarAnalytics.ts:19` is a
-`noopProvider` wired only from its own test); Chromium-only e2e; the
-published-site beacon is CORS-open (`app/api/public/track/[siteId]/route.ts:13`);
-the palette fails its own WCAG lint.
+**~~`agency_layer` has never run~~ — RETIRED 2026-08-25.** It has now run, end
+to end, and it works: editor `Re-send` → `reviews.submit` → client
+`/review/<token>` **with no session** → `Approve` → `clientReview.resolve` → DB
+`PENDING → APPROVED` → **editor topbar reads "Approved by Fixture Reviewer ·
+just now"**. `agency_layer` and `client_mode` are enabled on the fixture
+workspace. Record: `docs/walks/U6-review-and-share.md`. Three plans carried this
+line forward unchanged; it is false now.
+
+This also revises the "alternatives considered" row above, which rejected
+"run `agency_layer` once" on the grounds that walking `U6` was only *the closest
+this scope comes* to running the wedge. It turned out to be the thing itself.
+
+Still carried, none addressed here: nobody has been asked since 2026-06-21; no
+analytics (`sidebarAnalytics.ts:19` is a `noopProvider` wired only from its own
+test); Chromium-only e2e; the published-site beacon is CORS-open
+(`app/api/public/track/[siteId]/route.ts:13`); the palette fails its own WCAG
+lint.
 
 ## GSTACK REVIEW REPORT
 
