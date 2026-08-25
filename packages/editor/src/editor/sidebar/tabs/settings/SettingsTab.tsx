@@ -267,6 +267,12 @@ export const SettingsTab: React.FC<
   const [screenIsDirty, setScreenIsDirty] = React.useState(false);
   const [dirtyCount, setDirtyCount] = React.useState(0);
   const [guardOpen, setGuardOpen] = React.useState(false);
+  /* The guard knew two intents — pop to root, and swap sections — and the
+     header ✕ was neither, so it went straight through to the parent's onClose
+     with the screen dirty. Measured 2026-08-25: typed a value, counter read
+     "1 unsaved", clicked ✕, no dialog, ZERO POSTs during close, field empty on
+     reopen. Escape on the identical state raised the guard. Third intent. */
+  const pendingCloseRef = React.useRef(false);
   const pendingNavRef = React.useRef<InTabNavId | null>(null);
   const [resetKey, setResetKey] = React.useState(0);
 
@@ -799,7 +805,14 @@ export const SettingsTab: React.FC<
         title={isRoot ? "Settings" : current.title}
         subtitle={!isRoot ? current.subtitle : undefined}
         onHelpClick={onHelpClick}
-        onClose={onClose}
+        onClose={() => {
+          if (screenIsDirtyRef.current) {
+            pendingCloseRef.current = true;
+            setGuardOpen(true);
+            return;
+          }
+          onClose?.();
+        }}
         /* The header titles itself after the drilled-in section, so the derived
            name read "Close General" on a control that closes all of Settings. */
         closeLabel="Close settings"
@@ -897,6 +910,7 @@ export const SettingsTab: React.FC<
         open={guardOpen}
         onClose={() => {
           pendingNavRef.current = null;
+          pendingCloseRef.current = false;
           setGuardOpen(false);
         }}
         onConfirm={() => {
@@ -942,6 +956,11 @@ export const SettingsTab: React.FC<
           // inside the synchronous click handler), and navigateToRoot would
           // re-open the guard instead of popping to root.
           screenIsDirtyRef.current = false;
+          if (pendingCloseRef.current) {
+            pendingCloseRef.current = false;
+            onClose?.();
+            return;
+          }
           if (!isRoot && next === null) {
             navigateToRoot();
             return;
@@ -956,7 +975,11 @@ export const SettingsTab: React.FC<
           if (next !== null) navigate(next);
         }}
         title="Discard changes?"
-        message="You have unsaved changes. Switching will discard them."
+        message={
+          pendingCloseRef.current
+            ? "You have unsaved changes. Closing settings will discard them."
+            : "You have unsaved changes. Switching will discard them."
+        }
         confirmLabel="Discard"
         cancelLabel="Keep editing"
         tone="destructive"
