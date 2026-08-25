@@ -800,6 +800,9 @@ export const SettingsTab: React.FC<
         subtitle={!isRoot ? current.subtitle : undefined}
         onHelpClick={onHelpClick}
         onClose={onClose}
+        /* The header titles itself after the drilled-in section, so the derived
+           name read "Close General" on a control that closes all of Settings. */
+        closeLabel="Close settings"
       />
       <PanelFrame.Body noScroll>
         <div
@@ -873,11 +876,15 @@ export const SettingsTab: React.FC<
                 <span className="bd-set-savebar-note">
                   <span>{dirtyCount} unsaved</span>
                 </span>
+                {/* The bar is aria-hidden when clean, but its buttons stayed
+                    enabled and focusable — an interactive control inside an
+                    aria-hidden region, and a primary action that looked exactly
+                    as live at "0 unsaved" as at "1 unsaved". */}
                 <div className="bd-set-savebar-actions">
-                  <Button type="button" className="bd-set-btn sec" onClick={handleDiscard}>
+                  <Button type="button" className="bd-set-btn sec" onClick={handleDiscard} disabled={!screenIsDirty}>
                     Discard
                   </Button>
-                  <Button type="button" className="bd-set-btn pri" onClick={handleSave}>
+                  <Button type="button" className="bd-set-btn pri" onClick={handleSave} disabled={!screenIsDirty}>
                     Save
                   </Button>
                 </div>

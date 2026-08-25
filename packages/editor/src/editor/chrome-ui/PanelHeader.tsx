@@ -9,6 +9,11 @@ import { IconButton } from "./Icon";
 export interface PanelHeaderActionsProps {
   /** Aria-label context: "Expand {label}" / "Close {label}" (e.g. the panel title). */
   label: string;
+  /** Overrides the close button's name when the title is NOT what closing
+   *  affects. A drill-in surface titles itself after the section it is showing,
+   *  so the derived "Close {title}" claims to close the section while the
+   *  control closes the whole panel. */
+  closeLabel?: string;
   /** Expanded = 700-wide drawer (board 16:6 expand action); announced via aria-pressed. */
   isExpanded?: boolean;
   onExpandToggle?: () => void;
@@ -25,7 +30,7 @@ export interface PanelHeaderActionsProps {
  * headers that lay out their own title area (e.g. the sidebar DrillInHeader).
  */
 export function PanelHeaderActions({
-  label, isExpanded, onExpandToggle, onHelpClick, onClose, children, className, style,
+  label, closeLabel, isExpanded, onExpandToggle, onHelpClick, onClose, children, className, style,
 }: PanelHeaderActionsProps) {
   return (
     <span className={["tw:flex tw:items-center tw:gap-1", className].filter(Boolean).join(" ")} style={style}>
@@ -65,7 +70,7 @@ export function PanelHeaderActions({
         </IconButton>
       ) : null}
       {onClose ? (
-        <IconButton label={`Close ${label}`} onClick={onClose}>
+        <IconButton label={closeLabel ?? `Close ${label}`} onClick={onClose}>
           ✕
         </IconButton>
       ) : null}
@@ -81,9 +86,11 @@ export interface PanelHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   onExpandToggle?: () => void;
   onHelpClick?: () => void;
   onClose?: () => void;
+  /** See PanelHeaderActionsProps.closeLabel. */
+  closeLabel?: string;
 }
 
-export function PanelHeader({ title, actions, isExpanded, onExpandToggle, onHelpClick, onClose, className, ...rest }: PanelHeaderProps) {
+export function PanelHeader({ title, actions, isExpanded, onExpandToggle, onHelpClick, onClose, closeLabel, className, ...rest }: PanelHeaderProps) {
   return (
     <div
       className={[
@@ -119,6 +126,7 @@ export function PanelHeader({ title, actions, isExpanded, onExpandToggle, onHelp
       </span>
       <PanelHeaderActions
         label={title}
+        closeLabel={closeLabel}
         isExpanded={isExpanded}
         onExpandToggle={onExpandToggle}
         onHelpClick={onHelpClick}

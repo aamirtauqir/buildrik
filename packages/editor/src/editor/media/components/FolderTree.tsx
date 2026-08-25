@@ -106,9 +106,24 @@ function TreeNode({
   const depthClass = depth === 1 ? " depth-1" : depth === 2 ? " depth-2" : "";
   const droppable = onAssetDrop !== undefined;
   return (
+    /* Every row in this rail — the smart folders, Trash, and each user folder —
+       carried an onClick on a bare div, so none of them was reachable by Tab or
+       actionable by Enter. Gate 24 owns native elements in chrome, so the row
+       stays a div and gets the semantics instead of becoming a <button>. */
     <div
       className={`mgr-node${active ? " active" : ""}${depthClass}${isDropTarget ? " dragover" : ""}`}
+      role="button"
+      tabIndex={0}
+      aria-current={active ? "true" : undefined}
       onClick={onClick}
+      onKeyDown={(e) => {
+        if (e.key !== "Enter" && e.key !== " ") return;
+        // Space scrolls the rail otherwise, and the chevron button inside this
+        // row handles its own keys — don't fire the row for those.
+        if (e.target !== e.currentTarget) return;
+        e.preventDefault();
+        onClick?.();
+      }}
       onDragOver={droppable ? (e) => onAssetDragOver?.(e, dropFolderId ?? null) : undefined}
       onDragLeave={droppable ? () => onAssetDragLeave?.(dropFolderId ?? null) : undefined}
       onDrop={droppable ? (e) => onAssetDrop?.(e, dropFolderId ?? null) : undefined}
@@ -273,6 +288,7 @@ export function FolderTree({
         <Button
           className="mgr-tree-add"
           title="New folder"
+          aria-label="New folder"
           onClick={() => setNewFolderName((v) => (v === null ? "" : null))}
           aria-expanded={newFolderName !== null}
         >

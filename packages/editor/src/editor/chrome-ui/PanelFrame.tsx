@@ -53,6 +53,8 @@ export interface PanelFrameHeaderProps extends React.HTMLAttributes<HTMLDivEleme
   subtitle?: string;
   actions?: React.ReactNode;
   onClose?: () => void;
+  /** See PanelHeaderActionsProps.closeLabel. */
+  closeLabel?: string;
   onHelpClick?: () => void;
   /** Drawers can be pinned open; the state is announced, not just drawn. */
   isExpanded?: boolean;
@@ -88,7 +90,7 @@ export interface PanelFrameHeaderProps extends React.HTMLAttributes<HTMLDivEleme
  * not against the header.
  */
 function PanelFrameHeader({
-  title, subtitle, actions, onClose, onHelpClick, isExpanded, onExpandToggle, className, ...rest
+  title, subtitle, actions, onClose, closeLabel, onHelpClick, isExpanded, onExpandToggle, className, ...rest
 }: PanelFrameHeaderProps) {
   return (
     <PanelHeader
@@ -97,6 +99,7 @@ function PanelFrameHeader({
       onExpandToggle={onExpandToggle}
       onHelpClick={onHelpClick}
       onClose={onClose}
+      closeLabel={closeLabel}
       className={className}
       actions={
         <>
