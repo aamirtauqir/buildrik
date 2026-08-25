@@ -196,7 +196,40 @@ canUndo requires stack >1 (baseline checkpoint protected); depth 100; RAM-only �
 3. ~~Ship = "Send for review" popover~~ — `StudioHeader.tsx:644` leaves that slot deliberately empty in view mode ("sending a site for review is the owner's act"). `SendForReview` renders from the owner's Review tab (`ReviewTab.tsx:434`).
 4. ~~⛔ No tokenized share link exists~~ — **stale, verified 2026-08-23**: `/share/<token>` and `/review/<token>` both ship (`app/share/[token]`, `app/review/[token]`), and the editor's site menu opens the first through the dashboard's ShareDraftModal. What the URL param is has been renamed accordingly: it is view mode, not a client preview.
 
-### U6 · Review / approval loop (⛔ broken as designed)
+### U6 · Review / approval loop — ~~⛔ broken as designed~~ **WALKED END TO END AND WORKING, 2026-08-25**
+
+**The heading was wrong.** Walked live on 2026-08-25 with `agency_layer` and
+`client_mode` enabled on the fixture workspace — the full round closes and the
+result reaches the designer. Record: `docs/walks/U6-review-and-share.md`.
+
+```
+editor Re-send ──▶ reviews.submit 200 ──▶ snapshotPages NULL → 4 pages
+       │
+       ▼
+client /review/<token>   200, NO SESSION, 0 console errors
+       │  "…is asking for your feedback" · pages listed · Your notes
+       │  "You are looking at the version sent to you 8/9/2026 —
+       │   later edits will not change it."
+       ▼
+Approve this design ──▶ confirm ("…they can put it live") ──▶ Yes, approve
+       │                                    clientReview.resolve 200
+       ▼
+DB  status PENDING → APPROVED, resolvedAt stamped
+       ▼
+EDITOR topbar ──▶ "Approved by Fixture Reviewer · just now"
+```
+
+Point 3 below asked whether the client's own `/review/<token>` view reaches
+them. **It does.** That was the last unverified leg and it is now walked.
+
+Three behaviours worth recording as contract, found by walking:
+- `Re-send` on an already-PENDING round **updates it in place** — same id, same
+  token, refreshed snapshot. The client's link keeps working, but "round 2" is
+  not a new row, so anything counting rounds must not count rows.
+- `resolvedById` stays `null` after a token-identified approval, though both
+  surfaces name the reviewer correctly.
+- `changeSummary` is cleared by a re-send rather than carried forward.
+
 1. EDITOR submits review (U5) → ADMIN notified by email → resolve APPROVED | CHANGES_REQUESTED (1 PENDING/site).
 2. ~~⛔ Publish never checks review state~~ — **stale, verified 2026-08-23**, same as §11.1: the check is in `startPublish`. The live gap is the default (`false`), not the wiring.
 3. ~~⛔ External client not in loop: comments backend complete — zero editor UI~~ — **stale, verified 2026-08-23**: `editor/sidebar/tabs/review/ReviewTab.tsx` and `editor/shell/ReviewBar.tsx` both ship. What is NOT re-verified here is whether the client's own `/review/<token>` view reaches them — that leg was not walked.
