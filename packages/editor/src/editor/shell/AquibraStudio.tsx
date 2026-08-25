@@ -380,7 +380,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
      fresh round of what is already there, not a new message. A failed snapshot
      still sends — the round matters more than the preview, which is the
      tradeoff SendForReview already makes. */
-  const resendReview = React.useCallback(async () => {
+  const resendReview = React.useCallback(async (clientEmail?: string) => {
     let snapshotPages;
     if (composer) {
       try {
@@ -389,7 +389,15 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         console.warn("[review] snapshot render failed; re-sending without preview", e);
       }
     }
-    await submitForReview(undefined, undefined, undefined, snapshotPages);
+    /* The third argument is `clientEmail`, and it used to be hardcoded
+       `undefined`. `submitReview` mints a review token only when it is given an
+       email, so every round after the first carried `token: null` and the
+       client had no link to open — while the button said "Re-send for review"
+       and the client's old link still showed round 1's "You approved this".
+       The panel passes the round's own `invitedEmail`, so a re-send goes to
+       whoever the round was sent to; an internal submit with no client still
+       passes undefined and stays internal. */
+    await submitForReview(undefined, undefined, clientEmail, snapshotPages);
   }, [composer]);
 
   const requestPublish = React.useCallback(async () => {

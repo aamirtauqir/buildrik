@@ -279,7 +279,7 @@ export function ReviewClient({ token }: { token: string }) {
             disabled={resolve.isPending}
             className="h-9 rounded border border-[#D1D5DB] px-4 text-[13px] font-semibold text-[#111827] disabled:opacity-40"
           >
-            Ask for changes
+            Request changes
           </button>
           <button
             onClick={() => setAsking(true)}

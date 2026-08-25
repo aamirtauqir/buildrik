@@ -80,7 +80,7 @@ export interface LeftSidebarProps {
   /** P4.2 — opens the CMS collection-setup modal from the Content tab (data-first). */
   onCreateCollection?: () => void;
   /** P0 review loop: full re-send, forwarded to ReviewTab. */
-  onResendReview?: () => Promise<void>;
+  onResendReview?: (clientEmail?: string) => Promise<void>;
   /** §17 — opens ImageEditorModal for asset crop/rotate/adjust in panel-mode MediaTab. */
   onOpenImageEditor?: (
     imageSrc: string,

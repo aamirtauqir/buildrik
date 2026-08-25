@@ -35,6 +35,16 @@ function approvalLine(round: CurrentRound | null, loading: boolean): string {
     const who = round.reviewerName ?? round.invitedEmail ?? "the client";
     return when ? `Approved by ${who} on ${when}.` : `Approved by ${who}.`;
   }
+  // The schema has three statuses — PENDING | APPROVED | CHANGES_REQUESTED —
+  // and this line had two branches. A round the client CLOSED by asking for
+  // changes took the "still open" fallthrough: the right decision (publish
+  // stays blocked) given for the wrong reason.
+  if (round.status?.toLowerCase() === "changes_requested") {
+    const who = round.reviewerName ?? round.invitedEmail ?? "the client";
+    return round.openCommentCount > 0
+      ? `${who} asked for changes — ${round.openCommentCount} unresolved comment${round.openCommentCount === 1 ? "" : "s"}.`
+      : `${who} asked for changes on round ${round.roundNumber}.`;
+  }
   if (round.openCommentCount > 0) {
     return `Round ${round.roundNumber} open — ${round.openCommentCount} unresolved comment${round.openCommentCount === 1 ? "" : "s"}.`;
   }

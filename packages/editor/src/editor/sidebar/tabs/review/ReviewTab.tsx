@@ -66,7 +66,10 @@ export interface ReviewTabProps {
   onClose?: () => void;
   /** Full re-send (re-renders the snapshot, mints a fresh token) — provided by
    *  the shell so ReviewTab stays decoupled from the composer/export path. */
-  onResend?: () => Promise<void>;
+  /** A re-send goes to whoever the round was sent to. The panel passes the
+   *  round's `invitedEmail`; without it `submitReview` mints no token and the
+   *  new round is invisible to the client — measured 2026-08-25. */
+  onResend?: (clientEmail?: string) => Promise<void>;
   /** Live-render the current site to pages for the §3 Compare — same decoupling
    *  as onResend (the shell owns the composer/export path). Absent → no Compare. */
   onExportCurrentPages?: () => Promise<PublishPage[]>;
@@ -261,7 +264,10 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
     if (!onResend) return;
     setResending(true);
     try {
-      await onResend();
+      // Carry the round's client forward. `submitReview` only mints a token
+      // when it is given an email, so a re-send without this produced a round
+      // with `token: null` that the client could never open.
+      await onResend(round?.invitedEmail ?? undefined);
       await reload();
     } finally {
       setResending(false);
@@ -545,6 +551,23 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
     </div>
   );
 
+  /* The client closed this round by asking for changes. Without this the body
+     was chosen from comment counts alone, so a CHANGES_REQUESTED round with no
+     note rendered `emptyBody` — "has not commented yet. You will be notified." —
+     directly beside a topbar pill reading "Changes requested". */
+  const changesRequestedBody = (
+    <div className="tw:px-6 tw:py-8 tw:text-center tw:flex tw:flex-col tw:gap-2">
+      <span className="tw:text-[14px] tw:text-[var(--bk-ink)]">
+        {round.reviewerName ?? "Your reviewer"} asked for changes.
+      </span>
+      <span className={META}>
+        {total === 0
+          ? "They left no notes — the round is closed and it is your move."
+          : `${openComments.length} of ${total} still open.`}
+      </span>
+    </div>
+  );
+
   /* Board 157:221 — sent, nothing back yet. */
   const emptyBody = (
     <div className="tw:px-6 tw:py-8 tw:text-center tw:flex tw:flex-col tw:gap-2">
@@ -600,11 +623,13 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
       <div className={SCROLL}>
         {round.revoked
           ? revokedBody
-          : total === 0
-            ? emptyBody
-            : openComments.length === 0
-              ? allResolvedBody
-              : null}
+          : round.status?.toLowerCase() === "changes_requested"
+            ? changesRequestedBody
+            : total === 0
+              ? emptyBody
+              : openComments.length === 0
+                ? allResolvedBody
+                : null}
 
         {detached.length > 0 && (
           <div data-detached-group>
@@ -742,6 +767,26 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
           >
             {primaryLabel}
           </Button>
+          {/* D1-half-B: `SendForReview` — the only control in the product with a
+              "Client email" field — rendered under `if (!round)` and nowhere
+              else, so once ANY round existed there was no way to invite a
+              client to this site again, ever. A round with no client link gets
+              the control back here. Reused rather than reimplemented: it
+              already owns the snapshot render, the submit and the pill
+              refresh. */}
+          {!round.revoked && !hasClientLink && (
+            <div className="tw:self-center">
+              <SendForReview
+                composer={composer ?? null}
+                disabledReason={isViewer ? "Viewers can't send for review — ask an editor" : undefined}
+                /* `revision` IS the round's updatedAt — the same "the at moved,
+                   so OUR send landed" signal the pill passes. */
+                reviewStatus={{ at: round.revision }}
+                onSent={() => void load()}
+                idleLabel="Invite a client…"
+              />
+            </div>
+          )}
           {!round.revoked && (
             <Button
               color="light"

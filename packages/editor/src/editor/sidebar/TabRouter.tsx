@@ -81,7 +81,7 @@ export interface TabRouterProps {
   ) => void;
   /** P0 review loop: full re-send (re-render snapshot + mint fresh token) for
    *  the Review panel — provided by the shell (same path as the topbar send). */
-  onResendReview?: () => Promise<void>;
+  onResendReview?: (clientEmail?: string) => Promise<void>;
   /** P4.2 Content tab: opens the shell CMS collection-setup modal (data-first
    *  create, no element selection). Absent → the Content create button hides. */
   onCreateCollection?: () => void;

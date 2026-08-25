@@ -53,10 +53,12 @@ export async function submitReview(
     (await prisma.reviewRequest.findFirst({ where: { siteId, status: "PENDING" }, select: { id: true } }))?.id;
 
   let request;
+  let openedNewRound = false;
   const existing = await openId();
   if (existing) {
     request = await prisma.reviewRequest.update({ where: { id: existing }, data: updateData });
   } else {
+    openedNewRound = true;
     try {
       request = await prisma.reviewRequest.create({
         data: { siteId, requestedById, note: note ?? null, changeSummary: changeSummary ?? null, status: "PENDING", ...snapshot },
@@ -70,6 +72,10 @@ export async function submitReview(
         const winner = await openId();
         if (!winner) throw err;
         request = await prisma.reviewRequest.update({ where: { id: winner }, data: updateData });
+        // We lost the race, so no new round was opened here — the winner's
+        // round is the one that exists. Don't supersede anyone's link on a
+        // path that only updated a row.
+        openedNewRound = false;
       } else {
         throw err;
       }
@@ -85,6 +91,20 @@ export async function submitReview(
   let token: string | null | undefined;
   if (clientEmail) {
     ({ token } = await issueReviewToken(request.id, clientEmail));
+  }
+
+  // A new ROUND supersedes every earlier link for this site. The schema says so
+  // — `token`'s sibling `revokedAt` is documented as "Set when a re-send
+  // supersedes this link" — but nothing implemented it across rows.
+  // `issueReviewToken` clears `revokedAt` on the row it updates, and a new round
+  // is a new row, so round 1's token stayed live forever: measured 2026-08-25,
+  // round 1's link still opened its "You approved this" terminal after round 2
+  // existed. A bookmarked link from a superseded round must not keep answering.
+  if (openedNewRound) {
+    await prisma.reviewRequest.updateMany({
+      where: { siteId, id: { not: request.id }, token: { not: null }, revokedAt: null },
+      data: { revokedAt: new Date() },
+    });
   }
 
   await notifyReviewSubmitted(siteId, requestedById, note, changeSummary);

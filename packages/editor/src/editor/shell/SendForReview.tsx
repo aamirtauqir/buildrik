@@ -30,7 +30,15 @@ export interface SendForReviewProps {
    * terminal "Sent ✓" unlocks into "Send again". Without this the control
    * wedged until a full reload (finding D4).
    */
-  reviewStatus?: ReviewStatus | null;
+  /* Narrowed from `ReviewStatus` to the one field this control actually reads.
+     The round view passes a `CurrentRound`, which carries the same timestamp
+     under `revision` but none of the pill fields — and inventing a pill state
+     just to satisfy a type would have been a lie in the data. */
+  reviewStatus?: Pick<ReviewStatus, "at"> | null;
+  /** Overrides the idle trigger's label. The round view reuses this control to
+   *  invite a client to a round that has none, where "Send for review" would
+   *  read as a second send beside the re-send button. */
+  idleLabel?: string;
 }
 
 type SendState = "idle" | "sending" | "sent" | "again" | "error";
@@ -48,6 +56,7 @@ export const SendForReview: React.FC<SendForReviewProps> = ({
   disabledReason,
   onSent,
   reviewStatus,
+  idleLabel,
 }) => {
   const [state, setState] = React.useState<SendState>("idle");
   const [open, setOpen] = React.useState(false);
@@ -114,7 +123,7 @@ export const SendForReview: React.FC<SendForReviewProps> = ({
             className="tw:max-w-[280px] tw:whitespace-normal"
           >
             <Button size="xs" aria-disabled="true" onClick={() => {}}>
-              {LABEL[state]}
+              {state === "idle" && idleLabel ? idleLabel : LABEL[state]}
             </Button>
           </Tooltip>
         ) : (
@@ -123,7 +132,7 @@ export const SendForReview: React.FC<SendForReviewProps> = ({
             onClick={() => state !== "sent" && setOpen((v) => !v)}
             disabled={state === "sending" || state === "sent"}
           >
-            {LABEL[state]}
+            {state === "idle" && idleLabel ? idleLabel : LABEL[state]}
           </Button>
         )
       }
