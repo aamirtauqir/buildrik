@@ -40,3 +40,82 @@ fifth.
 Also not covered: variant swap via `VariantSection`, detach (pro-DS-mode only),
 the `componentSync` master mirror, the 27-component read-only catalog and its
 ⛔ drag-to-canvas stub, and the MAX-100 cap.
+
+---
+
+## Addendum, 2026-08-25 — the harness blocker found; the chain still not closed
+
+Lane 6 of `docs/plans/2026-08-25-editor-flow-walk-arc.md`. The override-survival
+chain is **still not walked**. What this pass did is find the real reason the
+08-24 attempt failed, which was not either of the two reasons that record gave.
+
+### The actual blocker: the dev overlay sits where the inspector sits
+
+The 08-24 record concluded *"my canvas click did not select — the inspector
+still read 'Select something on the canvas to edit it'"*. Both halves are
+wrong, and the second explains the first.
+
+Measured A/B this pass: **canvas selection works, with or without stripping any
+overlay.** Clicking a canvas node by its box selects it and the inspector
+switches to `TYPOGRAPHY / Family / Size`. The click was never the problem.
+
+The problem is the **read**. A right-column scrape returns this:
+
+```
+["v3.0.2","Output Detail","Standard","React Components","Hide Until Restart",
+ "Marker Color","Clear on copy/send","Block page interactions",
+ "Manage MCP & Webhooks","MCP Connection","Webhooks","Auto-Send", …]
+```
+
+That is the **agentation dev overlay**, not the inspector. It occupies the same
+screen region on the right. Any probe that reads "the right column" in dev gets
+the overlay's text, sees no element name, and concludes nothing is selected —
+which is precisely the false reading the 08-24 record filed and then correctly
+distrusted.
+
+**Strip it before reading, not before clicking.** This is trap 4 in
+`scripts/baseline/editor-rig.mjs`, and it is more dangerous than the header
+says: it does not merely add noise, it *impersonates the panel you are trying
+to measure*.
+
+### Method that now works, for the next attempt
+
+| problem | solution |
+|---|---|
+| identifying canvas nodes | `[data-buildrick-id]`. **`data-element-id` does not exist** — a probe written against it silently matches nothing |
+| reading the inspector | strip every `body > *` with `z-index >= 9000`, plus the agentation panel, **then** scope the read to `x > 1140` |
+| elements below the fold | `el.scrollIntoView({block:"center"})` **then** re-read the box — a coordinate click outside the viewport does nothing and reports no error |
+| multi-step chains | one browser session. Each `openEditor()` is a fresh context; an instance created in run N is not reliably present in run N+1 |
+
+### What was built and what was reached
+
+- Component **created** from the canvas Button via right-click → Save as
+  component → dialog (Name / Category / Tags) → `Create Component`. Library
+  then reads `1 components found · U4 Override Probe · 0 instances ›`.
+- Drill-in confirmed: `Back to Components / Components / U4 Override Probe`,
+  `No Preview`, `Type: UI component`, `Tags: No tags`, and the four actions
+  **Insert Component · Duplicate · Update · Delete**.
+- **Instance inserted** — canvas went from one `Click Me` node to two, then
+  three on a second insert.
+- **The override step was not reached.** Selecting the instance to change a
+  style needs the instance in view in the same session, and the two attempts
+  that got that far ran out of runway.
+
+### Observed, NOT filed — instance persistence is inconsistent
+
+One inserted instance (`el-mt89zsa3-187dr4t1cru`) was still present on a later
+fresh load; a second (`el-mt8a3o1z-6dfutlzmzp`) was not. That is either an
+autosave-timing artifact of closing the context quickly, or a real persistence
+gap. One observation cannot tell them apart and this record will not guess.
+Handed to whoever closes this chain: insert, wait for the save pill to settle,
+reload, and count.
+
+### Still not walked
+
+The override-survival chain itself, variant swap via `VariantSection`, detach
+(pro-DS-mode only), the `componentSync` master mirror, the 27-component
+read-only catalog and its ⛔ drag-to-canvas stub, and the MAX-100 cap.
+
+### What this walk did NOT assess
+
+Visual and IA. Behaviour, state and data only.
