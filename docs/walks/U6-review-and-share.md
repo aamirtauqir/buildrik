@@ -133,3 +133,67 @@ scope by founder call.
 ### What this walk did NOT assess
 
 Visual and IA. Behaviour, state and data only.
+
+---
+
+## Addendum 2 — the states after approval, 2026-08-25
+
+Continuing the same lane. Three findings from the post-approval states, none of
+which the first pass could see because the round was still PENDING.
+
+### 1. `Re-send` refreshes the snapshot but not the "Sent" clock
+
+The editor's Review panel (opened by clicking the approval pill) reads:
+
+> `0 of 0` · **Sent 16d ago** · Fixture Reviewer · *"Fixture Reviewer has not
+> commented yet. You will be notified."*
+
+The round **was re-sent today**. "16d ago" is counting from the row's original
+`createdAt` (2026-08-09), because `Re-send` updates the request **in place** —
+it refreshes `snapshotPages` and leaves `createdAt` alone. So the client's link
+is carrying today's snapshot while the designer's panel says it was sent
+sixteen days ago.
+
+Low severity, real, and it follows directly from the in-place update recorded in
+addendum 1. Whatever fixes it has to decide which timestamp "Sent" means: the
+first send, or the last.
+
+### 2. The client's resolution is one-way, and that looks deliberate
+
+Re-opening `/review/<token>` after approving shows a terminal state — *"You
+approved this. Thanks — … can take it from here."* — with **no `Ask for
+changes` and no way back**. The client cannot un-approve through the link they
+were given.
+
+Recorded as behaviour, not a defect: a resolution the designer can act on
+should not silently reverse under them. Worth confirming as intent.
+
+### 3. Copy defect — the header contradicts the body
+
+The same page still renders its pre-approval header above the post-approval
+body:
+
+```
+E2E Blank WS 0a95fc is asking for your feedback     <- header, unchanged
+You approved this                                    <- body, resolved
+Thanks — … can take it from here.
+```
+
+The heading asks for feedback that has already been given. One line, and it is
+the last thing a client sees on the wedge surface.
+
+### `Ask for changes` — still not walked, and why
+
+It needs a **PENDING** round. This fixture's only round is now `APPROVED`, and
+in the editor's `Approved · edited since` state there is no visible re-open or
+new-round door — clicking the approval pill opens the Review panel, which
+offers comments, not a re-send. So the branch is unreachable here without
+seeding a second round directly.
+
+Named with its precondition rather than guessed at: to walk it, create a fresh
+`reviewRequest` in `PENDING` and take `Ask for changes` on the client surface.
+
+### Also confirmed live
+
+`Approved · edited since` in the topbar — the `S5.6 · approved-edited-since`
+board state — appears as soon as an edit lands after approval.
