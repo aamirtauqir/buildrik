@@ -179,11 +179,22 @@ export async function stripDevOverlays(page) {
       const z = Number(getComputedStyle(el).zIndex);
       if (Number.isFinite(z) && z >= 9000) { el.remove(); n++; }
     }
-    // the agentation panel is not a body child in every build
-    for (const el of [...document.querySelectorAll("*")]) {
-      if (/Manage MCP & Webhooks/.test(el.innerText || "") && el.children.length < 40) {
-        el.remove(); n++; break;
-      }
+    // The agentation panel is not a body child in every build. Match it
+    // narrowly: a positioned, high-z, SMALL subtree.
+    //
+    // The obvious version of this loop removes <html>. `querySelectorAll("*")`
+    // starts there, `html.innerText` contains the overlay's text because the
+    // overlay is on the page, and `html.children.length` is 2 — so a
+    // "children.length < 40" guard passes and the whole document goes. That
+    // shipped for one commit and blanked the page. Hence every condition below.
+    for (const el of [...document.querySelectorAll("div,aside,section")]) {
+      if (el === document.body || el.contains(document.querySelector(".bd-studio"))) continue;
+      const s = getComputedStyle(el);
+      if (s.position !== "fixed" && s.position !== "absolute") continue;
+      const z = Number(s.zIndex);
+      if (!Number.isFinite(z) || z < 9000) continue;
+      if (!/Manage MCP & Webhooks|Output Detail/.test(el.innerText || "")) continue;
+      el.remove(); n++; break;
     }
     return n;
   });
