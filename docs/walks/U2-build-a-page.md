@@ -618,3 +618,44 @@ computed padding: 8px 8px 8px 8px       ← authored shorthand intact
 
 Tests are now 7, negative-tested three ways again: withholding `color` always,
 withholding it never, and dropping the shorthand guard each fail a distinct test.
+
+---
+
+## Addendum, 2026-08-25 — the last two legs, and a duplicated constant
+
+Lane of `docs/plans/2026-08-25-editor-flow-walk-arc.md`. This record's remaining
+"Not covered" entries were drag-to-canvas's last two numeric claims. Both are
+engine constants with no UI of their own, so this is code verification — said as
+that, not written up as a walk.
+
+| claim | verified |
+|---|---|
+| snap guides **5px** | `SNAP_THRESHOLD = 5`, and `useCanvasSnapping.ts:96` divides by `scale`, so the PRD's "5px ÷ scale" is literal |
+| touch long-press **500 ms** | `LONG_PRESS_DELAY = 500` (`useTouchDrag.ts:36`, used at `:166`) |
+
+### Finding — `SNAP_THRESHOLD` is defined twice, and one comment contradicts its own line
+
+```
+engine/canvas/constants.ts:14              export const SNAP_THRESHOLD = 5;   // canonical, imported by useDragSnapGuides.ts:21
+editor/canvas/hooks/useCanvasSnapping.ts:32  const SNAP_THRESHOLD = 5;        // local shadow
+```
+
+Two definitions of one constant. The drag-guide path imports the engine's; the
+snapping hook declares its own. **They agree at 5 today, so nothing is broken** —
+but a change to the engine constant silently would not reach the hook, and the
+two would drift apart with no test to catch it. Root `CLAUDE.md`'s SSOT rule is
+explicit: *"Types, constants, configs = ek canonical file. Baaki sab import
+karte hain."*
+
+The local one also carries the comment **"Configurable threshold (4px at 100%
+zoom)"** directly above `= 5`. The comment disagrees with its own line, and with
+the PRD, which says 5.
+
+Low severity, one import. Recorded rather than fixed — this arc changed no
+product code by design.
+
+### What this closes
+
+Nothing remains on this record's "Not covered" list. Inline text edit and the
+right-click context menu were walked 2026-08-24; these two constants close the
+rest.
