@@ -92,6 +92,17 @@ describe("captureSharedTheme", () => {
     expect(wsUpdate).not.toHaveBeenCalled();
   });
 
+  /* A brand-new site has no `projectStyles` — `createSite` never seeds it. This
+     used to write `Prisma.DbNull`, which `getSharedTheme` read back as null, so
+     the UI toasted "Theme captured" and then still showed "No shared theme
+     captured yet" with Push disabled. A new user's first agency action reported
+     success over a no-op. */
+  it("refuses a source site with no styles, and writes nothing", async () => {
+    siteFindFirst.mockResolvedValueOnce({ projectStyles: null });
+    await expect(captureSharedTheme("w1", "s1")).rejects.toBeInstanceOf(ThemeError);
+    expect(wsUpdate).not.toHaveBeenCalled();
+  });
+
   it("writes the source site's projectStyles to the workspace shared theme", async () => {
     siteFindFirst.mockResolvedValueOnce({ projectStyles: [{ id: "c", value: "#fff" }] });
     wsUpdate.mockResolvedValueOnce({});

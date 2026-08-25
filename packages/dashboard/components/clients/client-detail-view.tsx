@@ -74,6 +74,17 @@ function BrandingDialog({
           <input type="checkbox" checked={hideBuildrik} onChange={(e) => setHideBuildrik(e.target.checked)} className="accent-[var(--color-primary)]" />
           Hide Buildrick branding for this client
         </label>
+        {/* The badge is decided by PLAN, not by this box: `publish-html.ts:109`
+            — "Injected only on FREE; paid plans ship clean." Nothing outside the
+            clients CRUD reads `hideBuildrik`, so on a FREE workspace this used
+            to be ticked and the badge shipped anyway. Saying so is the fix;
+            making the box actually override the plan is a pricing decision, not
+            a defect fix. */}
+        <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
+          Saved with the client, but not applied yet — the Buildrick badge is
+          removed by upgrading the workspace, not per client. Logo and custom
+          domain are stored for your records and are not published either.
+        </p>
       </div>
     </Modal>
   );

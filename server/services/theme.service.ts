@@ -80,14 +80,23 @@ export async function captureSharedTheme(
   });
   if (!site) throw new ThemeError("NOT_FOUND", "Source site not found");
 
+  /* A brand-new site has no `projectStyles` — `createSite` never seeds it — so
+     this used to write `Prisma.DbNull`, `getSharedTheme` read it back as null,
+     and the UI toasted "Theme captured" while still showing "No shared theme
+     captured yet" with Push disabled. That is a new user's FIRST agency action
+     reporting success over a no-op. Capturing nothing is not a capture. */
+  if (site.projectStyles == null) {
+    throw new ThemeError(
+      "BAD_REQUEST",
+      "That site has no styles to capture yet — open it, set your brand colours and type, then capture.",
+    );
+  }
+
   const updatedAt = new Date();
   await prisma.workspace.update({
     where: { id: workspaceId },
     data: {
-      sharedTheme:
-        site.projectStyles == null
-          ? Prisma.DbNull
-          : (site.projectStyles as Prisma.InputJsonValue),
+      sharedTheme: site.projectStyles as Prisma.InputJsonValue,
       sharedThemeUpdatedAt: updatedAt,
     },
   });

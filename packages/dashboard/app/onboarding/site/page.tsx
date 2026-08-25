@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { trpc } from "@lib/trpc/client";
 import { WizardShell } from "@/components/onboarding/wizard/wizard-shell";
 import { OnbField } from "@/components/onboarding/wizard/onb-field";
@@ -20,6 +20,10 @@ const ORG_CARDS: { value: OrgType; title: string; description: string }[] = [
   { value: "new", title: "New client", description: "Add client details now. You can invite them later." },
 ];
 
+/** The two client branches only work when the agency layer is on — `clients.create`
+ *  and `clients.assignSite` are both flag-gated. */
+const CLIENT_CARDS: OrgType[] = ["existing", "new"];
+
 // Existing-client picker's trailing option (S2 · Existing client frame) — picking
 // it swaps the branch to "New client" rather than creating anything itself; the
 // New-client fields + submit flow (below) own the actual capture.
@@ -38,12 +42,25 @@ export default function SitePage() {
   const { data, saveAndGo, saving } = useWizard();
   const { skipSetup, skipping } = useOnboardingComplete();
   const clients = trpc.clients.list.useQuery(undefined, { refetchOnWindowFocus: false });
+  /* This step asked EVERY new user for a client — "New client" was the default
+     — made the name a hard validation blocker, and labelled the email "Used for
+     review and approval links". Then `attachClient` called `clients.create`,
+     which throws FORBIDDEN while the agency layer is off, and an empty catch
+     discarded it. So the answer was collected, promised something, and thrown
+     away. Ask only when we can keep it. */
+  const features = trpc.features.list.useQuery(undefined, { refetchOnWindowFocus: false });
+  const agencyOn = !!features.data?.agency_layer;
 
   const [siteName, setSiteName] = useState(data.site?.name ?? "");
-  const [orgType, setOrgType] = useState<OrgType>(data.site?.orgType ?? "new");
+  const [orgType, setOrgType] = useState<OrgType>(data.site?.orgType ?? "mine");
   const [clientId, setClientId] = useState(data.site?.client?.id ?? "");
   const [clientName, setClientName] = useState(data.site?.client?.name ?? "");
   const [clientEmail, setClientEmail] = useState(data.site?.client?.email ?? "");
+
+  useEffect(() => {
+    if (!features.isSuccess || agencyOn) return;
+    setOrgType((v) => (v === "mine" ? v : "mine"));
+  }, [features.isSuccess, agencyOn]);
 
   const [siteErr, setSiteErr] = useState<string>();
   const [clientNameErr, setClientNameErr] = useState<string>();
@@ -129,7 +146,7 @@ export default function SitePage() {
           {/* The org-type row breaks out past the 480px form column (804px in the
               frame); items-center overflows it symmetrically, keeping it centred. */}
           <div className="flex w-[804px] gap-3">
-            {ORG_CARDS.map((c) => (
+            {ORG_CARDS.filter((c) => agencyOn || !CLIENT_CARDS.includes(c.value)).map((c) => (
               <OnbCard
                 key={c.value}
                 title={c.title}

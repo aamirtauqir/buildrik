@@ -249,7 +249,7 @@ export function ClientsView() {
       ) : !agencyEnabled ? (
         <DeniedState
           title="Agency features aren't enabled"
-          description="Clients group sites per customer with white-label branding. Ask a workspace admin to enable the agency layer."
+          description="Clients group sites per customer, and gate publishing on their sign-off. Ask a workspace admin to enable the agency layer."
           action={{ label: "Back to projects", href: "/dashboard/projects" }}
         />
       ) : clientsQuery.isLoading ? (

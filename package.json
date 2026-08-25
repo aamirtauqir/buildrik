@@ -9,6 +9,7 @@
     "lint": "next lint",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
+    "funnel": "tsx scripts/funnel-report.ts",
     "db:generate": "prisma generate",
     "db:seed": "tsx prisma/seed.ts",
     "email:dev": "email dev --dir emails",

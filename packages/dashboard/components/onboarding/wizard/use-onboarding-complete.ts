@@ -37,8 +37,14 @@ export function useOnboardingComplete() {
         clientId = created.id;
       }
       if (clientId) await assignSite.mutateAsync({ siteId, clientId });
-    } catch {
-      /* agency layer off / not admin — non-blocking, site stays under workspace */
+    } catch (e) {
+      /* Still non-blocking — never trap the user out of their new site. But
+         this used to be an empty catch, and the wizard only reaches here when
+         the user typed a client name it had made a hard requirement. Silently
+         discarding that is the defect; S2 now hides the client branches unless
+         the agency layer is on, so reaching this catch means something else
+         went wrong and it should be visible. */
+      console.error("[onboarding] client attach failed; site stays under the workspace", e);
     }
   }
 
