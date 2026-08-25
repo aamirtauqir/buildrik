@@ -66,7 +66,7 @@ export const insertSubmenu: ContextAction[] = [
     // syncInstance, so they stay blocked — explicitly now that isLocked() no
     // longer implies "is an instance".
     isVisible: (ctx) =>
-      ctx.element.canHaveChildren() && !ctx.element.isLocked() && !ctx.element.isComponentInstance(),
+      ctx.element.canHaveChildren() && !ctx.element.isLocked() && !ctx.element.isComponentInstance?.(),
     handler: ({ composer, element }) => {
       const elementType = element.getType() as ElementType;
       const newEl = createPlaceholderElement(composer, elementType);
@@ -87,7 +87,7 @@ export const insertSubmenu: ContextAction[] = [
     // syncInstance, so they stay blocked — explicitly now that isLocked() no
     // longer implies "is an instance".
     isVisible: (ctx) =>
-      ctx.element.canHaveChildren() && !ctx.element.isLocked() && !ctx.element.isComponentInstance(),
+      ctx.element.canHaveChildren() && !ctx.element.isLocked() && !ctx.element.isComponentInstance?.(),
     handler: ({ composer, element }) => {
       const elementType = element.getType() as ElementType;
       const newEl = createPlaceholderElement(composer, elementType);

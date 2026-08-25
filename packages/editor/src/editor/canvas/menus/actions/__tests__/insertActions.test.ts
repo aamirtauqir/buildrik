@@ -108,6 +108,19 @@ describe("insertActions", () => {
       expect(action("insert-inside-last").isVisible!(ctx)).toBe(false);
     });
 
+    /* This guard used to ride on `isLocked()`, which returned true for every
+       component instance. `isLocked` stopped conflating the two on 2026-08-25,
+       so the guard is named here now — structural edits inside an instance
+       subtree are discarded by the next `syncInstance`, so they stay blocked. */
+    it("insert-inside stays hidden inside a component instance", () => {
+      expect(action("insert-inside-first").isVisible!(ctx)).toBe(true);
+      element.isComponentInstance.mockReturnValue(true);
+      expect(action("insert-inside-first").isVisible!(ctx)).toBe(false);
+      expect(action("insert-inside-last").isVisible!(ctx)).toBe(false);
+      element.isComponentInstance.mockReturnValue(false);
+      expect(action("insert-inside-first").isVisible!(ctx)).toBe(true);
+    });
+
     it("unwrap is enabled only when the element has children", () => {
       linkChildren(element, []);
       expect(action("unwrap").isEnabled!(ctx)).toBe(false);

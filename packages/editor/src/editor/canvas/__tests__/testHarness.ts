@@ -121,6 +121,9 @@ export interface ElementStubOptions {
   parent?: ElementStub | null;
   children?: ElementStub[];
   locked?: boolean;
+  /** Membership of a component-instance subtree — separate from `locked` since
+   *  2026-08-25, when `isLocked()` stopped conflating the two. */
+  componentInstance?: boolean;
   styles?: Record<string, string>;
   attributes?: Record<string, string>;
 }
@@ -141,6 +144,11 @@ export interface ElementStub {
   setContent: ReturnType<typeof vi.fn>;
   toJSON: ReturnType<typeof vi.fn>;
   isLocked: ReturnType<typeof vi.fn>;
+  /* Real `Element` always has this. The stub did not, so a call site that
+     started reading it — `insertActions` after `isLocked` stopped implying
+     "is an instance" — threw across eight tests that had nothing to do with
+     components. */
+  isComponentInstance: ReturnType<typeof vi.fn>;
   setLocked: ReturnType<typeof vi.fn>;
   isContainer: ReturnType<typeof vi.fn>;
   canHaveChildren: ReturnType<typeof vi.fn>;
@@ -161,6 +169,7 @@ export function makeElementStub(options: ElementStubOptions = {}): ElementStub {
     parent = null,
     children = [],
     locked = false,
+    componentInstance = false,
     styles = {},
     attributes = {},
   } = options;
@@ -185,6 +194,7 @@ export function makeElementStub(options: ElementStubOptions = {}): ElementStub {
     setContent: vi.fn(),
     toJSON: vi.fn(() => ({ id, type })),
     isLocked: vi.fn(() => locked),
+    isComponentInstance: vi.fn(() => componentInstance),
     setLocked: vi.fn(),
     isContainer: vi.fn(() => type === "container" || type === "section"),
     canHaveChildren: vi.fn(() => true),
