@@ -47,6 +47,14 @@
  *  5. CANVAS NODES ARE `[data-buildrick-id]`. `data-element-id` does not exist;
  *     a probe written against it matches nothing and reports no error.
  *
+ *  7. SOME MENU ROWS LEAVE THE EDITOR ENTIRELY. `Site health` and `Activity
+ *     log` call `openDashboard(...)` and open a NEW TAB
+ *     (`SiteMenu.tsx:195-199`); the editor page correctly stays put. A probe
+ *     that measures "did this page change" reads them as dead doors forever —
+ *     two different click mechanisms both looked like no-ops before a popup
+ *     listener showed the tab. Listen on `context.on("page", …)` BEFORE
+ *     clicking any row that might navigate away. See `clickMenuRow()`.
+ *
  *  6. A COORDINATE CLICK OUTSIDE THE VIEWPORT SILENTLY DOES NOTHING. Elements
  *     appended to the end of a page sit below the fold. `scrollIntoView` first,
  *     then re-read the box — `getBoundingClientRect()` from before the scroll
@@ -243,4 +251,43 @@ export async function clickCanvasElement(page, elementId) {
   await page.mouse.click(box.x, box.y);
   await page.waitForTimeout(1400);
   return true;
+}
+
+/**
+ * Trap 7 — click a site-menu row and report BOTH outcomes: what changed on the
+ * page, and any new tab it opened. Returns `{ newTabs, url }`.
+ *
+ * A row like `Site health` opens the dashboard in a new tab and leaves the
+ * editor untouched; measuring only the current page reads that as a dead door.
+ */
+export async function clickMenuRow(page, ctx, label, { settleMs = 3500 } = {}) {
+  const newTabs = [];
+  const onPage = (p) => newTabs.push(p.url());
+  ctx.on("page", onPage);
+  try {
+    await page.evaluate(() => {
+      const b = [...document.querySelectorAll("button")]
+        .find((x) => x.getAttribute("aria-label") === "Site menu");
+      if (b) b.click();
+    });
+    await page.waitForTimeout(1500);
+    const hit = await page.evaluate((t) => {
+      const leaf = [...document.querySelectorAll("*")]
+        .find((e) => e.children.length === 0 && (e.innerText || "").trim() === t);
+      if (!leaf) return false;
+      let el = leaf;
+      for (let i = 0; i < 4 && el; i++) {
+        if (el.getAttribute("role") === "menuitem" || el.tagName === "BUTTON") break;
+        el = el.parentElement;
+      }
+      if (!el) return false;
+      el.click();
+      return true;
+    }, label);
+    if (!hit) return { found: false, newTabs, url: page.url() };
+    await page.waitForTimeout(settleMs);
+    return { found: true, newTabs, url: page.url() };
+  } finally {
+    ctx.off("page", onPage);
+  }
 }
