@@ -226,3 +226,30 @@ uses a status legend instead. Any reconciliation keyed on `⛔` (as Ch.11's is)
 skips this chapter entirely, which is how it drifted while Ch.11 was being
 maintained. Diff Ch.12 by walking its **evidence column** and checking each
 `file:line` still resolves.
+
+### Lane 2 (F-A5) — code ahead of the PRD, added 2026-08-25
+
+4. **`OLLAMA_BASE_URL` is a global provider override, not a fallback.**
+   `quota.service.ts:167` returns `"ollama"` whenever the var is non-empty —
+   ahead of tier resolution and ahead of the client's model hint. Ch.11's
+   "gated by tier" line holds only when it is unset. Prod is protected
+   (`check-prod-env.mjs:242-251` fails the deploy), dev is not: with the var
+   set and no Ollama running, **every AI request in dev fails** while a valid
+   `OPENAI_API_KEY` sits unused.
+5. **`assertProviderConfigured` proves configuration, not reachability**
+   (`ai.service.ts:481-491`). Set-but-dead passes the fail-fast guard and then
+   fails deep — the failure mode the guard was written to prevent. Same shape
+   as `feedback_env_template_literal_fails_open`.
+6. **The AI error copy blames the vendor for a local misconfiguration**:
+   "This is usually the model provider, not your site" + `Unknown error`, for a
+   connection refusal the server had the stack trace for. Same class as the
+   429-renders-as-"expired-link" defect (task 0d).
+7. **The in-canvas AI path is single-shot, not a token stream** — for
+   `intent: "style-command"` with element or non-empty page scope, the server
+   yields one `edit` frame carrying `rows` (from/to) plus
+   `applyOps.commit.commands`, then `done` (`ai.ts:326-360`). The token-stream
+   branch is only reached for other intents. Ch.11's diagram shows both but
+   does not say which path a canvas edit takes.
+8. **Canvas nodes carry `data-buildrick-id`, not `data-element-id`.** Any probe
+   or test written against the latter silently matches nothing — a documented
+   harness trap that has produced false "the panel is broken" readings.
