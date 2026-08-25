@@ -212,3 +212,39 @@ neutering the failure branch drops exactly the refused-leg test, collapsing
 `truncated` into `whole` drops exactly that one, and making the search advance
 `loaded` drops exactly the paging-position test.
 
+
+---
+
+## Addendum, 2026-08-25 — the drawer with assets in it
+
+Lane of `docs/plans/2026-08-25-editor-flow-walk-arc.md`. Walked with the fixture
+carrying three seeded assets, which the 08-24 pass did not have.
+
+```
+Media  ·  All | image 2 | video 1 | svg 0 | icon 0
+storefront.jpg · dining-room.jpg · room-tour.mp4
+"Drag files or click to browse"
+Upload · Stock · Icons
+```
+
+**Filter counts are real** — `image 2 · video 1` match the seeded set, and the
+drawer lists all three including the `.mp4`. The empty-state copy is replaced by
+a drop target once assets exist, which is the right behaviour.
+
+**Refines the redesign arc's `R7`.** That ledger row says the filter chips
+"render `image 0 · video 0 · svg 0 · icon 0` and stay visible at zero". With
+assets present the counts are correct and useful; only the genuinely empty
+kinds (`svg 0`, `icon 0`) show zeros. So `R7` is narrower than written: it is
+about zero-count chips specifically, not the chip row as a whole. Handed to that
+lane.
+
+### Still not covered
+
+Import-from-URL (⛔ coming-soon stub), stock search, folders and smart folders,
+**Trash** (a `"Trash coming soon"` toast stub), bulk move/delete, the alt-text
+detail rail and its AI generate, the Versions tab and `replaceAcross`, the image
+editor (crop/adjust/resize), and the optimizer.
+
+### What this walk did NOT assess
+
+Visual and IA. Behaviour, state and data only.

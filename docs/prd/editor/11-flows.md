@@ -245,7 +245,7 @@ Three behaviours worth recording as contract, found by walking:
 8. Icons: Lucide 369, size 12-96 / stroke 0.5-4 / color, recents ×12.
 
 ### U8 · CMS / ecommerce flow
-1. Drop e-com block (product-card/grid/detail; ⛔ not in build-tab catalog — Ch.07) → CollectionSetupModal once per session → ProductCollectionService creates Products collection (8 fields, optional 3 samples) in composer.cms.
+1. Drop e-com block (product-card/grid/detail; ~~⛔ not in build-tab catalog — Ch.07~~ — **stale, verified live 2026-08-25**: typing `product` into the Insert panel's search returns **Product Card · Product Grid · Product Detail**, all under `BLOCKS`. Ch.12 §12.6 struck this on 08-23 ("reachable under Advanced") and the `U8` walk counted four blocks on 08-24 — **this is the third independent confirmation and Ch.11 was still carrying the ⛔**) → CollectionSetupModal once per session → ProductCollectionService creates Products collection (8 fields, optional 3 samples) in composer.cms.
 2. Bind elements via inspector BindingPopover (cms.bindings).
 3. cmsSync mirrors collections/entries to server (retry queue).
 4. ⛔ Dynamic pages have no editor front-door; records stay `draft`, per-record publish absent (§12 #6).
