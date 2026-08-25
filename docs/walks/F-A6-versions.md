@@ -76,3 +76,47 @@ back clean. The **scrubber is still unwalked.**
 **Disclosed:** this walk's probes inserted headings into `scratch-smoke`
 repeatedly, taking it to 48 elements; the leg-2 restore then dropped it to 8.
 Its content is arbitrary, but the churn is mine.
+
+---
+
+## Addendum, 2026-08-25 — the 50-per-site cap, and what it refuses to delete
+
+Lane of `docs/plans/2026-08-25-editor-flow-walk-arc.md`. This record's last
+uncovered item was **"the server mirror's own 50-per-site cap"**.
+
+`server/services/site-version.service.ts:13` — `MAX_VERSIONS_PER_SITE = 50`,
+enforced by `pruneSiteVersions` (`:71-85`).
+
+**Live on the fixture: exactly 50 rows.** The site sits on the boundary, which
+means the prune is running rather than merely existing.
+
+The prune's contract is the part worth recording:
+
+```js
+const overflow = all
+  .filter((r) => r.isAuto)      // <- only auto-saves are ever eligible
+  .slice(-excess)
+  .map((r) => r.id);
+if (overflow.length === 0) return;
+```
+
+**A named milestone is never pruned.** The cap can only evict auto-saves. That
+is the right trade — the 08-18 arc records boards catching *named milestones
+being pruned* as data loss, and this filter is the guard against it. Confirmed
+still in place at HEAD.
+
+**The consequence, recorded rather than filed:** a site whose 50 rows are *all*
+named milestones prunes nothing — `overflow.length === 0` returns early — so the
+cap is a soft ceiling for named versions and a hard one for autos. Deliberate,
+and better than the alternative, but it means "50 per site" is not literally
+true for a heavy milestone user.
+
+### Still not covered
+
+Nothing from this record's original list — the Compare diptych, time-travel
+scrubber and 300 ms hover preview were walked 2026-08-25 in
+`U9-version-rescue.md`, and the cap is closed here.
+
+### What this walk did NOT assess
+
+Visual and IA. Behaviour, state and data only.

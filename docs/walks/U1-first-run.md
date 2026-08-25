@@ -32,3 +32,33 @@ finding about something that is present.
 The achievement modal (4 s per completion), collapse-on-element-select, the
 dashboard's "Edit site" entry into `/edit/:id`, and the final publish — which is
 F-A3's untaken leg and SHIP-gate item 3.
+
+---
+
+## Addendum, 2026-08-25 — the dashboard entry, walked
+
+Lane of `docs/plans/2026-08-25-editor-flow-walk-arc.md`. This record's "Not
+covered" list named *"the dashboard's 'Edit site' entry into `/edit/:id`"*.
+
+`/dashboard/projects` with a real session lists three sites, each carrying an
+`Edit` link:
+
+```
+Edit → /edit/cmrsur1fp000unh3rvmmiq25t
+Edit → /edit/scratchver0000000000000001
+Edit → /edit/scratchsmoke00000000000001
+```
+
+**The href is the unified editor route**, not the retired standalone demo.
+That is the leg root `CLAUDE.md` warns about: with `NEXT_PUBLIC_UNIFIED_EDITOR`
+unset, "Edit site" points at `localhost:5050/?siteId=`, a dev-only demo that
+does not load real projects. Here it is wired correctly end to end.
+
+### Still not covered
+
+The achievement modal (4 s per completion) and collapse-on-element-select. The
+final publish remains out of scope by founder call.
+
+### What this walk did NOT assess
+
+Visual and IA. Behaviour, state and data only.
