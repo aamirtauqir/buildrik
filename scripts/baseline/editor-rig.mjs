@@ -175,7 +175,17 @@ export async function openEditor({
 export async function stripDevOverlays(page) {
   return page.evaluate(() => {
     let n = 0;
+    // NEVER remove a product overlay. Modals, dialogs and toasts are portaled
+    // to body too, so a bare "z >= 9000" sweep takes them with it — that made
+    // Ctrl+, look like a dead shortcut when the Project settings modal had in
+    // fact opened and then been deleted by this helper.
+    const isProduct = (el) =>
+      el.matches?.('[role="dialog"], [aria-modal="true"]') ||
+      el.querySelector?.('[role="dialog"], [aria-modal="true"]') ||
+      el.querySelector?.(".bd-studio") ||
+      el.classList?.contains("bd-studio");
     for (const el of [...document.querySelectorAll("body > *")]) {
+      if (isProduct(el)) continue;
       const z = Number(getComputedStyle(el).zIndex);
       if (Number.isFinite(z) && z >= 9000) { el.remove(); n++; }
     }
