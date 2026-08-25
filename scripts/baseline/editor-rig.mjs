@@ -2,10 +2,10 @@
  * Editor walk rig — open the running editor on a real, server-backed session.
  *
  * Lived in a session scratchpad until 2026-08-25, which meant every walk
- * re-paid the same four traps. Committed as task 0b of
+ * re-paid the same traps. Committed as task 0b of
  * `docs/plans/2026-08-25-editor-flow-walk-arc.md`.
  *
- * THE FOUR TRAPS, all paid for already — do not pay again:
+ * SEVEN TRAPS, all paid for already — do not pay again:
  *
  *  1. MAGIC-LINK TOKENS ARE SINGLE-USE. `generateToken("magic_link", …)` is
  *     marked `used` by the callback. Re-running a probe with a spent token
@@ -42,10 +42,17 @@
  *     present. **Strip before READING, not before clicking** — see
  *     `stripDevOverlays(page)`.
  *
- * TWO MORE, learned the same day:
+ * THREE MORE, learned the same day:
  *
  *  5. CANVAS NODES ARE `[data-buildrick-id]`. `data-element-id` does not exist;
  *     a probe written against it matches nothing and reports no error.
+ *
+ *  6. A COORDINATE CLICK OUTSIDE THE VIEWPORT SILENTLY DOES NOTHING. Elements
+ *     appended to the end of a page sit below the fold. `scrollIntoView` first,
+ *     then re-read the box — `getBoundingClientRect()` from before the scroll
+ *     is stale. And run multi-step chains in ONE session: every `openEditor()`
+ *     is a fresh context, so an element created in run N may not be there in
+ *     run N+1.
  *
  *  7. SOME MENU ROWS LEAVE THE EDITOR ENTIRELY. `Site health` and `Activity
  *     log` call `openDashboard(...)` and open a NEW TAB
@@ -54,13 +61,6 @@
  *     two different click mechanisms both looked like no-ops before a popup
  *     listener showed the tab. Listen on `context.on("page", …)` BEFORE
  *     clicking any row that might navigate away. See `clickMenuRow()`.
- *
- *  6. A COORDINATE CLICK OUTSIDE THE VIEWPORT SILENTLY DOES NOTHING. Elements
- *     appended to the end of a page sit below the fold. `scrollIntoView` first,
- *     then re-read the box — `getBoundingClientRect()` from before the scroll
- *     is stale. And run multi-step chains in ONE session: every `openEditor()`
- *     is a fresh context, so an element created in run N may not be there in
- *     run N+1.
  *
  * Never `waitUntil: "networkidle"` against the dev server — the HMR socket
  * never idles.
