@@ -175,3 +175,70 @@ Addendum 1 said the dev overlay was "the real harness blocker". It is *a*
 blocker — it impersonates the inspector on read — but the instance lock is the
 one that makes the click itself a no-op. Both are true; the lock is the reason
 the chain is unreachable.
+
+---
+
+## Addendum 3, 2026-08-25 — the escape hatch the toast names cannot work
+
+Addendum 2 found that instances are locked by construction and said the route
+was "the toast's own escape hatch: unlock it in Layers first". **Walked it. It
+does not work, and it cannot.**
+
+### What was done
+
+Layers rows carry no element id — only `role="treeitem"`, `aria-label="Button,
+button element"` and the text `Button ◇ ⚡`. **The `◇` is the instance marker**
+(the 08-24 record guessed that correctly). Selecting instance rows by `◇` found
+**3**, matching the three inserts, and each carries a
+`button[aria-label="Lock element"]` at x≈337 — not the x-range addendum 2
+guessed, which is why that pass missed it.
+
+Clicked the toggle on the instance row. Then selected the instance on canvas.
+**Still nothing** — inspector empty, no `Font size` input.
+
+### Why it cannot work — two lines
+
+`engine/elements/ElementSerialization.ts:118-127`:
+
+```js
+isLocked(): boolean {
+  return this.getData().locked === true || this.isComponentInstance();
+}
+
+isComponentInstance(): boolean {
+  return !!this.getComposer().components?.findInstanceContainingElement(this.getSelf().getId());
+}
+```
+
+The Layers toggle sets `data.locked` (`Element.ts:153`). Clearing it leaves the
+**second half of the `||` still true**, so `isLocked()` stays true and the
+selection guards keep refusing.
+
+**So the message is a dead end.** *"This element is locked. Unlock it in the
+Layers panel."* points at a control that, for the case that produced the
+message, changes nothing. A user follows the instruction, sees the lock toggle
+flip, tries again, and gets the same toast.
+
+### What this means for F1a
+
+The PRD's F1a — *"style + attr survive a master edit"* — is **not reachable
+through the UI as described**. An instance cannot be selected, and it cannot be
+unlocked. The only route that changes `isComponentInstance()` is **detach**,
+which this record already lists as uncovered and *pro-DS-mode only* — and once
+detached the element is no longer an instance, so "does the override survive a
+master edit" no longer applies to it.
+
+That may be a coherent design (instances are immutable; detach to edit). What is
+not coherent is the toast: it names an escape hatch that cannot open for the
+case that triggers it.
+
+### Status of this leg — closed with an answer, not a walk
+
+The override-survival chain is **not walkable through the UI**. Three sessions
+of probing produced that answer rather than the measurement, and the answer is
+the more useful result: the leg was never blocked by harness trouble, it is
+blocked by the product.
+
+Two things to decide, both product calls:
+1. Should the toast point at **detach** instead of the Layers lock?
+2. Is F1a still a real contract, given nothing in the UI can exercise it?
