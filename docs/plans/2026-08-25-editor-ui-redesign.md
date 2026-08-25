@@ -499,3 +499,49 @@ C is recommended, not required.
 - §5.9 vs `--bk-z-*`: which contract wins, and where the four missing float layers sit. Settled in Phase B (T4), not yet settled.
 - Per-family cost: one family must be estimated end to end before committing to twelve.
 - Whether the FAB survives at all (T6).
+
+---
+
+## Handed in from the flow-walk arc — 2026-08-25 (founder call: this arc owns them)
+
+The flow-walk arc measured these against the live app and the Figma file, and
+the founder ruled that drawing belongs here, not there: a behaviour walk drawing
+into a family this arc is actively redrawing is how the file gets duplicates.
+
+### Three client-review states with no board
+
+`S5.5 · reviewer-view · external-reviewer` (`807:8723`) is the **only**
+client-facing board and draws the active review state only —
+`review-toolbar` / `site-preview` / `review-bottom-bar`. The `S5.2` family is
+**editor-side** (`130:798`, `130:201` both draw `‹ Exit`, the rail, `Publish`
+and the review bar), so it does not cover the client at all.
+
+Walked live and uncovered:
+
+| Client state | Live copy to ground against |
+|---|---|
+| Identity gate | *"Before you start, tell us who you are. This goes on your comments and your approval so your designer knows who said what — it is not an account, and there is no password."* + `Your name` · `The email this link was sent to` · `Look at <site>` |
+| Approved terminal | *"You approved this — Thanks, <workspace> can take it from here. You'll hear from your designer when it goes live."* + `Signed as <name> · <email>` |
+| Changes-requested terminal | *"You asked for changes — Your notes are with your designer. They'll send a new link when the changes are ready for you."* |
+
+Reachable for grounding: mint a token with `issueReviewToken(reviewId, email)`
+and open `/review/<token>` in a session-less context. Record and method:
+`docs/walks/U6-review-and-share.md`.
+
+### One copy divergence to adjudicate while redrawing
+
+`S5.5`'s bottom bar says **"Request changes"**; the shipped surface says
+**"Ask for changes"**. Button copy is UI copy, not board sample data, so the
+precedence rule makes the board binding and the code the side to move. The
+founder chose **not** to change code from the walk arc — fold it into this
+family's pass, or into the U6 defect PR, whichever lands first.
+
+### Context the redraw should know
+
+That third state's copy — *"They'll send a new link"* — is a promise the product
+cannot currently keep: a client can be invited to exactly one review round per
+site, ever (`AquibraStudio.tsx:392` re-sends with `clientEmail: undefined`;
+`ReviewTab.tsx:405` gates the only email form behind `!round`). If that defect
+is fixed the copy stands as drawn; if it is not, the terminal screen should not
+promise a link nothing can send.
+
