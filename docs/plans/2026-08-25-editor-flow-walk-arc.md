@@ -1,7 +1,18 @@
 <!-- /autoplan restore point: /Users/shahg/.gstack/projects/aamirtauqir-buildrik/main-autoplan-restore-20260825-102727.md -->
 # Editor flow walk arc — walk every flow, reconcile the PRD, wire the flows
 
-Status: REVIEWED (autoplan 2026-08-25 — CEO dual voices; both rejected v1)
+Status: **TAIL CLOSED 2026-08-25** — every lane walked, 35 commits, zero changes
+to `packages/editor/src`. Was: REVIEWED (autoplan 2026-08-25 — CEO dual voices;
+both rejected v1).
+
+The four tail lanes closed in the order I recommended when the founder said
+"sare hi karney hein one bue one kar lo apni hi recmanded order ma":
+`U6` `Ask for changes` → `U12` fullpage Settings → `U7`'s eight media surfaces →
+`U3`'s lint rules and export/import. Per-lane results are in the walk records;
+the remaining open legs are listed at the end of
+`docs/walks/_uncovered-backlog.md`. One leg is blocked rather than done — the
+Brand panel's import wedge is the only route to a planted lint violation, so
+`banned-hue` and `pure-black` were never observed firing.
 Date: 2026-08-25 | Branch: `main` | HEAD: `ff7ec317`
 
 Founder ask, binding: run autoplan; walk **every** editor flow except payment
