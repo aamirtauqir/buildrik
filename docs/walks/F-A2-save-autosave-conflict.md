@@ -257,3 +257,65 @@ Two traps avoided, both by checking rather than assuming:
   `textAutoResize: "HEIGHT"`, `truncation: "DISABLED"`, height 26 — the same
   two lines as before, so the height is computed, not cropped.
 
+
+---
+
+## Addendum, 2026-08-25 — the offline-queue leg, walked live
+
+Lane 3 of `docs/plans/2026-08-25-editor-flow-walk-arc.md`. This record's own
+"Not covered by this walk" list named three items; the first — **the offline
+queue's durability across a navigation** — is the P1 entry in
+`docs/walks/_uncovered-backlog.md` and is now exercised.
+
+### The queue cannot survive a navigation, by construction
+
+`SyncRetryQueue` holds `private queue = new Map<string, () => Promise<boolean>>()`
+— a map of **closures in memory** (`syncRetryQueue.ts`). Four domains register
+into it: cms, components, templates, versions. **Never the project.** A
+navigation ends the closures; the local copy survives and the server never
+hears about it. That is not a question a walk can answer differently — it is
+the type.
+
+So the leg that matters is whether the product **warns** before it happens.
+
+### It does. Walked end to end.
+
+Mirror endpoint failed at the network layer (`siteVersions.*` → 503), project
+save deliberately left working — the whole point of the 08-24 guard is a
+**clean project with a full mirror queue**.
+
+| step | observed |
+|---|---|
+| Site menu → **Version history** (`⌃H`) → `+ Save a version`, named | `POST siteVersions.create` fired, blocked 503 |
+| after the failure | panel says **"Retry now, or leave it — a reconnect replays the queue."** with a `Retry now` action — no silent drop |
+| `‹ Exit` | the **stranded dialog** fires: *"…stay on this device and never reach your account."* with `Stay` / `Leave anyway` |
+
+Both guards in `StudioHeader.tsx` are live: `guardNavigation` (`:373`) for
+in-app navigation and the `beforeunload` handler (`:421`). Both call
+`totalPendingMirrors()` **at fire time** rather than reading React state, and
+the reasoning is written out in the source — the count changes from `window`
+callbacks with no render in between, so a state-gated listener would be absent
+exactly when it was needed.
+
+This closes the leg the 08-24 record left open, and confirms the `027c594d`
+fix works against a real blocked mirror rather than a unit stub.
+
+### Observed, NOT filed — inconclusive
+
+The Version History panel's **Milestones** filter listed only `Auto-save … Auto`
+rows and no named milestone. `useAutoMilestone` only *suggests* milestones, it
+does not create them, so autos arguably do not belong under that filter. But
+the fixture had no named milestone before this run, so an empty named list is
+the expected result and the observation cannot distinguish the two. Recorded as
+a question for the `U9`/`F-A6` lane, which has the fixture to settle it. Filing
+it as a defect from this evidence would be guessing.
+
+### Still not covered
+
+The Overwrite branch's "adopt token, re-save" (this record's second item), and
+`HistoryManager`'s 500 ms coalesce / max-100 / checkpoint-every-10 numbers —
+those remain a code-contract reading, not a live observation.
+
+### What this walk did NOT assess
+
+Visual and IA. Behaviour, state and data only.
