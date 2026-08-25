@@ -173,3 +173,47 @@ of its own, so it gets a service-contract test rather than a walk.
 ### What this walk did NOT assess
 
 Visual and IA. Behaviour, state and data only.
+
+---
+
+## F-A8 · Sync fan-out — addendum 2026-08-25
+
+This flow has **no UI of its own**, so it gets a contract verification plus the
+one live exercise that reaches it — stated as that rather than dressed up as a
+walk.
+
+**All four domains register with the shared queue**, each publishing its own
+pending count:
+
+| domain | registration |
+|---|---|
+| cms | `cmsSync.ts:36` — `registerPendingSource("cms", () => queue.pendingCount())` |
+| component | `componentSync.ts:29` |
+| template | `templateSync.ts:27` |
+| version | `versionSync.ts:31` |
+
+`totalPendingMirrors()` (`syncRetryQueue.ts`) sums those readers, and that sum
+is what both exit guards read at fire time (`StudioHeader.tsx:373` and `:421`).
+
+The registry is **keyed by domain name, not a Set of queue instances** — with
+the reason in the source: registering the objects has no removal path, so a dev
+hot-reload would leave an abandoned queue in the registry still reporting
+whatever it held, and the exit guard would warn about work no live queue is
+carrying. Re-registering under the same domain replaces the stale reader.
+
+**Live evidence — the `version` domain, end to end.** The F-A2 lane
+(`docs/walks/F-A2-save-autosave-conflict.md`, same day) blocked
+`siteVersions.*` at the network layer, created a named version, watched the
+mirror fail into the queue, saw the panel surface *"Retry now, or leave it — a
+reconnect replays the queue."*, and then saw the stranded-exit dialog fire on
+`‹ Exit`. That exercises registration → enqueue → user-visible notice →
+`totalPendingMirrors()` → guard, for one of the four domains.
+
+The other three are the same class by construction — they share the queue — but
+they were **not** individually exercised, and this record does not claim they
+were.
+
+### Not walked
+
+`cms`, `component` and `template` mirrors individually; the `'online'` reconnect
+auto-replay (only the manual `Retry now` path was seen).
