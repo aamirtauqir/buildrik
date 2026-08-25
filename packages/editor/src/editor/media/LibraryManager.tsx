@@ -163,6 +163,14 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
     fileInputRef.current?.click();
   }, []);
 
+  /* Assets that never reached the server. Their src is a session Object URL,
+     so they will not render on a published page — which is what the status
+     pill below exists to say. */
+  const localOnlyCount = React.useMemo(
+    () => state.libraryItems.filter((i) => i.localOnly).length,
+    [state.libraryItems],
+  );
+
   const [importUrlOpen, setImportUrlOpen] = React.useState(false);
 
   const handleImportFromUrl = React.useCallback(async (url: string) => {
@@ -425,10 +433,19 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           <div className="mgr-quota-bar">
             <div className="mgr-quota-fill" style={{ width: `${storageUsedPct}%` }} />
           </div>
-          <span className="mgr-sync-pill">
-            <AlertCircle size={10} />
-            This device only
-          </span>
+          {/* This was a hardcoded string. It is the library's only persistent
+              signal for whether assets reached the server, and it said "This
+              device only" unconditionally — so in production, where the blob
+              token is required and assets DO sync, it told every user the
+              opposite of the truth. `localOnly` is a real per-asset flag,
+              persisted to IndexedDB, and `MediaManager` already rebuilds its
+              retry queue by scanning for it. */}
+          {localOnlyCount > 0 && (
+            <span className="mgr-sync-pill">
+              <AlertCircle size={10} />
+              {localOnlyCount} not on the server
+            </span>
+          )}
         </div>
       </div>
       {/* Hidden file input */}

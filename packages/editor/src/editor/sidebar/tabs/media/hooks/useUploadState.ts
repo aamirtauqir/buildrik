@@ -13,6 +13,23 @@ import type { FailedUpload, UploadStateResult } from "../data/mediaTypes";
 
 type ShowToast = (msg: string, type: "success" | "error" | "info" | "warning") => void;
 
+/**
+ * Upload toasts have ONE owner per document.
+ *
+ * `useMediaState` — and through it this hook — is instantiated twice:
+ * `MediaTab.tsx:71` (the 320 rail panel) and `LibraryManager.tsx:65` (the
+ * fullpage manager). Both mount at once, because `Expand Media` opens the
+ * manager while the Media tab is still the active tab. Each instance
+ * subscribed its own handler to the same composer event, so one upload raised
+ * TWO identical toasts — measured 2026-08-25 on the local-only warning, and it
+ * applied to every upload toast, "uploaded ✓" included.
+ *
+ * First instance to mount claims toast duty and releases it on unmount; the
+ * others still track queue + storage, they just do not speak.
+ */
+const toastSpeakers: symbol[] = [];
+
+
 interface ServerQuota {
   usedBytes: number;
   totalBytes: number; // -1 for unlimited
@@ -42,6 +59,15 @@ export function useUploadState(
 
   useEffect(() => {
     recalcStorage();
+
+    /* A registry, not a single owner: the first instance to mount would
+       otherwise release on unmount and leave nobody speaking — the rail panel
+       unmounts when the fullpage manager takes over, which silenced the
+       warning entirely. The head of the live set speaks, so the duty moves
+       when the head goes away. */
+    const me = Symbol("upload-toast-speaker");
+    toastSpeakers.push(me);
+    const speaks = () => toastSpeakers[0] === me;
 
     const onProgress = (payload: unknown) => {
       const p = payload as UploadProgress;
@@ -81,7 +107,7 @@ export function useUploadState(
       // The reason is already computed — say it. This used to claim every
       // failure was an unsupported TYPE, so an oversized JPG was told to
       // upload a JPG.
-      showToast(`${name} — ${reason}`, "error");
+      if (speaks()) showToast(`${name} — ${reason}`, "error");
     };
 
     const onAdded = () => recalcStorage();
@@ -93,6 +119,10 @@ export function useUploadState(
         mimeType?: string;
         asset?: { localOnly?: boolean };
       };
+      if (!speaks()) {
+        recalcStorage();
+        return;
+      }
       if (p?.mimeType?.includes("font")) {
         showToast("Font uploaded! Use it via Text Style → Font → My Fonts", "info");
       } else if (p?.asset?.localOnly) {
@@ -117,6 +147,8 @@ export function useUploadState(
     composer.media.on(MEDIA_EVENTS.UPLOAD_COMPLETE, onComplete);
 
     return () => {
+      const i = toastSpeakers.indexOf(me);
+      if (i !== -1) toastSpeakers.splice(i, 1);
       composer.media.off(MEDIA_EVENTS.UPLOAD_PROGRESS, onProgress);
       composer.media.off(MEDIA_EVENTS.UPLOAD_ERROR, onError);
       composer.media.off(MEDIA_EVENTS.MEDIA_ADDED, onAdded);

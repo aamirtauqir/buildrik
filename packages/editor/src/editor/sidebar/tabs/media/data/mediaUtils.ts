@@ -71,6 +71,7 @@ export function toLibraryItem(asset: MediaAsset): LibraryItem {
     width: asset.width,
     height: asset.height,
     altText: asset.altText,
+    localOnly: asset.localOnly,
     generatedAltMeta: asset.generatedMetadata?.altText,
     createdAt: asset.createdAt,
     mimeType: asset.mimeType,
