@@ -182,8 +182,29 @@ canUndo requires stack >1 (baseline checkpoint protected); depth 100; RAM-only �
 7. Cross-site brand: "Open Shared theme ↗" **link-out to dashboard only** — no push UI in editor (§12 #7).
 
 ### U4 · Component flow
+
+> **⛔ Instances cannot be selected on canvas, and the message that says how to
+> fix that is wrong.** Verified live 2026-08-25 across three sessions
+> (`docs/walks/U4-components.md` addenda 2-3).
+>
+> `ElementSerialization.ts:118-120` —
+> `isLocked() { return this.getData().locked === true || this.isComponentInstance(); }`
+>
+> Every element inside a component instance is locked **by construction**, not
+> by a flag. The three selection guards in `useSelectionBehavior.ts`
+> (`:90`, `:108`, `:136`) refuse the click with *"This element is locked.
+> Unlock it in the Layers panel."* — but the Layers toggle sets `data.locked`
+> (`Element.ts:153`), and clearing it leaves the second half of the `||` true.
+> **Following the instruction cannot work.**
+>
+> Consequence for step 4 below: **F1a is not exercisable through the UI.** The
+> only thing that changes `isComponentInstance()` is `detach` (pro-DS-mode
+> only), after which the element is no longer an instance and the question does
+> not apply. Instances being immutable may be the intent; the toast pointing at
+> a control that cannot open is not.
+
 1. Select subtree → context "Save as component" or rail Components (⇧A; MAX 100).
-2. Instantiate from panel → per-instance overrides stored as `#/` position paths.
+2. Instantiate from panel → per-instance overrides stored as `#/` position paths. **Instances are locked on insert — see the banner above.**
 3. Variant swap via inspector VariantSection; detach = pro-DS-mode only.
 4. Master edit → sync re-applies overrides (style+attr survive — F1a; content/trait disputed; ⛔ reorder survival F1b deferred; ~~⛔ "reset to master"/is-overridden UI dead — path-scheme mismatch `#/` vs `/elements/`~~ — **stale on both halves, verified 2026-08-23**. The button ships: `VariantSection.tsx:142` "Reset to master" → `composer.components.resetInstance()` (`ComponentManager.ts:457`), which is real, awaited and covered by tests written against board 160:2. The path scheme is unified on `#/` and documented as canonical (`ComponentInstance.ts:59,68`). (A first pass of this walk called the feature dead on the strength of `ComponentInstance.resetOverride()` having zero callers. That method IS dead — it resets ONE property override, a finer-grained thing than the shipped button — but a symbol with no callers is not a feature with no door, and the two were conflated. The dead method is a cleanup item, not a broken flow.)).
 5. Masters mirrored via componentSync → siteComponents.*.
