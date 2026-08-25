@@ -71,3 +71,19 @@ customer's site outranks a leg that renders a banner.
 - 2 legs excluded by founder scope.
 
 The P1 block is the walk order for lanes 1-8 of the arc.
+
+---
+
+## Closed 2026-08-25 — the four tail lanes, walked in recommended order
+
+| Lane | Leg | Result |
+|---|---|---|
+| `U6` | `Ask for changes` branch | **Walked.** The branch passes end to end. Three defects came out of it, headed by: a client can be invited to exactly one round per site, ever |
+| `U12` | The 13-section fullpage Settings surface + 180 ms lock + dirty counter + savebar | **Walked.** Door is the `S` shortcut. All 13 render, the lock and counter hold, and the header ✕ drops unsaved edits with no prompt |
+| `U7` | All eight media surfaces | **Walked.** Most work, including several the PRD marked broken. "This device only" is a hardcoded pill and the folder rail is keyboard-unreachable |
+| `U3` | Remaining lint rules · export formats · JSON import conflict strategies | **Walked, one leg blocked.** The import Apply wedges the Brand panel on Import/export, which is also the only route to a planted lint violation — so `banned-hue` and `pure-black` are read in code and never observed firing |
+
+Still open from the P1 table above: `F-A2`'s two legs, `F-A1`'s migration step
+and crash recovery, `F-A7`'s two exclusion guards, `U11`'s last-page protection,
+and `U4`'s override-survival chain (blocked upstream by the instance-selection
+defect, not by the harness).
