@@ -376,3 +376,10 @@ what exists:
   sub-surfaces behind one panel; the walk recorded the rows, not what is behind
   them.
 - **The drill-in depths of Brand** (above) and the populated Content state.
+- **`BL-0169 brand-pro-mode` is captured but unverified.** The Brand panel sits
+  in Basic mode ("Switch to Pro to unlock"), and Pro has no string this walk
+  observed that Basic lacks, so `figma-verify` has no positive marker for it and
+  it is left unguarded rather than guarded with a guess. Worth a look by eye.
+  (Checked separately: the mode does NOT leak between captures — each runs from
+  the same saved storageState, so the Brand states after it captured Basic, as
+  intended.)
