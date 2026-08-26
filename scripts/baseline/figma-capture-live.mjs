@@ -119,6 +119,35 @@ if (ACTIONS_JSON && ACTIONS_JSON !== "none") {
     if (a.click) await page.click(a.click, { timeout: 8000, force: !!a.force }).catch((e) => console.log("click miss:", a.click));
     if (a.press) await page.keyboard.press(a.press);
     if (a.waitMs) await page.waitForTimeout(a.waitMs);
+    /* An action that quietly misses leaves the DEFAULT shell on screen, and the
+       capture then lands under the wanted state's name — a frame that says
+       "panel-brand" showing the Insert drawer. Nothing downstream can tell that
+       apart from a real capture, and the whole point of the CURRENT/SUPERSEDED
+       naming is to stop a dead frame being read as the design. `expect` turns
+       that silent case into a non-zero exit the driver reports as a failure. */
+    if (a.expect || a.expectText) {
+      const ok = await page
+        .waitForFunction(
+          ({ sel, txt }) => {
+            if (sel) {
+              const el = document.querySelector(sel);
+              if (!el) return false;
+              const r = el.getBoundingClientRect();
+              return r.width > 0 && r.height > 0;
+            }
+            return (document.body.innerText || "").includes(txt);
+          },
+          { sel: a.expect || null, txt: a.expectText || null },
+          { timeout: a.expectTimeout ?? 8000 }
+        )
+        .then(() => true)
+        .catch(() => false);
+      if (!ok) {
+        console.log(JSON.stringify({ error: "EXPECT_FAILED", expect: a.expect ?? a.expectText, url: page.url() }));
+        await b.close();
+        process.exit(3);
+      }
+    }
   }
 }
 

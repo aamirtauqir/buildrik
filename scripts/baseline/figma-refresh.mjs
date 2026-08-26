@@ -47,7 +47,7 @@ const RECIPES = [
   { bl: "BL-0102", state: "panel-pages",         supersede: "318:2", actions: [{ openTab: "pages" }] },
   { bl: "BL-0103", state: "panel-media",         supersede: "319:2", actions: [{ openTab: "assets" }] },
   { bl: "BL-0104", state: "panel-content",       supersede: "321:2", actions: [{ openTab: "content" }] },
-  { bl: "BL-0105", state: "panel-brand",         supersede: "322:2", actions: [{ openTab: "design" }] },
+  { bl: "BL-0105", state: "panel-brand",         supersede: "322:2", actions: [{ openTab: "design" }, { expectText: "Brand & shared theme" }] },
   { bl: "BL-0300", state: "panel-ai",            supersede: null,    actions: [{ press: "i" }, { waitMs: 3000 }] },
   { bl: "BL-0220", state: "panel-templates",     supersede: "360:2", actions: [{ press: "t" }, { waitMs: 3000 }] },
   { bl: "BL-0301", state: "panel-components",    supersede: null,    actions: [{ press: "Shift+A" }, { waitMs: 3000 }] },
@@ -75,10 +75,10 @@ const RECIPES = [
 
   /* Second pass — the sub-states behind a panel or a menu row. Every door here
      was opened by hand in the module walk first; none is guessed from a name. */
-  { bl: "BL-0122", state: "site-menu-open",       supersede: "87:2",  actions: [{ click: 'button[aria-label="Site menu"]' }, { waitMs: 2000 }] },
+  { bl: "BL-0122", state: "site-menu-open",       supersede: "87:2",  actions: [{ click: 'button[aria-label="Site menu"]' }, { waitMs: 2000 }, { expectText: "Keyboard shortcuts" }] },
   { bl: "BL-0107", state: "comments-open",        supersede: "329:2", actions: [{ click: 'button[aria-label^="Comments"]' }, { waitMs: 2500 }] },
   { bl: "BL-0108", state: "notifications-open",   supersede: "326:2", actions: [{ click: 'button[aria-label^="Notifications"]' }, { waitMs: 2500 }] },
-  { bl: "BL-0111", state: "cmdk-open",            supersede: "328:2", actions: [{ press: "Meta+k" }, { waitMs: 2500 }] },
+  { bl: "BL-0111", state: "cmdk-open",            supersede: "328:2", actions: [{ press: "Meta+k" }, { waitMs: 2500 }, { expectText: "navigate" }] },
   { bl: "BL-0106", state: "publish-panel",        supersede: "71:2",  actions: [{ click: 'button[aria-label="Site menu"]' }, { waitMs: 1500 }, { click: 'role=menuitem[name=/Publish panel/]' }, { waitMs: 3500 }] },
   { bl: "BL-0114", state: "sitemenu-publish-history", supersede: "79:2", actions: [{ click: 'button[aria-label="Site menu"]' }, { waitMs: 1500 }, { click: 'role=menuitem[name=/Publish history/]' }, { waitMs: 3500 }] },
   { bl: "BL-0115", state: "sitemenu-export-code", supersede: "80:2",  actions: [{ click: 'button[aria-label="Site menu"]' }, { waitMs: 1500 }, { click: 'role=menuitem[name=/Export code/]' }, { waitMs: 3500 }] },
@@ -87,12 +87,12 @@ const RECIPES = [
   { bl: "BL-0120", state: "sitemenu-invite-teammates", supersede: "85:2", actions: [{ click: 'button[aria-label="Site menu"]' }, { waitMs: 1500 }, { click: 'role=menuitem[name=/Invite teammates/]' }, { waitMs: 3500 }] },
   { bl: "BL-0121", state: "sitemenu-keyboard-shortcuts", supersede: "86:2", actions: [{ click: 'button[aria-label="Site menu"]' }, { waitMs: 1500 }, { click: 'role=menuitem[name=/Keyboard shortcuts/]' }, { waitMs: 3500 }] },
 
-  { bl: "BL-0161", state: "media-fullpage-library", supersede: "120:2", actions: [{ openTab: "assets" }, { click: 'button[aria-label="Expand Media"]' }, { waitMs: 4000 }] },
+  { bl: "BL-0161", state: "media-fullpage-library", supersede: "120:2", actions: [{ openTab: "assets" }, { click: 'button[aria-label="Expand Media"]' }, { waitMs: 4000 }, { expect: 'button[aria-label="List view"]:not([disabled])' }] },
   /* The drawer's List view is disabled, so this state is only reachable from
      the full-page library — and the drawer's dead buttons are still in the DOM
      behind it and come first, so the enabled one must be named by position. */
   { bl: "BL-0162", state: "media-list-view",      supersede: "121:2", actions: [{ openTab: "assets" }, { click: 'button[aria-label="Expand Media"]' }, { waitMs: 4000 }, { click: 'button[aria-label="List view"]:not([disabled])' }, { waitMs: 2500 }] },
-  { bl: "BL-0159", state: "media-stock-browser",  supersede: "118:2", actions: [{ openTab: "assets" }, { click: 'button:has-text("Stock")' }, { waitMs: 3500 }] },
+  { bl: "BL-0159", state: "media-stock-browser",  supersede: "118:2", actions: [{ openTab: "assets" }, { expectText: "Drag files or click to browse" }, { click: 'button:has-text("Stock")' }, { waitMs: 3500 }] },
   { bl: "BL-0160", state: "media-icon-picker",    supersede: "119:2", actions: [{ openTab: "assets" }, { click: 'button:has-text("Icons")' }, { waitMs: 3500 }] },
 
   { bl: "BL-0164", state: "pages-add-page",       supersede: "123:2", actions: [{ openTab: "pages" }, { click: 'button[aria-label="Add new page"]' }, { waitMs: 3000 }] },
@@ -101,10 +101,10 @@ const RECIPES = [
   { bl: "BL-0163", state: "pages-context-menu",   supersede: "122:2", actions: [{ openTab: "pages" }, { rightClick: 'role=treeitem[name=/About/]' }, { waitMs: 2500 }] },
   { bl: "BL-0168", state: "layers-context-menu",  supersede: "128:2", actions: [{ openTab: "layers" }, { rightClick: '.ls-panel [role=treeitem] >> nth=1' }, { waitMs: 2500 }] },
 
-  { bl: "BL-0169", state: "brand-pro-mode",       supersede: "129:2", actions: [{ openTab: "design" }, { click: 'button:has-text("Full power")' }, { waitMs: 3000 }] },
-  { bl: "BL-0171", state: "brand-starter-themes", supersede: "271:2", actions: [{ openTab: "design" }, { click: 'button:has-text("Starters")' }, { waitMs: 3500 }] },
+  { bl: "BL-0169", state: "brand-pro-mode",       supersede: "129:2", actions: [{ openTab: "design" }, { expectText: "Brand & shared theme" }, { click: 'button:has-text("Full power")' }, { waitMs: 3000 }] },
+  { bl: "BL-0171", state: "brand-starter-themes", supersede: "271:2", actions: [{ openTab: "design" }, { expectText: "Brand & shared theme" }, { click: 'button:has-text("Starters")' }, { waitMs: 3500 }] },
   { bl: "BL-0174", state: "brand-components-tab", supersede: "132:2", actions: [{ openTab: "design" }, { click: 'button:has-text("Components")' }, { waitMs: 3500 }] },
-  { bl: "BL-0175", state: "content-create-collection", supersede: "133:2", actions: [{ openTab: "content" }, { click: 'button:has-text("Create a collection")' }, { waitMs: 3500 }] },
+  { bl: "BL-0175", state: "content-create-collection", supersede: "133:2", actions: [{ openTab: "content" }, { expectText: "Collections turn a spreadsheet into pages" }, { click: 'button:has-text("Create a collection")' }, { waitMs: 3500 }] },
   { bl: "BL-0217", state: "canvas-cheat-sheet",   supersede: "340:2", actions: [{ click: 'button[aria-label*="hortcut"]' }, { waitMs: 2500 }] },
   { bl: "BL-0306", state: "canvas-context-menu",  supersede: null,    actions: [{ selectType: "heading" }, { waitMs: 1200 }, { rightClick: '[data-buildrick-type="heading"]' }, { waitMs: 2500 }] },
 ];
