@@ -64,3 +64,4 @@ packages/dashboard/.gstack/
 # untracked is a secret one `git add -A` away from history.
 .env*.bak*
 .env.local.bak-*
+.walk/
