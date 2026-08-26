@@ -116,6 +116,44 @@ Friendly / Full-power mode switch, then drill-in rows: Tokens 4, Presets 18,
 Starters 6, Classes, Components, Typography, Colour mode, Lint 2, Import/export.
 `Discard` and `Apply Changes` are disabled with no pending edit — correct.
 
+**All nine drill-ins walked** (`scripts/baseline/brand-walk.mjs`). Every one
+opens, every one has a back door, none mutated the site (52 elements before and
+after each), no console errors:
+
+| Drill-in | What is behind it |
+|---|---|
+| Tokens | 15 token families — color 4, the rest 0 |
+| Presets | 11 component presets, 18 variants (Button 3, Card 2, Link 2, Badge 2, Alert 2, Layout 2, and 5 with one each) |
+| Starters | 6 themes — Buildrik Default, Stripe Blue, Notion Warm, Apple Minimal, Linear Dark, Vercel Mono, over the warning "Applying a starter overwrites your tokens" |
+| Classes | `.btn` used 5×, `.buildrick-page-root` used 3×, `.container` used 2× |
+| Components | 14 components, 34 controls |
+| Typography | ACTIVE FONTS — Inter Display 2 weights, Inter Body 1 weight, Geist Mono not used yet |
+| Colour mode | Light / Dark, and 17 tokens under "NO DARK VALUE", each offering Set |
+| Lint | 2 failures |
+| Import / export | dark strategy (media-query / data-attr / off), CSS + JSON + Tailwind + Figma exports |
+
+Three of these have few *controls* (Classes, Typography and Lint have 5 each)
+because they are read-only reports, not editors. That is not an empty panel.
+
+**Gap — an engine-internal class is listed as one of the user's.** Brand →
+Classes offers `.buildrick-page-root` beside `.btn` and `.container`. That class
+is not the user's: the engine writes it onto every page root
+(`PageManager.ts:74`, `HTMLParser.ts:75`, `RecoveryManager.ts:184`) and styles
+it in `Canvas.css` and `site-content.css`. It reads as something the customer
+authored and might edit or remove.
+
+**Still true from 2026-08-19 — the shipped palette fails its own linter.** Lint
+reports exactly two: `color-accent` and `color-success`, both "Fails WCAG AA on
+the page background". The panel is straight about its limits: *"Auto-fix isn't
+available yet — the linter reports what is wrong, not what to replace it with.
+Edit the token in Tokens."*
+
+**Not a gap, checked:** the 17 tokens with no dark value are simply unset on a
+site nobody has themed, and the exporter handles that correctly —
+`CSSBundler.ts:79` emits the dark block only `if (darkColorLines.length > 0)`,
+so choosing a dark strategy with nothing set produces no empty `@media
+(prefers-color-scheme: dark)` block.
+
 ### AI (`I`) — 7 controls, 1 disabled
 Scope selector ("Whole page"), prompt box, Send (disabled while empty —
 correct), three suggestion chips, and "✦ Draft a new section from a brief".
