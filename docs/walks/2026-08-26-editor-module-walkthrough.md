@@ -320,14 +320,29 @@ not.
 
 The visible consequence today is in the design file. html-to-design builds
 Figma frames from the DOM box tree, so a capture of the editor with the menu
-open contains no menu, even though the capture script's own `PRE-CAPTURE` line
-reports it open at the moment of capture. Frame `473:2` is named
-`BL-0109 … site-menu-open … — CURRENT 2026-08-23` and holds no menu; `481:2` is
+open renders without it, even though the capture script's own `PRE-CAPTURE`
+line reports the menu open at the moment of capture. Frame `473:2` is named
+`BL-0109 … site-menu-open … — CURRENT 2026-08-23` and shows no menu; `481:2` is
 named `cmdk-open … CURRENT 2026-08-23 (first capture with the palette actually
-open)` and holds no palette. The assertion lives in the frame NAME, which is
-worse than an empty frame — it tells the next reader the surface was checked.
-`scripts/baseline/figma-verify.mjs` now checks frame CONTENT and renames these
-to `CAPTURE INCOMPLETE` with the reason.
+open)`. The assertion lives in the frame NAME, which is worse than an empty
+frame — it tells the next reader the surface was checked.
+
+**This is specific to the topbar menu, not to overlays.** Every overlay that
+lives inside the 732px drawer captures correctly, verified marker by marker:
+
+| Frame | State | Marker found |
+|---|---|---|
+| `597:2` | media-stock-browser | "Stock photos" |
+| `601:2` | media-icon-picker | "categories" |
+| `602:2` | pages-more-add-options | "From template" |
+| `606:2` | pages-context-menu | "Copy link" |
+| `608:2` | layers-context-menu | "Group selection" |
+
+An earlier draft of this section generalised the site-menu failure into
+"popovers do not capture". They do. The one that does not is the one built
+inside a box eleven times shorter than itself.
+`scripts/baseline/figma-verify.mjs` checks frame CONTENT and renames the
+failure to `CAPTURE INCOMPLETE` with its reason.
 
 ---
 
