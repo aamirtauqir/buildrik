@@ -3094,10 +3094,10 @@
       "viewport": "1440x900",
       "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
       "requires": "session",
-      "pipelineState": "readback-verified",
+      "pipelineState": "captured-current",
       "screenshotHash": "b3c38568d0e9b428",
-      "capturedFrom": "prod@f7b39a4c",
-      "figmaNodeId": "124:2",
+      "capturedFrom": "localhost@2026-08-26",
+      "figmaNodeId": "628:2",
       "figmaPageId": "75:2"
     },
     {
@@ -3163,7 +3163,7 @@
       "pipelineState": "captured-current",
       "screenshotHash": "4ecf169ad1c3b727",
       "capturedFrom": "localhost@2026-08-26",
-      "figmaNodeId": "610:2",
+      "figmaNodeId": "645:2",
       "figmaPageId": "75:2"
     },
     {
@@ -3176,10 +3176,10 @@
       "viewport": "1440x900",
       "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
       "requires": "session",
-      "pipelineState": "readback-verified",
+      "pipelineState": "captured-current",
       "screenshotHash": "da4e287ce998449d",
-      "capturedFrom": "prod@f7b39a4c",
-      "figmaNodeId": "130:2",
+      "capturedFrom": "localhost@2026-08-26",
+      "figmaNodeId": "632:2",
       "figmaPageId": "75:2",
       "notes": "REDRAWN 2026-08-19 (drift 15.38%). Drawer subtree rebuilt from the measured live DOM through measure-region.mjs → pack-measure.mjs → a use_figma interpreter; 95.83% pixel agreement against the reference render. Shell band left as drawn per the founder call. Note: token names in Geist Mono, and the CSS-uppercased summary label."
     },
@@ -3210,9 +3210,11 @@
       "viewport": "1440x900",
       "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
       "requires": "session",
-      "pipelineState": "blocked",
+      "pipelineState": "captured-current",
       "blockReason": "same as BL-0171",
-      "notes": "BLOCKED (reason established 2026-08-18): NEXT_PUBLIC_FEATURE_DS_AI is unset, so the Brand panel's AI entry points do not render at all — there is no state to capture. Setting only VITE_FEATURE_DS_AI does NOT help: the shipping editor is the Next-bundled one, where import.meta.env.VITE_* does not exist. Set the NEXT_PUBLIC_ half, restart, then capture."
+      "notes": "BLOCKED (reason established 2026-08-18): NEXT_PUBLIC_FEATURE_DS_AI is unset, so the Brand panel's AI entry points do not render at all — there is no state to capture. Setting only VITE_FEATURE_DS_AI does NOT help: the shipping editor is the Next-bundled one, where import.meta.env.VITE_* does not exist. Set the NEXT_PUBLIC_ half, restart, then capture.",
+      "figmaNodeId": "640:2",
+      "capturedFrom": "localhost@2026-08-26"
     },
     {
       "id": "BL-0173",
@@ -3226,8 +3228,8 @@
       "requires": "session",
       "pipelineState": "captured-current",
       "screenshotHash": "b95a33856d766833",
-      "capturedFrom": "localhost@2026-08-22",
-      "figmaNodeId": "426:2",
+      "capturedFrom": "localhost@2026-08-26",
+      "figmaNodeId": "630:2",
       "figmaPageId": "75:2",
       "notes": "REDRAWN 2026-08-19 (drift 12.43%). Drawer subtree rebuilt from the measured live DOM through measure-region.mjs → pack-measure.mjs → a use_figma interpreter; 97.35% pixel agreement against the reference render. Shell band left as drawn per the founder call. Note: the row this frame is named after is labelled Presets in the app now."
     },
@@ -4062,9 +4064,9 @@
       "viewport": "1440x900",
       "requires": "session",
       "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
-      "figmaNodeId": "471:2",
+      "figmaNodeId": "635:2",
       "pipelineState": "captured-current",
-      "capturedFrom": "localhost@2026-08-23"
+      "capturedFrom": "localhost@2026-08-26"
     },
     {
       "id": "BL-0300",

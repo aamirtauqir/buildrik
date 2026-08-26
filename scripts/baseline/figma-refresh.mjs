@@ -105,12 +105,42 @@ const RECIPES = [
   { bl: "BL-0163", state: "pages-context-menu",   supersede: "122:2", actions: [{ openTab: "pages" }, { rightClick: 'role=treeitem[name=/About/]' }, { waitMs: 2500 }] },
   { bl: "BL-0168", state: "layers-context-menu",  supersede: "128:2", actions: [{ openTab: "layers" }, { rightClick: '.ls-panel [role=treeitem] >> nth=1' }, { waitMs: 2500 }] },
 
-  { bl: "BL-0169", state: "brand-pro-mode",       supersede: "129:2", actions: [{ openTab: "design" }, { expectText: "Brand & shared theme" }, { click: 'button:has-text("Full power")' }, { waitMs: 3000 }] },
+  /* The mode control is a single "Pro" toggle (aria-checked), not the
+     "Friendly / Full power" pair an earlier reading of the panel reported —
+     clicking "Full power" matched nothing and the capture came out in BASIC,
+     replacing a correct 08-23 board with a wrong one. Verified live: clicking
+     Pro flips aria-checked to true and drops the "Basic mode hides…" notice. */
+  { bl: "BL-0169", state: "brand-pro-mode",       supersede: "129:2",
+    actions: [{ openTab: "design" }, { expectText: "Brand & shared theme" },
+              /* The control's TEXT is "Pro"; it carries no aria-label, so an
+                 attribute selector misses it. The mode itself is marked by what
+                 DISAPPEARS, which expectText cannot express — figma-verify's
+                 notText check on this id is what proves the capture. */
+              { click: '.ls-panel button:text-is("Pro")' }, { waitMs: 3500 }] },
   { bl: "BL-0171", state: "brand-starter-themes", supersede: "271:2", actions: [{ openTab: "design" }, { expectText: "Brand & shared theme" }, { click: 'button:has-text("Starters")' }, { waitMs: 3500 }] },
   { bl: "BL-0174", state: "brand-components-tab", supersede: "132:2", actions: [{ openTab: "design" }, { click: 'button:has-text("Components")' }, { waitMs: 3500 }] },
   { bl: "BL-0175", state: "content-create-collection", supersede: "133:2", actions: [{ openTab: "content" }, { expectText: "Collections turn a spreadsheet into pages" }, { click: 'button:has-text("Create a collection")' }, { waitMs: 3500 }] },
   { bl: "BL-0217", state: "canvas-cheat-sheet",   supersede: "340:2", actions: [{ click: 'button[aria-label*="hortcut"]' }, { waitMs: 2500 }] },
   { bl: "BL-0306", state: "canvas-context-menu",  supersede: null,    actions: [{ selectType: "heading" }, { waitMs: 1200 }, { rightClick: '[data-buildrick-type="heading"]' }, { waitMs: 2500 }] },
+
+  /* Third pass — the states the first two left on an older capture. Doors
+     walked by hand first, as always. BL-0172 (brand-ai-assist) is NOT here:
+     its surface is gated behind NEXT_PUBLIC_FEATURE_DS_AI, which is unset, so
+     there is nothing to photograph in this environment. */
+  { bl: "BL-0165", state: "pages-listings-view", supersede: "124:2", actions: [{ openTab: "pages" }, { click: 'button:has-text("Listings")' }, { waitMs: 3000 }, { expectText: "SCORE" }] },
+  { bl: "BL-0173", state: "brand-presets",       supersede: "426:2", actions: [{ openTab: "design" }, { expectText: "Brand & shared theme" }, { click: 'button:has-text("Presets")' }, { waitMs: 3000 }, { expectText: "variants" }] },
+  { bl: "BL-0170", state: "brand-colour-mode",   supersede: "130:2", actions: [{ openTab: "design" }, { expectText: "Brand & shared theme" }, { click: 'button:has-text("Colour mode")' }, { waitMs: 3000 }, { expectText: "NO DARK VALUE" }] },
+  /* BL-0172 has never had a frame. Its CTA is NOT gated by
+     NEXT_PUBLIC_FEATURE_DS_AI — only the client behind it is — so the modal
+     opens with the flag unset and Generate answers "AI service not
+     configured". Opening it is safe; nothing here submits a prompt. */
+  { bl: "BL-0172", state: "brand-ai-assist",     supersede: null,
+    actions: [{ openTab: "design" }, { expectText: "Brand & shared theme" },
+              { click: 'button:has-text("Components")' }, { waitMs: 3000 },
+              { click: "[data-open-ai-assist]" }, { waitMs: 3000 },
+              { expectText: "Generate component with AI" }] },
+  { bl: "BL-0235", state: "view-mode (?view=readonly)", supersede: "471:2",
+    path: `/edit/${SITE}?view=readonly`, actions: [{ expectText: "Back to editing" }] },
 ];
 
 const args = process.argv.slice(2);
@@ -154,7 +184,9 @@ async function captureOne(rec) {
 
   execFileSync(
     "node",
-    [join(HERE, "figma-capture-live.mjs"), captureId, PATH_, "15000", JSON.stringify(rec.actions)],
+    /* A few states are a URL, not a click — view mode is reached by a query
+       parameter and has no door inside the editor. */
+    [join(HERE, "figma-capture-live.mjs"), captureId, rec.path ?? PATH_, "15000", JSON.stringify(rec.actions)],
     { env: { ...process.env, BK_STATE: STATE }, encoding: "utf8", timeout: 300000, stdio: "pipe" }
   );
 

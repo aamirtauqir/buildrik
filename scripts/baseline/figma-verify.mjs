@@ -44,6 +44,14 @@ const VISUAL_FAIL = {
   "BL-0122": "the menu's text nodes are present but clipped — it is built inside the topbar's 56px header, not portaled",
 };
 
+/* States whose SURFACE no longer exists. Not a bad capture — a board for
+   something the product retired, which is worse than a blank frame because the
+   name asserts the surface is current. Marked RETIRED, never deleted. */
+const RETIRED = {
+  "BL-0164": "the + Add page button creates a page immediately — there is no add-page dialog to board",
+  "BL-0233": "?view=client was renamed to ?view=readonly on 2026-08-23 and nothing sets it; this frame is the ordinary editor",
+};
+
 const EXPECT = {
   "BL-0122": { text: "Keyboard shortcuts", why: "the site menu is not portaled — it renders inside the topbar's 56px header" },
   "BL-0111": { text: "navigate",           why: "the command palette did not survive the capture" },
@@ -72,6 +80,9 @@ const EXPECT = {
   /* Four BL ids describe the Publish PANEL (not the confirm modal, which is
      BL-0176). Its own marker is the deploy summary. BL-0219 fails this: that
      frame shows the Insert panel while claiming to be publish-open. */
+  /* Pro mode is marked by what is GONE — Basic carries the "Basic mode hides…"
+     notice and Pro does not, and every row Pro adds is data-dependent. */
+  "BL-0169": { notText: "Basic mode hides", why: "this frame is the Brand panel in BASIC mode, not Pro" },
   "BL-0106": { text: "Since last deploy",  why: "the publish panel was not open" },
   "BL-0219": { text: "Since last deploy",  why: "this frame shows the Insert panel, not a publish surface" },
   "BL-0221": { text: "Since last deploy",  why: "the publish panel was not open" },
@@ -102,14 +113,15 @@ const run = async (code, description, id) => {
    frame's characters blew past the MCP response cap and truncated the JSON
    mid-array — the read failed on payload size, not on anything about the file. */
 const frames = await run(
-  `const EXPECT = ${JSON.stringify(Object.fromEntries(Object.entries(EXPECT).map(([k, v]) => [k, v.text])))};
+  `const EXPECT = ${JSON.stringify(Object.fromEntries(Object.entries(EXPECT).map(([k, v]) => [k, { text: v.text ?? null, notText: v.notText ?? null }])))};
    const p = figma.root.children.find(x => x.id === "${EDITOR_PAGE}");
    if (p.children.length === 0) await p.loadAsync();
    const out = [];
    for (const f of p.children) {
      const bl = (f.name.match(/^(BL-\\d+)/) || [])[1];
      let has = null;
-     const want = bl && EXPECT[bl];
+     const spec = bl && EXPECT[bl];
+     const want = spec && (spec.text || spec.notText);
      if (want) {
        let found = false;
        /* Depth 9 was not enough: html-to-design nests a captured screen far
@@ -120,7 +132,7 @@ const frames = await run(
          if (n.type === "TEXT" && n.characters && n.characters.toLowerCase().includes(want.toLowerCase())) { found = true; return; }
          if (n.children) for (const c of n.children) walk(c, d + 1); };
        walk(f, 0);
-       has = found;
+       has = spec.notText ? !found : found;
      }
      /* One annotation frame carries a 900-character name; with 174 frames the
         payload blew the MCP cap again and the read failed as a parse error.
@@ -156,6 +168,14 @@ for (const [bl, list] of byBl) {
     }
   }
 
+  if (RETIRED[bl]) {
+    const cur = list.find((f) => /— CURRENT/.test(f.name));
+    if (cur) renames.push({ id: cur.id, from: cur.name,
+      to: cur.name.replace(/ — CURRENT [0-9-]+.*$/, "") + ` — RETIRED ${TODAY} (${RETIRED[bl]})`,
+      reason: "boards a surface the product no longer has" });
+    continue;
+  }
+
   const exp = EXPECT[bl];
   if (!exp) continue;
   const winner = (currents.length ? currents : list).find((f) => /— CURRENT/.test(f.name)) || null;
@@ -164,7 +184,7 @@ for (const [bl, list] of byBl) {
   if (winner.has === false || VISUAL_FAIL[bl]) {
     contentFails++;
     const why = VISUAL_FAIL[bl] ?? exp.why;
-    renames.push({ id: winner.id, from: winner.name, to: winner.name.replace(/ — CURRENT [0-9-]+.*$/, "") + ` — CAPTURE INCOMPLETE ${TODAY} (${why})`, reason: VISUAL_FAIL[bl] ? "renders without its overlay" : `missing "${exp.text}"` });
+    renames.push({ id: winner.id, from: winner.name, to: winner.name.replace(/ — CURRENT [0-9-]+.*$/, "") + ` — CAPTURE INCOMPLETE ${TODAY} (${why})`, reason: VISUAL_FAIL[bl] ? "renders without its overlay" : exp.notText ? `still shows "${exp.notText}"` : `missing "${exp.text}"` });
   }
 }
 

@@ -522,6 +522,42 @@ to point at), so it names them rather than leaving them silent. Two stand today:
 
 ---
 
+## The states the first refresh left behind
+
+All of them are now captured, and two are worth their own note.
+
+**`BL-0172 brand-ai-assist` had never had a frame, and the reason it "could
+not" was wrong.** The surface looked gated behind `NEXT_PUBLIC_FEATURE_DS_AI`,
+which is unset. The flag gates one thing — `useComposerInit.ts:126` builds a
+`ComponentSchemaAIClient` or `null` — and does **not** gate the entry point.
+The "✨ Generate with AI" CTA in Brand → Components renders and is *enabled*
+with the flag off (`disabled: false`, measured), and clicking it opens
+"Generate component with AI" with a prompt box, Cancel and Generate. Pressing
+Generate is handled: `AIPromptModal.tsx:74` answers *"AI service not
+configured"* rather than failing into the client. Captured; nothing submitted a
+prompt.
+
+**`BL-0169 brand-pro-mode` — a board this session broke and then fixed.** The
+recipe clicked `button:has-text("Full power")`, from an earlier reading of the
+panel that reported a "Friendly / Full power" pair. There is no such control:
+the mode is a single **`Pro`** toggle carrying `aria-checked`, with no
+aria-label, so the click matched nothing, the capture came out in **Basic**, and
+it superseded `423:2` — the correct 2026-08-23 board — with a wrong one.
+
+Caught by comparing the old and new frames for a marker Basic has and Pro does
+not (`"Basic mode hides what you cannot edit yet"`): the 08-23 frame lacked it,
+mine carried it. Re-captured against the real toggle — verified live that it
+flips `aria-checked` to `true` and drops the notice — and `figma-verify` gained
+a `notText` check so this specific board can never pass while it is still in
+Basic. It reports `still shows "Basic mode hides"` when it is.
+
+The other four were straightforward: `BL-0165 pages-listings-view` (a
+PAGE / TITLE / DESC / SCORE table — all four pages score **45** with a missing
+description), `BL-0173 brand-presets`, `BL-0170 brand-colour-mode`, and
+`BL-0235 view-mode` via `?view=readonly`.
+
+---
+
 ## What this walk did NOT cover
 
 Saying so plainly, because the count of what was walked is not the count of
