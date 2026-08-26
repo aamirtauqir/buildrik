@@ -35,6 +35,15 @@ const WRITE = process.argv.includes("--write");
 
 /* Only states whose expected copy this walk actually READ off the live surface.
    A guessed string fails a working capture, which is the same lie inverted. */
+/* Text presence is NOT sufficient for a popover. The site-menu capture holds
+   every menu string as real text nodes and still renders as the plain shell:
+   the menu is built inside the topbar's 56px <header>, so html-to-design
+   creates the nodes and the parent frame's bounds clip them. Only looking at
+   the rendered frame catches that, so these are listed from an actual look. */
+const VISUAL_FAIL = {
+  "BL-0122": "the menu's text nodes are present but clipped — it is built inside the topbar's 56px header, not portaled",
+};
+
 const EXPECT = {
   "BL-0122": { text: "Keyboard shortcuts", why: "the site menu is not portaled — it renders inside the topbar's 56px header" },
   "BL-0111": { text: "navigate",           why: "the command palette did not survive the capture" },
@@ -45,12 +54,12 @@ const EXPECT = {
   "BL-0176": { text: "Publish this site",  why: "the modal did not survive the capture" },
   "BL-0105": { text: "Brand & shared",     why: "the Brand panel was not open" },
   "BL-0300": { text: "Scope",              why: "the AI panel was not open" },
-  "BL-0301": { text: "components found",   why: "the Components panel was not open" },
+  "BL-0301": { text: "YOUR COMPONENTS",    why: "the Components panel was not open" },
   "BL-0113": { text: "Version History",    why: "the Version History panel was not open" },
   "BL-0218": { text: "Compare with approved", why: "the Review panel was not open" },
   "BL-0220": { text: "PAGE TEMPLATES",     why: "the Templates panel was not open" },
   "BL-0101": { text: "layers",             why: "the Layers panel was not open" },
-  "BL-0103": { text: "Drag files or click", why: "the Media panel was not open" },
+  "BL-0103": { text: "dining-room",       why: "the Media panel was not open" },   /* an asset label: the search box is a placeholder, which is not a TEXT node */
   "BL-0104": { text: "Collections turn",   why: "the Content panel was not open" },
 };
 
@@ -64,20 +73,34 @@ const run = async (code, description, id) => {
   return JSON.parse(m[0]);
 };
 
+/* The check runs INSIDE Figma and returns verdicts, not text. Returning each
+   frame's characters blew past the MCP response cap and truncated the JSON
+   mid-array — the read failed on payload size, not on anything about the file. */
 const frames = await run(
-  `const p = figma.root.children.find(x => x.id === "${EDITOR_PAGE}");
+  `const EXPECT = ${JSON.stringify(Object.fromEntries(Object.entries(EXPECT).map(([k, v]) => [k, v.text])))};
+   const p = figma.root.children.find(x => x.id === "${EDITOR_PAGE}");
    if (p.children.length === 0) await p.loadAsync();
    const out = [];
    for (const f of p.children) {
-     const texts = [];
-     const walk = (n, d) => { if (d > 9 || texts.length > 400) return;
-       if (n.type === "TEXT" && n.characters) texts.push(n.characters);
-       if (n.children) for (const c of n.children) walk(c, d + 1); };
-     walk(f, 0);
-     out.push({ id: f.id, name: f.name, text: texts.join(" | ").slice(0, 4000) });
+     const bl = (f.name.match(/^(BL-\\d+)/) || [])[1];
+     let has = null;
+     const want = bl && EXPECT[bl];
+     if (want) {
+       let found = false;
+       /* Depth 9 was not enough: html-to-design nests a captured screen far
+          deeper than that, and the AI panel — visually confirmed present in
+          521:2 — came back "missing". A shallow walk fails a good capture,
+          which is the same lie as passing a bad one. */
+       const walk = (n, d) => { if (found || d > 40) return;
+         if (n.type === "TEXT" && n.characters && n.characters.toLowerCase().includes(want.toLowerCase())) { found = true; return; }
+         if (n.children) for (const c of n.children) walk(c, d + 1); };
+       walk(f, 0);
+       has = found;
+     }
+     out.push({ id: f.id, name: f.name, has });
    }
    return out;`,
-  "read every editor frame with its text", 70
+  "verify frame contents", 70
 );
 
 const byBl = new Map();
@@ -110,9 +133,10 @@ for (const [bl, list] of byBl) {
   const winner = (currents.length ? currents : list).find((f) => /— CURRENT/.test(f.name)) || null;
   if (!winner) continue;
   checked++;
-  if (!winner.text.toLowerCase().includes(exp.text.toLowerCase())) {
+  if (winner.has === false || VISUAL_FAIL[bl]) {
     contentFails++;
-    renames.push({ id: winner.id, from: winner.name, to: winner.name.replace(/ — CURRENT [0-9-]+.*$/, "") + ` — CAPTURE INCOMPLETE ${TODAY} (${exp.why})`, reason: `missing "${exp.text}"` });
+    const why = VISUAL_FAIL[bl] ?? exp.why;
+    renames.push({ id: winner.id, from: winner.name, to: winner.name.replace(/ — CURRENT [0-9-]+.*$/, "") + ` — CAPTURE INCOMPLETE ${TODAY} (${why})`, reason: VISUAL_FAIL[bl] ? "renders without its overlay" : `missing "${exp.text}"` });
   }
 }
 
