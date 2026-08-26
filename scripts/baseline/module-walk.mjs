@@ -48,7 +48,10 @@ const TABS = [
 ];
 
 const args = process.argv.slice(2);
-const only = (args[args.indexOf("--only") + 1] || "").split(",").filter(Boolean);
+/* `indexOf` returns -1 when the flag is absent, so `args[-1 + 1]` reads
+   args[0] — with only `--dry` passed, every recipe was filtered out and the
+   run reported "0 states to refresh". Only read the value if the flag is there. */
+const only = args.includes("--only") ? (args[args.indexOf("--only") + 1] || "").split(",").filter(Boolean) : [];
 const OUT = args.includes("--out") ? args[args.indexOf("--out") + 1] : join(HERE, "..", "..", ".walk", "modules");
 
 /* Scrape the panel, not the window. The rail sits at x<64 and the topbar at
