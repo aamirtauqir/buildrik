@@ -140,12 +140,21 @@ restorable, then Cancel and **Publish now**. `sites.prePublishChecks` returns
 `ready: true` with 3 passes and 3 warnings. No publish was fired; all three job
 tables were checked and stayed at zero rows.
 
-**Gap — the confirm modal's rows have no horizontal padding.** Panel box is
-`[500, 321, 440, 259]`. The labels start at `x=500` — the panel's own left
-edge — and the values end at `x=940`, its right edge. The title and the footer
-buttons are inset normally, so the four information rows are the only band that
-sits flush, and long values ("The last 20 versions stay restorable") touch the
-border.
+**Gap — the confirm modal's rows have no horizontal inset.** Measured against
+the modal panel itself (not the scrim — that mistake measures everything
+against 1440), every one of the four rows sits flush on both sides:
+
+| Row | label inset from left | value inset from right |
+|---|---|---|
+| Target | 0px | 0px |
+| Pages | 0px | 0px |
+| Client approval | 0px | 0px |
+| Rollback | 0px | 0px |
+| *footer* `Publish now` | — | **20px** |
+
+The footer is inset by 20px, so the four information rows are the only band
+that touches the border, and the longest value ("The last 20 versions stay
+restorable") runs straight into it.
 
 ### Review (topbar "In review" pill) — 7 controls, 1 disabled
 "0 of 0 · Sent 17h ago · reviewer-fixture@buildrik.local", reply box, Send
