@@ -59,3 +59,8 @@ packages/dashboard/.gstack/
 
 # board-diff scratch output (board PNGs are short-lived Figma assets)
 .board-diff/
+
+# Backups of env files are still env files — a `.env.local.bak-<date>` sitting
+# untracked is a secret one `git add -A` away from history.
+.env*.bak*
+.env.local.bak-*
