@@ -198,13 +198,49 @@ parent, Ask AI about this element, Bind to collection field, Element actions,
 "Edit reach: this item", "Breakpoint: Desktop", "State: Base" — then collapsible
 sections (TYPOGRAPHY, SPACING, SIZE, BACKGROUND, …).
 
-**Gap — coverage, not code.** The fixture carries only 7 of the element types
-the Insert panel can create (53 are offered). `image`, `video`, `link`, `list`,
-`section`, `table`, `form` and the rest have no inspector profile walked here,
-and the board recipes record the same hole from the other side: *"Inspector ·
-profile · MEDIA — the fixture page carries no image or video element, so the
-media profile cannot be reached on it."* Until the fixture grows those
-elements, nobody — walk or board — is looking at those inspectors.
+**All 53 element types are now swept.** `scripts/baseline/element-sweep.mjs`
+inserts every item the Insert palette offers and reads the inspector for each.
+It runs against `scratch-smoke`, never the baseline fixture, because it mutates
+the site it walks.
+
+Every one of the 53 creates an element — there is no dead palette entry. 39
+arrive with their own engine type; 14 arrive as a plain `container`:
+
+| Arrives as | Palette items |
+|---|---|
+| own type | Heading, Text→paragraph, Link, List, Button, Icon, Divider, Progress, Countdown, Section, Grid, Columns, Flex, Input, Textarea, Select, Form, Image, Video, Audio, Gallery, SVG, Navbar→nav, Footer, CTA→section, Accordion, Testimonials, Pricing, Carousel→slider |
+| `input` | Slider→range, Upload→file, Submit→button, Email, Password, Number, Date, Time, Color |
+| `container` | Spacer, Label, Container, Stack, Card, Table, Checkbox, Radio, Switch, Lottie, Embed, Map, Tabs, Social Icons |
+
+Inspector control counts run from 23 (SVG) to 158 (Lottie); the header cluster
+is identical across every profile.
+
+**`container` is the wrapper, not the markup — three readings retracted here.**
+Table arrives as 46 engine nodes typed container/text/button and renders a real
+`<table>` with `thead`, 4 `tr`, 4 `th`, `tbody` and 12 `td`. Tabs renders
+`role="tablist"` with three `tab` and three `tabpanel`. Checkbox, Radio and
+Switch each render a `<label>` wrapping a real `<input type="checkbox">` or
+`type="radio"` — implicit association, which is valid — and Email / Date /
+Color / Slider / Upload render `<input type="email">`, `"date"`, `"color"`,
+`"range"`, `"file"`. Counting ENGINE types and concluding "these are divs" was
+wrong three times before the DOM was read.
+
+**Gap — the Accordion ships with no accessibility state.** Its header buttons
+carry no `aria-expanded`, no `aria-controls` and no `role`; every one reads
+`null`. `src/blocks/Components/Accordion.tsx` contains no `aria` or `role` at
+all, and the string `aria-expanded` does not appear anywhere in the exported
+HTML. A screen-reader user cannot tell an open panel from a closed one, and
+nothing ties a header to the panel it controls. This is on the customer's
+published page, not just the editor.
+
+**Gap — the canvas renders `aria-modal=""` where the export renders
+`aria-modal="true"`.** `Modal.tsx:48` sets `"aria-modal": "true"`, the element's
+stored attributes hold `"true"`, and the Export-code view emits
+`role="dialog" aria-modal="true"`. Only the editor's own canvas drops the
+value, and `aria-modal=""` is not a valid token — the accessibility API reads
+it as not-modal. `role` and `class` on the same element keep their values, so
+this is specific. Editor-only, and the direction is the unusual one: the
+exported page is the correct half.
 
 ---
 
