@@ -326,6 +326,14 @@ arrive with their own engine type; 14 arrive as a plain `container`:
 Inspector control counts run from 23 (SVG) to 158 (Lottie); the header cluster
 is identical across every profile.
 
+**Read those counts as expansion state, not capability.** They are what the
+inspector shows with whatever sections happened to be open. `Section` counts 31
+against `Container`'s 60, which looks like a thinner inspector for a layout
+element — it is not: opening it shows the same twenty disclosures (Layout,
+Position, Size, Spacing, Background, Border, Corner radius, Effects,
+Interactions, Animation, and the header cluster). The difference was which ones
+were expanded. Capability lives in `inspector-sections.mjs`, not here.
+
 **`container` is the wrapper, not the markup — three readings retracted here.**
 Table arrives as 46 engine nodes typed container/text/button and renders a real
 `<table>` with `thead`, 4 `tr`, 4 `th`, `tbody` and 12 `td`. Tabs renders

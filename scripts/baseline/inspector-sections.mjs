@@ -21,6 +21,9 @@ import { login, openEditor, stripDevOverlays, resetLoginRateLimit, FIXTURE_SITE 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
 const TYPE = args.includes("--type") ? args[args.indexOf("--type") + 1] : "container";
+/* The baseline fixture carries 7 element types; anything else has to be walked
+   on a site that has one, which is scratch-smoke after element-sweep ran. */
+const SITE = args.includes("--site") ? args[args.indexOf("--site") + 1] : FIXTURE_SITE;
 const OUT = join(HERE, "..", "..", ".walk", "inspector-sections");
 
 const selectType = (page, type) => page.evaluate((t) => {
@@ -62,7 +65,7 @@ async function main() {
   const statePath = join(OUT, "state.json");
   await resetLoginRateLimit();
   await login({ statePath });
-  const { browser, page } = await openEditor({ statePath, site: FIXTURE_SITE });
+  const { browser, page } = await openEditor({ statePath, site: SITE });
   await stripDevOverlays(page);
 
   console.log(`select ${TYPE}: ${await selectType(page, TYPE)}`);
