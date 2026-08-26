@@ -45,10 +45,15 @@ incomplete. This matters because that comment is the only record of the routing.
 53 elements across ELEMENTS, plus search (⌘F) and "Paste HTML…". Opens by
 default; the shell restores it across a reload.
 
-**Gap.** Opening the panel raises a console error every time:
+**Gap — intermittent.** Toggling the panel can raise
 `[Recovery] Runtime fault (error): ResizeObserver loop completed with undelivered
-notifications.` It is caught by the recovery layer and nothing visibly breaks,
-but it fires on the editor's default surface, so it is in every session.
+notifications.` Re-measured over three fresh loads: **zero** errors on load in
+all three, and the fault appeared on one of three close-then-reopen cycles. It
+is caught by the recovery layer and nothing visibly breaks.
+
+(This entry first said the error fires on every open of the editor's default
+surface. That was one observation from the walk generalised into "every
+session"; the count above is what three runs actually produced.)
 
 ### Layers (`L`) — 71 controls
 Tree of the page with search, expand/collapse all, per-row "Dim in editor" and
