@@ -99,6 +99,13 @@ FIRST in document order. A `querySelector('[aria-label="List view"]')` returns
 the dead one and reports the working control as disabled — which is exactly the
 reading this walk made before counting the matches (there are five).
 
+**Working, and worth saying so:** the drawer's `Stock` and `Icons` buttons open
+drill-in overlays inside the drawer. Stock gives "Stock photos" with
+Orientation / Colour / Type filters and "Search to browse free photos" — this
+with **neither** `PEXELS_API_KEY` nor `UNSPLASH_ACCESS_KEY` set in
+`.env.local`, so the surface is reachable and it is only the results that
+depend on the keys.
+
 ### Content (`D`) — 3 controls
 Empty state only: the Collections explainer and "Create a collection". Correct
 for a site with no collections, but it means the module's whole populated state

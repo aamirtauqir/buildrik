@@ -58,6 +58,10 @@ const EXPECT = {
   "BL-0113": { text: "Version History",    why: "the Version History panel was not open" },
   "BL-0218": { text: "Compare with approved", why: "the Review panel was not open" },
   "BL-0220": { text: "PAGE TEMPLATES",     why: "the Templates panel was not open" },
+  /* Observed live: clicking Stock opens a "Stock photos" overlay inside the
+     Media drawer, with Orientation / Colour / Type filters. The product works;
+     the overlay is what the capture drops. */
+  "BL-0159": { text: "Stock photos",       why: "the stock overlay did not survive the capture" },
   "BL-0101": { text: "layers",             why: "the Layers panel was not open" },
   "BL-0103": { text: "dining-room",       why: "the Media panel was not open" },   /* an asset label: the search box is a placeholder, which is not a TEXT node */
   "BL-0104": { text: "Collections turn",   why: "the Content panel was not open" },
