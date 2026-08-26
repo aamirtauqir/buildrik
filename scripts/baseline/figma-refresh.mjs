@@ -95,7 +95,11 @@ const RECIPES = [
   { bl: "BL-0159", state: "media-stock-browser",  supersede: "118:2", actions: [{ openTab: "assets" }, { expectText: "Drag files or click to browse" }, { click: 'button:has-text("Stock")' }, { waitMs: 3500 }] },
   { bl: "BL-0160", state: "media-icon-picker",    supersede: "119:2", actions: [{ openTab: "assets" }, { click: 'button:has-text("Icons")' }, { waitMs: 3500 }] },
 
-  { bl: "BL-0164", state: "pages-add-page",       supersede: "123:2", actions: [{ openTab: "pages" }, { click: 'button[aria-label="Add new page"]' }, { waitMs: 3000 }] },
+  /* BL-0164 "pages-add-page" is NOT captured, deliberately. Both "Add new page"
+     buttons (AddPageButton.tsx:39, PageTabBar.tsx:352) create a blank page on
+     click — there is no add-page dialog to photograph — so capturing this state
+     would leave a page behind in the fixture and corrupt every board captured
+     after it. The board describes a surface the product does not have. */
   { bl: "BL-0166", state: "pages-more-add-options", supersede: "126:2", actions: [{ openTab: "pages" }, { click: 'button[aria-label="More add options"]' }, { waitMs: 2500 }] },
   { bl: "BL-0167", state: "pages-fullpage",       supersede: "127:2", actions: [{ openTab: "pages" }, { click: 'button[aria-label="Expand Pages"]' }, { waitMs: 4000 }] },
   { bl: "BL-0163", state: "pages-context-menu",   supersede: "122:2", actions: [{ openTab: "pages" }, { rightClick: 'role=treeitem[name=/About/]' }, { waitMs: 2500 }] },
