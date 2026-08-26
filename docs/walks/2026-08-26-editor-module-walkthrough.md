@@ -269,7 +269,45 @@ Container `aside.layout-shell__inspector`, box `[1140, 104, 300, 732]`.
 Every profile carries the same header cluster — Pick element on canvas, Select
 parent, Ask AI about this element, Bind to collection field, Element actions,
 "Edit reach: this item", "Breakpoint: Desktop", "State: Base" — then collapsible
-sections (TYPOGRAPHY, SPACING, SIZE, BACKGROUND, …).
+sections.
+
+**The sections were counted, then opened** (`inspector-sections.mjs`). Counting
+controls covers whatever happens to be expanded by default, which is not the
+same as knowing what the inspector offers. Expanding everything on a container
+takes it from **31 controls to 114**; on a heading, from 71 to 102.
+
+The header cluster is itself expandable, and what is behind it matters:
+
+| Header control | Behind it |
+|---|---|
+| Element actions | Duplicate · Copy styles · Paste styles · Delete |
+| Edit reach: this item | "Just this element" · "Every edit also goes to 29 others" · "Site-wide colors & fonts live…" |
+| Breakpoint: Desktop | Desktop · Tablet ≤1023px · Mobile ≤767px |
+| State: Base | Base · `:hover` · `:focus` · `:active` · `:disabled` |
+| Bind to collection field | + Create Collection |
+
+The sections differ by element type, which is the point of profiling them:
+
+| Section | container | heading | what it holds |
+|---|---|---|---|
+| Typography | — | **default open** | family, size, weight, colour, transform, decoration, letter/word |
+| Layout | default open | — | |
+| Position, overflow & visibility | ✓ | — | |
+| Size | ✓ | ✓ | Fixed / Fill / Hug content |
+| Spacing | ✓ | default open | padding top-bottom & left-right, gap, margin |
+| Background | ✓ | ✓ | color · gradient · image, fill |
+| Border | ✓ | ✓ | width, None/Solid/Dashed/Dotted/Double, colour |
+| Corner radius | ✓ | — | unlink corners, tl/tr/bl/br |
+| Effects | ✓ | ✓ | opacity + shadow None/SM/MD/LG/XL/2XL — the biggest section, +34 controls |
+| Interactions | ✓ | ✓ | + Add Interaction |
+| Animation | ✓ | ✓ | Enable |
+| Visibility | ✓ | ✓ | Visible on Desktop / Tablet / Mobile |
+| Element Properties | ✓ | ✓ | element-id, Element title, `data-*` pairs — **and on a heading, the H1…H6 level** |
+| CSS classes | ✓ | ✓ | Add class |
+
+Worth knowing: **a heading's level is set in Element Properties, not
+Typography.** Typography governs how it looks; the semantic level sits with the
+element's attributes.
 
 **All 53 element types are now swept.** `scripts/baseline/element-sweep.mjs`
 inserts every item the Insert palette offers and reads the inspector for each.
@@ -563,21 +601,21 @@ description), `BL-0173 brand-presets`, `BL-0170 brand-colour-mode`, and
 Saying so plainly, because the count of what was walked is not the count of
 what exists:
 
-- **Populated Content.** The fixture has no collections, so only the empty
-  state was seen.
-- **46 of 53 insertable element types** have no inspector profile here — see the
-  Inspector gap above.
-- **Publish end to end.** Out of scope by founder decision; the confirm modal
-  was opened and cancelled, never confirmed.
-- **The drill-in depths of Brand.** Tokens / Presets / Starters / Classes /
-  Components / Typography / Colour mode / Lint / Import-export are nine
-  sub-surfaces behind one panel; the walk recorded the rows, not what is behind
-  them.
-- **The drill-in depths of Brand** (above) and the populated Content state.
-- **`BL-0169 brand-pro-mode` is captured but unverified.** The Brand panel sits
-  in Basic mode ("Switch to Pro to unlock"), and Pro has no string this walk
-  observed that Basic lacks, so `figma-verify` has no positive marker for it and
-  it is left unguarded rather than guarded with a guess. Worth a look by eye.
-  (Checked separately: the mode does NOT leak between captures — each runs from
-  the same saved storageState, so the Brand states after it captured Basic, as
-  intended.)
+- **Publish end to end.** Out of scope by founder decision. The confirm modal
+  and the publish panel were opened and cancelled; nothing was ever confirmed,
+  and all three job tables were checked and stayed at zero rows.
+- **The site menu's own board.** `BL-0122` cannot be captured while the menu is
+  built inside the topbar's 56px header — its text nodes land in the frame and
+  are clipped. That is the product finding above, not a harness limit to work
+  around; the frame says `CAPTURE INCOMPLETE` and the census row for it points
+  at a superseded frame because there is no CURRENT one to point at. `BL-0219`
+  is in the same position for the opposite reason: its only frame shows the
+  wrong surface.
+- **Applying anything in Brand.** Every drill-in was opened; `Apply Changes`,
+  `Discard`, a starter theme and an import were never pressed — each writes.
+- **Submitting an AI prompt.** The Generate-component modal was opened and its
+  unconfigured path read from source; no generation was ever requested.
+- **The dark half of the theme.** All 17 colour tokens are unset on this site,
+  so `brand-colour-mode` is walked in its empty state. That is the honest state
+  of a site nobody has themed, not a gap — the exporter omits the dark block
+  entirely when there is nothing in it.
