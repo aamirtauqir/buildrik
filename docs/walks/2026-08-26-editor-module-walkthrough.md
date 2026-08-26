@@ -317,6 +317,35 @@ to `CAPTURE INCOMPLETE` with the reason.
 
 ---
 
+## Where the screens are
+
+Every state walked above was re-captured from the running editor into the
+baseline Figma file `Micuc1rmLcFhjxF1A08Kk2`, page `75:2`
+("10.04 — ACTIVE — Editor"), on 2026-08-26. Before this, every editor frame in
+that file dated from 2026-08-21 to 08-23 — 187 to 217 commits behind HEAD.
+
+Frames are named `BL-#### / edit/:id / <state> / 1440 — CURRENT <date>`, and
+the frame each one replaces is renamed `— SUPERSEDED <date> by <node>`. The
+index is `scripts/baseline/inventory.json`, reconciled from the file itself by
+`scripts/baseline/inventory-sync.mjs` — not maintained by hand here, so this
+document cannot drift from the file.
+
+Six states got a frame for the first time, because the census only ever covered
+surfaces somebody had already drawn: **panel-ai**, **panel-components**,
+**inspector-none**, and the three canvas breakpoints. The Wide board is worth
+opening next to the Desktop one — they are identical, which is the gap above
+made visible.
+
+Three tools, all re-runnable:
+
+| Script | Job |
+|---|---|
+| `figma-refresh.mjs` | capture a state, name it, supersede what it replaces |
+| `figma-verify.mjs` | check what a frame CONTAINS; repair duplicate CURRENT claims |
+| `inventory-sync.mjs` | reconcile the census against the file |
+
+---
+
 ## What this walk did NOT cover
 
 Saying so plainly, because the count of what was walked is not the count of
