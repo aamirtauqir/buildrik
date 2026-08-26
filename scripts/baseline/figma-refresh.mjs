@@ -176,13 +176,21 @@ async function captureOne(rec) {
      for (const k of page.children) if (k !== frame) maxY = Math.max(maxY, k.y + k.height);
      frame.x = 200; frame.y = Math.round(maxY + 400);
      frame.name = ${JSON.stringify(name)};
-     let superseded = null;
-     ${rec.supersede ? `
-     const old = page.children.find(k => k.id === "${rec.supersede}");
-     if (old && !/SUPERSEDED/.test(old.name)) {
-       old.name = old.name.replace(/ — CURRENT [0-9-]+.*$/, "") + " — SUPERSEDED ${TODAY} by " + frame.id;
-       superseded = old.name;
-     }` : ""}
+     /* Supersede whatever CURRENTLY claims this state, not a node id from the
+        census — the census was itself stale, so a state whose frame had already
+        moved collected a SECOND current frame instead of a supersession, and
+        the file then had two frames claiming to be the design. */
+     const superseded = [];
+     for (const k of page.children) {
+       if (k === frame) continue;
+       const claims = new RegExp("^" + ${JSON.stringify(rec.bl)} + "\\b").test(k.name);
+       const isCurrent = /— CURRENT/.test(k.name);
+       const isNamedTarget = ${rec.supersede ? `k.id === "${rec.supersede}"` : "false"};
+       if (!(claims && isCurrent) && !isNamedTarget) continue;
+       if (/SUPERSEDED/.test(k.name)) continue;
+       k.name = k.name.replace(/ — CURRENT [0-9-]+.*$/, "") + " — SUPERSEDED ${TODAY} by " + frame.id;
+       superseded.push(k.id);
+     }
      return { id: frame.id, name: frame.name, y: frame.y, superseded };`,
     `name and park ${rec.bl}`
   );
@@ -199,7 +207,7 @@ for (const rec of list) {
   process.stdout.write(`${rec.bl} ${rec.state.padEnd(26)} `);
   try {
     const r = await captureOne(rec);
-    console.log(`→ ${r.id} @y=${r.y}${r.superseded ? "  superseded" : "  (new)"}`);
+    console.log(`→ ${r.id} @y=${r.y}${r.superseded?.length ? `  superseded ${r.superseded.join(",")}` : "  (new)"}`);
     done.push({ ...rec, ...r });
   } catch (e) {
     console.log(`FAILED: ${String(e.message).slice(0, 160)}`);
