@@ -113,7 +113,10 @@ const frames = await run(
        walk(f, 0);
        has = found;
      }
-     out.push({ id: f.id, name: f.name, has });
+     /* One annotation frame carries a 900-character name; with 174 frames the
+        payload blew the MCP cap again and the read failed as a parse error.
+        The suffix this rewrites is always at the end, so a slice is safe. */
+     out.push({ id: f.id, name: f.name.slice(0, 130), has });
    }
    return out;`,
   "verify frame contents", 70
