@@ -65,6 +65,13 @@ are `div[role="treeitem"][tabindex="0"]` — reachable and correct for a tree.
 (An earlier reading of this walk called them unreachable because it only counted
 `<button>`s. They are fine.)
 
+**Gap — a board for a surface that does not exist.** The census carries
+`BL-0164 pages-add-page`, but both "Add new page" buttons
+(`AddPageButton.tsx:39`, `PageTabBar.tsx:352`) create a blank page on click.
+There is no add-page dialog. The state cannot be captured — the attempt leaves
+a page behind in the fixture — and it is excluded from
+`scripts/baseline/figma-refresh.mjs` with that reason written next to it.
+
 ### Media (`assets`, `M`) — 18 controls, **3 disabled**
 Search, type pills (All / image 2 / video 1 / svg 0 / icon 0), the three fixture
 assets, a drop zone, and Upload / Stock / Icons.
