@@ -75,10 +75,17 @@ assets, a drop zone, and Upload / Stock / Icons.
 ```
 
 The comment above them reads *"Still disabled controls, not decoration (T12
-lights them up)"* — T12 never happened. The same three controls work in the
-full-page media library (`AssetGrid.tsx:312-333`, real `onClick` +
-`aria-pressed`), so list view exists in the product but cannot be reached from
-the drawer. Sort has no implementation on either surface.
+lights them up)"* — T12 never happened. The same controls work in the full-page media
+library (`AssetGrid.tsx:312-333`, real `onClick` + `aria-pressed`): clicking
+List view there flips `aria-pressed` to `true` and Grid view to `false`, so the
+baseline state `BL-0162 media-list-view` IS reachable — through "Expand Media",
+never from the drawer. Sort has no implementation on either surface.
+
+A caution for anyone testing this: while the full-page library is open, the
+drawer's three disabled buttons are still in the DOM behind it, and they come
+FIRST in document order. A `querySelector('[aria-label="List view"]')` returns
+the dead one and reports the working control as disabled — which is exactly the
+reading this walk made before counting the matches (there are five).
 
 ### Content (`D`) — 3 controls
 Empty state only: the Collections explainer and "Create a collection". Correct
