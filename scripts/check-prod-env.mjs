@@ -162,9 +162,23 @@ requirePresent("SMTP_USER");
 if (!env.SMTP_PASS_B64 && !env.SMTP_PASS) {
   fail("SMTP_PASS_B64", "missing (and no SMTP_PASS fallback)");
 } else if (!env.SMTP_PASS_B64) {
-  // cPanel/Passenger pipes env through a shell, so a `$` in the password is read
-  // as a variable and silently eaten. Base64 has no shell metacharacters.
-  fail("SMTP_PASS_B64", "only SMTP_PASS is set — cPanel will corrupt a password containing `$`");
+  // Two separate manglers, and naming only the first is why this sat unnoticed
+  // in DEV for months (2026-08-26):
+  //   1. cPanel/Passenger pipes env through a shell, so `$` is read as a
+  //      variable and silently eaten.
+  //   2. Next's own loader (`@next/env` -> dotenv + dotenv-expand) expands
+  //      `$VAR` inside .env* files. Quotes do NOT stop it — dotenv strips both
+  //      quote styles before expanding. Next's docs say a literal dollar must
+  //      be written `\$`.
+  // Base64 has neither problem. A 16-char password lost 3 characters this way
+  // and every outbound mail failed with `535 Incorrect authentication data`.
+  const dollarRisk = /\$\{?[A-Za-z_]/.test(String(env.SMTP_PASS ?? ""));
+  fail(
+    "SMTP_PASS_B64",
+    dollarRisk
+      ? "only SMTP_PASS is set, and it contains `$NAME` — Next expands that in .env* (and cPanel eats it too). Set SMTP_PASS_B64."
+      : "only SMTP_PASS is set — a `$` in the password is eaten by Next's .env expansion and by the cPanel shell",
+  );
 } else {
   pass("SMTP_PASS_B64");
 }

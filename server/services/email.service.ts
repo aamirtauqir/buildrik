@@ -56,8 +56,39 @@ function getTransport() {
 const FROM = process.env.EMAIL_FROM || "info@buildrick.io";
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
+/** A 535 says "wrong password" and nothing about WHY the password is wrong.
+ *  There is a specific, silent way to get one here: Next's env loader
+ *  (`@next/env` -> dotenv + dotenv-expand) expands `$VAR` inside .env* files,
+ *  and quotes do not stop it, so a password containing `$name` is delivered to
+ *  nodemailer with those characters removed. cPanel's shell does the same thing
+ *  for a different reason. `SMTP_PASS_B64` avoids both.
+ *
+ *  Measured 2026-08-26: a 16-character password lost 3 characters this way and
+ *  every outbound mail in local dev failed with `535 Incorrect authentication
+ *  data` — signup verification and client review invites alike. Both callers
+ *  logged the raw 535, which names the symptom and not the cause. */
+function explainAuthFailure(err: unknown): unknown {
+  const msg = err instanceof Error ? err.message : String(err);
+  if (!/\b535\b|Invalid login|EAUTH/i.test(msg)) return err;
+  if (process.env.SMTP_PASS_B64 || !process.env.SMTP_PASS) return err;
+  /* Deliberately NOT checking `process.env.SMTP_PASS` for a `$` — by the time
+     this runs the expansion has already happened, so the dollar is exactly what
+     is missing. The actionable fact is the one we can still see: an auth failure
+     while the base64 form is unset. */
+  return new Error(
+    `${msg} — SMTP_PASS_B64 is not set. Next expands \`$VAR\` inside .env* files ` +
+      `(quotes do not prevent it) and the cPanel shell eats \`$\` too, so a password ` +
+      `containing a dollar sign reaches nodemailer truncated. Set SMTP_PASS_B64 to the ` +
+      `base64 of the password — it takes precedence. \`pnpm run env:check:local\` checks this.`,
+  );
+}
+
 async function sendEmail(to: string, subject: string, html: string) {
-  await getTransport().sendMail({ from: FROM, to, subject, html });
+  try {
+    await getTransport().sendMail({ from: FROM, to, subject, html });
+  } catch (err) {
+    throw explainAuthFailure(err);
+  }
 }
 
 export async function sendVerificationEmail(to: string, token: string) {
