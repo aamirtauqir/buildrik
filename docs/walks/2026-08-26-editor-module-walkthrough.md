@@ -484,6 +484,44 @@ Three tools, all re-runnable:
 
 ---
 
+## The census counts surfaces it does not have
+
+Going through the states the refresh did NOT re-capture turned up a different
+problem: several BL ids describe one surface, so the count overstates coverage.
+Each pair below was checked by reading both frames' text for a marker only that
+surface carries.
+
+| Surface | ids describing it | marker |
+|---|---|---|
+| Publish panel | **BL-0106, BL-0221, BL-0230** | "Since last deploy" — all three carry the same deploy summary; BL-0230's says "5 pages" because it was captured while a stray page existed |
+| Site menu | BL-0109, BL-0122 | "Keyboard shortcuts" |
+| Review panel | BL-0110, BL-0218 | "Compare with approved" |
+| Templates panel | BL-0116, BL-0220 | "PAGE TEMPLATES" |
+| Components panel | BL-0117, BL-0301 | the components list |
+
+**And one frame claims a surface it does not show.** `BL-0219 publish-open`
+(`359:2`) was marked `CURRENT 2026-08-22` and contains the **Insert** panel —
+"Search elements ⌘F ▾ ELEMENTS 53 Text Link List Button". It is now renamed
+`CAPTURE INCOMPLETE`. `figma-verify` did not catch this earlier only because no
+expectation was registered for that id; it has one now, along with the other
+three publish ids.
+
+**Three rows were attributed to the wrong flow.** `BL-0222`, `BL-0223` and
+`BL-0224` carried `flow: "editor"` and `route: "/edit/[siteId]"` while their
+frames sit on the Dashboard page and their own names give the real routes —
+`dashboard/agency/reviews`, `review/:token`. Anyone filtering `flow=editor` to
+walk the editor got three surfaces that are not in it, and every editor-state
+count was three too high. Corrected from the frame names: the editor now has
+**67** rows, not 70.
+
+`inventory-sync.mjs` now also reports rows pointing at a frame the file has
+disowned — SUPERSEDED, CAPTURE INCOMPLETE, or absent from the editor page. It
+cannot fix those (a state whose only recent frame is incomplete has no CURRENT
+to point at), so it names them rather than leaving them silent. Two stand today:
+`BL-0122` and `BL-0219`, both for that reason.
+
+---
+
 ## What this walk did NOT cover
 
 Saying so plainly, because the count of what was walked is not the count of

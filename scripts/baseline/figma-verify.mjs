@@ -69,6 +69,15 @@ const EXPECT = {
      Media drawer, with Orientation / Colour / Type filters. The product works;
      the overlay is what the capture drops. */
   "BL-0159": { text: "Stock photos",       why: "the stock overlay did not survive the capture" },
+  /* Four BL ids describe the Publish PANEL (not the confirm modal, which is
+     BL-0176). Its own marker is the deploy summary. BL-0219 fails this: that
+     frame shows the Insert panel while claiming to be publish-open. */
+  "BL-0106": { text: "Since last deploy",  why: "the publish panel was not open" },
+  "BL-0219": { text: "Since last deploy",  why: "this frame shows the Insert panel, not a publish surface" },
+  "BL-0221": { text: "Since last deploy",  why: "the publish panel was not open" },
+  "BL-0230": { text: "Since last deploy",  why: "the publish panel was not open" },
+  "BL-0110": { text: "Compare with approved", why: "the review panel was not open" },
+  "BL-0116": { text: "PAGE TEMPLATES",     why: "the templates panel was not open" },
   /* Both observed live: Icons opens "‹ Icons · All ▾ · 17 categories" inside
      the drawer, and More add options opens a role=menu of "From template /
      New folder". Working surfaces — it is the capture that drops them. */

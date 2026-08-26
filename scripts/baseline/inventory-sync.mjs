@@ -87,11 +87,27 @@ for (const [bl, c] of current) {
   }
 }
 
+/* A row whose node is SUPERSEDED or CAPTURE INCOMPLETE is the failure this
+   census exists to prevent: it points the next reader at a frame the file has
+   already disowned. sync cannot fix those — a state with no CURRENT frame has
+   nothing to point AT — so it names them instead of leaving them silent. */
+const byNode = new Map(frames.map((f) => [f.id, f.name]));
+const orphaned = [];
+for (const r of rows) {
+  if (r.flow !== "editor" || !r.figmaNodeId) continue;
+  const name = byNode.get(r.figmaNodeId);
+  if (!name) { orphaned.push({ bl: r.id, node: r.figmaNodeId, why: "node not on the editor page" }); continue; }
+  if (/SUPERSEDED/.test(name)) orphaned.push({ bl: r.id, node: r.figmaNodeId, why: "points at a SUPERSEDED frame" });
+  else if (/CAPTURE INCOMPLETE/.test(name)) orphaned.push({ bl: r.id, node: r.figmaNodeId, why: "points at a CAPTURE INCOMPLETE frame" });
+}
+
 console.log(`frames on the editor page: ${frames.length}`);
 console.log(`states claiming CURRENT:   ${current.size}`);
 if (dupes.length) console.log(`!! ${dupes.length} state(s) with MORE THAN ONE current frame: ${[...new Set(dupes)].join(", ")}`);
 console.log(`\nnode id moved: ${changed.length}`);
 changed.forEach((c) => console.log(`   ${c.bl}  ${c.from} -> ${c.to}`));
+console.log(`rows pointing at a frame the file disowned: ${orphaned.length}`);
+orphaned.forEach((o) => console.log(`   ${o.bl}  ${o.node}  ${o.why}`));
 console.log(`new rows: ${added.length}`);
 added.forEach((a) => console.log(`   ${a.bl}  ${a.node}  ${a.state}`));
 
