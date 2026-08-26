@@ -220,6 +220,28 @@ Share preview link · Invite teammates · Account settings · Keyboard shortcuts
 
 ---
 
+## The five modules with no rail tab
+
+`src/editor/` carries five modules that no rail tab opens. Four of them are
+live; one is not:
+
+| Module | Status |
+|---|---|
+| `onboarding` | **live** — `AquibraStudio.tsx:702` renders `<OnboardingMount>`; it is the "Tip 1/4" strip and the "0 / 7 done" checklist visible in every capture. |
+| `animation` | **live** — `inspector/sections/AnimationSection.tsx:150` renders `<AnimationEditor>` inside the inspector. |
+| `export` | **live** — `StudioModals.tsx:165` renders `<ExportModal>`; its door is the site menu's "Export code". |
+| `ecommerce` | **live** — `StudioModals.tsx:213` renders `<CollectionSetupModal>`, alongside the separate `CMSCollectionSetupModal` at `:267`. |
+| `collaboration` | **the component is dead.** `<PresenceIndicators>` is rendered nowhere but its own test file. The shipped presence UI is `chrome-ui/Presence`, wired at `StudioHeader.tsx:635-641`. What survives from the old module is `toPresenceUsers`, a helper that happens to sit in the same file and is still imported. |
+
+Two readings were retracted getting here. Searching for imports by path
+(`from ".../editor/<module>"`) returned zero for all five, because four of them
+are imported relatively (`../onboarding/OnboardingMount`) — the module looked
+dead while its checklist was on screen in the screenshot beside it. And
+`ecommerce/CollectionSetupModal` looked replaced by `CMSCollectionSetupModal`
+until both turned out to be rendered, 54 lines apart, in the same file.
+
+---
+
 ## Cross-cutting
 
 **Modals announce themselves on a 0×0 element.** Both modals reached in this
@@ -246,5 +268,4 @@ what exists:
   Components / Typography / Colour mode / Lint / Import-export are nine
   sub-surfaces behind one panel; the walk recorded the rows, not what is behind
   them.
-- **Collaboration, ecommerce, export, onboarding and animation** — modules that
-  exist under `src/editor/` with no rail tab and no door found in this pass.
+- **The drill-in depths of Brand** (above) and the populated Content state.
