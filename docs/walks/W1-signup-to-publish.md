@@ -114,7 +114,28 @@ that as a silent failure. It is a disabled button behaving exactly as it should.
 Read the control's state before reading its behaviour.
 
 So the chain ends here, correctly and legibly. What is missing is a Vercel
-connection — a founder scope call, not a defect.
+connection **for this workspace** — and that is the whole of it.
+
+**Correction to something I said out loud during this session:** I repeated a
+subagent's claim that "nobody has ever published a site", sourced to F-A3.
+F-A3 does not say that — it says its own last leg, a real deploy to the
+internet, was *called out rather than performed*. The database says publishing
+has run:
+
+    2026-05-24  My New Site   https://buildrik-site-my-new-site-f3gfusk5w-shah8.vercel.app
+    2026-05-24  test-site-qa1 https://buildrik-site-test-site-qa1.vercel.app
+    2026-06-12  test-site-iter5 …
+
+The first carries a deployment hash and a Vercel scope (`shah8`). The simulation
+path returns `https://<siteId>.vercel.app` with no hash, so that one was a real
+deploy to a real Vercel account. `WorkspaceIntegration` holds a live `vercel`
+row created 2026-05-20.
+
+So publishing is not unbuilt and has not never run. What is unknown is whether
+it **still** works — the last real-looking deploy is three months old. That is a
+walk, not a project, and it is the last unwalked leg. It could not be walked from
+here: the connection belongs to the founder's own workspace, and this walk ran on
+a workspace created minutes earlier, which correctly had none.
 
 ## What this walk did NOT assess
 
