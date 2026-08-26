@@ -62,6 +62,11 @@ const EXPECT = {
      Media drawer, with Orientation / Colour / Type filters. The product works;
      the overlay is what the capture drops. */
   "BL-0159": { text: "Stock photos",       why: "the stock overlay did not survive the capture" },
+  /* Both observed live: Icons opens "‹ Icons · All ▾ · 17 categories" inside
+     the drawer, and More add options opens a role=menu of "From template /
+     New folder". Working surfaces — it is the capture that drops them. */
+  "BL-0160": { text: "categories",         why: "the icon picker overlay did not survive the capture" },
+  "BL-0166": { text: "From template",      why: "the add-options menu did not survive the capture" },
   "BL-0101": { text: "layers",             why: "the Layers panel was not open" },
   "BL-0103": { text: "dining-room",       why: "the Media panel was not open" },   /* an asset label: the search box is a placeholder, which is not a TEXT node */
   "BL-0104": { text: "Collections turn",   why: "the Content panel was not open" },
