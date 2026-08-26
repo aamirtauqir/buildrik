@@ -274,6 +274,42 @@ box itself rather than its subtree.
 
 ---
 
+## The site menu is not portaled, and it costs more than a screenshot
+
+Opening the site menu and reading its DOM parentage:
+
+```
+div.tw:absolute      218 x 673     ← the menu
+└ span.tw:relative    32 x 32      ← the Site menu button's wrapper
+  └ header.tw:flex  1440 x 56      ← the topbar
+```
+
+A 673px-tall menu is a child of a 32px span inside a 56px header. It escapes
+with `position: absolute`, so it looks right — but it is structurally inside a
+box eleven times shorter than itself. Anything an ancestor gains later that
+establishes clipping or a new containing block — `overflow: hidden`, a
+`transform`, `filter`, `contain` — clips it or re-anchors it.
+
+`packages/editor/CLAUDE.md` Gate 22 is exactly the rule this sidesteps: portals
+must route through chrome-ui's overlay-root primitives. Gate 22 looks for
+`createPortal` and `document.body.appendChild`, and this menu calls neither, so
+nothing flags it. The publish confirm and Project settings modals DO portal —
+they arrive in a capture as their own `OverlayMount` frame — and the menu does
+not.
+
+The visible consequence today is in the design file. html-to-design builds
+Figma frames from the DOM box tree, so a capture of the editor with the menu
+open contains no menu, even though the capture script's own `PRE-CAPTURE` line
+reports it open at the moment of capture. Frame `473:2` is named
+`BL-0109 … site-menu-open … — CURRENT 2026-08-23` and holds no menu; `481:2` is
+named `cmdk-open … CURRENT 2026-08-23 (first capture with the palette actually
+open)` and holds no palette. The assertion lives in the frame NAME, which is
+worse than an empty frame — it tells the next reader the surface was checked.
+`scripts/baseline/figma-verify.mjs` now checks frame CONTENT and renames these
+to `CAPTURE INCOMPLETE` with the reason.
+
+---
+
 ## What this walk did NOT cover
 
 Saying so plainly, because the count of what was walked is not the count of
