@@ -106,10 +106,45 @@ with **neither** `PEXELS_API_KEY` nor `UNSPLASH_ACCESS_KEY` set in
 `.env.local`, so the surface is reachable and it is only the results that
 depend on the keys.
 
-### Content (`D`) — 3 controls
-Empty state only: the Collections explainer and "Create a collection". Correct
-for a site with no collections, but it means the module's whole populated state
-is unwalked here.
+### Content (`D`) — 3 controls empty, walked populated on `scratch-smoke`
+On the baseline fixture: the Collections explainer and "Create a collection" —
+the empty state. `scratch-smoke` already carries a populated one, so the whole
+module was walked there rather than by creating data:
+
+| Surface | What is behind it |
+|---|---|
+| root | COLLECTIONS 1 · `Products 4 ›` · + New collection · DATA: Sources 0, Variables 0, Conditions 0 |
+| Products | 4 records (Minimalist Watch, Premium Wireless Headphones, Organic Cotton T-Shirt, `Record dm5y`), + Add, `Fields 8 ›`, `Dynamic pages ›` |
+| Sources | "No data source connected" · + Connect a source · *"A source feeds a collection. Edits sync one way — from the source in."* |
+| Variables | "No variables yet" · + New variable |
+| Conditions | "No conditions yet" · + New condition |
+
+**Worth quoting, because the product says it before anyone has to find it:**
+Variables reads *"A variable is a value you write once and reuse in this panel
+— `{{site.name}}` is saved in this browser, and pages do not read it yet."*
+That is a real limitation — variables are editor-local and never reach the
+page — stated plainly in the surface that has it.
+
+**Gap — the drill-in back button names the wrong destination.** Inside the
+Products collection the back control reads `‹ Products` and carries
+`aria-label="Back to Products"`. Pressing it lands on the Content root, not on
+Products. The accessible name is the surface being LEFT, so a screen-reader
+user is told the opposite of where the button goes.
+
+`ContentViews.tsx:95` interpolates the current label:
+
+```tsx
+<Button onClick={onClick} aria-label={`Back to ${label}`}>
+  ‹ {label}
+</Button>
+```
+
+The same codebase gets this right three other places, which is what makes it a
+slip rather than a convention: `StockBrowserOverlay.tsx:200` shows `‹ Stock
+photos` with `aria-label="Back to media grid"`, `AssetDetailOverlay.tsx:297`
+picks the destination per view, and `DrillInHeader.tsx:130` uses
+`parentName`. Brand's drill-ins carry no `Back to…` label at all — their back
+control is the bare `‹ Tokens` text.
 
 ### Brand (`design`, `B`) — 16 controls, 2 disabled
 Friendly / Full-power mode switch, then drill-in rows: Tokens 4, Presets 18,
