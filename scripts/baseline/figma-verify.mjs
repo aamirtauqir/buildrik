@@ -47,8 +47,15 @@ const VISUAL_FAIL = {
 const EXPECT = {
   "BL-0122": { text: "Keyboard shortcuts", why: "the site menu is not portaled — it renders inside the topbar's 56px header" },
   "BL-0111": { text: "navigate",           why: "the command palette did not survive the capture" },
-  "BL-0163": { text: "Reveal in Layers",   why: "the context menu did not survive the capture" },
-  "BL-0168": { text: "Reveal in Layers",   why: "the context menu did not survive the capture" },
+  /* The three context menus are DIFFERENT menus, observed live:
+       canvas → Edit / Insert / Layout / Quick Style / Save as component /
+                Reveal in Layers / Select Parent / Lock
+       layers → Cut / Copy / Paste / Duplicate / Delete / Rename / Group selection
+       pages  → Rename… / Duplicate / Copy link / Page settings… / Delete page
+     Expecting "Reveal in Layers" on all three would have failed the two that
+     are correct. */
+  "BL-0163": { text: "Copy link",          why: "the pages context menu did not survive the capture" },
+  "BL-0168": { text: "Group selection",    why: "the layers context menu did not survive the capture" },
   "BL-0306": { text: "Reveal in Layers",   why: "the context menu did not survive the capture" },
   "BL-0112": { text: "Project settings",   why: "the modal did not survive the capture" },
   "BL-0176": { text: "Publish this site",  why: "the modal did not survive the capture" },

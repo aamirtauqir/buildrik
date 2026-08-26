@@ -235,9 +235,16 @@ nothing else the user can see.
 drawer open, where the host is 760px and both Desktop and Tablet clamp to 712.
 With the drawer closed Tablet is correct.)
 
-Right-click on an element gives 8 rows, none disabled: Edit ▸, Insert ▸,
-Layout ▸, Quick Style ▸, Save as component, Reveal in Layers, Select Parent ←,
-Lock.
+There are **three** context menus, and they are different menus — worth saying
+because a test that expects one row on all three fails the two that are right:
+
+| Right-click on | Rows |
+|---|---|
+| a canvas element | Edit ▸ · Insert ▸ · Layout ▸ · Quick Style ▸ · Save as component · Reveal in Layers · Select Parent ← · Lock |
+| a Layers row | Cut · Copy · Paste · Duplicate · Delete · Rename · Group selection |
+| a Pages row | Rename… · Duplicate · Copy link · Page settings… · Delete page |
+
+All three open, and none of their rows is disabled.
 
 ---
 
