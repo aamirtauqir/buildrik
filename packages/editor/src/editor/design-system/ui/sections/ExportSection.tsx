@@ -22,13 +22,12 @@ import {
   useBreakpointRegistry, useGridRegistry, useSizingRegistry,
   useIconRegistry, useImageryRegistry,
 } from "../../state/TokenRegistryContext";
-import { CopyButton } from "@/editor/chrome-ui";
 import { CSSBundler } from "../../../../engine/designSystem/bundler";
 import { buildExport, downloadFile, type ExportFormat } from "../../utils/exportUtils";
 import type { DesignToken } from "../../types";
 import type { BundleOptions } from "../../../../engine/designSystem/bundler/CSSBundler";
 import { ImportCard } from "./ImportCard";
-import { Button, Radio, Select } from "@/editor/chrome-ui";
+import { Button, CopyButton, Radio, Select, BK_SELECT_BARE_VALUE_THEME } from "@/editor/chrome-ui";
 // Local format type widens exportUtils ExportFormat with a stub "figma" entry
 // so the s05 prototype's 4-row selector renders without touching the shared
 // exporter contract. Figma JSON download emits a minimal envelope until a
@@ -220,9 +219,17 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImpo
           how dark values are written — as a single row with its value at the
           right. It used to be three radio rows buried under the CSS format,
           which is where nobody chooses it before copying JSON. */}
-      <div className="tw:flex tw:items-center tw:gap-2">
+      {/* Board 153:120 draws this as a 32-tall row reading `Dark strategy ▾`
+          with its value to the right — a dropdown PILL, not a boxed form
+          control. The boxed `Select` measured 42 live, ten pixels over the
+          board and over `--bk-size-row`, because a bordered field sets the
+          row's height. `BK_SELECT_BARE_VALUE_THEME` is the sanctioned variant
+          for exactly this (SelectRow's dropdown pill), so the treatment comes
+          from the design system rather than from a hardcoded height. */}
+      <div className="tw:flex tw:h-[var(--bk-size-row)] tw:items-center tw:gap-2">
         <span className="tw:flex-1 tw:text-[13px] tw:text-gray-900">Dark strategy</span>
         <Select
+          theme={BK_SELECT_BARE_VALUE_THEME}
           className="tw:flex-none"
           value={darkStrategy}
           onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setDarkStrategy(e.target.value as DarkStrategy)}
