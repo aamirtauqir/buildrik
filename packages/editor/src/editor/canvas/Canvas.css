@@ -51,55 +51,42 @@
   outline: none;
 }
 
-[data-buildrick-id] h1,
-[data-buildrick-id] h2,
-[data-buildrick-id] h3,
-[data-buildrick-id] h4,
-[data-buildrick-id] h5,
-[data-buildrick-id] h6 {
-  font-family: var(--bk-font-ui);
-  color: var(--bk-ink);
-  margin: 0 0 var(--bk-space-16) 0;
-}
+/* CHROME TOKENS ON CUSTOMER CONTENT — REMOVED 2026-08-27.
+   What stood here painted the user's own page in the EDITOR'S colours, fonts
+   and spacing, using `--bk-*` tokens. `--bk-*` is the chrome namespace; the
+   canvas subtree is customer output, and none of these rules exist on the
+   published page, so the editor was showing something the site would never be:
 
-[data-buildrick-id] h1 {
-  font-size: calc(var(--bk-text-16) * 1.5);
-}
+     h1-h6   font-family --bk-font-ui, color --bk-ink, margin --bk-space-16
+     h1-h4   a type scale derived from --bk-text-16, which made an h2 render
+             at BODY size and h3/h4 render SMALLER than body
+     p       color --bk-ink, margin --bk-space-12
+     a       color --bk-accent — every customer link wore the Buildrick blue
+     button  background --bk-accent, --bk-radius-lg, --bk-font-ui …
+     inputs  --bk-ink / --bk-bg-card / --bk-border / --bk-radius-sm …
 
-[data-buildrick-id] h2 {
-  font-size: var(--bk-text-16);
-}
+   Measured live before removal: a canvas H2 computed 16px with no authored
+   font-size, while the inspector correctly read the element's 36px default —
+   the "lying inspector" of ledger row R1, which turns out to be a lying
+   CANVAS. Chrome asked Chrome directly (CSS.getMatchedStylesForNode) and named
+   `[data-buildrick-id] h2 { font-size: var(--bk-text-16) }` as the winner.
 
-[data-buildrick-id] h3 {
-  font-size: calc(var(--bk-text-16) * 0.75);
-}
+   Elements the user actually inserts are unaffected: `applyTypeDefaults`
+   (blocks/blockRegistry.ts) seeds each type's real defaults inline, and inline
+   wins over all of this. What these rules reached was elements that carry no
+   value of their own — legacy and imported content — and for those the honest
+   fallback is the one the published page will use: the browser's, plus the
+   site's own design system (`themes/design-system/site-content.css`), which
+   already supplies the base font-size the page root inherits.
 
-[data-buildrick-id] h4 {
-  font-size: calc(var(--bk-text-16) * 0.625);
-}
+   Deliberately kept below: outlines, cursors, selection, drop feedback and
+   empty-container hints. Those are editor affordances ON customer content, not
+   the editor repainting it.
 
-[data-buildrick-id] p {
-  color: var(--bk-ink);
-  margin: 0 0 var(--bk-space-12) 0;
-}
-
-[data-buildrick-id] a {
-  color: var(--bk-accent);
-}
-
-[data-buildrick-id] button {
-  background: var(--bk-accent);
-  color: var(--bk-bg-card);
-  border: none;
-  border-radius: var(--bk-radius-lg);
-  padding: var(--bk-space-8) var(--bk-space-16);
-  font-family: var(--bk-font-ui);
-  cursor: pointer;
-}
-
-[data-buildrick-id] button:hover {
-  background: var(--bk-ink-muted);
-}
+   Still outstanding, wider blast radius, left for its own change:
+   `[data-buildrick-id] * { color: inherit }` near the top of this file forces
+   every descendant to inherit colour, which a customer's own nested rules
+   should be free to override. */
 
 [data-buildrick-id] img {
   max-width: 100%;
