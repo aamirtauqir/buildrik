@@ -11,6 +11,19 @@
 import * as React from "react";
 import {
   AlignLeft,
+  Dot,
+  Heading1,
+  Heading2,
+  Heading3,
+  Heading4,
+  Heading5,
+  Heading6,
+  LayoutPanelTop,
+  Minus,
+  Newspaper,
+  PanelRight,
+  PanelTop,
+  Shapes,
   Box,
   CreditCard,
   FileText,
@@ -75,6 +88,32 @@ const glyphs: Record<string, LucideIcon> = {
   features: Sparkles,
   div: Box,
   span: FileType,
+
+  /* The engine also names elements by HTML tag, and every one of these fell
+     through to `default: Box`. Nineteen of `ELEMENT_TYPE_LABELS`'s forty-one
+     types drew the same square-in-a-box — so restoring glyphs to the Layers
+     tree would have left a heading, a paragraph, a link and a list still
+     indistinguishable, which is the defect it was meant to fix. */
+  h1: Heading1,
+  h2: Heading2,
+  h3: Heading3,
+  h4: Heading4,
+  h5: Heading5,
+  h6: Heading6,
+  p: AlignLeft,
+  a: Link,
+  img: Image,
+  nav: Navigation,
+  header: PanelTop,
+  main: LayoutPanelTop,
+  article: Newspaper,
+  aside: PanelRight,
+  ul: List,
+  ol: ListOrdered,
+  li: Dot,
+  icon: Shapes,
+  divider: Minus,
+
   default: Box,
 };
 

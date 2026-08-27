@@ -8,6 +8,7 @@ import * as React from "react";
 import type { Composer } from "../../../engine";
 import { ELEMENT_TYPE_LABELS } from "../../../shared/constants/elementTypeLabels";
 import type { LayerItem, DragState, LayerDisplayPrefs } from "./types";
+import { getElementIcon } from "@/editor/shared/elementIcons";
 import { Button, TextField } from "@/editor/chrome-ui";
 
 export interface LayerTreeItemProps {
@@ -88,6 +89,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
   const isLocked = lockedIds.has(layer.id);
   const isEditing = editingId === layer.id;
   const isCanvasHovered = canvasHoveredId === layer.id;
+  const LayerGlyph = getElementIcon(layer.type);
   const displayName =
     customNames.get(layer.id) ||
     (ELEMENT_TYPE_LABELS[layer.type] ?? layer.type.charAt(0).toUpperCase() + layer.type.slice(1));
@@ -194,9 +196,23 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
           </svg>
         </Button>
 
-        {/* Board 244:1580 icon: a 12px solid ink-muted rounded square —
-            the same treatment the founder chose for Insert rows. */}
-        <span className="bdc-lr-ic" aria-hidden />
+        {/* Was a 12px solid ink-muted square (board 244:1580, the same call as
+            the Insert rows), so a heading, an image and a form looked the same
+            at every depth of the tree — in the one panel whose whole job is
+            telling elements apart. `.bdc-lr-ic svg` had a rule waiting for a
+            glyph that nothing rendered; the map it needs is the one the
+            inspector already uses on the same element. */}
+        <span
+          /* Utilities, not a rule in layers-v2.css: the styling ratchet drains
+             that file and a real glyph needs no CSS of its own. The square
+             background is dropped here rather than overridden there. */
+          className={`bdc-lr-ic tw:inline-flex tw:items-center tw:justify-center tw:bg-transparent ${
+            isHidden ? "tw:text-[var(--bk-gray-300)]" : "tw:text-[var(--bk-ink-muted)]"
+          }`}
+          aria-hidden
+        >
+          <LayerGlyph size="xs" />
+        </span>
 
         {isEditing ? (
           <TextField

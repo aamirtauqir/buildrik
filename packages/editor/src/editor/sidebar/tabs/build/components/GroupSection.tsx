@@ -62,6 +62,12 @@ const HeaderRow: React.FC<{ group: InsertGroup; isOpen: boolean; onToggle: () =>
  *  the board's icon-less pinned rows (⌥ Paste HTML…) in BuildTab. */
 export const Row: React.FC<{
   label: string;
+  /**
+   * The element's own glyph — `ElEntry.iconHtml`, the inner markup of a
+   * `viewBox="0 0 24 24"` svg. Rows without one (blocks, components, the
+   * user's own) keep the plain square.
+   */
+  iconHtml?: string;
   /** Board 233:1123 draws the Paste-HTML row with no icon slot at all. */
   noIcon?: boolean;
   /** Board 138:198: disabled row = "Soon" tag + reason tooltip + no insert.
@@ -72,7 +78,7 @@ export const Row: React.FC<{
   draggable?: boolean;
   onDragStart?: (e: React.DragEvent) => void;
   onClick: () => void;
-}> = ({ label, noIcon, disabled, disabledReason, testId, draggable, onDragStart, onClick }) => {
+}> = ({ label, iconHtml, noIcon, disabled, disabledReason, testId, draggable, onDragStart, onClick }) => {
   const row = (
     <div
       role="button"
@@ -92,12 +98,37 @@ export const Row: React.FC<{
         if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClick(); }
       }}
     >
-      {/* Board icon treatment (founder call, 2026-08-06): EVERY element row
-          draws the same 12px solid ink-muted rounded square — the boards'
-          List-row icon is a plain filled div, not a glyph. The per-element
-          SVG glyph system was retired with it (real glyphs return only if a
-          Figma icon library ships and regenerates like the tokens do). */}
-      {noIcon ? null : (
+      {/* Every element row drew the same 12px solid ink-muted square — a founder
+          call from 2026-08-06, taken from the board's List-row icon. It made 53
+          element types visually identical in the first panel a user opens, and
+          it is the top row of this arc's ledger.
+
+          The artwork was never missing. `ElEntry.iconHtml` carries a distinct
+          hand-drawn glyph for every catalog entry — 59 entries, 53 distinct —
+          and nothing has ever rendered one. The inspector, meanwhile, shows a
+          real per-type lucide glyph for the SAME element (`ProInspector.tsx`
+          via `elementIcons.tsx`), so the product disagreed with itself about
+          whether an element has a face.
+
+          Reverting is this block. The square is still what a row with no
+          artwork of its own gets. */}
+      {noIcon ? null : iconHtml ? (
+        <svg
+          viewBox="0 0 24 24"
+          width={14}
+          height={14}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={1.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="tw:shrink-0 tw:text-[var(--bk-ink-muted)]"
+          aria-hidden="true"
+          /* Static markup compiled into the bundle from our own catalog — no
+             user input reaches this, and no request fetches it. */
+          dangerouslySetInnerHTML={{ __html: iconHtml }}
+        />
+      ) : (
         <span className="tw:size-[12px] tw:rounded-[2px] tw:bg-[var(--bk-ink-muted)] tw:shrink-0" aria-hidden="true" />
       )}
       <span className="tw:flex-1 tw:min-w-0 tw:truncate tw:text-[13px] tw:leading-[20px] tw:text-[var(--bk-ink)]">
@@ -130,6 +161,7 @@ export const GroupSection: React.FC<GroupSectionProps> = ({
       <Row
         key={`${el.catId}-${el.name}`}
         label={el.name}
+        iconHtml={el.iconHtml}
         disabled={el.disabled}
         disabledReason={el.disabled ? el.description : undefined}
         testId={`insert-el-${el.name}`}
