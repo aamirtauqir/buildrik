@@ -74,6 +74,12 @@ export function LayerContextMenu({
         Paste
       </Button>
       <div className="bdc-menu-sep" />
+      {/* Board 1082:4527 draws "Copy link" — a URL that reopens the editor with
+          this element selected. The other of its two unbacked rows ("Move to
+          page…") stays unbuilt; cut/paste already crosses pages. */}
+      <Button className="bdc-menu-item" role="menuitem" onClick={() => act("copyLink")}>
+        Copy link
+      </Button>
       <Button className="bdc-menu-item" role="menuitem" onClick={() => act("duplicate")}>
         Duplicate
       </Button>

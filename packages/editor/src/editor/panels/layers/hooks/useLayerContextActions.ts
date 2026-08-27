@@ -7,9 +7,11 @@ import * as React from "react";
 import { findById } from "../data/layerUtils";
 import type { LayerAction } from "../types";
 import type { UseLayersStateReturn } from "./useLayersState";
+import { useToast } from "@/editor/chrome-ui";
 
 export function useLayerContextActions(state: UseLayersStateReturn) {
   const { composer, actionsHook, treeHook, selectionHook } = state;
+  const { addToast } = useToast();
   return React.useCallback(
     (action: LayerAction, nodeId: string) => {
       const syntheticEvent = { stopPropagation: () => {} } as unknown as React.MouseEvent;
@@ -21,6 +23,22 @@ export function useLayerContextActions(state: UseLayersStateReturn) {
             const data = composer.elements.serializeElement(nodeId);
             composer.clipboard = data ? [data] : null;
           }
+          break;
+        }
+        case "copyLink": {
+          /* Board 1082:4527's "Copy link": a URL that reopens THIS editor with
+             this element selected. The page id rides along because the element
+             registry only holds the active page — the consumer (useDeepLink)
+             has to activate the page before it can select. Clipboard failures
+             surface as a toast rather than silently copying nothing. */
+          const pageId = composer?.elements.getActivePage?.()?.id;
+          const url = new URL(window.location.href);
+          url.searchParams.set("el", nodeId);
+          if (pageId) url.searchParams.set("page", pageId);
+          navigator.clipboard.writeText(url.toString()).then(
+            () => addToast({ description: "Link copied — opens the editor with this element selected", tone: "success" }),
+            () => addToast({ description: "Couldn't copy the link", tone: "error" }),
+          );
           break;
         }
         case "cut": {
@@ -88,6 +106,6 @@ export function useLayerContextActions(state: UseLayersStateReturn) {
           break;
       }
     },
-    [composer, actionsHook, treeHook, selectionHook]
+    [composer, actionsHook, treeHook, selectionHook, addToast]
   );
 }

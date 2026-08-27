@@ -3542,7 +3542,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "blocked:no-cross-page-move-or-deep-link",
+      "authority": "code:copy-link-ships-move-deferred",
       "recipe": null
     },
     {

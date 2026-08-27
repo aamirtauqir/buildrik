@@ -27,6 +27,7 @@ import { useComposerSelection } from "../canvas/hooks/useComposerSelection";
 import { OnboardingMount } from "../onboarding/OnboardingMount";
 import { useCmsSync } from "./hooks/useCmsSync";
 import { useVersionSync } from "./hooks/useVersionSync";
+import { useDeepLink } from "./hooks/useDeepLink";
 import { useComponentSync } from "./hooks/useComponentSync";
 import { hydrateUserTemplatesFromServer } from "@/services/templateSync";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
@@ -211,6 +212,8 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
 
   // #3/26: mirror version history to the server + hydrate on open (best-effort).
   useVersionSync(composer, addToast);
+  /* ?el=&page= from the Layers menu's "Copy link" — selects on load. */
+  useDeepLink(composer);
 
   // #4/27: mirror component masters to the server + hydrate on open (best-effort).
   useComponentSync(composer, addToast);

@@ -77,6 +77,7 @@ export interface LayerContextMenuState {
 export type LayerAction =
   | "cut"
   | "copy"
+  | "copyLink"
   | "paste"
   | "rename"
   | "duplicate"
