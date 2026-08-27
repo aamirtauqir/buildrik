@@ -21,6 +21,7 @@
 
 import * as React from "react";
 import type { SaveState as StudioSaveState } from "./hooks/useStudioState";
+import type { ReviewPillState } from "@buildrik/shared/schemas/reviews";
 import { deriveLifecycleState } from "./lifecycle";
 import { Topbar, ModalRoot, ModalContent, ModalTitle, ModalDescription, ModalFooter, isModalOpen, plural, Button, type PublishState, type ReviewPill, type ReviewTone, type SaveState, type ToastInput } from "@/editor/chrome-ui";
 import type { SaveOutcome } from "./hooks/useSaveCallback";
@@ -285,6 +286,31 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
     }, []),
   );
   useRefetchOnFocus(refreshUnread);
+
+  /* Board 158:213 announces the close: "Review closed — Sara approved v3". The
+     product had no such moment. The pill changed and the review bar vanished,
+     both silently, and the one thing a designer is waiting on — did my client
+     answer — arrived as furniture quietly rearranging itself.
+
+     Fires on the TRANSITION only, and only away from a live round, so opening
+     an already-approved site does not congratulate you on news from last week.
+     `answeredRef` starts unset and is seeded by the first status that lands, so
+     the mount itself is never a transition. */
+  const answeredRef = React.useRef<ReviewPillState | null>(null);
+  React.useEffect(() => {
+    const now = reviewStatus.state;
+    const was = answeredRef.current;
+    answeredRef.current = now;
+    if (was === null || was === now) return;
+    const LIVE: ReadonlySet<ReviewPillState> = new Set(["pending", "opened-not-acted"]);
+    if (!LIVE.has(was)) return;
+    const who = reviewStatus.reviewerName ?? "Your client";
+    if (now === "approved" || now === "approved-edited-since") {
+      addToast({ title: "Review closed", description: `${who} approved this design.`, tone: "success" });
+    } else if (now === "changes-requested") {
+      addToast({ title: "Review closed", description: `${who} asked for changes.`, tone: "info" });
+    }
+  }, [reviewStatus.state, reviewStatus.reviewerName, addToast]);
 
   // Keeps "Saved · 2m ago" honest without a render on every tick.
   const [, setTick] = React.useState(0);

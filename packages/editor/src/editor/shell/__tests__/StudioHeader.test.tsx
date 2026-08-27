@@ -89,7 +89,7 @@ vi.mock("../modals/CommandPalette", () => ({
 import { StudioHeader, type StudioHeaderProps } from "../StudioHeader";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
 import { getEditorViewMode } from "../../../shared/utils/editorViewMode";
-import { submitForReview, fetchReviewStatus } from "../../../services/ReviewService";
+import { submitForReview, fetchReviewStatus, fetchReviewStatusOrNull } from "../../../services/ReviewService";
 import type { ReviewStatus } from "../../../services/ReviewService";
 
 /* ReviewStatus gained two flag fields — whether reviews exist here at all, and
@@ -1108,3 +1108,45 @@ describe("F9 a11y", () => {
     expect(screen.queryByTestId("command-palette")).toBeNull();
   });
 });
+
+describe("StudioHeader — the review closing is an event, not furniture", () => {
+  /* Board 158:213 announces it: "Review closed — Sara approved v3". The product
+     had no such moment — the pill changed and the review bar vanished, both
+     silently, and the one thing a designer waits on arrived as the room quietly
+     rearranging itself. */
+  const settle = async () => { await act(async () => {}); };
+
+  it("says so when a live round comes back approved", async () => {
+    const addToast = vi.fn();
+    vi.mocked(fetchReviewStatus).mockResolvedValueOnce(
+      reviewStatus({ state: "pending", reviewerName: "Sana" }),
+    );
+    render(<StudioHeader {...makeProps({ addToast })} />);
+    await settle();
+    expect(addToast).not.toHaveBeenCalled();
+
+    /* The transition happens inside ONE mount — the focus refetch is how an
+       approval that landed while the editor was backgrounded arrives. A
+       remount would reset the ref and prove nothing. */
+    vi.mocked(fetchReviewStatusOrNull).mockResolvedValueOnce(
+      reviewStatus({ state: "approved", reviewerName: "Sana" }),
+    );
+    await act(async () => { window.dispatchEvent(new Event("focus")); });
+    await settle();
+    const said = addToast.mock.calls.map((c) => JSON.stringify(c[0])).join(" ");
+    expect(said).toMatch(/Review closed/);
+    expect(said).toMatch(/Sana/);
+  });
+
+  it("opening an already-approved site congratulates nobody", async () => {
+    // The mount is not a transition: last week's news is not an event.
+    const addToast = vi.fn();
+    vi.mocked(fetchReviewStatus).mockResolvedValueOnce(
+      reviewStatus({ state: "approved", reviewerName: "Sana" }),
+    );
+    render(<StudioHeader {...makeProps({ addToast })} />);
+    await settle();
+    expect(addToast).not.toHaveBeenCalled();
+  });
+});
+
