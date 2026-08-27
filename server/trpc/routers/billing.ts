@@ -24,9 +24,16 @@ function translateBillingError(e: unknown): TRPCError {
     if (e.message === "NO_SUBSCRIPTION") return new TRPCError({ code: "PRECONDITION_FAILED", message: "There's no active subscription on this workspace." });
     if (e.message === "PAYMENTS_NOT_CONFIGURED") return new TRPCError({ code: "PRECONDITION_FAILED", message: "Payments are not available yet." });
     if (e.message === "GRANDFATHERED_NO_PORTAL") return new TRPCError({ code: "PRECONDITION_FAILED", message: "This plan was set up outside Stripe. Contact support to change or cancel it." });
+    if (e.message === "NO_STRIPE_CUSTOMER") return new TRPCError({ code: "PRECONDITION_FAILED", message: "No billing account yet — upgrade a plan first." });
+    if (e.message === "ALREADY_SUBSCRIBED") return new TRPCError({ code: "CONFLICT", message: "You already have a subscription — manage your plan from the billing portal." });
+    if (e.message.startsWith("STRIPE_PRICE_NOT_CONFIGURED")) return new TRPCError({ code: "PRECONDITION_FAILED", message: "That plan isn't available for checkout yet." });
   }
   // Anything left is a Stripe/network failure. Say so plainly rather than
   // letting it surface as a bare 500 — and never imply the change took effect.
+  // "Anything left" includes Stripe's own prose: a stale customer id came back
+  // as the toast "Couldn't open billing portal — No such customer: 'cus_…'",
+  // which names an internal identifier and tells the customer nothing they can
+  // act on. The raw message never reaches the user.
   return new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Couldn't reach Stripe — nothing was changed. Please try again." });
 }
 
@@ -67,23 +74,13 @@ export const billingRouter = router({
     const wsId = await getWorkspaceId(ctx);
     await requireOwner(ctx, wsId);
     try { return await createCheckoutSession(wsId, input); }
-    catch (e: unknown) {
-      if (e instanceof Error && e.message === "PAYMENTS_NOT_CONFIGURED") throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Payments are not available yet." });
-      if (e instanceof Error && e.message === "ALREADY_SUBSCRIBED") throw new TRPCError({ code: "CONFLICT", message: "You already have a subscription — manage your plan from the billing portal." });
-      if (e instanceof Error && e.message.startsWith("STRIPE_PRICE_NOT_CONFIGURED")) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "That plan isn't available for checkout yet." });
-      throw e;
-    }
+    catch (e: unknown) { throw translateBillingError(e); }
   }),
   createPortalSession: protectedProcedure.mutation(async ({ ctx }) => {
     const wsId = await getWorkspaceId(ctx);
     await requireOwner(ctx, wsId);
     try { return await createPortalSession(wsId); }
-    catch (e: unknown) {
-      if (e instanceof Error && e.message === "PAYMENTS_NOT_CONFIGURED") throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Payments are not available yet." });
-      if (e instanceof Error && e.message === "NO_STRIPE_CUSTOMER") throw new TRPCError({ code: "PRECONDITION_FAILED", message: "No billing account yet — upgrade a plan first." });
-      if (e instanceof Error && e.message === "GRANDFATHERED_NO_PORTAL") throw new TRPCError({ code: "PRECONDITION_FAILED", message: "This plan was set up outside Stripe. Contact support to change or cancel it." });
-      throw e;
-    }
+    catch (e: unknown) { throw translateBillingError(e); }
   }),
   cancel: protectedProcedure.input(cancelSchema).mutation(async ({ ctx, input }) => {
     const wsId = await getWorkspaceId(ctx);
