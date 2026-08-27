@@ -678,13 +678,6 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.bdi-fill .bdi-pct {
-  font: 500 10px var(--bk-font-mono);
-  color: var(--bk-ink-soft);
-  min-width: 30px;
-  text-align: right;
-  flex-shrink: 0;
-}
 .bdi-fill .bdi-eye {
   width: 18px;
   height: 18px;

@@ -67,9 +67,15 @@ const SEG =
   "disabled:tw:cursor-default";
 const SEG_CURRENT =
   SEG_BASE + " tw:bg-[color:var(--bk-accent)] tw:text-[color:var(--bk-accent-on)] tw:font-medium";
-const SEP = "tw:shrink-0 tw:text-[10px] tw:text-[color:var(--bk-ink-muted)]";
+/* `--bk-ink-muted` is tuned for text on a light panel. On this bar — ink at 50%
+   over the canvas — it measured 3.67:1, under AA's 4.5 for normal text. The
+   gray-400 the hints already use measures 6.99:1 against the same bar. */
+const SEP = "tw:shrink-0 tw:text-[10px] tw:text-[color:var(--bk-gray-400)]";
+/* Was 9px. The type ramp bottoms out at `--bk-text-11`, and these are the two
+   controls that move the selection up and down the tree — not decoration. */
 const HINTS =
-  "tw:ml-auto tw:flex tw:shrink-0 tw:gap-3 tw:text-[9px] tw:text-[color:var(--bk-gray-400)]";
+  "tw:ml-auto tw:flex tw:shrink-0 tw:gap-3 tw:text-[length:var(--bk-text-11)] " +
+  "tw:text-[color:var(--bk-gray-400)]";
 
 export const CanvasBreadcrumb: React.FC<CanvasBreadcrumbProps> = ({
   composer,

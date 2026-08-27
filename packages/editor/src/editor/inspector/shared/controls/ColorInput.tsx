@@ -38,7 +38,11 @@ const stripHash = (val: string): string => (val.startsWith("#") ? val.slice(1) :
 
 // Opacity stub: real alpha channel support would require parsing rgba/hex8.
 // For now, hidden value reports 0% and visible reports 100%.
-const getPercent = (visible: boolean): string => (visible ? "100%" : "0%");
+/* `getPercent` lived here and returned "100%" when shown, "0%" when hidden —
+   from the eye toggle's own boolean, never from an alpha channel. It reported
+   the state of the control standing next to it, in 30px that the hex value
+   needed: at a 181px control track the field was left with 34, and a six-digit
+   hex arrived as "1a…". One bit does not need two controls. */
 
 // ============================================================================
 // COLOR INPUT
@@ -190,7 +194,6 @@ export const ColorInput: React.FC<ColorInputProps> = ({
                       needs — "Mixed" arrived as "Mi…" in the batch panel. */}
                   {value ? (
                     <>
-                      <span className="bdi-pct">{getPercent(!hidden)}</span>
                       <Button
                         type="button"
                         className="bdi-eye"
