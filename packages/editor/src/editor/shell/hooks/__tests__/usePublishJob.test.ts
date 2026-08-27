@@ -27,6 +27,9 @@ vi.mock("@/services/PublishService", () => ({
 }));
 
 vi.mock("@/services/BuildrikSyncProvider", () => ({
+  /* Added with the attribution wiring: useComposerInit now reads the
+     signed-in user so versions and history stop recording `userId: null`. */
+  loadCurrentUserId: vi.fn(() => Promise.resolve(null)),
   getSiteIdFromUrl: vi.fn(() => null),
 }));
 
@@ -64,7 +67,7 @@ describe("usePublishJob", () => {
     mockGetSiteId.mockReturnValue(null);
     mockPublishSite.mockResolvedValue({ jobId: "job-1" });
     mockCancel.mockResolvedValue(undefined);
-    mockFetchSiteState.mockResolvedValue({ isPublished: false, publishedUrl: null });
+    mockFetchSiteState.mockResolvedValue({ isPublished: false, publishedUrl: null, hasUnpublishedChanges: null, lastPublishedAt: null });
   });
 
   afterEach(() => {
@@ -312,6 +315,8 @@ describe("usePublishJob", () => {
       mockFetchSiteState.mockResolvedValue({
         isPublished: true,
         publishedUrl: "https://live.example.com",
+        hasUnpublishedChanges: null,
+        lastPublishedAt: null,
       });
 
       const { result } = renderHook(() => usePublishJob());
@@ -325,7 +330,7 @@ describe("usePublishJob", () => {
 
     it("stays idle when the site is not published", async () => {
       mockGetSiteId.mockReturnValue("site-9");
-      mockFetchSiteState.mockResolvedValue({ isPublished: false, publishedUrl: null });
+      mockFetchSiteState.mockResolvedValue({ isPublished: false, publishedUrl: null, hasUnpublishedChanges: null, lastPublishedAt: null });
 
       const { result } = renderHook(() => usePublishJob());
       await flushMicrotasks();
@@ -359,6 +364,8 @@ describe("usePublishJob", () => {
       mockFetchSiteState.mockResolvedValue({
         isPublished: true,
         publishedUrl: "https://live.example.com",
+        hasUnpublishedChanges: null,
+        lastPublishedAt: null,
       });
       mockFetchStatus.mockResolvedValueOnce(statusOf("QUEUED"));
 

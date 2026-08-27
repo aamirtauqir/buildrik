@@ -125,21 +125,53 @@ export async function cancelPublish(jobId: string): Promise<void> {
   await getClient().sites.cancelPublish.mutate({ jobId });
 }
 
+export interface SitePublishState {
+  isPublished: boolean;
+  publishedUrl: string | null;
+  /**
+   * Has the site changed since it last went live?
+   *
+   * `null` when it has never been published, or when the server did not send
+   * the stamps — unknown, not "no".
+   *
+   * **The durable answer, and the only one that survives a reload.** The
+   * editor's other "since last deploy" number counts entries in
+   * `composer.history`, which is memory-only and cleared by `importProject` —
+   * so publish, edit, close the tab, reopen tomorrow, and that count is 0 over
+   * a site with real unpublished changes.
+   *
+   * Bias, stated rather than hidden: `Site.lastEditedAt` is written on every
+   * `saveProjectData` **and** by `renameSite` and duplicate, so this can
+   * over-report (a rename with no content change reads as "unpublished
+   * changes"). It cannot under-report, which is the direction that matters — it
+   * will never say "nothing to publish" over edits that are really there.
+   */
+  hasUnpublishedChanges: boolean | null;
+  lastPublishedAt: string | null;
+}
+
 /**
  * Read whether a site has been previously published. Used by editor mount
  * to hydrate the Topbar's "Published" state so a returning user sees the
  * correct status without having to re-publish.
+ *
+ * `sites.get` has no `select`, so every scalar comes back; this used to narrow
+ * the cast to `status` + `publishedUrl` and drop the rest on the floor.
  */
-export async function fetchSitePublishState(
-  siteId: string,
-): Promise<{ isPublished: boolean; publishedUrl: string | null }> {
+export async function fetchSitePublishState(siteId: string): Promise<SitePublishState> {
   const site = (await getClient().sites.get.query({ id: siteId })) as {
     status?: string | null;
     publishedUrl?: string | null;
+    lastPublishedAt?: string | Date | null;
+    lastEditedAt?: string | Date | null;
   };
+  const publishedAt = site.lastPublishedAt ? new Date(site.lastPublishedAt) : null;
+  const editedAt = site.lastEditedAt ? new Date(site.lastEditedAt) : null;
   return {
     isPublished: site.status === "PUBLISHED" && !!site.publishedUrl,
     publishedUrl: site.publishedUrl ?? null,
+    hasUnpublishedChanges: publishedAt && editedAt ? editedAt.getTime() > publishedAt.getTime() : null,
+    lastPublishedAt: publishedAt ? publishedAt.toISOString() : null,
   };
 }
 

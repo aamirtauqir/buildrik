@@ -129,19 +129,73 @@ describe("fetchSitePublishState", () => {
     const state = await fetchSitePublishState("site-1");
 
     expect(sitesGetQuery).toHaveBeenCalledWith({ id: "site-1" });
-    expect(state).toEqual({ isPublished: true, publishedUrl: "https://x.vercel.app" });
+    expect(state).toEqual({
+      isPublished: true,
+      publishedUrl: "https://x.vercel.app",
+      hasUnpublishedChanges: null,
+      lastPublishedAt: null,
+    });
   });
 
   it("is NOT published when status is PUBLISHED but the url is missing", async () => {
     sitesGetQuery.mockResolvedValueOnce({ status: "PUBLISHED", publishedUrl: null });
     const state = await fetchSitePublishState("site-1");
-    expect(state).toEqual({ isPublished: false, publishedUrl: null });
+    expect(state).toEqual({
+      isPublished: false,
+      publishedUrl: null,
+      hasUnpublishedChanges: null,
+      lastPublishedAt: null,
+    });
   });
 
   it("is NOT published for a DRAFT site even if a stale url remains", async () => {
     sitesGetQuery.mockResolvedValueOnce({ status: "DRAFT", publishedUrl: "https://old.vercel.app" });
     const state = await fetchSitePublishState("site-1");
     // Current behavior: the stale url is still returned; only the flag gates the UI.
-    expect(state).toEqual({ isPublished: false, publishedUrl: "https://old.vercel.app" });
+    expect(state).toEqual({
+      isPublished: false,
+      publishedUrl: "https://old.vercel.app",
+      hasUnpublishedChanges: null,
+      lastPublishedAt: null,
+    });
+  });
+
+  /* The durable "edited since publish" signal. The editor's other one counts
+     composer.history entries after the last deploy, and that stack is
+     memory-only — publish, edit, reopen the tab, and it reads 0 over a site
+     with real unpublished changes. These stamps survive the reload. */
+  it("edited after the last deploy → unpublished changes", async () => {
+    sitesGetQuery.mockResolvedValueOnce({
+      status: "PUBLISHED",
+      publishedUrl: "https://x.vercel.app",
+      lastPublishedAt: "2026-08-20T10:00:00.000Z",
+      lastEditedAt: "2026-08-21T09:00:00.000Z",
+    });
+    const state = await fetchSitePublishState("site-1");
+    expect(state.hasUnpublishedChanges).toBe(true);
+    expect(state.lastPublishedAt).toBe("2026-08-20T10:00:00.000Z");
+  });
+
+  it("last edit predates the deploy → nothing to publish", async () => {
+    sitesGetQuery.mockResolvedValueOnce({
+      status: "PUBLISHED",
+      publishedUrl: "https://x.vercel.app",
+      lastPublishedAt: "2026-08-21T10:00:00.000Z",
+      lastEditedAt: "2026-08-20T09:00:00.000Z",
+    });
+    expect((await fetchSitePublishState("site-1")).hasUnpublishedChanges).toBe(false);
+  });
+
+  /* Never published, or the server sent no stamps: UNKNOWN, not "no". A caller
+     that reads null as false tells someone their site is up to date on a site
+     that has never been live. */
+  it("never published → unknown, not false", async () => {
+    sitesGetQuery.mockResolvedValueOnce({
+      status: "DRAFT",
+      publishedUrl: null,
+      lastPublishedAt: null,
+      lastEditedAt: "2026-08-21T09:00:00.000Z",
+    });
+    expect((await fetchSitePublishState("site-1")).hasUnpublishedChanges).toBeNull();
   });
 });
