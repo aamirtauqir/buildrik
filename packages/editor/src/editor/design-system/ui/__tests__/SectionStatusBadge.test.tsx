@@ -65,3 +65,24 @@ describe("SectionStatusBadge — the export outcome (306:2232)", () => {
   });
 });
 
+describe("SectionStatusBadge — the import outcome (306:2265 / 306:2298)", () => {
+  it("uses each board's own wording", () => {
+    const { rerender } = render(<SectionStatusBadge status="imported" />);
+    expect(screen.getByTestId("brand-section-status").textContent).toBe("Imported tokens");
+    rerender(<SectionStatusBadge status="import-failed" />);
+    expect(screen.getByTestId("brand-section-status").textContent).toBe("Import failed");
+  });
+
+  it("a failed import is the ONE state here that may be red", () => {
+    /* Draft, exported and imported are all things that worked or that the user
+       chose. Colouring those red would spend the one signal that means "this
+       did not happen" on four states where it did. */
+    const { container: failed } = render(<SectionStatusBadge status="import-failed" />);
+    expect(failed.innerHTML).toMatch(/red|failure/i);
+    for (const s of ["draft", "exported", "imported"] as const) {
+      const { container } = render(<SectionStatusBadge status={s} />);
+      expect(container.innerHTML).not.toMatch(/red|failure/i);
+    }
+  });
+});
+

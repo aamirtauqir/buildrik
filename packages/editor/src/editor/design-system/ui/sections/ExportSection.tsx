@@ -151,9 +151,12 @@ export interface ExportSectionProps {
    *  export. The badge belongs to the screen frame, which this section sits
    *  inside, so the outcome is reported upward rather than drawn here. */
   onExported?(formatLabel: string): void;
+  /** Boards 306:2265 / 306:2298 — passed straight through to the ImportCard
+   *  that owns the outcome. */
+  onImportOutcome?(outcome: "imported" | "import-failed"): void;
 }
 
-export const ExportSection: React.FC<ExportSectionProps> = ({ onExported }) => {
+export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImportOutcome }) => {
   const color      = useColorRegistry();
   const type       = useTypeRegistry();
   const spacing    = useSpacingRegistry();
@@ -343,7 +346,7 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onExported }) => {
             before taking it is real capability, not decoration. */}
       </div>
 
-      <ImportCard />
+      <ImportCard onOutcome={onImportOutcome} />
     </div>
   );
 };

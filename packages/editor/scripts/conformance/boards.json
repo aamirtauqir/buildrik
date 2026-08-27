@@ -242,7 +242,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "open:status-pill-convention",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -264,7 +264,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "open:status-pill-convention",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -451,7 +451,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "open:status-pill-convention",
+      "authority": "board:306-2049-modal",
       "recipe": null
     },
     {
@@ -462,7 +462,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "open:status-pill-convention",
+      "authority": "board:306-2080-modal",
       "recipe": null
     },
     {

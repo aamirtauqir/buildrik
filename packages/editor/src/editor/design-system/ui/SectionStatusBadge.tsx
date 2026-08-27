@@ -43,13 +43,15 @@ import { Badge } from "@/editor/chrome-ui";
 
 /** Only the state the data model can actually answer. `bound` / `unbound` are
  *  absent on purpose — see the note above. */
-export type SectionStatus = "draft" | "exported";
+export type SectionStatus = "draft" | "exported" | "imported" | "import-failed";
 
 /** The boards' wording, not a paraphrase — 306:2161 and 306:2232. The export
  *  label names the FORMAT ("Exported CSS"), so it composes. */
 const LABEL: Record<SectionStatus, string> = {
   draft: "Draft preset",
   exported: "Exported",
+  imported: "Imported tokens",
+  "import-failed": "Import failed",
 };
 
 /** Neither is a failure — a draft is a state the user chose, an export is a
@@ -57,6 +59,9 @@ const LABEL: Record<SectionStatus, string> = {
 const COLOR: Record<SectionStatus, string> = {
   draft: "info",
   exported: "success",
+  imported: "success",
+  /* The one state here that IS a failure, and the only one that may be red. */
+  "import-failed": "failure",
 };
 
 export interface SectionStatusBadgeProps {

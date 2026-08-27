@@ -276,8 +276,9 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
   /* Cleared when the screen changes: a badge saying "Exported CSS" on a screen
      the user walked back into later is stale news dressed as fresh. */
   const [lastExport, setLastExport] = React.useState<string | null>(null);
+  const [importOutcome, setImportOutcome] = React.useState<"imported" | "import-failed" | null>(null);
   React.useEffect(() => {
-    if (activeSection !== "export") setLastExport(null);
+    if (activeSection !== "export") { setLastExport(null); setImportOutcome(null); }
   }, [activeSection]);
 
   const sectionCounts = React.useMemo<Partial<Record<DesignSection, number>>>(() => {
@@ -674,6 +675,12 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
           {activeSection === "export" && lastExport && (
             <SectionStatusBadge status="exported" detail={lastExport} />
           )}
+          {/* Boards 306:2265 / 306:2298 — the import outcome, under the same
+              back row. The card shows its own error DETAIL inline; this says
+              what state the screen is in. */}
+          {activeSection === "export" && !lastExport && importOutcome && (
+            <SectionStatusBadge status={importOutcome} />
+          )}
           {/* Brand root — the drill-in list (M5, board 152:2) */}
           {activeSection === null && suppressedCount > 0 ? (
             <div className="tw:px-3 tw:pb-2">
@@ -780,7 +787,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
           {activeSection === "typography" && <TypographySection composer={composer} />}
           {activeSection === "colour-mode" && <ColourModeSection composer={composer} />}
           {activeSection === "lint"       && <LintSection issues={lintIssues} />}
-          {activeSection === "export"     && <ExportSection onExported={setLastExport} />}
+          {activeSection === "export"     && <ExportSection onExported={setLastExport} onImportOutcome={setImportOutcome} />}
         </div>
       )}
 
