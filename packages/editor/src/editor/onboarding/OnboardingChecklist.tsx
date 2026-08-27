@@ -251,13 +251,50 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
    which covered its "Zoom in" row. A dismissible progress helper does not
    outrank an open menu — drawer height puts it above the canvas and below
    popovers (40), overlays (50) and modals (60). */
+/* IN THE STATUS BAR, NOT ON TOP OF THE WORK (2026-08-27).
+
+   `right-6 bottom-20` put the pill on the inspector: measured live at
+   1440x900 with an element selected, it sat on the "Background" row and held
+   it for the whole first session. Two further placements were measured and
+   both failed, which is the finding:
+
+     left of the inspector  → landed on the canvas toolbar's "X-Ray" button.
+                              That toolbar is NOT bottom-centred the way its
+                              floating-pill look suggests — it spans the full
+                              canvas width, x 380→1140 at y 796→836.
+     above the toolbar      → landed on the canvas breadcrumb's
+                              "← Parent / → Child".
+
+   There is no free bottom corner in this shell. Every bottom-anchored float
+   covers a control somewhere. The footer is the one band with room: 32 tall,
+   full width, and empty from x 105 to x 1328 — the selection readout on the
+   left, the device/zoom readout on the right, 1223px of nothing between.
+
+   So the collapsed chip lives in the footer band and covers only that gap, and
+   the panel opens upward from it. It is still `fixed` rather than a child of
+   StudioFooter — the orchestrator's state lives here, and a second mount point
+   would mean a second copy of it — but it occupies status-bar space and
+   nothing else. Right offset clears the device/zoom readout with room for its
+   longest label ("Tablet · 150%").
+
+   Underscores become spaces in a Tailwind arbitrary value, and `calc()` needs
+   them around the `+` or the declaration is invalid and silently drops. */
+const CHIP_RIGHT = "tw:right-[160px]";
+
 const PANEL =
-  "tw:fixed tw:right-6 tw:bottom-20 tw:w-80 tw:max-h-[540px] tw:bg-white tw:border tw:border-gray-200 " +
+  `tw:fixed ${CHIP_RIGHT} tw:bottom-10 tw:w-80 tw:max-h-[540px] tw:bg-white ` +
+  "tw:border tw:border-gray-200 " +
   "tw:rounded-xl tw:[box-shadow:var(--bk-shadow-overlay)] tw:[z-index:var(--bk-z-drawer)] tw:overflow-hidden tw:flex " +
   "tw:flex-col tw:[font-family:var(--bk-font-ui)]";
+/* One above the footer, which is `--bk-z-topbar` (LayoutShell.css). At drawer
+   height the chip was in the DOM at the right place and simply never painted —
+   `elementFromPoint` at its centre returned the FOOTER. Still below popovers
+   (40), overlays (50) and modals (60), so the original rule holds: a dismissible
+   progress helper does not outrank an open menu. */
 const PILL =
-  "tw:fixed tw:right-6 tw:bottom-20 tw:flex tw:items-center tw:gap-2 tw:px-3.5 tw:py-2 tw:bg-white " +
-  "tw:border tw:border-gray-200 tw:rounded-full tw:[box-shadow:var(--bk-shadow-overlay)] tw:[z-index:var(--bk-z-drawer)] " +
+  `tw:fixed ${CHIP_RIGHT} tw:bottom-0.5 tw:flex tw:items-center tw:gap-2 tw:px-3 tw:py-0.5 tw:bg-white ` +
+  "tw:border tw:border-gray-200 tw:rounded-full tw:[box-shadow:var(--bk-shadow-overlay)] " +
+  "tw:[z-index:calc(var(--bk-z-topbar)_+_1)] " +
   "tw:cursor-pointer tw:[font-family:var(--bk-font-ui)] tw:select-none";
 const PILL_DOT = "tw:size-2 tw:rounded-full tw:flex-none";
 const PILL_TEXT = "tw:text-xs tw:font-semibold tw:text-gray-900 tw:whitespace-nowrap";
