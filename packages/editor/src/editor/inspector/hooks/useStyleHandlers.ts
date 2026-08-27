@@ -16,6 +16,7 @@ import { useCallback, useState, useEffect, useRef } from "react";
 import type { Composer } from "../../../engine";
 import { getBreakpointQuery } from "../../../shared/constants/breakpoints";
 import { getDefaultStyles } from "../../../shared/constants/defaultStyles";
+import { getDOMElement } from "../../../engine/canvas/resize/utils";
 import type { PseudoStateId } from "../../../shared/types";
 import type { BreakpointId } from "../../../shared/types/breakpoints";
 import { devLogger } from "../../../shared/utils/devLogger";
@@ -46,6 +47,33 @@ export interface StyleHandlers {
 /**
  * Hook to manage style changes with breakpoint and pseudo-state awareness
  */
+/**
+ * What the element ACTUALLY renders, for the properties it has no value of its
+ * own. Keeps the panel honest without changing which rows it shows.
+ *
+ * Colours are skipped: `getComputedStyle` returns `rgb(...)` and the colour
+ * controls expect a hex string, so a computed colour would be shown as a
+ * broken value rather than a truer one. They keep the type default until the
+ * controls speak both.
+ */
+function readRenderedValues(
+  elementId: string,
+  keys: string[],
+  authored: Record<string, string>,
+): Record<string, string> {
+  const node = getDOMElement(elementId);
+  if (!node) return {};
+  const cs = window.getComputedStyle(node);
+  const out: Record<string, string> = {};
+  for (const key of keys) {
+    if (authored[key]) continue;
+    if (key === "color" || key.endsWith("-color")) continue;
+    const value = cs.getPropertyValue(key);
+    if (value) out[key] = value.trim();
+  }
+  return out;
+}
+
 export function useStyleHandlers(
   selectedElement: SelectedElement | null,
   composer: Composer | null | undefined,
@@ -95,7 +123,24 @@ export function useStyleHandlers(
 
     const defaultStyles = getDefaultStyles(selectedElement.type, selectedElement.tagName);
     const effective = computeEffectiveStyles(el, composer, currentBreakpoint, currentPseudoState);
-    setStyles({ ...defaultStyles, ...effective });
+    /* For a property the element does not carry, the panel used to print the
+       TYPE's default — so a legacy heading with no font-size of its own read
+       "36" while it rendered at 24. Measured live at 1440×900 on a heading that
+       predates `applyTypeDefaults`.
+
+       The default is still the base, because it decides WHICH rows appear.
+       What each unset row SHOWS is now what the element actually renders, read
+       off the canvas node. Authored values are untouched — `effective` is
+       applied last and still wins.
+
+       Only keys the defaults already name are read, so the row set does not
+       change; and only on desktop/base, because a computed value describes the
+       live canvas, not the breakpoint or pseudo-state being edited. */
+    const rendered =
+      currentBreakpoint === "desktop" && currentPseudoState === "normal"
+        ? readRenderedValues(selectedElement.id, Object.keys(defaultStyles), effective)
+        : {};
+    setStyles({ ...defaultStyles, ...rendered, ...effective });
 
     // Overridden-keys indicator — which keys come from the breakpoint layer
     // specifically (not pseudo or base). Separate from the effective map
