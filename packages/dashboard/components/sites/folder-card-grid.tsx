@@ -111,8 +111,12 @@ export function FolderCardGrid({
           return (
             <div
               key={folder.id}
+              /* Was min-h-[167px] with the icon pinned top and the label pushed
+                 to the bottom by mt-auto — a 220px tall tile that was ~70%
+                 empty, in its own band above the site grid. A folder is a
+                 filter, not a site: it gets a row, not a poster. */
               className={cn(
-                "relative flex min-h-[167px] flex-col overflow-hidden rounded-lg border shadow-card transition-colors",
+                "relative flex flex-col overflow-hidden rounded-lg border shadow-card transition-colors hover:border-[var(--color-border-strong)]",
                 active && "ring-2 ring-[var(--color-primary)]"
               )}
               style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
@@ -126,16 +130,23 @@ export function FolderCardGrid({
               <button
                 type="button"
                 onClick={() => onSelect(folder.id)}
-                className="flex h-full w-full flex-col p-5 text-left"
+                className="flex w-full items-center gap-3 p-4 text-left"
               >
-                <Folder className="h-5 w-5" style={{ color: "var(--color-text-muted)" }} />
-                <h3 className="mt-auto truncate pr-6 text-section-title font-semibold" style={{ color: "var(--color-text-primary)" }}>
+                <span
+                  className="grid h-9 w-9 shrink-0 place-items-center rounded-lg"
+                  style={{ backgroundColor: "var(--color-bg-subtle)" }}
+                >
+                  <Folder className="h-[18px] w-[18px]" style={{ color: "var(--color-text-muted)" }} />
+                </span>
+                <span className="min-w-0 flex-1">
+                <h3 className="truncate pr-6 text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>
                   {folder.name}
                 </h3>
-                <p className="mt-1 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
+                <p className="mt-0.5 truncate text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
                   <MetricValue>{folder.count}</MetricValue> sites · <MetricValue>{folder.liveCount}</MetricValue> live ·{" "}
                   <MetricValue>{formatCompact(folder.views)}</MetricValue> views
                 </p>
+                </span>
               </button>
             </div>
           );

@@ -8,6 +8,8 @@ import { siteStatusTone, siteStatusLabel } from "./site-status";
 import { Pill, MetricValue } from "@/components/dashboard/primitives";
 
 interface SiteCardFullProps {
+  /** True while any card in the grid is selected — keeps every checkbox visible mid-selection. */
+  selectionActive?: boolean;
   site: { id: string; name: string; slug: string; status: string; thumbnail: string | null; pages: number; lastEditedAt: Date; publishedUrl: string | null; visitors30d: number; createdBy: string; domain: string | null; themeLocked?: boolean };
   selected: boolean;
   onSelect: (id: string, event?: React.MouseEvent) => void;
@@ -29,13 +31,22 @@ function formatVisitors(count: number): string {
   return String(count);
 }
 
-export function SiteCardFull({ site, selected, onSelect, onAction }: SiteCardFullProps) {
+export function SiteCardFull({ site, selected, selectionActive, onSelect, onAction }: SiteCardFullProps) {
   return (
     <div
       className={cn("group relative overflow-hidden rounded-lg border bg-white shadow-card transition-shadow hover:shadow-md", selected && "ring-2 ring-[var(--color-primary)]")}
       style={{ borderColor: "var(--color-border-default)" }}
     >
-      <div className="absolute left-3 top-3 z-10">
+      {/* The checkbox used to render on every card at all times — a control
+          nobody had asked for yet, on every tile in the grid. It appears on
+          hover, while a selection is live, or when this card is the selected
+          one, which is how the members table already behaves. */}
+      <div
+        className={cn(
+          "absolute left-3 top-3 z-10 transition-opacity focus-within:opacity-100 group-hover:opacity-100",
+          selected || selectionActive ? "opacity-100" : "opacity-0",
+        )}
+      >
         <input
           type="checkbox"
           aria-label={`Select ${site.name}`}

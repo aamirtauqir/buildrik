@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Plus, UserPlus, LayoutTemplate } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { CreateSiteModal } from "@/components/sites/create-site-modal";
+import { Button, ButtonLink } from "@/components/dashboard/primitives";
 import { useToast } from "@/components/dashboard/toast-provider";
 
 // Fixed destinations, reusing the hrefs the dynamic quick-action list already
@@ -36,25 +36,24 @@ export function QuickActions() {
 
   return (
     <div className="flex flex-col gap-[9px]">
-      <button
-        type="button"
-        onClick={() => setCreateOpen(true)}
-        className="flex items-center gap-[9px] rounded-lg bg-[var(--color-primary)] px-[14px] py-[11px] text-[13.5px] font-semibold text-white transition-colors hover:bg-[var(--color-primary-hover)]"
-      >
+      {/* Was a hand-rolled button: 42px tall, 13.5px/600, its own hover colour —
+          while "New site" on the Sites screen (the same action) came out of the
+          Button primitive at 40px/14px/500. Two shapes for one action. */}
+      <Button onClick={() => setCreateOpen(true)} className="tw:justify-start gap-[9px]">
         <Plus className="h-4 w-4" strokeWidth={2} /> Create a site
-      </button>
+      </Button>
 
       {ACTIONS.map((action) => {
         const Icon = action.icon;
         return (
-          <Link
+          <ButtonLink
             key={action.label}
             href={action.href}
-            className="flex items-center gap-[9px] rounded-lg border px-[14px] py-[11px] text-[13.5px] font-semibold transition-colors hover:border-[var(--color-primary)]"
-            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
+            variant="ghost"
+            className="tw:justify-start gap-[9px]"
           >
             <Icon className="h-4 w-4" strokeWidth={2} /> {action.label}
-          </Link>
+          </ButtonLink>
         );
       })}
 

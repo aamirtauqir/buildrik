@@ -12,7 +12,7 @@ export function SiteGrid({ sites, selectedIds, onSelect, onAction }: SiteGridPro
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {sites.map((site) => (
-        <SiteCardFull key={site.id} site={site} selected={selectedIds.has(site.id)} onSelect={onSelect} onAction={onAction} />
+        <SiteCardFull key={site.id} site={site} selected={selectedIds.has(site.id)} selectionActive={selectedIds.size > 0} onSelect={onSelect} onAction={onAction} />
       ))}
     </div>
   );

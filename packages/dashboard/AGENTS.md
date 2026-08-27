@@ -76,6 +76,17 @@ screen means one of the three above was skipped.
   including "New site" and the cookie banner's "Accept All". `<ThemeInit />`
   from `.flowbite-react/init.tsx` (rendered in `app/layout.tsx`) is the half
   that reaches the browser; it is CLI-generated and **must stay committed**.
+- **To override a flowbite base utility, the override must be `tw:`-prefixed.**
+  Dashboard app code writes UNPREFIXED Tailwind, but flowbite's own base classes
+  are `tw:`-prefixed — so `<Button className="justify-start">` lands on an
+  element that already carries `tw:justify-center`, twMerge cannot dedupe across
+  the prefix boundary, and the computed value stays `center`. The unprefixed
+  class is an orphan: present in the DOM, backed by nothing that wins. Write
+  `tw:justify-start` when overriding a flowbite base, plain `gap-3` when adding
+  something flowbite does not set. This is the likely reason so many screens
+  hand-rolled a `<button>` instead of using the primitive — the primitive looked
+  un-overridable. Measured 2026-08-27: 24 distinct button variants across 8
+  screens, with the same primary action rendering at 36/40/42px tall.
 - **Flowbite's default purple is not ours.** DESIGN.md bans purple/violet/
   indigo as accents. The Flowbite purple ramp is allowed for exactly two data
   uses — avatar identity tones and the PRO badge. Pass `color="blue"` (or the

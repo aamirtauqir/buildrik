@@ -487,27 +487,31 @@ export default function ProjectsPage() {
         />
       )}
 
-      {/* Search + filters */}
+      {/* One control strip: search, status chips, sort and filters on a single
+          row. These were three stacked rows, so the eye crossed four bands of
+          chrome before reaching a site. */}
       <div className="mt-4 flex flex-col gap-3">
-        <div className="relative max-w-md">
-          <InputField
-            ref={searchRef}
-            leading={<Search className="h-4 w-4" />}
-            type="text"
-            value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            placeholder="Search sites…"
-            aria-label="Search sites"
-            className="pr-8"
-          />
-          <kbd
-            className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 rounded border px-1.5 py-0.5 text-eyebrow font-medium"
-            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-muted)", backgroundColor: "var(--color-bg-subtle)" }}
-          >
-            /
-          </kbd>
-        </div>
         <SiteFilters
+          search={
+            <div className="relative w-[260px] shrink-0">
+              <InputField
+                ref={searchRef}
+                leading={<Search className="h-4 w-4" />}
+                type="text"
+                value={search}
+                onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+                placeholder="Search sites…"
+                aria-label="Search sites"
+                className="h-[30px] rounded-pill py-0 pr-8"
+              />
+              <kbd
+                className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 rounded border px-1.5 py-0.5 text-eyebrow font-medium"
+                style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-muted)", backgroundColor: "var(--color-bg-subtle)" }}
+              >
+                /
+              </kbd>
+            </div>
+          }
           status={status}
           onStatusChange={(val) => { setStatus(val); setPage(1); }}
           archivedCount={archivedQuery.data?.total ?? 0}

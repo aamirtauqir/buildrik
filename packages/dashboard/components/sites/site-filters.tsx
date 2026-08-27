@@ -1,6 +1,6 @@
 "use client";
 import { ChevronDown, ChevronUp, ToggleLeft, ToggleRight } from "lucide-react";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { cn } from "@lib/utils";
 import { trpc } from "@lib/trpc/client";
 import { FilterChip as ChipButton, MetricValue } from "@/components/dashboard/primitives";
@@ -49,6 +49,10 @@ interface SiteFiltersProps {
   hasTraffic: "none" | "1-100" | "100-1000" | "1000+" | undefined;
   onHasTrafficChange: (v: "none" | "1-100" | "100-1000" | "1000+" | undefined) => void;
   archivedCount?: number;
+  /** Rendered at the head of the filter row. The search box used to sit on its
+   *  own row above this one, which gave Sites four stacked control rows before
+   *  any content (header actions, folder cards, search, filters). One strip. */
+  search?: ReactNode;
 }
 
 
@@ -61,6 +65,7 @@ export function SiteFilters({
   hasCustomDomain, onHasCustomDomainChange,
   hasTraffic, onHasTrafficChange,
   archivedCount,
+  search,
 }: SiteFiltersProps) {
   const [sortOpen, setSortOpen] = useState(false);
   const [advancedOpen, setAdvancedOpen] = useState(false);
@@ -78,6 +83,7 @@ export function SiteFilters({
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center gap-3">
+        {search}
         {/* Status chips */}
         <div className="flex gap-1.5">
           {STATUS_FILTER_OPTIONS.map((opt) => (
@@ -93,7 +99,7 @@ export function SiteFilters({
         <div className="ml-auto flex items-center gap-2">
           {/* Sort dropdown */}
           <div className="relative">
-            <button onClick={() => setSortOpen(!sortOpen)} className="flex items-center gap-1 rounded-md border px-3 py-1.5 text-body-sm font-medium" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)", backgroundColor: "var(--color-bg-surface)" }}>
+            <button onClick={() => setSortOpen(!sortOpen)} className="flex items-center gap-1 rounded-pill border px-3 py-1 text-body-sm font-medium transition-colors" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)", backgroundColor: "var(--color-bg-surface)" }}>
               {SORT_OPTIONS.find((o) => o.value === sort)?.label ?? "Sort"}
               <ChevronDown className="h-3.5 w-3.5" />
             </button>
@@ -110,7 +116,7 @@ export function SiteFilters({
           {/* Advanced filters toggle */}
           <button
             onClick={() => setAdvancedOpen(!advancedOpen)}
-            className="flex items-center gap-1 rounded-md border px-3 py-1.5 text-body-sm font-medium transition-colors"
+            className="flex items-center gap-1 rounded-pill border px-3 py-1 text-body-sm font-medium transition-colors"
             style={hasAdvancedFilters
               ? { borderColor: "var(--color-primary)", color: "var(--color-primary)", backgroundColor: "var(--color-primary-subtle)" }
               : { borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)", backgroundColor: "var(--color-bg-surface)" }}
