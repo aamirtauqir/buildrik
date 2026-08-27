@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
-import { assertSiteAccess, checkSiteRole, checkWorkspaceRole, PermissionError } from "@/server/services/permission.service";
+import { assertSiteAccess, checkSiteRole, checkWorkspaceRole, getEffectiveSiteRole, PermissionError } from "@/server/services/permission.service";
 import {
   listSites,
   createSite,
@@ -202,17 +202,24 @@ export const sitesRouter = router({
   myRole: protectedProcedure
     .input(z.object({ siteId: z.string() }))
     .query(async ({ ctx, input }) => {
-      const site = await ctx.prisma.site.findUnique({
-        where: { id: input.siteId },
-        select: { workspaceId: true },
-      });
-      if (!site) throw new TRPCError({ code: "NOT_FOUND" });
-      const member = await ctx.prisma.workspaceMember.findFirst({
-        where: { userId: ctx.session.user.id, workspaceId: site.workspaceId, status: "ACTIVE" },
-        select: { role: true },
-      });
-      if (!member) throw new TRPCError({ code: "FORBIDDEN", message: "Not a member of this workspace" });
-      return { role: member.role };
+      /* Answers with the EFFECTIVE role for this site, which is what the
+         comment above always said it needed. It used to read the workspace
+         membership directly and return `member.role`, ignoring this site's
+         `SitePermission.roleOverride` — so the chrome and every enforcement
+         path disagreed about who the user is, and the disagreement showed up as
+         an enabled control the server then refused. One resolver now answers
+         both. It also drops two direct Prisma reads out of a router. */
+      try {
+        return { role: await getEffectiveSiteRole(ctx.prisma, ctx.session.user.id, input.siteId) };
+      } catch (e) {
+        if (e instanceof PermissionError) {
+          throw new TRPCError({
+            code: e.code === "NOT_FOUND" ? "NOT_FOUND" : "FORBIDDEN",
+            message: e.message,
+          });
+        }
+        throw e;
+      }
     }),
 
   checkSlug: protectedProcedure

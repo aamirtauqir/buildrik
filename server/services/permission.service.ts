@@ -80,13 +80,24 @@ export async function assertSiteAccess(
   await resolveSiteScope(db, member, siteId);
 }
 
-export async function checkSiteRole(
+/**
+ * The one answer to "what role does this user have ON THIS SITE".
+ *
+ * Site scope is enforced on the way through, and this site's `roleOverride`
+ * wins over the workspace role — which is the whole reason this exists as its
+ * own export. `sites.myRole` used to answer the chrome's version of this
+ * question with a bare `workspaceMember.findFirst` and return `member.role`, so
+ * a member with a per-site override was told one thing by the UI and a
+ * different thing by every enforcement path. A control that is enabled because
+ * the chrome believes you are an EDITOR, on a server that knows you are a
+ * VIEWER here, is the shape this repo files under copy-on-a-permission-boundary.
+ */
+export async function getEffectiveSiteRole(
   db: PrismaClient,
   userId: string,
   siteId: string,
-  minRole: Exclude<UserRoleType, "VIEWER">,
   bearer?: BearerScope | null,
-): Promise<void> {
+): Promise<UserRoleType> {
   const site = await db.site.findUnique({ where: { id: siteId }, select: { workspaceId: true } });
   if (!site) throw new PermissionError("NOT_FOUND");
   if (bearer && site.workspaceId !== bearer.workspaceId) {
@@ -101,7 +112,17 @@ export async function checkSiteRole(
 
   // Enforce site scope AND read this site's role override in one step.
   const row = await resolveSiteScope(db, member, siteId);
-  const effectiveRole = (row?.roleOverride ?? member.role) as UserRoleType;
+  return (row?.roleOverride ?? member.role) as UserRoleType;
+}
+
+export async function checkSiteRole(
+  db: PrismaClient,
+  userId: string,
+  siteId: string,
+  minRole: Exclude<UserRoleType, "VIEWER">,
+  bearer?: BearerScope | null,
+): Promise<void> {
+  const effectiveRole = await getEffectiveSiteRole(db, userId, siteId, bearer);
   if ((ROLE_RANK[effectiveRole] ?? -1) < ROLE_RANK[minRole]) {
     throw new PermissionError("FORBIDDEN", "Insufficient permissions");
   }
