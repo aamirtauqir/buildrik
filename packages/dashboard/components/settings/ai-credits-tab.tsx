@@ -13,6 +13,8 @@ interface GenerationRecord {
 
 interface AICreditsTabProps {
   used?: number;
+  // Monthly site-generation allowance. -1 = unlimited, the same sentinel
+  // `dailyPromptsLimit` uses and the value BUSINESS carries in PLAN_LIMITS.
   limit?: number;
   history?: GenerationRecord[];
   // The per-day, per-user in-editor AI prompt limit — the one that actually
@@ -52,7 +54,14 @@ export function AICreditsTab({
   dailyPromptsUsed = 0,
   dailyPromptsLimit = 0,
 }: AICreditsTabProps) {
+  // -1 is "unlimited", not "a limit of minus one". Reading it as a number made
+  // BUSINESS — the plan that advertises "Unlimited AI generations" — show
+  // "0 remaining this month", "0/-1 credits used", and a Generate New Site CTA
+  // greyed out by the remaining === 0 branch below. The plan's headline feature
+  // was unreachable on the screen that exists to run it.
+  const creditsUnlimited = limit < 0;
   const remaining = Math.max(0, limit - used);
+  const outOfCredits = !creditsUnlimited && remaining === 0;
   const usagePercent = limit > 0 ? Math.min(100, (used / limit) * 100) : 0;
   const promptsUnlimited = dailyPromptsLimit < 0;
   const promptsPercent = dailyPromptsLimit > 0 ? Math.min(100, (dailyPromptsUsed / dailyPromptsLimit) * 100) : 0;
@@ -65,10 +74,10 @@ export function AICreditsTab({
           <Link
             href="/dashboard/sites/new?method=ai"
             className={`inline-flex items-center px-4 py-2 text-body font-medium rounded-md text-white ${
-              remaining === 0 ? "pointer-events-none opacity-50" : ""
+              outOfCredits ? "pointer-events-none opacity-50" : ""
             }`}
             style={{ backgroundColor: "var(--color-primary)" }}
-            aria-disabled={remaining === 0}
+            aria-disabled={outOfCredits}
           >
             Generate New Site
           </Link>
@@ -76,15 +85,28 @@ export function AICreditsTab({
       >
         <div className="flex items-center justify-between mb-2">
           <p className="text-body" style={{ color: "var(--color-text-primary)" }}>
-            <MetricValue className="text-lg font-semibold">{remaining}</MetricValue> remaining this month
+            {creditsUnlimited ? (
+              <MetricValue className="text-lg font-semibold">Unlimited</MetricValue>
+            ) : (
+              <><MetricValue className="text-lg font-semibold">{remaining}</MetricValue> remaining this month</>
+            )}
           </p>
-          <p className="text-body font-medium" style={{ color: "var(--color-text-secondary)" }}>
-            <MetricValue>{used}/{limit}</MetricValue> credits used
-          </p>
+          {!creditsUnlimited && (
+            <p className="text-body font-medium" style={{ color: "var(--color-text-secondary)" }}>
+              <MetricValue>{used}/{limit}</MetricValue> credits used
+            </p>
+          )}
+          {creditsUnlimited && (
+            <p className="text-body font-medium" style={{ color: "var(--color-text-secondary)" }}>
+              <MetricValue>{used}</MetricValue> generated this month
+            </p>
+          )}
         </div>
-        <ProgressBar pct={usagePercent} tone="accent" />
+        {!creditsUnlimited && <ProgressBar pct={usagePercent} tone="accent" />}
         <p className="text-body-sm mt-2" style={{ color: "var(--color-text-secondary)" }}>
-          Credits reset on the 1st of each month.
+          {creditsUnlimited
+            ? "Your plan includes unlimited site generations."
+            : "Credits reset on the 1st of each month."}
         </p>
       </SectionCard>
 
