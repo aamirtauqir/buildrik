@@ -127,9 +127,21 @@ export function useOnboardingOrchestrator(): OnboardingOrchestratorState {
     return first?.id ?? null;
   });
 
-  // Refs so callbacks always read current state without stale closures
+  /* `stepsRef` is the AUTHORITATIVE working copy, written at commit time by the
+     callbacks below — never re-assigned during render.
+
+     It used to be `stepsRef.current = steps` here, and that lost a step whenever
+     two completions landed in one synchronous turn: no render can interleave
+     inside one JS turn, so both calls read the same pre-render value and the
+     second `setSteps` (and the second localStorage write) clobbered the first.
+     Not a batching artefact — `EventEmitter.emit` calls its handlers inline, and
+     `OnboardingMount` registers three step signals on the same composer, so one
+     user action really can complete two steps. The counter was the visible half;
+     `activeStepId`, the achievement payload and `isLastStep` were all derived
+     from the stale value too.
+
+     Every writer must keep the ref in step — see `replayAll`. */
   const stepsRef = useRef<OnboardingStep[]>(steps);
-  stepsRef.current = steps;
   const achievementRef = useRef<AchievementPromptState | null>(null);
   achievementRef.current = achievement;
 
@@ -152,6 +164,9 @@ export function useOnboardingOrchestrator(): OnboardingOrchestratorState {
       if (prev.find((s) => s.id === stepId)?.completed) return; // already done
 
       const next = prev.map((s) => (s.id === stepId ? { ...s, completed: true } : s));
+      /* Commit to the ref FIRST so a second completion in this same turn reads
+         this one's result rather than the value both started from. */
+      stepsRef.current = next;
       setSteps(next);
 
       try {
@@ -197,6 +212,10 @@ export function useOnboardingOrchestrator(): OnboardingOrchestratorState {
   // ── replayAll ──────────────────────────────────────────────────────────────
   const replayAll = useCallback(() => {
     const fresh = DEFAULT_ONBOARDING_STEPS;
+    /* The ref is written here too. It used to self-heal on the next render via
+       the render-time assignment that is now gone — without this line, a replay
+       followed by a completion would resurrect the pre-replay list. */
+    stepsRef.current = fresh;
     setSteps(fresh);
     setActiveStepId(fresh[0]?.id ?? null);
     setIsMinimized(false);

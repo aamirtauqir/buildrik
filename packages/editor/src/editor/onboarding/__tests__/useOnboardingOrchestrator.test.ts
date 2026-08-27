@@ -240,6 +240,50 @@ describe("step completion + progression", () => {
     expect(persisted.find((s) => s.id === "pick-start")?.completed).toBe(false);
   });
 
+  /* Both calls sit inside ONE act(). Every other case in this file gives each
+     completion its own act(), which flushes a render between them — which is
+     exactly why the suite could not see this bug: `stepsRef` was assigned during
+     render, so two completions in one synchronous turn both read the pre-render
+     value and the second write clobbered the first. One user action really does
+     complete two steps (the emitter calls its handlers inline and three step
+     signals share one composer), so the collision is constructed here rather
+     than borrowed from an insert. */
+  it("two completions in ONE tick both survive, in state and in storage", () => {
+    const { result } = renderHook(() => useOnboardingOrchestrator());
+
+    act(() => {
+      result.current.completeStep("add-element");
+      result.current.completeStep("edit-text");
+    });
+
+    expect(result.current.completedCount).toBe(2);
+    expect(result.current.steps.find((s) => s.id === "add-element")?.completed).toBe(true);
+    expect(result.current.steps.find((s) => s.id === "edit-text")?.completed).toBe(true);
+
+    const persisted = JSON.parse(
+      localStorage.getItem(STORAGE_KEYS.ONBOARDING_PROGRESS)!
+    ) as Array<{ id: string; completed: boolean }>;
+    expect(persisted.find((s) => s.id === "add-element")?.completed).toBe(true);
+    expect(persisted.find((s) => s.id === "edit-text")?.completed).toBe(true);
+  });
+
+  /* replayAll writes stepsRef too. It used to self-heal through the render-time
+     assignment; without this the first completion after a replay would resurrect
+     the pre-replay list. */
+  it("a completion right after replayAll starts from the fresh list", () => {
+    seedProgress(["name-project", "pick-start", "add-element"]);
+    const { result } = renderHook(() => useOnboardingOrchestrator());
+    expect(result.current.completedCount).toBe(3);
+
+    act(() => {
+      result.current.replayAll();
+      result.current.completeStep("add-element");
+    });
+
+    expect(result.current.completedCount).toBe(1);
+    expect(result.current.steps.find((s) => s.id === "name-project")?.completed).toBe(false);
+  });
+
   it("completeStep skips over already-completed steps when advancing", () => {
     seedProgress(["pick-start"]);
     const { result } = renderHook(() => useOnboardingOrchestrator());
