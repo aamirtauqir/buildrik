@@ -10,6 +10,7 @@
     "gate:ds": "bash scripts/ds-grep-gates.sh",
     "gate:figma": "node scripts/check-figma-conformance.mjs",
     "gate:trpc-orphans": "node scripts/check-trpc-orphans.mjs",
+    "gate:button-variants": "node scripts/check-button-variants.mjs",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:cloud": "playwright test --project='bs-*'",

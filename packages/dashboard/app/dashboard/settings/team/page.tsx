@@ -9,7 +9,7 @@ import { InviteModal } from "@/components/team/invite-modal";
 import { PendingInvites } from "@/components/team/pending-invites";
 import { TeamEmptyState } from "@/components/team/team-empty-state";
 import { ErrorState, DeniedState } from "@/components/states";
-import { MetricValue } from "@/components/dashboard/primitives";
+import { Button, MetricValue } from "@/components/dashboard/primitives";
 import { UserPlus } from "lucide-react";
 
 export default function TeamPage() {
@@ -153,26 +153,25 @@ export default function TeamPage() {
           </span>
         )}
         {!isEmpty && (
-          <button
+          /* Was hand-rolled at 38px while the identical Select/Invite pair on
+             the Sites screen already used the primitive at 40px. Same active
+             style override the Sites page applies. */
+          <Button
+            variant="ghost"
             onClick={() => setSelectMode((v) => !v)}
-            className="rounded-lg border px-3 py-2 text-body font-medium transition-colors"
             style={
               selectMode
                 ? { borderColor: "var(--color-primary)", color: "var(--color-primary)", backgroundColor: "var(--color-primary-subtle)" }
-                : { borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }
+                : undefined
             }
           >
             Select
-          </button>
+          </Button>
         )}
-        <button
-          onClick={() => setInviteOpen(true)}
-          className="flex items-center gap-2 rounded-lg px-4 py-2 text-body font-medium text-white"
-          style={{ backgroundColor: "var(--color-primary)" }}
-        >
+        <Button onClick={() => setInviteOpen(true)} className="gap-2">
           <UserPlus className="h-4 w-4" />
           Invite
-        </button>
+        </Button>
       </div>
 
       {isEmpty ? (

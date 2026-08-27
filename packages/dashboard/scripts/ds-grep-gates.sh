@@ -52,6 +52,7 @@ D2_HITS=$(grep -rEni "purple|violet|indigo|#7c3aed|#a855f7|#8b5cf6|#6366f1|#4f46
   | grep -v "/node_modules/" \
   | grep -v "/.next/" \
   | grep -v "components/settings/profile-form.tsx" \
+  | grep -v "/.flowbite-react/" \
   | wc -l | tr -d ' ')
 if [ "$D2_HITS" -gt 0 ]; then
   echo "GATE FAIL: D2 — $D2_HITS purple/violet/indigo bleed in dashboard chrome"
@@ -60,6 +61,7 @@ if [ "$D2_HITS" -gt 0 ]; then
     | grep -v "/node_modules/" \
     | grep -v "/.next/" \
     | grep -v "components/settings/profile-form.tsx" \
+  | grep -v "/.flowbite-react/" \
     | head -5
   exit 1
 fi

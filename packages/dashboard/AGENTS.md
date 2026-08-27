@@ -39,9 +39,22 @@ consistent.
    they do not style surfaces directly (DESIGN.md §Dashboard).
 2. `flowbite-react` directly, when no primitive covers it.
 3. A new primitive **composed from flowbite-react**, when the same shape is
-   needed twice. Six of the thirteen primitives already do this
-   (button, data-table, modal, pill, progress-bar, …); the rest are still raw
-   markup and are the drain target, not the pattern to copy.
+   needed twice. **Four** of the thirteen primitives do this — button,
+   data-table, pill, progress-bar. This said "six" and listed `modal` until
+   2026-08-27; `modal.tsx` names flowbite-react only in a comment explaining why
+   it REJECTS it (flowbite's Modal quantises width to size steps, and the focus
+   trap here is live-tested across 26 consumers). A grep for the string counts
+   that comment — check the import, not the mention.
+
+   The other nine are not a drain target. Seven have no flowbite counterpart at
+   all: `page-header` and `section-card` are layout structure (which AGENTS.md
+   says stays custom), `stat-card` paints entirely through an inline style
+   object, `filter-chip` is a `<button aria-pressed>` where Badge is a `<span>`,
+   `filter-tabs` is a controlled track where flowbite Tabs owns its panels,
+   `icon-chip` computes a `color-mix` tint, `metric-value` is a span with
+   `tabular-nums`. Only `input-field` has a real counterpart, and converting it
+   would drop the inset-shadow hairline, the wrapper-level disabled dim, and the
+   hairline-only invalid/valid states (decision log 2026-07-29).
 
 Never a fourth option. A raw `<button>`/`<input>`/`<select>`/`<table>` in a
 screen means one of the three above was skipped.
@@ -52,9 +65,17 @@ screen means one of the three above was skipped.
   Tailwind (`className="flex items-center gap-3"`) — that is what
   `globals.css` compiles. The `tw:` prefix exists only so flowbite-react's own
   internal theme classes compile, in a separate entry (`app/tw-flowbite.css`),
-  and that entry `@source`s ONLY `.flowbite-react/class-list.json`. Writing
-  `tw:flex` in a dashboard component compiles to **nothing**. The editor is the
-  opposite — see below.
+  and that entry `@source`s `.flowbite-react/class-list.json`. **That `@source`
+  is ADDITIVE, not exclusive** — Tailwind v4 keeps automatic content detection
+  unless you write `source(none)`, so a `tw:`-prefixed class written in a
+  dashboard `.tsx` DOES compile. This bullet claimed the opposite ("writing
+  `tw:flex` compiles to nothing") until 2026-08-27, and that sentence is the
+  best available explanation for why 237 screens hand-rolled a `<button>`: it
+  told everyone the only working override mechanism did not exist. Verified two
+  ways — compiling `tw-flowbite.css` through `@tailwindcss/postcss` with a probe
+  class, and measuring `tw:justify-start` winning in a live browser. The class
+  list exists because flowbite's own theme strings live in `node_modules`,
+  which automatic detection skips. The editor is the opposite — see below.
 - **Import a new flowbite component → regenerate the class list.** Run
   `npx flowbite-react build` from `packages/dashboard`, then `rm -rf .next`.
   Flowbite's theme classes live in `node_modules`, which Tailwind never scans;

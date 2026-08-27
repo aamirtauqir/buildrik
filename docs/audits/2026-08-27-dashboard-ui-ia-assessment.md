@@ -19,8 +19,16 @@ between the page title and the first site: header actions, a folder band, a
 search row, a filter row. The search box was its own row at an arbitrary 620px,
 aligned to nothing on either side.
 
-**2. One control, many shapes.** 24 distinct button variants across 8 screens.
-The same primary action renders three different ways:
+**2. One control, many shapes.** *(Corrected 2026-08-27, same day: the true
+product count is **9**, not 24. The original probe counted every `<button>` on
+the page, which included Claude's devtools and agentation overlays rendering
+their own buttons into the document. Stripping the overlays and scoping to
+`<main>` gives 9, and 6 of those are legitimately distinct roles — chip,
+segmented tab, ghost, primary, sm-primary, upload target. The genuine
+divergence was two buttons on the Team screen. The lesson is the one already in
+this repo's memory: the dev overlay impersonates the product.)*
+
+The same primary action did render three different ways:
 
 | Button | height | size / weight | left pad |
 |---|---|---|---|
@@ -79,10 +87,12 @@ alone. Worth revisiting as a taste call, not a bug.)*
 The two bottom cards are padded to match each other rather than sized to
 content, so Recent activity carries ~120px of nothing under its two rows.
 
-**5. The site card is mostly decoration.** A 300px pastel block with one ~90px
-letter, and the actual information — name, domain, pages, visitors, status —
-compressed into the bottom quarter. The reference's cards lead with data.
-DESIGN.md's own anti-slop direction argues against decorative fills this large.
+**5. The site card leads with decoration.** *(Numbers corrected: the source is
+`aspect-[16/10]` with a `text-[38px]` initial — not "a 300px block with a ~90px
+letter", which was eyeballed off a 2x screenshot without dividing by the device
+pixel ratio. At `lg:grid-cols-3` on 1440 the cover is roughly 219px of a ~320px
+card, so about 68% cover to 32% information — the direction of the point holds,
+the magnitude was overstated by 2.4x.)* The reference's cards lead with data.
 
 **6. The sidebar's storage widget is orphaned** — pinned to the very bottom with
 ~700px of empty column above it.
@@ -105,7 +115,7 @@ flowbite internals, one token contract in `globals.css`.
 
 | | |
 |---|---|
-| Primitives composing flowbite | **5 of 13** (button, data-table, modal, pill, progress-bar) |
+| Primitives composing flowbite | **4 of 13** (button, data-table, pill, progress-bar) — this table said 5 and included `modal`; `modal.tsx` names flowbite only in a comment explaining why it rejects it |
 | Primitives still raw markup | 8 (section-card, stat-card, input-field, filter-chip, filter-tabs, icon-chip, page-header, metric-value) |
 | Raw HTML controls in screens | **310** — 237 `<button>`, 33 `<input>`, 15 `<select>`, 14 `<textarea>`, 11 `<table>` |
 | Files importing flowbite-react directly | 15 |
@@ -117,14 +127,13 @@ looks.
 
 ## What I'd do next, in order
 
-1. **Convert the 8 raw primitives to compose flowbite**, starting with
-   `input-field` and `filter-chip` (highest screen count). Every screen inherits
-   consistency without being touched.
-2. **Sweep the 237 raw `<button>`s onto the Button primitive** — now that
-   overriding it actually works.
-3. **Give the top-level screens a context row** (breadcrumb + filters) the way
-   site detail already has, and demote the greeting.
-4. **Rebalance the site card** toward data over the pastel block.
-
-1 and 2 are mechanical and safe. 3 and 4 are design decisions and should go
-through Figma first.
+*(Superseded by the autoplan review — see
+`docs/plans/2026-08-27-dashboard-flowbite-sweep.md`. Items 1 and 2 as written
+here did not survive it. Seven of the eight primitives have no flowbite
+counterpart, and `input-field` would LOSE documented behaviour by converting;
+`filter-chip` has 3 consumers, not "the highest screen count". The 237 is a
+count of `<button>` tags, including menu rows, nav-rail items and icon
+triggers — the standalone-button population is about 15. What the review found
+instead was a set of live defects the sweep would have papered over: two radius
+scales compiled side by side, a second blue in every progress bar, a focus ring
+at 1.1:1, and status pills rendering as 4px boxes. Those were fixed.)*
