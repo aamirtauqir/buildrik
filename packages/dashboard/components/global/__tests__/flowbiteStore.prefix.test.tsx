@@ -185,6 +185,36 @@ describe("dashboard flowbite prefix wiring (flowbite-bigbang collision fix)", ()
     expect(code).toContain('prefix(tw)');
   });
 
+  /**
+   * One true source (founder call, 2026-08-27). The prefixed flowbite build
+   * imports the STOCK Tailwind theme, so without this block it compiles a
+   * SECOND scale under the same utility names — measured off the bundle,
+   * `--tw-radius-md` was .375rem (6px) against the DS contract's 8px, and
+   * `--tw-radius-sm` .25rem (4px) against 6px. The prefixed layer is declared
+   * last, so on every flowbite component that second scale wins.
+   *
+   * These two files must agree. `npx flowbite-react build` rewrites
+   * tw-flowbite.css (see AGENTS.md), so the block is exactly the kind of thing
+   * that silently disappears.
+   */
+  it("the flowbite build compiles against the DS token contract, not stock Tailwind", () => {
+    const tw = readFileSync(path.resolve(__dirname, "../../../app/tw-flowbite.css"), "utf-8");
+    const code = tw.replace(/\/\*[\s\S]*?\*\//g, "");
+    expect(code).toMatch(/@theme\s*\{/);
+
+    const globals = readFileSync(path.resolve(__dirname, "../../../app/globals.css"), "utf-8");
+    // Every radius the flowbite build restates must carry the SAME value the DS
+    // declares in globals.css — asserted against each other, not hardcoded here,
+    // so moving the DS scale can never leave the two builds disagreeing again.
+    for (const token of ["--radius-xs", "--radius-sm", "--radius-md", "--radius-lg", "--radius-xl"]) {
+      const inFlowbite = code.match(new RegExp(`${token}:\\s*([^;]+);`));
+      const inGlobals = globals.match(new RegExp(`${token}:\\s*([^;]+);`));
+      expect(inFlowbite, `${token} missing from tw-flowbite.css @theme`).toBeTruthy();
+      expect(inGlobals, `${token} missing from globals.css @theme`).toBeTruthy();
+      expect(inFlowbite![1].trim(), `${token} disagrees between the two builds`).toBe(inGlobals![1].trim());
+    }
+  });
+
   it("globals.css does not compile flowbite's classes unprefixed", () => {
     const css = readFileSync(path.resolve(__dirname, "../../../app/globals.css"), "utf-8");
     const code = css.replace(/\/\*[\s\S]*?\*\//g, "");

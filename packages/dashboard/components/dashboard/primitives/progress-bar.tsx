@@ -27,17 +27,17 @@ export function ProgressBar({
   const clamped = Math.min(Math.max(pct, 0), 100);
   const resolved: ProgressTone = tone === "auto" ? (clamped >= 85 ? "error" : clamped >= 60 ? "warning" : "accent") : tone;
   return (
-    /* The fill colour comes from flowbite's theme, not from className — the bar
-       is an inner element. Stock progressTheme.color.blue is bg-blue-600
-       (#1C64F2), which is a SECOND blue: DESIGN.md's accent section is titled
-       "the guard against a second blue" and names #1A56DB. Measured live on
-       /dashboard/settings/usage before the fix: rgb(28, 100, 242). */
+    /* No per-instance colour override. flowbite's progressTheme.color.blue is
+       bg-blue-600, which used to compile to #1C64F2 — a SECOND blue, against
+       DESIGN.md's "guard against a second blue". That was patched here first;
+       the patch is gone because app/tw-flowbite.css now compiles the flowbite
+       build against the DS token contract, so blue-600 IS the accent. One
+       source, not a workaround per component. */
     <Progress
       progress={clamped}
       color={COLORS[resolved]}
       size={size === "lg" ? "md" : "sm"}
       className={cn("w-full", className)}
-      theme={{ color: { blue: "tw:bg-[var(--color-primary)]" } }}
     />
   );
 }

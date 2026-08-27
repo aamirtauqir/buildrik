@@ -33,3 +33,40 @@
 @import "tailwindcss/utilities.css" layer(tw-utilities) prefix(tw);
 @plugin "flowbite-react/plugin/tailwindcss";
 @source '../.flowbite-react/class-list.json';
+
+/* ── The DS contract is the source of truth for THIS build too ──────────────
+ *
+ * The import above pulls in the STOCK Tailwind theme. globals.css's own
+ * `@theme inline` block — the DESIGN.md token contract — is invisible to this
+ * entry, because the two are separate Next CSS entry points with separate
+ * Tailwind passes. So the dashboard was compiling TWO scales under one set of
+ * utility names, and the prefixed one wins on every flowbite component because
+ * its layer is declared last:
+ *
+ *     rounded-md   ->  8px  (DS, globals.css)
+ *     tw:rounded-md->  6px  (stock Tailwind)      <- flowbite got this one
+ *     rounded-sm   ->  6px  (DS)
+ *     tw:rounded-sm->  4px  (stock)
+ *
+ * Measured off the compiled bundle: `--tw-radius-md: .375rem`,
+ * `--tw-radius-sm: .25rem`. `--tw-radius-lg` was already .5rem and agreed with
+ * the DS by coincidence, which is the only reason buttons looked right.
+ *
+ * Founder call 2026-08-27: one true source. These restate the DESIGN.md scale
+ * so flowbite's own internals land on it instead of Tailwind's defaults.
+ * Keep in lockstep with the `@theme inline` block in globals.css — the values
+ * are asserted against each other in flowbiteStore.prefix.test.tsx.
+ *
+ * Colour: flowbite's blue-700 is already #1A56DB, which is why primary buttons
+ * were correct. blue-600 is #1C64F2 — a second blue, and DESIGN.md's accent
+ * section is titled "the guard against a second blue". Progress reaches for it,
+ * so it is mapped to the accent here rather than patched per component.
+ */
+@theme {
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --color-blue-600: #1A56DB;
+}
