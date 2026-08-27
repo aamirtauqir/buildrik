@@ -56,6 +56,13 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
   const [renameValue, setRenameValue] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
   const [deleteAssetTarget, setDeleteAssetTarget] = useState<{ id: string; name: string } | null>(null);
+  // Filing an existing asset into a folder. The editor's media tab has always
+  // been able to do this (AssetUploadService -> media.moveAsset); this screen,
+  // which is where folders are created in the first place, could not. Uploads
+  // land in whichever folder you happen to be viewing, so anything added from
+  // "All media" was stuck there for good.
+  const [moveTarget, setMoveTarget] = useState<{ id: string; name: string; folderId: string | null } | null>(null);
+  const [moveValue, setMoveValue] = useState<string>("");
   const [createOpen, setCreateOpen] = useState(false);
   const [createValue, setCreateValue] = useState("");
   const folderMenuRef = useRef<HTMLDivElement>(null);
@@ -74,6 +81,11 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
     onError: (err) => addToast("error", "Couldn't delete asset", err.message),
   });
   const createAsset = trpc.media.createAsset.useMutation();
+
+  const moveAsset = trpc.media.moveAsset.useMutation({
+    onSuccess: () => { assets.refetch(); setMoveTarget(null); addToast("success", "Asset moved"); },
+    onError: (err) => addToast("error", "Couldn't move asset", err.message),
+  });
 
   const createFolder = trpc.media.createFolder.useMutation({
     onSuccess: (folder) => {
@@ -314,6 +326,9 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
                       <button type="button" onClick={() => copyUrl(a.id, a.url)} className="rounded p-1 hover:bg-white" style={{ backgroundColor: "rgba(255,255,255,0.9)", color: "var(--color-text-primary)" }} title="Copy URL" aria-label={`Copy URL for ${a.filename}`}>
                         {copiedId === a.id ? <Check size={12} /> : <Copy size={12} />}
                       </button>
+                      <button type="button" onClick={() => { setMoveTarget({ id: a.id, name: a.filename, folderId: a.folderId ?? null }); setMoveValue(a.folderId ?? ""); }} className="rounded p-1 hover:bg-white" style={{ backgroundColor: "rgba(255,255,255,0.9)", color: "var(--color-text-primary)" }} title="Move to folder" aria-label={`Move ${a.filename} to a folder`}>
+                        <Folder size={12} />
+                      </button>
                       <button type="button" onClick={() => setDeleteAssetTarget({ id: a.id, name: a.filename })} className="rounded p-1 hover:bg-white" style={{ backgroundColor: "rgba(255,255,255,0.9)", color: "var(--color-error)" }} title="Delete" aria-label={`Delete ${a.filename}`}>
                         <Trash2 size={12} />
                       </button>
@@ -441,6 +456,43 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
             Delete <strong>{deleteTarget?.name}</strong>? Assets in this folder stay in your library and move to <strong>All</strong>. This can’t be undone.
           </p>
         </div>
+      </Modal>
+
+      {/* Move asset into a folder. Nothing is copied or deleted — the asset's
+          folderId changes, which is what the editor's media tab has always done. */}
+      <Modal
+        open={moveTarget !== null}
+        onClose={() => setMoveTarget(null)}
+        title="Move to folder"
+        width={420}
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setMoveTarget(null)}>Cancel</Button>
+            <Button
+              onClick={() => moveTarget && moveAsset.mutate({ assetId: moveTarget.id, folderId: moveValue || null })}
+              disabled={moveAsset.isPending || (moveValue || null) === (moveTarget?.folderId ?? null)}
+              className="flex-1"
+            >
+              {moveAsset.isPending ? "Moving…" : "Move"}
+            </Button>
+          </>
+        }
+      >
+        <p className="mb-2 text-body" style={{ color: "var(--color-text-secondary)" }}>
+          Move <strong style={{ color: "var(--color-text-primary)" }}>{moveTarget?.name}</strong> to:
+        </p>
+        <select
+          value={moveValue}
+          onChange={(e) => setMoveValue(e.target.value)}
+          aria-label="Destination folder"
+          className="w-full rounded-lg border px-3 py-2 text-body"
+          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)", backgroundColor: "var(--color-bg-surface)" }}
+        >
+          <option value="">All media (no folder)</option>
+          {(folders.data ?? []).map((f) => (
+            <option key={f.id} value={f.id}>{f.name}</option>
+          ))}
+        </select>
       </Modal>
 
       {/* Delete asset — the file may be referenced by a live site, so confirm. */}
