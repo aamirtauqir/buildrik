@@ -3359,10 +3359,11 @@
       "viewport": "1440x900",
       "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
       "requires": "session",
-      "pipelineState": "blocked",
+      "pipelineState": "superseded",
       "screenshotHash": "f778bc9687f868ec",
       "capturedFrom": "prod@f7b39a4c",
-      "notes": " | BLOCKED: capture submit repeatedly dies (3 attempts, viewer dashboard)"
+      "notes": " | BLOCKED: capture submit repeatedly dies (3 attempts, viewer dashboard) [2026-08-27] NOT blocked. The viewer dashboard capture landed as node 384:2 and is now registered as BL-0229 - a reported submit failure is not evidence that nothing arrived. Verified by reading the frame text back (\"Good evening, Viewer\").",
+      "supersededBy": "BL-0229"
     },
     {
       "id": "BL-0182",
@@ -3982,15 +3983,16 @@
       "flow": "dashboard",
       "viewport": "1440x900",
       "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
-      "figmaPageId": "75:2",
+      "figmaPageId": "0:1",
       "requires": "session",
       "pipelineState": "captured-current",
       "capturedFrom": "localhost@6c140eb1",
       "id": "BL-0222",
       "state": "dashboard-agency-reviews",
       "figmaNodeId": "363:2",
-      "notes": "Captured 2026-08-22 from the running app at 1440x900, placed on the Dashboard page (0:1) — these are dashboard-app routes, and a NAVIGATE reaction only reaches a frame on the same page. The internal review queue. Carries the Withdraw action added in 40c4e3d2 for rows the caller submitted.",
-      "path": "/dashboard/agency/reviews"
+      "notes": "Captured 2026-08-22 from the running app at 1440x900, placed on the Dashboard page (0:1) — these are dashboard-app routes, and a NAVIGATE reaction only reaches a frame on the same page. The internal review queue. Carries the Withdraw action added in 40c4e3d2 for rows the caller submitted. [2026-08-27] figmaPageId corrected 75:2 -> 0:1: the frame is on the Dashboard page, which this row own notes already said. Read back from the ACTIVE file.",
+      "path": "/dashboard/agency/reviews",
+      "figmaPageIdPrev": "75:2"
     },
     {
       "kind": "editor-state",
@@ -3999,15 +4001,16 @@
       "flow": "public",
       "viewport": "1440x900",
       "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
-      "figmaPageId": "75:2",
+      "figmaPageId": "0:1",
       "requires": "session",
       "pipelineState": "captured-current",
       "capturedFrom": "localhost@6c140eb1",
       "id": "BL-0223",
       "state": "review-invalid-token",
       "figmaNodeId": "364:2",
-      "notes": "Captured 2026-08-22 from the running app at 1440x900, placed on the Dashboard page (0:1) — these are dashboard-app routes, and a NAVIGATE reaction only reaches a frame on the same page. The invalid-token screen. Captured by accident, kept on purpose: pointed at an e2e fixture token of 17 characters while the input schema requires 20, so the request was refused before the service ran and the page rendered 'This link doesn't work'. A real state, and a reminder that a 200 from curl is not a working page.",
-      "path": "/review/:token"
+      "notes": "Captured 2026-08-22 from the running app at 1440x900, placed on the Dashboard page (0:1) — these are dashboard-app routes, and a NAVIGATE reaction only reaches a frame on the same page. The invalid-token screen. Captured by accident, kept on purpose: pointed at an e2e fixture token of 17 characters while the input schema requires 20, so the request was refused before the service ran and the page rendered 'This link doesn't work'. A real state, and a reminder that a 200 from curl is not a working page. [2026-08-27] figmaPageId corrected 75:2 -> 0:1: the frame is on the Dashboard page, which this row own notes already said. Read back from the ACTIVE file.",
+      "path": "/review/:token",
+      "figmaPageIdPrev": "75:2"
     },
     {
       "kind": "editor-state",
@@ -4016,15 +4019,16 @@
       "flow": "public",
       "viewport": "1440x900",
       "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
-      "figmaPageId": "75:2",
+      "figmaPageId": "0:1",
       "requires": "session",
       "pipelineState": "captured-current",
       "capturedFrom": "localhost@6c140eb1",
       "id": "BL-0224",
       "state": "client-sign-off",
       "figmaNodeId": "366:2",
-      "notes": "Captured 2026-08-22 from the running app at 1440x900, placed on the Dashboard page (0:1) — these are dashboard-app routes, and a NAVIGATE reaction only reaches a frame on the same page. The client sign-off page — the agency wedge, and the first screen an agency's client ever sees. Identity gate before any comment or approval. Token minted with scripts/mint-review-link.ts.",
-      "path": "/review/:token"
+      "notes": "Captured 2026-08-22 from the running app at 1440x900, placed on the Dashboard page (0:1) — these are dashboard-app routes, and a NAVIGATE reaction only reaches a frame on the same page. The client sign-off page — the agency wedge, and the first screen an agency's client ever sees. Identity gate before any comment or approval. Token minted with scripts/mint-review-link.ts. [2026-08-27] figmaPageId corrected 75:2 -> 0:1: the frame is on the Dashboard page, which this row own notes already said. Read back from the ACTIVE file.",
+      "path": "/review/:token",
+      "figmaPageIdPrev": "75:2"
     },
     {
       "id": "BL-0230",
@@ -4165,6 +4169,74 @@
       "figmaNodeId": "620:2",
       "pipelineState": "captured-current",
       "capturedFrom": "localhost@2026-08-26"
+    },
+    {
+      "kind": "editor-state",
+      "statusClass": 1,
+      "viewport": "1440x900",
+      "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
+      "figmaPageId": "0:1",
+      "requires": "session",
+      "pipelineState": "captured-current",
+      "capturedFrom": "localhost@6c140eb1",
+      "id": "BL-0226",
+      "flow": "public",
+      "route": "/review/[token]",
+      "path": "/review/:token",
+      "state": "review-expired",
+      "figmaNodeId": "374:2",
+      "notes": "Registered 2026-08-27 by reading the ACTIVE file back: the frame was on the page all along, the inventory never recorded it. Identified by its own copy: \"This link has expired\" / \"Review links work for 90 days.\" Captured 2026-08-22."
+    },
+    {
+      "kind": "editor-state",
+      "statusClass": 1,
+      "viewport": "1440x900",
+      "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
+      "figmaPageId": "0:1",
+      "requires": "session",
+      "pipelineState": "captured-current",
+      "capturedFrom": "localhost@6c140eb1",
+      "id": "BL-0227",
+      "flow": "public",
+      "route": "/review/[token]",
+      "path": "/review/:token",
+      "state": "review-superseded",
+      "figmaNodeId": "377:2",
+      "notes": "Registered 2026-08-27 by reading the ACTIVE file back: the frame was on the page all along, the inventory never recorded it. Identified by its own copy: \"There is a newer version\" / \"Your designer sent an updated link, which replaced...\" Captured 2026-08-22."
+    },
+    {
+      "kind": "editor-state",
+      "statusClass": 1,
+      "viewport": "1440x900",
+      "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
+      "figmaPageId": "0:1",
+      "requires": "session",
+      "pipelineState": "captured-current",
+      "capturedFrom": "localhost@6c140eb1",
+      "id": "BL-0228",
+      "flow": "dashboard",
+      "route": "/dashboard",
+      "path": "/dashboard",
+      "state": "create-site-at-limit-owner",
+      "figmaNodeId": "382:2",
+      "notes": "Registered 2026-08-27 by reading the ACTIVE file back: the frame was on the page all along, the inventory never recorded it. Owner on a Free workspace at 3/3 sites with the Create New Site panel open. Captured 2026-08-22."
+    },
+    {
+      "kind": "editor-state",
+      "statusClass": 1,
+      "viewport": "1440x900",
+      "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
+      "figmaPageId": "0:1",
+      "requires": "session",
+      "pipelineState": "captured-current",
+      "capturedFrom": "localhost@6c140eb1",
+      "id": "BL-0229",
+      "flow": "dashboard",
+      "route": "/dashboard",
+      "path": "/dashboard",
+      "state": "at-limit-plus-checklist-non-owner",
+      "figmaNodeId": "384:2",
+      "notes": "Registered 2026-08-27 by reading the ACTIVE file back: the frame was on the page all along, the inventory never recorded it. Non-owner (Viewer) dashboard: \"Good evening, Viewer\", checklist 0/3, and \"Site limit reached (3/3) - Ask a workspace owner to upgrade the plan\". This is the capture BL-0181 was marked blocked for; it landed. Captured 2026-08-22."
     }
   ]
 }
