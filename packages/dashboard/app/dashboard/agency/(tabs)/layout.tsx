@@ -15,6 +15,8 @@ import { AgencyTabs } from "@/components/dashboard/shell/agency-tabs";
  *  security authority; this guard is UX. */
 export default function AgencyTabsLayout({ children }: { children: React.ReactNode }) {
   const features = trpc.features.list.useQuery(undefined, { staleTime: 60_000 });
+  const health = trpc.dashboard.health.useQuery();
+  const canManageClients = health.data?.role === "OWNER" || health.data?.role === "ADMIN";
   const pathname = usePathname();
   const router = useRouter();
   // The Clients tab's primary action lives in the section header (audit A3 —
@@ -44,7 +46,14 @@ export default function AgencyTabsLayout({ children }: { children: React.ReactNo
         description="Clients, sign-off, shared theme, and a shared component library."
         actions={
           onClientsTab ? (
-            <Button onClick={() => router.push("/dashboard/agency?new=1")} className="gap-1.5">
+            <Button
+              onClick={() => router.push("/dashboard/agency?new=1")}
+              className="gap-1.5"
+              /* clients.ts gates creation on ADMIN. A Designer got the New
+                 client dialog and a refusal only after filling it in. */
+              disabled={!canManageClients}
+              title={canManageClients ? undefined : "Only workspace admins can add clients."}
+            >
               <Plus className="h-4 w-4" />
               Add client
             </Button>

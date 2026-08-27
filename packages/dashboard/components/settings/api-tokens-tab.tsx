@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { Key, Plus, Copy, Check, Trash2 } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
+
+const ADMIN_ONLY_TOKENS = "Only workspace admins can create API tokens.";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { Pill, MetricValue, Button, Modal, InputField } from "@/components/dashboard/primitives";
 import { ErrorState } from "@/components/states";
@@ -39,6 +41,10 @@ function relativeTime(date: Date | string | null): string {
 }
 
 export function ApiTokensTab({ workspaceId }: { workspaceId: string }) {
+  // api-tokens.ts gates every mutation on ADMIN. Offering the create form to a
+  // Designer meant filling in a name and scopes before being refused.
+  const health = trpc.dashboard.health.useQuery();
+  const canManage = health.data?.role === "OWNER" || health.data?.role === "ADMIN";
   const { addToast } = useToast();
   const list = trpc.apiTokens.list.useQuery({ workspaceId }, { enabled: !!workspaceId });
 
@@ -86,7 +92,7 @@ export function ApiTokensTab({ workspaceId }: { workspaceId: string }) {
             For scripting and CI. Scoped, revocable, and never expire unless you set an expiry.
           </p>
         </div>
-        <Button type="button" size="sm" onClick={() => { resetForm(); setCreating(true); }}>
+        <Button type="button" size="sm" onClick={() => { resetForm(); setCreating(true); }} disabled={!canManage} title={canManage ? undefined : ADMIN_ONLY_TOKENS}>
           <Plus size={15} /> New token
         </Button>
       </div>

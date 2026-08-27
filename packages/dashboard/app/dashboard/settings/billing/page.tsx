@@ -135,6 +135,13 @@ function BillingPageInner() {
   const planKey = (overview?.plan ?? "FREE") as PlanKey;
   // No cast: the column is an unconstrained String, so PlanCard normalises it.
   const currentInterval = overview?.interval ?? "MONTHLY";
+  // Every mutation on this screen is OWNER-only (billing.ts requireOwner), and
+  // reads stay member-visible so the usage bars and dunning banner work for
+  // everyone. Without this a Designer got the enabled buttons, the cancel modal,
+  // and a 403 only after committing to the action.
+  const health = trpc.dashboard.health.useQuery();
+  const isOwner = health.data?.role === "OWNER";
+  const ownerOnly = isOwner ? undefined : "Only the workspace owner can change billing.";
   const cancelAtPeriodEnd = overview?.cancelAtPeriodEnd === true;
 
   if (isLoading) {
@@ -199,7 +206,8 @@ function BillingPageInner() {
       <div className="mb-6 flex justify-end">
         <button
           onClick={() => (planKey === "FREE" ? setShowPlans(true) : portalMutation.mutate())}
-          disabled={portalMutation.isPending}
+          disabled={portalMutation.isPending || !isOwner}
+          title={ownerOnly}
           className="rounded-lg px-4 py-2 text-body font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
           style={{ backgroundColor: "var(--color-primary)" }}
         >
@@ -285,7 +293,9 @@ function BillingPageInner() {
                 </div>
                 <button
                   onClick={() => setShowCancel(true)}
-                  className="rounded-lg border px-4 py-2 text-body font-medium transition-colors hover:bg-[var(--color-bg-page)]"
+                  disabled={!isOwner}
+                  title={ownerOnly}
+                  className="rounded-lg border px-4 py-2 text-body font-medium transition-colors hover:bg-[var(--color-bg-page)] disabled:opacity-50"
                   style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
                 >
                   Cancel subscription

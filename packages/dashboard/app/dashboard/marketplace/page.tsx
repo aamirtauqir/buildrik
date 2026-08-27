@@ -41,6 +41,12 @@ export default function MarketplacePage() {
 
   const utils = trpc.useUtils();
   const installed = trpc.marketplace.listInstalled.useQuery(undefined, { staleTime: 30_000 });
+  // marketplace.ts gates install/configure on ADMIN. Browsing stays open to
+  // everyone — only the actions that mutate the workspace are held back, so a
+  // Designer can still see what the workspace runs.
+  const health = trpc.dashboard.health.useQuery();
+  const canInstall = health.data?.role === "OWNER" || health.data?.role === "ADMIN";
+  const installTitle = canInstall ? undefined : "Only workspace admins can install or configure apps.";
   const installedIds = useMemo(() => new Set(installed.data ?? []), [installed.data]);
 
   const onSettled = () => {
@@ -191,7 +197,8 @@ export default function MarketplacePage() {
                   <Button
                     type="button"
                     variant="ghost"
-                    disabled={busy}
+                    disabled={busy || !canInstall}
+                    title={installTitle}
                     onClick={() => openConfigure(app)}
                     className="w-full"
                   >
@@ -202,7 +209,8 @@ export default function MarketplacePage() {
                   <Button
                     type="button"
                     variant="ghost"
-                    disabled={busy}
+                    disabled={busy || !canInstall}
+                    title={installTitle}
                     onClick={() => {
                       setActionError(undefined);
                       if (isInstalled) uninstall.mutate({ appId: app.id });

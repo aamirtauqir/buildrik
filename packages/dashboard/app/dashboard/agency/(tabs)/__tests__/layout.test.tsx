@@ -28,7 +28,13 @@ let featuresState: {
 } = { isLoading: true, isError: false, refetch: vi.fn() };
 
 vi.mock("@lib/trpc/client", () => ({
-  trpc: { features: { list: { useQuery: () => featuresState } } },
+  trpc: {
+    features: { list: { useQuery: () => featuresState } },
+    // The header's "Add client" is ADMIN-gated (clients.ts), so the layout
+    // reads dashboard.health for the role. These cases are about the agency
+    // FLAG guard, not the role, so answer as an owner and let them be.
+    dashboard: { health: { useQuery: () => ({ data: { role: "OWNER" } }) } },
+  },
 }));
 
 import AgencyTabsLayout from "../layout";
