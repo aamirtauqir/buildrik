@@ -131,6 +131,23 @@ describe("deriveLifecycleState — off the happy path", () => {
     expect(move?.blockedReason).toBeNull();
   });
 
+  it("a MIXED pair resolves on the weaker flag, not the stronger", () => {
+    /* Review caught this: testing each flag independently with `=== null` let
+       `reviewsEnabled: true` + `editsRequireApproval: undefined` skip the
+       unknown branch and fail the `&&`, so a workspace whose approval policy
+       was merely missing got an unguarded Publish. */
+    const half = deriveLifecycleState(
+      at({ reviewsEnabled: true, editsRequireApproval: undefined as unknown as null }),
+    );
+    expect(half?.kind).toBe("publish");
+    expect(half?.blockedReason).toBeNull();
+
+    // And the reverse: one flag still being ASKED holds the in-flight control
+    // even when its partner has answered.
+    const pending = deriveLifecycleState(at({ reviewsEnabled: true, editsRequireApproval: null }));
+    expect(pending?.blockedReason).toBe("Checking this site's review settings…");
+  });
+
   it("a blocker we already know outranks the in-flight one", () => {
     // Viewer/offline/flag-off do not depend on the review flags — those answers
     // are final at first paint and must not be replaced by "checking…".

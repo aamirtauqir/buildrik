@@ -79,13 +79,23 @@ export const OnboardingMount: React.FC<OnboardingMountProps> = ({ composer }) =>
   const loadingRef = React.useRef(false);
   const completeRef = React.useRef(o.completeStep);
   completeRef.current = o.completeStep;
-  /* When the last insert landed. Inserting an element writes its default
-     styles, so a single drag emits four `style:changed` before its
-     `element:inserted` — which credited "Style an element" for styles the user
-     never chose. (It only ever ticked ONE of the two because a separate bug
-     collapsed same-tick completions; fixing that made this one visible.)
-     The style credit therefore waits out a grace window and withdraws if an
-     insert turns up in it. */
+  /* Inserting an element writes its default styles, so a single drag emits four
+     `style:changed` before its `element:inserted` — which credited "Style an
+     element" for styles the user never chose.
+
+     The first guard was a global clock: ignore any style event within 400ms of
+     any insert. Review caught what that costs — insert a heading and change its
+     font size straight away, or insert one element and style a different one,
+     and the row could never be credited. A window cannot tell WHICH element a
+     style belongs to.
+
+     So the correlation is by element id, which the payloads carry
+     (`element:inserted` sends `elementId`; `StyleEngine` sends it on the
+     breakpoint path). A style event naming an element inserted moments ago is
+     that insert's own defaults; a style event naming anything else is the
+     user's, and is credited immediately. Events with no id fall back to the
+     window, which is all they can be judged by. */
+  const recentInserts = React.useRef(new Map<string, number>());
   const lastInsertAt = React.useRef(0);
 
   React.useEffect(() => {
@@ -97,28 +107,45 @@ export const OnboardingMount: React.FC<OnboardingMountProps> = ({ composer }) =>
     };
     composer.on(EVENTS.PROJECT_LOADED, onLoad);
 
-    const markInsert = () => {
-      lastInsertAt.current = Date.now();
+    const markInsert = (p?: unknown) => {
+      const now = Date.now();
+      lastInsertAt.current = now;
+      const id = (p as { elementId?: string } | undefined)?.elementId;
+      if (id) {
+        recentInserts.current.set(id, now);
+        // Bounded: an id is only interesting for as long as the window lasts.
+        for (const [k, at] of recentInserts.current) {
+          if (now - at > INSERT_STYLE_GRACE_MS) recentInserts.current.delete(k);
+        }
+      }
     };
     composer.on(EVENTS.ELEMENT_INSERTED, markInsert);
 
-    const timers: number[] = [];
-    const onStyle = () => {
+    const timers = new Set<number>();
+    const onStyle = (p?: unknown) => {
       if (loadingRef.current) return;
-      /* Compare the insert against THIS event's own timestamp, not against the
-         clock when the timer fires. Measured live: an insert emits four
-         `style:changed` in the same millisecond as its `element:inserted`, and
-         checking `Date.now() - lastInsertAt > GRACE` at fire time compares the
-         insert against the timer's own delay — which is always at least GRACE,
-         so it passed every time and the row was credited anyway. */
       const styleAt = Date.now();
+      const target = (p as { elementId?: string } | undefined)?.elementId;
+
+      /* Named element: decide from THAT element's own insert, so styling a
+         different element during the window is still the user's work. */
+      if (target) {
+        const insertedAt = recentInserts.current.get(target);
+        if (insertedAt !== undefined && styleAt - insertedAt <= INSERT_STYLE_GRACE_MS) return;
+        completeRef.current("change-style");
+        return;
+      }
+
+      /* Unnamed (the selector-rule path): all it can be judged by is the clock.
+         Compare the insert against THIS event's timestamp, not the clock when
+         the timer fires — that compares against the timer's own delay, which is
+         always at least the window, so it never suppressed anything. */
       const id = window.setTimeout(() => {
-        // An insert this close to the style event means these were the new
-        // element's defaults, not a style the user picked.
+        timers.delete(id);
         if (Math.abs(lastInsertAt.current - styleAt) <= INSERT_STYLE_GRACE_MS) return;
         completeRef.current("change-style");
       }, INSERT_STYLE_GRACE_MS);
-      timers.push(id);
+      timers.add(id);
     };
     composer.on(EVENTS.STYLE_CHANGED, onStyle);
 
@@ -135,6 +162,7 @@ export const OnboardingMount: React.FC<OnboardingMountProps> = ({ composer }) =>
       composer.off(EVENTS.ELEMENT_INSERTED, markInsert);
       composer.off(EVENTS.STYLE_CHANGED, onStyle);
       timers.forEach((id) => window.clearTimeout(id));
+      recentInserts.current.clear();
       offs.forEach((off) => off());
     };
   }, [composer, STEP_SIGNALS]);

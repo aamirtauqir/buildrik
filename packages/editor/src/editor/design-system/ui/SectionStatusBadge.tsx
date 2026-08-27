@@ -43,30 +43,37 @@ import { Badge } from "@/editor/chrome-ui";
 
 /** Only the state the data model can actually answer. `bound` / `unbound` are
  *  absent on purpose — see the note above. */
-export type SectionStatus = "draft";
+export type SectionStatus = "draft" | "exported";
 
-/** The board's wording, not a paraphrase (306:2161). */
+/** The boards' wording, not a paraphrase — 306:2161 and 306:2232. The export
+ *  label names the FORMAT ("Exported CSS"), so it composes. */
 const LABEL: Record<SectionStatus, string> = {
   draft: "Draft preset",
+  exported: "Exported",
 };
 
-/** A draft is a state the user put the screen in, not a failure — so not red. */
+/** Neither is a failure — a draft is a state the user chose, an export is a
+ *  thing that worked — so neither is red. */
 const COLOR: Record<SectionStatus, string> = {
   draft: "info",
+  exported: "success",
 };
 
 export interface SectionStatusBadgeProps {
   status: SectionStatus;
+  /** Appended to the label — board 306:2232 reads "Exported CSS", naming the
+   *  format that was written. */
+  detail?: string;
 }
 
-export function SectionStatusBadge({ status }: SectionStatusBadgeProps) {
+export function SectionStatusBadge({ status, detail }: SectionStatusBadgeProps) {
   return (
     /* `flex`, not a bare block: flowbite's Badge is a span that stretches to
        its container, and it measured 263px wide against the board's
        content-width 73–128. The board draws a chip, not a bar. */
     <div className="tw:flex tw:px-4 tw:pt-2 tw:pb-1" data-testid="brand-section-status">
       <Badge color={COLOR[status]} data-testid={`brand-section-status-${status}`}>
-        {LABEL[status]}
+        {detail ? `${LABEL[status]} ${detail}` : LABEL[status]}
       </Badge>
     </div>
   );

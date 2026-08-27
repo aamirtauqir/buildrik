@@ -21,7 +21,12 @@
  */
 
 import * as React from "react";
-import { Button, Tooltip } from "flowbite-react";
+import { Button } from "flowbite-react";
+/* The LOCAL Tooltip, not flowbite's. Sibling files inside chrome-ui/ are the
+   one place the surface gate cannot catch a raw import, and both of them had
+   one — so the `style="light"` default that took every other tooltip off
+   near-black did not reach these two. Found in review. */
+import { Tooltip } from "./Tooltip";
 
 export interface HelpTooltipProps {
   /** Help text explaining the property */

@@ -146,7 +146,14 @@ function chipForFormat(format: UIExportFormat, droppedCount: number): ChipSpec {
   return { label: "lossless", className: "tw:bg-green-100 tw:border-green-300 tw:text-green-800" };
 }
 
-export const ExportSection: React.FC = () => {
+export interface ExportSectionProps {
+  /** Board 306:2232 puts an "Exported CSS" badge under the back row after an
+   *  export. The badge belongs to the screen frame, which this section sits
+   *  inside, so the outcome is reported upward rather than drawn here. */
+  onExported?(formatLabel: string): void;
+}
+
+export const ExportSection: React.FC<ExportSectionProps> = ({ onExported }) => {
   const color      = useColorRegistry();
   const type       = useTypeRegistry();
   const spacing    = useSpacingRegistry();
@@ -277,6 +284,7 @@ export const ExportSection: React.FC = () => {
                     onClick={(e) => {
                       e.preventDefault();
                       downloadForFormat(allTokens, id, buildPreview(allTokens, id, darkStrategy));
+                      onExported?.(label);
                     }}
                     className="tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:font-normal tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
                   >

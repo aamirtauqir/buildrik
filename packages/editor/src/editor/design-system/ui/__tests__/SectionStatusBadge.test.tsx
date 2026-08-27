@@ -45,3 +45,23 @@ describe("SectionStatusBadge", () => {
     expect(container.firstElementChild?.className).toContain("tw:flex");
   });
 });
+
+describe("SectionStatusBadge — the export outcome (306:2232)", () => {
+  it("names the format that was written", () => {
+    // The board reads "Exported CSS", not a bare "Exported" — which file you
+    // just got is the only part worth saying.
+    render(<SectionStatusBadge status="exported" detail="CSS" />);
+    expect(screen.getByTestId("brand-section-status").textContent).toBe("Exported CSS");
+  });
+
+  it("an export that worked is not an error", () => {
+    const { container } = render(<SectionStatusBadge status="exported" detail="JSON" />);
+    expect(container.innerHTML).not.toMatch(/red|failure|error/i);
+  });
+
+  it("without a detail it still says something true", () => {
+    render(<SectionStatusBadge status="exported" />);
+    expect(screen.getByTestId("brand-section-status").textContent).toBe("Exported");
+  });
+});
+

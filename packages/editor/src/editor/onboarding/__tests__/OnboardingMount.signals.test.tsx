@@ -120,12 +120,40 @@ describe("OnboardingMount — outcomes, not intentions", () => {
     const c = fakeComposer();
     render(<OnboardingMount composer={c as never} />);
     act(() => {
-      c.emit(EVENTS.STYLE_CHANGED, {});
-      c.emit(EVENTS.STYLE_CHANGED, {});
-      c.emit(EVENTS.ELEMENT_INSERTED, {});
+      c.emit(EVENTS.ELEMENT_INSERTED, { elementId: "el-new" });
+      c.emit(EVENTS.STYLE_CHANGED, { elementId: "el-new" });
+      c.emit(EVENTS.STYLE_CHANGED, { elementId: "el-new" });
     });
     act(() => vi.advanceTimersByTime(1000));
     expect(ids()).toEqual(["add-element"]);
+  });
+
+  it("styling a DIFFERENT element during the window is still the user's work", () => {
+    /* The first guard was a global clock, so any style within 400ms of any
+       insert was suppressed — "insert one element, style another" could never
+       credit the row. Correlation is by element id now. */
+    const c = fakeComposer();
+    render(<OnboardingMount composer={c as never} />);
+    act(() => {
+      c.emit(EVENTS.ELEMENT_INSERTED, { elementId: "el-new" });
+      c.emit(EVENTS.STYLE_CHANGED, { elementId: "el-other" });
+    });
+    act(() => vi.advanceTimersByTime(1000));
+    expect(ids()).toEqual(["add-element", "change-style"]);
+  });
+
+  it("styling the element you just inserted still counts, once it is not a default", () => {
+    // Insert a heading, then change its font size a moment later. The defaults
+    // arrive inside the window; the deliberate change does not.
+    const c = fakeComposer();
+    render(<OnboardingMount composer={c as never} />);
+    act(() => {
+      c.emit(EVENTS.ELEMENT_INSERTED, { elementId: "el-new" });
+      c.emit(EVENTS.STYLE_CHANGED, { elementId: "el-new" });
+    });
+    act(() => vi.advanceTimersByTime(1000));
+    act(() => c.emit(EVENTS.STYLE_CHANGED, { elementId: "el-new" }));
+    expect(ids()).toEqual(["add-element", "change-style"]);
   });
 
   it("the insert is judged against the style event's own clock, not the timer's", () => {

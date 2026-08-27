@@ -135,7 +135,22 @@ export function deriveLifecycleState(i: LifecycleInput): NextMove | null {
 
      This distinction was accidental before it was deliberate: `undefined`
      silently took the reviews-off branch because nothing checked for it. */
-  if (i.reviewsEnabled === null || i.editsRequireApproval === null) {
+  /* A flag is "answered" only when it is a real boolean. `null` is our own
+     sentinel (not asked yet); `undefined` is a server too old to carry the
+     field. Both are unanswered — but they want different things, so they are
+     told apart below rather than lumped by a loose `== null`.
+
+     The first version tested `=== null` on each flag independently, which left
+     a hole review caught: `reviewsEnabled: true` with
+     `editsRequireApproval: undefined` skipped the unknown branch AND failed the
+     `&&` below, so a workspace whose approval policy was simply missing got the
+     no-review path and an unguarded Publish. Mixed states now resolve on the
+     WEAKER of the two. */
+  const answered = (v: boolean | null | undefined): v is boolean => typeof v === "boolean";
+  const bothAnswered = answered(i.reviewsEnabled) && answered(i.editsRequireApproval);
+  const anyPending = i.reviewsEnabled === null || i.editsRequireApproval === null;
+
+  if (!bothAnswered && anyPending) {
     /* First paint, before `reviews.status` answers. Not `null`: withholding the
        CTA here empties the topbar's right side on every load and then pops a
        button in, and an empty slot reads as broken rather than as loading. Not
@@ -155,7 +170,10 @@ export function deriveLifecycleState(i: LifecycleInput): NextMove | null {
      verb follows the round. With reviews on but approval optional, a review is
      something you may send (the Review panel owns that door) — it is not what
      the site is waiting on, so the verb stays publish. */
-  if (i.reviewsEnabled && i.editsRequireApproval) {
+  /* Only a fully-answered pair can put the review round on the path. A field
+     the server never sent falls through here deliberately (see the note above);
+     `publish-approval.ts` is the real gate and refuses with the actual reason. */
+  if (bothAnswered && i.reviewsEnabled && i.editsRequireApproval) {
     switch (i.reviewState) {
       case "none":
         return {

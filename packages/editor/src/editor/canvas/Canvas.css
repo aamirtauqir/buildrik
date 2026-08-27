@@ -107,16 +107,13 @@
   background-position: center;
 }
 
-[data-buildrick-id] input,
-[data-buildrick-id] textarea,
-[data-buildrick-id] select {
-  color: var(--bk-ink);
-  background: var(--bk-bg-card);
-  border: 1px solid var(--bk-border);
-  border-radius: var(--bk-radius-sm);
-  padding: var(--bk-space-8);
-  font-family: var(--bk-font-ui);
-}
+/* The form controls went with the rest of the chrome paint (see the note
+   above) — they were the half of it left behind. `--bk-ink`, `--bk-bg-card`,
+   `--bk-border`, `--bk-radius-sm`, `--bk-space-8` and `--bk-font-ui` on a
+   customer's input is the editor dressing content it does not own, and none of
+   it exists on the published page. Review caught the omission: with the
+   headings and buttons already stripped, forms were the only customer elements
+   still wearing the editor. */
 
 /* The page root is excluded: an empty PAGE is board 65:2's job — one
    sentence and two routes into the product — not a 60px dashed box telling

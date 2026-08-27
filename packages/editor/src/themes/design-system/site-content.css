@@ -53,41 +53,47 @@
   font-family: var(--buildrick-design-font-mono), monospace;
 }
 
-/* THE HOST APP'S PREFLIGHT REACHES THE CANVAS — put the browser back (2026-08-27).
+/* THE HOST APP'S PREFLIGHT REACHES THE CANVAS — put back only what the
+   PUBLISHED page keeps (2026-08-27, corrected same day).
 
-   `src/themes/tw.css` excludes Tailwind's preflight on purpose: "the canvas
-   mounts customer HTML+CSS in this same document (spec §4.1)". But the
-   SHIPPING editor is the one bundled into Next, and
-   `packages/dashboard/app/globals.css:23` does a bare `@import 'tailwindcss'`
-   — the whole thing, preflight included, unscoped, app-wide. The editor's own
-   protection is defeated by its host, so the exact thing tw.css refuses to do
-   happens anyway in the build every real user runs.
+   `src/themes/tw.css` excludes Tailwind's preflight on purpose ("the canvas
+   mounts customer HTML+CSS in this same document, §4.1"). But the SHIPPING
+   editor is bundled into Next, and `packages/dashboard/app/globals.css:23` does
+   a bare `@import 'tailwindcss'` — the whole thing, preflight included,
+   unscoped. Confirmed by asking Chrome, not by reading:
+   `CSS.getMatchedStylesForNode` on a canvas H2 named
+   `h1, h2, h3, h4, h5, h6 { font-size: inherit }` as a matched author rule, and
+   the heading rendered at body size.
 
-   Confirmed by asking Chrome, not by reading: `CSS.getMatchedStylesForNode` on
-   a canvas H2 named `h1, h2, h3, h4, h5, h6 { font-size: inherit }` as a
-   matched author rule. Preflight also zeroes every margin and strips list
-   markers, so a customer's headings render at body size, their paragraphs run
-   together, and their bulleted lists lose the bullets — none of which is true
-   of the published page, which has no preflight anywhere near it.
+   THE TARGET IS THE PUBLISHED PAGE, NOT THE BROWSER. The first version of this
+   block restored the browser's own defaults — margins and list padding
+   included — and that was a new canvas/live mismatch pointing the other way.
+   `ExportHelpers.RESET_CSS` is prepended to EVERY export
+   (`ExportEngine.generateCSS`) and carries `*{margin:0;padding:0}`, so the
+   shipped page has no heading margins and no list padding. Caught in review
+   before it shipped; the rule is that this block may only restore what
+   RESET_CSS leaves alone.
 
-   These are the browser's own defaults, restored for the canvas subtree only.
-   Two properties of the selector are load-bearing:
+   What RESET_CSS does NOT touch, and preflight does, is exactly two things:
+     · heading `font-size` / `font-weight` — so the published page keeps the
+       UA scale and the canvas must too
+     · `list-style` — so a customer's bullets survive publication and must
+       survive here
 
-     · `:where(...)` contributes ZERO specificity, so any rule the customer's
-       own stylesheet carries — even a bare `h1 {}` at (0,0,1) — still wins.
-       This puts a floor under the canvas; it does not put a ceiling on it.
-     · This file is imported unlayered (Canvas.tsx), and unlayered author CSS
-       beats every layered rule. Preflight sits in Tailwind's `base` layer, so
-       zero specificity is still enough to outrank it.
+   Margins are deliberately absent: preflight zeroes them and so does the
+   export, which means they already agree.
 
-   Delete this block the day the host stops importing preflight globally. */
-:where(.buildrick-canvas h1) { font-size: 2em; font-weight: bold; margin: 0.67em 0; }
-:where(.buildrick-canvas h2) { font-size: 1.5em; font-weight: bold; margin: 0.83em 0; }
-:where(.buildrick-canvas h3) { font-size: 1.17em; font-weight: bold; margin: 1em 0; }
-:where(.buildrick-canvas h4) { font-size: 1em; font-weight: bold; margin: 1.33em 0; }
-:where(.buildrick-canvas h5) { font-size: 0.83em; font-weight: bold; margin: 1.67em 0; }
-:where(.buildrick-canvas h6) { font-size: 0.67em; font-weight: bold; margin: 2.33em 0; }
-:where(.buildrick-canvas p) { margin: 1em 0; }
-:where(.buildrick-canvas blockquote) { margin: 1em 40px; }
-:where(.buildrick-canvas ul) { list-style: disc; margin: 1em 0; padding-left: 40px; }
-:where(.buildrick-canvas ol) { list-style: decimal; margin: 1em 0; padding-left: 40px; }
+   `:where(...)` contributes ZERO specificity, so any rule the customer's own
+   stylesheet carries still wins — a floor, not a ceiling. This file is imported
+   unlayered, so zero specificity still outranks preflight's `base` layer.
+
+   `__tests__/canvasExportParity.test.ts` pins this against RESET_CSS so the two
+   cannot drift apart again. */
+:where(.buildrick-canvas h1) { font-size: 2em; font-weight: bold; }
+:where(.buildrick-canvas h2) { font-size: 1.5em; font-weight: bold; }
+:where(.buildrick-canvas h3) { font-size: 1.17em; font-weight: bold; }
+:where(.buildrick-canvas h4) { font-size: 1em; font-weight: bold; }
+:where(.buildrick-canvas h5) { font-size: 0.83em; font-weight: bold; }
+:where(.buildrick-canvas h6) { font-size: 0.67em; font-weight: bold; }
+:where(.buildrick-canvas ul) { list-style: disc; }
+:where(.buildrick-canvas ol) { list-style: decimal; }

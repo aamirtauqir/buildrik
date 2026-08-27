@@ -16,6 +16,7 @@ import { useCallback, useState, useEffect, useRef } from "react";
 import type { Composer } from "../../../engine";
 import { getBreakpointQuery } from "../../../shared/constants/breakpoints";
 import { getDefaultStyles } from "../../../shared/constants/defaultStyles";
+import { EVENTS } from "../../../shared/constants";
 import { getDOMElement } from "../../../engine/canvas/resize/utils";
 import type { PseudoStateId } from "../../../shared/types";
 import type { BreakpointId } from "../../../shared/types/breakpoints";
@@ -107,6 +108,23 @@ export function useStyleHandlers(
   // source of truth for the layering logic — shared with useBatchStyleHandler
   // and deriveCssContext. Only the default-style layer and the overriddenKeys
   // indicator stay local to this hook.
+  /* Re-read trigger for the computed fallback below. Bumped by any event that
+     can repaint the selected element without changing what is selected. */
+  const [bump, setBump] = useState(0);
+  useEffect(() => {
+    /* Optional because the panel is mounted against partial composers in
+       several suites, and a missing bus must degrade to "no re-read", never to
+       a crash inside the inspector. */
+    if (typeof composer?.on !== "function" || typeof composer?.off !== "function") return;
+    const onRepaint = () => setBump((n) => n + 1);
+    composer.on(EVENTS.STYLE_CHANGED, onRepaint);
+    composer.on(EVENTS.PROJECT_LOADED, onRepaint);
+    return () => {
+      composer.off(EVENTS.STYLE_CHANGED, onRepaint);
+      composer.off(EVENTS.PROJECT_LOADED, onRepaint);
+    };
+  }, [composer]);
+
   useEffect(() => {
     if (!selectedElement?.id || !composer) {
       setStyles({});
@@ -151,7 +169,16 @@ export function useStyleHandlers(
     } else {
       setOverriddenProperties(new Set());
     }
-  }, [selectedElement, composer, currentBreakpoint, currentPseudoState]);
+    /* The computed fallback above is a SAMPLE of the canvas, and the canvas
+       moves without the selection moving. A token edit in Brand, an imported
+       stylesheet, a starter applied — all repaint the element while this panel
+       keeps showing the value it read on selection. Review caught it: the
+       effect was keyed on selection alone, so the fix that made unset rows
+       honest could go stale and quietly become a new lie.
+
+       `bump` re-runs it. It is deliberately coarse — any style write anywhere
+       is enough of a reason to re-read the one selected element. */
+  }, [selectedElement, composer, currentBreakpoint, currentPseudoState, bump]);
 
   // Style change handler - breakpoint and pseudo-state aware
   // Immediate visual update + 300ms debounced history entry to prevent keystroke spam

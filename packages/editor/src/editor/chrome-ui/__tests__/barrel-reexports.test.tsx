@@ -13,6 +13,8 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect } from "vitest";
+import { readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import * as ChromeUi from "../index";
 import * as FlowbiteReact from "flowbite-react";
 
@@ -50,5 +52,21 @@ describe("chrome-ui barrel — pure flowbite-react re-exports are identity-equal
     // accidentally passed through as pure re-exports.
     expect(ChromeUi.TextInput).not.toBe(FlowbiteReact.TextInput);
     expect(ChromeUi.Select).not.toBe(FlowbiteReact.Select);
+  });
+});
+
+describe("chrome-ui's own files use the local Tooltip", () => {
+  /* The surface gate bans raw flowbite imports OUTSIDE chrome-ui/, which means
+     siblings inside it are the one blind spot — and two of them had a raw
+     `Tooltip` import, so the light default that took every other tooltip off
+     near-black never reached them. Found in review 2026-08-27. */
+  it("no sibling imports Tooltip straight from flowbite-react", () => {
+    const dir = join(__dirname, "..");
+    const offenders = readdirSync(dir)
+      .filter((f) => f.endsWith(".tsx") && f !== "Tooltip.tsx")
+      .filter((f) => /import\s*\{[^}]*\bTooltip\b[^}]*\}\s*from\s*"flowbite-react"/.test(
+        readFileSync(join(dir, f), "utf8"),
+      ));
+    expect(offenders).toEqual([]);
   });
 });

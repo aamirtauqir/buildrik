@@ -20,7 +20,9 @@
  * @license BSD-3-Clause
  */
 import React from "react";
-import { Button, Tooltip } from "flowbite-react";
+import { Button } from "flowbite-react";
+/* The LOCAL Tooltip — see HelpTooltip.tsx. */
+import { Tooltip } from "./Tooltip";
 import { IconButton } from "./Icon";
 import { IssueChip } from "./IssueChip";
 import { SaveStatus, type SaveState } from "./SaveStatus";

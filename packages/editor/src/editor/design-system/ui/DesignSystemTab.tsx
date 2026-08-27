@@ -273,6 +273,13 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
      only one; these three are counted from the same sources the screens
      themselves render, so they are the truth. Starters and Components stay
      bare until their own registries can answer. */
+  /* Cleared when the screen changes: a badge saying "Exported CSS" on a screen
+     the user walked back into later is stale news dressed as fresh. */
+  const [lastExport, setLastExport] = React.useState<string | null>(null);
+  React.useEffect(() => {
+    if (activeSection !== "export") setLastExport(null);
+  }, [activeSection]);
+
   const sectionCounts = React.useMemo<Partial<Record<DesignSection, number>>>(() => {
     /* The same filter the Tokens screen applies to its own rows. Beginner
        mode lists semantic tokens only, so counting every registry entry here
@@ -660,6 +667,13 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
           {activeSection === "styles" && presetsStatus(stylesDirty > 0) && (
             <SectionStatusBadge status="draft" />
           )}
+          {/* Board 306:2232 — "Exported CSS" under the back row after a
+              download. The Copy button carries its own feedback; Download had
+              none at all, so the one action that writes a file to disk was the
+              one that said nothing. */}
+          {activeSection === "export" && lastExport && (
+            <SectionStatusBadge status="exported" detail={lastExport} />
+          )}
           {/* Brand root — the drill-in list (M5, board 152:2) */}
           {activeSection === null && suppressedCount > 0 ? (
             <div className="tw:px-3 tw:pb-2">
@@ -766,7 +780,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
           {activeSection === "typography" && <TypographySection composer={composer} />}
           {activeSection === "colour-mode" && <ColourModeSection composer={composer} />}
           {activeSection === "lint"       && <LintSection issues={lintIssues} />}
-          {activeSection === "export"     && <ExportSection />}
+          {activeSection === "export"     && <ExportSection onExported={setLastExport} />}
         </div>
       )}
 
