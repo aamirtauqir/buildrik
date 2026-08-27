@@ -166,6 +166,27 @@ export interface ReviewPillStatus {
   reviewerName: string | null;
   /** When the review was sent (createdAt) or resolved, depending on state. */
   at: Date | null;
+  /**
+   * Whether reviews exist here at all (the `agency_layer` flag).
+   *
+   * `state: "none"` used to mean three different things — no site, the flag is
+   * off, or the site has genuinely never been sent — and the editor could not
+   * tell them apart. That matters for anything that offers "Send for review" as
+   * a next step: with the flag off, that is a door into a mutation which
+   * hard-fails `requireAgencyLayer`.
+   */
+  reviewsEnabled: boolean;
+  /**
+   * Whether publishing this site needs an approved review
+   * (`Workspace.editsRequireApproval`).
+   *
+   * Read only inside `startPublish` until now, so the editor could not know
+   * whether Publish would be refused until after it was pressed — the four
+   * sentences in `PUBLISH_APPROVAL_MESSAGES` were a post-failure classifier.
+   * Note `APPROVAL_EXEMPT_ROLES` is OWNER only, so this being true does not mean
+   * *you* are gated; pair it with the effective role.
+   */
+  editsRequireApproval: boolean;
 }
 
 /**
@@ -181,6 +202,16 @@ export async function getReviewStatusForSite(siteId: string): Promise<ReviewPill
   /* Same `revokedAt: null` rule as the publish gate: a revoked round is not the
      site's current review, and showing it as one told the user they were
      waiting on a reply that could never come. */
+  /* Hoisted so every branch can answer "would publishing be gated here?", not
+     just the APPROVED one that needed `lastEditedAt`. Same single site read the
+     stale check already made — it just carries the workspace setting out too. */
+  const site = await prisma.site.findUnique({
+    where: { id: siteId },
+    select: { lastEditedAt: true, workspace: { select: { editsRequireApproval: true } } },
+  });
+  const editsRequireApproval = site?.workspace?.editsRequireApproval ?? false;
+  const base = { reviewsEnabled: true, editsRequireApproval };
+
   const r = await prisma.reviewRequest.findFirst({
     where: { siteId, revokedAt: null },
     orderBy: { createdAt: "desc" },
@@ -192,13 +223,16 @@ export async function getReviewStatusForSite(siteId: string): Promise<ReviewPill
       reviewer: { select: { name: true } },
     },
   });
-  if (!r) return { state: "none", reviewerName: null, at: null };
+  if (!r) return { state: "none", reviewerName: null, at: null, ...base };
   const reviewerName = r.reviewer?.name ?? null;
   if (r.status === "CHANGES_REQUESTED") {
-    return { state: "changes-requested", reviewerName, at: r.resolvedAt };
+    return { state: "changes-requested", reviewerName, at: r.resolvedAt, ...base };
   }
   if (r.status === "APPROVED") {
-    const site = await prisma.site.findUnique({ where: { id: siteId }, select: { lastEditedAt: true } });
+    /* `editsRequireApproval: true` is hard-coded here on purpose: this computes
+       the FACT that the site changed after approval, which is true regardless
+       of whether the workspace gates publishing on it. The setting travels
+       separately, in `base`, for callers that need the permission. */
     const stale = isApprovalStale({
       editsRequireApproval: true,
       role: "EDITOR",
@@ -206,10 +240,10 @@ export async function getReviewStatusForSite(siteId: string): Promise<ReviewPill
       latestReviewResolvedAt: r.resolvedAt,
       siteLastEditedAt: site?.lastEditedAt ?? null,
     });
-    return { state: stale ? "approved-edited-since" : "approved", reviewerName, at: r.resolvedAt };
+    return { state: stale ? "approved-edited-since" : "approved", reviewerName, at: r.resolvedAt, ...base };
   }
   // PENDING: opened (identified) vs sent-but-untouched.
-  return { state: r.reviewerId ? "opened-not-acted" : "pending", reviewerName, at: r.createdAt };
+  return { state: r.reviewerId ? "opened-not-acted" : "pending", reviewerName, at: r.createdAt, ...base };
 }
 
 export interface CurrentRound {

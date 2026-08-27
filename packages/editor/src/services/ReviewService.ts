@@ -23,20 +23,48 @@ export interface ReviewStatus {
   state: ReviewPillState;
   reviewerName: string | null;
   at: string | Date | null;
+  /**
+   * `true` / `false` from the server; **`null` means we could not ask** — no
+   * site, or the request failed.
+   *
+   * The distinction is the point. `state: "none"` conflates three situations —
+   * no site, reviews switched off, and a site genuinely never sent — and a
+   * caller that offers "Send for review" as the next step has to tell them
+   * apart or it offers a door into a mutation that hard-fails. `null` is the
+   * signal to show an in-flight control rather than guess a verb and change it
+   * after paint.
+   */
+  reviewsEnabled: boolean | null;
+  /** Same three-valued contract: `null` means unknown, not "not required". */
+  editsRequireApproval: boolean | null;
 }
+
+/**
+ * No site, no answer yet, or the request failed: state is `none` and the flags
+ * are UNKNOWN. Also the right value to hold *before* the first fetch lands —
+ * anything else asserts a lifecycle position nobody has confirmed.
+ */
+export const UNKNOWN_REVIEW_STATUS: ReviewStatus = {
+  state: "none",
+  reviewerName: null,
+  at: null,
+  reviewsEnabled: null,
+  editsRequireApproval: null,
+};
 
 /**
  * The current review status for the pill (S5.2). Returns `none` when there is no
  * site, the agency layer is off, or the site was never sent for review — the
- * editor then shows no pill. Never throws; a failed fetch is treated as `none`.
+ * editor then shows no pill. Never throws; a failed fetch is treated as `none`
+ * with **unknown** flags, so a caller can tell "no review" from "no answer".
  */
 export async function fetchReviewStatus(): Promise<ReviewStatus> {
   const siteId = currentSiteId();
-  if (!siteId) return { state: "none", reviewerName: null, at: null };
+  if (!siteId) return UNKNOWN_REVIEW_STATUS;
   try {
     return await getBuildrikClient(DASHBOARD_URL).reviews.status.query({ siteId });
   } catch {
-    return { state: "none", reviewerName: null, at: null };
+    return UNKNOWN_REVIEW_STATUS;
   }
 }
 
@@ -49,7 +77,7 @@ export async function fetchReviewStatus(): Promise<ReviewStatus> {
  */
 export async function fetchReviewStatusOrNull(): Promise<ReviewStatus | null> {
   const siteId = currentSiteId();
-  if (!siteId) return { state: "none", reviewerName: null, at: null };
+  if (!siteId) return UNKNOWN_REVIEW_STATUS;
   try {
     return await getBuildrikClient(DASHBOARD_URL).reviews.status.query({ siteId });
   } catch {

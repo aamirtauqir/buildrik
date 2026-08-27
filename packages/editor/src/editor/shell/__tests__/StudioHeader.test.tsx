@@ -30,8 +30,21 @@ vi.mock("../../../shared/utils/editorViewMode", () => ({
 
 vi.mock("../../../services/ReviewService", () => ({
   submitForReview: vi.fn(() => Promise.resolve()),
-  fetchReviewStatus: vi.fn(() => Promise.resolve({ state: "none", reviewerName: null, at: null })),
+  fetchReviewStatus: vi.fn(() =>
+    Promise.resolve({ state: "none", reviewerName: null, at: null, reviewsEnabled: true, editsRequireApproval: false }),
+  ),
   fetchReviewStatusOrNull: vi.fn(() => Promise.resolve(null)),
+  /* The header holds this as its pre-fetch state, so a wholesale mock has to
+     carry it or every render throws before the first assertion. Flags null =
+     "nobody has answered yet", which is what the component must not mistake for
+     "reviews are on". */
+  UNKNOWN_REVIEW_STATUS: {
+    state: "none",
+    reviewerName: null,
+    at: null,
+    reviewsEnabled: null,
+    editsRequireApproval: null,
+  },
   // RoleService (P6) resolves the site id through ReviewService — null keeps
   // the role "unknown" so no chrome gating kicks in during these tests.
   currentSiteId: vi.fn(() => null),
@@ -77,6 +90,21 @@ import { StudioHeader, type StudioHeaderProps } from "../StudioHeader";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
 import { getEditorViewMode } from "../../../shared/utils/editorViewMode";
 import { submitForReview, fetchReviewStatus } from "../../../services/ReviewService";
+import type { ReviewStatus } from "../../../services/ReviewService";
+
+/* ReviewStatus gained two flag fields — whether reviews exist here at all, and
+   whether publishing is gated on an approval — because `state: "none"` could
+   not tell "reviews are off" from "never sent". Every case in this file was
+   written against a workspace where reviews are on and publishing is not
+   gated, so that is the default; a case that cares says so. */
+const reviewStatus = (o: Partial<ReviewStatus> = {}): ReviewStatus => ({
+  state: "none",
+  reviewerName: null,
+  at: null,
+  reviewsEnabled: true,
+  editsRequireApproval: false,
+  ...o,
+});
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 
@@ -347,11 +375,11 @@ describe("StudioHeader", () => {
     });
 
     it("an open review round adds the D13 note", async () => {
-      vi.mocked(fetchReviewStatus).mockResolvedValueOnce({
+      vi.mocked(fetchReviewStatus).mockResolvedValueOnce(reviewStatus({
         state: "pending",
         reviewerName: "Sana",
         at: null,
-      });
+      }));
       setup([err("1", "x")]);
       await screen.findByText("In review");
       fireEvent.click(screen.getByRole("button", { name: "Publish anyway" }));
@@ -432,17 +460,17 @@ describe("StudioHeader", () => {
 
   describe("review status pill", () => {
     it("shows the pending pill once the status lands", async () => {
-      vi.mocked(fetchReviewStatus).mockResolvedValueOnce({ state: "pending", reviewerName: null, at: null });
+      vi.mocked(fetchReviewStatus).mockResolvedValueOnce(reviewStatus({ state: "pending", reviewerName: null, at: null }));
       render(<StudioHeader {...makeProps()} />);
       expect(await screen.findByText("In review")).toBeTruthy();
     });
 
     it("names the reviewer on an approval", async () => {
-      vi.mocked(fetchReviewStatus).mockResolvedValueOnce({
+      vi.mocked(fetchReviewStatus).mockResolvedValueOnce(reviewStatus({
         state: "approved",
         reviewerName: "Sara",
         at: new Date().toISOString(),
-      });
+      }));
       render(<StudioHeader {...makeProps()} />);
       expect(await screen.findByText(/Approved by Sara/)).toBeTruthy();
     });
@@ -861,11 +889,11 @@ describe("exit dialog — stranded mirrors", () => {
 // ── F3 · review pill is a door ──────────────────────────────────────────────
 describe("F3 review pill", () => {
   it("renders the pill as a button and clicking opens the review panel", async () => {
-    vi.mocked(fetchReviewStatus).mockResolvedValue({
+    vi.mocked(fetchReviewStatus).mockResolvedValue(reviewStatus({
       state: "pending",
       reviewerName: null,
       at: new Date().toISOString(),
-    });
+    }));
     const onOpenReview = vi.fn();
     render(<StudioHeader {...makeProps({ onOpenReview })} />);
     const pill = await screen.findByRole("button", { name: "In review" });
@@ -875,11 +903,11 @@ describe("F3 review pill", () => {
 
   it("59-minute-old approval reads in minutes, not 'just now' (U1)", async () => {
     const at = new Date(Date.now() - 59 * 60_000).toISOString();
-    vi.mocked(fetchReviewStatus).mockResolvedValue({
+    vi.mocked(fetchReviewStatus).mockResolvedValue(reviewStatus({
       state: "approved",
       reviewerName: "Sara",
       at,
-    });
+    }));
     render(<StudioHeader {...makeProps()} />);
     const pill = await screen.findByText(/Approved by Sara/);
     expect(pill.textContent).toMatch(/59m ago/);
@@ -901,22 +929,22 @@ describe("T8 status grammar", () => {
   const isWarningTone = (labelEl: HTMLElement) => toneOf(labelEl).includes("tw:bg-yellow-50");
 
   it("a blocking review keeps the warning tone when it is the only amber", async () => {
-    vi.mocked(fetchReviewStatus).mockResolvedValue({
+    vi.mocked(fetchReviewStatus).mockResolvedValue(reviewStatus({
       state: "changes-requested",
       reviewerName: "Sara",
       at: new Date().toISOString(),
-    });
+    }));
     render(<StudioHeader {...makeProps()} />);
     const label = await screen.findByText("Changes requested");
     expect(isWarningTone(label)).toBe(true);
   });
 
   it("D7 rule 6: with an amber save AND amber issues, the review pill steps back", async () => {
-    vi.mocked(fetchReviewStatus).mockResolvedValue({
+    vi.mocked(fetchReviewStatus).mockResolvedValue(reviewStatus({
       state: "changes-requested",
       reviewerName: "Sara",
       at: new Date().toISOString(),
-    });
+    }));
     render(
       <StudioHeader
         {...makeProps({
@@ -954,11 +982,11 @@ describe("T8 status grammar", () => {
   });
 
   it("errors do not spend the amber budget — an error chip is red, not amber", async () => {
-    vi.mocked(fetchReviewStatus).mockResolvedValue({
+    vi.mocked(fetchReviewStatus).mockResolvedValue(reviewStatus({
       state: "changes-requested",
       reviewerName: "Sara",
       at: new Date().toISOString(),
-    });
+    }));
     render(
       <StudioHeader
         {...makeProps({

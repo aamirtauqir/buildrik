@@ -109,7 +109,17 @@ export const reviewsRouter = router({
     .query(async ({ ctx, input }) => {
       const workspaceId = await resolveWorkspaceId(ctx);
       if (!(await isFeatureEnabled(workspaceId, "agency_layer")))
-        return { state: "none" as const, reviewerName: null, at: null };
+        /* `reviewsEnabled: false` is the point: without it the editor cannot
+           tell "reviews are off here" from "this site was never sent", and
+           would offer Send for review as a door into a mutation that
+           hard-fails requireAgencyLayer. */
+        return {
+          state: "none" as const,
+          reviewerName: null,
+          at: null,
+          reviewsEnabled: false,
+          editsRequireApproval: false,
+        };
       try {
         await checkSiteRole(ctx.prisma, ctx.session.user.id, input.siteId, "EDITOR");
       } catch (e) {

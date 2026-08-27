@@ -31,6 +31,7 @@ import { getSiteIdFromUrl } from "../../services/BuildrikSyncProvider";
 import {
   fetchReviewStatus,
   fetchReviewStatusOrNull,
+  UNKNOWN_REVIEW_STATUS,
   type ReviewStatus,
 } from "../../services/ReviewService";
 import { useRefetchOnFocus } from "../../shared/hooks";
@@ -252,13 +253,12 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
     return () => document.removeEventListener("keydown", onKey);
   }, [viewMode.readOnlyView]);
 
-  // S5.2: the persistent review pill. Fails closed to "none" (flag off, no
-  // review), which renders nothing — safe for non-agency workspaces too.
-  const [reviewStatus, setReviewStatus] = React.useState<ReviewStatus>({
-    state: "none",
-    reviewerName: null,
-    at: null,
-  });
+  /* S5.2: the persistent review pill. Starts at UNKNOWN — `state: "none"`, so
+     it still renders nothing, but with the two flags null rather than asserting
+     "reviews are on and publishing is ungated" before anyone has asked. A
+     control that picks a verb from a guessed lifecycle position and changes it
+     after paint is worse than one that arrives a beat late. */
+  const [reviewStatus, setReviewStatus] = React.useState<ReviewStatus>(UNKNOWN_REVIEW_STATUS);
   const refreshReview = React.useCallback(() => {
     fetchReviewStatus().then(setReviewStatus);
   }, []);
