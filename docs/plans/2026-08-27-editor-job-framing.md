@@ -346,12 +346,88 @@ question directly and is not built.
 
 ---
 
-## DESIGN REVIEW — 2026-08-27 `[single-reviewer]`
+## DESIGN REVIEW — 2026-08-27
 
-Both outside voices failed on this phase: Codex timed out at 600s, and the
-design subagent died on an API timeout mid-read. Per the degradation matrix
-this is single-reviewer mode, and it is tagged rather than presented as a
-dual-voice result.
+**Revised.** The section below was written as `[single-reviewer]` after both
+outside voices failed. The design subagent then finished on a retry and
+**overturned its central proposal**. The band answer is superseded; what it got
+right is kept, and the correction is recorded rather than quietly swapped.
+
+### SUPERSEDED — "generalise ReviewBar into a seven-state lifecycle band"
+
+Wrong on the arithmetic and wrong on the evidence.
+
+**The vertical budget kills it.** `2026-07-18-editor-shell-wireframes.md` §1:
+900 − 56 topbar − 32 footer − 36 page tabs = **776** middle band, and the
+tightest case the doc contemplates is **736**. A permanent 44–48px strip makes
+~730 the everyday number, forever, on the axis zoom-to-fit already fights. You
+do not spend canvas permanently to say something true five minutes a week.
+
+**And the thing it proposed to build is already specified, and already has a
+slot.** `2026-07-18-editor-shell-wireframes.md` §2 draws the topbar as
+`‹Exit BellaCucina ●Saved2m ◷Review 🔔 [ Send for review ] ⋯` and says:
+
+> *"The CTA is **state-dependent**: `[ Send for review ]` before a review,
+> `[ Publish ]` once approved, **disabled with a 'needs approval' tooltip**
+> while `pending`/`changes-requested`. It is the only filled cobalt button in
+> the shell chrome."*
+
+That is the lifecycle frame. Written 2026-07-18. Not built.
+
+### THE ANSWER — the topbar's one primary button becomes the next move
+
+Three slots, two of which already exist. Verified in the shipped code:
+
+**Slot A — the CTA.** `Topbar.tsx` already takes `action` and `publish`.
+`StudioHeader.tsx:663` passes `action={undefined}` — and there is exactly **one**
+`<Topbar>` render, so the slot is empty in every mode, not just view mode. The
+`publish` state is derived at `:503-508` from `publishEnabled → isViewer →
+offline` and **never reads `reviewStatus`**, which is sitting in state four
+lines above it. Zero new chrome; one derivation feeding a slot that exists.
+
+**Slot B — one `● Live · domain` chip**, 24h, between `SaveStatus` and
+`ReviewBadge`. The editor currently **cannot say the site is live**:
+`publishedUrl` is hydrated at mount and spent on a single `⋯` menu row. Two of
+the founder's seven states are invisible without it.
+
+**Slot C — ReviewBar stays conditional**, and carries **three** states, not
+seven: review open, changes requested, and stale approval. Never a "welcome"
+strip, never a "you're live" strip — those are A and B's job, and a strip there
+is the nag.
+
+### Two findings that are worth more than the frame
+
+**The product's stated wedge has no mouse door.** On a site never sent for
+review, the review pill renders `null` for `state: "none"`, Review has no `zone`
+so it has no rail button, and the only way in is ⌘K → "Open Review panel".
+*Send for client review* — the differentiator `PRODUCT-OVERVIEW §4` is built
+around — is keyboard-only in exactly the state where it is the next move.
+Slot A fixes this as a side effect.
+
+**An invited editor is handed a Publish the server will refuse.**
+`publish-approval.ts:34` — `APPROVAL_EXEMPT_ROLES = new Set(["OWNER"])`, and the
+file's own header calls gating ADMIN *"the whole point of the setting"*. The
+chrome knows one role: `isViewer = useEditorRole() === "VIEWER"`. Everyone else
+falls through to `publish: "ready"`. `StudioHeader`'s own file header already
+claims the opposite is shipped — *"an invited editor sends for review instead of
+publishing."* It is not.
+
+**And the copy for all of this is already written and reviewed.**
+`packages/shared/schemas/publish.ts:90-99` carries four lifecycle sentences —
+*"This site has not been sent for review yet. Send it for review to publish."*
+and three siblings — which `usePublishJob.ts:69-79` uses **only as a
+post-failure classifier**. The whole job is moving them from after the press to
+before it.
+
+**Blocking gap:** `editsRequireApproval` never reaches the client — zero reads
+across `packages/editor/src` and `server/trpc`. Until one boolean rides along on
+`reviews.status`, Slot A can only guess, and a guessing frame is a lying frame.
+
+---
+
+### What the superseded band section got right, and is kept
+
+
 
 ### The frame is not a new surface — it already ships, scoped to one stage
 
