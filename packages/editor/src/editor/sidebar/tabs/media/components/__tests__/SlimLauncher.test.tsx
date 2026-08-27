@@ -92,10 +92,29 @@ describe("SlimLauncher — §10 default 320px experience", () => {
     expect(container.querySelector(".med-upload-zone")).toBeInTheDocument();
   });
 
-  it("renders the board empty state — muted line + Upload / Browse stock links", () => {
+  it("renders the board empty state — one muted line, one link", () => {
     render(<SlimLauncher {...baseProps()} />);
     expect(screen.getByText("No images or files yet.")).toBeInTheDocument();
-    expect(screen.getByTestId("media-empty-upload")).toBeInTheDocument();
+    expect(screen.getByTestId("media-empty-cta")).toHaveTextContent("Browse stock");
+  });
+
+  it("the empty screen offers each act ONCE", () => {
+    /* On an empty library three things stacked in one column all did the same
+       thing: the empty block's Upload link, the drop zone under it saying
+       "Drag files or click to browse", and the footer's Upload. The block's
+       copy is the board's; the duplication was not. */
+    const { container } = render(<SlimLauncher {...baseProps()} />);
+    expect(screen.queryByTestId("media-empty-upload")).toBeNull();
+    // The two that remain, both still reachable.
+    expect(container.querySelector(".med-upload-zone")).toBeInTheDocument();
+    expect(screen.getByTestId("media-upload-action")).toBeInTheDocument();
+  });
+
+  it("one door, one name — stock is worded the same everywhere", () => {
+    // The footer said "Stock" while the empty and error states said "Browse
+    // stock", in the same panel.
+    render(<SlimLauncher {...baseProps()} />);
+    expect(screen.getByTestId("media-stock-action")).toHaveTextContent("Browse stock");
     expect(screen.getByTestId("media-empty-cta")).toHaveTextContent("Browse stock");
   });
 

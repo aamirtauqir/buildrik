@@ -360,21 +360,21 @@ export function SlimLauncher(props: SlimLauncherProps) {
             is the honest signal for an empty library.
           */
           counts.all === 0 ? (
-            /* Board 145:406: one muted line, then Upload / Browse stock as
-               accent text links — no filled CTA. */
+            /* Board 145:406: one muted line, then accent text links — no filled
+               CTA.
+
+               The board drew Upload here, and it is gone: on the empty screen
+               the drop zone sits directly below saying "Drag files or click to
+               browse", and the footer carries Upload as well, so the same act
+               had THREE affordances stacked in one column. The board describes
+               this block, not the composition around it, and the footer is
+               where Upload lives (the same move that put Stock there).
+
+               Stock stays, because it is the one action the drop zone cannot
+               perform — and it is worded the way the footer words it. */
             <div className="sl-empty tw:px-4 tw:pt-11 tw:text-center tw:text-[13px] tw:leading-5" data-testid="media-empty">
               <p className="tw:text-[var(--bk-ink-muted)]">No images or files yet.</p>
               <p className="tw:mt-2.5 tw:flex tw:justify-center tw:gap-10">
-                <Button
-                  type="button"
-                  color="light"
-                  size="xs"
-                  className="tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:font-normal tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
-                  data-testid="media-empty-upload"
-                  onClick={() => uploadInputRef.current?.click()}
-                >
-                  Upload
-                </Button>
                 <Button
                   type="button"
                   color="light"
@@ -582,7 +582,11 @@ export function SlimLauncher(props: SlimLauncherProps) {
             onClick={onOpenStock}
           >
             <Cloud size={14} aria-hidden="true" />
-            Stock
+            {/* Was "Stock". The empty state and the load-error state have both
+                said "Browse stock" all along, so one door wore two names in the
+                same panel. The longer phrase wins because "Stock" on its own
+                does not say what pressing it does. */}
+            Browse stock
           </Button>
           {props.onOpenIconPicker ? (
             <Button
