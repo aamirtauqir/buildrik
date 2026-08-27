@@ -144,7 +144,20 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
                         <path d="M2 6h8M8 3l3 3-3 3" strokeLinecap="round" />
                       </svg>
                       <div className={SWATCH} style={{ background: diff.currentValue }} />
-                      <span className={NAME}>{token?.name ?? diff.tokenId}</span>
+                      {/* Board 1172:4840 names each row `color/accent`, not
+                          `accent`. The kind is load-bearing on this screen: two
+                          kinds can each own a token called "primary", and this
+                          is the last confirmation before every element bound to
+                          it moves. A bare name cannot say which one is about to
+                          change. Falls back to the bare name when the kind is
+                          unknown, which is better than printing "undefined/". */}
+                      <span className={NAME}>
+                        {token?.name
+                          ? token.category
+                            ? `${token.category}/${token.name}`
+                            : token.name
+                          : diff.tokenId}
+                      </span>
                       {/* Board 1172:4840 prints the transition as text —
                           "#1A56DB → #1E429F" — beside the row. Two swatches
                           say a colour changed; they cannot say to WHAT, and

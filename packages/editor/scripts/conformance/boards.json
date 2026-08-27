@@ -198,7 +198,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "open:no-row-menu",
+      "authority": "board:153-2-no-menu",
       "recipe": null
     },
     {
@@ -209,7 +209,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "open:mode-toggle-treatment",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -429,7 +429,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "open:detail-as-screen",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -4499,7 +4499,7 @@
       "width": 520,
       "height": 0,
       "status": "active",
-      "authority": "open:review-row-naming",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
