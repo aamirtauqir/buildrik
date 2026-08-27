@@ -5,8 +5,8 @@
   "generatedAt": "2026-08-14",
   "counts": {
     "total": 422,
-    "active": 366,
-    "designAhead": 30,
+    "active": 364,
+    "designAhead": 32,
     "outOfScope": 26,
     "activeFamilies": 34
   },
@@ -351,8 +351,8 @@
       "state": "presets · bound",
       "width": 320,
       "height": 812,
-      "status": "active",
-      "authority": "open:status-pill-convention",
+      "status": "design-ahead",
+      "authority": "blocked:no-element-preset-reference",
       "recipe": null
     },
     {
@@ -363,7 +363,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "open:status-pill-convention",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -373,8 +373,8 @@
       "state": "presets · unbound",
       "width": 320,
       "height": 812,
-      "status": "active",
-      "authority": "open:status-pill-convention",
+      "status": "design-ahead",
+      "authority": "blocked:no-element-preset-reference",
       "recipe": null
     },
     {

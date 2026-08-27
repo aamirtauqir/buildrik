@@ -60,6 +60,7 @@ import { AIPromptModal } from "./AIPromptModal";
 import { AddTokenModal } from "./modals/AddTokenModal";
 import { ReviewModal } from "./modals/ReviewModal";
 import { BrandPreview } from "./BrandPreview";
+import { SectionStatusBadge, presetsStatus } from "./SectionStatusBadge";
 import { TokensSection } from "./sections/TokensSection";
 import { StylesSection, useStylesSectionTotalDirty } from "./sections/StylesSection";
 import { ComponentsSection } from "./sections/ComponentsSection";
@@ -652,6 +653,13 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
         />
       ) : (
         <div id={`design-section-${activeSection ?? "root"}`} className={SECTION_BODY}>
+          {/* Board 306:2161 draws a status badge in the band under the back
+              row. Its two siblings (bound / unbound) specify a state nothing can
+              answer — elements carry no preset reference — so only this one
+              ships. See SectionStatusBadge's note. */}
+          {activeSection === "styles" && presetsStatus(stylesDirty > 0) && (
+            <SectionStatusBadge status="draft" />
+          )}
           {/* Brand root — the drill-in list (M5, board 152:2) */}
           {activeSection === null && suppressedCount > 0 ? (
             <div className="tw:px-3 tw:pb-2">
