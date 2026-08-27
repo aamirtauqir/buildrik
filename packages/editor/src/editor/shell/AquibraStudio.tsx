@@ -413,6 +413,22 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   // useExportHandlers, announcements by StudioHeader.
   const publishOutcome = usePublishOutcomeFlash(publishJob.uiState);
 
+  /* Announce a real publish on the bus. The onboarding checklist used to tick
+     "Publish your site" when the publish PANEL opened — the CTA press, not the
+     outcome — so the list could reach 7 of 7 over a site that had never been
+     deployed. Nothing else on the bus could tell, because until now nothing
+     said it: publishing lives above the composer and never spoke to it. */
+  const publishedJobRef = React.useRef<string | null>(null);
+  React.useEffect(() => {
+    if (publishJob.uiState !== "published" || !publishJob.jobId) return;
+    if (publishedJobRef.current === publishJob.jobId) return;
+    publishedJobRef.current = publishJob.jobId;
+    composer?.emit(EVENTS.SITE_PUBLISHED, {
+      jobId: publishJob.jobId,
+      url: publishJob.publishedUrl,
+    });
+  }, [publishJob.uiState, publishJob.jobId, publishJob.publishedUrl, composer]);
+
   // Auto-enable spacing on first selection. Deps are the specific values read
   // (not the whole `state` object, which is a fresh literal every render and
   // made this effect run on every render).

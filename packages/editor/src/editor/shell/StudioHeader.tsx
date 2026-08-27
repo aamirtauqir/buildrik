@@ -732,6 +732,11 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
             onOpenTemplates={viewMode.readOnlyView ? undefined : onOpenTemplates}
             onOpenComponents={viewMode.readOnlyView ? undefined : onOpenComponents}
             onOpenShortcuts={viewMode.readOnlyView ? undefined : onOpenShortcuts}
+            onReplayOnboarding={
+              viewMode.readOnlyView || !composer
+                ? undefined
+                : () => composer.emit(EVENTS.UI_ONBOARDING_REPLAY, {})
+            }
             onAskAI={viewMode.fourToolRail ? onShowAI : undefined}
             onStartCollaboration={collabOn && !isConnected ? startCollab : undefined}
             onOpenDesignSystem={viewMode.readOnlyView ? undefined : onOpenDesignSystem}

@@ -220,6 +220,11 @@ export const EVENTS = {
   CMS_CONTENT_CREATED: "content:created",
   CMS_CONTENT_UPDATED: "content:updated",
   CMS_CONTENT_DELETED: "content:deleted",
+  /** A publish job for THIS site reported COMPLETED. Emitted by the shell, not
+   *  the engine — publishing lives above the composer — so anything on the bus
+   *  can react to "the site actually went live" rather than to a panel opening. */
+  SITE_PUBLISHED: "site:published",
+
   CMS_CONTENT_PUBLISHED: "content:published",
   CMS_CONTENT_UNPUBLISHED: "content:unpublished",
   /** The collection store was re-read after an outside write (server hydration).
@@ -325,6 +330,11 @@ export const EVENTS = {
   /** Open a specific inspector panel tab by name (layout/style/typography/size) */
   UI_PANEL_OPEN: "panel:open",
   /** Browse templates (opens template browser) */
+  /** Re-open the getting-started checklist after it was dismissed. Until this
+   *  existed `replayAll` had no caller anywhere in the product: skipping the
+   *  checklist once ended it for good, on every site, with no way back. */
+  UI_ONBOARDING_REPLAY: "ui:onboarding-replay",
+
   UI_BROWSE_TEMPLATES: "ui:browse-templates",
   UI_TOGGLE_TEMPLATES: "ui:toggle:templates",
   UI_TOGGLE_EXPORTER: "ui:toggle:exporter",

@@ -93,6 +93,9 @@ export interface SiteMenuProps {
   // ── Footer ────────────────────────────────────────────────────────────────
   /** Open Keyboard Shortcuts panel (`?`) */
   onOpenShortcuts?: () => void;
+  /** Re-open the getting-started checklist. Omitted in view mode — a viewer is
+   *  not being onboarded into a build they cannot make. */
+  onReplayOnboarding?: () => void;
 }
 
 function openDashboard(path: string) {
@@ -139,6 +142,7 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
   onStartCollaboration,
   onAskAI,
   onOpenShortcuts,
+  onReplayOnboarding,
 }) => {
   const [open, setOpen] = React.useState(false);
   const run = (fn?: () => void) => () => {
@@ -263,11 +267,16 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
         </MenuGroup>
         )}
 
-        {onOpenShortcuts ? (
+        {onOpenShortcuts || onReplayOnboarding ? (
           <MenuGroup>
-            <MenuItem kbd={SHORTCUTS_KBD} onClick={run(onOpenShortcuts)}>
-              Keyboard shortcuts
-            </MenuItem>
+            {onReplayOnboarding ? (
+              <MenuItem onClick={run(onReplayOnboarding)}>Getting started</MenuItem>
+            ) : null}
+            {onOpenShortcuts ? (
+              <MenuItem kbd={SHORTCUTS_KBD} onClick={run(onOpenShortcuts)}>
+                Keyboard shortcuts
+              </MenuItem>
+            ) : null}
           </MenuGroup>
         ) : null}
       </Menu>

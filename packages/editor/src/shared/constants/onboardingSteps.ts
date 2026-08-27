@@ -26,7 +26,10 @@ export interface OnboardingStep {
 // ── Schema Version ──────────────────────────────────────────────────────────
 // Bump when step IDs or count change — clears stale localStorage automatically.
 
-export const ONBOARDING_SCHEMA_VERSION = 3;
+/* 4 (2026-08-27): every step used to be creditable by pressing its CTA, so
+   stored progress can say "done" over things that were never done. The version
+   bump clears it — a checklist that lied is worse than one that starts over. */
+export const ONBOARDING_SCHEMA_VERSION = 4;
 
 // ── Default Steps ───────────────────────────────────────────────────────────
 

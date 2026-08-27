@@ -15,6 +15,22 @@ import { OnboardingChecklist } from "./OnboardingChecklist";
 import { AchievementPrompt } from "./AchievementPrompt";
 import { useOnboardingOrchestrator } from "./useOnboardingOrchestrator";
 
+/** How long the style credit waits before it counts. Long enough to cover an
+ *  insert's own default-style writes, short enough that a deliberate style
+ *  change still ticks while the user is looking at it. */
+const INSERT_STYLE_GRACE_MS = 400;
+
+/** Names the create flow hands out when nobody chose one. A project still
+ *  wearing one of these has not been named. */
+const PLACEHOLDER_NAMES: ReadonlySet<string> = new Set([
+  "untitled",
+  "untitled site",
+  "untitled project",
+  "my project",
+  "my site",
+  "new site",
+]);
+
 export interface OnboardingMountProps {
   composer: Composer | null;
 }
@@ -35,22 +51,27 @@ export const OnboardingMount: React.FC<OnboardingMountProps> = ({ composer }) =>
     };
   }, [composer]);
 
-  /* The checklist only ever completed a step when the user pressed that
-     step's own CTA — and two of the seven steps ("Edit text", "Style an
-     element") have no CTA at all, so they could never be ticked and the
-     counter could never reach 7 of 7. The achievement prompt's "You're all
-     set!" branch was unreachable for the same reason. These three steps now
-     complete when the user DOES the thing, which is what a checklist claims
-     to track; the rest keep their CTA, which works.
+  /* EVERY step completes on the outcome now, none on the CTA press.
+
+     Three of them already did. The other four were ticked by `handleAction`
+     the instant their button was clicked — so "Name your project" completed
+     when Settings opened over an unchanged name, "Choose a starting point"
+     when the template browser opened over nothing applied, "Add an element"
+     when the Build panel opened over an empty canvas, and "Publish your site"
+     when the publish PANEL opened over a site that had never been deployed.
+     The list could reach 7 of 7 having done none of the seven things.
 
      Suppressed during a project load: importing a site creates elements and
      styles by the hundred, and crediting the user for the loader's work is
      the same lie in the other direction. */
   const STEP_SIGNALS: ReadonlyArray<{ id: string; event: string }> = React.useMemo(
     () => [
+      { id: "name-project", event: EVENTS.PROJECT_METADATA_CHANGED },
+      { id: "pick-start", event: EVENTS.TEMPLATE_APPLIED },
       { id: "add-element", event: EVENTS.ELEMENT_INSERTED },
       { id: "edit-text", event: EVENTS.ELEMENT_EDIT_INLINE },
-      { id: "change-style", event: EVENTS.STYLE_CHANGED },
+      { id: "preview", event: EVENTS.UI_TOGGLE_PREVIEW },
+      { id: "publish", event: EVENTS.SITE_PUBLISHED },
     ],
     []
   );
@@ -58,6 +79,14 @@ export const OnboardingMount: React.FC<OnboardingMountProps> = ({ composer }) =>
   const loadingRef = React.useRef(false);
   const completeRef = React.useRef(o.completeStep);
   completeRef.current = o.completeStep;
+  /* When the last insert landed. Inserting an element writes its default
+     styles, so a single drag emits four `style:changed` before its
+     `element:inserted` — which credited "Style an element" for styles the user
+     never chose. (It only ever ticked ONE of the two because a separate bug
+     collapsed same-tick completions; fixing that made this one visible.)
+     The style credit therefore waits out a grace window and withdraws if an
+     insert turns up in it. */
+  const lastInsertAt = React.useRef(0);
 
   React.useEffect(() => {
     if (!composer) return;
@@ -67,6 +96,31 @@ export const OnboardingMount: React.FC<OnboardingMountProps> = ({ composer }) =>
       loadingRef.current = Boolean((payload as { importing?: boolean } | undefined)?.importing);
     };
     composer.on(EVENTS.PROJECT_LOADED, onLoad);
+
+    const markInsert = () => {
+      lastInsertAt.current = Date.now();
+    };
+    composer.on(EVENTS.ELEMENT_INSERTED, markInsert);
+
+    const timers: number[] = [];
+    const onStyle = () => {
+      if (loadingRef.current) return;
+      /* Compare the insert against THIS event's own timestamp, not against the
+         clock when the timer fires. Measured live: an insert emits four
+         `style:changed` in the same millisecond as its `element:inserted`, and
+         checking `Date.now() - lastInsertAt > GRACE` at fire time compares the
+         insert against the timer's own delay — which is always at least GRACE,
+         so it passed every time and the row was credited anyway. */
+      const styleAt = Date.now();
+      const id = window.setTimeout(() => {
+        // An insert this close to the style event means these were the new
+        // element's defaults, not a style the user picked.
+        if (Math.abs(lastInsertAt.current - styleAt) <= INSERT_STYLE_GRACE_MS) return;
+        completeRef.current("change-style");
+      }, INSERT_STYLE_GRACE_MS);
+      timers.push(id);
+    };
+    composer.on(EVENTS.STYLE_CHANGED, onStyle);
 
     const offs = STEP_SIGNALS.map(({ id, event }) => {
       const handler = () => {
@@ -78,9 +132,61 @@ export const OnboardingMount: React.FC<OnboardingMountProps> = ({ composer }) =>
 
     return () => {
       composer.off(EVENTS.PROJECT_LOADED, onLoad);
+      composer.off(EVENTS.ELEMENT_INSERTED, markInsert);
+      composer.off(EVENTS.STYLE_CHANGED, onStyle);
+      timers.forEach((id) => window.clearTimeout(id));
       offs.forEach((off) => off());
     };
   }, [composer, STEP_SIGNALS]);
+
+  /* B1/B2 — two of the seven rows were finished before the editor opened.
+     A site cannot exist without a name, and it was created from a template or
+     from blank; the dashboard's create flow asks both questions. Leaving them
+     unticked opened the checklist at 0 of 7 over work already done, and told a
+     returning designer to go and do it again.
+
+     Seeded from the project the composer actually loaded, not assumed: a name
+     still sitting on a placeholder is NOT a named project, and a page with
+     nothing on it has no starting point yet. Runs on load as well as mount
+     because the editor mounts before the project arrives. */
+  const seedRef = React.useRef(o.completeStep);
+  seedRef.current = o.completeStep;
+  React.useEffect(() => {
+    if (!composer) return;
+    const seed = () => {
+      const name = composer.getProjectMetadata?.()?.name?.trim() ?? "";
+      if (name && !PLACEHOLDER_NAMES.has(name.toLowerCase())) seedRef.current("name-project");
+      /* The live registry, not `page.root` — that is a hollow snapshot whose
+         `children` can be empty over a page full of content. */
+      const root = composer.elements.getActivePage?.()?.root;
+      const onPage = composer.elements
+        .getAllElements()
+        .filter((el) => el.getId() !== root?.id);
+      if (onPage.length > 0) seedRef.current("pick-start");
+    };
+    seed();
+    composer.on(EVENTS.PROJECT_LOADED, seed);
+    return () => {
+      composer.off(EVENTS.PROJECT_LOADED, seed);
+    };
+  }, [composer]);
+
+  /* The door back in. `replayAll` shipped with no caller anywhere in the
+     product, so "Skip" was permanent and global — dismiss once and no site
+     ever offered the checklist again. */
+  const replayRef = React.useRef({ replayAll: o.replayAll, restore: o.restore });
+  replayRef.current = { replayAll: o.replayAll, restore: o.restore };
+  React.useEffect(() => {
+    if (!composer) return;
+    const onReplay = () => {
+      replayRef.current.replayAll();
+      replayRef.current.restore();
+    };
+    composer.on(EVENTS.UI_ONBOARDING_REPLAY, onReplay);
+    return () => {
+      composer.off(EVENTS.UI_ONBOARDING_REPLAY, onReplay);
+    };
+  }, [composer]);
 
   const handleAction = React.useCallback(
     (actionKey: string) => {
@@ -110,11 +216,10 @@ export const OnboardingMount: React.FC<OnboardingMountProps> = ({ composer }) =>
         default:
           break;
       }
-      // Mark the step done — the user took the guided action.
-      const step = o.steps.find((s) => s.actionKey === actionKey);
-      if (step) o.completeStep(step.id);
+      /* No completion here. Opening the door is not walking through it — see
+         STEP_SIGNALS above, which credits each step from the outcome. */
     },
-    [composer, o],
+    [composer],
   );
 
   if (o.phase === "done") return null;
