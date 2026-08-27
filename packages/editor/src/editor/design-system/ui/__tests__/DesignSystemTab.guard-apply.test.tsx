@@ -27,6 +27,7 @@
 import { render, fireEvent, waitFor, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import * as React from "react";
+import { APPLY_CHANGES_LABEL } from "../DesignTabFooter";
 import { DesignSystemTab } from "../DesignSystemTab";
 import { TokenRegistryProvider } from "../../state/TokenRegistryContext";
 import { StylePresetRegistryProvider, useButtonPresets } from "../../state/StylePresetRegistryContext";
@@ -182,14 +183,14 @@ describe("DesignSystemTab — navigating with unsaved edits", () => {
     const original = utils.radiusInput.value;
 
     fireEvent.change(utils.radiusInput, { target: { value: "10px" } });
-    await utils.findByText(/previewing/);
+    await utils.findByText("Unsaved brand changes");
 
     fireEvent.click(utils.getByText("Discard"));
 
     await waitFor(() => {
       expect((utils.getByLabelText("Small radius value") as HTMLInputElement).value).toBe(original);
     });
-    expect(utils.queryByText(/previewing/)).toBeNull();
+    expect(utils.queryByText("Unsaved brand changes")).toBeNull();
   });
 
   // §2-B13 (FIXED): guard Discard (handleGuardDiscard) and footer Discard
@@ -222,8 +223,8 @@ describe("DesignSystemTab — navigating with unsaved edits", () => {
     /* The per-section dirty DOT moved from the tab bar to the root row, so it
        is only readable at the root — and you cannot walk back to the root while
        dirty, because that is precisely the move the guard intercepts. The
-       always-visible signal inside a section is the footer ("N previewing" /
-       "Brand is up to date"), which is what this test reads. That is not a
+       always-visible signal inside a section is the footer ("Unsaved brand
+       changes" / "Brand is up to date"), which is what this test reads. That is not a
        weaker assertion: it is the one a user actually has in front of them
        while editing. */
 
@@ -239,7 +240,7 @@ describe("DesignSystemTab — navigating with unsaved edits", () => {
     });
 
     await waitFor(() => {
-      expect(utils.getByText(/previewing/)).toBeTruthy();
+      expect(utils.getByText("Unsaved brand changes")).toBeTruthy();
     });
     expect(buttonReg!.isDirty).toBe(true);
 
@@ -255,16 +256,18 @@ describe("DesignSystemTab — navigating with unsaved edits", () => {
 
 /* The guard's "Save and switch" was this file's route into handleApply, and it
    is gone with the guard. The route below is the one a user actually has:
-   footer "Apply Changes" -> ReviewModal -> "Apply N changes". */
+   the footer's primary button -> ReviewModal -> "Apply N changes". */
 async function applyViaFooter(utils: ReturnType<typeof render>) {
-  // "Apply Changes" appears more than once in the tree (the footer button and
-  // its label constant reused elsewhere), so scope to the savebar.
+  /* Read the label from the constant rather than spelling it: it moved from
+     "Apply Changes" to board 154:78's "Save" on 2026-08-27, and a test that
+     hard-codes copy breaks on every wording decision instead of on behaviour.
+     The label appears more than once in the tree, so scope to the savebar. */
   const bar = utils.container.querySelector('[data-screen-savebar="true"]');
   if (!bar) throw new Error("footer savebar not rendered");
   const applyBtn = [...bar.querySelectorAll("button")].find(
-    (b) => (b.textContent || "").trim() === "Apply Changes",
+    (b) => (b.textContent || "").trim() === APPLY_CHANGES_LABEL,
   );
-  if (!applyBtn) throw new Error("footer Apply Changes not found");
+  if (!applyBtn) throw new Error(`footer ${APPLY_CHANGES_LABEL} not found`);
   fireEvent.click(applyBtn);
   fireEvent.click(await utils.findByText(/^Apply \d+ changes?$/));
 }
@@ -335,7 +338,7 @@ describe("DesignSystemTab — §2-B1 engine undo preserves unsaved DS edits (fix
 
     fireEvent.change(utils.radiusInput, { target: { value: "10px" } });
     await waitFor(() => {
-      expect(utils.getByText(/previewing/)).toBeTruthy();
+      expect(utils.getByText("Unsaved brand changes")).toBeTruthy();
     });
 
     // Engine-level undo (canvas action) — nothing to do with the DS tab.
@@ -347,7 +350,7 @@ describe("DesignSystemTab — §2-B1 engine undo preserves unsaved DS edits (fix
     // the canvas undo does not silently reload stored settings over them.
     await waitFor(() => {
       expect((utils.getByLabelText("Small radius value") as HTMLInputElement).value).toBe("10px");
-      expect(utils.getByText(/previewing/)).toBeTruthy();
+      expect(utils.getByText("Unsaved brand changes")).toBeTruthy();
     });
   });
 

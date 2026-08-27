@@ -2,7 +2,8 @@
  * The first-load hint must name the button that exists.
  *
  * It told people to click "Review & Apply" — the name the footer's action had
- * before it was renamed to "Apply Changes". Walked live: the Brand panel's
+ * before it was renamed. It is "Save" since 2026-08-27, from board 154:78.
+ * Walked live: the Brand panel's
  * Tokens screen printed the instruction in bold, and no such control was on
  * screen. Both now read one constant, so the next rename moves them together.
  *
@@ -29,6 +30,9 @@ describe("Brand — the apply action is named once", () => {
   it("the footer renders that same constant", () => {
     const footer = readFileSync(join(here, "..", "DesignTabFooter.tsx"), "utf8");
     expect(footer).toContain("{APPLY_CHANGES_LABEL}");
-    expect(APPLY_CHANGES_LABEL).toBe("Apply Changes");
+    /* Board 154:78 names this button "Save". Copy on screen is the board's
+       call (CLAUDE.md precedence), and the census row for that board was
+       literally `open:footer-copy`. */
+    expect(APPLY_CHANGES_LABEL).toBe("Save");
   });
 });

@@ -82,7 +82,7 @@ describe("DesignSystemTab — 14-kind aggregation", () => {
     // The dirty dot sits on the root row, which is unreachable while dirty (the
     // guard intercepts that move). Inside a section the footer is the signal.
     await waitFor(() => {
-      expect(getByText(/previewing/)).toBeTruthy();
+      expect(getByText("Unsaved brand changes")).toBeTruthy();
     });
   });
 
@@ -100,7 +100,7 @@ describe("DesignSystemTab — 14-kind aggregation", () => {
     );
     fireEvent.change(radiusInput, { target: { value: "10px" } });
     // Footer "Apply Changes" button opens the ReviewModal.
-    const reviewButtons = getAllByText(/Apply Changes/);
+    const reviewButtons = getAllByText("Save");
     fireEvent.click(reviewButtons[reviewButtons.length - 1]);
     // ReviewModal's confirm button is labeled "Save to site".
     const saveButton = await waitFor(

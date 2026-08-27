@@ -94,7 +94,7 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
           style={{
             width: "100%",
             padding: "8px 10px",
-            background: "rgba(255,255,255,0.05)",
+            background: "var(--bk-bg-card)",
             border: `1px solid ${nameError ? /* @lint-hex-policy: input error border red-500, off chrome palette */ "#ef4444" : "var(--bk-border)"}`,
             borderRadius: 6,
             color: "var(--bk-ink)",
@@ -138,7 +138,7 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
             style={{
               flex: 1,
               padding: "8px 10px",
-              background: "rgba(255,255,255,0.05)",
+              background: "var(--bk-bg-card)",
               border: `1px solid ${hexError ? /* @lint-hex-policy: input error border red-500, off chrome palette */ "#ef4444" : "var(--bk-border)"}`,
               borderRadius: 6,
               color: "var(--bk-ink)",

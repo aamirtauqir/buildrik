@@ -220,7 +220,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "open:component-row-count",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -231,7 +231,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "open:footer-copy",
+      "authority": "board:154-78-save-bar",
       "recipe": null
     },
     {

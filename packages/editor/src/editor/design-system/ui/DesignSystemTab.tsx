@@ -446,7 +446,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
      section change and even a full unmount of this panel; the only things that
      discard are the footer's own Discard and the guard's discard handler.
      Navigating away from a dirty section never lost anything, so there was
-     nothing to guard. The footer already reports "N previewing" + Apply
+     nothing to guard. The footer already reports "Unsaved brand changes" + Save
      Changes, which is the honest affordance. */
   const handleSectionClick = (s: DesignSection | "root") => {
     const target = s === "root" ? null : s;

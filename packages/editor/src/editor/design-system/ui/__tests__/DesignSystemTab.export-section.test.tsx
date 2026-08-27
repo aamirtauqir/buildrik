@@ -121,7 +121,7 @@ describe("DesignSystemTab → ExportSection (S5 integration)", () => {
       // M5: the per-section dot is a root-list affordance, and the root cannot
       // be reached while dirty — the guard intercepts exactly that move. The
       // footer carries the signal inside a section.
-      expect(getByText(/previewing/)).toBeTruthy();
+      expect(getByText("Unsaved brand changes")).toBeTruthy();
     });
   });
 
@@ -161,7 +161,7 @@ describe("DesignSystemTab → ExportSection (S5 integration)", () => {
       // M5: the per-section dot is a root-list affordance, and the root cannot
       // be reached while dirty — the guard intercepts exactly that move. The
       // footer carries the signal inside a section.
-      expect(getByText(/previewing/)).toBeTruthy();
+      expect(getByText("Unsaved brand changes")).toBeTruthy();
     });
   });
 

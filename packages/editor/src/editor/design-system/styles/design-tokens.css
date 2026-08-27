@@ -26,7 +26,8 @@
   align-items: center;
   gap: var(--bk-space-8);
   padding: 6px var(--bk-space-8);
-  background: rgba(255, 255, 255, 0.02);
+  /* was rgba(255,255,255,0.02) — a dark-theme plate, invisible on this panel */
+  background: var(--bk-bg-subtle);
   border-radius: var(--bk-radius-md);
   margin-bottom: var(--bk-space-4);
 }
@@ -178,7 +179,7 @@
   width: 28px;
   height: 28px;
   border-radius: 5px;
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 1px solid var(--bk-border);
   flex-shrink: 0;
 }
 
@@ -188,7 +189,7 @@
   align-items: center;
   gap: 2px;
   padding: 0 var(--bk-space-8);
-  background: rgba(255,255,255,0.05);
+  background: var(--bk-bg-card);
   border: 1px solid var(--bk-border);
   border-radius: 5px;
   height: 28px;
