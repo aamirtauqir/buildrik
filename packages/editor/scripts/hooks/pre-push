@@ -43,6 +43,7 @@ echo "────────────────────────�
 EDITOR_OK=0
 DASH_OK=0
 FIGMA_OK=0
+ORPHAN_OK=0
 AGE_OK=0
 pnpm run verify:ds > /tmp/buildrik-pre-push-gate.log 2>&1 || EDITOR_OK=$?
 (cd "$REPO_ROOT/packages/dashboard" && pnpm run gate:ds) >> /tmp/buildrik-pre-push-gate.log 2>&1 || DASH_OK=$?
@@ -51,6 +52,14 @@ pnpm run verify:ds > /tmp/buildrik-pre-push-gate.log 2>&1 || EDITOR_OK=$?
 # Added 2026-08-19; watched to fail first (change --color-primary in
 # app/globals.css and it reports FAIL, exit 1).
 (cd "$REPO_ROOT/packages/dashboard" && pnpm run gate:figma) >> /tmp/buildrik-pre-push-gate.log 2>&1 || FIGMA_OK=$?
+
+# Every tRPC procedure has a caller, or an entry saying why not. Added
+# 2026-08-27 after the dashboard walk found 27 with no caller — two of which
+# were features users could not reach (media folders you could not file into,
+# and a site archive with no way back). Watched to fail both ways: drop an
+# allowlist entry and it reports the undocumented orphan; allowlist something
+# that IS wired and it reports the stale entry.
+(cd "$REPO_ROOT/packages/dashboard" && pnpm run gate:trpc-orphans) >> /tmp/buildrik-pre-push-gate.log 2>&1 || ORPHAN_OK=$?
 
 # Conformance spec freshness — prepush mode BLOCKS, because this machine has the
 # Figma MCP and can actually re-extract. CI runs the same check in --mode=ci,
@@ -63,7 +72,7 @@ pnpm run verify:ds > /tmp/buildrik-pre-push-gate.log 2>&1 || EDITOR_OK=$?
 # end. Spec freshness is a human ritual with a reminder attached.
 node scripts/conformance/check-spec-age.mjs --mode=prepush >> /tmp/buildrik-pre-push-gate.log 2>&1 || AGE_OK=$?
 
-if [ "$EDITOR_OK" = "0" ] && [ "$DASH_OK" = "0" ] && [ "$FIGMA_OK" = "0" ] && [ "$AGE_OK" = "0" ]; then
+if [ "$EDITOR_OK" = "0" ] && [ "$DASH_OK" = "0" ] && [ "$FIGMA_OK" = "0" ] && [ "$ORPHAN_OK" = "0" ] && [ "$AGE_OK" = "0" ]; then
   echo " ✓ all gates passing (editor + dashboard)"
   echo "──────────────────────────────────────────────"
   exit 0

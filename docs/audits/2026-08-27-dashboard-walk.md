@@ -151,18 +151,52 @@ said otherwise. A null result is the harness until proven otherwise.
 
 ## Not fixed, and why
 
-- **`npx flowbite-react build` corrupts `tw-flowbite.css`.** It injects an
-  `@import` *inside a block comment* and deletes the real `@plugin` directive.
-  Reverted; the button fix was re-verified without it. Do not run that CLI
-  without reading its diff.
-- **Six procedures have no door**: `team.auditLog` (audit rows are written and
-  no screen reads them), `templates.cloneFromSite`, `dashboard.quickActions`,
-  `dashboard.recentSites`, `ai.getQuotaStatus`, `cms.dynamicPages`. Each is a
-  feature decision, not a bug — listed so they are decided rather than forgotten.
 - **`/dashboard/settings/domains` is read-only by design** — every row links to
   the site's own Domains tab, which is where the actions live.
 - **Marketplace "Set up in Integrations"** is a link, not a mutation, so it
   stays open to everyone; the page it leads to is gated.
+- **`userTemplates.delete`** — the editor saves and lists user templates and
+  never deletes one. Editor lane, not this one.
+
+## Follow-up — the two open items, closed
+
+*Added after the walk, when the founder asked for the remainder.*
+
+**"Six procedures have no door" was wrong — it is 27.** That number came from a
+scan that only understood `trpc.a.b.useQuery(...)`. The editor also calls
+procedures by raw `fetch("/api/trpc/ai.summarize")`, which that scan reported as
+dead. Re-scanned both call styles: 274 procedures, 27 with no caller, and
+`ai.summarize` / `ai.milestoneSuggest` are NOT among them.
+
+One of the 27 was a genuine broken flow, not a feature decision:
+**archiving a site was one-way.** The row menu offered Archive, the bulk bar
+offered "Archive selected", the filter row offered "Archived · N" so you could
+go and look — and nothing brought a site back. `sites.unarchive` had no caller;
+`bulkActionSchema` already accepted `"unarchive"`; `handleBulkAction` already
+had a branch waiting for that exact string. Only the menu row was missing. Fixed
+and verified as a full round trip. (The "Archived · N" badge was also stale —
+its own query never refetched, so archiving left the tab reading 0.)
+
+The other 26 are documented rather than deleted. Deleting a working service +
+schema + permission check because its UI was never built is a product call, not
+a lint, and several are half-built features worth keeping: theme presets (4
+procedures), per-locale page content (3), collection-driven pages (2),
+"save this site as a template".
+
+**`gate:trpc-orphans` closes the class.** Every procedure must have a caller or
+a named reason in the gate's allowlist. It understands both call styles, and
+fails in both directions: an orphan with no reason, and an allowlist entry for
+something that has since been wired up (so the list shrinks instead of rotting).
+Watched to fail both ways, and wired into the pre-push chain beside `gate:ds`
+and `gate:figma` — a gate nobody runs is a comment. Had it existed, it would
+have caught both the media-folder gap and the archive gap on the day they were
+introduced.
+
+**The flowbite CLI trap is guarded.** `flowbiteStore.prefix.test.tsx` now
+asserts the shape of both stylesheets — the `@plugin` directive `tw-flowbite.css`
+must keep, and the unprefixed flowbite import `globals.css` must not gain. Both
+assertions were watched to fail against the CLI's actual corruption. AGENTS.md
+says to `git diff` after running it, and why.
 
 ## Suite
 

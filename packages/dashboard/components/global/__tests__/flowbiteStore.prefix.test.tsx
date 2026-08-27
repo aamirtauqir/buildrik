@@ -161,4 +161,37 @@ describe("dashboard flowbite prefix wiring (flowbite-bigbang collision fix)", ()
     const initSource = readFileSync(path.resolve(__dirname, "../../../.flowbite-react/init.tsx"), "utf-8");
     expect(initSource).toContain('prefix: "tw"');
   });
+
+  /**
+   * `npx flowbite-react build` — the command AGENTS.md tells you to run after
+   * importing a new flowbite component — rewrites these two stylesheets, badly.
+   * Observed 2026-08-27: it injected `@import 'flowbite-react/plugin/tailwindcss';`
+   * INSIDE the block comment at the top of tw-flowbite.css (where it is inert),
+   * DELETED the real `@plugin` directive that compiles the prefixed theme, and
+   * added an UNPREFIXED `@import` + `@source` pair to globals.css — which would
+   * quietly compile flowbite's classes unprefixed and mask the very bug the
+   * ThemeInit wiring above exists to fix.
+   *
+   * The damage is silent: everything still builds. These assert the shape both
+   * files must keep, so the next person who runs that CLI finds out from a red
+   * test instead of from a screenshot months later.
+   */
+  it("tw-flowbite.css keeps the @plugin directive that compiles the prefixed theme", () => {
+    const css = readFileSync(path.resolve(__dirname, "../../../app/tw-flowbite.css"), "utf-8");
+    // Outside any block comment — the CLI's injection landed inside one.
+    const code = css.replace(/\/\*[\s\S]*?\*\//g, "");
+    expect(code).toContain('@plugin "flowbite-react/plugin/tailwindcss";');
+    expect(code).toContain("@source '../.flowbite-react/class-list.json';");
+    expect(code).toContain('prefix(tw)');
+  });
+
+  it("globals.css does not compile flowbite's classes unprefixed", () => {
+    const css = readFileSync(path.resolve(__dirname, "../../../app/globals.css"), "utf-8");
+    const code = css.replace(/\/\*[\s\S]*?\*\//g, "");
+    // An unprefixed flowbite plugin/source here makes the prefixed layer
+    // redundant and hides a broken prefix — the classes resolve either way.
+    expect(code).not.toMatch(/@plugin\s+["']flowbite-react/);
+    expect(code).not.toMatch(/@import\s+["']flowbite-react/);
+    expect(code).not.toMatch(/@source\s+["'][^"']*flowbite-react/);
+  });
 });

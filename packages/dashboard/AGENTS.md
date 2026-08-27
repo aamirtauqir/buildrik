@@ -60,6 +60,22 @@ screen means one of the three above was skipped.
   Flowbite's theme classes live in `node_modules`, which Tailwind never scans;
   without the regenerated `class-list.json` the component renders unstyled
   while everything still compiles green.
+  **`git diff` after running it — it rewrites more than the class list.** On
+  2026-08-27 it injected `@import 'flowbite-react/plugin/tailwindcss';` INSIDE
+  the block comment at the top of `app/tw-flowbite.css` (inert there), DELETED
+  the real `@plugin` directive that compiles the prefixed theme, and added an
+  unprefixed `@import` + `@source` pair to `globals.css` — which compiles
+  flowbite's classes unprefixed and masks a broken prefix. Everything still
+  builds. `flowbiteStore.prefix.test.tsx` now asserts the shape of both files,
+  so a red test is how you find out.
+- **The prefix must be set on the CLIENT, not just the server.** flowbite reads
+  it from a module singleton at render time. `components/global/flowbiteStore.ts`
+  has no `"use client"` and is imported by a Server Component, so on its own it
+  left every browser-rendered flowbite component emitting UNPREFIXED classes
+  that this package never compiles — 23 primary buttons at contrast 1.0,
+  including "New site" and the cookie banner's "Accept All". `<ThemeInit />`
+  from `.flowbite-react/init.tsx` (rendered in `app/layout.tsx`) is the half
+  that reaches the browser; it is CLI-generated and **must stay committed**.
 - **Flowbite's default purple is not ours.** DESIGN.md bans purple/violet/
   indigo as accents. The Flowbite purple ramp is allowed for exactly two data
   uses — avatar identity tones and the PRO badge. Pass `color="blue"` (or the
