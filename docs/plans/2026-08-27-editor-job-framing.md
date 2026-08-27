@@ -33,9 +33,43 @@ scattered: they are **seven features**.
 | Share permissions | 1 | S5.9 modal |
 | Publish changelog | 1 | S6.3 diff-summary |
 
-So the answer to *"kuch miss to ni hai?"* is: **the design is ahead of the code
-by seven features.** Nothing in the shipped editor is undrawn — the gap runs the
-other way.
+**That count was too narrow, and the review caught it.** Filtering
+`status == "design-ahead"` cannot see a board that is `status: active` with an
+unresolved `authority`. Re-run over `authority` and the real answer appears:
+
+| | Count | What it means |
+|---|---|---|
+| open decision (`open:*`) | **28** | drawn, buildable, waiting on a call nobody made |
+| blocked (`blocked:*`) | **6** | drawn, and blocked on a producer that was never written |
+| undecided | **55** | 15 are Reference boards, not screens; the rest are the design-ahead features above |
+| design-ahead / not-implemented | 30 | the seven features in the table |
+
+**18 of the 28 open decisions are Brand alone** — and 8 of those are one
+unsettled convention, `open:status-pill-convention`, repeated across the
+export / preset / token states. Brand is not missing code; it is missing a
+decision, eight times over.
+
+The six blocked boards name their own missing producers, and every one matches
+what the 2026-08-26 walk measured live:
+
+| Board | Blocked on |
+|---|---|
+| Brand · lint | `blocked:no-autofix-producer` — the panel says so itself: *"Auto-fix isn't available yet"* |
+| Review panel · older-round | `blocked:no-round-linkage` |
+| Templates · loading | `blocked:static-catalog` — a static catalog has no loading state |
+| Brand · loading | `blocked:sync-load` |
+| Modal · submitting, Modal · error | `blocked:sync-delete` |
+
+And the sentence *"nothing in the shipped editor is undrawn"* is **withdrawn**.
+`boards.json` enumerates the Figma page; it cannot support a claim about code,
+and its own `_note` records the counter-example — the Media full-page library,
+where *"code was ahead of Figma (founder catch)"*.
+
+One board deserves naming on its own. `65:2` carries
+`authority: open:first-run-drawer` and draws a rail coach mark reading
+*"Everything you build lives behind these six"*. It answers the founder's
+question in one sentence, it is drawn, and it is not built — and the
+`status`-only method could not see it.
 
 ---
 
