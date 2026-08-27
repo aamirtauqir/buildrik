@@ -58,7 +58,7 @@ export interface LayerDisplayPrefs {
   showHtmlBadges: boolean;
   /** Show element IDs (#w83sqctx format). Default: false */
   showElementIds: boolean;
-  /** Compact row density. Default: "comfortable" */
+  /** Compact row density. Default: "compact" (founder call 2026-08-28; DESIGN.md compact density + board 1082:4527). */
   treeDensity: "comfortable" | "compact";
 }
 

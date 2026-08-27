@@ -33,7 +33,14 @@ const DISPLAY_PREFS_KEY = "buildrick-layers-display-prefs";
 const defaultPrefs: LayerDisplayPrefs = {
   showHtmlBadges: false,
   showElementIds: false,
-  treeDensity: "comfortable",
+  /* Compact by default — founder call, 2026-08-28. Three things agree: DESIGN.md
+     names "compact density" as the chrome's stance, board 1082:4527 draws the
+     tree at 28 (`--bk-size-row-dense`), and at the drawer's 732px a compact
+     tree shows ~26 rows where comfortable shows 18 — and this panel's whole job
+     is seeing the tree. A stored preference still wins: loadDisplayPrefs
+     spreads the saved value over these, so anyone who chose comfortable keeps
+     it. */
+  treeDensity: "compact",
 };
 
 function loadDisplayPrefs(): LayerDisplayPrefs {
