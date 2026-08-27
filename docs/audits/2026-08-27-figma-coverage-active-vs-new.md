@@ -75,3 +75,52 @@ built for the client is the screen with no board.
   `2026-08-25-editor-ui-redesign.md`, and it is not done.
 - `opened-not-acted`, one CTA state, still has no live walk — its signal does
   not live on the review round, so it cannot be staged.
+
+---
+
+## Brand family loop — started 2026-08-27, and it found the order was wrong
+
+### `open:status-pill-convention` — settled, one third built
+
+Eight boards sat on this one authority. Read from Figma, the convention was
+never open: a single Badge, x=16, height 20, in the band between the back row
+and the first content row, one per screen. The wording is the boards' own —
+"Bound to elements" (128px), "Unbound" (73px), "Draft preset" (89px), each width
+corroborating its label.
+
+Only "Draft preset" could be built. `bound`/`unbound` mean *applied to elements*,
+and nothing in the product can answer that: elements carry no preset reference,
+and `TokenUsageTracker` tracks TOKENS. Both moved to `design-ahead` /
+`blocked:no-element-preset-reference`. Census is now 364 active / 32
+design-ahead.
+
+### `open:root-strips` — the code is ahead of the board, and I put it there
+
+Board `152:2` (Brand · root) draws **nine List rows at 32px each**, starting
+immediately under the 44px panel header. No preview strip. No swatches. No row
+hints.
+
+Measured live at 1440×900 after the R10 commit (`7573232b`):
+
+| | Board `152:2` | Live | Δ |
+|---|---|---|---|
+| rows | 9 | 9 | — |
+| row height | **32px** | **52px** | **+20 each** |
+| preview strip | **absent** | 295 × 82 | **added** |
+
+Nine rows twenty pixels taller, plus an 82px strip, is **262px** of extra height
+in an 812px panel.
+
+That work was right by the ledger (R10: "the design-system surface is a plain
+text list with counts — no swatches, no type specimens") and by the founder's
+brief. It is wrong by the process: the redesign loop in
+`2026-08-25-editor-ui-redesign.md` is *draw the board, then implement to it*, and
+this implemented first.
+
+The census already knew. `152:2` carries `authority: open:root-strips` — the
+open question on that board is literally whether the root gets strips. It is an
+open DECISION, and it is the founder's, not mine.
+
+**This is the blocker being raised**: whether an agent session may draw new
+boards into `g4GzQFqzNYz5sosz1QtZXC`. Until that is answered, the Brand root
+ships ahead of its board and this file records by how much.
