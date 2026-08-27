@@ -113,6 +113,12 @@ describe("SlimLauncher — §10 default 320px experience", () => {
         <SlimLauncher
           {...baseProps()}
           libraryItems={items}
+          /* The counts have to agree with the items. `baseProps` ships all
+             zeros, and a pill at zero is now disabled — it filters to a state
+             with nothing in it, which is a dead end the chip had already
+             announced. A fixture whose counts contradict its own library was
+             asserting on a shape the product cannot produce. */
+          counts={{ all: 3, img: 1, vid: 1, ico: 1, fnt: 0 }}
           activeTypes={types}
           onToggleType={(t) =>
             setTypes((prev) => {
@@ -162,3 +168,67 @@ describe("SlimLauncher — §10 default 320px experience", () => {
     expect(onRetryUpload).toHaveBeenCalledWith("poster.png");
   });
 });
+
+/* Two dead ends the drawer used to walk a user into, both measured live at
+   1440x900 before they were closed. */
+describe("SlimLauncher — filters that lead nowhere", () => {
+  const items = [
+    makeItem({ key: "a", name: "a.jpg", type: "img", src: "x", thumb: "x" }),
+    makeItem({ key: "b", name: "b.mp4", type: "vid", src: "y", thumb: "y" }),
+  ];
+  const withLibrary = (over = {}) => ({
+    ...baseProps(),
+    libraryItems: items,
+    counts: { all: 2, img: 1, vid: 1, ico: 0, fnt: 0 },
+    ...over,
+  });
+
+  it("a pill at zero cannot be clicked, and says why", () => {
+    // It offered a filter whose only possible result was "nothing here".
+    render(<SlimLauncher {...withLibrary()} />);
+    const svg = screen.getByTestId("media-type-chip-ico");
+    expect(svg).toBeDisabled();
+    expect(svg.getAttribute("title")).toMatch(/no svg files/i);
+    // The ones that would return something stay live.
+    expect(screen.getByTestId("media-type-chip-img")).not.toBeDisabled();
+  });
+
+  it("a pill at zero stays clickable while it is the ACTIVE filter", () => {
+    // Deleting the last SVG while filtered to SVG must not remove the control
+    // that clears the filter.
+    render(
+      <SlimLauncher {...withLibrary({ activeTypes: new Set<MediaBucket>(["ico"]) })} />,
+    );
+    expect(screen.getByTestId("media-type-chip-ico")).not.toBeDisabled();
+  });
+
+  it("the filtered-empty state offers a way back out", async () => {
+    const onToggleType = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <SlimLauncher
+        {...withLibrary({ activeTypes: new Set<MediaBucket>(["ico"]), onToggleType })}
+      />,
+    );
+    expect(screen.getByTestId("media-no-results")).toBeInTheDocument();
+    await user.click(screen.getByTestId("media-clear-filter"));
+    // Clearing means un-toggling every type that is on, not just the first.
+    expect(onToggleType).toHaveBeenCalledWith("ico");
+  });
+
+  it("Clear filter releases EVERY active type, not one", async () => {
+    const onToggleType = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <SlimLauncher
+        {...withLibrary({
+          activeTypes: new Set<MediaBucket>(["ico", "fnt"]),
+          onToggleType,
+        })}
+      />,
+    );
+    await user.click(screen.getByTestId("media-clear-filter"));
+    expect(onToggleType.mock.calls.map((c) => c[0]).sort()).toEqual(["fnt", "ico"]);
+  });
+});
+

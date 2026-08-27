@@ -406,9 +406,24 @@ export function SlimLauncher(props: SlimLauncherProps) {
               </div>
             ) : (
               /* Pill-only zero \u2014 no board of its own; scope and filters stay
-                 set, same rule as the search state. */
-              <div className="sl-empty tw:px-4 tw:py-6" data-testid="media-no-results">
+                 set, same rule as the search state.
+
+                 The way OUT was missing. The search state one branch up has
+                 offered "Clear search" all along; this one stated the dead end
+                 and left the user to work out that the way back was a pill
+                 above the grid. Same shape, same treatment. */
+              <div className="sl-empty tw:px-4 tw:py-6" data-testid="media-no-results" role="status">
                 <p className="sl-empty__body tw:text-[12px] tw:text-gray-600">No assets matching this filter.</p>
+                <Button
+                  type="button"
+                  color="light"
+                  size="xs"
+                  className="tw:mt-1.5 tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:font-normal tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+                  data-testid="media-clear-filter"
+                  onClick={() => activeTypes.forEach((tKey) => onToggleType(tKey))}
+                >
+                  Clear filter
+                </Button>
               </div>
             )
           )

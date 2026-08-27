@@ -60,6 +60,16 @@ export function TypePills({
       {PILLS.map((p) => {
         const isActive = selectedTypes.has(p.key);
         const count = counts[p.key];
+        /* A pill printing `0` is a filter whose only possible result is "No
+           assets matching this filter" — and that state has no way out of it,
+           so the chip walked the user into a dead end it had already told them
+           about. Disabled, with the reason, rather than hidden: the row would
+           otherwise change shape on every upload, which is the jitter the mono
+           count exists to avoid.
+
+           An ACTIVE pill stays enabled even at zero. Deleting the last SVG
+           while filtered to SVG must not strip the control that clears it. */
+        const isDeadFilter = !discMode && count === 0 && !isActive;
         return (
           <Chip
             key={p.key}
@@ -68,7 +78,8 @@ export function TypePills({
             label={p.label}
             count={discMode ? undefined : count}
             aria-label={p.title}
-            title={p.title}
+            disabled={isDeadFilter}
+            title={isDeadFilter ? `No ${p.label} files in this library yet` : p.title}
             data-testid={`media-type-chip-${p.key}`}
             countTestId={`media-type-count-${p.key}`}
             className={isActive ? "med-type-pill med-type-pill--active" : "med-type-pill"}
