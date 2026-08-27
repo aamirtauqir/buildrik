@@ -604,6 +604,43 @@ description), `BL-0173 brand-presets`, `BL-0170 brand-colour-mode`, and
 
 ---
 
+## Every printed chord was pressed
+
+The module walk opened panels through their doors — a rail click, a site-menu
+row, a topbar button — and never through the chord printed beside them. A
+printed chord is a contract, and this repo has already found 11 of 23
+right-click shortcuts wrong, two of them running a different command than
+advertised. So all fifteen were pressed, each from a freshly reloaded shell
+(`scripts/baseline/chord-walk.mjs`).
+
+**15 of 15 do what the sheet says.** All thirteen panel chords —
+`A I T M L P ⇧A B S U H R D` — open the panel they name, including the three
+that are not drawers: `S` opens Settings as a full-page surface, `H` opens
+Version History, `U` opens the Publish panel. `⌘K` opens the palette and `?`
+opens a shortcuts sheet.
+
+Two of those read as failures until the detector was fixed, and both were the
+detector: `⌘K`'s expected string ("command palette") does not appear in the
+palette's own text, and the `?` sheet was hidden behind a restored drawer
+because the reader preferred a panel over a full-page surface.
+
+**One thing worth knowing, already known to the code.** `?` and `⌘/` open
+*different* sheets, both titled "Keyboard Shortcuts":
+
+| Door | Component | Sections | Lists the panel chords? |
+|---|---|---|---|
+| `?`, and the footer help button | `canvas/controls/KeyboardCheatSheet.tsx` | SELECTION · Move · VIEW · Canvas | **no** |
+| `⌘/`, and the site menu row | `panels/KeyboardShortcutsPanel.tsx` | PANELS · History · EDIT · VIEW · Canvas | yes |
+
+Neither is a full reference, and the split is deliberate —
+`KeyboardShortcutsPanel.tsx:52-54` records the measurement that produced it:
+*"which opens the canvas cheat sheet, not this panel. Measured: `?` → '⌨️
+Keyboard Shortcuts · SELECTION', ⌘/ → this panel."* The census treats them as
+two surfaces too (`BL-0217 canvas-cheat-sheet`). Recorded here because a reader
+of the table above would otherwise reasonably expect one sheet.
+
+---
+
 ## What this walk did NOT cover
 
 Saying so plainly, because the count of what was walked is not the count of
