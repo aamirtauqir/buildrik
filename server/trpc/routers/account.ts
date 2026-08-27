@@ -23,7 +23,7 @@ import {
   getAccountDeletionEligibility, AccountDeletionBlockedError,
 } from "@/server/services/account.service";
 import { getWorkspaceSettings, updateWorkspaceSettings, updateSharingSettings, deleteWorkspace, cancelWorkspaceDeletion, listUserWorkspaces, createWorkspace, WorkspaceLimitError, WorkspaceNameTakenError } from "@/server/services/workspace-settings.service";
-import { checkWorkspaceRole } from "@/server/services/permission.service";
+import { checkWorkspaceRole, PermissionError } from "@/server/services/permission.service";
 import { initiateTransfer, acceptTransfer, cancelTransfer, getPendingTransfer } from "@/server/services/workspace-transfer.service";
 import { listIntegrations, addIntegration, removeIntegration, updateIntegration, sendIntegrationTestEvent } from "@/server/services/integrations.service";
 import { updateProfileSchema, changePasswordSchema, setPasswordSchema, changeEmailSchema, updateWorkspaceSchema, createWorkspaceSchema, workspaceSharingSettingsSchema, addIntegrationSchema, notificationPrefSchema, updatePreferencesSchema, deleteAccountSchema } from "@buildrik/shared/schemas/account";
@@ -44,6 +44,25 @@ async function getWorkspaceCtx(ctx: WorkspaceCtx): Promise<{ workspaceId: string
     : null);
   if (!member) throw new TRPCError({ code: "NOT_FOUND", message: "No workspace found" });
   return { workspaceId: member.workspaceId, plan: member.workspace.plan as PlanName };
+}
+
+/**
+ * Role gate for this router's ADMIN-scoped mutations.
+ *
+ * `checkWorkspaceRole` throws `PermissionError`, which carries the tRPC code it
+ * wants ("FORBIDDEN"/"NOT_FOUND"). Fifteen of the sixteen routers that call it
+ * translate that; this one was the only one that did not, so a Designer saving
+ * workspace settings got HTTP 500 "Insufficient permissions" instead of 403 —
+ * and INTERNAL_SERVER_ERROR is in tRPC's retryable set, so the client kept
+ * retrying a denial that can never succeed.
+ */
+async function requireWorkspaceAdmin(ctx: WorkspaceCtx, workspaceId: string): Promise<void> {
+  try {
+    await checkWorkspaceRole(ctx.prisma, ctx.session!.user.id, workspaceId, "ADMIN");
+  } catch (e) {
+    if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+    throw e;
+  }
 }
 
 export const accountRouter = router({
@@ -180,7 +199,7 @@ export const accountRouter = router({
       const { workspaceId } = await getWorkspaceCtx(ctx);
       // F3: workspace settings are admin-scoped. checkWorkspaceRole already exists;
       // these mutations just weren't calling it — any ACTIVE member could edit.
-      await checkWorkspaceRole(ctx.prisma, ctx.session.user.id, workspaceId, "ADMIN");
+      await requireWorkspaceAdmin(ctx, workspaceId);
       try {
         return await updateWorkspaceSettings(workspaceId, input, ctx.session.user.id);
       } catch (e) {
@@ -195,7 +214,7 @@ export const accountRouter = router({
     }),
     sharing: protectedProcedure.input(workspaceSharingSettingsSchema).mutation(async ({ ctx, input }) => {
       const { workspaceId } = await getWorkspaceCtx(ctx);
-      await checkWorkspaceRole(ctx.prisma, ctx.session.user.id, workspaceId, "ADMIN");
+      await requireWorkspaceAdmin(ctx, workspaceId);
       return updateSharingSettings(workspaceId, input);
     }),
     delete: protectedProcedure
@@ -209,7 +228,7 @@ export const accountRouter = router({
       }),
     cancelDelete: protectedProcedure.mutation(async ({ ctx }) => {
       const { workspaceId } = await getWorkspaceCtx(ctx);
-      await checkWorkspaceRole(ctx.prisma, ctx.session.user.id, workspaceId, "ADMIN");
+      await requireWorkspaceAdmin(ctx, workspaceId);
       return cancelWorkspaceDeletion(workspaceId);
     }),
     transfer: router({
@@ -262,7 +281,7 @@ export const accountRouter = router({
       // Registering an outbound webhook is a data-exfil surface — ADMIN, to
       // match remove/update/testEvent (which the service already gates). Was
       // member-open, so a VIEWER could add a webhook they couldn't then remove.
-      await checkWorkspaceRole(ctx.prisma, ctx.session.user.id, workspaceId, "ADMIN");
+      await requireWorkspaceAdmin(ctx, workspaceId);
       try { return await addIntegration(workspaceId, input, plan); }
       catch (e: unknown) {
         if (e instanceof Error && e.message === "INTEGRATION_LIMIT") throw new TRPCError({ code: "FORBIDDEN", message: "Integration limit reached." });
