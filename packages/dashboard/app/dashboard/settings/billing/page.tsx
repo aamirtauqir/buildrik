@@ -18,7 +18,6 @@ import { DunningBanner } from "@/components/dashboard/dunning-banner";
 import { SectionCard, MetricValue } from "@/components/dashboard/primitives";
 
 type PlanKey = "FREE" | "PRO" | "BUSINESS";
-type Interval = "MONTHLY" | "YEARLY";
 
 const PLAN_NAMES: Record<string, string> = {
   FREE: "Free",
@@ -134,7 +133,8 @@ function BillingPageInner() {
   const isLoading = overviewQuery.isLoading;
   const isDunning = overview?.status === "PAST_DUE";
   const planKey = (overview?.plan ?? "FREE") as PlanKey;
-  const currentInterval = (overview?.interval ?? "MONTHLY") as Interval;
+  // No cast: the column is an unconstrained String, so PlanCard normalises it.
+  const currentInterval = overview?.interval ?? "MONTHLY";
   const cancelAtPeriodEnd = overview?.cancelAtPeriodEnd === true;
 
   if (isLoading) {

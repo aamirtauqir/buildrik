@@ -4,7 +4,12 @@ import { cn } from "@lib/utils";
 import { Pill, MetricValue } from "@/components/dashboard/primitives";
 
 type PlanId = "FREE" | "PRO" | "BUSINESS";
-type Interval = "MONTHLY" | "YEARLY";
+/**
+ * `Subscription.interval` is a plain String column with no DB constraint, and
+ * Stripe's own vocabulary for the same idea is "month"/"year". Accept both, so
+ * a row carrying Stripe's spelling can't be mistaken for the other period.
+ */
+type Interval = string;
 
 export interface PlanCardProps {
   planId: PlanId;
@@ -25,9 +30,31 @@ export interface PlanCardProps {
   onChangePlan?: () => void;
 }
 
+/**
+ * "/mo" or "/yr" — or "" when the stored interval matches neither vocabulary.
+ * This was `interval === "MONTHLY" ? "/mo" : "/yr"`, which fails OPEN on a
+ * money figure: a row holding Stripe's "month" printed "$79/yr" on a $79/month
+ * subscription, telling the customer they pay 12× less than they do. An
+ * unrecognised period is printed as no period at all — "$79" is incomplete,
+ * "$79/yr" is wrong.
+ */
+function intervalSuffix(interval: Interval): string {
+  switch (interval.trim().toUpperCase()) {
+    case "MONTHLY":
+    case "MONTH":
+      return "/mo";
+    case "YEARLY":
+    case "YEAR":
+    case "ANNUAL":
+      return "/yr";
+    default:
+      return "";
+  }
+}
+
 function formatPrice(priceMinor: number, currency: string, interval: Interval): string {
   const symbol = currency.toUpperCase() === "USD" ? "$" : `${currency.toUpperCase()} `;
-  const suffix = interval === "MONTHLY" ? "/mo" : "/yr";
+  const suffix = intervalSuffix(interval);
   const major = priceMinor / 100;
   // Whole amounts stay "$29", not "$29.00" — plan pricing is whole-dollar.
   const amount = Number.isInteger(major) ? String(major) : major.toFixed(2);
