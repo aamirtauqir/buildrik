@@ -24,7 +24,9 @@
 import React from "react";
 import { Portal } from "./Portal";
 
-export type HintTooltipPlacement = "bottom" | "bottom-end";
+/** `right` is for a vertical icon rail: the bubble sits beside the icon,
+ *  vertically centred, the way every icon rail places one. */
+export type HintTooltipPlacement = "bottom" | "bottom-end" | "right";
 
 export interface HintTooltipProps {
   /** Bubble body. Kept a ReactNode so a label + shortcut can compose. */
@@ -36,11 +38,30 @@ export interface HintTooltipProps {
   children: TriggerElement;
 }
 
-/** Mirrors flowbite's default dark tooltip so the rail looks unchanged. */
+/* Mirrors flowbite's default dark tooltip so the rail looks unchanged.
+
+   `z-50` was hardcoded here. The token registry ships ten layers ending at
+   `--bk-z-tooltip: 90`, and 50 is `--bk-z-overlay` — so the one element that
+   must sit above everything was pinned to the same plane as the things it has
+   to clear. Bypassing a token that exists is not a style choice.
+
+   12px, not `text-sm`'s 14: this is a hint, and it was rendering at body size.
+
+   NOT fixed here, because it is a founder call and not a bug: `bg-gray-900`
+   is `#111827`, every channel under 0x35, against DESIGN.md's NO BLACK RULE
+   ("Account avatar, context menus, tooltips all follow this"). Flowbite's own
+   Tooltip is dark too, and board 138:198 specifies a dark bubble, so DESIGN.md
+   and the boards disagree and every tooltip in the product moves together.
+   Recorded in the redesign plan for adjudication. */
 const BUBBLE_CLASS =
-  "tw:fixed tw:z-50 tw:max-w-[280px] tw:whitespace-normal tw:rounded-lg tw:px-3 tw:py-2 " +
-  "tw:bg-gray-900 tw:text-white tw:text-sm tw:font-medium tw:[box-shadow:var(--bk-shadow-overlay)] " +
+  "tw:fixed tw:max-w-[280px] tw:whitespace-normal tw:rounded-lg tw:px-3 tw:py-2 " +
+  "tw:bg-gray-900 tw:text-white tw:text-[length:var(--bk-text-12)] tw:leading-[var(--bk-leading-16)] tw:font-medium " +
+  "tw:[box-shadow:var(--bk-shadow-overlay)] " +
   "tw:[font-family:var(--bk-font-ui)] tw:pointer-events-none";
+
+/* The registry's top layer. A `tw:z-*` utility cannot carry a var(), so this
+   rides on the same inline style that already positions the bubble. */
+const TOOLTIP_Z = "var(--bk-z-tooltip)";
 
 const GAP = 8;
 const EDGE = 8;
@@ -55,11 +76,25 @@ function place(
   bubble: DOMRect,
   placement: HintTooltipPlacement,
 ): Coords {
+  const maxLeft = window.innerWidth - bubble.width - EDGE;
+  const maxTop = window.innerHeight - bubble.height - EDGE;
+
+  /* Beside the icon, vertically centred. `bottom` on a narrow vertical rail
+     put the bubble at the ICON's left edge and let it run past the rail's own
+     width into the open drawer — measured live, roughly a third of the bubble.
+     It straddled two surfaces and belonged to neither. */
+  if (placement === "right") {
+    const left = anchor.right + GAP;
+    const top = anchor.top + anchor.height / 2 - bubble.height / 2;
+    return {
+      left: Math.max(EDGE, Math.min(left, Math.max(EDGE, maxLeft))),
+      top: Math.max(EDGE, Math.min(top, Math.max(EDGE, maxTop))),
+    };
+  }
+
   const left =
     placement === "bottom-end" ? anchor.right - bubble.width : anchor.left;
-  const maxLeft = window.innerWidth - bubble.width - EDGE;
   const top = anchor.bottom + GAP;
-  const maxTop = window.innerHeight - bubble.height - EDGE;
   return {
     left: Math.max(EDGE, Math.min(left, Math.max(EDGE, maxLeft))),
     // Flip above the anchor only when below genuinely does not fit.
@@ -181,10 +216,10 @@ export function HintTooltip({
             className={BUBBLE_CLASS}
             style={
               coords
-                ? { left: coords.left, top: coords.top }
+                ? { left: coords.left, top: coords.top, zIndex: TOOLTIP_Z }
                 : // First paint measures the bubble; showing it at 0,0 first
                   // would flash it in the corner.
-                  { left: 0, top: 0, opacity: 0 }
+                  { left: 0, top: 0, opacity: 0, zIndex: TOOLTIP_Z }
             }
           >
             {content}
