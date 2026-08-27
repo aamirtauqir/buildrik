@@ -205,6 +205,28 @@ export async function fetchCurrentRound(): Promise<CurrentRound | null> {
   return getBuildrikClient(DASHBOARD_URL).reviews.currentRound.query({ siteId });
 }
 
+/** One row of the panel's Previous-rounds list — board 157:169's header line. */
+export interface RoundListRow {
+  id: string;
+  roundNumber: number;
+  status: string;
+  reviewerName: string | null;
+  revoked: boolean;
+  resolvedAt: string | Date | null;
+  createdAt: string | Date;
+}
+
+/**
+ * Every round for the site, oldest first. Throws on transport failure (DF5) so
+ * the panel can tell "one round so far" apart from "couldn't load the
+ * history"; [] only when there is genuinely no site.
+ */
+export async function fetchRounds(): Promise<RoundListRow[]> {
+  const siteId = currentSiteId();
+  if (!siteId) return [];
+  return getBuildrikClient(DASHBOARD_URL).reviews.rounds.query({ siteId });
+}
+
 /**
  * The pages frozen at the last approval — the "approved side" of the §3
  * Compare. Throws on transport failure (DF5: a dropped read must surface as a

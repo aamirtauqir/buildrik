@@ -23,6 +23,7 @@ const resolveReviewComment = vi.fn();
 const revokeReview = vi.fn();
 
 vi.mock("../../../../../services/ReviewService", () => ({
+  fetchRounds: vi.fn(() => Promise.resolve([])),
   fetchCurrentRound: (...a: unknown[]) => fetchCurrentRound(...a),
   fetchReviewComments: (...a: unknown[]) => fetchReviewComments(...a),
   postReply: (...a: unknown[]) => postReply(...a),
@@ -35,6 +36,7 @@ vi.mock("../../../../../services/ReviewService", () => ({
   currentSiteId: () => "site_test",
 }));
 
+import { fetchRounds } from "../../../../../services/ReviewService";
 import { ReviewTab } from "../ReviewTab";
 
 const ROUND = {
@@ -75,15 +77,18 @@ describe("the frame every board shares", () => {
     renderTab();
     expect(await screen.findByText("1 of 3")).toBeInTheDocument();
     expect(screen.getByText("Sent 2d ago · Sara Khan")).toBeInTheDocument();
-    expect(screen.getByText("Round 2 of 3")).toBeInTheDocument();
+    expect(screen.getByText(/Round 2 of 3/)).toBeInTheDocument();
   });
 
-  /* The round line is deliberately arrow-less: no endpoint returns an older
-     round's comments, and a chevron that cannot move is a dead control. */
-  it("has no round pager", async () => {
+  /* The strip is a HISTORY toggle now (reviews.rounds, 2026-08-28), but still
+     no ‹ › pager: comments carry no round id by design (contracts §6.4), so an
+     older round's comments cannot be paged to, and a chevron that cannot move
+     is a dead control. */
+  it("has no round pager — the strip toggles a header-line history instead", async () => {
     renderTab();
-    await screen.findByText("Round 2 of 3");
+    await screen.findByText(/Round 2 of 3/);
     expect(screen.queryByRole("button", { name: /previous round|next round/i })).not.toBeInTheDocument();
+    expect(screen.getByTestId("review-rounds-toggle")).toBeInTheDocument();
   });
 });
 
@@ -347,3 +352,26 @@ describe("ReviewTab — board 157:2 fills the DETACHED band", () => {
     expect(band.style.background).toBe("");
   });
 });
+
+describe("the previous-rounds history (board 157:169, the buildable half)", () => {
+  it("opens on the strip and prints each earlier round as a header line", async () => {
+    vi.mocked(fetchRounds).mockResolvedValueOnce([
+      { id: "rr-old", roundNumber: 1, status: "APPROVED", reviewerName: "Sara Khan", revoked: false, resolvedAt: "2026-08-20T10:00:00Z", createdAt: "2026-08-18T10:00:00Z" },
+      { id: "r1", roundNumber: 2, status: "PENDING", reviewerName: null, revoked: false, resolvedAt: null, createdAt: "2026-08-25T10:00:00Z" },
+    ]);
+    renderTab();
+    fireEvent.click(await screen.findByTestId("review-rounds-toggle"));
+    // The current round is not its own history.
+    expect(await screen.findByTestId("review-round-1")).toHaveTextContent("Approved by Sara Khan");
+    expect(screen.queryByTestId("review-round-2")).not.toBeInTheDocument();
+  });
+
+  it("a failed history read says so and offers a retry — it does not impersonate 'no history'", async () => {
+    vi.mocked(fetchRounds).mockRejectedValueOnce(new Error("net"));
+    renderTab();
+    fireEvent.click(await screen.findByTestId("review-rounds-toggle"));
+    expect(await screen.findByText(/Couldn't load the history/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Try again" })).toBeInTheDocument();
+  });
+});
+

@@ -50,12 +50,14 @@ import { ApprovedCompareView } from "@/editor/panels/version-history/ApprovedCom
 import type { PublishPage } from "@/editor/shell/exportPublishPages";
 import {
   fetchCurrentRound,
+  fetchRounds,
   fetchReviewComments,
   fetchApprovedSnapshot,
   postReply,
   resolveReviewComment,
   revokeReview,
   type CurrentRound,
+  type RoundListRow,
   type ReviewComment,
 } from "../../../../services/ReviewService";
 
@@ -157,6 +159,29 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
   const [compareState, setCompareState] = React.useState<LoadState>("loading");
   const [approvedSnap, setApprovedSnap] = React.useState<PublishPage[] | null>(null);
   const [currentPages, setCurrentPages] = React.useState<PublishPage[] | null>(null);
+
+  /* Previous rounds — board 157:169's buildable half. Lazy: fetched the first
+     time the strip is opened, because most sessions never look back. `null`
+     means not asked yet; an error keeps the strip usable with a retry line
+     (DF5 — a failed read must not impersonate "no history"). */
+  const [roundsOpen, setRoundsOpen] = React.useState(false);
+  const [rounds, setRounds] = React.useState<RoundListRow[] | null>(null);
+  const [roundsError, setRoundsError] = React.useState(false);
+  const loadRounds = React.useCallback(async () => {
+    setRoundsError(false);
+    try {
+      setRounds(await fetchRounds());
+    } catch {
+      setRoundsError(true);
+    }
+  }, []);
+  const toggleRounds = React.useCallback(() => {
+    setRoundsOpen((open) => {
+      const next = !open;
+      if (next && rounds === null) void loadRounds();
+      return next;
+    });
+  }, [rounds, loadRounds]);
 
   const load = React.useCallback(async () => {
     setState("loading");
@@ -720,10 +745,53 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
         )}
       </div>
 
-      <div className={ROUND_STRIP}>
-        {/* No ‹ › arrows: nothing can fetch an older round's comments today. */}
+      {/* The strip opens the history now (reviews.rounds, 2026-08-28). What it
+          still does NOT do is open an older round's COMMENTS — those carry no
+          round id by design (contracts §6.4, comments outlive rounds), so the
+          history is header lines, which is everything the data can honestly
+          say. */}
+      <Button
+        color="light"
+        className={`${ROUND_STRIP} tw:w-full tw:rounded-none tw:border-0 tw:cursor-pointer`}
+        aria-expanded={roundsOpen}
+        data-testid="review-rounds-toggle"
+        onClick={toggleRounds}
+      >
         Round {round.roundNumber} of {round.totalRounds}
-      </div>
+        {round.totalRounds > 1 ? (roundsOpen ? " ▾" : " ▸") : ""}
+      </Button>
+      {roundsOpen && (
+        <div className="tw:px-4 tw:py-2 tw:bg-[var(--bk-bg-subtle)] tw:flex tw:flex-col tw:gap-1" data-testid="review-rounds-list">
+          {roundsError ? (
+            <span className={META}>
+              Couldn't load the history.{" "}
+              <Button color="light" size="xs" className="tw:border-0 tw:bg-transparent tw:px-0 tw:text-[12px] tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline" onClick={() => void loadRounds()}>
+                Try again
+              </Button>
+            </span>
+          ) : rounds === null ? (
+            <span className={META}>Loading…</span>
+          ) : rounds.length <= 1 ? (
+            <span className={META}>This is the first round.</span>
+          ) : (
+            rounds
+              .filter((r) => r.id !== round.id)
+              .map((r) => (
+                <span key={r.id} className="tw:text-[12px] tw:text-[var(--bk-ink-soft)]" data-testid={`review-round-${r.roundNumber}`}>
+                  Round {r.roundNumber} ·{" "}
+                  {r.revoked
+                    ? "Revoked"
+                    : r.status === "APPROVED"
+                      ? `Approved${r.reviewerName ? ` by ${r.reviewerName}` : ""}`
+                      : r.status === "CHANGES_REQUESTED"
+                        ? "Changes requested"
+                        : "Sent, no reply"}
+                  {r.resolvedAt ? ` · ${new Date(r.resolvedAt).toLocaleDateString()}` : ""}
+                </span>
+              ))
+          )}
+        </div>
+      )}
 
       <div className={COMPOSER}>
         <Textarea

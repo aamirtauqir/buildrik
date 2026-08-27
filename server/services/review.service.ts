@@ -269,6 +269,44 @@ export interface CurrentRound {
  * PENDING row; a new submit after a resolved round adds one), so the current
  * round is always the latest, i.e. roundNumber === totalRounds.
  */
+/** One row of the Previous-rounds list — board 157:169's header line
+ *  ("Round 1 · resolved 2d ago"), which is all the data can honestly answer.
+ *  The board also draws that round's own comment list; comments carry no round
+ *  id BY DESIGN (contracts §6.4 — comments outlive rounds), so per-round
+ *  comment attribution is a schema decision recorded in the census, not
+ *  something to fake here with timestamp bucketing. */
+export interface RoundListRow {
+  id: string;
+  roundNumber: number;
+  status: string;
+  reviewerName: string | null;
+  revoked: boolean;
+  resolvedAt: Date | null;
+  createdAt: Date;
+}
+
+/** Every round for the site, oldest first so the numbering matches the
+ *  "round N of M" the panel header already shows. */
+export async function listRounds(siteId: string): Promise<RoundListRow[]> {
+  const rows = await prisma.reviewRequest.findMany({
+    where: { siteId },
+    orderBy: { createdAt: "asc" },
+    select: {
+      id: true, status: true, revokedAt: true, resolvedAt: true, createdAt: true,
+      reviewer: { select: { name: true } },
+    },
+  });
+  return rows.map((r, i) => ({
+    id: r.id,
+    roundNumber: i + 1,
+    status: r.status,
+    reviewerName: r.reviewer?.name ?? null,
+    revoked: r.revokedAt !== null,
+    resolvedAt: r.resolvedAt,
+    createdAt: r.createdAt,
+  }));
+}
+
 export async function getCurrentRound(siteId: string): Promise<CurrentRound | null> {
   const r = await prisma.reviewRequest.findFirst({
     where: { siteId },

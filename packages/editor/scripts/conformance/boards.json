@@ -2046,7 +2046,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "blocked:no-round-linkage",
+      "authority": "code:rounds-list-ships-comment-linkage-blocked",
       "recipe": null
     },
     {

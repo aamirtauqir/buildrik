@@ -15,6 +15,7 @@ import {
   resolveReview,
   getReviewStatusForSite,
   getCurrentRound,
+  listRounds,
   getApprovedSnapshot,
   revokeReviewRound,
   ReviewError,
@@ -156,6 +157,22 @@ export const reviewsRouter = router({
         throw e;
       }
       return getCurrentRound(input.siteId);
+    }),
+
+  // The Previous-rounds list (board 157:169's buildable half). Flag off → []
+  // so the panel simply shows no history; any EDITOR of the site may read it.
+  rounds: protectedProcedure
+    .input(currentRoundInput)
+    .query(async ({ ctx, input }) => {
+      const workspaceId = await resolveWorkspaceId(ctx);
+      if (!(await isFeatureEnabled(workspaceId, "agency_layer"))) return [];
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user.id, input.siteId, "EDITOR");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+      return listRounds(input.siteId);
     }),
 
   // The approved snapshot for the §3 Compare — the pages frozen at the last
