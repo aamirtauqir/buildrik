@@ -191,3 +191,42 @@ describe("ReviewBar — Re-send", () => {
     expect(screen.queryByRole("button", { name: "Re-send" })).toBeNull();
   });
 });
+
+describe("ReviewBar — a zero is not a status", () => {
+  /* The bar only renders while a round is live, so "0 open" meant "your client
+     has not replied yet" and printed a number that says none of that. */
+  it("with nothing open on a pending round it names the wait", async () => {
+    fetchCurrentRound.mockResolvedValue(round({ openCommentCount: 0 }));
+    fetchReviewComments.mockResolvedValue([]);
+    mount();
+    expect(await screen.findByText("Sent — waiting on your client")).toBeTruthy();
+    expect(screen.queryByText("0 open")).toBeNull();
+  });
+
+  it("with nothing open after changes were requested it says which", async () => {
+    fetchCurrentRound.mockResolvedValue(
+      round({ status: "CHANGES_REQUESTED", openCommentCount: 0 }),
+    );
+    fetchReviewComments.mockResolvedValue([]);
+    mount();
+    expect(await screen.findByText("Changes requested — nothing left open")).toBeTruthy();
+  });
+
+  it("the count comes back the moment there is one", async () => {
+    fetchCurrentRound.mockResolvedValue(round());
+    fetchReviewComments.mockResolvedValue([comment()]);
+    mount();
+    expect(await screen.findByText("3 open")).toBeTruthy();
+  });
+
+  it("a disabled walk carries its reason", async () => {
+    // "Disabled without a reason is a bug, not a state" — wireframes §5.8.
+    fetchCurrentRound.mockResolvedValue(round({ openCommentCount: 0 }));
+    fetchReviewComments.mockResolvedValue([]);
+    mount();
+    const next = await screen.findByRole("button", { name: "Next ›" });
+    expect(next).toBeDisabled();
+    expect(next.getAttribute("title")).toBe("No open comments to step through");
+  });
+});
+

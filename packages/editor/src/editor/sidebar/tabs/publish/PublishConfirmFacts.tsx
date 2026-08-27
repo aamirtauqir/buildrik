@@ -22,7 +22,15 @@ import { exportPublishPages } from "@/editor/shell/exportPublishPages";
 
 const ROW = "tw:flex tw:justify-between tw:items-baseline tw:gap-[16px] tw:py-[7px] tw:text-[12px]";
 const KEY = "tw:flex-none tw:text-[var(--bk-ink-muted)]";
-const VAL = "tw:text-right tw:font-medium tw:text-[var(--bk-ink)]";
+/* `min-w-0` is the whole fix for ledger row R12 ("the value column runs into
+   the right border and clips — 'your connected Vercel projec[t]'"). A flex
+   item's min-width defaults to `auto`, which is its CONTENT width, so a long
+   value refuses to shrink and overflows the row instead. With the floor
+   removed it shrinks, and `overflow-wrap: anywhere` lets it wrap rather than
+   truncate — these are facts someone is reading before they publish, so
+   nothing here may be hidden behind an ellipsis. */
+const VAL =
+  "tw:min-w-0 tw:[overflow-wrap:anywhere] tw:text-right tw:font-medium tw:text-[var(--bk-ink)]";
 
 /** Board 914:4507 prints "Approved 2 Jul"; the real line names who, too. */
 function approvalLine(round: CurrentRound | null, loading: boolean): string {

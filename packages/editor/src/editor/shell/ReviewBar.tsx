@@ -119,10 +119,26 @@ export const ReviewBar: React.FC<ReviewBarProps> = ({ composer, onCompare, onRes
 
   return (
     <div className={BAR} role="region" aria-label="Review in progress" data-testid="review-bar">
+      {/* A zero here was a count where a sentence belongs. The bar renders only
+          while a round is live, so `0 open` meant "your client has not replied
+          yet" — and printed a number that says none of that. The count earns
+          its place the moment there IS one. */}
       <span className="tw:font-medium tw:text-[var(--bk-accent-text)]">
-        {count} open
+        {count > 0
+          ? `${count} open`
+          : round.status === "CHANGES_REQUESTED"
+            ? "Changes requested — nothing left open"
+            : "Sent — waiting on your client"}
       </span>
-      <Button color="light" size="xs" className={LINK} onClick={next} disabled={!open.length}>
+      <Button
+        color="light"
+        size="xs"
+        className={LINK}
+        onClick={next}
+        disabled={!open.length}
+        /* Disabled without a reason is a bug, not a state (wireframes §5.8). */
+        title={open.length ? undefined : "No open comments to step through"}
+      >
         Next ›
       </Button>
       <Button color="light" size="xs" className={LINK} onClick={onCompare}>

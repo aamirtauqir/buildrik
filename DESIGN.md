@@ -223,6 +223,38 @@ Fill = dots/icons/borders. Text = labels on the matching tint. Tint = the chip/b
 - **Topbar height:** 56px — canonical. All other chrome heights flow from this rhythm.
 - **Panel header height:** 44px — matches sidebar contract.
 
+## Overflow — what happens when the content is longer than the box
+
+Written down 2026-08-27, because it never was. Every surface that needed a rule
+had invented its own, and the audit that produced ledger row R15 read that as
+"no overflow rule anywhere". It is the opposite problem: four rules, four
+authors, and one place that forgot.
+
+Measured on 2026-08-27, the named surfaces all truncate correctly — the page
+row (`.bd-pg-row-name`), the layer row (`layers-v2.css`), the media filename
+(`AssetCell`) and the inspector's bound-token chip. The one that did not was the
+Publish confirm modal's value column, which overflowed its row rather than
+shrinking (R12).
+
+**In a flex row, the shrinking item needs `min-w-0`.** This is the whole of R12.
+A flex item's `min-width` defaults to `auto`, which resolves to its CONTENT
+width, so a long value refuses to shrink and pushes out of the row instead. A
+`truncate` or an ellipsis on that item does nothing until the floor is removed.
+
+**Truncate a NAME. Wrap a FACT.**
+
+- A name identifies something the user can hover, select or rename, and the
+  full string is one interaction away — page names, layer names, filenames,
+  token names. Single line, `text-overflow: ellipsis`, and the full value in a
+  `title`.
+- A fact is being read to make a decision — the rows of a confirm modal, an
+  error message, a permission reason. It wraps. Nothing a user is about to act
+  on may sit behind an ellipsis, and a taller row is the cheaper cost.
+
+**A truncated name without a `title` is a bug**, the same way a disabled control
+without a reason is (§5.8 of the shell wireframes). The ellipsis says there is
+more; something has to be able to show it.
+
 ## Motion
 - **Approach:** Minimal-functional. Only transitions that aid comprehension.
 - **Easing:** house curve `cubic-bezier(0.2, 0, 0, 1)` (ease-out) for enter/hover; `ease-in` for exit.
