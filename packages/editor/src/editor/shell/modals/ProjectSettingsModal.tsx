@@ -6,6 +6,25 @@
 
 import * as React from "react";
 import { Button, Checkbox, ModalBody, ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Tabs, TextInput, useToast } from "@/editor/chrome-ui";
+
+/* Board 1172:4867 fills this modal's inputs with `bg-subtle` — `--bk-bg-subtle` — not the
+   white every other chrome input uses. That is a deliberate difference on a
+   modal that floats over the shell: a white field on a white sheet has only its
+   border to separate it, and this sheet is 560 wide with four of them stacked.
+
+   Scoped to THIS modal on purpose. chrome-ui's TextInput default is white and
+   its own doc explains the choice (flowbite's `bg-gray-50` sat one ramp step
+   off `--bk-bg-card`); one board is evidence about one screen, not a reason to
+   move every input in the editor. */
+const BK_SETTINGS_INPUT_THEME = {
+  field: {
+    input: {
+      colors: {
+        gray: "tw:bg-[var(--bk-bg-subtle)]",
+      },
+    },
+  },
+};
 import type { Composer } from "../../../engine";
 import { devError } from "../../../shared/utils/devLogger";
 
@@ -116,6 +135,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
           <div className="tw:flex tw:flex-col tw:gap-3">
             <label className={FIELD_LABEL} htmlFor="ps-name">Project name</label>
             <TextInput
+              theme={BK_SETTINGS_INPUT_THEME}
               id="ps-name"
               type="text"
               value={projectName}
@@ -125,6 +145,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
 
             <label className={FIELD_LABEL} htmlFor="ps-author">Author / description</label>
             <TextInput
+              theme={BK_SETTINGS_INPUT_THEME}
               id="ps-author"
               type="text"
               value={projectDescription}
@@ -139,6 +160,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
             <label className={FIELD_LABEL} htmlFor="ps-grid">Grid size (px)</label>
             <div className="tw:flex tw:items-center tw:gap-2">
               <TextInput
+                theme={BK_SETTINGS_INPUT_THEME}
                 id="ps-grid"
                 type="number"
                 value={gridSize}
@@ -170,6 +192,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
           <div className="tw:flex tw:flex-col tw:gap-3">
             <label className={FIELD_LABEL} htmlFor="ps-seo-name">Site name (social sharing)</label>
             <TextInput
+              theme={BK_SETTINGS_INPUT_THEME}
               id="ps-seo-name"
               type="text"
               value={siteTitle}
