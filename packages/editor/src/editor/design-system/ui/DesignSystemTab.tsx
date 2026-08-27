@@ -59,7 +59,7 @@ import { useDSModeOptional } from "../state/DSModeContext";
 import { AIPromptModal } from "./AIPromptModal";
 import { AddTokenModal } from "./modals/AddTokenModal";
 import { ReviewModal } from "./modals/ReviewModal";
-import { TabGuardModal } from "./modals/TabGuardModal";
+import { BrandPreview } from "./BrandPreview";
 import { TokensSection } from "./sections/TokensSection";
 import { StylesSection, useStylesSectionTotalDirty } from "./sections/StylesSection";
 import { ComponentsSection } from "./sections/ComponentsSection";
@@ -192,10 +192,6 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
   const [tokenKind, setTokenKind] = React.useState<string | null>(null);
   /* null = the Brand root list. Every destination is entered from it (M5). */
   const [activeSection, setActiveSection] = React.useState<DesignSection | null>(null);
-  /* "root" is a real target (Back), so it cannot be modelled as null — null
-     already means "nothing pending". */
-  const [pendingSection, setPendingSection] = React.useState<DesignSection | "root" | null>(null);
-  const [showSectionGuard, setShowSectionGuard] = React.useState(false);
   const [showReview, setShowReview] = React.useState(false);
   const [showAddToken, setShowAddToken] = React.useState(false);
   const [aiOpen, setAiOpen] = React.useState(false);
@@ -435,40 +431,27 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
      loses exactly as much work as leaving it sideways did. The arrow-key
      tablist handler that used to live here went with the tab bar: a drill-in
      list is a list of buttons and gets Tab, not roving focus. */
+  /* This used to open a "you have unsaved changes" guard whenever `isDirty`,
+     which wedged the panel after a token import: `ImportCard.handleApply` only
+     STAGES tokens, so the panel becomes dirty, and from then on every
+     navigation — Back included — set `showSectionGuard` instead of navigating.
+     `TabGuardModal` renders `position:absolute; inset:0; z-index:200` inside
+     the panel with its buttons clipped, so the user saw a Back button that
+     appeared to do nothing. Measured 2026-08-25, reproduced 4x, and it also
+     blocked the only route to a planted lint violation.
+
+     The guard's premise was false. `TokenRegistryProvider` sits at
+     `StudioPanels.tsx:384`, ABOVE the whole sidebar, so staged edits survive a
+     section change and even a full unmount of this panel; the only things that
+     discard are the footer's own Discard and the guard's discard handler.
+     Navigating away from a dirty section never lost anything, so there was
+     nothing to guard. The footer already reports "N previewing" + Apply
+     Changes, which is the honest affordance. */
   const handleSectionClick = (s: DesignSection | "root") => {
     const target = s === "root" ? null : s;
     if (target === activeSection) return;
-    if (isDirty) {
-      setPendingSection(s);
-      setShowSectionGuard(true);
-    } else {
-      setTokenKind(null);
-      setActiveSection(target);
-    }
-  };
-
-  const handleGuardDiscard = () => {
-    allRegistries.forEach((r) => r.discardAll());
-    allPresetRegistries.forEach((r) => r.discardAll());
-    setShowSectionGuard(false);
-    if (pendingSection) {
-      setActiveSection(pendingSection === "root" ? null : pendingSection);
-      setPendingSection(null);
-    }
-  };
-
-  const handleGuardKeep = () => {
-    setShowSectionGuard(false);
-    setPendingSection(null);
-  };
-
-  const handleGuardSaveAndSwitch = () => {
-    handleApply();
-    setShowSectionGuard(false);
-    if (pendingSection) {
-      setActiveSection(pendingSection === "root" ? null : pendingSection);
-      setPendingSection(null);
-    }
+    setTokenKind(null);
+    setActiveSection(target);
   };
 
   // ─ Apply ─
@@ -572,8 +555,6 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
   // Tokens / Styles / Components / Export, so the header just needs the panel
   // identity ("Brand" per Figma board 52:2 rail naming, P1 convergence).
   const headerTitle = "Brand";
-
-  const changedSectionLabels = isDirty ? ["Tokens"] : [];
 
   return (
     <div data-ds-preview={resolvedMode} className={PANEL}>
@@ -683,6 +664,13 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
             </div>
           ) : null}
 
+          {/* The brand, before the list of places to change it. Nine rows of
+              text with counts described the panel; none of them showed a
+              colour or a typeface (ledger R10). */}
+          {activeSection === null && (
+            <BrandPreview colors={filterTokensByMode(color.tokens ?? [], isBeginner ? "beginner" : "pro")} />
+          )}
+
           {activeSection === null && (
             <ul className="tw:flex tw:flex-col tw:gap-0.5 tw:list-none tw:m-0 tw:p-0">
               {SECTIONS.map((s) => {
@@ -697,14 +685,24 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
                       onClick={() => handleSectionClick(s.id)}
                       className="tw:flex tw:w-full tw:items-center tw:gap-2 tw:justify-between tw:h-auto tw:px-2 tw:py-2 tw:rounded-md tw:border-0 tw:bg-transparent tw:text-left tw:hover:bg-gray-100"
                     >
-                      <span className="tw:flex tw:items-center tw:gap-[5px] tw:min-w-0 tw:text-[13px] tw:text-gray-900">
-                        {s.label}
-                        {dirtyHere && (
-                          <span
-                            className="tw:size-[5px] tw:flex-none tw:rounded-full tw:bg-[var(--bk-warning)]"
-                            aria-label="unsaved changes"
-                          />
-                        )}
+                      {/* `hint` has been written for all nine rows since the
+                          board landed and rendered for none of them — the row
+                          showed a bare noun and a number. "Presets" and
+                          "Starters" are not words a first-time user can rank
+                          without them. */}
+                      <span className="tw:flex tw:flex-col tw:gap-px tw:min-w-0 tw:text-left">
+                        <span className="tw:flex tw:items-center tw:gap-[5px] tw:min-w-0 tw:text-[13px] tw:text-gray-900">
+                          {s.label}
+                          {dirtyHere && (
+                            <span
+                              className="tw:size-[5px] tw:flex-none tw:rounded-full tw:bg-[var(--bk-warning)]"
+                              aria-label="unsaved changes"
+                            />
+                          )}
+                        </span>
+                        <span className="tw:truncate tw:text-[11px] tw:leading-4 tw:font-normal tw:text-gray-600">
+                          {s.hint}
+                        </span>
                       </span>
                       <span className="tw:flex tw:flex-none tw:items-center tw:gap-1.5">
                         {(s.id === "lint" ? lintIssues.length : sectionCounts[s.id]) ? (
@@ -771,14 +769,6 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
         onReview={() => setShowReview(true)}
       />
 
-      {showSectionGuard && (
-        <TabGuardModal
-          changedTabs={changedSectionLabels}
-          onDiscard={handleGuardDiscard}
-          onKeep={handleGuardKeep}
-          onSaveAndSwitch={handleGuardSaveAndSwitch}
-        />
-      )}
       {showReview && (
         <ReviewModal
           colorTokens={color.tokens}

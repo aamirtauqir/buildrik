@@ -41,8 +41,13 @@ export const DesignTabFooter: React.FC<FooterProps> = ({
   >
     {/* --bk-ink-soft, not --bk-ink-muted: this footer sits on --bk-bg-subtle,
         where muted measures 4.39:1 at 12px — under AA. Measured with axe. */}
+    {/* "All changes saved" is what the TOPBAR says about the document, and this
+        footer sits under a panel whose changes are staged behind Apply. Two
+        controls saying "saved" about two different buffers, six hundred pixels
+        apart, is a question the user should not have to answer. This one names
+        its own subject; the topbar keeps the document. */}
     <div style={{ flex: 1, fontSize: 12, color: "var(--bk-ink-soft)" }}>
-      {isDirty ? `${dirtyCount} previewing` : "All changes saved"}
+      {isDirty ? `${dirtyCount} previewing` : "Brand is up to date"}
     </div>
     <Button
       color="light"

@@ -1,14 +1,22 @@
 /**
- * DesignSystemTab — section switching, dirty guard (TabGuardModal) and the
- * Apply pipeline (composer.setProjectSettings + persist + markSaved fan-out).
+ * DesignSystemTab — section switching, unsaved-edit survival, and the Apply
+ * pipeline (composer.setProjectSettings + persist + markSaved fan-out).
  *
- * The Apply pipeline is exercised through the guard's "Save and switch"
- * button, which calls handleApply() directly — the ReviewModal confirm path
- * is known to hang under jsdom/vitest 4 (see the skipped test in
- * DesignSystemTab.aggregation.test.tsx).
+ * The navigation guard this file used to pin was REMOVED on 2026-08-25. Its
+ * premise was false: `TokenRegistryProvider` sits above the whole sidebar
+ * (`StudioPanels.tsx:384`), so staged edits survive a section change and even a
+ * full unmount — navigating away never lost anything. What the guard did
+ * instead was wedge the panel after a token import, because importing stages
+ * tokens, which makes the panel dirty, after which every navigation (Back
+ * included) opened a modal that renders clipped inside the panel. The tests
+ * below now pin the real contract: you can navigate while dirty, and the edit
+ * is still there when you come back.
  *
- * Also pins two §2 bugs:
- *   - §2-B13 guard/footer Discard only resets the 14 TOKEN registries and
+ * The Apply pipeline is exercised through the footer's "Apply Changes" ->
+ * ReviewModal confirm, which is the only route a user has.
+ *
+ * Also pins one §2 bug:
+ *   - §2-B13 footer Discard only resets the 14 TOKEN registries and
  *     skips the 11 preset registries (it.todo below).
  *   - §2-B1 engine history:undo / history:redo trigger loadFromComposer(),
  *     which wipes unsaved DS-tab edits (documenting test below).
@@ -89,18 +97,12 @@ async function renderTab(composer: ComposerProp) {
   return { ...utils, radiusInput };
 }
 
-/* Switching sections is two moves now: leave to the root, then enter the next
-   destination. The guard fires on the FIRST move — leaving dirty work behind is
-   exactly what it exists to catch — so the dirty tests below drive `leaveToRoot`
-   directly instead of the old one-shot tab click. */
-/* The crumb walks ONE level. From inside a token kind that is two clicks to the
-   Brand root — out of the kind, then out of Tokens — and the guard only fires
-   on the SECOND, because leaving a kind for its kind list does not leave Tokens
-   and so cannot lose the edit. Stops on whichever arrives first. */
+/* Switching sections is two moves: leave to the root, then enter the next
+   destination. The crumb walks ONE level, so from inside a token kind that is
+   two clicks to the Brand root — out of the kind, then out of Tokens. */
 function leaveToRoot(utils: ReturnType<typeof render>) {
   for (let i = 0; i < 3; i++) {
     if (utils.container.querySelector("[data-section-id]")) return;   // at root
-    if (utils.queryByText("Unsaved changes")) return;                 // guard took it
     const crumb = utils.container.querySelector<HTMLButtonElement>("[data-crumb-back]");
     if (!crumb) return;
     fireEvent.click(crumb);
@@ -119,7 +121,7 @@ function switchSection(utils: ReturnType<typeof render>, id: string) {
 }
 
 describe("DesignSystemTab — section switching (clean)", () => {
-  it("switches sections directly when nothing is dirty — no guard modal", async () => {
+  it("switches sections directly when nothing is dirty", async () => {
     const composer = makeFakeComposer();
     const utils = await renderTab(composer);
 
@@ -132,7 +134,7 @@ describe("DesignSystemTab — section switching (clean)", () => {
     });
   });
 
-  it("re-entering the section just left is clean — no guard", async () => {
+  it("re-entering the section just left works", async () => {
     const composer = makeFakeComposer();
     const utils = await renderTab(composer);
     switchSection(utils, "tokens");
@@ -141,63 +143,53 @@ describe("DesignSystemTab — section switching (clean)", () => {
   });
 });
 
-describe("DesignSystemTab — dirty guard (TabGuardModal)", () => {
-  it("switching sections with unsaved edits opens the guard and blocks the switch", async () => {
+describe("DesignSystemTab — navigating with unsaved edits", () => {
+  it("leaving a dirty section reaches the root instead of being intercepted", async () => {
     const composer = makeFakeComposer();
     const utils = await renderTab(composer);
 
     fireEvent.change(utils.radiusInput, { target: { value: "10px" } });
     leaveToRoot(utils);
 
-    expect(await utils.findByText("Unsaved changes")).toBeTruthy();
-    // Still on Tokens — the move was intercepted before reaching the root.
-    expect(document.getElementById("design-section-tokens")).toBeTruthy();
-    expect(document.getElementById("design-section-root")).toBeNull();
-  });
-
-  it("'Stay' keeps the section, the modal closes, and the edit survives", async () => {
-    const composer = makeFakeComposer();
-    const utils = await renderTab(composer);
-
-    fireEvent.change(utils.radiusInput, { target: { value: "10px" } });
-    leaveToRoot(utils);
-    await utils.findByText("Unsaved changes");
-
-    fireEvent.click(utils.getByText("Stay"));
-
+    /* This used to assert the opposite — that the move was blocked and a
+       modal appeared. Nothing on this path discards anything, so blocking it
+       protected nothing and wedged the panel after an import. */
+    await waitFor(() => {
+      expect(utils.container.querySelector("[data-section-id]")).toBeTruthy();
+    });
     expect(utils.queryByText("Unsaved changes")).toBeNull();
-    expect(document.getElementById("design-section-tokens")).toBeTruthy();
-    /* Stay leaves you where the guard caught you — the kind LIST, one level up
-       from radius. The edit lives in the registry, so re-entering shows it. */
-    enterKind(utils, "radius");
-    expect((utils.getByLabelText("Small radius value") as HTMLInputElement).value).toBe("10px");
   });
 
-  it("'Discard Tokens' reverts token edits and completes the switch", async () => {
+  it("the edit survives the trip out to the root and back", async () => {
+    const composer = makeFakeComposer();
+    const utils = await renderTab(composer);
+
+    fireEvent.change(utils.radiusInput, { target: { value: "10px" } });
+    leaveToRoot(utils);
+    enterSection(utils, "styles");
+    expect(document.getElementById("design-section-styles")).toBeTruthy();
+
+    switchSection(utils, "tokens");
+    enterKind(utils, "radius");
+    await waitFor(() => {
+      expect((utils.getByLabelText("Small radius value") as HTMLInputElement).value).toBe("10px");
+    });
+  });
+
+  it("footer Discard reverts a dirty TOKEN and the dirty signal clears", async () => {
     const composer = makeFakeComposer();
     const utils = await renderTab(composer);
     const original = utils.radiusInput.value;
 
     fireEvent.change(utils.radiusInput, { target: { value: "10px" } });
-    leaveToRoot(utils);
-    await utils.findByText("Unsaved changes");
+    await utils.findByText(/previewing/);
 
-    fireEvent.click(utils.getByText("Discard Tokens"));
+    fireEvent.click(utils.getByText("Discard"));
 
-    await waitFor(() => {
-      expect(document.getElementById("design-section-root")).toBeTruthy();
-    });
-    enterSection(utils, "styles");
-    expect(document.getElementById("design-section-styles")).toBeTruthy();
-
-    // Coming back to Tokens must NOT re-trigger the guard (clean again) and
-    // the input must show the pre-edit value.
-    switchSection(utils, "tokens");
-    enterKind(utils, "radius");
-    expect(utils.queryByText("Unsaved changes")).toBeNull();
     await waitFor(() => {
       expect((utils.getByLabelText("Small radius value") as HTMLInputElement).value).toBe(original);
     });
+    expect(utils.queryByText(/previewing/)).toBeNull();
   });
 
   // §2-B13 (FIXED): guard Discard (handleGuardDiscard) and footer Discard
@@ -231,7 +223,7 @@ describe("DesignSystemTab — dirty guard (TabGuardModal)", () => {
        is only readable at the root — and you cannot walk back to the root while
        dirty, because that is precisely the move the guard intercepts. The
        always-visible signal inside a section is the footer ("N previewing" /
-       "All changes saved"), which is what this test reads. That is not a
+       "Brand is up to date"), which is what this test reads. That is not a
        weaker assertion: it is the one a user actually has in front of them
        while editing. */
 
@@ -255,23 +247,36 @@ describe("DesignSystemTab — dirty guard (TabGuardModal)", () => {
     fireEvent.click(utils.getByText("Discard"));
 
     await waitFor(() => {
-      expect(utils.getByText("All changes saved")).toBeTruthy();
+      expect(utils.getByText("Brand is up to date")).toBeTruthy();
     });
     expect(buttonReg!.isDirty).toBe(false);
   });
 });
 
-describe("DesignSystemTab — Apply pipeline (via guard 'Save and switch')", () => {
+/* The guard's "Save and switch" was this file's route into handleApply, and it
+   is gone with the guard. The route below is the one a user actually has:
+   footer "Apply Changes" -> ReviewModal -> "Apply N changes". */
+async function applyViaFooter(utils: ReturnType<typeof render>) {
+  // "Apply Changes" appears more than once in the tree (the footer button and
+  // its label constant reused elsewhere), so scope to the savebar.
+  const bar = utils.container.querySelector('[data-screen-savebar="true"]');
+  if (!bar) throw new Error("footer savebar not rendered");
+  const applyBtn = [...bar.querySelectorAll("button")].find(
+    (b) => (b.textContent || "").trim() === "Apply Changes",
+  );
+  if (!applyBtn) throw new Error("footer Apply Changes not found");
+  fireEvent.click(applyBtn);
+  fireEvent.click(await utils.findByText(/^Apply \d+ changes?$/));
+}
+
+describe("DesignSystemTab — Apply pipeline (footer -> ReviewModal)", () => {
   it("persists tokens + presets + schema version through composer.setProjectSettings and clears dirty", async () => {
     const composer = makeFakeComposer();
     const setSpy = vi.spyOn(composer, "setProjectSettings");
     const utils = await renderTab(composer);
 
     fireEvent.change(utils.radiusInput, { target: { value: "10px" } });
-    leaveToRoot(utils);
-    await utils.findByText("Unsaved changes");
-
-    fireEvent.click(utils.getByText("Save and switch"));
+    await applyViaFooter(utils);
 
     await waitFor(() => expect(setSpy).toHaveBeenCalledTimes(1));
     const arg = setSpy.mock.calls[0][0] as {
@@ -290,11 +295,8 @@ describe("DesignSystemTab — Apply pipeline (via guard 'Save and switch')", () 
     expect(Array.isArray(arg.designPresets)).toBe(true);
     expect(arg.designPresets.length).toBeGreaterThan(0);
 
-    // Move completed + success toast + dirty cleared. The guarded move is now
-    // "leave to the root", so that is where Save-and-switch lands.
-    await waitFor(() => {
-      expect(document.getElementById("design-section-root")).toBeTruthy();
-    });
+    // Success toast + dirty cleared. Applying from the footer does NOT move
+    // you — that was the guard's behaviour, and it is gone.
     expect(await utils.findByText("Design tokens applied successfully")).toBeTruthy();
     await waitFor(() => {
       expect(document.querySelector('[aria-label="unsaved changes"]')).toBeNull();
@@ -309,9 +311,7 @@ describe("DesignSystemTab — Apply pipeline (via guard 'Save and switch')", () 
     const utils = await renderTab(composer);
 
     fireEvent.change(utils.radiusInput, { target: { value: "10px" } });
-    leaveToRoot(utils);
-    await utils.findByText("Unsaved changes");
-    fireEvent.click(utils.getByText("Save and switch"));
+    await applyViaFooter(utils);
 
     expect(await utils.findByText("Failed to apply tokens. Try again.")).toBeTruthy();
   });
