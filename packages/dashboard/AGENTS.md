@@ -76,6 +76,16 @@ screen means one of the three above was skipped.
   class, and measuring `tw:justify-start` winning in a live browser. The class
   list exists because flowbite's own theme strings live in `node_modules`,
   which automatic detection skips. The editor is the opposite — see below.
+- **The DS token contract is the source of truth for BOTH builds.** `globals.css`
+  and `app/tw-flowbite.css` are separate Next CSS entry points with separate
+  Tailwind passes, and the prefixed one imports the STOCK Tailwind theme — so it
+  used to compile a SECOND scale under the same utility names (`--tw-radius-md`
+  6px against the DS 8px, `--tw-radius-sm` 4px against 6px), and since its layer
+  is declared last it won on every flowbite component. `tw-flowbite.css` now
+  restates the DESIGN.md scale in its own `@theme` block. **Change a radius or
+  the accent in `globals.css` and you must change it there too** —
+  `flowbiteStore.prefix.test.tsx` asserts the two files against each other and
+  fails if they drift. Founder call 2026-08-27, "one true source".
 - **Import a new flowbite component → regenerate the class list.** Run
   `npx flowbite-react build` from `packages/dashboard`, then `rm -rf .next`.
   Flowbite's theme classes live in `node_modules`, which Tailwind never scans;
