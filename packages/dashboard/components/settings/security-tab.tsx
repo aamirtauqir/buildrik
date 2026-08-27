@@ -41,7 +41,17 @@ export function SecurityTab() {
   const [showDisableModal, setShowDisableModal] = useState(false);
   const [revoking, setRevoking] = useState<string | null>(null);
   const [revokingAll, setRevokingAll] = useState(false);
+  /**
+   * `error` carries the 2FA flow's failures. It used to carry the session
+   * section's too, and had exactly two render sites — inside the "verify your
+   * authenticator" step and inside the disable modal. Every writer that fired
+   * while neither was mounted wrote to a state nothing displayed: a failing
+   * Enable 2FA, a failing Remove-from-list, a failing Sign-out-everywhere. All
+   * three are security controls, and all three did nothing visible at all.
+   * Sessions get their own slot so the two sections cannot mask each other.
+   */
   const [error, setError] = useState("");
+  const [sessionError, setSessionError] = useState("");
 
   const utils = trpc.useUtils();
 
@@ -108,11 +118,12 @@ export function SecurityTab() {
   // try/finally: without it a failed revoke left the button stuck on "Revoking…"
   // forever and threw an unhandled rejection. Surface the error and always reset.
   async function handleRevoke(sessionId: string) {
+    setSessionError("");
     setRevoking(sessionId);
     try {
       await revokeMutation.mutateAsync({ sessionId });
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Couldn't revoke session");
+      setSessionError(e instanceof Error ? e.message : "Couldn't revoke session");
     } finally {
       setRevoking(null);
     }
@@ -120,11 +131,12 @@ export function SecurityTab() {
 
   async function handleRevokeAll() {
     if (!currentSessionId) return;
+    setSessionError("");
     setRevokingAll(true);
     try {
       await revokeAllMutation.mutateAsync({ currentSessionId });
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Couldn't revoke sessions");
+      setSessionError(e instanceof Error ? e.message : "Couldn't revoke sessions");
     } finally {
       setRevokingAll(false);
     }
@@ -187,6 +199,16 @@ export function SecurityTab() {
             </button>
           </div>
         </div>
+
+        {/* The 2FA flow's other two error slots live inside the verify step and
+            the disable modal. When neither is mounted — which is the whole of
+            the Enable path — this is the only thing standing between a failed
+            security mutation and total silence. */}
+        {error && setupStep !== "verify" && !showDisableModal && (
+          <p className="mt-2 text-body" role="alert" style={{ color: "var(--color-error-text)" }}>
+            {error}
+          </p>
+        )}
 
         {/* Setup Modal - Step 1: QR Code */}
         {setupStep === "qr" && setupData && (
@@ -380,6 +402,12 @@ export function SecurityTab() {
             </button>
           )}
         </div>
+
+        {sessionError && (
+          <p className="mb-3 text-body" role="alert" style={{ color: "var(--color-error-text)" }}>
+            {sessionError}
+          </p>
+        )}
 
         <div
           className="rounded-lg border overflow-hidden"

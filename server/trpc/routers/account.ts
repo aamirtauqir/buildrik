@@ -92,10 +92,29 @@ export const accountRouter = router({
       }
     }),
   twoFactor: router({
-    enable: protectedProcedure.mutation(({ ctx }) => enable2FA(ctx.session.user.id)),
+    // `disable` below maps five domain errors; these two mapped none, so every
+    // failure reached the client as a bare INTERNAL_SERVER_ERROR whose message
+    // was whatever the service happened to throw ("USER_NOT_FOUND").
+    enable: protectedProcedure.mutation(async ({ ctx }) => {
+      try {
+        return await enable2FA(ctx.session.user.id);
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message === "USER_NOT_FOUND") throw new TRPCError({ code: "NOT_FOUND", message: "User not found." });
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Couldn't start two-factor setup. Please try again." });
+      }
+    }),
     confirm: protectedProcedure
       .input(z.object({ code: z.string().length(6) }))
-      .mutation(({ ctx, input }) => confirm2FA(ctx.session.user.id, input.code)),
+      .mutation(async ({ ctx, input }) => {
+        try {
+          return await confirm2FA(ctx.session.user.id, input.code);
+        } catch (e: unknown) {
+          if (e instanceof Error && e.message === "INVALID_CODE") throw new TRPCError({ code: "UNAUTHORIZED", message: "Authenticator code is incorrect." });
+          if (e instanceof Error && e.message === "2FA_NOT_SETUP") throw new TRPCError({ code: "BAD_REQUEST", message: "Start two-factor setup before confirming a code." });
+          if (e instanceof Error && e.message === "USER_NOT_FOUND") throw new TRPCError({ code: "NOT_FOUND", message: "User not found." });
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Couldn't confirm two-factor setup. Please try again." });
+        }
+      }),
     disable: protectedProcedure
       .input(z.object({ password: z.string().optional().default(""), code: z.string().optional() }))
       .mutation(async ({ ctx, input }) => {
