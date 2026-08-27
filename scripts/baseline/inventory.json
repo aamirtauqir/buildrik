@@ -2917,10 +2917,12 @@
       "viewport": "1440x900",
       "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
       "requires": "session",
-      "pipelineState": "blocked",
+      "pipelineState": "captured-current",
       "screenshotHash": "6b46f86ae3b5cf18",
-      "capturedFrom": "prod@f7b39a4c",
-      "notes": " | BLOCKED: capture submit repeatedly dies (3 attempts: stale selector fixed, still no server-side arrival)"
+      "capturedFrom": "localhost@2026-08-27",
+      "notes": " | BLOCKED: capture submit repeatedly dies (3 attempts: stale selector fixed, still no server-side arrival) [2026-08-27] CAPTURED. The old blockReason said the submit \"repeatedly dies\"; the submit was fine, the sentinel was not. figma-capture-live checks its sentinel BEFORE replaying actions, so passing the modal heading as the sentinel always fails on a page that has not opened the modal yet. Sentinel \"text=seats\" (present on load) plus capture selector [role=\"dialog\"] captured 47 nodes; verified by reading the frame text back (Invite Team Members / Send Invitation). Filed on the Modals+States page.",
+      "figmaNodeId": "695:2",
+      "figmaPageId": "125:2"
     },
     {
       "id": "BL-0155",
@@ -2964,10 +2966,12 @@
       "viewport": "1440x900",
       "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
       "requires": "session",
-      "pipelineState": "blocked",
+      "pipelineState": "captured-current",
       "screenshotHash": "284d60de373d686a",
-      "capturedFrom": "prod@f7b39a4c",
-      "notes": " | BLOCKED: capture submit repeatedly dies (3 attempts; page renders but submit never lands)"
+      "capturedFrom": "localhost@2026-08-27",
+      "notes": " | BLOCKED: capture submit repeatedly dies (3 attempts; page renders but submit never lands) [2026-08-27] CAPTURED. Not a harness failure: \"I want to delete my account\" is disabled for a sole workspace OWNER (danger-zone-tab.tsx `blocked`), which is exactly what the owner storageState always was. Captured from a DESIGNER session instead. Verified by reading the frame text back (30-day grace period, \"Type DELETE to confirm\", Delete Account). Filed on the Modals+States page.",
+      "figmaNodeId": "696:2",
+      "figmaPageId": "125:2"
     },
     {
       "id": "BL-0158",
@@ -4237,6 +4241,38 @@
       "state": "at-limit-plus-checklist-non-owner",
       "figmaNodeId": "384:2",
       "notes": "Registered 2026-08-27 by reading the ACTIVE file back: the frame was on the page all along, the inventory never recorded it. Non-owner (Viewer) dashboard: \"Good evening, Viewer\", checklist 0/3, and \"Site limit reached (3/3) - Ask a workspace owner to upgrade the plan\". This is the capture BL-0181 was marked blocked for; it landed. Captured 2026-08-22."
+    },
+    {
+      "kind": "editor-state",
+      "statusClass": 3,
+      "viewport": "1440x900",
+      "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
+      "figmaPageId": "0:1",
+      "figmaNodeId": "468:2",
+      "flow": "editor",
+      "route": "/edit/[siteId]",
+      "path": "/edit/:siteId",
+      "state": "review-comment-open",
+      "id": "BL-0307",
+      "requires": "session",
+      "pipelineState": "unregistered-orphan",
+      "notes": "[2026-08-27] Landed on the Dashboard page (0:1) as an anonymous frame named \"Buildrick\" - html-to-design drops every capture on the file FIRST page, named after the captured element. Identified by its own text nodes (\"Back to editing\", \"Opened - no reply\", \"Desktop - 100%\"). Renamed in place, NOT re-paged: the editor baseline belongs to another lane, and a rename is reversible where a re-page is disruptive. Claim or delete it there."
+    },
+    {
+      "kind": "editor-state",
+      "statusClass": 3,
+      "viewport": "1440x900",
+      "figmaFileKey": "Micuc1rmLcFhjxF1A08Kk2",
+      "figmaPageId": "0:1",
+      "figmaNodeId": "506:2",
+      "flow": "editor",
+      "route": "/edit/[siteId]",
+      "path": "/edit/:siteId",
+      "state": "insert-panel-open",
+      "id": "BL-0308",
+      "requires": "session",
+      "pipelineState": "unregistered-orphan",
+      "notes": "[2026-08-27] Same story as BL-0307. Identified by its own text nodes (\"In review\", \"Compare\", \"Re-send\", Insert panel with ELEMENTS 53). Renamed in place, not re-paged."
     }
   ]
 }
