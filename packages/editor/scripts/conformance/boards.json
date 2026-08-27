@@ -5,8 +5,8 @@
   "generatedAt": "2026-08-14",
   "counts": {
     "total": 431,
-    "active": 367,
-    "designAhead": 37,
+    "active": 363,
+    "designAhead": 41,
     "outOfScope": 27,
     "activeFamilies": 35
   },
@@ -253,7 +253,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "open:status-pill-convention",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
@@ -285,7 +285,7 @@
       "state": "lint",
       "width": 320,
       "height": 812,
-      "status": "active",
+      "status": "design-ahead",
       "authority": "blocked:no-autofix-producer",
       "recipe": null
     },
@@ -329,7 +329,7 @@
       "state": "loading",
       "width": 320,
       "height": 812,
-      "status": "active",
+      "status": "design-ahead",
       "authority": "blocked:sync-load",
       "recipe": null
     },
@@ -472,8 +472,8 @@
       "state": "typography",
       "width": 320,
       "height": 812,
-      "status": "active",
-      "authority": "open:font-upload-unbuilt",
+      "status": "design-ahead",
+      "authority": "blocked:no-font-upload",
       "recipe": null
     },
     {
@@ -3651,8 +3651,8 @@
       "state": "empty",
       "width": 320,
       "height": 812,
-      "status": "active",
-      "authority": "open:empty-vs-defaults",
+      "status": "design-ahead",
+      "authority": "blocked:defaults-always-staged",
       "recipe": null
     },
     {
