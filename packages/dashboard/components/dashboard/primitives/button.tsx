@@ -18,6 +18,29 @@ const COLORS: Record<ButtonVariant, string> = {
 };
 
 /**
+ * `ghost` is flowbite's `light`: a BORDERED WHITE button, and it stays that way
+ * — 78 call sites depend on the meaning.
+ *
+ * What was wrong is its hover. flowbite ships `hover:bg-gray-100` = #F3F4F6,
+ * which is EXACTLY `--color-bg-page` (and `--color-bg-subtle`, which holds the
+ * same value). So a white bordered button sitting on the page background
+ * disappeared into it on hover — backwards from what a hover is for. Repointed
+ * at `--color-bg-hover`, one step further down the ramp and distinct from both
+ * surfaces. Measured: rest #FFFFFF -> hover #E5E7EB.
+ *
+ * A third, TRANSPARENT neutral variant was considered and rejected on the
+ * numbers. 48 call sites hand-roll `hover:bg-[var(--color-bg-subtle)]`, which
+ * looked like demand for one — but every single one is a `w-full` menu row or
+ * list item, not a standalone button. Zero standalone transparent buttons
+ * exist. Adding the variant would have shipped a surface with no door.
+ */
+const VARIANT_OVERRIDES: Record<ButtonVariant, string> = {
+  primary: "",
+  ghost: "tw:hover:bg-[var(--color-bg-hover)]",
+  danger: "",
+};
+
+/**
  * Focus ring, shared by both exports.
  *
  * flowbite ships `focus:ring-4` with a per-colour ring: blue-300 for primary,
@@ -44,7 +67,7 @@ export const Button = forwardRef<
   HTMLButtonElement,
   { variant?: ButtonVariant; size?: ButtonSize; className?: string; children: ReactNode } & ButtonHTMLAttributes<HTMLButtonElement>
 >(({ variant = "primary", size = "md", className, children, ...rest }, ref) => (
-  <FbButton ref={ref} color={COLORS[variant]} size={size} className={cn(FOCUS_RING, className)} {...rest}>
+  <FbButton ref={ref} color={COLORS[variant]} size={size} className={cn(FOCUS_RING, VARIANT_OVERRIDES[variant], className)} {...rest}>
     {children}
   </FbButton>
 ));
@@ -53,7 +76,7 @@ Button.displayName = "Button";
 /** Same shape as Button, rendered as a Next.js Link for navigation CTAs. */
 export function ButtonLink({ variant = "primary", size = "md", className, children, ...rest }: { variant?: ButtonVariant; size?: ButtonSize; className?: string; children: ReactNode } & AnchorHTMLAttributes<HTMLAnchorElement> & { href: string }) {
   return (
-    <FbButton as={Link} color={COLORS[variant]} size={size} className={cn(FOCUS_RING, className)} {...rest}>
+    <FbButton as={Link} color={COLORS[variant]} size={size} className={cn(FOCUS_RING, VARIANT_OVERRIDES[variant], className)} {...rest}>
       {children}
     </FbButton>
   );

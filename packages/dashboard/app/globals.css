@@ -119,6 +119,12 @@
   --color-bg-page: #F3F4F6;             /* bk-bg-app */
   --color-bg-surface: #FFFFFF;          /* bk-bg-card */
   --color-bg-subtle: #F3F4F6;           /* bk-bg-subtle */
+  /* Hover fill for a control sitting on EITHER surface. bg-page and bg-subtle
+     are the same value (#F3F4F6), so a control whose hover lands there vanishes
+     into the page background — measured on flowbite's `light` button, whose
+     hover:bg-gray-100 is exactly #F3F4F6. One step further down the gray ramp,
+     distinct from both #FFFFFF and #F3F4F6. */
+  --color-bg-hover: #E5E7EB;            /* gray-200 */
   --color-border-default: #E5E7EB;      /* bk-border */
   --color-border-strong: #D1D5DB;       /* bk-border-medium */
   --color-border-input: #9CA3AF;        /* bk-border-input */
