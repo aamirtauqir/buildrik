@@ -358,7 +358,12 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
                   data-kind-id={entry.kindId}
                   data-kind-count={count}
                   onClick={() => onOpenKind?.(entry.kindId)}
-                  className="tw:flex tw:w-full tw:items-center tw:justify-between tw:gap-2 tw:h-auto tw:px-2 tw:py-2 tw:rounded-md tw:border-0 tw:bg-transparent tw:text-left tw:hover:bg-gray-100"
+                  /* Board 152:52 draws these rows at 32, which is also
+                     `--bk-size-row`. `h-auto` + `py-2` let content decide and
+                     measured 36 live — four pixels per row over fourteen rows.
+                     The token and the board agree; the row was answering to
+                     neither. */
+                  className="tw:flex tw:w-full tw:items-center tw:justify-between tw:gap-2 tw:h-[var(--bk-size-row)] tw:px-2 tw:py-0 tw:rounded-md tw:border-0 tw:bg-transparent tw:text-left tw:hover:bg-gray-100"
                 >
                   <span className="tw:flex tw:items-center tw:gap-[5px] tw:text-[13px] tw:text-gray-900">
                     {entry.title.toLowerCase()}

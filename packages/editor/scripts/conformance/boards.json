@@ -341,7 +341,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "open:preset-categories",
+      "authority": "board:152-112-shape",
       "recipe": null
     },
     {
@@ -440,7 +440,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "open:extra-token-kinds",
+      "authority": "code:cites-board",
       "recipe": null
     },
     {
