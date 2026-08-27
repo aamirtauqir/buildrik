@@ -49,6 +49,8 @@ const failedJob = (steps: UsePublishJobResult["steps"]): UsePublishJobResult => 
   error: "Build error on Home — 3 unresolved links.",
   steps,
   blockedReason: null,
+  lastPublishedAt: null,
+  hasUnpublishedChanges: null,
   publish: vi.fn(),
   cancel: vi.fn(),
   track: vi.fn(),

@@ -14,6 +14,7 @@ import {
   fetchPublishStatus,
   cancelPublish as cancelPublishCall,
   fetchSitePublishState,
+  type SitePublishState,
   type PublishPagePayload,
   type PublishStatus,
   type PublishStep,
@@ -107,6 +108,16 @@ export interface UsePublishJobResult {
    */
   track: (jobId: string) => void;
   reset: () => void;
+  /**
+   * When the site last went live, ISO. Null when it never has, or the read
+   * failed. The caller compares it against its OWN save clock — the server's
+   * `hasUnpublishedChanges` below is a snapshot from mount and cannot see an
+   * edit made since.
+   */
+  lastPublishedAt: string | null;
+  /** The server's answer at hydration (and again after a publish completes):
+   *  had the site changed since it last went live? Null = unknown. */
+  hasUnpublishedChanges: boolean | null;
   /** Dismiss an approval block without publishing (Cancel / after a toast). */
   dismissBlock: () => void;
 }
@@ -119,7 +130,8 @@ export function usePublishJob(): UsePublishJobResult {
   // Server-hydrated state separate from in-session job state so a returning
   // user sees the correct "Published" Topbar without poisoning the publish()
   // re-entrancy guard (which keys on jobId).
-  const [hydratedUrl, setHydratedUrl] = React.useState<string | null>(null);
+  const [hydrated, setHydrated] = React.useState<SitePublishState | null>(null);
+  const hydratedUrl = hydrated?.isPublished ? hydrated.publishedUrl : null;
   const pollTimer = React.useRef<ReturnType<typeof setInterval> | null>(null);
   const abortRef = React.useRef(false);
   // Mirror status into a ref so publish()'s re-entrancy guard can read latest
@@ -247,7 +259,7 @@ export function usePublishJob(): UsePublishJobResult {
       try {
         const state = await fetchSitePublishState(siteId);
         if (cancelled) return;
-        if (state.isPublished) setHydratedUrl(state.publishedUrl);
+        setHydrated(state);
       } catch {
         // Hydration is best-effort — failures fall back to draft UI.
       }
@@ -255,7 +267,11 @@ export function usePublishJob(): UsePublishJobResult {
     return () => {
       cancelled = true;
     };
-  }, []);
+    /* Re-read once a publish lands. The stamps move on the server at
+       completion, so the snapshot taken at mount is stale from that moment on
+       and would keep offering "Publish changes" over a site that just shipped
+       them. */
+  }, [status?.status === "COMPLETED"]);
 
   /*
     A publish that dies BEFORE a job id comes back — the server refusing the
@@ -295,6 +311,8 @@ export function usePublishJob(): UsePublishJobResult {
     jobId,
     progress: status?.progress ?? 0,
     publishedUrl: status?.publishedUrl ?? hydratedUrl,
+    lastPublishedAt: hydrated?.lastPublishedAt ?? null,
+    hasUnpublishedChanges: hydrated?.hasUnpublishedChanges ?? null,
     error,
     steps: status?.steps ?? null,
     blockedReason,

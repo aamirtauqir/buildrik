@@ -122,10 +122,45 @@ export interface TopbarProps {
   onPublish?: () => void;
   /** Why publish is blocked — surfaced as a tooltip on the still-focusable button. */
   publishBlockedReason?: string;
+  /**
+   * The CTA's verb, when the shell has worked out where the site actually
+   * stands (`deriveLifecycleState`) — "Send for review", "Open feedback",
+   * "Publish changes". Overrides the built-in label for the ready and blocked
+   * states; the `published` success beat keeps its own "✓ Published".
+   *
+   * Wireframes §2: this is a state-dependent CTA, and the ONE filled button in
+   * the shell. It is a label override rather than a second control on purpose —
+   * the blocked branch's focusable/aria-disabled/tooltip behaviour is not worth
+   * reimplementing per verb.
+   */
+  ctaLabel?: string;
+  /** One sentence naming the site's position, as the button's title. */
+  ctaHint?: string;
+  /**
+   * The live site, when there is one. Rendered as `● Live · domain` beside the
+   * save pill — the settled half of the CTA's story.
+   *
+   * Load-bearing next to `ctaLabel`: on a site that is live with nothing
+   * waiting, the derivation returns no next move and the CTA disappears. Without
+   * this chip, "your site is live" would have no representation in the shell at
+   * all, and a finished site would look identical to one that was never
+   * published.
+   */
+  liveUrl?: string | null;
   /** Replaces the built-in Publish button — e.g. an editor who sends for review instead. */
   action?: React.ReactNode;
   /** The ⋯ site menu — a node that owns its own trigger (SiteMenu). */
   menu?: React.ReactNode;
+}
+
+/** The host, for the live chip. A URL the server never validated must not
+ *  throw inside a render — an unparseable one falls back to itself. */
+function hostOf(url: string): string {
+  try {
+    return new URL(url).host;
+  } catch {
+    return url;
+  }
 }
 
 const PUBLISH_LABEL: Record<PublishState, string> = {
@@ -139,7 +174,7 @@ const PUBLISH_LABEL: Record<PublishState, string> = {
 export function Topbar({
   siteName, onExit, exitLabel = "‹ Exit", save, savedAt, onSave, review, tools, presence,
   unreadCount = 0, onOpenNotifications, publish = "ready", publishBusy, onPublish,
-  publishBlockedReason, action, menu,
+  publishBlockedReason, ctaLabel, ctaHint, liveUrl, action, menu,
 }: TopbarProps) {
   const hasTools = Boolean(tools && (tools.onPreview || tools.onToggleComments || tools.issues));
   return (
@@ -176,6 +211,27 @@ export function Topbar({
           is status about a machine the viewer is not operating. `save` is
           omitted there rather than rendering a permanently-green pill. */}
       {save ? <SaveStatus state={save} savedAt={savedAt} onRetry={onSave} /> : null}
+
+      {liveUrl ? (
+        <a
+          href={liveUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          /* The domain, not the URL: `https://bella-cucina.vercel.app/` in a
+             56px bar pushes the site name out of it. The href keeps the whole
+             thing, and the title says where it goes. */
+          title={`Open the live site — ${liveUrl}`}
+          className={
+            "tw:inline-flex tw:flex-none tw:items-center tw:gap-1.5 tw:h-6 tw:px-2 tw:rounded " +
+            "tw:text-[12px] tw:text-gray-600 tw:no-underline tw:hover:bg-gray-100 tw:hover:text-gray-900 " +
+            "tw:focus-visible:[box-shadow:var(--bk-shadow-focus)] tw:focus-visible:outline-none"
+          }
+        >
+          <span className="tw:w-1.5 tw:h-1.5 tw:rounded-full tw:bg-green-600" aria-hidden="true" />
+          <span className="tw:sr-only">Live at </span>
+          {hostOf(liveUrl)}
+        </a>
+      ) : null}
 
       {review ? (
         <ReviewBadge {...review} />
@@ -258,7 +314,7 @@ export function Topbar({
               size="xs"
               className={PUBLISH_BTN_CLASS}
             >
-              {PUBLISH_LABEL[publish]}
+              {ctaLabel ?? PUBLISH_LABEL[publish]}
             </Button>
           </Tooltip>
         ) : (
@@ -267,9 +323,10 @@ export function Topbar({
             aria-busy={publishBusy || undefined}
             onClick={onPublish}
             size="xs"
+            title={ctaHint}
             className={PUBLISH_BTN_CLASS}
           >
-            {PUBLISH_LABEL[publish]}
+            {ctaLabel ?? PUBLISH_LABEL[publish]}
           </Button>
         )
       )}

@@ -21,6 +21,7 @@
 
 import * as React from "react";
 import type { SaveState as StudioSaveState } from "./hooks/useStudioState";
+import { deriveLifecycleState } from "./lifecycle";
 import { Topbar, ModalRoot, ModalContent, ModalTitle, ModalDescription, ModalFooter, isModalOpen, plural, Button, type PublishState, type ReviewPill, type ReviewTone, type SaveState, type ToastInput } from "@/editor/chrome-ui";
 import type { SaveOutcome } from "./hooks/useSaveCallback";
 import type { Composer } from "../../engine";
@@ -121,6 +122,12 @@ export interface StudioHeaderProps {
   /** T5 (D10): 2s outcome flash — drives "✓ Published" and the announcement
    *  region. Toasts stay with useExportHandlers (eng D10), never here. */
   publishOutcome?: "published" | "failed" | null;
+  /** When the site last went live, ISO — from `usePublishJob`. Compared against
+   *  this session's own save clock to answer "is anything waiting to ship?". */
+  lastPublishedAt?: string | null;
+  /** The server's answer at mount. Used only when this session has no save of
+   *  its own to compare — see `hasUnpublishedChanges` below. */
+  serverHasUnpublishedChanges?: boolean | null;
 
   // Toast notifications
   addToast: (input: ToastInput) => string;
@@ -192,6 +199,8 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   publishLoading,
   publishedUrl,
   publishOutcome = null,
+  lastPublishedAt = null,
+  serverHasUnpublishedChanges = null,
   addToast,
 }) => {
   const { users, currentUser, state: collaborationState, isConnected } = useCollaboration(composer);
@@ -498,23 +507,49 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   // T7/D14: the old errors-noun label ("3 errors" for 1 error + 2 warnings)
   // is gone — the IssueChip owns count copy via formatIssueSummary.
 
-  // A blocked publish is shown disabled with its reason, never hidden — the
-  // user must be able to find out why (P6 permissions boards).
-  const publishBlockedReason = !publishEnabled
-    ? "Publishing isn't switched on for this workspace yet"
-    : isViewer
-      ? "Viewers can't publish — ask an editor"
-      : offline
-        ? "Can't publish while offline"
-        : undefined;
+  /* A blocked publish is shown disabled with its reason, never hidden — the
+     user must be able to find out why (P6 permissions boards). The three
+     permission/network reasons used to be spelled out again here; they live in
+     `deriveLifecycleState`'s `publishBlocker` now, beside the review reasons
+     they have to be ordered against. */
+  /* ── The site's ONE next move (wireframes §2) ─────────────────────────────
+     The shell knew whether publishing was *permitted* and never where the site
+     stood. `deriveLifecycleState` is the table; everything here is the reads it
+     needs.
+
+     "Anything waiting to ship?" prefers THIS session's save clock over the
+     server's snapshot, which was taken at mount and cannot see an edit made
+     since. Unsaved work counts on its own — it is by definition not live. */
+  const savedAtMs = lastSavedAt ?? lastSaved?.getTime() ?? null;
+  const publishedAtMs = lastPublishedAt ? Date.parse(lastPublishedAt) : null;
+  const hasUnpublishedChanges =
+    isDirty ||
+    (savedAtMs != null && publishedAtMs != null
+      ? savedAtMs > publishedAtMs
+      : serverHasUnpublishedChanges);
+  const nextMove = deriveLifecycleState({
+    reviewState: reviewStatus.state,
+    reviewsEnabled: reviewStatus.reviewsEnabled,
+    editsRequireApproval: reviewStatus.editsRequireApproval,
+    isPublished: Boolean(publishedUrl),
+    hasUnpublishedChanges,
+    isViewer,
+    publishEnabled,
+    offline,
+    errorCount,
+  });
+  /* The visual state follows the derived move, not the old permission-only
+     reason. Reading `publishBlockedReason` here left a review-blocked site
+     rendering the ENABLED branch — no tooltip, no aria-disabled — because a
+     pending round is not a permission problem and never set that string.
+     `"anyway"` is gone: the derivation owns the error re-label, and it refuses
+     to put an invitation on a button nobody can press. */
   const publish: PublishState =
     publishOutcome === "published"
       ? "published"
-      : publishBlockedReason
+      : nextMove?.blockedReason
         ? "disabled"
-        : errorCount > 0
-          ? "anyway"
-          : "ready";
+        : "ready";
 
   // ── T5/F24 · the ONE announcement pipe (eng D5 — centralized) ────────────
   // SaveStatus is presentation-only; these two visually-hidden regions speak
@@ -550,13 +585,20 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   // now has its own door in SiteMenu; the chain stays as a degraded path for a
   // build with publishing switched off.
   const publishNow = onVercelPublish ?? onOpenPublish ?? handleExport;
-  const handlePublishClick = React.useCallback(() => {
+  /* One control, so one handler. Both review verbs land on the Review panel —
+     the door that already owns SendForReview and the feedback thread — so a
+     state-dependent CTA adds no surface, only a destination. */
+  const handleCtaClick = React.useCallback(() => {
+    if (nextMove && nextMove.kind !== "publish") {
+      onOpenReview?.();
+      return;
+    }
     if (errorCount > 0) {
       setPubConfirm(true);
       return;
     }
     publishNow();
-  }, [errorCount, publishNow]);
+  }, [nextMove, onOpenReview, errorCount, publishNow]);
   // D12: top-3 concrete rows, errors first — real messages from the shipped
   // Issue shape, never invented categories.
   const confirmRows = issues
@@ -652,10 +694,17 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         onOpenNotifications={() => setNotifOpen((v) => !v)}
         /* Publishing is the owner's act. It stayed visible in view mode
            because nothing here ever read readOnlyView for it. */
-        publish={viewMode.readOnlyView ? "hidden" : publish}
+        /* `nextMove === null` means the site has no next act — live, with
+           nothing waiting. The CTA is withheld there rather than showing a
+           Publish that would do nothing; the live chip below carries the
+           status that used to be implied by the button's presence. */
+        publish={viewMode.readOnlyView || !nextMove ? "hidden" : publish}
         publishBusy={publishLoading}
-        publishBlockedReason={publishBlockedReason}
-        onPublish={handlePublishClick}
+        publishBlockedReason={nextMove?.blockedReason ?? undefined}
+        ctaLabel={nextMove?.label}
+        ctaHint={nextMove?.hint}
+        liveUrl={viewMode.readOnlyView ? null : publishedUrl}
+        onPublish={handleCtaClick}
         /* SendForReview used to render ONLY in view mode, from when
            ?view=client (now ?view=readonly) meant "invited content editor". It is a viewer now
            (founder, 2026-08-23), and sending a site for review is the owner's

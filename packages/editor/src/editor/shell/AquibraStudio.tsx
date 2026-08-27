@@ -483,6 +483,8 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           publishLoading={publishJob.uiState === "publishing"}
           publishedUrl={publishJob.publishedUrl}
           publishOutcome={publishOutcome}
+          lastPublishedAt={publishJob.lastPublishedAt}
+          serverHasUnpublishedChanges={publishJob.hasUnpublishedChanges}
           addToast={addToast}
         />
       </header>

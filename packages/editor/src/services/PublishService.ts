@@ -134,11 +134,10 @@ export interface SitePublishState {
    * `null` when it has never been published, or when the server did not send
    * the stamps — unknown, not "no".
    *
-   * **The durable answer, and the only one that survives a reload.** The
-   * editor's other "since last deploy" number counts entries in
-   * `composer.history`, which is memory-only and cleared by `importProject` —
-   * so publish, edit, close the tab, reopen tomorrow, and that count is 0 over
-   * a site with real unpublished changes.
+   * **The only durable answer.** Before this the editor had no "changed since
+   * live" signal of any kind — grep `src/` for one and there is nothing — so a
+   * site that had been published showed the same settled Topbar whether or not
+   * it had been edited since, and the only way to find out was to publish again.
    *
    * Bias, stated rather than hidden: `Site.lastEditedAt` is written on every
    * `saveProjectData` **and** by `renameSite` and duplicate, so this can

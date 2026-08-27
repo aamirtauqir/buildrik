@@ -289,10 +289,13 @@ describe("StudioHeader", () => {
       expect(screen.getByRole("tooltip").textContent).toMatch(/isn't switched on/);
     });
 
-    it("flag on: Publish is live and fires the publish job", () => {
+    it("flag on: Publish is live and fires the publish job", async () => {
       vi.mocked(isFeatureEnabled).mockReturnValue(true);
       const onVercelPublish = vi.fn();
       render(<StudioHeader {...makeProps({ onVercelPublish })} />);
+      /* The CTA holds a disabled in-flight state until reviews.status answers —
+         clicking on the first paint is clicking the loading state. */
+      await act(async () => {});
       fireEvent.click(screen.getByRole("button", { name: "Publish" }));
       expect(onVercelPublish).toHaveBeenCalled();
     });
@@ -306,14 +309,14 @@ describe("StudioHeader", () => {
       expect(screen.getByRole("tooltip").textContent).toBe("Can't publish while offline");
     });
 
-    it("blocking errors turn it into Publish anyway rather than hiding it", () => {
+    it("blocking errors turn it into Publish anyway rather than hiding it", async () => {
       vi.mocked(isFeatureEnabled).mockReturnValue(true);
       render(
         <StudioHeader
           {...makeProps({ issues: [{ id: "1", type: "error", message: "x" }] as StudioHeaderProps["issues"] })}
         />,
       );
-      expect(screen.getByRole("button", { name: "Publish anyway" })).toBeTruthy();
+      expect(await screen.findByRole("button", { name: "Publish anyway" })).toBeTruthy();
     });
   });
 
@@ -321,7 +324,11 @@ describe("StudioHeader", () => {
   describe("publish-anyway confirm modal", () => {
     const err = (id: string, message: string) => ({ id, type: "error" as const, message });
     const warn = (id: string, message: string) => ({ id, type: "warning" as const, message });
-    const setup = (issues: unknown[], extra: Partial<StudioHeaderProps> = {}) => {
+    /* async, and every caller awaits it: the CTA is state-dependent now, and
+       until `reviews.status` answers the shell holds an in-flight control
+       rather than guessing a verb. Asserting on the first paint would be
+       asserting on the loading state. */
+    const setup = async (issues: unknown[], extra: Partial<StudioHeaderProps> = {}) => {
       vi.mocked(isFeatureEnabled).mockReturnValue(true);
       const onVercelPublish = vi.fn();
       const onOpenIssues = vi.fn();
@@ -335,11 +342,12 @@ describe("StudioHeader", () => {
           })}
         />,
       );
+      await act(async () => {});
       return { onVercelPublish, onOpenIssues };
     };
 
-    it("errors > 0 opens the confirm instead of publishing in one click", () => {
-      const { onVercelPublish } = setup([err("1", "Broken link — Home / CTA")]);
+    it("errors > 0 opens the confirm instead of publishing in one click", async () => {
+      const { onVercelPublish } = await setup([err("1", "Broken link — Home / CTA")]);
       fireEvent.click(screen.getByRole("button", { name: "Publish anyway" }));
       expect(onVercelPublish).not.toHaveBeenCalled();
       expect(screen.getByRole("dialog")).toBeTruthy();
@@ -349,15 +357,15 @@ describe("StudioHeader", () => {
       expect(screen.getByText("Broken link — Home / CTA")).toBeTruthy();
     });
 
-    it("warnings alone publish directly — the chip already carried the signal", () => {
-      const { onVercelPublish } = setup([warn("1", "Missing alt")]);
+    it("warnings alone publish directly — the chip already carried the signal", async () => {
+      const { onVercelPublish } = await setup([warn("1", "Missing alt")]);
       fireEvent.click(screen.getByRole("button", { name: "Publish" }));
       expect(onVercelPublish).toHaveBeenCalledTimes(1);
       expect(screen.queryByRole("dialog")).toBeNull();
     });
 
-    it("shows at most three rows, errors first, and +N more opens the panel", () => {
-      const { onOpenIssues } = setup([
+    it("shows at most three rows, errors first, and +N more opens the panel", async () => {
+      const { onOpenIssues } = await setup([
         warn("w1", "warn one"),
         err("e1", "error one"),
         warn("w2", "warn two"),
@@ -380,29 +388,29 @@ describe("StudioHeader", () => {
         reviewerName: "Sana",
         at: null,
       }));
-      setup([err("1", "x")]);
+      await setup([err("1", "x")]);
       await screen.findByText("In review");
       fireEvent.click(screen.getByRole("button", { name: "Publish anyway" }));
       expect(screen.getByText(/A review round is open — Sana will see the published site/)).toBeTruthy();
     });
 
-    it("no review round, no note", () => {
-      setup([err("1", "x")]);
+    it("no review round, no note", async () => {
+      await setup([err("1", "x")]);
       fireEvent.click(screen.getByRole("button", { name: "Publish anyway" }));
       expect(screen.queryByText(/review round is open/)).toBeNull();
     });
 
     /* Board 1168:4732 names the door by what it does: "Fix issues first". */
-    it("'Fix issues first' is the safe door — panel opens, nothing publishes", () => {
-      const { onVercelPublish, onOpenIssues } = setup([err("1", "x")]);
+    it("'Fix issues first' is the safe door — panel opens, nothing publishes", async () => {
+      const { onVercelPublish, onOpenIssues } = await setup([err("1", "x")]);
       fireEvent.click(screen.getByRole("button", { name: "Publish anyway" }));
       fireEvent.click(screen.getByRole("button", { name: "Fix issues first" }));
       expect(onOpenIssues).toHaveBeenCalled();
       expect(onVercelPublish).not.toHaveBeenCalled();
     });
 
-    it("confirming publishes", () => {
-      const { onVercelPublish } = setup([err("1", "x")]);
+    it("confirming publishes", async () => {
+      const { onVercelPublish } = await setup([err("1", "x")]);
       fireEvent.click(screen.getByRole("button", { name: "Publish anyway" }));
       fireEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Publish anyway" }));
       expect(onVercelPublish).toHaveBeenCalledTimes(1);
