@@ -254,7 +254,13 @@ export function ReviewClient({ token }: { token: string }) {
           </h1>
           <p className="mt-2 text-[13px] leading-relaxed text-[#4B5563]">
             {approved
-              ? `Thanks — ${agency} can take it from here. You'll hear from your designer when it goes live.`
+              ? data.editedSinceApproval
+                ? /* State E. The page's doc comment has claimed this state since
+                     it shipped; the payload only started carrying the flag on
+                     2026-08-28. Without it a returning client was congratulated
+                     about a version that no longer exists. */
+                  `Heads up — ${agency} has made changes since you approved. If you were sent a new link, use that one; your approval covered the version you saw.`
+                : `Thanks — ${agency} can take it from here. You'll hear from your designer when it goes live.`
               : `Your notes are with your designer. They'll send a new link when the changes are ready for you.`}
           </p>
           <p className="mt-4 text-[12px] text-[#6B7280]">

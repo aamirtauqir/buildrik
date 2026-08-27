@@ -102,11 +102,13 @@ async function requireLiveReview(token: string) {
       invitedEmail: true,
       snapshotPages: true,
       createdAt: true,
+      resolvedAt: true,
       site: {
         select: {
           id: true,
           name: true,
           workspaceId: true,
+          lastEditedAt: true,
           // The agency's name leads the client page ("<agency> is asking for
           // your feedback"), not the site name — the client hired the agency.
           workspace: { select: { name: true } },
@@ -153,6 +155,21 @@ export async function getReviewByToken(token: string) {
     snapshotPages: (review.snapshotPages as { path: string; html: string }[] | null) ?? null,
     /** Null until the client signs. The page shows the capture form when null. */
     reviewer,
+    /**
+     * State E of the sign-off wireframes (§S5.5), claimed in the client page's
+     * own doc comment since it shipped and never carried by this payload: the
+     * client approved, and the designer has edited the site SINCE. "Approved"
+     * stops being true the moment the page changes; a client who revisits
+     * their link deserves to be told, not congratulated about a version that
+     * no longer exists. Same timestamp comparison as `isApprovalStale`
+     * (publish-approval.ts), which is the server's one definition of "edited
+     * after sign-off".
+     */
+    editedSinceApproval:
+      review.status === "APPROVED" &&
+      review.resolvedAt !== null &&
+      review.site.lastEditedAt !== null &&
+      review.site.lastEditedAt.getTime() > review.resolvedAt.getTime(),
   };
 }
 
