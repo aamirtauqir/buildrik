@@ -38,7 +38,12 @@ export interface HintTooltipProps {
   children: TriggerElement;
 }
 
-/* Mirrors flowbite's default dark tooltip so the rail looks unchanged.
+/* Was flowbite's dark default. `bg-gray-900` carries the same value as
+   `--bk-ink` — every channel under 0x35 — which DESIGN.md's NO BLACK RULE bans
+   by name for this control ("Account avatar, context menus, tooltips all
+   follow this"). The same rule caps text at slate-700, so `--bk-ink-soft`
+   (~7.5:1 on white) rather than ink. Matches chrome-ui/Tooltip's default, so
+   the product has ONE tooltip surface again.
 
    `z-50` was hardcoded here. The token registry ships ten layers ending at
    `--bk-z-tooltip: 90`, and 50 is `--bk-z-overlay` — so the one element that
@@ -47,15 +52,12 @@ export interface HintTooltipProps {
 
    12px, not `text-sm`'s 14: this is a hint, and it was rendering at body size.
 
-   NOT fixed here, because it is a founder call and not a bug: `bg-gray-900`
-   is `#111827`, every channel under 0x35, against DESIGN.md's NO BLACK RULE
-   ("Account avatar, context menus, tooltips all follow this"). Flowbite's own
-   Tooltip is dark too, and board 138:198 specifies a dark bubble, so DESIGN.md
-   and the boards disagree and every tooltip in the product moves together.
-   Recorded in the redesign plan for adjudication. */
+   The founder resolved the DESIGN.md-vs-board conflict on 2026-08-27 in
+   DESIGN.md's favour; see chrome-ui/tooltipTheme.ts. */
 const BUBBLE_CLASS =
   "tw:fixed tw:max-w-[280px] tw:whitespace-normal tw:rounded-lg tw:px-3 tw:py-2 " +
-  "tw:bg-gray-900 tw:text-white tw:text-[length:var(--bk-text-12)] tw:leading-[var(--bk-leading-16)] tw:font-medium " +
+  "tw:border tw:border-gray-200 tw:bg-white tw:text-[color:var(--bk-ink-soft)] " +
+  "tw:text-[length:var(--bk-text-12)] tw:leading-[var(--bk-leading-16)] tw:font-medium " +
   "tw:[box-shadow:var(--bk-shadow-overlay)] " +
   "tw:[font-family:var(--bk-font-ui)] tw:pointer-events-none";
 

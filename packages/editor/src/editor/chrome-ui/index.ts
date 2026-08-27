@@ -156,7 +156,12 @@ export { Avatar, AvatarGroup } from "flowbite-react";
 export { Checkbox } from "flowbite-react";
 export { Radio } from "flowbite-react";
 export { ToggleSwitch } from "flowbite-react";
-export { Tooltip } from "flowbite-react";
+/* Wrapper, not a re-export: flowbite's Tooltip defaults to `style="dark"`
+   (`bg-gray-900`, the same value as `--bk-ink`), which DESIGN.md's NO BLACK RULE bans by name for
+   this control. The third member of the closed wrapper set — the gate manifest
+   is amended in the same commit, per CLAUDE.md's rule for adding one. */
+export { Tooltip, type TooltipProps } from "./Tooltip";
+export { BK_TOOLTIP_TEXT_CLASS } from "./tooltipTheme";
 export { Textarea } from "flowbite-react";
 export { Label } from "flowbite-react";
 export { HelperText } from "flowbite-react";
