@@ -5,8 +5,8 @@
   "generatedAt": "2026-08-14",
   "counts": {
     "total": 431,
-    "active": 372,
-    "designAhead": 32,
+    "active": 368,
+    "designAhead": 36,
     "outOfScope": 27,
     "activeFamilies": 35
   },
@@ -3431,7 +3431,7 @@
       "state": "loading",
       "width": 320,
       "height": 812,
-      "status": "active",
+      "status": "design-ahead",
       "authority": "blocked:static-catalog",
       "recipe": null
     },
@@ -3596,8 +3596,8 @@
       "state": "list-view",
       "width": 320,
       "height": 812,
-      "status": "active",
-      "authority": "open:list-view-unbuilt",
+      "status": "design-ahead",
+      "authority": "blocked:no-list-view",
       "recipe": null
     },
     {
@@ -3893,7 +3893,7 @@
       "state": "submitting",
       "width": 0,
       "height": 0,
-      "status": "active",
+      "status": "design-ahead",
       "authority": "blocked:sync-delete",
       "recipe": null
     },
@@ -3904,7 +3904,7 @@
       "state": "error",
       "width": 0,
       "height": 0,
-      "status": "active",
+      "status": "design-ahead",
       "authority": "blocked:sync-delete",
       "recipe": null
     },
@@ -4466,7 +4466,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "open:display-toggles-differ",
+      "authority": "board:1171-4829-entry",
       "recipe": null
     },
     {
