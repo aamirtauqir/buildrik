@@ -174,8 +174,25 @@ export default function ProjectsPage() {
   const archiveMutation = trpc.sites.archive.useMutation({
     onSuccess: () => {
       sitesQuery.refetch();
+      // The "Archived · N" badge is its own query — without this it kept showing
+      // the count from page load, so archiving a site left the tab reading 0.
+      archivedQuery.refetch();
       addToast("success", "Site archived");
     },
+    onError: (err) => addToast("error", "Couldn't archive site", err.message),
+  });
+
+  // Archiving was one-way from the UI: the context menu and the bulk bar both
+  // offered Archive, the filter row offered "Archived · N" to look at the
+  // result, and nothing anywhere brought a site back. sites.unarchive has
+  // existed the whole time with no caller.
+  const unarchiveMutation = trpc.sites.unarchive.useMutation({
+    onSuccess: () => {
+      sitesQuery.refetch();
+      archivedQuery.refetch();
+      addToast("success", "Site restored");
+    },
+    onError: (err) => addToast("error", "Couldn't restore site", err.message),
   });
 
   const duplicateMutation = trpc.sites.duplicate.useMutation({
@@ -189,6 +206,7 @@ export default function ProjectsPage() {
   const bulkMutation = trpc.sites.bulk.useMutation({
     onSuccess: () => {
       sitesQuery.refetch();
+      archivedQuery.refetch();
       setSelectedIds(new Set());
       addToast("success", "Bulk action completed");
     },
@@ -320,6 +338,9 @@ export default function ProjectsPage() {
         case "archive":
           archiveMutation.mutate({ id: siteId });
           break;
+        case "unarchive":
+          unarchiveMutation.mutate({ id: siteId });
+          break;
         case "delete":
           if (site) setDeleteTarget({ id: siteId, name: site.name });
           break;
@@ -344,7 +365,7 @@ export default function ProjectsPage() {
           break;
       }
     },
-    [sitesQuery.data, duplicateMutation, archiveMutation, addToast, unified, router]
+    [sitesQuery.data, duplicateMutation, archiveMutation, unarchiveMutation, addToast, unified, router]
   );
 
   // Bulk action handler
@@ -607,6 +628,7 @@ export default function ProjectsPage() {
       {/* Bulk Action Bar */}
       <BulkActionBar
         selectedCount={selectedIds.size}
+        archivedView={status === "ARCHIVED"}
         onAction={handleBulkAction}
         onClear={() => setSelectedIds(new Set())}
         folders={folders}

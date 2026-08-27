@@ -1,6 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import { Pencil, Settings, Type, Copy, UserCheck, ExternalLink, Link2, Archive, Trash2, MoreHorizontal } from "lucide-react";
+import { Pencil, Settings, Type, Copy, UserCheck, ExternalLink, Link2, Archive, ArchiveRestore, Trash2, MoreHorizontal } from "lucide-react";
 
 // "Move to Folder" + "Export Site" removed — handleSiteAction had no case for
 // either (folder-move works via drag + bulk select; no export backend exists),
@@ -17,7 +17,13 @@ export const CONTEXT_MENU_ITEMS = [
   { label: "Delete", action: "delete", icon: "Trash2" },
 ] as const;
 
-const iconMap = { Pencil, Settings, Type, Copy, UserCheck, ExternalLink, Link2, Archive, Trash2 } as const;
+/** The row swapped in on an ARCHIVED site. Archiving used to be one-way from
+ *  the UI — this menu and the bulk bar both offered Archive, the filter row
+ *  offered "Archived · N" to look at the result, and nothing brought a site
+ *  back. `sites.unarchive` had no caller at all. */
+const RESTORE_ITEM = { label: "Restore", action: "unarchive", icon: "ArchiveRestore" } as const;
+
+const iconMap = { Pencil, Settings, Type, Copy, UserCheck, ExternalLink, Link2, Archive, ArchiveRestore, Trash2 } as const;
 
 interface ContextMenuProps {
   siteStatus?: string;
@@ -55,7 +61,10 @@ export function ContextMenu({ siteStatus, siteName, onAction }: ContextMenuProps
       </button>
       {open && (
         <div className="absolute right-0 top-full z-20 mt-1 w-48 rounded-lg border bg-white py-1 shadow-lg" style={{ borderColor: "var(--color-border-default)" }}>
-          {CONTEXT_MENU_ITEMS.map((item) => {
+          {(siteStatus === "ARCHIVED"
+            ? CONTEXT_MENU_ITEMS.map((i) => (i.action === "archive" ? RESTORE_ITEM : i))
+            : CONTEXT_MENU_ITEMS
+          ).map((item) => {
             const Icon = iconMap[item.icon as keyof typeof iconMap];
             const isDestructive = item.action === "archive" || item.action === "delete";
             const showDivider = item.action === "copyUrl";

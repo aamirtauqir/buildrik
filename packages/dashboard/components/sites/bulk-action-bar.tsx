@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Archive, FolderInput, Trash2, X, ChevronDown } from "lucide-react";
+import { Archive, ArchiveRestore, FolderInput, Trash2, X, ChevronDown } from "lucide-react";
 
 // Bulk Publish/Unpublish were removed: they only flipped site.status without
 // creating publish jobs or deploying/tearing down, so they reported success
@@ -15,9 +15,14 @@ export const BULK_ACTIONS = [
   { label: "Delete selected", action: "delete", icon: "Trash2" },
 ] as const;
 
+/** Swapped in while the Archived filter is showing. `sites.bulkAction` has
+ *  always accepted "unarchive" and the page has always had a branch for it —
+ *  this bar just never offered the way back. */
+const RESTORE_ACTION = { label: "Restore selected", action: "unarchive", icon: "ArchiveRestore" } as const;
+
 export const BULK_SELECTION_CAP = 25;
 
-const iconMap = { Archive, FolderInput, Trash2 } as const;
+const iconMap = { Archive, ArchiveRestore, FolderInput, Trash2 } as const;
 
 interface Folder {
   id: string;
@@ -26,12 +31,14 @@ interface Folder {
 
 interface BulkActionBarProps {
   selectedCount: number;
+  /** True while the Archived filter is showing — swaps Archive for Restore. */
+  archivedView?: boolean;
   onAction: (action: string, folderId?: string) => void;
   onClear: () => void;
   folders?: Folder[];
 }
 
-export function BulkActionBar({ selectedCount, onAction, onClear, folders = [] }: BulkActionBarProps) {
+export function BulkActionBar({ selectedCount, archivedView = false, onAction, onClear, folders = [] }: BulkActionBarProps) {
   const [folderDropdownOpen, setFolderDropdownOpen] = useState(false);
 
   if (selectedCount === 0) return null;
@@ -40,7 +47,10 @@ export function BulkActionBar({ selectedCount, onAction, onClear, folders = [] }
     <div className="fixed bottom-6 left-1/2 z-40 flex -translate-x-1/2 items-center gap-2 rounded-lg border bg-white px-4 py-2.5 shadow-xl" style={{ borderColor: "var(--color-border-default)" }}>
       <span className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>{selectedCount} selected</span>
       <div className="mx-2 h-5 w-px" style={{ backgroundColor: "var(--color-border-default)" }} />
-      {BULK_ACTIONS.map((item) => {
+      {(archivedView
+        ? BULK_ACTIONS.map((a) => (a.action === "archive" ? RESTORE_ACTION : a))
+        : BULK_ACTIONS
+      ).map((item) => {
         const Icon = iconMap[item.icon as keyof typeof iconMap];
         const isDestructive = item.action === "delete";
         const isMove = item.action === "move";
