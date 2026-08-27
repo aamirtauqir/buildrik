@@ -659,3 +659,59 @@ Two harness traps this repo has already paid for, both live here:
 | 6 | Deployment risk manageable? | yes — the band is absent until derivation lands | `[codex-unavailable]` | subagent-only |
 
 Single-voice phase. Two of six are hard blockers on the band rendering anything.
+
+---
+
+## Landed — 2026-08-27
+
+| # | What | Commit | Verified |
+|---|---|---|---|
+| Blocker 1 | `sites.myRole` returns the EFFECTIVE role (site override, not workspace role). `getEffectiveSiteRole` extracted; the router stopped reading Prisma directly. | earlier | 96 `checkSiteRole` consumers unchanged; suites green |
+| Blocker 2 | `reviewsEnabled` + `editsRequireApproval` reach the client. Three-valued: `null` = could not ask. | `474c0f17` | service smoke returns both |
+| Blocker 3 | `hasUnpublishedChanges` / `lastPublishedAt` — the only durable "changed since live" signal. Zero server work; `sites.get` already returned the columns. | `31f6180e` | 13 tests |
+| Slot A | `deriveLifecycleState` — the site's ONE next move, as a table with the table as its test. Every `kind` routes to a door the shell already owned. | `6b4b293a` | 23 table tests; live at 1440×900 on the fixture row |
+| Slot B | `● Live · domain` chip. Load-bearing: with no next move the CTA is withheld, so this carries "your site is live". | `6b4b293a` | live (absent on a DRAFT site, which is correct) |
+| B1/B2 | Two rows finished before the editor opened are seeded from the loaded project. | `0ff5c756` | live: opens at 2 of 7 |
+| B3 | Every row completes on an outcome. `SITE_PUBLISHED` added because publishing never spoke to the bus. | `0ff5c756` | live: "Open Build panel" credits nothing |
+| B4 | `stepsRef` written at commit time — two completions in one tick both survive. | earlier | 2 regression tests |
+| B5 | An inserted element's default styles no longer credit "Style an element". | `0ff5c756` | live: one drag credits `add-element` only; Font size credits `change-style` |
+| B6 | `replayAll` has a door — "Getting started" in ⋯. It had **no caller anywhere in the product**. | `0ff5c756` | — |
+
+### Two bugs the work found in itself
+
+- **"Publish anyway" on a button nobody could press.** The label read the review
+  reason and the blocked-ness read the environment, so offline + site errors
+  produced an invitation with a refusal in its tooltip.
+- **A guard that only worked under fake timers.** The style/insert grace window
+  compared the insert against the timer's own delay at fire time — a quantity
+  always ≥ the window. Green in unit tests, credited the row on every real drag.
+  Fixed by keying the decision to the style event's own timestamp. **Only the
+  live walk could show this**; the unit suite was green over it.
+
+### Not verified live, and why
+
+The six review-dependent CTA rows (`pending`, `opened-not-acted`,
+`changes-requested`, `approved`, `approved-edited-since`, and reviews-off) are
+covered by the table tests and by a direct smoke of `getReviewStatusForSite`.
+They were NOT walked in the running app:
+
+1. The dev server (`next dev --turbopack`, up 17h) serves **stale route code** —
+   the service returns the new fields when called directly, the HTTP route does
+   not. Touching the file did not invalidate it. Founder declined a restart.
+2. A batch-response intercept delivered the patched payload to the page (proved
+   by wrapping `window.fetch`) and the review pill still did not move — so the
+   harness could not drive review state either. Pre-existing pill code did not
+   respond, which is where the intercept stopped being evidence about the change.
+
+That staleness is also what surfaced the `undefined`-vs-`null` bug below, so it
+was not wasted.
+
+### `undefined` is not `null`
+
+A server that predates these fields sends neither, and `undefined` failed a
+`=== null` guard and fell through to "reviews are off". The two now branch
+apart deliberately: `null` is our own sentinel and holds an in-flight control
+for a beat; `undefined` is a standing condition (an old deploy, a rollout
+mid-flight) and falls through to publish, where `publish-approval.ts` is the
+real gate. Blocking every publish for the length of a rollout is the worse
+failure.
