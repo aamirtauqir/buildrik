@@ -4,11 +4,11 @@
   "page": "1:3",
   "generatedAt": "2026-08-14",
   "counts": {
-    "total": 423,
-    "active": 364,
+    "total": 431,
+    "active": 372,
     "designAhead": 32,
     "outOfScope": 27,
-    "activeFamilies": 34
+    "activeFamilies": 35
   },
   "activeFamilies": [
     "AI",
@@ -4696,6 +4696,94 @@
       "state": "root",
       "width": 320,
       "height": 812,
+      "status": "active",
+      "authority": "code:cites-board",
+      "recipe": null
+    },
+    {
+      "nodeId": "1339:7162",
+      "name": "Client sign-off · A0 · identify",
+      "family": "Client sign-off",
+      "state": "A0 · identify",
+      "width": 1280,
+      "height": 720,
+      "status": "active",
+      "authority": "code:cites-board",
+      "recipe": null
+    },
+    {
+      "nodeId": "1339:7171",
+      "name": "Client sign-off · A · viewing",
+      "family": "Client sign-off",
+      "state": "A · viewing",
+      "width": 1280,
+      "height": 720,
+      "status": "active",
+      "authority": "code:cites-board",
+      "recipe": null
+    },
+    {
+      "nodeId": "1339:7186",
+      "name": "Client sign-off · D · approved",
+      "family": "Client sign-off",
+      "state": "D · approved",
+      "width": 1280,
+      "height": 720,
+      "status": "active",
+      "authority": "code:cites-board",
+      "recipe": null
+    },
+    {
+      "nodeId": "1339:7193",
+      "name": "Client sign-off · C · changes-requested",
+      "family": "Client sign-off",
+      "state": "C · changes-requested",
+      "width": 1280,
+      "height": 720,
+      "status": "active",
+      "authority": "code:cites-board",
+      "recipe": null
+    },
+    {
+      "nodeId": "1339:7200",
+      "name": "Client sign-off · F · dead-link · expired",
+      "family": "Client sign-off",
+      "state": "F · dead-link · expired",
+      "width": 1280,
+      "height": 720,
+      "status": "active",
+      "authority": "code:cites-board",
+      "recipe": null
+    },
+    {
+      "nodeId": "1339:7207",
+      "name": "Client sign-off · F · dead-link · revoked",
+      "family": "Client sign-off",
+      "state": "F · dead-link · revoked",
+      "width": 1280,
+      "height": 720,
+      "status": "active",
+      "authority": "code:cites-board",
+      "recipe": null
+    },
+    {
+      "nodeId": "1339:7214",
+      "name": "Client sign-off · F · dead-link · not-found",
+      "family": "Client sign-off",
+      "state": "F · dead-link · not-found",
+      "width": 1280,
+      "height": 720,
+      "status": "active",
+      "authority": "code:cites-board",
+      "recipe": null
+    },
+    {
+      "nodeId": "1339:7221",
+      "name": "Client sign-off · F · dead-link · conflict",
+      "family": "Client sign-off",
+      "state": "F · dead-link · conflict",
+      "width": 1280,
+      "height": 720,
       "status": "active",
       "authority": "code:cites-board",
       "recipe": null
