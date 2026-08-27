@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { DangerZoneTab } from "@/components/settings/danger-zone-tab";
@@ -13,6 +14,7 @@ import { DeleteWorkspaceModal } from "@/components/settings/delete-workspace-mod
 export default function DangerZonePage() {
   const { addToast } = useToast();
   const router = useRouter();
+  const { data: session } = useSession();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const wsQuery = trpc.account.workspace.get.useQuery();
@@ -60,6 +62,14 @@ export default function DangerZonePage() {
 
   const workspaceName = wsQuery.data?.name ?? "";
 
+  // `account.workspace.delete` is OWNER-only and answers 403 "Only the owner can
+  // delete". The button's only guard used to be `!wsQuery.data` — "has the
+  // workspace loaded", not "may you delete it" — so a Designer, Editor or Viewer
+  // got the enabled red button, the modal listing everything that would be
+  // destroyed, typed the workspace name exactly as asked, and was refused only
+  // after finishing the confirmation ritual. Ask the same question the server asks.
+  const isWorkspaceOwner = !!wsQuery.data && wsQuery.data.ownerId === session?.user?.id;
+
   return (
     <div className="space-y-10">
       {/* Workspace scope */}
@@ -79,13 +89,16 @@ export default function DangerZonePage() {
               Delete workspace
             </p>
             <p className="text-body-sm mt-0.5" style={{ color: "var(--color-text-secondary)" }}>
-              Permanently delete this workspace and all its data. This cannot be undone.
+              {isWorkspaceOwner
+                ? "Permanently delete this workspace and all its data. This cannot be undone."
+                : "Only the workspace owner can delete this workspace."}
             </p>
           </div>
           <button
             type="button"
             onClick={() => setShowDeleteModal(true)}
-            disabled={!wsQuery.data}
+            disabled={!isWorkspaceOwner}
+            title={!isWorkspaceOwner && wsQuery.data ? "Only the workspace owner can delete this workspace." : undefined}
             className="text-body font-medium px-4 py-2 rounded-md border shrink-0 disabled:opacity-60"
             style={{ borderColor: "var(--color-error)", color: "var(--color-error)" }}
           >
