@@ -83,13 +83,15 @@ function IntegrationCard({
   );
 }
 
-function ConnectButton({ onClick, children }: { onClick: (e: React.MouseEvent) => void; children: ReactNode }) {
+function ConnectButton({ onClick, children, disabled, title }: { onClick: (e: React.MouseEvent) => void; children: ReactNode; disabled?: boolean; title?: string }) {
   return (
-    <Button type="button" variant="ghost" size="sm" onClick={onClick}>
+    <Button type="button" variant="ghost" size="sm" onClick={onClick} disabled={disabled} title={title}>
       {children}
     </Button>
   );
 }
+
+const ADMIN_ONLY_CONNECT = "Only workspace admins can connect Vercel.";
 
 function VercelCard({ workspaceId }: { workspaceId: string }) {
   const { addToast } = useToast();
@@ -113,7 +115,16 @@ function VercelCard({ workspaceId }: { workspaceId: string }) {
     },
   });
 
+  // /api/integrations/vercel/authorize is ADMIN-only and answers a bare JSON
+  // 403. handleConnect is a full `window.location` navigation, so a non-admin
+  // who pressed Connect landed ON that JSON — no nav, no back, nothing to click.
+  // The role comes from dashboard.health, the same source create-site-modal
+  // already uses for its owner check.
+  const health = trpc.dashboard.health.useQuery();
+  const canConnect = health.data?.role === "OWNER" || health.data?.role === "ADMIN";
+
   const handleConnect = () => {
+    if (!canConnect) return;
     window.location.href = `/api/integrations/vercel/authorize?workspaceId=${encodeURIComponent(workspaceId)}`;
   };
 
@@ -131,11 +142,11 @@ function VercelCard({ workspaceId }: { workspaceId: string }) {
     right = (
       <>
         <Pill tone="error">Connection lost</Pill>
-        <ConnectButton onClick={handleConnect}>Reconnect</ConnectButton>
+        <ConnectButton onClick={handleConnect} disabled={!canConnect} title={canConnect ? undefined : ADMIN_ONLY_CONNECT}>Reconnect</ConnectButton>
       </>
     );
   } else {
-    right = <ConnectButton onClick={handleConnect}>Connect</ConnectButton>;
+    right = <ConnectButton onClick={handleConnect} disabled={!canConnect} title={canConnect ? undefined : ADMIN_ONLY_CONNECT}>Connect</ConnectButton>;
   }
 
   return (
