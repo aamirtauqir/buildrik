@@ -309,3 +309,110 @@ Re-running the inventory over `authority` rather than `status` surfaces **34**
 active-but-blocked boards, including `65:2` — a rail coach mark reading
 *"Everything you build lives behind these six"* — which answers the founder's
 question directly and is not built.
+
+---
+
+## DESIGN REVIEW — 2026-08-27 `[single-reviewer]`
+
+Both outside voices failed on this phase: Codex timed out at 600s, and the
+design subagent died on an API timeout mid-read. Per the degradation matrix
+this is single-reviewer mode, and it is tagged rather than presented as a
+dual-voice result.
+
+### The frame is not a new surface — it already ships, scoped to one stage
+
+`ReviewBar.tsx` is a 48px tinted strip under the topbar, `--bk-accent-tint`,
+full width, present **only while a review round is open**. Its own header states
+the principle this plan needs:
+
+> *"The topbar pill says a review EXISTS; this bar is what you work through
+> while it does, which is why the board gives it its own row rather than more
+> chips in the topbar."*
+
+That is the lifecycle frame, already designed, already boarded (`200:213`,
+Shell state 8), already built — and stopped at one of seven stages. The work is
+to let it carry the other six, not to invent a surface.
+
+This also answers "where does it live in a full topbar": nowhere. It does not
+go in the topbar. The topbar keeps saying what *exists*; the band says what you
+*do about it*.
+
+DESIGN.md binds three things here and the band already satisfies all three:
+56px topbar with *"all other chrome heights flow from this rhythm"* (the band is
+48px); the single accent `#1A56DB` (the band tints with `--bk-accent-tint`, no
+second hue); and anti-slop rule 12, *"No per-row action strips"* — a band is not
+a per-row strip.
+
+### What it says, per state — actual copy, not a description of copy
+
+| Site state | Band | Action |
+|---|---|---|
+| created, no content | *This site is empty.* | `Browse templates` · `Draft with AI` |
+| has content, never reviewed | *Ready to show your client?* | `Send for review` |
+| review open, N comments | *N open* + the current comment | `Next ›` · `Compare` · `Re-send` — **today's bar, unchanged** |
+| review open, 0 comments | *Sent 2 days ago. No comments yet.* | `Re-send` · `Revoke link` |
+| changes requested | *Your client asked for changes — N to address.* | `Next ›` · `Compare` |
+| approved, not published | *Approved 3 days ago. Not published yet.* | `Publish` |
+| published, edited since | *Live, with unpublished changes.* | `Compare with live` · `Republish` |
+| live, unchanged | — **the band is not there** | — |
+
+That last row is the discipline that keeps this from becoming a fourth nag:
+**when there is no next move, there is no band.** It is state, not advice. It
+carries no progress counter, it is not dismissible, and it does not stack with
+the onboarding pill — placement of that pill is T6's call, not this plan's.
+
+### States beyond the happy path
+
+| State | Behaviour |
+|---|---|
+| loading | the band does not render until site state is known. No skeleton flash — DESIGN.md keeps motion minimal, and a band that appears then changes its sentence is worse than one that appears once |
+| offline | last known state holds; the action disables **with its reason**, the way the topbar already does (*"Can't publish while offline"*). A disabled control without a reason is a bug, not a state — the approved arc's own state matrix says so |
+| permission-denied | never a dead end. An invited editor who cannot publish is not shown a disabled `Publish`; they are shown the move that is theirs |
+| stale approval | *Approved, but the site changed since.* → `Compare with approved`. This state already exists — the Review panel ships that exact control |
+| multi-page, one page edited | the band is **site**-scoped, not page-scoped. It says the site has unpublished changes; `Compare` is what resolves which pages |
+| review round superseded | the band follows `reviews.currentRound`, which already supersedes on a new round — no second source of truth |
+
+### What an invited editor sees
+
+Role `EDITOR` on someone else's site, per `client-detail-view.tsx` — *"They'll
+join as an Editor on {clientName}'s {siteCount} sites and nothing else — which
+includes publishing them."* Whether that seat can publish is the founder's call
+and is not settled here; the band's rule is the same either way: **it names the
+move that belongs to the person reading it.** If publishing is not theirs, the
+band reads *Your changes are saved. {owner} publishes this site.* and carries no
+action, rather than a greyed `Publish` they cannot explain.
+
+The dashboard already models exactly this split — `INVITED_CHECKLIST_ITEMS`
+versus `FULL_CHECKLIST_ITEMS`, selected off `memberRole` — and its code comment
+records what happened when the split broke: *"every invited member was handed
+the owner checklist, 'Publish your site' and all."* The editor repeats that bug
+today; `OnboardingMount` is mounted unconditionally and never reads
+`useEditorRole()`.
+
+### Why not ambient — in the topbar cluster instead of a band
+
+Ambient is what ships today, and it is the founder's complaint. The topbar
+carries `In review`, `Publish`, `Re-send` and an issues chip — four signals,
+no sentence between them. A chip says a state exists; it cannot say what to do
+about it, which is precisely the gap. The codebase already made this call once,
+for review, and wrote down why. Extending that decision is cheaper and more
+consistent than reversing it.
+
+### Design findings
+
+**D-1 — the band must not become the eighth thing in the corner. HIGH.** Three
+Getting Started checklists ship (F2) and the onboarding pill sits bottom-right.
+The band is only defensible because it is absent when idle. If it ever gains a
+persistent resting state, it has become a nag and this review's approval does
+not carry.
+
+**D-2 — one sentence, one action, no counter. MEDIUM.** The band's failure mode
+is growing into a dashboard. Its contract: at most one sentence and at most
+three controls, matching what `ReviewBar` ships today.
+
+**D-3 — state derivation is the hard part, not the pixels. HIGH.** Every row in
+the copy table above is a query against real state (`Site.creationMethod`, page
+count, `reviews.currentRound`, `lastPublishedAt`, dirty-since-publish, role).
+The band is a thin renderer over that; if the derivation is wrong the band lies
+more visibly than the checklist ever did, because it sits at the top of the
+screen. Land the derivation with tests before the band renders anything.
