@@ -545,3 +545,79 @@ site, ever (`AquibraStudio.tsx:392` re-sends with `clientEmail: undefined`;
 is fixed the copy stands as drawn; if it is not, the terminal screen should not
 promise a link nothing can send.
 
+
+---
+
+## Phase A findings — 2026-08-27
+
+### R0 — CLOSED, and the diagnosis was understated
+
+Not "the element library has no icons": the **artwork was already written and
+nothing rendered it**. `ElEntry.iconHtml` carries a distinct hand-drawn glyph
+for every catalog entry — 59 entries, **53 distinct** — with a doc comment
+describing a render that did not exist. Meanwhile `ProInspector` showed a real
+per-type lucide glyph for the same element, so the product disagreed with
+itself about whether an element has a face.
+
+Restoring the map alone would not have fixed Layers: **19 of
+`ELEMENT_TYPE_LABELS`'s 41 types** — every HTML-tag alias, `h1` through
+`divider` — fell through to `default: Box`. The map now covers all 41.
+
+Live at 1440×900: Insert 53 rows / 53 glyphs / **53 distinct**. Layers 34 rows /
+34 glyphs / 7 distinct (the fixture page has 7 types). Commit `7f0ab31f`.
+
+Reverses the 2026-08-06 founder call; the revert is one conditional in
+`GroupSection` and one span in `LayerTreeItem`.
+
+### R1 — the inspector was telling the truth. The CANVAS was lying.
+
+The ledger read this as "inspector shows a value that is not the element's".
+Measured live with `CSS.getMatchedStylesForNode` — Chrome naming its own
+winners, not a stylesheet walk — it is the other way round.
+
+A canvas H2 computed **16px** with no authored font-size, while the inspector
+correctly read the element's **36px** type default. Two author rules reached
+customer content:
+
+1. `[data-buildrick-id] h2 { font-size: var(--bk-text-16) }` — `Canvas.css`
+   imposing a **chrome** token, and a scale where an h2 renders at BODY size and
+   h3/h4 render *smaller* than body.
+2. `h1, h2, h3, h4, h5, h6 { font-size: inherit }` — **Tailwind preflight**.
+
+The second is the structural one. `src/themes/tw.css` excludes preflight on
+purpose ("the canvas mounts customer HTML+CSS in this same document, §4.1") —
+but the shipping editor is the one bundled into Next, and
+`packages/dashboard/app/globals.css:23` does a bare `@import 'tailwindcss'`,
+unscoped and app-wide. **The editor's protection is defeated by its host in the
+build every real user runs.** Same family as
+`feedback_css_layer_order_differs_per_build`.
+
+Both fixed:
+
+- The chrome-token paint is gone from `Canvas.css` — headings, `p`, `a`,
+  `button` (every customer button wore the Buildrick accent), and form
+  controls. Editor affordances (outlines, cursors, selection, drop feedback,
+  empty-container hints) stay.
+- The browser's own defaults are restored for the canvas subtree, in
+  `themes/design-system/site-content.css` — the site domain, not chrome, which
+  is where Gate 3 requires them. Selector is
+  `:where(.buildrick-canvas h1)`: **zero specificity**, so any rule the
+  customer's own stylesheet carries still wins, and unlayered, so it still
+  outranks preflight's `base` layer.
+
+Live: the legacy H2 went 16px → **24px**, which is what the published page
+renders. A freshly inserted Heading is unaffected at 36px inline —
+`applyTypeDefaults` already seeds real defaults, so R1's "lying inspector" only
+ever showed on legacy and imported content.
+
+**Half of R1 remains open.** On an element with no authored value the inspector
+prints the type default as though it were the element's own — 36 over something
+rendering 24. Nothing marks it "not set". `PropertyState.isOverridden` already
+exists to carry that distinction.
+
+### Still open from Phase A
+
+`[data-buildrick-id] * { color: inherit }` (`Canvas.css`) forces every
+descendant of customer content to inherit colour, which the customer's own
+nested rules should be free to override. Wider blast radius than the rest of
+this pass; left for its own change.
