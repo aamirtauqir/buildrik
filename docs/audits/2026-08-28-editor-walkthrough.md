@@ -77,9 +77,11 @@ confirm (`editsRequireApproval: false`, round PENDING).
 ## Client sign-off page (1280×720, no account)
 
 A0 identify ✓ · A viewing ✓ (Approve/Request-changes clear of the cookie banner
-after this arc's fix — y607 vs banner y672) · dead-link copy ✓ (4 variants in
-source, tested). Eight NEW boards drawn this arc (`1339:*`); B commenting and
-E post-approval-edited remain unwalked and undrawn.
+after this arc's fix — y607 vs banner y672) · B commenting ✓ (walked live —
+note typed, added, rendered back, then cleaned up) · D approved ✓ ·
+E post-approval-edited ✓ (BUILT this arc — the payload never carried the flag;
+verified at the service in both directions) · dead-link copy ✓ (4 variants).
+All ten states have boards (`1339:*`, `1340:*`) — the family is complete.
 
 ## ACTIVE vs NEW — the standing difference count
 
@@ -87,10 +89,11 @@ E post-approval-edited remain unwalked and undrawn.
   exceptions are disposed in `2026-08-27-figma-coverage-active-vs-new.md`
   (three real gaps → two now have boards, plugins/invite remain; two are a
   settled rail decision; one maps to Brand).
-- 363 active NEW boards: **359 settled** (code-backed / walked / board-authoritative),
-  **4 open** — all four are unbuilt FEATURES, not conformance:
-  cross-page move + element deep-link, template section catalog, review round
-  linkage, migration UI. Founder decisions.
+- 365 active NEW boards: **363 settled** (code-backed / walked / board-authoritative),
+  **2 open** — both founder-DEFERRED features, not conformance: the template
+  section catalog (waiting on template inventory) and the migration UI. Of the
+  four that were open when this document was first written, Copy link and the
+  rounds history shipped the same day.
 - 41 design-ahead: boards drawing states the product cannot produce (each one's
   reason is in its census row).
 
