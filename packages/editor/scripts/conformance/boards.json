@@ -5,8 +5,8 @@
   "generatedAt": "2026-08-14",
   "counts": {
     "total": 431,
-    "active": 368,
-    "designAhead": 36,
+    "active": 367,
+    "designAhead": 37,
     "outOfScope": 27,
     "activeFamilies": 35
   },
@@ -2265,8 +2265,8 @@
       "state": "force-refresh · new-version-available",
       "width": 1440,
       "height": 900,
-      "status": "active",
-      "authority": "open:new-version-detect",
+      "status": "design-ahead",
+      "authority": "blocked:no-version-detect",
       "recipe": null
     },
     {
@@ -3542,7 +3542,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "open:menu-awaiting-backing",
+      "authority": "blocked:no-cross-page-move-or-deep-link",
       "recipe": null
     },
     {
