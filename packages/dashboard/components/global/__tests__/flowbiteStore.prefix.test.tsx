@@ -119,4 +119,46 @@ describe("dashboard flowbite prefix wiring (flowbite-bigbang collision fix)", ()
     const importsFlowbiteStore = /^\s*import\s+["']@\/components\/global\/flowbiteStore["'];?\s*$/m.test(layoutSource);
     expect(importsFlowbiteStore).toBe(true);
   });
+
+  /**
+   * FIX ROUND 2 — the 6th "guard that passes while the thing it guards is
+   * broken" in this arc, and this file was the guard.
+   *
+   * Everything above proves the prefix is set when `components/global/
+   * flowbiteStore` is IMPORTED. In vitest that import runs in the test
+   * process, so it always looks wired. In the app it does not: that module
+   * has no "use client" and is imported by app/layout.tsx, a Server
+   * Component — so `setStore` only ever ran on the SERVER. Every flowbite
+   * component rendered in the browser used the DEFAULT prefix and emitted
+   * unprefixed classes, which this package's Tailwind never compiles.
+   *
+   * Measured in a real browser before the fix: the cookie banner's primary
+   * "Accept All" carried `bg-blue-700 text-white` with a rule for text-white
+   * (dashboard code uses it) and none for bg-blue-700 (only flowbite does) —
+   * white text on a transparent background over a white bar, contrast 1.0.
+   * 23 such controls across 14 routes, "New site" and "Upload" among them.
+   *
+   * The client half is `<ThemeInit />` from the CLI-generated
+   * .flowbite-react/init.tsx, which resolves to StoreInitClient in the
+   * browser. Assert it is both imported and rendered — an import alone is
+   * dead weight for a component.
+   */
+  it("STATIC WIRING CHECK: app/layout.tsx renders <ThemeInit /> — the CLIENT half of the prefix wiring", () => {
+    const layoutSource = readFileSync(path.resolve(__dirname, "../../../app/layout.tsx"), "utf-8");
+    expect(/^\s*import\s+\{\s*ThemeInit\s*\}\s+from\s+["']@\/\.flowbite-react\/init["'];?\s*$/m.test(layoutSource)).toBe(true);
+    // Comments stripped first. The first version of this assertion searched the
+    // raw source and was satisfied by the words "<ThemeInit />" inside the
+    // explanatory comment directly above the JSX — it stayed green with the real
+    // element deleted. Seventh time in this arc; caught by deleting the element
+    // and watching the test pass anyway.
+    const code = layoutSource.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+    expect(/<ThemeInit\s*\/>/.test(code)).toBe(true);
+  });
+
+  it("the generated init module carries the same prefix as config.json — a regenerate that drops it must fail here", async () => {
+    const config = JSON.parse(readFileSync(path.resolve(__dirname, "../../../.flowbite-react/config.json"), "utf-8"));
+    expect(config.prefix).toBe("tw");
+    const initSource = readFileSync(path.resolve(__dirname, "../../../.flowbite-react/init.tsx"), "utf-8");
+    expect(initSource).toContain('prefix: "tw"');
+  });
 });
