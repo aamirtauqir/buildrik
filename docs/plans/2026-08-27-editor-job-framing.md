@@ -450,3 +450,136 @@ count, `reviews.currentRound`, `lastPublishedAt`, dirty-since-publish, role).
 The band is a thin renderer over that; if the derivation is wrong the band lies
 more visibly than the checklist ever did, because it sits at the top of the
 screen. Land the derivation with tests before the band renders anything.
+
+---
+
+## ENG REVIEW — 2026-08-27 `[subagent-only]`
+
+Codex was not re-run for this phase after its design-phase timeout; this is the
+Claude eng subagent, tagged accordingly.
+
+### The shape of the finding: the data arrives and the mapper drops it
+
+Six of the seven states assemble from reads the editor **already makes**. Two
+inputs are on the wire and thrown away by their own mappers:
+
+| Input | Where it is dropped |
+|---|---|
+| `Site.creationMethod` | `getSite` has no `select`, so every scalar returns. `BuildrikSyncProvider.loadProject:293-332` maps `name` / `domain` / `projectSettings` / `projectStyles` / `dsSchemaVersion` / `lastEditedAt` and never reads it |
+| `Site.lastPublishedAt` | `PublishService.fetchSitePublishState:133-144` narrows the cast to `{status, publishedUrl}`, dropping `lastPublishedAt`, `lastEditedAt`, `creationMethod` and `pages` |
+
+Both are cast/mapping changes. **Zero server work.**
+
+### Three real bugs the plan did not know about
+
+**E-1 — `sites.myRole` returns the wrong role for site-scoped members. HIGH.**
+It does a bare `workspaceMember.findFirst` and returns `member.role`
+(`server/trpc/routers/sites.ts:202-217`). Every *enforcement* path resolves a
+per-site override instead: `const effectiveRole = row?.roleOverride ?? member.role`
+(`permission.service.ts:103-104`). So the chrome and the server disagree about
+who someone is. A band whose whole contract is *"name the move that belongs to
+the person reading it"* is the surface that gets this wrong first. One-line
+server fix, and it **is** server work.
+
+**E-2 — `agency_layer` is default-off and gates four of the seven states.**
+`isFeatureEnabled` returns `row?.enabled ?? false` — *"default-off, ships dark"*.
+With it off, `reviews.status` returns `{state:"none"}`, which is
+**indistinguishable from "has content, never reviewed"**, and the flag state is
+never sent to the client. So the band would offer *"Ready to show your client? →
+Send for review"* as a door into a mutation that hard-fails `requireAgencyLayer`.
+The flag has to reach the editor, or the band lies in every workspace that does
+not have it.
+
+**E-3 — "edited since publish" does not exist, and the nearest thing resets on
+reload. CRITICAL for D-3.** `isDirty` is dirty-since-**save** and lives about a
+second (`AUTOSAVE_DEBOUNCE` is 1000ms). `usePublishSnapshot:150-166` counts
+history entries after the last deploy — but `HistoryManager.clear()` is
+`this.undoStack = []` with no persistence, and `importProject` runs on every
+load, so **on a fresh tab the count is 0**. Publish, edit, close the tab, reopen
+tomorrow: the band says *"Live"* over a site with real unpublished changes. That
+is D-3's failure mode, at the top of the screen.
+
+The durable signal is already in the schema and nothing computes it:
+`Site.lastEditedAt` (written on every `saveProjectData`) vs `Site.lastPublishedAt`
+(written by the publish worker). And the codebase already ships this exact
+comparator for a different pair — `isApprovalStale` (`publish-approval.ts:58-64`)
+is `editedAt.getTime() > approvedAt.getTime()`, and its result reaches the editor
+as `reviewStatus.state === "approved-edited-since"`. The publish variant is the
+same three lines against a different column.
+
+Caveat to carry: `lastEditedAt` is bumped by non-content writes too —
+`renameSite`, duplicate — so client-side it means "any write", not "content
+changed".
+
+### B4 — confirmed, unconditional, and the fix has a second half
+
+Confirmed statically and it does **not** depend on React batching: no render can
+interleave inside one synchronous JS turn, and `EventEmitter.emit` calls handlers
+inline, so the ref is stale by construction. The damage is wider than the
+counter — `activeStepId`, the achievement payload and `isLastStep` all derive
+from the stale value.
+
+The fix, in this repo's own recorded idiom
+(`feedback_setter_closure_stale_state`, `feedback_persistall_stale_state`):
+delete the render-time assignment, make the ref the authoritative working copy
+written at commit time inside the handler, then `setSteps`, then persist.
+
+**And `replayAll` must write `stepsRef.current` in the same commit.** It does not
+today, and only self-heals *because of* the render-time assignment being removed
+— miss it and one stale-ref bug is traded for another. That is this repo's
+`grep the whole file after a decision changes` pattern.
+
+**Scoping note that changes B4's test.** Its headline example (an insert
+emitting `element:inserted` + `style:changed`) **disappears once B3 lands**,
+because B3 stops crediting `change-style` on default styles. B4 is still real —
+any two outcome events in one turn collide, and B2 adds more — but the
+regression test must construct the collision deliberately rather than lean on
+the insert.
+
+### Why the existing suites never caught it
+
+`useOnboardingOrchestrator.test.ts` puts **every `completeStep` in its own
+`act()`**, which flushes a render between calls — structurally incapable of
+seeing B4. `OnboardingMount.signals.test.tsx` mocks the orchestrator entirely,
+so the real hook never runs; it cannot see B2, B4 or B5 either.
+
+### Test plan
+
+Mirror the precedent already in the tree — `publish-approval.ts`, *"Pure
+decision function (no DB) so it is trivially unit-testable"*, with its own
+table-test.
+
+1. **Pure `deriveLifecycleState(input) → {state, sentence, actions} | null`** —
+   a plain record in, no React, no fetches. Table-test the seven rows, the four
+   off-happy-path rows, and the eighth load-bearing row: **returns `null` when
+   there is no next move**. That row is design finding D-1; without it the band
+   is a nag.
+2. **Thin `useLifecycleState()`** assembling the record from existing services,
+   tested the way `ReviewBar.test.tsx` already is.
+3. **Rendering test asserting D-2 mechanically** — ≤1 sentence, ≤3 controls, no
+   counter, and every disabled action carries its reason.
+
+Two harness traps this repo has already paid for, both live here:
+
+- **The hollow `page.root` trap.** `PageData.root` carries no children for any
+  page that is not open (`Composer.ts:588`), which already shipped broken in
+  React export and Duplicate page. A naive
+  `pages.every(p => p.root.children.length === 0)` calls a multi-page site
+  empty. The emptiness fixture must make the page-map snapshot and the element
+  registry **disagree**, or the test proves nothing.
+- **A green suite proves nothing about a flag-gated producer.** With
+  `agency_layer` off, four states never occur. Test the flag-off shape
+  explicitly.
+
+### ENG DUAL VOICES — CONSENSUS
+
+| # | Dimension | Claude | Codex | Consensus |
+|---|---|---|---|---|
+| 1 | Architecture sound? | yes, with E-1/E-2 fixed first | `[codex-unavailable]` | subagent-only |
+| 2 | Test coverage sufficient? | no — existing suites structurally cannot see B4 | `[codex-unavailable]` | subagent-only |
+| 3 | Performance risks addressed? | yes — every input is an existing read | `[codex-unavailable]` | subagent-only |
+| 4 | Security threats covered? | **no — E-1 is a role-disagreement between chrome and server** | `[codex-unavailable]` | subagent-only |
+| 5 | Error paths handled? | no — E-2 flag-off and E-3 fresh-tab both render a lie | `[codex-unavailable]` | subagent-only |
+| 6 | Deployment risk manageable? | yes — the band is absent until derivation lands | `[codex-unavailable]` | subagent-only |
+
+Single-voice phase. Two of six are hard blockers on the band rendering anything.
