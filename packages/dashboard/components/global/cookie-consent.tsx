@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Shield } from "lucide-react";
 import { ToggleSwitch } from "flowbite-react";
 import { Button, Modal } from "@/components/dashboard/primitives";
@@ -57,6 +57,36 @@ export function CookieConsent() {
     setShowManage(false);
   };
 
+  /* THE BANNER PUBLISHES ITS OWN HEIGHT (2026-08-27).
+     It is `fixed` at `z-[9998]`, so it covers whatever sits at the bottom of
+     the page. Measured live at 1280x720 on `/review/<token>`: the banner spans
+     y 672-708 and the two buttons that page exists for — "Approve this design"
+     and "Request changes" — sit at y 668-704. Both were completely covered. The
+     page's own source says it: "A client who cannot see 'Approve' does not
+     approve."
+
+     Rather than guess at document padding (which does nothing for a sticky
+     footer inside a full-height scroll container), the banner states its height
+     as `--cookie-inset` and anything bottom-anchored offsets by it. Cleared the
+     moment the banner goes, so the offset never outlives the thing it is for. */
+  const barRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const el = barRef.current;
+    const root = document.documentElement;
+    if (!show || showManage || !el) {
+      root.style.removeProperty("--cookie-inset");
+      return;
+    }
+    const publish = () => root.style.setProperty("--cookie-inset", `${Math.round(el.getBoundingClientRect().height)}px`);
+    publish();
+    const ro = typeof ResizeObserver === "function" ? new ResizeObserver(publish) : null;
+    ro?.observe(el);
+    return () => {
+      ro?.disconnect();
+      root.style.removeProperty("--cookie-inset");
+    };
+  }, [show, showManage]);
+
   if (!show) return null;
 
   if (showManage) {
@@ -94,6 +124,7 @@ export function CookieConsent() {
 
   return (
     <div
+      ref={barRef}
       className="fixed bottom-0 left-0 right-0 z-[9998] border-t bg-white px-4 py-3 shadow-lg sm:px-6"
       style={{
         borderColor: "var(--color-border-default)",

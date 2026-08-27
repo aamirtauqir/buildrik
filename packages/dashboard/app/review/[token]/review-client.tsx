@@ -94,8 +94,17 @@ function Shell({
       {/* Sticky, not static. At 1280x720 the two buttons this page exists for
           sat at y=733 — past the fold, on the one screen size we call the
           minimum. A client who cannot see "Approve" does not approve. */}
+      {/* And offset by the cookie banner, which is `fixed` at z-[9998] and was
+          sitting exactly on top of these two buttons — measured at 1280x720,
+          the banner spans y 672-708 and Approve/Request changes sat at y
+          668-704, fully covered. The banner publishes its height as
+          `--cookie-inset` (components/global/cookie-consent.tsx); 0 when it is
+          not there. */}
       {footer ? (
-        <footer className="sticky bottom-0 z-40 shrink-0 border-t border-[#E5E7EB] bg-white px-6 py-4">
+        <footer
+          className="sticky z-40 shrink-0 border-t border-[#E5E7EB] bg-white px-6 py-4"
+          style={{ bottom: "var(--cookie-inset, 0px)" }}
+        >
           {footer}
         </footer>
       ) : null}
