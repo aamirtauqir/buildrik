@@ -715,3 +715,41 @@ for a beat; `undefined` is a standing condition (an old deploy, a rollout
 mid-flight) and falls through to publish, where `publish-approval.ts` is the
 real gate. Blocking every publish for the length of a rollout is the worse
 failure.
+
+---
+
+## The unverified rows are verified — 2026-08-27, later
+
+The commit for Slot A recorded six review-dependent CTA rows as covered by
+table tests and a service smoke but **not walked in the running app**, for two
+stated reasons: a dev server serving stale route code, and a batch-response
+intercept that could not drive review state.
+
+The dev server restarted at 19:36 and now serves current route code —
+`reviews.status` returns `reviewsEnabled` and `editsRequireApproval` over HTTP,
+which it did not before. That removed both obstacles at once: with a real
+server there is nothing to intercept.
+
+Walked by moving the fixture's own review round through each state in the
+database and reading the topbar CTA at 1440×900. No intercepts, no stubs.
+
+| Review state | CTA | Disabled | Line |
+|---|---|---|---|
+| approval OFF, pending | `Publish` | no | "Not live yet." |
+| none (round revoked) | **`Send for review`** | no | "This workspace publishes after a client approves." |
+| pending | `Publish` | **yes** | tooltip: "Waiting on your client's approval" |
+| changes-requested | **`Open feedback`** | no | "Your client asked for changes." |
+| approved | `Publish` | no | "Approved — ready to go live." |
+| approved-edited-since | `Publish` | no | "Edited since approval — your client hasn't seen these changes." |
+
+Every row matches `deriveLifecycleState`'s table, including the deviation from
+wireframes §2 that was argued for in the commit: `changes-requested` opens the
+feedback instead of greying out Publish.
+
+The round and the workspace policy were restored afterwards and re-read to
+confirm it: `status: PENDING`, `resolvedAt: null`, `revokedAt: null`,
+`editsRequireApproval: false` — the values captured before the walk.
+
+**`opened-not-acted` is still not walked.** It needs a reviewer-opened signal
+that does not live on the round row, so it cannot be staged the way the other
+six were. It remains covered by the table tests only.
