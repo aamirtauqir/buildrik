@@ -87,6 +87,10 @@ export function useHistoryFeedback(
       return formatted;
     };
 
+    /* Board 814:7027 puts the reverse-action link on EVERY undo/redo toast,
+       not only the destructive ones — a misfired ⌘Z deserves a one-click way
+       back no matter what it reverted. Destructive labels keep the longer
+       linger they had. */
     const handleUndo = (data: { entry: { label?: string } }) => {
       const action = formatLabel(data.entry.label);
       const isDestructive = DESTRUCTIVE_LABELS.has(data.entry.label?.toLowerCase() ?? "");
@@ -95,9 +99,7 @@ export function useHistoryFeedback(
         description: action,
         tone: "info",
         duration: isDestructive ? 4000 : 2500,
-        ...(isDestructive && {
-          action: { label: "Redo", onClick: () => composer.history.redo() },
-        }),
+        action: { label: "Redo", onClick: () => composer.history.redo() },
       });
     };
 
@@ -109,9 +111,7 @@ export function useHistoryFeedback(
         description: action,
         tone: "info",
         duration: isDestructive ? 4000 : 2500,
-        ...(isDestructive && {
-          action: { label: "Undo", onClick: () => composer.history.undo() },
-        }),
+        action: { label: "Undo", onClick: () => composer.history.undo() },
       });
     };
 

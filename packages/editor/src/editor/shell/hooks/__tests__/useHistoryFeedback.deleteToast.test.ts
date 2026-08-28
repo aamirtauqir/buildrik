@@ -125,3 +125,28 @@ describe("a keyboard delete announces itself", () => {
     expect(addToast).not.toHaveBeenCalled();
   });
 });
+
+/* Board 814:7027 puts the reverse-action link on EVERY undo/redo toast; an
+   earlier version gated it on the destructive labels, so a misfired ⌘Z over a
+   nudge or a style change offered no way back. */
+describe("undo/redo toasts always carry the reverse action", () => {
+  it("non-destructive undo still offers Redo", () => {
+    const c = makeComposer([], {});
+    renderHook(() => useHistoryFeedback(c as never, addToast as never));
+    c.emit(EVENTS.HISTORY_UNDO, { entry: { label: "nudge" } });
+    const t = addToast.mock.calls[0][0] as { action?: { label?: string; onClick?: () => void } };
+    expect(t.action?.label).toBe("Redo");
+    t.action?.onClick?.();
+    expect(c.history.redo).toHaveBeenCalledTimes(1);
+  });
+
+  it("non-destructive redo still offers Undo", () => {
+    const c = makeComposer([], {});
+    renderHook(() => useHistoryFeedback(c as never, addToast as never));
+    c.emit(EVENTS.HISTORY_REDO, { entry: { label: "style-change" } });
+    const t = addToast.mock.calls[0][0] as { action?: { label?: string; onClick?: () => void } };
+    expect(t.action?.label).toBe("Undo");
+    t.action?.onClick?.();
+    expect(c.history.undo).toHaveBeenCalledTimes(1);
+  });
+});
