@@ -378,9 +378,12 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
   const pct = total === 0 ? 0 : Math.round((resolvedComments.length / total) * 100);
 
   /* The progress row and the sent line are the frame — every board carries
-     them, including the error one. */
+     them, including the error one. The BAR itself only renders once there is
+     something to measure: "0 of 0" over an empty thread was a gauge with no
+     quantity (designer walk 2026-08-28). The sent line stays either way. */
   const progress = (
     <div className="tw:flex tw:flex-col tw:gap-2 tw:px-3 tw:pt-3 tw:pb-2">
+      {total > 0 && (
       <div className="tw:flex tw:items-center tw:gap-3">
         <span
           className="tw:h-1.5 tw:flex-1 tw:rounded-full tw:bg-[var(--bk-bg-subtle)] tw:overflow-hidden"
@@ -399,6 +402,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
           {resolvedComments.length} of {total}
         </span>
       </div>
+      )}
       {round ? <span className={META}>{sentLine(round)}</span> : null}
       {notice ? <span className={META}>{notice}</span> : null}
     </div>
