@@ -6,7 +6,7 @@
  */
 
 import * as React from "react";
-import { ModalBody, ModalClose, ModalContent, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
+import { ModalBody, ModalClose, ModalContent, ModalRoot, ModalTitle, TextInput } from "@/editor/chrome-ui";
 import { GROUPED_TABS_CONFIG } from "../rail/tabsConfig";
 
 // =============================================================================
@@ -71,13 +71,21 @@ const SHORTCUT_GROUPS: ShortcutGroup[] = [
 // KEY BADGE
 // =============================================================================
 
-const KeyBadge: React.FC<{ children: string }> = ({ children }) => {
+/** The key as the USER sees it — ⌘ on Mac, Ctrl elsewhere. One function, used
+ *  by both the badge and the search filter: the data stores "Ctrl+Z", the
+ *  screen shows "⌘+Z", and a search has to match what is on the screen, not
+ *  what is in the array. */
+export function displayKey(key: string): string {
   const isMac =
     typeof navigator !== "undefined" && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
-  const display = children
+  return key
     .replace(/Ctrl/g, isMac ? "⌘" : "Ctrl")
     .replace(/Shift/g, isMac ? "⇧" : "Shift")
     .replace(/Alt/g, isMac ? "⌥" : "Alt");
+}
+
+const KeyBadge: React.FC<{ children: string }> = ({ children }) => {
+  const display = displayKey(children);
 
   return (
     <span
@@ -113,6 +121,30 @@ export const KeyboardShortcutsPanel: React.FC<KeyboardShortcutsPanelProps> = ({
   isOpen,
   onClose,
 }) => {
+  /* Board 815:4518 puts "Search shortcuts…" at the top and the overlay shipped
+     without it — sixty-one shortcuts in one modal and the only way to find one
+     was to read them all. Filters on the description AND the key, so "undo"
+     and "⌘Z" both land. Groups whose every row is filtered out disappear with
+     their heading; a heading over nothing is furniture. Cleared each open —
+     yesterday's query is not today's question. */
+  const [query, setQuery] = React.useState("");
+  React.useEffect(() => {
+    if (isOpen) setQuery("");
+  }, [isOpen]);
+  const q = query.trim().toLowerCase();
+  const visibleGroups = q
+    ? SHORTCUT_GROUPS.map((g) => ({
+        ...g,
+        shortcuts: g.shortcuts.filter(
+          (r) =>
+            r.desc.toLowerCase().includes(q) ||
+            /* Both spellings: the stored "Ctrl+Z" AND the rendered "⌘+Z" —
+               someone on a Mac searches what the badge shows. */
+            r.key.toLowerCase().includes(q) ||
+            displayKey(r.key).toLowerCase().includes(q),
+        ),
+      })).filter((g) => g.shortcuts.length > 0)
+    : SHORTCUT_GROUPS;
   return (
     <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
       <ModalContent size="lg">
@@ -123,6 +155,19 @@ export const KeyboardShortcutsPanel: React.FC<KeyboardShortcutsPanelProps> = ({
           </svg>
         </ModalClose>
         <ModalBody>
+    <TextInput
+      type="search"
+      value={query}
+      onChange={(e) => setQuery(e.target.value)}
+      placeholder="Search shortcuts…"
+      aria-label="Search shortcuts"
+      className="tw:mb-3"
+    />
+    {q && visibleGroups.length === 0 && (
+      <p className="tw:text-[13px] tw:text-[var(--bk-ink-muted)]">
+        Nothing matches &lsquo;{query.trim()}&rsquo;.
+      </p>
+    )}
     <div
       style={{
         display: "grid",
@@ -133,7 +178,7 @@ export const KeyboardShortcutsPanel: React.FC<KeyboardShortcutsPanelProps> = ({
         padding: "8px 0",
       }}
     >
-      {SHORTCUT_GROUPS.map((group) => (
+      {visibleGroups.map((group) => (
         <div key={group.label}>
           {/* Group heading */}
           <div
