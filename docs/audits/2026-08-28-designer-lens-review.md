@@ -74,7 +74,33 @@ reports (kept in the session log; top items below):
    page"; `Colour` beside `Colors`). Plus 13 more modals without `ModalBody`
    (inventoried; two proven-broken ones fixed above).
 
-These are a dedicated design-debt arc (codemods + one gate amendment), not
-inline fixes — proposed order: primitives-on-tokens → Button wrapper →
-blue/gray codemod → EmptyState contract → copy rule + `gate:copy`. Founder
-call to schedule.
+**SHIPPED same day** (the founder's goal ran the arc immediately), in the
+auditors' own order:
+
+1. **Primitives on tokens** — PanelHeader / SectionHeader / EmptyState /
+   Modal rewritten on `var(--bk-*)` (every swap value-identical, checked
+   against tokens.generated.css) + a five-role type ramp exported from
+   chrome-ui (`TYPE_PANEL_TITLE/SECTION_CAPTION/BODY/LABEL/HINT_CLASS`).
+2. **Button wrapper** — third member of the closed wrapper set (manifest +
+   gate copy amended in the same commit). `variant` maps
+   primary/secondary/ghost/link/danger; BK_BUTTON_THEME adds ONLY the two
+   missing vocabulary keys, so ~850 existing call sites pass through
+   byte-identical. A bare `<Button>` was already the brand accent — the
+   flowbite primary scale IS Flowbite blue.
+3. **Blues unified** — 109 `tw:*-blue-700/800` sites codemodded to the accent
+   tokens; live probe: "Browse stock" now computes rgb(26,86,219) — the same
+   cobalt as Publish. `failure`→`red`; the three purple buttons dropped to
+   primary. Avatar identity tones stay allowlisted (Gate 18 parity).
+4. **EmptyState contract** — `align="start"` covers the boards' left-anchored
+   language; ComponentsTab's bare markup and ColorTokenList's action-less
+   line migrated (the latter finally has "+ Add a color").
+5. **One copy voice** — sentence case across the ⌘K palette, the command
+   registry (25 labels) and the canvas context menus (acronyms kept);
+   Create/Rename component unified; Colour→Color; the "My Awesome …"
+   placeholders retired; "Template applied!" calmed.
+
+**And a floor under the rest**: `gate:design-debt-ratchet` (wired into
+verify:ds, negative-tested with a planted violation) locks offbrand-blue at
+ZERO and ratchets the ghost-link recipe (44), off-scale font sizes (86) and
+palette-gray text (470) strictly downward. The long tail drains against
+those baselines the way the hex ratchet drained.
