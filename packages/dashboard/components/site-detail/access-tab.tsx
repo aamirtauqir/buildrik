@@ -109,7 +109,7 @@ export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDay
       <SectionCard
         title="Share Links"
         actions={
-          <Button size="sm" onClick={() => setShowCreate(!showCreate)} className="gap-1"><Plus className="h-3 w-3" />New Link</Button>
+          <Button size="sm" onClick={() => setShowCreate(!showCreate)} className="gap-1"><Plus className="h-3 w-3" />New link</Button>
         }
       >
         <p className="mb-4 text-body-sm" style={{ color: "var(--color-text-muted)" }}>
@@ -152,7 +152,7 @@ export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDay
                 })}
               </div>
             </div>
-            <Button onClick={handleCreate}>Create Link</Button>
+            <Button onClick={handleCreate}>Create link</Button>
           </div>
         )}
         {shareLinks.length === 0 ? (

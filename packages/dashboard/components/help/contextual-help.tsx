@@ -101,7 +101,7 @@ export function ContextualHelp() {
           style={{ borderColor: "var(--color-border-default)" }}
         >
           <div className="border-b px-4 py-3" style={{ borderColor: "var(--color-border-default)" }}>
-            <p className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>Helpful Articles</p>
+            <p className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>Helpful articles</p>
           </div>
           <div className="divide-y" style={{ borderColor: "var(--color-border-default)" }}>
             {articles.map((article) => (

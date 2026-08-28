@@ -69,7 +69,7 @@ function TemplatesBrowserInner() {
       {/* Top row — this is an ecosystem tab (like Marketplace); the topbar's
           "Dashboard" link is the way back to the workspace, so no in-page back. */}
       <div className="mb-5 flex items-center gap-4">
-        <h1 className="text-[19px] font-[680] tracking-tight" style={{ color: "var(--color-text-primary)" }}>
+        <h1 className="text-page-title tracking-tight" style={{ color: "var(--color-text-primary)" }}>
           Templates
         </h1>
         <InputField

@@ -77,7 +77,10 @@ export function HelpCenter({ onSearch, onSelectCategory, onContactSupport, searc
     <div className="space-y-8">
       {/* Hero */}
       <div className="text-center">
-        <h1 className="text-[30px] font-extrabold leading-tight tracking-[-0.02em]" style={{ color: "var(--color-text-primary)" }}>
+        {/* text-display (28/700) — this was text-[30px]/extrabold, the only
+            30px in the dashboard. The token existed with no consumer; a
+            centred hero on a sidebar-less page is what it is for. */}
+        <h1 className="text-display tracking-[-0.02em]" style={{ color: "var(--color-text-primary)" }}>
           How can we help?
         </h1>
         <p className="mt-1.5 text-body" style={{ color: "var(--color-text-secondary)" }}>

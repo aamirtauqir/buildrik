@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Pencil, ExternalLink, Send, Share2, MoreHorizontal, LayoutTemplate } from "lucide-react";
+import { Pencil, ExternalLink, Send, Share2, MoreHorizontal, LayoutTemplate } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { siteAddress } from "@lib/utils";
 import { EditorLink } from "@/components/editor-route/EditorLink";
@@ -64,9 +64,9 @@ export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
 
   return (
     <div>
-      <Link href="/dashboard/projects" className="mb-3 inline-flex items-center gap-1 text-body transition-colors hover:underline" style={{ color: "var(--color-text-secondary)" }}>
-        <ArrowLeft className="h-4 w-4" />Back to sites
-      </Link>
+      {/* No "Back to sites" link. `sites/[id]/layout.tsx` — SiteHeader's only
+          render site — always draws a breadcrumb whose "Sites" item points at
+          the same /dashboard/projects. Two controls, one destination, stacked. */}
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-lg font-bold text-white" style={{ backgroundColor: "var(--color-ink)" }}>

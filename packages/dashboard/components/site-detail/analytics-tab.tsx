@@ -56,7 +56,7 @@ export function AnalyticsTab({ data, range, onRangeChange, isLoading }: Analytic
       {!isLoading && data && data.timeSeries.length === 0 && data.trafficSources.length === 0 && data.countries.length === 0 && (data.devices?.length ?? 0) === 0 && (
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <BarChart3 className="h-10 w-10 mb-4" style={{ color: "var(--color-text-muted)" }} />
-          <h3 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>No analytics data yet</h3>
+          <h3 className="text-section-title" style={{ color: "var(--color-text-primary)" }}>No analytics data yet</h3>
           <p className="text-body mt-1 max-w-sm" style={{ color: "var(--color-text-secondary)" }}>
             Analytics will appear here once your site starts receiving visitors.
           </p>

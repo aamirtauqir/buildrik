@@ -44,7 +44,7 @@ export default function SiteDetailLayout({
   if (!site) {
     return (
       <div className="flex flex-col items-center py-16 text-center">
-        <p className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>
+        <p className="text-section-title" style={{ color: "var(--color-text-primary)" }}>
           Site not found
         </p>
         <p className="mt-1 text-body" style={{ color: "var(--color-text-secondary)" }}>

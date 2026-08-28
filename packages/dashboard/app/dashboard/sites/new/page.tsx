@@ -97,7 +97,7 @@ function NewSitePageInner() {
     return (
       <div className="mx-auto max-w-[600px] pt-12 text-center">
         <h1 className="text-page-title" style={{ color: "var(--color-text-primary)" }}>
-          Create New Site
+          Create a site
         </h1>
         <p className="mt-2 text-body" style={{ color: "var(--color-text-secondary)" }}>
           Choose how you want to get started

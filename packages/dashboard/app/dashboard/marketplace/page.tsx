@@ -134,7 +134,7 @@ export default function MarketplacePage() {
           <p className="mt-2 max-w-[420px] text-[13px]" style={{ color: "rgba(255,255,255,0.6)" }}>{FEATURED_APP.description}</p>
           <Link
             href={INTEGRATIONS_HREF}
-            className="mt-3 inline-flex h-[38px] items-center justify-center rounded-lg bg-white px-4 text-[13px] font-semibold transition-opacity hover:opacity-90"
+            className="mt-3 inline-flex h-10 items-center justify-center rounded-lg bg-white px-4 text-[13px] font-semibold transition-opacity hover:opacity-90"
             style={{ color: "var(--color-ink)" }}
           >
             {FEATURED_APP.cta}

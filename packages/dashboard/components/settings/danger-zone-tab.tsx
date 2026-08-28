@@ -79,7 +79,7 @@ export function DangerZoneTab({
     <div className="space-y-8">
       {/* Export Section */}
       <section>
-        <h2 className="text-base font-semibold mb-1" style={{ color: "var(--color-text-primary)" }}>
+        <h2 className="text-section-title mb-1" style={{ color: "var(--color-text-primary)" }}>
           Export your data
         </h2>
         <p className="text-body mb-4" style={{ color: "var(--color-text-secondary)" }}>
@@ -150,7 +150,7 @@ export function DangerZoneTab({
         )}
 
         <Button type="button" variant="ghost" onClick={onExport} disabled={isExporting}>
-          {isExporting ? "Preparing export..." : "Export My Data"}
+          {isExporting ? "Preparing export..." : "Export my data"}
         </Button>
       </section>
 
@@ -158,7 +158,7 @@ export function DangerZoneTab({
 
       {/* Delete Account Section */}
       <section>
-        <h2 className="text-base font-semibold mb-1" style={{ color: "#771D1D" }}>
+        <h2 className="text-section-title mb-1" style={{ color: "#771D1D" }}>
           Delete account
         </h2>
         <p className="text-body mb-4" style={{ color: "var(--color-text-secondary)" }}>

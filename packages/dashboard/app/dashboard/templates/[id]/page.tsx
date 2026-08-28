@@ -78,7 +78,7 @@ export default function TemplateDetailPage({ params }: { params: Promise<{ id: s
               </div>
 
               <div>
-                <h1 className="text-[22px] font-[680] tracking-tight" style={{ color: "var(--color-text-primary)" }}>{t.name}</h1>
+                <h1 className="text-page-title tracking-tight" style={{ color: "var(--color-text-primary)" }}>{t.name}</h1>
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   <span className="rounded-full px-2.5 py-0.5 text-[12px] font-medium" style={{ backgroundColor: "var(--color-bg-subtle)", color: "var(--color-text-secondary)" }}>
                     {t.category.toLowerCase()}

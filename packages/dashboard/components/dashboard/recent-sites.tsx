@@ -16,7 +16,7 @@ export function RecentSites({ sites }: RecentSitesProps) {
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-section-title text-[var(--color-text-primary)]">Recent Sites</h2>
+        <h2 className="text-section-title text-[var(--color-text-primary)]">Recent sites</h2>
         <Link href="/dashboard/projects" className="text-body-sm text-[var(--color-primary)] hover:underline">
           View All &rarr;
         </Link>

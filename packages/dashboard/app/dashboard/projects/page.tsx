@@ -572,7 +572,7 @@ export default function ProjectsPage() {
           style={{ borderColor: "var(--color-border-default)" }}
         >
           <p
-            className="text-base font-semibold"
+            className="text-section-title"
             style={{ color: "var(--color-text-primary)" }}
           >
             No sites yet

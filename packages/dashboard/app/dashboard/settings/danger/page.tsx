@@ -74,7 +74,7 @@ export default function DangerZonePage() {
     <div className="space-y-10">
       {/* Workspace scope */}
       <section>
-        <h2 className="text-base font-semibold mb-1" style={{ color: "var(--color-text-primary)" }}>
+        <h2 className="text-section-title mb-1" style={{ color: "var(--color-text-primary)" }}>
           Workspace
         </h2>
         <p className="text-body mb-4" style={{ color: "var(--color-text-secondary)" }}>
@@ -94,16 +94,25 @@ export default function DangerZonePage() {
                 : "Only the workspace owner can delete this workspace."}
             </p>
           </div>
+          {/* No `title`. The reason is the <p> directly to the left, which
+              already says "Only the workspace owner can delete this workspace."
+              when the user is not the owner — a hover-only tooltip repeating
+              visible copy helps nobody and reaches no keyboard user. */}
+          <span className="shrink-0">
           <button
             type="button"
             onClick={() => setShowDeleteModal(true)}
             disabled={!isWorkspaceOwner}
-            title={!isWorkspaceOwner && wsQuery.data ? "Only the workspace owner can delete this workspace." : undefined}
-            className="text-body font-medium px-4 py-2 rounded-md border shrink-0 disabled:opacity-60"
+            /* Kept hand-rolled: the DS has no outline-danger variant and this
+               is its only consumer, so adding one would be a variant with a
+               single call site. Aligned to the Button shape instead — it was
+               rounded-md (6px) and ~38px against the DS 8px / 40px. */
+            className="h-10 rounded-lg border px-4 text-body font-medium disabled:opacity-60"
             style={{ borderColor: "var(--color-error)", color: "var(--color-error)" }}
           >
             Delete workspace
           </button>
+          </span>
         </div>
       </section>
 
@@ -111,7 +120,7 @@ export default function DangerZonePage() {
 
       {/* Account scope */}
       <section>
-        <h2 className="text-base font-semibold mb-1" style={{ color: "var(--color-text-primary)" }}>
+        <h2 className="text-section-title mb-1" style={{ color: "var(--color-text-primary)" }}>
           Your account
         </h2>
         <p className="text-body mb-4" style={{ color: "var(--color-text-secondary)" }}>

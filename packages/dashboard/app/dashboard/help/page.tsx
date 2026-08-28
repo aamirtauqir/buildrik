@@ -69,7 +69,7 @@ function HelpPageInner() {
       <div>
         <Breadcrumb current="Submit Ticket" />
         <div className="max-w-lg">
-          <h1 className="mb-6 text-page-title" style={{ color: "var(--color-text-primary)" }}>Submit a Support Ticket</h1>
+          <h1 className="mb-6 text-page-title" style={{ color: "var(--color-text-primary)" }}>Submit a support ticket</h1>
           <TicketForm />
         </div>
       </div>
@@ -103,7 +103,7 @@ function HelpPageInner() {
     return (
       <div>
         <Breadcrumb current={`Search results for "${searchQuery}"`} />
-        <h1 className="mb-6 text-page-title" style={{ color: "var(--color-text-primary)" }}>Search Results</h1>
+        <h1 className="mb-6 text-page-title" style={{ color: "var(--color-text-primary)" }}>Search results</h1>
         {searchResults.isLoading ? (
           <LoadingSkeleton rows={3} variant="list" />
         ) : searchResults.isError ? (

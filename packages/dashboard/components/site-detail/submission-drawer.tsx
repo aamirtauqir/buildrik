@@ -133,7 +133,7 @@ export function SubmissionDrawer({
           className="flex items-center justify-between border-b px-6 py-4"
           style={{ borderColor: "var(--color-border-default)" }}
         >
-          <h2 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>
+          <h2 className="text-section-title" style={{ color: "var(--color-text-primary)" }}>
             Submission Details
           </h2>
           <button

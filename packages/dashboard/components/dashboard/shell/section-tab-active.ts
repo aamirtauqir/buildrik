@@ -19,9 +19,15 @@ export function useSectionTabActive(href: string, opts?: { index?: boolean }): b
 
 /** The sidebar's active visual pattern, shared by both renderers: primary-subtle
  *  fill + semibold + primary text when active; bg-subtle hover; accent
- *  focus-visible ring; 13px labels; 6px radius; 44px touch target on mobile. */
+ *  focus-visible ring; 13px labels; 8px radius; 44px touch target on mobile.
+ *
+ *  The radius says 8px and IS 8px now. It was `rounded-sm` (6px) while the
+ *  sidebar items this comment claims parity with are `rounded-md` (8px) — two
+ *  nav radii under one "shared pattern" doc line. Caught when the button gate
+ *  widened from `button` to `button, a` and the active Agency tab surfaced as
+ *  an undeclared shape. */
 export const sectionTabClass = {
-  base: "flex items-center whitespace-nowrap rounded-sm px-3 py-2 text-body transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] max-lg:min-h-11",
+  base: "flex items-center whitespace-nowrap rounded-md px-3 py-2 text-body transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] max-lg:min-h-11",
   active: "bg-[var(--color-primary-subtle)] font-semibold text-[var(--color-primary)]",
   inactive: "font-medium text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-subtle)] hover:text-[var(--color-text-primary)]",
 };

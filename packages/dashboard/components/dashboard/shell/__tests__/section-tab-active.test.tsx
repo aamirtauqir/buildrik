@@ -48,7 +48,11 @@ describe("useSectionTabActive", () => {
   });
 
   it("exposes shared token classes for both renderers", () => {
-    expect(sectionTabClass.base).toContain("rounded-sm");
+    // rounded-md (8px), the same radius as the sidebar items this constant's
+    // own doc line claims parity with. It was rounded-sm (6px) — two nav radii
+    // under one "shared pattern" comment — until the button gate widened to
+    // anchors and surfaced the active Agency tab as an undeclared shape.
+    expect(sectionTabClass.base).toContain("rounded-md");
     expect(sectionTabClass.active).toContain("--color-primary-subtle");
     expect(sectionTabClass.inactive).toContain("hover:bg-[var(--color-bg-subtle)]");
   });

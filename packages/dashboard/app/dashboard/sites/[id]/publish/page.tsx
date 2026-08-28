@@ -96,11 +96,14 @@ export default function PublishPage() {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
         <div className="mx-auto max-w-lg text-center">
-          <p className="text-body font-semibold" style={{ color: "var(--color-error)" }}>Publish Error</p>
+          <p className="text-body font-semibold" style={{ color: "var(--color-error)" }}>Publish error</p>
           <p className="mt-2 text-body" style={{ color: "var(--color-text-secondary)" }}>{publishError ?? "Something went wrong."}</p>
-          <Button onClick={handleRetryFromError} className="mt-4">
-            Try Again
-          </Button>
+          {/* flex justify-center: the Button primitive is a flowbite `flex`
+              button, so the parent's text-center does not centre it — same
+              defect as the media empty state. */}
+          <div className="mt-4 flex justify-center">
+            <Button onClick={handleRetryFromError}>Try again</Button>
+          </div>
         </div>
       </div>
     );

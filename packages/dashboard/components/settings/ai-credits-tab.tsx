@@ -134,7 +134,7 @@ export function AICreditsTab({
       </SectionCard>
 
       <section>
-        <h2 className="text-base font-semibold mb-3" style={{ color: "var(--color-text-primary)" }}>
+        <h2 className="text-section-title mb-3" style={{ color: "var(--color-text-primary)" }}>
           Generation history
         </h2>
         <div
@@ -213,7 +213,7 @@ export function AICreditsTab({
       </section>
 
       <section>
-        <h2 className="text-base font-semibold mb-3" style={{ color: "var(--color-text-primary)" }}>
+        <h2 className="text-section-title mb-3" style={{ color: "var(--color-text-primary)" }}>
           More AI tools
         </h2>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -225,7 +225,7 @@ export function AICreditsTab({
               aria-disabled="true"
             >
               <div className="absolute top-3 right-3">
-                <Pill tone="neutral">Coming Soon</Pill>
+                <Pill tone="neutral">Coming soon</Pill>
               </div>
               <p className="text-body font-semibold pr-24" style={{ color: "var(--color-text-primary)" }}>
                 {tool.name}

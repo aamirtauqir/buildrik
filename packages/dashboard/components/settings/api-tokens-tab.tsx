@@ -87,7 +87,7 @@ export function ApiTokensTab({ workspaceId }: { workspaceId: string }) {
     <div className="space-y-6">
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>API tokens</h2>
+          <h2 className="text-section-title" style={{ color: "var(--color-text-primary)" }}>API tokens</h2>
           <p className="mt-1 text-body" style={{ color: "var(--color-text-secondary)" }}>
             For scripting and CI. Scoped, revocable, and never expire unless you set an expiry.
           </p>

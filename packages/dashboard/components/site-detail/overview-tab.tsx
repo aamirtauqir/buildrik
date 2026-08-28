@@ -185,7 +185,7 @@ export function OverviewTab({
           className="flex w-full items-center justify-between p-5"
         >
           <div className="flex min-w-0 items-center gap-3">
-            <h3 className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>Health Score</h3>
+            <h3 className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>Health score</h3>
             <span className="text-body font-bold" style={{ color: healthTextColor }}>{stats.healthScore}/100</span>
             {/* The single weakest area, inline — the top thing to fix, visible
                 before expanding. Hidden once the full breakdown is open. */}

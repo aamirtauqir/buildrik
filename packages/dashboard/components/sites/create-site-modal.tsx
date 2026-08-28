@@ -52,7 +52,7 @@ export function CreateSiteModal({ open, onClose, onSubmit }: CreateSiteModalProp
             reported the field as unlabelled ("does not have an implicit
             (wrapped) <label>") — a screen reader announced an edit box with no
             name in the only field of this dialog. */}
-        <label htmlFor="create-site-name" className="text-body font-medium" style={{ color: "var(--color-text-secondary)" }}>Site Name</label>
+        <label htmlFor="create-site-name" className="text-body font-medium" style={{ color: "var(--color-text-secondary)" }}>Site name</label>
         <InputField id="create-site-name" type="text" value={name} onChange={(e) => setName(e.target.value)} wrapperClassName="mt-1" />
         <div className="mt-1 flex items-center gap-2">
           {debouncedSlug.length >= 3 && slugCheck.data && (

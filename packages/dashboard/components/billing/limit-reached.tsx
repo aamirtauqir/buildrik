@@ -49,7 +49,7 @@ export function LimitReached({
           </svg>
         </div>
         <div className="flex-1">
-          <h3 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>
+          <h3 className="text-section-title" style={{ color: "var(--color-text-primary)" }}>
             {resource} limit reached
           </h3>
           <p className="mt-1 text-body" style={{ color: "var(--color-text-secondary)" }}>

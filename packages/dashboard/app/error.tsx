@@ -54,7 +54,7 @@ export default function GlobalError({
             className="px-4 py-2 rounded-lg text-body font-medium text-white cursor-pointer"
             style={{ backgroundColor: "var(--color-primary)" }}
           >
-            Try Again
+            Try again
           </button>
           <Link
             href="/dashboard"

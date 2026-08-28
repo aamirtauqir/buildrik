@@ -384,7 +384,7 @@ export function SecurityTab() {
       {/* Active Sessions */}
       <section>
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>
+          <h2 className="text-section-title" style={{ color: "var(--color-text-primary)" }}>
             Active sessions
           </h2>
           {sessionList.filter((s) => s.id !== currentSessionId).length > 0 && (
@@ -497,7 +497,7 @@ export function SecurityTab() {
 
       {/* Login History */}
       <section>
-        <h2 className="text-base font-semibold mb-3" style={{ color: "var(--color-text-primary)" }}>
+        <h2 className="text-section-title mb-3" style={{ color: "var(--color-text-primary)" }}>
           Login history
         </h2>
         <div

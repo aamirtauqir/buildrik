@@ -38,8 +38,11 @@ export default function GettingStartedPage() {
   const pct = Math.round((doneCount / STEPS.length) * 100);
   const firstIncompleteId = STEPS.find((s) => !completion[s.id])?.id;
 
+  // max-w without mx-auto: the checklist should not stretch to 1400px, but
+  // centring it put this H1 ~150px right of every other screen's, so the title
+  // jumped sideways when you moved between nav items.
   return (
-    <div className="mx-auto max-w-[760px]">
+    <div className="max-w-[760px]">
       <PageHeader title="Getting started" description="Finish setup to launch your first site." />
 
       {onboarding.isLoading ? (
