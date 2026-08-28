@@ -137,21 +137,29 @@ export function AssetCell({
       data-testid="media-card"
     >
       <span className="med-asset-cell__thumb tw:relative tw:flex tw:items-center tw:justify-center tw:w-34 tw:h-19 tw:shrink-0 tw:overflow-hidden tw:rounded tw:bg-gray-100 tw:text-gray-500">
-        {item.type === "img" && item.thumb ? (
+        {/* An image with no pre-cut thumb still IS an image — it used to fall
+            through to the font branch and render "Aa" in place of the photo
+            (walked live 2026-08-28: every fixture image showed the specimen).
+            The specimen is for FONTS only; anything else unknown gets a
+            neutral file glyph, never a fake typeface preview. */}
+        {item.type === "img" && (item.thumb || item.src) ? (
           <img
-            src={item.thumb}
+            src={item.thumb || item.src}
             alt=""
             className="med-asset-cell__img tw:h-full tw:w-full tw:object-cover"
+            loading="lazy"
             draggable={false}
           />
         ) : item.type === "vid" ? (
           <Play size={18} aria-hidden="true" />
         ) : item.type === "ico" ? (
           <FileType size={18} aria-hidden="true" />
-        ) : (
+        ) : item.type === "fnt" ? (
           <span className="tw:text-[16px]" style={{ fontFamily: item.name }}>
             Aa
           </span>
+        ) : (
+          <FileType size={18} aria-hidden="true" />
         )}
         {badge ? (
           <span
