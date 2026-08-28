@@ -36,7 +36,9 @@ const SHORTCUT_GROUPS: ShortcutGroup[] = [
     label: "Edit",
     shortcuts: [
       { key: "Ctrl+Z", desc: "Undo" },
-      { key: "Ctrl+Y", desc: "Redo" },
+      /* The handler takes Shift+Z OR Y (useEditorShortcuts:146). The sheet
+         shows the convention (⇧⌘Z on Mac); Y keeps working unlisted. */
+      { key: "Ctrl+Shift+Z", desc: "Redo" },
       { key: "Ctrl+C", desc: "Copy" },
       { key: "Ctrl+V", desc: "Paste" },
       { key: "Del", desc: "Delete element" },
@@ -229,20 +231,10 @@ export const KeyboardShortcutsPanel: React.FC<KeyboardShortcutsPanelProps> = ({
       ))}
     </div>
 
-    <div
-      style={{
-        marginTop: 16,
-        padding: "8px 12px",
-        background: "var(--bk-bg-subtle)",
-        borderRadius: "var(--bk-radius-sm)",
-        fontSize: 12,
-        /* muted on subtle is 4.39:1 — under AA at 12px (axe). */
-        color: "var(--bk-ink-soft)",
-        textAlign: "center",
-      }}
-    >
-      On Mac, use ⌘ Command instead of Ctrl
-    </div>
+    {/* The "On Mac, use ⌘ instead of Ctrl" footer died 2026-08-28: the badges
+        have been platform-aware since displayKey, so on a Mac it explained
+        symbols already shown, and on Windows it described somebody else's
+        keyboard. */}
         </ModalBody>
       </ModalContent>
     </ModalRoot>
