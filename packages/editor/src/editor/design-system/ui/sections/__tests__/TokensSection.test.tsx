@@ -38,11 +38,26 @@ const rowFor = (c: HTMLElement, kind: string) =>
   c.querySelector<HTMLButtonElement>(`[data-kind-id="${kind}"]`)!;
 
 describe("TokensSection — kind list (board 152:52)", () => {
-  it("lists every token kind as a row, not an expandable card", () => {
-    const { container } = render(wrap(<TokensSection />));
+  it("Pro lists every token kind as a row, not an expandable card", () => {
+    const { container } = render(wrap(<TokensSection />, "pro"));
     expect(rows(container)).toHaveLength(14);
     // The accordion it replaced is gone for good.
     expect(container.querySelector("[data-token-kind-card]")).toBeNull();
+  });
+
+  /* Beginner used to list twelve "0 ›" rows on a fresh site — a drawer that
+     opened on a wall of nothing (designer walk 2026-08-28). Empty foundation
+     kinds fold behind one disclosure row. */
+  it("Beginner folds empty foundation kinds behind 'More token kinds'", () => {
+    const { container } = render(wrap(<TokensSection />));
+    const more = rowFor(container, "more-kinds");
+    expect(more.textContent).toContain("More token kinds");
+    // Foundation kinds with no tokens are not listed until disclosed.
+    expect(container.querySelector('[data-kind-id="zindex"]')).toBeNull();
+
+    fireEvent.click(more);
+    expect(container.querySelector('[data-kind-id="zindex"]')).not.toBeNull();
+    expect(rowFor(container, "more-kinds").textContent).toContain("Fewer token kinds");
   });
 
   it("names the kinds the way the board writes them — lowercase", () => {

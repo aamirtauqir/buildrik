@@ -298,8 +298,13 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
   // bottom. B5-wire (2026-05-17): "visible" honors the semantic filter, so
   // a foundation kind with primitives-only (no semantics yet) still mutes
   // in Beginner — matches the empty card body the user will see.
+  /* Beginner used to move empty foundation kinds to the bottom but still
+     LIST them — twelve "0 ›" rows on a fresh site, a drawer that opens on a
+     wall of nothing (designer walk 2026-08-28). They fold behind one
+     disclosure row now; Pro keeps the complete list. */
+  const [showAllKinds, setShowAllKinds] = React.useState(false);
   const ordered = React.useMemo(() => {
-    if (!isBeginner) return KIND_ORDER;
+    if (!isBeginner) return { populated: KIND_ORDER, muted: [] as KindEntry[] };
     const populated: KindEntry[] = [];
     const muted: KindEntry[] = [];
     for (const k of KIND_ORDER) {
@@ -311,7 +316,7 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
       if (k.isFoundation && count === 0) muted.push(k);
       else                               populated.push(k);
     }
-    return [...populated, ...muted];
+    return { populated, muted };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isBeginner, visible, color.tokens, type.tokens, spacing.tokens,
       radius.tokens, shadow.tokens, motion.tokens, border.tokens,
@@ -336,7 +341,7 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
               already a row list, so this brings the last Brand destination onto
               one nav model. */}
           {openKind === null &&
-            ordered.map((entry) => {
+            [...ordered.populated, ...(showAllKinds ? ordered.muted : [])].map((entry) => {
               const r =
                 entry.kindId === "color" ? color
                 : entry.kindId === "type" ? type
@@ -381,8 +386,25 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
                 </Button>
               );
             })}
+          {openKind === null && ordered.muted.length > 0 && (
+            <Button
+              color="light"
+              data-kind-id="more-kinds"
+              aria-expanded={showAllKinds}
+              onClick={() => setShowAllKinds((v) => !v)}
+              className="tw:flex tw:w-full tw:items-center tw:justify-between tw:gap-2 tw:h-[var(--bk-size-row)] tw:px-2 tw:py-0 tw:rounded-md tw:border-0 tw:bg-transparent tw:text-left tw:hover:bg-gray-100"
+            >
+              <span className="tw:text-[13px] tw:text-gray-500">
+                {showAllKinds ? "Fewer token kinds" : "More token kinds"}
+              </span>
+              <span className="tw:flex tw:flex-none tw:items-center tw:gap-1.5">
+                <span className="tw:text-xs tw:text-gray-500">{ordered.muted.length}</span>
+                <span aria-hidden="true" className="tw:text-gray-400">{showAllKinds ? "⌃" : "›"}</span>
+              </span>
+            </Button>
+          )}
 
-          {ordered.filter((e) => e.kindId === openKind).map((entry) => {
+          {KIND_ORDER.filter((e) => e.kindId === openKind).map((entry) => {
             if (entry.kindId === "color") {
               const visibleColor = visible(color.tokens);
               return (
