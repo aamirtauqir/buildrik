@@ -266,7 +266,9 @@ describe("useSaveCallback", () => {
  * signed out) was the one thing the toast never said.
  */
 describe("useSaveCallback — an expired session is not a retryable save failure", () => {
-  const AUTH_ERRORS = ["UNAUTHORIZED", "401 Unauthorized", "Session expired", "FORBIDDEN"];
+  /* FORBIDDEN left this list on 2026-08-28: a role revocation is not a
+     session problem, and "Sign in" cannot fix it. */
+  const AUTH_ERRORS = ["UNAUTHORIZED", "401 Unauthorized", "Session expired"];
 
   it.each(AUTH_ERRORS)("%s raises Sign in, not Retry", async (raw) => {
     const opts = makeOpts();
@@ -292,6 +294,60 @@ describe("useSaveCallback — an expired session is not a retryable save failure
     expect(toast.action?.label).toBe("Sign in");
     expect(toast.tone).toBe("warning");
   });
+
+  it.each(AUTH_ERRORS)(
+    "%s opens the recovery surface instead of any toast when onAuthExpired is wired",
+    async (raw) => {
+      const opts = makeOpts();
+      const onAuthExpired = vi.fn();
+      opts.saveProject.mockRejectedValueOnce(new Error(raw));
+      const { result } = renderHook(() =>
+        useSaveCallback({
+          composer: opts.composer,
+          addToast: opts.addToast,
+          setSaveState: opts.setSaveState,
+          setIsDirty: opts.setIsDirty,
+          onAuthExpired,
+        }),
+      );
+      await act(async () => {
+        await result.current();
+        await flushMicrotasks();
+      });
+      expect(onAuthExpired).toHaveBeenCalledTimes(1);
+      const titles = opts.addToast.mock.calls.map((c) => (c[0] as { title?: string }).title);
+      expect(titles).not.toContain("Session expired");
+    },
+  );
+
+  it.each(["FORBIDDEN", "403 Forbidden"])(
+    "%s tells the role truth — no Sign in, no recovery surface",
+    async (raw) => {
+      const opts = makeOpts();
+      const onAuthExpired = vi.fn();
+      opts.saveProject.mockRejectedValueOnce(new Error(raw));
+      const { result } = renderHook(() =>
+        useSaveCallback({
+          composer: opts.composer,
+          addToast: opts.addToast,
+          setSaveState: opts.setSaveState,
+          setIsDirty: opts.setIsDirty,
+          onAuthExpired,
+        }),
+      );
+      await act(async () => {
+        await result.current();
+        await flushMicrotasks();
+      });
+      expect(onAuthExpired).not.toHaveBeenCalled();
+      const toast = opts.addToast.mock.calls.at(-1)?.[0] as {
+        title: string;
+        action?: { label: string };
+      };
+      expect(toast.title).toBe("You don't have access to save this site");
+      expect(toast.action).toBeUndefined();
+    },
+  );
 
   it("does not promise the work is safe on this device", async () => {
     const opts = makeOpts();

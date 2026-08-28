@@ -133,6 +133,8 @@ export const STORAGE_KEYS = {
   ONBOARDING_TOUR_STEP: "buildrick-onboarding-tour-step",
   /** Whether user has named their project during onboarding */
   ONBOARDING_PROJECT_NAMED: "buildrick-onboarding-project-named",
+  /** First-run rail coach mark ("Got it") — board 65:2 / S1.1 family */
+  ONBOARDING_COACH_DISMISSED: "buildrick-onboarding-coach-dismissed",
 
   // ─── Integrations ─────────────────────────────────────────────
   /** Vercel deployment token (encrypted) */

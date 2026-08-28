@@ -18,6 +18,7 @@ import type { ComposerConfig, ProjectData, DeviceType } from "../../../shared/ty
 import type { DesignToken } from "@/editor/design-system";
 import {
   getSiteIdFromUrl,
+  loadCurrentUserId,
   loadProject,
   loadServerMedia,
   saveProject,
@@ -29,6 +30,7 @@ import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { ComponentSchemaAIClient } from "@/engine/designSystem/services";
 import { getAiSubscriptionClient } from "@/services/ai/subscriptionClient";
 import { getDefaultPageName } from "@/shared/utils/pageUtils";
+import { isAuthSaveError, isForbiddenSaveError } from "./useSaveCallback";
 
 export type ComposerOptions = Partial<ComposerConfig> & {
   project?: {
@@ -60,6 +62,9 @@ export interface UseComposerInitParams {
    *  a transient toast. `auth` = session expired, `network` = generic failure.
    *  When wired, it replaces the toast; when omitted, the toast is kept (back-compat). */
   onLoadError?: (kind: "auth" | "network" | "missing") => void;
+  /** Board 813:4870: a mid-session 401 during AUTOSAVE opens the blocking
+   *  recovery surface. Same back-compat shape as onLoadError. */
+  onAuthExpired?: () => void;
 }
 
 export function useComposerInit(params: UseComposerInitParams): Composer | null {
@@ -81,6 +86,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
     setSaveState,
     openCollectionSetup,
     onLoadError,
+    onAuthExpired,
   } = params;
 
   // Codex P2 (2026-05-21): mount-only init effect previously captured
@@ -155,6 +161,19 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
            because `MediaManager` and its IndexedDB store carry no site at all. */
         void instance.media?.setProjectId?.(siteId);
         void instance.cms?.collections?.setProjectId?.(siteId);
+
+        /* Attribution. Both managers have carried a `setCurrentUserId` with no
+           caller, so every version and every history entry was written with
+           `userId: null` — six write sites recording nothing. Board 162:2 puts
+           an author on the row and could never have had one. Fire-and-forget:
+           a failed lookup must not delay or block the project load, and the
+           managers stamp whatever they hold at write time, so an id that
+           arrives a moment later still attributes everything after it. */
+        void loadCurrentUserId().then((userId) => {
+          if (!userId) return;
+          instance.versions?.setCurrentUserId?.(userId);
+          instance.history?.setCurrentUserId?.(userId);
+        });
 
         /* The shell is already fully mounted at this point — the canvas is up
            and empty, which is the state that draws "Start building · Browse
@@ -493,6 +512,30 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               status: "error",
               error: message,
             }));
+            /* The autosave path had NO auth branch at all — a mid-session 401
+               here read as the generic red "Save failed", with no way to sign
+               back in. Same split as the manual path: 401 opens the recovery
+               surface (board 813:4870), FORBIDDEN says the role truth. */
+            if (isAuthSaveError(message)) {
+              if (onAuthExpired) {
+                onAuthExpired();
+              } else {
+                addToast({
+                  title: "Session expired",
+                  description: "Sign in again to save your changes. Keep this tab open.",
+                  tone: "warning",
+                });
+              }
+              return;
+            }
+            if (isForbiddenSaveError(message)) {
+              addToast({
+                title: "You don't have access to save this site",
+                description: "Your role changed, or the site isn't yours to edit. Ask the owner.",
+                tone: "warning",
+              });
+              return;
+            }
             if (siteId) {
               /* A save refused because the project never loaded is not a
                  failed request — it is the guard that stops autosave from
@@ -537,7 +580,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
       composer.off("version:restored", handler);
       if (timeoutId) clearTimeout(timeoutId);
     };
-  }, [composer, setIsDirty, setSaveState, addToast]);
+  }, [composer, setIsDirty, setSaveState, addToast, onAuthExpired]);
 
   // Track undo/redo state
   React.useEffect(() => {

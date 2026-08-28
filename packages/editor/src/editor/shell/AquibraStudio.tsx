@@ -17,6 +17,7 @@ import { EVENTS } from "../../shared/constants";
 import type { ComposerConfig, ProjectData, BlockData } from "../../shared/types";
 import { ToastProvider, UpgradeModal, useToast, StudioSkeleton, Button } from "@/editor/chrome-ui";
 import { StaleApprovalModal } from "./modals/StaleApprovalModal";
+import { SessionExpiredModal } from "./modals/SessionExpiredModal";
 import { PublishConfirmModal } from "./modals/PublishConfirmModal";
 import { PreviewOverlay } from "./PreviewOverlay";
 import { ReviewBar } from "./ReviewBar";
@@ -152,6 +153,11 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
 
   // S1.5: a dashboard load failure surfaces as a persistent banner (not a toast).
   const [loadError, setLoadError] = React.useState<LoadErrorKind>(null);
+  /* Board 813:4870 — a mid-session 401 (manual save OR autosave) opens the
+     blocking recovery surface instead of a toast. Cleared the moment any save
+     lands (the watcher below), or by an explicit Keep editing. */
+  const [authExpired, setAuthExpired] = React.useState(false);
+  const onAuthExpired = React.useCallback(() => setAuthExpired(true), []);
   // P3: the Issues panel (the topbar issue pill opens it — was a settings stub).
   const [issuesOpen, setIssuesOpen] = React.useState(false);
 
@@ -177,6 +183,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     setSaveState: state.setSaveState,
     openCollectionSetup: modals.openCollectionSetup,
     onLoadError: setLoadError,
+    onAuthExpired,
   });
 
   /**
@@ -268,7 +275,15 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     addToast,
     setSaveState: state.setSaveState,
     setIsDirty: state.setIsDirty,
+    onAuthExpired,
   });
+
+  /* Recovery closes the surface from EITHER save path: a successful save
+     settles status to "idle", including an autosave that succeeded after the
+     user signed back in from another tab. */
+  React.useEffect(() => {
+    if (authExpired && state.saveState.status === "idle") setAuthExpired(false);
+  }, [authExpired, state.saveState.status]);
 
   // T10 (topbar plan): the Issues panel's page scope needs to know which page
   // the user is on, reactively — a page switch must re-scope the list.
@@ -464,7 +479,11 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
       <LoadErrorBanner
         kind={loadError}
         onRetry={() => window.location.reload()}
-        onSignIn={() => { window.location.href = `${DASHBOARD_URL}/auth`; }}
+        /* New tab, deliberately: the auth load-error can sit over LOCAL
+           fallback changes being edited, and a same-tab redirect destroys
+           them — the exact failure the session-expired surface exists to
+           prevent. Same-origin cookie lands either way. */
+        onSignIn={() => window.open(`${DASHBOARD_URL}/auth?reason=session-expired`, "_blank", "noopener")}
         onDismiss={() => setLoadError(null)}
       />
       <header role="banner" aria-label="Editor toolbar">
@@ -731,6 +750,14 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         composer={composer}
         onClose={publishJob.dismissBlock}
         onPublishAnyway={handlePublishAcknowledged}
+      />
+
+      <SessionExpiredModal
+        open={authExpired}
+        composer={composer}
+        lastSavedAt={state.saveState.lastSavedAt ?? null}
+        onRetry={saveProject}
+        onKeepEditing={() => setAuthExpired(false)}
       />
 
       {/* Confirm before an irreversible deploy. Runs BEFORE the publish call, so

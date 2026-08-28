@@ -34,6 +34,22 @@ export interface UseSaveCallbackOptions {
   addToast: (input: ToastInput) => string;
   setSaveState: React.Dispatch<React.SetStateAction<SaveState>>;
   setIsDirty: React.Dispatch<React.SetStateAction<boolean>>;
+  /** Board 813:4870: a mid-session 401 opens the blocking recovery surface.
+   *  When wired, it replaces the session-expired toast; omitted keeps the
+   *  toast (back-compat, same shape as onLoadError). */
+  onAuthExpired?: () => void;
+}
+
+/** A 401-shaped save failure — the session is gone and a re-login fixes it.
+ *  FORBIDDEN/403 is deliberately NOT here: that is a role problem a sign-in
+ *  cannot fix, and it gets its own copy. One regex pair, two consumers
+ *  (manual save here, autosave in useComposerInit). */
+export function isAuthSaveError(message: string): boolean {
+  return /unauthorized|401|session expired|not signed in/i.test(message);
+}
+
+export function isForbiddenSaveError(message: string): boolean {
+  return /forbidden|403/i.test(message);
 }
 
 /**
@@ -70,6 +86,7 @@ export function useSaveCallback({
   addToast,
   setSaveState,
   setIsDirty,
+  onAuthExpired,
 }: UseSaveCallbackOptions): SaveProjectFn {
   /* The pages and the site-column mirror ride in one batch. A refused mirror
      used to reject the whole save, so "Save failed — retry" appeared over
@@ -199,22 +216,36 @@ export function useSaveCallback({
           });
           return "error";
         }
-        const isAuth = /unauthorized|forbidden|401|403|session expired|not signed in/i.test(
-          errorMessage,
-        );
-        if (isAuth) {
+        /* FORBIDDEN used to ride the same regex as 401, so a role revocation
+           read as "Session expired" and sent the user to sign in — which would
+           change nothing. Different truths, different surfaces. */
+        if (isForbiddenSaveError(errorMessage)) {
           setSaveState((prev) => ({ ...prev, status: "error", error: errorMessage }));
           addToast({
-            title: "Session expired",
-            description: "Sign in again to save your changes. Keep this tab open.",
+            title: "You don't have access to save this site",
+            description: "Your role changed, or the site isn't yours to edit. Ask the owner.",
             tone: "warning",
-            action: {
-              label: "Sign in",
-              onClick: () => {
-                window.open(`${DASHBOARD_URL}/auth`, "_blank", "noopener");
-              },
-            },
           });
+          return "error";
+        }
+        if (isAuthSaveError(errorMessage)) {
+          setSaveState((prev) => ({ ...prev, status: "error", error: errorMessage }));
+          if (onAuthExpired) {
+            // The blocking surface (board 813:4870) owns the story now.
+            onAuthExpired();
+          } else {
+            addToast({
+              title: "Session expired",
+              description: "Sign in again to save your changes. Keep this tab open.",
+              tone: "warning",
+              action: {
+                label: "Sign in",
+                onClick: () => {
+                  window.open(`${DASHBOARD_URL}/auth`, "_blank", "noopener");
+                },
+              },
+            });
+          }
           return "error";
         }
         const userMessage = explainSaveError(errorMessage);
@@ -227,7 +258,7 @@ export function useSaveCallback({
         });
         return "error";
       });
-  }, [composer, addToast, setSaveState, setIsDirty]);
+  }, [composer, addToast, setSaveState, setIsDirty, onAuthExpired]);
 
   return save;
 }

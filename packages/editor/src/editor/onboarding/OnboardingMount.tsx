@@ -12,8 +12,10 @@ import * as React from "react";
 import type { Composer } from "../../engine";
 import { EVENTS } from "../../shared/constants";
 import { fetchCurrentRound } from "@/services/ReviewService";
+import { getEditorViewMode } from "@/shared/utils/editorViewMode";
 import { OnboardingChecklist } from "./OnboardingChecklist";
 import { AchievementPrompt } from "./AchievementPrompt";
+import { RailCoach, railCoachDismissed } from "./RailCoach";
 import { useOnboardingOrchestrator } from "./useOnboardingOrchestrator";
 
 /** Block ids that count as "a section" for the insert-section step — the
@@ -225,10 +227,22 @@ export const OnboardingMount: React.FC<OnboardingMountProps> = ({ composer }) =>
     [composer],
   );
 
+  /* The rail coach (board 65:2 / S1.1): first run only — nothing done yet,
+     never dismissed, and never over the stripped view-mode chrome (the rail
+     it introduces is not there). Lives with the checklist because both are
+     the same first-run story; dismissing the coach is not dismissing the
+     checklist. State so "Got it" hides it without waiting for a re-render
+     of the flag read. */
+  const [coachDismissed, setCoachDismissed] = React.useState(railCoachDismissed);
+
   if (o.phase === "done") return null;
+
+  const showCoach =
+    o.completedCount === 0 && !coachDismissed && !getEditorViewMode().readOnlyView;
 
   return (
     <>
+      {showCoach && <RailCoach onDismiss={() => setCoachDismissed(true)} />}
       <OnboardingChecklist
         steps={o.steps}
         completedCount={o.completedCount}
