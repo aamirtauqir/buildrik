@@ -5,6 +5,7 @@ import { Palette, UploadCloud, Lock, Unlock, Check, X, AlertTriangle, Undo2 } fr
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { LoadingSkeleton, ErrorState, DeniedState, StateEmpty } from "@/components/states";
+import { SelectField, Button } from "@/components/dashboard/primitives";
 
 type PushResultRow = { siteId: string; name: string; status: "pushed" | "skipped-locked" | "failed"; error?: string };
 type PushPreviewRow = { siteId: string; name: string; status: "would-push" | "skipped-locked"; willChange: boolean };
@@ -216,25 +217,30 @@ export function ThemeManager() {
             )}
 
             <div className="mt-4 flex items-center gap-2">
-              <select
+              {/* size="sm" (36px) to match the Button beside it. Defaulting to
+                  md put a 42px select next to a ~30px hand-rolled button on one
+                  control bar — the same defect the conversion was meant to
+                  remove, introduced by the conversion. */}
+              <SelectField
+                size="sm"
                 value={source}
                 onChange={(e) => setSource(e.target.value)}
-                className="flex-1 rounded-lg border px-3 py-1.5 text-body"
-                style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+                wrapperClassName="flex-1"
               >
                 <option value="">Choose a site to capture from…</option>
                 {targets.map((s) => (
                   <option key={s.id} value={s.id}>{s.name}</option>
                 ))}
-              </select>
-              <button
+              </SelectField>
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() => source && captureMut.mutate({ sourceSiteId: source })}
                 disabled={!source || busy}
-                className="flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-body-sm font-medium disabled:opacity-50"
-                style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
+                className="shrink-0"
               >
                 Capture from this site
-              </button>
+              </Button>
             </div>
           </div>
 

@@ -2,6 +2,7 @@
 
 import { trpc } from "@lib/trpc/client";
 import { ErrorState } from "@/components/states";
+import { SelectField } from "@/components/dashboard/primitives";
 
 export const NOTIFICATION_CATEGORIES = [
   "Site Updates",
@@ -166,18 +167,23 @@ export function NotificationPrefs() {
                     column caption, so axe reported eight "select-name"
                     criticals — a screen reader announced "combo box" with no
                     idea which category it changed. */}
-                <select
+                <SelectField
+                  size="sm"
                   aria-label={`Email frequency for ${pref.category}`}
                   value={pref.email}
                   disabled={isSecurity}
                   onChange={(e) => update(pref.category, { email: e.target.value as EmailFrequency })}
-                  className="text-body-sm px-2 py-1 rounded-md border outline-none disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+                  // disabled: on the SELECT, not the wrapper div — `:disabled`
+                  // only matches form controls, so on the wrapper it compiled
+                  // to a rule that can never match and the locked Security row
+                  // lost its not-allowed cursor.
+                  className="disabled:cursor-not-allowed"
+                  wrapperClassName="w-[140px]"
                 >
                   <option value="instant">Instant</option>
-                  <option value="digest">Daily Digest</option>
+                  <option value="digest">Daily digest</option>
                   <option value="off">Off</option>
-                </select>
+                </SelectField>
               </div>
             </div>
           );

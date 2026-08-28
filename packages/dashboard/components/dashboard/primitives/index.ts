@@ -9,5 +9,6 @@ export { Button, ButtonLink, type ButtonVariant, type ButtonSize } from "./butto
 export { IconChip } from "./icon-chip";
 export { Modal } from "./modal";
 export { InputField } from "./input-field";
+export { SelectField } from "./select-field";
 export { FilterTabs } from "./filter-tabs";
 export { FilterChip } from "./filter-chip";

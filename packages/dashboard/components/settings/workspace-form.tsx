@@ -3,13 +3,7 @@
 import { useState, useRef } from "react";
 import { trpc } from "@lib/trpc/client";
 import { useUnsavedChanges } from "@lib/hooks/use-unsaved-changes";
-import { SectionCard, Button, InputField } from "@/components/dashboard/primitives";
-
-// Shared field chrome for native <select> controls, matched to InputField's
-// 42px / radius-lg / inset-ring look (no Select primitive exists yet — see
-// components/dashboard/primitives/index.ts).
-const SELECT_FIELD_CLASS =
-  "h-[42px] w-full rounded-lg px-[13px] text-[13.5px] shadow-[var(--shadow-ring)] outline-none transition-shadow focus:shadow-[inset_0_0_0_1.5px_var(--color-primary)]";
+import { SectionCard, Button, InputField, SelectField } from "@/components/dashboard/primitives";
 
 // Canonical product accent (DESIGN.md §Surface Scope). Must be a real hex — the
 // workspace update schema validates accentColor against /^#[0-9A-Fa-f]{6}$/, so
@@ -219,36 +213,26 @@ export function WorkspaceForm({
             <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
               Default language
             </label>
-            <select
-              value={defaultLanguage}
-              onChange={(e) => setDefaultLanguage(e.target.value)}
-              className={SELECT_FIELD_CLASS}
-              style={{ backgroundColor: "var(--color-bg-surface)", color: "var(--color-text-primary)" }}
-            >
+            <SelectField value={defaultLanguage} onChange={(e) => setDefaultLanguage(e.target.value)}>
               {LANGUAGES.map((l) => (
                 <option key={l.value} value={l.value}>
                   {l.label}
                 </option>
               ))}
-            </select>
+            </SelectField>
           </div>
 
           <div>
             <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
               Timezone
             </label>
-            <select
-              value={timezone}
-              onChange={(e) => setTimezone(e.target.value)}
-              className={SELECT_FIELD_CLASS}
-              style={{ backgroundColor: "var(--color-bg-surface)", color: "var(--color-text-primary)" }}
-            >
+            <SelectField value={timezone} onChange={(e) => setTimezone(e.target.value)}>
               {TIMEZONES.map((tz) => (
                 <option key={tz.value} value={tz.value}>
                   {tz.label}
                 </option>
               ))}
-            </select>
+            </SelectField>
           </div>
         </div>
 
@@ -301,7 +285,10 @@ export function WorkspaceForm({
                     setAccentColor(e.target.value);
                     setHexInput(e.target.value);
                   }}
-                  className="w-9 h-9 rounded-md border cursor-pointer"
+                  // 42px / radius-lg so the picker sits on the same line as the
+                  // hex field beside it — it was 36px / radius-md, the only two
+                  // values of either on this screen.
+                  className="h-[42px] w-[42px] cursor-pointer rounded-lg border"
                   style={{ borderColor: "var(--color-border-default)" }}
                 />
                 <InputField
@@ -313,10 +300,6 @@ export function WorkspaceForm({
                   wrapperClassName="w-24"
                   invalid={!isValidHex(hexInput)}
                   aria-invalid={!isValidHex(hexInput)}
-                />
-                <div
-                  className="w-9 h-9 rounded-md border"
-                  style={{ backgroundColor: accentColor, borderColor: "var(--color-border-default)" }}
                 />
               </div>
               {!isValidHex(hexInput) && (
@@ -373,18 +356,17 @@ export function WorkspaceForm({
             <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
               Link expiration
             </label>
-            <select
+            <SelectField
               value={defaultExpiration ?? ""}
               onChange={(e) => setDefaultExpiration(e.target.value || null)}
-              className={`${SELECT_FIELD_CLASS} max-w-xs`}
-              style={{ backgroundColor: "var(--color-bg-surface)", color: "var(--color-text-primary)" }}
+              wrapperClassName="max-w-xs"
             >
               {EXPIRY_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
                   {opt.label}
                 </option>
               ))}
-            </select>
+            </SelectField>
             <p className="text-body-sm mt-1" style={{ color: "var(--color-text-secondary)" }}>
               Default expiration for new shared links.
             </p>

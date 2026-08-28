@@ -7,7 +7,7 @@ import {
   SubmissionDrawer,
   type FormSubmissionData,
 } from "@/components/site-detail/submission-drawer";
-import { Button, DataTable, Pill, MetricValue, type Column } from "@/components/dashboard/primitives";
+import { Button, DataTable, Pill, MetricValue, type Column, SelectField } from "@/components/dashboard/primitives";
 
 interface FormBlock {
   id: string;
@@ -174,20 +174,20 @@ export function SubmissionsPanel({ siteId, formBlocks, isLoading }: SubmissionsP
     <div className="space-y-4">
       {/* Filter + export */}
       <div className="flex items-center justify-between gap-3">
-        <select
+        <SelectField
           value={filterFormBlockId ?? ""}
           onChange={(e) => {
             setFilterFormBlockId(e.target.value || undefined);
             setPage(1);
           }}
-          className="rounded-lg border px-3 py-1.5 text-body-sm"
-          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+          size="sm"
+          wrapperClassName="w-[200px] shrink-0"
         >
-          <option value="">All Forms</option>
+          <option value="">All forms</option>
           {formBlocks.map((fb) => (
             <option key={fb.id} value={fb.id}>{fb.name}</option>
           ))}
-        </select>
+        </SelectField>
         <Button variant="ghost" size="sm" onClick={handleExportCsv} disabled={exporting || rows.length === 0} className="gap-1.5">
           <Download className="h-3.5 w-3.5" />
           {exporting ? "Exporting…" : "Export CSV"}

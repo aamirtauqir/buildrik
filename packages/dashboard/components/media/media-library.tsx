@@ -5,7 +5,7 @@ import { Search, Upload, Trash2, Copy, Check, Folder, FolderPlus, Images, ImageO
 import { upload } from "@vercel/blob/client";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
-import { Button, Modal, PageHeader, InputField, FilterTabs } from "@/components/dashboard/primitives";
+import { Button, Modal, PageHeader, InputField, FilterTabs, SelectField } from "@/components/dashboard/primitives";
 import { ErrorState } from "@/components/states";
 
 type MediaType = "image" | "video" | "icon" | "font";
@@ -197,8 +197,8 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
           placeholder="Search assets…"
           aria-label="Search assets"
         />
-        <FilterTabs value={typeFilter} onChange={setTypeFilter} options={TYPE_FILTERS} />
-        <FilterTabs value={sortBy} onChange={setSortBy} options={SORT_OPTIONS} />
+        <FilterTabs value={typeFilter} onChange={setTypeFilter} options={TYPE_FILTERS} label="Asset type" />
+        <FilterTabs value={sortBy} onChange={setSortBy} options={SORT_OPTIONS} label="Sort by" />
         {!assets.isLoading && (
           <span className="ml-auto shrink-0 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
             {items.length} asset{items.length === 1 ? "" : "s"}
@@ -291,12 +291,15 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
             // Was "No assets yet" on a failed query — a fake-empty hiding the error.
             <ErrorState title="Couldn't load your media" description="Something went wrong on our end." onRetry={() => assets.refetch()} />
           ) : items.length === 0 ? (
-            <div className="rounded-lg border border-dashed p-12 text-center" style={{ borderColor: "var(--color-border-default)" }}>
+            <div className="rounded-lg border border-dashed p-8 text-center" style={{ borderColor: "var(--color-border-default)" }}>
               <ImageOff size={26} className="mx-auto mb-2" style={{ color: "var(--color-text-placeholder)" }} />
               <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>{search ? "No assets match your search" : "No assets yet"}</p>
               <p className="mt-0.5 text-body" style={{ color: "var(--color-text-secondary)" }}>{search ? "Try a different term." : "Upload images, video, or fonts to use across your sites."}</p>
               {!search && !folderId && typeFilter === "all" && (
-                <div className="mt-4">
+                /* flex justify-center, not the parent's text-center: the Button
+                   primitive renders a flowbite `flex` button, which text-center
+                   cannot centre — it sat left of a centred icon and heading. */
+                <div className="mt-4 flex justify-center">
                   <Button onClick={onPickFiles} className="gap-1.5">
                     <Upload size={15} /> Upload
                   </Button>
@@ -481,18 +484,16 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
         <p className="mb-2 text-body" style={{ color: "var(--color-text-secondary)" }}>
           Move <strong style={{ color: "var(--color-text-primary)" }}>{moveTarget?.name}</strong> to:
         </p>
-        <select
+        <SelectField
           value={moveValue}
           onChange={(e) => setMoveValue(e.target.value)}
           aria-label="Destination folder"
-          className="w-full rounded-lg border px-3 py-2 text-body"
-          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)", backgroundColor: "var(--color-bg-surface)" }}
         >
           <option value="">All media (no folder)</option>
           {(folders.data ?? []).map((f) => (
             <option key={f.id} value={f.id}>{f.name}</option>
           ))}
-        </select>
+        </SelectField>
       </Modal>
 
       {/* Delete asset — the file may be referenced by a live site, so confirm. */}

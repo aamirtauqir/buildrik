@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { Paperclip, X, CheckCircle } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
-import { InputField } from "@/components/dashboard/primitives";
+import { InputField, SelectField } from "@/components/dashboard/primitives";
 import type { SupportTicketInput } from "@buildrik/shared/schemas/help";
 
 const TICKET_CATEGORIES: { value: SupportTicketInput["category"]; label: string }[] = [
@@ -200,16 +200,11 @@ export function TicketForm() {
         <label className="mb-1.5 block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
           Category
         </label>
-        <select
-          value={category}
-          onChange={(e) => setCategory(e.target.value as SupportTicketInput["category"])}
-          className="w-full rounded-lg border px-3 py-2 text-body focus:outline-none focus:ring-2"
-          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
-        >
+        <SelectField value={category} onChange={(e) => setCategory(e.target.value as SupportTicketInput["category"])}>
           {TICKET_CATEGORIES.map((opt) => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>
           ))}
-        </select>
+        </SelectField>
       </div>
 
       {/* Description */}

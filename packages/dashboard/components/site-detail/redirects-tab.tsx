@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { ArrowRight, Plus, Trash2, Download, Upload, Pencil } from "lucide-react";
-import { Button, StatCard, MetricValue, DataTable, Pill, InputField, type Column } from "@/components/dashboard/primitives";
+import { Button, StatCard, MetricValue, DataTable, Pill, InputField, type Column, SelectField } from "@/components/dashboard/primitives";
 
 export interface RedirectRow {
   id: string;
@@ -103,7 +103,7 @@ export function RedirectsTab({ redirects, limit, canEdit, onCreate, onUpdate, on
     <div className="space-y-6">
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>Redirects</h2>
+          <h2 className="text-section-title" style={{ color: "var(--color-text-primary)" }}>Redirects</h2>
           {/* This said "Forward old URLs to new ones", which the product does
               not do: the publish payload is HTML pages plus robots.txt — no
               vercel.json, no redirect config — so nothing here is ever applied
@@ -156,16 +156,16 @@ export function RedirectsTab({ redirects, limit, canEdit, onCreate, onUpdate, on
               {/* Named: the two option values are the only text near it, so a
                   screen reader announced "combo box" with no idea it chose the
                   redirect kind (axe: select-name). */}
-              <select
+              <SelectField
+                size="sm"
                 aria-label="Redirect type"
                 value={type}
                 onChange={(e) => setType(e.target.value as "301" | "302")}
-                className="rounded-md border px-2 py-1.5 text-body"
-                style={{ borderColor: "var(--color-border-default)" }}
+                wrapperClassName="w-[88px] shrink-0"
               >
                 <option value="301">301</option>
                 <option value="302">302</option>
-              </select>
+              </SelectField>
               <Button type="button" size="sm" onClick={submit} disabled={saving || !fromPath.trim() || !toUrl.trim()} className="gap-1">
                 {editingId ? <><Pencil size={14} /> Update</> : <><Plus size={14} /> Add</>}
               </Button>

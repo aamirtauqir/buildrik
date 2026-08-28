@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import { trpc } from "@lib/trpc/client";
-import { Button, InputField } from "@/components/dashboard/primitives";
+import { Button, InputField, SelectField } from "@/components/dashboard/primitives";
 import { useToast } from "@/components/dashboard/toast-provider";
 
 const LANGUAGES = [
@@ -253,18 +253,13 @@ export function ProfileForm({ initialData, onSave, saving }: ProfileFormProps) {
           <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
             Language
           </label>
-          <select
-            value={language}
-            onChange={(e) => setLanguage(e.target.value)}
-            className="w-full px-3 py-2 text-body rounded-md border outline-none focus:ring-2"
-            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
-          >
+          <SelectField value={language} onChange={(e) => setLanguage(e.target.value)}>
             {LANGUAGES.map((l) => (
               <option key={l.value} value={l.value}>
                 {l.label}
               </option>
             ))}
-          </select>
+          </SelectField>
           <p className="text-body-sm mt-1" style={{ color: "var(--color-text-secondary)" }}>
             Used for email and date formatting.
           </p>
@@ -274,18 +269,13 @@ export function ProfileForm({ initialData, onSave, saving }: ProfileFormProps) {
           <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
             Timezone
           </label>
-          <select
-            value={timezone}
-            onChange={(e) => setTimezone(e.target.value)}
-            className="w-full px-3 py-2 text-body rounded-md border outline-none focus:ring-2"
-            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
-          >
+          <SelectField value={timezone} onChange={(e) => setTimezone(e.target.value)}>
             {TIMEZONES.map((tz) => (
               <option key={tz.value} value={tz.value}>
                 {tz.label}
               </option>
             ))}
-          </select>
+          </SelectField>
           <p className="text-body-sm mt-1" style={{ color: "var(--color-text-secondary)" }}>
             Used for email and date formatting.
           </p>
