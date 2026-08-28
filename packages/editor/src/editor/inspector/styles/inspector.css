@@ -651,6 +651,10 @@
   border-radius: 3px;
   box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.1);
   flex-shrink: 0;
+  /* The trigger is a flowbite Button, whose default blue fill painted through
+     a transparent swatch — an empty color read as cobalt. The checkerboard
+     below is the only honest "no color". */
+  background-color: transparent;
   background-image:
     linear-gradient(45deg, var(--bk-alpha-ink-08) 25%, transparent 25%),
     linear-gradient(-45deg, var(--bk-alpha-ink-08) 25%, transparent 25%),

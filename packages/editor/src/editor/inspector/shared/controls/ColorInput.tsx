@@ -22,6 +22,13 @@ import { EVENTS } from "../../../../shared/constants/events";
 const isValidHexColor = (val: string): boolean =>
   /^#[0-9A-Fa-f]{6}$/.test(val) || /^#[0-9A-Fa-f]{3}$/.test(val);
 
+/* Engine styles store bare hex ("333333") on some elements. The swatch used
+   to reject it as invalid and go transparent — and the flowbite Button's
+   default blue showed through, so the row read value 333333 beside a COBALT
+   swatch (walked live 2026-08-28). A bare 3/6-digit hex is a hex. */
+const normalizeHex = (val: string): string =>
+  /^[0-9A-Fa-f]{3}$|^[0-9A-Fa-f]{6}$/.test(val) ? `#${val}` : val;
+
 const isKeywordValue = (val: string): boolean =>
   !!val && !isValidHexColor(val) && !isTokenVar(val);
 
@@ -89,9 +96,13 @@ export const ColorInput: React.FC<ColorInputProps> = ({
 
   const swatchColor = isBound
     ? resolveVar(value)
-    : isValidHexColor(value)
-      ? value
-      : "transparent";
+    : isValidHexColor(normalizeHex(value))
+      ? normalizeHex(value)
+      : isKeyword
+        ? /* CSS keywords (red, currentColor…) paint fine as a background;
+             an unknown word degrades to transparent, never to a lie. */
+          value
+        : "transparent";
 
   const display = isBound ? (boundToken?.name ?? value) : stripHash(value || "");
 
