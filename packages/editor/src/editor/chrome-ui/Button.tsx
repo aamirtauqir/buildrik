@@ -5,7 +5,7 @@
  *
  * What it adds and nothing more:
  *   · `variant` — the five-role vocabulary two independent audits found
- *     missing: primary (flowbite default — ALREADY brand #1A56DB via the
+ *     missing: primary (flowbite default — ALREADY the brand accent via the
  *     Flowbite primary scale), secondary (light), ghost, link, danger (red).
  *     The ghost-link 6-class incantation was copy-pasted across 22 files;
  *     `variant="link"` is that recipe, once, in buttonTheme.ts.

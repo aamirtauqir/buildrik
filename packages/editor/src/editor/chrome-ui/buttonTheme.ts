@@ -2,9 +2,9 @@
  * BK_BUTTON_THEME — the chrome Button vocabulary (design-debt arc 2026-08-28).
  *
  * Flowbite's own primary scale is Flowbite blue, so a bare `<Button>` was
- * ALREADY the brand #1A56DB — the audits' "no hierarchy" finding was about
+ * ALREADY the brand accent (--bk-accent) — the audits' "no hierarchy" finding was about
  * vocabulary, not the fill: a 6-class ghost-link incantation copy-pasted 48
- * times, and `red`/`failure`/`purple` all in play. Two NEW color keys carry
+ * times, and `red`, `failure` and a banned accent tone all in play. Two NEW color keys carry
  * the missing roles; every existing key renders exactly as before.
  *
  *   link  — the accent text-link Button (was the hand-rolled incantation)

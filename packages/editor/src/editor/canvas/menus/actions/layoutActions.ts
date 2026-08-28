@@ -10,7 +10,7 @@ import type { ContextAction } from "../contextMenuRegistry";
 export const layoutSubmenu: ContextAction[] = [
   {
     id: "layout-flex-row",
-    label: "Make Flex Row",
+    label: "Make flex row",
     icon: "arrow-right",
     group: "Layout",
     isVisible: (ctx) => ctx.element.isContainer(),
@@ -22,7 +22,7 @@ export const layoutSubmenu: ContextAction[] = [
   },
   {
     id: "layout-flex-column",
-    label: "Make Flex Column",
+    label: "Make flex column",
     icon: "arrow-down",
     group: "Layout",
     isVisible: (ctx) => ctx.element.isContainer(),
@@ -34,7 +34,7 @@ export const layoutSubmenu: ContextAction[] = [
   },
   {
     id: "layout-grid",
-    label: "Make Grid (2 cols)",
+    label: "Make grid (2 cols)",
     icon: "grid",
     group: "Layout",
     isVisible: (ctx) => ctx.element.isContainer(),
@@ -47,7 +47,7 @@ export const layoutSubmenu: ContextAction[] = [
   },
   {
     id: "layout-center",
-    label: "Center Content",
+    label: "Center content",
     icon: "align-center",
     group: "Layout",
     isVisible: (ctx) => ctx.element.isContainer(),
@@ -60,7 +60,7 @@ export const layoutSubmenu: ContextAction[] = [
   },
   {
     id: "layout-space-between",
-    label: "Space Between",
+    label: "Space between",
     icon: "maximize-2",
     group: "Layout",
     isVisible: (ctx) => ctx.element.isContainer(),
@@ -73,7 +73,7 @@ export const layoutSubmenu: ContextAction[] = [
   // ── Layer ordering ───────────────────────────────────────────────────────────
   {
     id: "bring-to-front",
-    label: "Bring to Front",
+    label: "Bring to front",
     icon: "chevrons-up",
     group: "Layout",
     shortcut: "Cmd+Shift+]",
@@ -84,7 +84,7 @@ export const layoutSubmenu: ContextAction[] = [
   },
   {
     id: "bring-forward",
-    label: "Bring Forward",
+    label: "Bring forward",
     icon: "chevron-up",
     group: "Layout",
     shortcut: "Cmd+]",
@@ -95,7 +95,7 @@ export const layoutSubmenu: ContextAction[] = [
   },
   {
     id: "send-backward",
-    label: "Send Backward",
+    label: "Send backward",
     icon: "chevron-down",
     group: "Layout",
     shortcut: "Cmd+[",
@@ -106,7 +106,7 @@ export const layoutSubmenu: ContextAction[] = [
   },
   {
     id: "send-to-back",
-    label: "Send to Back",
+    label: "Send to back",
     icon: "chevrons-down",
     group: "Layout",
     shortcut: "Cmd+Shift+[",

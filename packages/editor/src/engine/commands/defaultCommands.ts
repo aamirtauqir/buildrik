@@ -280,42 +280,42 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
        — measured live. The commands stay for the palette; the keys do not. */
     {
       id: "nudge-up",
-      label: "Nudge Up",
+      label: "Nudge up",
       run: (c) => nudgeSelected(c, 0, -nudgeAmount),
     },
     {
       id: "nudge-down",
-      label: "Nudge Down",
+      label: "Nudge down",
       run: (c) => nudgeSelected(c, 0, nudgeAmount),
     },
     {
       id: "nudge-left",
-      label: "Nudge Left",
+      label: "Nudge left",
       run: (c) => nudgeSelected(c, -nudgeAmount, 0),
     },
     {
       id: "nudge-right",
-      label: "Nudge Right",
+      label: "Nudge right",
       run: (c) => nudgeSelected(c, nudgeAmount, 0),
     },
     {
       id: "nudge-up-large",
-      label: "Nudge Up (10px)",
+      label: "Nudge up (10px)",
       run: (c) => nudgeSelected(c, 0, -nudgeAmountLarge),
     },
     {
       id: "nudge-down-large",
-      label: "Nudge Down (10px)",
+      label: "Nudge down (10px)",
       run: (c) => nudgeSelected(c, 0, nudgeAmountLarge),
     },
     {
       id: "nudge-left-large",
-      label: "Nudge Left (10px)",
+      label: "Nudge left (10px)",
       run: (c) => nudgeSelected(c, -nudgeAmountLarge, 0),
     },
     {
       id: "nudge-right-large",
-      label: "Nudge Right (10px)",
+      label: "Nudge right (10px)",
       run: (c) => nudgeSelected(c, nudgeAmountLarge, 0),
     },
 
@@ -324,25 +324,25 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
     // ============================================
     {
       id: "bring-forward",
-      label: "Bring Forward",
+      label: "Bring forward",
       shortcut: "ctrl+]",
       run: (c) => reorderElement(c, "forward"),
     },
     {
       id: "send-backward",
-      label: "Send Backward",
+      label: "Send backward",
       shortcut: "ctrl+[",
       run: (c) => reorderElement(c, "backward"),
     },
     {
       id: "bring-to-front",
-      label: "Bring to Front",
+      label: "Bring to front",
       shortcut: "ctrl+shift+]",
       run: (c) => reorderElement(c, "front"),
     },
     {
       id: "send-to-back",
-      label: "Send to Back",
+      label: "Send to back",
       shortcut: "ctrl+shift+[",
       run: (c) => reorderElement(c, "back"),
     },
@@ -357,7 +357,7 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
        ⌘1–⌘4 below: the printed chord wins, the command keeps its palette row. */
     {
       id: "toggle-snap-to-grid",
-      label: "Toggle Snap to Grid",
+      label: "Toggle snap to grid",
       run: (c) => {
         const current = c.getState().snapToGrid;
         c.setSnapToGrid(!current);
@@ -369,7 +369,7 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
     // ============================================
     {
       id: "select-all",
-      label: "Select All",
+      label: "Select all",
       shortcut: "ctrl+a",
       /* Selected the page ROOT — one container — which is not what Select All
          means in any editor, and is not what the OTHER Select All in this app
@@ -425,25 +425,25 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
     // ============================================
     {
       id: "ui-open-templates",
-      label: "Open Templates",
+      label: "Open templates",
       shortcut: "ctrl+shift+t",
       run: () => composer.emit(EVENTS.UI_TOGGLE_TEMPLATES),
     },
     {
       id: "ui-open-exporter",
-      label: "Open Exporter",
+      label: "Open exporter",
       shortcut: "ctrl+shift+e",
       run: () => composer.emit(EVENTS.UI_TOGGLE_EXPORTER),
     },
     {
       id: "ui-open-ai",
-      label: "Open AI Assistant",
+      label: "Open AI assistant",
       shortcut: "ctrl+shift+a",
       run: () => composer.emit(EVENTS.UI_TOGGLE_AI),
     },
     {
       id: "ui-toggle-component-view",
-      label: "Toggle Component View",
+      label: "Toggle component view",
       shortcut: "ctrl+shift+c",
       run: () => composer.emit(EVENTS.UI_TOGGLE_COMPONENT_VIEW),
     },
@@ -458,7 +458,7 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
        of the flyout's printed rows (fit, selection, 100%, in, out). */
     {
       id: "zoom-in",
-      label: "Zoom In",
+      label: "Zoom in",
       run: (c) => {
         const current = c.getState().zoom;
         c.setZoom(current + 10);
@@ -466,7 +466,7 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
     },
     {
       id: "zoom-out",
-      label: "Zoom Out",
+      label: "Zoom out",
       run: (c) => {
         const current = c.getState().zoom;
         c.setZoom(current - 10);
@@ -474,7 +474,7 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
     },
     {
       id: "zoom-reset",
-      label: "Reset Zoom",
+      label: "Reset zoom",
       run: (c) => c.setZoom(100),
     },
 
@@ -490,22 +490,22 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
        palette, which is where they are actually discovered. */
     {
       id: "device-desktop",
-      label: "Desktop View",
+      label: "Desktop view",
       run: (c) => c.setDevice("desktop"),
     },
     {
       id: "device-tablet",
-      label: "Tablet View",
+      label: "Tablet view",
       run: (c) => c.setDevice("tablet"),
     },
     {
       id: "device-mobile",
-      label: "Mobile View",
+      label: "Mobile view",
       run: (c) => c.setDevice("mobile"),
     },
     {
       id: "device-watch",
-      label: "Watch View",
+      label: "Watch view",
       run: (c) => c.setDevice("watch"),
     },
   ];

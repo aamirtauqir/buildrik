@@ -34,7 +34,7 @@ export const standaloneActions: ContextAction[] = [
   },
   {
     id: "reveal-in-layers",
-    label: "Reveal in Layers",
+    label: "Reveal in layers",
     icon: "eye",
     group: "standalone",
     handler: ({ composer, element }) => {
@@ -48,7 +48,7 @@ export const standaloneActions: ContextAction[] = [
   },
   {
     id: "select-parent",
-    label: "Select Parent",
+    label: "Select parent",
     icon: "arrow-up",
     group: "standalone",
     /* The key this binds is Left (useCanvasKeyboard), which the breadcrumb

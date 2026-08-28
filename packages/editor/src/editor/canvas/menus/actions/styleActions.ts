@@ -10,7 +10,7 @@ import type { ContextAction } from "../contextMenuRegistry";
 export const quickStyleSubmenu: ContextAction[] = [
   {
     id: "style-padding",
-    label: "Add Padding (16px)",
+    label: "Add padding (16px)",
     icon: "square",
     group: "Quick Style",
     handler: ({ composer, element }) =>
@@ -20,7 +20,7 @@ export const quickStyleSubmenu: ContextAction[] = [
   },
   {
     id: "style-margin",
-    label: "Add Margin (16px)",
+    label: "Add margin (16px)",
     icon: "move",
     group: "Quick Style",
     handler: ({ composer, element }) =>
@@ -30,7 +30,7 @@ export const quickStyleSubmenu: ContextAction[] = [
   },
   {
     id: "style-border",
-    label: "Add Border",
+    label: "Add border",
     icon: "square",
     group: "Quick Style",
     handler: ({ composer, element }) =>
@@ -40,7 +40,7 @@ export const quickStyleSubmenu: ContextAction[] = [
   },
   {
     id: "style-background",
-    label: "Add Background",
+    label: "Add background",
     icon: "image",
     group: "Quick Style",
     handler: ({ composer, element }) =>
@@ -50,7 +50,7 @@ export const quickStyleSubmenu: ContextAction[] = [
   },
   {
     id: "style-shadow",
-    label: "Add Shadow",
+    label: "Add shadow",
     icon: "layers",
     group: "Quick Style",
     handler: ({ composer, element }) =>
@@ -60,7 +60,7 @@ export const quickStyleSubmenu: ContextAction[] = [
   },
   {
     id: "copy-styles",
-    label: "Copy Styles",
+    label: "Copy styles",
     icon: "clipboard",
     group: "Quick Style",
     shortcut: "Cmd+Alt+C",
@@ -70,7 +70,7 @@ export const quickStyleSubmenu: ContextAction[] = [
   },
   {
     id: "paste-styles",
-    label: "Paste Styles",
+    label: "Paste styles",
     icon: "clipboard-paste",
     group: "Quick Style",
     shortcut: "Cmd+Alt+V",
@@ -86,7 +86,7 @@ export const quickStyleSubmenu: ContextAction[] = [
   },
   {
     id: "style-reset",
-    label: "Reset All Styles",
+    label: "Reset all styles",
     icon: "refresh-cw",
     group: "Quick Style",
     handler: ({ composer, element }) =>

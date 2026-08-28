@@ -21,7 +21,7 @@ const createPlaceholderElement = (composer: Composer, parentType: ElementType) =
 export const insertSubmenu: ContextAction[] = [
   {
     id: "insert-before",
-    label: "Insert Before",
+    label: "Insert before",
     icon: "arrow-up",
     group: "Insert",
     isVisible: ({ element }) => Boolean(element.getParent()),
@@ -40,7 +40,7 @@ export const insertSubmenu: ContextAction[] = [
   },
   {
     id: "insert-after",
-    label: "Insert After",
+    label: "Insert after",
     icon: "arrow-down",
     group: "Insert",
     isVisible: ({ element }) => Boolean(element.getParent()),
@@ -59,7 +59,7 @@ export const insertSubmenu: ContextAction[] = [
   },
   {
     id: "insert-inside-first",
-    label: "Insert Inside (First)",
+    label: "Insert inside (First)",
     icon: "corner-down-right",
     group: "Insert",
     // Structural inserts inside an instance subtree are discarded by the next
@@ -80,7 +80,7 @@ export const insertSubmenu: ContextAction[] = [
   },
   {
     id: "insert-inside-last",
-    label: "Insert Inside (Last)",
+    label: "Insert inside (Last)",
     icon: "corner-down-left",
     group: "Insert",
     // Structural inserts inside an instance subtree are discarded by the next
@@ -102,7 +102,7 @@ export const insertSubmenu: ContextAction[] = [
   },
   {
     id: "wrap-section",
-    label: "Wrap in Section",
+    label: "Wrap in section",
     icon: "box",
     group: "Insert",
     isVisible: (ctx) => ctx.element.canBeWrapped(),
@@ -112,7 +112,7 @@ export const insertSubmenu: ContextAction[] = [
   },
   {
     id: "unwrap",
-    label: "Unwrap Element",
+    label: "Unwrap element",
     icon: "minimize-2",
     group: "Insert",
     /* Board 1176:4866 draws this row greyed rather than absent. Hiding it made
