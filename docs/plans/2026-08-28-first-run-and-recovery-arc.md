@@ -15,11 +15,13 @@ C ✓ (sibling visible; the click exposed that new-page mode had NEVER worked �
 fixed prop-driven, live both ways) · D ✓ (cookie-kill + ⌘S opened the surface,
 Keep editing closed it; FORBIDDEN split; autosave auth branch added) ·
 E ✓ (1347:7162 drawn + read back, census 439 rows PASS, verify:ds green,
-202 test files / 1832 pass). NOT live-verified: set-brand / insert-section /
-send-review ticks (the wires are unit-tested; send was deliberately not fired
-against the fixture's review round) and the publish tick (publish stays
-out of scope per 2026-08-25). Scratch site deleted; workspace plan restored
-to FREE and re-read.
+202 test files / 1832 pass). Five scratch-site rounds later, live ticks also
+verified for insert-section (0→1), send-review (popover Send, 0→1) and
+add-page/preview. NOT live-verified: the set-brand tick's full UI drive
+(Starters drill-in resisted synthetic clicks — its emit is pinned through
+the real footer→ReviewModal route in DesignSystemTab.guard-apply instead)
+and the publish tick (publish stays out of scope per 2026-08-25). Every
+scratch site deleted; workspace plan restored to FREE and re-read each time.
 
 | # | Item | Done-condition (observed, not claimed) |
 |---|------|----------------------------------------|
