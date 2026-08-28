@@ -138,7 +138,10 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mi
       <div className="bdi-row-ctrl" role="group" aria-label="Size and line height">
         <label className="bdi-lb">Size</label>
         <div className="bdi-pair">
-          <div className={CHAIN_ROW}>
+          {/* Board 807:8342 pairs the numbers with no second label; a hover
+              title says which is which when both read in px (designer walk
+              2026-08-28: "16 / 24" gave no clue the 24 was line height). */}
+          <div className={CHAIN_ROW} title="Font size">
             <MixedValueIndicator prop="font-size" mixedKeys={mixedKeys} />
             <div className="tw:flex-1">
               <InputWithUnit
@@ -158,7 +161,7 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mi
             </div>
           </div>
           <span className="bdi-pair-sep" aria-hidden="true" />
-          <div className={CHAIN_ROW}>
+          <div className={CHAIN_ROW} title="Line height">
             <MixedValueIndicator prop="line-height" mixedKeys={mixedKeys} />
             <div className="tw:flex-1">
               <InputWithUnit
