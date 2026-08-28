@@ -1,7 +1,11 @@
 import { IconButton, Menu, MenuItem, POPOVER_BASE_CLASS, Button } from "@/editor/chrome-ui";
 /**
  * AddPageButton — sticky cobalt CTA in pages footer.
- * Overflow (⋮) menu reveals secondary actions: "From template" + "New folder".
+ *
+ * "From template" is a visible sibling of "+ Add page" (founder call
+ * 2026-08-28): buried in the ⋮ overflow, the template route was invisible —
+ * this walk's own probe missed it there. The overflow (⋮) keeps only
+ * "New folder".
  *
  * @license BSD-3-Clause
  */
@@ -25,7 +29,7 @@ export const AddPageButton: React.FC<AddPageButtonProps> = ({
 
   useClickOutside(wrapRef, () => setMenuOpen(false), { enabled: menuOpen });
 
-  const hasOverflow = !!onFromTemplate || !!onAddFolder;
+  const hasOverflow = !!onAddFolder;
 
   return (
     <div ref={wrapRef} style={{ display: "flex", alignItems: "center", gap: 4, position: "relative" }}>
@@ -41,6 +45,17 @@ export const AddPageButton: React.FC<AddPageButtonProps> = ({
       >
         +&nbsp;&nbsp;Add page
       </Button>
+      {onFromTemplate && (
+        <Button
+          type="button"
+          color="light"
+          size="xs"
+          onClick={onFromTemplate}
+          className="tw:min-h-0 tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[13px] tw:leading-5 tw:text-gray-600 tw:shadow-none tw:enabled:hover:bg-transparent tw:enabled:hover:text-gray-900 tw:enabled:hover:underline"
+        >
+          From template
+        </Button>
+      )}
       {hasOverflow && (
         <>
           <IconButton
@@ -63,16 +78,6 @@ export const AddPageButton: React.FC<AddPageButtonProps> = ({
               style={{ position: "absolute", bottom: "calc(100% + 4px)", right: 0, zIndex: 10 }}
             >
               <Menu label="More add options">
-                {onFromTemplate && (
-                  <MenuItem
-                    onClick={() => {
-                      onFromTemplate();
-                      setMenuOpen(false);
-                    }}
-                  >
-                    From template
-                  </MenuItem>
-                )}
                 {onAddFolder && (
                   <MenuItem
                     onClick={() => {

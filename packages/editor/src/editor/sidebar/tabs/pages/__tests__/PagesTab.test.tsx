@@ -75,15 +75,26 @@ describe("AddPageButton", () => {
     expect(onAddBlank).toHaveBeenCalledTimes(1);
   });
 
-  it("shows From template in overflow menu when onFromTemplate provided", () => {
+  /* "From template" left the ⋮ overflow on 2026-08-28 — buried there, the
+     template route was invisible (the flow walk's own probe missed it). It is
+     a visible sibling now; the overflow holds only "New folder". */
+  it("shows From template as a visible sibling when onFromTemplate provided", () => {
+    const onFromTemplate = vi.fn();
+    render(<AddPageButton onAddBlank={vi.fn()} onFromTemplate={onFromTemplate} />);
+    const btn = screen.getByRole("button", { name: /from template/i });
+    fireEvent.click(btn);
+    expect(onFromTemplate).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not show the overflow for onFromTemplate alone — only onAddFolder earns it", () => {
     render(<AddPageButton onAddBlank={vi.fn()} onFromTemplate={vi.fn()} />);
-    fireEvent.click(screen.getByRole("button", { name: /more add options/i }));
-    expect(screen.getByText("From template")).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /more add options/i })).toBeNull();
   });
 
   it("does not show overflow button when no extra options provided", () => {
     render(<AddPageButton onAddBlank={vi.fn()} />);
     expect(screen.queryByRole("button", { name: /more add options/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /from template/i })).toBeNull();
   });
 
   it("calls onAddBlank when primary button clicked", () => {
@@ -95,22 +106,23 @@ describe("AddPageButton", () => {
     expect(screen.queryByText("Blank page")).toBeNull();
   });
 
-  it("calls onFromTemplate and closes overflow menu on From template click", () => {
-    const onFromTemplate = vi.fn();
-    render(<AddPageButton onAddBlank={vi.fn()} onFromTemplate={onFromTemplate} />);
+  it("overflow menu holds New folder only", () => {
+    const onAddFolder = vi.fn();
+    render(<AddPageButton onAddBlank={vi.fn()} onFromTemplate={vi.fn()} onAddFolder={onAddFolder} />);
     fireEvent.click(screen.getByRole("button", { name: /more add options/i }));
-    fireEvent.click(screen.getByText("From template"));
-    expect(onFromTemplate).toHaveBeenCalledTimes(1);
-    expect(screen.queryByText("From template")).toBeNull();
+    expect(screen.queryByRole("menuitem", { name: /from template/i })).toBeNull();
+    fireEvent.click(screen.getByText("New folder"));
+    expect(onAddFolder).toHaveBeenCalledTimes(1);
+    expect(screen.queryByText("New folder")).toBeNull();
   });
 
   it("toggles overflow menu closed on second overflow button click", () => {
-    render(<AddPageButton onAddBlank={vi.fn()} onFromTemplate={vi.fn()} />);
+    render(<AddPageButton onAddBlank={vi.fn()} onAddFolder={vi.fn()} />);
     const btn = screen.getByRole("button", { name: /more add options/i });
     fireEvent.click(btn);
-    expect(screen.getByText("From template")).toBeTruthy();
+    expect(screen.getByText("New folder")).toBeTruthy();
     fireEvent.click(btn);
-    expect(screen.queryByText("From template")).toBeNull();
+    expect(screen.queryByText("New folder")).toBeNull();
   });
 });
 
