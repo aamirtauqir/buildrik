@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ToggleSwitch } from "flowbite-react";
 import { cn } from "@lib/utils";
 import { PLAN_LIMITS } from "@lib/constants/plan-limits";
+import { Button } from "@/components/dashboard/primitives";
 
 export const PLAN_FEATURES = [
   { label: "Sites", free: "3", pro: "15", business: "50" },
@@ -209,25 +210,31 @@ export function PlanComparison({
                   return (
                     <td key={plan} className={cn("px-6 py-4 text-center", isCurrent && "bg-[var(--color-primary-subtle)]")}>
                       {!isCurrent && plan !== "FREE" && (
-                        <button
-                          onClick={() => onSelectPlan?.(plan, interval)}
-                          disabled={upgradesDisabled}
-                          title={upgradesDisabled ? "Payment processing is coming soon" : undefined}
-                          className={cn(
-                            "rounded-lg px-4 py-2 text-body font-semibold text-white transition-opacity",
-                            upgradesDisabled
-                              ? "cursor-not-allowed opacity-50"
-                              : "hover:opacity-90",
-                            !upgradesDisabled && isBest && "ring-2 ring-[var(--color-success)] ring-offset-2"
-                          )}
-                          style={{ backgroundColor: "var(--color-primary)" }}
-                        >
-                          {upgradesDisabled
-                            ? "Coming soon"
-                            : isBest
-                              ? "Upgrade — Best for you"
-                              : "Upgrade"}
-                        </button>
+                        // inline-flex on the wrapper, not a bare span: the cell
+                        // is `text-center`, the Button primitive is a flowbite
+                        // FLEX button, and text-align does not position a
+                        // block-level box — so all three Upgrade CTAs rendered
+                        // left of centre. Same defect this arc fixed in the
+                        // media empty state and the publish error screen, and
+                        // reintroduced here two files over.
+                        // No `title` — the button's own label reads "Coming
+                        // soon" in this state, so the tooltip repeated it to
+                        // mouse users only. The span stays for the centring
+                        // above.
+                        <span className="inline-flex">
+                          <Button
+                            size="sm"
+                            onClick={() => onSelectPlan?.(plan, interval)}
+                            disabled={upgradesDisabled}
+                            className={cn(!upgradesDisabled && isBest && "tw:ring-2 tw:ring-[var(--color-success)] tw:ring-offset-2")}
+                          >
+                            {upgradesDisabled
+                              ? "Coming soon"
+                              : isBest
+                                ? "Upgrade — Best for you"
+                                : "Upgrade"}
+                          </Button>
+                        </span>
                       )}
                       {isCurrent && (
                         <span className="text-body font-semibold" style={{ color: "var(--color-primary)" }}>

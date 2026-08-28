@@ -10,6 +10,7 @@ import { PendingInvites } from "@/components/team/pending-invites";
 import { TeamEmptyState } from "@/components/team/team-empty-state";
 import { ErrorState, DeniedState } from "@/components/states";
 import { Button, MetricValue } from "@/components/dashboard/primitives";
+import { PageHeaderActions } from "@/components/dashboard/shell/page-actions";
 import { UserPlus } from "lucide-react";
 
 export default function TeamPage() {
@@ -146,7 +147,10 @@ export default function TeamPage() {
     <div>
       {/* The settings layout owns the section PageHeader (D10.4) — this page
           keeps only its functional actions. */}
-      <div className="mb-6 flex items-center justify-end gap-2">
+      {/* On the layout's title row via the actions slot — see page-actions.tsx.
+          This was a right-aligned band under the header, which read as a gap
+          with nothing in its left half. */}
+      <PageHeaderActions>
         {statsQuery.data && (
           <span className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
             <MetricValue>{statsQuery.data.active} / {statsQuery.data.limit === -1 ? "∞" : statsQuery.data.limit}</MetricValue> seats
@@ -172,7 +176,7 @@ export default function TeamPage() {
           <UserPlus className="h-4 w-4" />
           Invite
         </Button>
-      </div>
+      </PageHeaderActions>
 
       {isEmpty ? (
         <TeamEmptyState onInvite={() => setInviteOpen(true)} />
@@ -195,7 +199,7 @@ export default function TeamPage() {
           {/* Pending Invites */}
           {pendingQuery.data && pendingQuery.data.length > 0 && (
             <div>
-              <h2 className="mb-3 text-section-title" style={{ color: "var(--color-text-primary)" }}>Pending Invitations</h2>
+              <h2 className="mb-3 text-section-title" style={{ color: "var(--color-text-primary)" }}>Pending invitations</h2>
               <PendingInvites
                 invites={pendingQuery.data}
                 onRevoke={(inviteId) => revokeInviteMutation.mutate({ inviteId })}
@@ -206,7 +210,7 @@ export default function TeamPage() {
 
           {/* Team Activity */}
           <div className="rounded-lg border bg-white p-5" style={{ borderColor: "var(--color-border-default)" }}>
-            <h3 className="mb-3 text-section-title" style={{ color: "var(--color-text-primary)" }}>Team Activity</h3>
+            <h3 className="mb-3 text-section-title" style={{ color: "var(--color-text-primary)" }}>Team activity</h3>
             {activityQuery.data && activityQuery.data.length > 0 ? (
               <div className="space-y-3">
                 {activityQuery.data.map((entry) => (

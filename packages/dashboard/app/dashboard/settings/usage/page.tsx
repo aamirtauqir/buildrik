@@ -3,17 +3,9 @@
 import { trpc } from "@lib/trpc/client";
 import { LoadingSkeleton, ErrorState } from "@/components/states";
 import { SectionCard, MetricValue, ProgressBar, Pill } from "@/components/dashboard/primitives";
+import { PageHeaderActions } from "@/components/dashboard/shell/page-actions";
 
 type UsageMetric = { key: string; label: string; used: number; limit: number; unit: string; estimated?: boolean };
-
-/** Explicit per-tile bar color (design mockup), keyed to the service metric order:
- *  Bandwidth → cobalt, Build minutes → teal, Form submissions → warning, Storage → cobalt. */
-const TILE_TONE: Record<string, "accent" | "warning" | "teal"> = {
-  bandwidth: "accent",
-  build: "teal",
-  submissions: "warning",
-  storage: "accent",
-};
 
 function fmt(n: number, unit: string) {
   const v = unit === "GB" ? n.toFixed(1) : n >= 1000 ? `${(n / 1000).toFixed(n % 1000 === 0 ? 0 : 1)}k` : String(n);
@@ -25,19 +17,23 @@ export default function UsagePage() {
 
   return (
     <div>
-      {/* The settings layout owns the section PageHeader (D10.4) — this row
-          keeps the billing-period context. */}
-      <div className="mb-6 flex items-center justify-between gap-4">
-        <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>
-          {query.data ? `Current billing period · ${query.data.period.label}` : "Track your workspace usage against plan limits."}
-        </p>
+      {/* On the layout's title row via the actions slot. The loading fallback
+          here used to read "Track your workspace usage against plan limits.",
+          which is the header description's job — the layout already says
+          "Bandwidth, storage & credits". Now it shows the period or nothing. */}
+      <PageHeaderActions>
+        {query.data && (
+          <span className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
+            {query.data.period.label}
+          </span>
+        )}
         <span
           className="inline-flex shrink-0 items-center rounded-pill border px-3 py-1 text-body-sm font-medium"
           style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
         >
           This month
         </span>
-      </div>
+      </PageHeaderActions>
 
       {query.isLoading ? (
         <LoadingSkeleton rows={4} variant="card" />
@@ -47,7 +43,7 @@ export default function UsagePage() {
         <>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {query.data.metrics.map((m) => (
-              <UsageTile key={m.key} metric={m} tone={TILE_TONE[m.key] ?? "accent"} />
+              <UsageTile key={m.key} metric={m} />
             ))}
           </div>
 
@@ -68,9 +64,27 @@ export default function UsagePage() {
   );
 }
 
-function UsageTile({ metric, tone }: { metric: UsageMetric; tone: "accent" | "warning" | "teal" }) {
+/** The bar reads headroom, not identity.
+ *
+ *  It used to take a hardcoded per-tile colour from the design mockup —
+ *  "Form submissions → warning" meant a bar at 0/100 rendered amber, while
+ *  amber means "approaching the limit" on every other bar in the product. And
+ *  because the colour was keyed to the metric and not the number, "Team
+ *  members 2 / 1" — over the limit — drew in the accent blue, while the
+ *  Billing screen drew the same fact in red. Two screens, one fact, two
+ *  answers. `tone="auto"` is the ProgressBar behaviour that already existed:
+ *  accent under 60%, warning from 60%, error from 85%. */
+function UsageTile({ metric }: { metric: UsageMetric }) {
   const unlimited = metric.limit < 0;
-  const pct = unlimited || metric.limit === 0 ? 0 : Math.min((metric.used / metric.limit) * 100, 100);
+  // limit 0 is a hard cap, not "no data": anything used against it is over the
+  // line and must read as over the line. It painted accent-blue at 0% before,
+  // which is the same "two screens, one fact, two answers" the tone change
+  // above fixes.
+  const pct = unlimited
+    ? 0
+    : metric.limit === 0
+      ? (metric.used > 0 ? 100 : 0)
+      : Math.min((metric.used / metric.limit) * 100, 100);
   return (
     <div
       className="rounded-lg border p-4 shadow-card"
@@ -80,18 +94,12 @@ function UsageTile({ metric, tone }: { metric: UsageMetric; tone: "accent" | "wa
         <span className="font-mono text-eyebrow uppercase tracking-wide" style={{ color: "var(--color-text-secondary)" }}>{metric.label}</span>
         {metric.estimated && <Pill tone="neutral">est.</Pill>}
       </div>
-      <p className="mt-2 font-mono tabular-nums text-[22px] font-bold leading-[1.1]" style={{ color: "var(--color-text-primary)" }}>
+      <p className="mt-2 font-mono tabular-nums text-metric" style={{ color: "var(--color-text-primary)" }}>
         {fmt(metric.used, metric.unit)}
         <span className="font-normal" style={{ color: "var(--color-text-muted)" }}> / {unlimited ? "∞" : fmt(metric.limit, metric.unit)}</span>
       </p>
       <div className="mt-3">
-        {tone === "teal" ? (
-          <div className="h-1.5 w-full overflow-hidden rounded-pill" style={{ backgroundColor: "var(--color-border-default)" }}>
-            <div className="h-full rounded-pill transition-all" style={{ width: `${pct}%`, backgroundColor: "var(--color-teal)" }} />
-          </div>
-        ) : (
-          <ProgressBar pct={pct} tone={tone} />
-        )}
+        <ProgressBar pct={pct} tone="auto" />
       </div>
     </div>
   );

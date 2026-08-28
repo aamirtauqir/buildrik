@@ -16,6 +16,8 @@ import { PaymentMethodCard } from "@/components/billing/payment-method-card";
 import { CancelModal } from "@/components/billing/cancel-modal";
 import { DunningBanner } from "@/components/dashboard/dunning-banner";
 import { SectionCard, MetricValue } from "@/components/dashboard/primitives";
+import { Button } from "@/components/dashboard/primitives";
+import { PageHeaderActions } from "@/components/dashboard/shell/page-actions";
 
 type PlanKey = "FREE" | "PRO" | "BUSINESS";
 
@@ -174,13 +176,9 @@ function BillingPageInner() {
           <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>
             Choose a plan — upgrade or downgrade your workspace subscription.
           </p>
-          <button
-            onClick={() => setShowPlans(false)}
-            className="shrink-0 rounded-lg border px-4 py-2 text-body font-medium"
-            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
-          >
+          <Button variant="ghost" onClick={() => setShowPlans(false)} className="shrink-0">
             Back to Billing
-          </button>
+          </Button>
         </div>
         <div className="space-y-4">
           <PlanComparison
@@ -203,23 +201,34 @@ function BillingPageInner() {
           caller of createCheckoutSession. Gating it to FREE (the prior bug) left
           PRO/BUSINESS with no in-app path to change tier — the PlanCard's own
           "Change Plan" button never renders because that card is always isCurrent. */}
-      <div className="mb-6 flex justify-end">
-        <button
-          onClick={() => (planKey === "FREE" ? setShowPlans(true) : portalMutation.mutate())}
-          disabled={portalMutation.isPending || !isOwner}
-          title={ownerOnly}
-          className="rounded-lg px-4 py-2 text-body font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
-          style={{ backgroundColor: "var(--color-primary)" }}
-        >
-          {planKey === "FREE"
-            ? "View Plans"
-            : portalMutation.isPending
-              ? "Opening…"
-              : isDunning
-                ? "Update payment method"
-                : "Change plan"}
-        </button>
-      </div>
+      {/* On the layout's title row via the actions slot, and on the Button
+          primitive — it was a hand-rolled 38px/600 button next to a dashboard
+          full of 40px/500 ones. */}
+      <PageHeaderActions>
+        {/* The reason, visible. It was carried ONLY by a `title` on a span —
+            hover-only, so a keyboard or screen-reader user met a dead button
+            with no explanation anywhere on the page. Team already puts its
+            seat count in this slot the same way. */}
+        {ownerOnly && (
+          <span className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
+            {ownerOnly}
+          </span>
+        )}
+        <span>
+          <Button
+            onClick={() => (planKey === "FREE" ? setShowPlans(true) : portalMutation.mutate())}
+            disabled={portalMutation.isPending || !isOwner}
+          >
+            {planKey === "FREE"
+              ? "View Plans"
+              : portalMutation.isPending
+                ? "Opening…"
+                : isDunning
+                  ? "Update payment method"
+                  : "Change plan"}
+          </Button>
+        </span>
+      </PageHeaderActions>
 
       {/* D) Dunning countdown — grace end matches the billing-downgrade cron
           (7 days after the period end). */}
@@ -244,14 +253,14 @@ function BillingPageInner() {
           <p className="text-body font-medium" style={{ color: "#723B13" }}>
             Your plan cancels on <MetricValue>{formatDate(overview.currentPeriodEnd)}</MetricValue>
           </p>
-          <button
+          <Button
+            size="sm"
             onClick={() => reactivateMutation.mutate()}
             disabled={reactivateMutation.isPending}
-            className="ml-4 shrink-0 rounded-lg px-4 py-1.5 text-body font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
-            style={{ backgroundColor: "var(--color-primary)" }}
+            className="ml-4 shrink-0"
           >
             {reactivateMutation.isPending ? "Reactivating..." : "Reactivate"}
-          </button>
+          </Button>
         </div>
       )}
 
@@ -267,7 +276,6 @@ function BillingPageInner() {
               features={PLAN_FEATURES_MAP[planKey] ?? []}
               isCurrent
               isGrandfathered={overview.isGrandfathered}
-              onChangePlan={() => setShowPlans(true)}
             />
 
             {/* C) Interval switch — hidden until real Stripe. The mutation
@@ -288,18 +296,12 @@ function BillingPageInner() {
                     Cancel subscription
                   </p>
                   <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
-                    Stays active until the end of your billing period
+                    {ownerOnly ?? "Stays active until the end of your billing period"}
                   </p>
                 </div>
-                <button
-                  onClick={() => setShowCancel(true)}
-                  disabled={!isOwner}
-                  title={ownerOnly}
-                  className="rounded-lg border px-4 py-2 text-body font-medium transition-colors hover:bg-[var(--color-bg-page)] disabled:opacity-50"
-                  style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
-                >
+                <Button variant="ghost" size="sm" onClick={() => setShowCancel(true)} disabled={!isOwner}>
                   Cancel subscription
-                </button>
+                </Button>
               </div>
             )}
           </>

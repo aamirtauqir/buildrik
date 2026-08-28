@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { PageHeader } from "@/components/dashboard/primitives";
+import { PageHeaderActionsSlot } from "@/components/dashboard/shell/page-actions";
 import { findSettingsSection } from "@/components/dashboard/shell/settings-sections";
 
 /** Settings chrome. The index is the design's directory of section cards; a
@@ -37,7 +38,12 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
         <ChevronLeft className="h-4 w-4" />
         Settings
       </Link>
-      <PageHeader title={section.label} description={section.description} />
+      {/* The actions slot a section page portals into. Team, Plans, Usage and
+          Billing each drew their own right-aligned band UNDER this header,
+          because the layout owns the PageHeader and a page had no way to reach
+          its actions prop — so those four read as a different kind of page from
+          every other screen in the dashboard. */}
+      <PageHeader title={section.label} description={section.description} actions={<PageHeaderActionsSlot />} />
       <div className="min-w-0">{children}</div>
     </div>
   );

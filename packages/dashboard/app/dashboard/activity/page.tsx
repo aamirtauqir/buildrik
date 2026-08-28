@@ -20,8 +20,12 @@ export default function ActivityPage() {
   const [filter, setFilter] = useState<ActivityFilter>("all");
   const activity = trpc.dashboard.activity.useQuery({ filter });
 
+  // Left-aligned, not centred: `mx-auto` put this H1 at x=483 while the other
+  // nine sidebar screens sit at x=333, so the title slid 150px sideways on the
+  // way in from Home. `py-8` also went — every other screen's header starts at
+  // the same y. Measured on all 12 screens.
   return (
-    <div className="mx-auto max-w-3xl space-y-6 py-8">
+    <div className="max-w-3xl space-y-6">
       <div className="flex items-center justify-between gap-4">
         <div>
           <h1 className="text-page-title" style={{ color: "var(--color-text-primary)" }}>Activity</h1>
@@ -29,7 +33,7 @@ export default function ActivityPage() {
             Everything that&apos;s happened across your workspace.
           </p>
         </div>
-        <FilterTabs value={filter} onChange={setFilter} options={FILTERS} />
+        <FilterTabs value={filter} onChange={setFilter} options={FILTERS} label="Activity type" />
       </div>
 
       {activity.isError ? (

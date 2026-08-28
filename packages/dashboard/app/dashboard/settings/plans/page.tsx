@@ -3,9 +3,29 @@
 import { useState } from "react";
 import { Check } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
-import { MetricValue } from "@/components/dashboard/primitives";
+import { cn } from "@lib/utils";
+import { MetricValue, FilterTabs, Button } from "@/components/dashboard/primitives";
+import { PageHeaderActions } from "@/components/dashboard/shell/page-actions";
 import { ErrorState } from "@/components/states";
 import { useToast } from "@/components/dashboard/toast-provider";
+
+/** The billing-cycle segments. The saving badge stays green in both states —
+ *  FilterTabs' active segment is a white pill, so white-on-white was the reason
+ *  the old hand-rolled track flipped it. */
+const BILLING_CYCLES = [
+  { value: "monthly" as const, label: "Monthly" },
+  {
+    value: "yearly" as const,
+    label: (
+      <span className="inline-flex items-center gap-1.5">
+        Yearly
+        <span className="text-body-sm font-semibold" style={{ color: "var(--color-success)" }}>
+          &minus;20%
+        </span>
+      </span>
+    ),
+  },
+];
 
 type PlanName = "FREE" | "PRO" | "BUSINESS";
 
@@ -128,41 +148,19 @@ export default function PlansPage() {
 
   return (
     <div>
-      {/* The settings layout owns the section PageHeader (D10.4) — this page
-          keeps only its billing-cycle toggle. */}
-      <div className="mb-6 flex justify-end">
-        <div
-          className="inline-flex shrink-0 rounded-lg border p-0.5"
-          style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
-          role="tablist"
-          aria-label="Billing cycle"
-        >
-          <button
-            role="tab"
-            aria-selected={!yearly}
-            onClick={() => setYearly(false)}
-            className="rounded-md px-4 py-1.5 text-body font-medium transition-colors"
-            style={!yearly ? { backgroundColor: "var(--color-primary)", color: "#FFFFFF" } : { color: "var(--color-text-secondary)" }}
-          >
-            Monthly
-          </button>
-          <button
-            role="tab"
-            aria-selected={yearly}
-            onClick={() => setYearly(true)}
-            className="inline-flex items-center gap-1.5 rounded-md px-4 py-1.5 text-body font-medium transition-colors"
-            style={yearly ? { backgroundColor: "var(--color-primary)", color: "#FFFFFF" } : { color: "var(--color-text-secondary)" }}
-          >
-            Yearly
-            <span
-              className="text-body-sm font-semibold"
-              style={{ color: yearly ? "rgba(255,255,255,0.9)" : "var(--color-success)" }}
-            >
-              &minus;20%
-            </span>
-          </button>
-        </div>
-      </div>
+      {/* On the layout's title row, not a band under it: the settings layout
+          owns the section PageHeader (D10.4), and PageHeaderActions portals
+          into the slot it renders there. And the cycle toggle is the shared
+          FilterTabs now — it was a hand-rolled track with a blue-fill active
+          segment, a second track shape doing Media's job. */}
+      <PageHeaderActions>
+        <FilterTabs
+          value={yearly ? "yearly" : "monthly"}
+          onChange={(v) => setYearly(v === "yearly")}
+          options={BILLING_CYCLES}
+          label="Billing cycle"
+        />
+      </PageHeaderActions>
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {plans.map((plan) => {
@@ -262,15 +260,14 @@ function PlanCta({
   onSelect: (planId: PlanName) => void;
   pending: boolean;
 }) {
+  // Both branches ride the Button primitive. Hand-rolled, these were 40px/600
+  // and 42px/600 — two more heights and a weight the dashboard uses nowhere
+  // else, sitting under a header full of 40px/500 buttons.
   if (isCurrent) {
     return (
-      <button
-        disabled
-        className="w-full cursor-not-allowed rounded-lg py-2.5 text-center text-body font-semibold"
-        style={{ backgroundColor: "var(--color-bg-subtle)", color: "var(--color-text-muted)" }}
-      >
+      <Button variant="ghost" disabled className="w-full">
         Current plan
-      </button>
+      </Button>
     );
   }
 
@@ -278,23 +275,21 @@ function PlanCta({
   const label = isUpgrade ? "Upgrade" : "Downgrade";
 
   return (
-    <button
+    <Button
+      variant={popular ? "primary" : "ghost"}
       onClick={() => onSelect(planId)}
       disabled={pending}
-      className={
-        popular
-          ? "block w-full rounded-lg py-2.5 text-center text-body font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
-          : "block w-full rounded-lg border py-2.5 text-center text-body font-semibold transition-colors disabled:opacity-50"
-      }
-      style={
-        popular
-          ? { backgroundColor: "var(--color-primary)" }
-          : onInk
-            ? { borderColor: "rgba(255,255,255,0.45)", color: "#FFFFFF" }
-            : { borderColor: "var(--color-border-strong)", color: "var(--color-text-primary)" }
-      }
+      // The BUSINESS card is painted on ink, so a light ghost button would
+      // vanish into it — it borrows the card's own hairline instead. The
+      // background and hover are CLASSES, not an inline style: an inline
+      // `backgroundColor: transparent` beats the hover class in every state,
+      // which left this CTA with no hover feedback at all.
+      className={cn(
+        "w-full",
+        !popular && onInk && "tw:border-white/45 tw:bg-transparent tw:text-white tw:hover:bg-white/10",
+      )}
     >
       {pending ? "Opening…" : label}
-    </button>
+    </Button>
   );
 }

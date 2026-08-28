@@ -93,23 +93,29 @@ export function PendingInvites({ invites, onResend, onRevoke, resendingId, revok
                 </td>
                 <td className="px-4 py-3 text-right">
                   <div className="flex items-center justify-end gap-2">
+                    {/* No `title`. The RESENDS cell in this same row already
+                        reads "Resent 2/2 times" in the accent colour when the
+                        cap is hit — visible to everyone, unlike a tooltip on a
+                        span, which reaches only a mouse. */}
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => onResend(invite.id)}
                       disabled={!!resendingId || resendDisabled}
-                      title={resendDisabled ? "Maximum resends reached" : undefined}
                     >
                       {resendingId === invite.id ? "Sending..." : "Resend"}
                     </Button>
-                    <button
+                    {/* Was hand-rolled at 30px beside a 36px Resend in the same
+                        cell, and painted with `--color-primary` while hovering
+                        to red — the accent colour on a destructive action. */}
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       onClick={() => onRevoke(invite.id)}
                       disabled={!!revokingId}
-                      className="rounded-lg border px-3 py-1.5 text-body-sm font-medium transition-colors hover:bg-red-50 disabled:opacity-50"
-                      style={{ borderColor: "var(--color-primary)", color: "var(--color-primary)" }}
                     >
                       {revokingId === invite.id ? "Revoking..." : "Revoke"}
-                    </button>
+                    </Button>
                   </div>
                 </td>
               </tr>

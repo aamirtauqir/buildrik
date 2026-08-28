@@ -27,7 +27,6 @@ export interface PlanCardProps {
   features: string[];
   isCurrent: boolean;
   isGrandfathered?: boolean;
-  onChangePlan?: () => void;
 }
 
 /**
@@ -69,7 +68,6 @@ export function PlanCard({
   features,
   isCurrent,
   isGrandfathered = false,
-  onChangePlan,
 }: PlanCardProps) {
   return (
     <div
@@ -102,23 +100,14 @@ export function PlanCard({
         ))}
       </ul>
 
-      {!isCurrent && onChangePlan && (
-        <button
-          onClick={onChangePlan}
-          className="mt-6 w-full rounded-lg py-2.5 text-body font-semibold text-white transition-opacity hover:opacity-90"
-          style={{ backgroundColor: "var(--color-primary)" }}
-        >
-          Change Plan
-        </button>
-      )}
-      {isCurrent && (
-        <div
-          className="mt-6 w-full rounded-lg py-2.5 text-center text-body font-semibold"
-          style={{ backgroundColor: "var(--color-primary-subtle)", color: "var(--color-primary)" }}
-        >
-          Active
-        </div>
-      )}
+      {/* No CTA. This component has one call site (billing/page.tsx) and it
+          passes `isCurrent` unconditionally, so a `{!isCurrent && ...}` branch
+          could never render — it was dead code holding a live `Button` import.
+          The plan-change door is the "View Plans" action on the title row. */}
+      {/* No "Active" block. It was a div painted as a full-width primary
+          button — the largest, most button-shaped thing on the Billing screen,
+          and it did nothing. The card already says the same thing twice above:
+          the accent "Current Plan" pill on the title row. */}
     </div>
   );
 }
