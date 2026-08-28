@@ -117,7 +117,7 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
           aria-label="Custom head code"
           style={{ minHeight: 100, fontFamily: "var(--bk-font-mono)", fontSize: "11.5px", lineHeight: 1.4 }}
         />
-        {s.headCodeError && <HelperText color="failure" className={BK_HELPER_ERROR_CLASS}>{s.headCodeError}</HelperText>}
+        {s.headCodeError && <HelperText color="red" className={BK_HELPER_ERROR_CLASS}>{s.headCodeError}</HelperText>}
         <HelperText className={BK_HELPER_CLASS}>Injected into the &lt;head&gt; of this page only. Sanitized before save.</HelperText>
       </div>
     </div>

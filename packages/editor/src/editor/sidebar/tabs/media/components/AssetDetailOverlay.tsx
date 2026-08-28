@@ -80,7 +80,7 @@ function isCoveredByModal(el: HTMLElement): boolean {
 
 const BACK_ROW =
   "tw:flex tw:h-9 tw:w-full tw:items-center tw:justify-start tw:border-0 tw:bg-transparent tw:px-4 tw:text-left " +
-  "tw:text-[13px] tw:leading-5 tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline";
+  "tw:text-[13px] tw:leading-5 tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline";
 
 export function AssetDetailOverlay({
   item,
@@ -310,7 +310,7 @@ export function AssetDetailOverlay({
               type="button"
               color="light"
               size="xs"
-              className="tw:mt-2 tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+              className="tw:mt-2 tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
               onClick={() => setMetaError(false)}
             >
               Retry
@@ -366,7 +366,7 @@ export function AssetDetailOverlay({
                 type="button"
                 color="light"
                 size="xs"
-                className="tw:mt-1.5 tw:min-h-5 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[12px] tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+                className="tw:mt-1.5 tw:min-h-5 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[12px] tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
                 data-testid="media-alt-generate"
                 disabled={altBusy}
                 aria-busy={altBusy || undefined}
@@ -486,7 +486,7 @@ export function AssetDetailOverlay({
                       type="button"
                       color="light"
                       size="xs"
-                      className="tw:min-h-5 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[12px] tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+                      className="tw:min-h-5 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[12px] tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
                       data-testid="media-restore-go"
                       onClick={() => confirmRestore(v.id)}
                     >
@@ -538,7 +538,7 @@ export function AssetDetailOverlay({
                       type="button"
                       color="light"
                       size="xs"
-                      className="tw:min-h-6 tw:shrink-0 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+                      className="tw:min-h-6 tw:shrink-0 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
                       data-testid={`media-jump-${hit.elementId}`}
                       onClick={() => handleJump(pg.pageId, hit.elementId)}
                     >

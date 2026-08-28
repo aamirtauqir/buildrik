@@ -248,7 +248,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
                     onChange("background-image", `url('${asset.src}')`);
                   })
                 }
-                className="tw:mb-3 tw:whitespace-nowrap tw:px-3 tw:py-2 tw:rounded-md tw:border tw:border-blue-700 tw:bg-[var(--bk-accent-subtle)] tw:text-xs tw:font-semibold tw:text-blue-700"
+                className="tw:mb-3 tw:whitespace-nowrap tw:px-3 tw:py-2 tw:rounded-md tw:border tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-subtle)] tw:text-xs tw:font-semibold tw:text-[var(--bk-accent-text)]"
                 title="Browse media library"
               >
                 Browse

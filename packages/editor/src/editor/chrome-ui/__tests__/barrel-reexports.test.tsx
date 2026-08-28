@@ -20,7 +20,10 @@ import * as FlowbiteReact from "flowbite-react";
 
 describe("chrome-ui barrel — pure flowbite-react re-exports are identity-equal", () => {
   const pureReExports = [
-    "Button",
+    /* `Button` left this list on 2026-08-28 (design-debt arc): it is the
+       third member of the closed wrapper set now — BK_BUTTON_THEME adds the
+       `link`/`ghost` color vocabulary and the `variant` sugar. Its wrapper
+       contract is pinned below. */
     "Badge",
     "Avatar",
     "AvatarGroup",

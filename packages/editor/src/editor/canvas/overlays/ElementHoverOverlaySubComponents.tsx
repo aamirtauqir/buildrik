@@ -191,7 +191,7 @@ const BADGE =
   "tw:flex tw:flex-col tw:gap-0.5 tw:absolute tw:whitespace-nowrap tw:px-2 tw:py-1 tw:rounded " +
   "tw:bg-[#3b3b3b] tw:text-white tw:text-xs tw:[font-family:var(--bk-font-ui)] " +
   "tw:[box-shadow:0_4px_12px_rgba(0,0,0,0.3)]";
-const BADGE_TAG = "tw:px-1 tw:rounded-[2px] tw:text-xs tw:bg-blue-700";
+const BADGE_TAG = "tw:px-1 tw:rounded-[2px] tw:text-xs tw:bg-[var(--bk-accent)]";
 const HINT =
   "tw:absolute tw:-translate-x-full tw:whitespace-nowrap tw:px-2 tw:py-[3px] tw:rounded " +
   "tw:text-xs tw:font-medium tw:[box-shadow:0_2px_8px_rgba(0,0,0,0.2)]";

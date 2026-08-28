@@ -144,7 +144,7 @@ export const AssetCard: React.FC<AssetCardProps> = ({
         draggable ? "tw:cursor-grab" : "tw:cursor-pointer"
       } ${
         isSelected
-          ? "tw:border-2 tw:border-blue-700 tw:[box-shadow:0_0_0_2px_var(--bk-alpha-accent-15)]"
+          ? "tw:border-2 tw:border-[var(--bk-accent)] tw:[box-shadow:0_0_0_2px_var(--bk-alpha-accent-15)]"
           : "tw:border tw:border-gray-200"
       }`}
     >

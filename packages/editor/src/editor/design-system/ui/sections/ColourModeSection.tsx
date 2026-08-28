@@ -120,7 +120,7 @@ export const ColourModeSection: React.FC<ColourModeSectionProps> = ({ composer }
                     setDraft(t.value);
                     setEditing(t.id);
                   }}
-                  className="tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:font-normal tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+                  className="tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:font-normal tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
                 >
                   Set
                 </Button>

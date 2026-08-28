@@ -112,3 +112,69 @@ describe("SavesPruneNote — the retention rule", () => {
     expect(screen.queryByText(/versions kept/)).toBeNull();
   });
 });
+
+/* ── Added 2026-08-25 with the two board pieces the band was missing ─────────
+   Board 163:2's Now row is TWO lines — the count, then what moved — and the
+   approval anchor carries one action, "Compare with current". The string had
+   zero occurrences in src/ while ApprovedCompareView, which renders exactly
+   that comparison, was built and reachable only from ReviewTab. */
+
+/* The repeat sits SECOND on purpose. An earlier version of this fixture put it
+   fifth, where the three-item cap hid it — removing the de-dup left the output
+   identical and this suite passed over the mutation. A guard that cannot see
+   the property it guards is not a guard. */
+const LABELLED = [
+  { id: "a", label: "hero copy", timestamp: 9_000 },
+  { id: "b", label: "hero copy", timestamp: 8_500 }, // repeat, inside the cap
+  { id: "c", label: "2 images", timestamp: 8_000 },
+  { id: "d", label: "menu", timestamp: 7_000 },
+  { id: "e", label: "footer", timestamp: 6_000 },    // 4th distinct — cap drops it
+  { id: "f", label: "before", timestamp: 1_000 },    // predates the approval
+];
+
+const emit = vi.fn();
+const labelledComposer = () =>
+  ({
+    history: { getHistoryStack: () => LABELLED },
+    versions: { maxVersions: 50 },
+    emit,
+  }) as unknown as Composer;
+
+describe("SavesApproval — what changed, and the way to look at it", () => {
+  beforeEach(() => emit.mockClear());
+
+  it("names what moved beneath the count, newest first", async () => {
+    reviewState.value = { state: "approved", reviewerName: "Sara Khan", at: APPROVED_AT };
+    render(<SavesApproval composer={labelledComposer()} />);
+    expect(await screen.findByText("hero copy · 2 images · menu")).toBeInTheDocument();
+  });
+
+  /* Both caps matter: three because a fourth wraps the row, distinct because a
+     repeated label says nothing the first one did not. */
+  it("stops at three and never repeats one", async () => {
+    reviewState.value = { state: "approved", reviewerName: "Sara Khan", at: APPROVED_AT };
+    render(<SavesApproval composer={labelledComposer()} />);
+    const line = await screen.findByText(/hero copy/);
+    expect(line.textContent).not.toContain("footer");
+    expect(line.textContent!.match(/hero copy/g)).toHaveLength(1);
+  });
+
+  it("says nothing when nothing has moved since approval", async () => {
+    reviewState.value = { state: "approved", reviewerName: "Sara Khan", at: APPROVED_AT };
+    const quiet = {
+      history: { getHistoryStack: () => [{ id: "x", label: "old", timestamp: 1_000 }] },
+      versions: { maxVersions: 50 },
+      emit,
+    } as unknown as Composer;
+    render(<SavesApproval composer={quiet} />);
+    expect(await screen.findByText(/Now — 0 changes since approval/)).toBeInTheDocument();
+    expect(screen.queryByText("old")).toBeNull();
+  });
+
+  it("opens Review straight into Compare, rather than rebuilding it here", async () => {
+    reviewState.value = { state: "approved", reviewerName: "Sara Khan", at: APPROVED_AT };
+    render(<SavesApproval composer={labelledComposer()} />);
+    (await screen.findByRole("button", { name: "Compare with current" })).click();
+    expect(emit).toHaveBeenCalledWith("panel:open", { panel: "review", screen: "compare" });
+  });
+});

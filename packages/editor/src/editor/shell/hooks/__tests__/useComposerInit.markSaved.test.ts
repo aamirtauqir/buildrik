@@ -57,6 +57,9 @@ vi.mock("@/services/AssetUploadService", () => ({ createRemoteAssetSync: vi.fn((
 
 const syncSave = vi.fn(() => Promise.resolve({ success: true, savedAt: new Date() }));
 vi.mock("@/services/BuildrikSyncProvider", () => ({
+  /* Added with the attribution wiring: useComposerInit now reads the
+     signed-in user so versions and history stop recording `userId: null`. */
+  loadCurrentUserId: vi.fn(() => Promise.resolve(null)),
   getSiteIdFromUrl: vi.fn(() => "site-1"),
   loadProject: vi.fn(() => Promise.resolve({})),
   loadServerMedia: vi.fn(() => Promise.resolve(null)),

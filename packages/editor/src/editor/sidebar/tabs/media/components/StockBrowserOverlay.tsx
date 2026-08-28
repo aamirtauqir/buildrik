@@ -195,7 +195,7 @@ export function StockBrowserOverlay({
       <PanelFrame.Header title="Media" onClose={onClose} />
 
       <Button
-        className="tw:flex tw:h-9 tw:w-full tw:shrink-0 tw:items-center tw:justify-start tw:border-0 tw:bg-transparent tw:px-4 tw:text-left tw:text-[13px] tw:leading-5 tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+        className="tw:flex tw:h-9 tw:w-full tw:shrink-0 tw:items-center tw:justify-start tw:border-0 tw:bg-transparent tw:px-4 tw:text-left tw:text-[13px] tw:leading-5 tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
         onClick={onClose}
         aria-label="Back to media grid"
       >
@@ -291,7 +291,7 @@ export function StockBrowserOverlay({
               type="button"
               color="light"
               size="xs"
-              className="tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+              className="tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
               data-testid="stock-load-more"
               onClick={() => onLoadMore(type)}
             >

@@ -35,7 +35,7 @@ export interface CommandPaletteProps {
    values can't be additive (Row/PanelFrame precedent). */
 const ITEM_STATE_CLASS: Record<"idle" | "selected" | "disabled", string> = {
   idle: "tw:bg-transparent tw:text-gray-900",
-  selected: "tw:bg-blue-50 tw:text-blue-700",
+  selected: "tw:bg-blue-50 tw:text-[var(--bk-accent-text)]",
   disabled: "tw:bg-transparent tw:text-gray-300 tw:pointer-events-none",
 };
 

@@ -51,7 +51,7 @@ const PREVIEW_BOX =
 const CARD_NAME = "tw:text-[11px] tw:font-semibold tw:text-gray-900 tw:mb-0.5";
 const CARD_META = "tw:text-[10px] tw:text-gray-500 tw:leading-[1.4]";
 const AI_ROW = "tw:flex tw:items-center tw:justify-between tw:px-3 tw:pt-4 tw:pb-1 tw:gap-2";
-const AI_CTA = "tw:text-xs tw:font-medium tw:text-blue-700";
+const AI_CTA = "tw:text-xs tw:font-medium tw:text-[var(--bk-accent-text)]";
 const AI_DESC = "tw:px-3 tw:pb-3 tw:text-[11px] tw:text-gray-500";
 const SAVED_HEADER =
   "tw:px-3 tw:pt-2 tw:pb-1.5 tw:text-[11px] tw:font-semibold tw:text-[var(--bk-ink-soft)] tw:uppercase tw:tracking-[0.04em]";
@@ -68,7 +68,7 @@ const SKETCH = "tw:bg-gray-50 tw:border tw:border-gray-200 tw:rounded-sm";
 function CatalogPreview({ component }: { component: ComponentType }): React.ReactElement {
   switch (component.id) {
     case "button":
-      return <div className="tw:px-2.5 tw:py-[3px] tw:bg-blue-700 tw:text-white tw:rounded tw:text-[10px]">Btn</div>;
+      return <div className="tw:px-2.5 tw:py-[3px] tw:bg-[var(--bk-accent)] tw:text-white tw:rounded tw:text-[10px]">Btn</div>;
     case "input":
       return <div className={`${SKETCH} tw:w-[70%] tw:h-4`} />;
     case "card":
@@ -168,7 +168,7 @@ export const ComponentsSection: React.FC<ComponentsSectionProps> = ({
           onClick={onOpenAIAssist}
           disabled={!onOpenAIAssist}
           data-open-ai-assist
-          className="tw:w-full tw:justify-start tw:gap-1.5 tw:border-0 tw:bg-transparent tw:text-[13px] tw:font-normal tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+          className="tw:w-full tw:justify-start tw:gap-1.5 tw:border-0 tw:bg-transparent tw:text-[13px] tw:font-normal tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
         >
           ✨ Generate with AI
         </Button>

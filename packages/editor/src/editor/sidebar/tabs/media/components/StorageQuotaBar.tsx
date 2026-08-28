@@ -95,7 +95,7 @@ export function StorageQuotaBar({ used, total, onOptimize, compact = false }: St
           type="button"
           color="light"
           size="xs"
-          className="tw:min-h-5 tw:self-start tw:border-0 tw:bg-transparent tw:px-0 tw:text-[12px] tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+          className="tw:min-h-5 tw:self-start tw:border-0 tw:bg-transparent tw:px-0 tw:text-[12px] tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
           data-testid="media-quota-optimize"
           onClick={onOptimize}
         >

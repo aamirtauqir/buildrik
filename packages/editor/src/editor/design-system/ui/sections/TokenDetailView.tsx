@@ -106,7 +106,7 @@ const previewSlot = (token: DesignToken): React.ReactNode => {
         className="tw:inline-block tw:w-6 tw:h-2 tw:bg-gray-200 tw:rounded-sm tw:flex-none tw:relative"
       >
         <span
-          className="tw:absolute tw:left-0 tw:top-0 tw:h-full tw:bg-blue-700 tw:rounded-sm"
+          className="tw:absolute tw:left-0 tw:top-0 tw:h-full tw:bg-[var(--bk-accent)] tw:rounded-sm"
           style={{ width: widthPx }}
         />
       </span>

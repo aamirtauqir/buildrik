@@ -66,7 +66,7 @@ const PresetChip: React.FC<{
     onClick={onApply}
     className={`${PILL} ${
       isActive
-        ? "tw:border-blue-700 tw:bg-[var(--bk-accent-tint)] tw:text-blue-700 tw:font-semibold"
+        ? "tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-accent-text)] tw:font-semibold"
         : "tw:border-gray-200 tw:bg-transparent tw:text-gray-500 tw:font-medium tw:hover:text-gray-900"
     }`}
   >
@@ -97,7 +97,7 @@ const ValueChip: React.FC<ValueChipProps> = ({ token, isActive, isDirty, onClick
       onClick={onClick}
       className={`tw:relative tw:px-3 tw:py-[5px] tw:rounded-[5px] tw:border tw:text-[11px] tw:font-medium ${MONO} ${
         isActive
-          ? "tw:border-blue-700 tw:bg-[var(--bk-accent-tint)] tw:text-blue-700"
+          ? "tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-accent-text)]"
           : "tw:border-transparent tw:bg-[var(--bk-bg-subtle)] tw:text-gray-900 tw:hover:bg-gray-100"
       }`}
     >
@@ -179,7 +179,7 @@ const EditDrawer: React.FC<EditDrawerProps> = ({
           onClick={() => onRedo(token.id)}
           title="Redo"
           aria-label={`Redo change to ${token.name}`}
-          className={`${ICON_BTN} tw:text-blue-700`}
+          className={`${ICON_BTN} tw:text-[var(--bk-accent-text)]`}
         >
           ↪
         </Button>

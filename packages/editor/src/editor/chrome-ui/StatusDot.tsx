@@ -21,7 +21,7 @@ const LABEL: Record<StatusDotState, string> = {
 const TONE: Record<StatusDotState, string> = {
   live: "tw:bg-green-500",
   review: "tw:bg-yellow-500",
-  changes: "tw:bg-blue-700",
+  changes: "tw:bg-[var(--bk-accent)]",
   draft: "tw:bg-gray-400",
   failed: "tw:bg-red-600",
 };

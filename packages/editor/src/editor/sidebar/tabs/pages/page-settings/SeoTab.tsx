@@ -77,7 +77,7 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
         <div className={`tw:text-[10.5px] tw:font-medium tw:text-[var(--bk-ink-soft)] ${MONO}`}>
           {s.domain ?? "yoursite.com"} › {page.slug?.replace(/^\//, "") || page.id}
         </div>
-        <div className={`tw:mt-1 tw:mb-0.5 tw:text-base tw:font-medium tw:text-blue-700 ${UI}`}>
+        <div className={`tw:mt-1 tw:mb-0.5 tw:text-base tw:font-medium tw:text-[var(--bk-accent-text)] ${UI}`}>
           {s.seoTitle || page.name}
         </div>
         <div
@@ -99,7 +99,7 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
               size="xs"
               type="button"
               onClick={() => s.setAllowIndex(true)}
-              className={`tw:ml-1.5 tw:text-[11.5px] tw:font-medium tw:text-blue-700 tw:hover:text-blue-800 ${GHOST_BTN} ${UI}`}
+              className={`tw:ml-1.5 tw:text-[11.5px] tw:font-medium tw:text-[var(--bk-accent-text)] tw:hover:text-[var(--bk-accent-hover)] ${GHOST_BTN} ${UI}`}
             >
               Turn indexing on →
             </Button>
@@ -189,7 +189,7 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
             disabled={aiBusy}
             onClick={suggestTitle}
             aria-busy={aiBusy || undefined}
-            className={`tw:self-start tw:inline-flex tw:items-center tw:gap-1 tw:px-2 tw:py-[3px] tw:border tw:border-blue-700 tw:rounded-full tw:bg-blue-50 tw:text-blue-700 tw:hover:bg-blue-100 tw:text-[10.5px] tw:font-medium ${UI}`}
+            className={`tw:self-start tw:inline-flex tw:items-center tw:gap-1 tw:px-2 tw:py-[3px] tw:border tw:border-[var(--bk-accent)] tw:rounded-full tw:bg-blue-50 tw:text-[var(--bk-accent-text)] tw:hover:bg-[var(--bk-accent-subtle)] tw:text-[10.5px] tw:font-medium ${UI}`}
           >
             <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
               <path d="M5 3l14 9-14 9V3z" />
@@ -306,7 +306,7 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
             one URL two different scores — but the COPY must not assert a fact
             it does not have. Codex, whole-session review. */}
         {s.slugError ? (
-          <HelperText color="failure" className={BK_HELPER_ERROR_CLASS}>{s.slugError}</HelperText>
+          <HelperText color="red" className={BK_HELPER_ERROR_CLASS}>{s.slugError}</HelperText>
         ) : isPlaceholderSlug(s.slug) ? (
           <HelperText className={BK_HELPER_CLASS}>
             “{s.slug}” is a numbered URL — a descriptive slug ranks better (+10 pts)

@@ -66,7 +66,7 @@ export const InsertLoadError: React.FC<{ onRetry: () => void }> = ({ onRetry }) 
       type="button"
       color="light"
       size="xs"
-      className="tw:min-h-6 tw:self-start tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+      className="tw:min-h-6 tw:self-start tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
       data-testid="insert-load-retry"
       onClick={onRetry}
     >

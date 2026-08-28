@@ -11,7 +11,7 @@
 import * as React from "react";
 
 /** The accent block every diagram is built from, and its muted counterpart. */
-const BOX = "tw:bg-blue-700 tw:rounded-[1px]";
+const BOX = "tw:bg-[var(--bk-accent)] tw:rounded-[1px]";
 const GRAY = "tw:bg-gray-400 tw:rounded-[1px]";
 const GHOST = "tw:border tw:border-dashed tw:border-gray-400 tw:opacity-50";
 
@@ -79,13 +79,13 @@ export const PositionPreview: React.FC<{ type: string }> = ({ type }) => {
     case "static":
       return (
         <div className={FRAME}>
-          <div className={`${DOT} tw:relative tw:my-[5px] tw:mx-auto tw:bg-blue-700`} />
+          <div className={`${DOT} tw:relative tw:my-[5px] tw:mx-auto tw:bg-[var(--bk-accent)]`} />
         </div>
       );
     case "relative":
       return (
         <div className={FRAME}>
-          <div className={`${DOT} tw:top-0.5 tw:left-0.5 tw:bg-blue-700`} />
+          <div className={`${DOT} tw:top-0.5 tw:left-0.5 tw:bg-[var(--bk-accent)]`} />
           {/* the outline it moved away from */}
           <div className={`${GHOST} tw:w-2 tw:h-1.5 tw:rounded-[1px] tw:absolute tw:top-[5px] tw:left-2`} />
         </div>
@@ -93,7 +93,7 @@ export const PositionPreview: React.FC<{ type: string }> = ({ type }) => {
     case "absolute":
       return (
         <div className={FRAME}>
-          <div className={`${DOT} tw:top-0.5 tw:right-0.5 tw:bg-blue-700`} />
+          <div className={`${DOT} tw:top-0.5 tw:right-0.5 tw:bg-[var(--bk-accent)]`} />
         </div>
       );
     case "fixed":

@@ -45,7 +45,7 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
   switch (component.id) {
     case "button":
       return (
-        <div className="tw:bg-blue-700 tw:text-white tw:text-[9px] tw:px-2 tw:py-[3px] tw:rounded-sm tw:font-medium">
+        <div className="tw:bg-[var(--bk-accent)] tw:text-white tw:text-[9px] tw:px-2 tw:py-[3px] tw:rounded-sm tw:font-medium">
           Btn
         </div>
       );
@@ -96,7 +96,7 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
     case "tabs":
       return (
         <div className={`tw:flex tw:gap-1 tw:text-[8px] ${MUTED}`}>
-          <span className="tw:border-b-2 tw:border-blue-700 tw:pb-px">One</span>
+          <span className="tw:border-b-2 tw:border-[var(--bk-accent)] tw:pb-px">One</span>
           <span>Two</span>
         </div>
       );
@@ -105,7 +105,7 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
         <div className={`tw:flex tw:gap-[3px] tw:text-[8px] ${MUTED}`}>
           <span>‹</span>
           <span>1</span>
-          <span className="tw:text-blue-700">2</span>
+          <span className="tw:text-[var(--bk-accent-text)]">2</span>
           <span>3</span>
           <span>›</span>
         </div>
@@ -141,7 +141,7 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
       );
     case "cta":
       return (
-        <div className="tw:bg-blue-700 tw:text-white tw:text-[9px] tw:px-2.5 tw:py-[3px] tw:rounded-sm">Start</div>
+        <div className="tw:bg-[var(--bk-accent)] tw:text-white tw:text-[9px] tw:px-2.5 tw:py-[3px] tw:rounded-sm">Start</div>
       );
     case "header":
       return (

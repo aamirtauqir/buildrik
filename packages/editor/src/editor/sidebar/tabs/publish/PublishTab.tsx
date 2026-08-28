@@ -672,11 +672,11 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           would let colour do the work on its own. */}
       <div className="tw:px-4 tw:py-2.5 tw:text-xs tw:leading-normal tw:text-gray-600 tw:text-center">
         By publishing, your site is deployed to your connected Vercel account.{" "}
-        <a href={`${DASHBOARD_URL}/privacy`} target="_blank" rel="noopener noreferrer" className="tw:text-blue-700 tw:underline">
+        <a href={`${DASHBOARD_URL}/privacy`} target="_blank" rel="noopener noreferrer" className="tw:text-[var(--bk-accent-text)] tw:underline">
           Privacy policy
         </a>
         {" · "}
-        <a href={`${DASHBOARD_URL}/terms`} target="_blank" rel="noopener noreferrer" className="tw:text-blue-700 tw:underline">
+        <a href={`${DASHBOARD_URL}/terms`} target="_blank" rel="noopener noreferrer" className="tw:text-[var(--bk-accent-text)] tw:underline">
           Terms of service
         </a>
       </div>

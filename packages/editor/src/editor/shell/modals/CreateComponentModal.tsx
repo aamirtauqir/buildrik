@@ -148,7 +148,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
     <div className="tw:flex tw:flex-col tw:gap-4" onKeyDown={handleKeyPress}>
       <div>
         <label className={FIELD_LABEL}>
-          Name <span className="tw:text-blue-700">*</span>
+          Name <span className="tw:text-[var(--bk-accent-text)]">*</span>
         </label>
         <TextInput
           type="text"
@@ -215,7 +215,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
                   onClick={() => toggleVariantProp(preset.name)}
                   className={`${CHIP} ${
                     selectedVariantProps.includes(preset.name)
-                      ? "tw:bg-blue-700 tw:text-white"
+                      ? "tw:bg-[var(--bk-accent)] tw:text-white"
                       : "tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink-soft)] tw:hover:bg-gray-100"
                   }`}
                 >

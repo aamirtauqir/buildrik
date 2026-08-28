@@ -84,7 +84,7 @@ function StarterCard({ starter, selected, onSelect, showDescription = true }: St
          live 2026-08-13; the CLAUDE.md menu/pill trap, on a card. */
       className={`tw:h-auto tw:items-stretch tw:justify-start tw:text-left tw:font-normal tw:rounded-lg tw:overflow-hidden tw:flex tw:flex-col tw:bg-white tw:p-0 ${
         selected
-          ? "tw:border-2 tw:border-blue-700 tw:[box-shadow:0_0_0_2px_var(--bk-accent-subtle)]"
+          ? "tw:border-2 tw:border-[var(--bk-accent)] tw:[box-shadow:0_0_0_2px_var(--bk-accent-subtle)]"
           : "tw:border tw:border-gray-200 tw:shadow-none"
       }`}
     >

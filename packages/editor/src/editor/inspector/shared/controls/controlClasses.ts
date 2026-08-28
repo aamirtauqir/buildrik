@@ -47,7 +47,7 @@ export const compactBtnClass = (active: boolean): string =>
     "tw:flex-1 tw:h-[22px] tw:px-1 tw:py-0 tw:rounded-[3px] tw:border tw:text-[11px] tw:font-medium",
     "tw:[font-family:var(--bk-font-ui)]",
     active
-      ? "tw:bg-[var(--bk-accent-tint)] tw:border-[var(--bk-alpha-accent-30)] tw:text-blue-700 tw:hover:bg-[var(--bk-accent-tint)]"
+      ? "tw:bg-[var(--bk-accent-tint)] tw:border-[var(--bk-alpha-accent-30)] tw:text-[var(--bk-accent-text)] tw:hover:bg-[var(--bk-accent-tint)]"
       : "tw:bg-[var(--bk-bg-subtle)] tw:border-transparent tw:text-[var(--bk-ink-soft)] tw:hover:bg-gray-100",
   ].join(" ");
 
@@ -78,6 +78,6 @@ export const CHAIN_TRIGGER =
 /** The chain button once a token IS bound — always visible, accent-tinted. */
 export const CHAIN_BOUND =
   "tw:flex tw:items-center tw:gap-[3px] tw:flex-none tw:whitespace-nowrap tw:px-1 tw:py-0.5 " +
-  "tw:rounded tw:border tw:border-blue-700 tw:bg-[var(--bk-accent-subtle)] tw:text-blue-700 tw:text-[9px]";
+  "tw:rounded tw:border tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-subtle)] tw:text-[var(--bk-accent-text)] tw:text-[9px]";
 /** Absolute slot the chain button sits in, vertically centred in the field. */
 export const CHAIN_SLOT = "tw:absolute tw:right-1.5 tw:top-1/2 tw:-translate-y-1/2 tw:z-[2]";

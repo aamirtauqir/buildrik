@@ -192,7 +192,7 @@ export function UploadZone({
                 aria-valuemax={100}
               >
                 <span
-                  className="tw:block tw:h-full tw:rounded-sm tw:bg-blue-700"
+                  className="tw:block tw:h-full tw:rounded-sm tw:bg-[var(--bk-accent)]"
                   style={{ width: `${Math.min(100, Math.max(0, item.progress))}%` }}
                 />
               </span>
@@ -236,7 +236,7 @@ export function UploadZone({
                   type="button"
                   color="light"
                   size="xs"
-                  className="med-upload-queue-item__retry tw:min-h-6 tw:shrink-0 tw:border-transparent tw:bg-transparent tw:px-0 tw:text-[12px] tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+                  className="med-upload-queue-item__retry tw:min-h-6 tw:shrink-0 tw:border-transparent tw:bg-transparent tw:px-0 tw:text-[12px] tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
                   onClick={() => onRetryUpload(item.fileName)}
                   aria-label={`Retry ${item.fileName}`}
                 >

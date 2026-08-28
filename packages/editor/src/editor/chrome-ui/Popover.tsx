@@ -215,7 +215,7 @@ export function MenuItem({ icon, kbd, selected, danger, disabled, className, chi
       {...rest}
     >
       {selected !== undefined ? (
-        <span aria-hidden="true" className="tw:w-3 tw:flex-none tw:text-blue-700">
+        <span aria-hidden="true" className="tw:w-3 tw:flex-none tw:text-[var(--bk-accent-text)]">
           {selected ? "✓" : ""}
         </span>
       ) : null}

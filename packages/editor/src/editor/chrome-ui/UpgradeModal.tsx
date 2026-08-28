@@ -107,7 +107,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
       {/* The board sets this block left, on plain white: no centring, and the
           benefit rows carry no tinted card behind them. */}
       <div className="tw:flex tw:flex-col tw:items-start tw:gap-3 tw:py-1">
-        <Badge color="purple">{requiredPlan}</Badge>
+        <Badge>{requiredPlan}</Badge>
 
         <p className="tw:m-0 tw:text-sm tw:text-gray-600 tw:leading-normal">
           {feature

@@ -46,7 +46,7 @@ const BOUND_CLASS =
   "tw:flex tw:items-center tw:justify-between tw:gap-2 tw:px-2 tw:pb-2 tw:mb-1 " +
   "tw:border-b tw:border-gray-200 tw:text-[11px] tw:text-gray-500";
 const LINK_BTN_CLASS =
-  "tw:border-transparent tw:bg-transparent tw:text-blue-700 tw:hover:bg-blue-50 tw:hover:text-blue-700";
+  "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-accent-text)] tw:hover:bg-[var(--bk-accent-subtle)] tw:hover:text-[var(--bk-accent-hover)]";
 const UNBIND_BTN_CLASS =
   "tw:border-transparent tw:bg-transparent tw:text-red-700 tw:hover:bg-red-50 tw:hover:text-red-700";
 
@@ -163,7 +163,7 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
       {isBound && boundLabel && (
         <div className={BOUND_CLASS}>
           <span className="tw:flex tw:items-center tw:gap-1 tw:min-w-0 tw:truncate">
-            <Link size={10} className="tw:text-blue-700" />
+            <Link size={10} className="tw:text-[var(--bk-accent-text)]" />
             {boundLabel}
           </span>
           <Button
@@ -210,7 +210,7 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
         {selectedCollection && !selectedField && (
           <>
             <MenuItem
-              className="tw:text-blue-700"
+              className="tw:text-[var(--bk-accent-text)]"
               onClick={() => setSelectedCollection(null)}
             >
               ← {selectedCollection.name}
@@ -236,7 +236,7 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
         {selectedCollection && selectedField && (
           <>
             <MenuItem
-              className="tw:text-blue-700"
+              className="tw:text-[var(--bk-accent-text)]"
               onClick={() => {
                 setSelectedField(null);
                 setRecords([]);

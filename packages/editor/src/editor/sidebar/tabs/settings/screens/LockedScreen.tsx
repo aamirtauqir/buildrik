@@ -53,7 +53,7 @@ export const LockedScreen: React.FC<LockedScreenProps> = ({
   return (
     <LockedContainer>
       <LockedIcon>
-        <Badge color="purple">PRO</Badge>
+        <Badge>PRO</Badge>
       </LockedIcon>
       <LockedTitle>Available in {variant === "pro" ? "Pro" : "Enterprise"}</LockedTitle>
       <LockedDesc>{message ?? "Upgrade your plan to unlock this feature."}</LockedDesc>

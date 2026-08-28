@@ -68,13 +68,13 @@ const extractVarName = (v: string) => {
 
 const VALUE_BADGE =
   "tw:flex-none tw:max-w-20 tw:px-[5px] tw:py-px tw:rounded tw:overflow-hidden tw:text-ellipsis " +
-  "tw:whitespace-nowrap tw:text-[10px] tw:text-blue-700 tw:bg-[var(--bk-accent-subtle)] " +
+  "tw:whitespace-nowrap tw:text-[10px] tw:text-[var(--bk-accent-text)] tw:bg-[var(--bk-accent-subtle)] " +
   "tw:[font-family:var(--bk-font-mono)]";
 
 /** Selected / keyboard-focused / resting frame, shared by both layouts. */
 const optionState = (selected: boolean, focused: boolean) =>
   selected
-    ? "tw:bg-[var(--bk-accent-subtle)] tw:border-blue-700"
+    ? "tw:bg-[var(--bk-accent-subtle)] tw:border-[var(--bk-accent)]"
     : focused
       ? "tw:bg-[var(--bk-accent-subtle)] tw:border-[var(--bk-alpha-accent-30)]"
       : "tw:bg-transparent tw:border-transparent tw:hover:bg-[var(--bk-accent-subtle)]";
@@ -201,7 +201,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
             onClick={() => setTab(t)}
             className={`tw:flex-1 tw:px-0 tw:py-[7px] tw:rounded-none tw:border-0 tw:border-b-2 tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.04em] ${
               tab === t
-                ? "tw:border-b-blue-700 tw:bg-[var(--bk-accent-subtle)] tw:text-blue-700"
+                ? "tw:border-b-blue-700 tw:bg-[var(--bk-accent-subtle)] tw:text-[var(--bk-accent-text)]"
                 : "tw:border-b-transparent tw:bg-transparent tw:text-gray-500 tw:hover:text-gray-900"
             }`}
           >

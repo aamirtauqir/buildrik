@@ -273,7 +273,7 @@ export function Topbar({
         </IconButton>
         {unreadCount > 0 ? (
           <span
-            className="tw:absolute tw:top-1 tw:right-0.5 tw:w-2 tw:h-2 tw:rounded-full tw:bg-blue-700 tw:[box-shadow:0_0_0_2px_var(--bk-bg-card)]"
+            className="tw:absolute tw:top-1 tw:right-0.5 tw:w-2 tw:h-2 tw:rounded-full tw:bg-[var(--bk-accent)] tw:[box-shadow:0_0_0_2px_var(--bk-bg-card)]"
             aria-hidden="true"
           />
         ) : null}

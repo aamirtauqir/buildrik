@@ -184,7 +184,7 @@ export function AssetCell({
           <span
             className={[
               "tw:flex tw:h-4 tw:w-4 tw:flex-none tw:items-center tw:justify-center tw:rounded tw:border tw:text-[10px]",
-              isSelected ? "tw:border-blue-700 tw:bg-blue-700 tw:text-white" : "tw:border-gray-300 tw:text-transparent",
+              isSelected ? "tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent)] tw:text-white" : "tw:border-gray-300 tw:text-transparent",
             ].join(" ")}
             aria-hidden="true"
             data-testid="media-card-check"
@@ -200,7 +200,7 @@ export function AssetCell({
 
       {isApplied ? (
         <span
-          className="med-asset-cell__applied-badge tw:absolute tw:right-1.5 tw:top-1.5 tw:rounded tw:bg-blue-700 tw:px-1.5 tw:text-[11px] tw:leading-4 tw:text-white"
+          className="med-asset-cell__applied-badge tw:absolute tw:right-1.5 tw:top-1.5 tw:rounded tw:bg-[var(--bk-accent)] tw:px-1.5 tw:text-[11px] tw:leading-4 tw:text-white"
           data-testid="media-card-applied"
         >
           APPLIED

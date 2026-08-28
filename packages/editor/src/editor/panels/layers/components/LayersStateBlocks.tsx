@@ -60,7 +60,7 @@ export const LayersLoadError: React.FC<{ onRetry: () => void }> = ({ onRetry }) 
       type="button"
       color="light"
       size="xs"
-      className="tw:min-h-6 tw:self-start tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+      className="tw:min-h-6 tw:self-start tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
       data-testid="layers-load-retry"
       onClick={onRetry}
     >
@@ -82,7 +82,7 @@ export const LayersNoResults: React.FC<{ search: string; onClear: () => void }> 
       type="button"
       color="light"
       size="xs"
-      className="tw:min-h-6 tw:self-start tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+      className="tw:min-h-6 tw:self-start tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
       data-testid="layers-clear-search"
       onClick={onClear}
     >

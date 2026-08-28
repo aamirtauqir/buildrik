@@ -121,7 +121,7 @@ export const MigrationProgressModal: React.FC<MigrationProgressModalProps> = ({
                 className="tw:mt-3 tw:h-1 tw:rounded-sm tw:overflow-hidden tw:bg-[var(--bk-bg-subtle)]"
               >
                 {/* width is the live value — the one thing here that is data */}
-                <div className="tw:h-full tw:bg-blue-700 tw:transition-[width]" style={{ width: `${progress}%` }} />
+                <div className="tw:h-full tw:bg-[var(--bk-accent)] tw:transition-[width]" style={{ width: `${progress}%` }} />
               </div>
               <div className="tw:mt-1 tw:text-center tw:text-[10px] tw:text-gray-500">
                 {completedCount} of {total}
@@ -182,7 +182,7 @@ function statusLabel(status: MigrationStep["status"]): React.ReactNode {
     case "done":
       return <span className="tw:text-[var(--bk-success)]">✓</span>;
     case "running":
-      return <span className="tw:text-blue-700">running…</span>;
+      return <span className="tw:text-[var(--bk-accent-text)]">running…</span>;
     case "failed":
       return <span className="tw:text-[var(--bk-error)]">failed</span>;
     case "queued":

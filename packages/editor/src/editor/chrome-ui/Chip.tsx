@@ -47,7 +47,7 @@ export const Chip = React.forwardRef<HTMLButtonElement, ChipProps>(function Chip
         "tw:[transition:var(--bk-transition-fast)]",
         "tw:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]",
         selected
-          ? "tw:bg-blue-50 tw:text-blue-700"
+          ? "tw:bg-blue-50 tw:text-[var(--bk-accent-text)]"
           : "tw:bg-gray-100 tw:text-gray-900 tw:hover:bg-gray-200",
         className,
       ]

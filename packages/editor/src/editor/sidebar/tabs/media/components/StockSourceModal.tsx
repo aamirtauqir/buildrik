@@ -170,7 +170,7 @@ export function StockSourceModal({
                     onClick={() => onSetSource(s.id)}
                     className={`tw:px-2.5 tw:py-1 tw:text-xs tw:rounded ${
                       active
-                        ? "tw:bg-blue-700 tw:text-white tw:font-semibold tw:border-blue-700"
+                        ? "tw:bg-[var(--bk-accent)] tw:text-white tw:font-semibold tw:border-[var(--bk-accent)]"
                         : "tw:bg-transparent tw:text-gray-500 tw:font-medium tw:border-transparent"
                     }`}
                   >

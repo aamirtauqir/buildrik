@@ -49,7 +49,7 @@ export function IntegrationRow({
         <span className="tw:font-medium">{name}</span>
         <span className="tw:text-gray-500 tw:text-xs">{scope}</span>
       </span>
-      {pro ? <Badge color="purple">PRO</Badge> : null}
+      {pro ? <Badge>PRO</Badge> : null}
       <Badge color={s.color} className={s.className}>{s.label}</Badge>
       {action}
     </div>

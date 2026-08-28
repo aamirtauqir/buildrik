@@ -86,7 +86,7 @@ const StyleToggle: React.FC<{
     aria-pressed={active}
     className={`${labelClass ?? ""} tw:size-6 tw:flex tw:items-center tw:justify-center tw:rounded tw:text-xs tw:font-bold tw:border ${
       active
-        ? "tw:border-blue-700 tw:bg-[var(--bk-accent-tint)] tw:text-blue-700"
+        ? "tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-accent-text)]"
         : "tw:border-gray-200 tw:bg-transparent tw:text-gray-500"
     }`}
     title={`Toggle ${label}`}

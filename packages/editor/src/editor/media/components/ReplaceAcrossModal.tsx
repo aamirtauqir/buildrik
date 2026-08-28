@@ -186,7 +186,7 @@ interface ThumbBlockProps {
 
 function ThumbBlock({ label, name, src, kind }: ThumbBlockProps) {
   const isNew = kind === "new";
-  const frame = `${HERO_THUMB} ${isNew ? `${TINT_ACCENT} tw:border-2 tw:border-blue-700` : `${TINT_WARM} tw:border ${HAIRLINE}`}`;
+  const frame = `${HERO_THUMB} ${isNew ? `${TINT_ACCENT} tw:border-2 tw:border-[var(--bk-accent)]` : `${TINT_WARM} tw:border ${HAIRLINE}`}`;
   return (
     <div className="tw:flex tw:flex-1 tw:items-center tw:gap-2.5">
       {src ? (
@@ -203,7 +203,7 @@ function ThumbBlock({ label, name, src, kind }: ThumbBlockProps) {
       <div>
         <div
           className={`tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.04em] ${
-            isNew ? "tw:text-blue-700" : "tw:text-gray-500"
+            isNew ? "tw:text-[var(--bk-accent-text)]" : "tw:text-gray-500"
           }`}
         >
           {label}
@@ -225,7 +225,7 @@ function PageRow({ page, checked, onToggle }: PageRowProps) {
     <label
       className={`tw:flex tw:items-center tw:gap-3 tw:p-2.5 tw:rounded-md tw:border tw:cursor-pointer ${
         checked
-          ? "tw:border-blue-700 tw:bg-[var(--bk-accent-tint)]"
+          ? "tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-tint)]"
           : `${HAIRLINE} tw:bg-transparent tw:opacity-70`
       }`}
     >
@@ -244,7 +244,7 @@ function PageRow({ page, checked, onToggle }: PageRowProps) {
         <div
           className={`${ROW_THUMB} ${
             checked
-              ? `${TINT_ACCENT} tw:border tw:border-blue-700`
+              ? `${TINT_ACCENT} tw:border tw:border-[var(--bk-accent)]`
               : `tw:bg-[var(--bk-bg-subtle)] tw:border tw:border-dashed ${HAIRLINE}`
           }`}
         />

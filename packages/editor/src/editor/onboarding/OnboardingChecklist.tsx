@@ -81,7 +81,7 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onRestore(); }}
         aria-label={`Get started — ${completedCount} of ${totalCount} complete. Click to expand.`}
       >
-        <span className={`${PILL_DOT} ${allDone ? "tw:bg-[var(--bk-success)]" : "tw:bg-blue-700"}`} />
+        <span className={`${PILL_DOT} ${allDone ? "tw:bg-[var(--bk-success)]" : "tw:bg-[var(--bk-accent)]"}`} />
         <span className={PILL_TEXT}>
           {allDone ? "All done!" : `${completedCount} / ${totalCount} done`}
         </span>
@@ -144,7 +144,7 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
       <div className={PROGRESS_TRACK}>
         {/* width is the only genuinely computed value in this file. */}
         <div
-          className={`tw:h-full tw:rounded-[1px] tw:[transition:width_400ms_ease] ${allDone ? "tw:bg-[var(--bk-success)]" : "tw:bg-blue-700"}`}
+          className={`tw:h-full tw:rounded-[1px] tw:[transition:width_400ms_ease] ${allDone ? "tw:bg-[var(--bk-success)]" : "tw:bg-[var(--bk-accent)]"}`}
           style={{ width: `${progress}%` }}
         />
       </div>
@@ -178,7 +178,7 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
                     isCompleted
                       ? "tw:bg-[var(--bk-success)] tw:border-[var(--bk-success)]"
                       : isActive
-                        ? "tw:bg-blue-700 tw:border-blue-700"
+                        ? "tw:bg-[var(--bk-accent)] tw:border-[var(--bk-accent)]"
                         : "tw:bg-transparent tw:border-gray-300"
                   }`}
                   aria-hidden="true"

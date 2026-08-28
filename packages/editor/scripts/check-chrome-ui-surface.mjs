@@ -369,7 +369,7 @@ if (!existsSync(MANIFEST_PATH)) {
         newExports.map((n) => `    ${n} (computed provenance: "${actual[n]}", source: ${barrelEntries.find((e) => e.name === n)?.source})`).join("\n") +
         `\n  If this addition is deliberate, add it to the manifest with its provenance in the SAME commit — ` +
         `that edit is the review checkpoint the spec calls for. A "wrapper" provenance is reserved for the ` +
-        `closed 2-member set (TextInput, Select) — adding a 3rd here means deliberately deciding to grow that set.`,
+        `closed 3-member set (TextInput, Select, Button — grown 2026-08-28, design-debt arc) — adding a 4th here means deliberately deciding to grow that set.`,
     );
   }
   if (removedExports.length > 0) {

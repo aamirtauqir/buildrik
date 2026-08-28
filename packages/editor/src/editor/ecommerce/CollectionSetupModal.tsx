@@ -71,7 +71,7 @@ export const CollectionSetupModal: React.FC<CollectionSetupModalProps> = ({
         <ModalBody>
     <div className="tw:flex tw:flex-col tw:gap-4">
       <div className="tw:flex tw:justify-center tw:py-2">
-        <ShoppingBag size={48} className="tw:text-blue-700" />
+        <ShoppingBag size={48} className="tw:text-[var(--bk-accent-text)]" />
       </div>
 
       <p className="tw:m-0 tw:text-center tw:leading-normal tw:text-[var(--bk-ink-soft)]">

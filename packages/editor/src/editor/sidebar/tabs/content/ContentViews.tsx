@@ -56,7 +56,7 @@ const SCROLL = "tw:flex-1 tw:min-h-0 tw:overflow-y-auto";
    move, only the hit area grows. */
 const LINK_BTN =
   "tw:inline-flex tw:items-center tw:gap-1.5 tw:bg-transparent tw:border-0 tw:p-0 tw:min-h-6 " +
-  "tw:text-[13px] tw:text-blue-700 tw:hover:text-blue-800 tw:enabled:hover:bg-transparent";
+  "tw:text-[13px] tw:text-[var(--bk-accent-text)] tw:hover:text-[var(--bk-accent-hover)] tw:enabled:hover:bg-transparent";
 /** The quiet row-action button, previously copy-pasted at eleven call sites. */
 const GHOST = "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900";
 const FIELD_LABEL = "tw:text-xs tw:text-gray-500 tw:mx-3 tw:mt-2.5 tw:mb-1";
@@ -74,10 +74,10 @@ const SAVEBAR =
    screen's primary action; a drawer's save bar is not where that is spent. */
 const SAVE_LINK =
   "tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:font-normal " +
-  "tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline";
+  "tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline";
 /** A note that belongs to the row above it, not to the panel's foot. */
 const INLINE_HINT = "tw:text-xs tw:text-gray-500 tw:leading-normal tw:px-3 tw:pb-3";
-const MONO = "tw:[font-family:var(--bk-font-mono)] tw:text-xs tw:text-blue-700";
+const MONO = "tw:[font-family:var(--bk-font-mono)] tw:text-xs tw:text-[var(--bk-accent-text)]";
 const SUB = "tw:text-xs tw:text-gray-500";
 const INLINE_FORM = "tw:flex tw:flex-col tw:gap-2 tw:p-3 tw:border-b tw:border-gray-200";
 const FORM_ROW = "tw:flex tw:gap-2 tw:items-center";
@@ -150,7 +150,7 @@ export function RootView({
             <Button
               color="light"
               size="xs"
-              className="tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:font-normal tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+              className="tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:font-normal tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
               data-testid="content-empty-cta"
               onClick={onCreateCollection}
             >

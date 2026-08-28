@@ -463,7 +463,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
                 <Button
                   onClick={askAI}
                   data-idx={0}
-                  className="tw:flex tw:items-center tw:gap-2 tw:px-3 tw:py-2 tw:rounded tw:border-0 tw:bg-[var(--bk-accent-tint)] tw:text-[13px] tw:font-semibold tw:text-blue-700"
+                  className="tw:flex tw:items-center tw:gap-2 tw:px-3 tw:py-2 tw:rounded tw:border-0 tw:bg-[var(--bk-accent-tint)] tw:text-[13px] tw:font-semibold tw:text-[var(--bk-accent-text)]"
                 >
                   <span aria-hidden="true">✨</span>
                   {query.trim().split(/\s+/).length > 1 ? "Ask AI ›" : "Ask AI instead ›"}

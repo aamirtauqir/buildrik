@@ -74,7 +74,7 @@ export const HelpTooltip: React.FC<HelpTooltipProps> = ({
               href={docsLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="tw:mt-1 tw:block tw:text-[12px] tw:text-blue-700 tw:no-underline"
+              className="tw:mt-1 tw:block tw:text-[12px] tw:text-[var(--bk-accent-text)] tw:no-underline"
               onClick={(e) => e.stopPropagation()}
             >
               Learn more →

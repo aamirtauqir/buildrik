@@ -89,7 +89,7 @@ export const InspectorEmptyState: React.FC<InspectorEmptyStateProps> = ({
           size="xs"
           data-testid="inspector-empty-ask-ai"
           onClick={() => composer.emit("ui:switch-tab", { tab: "ai" })}
-          className="tw:mt-1 tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:font-normal tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+          className="tw:mt-1 tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:font-normal tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
         >
           ✦ Ask AI ›
         </Button>

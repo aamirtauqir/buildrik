@@ -217,7 +217,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
         >
           {/* width is the playhead — data, not style */}
           <div
-            className="tw:h-full tw:rounded-sm tw:bg-blue-700 tw:transition-[width]"
+            className="tw:h-full tw:rounded-sm tw:bg-[var(--bk-accent)] tw:transition-[width]"
             style={{ width: `${progressPercent}%` }}
           />
         </div>

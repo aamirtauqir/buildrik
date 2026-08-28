@@ -14,7 +14,10 @@ vi.mock("@/services/ai/subscriptionClient", () => ({
     actions: { propose: { mutate: proposeMutate }, confirm: { mutate: confirmMutate } },
   }),
 }));
-vi.mock("@/services/BuildrikSyncProvider", () => ({ getSiteIdFromUrl: () => "site-1" }));
+vi.mock("@/services/BuildrikSyncProvider", () => ({
+  /* Added with the attribution wiring: useComposerInit now reads the
+     signed-in user so versions and history stop recording `userId: null`. */
+  loadCurrentUserId: vi.fn(() => Promise.resolve(null)), getSiteIdFromUrl: () => "site-1" }));
 vi.mock("@/editor/shell/exportPublishPages", () => ({
   exportPublishPages: vi.fn(() => Promise.resolve([{ path: "index.html", html: "<h1>Hi</h1>" }])),
 }));

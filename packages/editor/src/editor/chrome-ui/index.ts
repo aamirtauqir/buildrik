@@ -157,7 +157,7 @@ export { Select, type SelectProps } from "./Select";
 // already own. Collision list (never re-export these from flowbite): Spinner,
 // Kbd, Footer, Drawer, Popover, Menu*, Tabs, Slider, Modal*, Toast, TextField.
 // ─────────────────────────────────────────────────────────────────────────
-export { Button } from "flowbite-react";
+export { Button, type ButtonProps, type ButtonVariant } from "./Button";
 export { Badge } from "flowbite-react";
 export { Avatar, AvatarGroup } from "flowbite-react";
 export { Checkbox } from "flowbite-react";

@@ -72,6 +72,9 @@ vi.mock("../../../../engine/cms", () => ({
 
 // Default mocks; migration tests below override per-case.
 vi.mock("@/services/BuildrikSyncProvider", () => ({
+  /* Added with the attribution wiring: useComposerInit now reads the
+     signed-in user so versions and history stop recording `userId: null`. */
+  loadCurrentUserId: vi.fn(() => Promise.resolve(null)),
   getSiteIdFromUrl: vi.fn(() => null),
   loadProject: vi.fn(() => Promise.resolve({})),
   loadServerMedia: vi.fn(() => Promise.resolve(null)),

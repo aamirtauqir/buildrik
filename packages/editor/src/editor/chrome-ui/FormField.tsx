@@ -53,7 +53,7 @@ export function FormField({ label, hint, error, required, className, children, .
       </Label>
       {children({ id, "aria-describedby": describedBy, "aria-invalid": error ? true : undefined })}
       {error ? (
-        <HelperText color="failure" className={BK_HELPER_ERROR_CLASS} id={errorId} role="alert">
+        <HelperText color="red" className={BK_HELPER_ERROR_CLASS} id={errorId} role="alert">
           {error}
         </HelperText>
       ) : hint ? (

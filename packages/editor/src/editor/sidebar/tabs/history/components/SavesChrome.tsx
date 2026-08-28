@@ -18,6 +18,8 @@
 import * as React from "react";
 import type { Composer } from "@/engine";
 import { fetchReviewStatus, type ReviewStatus } from "@/services/ReviewService";
+import { EVENTS } from "@/shared/constants/events";
+import { Button } from "@/editor/chrome-ui";
 
 const BAND =
   "tw:rounded-md tw:bg-[var(--bk-success-tint)] tw:px-3 tw:py-2.5 tw:flex tw:flex-col tw:gap-0.5 tw:mb-2";
@@ -25,9 +27,21 @@ const BAND_TITLE =
   "tw:flex tw:items-center tw:gap-1.5 tw:text-[12px] tw:font-semibold tw:tracking-[0.04em] tw:text-[var(--bk-success-text)]";
 const BAND_META = "tw:text-[11px] tw:text-[var(--bk-ink-soft)]";
 const NOW_ROW =
-  "tw:flex tw:items-center tw:gap-2 tw:px-1 tw:pb-2 tw:text-[13px] tw:text-[var(--bk-ink)]";
+  "tw:flex tw:items-center tw:gap-2 tw:px-1 tw:text-[13px] tw:text-[var(--bk-ink)]";
 const NOW_DOT = "tw:size-2 tw:rounded-full tw:bg-[var(--bk-accent)]";
+const NOW_COL = "tw:flex tw:flex-col";
+/* Aligned under the count, past the dot and its gap (8px + 8px). */
+const NOW_SUMMARY =
+  "tw:px-1 tw:pb-2 tw:pl-[calc(0.25rem+16px)] tw:text-[11px] tw:text-[var(--bk-ink-muted)] tw:truncate";
 const PRUNE_NOTE = "tw:m-0 tw:mt-2 tw:px-1 tw:text-[11px] tw:text-[var(--bk-ink-muted)]";
+/* Boards 163:2 / 163:113 hang one action off the approval anchor. It sat
+   unbuilt: "Compare with current" had ZERO occurrences in src/, while the view
+   that renders exactly that comparison — ApprovedCompareView — was already
+   built to its own eight boards and reachable only from ReviewTab. A finished
+   surface with no door to it from the place the board draws the door. */
+const BAND_ACTION =
+  "tw:mt-1 tw:self-start tw:px-0 tw:text-[11px] tw:font-medium " +
+  "tw:text-[var(--bk-success-text)] tw:underline tw:underline-offset-2";
 
 /** Board 162:2 stamps the approval "18 Jul, 15:42". */
 function approvalStamp(at: string | Date): string {
@@ -70,11 +84,25 @@ export const SavesApproval: React.FC<{ composer: Composer | null }> = ({ compose
   /* Counted the same way the publish panel counts "since last deploy": the
      engine's own history stack, filtered to entries newer than the moment
      being measured from. */
-  const changes = React.useMemo(() => {
-    if (approvedAt === null) return 0;
+  const since = React.useMemo(() => {
+    if (approvedAt === null) return [];
     const stack = composer?.history?.getHistoryStack?.() ?? [];
-    return stack.filter((e) => e.timestamp > approvedAt).length;
+    return stack.filter((e) => e.timestamp > approvedAt);
   }, [composer, approvedAt]);
+  const changes = since.length;
+
+  /* Board 163:2's Now row is two lines: the count, then WHAT changed —
+     "hero copy · 2 images · menu". The count alone shipped, which answers "is
+     there drift" but not "drift in what", and the second question is the one
+     that decides whether to look. Distinct labels, newest first, capped at
+     three because the board draws three and a fourth wraps the row. */
+  const summary = React.useMemo(
+    () =>
+      [...new Set(since.map((e) => e.label).filter(Boolean))]
+        .slice(0, 3)
+        .join(" · "),
+    [since],
+  );
 
   if (!isApproved || !review) return null;
 
@@ -91,12 +119,30 @@ export const SavesApproval: React.FC<{ composer: Composer | null }> = ({ compose
               .join(" · ")}
           </div>
         )}
+        {/* Routed, not rebuilt: UI_PANEL_OPEN carries a `screen`, TabRouter maps
+            `activeSubTab === "compare"` to ReviewTab's `initialCompare`, and
+            ReviewTab opens straight into ApprovedCompareView. A second copy of
+            that view here would need its own snapshot + live-export plumbing
+            and would drift from the one the boards describe. */}
+        <Button
+          color="light"
+          size="xs"
+          className={BAND_ACTION}
+          onClick={() =>
+            composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "review", screen: "compare" })
+          }
+        >
+          Compare with current
+        </Button>
       </div>
-      <div className={NOW_ROW}>
-        <span className={NOW_DOT} aria-hidden="true" />
-        <span>
-          Now — {changes} change{changes === 1 ? "" : "s"} since approval
-        </span>
+      <div className={NOW_COL}>
+        <div className={NOW_ROW}>
+          <span className={NOW_DOT} aria-hidden="true" />
+          <span>
+            Now — {changes} change{changes === 1 ? "" : "s"} since approval
+          </span>
+        </div>
+        {summary && <div className={NOW_SUMMARY}>{summary}</div>}
       </div>
     </>
   );

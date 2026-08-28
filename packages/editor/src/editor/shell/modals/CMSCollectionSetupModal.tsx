@@ -60,11 +60,11 @@ function makeId(): string {
    a third style is gone rather than invented. */
 const STEP_BAR = "tw:flex tw:items-center tw:gap-2 tw:pb-4 tw:mb-4 tw:border-b tw:border-gray-200";
 const STEP = "tw:flex tw:items-center tw:gap-1.5 tw:text-xs";
-const STEP_LABEL_ON = "tw:text-blue-700 tw:font-semibold";
+const STEP_LABEL_ON = "tw:text-[var(--bk-accent-text)] tw:font-semibold";
 const STEP_LABEL_OFF = "tw:text-gray-500";
 const STEP_DOT =
   "tw:size-5 tw:rounded-full tw:flex tw:items-center tw:justify-center tw:text-[11px] tw:font-bold tw:flex-none";
-const STEP_DOT_ON = "tw:bg-blue-700 tw:text-white";
+const STEP_DOT_ON = "tw:bg-[var(--bk-accent)] tw:text-white";
 /* The board marks a finished step with success green, not another blue. */
 const STEP_DOT_DONE = "tw:bg-[var(--bk-success)] tw:text-white";
 const STEP_DOT_OFF = "tw:bg-gray-200 tw:text-gray-500";
@@ -85,7 +85,7 @@ const BOARD_ROW =
    fallback: it would have rendered no colour at all. */
 const BOARD_HANDLE = "tw:flex-none tw:cursor-grab tw:text-[10px] tw:text-gray-400";
 const BOARD_LINK =
-  "tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[11px] tw:font-medium tw:text-blue-700 tw:enabled:hover:bg-transparent tw:enabled:hover:underline";
+  "tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[11px] tw:font-medium tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline";
 const BOARD_BLOCK =
   "tw:flex tw:flex-col tw:gap-1.5 tw:rounded-md tw:bg-[var(--bk-bg-subtle)] tw:px-2.5 tw:py-2";
 const SUCCESS_BANNER =

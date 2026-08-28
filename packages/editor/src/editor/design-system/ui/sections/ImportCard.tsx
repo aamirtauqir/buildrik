@@ -59,7 +59,7 @@ const DROP_BASE =
   "tw:border-[1.5px] tw:border-dashed tw:rounded-lg tw:px-4 tw:py-8 tw:text-center tw:cursor-pointer " +
   "tw:text-[var(--bk-ink-soft)] tw:text-xs tw:leading-relaxed tw:[transition:var(--bk-transition-fast)]";
 const DROP_IDLE = "tw:border-gray-200 tw:bg-gray-50";
-const DROP_ACTIVE = "tw:border-blue-700 tw:bg-[var(--bk-accent-tint)]";
+const DROP_ACTIVE = "tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-tint)]";
 const DETAIL_BLOCK =
   "tw:mt-3 tw:p-3 tw:bg-gray-50 tw:border tw:border-gray-200 tw:rounded-md tw:flex tw:flex-col tw:gap-1.5";
 const DETAIL_ROW = "tw:flex tw:items-baseline tw:justify-between tw:gap-2 tw:text-xs";
