@@ -65,3 +65,15 @@ packages/dashboard/.gstack/
 .env*.bak*
 .env.local.bak-*
 .walk/
+
+# Throwaway live-measurement probes (playwright one-offs). The durable checks
+# are scripts/check-*.mjs and the vitest guards.
+packages/dashboard/.qa-ui/
+
+# BrowserStack Local writes packages/dashboard/local.log next to the app.
+*.log
+
+# Founder-supplied HTML mockups dropped into the package (891 KB, 2026-08-13).
+# Kept on disk, out of history — a `git add -A` on any dashboard arc would
+# otherwise commit them permanently.
+packages/dashboard/newdeisgn/

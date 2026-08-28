@@ -61,6 +61,22 @@ pnpm run verify:ds > /tmp/buildrik-pre-push-gate.log 2>&1 || EDITOR_OK=$?
 # that IS wired and it reports the stale entry.
 (cd "$REPO_ROOT/packages/dashboard" && pnpm run gate:trpc-orphans) >> /tmp/buildrik-pre-push-gate.log 2>&1 || ORPHAN_OK=$?
 
+# One button shape per role, measured in a real browser. Written 2026-08-27 and
+# wired into NO chain for a day — the same shape as gate:figma above, which sat
+# red for five days because nothing ran it. It needs a running dev server and a
+# Playwright storageState, so it SKIPS loudly when either is missing rather than
+# failing a push for a missing prerequisite: a gate that blocks on something the
+# pusher cannot fix is a gate people learn to bypass. Widened from `button` to
+# `button, a` on 2026-08-28 — every navigation CTA had been outside it.
+VARIANTS_OK=0
+if [ -z "${BK_STATE:-}" ] || [ ! -f "${BK_STATE:-/nonexistent}" ]; then
+  echo " · gate:button-variants SKIPPED — set BK_STATE to a Playwright storageState file" | tee -a /tmp/buildrik-pre-push-gate.log
+elif ! curl -s -o /dev/null --max-time 5 http://localhost:3000/dashboard; then
+  echo " · gate:button-variants SKIPPED — no dev server on :3000" | tee -a /tmp/buildrik-pre-push-gate.log
+else
+  (cd "$REPO_ROOT/packages/dashboard" && pnpm run gate:button-variants) >> /tmp/buildrik-pre-push-gate.log 2>&1 || VARIANTS_OK=$?
+fi
+
 # Conformance spec freshness — prepush mode BLOCKS, because this machine has the
 # Figma MCP and can actually re-extract. CI runs the same check in --mode=ci,
 # where it only warns: failing a build for something the build cannot fix is how
@@ -72,14 +88,14 @@ pnpm run verify:ds > /tmp/buildrik-pre-push-gate.log 2>&1 || EDITOR_OK=$?
 # end. Spec freshness is a human ritual with a reminder attached.
 node scripts/conformance/check-spec-age.mjs --mode=prepush >> /tmp/buildrik-pre-push-gate.log 2>&1 || AGE_OK=$?
 
-if [ "$EDITOR_OK" = "0" ] && [ "$DASH_OK" = "0" ] && [ "$FIGMA_OK" = "0" ] && [ "$ORPHAN_OK" = "0" ] && [ "$AGE_OK" = "0" ]; then
+if [ "$EDITOR_OK" = "0" ] && [ "$DASH_OK" = "0" ] && [ "$FIGMA_OK" = "0" ] && [ "$ORPHAN_OK" = "0" ] && [ "$AGE_OK" = "0" ] && [ "$VARIANTS_OK" = "0" ]; then
   echo " ✓ all gates passing (editor + dashboard)"
   echo "──────────────────────────────────────────────"
   exit 0
 fi
 
 # Gate failed. Show what broke and either warn-or-block.
-echo " ✗ one or more gates failing (editor=$EDITOR_OK dashboard=$DASH_OK figma=$FIGMA_OK spec-age=$AGE_OK)"
+echo " ✗ one or more gates failing (editor=$EDITOR_OK dashboard=$DASH_OK figma=$FIGMA_OK orphans=$ORPHAN_OK spec-age=$AGE_OK button-variants=$VARIANTS_OK)"
 echo ""
 tail -20 /tmp/buildrik-pre-push-gate.log | sed 's/^/   /'
 echo ""

@@ -35,18 +35,21 @@ consistent.
 
 1. `components/dashboard/primitives/` — `PageHeader`, `SectionCard`, `StatCard`,
    `DataTable`, `Pill`, `ProgressBar`, `MetricValue`, `Button`, `Modal`,
-   `InputField`, `FilterTabs`, `FilterChip`, `IconChip`. Screens compose these;
-   they do not style surfaces directly (DESIGN.md §Dashboard).
+   `InputField`, `SelectField`, `FilterTabs`, `FilterChip`, `IconChip`. Screens
+   compose these; they do not style surfaces directly (DESIGN.md §Dashboard).
 2. `flowbite-react` directly, when no primitive covers it.
 3. A new primitive **composed from flowbite-react**, when the same shape is
-   needed twice. **Four** of the thirteen primitives do this — button,
+   needed twice. **Four** of the fourteen primitives do this — button,
    data-table, pill, progress-bar. This said "six" and listed `modal` until
    2026-08-27; `modal.tsx` names flowbite-react only in a comment explaining why
    it REJECTS it (flowbite's Modal quantises width to size steps, and the focus
    trap here is live-tested across 26 consumers). A grep for the string counts
    that comment — check the import, not the mention.
 
-   The other nine are not a drain target. Seven have no flowbite counterpart at
+   The other ten are not a drain target. (`SelectField`, added 2026-08-28, is
+   deliberately not flowbite's `Select`: it has to wear `InputField`'s exact
+   ring so a select and an input on one row match, and it owns its chevron so
+   the control does not change shape with the operating system.) Seven have no flowbite counterpart at
    all: `page-header` and `section-card` are layout structure (which AGENTS.md
    says stays custom), `stat-card` paints entirely through an inline style
    object, `filter-chip` is a `<button aria-pressed>` where Badge is a `<span>`,

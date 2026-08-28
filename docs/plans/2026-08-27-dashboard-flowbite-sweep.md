@@ -1,3 +1,4 @@
+<!-- /autoplan restore point: /Users/shahg/.gstack/projects/aamirtauqir-buildrik/main-autoplan-restore-20260828-115221.md -->
 # Dashboard consistency sweep — Flowbite adoption at the primitive layer
 
 Source: `docs/audits/2026-08-27-dashboard-ui-ia-assessment.md`.
@@ -168,21 +169,35 @@ already live, inside the primitives that had *already* been converted.
 
 ## Still open — founder calls, not sweeps
 
-- **W0: give `tw-flowbite.css` a `@theme` block** so flowbite compiles against
-  the DS radius/colour/text scale. One file, every flowbite component on
-  contract, zero screens touched. This is what P-C promised and W1 could not
-  deliver. Not done here: it changes the rendered radius of every flowbite
-  component at once and wants its own before/after pass.
-- **`ghost` maps to flowbite `light`, a bordered white button** — there is no
-  transparent variant, which is why screens hand-rolled one. Decide whether the
-  DS has two or three neutral button variants.
+- ~~**W0: give `tw-flowbite.css` a `@theme` block**~~ **DONE 2026-08-27**, on the
+  founder's call ("mara faisla hai true source karoo is ko"). The block is at
+  the top of `tw-flowbite.css` with the two-scale explanation and the radius +
+  `blue-600` values; `flowbiteStore.prefix.test.tsx` asserts them against
+  `globals.css` so the two files cannot drift apart silently. Measured blast
+  radius was nil — `rounded-md` appears only in an unused ButtonGroup.
+  **This row sat here saying "not done" for a day after it shipped.** A Codex
+  review on 2026-08-28 read it and concluded the arc had avoided the systemic
+  fix and paid the tax manually across dozens of files. The code was right and
+  the doc was wrong, and the doc is what got reviewed.
+- ~~**`ghost` maps to flowbite `light`, a bordered white button**~~ **Closed
+  2026-08-27 as "two variants, not three."** A transparent variant was written
+  and then removed before shipping: the measurement found **zero** standalone
+  transparent buttons — all 48 candidates were `w-full` menu rows, which are
+  not the Button shape. A third variant would have had no consumer.
 - **Breadcrumb on Sites/Media/Settings.** `components/dashboard/breadcrumb.tsx`
   already exists and already ships on site detail, so this is primitive
   application, not new design. Home cannot take one (it returns null at ≤1
   level). Deferred with the greeting question, which IS a design call.
-- **`disabled: pointer-events-none` suppresses native `title` tooltips**, so a
-  disabled control's reason is unreachable. Affects the admin-gating shipped
-  earlier today. Needs a tooltip that is not `title`.
+- ~~**`disabled: pointer-events-none` suppresses native `title` tooltips**~~
+  **Wrong premise — closed 2026-08-28.** Measured in the browser: a disabled
+  `Button` computes `pointer-events: auto`. flowbite does ship a
+  `tw:pointer-events-none` class, but not on this component's disabled state, so
+  the mechanism named here never applied. What is true is that browsers disagree
+  about showing a *disabled* control's own `title` at all, so the four gated
+  controls (billing plan-change, billing cancel, danger delete, invite resend,
+  plans upgrade) now carry it on a `<span>` wrapper. Recorded rather than
+  quietly deleted: this sat as an open defect for a day on a mechanism that was
+  never checked.
 
 ## Verification run
 

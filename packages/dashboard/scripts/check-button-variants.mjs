@@ -44,6 +44,11 @@ const ROUTES = [
   "/dashboard/settings/workspace",
   "/dashboard/agency",
   "/dashboard/marketplace",
+  // Added 2026-08-28. Both were outside the gate and both carried hand-rolled
+  // buttons: billing had four (its primary "Change plan" was 38px/600 against
+  // the dashboard's 40px/500) and plans had a second segmented-track shape.
+  "/dashboard/settings/billing",
+  "/dashboard/settings/plans",
 ];
 
 /**
@@ -64,6 +69,11 @@ const ALLOWED_SHAPES = {
   // shape check sees. Declared rather than converted: forcing a nav item onto
   // the Button primitive would be the wrong fix.
   "36|8px|13.5px|600|fill": "Media folder rail — the active item in a nav list",
+  // Anchor CTAs, visible to this gate only since it widened from `button` to
+  // `button, a` on 2026-08-28 — every navigation CTA in the dashboard had been
+  // outside a gate whose whole job is one button shape.
+  "36|8px|14px|600|fill": "Agency tab rail — the active item in a nav list",
+  "40|8px|13px|600|fill": "Marketplace featured banner — white-on-ink hero CTA, the DS has no on-ink variant and this is its only consumer",
 };
 
 function shapeKey(b) {
@@ -84,7 +94,14 @@ for (const route of ROUTES) {
   const page = await ctx.newPage();
   try {
     await page.goto(BASE + route, { waitUntil: "domcontentloaded", timeout: 60000 });
-    await page.waitForTimeout(9000);
+    // A flat settle, deliberately. `networkidle` was tried and is WRONG here:
+    // the dashboard holds an SSE connection open, so idle never fires and every
+    // route burned its full 30s timeout — 5m25s for ten routes against 90s for
+    // the flat wait it replaced. 3s is enough for these screens' tRPC round
+    // trips; the shape counts are compared against the 9s run whenever this
+    // number moves, because a settle that is too short reports FEWER shapes and
+    // passes for the wrong reason.
+    await page.waitForTimeout(3000);
     if (/\/auth(\/|$)/.test(new URL(page.url()).pathname)) {
       console.log(`  skip ${route} — redirected to auth (set BK_STATE to a storageState file)`);
       await page.close();
@@ -97,12 +114,22 @@ for (const route of ROUTES) {
         .forEach((n) => n.remove());
       const scope = document.querySelector("main") ?? document.body;
       const out = [];
-      for (const el of scope.querySelectorAll("button")) {
+      // `button, a` — not just `button`. `ButtonLink` renders an <a>, so every
+      // navigation CTA in the dashboard ("Create a site", "Browse templates",
+      // "Edit") was invisible to a gate whose whole job is one button shape.
+      // Plain text links are dropped by the fill/border test below, same as
+      // they always were for <button>.
+      for (const el of scope.querySelectorAll("button, a")) {
         const r = el.getBoundingClientRect();
         if (r.width < 24 || r.height < 20) continue;
         const cs = getComputedStyle(el);
         const label = (el.innerText || "").trim();
         if (!label || label.length > 40) continue;
+        // A multi-line label is a CARD, not a control. Widening the scan to
+        // <a> pulled in every settings tile and stat tile — whole cards wrapped
+        // in a Link, which have a border and so read as "bordered control" to
+        // the shape test. A button's label is one line.
+        if (label.includes("\n")) continue;
         const bordered = parseFloat(cs.borderWidth) > 0;
         const filled = cs.backgroundColor !== "rgba(0, 0, 0, 0)";
         if (!bordered && !filled) continue; // a text link, not a button
