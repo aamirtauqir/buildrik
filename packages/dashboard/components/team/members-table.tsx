@@ -258,11 +258,11 @@ export function MembersTable({ members, currentUserId, onAction, onChangeRole, s
         <table className="w-full text-body">
           <thead>
             <tr className="border-b text-left text-eyebrow uppercase tracking-wide" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)", backgroundColor: "var(--color-bg-subtle)" }}>
-              <th className="px-[18px] py-2.5 font-semibold">Member</th>
-              <th className="px-[18px] py-2.5 font-semibold">Email</th>
-              <th className="px-[18px] py-2.5 font-semibold">Role</th>
-              <th className="px-[18px] py-2.5 font-semibold">Last active</th>
-              <th className="w-10 px-[18px] py-2.5 font-semibold" aria-label="Actions" />
+              <th className="px-4 py-2.5 font-semibold">Member</th>
+              <th className="px-4 py-2.5 font-semibold">Email</th>
+              <th className="px-4 py-2.5 font-semibold">Role</th>
+              <th className="px-4 py-2.5 font-semibold">Last active</th>
+              <th className="w-10 px-4 py-2.5 font-semibold" aria-label="Actions" />
             </tr>
           </thead>
           <tbody>
@@ -283,7 +283,7 @@ export function MembersTable({ members, currentUserId, onAction, onChangeRole, s
                   )}
                   style={{ borderColor: "var(--color-border-default)" }}
                 >
-                  <td className="px-[18px] py-3.5" style={{ color: "var(--color-text-primary)" }}>
+                  <td className="px-4 py-3" style={{ color: "var(--color-text-primary)" }}>
                     <div className="flex items-center gap-3">
                       {selectMode && (
                         <input
@@ -302,16 +302,16 @@ export function MembersTable({ members, currentUserId, onAction, onChangeRole, s
                       <span className="font-medium">{member.fullName}</span>
                     </div>
                   </td>
-                  <td className="px-[18px] py-3.5" style={{ color: "var(--color-text-secondary)" }}>
+                  <td className="px-4 py-3" style={{ color: "var(--color-text-secondary)" }}>
                     {member.email}
                   </td>
-                  <td className="px-[18px] py-3.5">
+                  <td className="px-4 py-3">
                     <Pill tone={ROLE_TONE[member.role as Role] ?? "neutral"}>{roleLabel(member.role)}</Pill>
                   </td>
-                  <td className="px-[18px] py-3.5" style={{ color: "var(--color-text-secondary)" }}>
+                  <td className="px-4 py-3" style={{ color: "var(--color-text-secondary)" }}>
                     <MetricValue>{relativeTime(member.lastActiveAt)}</MetricValue>
                   </td>
-                  <td className="px-[18px] py-3.5 text-right" onClick={(e) => e.stopPropagation()}>
+                  <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
                     <MemberActions
                       memberId={member.id}
                       isOwner={isOwner}

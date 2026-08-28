@@ -57,25 +57,32 @@ export function SiteCardFull({ site, selected, selectionActive, onSelect, onActi
         />
       </div>
       <Link href={`/dashboard/sites/${site.id}`}>
-        {/* 16:10 preview. A real screenshot when we have one; otherwise a
+        {/* 16:7 preview. A real screenshot when we have one; otherwise a
             deterministic tinted cover with the site's initial, so no two cards
-            read as the same grey globe (audit B1). */}
+            read as the same grey globe (audit B1).
+            Was 16:10, which put ~68% of a 320px card into decoration and let
+            one row of three fill the whole fold. 16:7 takes the card to 205px,
+            which is what lets a second row sit in the fold.
+            The 4-up grid is gated on `2xl:` (1536px), not `xl:` (1280px):
+            measured at five widths, a 1280 viewport gives a 215px card whose
+            meta row needs 238px, so all three cards clipped. The original
+            "scrollWidth === clientWidth" proof had been taken at 1440 only. */}
         {site.thumbnail ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={site.thumbnail} alt="" className="aspect-[16/10] w-full object-cover" />
+          <img src={site.thumbnail} alt="" className="aspect-[16/7] w-full object-cover" />
         ) : (
           (() => {
             const cover = coverFromSeed(site.id);
             return (
-              <div className="flex aspect-[16/10] w-full items-center justify-center" style={{ backgroundColor: cover.bg }}>
-                <span className="text-[38px] font-bold leading-none" style={{ color: cover.fg }}>
+              <div className="flex aspect-[16/7] w-full items-center justify-center" style={{ backgroundColor: cover.bg }}>
+                <span className="text-[26px] font-bold leading-none" style={{ color: cover.fg }}>
                   {site.name.charAt(0).toUpperCase()}
                 </span>
               </div>
             );
           })()
         )}
-        <div className="p-4">
+        <div className="px-4 py-3">
           <div className="flex items-center justify-between gap-2">
             <h3 className="truncate text-[14px] font-semibold leading-tight" style={{ color: "var(--color-text-primary)" }}>{site.name}</h3>
             <Pill tone={siteStatusTone(site.status)} className="shrink-0">{siteStatusLabel(site.status)}</Pill>
@@ -89,7 +96,7 @@ export function SiteCardFull({ site, selected, selectionActive, onSelect, onActi
               </span>
             )}
           </div>
-          <div className="mt-2.5 flex items-center gap-3 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
+          <div className="mt-2.5 flex items-center gap-2.5 whitespace-nowrap text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
             <span className="flex items-center gap-1"><FileText className="h-3.5 w-3.5" /><MetricValue>{site.pages}</MetricValue> pages</span>
             <span className="flex items-center gap-1"><Users className="h-3.5 w-3.5" /><MetricValue>{formatVisitors(site.visitors30d)}</MetricValue> visitors</span>
             <span className="ml-auto flex items-center gap-1" style={{ color: "var(--color-text-muted)" }}>
@@ -99,10 +106,13 @@ export function SiteCardFull({ site, selected, selectionActive, onSelect, onActi
         </div>
       </Link>
       <div className="absolute inset-x-0 bottom-0 flex items-center gap-2 rounded-b-lg bg-white/95 px-4 py-3 opacity-0 transition-opacity group-hover:opacity-100" style={{ borderTop: "1px solid var(--color-border-default)" }}>
-        <EditorLink siteId={site.id} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-body-sm font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}>
+        {/* h-9 / rounded-lg / 14px = Button size="sm". These were 28px and 30px,
+            two heights 2px apart in one overlay, both at the off-contract 6px
+            radius — invisible until the gate widened to anchors. */}
+        <EditorLink siteId={site.id} target="_blank" rel="noopener noreferrer" className="flex h-9 items-center gap-1.5 rounded-lg px-3 text-body font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}>
           <Pencil className="h-3.5 w-3.5" />Edit
         </EditorLink>
-        <Link href={`/dashboard/sites/${site.id}`} className="flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-body-sm font-medium" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>
+        <Link href={`/dashboard/sites/${site.id}`} className="flex h-9 items-center gap-1.5 rounded-lg border px-3 text-body font-medium" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>
           <Settings className="h-3.5 w-3.5" />Manage
         </Link>
         <div className="ml-auto">

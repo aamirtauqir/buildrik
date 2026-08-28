@@ -11,7 +11,7 @@ function SettingsCard({ entry }: { entry: SettingsSection }) {
   return (
     <Link
       href={entry.href}
-      className="flex items-center gap-3.5 rounded-lg border px-[18px] py-4 transition-colors hover:border-[var(--color-border-strong)]"
+      className="flex items-center gap-3 rounded-lg border px-4 py-3 transition-colors hover:border-[var(--color-border-strong)]"
       style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
     >
       <IconChip>
@@ -33,7 +33,7 @@ export default function SettingsIndexPage() {
   const agency = !!features.data?.agency_layer;
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-6">
       {SETTINGS_GROUPS.map((group) => {
         const items = group.items.filter((i) => !i.agencyOnly || agency);
         if (items.length === 0) return null;
@@ -42,7 +42,7 @@ export default function SettingsIndexPage() {
             <h2 className="mb-3 text-eyebrow font-semibold uppercase tracking-wide" style={{ color: "var(--color-text-muted)" }}>
               {group.label}
             </h2>
-            <div className="grid grid-cols-1 gap-3.5 lg:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
               {items.map((item) => (
                 <SettingsCard key={item.href} entry={item} />
               ))}

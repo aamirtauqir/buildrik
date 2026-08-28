@@ -18,7 +18,7 @@ export function OnbBanner({
   retrying?: boolean;
 }) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-lg border border-onb-error bg-white px-[18px] py-3">
+    <div className="flex items-center justify-between gap-3 rounded-lg border border-onb-error bg-white px-4 py-3">
       <span className="text-[13px] text-onb-error">⚠ {message}</span>
       {onRetry ? (
         <button

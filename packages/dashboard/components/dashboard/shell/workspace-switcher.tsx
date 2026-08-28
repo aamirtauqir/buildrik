@@ -45,13 +45,13 @@ export function WorkspaceSwitcher() {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center gap-2.5 rounded-lg border px-2.5 py-2 text-left transition-colors hover:bg-[var(--color-bg-subtle)]"
+        className="flex w-full items-center gap-2.5 rounded-lg border px-2.5 py-1.5 text-left transition-colors hover:bg-[var(--color-bg-subtle)]"
         style={{ borderColor: "var(--color-border-default)" }}
         aria-label="Switch workspace"
         aria-haspopup="menu"
         aria-expanded={open}
       >
-        <span className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-md text-body-sm font-bold text-white" style={{ backgroundColor: "var(--color-ink)" }}>{initials(current?.name)}</span>
+        <span className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-md text-body-sm font-bold text-white" style={{ backgroundColor: "var(--color-ink)" }}>{initials(current?.name)}</span>
         <span className="min-w-0 flex-1">
           <span className="block truncate text-[13.5px] font-bold leading-tight" style={{ color: "var(--color-text-primary)" }}>{current?.name ?? "Workspace"}</span>
         </span>

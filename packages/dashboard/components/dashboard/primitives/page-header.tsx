@@ -4,10 +4,11 @@ import type { ReactNode } from "react";
  *  Replaces the per-screen hand-rolled <header> blocks. */
 export function PageHeader({ title, description, actions }: { title: string; description?: string; actions?: ReactNode }) {
   return (
-    <header className="mb-6 flex flex-wrap items-start justify-between gap-4">
+    <header className="mb-5 flex flex-wrap items-start justify-between gap-4">
       <div className="min-w-0">
-        {/* UI kit §2 — Page H1: 24px / 700 / -.01em */}
-        <h1 className="text-[24px] font-bold leading-[1.25] tracking-[-0.01em]" style={{ color: "var(--color-text-primary)" }}>{title}</h1>
+        {/* The token, not a hardcode — this read text-[24px] while eight other
+            screens used `text-page-title`, so the ramp could move without it. */}
+        <h1 className="text-page-title tracking-[-0.01em]" style={{ color: "var(--color-text-primary)" }}>{title}</h1>
         {description && (
           <p className="mt-0.5 text-[13px]" style={{ color: "var(--color-text-secondary)" }}>{description}</p>
         )}

@@ -28,8 +28,12 @@ export function StatCard({
   const labelEl = <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.06em]" style={{ color: "var(--color-text-secondary)" }}>{label}</p>;
   const valueEl = (
     <p
-      className={cn("text-[27px] leading-none tracking-[-0.02em]", mono && "tabular-nums")}
-      style={{ color: "var(--color-text-primary)", fontWeight: 730 }}
+      /* 27px/730 -> text-metric (22/700). Four of these sat in a row above a
+         24px H1 and outweighed it — the numbers read as the page title and the
+         actual title as a caption. 730 was not a token, and neither was the
+         22px that replaced it until `--text-metric` was written. */
+      className={cn("text-metric tracking-[-0.02em]", mono && "tabular-nums")}
+      style={{ color: "var(--color-text-primary)" }}
     >{value}</p>
   );
   // Cards with a `visual` (sparkline) put the label on its own row, then the
@@ -39,11 +43,11 @@ export function StatCard({
   const inner = visual ? (
     <>
       {labelEl}
-      <div className="mt-2 flex items-end justify-between gap-[10px]">
+      <div className="mt-1.5 flex items-end justify-between gap-[10px]">
         {valueEl}
         <div className="shrink-0">{visual}</div>
       </div>
-      {delta && <div className="mt-2 text-[12px]" style={{ color: "var(--color-text-secondary)" }}>{delta}</div>}
+      {delta && <div className="mt-1.5 text-[12px]" style={{ color: "var(--color-text-secondary)" }}>{delta}</div>}
     </>
   ) : (
     <>
@@ -60,7 +64,7 @@ export function StatCard({
     borderColor: "var(--color-border-default)",
     backgroundColor: "var(--color-bg-surface)",
     borderRadius: "8px",
-    padding: "16px 18px",
+    padding: "13px 15px",
     boxShadow: "var(--shadow-ring)",
   };
   if (href) {

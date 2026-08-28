@@ -53,7 +53,7 @@ export function collapseEntries(entries: ActivityEntry[]): Array<{ entry: Activi
 function ActivityRow({ entry, count, isLast }: { entry: ActivityEntry; count: number; isLast: boolean }) {
   return (
     <li
-      className={cn("flex items-center gap-[11px] px-[18px] py-[13px]", !isLast && "border-b")}
+      className={cn("flex items-center gap-[11px] px-4 py-2.5", !isLast && "border-b")}
       style={{ borderColor: "var(--color-border-default)" }}
     >
       {(() => {

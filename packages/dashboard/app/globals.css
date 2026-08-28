@@ -191,15 +191,28 @@
   --text-display: 28px;
   --text-display--line-height: 1.2;
   --text-display--font-weight: 700;
-  --text-page-title: 24px;
+  /* 24px -> 20px, density pass 2026-08-28 (founder: "text kabhi bara hai").
+     The H1 was optically outweighed by the 27px stat metrics beside it. */
+  --text-page-title: 20px;
   --text-page-title--line-height: 1.2;
   --text-page-title--font-weight: 700;
+  /* 15px, NOT 14px. The density pass took this to 14 and --text-body is also
+     14, so section headings and body copy became the same size separated by
+     weight alone — a step of zero. The founder asked for the page title and
+     the cards to come down, not for a level of hierarchy to be deleted. */
   --text-section-title: 15px;
   --text-section-title--line-height: 1.3;
   --text-section-title--font-weight: 650;
   --text-eyebrow: 11px;
   --text-eyebrow--line-height: 1.2;
   --text-eyebrow--font-weight: 600;
+  /* The hero metric on a StatCard or usage tile. The comment above has named
+     this slot since the reskin and the token was never written, so three files
+     hand-rolled `text-[22px]` — the exact literal that comment says the tokens
+     exist to kill. */
+  --text-metric: 22px;
+  --text-metric--line-height: 1;
+  --text-metric--font-weight: 700;
   --text-body: 14px;
   --text-body--line-height: 1.45;
   --text-body-sm: 12px;

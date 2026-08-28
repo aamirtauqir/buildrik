@@ -249,8 +249,11 @@ export default function DashboardPage() {
             />
           </div>
 
-          {/* Recent activity + Quick actions */}
-          <div className="grid gap-[14px]" style={{ gridTemplateColumns: "1.55fr 1fr" }}>
+          {/* Recent activity + Quick actions.
+              `items-start` so each card sizes to its own content. Stretched,
+              the shorter card grew to match the taller one and Recent activity
+              carried ~50px of nothing under its last row (UI/IA audit #4). */}
+          <div className="grid items-start gap-[14px]" style={{ gridTemplateColumns: "1.55fr 1fr" }}>
             <SectionCard
               title="Recent activity"
               padding="none"

@@ -32,7 +32,7 @@ export function SectionCard({
       style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
     >
       {hasHeader && (
-        <div className="flex items-center justify-between gap-4 border-b px-5 py-3.5" style={{ borderColor: "var(--color-border-default)" }}>
+        <div className="flex items-center justify-between gap-4 border-b px-4 py-3" style={{ borderColor: "var(--color-border-default)" }}>
           <div className="min-w-0">
             {title && <h2 className="text-section-title" style={{ color: "var(--color-text-primary)" }}>{title}</h2>}
             {description && <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>{description}</p>}
@@ -40,7 +40,7 @@ export function SectionCard({
           {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
         </div>
       )}
-      <div className={padding === "md" ? "p-5" : undefined}>{children}</div>
+      <div className={padding === "md" ? "p-4" : undefined}>{children}</div>
     </section>
   );
 }

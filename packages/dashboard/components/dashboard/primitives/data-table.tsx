@@ -36,7 +36,7 @@ export function DataTable<T>({
         <TableHead>
           <TableRow>
             {columns.map((c) => (
-              <TableHeadCell key={c.key} className={cn("px-[18px] py-2.5", c.align === "right" && "text-right")}>
+              <TableHeadCell key={c.key} className={cn("px-4 py-2.5", c.align === "right" && "text-right")}>
                 {c.header}
               </TableHeadCell>
             ))}
@@ -51,7 +51,7 @@ export function DataTable<T>({
               style={{ borderColor: "var(--color-border-default)" }}
             >
               {columns.map((c) => (
-                <TableCell key={c.key} className={cn("px-[18px] py-3.5", c.align === "right" && "text-right", c.className)} style={{ color: "var(--color-text-primary)" }}>
+                <TableCell key={c.key} className={cn("px-4 py-3", c.align === "right" && "text-right", c.className)} style={{ color: "var(--color-text-primary)" }}>
                   {c.render ? c.render(row) : (row as Record<string, ReactNode>)[c.key]}
                 </TableCell>
               ))}
