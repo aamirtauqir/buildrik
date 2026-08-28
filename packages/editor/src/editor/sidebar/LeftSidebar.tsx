@@ -391,6 +391,19 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
     pendingTab: GroupedTabId | null;
   }>({ open: false, pendingTab: null });
 
+  /* Pages › "From template" opens Templates in NEW-PAGE mode. A prop, not an
+     event: the old UI_TEMPLATES_NEWPAGE_ON emit could never be heard —
+     TabRouter mounts one tab at a time, so TemplatesTab's listener did not
+     exist yet when the emit fired from the Pages tab, and the panel always
+     opened in gallery mode, whose apply REPLACES the current page. Found
+     live 2026-08-28 the first time the door was actually walked. Reset when
+     the visit leaves Templates — new-page mode belongs to the visit that
+     asked for it. */
+  const [templatesNewPage, setTemplatesNewPage] = React.useState(false);
+  React.useEffect(() => {
+    if (activeTab !== "templates") setTemplatesNewPage(false);
+  }, [activeTab]);
+
   const safeTabChange = React.useCallback(
     (tab: GroupedTabId) => {
       if (activeTab === "settings" && settingsDirty) {
@@ -663,13 +676,11 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
                   canvasHoveredId={canvasHoveredId}
                   onSwitchToAdd={() => safeTabChange("add")}
                   onSwitchToTemplates={() => {
-                    /* Pages › "From template" means a NEW page. Without this the
-                       Templates panel opens in its ordinary gallery mode, whose
-                       apply path replaces the CURRENT page — boards 807:7252 and
-                       1169:4725 are the new-page flow this turns on. */
-                    composer?.emit(EVENTS.UI_TEMPLATES_NEWPAGE_ON, {});
+                    /* Boards 807:7252 and 1169:4725 — the new-page flow. */
+                    setTemplatesNewPage(true);
                     safeTabChange("templates");
                   }}
+                  templatesNewPageMode={templatesNewPage}
                   onCreateComponent={handleCreateComponent}
                   projectId={projectId}
                   publishJob={publishJob}

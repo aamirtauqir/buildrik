@@ -62,6 +62,11 @@ export interface TabRouterProps {
   canvasHoveredId?: string | null;
   onSwitchToAdd: () => void;
   onSwitchToTemplates?: () => void;
+  /** Pages › "From template" navigated here — Templates opens in new-page
+   *  mode. A prop, deliberately: the old event-based handoff ALWAYS missed,
+   *  because TabRouter mounts one tab at a time, so the listener did not
+   *  exist yet when the emit fired from the Pages tab. */
+  templatesNewPageMode?: boolean;
   onCreateComponent: () => void;
   projectId?: string | null;
   publishJob?: UsePublishJobResult;
@@ -103,6 +108,7 @@ export const TabRouter: React.FC<TabRouterProps> = ({
   canvasHoveredId,
   onSwitchToAdd,
   onSwitchToTemplates,
+  templatesNewPageMode,
   onCreateComponent,
   projectId,
   publishJob,
@@ -125,6 +131,7 @@ export const TabRouter: React.FC<TabRouterProps> = ({
           isExpanded={commonTabProps.isExpanded}
           onExpandToggle={commonTabProps.onExpandToggle}
           composer={composer}
+          newPageMode={templatesNewPageMode}
           onTemplateUsed={onSwitchToAdd}
           onSwitchTab={onTemplatesSwitchTab}
           onClose={commonTabProps.onClose}

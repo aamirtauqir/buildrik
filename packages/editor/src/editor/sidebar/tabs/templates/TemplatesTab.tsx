@@ -60,25 +60,13 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   const [showCreateConfirm, setShowCreateConfirm] = React.useState(false);
   const [createResult, setCreateResult] = React.useState<"success" | "error" | null>(null);
 
-  // §6 — newPageMode is activated by the caller that navigated here. Pages ›
-  // "From template" (LeftSidebar) emits UI_TEMPLATES_NEWPAGE_ON; without it
-  // this panel shows the ordinary gallery, whose apply path REPLACES the
-  // current page instead of creating a new one.
-  const [newPageModeInternal, setNewPageModeInternal] = React.useState(false);
-  const newPageMode = newPageModeProp || newPageModeInternal;
-  React.useEffect(() => {
-    if (!composer) return;
-    const enable = () => setNewPageModeInternal(true);
-    composer.on(EVENTS.UI_TEMPLATES_NEWPAGE_ON, enable);
-    return () => {
-      composer.off(EVENTS.UI_TEMPLATES_NEWPAGE_ON, enable);
-      /* TabRouter renders one tab at a time, so leaving Templates unmounts
-         this. New-page mode belongs to the visit that asked for it — without
-         this reset, opening Templates from the rail later would still promise
-         a new page. */
-      setNewPageModeInternal(false);
-    };
-  }, [composer]);
+  // §6 — newPageMode is a PROP from the caller that navigated here (Pages ›
+  // "From template" via LeftSidebar). It used to be an event, and the event
+  // could never be heard: TabRouter mounts one tab at a time, so this panel's
+  // listener did not exist yet when the emit fired — the gallery mode, whose
+  // apply REPLACES the current page, showed every time. LeftSidebar owns the
+  // reset (mode ends when the visit leaves Templates).
+  const newPageMode = newPageModeProp;
 
   // ── Hooks ──
   const { appliedId, setAppliedId } = useTemplatePersistence();

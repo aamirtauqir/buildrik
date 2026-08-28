@@ -520,9 +520,11 @@ export const EVENTS = {
   /** Trigger scroll to selected element in Layers panel */
   LAYERS_SCROLL_TO_SELECTION: "layers:scroll-to-selection",
   /** Open the Build/Add panel in the left sidebar */
-  /** Templates panel enters "choose a template for a NEW page" mode. Leaving
-      the panel unmounts it, which is the only way out — no OFF event. */
-  UI_TEMPLATES_NEWPAGE_ON: "ui:templates-newpage-on",
+  /* (UI_TEMPLATES_NEWPAGE_ON deleted 2026-08-28 — the mode is a prop now.
+     The event could never be heard: TabRouter mounts one tab at a time, so
+     TemplatesTab's listener did not exist when the emit fired. Same
+     declared-never-works family as PAGE_CREATED, but worse — this one
+     LOOKED wired from both ends.) */
   /* Open a page's settings from outside the Pages panel — the Templates
      success modal offers it (board 1169:4725) and page settings is otherwise
      local state inside PagesTab. */
