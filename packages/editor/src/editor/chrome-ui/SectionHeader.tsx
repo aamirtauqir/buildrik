@@ -13,13 +13,13 @@ export interface SectionHeaderProps extends React.HTMLAttributes<HTMLDivElement>
 }
 
 const BASE =
-  "tw:flex tw:items-center tw:gap-2 tw:h-7 tw:px-4 tw:[font-family:var(--bk-font-ui)] tw:text-[11px] " +
-  "tw:font-medium tw:tracking-[0.08em] tw:text-gray-500 tw:uppercase";
+  "tw:flex tw:items-center tw:gap-2 tw:h-7 tw:px-4 tw:[font-family:var(--bk-font-ui)] tw:text-[length:var(--bk-text-11)] " +
+  "tw:font-medium tw:tracking-[0.08em] tw:text-[var(--bk-ink-muted)] tw:uppercase";
 
 export function SectionHeader({ tint, count, level = 3, className, children, ...rest }: SectionHeaderProps) {
   return (
     <div
-      className={[BASE, tint && "tw:bg-gray-100", className].filter(Boolean).join(" ")}
+      className={[BASE, tint && "tw:bg-[var(--bk-bg-subtle)]", className].filter(Boolean).join(" ")}
       {...rest}
     >
       {/* The heading is the LABEL, not the bar — with the role on the container
@@ -34,7 +34,7 @@ export function SectionHeader({ tint, count, level = 3, className, children, ...
            whole reason data/* is a separate family." It was rendering in the UI
            font, so a filtering list shifted its own count sideways. Tracking is
            reset because the label's .08em caps spacing is wrong for digits. */
-        <span className="tw:ml-auto tw:[font-family:var(--bk-font-mono)] tw:tabular-nums tw:tracking-normal tw:text-gray-500">
+        <span className="tw:ml-auto tw:[font-family:var(--bk-font-mono)] tw:tabular-nums tw:tracking-normal tw:text-[var(--bk-ink-muted)]">
           {count}
         </span>
       ) : null}

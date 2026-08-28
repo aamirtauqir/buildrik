@@ -17,14 +17,14 @@ export type ModalKind = "question" | "flow" | "form";
    own header comment). Exported here so both compose one source of truth
    instead of two copies of the same restyle. */
 export const MODAL_FRAME_BASE_CLASS =
-  "tw:z-[60] tw:flex tw:flex-col tw:bg-white tw:rounded-lg tw:[box-shadow:var(--bk-shadow-overlay)] " +
+  "tw:z-[60] tw:flex tw:flex-col tw:bg-[var(--bk-bg-elevated)] tw:rounded-lg tw:[box-shadow:var(--bk-shadow-overlay)] " +
   "tw:max-h-[80vh] tw:max-w-[calc(100vw-32px)] tw:[font-family:var(--bk-font-ui)]";
 export const MODAL_HEAD_CLASS = "tw:flex tw:flex-col tw:gap-1 tw:pt-5 tw:px-5 tw:pb-3";
-export const MODAL_TITLE_CLASS = "tw:text-base tw:font-semibold tw:text-gray-900";
-export const MODAL_SUBTITLE_CLASS = "tw:text-xs tw:text-gray-500";
-export const MODAL_BODY_CLASS = "tw:px-5 tw:pt-0 tw:pb-4 tw:overflow-auto tw:text-[13px] tw:text-gray-600";
+export const MODAL_TITLE_CLASS = "tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:text-[var(--bk-ink)]";
+export const MODAL_SUBTITLE_CLASS = "tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink-muted)]";
+export const MODAL_BODY_CLASS = "tw:px-5 tw:pt-0 tw:pb-4 tw:overflow-auto tw:text-[length:var(--bk-text-13)] tw:text-[var(--bk-ink-soft)]";
 export const MODAL_FOOT_CLASS =
-  "tw:flex tw:items-center tw:justify-end tw:gap-2 tw:py-4 tw:px-5 tw:border-t tw:border-gray-200";
+  "tw:flex tw:items-center tw:justify-end tw:gap-2 tw:py-4 tw:px-5 tw:border-t tw:border-[var(--bk-border)]";
 
 const KIND_WIDTH_CLASS: Record<ModalKind, string> = {
   question: "tw:w-[440px]",

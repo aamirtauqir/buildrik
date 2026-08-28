@@ -46,6 +46,13 @@ export type { TopbarProps, TopbarTools, PublishState, ReviewPill, ReviewTone } f
 export { Icon, IconButton, Kbd, Spinner, type IconProps, type IconButtonProps, type KbdProps, type SpinnerProps } from "./Icon";
 export { CopyButton, type CopyButtonProps } from "./CopyButton";
 export { SectionHeader, type SectionHeaderProps } from "./SectionHeader";
+export {
+  TYPE_PANEL_TITLE_CLASS,
+  TYPE_SECTION_CAPTION_CLASS,
+  TYPE_BODY_CLASS,
+  TYPE_LABEL_CLASS,
+  TYPE_HINT_CLASS,
+} from "./typeRamp";
 export { NavItem, type NavItemProps } from "./NavItem";
 export {
   Row,

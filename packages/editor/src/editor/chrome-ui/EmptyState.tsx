@@ -20,8 +20,8 @@ export interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
   action?: React.ReactNode;
 }
 
-const TITLE_CLASS = "tw:font-medium tw:text-gray-900";
-const BODY_CLASS = "tw:text-gray-500 tw:text-xs tw:max-w-[34ch]";
+const TITLE_CLASS = "tw:font-medium tw:text-[var(--bk-ink)]";
+const BODY_CLASS = "tw:text-[var(--bk-ink-muted)] tw:text-[length:var(--bk-text-12)] tw:max-w-[34ch]";
 
 /** Compound parts — call sites that build their own copy blocks use these. */
 export function EmptyStateTitle({ className, children, ...rest }: React.HTMLAttributes<HTMLSpanElement>) {
@@ -48,7 +48,7 @@ export function EmptyStateActions({ className, children, ...rest }: React.HTMLAt
 
 const BASE =
   "tw:flex tw:flex-col tw:items-center tw:justify-center tw:text-center " +
-  "tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:text-gray-600";
+  "tw:[font-family:var(--bk-font-ui)] tw:text-[length:var(--bk-text-13)] tw:text-[var(--bk-ink-soft)]";
 
 /** md and the collapsed compact/sm bucket each supply their OWN gap+padding
  *  (never both at once in the same composed string) — same no-two-classes-
