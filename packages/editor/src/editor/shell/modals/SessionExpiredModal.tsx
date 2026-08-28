@@ -20,7 +20,7 @@
  */
 
 import * as React from "react";
-import { Button, ModalContent, ModalFooter, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
+import { Button, ModalBody, ModalContent, ModalFooter, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import type { SaveOutcome } from "../hooks/useSaveCallback";
@@ -85,6 +85,9 @@ export const SessionExpiredModal: React.FC<SessionExpiredModalProps> = ({
     <ModalRoot open={open} onOpenChange={(o) => !o && onKeepEditing()}>
       <ModalContent size="question" srTitle="Your session expired">
         <ModalTitle>Your session expired</ModalTitle>
+        {/* ModalBody carries the horizontal inset — same missing-gutter bug
+            as PublishConfirmModal (FINDING-008). */}
+        <ModalBody>
         <p className="tw:my-2 tw:text-[13px] tw:leading-normal tw:text-[var(--bk-ink-muted)]">
           You have unsaved changes — they live in this tab. Keep it open, sign
           in again, then save.
@@ -116,6 +119,7 @@ export const SessionExpiredModal: React.FC<SessionExpiredModalProps> = ({
             Still signed out — finish signing in first, then try again.
           </p>
         )}
+        </ModalBody>
         <ModalFooter>
           <Button color="light" size="sm" onClick={onKeepEditing}>
             Keep editing

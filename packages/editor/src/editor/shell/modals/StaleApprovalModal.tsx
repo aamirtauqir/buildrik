@@ -10,7 +10,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { ModalContent, ModalFooter, ModalRoot, ModalTitle, useToast, Button } from "@/editor/chrome-ui";
+import { ModalBody, ModalContent, ModalFooter, ModalRoot, ModalTitle, useToast, Button } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
 import { exportPublishPages, type PublishPage } from "../exportPublishPages";
@@ -136,6 +136,9 @@ export const StaleApprovalModal: React.FC<StaleApprovalModalProps> = ({
         {/* Board 1168:4713. The title states the FACT (the approval is stale),
             not a question about the client — the question is the buttons. */}
         <ModalTitle>The approval is older than your latest edits</ModalTitle>
+        {/* ModalBody carries the horizontal inset — same missing-gutter bug
+            as PublishConfirmModal (FINDING-008). */}
+        <ModalBody>
         <p className="tw:my-2 tw:mb-3 tw:text-[13px] tw:leading-normal tw:text-[var(--bk-ink-muted)]">
           {/* The round is fetched separately from the block that opens this
               modal, so it can be absent — and the fallback used to render the
@@ -179,6 +182,7 @@ export const StaleApprovalModal: React.FC<StaleApprovalModalProps> = ({
             </div>
           </>
         )}
+        </ModalBody>
         <ModalFooter>
           <Button color="light" size="xs" disabled={resending} onClick={() => void handleResend()}>
             {resending ? "Requesting…" : "Request fresh review"}
