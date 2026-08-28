@@ -8,6 +8,19 @@ below come from those.
 
 ## Done-conditions (checked live before anything is called done)
 
+**CLOSED 2026-08-28.** A ✓ (7/7 steps live on a scratch site; add-page ticked
+0→1, preview 0→1, fixture seeds read 3/7; v4→v5 wipe pinned in tests) ·
+B ✓ (coach live on fresh site, Got-it persisted flag "1", absent after) ·
+C ✓ (sibling visible; the click exposed that new-page mode had NEVER worked —
+fixed prop-driven, live both ways) · D ✓ (cookie-kill + ⌘S opened the surface,
+Keep editing closed it; FORBIDDEN split; autosave auth branch added) ·
+E ✓ (1347:7162 drawn + read back, census 439 rows PASS, verify:ds green,
+202 test files / 1832 pass). NOT live-verified: set-brand / insert-section /
+send-review ticks (the wires are unit-tested; send was deliberately not fired
+against the fixture's review round) and the publish tick (publish stays
+out of scope per 2026-08-25). Scratch site deleted; workspace plan restored
+to FREE and re-read.
+
 | # | Item | Done-condition (observed, not claimed) |
 |---|------|----------------------------------------|
 | A | Checklist agency-framing | The checklist shows the 7 board steps; in the running app, applying Brand tokens ticks "Set your brand", adding a page ticks its step, inserting a section block ticks its step, sending a review round ticks "Send for review"; stale localStorage from schema v4 resets cleanly |

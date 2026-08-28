@@ -4,10 +4,10 @@
   "page": "1:3",
   "generatedAt": "2026-08-14",
   "counts": {
-    "total": 438,
+    "total": 439,
     "active": 355,
     "designAhead": 41,
-    "outOfScope": 42,
+    "outOfScope": 43,
     "activeFamilies": 35
   },
   "activeFamilies": [
@@ -2403,13 +2403,13 @@
     },
     {
       "nodeId": "813:4870",
-      "name": "S1.5b · session-expired · unsaved-changes-warning",
+      "name": "S1.5b · session-expired · unsaved-changes-warning — SUPERSEDED 2026-08-28 by 1347:7162",
       "family": "S1 flows",
       "state": "session-expired · unsaved-changes-warning",
       "width": 1440,
       "height": 900,
-      "status": "active",
-      "authority": "board:813:4870",
+      "status": "out-of-scope",
+      "authority": "superseded:1347-7162",
       "recipe": null
     },
     {
@@ -4863,6 +4863,17 @@
       "height": 480,
       "status": "active",
       "authority": "code:state-exists — chat composer + agent plan shipped; brief-form family superseded",
+      "recipe": null
+    },
+    {
+      "nodeId": "1347:7162",
+      "name": "S1.5b · session-expired · unsaved-warning — NEW 2026-08-28",
+      "family": "S1 flows",
+      "state": "session-expired · unsaved-warning",
+      "width": 720,
+      "height": 520,
+      "status": "active",
+      "authority": "walked:2026-08-28 — SessionExpiredModal live: cookie kill + ⌘S opened it, Keep editing closed it; honest copy (no cache/24h claims)",
       "recipe": null
     }
   ],

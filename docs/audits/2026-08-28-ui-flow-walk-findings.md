@@ -14,12 +14,24 @@ code disagree on something only the founder can settle).
 **Board-authority closure** (the rows where the census says the BOARD is the
 contract): 815:4518 shortcuts search — fixed · 814:7027 undo-toast reverse
 action — fixed · 807:8069 breakpoint bar — walked, MATCH · 307:2193/2203/2213
-review gates — walked, verbs match · **813:4870 session-expired
-unsaved-warning — OPEN, the one board-authority row live does not satisfy**
-(see S1). Everything else in the 92 carries code/walked/founder authority and
-is cited to its arc below. NOT verified live this arc: the S2 generation
-states (AI dead in dev), the 294:* error states (static cites only), and the
-canvas interaction states re-cited from 08-21/08-22.
+review gates — walked, verbs match · 813:4870 session-expired
+unsaved-warning — **CLOSED 2026-08-28**: `SessionExpiredModal` shipped on
+honest copy (no cache/24h claims — nothing in the code backs them), fired
+from BOTH save paths, live-verified via cookie-kill + ⌘S; the board redrawn
+as 1347:7162 and the old drawing superseded. Every board-authority row is now
+satisfied. NOT verified live this arc: the S2 generation states (AI dead in
+dev), the 294:* error states (static cites only), and the canvas interaction
+states re-cited from 08-21/08-22.
+
+**Post-walk arc (same day):** the founder approved the recommendation package
+and it shipped — agency-framed checklist (7/7 board steps live, seeds
+verified at 3/7 on the fixture), the rail coach mark (live: shown fresh,
+Got-it persisted), "From template" out of the overflow, and the
+session-expired surface. The walk's method found one more shipped-dead flow
+on the way: Templates' new-page mode had NEVER worked (its event fired before
+the listener's tab was mounted — gallery mode, whose apply replaces the
+current page, showed every time). Prop-driven now, live-verified both ways.
+Plan + codex review: `docs/plans/2026-08-28-first-run-and-recovery-arc.md`.
 
 ## Fixed during the walk
 
