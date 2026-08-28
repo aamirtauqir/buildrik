@@ -276,6 +276,7 @@ describe("DesignSystemTab — Apply pipeline (footer -> ReviewModal)", () => {
   it("persists tokens + presets + schema version through composer.setProjectSettings and clears dirty", async () => {
     const composer = makeFakeComposer();
     const setSpy = vi.spyOn(composer, "setProjectSettings");
+    const emitSpy = vi.spyOn(composer, "emit");
     const utils = await renderTab(composer);
 
     fireEvent.change(utils.radiusInput, { target: { value: "10px" } });
@@ -304,6 +305,9 @@ describe("DesignSystemTab — Apply pipeline (footer -> ReviewModal)", () => {
     await waitFor(() => {
       expect(document.querySelector('[aria-label="unsaved changes"]')).toBeNull();
     });
+    // The onboarding "Set your brand" wire — announced only after the whole
+    // apply succeeded.
+    expect(emitSpy).toHaveBeenCalledWith("brand:applied", undefined);
   });
 
   it("shows the error toast and stays recoverable when setProjectSettings throws", async () => {
@@ -311,12 +315,15 @@ describe("DesignSystemTab — Apply pipeline (footer -> ReviewModal)", () => {
     vi.spyOn(composer, "setProjectSettings").mockImplementation(() => {
       throw new Error("boom");
     });
+    const emitSpy = vi.spyOn(composer, "emit");
     const utils = await renderTab(composer);
 
     fireEvent.change(utils.radiusInput, { target: { value: "10px" } });
     await applyViaFooter(utils);
 
     expect(await utils.findByText("Failed to apply tokens. Try again.")).toBeTruthy();
+    // A failed apply must not tick the onboarding step (codex, plan review).
+    expect(emitSpy).not.toHaveBeenCalledWith("brand:applied", undefined);
   });
 });
 
