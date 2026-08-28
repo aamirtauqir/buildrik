@@ -15,7 +15,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { ModalContent, ModalFooter, ModalRoot, ModalTitle, Button } from "@/editor/chrome-ui";
+import { ModalBody, ModalContent, ModalFooter, ModalRoot, ModalTitle, Button } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import { PublishConfirmFacts } from "@/editor/sidebar/tabs/publish/PublishConfirmFacts";
 
@@ -60,7 +60,10 @@ export const PublishConfirmModal: React.FC<PublishConfirmModalProps> = ({
 
         {/* The four rows live in PublishConfirmFacts — the wizard's Confirm
             step renders the same component, so the two entry points into board
-            914:4507 cannot drift apart. */}
+            914:4507 cannot drift apart. ModalBody carries the horizontal
+            inset: without it the fact labels and values sat flush against the
+            modal edges (walked live 2026-08-28). */}
+        <ModalBody>
         <div className="tw:mt-[10px] tw:mb-[4px]">
           <PublishConfirmFacts
             active={isOpen}
@@ -84,6 +87,7 @@ export const PublishConfirmModal: React.FC<PublishConfirmModalProps> = ({
             {blocked}
           </p>
         )}
+        </ModalBody>
 
         <ModalFooter>
           <Button color="light" size="xs" disabled={submitting} onClick={onClose}>
