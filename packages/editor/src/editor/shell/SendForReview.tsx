@@ -15,6 +15,7 @@
 import * as React from "react";
 import { FormField, Popover, Button, Textarea, TextInput, Tooltip } from "@/editor/chrome-ui";
 import type { Composer } from "../../engine";
+import { EVENTS } from "@/shared/constants/events";
 import { submitForReview, type ReviewStatus } from "../../services/ReviewService";
 import { exportPublishPages } from "./exportPublishPages";
 
@@ -116,6 +117,8 @@ export const SendForReview: React.FC<SendForReviewProps> = ({
       setReviewUrl(outcome?.reviewUrl ?? null);
       setState("sent");
       setOpen(outcome?.inviteEmailSent === false);
+      // The onboarding checklist's send-review / connect-client wires.
+      composer?.emit(EVENTS.REVIEW_SENT, { invitedEmail: email.trim() || null });
       onSent?.({ inviteEmailSent: outcome?.inviteEmailSent ?? null });
     } catch {
       setState("error");

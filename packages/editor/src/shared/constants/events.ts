@@ -478,6 +478,14 @@ export const EVENTS = {
   PAGE_CREATED: "page:created",
 
   // ============================================
+  // Brand / Review milestone events (onboarding wires, 2026-08-28)
+  // ============================================
+  /** DesignSystemTab's Apply persisted brand tokens — fired only on success. */
+  BRAND_APPLIED: "brand:applied",
+  /** A review round went out (send or re-send, any of the three send sites). */
+  REVIEW_SENT: "review:sent",
+
+  // ============================================
   // Device/Zoom Events
   // ============================================
   ZOOM_IN: "zoom:in",
@@ -868,6 +876,8 @@ export interface EventPayloads {
 
   // Template apply / remove (S9 — emitted by PageManager.recordAppliedTemplate / removeAppliedTemplate)
   [EVENTS.TEMPLATE_APPLIED]: { templateId: string; pageId: string; version?: string };
+  [EVENTS.BRAND_APPLIED]: void;
+  [EVENTS.REVIEW_SENT]: { invitedEmail: string | null };
   [EVENTS.TEMPLATE_REMOVED]: { templateId: string; pageId: string };
 }
 

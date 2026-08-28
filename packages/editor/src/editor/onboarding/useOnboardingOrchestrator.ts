@@ -55,9 +55,39 @@ export interface OnboardingOrchestratorState {
   restore: () => void;
 }
 
+// ── Schema migration ─────────────────────────────────────────────────────────
+
+/* A schema bump changes what the steps ARE (v5 replaced the tool-framed list
+   with the agency-framed one), so it must reset the whole story — progress,
+   phase, and the dismissed flag. Clearing only progress left a v4 user whose
+   phase said "done" permanently done: the new list would never show. Codex
+   caught it at plan review. Idempotent — the version stamp is written first,
+   so the second call in the same render (StrictMode double-invoke, and both
+   loaders below call this) is a no-op. */
+function migrateOnboardingSchema(): void {
+  try {
+    const storedVersion = parseInt(
+      localStorage.getItem(STORAGE_KEYS.ONBOARDING_SCHEMA_VERSION) ?? "0",
+      10
+    );
+    if (storedVersion >= ONBOARDING_SCHEMA_VERSION) return;
+    localStorage.setItem(
+      STORAGE_KEYS.ONBOARDING_SCHEMA_VERSION,
+      String(ONBOARDING_SCHEMA_VERSION)
+    );
+    localStorage.removeItem(STORAGE_KEYS.ONBOARDING_PROGRESS);
+    localStorage.removeItem(STORAGE_KEYS.ONBOARDING_PHASE);
+    localStorage.removeItem(STORAGE_KEYS.ONBOARDING_DISMISSED);
+    localStorage.removeItem("aquibra-onboarding-dismissed");
+  } catch {
+    /* storage unavailable — the loaders fall back to defaults anyway */
+  }
+}
+
 // ── Phase loader ─────────────────────────────────────────────────────────────
 
 function loadInitialPhase(): OnboardingPhase {
+  migrateOnboardingSchema();
   try {
     const stored = localStorage.getItem(STORAGE_KEYS.ONBOARDING_PHASE);
     if (stored === "done") return "done";
@@ -77,19 +107,8 @@ function loadInitialPhase(): OnboardingPhase {
 // ── Steps loader ─────────────────────────────────────────────────────────────
 
 function loadInitialSteps(): OnboardingStep[] {
+  migrateOnboardingSchema();
   try {
-    const storedVersion = parseInt(
-      localStorage.getItem(STORAGE_KEYS.ONBOARDING_SCHEMA_VERSION) ?? "0",
-      10
-    );
-    if (storedVersion < ONBOARDING_SCHEMA_VERSION) {
-      localStorage.removeItem(STORAGE_KEYS.ONBOARDING_PROGRESS);
-      localStorage.setItem(
-        STORAGE_KEYS.ONBOARDING_SCHEMA_VERSION,
-        String(ONBOARDING_SCHEMA_VERSION)
-      );
-      return DEFAULT_ONBOARDING_STEPS;
-    }
     const saved = localStorage.getItem(STORAGE_KEYS.ONBOARDING_PROGRESS);
     if (saved) {
       const parsed = JSON.parse(saved) as OnboardingStep[];

@@ -26,7 +26,6 @@ import { deriveLifecycleState } from "./lifecycle";
 import { Topbar, ModalRoot, ModalContent, ModalTitle, ModalDescription, ModalFooter, isModalOpen, plural, Button, type PublishState, type ReviewPill, type ReviewTone, type SaveState, type ToastInput } from "@/editor/chrome-ui";
 import type { SaveOutcome } from "./hooks/useSaveCallback";
 import type { Composer } from "../../engine";
-import { sanitizeHTMLForPreview } from "../export/ExportUtils";
 import { useCollaboration } from "../canvas/hooks/useCollaboration";
 import { toPresenceUsers } from "../collaboration/PresenceIndicators";
 import { getSiteIdFromUrl } from "../../services/BuildrikSyncProvider";
@@ -112,8 +111,6 @@ export interface StudioHeaderProps {
   /** Export HTML as zip download */
   onExportHTML?: () => void;
 
-  /** Opens the in-shell preview overlay with the sanitized page HTML (shell state 7). */
-  onInlinePreview: (html: string) => void;
   /** Vercel publish flow — when present, replaces fallback handleExport on Publish click */
   onVercelPublish?: () => void;
   /** True while a publish job is in flight */
@@ -195,7 +192,6 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   onOpenReview,
   onSave,
   onExportHTML,
-  onInlinePreview,
   onVercelPublish,
   publishLoading,
   publishedUrl,
@@ -343,12 +339,16 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
     // F7-B2: exportHTML is synchronous and can be heavy on big sites — yield a
     // tick so the loading state PAINTS before the export blocks the thread.
     // (The old fake 300ms timer pretended to load; the real work replaces it.)
+    /* Emits the toggle instead of building HTML itself: this button was the
+       one preview door that bypassed UI_TOGGLE_PREVIEW, so the shell had two
+       preview builders and the onboarding "Preview your site" step never
+       ticked on the most common path. One owner now — the shell's toggle
+       handler builds and sanitizes. */
     setTimeout(() => {
-      const rawHtml = composer?.exportHTML().combined || "<!DOCTYPE html><html><body>No content</body></html>";
-      onInlinePreview(sanitizeHTMLForPreview(rawHtml));
+      composer?.emit(EVENTS.UI_TOGGLE_PREVIEW, {});
       onSetPreviewLoading(false);
     }, 0);
-  }, [composer, previewLoading, onSetPreviewLoading, onInlinePreview]);
+  }, [composer, previewLoading, onSetPreviewLoading]);
 
   const handleExport = React.useCallback(() => {
     onSetExportLoading(true);

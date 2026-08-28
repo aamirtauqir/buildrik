@@ -28,51 +28,57 @@ export interface OnboardingStep {
 
 /* 4 (2026-08-27): every step used to be creditable by pressing its CTA, so
    stored progress can say "done" over things that were never done. The version
-   bump clears it — a checklist that lied is worse than one that starts over. */
-export const ONBOARDING_SCHEMA_VERSION = 4;
+   bump clears it — a checklist that lied is worse than one that starts over.
+   5 (2026-08-28): the list itself changed — board 296:1972's agency-framed
+   steps replace the tool-framed ones (founder call). The migration resets
+   progress AND phase, or a v4 "done" user would never see this list. */
+export const ONBOARDING_SCHEMA_VERSION = 5;
 
 // ── Default Steps ───────────────────────────────────────────────────────────
 
 export const DEFAULT_ONBOARDING_STEPS: OnboardingStep[] = [
   {
-    id: "name-project",
-    label: "Name your project",
+    id: "set-brand",
+    label: "Set your brand",
     description:
-      "Give your project a name — it shows in the browser tab and as the SEO site title.",
-    actionLabel: "Open settings",
-    actionKey: "open-project-name",
+      "Apply your fonts and colors in the Brand panel — everything you build uses them.",
+    actionLabel: "Open Brand panel",
+    actionKey: "open-brand",
     completed: false,
   },
   {
-    id: "pick-start",
-    label: "Choose a starting point",
-    description:
-      "Browse professionally designed templates or start with a blank canvas.",
-    actionLabel: "Browse templates",
-    actionKey: "open-templates",
+    id: "add-page",
+    label: "Add your first page",
+    description: "Create a page — blank, or from a template.",
+    actionLabel: "Open Pages",
+    actionKey: "open-pages",
     completed: false,
   },
   {
-    id: "add-element",
-    label: "Add an element",
+    id: "insert-section",
+    label: "Insert a section",
     description:
-      "Open the Build panel and drag any element — text, image, button — onto your canvas.",
-    actionLabel: "Open Build panel",
+      "Drop a ready-made section — hero, features, footer — onto the canvas.",
+    actionLabel: "Open Insert panel",
     actionKey: "open-build",
     completed: false,
   },
   {
-    id: "edit-text",
-    label: "Edit text",
+    id: "connect-client",
+    label: "Connect your client",
     description:
-      "Double-click any text element on the canvas to edit its content inline.",
+      "Invite your client by email when you send the site for review — they get their own link.",
+    actionLabel: "Open Review",
+    actionKey: "open-review",
     completed: false,
   },
   {
-    id: "change-style",
-    label: "Style an element",
+    id: "send-review",
+    label: "Send for review",
     description:
-      "Select any element and use the right panel to change colors, fonts, and spacing.",
+      "Send a review link so your client can approve the site or request changes.",
+    actionLabel: "Open Review",
+    actionKey: "open-review",
     completed: false,
   },
   {

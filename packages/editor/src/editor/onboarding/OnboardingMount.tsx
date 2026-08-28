@@ -11,24 +11,21 @@
 import * as React from "react";
 import type { Composer } from "../../engine";
 import { EVENTS } from "../../shared/constants";
+import { fetchCurrentRound } from "@/services/ReviewService";
 import { OnboardingChecklist } from "./OnboardingChecklist";
 import { AchievementPrompt } from "./AchievementPrompt";
 import { useOnboardingOrchestrator } from "./useOnboardingOrchestrator";
 
-/** How long the style credit waits before it counts. Long enough to cover an
- *  insert's own default-style writes, short enough that a deliberate style
- *  change still ticks while the user is looking at it. */
-const INSERT_STYLE_GRACE_MS = 400;
-
-/** Names the create flow hands out when nobody chose one. A project still
- *  wearing one of these has not been named. */
-const PLACEHOLDER_NAMES: ReadonlySet<string> = new Set([
-  "untitled",
-  "untitled site",
-  "untitled project",
-  "my project",
-  "my site",
-  "new site",
+/** Block ids that count as "a section" for the insert-section step — the
+ *  section-shaped entries in the block registry. A bare element drop (text,
+ *  image, button) is not a section. */
+const SECTION_BLOCK_IDS: ReadonlySet<string> = new Set([
+  "section",
+  "hero",
+  "features",
+  "cta",
+  "footer",
+  "navbar",
 ]);
 
 export interface OnboardingMountProps {
@@ -51,25 +48,16 @@ export const OnboardingMount: React.FC<OnboardingMountProps> = ({ composer }) =>
     };
   }, [composer]);
 
-  /* EVERY step completes on the outcome now, none on the CTA press.
+  /* EVERY step completes on the outcome, none on the CTA press — opening a
+     door is not walking through it (the v4 list learned that the hard way).
 
-     Three of them already did. The other four were ticked by `handleAction`
-     the instant their button was clicked — so "Name your project" completed
-     when Settings opened over an unchanged name, "Choose a starting point"
-     when the template browser opened over nothing applied, "Add an element"
-     when the Build panel opened over an empty canvas, and "Publish your site"
-     when the publish PANEL opened over a site that had never been deployed.
-     The list could reach 7 of 7 having done none of the seven things.
-
-     Suppressed during a project load: importing a site creates elements and
-     styles by the hundred, and crediting the user for the loader's work is
-     the same lie in the other direction. */
+     v5 (board 296:1972, agency-framed): the signals are the events the real
+     outcomes emit. Suppressed during a project load: importing a site creates
+     pages and elements by the hundred, and crediting the user for the
+     loader's work is a lie. */
   const STEP_SIGNALS: ReadonlyArray<{ id: string; event: string }> = React.useMemo(
     () => [
-      { id: "name-project", event: EVENTS.PROJECT_METADATA_CHANGED },
-      { id: "pick-start", event: EVENTS.TEMPLATE_APPLIED },
-      { id: "add-element", event: EVENTS.ELEMENT_INSERTED },
-      { id: "edit-text", event: EVENTS.ELEMENT_EDIT_INLINE },
+      { id: "set-brand", event: EVENTS.BRAND_APPLIED },
       { id: "preview", event: EVENTS.UI_TOGGLE_PREVIEW },
       { id: "publish", event: EVENTS.SITE_PUBLISHED },
     ],
@@ -79,24 +67,6 @@ export const OnboardingMount: React.FC<OnboardingMountProps> = ({ composer }) =>
   const loadingRef = React.useRef(false);
   const completeRef = React.useRef(o.completeStep);
   completeRef.current = o.completeStep;
-  /* Inserting an element writes its default styles, so a single drag emits four
-     `style:changed` before its `element:inserted` — which credited "Style an
-     element" for styles the user never chose.
-
-     The first guard was a global clock: ignore any style event within 400ms of
-     any insert. Review caught what that costs — insert a heading and change its
-     font size straight away, or insert one element and style a different one,
-     and the row could never be credited. A window cannot tell WHICH element a
-     style belongs to.
-
-     So the correlation is by element id, which the payloads carry
-     (`element:inserted` sends `elementId`; `StyleEngine` sends it on the
-     breakpoint path). A style event naming an element inserted moments ago is
-     that insert's own defaults; a style event naming anything else is the
-     user's, and is credited immediately. Events with no id fall back to the
-     window, which is all they can be judged by. */
-  const recentInserts = React.useRef(new Map<string, number>());
-  const lastInsertAt = React.useRef(0);
 
   React.useEffect(() => {
     if (!composer) return;
@@ -107,47 +77,39 @@ export const OnboardingMount: React.FC<OnboardingMountProps> = ({ composer }) =>
     };
     composer.on(EVENTS.PROJECT_LOADED, onLoad);
 
-    const markInsert = (p?: unknown) => {
-      const now = Date.now();
-      lastInsertAt.current = now;
-      const id = (p as { elementId?: string } | undefined)?.elementId;
-      if (id) {
-        recentInserts.current.set(id, now);
-        // Bounded: an id is only interesting for as long as the window lasts.
-        for (const [k, at] of recentInserts.current) {
-          if (now - at > INSERT_STYLE_GRACE_MS) recentInserts.current.delete(k);
-        }
-      }
-    };
-    composer.on(EVENTS.ELEMENT_INSERTED, markInsert);
-
-    const timers = new Set<number>();
-    const onStyle = (p?: unknown) => {
+    /* add-page rides PROJECT_CHANGED's `page:created` — EVENTS.PAGE_CREATED is
+       a declared constant nothing emits (useAutoMilestone documents the same
+       trap). The import parser emits the same type; loadingRef filters it. */
+    const onProjectChanged = (p?: unknown) => {
       if (loadingRef.current) return;
-      const styleAt = Date.now();
-      const target = (p as { elementId?: string } | undefined)?.elementId;
-
-      /* Named element: decide from THAT element's own insert, so styling a
-         different element during the window is still the user's work. */
-      if (target) {
-        const insertedAt = recentInserts.current.get(target);
-        if (insertedAt !== undefined && styleAt - insertedAt <= INSERT_STYLE_GRACE_MS) return;
-        completeRef.current("change-style");
-        return;
+      if ((p as { type?: string } | undefined)?.type === "page:created") {
+        completeRef.current("add-page");
       }
-
-      /* Unnamed (the selector-rule path): all it can be judged by is the clock.
-         Compare the insert against THIS event's timestamp, not the clock when
-         the timer fires — that compares against the timer's own delay, which is
-         always at least the window, so it never suppressed anything. */
-      const id = window.setTimeout(() => {
-        timers.delete(id);
-        if (Math.abs(lastInsertAt.current - styleAt) <= INSERT_STYLE_GRACE_MS) return;
-        completeRef.current("change-style");
-      }, INSERT_STYLE_GRACE_MS);
-      timers.add(id);
     };
-    composer.on(EVENTS.STYLE_CHANGED, onStyle);
+    composer.on(EVENTS.PROJECT_CHANGED, onProjectChanged);
+
+    /* insert-section: ELEMENT_INSERTED has two emitters with different
+       payloads — the block registry sends `blockId`, ElementManager sends
+       `type`. Either naming a section shape counts; a bare element does not. */
+    const onInserted = (p?: unknown) => {
+      if (loadingRef.current) return;
+      const { blockId, type } = (p as { blockId?: string; type?: string } | undefined) ?? {};
+      if ((blockId && SECTION_BLOCK_IDS.has(blockId)) || type === "section") {
+        completeRef.current("insert-section");
+      }
+    };
+    composer.on(EVENTS.ELEMENT_INSERTED, onInserted);
+
+    /* send-review completes on ANY send (a link-only round is still a round);
+       connect-client only when an invite email rode along — the invite IS the
+       editor's act of connecting a client. */
+    const onReviewSent = (p?: unknown) => {
+      completeRef.current("send-review");
+      if ((p as { invitedEmail?: string | null } | undefined)?.invitedEmail) {
+        completeRef.current("connect-client");
+      }
+    };
+    composer.on(EVENTS.REVIEW_SENT, onReviewSent);
 
     const offs = STEP_SIGNALS.map(({ id, event }) => {
       const handler = () => {
@@ -159,42 +121,50 @@ export const OnboardingMount: React.FC<OnboardingMountProps> = ({ composer }) =>
 
     return () => {
       composer.off(EVENTS.PROJECT_LOADED, onLoad);
-      composer.off(EVENTS.ELEMENT_INSERTED, markInsert);
-      composer.off(EVENTS.STYLE_CHANGED, onStyle);
-      timers.forEach((id) => window.clearTimeout(id));
-      recentInserts.current.clear();
+      composer.off(EVENTS.PROJECT_CHANGED, onProjectChanged);
+      composer.off(EVENTS.ELEMENT_INSERTED, onInserted);
+      composer.off(EVENTS.REVIEW_SENT, onReviewSent);
       offs.forEach((off) => off());
     };
   }, [composer, STEP_SIGNALS]);
 
-  /* B1/B2 — two of the seven rows were finished before the editor opened.
-     A site cannot exist without a name, and it was created from a template or
-     from blank; the dashboard's create flow asks both questions. Leaving them
-     unticked opened the checklist at 0 of 7 over work already done, and told a
-     returning designer to go and do it again.
-
-     Seeded from the project the composer actually loaded, not assumed: a name
-     still sitting on a placeholder is NOT a named project, and a page with
-     nothing on it has no starting point yet. Runs on load as well as mount
-     because the editor mounts before the project arrives. */
+  /* Steps finished before this editor session opened stay finished — a
+     returning designer must not be told to redo work the project already
+     shows. Seeded from what is observable, never assumed:
+       add-page       — more than one page in the loaded project
+       insert-section — a section-type element in the live registry (never
+                        `page.root`, the hollow-snapshot trap)
+       send-review    — a round exists on the server
+       connect-client — that round carries an invited email
+     Brand, preview and publish stay unseeded — a loaded snapshot holds no
+     honest signal for them. */
   const seedRef = React.useRef(o.completeStep);
   seedRef.current = o.completeStep;
   React.useEffect(() => {
     if (!composer) return;
     const seed = () => {
-      const name = composer.getProjectMetadata?.()?.name?.trim() ?? "";
-      if (name && !PLACEHOLDER_NAMES.has(name.toLowerCase())) seedRef.current("name-project");
-      /* The live registry, not `page.root` — that is a hollow snapshot whose
-         `children` can be empty over a page full of content. */
-      const root = composer.elements.getActivePage?.()?.root;
-      const onPage = composer.elements
+      if ((composer.elements.getAllPages?.() ?? []).length > 1) seedRef.current("add-page");
+      const hasSection = composer.elements
         .getAllElements()
-        .filter((el) => el.getId() !== root?.id);
-      if (onPage.length > 0) seedRef.current("pick-start");
+        .some((el) => el.getType?.() === "section");
+      if (hasSection) seedRef.current("insert-section");
     };
     seed();
     composer.on(EVENTS.PROJECT_LOADED, seed);
+
+    /* One best-effort read; a fetch error seeds nothing (the live REVIEW_SENT
+       wire still completes both rows the moment a send happens). */
+    let cancelled = false;
+    fetchCurrentRound()
+      .then((round) => {
+        if (cancelled || !round) return;
+        seedRef.current("send-review");
+        if (round.invitedEmail) seedRef.current("connect-client");
+      })
+      .catch(() => {});
+
     return () => {
+      cancelled = true;
       composer.off(EVENTS.PROJECT_LOADED, seed);
     };
   }, [composer]);
@@ -220,11 +190,16 @@ export const OnboardingMount: React.FC<OnboardingMountProps> = ({ composer }) =>
     (actionKey: string) => {
       if (!composer) return;
       switch (actionKey) {
-        case "open-project-name":
-          composer.emit(EVENTS.UI_PANEL_OPEN, { panel: "settings" });
+        case "open-brand":
+          /* "design" is the Brand tab's registry id — the rail label reads
+             Brand, the tab id never renamed. */
+          composer.emit(EVENTS.UI_PANEL_OPEN, { panel: "design" });
           break;
-        case "open-templates":
-          composer.emit(EVENTS.UI_PANEL_OPEN, { panel: "templates" });
+        case "open-pages":
+          composer.emit(EVENTS.UI_PANEL_OPEN, { panel: "pages" });
+          break;
+        case "open-review":
+          composer.emit(EVENTS.UI_PANEL_OPEN, { panel: "review" });
           break;
         case "open-build":
           composer.emit(EVENTS.UI_PANEL_OPEN, { panel: "add" });

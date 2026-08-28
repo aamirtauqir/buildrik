@@ -1,31 +1,27 @@
 /**
  * The checklist ticks when the user does the thing — and only then.
  *
- * It used to complete a step when that step's own CTA was pressed, so "Name
- * your project" ticked when Settings opened over an unchanged name and
- * "Publish your site" ticked when the publish PANEL opened over a site that
- * had never been deployed. The list could read 7 of 7 having done none of the
- * seven things. Every row is now credited from an outcome.
- *
- * Two directions of lie are tested here, not one:
- *   · crediting work the user did not do (a CTA press, a loader's elements,
- *     an inserted element's own default styles)
+ * v5 (board 296:1972): the steps are agency-framed — brand, page, section,
+ * client, review, preview, publish. Every row is credited from an outcome
+ * event, never a CTA press. Two directions of lie are tested here:
+ *   · crediting work the user did not do (a CTA press, a loader's pages)
  *   · failing to credit work already done before the editor opened
  *
  * @license BSD-3-Clause
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, act } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, act, waitFor } from "@testing-library/react";
 import * as React from "react";
 import { EVENTS } from "../../../shared/constants";
 
 const completeStep = vi.hoisted(() => vi.fn());
 const replayAll = vi.hoisted(() => vi.fn());
 const restore = vi.hoisted(() => vi.fn());
+const fetchCurrentRound = vi.hoisted(() => vi.fn(async () => null as unknown));
 const orchestrator = vi.hoisted(() => ({
   steps: [
-    { id: "name-project", actionKey: "open-project-name" },
+    { id: "set-brand", actionKey: "open-brand" },
     { id: "publish", actionKey: "trigger-publish" },
   ] as Array<{ id: string; actionKey?: string }>,
   completedCount: 0,
@@ -47,6 +43,7 @@ vi.mock("../useOnboardingOrchestrator", () => ({
   useOnboardingOrchestrator: () => orchestrator,
   ACHIEVEMENT_AUTO_DISMISS_MS: 4000,
 }));
+vi.mock("@/services/ReviewService", () => ({ fetchCurrentRound }));
 let lastChecklistProps: { onAction: (k: string) => void } | null = null;
 vi.mock("../OnboardingChecklist", () => ({
   OnboardingChecklist: (p: { onAction: (k: string) => void }) => {
@@ -58,9 +55,10 @@ vi.mock("../AchievementPrompt", () => ({ AchievementPrompt: () => <div /> }));
 
 import { OnboardingMount } from "../OnboardingMount";
 
-/** `name` and `elements` are what the seeding reads. Empty by default: a blank,
- *  unnamed project seeds nothing, which is the case that must not over-credit. */
-function fakeComposer({ name = "", elements = [] as string[] } = {}) {
+/** `pages` and `elements` are what the seeding reads. One empty page by
+ *  default: a fresh site seeds nothing, which is the case that must not
+ *  over-credit. */
+function fakeComposer({ pages = 1, sectionTypes = [] as string[] } = {}) {
   const handlers = new Map<string, Set<(p?: unknown) => void>>();
   return {
     on: (e: string, h: (p?: unknown) => void) => {
@@ -70,10 +68,10 @@ function fakeComposer({ name = "", elements = [] as string[] } = {}) {
     off: (e: string, h: (p?: unknown) => void) => handlers.get(e)?.delete(h),
     emit: (e: string, p?: unknown) => handlers.get(e)?.forEach((h) => h(p)),
     listenerCount: (e: string) => handlers.get(e)?.size ?? 0,
-    getProjectMetadata: () => ({ name }),
     elements: {
-      getActivePage: () => ({ root: { id: "root" } }),
-      getAllElements: () => [{ getId: () => "root" }, ...elements.map((id) => ({ getId: () => id }))],
+      getAllPages: () => Array.from({ length: pages }, (_, i) => ({ id: `p${i}` })),
+      getAllElements: () =>
+        sectionTypes.map((t, i) => ({ getId: () => `e${i}`, getType: () => t })),
     },
   };
 }
@@ -81,110 +79,64 @@ function fakeComposer({ name = "", elements = [] as string[] } = {}) {
 const ids = () => completeStep.mock.calls.map((a) => a[0] as string);
 
 beforeEach(() => {
-  vi.useFakeTimers();
   completeStep.mockClear();
   replayAll.mockClear();
   restore.mockClear();
+  fetchCurrentRound.mockClear();
+  fetchCurrentRound.mockResolvedValue(null);
   lastChecklistProps = null;
 });
-afterEach(() => vi.useRealTimers());
 
 describe("OnboardingMount — outcomes, not intentions", () => {
   it("ticks each step off the event that means it actually happened", () => {
     const c = fakeComposer();
     render(<OnboardingMount composer={c as never} />);
 
-    act(() => c.emit(EVENTS.PROJECT_METADATA_CHANGED, {}));
-    act(() => c.emit(EVENTS.TEMPLATE_APPLIED, {}));
-    act(() => c.emit(EVENTS.ELEMENT_EDIT_INLINE, { elementId: "e1" }));
+    act(() => c.emit(EVENTS.BRAND_APPLIED, undefined));
+    act(() => c.emit(EVENTS.PROJECT_CHANGED, { type: "page:created", page: { id: "p2" } }));
+    act(() => c.emit(EVENTS.ELEMENT_INSERTED, { elementId: "e1", blockId: "hero" }));
     act(() => c.emit(EVENTS.UI_TOGGLE_PREVIEW, {}));
     act(() => c.emit(EVENTS.SITE_PUBLISHED, { jobId: "j1" }));
 
-    expect(ids()).toEqual(["name-project", "pick-start", "edit-text", "preview", "publish"]);
+    expect(ids()).toEqual(["set-brand", "add-page", "insert-section", "preview", "publish"]);
   });
 
   it("pressing a step's CTA opens the door and credits NOTHING", () => {
     const c = fakeComposer();
     render(<OnboardingMount composer={c as never} />);
     act(() => lastChecklistProps!.onAction("trigger-publish"));
-    // The panel opens…
     expect(completeStep).not.toHaveBeenCalled();
-    // …and only a real deploy ticks the row.
     act(() => c.emit(EVENTS.SITE_PUBLISHED, { jobId: "j1" }));
     expect(ids()).toEqual(["publish"]);
   });
 
-  it("an inserted element's own default styles are not a style the user chose", () => {
-    // One drag emits four style:changed before its element:inserted. Both rows
-    // ticking off one drag is the same lie as neither.
+  it("a bare element drop is not a section", () => {
     const c = fakeComposer();
     render(<OnboardingMount composer={c as never} />);
-    act(() => {
-      c.emit(EVENTS.ELEMENT_INSERTED, { elementId: "el-new" });
-      c.emit(EVENTS.STYLE_CHANGED, { elementId: "el-new" });
-      c.emit(EVENTS.STYLE_CHANGED, { elementId: "el-new" });
-    });
-    act(() => vi.advanceTimersByTime(1000));
-    expect(ids()).toEqual(["add-element"]);
+    act(() => c.emit(EVENTS.ELEMENT_INSERTED, { elementId: "e1", type: "text" }));
+    act(() => c.emit(EVENTS.ELEMENT_INSERTED, { elementId: "e2", blockId: "button" }));
+    expect(completeStep).not.toHaveBeenCalled();
+    // The ElementManager path names a type, the registry path a blockId —
+    // either saying "section" counts.
+    act(() => c.emit(EVENTS.ELEMENT_INSERTED, { elementId: "e3", type: "section" }));
+    expect(ids()).toEqual(["insert-section"]);
   });
 
-  it("styling a DIFFERENT element during the window is still the user's work", () => {
-    /* The first guard was a global clock, so any style within 400ms of any
-       insert was suppressed — "insert one element, style another" could never
-       credit the row. Correlation is by element id now. */
+  it("a PROJECT_CHANGED that is not page:created credits nothing", () => {
     const c = fakeComposer();
     render(<OnboardingMount composer={c as never} />);
-    act(() => {
-      c.emit(EVENTS.ELEMENT_INSERTED, { elementId: "el-new" });
-      c.emit(EVENTS.STYLE_CHANGED, { elementId: "el-other" });
-    });
-    act(() => vi.advanceTimersByTime(1000));
-    expect(ids()).toEqual(["add-element", "change-style"]);
+    act(() => c.emit(EVENTS.PROJECT_CHANGED, { type: "page:activated" }));
+    act(() => c.emit(EVENTS.PROJECT_CHANGED, undefined));
+    expect(completeStep).not.toHaveBeenCalled();
   });
 
-  it("styling the element you just inserted still counts, once it is not a default", () => {
-    // Insert a heading, then change its font size a moment later. The defaults
-    // arrive inside the window; the deliberate change does not.
+  it("any review send ticks send-review; only an emailed one connects the client", () => {
     const c = fakeComposer();
     render(<OnboardingMount composer={c as never} />);
-    act(() => {
-      c.emit(EVENTS.ELEMENT_INSERTED, { elementId: "el-new" });
-      c.emit(EVENTS.STYLE_CHANGED, { elementId: "el-new" });
-    });
-    act(() => vi.advanceTimersByTime(1000));
-    act(() => c.emit(EVENTS.STYLE_CHANGED, { elementId: "el-new" }));
-    expect(ids()).toEqual(["add-element", "change-style"]);
-  });
-
-  it("the insert is judged against the style event's own clock, not the timer's", () => {
-    /* The first version of this guard asked "has it been longer than the grace
-       window since the last insert?" AT FIRE TIME — which compares the insert
-       against the timer's own delay, a quantity that is always at least the
-       grace window. It skipped correctly under frozen fake timers and credited
-       the row on every real drag. Fake timers cannot reproduce a millisecond of
-       scheduling jitter, so this pins the SEMANTIC instead: the insert is
-       compared to when the style fired.
-
-       Live is the verifier for the jitter itself — walked 2026-08-27: one drag
-       credits add-element and nothing else; a Font size change credits
-       change-style. */
-    const c = fakeComposer();
-    render(<OnboardingMount composer={c as never} />);
-    act(() => {
-      c.emit(EVENTS.STYLE_CHANGED, {});
-      c.emit(EVENTS.ELEMENT_INSERTED, {});
-    });
-    // Well past the window — the old fire-time comparison credited here.
-    act(() => vi.advanceTimersByTime(60_000));
-    expect(ids()).toEqual(["add-element"]);
-  });
-
-  it("a style change on its own still ticks, once the grace window passes", () => {
-    const c = fakeComposer();
-    render(<OnboardingMount composer={c as never} />);
-    act(() => c.emit(EVENTS.STYLE_CHANGED, {}));
-    act(() => vi.advanceTimersByTime(1000));
-    expect(ids()).toEqual(["change-style"]);
+    act(() => c.emit(EVENTS.REVIEW_SENT, { invitedEmail: null }));
+    expect(ids()).toEqual(["send-review"]);
+    act(() => c.emit(EVENTS.REVIEW_SENT, { invitedEmail: "client@site.io" }));
+    expect(ids()).toEqual(["send-review", "send-review", "connect-client"]);
   });
 
   it("credits nothing while a project is being imported", () => {
@@ -192,51 +144,62 @@ describe("OnboardingMount — outcomes, not intentions", () => {
     render(<OnboardingMount composer={c as never} />);
 
     act(() => c.emit(EVENTS.PROJECT_LOADED, { importing: true }));
-    act(() => c.emit(EVENTS.ELEMENT_INSERTED, {}));
-    act(() => c.emit(EVENTS.STYLE_CHANGED, {}));
-    act(() => vi.advanceTimersByTime(1000));
+    act(() => c.emit(EVENTS.PROJECT_CHANGED, { type: "page:created" }));
+    act(() => c.emit(EVENTS.ELEMENT_INSERTED, { blockId: "hero" }));
     expect(completeStep).not.toHaveBeenCalled();
 
     // The second PROJECT_LOADED — plain project data — ends the import.
     act(() => c.emit(EVENTS.PROJECT_LOADED, { pages: [] }));
-    act(() => c.emit(EVENTS.ELEMENT_INSERTED, {}));
-    expect(ids()).toContain("add-element");
+    act(() => c.emit(EVENTS.PROJECT_CHANGED, { type: "page:created" }));
+    expect(ids()).toContain("add-page");
   });
 
   describe("work finished before the editor opened", () => {
-    it("a named project with content seeds both rows", () => {
-      const c = fakeComposer({ name: "Bella Cucina", elements: ["e1"] });
+    it("a second page and a section seed their rows", () => {
+      const c = fakeComposer({ pages: 2, sectionTypes: ["container", "section"] });
       render(<OnboardingMount composer={c as never} />);
-      expect(ids()).toEqual(["name-project", "pick-start"]);
+      expect(ids()).toEqual(["add-page", "insert-section"]);
     });
 
-    it("a placeholder name is not a named project", () => {
-      const c = fakeComposer({ name: "Untitled site", elements: ["e1"] });
+    it("one page of bare elements seeds nothing", () => {
+      const c = fakeComposer({ pages: 1, sectionTypes: ["container", "text"] });
       render(<OnboardingMount composer={c as never} />);
-      expect(ids()).toEqual(["pick-start"]);
+      expect(ids()).toEqual([]);
     });
 
-    it("an empty canvas has no starting point yet", () => {
-      const c = fakeComposer({ name: "Bella Cucina" });
+    it("an existing round seeds send-review; its invite email seeds connect-client", async () => {
+      fetchCurrentRound.mockResolvedValue({ invitedEmail: "client@site.io" });
+      const c = fakeComposer();
       render(<OnboardingMount composer={c as never} />);
-      expect(ids()).toEqual(["name-project"]);
+      await waitFor(() => expect(ids()).toEqual(["send-review", "connect-client"]));
+    });
+
+    it("a round with no invite seeds only send-review", async () => {
+      fetchCurrentRound.mockResolvedValue({ invitedEmail: null });
+      const c = fakeComposer();
+      render(<OnboardingMount composer={c as never} />);
+      await waitFor(() => expect(ids()).toEqual(["send-review"]));
+    });
+
+    it("a failed round fetch seeds nothing and throws nothing", async () => {
+      fetchCurrentRound.mockRejectedValue(new Error("network"));
+      const c = fakeComposer();
+      render(<OnboardingMount composer={c as never} />);
+      await act(async () => {});
+      expect(completeStep).not.toHaveBeenCalled();
     });
 
     it("re-seeds when the project finally arrives, not just at mount", () => {
-      // The editor mounts before the project loads; seeding only at mount reads
-      // an empty composer and credits nothing, forever.
       const c = fakeComposer();
       render(<OnboardingMount composer={c as never} />);
       expect(completeStep).not.toHaveBeenCalled();
-      c.getProjectMetadata = () => ({ name: "Bella Cucina" });
+      c.elements.getAllPages = () => [{ id: "p0" }, { id: "p1" }];
       act(() => c.emit(EVENTS.PROJECT_LOADED, { pages: [] }));
-      expect(ids()).toEqual(["name-project"]);
+      expect(ids()).toEqual(["add-page"]);
     });
   });
 
   it("the checklist can be re-opened after it was skipped", () => {
-    // `replayAll` had no caller anywhere in the product: Skip was permanent and
-    // global — dismiss once and no site ever offered the checklist again.
     const c = fakeComposer();
     render(<OnboardingMount composer={c as never} />);
     act(() => c.emit(EVENTS.UI_ONBOARDING_REPLAY, {}));
@@ -251,7 +214,8 @@ describe("OnboardingMount — outcomes, not intentions", () => {
     unmount();
     for (const e of [
       EVENTS.ELEMENT_INSERTED,
-      EVENTS.STYLE_CHANGED,
+      EVENTS.PROJECT_CHANGED,
+      EVENTS.REVIEW_SENT,
       EVENTS.PROJECT_LOADED,
       EVENTS.UI_ONBOARDING_REPLAY,
     ]) {

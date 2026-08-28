@@ -400,7 +400,9 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
        The panel passes the round's own `invitedEmail`, so a re-send goes to
        whoever the round was sent to; an internal submit with no client still
        passes undefined and stays internal. */
-    return submitForReview(undefined, undefined, clientEmail, snapshotPages);
+    const outcome = await submitForReview(undefined, undefined, clientEmail, snapshotPages);
+    composer?.emit(EVENTS.REVIEW_SENT, { invitedEmail: clientEmail ?? null });
+    return outcome;
   }, [composer]);
 
   const requestPublish = React.useCallback(async () => {
@@ -477,7 +479,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           selectedElement={selectedElement}
           studioSyncStatus={state.syncStatus}
           issues={state.issues}
-          onInlinePreview={setPreviewHtml}
           onSetPreviewLoading={modals.setPreviewLoading}
           onSetExportLoading={modals.setExportLoading}
           // ✨ Ask AI → the AITab rail panel (single consolidated AI surface).

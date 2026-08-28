@@ -12,6 +12,7 @@
 import * as React from "react";
 import { ModalContent, ModalFooter, ModalRoot, ModalTitle, useToast, Button } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
+import { EVENTS } from "@/shared/constants/events";
 import { exportPublishPages, type PublishPage } from "../exportPublishPages";
 import {
   fetchApprovedSnapshot,
@@ -109,6 +110,7 @@ export const StaleApprovalModal: React.FC<StaleApprovalModalProps> = ({
         round?.invitedEmail ?? undefined,
         currentPages ?? undefined,
       );
+      composer?.emit(EVENTS.REVIEW_SENT, { invitedEmail: round?.invitedEmail ?? null });
       addToast({
         tone: "success",
         title: "Sent for approval",

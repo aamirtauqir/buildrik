@@ -47,7 +47,10 @@ vi.mock("../../exportPublishPages", () => ({
 import { ToastProvider } from "@/editor/chrome-ui";
 import { StaleApprovalModal } from "../StaleApprovalModal";
 
-const composer = {} as never;
+/* emit is real: a successful re-send announces REVIEW_SENT for the
+   onboarding checklist's send-review / connect-client wires. */
+const composerEmit = vi.fn();
+const composer = { emit: composerEmit } as never;
 
 function mount(over: Partial<React.ComponentProps<typeof StaleApprovalModal>> = {}) {
   return render(
@@ -91,6 +94,9 @@ describe("StaleApprovalModal", () => {
     const [, changeSummary, email] = submitForReview.mock.calls[0];
     expect(changeSummary).toBe("Re-send after 2 changes");
     expect(email).toBe("sara@client.example");
+    expect(composerEmit).toHaveBeenCalledWith("review:sent", {
+      invitedEmail: "sara@client.example",
+    });
     await waitFor(() => expect(onClose).toHaveBeenCalled());
   });
 

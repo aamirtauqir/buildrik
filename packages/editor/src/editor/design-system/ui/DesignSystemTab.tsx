@@ -506,6 +506,10 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
       allPresetRegistries.forEach((r) => r.markSaved());
       setShowReview(false);
       setIsFirstLoad(false);
+      /* Last line of the try, deliberately: every persist step above can still
+         throw into the catch, and a failed apply must not tick the "Set your
+         brand" onboarding step (codex, plan review 2026-08-28). */
+      composer.emit(EVENTS.BRAND_APPLIED, undefined);
       addToast({ description: "Design tokens applied successfully", tone: "success" });
     } catch {
       addToast({ description: "Failed to apply tokens. Try again.", tone: "error" });

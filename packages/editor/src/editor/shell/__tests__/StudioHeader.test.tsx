@@ -121,7 +121,6 @@ function makeProps(overrides: Partial<StudioHeaderProps> = {}): StudioHeaderProp
     onShowAI: vi.fn(),
     onShowExporter: vi.fn(),
     onSave: vi.fn(async () => "saved" as const),
-    onInlinePreview: vi.fn(),
     addToast: vi.fn(() => "id"),
     ...overrides,
   };
@@ -603,12 +602,19 @@ describe("StudioHeader", () => {
       },
     );
 
-    it("Quick preview in the bar opens the shell overlay — ⌘P is a different feature", async () => {
-      const onInlinePreview = vi.fn();
-      render(<StudioHeader {...makeProps({ ...menuProps, onInlinePreview })} />);
+    it("Quick preview in the bar emits the shell's toggle — one preview owner", async () => {
+      /* The bar used to build the HTML itself, which meant the onboarding
+         preview step never ticked on the most common path. It emits
+         UI_TOGGLE_PREVIEW now; the shell's handler builds and sanitizes. */
+      const emit = vi.fn();
+      const composer = {
+        on: vi.fn(), off: vi.fn(), emit,
+        getProjectMetadata: vi.fn(() => ({ name: "Acme" })),
+      } as unknown as StudioHeaderProps["composer"];
+      render(<StudioHeader {...makeProps({ ...menuProps, composer })} />);
       fireEvent.click(screen.getByRole("button", { name: "Quick preview" }));
-      // F7-B2: the export runs a tick later so the loading state can paint.
-      await waitFor(() => expect(onInlinePreview).toHaveBeenCalledTimes(1));
+      // F7-B2: the emit runs a tick later so the loading state can paint.
+      await waitFor(() => expect(emit).toHaveBeenCalledWith("ui:toggle:preview", {}));
     });
 
     it("the bar's Comments toggle emits the command and mirrors the state event", () => {
@@ -1055,25 +1061,24 @@ describe("F7 perf pair", () => {
     expect(screen.getByText("After")).toBeTruthy();
   });
 
-  it("the preview loading state paints before the export blocks the thread", () => {
+  it("the preview loading state paints before the toggle emit blocks the thread", () => {
     vi.useFakeTimers();
     try {
       const composer = makeComposer({ name: "Acme" });
+      const emitSpy = vi.spyOn(composer, "emit");
       const onSetPreviewLoading = vi.fn();
-      const onInlinePreview = vi.fn();
       render(
         <StudioHeader
-          {...makeProps({ composer: asComposer(composer), onSetPreviewLoading, onInlinePreview })}
+          {...makeProps({ composer: asComposer(composer), onSetPreviewLoading })}
         />,
       );
       fireEvent.click(screen.getByRole("button", { name: "Quick preview" }));
       expect(onSetPreviewLoading).toHaveBeenCalledWith(true);
-      expect(composer.exportHTML).not.toHaveBeenCalled();
+      expect(emitSpy).not.toHaveBeenCalledWith("ui:toggle:preview", {});
       act(() => {
         vi.runAllTimers();
       });
-      expect(composer.exportHTML).toHaveBeenCalledTimes(1);
-      expect(onInlinePreview).toHaveBeenCalledTimes(1);
+      expect(emitSpy).toHaveBeenCalledWith("ui:toggle:preview", {});
       expect(onSetPreviewLoading).toHaveBeenLastCalledWith(false);
     } finally {
       vi.useRealTimers();

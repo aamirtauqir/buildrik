@@ -133,43 +133,48 @@ describe("step items", () => {
   it("completed steps render struck-through; pending steps do not", () => {
     render(<OnboardingChecklist {...makeProps({ completedCount: 1, steps: stepsWithCompleted(1) })} />);
 
-    const doneLabel = screen.getByText("Name your project");
-    const pendingLabel = screen.getByText("Choose a starting point");
+    const doneLabel = screen.getByText("Set your brand");
+    const pendingLabel = screen.getByText("Add your first page");
     expect(doneLabel.className).toMatch(/tw:line-through/);
     expect(pendingLabel.className).toMatch(/tw:no-underline/);
     expect(pendingLabel.className).not.toMatch(/tw:line-through/);
   });
 
   it("active step row has aria-expanded=true and shows description + CTA", () => {
-    const props = makeProps({ activeStepId: "name-project" });
+    const props = makeProps({ activeStepId: "set-brand" });
     render(<OnboardingChecklist {...props} />);
 
-    const row = screen.getByRole("button", { name: "Name your project" });
+    const row = screen.getByRole("button", { name: "Set your brand" });
     expect(row).toHaveAttribute("aria-expanded", "true");
     expect(
-      screen.getByText(/Give your project a name/)
+      screen.getByText(/Apply your fonts and colors/)
     ).toBeInTheDocument();
 
     // CTA fires onAction with the step's actionKey
-    fireEvent.click(screen.getByRole("button", { name: /Open settings/ }));
-    expect(props.onAction).toHaveBeenCalledWith("open-project-name");
+    fireEvent.click(screen.getByRole("button", { name: /Open Brand panel/ }));
+    expect(props.onAction).toHaveBeenCalledWith("open-brand");
   });
 
   it("steps without actionKey render no CTA button when expanded", () => {
-    // "edit-text" has neither actionKey nor actionLabel.
-    render(<OnboardingChecklist {...makeProps({ activeStepId: "edit-text" })} />);
-    expect(screen.getByText(/Double-click any text element/)).toBeInTheDocument();
+    /* Every v5 default step has a CTA, so the no-CTA branch is pinned with a
+       synthetic step — the component contract, not the current list. */
+    const steps = [
+      { id: "quiet", label: "Quiet step", description: "No door to open.", completed: false },
+      ...DEFAULT_ONBOARDING_STEPS.slice(1),
+    ];
+    render(<OnboardingChecklist {...makeProps({ steps, activeStepId: "quiet" })} />);
+    expect(screen.getByText(/No door to open/)).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Open/ })).not.toBeInTheDocument();
   });
 
   it("clicking an inactive step expands it; clicking the active step collapses it", () => {
-    const props = makeProps({ activeStepId: "name-project" });
+    const props = makeProps({ activeStepId: "set-brand" });
     render(<OnboardingChecklist {...props} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Choose a starting point" }));
-    expect(props.onSetActiveStepId).toHaveBeenCalledWith("pick-start");
+    fireEvent.click(screen.getByRole("button", { name: "Add your first page" }));
+    expect(props.onSetActiveStepId).toHaveBeenCalledWith("add-page");
 
-    fireEvent.click(screen.getByRole("button", { name: "Name your project" }));
+    fireEvent.click(screen.getByRole("button", { name: "Set your brand" }));
     expect(props.onSetActiveStepId).toHaveBeenCalledWith(null);
   });
 
@@ -177,13 +182,13 @@ describe("step items", () => {
     render(
       <OnboardingChecklist
         {...makeProps({
-          activeStepId: "name-project",
+          activeStepId: "set-brand",
           completedCount: 1,
           steps: stepsWithCompleted(1),
         })}
       />
     );
-    expect(screen.queryByText(/Give your project a name/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Apply your fonts and colors/)).not.toBeInTheDocument();
   });
 });
 

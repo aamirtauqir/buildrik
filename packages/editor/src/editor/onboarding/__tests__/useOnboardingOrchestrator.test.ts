@@ -59,7 +59,7 @@ describe("persisted-state schema v3 migration", () => {
 
   it("older-schema (v2) progress is discarded and version bumped to v3", () => {
     // Old payload claims two steps completed — must NOT survive the migration.
-    seedProgress(["name-project", "pick-start"], 2);
+    seedProgress(["set-brand", "add-page"], 2);
 
     const { result } = renderHook(() => useOnboardingOrchestrator());
 
@@ -84,14 +84,14 @@ describe("persisted-state schema v3 migration", () => {
   });
 
   it("v3 progress with matching ids restores completed flags", () => {
-    seedProgress(["name-project", "add-element"]);
+    seedProgress(["set-brand", "insert-section"]);
 
     const { result } = renderHook(() => useOnboardingOrchestrator());
 
     expect(result.current.completedCount).toBe(2);
-    expect(result.current.steps.find((s) => s.id === "name-project")?.completed).toBe(true);
-    expect(result.current.steps.find((s) => s.id === "add-element")?.completed).toBe(true);
-    expect(result.current.steps.find((s) => s.id === "pick-start")?.completed).toBe(false);
+    expect(result.current.steps.find((s) => s.id === "set-brand")?.completed).toBe(true);
+    expect(result.current.steps.find((s) => s.id === "insert-section")?.completed).toBe(true);
+    expect(result.current.steps.find((s) => s.id === "add-page")?.completed).toBe(false);
   });
 
   it("v3 progress restores label/description from DEFAULTS, not from storage", () => {
@@ -106,7 +106,7 @@ describe("persisted-state schema v3 migration", () => {
         DEFAULT_ONBOARDING_STEPS.map((s) => ({
           ...s,
           label: "STALE LABEL",
-          completed: s.id === "name-project",
+          completed: s.id === "set-brand",
         }))
       )
     );
@@ -175,6 +175,16 @@ describe("persisted-state schema v3 migration", () => {
 // ─── Phase loading + legacy migration ─────────────────────────────────
 
 describe("phase loading + legacy value migration", () => {
+  /* Stamp the CURRENT schema version first: since v5 the migration wipes
+     phase/dismiss state stored under an older version (see the wipe suite
+     below), so these tests pin phase semantics for a current-version user. */
+  beforeEach(() => {
+    localStorage.setItem(
+      STORAGE_KEYS.ONBOARDING_SCHEMA_VERSION,
+      String(ONBOARDING_SCHEMA_VERSION)
+    );
+  });
+
   it("fresh storage → phase 'active'", () => {
     const { result } = renderHook(() => useOnboardingOrchestrator());
     expect(result.current.phase).toBe("active");
@@ -208,13 +218,55 @@ describe("phase loading + legacy value migration", () => {
   });
 });
 
+// ─── v4 → v5 wipe (codex blocking finding, 2026-08-28) ────────────────
+
+describe("a schema bump resets phase and dismissal, not just progress", () => {
+  /* v5 changed what the seven steps ARE. Clearing only progress left a v4
+     user whose phase said "done" permanently done — the agency-framed list
+     would never show. The migration wipes the whole story. */
+  it("a v4 user who finished or skipped comes back 'active' with a fresh list", () => {
+    localStorage.setItem(STORAGE_KEYS.ONBOARDING_SCHEMA_VERSION, "4");
+    localStorage.setItem(STORAGE_KEYS.ONBOARDING_PHASE, "done");
+    localStorage.setItem(STORAGE_KEYS.ONBOARDING_DISMISSED, "true");
+    localStorage.setItem("aquibra-onboarding-dismissed", "true");
+    localStorage.setItem(
+      STORAGE_KEYS.ONBOARDING_PROGRESS,
+      JSON.stringify(DEFAULT_ONBOARDING_STEPS.map((s) => ({ ...s, completed: true })))
+    );
+
+    const { result } = renderHook(() => useOnboardingOrchestrator());
+
+    expect(result.current.phase).toBe("active");
+    expect(result.current.completedCount).toBe(0);
+    expect(localStorage.getItem(STORAGE_KEYS.ONBOARDING_DISMISSED)).toBeNull();
+    expect(localStorage.getItem("aquibra-onboarding-dismissed")).toBeNull();
+    expect(localStorage.getItem(STORAGE_KEYS.ONBOARDING_SCHEMA_VERSION)).toBe(
+      String(ONBOARDING_SCHEMA_VERSION)
+    );
+  });
+
+  it("the wipe is idempotent — a second load in the same session keeps state", () => {
+    localStorage.setItem(STORAGE_KEYS.ONBOARDING_SCHEMA_VERSION, "4");
+    localStorage.setItem(STORAGE_KEYS.ONBOARDING_PHASE, "done");
+
+    const first = renderHook(() => useOnboardingOrchestrator());
+    act(() => first.result.current.completeStep("set-brand"));
+    first.unmount();
+
+    // StrictMode / remount: the version now matches, so nothing is wiped.
+    const second = renderHook(() => useOnboardingOrchestrator());
+    expect(second.result.current.completedCount).toBe(1);
+    expect(second.result.current.phase).toBe("active");
+  });
+});
+
 // ─── Step completion + progression ────────────────────────────────────
 
 describe("step completion + progression", () => {
   it("starts with activeStepId on the first incomplete step", () => {
-    seedProgress(["name-project"]);
+    seedProgress(["set-brand"]);
     const { result } = renderHook(() => useOnboardingOrchestrator());
-    expect(result.current.activeStepId).toBe("pick-start");
+    expect(result.current.activeStepId).toBe("add-page");
   });
 
   it("all steps complete in storage → activeStepId is null", () => {
@@ -227,17 +279,17 @@ describe("step completion + progression", () => {
   it("completeStep marks the step, persists progress, advances activeStepId", () => {
     const { result } = renderHook(() => useOnboardingOrchestrator());
 
-    act(() => result.current.completeStep("name-project"));
+    act(() => result.current.completeStep("set-brand"));
 
     expect(result.current.steps[0].completed).toBe(true);
     expect(result.current.completedCount).toBe(1);
-    expect(result.current.activeStepId).toBe("pick-start");
+    expect(result.current.activeStepId).toBe("add-page");
 
     const persisted = JSON.parse(
       localStorage.getItem(STORAGE_KEYS.ONBOARDING_PROGRESS)!
     ) as Array<{ id: string; completed: boolean }>;
-    expect(persisted.find((s) => s.id === "name-project")?.completed).toBe(true);
-    expect(persisted.find((s) => s.id === "pick-start")?.completed).toBe(false);
+    expect(persisted.find((s) => s.id === "set-brand")?.completed).toBe(true);
+    expect(persisted.find((s) => s.id === "add-page")?.completed).toBe(false);
   });
 
   /* Both calls sit inside ONE act(). Every other case in this file gives each
@@ -252,56 +304,56 @@ describe("step completion + progression", () => {
     const { result } = renderHook(() => useOnboardingOrchestrator());
 
     act(() => {
-      result.current.completeStep("add-element");
-      result.current.completeStep("edit-text");
+      result.current.completeStep("insert-section");
+      result.current.completeStep("connect-client");
     });
 
     expect(result.current.completedCount).toBe(2);
-    expect(result.current.steps.find((s) => s.id === "add-element")?.completed).toBe(true);
-    expect(result.current.steps.find((s) => s.id === "edit-text")?.completed).toBe(true);
+    expect(result.current.steps.find((s) => s.id === "insert-section")?.completed).toBe(true);
+    expect(result.current.steps.find((s) => s.id === "connect-client")?.completed).toBe(true);
 
     const persisted = JSON.parse(
       localStorage.getItem(STORAGE_KEYS.ONBOARDING_PROGRESS)!
     ) as Array<{ id: string; completed: boolean }>;
-    expect(persisted.find((s) => s.id === "add-element")?.completed).toBe(true);
-    expect(persisted.find((s) => s.id === "edit-text")?.completed).toBe(true);
+    expect(persisted.find((s) => s.id === "insert-section")?.completed).toBe(true);
+    expect(persisted.find((s) => s.id === "connect-client")?.completed).toBe(true);
   });
 
   /* replayAll writes stepsRef too. It used to self-heal through the render-time
      assignment; without this the first completion after a replay would resurrect
      the pre-replay list. */
   it("a completion right after replayAll starts from the fresh list", () => {
-    seedProgress(["name-project", "pick-start", "add-element"]);
+    seedProgress(["set-brand", "add-page", "insert-section"]);
     const { result } = renderHook(() => useOnboardingOrchestrator());
     expect(result.current.completedCount).toBe(3);
 
     act(() => {
       result.current.replayAll();
-      result.current.completeStep("add-element");
+      result.current.completeStep("insert-section");
     });
 
     expect(result.current.completedCount).toBe(1);
-    expect(result.current.steps.find((s) => s.id === "name-project")?.completed).toBe(false);
+    expect(result.current.steps.find((s) => s.id === "set-brand")?.completed).toBe(false);
   });
 
   it("completeStep skips over already-completed steps when advancing", () => {
-    seedProgress(["pick-start"]);
+    seedProgress(["add-page"]);
     const { result } = renderHook(() => useOnboardingOrchestrator());
 
-    // Completing step 0 must land on step 2 ("add-element"), not the
-    // already-done "pick-start".
-    act(() => result.current.completeStep("name-project"));
-    expect(result.current.activeStepId).toBe("add-element");
+    // Completing step 0 must land on step 2 ("insert-section"), not the
+    // already-done "add-page".
+    act(() => result.current.completeStep("set-brand"));
+    expect(result.current.activeStepId).toBe("insert-section");
   });
 
   it("completeStep on an already-completed step is a no-op (no achievement fired)", () => {
     const { result } = renderHook(() => useOnboardingOrchestrator());
 
-    act(() => result.current.completeStep("name-project"));
+    act(() => result.current.completeStep("set-brand"));
     act(() => vi.advanceTimersByTime(ACHIEVEMENT_AUTO_DISMISS_MS));
     expect(result.current.achievement).toBeNull();
 
-    act(() => result.current.completeStep("name-project"));
+    act(() => result.current.completeStep("set-brand"));
 
     expect(result.current.achievement).toBeNull();
     expect(result.current.completedCount).toBe(1);
@@ -332,7 +384,7 @@ describe("step completion + progression", () => {
   });
 
   it("replayAll resets steps, phase, activeStepId, and un-minimizes", () => {
-    seedProgress(["name-project", "pick-start"]);
+    seedProgress(["set-brand", "add-page"]);
     localStorage.setItem(STORAGE_KEYS.ONBOARDING_PHASE, "done");
     const { result } = renderHook(() => useOnboardingOrchestrator());
     expect(result.current.phase).toBe("done");
@@ -341,7 +393,7 @@ describe("step completion + progression", () => {
 
     expect(result.current.phase).toBe("active");
     expect(result.current.completedCount).toBe(0);
-    expect(result.current.activeStepId).toBe("name-project");
+    expect(result.current.activeStepId).toBe("set-brand");
     expect(result.current.isMinimized).toBe(false);
     expect(localStorage.getItem(STORAGE_KEYS.ONBOARDING_PROGRESS)).toBeNull();
     expect(localStorage.getItem(STORAGE_KEYS.ONBOARDING_PHASE)).toBe("active");
@@ -377,19 +429,19 @@ describe("achievement 4-second auto-dismiss", () => {
   it("completeStep raises an achievement with completed/next/isLastStep payload", () => {
     const { result } = renderHook(() => useOnboardingOrchestrator());
 
-    act(() => result.current.completeStep("name-project"));
+    act(() => result.current.completeStep("set-brand"));
 
     expect(result.current.achievement).not.toBeNull();
-    expect(result.current.achievement?.completedStep.id).toBe("name-project");
+    expect(result.current.achievement?.completedStep.id).toBe("set-brand");
     expect(result.current.achievement?.completedStep.completed).toBe(true);
-    expect(result.current.achievement?.nextStep?.id).toBe("pick-start");
+    expect(result.current.achievement?.nextStep?.id).toBe("add-page");
     expect(result.current.achievement?.isLastStep).toBe(false);
   });
 
   it("achievement survives 3999ms and auto-dismisses at exactly 4000ms", () => {
     const { result } = renderHook(() => useOnboardingOrchestrator());
 
-    act(() => result.current.completeStep("name-project"));
+    act(() => result.current.completeStep("set-brand"));
 
     act(() => vi.advanceTimersByTime(ACHIEVEMENT_AUTO_DISMISS_MS - 1));
     expect(result.current.achievement).not.toBeNull();
@@ -403,14 +455,14 @@ describe("achievement 4-second auto-dismiss", () => {
   it("completing another step within the window resets the 4s timer", () => {
     const { result } = renderHook(() => useOnboardingOrchestrator());
 
-    act(() => result.current.completeStep("name-project"));
+    act(() => result.current.completeStep("set-brand"));
     act(() => vi.advanceTimersByTime(2000));
-    act(() => result.current.completeStep("pick-start"));
+    act(() => result.current.completeStep("add-page"));
 
     // 3999ms after the SECOND completion (5999ms total) — still visible,
     // and showing the second step.
     act(() => vi.advanceTimersByTime(ACHIEVEMENT_AUTO_DISMISS_MS - 1));
-    expect(result.current.achievement?.completedStep.id).toBe("pick-start");
+    expect(result.current.achievement?.completedStep.id).toBe("add-page");
 
     act(() => vi.advanceTimersByTime(1));
     expect(result.current.achievement).toBeNull();
@@ -436,7 +488,7 @@ describe("achievement 4-second auto-dismiss", () => {
   it("manual dismissAchievement clears immediately and cancels the timer", () => {
     const { result } = renderHook(() => useOnboardingOrchestrator());
 
-    act(() => result.current.completeStep("name-project"));
+    act(() => result.current.completeStep("set-brand"));
     act(() => result.current.dismissAchievement());
 
     expect(result.current.achievement).toBeNull();
