@@ -229,7 +229,7 @@ export function StockBrowserOverlay({
           testid="stock-filter-orientation"
         />
         <FilterDropdown
-          label="Colour"
+          label="Color"
           value={color}
           options={COLORS}
           onPick={(c) => {

@@ -117,7 +117,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer, onDirtyCha
             type="text"
             value={siteName}
             onChange={(e) => { setSiteName(e.target.value); identity.markDirty(); }}
-            placeholder="My Awesome Site"
+            placeholder="Bella Cucina"
           />
         </Field>
         <Field label="Favicon URL">

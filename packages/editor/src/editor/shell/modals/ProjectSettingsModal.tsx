@@ -140,7 +140,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
               type="text"
               value={projectName}
               onChange={(e) => setProjectName(e.target.value)}
-              placeholder="My Awesome Project"
+              placeholder="Bella Cucina"
             />
 
             <label className={FIELD_LABEL} htmlFor="ps-author">Author / description</label>

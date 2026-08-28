@@ -255,7 +255,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
             Cancel
           </Button>
           <Button onClick={handleSubmit} disabled={!name.trim() || isCreating}>
-            {isCreating ? "Creating..." : "Create Component"}
+            {isCreating ? "Creating..." : "Create component"}
           </Button>
         </ModalFooter>
       </ModalContent>

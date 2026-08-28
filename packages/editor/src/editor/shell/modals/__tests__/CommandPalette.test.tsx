@@ -80,13 +80,13 @@ describe("CommandPalette", () => {
       }
       // Representative hardcoded entries (id → label):
       // nav-add → "Open Insert panel", edit-undo → "Undo",
-      // view-zoom-in → "Zoom In", history-clear → "Clear History".
+      // view-zoom-in → "Zoom in", history-clear → "Clear history".
       // "Delete element" is deliberately NOT here any more: it comes from the
       // registry, which this stub composer does not have.
       expect(screen.getByText("Open Insert panel")).toBeInTheDocument();
       expect(screen.queryByText("Delete element")).toBeNull();
-      expect(screen.getByText("Zoom In")).toBeInTheDocument();
-      expect(screen.getByText("Clear History")).toBeInTheDocument();
+      expect(screen.getByText("Zoom in")).toBeInTheDocument();
+      expect(screen.getByText("Clear history")).toBeInTheDocument();
       // The list even hardcodes Undo twice (edit-undo + history-undo).
       expect(screen.getByText("Undo")).toBeInTheDocument();
       expect(screen.getByText("Undo last action")).toBeInTheDocument();
@@ -111,8 +111,8 @@ describe("CommandPalette", () => {
       fireEvent.change(searchInput(), { target: { value: "zoom" } });
       const labels = commandButtons().map((b) => b.textContent);
       expect(labels).toHaveLength(2);
-      expect(labels[0]).toContain("Zoom In");
-      expect(labels[1]).toContain("Zoom Out");
+      expect(labels[0]).toContain("Zoom in");
+      expect(labels[1]).toContain("Zoom out");
     });
 
     it("matches against the group name too", () => {
@@ -121,7 +121,7 @@ describe("CommandPalette", () => {
       // Both History-group commands match via group text.
       const labels = commandButtons().map((b) => b.textContent ?? "");
       expect(labels.some((l) => l.includes("Undo last action"))).toBe(true);
-      expect(labels.some((l) => l.includes("Clear History"))).toBe(true);
+      expect(labels.some((l) => l.includes("Clear history"))).toBe(true);
     });
 
     it("is case-insensitive and trims", () => {

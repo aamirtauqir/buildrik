@@ -1,5 +1,5 @@
 /* @lint-hex-policy: component-theme
-   "Template applied!" success banner uses a slightly brighter emerald than
+   "Template applied." success banner uses a slightly brighter emerald than
    canonical --buildrick-success — intentional tonal choice for the post-apply
    celebration state. */
 
@@ -45,7 +45,7 @@ export const InspectorEmptyState: React.FC<InspectorEmptyStateProps> = ({
     return (
       <div role="status" aria-live="polite" className={CONTAINER}>
         <div className={APPLIED_BANNER}>
-          <h3 className={`${TITLE} tw:mb-1 tw:text-[var(--bk-success)]`}>Template applied!</h3>
+          <h3 className={`${TITLE} tw:mb-1 tw:text-[var(--bk-success)]`}>Template applied.</h3>
           {/* was color: var(--bk-success-tint) — a BACKGROUND tone used as text,
               i.e. pale green on pale green. The name was barely readable. */}
           <p className={`${DESCRIPTION} tw:mb-3 tw:text-gray-900`}>

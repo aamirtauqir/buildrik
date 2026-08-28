@@ -32,7 +32,7 @@ import {
 import { TokenRow } from "../sections/TokenRow";
 import type { LintIssue } from "../../../../engine/designSystem/LintState";
 import type { Composer } from "../../../../engine/Composer";
-import { Button, TextInput } from "@/editor/chrome-ui";
+import { Button, EmptyState, TextInput } from "@/editor/chrome-ui";
 
 export interface ColorTokenListProps {
   tokens: DesignToken[];
@@ -420,14 +420,26 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
             <>
               <div className="tw:text-xs tw:text-gray-500" data-testid="color-empty-mode">
                 Beginner mode is hiding {hiddenByModeCount}{" "}
-                {hiddenByModeCount === 1 ? "colour" : "colours"}.
+                {hiddenByModeCount === 1 ? "color" : "colors"}.
               </div>
               <div className="tw:mt-1 tw:text-[11px] tw:text-gray-500">
                 They are primitives. Switch to Pro to see them.
               </div>
             </>
           ) : (
-            <div className="tw:text-xs tw:text-gray-500">No colours yet.</div>
+            /* "No colors yet." was a bare line with no door — the one rule
+               the shared EmptyState states for itself (audits 2026-08-28).
+               American spelling per the copy rule. */
+            <EmptyState
+              size="sm"
+              align="start"
+              body="No colors yet."
+              action={
+                <Button variant="link" size="xs" onClick={onAddToken}>
+                  + Add a color
+                </Button>
+              }
+            />
           )}
         </div>
       )}
@@ -439,7 +451,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
           return (
             <div key={group.key} data-group={group.key}>
               <GroupHeader
-                label={group.key === "brand" ? "Brand colour" : group.label}
+                label={group.key === "brand" ? "Brand color" : group.label}
                 mini={mini}
                 subtext={group.subtext}
               />

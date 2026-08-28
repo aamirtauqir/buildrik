@@ -64,13 +64,13 @@ describe("ColorTokenList — row stack (T4)", () => {
     expect(onRowClick).toHaveBeenCalledWith("color-primary");
   });
 
-  it("groups tokens by their `group` field — brand renders as 'Brand colour' header", () => {
+  it("groups tokens by their `group` field — brand renders as 'Brand color' header", () => {
     const tokens = [
       makeToken("color-primary", "Primary", "#2D6DFF", "brand"),
       makeToken("color-bg", "Background", "#F8FAFC", "surface"),
     ];
     const { getByText } = render(<ColorTokenList tokens={tokens} {...baseProps} />);
-    expect(getByText("Brand colour")).toBeTruthy();
+    expect(getByText("Brand color")).toBeTruthy();
     expect(getByText("Surface")).toBeTruthy();
   });
 

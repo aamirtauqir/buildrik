@@ -13,6 +13,8 @@ export type EmptyStateSize = "compact" | "sm" | "md";
 export interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
   /** compact/sm are for inline slots; md is the full-panel state. */
   size?: EmptyStateSize;
+  /** centered card (default) or the boards' left-anchored top block. */
+  align?: "center" | "start";
   /** Optional when the caller composes EmptyStateTitle/Desc/Actions itself. */
   title?: string;
   body?: string;
@@ -47,8 +49,17 @@ export function EmptyStateActions({ className, children, ...rest }: React.HTMLAt
 }
 
 const BASE =
-  "tw:flex tw:flex-col tw:items-center tw:justify-center tw:text-center " +
+  "tw:flex tw:flex-col " +
   "tw:[font-family:var(--bk-font-ui)] tw:text-[length:var(--bk-text-13)] tw:text-[var(--bk-ink-soft)]";
+
+/** Two alignment languages ship (audits 2026-08-28): the centered card and
+ *  the newer boards' left-anchored top-of-panel block. Both are THIS
+ *  component now — the third/fourth/fifth hand-rolled variants have no
+ *  reason left to exist. */
+const ALIGN = {
+  center: "tw:items-center tw:justify-center tw:text-center",
+  start: "tw:items-start tw:text-left",
+};
 
 /** md and the collapsed compact/sm bucket each supply their OWN gap+padding
  *  (never both at once in the same composed string) — same no-two-classes-
@@ -58,9 +69,9 @@ const SIZE = {
   sm: "tw:gap-1 tw:py-4 tw:px-3",
 };
 
-export function EmptyState({ size = "md", title, body, icon, action, className, children, ...rest }: EmptyStateProps) {
+export function EmptyState({ size = "md", align = "center", title, body, icon, action, className, children, ...rest }: EmptyStateProps) {
   return (
-    <div className={[BASE, size !== "md" ? SIZE.sm : SIZE.md, className].filter(Boolean).join(" ")} {...rest}>
+    <div className={[BASE, ALIGN[align], size !== "md" ? SIZE.sm : SIZE.md, className].filter(Boolean).join(" ")} {...rest}>
       {icon ? <span aria-hidden="true">{icon}</span> : null}
       {title ? <span className={TITLE_CLASS}>{title}</span> : null}
       {body ? <span className={BODY_CLASS}>{body}</span> : null}

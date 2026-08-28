@@ -141,19 +141,26 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
 
   if (state.components.length === 0) {
     if (compactMode) {
+      /* Was bare unstyled markup — the audits' "fifth empty-state language".
+         The shared EmptyState is the only one. */
       return (
-        <div>
-          <span>No components saved yet</span>
-          {onCreateNew && (
-            <Button
-             
-              onClick={onCreateNew}
-              title="Right-click any element to save as component"
-            >
-              + New
-            </Button>
-          )}
-        </div>
+        <EmptyState
+          size="sm"
+          align="start"
+          body="No components saved yet."
+          action={
+            onCreateNew && (
+              <Button
+                variant="link"
+                size="xs"
+                onClick={onCreateNew}
+                title="Right-click any element to save as component"
+              >
+                + New
+              </Button>
+            )
+          }
+        />
       );
     }
     return (

@@ -32,15 +32,15 @@ describe("ColorTokenList — which empty is it", () => {
   it("blames the mode when the mode is what emptied it", () => {
     render(<ColorTokenList {...base} tokens={[]} hiddenByModeCount={9} />);
     expect(screen.getByTestId("color-empty-mode")).toBeInTheDocument();
-    expect(screen.getByText(/Beginner mode is hiding 9 colours/)).toBeInTheDocument();
+    expect(screen.getByText(/Beginner mode is hiding 9 colors/)).toBeInTheDocument();
     // And it says how to get out, not just what is wrong.
     expect(screen.getByText(/Switch to Pro/)).toBeInTheDocument();
     expect(screen.queryByText(/No colors match/)).toBeNull();
   });
 
-  it("says colour, singular, when it is hiding one", () => {
+  it("says color, singular, when it is hiding one", () => {
     render(<ColorTokenList {...base} tokens={[]} hiddenByModeCount={1} />);
-    expect(screen.getByText(/hiding 1 colour\./)).toBeInTheDocument();
+    expect(screen.getByText(/hiding 1 color\./)).toBeInTheDocument();
   });
 
   // The search box is the component's own state, so the query is typed, not passed.
@@ -54,7 +54,7 @@ describe("ColorTokenList — which empty is it", () => {
 
   it("says neither when the library is simply empty", () => {
     render(<ColorTokenList {...base} tokens={[]} hiddenByModeCount={0} />);
-    expect(screen.getByText(/No colours yet\./)).toBeInTheDocument();
+    expect(screen.getByText(/No colors yet\./)).toBeInTheDocument();
   });
 
   it("renders no empty state at all when there are tokens", () => {

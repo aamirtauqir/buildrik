@@ -116,21 +116,21 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
     },
     {
       id: "view-zoom-in",
-      label: "Zoom In",
+      label: "Zoom in",
       group: "View",
       shortcut: "Ctrl++",
       handler: () => { composer.emit(EVENTS.ZOOM_IN, {}); onClose(); },
     },
     {
       id: "view-zoom-out",
-      label: "Zoom Out",
+      label: "Zoom out",
       group: "View",
       shortcut: "Ctrl+-",
       handler: () => { composer.emit(EVENTS.ZOOM_OUT, {}); onClose(); },
     },
     {
       id: "view-fit",
-      label: "Fit to View",
+      label: "Fit to view",
       group: "View",
       shortcut: "Ctrl+0",
       handler: () => { composer.emit(EVENTS.ZOOM_FIT, {}); onClose(); },
@@ -150,7 +150,7 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
     },
     {
       id: "history-clear",
-      label: "Clear History",
+      label: "Clear history",
       group: "History",
       handler: () => { composer.emit(EVENTS.HISTORY_CLEARED, undefined); onClose(); },
     }
