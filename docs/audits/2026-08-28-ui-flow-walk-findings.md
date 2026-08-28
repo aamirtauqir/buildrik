@@ -11,11 +11,22 @@ difference, logged) · CODE-AHEAD (live richer than the board) · STATIC
 (no live door; source compared, never claimed as a walk) · DECISION (board and
 code disagree on something only the founder can settle).
 
+**Board-authority closure** (the rows where the census says the BOARD is the
+contract): 815:4518 shortcuts search — fixed · 814:7027 undo-toast reverse
+action — fixed · 807:8069 breakpoint bar — walked, MATCH · 307:2193/2203/2213
+review gates — walked, verbs match · **813:4870 session-expired
+unsaved-warning — OPEN, the one board-authority row live does not satisfy**
+(see S1). Everything else in the 92 carries code/walked/founder authority and
+is cited to its arc below. NOT verified live this arc: the S2 generation
+states (AI dead in dev), the 294:* error states (static cites only), and the
+canvas interaction states re-cited from 08-21/08-22.
+
 ## Fixed during the walk
 
 | Fix | Board | Evidence |
 |---|---|---|
 | Shortcuts overlay search — board draws "Search shortcuts…", live had 61 rows and no filter | 815:4518 | live: query "undo" filters 61 → 2 lines; filter matches the DISPLAYED chord (⌘ on Mac), not just the stored one; empty groups drop their headings |
+| Undo/redo toast reverse-action link was gated on destructive labels; board puts it on every variant | 814:7027 | live: ⌘D→⌘Z shows "↩ Undo · Duplicate · Redo", ⌘⇧Z the mirror; empty stack keeps the grey no-action "Nothing to undo" (`8c558483`) |
 
 ## S7 · Settings (14 boards)
 
@@ -64,8 +75,47 @@ code disagree on something only the founder can settle).
   Page 5, which was deleted and the fixture re-verified at 4 pages.
 - **Loading skeleton: MATCH** — captured accidentally when a probe fired
   early: drawer skeleton rows, inspector skeleton, "Loading…" footer.
-- **Save indicator, session/network/crash states: STATIC + prior-arc cites**
-  (SaveStatus five states carried by earlier live arcs).
+- **Save indicator (813:4836): MATCH.** All five board states ship in
+  chrome-ui `SaveStatus` ("Autosave has five truths"): Saving… · Saved just
+  now · Saved Xm ago (minute tick) · Unsaved changes · Save failed — retry.
+  "● Saved · just now" observed live in this walk's topbar screenshots.
+- **Templates drawer (807:4299): MATCH, walked live.** Site menu → Templates
+  opens the drawer: search, All / Site Pages / Sections / My Templates chips,
+  10 cards with thumbnails and Free/Pro labels, pagination, expand-to-full-page
+  glyph. The previous "door didn't open" reading was the probe, not the
+  product — `clickMenuRow` (rig trap 7) opens it every time.
+- **Template preview (813:4489 / S1.1e): MATCH per census authority.** Card
+  click opens the preview modal — rendered visual, "3 sections · Free", the
+  honest consequence line ("Applying replaces the content of Home. Your
+  version history keeps the previous state."), Cancel / Apply template. Board
+  draws it full-page; census settled this row as `code:state-exists` (modal
+  form). Apply was NOT clicked; fixture untouched.
+- **Read-only view (813:4676): code wins, verified live.** `?view=readonly`
+  strips rail, drawer, inspector and Publish; topbar reduces to "‹ Back to
+  editing" + title + lifecycle pill + comments/notifications. That is the
+  founder call of 2026-08-23 recorded in `editorViewMode.ts`, and the census
+  row already says `code:state-exists`. The board still draws full chrome plus
+  a "You have view-only access…" role banner — a superseded concept
+  (redraw candidate, not a code issue).
+- **Session-expired with unsaved changes (813:4870): DRIFT — the one open
+  board-authority row.** The census marks the BOARD as authority, and live
+  does not match it: a mid-session 401 on save produces only a toast
+  ("Session expired / Sign in again to save your changes. Keep this tab
+  open."). The board draws a blocking surface: lock icon, "You have unsaved
+  changes. Sign in to recover your work.", an itemized "3 unsaved changes at
+  risk" list, and "Changes are cached locally. Sign in within 24h to recover."
+  Two of those copy claims are behaviour claims the code does not make — the
+  sibling crash-recovery board (297:2027) was already ruled `code:copy-wins`
+  for exactly this kind of promise. DECISION: build the warning surface with
+  copy that matches the real recovery mechanism, or re-authority this row to
+  match its sibling. Not an inline fix.
+- **First-run coach mark: DECISION.** 297:1972 (coach-dismissed) is live by
+  vacancy — no coach mark exists anywhere in the code (`Got it`, "Everything
+  you build lives behind these six" — zero hits), so the *dismissed* state is
+  simply the default screen. The S1.1b/c routes the coach's buttons open are
+  live and walked. Whether the coach itself ships is a product call.
+- **Session/network/crash states (294:*, 297:2027/2139): prior-arc cites**
+  (`code:cites-board` in the census; crash-recovery walked 2026-08-25).
 
 ## S3 canvas (17 boards)
 
@@ -75,6 +125,19 @@ code disagree on something only the founder can settle).
   a scored "Needs work · 30" readiness meter the board never drew.
 - **Breakpoint bar / breadcrumb / context menu:** walked this arc (walkthrough
   doc + Copy link walk) — MATCH.
+- **Undo/redo toast catalog (814:7027): MATCH after one fix.** All six variants
+  ship in `useHistoryFeedback` (five since the 08-25 arc, the grey
+  "Nothing to undo" in `fd39fb00`); the one delta was the reverse-action link
+  appearing only on destructive labels — fixed and live-verified this walk.
+  A walker's warning: a first grep for this hook missed it (searched "toast"
+  near HISTORY_* in the wrong shapes) and nearly filed the whole catalog as
+  absent. Grep both the event name AND the hook-file convention before calling
+  a feature missing.
+- **Canvas interaction states (301:1979/2186/2393, 807:7301, 815:4608,
+  807:8663): prior-arc cites.** Dragging, pick-mode, inline-edit, drop
+  indicators, smart guides and the mobile device frame were all live-walked in
+  the 08-21/08-22 arcs (snap-to-grid, drag-slot arithmetic, inline-edit via
+  keystrokes); census carries `code:state-exists` on each. Not re-walked.
 
 ## S5 review (23 boards)
 
