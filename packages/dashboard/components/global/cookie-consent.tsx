@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import { Shield } from "lucide-react";
 import { ToggleSwitch } from "flowbite-react";
 import { Button, Modal } from "@/components/dashboard/primitives";
@@ -43,11 +44,24 @@ export function CookieConsent() {
   const [show, setShow] = useState(false);
   const [showManage, setShowManage] = useState(false);
   const [analytics, setAnalytics] = useState(true);
+  const pathname = usePathname();
+
+  /* Not inside the editor workspace. The banner is fixed over the bottom of
+     the viewport — in /edit that is the status footer (save state, setup
+     chip, zoom), which it covered entirely for anyone who hadn't answered
+     consent yet (walked live 2026-08-28). The editor sits behind auth; the
+     dashboard pages the user necessarily passed through carry the banner. */
+  const inEditor = pathname?.startsWith("/edit/") ?? false;
 
   useEffect(() => {
+    if (inEditor) {
+      // Entering /edit with the banner already up (client-side nav) hides it.
+      setShow(false);
+      return;
+    }
     const consent = getConsentCookie();
     if (!consent) setShow(true);
-  }, []);
+  }, [inEditor]);
 
   const saveConsent = (choice: string) => {
     const analyticsEnabled =
@@ -87,7 +101,7 @@ export function CookieConsent() {
     };
   }, [show, showManage]);
 
-  if (!show) return null;
+  if (inEditor || !show) return null;
 
   if (showManage) {
     return (
