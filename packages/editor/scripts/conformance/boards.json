@@ -1629,7 +1629,7 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — Notifications · unread: panel 360 wide; day section headers (AUG 21 / AUG 20) at x1 and relative times ('9 days ago') right-aligned ~x280. Board groups under one Section header instance and shows a short time ('2h') at x312 — the shape matches, the time format and grouping differ",
       "recipe": null
     },
     {
@@ -3818,7 +3818,7 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — Issues · all: panel 360 wide, title x17 y13 — matches. The filter head rendered as TWO lines ('All' y50, '· 2' y82) because the label is a block-level Button and the count a sibling span with no flex on the container; board draws one string 'All · 3'. FIXED, re-measured on one line and confirmed by eye. Remaining drift: issue subtitle x51 vs board x32; ✕ at x316 y6 vs board x332 y14",
       "recipe": null
     },
     {

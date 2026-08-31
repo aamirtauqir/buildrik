@@ -60,7 +60,13 @@ const TONE: Record<Issue["type"], { icon: React.ReactNode; className: string }> 
 };
 
 const BODY = "tw:flex tw:flex-col tw:h-full tw:min-h-0";
-const SUMMARY = "tw:text-xs tw:text-[var(--bk-ink-muted)] tw:px-3 tw:py-1.5";
+/* ONE line. Boards 164:2 / 164:22 head the list with a single string —
+   "All · 3" — but the label is a flowbite Button (block-level) and the count a
+   sibling span, so with no flex here they stacked: measured live, "All" at
+   y50 and "· 2" at y82, leaving the count orphaned on its own line where it
+   reads as stray punctuation. */
+const SUMMARY =
+  "tw:flex tw:items-center tw:text-xs tw:text-[var(--bk-ink-muted)] tw:px-3 tw:py-1.5";
 const SCROLL = "tw:flex-1 tw:min-h-0 tw:overflow-y-auto tw:pt-1 tw:px-3 tw:pb-3";
 /** The fixing / fix-failed bands differ only by tint. */
 const BAND = "tw:px-3 tw:py-2.5 tw:border-b tw:border-[var(--bk-gray-200)]";
