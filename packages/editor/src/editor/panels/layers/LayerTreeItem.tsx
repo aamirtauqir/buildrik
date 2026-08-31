@@ -90,9 +90,12 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
   const isEditing = editingId === layer.id;
   const isCanvasHovered = canvasHoveredId === layer.id;
   const LayerGlyph = getElementIcon(layer.type);
-  const displayName =
-    customNames.get(layer.id) ||
-    (ELEMENT_TYPE_LABELS[layer.type] ?? layer.type.charAt(0).toUpperCase() + layer.type.slice(1));
+  /* A rename always wins; otherwise a text layer shows its own copy and
+     everything else its type label. Twelve rows reading "Heading" named
+     nothing — the words on the page are what a designer is looking for. */
+  const typeLabel =
+    ELEMENT_TYPE_LABELS[layer.type] ?? layer.type.charAt(0).toUpperCase() + layer.type.slice(1);
+  const displayName = customNames.get(layer.id) || layer.preview || typeLabel;
   const canDrag = !!(composer && layer.depth > 0 && !isLocked);
 
   // Board 1082:4739 (Layers · component-instance): a diamond badge sits

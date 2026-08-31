@@ -71,11 +71,26 @@ export function useLayerTree(
       return;
     }
 
+    /* Text-ish layers carry the first words of their own copy — see
+       LayerItem.preview. Only these types: a container's "content" is its
+       children's text concatenated, which would make every wrapper row read
+       like the page. Tags stripped, because content can hold inline HTML. */
+    const PREVIEWABLE = new Set([
+      "text", "heading", "paragraph", "button", "link", "label", "quote", "list-item",
+    ]);
+    const previewOf = (element: Element): string | undefined => {
+      if (!PREVIEWABLE.has(element.getType())) return undefined;
+      const raw = (element.getContent?.() ?? "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+      if (!raw) return undefined;
+      return raw.length > 32 ? `${raw.slice(0, 32)}…` : raw;
+    };
+
     const buildTree = (element: Element, depth = 0): LayerItem => ({
       id: element.getId(),
       type: element.getType() || "element",
       tagName: (element.getTagName() || "div").toLowerCase(),
       depth,
+      preview: previewOf(element),
       isComponent: element.isComponentInstance(),
       children: element.getChildren().map((child: Element) => buildTree(child, depth + 1)),
     });

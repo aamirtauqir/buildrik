@@ -39,6 +39,11 @@ export interface LayerItem {
   isHidden?: boolean;
   isLocked?: boolean;
   customName?: string;
+  /** First words of the element's own text, for TEXT-ish layers only. A tree
+   *  of twelve rows reading "Heading" tells a designer nothing about which
+   *  heading is which (designer walk 2026-08-28); the copy is the identity.
+   *  Never overrides a custom name. */
+  preview?: string;
   /** Whether this layer is a component instance */
   isComponent?: boolean;
   /** Breakpoint-specific visibility overrides */
