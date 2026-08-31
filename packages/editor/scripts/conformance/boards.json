@@ -485,7 +485,7 @@
       "width": 1440,
       "height": 500,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — toolbar states: 6 of 7 toggles on the bar, all chords honoured; Comments has no bar control (chord works, lives in topbar); active pill grey vs board blue",
       "recipe": null
     },
     {
@@ -496,7 +496,7 @@
       "width": 900,
       "height": 480,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — zoom flyout: all 5 chords correct; presets right-aligned where the board left-aligns; active preset grey vs board pale-blue",
       "recipe": null
     },
     {
@@ -507,7 +507,7 @@
       "width": 640,
       "height": 420,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — CmdK ai-offer: the full-width tinted band is missing and the modal collapses to 210px vs the board's fixed 420",
       "recipe": null
     },
     {
@@ -518,7 +518,7 @@
       "width": 640,
       "height": 420,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — CmdK disabled-command: reason text is inline after the label, board uses a fixed column; two duplicate Undo rows (hardcoded + registry)",
       "recipe": null
     },
     {
@@ -529,7 +529,7 @@
       "width": 640,
       "height": 420,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — CmdK empty: modal 560x450 vs 640x420; renders all 55 commands where the board shows a short head; chord chip reads ⌘+I vs board ⌘I",
       "recipe": null
     },
     {
@@ -540,7 +540,7 @@
       "width": 640,
       "height": 420,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — CmdK no-results: left-aligned (board centres); 'Ask AI instead' is a tinted pill with an emoji where the board draws a plain blue link",
       "recipe": null
     },
     {
@@ -551,7 +551,7 @@
       "width": 640,
       "height": 420,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — CmdK results: band order reversed — live GO TO → ACTIONS, board ACTIONS → GO TO",
       "recipe": null
     },
     {
@@ -716,7 +716,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — collection: reached by creating one; drift — back row / +Add 40h (FIXED to 32 via LINK_BTN), inset 12 vs 16",
       "recipe": null
     },
     {
@@ -727,7 +727,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — conditions: empty-state copy matches; populated rows NOT reached (needs a canvas element pick)",
       "recipe": null
     },
     {
@@ -738,7 +738,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — data-sources: row 64=64, green dot and note copy all match — MATCH",
       "recipe": null
     },
     {
@@ -749,7 +749,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — Content empty: MATCH",
       "recipe": null
     },
     {
@@ -760,7 +760,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — fields: field row 64 vs board 44 (Row size='comment' is 64 min-height but the boards use three different two-line heights)",
       "recipe": null
     },
     {
@@ -771,7 +771,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — Content load-error: reached via a 500 on the cms.collections.list batch; copy and x/y exact",
       "recipe": null
     },
     {
@@ -782,7 +782,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — Content loading: reached by delaying the batch; within 2-4px throughout",
       "recipe": null
     },
     {
@@ -793,7 +793,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — record: toggle 44x24 exact; back row 40h; field inputs NOT verified (0-field collection)",
       "recipe": null
     },
     {
@@ -804,7 +804,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — Content root: section bands lose their tint (the panel's OWN skeleton passes tint and matches the board) and rows carry no leading glyph, so data landing reflows 18px — the exact thing the skeleton exists to prevent",
       "recipe": null
     },
     {
@@ -826,7 +826,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — variables: var row 64 vs 44, same Row-size cause as fields",
       "recipe": null
     },
     {
@@ -3400,7 +3400,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "code:unverified-2026-08-31 — reaching 'applying' requires actually applying a template, which replaces the fixture page",
       "recipe": null
     },
     {
@@ -3411,7 +3411,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "open:no-section-catalog",
+      "authority": "walked:2026-08-31 — gallery: card geometry exact (130h, thumb 288x88); thumb rendered SQUARE because tw:rounded-6 compiles to nothing — FIXED to rounded-md + gated",
       "recipe": null
     },
     {
@@ -3422,7 +3422,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — load-error: line rhythm 22px matches; drift — inset 16 vs 24 and top-pad 12 where sibling states use 20",
       "recipe": null
     },
     {
@@ -3444,7 +3444,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — no-results: message→button delta 26px matches; drift — text inset 16 vs board 24",
       "recipe": null
     },
     {
@@ -3455,7 +3455,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — preview modal: 720 wide at x360 exact; drift — preview iframe 260h vs board 320",
       "recipe": null
     },
     {
@@ -3675,7 +3675,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "code:unreachable-2026-08-31 — the template catalog is a static array, so the empty branch cannot fire live",
       "recipe": null
     },
     {
@@ -3928,7 +3928,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — data · no-source: copy exact; drawn as a full-width empty state rather than the board's pill",
       "recipe": null
     },
     {
@@ -3939,7 +3939,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — data · watching: green pill real (140 vs 146 wide); board pill has a border, live does not",
       "recipe": null
     },
     {
@@ -4346,7 +4346,7 @@
       "width": 480,
       "height": 140,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — replace-confirm: backup checkbox defaulted OFF against a board that draws it checked — FIXED to ON + test; footer buttons 40h (board's 27 is a compressed schematic)",
       "recipe": null
     },
     {
@@ -4357,7 +4357,7 @@
       "width": 1068,
       "height": 102,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "code:unreachable-2026-08-31 — needs newPageMode, a prop that only the Pages › New page route supplies",
       "recipe": null
     },
     {
@@ -4368,7 +4368,7 @@
       "width": 460,
       "height": 142,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "code:unreachable-2026-08-31 — the ⌘K door does not surface 'Save page as template'; the palette answers 'That isn't a command' for the exact registered label. Chain is wired (useCanvasCommandPalette → useEditorEventListeners → StudioModals); cause unverified",
       "recipe": null
     },
     {
@@ -4379,7 +4379,7 @@
       "width": 380,
       "height": 139,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "code:unreachable-2026-08-31 — the usage-drawer door is gated on a usage count and nothing was applied on the fixture",
       "recipe": null
     },
     {
@@ -4390,7 +4390,7 @@
       "width": 500,
       "height": 407,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — collection-setup modal: 560 wide vs 500, inputs 42 vs 29, field rows 42 vs 25; dynamic-pages block expands to ~192px where the board draws 49",
       "recipe": null
     },
     {
@@ -4401,7 +4401,7 @@
       "width": 640,
       "height": 222,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — records modal: 720 wide vs 640; adds a collection select the board lacks; thead 32 vs 20",
       "recipe": null
     },
     {
@@ -4566,7 +4566,7 @@
       "width": 720,
       "height": 36,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — breadcrumb bar: live prints ← Parent / → Child and BOTH WORK; the board's Alt+↑/Alt+↓ are dead — the board is stale here, not the code",
       "recipe": null
     },
     {
@@ -4588,7 +4588,7 @@
       "width": 605,
       "height": 33,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — inline-edit toolbar: bar 903x34 vs board 605x33 and FOUR of 18 controls render past the canvas column, focusable but unclickable; font-size select shows 10px on a 16px paragraph (legacy execCommand index)",
       "recipe": null
     },
     {
@@ -4599,7 +4599,7 @@
       "width": 402,
       "height": 238,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — context-menu anatomy: structure matches 1:1; all four submenu chords the board prints are absent from insertActions.ts; rows 40h vs 27",
       "recipe": null
     },
     {
@@ -4610,7 +4610,7 @@
       "width": 980,
       "height": 145,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:2026-08-31 — hover levels: all four reproduced (dashed+pill+handle · solid+breadcrumb · box model + InfoBadge · green ⊕) — MATCH",
       "recipe": null
     },
     {
@@ -4621,7 +4621,7 @@
       "width": 520,
       "height": 426,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — canvas palette: 'Zoom to Fit ⌘0' was a wrong chord — FIXED to ⌘1; 19 Title Case labels FIXED to sentence case; highlight indexes the sorted array while the list renders grouped, so Enter on open runs the wrong command (NOT fixed)",
       "recipe": null
     },
     {
